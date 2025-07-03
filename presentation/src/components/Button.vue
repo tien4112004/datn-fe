@@ -50,23 +50,24 @@ const handleClick = () => {
 
 <style lang="scss" scoped>
 .button {
-  height: 32px;
-  line-height: 32px;
+  height: fit-content;
+  min-height: 32px;
+  //   line-height: 32px;
   outline: 0;
   font-size: 13px;
-  padding: 0 15px;
+  padding: 4px 15px;
   text-align: center;
   color: $textColor;
   border-radius: $borderRadius;
   user-select: none;
-  letter-spacing: 1px;
+  //   letter-spacing: 1px;
   cursor: pointer;
 
   &.small {
     height: 24px;
     line-height: 24px;
     padding: 0 7px;
-    letter-spacing: 0;
+    // letter-spacing: 0;
     font-size: 12px;
   }
 

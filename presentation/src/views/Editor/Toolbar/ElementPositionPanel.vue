@@ -2,20 +2,32 @@
   <div class="element-positopn-panel">
     <div class="title">Layer:</div>
     <ButtonGroup class="row">
-      <Button style="flex: 1" @click="orderElement(handleElement!, ElementOrderCommands.TOP)"
-        ><IconSendToBack class="btn-icon" /> Bring to Front</Button
-      >
-      <Button style="flex: 1" @click="orderElement(handleElement!, ElementOrderCommands.BOTTOM)"
-        ><IconBringToFrontOne class="btn-icon" /> Send to Back</Button
-      >
+      <Button style="flex: 1" @click="orderElement(handleElement!, ElementOrderCommands.TOP)">
+        <div class="center">
+          <IconSendToBack class="btn-icon" />
+          <p>Bring to Front</p>
+        </div>
+      </Button>
+      <Button style="flex: 1" @click="orderElement(handleElement!, ElementOrderCommands.BOTTOM)">
+        <div class="center">
+          <IconBringToFrontOne class="btn-icon" />
+          <p>Send to Back</p>
+        </div>
+      </Button>
     </ButtonGroup>
     <ButtonGroup class="row">
-      <Button style="flex: 1" @click="orderElement(handleElement!, ElementOrderCommands.UP)"
-        ><IconBringToFront class="btn-icon" /> Move Up</Button
-      >
-      <Button style="flex: 1" @click="orderElement(handleElement!, ElementOrderCommands.DOWN)"
-        ><IconSentToBack class="btn-icon" /> Move Down</Button
-      >
+      <Button style="flex: 1" @click="orderElement(handleElement!, ElementOrderCommands.UP)">
+        <div class="center">
+          <IconBringToFront class="btn-icon" />
+          <p>Move Up</p>
+        </div>
+      </Button>
+      <Button style="flex: 1" @click="orderElement(handleElement!, ElementOrderCommands.DOWN)">
+        <div class="center">
+          <IconSentToBack class="btn-icon" />
+          <p>Move Down</p>
+        </div>
+      </Button>
     </ButtonGroup>
 
     <Divider />
@@ -60,31 +72,36 @@
     </ButtonGroup>
 
     <Divider />
+    <div class="title">Properties:</div>
 
     <div class="row">
+      <div style="width: 45%">Horizontal:</div>
       <NumberInput
         :min="-1000"
         :step="5"
         :value="left"
         @update:value="(value) => updateLeft(value)"
-        style="width: 45%"
+        style="width: 100%"
       >
-        <template #prefix> Horizontal: </template>
+        <template #placeholder>Input horizontal</template>
       </NumberInput>
-      <div style="width: 10%"></div>
+    </div>
+    <div class="row">
+      <div style="width: 45%">Vertical:</div>
       <NumberInput
         :min="-1000"
         :step="5"
         :value="top"
         @update:value="(value) => updateTop(value)"
-        style="width: 45%"
+        style="width: 100%"
       >
-        <template #prefix> Vertical: </template>
+        <template #placeholder>Input vertical</template>
       </NumberInput>
     </div>
 
     <template v-if="handleElement!.type !== 'line'">
       <div class="row">
+        <div style="width: 45%">Width:</div>
         <NumberInput
           :min="minSize"
           :max="1500"
@@ -92,27 +109,30 @@
           :disabled="isVerticalText"
           :value="width"
           @update:value="(value) => updateWidth(value)"
-          style="width: 45%"
+          style="width: 100%"
         >
-          <template #prefix> Width: </template>
+          <template #placeholder>Input width</template>
         </NumberInput>
-        <template v-if="['image', 'shape', 'audio'].includes(handleElement!.type)">
-          <IconLock
-            style="width: 10%"
-            class="icon-btn active"
-            v-tooltip="'Unlock Aspect Ratio'"
-            @click="updateFixedRatio(false)"
-            v-if="fixedRatio"
-          />
-          <IconUnlock
-            style="width: 10%"
-            class="icon-btn"
-            v-tooltip="'Lock Aspect Ratio'"
-            @click="updateFixedRatio(true)"
-            v-else
-          />
-        </template>
-        <div style="width: 10%" v-else></div>
+      </div>
+      <template v-if="['image', 'shape', 'audio'].includes(handleElement!.type)">
+        <IconLock
+          style="width: 10%"
+          class="icon-btn active"
+          v-tooltip="'Unlock Aspect Ratio'"
+          @click="updateFixedRatio(false)"
+          v-if="fixedRatio"
+        />
+        <IconUnlock
+          style="width: 10%"
+          class="icon-btn"
+          v-tooltip="'Lock Aspect Ratio'"
+          @click="updateFixedRatio(true)"
+          v-else
+        />
+      </template>
+      <div style="width: 10%" v-else></div>
+      <div class="row">
+        <div style="width: 45%">Height:</div>
         <NumberInput
           :min="minSize"
           :max="800"
@@ -120,9 +140,9 @@
           :disabled="isHorizontalText || handleElement!.type === 'table'"
           :value="height"
           @update:value="(value) => updateHeight(value)"
-          style="width: 45%"
+          style="width: 100%"
         >
-          <template #prefix> Height: </template>
+          <template #placeholder>Input height</template>
         </NumberInput>
       </div>
     </template>
@@ -365,5 +385,12 @@ const updateRotate45 = (command: '+' | '-') => {
     background-color: #efefef;
     border-radius: $borderRadius;
   }
+}
+.center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 1px;
 }
 </style>

@@ -18,7 +18,7 @@
           <template v-for="key in animationTypes">
             <div :class="['animation-pool', key]" :key="key" v-if="activeTab === key">
               <div class="pool-type" :key="effect.name" v-for="effect in animations[key]">
-                <div class="type-title">{{ effect.name }}：</div>
+                <div class="type-title">{{ effect.name }}:</div>
                 <div class="pool-item-wrapper">
                   <div
                     class="pool-item"
@@ -443,15 +443,17 @@ $attentionColor: #e8b76a;
   @include flex-grid-layout();
 }
 .pool-item {
-  @include flex-grid-layout-children(4, 24%);
-
+  @include flex-grid-layout-children(4, 23.5%);
   margin-bottom: 5px;
-  height: 40px;
-  line-height: 40px;
   text-align: center;
   cursor: pointer;
 }
 .animation-box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 45px;
+  line-height: 16px;
   background-color: $lightGray;
   border-radius: $borderRadius;
 }

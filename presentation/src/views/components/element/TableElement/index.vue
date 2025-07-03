@@ -37,7 +37,7 @@
             v-if="handleElementId === elementInfo.id"
             :style="{ transform: `scale(${1 / canvasScale})` }"
           >
-            双击编辑
+            Double-click to edit
           </div>
         </div>
       </div>

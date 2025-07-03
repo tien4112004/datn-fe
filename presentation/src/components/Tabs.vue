@@ -60,6 +60,8 @@ const emit = defineEmits<{
   display: flex;
   user-select: none;
   line-height: 1;
+  padding-bottom: 4px;
+  overflow-x: auto;
 
   &:not(.card) {
     font-size: 13px;

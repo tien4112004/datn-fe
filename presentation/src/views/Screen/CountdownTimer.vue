@@ -1,5 +1,5 @@
 <template>
-  <MoveablePanel class="countdown-timer" :width="180" :height="110" :left="left" :top="top">
+  <MoveablePanel class="countdown-timer" :width="220" :height="120" :left="left" :top="top">
     <div class="header">
       <span class="text-btn" @click="toggle()">{{ inTiming ? 'Pause' : 'Start' }}</span>
       <span class="text-btn" @click="reset()">Reset</span>
@@ -137,13 +137,13 @@ const changeTime = (e: FocusEvent | KeyboardEvent, type: 'minute' | 'second') =>
 }
 .header {
   height: 16px;
-  font-size: 13px;
+  font-size: 14px;
   margin-bottom: 16px;
   display: flex;
   align-items: center;
 
   .text-btn {
-    margin-right: 8px;
+    margin-right: 12px;
     cursor: pointer;
 
     &:hover,
@@ -154,7 +154,8 @@ const changeTime = (e: FocusEvent | KeyboardEvent, type: 'minute' | 'second') =>
 }
 .content {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
+  gap: 10px;
   padding: 0 5px;
 }
 .timer {

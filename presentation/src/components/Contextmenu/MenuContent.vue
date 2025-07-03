@@ -127,7 +127,8 @@ $subMenuWidth: 120px;
     opacity: 0.6;
   }
   .sub-menu {
-    width: $subMenuWidth;
+    width: fit-content;
+    min-width: $subMenuWidth;
     position: absolute;
     display: none;
     left: 112%;

@@ -87,7 +87,7 @@
             end: handleLineElement.start,
           })
         "
-        ><IconSwitch /> Swap Direction</Button
+        ><IconSwitch /> Flip Direction</Button
       >
     </div>
 

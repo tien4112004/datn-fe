@@ -175,6 +175,15 @@
       </div>
       <div class="row">
         <div style="width: 40%">Theme Color:</div>
+        <Popover trigger="click" style="width: 60%">
+          <template #content>
+            <ColorPicker
+              :modelValue="theme.color"
+              @update:modelValue="(value) => updateTheme({ color: value })"
+            />
+          </template>
+          <ColorButton :color="theme.color" />
+        </Popover>
       </div>
     </template>
   </div>

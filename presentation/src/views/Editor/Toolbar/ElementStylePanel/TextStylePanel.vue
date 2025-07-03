@@ -17,14 +17,14 @@
     <Divider />
 
     <div class="row">
-      <div style="width: 40%">行间距：</div>
+      <div style="width: 40%">Line Spacing:</div>
       <Select
         style="width: 60%"
         :value="lineHeight || 1"
         @update:value="(value) => updateLineHeight(value as number)"
         :options="
           lineHeightOptions.map((item) => ({
-            label: item + '倍',
+            label: item + 'x',
             value: item,
           }))
         "
@@ -35,7 +35,7 @@
       </Select>
     </div>
     <div class="row">
-      <div style="width: 40%">段间距：</div>
+      <div style="width: 40%">Paragraph Spacing:</div>
       <Select
         style="width: 60%"
         :value="paragraphSpace || 0"
@@ -53,7 +53,7 @@
       </Select>
     </div>
     <div class="row">
-      <div style="width: 40%">字间距：</div>
+      <div style="width: 40%">Word Spacing:</div>
       <Select
         style="width: 60%"
         :value="wordSpace || 0"
@@ -71,7 +71,7 @@
       </Select>
     </div>
     <div class="row">
-      <div style="width: 40%">文本框填充：</div>
+      <div style="width: 40%">Textbox Fill:</div>
       <Popover trigger="click" style="width: 60%">
         <template #content>
           <ColorPicker :modelValue="fill" @update:modelValue="(value) => updateFill(value)" />
@@ -107,11 +107,11 @@ import Divider from '@/components/Divider.vue';
 import Select from '@/components/Select.vue';
 import Popover from '@/components/Popover.vue';
 
-// 注意，存在一个未知原因的BUG，如果文本加粗后文本框高度增加，画布的可视区域定位会出现错误
-// 因此在执行预置样式命令时，将加粗命令放在尽可能靠前的位置，避免字号增大后再加粗
+// Note: There is an unknown bug where increasing the height of the text box after bolding text causes incorrect canvas viewport positioning.
+// Therefore, when executing preset style commands, place the bold command as early as possible to avoid bolding after increasing font size.
 const presetStyles = [
   {
-    label: '大标题',
+    label: 'Large Title',
     style: {
       fontSize: '26px',
       fontWeight: 700,
@@ -124,7 +124,7 @@ const presetStyles = [
     ],
   },
   {
-    label: '小标题',
+    label: 'Small Title',
     style: {
       fontSize: '22px',
       fontWeight: 700,
@@ -137,21 +137,21 @@ const presetStyles = [
     ],
   },
   {
-    label: '正文',
+    label: 'Body Text',
     style: {
       fontSize: '20px',
     },
     cmd: [{ command: 'clear' }, { command: 'fontsize', value: '20px' }],
   },
   {
-    label: '正文[小]',
+    label: 'Body Text [Small]',
     style: {
       fontSize: '18px',
     },
     cmd: [{ command: 'clear' }, { command: 'fontsize', value: '18px' }],
   },
   {
-    label: '注释 1',
+    label: 'Note 1',
     style: {
       fontSize: '16px',
       fontStyle: 'italic',
@@ -159,7 +159,7 @@ const presetStyles = [
     cmd: [{ command: 'clear' }, { command: 'fontsize', value: '16px' }, { command: 'em' }],
   },
   {
-    label: '注释 2',
+    label: 'Note 2',
     style: {
       fontSize: '16px',
       textDecoration: 'underline',

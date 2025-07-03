@@ -32,6 +32,7 @@
 </template>
 
 <script lang="ts" setup>
+// Import necessary modules and components
 import type { Ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useMainStore, useSlidesStore } from '@/store';
@@ -50,6 +51,7 @@ const handleVideoElement = handleElement as Ref<PPTVideoElement>;
 
 const { addHistorySnapshot } = useHistorySnapshot();
 
+// Update video properties
 const updateVideo = (props: Partial<PPTVideoElement>) => {
   if (!handleElement.value) return;
   slidesStore.updateElement({ id: handleElement.value.id, props });

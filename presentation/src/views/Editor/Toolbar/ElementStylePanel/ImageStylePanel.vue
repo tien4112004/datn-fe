@@ -6,12 +6,12 @@
 
     <ButtonGroup class="row" passive>
       <Button first style="width: calc(100% / 6 * 5)" @click="clipImage()"
-        ><IconTailoring class="btn-icon" /> 裁剪图片</Button
+        ><IconTailoring class="btn-icon" /> Crop Image</Button
       >
       <Popover trigger="click" v-model:value="clipPanelVisible" style="width: calc(100% / 6)">
         <template #content>
           <div class="clip">
-            <div class="title">按形状：</div>
+            <div class="title">By Shape:</div>
             <div class="shape-clip">
               <div
                 class="shape-clip-item"
@@ -24,7 +24,7 @@
             </div>
 
             <template v-for="typeItem in ratioClipOptions" :key="typeItem.label">
-              <div class="title" v-if="typeItem.label">按{{ typeItem.label }}：</div>
+              <div class="title" v-if="typeItem.label">By {{ typeItem.label }}:</div>
               <ButtonGroup class="row">
                 <Button
                   style="flex: 1"
@@ -42,7 +42,7 @@
     </ButtonGroup>
 
     <div class="row">
-      <div style="width: 40%">圆角半径：</div>
+      <div style="width: 40%">Border Radius:</div>
       <NumberInput
         :value="handleImageElement.radius || 0"
         @update:value="(value) => updateImage({ radius: value })"
@@ -61,11 +61,11 @@
     <Divider />
 
     <FileInput @change="(files) => replaceImage(files)">
-      <Button class="full-width-btn"><IconTransform class="btn-icon" /> 替换图片</Button>
+      <Button class="full-width-btn"><IconTransform class="btn-icon" /> Replace Image</Button>
     </FileInput>
-    <Button class="full-width-btn" @click="resetImage()"><IconUndo class="btn-icon" /> 重置样式</Button>
+    <Button class="full-width-btn" @click="resetImage()"><IconUndo class="btn-icon" /> Reset Style</Button>
     <Button class="full-width-btn" @click="setBackgroundImage()"
-      ><IconTheme class="btn-icon" /> 设为背景</Button
+      ><IconTheme class="btn-icon" /> Set as Background</Button
     >
   </div>
 </template>

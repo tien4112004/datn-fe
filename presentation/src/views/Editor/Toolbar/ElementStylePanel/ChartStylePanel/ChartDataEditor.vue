@@ -62,7 +62,7 @@
 
     <div class="btns">
       <div class="left">
-        图表类型：{{ CHART_TYPE_MAP[chartType] }}
+        Chart Type: {{ CHART_TYPE_MAP[chartType] }}
         <Popover trigger="click" placement="top" v-model:value="chartTypeSelectVisible">
           <template #content>
             <PopoverMenuItem
@@ -76,13 +76,13 @@
               >{{ CHART_TYPE_MAP[item] }}</PopoverMenuItem
             >
           </template>
-          <span class="change">点击更换</span>
+          <span class="change">Click to Change</span>
         </Popover>
       </div>
       <div class="right">
-        <Button class="btn" @click="closeEditor()">取消</Button>
-        <Button class="btn" @click="clear()">清空数据</Button>
-        <Button type="primary" class="btn" @click="getTableData()">确认</Button>
+        <Button class="btn" @click="closeEditor()">Cancel</Button>
+        <Button class="btn" @click="clear()">Clear Data</Button>
+        <Button type="primary" class="btn" @click="getTableData()">Confirm</Button>
       </div>
     </div>
   </div>
@@ -202,6 +202,10 @@ onUnmounted(() => {
 });
 
 // 获取当前图表DOM中的数据，整理格式化后传递出去
+// First row is series name, first column is item name, actual data starts from the second row and second column
+// Some special chart types require separate data handling
+// Scatter charts have only two columns of data
+// Pie and ring charts have only one column of data
 const getTableData = () => {
   const [col, row] = selectedRange.value;
 
@@ -209,15 +213,14 @@ const getTableData = () => {
   let legends: string[] = [];
   let series: number[][] = [];
 
-  // 第一行为系列名，第一列为项目名，实际数据从第二行第二列开始
   for (let rowIndex = 1; rowIndex < row; rowIndex++) {
-    let labelsItem = `类别${rowIndex}`;
+    let labelsItem = `Category ${rowIndex}`;
     const labelInputRef = document.querySelector(`#cell-${rowIndex}-0`) as HTMLInputElement;
     if (labelInputRef && labelInputRef.value) labelsItem = labelInputRef.value;
     labels.push(labelsItem);
   }
   for (let colIndex = 1; colIndex < col; colIndex++) {
-    let legendsItem = `系列${colIndex}`;
+    let legendsItem = `Series ${colIndex}`;
     const labelInputRef = document.querySelector(`#cell-0-${colIndex}`) as HTMLInputElement;
     if (labelInputRef && labelInputRef.value) legendsItem = labelInputRef.value;
     legends.push(legendsItem);

@@ -1,13 +1,13 @@
 <template>
   <div class="latex-style-panel">
     <div class="row">
-      <Button style="flex: 1" @click="latexEditorVisible = true">编辑 LaTeX</Button>
+      <Button style="flex: 1" @click="latexEditorVisible = true">Edit LaTeX</Button>
     </div>
 
     <Divider />
 
     <div class="row">
-      <div style="width: 40%">颜色：</div>
+      <div style="width: 40%">Color:</div>
       <Popover trigger="click" style="width: 60%">
         <template #content>
           <ColorPicker
@@ -19,7 +19,7 @@
       </Popover>
     </div>
     <div class="row">
-      <div style="width: 40%">粗细：</div>
+      <div style="width: 40%">Thickness:</div>
       <NumberInput
         :min="1"
         :max="3"
@@ -45,6 +45,7 @@
 </template>
 
 <script lang="ts" setup>
+// Import necessary modules and components
 import { onUnmounted, ref, type Ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useMainStore, useSlidesStore } from '@/store';
@@ -70,12 +71,14 @@ const latexEditorVisible = ref(false);
 
 const { addHistorySnapshot } = useHistorySnapshot();
 
+// Update LaTeX properties
 const updateLatex = (props: Partial<PPTLatexElement>) => {
   if (!handleElement.value) return;
   slidesStore.updateElement({ id: handleElement.value.id, props });
   addHistorySnapshot();
 };
 
+// Update LaTeX data
 const updateLatexData = (data: { path: string; latex: string; w: number; h: number }) => {
   updateLatex({
     path: data.path,
@@ -86,6 +89,7 @@ const updateLatexData = (data: { path: string; latex: string; w: number; h: numb
   });
 };
 
+// Open LaTeX editor
 const openLatexEditor = () => (latexEditorVisible.value = true);
 
 emitter.on(EmitterEvents.OPEN_LATEX_EDITOR, openLatexEditor);

@@ -11,7 +11,7 @@ export default () => {
   // Load slides with a limit
   const loadSlide = () => {
     if (slides.value.length > slidesLoadLimit.value) {
-      timer.value = setTimeout(() => {
+      timer.value = window.setTimeout(() => {
         slidesLoadLimit.value = slidesLoadLimit.value + 20;
         loadSlide();
       }, 600);

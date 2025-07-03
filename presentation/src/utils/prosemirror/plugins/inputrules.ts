@@ -14,7 +14,7 @@ const orderedListRule = (nodeType: NodeType) =>
   wrappingInputRule(
     /^(\d+)\.\s$/,
     nodeType,
-    (match) => ({ order: +match[1] }),
+    (match: any) => ({ order: +match[1] }),
     (match, node) => node.childCount + node.attrs.order === +match[1]
   );
 

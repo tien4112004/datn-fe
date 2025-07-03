@@ -61,7 +61,7 @@ const timer = ref<number | null>(null);
 
 const startTimer = () => {
   if (props.duration <= 0) return;
-  timer.value = setTimeout(close, props.duration);
+  timer.value = window.setTimeout(close, props.duration);
 };
 const clearTimer = () => {
   if (timer.value) clearTimeout(timer.value);

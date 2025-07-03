@@ -367,7 +367,7 @@ const hideController = ref(false);
 const autoHideController = () => {
   hideController.value = false;
   clearTimeout(autoHideControllerTimer.value);
-  autoHideControllerTimer.value = setTimeout(() => {
+  autoHideControllerTimer.value = window.setTimeout(() => {
     if (videoRef.value?.played.length) hideController.value = true;
   }, 3000);
 };

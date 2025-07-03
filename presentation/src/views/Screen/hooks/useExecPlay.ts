@@ -172,7 +172,7 @@ export default () => {
   const autoPlay = () => {
     closeAutoPlay();
     message.success('Auto playback started');
-    autoPlayTimer.value = setInterval(execNext, autoPlayInterval.value);
+    autoPlayTimer.value = window.setInterval(execNext, autoPlayInterval.value);
   };
 
   const setAutoPlayInterval = (interval: number) => {

@@ -28,7 +28,7 @@ export const enum KEYS {
   ESC = 'ESCAPE',
   PAGEUP = 'PAGEUP',
   PAGEDOWN = 'PAGEDOWN',
-  F5 = 'F5',
+  //   F5 = 'F5',
 }
 
 interface HotkeyItem {

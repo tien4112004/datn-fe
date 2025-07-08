@@ -147,6 +147,11 @@ onMounted(() => {
   margin-bottom: 10px;
   padding-right: 4px;
 
+  .insert-all {
+    min-width: fit-content;
+    padding-left: 4px;
+  }
+
   &:hover .insert-all {
     opacity: 1;
     transition: opacity $transitionDelay;

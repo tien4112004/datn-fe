@@ -107,7 +107,7 @@ const handleInputMark = (e: Event) => {
 
 <style lang="scss" scoped>
 .slide-toolbar {
-  height: 230px;
+  height: 100%;
   background-color: #fff;
   box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.1);
   display: flex;
@@ -136,7 +136,7 @@ const handleInputMark = (e: Event) => {
   }
 }
 .toolbar {
-  height: 90px;
+  height: 100px;
   border-bottom: 1px solid $borderColor;
   padding: 10px;
 }

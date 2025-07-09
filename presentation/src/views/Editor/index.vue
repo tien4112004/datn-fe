@@ -88,19 +88,19 @@ usePasteEvent();
   display: flex;
 }
 .layout-content-left {
-  width: 160px;
+  width: 180px;
   height: 100%;
   flex-shrink: 0;
 }
 .layout-content-center {
-  width: calc(100% - 160px - 260px);
+  width: calc(100% - 180px - 300px);
 
   .center-top {
     height: 40px;
   }
 }
 .layout-content-right {
-  width: 260px;
+  width: 300px;
   height: 100%;
 }
 </style>

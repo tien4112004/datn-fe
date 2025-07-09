@@ -60,7 +60,7 @@ const setThemeColors = () => {
 };
 
 const addThemeColor = () => {
-  const colors = [...themeColors.value, '#00000000'];
+  const colors = [...themeColors.value, '$foreground00'];
   themeColors.value = colors;
 };
 
@@ -105,7 +105,7 @@ const deleteThemeColor = (index: number) => {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #fff;
+  background-color: $background;
   cursor: pointer;
 }
 </style>

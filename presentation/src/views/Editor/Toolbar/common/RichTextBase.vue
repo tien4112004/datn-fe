@@ -417,7 +417,7 @@ const removeLink = () => {
 }
 .list-wrap {
   width: 176px;
-  color: #666;
+  color: $gray-666;
   padding: 8px;
   margin: -12px;
   display: flex;
@@ -460,7 +460,7 @@ const removeLink = () => {
     display: inline-block;
     position: absolute;
     top: 8px;
-    background-color: #666;
+    background-color: $gray-666;
   }
 }
 .popover-btn {

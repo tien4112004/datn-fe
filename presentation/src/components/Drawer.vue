@@ -55,7 +55,7 @@ const contentStyle = computed(() => {
   top: 0;
   bottom: 0;
   z-index: 5000;
-  background: #fff;
+  background: $background;
   display: flex;
   flex-direction: column;
 

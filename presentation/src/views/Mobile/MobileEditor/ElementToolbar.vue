@@ -150,8 +150,8 @@ interface TabItem {
 }
 
 const colors = [
-  '#000000',
-  '#ffffff',
+  '$foreground',
+  '$background',
   '#eeece1',
   '#1e497b',
   '#4e81bb',
@@ -254,8 +254,8 @@ const updateFill = (color: string) => {
   z-index: 99;
   bottom: 0;
   left: 0;
-  background-color: #fff;
-  box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.1);
+  background-color: $background;
+  box-shadow: 0 0 15px 0 $shadow-light;
   display: flex;
   flex-direction: column;
   animation: slideInUp 0.15s;

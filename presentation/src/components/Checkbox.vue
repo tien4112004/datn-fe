@@ -62,7 +62,7 @@ const handleChange = (e: Event) => {
     cursor: default;
 
     .checkbox-input {
-      background-color: #f5f5f5;
+      background-color: $gray-f5f5f5;
     }
   }
 }
@@ -74,16 +74,15 @@ const handleChange = (e: Event) => {
   border-radius: $borderRadius;
   width: 16px;
   height: 16px;
-  background-color: #fff;
+  background-color: $background;
   vertical-align: middle;
-  transition:
-    border-color 0.15s cubic-bezier(0.71, -0.46, 0.29, 1.46),
+  transition: border-color 0.15s cubic-bezier(0.71, -0.46, 0.29, 1.46),
     background-color 0.15s cubic-bezier(0.71, -0.46, 0.29, 1.46);
   z-index: 1;
 
   &::after {
     content: '';
-    border: 2px solid #fff;
+    border: 2px solid $background;
     border-left: 0;
     border-top: 0;
     height: 9px;

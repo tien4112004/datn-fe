@@ -85,7 +85,7 @@ const handleDragEnd = (eventData: { newIndex: number; oldIndex: number }) => {
     color: #fff;
     background-color: #aaa;
     z-index: 1;
-    font-size: 12px;
+    font-size: $xsTextSize;
     text-align: center;
     padding: 0 5px;
   }

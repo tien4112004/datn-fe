@@ -22,7 +22,7 @@ import ElementStylePanel from './ElementStylePanel/index.vue';
 import ElementPositionPanel from './ElementPositionPanel.vue';
 import ElementAnimationPanel from './ElementAnimationPanel.vue';
 import SlideDesignPanel from './SlideDesignPanel/index.vue';
-import SlideAnimationPanel from './SlideAnimationPanel.vue';
+import SlideAnimationPanel from './SlideTransitionPanel.vue';
 import MultiPositionPanel from './MultiPositionPanel.vue';
 import MultiStylePanel from './MultiStylePanel.vue';
 import SymbolPanel from './SymbolPanel.vue';
@@ -108,8 +108,8 @@ const currentPanelComponent = computed(() => {
   flex-direction: column;
 }
 .content {
-  padding: 12px;
-  font-size: 13px;
+  padding: $cardPadding;
+  font-size: $smTextSize;
 
   @include overflow-overlay();
 }

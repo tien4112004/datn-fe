@@ -164,7 +164,7 @@ const startResize = (e: MouseEvent) => {
 <style lang="scss" scoped>
 .moveable-panel {
   position: fixed;
-  background-color: #fff;
+  background-color: $background;
   box-shadow: $boxShadow;
   border: 1px solid $borderColor;
   border-radius: $borderRadius;
@@ -211,7 +211,7 @@ const startResize = (e: MouseEvent) => {
   display: flex;
   justify-content: center;
   align-items: center;
-  color: #666;
+  color: $gray-666;
   font-size: 13px;
   cursor: pointer;
 }

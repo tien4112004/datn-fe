@@ -34,7 +34,7 @@
               @update:modelValue="(value) => updateOutline({ color: value })"
             />
           </template>
-          <ColorButton :color="outline.color || '#000'" />
+          <ColorButton :color="outline.color || '$foreground'" />
         </Popover>
       </div>
       <div class="row">

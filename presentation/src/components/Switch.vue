@@ -54,7 +54,7 @@ const handleChange = () => {
     cursor: default;
 
     .switch-core::after {
-      background-color: #f5f5f5;
+      background-color: $gray-f5f5f5;
     }
   }
 }
@@ -83,7 +83,7 @@ const handleChange = () => {
     transition: all 0.3s;
     width: 16px;
     height: 16px;
-    background-color: #fff;
+    background-color: $background;
   }
 }
 </style>

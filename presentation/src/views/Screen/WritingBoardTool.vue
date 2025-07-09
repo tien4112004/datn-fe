@@ -273,7 +273,7 @@ const hanldeWritingEnd = () => {
 
 <style lang="scss" scoped>
 .writing-board-tool {
-  font-size: 12px;
+  font-size: $xsTextSize;
   z-index: 10;
   @include absolute-0();
 
@@ -314,7 +314,7 @@ const hanldeWritingEnd = () => {
     }
   }
   .icon {
-    font-size: 20px;
+    font-size: $lgTextSize;
   }
   .colors {
     display: flex;
@@ -346,7 +346,7 @@ const hanldeWritingEnd = () => {
   display: flex;
   align-items: center;
   user-select: none;
-  font-size: 13px;
+  font-size: $smTextSize;
 
   &.shape {
     width: 280px;
@@ -357,7 +357,7 @@ const hanldeWritingEnd = () => {
     align-items: center;
 
     .icon {
-      font-size: 20px;
+      font-size: $lgTextSize;
       cursor: pointer;
 
       & + .icon {

@@ -62,9 +62,9 @@ const emit = defineEmits<{
   line-height: 1;
   padding-bottom: 4px;
   overflow-x: auto;
+  border-radius: $borderRadius;
 
   &:not(.card) {
-    font-size: 13px;
     align-items: center;
     justify-content: flex-start;
     border-bottom: 1px solid $borderColor;
@@ -90,7 +90,7 @@ const emit = defineEmits<{
 
   &.card {
     height: 40px;
-    font-size: 12px;
+    font-size: $baseTextSize;
     flex-shrink: 0;
 
     .tab {
@@ -101,14 +101,26 @@ const emit = defineEmits<{
       background-color: $lightGray;
       border-bottom: 1px solid $borderColor;
       cursor: pointer;
+      border-radius: $borderRadius;
+      padding: 0 8px;
 
       &.active {
-        background-color: transparent;
+        background-color: $secondary;
+        color: $secondary-foreground;
         border-bottom-color: transparent;
       }
 
       & + .tab {
         border-left: 1px solid $borderColor;
+      }
+
+      &.active:hover {
+        background-color: $secondary;
+        opacity: 0.9;
+      }
+
+      &:hover {
+        background-color: $card;
       }
     }
   }

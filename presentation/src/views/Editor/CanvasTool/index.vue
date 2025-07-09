@@ -357,7 +357,7 @@ const toggleNotesPanel = () => {
 .canvas-tool {
   position: relative;
   border-bottom: 1px solid $borderColor;
-  background-color: #fff;
+  background-color: $card;
   display: flex;
   justify-content: space-between;
   padding: 0 10px;
@@ -383,7 +383,7 @@ const toggleNotesPanel = () => {
     width: 32px;
 
     &:not(.group-btn):hover {
-      background-color: #f1f1f1;
+      background-color: $card-hover;
     }
 
     &.active {
@@ -395,7 +395,7 @@ const toggleNotesPanel = () => {
       margin-right: 5px;
 
       &:hover {
-        background-color: #f3f3f3;
+        background-color: $card-hover;
       }
 
       .icon,
@@ -407,7 +407,7 @@ const toggleNotesPanel = () => {
       }
 
       .icon {
-        width: 26px;
+        width: 30px;
         padding: 0 2px;
 
         &:hover {
@@ -465,7 +465,7 @@ const toggleNotesPanel = () => {
   }
 
   .viewport-size {
-    font-size: 13px;
+    font-size: $baseTextSize;
   }
 }
 

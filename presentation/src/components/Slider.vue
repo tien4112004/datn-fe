@@ -230,7 +230,7 @@ const handleMousedown = (e: MouseEvent | TouchEvent) => {
   height: 4px;
   border-radius: 2px;
   position: relative;
-  background-color: #f5f5f5;
+  background-color: $gray-f5f5f5;
   user-select: none;
   transition: background-color 0.2s;
 }
@@ -250,7 +250,7 @@ const handleMousedown = (e: MouseEvent | TouchEvent) => {
   left: 0;
   width: 10px;
   height: 10px;
-  background-color: #fff;
+  background-color: $background;
   outline: 2px solid $themeColor;
   transform: translate(-50%, -50%);
   border-radius: 50%;
@@ -274,7 +274,7 @@ const handleMousedown = (e: MouseEvent | TouchEvent) => {
     transform: translateX(-50%);
     background-color: #262626;
     text-align: center;
-    color: #fff;
+    color: $background;
     border-radius: $borderRadius;
     padding: 6px 5px;
     font-size: 12px;

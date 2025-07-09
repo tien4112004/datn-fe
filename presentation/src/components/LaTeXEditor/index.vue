@@ -193,7 +193,7 @@ const insertSymbol = (latex: string) => {
   height: 100%;
   margin-left: 20px;
   border: solid 1px $borderColor;
-  background-color: #fff;
+  background-color: $background;
   display: flex;
   flex-direction: column;
   user-select: none;
@@ -201,6 +201,7 @@ const insertSymbol = (latex: string) => {
 .content {
   height: calc(100% - 40px);
   font-size: 13px;
+  padding: $cardPadding;
 }
 .formula {
   height: 100%;

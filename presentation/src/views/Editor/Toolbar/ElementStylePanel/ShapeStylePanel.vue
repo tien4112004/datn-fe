@@ -129,13 +129,15 @@
 
     <div class="row">
       <CheckboxButton
+        class="center"
         v-tooltip="'Double-click to use continuously'"
         style="flex: 1"
         :checked="!!shapeFormatPainter"
         @click="toggleShapeFormatPainter()"
         @dblclick="toggleShapeFormatPainter(true)"
-        ><IconFormatBrush /> Shape Format Painter</CheckboxButton
-      >
+        ><IconFormatBrush />
+        <div>Shape Format Painter</div>
+      </CheckboxButton>
     </div>
   </div>
 </template>
@@ -175,14 +177,14 @@ const { handleElement, handleElementId, shapeFormatPainter } = storeToRefs(mainS
 
 const handleShapeElement = handleElement as Ref<PPTShapeElement>;
 
-const fill = ref<string>('#000');
+const fill = ref<string>('$foreground');
 const pattern = ref<string>('');
 const gradient = ref<Gradient>({
   type: 'linear',
   rotate: 0,
   colors: [
-    { pos: 0, color: '#fff' },
-    { pos: 100, color: '#fff' },
+    { pos: 0, color: '$background' },
+    { pos: 100, color: '$background' },
   ],
 });
 const fillType = ref('fill');
@@ -194,10 +196,10 @@ watch(
   () => {
     if (!handleElement.value || handleElement.value.type !== 'shape') return;
 
-    fill.value = handleElement.value.fill || '#fff';
+    fill.value = handleElement.value.fill || '$background';
     const defaultGradientColor = [
       { pos: 0, color: fill.value },
-      { pos: 100, color: '#fff' },
+      { pos: 100, color: '$background' },
     ];
     gradient.value = handleElement.value.gradient || {
       type: 'linear',
@@ -315,7 +317,7 @@ const updateTextAlign = (align: 'top' | 'middle' | 'bottom') => {
   const defaultText: ShapeText = {
     content: '',
     defaultFontName: '',
-    defaultColor: '#000',
+    defaultColor: '$foreground',
     align: 'middle',
   };
   const _text = _handleElement.text || defaultText;
@@ -338,7 +340,7 @@ const updateTextAlign = (align: 'top' | 'middle' | 'bottom') => {
 }
 .title {
   display: flex;
-  justify-content: space-between;
+  gap: 4px;
   align-items: center;
   margin-bottom: 10px;
 }

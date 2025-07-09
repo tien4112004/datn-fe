@@ -104,7 +104,7 @@ const expPDF = () => {
 
   &::after {
     content: '';
-    background-color: #fff;
+    background-color: $background;
     @include absolute-0();
   }
 }
@@ -114,7 +114,7 @@ const expPDF = () => {
   }
 }
 .configs {
-  width: 300px;
+  width: 500px;
   height: calc(100% - 100px);
   display: flex;
   flex-direction: column;
@@ -129,7 +129,7 @@ const expPDF = () => {
   }
 
   .title {
-    width: 100px;
+    width: 140px;
   }
   .config-item {
     flex: 1;
@@ -137,7 +137,7 @@ const expPDF = () => {
 
   .tip {
     font-size: 12px;
-    color: #aaa;
+    color: $gray-aaa;
     line-height: 1.8;
     margin-top: 25px;
   }

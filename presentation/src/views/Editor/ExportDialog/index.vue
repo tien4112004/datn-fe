@@ -59,6 +59,8 @@ const currentDialogComponent = computed<unknown>(() => {
 <style lang="scss" scoped>
 .export-dialog {
   margin: -20px;
+  border-radius: $cardBorderRadius;
+  padding: $cardPadding;
 }
 .content {
   height: 460px;

@@ -231,7 +231,7 @@ const contextmenus = (): ContextmenuItem[] => {
   height: 100%;
   background-color: #fff;
   border-right: solid 1px #eee;
-  font-size: 12px;
+  font-size: $xsTextSize;
   margin: 20px 0;
 
   .tool-btn {
@@ -259,7 +259,7 @@ const contextmenus = (): ContextmenuItem[] => {
 
   .tool-icon {
     margin-bottom: 8px;
-    font-size: 22px;
+    font-size: $xlgTextSize;
   }
 }
 .content {
@@ -319,7 +319,7 @@ const contextmenus = (): ContextmenuItem[] => {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 18px;
+    font-size: $baseTextSize;
     border-bottom: 1px solid #3a3a3a;
   }
 
@@ -339,7 +339,7 @@ const contextmenus = (): ContextmenuItem[] => {
     position: absolute;
     right: 5px;
     bottom: 5px;
-    font-size: 22px;
+    font-size: $xlgTextSize;
     display: flex;
   }
   .scale-btn {

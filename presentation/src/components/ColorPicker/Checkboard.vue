@@ -13,7 +13,7 @@ const props = withDefaults(
   }>(),
   {
     size: 8,
-    white: '#fff',
+    white: '$background',
     grey: '#e6e6e6',
   }
 );

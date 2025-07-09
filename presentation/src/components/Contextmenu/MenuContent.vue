@@ -47,7 +47,7 @@ $subMenuWidth: 120px;
 .menu-content {
   width: $menuWidth;
   padding: 5px 0;
-  background: #fff;
+  background: $background;
   border: 1px solid $borderColor;
   box-shadow: $boxShadow;
   border-radius: $borderRadius;
@@ -56,13 +56,13 @@ $subMenuWidth: 120px;
 }
 .menu-item {
   padding: 0 20px;
-  color: #555;
+  color: $gray-555;
   font-size: 12px;
   transition: all $transitionDelayFast;
   white-space: nowrap;
   height: $menuHeight;
   line-height: $menuHeight;
-  background-color: #fff;
+  background-color: $background;
   cursor: pointer;
 
   &:not(.disable):hover > .menu-item-content > .sub-menu {
@@ -104,7 +104,7 @@ $subMenuWidth: 120px;
     height: 8px;
     border-width: 1px;
     border-style: solid;
-    border-color: #666 #666 transparent transparent;
+    border-color: $gray-666 $gray-666 transparent transparent;
     position: absolute;
     right: 0;
     top: 50%;
@@ -115,7 +115,7 @@ $subMenuWidth: 120px;
     display: inline-block;
     width: 1px;
     height: 24px;
-    background-color: rgba($color: #fff, $alpha: 0.3);
+    background-color: rgba($color: $background, $alpha: 0.3);
     position: absolute;
     right: 18px;
     top: 3px;

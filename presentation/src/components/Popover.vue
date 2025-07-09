@@ -100,12 +100,12 @@ onMounted(() => {
   align-items: center;
 }
 .popover-content {
-  background-color: #fff;
+  background-color: $background;
   padding: 10px;
   border: 1px solid $borderColor;
   box-shadow: $boxShadow;
-  border-radius: $borderRadius;
-  font-size: 13px;
+  border-radius: $cardBorderRadius;
+  font-size: $smTextSize;
 }
 </style>
 

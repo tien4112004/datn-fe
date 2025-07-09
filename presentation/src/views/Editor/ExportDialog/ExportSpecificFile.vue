@@ -10,7 +10,9 @@
         </RadioGroup>
       </div>
       <div class="row" v-if="rangeType === 'custom'">
-        <div class="title" :data-range="`（${range[0]} ~ ${range[1]}）`">Custom Range:</div>
+        <div class="title" :data-range="`（${range[0]} ~ ${range[1]}）`">
+          Custom Range ({{ range[0] }} ~ {{ range[1] }}):
+        </div>
         <Slider class="config-item" range :min="1" :max="slides.length" :step="1" v-model:value="range" />
       </div>
       <div class="tip">
@@ -70,7 +72,7 @@ const selectedSlides = computed(() => {
   overflow: hidden;
 }
 .configs {
-  width: 350px;
+  width: 500px;
   height: calc(100% - 100px);
   display: flex;
   flex-direction: column;
@@ -84,15 +86,7 @@ const selectedSlides = computed(() => {
   }
 
   .title {
-    width: 100px;
-    position: relative;
-
-    &::after {
-      content: attr(data-range);
-      position: absolute;
-      top: 20px;
-      left: 0;
-    }
+    width: 140px;
   }
   .config-item {
     flex: 1;
@@ -100,7 +94,7 @@ const selectedSlides = computed(() => {
 
   .tip {
     font-size: 12px;
-    color: #aaa;
+    color: $gray-aaa;
     line-height: 1.8;
     margin-top: 25px;
   }

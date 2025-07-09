@@ -458,7 +458,7 @@ defineExpose({
   z-index: 9;
 
   .icon {
-    filter: drop-shadow(2px 2px 2px #555);
+    filter: drop-shadow(2px 2px 2px $muted-foreground);
   }
 }
 .eraser {
@@ -466,7 +466,7 @@ defineExpose({
   justify-content: center;
   align-items: center;
   border-radius: 50%;
-  border: 4px solid rgba($color: #555, $alpha: 0.15);
-  color: rgba($color: #555, $alpha: 0.75);
+  border: 4px solid rgba($color: $muted-foreground, $alpha: 0.15);
+  color: rgba($color: $muted-foreground, $alpha: 0.75);
 }
 </style>

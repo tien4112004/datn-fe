@@ -75,7 +75,7 @@ const selectLine = (line: LinePoolItem) => {
   border-left: 4px solid #bbb;
   background-color: #f1f1f1;
   padding: 3px 0 3px 8px;
-  color: #555;
+  color: $gray-555;
 }
 .line-list {
   @include flex-grid-layout();
@@ -97,7 +97,7 @@ const selectLine = (line: LinePoolItem) => {
   display: flex;
   justify-content: center;
   align-items: center;
-  color: #999;
+  color: $gray-999;
 
   &:hover {
     color: $themeColor;

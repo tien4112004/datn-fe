@@ -1,6 +1,6 @@
 <template>
   <div class="element-positopn-panel">
-    <div class="title">Layer:</div>
+    <div class="title title-panel">Layer</div>
     <ButtonGroup class="row">
       <Button style="flex: 1" @click="orderElement(handleElement!, ElementOrderCommands.TOP)">
         <div class="center">
@@ -32,7 +32,7 @@
 
     <Divider />
 
-    <div class="title">Alignment:</div>
+    <div class="title title-panel">Alignment</div>
     <ButtonGroup class="row">
       <Button
         style="flex: 1"
@@ -72,7 +72,7 @@
     </ButtonGroup>
 
     <Divider />
-    <div class="title">Properties:</div>
+    <div class="title title-panel">Properties</div>
 
     <div class="row">
       <div style="width: 45%">Horizontal:</div>
@@ -385,12 +385,5 @@ const updateRotate45 = (command: '+' | '-') => {
     background-color: #efefef;
     border-radius: $borderRadius;
   }
-}
-.center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  gap: 1px;
 }
 </style>

@@ -101,7 +101,7 @@ table {
   --subThemeColor2: $themeColor;
 
   &.theme {
-    background-color: #fff;
+    background-color: $background;
 
     tr:nth-child(2n) .cell {
       background-color: var(--subThemeColor1);

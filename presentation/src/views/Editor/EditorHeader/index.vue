@@ -185,7 +185,7 @@ const openAIPPTDialog = () => {
 
 <style lang="scss" scoped>
 .editor-header {
-  background-color: #fff;
+  background-color: $background;
   user-select: none;
   border-bottom: 1px solid $borderColor;
   display: flex;
@@ -210,7 +210,7 @@ const openAIPPTDialog = () => {
 
   .icon {
     font-size: 18px;
-    color: #666;
+    color: $gray-666;
   }
   .text {
     width: 18px;

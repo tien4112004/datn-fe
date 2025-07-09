@@ -46,7 +46,7 @@ const selectShape = (shape: ShapePoolItem) => {
   border-left: 4px solid #bbb;
   background-color: #f1f1f1;
   padding: 3px 0 3px 8px;
-  color: #555;
+  color: $gray-555;
 }
 .shape-list {
   @include flex-grid-layout();

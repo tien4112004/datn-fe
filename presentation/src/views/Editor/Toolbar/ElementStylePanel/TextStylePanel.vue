@@ -179,7 +179,7 @@ const updateElement = (props: Partial<PPTTextElement>) => {
   addHistorySnapshot();
 };
 
-const fill = ref<string>('#000');
+const fill = ref<string>('$foreground');
 const lineHeight = ref<number>();
 const wordSpace = ref<number>();
 const paragraphSpace = ref<number>();
@@ -189,7 +189,7 @@ watch(
   () => {
     if (!handleElement.value || handleElement.value.type !== 'text') return;
 
-    fill.value = handleElement.value.fill || '#fff';
+    fill.value = handleElement.value.fill || '$background';
     lineHeight.value = handleElement.value.lineHeight || 1.5;
     wordSpace.value = handleElement.value.wordSpace || 0;
     paragraphSpace.value =
@@ -247,7 +247,7 @@ const emitBatchRichTextCommand = (action: RichTextAction[]) => {
 .preset-style-item {
   width: 50%;
   height: 50px;
-  border: solid 1px #d6d6d6;
+  border: solid 1px $borderColor;
   box-sizing: border-box;
   display: flex;
   justify-content: center;

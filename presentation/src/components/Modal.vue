@@ -101,13 +101,13 @@ const onClickMask = () => {
 
 .mask {
   position: absolute;
-  background: rgba(0, 0, 0, 0.25);
+  background: $shadow-medium;
 }
 
 .modal-content {
   z-index: 5001;
   padding: 20px;
-  background: #fff;
+  background: $background;
   border-radius: $borderRadius;
   overflow: hidden;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);

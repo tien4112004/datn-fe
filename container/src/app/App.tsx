@@ -5,7 +5,7 @@ import { CardsDemo } from '@/components/cards';
 export default function App() {
   return (
     <BrowserRouter>
-      <nav className="p-4 bg-gray-100">
+      <nav className="p-4 bg-gray-100 header-nav">
         <Link to="/" className="mr-4 hover:underline">
           Home
         </Link>

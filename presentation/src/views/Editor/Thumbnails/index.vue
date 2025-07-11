@@ -1,12 +1,14 @@
 <template>
-  <div
+  <Card
     class="thumbnails"
     @mousedown="() => setThumbnailsFocus(true)"
     v-click-outside="() => setThumbnailsFocus(false)"
     v-contextmenu="contextmenusThumbnails"
+    padding="normal"
   >
     <div class="add-slide">
       <div class="btn center" @click="createSlide()"><IconPlus class="icon" />Add Slide</div>
+      <Divider type="vertical" :margin="0" />
       <Popover trigger="click" placement="bottom-start" v-model:value="presetLayoutPopoverVisible" center>
         <template #content>
           <Templates
@@ -96,7 +98,7 @@
     </Draggable>
 
     <div class="page-number">Slide {{ slideIndex + 1 }}/{{ slides.length }}</div>
-  </div>
+  </Card>
 </template>
 
 <script lang="ts" setup>
@@ -117,6 +119,8 @@ import ThumbnailSlide from '@/views/components/ThumbnailSlide/index.vue';
 import Templates from './Templates.vue';
 import Popover from '@/components/Popover.vue';
 import Draggable from 'vuedraggable';
+import Divider from '@/components/Divider.vue';
+import Card from '@/components/Card.vue';
 
 const mainStore = useMainStore();
 const slidesStore = useSlidesStore();
@@ -392,25 +396,35 @@ const contextmenusThumbnailItem = (): ContextmenuItem[] => {
 
 <style lang="scss" scoped>
 .thumbnails {
-  border-right: solid 1px $borderColor;
-  background-color: $background;
-  display: flex;
-  flex-direction: column;
-  user-select: none;
+  height: 100%;
+
+  :deep(.card-content) {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
 }
+
 .add-slide {
   height: 40px;
   font-size: $baseTextSize;
   display: flex;
   flex-shrink: 0;
-  border-bottom: 1px solid $borderColor;
   cursor: pointer;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+  border-radius: $borderRadius;
+  color: $primary-foreground;
+  background-color: $primary;
+  margin: 0 5px;
 
   .btn {
     flex: 1;
-
+    font-size: 1rem;
+    font-weight: 500;
+    border-radius: $borderRadius 0 0 $borderRadius;
+    background-color: $primary;
     &:hover {
-      background-color: $lightGray;
+      background-color: $secondary;
     }
   }
   .select-btn {
@@ -419,10 +433,10 @@ const contextmenusThumbnailItem = (): ContextmenuItem[] => {
     display: flex;
     justify-content: center;
     align-items: center;
-    border-left: 1px solid $borderColor;
-
+    background-color: $primary;
+    border-radius: 0 $borderRadius $borderRadius 0;
     &:hover {
-      background-color: $lightGray;
+      background-color: $secondary;
     }
   }
 

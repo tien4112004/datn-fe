@@ -1,15 +1,16 @@
 <template>
-  <div class="toolbar">
+  <Card class="toolbar" padding="normal">
     <Tabs
       :tabs="currentTabs"
       :value="toolbarState"
       card
       @update:value="(key) => setToolbarState(key as ToolbarStates)"
     />
+
     <div class="content">
       <component :is="currentPanelComponent"></component>
     </div>
-  </div>
+  </Card>
 </template>
 
 <script lang="ts" setup>
@@ -27,6 +28,7 @@ import MultiPositionPanel from './MultiPositionPanel.vue';
 import MultiStylePanel from './MultiStylePanel.vue';
 import SymbolPanel from './SymbolPanel.vue';
 import Tabs from '@/components/Tabs.vue';
+import Card from '@/components/Card.vue';
 
 interface ElementTabs {
   label: string;
@@ -102,14 +104,21 @@ const currentPanelComponent = computed(() => {
 
 <style lang="scss" scoped>
 .toolbar {
-  border-left: solid 1px $borderColor;
-  background-color: #fff;
-  display: flex;
-  flex-direction: column;
+  color: $textColor;
+  height: 100%;
+
+  :deep(.card-content) {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    flex: 1;
+  }
 }
+
 .content {
   padding: $cardPadding;
   font-size: $smTextSize;
+  flex: 1;
 
   @include overflow-overlay();
 }

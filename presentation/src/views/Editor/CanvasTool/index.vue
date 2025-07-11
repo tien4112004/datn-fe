@@ -1,5 +1,5 @@
 <template>
-  <div class="canvas-tool">
+  <Card class="canvas-tool" padding="none">
     <div class="left-handler">
       <IconBack
         class="handler-item"
@@ -238,7 +238,7 @@
         "
       />
     </Modal>
-  </div>
+  </Card>
 </template>
 
 <script lang="ts" setup>
@@ -263,6 +263,7 @@ import Modal from '@/components/Modal.vue';
 import Divider from '@/components/Divider.vue';
 import Popover from '@/components/Popover.vue';
 import PopoverMenuItem from '@/components/PopoverMenuItem.vue';
+import Card from '@/components/Card.vue';
 
 const mainStore = useMainStore();
 const { creatingElement, creatingCustomShape, showSelectPanel, showSearchPanel, showNotesPanel } =
@@ -356,13 +357,14 @@ const toggleNotesPanel = () => {
 <style lang="scss" scoped>
 .canvas-tool {
   position: relative;
-  border-bottom: 1px solid $borderColor;
-  background-color: $card;
-  display: flex;
-  justify-content: space-between;
-  padding: 0 10px;
-  font-size: 13px;
-  user-select: none;
+  font-size: $baseTextSize;
+  margin: 16px;
+
+  :deep(.card-content) {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 10px;
+  }
 }
 .left-handler,
 .more {

@@ -74,6 +74,7 @@ const applyAllSlide = () => {
   padding: 20px 0 15px 0;
   position: relative;
   cursor: pointer;
+  border-radius: $borderRadius;
 
   &.active {
     border-color: $themeColor;

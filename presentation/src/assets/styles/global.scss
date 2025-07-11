@@ -2,7 +2,17 @@
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  gap: 4px !important;
+  gap: $normalSpacing !important;
+}
+
+.title-panel {
+  font-size: $baseTextSize;
+}
+
+.title {
+  font-size: $baseTextSize;
+  font-weight: $boldFontWeight;
+  text-align: center;
 }
 
 html,

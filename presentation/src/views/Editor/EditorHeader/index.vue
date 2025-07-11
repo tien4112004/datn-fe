@@ -185,9 +185,7 @@ const openAIPPTDialog = () => {
 
 <style lang="scss" scoped>
 .editor-header {
-  background-color: $background;
   user-select: none;
-  border-bottom: 1px solid $borderColor;
   display: flex;
   justify-content: space-between;
   padding: 0 5px;
@@ -252,7 +250,7 @@ const openAIPPTDialog = () => {
 .title {
   height: 30px;
   margin-left: 2px;
-  font-size: 13px;
+  font-size: $baseTextSize;
 
   .title-input {
     width: 200px;
@@ -276,7 +274,7 @@ const openAIPPTDialog = () => {
     @include ellipsis-oneline();
 
     &:hover {
-      background-color: #f1f1f1;
+      background-color: $light-gray;
     }
   }
 }

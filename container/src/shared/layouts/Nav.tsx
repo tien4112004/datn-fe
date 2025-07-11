@@ -9,6 +9,17 @@ const Nav = () => {
     document.documentElement.style.setProperty('--header-height', `${0}px`);
   });
 
+  window.addEventListener('resize', () => {
+    if (document.fullscreenElement) {
+      document.documentElement.style.setProperty('--header-height', `${0}px`);
+    } else {
+      document.documentElement.style.setProperty(
+        '--header-height',
+        `${document.querySelector('nav')?.offsetHeight || 0}px`
+      );
+    }
+  });
+
   return (
     !isFullscreen && (
       <nav className="p-4 bg-gray-100 header-nav">

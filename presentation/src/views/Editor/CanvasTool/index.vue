@@ -360,6 +360,7 @@ const toggleNotesPanel = () => {
   font-size: $baseTextSize;
   margin: 4px 16px;
   display: flex;
+  font-size: $baseTextSize;
 
   :deep(.card-content) {
     display: flex;

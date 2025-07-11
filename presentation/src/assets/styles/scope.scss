@@ -2,11 +2,11 @@
   height: calc(100vh - var(--header-height, 64px)); // fallback to 64px if custom property not available
 
   span.i-icon {
-    font-size: $smIconSize !important;
-    opacity: 0.7 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
+    font-size: $smIconSize;
+    opacity: 0.7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .title-panel {
@@ -14,10 +14,10 @@
   }
 
   .center {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 4px !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
   }
 
   .serif {

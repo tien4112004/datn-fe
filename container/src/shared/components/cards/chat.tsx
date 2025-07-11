@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { ArrowUpIcon, CheckIcon, PlusIcon } from 'lucide-react';
 
-import { cn } from '@/lib/utils';
+import { cn } from '@/shared/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '@ui/avatar';
 import { Button } from '@ui/button';
 import { Card, CardContent, CardFooter, CardHeader } from '@ui/card';

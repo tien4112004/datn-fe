@@ -28,8 +28,18 @@
     <CountdownTimer v-if="timerlVisible" @close="timerlVisible = false" />
 
     <div class="tools-left">
-      <IconLeftTwo class="tool-btn" theme="two-tone" :fill="['#111', '$background']" @click="execPrev()" />
-      <IconRightTwo class="tool-btn" theme="two-tone" :fill="['#111', '$background']" @click="execNext()" />
+      <IconLeftTwo
+        class="tool-btn big-icon"
+        theme="two-tone"
+        :fill="['#111', '$background']"
+        @click="execPrev()"
+      />
+      <IconRightTwo
+        class="tool-btn big-icon"
+        theme="two-tone"
+        :fill="['#111', '$background']"
+        @click="execNext()"
+      />
     </div>
 
     <div
@@ -236,6 +246,7 @@ const contextmenus = (): ContextmenuItem[] => {
   font-size: $xxlMinusTextSize;
   color: $gray-666;
   z-index: 10;
+  display: flex;
 
   .tool-btn {
     opacity: 0.3;
@@ -248,6 +259,10 @@ const contextmenus = (): ContextmenuItem[] => {
     & + .tool-btn {
       margin-left: 8px;
     }
+  }
+
+  .big-icon {
+    font-size: $xlTextSize;
   }
 }
 .tools-right {

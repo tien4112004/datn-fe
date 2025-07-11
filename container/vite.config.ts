@@ -35,8 +35,9 @@ export default defineConfig(({ mode }) => {
     ],
     resolve: {
       alias: {
+        '@/components': path.resolve(__dirname, './src/shared/components'),
         '@': path.resolve(__dirname, './src'),
-        '@ui': path.resolve(__dirname, './src/components/ui'),
+        '@ui': path.resolve(__dirname, './src/shared/components/ui'),
       },
     },
   };

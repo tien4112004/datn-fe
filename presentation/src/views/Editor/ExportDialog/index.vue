@@ -60,7 +60,7 @@ const currentDialogComponent = computed<unknown>(() => {
 .export-dialog {
   margin: -20px;
   border-radius: $cardBorderRadius;
-  padding: $cardPadding;
+  padding: $extraLargeSpacing;
 }
 .content {
   height: 460px;

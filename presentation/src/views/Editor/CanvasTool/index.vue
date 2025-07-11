@@ -358,31 +358,38 @@ const toggleNotesPanel = () => {
 .canvas-tool {
   position: relative;
   font-size: $baseTextSize;
-  margin: 16px;
+  margin: 4px 16px;
+  display: flex;
 
   :deep(.card-content) {
     display: flex;
     justify-content: space-between;
-    padding: 0 10px;
+    align-items: center;
+    padding-inline: $extraLargeSpacing;
   }
 }
 .left-handler,
 .more {
   display: flex;
   align-items: center;
+  flex: 0 0 auto;
+}
+.left-handler {
+  min-width: 0;
+  gap: 2px;
 }
 .more-icon {
   display: none;
 }
 .add-element-handler {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
   display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
 
   .handler-item {
     width: 32px;
+    flex-shrink: 0;
 
     &:not(.group-btn):hover {
       background-color: $card-hover;
@@ -394,7 +401,8 @@ const toggleNotesPanel = () => {
 
     &.group-btn {
       width: auto;
-      margin-right: 5px;
+      margin-right: 0;
+      flex-shrink: 0;
 
       &:hover {
         background-color: $card-hover;
@@ -431,14 +439,13 @@ const toggleNotesPanel = () => {
 }
 .handler-item {
   height: 30px;
-  font-size: 14px;
-  margin: 0 2px;
   display: flex;
   justify-content: center;
   align-items: center;
   border-radius: $borderRadius;
   overflow: hidden;
   cursor: pointer;
+  padding: 0 8px;
 
   &.disable {
     opacity: 0.5;
@@ -447,8 +454,6 @@ const toggleNotesPanel = () => {
 .left-handler,
 .right-handler {
   .handler-item {
-    padding: 0 8px;
-
     &.active,
     &:not(.disable):hover {
       background-color: #f1f1f1;
@@ -458,6 +463,8 @@ const toggleNotesPanel = () => {
 .right-handler {
   display: flex;
   align-items: center;
+  flex: 0 0 auto;
+  min-width: 0;
 
   .text {
     display: inline-block;

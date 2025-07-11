@@ -57,12 +57,13 @@ const emit = defineEmits<{
 
 <style lang="scss" scoped>
 .tabs {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
   user-select: none;
   line-height: 1;
-  padding-bottom: 4px;
   overflow-x: auto;
   border-radius: $borderRadius;
+  gap: $normalSpacing;
 
   &:not(.card) {
     align-items: center;
@@ -92,14 +93,16 @@ const emit = defineEmits<{
     height: 40px;
     font-size: $baseTextSize;
     flex-shrink: 0;
+    background-color: $lightGray;
+    border: 1px solid $borderColor;
+    display: flex;
 
     .tab {
       flex: 1;
       display: flex;
       justify-content: center;
       align-items: center;
-      background-color: $lightGray;
-      border-bottom: 1px solid $borderColor;
+
       cursor: pointer;
       border-radius: $borderRadius;
       padding: 0 8px;
@@ -107,11 +110,6 @@ const emit = defineEmits<{
       &.active {
         background-color: $secondary;
         color: $secondary-foreground;
-        border-bottom-color: transparent;
-      }
-
-      & + .tab {
-        border-left: 1px solid $borderColor;
       }
 
       &.active:hover {

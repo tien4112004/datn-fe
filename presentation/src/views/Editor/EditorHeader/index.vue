@@ -194,14 +194,14 @@ const openAIPPTDialog = () => {
 .right {
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-end;
 }
 .menu-item {
   height: 30px;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 14px;
+  font-size: $baseTextSize;
   padding: 0 10px;
   border-radius: $borderRadius;
   cursor: pointer;
@@ -270,7 +270,6 @@ const openAIPPTDialog = () => {
     padding: 0 6px;
     border-radius: $borderRadius;
     cursor: pointer;
-
     @include ellipsis-oneline();
 
     &:hover {

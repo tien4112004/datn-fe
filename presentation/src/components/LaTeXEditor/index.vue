@@ -200,8 +200,8 @@ const insertSymbol = (latex: string) => {
 }
 .content {
   height: calc(100% - 40px);
-  font-size: 13px;
-  padding: $cardPadding;
+  font-size: $smTextSize;
+  padding: $extraLargeSpacing;
 }
 .formula {
   height: 100%;

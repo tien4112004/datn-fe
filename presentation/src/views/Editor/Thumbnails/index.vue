@@ -407,24 +407,24 @@ const contextmenusThumbnailItem = (): ContextmenuItem[] => {
 
 .add-slide {
   height: 40px;
-  font-size: $baseTextSize;
+  font-size: $smTextSize;
   display: flex;
   flex-shrink: 0;
   cursor: pointer;
   transition: background-color 0.2s ease, box-shadow 0.2s ease;
   border-radius: $borderRadius;
-  color: $primary-foreground;
-  background-color: $primary;
-  margin: 0 5px;
+  color: $secondary-foreground;
+  background-color: $secondary;
+  margin: $normalSpacing;
 
   .btn {
     flex: 1;
-    font-size: 1rem;
+    font-size: $baseTextSize;
     font-weight: 500;
     border-radius: $borderRadius 0 0 $borderRadius;
-    background-color: $primary;
+    background-color: $secondary;
     &:hover {
-      background-color: $secondary;
+      background-color: $primary;
     }
   }
   .select-btn {
@@ -433,10 +433,10 @@ const contextmenusThumbnailItem = (): ContextmenuItem[] => {
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: $primary;
+    background-color: $secondary;
     border-radius: 0 $borderRadius $borderRadius 0;
     &:hover {
-      background-color: $secondary;
+      background-color: $primary;
     }
   }
 
@@ -449,12 +449,14 @@ const contextmenusThumbnailItem = (): ContextmenuItem[] => {
   }
 }
 .thumbnail-list {
-  padding: 5px 0;
   flex: 1;
   overflow: auto;
+  display: flex;
+  flex-direction: column;
+  padding-top: $largeSpacing;
+  gap: $largeSpacing;
 }
 .thumbnail-item {
-  padding: 5px 0;
   position: relative;
 
   .thumbnail {

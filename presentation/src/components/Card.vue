@@ -8,7 +8,6 @@
     }"
     @click="handleClick"
   >
-    <!-- Main content -->
     <div class="card-content">
       <slot></slot>
     </div>
@@ -45,12 +44,12 @@ const handleClick = () => {
 .card {
   background-color: $card;
   display: flex;
-  flex-direction: column;
   user-select: none;
   border: 1px solid $borderColor;
   border-radius: $borderRadius;
   transition: all 0.2s ease;
   height: 100%;
+  margin: $normalSpacing;
 
   // Padding variations
   &.padding-none {
@@ -58,15 +57,15 @@ const handleClick = () => {
   }
 
   &.padding-small {
-    padding: calc($normalSpacing / 2);
-  }
-
-  &.padding-normal {
     padding: $normalSpacing;
   }
 
-  &.padding-large {
+  &.padding-normal {
     padding: $largeSpacing;
+  }
+
+  &.padding-large {
+    padding: $extraLargeSpacing;
   }
 
   // Interactive states
@@ -93,6 +92,7 @@ const handleClick = () => {
 }
 
 .card-content {
+  width: 100%;
   color: $card-foreground;
 }
 </style>

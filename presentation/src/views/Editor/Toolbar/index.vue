@@ -116,7 +116,7 @@ const currentPanelComponent = computed(() => {
 }
 
 .content {
-  padding: $cardPadding;
+  padding: $extraLargeSpacing;
   font-size: $smTextSize;
   flex: 1;
 

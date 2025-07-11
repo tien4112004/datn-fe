@@ -1,0 +1,20 @@
+span.i-icon {
+  font-size: $smIconSize !important;
+  opacity: 0.8;
+}
+
+button,
+input {
+  padding: 8px 16px;
+}
+
+.title-panel {
+  font-size: $baseTextSize;
+}
+
+.center {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 4px !important;
+}

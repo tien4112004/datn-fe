@@ -428,7 +428,10 @@ const contextmenusThumbnailItem = (): ContextmenuItem[] => {
 
   .icon {
     margin-right: 3px;
-    font-size: 14px;
+    font-size: 14px !important;
+    width: 14px !important;
+    height: 14px !important;
+    display: inline-block;
   }
 }
 .thumbnail-list {

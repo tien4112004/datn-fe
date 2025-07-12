@@ -25,13 +25,13 @@ const { redo, undo } = useHistorySnapshot();
 <style lang="scss" scoped>
 .mobile-editor-header {
   height: 50px;
-  background-color: #fff;
+  background-color: $background;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 0 18px;
   font-size: 13px;
-  box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 15px 0 $shadow-light;
   position: relative;
   z-index: 2;
 }

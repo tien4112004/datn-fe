@@ -225,7 +225,7 @@ const removeThemeColor = (index: number) => {
 };
 
 const getMostReadableColor = (color: string) => {
-  const colorList = ['#000', '#fff'];
+  const colorList = ['$foreground', '$background'];
   return tinycolor.mostReadable(color, colorList, { includeFallbackColors: true }).toRgbString();
 };
 const getHexColor = (color: string) => {
@@ -250,7 +250,7 @@ const getHexColor = (color: string) => {
 }
 .config-item {
   padding: 12px 0 10px;
-  border-bottom: 1px dashed #f5f5f5;
+  border-bottom: 1px dashed $gray-f5f5f5;
   font-size: 13px;
 }
 .label {
@@ -260,7 +260,7 @@ const getHexColor = (color: string) => {
 
   .tip {
     font-size: 12px;
-    color: #999;
+    color: $gray-999;
   }
 }
 .values {
@@ -288,7 +288,7 @@ const getHexColor = (color: string) => {
           top: 11px;
           left: -1px;
           transform: rotate(-45deg);
-          background-color: #000;
+          background-color: $foreground;
         }
         &::before {
           content: '';
@@ -298,7 +298,7 @@ const getHexColor = (color: string) => {
           top: 11px;
           left: -1px;
           transform: rotate(45deg);
-          background-color: #000;
+          background-color: $foreground;
         }
       }
     }

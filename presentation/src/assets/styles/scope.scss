@@ -1,0 +1,40 @@
+.vue-remote {
+  height: calc(100vh - var(--header-height, 64px)); // fallback to 64px if custom property not available
+
+  span.i-icon {
+    font-size: $smIconSize;
+    opacity: 0.7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .title-panel {
+    font-size: $baseTextSize;
+  }
+
+  .center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+  }
+
+  .serif {
+    font-family: ui-serif, Georgia, Cambria, 'Times New Roman', serif;
+  }
+
+  .mono {
+    font-family: Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+  }
+
+  ::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+    background-color: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background-color: #e1e1e1;
+    border-radius: 3px;
+  }
+}

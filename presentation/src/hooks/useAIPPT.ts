@@ -41,6 +41,7 @@ export default () => {
   // Get usable templates
   const getUseableTemplates = (templates: Slide[], n: number, type: TextType) => {
     if (n === 1) {
+      console.log('getUseableTemplates', templates, n, type);
       const list = templates.filter((slide) => {
         const items = slide.elements.filter((el) => checkTextType(el, type));
         const titles = slide.elements.filter((el) => checkTextType(el, 'title'));
@@ -73,11 +74,15 @@ export default () => {
       });
     }
 
-    return templates.filter((slide) => {
+    const res = templates.filter((slide) => {
       const len = slide.elements.filter((el) => checkTextType(el, type)).length;
       const targetLen = target!.elements.filter((el) => checkTextType(el, type)).length;
       return len === targetLen;
     });
+
+    console.log('getUseableTemplates', templates, n, type, res);
+
+    return res;
   };
 
   // Get adapted font size
@@ -267,12 +272,13 @@ export default () => {
 
   // Generate AI-powered PPT
   const AIPPT = (templateSlides: Slide[], _AISlides: AIPPTSlide[], imgs?: ImgPoolItem[]) => {
-    slidesStore.updateSlideIndex(slidesStore.slides.length - 1);
+    // slidesStore.updateSlideIndex(slidesStore.slides.length - 1);
+    const flatAISlides = Array.isArray(_AISlides[0]) ? _AISlides[0] : _AISlides;
 
     if (imgs) imgPool.value = imgs;
 
     const AISlides: AIPPTSlide[] = [];
-    for (const template of _AISlides) {
+    for (const template of flatAISlides) {
       if (template.type === 'content') {
         const items = template.data.items;
         if (items.length === 5 || items.length === 6) {
@@ -649,8 +655,12 @@ export default () => {
         });
       }
     }
-    if (isEmptySlide.value) slidesStore.setSlides(slides);
-    else addSlidesFromData(slides);
+
+    if (isEmptySlide.value) {
+      slidesStore.setSlides(slides);
+    } else {
+      addSlidesFromData(slides);
+    }
   };
 
   return {

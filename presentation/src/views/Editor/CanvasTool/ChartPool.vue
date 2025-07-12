@@ -55,7 +55,7 @@ const selectChart = (chart: ChartType) => {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  color: #999;
+  color: $gray-999;
 
   &:hover {
     color: $themeColor;

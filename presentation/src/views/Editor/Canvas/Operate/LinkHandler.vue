@@ -47,7 +47,7 @@ const turnTarget = (slideId: string) => {
   left: 0;
   font-size: 12px;
   padding: 0 10px;
-  background-color: #fff;
+  background-color: $background;
   box-shadow: $boxShadow;
   display: flex;
   align-items: center;

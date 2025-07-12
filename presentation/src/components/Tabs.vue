@@ -6,7 +6,10 @@
       'space-around': spaceAround,
       'space-between': spaceBetween,
     }"
-    :style="tabsStyle || {}"
+    :style="{
+      ...(tabsStyle || {}),
+      '--tab-count': tabs.length,
+    }"
   >
     <div
       class="tab"
@@ -57,17 +60,19 @@ const emit = defineEmits<{
 
 <style lang="scss" scoped>
 .tabs {
-  display: flex;
+  display: grid;
   user-select: none;
   line-height: 1;
-  padding-bottom: 4px;
   overflow-x: auto;
+  border-radius: $borderRadius;
+  gap: $normalSpacing;
+  grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
 
   &:not(.card) {
-    font-size: 13px;
     align-items: center;
     justify-content: flex-start;
     border-bottom: 1px solid $borderColor;
+    display: flex;
 
     &.space-around {
       justify-content: space-around;
@@ -90,25 +95,34 @@ const emit = defineEmits<{
 
   &.card {
     height: 40px;
-    font-size: 12px;
+    font-size: $baseTextSize;
     flex-shrink: 0;
+    background-color: $lightGray;
+    border: 1px solid $borderColor;
 
     .tab {
       flex: 1;
       display: flex;
       justify-content: center;
       align-items: center;
-      background-color: $lightGray;
-      border-bottom: 1px solid $borderColor;
+      transition: background-color 0.2s ease, opacity 0.2s ease;
+
       cursor: pointer;
+      border-radius: $borderRadius;
+      padding: 0 8px;
 
       &.active {
-        background-color: transparent;
-        border-bottom-color: transparent;
+        background-color: $secondary;
+        color: $secondary-foreground;
       }
 
-      & + .tab {
-        border-left: 1px solid $borderColor;
+      &.active:hover {
+        background-color: $secondary;
+        opacity: 0.9;
+      }
+
+      &:hover {
+        background-color: $card;
       }
     }
   }

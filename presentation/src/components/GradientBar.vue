@@ -142,10 +142,10 @@ const addPoint = (e: MouseEvent) => {
   .point {
     width: 10px;
     height: 18px;
-    background-color: #fff;
+    background-color: $background;
     position: absolute;
     top: 0;
-    border: 2px solid #fff;
+    border: 2px solid $background;
     outline: 1px solid #d9d9d9;
     box-shadow: 0 0 2px 2px #d9d9d9;
     border-radius: 1px;

@@ -41,7 +41,7 @@ const selectSymbol = (value: string) => {
     padding: 5px 12px;
     margin: 0 -12px;
     flex: 1;
-    font-size: 18px;
+    font-size: $baseTextSize;
 
     @include overflow-overlay();
     @include flex-grid-layout();

@@ -1,3 +1,20 @@
+.center {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: $normalSpacing !important;
+}
+
+.title-panel {
+  font-size: $baseTextSize;
+}
+
+.title {
+  font-size: $baseTextSize;
+  font-weight: $boldFontWeight;
+  text-align: center;
+}
+
 html,
 body,
 div,
@@ -111,14 +128,15 @@ body {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background-color: #fff;
+  background-color: $card;
   color: $textColor;
+  font-size: $baseTextSize;
 }
 
 body {
-  //   font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif,
-    'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
+    'Noto Color Emoji';
 }
 
 ol,
@@ -160,7 +178,7 @@ hr {
 }
 
 mark.active {
-  background-color: #ff9632;
+  background-color: $secondary;
 }
 
 input,

@@ -149,7 +149,7 @@ const handleSelect = (option: SelectOption) => {
   transition: border-color 0.25s;
   font-size: 13px;
   user-select: none;
-  background-color: #fff;
+  background-color: $background;
   border: 1px solid #d9d9d9;
   position: relative;
   cursor: pointer;
@@ -159,7 +159,7 @@ const handleSelect = (option: SelectOption) => {
   }
 
   &.disabled {
-    background-color: #f5f5f5;
+    background-color: $gray-f5f5f5;
     border-color: #dcdcdc;
     color: #b7b7b7;
     cursor: default;
@@ -204,7 +204,7 @@ const handleSelect = (option: SelectOption) => {
 .icon {
   width: 32px;
   height: 30px;
-  color: #bfbfbf;
+  color: $muted-foreground;
   position: absolute;
   top: 0;
   right: 0;

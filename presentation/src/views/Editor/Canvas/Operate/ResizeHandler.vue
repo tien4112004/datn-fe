@@ -40,7 +40,7 @@ const rotateClassName = computed(() => {
   top: 0;
   margin: -5px 0 0 -5px;
   border: 1px solid $themeColor;
-  background-color: #fff;
+  background-color: $background;
   border-radius: 1px;
   cursor: pointer;
 

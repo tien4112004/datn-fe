@@ -5,7 +5,7 @@
       <Thumbnails class="layout-content-left" />
       <div class="layout-content-center">
         <CanvasTool class="center-top" />
-        <Canvas class="center-body" :style="{ height: `calc(100% - ${remarkHeight + 40}px)` }" />
+        <Canvas class="center-body" />
         <Remark
           class="center-bottom"
           v-model:height="remarkHeight"
@@ -21,13 +21,13 @@
   <NotesPanel v-if="showNotesPanel" />
   <MarkupPanel v-if="showMarkupPanel" />
 
-  <Modal :visible="!!dialogForExport" :width="680" @closed="closeExportDialog()">
+  <Modal :visible="!!dialogForExport" :width="800" @closed="closeExportDialog()">
     <ExportDialog />
   </Modal>
 
   <Modal
     :visible="showAIPPTDialog"
-    :width="720"
+    :width="840"
     :closeOnClickMask="false"
     :closeOnEsc="false"
     closeButton
@@ -70,7 +70,7 @@ const {
 const closeExportDialog = () => mainStore.setDialogForExport('');
 const closeAIPPTDialog = () => mainStore.setAIPPTDialogState(false);
 
-const remarkHeight = ref(40);
+const remarkHeight = ref(45);
 
 useGlobalHotkey();
 usePasteEvent();
@@ -88,19 +88,30 @@ usePasteEvent();
   display: flex;
 }
 .layout-content-left {
-  width: 160px;
+  width: 180px;
   height: 100%;
   flex-shrink: 0;
 }
 .layout-content-center {
-  width: calc(100% - 160px - 260px);
+  width: calc(100% - 180px - 320px);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 
   .center-top {
     height: 40px;
+    flex-shrink: 0;
+  }
+  .center-body {
+    flex: 1;
+    min-height: 0;
+  }
+  .center-bottom {
+    flex-shrink: 0;
   }
 }
 .layout-content-right {
-  width: 260px;
+  width: 320px;
   height: 100%;
 }
 </style>

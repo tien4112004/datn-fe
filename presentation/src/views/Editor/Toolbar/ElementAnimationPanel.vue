@@ -8,13 +8,7 @@
         style="width: 100%"
       >
         <template #content>
-          <Tabs
-            :tabs="tabs"
-            v-model:value="activeTab"
-            :tabsStyle="{ marginBottom: '20px' }"
-            :tabStyle="{ width: '33.333%' }"
-            spaceAround
-          />
+          <Tabs :tabs="tabs" v-model:value="activeTab" :tabsStyle="{ marginBottom: '20px' }" spaceAround />
           <template v-for="key in animationTypes">
             <div :class="['animation-pool', key]" :key="key" v-if="activeTab === key">
               <div class="pool-type" :key="effect.name" v-for="effect in animations[key]">
@@ -45,13 +39,14 @@
             </div>
           </template>
         </template>
-        <Button class="element-animation-btn" @click="handleAnimationId = ''">
-          <IconEffects style="margin-right: 5px" /> Add Animation
+        <Button class="element-animation-btn center" @click="handleAnimationId = ''">
+          <IconEffects style="margin-right: 5px" />
+          <div>Add Animation</div>
         </Button>
       </Popover>
     </div>
 
-    <div class="tip" v-else>
+    <div class="tip center" v-else>
       <IconClick style="margin-right: 5px" /> Select an element on the canvas to add animation
     </div>
 
@@ -385,6 +380,7 @@ $attentionColor: #e8b76a;
 }
 .element-animation-btn {
   width: 100%;
+  gap: 2px;
 }
 .config-item {
   display: flex;
@@ -396,9 +392,6 @@ $attentionColor: #e8b76a;
 }
 .tip {
   height: 32px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   font-style: italic;
 }
 .animation-pool {
@@ -433,7 +426,7 @@ $attentionColor: #e8b76a;
 }
 .type-title {
   width: 100%;
-  font-size: 13px;
+  font-size: $baseTextSize;
   margin-bottom: 10px;
   border-left: 4px solid #aaa;
   background-color: #eee;
@@ -443,7 +436,7 @@ $attentionColor: #e8b76a;
   @include flex-grid-layout();
 }
 .pool-item {
-  @include flex-grid-layout-children(4, 23.5%);
+  @include flex-grid-layout-children(3, 32.5%);
   margin-bottom: 5px;
   text-align: center;
   cursor: pointer;
@@ -454,8 +447,9 @@ $attentionColor: #e8b76a;
   align-items: center;
   height: 45px;
   line-height: 16px;
-  background-color: $lightGray;
+  background-color: $gray-eee;
   border-radius: $borderRadius;
+  padding: 0px 8px;
 }
 
 .animation-sequence {
@@ -502,7 +496,7 @@ $attentionColor: #e8b76a;
     }
     .handler {
       flex: 2;
-      font-size: 15px;
+      font-size: $baseTextSize;
       text-align: right;
     }
     .handler-btn {

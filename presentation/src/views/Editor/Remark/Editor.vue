@@ -135,7 +135,7 @@ const handleMouseup = () => {
           width: 0,
           right: left,
           bottom: top,
-        }) as DOMRect,
+        } as DOMRect),
     });
     menuInstance.value.show();
   }
@@ -232,7 +232,7 @@ onUnmounted(() => {
 
   ::v-deep(.ProseMirror) {
     height: 100%;
-    font-size: 12px;
+    font-size: $xsTextSize;
     overflow: auto;
     padding: 8px;
     line-height: 1.5;
@@ -241,14 +241,14 @@ onUnmounted(() => {
       content: attr(data-placeholder);
       pointer-events: none;
       position: absolute;
-      font-size: 12px;
-      color: rgba(#666, 0.5);
+      font-size: $xsTextSize;
+      color: rgba($gray-666, 0.5);
     }
   }
 }
 .menu {
   display: flex;
-  background-color: #fff;
+  background-color: $background;
   padding: 6px 4px;
   border-radius: $borderRadius;
   box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.15);
@@ -256,10 +256,10 @@ onUnmounted(() => {
   button {
     outline: 0;
     border: 0;
-    background-color: #fff;
+    background-color: $background;
     padding: 3px;
     border-radius: $borderRadius;
-    font-size: 16px;
+    font-size: $baseTextSize;
     margin: 0 3px;
     display: flex;
     align-items: center;
@@ -269,7 +269,7 @@ onUnmounted(() => {
     &:hover,
     &.active {
       background-color: $themeColor;
-      color: #fff;
+      color: $background;
     }
   }
 }

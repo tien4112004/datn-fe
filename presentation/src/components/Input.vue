@@ -84,7 +84,7 @@ defineExpose({
 
 <style lang="scss" scoped>
 .input {
-  background-color: #fff;
+  background-color: $background;
   border: 1px solid #d9d9d9;
   padding: 0 5px;
   border-radius: $borderRadius;
@@ -103,12 +103,11 @@ defineExpose({
     padding: 0 5px;
     flex: 1;
     font-size: 13px;
-    font-family:
-      -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif,
-      'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
+      sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 
     &::placeholder {
-      color: #bfbfbf;
+      color: $muted-foreground;
     }
   }
 
@@ -118,7 +117,7 @@ defineExpose({
   }
 
   &.disabled {
-    background-color: #f5f5f5;
+    background-color: $gray-f5f5f5;
     border-color: #dcdcdc;
     color: #b7b7b7;
 

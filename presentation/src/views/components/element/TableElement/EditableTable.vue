@@ -769,7 +769,7 @@ table {
   --subThemeColor2: $themeColor;
 
   &.theme {
-    background-color: #fff;
+    background-color: $background;
 
     tr:nth-child(2n) .cell {
       background-color: var(--subThemeColor1);
@@ -805,7 +805,7 @@ table {
     white-space: normal;
     word-wrap: break-word;
     vertical-align: middle;
-    font-size: 14px;
+    font-size: $smTextSize;
     background-clip: padding-box;
     cursor: default;
 
@@ -816,7 +816,7 @@ table {
       position: absolute;
       top: 0;
       left: 0;
-      background-color: rgba($color: #666, $alpha: 0.4);
+      background-color: rgba($color: $gray-666, $alpha: 0.4);
     }
   }
 

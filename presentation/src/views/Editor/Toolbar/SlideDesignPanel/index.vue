@@ -1,6 +1,6 @@
 <template>
   <div class="slide-design-panel">
-    <div class="title">Background Fill</div>
+    <div class="title title-panel">Background Fill</div>
     <div class="row">
       <Select
         style="flex: 1"
@@ -21,7 +21,7 @@
             @update:modelValue="(color) => updateBackground({ color })"
           />
         </template>
-        <ColorButton :color="background.color || '#fff'" />
+        <ColorButton :color="background.color || '$background'" />
       </Popover>
 
       <Select
@@ -104,18 +104,18 @@
         :value="viewportRatio"
         @update:value="(value) => updateViewportRatio(value as number)"
         :options="[
-          { label: 'Widescreen 16 : 9', value: 0.5625 },
-          { label: 'Widescreen 16 : 10', value: 0.625 },
-          { label: 'Standard 4 : 3', value: 0.75 },
-          { label: 'Paper A3 / A4', value: 0.70710678 },
-          { label: 'Portrait A3 / A4', value: 1.41421356 },
+          { label: 'Widescreen 16:9', value: 0.5625 },
+          { label: 'Widescreen 16:10', value: 0.625 },
+          { label: 'Standard 4:3', value: 0.75 },
+          { label: 'Paper A3/A4', value: 0.70710678 },
+          { label: 'Portrait A3/A4', value: 1.41421356 },
         ]"
       />
     </div>
 
     <div class="row">
       <div class="canvas-size">
-        Canvas Size：{{ viewportSize }} ×
+        Canvas Size: {{ viewportSize }} ×
         {{ toFixed(viewportSize * viewportRatio) }}
       </div>
     </div>
@@ -123,9 +123,11 @@
     <Divider />
 
     <div class="title">
-      <span>Main Theme</span>
+      <span class="title-panel">Main Theme</span>
       <span class="more" @click="moreThemeConfigsVisible = !moreThemeConfigsVisible">
-        <span class="text">More</span>
+        <span class="text">
+          {{ moreThemeConfigsVisible ? 'Hide' : 'More' }}
+        </span>
         <IconDown v-if="moreThemeConfigsVisible" />
         <IconRight v-else />
       </span>
@@ -202,7 +204,7 @@
               @update:modelValue="(value) => updateTheme({ outline: { ...theme.outline, color: value } })"
             />
           </template>
-          <ColorButton :color="theme.outline.color || '#000'" />
+          <ColorButton :color="theme.outline.color || '$foreground'" />
         </Popover>
       </div>
       <div class="row">
@@ -272,7 +274,7 @@
 
     <Divider />
 
-    <div class="title">Preset Themes</div>
+    <div class="title title-panel">Preset Themes</div>
     <div class="theme-list">
       <div
         class="theme-item"
@@ -364,7 +366,7 @@ const background = computed(() => {
   if (!currentSlide.value.background) {
     return {
       type: 'solid',
-      value: '#fff',
+      value: '$background',
     } as SlideBackground;
   }
   return currentSlide.value.background;
@@ -383,7 +385,7 @@ const updateBackgroundType = (type: SlideBackgroundType) => {
     const newBackground: SlideBackground = {
       ...background.value,
       type: 'solid',
-      color: background.value.color || '#fff',
+      color: background.value.color || '$background',
     };
     slidesStore.updateSlide({ background: newBackground });
   } else if (type === 'image') {
@@ -403,8 +405,8 @@ const updateBackgroundType = (type: SlideBackgroundType) => {
       gradient: background.value.gradient || {
         type: 'linear',
         colors: [
-          { pos: 0, color: '#fff' },
-          { pos: 100, color: '#fff' },
+          { pos: 0, color: '$background' },
+          { pos: 100, color: '$background' },
         ],
         rotate: 0,
       },
@@ -491,10 +493,11 @@ const toFixed = (num: number) => {
   margin-bottom: 10px;
 
   .more {
+    display: flex;
+    align-items: center;
     cursor: pointer;
 
     .text {
-      font-size: 12px;
       margin-right: 3px;
     }
   }
@@ -530,7 +533,7 @@ const toFixed = (num: number) => {
 .canvas-size {
   width: 100%;
   color: #888;
-  font-size: 12px;
+  font-size: $xsTextSize;
   text-align: center;
 }
 
@@ -557,7 +560,7 @@ const toFixed = (num: number) => {
   }
 
   .text {
-    font-size: 15px;
+    font-size: $baseTextSize;
   }
   .colors {
     display: flex;
@@ -580,7 +583,7 @@ const toFixed = (num: number) => {
     justify-content: center;
     align-items: center;
     display: flex;
-    background-color: rgba($color: #000, $alpha: 0.25);
+    background-color: rgba($color: $foreground, $alpha: 0.25);
     opacity: 0;
     transition: opacity $transitionDelay;
   }

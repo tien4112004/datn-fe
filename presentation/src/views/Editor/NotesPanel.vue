@@ -243,14 +243,14 @@ const close = () => {
 .empty {
   width: 100%;
   height: 100%;
-  color: #999;
+  color: $gray-999;
   font-style: italic;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 .note {
-  border: 1px solid #eee;
+  border: 1px solid $gray-eee;
   border-radius: 4px;
   padding: 10px;
 
@@ -282,7 +282,7 @@ const close = () => {
       height: 30px;
       border-radius: 50%;
       background-color: #42ba97;
-      color: #fff;
+      color: $background;
       font-size: 18px;
       display: flex;
       justify-content: center;
@@ -295,7 +295,7 @@ const close = () => {
     }
     .time {
       font-size: 12px;
-      color: #aaa;
+      color: $gray-aaa;
     }
   }
   .btns {
@@ -356,7 +356,7 @@ const close = () => {
 
       &.icon {
         font-size: 18px;
-        color: #666;
+        color: $gray-666;
         cursor: pointer;
       }
     }

@@ -113,7 +113,7 @@ td {
   width: 23px;
   height: 23px;
   line-height: 23px;
-  border: 2px solid #fff;
+  border: 2px solid $background;
   background-color: #f7f7f7;
 }
 .cell {

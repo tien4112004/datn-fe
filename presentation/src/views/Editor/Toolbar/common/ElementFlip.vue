@@ -1,11 +1,13 @@
 <template>
   <div class="element-flip">
     <ButtonGroup class="row">
-      <CheckboxButton style="flex: 1" :checked="flipV" @click="updateFlip({ flipV: !flipV })">
-        <IconFlipVertically /> Vertical Flip
+      <CheckboxButton class="center" style="flex: 1" :checked="flipV" @click="updateFlip({ flipV: !flipV })">
+        <IconFlipVertically />
+        <div>Vertical Flip</div>
       </CheckboxButton>
-      <CheckboxButton style="flex: 1" :checked="flipH" @click="updateFlip({ flipH: !flipH })">
-        <IconFlipHorizontally /> Horizontal Flip
+      <CheckboxButton class="center" style="flex: 1" :checked="flipH" @click="updateFlip({ flipH: !flipH })">
+        <IconFlipHorizontally />
+        <div>Horizontal Flip</div>
       </CheckboxButton>
     </ButtonGroup>
   </div>

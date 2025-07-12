@@ -47,11 +47,11 @@
             </div>
             <div class="icons">
               <IconPreviewClose
-                style="font-size: 17px"
+                class="visibility-icon"
                 @click.stop="toggleHideElement(groupItem.id)"
                 v-if="hiddenElementIdList.includes(groupItem.id)"
               />
-              <IconPreviewOpen style="font-size: 17px" @click.stop="toggleHideElement(groupItem.id)" v-else />
+              <IconPreviewOpen class="visibility-icon" @click.stop="toggleHideElement(groupItem.id)" v-else />
             </div>
           </div>
         </div>
@@ -76,11 +76,11 @@
           </div>
           <div class="icons">
             <IconPreviewClose
-              style="font-size: 17px"
+              class="visibility-icon"
               @click.stop="toggleHideElement(item.id)"
               v-if="hiddenElementIdList.includes(item.id)"
             />
-            <IconPreviewOpen style="font-size: 17px" @click.stop="toggleHideElement(item.id)" v-else />
+            <IconPreviewOpen class="visibility-icon" @click.stop="toggleHideElement(item.id)" v-else />
           </div>
         </div>
       </template>
@@ -169,7 +169,7 @@ const close = () => {
 <style lang="scss" scoped>
 .select-panel {
   height: 100%;
-  font-size: 12px;
+  font-size: $xsTextSize;
   user-select: none;
 }
 .handler {
@@ -207,7 +207,7 @@ const close = () => {
 }
 .item {
   padding: 5px;
-  font-size: 12px;
+  font-size: $xsTextSize;
   border-radius: $borderRadius;
   display: flex;
   align-items: center;
@@ -256,7 +256,11 @@ const close = () => {
   padding-left: 0;
   padding-right: 0;
   flex: 1;
-  font-size: 12px;
+  font-size: $xsTextSize;
   background-color: transparent;
+}
+
+.visibility-icon {
+  font-size: $baseTextSize;
 }
 </style>

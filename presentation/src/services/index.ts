@@ -27,33 +27,10 @@ export default {
   },
 
   AIPPT_Outline({ content, language, model }: AIPPTOutlinePayload): Promise<any> {
-    return fetch(`${SERVER_URL}/tools/aippt_outline`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        content,
-        language,
-        model,
-        stream: true,
-      }),
-    });
+    return fetch(`${import.meta.env.VITE_BASE_URL}/mocks/AIPPT_Outline.md`);
   },
 
   AIPPT({ content, language, style, model }: AIPPTPayload): Promise<any> {
-    return fetch(`${SERVER_URL}/tools/aippt`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        content,
-        language,
-        model,
-        style,
-        stream: true,
-      }),
-    });
+    return fetch(`${import.meta.env.VITE_BASE_URL}/mocks/AIPPT.json`);
   },
 };

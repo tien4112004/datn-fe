@@ -1,15 +1,17 @@
 <template>
-  <div class="toolbar">
+  <Card class="toolbar" padding="normal">
     <Tabs
+      class="toolbar-tabs"
       :tabs="currentTabs"
       :value="toolbarState"
       card
       @update:value="(key) => setToolbarState(key as ToolbarStates)"
     />
+
     <div class="content">
       <component :is="currentPanelComponent"></component>
     </div>
-  </div>
+  </Card>
 </template>
 
 <script lang="ts" setup>
@@ -22,11 +24,12 @@ import ElementStylePanel from './ElementStylePanel/index.vue';
 import ElementPositionPanel from './ElementPositionPanel.vue';
 import ElementAnimationPanel from './ElementAnimationPanel.vue';
 import SlideDesignPanel from './SlideDesignPanel/index.vue';
-import SlideAnimationPanel from './SlideAnimationPanel.vue';
+import SlideAnimationPanel from './SlideTransitionPanel.vue';
 import MultiPositionPanel from './MultiPositionPanel.vue';
 import MultiStylePanel from './MultiStylePanel.vue';
 import SymbolPanel from './SymbolPanel.vue';
 import Tabs from '@/components/Tabs.vue';
+import Card from '@/components/Card.vue';
 
 interface ElementTabs {
   label: string;
@@ -102,15 +105,34 @@ const currentPanelComponent = computed(() => {
 
 <style lang="scss" scoped>
 .toolbar {
-  border-left: solid 1px $borderColor;
-  background-color: #fff;
-  display: flex;
-  flex-direction: column;
+  color: $textColor;
+  height: 100%;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+
+  :deep(.card-content) {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+  }
 }
+
 .content {
-  padding: 12px;
-  font-size: 13px;
+  padding: $extraLargeSpacing;
+  font-size: $smTextSize;
+  flex: 1;
+
+  min-width: 0;
+  width: 100%;
 
   @include overflow-overlay();
+}
+
+.toolbar-tabs {
+  margin: 2px;
 }
 </style>

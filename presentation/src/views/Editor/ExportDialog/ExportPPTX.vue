@@ -10,7 +10,9 @@
         </RadioGroup>
       </div>
       <div class="row" v-if="rangeType === 'custom'">
-        <div class="title" :data-range="`（${range[0]} ~ ${range[1]}）`">Custom Range:</div>
+        <div class="title" :data-range="`（${range[0]} ~ ${range[1]}）`">
+          Custom Range ({{ range[0] }} ~ {{ range[1] }}):
+        </div>
         <Slider class="config-item" range :min="1" :max="slides.length" :step="1" v-model:value="range" />
       </div>
       <div class="row">
@@ -19,7 +21,10 @@
           <Switch
             v-model:value="ignoreMedia"
             v-tooltip="
-              '导出时默认忽略音视频，若您的幻灯片中存在音视频元素，且希望将其导出到PPTX文件中，可选择关闭【忽略音视频】选项，但要注意这将会大幅增加导出用时。'
+              `By default, audio and video are ignored during
+          export. If your slides contain audio or video elements and you want to include them in the exported
+          PPTX file, you can choose to disable the \'Ignore Audio/Video\' option. However, note that this will
+          significantly increase the export time.`
             "
           />
         </div>
@@ -97,7 +102,7 @@ const selectedSlides = computed(() => {
   overflow: hidden;
 }
 .configs {
-  width: 350px;
+  width: 520px;
   height: calc(100% - 100px);
   display: flex;
   flex-direction: column;
@@ -111,39 +116,30 @@ const selectedSlides = computed(() => {
   }
 
   .title {
-    width: 100px;
-    position: relative;
-
-    &::after {
-      content: attr(data-range);
-      position: absolute;
-      top: 20px;
-      left: 0;
-    }
+    width: 180px;
+    text-align: left;
   }
   .config-item {
     flex: 1;
   }
 
   .tip {
-    font-size: 12px;
-    color: #aaa;
+    font-size: $smTextSize;
+    color: $gray-aaa;
     line-height: 1.8;
     margin-top: 10px;
   }
 }
 .btns {
-  width: 300px;
-  height: 100px;
   display: flex;
   justify-content: center;
   align-items: center;
 
   .export {
-    flex: 1;
+    width: 120px;
   }
   .close {
-    width: 100px;
+    width: 120px;
     margin-left: 10px;
   }
 }

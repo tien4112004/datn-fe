@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "packageManager": "pnpm@7.22.0",
+  "packageManager": "pnpm@10.12.0",
   "scripts": {
     "dev": "turbo run dev --parallel",
     "build": "turbo run build",

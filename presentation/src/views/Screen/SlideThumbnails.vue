@@ -58,7 +58,7 @@ const turnSlide = (index: number) => {
 
   .icon {
     color: #fff;
-    font-size: 36px;
+    font-size: $xxxlTextSize;
     cursor: pointer;
 
     &:hover {

@@ -3,7 +3,9 @@
     <div class="shape-content">
       <svg overflow="visible" width="18" height="18">
         <g
-          :transform="`scale(${18 / shape.viewBox[0]}, ${18 / shape.viewBox[1]}) translate(0,0) matrix(1,0,0,1,0,0)`"
+          :transform="`scale(${18 / shape.viewBox[0]}, ${
+            18 / shape.viewBox[1]
+          }) translate(0,0) matrix(1,0,0,1,0,0)`"
         >
           <path
             class="shape-path"

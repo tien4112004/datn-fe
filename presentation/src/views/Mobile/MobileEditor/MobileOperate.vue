@@ -5,7 +5,9 @@
       top: elementInfo.top * canvasScale + 'px',
       left: elementInfo.left * canvasScale + 'px',
       transform: `rotate(${rotate}deg)`,
-      transformOrigin: `${(elementInfo.width * canvasScale) / 2}px ${(elementInfo.height * canvasScale) / 2}px`,
+      transformOrigin: `${(elementInfo.width * canvasScale) / 2}px ${
+        (elementInfo.height * canvasScale) / 2
+      }px`,
     }"
   >
     <template v-if="isSelected">
@@ -23,13 +25,13 @@
         :type="point.direction"
         :rotate="elementInfo.rotate"
         :style="point.style"
-        @touchstart.stop="($event) => scaleElement($event, elementInfo, point.direction)"
+        @touchstart.stop="($event: any) => scaleElement($event, elementInfo, point.direction)"
       />
       <RotateHandler
         class="operate-rotate-handler"
         :style="{ left: scaleWidth / 2 + 'px' }"
         v-if="!cannotRotate"
-        @touchstart.stop="($event) => rotateElement($event, elementInfo as CanRotatePPTElement)"
+        @touchstart.stop="($event: any) => rotateElement($event, elementInfo as CanRotatePPTElement)"
       />
     </template>
   </div>

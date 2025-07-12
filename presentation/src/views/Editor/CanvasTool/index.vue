@@ -14,7 +14,7 @@
         @click="redo()"
       />
       <div class="more">
-        <Divider type="vertical" style="height: 20px" />
+        <Divider type="vertical" style="height: 20px" class="divider1" />
         <Popover class="more-icon" trigger="click" v-model:value="moreVisible" :offset="10">
           <template #content>
             <PopoverMenuItem
@@ -489,11 +489,35 @@ const toggleNotesPanel = () => {
   .more-icon {
     display: block;
   }
+
+  .more .divider1 {
+    display: none;
+  }
 }
-@media screen and (width <= 1000px) {
+
+@media screen and (width <= 1100px) {
+  .canvas-tool {
+    :deep(.card-content) {
+      padding-inline: 2px;
+    }
+  }
+}
+
+@media screen and (width <= 1050px) {
   .left-handler,
   .right-handler {
     display: none;
+  }
+
+  .canvas-tool {
+    margin: 2px 8px;
+
+    :deep(.card-content) {
+      padding-inline: $normalSpacing;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
   }
 }
 </style>

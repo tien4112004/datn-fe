@@ -65,7 +65,7 @@ const currentDialogComponent = computed<unknown>(() => {
 .content {
   height: 460px;
   padding: 12px;
-  font-size: 13px;
+  font-size: $baseTextSize;
 
   @include overflow-overlay();
 }

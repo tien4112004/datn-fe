@@ -102,7 +102,7 @@ const selectedSlides = computed(() => {
   overflow: hidden;
 }
 .configs {
-  width: 500px;
+  width: 520px;
   height: calc(100% - 100px);
   display: flex;
   flex-direction: column;
@@ -116,31 +116,30 @@ const selectedSlides = computed(() => {
   }
 
   .title {
-    width: 140px;
+    width: 180px;
+    text-align: left;
   }
   .config-item {
     flex: 1;
   }
 
   .tip {
-    font-size: 12px;
+    font-size: $smTextSize;
     color: $gray-aaa;
     line-height: 1.8;
     margin-top: 10px;
   }
 }
 .btns {
-  width: 300px;
-  height: 100px;
   display: flex;
   justify-content: center;
   align-items: center;
 
   .export {
-    flex: 1;
+    width: 120px;
   }
   .close {
-    width: 100px;
+    width: 120px;
     margin-left: 10px;
   }
 }

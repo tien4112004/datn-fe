@@ -21,13 +21,13 @@
   <NotesPanel v-if="showNotesPanel" />
   <MarkupPanel v-if="showMarkupPanel" />
 
-  <Modal :visible="!!dialogForExport" :width="680" @closed="closeExportDialog()">
+  <Modal :visible="!!dialogForExport" :width="800" @closed="closeExportDialog()">
     <ExportDialog />
   </Modal>
 
   <Modal
     :visible="showAIPPTDialog"
-    :width="720"
+    :width="840"
     :closeOnClickMask="false"
     :closeOnEsc="false"
     closeButton

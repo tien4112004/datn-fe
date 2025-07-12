@@ -40,7 +40,7 @@
         <div class="config-item">
           <div class="label">Language:</div>
           <Select
-            style="width: 80px"
+            style="width: 120px"
             v-model:value="language"
             :options="[
               { label: 'Chinese', value: 'Chinese' },
@@ -52,7 +52,7 @@
         <div class="config-item">
           <div class="label">Style:</div>
           <Select
-            style="width: 80px"
+            style="width: 120px"
             v-model:value="style"
             :options="[
               { label: 'General', value: 'General' },
@@ -303,7 +303,7 @@ const createPPT = async () => {
   }
   .subtite {
     color: #888;
-    font-size: $xsTextSize;
+    font-size: $smTextSize;
   }
 }
 .preview {
@@ -397,6 +397,7 @@ const createPPT = async () => {
     font-size: $smTextSize;
     display: flex;
     align-items: center;
+    gap: $normalSpacing;
   }
 }
 .count {
@@ -406,7 +407,7 @@ const createPPT = async () => {
 }
 .submit {
   height: 20px;
-  font-size: $xsTextSize;
+  font-size: $smTextSize;
   background-color: $themeColor;
   color: $background;
   display: flex;

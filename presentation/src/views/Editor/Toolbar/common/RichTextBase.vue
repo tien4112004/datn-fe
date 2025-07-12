@@ -199,8 +199,8 @@
       <RadioButton value="justify" v-tooltip="'Justify'" style="flex: 1"><IconAlignTextBoth /></RadioButton>
     </RadioGroup>
 
-    <div class="row" passive>
-      <ButtonGroup style="flex: 1">
+    <div class="row">
+      <ButtonGroup style="flex: 1" passive>
         <Button
           first
           :type="richTextAttrs.bulletList ? 'primary' : 'default'"
@@ -382,7 +382,7 @@ const openLinkPopover = () => {
 };
 const updateLink = (link?: string) => {
   const linkRegExp = /^(https?):\/\/[\w\-]+(\.[\w\-]+)+([\w\-.,@?^=%&:\/~+#]*[\w\-@?^=%&\/~+#])?$/;
-  if (!link || !linkRegExp.test(link)) return message.error('不是正确的网页链接地址');
+  if (!link || !linkRegExp.test(link)) return message.error('Not a valid web link address');
 
   emitRichTextCommand('link', link);
   linkPopoverVisible.value = false;

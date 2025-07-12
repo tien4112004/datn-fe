@@ -93,24 +93,22 @@ const selectedSlides = computed(() => {
   }
 
   .tip {
-    font-size: 12px;
+    font-size: $smTextSize;
     color: $gray-aaa;
     line-height: 1.8;
     margin-top: 25px;
   }
 }
 .btns {
-  width: 300px;
-  height: 100px;
   display: flex;
   justify-content: center;
   align-items: center;
 
   .export {
-    flex: 1;
+    width: 140px;
   }
   .close {
-    width: 100px;
+    width: 140px;
     margin-left: 10px;
   }
 }

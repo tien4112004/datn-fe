@@ -125,7 +125,9 @@
     <div class="title">
       <span class="title-panel">Main Theme</span>
       <span class="more" @click="moreThemeConfigsVisible = !moreThemeConfigsVisible">
-        <span class="text">More</span>
+        <span class="text">
+          {{ moreThemeConfigsVisible ? 'Hide' : 'More' }}
+        </span>
         <IconDown v-if="moreThemeConfigsVisible" />
         <IconRight v-else />
       </span>

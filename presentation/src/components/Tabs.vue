@@ -6,7 +6,10 @@
       'space-around': spaceAround,
       'space-between': spaceBetween,
     }"
-    :style="tabsStyle || {}"
+    :style="{
+      ...(tabsStyle || {}),
+      '--tab-count': tabs.length,
+    }"
   >
     <div
       class="tab"
@@ -58,17 +61,18 @@ const emit = defineEmits<{
 <style lang="scss" scoped>
 .tabs {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
   user-select: none;
   line-height: 1;
   overflow-x: auto;
   border-radius: $borderRadius;
   gap: $normalSpacing;
+  grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
 
   &:not(.card) {
     align-items: center;
     justify-content: flex-start;
     border-bottom: 1px solid $borderColor;
+    display: flex;
 
     &.space-around {
       justify-content: space-around;
@@ -95,13 +99,13 @@ const emit = defineEmits<{
     flex-shrink: 0;
     background-color: $lightGray;
     border: 1px solid $borderColor;
-    display: flex;
 
     .tab {
       flex: 1;
       display: flex;
       justify-content: center;
       align-items: center;
+      transition: background-color 0.2s ease, opacity 0.2s ease;
 
       cursor: pointer;
       border-radius: $borderRadius;

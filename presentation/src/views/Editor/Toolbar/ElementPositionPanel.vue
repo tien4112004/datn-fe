@@ -75,7 +75,7 @@
     <div class="title title-panel">Properties</div>
 
     <div class="row">
-      <div style="width: 45%">Horizontal:</div>
+      <div style="width: 45%">Horizontal</div>
       <NumberInput
         :min="-1000"
         :step="5"
@@ -87,7 +87,7 @@
       </NumberInput>
     </div>
     <div class="row">
-      <div style="width: 45%">Vertical:</div>
+      <div style="width: 45%">Vertical</div>
       <NumberInput
         :min="-1000"
         :step="5"
@@ -101,7 +101,7 @@
 
     <template v-if="handleElement!.type !== 'line'">
       <div class="row">
-        <div style="width: 45%">Width:</div>
+        <div style="width: 45%">Width</div>
         <NumberInput
           :min="minSize"
           :max="1500"
@@ -132,7 +132,7 @@
       </template>
       <div style="width: 10%" v-else></div>
       <div class="row">
-        <div style="width: 45%">Height:</div>
+        <div style="width: 45%">Height</div>
         <NumberInput
           :min="minSize"
           :max="800"
@@ -157,9 +157,9 @@
           :step="5"
           :value="rotate"
           @update:value="(value) => updateRotate(value)"
-          style="width: 45%"
+          style="width: 60%"
         >
-          <template #prefix> Rotation: </template>
+          <template #prefix> Rotation </template>
         </NumberInput>
         <div style="width: 7%"></div>
         <div class="text-btn" @click="updateRotate45('-')" style="width: 24%"><IconRotate /> -45°</div>
@@ -353,6 +353,7 @@ const updateRotate45 = (command: '+' | '-') => {
 </script>
 
 <style lang="scss" scoped>
+@use 'sass:color';
 .row {
   width: 100%;
   display: flex;
@@ -370,9 +371,20 @@ const updateRotate45 = (command: '+' | '-') => {
 }
 .icon-btn {
   cursor: pointer;
+  padding: 6px;
+
+  &:hover {
+    color: $themeColor;
+  }
 
   &.active {
-    color: $themeColor;
+    color: $lightGray;
+    background-color: $themeColor;
+    border-radius: 50%;
+
+    &:hover {
+      background-color: color.adjust($themeColor, $lightness: -10%);
+    }
   }
 }
 .text-btn {

@@ -8,13 +8,7 @@
         style="width: 100%"
       >
         <template #content>
-          <Tabs
-            :tabs="tabs"
-            v-model:value="activeTab"
-            :tabsStyle="{ marginBottom: '20px' }"
-            :tabStyle="{ width: '33.333%' }"
-            spaceAround
-          />
+          <Tabs :tabs="tabs" v-model:value="activeTab" :tabsStyle="{ marginBottom: '20px' }" spaceAround />
           <template v-for="key in animationTypes">
             <div :class="['animation-pool', key]" :key="key" v-if="activeTab === key">
               <div class="pool-type" :key="effect.name" v-for="effect in animations[key]">
@@ -502,7 +496,7 @@ $attentionColor: #e8b76a;
     }
     .handler {
       flex: 2;
-      font-size: 15px;
+      font-size: $baseTextSize;
       text-align: right;
     }
     .handler-btn {

@@ -1,14 +1,14 @@
 <template>
   <div class="element-outline">
     <div class="row" v-if="!fixed">
-      <div style="width: 40%">Enable Border:</div>
+      <div style="width: 40%">Border:</div>
       <div class="switch-wrapper" style="width: 60%">
         <Switch :value="hasOutline" @update:value="(value) => toggleOutline(value)" />
       </div>
     </div>
     <template v-if="hasOutline && outline">
       <div class="row">
-        <div style="width: 40%">Border Style:</div>
+        <div style="width: 40%">Style:</div>
         <SelectCustom style="width: 60%">
           <template #options>
             <div
@@ -26,7 +26,7 @@
         </SelectCustom>
       </div>
       <div class="row">
-        <div style="width: 40%">Border Color:</div>
+        <div style="width: 40%">Color:</div>
         <Popover trigger="click" style="width: 60%">
           <template #content>
             <ColorPicker
@@ -38,7 +38,7 @@
         </Popover>
       </div>
       <div class="row">
-        <div style="width: 40%">Border Thickness:</div>
+        <div style="width: 40%">Thickness:</div>
         <NumberInput
           :value="outline.width || 0"
           @update:value="(value) => updateOutline({ width: value })"

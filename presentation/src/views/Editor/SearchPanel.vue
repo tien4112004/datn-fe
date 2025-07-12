@@ -7,7 +7,7 @@
       <Input
         class="input"
         v-model:value="searchWord"
-        placeholder="Enter search content"
+        placeholder="Find"
         @enter="searchNext()"
         ref="searchInpRef"
       >
@@ -29,7 +29,7 @@
       <Input
         class="input"
         v-model:value="replaceWord"
-        placeholder="Enter replacement content"
+        placeholder="Replace"
         @enter="replace()"
         v-if="type === 'replace'"
       ></Input>

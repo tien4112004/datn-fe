@@ -146,24 +146,23 @@ const expImage = () => {
   .title {
     width: 160px;
     position: relative;
+    text-align: left;
   }
   .config-item {
     flex: 1;
   }
 }
 .btns {
-  width: 300px;
-  height: 100px;
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1;
 
   .export {
-    flex: 1;
+    width: 120px;
   }
   .close {
-    width: 100px;
+    width: 120px;
     margin-left: 10px;
   }
 }

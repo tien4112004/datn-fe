@@ -1,6 +1,7 @@
 <template>
   <Card class="toolbar" padding="normal">
     <Tabs
+      class="toolbar-tabs"
       :tabs="currentTabs"
       :value="toolbarState"
       card
@@ -106,12 +107,17 @@ const currentPanelComponent = computed(() => {
 .toolbar {
   color: $textColor;
   height: 100%;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
 
   :deep(.card-content) {
     display: flex;
     flex-direction: column;
     height: 100%;
     flex: 1;
+    min-width: 0;
+    overflow: hidden;
   }
 }
 
@@ -120,6 +126,13 @@ const currentPanelComponent = computed(() => {
   font-size: $smTextSize;
   flex: 1;
 
+  min-width: 0;
+  width: 100%;
+
   @include overflow-overlay();
+}
+
+.toolbar-tabs {
+  margin: 2px;
 }
 </style>

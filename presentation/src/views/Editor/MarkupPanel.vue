@@ -191,7 +191,7 @@ const close = () => {
   height: 30px;
   line-height: 30px;
   text-align: center;
-  color: #999;
+  color: $gray-999;
   font-style: italic;
   border: 1px dashed #ccc;
   border-radius: $borderRadius;

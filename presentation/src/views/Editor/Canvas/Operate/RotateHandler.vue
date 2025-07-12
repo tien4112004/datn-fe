@@ -12,7 +12,7 @@
   top: -25px;
   margin-left: -5px;
   border: 1px solid $themeColor;
-  background-color: #fff;
+  background-color: $background;
   border-radius: 1px;
   cursor: grab;
 

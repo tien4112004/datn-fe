@@ -1,7 +1,7 @@
 <template>
   <div class="element-shadow">
     <div class="row">
-      <div style="width: 40%">Enable Shadow:</div>
+      <div style="width: 40%">Shadow:</div>
       <div class="switch-wrapper" style="width: 60%">
         <Switch :value="hasShadow" @update:value="(value) => toggleShadow(value)" />
       </div>

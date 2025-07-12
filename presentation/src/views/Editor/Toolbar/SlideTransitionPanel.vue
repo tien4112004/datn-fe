@@ -2,7 +2,7 @@
   <div class="slide-animation-panel">
     <div class="animation-pool">
       <div
-        class="animation-item"
+        class="animation-item center"
         :class="{ active: currentTurningMode === item.value }"
         v-for="item in animations"
         :key="item.label"
@@ -74,6 +74,7 @@ const applyAllSlide = () => {
   padding: 20px 0 15px 0;
   position: relative;
   cursor: pointer;
+  border-radius: $borderRadius;
 
   &.active {
     border-color: $themeColor;
@@ -162,7 +163,8 @@ const applyAllSlide = () => {
   }
 }
 .animation-text {
-  font-size: 12px;
+  font-size: $smTextSize;
+  width: 90%;
   color: #333;
   text-align: center;
 }

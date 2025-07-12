@@ -68,11 +68,11 @@ const handleClick = () => {
     line-height: 24px;
     padding: 0 7px;
     // letter-spacing: 0;
-    font-size: 12px;
+    font-size: $smTextSize;
   }
 
   &.default {
-    background-color: #fff;
+    background-color: $background;
     border: 1px solid #d9d9d9;
     color: $textColor;
 
@@ -84,7 +84,7 @@ const handleClick = () => {
   &.primary {
     background-color: $themeColor;
     border: 1px solid $themeColor;
-    color: #fff;
+    color: $background;
 
     &:hover {
       background-color: $themeHoverColor;
@@ -93,7 +93,7 @@ const handleClick = () => {
   }
   &.checkbox,
   &.radio {
-    background-color: #fff;
+    background-color: $background;
     border: 1px solid #d9d9d9;
     color: $textColor;
 
@@ -102,7 +102,7 @@ const handleClick = () => {
     }
   }
   &.checked {
-    color: #fff;
+    color: $background;
     background-color: $themeColor;
     border-color: $themeColor;
 
@@ -112,7 +112,7 @@ const handleClick = () => {
     }
   }
   &.disabled {
-    background-color: #f5f5f5;
+    background-color: $gray-f5f5f5;
     border: 1px solid #d9d9d9;
     color: #b7b7b7;
     cursor: default;

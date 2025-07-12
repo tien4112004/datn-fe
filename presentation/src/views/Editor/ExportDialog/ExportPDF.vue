@@ -104,7 +104,7 @@ const expPDF = () => {
 
   &::after {
     content: '';
-    background-color: #fff;
+    background-color: $background;
     @include absolute-0();
   }
 }
@@ -114,7 +114,7 @@ const expPDF = () => {
   }
 }
 .configs {
-  width: 300px;
+  width: 500px;
   height: calc(100% - 100px);
   display: flex;
   flex-direction: column;
@@ -129,32 +129,30 @@ const expPDF = () => {
   }
 
   .title {
-    width: 100px;
+    width: 140px;
+    text-align: left;
   }
   .config-item {
     flex: 1;
   }
 
   .tip {
-    font-size: 12px;
-    color: #aaa;
+    font-size: $smTextSize;
+    color: $gray-aaa;
     line-height: 1.8;
     margin-top: 25px;
   }
 }
 .btns {
-  width: 300px;
-  height: 100px;
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1;
 
   .export {
-    flex: 1;
+    width: 120px;
   }
   .close {
-    width: 100px;
+    width: 120px;
     margin-left: 10px;
   }
 }

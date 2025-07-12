@@ -49,7 +49,7 @@ const json = computed(() => {
 .preview {
   width: 100%;
   height: calc(100% - 100px);
-  background-color: #f9f9f9;
+  background-color: $gray-f9f9f9;
   color: #0451a5;
   overflow: auto;
 }
@@ -57,7 +57,7 @@ pre {
   font-family: SFMono-Regular, Consolas, 'Liberation Mono', Menlo, Courier, monospace;
 }
 .btns {
-  width: 300px;
+  width: 500px;
   height: 100px;
   display: flex;
   justify-content: center;

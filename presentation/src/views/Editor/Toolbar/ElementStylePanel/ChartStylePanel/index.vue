@@ -146,7 +146,7 @@ const themeColorsSettingVisible = ref(false);
 
 const { addHistorySnapshot } = useHistorySnapshot();
 
-const fill = ref<string>('#000');
+const fill = ref<string>('$foreground');
 
 const themeColors = ref<string[]>([]);
 const textColor = ref('');
@@ -157,7 +157,7 @@ watch(
   handleElement,
   () => {
     if (!handleElement.value || handleElement.value.type !== 'chart') return;
-    fill.value = handleElement.value.fill || '#fff';
+    fill.value = handleElement.value.fill || '$background';
 
     lineSmooth.value = false;
     stack.value = false;
@@ -170,7 +170,7 @@ watch(
     }
 
     themeColors.value = handleElement.value.themeColors;
-    textColor.value = handleElement.value.textColor || '#333';
+    textColor.value = handleElement.value.textColor || '$gray-333';
   },
   { deep: true, immediate: true }
 );

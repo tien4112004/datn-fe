@@ -189,10 +189,10 @@ const updateSelectedCells = (cells: string[]) => {
     position: absolute;
     top: 5px;
     left: 5px;
-    background-color: rgba($color: #000, $alpha: 0.5);
-    color: #fff;
+    background-color: rgba($color: $foreground, $alpha: 0.5);
+    color: $background;
     padding: 6px 12px;
-    font-size: 12px;
+    font-size: $xsTextSize;
     transform-origin: 0 0;
   }
 

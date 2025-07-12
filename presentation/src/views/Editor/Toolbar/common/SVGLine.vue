@@ -49,7 +49,7 @@ const props = withDefaults(
   }>(),
   {
     width: 2,
-    color: '#333',
+    color: '$gray-333',
     padding: 0,
   }
 );

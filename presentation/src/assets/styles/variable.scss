@@ -1,8 +1,47 @@
-$themeColor: #d14424;
-$themeHoverColor: #de6949;
-$textColor: #41464b;
-$borderColor: #e5e7eb;
-$lightGray: #f4f4f4;
+$themeColor: #2563eb; // primary
+$themeHoverColor: #5484f2; // secondary
+$textColor: #020617; // foreground
+$borderColor: #dddfe2; // border
+$lightGray: #f9fafb; // muted
+
+// Neutral
+$background: #f8fafc; // var(--background)
+$foreground: #020617; // var(--foreground)
+$border: #e5e7eb; // var(--border)
+$muted: #f9fafb; // var(--muted)
+$muted-foreground: #6b7280; // var(--muted-foreground)
+$light-gray: #f3f4f6; // var(--sidebar) or use $muted if you prefer
+
+// Cards & Popovers
+$card: #ffffff; // var(--card)
+$card-foreground: #020617; // var(--card-foreground)
+$card-hover: #f3f4f6; // var(--card-hover)
+$card-hover-foreground: #020617; // var(--card-hover-foreground)
+$popover: #ffffff; // var(--popover)
+$popover-foreground: #020617; // var(--popover-foreground)
+
+// Primary & Secondary
+$primary: #2563eb; // var(--primary)
+$primary-foreground: #f0f9ff; // var(--primary-foreground)
+$secondary: #5484f2; // var(--secondary)
+$secondary-foreground: #ffffff; // var(--secondary-foreground)
+
+// Accent & Destructive
+$accent: #b8daff; // var(--accent)
+$accent-foreground: #0d253f; // var(--accent-foreground)
+$destructive: #dc2626; // var(--destructive)
+$destructive-foreground: #f8fafc; // var(--destructive-foreground)
+
+// Form & Focus ring
+$input-bg: #f8fafc; // var(--input)
+$ring-color: #2563eb; // var(--ring)
+
+// Charts
+$chart-1: #ff6b6b; // var(--chart-1)
+$chart-2: #4f86c6; // var(--chart-2)
+$chart-3: #90ee90; // var(--chart-3)
+$chart-4: #ffd700; // var(--chart-4)
+$chart-5: #800080; // var(--chart-5)
 
 $boxShadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
 
@@ -10,4 +49,49 @@ $transitionDelay: 0.2s;
 $transitionDelayFast: 0.1s;
 $transitionDelaySlow: 0.3s;
 
-$borderRadius: 2px;
+$borderRadius: 8px; // 0.5rem
+$cardBorderRadius: 8px; // 0.5rem
+$bigBorderRadius: 12px; // 0.75rem
+
+$normalSpacing: 4px; // 0.25rem
+$largeSpacing: 8px; // 0.5rem
+$extraLargeSpacing: 16px; // 1rem
+
+$xxsTextSize: 10px; // 0.625rem
+$xsTextSize: 12px; // 0.75rem
+$smTextSize: 13px; // 0.8125rem
+$baseTextSize: 14px; // 0.875rem
+$lgTextSize: 18px; // 1.125rem
+$xlgTextSize: 20px; // 1.25rem
+$xlTextSize: 22px; // 1.375rem
+$xxlMinusTextSize: 24px; // 1.5rem
+$xxlPlusTextSize: 26px; // 1.625rem
+$xxlTextSize: 30px; // 1.875rem
+$xxxlTextSize: 36px; // 2.25rem
+
+$lightFontWeight: 300;
+$normalFontWeight: 400;
+$semiBoldFontWeight: 500;
+$boldFontWeight: 600;
+
+$smIconSize: 16px; // 1rem
+$mdIconSize: 20px; // 1.25rem
+$lgIconSize: 24px; // 1.5rem
+
+// Extended Gray Palette
+$gray-333: #333333; // Dark gray
+$gray-555: #555555; // Medium dark gray
+$gray-666: #666666; // Medium gray
+$gray-999: #999999; // Light gray
+$gray-aaa: #aaaaaa; // Lighter gray
+$gray-ddd: #dddddd; // Very light gray
+$gray-eee: #eeeeee; // Extra light gray
+$gray-f5f5f5: #f5f5f5; // Almost white gray
+$gray-f9f9f9: #f9f9f9; // Very light gray variant
+
+// Shadow Colors
+$shadow-light: rgba(0, 0, 0, 0.1); // Light shadow
+$shadow-medium: rgba(0, 0, 0, 0.4); // Medium shadow
+
+// Text Color Variants
+$muted-foreground: #bfbfbf; // Light text color for placeholders and disabled states

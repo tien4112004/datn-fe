@@ -185,9 +185,7 @@ const openAIPPTDialog = () => {
 
 <style lang="scss" scoped>
 .editor-header {
-  background-color: #fff;
   user-select: none;
-  border-bottom: 1px solid $borderColor;
   display: flex;
   justify-content: space-between;
   padding: 0 5px;
@@ -196,21 +194,21 @@ const openAIPPTDialog = () => {
 .right {
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-end;
 }
 .menu-item {
   height: 30px;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 14px;
+  font-size: $baseTextSize;
   padding: 0 10px;
   border-radius: $borderRadius;
   cursor: pointer;
 
   .icon {
     font-size: 18px;
-    color: #666;
+    color: $gray-666;
   }
   .text {
     width: 18px;
@@ -252,7 +250,7 @@ const openAIPPTDialog = () => {
 .title {
   height: 30px;
   margin-left: 2px;
-  font-size: 13px;
+  font-size: $baseTextSize;
 
   .title-input {
     width: 200px;
@@ -272,11 +270,10 @@ const openAIPPTDialog = () => {
     padding: 0 6px;
     border-radius: $borderRadius;
     cursor: pointer;
-
     @include ellipsis-oneline();
 
     &:hover {
-      background-color: #f1f1f1;
+      background-color: $light-gray;
     }
   }
 }

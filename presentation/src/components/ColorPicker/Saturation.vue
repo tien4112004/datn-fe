@@ -94,10 +94,10 @@ onUnmounted(unbindEventListeners);
   cursor: pointer;
 }
 .saturation-white {
-  background: linear-gradient(to right, #fff, rgba(255, 255, 255, 0));
+  background: linear-gradient(to right, $background, rgba(255, 255, 255, 0));
 }
 .saturation-black {
-  background: linear-gradient(to top, #000, rgba(0, 0, 0, 0));
+  background: linear-gradient(to top, $foreground, rgba(0, 0, 0, 0));
 }
 .saturation-pointer {
   cursor: pointer;
@@ -106,10 +106,7 @@ onUnmounted(unbindEventListeners);
 .saturation-circle {
   width: 4px;
   height: 4px;
-  box-shadow:
-    0 0 0 1.5px #fff,
-    inset 0 0 1px 1px rgba(0, 0, 0, 0.3),
-    0 0 1px 2px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 0 0 1.5px $background, inset 0 0 1px 1px rgba(0, 0, 0, 0.3), 0 0 1px 2px rgba(0, 0, 0, 0.4);
   border-radius: 50%;
   transform: translate(-2px, -2px);
 }

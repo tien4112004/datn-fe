@@ -17,7 +17,8 @@ const PresentationWrapper = () => {
       });
   }, []);
 
-  return <div className="h-[960px]" ref={containerRef} />;
+  // vue-remote must match the style's name in presentation/src/assets/styles/scope.scss
+  return <div className="vue-remote" ref={containerRef} />;
 };
 
 export default PresentationWrapper;

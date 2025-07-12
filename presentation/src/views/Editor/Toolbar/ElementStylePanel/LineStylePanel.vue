@@ -154,7 +154,7 @@ const updateLine = (props: Partial<PPTLineElement>) => {
   width: 30px;
   font-size: 12px;
   margin-top: 2px;
-  color: #bfbfbf;
+  color: $muted-foreground;
 }
 .preset-point-style {
   padding: 0 10px;

@@ -5,6 +5,9 @@
     <Mobile v-else />
   </template>
   <FullscreenSpin tip="Initializing data, please wait..." v-else loading :mask="false" />
+
+  <!-- Stagewise Toolbar - only in development mode -->
+  <StagewiseToolbar v-if="isDev" :config="stagewiseConfig" />
 </template>
 
 <script lang="ts" setup>
@@ -21,7 +24,17 @@ import Screen from './views/Screen/index.vue';
 import Mobile from './views/Mobile/index.vue';
 import FullscreenSpin from '@/components/FullscreenSpin.vue';
 
+// Stagewise imports
+import { StagewiseToolbar } from '@stagewise/toolbar-vue';
+import VuePlugin from '@stagewise-plugins/vue';
+
 const _isPC = isPC();
+
+// Stagewise configuration
+const isDev = import.meta.env.DEV;
+const stagewiseConfig = {
+  plugins: [VuePlugin],
+};
 
 const mainStore = useMainStore();
 const slidesStore = useSlidesStore();

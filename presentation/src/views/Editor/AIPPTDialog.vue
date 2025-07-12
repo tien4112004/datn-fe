@@ -40,7 +40,7 @@
         <div class="config-item">
           <div class="label">Language:</div>
           <Select
-            style="width: 80px"
+            style="width: 120px"
             v-model:value="language"
             :options="[
               { label: 'Chinese', value: 'Chinese' },
@@ -52,7 +52,7 @@
         <div class="config-item">
           <div class="label">Style:</div>
           <Select
-            style="width: 80px"
+            style="width: 120px"
             v-model:value="style"
             :options="[
               { label: 'General', value: 'General' },
@@ -293,7 +293,7 @@ const createPPT = async () => {
 
   .title {
     font-weight: 700;
-    font-size: 20px;
+    font-size: $lgTextSize;
     margin-right: 8px;
     background: linear-gradient(270deg, #d897fd, #33bcfc);
     background-clip: text;
@@ -303,7 +303,7 @@ const createPPT = async () => {
   }
   .subtite {
     color: #888;
-    font-size: 12px;
+    font-size: $smTextSize;
   }
 }
 .preview {
@@ -375,7 +375,7 @@ const createPPT = async () => {
   margin-top: 10px;
 
   .recommend {
-    font-size: 12px;
+    font-size: $xsTextSize;
     background-color: #f1f1f1;
     border-radius: $borderRadius;
     padding: 3px 5px;
@@ -394,21 +394,22 @@ const createPPT = async () => {
   justify-content: space-between;
 
   .config-item {
-    font-size: 13px;
+    font-size: $smTextSize;
     display: flex;
     align-items: center;
+    gap: $normalSpacing;
   }
 }
 .count {
-  font-size: 12px;
-  color: #999;
+  font-size: $xsTextSize;
+  color: $gray-999;
   margin-right: 10px;
 }
 .submit {
   height: 20px;
-  font-size: 12px;
+  font-size: $smTextSize;
   background-color: $themeColor;
-  color: #fff;
+  color: $background;
   display: flex;
   align-items: center;
   padding: 0 8px 0 6px;
@@ -420,7 +421,7 @@ const createPPT = async () => {
   }
 
   .icon {
-    font-size: 15px;
+    font-size: $baseTextSize;
     margin-right: 3px;
   }
 }

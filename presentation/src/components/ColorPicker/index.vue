@@ -21,7 +21,7 @@
     <div class="picker-field">
       <EditableInput class="input" :value="color" @colorChange="(value) => changeColor(value)" />
       <div class="straw" @click="openEyeDropper()"><IconNeedle /></div>
-      <div class="transparent" @click="selectPresetColor('#00000000')">
+      <div class="transparent" @click="selectPresetColor('$foreground00')">
         <Checkboard />
       </div>
     </div>
@@ -142,8 +142,8 @@ const getPresetColors = () => {
 };
 
 const themeColors = [
-  '#000000',
-  '#ffffff',
+  '$foreground',
+  '$background',
   '#eeece1',
   '#1e497b',
   '#4e81bb',
@@ -271,7 +271,7 @@ const customEyeDropper = () => {
 
   const colorBlockRef = document.createElement('div');
   colorBlockRef.style.cssText =
-    'position: absolute; top: -100px; left: -100px; width: 16px; height: 16px; border: 1px solid #000; z-index: 999';
+    'position: absolute; top: -100px; left: -100px; width: 16px; height: 16px; border: 1px solid $foreground; z-index: 999';
   maskRef.appendChild(colorBlockRef);
 
   const { left, top, width, height } = targetRef.getBoundingClientRect();
@@ -350,7 +350,7 @@ const customEyeDropper = () => {
 .color-picker {
   position: relative;
   width: 240px;
-  background: #fff;
+  background: $background;
   user-select: none;
   margin-bottom: -10px;
 }
@@ -383,7 +383,7 @@ const customEyeDropper = () => {
   position: relative;
   margin-top: 4px;
   margin-right: 4px;
-  outline: 1px dashed rgba($color: #666, $alpha: 0.12);
+  outline: 1px dashed rgba($color: $gray-666, $alpha: 0.12);
 
   .checkerboard {
     background-size: auto;
@@ -432,7 +432,7 @@ const customEyeDropper = () => {
     justify-content: center;
     align-items: center;
     font-size: 20px;
-    background-color: #f5f5f5;
+    background-color: $gray-f5f5f5;
     outline: 1px solid #f1f1f1;
     cursor: pointer;
   }

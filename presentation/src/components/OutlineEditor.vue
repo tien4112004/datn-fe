@@ -267,16 +267,16 @@ const contextmenus = (el: HTMLElement): ContextmenuItem[] => {
       font-weight: 700;
     }
     &.lv-1 {
-      font-size: 22px;
+      font-size: $xlgTextSize;
     }
     &.lv-2 {
-      font-size: 17px;
+      font-size: $baseTextSize;
     }
     &.lv-3 {
-      font-size: 15px;
+      font-size: $baseTextSize;
     }
     &.lv-4 {
-      font-size: 13px;
+      font-size: $smTextSize;
       padding-left: 20px;
     }
   }
@@ -318,14 +318,14 @@ const contextmenus = (el: HTMLElement): ContextmenuItem[] => {
       width: 32px;
       height: 22px;
       border-radius: 2px;
-      background-color: #fff;
+      background-color: $background;
       border: 1px solid $themeColor;
       color: $themeColor;
       position: relative;
       display: flex;
       justify-content: center;
       align-items: center;
-      font-size: 12px;
+      font-size: $xsTextSize;
       font-weight: 400;
     }
   }

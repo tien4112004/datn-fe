@@ -399,7 +399,7 @@ useMSE(props.src, videoRef);
 
 .video-wrap {
   position: relative;
-  background: #000;
+  background: $foreground;
   font-size: 0;
   width: 100%;
   height: 100%;
@@ -448,8 +448,8 @@ useMSE(props.src, videoRef);
       border-radius: 4px;
       padding: 5px 7px;
       background-color: rgba(0, 0, 0, 0.62);
-      color: #fff;
-      font-size: 12px;
+      color: $background;
+      font-size: $xsTextSize;
       text-align: center;
       opacity: 1;
       transition: opacity 0.1s ease-in-out;
@@ -486,7 +486,7 @@ useMSE(props.src, videoRef);
         bottom: 0;
         height: 3px;
         will-change: width;
-        background-color: #fff;
+        background-color: $background;
 
         .thumb {
           position: absolute;
@@ -500,7 +500,7 @@ useMSE(props.src, videoRef);
           cursor: pointer;
           transition: all 0.3s ease-in-out;
           transform: scale(0);
-          background-color: #fff;
+          background-color: $background;
         }
       }
     }
@@ -517,10 +517,10 @@ useMSE(props.src, videoRef);
     }
     .time {
       line-height: 38px;
-      color: #eee;
+      color: $gray-eee;
       text-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
       vertical-align: middle;
-      font-size: 13px;
+      font-size: $smTextSize;
       cursor: default;
     }
     .icon {
@@ -531,26 +531,26 @@ useMSE(props.src, videoRef);
       display: flex;
       margin-inline: 5px;
       align-items: center;
-      font-size: 20px;
+      font-size: $lgTextSize;
 
       &.play-icon {
-        font-size: 26px;
+        font-size: $xxlMinusTextSize;
       }
 
       .icon-content {
         transition: all 0.2s ease-in-out;
         opacity: 0.8;
-        color: #fff;
+        color: $background;
       }
       &.loop-icon {
-        font-size: 12px;
+        font-size: $xsTextSize;
 
         .icon-content {
           opacity: 0.5;
         }
       }
       &.speed-icon {
-        font-size: 12px;
+        font-size: $xsTextSize;
         position: relative;
       }
       .speed-menu {
@@ -560,7 +560,7 @@ useMSE(props.src, videoRef);
         left: -23px;
         background-color: #22211b;
         padding: 5px 0;
-        color: #ddd;
+        color: $gray-ddd;
 
         .speed-menu-item {
           padding: 8px 0;
@@ -568,11 +568,11 @@ useMSE(props.src, videoRef);
 
           &:hover {
             background-color: #393833;
-            color: #fff;
+            color: $background;
           }
           &.active {
             font-weight: 700;
-            color: #fff;
+            color: $background;
           }
         }
       }
@@ -619,7 +619,7 @@ useMSE(props.src, videoRef);
       top: 17px;
       width: 0;
       height: 3px;
-      background: #aaa;
+      background: $gray-aaa;
       transition: all 0.3s ease-in-out;
 
       .volume-bar-inner {
@@ -629,7 +629,7 @@ useMSE(props.src, videoRef);
         height: 100%;
         transition: all 0.1s ease;
         will-change: width;
-        background-color: #fff;
+        background-color: $background;
 
         .thumb {
           position: absolute;
@@ -643,7 +643,7 @@ useMSE(props.src, videoRef);
           cursor: pointer;
           transition: all 0.3s ease-in-out;
           transform: scale(0);
-          background-color: #fff;
+          background-color: $background;
         }
       }
     }
@@ -660,8 +660,8 @@ useMSE(props.src, videoRef);
   right: 0;
   top: 0;
   bottom: 0;
-  font-size: 22px;
-  color: #fff;
+  font-size: $xlgTextSize;
+  color: $background;
   pointer-events: none;
 
   .bezel-icon {
@@ -679,7 +679,7 @@ useMSE(props.src, videoRef);
     border-radius: 50%;
     opacity: 0;
     pointer-events: none;
-    font-size: 40px;
+    font-size: $xxxlTextSize;
 
     &.bezel-transition {
       animation: bezel-hide 0.5s linear;
@@ -704,8 +704,8 @@ useMSE(props.src, videoRef);
   right: 0;
   top: 0;
   bottom: 0;
-  font-size: 15px;
-  color: #fff;
+  font-size: $baseTextSize;
+  color: $background;
   pointer-events: none;
   display: flex;
   justify-content: center;

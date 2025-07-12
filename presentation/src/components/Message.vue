@@ -98,7 +98,7 @@ defineExpose({
   overflow: hidden;
   border-radius: $borderRadius;
   box-shadow: 0 1px 8px rgba(0, 0, 0, 0.15);
-  background: #fff;
+  background: $background;
   pointer-events: all;
   position: relative;
 
@@ -131,7 +131,7 @@ defineExpose({
   }
   .close-btn {
     font-size: 15px;
-    color: #666;
+    color: $gray-666;
     display: flex;
     align-items: center;
     cursor: pointer;

@@ -1,5 +1,5 @@
 <template>
-  <div class="canvas-tool">
+  <Card class="canvas-tool" padding="none">
     <div class="left-handler">
       <IconBack
         class="handler-item"
@@ -14,7 +14,7 @@
         @click="redo()"
       />
       <div class="more">
-        <Divider type="vertical" style="height: 20px" />
+        <Divider type="vertical" style="height: 20px" class="divider1" />
         <Popover class="more-icon" trigger="click" v-model:value="moreVisible" :offset="10">
           <template #content>
             <PopoverMenuItem
@@ -238,7 +238,7 @@
         "
       />
     </Modal>
-  </div>
+  </Card>
 </template>
 
 <script lang="ts" setup>
@@ -263,6 +263,7 @@ import Modal from '@/components/Modal.vue';
 import Divider from '@/components/Divider.vue';
 import Popover from '@/components/Popover.vue';
 import PopoverMenuItem from '@/components/PopoverMenuItem.vue';
+import Card from '@/components/Card.vue';
 
 const mainStore = useMainStore();
 const { creatingElement, creatingCustomShape, showSelectPanel, showSearchPanel, showNotesPanel } =
@@ -356,34 +357,43 @@ const toggleNotesPanel = () => {
 <style lang="scss" scoped>
 .canvas-tool {
   position: relative;
-  border-bottom: 1px solid $borderColor;
-  background-color: #fff;
+  font-size: $baseTextSize;
+  margin: 4px 16px;
   display: flex;
-  justify-content: space-between;
-  padding: 0 10px;
-  font-size: 13px;
-  user-select: none;
+  font-size: $baseTextSize;
+
+  :deep(.card-content) {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-inline: $extraLargeSpacing;
+  }
 }
 .left-handler,
 .more {
   display: flex;
   align-items: center;
+  flex: 0 0 auto;
+}
+.left-handler {
+  min-width: 0;
+  gap: 2px;
 }
 .more-icon {
   display: none;
 }
 .add-element-handler {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
   display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
 
   .handler-item {
     width: 32px;
+    flex-shrink: 0;
 
     &:not(.group-btn):hover {
-      background-color: #f1f1f1;
+      background-color: $card-hover;
     }
 
     &.active {
@@ -392,10 +402,11 @@ const toggleNotesPanel = () => {
 
     &.group-btn {
       width: auto;
-      margin-right: 5px;
+      margin-right: 0;
+      flex-shrink: 0;
 
       &:hover {
-        background-color: #f3f3f3;
+        background-color: $card-hover;
       }
 
       .icon,
@@ -407,7 +418,7 @@ const toggleNotesPanel = () => {
       }
 
       .icon {
-        width: 26px;
+        width: 30px;
         padding: 0 2px;
 
         &:hover {
@@ -429,14 +440,13 @@ const toggleNotesPanel = () => {
 }
 .handler-item {
   height: 30px;
-  font-size: 14px;
-  margin: 0 2px;
   display: flex;
   justify-content: center;
   align-items: center;
   border-radius: $borderRadius;
   overflow: hidden;
   cursor: pointer;
+  padding: 0 8px;
 
   &.disable {
     opacity: 0.5;
@@ -445,8 +455,6 @@ const toggleNotesPanel = () => {
 .left-handler,
 .right-handler {
   .handler-item {
-    padding: 0 8px;
-
     &.active,
     &:not(.disable):hover {
       background-color: #f1f1f1;
@@ -456,6 +464,8 @@ const toggleNotesPanel = () => {
 .right-handler {
   display: flex;
   align-items: center;
+  flex: 0 0 auto;
+  min-width: 0;
 
   .text {
     display: inline-block;
@@ -465,7 +475,7 @@ const toggleNotesPanel = () => {
   }
 
   .viewport-size {
-    font-size: 13px;
+    font-size: $baseTextSize;
   }
 }
 
@@ -479,11 +489,35 @@ const toggleNotesPanel = () => {
   .more-icon {
     display: block;
   }
+
+  .more .divider1 {
+    display: none;
+  }
 }
-@media screen and (width <= 1000px) {
+
+@media screen and (width <= 1100px) {
+  .canvas-tool {
+    :deep(.card-content) {
+      padding-inline: 2px;
+    }
+  }
+}
+
+@media screen and (width <= 1050px) {
   .left-handler,
   .right-handler {
     display: none;
+  }
+
+  .canvas-tool {
+    margin: 2px 8px;
+
+    :deep(.card-content) {
+      padding-inline: $normalSpacing;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
   }
 }
 </style>

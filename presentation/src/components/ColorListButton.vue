@@ -35,7 +35,7 @@ const colors = computed(() => {
   display: flex;
   flex: 1;
   margin-left: 8px;
-  outline: 1px dashed rgba($color: #666, $alpha: 0.12);
+  outline: 1px dashed rgba($color: $gray-666, $alpha: 0.12);
 }
 .color-block {
   height: 20px;
@@ -53,6 +53,5 @@ const colors = computed(() => {
 .color-btn-icon {
   width: 32px;
   font-size: 13px;
-  color: #bfbfbf;
 }
 </style>

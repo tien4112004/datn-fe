@@ -121,7 +121,7 @@ onMounted(() => {
     cursor: pointer;
 
     &:hover {
-      background-color: #f5f5f5;
+      background-color: $gray-f5f5f5;
     }
 
     &.active {
@@ -146,6 +146,11 @@ onMounted(() => {
   align-items: center;
   margin-bottom: 10px;
   padding-right: 4px;
+
+  .insert-all {
+    min-width: fit-content;
+    padding-left: 4px;
+  }
 
   &:hover .insert-all {
     opacity: 1;
@@ -172,7 +177,7 @@ onMounted(() => {
     }
 
     &:hover {
-      background-color: #f5f5f5;
+      background-color: $gray-f5f5f5;
     }
   }
 }
@@ -210,7 +215,7 @@ onMounted(() => {
     justify-content: center;
     align-items: center;
     display: flex;
-    background-color: rgba($color: #000, $alpha: 0.25);
+    background-color: rgba($color: $foreground, $alpha: 0.25);
     opacity: 0;
     transition: opacity $transitionDelay;
   }

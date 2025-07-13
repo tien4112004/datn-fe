@@ -1,17 +1,17 @@
-import { CardsActivityGoal } from "@/components/cards/activity-goal"
-import { CardsCalendar } from "@/components/cards/calendar"
-import { CardsChat } from "@/components/cards/chat"
-import { CardsCookieSettings } from "@/components/cards/cookie-settings"
-import { CardsCreateAccount } from "@/components/cards/create-account"
-import { CardsExerciseMinutes } from "@/components/cards/exercise-minutes"
-import { CardsForms } from "@/components/cards/forms"
-import { CardsPayments } from "@/components/cards/payments"
-import { CardsReportIssue } from "@/components/cards/report-issue"
-import { CardsShare } from "@/components/cards/share"
-import { CardsStats } from "@/components/cards/stats"
-import { CardsTeamMembers } from "@/components/cards/team-members"
+import { CardsActivityGoal } from '@/components/cards/activity-goal';
+import { CardsCalendar } from '@/components/cards/calendar';
+import { CardsChat } from '@/components/cards/chat';
+import { CardsCookieSettings } from '@/components/cards/cookie-settings';
+import { CardsCreateAccount } from '@/components/cards/create-account';
+import { CardsExerciseMinutes } from '@/components/cards/exercise-minutes';
+import { CardsForms } from '@/components/cards/forms';
+import { CardsPayments } from '@/components/cards/payments';
+import { CardsReportIssue } from '@/components/cards/report-issue';
+import { CardsShare } from '@/components/cards/share';
+import { CardsStats } from '@/components/cards/stats';
+import { CardsTeamMembers } from '@/components/cards/team-members';
 
-export function CardsDemo() {
+export default function CardsDemo() {
   return (
     <div className="md:grids-col-2 grid **:data-[slot=card]:shadow-none md:gap-4 lg:grid-cols-10 xl:grid-cols-11">
       <div className="grid gap-4 lg:col-span-4 xl:col-span-6">
@@ -59,5 +59,5 @@ export function CardsDemo() {
         </div>
       </div>
     </div>
-  )
+  );
 }

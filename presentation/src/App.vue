@@ -4,7 +4,7 @@
     <Editor v-else-if="_isPC" />
     <Mobile v-else />
   </template>
-  <FullscreenSpin tip="Initializing data, please wait..." v-else loading :mask="false" />
+  <FullscreenSpin tip="Initializing data, please wait..." v-else loading :mask="false" class="spin" />
 
   <!-- Stagewise Toolbar - only in development mode -->
   <StagewiseToolbar v-if="isDev" :config="stagewiseConfig" />

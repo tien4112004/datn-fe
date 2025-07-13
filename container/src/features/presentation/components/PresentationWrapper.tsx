@@ -1,24 +1,36 @@
-import { useEffect, useRef } from 'react';
+import GlobalSpinner from '@/shared/components/common/GlobalSpinner';
+import { useEffect, useRef, useState } from 'react';
 
 const PresentationWrapper = () => {
   const containerRef = useRef(null);
   const hasMounted = useRef(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    // Prevent re-mounting the Vue component if it has already been mounted
     if (hasMounted.current) return;
     hasMounted.current = true;
+
+    setIsLoading(true);
 
     import('vueRemote/Editor')
       .then((mod) => {
         mod.mount(containerRef.current);
+        setIsLoading(false);
       })
       .catch((err) => {
         console.error('Failed to load Vue remote:', err);
+        setIsLoading(false);
       });
   }, []);
 
   // vue-remote must match the style's name in presentation/src/assets/styles/scope.scss
-  return <div className="vue-remote" ref={containerRef} />;
+  return (
+    <>
+      <div className="vue-remote" ref={containerRef} />;
+      {isLoading && <GlobalSpinner text="Loading presentation editor..." />}
+    </>
+  );
 };
 
 export default PresentationWrapper;

@@ -22,12 +22,15 @@ const Nav = () => {
 
   return (
     !isFullscreen && (
-      <nav className="p-4 bg-gray-100 header-nav">
-        <Link to="/" className="mr-4 hover:underline">
+      <nav className="p-4 bg-gray-100 header-nav flex gap-4">
+        <Link to="/" className="hover:underline">
           Home
         </Link>
         <Link to="/presentation" className="hover:underline">
           Presentation
+        </Link>
+        <Link to="/presentation/123" className="hover:underline">
+          Presentation Details
         </Link>
       </nav>
     )

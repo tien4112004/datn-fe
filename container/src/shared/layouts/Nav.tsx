@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 
 const Nav = () => {
   const [isFullscreen, setIsFullscreen] = React.useState(document.fullscreenElement !== null);
@@ -23,15 +23,15 @@ const Nav = () => {
   return (
     !isFullscreen && (
       <nav className="p-4 bg-gray-100 header-nav flex gap-4">
-        <Link to="/" className="hover:underline">
+        <NavLink to="/" className="hover:underline">
           Home
-        </Link>
-        <Link to="/presentation" className="hover:underline">
+        </NavLink>
+        <NavLink to="/presentation" className="hover:underline">
           Presentation
-        </Link>
-        <Link to="/presentation/123" className="hover:underline">
+        </NavLink>
+        <NavLink to="/presentation/123" className="hover:underline">
           Presentation Details
-        </Link>
+        </NavLink>
       </nav>
     )
   );

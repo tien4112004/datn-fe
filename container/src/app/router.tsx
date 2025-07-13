@@ -1,24 +1,24 @@
-import { CardsDemo } from '@/shared/components/cards';
 import { createBrowserRouter } from 'react-router-dom';
 import NavLayout from '../shared/layouts/NavLayout';
 import Presentation from '@/features/presentation';
+import Demo from '@/features/demo';
+import GlobalSpinner from '@/shared/components/common/GlobalSpinner';
 
 const router = createBrowserRouter([
   {
-    path: '/',
     element: <NavLayout />,
     children: [
       {
         index: true,
-        element: <CardsDemo />,
+        Component: Demo.CardDemoPage,
       },
       {
         path: 'presentation',
-        element: <Presentation.EditorPage />,
+        Component: Presentation.EditorPage,
       },
       {
         path: 'presentation/:presentationId',
-        element: <Presentation.DetailsPage />,
+        Component: Presentation.DetailsPage,
         loader: async ({ params }) => {
           // Simulate api call
           await new Promise((resolve) => setTimeout(resolve, 2000));

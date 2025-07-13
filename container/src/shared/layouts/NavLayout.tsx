@@ -4,15 +4,14 @@ import GlobalSpinner from '@/components/common/GlobalSpinner';
 
 export default function NavLayout() {
   const navigation = useNavigation();
-
-  console.log('Navigation state:', navigation.state);
-  console.log('Navigation location:', navigation.location);
+  const isLoading = navigation.state === 'loading';
 
   return (
     <>
       <Nav />
       <main className="overflow-hidden flex flex-col">
-        {navigation.state === 'loading' ? <GlobalSpinner /> : <Outlet />}
+        {isLoading && <GlobalSpinner text="Loading data..." />}
+        <Outlet />
       </main>
     </>
   );

@@ -1,11 +1,16 @@
+import GlobalSpinner from '@/shared/components/common/GlobalSpinner';
 import PresentationCard from './components/PresentationCard';
 
-import { lazy } from 'react';
+import { lazy, Suspense } from 'react';
 
 const PresentationWrapper = lazy(() => import('./components/PresentationWrapper'));
 
 const EditorPage = () => {
-  return <PresentationWrapper />;
+  return (
+    // <Suspense fallback={<GlobalSpinner text="Loading presentation editor..." />}>
+    <PresentationWrapper />
+    // </Suspense>
+  );
 };
 
 const DetailsPage = () => {

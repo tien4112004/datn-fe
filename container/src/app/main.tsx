@@ -1,17 +1,21 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import App from './App.tsx';
 import './index.css';
-import { StagewiseToolbar } from '@stagewise/toolbar-react';
-import ReactPlugin from '@stagewise-plugins/react';
-
-const toolbarConfig = {
-  plugins: [ReactPlugin],
-};
+import App from './App';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <App />
-    <StagewiseToolbar config={toolbarConfig} />
   </StrictMode>
 );
+
+const removeLoader = async () => {
+  const el = document.getElementById('loader-overlay');
+
+  await new Promise((resolve) => setTimeout(resolve, 300));
+  if (el) {
+    el?.parentElement?.removeChild(el);
+  }
+};
+
+removeLoader();

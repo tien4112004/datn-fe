@@ -1,11 +1,17 @@
-import { Outlet } from 'react-router-dom';
-import Nav from '@/shared/layouts/Nav';
+import { RouterProvider } from 'react-router-dom';
+import { StagewiseToolbar } from '@stagewise/toolbar-react';
+import ReactPlugin from '@stagewise-plugins/react';
+import router from './router';
+
+const toolbarConfig = {
+  plugins: [ReactPlugin],
+};
 
 export default function App() {
   return (
     <>
-      <Nav />
-      <Outlet />
+      <RouterProvider router={router} />
+      <StagewiseToolbar config={toolbarConfig} />
     </>
   );
 }

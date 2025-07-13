@@ -1,14 +1,7 @@
-import GlobalSpinner from '@/shared/components/common/GlobalSpinner.tsx';
-import { lazy, Suspense } from 'react';
-
-const CardDemos = lazy(() => import('../../shared/components/cards/index.tsx'));
+import CardsDemo from '@/shared/components/cards';
 
 const CardDemoPage = () => {
-  return (
-    // <Suspense fallback={<GlobalSpinner text="Loading presentation editor..." />}>
-    <CardDemos />
-    // </Suspense>
-  );
+  return <CardsDemo />;
 };
 
 export default { CardDemoPage };

@@ -2,7 +2,6 @@ import { createBrowserRouter } from 'react-router-dom';
 import NavLayout from '../shared/layouts/NavLayout';
 import Presentation from '@/features/presentation';
 import Demo from '@/features/demo';
-import GlobalSpinner from '@/shared/components/common/GlobalSpinner';
 
 const router = createBrowserRouter([
   {

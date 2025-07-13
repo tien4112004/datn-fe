@@ -10,7 +10,7 @@ export default function NavLayout() {
     <>
       <Nav />
       <main className="overflow-hidden flex flex-col">
-        {isLoading && <GlobalSpinner text="Loading data..." />}
+        {isLoading && <GlobalSpinner text="Loading page..." />}
         <Outlet />
       </main>
     </>

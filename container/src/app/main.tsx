@@ -8,3 +8,14 @@ createRoot(document.getElementById('root')!).render(
     <App />
   </StrictMode>
 );
+
+const removeLoader = async () => {
+  const el = document.getElementById('loader-overlay');
+
+  await new Promise((resolve) => setTimeout(resolve, 300));
+  if (el) {
+    el?.parentElement?.removeChild(el);
+  }
+};
+
+removeLoader();

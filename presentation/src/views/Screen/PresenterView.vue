@@ -2,29 +2,31 @@
   <div class="presenter-view">
     <div class="toolbar">
       <div class="tool-btn" @click="changeViewMode('base')">
-        <IconListView class="tool-icon" /><span>Normal View</span>
+        <IconListView class="tool-icon" /><span>{{ $t('presentation.presenter.normalView') }}</span>
       </div>
       <div
         class="tool-btn"
         :class="{ active: writingBoardToolVisible }"
         @click="writingBoardToolVisible = !writingBoardToolVisible"
       >
-        <IconWrite class="tool-icon" /><span>Pen</span>
+        <IconWrite class="tool-icon" /><span>{{ $t('presentation.presenter.pen') }}</span>
       </div>
       <div class="tool-btn" :class="{ active: laserPen }" @click="laserPen = !laserPen">
-        <IconMagic class="tool-icon" /><span>Laser Pen</span>
+        <IconMagic class="tool-icon" /><span>{{ $t('presentation.presenter.laserPen') }}</span>
       </div>
       <div class="tool-btn" :class="{ active: timerlVisible }" @click="timerlVisible = !timerlVisible">
-        <IconStopwatchStart class="tool-icon" /><span>Timer</span>
+        <IconStopwatchStart class="tool-icon" /><span>{{ $t('presentation.presenter.timer') }}</span>
       </div>
       <div class="tool-btn" @click="() => (fullscreenState ? manualExitFullscreen() : enterFullscreen())">
         <IconOffScreenOne class="tool-icon" v-if="fullscreenState" />
         <IconFullScreenOne class="tool-icon" v-else />
-        <span>{{ fullscreenState ? 'Exit Fullscreen' : 'Fullscreen' }}</span>
+        <span>{{
+          fullscreenState ? $t('presentation.presenter.exitFullscreen') : $t('presentation.presenter.fullscreen')
+        }}</span>
       </div>
       <Divider class="divider" />
       <div class="tool-btn" @click="exitScreening()">
-        <IconPower class="tool-icon" /><span>End Presentation</span>
+        <IconPower class="tool-icon" /><span>{{ $t('presentation.presenter.endPresentation') }}</span>
       </div>
     </div>
 
@@ -71,14 +73,14 @@
 
     <div class="remark">
       <div class="header">
-        <span>Speaker Notes</span>
+        <span>{{ $t('presentation.presenter.speakerNotes') }}</span>
         <span>P {{ slideIndex + 1 }} / {{ slides.length }}</span>
       </div>
       <div
         class="remark-content ProseMirror-static"
         :class="{ empty: !currentSlideRemark }"
         :style="{ fontSize: remarkFontSize + 'px' }"
-        v-html="currentSlideRemark || 'No notes'"
+        v-html="currentSlideRemark || $t('presentation.presenter.noNotes')"
       ></div>
       <div class="remark-scale">
         <div
@@ -110,6 +112,7 @@ import useLoadSlides from '@/hooks/useLoadSlides';
 import useExecPlay from './hooks/useExecPlay';
 import useSlideSize from './hooks/useSlideSize';
 import useFullscreen from './hooks/useFullscreen';
+import { useI18n } from 'vue-i18n';
 
 import ThumbnailSlide from '@/views/components/ThumbnailSlide/index.vue';
 import ScreenSlideList from './ScreenSlideList.vue';
@@ -121,6 +124,7 @@ const props = defineProps<{
   changeViewMode: (mode: 'base' | 'presenter') => void;
 }>();
 
+const { t } = useI18n();
 const { slides, slideIndex, viewportRatio, currentSlide } = storeToRefs(useSlidesStore());
 
 const slideListWrapRef = ref<HTMLElement>();
@@ -180,39 +184,39 @@ watch(slideIndex, () => {
 const contextmenus = (): ContextmenuItem[] => {
   return [
     {
-      text: 'Previous Page',
+      text: t('presenterView.previousPage'),
       subText: '↑ ←',
       disable: slideIndex.value <= 0,
       handler: () => turnPrevSlide(),
     },
     {
-      text: 'Next Page',
+      text: t('presenterView.nextPage'),
       subText: '↓ →',
       disable: slideIndex.value >= slides.value.length - 1,
       handler: () => turnNextSlide(),
     },
     {
-      text: 'First Page',
+      text: t('presenterView.firstPage'),
       disable: slideIndex.value === 0,
       handler: () => turnSlideToIndex(0),
     },
     {
-      text: 'Last Page',
+      text: t('presenterView.lastPage'),
       disable: slideIndex.value === slides.value.length - 1,
       handler: () => turnSlideToIndex(slides.value.length - 1),
     },
     { divider: true },
     {
-      text: 'Pen Tool',
+      text: t('presenterView.penTool'),
       handler: () => (writingBoardToolVisible.value = true),
     },
     {
-      text: 'Normal View',
+      text: t('presentation.presenter.normalView'),
       handler: () => props.changeViewMode('base'),
     },
     { divider: true },
     {
-      text: 'End Presentation',
+      text: t('presentation.presenter.endPresentation'),
       subText: 'ESC',
       handler: exitScreening,
     },

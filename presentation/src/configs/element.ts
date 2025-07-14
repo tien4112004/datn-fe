@@ -1,13 +1,19 @@
-export const ELEMENT_TYPE_ZH: { [key: string]: string } = {
-  text: 'Text',
-  image: 'Image',
-  shape: 'Shape',
-  line: 'Line',
-  chart: 'Chart',
-  table: 'Table',
-  video: 'Video',
-  audio: 'Audio',
-  latex: 'Formula',
+import { useI18n } from 'vue-i18n';
+
+export const getElementType = () => {
+  const { t } = useI18n();
+
+  return {
+    text: t('elements.types.text'),
+    image: t('elements.types.image'),
+    shape: t('elements.types.shape'),
+    line: t('elements.types.line'),
+    chart: t('elements.types.chart'),
+    table: t('elements.types.table'),
+    video: t('elements.types.video'),
+    audio: t('elements.types.audio'),
+    latex: t('elements.types.formula'),
+  };
 };
 
 export const MIN_SIZE: { [key: string]: number } = {

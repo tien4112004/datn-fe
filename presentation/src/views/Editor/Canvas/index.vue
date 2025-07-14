@@ -97,6 +97,7 @@ import type { AlignmentLineProps, CreateCustomShapeData } from '@/types/edit';
 import { injectKeySlideScale } from '@/types/injectKey';
 import { removeAllRanges } from '@/utils/selection';
 import { KEYS } from '@/configs/hotkey';
+import { useI18n } from 'vue-i18n';
 
 import useViewportSize from './hooks/useViewportSize';
 import useMouseSelection from './hooks/useMouseSelection';
@@ -128,6 +129,8 @@ import MultiSelectOperate from './Operate/MultiSelectOperate.vue';
 import Operate from './Operate/index.vue';
 import LinkDialog from './LinkDialog.vue';
 import Modal from '@/components/Modal.vue';
+
+const { t } = useI18n();
 
 const mainStore = useMainStore();
 const {
@@ -218,7 +221,7 @@ const handleDblClick = (e: MouseEvent) => {
   createTextElement({
     left,
     top,
-    width: 200 / canvasScale.value, // 除以 canvasScale 是为了与点击选区创建的形式保持相同的宽度
+    width: 200 / canvasScale.value, // divide by canvasScale to match the width used in click-based selection
     height: 0,
   });
 };
@@ -247,27 +250,27 @@ const throttleUpdateSlideIndex = throttle(updateSlideIndex, 300, {
 const handleMousewheelCanvas = (e: WheelEvent) => {
   e.preventDefault();
 
-  // 按住Ctrl键时：缩放画布
+  // When holding Ctrl: zoom the canvas
   if (ctrlKeyState.value) {
     if (e.deltaY > 0) throttleScaleCanvas('-');
     else if (e.deltaY < 0) throttleScaleCanvas('+');
   }
-  // 上下翻页
+  // Page up/down
   else {
     if (e.deltaY > 0) throttleUpdateSlideIndex(KEYS.DOWN);
     else if (e.deltaY < 0) throttleUpdateSlideIndex(KEYS.UP);
   }
 };
 
-// 开关标尺
+// Toggle rulers
 const toggleRuler = () => {
   mainStore.setRulerState(!showRuler.value);
 };
 
-// 在鼠标绘制的范围插入元素
+// Insert element within the area drawn by mouse
 const { insertElementFromCreateSelection, formatCreateSelection } = useInsertFromCreateSelection(viewportRef);
 
-// 插入自定义任意多边形
+//  Insert custom arbitrary polygon
 const insertCustomShape = (data: CreateCustomShapeData) => {
   const { start, end, path, viewBox } = data;
   const position = formatCreateSelection({ start, end });
@@ -284,53 +287,53 @@ const insertCustomShape = (data: CreateCustomShapeData) => {
 const contextmenus = (): ContextmenuItem[] => {
   return [
     {
-      text: 'Paste',
+      text: t('canvas.controls.paste'),
       subText: 'Ctrl + V',
       handler: pasteElement,
     },
     {
-      text: 'Select All',
+      text: t('canvas.controls.selectAll'),
       subText: 'Ctrl + A',
       handler: selectAllElements,
     },
     {
-      text: 'Ruler',
+      text: t('canvas.controls.ruler'),
       subText: showRuler.value ? '✓' : '',
       handler: toggleRuler,
     },
     {
-      text: 'Grid Lines',
+      text: t('canvas.controls.gridLines'),
       handler: () => mainStore.setGridLineSize(gridLineSize.value ? 0 : 50),
       children: [
         {
-          text: 'None',
+          text: t('canvas.grid.none'),
           subText: gridLineSize.value === 0 ? '✓' : '',
           handler: () => mainStore.setGridLineSize(0),
         },
         {
-          text: 'Small',
+          text: t('canvas.grid.small'),
           subText: gridLineSize.value === 25 ? '✓' : '',
           handler: () => mainStore.setGridLineSize(25),
         },
         {
-          text: 'Medium',
+          text: t('canvas.grid.medium'),
           subText: gridLineSize.value === 50 ? '✓' : '',
           handler: () => mainStore.setGridLineSize(50),
         },
         {
-          text: 'Large',
+          text: t('canvas.grid.large'),
           subText: gridLineSize.value === 100 ? '✓' : '',
           handler: () => mainStore.setGridLineSize(100),
         },
       ],
     },
     {
-      text: 'Reset Current Page',
+      text: t('canvas.resetCurrentPage'),
       handler: deleteAllElements,
     },
     { divider: true },
     {
-      text: 'Slide Show',
+      text: t('canvas.slideShow'),
       subText: 'F5',
       handler: enterScreeningFromStart,
     },

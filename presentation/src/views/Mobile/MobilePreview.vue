@@ -6,9 +6,13 @@
       </div>
     </div>
     <div class="menu">
-      <div class="menu-item" @click="changeMode('editor')"><IconEdit class="icon" /> Edit</div>
+      <div class="menu-item" @click="changeMode('editor')">
+        <IconEdit class="icon" /> {{ $t('ui.mobile.preview.edit') }}
+      </div>
       <Divider type="vertical" style="height: 30px" />
-      <div class="menu-item" @click="changeMode('player')"><IconFullScreenPlay class="icon" /> Play</div>
+      <div class="menu-item" @click="changeMode('player')">
+        <IconFullScreenPlay class="icon" /> {{ $t('ui.mobile.preview.play') }}
+      </div>
     </div>
   </div>
 </template>

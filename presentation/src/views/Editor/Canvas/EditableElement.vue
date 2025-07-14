@@ -20,6 +20,7 @@
 import { computed } from 'vue';
 import { ElementTypes, type PPTElement } from '@/types/slides';
 import type { ContextmenuItem } from '@/components/Contextmenu/types';
+import { useI18n } from 'vue-i18n';
 
 import useLockElement from '@/hooks/useLockElement';
 import useDeleteElement from '@/hooks/useDeleteElement';
@@ -49,6 +50,8 @@ const props = defineProps<{
   openLinkDialog: () => void;
 }>();
 
+const { t } = useI18n();
+
 const currentElementComponent = computed<unknown>(() => {
   const elementTypeMap = {
     [ElementTypes.IMAGE]: ImageElement,
@@ -77,7 +80,7 @@ const contextmenus = (): ContextmenuItem[] => {
   if (props.elementInfo.lock) {
     return [
       {
-        text: 'Unlock',
+        text: $t('canvas.editableElement.unlock'),
         handler: () => unlockElement(props.elementInfo),
       },
     ];
@@ -85,119 +88,121 @@ const contextmenus = (): ContextmenuItem[] => {
 
   return [
     {
-      text: 'Cut',
+      text: $t('canvas.editableElement.cut'),
       subText: 'Ctrl + X',
       handler: cutElement,
     },
     {
-      text: 'Copy',
+      text: $t('canvas.editableElement.copy'),
       subText: 'Ctrl + C',
       handler: copyElement,
     },
     {
-      text: 'Paste',
+      text: $t('canvas.editableElement.paste'),
       subText: 'Ctrl + V',
       handler: pasteElement,
     },
     { divider: true },
     {
-      text: 'Align Horizontal Center',
+      text: $t('canvas.editableElement.alignHorizontalCenter'),
       handler: () => alignElementToCanvas(ElementAlignCommands.HORIZONTAL),
       children: [
         {
-          text: 'Align Center',
+          text: $t('canvas.editableElement.alignCenter'),
           handler: () => alignElementToCanvas(ElementAlignCommands.CENTER),
         },
         {
-          text: 'Align Horizontal Center',
+          text: $t('canvas.editableElement.alignHorizontalCenter'),
           handler: () => alignElementToCanvas(ElementAlignCommands.HORIZONTAL),
         },
         {
-          text: 'Align Left',
+          text: $t('canvas.editableElement.alignLeft'),
           handler: () => alignElementToCanvas(ElementAlignCommands.LEFT),
         },
         {
-          text: 'Align Right',
+          text: $t('canvas.editableElement.alignRight'),
           handler: () => alignElementToCanvas(ElementAlignCommands.RIGHT),
         },
       ],
     },
     {
-      text: 'Align Vertical Center',
+      text: $t('canvas.editableElement.alignVerticalCenter'),
       handler: () => alignElementToCanvas(ElementAlignCommands.VERTICAL),
       children: [
         {
-          text: 'Align Center',
+          text: $t('canvas.editableElement.alignCenter'),
           handler: () => alignElementToCanvas(ElementAlignCommands.CENTER),
         },
         {
-          text: 'Align Vertical Center',
+          text: $t('canvas.editableElement.alignVerticalCenter'),
           handler: () => alignElementToCanvas(ElementAlignCommands.VERTICAL),
         },
         {
-          text: 'Align Top',
+          text: $t('canvas.editableElement.alignTop'),
           handler: () => alignElementToCanvas(ElementAlignCommands.TOP),
         },
         {
-          text: 'Align Bottom',
+          text: $t('canvas.editableElement.alignBottom'),
           handler: () => alignElementToCanvas(ElementAlignCommands.BOTTOM),
         },
       ],
     },
     { divider: true },
     {
-      text: 'Bring to Front',
+      text: $t('canvas.editableElement.bringToFront'),
       disable: props.isMultiSelect && !props.elementInfo.groupId,
       handler: () => orderElement(props.elementInfo, ElementOrderCommands.TOP),
       children: [
         {
-          text: 'Bring to Front',
+          text: $t('canvas.editableElement.bringToFront'),
           handler: () => orderElement(props.elementInfo, ElementOrderCommands.TOP),
         },
         {
-          text: 'Bring Forward',
+          text: $t('canvas.editableElement.bringForward'),
           handler: () => orderElement(props.elementInfo, ElementOrderCommands.UP),
         },
       ],
     },
     {
-      text: 'Send to Back',
+      text: $t('canvas.editableElement.sendToBack'),
       disable: props.isMultiSelect && !props.elementInfo.groupId,
       handler: () => orderElement(props.elementInfo, ElementOrderCommands.BOTTOM),
       children: [
         {
-          text: 'Send to Back',
+          text: $t('canvas.editableElement.sendToBack'),
           handler: () => orderElement(props.elementInfo, ElementOrderCommands.BOTTOM),
         },
         {
-          text: 'Send Backward',
+          text: $t('canvas.editableElement.sendBackward'),
           handler: () => orderElement(props.elementInfo, ElementOrderCommands.DOWN),
         },
       ],
     },
     { divider: true },
     {
-      text: 'Set Link',
+      text: $t('canvas.editableElement.setLink'),
       handler: props.openLinkDialog,
     },
     {
-      text: props.elementInfo.groupId ? 'Ungroup' : 'Group',
+      text: props.elementInfo.groupId
+        ? $t('canvas.editableElement.ungroup')
+        : $t('canvas.editableElement.group'),
       subText: 'Ctrl + G',
       handler: props.elementInfo.groupId ? uncombineElements : combineElements,
       hide: !props.isMultiSelect,
     },
     {
-      text: 'Select All',
+      text: $t('canvas.editableElement.selectAll'),
       subText: 'Ctrl + A',
       handler: selectAllElements,
     },
     {
-      text: 'Lock',
+      text: $t('canvas.editableElement.lock'),
       subText: 'Ctrl + L',
       handler: lockElement,
     },
     {
-      text: 'Delete',
+      text: $t('canvas.editableElement.delete'),
       subText: 'Delete',
       handler: deleteElement,
     },

@@ -1,9 +1,13 @@
 <template>
   <MoveablePanel class="countdown-timer" :width="220" :height="120" :left="left" :top="top">
     <div class="header">
-      <span class="text-btn" @click="toggle()">{{ inTiming ? 'Pause' : 'Start' }}</span>
-      <span class="text-btn" @click="reset()">Reset</span>
-      <span class="text-btn" @click="toggleCountdown()" :class="{ active: isCountdown }">Countdown</span>
+      <span class="text-btn" @click="toggle()">{{
+        inTiming ? $t('presentation.timer.pause') : $t('presentation.timer.start')
+      }}</span>
+      <span class="text-btn" @click="reset()">{{ $t('presentation.timer.reset') }}</span>
+      <span class="text-btn" @click="toggleCountdown()" :class="{ active: isCountdown }">{{
+        $t('presentation.timer.countdown')
+      }}</span>
     </div>
     <div class="content">
       <div class="timer">

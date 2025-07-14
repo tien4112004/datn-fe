@@ -1,10 +1,11 @@
 import { computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useSlidesStore } from '@/store';
-import { SLIDE_ANIMATIONS } from '@/configs/animation';
+import { getSlideAnimations } from '@/configs/animation';
 
 export default () => {
   const { slides } = storeToRefs(useSlidesStore());
+  const SLIDE_ANIMATIONS = getSlideAnimations();
 
   const slidesWithTurningMode = computed(() => {
     return slides.value.map((slide) => {

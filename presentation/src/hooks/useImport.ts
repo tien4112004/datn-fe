@@ -4,7 +4,7 @@ import { parse, type Shape, type Element, type ChartItem, type BaseElement } fro
 import { nanoid } from 'nanoid';
 import { useSlidesStore } from '@/store';
 import { decrypt } from '@/utils/crypto';
-import { type ShapePoolItem, SHAPE_LIST, SHAPE_PATH_FORMULAS } from '@/configs/shapes';
+import { type ShapePoolItem, getShapeList, SHAPE_PATH_FORMULAS } from '@/configs/shapes';
 import useAddSlidesOrElements from '@/hooks/useAddSlidesOrElements';
 import useSlideHandler from '@/hooks/useSlideHandler';
 import useHistorySnapshot from './useHistorySnapshot';
@@ -26,6 +26,7 @@ import type {
   PPTElement,
 } from '@/types/slides';
 import { getElementListRange } from '@/utils/element';
+import { useI18n } from 'vue-i18n';
 
 const convertFontSizePtToPx = (html: string, ratio: number) => {
   return html.replace(/font-size:\s*([\d.]+)pt/g, (match, p1) => {
@@ -36,12 +37,14 @@ const convertFontSizePtToPx = (html: string, ratio: number) => {
 export default () => {
   const slidesStore = useSlidesStore();
   const { theme } = storeToRefs(useSlidesStore());
+  const SHAPE_LIST = getShapeList();
 
   const { addHistorySnapshot } = useHistorySnapshot();
   const { addSlidesFromData } = useAddSlidesOrElements();
   const { isEmptySlide } = useSlideHandler();
 
   const exporting = ref(false);
+  const { t } = useI18n();
 
   // Import PPTist file
   const importSpecificFile = (files: FileList, cover = false) => {

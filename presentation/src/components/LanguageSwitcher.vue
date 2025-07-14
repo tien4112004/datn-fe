@@ -1,7 +1,7 @@
 <template>
   <div class="language-switcher">
     <Popover v-model:value="dropdownVisible" trigger="click" placement="bottom-end">
-      <div class="language-icon" :title="$t('changeLanguage')">
+      <div class="language-icon" :title="$t('header.tools.changeLanguage')">
         <span class="current-flag">{{ getCurrentFlag() }}</span>
         <svg class="dropdown-arrow" viewBox="0 0 16 16" width="12" height="12">
           <path d="M8 10.5L4 6.5h8L8 10.5z" fill="currentColor" />
@@ -56,7 +56,6 @@ const getCurrentFlag = () => {
 const handleLocaleChange = (newLocale: string) => {
   if (changeLocale(newLocale)) {
     dropdownVisible.value = false;
-    console.log(`Language changed to: ${newLocale}`);
   }
 };
 </script>

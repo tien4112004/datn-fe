@@ -1,7 +1,7 @@
 <template>
   <div class="line-style-panel">
     <div class="row">
-      <div style="width: 40%">Line Style:</div>
+      <div style="width: 40%">{{ $t('styling.elements.line.lineStyle') }}</div>
       <SelectCustom style="width: 60%">
         <template #options>
           <div
@@ -19,7 +19,7 @@
       </SelectCustom>
     </div>
     <div class="row">
-      <div style="width: 40%">Line Color:</div>
+      <div style="width: 40%">{{ $t('styling.elements.line.lineColor') }}</div>
       <Popover trigger="click" style="width: 60%">
         <template #content>
           <ColorPicker
@@ -31,7 +31,7 @@
       </Popover>
     </div>
     <div class="row">
-      <div style="width: 40%">Line Width:</div>
+      <div style="width: 40%">{{ $t('styling.elements.line.lineWidth') }}</div>
       <NumberInput
         :value="handleLineElement.width"
         @update:value="(value) => updateLine({ width: value })"
@@ -40,7 +40,7 @@
     </div>
 
     <div class="row">
-      <div style="width: 40%">Start Style:</div>
+      <div style="width: 40%">{{ $t('styling.elements.line.startStyle') }}</div>
       <SelectCustom style="width: 60%">
         <template #options>
           <div
@@ -58,7 +58,7 @@
       </SelectCustom>
     </div>
     <div class="row">
-      <div style="width: 40%">End Style:</div>
+      <div style="width: 40%">{{ $t('styling.elements.line.endStyle') }}</div>
       <SelectCustom style="width: 60%">
         <template #options>
           <div
@@ -87,7 +87,7 @@
             end: handleLineElement.start,
           })
         "
-        ><IconSwitch /> Flip Direction</Button
+        ><IconSwitch /> {{ $t('styling.elements.line.flipDirection') }}</Button
       >
     </div>
 

@@ -84,6 +84,7 @@ import { KEYS } from '@/configs/hotkey';
 import { getTextStyle, formatText } from './utils';
 import useHideCells from './useHideCells';
 import useSubThemeColor from './useSubThemeColor';
+import { useI18n } from 'vue-i18n';
 
 import CustomTextarea from './CustomTextarea.vue';
 
@@ -109,6 +110,7 @@ const emit = defineEmits<{
 }>();
 
 const { canvasScale } = storeToRefs(useMainStore());
+const { t } = useI18n();
 
 const isStartSelect = ref(false);
 const startCell = ref<number[]>([]);
@@ -152,7 +154,7 @@ watch(
   }
 );
 
-// 用于拖拽列宽的操作节点位置
+// The position of the handle node used for dragging to adjust column width
 const dragLinePosition = computed(() => {
   const dragLinePosition: number[] = [];
   for (let i = 1; i < colSizeList.value.length + 1; i++) {
@@ -162,11 +164,11 @@ const dragLinePosition = computed(() => {
   return dragLinePosition;
 });
 
-// 无效的单元格位置（被合并的单元格位置）集合
+// Set of invalid cell positions (cells that have been merged)
 const cells = computed(() => props.data);
 const { hideCells } = useHideCells(cells);
 
-// 当前选中的单元格集合
+// Currently selected cell set
 const selectedCells = computed(() => {
   if (!startCell.value.length) return [];
   const [startX, startY] = startCell.value;
@@ -197,13 +199,13 @@ watch(selectedCells, (value, oldValue) => {
   emit('changeSelectedCells', selectedCells.value);
 });
 
-// 当前激活的单元格：当且仅当只有一个选中单元格时，该单元格为激活的单元格
+// The currently active cell: only active when exactly one cell is selected
 const activedCell = computed(() => {
   if (selectedCells.value.length > 1) return null;
   return selectedCells.value[0];
 });
 
-// 设置选中单元格状态（鼠标点击或拖选）
+// Set the selection state of cells (by mouse click or drag selection)
 const handleMouseup = () => (isStartSelect.value = false);
 
 const handleCellMousedown = (e: MouseEvent, rowIndex: number, colIndex: number) => {
@@ -226,25 +228,25 @@ onUnmounted(() => {
   document.removeEventListener('mouseup', handleMouseup);
 });
 
-// 判断某位置是否为无效单元格（被合并掉的位置）
+//  Determine whether a position is an invalid cell (a merged-away position)
 const isHideCell = (rowIndex: number, colIndex: number) =>
   hideCells.value.includes(`${rowIndex}_${colIndex}`);
 
-// 选中指定的列
+// Select a specific column
 const selectCol = (index: number) => {
   const maxRow = tableCells.value.length - 1;
   startCell.value = [0, index];
   endCell.value = [maxRow, index];
 };
 
-// 选中指定的行
+// Select a specific row
 const selectRow = (index: number) => {
   const maxCol = tableCells.value[index].length - 1;
   startCell.value = [index, 0];
   endCell.value = [index, maxCol];
 };
 
-// 选中全部单元格
+// Select all cells
 const selectAll = () => {
   const maxRow = tableCells.value.length - 1;
   const maxCol = tableCells.value[maxRow].length - 1;
@@ -252,7 +254,7 @@ const selectAll = () => {
   endCell.value = [maxRow, maxCol];
 };
 
-// 删除一行
+// Delete a row
 const deleteRow = (rowIndex: number) => {
   const _tableCells: TableCell[][] = JSON.parse(JSON.stringify(tableCells.value));
 
@@ -275,7 +277,7 @@ const deleteRow = (rowIndex: number) => {
   tableCells.value = _tableCells;
 };
 
-// 删除一列
+// Delete a column
 const deleteCol = (colIndex: number) => {
   const _tableCells: TableCell[][] = JSON.parse(JSON.stringify(tableCells.value));
 
@@ -301,7 +303,7 @@ const deleteCol = (colIndex: number) => {
   emit('changeColWidths', colSizeList.value);
 };
 
-// 插入一行
+// Insert a row
 const insertRow = (rowIndex: number) => {
   const _tableCells: TableCell[][] = JSON.parse(JSON.stringify(tableCells.value));
 
@@ -319,7 +321,7 @@ const insertRow = (rowIndex: number) => {
   tableCells.value = _tableCells;
 };
 
-// 插入一列
+// Insert a column
 const insertCol = (colIndex: number) => {
   tableCells.value = tableCells.value.map((item) => {
     const cell = {
@@ -335,7 +337,7 @@ const insertCol = (colIndex: number) => {
   emit('changeColWidths', colSizeList.value);
 };
 
-// 填充指定的行/列数
+// Fill a specified number of rows/columns
 const fillTable = (rowCount: number, colCount: number) => {
   let _tableCells: TableCell[][] = JSON.parse(JSON.stringify(tableCells.value));
   const defaultCell = { colspan: 1, rowspan: 1, text: '' };
@@ -373,7 +375,7 @@ const fillTable = (rowCount: number, colCount: number) => {
   tableCells.value = _tableCells;
 };
 
-// 合并单元格
+// Merge cells
 const mergeCells = () => {
   const [startX, startY] = startCell.value;
   const [endX, endY] = endCell.value;
@@ -392,7 +394,7 @@ const mergeCells = () => {
   removeSelectedCells();
 };
 
-// 拆分单元格
+// Split cells
 const splitCells = (rowIndex: number, colIndex: number) => {
   const _tableCells: TableCell[][] = JSON.parse(JSON.stringify(tableCells.value));
   _tableCells[rowIndex][colIndex].rowspan = 1;
@@ -402,7 +404,7 @@ const splitCells = (rowIndex: number, colIndex: number) => {
   removeSelectedCells();
 };
 
-// 鼠标拖拽调整列宽
+// Adjust column width by mouse dragging
 const handleMousedownColHandler = (e: MouseEvent, colIndex: number) => {
   removeSelectedCells();
   let isMouseDown = true;
@@ -429,7 +431,7 @@ const handleMousedownColHandler = (e: MouseEvent, colIndex: number) => {
   };
 };
 
-// 清空选中单元格内的文字
+// Clear the text inside selected cells
 const clearSelectedCellText = () => {
   const _tableCells: TableCell[][] = JSON.parse(JSON.stringify(tableCells.value));
 
@@ -450,10 +452,10 @@ const focusActiveCell = () => {
   });
 };
 
-// 将焦点移动到下一个单元格
-// 当前行右边有单元格时，焦点右移
-// 当前行右边无单元格（已处在行末），且存在下一行时，焦点移动至下一行行首
-// 当前行右边无单元格（已处在行末），且不存在下一行（已处在最后一行）时，新建一行并将焦点移动至下一行行首
+// Move the focus to the next cell
+// If there is a cell to the right, move focus right
+// If there’s no cell to the right (end of row) but a next row exists, move focus to the beginning of the next row
+// If no cell to the right and it’s the last row, create a new row and move focus to its beginning
 const tabActiveCell = () => {
   const getNextCell = (i: number, j: number): [number, number] | null => {
     if (!tableCells.value[i]) return null;
@@ -473,11 +475,11 @@ const tabActiveCell = () => {
     startCell.value = [nextRow + 1, 0];
   } else startCell.value = nextCell;
 
-  // 移动焦点后自动聚焦文本
+  // Automatically focus the text after moving the focus
   focusActiveCell();
 };
 
-// 移动焦点（上下左右）
+// Move the focus (up, down, left, right)
 const moveActiveCell = (dir: 'UP' | 'DOWN' | 'LEFT' | 'RIGHT') => {
   const rowIndex = +selectedCells.value[0].split('_')[0];
   const colIndex = +selectedCells.value[0].split('_')[1];
@@ -532,7 +534,7 @@ const moveActiveCell = (dir: 'UP' | 'DOWN' | 'LEFT' | 'RIGHT') => {
   focusActiveCell();
 };
 
-// 获取光标位置
+//  Get cursor position
 const getCaretPosition = (element: HTMLDivElement) => {
   const selection = window.getSelection();
   if (selection && selection.rangeCount > 0) {
@@ -553,7 +555,7 @@ const getCaretPosition = (element: HTMLDivElement) => {
   return null;
 };
 
-// 表格快捷键监听
+// Table keyboard shortcut listener
 const keydownListener = (e: KeyboardEvent) => {
   if (!props.editable || !selectedCells.value.length) return;
 
@@ -611,7 +613,7 @@ onUnmounted(() => {
   document.removeEventListener('keydown', keydownListener);
 });
 
-// 单元格文字输入时更新表格数据
+// Update table data when cell text is entered
 const handleInput = debounce(
   function (value, rowIndex, colIndex) {
     tableCells.value[rowIndex][colIndex].text = value;
@@ -621,7 +623,7 @@ const handleInput = debounce(
   { trailing: true }
 );
 
-// 插入来自Excel的数据，表格的行/列数不够时自动补足
+// Insert data from Excel; auto-expand the table if there are not enough rows/columns
 const insertExcelData = (data: string[][], rowIndex: number, colIndex: number) => {
   const maxRow = data.length;
   const maxCol = data[0].length;
@@ -645,7 +647,7 @@ const insertExcelData = (data: string[][], rowIndex: number, colIndex: number) =
   });
 };
 
-// 获取有效的单元格（排除掉被合并的单元格）
+// Get valid cells (excluding merged cells)
 const getEffectiveTableCells = () => {
   const effectiveTableCells = [];
 
@@ -661,7 +663,7 @@ const getEffectiveTableCells = () => {
   return effectiveTableCells;
 };
 
-// 检查是否可以删除行和列：有效的行/列数大于1
+//  Check if rows or columns can be deleted: valid count must be greater than 1
 const checkCanDeleteRowOrCol = () => {
   const effectiveTableCells = getEffectiveTableCells();
   const canDeleteRow = effectiveTableCells.length > 1;
@@ -670,9 +672,9 @@ const checkCanDeleteRowOrCol = () => {
   return { canDeleteRow, canDeleteCol };
 };
 
-// 检查是否可以合并或拆分
-// 必须多选才可以合并
-// 必须单选且所选单元格为合并单元格才可以拆分
+// Check whether merging or splitting is possible
+// Merging requires multiple cells to be selected
+// Splitting requires a single selection, and the selected cell must be a merged cell
 const checkCanMergeOrSplit = (rowIndex: number, colIndex: number) => {
   const isMultiSelected = selectedCells.value.length > 1;
   const targetCell = tableCells.value[rowIndex][colIndex];
@@ -698,51 +700,51 @@ const contextmenus = (el: HTMLElement): ContextmenuItem[] => {
 
   return [
     {
-      text: 'Insert column',
+      text: t('elements.table.columns.insertColumn'),
       children: [
-        { text: 'To the left', handler: () => insertCol(colIndex) },
-        { text: 'To the right', handler: () => insertCol(colIndex + 1) },
+        { text: t('elements.table.columns.toTheLeft'), handler: () => insertCol(colIndex) },
+        { text: t('elements.table.columns.toTheRight'), handler: () => insertCol(colIndex + 1) },
       ],
     },
     {
-      text: 'Insert row',
+      text: t('elements.table.rows.insertRow'),
       children: [
-        { text: 'Above', handler: () => insertRow(rowIndex) },
-        { text: 'Below', handler: () => insertRow(rowIndex + 1) },
+        { text: t('elements.table.rows.above'), handler: () => insertRow(rowIndex) },
+        { text: t('elements.table.rows.below'), handler: () => insertRow(rowIndex + 1) },
       ],
     },
     {
-      text: 'Delete column',
+      text: t('elements.table.columns.deleteColumn'),
       disable: !canDeleteCol,
       handler: () => deleteCol(colIndex),
     },
     {
-      text: 'Delete row',
+      text: t('elements.table.rows.deleteRow'),
       disable: !canDeleteRow,
       handler: () => deleteRow(rowIndex),
     },
     { divider: true },
     {
-      text: 'Merge cells',
+      text: t('elements.table.cells.mergeCells'),
       disable: !canMerge,
       handler: mergeCells,
     },
     {
-      text: 'Unmerge cells',
+      text: t('elements.table.cells.unmergeCells'),
       disable: !canSplit,
       handler: () => splitCells(rowIndex, colIndex),
     },
     { divider: true },
     {
-      text: 'Select current column',
+      text: t('elements.table.columns.selectCurrentColumn'),
       handler: () => selectCol(colIndex),
     },
     {
-      text: 'Select current row',
+      text: t('elements.table.rows.selectCurrentRow'),
       handler: () => selectRow(rowIndex),
     },
     {
-      text: 'Select all cells',
+      text: t('elements.table.cells.selectAllCells'),
       handler: selectAll,
     },
   ];
@@ -764,9 +766,9 @@ table {
   word-wrap: break-word;
   user-select: none;
 
-  --themeColor: $themeColor;
-  --subThemeColor1: $themeColor;
-  --subThemeColor2: $themeColor;
+  --themeColor: themeColor;
+  --subThemeColor1: themeColor;
+  --subThemeColor2: themeColor;
 
   &.theme {
     background-color: $background;
@@ -837,7 +839,7 @@ table {
   top: 0;
   bottom: 0;
   width: 3px;
-  background-color: $themeColor;
+  background-color: themeColor;
   margin-left: -1px;
   opacity: 0;
   z-index: 2;

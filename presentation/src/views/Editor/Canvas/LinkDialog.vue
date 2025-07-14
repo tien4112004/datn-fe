@@ -6,19 +6,21 @@
       class="input"
       v-if="type === 'web'"
       v-model:value="address"
-      placeholder="Enter webpage link address"
+      :placeholder="t('canvas.linkDialog.enterWebAddress')"
     />
 
     <Select class="input" v-if="type === 'slide'" v-model:value="slideId" :options="slideOptions" />
 
     <div class="preview" v-if="type === 'slide' && selectedSlide">
-      <div>Preview:</div>
+      <div>{{ $t('canvas.linkDialog.preview') }}:</div>
       <ThumbnailSlide class="thumbnail" :slide="selectedSlide" :size="500" />
     </div>
 
     <div class="btns">
-      <Button @click="emit('close')" style="margin-right: 10px">Cancel</Button>
-      <Button type="primary" @click="save()">Confirm</Button>
+      <Button @click="emit('close')" style="margin-right: 10px">{{
+        $t('canvas.linkDialog.cancel')
+      }}</Button>
+      <Button type="primary" @click="save()">{{ $t('canvas.linkDialog.confirm') }}</Button>
     </div>
   </div>
 </template>
@@ -35,6 +37,9 @@ import Tabs from '@/components/Tabs.vue';
 import Input from '@/components/Input.vue';
 import Button from '@/components/Button.vue';
 import Select from '@/components/Select.vue';
+
+import { useI18n } from 'vue-i18n';
+const { t } = useI18n();
 
 interface TabItem {
   key: ElementLinkType;
@@ -69,8 +74,8 @@ const selectedSlide = computed(() => {
 });
 
 const tabs: TabItem[] = [
-  { key: 'web', label: 'Web Link' },
-  { key: 'slide', label: 'Slide Page' },
+  { key: 'web', label: t('canvas.linkDialog.webLink') },
+  { key: 'slide', label: t('canvas.linkDialog.slidePage') },
 ];
 
 const { setLink } = useLink();

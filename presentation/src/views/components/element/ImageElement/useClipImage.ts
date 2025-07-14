@@ -1,8 +1,10 @@
 import { computed, type Ref } from 'vue';
-import { CLIPPATHS, ClipPathTypes } from '@/configs/imageClip';
+import { getClipPaths, ClipPathTypes } from '@/configs/imageClip';
 import type { PPTImageElement } from '@/types/slides';
 
 export default (element: Ref<PPTImageElement>) => {
+  const CLIPPATHS = getClipPaths();
+
   const clipShape = computed(() => {
     let _clipShape = CLIPPATHS.rect;
 

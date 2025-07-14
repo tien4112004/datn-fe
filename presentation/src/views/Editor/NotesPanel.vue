@@ -3,7 +3,7 @@
     class="notes-panel"
     :width="300"
     :height="560"
-    :title="`Notes for Slide ${slideIndex + 1}`"
+    :title="t('panels.notes.title', { slide: slideIndex + 1 })"
     :left="-270"
     :top="90"
     :minWidth="300"
@@ -33,8 +33,10 @@
               </div>
             </div>
             <div class="btns">
-              <div class="btn reply" @click="replyNoteId = note.id">Reply</div>
-              <div class="btn delete" @click.stop="deleteNote(note.id)">Delete</div>
+              <div class="btn reply" @click="replyNoteId = note.id">{{ $t('panels.notes.reply') }}</div>
+              <div class="btn delete" @click.stop="deleteNote(note.id)">
+                {{ $t('panels.notes.delete') }}
+              </div>
             </div>
           </div>
           <div class="content">{{ note.content }}</div>
@@ -51,7 +53,9 @@
                   </div>
                 </div>
                 <div class="btns">
-                  <div class="btn delete" @click.stop="deleteReply(note.id, reply.id)">Delete</div>
+                  <div class="btn delete" @click.stop="deleteReply(note.id, reply.id)">
+                    {{ $t('panels.notes.delete') }}
+                  </div>
                 </div>
               </div>
               <div class="content">{{ reply.content }}</div>
@@ -61,24 +65,32 @@
             <TextArea
               :padding="6"
               v-model:value="replyContent"
-              placeholder="Enter reply content"
+              :placeholder="t('panels.notes.replyPlaceholder')"
               :rows="1"
               @enter.prevent="createNoteReply()"
             />
             <div class="reply-btns">
-              <Button class="btn" size="small" @click="replyNoteId = ''">Cancel</Button>
-              <Button class="btn" size="small" type="primary" @click="createNoteReply()">Reply</Button>
+              <Button class="btn" size="small" @click="replyNoteId = ''">{{
+                $t('ui.actions.cancel')
+              }}</Button>
+              <Button class="btn" size="small" type="primary" @click="createNoteReply()">{{
+                $t('panels.notes.reply')
+              }}</Button>
             </div>
           </div>
         </div>
-        <div class="empty" v-if="!notes.length">No notes for this page</div>
+        <div class="empty" v-if="!notes.length">{{ $t('panels.notes.noNotes') }}</div>
       </div>
       <div class="send">
         <TextArea
           ref="textAreaRef"
           v-model:value="content"
           :padding="6"
-          :placeholder="`Enter note (for ${handleElementId ? 'selected element' : 'current slide'})`"
+          :placeholder="
+            $t('panels.notes.notePlaceholder', {
+              target: handleElementId ? $t('panels.notes.selectedElement') : $t('panels.notes.currentSlide'),
+            })
+          "
           :rows="2"
           @focus="
             replyNoteId = ``;
@@ -89,11 +101,13 @@
         <div class="footer">
           <IconDelete
             class="btn icon"
-            v-tooltip="'Clear all notes for this page'"
+            :v-tooltip="t('panels.notes.clearTooltip')"
             style="flex: 1"
             @click="clear()"
           />
-          <Button type="primary" class="btn" style="flex: 12" @click="createNote()">Add Note</Button>
+          <Button type="primary" class="btn" style="flex: 12" @click="createNote()">{{
+            $t('panels.notes.addNote')
+          }}</Button>
         </div>
       </div>
     </div>
@@ -110,6 +124,9 @@ import type { Note } from '@/types/slides';
 import MoveablePanel from '@/components/MoveablePanel.vue';
 import TextArea from '@/components/TextArea.vue';
 import Button from '@/components/Button.vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const slidesStore = useSlidesStore();
 const mainStore = useMainStore();
@@ -118,6 +135,7 @@ const { handleElementId } = storeToRefs(mainStore);
 
 const content = ref('');
 const replyContent = ref('');
+
 const notes = computed(() => currentSlide.value?.notes || []);
 const activeNoteId = ref('');
 const replyNoteId = ref('');
@@ -174,7 +192,7 @@ const createNoteReply = () => {
       id: nanoid(),
       content: replyContent.value,
       time: new Date().getTime(),
-      user: 'Test User',
+      user: t('notesPanel.testUser'),
     },
   ];
   const newNote: Note = {

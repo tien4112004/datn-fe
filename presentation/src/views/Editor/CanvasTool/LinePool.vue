@@ -47,9 +47,11 @@
 </template>
 
 <script lang="ts" setup>
-import { LINE_LIST, type LinePoolItem } from '@/configs/lines';
+import { getLineList, type LinePoolItem } from '@/configs/lines';
 
 import LinePointMarker from '@/views/components/element/LineElement/LinePointMarker.vue';
+
+const LINE_LIST = getLineList();
 
 const emit = defineEmits<{
   (event: 'select', payload: LinePoolItem): void;

@@ -1,5 +1,6 @@
 import Clipboard from 'clipboard';
 import { decrypt } from '@/utils/crypto';
+import { useI18n } from 'vue-i18n';
 
 /**
  * Copy text to clipboard
@@ -29,13 +30,15 @@ export const copyText = (text: string) => {
 
 // Read clipboard
 export const readClipboard = (): Promise<string> => {
+  const { t } = useI18n();
+
   return new Promise((resolve, reject) => {
     if (navigator.clipboard?.readText) {
       navigator.clipboard.readText().then((text) => {
-        if (!text) reject('Clipboard is empty or does not contain text');
+        if (!text) reject(t('system.clipboard.emptyOrInvalid'));
         return resolve(text);
       });
-    } else reject('Browser does not support or has disabled clipboard access, please use Ctrl + V');
+    } else reject(t('system.clipboard.unsupportedBrowser'));
   });
 };
 

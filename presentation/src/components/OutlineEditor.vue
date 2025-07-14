@@ -31,6 +31,7 @@ import { ref, nextTick, onMounted, watch } from 'vue';
 import { nanoid } from 'nanoid';
 import type { ContextmenuItem } from '@/components/Contextmenu/types';
 import Input from './Input.vue';
+import { useI18n } from 'vue-i18n';
 
 interface OutlineItem {
   id: string;
@@ -46,6 +47,8 @@ const props = defineProps<{
 const emit = defineEmits<{
   (event: 'update:value', payload: string): void;
 }>();
+
+const { t } = useI18n();
 
 const data = ref<OutlineItem[]>([]);
 const activeItemId = ref('');
@@ -193,52 +196,52 @@ const contextmenus = (el: HTMLElement): ContextmenuItem[] => {
   if (lv === 1) {
     return [
       {
-        text: 'Add Sub Outline (Chapter)',
-        handler: () => addItem(id, 'next', 'New Chapter'),
+        text: t('elements.outline.actions.addSubOutlineChapter'),
+        handler: () => addItem(id, 'next', t('elements.outline.defaults.newChapter')),
       },
     ];
   } else if (lv === 2) {
     return [
       {
-        text: 'Add Same Level Above (Chapter)',
-        handler: () => addItem(id, 'prev', 'New Chapter'),
+        text: t('elements.outline.actions.addSameLevelAboveChapter'),
+        handler: () => addItem(id, 'prev', t('elements.outline.defaults.newChapter')),
       },
       {
-        text: 'Add Sub Outline (Section)',
-        handler: () => addItem(id, 'next', 'New Section'),
+        text: t('elements.outline.actions.addSubOutlineSection'),
+        handler: () => addItem(id, 'next', t('elements.outline.defaults.newSection')),
       },
       {
-        text: 'Delete This Chapter',
+        text: t('elements.outline.actions.deleteThisChapter'),
         handler: () => deleteItem(id, true),
       },
     ];
   } else if (lv === 3) {
     return [
       {
-        text: 'Add Same Level Above (Section)',
-        handler: () => addItem(id, 'prev', 'New Section'),
+        text: t('elements.outline.actions.addSameLevelAboveSection'),
+        handler: () => addItem(id, 'prev', t('elements.outline.defaults.newSection')),
       },
       {
-        text: 'Add Sub Outline (Item)',
-        handler: () => addItem(id, 'next', 'New Item'),
+        text: t('elements.outline.actions.addSubOutlineItem'),
+        handler: () => addItem(id, 'next', t('elements.outline.defaults.newItem')),
       },
       {
-        text: 'Delete This Section',
+        text: t('elements.outline.actions.deleteThisSection'),
         handler: () => deleteItem(id, true),
       },
     ];
   }
   return [
     {
-      text: 'Add Same Level Above (Item)',
-      handler: () => addItem(id, 'prev', 'New Item'),
+      text: t('elements.outline.actions.addSameLevelAboveItem'),
+      handler: () => addItem(id, 'prev', t('elements.outline.defaults.newItem')),
     },
     {
-      text: 'Add Same Level Below (Item)',
-      handler: () => addItem(id, 'next', 'New Item'),
+      text: t('elements.outline.actions.addSameLevelBelowItem'),
+      handler: () => addItem(id, 'next', t('elements.outline.defaults.newItem')),
     },
     {
-      text: 'Delete This Item',
+      text: t('elements.outline.actions.deleteThisItem'),
       handler: () => deleteItem(id),
     },
   ];
@@ -330,13 +333,13 @@ const contextmenus = (el: HTMLElement): ContextmenuItem[] => {
     }
   }
   .item.lv-1 .flag::after {
-    content: 'Theme';
+    content: attr(data-i18n-theme);
   }
   .item.lv-2 .flag::after {
-    content: 'Chapter';
+    content: attr(data-i18n-chapter);
   }
   .item.lv-3 .flag::after {
-    content: 'Section';
+    content: attr(data-i18n-section);
   }
   .item.lv-4 .flag::after {
     opacity: 0;

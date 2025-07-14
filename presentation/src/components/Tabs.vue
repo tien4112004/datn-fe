@@ -67,6 +67,7 @@ const emit = defineEmits<{
   border-radius: $borderRadius;
   gap: $normalSpacing;
   grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+  text-align: center;
 
   &:not(.card) {
     align-items: center;

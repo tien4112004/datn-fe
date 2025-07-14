@@ -74,6 +74,7 @@
 
 <script lang="ts" setup>
 import { computed, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import message from '@/utils/message';
 
 const props = withDefaults(
@@ -88,6 +89,8 @@ const props = withDefaults(
     scale: 1,
   }
 );
+
+const { t } = useI18n();
 
 const secondToTime = (second = 0) => {
   if (second === 0 || isNaN(second)) return '00:00';
@@ -189,7 +192,7 @@ const handleProgress = () => {
     : 0;
 };
 
-const handleError = () => message.error('Audio loading failed');
+const handleError = () => message.error(t('elements.media.audio.audioLoadingFailed'));
 
 const thumbMove = (e: MouseEvent | TouchEvent) => {
   if (!audioRef.value || !playBarWrap.value) return;

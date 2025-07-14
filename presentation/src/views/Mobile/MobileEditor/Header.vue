@@ -1,10 +1,14 @@
 <template>
   <div class="mobile-editor-header">
     <div class="history">
-      <div class="history-item" :class="{ disable: !canUndo }" @click.stop="undo()"><IconBack /> Undo</div>
-      <div class="history-item" :class="{ disable: !canRedo }" @click.stop="redo()"><IconNext /> Redo</div>
+      <div class="history-item" :class="{ disable: !canUndo }" @click.stop="undo()">
+        <IconBack /> {{ $t('header.undo') }}
+      </div>
+      <div class="history-item" :class="{ disable: !canRedo }" @click.stop="redo()">
+        <IconNext /> {{ $t('header.redo') }}
+      </div>
     </div>
-    <div class="back" @click="changeMode('preview')"><IconLogout /> Exit Edit</div>
+    <div class="back" @click="changeMode('preview')"><IconLogout /> {{ $t('header.exitEdit') }}</div>
   </div>
 </template>
 

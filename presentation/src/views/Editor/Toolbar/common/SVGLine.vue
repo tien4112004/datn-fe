@@ -49,7 +49,7 @@ const props = withDefaults(
   }>(),
   {
     width: 2,
-    color: '$gray-333',
+    color: '',
     padding: 0,
   }
 );
@@ -68,4 +68,9 @@ const lineDashArray = computed(() => {
 });
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+// add $gray-333 color for line
+svg {
+  stroke: $gray-333;
+}
+</style>

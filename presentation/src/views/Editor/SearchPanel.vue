@@ -7,7 +7,7 @@
       <Input
         class="input"
         v-model:value="searchWord"
-        placeholder="Find"
+        :placeholder="t('panels.search.find')"
         @enter="searchNext()"
         ref="searchInpRef"
       >
@@ -17,27 +17,33 @@
           <span
             class="ignore-case"
             :class="{ active: modifiers === 'g' }"
-            v-tooltip="'Ignore case'"
+            v-tooltip="t('searchPanel.ignoreCase')"
             @click="toggleModifiers()"
             >Aa</span
           >
           <Divider type="vertical" />
-          <IconLeft class="next-btn left" @click="searchPrev()" v-tooltip="'Previous'" />
-          <IconRight class="next-btn right" @click="searchNext()" v-tooltip="'Next'" />
+          <IconLeft
+            class="next-btn left"
+            @click="searchPrev()"
+            v-tooltip="t('panels.search.previous')"
+          />
+          <IconRight class="next-btn right" @click="searchNext()" v-tooltip="t('panels.search.next')" />
         </template>
       </Input>
       <Input
         class="input"
         v-model:value="replaceWord"
-        placeholder="Replace"
+        :placeholder="t('panels.search.replace')"
         @enter="replace()"
         v-if="type === 'replace'"
       ></Input>
       <div class="footer" v-if="type === 'replace'">
-        <Button :disabled="!searchWord" style="margin-left: 5px" @click="replace()">Replace</Button>
-        <Button :disabled="!searchWord" type="primary" style="margin-left: 5px" @click="replaceAll()"
-          >Replace All</Button
-        >
+        <Button :disabled="!searchWord" style="margin-left: 5px" @click="replace()">{{
+          $t('panels.search.replace')
+        }}</Button>
+        <Button :disabled="!searchWord" type="primary" style="margin-left: 5px" @click="replaceAll()">{{
+          $t('panels.search.replaceAll')
+        }}</Button>
       </div>
     </div>
   </MoveablePanel>
@@ -52,6 +58,9 @@ import Tabs from '@/components/Tabs.vue';
 import Divider from '@/components/Divider.vue';
 import Input from '@/components/Input.vue';
 import Button from '@/components/Button.vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 type TypeKey = 'search' | 'replace';
 interface TabItem {
@@ -76,8 +85,8 @@ const {
 
 const type = ref<TypeKey>('search');
 const tabs: TabItem[] = [
-  { key: 'search', label: 'Search' },
-  { key: 'replace', label: 'Replace' },
+  { key: 'search', label: t('panels.search.search') },
+  { key: 'replace', label: t('panels.search.replace') },
 ];
 
 const close = () => {

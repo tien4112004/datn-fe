@@ -17,7 +17,7 @@
     <Divider />
 
     <div class="row">
-      <div style="width: 40%">Line Spacing:</div>
+      <div style="width: 40%">{{ $t('styling.elements.text.lineSpacing') }}:</div>
       <Select
         style="width: 60%"
         :value="lineHeight || 1"
@@ -35,7 +35,7 @@
       </Select>
     </div>
     <div class="row">
-      <div style="width: 40%">Paragraph Spacing:</div>
+      <div style="width: 40%">{{ $t('styling.elements.text.paragraphSpacing') }}:</div>
       <Select
         style="width: 60%"
         :value="paragraphSpace || 0"
@@ -53,7 +53,7 @@
       </Select>
     </div>
     <div class="row">
-      <div style="width: 40%">Word Spacing:</div>
+      <div style="width: 40%">{{ $t('styling.elements.text.wordSpacing') }}:</div>
       <Select
         style="width: 60%"
         :value="wordSpace || 0"
@@ -71,7 +71,7 @@
       </Select>
     </div>
     <div class="row">
-      <div style="width: 40%">Textbox Fill:</div>
+      <div style="width: 40%">{{ $t('styling.elements.text.textboxFill') }}:</div>
       <Popover trigger="click" style="width: 60%">
         <template #content>
           <ColorPicker :modelValue="fill" @update:modelValue="(value) => updateFill(value)" />
@@ -203,27 +203,27 @@ const lineHeightOptions = [0.9, 1.0, 1.15, 1.2, 1.4, 1.5, 1.8, 2.0, 2.5, 3.0];
 const wordSpaceOptions = [0, 1, 2, 3, 4, 5, 6, 8, 10];
 const paragraphSpaceOptions = [0, 5, 10, 15, 20, 25, 30, 40, 50, 80];
 
-// 设置行高
+//  Set line height
 const updateLineHeight = (value: number) => {
   updateElement({ lineHeight: value });
 };
 
-// 设置段间距
+// Set paragraph spacing
 const updateParagraphSpace = (value: number) => {
   updateElement({ paragraphSpace: value });
 };
 
-// 设置字间距
+// Set letter spacing
 const updateWordSpace = (value: number) => {
   updateElement({ wordSpace: value });
 };
 
-// 设置文本框填充
+// Set text box padding
 const updateFill = (value: string) => {
   updateElement({ fill: value });
 };
 
-// 发送富文本设置命令（批量）
+// Send rich text formatting commands (in batch)
 const emitBatchRichTextCommand = (action: RichTextAction[]) => {
   emitter.emit(EmitterEvents.RICH_TEXT_COMMAND, { action });
 };

@@ -1,18 +1,16 @@
 <template>
   <div class="aippt-dialog">
     <div class="header">
-      <span class="title">AIPPT</span>
-      <span class="subtite" v-if="step === 'template'"
-        >Select a suitable template from below to start generating PPT</span
-      >
-      <span class="subtite" v-else-if="step === 'outline'"
-        >Confirm the content outline below (click to edit content, right-click to add/delete outline items),
-        then start selecting templates</span
-      >
-      <span class="subtite" v-else
-        >Enter your PPT topic below and add appropriate information such as industry, position, subject,
-        purpose, etc.</span
-      >
+      <span class="title">{{ $t('ai.dialog.title') }}</span>
+      <span class="subtite" v-if="step === 'template'">
+        {{ $t('ai.dialog.templateSubtitle') }}
+      </span>
+      <span class="subtite" v-else-if="step === 'outline'">
+        {{ $t('ai.dialog.outlineSubtitle') }}
+      </span>
+      <span class="subtite" v-else>
+        {{ $t('ai.dialog.setupSubtitle') }}
+      </span>
     </div>
 
     <template v-if="step === 'setup'">
@@ -21,13 +19,13 @@
         ref="inputRef"
         v-model:value="keyword"
         :maxlength="50"
-        placeholder="Please enter PPT topic, e.g.: College Student Career Planning"
+        :placeholder="t('ai.dialog.topicPlaceholder')"
         @enter="createOutline()"
       >
         <template #suffix>
           <span class="count">{{ keyword.length }} / 50</span>
           <div class="submit" type="primary" @click="createOutline()">
-            <IconSend class="icon" /> AI Generate
+            <IconSend class="icon" /> {{ $t('ai.dialog.generate') }}
           </div>
         </template>
       </Input>
@@ -38,60 +36,60 @@
       </div>
       <div class="configs">
         <div class="config-item">
-          <div class="label">Language:</div>
+          <div class="label">{{ $t('ai.dialog.settings.language') }}</div>
           <Select
             style="width: 120px"
             v-model:value="language"
             :options="[
-              { label: 'Chinese', value: 'Chinese' },
-              { label: 'English', value: 'English' },
-              { label: 'Japanese', value: 'Japanese' },
+              { label: $t('ai.dialog.languages.chinese'), value: 'Chinese' },
+              { label: $t('ai.dialog.languages.english'), value: 'English' },
+              { label: $t('ai.dialog.languages.japanese'), value: 'Japanese' },
             ]"
           />
         </div>
         <div class="config-item">
-          <div class="label">Style:</div>
+          <div class="label">{{ $t('ai.dialog.settings.style') }}</div>
           <Select
             style="width: 120px"
             v-model:value="style"
             :options="[
-              { label: 'General', value: 'General' },
-              { label: 'Academic', value: 'Academic' },
-              { label: 'Workplace', value: 'Workplace' },
-              { label: 'Education', value: 'Education' },
-              { label: 'Marketing', value: 'Marketing' },
+              { label: $t('ai.dialog.styles.general'), value: 'General' },
+              { label: $t('ai.dialog.styles.academic'), value: 'Academic' },
+              { label: $t('ai.dialog.styles.workplace'), value: 'Workplace' },
+              { label: $t('ai.dialog.styles.education'), value: 'Education' },
+              { label: $t('ai.dialog.styles.marketing'), value: 'Marketing' },
             ]"
           />
         </div>
         <div class="config-item">
-          <div class="label">Model:</div>
+          <div class="label">{{ $t('ai.dialog.settings.model') }}</div>
           <Select
             style="width: 190px"
             v-model:value="model"
             :options="[
-              { label: 'GLM-4-Flash', value: 'GLM-4-Flash' },
-              { label: 'GLM-4-FlashX', value: 'GLM-4-FlashX' },
+              { label: $t('ai.dialog.models.glm4Flash'), value: 'GLM-4-Flash' },
+              { label: $t('ai.dialog.models.glm4FlashX'), value: 'GLM-4-FlashX' },
               {
-                label: 'doubao-1.5-lite-32k',
+                label: $t('ai.dialog.models.doubaoLite'),
                 value: 'ark-doubao-1.5-lite-32k',
               },
               {
-                label: 'doubao-seed-1.6-flash',
+                label: $t('ai.dialog.models.doubaoSeed'),
                 value: 'ark-doubao-seed-1.6-flash',
               },
             ]"
           />
         </div>
         <div class="config-item">
-          <div class="label">Images:</div>
+          <div class="label">{{ $t('ai.dialog.settings.images') }}</div>
           <Select
             style="width: 100px"
             v-model:value="img"
             :options="[
-              { label: 'None', value: '' },
-              { label: 'Mock Test', value: 'test' },
-              { label: 'AI Search', value: 'ai-search', disabled: true },
-              { label: 'AI Create', value: 'ai-create', disabled: true },
+              { label: $t('ai.dialog.imageOptions.none'), value: '' },
+              { label: $t('ai.dialog.imageOptions.mockTest'), value: 'test' },
+              { label: $t('ai.dialog.imageOptions.aiSearch'), value: 'ai-search', disabled: true },
+              { label: $t('ai.dialog.imageOptions.aiCreate'), value: 'ai-create', disabled: true },
             ]"
           />
         </div>
@@ -103,7 +101,9 @@
         <OutlineEditor v-model:value="outline" />
       </div>
       <div class="btns" v-if="!outlineCreating">
-        <Button class="btn" type="primary" @click="step = 'template'">Select Template</Button>
+        <Button class="btn" type="primary" @click="step = 'template'">{{
+          $t('ai.dialog.actions.selectTemplate')
+        }}</Button>
 
         <Button
           class="btn"
@@ -111,7 +111,7 @@
             outline = ``;
             step = `setup`;
           "
-          >Back to Regenerate</Button
+          >{{ $t('ai.dialog.actions.backToRegenerate') }}</Button
         >
       </div>
     </div>
@@ -128,12 +128,14 @@
         </div>
       </div>
       <div class="btns">
-        <Button class="btn" type="primary" @click="createPPT()">Generate</Button>
-        <Button class="btn" @click="step = 'outline'">Back to Outline</Button>
+        <Button class="btn" type="primary" @click="createPPT()">{{
+          $t('ai.dialog.generate')
+        }}</Button>
+        <Button class="btn" @click="step = 'outline'">{{ $t('ai.dialog.actions.backToOutline') }}</Button>
       </div>
     </div>
 
-    <FullscreenSpin :loading="loading" tip="AI is generating, please wait patiently..." />
+    <FullscreenSpin :loading="loading" :tip="t('ai.dialog.status.loadingTip')" />
   </div>
 </template>
 
@@ -151,6 +153,9 @@ import Button from '@/components/Button.vue';
 import Select from '@/components/Select.vue';
 import FullscreenSpin from '@/components/FullscreenSpin.vue';
 import OutlineEditor from '@/components/OutlineEditor.vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const mainStore = useMainStore();
 const slideStore = useSlidesStore();
@@ -171,16 +176,16 @@ const step = ref<'setup' | 'outline' | 'template'>('setup');
 const model = ref('GLM-4-Flash');
 
 const recommends = ref([
-  'Company Annual Meeting Planning',
-  'How Big Data Changes the World',
-  'Restaurant Market Research',
-  'AIGC Applications in Education',
-  'How 5G Technology Changes Our Lives',
-  'College Student Career Planning',
-  '2025 Technology Frontiers',
-  'Social Media and Brand Marketing',
-  'Annual Work Summary and Outlook',
-  'Blockchain Technology and Applications',
+  t('ai.dialog.sampleTopics.companyAnnualMeetingPlanning'),
+  t('ai.dialog.sampleTopics.howBigDataChangesTheWorld'),
+  t('ai.dialog.sampleTopics.restaurantMarketResearch'),
+  t('ai.dialog.sampleTopics.aigcApplicationsInEducation'),
+  t('ai.dialog.sampleTopics.how5GTechnologyChangesOurLives'),
+  t('ai.dialog.sampleTopics.collegeStudentCareerPlanning'),
+  t('ai.dialog.sampleTopics.technologyFrontiers2025'),
+  t('ai.dialog.sampleTopics.socialMediaAndBrandMarketing'),
+  t('ai.dialog.sampleTopics.annualWorkSummaryAndOutlook'),
+  t('ai.dialog.sampleTopics.blockchainTechnologyAndApplications'),
 ]);
 
 onMounted(() => {
@@ -195,7 +200,7 @@ const setKeyword = (value: string) => {
 };
 
 const createOutline = async () => {
-  if (!keyword.value) return message.error('Please enter PPT topic first');
+  if (!keyword.value) return message.error(t('ai.dialog.status.enterTopicError'));
 
   loading.value = true;
   outlineCreating.value = true;

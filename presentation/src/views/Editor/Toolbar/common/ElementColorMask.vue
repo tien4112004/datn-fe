@@ -1,14 +1,14 @@
 <template>
   <div class="element-color-mask">
     <div class="row">
-      <div style="width: 40%">Coloring (Mask):</div>
+      <div style="width: 40%">{{ $t('styling.effects.colorMask.coloringMask') }}</div>
       <div class="switch-wrapper" style="width: 60%">
         <Switch :value="hasColorMask" @update:value="(value) => toggleColorMask(value)" />
       </div>
     </div>
     <template v-if="hasColorMask">
       <div class="row" style="margin-top: 15px">
-        <div style="width: 40%">Mask Color:</div>
+        <div style="width: 40%">{{ $t('styling.effects.colorMask.maskColor') }}</div>
         <Popover trigger="click" style="width: 60%">
           <template #content>
             <ColorPicker :modelValue="colorMask" @update:modelValue="(value) => updateColorMask(value)" />

@@ -8,7 +8,7 @@
               openAIPPTDialog();
               mainMenuVisible = false;
             "
-            >{{ $t('header.aiGeneratePPT') }}</PopoverMenuItem
+            >{{ $t('header.ai.aiGeneratePPT') }}</PopoverMenuItem
           >
           <FileInput
             accept="application/vnd.openxmlformats-officedocument.presentationml.presentation"
@@ -19,7 +19,7 @@
               }
             "
           >
-            <PopoverMenuItem>{{ $t('header.importPptx') }}</PopoverMenuItem>
+            <PopoverMenuItem>{{ $t('header.file.importPptx') }}</PopoverMenuItem>
           </FileInput>
           <FileInput
             accept=".pptist"
@@ -30,29 +30,31 @@
               }
             "
           >
-            <PopoverMenuItem>{{ $t('header.importPptist') }}</PopoverMenuItem>
+            <PopoverMenuItem>{{ $t('header.file.importPptist') }}</PopoverMenuItem>
           </FileInput>
-          <PopoverMenuItem @click="setDialogForExport('pptx')">{{ $t('header.exportFile') }}</PopoverMenuItem>
+          <PopoverMenuItem @click="setDialogForExport('pptx')">{{
+            $t('header.file.exportFile')
+          }}</PopoverMenuItem>
           <PopoverMenuItem
             @click="
               resetSlides();
               mainMenuVisible = false;
             "
-            >{{ $t('header.resetSlides') }}</PopoverMenuItem
+            >{{ $t('header.file.resetSlides') }}</PopoverMenuItem
           >
           <PopoverMenuItem
             @click="
               openMarkupPanel();
               mainMenuVisible = false;
             "
-            >{{ $t('header.slideTypeAnnotation') }}</PopoverMenuItem
+            >{{ $t('header.tools.slideTypeAnnotation') }}</PopoverMenuItem
           >
           <PopoverMenuItem
             @click="
               mainMenuVisible = false;
               hotkeyDrawerVisible = true;
             "
-            >{{ $t('header.quickActions') }}</PopoverMenuItem
+            >{{ $t('header.tools.quickActions') }}</PopoverMenuItem
           >
         </template>
         <div class="menu-item"><IconHamburgerButton class="icon" /></div>
@@ -74,22 +76,28 @@
 
     <div class="right">
       <div class="group-menu-item">
-        <div class="menu-item" v-tooltip="$t('header.slideShow')" @click="enterScreening()">
+        <div
+          class="menu-item"
+          v-tooltip="$t('header.presentation.slideShow')"
+          @click="enterScreening()"
+        >
           <IconPpt class="icon" />
         </div>
         <Popover trigger="click" center>
           <template #content>
             <PopoverMenuItem @click="enterScreeningFromStart()">{{
-              $t('header.fromBeginning')
+              $t('header.presentation.fromBeginning')
             }}</PopoverMenuItem>
-            <PopoverMenuItem @click="enterScreening()">{{ $t('header.fromCurrentPage') }}</PopoverMenuItem>
+            <PopoverMenuItem @click="enterScreening()">{{
+              $t('header.presentation.fromCurrentPage')
+            }}</PopoverMenuItem>
           </template>
           <div class="arrow-btn"><IconDown class="arrow" /></div>
         </Popover>
       </div>
       <div
         class="menu-item"
-        v-tooltip="$t('header.aiGeneratePPT')"
+        v-tooltip="$t('header.ai.aiGeneratePPT')"
         @click="
           openAIPPTDialog();
           mainMenuVisible = false;
@@ -97,12 +105,16 @@
       >
         <span class="text ai">AI</span>
       </div>
-      <div class="menu-item" v-tooltip="$t('header.export')" @click="setDialogForExport('pptx')">
+      <div
+        class="menu-item"
+        v-tooltip="$t('header.file.exportFile')"
+        @click="setDialogForExport('pptx')"
+      >
         <IconDownload class="icon" />
       </div>
       <a
         class="github-link"
-        v-tooltip="$t('header.copyright')"
+        v-tooltip="$t('header.meta.copyright')"
         href="https://github.com/pipipi-pikachu/PPTist"
         target="_blank"
       >
@@ -115,10 +127,10 @@
 
     <Drawer :width="320" v-model:visible="hotkeyDrawerVisible" placement="right">
       <HotkeyDoc />
-      <template v-slot:title>{{ $t('header.quickActions') }}</template>
+      <template v-slot:title>{{ $t('header.tools.quickActions') }}</template>
     </Drawer>
 
-    <FullscreenSpin :loading="exporting" :tip="$t('header.importing')" />
+    <FullscreenSpin :loading="exporting" :tip="$t('header.file.importing')" />
   </div>
 </template>
 

@@ -1,6 +1,6 @@
 import { createI18n } from 'vue-i18n';
-import en from './en';
-import vi from './vi';
+import en from './en/index';
+import vi from './vi/index';
 
 const getDefaultLocale = (): string => {
   const savedLocale = localStorage.getItem('locale');

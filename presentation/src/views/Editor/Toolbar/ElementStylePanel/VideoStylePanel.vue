@@ -1,6 +1,6 @@
 <template>
   <div class="video-style-panel">
-    <div class="title">Video Preview Cover</div>
+    <div class="title">{{ $t('styling.elements.video.videoPreviewCover') }}</div>
     <div class="background-image-wrapper">
       <FileInput @change="(files) => setVideoPoster(files)">
         <div class="background-image">
@@ -16,11 +16,13 @@
       </FileInput>
     </div>
     <div class="row">
-      <Button style="flex: 1" @click="updateVideo({ poster: '' })">Reset Cover</Button>
+      <Button style="flex: 1" @click="updateVideo({ poster: '' })">{{
+        $t('styling.elements.video.resetCover')
+      }}</Button>
     </div>
 
     <div class="row switch-row">
-      <div style="width: 40%">Autoplay:</div>
+      <div style="width: 40%">{{ $t('styling.elements.video.autoplay') }}:</div>
       <div class="switch-wrapper" style="width: 60%">
         <Switch
           :value="handleVideoElement.autoplay"

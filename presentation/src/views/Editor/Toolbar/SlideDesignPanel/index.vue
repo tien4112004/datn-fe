@@ -140,7 +140,7 @@
         style="width: 60%"
         :value="theme.fontName"
         search
-        searchLabel="$t('styling.slide.design.theme.searchFont')"
+        :searchLabel="$t('styling.slide.design.theme.searchFont')"
         @update:value="(value) => updateTheme({ fontName: value as string })"
         :options="FONTS"
       />

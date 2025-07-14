@@ -22,7 +22,7 @@
       <div class="row">
         <div class="title">{{ $t('files.export.pptx.ignoreAudioVideo') }}</div>
         <div class="config-item">
-          <Switch v-model:value="ignoreMedia" :v-tooltip="t('files.export.pptx.ignoreAudioVideoTooltip')" />
+          <Switch v-model:value="ignoreMedia" v-tooltip="t('files.export.pptx.ignoreAudioVideoTooltip')" />
         </div>
       </div>
       <div class="row">

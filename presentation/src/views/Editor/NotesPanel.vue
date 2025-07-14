@@ -101,7 +101,7 @@
         <div class="footer">
           <IconDelete
             class="btn icon"
-            :v-tooltip="t('panels.notes.clearTooltip')"
+            v-tooltip="t('panels.notes.clearTooltip')"
             style="flex: 1"
             @click="clear()"
           />

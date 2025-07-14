@@ -48,7 +48,7 @@
         <div class="config-item">
           <Switch
             v-model:value="ignoreWebfont"
-            :v-tooltip="t('files.export.image.ignoreOnlineFontsTooltip')"
+            v-tooltip="t('files.export.image.ignoreOnlineFontsTooltip')"
           />
         </div>
       </div>

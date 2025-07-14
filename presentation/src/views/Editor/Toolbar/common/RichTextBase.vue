@@ -177,7 +177,7 @@
           last
           style="width: 100%"
           :checked="!!richTextAttrs.link"
-          :v-tooltip="$t('elements.text.editor.hyperlink')"
+          v-tooltip="$t('elements.text.editor.hyperlink')"
           @click="openLinkPopover()"
           ><IconLinkOne
         /></CheckboxButton>
@@ -191,16 +191,16 @@
       :value="richTextAttrs.align"
       @update:value="(value) => emitRichTextCommand('align', value)"
     >
-      <RadioButton value="left" :v-tooltip="$t('elements.text.editor.alignLeft')" style="flex: 1"
+      <RadioButton value="left" v-tooltip="$t('elements.text.editor.alignLeft')" style="flex: 1"
         ><IconAlignTextLeft
       /></RadioButton>
-      <RadioButton value="center" :v-tooltip="$t('elements.text.editor.alignCenter')" style="flex: 1"
+      <RadioButton value="center" v-tooltip="$t('elements.text.editor.alignCenter')" style="flex: 1"
         ><IconAlignTextCenter
       /></RadioButton>
-      <RadioButton value="right" :v-tooltip="$t('elements.text.editor.alignRight')" style="flex: 1"
+      <RadioButton value="right" v-tooltip="$t('elements.text.editor.alignRight')" style="flex: 1"
         ><IconAlignTextRight
       /></RadioButton>
-      <RadioButton value="justify" :v-tooltip="$t('elements.text.editor.justify')" style="flex: 1"
+      <RadioButton value="justify" v-tooltip="$t('elements.text.editor.justify')" style="flex: 1"
         ><IconAlignTextBoth
       /></RadioButton>
     </RadioGroup>
@@ -211,7 +211,7 @@
           first
           :type="richTextAttrs.bulletList ? 'primary' : 'default'"
           style="flex: 1"
-          :v-tooltip="$t('elements.text.editor.bulletList')"
+          v-tooltip="$t('elements.text.editor.bulletList')"
           @click="emitRichTextCommand('bulletList')"
           ><IconList
         /></Button>
@@ -240,7 +240,7 @@
           first
           :type="richTextAttrs.orderedList ? 'primary' : 'default'"
           style="flex: 1"
-          :v-tooltip="$t('elements.text.editor.numberedList')"
+          v-tooltip="$t('elements.text.editor.numberedList')"
           @click="emitRichTextCommand('orderedList')"
           ><IconOrderedList
         /></Button>
@@ -270,7 +270,7 @@
         <Button
           first
           style="flex: 1"
-          :v-tooltip="$t('elements.text.editor.decreaseIndent')"
+          v-tooltip="$t('elements.text.editor.decreaseIndent')"
           @click="emitRichTextCommand('indent', '-1')"
           ><IconIndentLeft
         /></Button>
@@ -288,7 +288,7 @@
         <Button
           first
           style="flex: 1"
-          :v-tooltip="$t('elements.text.editor.increaseIndent')"
+          v-tooltip="$t('elements.text.editor.increaseIndent')"
           @click="emitRichTextCommand('indent', '+1')"
           ><IconIndentRight
         /></Button>

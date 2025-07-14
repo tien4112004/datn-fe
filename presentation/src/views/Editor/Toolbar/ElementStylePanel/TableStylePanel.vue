@@ -40,7 +40,7 @@
             @update:modelValue="(value) => updateTextAttrs({ color: value })"
           />
         </template>
-        <TextColorButton first :v-tooltip="$t('styling.elements.table.textColor')" :color="textAttrs.color">
+        <TextColorButton first v-tooltip="$t('styling.elements.table.textColor')" :color="textAttrs.color">
           <IconText />
         </TextColorButton>
       </Popover>
@@ -51,7 +51,7 @@
             @update:modelValue="(value) => updateTextAttrs({ backcolor: value })"
           />
         </template>
-        <TextColorButton last :v-tooltip="$t('styling.elements.table.cellFill')" :color="textAttrs.backcolor">
+        <TextColorButton last v-tooltip="$t('styling.elements.table.cellFill')" :color="textAttrs.backcolor">
           <IconFill />
         </TextColorButton>
       </Popover>
@@ -61,28 +61,28 @@
       <CheckboxButton
         style="flex: 1"
         :checked="textAttrs.bold"
-        :v-tooltip="$t('styling.elements.table.bold')"
+        v-tooltip="$t('styling.elements.table.bold')"
         @click="updateTextAttrs({ bold: !textAttrs.bold })"
         ><IconTextBold
       /></CheckboxButton>
       <CheckboxButton
         style="flex: 1"
         :checked="textAttrs.em"
-        :v-tooltip="$t('styling.elements.table.italic')"
+        v-tooltip="$t('styling.elements.table.italic')"
         @click="updateTextAttrs({ em: !textAttrs.em })"
         ><IconTextItalic
       /></CheckboxButton>
       <CheckboxButton
         style="flex: 1"
         :checked="textAttrs.underline"
-        :v-tooltip="$t('styling.elements.table.underline')"
+        v-tooltip="$t('styling.elements.table.underline')"
         @click="updateTextAttrs({ underline: !textAttrs.underline })"
         ><IconTextUnderline
       /></CheckboxButton>
       <CheckboxButton
         style="flex: 1"
         :checked="textAttrs.strikethrough"
-        :v-tooltip="$t('styling.elements.table.strikethrough')"
+        v-tooltip="$t('styling.elements.table.strikethrough')"
         @click="updateTextAttrs({ strikethrough: !textAttrs.strikethrough })"
         ><IconStrikethrough
       /></CheckboxButton>
@@ -94,16 +94,16 @@
       :value="textAttrs.align"
       @update:value="(value) => updateTextAttrs({ align: value as TextAlign })"
     >
-      <RadioButton value="left" :v-tooltip="$t('styling.elements.table.alignLeft')" style="flex: 1"
+      <RadioButton value="left" v-tooltip="$t('styling.elements.table.alignLeft')" style="flex: 1"
         ><IconAlignTextLeft
       /></RadioButton>
-      <RadioButton value="center" :v-tooltip="$t('styling.elements.table.alignCenter')" style="flex: 1"
+      <RadioButton value="center" v-tooltip="$t('styling.elements.table.alignCenter')" style="flex: 1"
         ><IconAlignTextCenter
       /></RadioButton>
-      <RadioButton value="right" :v-tooltip="$t('styling.elements.table.alignRight')" style="flex: 1"
+      <RadioButton value="right" v-tooltip="$t('styling.elements.table.alignRight')" style="flex: 1"
         ><IconAlignTextRight
       /></RadioButton>
-      <RadioButton value="justify" :v-tooltip="$t('styling.elements.table.justify')" style="flex: 1"
+      <RadioButton value="justify" v-tooltip="$t('styling.elements.table.justify')" style="flex: 1"
         ><IconAlignTextBoth
       /></RadioButton>
     </RadioGroup>

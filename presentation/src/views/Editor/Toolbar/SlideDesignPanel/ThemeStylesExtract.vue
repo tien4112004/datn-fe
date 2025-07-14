@@ -15,7 +15,7 @@
               {{ fontMap[item] || item }}
             </div>
             <div class="handler">
-              <div class="state" :class="{ active: selectedIndex.fontName === index }"></div>
+              <div class="state" :class="{ active: selectedIndex.fontName === index }">√</div>
               <div class="config-btn" @click="selectedIndex.fontName = index">
                 {{ $t('styling.slide.themeColors.extract.select') }}
               </div>

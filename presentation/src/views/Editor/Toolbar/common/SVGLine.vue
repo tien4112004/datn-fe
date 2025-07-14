@@ -69,7 +69,6 @@ const lineDashArray = computed(() => {
 </script>
 
 <style lang="scss" scoped>
-// add $gray-333 color for line
 svg {
   stroke: $gray-333;
 }

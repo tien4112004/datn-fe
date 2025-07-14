@@ -1,7 +1,10 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { NavLink } from 'react-router-dom';
 
 const Nav = () => {
+  const { t } = useTranslation('nav');
+
   const [isFullscreen, setIsFullscreen] = React.useState(document.fullscreenElement !== null);
 
   window.addEventListener('fullscreenchange', () => {
@@ -24,13 +27,13 @@ const Nav = () => {
     !isFullscreen && (
       <nav className="p-4 bg-gray-100 header-nav flex gap-4">
         <NavLink to="/" className="hover:underline">
-          Home
+          {t('home')}
         </NavLink>
         <NavLink to="/presentation" className="hover:underline">
-          Presentation
+          {t('presentation')}
         </NavLink>
         <NavLink to="/presentation/123" className="hover:underline">
-          Presentation Details
+          {t('presentationDetails')}
         </NavLink>
       </nav>
     )

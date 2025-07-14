@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { NavLink } from 'react-router-dom';
+import LanguageSwitcher from '../components/common/LanguageSwitcher';
 
 const Nav = () => {
   const { t } = useTranslation('nav');
@@ -25,16 +26,22 @@ const Nav = () => {
 
   return (
     !isFullscreen && (
-      <nav className="p-4 bg-gray-100 header-nav flex gap-4">
-        <NavLink to="/" className="hover:underline">
-          {t('home')}
-        </NavLink>
-        <NavLink to="/presentation" className="hover:underline">
-          {t('presentation')}
-        </NavLink>
-        <NavLink to="/presentation/123" className="hover:underline">
-          {t('presentationDetails')}
-        </NavLink>
+      <nav className="p-4 bg-gray-100 header-nav flex items-center justify-between">
+        <div className="flex gap-4">
+          <NavLink to="/" className="hover:underline">
+            {t('home')}
+          </NavLink>
+          <NavLink to="/presentation" className="hover:underline">
+            {t('presentation')}
+          </NavLink>
+          <NavLink to="/presentation/123" className="hover:underline">
+            {t('presentationDetails')}
+          </NavLink>
+        </div>
+
+        <div>
+          <LanguageSwitcher />
+        </div>
       </nav>
     )
   );

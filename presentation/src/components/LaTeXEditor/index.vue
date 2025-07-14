@@ -69,7 +69,7 @@ import Button from '../Button.vue';
 import TextArea from '../TextArea.vue';
 import Tabs from '../Tabs.vue';
 
-const SYMBOL_LIST = getSymbolList();
+const SYMBOL_LIST = getSymbolList().value;
 
 interface TabItem {
   key: 'symbol' | 'formula';

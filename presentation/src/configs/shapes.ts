@@ -3,6 +3,7 @@
 // Non-professional designers can use this application to draw basic shapes: https://github.com/pipipi-pikachu/svgPathCreator
 
 import { ShapePathFormulasKeys } from '@/types/slides';
+import { computed, type ComputedRef } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 export interface ShapePoolItem {
@@ -286,10 +287,10 @@ export const SHAPE_PATH_FORMULAS: {
   },
 };
 
-export const getShapeList = (): ShapeListItem[] => {
+export const getShapeList = (): ComputedRef<ShapeListItem[]> => {
   const { t } = useI18n();
 
-  return [
+  return computed(() => [
     {
       type: t('content.shapes.categories.rectangle'),
       children: [
@@ -1079,5 +1080,5 @@ export const getShapeList = (): ShapeListItem[] => {
         },
       ],
     },
-  ];
+  ]);
 };

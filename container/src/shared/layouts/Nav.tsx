@@ -19,14 +19,23 @@ const Nav = () => {
     } else {
       document.documentElement.style.setProperty(
         '--header-height',
-        `${document.querySelector('nav')?.offsetHeight || 0}px`
+        `${(document.querySelector('nav')?.clientHeight || 0) + 16}px`
+      );
+    }
+  });
+
+  React.useEffect(() => {
+    if (!document.fullscreenElement) {
+      document.documentElement.style.setProperty(
+        '--header-height',
+        `${(document.querySelector('nav')?.clientHeight || 0) + 16}px`
       );
     }
   });
 
   return (
     !isFullscreen && (
-      <nav className="p-4 bg-gray-100 header-nav flex items-center justify-between">
+      <nav className="px-4 py-2 bg-gray-100  flex items-center justify-between">
         <div className="flex gap-4">
           <NavLink to="/" className="hover:underline">
             {t('home')}

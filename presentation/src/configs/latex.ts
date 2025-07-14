@@ -1,4 +1,5 @@
 import { useI18n } from 'vue-i18n';
+import { computed } from 'vue';
 
 export const FORMULA_LIST = [
   {
@@ -78,7 +79,7 @@ export const FORMULA_LIST = [
 export const getSymbolList = () => {
   const { t } = useI18n();
 
-  return [
+  return computed(() => [
     {
       type: 'operators',
       label: t('content.latex.categories.math'),
@@ -276,5 +277,5 @@ export const getSymbolList = () => {
         { latex: '\\Omega' },
       ],
     },
-  ];
+  ]);
 };

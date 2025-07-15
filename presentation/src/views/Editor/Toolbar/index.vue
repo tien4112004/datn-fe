@@ -62,10 +62,10 @@ const slideTabs = computed(() => [
   { label: t('toolbar.categories.transition'), key: ToolbarStates.SLIDE_ANIMATION },
   { label: t('toolbar.categories.animation'), key: ToolbarStates.EL_ANIMATION },
 ]);
-const multiSelectTabs = [
+const multiSelectTabs = computed(() => [
   { label: 'Style (Multi-select)', key: ToolbarStates.MULTI_STYLE },
   { label: 'Position (Multi-select)', key: ToolbarStates.MULTI_POSITION },
-];
+]);
 
 const setToolbarState = (value: ToolbarStates) => {
   mainStore.setToolbarState(value);

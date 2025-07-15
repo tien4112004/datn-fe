@@ -42,7 +42,7 @@ export default {
 
         // Phông chữ
         searchFont: 'Tìm phông chữ',
-        searchFontSize: 'Tìm cỡ chữ',
+        searchFontSize: '',
 
         // Căn chỉnh
         alignLeft: 'Căn trái',

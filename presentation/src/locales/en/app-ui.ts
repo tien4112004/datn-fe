@@ -55,7 +55,7 @@ export default {
       enterHyperlink: 'Enter Hyperlink',
       enterWebAddress: 'Enter webpage link address',
       searchFont: 'Search Font',
-      searchFontSize: 'Search Font Size',
+      searchFontSize: '',
       placeholder: 'Placeholder',
       invalidWebLink: 'Not a valid web link address',
     },

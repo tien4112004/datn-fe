@@ -1,39 +1,37 @@
 <template>
-  <div class="language-switcher">
-    <Popover v-model:value="dropdownVisible" trigger="click" placement="bottom-end">
-      <div class="language-icon" :title="$t('header.tools.changeLanguage')">
-        <span class="current-flag">{{ getCurrentFlag() }}</span>
-        <svg class="dropdown-arrow" viewBox="0 0 16 16" width="12" height="12">
-          <path d="M8 10.5L4 6.5h8L8 10.5z" fill="currentColor" />
-        </svg>
-      </div>
-      <template #content>
-        <div class="language-menu">
-          <PopoverMenuItem
-            v-for="locale in getAvailableLocales()"
-            :key="locale.code"
-            @click="handleLocaleChange(locale.code)"
-            :class="{ active: locale.code === currentLocale }"
+  <Popover class="language-switcher" v-model:value="dropdownVisible" trigger="click" placement="bottom-end">
+    <div class="language-icon" :title="$t('header.tools.changeLanguage')">
+      <span class="current-flag">{{ getCurrentFlag() }}</span>
+      <svg class="dropdown-arrow" viewBox="0 0 16 16" width="12" height="12">
+        <path d="M8 10.5L4 6.5h8L8 10.5z" fill="currentColor" />
+      </svg>
+    </div>
+    <template #content>
+      <div class="language-menu">
+        <PopoverMenuItem
+          v-for="locale in getAvailableLocales()"
+          :key="locale.code"
+          @click="handleLocaleChange(locale.code)"
+          :class="{ active: locale.code === currentLocale }"
+        >
+          <span class="flag">{{ locale.flag }}</span>
+          <span class="locale-name">{{ locale.name }}</span>
+          <svg
+            v-if="locale.code === currentLocale"
+            class="check-icon"
+            viewBox="0 0 16 16"
+            width="12"
+            height="12"
           >
-            <span class="flag">{{ locale.flag }}</span>
-            <span class="locale-name">{{ locale.name }}</span>
-            <svg
-              v-if="locale.code === currentLocale"
-              class="check-icon"
-              viewBox="0 0 16 16"
-              width="12"
-              height="12"
-            >
-              <path
-                d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"
-                fill="currentColor"
-              />
-            </svg>
-          </PopoverMenuItem>
-        </div>
-      </template>
-    </Popover>
-  </div>
+            <path
+              d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"
+              fill="currentColor"
+            />
+          </svg>
+        </PopoverMenuItem>
+      </div>
+    </template>
+  </Popover>
 </template>
 
 <script setup lang="ts">
@@ -75,11 +73,6 @@ const handleLocaleChange = (newLocale: string) => {
     cursor: pointer;
     transition: background-color 0.2s ease;
     user-select: none;
-
-    &:hover {
-      background-color: color.adjust($primary, $lightness: +25%);
-      color: $textColor;
-    }
 
     .current-flag {
       font-size: 16px;

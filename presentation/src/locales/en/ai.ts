@@ -3,7 +3,7 @@ export default {
   ai: {
     dialog: {
       title: 'AIPPT',
-      templateSubtitle: 'Select a suitable template from below to start generating PPT',
+      templateSubtitle: 'Select a template to start generating PPT',
       outlineSubtitle:
         'Confirm the content outline below (click to edit content, right-click to add/delete outline items), then start selecting templates',
       setupSubtitle:

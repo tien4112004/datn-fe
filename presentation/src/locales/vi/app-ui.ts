@@ -55,7 +55,7 @@ export default {
       enterHyperlink: 'Nhập liên kết',
       enterWebAddress: 'Nhập địa chỉ liên kết trang web',
       searchFont: 'Tìm phông chữ',
-      searchFontSize: 'Tìm cỡ chữ',
+      searchFontSize: '',
       placeholder: 'Nội dung mẫu',
       invalidWebLink: 'Địa chỉ liên kết không hợp lệ',
     },

@@ -42,7 +42,7 @@ export default {
 
         // Fonts
         searchFont: 'Search Font',
-        searchFontSize: 'Search Font Size',
+        searchFontSize: '',
 
         // Alignment
         alignLeft: 'Align Left',

@@ -66,7 +66,7 @@ export default {
     // Phần tử bảng
     table: {
       searchFont: 'Tìm phông chữ',
-      searchFontSize: 'Tìm cỡ chữ',
+      searchFontSize: '',
       textColor: 'Màu chữ',
       cellFill: 'Màu nền ô',
       bold: 'In đậm',
@@ -107,7 +107,7 @@ export default {
     // Kiểu nhiều phần tử
     multi: {
       searchFont: 'Tìm phông chữ',
-      searchFontSize: 'Tìm cỡ chữ',
+      searchFontSize: '',
       textColor: 'Màu chữ',
       textHighlight: 'Tô sáng văn bản',
     },

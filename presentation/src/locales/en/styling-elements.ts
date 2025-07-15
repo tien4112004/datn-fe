@@ -65,7 +65,7 @@ export default {
     // Table Elements
     table: {
       searchFont: 'Search Font',
-      searchFontSize: 'Search Font Size',
+      searchFontSize: '',
       textColor: 'Text Color',
       cellFill: 'Cell Fill',
       bold: 'Bold',
@@ -106,7 +106,7 @@ export default {
     // Multi-Element Styles
     multi: {
       searchFont: 'Search Font',
-      searchFontSize: 'Search Font Size',
+      searchFontSize: '',
       textColor: 'Text Color',
       textHighlight: 'Text Highlight',
     },

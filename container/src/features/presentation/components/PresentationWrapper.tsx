@@ -1,4 +1,5 @@
 import GlobalSpinner from '@/shared/components/common/GlobalSpinner';
+import { useSidebar } from '@/shared/components/ui/sidebar';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -7,6 +8,7 @@ const PresentationWrapper = () => {
   const hasMounted = useRef(false);
   const [isLoading, setIsLoading] = useState(true);
   const { t } = useTranslation('loading');
+  const { toggleSidebar } = useSidebar();
 
   useEffect(() => {
     // Prevent re-mounting the Vue component if it has already been mounted
@@ -17,7 +19,7 @@ const PresentationWrapper = () => {
 
     import('vueRemote/Editor')
       .then((mod) => {
-        mod.mount(containerRef.current);
+        mod.mount(containerRef.current, { handleSidebar: toggleSidebar });
         setIsLoading(false);
       })
       .catch((err) => {

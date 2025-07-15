@@ -76,11 +76,7 @@
 
     <div class="right">
       <div class="group-menu-item">
-        <div
-          class="menu-item"
-          v-tooltip="$t('header.presentation.slideShow')"
-          @click="enterScreening()"
-        >
+        <div class="menu-item" v-tooltip="$t('header.presentation.slideShow')" @click="enterScreening()">
           <IconPpt class="icon" />
         </div>
         <Popover trigger="click" center>
@@ -105,11 +101,7 @@
       >
         <span class="text ai">AI</span>
       </div>
-      <div
-        class="menu-item"
-        v-tooltip="$t('header.file.exportFile')"
-        @click="setDialogForExport('pptx')"
-      >
+      <div class="menu-item" v-tooltip="$t('header.file.exportFile')" @click="setDialogForExport('pptx')">
         <IconDownload class="icon" />
       </div>
       <a
@@ -120,7 +112,7 @@
       >
         <div class="menu-item"><IconGithub class="icon" /></div>
       </a>
-      <div class="menu-item">
+      <div class="menu-item" id="language-switcher">
         <LanguageSwitcher />
       </div>
     </div>

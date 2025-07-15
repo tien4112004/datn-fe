@@ -169,7 +169,7 @@ export default () => {
     exporting.value = true;
 
     const shapeList: ShapePoolItem[] = [];
-    for (const item of SHAPE_LIST) {
+    for (const item of SHAPE_LIST.value) {
       shapeList.push(...item.children);
     }
 

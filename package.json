@@ -10,6 +10,8 @@
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{js,ts,vue,json,css,tsx}\"",
     "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "test:run": "turbo run test:run",
     "prepare": "husky install"
   },
   "keywords": [],

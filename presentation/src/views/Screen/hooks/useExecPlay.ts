@@ -1,4 +1,5 @@
 import { onMounted, onUnmounted, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { throttle } from 'lodash';
 import { storeToRefs } from 'pinia';
 import { useSlidesStore } from '@/store';
@@ -7,6 +8,7 @@ import { ANIMATION_CLASS_PREFIX } from '@/configs/animation';
 import message from '@/utils/message';
 
 export default () => {
+  const { t } = useI18n();
   const slidesStore = useSlidesStore();
   const { slides, slideIndex, formatedAnimations } = storeToRefs(slidesStore);
 
@@ -146,7 +148,7 @@ export default () => {
       } else animationIndex.value = formatedAnimations.value.length;
     } else {
       if (loopPlay.value) turnSlideToIndex(slides.value.length - 1);
-      else throttleMassage('Already at the first page');
+      else throttleMassage(t('presentation.playback.alreadyAtFirstPage'));
     }
     inAnimation.value = false;
   };
@@ -160,7 +162,7 @@ export default () => {
     } else {
       if (loopPlay.value) turnSlideToIndex(0);
       else {
-        throttleMassage('Already at the last page');
+        throttleMassage(t('presentation.playback.alreadyAtLastPage'));
         closeAutoPlay();
       }
       inAnimation.value = false;
@@ -171,7 +173,7 @@ export default () => {
   const autoPlayInterval = ref(2500);
   const autoPlay = () => {
     closeAutoPlay();
-    message.success('Auto playback started');
+    message.success(t('presentation.playback.autoPlaybackStarted'));
     autoPlayTimer.value = window.setInterval(execNext, autoPlayInterval.value);
   };
 

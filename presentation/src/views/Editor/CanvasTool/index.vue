@@ -4,13 +4,13 @@
       <IconBack
         class="handler-item"
         :class="{ disable: !canUndo }"
-        v-tooltip="'Undo (Ctrl + Z)'"
+        v-tooltip="$t('ui.actions.undo')"
         @click="undo()"
       />
       <IconNext
         class="handler-item"
         :class="{ disable: !canRedo }"
-        v-tooltip="'Redo (Ctrl + Y)'"
+        v-tooltip="$t('ui.actions.redo')"
         @click="redo()"
       />
       <div class="more">
@@ -23,7 +23,7 @@
                 toggleNotesPanel();
                 moreVisible = false;
               "
-              >Annotation Panel</PopoverMenuItem
+              >{{ $t('toolbar.panels.annotationPanel') }}</PopoverMenuItem
             >
             <PopoverMenuItem
               center
@@ -31,7 +31,7 @@
                 toggleSelectPanel();
                 moreVisible = false;
               "
-              >Selection Pane</PopoverMenuItem
+              >{{ $t('toolbar.panels.selectionPane') }}</PopoverMenuItem
             >
             <PopoverMenuItem
               center
@@ -39,7 +39,7 @@
                 toggleSraechPanel();
                 moreVisible = false;
               "
-              >Find and Replace</PopoverMenuItem
+              >{{ $t('toolbar.panels.findAndReplace') }}</PopoverMenuItem
             >
           </template>
           <IconMore class="handler-item" />
@@ -47,26 +47,26 @@
         <IconComment
           class="handler-item"
           :class="{ active: showNotesPanel }"
-          v-tooltip="'Annotation Panel'"
+          v-tooltip="$t('toolbar.panels.annotationPanel')"
           @click="toggleNotesPanel()"
         />
         <IconMoveOne
           class="handler-item"
           :class="{ active: showSelectPanel }"
-          v-tooltip="'Selection Pane'"
+          v-tooltip="$t('toolbar.panels.selectionPane')"
           @click="toggleSelectPanel()"
         />
         <IconSearch
           class="handler-item"
           :class="{ active: showSearchPanel }"
-          v-tooltip="'Find/Replace (Ctrl + F)'"
+          v-tooltip="$t('toolbar.panels.findAndReplace')"
           @click="toggleSraechPanel()"
         />
       </div>
     </div>
 
     <div class="add-element-handler">
-      <div class="handler-item group-btn" v-tooltip="'Insert Text'">
+      <div class="handler-item group-btn" v-tooltip="$t('toolbar.tools.insertText')">
         <IconFontSize
           class="icon"
           :class="{ active: creatingElement?.type === 'text' }"
@@ -83,7 +83,7 @@
                   textTypeSelectVisible = false;
                 }
               "
-              ><IconTextRotationNone /> Horizontal Text Box</PopoverMenuItem
+              ><IconTextRotationNone /> {{ $t('toolbar.tools.horizontalTextBox') }}</PopoverMenuItem
             >
             <PopoverMenuItem
               center
@@ -93,13 +93,13 @@
                   textTypeSelectVisible = false;
                 }
               "
-              ><IconTextRotationDown /> Vertical Text Box</PopoverMenuItem
+              ><IconTextRotationDown /> {{ $t('toolbar.tools.verticalTextBox') }}</PopoverMenuItem
             >
           </template>
           <IconDown class="arrow" />
         </Popover>
       </div>
-      <div class="handler-item group-btn" v-tooltip="'Insert Shape'" :offset="10">
+      <div class="handler-item group-btn" v-tooltip="$t('toolbar.tools.insertShape')" :offset="10">
         <Popover trigger="click" style="height: 100%" v-model:value="shapePoolVisible" :offset="10">
           <template #content>
             <ShapePool @select="(shape) => drawShape(shape)" />
@@ -107,6 +107,7 @@
           <IconGraphicDesign
             class="icon"
             :class="{ active: creatingCustomShape || creatingElement?.type === 'shape' }"
+            v-tooltip="$t('toolbar.tools.insertShape')"
           />
         </Popover>
 
@@ -120,14 +121,14 @@
                   shapeMenuVisible = false;
                 }
               "
-              >Freehand Drawing</PopoverMenuItem
+              >{{ $t('toolbar.tools.freehandDrawing') }}</PopoverMenuItem
             >
           </template>
           <IconDown class="arrow" />
         </Popover>
       </div>
       <FileInput @change="(files) => insertImageElement(files)">
-        <IconPicture class="handler-item" v-tooltip="'Insert Image'" />
+        <IconPicture class="handler-item" v-tooltip="$t('toolbar.tools.insertImage')" />
       </FileInput>
       <Popover trigger="click" v-model:value="linePoolVisible" :offset="10">
         <template #content>
@@ -136,7 +137,7 @@
         <IconConnection
           class="handler-item"
           :class="{ active: creatingElement?.type === 'line' }"
-          v-tooltip="'Insert Line'"
+          v-tooltip="$t('toolbar.tools.insertLine')"
         />
       </Popover>
       <Popover trigger="click" v-model:value="chartPoolVisible" :offset="10">
@@ -150,7 +151,7 @@
             "
           />
         </template>
-        <IconChartProportion class="handler-item" v-tooltip="'Insert Chart'" />
+        <IconChartProportion class="handler-item" v-tooltip="$t('toolbar.tools.insertChart')" />
       </Popover>
       <Popover trigger="click" v-model:value="tableGeneratorVisible" :offset="10">
         <template #content>
@@ -164,9 +165,13 @@
             "
           />
         </template>
-        <IconInsertTable class="handler-item" v-tooltip="'Insert Table'" />
+        <IconInsertTable class="handler-item" v-tooltip="$t('toolbar.tools.insertTable')" />
       </Popover>
-      <IconFormula class="handler-item" v-tooltip="'Insert Formula'" @click="latexEditorVisible = true" />
+      <IconFormula
+        class="handler-item"
+        v-tooltip="$t('toolbar.tools.insertFormula')"
+        @click="latexEditorVisible = true"
+      />
       <Popover trigger="click" v-model:value="mediaInputVisible" :offset="10">
         <template #content>
           <MediaInput
@@ -185,14 +190,14 @@
             "
           />
         </template>
-        <IconVideoTwo class="handler-item" v-tooltip="'Insert Audio/Video'" />
+        <IconVideoTwo class="handler-item" v-tooltip="$t('toolbar.tools.insertAudioVideo')" />
       </Popover>
     </div>
 
     <div class="right-handler">
       <IconMinus
         class="handler-item viewport-size"
-        v-tooltip="'Zoom Out (Ctrl + -)'"
+        v-tooltip="$t('canvas.controls.zoomOut')"
         @click="scaleCanvas('-')"
       />
       <Popover trigger="click" v-model:value="canvasScaleVisible">
@@ -210,24 +215,24 @@
               resetCanvas();
               canvasScaleVisible = false;
             "
-            >Fit to Screen</PopoverMenuItem
+            >{{ $t('ui.layout.fitToScreen') }}</PopoverMenuItem
           >
         </template>
         <span class="text">{{ canvasScalePercentage }}</span>
       </Popover>
       <IconPlus
         class="handler-item viewport-size"
-        v-tooltip="'Zoom In (Ctrl + =)'"
+        v-tooltip="$t('canvas.controls.zoomIn')"
         @click="scaleCanvas('+')"
       />
       <IconFullScreen
         class="handler-item viewport-size-adaptation"
-        v-tooltip="'Fit to Screen (Ctrl + 0)'"
+        v-tooltip="$t('canvas.controls.fitToScreen')"
         @click="resetCanvas()"
       />
     </div>
 
-    <Modal v-model:visible="latexEditorVisible" :width="880">
+    <Modal v-model:visible="latexEditorVisible" :width="920">
       <LaTeXEditor
         @close="latexEditorVisible = false"
         @update="

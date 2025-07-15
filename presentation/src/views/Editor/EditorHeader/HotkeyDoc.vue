@@ -14,7 +14,9 @@
 </template>
 
 <script lang="ts" setup>
-import { HOTKEY_DOC } from '@/configs/hotkey';
+import { getHotkeyDoc } from '@/configs/hotkey';
+
+const HOTKEY_DOC = getHotkeyDoc();
 </script>
 
 <style lang="scss" scoped>

@@ -1,15 +1,20 @@
 import type { ChartData } from '@/types/slides';
 
-export const CHART_TYPE_MAP: { [key: string]: string } = {
-  bar: 'Bar Chart',
-  column: 'Column Chart',
-  line: 'Line Chart',
-  area: 'Area Chart',
-  scatter: 'Scatter Chart',
-  pie: 'Pie Chart',
-  ring: 'Ring Chart',
-  radar: 'Radar Chart',
-};
+import { useI18n } from 'vue-i18n';
+
+export function getChartTypeMap() {
+  const { t } = useI18n();
+  return {
+    bar: t('toolbar.charts.pool.bar'),
+    column: t('toolbar.charts.pool.column'),
+    line: t('toolbar.charts.pool.line'),
+    area: t('toolbar.charts.pool.area'),
+    scatter: t('toolbar.charts.pool.scatter'),
+    pie: t('toolbar.charts.pool.pie'),
+    ring: t('toolbar.charts.pool.ring'),
+    radar: t('toolbar.charts.pool.radar'),
+  };
+}
 
 export const CHART_DEFAULT_DATA: { [key: string]: ChartData } = {
   bar: {

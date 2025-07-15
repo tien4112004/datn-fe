@@ -1,10 +1,12 @@
 <template>
   <div class="theme-colors-setting">
-    <div class="title">Edit Theme Colors</div>
+    <div class="title">{{ $t('styling.slide.design.editThemeColors') }}</div>
 
     <div class="list">
       <div class="row" v-for="(item, index) in themeColors" :key="index">
-        <div class="label" style="width: 40%">Slide Theme Color {{ index + 1 }}:</div>
+        <div class="label" style="width: 40%">
+          {{ $t('styling.slide.themeColors.setting.slideThemeColor') }} {{ index + 1 }}:
+        </div>
         <Popover trigger="click" style="width: 60%">
           <template #content>
             <ColorPicker
@@ -17,7 +19,7 @@
       </div>
     </div>
 
-    <Button class="btn" type="primary" @click="setThemeColors()">Confirm</Button>
+    <Button class="btn" type="primary" @click="setThemeColors()">{{ $t('styling.slide.design.confirm') }}</Button>
   </div>
 </template>
 

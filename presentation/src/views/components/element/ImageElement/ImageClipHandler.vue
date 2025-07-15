@@ -78,7 +78,7 @@ const clipWrapperPositionStyle = ref({
 const isSettingClipRange = ref(false);
 const currentRange = ref<ImageClipDataRange | null>(null);
 
-// 获取裁剪区域信息（裁剪区域占原图的宽高比例，处在原图中的位置）
+//  Get cropping area info (the area’s width/height ratio relative to the original image, and its position within the original)
 const getClipDataTransformInfo = () => {
   const [start, end] = props.clipData
     ? props.clipData.range
@@ -95,7 +95,7 @@ const getClipDataTransformInfo = () => {
   return { widthScale, heightScale, left, top };
 };
 
-// 底层图片位置大小（遮罩区域图片）
+// Base image position and size (image under the mask area)
 const imgPosition = computed(() => {
   const { widthScale, heightScale, left, top } = getClipDataTransformInfo();
   return {
@@ -106,7 +106,7 @@ const imgPosition = computed(() => {
   };
 });
 
-// 底层图片位置大小样式（遮罩区域图片）
+//  Base image style for position and size (image under the mask)
 const bottomImgPositionStyle = computed(() => {
   return {
     top: imgPosition.value.top + '%',
@@ -116,7 +116,7 @@ const bottomImgPositionStyle = computed(() => {
   };
 });
 
-// 顶层图片容器位置大小（裁剪高亮区域）
+// Top image container position and size (highlighted cropping area)
 const topImgWrapperPosition = ref({
   top: 0,
   left: 0,
@@ -124,7 +124,7 @@ const topImgWrapperPosition = ref({
   height: 0,
 });
 
-// 顶层图片容器位置大小样式（裁剪高亮区域）
+//  Top image container style for position and size (highlighted crop area)
 const topImgWrapperPositionStyle = computed(() => {
   const { top, left, width, height } = topImgWrapperPosition.value;
   return {
@@ -135,7 +135,7 @@ const topImgWrapperPositionStyle = computed(() => {
   };
 });
 
-// 顶层图片位置大小样式（裁剪区域图片）
+//  Top image style for position and size (image shown in cropping area)
 const topImgPositionStyle = computed(() => {
   const bottomWidth = imgPosition.value.width;
   const bottomHeight = imgPosition.value.height;
@@ -150,7 +150,7 @@ const topImgPositionStyle = computed(() => {
   };
 });
 
-// 初始化裁剪位置信息
+// Initialize cropping position info
 const initClipPosition = () => {
   const { left, top } = getClipDataTransformInfo();
   topImgWrapperPosition.value = {
@@ -166,7 +166,7 @@ const initClipPosition = () => {
   };
 };
 
-// 执行裁剪：计算裁剪后的图片位置大小和裁剪信息，并将数据同步出去
+// Execute crop: calculate the cropped image's position/size and sync the crop data
 const handleClip = () => {
   if (isSettingClipRange.value) return;
 
@@ -191,7 +191,7 @@ const handleClip = () => {
   emit('clip', clipedEmitData);
 };
 
-// 快捷键监听：回车确认裁剪
+// Keyboard shortcut listener: Enter to confirm crop
 const keyboardListener = (e: KeyboardEvent) => {
   const key = e.key.toUpperCase();
   if (key === KEYS.ENTER) handleClip();
@@ -205,7 +205,7 @@ onUnmounted(() => {
   document.removeEventListener('keydown', keyboardListener);
 });
 
-// 计算并更新裁剪区域范围数据
+// Calculate and update crop area range data
 const updateRange = () => {
   const retPosition = {
     left: parseInt(topImgPositionStyle.value.left),
@@ -223,7 +223,7 @@ const updateRange = () => {
   currentRange.value = [start, end];
 };
 
-// 移动裁剪区域
+// Move the cropping area
 const moveClipRange = (e: MouseEvent) => {
   isSettingClipRange.value = true;
   let isMouseDown = true;
@@ -282,7 +282,7 @@ const moveClipRange = (e: MouseEvent) => {
   };
 };
 
-// 缩放裁剪区域
+// Resize the cropping area
 const scaleClipRange = (e: MouseEvent, type: OperateResizeHandlers) => {
   isSettingClipRange.value = true;
   let isMouseDown = true;

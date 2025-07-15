@@ -1,17 +1,17 @@
 <template>
   <div class="element-positopn-panel">
-    <div class="title title-panel">Layer</div>
+    <div class="title title-panel">{{ $t('styling.position.single.layer') }}</div>
     <ButtonGroup class="row">
       <Button style="flex: 1" @click="orderElement(handleElement!, ElementOrderCommands.TOP)">
         <div class="center">
           <IconSendToBack class="btn-icon" />
-          <p>Bring to Front</p>
+          <p>{{ $t('styling.position.single.bringToFront') }}</p>
         </div>
       </Button>
       <Button style="flex: 1" @click="orderElement(handleElement!, ElementOrderCommands.BOTTOM)">
         <div class="center">
           <IconBringToFrontOne class="btn-icon" />
-          <p>Send to Back</p>
+          <p>{{ $t('styling.position.single.sendToBack') }}</p>
         </div>
       </Button>
     </ButtonGroup>
@@ -19,63 +19,66 @@
       <Button style="flex: 1" @click="orderElement(handleElement!, ElementOrderCommands.UP)">
         <div class="center">
           <IconBringToFront class="btn-icon" />
-          <p>Move Up</p>
+          <p>{{ $t('styling.position.single.moveUp') }}</p>
         </div>
       </Button>
       <Button style="flex: 1" @click="orderElement(handleElement!, ElementOrderCommands.DOWN)">
         <div class="center">
           <IconSentToBack class="btn-icon" />
-          <p>Move Down</p>
+          <p>{{ $t('styling.position.single.moveDown') }}</p>
         </div>
       </Button>
     </ButtonGroup>
 
     <Divider />
 
-    <div class="title title-panel">Alignment</div>
+    <div class="title title-panel">{{ $t('styling.position.single.alignment') }}</div>
     <ButtonGroup class="row">
       <Button
         style="flex: 1"
-        v-tooltip="'Left Align'"
+        v-tooltip="$t('styling.position.single.leftAlign')"
         @click="alignElementToCanvas(ElementAlignCommands.LEFT)"
         ><IconAlignLeft
       /></Button>
       <Button
         style="flex: 1"
-        v-tooltip="'Center Horizontally'"
+        v-tooltip="$t('styling.position.single.centerHorizontally')"
         @click="alignElementToCanvas(ElementAlignCommands.HORIZONTAL)"
         ><IconAlignVertically
       /></Button>
       <Button
         style="flex: 1"
-        v-tooltip="'Right Align'"
+        v-tooltip="$t('styling.position.single.rightAlign')"
         @click="alignElementToCanvas(ElementAlignCommands.RIGHT)"
         ><IconAlignRight
       /></Button>
     </ButtonGroup>
     <ButtonGroup class="row">
-      <Button style="flex: 1" v-tooltip="'Top Align'" @click="alignElementToCanvas(ElementAlignCommands.TOP)"
+      <Button
+        style="flex: 1"
+        v-tooltip="$t('styling.position.single.topAlign')"
+        @click="alignElementToCanvas(ElementAlignCommands.TOP)"
         ><IconAlignTop
       /></Button>
       <Button
         style="flex: 1"
-        v-tooltip="'Center Vertically'"
+        v-tooltip="$t('styling.position.single.centerVertically')"
         @click="alignElementToCanvas(ElementAlignCommands.VERTICAL)"
         ><IconAlignHorizontally
       /></Button>
       <Button
         style="flex: 1"
-        v-tooltip="'Bottom Align'"
+        v-tooltip="$t('styling.position.single.bottomAlign')"
         @click="alignElementToCanvas(ElementAlignCommands.BOTTOM)"
         ><IconAlignBottom
       /></Button>
     </ButtonGroup>
 
     <Divider />
-    <div class="title title-panel">Properties</div>
+    <div class="title title-panel">{{ $t('styling.position.single.properties') }}</div>
 
     <div class="row">
-      <div style="width: 45%">Horizontal</div>
+      <div style="width: 45%">{{ $t('styling.position.single.horizontal') }}</div>
       <NumberInput
         :min="-1000"
         :step="5"
@@ -83,11 +86,11 @@
         @update:value="(value) => updateLeft(value)"
         style="width: 100%"
       >
-        <template #placeholder>Input horizontal</template>
+        <template #placeholder>{{ $t('styling.position.single.inputHorizontal') }}</template>
       </NumberInput>
     </div>
     <div class="row">
-      <div style="width: 45%">Vertical</div>
+      <div style="width: 45%">{{ $t('styling.position.single.vertical') }}</div>
       <NumberInput
         :min="-1000"
         :step="5"
@@ -95,13 +98,13 @@
         @update:value="(value) => updateTop(value)"
         style="width: 100%"
       >
-        <template #placeholder>Input vertical</template>
+        <template #placeholder>{{ $t('styling.position.single.inputVertical') }}</template>
       </NumberInput>
     </div>
 
     <template v-if="handleElement!.type !== 'line'">
       <div class="row">
-        <div style="width: 45%">Width</div>
+        <div style="width: 45%">{{ $t('styling.position.single.width') }}</div>
         <NumberInput
           :min="minSize"
           :max="1500"
@@ -111,28 +114,28 @@
           @update:value="(value) => updateWidth(value)"
           style="width: 100%"
         >
-          <template #placeholder>Input width</template>
+          <template #placeholder>{{ $t('styling.position.single.inputWidth') }}</template>
         </NumberInput>
       </div>
       <template v-if="['image', 'shape', 'audio'].includes(handleElement!.type)">
         <IconLock
           style="width: 10%"
           class="icon-btn active"
-          v-tooltip="'Unlock Aspect Ratio'"
+          v-tooltip="$t('styling.position.single.unlockAspectRatio')"
           @click="updateFixedRatio(false)"
           v-if="fixedRatio"
         />
         <IconUnlock
           style="width: 10%"
           class="icon-btn"
-          v-tooltip="'Lock Aspect Ratio'"
+          v-tooltip="$t('styling.position.single.lockAspectRatio')"
           @click="updateFixedRatio(true)"
           v-else
         />
       </template>
       <div style="width: 10%" v-else></div>
       <div class="row">
-        <div style="width: 45%">Height</div>
+        <div style="width: 45%">{{ $t('styling.position.single.height') }}</div>
         <NumberInput
           :min="minSize"
           :max="800"
@@ -142,7 +145,7 @@
           @update:value="(value) => updateHeight(value)"
           style="width: 100%"
         >
-          <template #placeholder>Input height</template>
+          <template #placeholder>{{ $t('styling.position.single.inputHeight') }}</template>
         </NumberInput>
       </div>
     </template>
@@ -159,7 +162,7 @@
           @update:value="(value) => updateRotate(value)"
           style="width: 60%"
         >
-          <template #prefix> Rotation </template>
+          <template #prefix> {{ $t('styling.position.single.rotation') }} </template>
         </NumberInput>
         <div style="width: 7%"></div>
         <div class="text-btn" @click="updateRotate45('-')" style="width: 24%"><IconRotate /> -45°</div>

@@ -21,10 +21,10 @@
             :key="item.value"
             @click="activeType = item.value"
           >
-            {{ item.label }}
+            {{ t(`editor.templates.types.${item.value}`) }}
           </div>
         </div>
-        <div class="insert-all" @click="insertTemplates(slides)">Insert All</div>
+        <div class="insert-all" @click="insertTemplates(slides)">{{ $t('templates.actions.insertAll') }}</div>
       </div>
       <div class="list" ref="listRef">
         <template v-for="slide in slides" :key="slide.id">
@@ -32,9 +32,9 @@
             <ThumbnailSlide class="thumbnail" :slide="slide" :size="180" />
 
             <div class="btns">
-              <Button class="btn" type="primary" size="small" @click="insertTemplate(slide)"
-                >Insert Template</Button
-              >
+              <Button class="btn" type="primary" size="small" @click="insertTemplate(slide)">{{
+                $t('templates.actions.insertTemplate')
+              }}</Button>
             </div>
           </div>
         </template>
@@ -52,6 +52,9 @@ import api from '@/services';
 
 import ThumbnailSlide from '@/views/components/ThumbnailSlide/index.vue';
 import Button from '@/components/Button.vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const emit = defineEmits<{
   (event: 'select', payload: Slide): void;
@@ -68,12 +71,12 @@ const types = ref<
     value: string;
   }[]
 >([
-  { label: 'All', value: 'all' },
-  { label: 'Cover', value: 'cover' },
-  { label: 'Contents', value: 'contents' },
-  { label: 'Transition', value: 'transition' },
-  { label: 'Content', value: 'content' },
-  { label: 'End', value: 'end' },
+  { label: t('templates.types.all'), value: 'all' },
+  { label: t('templates.types.cover'), value: 'cover' },
+  { label: t('templates.types.contents'), value: 'contents' },
+  { label: t('templates.types.transition'), value: 'transition' },
+  { label: t('templates.types.content'), value: 'content' },
+  { label: t('templates.types.end'), value: 'end' },
 ]);
 const activeType = ref('all');
 

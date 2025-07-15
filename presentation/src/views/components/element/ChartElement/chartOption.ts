@@ -48,11 +48,11 @@ export const getChartOption = ({
                 : {},
             }
           : undefined,
-      xAxis: {
+      yAxis: {
         type: 'category',
         data: data.labels,
       },
-      yAxis: {
+      xAxis: {
         type: 'value',
       },
       series: data.series.map((item, index) => {
@@ -88,11 +88,11 @@ export const getChartOption = ({
                 : {},
             }
           : undefined,
-      yAxis: {
+      xAxis: {
         type: 'category',
         data: data.labels,
       },
-      xAxis: {
+      yAxis: {
         type: 'value',
       },
       series: data.series.map((item, index) => {

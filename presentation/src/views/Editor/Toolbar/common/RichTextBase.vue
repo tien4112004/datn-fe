@@ -5,7 +5,7 @@
         style="width: 60%"
         :value="richTextAttrs.fontname"
         search
-        searchLabel="Search Font"
+        :searchLabel="$t('elements.text.editor.searchFont')"
         @update:value="(value) => emitRichTextCommand('fontname', value as string)"
         :options="FONTS"
       >
@@ -17,7 +17,7 @@
         style="width: 40%"
         :value="richTextAttrs.fontsize"
         search
-        searchLabel="Search Font Size"
+        :searchLabel="$t('elements.text.editor.searchFontSize')"
         @update:value="(value) => emitRichTextCommand('fontsize', value as string)"
         :options="
           fontSizeOptions.map((item) => ({
@@ -40,7 +40,7 @@
             @update:modelValue="(value) => emitRichTextCommand('color', value)"
           />
         </template>
-        <TextColorButton first v-tooltip="'Text Color'" :color="richTextAttrs.color">
+        <TextColorButton first v-tooltip="t('elements.text.editor.textColor')" :color="richTextAttrs.color">
           <IconText />
         </TextColorButton>
       </Popover>
@@ -51,14 +51,14 @@
             @update:modelValue="(value) => emitRichTextCommand('backcolor', value)"
           />
         </template>
-        <TextColorButton v-tooltip="'Text Highlight'" :color="richTextAttrs.backcolor">
+        <TextColorButton v-tooltip="t('elements.text.editor.textHighlight')" :color="richTextAttrs.backcolor">
           <IconHighLight />
         </TextColorButton>
       </Popover>
       <Button
         class="font-size-btn"
         style="width: 20%"
-        v-tooltip="'Increase Font Size'"
+        v-tooltip="t('elements.text.editor.increaseFontSize')"
         @click="emitRichTextCommand('fontsize-add')"
         ><IconFontSize />+</Button
       >
@@ -66,7 +66,7 @@
         last
         class="font-size-btn"
         style="width: 20%"
-        v-tooltip="'Decrease Font Size'"
+        v-tooltip="t('elements.text.editor.decreaseFontSize')"
         @click="emitRichTextCommand('fontsize-reduce')"
         ><IconFontSize />-</Button
       >
@@ -76,28 +76,28 @@
       <CheckboxButton
         style="flex: 1"
         :checked="richTextAttrs.bold"
-        v-tooltip="'Bold'"
+        v-tooltip="t('elements.text.editor.bold')"
         @click="emitRichTextCommand('bold')"
         ><IconTextBold
       /></CheckboxButton>
       <CheckboxButton
         style="flex: 1"
         :checked="richTextAttrs.em"
-        v-tooltip="'Italic'"
+        v-tooltip="t('elements.text.editor.italic')"
         @click="emitRichTextCommand('em')"
         ><IconTextItalic
       /></CheckboxButton>
       <CheckboxButton
         style="flex: 1"
         :checked="richTextAttrs.underline"
-        v-tooltip="'Underline'"
+        v-tooltip="t('elements.text.editor.underline')"
         @click="emitRichTextCommand('underline')"
         ><IconTextUnderline
       /></CheckboxButton>
       <CheckboxButton
         style="flex: 1"
         :checked="richTextAttrs.strikethrough"
-        v-tooltip="'Strikethrough'"
+        v-tooltip="t('elements.text.editor.strikethrough')"
         @click="emitRichTextCommand('strikethrough')"
         ><IconStrikethrough
       /></CheckboxButton>
@@ -107,28 +107,28 @@
       <CheckboxButton
         style="flex: 1"
         :checked="richTextAttrs.superscript"
-        v-tooltip="'Superscript'"
+        v-tooltip="t('elements.text.editor.superscript')"
         @click="emitRichTextCommand('superscript')"
         >A²</CheckboxButton
       >
       <CheckboxButton
         style="flex: 1"
         :checked="richTextAttrs.subscript"
-        v-tooltip="'Subscript'"
+        v-tooltip="t('elements.text.editor.subscript')"
         @click="emitRichTextCommand('subscript')"
         >A₂</CheckboxButton
       >
       <CheckboxButton
         style="flex: 1"
         :checked="richTextAttrs.code"
-        v-tooltip="'Inline Code'"
+        v-tooltip="t('elements.text.editor.inlineCode')"
         @click="emitRichTextCommand('code')"
         ><IconCode
       /></CheckboxButton>
       <CheckboxButton
         style="flex: 1"
         :checked="richTextAttrs.blockquote"
-        v-tooltip="'Blockquote'"
+        v-tooltip="t('elements.text.editor.blockquote')"
         @click="emitRichTextCommand('blockquote')"
         ><IconQuote
       /></CheckboxButton>
@@ -138,14 +138,14 @@
       <CheckboxButton
         first
         style="flex: 1"
-        v-tooltip="'Clear Formatting'"
+        v-tooltip="t('elements.text.editor.clearFormatting')"
         @click="emitRichTextCommand('clear')"
         ><IconFormat
       /></CheckboxButton>
       <CheckboxButton
         style="flex: 1"
         :checked="!!textFormatPainter"
-        v-tooltip="'Format Painter (Double-click for continuous use)'"
+        v-tooltip="t('elements.text.editor.formatPainter')"
         @click="toggleTextFormatPainter()"
         @dblclick="toggleTextFormatPainter(true)"
         ><IconFormatBrush
@@ -158,16 +158,18 @@
       >
         <template #content>
           <div class="link-popover">
-            <Input v-model:value="link" placeholder="Enter Hyperlink" />
+            <Input v-model:value="link" :placeholder="t('elements.text.editor.enterHyperlink')" />
             <div class="btns">
               <Button
                 size="small"
                 :disabled="!richTextAttrs.link"
                 @click="removeLink()"
                 style="margin-right: 5px"
-                >Remove</Button
+                >{{ t('elements.text.editor.remove') }}</Button
               >
-              <Button size="small" type="primary" @click="updateLink(link)">Confirm</Button>
+              <Button size="small" type="primary" @click="updateLink(link)">{{
+                $t('elements.text.editor.confirm')
+              }}</Button>
             </div>
           </div>
         </template>
@@ -175,7 +177,7 @@
           last
           style="width: 100%"
           :checked="!!richTextAttrs.link"
-          v-tooltip="'Hyperlink'"
+          v-tooltip="$t('elements.text.editor.hyperlink')"
           @click="openLinkPopover()"
           ><IconLinkOne
         /></CheckboxButton>
@@ -189,14 +191,18 @@
       :value="richTextAttrs.align"
       @update:value="(value) => emitRichTextCommand('align', value)"
     >
-      <RadioButton value="left" v-tooltip="'Align Left'" style="flex: 1"><IconAlignTextLeft /></RadioButton>
-      <RadioButton value="center" v-tooltip="'Align Center'" style="flex: 1"
+      <RadioButton value="left" v-tooltip="$t('elements.text.editor.alignLeft')" style="flex: 1"
+        ><IconAlignTextLeft
+      /></RadioButton>
+      <RadioButton value="center" v-tooltip="$t('elements.text.editor.alignCenter')" style="flex: 1"
         ><IconAlignTextCenter
       /></RadioButton>
-      <RadioButton value="right" v-tooltip="'Align Right'" style="flex: 1"
+      <RadioButton value="right" v-tooltip="$t('elements.text.editor.alignRight')" style="flex: 1"
         ><IconAlignTextRight
       /></RadioButton>
-      <RadioButton value="justify" v-tooltip="'Justify'" style="flex: 1"><IconAlignTextBoth /></RadioButton>
+      <RadioButton value="justify" v-tooltip="$t('elements.text.editor.justify')" style="flex: 1"
+        ><IconAlignTextBoth
+      /></RadioButton>
     </RadioGroup>
 
     <div class="row">
@@ -205,7 +211,7 @@
           first
           :type="richTextAttrs.bulletList ? 'primary' : 'default'"
           style="flex: 1"
-          v-tooltip="'Bullet List'"
+          v-tooltip="$t('elements.text.editor.bulletList')"
           @click="emitRichTextCommand('bulletList')"
           ><IconList
         /></Button>
@@ -234,7 +240,7 @@
           first
           :type="richTextAttrs.orderedList ? 'primary' : 'default'"
           style="flex: 1"
-          v-tooltip="'Numbered List'"
+          v-tooltip="$t('elements.text.editor.numberedList')"
           @click="emitRichTextCommand('orderedList')"
           ><IconOrderedList
         /></Button>
@@ -264,15 +270,15 @@
         <Button
           first
           style="flex: 1"
-          v-tooltip="'Decrease Indent'"
+          v-tooltip="$t('elements.text.editor.decreaseIndent')"
           @click="emitRichTextCommand('indent', '-1')"
           ><IconIndentLeft
         /></Button>
         <Popover trigger="click" v-model:value="indentLeftPanelVisible">
           <template #content>
-            <PopoverMenuItem @click="emitRichTextCommand('textIndent', '-1')"
-              >Reduce First Line Indent</PopoverMenuItem
-            >
+            <PopoverMenuItem @click="emitRichTextCommand('textIndent', '-1')">{{
+              $t('elements.text.editor.reduceFirstLineIndent')
+            }}</PopoverMenuItem>
           </template>
           <Button last class="popover-btn"><IconDown /></Button>
         </Popover>
@@ -282,15 +288,15 @@
         <Button
           first
           style="flex: 1"
-          v-tooltip="'Increase Indent'"
+          v-tooltip="$t('elements.text.editor.increaseIndent')"
           @click="emitRichTextCommand('indent', '+1')"
           ><IconIndentRight
         /></Button>
         <Popover trigger="click" v-model:value="indentRightPanelVisible">
           <template #content>
-            <PopoverMenuItem @click="emitRichTextCommand('textIndent', '+1')"
-              >Increase First Line Indent</PopoverMenuItem
-            >
+            <PopoverMenuItem @click="emitRichTextCommand('textIndent', '+1')">{{
+              $t('elements.text.editor.increaseFirstLineIndent')
+            }}</PopoverMenuItem>
           </template>
           <Button last class="popover-btn"><IconDown /></Button>
         </Popover>
@@ -307,6 +313,7 @@ import emitter, { EmitterEvents } from '@/utils/emitter';
 import { FONTS } from '@/configs/font';
 import useTextFormatPainter from '@/hooks/useTextFormatPainter';
 import message from '@/utils/message';
+import { useI18n } from 'vue-i18n';
 
 import TextColorButton from '@/components/TextColorButton.vue';
 import CheckboxButton from '@/components/CheckboxButton.vue';
@@ -325,6 +332,7 @@ import PopoverMenuItem from '@/components/PopoverMenuItem.vue';
 const { richTextAttrs, textFormatPainter } = storeToRefs(useMainStore());
 
 const { toggleTextFormatPainter } = useTextFormatPainter();
+const { t } = useI18n();
 
 const fontSizeOptions = [
   '12px',
@@ -382,7 +390,7 @@ const openLinkPopover = () => {
 };
 const updateLink = (link?: string) => {
   const linkRegExp = /^(https?):\/\/[\w\-]+(\.[\w\-]+)+([\w\-.,@?^=%&:\/~+#]*[\w\-@?^=%&\/~+#])?$/;
-  if (!link || !linkRegExp.test(link)) return message.error('Not a valid web link address');
+  if (!link || !linkRegExp.test(link)) return message.error(t('elements.text.editor.invalidWebLink'));
 
   emitRichTextCommand('link', link);
   linkPopoverVisible.value = false;

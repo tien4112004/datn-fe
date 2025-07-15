@@ -1,7 +1,7 @@
 <template>
   <div class="audio-style-panel">
     <div class="row">
-      <div style="width: 40%">Icon Color:</div>
+      <div style="width: 40%">{{ $t('styling.elements.audio.iconColor') }}</div>
       <Popover trigger="click" style="width: 60%">
         <template #content>
           <ColorPicker
@@ -14,7 +14,7 @@
     </div>
 
     <div class="row switch-row">
-      <div style="width: 40%">Autoplay:</div>
+      <div style="width: 40%">{{ $t('styling.elements.audio.autoplay') }}</div>
       <div class="switch-wrapper" style="width: 60%">
         <Switch
           :value="handleAudioElement.autoplay"
@@ -24,7 +24,7 @@
     </div>
 
     <div class="row switch-row">
-      <div style="width: 40%">Loop:</div>
+      <div style="width: 40%">{{ $t('styling.elements.audio.loop') }}</div>
       <div class="switch-wrapper" style="width: 60%">
         <Switch :value="handleAudioElement.loop" @update:value="(value) => updateAudio({ loop: value })" />
       </div>

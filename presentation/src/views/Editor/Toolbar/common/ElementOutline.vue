@@ -1,14 +1,14 @@
 <template>
   <div class="element-outline">
     <div class="row" v-if="!fixed">
-      <div style="width: 40%">Border:</div>
+      <div style="width: 40%">{{ $t('styling.effects.outline.border') }}</div>
       <div class="switch-wrapper" style="width: 60%">
         <Switch :value="hasOutline" @update:value="(value) => toggleOutline(value)" />
       </div>
     </div>
     <template v-if="hasOutline && outline">
       <div class="row">
-        <div style="width: 40%">Style:</div>
+        <div style="width: 40%">{{ $t('styling.effects.outline.style') }}</div>
         <SelectCustom style="width: 60%">
           <template #options>
             <div
@@ -26,7 +26,7 @@
         </SelectCustom>
       </div>
       <div class="row">
-        <div style="width: 40%">Color:</div>
+        <div style="width: 40%">{{ $t('styling.effects.outline.color') }}</div>
         <Popover trigger="click" style="width: 60%">
           <template #content>
             <ColorPicker
@@ -38,7 +38,7 @@
         </Popover>
       </div>
       <div class="row">
-        <div style="width: 40%">Thickness:</div>
+        <div style="width: 40%">{{ $t('styling.effects.outline.thickness') }}</div>
         <NumberInput
           :value="outline.width || 0"
           @update:value="(value) => updateOutline({ width: value })"

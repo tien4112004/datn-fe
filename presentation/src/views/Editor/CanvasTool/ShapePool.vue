@@ -16,8 +16,10 @@
 </template>
 
 <script lang="ts" setup>
-import { SHAPE_LIST, type ShapePoolItem } from '@/configs/shapes';
+import { getShapeList, type ShapePoolItem } from '@/configs/shapes';
 import ShapeItemThumbnail from './ShapeItemThumbnail.vue';
+
+const SHAPE_LIST = getShapeList();
 
 const emit = defineEmits<{
   (event: 'select', payload: ShapePoolItem): void;

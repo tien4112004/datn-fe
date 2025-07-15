@@ -1,234 +1,248 @@
 import type { TurningMode } from '@/types/slides';
+import { useI18n } from 'vue-i18n';
 
 export const ANIMATION_DEFAULT_DURATION = 1000;
 export const ANIMATION_DEFAULT_TRIGGER = 'click';
 export const ANIMATION_CLASS_PREFIX = 'animate__';
 
-export const ENTER_ANIMATIONS = [
-  {
-    type: 'bounce',
-    name: 'Bounce',
-    children: [
-      { name: 'Bounce In', value: 'bounceIn' },
-      { name: 'Bounce In Right', value: 'bounceInLeft' },
-      { name: 'Bounce In Left', value: 'bounceInRight' },
-      { name: 'Bounce In Up', value: 'bounceInUp' },
-      { name: 'Bounce In Down', value: 'bounceInDown' },
-    ],
-  },
-  {
-    type: 'fade',
-    name: 'Fade In',
-    children: [
-      { name: 'Fade In', value: 'fadeIn' },
-      { name: 'Fade In Down', value: 'fadeInDown' },
-      { name: 'Fade In Down Big', value: 'fadeInDownBig' },
-      { name: 'Fade In Right', value: 'fadeInLeft' },
-      { name: 'Fade In Right Big', value: 'fadeInLeftBig' },
-      { name: 'Fade In Left', value: 'fadeInRight' },
-      { name: 'Fade In Left Big', value: 'fadeInRightBig' },
-      { name: 'Fade In Up', value: 'fadeInUp' },
-      { name: 'Fade In Up Big', value: 'fadeInUpBig' },
-      { name: 'Fade In Top Left', value: 'fadeInTopLeft' },
-      { name: 'Fade In Top Right', value: 'fadeInTopRight' },
-      { name: 'Fade In Bottom Left', value: 'fadeInBottomLeft' },
-      { name: 'Fade In Bottom Right', value: 'fadeInBottomRight' },
-    ],
-  },
-  {
-    type: 'rotate',
-    name: 'Rotate In',
-    children: [
-      { name: 'Rotate In', value: 'rotateIn' },
-      { name: 'Rotate In Down Left', value: 'rotateInDownLeft' },
-      { name: 'Rotate In Down Right', value: 'rotateInDownRight' },
-      { name: 'Rotate In Up Left', value: 'rotateInUpLeft' },
-      { name: 'Rotate In Up Right', value: 'rotateInUpRight' },
-    ],
-  },
-  {
-    type: 'zoom',
-    name: 'Zoom In',
-    children: [
-      { name: 'Zoom In', value: 'zoomIn' },
-      { name: 'Zoom In Down', value: 'zoomInDown' },
-      { name: 'Zoom In Left', value: 'zoomInLeft' },
-      { name: 'Zoom In Right', value: 'zoomInRight' },
-      { name: 'Zoom In Up', value: 'zoomInUp' },
-    ],
-  },
-  {
-    type: 'slide',
-    name: 'Slide In',
-    children: [
-      { name: 'Slide In Down', value: 'slideInDown' },
-      { name: 'Slide In Left', value: 'slideInLeft' },
-      { name: 'Slide In Right', value: 'slideInRight' },
-      { name: 'Slide In Up', value: 'slideInUp' },
-    ],
-  },
-  {
-    type: 'flip',
-    name: 'Flip In',
-    children: [
-      { name: 'Flip In X Axis', value: 'flipInX' },
-      { name: 'Flip In Y Axis', value: 'flipInY' },
-    ],
-  },
-  {
-    type: 'back',
-    name: 'Back Zoom In',
-    children: [
-      { name: 'Back Zoom In Down', value: 'backInDown' },
-      { name: 'Back Zoom In Left', value: 'backInLeft' },
-      { name: 'Back Zoom In Right', value: 'backInRight' },
-      { name: 'Back Zoom In Up', value: 'backInUp' },
-    ],
-  },
-  {
-    type: 'lightSpeed',
-    name: 'Light Speed In',
-    children: [
-      { name: 'Light Speed In Right', value: 'lightSpeedInRight' },
-      { name: 'Light Speed In Left', value: 'lightSpeedInLeft' },
-    ],
-  },
-];
+type PresetAnimation = {
+  type: string;
+  name: string;
+  children: { name: string; value: string }[];
+};
 
-export const EXIT_ANIMATIONS = [
-  {
-    type: 'bounce',
-    name: 'Bounce',
-    children: [
-      { name: 'Bounce Out', value: 'bounceOut' },
-      { name: 'Bounce Out Left', value: 'bounceOutLeft' },
-      { name: 'Bounce Out Right', value: 'bounceOutRight' },
-      { name: 'Bounce Out Up', value: 'bounceOutUp' },
-      { name: 'Bounce Out Down', value: 'bounceOutDown' },
-    ],
-  },
-  {
-    type: 'fade',
-    name: 'Fade Out',
-    children: [
-      { name: 'Fade Out', value: 'fadeOut' },
-      { name: 'Fade Out Down', value: 'fadeOutDown' },
-      { name: 'Fade Out Down Big', value: 'fadeOutDownBig' },
-      { name: 'Fade Out Left', value: 'fadeOutLeft' },
-      { name: 'Fade Out Left Big', value: 'fadeOutLeftBig' },
-      { name: 'Fade Out Right', value: 'fadeOutRight' },
-      { name: 'Fade Out Right Big', value: 'fadeOutRightBig' },
-      { name: 'Fade Out Up', value: 'fadeOutUp' },
-      { name: 'Fade Out Up Big', value: 'fadeOutUpBig' },
-      { name: 'Fade Out Top Left', value: 'fadeOutTopLeft' },
-      { name: 'Fade Out Top Right', value: 'fadeOutTopRight' },
-      { name: 'Fade Out Bottom Left', value: 'fadeOutBottomLeft' },
-      { name: 'Fade Out Bottom Right', value: 'fadeOutBottomRight' },
-    ],
-  },
-  {
-    type: 'rotate',
-    name: 'Rotate Out',
-    children: [
-      { name: 'Rotate Out', value: 'rotateOut' },
-      { name: 'Rotate Out Down Left', value: 'rotateOutDownLeft' },
-      { name: 'Rotate Out Down Right', value: 'rotateOutDownRight' },
-      { name: 'Rotate Out Up Left', value: 'rotateOutUpLeft' },
-      { name: 'Rotate Out Up Right', value: 'rotateOutUpRight' },
-    ],
-  },
-  {
-    type: 'zoom',
-    name: 'Zoom Out',
-    children: [
-      { name: 'Zoom Out', value: 'zoomOut' },
-      { name: 'Zoom Out Down', value: 'zoomOutDown' },
-      { name: 'Zoom Out Left', value: 'zoomOutLeft' },
-      { name: 'Zoom Out Right', value: 'zoomOutRight' },
-      { name: 'Zoom Out Up', value: 'zoomOutUp' },
-    ],
-  },
-  {
-    type: 'slide',
-    name: 'Slide Out',
-    children: [
-      { name: 'Slide Out Down', value: 'slideOutDown' },
-      { name: 'Slide Out Left', value: 'slideOutLeft' },
-      { name: 'Slide Out Right', value: 'slideOutRight' },
-      { name: 'Slide Out Up', value: 'slideOutUp' },
-    ],
-  },
-  {
-    type: 'flip',
-    name: 'Flip Out',
-    children: [
-      { name: 'Flip Out X Axis', value: 'flipOutX' },
-      { name: 'Flip Out Y Axis', value: 'flipOutY' },
-    ],
-  },
-  {
-    type: 'back',
-    name: 'Back Zoom Out',
-    children: [
-      { name: 'Back Zoom Out Down', value: 'backOutDown' },
-      { name: 'Back Zoom Out Left', value: 'backOutLeft' },
-      { name: 'Back Zoom Out Right', value: 'backOutRight' },
-      { name: 'Back Zoom Out Up', value: 'backOutUp' },
-    ],
-  },
-  {
-    type: 'lightSpeed',
-    name: 'Light Speed Out',
-    children: [
-      { name: 'Light Speed Out Right', value: 'lightSpeedOutRight' },
-      { name: 'Light Speed Out Left', value: 'lightSpeedOutLeft' },
-    ],
-  },
-];
+export function getEnterAnimations(): PresetAnimation[] {
+  const { t } = useI18n();
+  return [
+    {
+      type: 'bounce',
+      name: t('content.animations.entrance.bounce'),
+      children: [
+        { name: t('content.animations.entrance.bounceIn'), value: 'bounceIn' },
+        { name: t('content.animations.entrance.bounceInRight'), value: 'bounceInLeft' },
+        { name: t('content.animations.entrance.bounceInLeft'), value: 'bounceInRight' },
+        { name: t('content.animations.entrance.bounceInUp'), value: 'bounceInUp' },
+        { name: t('content.animations.entrance.bounceInDown'), value: 'bounceInDown' },
+      ],
+    },
+    {
+      type: 'fade',
+      name: t('content.animations.entrance.fadeIn'),
+      children: [
+        { name: t('content.animations.entrance.fadeIn'), value: 'fadeIn' },
+        { name: t('content.animations.entrance.fadeInDown'), value: 'fadeInDown' },
+        { name: t('content.animations.entrance.fadeInDownBig'), value: 'fadeInDownBig' },
+        { name: t('content.animations.entrance.fadeInRight'), value: 'fadeInLeft' },
+        { name: t('content.animations.entrance.fadeInRightBig'), value: 'fadeInLeftBig' },
+        { name: t('content.animations.entrance.fadeInLeft'), value: 'fadeInRight' },
+        { name: t('content.animations.entrance.fadeInLeftBig'), value: 'fadeInRightBig' },
+        { name: t('content.animations.entrance.fadeInUp'), value: 'fadeInUp' },
+        { name: t('content.animations.entrance.fadeInUpBig'), value: 'fadeInUpBig' },
+        { name: t('content.animations.entrance.fadeInTopLeft'), value: 'fadeInTopLeft' },
+        { name: t('content.animations.entrance.fadeInTopRight'), value: 'fadeInTopRight' },
+        { name: t('content.animations.entrance.fadeInBottomLeft'), value: 'fadeInBottomLeft' },
+        { name: t('content.animations.entrance.fadeInBottomRight'), value: 'fadeInBottomRight' },
+      ],
+    },
+    {
+      type: 'rotate',
+      name: t('content.animations.entrance.rotateIn'),
+      children: [
+        { name: t('content.animations.entrance.rotateIn'), value: 'rotateIn' },
+        { name: t('content.animations.entrance.rotateInDownLeft'), value: 'rotateInDownLeft' },
+        { name: t('content.animations.entrance.rotateInDownRight'), value: 'rotateInDownRight' },
+        { name: t('content.animations.entrance.rotateInUpLeft'), value: 'rotateInUpLeft' },
+        { name: t('content.animations.entrance.rotateInUpRight'), value: 'rotateInUpRight' },
+      ],
+    },
+    {
+      type: 'zoom',
+      name: t('content.animations.entrance.zoomIn'),
+      children: [
+        { name: t('content.animations.entrance.zoomIn'), value: 'zoomIn' },
+        { name: t('content.animations.entrance.zoomInDown'), value: 'zoomInDown' },
+        { name: t('content.animations.entrance.zoomInLeft'), value: 'zoomInLeft' },
+        { name: t('content.animations.entrance.zoomInRight'), value: 'zoomInRight' },
+        { name: t('content.animations.entrance.zoomInUp'), value: 'zoomInUp' },
+      ],
+    },
+    {
+      type: 'slide',
+      name: t('content.animations.entrance.slideIn'),
+      children: [
+        { name: t('content.animations.entrance.slideInDown'), value: 'slideInDown' },
+        { name: t('content.animations.entrance.slideInLeft'), value: 'slideInLeft' },
+        { name: t('content.animations.entrance.slideInRight'), value: 'slideInRight' },
+        { name: t('content.animations.entrance.slideInUp'), value: 'slideInUp' },
+      ],
+    },
+    {
+      type: 'flip',
+      name: t('content.animations.entrance.flipIn'),
+      children: [
+        { name: t('content.animations.entrance.flipInXAxis'), value: 'flipInX' },
+        { name: t('content.animations.entrance.flipInYAxis'), value: 'flipInY' },
+      ],
+    },
+    {
+      type: 'back',
+      name: t('content.animations.entrance.backZoomIn'),
+      children: [
+        { name: t('content.animations.entrance.backZoomInDown'), value: 'backInDown' },
+        { name: t('content.animations.entrance.backZoomInLeft'), value: 'backInLeft' },
+        { name: t('content.animations.entrance.backZoomInRight'), value: 'backInRight' },
+        { name: t('content.animations.entrance.backZoomInUp'), value: 'backInUp' },
+      ],
+    },
+    {
+      type: 'lightSpeed',
+      name: t('content.animations.entrance.lightSpeedIn'),
+      children: [
+        { name: t('content.animations.entrance.lightSpeedInRight'), value: 'lightSpeedInRight' },
+        { name: t('content.animations.entrance.lightSpeedInLeft'), value: 'lightSpeedInLeft' },
+      ],
+    },
+  ];
+}
 
-export const ATTENTION_ANIMATIONS = [
-  {
-    type: 'shake',
-    name: 'Shake',
-    children: [
-      { name: 'Shake Left and Right', value: 'shakeX' },
-      { name: 'Shake Up and Down', value: 'shakeY' },
-      { name: 'Head Shake', value: 'headShake' },
-      { name: 'Swing', value: 'swing' },
-      { name: 'Wobble', value: 'wobble' },
-      { name: 'Tada', value: 'tada' },
-      { name: 'Jello', value: 'jello' },
-    ],
-  },
-  {
-    type: 'other',
-    name: 'Other',
-    children: [
-      { name: 'Bounce', value: 'bounce' },
-      { name: 'Flash', value: 'flash' },
-      { name: 'Pulse', value: 'pulse' },
-      { name: 'Rubber Band', value: 'rubberBand' },
-      { name: 'Heart Beat (Fast)', value: 'heartBeat' },
-    ],
-  },
-];
+export function getExitAnimations(): PresetAnimation[] {
+  const { t } = useI18n();
+  return [
+    {
+      type: 'bounce',
+      name: t('content.animations.entrance.bounce'),
+      children: [
+        { name: t('content.animations.exit.bounceOut'), value: 'bounceOut' },
+        { name: t('content.animations.exit.bounceOutLeft'), value: 'bounceOutLeft' },
+        { name: t('content.animations.exit.bounceOutRight'), value: 'bounceOutRight' },
+        { name: t('content.animations.exit.bounceOutUp'), value: 'bounceOutUp' },
+        { name: t('content.animations.exit.bounceOutDown'), value: 'bounceOutDown' },
+      ],
+    },
+    {
+      type: 'fade',
+      name: t('content.animations.exit.fadeOut'),
+      children: [
+        { name: t('content.animations.exit.fadeOut'), value: 'fadeOut' },
+        { name: t('content.animations.exit.fadeOutDown'), value: 'fadeOutDown' },
+        { name: t('content.animations.exit.fadeOutDownBig'), value: 'fadeOutDownBig' },
+        { name: t('content.animations.exit.fadeOutLeft'), value: 'fadeOutLeft' },
+        { name: t('content.animations.exit.fadeOutLeftBig'), value: 'fadeOutLeftBig' },
+        { name: t('content.animations.exit.fadeOutRight'), value: 'fadeOutRight' },
+        { name: t('content.animations.exit.fadeOutRightBig'), value: 'fadeOutRightBig' },
+        { name: t('content.animations.exit.fadeOutUp'), value: 'fadeOutUp' },
+        { name: t('content.animations.exit.fadeOutUpBig'), value: 'fadeOutUpBig' },
+        { name: t('content.animations.exit.fadeOutTopLeft'), value: 'fadeOutTopLeft' },
+        { name: t('content.animations.exit.fadeOutTopRight'), value: 'fadeOutTopRight' },
+        { name: t('content.animations.exit.fadeOutBottomLeft'), value: 'fadeOutBottomLeft' },
+        { name: t('content.animations.exit.fadeOutBottomRight'), value: 'fadeOutBottomRight' },
+      ],
+    },
+    {
+      type: 'rotate',
+      name: t('content.animations.exit.rotateOut'),
+      children: [
+        { name: t('content.animations.exit.rotateOut'), value: 'rotateOut' },
+        { name: t('content.animations.exit.rotateOutDownLeft'), value: 'rotateOutDownLeft' },
+        { name: t('content.animations.exit.rotateOutDownRight'), value: 'rotateOutDownRight' },
+        { name: t('content.animations.exit.rotateOutUpLeft'), value: 'rotateOutUpLeft' },
+        { name: t('content.animations.exit.rotateOutUpRight'), value: 'rotateOutUpRight' },
+      ],
+    },
+    {
+      type: 'zoom',
+      name: t('content.animations.exit.zoomOut'),
+      children: [
+        { name: t('content.animations.exit.zoomOut'), value: 'zoomOut' },
+        { name: t('content.animations.exit.zoomOutDown'), value: 'zoomOutDown' },
+        { name: t('content.animations.exit.zoomOutLeft'), value: 'zoomOutLeft' },
+        { name: t('content.animations.exit.zoomOutRight'), value: 'zoomOutRight' },
+        { name: t('content.animations.exit.zoomOutUp'), value: 'zoomOutUp' },
+      ],
+    },
+    {
+      type: 'slide',
+      name: t('content.animations.exit.slideOut'),
+      children: [
+        { name: t('content.animations.exit.slideOutDown'), value: 'slideOutDown' },
+        { name: t('content.animations.exit.slideOutLeft'), value: 'slideOutLeft' },
+        { name: t('content.animations.exit.slideOutRight'), value: 'slideOutRight' },
+        { name: t('content.animations.exit.slideOutUp'), value: 'slideOutUp' },
+      ],
+    },
+    {
+      type: 'flip',
+      name: t('content.animations.exit.flipOut'),
+      children: [
+        { name: t('content.animations.exit.flipOutX'), value: 'flipOutX' },
+        { name: t('content.animations.exit.flipOutY'), value: 'flipOutY' },
+        { name: t('content.animations.exit.backZoomOut'), value: 'backZoomOut' },
+        { name: t('content.animations.exit.backZoomOutDown'), value: 'backZoomOutDown' },
+        { name: t('content.animations.exit.backZoomOutLeft'), value: 'backZoomOutLeft' },
+        { name: t('content.animations.exit.backZoomOutRight'), value: 'backZoomOutRight' },
+        { name: t('content.animations.exit.backZoomOutUp'), value: 'backZoomOutUp' },
+      ],
+    },
+    {
+      type: 'lightSpeed',
+      name: t('content.animations.exit.lightSpeedOut'),
+      children: [
+        { name: t('content.animations.exit.lightSpeedOutRight'), value: 'lightSpeedOutRight' },
+        { name: t('content.animations.exit.lightSpeedOutLeft'), value: 'lightSpeedOutLeft' },
+      ],
+    },
+  ];
+}
+
+export function getAttentionAnimations(): PresetAnimation[] {
+  const { t } = useI18n();
+  return [
+    {
+      type: 'shake',
+      name: t('content.animations.emphasis.shake'),
+      children: [
+        { name: t('content.animations.emphasis.shakeLeftAndRight'), value: 'shakeX' },
+        { name: t('content.animations.emphasis.shakeUpAndDown'), value: 'shakeY' },
+        { name: t('content.animations.emphasis.headShake'), value: 'headShake' },
+        { name: t('content.animations.emphasis.swing'), value: 'swing' },
+        { name: t('content.animations.emphasis.wobble'), value: 'wobble' },
+        { name: t('content.animations.emphasis.tada'), value: 'tada' },
+        { name: t('content.animations.emphasis.jello'), value: 'jello' },
+      ],
+    },
+    {
+      type: 'other',
+      name: t('content.animations.special.other'),
+      children: [
+        { name: t('content.animations.entrance.bounce'), value: 'bounce' },
+        { name: t('content.animations.emphasis.flash'), value: 'flash' },
+        { name: t('content.animations.emphasis.pulse'), value: 'pulse' },
+        { name: t('content.animations.emphasis.rubberBand'), value: 'rubberBand' },
+        { name: t('content.animations.emphasis.heartBeatFast'), value: 'heartBeat' },
+      ],
+    },
+  ];
+}
 
 interface SlideAnimation {
   label: string;
   value: TurningMode;
 }
 
-export const SLIDE_ANIMATIONS: SlideAnimation[] = [
-  { label: 'None', value: 'no' },
-  { label: 'Random', value: 'random' },
-  { label: 'Slide Left and Right', value: 'slideX' },
-  { label: 'Slide Up and Down', value: 'slideY' },
-  { label: 'Slide Left and Right (3D)', value: 'slideX3D' },
-  { label: 'Slide Up and Down (3D)', value: 'slideY3D' },
-  { label: 'Fade In and Out', value: 'fade' },
-  { label: 'Rotate', value: 'rotate' },
-  { label: 'Expand Up and Down', value: 'scaleY' },
-  { label: 'Expand Left and Right', value: 'scaleX' },
-  { label: 'Zoom In', value: 'scale' },
-  { label: 'Zoom Out', value: 'scaleReverse' },
-];
+export function getSlideAnimations(): SlideAnimation[] {
+  const { t } = useI18n();
+  return [
+    { label: t('content.animations.special.none'), value: 'no' },
+    { label: t('content.animations.special.random'), value: 'random' },
+    { label: t('content.animations.transitions.slideLeftAndRight'), value: 'slideX' },
+    { label: t('content.animations.transitions.slideUpAndDown'), value: 'slideY' },
+    { label: t('content.animations.transitions.slideLeftAndRight3D'), value: 'slideX3D' },
+    { label: t('content.animations.transitions.slideUpAndDown3D'), value: 'slideY3D' },
+    { label: t('content.animations.transitions.fadeInAndOut'), value: 'fade' },
+    { label: t('content.animations.transitions.rotate'), value: 'rotate' },
+    { label: t('content.animations.transitions.expandUpAndDown'), value: 'scaleY' },
+    { label: t('content.animations.transitions.expandLeftAndRight'), value: 'scaleX' },
+    { label: t('content.animations.entrance.zoomIn'), value: 'scale' },
+    { label: t('content.animations.exit.zoomOut'), value: 'scaleReverse' },
+  ];
+}

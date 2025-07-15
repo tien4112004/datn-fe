@@ -1,3 +1,5 @@
+import { useI18n } from 'vue-i18n';
+
 export const enum KEYS {
   C = 'C',
   X = 'X',
@@ -40,111 +42,115 @@ interface HotkeyItem {
   }[];
 }
 
-export const HOTKEY_DOC: HotkeyItem[] = [
-  {
-    type: 'General',
-    children: [
-      { label: 'Cut', value: 'Ctrl + X' },
-      { label: 'Copy', value: 'Ctrl + C' },
-      { label: 'Paste', value: 'Ctrl + V' },
-      { label: 'Paste as plain text', value: 'Ctrl + Shift + V' },
-      { label: 'Quick copy and paste', value: 'Ctrl + D' },
-      { label: 'Select all', value: 'Ctrl + A' },
-      { label: 'Undo', value: 'Ctrl + Z' },
-      { label: 'Redo', value: 'Ctrl + Y' },
-      { label: 'Delete', value: 'Delete / Backspace' },
-      { label: 'Multi-select', value: 'Hold Ctrl or Shift' },
-      { label: 'Open search and replace', value: 'Ctrl + F' },
-      { label: 'Print', value: 'Ctrl + P' },
-      { label: 'Close popup', value: 'ESC' },
-    ],
-  },
-  {
-    type: 'Slideshow',
-    children: [
-      { label: 'Start slideshow from beginning', value: 'F5' },
-      { label: 'Start slideshow from current', value: 'Shift + F5' },
-      { label: 'Previous slide', value: '↑ / ← / PgUp' },
-      { label: 'Next slide', value: '↓ / → / PgDown' },
-      { label: 'Next slide', value: 'Enter / Space' },
-      { label: 'Exit slideshow', value: 'ESC' },
-    ],
-  },
-  {
-    type: 'Slide Editing',
-    children: [
-      { label: 'New slide', value: 'Enter' },
-      { label: 'Move canvas', value: 'Space + Mouse drag' },
-      { label: 'Zoom canvas', value: 'Ctrl + Mouse wheel' },
-      { label: 'Zoom in', value: 'Ctrl + =' },
-      { label: 'Zoom out', value: 'Ctrl + -' },
-      { label: 'Fit canvas to screen', value: 'Ctrl + 0' },
-      { label: 'Previous slide (no element selected)', value: '↑' },
-      { label: 'Next slide (no element selected)', value: '↓' },
-      { label: 'Previous slide', value: 'Mouse wheel up / PgUp' },
-      { label: 'Next slide', value: 'Mouse wheel down / PgDown' },
-      { label: 'Quick create text', value: 'Double click blank / T' },
-      { label: 'Quick create rectangle', value: 'R' },
-      { label: 'Quick create circle', value: 'O' },
-      { label: 'Quick create line', value: 'L' },
-      { label: 'Exit drawing mode', value: 'Right mouse button' },
-    ],
-  },
-  {
-    type: 'Element Operation',
-    children: [
-      { label: 'Move', value: '↑ / ← / ↓ / →' },
-      { label: 'Lock', value: 'Ctrl + L' },
-      { label: 'Group', value: 'Ctrl + G' },
-      { label: 'Ungroup', value: 'Ctrl + Shift + G' },
-      { label: 'Bring to front', value: 'Alt + F' },
-      { label: 'Send to back', value: 'Alt + B' },
-      { label: 'Lock aspect ratio', value: 'Hold Ctrl or Shift' },
-      { label: 'Create horizontal/vertical line', value: 'Hold Ctrl or Shift' },
-      { label: 'Switch focus element', value: 'Tab' },
-      { label: 'Confirm image crop', value: 'Enter' },
-      { label: 'Finish custom shape drawing', value: 'Enter' },
-    ],
-  },
-  {
-    type: 'Table Editing',
-    children: [
-      { label: 'Focus next cell', value: 'Tab' },
-      { label: 'Move focus cell', value: '↑ / ← / ↓ / →' },
-      { label: 'Insert row above', value: 'Ctrl + ↑' },
-      { label: 'Insert row below', value: 'Ctrl + ↓' },
-      { label: 'Insert column left', value: 'Ctrl + ←' },
-      { label: 'Insert column right', value: 'Ctrl + →' },
-    ],
-  },
-  {
-    type: 'Chart Data Editing',
-    children: [{ label: 'Focus next row', value: 'Enter' }],
-  },
-  {
-    type: 'Text Editing',
-    children: [
-      { label: 'Bold', value: 'Ctrl + B' },
-      { label: 'Italic', value: 'Ctrl + I' },
-      { label: 'Underline', value: 'Ctrl + U' },
-      { label: 'Inline code', value: 'Ctrl + E' },
-      { label: 'Superscript', value: 'Ctrl + ;' },
-      { label: 'Subscript', value: `Ctrl + '` },
-      { label: 'Select paragraph', value: `ESC` },
-    ],
-  },
-  {
-    type: 'Other Shortcuts',
-    children: [
-      { label: 'Add image - Paste image from system clipboard' },
-      { label: 'Add image - Drag local image to canvas' },
-      { label: 'Add image - Paste SVG code into canvas' },
-      { label: 'Add image - Paste image link from pexels' },
-      { label: 'Add text - Paste text from system clipboard' },
-      { label: 'Add text - Drag selected text from outside into canvas' },
-      {
-        label: 'Text editing - Support markdown syntax for creating lists and quotes',
-      },
-    ],
-  },
-];
+export const getHotkeyDoc = () => {
+  const { t } = useI18n();
+
+  return [
+    {
+      type: t('hotkeys.documentation.general'),
+      children: [
+        { label: t('hotkeys.documentation.cut'), value: 'Ctrl + X' },
+        { label: t('hotkeys.documentation.copy'), value: 'Ctrl + C' },
+        { label: t('hotkeys.documentation.paste'), value: 'Ctrl + V' },
+        { label: t('hotkeys.documentation.pastePlainText'), value: 'Ctrl + Shift + V' },
+        { label: t('hotkeys.documentation.quickCopyPaste'), value: 'Ctrl + D' },
+        { label: t('hotkeys.documentation.selectAll'), value: 'Ctrl + A' },
+        { label: t('hotkeys.documentation.undo'), value: 'Ctrl + Z' },
+        { label: t('hotkeys.documentation.redo'), value: 'Ctrl + Y' },
+        { label: t('hotkeys.documentation.delete'), value: 'Delete / Backspace' },
+        { label: t('hotkeys.documentation.multiSelect'), value: 'Hold Ctrl or Shift' },
+        { label: t('hotkeys.documentation.openSearchReplace'), value: 'Ctrl + F' },
+        { label: t('hotkeys.documentation.print'), value: 'Ctrl + P' },
+        { label: t('hotkeys.documentation.closePopup'), value: 'ESC' },
+      ],
+    },
+    {
+      type: t('hotkeys.documentation.slideshow'),
+      children: [
+        { label: t('hotkeys.documentation.startSlideshowBeginning'), value: 'F5' },
+        { label: t('hotkeys.documentation.startSlideshowCurrent'), value: 'Shift + F5' },
+        { label: t('hotkeys.documentation.previousSlide'), value: '↑ / ← / PgUp' },
+        { label: t('hotkeys.documentation.nextSlide'), value: '↓ / → / PgDown' },
+        { label: t('hotkeys.documentation.nextSlideAlt'), value: 'Enter / Space' },
+        { label: t('hotkeys.documentation.exitSlideshow'), value: 'ESC' },
+      ],
+    },
+    {
+      type: t('hotkeys.documentation.slideEditing'),
+      children: [
+        { label: t('hotkeys.documentation.newSlide'), value: 'Enter' },
+        { label: t('hotkeys.documentation.moveCanvas'), value: 'Space + Mouse drag' },
+        { label: t('hotkeys.documentation.zoomCanvas'), value: 'Ctrl + Mouse wheel' },
+        { label: t('hotkeys.documentation.zoomIn'), value: 'Ctrl + =' },
+        { label: t('hotkeys.documentation.zoomOut'), value: 'Ctrl + -' },
+        { label: t('hotkeys.documentation.fitCanvasToScreen'), value: 'Ctrl + 0' },
+        { label: t('hotkeys.documentation.previousSlideNoElement'), value: '↑' },
+        { label: t('hotkeys.documentation.nextSlideNoElement'), value: '↓' },
+        { label: t('hotkeys.documentation.previousSlide'), value: 'Mouse wheel up / PgUp' },
+        { label: t('hotkeys.documentation.nextSlide'), value: 'Mouse wheel down / PgDown' },
+        { label: t('hotkeys.documentation.quickCreateText'), value: 'Double click blank / T' },
+        { label: t('hotkeys.documentation.quickCreateRectangle'), value: 'R' },
+        { label: t('hotkeys.documentation.quickCreateCircle'), value: 'O' },
+        { label: t('hotkeys.documentation.quickCreateLine'), value: 'L' },
+        { label: t('hotkeys.documentation.exitDrawingMode'), value: 'Right mouse button' },
+      ],
+    },
+    {
+      type: t('hotkeys.documentation.elementOperation'),
+      children: [
+        { label: t('hotkeys.documentation.move'), value: '↑ / ← / ↓ / →' },
+        { label: t('hotkeys.documentation.lock'), value: 'Ctrl + L' },
+        { label: t('hotkeys.documentation.group'), value: 'Ctrl + G' },
+        { label: t('hotkeys.documentation.ungroup'), value: 'Ctrl + Shift + G' },
+        { label: t('hotkeys.documentation.bringToFront'), value: 'Alt + F' },
+        { label: t('hotkeys.documentation.sendToBack'), value: 'Alt + B' },
+        { label: t('hotkeys.documentation.lockAspectRatio'), value: 'Hold Ctrl or Shift' },
+        { label: t('hotkeys.documentation.createHorizontalVerticalLine'), value: 'Hold Ctrl or Shift' },
+        { label: t('hotkeys.documentation.switchFocusElement'), value: 'Tab' },
+        { label: t('hotkeys.documentation.confirmImageCrop'), value: 'Enter' },
+        { label: t('hotkeys.documentation.finishCustomShapeDrawing'), value: 'Enter' },
+      ],
+    },
+    {
+      type: t('hotkeys.documentation.tableEditing'),
+      children: [
+        { label: t('hotkeys.documentation.focusNextCell'), value: 'Tab' },
+        { label: t('hotkeys.documentation.moveFocusCell'), value: '↑ / ← / ↓ / →' },
+        { label: t('hotkeys.documentation.insertRowAbove'), value: 'Ctrl + ↑' },
+        { label: t('hotkeys.documentation.insertRowBelow'), value: 'Ctrl + ↓' },
+        { label: t('hotkeys.documentation.insertColumnLeft'), value: 'Ctrl + ←' },
+        { label: t('hotkeys.documentation.insertColumnRight'), value: 'Ctrl + →' },
+      ],
+    },
+    {
+      type: t('hotkeys.documentation.chartDataEditing'),
+      children: [{ label: t('hotkeys.documentation.focusNextRow'), value: 'Enter' }],
+    },
+    {
+      type: t('hotkeys.documentation.textEditing'),
+      children: [
+        { label: t('hotkeys.documentation.bold'), value: 'Ctrl + B' },
+        { label: t('hotkeys.documentation.italic'), value: 'Ctrl + I' },
+        { label: t('hotkeys.documentation.underline'), value: 'Ctrl + U' },
+        { label: t('hotkeys.documentation.inlineCode'), value: 'Ctrl + E' },
+        { label: t('hotkeys.documentation.superscript'), value: 'Ctrl + ;' },
+        { label: t('hotkeys.documentation.subscript'), value: `Ctrl + '` },
+        { label: t('hotkeys.documentation.selectParagraph'), value: `ESC` },
+      ],
+    },
+    {
+      type: t('hotkeys.documentation.otherShortcuts'),
+      children: [
+        { label: t('hotkeys.documentation.addImagePasteImage') },
+        { label: t('hotkeys.documentation.addImageDragLocalImage') },
+        { label: t('hotkeys.documentation.addImagePasteSVGCode') },
+        { label: t('hotkeys.documentation.addImagePasteImageLinkFromPexels') },
+        { label: t('hotkeys.documentation.addTextPasteText') },
+        { label: t('hotkeys.documentation.addTextDragSelectedText') },
+        {
+          label: t('hotkeys.documentation.textEditingSupportMarkdown'),
+        },
+      ],
+    },
+  ] as HotkeyItem[];
+};

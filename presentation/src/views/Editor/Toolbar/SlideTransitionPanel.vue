@@ -12,7 +12,7 @@
         <div class="animation-text">{{ item.label }}</div>
       </div>
     </div>
-    <Button style="width: 100%" @click="applyAllSlide()">Apply to All</Button>
+    <Button style="width: 100%" @click="applyAllSlide()">{{ $t('styling.slide.transition.applyToAll') }}</Button>
   </div>
 </template>
 
@@ -21,19 +21,21 @@ import { computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useSlidesStore } from '@/store';
 import type { TurningMode } from '@/types/slides';
-import { SLIDE_ANIMATIONS } from '@/configs/animation';
+import { getSlideAnimations } from '@/configs/animation';
 import useHistorySnapshot from '@/hooks/useHistorySnapshot';
 import message from '@/utils/message';
 import Button from '@/components/Button.vue';
+import { useI18n } from 'vue-i18n';
 
 const slidesStore = useSlidesStore();
 const { slides, currentSlide } = storeToRefs(slidesStore);
 
 const currentTurningMode = computed(() => currentSlide.value.turningMode || 'slideY');
 
-const animations = SLIDE_ANIMATIONS;
+const animations = getSlideAnimations();
 
 const { addHistorySnapshot } = useHistorySnapshot();
+const { t } = useI18n();
 
 // Modify the page transition mode during playback
 const updateTurningMode = (mode: TurningMode) => {
@@ -51,7 +53,7 @@ const applyAllSlide = () => {
     };
   });
   slidesStore.setSlides(newSlides);
-  message.success('Applied to all');
+  message.success(t('styling.slide.transition.appliedToAll'));
   addHistorySnapshot();
 };
 </script>

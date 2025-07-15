@@ -3,10 +3,14 @@
     <div class="container">
       <div class="left">
         <div class="input-area">
-          <TextArea v-model:value="latex" placeholder="Enter LaTeX formula" ref="textAreaRef" />
+          <TextArea
+            v-model:value="latex"
+            :placeholder="t('elements.latex.editor.placeholder')"
+            ref="textAreaRef"
+          />
         </div>
         <div class="preview">
-          <div class="placeholder" v-if="!latex">Formula Preview</div>
+          <div class="placeholder" v-if="!latex">{{ $t('elements.latex.editor.formulaPreview') }}</div>
           <div class="preview-content" v-else>
             <FormulaContent :width="518" :height="138" :latex="latex" />
           </div>
@@ -45,16 +49,18 @@
       </div>
     </div>
     <div class="footer">
-      <Button class="btn" @click="emit('close')">Cancel</Button>
-      <Button class="btn" type="primary" @click="update()">Confirm</Button>
+      <Button class="btn" @click="emit('close')">{{ $t('elements.latex.editor.cancel') }}</Button>
+      <Button class="btn" type="primary" @click="update()">{{ $t('elements.latex.editor.confirm') }}</Button>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { computed, onMounted, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
+const { t } = useI18n();
 import { hfmath } from './hfmath';
-import { FORMULA_LIST, SYMBOL_LIST } from '@/configs/latex';
+import { FORMULA_LIST, getSymbolList } from '@/configs/latex';
 import message from '@/utils/message';
 
 import FormulaContent from './FormulaContent.vue';
@@ -63,14 +69,16 @@ import Button from '../Button.vue';
 import TextArea from '../TextArea.vue';
 import Tabs from '../Tabs.vue';
 
+const SYMBOL_LIST = getSymbolList();
+
 interface TabItem {
   key: 'symbol' | 'formula';
   label: string;
 }
 
 const tabs: TabItem[] = [
-  { label: 'Common Symbols', key: 'symbol' },
-  { label: 'Preset Formulas', key: 'formula' },
+  { label: t('elements.latex.editor.commonSymbols'), key: 'symbol' },
+  { label: t('elements.latex.editor.presetFormulas'), key: 'formula' },
 ];
 
 interface LatexResult {
@@ -116,7 +124,7 @@ onMounted(() => {
 });
 
 const update = () => {
-  if (!latex.value) return message.error('Formula cannot be empty');
+  if (!latex.value) return message.error(t('elements.latex.editor.formulaCannotBeEmpty'));
 
   const eq = new hfmath(latex.value);
   const pathd = eq.pathd({});
@@ -144,6 +152,7 @@ const insertSymbol = (latex: string) => {
 .container {
   height: calc(100% - 50px);
   display: flex;
+  justify-content: center;
 }
 .left {
   width: 540px;
@@ -187,9 +196,10 @@ const insertSymbol = (latex: string) => {
   display: flex;
   justify-content: center;
   align-items: center;
+  border-radius: $cardBorderRadius;
 }
 .right {
-  width: 280px;
+  width: 300px;
   height: 100%;
   margin-left: 20px;
   border: solid 1px $borderColor;
@@ -197,6 +207,7 @@ const insertSymbol = (latex: string) => {
   display: flex;
   flex-direction: column;
   user-select: none;
+  border-radius: $cardBorderRadius;
 }
 .content {
   height: calc(100% - 40px);

@@ -25,7 +25,7 @@
         <Input
           ref="searchInputRef"
           simple
-          :placeholder="searchLabel"
+          :placeholder="searchPlaceholder"
           v-model:value="searchKey"
           :style="{ width: width + 2 + 'px' }"
         />
@@ -62,6 +62,9 @@ import { computed, onMounted, onUnmounted, ref, watch, nextTick, onBeforeUnmount
 import Popover from './Popover.vue';
 import Input from './Input.vue';
 import Divider from './Divider.vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 interface SelectOption {
   label: string;
@@ -80,7 +83,7 @@ const props = withDefaults(
   {
     disabled: false,
     search: false,
-    searchLabel: 'Search',
+    searchLabel: '',
   }
 );
 
@@ -96,6 +99,10 @@ const searchKey = ref('');
 
 const showLabel = computed(() => {
   return props.options.find((item) => item.value === props.value)?.label || props.value;
+});
+
+const searchPlaceholder = computed(() => {
+  return props.searchLabel || t('ui.components.select.search');
 });
 
 const showOptions = computed(() => {

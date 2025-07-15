@@ -3,15 +3,15 @@
     <li class="chart-item" v-for="(chart, index) in chartList" :key="index">
       <div class="chart-content" @click="selectChart(chart)">
         <IconChartLine size="24" v-if="chart === 'line'" />
-        <IconChartHistogram size="24" v-else-if="chart === 'bar'" />
+        <IconChartHistogram size="24" v-else-if="chart === 'column'" />
         <IconChartPie size="24" v-else-if="chart === 'pie'" />
-        <IconChartHistogramOne size="24" v-else-if="chart === 'column'" />
+        <IconChartHistogramOne size="24" v-else-if="chart === 'bar'" />
         <IconChartLineArea size="24" v-else-if="chart === 'area'" />
         <IconChartRing size="24" v-else-if="chart === 'ring'" />
         <IconChartScatter size="24" v-else-if="chart === 'scatter'" />
         <IconRadarChart size="23" v-else-if="chart === 'radar'" />
 
-        <div class="name">{{ CHART_TYPE_MAP[chart] }}</div>
+        <div class="name">{{ t(`toolbar.charts.pool.${chart}`) }}</div>
       </div>
     </li>
   </ul>
@@ -19,7 +19,9 @@
 
 <script lang="ts" setup>
 import type { ChartType } from '@/types/slides';
-import { CHART_TYPE_MAP } from '@/configs/chart';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const emit = defineEmits<{
   (event: 'select', payload: ChartType): void;
@@ -55,6 +57,7 @@ const selectChart = (chart: ChartType) => {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  text-align: center;
   color: $gray-999;
 
   &:hover {

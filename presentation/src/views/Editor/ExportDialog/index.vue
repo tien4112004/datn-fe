@@ -17,6 +17,7 @@ import { computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useMainStore } from '@/store';
 import type { DialogForExportTypes } from '@/types/export';
+import { useI18n } from 'vue-i18n';
 
 import ExportImage from './ExportImage.vue';
 import ExportJSON from './ExportJSON.vue';
@@ -34,13 +35,14 @@ const mainStore = useMainStore();
 const { dialogForExport } = storeToRefs(mainStore);
 
 const setDialogForExport = mainStore.setDialogForExport;
+const { t } = useI18n();
 
 const tabs: TabItem[] = [
-  { key: 'pptist', label: 'Export PPTist File' },
-  { key: 'pptx', label: 'Export PPTX' },
-  { key: 'image', label: 'Export Image' },
-  { key: 'json', label: 'Export JSON' },
-  { key: 'pdf', label: 'Print / Export PDF' },
+  { key: 'pptist', label: t('files.export.pptist.exportPptistFile') },
+  { key: 'image', label: t('files.export.image.exportImage') },
+  { key: 'pptx', label: t('files.export.pptx.exportPPTX') },
+  { key: 'json', label: t('files.export.json.exportJSON') },
+  { key: 'pdf', label: t('files.export.pdf.printExportPDF') },
 ];
 
 const currentDialogComponent = computed<unknown>(() => {

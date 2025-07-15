@@ -8,7 +8,7 @@
               openAIPPTDialog();
               mainMenuVisible = false;
             "
-            >AI Generate PPT</PopoverMenuItem
+            >{{ $t('header.ai.aiGeneratePPT') }}</PopoverMenuItem
           >
           <FileInput
             accept="application/vnd.openxmlformats-officedocument.presentationml.presentation"
@@ -19,7 +19,7 @@
               }
             "
           >
-            <PopoverMenuItem>Import pptx file (Beta)</PopoverMenuItem>
+            <PopoverMenuItem>{{ $t('header.file.importPptx') }}</PopoverMenuItem>
           </FileInput>
           <FileInput
             accept=".pptist"
@@ -30,35 +30,31 @@
               }
             "
           >
-            <PopoverMenuItem>Import pptist file</PopoverMenuItem>
+            <PopoverMenuItem>{{ $t('header.file.importPptist') }}</PopoverMenuItem>
           </FileInput>
-          <PopoverMenuItem @click="setDialogForExport('pptx')">Export File</PopoverMenuItem>
+          <PopoverMenuItem @click="setDialogForExport('pptx')">{{
+            $t('header.file.exportFile')
+          }}</PopoverMenuItem>
           <PopoverMenuItem
             @click="
               resetSlides();
               mainMenuVisible = false;
             "
-            >Reset Slides</PopoverMenuItem
+            >{{ $t('header.file.resetSlides') }}</PopoverMenuItem
           >
           <PopoverMenuItem
             @click="
               openMarkupPanel();
               mainMenuVisible = false;
             "
-            >Slide Type Annotation</PopoverMenuItem
-          >
-          <PopoverMenuItem @click="goLink('https://github.com/pipipi-pikachu/PPTist/issues')"
-            >Feedback</PopoverMenuItem
-          >
-          <PopoverMenuItem @click="goLink('https://github.com/pipipi-pikachu/PPTist/blob/master/doc/Q&A.md')"
-            >FAQ</PopoverMenuItem
+            >{{ $t('header.tools.slideTypeAnnotation') }}</PopoverMenuItem
           >
           <PopoverMenuItem
             @click="
               mainMenuVisible = false;
               hotkeyDrawerVisible = true;
             "
-            >Quick Actions</PopoverMenuItem
+            >{{ $t('header.tools.quickActions') }}</PopoverMenuItem
           >
         </template>
         <div class="menu-item"><IconHamburgerButton class="icon" /></div>
@@ -80,20 +76,28 @@
 
     <div class="right">
       <div class="group-menu-item">
-        <div class="menu-item" v-tooltip="'Slide Show (F5)'" @click="enterScreening()">
+        <div
+          class="menu-item"
+          v-tooltip="$t('header.presentation.slideShow')"
+          @click="enterScreening()"
+        >
           <IconPpt class="icon" />
         </div>
         <Popover trigger="click" center>
           <template #content>
-            <PopoverMenuItem @click="enterScreeningFromStart()">From Beginning</PopoverMenuItem>
-            <PopoverMenuItem @click="enterScreening()">From Current Page</PopoverMenuItem>
+            <PopoverMenuItem @click="enterScreeningFromStart()">{{
+              $t('header.presentation.fromBeginning')
+            }}</PopoverMenuItem>
+            <PopoverMenuItem @click="enterScreening()">{{
+              $t('header.presentation.fromCurrentPage')
+            }}</PopoverMenuItem>
           </template>
           <div class="arrow-btn"><IconDown class="arrow" /></div>
         </Popover>
       </div>
       <div
         class="menu-item"
-        v-tooltip="'AI Generate PPT'"
+        v-tooltip="$t('header.ai.aiGeneratePPT')"
         @click="
           openAIPPTDialog();
           mainMenuVisible = false;
@@ -101,25 +105,32 @@
       >
         <span class="text ai">AI</span>
       </div>
-      <div class="menu-item" v-tooltip="'Export'" @click="setDialogForExport('pptx')">
+      <div
+        class="menu-item"
+        v-tooltip="$t('header.file.exportFile')"
+        @click="setDialogForExport('pptx')"
+      >
         <IconDownload class="icon" />
       </div>
       <a
         class="github-link"
-        v-tooltip="'Copyright © 2020-PRESENT pipipi-pikachu'"
+        v-tooltip="$t('header.meta.copyright')"
         href="https://github.com/pipipi-pikachu/PPTist"
         target="_blank"
       >
         <div class="menu-item"><IconGithub class="icon" /></div>
       </a>
+      <div class="menu-item">
+        <LanguageSwitcher />
+      </div>
     </div>
 
     <Drawer :width="320" v-model:visible="hotkeyDrawerVisible" placement="right">
       <HotkeyDoc />
-      <template v-slot:title>Quick Actions</template>
+      <template v-slot:title>{{ $t('header.tools.quickActions') }}</template>
     </Drawer>
 
-    <FullscreenSpin :loading="exporting" tip="Importing..." />
+    <FullscreenSpin :loading="exporting" :tip="$t('header.file.importing')" />
   </div>
 </template>
 
@@ -139,6 +150,7 @@ import Drawer from '@/components/Drawer.vue';
 import Input from '@/components/Input.vue';
 import Popover from '@/components/Popover.vue';
 import PopoverMenuItem from '@/components/PopoverMenuItem.vue';
+import LanguageSwitcher from '@/components/LanguageSwitcher.vue';
 
 const mainStore = useMainStore();
 const slidesStore = useSlidesStore();

@@ -1,10 +1,10 @@
 <template>
   <div class="theme-colors-setting">
-    <div class="title">Chart Theme Colors</div>
+    <div class="title">{{ $t('styling.slide.themeColors.setting.chartThemeColors') }}</div>
 
     <div class="list">
       <div class="row" v-for="(item, index) in themeColors" :key="index">
-        <div class="label" style="width: 40%">Theme Color {{ index + 1 }}:</div>
+        <div class="label" style="width: 40%">{{ $t('styling.slide.themeColors.setting.themeColor') }} {{ index + 1 }}:</div>
         <Popover trigger="click" style="width: 60%">
           <template #content>
             <ColorPicker
@@ -16,7 +16,7 @@
             <ColorButton :color="item" />
             <div
               class="delete-color-btn"
-              v-tooltip="'Delete'"
+              v-tooltip="$t('styling.slide.themeColors.setting.delete')"
               @click.stop="deleteThemeColor(index)"
               v-if="index !== 0"
             >
@@ -30,7 +30,9 @@
       </Button>
     </div>
 
-    <Button class="btn" type="primary" @click="setThemeColors()">Confirm</Button>
+    <Button class="btn" type="primary" @click="setThemeColors()">{{
+      $t('themeColorsSetting.confirm')
+    }}</Button>
   </div>
 </template>
 

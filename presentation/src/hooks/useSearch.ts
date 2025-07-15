@@ -3,6 +3,7 @@ import { storeToRefs } from 'pinia';
 import { useMainStore, useSlidesStore } from '@/store';
 import type { PPTTableElement } from '@/types/slides';
 import message from '@/utils/message';
+import { useI18n } from 'vue-i18n';
 
 interface SearchTextResult {
   elType: 'text' | 'shape';
@@ -25,6 +26,7 @@ export default () => {
   const slidesStore = useSlidesStore();
   const { handleElement } = storeToRefs(mainStore);
   const { slides, slideIndex, currentSlide } = storeToRefs(slidesStore);
+  const { t } = useI18n();
 
   const searchWord = ref('');
   const replaceWord = ref('');
@@ -89,7 +91,7 @@ export default () => {
       searchIndex.value = 0;
       highlightCurrentSlide();
     } else {
-      message.warning('No matching items found');
+      message.warning(t('system.search.noMatchingItems'));
       clearMarks();
     }
   };
@@ -238,7 +240,7 @@ export default () => {
   };
 
   const searchNext = () => {
-    if (!searchWord.value) return message.warning('Please enter Find content first');
+    if (!searchWord.value) return message.warning(t('system.search.enterFindContent'));
     mainStore.setActiveElementIdList([]);
     if (searchIndex.value === -1) search();
     else if (searchIndex.value < searchResults.value.length - 1) searchIndex.value += 1;
@@ -247,7 +249,7 @@ export default () => {
   };
 
   const searchPrev = () => {
-    if (!searchWord.value) return message.warning('Please enter Find content first');
+    if (!searchWord.value) return message.warning(t('system.search.enterFindContent'));
     mainStore.setActiveElementIdList([]);
     if (searchIndex.value === -1) search();
     else if (searchIndex.value > 0) searchIndex.value -= 1;

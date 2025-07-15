@@ -1,14 +1,14 @@
 <template>
   <div class="element-shadow">
     <div class="row">
-      <div style="width: 40%">Shadow:</div>
+      <div style="width: 40%">{{ $t('styling.effects.shadow.shadow') }}</div>
       <div class="switch-wrapper" style="width: 60%">
         <Switch :value="hasShadow" @update:value="(value) => toggleShadow(value)" />
       </div>
     </div>
     <template v-if="hasShadow && shadow">
       <div class="row">
-        <div style="width: 40%">Horizontal Shadow:</div>
+        <div style="width: 40%">{{ $t('styling.effects.shadow.horizontalShadow') }}</div>
         <Slider
           style="width: 60%"
           :min="-10"
@@ -19,7 +19,7 @@
         />
       </div>
       <div class="row">
-        <div style="width: 40%">Vertical Shadow:</div>
+        <div style="width: 40%">{{ $t('styling.effects.shadow.verticalShadow') }}</div>
         <Slider
           style="width: 60%"
           :min="-10"
@@ -30,7 +30,7 @@
         />
       </div>
       <div class="row">
-        <div style="width: 40%">Blur Distance:</div>
+        <div style="width: 40%">{{ $t('styling.effects.shadow.blurDistance') }}</div>
         <Slider
           style="width: 60%"
           :min="1"
@@ -41,7 +41,7 @@
         />
       </div>
       <div class="row">
-        <div style="width: 40%">Shadow Color:</div>
+        <div style="width: 40%">{{ $t('styling.effects.shadow.shadowColor') }}</div>
         <Popover trigger="click" style="width: 60%">
           <template #content>
             <ColorPicker

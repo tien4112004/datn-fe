@@ -11,7 +11,7 @@
     @click="autoHideController()"
   >
     <div class="video-wrap" @click="toggle()">
-      <div class="load-error" v-if="loadError">Video failed to load</div>
+      <div class="load-error" v-if="loadError">{{ $t('elements.media.video.videoFailedToLoad') }}</div>
 
       <video
         class="video"
@@ -83,7 +83,7 @@
         <div class="speed">
           <div class="icon speed-icon">
             <span class="icon-content" @click="speedMenuVisible = !speedMenuVisible">{{
-              playbackRate === 1 ? 'Speed' : playbackRate + 'x'
+              playbackRate === 1 ? $t('elements.media.video.speed') : playbackRate + 'x'
             }}</span>
             <div class="speed-menu" v-if="speedMenuVisible" @mouseleave="speedMenuVisible = false">
               <div
@@ -100,7 +100,7 @@
         </div>
         <div class="loop" @click="toggleLoop()">
           <div class="icon loop-icon" :class="{ active: loop }">
-            <span class="icon-content">Loop {{ loop ? 'On' : 'Off' }}</span>
+            <span class="icon-content">{{ t(loop ? 'videoElement.on' : 'videoElement.off') }}</span>
           </div>
         </div>
       </div>
@@ -130,6 +130,7 @@
 
 <script lang="ts" setup>
 import { computed, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import useMSE from './useMSE';
 
 const props = withDefaults(
@@ -147,6 +148,8 @@ const props = withDefaults(
     scale: 1,
   }
 );
+
+const { t } = useI18n();
 
 const secondToTime = (second = 0) => {
   if (second === 0 || isNaN(second)) return '00:00';

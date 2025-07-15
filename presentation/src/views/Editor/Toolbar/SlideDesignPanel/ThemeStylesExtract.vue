@@ -1,14 +1,14 @@
 <template>
   <div class="theme-styles-extract">
     <Tabs
-      :tabs="tabs"
+      :tabs="tabs.map((tab) => ({ ...tab, label: $t(`themeStylesExtract.${tab.key}`) }))"
       v-model:value="activeTab"
       :tabsStyle="{ marginBottom: '12px' }"
       :tabStyle="{ padding: '8px 12px' }"
     />
     <div class="content">
       <div class="config-item" v-if="themeStyles.fontNames.length">
-        <div class="label">Font:</div>
+        <div class="label">{{ $t('styling.slide.themeColors.extract.font') }}</div>
         <div class="values">
           <div class="value-wrap" v-for="(item, index) in themeStyles.fontNames" :key="item">
             <div class="value" :style="{ fontFamily: item }">
@@ -16,7 +16,9 @@
             </div>
             <div class="handler">
               <div class="state" :class="{ active: selectedIndex.fontName === index }">√</div>
-              <div class="config-btn" @click="selectedIndex.fontName = index">Select</div>
+              <div class="config-btn" @click="selectedIndex.fontName = index">
+                {{ $t('styling.slide.themeColors.extract.select') }}
+              </div>
               <div
                 class="config-btn"
                 @click="
@@ -24,14 +26,14 @@
                   selectedIndex.fontName = index;
                 "
               >
-                Apply to Theme
+                {{ $t('styling.slide.themeColors.extract.applyToTheme') }}
               </div>
             </div>
           </div>
         </div>
       </div>
       <div class="config-item" v-if="themeStyles.fontColors.length">
-        <div class="label">Text Color:</div>
+        <div class="label">{{ $t('styling.slide.themeColors.extract.textColor') }}</div>
         <div class="values">
           <div class="value-wrap" v-for="(item, index) in themeStyles.fontColors" :key="item">
             <div
@@ -44,8 +46,10 @@
               {{ getHexColor(item) }}
             </div>
             <div class="handler">
-              <div class="state" :class="{ active: selectedIndex.fontColor === index }">√</div>
-              <div class="config-btn" @click="selectedIndex.fontColor = index">Select</div>
+              <div class="state" :class="{ active: selectedIndex.fontColor === index }"></div>
+              <div class="config-btn" @click="selectedIndex.fontColor = index">
+                {{ $t('styling.slide.themeColors.extract.select') }}
+              </div>
               <div
                 class="config-btn"
                 @click="
@@ -53,14 +57,14 @@
                   selectedIndex.fontColor = index;
                 "
               >
-                Apply to Theme
+                {{ $t('styling.slide.themeColors.extract.applyToTheme') }}
               </div>
             </div>
           </div>
         </div>
       </div>
       <div class="config-item" v-if="themeStyles.backgroundColors.length">
-        <div class="label">Background Color:</div>
+        <div class="label">{{ $t('styling.slide.themeColors.extract.backgroundColor') }}</div>
         <div class="values">
           <div class="value-wrap" v-for="(item, index) in themeStyles.backgroundColors" :key="item">
             <div
@@ -73,8 +77,10 @@
               {{ getHexColor(item) }}
             </div>
             <div class="handler">
-              <div class="state" :class="{ active: selectedIndex.backgroundColor === index }">√</div>
-              <div class="config-btn" @click="selectedIndex.backgroundColor = index">Select</div>
+              <div class="state" :class="{ active: selectedIndex.backgroundColor === index }"></div>
+              <div class="config-btn" @click="selectedIndex.backgroundColor = index">
+                {{ $t('styling.slide.themeColors.extract.select') }}
+              </div>
               <div
                 class="config-btn"
                 @click="
@@ -82,7 +88,7 @@
                   selectedIndex.backgroundColor = index;
                 "
               >
-                Apply to Theme
+                {{ $t('styling.slide.themeColors.extract.applyToTheme') }}
               </div>
             </div>
           </div>
@@ -90,7 +96,8 @@
       </div>
       <div class="config-item" v-if="themeStyles.themeColors.length">
         <div class="label">
-          Theme Colors:<span class="tip">(Click color blocks to exclude unwanted colors)</span>
+          {{ $t('styling.slide.themeColors.extract.themeColors')
+          }}<span class="tip">{{ $t('styling.slide.themeColors.extract.excludeTip') }}</span>
         </div>
         <div class="values inline">
           <div
@@ -110,15 +117,17 @@
     </div>
 
     <div class="btns">
-      <Button class="btn" type="primary" @click="updateAllThemes()"
-        >Save Selected Configuration as Theme</Button
-      >
+      <Button class="btn" type="primary" @click="updateAllThemes()">{{
+        $t('styling.slide.themeColors.extract.saveSelectedConfiguration')
+      }}</Button>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { onMounted, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
+const { t } = useI18n();
 import { storeToRefs } from 'pinia';
 import tinycolor from 'tinycolor2';
 import { useSlidesStore } from '@/store';
@@ -143,8 +152,8 @@ interface TabItem {
 }
 
 const tabs: TabItem[] = [
-  { key: 'single', label: 'Extract from Current Page' },
-  { key: 'all', label: 'Extract from All Slides' },
+  { key: 'single', label: t('styling.slide.themeColors.extract.extractFromCurrentPage') },
+  { key: 'all', label: t('styling.slide.themeColors.extract.extractFromAllSlides') },
 ];
 const activeTab = ref<'single' | 'all'>('single');
 
@@ -201,7 +210,7 @@ const updateAllThemes = () => {
   );
   if (themeColors.length > 6) {
     themeColors = themeColors.slice(0, 6);
-    message.warning('Theme colors exceed quantity limit, automatically selected first 6');
+    message.warning(t('styling.slide.design.themeColorsLimitWarning'));
   }
 
   const backgroundColor = themeStyles.value.backgroundColors[selectedIndex.value.backgroundColor];

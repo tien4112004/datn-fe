@@ -93,6 +93,8 @@ export default {
       paragraphSpacing: 'Giãn đoạn',
       wordSpacing: 'Giãn chữ',
       textboxFill: 'Màu nền hộp văn bản',
+      selectStyle: 'Chọn kiểu',
+      selectPresetStyle: 'Nhấp để chọn kiểu văn bản có sẵn',
     },
 
     // Phần tử video

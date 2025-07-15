@@ -92,6 +92,8 @@ export default {
       paragraphSpacing: 'Paragraph Spacing',
       wordSpacing: 'Word Spacing',
       textboxFill: 'Textbox Fill',
+      selectStyle: 'Select Style',
+      selectPresetStyle: 'Click to select a preset text style',
     },
 
     // Video Elements

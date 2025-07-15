@@ -2,8 +2,10 @@ import { createI18n } from 'vue-i18n';
 import en from './en/index';
 import vi from './vi/index';
 
+const KEY = 'i18nextLng';
+
 const getDefaultLocale = (): string => {
-  const savedLocale = localStorage.getItem('locale');
+  const savedLocale = localStorage.getItem(KEY);
   if (savedLocale && ['en', 'vi'].includes(savedLocale)) {
     return savedLocale;
   }
@@ -15,8 +17,16 @@ const getDefaultLocale = (): string => {
 };
 
 const saveLocale = (locale: string) => {
-  localStorage.setItem('locale', locale);
+  localStorage.setItem(KEY, locale);
 };
+
+window.addEventListener('languageChanged', () => {
+  const currentLocale = localStorage.getItem(KEY);
+  if (currentLocale) {
+    document.documentElement.lang = currentLocale;
+    i18n.global.locale.value = currentLocale as Locale;
+  }
+});
 
 export const availableLocales = [
   { code: 'en', name: 'English', flag: '🇺🇸' },

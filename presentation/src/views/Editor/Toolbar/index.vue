@@ -57,28 +57,28 @@ const elementTabs = computed<ElementTabs[]>(() => {
     { label: t('toolbar.categories.animation'), key: ToolbarStates.EL_ANIMATION },
   ];
 });
-const slideTabs = [
+const slideTabs = computed(() => [
   { label: t('toolbar.categories.design'), key: ToolbarStates.SLIDE_DESIGN },
   { label: t('toolbar.categories.transition'), key: ToolbarStates.SLIDE_ANIMATION },
   { label: t('toolbar.categories.animation'), key: ToolbarStates.EL_ANIMATION },
-];
-const multiSelectTabs = [
+]);
+const multiSelectTabs = computed(() => [
   { label: 'Style (Multi-select)', key: ToolbarStates.MULTI_STYLE },
   { label: 'Position (Multi-select)', key: ToolbarStates.MULTI_POSITION },
-];
+]);
 
 const setToolbarState = (value: ToolbarStates) => {
   mainStore.setToolbarState(value);
 };
 
 const currentTabs = computed(() => {
-  if (!activeElementIdList.value.length) return slideTabs;
+  if (!activeElementIdList.value.length) return slideTabs.value;
   else if (activeElementIdList.value.length > 1) {
-    if (!activeGroupElementId.value) return multiSelectTabs;
+    if (!activeGroupElementId.value) return multiSelectTabs.value;
 
     const activeGroupElement = activeElementList.value.find((item) => item.id === activeGroupElementId.value);
     if (activeGroupElement) return elementTabs.value;
-    return multiSelectTabs;
+    return multiSelectTabs.value;
   }
   return elementTabs.value;
 });

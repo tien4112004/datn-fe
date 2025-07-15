@@ -12,6 +12,7 @@ export function mount(el) {
 
   const pinia = createPinia();
   app.use(pinia);
+  app.use(i18n);
   icon.install(app);
   directive.install(app);
   app.mount(el);

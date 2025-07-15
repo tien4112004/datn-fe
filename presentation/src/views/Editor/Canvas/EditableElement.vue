@@ -80,7 +80,7 @@ const contextmenus = (): ContextmenuItem[] => {
   if (props.elementInfo.lock) {
     return [
       {
-        text: $t('canvas.editableElement.unlock'),
+        text: t('canvas.editableElement.unlock'),
         handler: () => unlockElement(props.elementInfo),
       },
     ];
@@ -88,121 +88,121 @@ const contextmenus = (): ContextmenuItem[] => {
 
   return [
     {
-      text: $t('canvas.editableElement.cut'),
+      text: t('canvas.editableElement.cut'),
       subText: 'Ctrl + X',
       handler: cutElement,
     },
     {
-      text: $t('canvas.editableElement.copy'),
+      text: t('canvas.editableElement.copy'),
       subText: 'Ctrl + C',
       handler: copyElement,
     },
     {
-      text: $t('canvas.editableElement.paste'),
+      text: t('canvas.editableElement.paste'),
       subText: 'Ctrl + V',
       handler: pasteElement,
     },
     { divider: true },
     {
-      text: $t('canvas.editableElement.alignHorizontalCenter'),
+      text: t('canvas.editableElement.alignHorizontalCenter'),
       handler: () => alignElementToCanvas(ElementAlignCommands.HORIZONTAL),
       children: [
         {
-          text: $t('canvas.editableElement.alignCenter'),
+          text: t('canvas.editableElement.alignCenter'),
           handler: () => alignElementToCanvas(ElementAlignCommands.CENTER),
         },
         {
-          text: $t('canvas.editableElement.alignHorizontalCenter'),
+          text: t('canvas.editableElement.alignHorizontalCenter'),
           handler: () => alignElementToCanvas(ElementAlignCommands.HORIZONTAL),
         },
         {
-          text: $t('canvas.editableElement.alignLeft'),
+          text: t('canvas.editableElement.alignLeft'),
           handler: () => alignElementToCanvas(ElementAlignCommands.LEFT),
         },
         {
-          text: $t('canvas.editableElement.alignRight'),
+          text: t('canvas.editableElement.alignRight'),
           handler: () => alignElementToCanvas(ElementAlignCommands.RIGHT),
         },
       ],
     },
     {
-      text: $t('canvas.editableElement.alignVerticalCenter'),
+      text: t('canvas.editableElement.alignVerticalCenter'),
       handler: () => alignElementToCanvas(ElementAlignCommands.VERTICAL),
       children: [
         {
-          text: $t('canvas.editableElement.alignCenter'),
+          text: t('canvas.editableElement.alignCenter'),
           handler: () => alignElementToCanvas(ElementAlignCommands.CENTER),
         },
         {
-          text: $t('canvas.editableElement.alignVerticalCenter'),
+          text: t('canvas.editableElement.alignVerticalCenter'),
           handler: () => alignElementToCanvas(ElementAlignCommands.VERTICAL),
         },
         {
-          text: $t('canvas.editableElement.alignTop'),
+          text: t('canvas.editableElement.alignTop'),
           handler: () => alignElementToCanvas(ElementAlignCommands.TOP),
         },
         {
-          text: $t('canvas.editableElement.alignBottom'),
+          text: t('canvas.editableElement.alignBottom'),
           handler: () => alignElementToCanvas(ElementAlignCommands.BOTTOM),
         },
       ],
     },
     { divider: true },
     {
-      text: $t('canvas.editableElement.bringToFront'),
+      text: t('canvas.editableElement.bringToFront'),
       disable: props.isMultiSelect && !props.elementInfo.groupId,
       handler: () => orderElement(props.elementInfo, ElementOrderCommands.TOP),
       children: [
         {
-          text: $t('canvas.editableElement.bringToFront'),
+          text: t('canvas.editableElement.bringToFront'),
           handler: () => orderElement(props.elementInfo, ElementOrderCommands.TOP),
         },
         {
-          text: $t('canvas.editableElement.bringForward'),
+          text: t('canvas.editableElement.bringForward'),
           handler: () => orderElement(props.elementInfo, ElementOrderCommands.UP),
         },
       ],
     },
     {
-      text: $t('canvas.editableElement.sendToBack'),
+      text: t('canvas.editableElement.sendToBack'),
       disable: props.isMultiSelect && !props.elementInfo.groupId,
       handler: () => orderElement(props.elementInfo, ElementOrderCommands.BOTTOM),
       children: [
         {
-          text: $t('canvas.editableElement.sendToBack'),
+          text: t('canvas.editableElement.sendToBack'),
           handler: () => orderElement(props.elementInfo, ElementOrderCommands.BOTTOM),
         },
         {
-          text: $t('canvas.editableElement.sendBackward'),
+          text: t('canvas.editableElement.sendBackward'),
           handler: () => orderElement(props.elementInfo, ElementOrderCommands.DOWN),
         },
       ],
     },
     { divider: true },
     {
-      text: $t('canvas.editableElement.setLink'),
+      text: t('canvas.editableElement.setLink'),
       handler: props.openLinkDialog,
     },
     {
       text: props.elementInfo.groupId
-        ? $t('canvas.editableElement.ungroup')
-        : $t('canvas.editableElement.group'),
+        ? t('canvas.editableElement.ungroup')
+        : t('canvas.editableElement.group'),
       subText: 'Ctrl + G',
       handler: props.elementInfo.groupId ? uncombineElements : combineElements,
       hide: !props.isMultiSelect,
     },
     {
-      text: $t('canvas.editableElement.selectAll'),
+      text: t('canvas.editableElement.selectAll'),
       subText: 'Ctrl + A',
       handler: selectAllElements,
     },
     {
-      text: $t('canvas.editableElement.lock'),
+      text: t('canvas.editableElement.lock'),
       subText: 'Ctrl + L',
       handler: lockElement,
     },
     {
-      text: $t('canvas.editableElement.delete'),
+      text: t('canvas.editableElement.delete'),
       subText: 'Delete',
       handler: deleteElement,
     },

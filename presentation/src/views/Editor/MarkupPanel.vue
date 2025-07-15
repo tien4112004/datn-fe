@@ -10,7 +10,7 @@
   >
     <div class="container">
       <div class="row">
-        <div style="width: 40%">{{ $t('panels.markup.currentPageType') }}</div>
+        <div style="width: 40%">{{ t('panels.markup.currentPageType') }}</div>
         <Select
           style="width: 60%"
           :value="slideType"
@@ -25,7 +25,7 @@
           (handleElement.type === 'text' || (handleElement.type === 'shape' && handleElement.text))
         "
       >
-        <div style="width: 40%">{{ $t('panels.markup.currentTextType') }}</div>
+        <div style="width: 40%">{{ t('panels.markup.currentTextType') }}</div>
         <Select
           style="width: 60%"
           :value="textType"
@@ -34,7 +34,7 @@
         />
       </div>
       <div class="row" v-else-if="handleElement && handleElement.type === 'image'">
-        <div style="width: 40%">{{ $t('panels.markup.currentImageType') }}</div>
+        <div style="width: 40%">{{ t('panels.markup.currentImageType') }}</div>
         <Select
           style="width: 60%"
           :value="imageType"
@@ -42,7 +42,7 @@
           :options="imageTypeOptions"
         />
       </div>
-      <div class="placeholder" v-else>{{ $t('panels.markup.placeholder') }}</div>
+      <div class="placeholder" v-else>{{ t('panels.markup.placeholder') }}</div>
     </div>
   </MoveablePanel>
 </template>
@@ -65,33 +65,33 @@ const { currentSlide } = storeToRefs(slidesStore);
 const { handleElement, handleElementId } = storeToRefs(mainStore);
 
 const slideTypeOptions = ref<{ label: string; value: SlideType | '' }[]>([
-  { label: $t('panels.markup.unmarkedType'), value: '' },
-  { label: $t('panels.markup.pageTypes.coverPage'), value: 'cover' },
-  { label: $t('panels.markup.pageTypes.tableOfContents'), value: 'contents' },
-  { label: $t('panels.markup.pageTypes.transitionPage'), value: 'transition' },
-  { label: $t('panels.markup.pageTypes.contentPage'), value: 'content' },
-  { label: $t('panels.markup.pageTypes.endPage'), value: 'end' },
+  { label: t('panels.markup.unmarkedType'), value: '' },
+  { label: t('panels.markup.pageTypes.coverPage'), value: 'cover' },
+  { label: t('panels.markup.pageTypes.tableOfContents'), value: 'contents' },
+  { label: t('panels.markup.pageTypes.transitionPage'), value: 'transition' },
+  { label: t('panels.markup.pageTypes.contentPage'), value: 'content' },
+  { label: t('panels.markup.pageTypes.endPage'), value: 'end' },
 ]);
 
 const textTypeOptions = ref<{ label: string; value: TextType | '' }[]>([
-  { label: $t('panels.markup.unmarkedType'), value: '' },
-  { label: $t('panels.markup.title'), value: 'title' },
-  { label: $t('panels.markup.textTypes.subtitle'), value: 'subtitle' },
-  { label: $t('panels.markup.textTypes.content'), value: 'content' },
-  { label: $t('panels.markup.textTypes.listItem'), value: 'item' },
-  { label: $t('panels.markup.textTypes.listItemTitle'), value: 'itemTitle' },
-  { label: $t('panels.markup.textTypes.notes'), value: 'notes' },
-  { label: $t('panels.markup.textTypes.header'), value: 'header' },
-  { label: $t('panels.markup.textTypes.footer'), value: 'footer' },
-  { label: $t('panels.markup.textTypes.sectionNumber'), value: 'partNumber' },
-  { label: $t('panels.markup.textTypes.itemNumber'), value: 'itemNumber' },
+  { label: t('panels.markup.unmarkedType'), value: '' },
+  { label: t('panels.markup.title'), value: 'title' },
+  { label: t('panels.markup.textTypes.subtitle'), value: 'subtitle' },
+  { label: t('panels.markup.textTypes.content'), value: 'content' },
+  { label: t('panels.markup.textTypes.listItem'), value: 'item' },
+  { label: t('panels.markup.textTypes.listItemTitle'), value: 'itemTitle' },
+  { label: t('panels.markup.textTypes.notes'), value: 'notes' },
+  { label: t('panels.markup.textTypes.header'), value: 'header' },
+  { label: t('panels.markup.textTypes.footer'), value: 'footer' },
+  { label: t('panels.markup.textTypes.sectionNumber'), value: 'partNumber' },
+  { label: t('panels.markup.textTypes.itemNumber'), value: 'itemNumber' },
 ]);
 
 const imageTypeOptions = ref<{ label: string; value: ImageType | '' }[]>([
-  { label: $t('panels.markup.unmarkedType'), value: '' },
-  { label: $t('panels.markup.imageTypes.pageIllustration'), value: 'pageFigure' },
-  { label: $t('panels.markup.imageTypes.itemIllustration'), value: 'itemFigure' },
-  { label: $t('panels.markup.imageTypes.backgroundImage'), value: 'background' },
+  { label: t('panels.markup.unmarkedType'), value: '' },
+  { label: t('panels.markup.imageTypes.pageIllustration'), value: 'pageFigure' },
+  { label: t('panels.markup.imageTypes.itemIllustration'), value: 'itemFigure' },
+  { label: t('panels.markup.imageTypes.backgroundImage'), value: 'background' },
 ]);
 
 const slideType = computed(() => currentSlide.value?.type || '');

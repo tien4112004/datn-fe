@@ -9,7 +9,7 @@ export default function NavLayout() {
   return (
     <>
       <Nav />
-      <main className="overflow-hidden flex flex-col">
+      <main className="flex flex-col h-fit">
         {isLoading && <GlobalSpinner text="Loading page..." />}
         <Outlet />
       </main>

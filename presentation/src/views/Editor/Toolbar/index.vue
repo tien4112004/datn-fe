@@ -74,11 +74,11 @@ const setToolbarState = (value: ToolbarStates) => {
 const currentTabs = computed(() => {
   if (!activeElementIdList.value.length) return slideTabs.value;
   else if (activeElementIdList.value.length > 1) {
-    if (!activeGroupElementId.value) return multiSelectTabs;
+    if (!activeGroupElementId.value) return multiSelectTabs.value;
 
     const activeGroupElement = activeElementList.value.find((item) => item.id === activeGroupElementId.value);
     if (activeGroupElement) return elementTabs.value;
-    return multiSelectTabs;
+    return multiSelectTabs.value;
   }
   return elementTabs.value;
 });

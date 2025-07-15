@@ -46,7 +46,9 @@
 
     <template v-if="toolVisible">
       <div class="header">
-        <div class="back" @click="changeMode('preview')"><IconLogout /> Exit Play</div>
+        <div class="back" @click="changeMode('preview')">
+          <IconLogout /> {{ $t('ui.mobile.player.exitPlay') }}
+        </div>
       </div>
       <MobileThumbnails class="thumbnails" />
     </template>

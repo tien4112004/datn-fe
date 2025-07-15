@@ -48,6 +48,7 @@
 import { onMounted, onUnmounted, ref } from 'vue';
 import { debounce } from 'lodash';
 import { useMainStore } from '@/store';
+import { useI18n } from 'vue-i18n';
 import type { EditorView } from 'prosemirror-view';
 import { initProsemirrorEditor, createDocument } from '@/utils/prosemirror';
 import { addMark, autoSelectAll, getTextAttrs, type TextAttrs } from '@/utils/prosemirror/utils';
@@ -57,6 +58,8 @@ import tippy, { type Instance } from 'tippy.js';
 import ColorPicker from '@/components/ColorPicker/index.vue';
 import Popover from '@/components/Popover.vue';
 import { toggleMark } from 'prosemirror-commands';
+
+const { t } = useI18n();
 
 const props = defineProps<{
   value: string;
@@ -201,7 +204,7 @@ onMounted(() => {
       },
     },
     {
-      placeholder: 'Click to enter speaker notes',
+      placeholder: t('notes.editor.placeholder'),
     }
   );
 

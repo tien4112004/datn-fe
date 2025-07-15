@@ -24,6 +24,9 @@ import { useKeyboardStore, useMainStore, useSlidesStore } from '@/store';
 import type { CreateCustomShapeData } from '@/types/edit';
 import { KEYS } from '@/configs/hotkey';
 import message from '@/utils/message';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const emit = defineEmits<{
   (event: 'created', payload: CreateCustomShapeData): void;
@@ -162,12 +165,9 @@ const keydownListener = (e: KeyboardEvent) => {
   if (key === KEYS.ENTER) create();
 };
 onMounted(() => {
-  message.success(
-    'Click to draw any shape, close the shape to complete drawing, press ESC key or right-click to cancel, press ENTER key to finish early',
-    {
-      duration: 0,
-    }
-  );
+  message.success(t('styling.slide.design.shapeCreateHint'), {
+    duration: 0,
+  });
   document.addEventListener('keydown', keydownListener);
 });
 onUnmounted(() => {

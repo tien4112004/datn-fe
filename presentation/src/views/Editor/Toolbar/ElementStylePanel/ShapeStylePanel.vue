@@ -1,7 +1,7 @@
 <template>
   <div class="shape-style-panel">
     <div class="title">
-      <span>Click to Replace Shape</span>
+      <span>{{ t('styling.elements.shape.clickToReplaceShape') }}</span>
       <IconDown />
     </div>
     <div class="shape-pool">
@@ -24,9 +24,9 @@
         :value="fillType"
         @update:value="(value) => updateFillType(value as 'fill' | 'gradient' | 'pattern')"
         :options="[
-          { label: 'Solid Fill', value: 'fill' },
-          { label: 'Gradient Fill', value: 'gradient' },
-          { label: 'Image Fill', value: 'pattern' },
+          { label: t('styling.elements.shape.solidFill'), value: 'fill' },
+          { label: t('styling.elements.shape.gradientFill'), value: 'gradient' },
+          { label: t('styling.elements.shape.imageFill'), value: 'pattern' },
         ]"
       />
       <div style="width: 10px" v-if="fillType !== 'pattern'"></div>
@@ -42,8 +42,8 @@
         @update:value="(value) => updateGradient({ type: value as GradientType })"
         v-else-if="fillType === 'gradient'"
         :options="[
-          { label: 'Linear Gradient', value: 'linear' },
-          { label: 'Radial Gradient', value: 'radial' },
+          { label: t('styling.elements.shape.linearGradient'), value: 'linear' },
+          { label: t('styling.elements.shape.radialGradient'), value: 'radial' },
         ]"
       />
     </div>
@@ -58,7 +58,7 @@
         />
       </div>
       <div class="row">
-        <div style="width: 40%">Current Color Block:</div>
+        <div style="width: 40%">{{ t('styling.elements.shape.currentColorBlock') }}:</div>
         <Popover trigger="click" style="width: 60%">
           <template #content>
             <ColorPicker
@@ -70,7 +70,7 @@
         </Popover>
       </div>
       <div class="row" v-if="gradient.type === 'linear'">
-        <div style="width: 40%">Gradient Angle:</div>
+        <div style="width: 40%">{{ t('styling.elements.shape.gradientAngle') }}:</div>
         <Slider
           style="width: 60%"
           :min="0"
@@ -108,11 +108,13 @@
         :value="textAlign"
         @update:value="(value) => updateTextAlign(value as 'top' | 'middle' | 'bottom')"
       >
-        <RadioButton value="top" v-tooltip="'Align Top'" style="flex: 1"><IconAlignTextTopOne /></RadioButton>
-        <RadioButton value="middle" v-tooltip="'Center'" style="flex: 1"
+        <RadioButton value="top" v-tooltip="t('styling.elements.shape.alignTop')" style="flex: 1"
+          ><IconAlignTextTopOne
+        /></RadioButton>
+        <RadioButton value="middle" v-tooltip="t('styling.elements.shape.center')" style="flex: 1"
           ><IconAlignTextMiddleOne
         /></RadioButton>
-        <RadioButton value="bottom" v-tooltip="'Align Bottom'" style="flex: 1"
+        <RadioButton value="bottom" v-tooltip="t('styling.elements.shape.alignBottom')" style="flex: 1"
           ><IconAlignTextBottomOne
         /></RadioButton>
       </RadioGroup>
@@ -130,24 +132,27 @@
     <div class="row">
       <CheckboxButton
         class="center"
-        v-tooltip="'Double-click to use continuously'"
+        v-tooltip="t('styling.elements.shape.doubleClickToUse')"
         style="flex: 1"
         :checked="!!shapeFormatPainter"
         @click="toggleShapeFormatPainter()"
         @dblclick="toggleShapeFormatPainter(true)"
         ><IconFormatBrush />
-        <div>Shape Format Painter</div>
+        <div>{{ $t('styling.elements.shape.shapeFormatPainter') }}</div>
       </CheckboxButton>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { type Ref, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
+const { t } = useI18n();
+
+import { ref, type Ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useMainStore, useSlidesStore } from '@/store';
 import type { GradientType, PPTShapeElement, Gradient, ShapeText } from '@/types/slides';
-import { type ShapePoolItem, SHAPE_LIST, SHAPE_PATH_FORMULAS } from '@/configs/shapes';
+import { type ShapePoolItem, getShapeList, SHAPE_PATH_FORMULAS } from '@/configs/shapes';
 import { getImageDataURL } from '@/utils/image';
 import emitter, { EmitterEvents } from '@/utils/emitter';
 import useHistorySnapshot from '@/hooks/useHistorySnapshot';
@@ -190,6 +195,7 @@ const gradient = ref<Gradient>({
 const fillType = ref('fill');
 const textAlign = ref('middle');
 const currentGradientIndex = ref(0);
+const SHAPE_LIST = getShapeList();
 
 watch(
   handleElement,
@@ -234,7 +240,7 @@ const updateElement = (props: Partial<PPTShapeElement>) => {
   addHistorySnapshot();
 };
 
-// 设置填充类型：渐变、纯色
+// Set fill type: gradient or solid color
 const updateFillType = (type: 'gradient' | 'fill' | 'pattern') => {
   if (type === 'fill') {
     slidesStore.removeElementProps({
@@ -258,7 +264,7 @@ const updateFillType = (type: 'gradient' | 'fill' | 'pattern') => {
   }
 };
 
-// 设置渐变填充
+// Set gradient fill
 const updateGradient = (gradientProps: Partial<Gradient>) => {
   if (!gradient.value) return;
   const _gradient = { ...gradient.value, ...gradientProps };
@@ -272,7 +278,7 @@ const updateGradientColors = (color: string) => {
   updateGradient({ colors });
 };
 
-// 上传填充图片
+// Upload fill image
 const uploadPattern = (files: FileList) => {
   const imageFile = files[0];
   if (!imageFile) return;
@@ -282,12 +288,12 @@ const uploadPattern = (files: FileList) => {
   });
 };
 
-// 设置填充色
+// Set fill color
 const updateFill = (value: string) => {
   updateElement({ fill: value });
 };
 
-// 修改形状
+// Modify shape
 const changeShape = (shape: ShapePoolItem) => {
   const { width, height } = handleElement.value as PPTShapeElement;
   const props: Partial<PPTShapeElement> = {

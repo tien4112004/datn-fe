@@ -1,13 +1,15 @@
 <template>
   <div class="latex-style-panel">
     <div class="row">
-      <Button style="flex: 1" @click="latexEditorVisible = true">Edit LaTeX</Button>
+      <Button style="flex: 1" @click="latexEditorVisible = true">{{
+        $t('styling.elements.latex.editLatex')
+      }}</Button>
     </div>
 
     <Divider />
 
     <div class="row">
-      <div style="width: 40%">Color:</div>
+      <div style="width: 40%">{{ $t('styling.elements.latex.color') }}</div>
       <Popover trigger="click" style="width: 60%">
         <template #content>
           <ColorPicker
@@ -19,7 +21,7 @@
       </Popover>
     </div>
     <div class="row">
-      <div style="width: 40%">Thickness:</div>
+      <div style="width: 40%">{{ $t('styling.elements.latex.thickness') }}</div>
       <NumberInput
         :min="1"
         :max="3"

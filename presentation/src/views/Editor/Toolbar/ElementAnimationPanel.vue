@@ -41,13 +41,13 @@
         </template>
         <Button class="element-animation-btn center" @click="handleAnimationId = ''">
           <IconEffects style="margin-right: 5px" />
-          <div>Add Animation</div>
+          <div>{{ $t('styling.animation.addAnimation') }}</div>
         </Button>
       </Popover>
     </div>
 
     <div class="tip center" v-else>
-      <IconClick style="margin-right: 5px" /> Select an element on the canvas to add animation
+      <IconClick style="margin-right: 5px" /> {{ $t('styling.animation.selectElement') }}
     </div>
 
     <Divider />
@@ -70,10 +70,14 @@
             <div class="handler">
               <IconPlayOne
                 class="handler-btn"
-                v-tooltip="'Preview'"
+                v-tooltip="$t('styling.animation.preview')"
                 @click="runAnimation(element.elId, element.effect, element.duration)"
               />
-              <IconCloseSmall class="handler-btn" v-tooltip="'Delete'" @click="deleteAnimation(element.id)" />
+              <IconCloseSmall
+                class="handler-btn"
+                v-tooltip="$t('styling.animation.delete')"
+                @click="deleteAnimation(element.id)"
+              />
             </div>
           </div>
 
@@ -81,7 +85,7 @@
             <Divider :margin="16" />
 
             <div class="config-item">
-              <div style="width: 35%">Duration:</div>
+              <div style="width: 35%">{{ $t('styling.animation.duration') }}:</div>
               <NumberInput
                 :min="500"
                 :max="3000"
@@ -92,7 +96,7 @@
               />
             </div>
             <div class="config-item">
-              <div style="width: 35%">Trigger:</div>
+              <div style="width: 35%">{{ $t('styling.animation.trigger') }}:</div>
               <Select
                 :value="element.trigger"
                 @update:value="
@@ -100,14 +104,16 @@
                 "
                 style="width: 65%"
                 :options="[
-                  { label: 'Manual Trigger', value: 'click' },
-                  { label: 'With Previous', value: 'meantime' },
-                  { label: 'After Previous', value: 'auto' },
+                  { label: $t('styling.animation.manualTrigger'), value: 'click' },
+                  { label: $t('styling.animation.withPrevious'), value: 'meantime' },
+                  { label: $t('styling.animation.afterPrevious'), value: 'auto' },
                 ]"
               />
             </div>
             <div class="config-item">
-              <Button style="width: 100%" @click="openAnimationPool(element.id)">Change Animation</Button>
+              <Button style="width: 100%" @click="openAnimationPool(element.id)">{{
+                $t('styling.animation.changeAnimation')
+              }}</Button>
             </div>
           </div>
         </div>
@@ -117,7 +123,7 @@
     <template v-if="animationSequence.length >= 2">
       <Divider />
       <Button @click="runAllAnimation()">
-        {{ animateIn ? 'Stop Preview' : 'Preview All' }}
+        {{ animateIn ? $t('styling.animation.stopPreview') : $t('styling.animation.previewAll') }}
       </Button>
     </template>
   </div>
@@ -130,14 +136,14 @@ import { storeToRefs } from 'pinia';
 import { useMainStore, useSlidesStore } from '@/store';
 import type { AnimationTrigger, AnimationType, PPTAnimation } from '@/types/slides';
 import {
-  ENTER_ANIMATIONS,
-  EXIT_ANIMATIONS,
-  ATTENTION_ANIMATIONS,
+  getEnterAnimations,
+  getExitAnimations,
+  getAttentionAnimations,
   ANIMATION_DEFAULT_DURATION,
   ANIMATION_DEFAULT_TRIGGER,
   ANIMATION_CLASS_PREFIX,
 } from '@/configs/animation';
-import { ELEMENT_TYPE_ZH } from '@/configs/element';
+import { getElementType } from '@/configs/element';
 import useHistorySnapshot from '@/hooks/useHistorySnapshot';
 
 import Tabs from '@/components/Tabs.vue';
@@ -147,6 +153,12 @@ import Draggable from 'vuedraggable';
 import NumberInput from '@/components/NumberInput.vue';
 import Select from '@/components/Select.vue';
 import Popover from '@/components/Popover.vue';
+import { useI18n } from 'vue-i18n';
+const { t } = useI18n();
+const ELEMENT_TYPE = getElementType();
+const ENTER_ANIMATIONS = getEnterAnimations();
+const EXIT_ANIMATIONS = getExitAnimations();
+const ATTENTION_ANIMATIONS = getAttentionAnimations();
 
 const animationEffects: { [key: string]: string } = {};
 for (const effect of ENTER_ANIMATIONS) {
@@ -178,9 +190,9 @@ const { handleElement, handleElementId } = storeToRefs(useMainStore());
 const { currentSlide, formatedAnimations, currentSlideAnimations } = storeToRefs(slidesStore);
 
 const tabs: TabItem[] = [
-  { key: 'in', label: 'Entrance', color: '#68a490' },
-  { key: 'out', label: 'Exit', color: '#d86344' },
-  { key: 'attention', label: 'Emphasis', color: '#e8b76a' },
+  { key: 'in', label: t('styling.animation.entrance'), color: '#68a490' },
+  { key: 'out', label: t('styling.animation.exit'), color: '#d86344' },
+  { key: 'attention', label: t('styling.animation.emphasis'), color: '#e8b76a' },
 ];
 const activeTab = ref('in');
 const animateIn = ref(false);
@@ -206,7 +218,7 @@ const animationSequence = computed(() => {
       const el = currentSlide.value.elements.find((el) => el.id === animation.elId);
       if (!el) continue;
 
-      const elType = ELEMENT_TYPE_ZH[el.type];
+      const elType = ELEMENT_TYPE[el.type];
       const animationEffect = animationEffects[animation.effect];
       animationSequence.push({
         ...animation,

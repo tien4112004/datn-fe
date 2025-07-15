@@ -11,9 +11,11 @@
 
 <script lang="ts" setup>
 import { computed, ref } from 'vue';
-import { SYMBOL_LIST } from '@/configs/symbol';
+import { getSymbolList } from '@/configs/symbol';
 import emitter, { EmitterEvents } from '@/utils/emitter';
 import Tabs from '@/components/Tabs.vue';
+
+const SYMBOL_LIST = getSymbolList();
 
 const selectedSymbolKey = ref(SYMBOL_LIST[0].key);
 const symbolPool = computed(() => {

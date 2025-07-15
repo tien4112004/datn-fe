@@ -1,46 +1,62 @@
 <template>
   <div class="multi-position-panel">
     <ButtonGroup class="row">
-      <Button style="flex: 1" v-tooltip="'Left Align'" @click="alignElement(ElementAlignCommands.LEFT)"
+      <Button
+        style="flex: 1"
+        v-tooltip="$t('styling.position.multi.leftAlign')"
+        @click="alignElement(ElementAlignCommands.LEFT)"
         ><IconAlignLeft
       /></Button>
       <Button
         style="flex: 1"
-        v-tooltip="'Horizontal Center'"
+        v-tooltip="$t('styling.position.multi.horizontalCenter')"
         @click="alignElement(ElementAlignCommands.HORIZONTAL)"
         ><IconAlignHorizontally
       /></Button>
-      <Button style="flex: 1" v-tooltip="'Right Align'" @click="alignElement(ElementAlignCommands.RIGHT)"
+      <Button
+        style="flex: 1"
+        v-tooltip="$t('styling.position.multi.rightAlign')"
+        @click="alignElement(ElementAlignCommands.RIGHT)"
         ><IconAlignRight
       /></Button>
     </ButtonGroup>
     <ButtonGroup class="row">
-      <Button style="flex: 1" v-tooltip="'Top Align'" @click="alignElement(ElementAlignCommands.TOP)"
+      <Button
+        style="flex: 1"
+        v-tooltip="$t('styling.position.multi.topAlign')"
+        @click="alignElement(ElementAlignCommands.TOP)"
         ><IconAlignTop
       /></Button>
       <Button
         style="flex: 1"
-        v-tooltip="'Vertical Center'"
+        v-tooltip="$t('styling.position.multi.verticalCenter')"
         @click="alignElement(ElementAlignCommands.VERTICAL)"
         ><IconAlignVertically
       /></Button>
-      <Button style="flex: 1" v-tooltip="'Bottom Align'" @click="alignElement(ElementAlignCommands.BOTTOM)"
+      <Button
+        style="flex: 1"
+        v-tooltip="$t('styling.position.multi.bottomAlign')"
+        @click="alignElement(ElementAlignCommands.BOTTOM)"
         ><IconAlignBottom
       /></Button>
     </ButtonGroup>
     <ButtonGroup class="row" v-if="displayItemCount > 2">
-      <Button style="flex: 1" @click="uniformHorizontalDisplay()">Horizontal Distribute</Button>
-      <Button style="flex: 1" @click="uniformVerticalDisplay()">Vertical Distribute</Button>
+      <Button style="flex: 1" @click="uniformHorizontalDisplay()">{{
+        $t('styling.position.multi.horizontalDistribute')
+      }}</Button>
+      <Button style="flex: 1" @click="uniformVerticalDisplay()">{{
+        $t('styling.position.multi.verticalDistribute')
+      }}</Button>
     </ButtonGroup>
 
     <Divider />
 
     <ButtonGroup class="row">
       <Button :disabled="!canCombine" @click="combineElements()" style="flex: 1"
-        ><IconGroup style="margin-right: 3px" />Group</Button
+        ><IconGroup style="margin-right: 3px" />{{ $t('styling.position.multi.group') }}</Button
       >
       <Button :disabled="canCombine" @click="uncombineElements()" style="flex: 1"
-        ><IconUngroup style="margin-right: 3px" />Ungroup</Button
+        ><IconUngroup style="margin-right: 3px" />{{ $t('styling.position.multi.ungroup') }}</Button
       >
     </ButtonGroup>
   </div>

@@ -7,7 +7,9 @@
     padding="normal"
   >
     <div class="add-slide">
-      <div class="btn center" @click="createSlide()"><IconPlus class="icon" />Add Slide</div>
+      <div class="btn center" @click="createSlide()">
+        <IconPlus class="icon" />{{ $t('thumbnails.slides.addSlide') }}
+      </div>
       <Divider type="vertical" :margin="0" />
       <Popover trigger="click" placement="bottom-start" v-model:value="presetLayoutPopoverVisible" center>
         <template #content>
@@ -53,7 +55,7 @@
               :id="`section-title-input-${element?.sectionTag?.id || 'default'}`"
               type="text"
               :value="element?.sectionTag?.title || ''"
-              placeholder="Enter section name"
+              :placeholder="$t('thumbnails.sections.enterSectionName')"
               @blur="($event) => saveSection($event)"
               @keydown.enter.stop="($event) => saveSection($event)"
               v-if="
@@ -64,7 +66,9 @@
             <span class="text" v-else>
               <div class="text-content">
                 {{
-                  element?.sectionTag ? element?.sectionTag?.title || 'Untitled Section' : 'Default Section'
+                  element?.sectionTag
+                    ? element?.sectionTag?.title || $t('thumbnails.sections.untitledSection')
+                    : $t('thumbnails.sections.defaultSection')
                 }}
               </div>
             </span>
@@ -97,7 +101,9 @@
       </template>
     </Draggable>
 
-    <div class="page-number">Slide {{ slideIndex + 1 }}/{{ slides.length }}</div>
+    <div class="page-number">
+      {{ $t('thumbnails.slides.slide') }} {{ slideIndex + 1 }}/{{ slides.length }}
+    </div>
   </Card>
 </template>
 
@@ -121,7 +127,8 @@ import Popover from '@/components/Popover.vue';
 import Draggable from 'vuedraggable';
 import Divider from '@/components/Divider.vue';
 import Card from '@/components/Card.vue';
-
+import { useI18n } from 'vue-i18n';
+const { t } = useI18n();
 const mainStore = useMainStore();
 const slidesStore = useSlidesStore();
 const keyboardStore = useKeyboardStore();
@@ -293,22 +300,22 @@ const contextmenusSection = (el: HTMLElement): ContextmenuItem[] => {
 
   return [
     {
-      text: 'Delete Section',
+      text: t('thumbnails.sections.deleteSection'),
       handler: () => removeSection(sectionId),
     },
     {
-      text: 'Delete Section and Slides',
+      text: t('thumbnails.sections.deleteSectionAndSlides'),
       handler: () => {
         mainStore.setActiveElementIdList([]);
         removeSectionSlides(sectionId);
       },
     },
     {
-      text: 'Delete All Sections',
+      text: t('thumbnails.sections.deleteAllSections'),
       handler: removeAllSection,
     },
     {
-      text: 'Rename Section',
+      text: t('thumbnails.sections.renameSection'),
       handler: () => editSection(sectionId),
     },
   ];
@@ -319,22 +326,22 @@ const { enterScreening, enterScreeningFromStart } = useScreening();
 const contextmenusThumbnails = (): ContextmenuItem[] => {
   return [
     {
-      text: 'Paste',
+      text: t('thumbnails.slides.paste'),
       subText: 'Ctrl + V',
       handler: pasteSlide,
     },
     {
-      text: 'Select All',
+      text: t('thumbnails.slides.selectAll'),
       subText: 'Ctrl + A',
       handler: selectAllSlide,
     },
     {
-      text: 'New Page',
+      text: t('thumbnails.slides.newPage'),
       subText: 'Enter',
       handler: createSlide,
     },
     {
-      text: 'Slide Show',
+      text: t('thumbnails.slides.slideShow'),
       subText: 'F5',
       handler: enterScreeningFromStart,
     },
@@ -344,49 +351,49 @@ const contextmenusThumbnails = (): ContextmenuItem[] => {
 const contextmenusThumbnailItem = (): ContextmenuItem[] => {
   return [
     {
-      text: 'Cut',
+      text: t('thumbnails.slides.cut'),
       subText: 'Ctrl + X',
       handler: cutSlide,
     },
     {
-      text: 'Copy',
+      text: t('thumbnails.slides.copy'),
       subText: 'Ctrl + C',
       handler: copySlide,
     },
     {
-      text: 'Paste',
+      text: t('thumbnails.slides.paste'),
       subText: 'Ctrl + V',
       handler: pasteSlide,
     },
     {
-      text: 'Select All',
+      text: t('thumbnails.slides.selectAll'),
       subText: 'Ctrl + A',
       handler: selectAllSlide,
     },
     { divider: true },
     {
-      text: 'New Page',
+      text: t('thumbnails.slides.newPage'),
       subText: 'Enter',
       handler: createSlide,
     },
     {
-      text: 'Copy Page',
+      text: t('thumbnails.slides.copyPage'),
       subText: 'Ctrl + D',
       handler: copyAndPasteSlide,
     },
     {
-      text: 'Delete Page',
+      text: t('thumbnails.slides.deletePage'),
       subText: 'Delete',
       handler: () => deleteSlide(),
     },
     {
-      text: 'Add Section',
+      text: t('thumbnails.sections.addSection'),
       handler: createSection,
       disable: !!currentSlide.value.sectionTag,
     },
     { divider: true },
     {
-      text: 'From Current Show',
+      text: t('thumbnails.slides.fromCurrentShow'),
       subText: 'Shift + F5',
       handler: enterScreening,
     },

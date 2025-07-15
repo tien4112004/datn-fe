@@ -17,14 +17,16 @@
     </div>
     <div class="configs">
       <div class="row">
-        <div class="title">Export Range:</div>
+        <div class="title">{{ $t('files.export.common.exportRange') }}</div>
         <RadioGroup class="config-item" v-model:value="rangeType">
-          <RadioButton style="width: 50%" value="all">All</RadioButton>
-          <RadioButton style="width: 50%" value="current">Current Page</RadioButton>
+          <RadioButton style="width: 50%" value="all">{{ $t('files.export.common.all') }}</RadioButton>
+          <RadioButton style="width: 50%" value="current">{{
+            $t('files.export.common.currentPage')
+          }}</RadioButton>
         </RadioGroup>
       </div>
       <div class="row">
-        <div class="title">Per Page Count:</div>
+        <div class="title">{{ $t('files.export.pdf.perPageCount') }}</div>
         <Select
           class="config-item"
           v-model:value="count"
@@ -36,26 +38,28 @@
         />
       </div>
       <div class="row">
-        <div class="title">Edge Padding:</div>
+        <div class="title">{{ $t('files.export.pdf.edgePadding') }}</div>
         <div class="config-item">
           <Switch v-model:value="padding" />
         </div>
       </div>
       <div class="tip">
-        Tip: If the print preview doesn't match the actual style, please check the [Background Graphics]
-        option in the popup print window.
+        {{ $t('files.export.pdf.tip') }}
       </div>
     </div>
 
     <div class="btns">
-      <Button class="btn export" type="primary" @click="expPDF()">Print / Export PDF</Button>
-      <Button class="btn close" @click="emit('close')">Close</Button>
+      <Button class="btn export" type="primary" @click="expPDF()">{{
+        $t('files.export.pdf.printExportPDF')
+      }}</Button>
+      <Button class="btn close" @click="emit('close')">{{ $t('files.export.common.close') }}</Button>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { storeToRefs } from 'pinia';
 import { useSlidesStore } from '@/store';
 import { print } from '@/utils/print';
@@ -66,6 +70,8 @@ import Button from '@/components/Button.vue';
 import RadioButton from '@/components/RadioButton.vue';
 import RadioGroup from '@/components/RadioGroup.vue';
 import Select from '@/components/Select.vue';
+
+const { t } = useI18n();
 
 const emit = defineEmits<{
   (event: 'close'): void;

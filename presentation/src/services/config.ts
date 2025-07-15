@@ -1,6 +1,8 @@
 import axios from 'axios';
 import message from '@/utils/message';
+// import { useI18n } from 'vue-i18n';
 
+// const { t } = useI18n();
 const instance = axios.create({ timeout: 1000 * 300 });
 
 instance.interceptors.response.use(
@@ -10,6 +12,7 @@ instance.interceptors.response.use(
     }
 
     message.error('Unknown request error!');
+    // message.error(t('system.services.unknownRequestError'));
     return Promise.reject(response);
   },
   (error) => {
@@ -21,10 +24,12 @@ instance.interceptors.response.use(
       }
 
       message.error('The server encountered an unknown error!');
+      //   message.error(t('system.services.serverUnknownError'));
       return Promise.reject(error.message);
     }
 
     message.error('Failed to connect to the server or the server response timed out!');
+    // message.error(t('system.services.failedToConnect'));
     return Promise.reject(error);
   }
 );

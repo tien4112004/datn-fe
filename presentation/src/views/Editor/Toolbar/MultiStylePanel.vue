@@ -1,7 +1,7 @@
 <template>
   <div class="multi-style-panel">
     <div class="row">
-      <div style="width: 40%">Fill Color:</div>
+      <div style="width: 40%">{{ $t('styling.elements.multi.fillColor') }}:</div>
       <Popover trigger="click" style="width: 60%">
         <template #content>
           <ColorPicker :modelValue="fill" @update:modelValue="(value) => updateFill(value)" />
@@ -13,7 +13,7 @@
     <Divider />
 
     <div class="row">
-      <div style="width: 40%">Border Style:</div>
+      <div style="width: 40%">{{ $t('styling.elements.multi.borderStyle') }}:</div>
       <SelectCustom style="width: 60%">
         <template #options>
           <div
@@ -31,7 +31,7 @@
       </SelectCustom>
     </div>
     <div class="row">
-      <div style="width: 40%">Border Color:</div>
+      <div style="width: 40%">{{ $t('styling.elements.multi.borderColor') }}:</div>
       <Popover trigger="click" style="width: 60%">
         <template #content>
           <ColorPicker
@@ -43,7 +43,7 @@
       </Popover>
     </div>
     <div class="row">
-      <div style="width: 40%">Border Width:</div>
+      <div style="width: 40%">{{ $t('styling.elements.multi.borderWidth') }}:</div>
       <NumberInput
         :value="outline.width || 0"
         @update:value="(value) => updateOutline({ width: value })"
@@ -58,7 +58,7 @@
         style="width: 60%"
         :value="richTextAttrs.fontname"
         search
-        searchLabel="Search Font"
+        :searchLabel="$t('styling.elements.multi.searchFont')"
         @update:value="(value) => updateFontStyle('fontname', value as string)"
         :options="FONTS"
       >
@@ -70,7 +70,7 @@
         style="width: 40%"
         :value="richTextAttrs.fontsize"
         search
-        searchLabel="Search Font Size"
+        :searchLabel="$t('styling.elements.multi.searchFontSize')"
         @update:value="(value) => updateFontStyle('fontsize', value as string)"
         :options="
           fontSizeOptions.map((item) => ({
@@ -92,7 +92,11 @@
             @update:modelValue="(value) => updateFontStyle('color', value)"
           />
         </template>
-        <TextColorButton first :color="richTextAttrs.color" v-tooltip="'Text Color'">
+        <TextColorButton
+          first
+          :color="richTextAttrs.color"
+          v-tooltip="$t('styling.elements.multi.textColor')"
+        >
           <IconText />
         </TextColorButton>
       </Popover>
@@ -103,14 +107,17 @@
             @update:modelValue="(value) => updateFontStyle('backcolor', value)"
           />
         </template>
-        <TextColorButton :color="richTextAttrs.backcolor" v-tooltip="'Text Highlight'">
+        <TextColorButton
+          :color="richTextAttrs.backcolor"
+          v-tooltip="$t('styling.elements.multi.textHighlight')"
+        >
           <IconHighLight />
         </TextColorButton>
       </Popover>
       <Button
         class="font-size-btn"
         style="width: 20%"
-        v-tooltip="'Increase Font Size'"
+        v-tooltip="$t('styling.elements.multi.increaseFontSize')"
         @click="updateFontStyle('fontsize-add', '2')"
         ><IconFontSize />+</Button
       >
@@ -118,7 +125,7 @@
         last
         class="font-size-btn"
         style="width: 20%"
-        v-tooltip="'Decrease Font Size'"
+        v-tooltip="$t('styling.elements.multi.decreaseFontSize')"
         @click="updateFontStyle('fontsize-reduce', '2')"
         ><IconFontSize />-</Button
       >
@@ -129,12 +136,18 @@
       :value="richTextAttrs.align"
       @update:value="(value) => updateFontStyle('align', value)"
     >
-      <RadioButton value="left" style="flex: 1" v-tooltip="'Align Left'"><IconAlignTextLeft /></RadioButton>
-      <RadioButton value="center" style="flex: 1" v-tooltip="'Center'"><IconAlignTextCenter /></RadioButton>
-      <RadioButton value="right" style="flex: 1" v-tooltip="'Align Right'"
+      <RadioButton value="left" style="flex: 1" v-tooltip="$t('styling.elements.multi.alignLeft')"
+        ><IconAlignTextLeft
+      /></RadioButton>
+      <RadioButton value="center" style="flex: 1" v-tooltip="$t('styling.elements.multi.center')"
+        ><IconAlignTextCenter
+      /></RadioButton>
+      <RadioButton value="right" style="flex: 1" v-tooltip="$t('styling.elements.multi.alignRight')"
         ><IconAlignTextRight
       /></RadioButton>
-      <RadioButton value="justify" style="flex: 1" v-tooltip="'Justify'"><IconAlignTextBoth /></RadioButton>
+      <RadioButton value="justify" style="flex: 1" v-tooltip="$t('styling.elements.multi.justify')"
+        ><IconAlignTextBoth
+      /></RadioButton>
     </RadioGroup>
   </div>
 </template>

@@ -13,6 +13,7 @@ import { type SvgPoints, toPoints } from '@/utils/svgPathParser';
 import { encrypt } from '@/utils/crypto';
 import { svg2Base64 } from '@/utils/svg2Base64';
 import message from '@/utils/message';
+import { useI18n } from 'vue-i18n';
 
 interface ExportImageConfig {
   quality: number;
@@ -34,6 +35,7 @@ export default () => {
   });
 
   const exporting = ref(false);
+  const { t } = useI18n();
 
   // Export image
   const exportImage = (domRef: HTMLElement, format: string, quality: number, ignoreWebfont = true) => {
@@ -58,7 +60,7 @@ export default () => {
         })
         .catch(() => {
           exporting.value = false;
-          message.error('Failed to export image');
+          message.error(t('system.exportUtils.failedToExportImage'));
         });
     }, 200);
   };
@@ -497,7 +499,7 @@ export default () => {
             w: el.width / ratioPx2Inch.value,
             h: el.height / ratioPx2Inch.value,
             fontSize: defaultFontSize / ratioPx2Pt.value,
-            fontFace: '微软雅黑',
+            fontFace: 'Microsoft YaHei',
             color: '#000000',
             valign: 'top',
             margin: 10 / ratioPx2Pt.value,
@@ -640,7 +642,7 @@ export default () => {
               w: el.width / ratioPx2Inch.value,
               h: el.height / ratioPx2Inch.value,
               fontSize: defaultFontSize / ratioPx2Pt.value,
-              fontFace: '微软雅黑',
+              fontFace: 'Microsoft YaHei',
               color: '#000000',
               paraSpaceBefore: 5 / ratioPx2Pt.value,
               valign: el.text.align,
@@ -700,7 +702,7 @@ export default () => {
           for (let i = 0; i < el.data.series.length; i++) {
             const item = el.data.series[i];
             chartData.push({
-              name: `系列${i + 1}`,
+              name: `Series ${i + 1}`,
               labels: el.data.labels,
               values: item,
             });
@@ -935,7 +937,7 @@ export default () => {
         .then(() => (exporting.value = false))
         .catch(() => {
           exporting.value = false;
-          message.error('Export failed');
+          message.error(t('system.exportUtils.exportFailed'));
         });
     }, 200);
   };

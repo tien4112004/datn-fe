@@ -58,7 +58,9 @@
       ></div>
     </div>
 
-    <div class="recent-colors-title" v-if="recentColors.length">Recently Used:</div>
+    <div class="recent-colors-title" v-if="recentColors.length">
+      {{ $t('ui.components.colorPicker.recentlyUsed') }}
+    </div>
     <div class="picker-presets">
       <div
         v-for="c in recentColors"
@@ -74,6 +76,7 @@
 
 <script lang="ts" setup>
 import { computed, onMounted, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import tinycolor, { type ColorFormats } from 'tinycolor2';
 import { debounce } from 'lodash';
 import { toCanvas } from 'html-to-image';
@@ -84,6 +87,8 @@ import Checkboard from './Checkboard.vue';
 import Hue from './Hue.vue';
 import Saturation from './Saturation.vue';
 import EditableInput from './EditableInput.vue';
+
+const { t } = useI18n();
 
 const props = withDefaults(
   defineProps<{
@@ -240,7 +245,7 @@ const openEyeDropper = () => {
 
 // Native eyedropper
 const browserEyeDropper = () => {
-  message.success('Press ESC to close eyedropper', { duration: 0 });
+  message.success(t('styling.slide.design.eyedropperEscHint'), { duration: 0 });
 
   // eslint-disable-next-line
   const eyeDropper = new (window as any).EyeDropper();
@@ -340,7 +345,7 @@ const customEyeDropper = () => {
       window.addEventListener('mousedown', handleMousedown);
     })
     .catch(() => {
-      message.error('Eyedropper initialization failed');
+      message.error(t('ui.components.colorPicker.eyedropperInitializationFailed'));
       document.body.removeChild(maskRef);
     });
 };

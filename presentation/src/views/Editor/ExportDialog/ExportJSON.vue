@@ -5,18 +5,23 @@
     </div>
 
     <div class="btns">
-      <Button class="btn export" type="primary" @click="exportJSON()">Export JSON</Button>
-      <Button class="btn close" @click="emit('close')">Close</Button>
+      <Button class="btn export" type="primary" @click="exportJSON()">{{
+        $t('files.export.json.exportJSON')
+      }}</Button>
+      <Button class="btn close" @click="emit('close')">{{ $t('files.export.common.close') }}</Button>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { storeToRefs } from 'pinia';
 import { useSlidesStore } from '@/store';
 import useExport from '@/hooks/useExport';
 import Button from '@/components/Button.vue';
+
+const { t } = useI18n();
 
 const emit = defineEmits<{
   (event: 'close'): void;

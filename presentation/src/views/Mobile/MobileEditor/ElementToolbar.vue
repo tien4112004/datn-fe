@@ -54,7 +54,7 @@
         <Divider :margin="20" />
 
         <div class="row-block">
-          <div class="label">Text Color:</div>
+          <div class="label">{{ $t('mobile.toolbar.element.textColor') }}</div>
           <div class="colors">
             <div class="color" v-for="color in colors" :key="color" @click="updateFontColor(color)">
               <div class="color-block" :style="{ backgroundColor: color }"></div>
@@ -62,7 +62,7 @@
           </div>
         </div>
         <div class="row-block">
-          <div class="label">Fill Color:</div>
+          <div class="label">{{ $t('mobile.toolbar.element.fillColor') }}</div>
           <div class="colors">
             <div class="color" v-for="color in colors" :key="color" @click="updateFill(color)">
               <div class="color-block" :style="{ backgroundColor: color }"></div>
@@ -73,24 +73,28 @@
 
       <div class="common" v-if="activeTab === 'common'">
         <ButtonGroup class="row">
-          <Button style="flex: 1" @click="copyElement()"><IconCopy class="icon" /> Copy</Button>
-          <Button style="flex: 1" @click="deleteElement()"><IconDelete class="icon" /> Delete</Button>
+          <Button style="flex: 1" @click="copyElement()"
+            ><IconCopy class="icon" /> {{ $t('mobile.toolbar.element.copy') }}</Button
+          >
+          <Button style="flex: 1" @click="deleteElement()"
+            ><IconDelete class="icon" /> {{ $t('mobile.toolbar.element.delete') }}</Button
+          >
         </ButtonGroup>
 
         <Divider :margin="20" />
 
         <ButtonGroup class="row">
           <Button style="flex: 1" @click="orderElement(handleElement!, ElementOrderCommands.TOP)"
-            ><IconSendToBack class="icon" /> Bring to Front</Button
+            ><IconSendToBack class="icon" /> {{ $t('mobile.toolbar.element.bringToFront') }}</Button
           >
           <Button style="flex: 1" @click="orderElement(handleElement!, ElementOrderCommands.BOTTOM)"
-            ><IconBringToFrontOne class="icon" /> Send to Back</Button
+            ><IconBringToFrontOne class="icon" /> {{ $t('mobile.toolbar.element.sendToBack') }}</Button
           >
           <Button style="flex: 1" @click="orderElement(handleElement!, ElementOrderCommands.UP)"
-            ><IconBringToFront class="icon" /> Move Forward</Button
+            ><IconBringToFront class="icon" /> {{ $t('mobile.toolbar.element.moveForward') }}</Button
           >
           <Button style="flex: 1" @click="orderElement(handleElement!, ElementOrderCommands.DOWN)"
-            ><IconSentToBack class="icon" /> Move Backward</Button
+            ><IconSentToBack class="icon" /> {{ $t('mobile.toolbar.element.moveBackward') }}</Button
           >
         </ButtonGroup>
 
@@ -98,24 +102,24 @@
 
         <ButtonGroup class="row">
           <Button style="flex: 1" @click="alignElementToCanvas(ElementAlignCommands.LEFT)"
-            ><IconAlignLeft class="icon" /> Align Left</Button
+            ><IconAlignLeft class="icon" /> {{ $t('mobile.toolbar.element.alignLeft') }}</Button
           >
           <Button style="flex: 1" @click="alignElementToCanvas(ElementAlignCommands.HORIZONTAL)"
-            ><IconAlignVertically class="icon" /> Center Horizontally</Button
+            ><IconAlignVertically class="icon" /> {{ $t('mobile.toolbar.element.centerHorizontally') }}</Button
           >
           <Button style="flex: 1" @click="alignElementToCanvas(ElementAlignCommands.RIGHT)"
-            ><IconAlignRight class="icon" /> Align Right</Button
+            ><IconAlignRight class="icon" /> {{ $t('mobile.toolbar.element.alignRight') }}</Button
           >
         </ButtonGroup>
         <ButtonGroup class="row">
           <Button style="flex: 1" @click="alignElementToCanvas(ElementAlignCommands.TOP)"
-            ><IconAlignTop class="icon" /> Align Top</Button
+            ><IconAlignTop class="icon" /> {{ $t('mobile.toolbar.element.alignTop') }}</Button
           >
           <Button style="flex: 1" @click="alignElementToCanvas(ElementAlignCommands.VERTICAL)"
-            ><IconAlignHorizontally class="icon" /> Center Vertically</Button
+            ><IconAlignHorizontally class="icon" /> {{ $t('mobile.toolbar.element.centerVertically') }}</Button
           >
           <Button style="flex: 1" @click="alignElementToCanvas(ElementAlignCommands.BOTTOM)"
-            ><IconAlignBottom class="icon" /> Align Bottom</Button
+            ><IconAlignBottom class="icon" /> {{ $t('mobile.toolbar.element.alignBottom') }}</Button
           >
         </ButtonGroup>
       </div>
@@ -125,6 +129,8 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
+const { t } = useI18n();
 import { storeToRefs } from 'pinia';
 import { useMainStore, useSlidesStore } from '@/store';
 import type { PPTElement, TableCell } from '@/types/slides';
@@ -180,8 +186,8 @@ const updateElement = (id: string, props: Partial<PPTElement>) => {
 };
 
 const tabs: TabItem[] = [
-  { key: 'style', label: 'Style' },
-  { key: 'common', label: 'Layout' },
+  { key: 'style', label: t('mobile.toolbar.element.style') },
+  { key: 'common', label: t('mobile.toolbar.element.layout') },
 ];
 const activeTab = ref('common');
 

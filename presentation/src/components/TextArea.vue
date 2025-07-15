@@ -67,7 +67,7 @@ defineExpose({
   width: 100%;
   background-color: $background;
   border: 1px solid #d9d9d9;
-  border-radius: $borderRadius;
+  border-radius: $cardBorderRadius;
   padding: 10px;
   transition: border-color 0.25s;
   box-sizing: border-box;

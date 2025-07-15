@@ -52,33 +52,41 @@
         <div class="tool-btn page-number" @click="slideThumbnailModelVisible = true">
           Slide {{ slideIndex + 1 }} / {{ slides.length }}
         </div>
-        <IconWrite class="tool-btn" v-tooltip="'Pen Tool'" @click="writingBoardToolVisible = true" />
+        <IconWrite
+          class="tool-btn"
+          v-tooltip="t('presentation.controls.ui.penTool')"
+          @click="writingBoardToolVisible = true"
+        />
         <IconMagic
           class="tool-btn"
-          v-tooltip="'Laser Pen'"
+          v-tooltip="t('presentation.controls.laserPen')"
           :class="{ active: laserPen }"
           @click="laserPen = !laserPen"
         />
         <IconStopwatchStart
           class="tool-btn"
-          v-tooltip="'Timer'"
+          v-tooltip="t('presentation.controls.timer')"
           :class="{ active: timerlVisible }"
           @click="timerlVisible = !timerlVisible"
         />
-        <IconListView class="tool-btn" v-tooltip="'Presenter View'" @click="changeViewMode('presenter')" />
+        <IconListView
+          class="tool-btn"
+          v-tooltip="t('presentation.controls.presenterView')"
+          @click="changeViewMode('presenter')"
+        />
         <IconOffScreenOne
           class="tool-btn"
-          v-tooltip="'Exit Fullscreen'"
+          v-tooltip="t('presentation.controls.exitFullscreen')"
           v-if="fullscreenState"
           @click="manualExitFullscreen()"
         />
         <IconFullScreenOne
           class="tool-btn"
-          v-tooltip="'Enter Fullscreen'"
+          v-tooltip="t('presentation.controls.enterFullscreen')"
           v-else
           @click="enterFullscreen()"
         />
-        <IconPower class="tool-btn" v-tooltip="'End Presentation'" @click="exitScreening()" />
+        <IconPower class="tool-btn" v-tooltip="t('presentation.controls.endPresentation')" @click="exitScreening()" />
       </div>
     </div>
 
@@ -96,6 +104,7 @@ import useScreening from '@/hooks/useScreening';
 import useExecPlay from './hooks/useExecPlay';
 import useSlideSize from './hooks/useSlideSize';
 import useFullscreen from './hooks/useFullscreen';
+import { useI18n } from 'vue-i18n';
 
 import ScreenSlideList from './ScreenSlideList.vue';
 import SlideThumbnails from './SlideThumbnails.vue';
@@ -107,6 +116,7 @@ const props = defineProps<{
   changeViewMode: (mode: 'base' | 'presenter') => void;
 }>();
 
+const { t } = useI18n();
 const { slides, slideIndex } = storeToRefs(useSlidesStore());
 
 const {
@@ -143,30 +153,30 @@ const laserPen = ref(false);
 const contextmenus = (): ContextmenuItem[] => {
   return [
     {
-      text: 'Previous Page',
+      text: t('presentation.controls.navigation.previousPage'),
       subText: '↑ ←',
       disable: slideIndex.value <= 0,
       handler: () => turnPrevSlide(),
     },
     {
-      text: 'Next Page',
+      text: t('presentation.controls.navigation.nextPage'),
       subText: '↓ →',
       disable: slideIndex.value >= slides.value.length - 1,
       handler: () => turnNextSlide(),
     },
     {
-      text: 'First Page',
+      text: t('presentation.controls.navigation.firstPage'),
       disable: slideIndex.value === 0,
       handler: () => turnSlideToIndex(0),
     },
     {
-      text: 'Last Page',
+      text: t('presentation.controls.navigation.lastPage'),
       disable: slideIndex.value === slides.value.length - 1,
       handler: () => turnSlideToIndex(slides.value.length - 1),
     },
     { divider: true },
     {
-      text: autoPlayTimer.value ? 'Cancel Auto Play' : 'Auto Play',
+      text: autoPlayTimer.value ? t('presentation.controls.playback.cancelAutoPlay') : t('presentation.controls.playback.autoPlay'),
       handler: autoPlayTimer.value ? closeAutoPlay : autoPlay,
       children: [
         {
@@ -192,35 +202,35 @@ const contextmenus = (): ContextmenuItem[] => {
       ],
     },
     {
-      text: 'Loop Play',
+      text: t('presentation.controls.playback.loopPlay'),
       subText: loopPlay.value ? '√' : '',
       handler: () => setLoopPlay(!loopPlay.value),
     },
     { divider: true },
     {
-      text: 'Show Toolbar',
+      text: t('presentation.controls.ui.showToolbar'),
       handler: () => (rightToolsVisible.value = true),
     },
     {
-      text: 'View All Slides',
+      text: t('presentation.controls.ui.viewAllSlides'),
       handler: () => (slideThumbnailModelVisible.value = true),
     },
     {
-      text: 'Show Thumbnails at Bottom',
+      text: t('presentation.controls.ui.showThumbnailsAtBottom'),
       subText: bottomThumbnailsVisible.value ? '√' : '',
       handler: () => (bottomThumbnailsVisible.value = !bottomThumbnailsVisible.value),
     },
     {
-      text: 'Pen Tool',
+      text: t('presentation.controls.ui.penTool'),
       handler: () => (writingBoardToolVisible.value = true),
     },
     {
-      text: 'Presenter View',
+      text: t('presentation.controls.presenterView'),
       handler: () => props.changeViewMode('presenter'),
     },
     { divider: true },
     {
-      text: 'End Presentation',
+      text: t('presentation.controls.endPresentation'),
       subText: 'ESC',
       handler: exitScreening,
     },

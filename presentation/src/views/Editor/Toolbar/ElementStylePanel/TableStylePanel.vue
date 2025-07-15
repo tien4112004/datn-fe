@@ -5,7 +5,7 @@
         style="width: 50%"
         :value="textAttrs.fontname"
         search
-        searchLabel="Search Font"
+        :searchLabel="$t('styling.elements.table.searchFont')"
         @update:value="(value) => updateTextAttrs({ fontname: value as string })"
         :options="FONTS"
       >
@@ -17,7 +17,7 @@
         style="width: 50%"
         :value="textAttrs.fontsize"
         search
-        searchLabel="Search Font Size"
+        :searchLabel="$t('styling.elements.table.searchFontSize')"
         @update:value="(value) => updateTextAttrs({ fontsize: value as string })"
         :options="
           fontSizeOptions.map((item) => ({
@@ -40,7 +40,7 @@
             @update:modelValue="(value) => updateTextAttrs({ color: value })"
           />
         </template>
-        <TextColorButton first v-tooltip="'Text Color'" :color="textAttrs.color">
+        <TextColorButton first v-tooltip="$t('styling.elements.table.textColor')" :color="textAttrs.color">
           <IconText />
         </TextColorButton>
       </Popover>
@@ -51,7 +51,7 @@
             @update:modelValue="(value) => updateTextAttrs({ backcolor: value })"
           />
         </template>
-        <TextColorButton last v-tooltip="'Cell Fill'" :color="textAttrs.backcolor">
+        <TextColorButton last v-tooltip="$t('styling.elements.table.cellFill')" :color="textAttrs.backcolor">
           <IconFill />
         </TextColorButton>
       </Popover>
@@ -61,28 +61,28 @@
       <CheckboxButton
         style="flex: 1"
         :checked="textAttrs.bold"
-        v-tooltip="'Bold'"
+        v-tooltip="$t('styling.elements.table.bold')"
         @click="updateTextAttrs({ bold: !textAttrs.bold })"
         ><IconTextBold
       /></CheckboxButton>
       <CheckboxButton
         style="flex: 1"
         :checked="textAttrs.em"
-        v-tooltip="'Italic'"
+        v-tooltip="$t('styling.elements.table.italic')"
         @click="updateTextAttrs({ em: !textAttrs.em })"
         ><IconTextItalic
       /></CheckboxButton>
       <CheckboxButton
         style="flex: 1"
         :checked="textAttrs.underline"
-        v-tooltip="'Underline'"
+        v-tooltip="$t('styling.elements.table.underline')"
         @click="updateTextAttrs({ underline: !textAttrs.underline })"
         ><IconTextUnderline
       /></CheckboxButton>
       <CheckboxButton
         style="flex: 1"
         :checked="textAttrs.strikethrough"
-        v-tooltip="'Strikethrough'"
+        v-tooltip="$t('styling.elements.table.strikethrough')"
         @click="updateTextAttrs({ strikethrough: !textAttrs.strikethrough })"
         ><IconStrikethrough
       /></CheckboxButton>
@@ -94,14 +94,18 @@
       :value="textAttrs.align"
       @update:value="(value) => updateTextAttrs({ align: value as TextAlign })"
     >
-      <RadioButton value="left" v-tooltip="'Align Left'" style="flex: 1"><IconAlignTextLeft /></RadioButton>
-      <RadioButton value="center" v-tooltip="'Align Center'" style="flex: 1"
+      <RadioButton value="left" v-tooltip="$t('styling.elements.table.alignLeft')" style="flex: 1"
+        ><IconAlignTextLeft
+      /></RadioButton>
+      <RadioButton value="center" v-tooltip="$t('styling.elements.table.alignCenter')" style="flex: 1"
         ><IconAlignTextCenter
       /></RadioButton>
-      <RadioButton value="right" v-tooltip="'Align Right'" style="flex: 1"
+      <RadioButton value="right" v-tooltip="$t('styling.elements.table.alignRight')" style="flex: 1"
         ><IconAlignTextRight
       /></RadioButton>
-      <RadioButton value="justify" v-tooltip="'Justify'" style="flex: 1"><IconAlignTextBoth /></RadioButton>
+      <RadioButton value="justify" v-tooltip="$t('styling.elements.table.justify')" style="flex: 1"
+        ><IconAlignTextBoth
+      /></RadioButton>
     </RadioGroup>
 
     <Divider />
@@ -111,7 +115,7 @@
     <Divider />
 
     <div class="row">
-      <div style="width: 40%">Rows:</div>
+      <div style="width: 40%">{{ $t('styling.elements.table.rows') }}:</div>
       <div class="set-count" style="width: 60%">
         <Button class="btn" :disabled="rowCount <= 1" @click="setTableRow(rowCount - 1)"
           ><IconMinus
@@ -123,7 +127,7 @@
       </div>
     </div>
     <div class="row">
-      <div style="width: 40%">Columns:</div>
+      <div style="width: 40%">{{ $t('styling.elements.table.columns') }}:</div>
       <div class="set-count" style="width: 60%">
         <Button class="btn" :disabled="colCount <= 1" @click="setTableCol(colCount - 1)"
           ><IconMinus
@@ -138,7 +142,7 @@
     <Divider />
 
     <div class="row theme-switch">
-      <div style="width: 40%">Enable Themed Table:</div>
+      <div style="width: 40%">{{ $t('styling.elements.table.enableThemedTable') }}:</div>
       <div class="switch-wrapper" style="width: 60%">
         <Switch :value="hasTheme" @update:value="(value) => toggleTheme(value)" />
       </div>
@@ -150,13 +154,13 @@
           @update:value="(value) => updateTheme({ rowHeader: value })"
           :value="theme.rowHeader"
           style="flex: 1"
-          >Header Row</Checkbox
+          >{{ $t('styling.elements.table.headerRow') }}</Checkbox
         >
         <Checkbox
           @update:value="(value) => updateTheme({ rowFooter: value })"
           :value="theme.rowFooter"
           style="flex: 1"
-          >Summary Row</Checkbox
+          >{{ $t('styling.elements.table.summaryRow') }}</Checkbox
         >
       </div>
       <div class="row">
@@ -164,17 +168,17 @@
           @update:value="(value) => updateTheme({ colHeader: value })"
           :value="theme.colHeader"
           style="flex: 1"
-          >First Column</Checkbox
+          >{{ $t('styling.elements.table.firstColumn') }}</Checkbox
         >
         <Checkbox
           @update:value="(value) => updateTheme({ colFooter: value })"
           :value="theme.colFooter"
           style="flex: 1"
-          >Last Column</Checkbox
+          >{{ $t('styling.elements.table.lastColumn') }}</Checkbox
         >
       </div>
       <div class="row">
-        <div style="width: 40%">Theme Color:</div>
+        <div style="width: 40%">{{ $t('styling.elements.table.themeColor') }}:</div>
         <Popover trigger="click" style="width: 60%">
           <template #content>
             <ColorPicker
@@ -258,7 +262,7 @@ watch(
 
 const { addHistorySnapshot } = useHistorySnapshot();
 
-// 更新当前选中单元格的文本样式状态
+//  Update the text style state of the currently selected cell
 const updateTextAttrState = () => {
   if (!handleElement.value || handleElement.value.type !== 'table') return;
 
@@ -309,7 +313,7 @@ const updateElement = (props: Partial<PPTTableElement>) => {
   addHistorySnapshot();
 };
 
-// 设置单元格内容文本样式
+// Set the text style for cell content
 const updateTextAttrs = (textAttrProp: Partial<TableCellStyle>) => {
   const _handleElement = handleElement.value as PPTTableElement;
 
@@ -327,14 +331,14 @@ const updateTextAttrs = (textAttrProp: Partial<TableCellStyle>) => {
   updateTextAttrState();
 };
 
-// 更新表格主题：主题色、标题行、汇总行、第一列、最后一列
+// Update table theme: theme color, header row, summary row, first column, last column
 const updateTheme = (themeProp: Partial<TableTheme>) => {
   if (!theme.value) return;
   const _theme = { ...theme.value, ...themeProp };
   updateElement({ theme: _theme });
 };
 
-// 开启/关闭表格主题
+// Enable/disable table theme
 const toggleTheme = (checked: boolean) => {
   if (checked) {
     const props = {
@@ -353,7 +357,7 @@ const toggleTheme = (checked: boolean) => {
   }
 };
 
-// 设置表格行数
+//  Set number of table rows
 const setTableRow = (value: number) => {
   const _handleElement = handleElement.value as PPTTableElement;
   const rowCount = _handleElement.data.length;
@@ -377,7 +381,7 @@ const setTableRow = (value: number) => {
   }
 };
 
-// 设置表格列数
+// Set number of table columns
 const setTableCol = (value: number) => {
   const _handleElement = handleElement.value as PPTTableElement;
   const colCount = _handleElement.data[0].length;

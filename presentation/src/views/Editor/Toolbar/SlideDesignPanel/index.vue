@@ -1,15 +1,15 @@
 <template>
   <div class="slide-design-panel">
-    <div class="title title-panel">Background Fill</div>
+    <div class="title title-panel">{{ $t('styling.slide.design.background.backgroundFill') }}</div>
     <div class="row">
       <Select
         style="flex: 1"
         :value="background.type"
         @update:value="(value) => updateBackgroundType(value as 'gradient' | 'image' | 'solid')"
         :options="[
-          { label: 'Solid Fill', value: 'solid' },
-          { label: 'Image Fill', value: 'image' },
-          { label: 'Gradient Fill', value: 'gradient' },
+          { label: $t('styling.slide.design.background.solidFill'), value: 'solid' },
+          { label: $t('styling.slide.design.background.imageFill'), value: 'image' },
+          { label: $t('styling.slide.design.background.gradientFill'), value: 'gradient' },
         ]"
       />
       <div style="width: 10px"></div>
@@ -30,9 +30,9 @@
         @update:value="(value) => updateImageBackground({ size: value as SlideBackgroundImageSize })"
         v-else-if="background.type === 'image'"
         :options="[
-          { label: 'Scale', value: 'contain' },
-          { label: 'Tile', value: 'repeat' },
-          { label: 'Cover', value: 'cover' },
+          { label: $t('styling.slide.design.background.scale'), value: 'contain' },
+          { label: $t('styling.slide.design.background.tile'), value: 'repeat' },
+          { label: $t('styling.slide.design.background.cover'), value: 'cover' },
         ]"
       />
 
@@ -42,8 +42,8 @@
         @update:value="(value) => updateGradientBackground({ type: value as GradientType })"
         v-else
         :options="[
-          { label: 'Linear Gradient', value: 'linear' },
-          { label: 'Radial Gradient', value: 'radial' },
+          { label: $t('styling.slide.design.background.linearGradient'), value: 'linear' },
+          { label: $t('styling.slide.design.background.radialGradient'), value: 'radial' },
         ]"
       />
     </div>
@@ -68,7 +68,7 @@
         />
       </div>
       <div class="row">
-        <div style="width: 40%">Current Color Block:</div>
+        <div style="width: 40%">{{ $t('styling.slide.design.theme.currentColorBlock') }}</div>
         <Popover trigger="click" style="width: 60%">
           <template #content>
             <ColorPicker
@@ -80,7 +80,7 @@
         </Popover>
       </div>
       <div class="row" v-if="background.gradient?.type === 'linear'">
-        <div style="width: 40%">Gradient Angle:</div>
+        <div style="width: 40%">{{ $t('styling.slide.design.theme.gradientAngle') }}</div>
         <Slider
           :min="0"
           :max="360"
@@ -93,7 +93,9 @@
     </div>
 
     <div class="row">
-      <Button style="flex: 1" @click="applyBackgroundAllSlide()">Apply Background to All</Button>
+      <Button style="flex: 1" @click="applyBackgroundAllSlide()">{{
+        $t('styling.slide.design.background.applyBackgroundToAll')
+      }}</Button>
     </div>
 
     <Divider />
@@ -104,18 +106,18 @@
         :value="viewportRatio"
         @update:value="(value) => updateViewportRatio(value as number)"
         :options="[
-          { label: 'Widescreen 16:9', value: 0.5625 },
-          { label: 'Widescreen 16:10', value: 0.625 },
-          { label: 'Standard 4:3', value: 0.75 },
-          { label: 'Paper A3/A4', value: 0.70710678 },
-          { label: 'Portrait A3/A4', value: 1.41421356 },
+          { label: $t('styling.slide.design.aspectRatios.widescreen169'), value: 0.5625 },
+          { label: $t('styling.slide.design.aspectRatios.widescreen1610'), value: 0.625 },
+          { label: $t('styling.slide.design.aspectRatios.standard43'), value: 0.75 },
+          { label: $t('styling.slide.design.aspectRatios.paperA'), value: 0.70710678 },
+          { label: $t('styling.slide.design.aspectRatios.portraitA'), value: 1.41421356 },
         ]"
       />
     </div>
 
     <div class="row">
       <div class="canvas-size">
-        Canvas Size: {{ viewportSize }} ×
+        {{ $t('styling.slide.design.canvasSize') }} {{ viewportSize }} ×
         {{ toFixed(viewportSize * viewportRatio) }}
       </div>
     </div>
@@ -123,28 +125,28 @@
     <Divider />
 
     <div class="title">
-      <span class="title-panel">Main Theme</span>
+      <span class="title-panel">{{ $t('styling.slide.design.theme.mainTheme') }}</span>
       <span class="more" @click="moreThemeConfigsVisible = !moreThemeConfigsVisible">
         <span class="text">
-          {{ moreThemeConfigsVisible ? 'Hide' : 'More' }}
+          {{ moreThemeConfigsVisible ? $t('ui.actions.hide') : $t('ui.actions.more') }}
         </span>
         <IconDown v-if="moreThemeConfigsVisible" />
         <IconRight v-else />
       </span>
     </div>
     <div class="row">
-      <div style="width: 40%">Font:</div>
+      <div style="width: 40%">{{ $t('styling.slide.design.theme.font') }}</div>
       <Select
         style="width: 60%"
         :value="theme.fontName"
         search
-        searchLabel="Search Font"
+        :searchLabel="$t('styling.slide.design.theme.searchFont')"
         @update:value="(value) => updateTheme({ fontName: value as string })"
         :options="FONTS"
       />
     </div>
     <div class="row">
-      <div style="width: 40%">Font Color:</div>
+      <div style="width: 40%">{{ $t('styling.slide.design.theme.fontColor') }}</div>
       <Popover trigger="click" style="width: 60%">
         <template #content>
           <ColorPicker
@@ -156,7 +158,7 @@
       </Popover>
     </div>
     <div class="row">
-      <div style="width: 40%">Background Color:</div>
+      <div style="width: 40%">{{ $t('styling.slide.design.theme.backgroundColor') }}</div>
       <Popover trigger="click" style="width: 60%">
         <template #content>
           <ColorPicker
@@ -168,7 +170,7 @@
       </Popover>
     </div>
     <div class="row">
-      <div style="width: 40%">Theme Color:</div>
+      <div style="width: 40%">{{ $t('styling.slide.design.theme.themeColor') }}</div>
       <ColorListButton
         style="width: 60%"
         :colors="theme.themeColors"
@@ -178,7 +180,7 @@
 
     <template v-if="moreThemeConfigsVisible">
       <div class="row">
-        <div style="width: 40%">Border Style:</div>
+        <div style="width: 40%">{{ $t('styling.slide.design.style.borderStyle') }}</div>
         <SelectCustom style="width: 60%">
           <template #options>
             <div
@@ -196,7 +198,7 @@
         </SelectCustom>
       </div>
       <div class="row">
-        <div style="width: 40%">Border Color:</div>
+        <div style="width: 40%">{{ $t('styling.slide.design.style.borderColor') }}</div>
         <Popover trigger="click" style="width: 60%">
           <template #content>
             <ColorPicker
@@ -208,7 +210,7 @@
         </Popover>
       </div>
       <div class="row">
-        <div style="width: 40%">Border Width:</div>
+        <div style="width: 40%">{{ $t('styling.slide.design.style.borderWidth') }}</div>
         <NumberInput
           :value="theme.outline.width || 0"
           @update:value="(value) => updateTheme({ outline: { ...theme.outline, width: value } })"
@@ -216,7 +218,7 @@
         />
       </div>
       <div class="row" style="height: 30px">
-        <div style="width: 40%">Horizontal Shadow:</div>
+        <div style="width: 40%">{{ $t('styling.slide.design.style.horizontalShadow') }}</div>
         <Slider
           style="width: 60%"
           :min="-10"
@@ -227,7 +229,7 @@
         />
       </div>
       <div class="row" style="height: 30px">
-        <div style="width: 40%">Vertical Shadow:</div>
+        <div style="width: 40%">{{ $t('styling.slide.design.style.verticalShadow') }}</div>
         <Slider
           style="width: 60%"
           :min="-10"
@@ -238,7 +240,7 @@
         />
       </div>
       <div class="row" style="height: 30px">
-        <div style="width: 40%">Blur Distance:</div>
+        <div style="width: 40%">{{ $t('styling.slide.design.style.blurDistance') }}</div>
         <Slider
           style="width: 60%"
           :min="1"
@@ -249,7 +251,7 @@
         />
       </div>
       <div class="row">
-        <div style="width: 40%">Shadow Color:</div>
+        <div style="width: 40%">{{ $t('styling.slide.design.style.shadowColor') }}</div>
         <Popover trigger="click" style="width: 60%">
           <template #content>
             <ColorPicker
@@ -263,18 +265,20 @@
     </template>
 
     <div class="row">
-      <Button style="flex: 1" @click="applyThemeToAllSlides(moreThemeConfigsVisible)"
-        >Apply Theme to All</Button
-      >
+      <Button style="flex: 1" @click="applyThemeToAllSlides(moreThemeConfigsVisible)">{{
+        $t('styling.slide.design.applyThemeToAll')
+      }}</Button>
     </div>
 
     <div class="row">
-      <Button style="flex: 1" @click="themeStylesExtractVisible = true">Extract Theme from Slide</Button>
+      <Button style="flex: 1" @click="themeStylesExtractVisible = true">
+        {{ $t('styling.slide.design.extractThemeFromSlide') }}
+      </Button>
     </div>
 
     <Divider />
 
-    <div class="title title-panel">Preset Themes</div>
+    <div class="title title-panel">{{ $t('styling.slide.design.presetThemes') }}</div>
     <div class="theme-list">
       <div
         class="theme-item"
@@ -286,7 +290,7 @@
         }"
       >
         <div class="theme-item-content">
-          <div class="text" :style="{ color: item.fontColor }">Text Aa</div>
+          <div class="text" :style="{ color: item.fontColor }">{{ $t('styling.slide.design.textAa') }}</div>
           <div class="colors">
             <div
               class="color-block"
@@ -297,9 +301,15 @@
           </div>
 
           <div class="btns">
-            <Button type="primary" size="small" @click="applyPresetTheme(item)">Set</Button>
-            <Button type="primary" size="small" style="margin-top: 3px" @click="applyPresetTheme(item, true)"
-              >Set and Apply</Button
+            <Button type="primary" size="small" @click="applyPresetTheme(item)">{{
+              $t('styling.slide.design.set')
+            }}</Button>
+            <Button
+              type="primary"
+              size="small"
+              style="margin-top: 3px"
+              @click="applyPresetTheme(item, true)"
+              >{{ $t('styling.slide.design.setAndApply') }}</Button
             >
           </div>
         </div>
@@ -335,6 +345,7 @@ import { FONTS } from '@/configs/font';
 import useHistorySnapshot from '@/hooks/useHistorySnapshot';
 import useSlideTheme from '@/hooks/useSlideTheme';
 import { getImageDataURL } from '@/utils/image';
+import { useI18n } from 'vue-i18n';
 
 import ThemeStylesExtract from './ThemeStylesExtract.vue';
 import ThemeColorsSetting from './ThemeColorsSetting.vue';
@@ -374,12 +385,13 @@ const background = computed(() => {
 
 const { addHistorySnapshot } = useHistorySnapshot();
 const { applyPresetTheme, applyThemeToAllSlides } = useSlideTheme();
+const { t } = useI18n();
 
 watch(slideIndex, () => {
   currentGradientIndex.value = 0;
 });
 
-// 设置背景模式：纯色、图片、渐变色
+// Set background mode: solid color, image, gradient
 const updateBackgroundType = (type: SlideBackgroundType) => {
   if (type === 'solid') {
     const newBackground: SlideBackground = {
@@ -417,13 +429,13 @@ const updateBackgroundType = (type: SlideBackgroundType) => {
   addHistorySnapshot();
 };
 
-// 设置背景
+//  Set background
 const updateBackground = (props: Partial<SlideBackground>) => {
   slidesStore.updateSlide({ background: { ...background.value, ...props } });
   addHistorySnapshot();
 };
 
-// 设置渐变背景
+// Set gradient background
 const updateGradientBackground = (props: Partial<Gradient>) => {
   updateBackground({ gradient: { ...background.value.gradient!, ...props } });
 };
@@ -435,19 +447,19 @@ const updateGradientBackgroundColors = (color: string) => {
   updateGradientBackground({ colors });
 };
 
-// 设置图片背景
+// Set image background
 const updateImageBackground = (props: Partial<SlideBackgroundImage>) => {
   updateBackground({ image: { ...background.value.image!, ...props } });
 };
 
-// 上传背景图片
+// Upload background image
 const uploadBackgroundImage = (files: FileList) => {
   const imageFile = files[0];
   if (!imageFile) return;
   getImageDataURL(imageFile).then((dataURL) => updateImageBackground({ src: dataURL }));
 };
 
-// 应用当前页背景到全部页面
+// Apply current page background to all pages
 const applyBackgroundAllSlide = () => {
   const newSlides = slides.value.map((slide) => {
     return {
@@ -459,12 +471,12 @@ const applyBackgroundAllSlide = () => {
   addHistorySnapshot();
 };
 
-// 设置主题
+// Set theme
 const updateTheme = (themeProps: Partial<SlideTheme>) => {
   slidesStore.setTheme(themeProps);
 };
 
-// 设置画布尺寸（宽高比例）
+// Set canvas size (aspect ratio)
 const updateViewportRatio = (value: number) => {
   slidesStore.setViewportRatio(value);
 };

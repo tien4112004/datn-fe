@@ -13,60 +13,61 @@
     </div>
     <div class="configs">
       <div class="row">
-        <div class="title">Export Format:</div>
+        <div class="title">{{ $t('files.export.image.exportFormat') }}</div>
         <RadioGroup class="config-item" v-model:value="format">
           <RadioButton style="width: 50%" value="jpeg">JPEG</RadioButton>
           <RadioButton style="width: 50%" value="png">PNG</RadioButton>
         </RadioGroup>
       </div>
       <div class="row">
-        <div class="title">Export Range:</div>
+        <div class="title">{{ $t('files.export.common.exportRange') }}</div>
         <RadioGroup class="config-item" v-model:value="rangeType">
-          <RadioButton style="width: 33.33%" value="all">All</RadioButton>
-          <RadioButton style="width: 33.33%" value="current">Current Page</RadioButton>
-          <RadioButton style="width: 33.33%" value="custom">Custom</RadioButton>
+          <RadioButton style="width: 33.33%" value="all">{{ $t('files.export.common.all') }}</RadioButton>
+          <RadioButton style="width: 33.33%" value="current">{{
+            $t('files.export.common.currentPage')
+          }}</RadioButton>
+          <RadioButton style="width: 33.33%" value="custom">{{
+            $t('files.export.common.custom')
+          }}</RadioButton>
         </RadioGroup>
       </div>
       <div class="row" v-if="rangeType === 'custom'">
         <div class="title" :data-range="`（${range[0]} ~ ${range[1]}）`">
-          Custom Range: ({{ range[0] }} ~ {{ range[1] }})
+          {{ $t('exportDialog.common.customRange', { min: range[0], max: range[1] }) }}
         </div>
         <Slider class="config-item" range :min="1" :max="slides.length" :step="1" v-model:value="range" />
       </div>
 
       <div class="row">
-        <div class="title">Image Quality:</div>
+        <div class="title">{{ $t('files.export.image.imageQuality') }}</div>
         <Slider class="config-item" :min="0" :max="1" :step="0.1" v-model:value="quality" />
       </div>
 
       <div class="row">
-        <div class="title">Ignore Online Fonts:</div>
+        <div class="title">{{ $t('files.export.image.ignoreOnlineFonts') }}</div>
         <div class="config-item">
           <Switch
             v-model:value="ignoreWebfont"
-            v-tooltip="
-              `By default, online
-          fonts are ignored during export. If you have used online fonts in your
-          slides and wish to retain the styles after export, you can disable the
-          \'Ignore Online Fonts\' option. Note that this will increase export
-          time.`
-            "
+            v-tooltip="t('files.export.image.ignoreOnlineFontsTooltip')"
           />
         </div>
       </div>
     </div>
 
     <div class="btns">
-      <Button class="btn export" type="primary" @click="expImage()">Export Image</Button>
-      <Button class="btn close" @click="emit('close')">Close</Button>
+      <Button class="btn export" type="primary" @click="expImage()">{{
+        $t('files.export.image.exportImage')
+      }}</Button>
+      <Button class="btn close" @click="emit('close')">{{ $t('files.export.common.close') }}</Button>
     </div>
 
-    <FullscreenSpin :loading="exporting" tip="Exporting..." />
+    <FullscreenSpin :loading="exporting" :tip="t('files.export.common.exporting')" />
   </div>
 </template>
 
 <script lang="ts" setup>
 import { computed, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { storeToRefs } from 'pinia';
 import { useSlidesStore } from '@/store';
 import useExport from '@/hooks/useExport';
@@ -78,6 +79,8 @@ import Slider from '@/components/Slider.vue';
 import Button from '@/components/Button.vue';
 import RadioButton from '@/components/RadioButton.vue';
 import RadioGroup from '@/components/RadioGroup.vue';
+
+const { t } = useI18n();
 
 const emit = defineEmits<{
   (event: 'close'): void;

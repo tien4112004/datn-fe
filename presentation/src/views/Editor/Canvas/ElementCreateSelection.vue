@@ -6,7 +6,7 @@
     @contextmenu.stop.prevent
   >
     <div :class="['selection', creatingElement?.type]" v-if="start && end" :style="position">
-      <!-- 绘制线条专用 -->
+      <!-- For drawing lines only -->
       <svg
         v-if="creatingElement?.type === 'line' && lineData"
         overflow="visible"
@@ -62,18 +62,18 @@ const createSelection = (e: MouseEvent) => {
     let currentPageX = e.pageX;
     let currentPageY = e.pageY;
 
-    // 按住Ctrl键或者Shift键时：
-    // 对于非线条元素需要锁定宽高比例，对于线条元素需要锁定水平或垂直方向
+    // When holding Ctrl or Shift:
+    // Lock aspect ratio for non-line elements; lock horizontal or vertical direction for lines
     if (ctrlOrShiftKeyActive.value) {
       const moveX = currentPageX - startPageX;
       const moveY = currentPageY - startPageY;
 
-      // 水平和垂直方向的拖动距离，后面以拖动距离较大的方向为基础计算另一方向的数据
+      // Track horizontal and vertical drag distances; use the larger one as the base to compute the other
       const absX = Math.abs(moveX);
       const absY = Math.abs(moveY);
 
       if (creatingElement.value.type === 'shape') {
-        // 判断是否为反向拖动：从左上到右下为正向操作，此外所有情况都是反向操作
+        //  Determine reverse dragging: top-left to bottom-right is forward, all other directions are reverse
         const isOpposite = (moveY > 0 && moveX < 0) || (moveY < 0 && moveX > 0);
 
         if (absX > absY) {

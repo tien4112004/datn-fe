@@ -62,7 +62,7 @@
 
     <div class="btns">
       <div class="left">
-        Chart Type: {{ CHART_TYPE_MAP[chartType] }}
+        {{ $t('toolbar.charts.type') }}: {{ CHART_TYPE_MAP[chartType] }}
         <Popover trigger="click" placement="top" v-model:value="chartTypeSelectVisible">
           <template #content>
             <PopoverMenuItem
@@ -76,13 +76,15 @@
               >{{ CHART_TYPE_MAP[item] }}</PopoverMenuItem
             >
           </template>
-          <span class="change">Click to Change</span>
+          <span class="change">{{ $t('toolbar.charts.editor.clickToChange') }}</span>
         </Popover>
       </div>
       <div class="right">
-        <Button class="btn" @click="closeEditor()">Cancel</Button>
-        <Button class="btn" @click="clear()">Clear Data</Button>
-        <Button type="primary" class="btn" @click="getTableData()">Confirm</Button>
+        <Button class="btn" @click="closeEditor()">{{ $t('toolbar.charts.editor.cancel') }}</Button>
+        <Button class="btn" @click="clear()">{{ $t('toolbar.charts.editor.clearData') }}</Button>
+        <Button type="primary" class="btn" @click="getTableData()">{{
+          $t('toolbar.charts.editor.confirm')
+        }}</Button>
       </div>
     </div>
   </div>
@@ -92,7 +94,7 @@
 import { computed, onMounted, onUnmounted, ref } from 'vue';
 import type { ChartData, ChartType } from '@/types/slides';
 import { KEYS } from '@/configs/hotkey';
-import { CHART_TYPE_MAP } from '@/configs/chart';
+import { getChartTypeMap } from '@/configs/chart';
 import {
   pasteCustomClipboardString,
   pasteExcelClipboardString,
@@ -101,6 +103,8 @@ import {
 import Button from '@/components/Button.vue';
 import Popover from '@/components/Popover.vue';
 import PopoverMenuItem from '@/components/PopoverMenuItem.vue';
+
+const CHART_TYPE_MAP = getChartTypeMap();
 
 const props = defineProps<{
   type: ChartType;
@@ -129,7 +133,7 @@ const tempRangeSize = ref({ width: 0, height: 0 });
 const focusCell = ref<[number, number] | null>(null);
 const chartType = ref<ChartType>('bar');
 
-// 当前选区的边框线条位置
+// Border line position of the current selection
 const rangeLines = computed(() => {
   const width = selectedRange.value[0] * CELL_WIDTH;
   const height = selectedRange.value[1] * CELL_HEIGHT;
@@ -141,14 +145,14 @@ const rangeLines = computed(() => {
   ];
 });
 
-// 当前选区的缩放点位置
+// Resize handle position of the current selection
 const resizablePointStyle = computed(() => {
   const width = selectedRange.value[0] * CELL_WIDTH;
   const height = selectedRange.value[1] * CELL_HEIGHT;
   return { left: width + 'px', top: height + 'px' };
 });
 
-// 初始化图表数据：将数据格式化并填充到DOM
+// Initialize chart data: format the data and inject it into the DOM
 const initData = () => {
   chartType.value = props.type;
 
@@ -180,7 +184,7 @@ const initData = () => {
 
 onMounted(initData);
 
-// 快捷键监听：回车移动焦点到下一行
+// Shortcut key listener: pressing Enter moves focus to the next row
 const moveNextRow = () => {
   if (!focusCell.value) return;
 
@@ -201,7 +205,7 @@ onUnmounted(() => {
   document.removeEventListener('keydown', keyboardListener);
 });
 
-// 获取当前图表DOM中的数据，整理格式化后传递出去
+// Get the current chart data from the DOM, format it, and pass it out
 // First row is series name, first column is item name, actual data starts from the second row and second column
 // Some special chart types require separate data handling
 // Scatter charts have only two columns of data
@@ -239,8 +243,8 @@ const getTableData = () => {
     series.push(seriesItem);
   }
 
-  // 一些特殊图表类型，数据需要单独处理
-  // 散点图有且只有两列数据
+  // Some special chart types require separate data handling
+  //  A scatter plot must have exactly two columns of data
   if (chartType.value === 'scatter') {
     if (legends.length > 2) {
       legends = legends.slice(0, 2);
@@ -251,7 +255,7 @@ const getTableData = () => {
       series.push(series[0]);
     }
   }
-  // 饼图和环形图只有一列数据
+  // Pie and donut charts have only one column of data
   if (chartType.value === 'ring' || chartType.value === 'pie') {
     if (legends.length > 1) {
       legends = legends.slice(0, 1);
@@ -262,7 +266,7 @@ const getTableData = () => {
   emit('save', { data: { labels, legends, series }, type: chartType.value });
 };
 
-// 清空表格数据
+// Clear table data
 const clear = () => {
   for (let rowIndex = 1; rowIndex < 31; rowIndex++) {
     for (let colIndex = 1; colIndex < 7; colIndex++) {
@@ -285,7 +289,7 @@ const fillTableData = (data: string[][], rowIndex: number, colIndex: number) => 
   }
 };
 
-// 自定义粘贴事件（尝试读取剪贴板中的表格数据）
+// Custom paste event (try to read table data from the clipboard)
 const handlePaste = (e: ClipboardEvent, rowIndex: number, colIndex: number) => {
   e.preventDefault();
 
@@ -316,10 +320,10 @@ const handlePaste = (e: ClipboardEvent, rowIndex: number, colIndex: number) => {
   }
 };
 
-// 关闭图表数据编辑器
+// Close the chart data editor
 const closeEditor = () => emit('close');
 
-// 鼠标拖拽修改选中的数据范围
+// Modify the selected data range via mouse drag
 const changeSelectRange = (e: MouseEvent) => {
   let isMouseDown = true;
 
@@ -354,7 +358,8 @@ const changeSelectRange = (e: MouseEvent) => {
 
     if (startPageX === endPageX && startPageY === endPageY) return;
 
-    // 拖拽结束时，范围超过格子一半自动扩大到下一格（如拖动到一格半多的位置，会自动扩展到两格，横竖都同理）
+    // After dragging ends, if the range exceeds half a cell, it automatically extends to the next cell
+    // (e.g., dragging beyond 1.5 cells expands to 2 cells — applies both horizontally and vertically)
     let width = tempRangeSize.value.width;
     let height = tempRangeSize.value.height;
     if (width % CELL_WIDTH > CELL_WIDTH * 0.5) width = width + (CELL_WIDTH - (width % CELL_WIDTH));

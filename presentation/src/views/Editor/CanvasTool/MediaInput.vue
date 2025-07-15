@@ -3,18 +3,32 @@
     <Tabs :tabs="tabs" v-model:value="type" :tabsStyle="{ marginBottom: '15px' }" />
 
     <template v-if="type === 'video'">
-      <Input v-model:value="videoSrc" placeholder="Please enter video URL, e.g. https://xxx.mp4"></Input>
+      <Input
+        v-model:value="videoSrc"
+        :placeholder="t('toolbar.media.input.videoPlaceholder')"
+      ></Input>
       <div class="btns">
-        <Button @click="emit('close')" style="margin-right: 10px">Cancel</Button>
-        <Button type="primary" @click="insertVideo()">Confirm</Button>
+        <Button @click="emit('close')" style="margin-right: 10px">{{
+          $t('ui.actions.cancel')
+        }}</Button>
+        <Button type="primary" @click="insertVideo()">{{
+          $t('ui.actions.confirm')
+        }}</Button>
       </div>
     </template>
 
     <template v-if="type === 'audio'">
-      <Input v-model:value="audioSrc" placeholder="Please enter audio URL, e.g. https://xxx.mp3"></Input>
+      <Input
+        v-model:value="audioSrc"
+        :placeholder="t('toolbar.media.input.audioPlaceholder')"
+      ></Input>
       <div class="btns">
-        <Button @click="emit('close')" style="margin-right: 10px">Cancel</Button>
-        <Button type="primary" @click="insertAudio()">Confirm</Button>
+        <Button @click="emit('close')" style="margin-right: 10px">{{
+          $t('ui.actions.cancel')
+        }}</Button>
+        <Button type="primary" @click="insertAudio()">{{
+          $t('ui.actions.confirm')
+        }}</Button>
       </div>
     </template>
   </div>
@@ -22,10 +36,13 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import message from '@/utils/message';
 import Tabs from '@/components/Tabs.vue';
 import Input from '@/components/Input.vue';
 import Button from '@/components/Button.vue';
+
+const { t } = useI18n();
 
 type TypeKey = 'video' | 'audio';
 interface TabItem {
@@ -47,17 +64,17 @@ const videoSrc = ref(
 const audioSrc = ref('https://freesound.org/data/previews/614/614107_11861866-lq.mp3');
 
 const tabs: TabItem[] = [
-  { key: 'video', label: 'Video' },
-  { key: 'audio', label: 'Audio' },
+  { key: 'video', label: t('toolbar.media.input.video') },
+  { key: 'audio', label: t('toolbar.media.input.audio') },
 ];
 
 const insertVideo = () => {
-  if (!videoSrc.value) return message.error('Please enter a valid video URL first');
+  if (!videoSrc.value) return message.error(t('toolbar.media.input.invalidVideoUrl'));
   emit('insertVideo', videoSrc.value);
 };
 
 const insertAudio = () => {
-  if (!audioSrc.value) return message.error('Please enter a valid audio URL first');
+  if (!audioSrc.value) return message.error(t('toolbar.media.input.invalidAudioUrl'));
   emit('insertAudio', audioSrc.value);
 };
 </script>

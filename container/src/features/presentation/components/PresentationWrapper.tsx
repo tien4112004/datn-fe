@@ -27,7 +27,7 @@ const PresentationWrapper = () => {
   // vue-remote must match the style's name in presentation/src/assets/styles/scope.scss
   return (
     <>
-      <div className="vue-remote" ref={containerRef} />;
+      <div className="vue-remote" ref={containerRef} />
       {isLoading && <GlobalSpinner text="Loading presentation editor..." />}
     </>
   );

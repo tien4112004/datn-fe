@@ -13,6 +13,7 @@ import type { AIPPTSlide } from '@/types/AIPPT';
 import { useSlidesStore } from '@/store';
 import useAddSlidesOrElements from './useAddSlidesOrElements';
 import useSlideHandler from './useSlideHandler';
+import { useI18n } from 'vue-i18n';
 
 interface ImgPoolItem {
   id: string;
@@ -25,6 +26,7 @@ export default () => {
   const slidesStore = useSlidesStore();
   const { addSlidesFromData } = useAddSlidesOrElements();
   const { isEmptySlide } = useSlideHandler();
+  const { t } = useI18n();
 
   const imgPool = ref<ImgPoolItem[]>([]);
   const transitionIndex = ref(0);
@@ -41,7 +43,6 @@ export default () => {
   // Get usable templates
   const getUseableTemplates = (templates: Slide[], n: number, type: TextType) => {
     if (n === 1) {
-      console.log('getUseableTemplates', templates, n, type);
       const list = templates.filter((slide) => {
         const items = slide.elements.filter((el) => checkTextType(el, type));
         const titles = slide.elements.filter((el) => checkTextType(el, 'title'));
@@ -79,8 +80,6 @@ export default () => {
       const targetLen = target!.elements.filter((el) => checkTextType(el, type)).length;
       return len === targetLen;
     });
-
-    console.log('getUseableTemplates', templates, n, type, res);
 
     return res;
   };
@@ -126,7 +125,7 @@ export default () => {
 
     const defaultInfo = {
       fontSize: 16,
-      fontFamily: 'Microsoft Yahei',
+      fontFamily: t('system.ai.microsoftYahei'),
     };
 
     const fontSizeMatch = htmlString.match(fontSizeRegex);

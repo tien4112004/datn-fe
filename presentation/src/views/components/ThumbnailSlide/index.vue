@@ -23,7 +23,7 @@
         :elementIndex="index + 1"
       />
     </div>
-    <div class="placeholder" v-else>Loading ...</div>
+    <div class="placeholder" v-else>{{ $t('elements.media.thumbnails.loading') }}</div>
   </div>
 </template>
 

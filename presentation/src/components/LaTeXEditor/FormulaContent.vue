@@ -4,7 +4,7 @@
     overflow="visible"
     :width="box.w + 32"
     :height="box.h + 32"
-    stroke="$foreground"
+    stroke="#000"
     stroke-width="1"
     fill="none"
     stroke-linecap="round"

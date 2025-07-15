@@ -2,43 +2,38 @@
   <div class="export-pptx-dialog">
     <div class="configs">
       <div class="row">
-        <div class="title">Export Range:</div>
+        <div class="title">{{ $t('files.export.common.exportRange') }}</div>
         <RadioGroup class="config-item" v-model:value="rangeType">
-          <RadioButton style="width: 33.33%" value="all">All</RadioButton>
-          <RadioButton style="width: 33.33%" value="current">Current Page</RadioButton>
-          <RadioButton style="width: 33.33%" value="custom">Custom</RadioButton>
+          <RadioButton style="width: 33.33%" value="all">{{ $t('files.export.common.all') }}</RadioButton>
+          <RadioButton style="width: 33.33%" value="current">{{
+            $t('files.export.common.currentPage')
+          }}</RadioButton>
+          <RadioButton style="width: 33.33%" value="custom">{{
+            $t('files.export.common.custom')
+          }}</RadioButton>
         </RadioGroup>
       </div>
       <div class="row" v-if="rangeType === 'custom'">
         <div class="title" :data-range="`（${range[0]} ~ ${range[1]}）`">
-          Custom Range ({{ range[0] }} ~ {{ range[1] }}):
+          {{ $t('exportDialog.common.customRange', { min: range[0], max: range[1] }) }}
         </div>
         <Slider class="config-item" range :min="1" :max="slides.length" :step="1" v-model:value="range" />
       </div>
       <div class="row">
-        <div class="title">Ignore Audio/Video:</div>
+        <div class="title">{{ $t('files.export.pptx.ignoreAudioVideo') }}</div>
         <div class="config-item">
-          <Switch
-            v-model:value="ignoreMedia"
-            v-tooltip="
-              `By default, audio and video are ignored during
-          export. If your slides contain audio or video elements and you want to include them in the exported
-          PPTX file, you can choose to disable the \'Ignore Audio/Video\' option. However, note that this will
-          significantly increase the export time.`
-            "
-          />
+          <Switch v-model:value="ignoreMedia" v-tooltip="t('files.export.pptx.ignoreAudioVideoTooltip')" />
         </div>
       </div>
       <div class="row">
-        <div class="title">Overwrite Default Master:</div>
+        <div class="title">{{ $t('files.export.pptx.overwriteDefaultMaster') }}</div>
         <div class="config-item">
           <Switch v-model:value="masterOverwrite" />
         </div>
       </div>
 
       <div class="tip" v-if="!ignoreMedia">
-        Note: 1. Supported export formats: avi, mp4, mov, wmv, mp3, wav; 2. Cross-origin resources cannot be
-        exported.
+        {{ $t('files.export.pptx.note') }}
       </div>
     </div>
     <div class="btns">
@@ -46,17 +41,18 @@
         class="btn export"
         type="primary"
         @click="exportPPTX(selectedSlides, masterOverwrite, ignoreMedia)"
-        >Export PPTX</Button
+        >{{ $t('files.export.pptx.exportPPTX') }}</Button
       >
-      <Button class="btn close" @click="emit('close')">Close</Button>
+      <Button class="btn close" @click="emit('close')">{{ $t('files.export.common.close') }}</Button>
     </div>
 
-    <FullscreenSpin :loading="exporting" tip="Exporting..." />
+    <FullscreenSpin :loading="exporting" :tip="t('files.export.common.exporting')" />
   </div>
 </template>
 
 <script lang="ts" setup>
 import { computed, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { storeToRefs } from 'pinia';
 import { useSlidesStore } from '@/store';
 import useExport from '@/hooks/useExport';
@@ -67,6 +63,8 @@ import Slider from '@/components/Slider.vue';
 import Button from '@/components/Button.vue';
 import RadioButton from '@/components/RadioButton.vue';
 import RadioGroup from '@/components/RadioGroup.vue';
+
+const { t } = useI18n();
 
 const emit = defineEmits<{
   (event: 'close'): void;

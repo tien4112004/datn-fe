@@ -32,14 +32,14 @@
           >
             <template #content>
               <div class="setting">
-                <div class="label">Stroke Width:</div>
+                <div class="label">{{ $t('presentation.writingBoard.strokeWidth') }}</div>
                 <Slider class="size-slider" :min="4" :max="10" :step="2" v-model:value="penSize" />
               </div>
             </template>
             <div
               class="btn"
               :class="{ active: writingBoardModel === 'pen' }"
-              v-tooltip="'Pen'"
+              v-tooltip="$t('presentation.writingBoard.pen')"
               @click="changeModel('pen')"
             >
               <IconWrite class="icon" />
@@ -71,14 +71,14 @@
                   />
                 </div>
                 <Divider type="vertical" />
-                <div class="label">Stroke Width:</div>
+                <div class="label">{{ $t('presentation.writingBoard.strokeWidth') }}</div>
                 <Slider class="size-slider" :min="2" :max="8" :step="2" v-model:value="shapeSize" />
               </div>
             </template>
             <div
               class="btn"
               :class="{ active: writingBoardModel === 'shape' }"
-              v-tooltip="'Shape'"
+              v-tooltip="$t('presentation.writingBoard.shape')"
               @click="changeModel('shape')"
             >
               <IconGraphicDesign class="icon" />
@@ -92,14 +92,14 @@
           >
             <template #content>
               <div class="setting">
-                <div class="label">Stroke Width:</div>
+                <div class="label">{{ $t('presentation.writingBoard.strokeWidth') }}</div>
                 <Slider class="size-slider" :min="16" :max="40" :step="4" v-model:value="markSize" />
               </div>
             </template>
             <div
               class="btn"
               :class="{ active: writingBoardModel === 'mark' }"
-              v-tooltip="'Highlighter'"
+              v-tooltip="$t('presentation.writingBoard.highlighter')"
               @click="changeModel('mark')"
             >
               <IconHighLight class="icon" />
@@ -113,26 +113,26 @@
           >
             <template #content>
               <div class="setting">
-                <div class="label">Eraser Size:</div>
+                <div class="label">{{ $t('presentation.writingBoard.eraserSize') }}</div>
                 <Slider class="size-slider" :min="20" :max="200" :step="20" v-model:value="rubberSize" />
               </div>
             </template>
             <div
               class="btn"
               :class="{ active: writingBoardModel === 'eraser' }"
-              v-tooltip="'Eraser'"
+              v-tooltip="$t('presentation.writingBoard.eraser')"
               @click="changeModel('eraser')"
             >
               <IconErase class="icon" />
             </div>
           </Popover>
-          <div class="btn" v-tooltip="'Clear Ink'" @click="clearCanvas()">
+          <div class="btn" v-tooltip="$t('presentation.writingBoard.clearInk')" @click="clearCanvas()">
             <IconClear class="icon" />
           </div>
           <div
             class="btn"
             :class="{ active: blackboard }"
-            v-tooltip="'Blackboard'"
+            v-tooltip="$t('presentation.writingBoard.blackboard')"
             @click="blackboard = !blackboard"
           >
             <IconFill class="icon" />
@@ -151,7 +151,7 @@
             ></div>
           </div>
         </div>
-        <div class="btn close" v-tooltip="'Close Pen Tool'" @click="closeWritingBoard()">
+        <div class="btn close" v-tooltip="$t('presentation.writingBoard.closePenTool')" @click="closeWritingBoard()">
           <IconClose class="icon" />
         </div>
       </div>

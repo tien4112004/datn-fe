@@ -5,13 +5,13 @@
     <ElementFlip />
 
     <ButtonGroup class="row" passive>
-      <Button first style="width: calc(100% / 6 * 5)" @click="clipImage()"
-        ><IconTailoring class="btn-icon" /> Crop Image</Button
-      >
+      <Button first style="width: calc(100% / 6 * 5)" @click="clipImage()">
+        <IconTailoring class="btn-icon" /> {{ t('styling.elements.image.cropImage') }}
+      </Button>
       <Popover trigger="click" v-model:value="clipPanelVisible" style="width: calc(100% / 6)">
         <template #content>
           <div class="clip">
-            <div class="title">By Shape:</div>
+            <div class="title">{{ t('styling.elements.image.byShape') }}:</div>
             <div class="shape-clip">
               <div
                 class="shape-clip-item"
@@ -24,15 +24,18 @@
             </div>
 
             <template v-for="typeItem in ratioClipOptions" :key="typeItem.label">
-              <div class="title" v-if="typeItem.label">By {{ typeItem.label }}:</div>
+              <div class="title" v-if="typeItem.label">
+                {{ t('styling.elements.image.by') }} {{ typeItem.label }}:
+              </div>
               <ButtonGroup class="row">
                 <Button
                   style="flex: 1"
                   v-for="item in typeItem.children"
                   :key="item.key"
                   @click="presetImageClip('rect', item.ratio)"
-                  >{{ item.key }}</Button
                 >
+                  {{ item.key }}
+                </Button>
               </ButtonGroup>
             </template>
           </div>
@@ -42,7 +45,7 @@
     </ButtonGroup>
 
     <div class="row">
-      <div style="width: 40%">Border Radius:</div>
+      <div style="width: 40%">{{ t('styling.elements.image.borderRadius') }}:</div>
       <NumberInput
         :value="handleImageElement.radius || 0"
         @update:value="(value) => updateImage({ radius: value })"
@@ -61,21 +64,28 @@
     <Divider />
 
     <FileInput @change="(files) => replaceImage(files)">
-      <Button class="full-width-btn"><IconTransform class="btn-icon" /> Replace Image</Button>
+      <Button class="full-width-btn"
+        ><IconTransform class="btn-icon" /> {{ t('styling.elements.image.replaceImage') }}</Button
+      >
     </FileInput>
-    <Button class="full-width-btn" @click="resetImage()"><IconUndo class="btn-icon" /> Reset Style</Button>
-    <Button class="full-width-btn" @click="setBackgroundImage()"
-      ><IconTheme class="btn-icon" /> Set as Background</Button
-    >
+    <Button class="full-width-btn" @click="resetImage()">
+      <IconUndo class="btn-icon" /> {{ t('styling.elements.image.resetStyle') }}
+    </Button>
+    <Button class="full-width-btn" @click="setBackgroundImage()">
+      <IconTheme class="btn-icon" /> {{ t('styling.elements.image.setAsBackground') }}
+    </Button>
   </div>
 </template>
 
 <script lang="ts" setup>
+import { useI18n } from 'vue-i18n';
+const { t } = useI18n();
+
 import { type Ref, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useMainStore, useSlidesStore } from '@/store';
 import type { PPTImageElement, SlideBackground } from '@/types/slides';
-import { CLIPPATHS } from '@/configs/imageClip';
+import { getClipPaths } from '@/configs/imageClip';
 import { getImageDataURL, getImageSize } from '@/utils/image';
 import useHistorySnapshot from '@/hooks/useHistorySnapshot';
 
@@ -90,6 +100,8 @@ import Button from '@/components/Button.vue';
 import ButtonGroup from '@/components/ButtonGroup.vue';
 import Popover from '@/components/Popover.vue';
 import NumberInput from '@/components/NumberInput.vue';
+
+const CLIPPATHS = getClipPaths();
 
 const shapeClipPathOptions = CLIPPATHS;
 const ratioClipOptions = [

@@ -1,0 +1,201 @@
+export default {
+  // Thư viện nội dung
+  content: {
+    // Hình dạng
+    shapes: {
+      categories: {
+        common: 'Hình dạng phổ biến',
+        rectangle: 'Hình chữ nhật',
+        arrow: 'Mũi tên',
+        other: 'Hình dạng khác',
+        series: 'Chuỗi',
+      },
+    },
+
+    // Ký hiệu
+    symbols: {
+      categories: {
+        letter: 'Chữ cái',
+        number: 'Số',
+        math: 'Toán học',
+        arrow: 'Mũi tên',
+        shape: 'Hình dạng',
+      },
+    },
+
+    // Đường thẳng
+    lines: {
+      types: {
+        straightLine: 'Đường thẳng',
+        brokenLine: 'Đường gấp khúc, Đường cong',
+      },
+    },
+
+    // LaTeX
+    latex: {
+      categories: {
+        math: 'Toán học',
+        group: 'Nhóm',
+        function: 'Hàm số',
+        greekLetter: 'Chữ Hy Lạp',
+      },
+    },
+
+    // Cắt ảnh
+    imageClip: {
+      shapes: {
+        rectangle: 'Hình chữ nhật',
+        rectangle2: 'Hình chữ nhật 2',
+        roundedRectangle: 'Hình chữ nhật bo góc',
+        circle: 'Hình tròn',
+        triangle: 'Hình tam giác',
+        rhombus: 'Hình thoi',
+        pentagon: 'Hình ngũ giác',
+        hexagon: 'Hình lục giác',
+        heptagon: 'Hình thất giác',
+        octagon: 'Hình bát giác',
+        chevron: 'Hình chữ V',
+        point: 'Hình chóp nhọn',
+        arrow: 'Mũi tên',
+        parallelogram: 'Hình bình hành',
+        parallelogram2: 'Hình bình hành 2',
+        trapezoid: 'Hình thang',
+        trapezoid2: 'Hình thang 2',
+      },
+    },
+    // Hiệu ứng
+    animations: {
+      // Hiệu ứng xuất hiện
+      entrance: {
+        bounce: 'Bật',
+        bounceIn: 'Bật vào',
+        bounceInRight: 'Bật vào từ bên phải',
+        bounceInLeft: 'Bật vào từ bên trái',
+        bounceInUp: 'Bật vào từ dưới',
+        bounceInDown: 'Bật vào từ trên',
+        fadeIn: 'Xuất hiện mờ dần',
+        fadeInDown: 'Xuất hiện mờ dần từ trên',
+        fadeInDownBig: 'Xuất hiện mờ dần từ trên (lớn)',
+        fadeInRight: 'Xuất hiện mờ dần từ bên phải',
+        fadeInRightBig: 'Xuất hiện mờ dần từ bên phải (lớn)',
+        fadeInLeft: 'Xuất hiện mờ dần từ bên trái',
+        fadeInLeftBig: 'Xuất hiện mờ dần từ bên trái (lớn)',
+        fadeInUp: 'Xuất hiện mờ dần từ dưới',
+        fadeInUpBig: 'Xuất hiện mờ dần từ dưới (lớn)',
+        fadeInTopLeft: 'Xuất hiện mờ dần từ góc trên trái',
+        fadeInTopRight: 'Xuất hiện mờ dần từ góc trên phải',
+        fadeInBottomLeft: 'Xuất hiện mờ dần từ góc dưới trái',
+        fadeInBottomRight: 'Xuất hiện mờ dần từ góc dưới phải',
+        rotateIn: 'Xoay vào',
+        rotateInDownLeft: 'Xoay vào từ góc dưới trái',
+        rotateInDownRight: 'Xoay vào từ góc dưới phải',
+        rotateInUpLeft: 'Xoay vào từ góc trên trái',
+        rotateInUpRight: 'Xoay vào từ góc trên phải',
+        zoomIn: 'Phóng to vào',
+        zoomInDown: 'Phóng to vào từ trên',
+        zoomInLeft: 'Phóng to vào từ bên trái',
+        zoomInRight: 'Phóng to vào từ bên phải',
+        zoomInUp: 'Phóng to vào từ dưới',
+        slideIn: 'Trượt vào',
+        slideInDown: 'Trượt vào từ trên',
+        slideInLeft: 'Trượt vào từ bên trái',
+        slideInRight: 'Trượt vào từ bên phải',
+        slideInUp: 'Trượt vào từ dưới',
+        flipIn: 'Lật vào',
+        flipInXAxis: 'Lật vào trục X',
+        flipInYAxis: 'Lật vào trục Y',
+        backZoomIn: 'Thu nhỏ rồi phóng to',
+        backZoomInDown: 'Thu nhỏ rồi phóng to từ trên',
+        backZoomInLeft: 'Thu nhỏ rồi phóng to từ bên trái',
+        backZoomInRight: 'Thu nhỏ rồi phóng to từ bên phải',
+        backZoomInUp: 'Thu nhỏ rồi phóng to từ dưới',
+        lightSpeedIn: 'Vào với tốc độ ánh sáng',
+        lightSpeedInRight: 'Vào với tốc độ ánh sáng từ bên phải',
+        lightSpeedInLeft: 'Vào với tốc độ ánh sáng từ bên trái',
+      },
+
+      // Hiệu ứng thoát
+      exit: {
+        bounceOut: 'Bật ra',
+        bounceOutLeft: 'Bật ra sang bên trái',
+        bounceOutRight: 'Bật ra sang bên phải',
+        bounceOutUp: 'Bật ra lên trên',
+        bounceOutDown: 'Bật ra xuống dưới',
+        fadeOut: 'Biến mất mờ dần',
+        fadeOutDown: 'Mờ dần xuống dưới',
+        fadeOutDownBig: 'Mờ dần xuống dưới (lớn)',
+        fadeOutLeft: 'Mờ dần sang trái',
+        fadeOutLeftBig: 'Mờ dần sang trái (lớn)',
+        fadeOutRight: 'Mờ dần sang phải',
+        fadeOutRightBig: 'Mờ dần sang phải (lớn)',
+        fadeOutUp: 'Mờ dần lên trên',
+        fadeOutUpBig: 'Mờ dần lên trên (lớn)',
+        fadeOutTopLeft: 'Mờ dần ở góc trên trái',
+        fadeOutTopRight: 'Mờ dần ở góc trên phải',
+        fadeOutBottomLeft: 'Mờ dần ở góc dưới trái',
+        fadeOutBottomRight: 'Mờ dần ở góc dưới phải',
+        rotateOut: 'Xoay ra',
+        rotateOutDownLeft: 'Xoay ra từ góc dưới trái',
+        rotateOutDownRight: 'Xoay ra từ góc dưới phải',
+        rotateOutUpLeft: 'Xoay ra từ góc trên trái',
+        rotateOutUpRight: 'Xoay ra từ góc trên phải',
+        zoomOut: 'Thu nhỏ ra',
+        zoomOutDown: 'Thu nhỏ xuống',
+        zoomOutLeft: 'Thu nhỏ sang trái',
+        zoomOutRight: 'Thu nhỏ sang phải',
+        zoomOutUp: 'Thu nhỏ lên',
+        slideOut: 'Trượt ra',
+        slideOutDown: 'Trượt xuống',
+        slideOutLeft: 'Trượt sang trái',
+        slideOutRight: 'Trượt sang phải',
+        slideOutUp: 'Trượt lên',
+        flipOut: 'Lật ra',
+        flipOutX: 'Lật ra trục X',
+        flipOutY: 'Lật ra trục Y',
+        backZoomOut: 'Phóng to rồi thu nhỏ',
+        backZoomOutDown: 'Phóng to rồi thu nhỏ xuống',
+        backZoomOutLeft: 'Phóng to rồi thu nhỏ sang trái',
+        backZoomOutRight: 'Phóng to rồi thu nhỏ sang phải',
+        backZoomOutUp: 'Phóng to rồi thu nhỏ lên',
+        lightSpeedOut: 'Ra với tốc độ ánh sáng',
+        lightSpeedOutRight: 'Ra với tốc độ ánh sáng sang phải',
+        lightSpeedOutLeft: 'Ra với tốc độ ánh sáng sang trái',
+      },
+
+      // Hiệu ứng nhấn mạnh
+      emphasis: {
+        shake: 'Lắc',
+        shakeLeftAndRight: 'Lắc trái phải',
+        shakeUpAndDown: 'Lắc lên xuống',
+        headShake: 'Lắc đầu',
+        swing: 'Đung đưa',
+        wobble: 'Lắc lư',
+        tada: 'Tada',
+        jello: 'Rung như thạch',
+        flash: 'Chớp',
+        pulse: 'Nhịp tim',
+        rubberBand: 'Co giãn',
+        heartBeatFast: 'Nhịp tim nhanh',
+      },
+
+      // Hiệu ứng chuyển trang
+      transitions: {
+        slideLeftAndRight: 'Trượt trái và phải',
+        slideLeftAndRight3D: 'Trượt trái và phải 3D',
+        slideUpAndDown3D: 'Trượt lên và xuống 3D',
+        slideUpAndDown: 'Trượt lên và xuống',
+        fadeInAndOut: 'Mờ dần vào và ra',
+        rotate: 'Xoay',
+        expandUpAndDown: 'Mở rộng lên và xuống',
+        expandLeftAndRight: 'Mở rộng trái và phải',
+      },
+
+      // Tùy chọn đặc biệt
+      special: {
+        other: 'Khác',
+        none: 'Không có',
+        random: 'Ngẫu nhiên',
+      },
+    },
+  },
+};

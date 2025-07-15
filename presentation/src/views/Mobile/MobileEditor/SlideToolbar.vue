@@ -3,28 +3,36 @@
     <div class="remark">
       <textarea
         :value="remark"
-        placeholder="Click to enter speaker notes"
+        :placeholder="$t('mobile.toolbar.slide.enterSpeakerNotes')"
         @input="($event) => handleInputMark($event)"
       ></textarea>
     </div>
     <div class="toolbar">
       <ButtonGroup class="row">
-        <Button style="flex: 1" @click="createSlide()"><IconPlus class="icon" /> New Slide</Button>
-        <Button style="flex: 1" @click="copyAndPasteSlide()"><IconCopy class="icon" /> Copy</Button>
-        <Button style="flex: 1" @click="deleteSlide()"><IconDelete class="icon" /> Delete</Button>
+        <Button style="flex: 1" @click="createSlide()"
+          ><IconPlus class="icon" /> {{ $t('mobile.toolbar.slide.newSlide') }}</Button
+        >
+        <Button style="flex: 1" @click="copyAndPasteSlide()"
+          ><IconCopy class="icon" /> {{ $t('mobile.toolbar.slide.copy') }}</Button
+        >
+        <Button style="flex: 1" @click="deleteSlide()"
+          ><IconDelete class="icon" /> {{ $t('mobile.toolbar.slide.delete') }}</Button
+        >
       </ButtonGroup>
       <ButtonGroup class="row">
-        <Button style="flex: 1" @click="insertTextElement()"><IconFontSize class="icon" /> Text</Button>
+        <Button style="flex: 1" @click="insertTextElement()"
+          ><IconFontSize class="icon" /> {{ $t('mobile.toolbar.slide.text') }}</Button
+        >
         <Button style="flex: 1">
           <FileInput @change="(files) => insertImageElement(files)">
             <IconPicture class="icon" />Image
           </FileInput>
         </Button>
         <Button style="flex: 1" @click="insertShapeElement('square')"
-          ><IconSquare class="icon" /> Rectangle</Button
+          ><IconSquare class="icon" /> {{ $t('mobile.toolbar.slide.rectangle') }}</Button
         >
         <Button style="flex: 1" @click="insertShapeElement('round')"
-          ><IconRound class="icon" /> Circle</Button
+          ><IconRound class="icon" /> {{ $t('mobile.toolbar.slide.circle') }}</Button
         >
       </ButtonGroup>
     </div>
@@ -41,6 +49,7 @@ import useSlideHandler from '@/hooks/useSlideHandler';
 import useCreateElement from '@/hooks/useCreateElement';
 import { getImageDataURL } from '@/utils/image';
 import type { ShapePoolItem } from '@/configs/shapes';
+import { useI18n } from 'vue-i18n';
 
 import MobileThumbnails from '../MobileThumbnails.vue';
 import FileInput from '@/components/FileInput.vue';
@@ -52,6 +61,7 @@ const { viewportRatio, currentSlide, viewportSize } = storeToRefs(slidesStore);
 
 const { createSlide, copyAndPasteSlide, deleteSlide } = useSlideHandler();
 const { createTextElement, createImageElement, createShapeElement } = useCreateElement();
+const { t } = useI18n();
 
 const insertTextElement = () => {
   const width = 400;
@@ -64,7 +74,7 @@ const insertTextElement = () => {
       width,
       height,
     },
-    { content: '<p>New text</p>' }
+    { content: t('mobile.toolbar.slide.newText') }
   );
 };
 

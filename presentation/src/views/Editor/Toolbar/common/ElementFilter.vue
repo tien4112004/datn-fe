@@ -1,7 +1,7 @@
 <template>
   <div class="element-filter">
     <div class="row">
-      <div style="flex: 2">Enable filter:</div>
+      <div style="flex: 2">{{ t('styling.effects.filter.enableFilter') }}</div>
       <div class="switch-wrapper" style="flex: 3">
         <Switch :value="hasFilters" @update:value="(value) => toggleFilters(value)" />
       </div>
@@ -41,6 +41,7 @@ import { storeToRefs } from 'pinia';
 import { useMainStore, useSlidesStore } from '@/store';
 import type { ImageElementFilterKeys, ImageElementFilters, PPTImageElement } from '@/types/slides';
 import useHistorySnapshot from '@/hooks/useHistorySnapshot';
+import { useI18n } from 'vue-i18n';
 
 import Switch from '@/components/Switch.vue';
 import Slider from '@/components/Slider.vue';
@@ -55,10 +56,12 @@ interface FilterOption {
   step: number;
 }
 
+const { t } = useI18n();
+
 const defaultFilters: FilterOption[] = [
-  { label: 'Blur', key: 'blur', default: 0, value: 0, unit: 'px', max: 10, step: 1 },
+  { label: t('styling.effects.filter.blur'), key: 'blur', default: 0, value: 0, unit: 'px', max: 10, step: 1 },
   {
-    label: 'Brightness',
+    label: t('styling.effects.filter.brightness'),
     key: 'brightness',
     default: 100,
     value: 100,
@@ -66,28 +69,60 @@ const defaultFilters: FilterOption[] = [
     max: 200,
     step: 5,
   },
-  { label: 'Contrast', key: 'contrast', default: 100, value: 100, unit: '%', max: 200, step: 5 },
-  { label: 'Grayscale', key: 'grayscale', default: 0, value: 0, unit: '%', max: 100, step: 5 },
-  { label: 'Saturation', key: 'saturate', default: 100, value: 100, unit: '%', max: 200, step: 5 },
-  { label: 'Hue', key: 'hue-rotate', default: 0, value: 0, unit: 'deg', max: 360, step: 10 },
-  { label: 'Sepia', key: 'sepia', default: 0, value: 0, unit: '%', max: 100, step: 5 },
-  { label: 'Invert', key: 'invert', default: 0, value: 0, unit: '%', max: 100, step: 5 },
-  { label: 'Opacity', key: 'opacity', default: 100, value: 100, unit: '%', max: 100, step: 5 },
+  {
+    label: t('styling.effects.filter.contrast'),
+    key: 'contrast',
+    default: 100,
+    value: 100,
+    unit: '%',
+    max: 200,
+    step: 5,
+  },
+  {
+    label: t('styling.effects.filter.grayscale'),
+    key: 'grayscale',
+    default: 0,
+    value: 0,
+    unit: '%',
+    max: 100,
+    step: 5,
+  },
+  {
+    label: t('styling.effects.filter.saturation'),
+    key: 'saturate',
+    default: 100,
+    value: 100,
+    unit: '%',
+    max: 200,
+    step: 5,
+  },
+  { label: t('styling.effects.filter.hue'), key: 'hue-rotate', default: 0, value: 0, unit: 'deg', max: 360, step: 10 },
+  { label: t('styling.effects.filter.sepia'), key: 'sepia', default: 0, value: 0, unit: '%', max: 100, step: 5 },
+  { label: t('styling.effects.filter.invert'), key: 'invert', default: 0, value: 0, unit: '%', max: 100, step: 5 },
+  {
+    label: t('styling.effects.filter.opacity'),
+    key: 'opacity',
+    default: 100,
+    value: 100,
+    unit: '%',
+    max: 100,
+    step: 5,
+  },
 ];
 
 const presetFilters: {
   label: string;
   values: ImageElementFilters;
 }[] = [
-  { label: 'Black and White', values: { grayscale: '100%' } },
-  { label: 'Retro', values: { sepia: '50%', contrast: '110%', brightness: '90%' } },
-  { label: 'Sharpen', values: { contrast: '150%' } },
-  { label: 'Soft', values: { brightness: '110%', contrast: '90%' } },
-  { label: 'Warm', values: { sepia: '30%', saturate: '135%' } },
-  { label: 'Bright', values: { brightness: '110%', contrast: '110%' } },
-  { label: 'Vivid', values: { saturate: '200%' } },
-  { label: 'Blur', values: { blur: '2px' } },
-  { label: 'Invert', values: { invert: '100%' } },
+  { label: t('styling.effects.filter.blackAndWhite'), values: { grayscale: '100%' } },
+  { label: t('styling.effects.filter.sepia'), values: { sepia: '50%', contrast: '110%', brightness: '90%' } },
+  { label: t('styling.effects.filter.sharpen'), values: { contrast: '150%' } },
+  { label: t('styling.effects.filter.soft'), values: { brightness: '110%', contrast: '90%' } },
+  { label: t('styling.effects.filter.warm'), values: { sepia: '30%', saturate: '135%' } },
+  { label: t('styling.effects.filter.bright'), values: { brightness: '110%', contrast: '110%' } },
+  { label: t('styling.effects.filter.vivid'), values: { saturate: '200%' } },
+  { label: t('styling.effects.filter.blur'), values: { blur: '2px' } },
+  { label: t('styling.effects.filter.invert'), values: { invert: '100%' } },
 ];
 
 const slidesStore = useSlidesStore();
@@ -121,7 +156,7 @@ watch(
   { deep: true, immediate: true }
 );
 
-// 将滤镜配置转为css
+// Convert filter configuration to CSS
 const filters2Style = (filters: ImageElementFilters) => {
   let filter = '';
   const keys = Object.keys(filters) as ImageElementFilterKeys[];
@@ -131,7 +166,7 @@ const filters2Style = (filters: ImageElementFilters) => {
   return filter;
 };
 
-// 设置滤镜
+// Set filter
 const updateFilter = (filter: FilterOption, value: number) => {
   const _handleElement = handleElement.value as PPTImageElement;
 

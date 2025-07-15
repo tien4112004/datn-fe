@@ -1,30 +1,31 @@
 <template>
   <div class="chart-style-panel">
     <Button class="full-width-btn" @click="chartDataEditorVisible = true">
-      <IconEdit class="btn-icon" /> Edit Chart
+      <IconEdit class="btn-icon" /> {{ $t('styling.elements.chart.editChart') }}
     </Button>
 
     <Divider />
 
     <template v-if="['bar', 'column', 'area', 'line'].includes(handleChartElement.chartType)">
       <div class="row">
-        <Checkbox @update:value="(value) => updateOptions({ stack: value })" :value="stack" style="flex: 2"
-          >Stacked Style</Checkbox
-        >
+        <Checkbox @update:value="(value) => updateOptions({ stack: value })" :value="stack" style="flex: 2">
+          {{ $t('styling.elements.chart.stackedStyle') }}
+        </Checkbox>
         <Checkbox
           v-if="handleChartElement.chartType === 'line'"
           @update:value="(value) => updateOptions({ lineSmooth: value })"
           :value="lineSmooth"
           style="flex: 3"
-          >Use Smooth Curve</Checkbox
         >
+          {{ $t('styling.elements.chart.useSmoothCurve') }}
+        </Checkbox>
       </div>
 
       <Divider />
     </template>
 
     <div class="row">
-      <div style="width: 40%">Background Fill:</div>
+      <div style="width: 40%">{{ $t('styling.elements.chart.backgroundFill') }}:</div>
       <Popover trigger="click" style="width: 60%">
         <template #content>
           <ColorPicker :modelValue="fill" @update:modelValue="(value) => updateFill(value)" />
@@ -33,7 +34,7 @@
       </Popover>
     </div>
     <div class="row">
-      <div style="width: 40%">Text Color:</div>
+      <div style="width: 40%">{{ $t('styling.elements.chart.textColor') }}:</div>
       <Popover trigger="click" style="width: 60%">
         <template #content>
           <ColorPicker :modelValue="textColor" @update:modelValue="(value) => updateTextColor(value)" />
@@ -43,11 +44,11 @@
     </div>
 
     <div class="row">
-      <div style="width: 40%">Theme Colors:</div>
+      <div style="width: 40%">{{ $t('styling.elements.chart.themeColors') }}:</div>
       <Popover trigger="click" v-model:value="themesVisible" style="width: 60%">
         <template #content>
           <div class="themes">
-            <div class="label">Preset Chart Themes:</div>
+            <div class="label">{{ $t('styling.elements.chart.presetChartThemes') }}:</div>
             <div class="preset-themes">
               <div
                 class="preset-theme"
@@ -63,7 +64,7 @@
                 ></div>
               </div>
             </div>
-            <div class="label">Slide Theme:</div>
+            <div class="label">{{ $t('styling.elements.chart.slideTheme') }}:</div>
             <div class="preset-themes" :style="{ marginBottom: '-10px' }">
               <div class="preset-theme" @click="setThemeColors(theme.themeColors)">
                 <div
@@ -81,8 +82,9 @@
                 themesVisible = false;
                 themeColorsSettingVisible = true;
               "
-              >Custom Colors</Button
             >
+              {{ $t('styling.elements.chart.customColors') }}
+            </Button>
           </div>
         </template>
         <ColorListButton :colors="themeColors" />
@@ -180,18 +182,18 @@ const updateElement = (props: Partial<PPTChartElement>) => {
   addHistorySnapshot();
 };
 
-// 设置图表数据
+// Set chart data
 const updateData = (payload: { data: ChartData; type: ChartType }) => {
   chartDataEditorVisible.value = false;
   updateElement({ data: payload.data, chartType: payload.type });
 };
 
-// 设置填充色
+//  Set fill color
 const updateFill = (value: string) => {
   updateElement({ fill: value });
 };
 
-// 设置扩展选项
+// Set advanced options
 const updateOptions = (optionProps: ChartOptions) => {
   const _handleElement = handleElement.value as PPTChartElement;
 
@@ -199,14 +201,14 @@ const updateOptions = (optionProps: ChartOptions) => {
   updateElement({ options: newOptions });
 };
 
-// 使用预置主题配色
+// Use preset theme color scheme
 const setThemeColors = (colors: string[]) => {
   updateElement({ themeColors: colors });
   themesVisible.value = false;
   themeColorsSettingVisible.value = false;
 };
 
-// 设置文字颜色
+// Set text color
 const updateTextColor = (textColor: string) => {
   updateElement({ textColor });
 };

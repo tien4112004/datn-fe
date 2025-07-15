@@ -19,6 +19,7 @@ import { computed, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useMainStore } from '@/store';
 import { ToolbarStates } from '@/types/toolbar';
+import { useI18n } from 'vue-i18n';
 
 import ElementStylePanel from './ElementStylePanel/index.vue';
 import ElementPositionPanel from './ElementPositionPanel.vue';
@@ -36,6 +37,7 @@ interface ElementTabs {
   key: ToolbarStates;
 }
 
+const { t } = useI18n();
 const mainStore = useMainStore();
 const { activeElementIdList, activeElementList, activeGroupElementId, handleElement, toolbarState } =
   storeToRefs(mainStore);
@@ -43,22 +45,22 @@ const { activeElementIdList, activeElementList, activeGroupElementId, handleElem
 const elementTabs = computed<ElementTabs[]>(() => {
   if (handleElement.value?.type === 'text') {
     return [
-      { label: 'Style', key: ToolbarStates.EL_STYLE },
-      { label: 'Symbol', key: ToolbarStates.SYMBOL },
-      { label: 'Position', key: ToolbarStates.EL_POSITION },
-      { label: 'Animation', key: ToolbarStates.EL_ANIMATION },
+      { label: t('toolbar.categories.style'), key: ToolbarStates.EL_STYLE },
+      { label: t('toolbar.categories.symbol'), key: ToolbarStates.SYMBOL },
+      { label: t('toolbar.categories.position'), key: ToolbarStates.EL_POSITION },
+      { label: t('toolbar.categories.animation'), key: ToolbarStates.EL_ANIMATION },
     ];
   }
   return [
-    { label: 'Style', key: ToolbarStates.EL_STYLE },
-    { label: 'Position', key: ToolbarStates.EL_POSITION },
-    { label: 'Animation', key: ToolbarStates.EL_ANIMATION },
+    { label: t('toolbar.categories.style'), key: ToolbarStates.EL_STYLE },
+    { label: t('toolbar.categories.position'), key: ToolbarStates.EL_POSITION },
+    { label: t('toolbar.categories.animation'), key: ToolbarStates.EL_ANIMATION },
   ];
 });
 const slideTabs = [
-  { label: 'Design', key: ToolbarStates.SLIDE_DESIGN },
-  { label: 'Transition', key: ToolbarStates.SLIDE_ANIMATION },
-  { label: 'Animation', key: ToolbarStates.EL_ANIMATION },
+  { label: t('toolbar.categories.design'), key: ToolbarStates.SLIDE_DESIGN },
+  { label: t('toolbar.categories.transition'), key: ToolbarStates.SLIDE_ANIMATION },
+  { label: t('toolbar.categories.animation'), key: ToolbarStates.EL_ANIMATION },
 ];
 const multiSelectTabs = [
   { label: 'Style (Multi-select)', key: ToolbarStates.MULTI_STYLE },

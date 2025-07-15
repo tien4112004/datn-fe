@@ -3,11 +3,11 @@
     <ButtonGroup class="row">
       <CheckboxButton class="center" style="flex: 1" :checked="flipV" @click="updateFlip({ flipV: !flipV })">
         <IconFlipVertically />
-        <div>Vertical Flip</div>
+        <div>{{ $t('styling.effects.flip.verticalFlip') }}</div>
       </CheckboxButton>
       <CheckboxButton class="center" style="flex: 1" :checked="flipH" @click="updateFlip({ flipH: !flipH })">
         <IconFlipHorizontally />
-        <div>Horizontal Flip</div>
+        <div>{{ $t('styling.effects.flip.horizontalFlip') }}</div>
       </CheckboxButton>
     </ButtonGroup>
   </div>
@@ -22,6 +22,8 @@ import useHistorySnapshot from '@/hooks/useHistorySnapshot';
 
 import CheckboxButton from '@/components/CheckboxButton.vue';
 import ButtonGroup from '@/components/ButtonGroup.vue';
+import { useI18n } from 'vue-i18n';
+const { t } = useI18n();
 
 const slidesStore = useSlidesStore();
 const { handleElement } = storeToRefs(useMainStore());

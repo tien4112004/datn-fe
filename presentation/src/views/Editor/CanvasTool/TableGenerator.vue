@@ -3,7 +3,11 @@
     <div class="title">
       <div class="lef">Table {{ endCell.length ? `${endCell[0]} x ${endCell[1]}` : '' }}</div>
       <div class="right" @click="isCustom = !isCustom">
-        {{ isCustom ? 'Back' : 'Custom' }}
+        {{
+          isCustom
+            ? $t('ui.actions.back')
+            : $t('toolbar.table.generator.custom')
+        }}
       </div>
     </div>
     <table @mouseleave="endCell = []" @click="handleClickTable()" v-if="!isCustom">
@@ -23,16 +27,18 @@
 
     <div class="custom" v-else>
       <div class="row">
-        <div class="label" style="width: 25%">Rows:</div>
+        <div class="label" style="width: 25%">{{ $t('toolbar.table.generator.rows') }}</div>
         <NumberInput :min="1" :max="20" v-model:value="customRow" style="width: 75%" />
       </div>
       <div class="row">
-        <div class="label" style="width: 25%">Columns:</div>
+        <div class="label" style="width: 25%">{{ $t('toolbar.table.generator.columns') }}</div>
         <NumberInput :min="1" :max="20" v-model:value="customCol" style="width: 75%" />
       </div>
       <div class="btns">
-        <Button class="btn" @click="close()">Cancel</Button>
-        <Button class="btn" type="primary" @click="insertCustomTable()">Confirm</Button>
+        <Button class="btn" @click="close()">{{ $t('ui.actions.cancel') }}</Button>
+        <Button class="btn" type="primary" @click="insertCustomTable()">{{
+          $t('ui.actions.confirm')
+        }}</Button>
       </div>
     </div>
   </div>
@@ -40,9 +46,12 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import message from '@/utils/message';
 import Button from '@/components/Button.vue';
 import NumberInput from '@/components/NumberInput.vue';
+
+const { t } = useI18n();
 
 interface InsertData {
   row: number;
@@ -67,9 +76,9 @@ const handleClickTable = () => {
 
 const insertCustomTable = () => {
   if (customRow.value < 1 || customRow.value > 20)
-    return message.warning('Rows/Columns must be between 1-20!');
+    return message.warning(t('toolbar.table.generator.invalidRange'));
   if (customCol.value < 1 || customCol.value > 20)
-    return message.warning('Rows/Columns must be between 1-20!');
+    return message.warning(t('toolbar.table.generator.invalidRange'));
   emit('insert', { row: customRow.value, col: customCol.value });
   isCustom.value = false;
 };

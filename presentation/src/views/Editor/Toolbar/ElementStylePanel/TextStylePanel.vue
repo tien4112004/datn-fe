@@ -1,14 +1,29 @@
 <template>
   <div class="text-style-panel">
-    <div class="preset-style">
+    <div class="preset-style-dropdown">
       <div
-        class="preset-style-item"
-        v-for="item in presetStyles"
-        :key="item.label"
-        :style="item.style"
-        @click="emitBatchRichTextCommand(item.cmd)"
+        class="custom-select"
+        @click="toggleDropdown"
+        ref="selectRef"
+        v-tooltip="$t('styling.elements.text.selectPresetStyle')"
       >
-        {{ item.label }}
+        <div class="selected-item" :style="selectedStyleDisplay?.style">
+          {{ selectedStyleDisplay?.label || $t('styling.elements.text.selectStyle') }}
+        </div>
+        <div class="dropdown-arrow" :class="{ open: isDropdownOpen }">
+          <IconDown />
+        </div>
+      </div>
+      <div v-if="isDropdownOpen" class="dropdown-options" ref="dropdownRef">
+        <div
+          class="preset-style-item"
+          v-for="(item, index) in presetStyles"
+          :key="item.label"
+          :style="item.style"
+          @click="selectPresetStyle(index)"
+        >
+          {{ item.label }}
+        </div>
       </div>
     </div>
 
@@ -17,7 +32,7 @@
     <Divider />
 
     <div class="row">
-      <div style="width: 40%">Line Spacing:</div>
+      <div style="width: 40%">{{ $t('styling.elements.text.lineSpacing') }}:</div>
       <Select
         style="width: 60%"
         :value="lineHeight || 1"
@@ -35,7 +50,7 @@
       </Select>
     </div>
     <div class="row">
-      <div style="width: 40%">Paragraph Spacing:</div>
+      <div style="width: 40%">{{ $t('styling.elements.text.paragraphSpacing') }}:</div>
       <Select
         style="width: 60%"
         :value="paragraphSpace || 0"
@@ -53,7 +68,7 @@
       </Select>
     </div>
     <div class="row">
-      <div style="width: 40%">Word Spacing:</div>
+      <div style="width: 40%">{{ $t('styling.elements.text.wordSpacing') }}:</div>
       <Select
         style="width: 60%"
         :value="wordSpace || 0"
@@ -71,7 +86,7 @@
       </Select>
     </div>
     <div class="row">
-      <div style="width: 40%">Textbox Fill:</div>
+      <div style="width: 40%">{{ $t('styling.elements.text.textboxFill') }}:</div>
       <Popover trigger="click" style="width: 60%">
         <template #content>
           <ColorPicker :modelValue="fill" @update:modelValue="(value) => updateFill(value)" />
@@ -90,7 +105,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch } from 'vue';
+import { ref, watch, computed, onMounted, onUnmounted } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useMainStore, useSlidesStore } from '@/store';
 import type { PPTTextElement } from '@/types/slides';
@@ -183,6 +198,54 @@ const fill = ref<string>('$foreground');
 const lineHeight = ref<number>();
 const wordSpace = ref<number>();
 const paragraphSpace = ref<number>();
+const isDropdownOpen = ref(false);
+const selectedStyleIndex = ref<number | null>(null);
+const selectRef = ref<HTMLElement>();
+const dropdownRef = ref<HTMLElement>();
+
+// Computed property for selected style display
+const selectedStyleDisplay = computed(() => {
+  if (selectedStyleIndex.value !== null) {
+    return presetStyles[selectedStyleIndex.value];
+  }
+  return null;
+});
+
+// Toggle dropdown open/close
+const toggleDropdown = () => {
+  isDropdownOpen.value = !isDropdownOpen.value;
+};
+
+// Select a preset style
+const selectPresetStyle = (index: number) => {
+  const selectedStyle = presetStyles[index];
+  if (selectedStyle) {
+    emitBatchRichTextCommand(selectedStyle.cmd);
+  }
+  isDropdownOpen.value = false;
+  // Don't keep the selection to allow reapplying the same style
+  selectedStyleIndex.value = null;
+};
+
+// Close dropdown when clicking outside
+const handleClickOutside = (event: MouseEvent) => {
+  if (
+    selectRef.value &&
+    dropdownRef.value &&
+    !selectRef.value.contains(event.target as Node) &&
+    !dropdownRef.value.contains(event.target as Node)
+  ) {
+    isDropdownOpen.value = false;
+  }
+};
+
+onMounted(() => {
+  document.addEventListener('click', handleClickOutside);
+});
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside);
+});
 
 watch(
   handleElement,
@@ -203,27 +266,27 @@ const lineHeightOptions = [0.9, 1.0, 1.15, 1.2, 1.4, 1.5, 1.8, 2.0, 2.5, 3.0];
 const wordSpaceOptions = [0, 1, 2, 3, 4, 5, 6, 8, 10];
 const paragraphSpaceOptions = [0, 5, 10, 15, 20, 25, 30, 40, 50, 80];
 
-// 设置行高
+//  Set line height
 const updateLineHeight = (value: number) => {
   updateElement({ lineHeight: value });
 };
 
-// 设置段间距
+// Set paragraph spacing
 const updateParagraphSpace = (value: number) => {
   updateElement({ paragraphSpace: value });
 };
 
-// 设置字间距
+// Set letter spacing
 const updateWordSpace = (value: number) => {
   updateElement({ wordSpace: value });
 };
 
-// 设置文本框填充
+// Set text box padding
 const updateFill = (value: string) => {
   updateElement({ fill: value });
 };
 
-// 发送富文本设置命令（批量）
+// Send rich text formatting commands (in batch)
 const emitBatchRichTextCommand = (action: RichTextAction[]) => {
   emitter.emit(EmitterEvents.RICH_TEXT_COMMAND, { action });
 };
@@ -239,15 +302,70 @@ const emitBatchRichTextCommand = (action: RichTextAction[]) => {
   align-items: center;
   margin-bottom: 10px;
 }
-.preset-style {
-  display: flex;
-  flex-wrap: wrap;
+.preset-style-dropdown {
   margin-bottom: 10px;
+  position: relative;
 }
+
+.custom-select {
+  width: 100%;
+  height: 32px;
+  border: 1px solid $borderColor;
+  border-radius: $borderRadius;
+  background-color: $background;
+  cursor: pointer;
+  position: relative;
+  transition: all $transitionDelay;
+
+  &:hover {
+    border-color: $themeColor;
+  }
+}
+
+.selected-item {
+  height: 30px;
+  line-height: 30px;
+  padding-left: 10px;
+  padding-right: 32px;
+  font-size: 13px;
+  @include ellipsis-oneline();
+}
+
+.dropdown-arrow {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 32px;
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: $muted-foreground;
+  transition: transform $transitionDelay;
+
+  &.open {
+    transform: rotate(180deg);
+  }
+}
+
+.dropdown-options {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: $background;
+  border: 1px solid $borderColor;
+  border-top: none;
+  border-radius: 0 0 $borderRadius $borderRadius;
+  box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.08);
+  z-index: 1000;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
 .preset-style-item {
-  width: 50%;
   height: 50px;
-  border: solid 1px $borderColor;
+  border-bottom: solid 1px $borderColor;
   box-sizing: border-box;
   display: flex;
   justify-content: center;
@@ -255,18 +373,16 @@ const emitBatchRichTextCommand = (action: RichTextAction[]) => {
   position: relative;
   cursor: pointer;
   transition: all $transitionDelay;
+  padding: 0 10px;
 
   &:hover {
     border-color: $themeColor;
     color: $themeColor;
-    z-index: 1;
+    background-color: rgba($color: $themeColor, $alpha: 0.05);
   }
 
-  &:nth-child(2n) {
-    margin-left: -1px;
-  }
-  &:nth-child(n + 3) {
-    margin-top: -1px;
+  &:last-child {
+    border-bottom: none;
   }
 }
 </style>

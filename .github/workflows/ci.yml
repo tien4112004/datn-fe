@@ -13,8 +13,7 @@ jobs:
     # To use Remote Caching, uncomment the next lines and follow the steps below.
     env:
       TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
-      TURBO_TEAM: 'DATN'
-      TURBO_REMOTE_ONLY: true
+      TURBO_TEAM: 'datn-fe'
 
     steps:
       - name: Check out code

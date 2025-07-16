@@ -135,12 +135,12 @@ textarea {
   touch-action: manipulation;
 }
 
-::-webkit-scrollbar {
+*::-webkit-scrollbar {
   width: 5px;
   height: 5px;
   background-color: transparent;
 }
-::-webkit-scrollbar-thumb {
+*::-webkit-scrollbar-thumb {
   background-color: #e1e1e1;
   border-radius: 3px;
 }

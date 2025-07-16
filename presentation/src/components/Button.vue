@@ -1,6 +1,6 @@
 <template>
   <button
-    class="button"
+    class="button center"
     :class="{
       disabled: disabled,
       checked: !disabled && checked,
@@ -50,7 +50,7 @@ const handleClick = () => {
 
 <style lang="scss" scoped>
 .button {
-  height: fit-content;
+  height: 100%;
   min-height: 32px;
   //   line-height: 32px;
   outline: 0;
@@ -62,6 +62,7 @@ const handleClick = () => {
   user-select: none;
   //   letter-spacing: 1px;
   cursor: pointer;
+  gap: 0px !important;
 
   &.small {
     height: 24px;

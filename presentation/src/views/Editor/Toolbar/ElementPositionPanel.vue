@@ -2,13 +2,13 @@
   <div class="element-positopn-panel">
     <div class="title title-panel">{{ $t('styling.position.single.layer') }}</div>
     <ButtonGroup class="row">
-      <Button style="flex: 1" @click="orderElement(handleElement!, ElementOrderCommands.TOP)">
+      <Button style="flex-grow: 1" @click="orderElement(handleElement!, ElementOrderCommands.TOP)">
         <div class="center">
           <IconSendToBack class="btn-icon" />
           <p>{{ $t('styling.position.single.bringToFront') }}</p>
         </div>
       </Button>
-      <Button style="flex: 1" @click="orderElement(handleElement!, ElementOrderCommands.BOTTOM)">
+      <Button style="flex-grow: 1" @click="orderElement(handleElement!, ElementOrderCommands.BOTTOM)">
         <div class="center">
           <IconBringToFrontOne class="btn-icon" />
           <p>{{ $t('styling.position.single.sendToBack') }}</p>
@@ -16,13 +16,13 @@
       </Button>
     </ButtonGroup>
     <ButtonGroup class="row">
-      <Button style="flex: 1" @click="orderElement(handleElement!, ElementOrderCommands.UP)">
+      <Button style="flex-grow: 1" @click="orderElement(handleElement!, ElementOrderCommands.UP)">
         <div class="center">
           <IconBringToFront class="btn-icon" />
           <p>{{ $t('styling.position.single.moveUp') }}</p>
         </div>
       </Button>
-      <Button style="flex: 1" @click="orderElement(handleElement!, ElementOrderCommands.DOWN)">
+      <Button style="flex-grow: 1" @click="orderElement(handleElement!, ElementOrderCommands.DOWN)">
         <div class="center">
           <IconSentToBack class="btn-icon" />
           <p>{{ $t('styling.position.single.moveDown') }}</p>
@@ -35,19 +35,19 @@
     <div class="title title-panel">{{ $t('styling.position.single.alignment') }}</div>
     <ButtonGroup class="row">
       <Button
-        style="flex: 1"
+        style="flex-grow: 1"
         v-tooltip="$t('styling.position.single.leftAlign')"
         @click="alignElementToCanvas(ElementAlignCommands.LEFT)"
         ><IconAlignLeft
       /></Button>
       <Button
-        style="flex: 1"
+        style="flex-grow: 1"
         v-tooltip="$t('styling.position.single.centerHorizontally')"
         @click="alignElementToCanvas(ElementAlignCommands.HORIZONTAL)"
         ><IconAlignVertically
       /></Button>
       <Button
-        style="flex: 1"
+        style="flex-grow: 1"
         v-tooltip="$t('styling.position.single.rightAlign')"
         @click="alignElementToCanvas(ElementAlignCommands.RIGHT)"
         ><IconAlignRight
@@ -55,19 +55,19 @@
     </ButtonGroup>
     <ButtonGroup class="row">
       <Button
-        style="flex: 1"
+        style="flex-grow: 1"
         v-tooltip="$t('styling.position.single.topAlign')"
         @click="alignElementToCanvas(ElementAlignCommands.TOP)"
         ><IconAlignTop
       /></Button>
       <Button
-        style="flex: 1"
+        style="flex-grow: 1"
         v-tooltip="$t('styling.position.single.centerVertically')"
         @click="alignElementToCanvas(ElementAlignCommands.VERTICAL)"
         ><IconAlignHorizontally
       /></Button>
       <Button
-        style="flex: 1"
+        style="flex-grow: 1"
         v-tooltip="$t('styling.position.single.bottomAlign')"
         @click="alignElementToCanvas(ElementAlignCommands.BOTTOM)"
         ><IconAlignBottom

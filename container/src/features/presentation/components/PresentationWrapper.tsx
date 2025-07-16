@@ -1,10 +1,12 @@
 import GlobalSpinner from '@/shared/components/common/GlobalSpinner';
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const PresentationWrapper = () => {
   const containerRef = useRef(null);
   const hasMounted = useRef(false);
   const [isLoading, setIsLoading] = useState(true);
+  const { t } = useTranslation('loading');
 
   useEffect(() => {
     // Prevent re-mounting the Vue component if it has already been mounted
@@ -28,7 +30,7 @@ const PresentationWrapper = () => {
   return (
     <>
       <div className="vue-remote" ref={containerRef} />
-      {isLoading && <GlobalSpinner text="Loading presentation editor..." />}
+      {isLoading && <GlobalSpinner text={t('presentation')} />}
     </>
   );
 };

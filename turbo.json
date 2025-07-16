@@ -5,14 +5,16 @@
     "lint": { "outputs": [] },
     "format": { "outputs": [] },
     "typecheck": { "outputs": [] },
-    "test": { "outputs": [] },
-    "test:run": { "outputs": [] },
 
     "dev": { "cache": true, "persistent": true },
 
     "build": {
       "dependsOn": ["^build"],
       "outputs": ["dist/**", "build/**"]
+    },
+
+    "test": {
+      "dependsOn": ["^build"]
     }
   }
 }

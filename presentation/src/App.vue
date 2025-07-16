@@ -13,7 +13,7 @@
 <script lang="ts" setup>
 import { onMounted } from 'vue';
 import { storeToRefs } from 'pinia';
-import { useScreenStore, useMainStore, useSnapshotStore, useSlidesStore } from '@/store';
+import { useScreenStore, useMainStore, useSnapshotStore, useSlidesStore, useContainerStore } from '@/store';
 import { LOCALSTORAGE_KEY_DISCARDED_DB } from '@/configs/storage';
 import { deleteDiscardedDB } from '@/utils/database';
 import { isPC } from '@/utils/common';
@@ -30,6 +30,10 @@ import VuePlugin from '@stagewise-plugins/vue';
 
 const _isPC = isPC();
 
+const props = defineProps<{
+  titleTest: string
+}>();
+
 // Stagewise configuration
 const isDev = import.meta.env.DEV;
 const stagewiseConfig = {
@@ -39,6 +43,7 @@ const stagewiseConfig = {
 const mainStore = useMainStore();
 const slidesStore = useSlidesStore();
 const snapshotStore = useSnapshotStore();
+const containerStore = useContainerStore();
 const { databaseId } = storeToRefs(mainStore);
 const { slides } = storeToRefs(slidesStore);
 const { screening } = storeToRefs(useScreenStore());
@@ -50,6 +55,8 @@ if (import.meta.env.MODE !== 'development') {
 onMounted(async () => {
   const slides = await api.getFileData('slides');
   slidesStore.setSlides(slides);
+
+  containerStore.initialize(props);
 
   await deleteDiscardedDB();
   snapshotStore.initSnapshotDatabase();

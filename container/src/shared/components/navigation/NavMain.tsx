@@ -18,6 +18,7 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/shared/components/ui/sidebar"
+import { useTranslation } from "react-i18next"
 
 export function NavMain({
   items,
@@ -33,9 +34,11 @@ export function NavMain({
     }[]
   }[]
 }) {
+  const { t } = useTranslation('navSidebar');
+
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>Platform</SidebarGroupLabel>
+      <SidebarGroupLabel>{t('features')}</SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => (
           <Collapsible key={item.title} asChild defaultOpen={item.isActive}>

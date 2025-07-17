@@ -8,6 +8,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/shared/components/ui/sidebar"
+import SidebarLanguageSwitcher from "./SidebarLanguageSwitcher"
 
 export function NavSecondary({
   items,
@@ -23,6 +24,7 @@ export function NavSecondary({
     <SidebarGroup {...props}>
       <SidebarGroupContent>
         <SidebarMenu>
+          <SidebarLanguageSwitcher />
           {items.map((item) => (
             <SidebarMenuItem key={item.title}>
               <SidebarMenuButton asChild size="sm">

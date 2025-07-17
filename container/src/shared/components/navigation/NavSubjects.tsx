@@ -3,7 +3,6 @@ import {
   MoreHorizontal,
   Share,
   Trash2,
-  type LucideIcon,
 } from "lucide-react"
 
 import {
@@ -22,35 +21,36 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/shared/components/ui/sidebar"
+import { NavLink } from "react-router-dom"
+import { useTranslation } from "react-i18next"
 
-export function NavProjects({
-  projects,
+export function NavSubjects({
+  subjects,
 }: {
-  projects: {
+  subjects: {
     name: string
     url: string
-    icon: LucideIcon
   }[]
 }) {
   const { isMobile } = useSidebar()
+  const { t } = useTranslation('navSidebar')
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-      <SidebarGroupLabel>Projects</SidebarGroupLabel>
+      <SidebarGroupLabel>{t('subjects.index')}</SidebarGroupLabel>
       <SidebarMenu>
-        {projects.map((item) => (
+        {subjects.map((item) => (
           <SidebarMenuItem key={item.name}>
             <SidebarMenuButton asChild>
-              <a href={item.url}>
-                <item.icon />
+              <NavLink to={item.url}>
                 <span>{item.name}</span>
-              </a>
+              </NavLink>
             </SidebarMenuButton>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuAction showOnHover>
                   <MoreHorizontal />
-                  <span className="sr-only">More</span>
+                  <span className="sr-only">{t('subjects.more')}</span>
                 </SidebarMenuAction>
               </DropdownMenuTrigger>
               <DropdownMenuContent
@@ -60,16 +60,16 @@ export function NavProjects({
               >
                 <DropdownMenuItem>
                   <Folder className="text-muted-foreground" />
-                  <span>View Project</span>
+                  <span>Action 1</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
                   <Share className="text-muted-foreground" />
-                  <span>Share Project</span>
+                  <span>Action 2</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
                   <Trash2 className="text-muted-foreground" />
-                  <span>Delete Project</span>
+                  <span>Action 3</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -78,7 +78,7 @@ export function NavProjects({
         <SidebarMenuItem>
           <SidebarMenuButton>
             <MoreHorizontal />
-            <span>More</span>
+            <span>{t('subjects.more')}</span>
           </SidebarMenuButton>
         </SidebarMenuItem>
       </SidebarMenu>

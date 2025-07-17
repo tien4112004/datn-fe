@@ -1,8 +1,35 @@
 export default {
-  nav: {
+  navSidebar: {
+    slogan: "Trợ thủ đắc lực của giáo viên",
+    notification: "Thông báo",
+    features: "Tính năng",
+    create: "Tạo mới",
+    resources: {
+      index: 'Tài nguyên',
+      files: 'Tập tin',
+      presentations: 'Trang trình bày',
+      lectures: 'Bài giảng',
+      exercises: 'Bài tập',
+      videos: 'Video',
+      images: 'Hình ảnh',
+      mindmaps: 'Bản đồ tư duy',
+    },
+    classroom: {
+      index: 'Quản lý',
+      classes: 'Lớp học',
+      groups: 'Nhóm',
+      subjects: 'Môn học',
+      schedules: 'Thời khóa biểu',
+    },
+    subjects: {
+      index: 'Môn học',
+      math: 'Toán học',
+      vietnamese: 'Tiếng Việt',
+      english: 'Tiếng Anh',
+      more: 'Xem thêm',
+    },
     home: 'Trang chủ',
-    presentation: 'Thuyết trình',
-    presentationDetails: 'Chi tiết thuyết trình',
+    settings: 'Cài đặt',
   },
 
   loading: {

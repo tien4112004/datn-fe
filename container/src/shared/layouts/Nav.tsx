@@ -4,7 +4,7 @@ import { NavLink } from 'react-router-dom';
 import LanguageSwitcher from '../components/common/LanguageSwitcher';
 
 const Nav = () => {
-  const { t } = useTranslation('nav');
+  const { t } = useTranslation('navSidebar');
 
   const [isFullscreen, setIsFullscreen] = React.useState(document.fullscreenElement !== null);
 

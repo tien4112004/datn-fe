@@ -2,13 +2,9 @@ import * as React from "react"
 import {
   Bell,
   BookOpen,
-  Bot,
   Command,
   File,
-  Frame,
   Home,
-  Map,
-  PieChart,
   Plus,
   Settings2,
 } from "lucide-react"
@@ -51,7 +47,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       {
         title: t('resources.index'),
         icon: File,
-        url: "#", 
         items: [
           {
             title: t('resources.files'),
@@ -84,24 +79,23 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         ],
       },
       {
-        title: t('classroom.index'),
-        url: "#",
+        title: t('management.index'),
         icon: BookOpen,
         items: [
           {
-            title: t('classroom.classes'),
+            title: t('management.classes'),
             url: "#",
           },
           {
-            title: t('classroom.groups'),
+            title: t('management.groups'),
             url: "#",
           },
           {
-            title: t('classroom.subjects'),
+            title: t('management.subjects'),
             url: "#",
           },
           {
-            title: t('classroom.schedules'),
+            title: t('management.schedules'),
             url: "#",
           },
         ],

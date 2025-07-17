@@ -2,7 +2,7 @@ import { Outlet, useNavigation } from 'react-router-dom';
 import GlobalSpinner from '@/components/common/GlobalSpinner';
 import { useTranslation } from 'react-i18next';
 import { SidebarInset, SidebarProvider, useSidebar } from '../components/ui/sidebar';
-import { AppSidebar } from './AppSidebar';
+import { AppSidebar } from '../components/navigation/AppSidebar';
 import { subscribe, unsubscribe } from '@/shared/lib/event';
 import React from 'react';
 

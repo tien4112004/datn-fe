@@ -4,6 +4,23 @@
       <button class="menu-item" @click="handleToggleSidebar">
         <IconMoreApp />
       </button>
+      
+
+      <div class="title">
+        <Input
+          class="title-input"
+          ref="titleInputRef"
+          v-model:value="titleValue"
+          @blur="handleUpdateTitle()"
+          v-if="editingTitle"
+        ></Input>
+        <div class="title-text" @click="startEditTitle()" :title="title" v-else>
+          {{ title }}
+        </div>
+      </div>
+    </div>
+
+    <div class="right">
       <Popover trigger="click" placement="bottom-start" v-model:value="mainMenuVisible">
         <template #content>
           <PopoverMenuItem
@@ -62,22 +79,6 @@
         </template>
         <div class="menu-item"><IconHamburgerButton class="icon" /></div>
       </Popover>
-
-      <div class="title">
-        <Input
-          class="title-input"
-          ref="titleInputRef"
-          v-model:value="titleValue"
-          @blur="handleUpdateTitle()"
-          v-if="editingTitle"
-        ></Input>
-        <div class="title-text" @click="startEditTitle()" :title="title" v-else>
-          {{ title }}
-        </div>
-      </div>
-    </div>
-
-    <div class="right">
       <div class="group-menu-item">
         <div class="menu-item" v-tooltip="$t('header.presentation.slideShow')" @click="enterScreening()">
           <IconPpt class="icon" />

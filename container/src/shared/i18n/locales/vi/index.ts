@@ -14,7 +14,7 @@ export default {
       images: 'Hình ảnh',
       mindmaps: 'Bản đồ tư duy',
     },
-    classroom: {
+    management: {
       index: 'Quản lý',
       classes: 'Lớp học',
       groups: 'Nhóm',

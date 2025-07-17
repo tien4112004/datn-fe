@@ -14,8 +14,8 @@ export default {
       images: 'Images',
       mindmaps: 'Mind Maps',
     },
-    classroom: {
-      index: 'Classroom',
+    management: {
+      index: 'Management',
       classes: 'Classes',
       groups: 'Groups',
       subjects: 'Subjects',

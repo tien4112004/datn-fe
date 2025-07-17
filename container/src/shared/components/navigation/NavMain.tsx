@@ -19,20 +19,28 @@ import {
   SidebarMenuSubItem,
 } from "@/shared/components/ui/sidebar"
 import { useTranslation } from "react-i18next"
+import { NavLink } from "react-router-dom"
 
 export function NavMain({
   items,
 }: {
-  items: {
+  items: ({
     title: string
-    url: string
     icon: LucideIcon
     isActive?: boolean
-    items?: {
-      title: string
-      url: string
-    }[]
-  }[]
+  } & (
+    | {
+        url: string
+        items?: never
+      }
+    | {
+        url?: never
+        items: {
+          title: string
+          url: string
+        }[]
+      }
+  ))[]
 }) {
   const { t } = useTranslation('navSidebar');
 
@@ -42,37 +50,42 @@ export function NavMain({
       <SidebarMenu>
         {items.map((item) => (
           <Collapsible key={item.title} asChild defaultOpen={item.isActive}>
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip={item.title}>
-                <a href={item.url}>
-                  <item.icon />
-                  <span>{item.title}</span>
-                </a>
-              </SidebarMenuButton>
-              {item.items?.length ? (
-                <>
-                  <CollapsibleTrigger asChild>
-                    <SidebarMenuAction className="data-[state=open]:rotate-90">
-                      <ChevronRight />
+            {item.url ? (
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild tooltip={item.title}>
+                  <NavLink to={item.url}>
+                    <item.icon />
+                    <span>{item.title}</span>
+                  </NavLink>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ) : (
+              <SidebarMenuItem>
+                <CollapsibleTrigger asChild>
+                  <SidebarMenuButton tooltip={item.title} className="group">
+                    <item.icon />
+                    <span>{item.title}</span>
+                    <SidebarMenuAction>
+                      <ChevronRight className="transition-transform group-data-[state=open]:rotate-90" />
                       <span className="sr-only">Toggle</span>
                     </SidebarMenuAction>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent>
-                    <SidebarMenuSub>
-                      {item.items?.map((subItem) => (
-                        <SidebarMenuSubItem key={subItem.title}>
-                          <SidebarMenuSubButton asChild>
-                            <a href={subItem.url}>
-                              <span>{subItem.title}</span>
-                            </a>
-                          </SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
-                      ))}
-                    </SidebarMenuSub>
-                  </CollapsibleContent>
-                </>
-              ) : null}
-            </SidebarMenuItem>
+                  </SidebarMenuButton>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <SidebarMenuSub>
+                    {item.items?.map((subItem) => (
+                      <SidebarMenuSubItem key={subItem.title}>
+                        <SidebarMenuSubButton asChild>
+                          <a href={subItem.url}>
+                            <span>{subItem.title}</span>
+                          </a>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                    ))}
+                  </SidebarMenuSub>
+                </CollapsibleContent>
+              </SidebarMenuItem>
+            )}
           </Collapsible>
         ))}
       </SidebarMenu>

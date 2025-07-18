@@ -1,5 +1,5 @@
 import { useSortable } from '@dnd-kit/sortable';
-import type { SortableOptionProps } from './types/types';
+import type { SortableOptionProps } from '../types/types';
 
 const SortableOption = ({ option, index, questionId }: SortableOptionProps) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({

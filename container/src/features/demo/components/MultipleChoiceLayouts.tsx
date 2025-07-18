@@ -2,20 +2,14 @@ import { useState } from 'react';
 import {
   DndContext,
   closestCenter,
-  KeyboardSensor,
   PointerSensor,
   useSensor,
   useSensors,
   type DragEndEvent,
 } from '@dnd-kit/core';
-import {
-  arrayMove,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
-import type { Question } from './types/types';
-import SortableQuestion from './SortableQuestion';
+import type { Question } from '../types/types';
+import Workspace from './Workspace';
+import Panel from './Panel';
 
 const MultipleChoiceDemo = () => {
   const [questions, setQuestions] = useState<Question[]>([
@@ -29,94 +23,43 @@ const MultipleChoiceDemo = () => {
         { id: '1d', text: 'Madrid', isCorrect: false },
       ],
     },
-    {
-      id: '2',
-      question: 'Which programming language is known for its use in web development?',
-      options: [
-        { id: '2a', text: 'Python', isCorrect: false },
-        { id: '2b', text: 'JavaScript', isCorrect: true },
-        { id: '2c', text: 'C++', isCorrect: false },
-        { id: '2d', text: 'Java', isCorrect: false },
-      ],
-    },
-    {
-      id: '3',
-      question: 'What does HTML stand for?',
-      options: [
-        { id: '3a', text: 'HyperText Markup Language', isCorrect: true },
-        { id: '3b', text: 'High Tech Modern Language', isCorrect: false },
-        { id: '3c', text: 'Home Tool Markup Language', isCorrect: false },
-        { id: '3d', text: 'Hyperlink and Text Markup Language', isCorrect: false },
-      ],
-    },
+    // {
+    //   id: '2',
+    //   question: 'Which programming language is known for its use in web development?',
+    //   options: [
+    //     { id: '2a', text: 'Python', isCorrect: false },
+    //     { id: '2b', text: 'JavaScript', isCorrect: true },
+    //     { id: '2c', text: 'C++', isCorrect: false },
+    //     { id: '2d', text: 'Java', isCorrect: false },
+    //   ],
+    // },
+    // {
+    //   id: '3',
+    //   question: 'What does HTML stand for?',
+    //   options: [
+    //     { id: '3a', text: 'HyperText Markup Language', isCorrect: true },
+    //     { id: '3b', text: 'High Tech Modern Language', isCorrect: false },
+    //     { id: '3c', text: 'Home Tool Markup Language', isCorrect: false },
+    //     { id: '3d', text: 'Hyperlink and Text Markup Language', isCorrect: false },
+    //   ],
+    // },
   ]);
 
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
-  );
+  const sensors = useSensors(useSensor(PointerSensor));
 
-  const handleQuestionDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-
-    if (!over) return;
-
-    if (active.id !== over.id) {
-      const activeId = active.id as string;
-      const overId = over.id as string;
-
-      // Handle question reordering
-      if (activeId.startsWith('question-') && overId.startsWith('question-')) {
-        const activeQuestionId = activeId.replace('question-', '');
-        const overQuestionId = overId.replace('question-', '');
-
-        setQuestions((prevQuestions) => {
-          const oldIndex = prevQuestions.findIndex((q) => q.id === activeQuestionId);
-          const newIndex = prevQuestions.findIndex((q) => q.id === overQuestionId);
-          return arrayMove(prevQuestions, oldIndex, newIndex);
-        });
-      }
-    }
-  };
-
-  const handleOptionDragEnd = (_questionId: string, event: DragEndEvent) => {
-    const { active, over } = event;
-
-    if (!over) return;
-
-    if (active.id !== over.id) {
-      const activeId = active.id as string;
-      const overId = over.id as string;
-
-      // Handle option reordering within the same question
-      if (activeId.startsWith('option-') && overId.startsWith('option-')) {
-        const activeQuestionId = activeId.split('-')[1];
-        const overQuestionId = overId.split('-')[1];
-
-        // Only allow reordering within the same question
-        if (activeQuestionId !== overQuestionId) return;
-
-        setQuestions((prevQuestions) => {
-          const newQuestions = [...prevQuestions];
-          const questionIndex = newQuestions.findIndex((q) => q.id === activeQuestionId);
-          const question = newQuestions[questionIndex];
-
-          const activeOptionId = activeId.split('-')[2];
-          const overOptionId = overId.split('-')[2];
-
-          const oldIndex = question.options.findIndex((option) => option.id === activeOptionId);
-          const newIndex = question.options.findIndex((option) => option.id === overOptionId);
-
-          newQuestions[questionIndex] = {
-            ...question,
-            options: arrayMove(question.options, oldIndex, newIndex),
-          };
-
-          return newQuestions;
-        });
-      }
+  const handleNewQuestionDragEnd = (event: DragEndEvent) => {
+    if (event.active.data.current?.type === 'question-template') {
+      const newQuestion: Question = {
+        id: String(questions.length + 1),
+        question: 'New Question',
+        options: [
+          { id: `new-${questions.length + 1}-a`, text: 'Option A', isCorrect: false },
+          { id: `new-${questions.length + 1}-b`, text: 'Option B', isCorrect: false },
+          { id: `new-${questions.length + 1}-c`, text: 'Option C', isCorrect: false },
+          { id: `new-${questions.length + 1}-d`, text: 'Option D', isCorrect: false },
+        ],
+      };
+      setQuestions([...questions, newQuestion]);
     }
   };
 
@@ -126,21 +69,10 @@ const MultipleChoiceDemo = () => {
         <h1 className="text-3xl font-bold text-foreground mb-2">Multiple Choice Questions - DnD Kit Demo</h1>
       </div>
 
-      <div className="space-y-6">
-        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleQuestionDragEnd}>
-          <SortableContext
-            items={questions.map((question) => `question-${question.id}`)}
-            strategy={verticalListSortingStrategy}
-          >
-            {questions.map((question, questionIndex) => (
-              <SortableQuestion
-                key={question.id}
-                question={question}
-                index={questionIndex}
-                onOptionDragEnd={handleOptionDragEnd}
-              />
-            ))}
-          </SortableContext>
+      <div className="flex space-x-6">
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleNewQuestionDragEnd}>
+          <Workspace questions={questions} setQuestions={setQuestions} />
+          <Panel />
         </DndContext>
       </div>
     </div>

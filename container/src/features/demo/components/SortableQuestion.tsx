@@ -14,7 +14,7 @@ import {
   useSortable,
 } from '@dnd-kit/sortable';
 import { ArrowUpDown } from 'lucide-react';
-import type { SortableQuestionProps } from './types/types';
+import type { SortableQuestionProps } from '../types/types';
 import SortableOption from './SortableOption';
 
 const SortableQuestion = ({ question, index, onOptionDragEnd }: SortableQuestionProps) => {
@@ -43,7 +43,7 @@ const SortableQuestion = ({ question, index, onOptionDragEnd }: SortableQuestion
       ref={setNodeRef}
       style={style}
       className={`
-        bg-white rounded-lg shadow-lg p-6 border-2 border-transparent flex items-center gap-4
+        bg-white rounded-lg shadow-lg p-6 border-2 border-transparent flex items-center gap-4 min-w-3xl
         ${isDragging ? 'opacity-50 border-blue-300' : ''}
         hover:shadow-xl transition-shadow
       `}

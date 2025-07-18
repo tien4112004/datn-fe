@@ -97,20 +97,22 @@ const Workspace: React.FC<WorkspaceProps> = ({ questions, setQuestions }) => {
   };
 
   return (
-    <div ref={setDroppableNodeRef} className={`flex-1 ${isOver ? 'bg-red-500' : ''}`}>
+    <div ref={setDroppableNodeRef} className={`flex-1 ${isOver ? 'bg-red-500' : ''} p-4`}>
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleQuestionDragEnd}>
         <SortableContext
           items={questions.map((question) => `question-${question.id}`)}
           strategy={verticalListSortingStrategy}
         >
-          {questions.map((question, questionIndex) => (
-            <SortableQuestion
-              key={question.id}
-              question={question}
-              index={questionIndex}
-              onOptionDragEnd={handleOptionDragEnd}
-            />
-          ))}
+          <div className="space-y-4">
+            {questions.map((question, questionIndex) => (
+              <SortableQuestion
+                key={question.id}
+                question={question}
+                index={questionIndex}
+                onOptionDragEnd={handleOptionDragEnd}
+              />
+            ))}
+          </div>
         </SortableContext>
       </DndContext>
     </div>

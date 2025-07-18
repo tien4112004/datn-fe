@@ -1,12 +1,5 @@
 import { useState } from 'react';
-import {
-  DndContext,
-  closestCenter,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  type DragEndEvent,
-} from '@dnd-kit/core';
+import { DndContext, PointerSensor, useSensor, useSensors, type DragEndEvent } from '@dnd-kit/core';
 import type { Question } from '../types/types';
 import Workspace from './Workspace';
 import Panel from './Panel';
@@ -23,40 +16,43 @@ const MultipleChoiceDemo = () => {
         { id: '1d', text: 'Madrid', isCorrect: false },
       ],
     },
-    // {
-    //   id: '2',
-    //   question: 'Which programming language is known for its use in web development?',
-    //   options: [
-    //     { id: '2a', text: 'Python', isCorrect: false },
-    //     { id: '2b', text: 'JavaScript', isCorrect: true },
-    //     { id: '2c', text: 'C++', isCorrect: false },
-    //     { id: '2d', text: 'Java', isCorrect: false },
-    //   ],
-    // },
-    // {
-    //   id: '3',
-    //   question: 'What does HTML stand for?',
-    //   options: [
-    //     { id: '3a', text: 'HyperText Markup Language', isCorrect: true },
-    //     { id: '3b', text: 'High Tech Modern Language', isCorrect: false },
-    //     { id: '3c', text: 'Home Tool Markup Language', isCorrect: false },
-    //     { id: '3d', text: 'Hyperlink and Text Markup Language', isCorrect: false },
-    //   ],
-    // },
+    {
+      id: '2',
+      question: 'Which programming language is known for its use in web development?',
+      options: [
+        { id: '2a', text: 'Python', isCorrect: false },
+        { id: '2b', text: 'JavaScript', isCorrect: true },
+        { id: '2c', text: 'C++', isCorrect: false },
+        { id: '2d', text: 'Java', isCorrect: false },
+      ],
+    },
+    {
+      id: '3',
+      question: 'What does HTML stand for?',
+      options: [
+        { id: '3a', text: 'HyperText Markup Language', isCorrect: true },
+        { id: '3b', text: 'High Tech Modern Language', isCorrect: false },
+        { id: '3c', text: 'Home Tool Markup Language', isCorrect: false },
+        { id: '3d', text: 'Hyperlink and Text Markup Language', isCorrect: false },
+      ],
+    },
   ]);
 
   const sensors = useSensors(useSensor(PointerSensor));
 
   const handleNewQuestionDragEnd = (event: DragEndEvent) => {
-    if (event.active.data.current?.type === 'question-template') {
+    if (!event.over) return;
+
+    // Only handle question-template drags, ignore question/option drags
+    if (event.active.data.current?.type === 'question-template' && event.over.id === 'workspace') {
       const newQuestion: Question = {
         id: String(questions.length + 1),
         question: 'New Question',
         options: [
-          { id: `new-${questions.length + 1}-a`, text: 'Option A', isCorrect: false },
-          { id: `new-${questions.length + 1}-b`, text: 'Option B', isCorrect: false },
-          { id: `new-${questions.length + 1}-c`, text: 'Option C', isCorrect: false },
-          { id: `new-${questions.length + 1}-d`, text: 'Option D', isCorrect: false },
+          { id: `${questions.length + 1}a`, text: 'Option A', isCorrect: false },
+          { id: `${questions.length + 1}b`, text: 'Option B', isCorrect: false },
+          { id: `${questions.length + 1}c`, text: 'Option C', isCorrect: false },
+          { id: `${questions.length + 1}d`, text: 'Option D', isCorrect: false },
         ],
       };
       setQuestions([...questions, newQuestion]);
@@ -70,10 +66,14 @@ const MultipleChoiceDemo = () => {
       </div>
 
       <div className="flex space-x-6">
-        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleNewQuestionDragEnd}>
+        <DndContext sensors={sensors} onDragEnd={handleNewQuestionDragEnd}>
           <Workspace questions={questions} setQuestions={setQuestions} />
           <Panel />
         </DndContext>
+        <p className="mt-6 text-sm text-gray-600">
+          Drag and drop to reorder questions and options. Click on the question template to add a new
+          question.
+        </p>
       </div>
     </div>
   );

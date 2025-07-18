@@ -1,12 +1,7 @@
 import { useDraggable } from '@dnd-kit/core';
 
 const Panel = () => {
-  const {
-    attributes,
-    listeners,
-    setNodeRef: setDraggableNodeRef,
-    transform,
-  } = useDraggable({
+  const { attributes, listeners, setNodeRef, transform, isDragging, active } = useDraggable({
     id: 'question-template',
     data: {
       type: 'question-template',
@@ -15,10 +10,12 @@ const Panel = () => {
 
   return (
     <div
-      ref={setDraggableNodeRef}
+      ref={setNodeRef}
       {...attributes}
       {...listeners}
-      className="w-64 h-32 bg-blue-100 border-2 border-dashed border-blue-300 rounded-lg p-4 cursor-grab active:cursor-grabbing hover:bg-blue-200 transition-colors"
+      className={`w-64 h-16 bg-blue-100 border-2 border-dashed border-blue-300 rounded-lg p-4 cursor-grab active:cursor-grabbing hover:bg-blue-200 transition-colors ${
+        isDragging ? 'opacity-50' : ''
+      }`}
       style={{
         transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
       }}

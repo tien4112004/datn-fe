@@ -46,6 +46,9 @@ const Nav = () => {
           <NavLink to="/presentation/123" className="hover:underline">
             {t('presentationDetails')}
           </NavLink>
+          <NavLink to="/dnd" className="hover:underline">
+            Dnd Demo
+          </NavLink>
         </div>
 
         <div>

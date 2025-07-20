@@ -1,0 +1,184 @@
+# .github/workflows/ci-cd.yml
+name: CI/CD
+
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  path_filter:
+    name: Check for path changes
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    outputs:
+      presentation_changed: ${{ steps.filter.outputs.presentation }}
+      container_changed: ${{ steps.filter.outputs.container }}
+      something_changed: ${{ steps.filter.outputs.presentation || steps.filter.outputs.container }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            presentation:
+              - 'presentation/**'
+            container:
+              - 'container/**'
+
+  ci:
+    name: Build and Test
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
+    needs: path_filter
+    if: github.event_name == 'push' && (needs.path_filter.outputs.something_changed == 'true')
+    env:
+      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+      TURBO_TEAM: 'datn-fe'
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Cache turbo build setup
+        uses: actions/cache@v4
+        with:
+          path: .turbo
+          key: ${{ runner.os }}-turbo-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.12.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm build
+
+      - name: Test
+        run: pnpm test
+
+  deploy_presentation:
+    name: Deploy Presentation Preview
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: read
+    needs: [ci, path_filter]
+    if: github.event_name == 'pull_request' && needs.path_filter.outputs.presentation_changed == 'true'
+    env:
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PRESENTATION_ID }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.12.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+          cache: pnpm
+
+      - name: Pull Vercel Environment Information
+        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Build Project Artifacts
+        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Deploy Project and Get URL
+        id: deploy_vercel
+        run: |
+          DEPLOY_OUTPUT=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})
+          echo "$DEPLOY_OUTPUT"
+          PREVIEW_URL=$(echo "$DEPLOY_OUTPUT" | grep -oE "https://[a-zA-Z0-9.-]+\.vercel\.app" | tail -n 1)
+          echo "preview_url=$PREVIEW_URL" >> "$GITHUB_OUTPUT"
+
+      - name: Add PR Comment
+        if: steps.deploy_vercel.outputs.preview_url != ''
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `Vercel Presentation Preview: ${{ steps.deploy_vercel.outputs.preview_url }}`
+            })
+
+  deploy_container:
+    name: Deploy Container Preview
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: read
+    needs: [ci, path_filter]
+    if: github.event_name == 'pull_request' && needs.path_filter.outputs.container_changed == 'true'
+    env:
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_CONTAINER_ID }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.12.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+          cache: pnpm
+
+      - name: Pull Vercel Environment Information
+        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Build Project Artifacts
+        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Deploy Project and Get URL
+        id: deploy_vercel
+        run: |
+          DEPLOY_OUTPUT=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})
+          echo "$DEPLOY_OUTPUT"
+          PREVIEW_URL=$(echo "$DEPLOY_OUTPUT" | grep -oE "https://[a-zA-Z0-9.-]+\.vercel\.app" | tail -n 1)
+          echo "preview_url=$PREVIEW_URL" >> "$GITHUB_OUTPUT"
+
+      - name: Add PR Comment
+        if: steps.deploy_vercel.outputs.preview_url != ''
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `Vercel Container Preview: ${{ steps.deploy_vercel.outputs.preview_url }}`
+            })

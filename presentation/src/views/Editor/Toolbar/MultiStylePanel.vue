@@ -119,16 +119,17 @@
         style="width: 20%"
         v-tooltip="$t('styling.elements.multi.increaseFontSize')"
         @click="updateFontStyle('fontsize-add', '2')"
-        ><IconFontSize />+</Button
       >
+        <IconFontSize />+
+      </Button>
       <Button
         last
         class="font-size-btn"
         style="width: 20%"
         v-tooltip="$t('styling.elements.multi.decreaseFontSize')"
         @click="updateFontStyle('fontsize-reduce', '2')"
-        ><IconFontSize />-</Button
-      >
+        ><IconFontSize />-
+      </Button>
     </ButtonGroup>
     <RadioGroup
       class="row"

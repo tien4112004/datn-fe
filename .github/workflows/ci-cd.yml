@@ -2,9 +2,6 @@
 name: CI/CD
 
 on:
-  push:
-    branches:
-      - '**'
   pull_request:
     branches:
       - main
@@ -84,7 +81,7 @@ jobs:
     needs: [ci, path_filter]
     outputs:
       preview_url: ${{ steps.deploy_vercel.outputs.preview_url }}
-    if: github.event_name == 'pull_request' && needs.path_filter.outputs.presentation_changed == 'true'
+    if: github.event_name == 'push' && needs.path_filter.outputs.presentation_changed == 'true'
     env:
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PRESENTATION_ID }}
@@ -127,7 +124,7 @@ jobs:
       pull-requests: write
       contents: read
     needs: [ci, path_filter, deploy_presentation]
-    if: github.event_name == 'pull_request' && needs.path_filter.outputs.container_changed == 'true'
+    if: github.event_name == 'push' && needs.path_filter.outputs.container_changed == 'true'
     env:
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_CONTAINER_ID }}

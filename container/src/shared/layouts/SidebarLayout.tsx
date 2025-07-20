@@ -18,6 +18,8 @@ function NavLayoutContent() {
     }
   };
 
+  //
+
   React.useEffect(() => {
     subscribe('toggleSidebar', () => toggleSidebar());
     subscribe('hideSidebar', hideSidebar);

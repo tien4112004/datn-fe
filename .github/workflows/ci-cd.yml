@@ -13,8 +13,6 @@ jobs:
   path_filter:
     name: Check for path changes
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
 
     if: github.event_name == 'pull_request'
     outputs:
@@ -23,7 +21,7 @@ jobs:
       something_changed: ${{ steps.filter.outputs.presentation || steps.filter.outputs.container }}
     steps:
       - uses: actions/checkout@v4
-      - uses: dorny/paths-filter@v3
+      - uses: dorny/paths-filter@v2
         id: filter
         with:
           filters: |

@@ -98,24 +98,16 @@ jobs:
             ${{ runner.os }}-pnpm-
 
       - name: Cache Vercel CLI
+        id: cache-vercel-presentation
         uses: actions/cache@v4
         with:
-          path: ~/.npm
+          path: ~/.npm/_npx
           key: ${{ runner.os }}-vercel-cli-${{ hashFiles('**/package.json') }}
           restore-keys: |
             ${{ runner.os }}-vercel-cli-
 
-      - name: Cache Vercel artifacts
-        uses: actions/cache@v4
-        with:
-          path: |
-            .vercel
-            presentation/.vercel
-          key: ${{ runner.os }}-vercel-presentation-${{ hashFiles('**/vercel.json', '**/package.json') }}
-          restore-keys: |
-            ${{ runner.os }}-vercel-presentation-
-
       - name: Install Vercel CLI
+        if: steps.cache-vercel-presentation.outputs.cache-hit != 'true'
         run: npm install --global vercel@latest
 
       - name: Setup pnpm
@@ -167,24 +159,16 @@ jobs:
             ${{ runner.os }}-pnpm-
 
       - name: Cache Vercel CLI
+        id: cache-vercel-container
         uses: actions/cache@v4
         with:
-          path: ~/.npm
+          path: ~/.npm/_npx
           key: ${{ runner.os }}-vercel-cli-${{ hashFiles('**/package.json') }}
           restore-keys: |
             ${{ runner.os }}-vercel-cli-
 
-      - name: Cache Vercel artifacts
-        uses: actions/cache@v4
-        with:
-          path: |
-            .vercel
-            container/.vercel
-          key: ${{ runner.os }}-vercel-container-${{ hashFiles('**/vercel.json', '**/package.json') }}
-          restore-keys: |
-            ${{ runner.os }}-vercel-container-
-
       - name: Install Vercel CLI
+        if: steps.cache-vercel-container.outputs.cache-hit != 'true'
         run: npm install --global vercel@latest
 
       - name: Setup pnpm
@@ -207,14 +191,14 @@ jobs:
 
       - name: Generate vercel.json with dynamic rewrites
         run: |
-          PREVIEW_API_URL=${{ needs.deploy_presentation.outputs.preview_url }}
+          PREVIEW_PRESENTATION_URL=${{ needs.deploy_presentation.outputs.preview_url }}
 
           cat <<EOF > vercel.json
           {
             "rewrites": [
               {
                 "source": "/vue-remote",
-                "destination": "$PREVIEW_API_URL"
+                "destination": "$PREVIEW_PRESENTATION_URL"
               }
             ]
           }

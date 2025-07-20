@@ -1,0 +1,50 @@
+name: Vercel Preview Deployment
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_CONTAINER_ID }}
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'container/**'
+
+jobs:
+  Deploy-Container-Preview:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      - name: Pull Vercel Environment Information
+        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Build Project Artifacts
+        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Deploy Project Artifacts to Vercel
+        run: vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Get Vercel Preview URL
+        id: get_url
+        run: |
+          if [ "${{ github.ref_name }}" != "main" ]; then
+            # You might need to parse the vercel deploy output to get the URL
+            # This is a placeholder and might require more advanced parsing or a dedicated Vercel Action
+            PREVIEW_URL=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }} --json | jq -r '.url')
+            echo "preview_url=$PREVIEW_URL" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Add PR Comment
+        if: github.event_name == 'pull_request' && steps.get_url.outputs.preview_url != ''
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `Vercel Preview: ${{ steps.get_url.outputs.preview_url }}`
+            })

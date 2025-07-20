@@ -82,6 +82,8 @@ jobs:
       pull-requests: write
       contents: read
     needs: [ci, path_filter]
+    outputs:
+      preview_url: ${{ steps.deploy_vercel.outputs.preview_url }}
     if: github.event_name == 'pull_request' && needs.path_filter.outputs.presentation_changed == 'true'
     env:
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
@@ -118,25 +120,13 @@ jobs:
           PREVIEW_URL=$(echo "$DEPLOY_OUTPUT" | grep -oE "https://[a-zA-Z0-9.-]+\.vercel\.app" | tail -n 1)
           echo "preview_url=$PREVIEW_URL" >> "$GITHUB_OUTPUT"
 
-      - name: Add PR Comment
-        if: steps.deploy_vercel.outputs.preview_url != ''
-        uses: actions/github-script@v6
-        with:
-          script: |
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: `Vercel Presentation Preview: ${{ steps.deploy_vercel.outputs.preview_url }}`
-            })
-
   deploy_container:
     name: Deploy Container Preview
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
       contents: read
-    needs: [ci, path_filter]
+    needs: [ci, path_filter, deploy_presentation]
     if: github.event_name == 'pull_request' && needs.path_filter.outputs.container_changed == 'true'
     env:
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
@@ -168,10 +158,29 @@ jobs:
       - name: Deploy Project and Get URL
         id: deploy_vercel
         run: |
-          DEPLOY_OUTPUT=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})
+          DEPLOY_OUTPUT=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }} --env PRESENTATION_URL=${{ needs.deploy_presentation.outputs.preview_url }})
           echo "$DEPLOY_OUTPUT"
           PREVIEW_URL=$(echo "$DEPLOY_OUTPUT" | grep -oE "https://[a-zA-Z0-9.-]+\.vercel\.app" | tail -n 1)
           echo "preview_url=$PREVIEW_URL" >> "$GITHUB_OUTPUT"
+
+      - name: Delete Previous Comments
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const comments = await github.rest.issues.listComments({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo
+            });
+            for (const comment of comments.data) {
+              if (comment.body.includes('Vercel Container Preview')) {
+                await github.rest.issues.deleteComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  comment_id: comment.id
+                });
+              }
+            }
 
       - name: Add PR Comment
         if: steps.deploy_vercel.outputs.preview_url != ''

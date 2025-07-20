@@ -240,9 +240,7 @@ jobs:
               repo: context.repo.repo
             });
             for (const comment of comments.data) {
-              // print comment author
-              console.log(`Comment by ${comment.user.login}: ${comment.body}`);
-              if (comment.body.includes('Vercel')) {
+              if (comment.body.includes('Vercel') && comment.user.login === 'github-actions[bot]') {
                 await github.rest.issues.deleteComment({
                   owner: context.repo.owner,
                   repo: context.repo.repo,

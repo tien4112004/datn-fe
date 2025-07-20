@@ -152,6 +152,23 @@ jobs:
       - name: Build Project Artifacts
         run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
 
+      - name: Generate vercel.json with dynamic rewrites
+        run: |
+          PREVIEW_API_URL=${{ needs.deploy_presentation.outputs.preview_url }}
+
+          cat <<EOF > vercel.json
+          {
+            "rewrites": [
+              {
+                "source": "/vue-remote",
+                "destination": "$PREVIEW_API_URL"
+              }
+            ]
+          }
+          EOF
+          echo "Generated vercel.json:"
+          cat vercel.json
+
       - name: Deploy Project and Get URL
         id: deploy_vercel
         run: |
@@ -170,12 +187,14 @@ jobs:
               repo: context.repo.repo
             });
             for (const comment of comments.data) {
-              if (comment.body.includes('Vercel Container Preview')) {
-                await github.rest.issues.deleteComment({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  comment_id: comment.id
-                });
+              // print comment author
+              console.log(`Comment by ${comment.user.login}: ${comment.body}`);
+              if (comment.body.includes('Vercel')) {
+                # await github.rest.issues.deleteComment({
+                #   owner: context.repo.owner,
+                #   repo: context.repo.repo,
+                #   comment_id: comment.id
+                # });
               }
             }
 
@@ -188,5 +207,5 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `Vercel Container Preview: ${{ steps.deploy_vercel.outputs.preview_url }}`
+              body: `Vercel Preview: ${{ steps.deploy_vercel.outputs.preview_url }}`
             })

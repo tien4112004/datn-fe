@@ -92,7 +92,7 @@ jobs:
       - name: Cache node modules
         uses: actions/cache@v4
         with:
-          path: ~/.pnpm-store
+          path: .pnpm-store
           key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-
@@ -101,7 +101,7 @@ jobs:
         id: cache-vercel-presentation
         uses: actions/cache@v4
         with:
-          path: ~/.npm/_npx
+          path: .npm
           key: ${{ runner.os }}-vercel-cli-${{ hashFiles('**/package.json') }}
           restore-keys: |
             ${{ runner.os }}-vercel-cli-
@@ -124,9 +124,6 @@ jobs:
 
       - name: Pull Vercel Environment Information
         run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
-
-      - name: Build Project Artifacts
-        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
 
       - name: Deploy Project and Get URL
         id: deploy_vercel
@@ -153,7 +150,7 @@ jobs:
       - name: Cache node modules
         uses: actions/cache@v4
         with:
-          path: ~/.pnpm-store
+          path: .pnpm-store
           key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-
@@ -162,7 +159,7 @@ jobs:
         id: cache-vercel-container
         uses: actions/cache@v4
         with:
-          path: ~/.npm/_npx
+          path: .npm
           key: ${{ runner.os }}-vercel-cli-${{ hashFiles('**/package.json') }}
           restore-keys: |
             ${{ runner.os }}-vercel-cli-
@@ -185,9 +182,6 @@ jobs:
 
       - name: Pull Vercel Environment Information
         run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
-
-      - name: Build Project Artifacts
-        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
 
       - name: Generate vercel.json with dynamic rewrites
         run: |

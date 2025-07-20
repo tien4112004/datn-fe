@@ -32,3 +32,4 @@ coverage
 .__mf__temp/
 .env
 .turbo
+.vercel

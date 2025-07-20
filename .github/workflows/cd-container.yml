@@ -37,20 +37,16 @@ jobs:
         run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
 
       - name: Deploy Project Artifacts to Vercel
-        run: vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }}
-
-      - name: Get Vercel Preview URL
-        id: get_url
+        id: deploy_vercel
         run: |
-          if [ "${{ github.ref_name }}" != "main" ]; then
-            # You might need to parse the vercel deploy output to get the URL
-            # This is a placeholder and might require more advanced parsing or a dedicated Vercel Action
-            PREVIEW_URL=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }} --json | jq -r '.url')
-            echo "preview_url=$PREVIEW_URL" >> $GITHUB_OUTPUT
-          fi
+          DEPLOY_OUTPUT=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})
+          echo "$DEPLOY_OUTPUT" # Print the output for logs
+          PREVIEW_URL=$(echo "$DEPLOY_OUTPUT" | grep -oE "https://[a-zA-Z0-9.-]+\.vercel\.app" | tail -n 1)
+
+          echo "preview_url=$PREVIEW_URL" >> "$GITHUB_OUTPUT"
 
       - name: Add PR Comment
-        if: github.event_name == 'pull_request' && steps.get_url.outputs.preview_url != ''
+        if: github.event_name == 'pull_request' && steps.deploy_vercel.outputs.preview_url != ''
         uses: actions/github-script@v6
         with:
           script: |
@@ -58,5 +54,5 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `Vercel Preview: ${{ steps.get_url.outputs.preview_url }}`
+              body: `Vercel Preview: ${{ steps.deploy_vercel.outputs.preview_url }}`
             })

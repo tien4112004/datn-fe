@@ -112,17 +112,19 @@ jobs:
 
       - name: Get npm global path
         id: npm-global-cache
-        run: echo "::set-output name=dir::$(npm config get prefix)"
+        run: |
+          echo "NPM_GLOBAL_DIR=$(npm config get prefix)" >> $GITHUB_ENV
 
       - name: Cache global npm packages
         uses: actions/cache@v4
         with:
-          path: ${{ steps.npm-global-cache.outputs.dir }}
+          path: ${{ env.NPM_GLOBAL_DIR }}
           key: ${{ runner.os }}-npm-global-${{ hashFiles('package.json') }}
           restore-keys: |
             ${{ runner.os }}-npm-global-
 
       - name: Install Vercel CLI
+        if: steps.npm-global-cache.outputs.cache-hit != 'true'
         run: npm install --global vercel@latest
 
       - name: Pull Vercel Environment Information
@@ -176,17 +178,19 @@ jobs:
 
       - name: Get npm global path
         id: npm-global-cache
-        run: echo "::set-output name=dir::$(npm config get prefix)"
+        run: |
+          echo "NPM_GLOBAL_DIR=$(npm config get prefix)" >> $GITHUB_ENV
 
       - name: Cache global npm packages
         uses: actions/cache@v4
         with:
-          path: ${{ steps.npm-global-cache.outputs.dir }}
+          path: ${{ env.NPM_GLOBAL_DIR }}
           key: ${{ runner.os }}-npm-global-${{ hashFiles('package.json') }}
           restore-keys: |
             ${{ runner.os }}-npm-global-
 
       - name: Install Vercel CLI
+        if: steps.npm-global-cache.outputs.cache-hit != 'true'
         run: npm install --global vercel@latest
 
       - name: Pull Vercel Environment Information

@@ -105,7 +105,8 @@
             ><IconAlignLeft class="icon" /> {{ $t('mobile.toolbar.element.alignLeft') }}</Button
           >
           <Button style="flex: 1" @click="alignElementToCanvas(ElementAlignCommands.HORIZONTAL)"
-            ><IconAlignVertically class="icon" /> {{ $t('mobile.toolbar.element.centerHorizontally') }}</Button
+            ><IconAlignVertically class="icon" />
+            {{ $t('mobile.toolbar.element.centerHorizontally') }}</Button
           >
           <Button style="flex: 1" @click="alignElementToCanvas(ElementAlignCommands.RIGHT)"
             ><IconAlignRight class="icon" /> {{ $t('mobile.toolbar.element.alignRight') }}</Button
@@ -116,7 +117,8 @@
             ><IconAlignTop class="icon" /> {{ $t('mobile.toolbar.element.alignTop') }}</Button
           >
           <Button style="flex: 1" @click="alignElementToCanvas(ElementAlignCommands.VERTICAL)"
-            ><IconAlignHorizontally class="icon" /> {{ $t('mobile.toolbar.element.centerVertically') }}</Button
+            ><IconAlignHorizontally class="icon" />
+            {{ $t('mobile.toolbar.element.centerVertically') }}</Button
           >
           <Button style="flex: 1" @click="alignElementToCanvas(ElementAlignCommands.BOTTOM)"
             ><IconAlignBottom class="icon" /> {{ $t('mobile.toolbar.element.alignBottom') }}</Button

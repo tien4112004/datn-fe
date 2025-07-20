@@ -128,9 +128,7 @@
         </div>
       </div>
       <div class="btns">
-        <Button class="btn" type="primary" @click="createPPT()">{{
-          $t('ai.dialog.generate')
-        }}</Button>
+        <Button class="btn" type="primary" @click="createPPT()">{{ $t('ai.dialog.generate') }}</Button>
         <Button class="btn" @click="step = 'outline'">{{ $t('ai.dialog.actions.backToOutline') }}</Button>
       </div>
     </div>

@@ -17,7 +17,9 @@ const PresentationWrapper = () => {
 
     import('vueRemote/Editor')
       .then((mod) => {
-        mod.mount(containerRef.current);
+        mod.mount(containerRef.current, {
+          titleTest: 'random',
+        });
         setIsLoading(false);
       })
       .catch((err) => {

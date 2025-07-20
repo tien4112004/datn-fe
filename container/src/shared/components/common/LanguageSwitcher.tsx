@@ -1,3 +1,5 @@
+// DEPRECATED: This file is no longer in use.
+
 import { useTranslation } from 'react-i18next';
 import { Popover, PopoverTrigger, PopoverContent } from '@/shared/components/ui/popover';
 import { Button } from '@/shared/components/ui/button';

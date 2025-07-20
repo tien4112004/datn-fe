@@ -1,5 +1,6 @@
 .vue-remote {
-  height: calc(100vh - var(--header-height, 64px)); // fallback to 64px if custom property not available
+  // height: calc(100vh - var(--header-height, 64px)); // fallback to 64px if custom property not available
+  height: calc(100vh - 16px);
 
   span.i-icon {
     font-size: $smIconSize;

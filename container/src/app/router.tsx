@@ -1,5 +1,5 @@
 import { createBrowserRouter } from 'react-router-dom';
-import NavLayout from '../shared/layouts/NavLayout';
+import NavLayout from '../shared/layouts/SidebarLayout';
 import Presentation from '@/features/presentation';
 import Demo from '@/features/demo';
 

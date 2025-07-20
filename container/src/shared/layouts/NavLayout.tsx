@@ -1,3 +1,5 @@
+// DEPRECATED: This file is no longer in use.
+
 import Nav from '@/shared/layouts/Nav';
 import { Outlet, useNavigation } from 'react-router-dom';
 import GlobalSpinner from '@/components/common/GlobalSpinner';

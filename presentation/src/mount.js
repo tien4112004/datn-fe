@@ -7,8 +7,8 @@ import '@/assets/styles/prosemirror.scss';
 import '@/assets/styles/scope.scss';
 import i18n from '@/locales';
 
-export function mount(el) {
-  const app = createApp(App);
+export function mount(el, props) {
+  const app = createApp(App, props);
 
   const pinia = createPinia();
   app.use(pinia);

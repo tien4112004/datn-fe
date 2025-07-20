@@ -3,32 +3,18 @@
     <Tabs :tabs="tabs" v-model:value="type" :tabsStyle="{ marginBottom: '15px' }" />
 
     <template v-if="type === 'video'">
-      <Input
-        v-model:value="videoSrc"
-        :placeholder="t('toolbar.media.input.videoPlaceholder')"
-      ></Input>
+      <Input v-model:value="videoSrc" :placeholder="t('toolbar.media.input.videoPlaceholder')"></Input>
       <div class="btns">
-        <Button @click="emit('close')" style="margin-right: 10px">{{
-          $t('ui.actions.cancel')
-        }}</Button>
-        <Button type="primary" @click="insertVideo()">{{
-          $t('ui.actions.confirm')
-        }}</Button>
+        <Button @click="emit('close')" style="margin-right: 10px">{{ $t('ui.actions.cancel') }}</Button>
+        <Button type="primary" @click="insertVideo()">{{ $t('ui.actions.confirm') }}</Button>
       </div>
     </template>
 
     <template v-if="type === 'audio'">
-      <Input
-        v-model:value="audioSrc"
-        :placeholder="t('toolbar.media.input.audioPlaceholder')"
-      ></Input>
+      <Input v-model:value="audioSrc" :placeholder="t('toolbar.media.input.audioPlaceholder')"></Input>
       <div class="btns">
-        <Button @click="emit('close')" style="margin-right: 10px">{{
-          $t('ui.actions.cancel')
-        }}</Button>
-        <Button type="primary" @click="insertAudio()">{{
-          $t('ui.actions.confirm')
-        }}</Button>
+        <Button @click="emit('close')" style="margin-right: 10px">{{ $t('ui.actions.cancel') }}</Button>
+        <Button type="primary" @click="insertAudio()">{{ $t('ui.actions.confirm') }}</Button>
       </div>
     </template>
   </div>

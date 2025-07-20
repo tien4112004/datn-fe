@@ -217,8 +217,8 @@ watch(
       handleElement.value.pattern !== undefined
         ? 'pattern'
         : handleElement.value.gradient
-        ? 'gradient'
-        : 'fill';
+          ? 'gradient'
+          : 'fill';
     textAlign.value = handleElement.value?.text?.align || 'middle';
 
     if (handleElement.value.text?.content) {

@@ -13,8 +13,9 @@ jobs:
   path_filter:
     name: Check for path changes
     runs-on: ubuntu-latest
-
-    if: github.event_name == 'pull_request'
+    permissions:
+      pull-requests: read
+      contents: read
     outputs:
       presentation_changed: ${{ steps.filter.outputs.presentation }}
       container_changed: ${{ steps.filter.outputs.container }}

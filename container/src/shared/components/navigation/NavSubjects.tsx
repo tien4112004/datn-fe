@@ -1,9 +1,4 @@
-import {
-  Folder,
-  MoreHorizontal,
-  Share,
-  Trash2,
-} from "lucide-react"
+import { Folder, MoreHorizontal, Share, Trash2 } from 'lucide-react';
 
 import {
   DropdownMenu,
@@ -11,7 +6,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/shared/components/ui/dropdown-menu"
+} from '@/shared/components/ui/dropdown-menu';
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -20,20 +15,20 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from "@/shared/components/ui/sidebar"
-import { NavLink } from "react-router-dom"
-import { useTranslation } from "react-i18next"
+} from '@/shared/components/ui/sidebar';
+import { NavLink } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 export function NavSubjects({
   subjects,
 }: {
   subjects: {
-    name: string
-    url: string
-  }[]
+    name: string;
+    url: string;
+  }[];
 }) {
-  const { isMobile } = useSidebar()
-  const { t } = useTranslation('navSidebar')
+  const { isMobile } = useSidebar();
+  const { t } = useTranslation('navSidebar');
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
@@ -55,8 +50,8 @@ export function NavSubjects({
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 className="w-48"
-                side={isMobile ? "bottom" : "right"}
-                align={isMobile ? "end" : "start"}
+                side={isMobile ? 'bottom' : 'right'}
+                align={isMobile ? 'end' : 'start'}
               >
                 <DropdownMenuItem>
                   <Folder className="text-muted-foreground" />
@@ -83,5 +78,5 @@ export function NavSubjects({
         </SidebarMenuItem>
       </SidebarMenu>
     </SidebarGroup>
-  )
+  );
 }

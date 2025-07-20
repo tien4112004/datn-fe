@@ -13,7 +13,9 @@ function NavLayoutContent() {
   const { t } = useTranslation();
 
   const hideSidebar = () => {
-    if (state === "expanded") { toggleSidebar(); }
+    if (state === 'expanded') {
+      toggleSidebar();
+    }
   };
 
   React.useEffect(() => {

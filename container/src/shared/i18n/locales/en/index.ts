@@ -1,9 +1,9 @@
 export default {
   navSidebar: {
     slogan: "The teacher's powerful ally",
-    notification: "Notifications",
-    features: "Features",
-    create: "Create",
+    notification: 'Notifications',
+    features: 'Features',
+    create: 'Create',
     resources: {
       index: 'Resources',
       files: 'Files',

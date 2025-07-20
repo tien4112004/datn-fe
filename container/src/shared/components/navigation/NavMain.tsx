@@ -1,12 +1,8 @@
-"use client"
+'use client';
 
-import { ChevronRight, type LucideIcon } from "lucide-react"
+import { ChevronRight, type LucideIcon } from 'lucide-react';
 
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/shared/components/ui/collapsible"
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/shared/components/ui/collapsible';
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -17,30 +13,30 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-} from "@/shared/components/ui/sidebar"
-import { useTranslation } from "react-i18next"
-import { NavLink } from "react-router-dom"
+} from '@/shared/components/ui/sidebar';
+import { useTranslation } from 'react-i18next';
+import { NavLink } from 'react-router-dom';
 
 export function NavMain({
   items,
 }: {
   items: ({
-    title: string
-    icon: LucideIcon
-    isActive?: boolean
+    title: string;
+    icon: LucideIcon;
+    isActive?: boolean;
   } & (
     | {
-        url: string
-        items?: never
+        url: string;
+        items?: never;
       }
     | {
-        url?: never
+        url?: never;
         items: {
-          title: string
-          url: string
-        }[]
+          title: string;
+          url: string;
+        }[];
       }
-  ))[]
+  ))[];
 }) {
   const { t } = useTranslation('navSidebar');
 
@@ -90,5 +86,5 @@ export function NavMain({
         ))}
       </SidebarMenu>
     </SidebarGroup>
-  )
+  );
 }

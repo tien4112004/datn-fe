@@ -3,11 +3,7 @@
     <div class="title">
       <div class="lef">Table {{ endCell.length ? `${endCell[0]} x ${endCell[1]}` : '' }}</div>
       <div class="right" @click="isCustom = !isCustom">
-        {{
-          isCustom
-            ? $t('ui.actions.back')
-            : $t('toolbar.table.generator.custom')
-        }}
+        {{ isCustom ? $t('ui.actions.back') : $t('toolbar.table.generator.custom') }}
       </div>
     </div>
     <table @mouseleave="endCell = []" @click="handleClickTable()" v-if="!isCustom">

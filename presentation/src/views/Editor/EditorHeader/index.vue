@@ -4,7 +4,6 @@
       <button class="menu-item" @click="handleToggleSidebar">
         <IconMoreApp />
       </button>
-      
 
       <div class="title">
         <Input

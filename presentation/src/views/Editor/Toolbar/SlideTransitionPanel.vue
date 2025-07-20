@@ -12,7 +12,9 @@
         <div class="animation-text">{{ item.label }}</div>
       </div>
     </div>
-    <Button style="width: 100%" @click="applyAllSlide()">{{ $t('styling.slide.transition.applyToAll') }}</Button>
+    <Button style="width: 100%" @click="applyAllSlide()">{{
+      $t('styling.slide.transition.applyToAll')
+    }}</Button>
   </div>
 </template>
 

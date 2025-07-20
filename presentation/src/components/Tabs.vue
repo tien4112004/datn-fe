@@ -106,7 +106,9 @@ const emit = defineEmits<{
       display: flex;
       justify-content: center;
       align-items: center;
-      transition: background-color 0.2s ease, opacity 0.2s ease;
+      transition:
+        background-color 0.2s ease,
+        opacity 0.2s ease;
 
       cursor: pointer;
       border-radius: $borderRadius;

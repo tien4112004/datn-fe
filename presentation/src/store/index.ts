@@ -4,5 +4,12 @@ import { useSnapshotStore } from './snapshot';
 import { useKeyboardStore } from './keyboard';
 import { useScreenStore } from './screen';
 import { useContainerStore } from './container';
-  
-export { useMainStore, useSlidesStore, useSnapshotStore, useKeyboardStore, useScreenStore, useContainerStore };
+
+export {
+  useMainStore,
+  useSlidesStore,
+  useSnapshotStore,
+  useKeyboardStore,
+  useScreenStore,
+  useContainerStore,
+};

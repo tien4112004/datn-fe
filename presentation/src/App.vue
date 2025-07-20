@@ -31,7 +31,7 @@ import VuePlugin from '@stagewise-plugins/vue';
 const _isPC = isPC();
 
 const props = defineProps<{
-  titleTest: string
+  titleTest: string;
 }>();
 
 // Stagewise configuration

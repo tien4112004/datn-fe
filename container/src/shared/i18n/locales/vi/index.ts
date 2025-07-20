@@ -1,9 +1,9 @@
 export default {
   navSidebar: {
-    slogan: "Trợ thủ đắc lực của giáo viên",
-    notification: "Thông báo",
-    features: "Tính năng",
-    create: "Tạo mới",
+    slogan: 'Trợ thủ đắc lực của giáo viên',
+    notification: 'Thông báo',
+    features: 'Tính năng',
+    create: 'Tạo mới',
     resources: {
       index: 'Tài nguyên',
       files: 'Tập tin',

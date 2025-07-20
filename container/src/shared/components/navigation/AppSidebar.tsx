@@ -1,18 +1,10 @@
-import * as React from "react"
-import {
-  Bell,
-  BookOpen,
-  Command,
-  File,
-  Home,
-  Plus,
-  Settings2,
-} from "lucide-react"
+import * as React from 'react';
+import { Bell, BookOpen, Command, File, Home, Plus, Settings2 } from 'lucide-react';
 
-import { NavMain } from "@/shared/components/navigation/NavMain"
-import { NavSubjects } from "@/shared/components/navigation/NavSubjects"
-import { NavSecondary } from "@/shared/components/navigation/NavSecondary"
-import { NavUser } from "@/shared/components/navigation/NavUser"
+import { NavMain } from '@/shared/components/navigation/NavMain';
+import { NavSubjects } from '@/shared/components/navigation/NavSubjects';
+import { NavSecondary } from '@/shared/components/navigation/NavSecondary';
+import { NavUser } from '@/shared/components/navigation/NavUser';
 import {
   Sidebar,
   SidebarContent,
@@ -21,27 +13,27 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/shared/components/ui/sidebar"
-import { useTranslation } from "react-i18next"
+} from '@/shared/components/ui/sidebar';
+import { useTranslation } from 'react-i18next';
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { t } = useTranslation('navSidebar');
 
   const data = {
     user: {
-      name: "Boss",
-      email: "luuthaiton@example.com",
-      avatar: "/avatars/shadcn.jpg",
+      name: 'Boss',
+      email: 'luuthaiton@example.com',
+      avatar: '/avatars/shadcn.jpg',
     },
     navMain: [
       {
         title: t('home'),
-        url: "/",
+        url: '/',
         icon: Home,
       },
       {
         title: t('create'),
-        url: "#",
+        url: '#',
         icon: Plus,
       },
       {
@@ -50,31 +42,31 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         items: [
           {
             title: t('resources.files'),
-            url: "#",
+            url: '#',
           },
           {
             title: t('resources.presentations'),
-            url: "/presentation",
+            url: '/presentation',
           },
           {
             title: t('resources.lectures'),
-            url: "#",
+            url: '#',
           },
           {
             title: t('resources.exercises'),
-            url: "#",
+            url: '#',
           },
           {
             title: t('resources.videos'),
-            url: "#",
+            url: '#',
           },
           {
             title: t('resources.images'),
-            url: "#",
+            url: '#',
           },
           {
             title: t('resources.mindmaps'),
-            url: "#",
+            url: '#',
           },
         ],
       },
@@ -84,50 +76,50 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         items: [
           {
             title: t('management.classes'),
-            url: "#",
+            url: '#',
           },
           {
             title: t('management.groups'),
-            url: "#",
+            url: '#',
           },
           {
             title: t('management.subjects'),
-            url: "#",
+            url: '#',
           },
           {
             title: t('management.schedules'),
-            url: "#",
+            url: '#',
           },
         ],
       },
       {
         title: t('settings'),
-        url: "#",
+        url: '#',
         icon: Settings2,
       },
     ],
     navSecondary: [
       {
         title: t('notification'),
-        url: "#",
+        url: '#',
         icon: Bell,
       },
     ],
     subjects: [
       {
         name: t('subjects.math'),
-        url: "#",
+        url: '#',
       },
       {
         name: t('subjects.vietnamese'),
-        url: "#",
+        url: '#',
       },
       {
         name: t('subjects.english'),
-        url: "#",
+        url: '#',
       },
     ],
-  }
+  };
 
   return (
     <Sidebar variant="inset" {...props}>
@@ -157,5 +149,5 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavUser user={data.user} />
       </SidebarFooter>
     </Sidebar>
-  )
+  );
 }

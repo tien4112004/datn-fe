@@ -50,7 +50,7 @@ export default {
         printExportPDF: 'In / Xuất PDF',
         perPageCount: 'Số slide mỗi trang:',
         edgePadding: 'Lề trang:',
-        tip: "Mẹo: Nếu bản xem trước in không khớp với kiểu thực tế, vui lòng kiểm tra tùy chọn [Đồ họa nền] trong cửa sổ in hiện ra.",
+        tip: 'Mẹo: Nếu bản xem trước in không khớp với kiểu thực tế, vui lòng kiểm tra tùy chọn [Đồ họa nền] trong cửa sổ in hiện ra.',
       },
     },
 

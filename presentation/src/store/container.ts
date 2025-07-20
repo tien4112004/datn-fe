@@ -19,6 +19,6 @@ export const useContainerStore = defineStore('container', {
   actions: {
     initialize(data: Partial<ContainerState>) {
       this.titleTest = data?.titleTest || '';
-    }
+    },
   },
 });

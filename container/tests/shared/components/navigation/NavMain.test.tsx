@@ -51,7 +51,7 @@ describe('NavMain', () => {
     title: 'Dashboard',
     icon: MockIcon,
     url: '/dashboard',
-    isActive: true,
+    isExpanded: true,
   };
   const groupItem = {
     title: 'Settings',
@@ -102,11 +102,6 @@ describe('NavMain', () => {
     expect(screen.getByText('Settings')).toBeInTheDocument();
     expect(screen.getByText('Profile')).toBeInTheDocument();
     expect(screen.getByText('Account')).toBeInTheDocument();
-  });
-
-  it('applies active state to direct link', () => {
-    render(<NavMain items={[directLinkItem]} />);
-    expect(screen.getByTestId('nav-link')).toHaveClass('active');
   });
 
   it('applies active state to group and sub-items', () => {

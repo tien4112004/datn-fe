@@ -23,7 +23,7 @@ export function NavMain({
   items: ({
     title: string;
     icon: LucideIcon;
-    isActive?: boolean;
+    isExpanded?: boolean;
   } & (
     | {
         url: string;
@@ -40,12 +40,16 @@ export function NavMain({
 }) {
   const { t } = useTranslation('navSidebar');
 
+  if (items.length === 0) {
+    return null;
+  }
+
   return (
     <SidebarGroup>
       <SidebarGroupLabel>{t('features')}</SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => (
-          <Collapsible key={item.title} asChild defaultOpen={item.isActive}>
+          <Collapsible key={item.title} asChild defaultOpen={item.isExpanded}>
             {item.url ? (
               <SidebarMenuItem>
                 <SidebarMenuButton asChild tooltip={item.title}>
@@ -72,9 +76,9 @@ export function NavMain({
                     {item.items?.map((subItem) => (
                       <SidebarMenuSubItem key={subItem.title}>
                         <SidebarMenuSubButton asChild>
-                          <a href={subItem.url}>
+                          <NavLink href={subItem.url}>
                             <span>{subItem.title}</span>
-                          </a>
+                          </NavLink>
                         </SidebarMenuSubButton>
                       </SidebarMenuSubItem>
                     ))}

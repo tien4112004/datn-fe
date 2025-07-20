@@ -17,9 +17,7 @@
     </div>
 
     <div class="btns">
-      <Button @click="emit('close')" style="margin-right: 10px">{{
-        $t('canvas.linkDialog.cancel')
-      }}</Button>
+      <Button @click="emit('close')" style="margin-right: 10px">{{ $t('canvas.linkDialog.cancel') }}</Button>
       <Button type="primary" @click="save()">{{ $t('canvas.linkDialog.confirm') }}</Button>
     </div>
   </div>

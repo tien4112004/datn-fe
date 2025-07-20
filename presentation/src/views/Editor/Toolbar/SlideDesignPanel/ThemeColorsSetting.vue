@@ -19,7 +19,9 @@
       </div>
     </div>
 
-    <Button class="btn" type="primary" @click="setThemeColors()">{{ $t('styling.slide.design.confirm') }}</Button>
+    <Button class="btn" type="primary" @click="setThemeColors()">{{
+      $t('styling.slide.design.confirm')
+    }}</Button>
   </div>
 </template>
 

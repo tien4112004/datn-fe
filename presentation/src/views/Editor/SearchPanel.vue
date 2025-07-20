@@ -22,11 +22,7 @@
             >Aa</span
           >
           <Divider type="vertical" />
-          <IconLeft
-            class="next-btn left"
-            @click="searchPrev()"
-            v-tooltip="t('panels.search.previous')"
-          />
+          <IconLeft class="next-btn left" @click="searchPrev()" v-tooltip="t('panels.search.previous')" />
           <IconRight class="next-btn right" @click="searchNext()" v-tooltip="t('panels.search.next')" />
         </template>
       </Input>

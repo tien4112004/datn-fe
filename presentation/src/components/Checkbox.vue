@@ -76,7 +76,8 @@ const handleChange = (e: Event) => {
   height: 16px;
   background-color: $background;
   vertical-align: middle;
-  transition: border-color 0.15s cubic-bezier(0.71, -0.46, 0.29, 1.46),
+  transition:
+    border-color 0.15s cubic-bezier(0.71, -0.46, 0.29, 1.46),
     background-color 0.15s cubic-bezier(0.71, -0.46, 0.29, 1.46);
   z-index: 1;
 

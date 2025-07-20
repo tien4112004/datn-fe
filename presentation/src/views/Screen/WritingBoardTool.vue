@@ -151,7 +151,11 @@
             ></div>
           </div>
         </div>
-        <div class="btn close" v-tooltip="$t('presentation.writingBoard.closePenTool')" @click="closeWritingBoard()">
+        <div
+          class="btn close"
+          v-tooltip="$t('presentation.writingBoard.closePenTool')"
+          @click="closeWritingBoard()"
+        >
           <IconClose class="icon" />
         </div>
       </div>

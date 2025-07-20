@@ -59,7 +59,15 @@ interface FilterOption {
 const { t } = useI18n();
 
 const defaultFilters: FilterOption[] = [
-  { label: t('styling.effects.filter.blur'), key: 'blur', default: 0, value: 0, unit: 'px', max: 10, step: 1 },
+  {
+    label: t('styling.effects.filter.blur'),
+    key: 'blur',
+    default: 0,
+    value: 0,
+    unit: 'px',
+    max: 10,
+    step: 1,
+  },
   {
     label: t('styling.effects.filter.brightness'),
     key: 'brightness',
@@ -96,9 +104,33 @@ const defaultFilters: FilterOption[] = [
     max: 200,
     step: 5,
   },
-  { label: t('styling.effects.filter.hue'), key: 'hue-rotate', default: 0, value: 0, unit: 'deg', max: 360, step: 10 },
-  { label: t('styling.effects.filter.sepia'), key: 'sepia', default: 0, value: 0, unit: '%', max: 100, step: 5 },
-  { label: t('styling.effects.filter.invert'), key: 'invert', default: 0, value: 0, unit: '%', max: 100, step: 5 },
+  {
+    label: t('styling.effects.filter.hue'),
+    key: 'hue-rotate',
+    default: 0,
+    value: 0,
+    unit: 'deg',
+    max: 360,
+    step: 10,
+  },
+  {
+    label: t('styling.effects.filter.sepia'),
+    key: 'sepia',
+    default: 0,
+    value: 0,
+    unit: '%',
+    max: 100,
+    step: 5,
+  },
+  {
+    label: t('styling.effects.filter.invert'),
+    key: 'invert',
+    default: 0,
+    value: 0,
+    unit: '%',
+    max: 100,
+    step: 5,
+  },
   {
     label: t('styling.effects.filter.opacity'),
     key: 'opacity',

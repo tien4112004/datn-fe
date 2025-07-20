@@ -138,7 +138,7 @@ const handleMouseup = () => {
           width: 0,
           right: left,
           bottom: top,
-        } as DOMRect),
+        }) as DOMRect,
     });
     menuInstance.value.show();
   }

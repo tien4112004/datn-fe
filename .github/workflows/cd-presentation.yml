@@ -1,4 +1,4 @@
-name: Vercel Preview Deployment Presentation
+name: Preview Deployment Presentation
 env:
   VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PRESENTATION_ID }}
@@ -10,13 +10,25 @@ on:
       - 'presentation/**'
 
 jobs:
-  Deploy-Presentation-Preview:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
 
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.12.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+          cache: pnpm
 
       - name: Pull Vercel Environment Information
         run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}

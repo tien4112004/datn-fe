@@ -110,6 +110,18 @@ jobs:
           registry-url: https://registry.npmjs.org
           cache: pnpm
 
+      - name: Get npm global path
+        id: npm-global-cache
+        run: echo "::set-output name=dir::$(npm config get prefix)"
+
+      - name: Cache global npm packages
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.npm-global-cache.outputs.dir }}
+          key: ${{ runner.os }}-npm-global-${{ hashFiles('package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-global-
+
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
 
@@ -161,6 +173,18 @@ jobs:
           node-version: 22
           registry-url: https://registry.npmjs.org
           cache: pnpm
+
+      - name: Get npm global path
+        id: npm-global-cache
+        run: echo "::set-output name=dir::$(npm config get prefix)"
+
+      - name: Cache global npm packages
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.npm-global-cache.outputs.dir }}
+          key: ${{ runner.os }}-npm-global-${{ hashFiles('package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-global-
 
       - name: Install Vercel CLI
         run: npm install --global vercel@latest

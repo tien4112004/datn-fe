@@ -21,7 +21,7 @@
             :key="item.value"
             @click="activeType = item.value"
           >
-            {{ t(`editor.templates.types.${item.value}`) }}
+            {{ t(`templates.types.${item.value}`) }}
           </div>
         </div>
         <div class="insert-all" @click="insertTemplates(slides)">{{ $t('templates.actions.insertAll') }}</div>
@@ -110,6 +110,7 @@ onMounted(() => {
   height: 500px;
   display: flex;
   user-select: none;
+  width: fit-content;
 }
 .catalogs {
   width: 108px;
@@ -142,6 +143,7 @@ onMounted(() => {
 .content {
   display: flex;
   flex-direction: column;
+  width: fit-content;
 }
 .header {
   display: flex;
@@ -166,7 +168,7 @@ onMounted(() => {
   .type {
     border-radius: $borderRadius;
     padding: 3px 8px;
-    font-size: 12px;
+    font-size: $smTextSize;
     cursor: pointer;
 
     & + .type {
@@ -186,22 +188,25 @@ onMounted(() => {
 }
 .insert-all {
   opacity: 0;
-  font-size: 12px;
+  font-size: $smTextSize;
   color: $themeColor;
   text-decoration: underline;
   cursor: pointer;
 }
 .list {
-  width: 392px;
+  width: fit-content;
   padding: 2px;
   margin-right: -10px;
   padding-right: 10px;
   overflow: auto;
-  @include flex-grid-layout();
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-auto-rows: min-content;
+  gap: 10px;
 }
 .slide-item {
   position: relative;
-  @include flex-grid-layout-children(2, 48%);
+  height: fit-content;
 
   &:hover .btns {
     opacity: 1;
@@ -228,6 +233,12 @@ onMounted(() => {
     transition: outline $transitionDelay;
     border-radius: $borderRadius;
     cursor: pointer;
+  }
+}
+
+@media screen and (max-width: 1000px) {
+  .list {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 </style>

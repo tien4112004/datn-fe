@@ -31,6 +31,8 @@ export default {
       animation: 'Hiệu ứng',
       design: 'Thiết kế',
       transition: 'Chuyển trang',
+      styleMulti: 'Kiểu dáng (Chọn nhiều)',
+      positionMulti: 'Vị trí (Chọn nhiều)',
     },
 
     // Công cụ biểu đồ

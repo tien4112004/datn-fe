@@ -100,7 +100,9 @@
         </div>
         <div class="loop" @click="toggleLoop()">
           <div class="icon loop-icon" :class="{ active: loop }">
-            <span class="icon-content">{{ t(loop ? 'videoElement.on' : 'videoElement.off') }}</span>
+            <span class="icon-content">{{
+              t(loop ? 'elements.media.video.on' : 'elements.media.video.off')
+            }}</span>
           </div>
         </div>
       </div>

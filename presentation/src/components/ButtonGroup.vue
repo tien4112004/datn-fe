@@ -24,7 +24,6 @@ withDefaults(
     border-radius: 0;
     border-left-width: 1px;
     border-right-width: 0;
-    display: inline-block;
   }
 
   &:not(.passive) {

@@ -10,7 +10,7 @@ on:
       - 'presentation/**'
 
 jobs:
-  deploy:
+  deploy_presentation:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2

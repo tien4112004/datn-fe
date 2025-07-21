@@ -7,6 +7,10 @@ settings:
 importers:
 
   .:
+    dependencies:
+      lucide-vue-next:
+        specifier: ^0.525.0
+        version: 0.525.0(vue@3.5.17(typescript@5.8.3))
     devDependencies:
       '@commitlint/cli':
         specifier: ^18.4.3
@@ -186,9 +190,6 @@ importers:
 
   presentation:
     dependencies:
-      '@icon-park/vue-next':
-        specifier: ^1.4.2
-        version: 1.4.2(vue@3.5.17(typescript@5.3.3))
       animate.css:
         specifier: ^4.1.1
         version: 4.1.1
@@ -1125,12 +1126,6 @@ packages:
   '@humanwhocodes/retry@0.4.3':
     resolution: {integrity: sha512-bV0Tgo9K4hfPCek+aMAn81RppFKv2ySDQeMoSZuvTASywNTnVJCArCZE2FWqpvIatKu7VMRLWlR1EazvVhDyhQ==}
     engines: {node: '>=18.18'}
-
-  '@icon-park/vue-next@1.4.2':
-    resolution: {integrity: sha512-+QklF255wkfBOabY+xw6FAI0Bwln/RhdwCunNy/9sKdKuChtaU67QZqU67KGAvZUTeeBgsL+yaHHxqfQeGZXEQ==}
-    engines: {node: '>= 8.0.0', npm: '>= 5.0.0'}
-    peerDependencies:
-      vue: 3.x
 
   '@iconify/types@2.0.0':
     resolution: {integrity: sha512-+wluvCrRhXrhyOmRDJ3q8mux9JkKy5SJ/v8ol2tu4FVjyYvtEzkc/3pK15ET6RKg4b4w4BmTk1+gsCUhf21Ykg==}
@@ -4052,6 +4047,11 @@ packages:
     peerDependencies:
       react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
+  lucide-vue-next@0.525.0:
+    resolution: {integrity: sha512-Xf8+x8B2DrnGDV/rxylS+KBp2FIe6ljwDn2JsGTZZvXIfhmm/q+nv8RuGO1OyoMjOVkkz7CqtUqJfwtFPRbB2w==}
+    peerDependencies:
+      vue: '>=3.0.1'
+
   luxon@3.7.1:
     resolution: {integrity: sha512-RkRWjA926cTvz5rAb1BqyWkKbbjzCGchDUIKMCUvNi17j6f6j8uHGDV82Aqcqtzd+icoYpELmG3ksgGiFNNcNg==}
     engines: {node: '>=12'}
@@ -6207,10 +6207,6 @@ snapshots:
 
   '@humanwhocodes/retry@0.4.3': {}
 
-  '@icon-park/vue-next@1.4.2(vue@3.5.17(typescript@5.3.3))':
-    dependencies:
-      vue: 3.5.17(typescript@5.3.3)
-
   '@iconify/types@2.0.0': {}
 
   '@iconify/utils@2.3.0':
@@ -7668,7 +7664,7 @@ snapshots:
       sirv: 3.0.1
       tinyglobby: 0.2.14
       tinyrainbow: 2.0.0
-      vitest: 3.2.4(@types/node@20.19.7)(@vitest/ui@3.2.4)(jiti@2.4.2)(jsdom@26.1.0)(lightningcss@1.30.1)(sass@1.89.2)(terser@5.43.1)
+      vitest: 3.2.4(@types/node@18.19.118)(@vitest/ui@3.2.4)(jiti@2.4.2)(jsdom@26.1.0)(lightningcss@1.30.1)(sass@1.89.2)(terser@5.43.1)
 
   '@vitest/utils@3.2.4':
     dependencies:
@@ -7789,6 +7785,12 @@ snapshots:
       '@vue/compiler-ssr': 3.5.17
       '@vue/shared': 3.5.17
       vue: 3.5.17(typescript@5.3.3)
+
+  '@vue/server-renderer@3.5.17(vue@3.5.17(typescript@5.8.3))':
+    dependencies:
+      '@vue/compiler-ssr': 3.5.17
+      '@vue/shared': 3.5.17
+      vue: 3.5.17(typescript@5.8.3)
 
   '@vue/shared@3.5.17': {}
 
@@ -9110,7 +9112,7 @@ snapshots:
 
   jest-worker@27.5.1:
     dependencies:
-      '@types/node': 20.19.7
+      '@types/node': 18.19.118
       merge-stream: 2.0.0
       supports-color: 8.1.1
 
@@ -9372,6 +9374,10 @@ snapshots:
   lucide-react@0.525.0(react@19.1.0):
     dependencies:
       react: 19.1.0
+
+  lucide-vue-next@0.525.0(vue@3.5.17(typescript@5.8.3)):
+    dependencies:
+      vue: 3.5.17(typescript@5.8.3)
 
   luxon@3.7.1: {}
 
@@ -10772,6 +10778,16 @@ snapshots:
       '@vue/shared': 3.5.17
     optionalDependencies:
       typescript: 5.3.3
+
+  vue@3.5.17(typescript@5.8.3):
+    dependencies:
+      '@vue/compiler-dom': 3.5.17
+      '@vue/compiler-sfc': 3.5.17
+      '@vue/runtime-dom': 3.5.17
+      '@vue/server-renderer': 3.5.17(vue@3.5.17(typescript@5.8.3))
+      '@vue/shared': 3.5.17
+    optionalDependencies:
+      typescript: 5.8.3
 
   vuedraggable@4.1.0(vue@3.5.17(typescript@5.3.3)):
     dependencies:

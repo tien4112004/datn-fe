@@ -2,14 +2,14 @@
   <ul class="chart-pool">
     <li class="chart-item" v-for="(chart, index) in chartList" :key="index">
       <div class="chart-content" @click="selectChart(chart)">
-        <IconChartLine size="24" v-if="chart === 'line'" />
-        <IconChartHistogram size="24" v-else-if="chart === 'column'" />
-        <IconChartPie size="24" v-else-if="chart === 'pie'" />
-        <IconChartHistogramOne size="24" v-else-if="chart === 'bar'" />
-        <IconChartLineArea size="24" v-else-if="chart === 'area'" />
-        <IconChartRing size="24" v-else-if="chart === 'ring'" />
-        <IconChartScatter size="24" v-else-if="chart === 'scatter'" />
-        <IconRadarChart size="23" v-else-if="chart === 'radar'" />
+        <IconChartLine width="24" v-if="chart === 'line'" />
+        <IconChartHistogram width="24" v-else-if="chart === 'column'" />
+        <IconChartPie width="24" v-else-if="chart === 'pie'" />
+        <IconChartHistogramOne width="24" v-else-if="chart === 'bar'" />
+        <IconChartLineArea width="24" v-else-if="chart === 'area'" />
+        <IconChartRing width="24" v-else-if="chart === 'ring'" />
+        <IconChartScatter width="24" v-else-if="chart === 'scatter'" />
+        <IconRadarChart width="23" v-else-if="chart === 'radar'" />
 
         <div class="name">{{ t(`toolbar.charts.pool.${chart}`) }}</div>
       </div>

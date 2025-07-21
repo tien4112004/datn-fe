@@ -244,7 +244,7 @@ const close = () => {
 <style lang="scss" scoped>
 .notes-panel {
   height: 100%;
-  font-size: 12px;
+  font-size: $smTextSize;
   user-select: none;
 }
 .container {
@@ -309,10 +309,10 @@ const close = () => {
     }
 
     .username {
-      font-size: 14px;
+      font-size: $baseTextSize;
     }
     .time {
-      font-size: 12px;
+      font-size: $xsTextSize;
       color: $gray-aaa;
     }
   }
@@ -373,7 +373,8 @@ const close = () => {
       align-items: center;
 
       &.icon {
-        font-size: 18px;
+        width: 32px;
+        height: 32px;
         color: $gray-666;
         cursor: pointer;
       }

@@ -128,7 +128,6 @@ watch(type, () => {
   }
 }
 .next-btn {
-  width: 22px;
   height: 100%;
   display: flex;
   justify-content: center;

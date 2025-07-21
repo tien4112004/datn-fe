@@ -96,7 +96,7 @@ const close = () => {
   background-color: $lightGray;
   margin: 0 -10px 10px -10px;
   padding: 0 14px;
-  font-size: 12px;
+  font-size: $smTextSize;
   display: flex;
   justify-content: space-between;
   border-top-left-radius: $borderRadius;

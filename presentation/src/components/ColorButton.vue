@@ -3,7 +3,9 @@
     <div class="color-block">
       <div class="content" :style="{ backgroundColor: color }"></div>
     </div>
-    <IconPlatte class="color-btn-icon" />
+    <div class="handler-item">
+      <IconPlatte class="color-btn-icon" />
+    </div>
   </Button>
 </template>
 
@@ -22,6 +24,7 @@ defineProps<{
   align-items: center;
   justify-content: center;
   padding: 0 !important;
+  gap: 2px;
 }
 .color-block {
   height: 20px;

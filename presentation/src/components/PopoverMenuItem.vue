@@ -24,7 +24,7 @@ const emit = defineEmits<{
   min-width: 80px;
   padding: 6px 10px;
   border-radius: $borderRadius;
-  font-size: 13px;
+  font-size: $smTextSize;
   cursor: pointer;
 
   &.center {

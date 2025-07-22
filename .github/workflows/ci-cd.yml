@@ -194,7 +194,7 @@ jobs:
         run: npm install --global vercel@latest
 
       - name: Pull Vercel Environment Information
-        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+        run: vercel pull --yes --environment=preview --git-branch=${{ github.head_ref }} --token=${{ secrets.VERCEL_TOKEN }}
 
       - name: Remove Vercel Environment Variable
         if: ${{ needs.deploy_presentation.result == 'success' && needs.deploy_presentation.outputs.preview_url != '' }}
@@ -212,8 +212,9 @@ jobs:
           if [ "${{ needs.deploy_presentation.result }}" = "success" ] && [ -n "$PREVIEW_PRESENTATION_URL" ]; then
             DESTINATION_URL="$PREVIEW_PRESENTATION_URL"
           else
-            # Get current PRESENTATION_URL from Vercel environment
-            DESTINATION_URL=$(vercel env ls --token=${{ secrets.VERCEL_TOKEN }} | grep PRESENTATION_URL | awk '{print $2}' || echo "https://datn-fe-presentation.vercel.app")
+            # Pull environment variables to get actual PRESENTATION_URL value
+            vercel env pull .env.local --environment=preview --git-branch=${{ github.head_ref }} --token=${{ secrets.VERCEL_TOKEN }}
+            DESTINATION_URL=$(grep PRESENTATION_URL .env.local | cut -d '=' -f2 || echo "https://datn-fe-presentation.vercel.app")
           fi
 
           cat <<EOF > vercel.json
@@ -239,8 +240,9 @@ jobs:
           if [ "${{ needs.deploy_presentation.result }}" = "success" ] && [ -n "${{ needs.deploy_presentation.outputs.preview_url }}" ]; then
             PRESENTATION_URL="${{ needs.deploy_presentation.outputs.preview_url }}"
           else
-            # Get current PRESENTATION_URL from Vercel environment
-            PRESENTATION_URL=$(vercel env ls --token=${{ secrets.VERCEL_TOKEN }} | grep PRESENTATION_URL | awk '{print $2}' || echo "https://datn-fe-presentation.vercel.app")
+            # Pull environment variables to get actual PRESENTATION_URL value
+            vercel env pull .env.local --environment=preview --git-branch=${{ github.head_ref }} --token=${{ secrets.VERCEL_TOKEN }}
+            PRESENTATION_URL=$(grep PRESENTATION_URL .env.local | cut -d '=' -f2 || echo "https://datn-fe-presentation.vercel.app")
           fi
 
           DEPLOY_OUTPUT=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }} --env PRESENTATION_URL="$PRESENTATION_URL")

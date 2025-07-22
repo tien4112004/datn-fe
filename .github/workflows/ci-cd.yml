@@ -214,7 +214,7 @@ jobs:
           else
             # Pull environment variables to get actual PRESENTATION_URL value
             vercel env pull .env.local --environment=preview --git-branch=${{ github.head_ref }} --token=${{ secrets.VERCEL_TOKEN }}
-            DESTINATION_URL=$(grep PRESENTATION_URL .env.local | cut -d '=' -f2 || echo "https://datn-fe-presentation.vercel.app")
+            DESTINATION_URL=$(grep PRESENTATION_URL .env.local | cut -d '=' -f2 | tr -d '"' || echo "https://datn-fe-presentation.vercel.app")
           fi
 
           cat <<EOF > vercel.json
@@ -242,7 +242,7 @@ jobs:
           else
             # Pull environment variables to get actual PRESENTATION_URL value
             vercel env pull .env.local --environment=preview --git-branch=${{ github.head_ref }} --token=${{ secrets.VERCEL_TOKEN }}
-            PRESENTATION_URL=$(grep PRESENTATION_URL .env.local | cut -d '=' -f2 || echo "https://datn-fe-presentation.vercel.app")
+            PRESENTATION_URL=$(grep PRESENTATION_URL .env.local | cut -d '=' -f2 | tr -d '"' || echo "https://datn-fe-presentation.vercel.app")
           fi
 
           DEPLOY_OUTPUT=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }} --env PRESENTATION_URL="$PRESENTATION_URL")

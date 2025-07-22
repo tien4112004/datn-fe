@@ -1,0 +1,181 @@
+# .github/workflows/ci-cd-prod.yml
+name: Production CI/CD
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+  TURBO_TEAM: 'datn-fe'
+
+jobs:
+  ci:
+    name: Build and Test
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Cache turbo build setup
+        uses: actions/cache@v4
+        with:
+          path: .turbo
+          key: ${{ runner.os }}-turbo-${{ hashFiles('**/package.json', '**/pnpm-lock.yaml') }}-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-${{ hashFiles('**/package.json', '**/pnpm-lock.yaml') }}-
+            ${{ runner.os }}-turbo-
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.12.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm build
+
+      - name: Test
+        run: pnpm test
+
+  deploy_presentation:
+    name: Deploy Presentation to Production
+    runs-on: ubuntu-latest
+    needs: ci
+    env:
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PRESENTATION_ID }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache turbo build setup
+        uses: actions/cache@v4
+        with:
+          path: .turbo
+          key: ${{ runner.os }}-turbo-${{ hashFiles('**/package.json', '**/pnpm-lock.yaml') }}-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-${{ hashFiles('**/package.json', '**/pnpm-lock.yaml') }}-
+            ${{ runner.os }}-turbo-
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.12.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+          cache: pnpm
+
+      - name: Get npm global path
+        run: |
+          echo "NPM_GLOBAL_DIR=$(npm config get prefix)" >> $GITHUB_ENV
+
+      - name: Cache global npm packages
+        uses: actions/cache@v4
+        id: npm-global-cache
+        with:
+          path: ${{ env.NPM_GLOBAL_DIR }}
+          key: ${{ runner.os }}-npm-global-${{ hashFiles('package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-global-
+
+      - name: Install Vercel CLI
+        if: ${{ steps.npm-global-cache.outputs.cache-hit != 'true' }}
+        run: npm install --global vercel@latest
+
+      - name: Pull Vercel Environment Information
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Build Vercel
+        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Deploy to Production
+        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
+
+  deploy_container:
+    name: Deploy Container to Production
+    runs-on: ubuntu-latest
+    needs: ci
+    env:
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_CONTAINER_ID }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache turbo build setup
+        uses: actions/cache@v4
+        with:
+          path: .turbo
+          key: ${{ runner.os }}-turbo-${{ hashFiles('**/package.json', '**/pnpm-lock.yaml') }}-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-${{ hashFiles('**/package.json', '**/pnpm-lock.yaml') }}-
+            ${{ runner.os }}-turbo-
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.12.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+          cache: pnpm
+
+      - name: Get npm global path
+        run: |
+          echo "NPM_GLOBAL_DIR=$(npm config get prefix)" >> $GITHUB_ENV
+
+      - name: Cache global npm packages
+        uses: actions/cache@v4
+        id: npm-global-cache
+        with:
+          path: ${{ env.NPM_GLOBAL_DIR }}
+          key: ${{ runner.os }}-npm-global-${{ hashFiles('package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-global-
+
+      - name: Install Vercel CLI
+        if: ${{ steps.npm-global-cache.outputs.cache-hit != 'true' }}
+        run: npm install --global vercel@latest
+
+      - name: Pull Vercel Environment Information
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Generate vercel.json with production rewrites
+        run: |
+          cat <<EOF > vercel.json
+          {
+            "rewrites": [
+              {
+                "source": "/vue-remote",
+                "destination": "https://datn-fe-presentation.vercel.app"
+              }
+            ]
+          }
+          EOF
+          echo "Generated vercel.json:"
+          cat vercel.json
+
+      - name: Build Vercel
+        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Deploy to Production
+        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }} --env PRESENTATION_URL=https://datn-fe-presentation.vercel.app

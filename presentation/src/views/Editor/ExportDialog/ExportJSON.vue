@@ -63,7 +63,6 @@ pre {
 }
 .btns {
   width: 500px;
-  height: 100px;
   display: flex;
   justify-content: center;
   align-items: center;

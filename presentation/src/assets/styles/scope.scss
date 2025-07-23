@@ -2,12 +2,13 @@
   // height: calc(100vh - var(--header-height, 64px)); // fallback to 64px if custom property not available
   height: calc(100vh - 16px);
 
-  span.i-icon {
-    font-size: $smIconSize;
-    opacity: 0.7;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  .lucide {
+    width: $smIconSize;
+    height: $smIconSize;
+    opacity: 0.7 !important;
+    padding: 0;
+    margin: 0;
+    outline: none;
   }
 
   .title-panel {

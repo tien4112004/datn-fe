@@ -181,7 +181,7 @@ const close = () => {
 <style lang="scss" scoped>
 .select-panel {
   height: 100%;
-  font-size: $xsTextSize;
+  font-size: $smTextSize;
   user-select: none;
 }
 .handler {
@@ -219,7 +219,7 @@ const close = () => {
 }
 .item {
   padding: 5px;
-  font-size: $xsTextSize;
+  font-size: $smTextSize;
   border-radius: $borderRadius;
   display: flex;
   align-items: center;
@@ -268,11 +268,19 @@ const close = () => {
   padding-left: 0;
   padding-right: 0;
   flex: 1;
-  font-size: $xsTextSize;
+  font-size: $smTextSize;
   background-color: transparent;
 }
 
 .visibility-icon {
   font-size: $baseTextSize;
+}
+
+.btns {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 5px;
 }
 </style>

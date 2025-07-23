@@ -2,7 +2,9 @@
   <div class="editor-header">
     <div class="left">
       <button class="menu-item" @click="handleToggleSidebar">
-        <IconMoreApp />
+        <div class="handler-item">
+          <IconMoreApp />
+        </div>
       </button>
 
       <div class="title">
@@ -76,11 +78,17 @@
             >{{ $t('header.tools.quickActions') }}</PopoverMenuItem
           >
         </template>
-        <div class="menu-item"><IconHamburgerButton class="icon" /></div>
+        <div class="menu-item">
+          <div class="handler-item">
+            <IconHamburgerButton class="icon" />
+          </div>
+        </div>
       </Popover>
       <div class="group-menu-item">
         <div class="menu-item" v-tooltip="$t('header.presentation.slideShow')" @click="enterScreening()">
-          <IconPpt class="icon" />
+          <div class="handler-item">
+            <IconPpt class="icon" />
+          </div>
         </div>
         <Popover trigger="click" center>
           <template #content>
@@ -91,7 +99,11 @@
               $t('header.presentation.fromCurrentPage')
             }}</PopoverMenuItem>
           </template>
-          <div class="arrow-btn"><IconDown class="arrow" /></div>
+          <div class="arrow-btn">
+            <div class="handler-item">
+              <IconDown class="arrow" />
+            </div>
+          </div>
         </Popover>
       </div>
       <div
@@ -105,7 +117,9 @@
         <span class="text ai">AI</span>
       </div>
       <div class="menu-item" v-tooltip="$t('header.file.exportFile')" @click="setDialogForExport('pptx')">
-        <IconDownload class="icon" />
+        <div class="handler-item">
+          <IconDownload class="icon" />
+        </div>
       </div>
       <a
         class="github-link"
@@ -113,7 +127,11 @@
         href="https://github.com/pipipi-pikachu/PPTist"
         target="_blank"
       >
-        <div class="menu-item"><IconGithub class="icon" /></div>
+        <div class="menu-item">
+          <div class="handler-item">
+            <IconGithub class="icon" />
+          </div>
+        </div>
       </a>
       <div class="menu-item" id="language-switcher">
         <LanguageSwitcher />
@@ -218,7 +236,6 @@ const openAIPPTDialog = () => {
   cursor: pointer;
 
   .icon {
-    font-size: 18px;
     color: $gray-666;
   }
   .text {

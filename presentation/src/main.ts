@@ -3,7 +3,6 @@ import { createPinia } from 'pinia';
 import App from './App.vue';
 import i18n from '@/locales';
 
-import '@icon-park/vue-next/styles/index.css';
 import 'prosemirror-view/style/prosemirror.css';
 import 'animate.css';
 import '@/assets/styles/prosemirror.scss';

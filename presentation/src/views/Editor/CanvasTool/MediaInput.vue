@@ -72,5 +72,6 @@ const insertAudio = () => {
 .btns {
   margin-top: 10px;
   text-align: right;
+  display: flex;
 }
 </style>

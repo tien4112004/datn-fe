@@ -33,3 +33,4 @@ coverage
 .env
 .turbo
 .vercel
+.env*.local

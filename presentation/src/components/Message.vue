@@ -9,10 +9,10 @@
     <div class="message" :id="id" v-if="visible">
       <div class="message-container" @mouseenter="clearTimer()" @mouseleave="startTimer()">
         <div class="icons">
-          <IconAttention theme="filled" size="18" fill="#faad14" v-if="type === 'warning'" />
-          <IconCheckOne theme="filled" size="18" fill="#52c41a" v-if="type === 'success'" />
-          <IconCloseOne theme="filled" size="18" fill="#ff4d4f" v-if="type === 'error'" />
-          <IconInfo theme="filled" size="18" fill="#1677ff" v-if="type === 'info'" />
+          <IconAttention theme="filled" fill="#faad14" v-if="type === 'warning'" />
+          <IconCheckOne theme="filled" fill="#52c41a" v-if="type === 'success'" />
+          <IconCloseOne theme="filled" fill="#ff4d4f" v-if="type === 'error'" />
+          <IconInfo theme="filled" fill="#1677ff" v-if="type === 'info'" />
         </div>
         <div class="content">
           <div class="title" v-if="title">{{ title }}</div>

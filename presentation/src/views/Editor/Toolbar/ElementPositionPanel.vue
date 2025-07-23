@@ -160,11 +160,11 @@
           :step="5"
           :value="rotate"
           @update:value="(value) => updateRotate(value)"
-          style="width: 60%"
+          style="width: 50%"
         >
           <template #prefix> {{ $t('styling.position.single.rotation') }} </template>
         </NumberInput>
-        <div style="width: 7%"></div>
+        <div style="width: 6%"></div>
         <div class="text-btn" @click="updateRotate45('-')" style="width: 24%"><IconRotate /> -45°</div>
         <div class="text-btn" @click="updateRotate45('+')" style="width: 24%">
           <IconRotate :style="{ transform: 'rotateY(180deg)' }" /> +45°
@@ -395,6 +395,10 @@ const updateRotate45 = (command: '+' | '-') => {
   line-height: 30px;
   text-align: center;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
 
   &:hover {
     background-color: #efefef;

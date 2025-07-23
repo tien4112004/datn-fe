@@ -1,18 +1,22 @@
 <template>
   <Card class="canvas-tool" padding="none">
     <div class="left-handler">
-      <IconBack
+      <div
         class="handler-item"
         :class="{ disable: !canUndo }"
         v-tooltip="$t('ui.actions.undo')"
         @click="undo()"
-      />
-      <IconNext
+      >
+        <IconBack />
+      </div>
+      <div
         class="handler-item"
         :class="{ disable: !canRedo }"
         v-tooltip="$t('ui.actions.redo')"
         @click="redo()"
-      />
+      >
+        <IconNext />
+      </div>
       <div class="more">
         <Divider type="vertical" style="height: 20px" class="divider1" />
         <Popover class="more-icon" trigger="click" v-model:value="moreVisible" :offset="10">
@@ -42,36 +46,42 @@
               >{{ $t('toolbar.panels.findAndReplace') }}</PopoverMenuItem
             >
           </template>
-          <IconMore class="handler-item" />
+          <div class="handler-item">
+            <IconMore />
+          </div>
         </Popover>
-        <IconComment
+        <div
           class="handler-item"
           :class="{ active: showNotesPanel }"
           v-tooltip="$t('toolbar.panels.annotationPanel')"
           @click="toggleNotesPanel()"
-        />
-        <IconMoveOne
+        >
+          <IconComment />
+        </div>
+        <div
           class="handler-item"
           :class="{ active: showSelectPanel }"
           v-tooltip="$t('toolbar.panels.selectionPane')"
           @click="toggleSelectPanel()"
-        />
-        <IconSearch
+        >
+          <IconMoveOne />
+        </div>
+        <div
           class="handler-item"
           :class="{ active: showSearchPanel }"
           v-tooltip="$t('toolbar.panels.findAndReplace')"
           @click="toggleSraechPanel()"
-        />
+        >
+          <IconSearch />
+        </div>
       </div>
     </div>
 
     <div class="add-element-handler">
-      <div class="handler-item group-btn" v-tooltip="$t('toolbar.tools.insertText')">
-        <IconFontSize
-          class="icon"
-          :class="{ active: creatingElement?.type === 'text' }"
-          @click="drawText()"
-        />
+      <div class="group-btn" v-tooltip="$t('toolbar.tools.insertText')">
+        <div class="handler-item" @click="drawText()">
+          <IconFontSize class="icon" :class="{ active: creatingElement?.type === 'text' }" />
+        </div>
 
         <Popover trigger="click" v-model:value="textTypeSelectVisible" style="height: 100%" :offset="10">
           <template #content>
@@ -83,8 +93,10 @@
                   textTypeSelectVisible = false;
                 }
               "
-              ><IconTextRotationNone /> {{ $t('toolbar.tools.horizontalTextBox') }}</PopoverMenuItem
             >
+              <IconTextRotationNone style="margin-right: 2px" />
+              {{ $t('toolbar.tools.horizontalTextBox') }}
+            </PopoverMenuItem>
             <PopoverMenuItem
               center
               @click="
@@ -93,22 +105,27 @@
                   textTypeSelectVisible = false;
                 }
               "
-              ><IconTextRotationDown /> {{ $t('toolbar.tools.verticalTextBox') }}</PopoverMenuItem
             >
+              <IconTextRotationDown style="margin-right: 2px" />
+              {{ $t('toolbar.tools.verticalTextBox') }}
+            </PopoverMenuItem>
           </template>
-          <IconDown class="arrow" />
+          <div class="handler-item">
+            <IconDown class="arrow" />
+          </div>
         </Popover>
       </div>
-      <div class="handler-item group-btn" v-tooltip="$t('toolbar.tools.insertShape')" :offset="10">
+      <div class="group-btn" v-tooltip="$t('toolbar.tools.insertShape')" :offset="10">
         <Popover trigger="click" style="height: 100%" v-model:value="shapePoolVisible" :offset="10">
           <template #content>
             <ShapePool @select="(shape) => drawShape(shape)" />
           </template>
-          <IconGraphicDesign
-            class="icon"
-            :class="{ active: creatingCustomShape || creatingElement?.type === 'shape' }"
-            v-tooltip="$t('toolbar.tools.insertShape')"
-          />
+          <div class="handler-item">
+            <IconGraphicDesign
+              class="icon"
+              :class="{ active: creatingCustomShape || creatingElement?.type === 'shape' }"
+            />
+          </div>
         </Popover>
 
         <Popover trigger="click" v-model:value="shapeMenuVisible" style="height: 100%" :offset="10">
@@ -124,21 +141,27 @@
               >{{ $t('toolbar.tools.freehandDrawing') }}</PopoverMenuItem
             >
           </template>
-          <IconDown class="arrow" />
+          <div class="handler-item">
+            <IconDown class="arrow" />
+          </div>
         </Popover>
       </div>
       <FileInput @change="(files) => insertImageElement(files)">
-        <IconPicture class="handler-item" v-tooltip="$t('toolbar.tools.insertImage')" />
+        <div class="handler-item" v-tooltip="$t('toolbar.tools.insertImage')">
+          <IconPicture />
+        </div>
       </FileInput>
       <Popover trigger="click" v-model:value="linePoolVisible" :offset="10">
         <template #content>
           <LinePool @select="(line) => drawLine(line)" />
         </template>
-        <IconConnection
+        <div
           class="handler-item"
           :class="{ active: creatingElement?.type === 'line' }"
           v-tooltip="$t('toolbar.tools.insertLine')"
-        />
+        >
+          <IconConnection />
+        </div>
       </Popover>
       <Popover trigger="click" v-model:value="chartPoolVisible" :offset="10">
         <template #content>
@@ -151,7 +174,9 @@
             "
           />
         </template>
-        <IconChartProportion class="handler-item" v-tooltip="$t('toolbar.tools.insertChart')" />
+        <div class="handler-item" v-tooltip="$t('toolbar.tools.insertChart')">
+          <IconChartProportion />
+        </div>
       </Popover>
       <Popover trigger="click" v-model:value="tableGeneratorVisible" :offset="10">
         <template #content>
@@ -165,13 +190,17 @@
             "
           />
         </template>
-        <IconInsertTable class="handler-item" v-tooltip="$t('toolbar.tools.insertTable')" />
+        <div class="handler-item" v-tooltip="$t('toolbar.tools.insertTable')">
+          <IconInsertTable />
+        </div>
       </Popover>
-      <IconFormula
+      <div
         class="handler-item"
         v-tooltip="$t('toolbar.tools.insertFormula')"
         @click="latexEditorVisible = true"
-      />
+      >
+        <IconFormula />
+      </div>
       <Popover trigger="click" v-model:value="mediaInputVisible" :offset="10">
         <template #content>
           <MediaInput
@@ -190,16 +219,20 @@
             "
           />
         </template>
-        <IconVideoTwo class="handler-item" v-tooltip="$t('toolbar.tools.insertAudioVideo')" />
+        <div class="handler-item" v-tooltip="$t('toolbar.tools.insertAudioVideo')">
+          <IconVideoTwo />
+        </div>
       </Popover>
     </div>
 
     <div class="right-handler">
-      <IconMinus
+      <div
         class="handler-item viewport-size"
         v-tooltip="$t('canvas.controls.zoomOut')"
         @click="scaleCanvas('-')"
-      />
+      >
+        <IconMinus />
+      </div>
       <Popover trigger="click" v-model:value="canvasScaleVisible">
         <template #content>
           <PopoverMenuItem
@@ -220,16 +253,20 @@
         </template>
         <span class="text">{{ canvasScalePercentage }}</span>
       </Popover>
-      <IconPlus
+      <div
         class="handler-item viewport-size"
         v-tooltip="$t('canvas.controls.zoomIn')"
         @click="scaleCanvas('+')"
-      />
-      <IconFullScreen
+      >
+        <IconPlus />
+      </div>
+      <div
         class="handler-item viewport-size-adaptation"
         v-tooltip="$t('canvas.controls.fitToScreen')"
         @click="resetCanvas()"
-      />
+      >
+        <IconFullScreenOne />
+      </div>
     </div>
 
     <Modal v-model:visible="latexEditorVisible" :width="920">
@@ -379,10 +416,11 @@ const toggleNotesPanel = () => {
   display: flex;
   align-items: center;
   flex: 0 0 auto;
+  gap: 4px;
 }
 .left-handler {
   min-width: 0;
-  gap: 2px;
+  gap: 4px;
 }
 .more-icon {
   display: none;
@@ -393,58 +431,46 @@ const toggleNotesPanel = () => {
   justify-content: center;
   gap: 4px;
 
-  .handler-item {
-    width: 32px;
+  .group-btn {
+    display: flex;
+    width: auto;
+    margin-right: 0;
     flex-shrink: 0;
+    padding: 0 8px;
+    border-radius: $borderRadius;
 
-    &:not(.group-btn):hover {
+    .handler-item {
+      width: 24px;
+      padding: 0;
+
+      .active {
+        color: $themeColor;
+      }
+    }
+
+    &:hover {
       background-color: $card-hover;
     }
 
-    &.active {
-      color: $themeColor;
+    .icon,
+    .arrow {
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
-
-    &.group-btn {
-      width: auto;
-      margin-right: 0;
-      flex-shrink: 0;
+    .arrow {
+      font-size: 12px;
 
       &:hover {
-        background-color: $card-hover;
-      }
-
-      .icon,
-      .arrow {
-        height: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
-
-      .icon {
-        width: 30px;
-        padding: 0 2px;
-
-        &:hover {
-          background-color: #e9e9e9;
-        }
-        &.active {
-          color: $themeColor;
-        }
-      }
-      .arrow {
-        font-size: 12px;
-
-        &:hover {
-          background-color: #e9e9e9;
-        }
+        background-color: #e9e9e9;
       }
     }
   }
 }
 .handler-item {
-  height: 30px;
+  width: 36px;
+  height: 36px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -457,21 +483,20 @@ const toggleNotesPanel = () => {
     opacity: 0.5;
   }
 }
-.left-handler,
-.right-handler {
-  .handler-item {
-    &.active,
-    &:not(.disable):hover {
-      background-color: #f1f1f1;
-    }
+
+.handler-item {
+  &.active,
+  &:not(.disable):hover {
+    background-color: #f1f1f1;
   }
 }
+
 .right-handler {
   display: flex;
   align-items: center;
   flex: 0 0 auto;
   min-width: 0;
-
+  gap: 4px;
   .text {
     display: inline-block;
     width: 40px;

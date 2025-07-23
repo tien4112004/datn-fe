@@ -72,7 +72,7 @@ const selectLine = (line: LinePoolItem) => {
 }
 .category-name {
   width: 100%;
-  font-size: 12px;
+  font-size: $smTextSize;
   margin-bottom: 10px;
   border-left: 4px solid #bbb;
   background-color: #f1f1f1;

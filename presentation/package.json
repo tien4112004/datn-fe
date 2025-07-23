@@ -16,7 +16,6 @@
   },
   "author": "pipipi_pikachu@163.com",
   "dependencies": {
-    "@icon-park/vue-next": "^1.4.2",
     "animate.css": "^4.1.1",
     "axios": "^1.7.9",
     "clipboard": "^2.0.11",
@@ -51,7 +50,8 @@
     "tippy.js": "^6.3.7",
     "vue": "^3.4.34",
     "vue-i18n": "^11.1.9",
-    "vuedraggable": "^4.1.0"
+    "vuedraggable": "^4.1.0",
+    "lucide-vue-next": "^0.525.0"
   },
   "devDependencies": {
     "@module-federation/enhanced": "^0.15.0",

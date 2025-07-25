@@ -33,3 +33,7 @@ svg {
 .bn-color-picker-dropdown {
   transform: translateX(8px);
 }
+
+.mantine-Badge-root {
+  color: var(--muted-foreground) !important;
+}

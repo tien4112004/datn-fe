@@ -16,6 +16,10 @@ const router = createBrowserRouter([
         Component: Presentation.EditorPage,
       },
       {
+        path: 'test',
+        Component: Presentation.RichTextEditorPage,
+      },
+      {
         path: 'presentation/:presentationId',
         Component: Presentation.DetailsPage,
         loader: async ({ params }) => {

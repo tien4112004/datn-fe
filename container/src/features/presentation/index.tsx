@@ -1,3 +1,4 @@
+import RichTextEditor from '@/shared/components/rte/RichTextEditor';
 import PresentationCard from './components/PresentationCard';
 import PresentationWrapper from './components/PresentationWrapper';
 
@@ -14,7 +15,12 @@ const DetailsPage = () => {
   );
 };
 
+const RichTextEditorPage = () => {
+  return <RichTextEditor />;
+};
+
 export default {
   EditorPage,
   DetailsPage,
+  RichTextEditorPage,
 };

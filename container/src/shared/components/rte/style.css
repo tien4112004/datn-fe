@@ -34,6 +34,10 @@ svg {
   transform: translateX(8px);
 }
 
+.bn-editor {
+  padding: 0;
+}
+
 .mantine-Badge-root {
   color: var(--muted-foreground) !important;
 }

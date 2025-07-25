@@ -1,7 +1,6 @@
-import RichTextEditor from '@/shared/components/rte/RichTextEditor';
 import PresentationCard from './components/PresentationCard';
 import PresentationWrapper from './components/PresentationWrapper';
-import { useRichTextEditor } from '@/shared/components/rte/useRichTextEditor';
+import OutlineCard from './components/OutlineCard';
 
 const EditorPage = () => {
   return <PresentationWrapper />;
@@ -9,20 +8,27 @@ const EditorPage = () => {
 
 const DetailsPage = () => {
   return (
-    <div className="max-w-2xl mx-auto my-8 p-4">
+    <div className="mx-auto my-8 max-w-2xl p-4">
       <h1>Presentation Details</h1>
       <PresentationCard />
     </div>
   );
 };
 
-const RichTextEditorPage = () => {
-  const editor = useRichTextEditor();
-  return <RichTextEditor editor={editor} />;
+const OutlineWorkspace = () => {
+  return (
+    <div className="bg-accent flex w-full justify-center p-8">
+      <div className="bg-background flex w-full max-w-3xl flex-col items-center gap-6 rounded-xl p-8">
+        <OutlineCard />
+        <OutlineCard />
+        <OutlineCard />
+      </div>
+    </div>
+  );
 };
 
 export default {
   EditorPage,
   DetailsPage,
-  RichTextEditorPage,
+  OutlineWorkspace,
 };

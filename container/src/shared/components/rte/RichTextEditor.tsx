@@ -1,30 +1,26 @@
 import '@blocknote/core/fonts/inter.css';
-import { useCreateBlockNote } from '@blocknote/react';
-import { BlockNoteView } from '@blocknote/shadcn';
-import '@blocknote/shadcn/style.css';
-import * as Button from '@/components/ui/button';
-import * as Select from '@/components/ui/select';
-import * as Input from '@/components/ui/input';
-import * as DropdownMenu from '@/components/ui/dropdown-menu';
-import * as Popover from '@/components/ui/popover';
-import * as Card from '@/components/ui/card';
-import * as Tooltip from '@/components/ui/tooltip';
+import { type BlockNoteViewProps } from '@blocknote/react';
+import { BlockNoteView } from '@blocknote/mantine';
+import '@blocknote/mantine/style.css';
+import './style.css';
+import { cn } from '@/shared/lib/utils';
 
-export default function RichTextEditor() {
-  const editor = useCreateBlockNote();
-
+export default function RichTextEditor({
+  children,
+  ...props
+}: React.PropsWithChildren<BlockNoteViewProps<any, any, any> & { className?: string }>) {
   return (
-    <BlockNoteView
-      editor={editor}
-      shadCNComponents={{
-        Button,
-        Select,
-        Input,
-        DropdownMenu,
-        Popover,
-        Card,
-        Tooltip,
-      }}
-    />
+    <>
+      {children}
+      <BlockNoteView
+        {...props}
+        data-theming-ui-css-variables
+        className={cn(
+          'min-h-[120px] h-full w-full bg-transparent placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring',
+          props.className
+        )}
+      />
+      ;
+    </>
   );
 }

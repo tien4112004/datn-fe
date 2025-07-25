@@ -1,6 +1,7 @@
 import RichTextEditor from '@/shared/components/rte/RichTextEditor';
 import PresentationCard from './components/PresentationCard';
 import PresentationWrapper from './components/PresentationWrapper';
+import { useCreateBlockNote } from '@blocknote/react';
 
 const EditorPage = () => {
   return <PresentationWrapper />;
@@ -16,7 +17,8 @@ const DetailsPage = () => {
 };
 
 const RichTextEditorPage = () => {
-  return <RichTextEditor />;
+  const editor = useCreateBlockNote();
+  return <RichTextEditor editor={editor} />;
 };
 
 export default {

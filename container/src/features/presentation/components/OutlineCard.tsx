@@ -54,10 +54,10 @@ const OutlineCard = ({
         isDragging ? 'opacity-50' : ''
       )}
     >
-      <CardHeader {...attributes} {...listeners} className="bg-accent w-24 rounded-l-xl p-4 text-center">
+      <CardHeader {...attributes} {...listeners} className="bg-accent w-24 rounded-l-xl p-2 text-center">
         <CardTitle>{title}</CardTitle>
       </CardHeader>
-      <CardContent className="flex-start flex-1 p-4">
+      <CardContent className="flex-start flex-1 p-2">
         <RichTextEditor editor={editor} sideMenu={false} className="-mx-2" />
       </CardContent>
     </Card>

@@ -17,7 +17,7 @@ const router = createBrowserRouter([
       },
       {
         path: 'test',
-        Component: Presentation.OutlineWorkspace,
+        Component: Presentation.OutlineWorkspacePage,
       },
       {
         path: 'presentation/:presentationId',

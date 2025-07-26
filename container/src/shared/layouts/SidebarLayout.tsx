@@ -5,6 +5,7 @@ import { AppSidebar } from '../components/navigation/AppSidebar';
 import { subscribe, unsubscribe } from '@/shared/lib/event';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { Toaster } from 'sonner';
 
 function NavLayoutContent() {
   const navigation = useNavigation();
@@ -42,6 +43,7 @@ function NavLayoutContent() {
 export default function NavLayout() {
   return (
     <SidebarProvider>
+      <Toaster />
       <NavLayoutContent />
     </SidebarProvider>
   );

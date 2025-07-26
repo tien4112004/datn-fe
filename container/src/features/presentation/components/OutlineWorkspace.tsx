@@ -15,7 +15,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import { Download, Loader, Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { OutlineItem } from '../types/outline';
@@ -71,16 +71,25 @@ const OutlineWorkspace = ({ items, setItems, onDownload }: OutlineWorkspaceProps
     }
   };
 
+  const handleDelete = (id: string) => {
+    setItems((prevItems) => prevItems.filter((item) => item.id !== id));
+  };
+
   return (
     <div className="bg-accent flex w-full justify-center p-8">
       <div className="bg-background flex w-full max-w-3xl flex-col items-center gap-6 rounded-xl p-8">
         <DndContext sensors={sensors} onDragEnd={handleOutlineCardDragEnd}>
           <SortableContext
-            items={items.map((id) => `outline-card-${id}`)}
+            items={items.map((item) => `outline-card-${item.id}`)}
             strategy={verticalListSortingStrategy}
           >
             {items.map((item, index) => (
-              <OutlineCard key={item.id} id={item.id} title={`${index + 1}`} />
+              <OutlineCard
+                key={item.id}
+                id={item.id}
+                title={`${index + 1}`}
+                onDelete={() => handleDelete(item.id)}
+              />
             ))}
           </SortableContext>
         </DndContext>
@@ -89,7 +98,7 @@ const OutlineWorkspace = ({ items, setItems, onDownload }: OutlineWorkspaceProps
         <Button
           variant={'outline'}
           className="mt-4 w-full"
-          onClick={() => setItems((prev) => [...prev, { id: (prev.length + 1).toString() }])}
+          onClick={() => setItems((prev) => [...prev, { id: useId().toString() }])}
         >
           <Plus className="h-4 w-4" />
           {t('addOutlineCard')}

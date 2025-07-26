@@ -169,4 +169,87 @@ describe('OutlineWorkspace', () => {
     expect(screen.getByTestId('dnd-context')).toBeInTheDocument();
     expect(screen.getByTestId('sortable-context')).toBeInTheDocument();
   });
+
+  it('calls handleDelete when delete is triggered from OutlineCard', () => {
+    const mockOutlineCard = vi.mocked(
+      require('@/features/presentation/components/OutlineCard').default
+    );
+    
+    render(<OutlineWorkspace {...defaultProps} />);
+    
+    const cardProps = mockOutlineCard.mock.calls[0][0];
+    cardProps.onDelete();
+    
+    expect(mockSetItems).toHaveBeenCalledWith(expect.any(Function));
+  });
+
+  it('renders items with correct sequential titles', () => {
+    const mockOutlineCard = vi.mocked(
+      require('@/features/presentation/components/OutlineCard').default
+    );
+    
+    render(<OutlineWorkspace {...defaultProps} />);
+    
+    expect(mockOutlineCard).toHaveBeenCalledWith(
+      expect.objectContaining({ title: '1' }),
+      expect.anything()
+    );
+    expect(mockOutlineCard).toHaveBeenCalledWith(
+      expect.objectContaining({ title: '2' }),
+      expect.anything()
+    );
+    expect(mockOutlineCard).toHaveBeenCalledWith(
+      expect.objectContaining({ title: '3' }),
+      expect.anything()
+    );
+  });
+
+  it('prevents multiple simultaneous downloads', async () => {
+    let resolveFirstDownload: () => void;
+    const firstDownloadPromise = new Promise<void>((resolve) => {
+      resolveFirstDownload = resolve;
+    });
+    mockOnDownload.mockReturnValueOnce(firstDownloadPromise);
+    
+    render(<OutlineWorkspace {...defaultProps} />);
+    
+    const downloadButton = screen.getByText('downloadOutline');
+    
+    fireEvent.click(downloadButton);
+    fireEvent.click(downloadButton);
+    
+    expect(mockOnDownload).toHaveBeenCalledTimes(1);
+    
+    resolveFirstDownload!();
+    await waitFor(() => {
+      expect(screen.getByText('downloadOutline')).toBeInTheDocument();
+    });
+  });
+
+  it('handles download errors gracefully', async () => {
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    mockOnDownload.mockRejectedValue(new Error('Download failed'));
+    
+    render(<OutlineWorkspace {...defaultProps} />);
+    
+    const downloadButton = screen.getByText('downloadOutline');
+    fireEvent.click(downloadButton);
+    
+    await waitFor(() => {
+      expect(screen.getByText('downloadOutline')).toBeInTheDocument();
+    });
+    
+    expect(downloadButton.closest('button')).not.toBeDisabled();
+    consoleErrorSpy.mockRestore();
+  });
+
+  it('updates items count dynamically when items change', () => {
+    const { rerender } = render(<OutlineWorkspace {...defaultProps} />);
+    
+    expect(screen.getByText('3 outlineCards')).toBeInTheDocument();
+    
+    rerender(<OutlineWorkspace {...defaultProps} items={[{ id: '1' }]} />);
+    
+    expect(screen.getByText('1 outlineCards')).toBeInTheDocument();
+  });
 });

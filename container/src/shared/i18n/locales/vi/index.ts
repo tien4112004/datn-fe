@@ -38,9 +38,9 @@ export default {
   },
 
   outlineWorkspace: {
-    addOutlineCard: 'Thêm Thẻ Phác Thảo',
-    outlineCards: 'Thẻ Phác Thảo',
-    downloadOutline: 'Tải Phác Thảo',
+    addOutlineCard: 'Thêm mục dàn ý',
+    outlineCards: 'Mục dàn ý',
+    downloadOutline: 'Tải dàn ý',
     downloading: 'Đang tải...',
   },
 };

@@ -17,6 +17,7 @@ import {
 
 import { useState } from 'react';
 import { Download, Loader, Plus } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 type OutlineWorkspaceProps = {
   items: string[];
@@ -25,6 +26,7 @@ type OutlineWorkspaceProps = {
 };
 
 const OutlineWorkspace = ({ items, setItems, onDownload }: OutlineWorkspaceProps) => {
+  const { t } = useTranslation('outlineWorkspace');
   const [isDownloading, setIsDownloading] = useState(false);
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -87,10 +89,12 @@ const OutlineWorkspace = ({ items, setItems, onDownload }: OutlineWorkspaceProps
           onClick={() => setItems((prev) => [...prev, (prev.length + 1).toString()])}
         >
           <Plus className="h-4 w-4" />
-          Add Outline Card
+          {t('addOutlineCard')}
         </Button>
         <div className="flex w-full items-center justify-between">
-          <div>{items.length} Outline Cards</div>
+          <div>
+            {items.length} {t('outlineCards')}
+          </div>
           <Button
             variant={'outline'}
             className="text-muted-foreground"
@@ -98,7 +102,7 @@ const OutlineWorkspace = ({ items, setItems, onDownload }: OutlineWorkspaceProps
             disabled={isDownloading}
           >
             {isDownloading ? <Loader className="animate-spin" /> : <Download className="h-4 w-4" />}
-            {isDownloading ? 'Downloading...' : 'Download Outline'}
+            {isDownloading ? t('downloading') : t('downloadOutline')}
           </Button>
         </div>
       </div>

@@ -36,4 +36,11 @@ export default {
     page: 'Đang tải trang...',
     presentation: 'Đang tải trình chỉnh sửa thuyết trình...',
   },
+
+  outlineWorkspace: {
+    addOutlineCard: 'Thêm Thẻ Phác Thảo',
+    outlineCards: 'Thẻ Phác Thảo',
+    downloadOutline: 'Tải Phác Thảo',
+    downloading: 'Đang tải...',
+  },
 };

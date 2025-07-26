@@ -17,7 +17,7 @@ const DetailsPage = () => {
 };
 
 const OutlineWorkspacePage = () => {
-  const [items, setItems] = useState(['1', '2', '3']);
+  const [items, setItems] = useState([{ id: '1' }, { id: '2' }, { id: '3' }]);
   return (
     <OutlineWorkspace
       items={items}

@@ -18,10 +18,11 @@ import {
 import { useState } from 'react';
 import { Download, Loader, Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import type { OutlineItem } from '../types/outline';
 
 type OutlineWorkspaceProps = {
-  items: string[];
-  setItems: React.Dispatch<React.SetStateAction<string[]>>;
+  items: OutlineItem[];
+  setItems: React.Dispatch<React.SetStateAction<OutlineItem[]>>;
   onDownload?: () => Promise<void>;
 };
 
@@ -50,8 +51,8 @@ const OutlineWorkspace = ({ items, setItems, onDownload }: OutlineWorkspaceProps
         const overItemId = overId.replace('outline-card-', '');
 
         setItems((prevItems) => {
-          const oldIndex = prevItems.findIndex((id) => id === activeItemId);
-          const newIndex = prevItems.findIndex((id) => id === overItemId);
+          const oldIndex = prevItems.findIndex((item) => item.id === activeItemId);
+          const newIndex = prevItems.findIndex((item) => item.id === overItemId);
           return arrayMove(prevItems, oldIndex, newIndex);
         });
       }
@@ -78,23 +79,28 @@ const OutlineWorkspace = ({ items, setItems, onDownload }: OutlineWorkspaceProps
             items={items.map((id) => `outline-card-${id}`)}
             strategy={verticalListSortingStrategy}
           >
-            {items.map((id, index) => (
-              <OutlineCard key={id} id={id} title={`${index + 1}`} />
+            {items.map((item, index) => (
+              <OutlineCard key={item.id} id={item.id} title={`${index + 1}`} />
             ))}
           </SortableContext>
         </DndContext>
+
+        {/* Add button */}
         <Button
           variant={'outline'}
           className="mt-4 w-full"
-          onClick={() => setItems((prev) => [...prev, (prev.length + 1).toString()])}
+          onClick={() => setItems((prev) => [...prev, { id: (prev.length + 1).toString() }])}
         >
           <Plus className="h-4 w-4" />
           {t('addOutlineCard')}
         </Button>
+
         <div className="flex w-full items-center justify-between">
           <div>
             {items.length} {t('outlineCards')}
           </div>
+
+          {/* Download button */}
           <Button
             variant={'outline'}
             className="text-muted-foreground"

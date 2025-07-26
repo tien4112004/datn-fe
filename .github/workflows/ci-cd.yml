@@ -198,7 +198,7 @@ jobs:
 
       - name: Remove Vercel Environment Variable
         if: ${{ needs.deploy_presentation.result == 'success' && needs.deploy_presentation.outputs.preview_url != '' }}
-        run: vercel env rm PRESENTATION_URL preview ${{ github.head_ref }} --yes --token=${{ secrets.VERCEL_TOKEN }}
+        run: vercel env rm PRESENTATION_URL preview ${{ github.head_ref }} --yes --token=${{ secrets.VERCEL_TOKEN }} || true
 
       - name: Update Vercel Environment Variable
         if: ${{ needs.deploy_presentation.result == 'success' && needs.deploy_presentation.outputs.preview_url != '' }}

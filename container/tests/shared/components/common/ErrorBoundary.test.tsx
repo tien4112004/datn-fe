@@ -2,14 +2,19 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import ErrorBoundary from '@/shared/components/common/ErrorBoundary';
+<<<<<<< HEAD
 import { CriticalError, ExpectedError } from '@/shared/types/errors';
 import { ERROR_TYPE } from '@/shared/constants';
+=======
+import { CriticalError, ExpectedError, ERROR_TYPE } from '@/shared/types/errors';
+>>>>>>> 12e7163 (feat: add error boundary)
 
 // Mock react-i18next
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
+<<<<<<< HEAD
         title: 'Something went wrong',
         description: 'An unexpected error occurred. Please try again.',
         errorDetails: 'Error Details',
@@ -18,6 +23,16 @@ vi.mock('react-i18next', () => ({
         componentStack: 'Component Stack',
         tryAgain: 'Try Again',
         goHome: 'Go Home',
+=======
+        'errorBoundary.title': 'Something went wrong',
+        'errorBoundary.description': 'An unexpected error occurred. Please try again.',
+        'errorBoundary.errorDetails': 'Error Details',
+        'errorBoundary.errorId': 'Error ID',
+        'errorBoundary.message': 'Message',
+        'errorBoundary.componentStack': 'Component Stack',
+        'errorBoundary.tryAgain': 'Try Again',
+        'errorBoundary.goHome': 'Go Home',
+>>>>>>> 12e7163 (feat: add error boundary)
       };
       return translations[key] || key;
     },
@@ -45,11 +60,19 @@ const mockConsole = {
 Object.assign(console, mockConsole);
 
 // Component that throws an error
+<<<<<<< HEAD
 const ThrowError: React.FC<{
   shouldThrow?: boolean;
   errorMessage?: string;
   errorType?: 'critical' | 'expected' | 'regular';
 }> = ({ shouldThrow = false, errorMessage = 'Test error', errorType = 'critical' }) => {
+=======
+const ThrowError: React.FC<{ shouldThrow?: boolean; errorMessage?: string; errorType?: 'critical' | 'expected' | 'regular' }> = ({
+  shouldThrow = false,
+  errorMessage = 'Test error',
+  errorType = 'critical',
+}) => {
+>>>>>>> 12e7163 (feat: add error boundary)
   if (shouldThrow) {
     if (errorType === 'critical') {
       throw new CriticalError(errorMessage, ERROR_TYPE.COMPONENT_CRASH);

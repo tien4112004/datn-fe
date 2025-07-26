@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "test": "vitest",
     "test:ui": "vitest --ui",
-    "test:run": "vitest run"
+    "test:run": "vitest run",
+	"format": "prettier --write \"**/*.{js,ts,vue,json,css,tsx}\""
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

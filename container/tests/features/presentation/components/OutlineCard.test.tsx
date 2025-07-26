@@ -64,7 +64,7 @@ describe('OutlineCard', () => {
       transform: null,
       transition: undefined,
       isDragging: true,
-    });
+    } as any);
 
     const { container } = render(<OutlineCard {...defaultProps} />);
 
@@ -79,7 +79,7 @@ describe('OutlineCard', () => {
       transform: { x: 10, y: 20 },
       transition: 'transform 200ms',
       isDragging: false,
-    });
+    }as any);
 
     const { container } = render(<OutlineCard {...defaultProps} />);
     const card = container.querySelector('[style*="transform"]');

@@ -71,4 +71,15 @@ export default {
       generateOutline: 'Generate Outline',
     },
   },
+
+  errorBoundary: {
+    title: 'Something went wrong',
+    description: 'We encountered an unexpected error. Our team has been notified.',
+    errorDetails: 'Error Details',
+    errorId: 'Error ID',
+    message: 'Message',
+    componentStack: 'Component Stack',
+    tryAgain: 'Try Again',
+    goHome: 'Go Home',
+  },
 };

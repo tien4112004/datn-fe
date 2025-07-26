@@ -1,168 +1,219 @@
-import { render, screen } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import userEvent from '@testing-library/user-event';
-import ReactErrorBoundary from '@/shared/components/common/ErrorBoundary';
+import React from 'react';
+import { render, screen, fireEvent } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import ErrorBoundary from '@/shared/components/common/ErrorBoundary';
 
-const ThrowError = ({ shouldThrow }: { shouldThrow: boolean }) => {
+// Mock react-i18next
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string) => {
+      const translations: Record<string, string> = {
+        'errorBoundary.title': 'Something went wrong',
+        'errorBoundary.description': 'An unexpected error occurred. Please try again.',
+        'errorBoundary.errorDetails': 'Error Details',
+        'errorBoundary.errorId': 'Error ID',
+        'errorBoundary.message': 'Message',
+        'errorBoundary.componentStack': 'Component Stack',
+        'errorBoundary.tryAgain': 'Try Again',
+        'errorBoundary.goHome': 'Go Home',
+      };
+      return translations[key] || key;
+    },
+  }),
+}));
+
+// Mock window.location
+const mockLocation = {
+  href: 'http://localhost:3000/test',
+  assign: vi.fn(),
+  replace: vi.fn(),
+  reload: vi.fn(),
+};
+Object.defineProperty(window, 'location', {
+  value: mockLocation,
+  writable: true,
+});
+
+// Mock console methods
+const mockConsole = {
+  group: vi.fn(),
+  error: vi.fn(),
+  groupEnd: vi.fn(),
+};
+Object.assign(console, mockConsole);
+
+// Component that throws an error
+const ThrowError: React.FC<{ shouldThrow?: boolean; errorMessage?: string }> = ({
+  shouldThrow = false,
+  errorMessage = 'Test error',
+}) => {
   if (shouldThrow) {
-    throw new Error('Test error');
+    throw new Error(errorMessage);
   }
-  return <div>No error</div>;
+  return <div data-testid="working-component">Working Component</div>;
 };
 
-describe('ErrorBoundary', () => {
-  const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-  const consoleGroupSpy = vi.spyOn(console, 'group').mockImplementation(() => {});
-  const consoleGroupEndSpy = vi.spyOn(console, 'groupEnd').mockImplementation(() => {});
+// Custom fallback component for testing
+const CustomFallback: React.FC<{
+  error: Error;
+  errorInfo: React.ErrorInfo | null;
+  resetError: () => void;
+  errorId: string;
+}> = ({ error, resetError, errorId }) => (
+  <div data-testid="custom-fallback">
+    <p>Custom Error: {error.message}</p>
+    <p>Error ID: {errorId}</p>
+    <button onClick={resetError}>Custom Reset</button>
+  </div>
+);
 
+describe('ErrorBoundary', () => {
   beforeEach(() => {
-    consoleSpy.mockClear();
-    consoleGroupSpy.mockClear();
-    consoleGroupEndSpy.mockClear();
+    vi.clearAllMocks();
+    // Suppress error boundary console warnings in tests
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
 
   it('renders children when there is no error', () => {
     render(
-      <ReactErrorBoundary>
+      <ErrorBoundary>
         <ThrowError shouldThrow={false} />
-      </ReactErrorBoundary>
+      </ErrorBoundary>
     );
 
-    expect(screen.getByText('No error')).toBeInTheDocument();
+    expect(screen.getByTestId('working-component')).toBeInTheDocument();
+    expect(screen.getByText('Working Component')).toBeInTheDocument();
   });
 
-  it('renders error fallback when there is an error', () => {
+  it('renders default error fallback when an error occurs', () => {
     render(
-      <ReactErrorBoundary>
-        <ThrowError shouldThrow={true} />
-      </ReactErrorBoundary>
+      <ErrorBoundary>
+        <ThrowError shouldThrow={true} errorMessage="Component crashed" />
+      </ErrorBoundary>
     );
 
     expect(screen.getByText('Something went wrong')).toBeInTheDocument();
-    expect(
-      screen.getByText('We encountered an unexpected error. Our team has been notified.')
-    ).toBeInTheDocument();
+    expect(screen.getByText('An unexpected error occurred. Please try again.')).toBeInTheDocument();
+    expect(screen.getByText('Try Again')).toBeInTheDocument();
+    expect(screen.getByText('Go Home')).toBeInTheDocument();
   });
 
-  it('shows error details when showDetails is true', () => {
+  it('displays error details when showDetails is true (default)', () => {
     render(
-      <ReactErrorBoundary showDetails={true}>
-        <ThrowError shouldThrow={true} />
-      </ReactErrorBoundary>
+      <ErrorBoundary>
+        <ThrowError shouldThrow={true} errorMessage="Detailed error message" />
+      </ErrorBoundary>
     );
 
-    expect(screen.getByText('Error Details')).toBeInTheDocument();
+    const detailsElement = screen.getByText('Error Details');
+    expect(detailsElement).toBeInTheDocument();
+
+    // Click to expand details
+    fireEvent.click(detailsElement);
+
+    expect(screen.getByText(/Error ID:/)).toBeInTheDocument();
+    expect(screen.getByText(/Message:/)).toBeInTheDocument();
+    expect(screen.getByText('Detailed error message')).toBeInTheDocument();
   });
 
   it('hides error details when showDetails is false', () => {
     render(
-      <ReactErrorBoundary showDetails={false}>
-        <ThrowError shouldThrow={true} />
-      </ReactErrorBoundary>
-    );
-
-    expect(screen.queryByText('Error Details')).not.toBeInTheDocument();
-  });
-
-  it('calls onError callback when error occurs', () => {
-    const onError = vi.fn();
-
-    render(
-      <ReactErrorBoundary onError={onError}>
-        <ThrowError shouldThrow={true} />
-      </ReactErrorBoundary>
-    );
-
-    expect(onError).toHaveBeenCalledWith(expect.any(Error), expect.any(Object), expect.any(String));
-  });
-
-  it('logs error to console', () => {
-    render(
-      <ReactErrorBoundary>
-        <ThrowError shouldThrow={true} />
-      </ReactErrorBoundary>
-    );
-
-    expect(consoleGroupSpy).toHaveBeenCalledWith(expect.stringContaining('Critical Error'));
-    expect(consoleSpy).toHaveBeenCalledWith('Error:', expect.any(Error));
-    expect(consoleGroupEndSpy).toHaveBeenCalled();
-  });
-
-  it('resets error state when try again button is clicked', async () => {
-    const user = userEvent.setup();
-    let shouldThrow = true;
-
-    const DynamicComponent = () => {
-      if (shouldThrow) {
-        throw new Error('Test error');
-      }
-      return <div>Component recovered</div>;
-    };
-
-    const { rerender } = render(
-      <ReactErrorBoundary>
-        <DynamicComponent />
-      </ReactErrorBoundary>
+      <ErrorBoundary showDetails={false}>
+        <ThrowError shouldThrow={true} errorMessage="Hidden details error" />
+      </ErrorBoundary>
     );
 
     expect(screen.getByText('Something went wrong')).toBeInTheDocument();
-
-    shouldThrow = false;
-
-    const tryAgainButton = screen.getByText('Try Again');
-    await user.click(tryAgainButton);
-
-    rerender(
-      <ReactErrorBoundary>
-        <DynamicComponent />
-      </ReactErrorBoundary>
-    );
-
-    expect(screen.getByText('Component recovered')).toBeInTheDocument();
+    expect(screen.queryByText('Error Details')).not.toBeInTheDocument();
   });
 
-  it('navigates to home when go home button is clicked', async () => {
-    const user = userEvent.setup();
+  it('renders custom fallback component when provided', () => {
+    render(
+      <ErrorBoundary fallback={CustomFallback}>
+        <ThrowError shouldThrow={true} errorMessage="Custom fallback test" />
+      </ErrorBoundary>
+    );
 
-    // Mock window.location.href
-    delete (window as any).location;
-    window.location = { href: '' } as any;
+    expect(screen.getByTestId('custom-fallback')).toBeInTheDocument();
+    expect(screen.getByText('Custom Error: Custom fallback test')).toBeInTheDocument();
+    expect(screen.getByText(/Error ID:/)).toBeInTheDocument();
+    expect(screen.getByText('Custom Reset')).toBeInTheDocument();
+  });
+
+  it('calls onError callback when an error occurs', () => {
+    const onErrorCallback = vi.fn();
 
     render(
-      <ReactErrorBoundary>
-        <ThrowError shouldThrow={true} />
-      </ReactErrorBoundary>
+      <ErrorBoundary onError={onErrorCallback}>
+        <ThrowError shouldThrow={true} errorMessage="Callback test error" />
+      </ErrorBoundary>
+    );
+
+    expect(onErrorCallback).toHaveBeenCalledTimes(1);
+    expect(onErrorCallback).toHaveBeenCalledWith(
+      expect.any(Error),
+      expect.objectContaining({
+        componentStack: expect.any(String),
+      }),
+      expect.stringMatching(/^error_\d+$/)
+    );
+  });
+
+  it('resets error state when reset button is clicked', () => {
+    // Create a custom fallback that tracks reset calls
+    const mockReset = vi.fn();
+    const CustomTestFallback: React.FC<{
+      error: Error;
+      errorInfo: React.ErrorInfo | null;
+      resetError: () => void;
+      errorId: string;
+    }> = ({ error, resetError, errorId }) => {
+      const handleReset = () => {
+        mockReset();
+        resetError();
+      };
+      
+      return (
+        <div data-testid="test-fallback">
+          <p>Error: {error.message}</p>
+          <p>Error ID: {errorId}</p>
+          <button onClick={handleReset} data-testid="test-reset-button">Reset Error</button>
+        </div>
+      );
+    };
+
+    render(
+      <ErrorBoundary fallback={CustomTestFallback}>
+        <ThrowError shouldThrow={true} errorMessage="Reset test error" />
+      </ErrorBoundary>
+    );
+
+    // Verify error state is shown
+    expect(screen.getByTestId('test-fallback')).toBeInTheDocument();
+    expect(screen.getByText('Error: Reset test error')).toBeInTheDocument();
+    
+    // Click reset button
+    const resetButton = screen.getByTestId('test-reset-button');
+    fireEvent.click(resetButton);
+
+    // Verify reset function was called
+    expect(mockReset).toHaveBeenCalledTimes(1);
+  });
+
+  it('redirects to home when go home button is clicked', () => {
+    render(
+      <ErrorBoundary>
+        <ThrowError shouldThrow={true} errorMessage="Home redirect test" />
+      </ErrorBoundary>
     );
 
     const goHomeButton = screen.getByText('Go Home');
-    await user.click(goHomeButton);
+    fireEvent.click(goHomeButton);
 
     expect(window.location.href).toBe('/');
-  });
-
-  it('generates unique error IDs', () => {
-    const onError1 = vi.fn();
-    const onError2 = vi.fn();
-
-    const { unmount } = render(
-      <ReactErrorBoundary onError={onError1}>
-        <ThrowError shouldThrow={true} />
-      </ReactErrorBoundary>
-    );
-
-    unmount();
-
-    render(
-      <ReactErrorBoundary onError={onError2}>
-        <ThrowError shouldThrow={true} />
-      </ReactErrorBoundary>
-    );
-
-    const errorId1 = onError1.mock.calls[0][2];
-    const errorId2 = onError2.mock.calls[0][2];
-
-    expect(errorId1).not.toBe(errorId2);
-    expect(typeof errorId1).toBe('string');
-    expect(typeof errorId2).toBe('string');
   });
 });

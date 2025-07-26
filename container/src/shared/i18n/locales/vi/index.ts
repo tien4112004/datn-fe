@@ -71,4 +71,14 @@ export default {
       generateOutline: 'Tạo dàn ý',
     },
   },
+  errorBoundary: {
+    title: 'Đã xảy ra lỗi',
+    description: 'Chúng tôi gặp phải một lỗi không mong muốn. Nhóm của chúng tôi đã được thông báo.',
+    errorDetails: 'Chi tiết lỗi',
+    errorId: 'Mã lỗi',
+    message: 'Thông báo',
+    componentStack: 'Ngăn xếp thành phần',
+    tryAgain: 'Thử lại',
+    goHome: 'Về trang chủ',
+  },
 };

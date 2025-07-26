@@ -3,6 +3,7 @@ import { type AppError, CriticalError, ERROR_TYPE } from '@/shared/types/errors'
 import { Button } from '@/shared/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface ErrorBoundaryState {
   hasError: boolean;
@@ -23,9 +24,12 @@ interface ErrorFallbackProps {
   errorInfo: React.ErrorInfo | null;
   resetError: () => void;
   errorId: string;
+  showDetails?: boolean;
 }
 
-const DefaultErrorFallback: React.FC<ErrorFallbackProps> = ({ error, errorInfo, resetError, errorId }) => {
+const DefaultErrorFallback: React.FC<ErrorFallbackProps> = ({ error, errorInfo, resetError, errorId, showDetails = true }) => {
+  const { t } = useTranslation();
+
   const goHome = () => {
     window.location.href = '/';
   };
@@ -37,37 +41,44 @@ const DefaultErrorFallback: React.FC<ErrorFallbackProps> = ({ error, errorInfo, 
           <div className="bg-destructive/10 mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full">
             <AlertTriangle className="text-destructive h-6 w-6" />
           </div>
-          <CardTitle className="text-xl">Something went wrong</CardTitle>
+          <CardTitle className="text-xl">{t('errorBoundary.title')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="space-y-2 text-sm">
-            <details className="cursor-pointer">
-              <summary className="font-medium">Error Details</summary>
-              <div className="bg-muted mt-2 rounded-md p-3">
-                <p className="mb-2 break-all font-mono text-xs">
-                  <strong>Error ID:</strong> {errorId}
-                </p>
-                <p className="mb-2 break-all font-mono text-xs">
-                  <strong>Message:</strong> {error.message}
-                </p>
-                {errorInfo?.componentStack && (
-                  <p className="break-all font-mono text-xs">
-                    <strong>Component Stack:</strong>
-                    <br />
-                    {errorInfo.componentStack}
+          <p className="text-center text-sm text-muted-foreground">
+            {t('errorBoundary.description')}
+          </p>
+          
+          {showDetails && (
+            <div className="space-y-2 text-sm">
+              <details className="cursor-pointer">
+                <summary className="font-medium">{t('errorBoundary.errorDetails')}</summary>
+                <div className="bg-muted mt-2 rounded-md p-3">
+                  <p className="mb-2 break-all font-mono text-xs">
+                    <strong>{t('errorBoundary.errorId')}:</strong> {errorId}
                   </p>
-                )}
-              </div>
-            </details>
-          </div>
+                  <p className="mb-2 break-all font-mono text-xs">
+                    <strong>{t('errorBoundary.message')}:</strong> {error.message}
+                  </p>
+                  {errorInfo?.componentStack && (
+                    <p className="break-all font-mono text-xs">
+                      <strong>{t('errorBoundary.componentStack')}:</strong>
+                      <br />
+                      {errorInfo.componentStack}
+                    </p>
+                  )}
+                </div>
+              </details>
+            </div>
+          )}
+          
           <div className="flex flex-col gap-2">
             <Button onClick={resetError} className="w-full">
               <RefreshCw className="mr-2 h-4 w-4" />
-              Try Again
+              {t('errorBoundary.tryAgain')}
             </Button>
             <Button variant="outline" onClick={goHome} className="w-full">
               <Home className="mr-2 h-4 w-4" />
-              Go Home
+              {t('errorBoundary.goHome')}
             </Button>
           </div>
         </CardContent>
@@ -147,6 +158,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
           errorInfo={this.state.errorInfo}
           resetError={this.resetError}
           errorId={this.state.errorId || 'unknown'}
+          showDetails={this.props.showDetails}
         />
       );
     }

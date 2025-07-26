@@ -3,8 +3,11 @@ import EditorPage from '@/features/presentation/pages/EditorPage';
 import CreateOutlinePage from '@/features/presentation/pages/CreateOutlinePage';
 import { useState } from 'react';
 import OutlineWorkspace from './components/OutlineWorkspace';
+import { CriticalError } from '@/shared/types/errors';
 
 const OutlineWorkspacePage = () => {
+  throw new CriticalError('This is a simulated error for testing purposes');
+
   const [items, setItems] = useState([{ id: '1' }, { id: '2' }, { id: '3' }]);
   return (
     <OutlineWorkspace

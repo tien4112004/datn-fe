@@ -1,0 +1,158 @@
+import React, { Component, type ReactNode } from 'react';
+import { type AppError, CriticalError, ERROR_TYPE } from '@/shared/types/errors';
+import { Button } from '@/shared/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
+import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
+
+interface ErrorBoundaryState {
+  hasError: boolean;
+  error: Error | null;
+  errorInfo: React.ErrorInfo | null;
+  errorId: string | null;
+}
+
+interface ErrorBoundaryProps {
+  children: ReactNode;
+  fallback?: React.ComponentType<ErrorFallbackProps>;
+  onError?: (error: Error, errorInfo: React.ErrorInfo, errorId: string) => void;
+  showDetails?: boolean;
+}
+
+interface ErrorFallbackProps {
+  error: Error;
+  errorInfo: React.ErrorInfo | null;
+  resetError: () => void;
+  errorId: string;
+}
+
+const DefaultErrorFallback: React.FC<ErrorFallbackProps> = ({ error, errorInfo, resetError, errorId }) => {
+  const goHome = () => {
+    window.location.href = '/';
+  };
+
+  return (
+    <div className="bg-background flex min-h-screen w-screen items-center justify-center p-4">
+      <Card className="w-full max-w-2xl">
+        <CardHeader className="text-center">
+          <div className="bg-destructive/10 mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full">
+            <AlertTriangle className="text-destructive h-6 w-6" />
+          </div>
+          <CardTitle className="text-xl">Something went wrong</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2 text-sm">
+            <details className="cursor-pointer">
+              <summary className="font-medium">Error Details</summary>
+              <div className="bg-muted mt-2 rounded-md p-3">
+                <p className="mb-2 break-all font-mono text-xs">
+                  <strong>Error ID:</strong> {errorId}
+                </p>
+                <p className="mb-2 break-all font-mono text-xs">
+                  <strong>Message:</strong> {error.message}
+                </p>
+                {errorInfo?.componentStack && (
+                  <p className="break-all font-mono text-xs">
+                    <strong>Component Stack:</strong>
+                    <br />
+                    {errorInfo.componentStack}
+                  </p>
+                )}
+              </div>
+            </details>
+          </div>
+          <div className="flex flex-col gap-2">
+            <Button onClick={resetError} className="w-full">
+              <RefreshCw className="mr-2 h-4 w-4" />
+              Try Again
+            </Button>
+            <Button variant="outline" onClick={goHome} className="w-full">
+              <Home className="mr-2 h-4 w-4" />
+              Go Home
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps) {
+    super(props);
+    this.state = {
+      hasError: false,
+      error: null,
+      errorInfo: null,
+      errorId: null,
+    };
+  }
+
+  static getDerivedStateFromError(error: Error): Partial<ErrorBoundaryState> {
+    const errorId = `error_${Date.now()}`;
+
+    return {
+      hasError: true,
+      error,
+      errorId,
+    };
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    const errorId = this.state.errorId || `error_${Date.now()}`;
+
+    this.setState({
+      errorInfo,
+      errorId,
+    });
+
+    const criticalError = new CriticalError(error.message, ERROR_TYPE.COMPONENT_CRASH, 'COMPONENT_ERROR', {
+      componentStack: errorInfo.componentStack,
+      errorStack: error.stack,
+      userAgent: navigator.userAgent,
+      url: window.location.href,
+      timestamp: new Date().toISOString(),
+    });
+
+    this.logError(criticalError, errorInfo, errorId);
+
+    if (this.props.onError) {
+      this.props.onError(error, errorInfo, errorId);
+    }
+  }
+
+  private logError = (error: AppError, errorInfo: React.ErrorInfo, errorId: string) => {
+    console.group(`Critical Error [${errorId}]`);
+    console.error('Error:', error);
+    console.error('Error Info:', errorInfo);
+    console.error('Context:', error.context);
+    console.groupEnd();
+  };
+
+  private resetError = () => {
+    this.setState({
+      hasError: false,
+      error: null,
+      errorInfo: null,
+      errorId: null,
+    });
+  };
+
+  render() {
+    if (this.state.hasError && this.state.error) {
+      const FallbackComponent = this.props.fallback || DefaultErrorFallback;
+
+      return (
+        <FallbackComponent
+          error={this.state.error}
+          errorInfo={this.state.errorInfo}
+          resetError={this.resetError}
+          errorId={this.state.errorId || 'unknown'}
+        />
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
+export default ErrorBoundary;

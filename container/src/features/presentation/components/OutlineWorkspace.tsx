@@ -15,7 +15,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 
-import { useId, useState } from 'react';
+import { useState } from 'react';
 import { Download, Loader, Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { OutlineItem } from '../types/outline';
@@ -101,7 +101,7 @@ const OutlineWorkspace = ({ items, setItems, onDownload }: OutlineWorkspaceProps
         <Button
           variant={'outline'}
           className="mt-4 w-full"
-          onClick={() => setItems((prev) => [...prev, { id: useId().toString() }])}
+          onClick={() => setItems((prev) => [...prev, { id: Date.now().toString() }])}
         >
           <Plus className="h-4 w-4" />
           {t('addOutlineCard')}

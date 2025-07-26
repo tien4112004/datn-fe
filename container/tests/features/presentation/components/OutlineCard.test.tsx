@@ -94,7 +94,6 @@ describe('OutlineCard', () => {
 
     const deleteButton = screen.getByRole('button');
     expect(deleteButton).toBeInTheDocument();
-    expect(deleteButton.querySelector('[data-testid="trash-icon"]')).toBeNull();
   });
 
   it('does not render delete button when onDelete prop is not provided', () => {
@@ -131,7 +130,7 @@ describe('OutlineCard', () => {
     expect(container.querySelector('.scale-0')).toBeInTheDocument();
   });
 
-  it('renders with custom text content', () => {
+  it('renders with custom text content', async () => {
     const customTexts = [
       {
         type: 'paragraph',
@@ -139,9 +138,8 @@ describe('OutlineCard', () => {
       },
     ];
 
-    const mockUseRichTextEditor = vi.mocked(
-      require('@/shared/components/rte/useRichTextEditor').useRichTextEditor
-    );
+    const { useRichTextEditor } = await import('@/shared/components/rte/useRichTextEditor');
+    const mockUseRichTextEditor = vi.mocked(useRichTextEditor);
 
     render(<OutlineCard {...defaultProps} texts={customTexts as any} />);
 

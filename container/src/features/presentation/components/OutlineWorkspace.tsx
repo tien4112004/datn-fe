@@ -66,6 +66,9 @@ const OutlineWorkspace = ({ items, setItems, onDownload }: OutlineWorkspaceProps
       if (onDownload) {
         await onDownload();
       }
+    } catch (error) {
+      // Handle download errors gracefully
+      console.error('Download failed:', error);
     } finally {
       setIsDownloading(false);
     }

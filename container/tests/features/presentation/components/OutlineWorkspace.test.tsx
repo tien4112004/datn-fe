@@ -246,12 +246,10 @@ describe('OutlineWorkspace', () => {
   it('handles download errors gracefully', async () => {
     const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-    // Handle the error rejection properly to avoid unhandled promise rejection
-    let rejectDownload: (error: Error) => void;
-    const downloadPromise = new Promise<void>((_, reject) => {
-      rejectDownload = reject;
+    // Mock the download function to throw an error
+    mockOnDownload.mockImplementation(async () => {
+      throw new Error('Download failed');
     });
-    mockOnDownload.mockReturnValueOnce(downloadPromise);
 
     render(<OutlineWorkspace {...defaultProps} />);
 
@@ -259,13 +257,8 @@ describe('OutlineWorkspace', () => {
 
     await act(async () => {
       fireEvent.click(downloadButton);
-      // Reject the promise and wait for error handling
-      rejectDownload!(new Error('Download failed'));
-      try {
-        await downloadPromise;
-      } catch {
-        // Expected error, ignore
-      }
+      // Wait for the async error handling to complete
+      await new Promise(resolve => setTimeout(resolve, 50));
     });
 
     await waitFor(() => {

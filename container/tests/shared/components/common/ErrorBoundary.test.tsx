@@ -2,6 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import ErrorBoundary from '@/shared/components/common/ErrorBoundary';
+import { CriticalError, ExpectedError, ERROR_TYPE } from '@/shared/types/errors';
 
 // Mock react-i18next
 vi.mock('react-i18next', () => ({
@@ -43,12 +44,19 @@ const mockConsole = {
 Object.assign(console, mockConsole);
 
 // Component that throws an error
-const ThrowError: React.FC<{ shouldThrow?: boolean; errorMessage?: string }> = ({
+const ThrowError: React.FC<{ shouldThrow?: boolean; errorMessage?: string; errorType?: 'critical' | 'expected' | 'regular' }> = ({
   shouldThrow = false,
   errorMessage = 'Test error',
+  errorType = 'critical',
 }) => {
   if (shouldThrow) {
-    throw new Error(errorMessage);
+    if (errorType === 'critical') {
+      throw new CriticalError(errorMessage, ERROR_TYPE.COMPONENT_CRASH);
+    } else if (errorType === 'expected') {
+      throw new ExpectedError(errorMessage, ERROR_TYPE.VALIDATION);
+    } else {
+      throw new Error(errorMessage);
+    }
   }
   return <div data-testid="working-component">Working Component</div>;
 };
@@ -89,10 +97,10 @@ describe('ErrorBoundary', () => {
     expect(screen.getByText('Working Component')).toBeInTheDocument();
   });
 
-  it('renders default error fallback when an error occurs', () => {
+  it('renders default error fallback when a critical error occurs', () => {
     render(
       <ErrorBoundary>
-        <ThrowError shouldThrow={true} errorMessage="Component crashed" />
+        <ThrowError shouldThrow={true} errorMessage="Component crashed" errorType="critical" />
       </ErrorBoundary>
     );
 
@@ -105,7 +113,7 @@ describe('ErrorBoundary', () => {
   it('displays error details when showDetails is true (default)', () => {
     render(
       <ErrorBoundary>
-        <ThrowError shouldThrow={true} errorMessage="Detailed error message" />
+        <ThrowError shouldThrow={true} errorMessage="Detailed error message" errorType="critical" />
       </ErrorBoundary>
     );
 
@@ -123,7 +131,7 @@ describe('ErrorBoundary', () => {
   it('hides error details when showDetails is false', () => {
     render(
       <ErrorBoundary showDetails={false}>
-        <ThrowError shouldThrow={true} errorMessage="Hidden details error" />
+        <ThrowError shouldThrow={true} errorMessage="Hidden details error" errorType="critical" />
       </ErrorBoundary>
     );
 
@@ -134,7 +142,7 @@ describe('ErrorBoundary', () => {
   it('renders custom fallback component when provided', () => {
     render(
       <ErrorBoundary fallback={CustomFallback}>
-        <ThrowError shouldThrow={true} errorMessage="Custom fallback test" />
+        <ThrowError shouldThrow={true} errorMessage="Custom fallback test" errorType="critical" />
       </ErrorBoundary>
     );
 
@@ -144,18 +152,18 @@ describe('ErrorBoundary', () => {
     expect(screen.getByText('Custom Reset')).toBeInTheDocument();
   });
 
-  it('calls onError callback when an error occurs', () => {
+  it('calls onError callback when a critical error occurs', () => {
     const onErrorCallback = vi.fn();
 
     render(
       <ErrorBoundary onError={onErrorCallback}>
-        <ThrowError shouldThrow={true} errorMessage="Callback test error" />
+        <ThrowError shouldThrow={true} errorMessage="Callback test error" errorType="critical" />
       </ErrorBoundary>
     );
 
     expect(onErrorCallback).toHaveBeenCalledTimes(1);
     expect(onErrorCallback).toHaveBeenCalledWith(
-      expect.any(Error),
+      expect.any(CriticalError),
       expect.objectContaining({
         componentStack: expect.any(String),
       }),
@@ -176,26 +184,28 @@ describe('ErrorBoundary', () => {
         mockReset();
         resetError();
       };
-      
+
       return (
         <div data-testid="test-fallback">
           <p>Error: {error.message}</p>
           <p>Error ID: {errorId}</p>
-          <button onClick={handleReset} data-testid="test-reset-button">Reset Error</button>
+          <button onClick={handleReset} data-testid="test-reset-button">
+            Reset Error
+          </button>
         </div>
       );
     };
 
     render(
       <ErrorBoundary fallback={CustomTestFallback}>
-        <ThrowError shouldThrow={true} errorMessage="Reset test error" />
+        <ThrowError shouldThrow={true} errorMessage="Reset test error" errorType="critical" />
       </ErrorBoundary>
     );
 
     // Verify error state is shown
     expect(screen.getByTestId('test-fallback')).toBeInTheDocument();
     expect(screen.getByText('Error: Reset test error')).toBeInTheDocument();
-    
+
     // Click reset button
     const resetButton = screen.getByTestId('test-reset-button');
     fireEvent.click(resetButton);
@@ -207,7 +217,7 @@ describe('ErrorBoundary', () => {
   it('redirects to home when go home button is clicked', () => {
     render(
       <ErrorBoundary>
-        <ThrowError shouldThrow={true} errorMessage="Home redirect test" />
+        <ThrowError shouldThrow={true} errorMessage="Home redirect test" errorType="critical" />
       </ErrorBoundary>
     );
 
@@ -215,5 +225,38 @@ describe('ErrorBoundary', () => {
     fireEvent.click(goHomeButton);
 
     expect(window.location.href).toBe('/');
+  });
+
+  it('re-throws non-critical errors (ExpectedError)', () => {
+    // Verify that ExpectedError is not caught by ErrorBoundary
+    expect(() => {
+      render(
+        <ErrorBoundary>
+          <ThrowError shouldThrow={true} errorMessage="Expected error test" errorType="expected" />
+        </ErrorBoundary>
+      );
+    }).toThrow('Expected error test');
+  });
+
+  it('re-throws regular errors', () => {
+    // Verify that regular Error is not caught by ErrorBoundary
+    expect(() => {
+      render(
+        <ErrorBoundary>
+          <ThrowError shouldThrow={true} errorMessage="Regular error test" errorType="regular" />
+        </ErrorBoundary>
+      );
+    }).toThrow('Regular error test');
+  });
+
+  it('only catches CriticalError instances', () => {
+    // This should be caught by ErrorBoundary
+    render(
+      <ErrorBoundary>
+        <ThrowError shouldThrow={true} errorMessage="Critical error test" errorType="critical" />
+      </ErrorBoundary>
+    );
+
+    expect(screen.getByText('Something went wrong')).toBeInTheDocument();
   });
 });

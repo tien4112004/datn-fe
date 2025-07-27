@@ -1,5 +1,5 @@
 import React, { Component, type ReactNode } from 'react';
-import { type AppError, CriticalError, ERROR_TYPE } from '@/shared/types/errors';
+import { type AppError, CriticalError, isCriticalError } from '@/shared/types/errors';
 import { Button } from '@/shared/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
@@ -99,6 +99,10 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   }
 
   static getDerivedStateFromError(error: Error): Partial<ErrorBoundaryState> {
+    if (!isCriticalError(error)) {
+      throw error;
+    }
+
     const errorId = `error_${Date.now()}`;
 
     return {
@@ -109,6 +113,10 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    if (!isCriticalError(error)) {
+      return;
+    }
+
     const errorId = this.state.errorId || `error_${Date.now()}`;
 
     this.setState({
@@ -116,15 +124,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
       errorId,
     });
 
-    const criticalError = new CriticalError(error.message, ERROR_TYPE.COMPONENT_CRASH, 'COMPONENT_ERROR', {
-      componentStack: errorInfo.componentStack,
-      errorStack: error.stack,
-      userAgent: navigator.userAgent,
-      url: window.location.href,
-      timestamp: new Date().toISOString(),
-    });
-
-    this.logError(criticalError, errorInfo, errorId);
+    this.logError(error as CriticalError, errorInfo, errorId);
 
     if (this.props.onError) {
       this.props.onError(error, errorInfo, errorId);

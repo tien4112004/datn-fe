@@ -52,7 +52,7 @@ describe('NavMain', () => {
     icon: MockIcon,
     url: '/dashboard',
     isExpanded: true,
-  };
+  } as any;
   const groupItem = {
     title: 'Settings',
     icon: MockIcon,
@@ -61,7 +61,7 @@ describe('NavMain', () => {
       { title: 'Account', url: '/settings/account' },
     ],
     isActive: false,
-  };
+  } as any;
   const items = [directLinkItem, groupItem];
 
   it('renders direct link items with NavLink', () => {

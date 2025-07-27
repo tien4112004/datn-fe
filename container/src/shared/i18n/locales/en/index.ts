@@ -36,4 +36,11 @@ export default {
     page: 'Loading page...',
     presentation: 'Loading presentation editor...',
   },
+
+  outlineWorkspace: {
+    addOutlineCard: 'Add Outline Card',
+    outlineCards: 'Outline Cards',
+    downloadOutline: 'Download Outline',
+    downloading: 'Downloading...',
+  },
 };

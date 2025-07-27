@@ -12,7 +12,8 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
     "test": "vitest",
     "test:ui": "vitest --ui",
-    "test:run": "vitest run"
+    "test:run": "vitest run",
+	"format": "prettier --write \"**/*.{js,ts,vue,json,css,tsx}\""
   },
   "author": "pipipi_pikachu@163.com",
   "dependencies": {

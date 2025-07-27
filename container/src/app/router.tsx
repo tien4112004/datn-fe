@@ -29,6 +29,10 @@ const router = createBrowserRouter([
           return { presentationId: params.presentationId };
         },
       },
+      {
+        path: 'presentation/create',
+        Component: Presentation.CreateOutlinePage,
+      }
     ],
   },
 ]);

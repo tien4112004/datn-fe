@@ -9,14 +9,14 @@ vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
-        'errorBoundary.title': 'Something went wrong',
-        'errorBoundary.description': 'An unexpected error occurred. Please try again.',
-        'errorBoundary.errorDetails': 'Error Details',
-        'errorBoundary.errorId': 'Error ID',
-        'errorBoundary.message': 'Message',
-        'errorBoundary.componentStack': 'Component Stack',
-        'errorBoundary.tryAgain': 'Try Again',
-        'errorBoundary.goHome': 'Go Home',
+        title: 'Something went wrong',
+        description: 'An unexpected error occurred. Please try again.',
+        errorDetails: 'Error Details',
+        errorId: 'Error ID',
+        message: 'Message',
+        componentStack: 'Component Stack',
+        tryAgain: 'Try Again',
+        goHome: 'Go Home',
       };
       return translations[key] || key;
     },
@@ -44,11 +44,11 @@ const mockConsole = {
 Object.assign(console, mockConsole);
 
 // Component that throws an error
-const ThrowError: React.FC<{ shouldThrow?: boolean; errorMessage?: string; errorType?: 'critical' | 'expected' | 'regular' }> = ({
-  shouldThrow = false,
-  errorMessage = 'Test error',
-  errorType = 'critical',
-}) => {
+const ThrowError: React.FC<{
+  shouldThrow?: boolean;
+  errorMessage?: string;
+  errorType?: 'critical' | 'expected' | 'regular';
+}> = ({ shouldThrow = false, errorMessage = 'Test error', errorType = 'critical' }) => {
   if (shouldThrow) {
     if (errorType === 'critical') {
       throw new CriticalError(errorMessage, ERROR_TYPE.COMPONENT_CRASH);

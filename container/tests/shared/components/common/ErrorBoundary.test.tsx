@@ -2,7 +2,8 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import ErrorBoundary from '@/shared/components/common/ErrorBoundary';
-import { CriticalError, ExpectedError, ERROR_TYPE } from '@/shared/types/errors';
+import { CriticalError, ExpectedError } from '@/shared/types/errors';
+import { ERROR_TYPE } from '@/shared/constants';
 
 // Mock react-i18next
 vi.mock('react-i18next', () => ({

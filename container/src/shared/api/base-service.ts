@@ -1,6 +1,8 @@
 import { useApiSwitching } from '@/context/api-switching';
 
-export interface Service {}
+export interface Service {
+  getType(): 'mock' | 'real';
+}
 
 export function createApiServiceFactory<T extends Service>(
   MockService: new () => T,

@@ -24,7 +24,7 @@ import { useApi } from '@/features/demo/hooks/useApi';
 import { Button } from '@ui/button';
 
 export default function CardsDemo() {
-  const fetchData = useApi().fetchData;
+  const { isLoading, refetch } = useApi();
 
   return (
     <>
@@ -44,7 +44,13 @@ export default function CardsDemo() {
         </Breadcrumb>
       </header>
       <div className="flex items-center justify-between p-4">
-        <Button onClick={fetchData}>Fetch Demo Items</Button>
+        <Button
+          onClick={() => {
+            refetch();
+          }}
+        >
+          {isLoading ? 'Fetching...' : 'Fetch Demo Items'}
+        </Button>
       </div>
       <div className="md:grids-col-2 **:data-[slot=card]:shadow-none grid md:gap-4 lg:grid-cols-10 xl:grid-cols-11">
         <div className="grid gap-4 lg:col-span-4 xl:col-span-6">

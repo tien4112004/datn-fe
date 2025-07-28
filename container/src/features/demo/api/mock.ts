@@ -25,6 +25,10 @@ const mockDemoItems: DemoItem[] = [
 ];
 
 export default class DemoMockService implements DemoApiService {
+  getType(): 'mock' | 'real' {
+    return 'mock';
+  }
+
   async getDemoItems(): Promise<DemoItem[]> {
     return new Promise((resolve) => {
       setTimeout(() => resolve([...mockDemoItems]), 500);

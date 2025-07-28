@@ -30,6 +30,9 @@ export default class DemoRealApiService implements DemoApiService {
   //     const response = await api.get<DemoItem[]>('/demo/items');
   //     return response.data;
   //   }
+  getType(): 'mock' | 'real' {
+    return 'real';
+  }
 
   async getDemoItems(): Promise<DemoItem[]> {
     return new Promise((resolve) => {

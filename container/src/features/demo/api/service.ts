@@ -1,3 +1,4 @@
+import { API_MODE, type ApiMode } from '@/shared/constants';
 import { type DemoApiService, type DemoItem } from '../types';
 // import api from '@/shared/api';
 
@@ -30,8 +31,8 @@ export default class DemoRealApiService implements DemoApiService {
   //     const response = await api.get<DemoItem[]>('/demo/items');
   //     return response.data;
   //   }
-  getType(): 'mock' | 'real' {
-    return 'real';
+  getType(): ApiMode {
+    return API_MODE.real;
   }
 
   async getDemoItems(): Promise<DemoItem[]> {

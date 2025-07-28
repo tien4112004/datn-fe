@@ -1,7 +1,8 @@
 import { useApiSwitching } from '@/context/api-switching';
+import type { ApiMode } from '../constants';
 
 export interface Service {
-  getType(): 'mock' | 'real';
+  getType(): ApiMode;
 }
 
 export function createApiServiceFactory<T extends Service>(

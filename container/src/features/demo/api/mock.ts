@@ -1,3 +1,4 @@
+import { API_MODE, type ApiMode } from '@/shared/constants';
 import { type DemoItem, type DemoApiService } from '../types';
 
 const mockDemoItems: DemoItem[] = [
@@ -25,8 +26,8 @@ const mockDemoItems: DemoItem[] = [
 ];
 
 export default class DemoMockService implements DemoApiService {
-  getType(): 'mock' | 'real' {
-    return 'mock';
+  getType(): ApiMode {
+    return API_MODE.mock;
   }
 
   async getDemoItems(): Promise<DemoItem[]> {

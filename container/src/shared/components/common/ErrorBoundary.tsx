@@ -27,8 +27,14 @@ interface ErrorFallbackProps {
   showDetails?: boolean;
 }
 
-const DefaultErrorFallback: React.FC<ErrorFallbackProps> = ({ error, errorInfo, resetError, errorId, showDetails = true }) => {
-  const { t } = useTranslation();
+const DefaultErrorFallback: React.FC<ErrorFallbackProps> = ({
+  error,
+  errorInfo,
+  resetError,
+  errorId,
+  showDetails = true,
+}) => {
+  const { t } = useTranslation('errorBoundary');
 
   const goHome = () => {
     window.location.href = '/';
@@ -41,27 +47,25 @@ const DefaultErrorFallback: React.FC<ErrorFallbackProps> = ({ error, errorInfo, 
           <div className="bg-destructive/10 mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full">
             <AlertTriangle className="text-destructive h-6 w-6" />
           </div>
-          <CardTitle className="text-xl">{t('errorBoundary.title')}</CardTitle>
+          <CardTitle className="text-xl">{t('title')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <p className="text-center text-sm text-muted-foreground">
-            {t('errorBoundary.description')}
-          </p>
-          
+          <p className="text-muted-foreground text-center text-sm">{t('description')}</p>
+
           {showDetails && (
             <div className="space-y-2 text-sm">
               <details className="cursor-pointer">
-                <summary className="font-medium">{t('errorBoundary.errorDetails')}</summary>
+                <summary className="font-medium">{t('errorDetails')}</summary>
                 <div className="bg-muted mt-2 rounded-md p-3">
                   <p className="mb-2 break-all font-mono text-xs">
-                    <strong>{t('errorBoundary.errorId')}:</strong> {errorId}
+                    <strong>{t('errorId')}:</strong> {errorId}
                   </p>
                   <p className="mb-2 break-all font-mono text-xs">
-                    <strong>{t('errorBoundary.message')}:</strong> {error.message}
+                    <strong>{t('message')}:</strong> {error.message}
                   </p>
                   {errorInfo?.componentStack && (
                     <p className="break-all font-mono text-xs">
-                      <strong>{t('errorBoundary.componentStack')}:</strong>
+                      <strong>{t('componentStack')}:</strong>
                       <br />
                       {errorInfo.componentStack}
                     </p>
@@ -70,15 +74,15 @@ const DefaultErrorFallback: React.FC<ErrorFallbackProps> = ({ error, errorInfo, 
               </details>
             </div>
           )}
-          
+
           <div className="flex flex-col gap-2">
             <Button onClick={resetError} className="w-full">
               <RefreshCw className="mr-2 h-4 w-4" />
-              {t('errorBoundary.tryAgain')}
+              {t('tryAgain')}
             </Button>
             <Button variant="outline" onClick={goHome} className="w-full">
               <Home className="mr-2 h-4 w-4" />
-              {t('errorBoundary.goHome')}
+              {t('goHome')}
             </Button>
           </div>
         </CardContent>

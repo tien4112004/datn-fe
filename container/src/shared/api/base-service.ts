@@ -1,5 +1,5 @@
 import { useApiSwitching } from '@/context/api-switching';
-import type { ApiMode } from '../constants';
+import type { ApiMode } from '@/shared/constants';
 
 export interface Service {
   getType(): ApiMode;

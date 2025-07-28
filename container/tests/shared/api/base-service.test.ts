@@ -1,11 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { createApiServiceFactory, type Service } from '@/shared/api/base-service';
+import type { ApiMode } from '@/shared/constants';
 
 // Mock the useApiSwitching hook
-const mockUseApiSwitching = vi.fn();
 vi.mock('@/context/api-switching', () => ({
-  useApiSwitching: mockUseApiSwitching,
+  useApiSwitching: vi.fn(),
 }));
+
+import { useApiSwitching } from '@/context/api-switching';
+const mockUseApiSwitching = vi.mocked(useApiSwitching);
 
 // Mock service classes for testing
 interface TestService extends Service {
@@ -13,12 +16,18 @@ interface TestService extends Service {
 }
 
 class MockTestService implements TestService {
+  getType(): ApiMode {
+    return 'mock';
+  }
   getName(): string {
     return 'Mock Service';
   }
 }
 
 class RealTestService implements TestService {
+  getType(): ApiMode {
+    return 'real';
+  }
   getName(): string {
     return 'Real Service';
   }
@@ -26,18 +35,24 @@ class RealTestService implements TestService {
 
 // Another service type for generic testing
 interface AnotherService extends Service {
-  getType(): string;
+  getServiceMode(): string;
 }
 
 class MockAnotherService implements AnotherService {
-  getType(): string {
-    return 'Mock Another';
+  getType(): ApiMode {
+    return 'mock';
+  }
+  getServiceMode(): string {
+    return 'Mock Service Mode';
   }
 }
 
 class RealAnotherService implements AnotherService {
-  getType(): string {
-    return 'Real Another';
+  getType(): ApiMode {
+    return 'real';
+  }
+  getServiceMode(): string {
+    return 'Real Service Mode';
   }
 }
 
@@ -62,6 +77,7 @@ describe('createApiServiceFactory', () => {
 
     expect(service).toBeInstanceOf(RealTestService);
     expect(service.getName()).toBe('Real Service');
+    expect(service.getType()).toBe('real');
   });
 
   it('works with different service types', () => {
@@ -70,7 +86,7 @@ describe('createApiServiceFactory', () => {
     const service = createApiServiceFactory(MockAnotherService, RealAnotherService);
 
     expect(service).toBeInstanceOf(MockAnotherService);
-    expect(service.getType()).toBe('Mock Another');
+    expect(service.getServiceMode()).toBe('Mock Service Mode');
   });
 
   it('maintains proper service interface', () => {
@@ -82,13 +98,16 @@ describe('createApiServiceFactory', () => {
     expect(typeof service).toBe('object');
     expect(service).toHaveProperty('getName');
     expect(typeof service.getName).toBe('function');
+    expect(service).toHaveProperty('getType');
+    expect(typeof service.getType).toBe('function');
+    expect(service.getType()).toBe('mock');
   });
 
   it('handles service instantiation correctly', () => {
     // Test both modes to ensure proper instantiation
     mockUseApiSwitching.mockReturnValue({ apiMode: 'mock' });
     const mockService = createApiServiceFactory(MockTestService, RealTestService);
-    
+
     mockUseApiSwitching.mockReturnValue({ apiMode: 'real' });
     const realService = createApiServiceFactory(MockTestService, RealTestService);
 

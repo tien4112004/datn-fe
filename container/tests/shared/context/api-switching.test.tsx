@@ -13,7 +13,7 @@ vi.stubGlobal('localStorage', localStorageMock);
 // Test component to use the hook
 const TestComponent = () => {
   const { apiMode, setApiMode } = useApiSwitching();
-  
+
   return (
     <div>
       <span data-testid="api-mode">{apiMode}</span>
@@ -41,7 +41,7 @@ describe('ApiSwitchingContext', () => {
 
   it('provides default mock mode when no localStorage value', () => {
     localStorageMock.getItem.mockReturnValue(null);
-    
+
     render(
       <ApiSwitchingProvider>
         <TestComponent />
@@ -54,7 +54,7 @@ describe('ApiSwitchingContext', () => {
 
   it('loads saved mode from localStorage', () => {
     localStorageMock.getItem.mockReturnValue('real');
-    
+
     render(
       <ApiSwitchingProvider>
         <TestComponent />
@@ -95,17 +95,17 @@ describe('ApiSwitchingContext', () => {
   it('throws error when hook used outside provider', () => {
     // Suppress console.error for this test
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    
+
     expect(() => {
       render(<ComponentOutsideProvider />);
     }).toThrow('useApiSwitching must be used within ApiSwitchingProvider');
-    
+
     consoleSpy.mockRestore();
   });
 
   it('handles invalid localStorage values gracefully', () => {
     localStorageMock.getItem.mockReturnValue('invalid-value');
-    
+
     render(
       <ApiSwitchingProvider>
         <TestComponent />

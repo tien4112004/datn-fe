@@ -41,6 +41,7 @@ export default defineConfig(({ mode }) => {
         '@/types': path.resolve(__dirname, './src/shared/types'),
         '@/assets': path.resolve(__dirname, './src/shared/assets'),
         '@/services': path.resolve(__dirname, './src/shared/services'),
+        '@/context': path.resolve(__dirname, './src/shared/context'),
         '@': path.resolve(__dirname, './src'),
         '@ui': path.resolve(__dirname, './src/shared/components/ui'),
       },

@@ -30,6 +30,7 @@
       "@/hooks/*": ["./src/shared/hooks/*"],
       "@/types/*": ["./src/shared/types/*"],
       "@/assets/*": ["./src/shared/assets/*"],
+      "@/context/*": ["./src/shared/context/*"],
       "@/components/*": ["./src/shared/components/*"],
       "@ui/*": ["./src/shared/components/ui/*"],
       "@/*": ["./src/*"]

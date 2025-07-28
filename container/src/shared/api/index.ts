@@ -45,3 +45,4 @@ api.interceptors.response.use(
 );
 
 export default api;
+export * from './base-service';

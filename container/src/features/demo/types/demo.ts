@@ -5,7 +5,3 @@ export interface DemoItem {
   createdAt: string;
   status: 'active' | 'inactive';
 }
-
-export interface DemoApiService {
-  getDemoItems(): Promise<DemoItem[]>;
-}

@@ -1,4 +1,4 @@
-import { type DemoApiService, type DemoItem } from './interface';
+import { type DemoApiService, type DemoItem } from '../types';
 // import api from '@/shared/api';
 
 const mockDemoItems: DemoItem[] = [

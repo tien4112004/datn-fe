@@ -1,8 +1,10 @@
 import axios from 'axios';
 import { CriticalError, ERROR_TYPE, ExpectedError } from '@/types/errors';
 
+const API_BASE_URL = import.meta.env.API_BASE_URL || 'http://localhost:3000';
+
 const api = axios.create({
-  baseURL: process.env.API_BASE_URL,
+  baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },

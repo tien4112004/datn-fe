@@ -3,6 +3,7 @@ import { StagewiseToolbar } from '@stagewise/toolbar-react';
 import ReactPlugin from '@stagewise-plugins/react';
 import router from './router';
 import '@/shared/i18n';
+import { ApiSwitchingProvider } from '@/shared/context/api-switching';
 
 const toolbarConfig = {
   plugins: [ReactPlugin],
@@ -11,7 +12,9 @@ const toolbarConfig = {
 export default function App() {
   return (
     <>
-      <RouterProvider router={router} />
+      <ApiSwitchingProvider>
+        <RouterProvider router={router} />
+      </ApiSwitchingProvider>
       <StagewiseToolbar config={toolbarConfig} />
     </>
   );

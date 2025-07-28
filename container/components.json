@@ -16,9 +16,7 @@
     "ui": "@/shared/components/ui",
     "lib": "@/shared/lib",
     "hooks": "@/shared/hooks",
-    "types": "@/shared/types",
-    "assets": "@/shared/assets",
-    "services": "@/shared/services"
+    "types": "@/shared/types"
   },
   "iconLibrary": "lucide"
 }

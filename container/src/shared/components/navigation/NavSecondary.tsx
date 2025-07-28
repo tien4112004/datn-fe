@@ -9,6 +9,7 @@ import {
   SidebarMenuItem,
 } from '@/shared/components/ui/sidebar';
 import SidebarLanguageSwitcher from './SidebarLanguageSwitcher';
+import SidebarApiSwitcher from './SidebarApiSwitcher';
 
 export function NavSecondary({
   items,
@@ -24,6 +25,7 @@ export function NavSecondary({
     <SidebarGroup {...props}>
       <SidebarGroupContent>
         <SidebarMenu>
+          <SidebarApiSwitcher />
           <SidebarLanguageSwitcher />
           {items.map((item) => (
             <SidebarMenuItem key={item.title}>

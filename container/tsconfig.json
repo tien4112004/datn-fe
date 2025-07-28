@@ -12,13 +12,12 @@
     "baseUrl": ".",
     "paths": {
       "@/components/*": ["./src/shared/components/*"],
-      "@/*": ["./src/*"],
-      "@ui/*": ["./src/shared/components/ui/*"],
       "@/utils/*": ["./src/shared/lib/utils/*"],
       "@/hooks/*": ["./src/shared/hooks/*"],
       "@/types/*": ["./src/shared/types/*"],
       "@/assets/*": ["./src/shared/assets/*"],
-      "@/services/*": ["./src/shared/services/*"]
+      "@/*": ["./src/*"],
+      "@ui/*": ["./src/shared/components/ui/*"]
     }
   }
 }

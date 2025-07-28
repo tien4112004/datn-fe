@@ -28,7 +28,12 @@
     "paths": {
       "@/*": ["./src/*"],
       "@/components/*": ["./src/shared/components/*"],
-      "@ui/*": ["./src/shared/components/ui/*"]
+      "@ui/*": ["./src/shared/components/ui/*"],
+      "@/utils/*": ["./src/shared/lib/utils/*"],
+      "@/hooks/*": ["./src/shared/hooks/*"],
+      "@/types/*": ["./src/shared/types/*"],
+      "@/assets/*": ["./src/shared/assets/*"],
+      "@/services/*": ["./src/shared/services/*"]
     }
   },
   "include": ["src/**/*.ts", "src/**/*.tsx", "tests/**/*.ts", "tests/**/*.tsx"]

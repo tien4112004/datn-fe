@@ -38,6 +38,11 @@ export default defineConfig(({ mode }) => {
         '@/components': path.resolve(__dirname, './src/shared/components'),
         '@': path.resolve(__dirname, './src'),
         '@ui': path.resolve(__dirname, './src/shared/components/ui'),
+        '@/utils': path.resolve(__dirname, './src/shared/lib/utils'),
+        '@/hooks': path.resolve(__dirname, './src/shared/hooks'),
+        '@/types': path.resolve(__dirname, './src/shared/types'),
+        '@/assets': path.resolve(__dirname, './src/shared/assets'),
+        '@/services': path.resolve(__dirname, './src/shared/services'),
       },
     },
   };

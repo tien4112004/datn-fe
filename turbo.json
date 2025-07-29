@@ -3,7 +3,7 @@
 
   "tasks": {
     "lint": { "outputs": [] },
-    "format": { "outputs": [] },
+    "format": { "outputs": [], "inputs": ["src/**/*.{js,ts,jsx,tsx,json,md}", "*.{js,ts,json}"] },
     "typecheck": { "outputs": [] },
     "test:run": { "outputs": [] },
 

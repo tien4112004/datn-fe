@@ -79,50 +79,48 @@ const OutlineWorkspace = ({ items, setItems, onDownload }: OutlineWorkspaceProps
   };
 
   return (
-    <div className="bg-accent flex w-full justify-center p-8">
-      <div className="bg-background flex w-full max-w-3xl flex-col items-center gap-6 rounded-xl p-8">
-        <DndContext sensors={sensors} onDragEnd={handleOutlineCardDragEnd}>
-          <SortableContext
-            items={items.map((item) => `outline-card-${item.id}`)}
-            strategy={verticalListSortingStrategy}
-          >
-            {items.map((item, index) => (
-              <OutlineCard
-                key={item.id}
-                id={item.id}
-                title={`${index + 1}`}
-                onDelete={() => handleDelete(item.id)}
-              />
-            ))}
-          </SortableContext>
-        </DndContext>
+    <div className="bg-card flex w-full flex-col gap-6 rounded-xl p-8">
+      <DndContext sensors={sensors} onDragEnd={handleOutlineCardDragEnd}>
+        <SortableContext
+          items={items.map((item) => `outline-card-${item.id}`)}
+          strategy={verticalListSortingStrategy}
+        >
+          {items.map((item, index) => (
+            <OutlineCard
+              key={item.id}
+              id={item.id}
+              title={`${index + 1}`}
+              onDelete={() => handleDelete(item.id)}
+            />
+          ))}
+        </SortableContext>
+      </DndContext>
 
-        {/* Add button */}
+      {/* Add button */}
+      <Button
+        variant={'outline'}
+        className="mt-4 w-full"
+        onClick={() => setItems((prev) => [...prev, { id: Date.now().toString() }])}
+      >
+        <Plus className="h-4 w-4" />
+        {t('addOutlineCard')}
+      </Button>
+
+      <div className="flex w-full items-center justify-between">
+        <div>
+          {items.length} {t('outlineCards')}
+        </div>
+
+        {/* Download button */}
         <Button
           variant={'outline'}
-          className="mt-4 w-full"
-          onClick={() => setItems((prev) => [...prev, { id: Date.now().toString() }])}
+          className="text-muted-foreground"
+          onClick={handleDownload}
+          disabled={isDownloading}
         >
-          <Plus className="h-4 w-4" />
-          {t('addOutlineCard')}
+          {isDownloading ? <Loader className="animate-spin" /> : <Download className="h-4 w-4" />}
+          {isDownloading ? t('downloading') : t('downloadOutline')}
         </Button>
-
-        <div className="flex w-full items-center justify-between">
-          <div>
-            {items.length} {t('outlineCards')}
-          </div>
-
-          {/* Download button */}
-          <Button
-            variant={'outline'}
-            className="text-muted-foreground"
-            onClick={handleDownload}
-            disabled={isDownloading}
-          >
-            {isDownloading ? <Loader className="animate-spin" /> : <Download className="h-4 w-4" />}
-            {isDownloading ? t('downloading') : t('downloadOutline')}
-          </Button>
-        </div>
       </div>
     </div>
   );

@@ -42,7 +42,7 @@ const SidebarLanguageSwitcher = () => {
                   key={language.code}
                   variant="ghost"
                   className={clsx(
-                    'w-full justify-start text-left hover:bg-primary hover:text-primary-foreground',
+                    'hover:bg-primary hover:text-primary-foreground w-full justify-start text-left',
                     active && 'bg-accent hover:bg-secondary hover:text-secondary-foreground',
                     index === 0 && 'rounded-bl-none rounded-br-none',
                     index === LANGUAGES.length - 1 && 'rounded-tl-none rounded-tr-none'

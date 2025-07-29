@@ -18,6 +18,10 @@
   --bn-font-family: var(--font-sans);
 }
 
+.bn-container[data-theming-ui-css-variables][data-card] {
+  --bn-colors-editor-background: var(--card);
+}
+
 svg {
   width: 1em !important;
   height: 1em !important;

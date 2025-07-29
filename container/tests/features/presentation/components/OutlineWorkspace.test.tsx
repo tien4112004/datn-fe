@@ -258,7 +258,7 @@ describe('OutlineWorkspace', () => {
     await act(async () => {
       fireEvent.click(downloadButton);
       // Wait for the async error handling to complete
-      await new Promise(resolve => setTimeout(resolve, 50));
+      await new Promise((resolve) => setTimeout(resolve, 50));
     });
 
     await waitFor(() => {

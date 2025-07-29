@@ -51,7 +51,7 @@ export type AutosizeTextAreaRef = {
 type AutosizeTextAreaProps = {
   maxHeight?: number;
   minHeight?: number;
-  variant?: 'default'| 'ghost';
+  variant?: 'default' | 'ghost';
 } & React.TextareaHTMLAttributes<HTMLTextAreaElement>;
 
 export const AutosizeTextarea = React.forwardRef<AutosizeTextAreaRef, AutosizeTextAreaProps>(
@@ -65,7 +65,7 @@ export const AutosizeTextarea = React.forwardRef<AutosizeTextAreaRef, AutosizeTe
       variant = 'default',
       ...props
     }: AutosizeTextAreaProps,
-    ref: React.Ref<AutosizeTextAreaRef>,
+    ref: React.Ref<AutosizeTextAreaRef>
   ) => {
     const textAreaRef = React.useRef<HTMLTextAreaElement | null>(null);
     const [triggerAutoSize, setTriggerAutoSize] = React.useState('');
@@ -90,21 +90,23 @@ export const AutosizeTextarea = React.forwardRef<AutosizeTextAreaRef, AutosizeTe
 
     return (
       <textarea
-      {...props}
-      value={value}
-      ref={textAreaRef}
-      className={cn(
-        'flex w-full rounded-md border px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50',
-        variant === 'ghost' && 'border-0 bg-transparent shadow-none focus-visible:outline-none focus-visible:ring-0',
-        variant === 'default' && 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border-input bg-background',
-        className,
-      )}
-      onChange={(e) => {
-        setTriggerAutoSize(e.target.value);
-        onChange?.(e);
-      }}
+        {...props}
+        value={value}
+        ref={textAreaRef}
+        className={cn(
+          'ring-offset-background placeholder:text-muted-foreground flex w-full rounded-md border px-3 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50',
+          variant === 'ghost' &&
+            'border-0 bg-transparent shadow-none focus-visible:outline-none focus-visible:ring-0',
+          variant === 'default' &&
+            'focus-visible:ring-ring border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
+          className
+        )}
+        onChange={(e) => {
+          setTriggerAutoSize(e.target.value);
+          onChange?.(e);
+        }}
       />
     );
-  },
+  }
 );
 AutosizeTextarea.displayName = 'AutosizeTextarea';

@@ -14,7 +14,7 @@ export function CardsCookieSettings() {
         <div className="flex items-center justify-between gap-4">
           <Label htmlFor="necessary" className="flex flex-col items-start">
             <span>Strictly Necessary</span>
-            <span className="text-muted-foreground leading-snug font-normal">
+            <span className="text-muted-foreground font-normal leading-snug">
               These cookies are essential in order to use the website and use its features.
             </span>
           </Label>
@@ -23,7 +23,7 @@ export function CardsCookieSettings() {
         <div className="flex items-center justify-between gap-4">
           <Label htmlFor="functional" className="flex flex-col items-start">
             <span>Functional Cookies</span>
-            <span className="text-muted-foreground leading-snug font-normal">
+            <span className="text-muted-foreground font-normal leading-snug">
               These cookies allow the website to provide personalized functionality.
             </span>
           </Label>

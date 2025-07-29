@@ -2,7 +2,7 @@ import PresentationCard from '@/features/presentation/components/PresentationCar
 
 const DetailsPage = () => {
   return (
-    <div className="max-w-2xl mx-auto my-8 p-4">
+    <div className="mx-auto my-8 max-w-2xl p-4">
       <h1>Presentation Details</h1>
       <PresentationCard />
     </div>

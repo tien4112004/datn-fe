@@ -13,7 +13,7 @@ export default function NavLayout() {
   return (
     <>
       <Nav />
-      <main className="flex flex-col h-fit">
+      <main className="flex h-fit flex-col">
         {isLoading && <GlobalSpinner text={t('page')} />}
         <Outlet />
       </main>

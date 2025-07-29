@@ -37,7 +37,7 @@ const Nav = () => {
 
   return (
     !isFullscreen && (
-      <nav className="px-4 py-2 bg-gray-100  flex items-center justify-between">
+      <nav className="flex items-center justify-between bg-gray-100 px-4 py-2">
         <div className="flex gap-4">
           <NavLink to="/" className="hover:underline">
             {t('home')}

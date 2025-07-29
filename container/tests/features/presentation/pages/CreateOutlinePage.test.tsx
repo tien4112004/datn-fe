@@ -1,6 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import CreateOutlinePage from '@/features/presentation/pages/CreateOutlinePage';
+import { toast } from 'sonner';
 
 vi.mock('@/shared/components/ui/button', () => ({
   Button: ({ children, onClick, ...props }: any) => (
@@ -124,6 +125,16 @@ vi.mock('sonner', () => ({
   toast: vi.fn(),
 }));
 
+// Mock React Router
+vi.mock('react-router-dom', () => ({
+  useLoaderData: vi.fn().mockReturnValue({
+    id: 'gpt-4o-mini',
+    name: 'gpt-4o-mini',
+    displayName: 'GPT-4o Mini',
+  }),
+  useNavigate: vi.fn().mockReturnValue(vi.fn()),
+}));
+
 // Mock React Query
 vi.mock('@tanstack/react-query', () => ({
   useQuery: vi.fn().mockImplementation(() => ({
@@ -243,13 +254,12 @@ describe('CreateOutlinePage', () => {
   });
 
   it('calls toast when generate outline button is clicked', () => {
-    const { toast } = require('sonner');
     render(<CreateOutlinePage />);
     const generateBtn = screen.getAllByTestId('button').find((btn) => btn.textContent === 'generateOutline');
     expect(generateBtn).toBeInTheDocument();
 
     fireEvent.click(generateBtn!);
-    expect(toast).toHaveBeenCalledWith(
+    expect(vi.mocked(toast)).toHaveBeenCalledWith(
       'Data:',
       expect.objectContaining({
         description: expect.anything(),

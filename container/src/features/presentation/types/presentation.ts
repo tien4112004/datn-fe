@@ -3,5 +3,4 @@ export interface PresentationItem {
   title: string;
   description: string;
   createdAt: string;
-  status: 'active' | 'inactive';
 }

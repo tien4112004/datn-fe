@@ -1,4 +1,4 @@
-import { AnimatePresence, delay, motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { CardTitle } from '@/shared/components/ui/card';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';

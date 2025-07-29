@@ -4,7 +4,7 @@ import { SidebarTrigger } from '@/shared/components/ui/sidebar';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import OutlineForm from '../components/OutlineForm';
-import { useLoaderData } from 'react-router-dom';
+import { useLoaderData, useNavigate } from 'react-router-dom';
 import type { ModelOption } from '@/features/model';
 
 const CreateOutlinePage = () => {
@@ -13,6 +13,7 @@ const CreateOutlinePage = () => {
   const [slideCount, setSlideCount] = React.useState<string | undefined>('10');
   const [style, setStyle] = React.useState<string | undefined>(undefined);
 
+  const navigate = useNavigate();
   const defaultModel = useLoaderData() as ModelOption;
   const [model, setModel] = React.useState<string>(defaultModel.name);
 
@@ -36,6 +37,8 @@ const CreateOutlinePage = () => {
         </pre>
       ),
     });
+
+    navigate('/presentation/outline');
   };
 
   return (

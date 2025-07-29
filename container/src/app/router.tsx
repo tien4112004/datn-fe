@@ -17,10 +17,6 @@ const router = createBrowserRouter([
         Component: Presentation.EditorPage,
       },
       {
-        path: 'test',
-        Component: Presentation.OutlineWorkspacePage,
-      },
-      {
         path: 'presentation/:presentationId',
         Component: Presentation.DetailsPage,
         loader: async ({ params }) => {
@@ -34,6 +30,10 @@ const router = createBrowserRouter([
         path: 'presentation/create',
         Component: Presentation.CreateOutlinePage,
         loader: getDefaultModel,
+      },
+      {
+        path: 'presentation/outline',
+        Component: Presentation.OutlineWorkspacePage,
       },
     ],
   },

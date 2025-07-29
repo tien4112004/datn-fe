@@ -14,11 +14,11 @@
     "format": "prettier --write \"**/*.{js,ts,vue,json,css,tsx}\""
   },
   "dependencies": {
-    "@dnd-kit/core": "^6.3.1",
-    "@dnd-kit/sortable": "^10.0.0",
     "@blocknote/core": "^0.35.0",
     "@blocknote/mantine": "^0.35.0",
     "@blocknote/react": "^0.35.0",
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/sortable": "^10.0.0",
     "@hookform/resolvers": "^5.1.1",
     "@module-federation/vite": "^1.5.1",
     "@radix-ui/react-avatar": "^1.1.10",
@@ -50,6 +50,7 @@
     "react": "^19.1.0",
     "react-day-picker": "^9.8.0",
     "react-dom": "^19.1.0",
+    "react-error-boundary": "^6.0.0",
     "react-hook-form": "^7.61.1",
     "react-i18next": "^15.6.0",
     "react-router-dom": "^7.6.3",

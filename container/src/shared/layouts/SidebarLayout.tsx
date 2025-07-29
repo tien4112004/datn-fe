@@ -6,6 +6,7 @@ import { subscribe, unsubscribe } from '@/shared/lib/event';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Toaster } from 'sonner';
+import ErrorBoundary from '@/components/common/ErrorBoundary';
 
 function NavLayoutContent() {
   const navigation = useNavigation();
@@ -31,11 +32,13 @@ function NavLayoutContent() {
 
   return (
     <>
-      <AppSidebar />
-      <SidebarInset>
-        {isLoading && <GlobalSpinner text={t('page')} />}
-        <Outlet />
-      </SidebarInset>
+      <ErrorBoundary>
+        <AppSidebar />
+        <SidebarInset>
+          {isLoading && <GlobalSpinner text={t('page')} />}
+          <Outlet />
+        </SidebarInset>
+      </ErrorBoundary>
     </>
   );
 }

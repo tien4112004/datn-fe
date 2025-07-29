@@ -1,6 +1,7 @@
 import { render, screen, act } from '@testing-library/react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { ApiSwitchingProvider, useApiSwitching } from '@/shared/context/api-switching';
+import { API_MODE } from '@/shared/constants';
 
 // Mock localStorage
 const localStorageMock = {
@@ -17,10 +18,10 @@ const TestComponent = () => {
   return (
     <div>
       <span data-testid="api-mode">{apiMode}</span>
-      <button onClick={() => setApiMode('mock')} data-testid="set-mock">
+      <button onClick={() => setApiMode(API_MODE.mock)} data-testid="set-mock">
         Set Mock
       </button>
-      <button onClick={() => setApiMode('real')} data-testid="set-real">
+      <button onClick={() => setApiMode(API_MODE.real)} data-testid="set-real">
         Set Real
       </button>
     </div>

@@ -62,7 +62,7 @@ describe('createApiServiceFactory', () => {
   });
 
   it('returns MockService when apiMode is mock', () => {
-    mockUseApiSwitching.mockReturnValue({ apiMode: API_MODE.mock });
+    mockUseApiSwitching.mockReturnValue({ apiMode: API_MODE.mock, setApiMode: vi.fn() });
 
     const service = createApiServiceFactory(MockTestService, RealTestService);
 
@@ -71,7 +71,7 @@ describe('createApiServiceFactory', () => {
   });
 
   it('returns RealService when apiMode is real', () => {
-    mockUseApiSwitching.mockReturnValue({ apiMode: API_MODE.real });
+    mockUseApiSwitching.mockReturnValue({ apiMode: API_MODE.real, setApiMode: vi.fn() });
 
     const service = createApiServiceFactory(MockTestService, RealTestService);
 
@@ -81,7 +81,7 @@ describe('createApiServiceFactory', () => {
   });
 
   it('works with different service types', () => {
-    mockUseApiSwitching.mockReturnValue({ apiMode: API_MODE.mock });
+    mockUseApiSwitching.mockReturnValue({ apiMode: API_MODE.mock, setApiMode: vi.fn() });
 
     const service = createApiServiceFactory(MockAnotherService, RealAnotherService);
 
@@ -90,7 +90,7 @@ describe('createApiServiceFactory', () => {
   });
 
   it('maintains proper service interface', () => {
-    mockUseApiSwitching.mockReturnValue({ apiMode: API_MODE.mock });
+    mockUseApiSwitching.mockReturnValue({ apiMode: API_MODE.mock, setApiMode: vi.fn() });
 
     const service = createApiServiceFactory(MockTestService, RealTestService);
 
@@ -105,10 +105,10 @@ describe('createApiServiceFactory', () => {
 
   it('handles service instantiation correctly', () => {
     // Test both modes to ensure proper instantiation
-    mockUseApiSwitching.mockReturnValue({ apiMode: API_MODE.mock });
+    mockUseApiSwitching.mockReturnValue({ apiMode: API_MODE.mock, setApiMode: vi.fn() });
     const mockService = createApiServiceFactory(MockTestService, RealTestService);
 
-    mockUseApiSwitching.mockReturnValue({ apiMode: API_MODE.real });
+    mockUseApiSwitching.mockReturnValue({ apiMode: API_MODE.real, setApiMode: vi.fn() });
     const realService = createApiServiceFactory(MockTestService, RealTestService);
 
     expect(mockService).toBeInstanceOf(MockTestService);

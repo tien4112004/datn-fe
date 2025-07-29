@@ -1,12 +1,13 @@
-import { useState } from 'react';
 import OutlineWorkspace from '@/features/presentation/components/OutlineWorkspace';
+import { usePresentationOutlines } from '../hooks/useApi';
 
 const OutlineWorkspacePage = () => {
-  const [items, setItems] = useState([{ id: '1' }, { id: '2' }, { id: '3' }]);
+  const { outlineItems, setOutlineItems } = usePresentationOutlines();
+
   return (
     <OutlineWorkspace
-      items={items}
-      setItems={setItems}
+      items={outlineItems}
+      setItems={setOutlineItems}
       onDownload={async () => {
         await new Promise((resolve) => setTimeout(resolve, 2000));
       }}

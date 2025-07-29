@@ -6,7 +6,7 @@ interface ApiSwitchingContextType {
   setApiMode: (mode: ApiMode) => void;
 }
 
-const ApiSwitchingContext = createContext<ApiSwitchingContextType | null>(null);
+const ApiSwitchingContext = createContext<ApiSwitchingContextType | undefined>(undefined);
 
 const LOCAL_STORAGE_KEY = 'apiMode';
 
@@ -18,13 +18,13 @@ export const useApiSwitching = () => {
   return context;
 };
 
-export const ApiSwitchingProvider = ({ children }: { children: ReactNode }) => {
-  const getInitialApiMode = (): ApiMode => {
-    const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
-    return stored === API_MODE.mock || stored === API_MODE.real ? stored : API_MODE.mock;
-  };
+export const getApiMode = (): ApiMode => {
+  const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
+  return stored === API_MODE.mock || stored === API_MODE.real ? stored : API_MODE.mock;
+};
 
-  const [apiMode, setApiMode] = useState<ApiMode>(getInitialApiMode());
+export const ApiSwitchingProvider = ({ children }: { children: ReactNode }) => {
+  const [apiMode, setApiMode] = useState<ApiMode>(getApiMode());
 
   const handleSetApiMode = (mode: ApiMode) => {
     setApiMode(mode);

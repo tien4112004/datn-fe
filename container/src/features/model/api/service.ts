@@ -19,4 +19,12 @@ export default class ModelRealApiService implements ModelApiService {
       setTimeout(() => resolve([...realApiModels]), 300);
     });
   }
+
+  async getDefaultModel(): Promise<ModelOption> {
+    // const response = await api.get<ModelOption>('/models/default');
+    // return response.data;
+    return new Promise((resolve) => {
+      setTimeout(() => resolve(realApiModels[0]), 300);
+    });
+  }
 }

@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useModelApiService } from '../api';
 
 export const useModels = () => {
-  const modelApiService = useModelApiService();
+  const modelApiService = useModelApiService(false);
 
   const {
     data: models,

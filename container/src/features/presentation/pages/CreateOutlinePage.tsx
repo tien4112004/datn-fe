@@ -4,13 +4,17 @@ import { SidebarTrigger } from '@/shared/components/ui/sidebar';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import OutlineForm from '../components/OutlineForm';
+import { useLoaderData } from 'react-router-dom';
+import type { ModelOption } from '@/features/model';
 
 const CreateOutlinePage = () => {
   const { t } = useTranslation('presentation', { keyPrefix: 'createOutline' });
   const [promptInput, setPromptInput] = React.useState('');
   const [slideCount, setSlideCount] = React.useState<string | undefined>('10');
   const [style, setStyle] = React.useState<string | undefined>(undefined);
-  const [model, setModel] = React.useState<string>('gpt-4o-mini');
+
+  const defaultModel = useLoaderData() as ModelOption;
+  const [model, setModel] = React.useState<string>(defaultModel.name);
 
   const handleSubmit = () => {
     // TODO: Implement the actual API call to generate the outline

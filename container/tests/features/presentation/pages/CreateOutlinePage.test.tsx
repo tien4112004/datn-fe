@@ -104,6 +104,10 @@ vi.mock('@/features/model', () => ({
     error: null,
     refetch: vi.fn(),
   }),
+  useDefaultModel: () => ({
+    defaultModel: 'gpt-4o-mini',
+    isLoading: false,
+  }),
 }));
 
 vi.mock('@/features/presentation/constants/styles', () => ({

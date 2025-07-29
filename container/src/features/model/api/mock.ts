@@ -16,4 +16,10 @@ export default class ModelMockService implements ModelApiService {
       setTimeout(() => resolve([...mockModels]), 300);
     });
   }
+
+  async getDefaultModel(): Promise<ModelOption> {
+    return new Promise((resolve) => {
+      setTimeout(() => resolve(mockModels[0]), 300);
+    });
+  }
 }

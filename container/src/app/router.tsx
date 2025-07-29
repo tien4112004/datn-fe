@@ -2,6 +2,7 @@ import { createBrowserRouter } from 'react-router-dom';
 import NavLayout from '../shared/layouts/SidebarLayout';
 import Presentation from '@/features/presentation';
 import Demo from '@/features/demo';
+import { getDefaultModel } from '@/features/model';
 
 const router = createBrowserRouter([
   {
@@ -32,7 +33,8 @@ const router = createBrowserRouter([
       {
         path: 'presentation/create',
         Component: Presentation.CreateOutlinePage,
-      }
+        loader: getDefaultModel,
+      },
     ],
   },
 ]);

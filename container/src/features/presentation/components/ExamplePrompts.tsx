@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, delay, motion } from 'framer-motion';
 import { CardTitle } from '@/shared/components/ui/card';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
@@ -27,7 +27,7 @@ const ExamplePrompts = ({
           key="examplePrompts"
           initial={{ opacity: 0, height: 0, y: -20 }}
           animate={{ opacity: 1, height: 'auto', y: 0 }}
-          exit={{ opacity: 0, height: 0, y: -20 }}
+          exit={{ opacity: 0, height: 0, y: -20, delay: 0.1 }}
           transition={{ type: 'spring', stiffness: 300, damping: 30, duration: 0.4 }}
           style={{ overflow: 'hidden' }}
         >

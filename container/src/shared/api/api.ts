@@ -35,7 +35,7 @@ api.interceptors.response.use(
             'Critical API error occurred',
             ERROR_TYPE.API_ERROR,
             response.status.toString(),
-            ...response.data
+            response.data
           )
         );
       }

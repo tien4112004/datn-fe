@@ -3,7 +3,7 @@ import { API_MODE, type ApiMode } from '@/shared/constants';
 
 interface ApiSwitchingContextType {
   apiMode: ApiMode;
-  setApiMode: (mode: ApiMode) => void;
+  setApiMode?: (mode: ApiMode) => void;
 }
 
 const ApiSwitchingContext = createContext<ApiSwitchingContextType | null>(null);

@@ -13,7 +13,7 @@ export const useApi = () => {
     queryKey: [demoApiService.getType(), 'demoItems'],
     queryFn: async () => {
       const data = await demoApiService.getDemoItems();
-      console.log('Fetch data', demoItems);
+      console.log('Fetch data', data);
       return data;
     },
   });

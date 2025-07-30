@@ -8,6 +8,7 @@ const OutlineWorkspacePage = () => {
     <OutlineWorkspace
       items={outlineItems}
       setItems={setOutlineItems}
+
       onDownload={async () => {
         await new Promise((resolve) => setTimeout(resolve, 2000));
       }}

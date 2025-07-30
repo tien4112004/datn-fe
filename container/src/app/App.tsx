@@ -9,6 +9,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 const queryClient = new QueryClient();
 
+
 const toolbarConfig = {
   plugins: [ReactPlugin],
 };

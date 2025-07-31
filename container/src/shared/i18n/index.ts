@@ -12,8 +12,12 @@ i18n
   // Initialize
   .init({
     resources: {
-      en: enTranslation,
-      vi: viTranslation,
+      en: {
+        translation: enTranslation,
+      },
+      vi: {
+        translation: viTranslation,
+      },
     },
     fallbackLng: 'en',
     interpolation: {

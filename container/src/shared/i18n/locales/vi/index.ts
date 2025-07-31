@@ -111,10 +111,10 @@ export default {
       description: 'Mô tả',
       createdAt: 'Ngày tạo',
       status: 'Trạng thái',
-      actions: 'Hành động',
     },
   },
   table: {
+    actions: 'Hành động',
     rowsPerPage: 'Số hàng mỗi trang',
     showing: 'Hiển thị',
     to: 'đến',

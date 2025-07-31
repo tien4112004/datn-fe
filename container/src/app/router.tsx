@@ -17,6 +17,10 @@ const router = createBrowserRouter([
         Component: Presentation.EditorPage,
       },
       {
+        path: 'presentation/list',
+        Component: Presentation.PresentationListPage,
+      },
+      {
         path: 'presentation/:presentationId',
         Component: Presentation.DetailsPage,
         loader: async ({ params }) => {

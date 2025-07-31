@@ -17,7 +17,10 @@ const PresentationListPage = () => {
           </BreadcrumbList>
         </Breadcrumb>
       </header>
-      <PresentationTable />
+      <div className="px-8 py-4">
+        <h1 className="mb-4 text-center text-2xl font-semibold">Presentations</h1>
+        <PresentationTable />
+      </div>
     </>
   );
 };

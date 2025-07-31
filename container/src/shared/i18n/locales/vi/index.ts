@@ -104,7 +104,29 @@ export default {
         longDesc: 'Giải thích sâu',
       },
     },
+
+    table: {
+      id: 'ID',
+      title: 'Tiêu đề',
+      description: 'Mô tả',
+      createdAt: 'Ngày tạo',
+      status: 'Trạng thái',
+      actions: 'Hành động',
+    },
   },
+  table: {
+    rowsPerPage: 'Số hàng mỗi trang',
+    showing: 'Hiển thị',
+    to: 'đến',
+    of: 'trên',
+    entries: 'mục',
+    goToFirstPage: 'Đi đến trang đầu',
+    goToPreviousPage: 'Đi đến trang trước',
+    goToPage: 'Đi đến trang',
+    goToNextPage: 'Đi đến trang tiếp theo',
+    goToLastPage: 'Đi đến trang cuối',
+  },
+
   errorBoundary: {
     title: 'Đã xảy ra lỗi',
     description: 'Chúng tôi gặp phải một lỗi không mong muốn. Nhóm của chúng tôi đã được thông báo.',

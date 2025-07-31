@@ -1,50 +1,37 @@
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TablePagination,
-  TableRow,
-} from '@/components/ui/table';
-import {
-  createColumnHelper,
-  flexRender,
-  getCoreRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  useReactTable,
-} from '@tanstack/react-table';
+import { createColumnHelper, getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { PresentationItem } from '../types/presentation';
 import { Badge } from '@/components/ui/badge';
 import ActionButton from './ActionButton';
 import { usePresentations } from '../hooks/useApi';
+import DataTable from '@/components/table/DataTable';
 
 const PresentationTable = () => {
+  const { t } = useTranslation('presentation.table');
   const columnHelper = createColumnHelper<PresentationItem>();
 
   const columns = useMemo(
     () => [
       columnHelper.accessor('id', {
-        header: 'ID',
+        header: t('id'),
         cell: (info) => info.getValue(),
       }),
       columnHelper.accessor('title', {
-        header: 'Title',
+        header: t('title'),
         cell: (info) => info.getValue(),
       }),
       columnHelper.accessor('description', {
-        header: 'Description',
+        header: t('description'),
         cell: (info) => <i>{info.getValue()}</i>,
         enableSorting: false,
       }),
       columnHelper.accessor('createdAt', {
-        header: 'Created At',
+        header: t('createdAt'),
         cell: (info) => info.renderValue(),
       }),
       columnHelper.accessor('status', {
-        header: 'Status',
+        header: t('status'),
         cell: (info) => (
           <Badge variant={info.getValue() === 'active' ? 'default' : 'outline'} className="text-sm">
             {info.getValue()}
@@ -53,7 +40,7 @@ const PresentationTable = () => {
       }),
       columnHelper.display({
         id: 'actions',
-        header: 'Actions',
+        header: t('actions'),
         cell: (info) => (
           <ActionButton
             onEdit={() => {
@@ -71,7 +58,7 @@ const PresentationTable = () => {
         },
       }),
     ],
-    []
+    [t]
   );
 
   const { presentationItems } = usePresentations();
@@ -95,8 +82,8 @@ const PresentationTable = () => {
     data: presentationItems || [],
     columns: columns,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
+    manualPagination: true,
+    manualSorting: true,
     state: {
       sorting,
       pagination,
@@ -105,49 +92,7 @@ const PresentationTable = () => {
     onPaginationChange: setPagination,
   });
 
-  return (
-    <div className="p-2">
-      <Table>
-        <TableHeader>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => (
-                <TableHead
-                  key={header.id}
-                  className={(header.column.columnDef.meta as any)?.style?.className}
-                  align={(header.column.columnDef.meta as any)?.style?.align}
-                  sortKey={header.column.id}
-                  isSorting={header.column.getIsSorted() || false}
-                  onSort={header.column.getToggleSortingHandler()}
-                  sortable={header.column.getCanSort()}
-                >
-                  {header.isPlaceholder
-                    ? null
-                    : flexRender(header.column.columnDef.header, header.getContext())}
-                </TableHead>
-              ))}
-            </TableRow>
-          ))}
-        </TableHeader>
-        <TableBody>
-          {table.getRowModel().rows.map((row) => (
-            <TableRow key={row.id}>
-              {row.getVisibleCells().map((cell) => (
-                <TableCell
-                  key={cell.id}
-                  className={(cell.column.columnDef.meta as any)?.style?.className}
-                  align={(cell.column.columnDef.meta as any)?.style?.align}
-                >
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </TableCell>
-              ))}
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-      <TablePagination table={table} />
-    </div>
-  );
+  return <DataTable table={table} />;
 };
 
 export default PresentationTable;

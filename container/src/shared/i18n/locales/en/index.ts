@@ -104,6 +104,28 @@ export default {
         longDesc: 'In-depth explanation',
       },
     },
+
+    table: {
+      id: 'ID',
+      title: 'Title',
+      description: 'Description',
+      createdAt: 'Created At',
+      status: 'Status',
+    },
+  },
+
+  table: {
+    actions: 'Actions',
+    rowsPerPage: 'Rows per page',
+    showing: 'Showing',
+    to: 'to',
+    of: 'of',
+    entries: 'entries',
+    goToFirstPage: 'Go to first page',
+    goToPreviousPage: 'Go to previous page',
+    goToPage: 'Go to page',
+    goToNextPage: 'Go to next page',
+    goToLastPage: 'Go to last page',
   },
 
   errorBoundary: {

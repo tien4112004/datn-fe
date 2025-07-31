@@ -1,79 +1,67 @@
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { createColumnHelper, flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import { useMemo, useState } from 'react';
+import type { PresentationItem } from '../types/presentation';
+import { Badge } from '@/components/ui/badge';
 
-type Person = {
-  firstName: string;
-  lastName: string;
-  age: number;
-  visits: number;
-  status: string;
-  progress: number;
-};
-
-const defaultData: Person[] = [
+const defaultData: PresentationItem[] = [
   {
-    firstName: 'tanner',
-    lastName: 'linsley',
-    age: 24,
-    visits: 100,
-    status: 'In Relationship',
-    progress: 50,
+    id: '1',
+    title: 'Introduction to React',
+    description: 'A comprehensive overview of React fundamentals',
+    createdAt: '2023-01-15',
+    status: 'active',
   },
   {
-    firstName: 'tandy',
-    lastName: 'miller',
-    age: 40,
-    visits: 40,
-    status: 'Single',
-    progress: 80,
+    id: '2',
+    title: 'Advanced TypeScript',
+    description: 'Deep dive into TypeScript advanced features',
+    createdAt: '2023-02-20',
+    status: 'active',
   },
   {
-    firstName: 'joe',
-    lastName: 'dirte',
-    age: 45,
-    visits: 20,
-    status: 'Complicated',
-    progress: 10,
+    id: '3',
+    title: 'Database Design Patterns',
+    description: 'Best practices for database architecture',
+    createdAt: '2023-03-10',
+    status: 'inactive',
   },
 ];
 
 const PresentationTable = () => {
-  const columnHelper = createColumnHelper<Person>();
+  const columnHelper = createColumnHelper<PresentationItem>();
 
   const columns = useMemo(
     () => [
-      columnHelper.accessor('firstName', {
+      columnHelper.accessor('id', {
+        header: 'ID',
         cell: (info) => info.getValue(),
-        footer: (info) => info.column.id,
       }),
-      columnHelper.accessor((row) => row.lastName, {
-        id: 'lastName',
+      columnHelper.accessor('title', {
+        header: 'Title',
+        cell: (info) => info.getValue(),
+      }),
+      columnHelper.accessor('description', {
+        header: 'Description',
         cell: (info) => <i>{info.getValue()}</i>,
-        header: () => <span>Last Name</span>,
-        footer: (info) => info.column.id,
       }),
-      columnHelper.accessor('age', {
-        header: () => 'Age',
+      columnHelper.accessor('createdAt', {
+        header: 'Created At',
         cell: (info) => info.renderValue(),
-        footer: (info) => info.column.id,
-      }),
-      columnHelper.accessor('visits', {
-        header: () => <span>Visits</span>,
-        footer: (info) => info.column.id,
       }),
       columnHelper.accessor('status', {
         header: 'Status',
-        footer: (info) => info.column.id,
-      }),
-      columnHelper.accessor('progress', {
-        header: 'Profile Progress',
-        footer: (info) => info.column.id,
+        cell: (info) => (
+          <Badge variant={info.getValue() === 'active' ? 'default' : 'outline'} className="text-sm">
+            {info.getValue()}
+          </Badge>
+        ),
       }),
     ],
     []
   );
 
-  const [data] = useState<Person[]>(() => [...defaultData]);
+  const [data] = useState<PresentationItem[]>(() => [...defaultData]);
 
   const table = useReactTable({
     data: data,
@@ -83,30 +71,32 @@ const PresentationTable = () => {
 
   return (
     <div className="p-2">
-      <table>
-        <thead>
+      <Table>
+        <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
-            <tr key={headerGroup.id}>
+            <TableRow key={headerGroup.id}>
               {headerGroup.headers.map((header) => (
-                <th key={header.id}>
+                <TableHead key={header.id}>
                   {header.isPlaceholder
                     ? null
                     : flexRender(header.column.columnDef.header, header.getContext())}
-                </th>
+                </TableHead>
               ))}
-            </tr>
+            </TableRow>
           ))}
-        </thead>
-        <tbody>
+        </TableHeader>
+        <TableBody>
           {table.getRowModel().rows.map((row) => (
-            <tr key={row.id}>
+            <TableRow key={row.id}>
               {row.getVisibleCells().map((cell) => (
-                <td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
+                <TableCell key={cell.id}>
+                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                </TableCell>
               ))}
-            </tr>
+            </TableRow>
           ))}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
     </div>
   );
 };

@@ -27,3 +27,28 @@ export const usePresentationOutlines = () => {
     isFetching,
   };
 };
+
+export const usePresentations = () => {
+  const presentationApiService = usePresentationApiService();
+
+  const {
+    data: presentationItems,
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: [presentationApiService.getType(), 'presentations'],
+    queryFn: async () => {
+      const data = await presentationApiService.getPresentationItems();
+      console.log('Fetch presentations', data);
+      return data;
+    },
+  });
+
+  return {
+    presentationItems,
+    isLoading,
+    error,
+    refetch,
+  };
+};

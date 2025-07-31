@@ -1,34 +1,10 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { createColumnHelper, flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { PresentationItem } from '../types/presentation';
 import { Badge } from '@/components/ui/badge';
 import ActionButton from './ActionButton';
-import { cn } from '@/shared/lib/utils';
-
-const defaultData: PresentationItem[] = [
-  {
-    id: '1',
-    title: 'Introduction to React',
-    description: 'A comprehensive overview of React fundamentals',
-    createdAt: '2023-01-15',
-    status: 'active',
-  },
-  {
-    id: '2',
-    title: 'Advanced TypeScript',
-    description: 'Deep dive into TypeScript advanced features',
-    createdAt: '2023-02-20',
-    status: 'active',
-  },
-  {
-    id: '3',
-    title: 'Database Design Patterns',
-    description: 'Best practices for database architecture',
-    createdAt: '2023-03-10',
-    status: 'inactive',
-  },
-];
+import { usePresentations } from '../hooks/useApi';
 
 const PresentationTable = () => {
   const columnHelper = createColumnHelper<PresentationItem>();
@@ -46,6 +22,7 @@ const PresentationTable = () => {
       columnHelper.accessor('description', {
         header: 'Description',
         cell: (info) => <i>{info.getValue()}</i>,
+        enableSorting: false,
       }),
       columnHelper.accessor('createdAt', {
         header: 'Created At',
@@ -82,12 +59,23 @@ const PresentationTable = () => {
     []
   );
 
-  const [data] = useState<PresentationItem[]>(() => [...defaultData]);
+  const { presentationItems } = usePresentations();
+
+  const [sorting, setSorting] = useState([{ id: 'createdAt', desc: true }]);
+
+  useEffect(() => {
+    console.log('Sorting changed:', sorting);
+  }, [sorting]);
 
   const table = useReactTable({
-    data: data,
+    data: presentationItems || [],
     columns: columns,
     getCoreRowModel: getCoreRowModel(),
+    manualSorting: true,
+    state: {
+      sorting,
+    },
+    onSortingChange: setSorting,
   });
 
   return (
@@ -100,6 +88,11 @@ const PresentationTable = () => {
                 <TableHead
                   key={header.id}
                   className={(header.column.columnDef.meta as any)?.style?.className}
+                  align={(header.column.columnDef.meta as any)?.style?.align}
+                  sortKey={header.column.id}
+                  isSorting={header.column.getIsSorted() || false}
+                  onSort={header.column.getToggleSortingHandler()}
+                  sortable={header.column.getCanSort()}
                 >
                   {header.isPlaceholder
                     ? null
@@ -116,7 +109,7 @@ const PresentationTable = () => {
                 <TableCell
                   key={cell.id}
                   className={(cell.column.columnDef.meta as any)?.style?.className}
-                  align={(cell.column.columnDef.meta as any)?.style}
+                  align={(cell.column.columnDef.meta as any)?.style?.align}
                 >
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </TableCell>

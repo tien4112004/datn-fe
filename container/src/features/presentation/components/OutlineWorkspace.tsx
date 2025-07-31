@@ -78,6 +78,10 @@ const OutlineWorkspace = ({ items, setItems, onDownload }: OutlineWorkspaceProps
     setItems(safeItems.filter((item) => item.id !== id));
   };
 
+  const handleContentChange = (id: string, html: string) => {
+    setItems(items.map(item => item.id === id ? { ...item, htmlContent: html } : item));
+  };
+
   return (
     <div className="bg-card flex w-full flex-col gap-6 rounded-xl p-8">
       <DndContext sensors={sensors} onDragEnd={handleOutlineCardDragEnd}>
@@ -91,6 +95,7 @@ const OutlineWorkspace = ({ items, setItems, onDownload }: OutlineWorkspaceProps
               id={item.id}
               title={`${index + 1}`}
               onDelete={() => handleDelete(item.id)}
+              onContentChange={(html) => handleContentChange(item.id, html)}
             />
           ))}
         </SortableContext>
@@ -100,7 +105,7 @@ const OutlineWorkspace = ({ items, setItems, onDownload }: OutlineWorkspaceProps
       <Button
         variant={'outline'}
         className="mt-4 w-full"
-        onClick={() => setItems([...safeItems, { id: Date.now().toString() }])}
+        onClick={() => setItems([...safeItems, { id: Date.now().toString(), htmlContent: '' }])}
       >
         <Plus className="h-4 w-4" />
         {t('addOutlineCard')}

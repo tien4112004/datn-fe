@@ -3,7 +3,7 @@ import { useRichTextEditor } from '@/shared/components/rte/useRichTextEditor';
 import { Button } from '@/shared/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
 import { cn } from '@/shared/lib/utils';
-import type { PartialBlock } from '@blocknote/core';
+import { BlockNoteEditor, type PartialBlock } from '@blocknote/core';
 import { useSortable } from '@dnd-kit/sortable';
 import { Trash } from 'lucide-react';
 import { useState } from 'react';
@@ -14,6 +14,7 @@ interface OutlineCardProps {
   className?: string;
   texts?: PartialBlock[];
   onDelete?: () => void;
+  onContentChange: (html: string) => void;
 }
 
 const OutlineCard = ({
@@ -38,6 +39,7 @@ const OutlineCard = ({
     },
   ],
   onDelete,
+  onContentChange,
 }: OutlineCardProps) => {
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -56,6 +58,11 @@ const OutlineCard = ({
     setTimeout(() => {
       onDelete();
     }, 300);
+  };
+
+  const handleContentChange = async (editor: BlockNoteEditor) => {
+    const htmlContent = await editor.blocksToHTMLLossy(editor.document);
+    onContentChange(htmlContent);
   };
 
   const style = {
@@ -88,7 +95,12 @@ const OutlineCard = ({
         <CardTitle>{title}</CardTitle>
       </CardHeader>
       <CardContent className="flex-start flex-1 p-2">
-        <RichTextEditor data-card editor={editor} sideMenu={false} className="-mx-2" />
+        <RichTextEditor 
+          data-card editor={editor} 
+          onChange={handleContentChange} 
+          sideMenu={false} 
+          className="-mx-2" 
+        />
       </CardContent>
     </Card>
   );

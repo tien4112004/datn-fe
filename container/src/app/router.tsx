@@ -2,6 +2,7 @@ import { createBrowserRouter } from 'react-router-dom';
 import NavLayout from '../shared/layouts/SidebarLayout';
 import Presentation from '@/features/presentation';
 import Demo from '@/features/demo';
+import { getDefaultModel } from '@/features/model';
 
 const router = createBrowserRouter([
   {
@@ -16,10 +17,6 @@ const router = createBrowserRouter([
         Component: Presentation.EditorPage,
       },
       {
-        path: 'test',
-        Component: Presentation.OutlineWorkspacePage,
-      },
-      {
         path: 'presentation/:presentationId',
         Component: Presentation.DetailsPage,
         loader: async ({ params }) => {
@@ -32,7 +29,12 @@ const router = createBrowserRouter([
       {
         path: 'presentation/create',
         Component: Presentation.CreateOutlinePage,
-      }
+        loader: getDefaultModel,
+      },
+      {
+        path: 'presentation/outline',
+        Component: Presentation.OutlineWorkspacePage,
+      },
     ],
   },
 ]);

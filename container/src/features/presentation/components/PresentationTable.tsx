@@ -8,30 +8,30 @@ import { usePresentations } from '../hooks/useApi';
 import DataTable from '@/components/table/DataTable';
 
 const PresentationTable = () => {
-  const { t } = useTranslation();
+  const { t } = useTranslation('table');
   const columnHelper = createColumnHelper<PresentationItem>();
 
   const columns = useMemo(
     () => [
       columnHelper.accessor('id', {
-        header: t('presentation.table.id'),
+        header: t('presentation.id'),
         cell: (info) => info.getValue(),
       }),
       columnHelper.accessor('title', {
-        header: t('presentation.table.title'),
+        header: t('presentation.title'),
         cell: (info) => info.getValue(),
       }),
       columnHelper.accessor('description', {
-        header: t('presentation.table.description'),
+        header: t('presentation.description'),
         cell: (info) => <i>{info.getValue()}</i>,
         enableSorting: false,
       }),
       columnHelper.accessor('createdAt', {
-        header: t('presentation.table.createdAt'),
+        header: t('presentation.createdAt'),
         cell: (info) => info.renderValue(),
       }),
       columnHelper.accessor('status', {
-        header: t('presentation.table.status'),
+        header: t('presentation.status'),
         cell: (info) => (
           <Badge variant={info.getValue() === 'active' ? 'default' : 'outline'} className="text-sm">
             {info.getValue()}
@@ -40,7 +40,7 @@ const PresentationTable = () => {
       }),
       columnHelper.display({
         id: 'actions',
-        header: t('table.actions'),
+        header: t('actions'),
         cell: (info) => (
           <ActionButton
             onEdit={() => {

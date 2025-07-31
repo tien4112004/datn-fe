@@ -104,16 +104,16 @@ export default {
         longDesc: 'Giải thích sâu',
       },
     },
+  },
 
-    table: {
+  table: {
+    presentation: {
       id: 'ID',
       title: 'Tiêu đề',
       description: 'Mô tả',
       createdAt: 'Ngày tạo',
       status: 'Trạng thái',
     },
-  },
-  table: {
     actions: 'Hành động',
     rowsPerPage: 'Số hàng mỗi trang',
     showing: 'Hiển thị',

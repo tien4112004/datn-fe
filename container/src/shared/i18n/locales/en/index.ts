@@ -104,17 +104,16 @@ export default {
         longDesc: 'In-depth explanation',
       },
     },
+  },
 
-    table: {
+  table: {
+    presentation: {
       id: 'ID',
       title: 'Title',
       description: 'Description',
       createdAt: 'Created At',
       status: 'Status',
     },
-  },
-
-  table: {
     actions: 'Actions',
     rowsPerPage: 'Rows per page',
     showing: 'Showing',

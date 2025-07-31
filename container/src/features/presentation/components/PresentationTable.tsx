@@ -3,6 +3,8 @@ import { createColumnHelper, flexRender, getCoreRowModel, useReactTable } from '
 import { useMemo, useState } from 'react';
 import type { PresentationItem } from '../types/presentation';
 import { Badge } from '@/components/ui/badge';
+import ActionButton from './ActionButton';
+import { cn } from '@/shared/lib/utils';
 
 const defaultData: PresentationItem[] = [
   {
@@ -57,6 +59,25 @@ const PresentationTable = () => {
           </Badge>
         ),
       }),
+      columnHelper.display({
+        id: 'actions',
+        header: 'Actions',
+        cell: (info) => (
+          <ActionButton
+            onEdit={() => {
+              console.log('Edit: ', info.row.original.id);
+            }}
+            onDelete={() => {
+              console.log('Delete: ', info.row.original.id);
+            }}
+          />
+        ),
+        meta: {
+          style: {
+            align: 'center',
+          },
+        },
+      }),
     ],
     []
   );
@@ -76,7 +97,10 @@ const PresentationTable = () => {
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>
               {headerGroup.headers.map((header) => (
-                <TableHead key={header.id}>
+                <TableHead
+                  key={header.id}
+                  className={(header.column.columnDef.meta as any)?.style?.className}
+                >
                   {header.isPlaceholder
                     ? null
                     : flexRender(header.column.columnDef.header, header.getContext())}
@@ -89,7 +113,11 @@ const PresentationTable = () => {
           {table.getRowModel().rows.map((row) => (
             <TableRow key={row.id}>
               {row.getVisibleCells().map((cell) => (
-                <TableCell key={cell.id}>
+                <TableCell
+                  key={cell.id}
+                  className={(cell.column.columnDef.meta as any)?.style?.className}
+                  align={(cell.column.columnDef.meta as any)?.style}
+                >
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </TableCell>
               ))}

@@ -1,5 +1,20 @@
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { createColumnHelper, flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TablePagination,
+  TableRow,
+} from '@/components/ui/table';
+import {
+  createColumnHelper,
+  flexRender,
+  getCoreRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useReactTable,
+} from '@tanstack/react-table';
 import { useEffect, useMemo, useState } from 'react';
 import type { PresentationItem } from '../types/presentation';
 import { Badge } from '@/components/ui/badge';
@@ -67,15 +82,27 @@ const PresentationTable = () => {
     console.log('Sorting changed:', sorting);
   }, [sorting]);
 
+  const [pagination, setPagination] = useState({
+    pageIndex: 0,
+    pageSize: 10,
+  });
+
+  useEffect(() => {
+    console.log('Pagination changed:', pagination);
+  }, [pagination]);
+
   const table = useReactTable({
     data: presentationItems || [],
     columns: columns,
     getCoreRowModel: getCoreRowModel(),
-    manualSorting: true,
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
     state: {
       sorting,
+      pagination,
     },
     onSortingChange: setSorting,
+    onPaginationChange: setPagination,
   });
 
   return (
@@ -118,6 +145,7 @@ const PresentationTable = () => {
           ))}
         </TableBody>
       </Table>
+      <TablePagination table={table} />
     </div>
   );
 };

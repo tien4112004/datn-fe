@@ -35,11 +35,12 @@ import { useTranslation } from 'react-i18next';
 import { AutosizeTextarea } from '@/shared/components/ui/autosize-textarea';
 import { useForm, Controller } from 'react-hook-form';
 import type { OutlineItem } from '../types/outline';
+import { useEffect } from 'react';
 
 const OutlineWorkspacePage = () => {
-  const { outlineItems } = usePresentationOutlines();
+  const { outlineItems, isLoading } = usePresentationOutlines();
   const { t } = useTranslation('presentation', { keyPrefix: 'createOutline' });
-  const { control, handleSubmit, setValue, watch } = useForm<{
+  const { control, handleSubmit, setValue, watch, reset } = useForm<{
     slideCount: string;
     style: string;
     model: string;
@@ -57,9 +58,25 @@ const OutlineWorkspacePage = () => {
       theme: '',
       contentLength: '',
       imageModel: '',
-      items: outlineItems, 
+      items: [], 
     },
   });
+
+  useEffect(() => {
+    if (!isLoading) {
+      reset({
+        slideCount: '',
+        style: '',
+        model: '',
+        prompt: '',
+        theme: '',
+        contentLength: '',
+        imageModel: '',
+        items: outlineItems,
+      });
+    }
+  }, [isLoading, reset]);
+
   const items = watch('items');
   const setItems = (newItems: OutlineItem[]) => setValue('items', newItems);
   const onSubmit = (data: {
@@ -147,16 +164,23 @@ const OutlineWorkspacePage = () => {
             <Controller
               name="prompt"
               control={control}
-              render={({ field }) => <AutosizeTextarea {...field} />}
+              render={({ field }) => <AutosizeTextarea className="text-lg" {...field} />}
             />
             <div className="scroll-m-20 text-xl font-semibold tracking-tight">Outline</div>
-            <OutlineWorkspace
-              items={items}
-              setItems={setItems}
-              onDownload={async () => {
-                await new Promise((resolve) => setTimeout(resolve, 2000));
-              }}
-            />
+            {isLoading ? (
+              <div className="flex w-full items-center justify-center py-12">
+                <span className="animate-spin mr-2 h-6 w-6 border-4 border-primary border-t-transparent rounded-full inline-block" />
+                <span className="text-lg font-medium">Loading outline...</span>
+              </div>
+            ) : (
+              <OutlineWorkspace
+                items={items}
+                setItems={setItems}
+                onDownload={async () => {
+                  await new Promise((resolve) => setTimeout(resolve, 2000));
+                }}
+              />
+            )}
             <div className="scroll-m-20 text-xl font-semibold tracking-tight">Customize your presentation</div>
             <Card className="w-full max-w-3xl">
               <CardHeader>
@@ -235,7 +259,10 @@ const OutlineWorkspacePage = () => {
                 />
               </CardContent>
             </Card>
-            <Button type="submit">Generate Presentation</Button>
+            <Button className="mt-5" type="submit">
+              <Sparkles />
+              Generate Presentation
+            </Button>
           </form>
         </div>
       </div>

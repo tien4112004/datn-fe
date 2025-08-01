@@ -3,16 +3,16 @@ import { useRichTextEditor } from '@/shared/components/rte/useRichTextEditor';
 import { Button } from '@/shared/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
 import { cn } from '@/shared/lib/utils';
-import { BlockNoteEditor, type PartialBlock } from '@blocknote/core';
+import { BlockNoteEditor } from '@blocknote/core';
 import { useSortable } from '@dnd-kit/sortable';
 import { Trash } from 'lucide-react';
-import { useState } from 'react';
+import React from 'react';
 
 interface OutlineCardProps {
   id: string;
   title?: string;
   className?: string;
-  texts?: PartialBlock[];
+  htmlContent?: string;
   onDelete?: () => void;
   onContentChange: (html: string) => void;
 }
@@ -21,35 +21,23 @@ const OutlineCard = ({
   id,
   title = 'Outline',
   className = '',
-  texts = [
-    {
-      type: 'paragraph',
-      content: [
-        {
-          type: 'text',
-          text: 'Blocks:',
-          styles: { bold: true },
-        },
-      ],
-    },
-    {
-      type: 'paragraph',
-      content:
-        'This is a sample text for the outline card. You can edit this content using the rich text editor.',
-    },
-  ],
+  htmlContent = '',
   onDelete,
   onContentChange,
 }: OutlineCardProps) => {
-  const [isDeleting, setIsDeleting] = useState(false);
-
+  const [isDeleting, setIsDeleting] = React.useState(false);
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: `outline-card-${id.toString()}`,
   });
+  const editor = useRichTextEditor();
 
-  const editor = useRichTextEditor({
-    initialContent: texts,
-  });
+  React.useEffect(() => {
+    async function loadInitialHTML() {
+      const blocks = await editor.tryParseHTMLToBlocks(htmlContent);
+      editor.replaceBlocks(editor.document, blocks);
+    }
+    loadInitialHTML();
+  }, [editor]);
 
   const handleDelete = () => {
     if (!onDelete) return;

@@ -94,6 +94,7 @@ const OutlineWorkspace = ({ items, setItems, onDownload }: OutlineWorkspaceProps
               key={item.id}
               id={item.id}
               title={`${index + 1}`}
+              htmlContent={item.htmlContent}
               onDelete={() => handleDelete(item.id)}
               onContentChange={(html) => handleContentChange(item.id, html)}
             />

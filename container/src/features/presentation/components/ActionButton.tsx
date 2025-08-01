@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 import { EllipsisVerticalIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -9,6 +10,8 @@ type ActionButtonProps = {
 };
 
 const ActionButton: React.FC<ActionButtonProps> = ({ onEdit, onDelete }) => {
+  const { t } = useTranslation();
+
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -18,12 +21,12 @@ const ActionButton: React.FC<ActionButtonProps> = ({ onEdit, onDelete }) => {
         <ul className="space-y-2">
           <li>
             <Button onClick={onEdit} className="w-full text-left" variant={'ghost'}>
-              Edit
+              {t('actionButton.edit')}
             </Button>
           </li>
           <li>
             <Button onClick={onDelete} className="w-full text-left" variant={'destructive'}>
-              Delete
+              {t('actionButton.delete')}
             </Button>
           </li>
         </ul>

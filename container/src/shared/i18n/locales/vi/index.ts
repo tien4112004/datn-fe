@@ -137,4 +137,9 @@ export default {
     tryAgain: 'Thử lại',
     goHome: 'Về trang chủ',
   },
+
+  actionButton: {
+    edit: 'Chỉnh sửa',
+    delete: 'Xóa',
+  },
 };

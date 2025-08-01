@@ -137,4 +137,9 @@ export default {
     tryAgain: 'Try Again',
     goHome: 'Go Home',
   },
+
+  actionButton: {
+    edit: 'Edit',
+    delete: 'Delete',
+  },
 };

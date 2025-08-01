@@ -72,6 +72,11 @@ export default {
       examplePrompt6: 'Lập dàn ý bài trình bày về các nghề giúp ích cho cộng đồng và vai trò của họ.',
       generateOutline: 'Tạo dàn ý',
     },
+    list: {
+      title: 'Danh sách bài trình bày',
+      createNewPresentation: 'Tạo bài trình bày mới',
+      viewEditor: 'Xem trình chỉnh sửa',
+    },
     workspace: {
       title: 'Tùy chỉnh',
       loading: 'Đang tải...',
@@ -115,6 +120,10 @@ export default {
       status: 'Trạng thái',
       emptyState: 'Không có bài trình bày nào được tìm thấy',
     },
+    actionButton: {
+      edit: 'Chỉnh sửa',
+      delete: 'Xóa',
+    },
     actions: 'Hành động',
     rowsPerPage: 'Số hàng mỗi trang',
     showing: 'Hiển thị',
@@ -139,8 +148,7 @@ export default {
     goHome: 'Về trang chủ',
   },
 
-  actionButton: {
-    edit: 'Chỉnh sửa',
-    delete: 'Xóa',
+  page: {
+    presentations: 'Bài trình bày',
   },
 };

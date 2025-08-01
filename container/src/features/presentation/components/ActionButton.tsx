@@ -10,7 +10,7 @@ type ActionButtonProps = {
 };
 
 const ActionButton: React.FC<ActionButtonProps> = ({ onEdit, onDelete }) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation('table');
 
   return (
     <Popover>

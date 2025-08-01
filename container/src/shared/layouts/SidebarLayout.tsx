@@ -12,7 +12,7 @@ function NavLayoutContent() {
   const navigation = useNavigation();
   const isLoading = navigation.state === 'loading';
   const { state, toggleSidebar } = useSidebar();
-  const { t } = useTranslation();
+  const { t } = useTranslation('loading');
 
   const hideSidebar = () => {
     if (state === 'expanded') {

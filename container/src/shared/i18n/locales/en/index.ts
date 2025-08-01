@@ -104,6 +104,11 @@ export default {
         longDesc: 'In-depth explanation',
       },
     },
+    list: {
+      title: 'Presentation List',
+      createNewPresentation: 'Create New Presentation',
+      viewEditor: 'View Editor',
+    },
   },
 
   table: {
@@ -114,6 +119,10 @@ export default {
       createdAt: 'Created At',
       status: 'Status',
       emptyState: 'No presentations found',
+    },
+    actionButton: {
+      edit: 'Edit',
+      delete: 'Delete',
     },
     actions: 'Actions',
     rowsPerPage: 'Rows per page',
@@ -139,8 +148,7 @@ export default {
     goHome: 'Go Home',
   },
 
-  actionButton: {
-    edit: 'Edit',
-    delete: 'Delete',
+  page: {
+    presentations: 'Presentations',
   },
 };

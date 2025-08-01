@@ -32,9 +32,9 @@ vi.mock('@/components/table/DataTable', () => ({
     if (isLoading) {
       return <div data-testid="loading-skeleton">Loading...</div>;
     }
-    
+
     const hasRows = table.getRowModel().rows.length > 0;
-    
+
     return (
       <div data-testid="data-table">
         <table>
@@ -59,9 +59,7 @@ vi.mock('@/components/table/DataTable', () => ({
             ))}
           </tbody>
         </table>
-        {!hasRows && emptyState && (
-          <div data-testid="empty-state">{emptyState}</div>
-        )}
+        {!hasRows && emptyState && <div data-testid="empty-state">{emptyState}</div>}
       </div>
     );
   }),

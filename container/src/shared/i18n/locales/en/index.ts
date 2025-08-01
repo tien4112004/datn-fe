@@ -113,6 +113,7 @@ export default {
       description: 'Description',
       createdAt: 'Created At',
       status: 'Status',
+      emptyState: 'No presentations found',
     },
     actions: 'Actions',
     rowsPerPage: 'Rows per page',

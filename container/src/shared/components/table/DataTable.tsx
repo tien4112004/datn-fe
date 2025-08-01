@@ -1,8 +1,17 @@
 import { flexRender, type Table as TableType } from '@tanstack/react-table';
 import { TableHeader, TableRow, TableHead, TableBody, TableCell, Table } from '@ui/table';
 import TablePagination from './TablePagination';
+import SkeletonTable from './SkeletonTable';
 
-const DataTable: React.FC<{ table: TableType<any> }> = ({ table }) => {
+const DataTable: React.FC<{ table: TableType<any>; isLoading: boolean; emptyState: React.ReactNode }> = ({
+  table,
+  isLoading,
+  emptyState,
+}) => {
+  if (isLoading) {
+    return <SkeletonTable rows={5} columns={6} />;
+  }
+
   return (
     <>
       <Table>
@@ -43,6 +52,9 @@ const DataTable: React.FC<{ table: TableType<any> }> = ({ table }) => {
           ))}
         </TableBody>
       </Table>
+      {emptyState && table.getRowModel().rows.length === 0 && (
+        <div className="flex min-h-24 items-center justify-center">{emptyState}</div>
+      )}
       <TablePagination table={table} />
     </>
   );

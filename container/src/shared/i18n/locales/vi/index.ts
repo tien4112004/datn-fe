@@ -113,6 +113,7 @@ export default {
       description: 'Mô tả',
       createdAt: 'Ngày tạo',
       status: 'Trạng thái',
+      emptyState: 'Không có bài trình bày nào được tìm thấy',
     },
     actions: 'Hành động',
     rowsPerPage: 'Số hàng mỗi trang',

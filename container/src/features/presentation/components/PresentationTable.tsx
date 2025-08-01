@@ -61,7 +61,7 @@ const PresentationTable = () => {
     [t]
   );
 
-  const { presentationItems } = usePresentations();
+  const { presentationItems, isLoading } = usePresentations();
 
   const [sorting, setSorting] = useState([{ id: 'createdAt', desc: true }]);
 
@@ -92,7 +92,13 @@ const PresentationTable = () => {
     onPaginationChange: setPagination,
   });
 
-  return <DataTable table={table} />;
+  return (
+    <DataTable
+      table={table}
+      isLoading={isLoading}
+      emptyState={<div className="text-muted-foreground">{t('presentation.emptyState')}</div>}
+    />
+  );
 };
 
 export default PresentationTable;

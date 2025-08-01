@@ -36,7 +36,6 @@ const OutlineWorkspace = ({ items, setItems, onDownload }: OutlineWorkspaceProps
     })
   );
 
-  // Ensure items is always an array
   const safeItems = Array.isArray(items) ? items : [];
 
   const handleOutlineCardDragEnd = (event: DragEndEvent) => {
@@ -48,7 +47,6 @@ const OutlineWorkspace = ({ items, setItems, onDownload }: OutlineWorkspaceProps
       const activeId = active.id as string;
       const overId = over.id as string;
 
-      // Handle item reordering
       if (activeId.startsWith('outline-card-') && overId.startsWith('outline-card-')) {
         const activeItemId = activeId.replace('outline-card-', '');
         const overItemId = overId.replace('outline-card-', '');
@@ -83,7 +81,7 @@ const OutlineWorkspace = ({ items, setItems, onDownload }: OutlineWorkspaceProps
   };
 
   return (
-    <div className="bg-card flex w-full flex-col gap-6 rounded-xl p-8">
+    <div className="bg-card flex w-3xl flex-col gap-6 rounded-xl p-8">
       <DndContext sensors={sensors} onDragEnd={handleOutlineCardDragEnd}>
         <SortableContext
           items={safeItems.map((item) => `outline-card-${item.id}`)}

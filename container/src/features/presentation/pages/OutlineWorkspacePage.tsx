@@ -1,3 +1,6 @@
+// DEPRECATED: This file is no longer in use.
+
+
 import OutlineWorkspace from '@/features/presentation/components/OutlineWorkspace';
 import { usePresentationOutlines } from '../hooks/useApi';
 import { SidebarTrigger } from '@/shared/components/ui/sidebar';

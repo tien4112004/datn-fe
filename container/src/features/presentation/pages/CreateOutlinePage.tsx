@@ -1,3 +1,5 @@
+// DEPRECATED: This file is no longer in use.
+
 import React from 'react';
 import { Button } from '@/shared/components/ui/button';
 import { SidebarTrigger } from '@/shared/components/ui/sidebar';

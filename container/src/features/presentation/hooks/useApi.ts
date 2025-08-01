@@ -9,6 +9,7 @@ export const usePresentationOutlines = () => {
     isLoading,
     error,
     refetch,
+    isFetching,
   } = useQuery({
     queryKey: [presentationApiService.getType(), 'presentationItems'],
     queryFn: async () => {
@@ -23,5 +24,6 @@ export const usePresentationOutlines = () => {
     isLoading,
     error,
     refetch,
+    isFetching,
   };
 };

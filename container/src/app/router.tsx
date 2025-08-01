@@ -28,13 +28,14 @@ const router = createBrowserRouter([
       },
       {
         path: 'presentation/create',
-        Component: Presentation.CreateOutlinePage,
+        // Component: Presentation.CreateOutlinePage,
+        Component: Presentation.PresentationOutlinePage,
         loader: getDefaultModel,
       },
-      {
-        path: 'presentation/outline',
-        Component: Presentation.OutlineWorkspacePage,
-      },
+      // {
+      //   path: 'presentation/outline',
+      //   Component: Presentation.OutlineWorkspacePage,
+      // },
     ],
   },
 ]);

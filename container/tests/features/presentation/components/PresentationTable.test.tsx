@@ -28,32 +28,43 @@ vi.mock('@/features/presentation/components/ActionButton', () => ({
 }));
 
 vi.mock('@/components/table/DataTable', () => ({
-  default: vi.fn(({ table }) => (
-    <div data-testid="data-table">
-      <table>
-        <thead>
-          <tr>
-            {table.getHeaderGroups()[0]?.headers.map((header: any) => (
-              <th key={header.id}>{header.column.columnDef.header}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {table.getRowModel().rows.map((row: any) => (
-            <tr key={row.id}>
-              {row.getVisibleCells().map((cell: any) => (
-                <td key={cell.id} data-testid={`cell-${cell.column.id}`}>
-                  {typeof cell.column.columnDef.cell === 'function'
-                    ? cell.column.columnDef.cell(cell.getContext())
-                    : cell.getValue()}
-                </td>
+  default: vi.fn(({ table, isLoading, emptyState }) => {
+    if (isLoading) {
+      return <div data-testid="loading-skeleton">Loading...</div>;
+    }
+    
+    const hasRows = table.getRowModel().rows.length > 0;
+    
+    return (
+      <div data-testid="data-table">
+        <table>
+          <thead>
+            <tr>
+              {table.getHeaderGroups()[0]?.headers.map((header: any) => (
+                <th key={header.id}>{header.column.columnDef.header}</th>
               ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  )),
+          </thead>
+          <tbody>
+            {table.getRowModel().rows.map((row: any) => (
+              <tr key={row.id}>
+                {row.getVisibleCells().map((cell: any) => (
+                  <td key={cell.id} data-testid={`cell-${cell.column.id}`}>
+                    {typeof cell.column.columnDef.cell === 'function'
+                      ? cell.column.columnDef.cell(cell.getContext())
+                      : cell.getValue()}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        {!hasRows && emptyState && (
+          <div data-testid="empty-state">{emptyState}</div>
+        )}
+      </div>
+    );
+  }),
 }));
 
 describe('PresentationTable', () => {
@@ -64,6 +75,7 @@ describe('PresentationTable', () => {
       'presentation.description': 'Description',
       'presentation.createdAt': 'Created At',
       'presentation.status': 'Status',
+      'presentation.emptyState': 'No presentations found',
       actions: 'Actions',
     };
     return translations[key] || key;
@@ -95,6 +107,7 @@ describe('PresentationTable', () => {
     });
     vi.mocked(usePresentations).mockReturnValue({
       presentationItems: mockPresentationData,
+      isLoading: false,
     } as any);
   });
 
@@ -160,5 +173,50 @@ describe('PresentationTable', () => {
     });
 
     consoleSpy.mockRestore();
+  });
+
+  it('shows loading state when isLoading is true', () => {
+    vi.mocked(usePresentations).mockReturnValue({
+      presentationItems: [],
+      isLoading: true,
+    } as any);
+
+    render(<PresentationTable />);
+
+    expect(screen.getByTestId('loading-skeleton')).toBeInTheDocument();
+    expect(screen.getByText('Loading...')).toBeInTheDocument();
+  });
+
+  it('shows empty state when no data and not loading', () => {
+    vi.mocked(usePresentations).mockReturnValue({
+      presentationItems: [],
+      isLoading: false,
+    } as any);
+
+    render(<PresentationTable />);
+
+    expect(screen.getByTestId('empty-state')).toBeInTheDocument();
+    expect(screen.getByText('No presentations found')).toBeInTheDocument();
+    expect(screen.queryByTestId('loading-skeleton')).not.toBeInTheDocument();
+  });
+
+  it('does not show empty state when loading', () => {
+    vi.mocked(usePresentations).mockReturnValue({
+      presentationItems: [],
+      isLoading: true,
+    } as any);
+
+    render(<PresentationTable />);
+
+    expect(screen.queryByTestId('empty-state')).not.toBeInTheDocument();
+    expect(screen.getByTestId('loading-skeleton')).toBeInTheDocument();
+  });
+
+  it('does not show empty state when there is data', () => {
+    render(<PresentationTable />);
+
+    expect(screen.queryByTestId('empty-state')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('loading-skeleton')).not.toBeInTheDocument();
+    expect(screen.getByTestId('data-table')).toBeInTheDocument();
   });
 });

@@ -22,11 +22,6 @@
   --bn-colors-editor-background: var(--card);
 }
 
-svg {
-  width: 1em !important;
-  height: 1em !important;
-}
-
 .bn-drag-handle-menu {
   position: absolute !important;
   top: 100% !important;

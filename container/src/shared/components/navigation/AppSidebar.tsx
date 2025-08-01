@@ -37,11 +37,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         icon: Plus,
       },
       {
-        title: 'Create Presentation',
-        url: '/presentation/create',
-        icon: Command,
-      },
-      {
         title: t('resources.index'),
         icon: File,
         items: [

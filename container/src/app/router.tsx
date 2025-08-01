@@ -14,11 +14,11 @@ const router = createBrowserRouter([
       },
       {
         path: 'presentation',
-        Component: Presentation.EditorPage,
+        Component: Presentation.PresentationListPage,
       },
       {
-        path: 'presentation/list',
-        Component: Presentation.PresentationListPage,
+        path: 'presentation/editor',
+        Component: Presentation.EditorPage,
       },
       {
         path: 'presentation/:presentationId',

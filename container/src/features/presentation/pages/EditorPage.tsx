@@ -5,4 +5,3 @@ const EditorPage = () => {
 };
 
 export default EditorPage;
-

@@ -83,7 +83,7 @@ export function CardsActivityGoal() {
             <span className="sr-only">Decrease</span>
           </Button>
           <div className="text-center">
-            <div className="text-4xl font-bold tracking-tighter tabular-nums">{goal}</div>
+            <div className="text-4xl font-bold tabular-nums tracking-tighter">{goal}</div>
             <div className="text-muted-foreground text-xs uppercase">Calories/day</div>
           </div>
           <Button

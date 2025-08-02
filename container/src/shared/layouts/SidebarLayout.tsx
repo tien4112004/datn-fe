@@ -34,7 +34,7 @@ function NavLayoutContent() {
     <>
       <ErrorBoundary>
         <AppSidebar />
-        <SidebarInset>
+        <SidebarInset className="bg-accent">
           {isLoading && <GlobalSpinner text={t('page')} />}
           <Outlet />
         </SidebarInset>

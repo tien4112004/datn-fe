@@ -1,27 +1,18 @@
 import { API_MODE, type ApiMode } from '@/shared/constants';
-import { type PresentationItem, type PresentationApiService } from '../types';
+import { type OutlineItem, type PresentationApiService } from '../types';
 
-const mockPresentationItems: PresentationItem[] = [
+const mockOutlineItems: OutlineItem[] = [
   {
     id: '1',
-    title: 'Mock Presentation Item 1',
-    description: 'This is the first Mock Presentation Item for testing purposes',
-    createdAt: '2024-01-15T10:30:00Z',
-    status: 'active',
+    htmlContent: '<div><h1>Introduction to Web Development</h1><p>This slide covers the basics of web development including HTML, CSS, and JavaScript fundamentals.</p></div>',
   },
   {
     id: '2',
-    title: 'Mock Presentation Item 2',
-    description: 'This is the second Mock Presentation Item for testing purposes',
-    createdAt: '2024-01-16T14:20:00Z',
-    status: 'inactive',
+    htmlContent: '<div><h1>Frontend Frameworks</h1><p>Overview of popular frontend frameworks like React, Vue, and Angular with their key features and use cases.</p></div>',
   },
   {
     id: '3',
-    title: 'Mock Presentation Item 3',
-    description: 'This is the third Mock Presentation Item for testing purposes',
-    createdAt: '2024-01-17T09:45:00Z',
-    status: 'active',
+    htmlContent: '<div><h1>Backend Technologies</h1><p>Exploring server-side technologies including Node.js, Python, and database management systems.</p></div>',
   },
 ];
 
@@ -30,9 +21,9 @@ export default class PresentationMockService implements PresentationApiService {
     return API_MODE.mock;
   }
 
-  async getPresentationItems(): Promise<PresentationItem[]> {
+  async getPresentationItems(): Promise<OutlineItem[]> {
     return new Promise((resolve) => {
-      setTimeout(() => resolve([...mockPresentationItems]), 500);
+      setTimeout(() => resolve([...mockOutlineItems]), 500);
     });
   }
 }

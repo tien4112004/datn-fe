@@ -3,51 +3,41 @@ import { useRichTextEditor } from '@/shared/components/rte/useRichTextEditor';
 import { Button } from '@/shared/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
 import { cn } from '@/shared/lib/utils';
-import type { PartialBlock } from '@blocknote/core';
+import { BlockNoteEditor } from '@blocknote/core';
 import { useSortable } from '@dnd-kit/sortable';
 import { Trash } from 'lucide-react';
-import { useState } from 'react';
+import React from 'react';
 
 interface OutlineCardProps {
   id: string;
   title?: string;
   className?: string;
-  texts?: PartialBlock[];
+  htmlContent?: string;
   onDelete?: () => void;
+  onContentChange: (html: string) => void;
 }
 
 const OutlineCard = ({
   id,
   title = 'Outline',
   className = '',
-  texts = [
-    {
-      type: 'paragraph',
-      content: [
-        {
-          type: 'text',
-          text: 'Blocks:',
-          styles: { bold: true },
-        },
-      ],
-    },
-    {
-      type: 'paragraph',
-      content:
-        'This is a sample text for the outline card. You can edit this content using the rich text editor.',
-    },
-  ],
+  htmlContent = '',
   onDelete,
+  onContentChange,
 }: OutlineCardProps) => {
-  const [isDeleting, setIsDeleting] = useState(false);
-
+  const [isDeleting, setIsDeleting] = React.useState(false);
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: `outline-card-${id.toString()}`,
   });
+  const editor = useRichTextEditor();
 
-  const editor = useRichTextEditor({
-    initialContent: texts,
-  });
+  React.useEffect(() => {
+    async function loadInitialHTML() {
+      const blocks = await editor.tryParseHTMLToBlocks(htmlContent);
+      editor.replaceBlocks(editor.document, blocks);
+    }
+    loadInitialHTML();
+  }, [editor]);
 
   const handleDelete = () => {
     if (!onDelete) return;
@@ -56,6 +46,11 @@ const OutlineCard = ({
     setTimeout(() => {
       onDelete();
     }, 300);
+  };
+
+  const handleContentChange = async (editor: BlockNoteEditor) => {
+    const htmlContent = await editor.blocksToHTMLLossy(editor.document);
+    onContentChange(htmlContent);
   };
 
   const style = {
@@ -68,7 +63,7 @@ const OutlineCard = ({
       ref={setNodeRef}
       style={style}
       className={cn(
-        `border-primary group relative flex min-h-24 w-full flex-row gap-4 bg-white p-0 shadow-md transition-shadow duration-300 hover:shadow-lg`,
+        `border-primary group relative flex min-h-24 w-full flex-row gap-4 p-0 shadow-md transition-shadow duration-300 hover:shadow-lg`,
         isDragging ? 'z-1000 opacity-50' : '',
         isDeleting ? 'scale-0 transition-all' : '',
         className
@@ -88,7 +83,13 @@ const OutlineCard = ({
         <CardTitle>{title}</CardTitle>
       </CardHeader>
       <CardContent className="flex-start flex-1 p-2">
-        <RichTextEditor editor={editor} sideMenu={false} className="-mx-2" />
+        <RichTextEditor
+          data-card
+          editor={editor}
+          onChange={handleContentChange}
+          sideMenu={false}
+          className="-mx-2"
+        />
       </CardContent>
     </Card>
   );

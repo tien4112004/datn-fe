@@ -1,12 +1,19 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import OutlineCard from '@/features/presentation/components/OutlineCard';
 import { useSortable } from '@dnd-kit/sortable';
 import { fireEvent } from '@testing-library/react';
 
 // Mock dependencies
+const mockEditor = {
+  tryParseHTMLToBlocks: vi.fn().mockResolvedValue([]),
+  replaceBlocks: vi.fn(),
+  document: [],
+  blocksToHTMLLossy: vi.fn().mockResolvedValue('<p>test content</p>'),
+};
+
 vi.mock('@/shared/components/rte/useRichTextEditor', () => ({
-  useRichTextEditor: vi.fn(() => ({})),
+  useRichTextEditor: vi.fn(() => mockEditor),
 }));
 
 vi.mock('@dnd-kit/sortable', () => {
@@ -25,13 +32,57 @@ vi.mock('@dnd-kit/sortable', () => {
 });
 
 vi.mock('@/shared/components/rte/RichTextEditor', () => ({
-  default: vi.fn(() => <div data-testid="rich-text-editor">Rich Text Editor</div>),
+  default: vi.fn(({ onChange }) => {
+    // Simulate editor interaction
+    if (onChange) {
+      setTimeout(() => onChange(mockEditor), 0);
+    }
+    return <div data-testid="rich-text-editor">Rich Text Editor</div>;
+  }),
+}));
+
+// Mock UI components
+vi.mock('@/shared/components/ui/card', () => ({
+  Card: ({ children, ...props }: any) => (
+    <div data-testid="card" {...props}>
+      {children}
+    </div>
+  ),
+  CardContent: ({ children, ...props }: any) => (
+    <div data-testid="card-content" {...props}>
+      {children}
+    </div>
+  ),
+  CardHeader: ({ children, ...props }: any) => (
+    <div data-testid="card-header" {...props}>
+      {children}
+    </div>
+  ),
+  CardTitle: ({ children, ...props }: any) => (
+    <h3 data-testid="card-title" {...props}>
+      {children}
+    </h3>
+  ),
+}));
+
+vi.mock('@/shared/components/ui/button', () => ({
+  Button: ({ children, onClick, ...props }: any) => (
+    <button data-testid="button" onClick={onClick} {...props}>
+      {children}
+    </button>
+  ),
+}));
+
+vi.mock('lucide-react', () => ({
+  Trash: () => <div data-testid="trash-icon">Trash</div>,
 }));
 
 // Test suite for OutlineCard component
 describe('OutlineCard', () => {
+  const mockOnContentChange = vi.fn();
   const defaultProps = {
     id: 'test-id',
+    onContentChange: mockOnContentChange,
   };
 
   beforeEach(() => {
@@ -92,14 +143,14 @@ describe('OutlineCard', () => {
     const mockOnDelete = vi.fn();
     render(<OutlineCard {...defaultProps} onDelete={mockOnDelete} />);
 
-    const deleteButton = screen.getByRole('button');
+    const deleteButton = screen.getByTestId('button');
     expect(deleteButton).toBeInTheDocument();
   });
 
   it('does not render delete button when onDelete prop is not provided', () => {
     render(<OutlineCard {...defaultProps} />);
 
-    expect(screen.queryByRole('button')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('button')).not.toBeInTheDocument();
   });
 
   it('calls onDelete after delay when delete button is clicked', async () => {
@@ -108,7 +159,7 @@ describe('OutlineCard', () => {
 
     render(<OutlineCard {...defaultProps} onDelete={mockOnDelete} />);
 
-    const deleteButton = screen.getByRole('button');
+    const deleteButton = screen.getByTestId('button');
     fireEvent.click(deleteButton);
 
     expect(mockOnDelete).not.toHaveBeenCalled();
@@ -124,27 +175,29 @@ describe('OutlineCard', () => {
     const mockOnDelete = vi.fn();
     const { container } = render(<OutlineCard {...defaultProps} onDelete={mockOnDelete} />);
 
-    const deleteButton = screen.getByRole('button');
+    const deleteButton = screen.getByTestId('button');
     fireEvent.click(deleteButton);
 
     expect(container.querySelector('.scale-0')).toBeInTheDocument();
   });
 
-  it('renders with custom text content', async () => {
-    const customTexts = [
-      {
-        type: 'paragraph',
-        content: 'Custom content for testing',
-      },
-    ];
+  it('calls onContentChange when editor content changes', async () => {
+    const mockOnContentChange = vi.fn();
+    render(<OutlineCard {...defaultProps} onContentChange={mockOnContentChange} />);
 
-    const { useRichTextEditor } = await import('@/shared/components/rte/useRichTextEditor');
-    const mockUseRichTextEditor = vi.mocked(useRichTextEditor);
+    // Wait for the editor onChange to be triggered
+    await waitFor(() => {
+      expect(mockOnContentChange).toHaveBeenCalledWith('<p>test content</p>');
+    });
+  });
 
-    render(<OutlineCard {...defaultProps} texts={customTexts as any} />);
+  it('loads initial HTML content', async () => {
+    const htmlContent = '<p>Initial content</p>';
+    render(<OutlineCard {...defaultProps} htmlContent={htmlContent} />);
 
-    expect(mockUseRichTextEditor).toHaveBeenCalledWith({
-      initialContent: customTexts,
+    await waitFor(() => {
+      expect(mockEditor.tryParseHTMLToBlocks).toHaveBeenCalledWith(htmlContent);
+      expect(mockEditor.replaceBlocks).toHaveBeenCalledWith(mockEditor.document, []);
     });
   });
 

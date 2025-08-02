@@ -1,3 +1,5 @@
+// DEPRECATED: This file is no longer in use.
+
 import React from 'react';
 import { Button } from '@/shared/components/ui/button';
 import { SidebarTrigger } from '@/shared/components/ui/sidebar';
@@ -43,7 +45,7 @@ const CreateOutlinePage = () => {
   return (
     <>
       <SidebarTrigger className="absolute left-4 top-4 z-50" />
-      <div className="lg:w-4xl flex h-[calc(100vh-1rem)] flex-col items-center justify-center gap-4 self-center sm:w-full">
+      <div className="lg:w-4xl flex min-h-[calc(100vh-1rem)] flex-col items-center justify-center gap-4 self-center sm:w-full">
         <h1 className="text-3xl font-bold leading-10 text-neutral-900">{t('title')}</h1>
         <h2 className="text-xl font-bold leading-10 text-sky-500/80">{t('subtitle')}</h2>
 
@@ -60,7 +62,6 @@ const CreateOutlinePage = () => {
         <Button onClick={handleSubmit}>{t('generateOutline')}</Button>
       </div>
     </>
-
   );
 };
 

@@ -5,7 +5,7 @@ const PresentationCard = () => {
   const { presentationId } = useLoaderData();
 
   return (
-    <Card className="max-w-sm mx-auto my-4 p-4">
+    <Card className="mx-auto my-4 max-w-sm p-4">
       <CardContent>
         <h2 className="text-lg font-semibold">Presentation ID: {presentationId}</h2>
       </CardContent>

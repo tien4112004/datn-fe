@@ -48,7 +48,7 @@ export function CardsPaymentMethod() {
                 />
                 <div className="grid gap-1 font-normal">
                   <div className="font-medium">{plan.name}</div>
-                  <div className="text-muted-foreground pr-2 text-xs leading-snug text-balance">
+                  <div className="text-muted-foreground text-balance pr-2 text-xs leading-snug">
                     {plan.description}
                   </div>
                 </div>

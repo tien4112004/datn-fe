@@ -62,7 +62,7 @@ export function CardsTeamMembers() {
                 <AvatarFallback>{member.name.charAt(0)}</AvatarFallback>
               </Avatar>
               <div className="flex flex-col gap-0.5">
-                <p className="text-sm leading-none font-medium">{member.name}</p>
+                <p className="text-sm font-medium leading-none">{member.name}</p>
                 <p className="text-muted-foreground text-xs">{member.email}</p>
               </div>
             </div>

@@ -57,7 +57,7 @@ export function CardsShare() {
                     <AvatarFallback>{person.name.charAt(0)}</AvatarFallback>
                   </Avatar>
                   <div>
-                    <p className="text-sm leading-none font-medium">{person.name}</p>
+                    <p className="text-sm font-medium leading-none">{person.name}</p>
                     <p className="text-muted-foreground text-sm">{person.email}</p>
                   </div>
                 </div>

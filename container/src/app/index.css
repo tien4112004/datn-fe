@@ -178,6 +178,7 @@ body {
   display: none;
 }
 
-textarea, input[type="text"] {
+textarea,
+input[type='text'] {
   resize: none;
 }

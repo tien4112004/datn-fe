@@ -1,6 +1,6 @@
 import type { Service } from '@/shared/api';
-import type { PresentationItem } from './presentation';
+import type { OutlineItem } from './outline';
 
 export interface PresentationApiService extends Service {
-  getPresentationItems(): Promise<PresentationItem[]>;
+  getPresentationItems(): Promise<OutlineItem[]>;
 }

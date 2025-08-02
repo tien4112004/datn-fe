@@ -77,11 +77,11 @@ const OutlineWorkspace = ({ items, setItems, onDownload }: OutlineWorkspaceProps
   };
 
   const handleContentChange = (id: string, html: string) => {
-    setItems(items.map(item => item.id === id ? { ...item, htmlContent: html } : item));
+    setItems(items.map((item) => (item.id === id ? { ...item, htmlContent: html } : item)));
   };
 
   return (
-    <div className="bg-card flex w-3xl flex-col gap-6 rounded-xl p-8">
+    <div className="bg-card w-3xl flex flex-col gap-6 rounded-xl p-8">
       <DndContext sensors={sensors} onDragEnd={handleOutlineCardDragEnd}>
         <SortableContext
           items={safeItems.map((item) => `outline-card-${item.id}`)}

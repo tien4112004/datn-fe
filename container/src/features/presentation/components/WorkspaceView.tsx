@@ -62,7 +62,7 @@ interface CustomizationSectionProps {
 
 const WorkspaceHeader = ({ title }: WorkspaceHeaderProps) => {
   return (
-    <div className="flex items-center justify-between w-full">
+    <div className="flex w-full items-center justify-between">
       <h1 className="text-3xl font-bold leading-10 text-neutral-900">{title}</h1>
     </div>
   );
@@ -144,15 +144,15 @@ const OutlineFormSection = ({ control, isFetching, onSubmit }: OutlineFormSectio
         </div>
         <Button className="ml-auto" type="submit" size="sm" disabled={isFetching}>
           {isFetching ? (
-          <>
-            <span className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-            {t('loading')}
-          </>
+            <>
+              <span className="border-primary mr-2 h-4 w-4 animate-spin rounded-full border-2 border-t-transparent" />
+              {t('loading')}
+            </>
           ) : (
-          <>
-            <RotateCcw className="mr-2 h-4 w-4" />
-            <span>{t('regenerate')}</span>
-          </>
+            <>
+              <RotateCcw className="mr-2 h-4 w-4" />
+              <span>{t('regenerate')}</span>
+            </>
           )}
         </Button>
       </div>
@@ -173,7 +173,7 @@ const OutlineSection = ({ items, setItems, isFetching }: OutlineSectionProps) =>
       <div className="scroll-m-20 text-xl font-semibold tracking-tight">{t('outlineSection')}</div>
       {isFetching ? (
         <div className="flex w-full items-center justify-center py-12">
-          <span className="animate-spin mr-2 h-6 w-6 border-4 border-primary border-t-transparent rounded-full inline-block" />
+          <span className="border-primary mr-2 inline-block h-6 w-6 animate-spin rounded-full border-4 border-t-transparent" />
           <span className="text-lg font-medium">{t('loadingOutline')}</span>
         </div>
       ) : (
@@ -196,11 +196,7 @@ const CustomizationSection = ({ control, watch, setValue, onSubmit }: Customizat
   return (
     <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
       <div className="scroll-m-20 text-xl font-semibold tracking-tight">{t('customizeSection')}</div>
-      <PresentationCustomizationForm
-        control={control}
-        watch={watch}
-        setValue={setValue}
-      />
+      <PresentationCustomizationForm control={control} watch={watch} setValue={setValue} />
       <Button className="mt-5" type="submit">
         <Sparkles />
         {t('generatePresentation')}
@@ -209,15 +205,9 @@ const CustomizationSection = ({ control, watch, setValue, onSubmit }: Customizat
   );
 };
 
-const WorkspaceView = ({
-  initialOutlineData,
-}: WorkspaceViewProps) => {
+const WorkspaceView = ({ initialOutlineData }: WorkspaceViewProps) => {
   const { t } = useTranslation('presentation', { keyPrefix: 'workspace' });
-  const { 
-    outlineItems, 
-    refetch,
-    isFetching,
-  } = usePresentationOutlines();
+  const { outlineItems, refetch, isFetching } = usePresentationOutlines();
   const [items, setItems] = useState<OutlineItem[]>([]);
   const { control: outlineControl, handleSubmit: handleRegenerateSubmit } = useForm<OutlineFormData>({
     defaultValues: {
@@ -228,7 +218,12 @@ const WorkspaceView = ({
     },
   });
 
-  const { control: customizationControl, setValue, watch, handleSubmit: handleCustomizationSubmit } = useForm<CustomizationFormData>({
+  const {
+    control: customizationControl,
+    setValue,
+    watch,
+    handleSubmit: handleCustomizationSubmit,
+  } = useForm<CustomizationFormData>({
     defaultValues: {
       theme: '',
       contentLength: '',
@@ -237,15 +232,15 @@ const WorkspaceView = ({
   });
 
   useEffect(() => {
-    setItems([...outlineItems]); 
+    setItems([...outlineItems]);
   }, [isFetching]);
 
   const onRegenerateOutline = (data: OutlineFormData) => {
     console.log('Regenerating outline with data:', data);
     // TODO: Implement outline regeneration
 
-    // 
-    refetch()
+    //
+    refetch();
   };
 
   const onSubmitPresentation = (data: CustomizationFormData) => {
@@ -261,23 +256,19 @@ const WorkspaceView = ({
       <div className="flex flex-col gap-4">
         <WorkspaceHeader title={t('title')} />
 
-        <OutlineFormSection 
-          control={outlineControl} 
-          isFetching={isFetching} 
-          onSubmit={handleRegenerateSubmit(onRegenerateOutline)} 
+        <OutlineFormSection
+          control={outlineControl}
+          isFetching={isFetching}
+          onSubmit={handleRegenerateSubmit(onRegenerateOutline)}
         />
 
-        <OutlineSection 
-          items={items} 
-          setItems={setItems} 
-          isFetching={isFetching} 
-        />
+        <OutlineSection items={items} setItems={setItems} isFetching={isFetching} />
 
-        <CustomizationSection 
-          control={customizationControl} 
-          watch={watch} 
-          setValue={setValue} 
-          onSubmit={handleCustomizationSubmit(onSubmitPresentation)} 
+        <CustomizationSection
+          control={customizationControl}
+          watch={watch}
+          setValue={setValue}
+          onSubmit={handleCustomizationSubmit(onSubmitPresentation)}
         />
       </div>
     </div>

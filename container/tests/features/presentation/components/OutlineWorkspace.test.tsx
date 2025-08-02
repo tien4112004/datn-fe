@@ -12,7 +12,11 @@ vi.mock('react-i18next', () => ({
 }));
 
 vi.mock('@dnd-kit/core', () => ({
-  DndContext: vi.fn(({ children }) => <div data-testid="dnd-context">{children}</div>),
+  DndContext: vi.fn(({ children, onDragEnd }) => {
+    // Expose onDragEnd for testing
+    (globalThis as any).__dndOnDragEnd = onDragEnd;
+    return <div data-testid="dnd-context">{children}</div>;
+  }),
   useSensor: vi.fn(),
   useSensors: vi.fn(() => []),
   PointerSensor: vi.fn(),
@@ -32,11 +36,23 @@ vi.mock('@dnd-kit/sortable', () => ({
 }));
 
 vi.mock('@/features/presentation/components/OutlineCard', () => ({
-  default: vi.fn(({ id, title, onDelete }) => (
-    <div data-testid={`outline-card-${id}`} onClick={onDelete}>
+  default: vi.fn(({ id, title, onDelete, onContentChange }) => (
+    <div
+      data-testid={`outline-card-${id}`}
+      onClick={onDelete}
+      onInput={(e) => onContentChange?.((e.target as HTMLElement).textContent || '')}
+    >
       OutlineCard {title}
     </div>
   )),
+}));
+
+vi.mock('@/shared/components/ui/button', () => ({
+  Button: ({ children, onClick, disabled, ...props }: any) => (
+    <button onClick={onClick} disabled={disabled} {...props}>
+      {children}
+    </button>
+  ),
 }));
 
 vi.mock('lucide-react', () => ({
@@ -49,7 +65,11 @@ const mockOutlineCard = vi.mocked(OutlineCard);
 
 // Test suite for OutlineWorkspace component
 describe('OutlineWorkspace', () => {
-  const mockItems: OutlineItem[] = [{ id: '1' }, { id: '2' }, { id: '3' }];
+  const mockItems: OutlineItem[] = [
+    { id: '1', htmlContent: '<p>Content 1</p>' },
+    { id: '2', htmlContent: '<p>Content 2</p>' },
+    { id: '3', htmlContent: '<p>Content 3</p>' },
+  ];
 
   const mockSetItems = vi.fn();
   const mockOnDownload = vi.fn();
@@ -92,7 +112,13 @@ describe('OutlineWorkspace', () => {
     const addButton = screen.getByText('addOutlineCard');
     fireEvent.click(addButton);
 
-    expect(mockSetItems).toHaveBeenCalledWith(expect.any(Function));
+    expect(mockSetItems).toHaveBeenCalledWith([
+      ...mockItems,
+      expect.objectContaining({
+        id: expect.any(String),
+        htmlContent: '',
+      }),
+    ]);
   });
 
   it('renders download button', () => {
@@ -204,7 +230,24 @@ describe('OutlineWorkspace', () => {
     const cardProps = mockOutlineCard.mock.calls[0][0];
     cardProps.onDelete?.();
 
-    expect(mockSetItems).toHaveBeenCalledWith(expect.any(Function));
+    expect(mockSetItems).toHaveBeenCalledWith([
+      { id: '2', htmlContent: '<p>Content 2</p>' },
+      { id: '3', htmlContent: '<p>Content 3</p>' },
+    ]);
+  });
+
+  it('calls handleContentChange when content is updated from OutlineCard', () => {
+    render(<OutlineWorkspace {...defaultProps} />);
+
+    const cardProps = mockOutlineCard.mock.calls[0][0];
+    const newContent = '<p>Updated content</p>';
+    cardProps.onContentChange?.(newContent);
+
+    expect(mockSetItems).toHaveBeenCalledWith([
+      { id: '1', htmlContent: newContent },
+      { id: '2', htmlContent: '<p>Content 2</p>' },
+      { id: '3', htmlContent: '<p>Content 3</p>' },
+    ]);
   });
 
   it('renders items with correct sequential titles', () => {
@@ -274,8 +317,58 @@ describe('OutlineWorkspace', () => {
 
     expect(screen.getByText('3 outlineCards')).toBeInTheDocument();
 
-    rerender(<OutlineWorkspace {...defaultProps} items={[{ id: '1' }]} />);
+    rerender(<OutlineWorkspace {...defaultProps} items={[{ id: '1', htmlContent: '<p>Content 1</p>' }]} />);
 
     expect(screen.getByText('1 outlineCards')).toBeInTheDocument();
+  });
+
+  it('handles drag and drop reordering', () => {
+    render(<OutlineWorkspace {...defaultProps} />);
+
+    // Simulate drag end event
+    const dragEndEvent = {
+      active: { id: 'outline-card-1' },
+      over: { id: 'outline-card-3' },
+    };
+
+    if ((globalThis as any).__dndOnDragEnd) {
+      (globalThis as any).__dndOnDragEnd(dragEndEvent);
+    }
+
+    expect(mockSetItems).toHaveBeenCalledWith([
+      { id: '2', htmlContent: '<p>Content 2</p>' },
+      { id: '3', htmlContent: '<p>Content 3</p>' },
+      { id: '1', htmlContent: '<p>Content 1</p>' },
+    ]);
+  });
+
+  it('ignores drag events without over target', () => {
+    render(<OutlineWorkspace {...defaultProps} />);
+
+    const dragEndEvent = {
+      active: { id: 'outline-card-1' },
+      over: null,
+    };
+
+    if ((globalThis as any).__dndOnDragEnd) {
+      (globalThis as any).__dndOnDragEnd(dragEndEvent);
+    }
+
+    expect(mockSetItems).not.toHaveBeenCalled();
+  });
+
+  it('ignores drag events with same source and target', () => {
+    render(<OutlineWorkspace {...defaultProps} />);
+
+    const dragEndEvent = {
+      active: { id: 'outline-card-1' },
+      over: { id: 'outline-card-1' },
+    };
+
+    if ((globalThis as any).__dndOnDragEnd) {
+      (globalThis as any).__dndOnDragEnd(dragEndEvent);
+    }
+
+    expect(mockSetItems).not.toHaveBeenCalled();
   });
 });

@@ -9,5 +9,5 @@ export default {
   DetailsPage,
   // OutlineWorkspacePage,
   // CreateOutlinePage,
-  PresentationOutlinePage
+  PresentationOutlinePage,
 };

@@ -11,13 +11,15 @@ const PresentationViewState = {
   WORKSPACE: 'workspace',
 } as const;
 
-type PresentationViewState = typeof PresentationViewState[keyof typeof PresentationViewState];
+type PresentationViewState = (typeof PresentationViewState)[keyof typeof PresentationViewState];
 
 const PresentationOutlinePage = () => {
   const defaultModel = useLoaderData() as ModelOption;
-  const [currentView, setCurrentView] = useState<PresentationViewState>(PresentationViewState.OUTLINE_CREATION);  
+  const [currentView, setCurrentView] = useState<PresentationViewState>(
+    PresentationViewState.OUTLINE_CREATION
+  );
   const [outlineData, setOutlineData] = useState<OutlineData | null>(null);
-  
+
   const handleCreateOutline = (outlineData: OutlineData) => {
     setOutlineData(outlineData);
     setCurrentView(PresentationViewState.WORKSPACE);
@@ -27,14 +29,9 @@ const PresentationOutlinePage = () => {
     <>
       <SidebarTrigger className="absolute left-4 top-4 z-50" />
       {currentView === PresentationViewState.OUTLINE_CREATION ? (
-        <OutlineCreationView
-          defaultModel={defaultModel}
-          onCreateOutline={handleCreateOutline}
-        />
+        <OutlineCreationView defaultModel={defaultModel} onCreateOutline={handleCreateOutline} />
       ) : (
-        <WorkspaceView
-          initialOutlineData={outlineData}
-        />
+        <WorkspaceView initialOutlineData={outlineData} />
       )}
     </>
   );

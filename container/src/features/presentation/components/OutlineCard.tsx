@@ -83,11 +83,12 @@ const OutlineCard = ({
         <CardTitle>{title}</CardTitle>
       </CardHeader>
       <CardContent className="flex-start flex-1 p-2">
-        <RichTextEditor 
-          data-card editor={editor} 
-          onChange={handleContentChange} 
-          sideMenu={false} 
-          className="-mx-2" 
+        <RichTextEditor
+          data-card
+          editor={editor}
+          onChange={handleContentChange}
+          sideMenu={false}
+          className="-mx-2"
         />
       </CardContent>
     </Card>

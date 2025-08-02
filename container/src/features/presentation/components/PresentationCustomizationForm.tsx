@@ -171,13 +171,10 @@ const ImageModelSection = ({ control }: ImageModelSectionProps) => {
 const PresentationCustomizationForm = ({ control, watch, setValue }: PresentationCustomizationFormProps) => {
   return (
     <Card className="w-full max-w-3xl">
-      <ThemeSection 
-        selectedTheme={watch('theme')} 
-        onThemeSelect={(theme) => setValue('theme', theme)} 
-      />
-      <ContentSection 
-        selectedContentLength={watch('contentLength')} 
-        onContentLengthSelect={(length) => setValue('contentLength', length)} 
+      <ThemeSection selectedTheme={watch('theme')} onThemeSelect={(theme) => setValue('theme', theme)} />
+      <ContentSection
+        selectedContentLength={watch('contentLength')}
+        onContentLengthSelect={(length) => setValue('contentLength', length)}
       />
       <ImageModelSection control={control} />
     </Card>

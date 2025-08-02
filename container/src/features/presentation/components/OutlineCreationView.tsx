@@ -14,10 +14,7 @@ interface OutlineCreationViewProps {
   }) => void;
 }
 
-const OutlineCreationView = ({
-  defaultModel,
-  onCreateOutline,
-}: OutlineCreationViewProps) => {
+const OutlineCreationView = ({ defaultModel, onCreateOutline }: OutlineCreationViewProps) => {
   const { t } = useTranslation('presentation', { keyPrefix: 'createOutline' });
 
   // Local state for outline creation form

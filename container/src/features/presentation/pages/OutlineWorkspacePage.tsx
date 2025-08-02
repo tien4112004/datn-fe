@@ -1,6 +1,5 @@
 // DEPRECATED: This file is no longer in use.
 
-
 import OutlineWorkspace from '@/features/presentation/components/OutlineWorkspace';
 import { usePresentationOutlines } from '../hooks/useApi';
 import { SidebarTrigger } from '@/shared/components/ui/sidebar';
@@ -61,7 +60,7 @@ const OutlineWorkspacePage = () => {
       theme: '',
       contentLength: '',
       imageModel: '',
-      items: [], 
+      items: [],
     },
   });
 
@@ -172,7 +171,7 @@ const OutlineWorkspacePage = () => {
             <div className="scroll-m-20 text-xl font-semibold tracking-tight">Outline</div>
             {isLoading ? (
               <div className="flex w-full items-center justify-center py-12">
-                <span className="animate-spin mr-2 h-6 w-6 border-4 border-primary border-t-transparent rounded-full inline-block" />
+                <span className="border-primary mr-2 inline-block h-6 w-6 animate-spin rounded-full border-4 border-t-transparent" />
                 <span className="text-lg font-medium">Loading outline...</span>
               </div>
             ) : (
@@ -184,7 +183,9 @@ const OutlineWorkspacePage = () => {
                 }}
               />
             )}
-            <div className="scroll-m-20 text-xl font-semibold tracking-tight">Customize your presentation</div>
+            <div className="scroll-m-20 text-xl font-semibold tracking-tight">
+              Customize your presentation
+            </div>
             <Card className="w-full max-w-3xl">
               <CardHeader>
                 <CardTitle>Theme</CardTitle>
@@ -226,7 +227,11 @@ const OutlineWorkspacePage = () => {
                   {[
                     { label: 'Short', desc: 'Concise summary', icon: <AlignLeft className="h-5 w-5" /> },
                     { label: 'Medium', desc: 'Balanced detail', icon: <AlignCenter className="h-5 w-5" /> },
-                    { label: 'Long', desc: 'In-depth explanation', icon: <AlignJustify className="h-5 w-5" /> },
+                    {
+                      label: 'Long',
+                      desc: 'In-depth explanation',
+                      icon: <AlignJustify className="h-5 w-5" />,
+                    },
                   ].map((content) => (
                     <div
                       key={content.label}

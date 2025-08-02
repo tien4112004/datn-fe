@@ -218,6 +218,7 @@ jobs:
             if [ -z "$DESTINATION_URL" ]; then
               DESTINATION_URL="https://datn-fe-presentation.vercel.app"
             fi
+          fi
 
           cat <<EOF > vercel.json
           {

@@ -35,7 +35,7 @@ vi.mock('@dnd-kit/sortable', () => ({
   }),
 }));
 
-vi.mock('@/features/presentation/components/OutlineCard', () => ({
+vi.mock('@/features/presentation/components/generation/OutlineCard', () => ({
   default: vi.fn(({ id, title, onDelete, onContentChange }) => (
     <div
       data-testid={`outline-card-${id}`}

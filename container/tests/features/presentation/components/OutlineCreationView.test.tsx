@@ -25,7 +25,7 @@ vi.mock('@/shared/components/ui/button', () => ({
   ),
 }));
 
-vi.mock('@/features/presentation/components/OutlineForm', () => ({
+vi.mock('@/features/presentation/components/generation/OutlineForm', () => ({
   default: vi.fn(
     ({ promptInput, setPromptInput, slideCount, setSlideCount, style, setStyle, model, setModel }: any) => (
       <div data-testid="outline-form">

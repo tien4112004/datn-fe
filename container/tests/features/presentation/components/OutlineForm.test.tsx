@@ -114,7 +114,7 @@ vi.mock('@/shared/components/ui/autosize-textarea', () => ({
   ),
 }));
 
-vi.mock('@/features/presentation/components/ExamplePrompts', () => ({
+vi.mock('@/features/presentation/components/generation/ExamplePrompts', () => ({
   default: vi.fn(({ onExampleClick, promptInput }: any) => (
     <div data-testid="example-prompts">
       <button data-testid="example-button" onClick={() => onExampleClick('Example prompt')}>

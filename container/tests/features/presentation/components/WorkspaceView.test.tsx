@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import WorkspaceView from '@/features/presentation/components/WorkspaceView';
 import type { OutlineData } from '@/features/presentation/types/outline';
@@ -153,7 +153,7 @@ vi.mock('@/features/presentation/components/OutlineWorkspace', () => ({
 }));
 
 vi.mock('@/features/presentation/components/PresentationCustomizationForm', () => ({
-  default: vi.fn(({ control, watch, setValue, onSubmit }: any) => (
+  default: vi.fn(() => (
     <div data-testid="presentation-customization-form">
       <button data-testid="submit-customization">Submit Customization</button>
     </div>

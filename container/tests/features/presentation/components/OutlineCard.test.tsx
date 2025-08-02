@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import OutlineCard from '@/features/presentation/components/OutlineCard';
+import OutlineCard from '@/features/presentation/components/generation/OutlineCard';
 import { useSortable } from '@dnd-kit/sortable';
 import { fireEvent } from '@testing-library/react';
 

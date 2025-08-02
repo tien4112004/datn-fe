@@ -18,7 +18,7 @@ import {
 import { useState } from 'react';
 import { Download, Loader, Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import type { OutlineItem } from '../types/outline';
+import type { OutlineItem } from '../../types/outline';
 
 type OutlineWorkspaceProps = {
   items: OutlineItem[];

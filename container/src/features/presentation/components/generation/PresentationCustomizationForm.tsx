@@ -105,9 +105,24 @@ const ContentSection = ({ selectedContentLength, onContentLengthSelect }: Conten
   const { t } = useTranslation('presentation', { keyPrefix: 'customization' });
 
   const contentOptions = [
-    { label: 'short', desc: 'shortDesc', icon: <AlignLeft className="h-5 w-5" /> },
-    { label: 'medium', desc: 'mediumDesc', icon: <AlignCenter className="h-5 w-5" /> },
-    { label: 'long', desc: 'longDesc', icon: <AlignJustify className="h-5 w-5" /> },
+    {
+      key: 'short',
+      label: t('contentLength.short'),
+      desc: t('contentLength.shortDesc'),
+      icon: <AlignLeft className="h-5 w-5" />,
+    },
+    {
+      key: 'medium',
+      label: t('contentLength.medium'),
+      desc: t('contentLength.mediumDesc'),
+      icon: <AlignCenter className="h-5 w-5" />,
+    },
+    {
+      key: 'long',
+      label: t('contentLength.long'),
+      desc: t('contentLength.longDesc'),
+      icon: <AlignJustify className="h-5 w-5" />,
+    },
   ];
 
   return (
@@ -120,13 +135,13 @@ const ContentSection = ({ selectedContentLength, onContentLengthSelect }: Conten
         <div className="grid grid-cols-3 gap-4">
           {contentOptions.map((content) => (
             <div
-              key={content.label}
-              className={`bg-muted border-muted flex cursor-pointer flex-col items-center justify-center rounded-lg border p-4 transition hover:scale-105 ${selectedContentLength === content.label ? 'ring-primary ring-2' : ''}`}
-              onClick={() => onContentLengthSelect(content.label)}
+              key={content.key}
+              className={`bg-muted border-muted flex cursor-pointer flex-col items-center justify-center rounded-lg border p-4 transition hover:scale-105 ${selectedContentLength === content.key ? 'ring-primary ring-2' : ''}`}
+              onClick={() => onContentLengthSelect(content.key)}
             >
               {content.icon}
-              <span className="mt-2 text-sm font-medium">{t(`contentLength.${content.label}`)}</span>
-              <span className="text-muted-foreground text-xs">{t(`contentLength.${content.desc}`)}</span>
+              <span className="mt-2 text-sm font-medium">{t(`contentLength.${content.key}`)}</span>
+              <span className="text-muted-foreground text-xs">{content.desc}</span>
             </div>
           ))}
         </div>

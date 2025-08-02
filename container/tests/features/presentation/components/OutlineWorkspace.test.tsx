@@ -1,7 +1,7 @@
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import OutlineWorkspace from '@/features/presentation/components/OutlineWorkspace';
-import OutlineCard from '@/features/presentation/components/OutlineCard';
+import OutlineWorkspace from '@/features/presentation/components/generation/OutlineWorkspace';
+import OutlineCard from '@/features/presentation/components/generation/OutlineCard';
 import type { OutlineItem } from '@/features/presentation/types/outline';
 
 // Mock dependencies

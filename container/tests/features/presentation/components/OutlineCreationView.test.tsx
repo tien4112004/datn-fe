@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import OutlineCreationView from '@/features/presentation/components/OutlineCreationView';
+import OutlineCreationView from '@/features/presentation/components/generation/OutlineCreationView';
 import type { ModelOption } from '@/features/model';
 
 // Mock dependencies

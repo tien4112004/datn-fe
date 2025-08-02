@@ -1,4 +1,3 @@
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 import { EllipsisVerticalIcon } from 'lucide-react';
@@ -9,7 +8,7 @@ type ActionButtonProps = {
   onDelete?: () => void;
 };
 
-const ActionButton: React.FC<ActionButtonProps> = ({ onEdit, onDelete }) => {
+const ActionButton = ({ onEdit, onDelete }: ActionButtonProps) => {
   const { t } = useTranslation('table');
 
   return (

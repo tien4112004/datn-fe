@@ -1,4 +1,4 @@
-import PresentationCard from '@/features/presentation/components/PresentationCard';
+import { PresentationCard } from '@/features/presentation/components';
 
 const DetailsPage = () => {
   return (

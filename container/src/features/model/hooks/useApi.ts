@@ -4,12 +4,7 @@ import { useModelApiService } from '../api';
 export const useModels = () => {
   const modelApiService = useModelApiService(false);
 
-  const {
-    data: models,
-    isLoading,
-    error,
-    refetch,
-  } = useQuery({
+  const { data: models, ...query } = useQuery({
     queryKey: [modelApiService.getType(), 'models'],
     queryFn: async () => {
       const data = await modelApiService.getAvailableModels();
@@ -20,8 +15,6 @@ export const useModels = () => {
 
   return {
     models,
-    isLoading,
-    error,
-    refetch,
+    ...query,
   };
 };

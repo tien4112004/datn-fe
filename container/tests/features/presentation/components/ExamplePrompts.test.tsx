@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import ExamplePrompts from '@/features/presentation/components/ExamplePrompts';
+import ExamplePrompts from '@/features/presentation/components/generation/ExamplePrompts';
 
 // Mock dependencies
 vi.mock('react-i18next', () => ({

@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import WorkspaceView from '@/features/presentation/components/WorkspaceView';
+import WorkspaceView from '@/features/presentation/components/generation/WorkspaceView';
 import type { OutlineData } from '@/features/presentation/types/outline';
 
 // Mock dependencies

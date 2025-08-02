@@ -212,10 +212,10 @@ const CustomizationSection = ({ control, watch, setValue, onSubmit }: Customizat
 const WorkspaceView = ({
   initialOutlineData,
 }: WorkspaceViewProps) => {
-  const { t: tWorkspace } = useTranslation('presentation', { keyPrefix: 'workspace' });
+  const { t } = useTranslation('presentation', { keyPrefix: 'workspace' });
   const { 
     outlineItems, 
-    // refetch,
+    refetch,
     isFetching,
   } = usePresentationOutlines();
   const [items, setItems] = useState<OutlineItem[]>([]);
@@ -245,7 +245,7 @@ const WorkspaceView = ({
     // TODO: Implement outline regeneration
 
     // 
-    // refetch()
+    refetch()
   };
 
   const onSubmitPresentation = (data: CustomizationFormData) => {
@@ -259,7 +259,7 @@ const WorkspaceView = ({
   return (
     <div className="flex min-h-[calc(100vh-1rem)] w-full max-w-3xl flex-col items-center justify-center self-center p-8">
       <div className="flex flex-col gap-4">
-        <WorkspaceHeader title={tWorkspace('title')} />
+        <WorkspaceHeader title={t('title')} />
 
         <OutlineFormSection 
           control={outlineControl} 

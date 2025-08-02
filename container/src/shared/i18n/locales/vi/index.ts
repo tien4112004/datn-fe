@@ -48,6 +48,8 @@ export default {
     createOutline: {
       title: 'Tạo dàn ý trình bày',
       subtitle: 'Tạo dàn ý slide với AI',
+      promptSection: 'Đầu vào',
+      regenerate: 'Tạo lại',
       promptTitle: 'Bài thuyết trình của bạn về cái gì (Hãy cụ thể)?',
       promptPlaceholder: 'Mô tả chủ đề hoặc nội dung bạn muốn trình bày...',
       slideCountPlaceholder: 'Số lượng trang?',
@@ -72,8 +74,6 @@ export default {
     },
     workspace: {
       title: 'Tùy chỉnh',
-      promptSection: 'Đầu vào',
-      regenerate: 'Tạo lại',
       loading: 'Đang tải...',
       outlineSection: 'Dàn ý',
       loadingOutline: 'Đang tải dàn ý...',

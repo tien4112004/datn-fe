@@ -44,6 +44,7 @@ _AI is like having a super-smart friend who never sleeps and always wants to hel
 async function splitMarkdownToOutlineItems(markdown: string): Promise<OutlineItem[]> {
   const cleanMarkdown = markdown.replace(/^```markdown\n/, '').replace(/\n```$/, '').trim();
   
+  // Split the markdown into sections based on headings (## and above)
   const sections = cleanMarkdown.split(/(?=^#{2,}\s)/m).filter(Boolean);
   
   const items = await Promise.all(
@@ -66,6 +67,8 @@ export default class PresentationRealApiService implements PresentationApiServic
   }
 
   async getPresentationItems(): Promise<OutlineItem[]> {
+    // toi yeu react
+    await new Promise(resolve => setTimeout(resolve, 50));
     return splitMarkdownToOutlineItems(mockOutlineOutput);
   }
 }

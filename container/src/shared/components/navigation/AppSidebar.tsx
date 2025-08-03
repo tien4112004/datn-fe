@@ -37,6 +37,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         icon: Plus,
       },
       {
+        title: 'Test SSE Generator',
+        url: '/presentation/presentation',
+        icon: Plus,
+      },
+      {
+        title: 'Test POST text/plain Generator',
+        url: '/presentation/outline',
+        icon: Plus,
+      },
+      {
         title: t('resources.index'),
         icon: File,
         items: [

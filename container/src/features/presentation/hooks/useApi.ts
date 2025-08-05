@@ -1,19 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
 import { usePresentationApiService } from '../api';
-// import type { OutlineItem } from '../types/outline';
 
 export const usePresentationOutlines = () => {
   const presentationApiService = usePresentationApiService();
-  const {
-    data: outlineItems = [],
-    isLoading,
-    error,
-    refetch,
-    isFetching,
-  } = useQuery({
+  const { data: outlineItems = [], ...query } = useQuery({
     queryKey: [presentationApiService.getType(), 'presentationItems'],
     queryFn: async () => {
-      const data = await presentationApiService.getPresentationItems();
+      const data = await presentationApiService.getOutlineItems();
       console.log('Fetch data', data);
       return data;
     },
@@ -21,9 +14,24 @@ export const usePresentationOutlines = () => {
 
   return {
     outlineItems,
-    isLoading,
-    error,
-    refetch,
-    isFetching,
+    ...query,
+  };
+};
+
+export const usePresentations = () => {
+  const presentationApiService = usePresentationApiService();
+
+  const { data: presentationItems, ...query } = useQuery({
+    queryKey: [presentationApiService.getType(), 'presentations'],
+    queryFn: async () => {
+      const data = await presentationApiService.getPresentationItems();
+      console.log('Fetch presentations', data);
+      return data;
+    },
+  });
+
+  return {
+    presentationItems,
+    ...query,
   };
 };

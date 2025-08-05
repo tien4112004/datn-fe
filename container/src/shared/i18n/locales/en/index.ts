@@ -104,6 +104,37 @@ export default {
         longDesc: 'In-depth explanation',
       },
     },
+    list: {
+      title: 'Presentation List',
+      createNewPresentation: 'Create New Presentation',
+      viewEditor: 'View Editor',
+    },
+  },
+
+  table: {
+    presentation: {
+      id: 'ID',
+      title: 'Title',
+      description: 'Description',
+      createdAt: 'Created At',
+      status: 'Status',
+      emptyState: 'No presentations found',
+    },
+    actionButton: {
+      edit: 'Edit',
+      delete: 'Delete',
+    },
+    actions: 'Actions',
+    rowsPerPage: 'Rows per page',
+    showing: 'Showing',
+    to: 'to',
+    of: 'of',
+    entries: 'entries',
+    goToFirstPage: 'Go to first page',
+    goToPreviousPage: 'Go to previous page',
+    goToPage: 'Go to page',
+    goToNextPage: 'Go to next page',
+    goToLastPage: 'Go to last page',
   },
 
   errorBoundary: {
@@ -115,5 +146,9 @@ export default {
     componentStack: 'Component Stack',
     tryAgain: 'Try Again',
     goHome: 'Go Home',
+  },
+
+  page: {
+    presentations: 'Presentations',
   },
 };

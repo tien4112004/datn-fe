@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useLoaderData } from 'react-router-dom';
-import OutlineCreationView from '@/features/presentation/components/OutlineCreationView';
-import WorkspaceView from '@/features/presentation/components/WorkspaceView';
+import { OutlineCreationView, WorkspaceView } from '@/features/presentation/components';
 import type { ModelOption } from '@/features/model';
 import { SidebarTrigger } from '@/shared/components/ui/sidebar';
 import type { OutlineData } from '@/features/presentation/types';

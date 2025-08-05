@@ -1,5 +1,5 @@
 import { API_MODE, type ApiMode } from '@/shared/constants';
-import { type PresentationApiService, type OutlineItem } from '../types';
+import { type PresentationApiService, type OutlineItem, type PresentationItem } from '../types';
 import { marked } from 'marked';
 // import api from '@/shared/api';
 
@@ -69,8 +69,14 @@ export default class PresentationRealApiService implements PresentationApiServic
     return API_MODE.real;
   }
 
-  async getPresentationItems(): Promise<OutlineItem[]> {
-    // toi yeu react
+  async getPresentationItems(): Promise<PresentationItem[]> {
+    console.warn('getPresentationItems is not implemented in PresentationRealApiService');
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    // TODO: Implement real API call
+    return [];
+  }
+
+  async getOutlineItems(): Promise<OutlineItem[]> {
     await new Promise((resolve) => setTimeout(resolve, 50));
     return splitMarkdownToOutlineItems(mockOutlineOutput);
   }

@@ -214,7 +214,10 @@ jobs:
           else
             # Pull environment variables to get actual PRESENTATION_URL value
             vercel env pull .env.local --environment=preview --git-branch=${{ github.head_ref }} --token=${{ secrets.VERCEL_TOKEN }}
-            DESTINATION_URL=$(grep PRESENTATION_URL .env.local | cut -d '=' -f2 | tr -d '"' || echo "https://datn-fe-presentation.vercel.app")
+            DESTINATION_URL=$(grep PRESENTATION_URL .env.local | cut -d '=' -f2 | tr -d '"')
+            if [ -z "$DESTINATION_URL" ]; then
+              DESTINATION_URL="https://datn-fe-presentation.vercel.app"
+            fi
           fi
 
           cat <<EOF > vercel.json

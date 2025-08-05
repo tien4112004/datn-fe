@@ -72,6 +72,11 @@ export default {
       examplePrompt6: 'Lập dàn ý bài trình bày về các nghề giúp ích cho cộng đồng và vai trò của họ.',
       generateOutline: 'Tạo dàn ý',
     },
+    list: {
+      title: 'Danh sách bài trình bày',
+      createNewPresentation: 'Tạo bài trình bày mới',
+      viewEditor: 'Xem trình chỉnh sửa',
+    },
     workspace: {
       title: 'Tùy chỉnh',
       loading: 'Đang tải...',
@@ -105,6 +110,33 @@ export default {
       },
     },
   },
+
+  table: {
+    presentation: {
+      id: 'ID',
+      title: 'Tiêu đề',
+      description: 'Mô tả',
+      createdAt: 'Ngày tạo',
+      status: 'Trạng thái',
+      emptyState: 'Không có bài trình bày nào được tìm thấy',
+    },
+    actionButton: {
+      edit: 'Chỉnh sửa',
+      delete: 'Xóa',
+    },
+    actions: 'Hành động',
+    rowsPerPage: 'Số hàng mỗi trang',
+    showing: 'Hiển thị',
+    to: 'đến',
+    of: 'trên',
+    entries: 'mục',
+    goToFirstPage: 'Đi đến trang đầu',
+    goToPreviousPage: 'Đi đến trang trước',
+    goToPage: 'Đi đến trang',
+    goToNextPage: 'Đi đến trang tiếp theo',
+    goToLastPage: 'Đi đến trang cuối',
+  },
+
   errorBoundary: {
     title: 'Đã xảy ra lỗi',
     description: 'Chúng tôi gặp phải một lỗi không mong muốn. Nhóm của chúng tôi đã được thông báo.',
@@ -114,5 +146,9 @@ export default {
     componentStack: 'Ngăn xếp thành phần',
     tryAgain: 'Thử lại',
     goHome: 'Về trang chủ',
+  },
+
+  page: {
+    presentations: 'Bài trình bày',
   },
 };

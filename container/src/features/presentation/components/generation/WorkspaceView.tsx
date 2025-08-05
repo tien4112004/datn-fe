@@ -16,13 +16,9 @@ import {
   SelectValue,
 } from '@/shared/components/ui/select';
 import { useModels } from '@/features/model';
-import { PRESENTATION_STYLES } from '@/features/presentation/constants/styles';
+import { PRESENTATION_STYLES, SLIDE_COUNT_OPTIONS } from '@/features/presentation/constants';
 import type { OutlineData, OutlineItem } from '@/features/presentation/types/outline';
 import { usePresentationOutlines } from '@/features/presentation/hooks/useApi';
-
-interface WorkspaceViewProps {
-  initialOutlineData: OutlineData | null;
-}
 
 type OutlineFormData = {
   slideCount: string;
@@ -37,36 +33,87 @@ type CustomizationFormData = {
   imageModel: string;
 };
 
-interface WorkspaceHeaderProps {
-  title: string;
+interface WorkspaceViewProps {
+  initialOutlineData: OutlineData | null;
 }
+
+const WorkspaceView = ({ initialOutlineData }: WorkspaceViewProps) => {
+  const { t } = useTranslation('presentation', { keyPrefix: 'workspace' });
+  const { outlineItems, refetch, isFetching } = usePresentationOutlines();
+  const [items, setItems] = useState<OutlineItem[]>([]);
+  const { control: outlineControl, handleSubmit: handleRegenerateSubmit } = useForm<OutlineFormData>({
+    defaultValues: {
+      slideCount: initialOutlineData?.slideCount || '',
+      style: initialOutlineData?.style || '',
+      model: initialOutlineData?.model || '',
+      prompt: initialOutlineData?.prompt || '',
+    },
+  });
+
+  const {
+    control: customizationControl,
+    setValue,
+    watch,
+    handleSubmit: handleCustomizationSubmit,
+  } = useForm<CustomizationFormData>({
+    defaultValues: {
+      theme: '',
+      contentLength: '',
+      imageModel: '',
+    },
+  });
+
+  useEffect(() => {
+    setItems([...outlineItems]);
+  }, [isFetching]);
+
+  const onRegenerateOutline = (data: OutlineFormData) => {
+    console.log('Regenerating outline with data:', data);
+    // TODO: Implement outline regeneration
+
+    //
+    refetch();
+  };
+
+  const onSubmitPresentation = (data: CustomizationFormData) => {
+    const fullData = {
+      ...data,
+      items,
+    };
+    console.log('Form data:', fullData);
+  };
+
+  return (
+    <div className="flex min-h-[calc(100vh-1rem)] w-full max-w-3xl flex-col items-center justify-center self-center p-8">
+      <div className="flex flex-col gap-4">
+        <div className="flex w-full items-center justify-between">
+          <h1 className="text-3xl font-bold leading-10 text-neutral-900">{t('title')}</h1>
+        </div>
+
+        <OutlineFormSection
+          control={outlineControl}
+          isFetching={isFetching}
+          onSubmit={handleRegenerateSubmit(onRegenerateOutline)}
+        />
+
+        <OutlineSection items={items} setItems={setItems} isFetching={isFetching} />
+
+        <CustomizationSection
+          control={customizationControl}
+          watch={watch}
+          setValue={setValue}
+          onSubmit={handleCustomizationSubmit(onSubmitPresentation)}
+        />
+      </div>
+    </div>
+  );
+};
 
 interface OutlineFormSectionProps {
   control: Control<OutlineFormData>;
   isFetching: boolean;
   onSubmit: (data: OutlineFormData) => void;
 }
-
-interface OutlineSectionProps {
-  items: OutlineItem[];
-  setItems: (items: OutlineItem[]) => void;
-  isFetching: boolean;
-}
-
-interface CustomizationSectionProps {
-  control: Control<CustomizationFormData>;
-  watch: any;
-  setValue: any;
-  onSubmit: (data: CustomizationFormData) => void;
-}
-
-const WorkspaceHeader = ({ title }: WorkspaceHeaderProps) => {
-  return (
-    <div className="flex w-full items-center justify-between">
-      <h1 className="text-3xl font-bold leading-10 text-neutral-900">{title}</h1>
-    </div>
-  );
-};
 
 const OutlineFormSection = ({ control, isFetching, onSubmit }: OutlineFormSectionProps) => {
   const { t } = useTranslation('presentation', { keyPrefix: 'createOutline' });
@@ -89,7 +136,7 @@ const OutlineFormSection = ({ control, isFetching, onSubmit }: OutlineFormSectio
                 <SelectContent>
                   <SelectGroup>
                     <SelectLabel>{t('slideCountLabel')}</SelectLabel>
-                    {[1, 2, 3, 4, 5, 10, 15, 20, 25, 30, 36].map((num) => (
+                    {SLIDE_COUNT_OPTIONS.map((num) => (
                       <SelectItem key={num} value={num.toString()}>
                         {num} {t('slideCountUnit')}
                       </SelectItem>
@@ -165,6 +212,12 @@ const OutlineFormSection = ({ control, isFetching, onSubmit }: OutlineFormSectio
   );
 };
 
+interface OutlineSectionProps {
+  items: OutlineItem[];
+  setItems: (items: OutlineItem[]) => void;
+  isFetching: boolean;
+}
+
 const OutlineSection = ({ items, setItems, isFetching }: OutlineSectionProps) => {
   const { t } = useTranslation('presentation', { keyPrefix: 'workspace' });
 
@@ -189,6 +242,13 @@ const OutlineSection = ({ items, setItems, isFetching }: OutlineSectionProps) =>
   );
 };
 
+interface CustomizationSectionProps {
+  control: Control<CustomizationFormData>;
+  watch: any;
+  setValue: any;
+  onSubmit: (data: CustomizationFormData) => void;
+}
+
 const CustomizationSection = ({ control, watch, setValue, onSubmit }: CustomizationSectionProps) => {
   const { t } = useTranslation('presentation', { keyPrefix: 'workspace' });
   const { handleSubmit } = useForm<CustomizationFormData>();
@@ -205,74 +265,5 @@ const CustomizationSection = ({ control, watch, setValue, onSubmit }: Customizat
   );
 };
 
-const WorkspaceView = ({ initialOutlineData }: WorkspaceViewProps) => {
-  const { t } = useTranslation('presentation', { keyPrefix: 'workspace' });
-  const { outlineItems, refetch, isFetching } = usePresentationOutlines();
-  const [items, setItems] = useState<OutlineItem[]>([]);
-  const { control: outlineControl, handleSubmit: handleRegenerateSubmit } = useForm<OutlineFormData>({
-    defaultValues: {
-      slideCount: initialOutlineData?.slideCount || '',
-      style: initialOutlineData?.style || '',
-      model: initialOutlineData?.model || '',
-      prompt: initialOutlineData?.prompt || '',
-    },
-  });
-
-  const {
-    control: customizationControl,
-    setValue,
-    watch,
-    handleSubmit: handleCustomizationSubmit,
-  } = useForm<CustomizationFormData>({
-    defaultValues: {
-      theme: '',
-      contentLength: '',
-      imageModel: '',
-    },
-  });
-
-  useEffect(() => {
-    setItems([...outlineItems]);
-  }, [isFetching]);
-
-  const onRegenerateOutline = (data: OutlineFormData) => {
-    console.log('Regenerating outline with data:', data);
-    // TODO: Implement outline regeneration
-
-    //
-    refetch();
-  };
-
-  const onSubmitPresentation = (data: CustomizationFormData) => {
-    const fullData = {
-      ...data,
-      items,
-    };
-    console.log('Form data:', fullData);
-  };
-
-  return (
-    <div className="flex min-h-[calc(100vh-1rem)] w-full max-w-3xl flex-col items-center justify-center self-center p-8">
-      <div className="flex flex-col gap-4">
-        <WorkspaceHeader title={t('title')} />
-
-        <OutlineFormSection
-          control={outlineControl}
-          isFetching={isFetching}
-          onSubmit={handleRegenerateSubmit(onRegenerateOutline)}
-        />
-
-        <OutlineSection items={items} setItems={setItems} isFetching={isFetching} />
-
-        <CustomizationSection
-          control={customizationControl}
-          watch={watch}
-          setValue={setValue}
-          onSubmit={handleCustomizationSubmit(onSubmitPresentation)}
-        />
-      </div>
-    </div>
-  );
-};
-
 export default WorkspaceView;
+export { OutlineFormSection, OutlineSection, CustomizationSection };

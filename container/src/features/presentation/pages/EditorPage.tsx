@@ -1,4 +1,4 @@
-import PresentationWrapper from '@/features/presentation/components/PresentationWrapper';
+import { PresentationWrapper } from '@/features/presentation/components';
 
 const EditorPage = () => {
   return <PresentationWrapper />;

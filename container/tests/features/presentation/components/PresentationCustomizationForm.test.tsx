@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import PresentationCustomizationForm from '@/features/presentation/components/PresentationCustomizationForm';
+import PresentationCustomizationForm from '@/features/presentation/components/generation/PresentationCustomizationForm';
 import type { Control } from 'react-hook-form';
 
 // Mock dependencies

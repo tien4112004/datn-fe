@@ -1,8 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import OutlineForm from '@/features/presentation/components/OutlineForm';
-import type { OutlineFormProps } from '@/features/presentation/components/OutlineForm';
+import OutlineForm from '@/features/presentation/components/generation/OutlineForm';
+import type { OutlineFormProps } from '@/features/presentation/components/generation/OutlineForm';
 
 // Mock dependencies
 vi.mock('react-i18next', () => ({
@@ -114,7 +114,7 @@ vi.mock('@/shared/components/ui/autosize-textarea', () => ({
   ),
 }));
 
-vi.mock('@/features/presentation/components/ExamplePrompts', () => ({
+vi.mock('@/features/presentation/components/generation/ExamplePrompts', () => ({
   default: vi.fn(({ onExampleClick, promptInput }: any) => (
     <div data-testid="example-prompts">
       <button data-testid="example-button" onClick={() => onExampleClick('Example prompt')}>

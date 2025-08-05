@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import OutlineCreationView from '@/features/presentation/components/OutlineCreationView';
+import OutlineCreationView from '@/features/presentation/components/generation/OutlineCreationView';
 import type { ModelOption } from '@/features/model';
 
 // Mock dependencies
@@ -25,7 +25,7 @@ vi.mock('@/shared/components/ui/button', () => ({
   ),
 }));
 
-vi.mock('@/features/presentation/components/OutlineForm', () => ({
+vi.mock('@/features/presentation/components/generation/OutlineForm', () => ({
   default: vi.fn(
     ({ promptInput, setPromptInput, slideCount, setSlideCount, style, setStyle, model, setModel }: any) => (
       <div data-testid="outline-form">

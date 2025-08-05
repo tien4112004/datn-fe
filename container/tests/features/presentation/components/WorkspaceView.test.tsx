@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import WorkspaceView from '@/features/presentation/components/WorkspaceView';
+import WorkspaceView from '@/features/presentation/components/generation/WorkspaceView';
 import type { OutlineData } from '@/features/presentation/types/outline';
 
 // Mock dependencies
@@ -140,7 +140,7 @@ vi.mock('@/features/presentation/hooks/useApi', () => ({
   })),
 }));
 
-vi.mock('@/features/presentation/components/OutlineWorkspace', () => ({
+vi.mock('@/features/presentation/components/generation/OutlineWorkspace', () => ({
   default: vi.fn(({ items, setItems, isFetching }: any) => (
     <div data-testid="outline-workspace">
       <span data-testid="items-count">{items.length}</span>
@@ -152,7 +152,7 @@ vi.mock('@/features/presentation/components/OutlineWorkspace', () => ({
   )),
 }));
 
-vi.mock('@/features/presentation/components/PresentationCustomizationForm', () => ({
+vi.mock('@/features/presentation/components/generation/PresentationCustomizationForm', () => ({
   default: vi.fn(() => (
     <div data-testid="presentation-customization-form">
       <button data-testid="submit-customization">Submit Customization</button>

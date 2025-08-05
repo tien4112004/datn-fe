@@ -29,7 +29,9 @@ const OutlineCard = ({
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: `outline-card-${id.toString()}`,
   });
-  const editor = useRichTextEditor();
+  const editor = useRichTextEditor({
+    trailingBlock: false,
+  });
 
   React.useEffect(() => {
     async function loadInitialHTML() {

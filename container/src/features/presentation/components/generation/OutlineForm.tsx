@@ -11,7 +11,7 @@ import { Card, CardContent, CardTitle } from '@/shared/components/ui/card';
 import { AutosizeTextarea } from '@/shared/components/ui/autosize-textarea';
 import { useTranslation } from 'react-i18next';
 import ExamplePrompts from './ExamplePrompts';
-import { PRESENTATION_STYLES } from '../constants/styles';
+import { PRESENTATION_STYLES, SLIDE_COUNT_OPTIONS } from '../../constants';
 import { useModels } from '@/features/model';
 
 export interface OutlineFormProps {
@@ -37,7 +37,6 @@ const OutlineForm = ({
 }: OutlineFormProps) => {
   const { t } = useTranslation('presentation', { keyPrefix: 'createOutline' });
   const { models } = useModels();
-  const slideCountOptions = [1, 2, 3, 4, 5, 10, 15, 20, 25, 30, 36];
 
   function handleExampleClick(example: string) {
     setPromptInput(example);
@@ -66,7 +65,7 @@ const OutlineForm = ({
                 <SelectContent>
                   <SelectGroup>
                     <SelectLabel>{t('slideCountLabel')}</SelectLabel>
-                    {slideCountOptions.map((num) => (
+                    {SLIDE_COUNT_OPTIONS.map((num) => (
                       <SelectItem key={num} value={num.toString()}>
                         {num} {t('slideCountUnit')}
                       </SelectItem>

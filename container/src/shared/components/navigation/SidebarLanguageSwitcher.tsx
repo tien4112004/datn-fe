@@ -51,8 +51,8 @@ const SidebarLanguageSwitcher = () => {
                     change(language.code);
                   }}
                 >
-                  {active && <Check className="mr-2 h-4 w-4" />}
-                  <span className="text-lg leading-none">{language.flag}</span> {language.name}
+                  <span className="text-lg leading-none">{language.flag}</span>{language.name}
+                  {active && <Check className="ml-auto h-4 w-4" />}
                 </Button>
               );
             })}

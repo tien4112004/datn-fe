@@ -51,7 +51,7 @@ const OutlineCard = ({
   };
 
   const handleContentChange = async (editor: BlockNoteEditor) => {
-    const htmlContent = await editor.blocksToHTMLLossy(editor.document);
+    const htmlContent = await editor.blocksToFullHTML(editor.document);
     onContentChange(htmlContent);
   };
 

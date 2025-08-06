@@ -42,7 +42,7 @@ const SidebarLanguageSwitcher = () => {
                   key={language.code}
                   variant="ghost"
                   className={clsx(
-                    'hover:bg-primary hover:text-primary-foreground w-full justify-start text-left',
+                    'hover:bg-primary hover:text-primary-foreground w-full justify-start px-3 text-left',
                     active && 'bg-accent hover:bg-secondary hover:text-secondary-foreground',
                     index === 0 && 'rounded-bl-none rounded-br-none',
                     index === LANGUAGES.length - 1 && 'rounded-tl-none rounded-tr-none'
@@ -51,7 +51,8 @@ const SidebarLanguageSwitcher = () => {
                     change(language.code);
                   }}
                 >
-                  <span className="text-lg leading-none">{language.flag}</span>{language.name}
+                  <span className="text-lg leading-none">{language.flag}</span>
+                  <span>{language.name}</span>
                   {active && <Check className="ml-auto h-4 w-4" />}
                 </Button>
               );

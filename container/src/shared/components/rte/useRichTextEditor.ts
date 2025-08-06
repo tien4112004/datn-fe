@@ -9,11 +9,14 @@ export const useRichTextEditor = (
   const { i18n } = useTranslation();
   const currentLanguage = i18n.language;
 
-  return useCreateBlockNote({
-    dictionary: {
-      ...(locales[currentLanguage as keyof typeof locales] || locales.en),
-      ...options.dictionary,
+  return useCreateBlockNote(
+    {
+      dictionary: {
+        ...(locales[currentLanguage as keyof typeof locales] || locales.en),
+        ...options.dictionary,
+      },
+      ...options,
     },
-    ...options,
-  });
+    [currentLanguage]
+  );
 };

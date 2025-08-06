@@ -9,7 +9,7 @@ const mockEditor = {
   tryParseHTMLToBlocks: vi.fn().mockResolvedValue([]),
   replaceBlocks: vi.fn(),
   document: [],
-  blocksToHTMLLossy: vi.fn().mockResolvedValue('<p>test content</p>'),
+  blocksToFullHTML: vi.fn().mockResolvedValue('<p>test content</p>'),
 };
 
 vi.mock('@/shared/components/rte/useRichTextEditor', () => ({

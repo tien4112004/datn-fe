@@ -7,7 +7,7 @@ import './style.css';
 export default function RichTextEditor({
   children,
   ...props
-}: React.PropsWithChildren<BlockNoteViewProps<any, any, any> & { className?: string }>) {
+}: React.PropsWithChildren<BlockNoteViewProps<any, any, any> & { className?: string; onBlur?: () => void }>) {
   return (
     <>
       {children}

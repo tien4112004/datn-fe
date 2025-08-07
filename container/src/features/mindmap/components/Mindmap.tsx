@@ -1,160 +1,18 @@
-import React, { useCallback, useState, useMemo } from 'react';
+import React from 'react';
 
 import '@xyflow/react/dist/style.css';
 import { Plus, Trash2 } from 'lucide-react';
 import MindMapNode from './MindmapNode';
-import {
-  addEdge,
-  Background,
-  BackgroundVariant,
-  Controls,
-  MiniMap,
-  ReactFlow,
-  useEdgesState,
-  useNodesState,
-  type Connection,
-  type Edge,
-  type Node,
-  type XYPosition,
-} from '@xyflow/react';
+import { Background, BackgroundVariant, Controls, MiniMap, ReactFlow } from '@xyflow/react';
+import { useMindmap } from '../context/MindmapContext';
 
 const nodeTypes = {
   mindMapNode: MindMapNode,
 };
 
-const initialNodes: Node[] = [
-  {
-    id: '1',
-    type: 'mindMapNode',
-    position: { x: 400, y: 300 },
-    data: { label: 'Central Idea', level: 0 },
-  },
-  {
-    id: '2',
-    type: 'mindMapNode',
-    position: { x: 200, y: 200 },
-    data: { label: 'Branch 1', level: 1 },
-  },
-  {
-    id: '3',
-    type: 'mindMapNode',
-    position: { x: 200, y: 400 },
-    data: { label: 'Branch 2', level: 1 },
-  },
-  {
-    id: '4',
-    type: 'mindMapNode',
-    position: { x: 600, y: 200 },
-    data: { label: 'Branch 3', level: 1 },
-  },
-  {
-    id: '5',
-    type: 'mindMapNode',
-    position: { x: 50, y: 150 },
-    data: { label: 'Sub-idea 1.1', level: 2 },
-  },
-  {
-    id: '6',
-    type: 'mindMapNode',
-    position: { x: 50, y: 250 },
-    data: { label: 'Sub-idea 1.2', level: 2 },
-  },
-];
-
-const initialEdges: Edge[] = [
-  {
-    id: 'e1-2',
-    source: '1',
-    target: '2',
-    type: 'smoothstep',
-  },
-  {
-    id: 'e1-3',
-    source: '1',
-    target: '3',
-    type: 'smoothstep',
-  },
-  {
-    id: 'e1-4',
-    source: '1',
-    target: '4',
-    type: 'smoothstep',
-  },
-  {
-    id: 'e2-5',
-    source: '2',
-    target: '5',
-    type: 'smoothstep',
-  },
-  {
-    id: 'e2-6',
-    source: '2',
-    target: '6',
-    type: 'smoothstep',
-  },
-];
-
 const MindMap: React.FC = () => {
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
-  const [nodeId, setNodeId] = useState(7);
-
-  const onConnect = useCallback(
-    (params: Edge | Connection) => {
-      const edge = {
-        ...params,
-        type: 'smoothstep',
-        style: { stroke: 'var(--primary)', strokeWidth: 2 },
-      };
-      setEdges((eds: any) => addEdge(edge, eds));
-    },
-    [setEdges]
-  );
-
-  const addChildNode = (parentNode: Node, position: XYPosition) => {
-    const newNode = {
-      id: nanoid(),
-      type: 'mindmap',
-      data: { label: 'New Node' },
-      position,
-      parentNode: parentNode.id,
-    };
-
-    const newEdge = {
-      id: nanoid(),
-      source: parentNode.id,
-      target: newNode.id,
-    };
-
-    setNodes((nds: any) => [...nds, newNode]);
-    setEdges((eds: any) => [...eds, newEdge]);
-  };
-
-  const addNode = useCallback(() => {
-    const newNode: Node = {
-      id: nodeId.toString(),
-      type: 'mindMapNode',
-      position: {
-        x: Math.random() * 500 + 100,
-        y: Math.random() * 400 + 100,
-      },
-      data: { label: `New Node ${nodeId}`, level: 1 },
-    };
-
-    setNodes((nds: any) => [...nds, newNode]);
-    setNodeId((id) => id + 1);
-  }, [nodeId, setNodes]);
-
-  const deleteSelectedNodes = useCallback(() => {
-    setNodes((nds: any) => nds.filter((node: any) => !node.selected));
-    setEdges((eds: any) =>
-      eds.filter((edge: any) => {
-        const sourceExists = nodes.some((node) => node.id === edge.source && !node.selected);
-        const targetExists = nodes.some((node) => node.id === edge.target && !node.selected);
-        return sourceExists && targetExists;
-      })
-    );
-  }, [setNodes, setEdges, nodes]);
+  const { nodes, edges, onNodesChange, onEdgesChange, onConnect, addNode, deleteSelectedNodes } =
+    useMindmap();
 
   const proOptions = { hideAttribution: true };
 
@@ -187,6 +45,18 @@ const MindMap: React.FC = () => {
           <Trash2 size={16} />
           Delete Selected
         </button>
+
+        <button
+          className="flex items-center gap-2 rounded-lg px-4 py-2 shadow-md transition-colors hover:opacity-90"
+          onClick={() => {
+            console.log(nodes);
+            console.log(edges);
+          }}
+        >
+          <span className="sr-only">Log Nodes and Edges</span>
+          <Trash2 size={16} />
+          Log Data
+        </button>
       </div>
 
       {/* Instructions */}
@@ -218,8 +88,6 @@ const MindMap: React.FC = () => {
         onConnect={onConnect}
         nodeTypes={nodeTypes}
         proOptions={proOptions}
-        fitView
-        attributionPosition="bottom-left"
       >
         <Controls className="!border-border !bg-white/90" style={{ border: '1px solid var(--border)' }} />
 
@@ -247,6 +115,3 @@ const MindMap: React.FC = () => {
 };
 
 export default MindMap;
-function nanoid() {
-  throw new Error('Function not implemented.');
-}

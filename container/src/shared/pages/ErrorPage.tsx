@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import React from 'react';
 
 interface ErrorPageProps {
   error?: Error;
@@ -14,15 +15,9 @@ interface ErrorPageProps {
   showDetails?: boolean;
 }
 
-const ErrorPage: React.FC<ErrorPageProps> = ({
-  error,
-  errorInfo,
-  resetError,
-  errorId,
-  showDetails = false,
-}) => {
-  const { t } = useTranslation('errorBoundary');
+const ErrorPage = ({ error, errorInfo, resetError, errorId, showDetails = false }: ErrorPageProps) => {
   const { open, toggleSidebar } = useSidebar();
+  const { t } = useTranslation('errorBoundary');
 
   const goHome = () => {
     window.location.href = '/';
@@ -36,9 +31,11 @@ const ErrorPage: React.FC<ErrorPageProps> = ({
     }
   };
 
-  if (open) {
-    toggleSidebar();
-  }
+  React.useEffect(() => {
+    if (open) {
+      toggleSidebar();
+    }
+  }, []);
 
   return (
     <>

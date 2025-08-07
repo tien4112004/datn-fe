@@ -4,15 +4,18 @@ import { Separator } from '@radix-ui/react-separator';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import React from 'react';
 
 const NotFoundPage = () => {
   const navigate = useNavigate();
   const { t } = useTranslation('page');
   const { open, toggleSidebar } = useSidebar();
 
-  if (open) {
-    toggleSidebar();
-  }
+  React.useEffect(() => {
+    if (open) {
+      toggleSidebar();
+    }
+  }, []);
 
   return (
     <>

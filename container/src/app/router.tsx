@@ -3,6 +3,7 @@ import NavLayout from '../shared/layouts/SidebarLayout';
 import Presentation from '@/features/presentation';
 import Demo from '@/features/demo';
 import { getDefaultModel } from '@/features/model';
+import Mindmap from '@/features/mindmap';
 
 const router = createBrowserRouter([
   {
@@ -19,6 +20,10 @@ const router = createBrowserRouter([
       {
         path: 'presentation/editor',
         Component: Presentation.EditorPage,
+      },
+      {
+        path: 'demo',
+        Component: Mindmap.MindmapPage,
       },
       {
         path: 'presentation/:presentationId',

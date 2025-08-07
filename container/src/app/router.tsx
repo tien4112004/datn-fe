@@ -3,6 +3,7 @@ import NavLayout from '../shared/layouts/SidebarLayout';
 import Presentation from '@/features/presentation';
 import Demo from '@/features/demo';
 import { getDefaultModel } from '@/features/model';
+import NotFoundPage from '@/shared/pages/NotFoundPage';
 
 const router = createBrowserRouter([
   {
@@ -40,6 +41,10 @@ const router = createBrowserRouter([
       //   path: 'presentation/outline',
       //   Component: Presentation.OutlineWorkspacePage,
       // },
+      {
+        path: '*',
+        Component: NotFoundPage,
+      },
     ],
   },
 ]);

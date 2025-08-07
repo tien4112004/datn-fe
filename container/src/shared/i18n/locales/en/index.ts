@@ -150,5 +150,10 @@ export default {
 
   page: {
     presentations: 'Presentations',
+    notFound: '404 Not Found',
+    pageNotFound: 'Page Not Found',
+    pageNotFoundDescription: 'Sorry, the page you are looking for does not exist or may have been moved.',
+    goBack: 'Go Back',
+    goHome: 'Go Home',
   },
 };

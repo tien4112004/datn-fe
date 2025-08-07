@@ -225,7 +225,7 @@ jobs:
             fi
           fi
 
-          cat <<EOF > vercel.json
+          cat <<EOF > container/vercel.json
           {
             "rewrites": [
                 {
@@ -240,7 +240,7 @@ jobs:
           }
           EOF
           echo "Generated vercel.json with destination: $DESTINATION_URL"
-          cat vercel.json
+          cat container/vercel.json
 
       - name: Build Vercel
         run: vercel build --token=${{ secrets.VERCEL_TOKEN }}

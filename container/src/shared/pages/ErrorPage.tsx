@@ -1,5 +1,5 @@
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbPage } from '@/components/ui/breadcrumb';
-import { SidebarTrigger } from '@/components/ui/sidebar';
+import { SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
 import { Separator } from '@radix-ui/react-separator';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
@@ -22,6 +22,7 @@ const ErrorPage: React.FC<ErrorPageProps> = ({
   showDetails = false,
 }) => {
   const { t } = useTranslation('errorBoundary');
+  const { open, toggleSidebar } = useSidebar();
 
   const goHome = () => {
     window.location.href = '/';
@@ -34,6 +35,10 @@ const ErrorPage: React.FC<ErrorPageProps> = ({
       window.location.reload();
     }
   };
+
+  if (open) {
+    toggleSidebar();
+  }
 
   return (
     <>

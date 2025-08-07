@@ -1,5 +1,5 @@
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbPage } from '@/components/ui/breadcrumb';
-import { SidebarTrigger } from '@/components/ui/sidebar';
+import { SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
 import { Separator } from '@radix-ui/react-separator';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
@@ -8,6 +8,11 @@ import { useTranslation } from 'react-i18next';
 const NotFoundPage = () => {
   const navigate = useNavigate();
   const { t } = useTranslation('page');
+  const { open, toggleSidebar } = useSidebar();
+
+  if (open) {
+    toggleSidebar();
+  }
 
   return (
     <>

@@ -227,16 +227,14 @@ jobs:
 
           cat <<EOF > vercel.json
           {
-            "routes": [
+            "rewrites": [
                 {
-                    "src": "/vue-remote",
-                    "dest": "$DESTINATION_URL",
-                    "status": 200
+                    "source": "/vue-remote",
+                    "destination": "$DESTINATION_URL"
                 },
                 {
-                    "src": "/[^.]+",
-                    "dest": "/",
-                    "status": 200
+                    "source": "/((?!api/).*)",
+                    "destination": "/"
                 }
             ]
           }

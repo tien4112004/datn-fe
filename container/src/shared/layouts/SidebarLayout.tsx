@@ -32,13 +32,13 @@ function NavLayoutContent() {
 
   return (
     <>
-      <ErrorBoundary>
-        <AppSidebar />
-        <SidebarInset className="bg-accent">
-          {isLoading && <GlobalSpinner text={t('page')} />}
+      <AppSidebar />
+      <SidebarInset className="bg-accent">
+        {isLoading && <GlobalSpinner text={t('page')} />}
+        <ErrorBoundary>
           <Outlet />
-        </SidebarInset>
-      </ErrorBoundary>
+        </ErrorBoundary>
+      </SidebarInset>
     </>
   );
 }

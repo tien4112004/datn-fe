@@ -4,6 +4,7 @@ import { Button } from '@/shared/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import ErrorPage from '@/shared/pages/ErrorPage';
 
 interface ErrorBoundaryState {
   hasError: boolean;
@@ -26,6 +27,26 @@ interface ErrorFallbackProps {
   errorId: string;
   showDetails?: boolean;
 }
+
+const ErrorPageFallback: React.FC<ErrorFallbackProps> = ({
+  error,
+  errorInfo,
+  resetError,
+  errorId,
+  showDetails = true,
+}) => {
+  return (
+    <div className="bg-background flex min-h-screen w-screen flex-col">
+      <ErrorPage
+        error={error}
+        errorInfo={errorInfo}
+        resetError={resetError}
+        errorId={errorId}
+        showDetails={showDetails}
+      />
+    </div>
+  );
+};
 
 const DefaultErrorFallback: React.FC<ErrorFallbackProps> = ({
   error,
@@ -154,7 +175,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
 
   render() {
     if (this.state.hasError && this.state.error) {
-      const FallbackComponent = this.props.fallback || DefaultErrorFallback;
+      const FallbackComponent = this.props.fallback || ErrorPageFallback;
 
       return (
         <FallbackComponent
@@ -172,3 +193,4 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
 }
 
 export default ErrorBoundary;
+export { ErrorPageFallback, DefaultErrorFallback, type ErrorFallbackProps };

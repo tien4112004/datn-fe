@@ -19,6 +19,10 @@ const router = createBrowserRouter([
         Component: Presentation.PresentationListPage,
       },
       {
+        path: 'presentation/outline',
+        Component: Demo.TestOutlineGenerator2,
+      },
+      {
         path: 'presentation/editor',
         Component: Presentation.EditorPage,
       },

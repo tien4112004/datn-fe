@@ -18,7 +18,9 @@ import {
 import { useModels } from '@/features/model';
 import { PRESENTATION_STYLES, SLIDE_COUNT_OPTIONS } from '@/features/presentation/constants';
 import type { OutlineData, OutlineItem } from '@/features/presentation/types/outline';
-import { usePresentationOutlines } from '@/features/presentation/hooks/useApi';
+// import { usePresentationOutlines } from '@/features/presentation/hooks/useApi';
+import useFetchStreaming from '@/features/presentation/hooks/useFetchStreaming';
+import GhostOutlineWorkspace from '@/features/presentation/components/GhostOutlineWorkspace';
 
 type OutlineFormData = {
   slideCount: string;
@@ -39,7 +41,8 @@ interface WorkspaceViewProps {
 
 const WorkspaceView = ({ initialOutlineData }: WorkspaceViewProps) => {
   const { t } = useTranslation('presentation', { keyPrefix: 'workspace' });
-  const { outlineItems, refetch, isFetching } = usePresentationOutlines();
+  // const { outlineItems, refetch, isFetching } = usePresentationOutlines();
+  const { outlineItems, isStreaming, startStream, stopStream, clearContent } = useFetchStreaming();
   const [items, setItems] = useState<OutlineItem[]>([]);
   const { control: outlineControl, handleSubmit: handleRegenerateSubmit } = useForm<OutlineFormData>({
     defaultValues: {
@@ -65,14 +68,16 @@ const WorkspaceView = ({ initialOutlineData }: WorkspaceViewProps) => {
 
   useEffect(() => {
     setItems([...outlineItems]);
-  }, [isFetching]);
+    console.log('Outline items updated:', outlineItems);
+  }, [isStreaming, outlineItems]);
 
   const onRegenerateOutline = (data: OutlineFormData) => {
     console.log('Regenerating outline with data:', data);
     // TODO: Implement outline regeneration
 
     //
-    refetch();
+    // refetch();
+    startStream(data);
   };
 
   const onSubmitPresentation = (data: CustomizationFormData) => {
@@ -92,11 +97,11 @@ const WorkspaceView = ({ initialOutlineData }: WorkspaceViewProps) => {
 
         <OutlineFormSection
           control={outlineControl}
-          isFetching={isFetching}
+          isFetching={isStreaming}
           onSubmit={handleRegenerateSubmit(onRegenerateOutline)}
         />
 
-        <OutlineSection items={items} setItems={setItems} isFetching={isFetching} />
+        <OutlineSection items={items} setItems={setItems} isFetching={isStreaming} />
 
         <CustomizationSection
           control={customizationControl}
@@ -225,10 +230,7 @@ const OutlineSection = ({ items, setItems, isFetching }: OutlineSectionProps) =>
     <>
       <div className="scroll-m-20 text-xl font-semibold tracking-tight">{t('outlineSection')}</div>
       {isFetching ? (
-        <div className="flex w-full items-center justify-center py-12">
-          <span className="border-primary mr-2 inline-block h-6 w-6 animate-spin rounded-full border-4 border-t-transparent" />
-          <span className="text-lg font-medium">{t('loadingOutline')}</span>
-        </div>
+        <GhostOutlineWorkspace items={items} />
       ) : (
         <OutlineWorkspace
           items={items}

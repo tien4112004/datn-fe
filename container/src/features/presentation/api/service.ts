@@ -41,7 +41,7 @@ From your smartphone to your favorite streaming service, AI is everywhere workin
 _AI is like having a super-smart friend who never sleeps and always wants to help!_
 \`\`\``;
 
-async function splitMarkdownToOutlineItems(markdown: string): Promise<OutlineItem[]> {
+function splitMarkdownToOutlineItems(markdown: string): OutlineItem[] {
   const cleanMarkdown = markdown
     .replace(/^```markdown\n/, '')
     .replace(/\n```$/, '')
@@ -50,12 +50,12 @@ async function splitMarkdownToOutlineItems(markdown: string): Promise<OutlineIte
   // Split the markdown into sections based on headings (## and above)
   const sections = cleanMarkdown.split(/(?=^#{2,}\s)/m).filter(Boolean);
 
-  const items = await Promise.all(
-    sections.map(async (section, index) => ({
-      id: index.toString(),
-      htmlContent: await marked.parse(section.trim()),
-    }))
-  );
+  const items =  sections.map((section, index) => ({
+    id: index.toString(),
+    htmlContent: marked.parse(section.trim(), {
+      async: false, 
+    })
+  }));
 
   return items;
 }

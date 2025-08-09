@@ -5,7 +5,7 @@ import { useMindmap } from '../context/MindmapContext';
 import MindMapNodeBlock from './MindmapNode';
 import MindmapEdgeBlock from './MindmapEdge';
 import { Button } from '@/components/ui/button';
-import { useEffect } from 'react';
+import { useShortcuts } from '../hooks/useShortcut';
 
 const nodeTypes = {
   mindMapNode: MindMapNodeBlock,
@@ -51,23 +51,14 @@ const MindMap = () => {
     selectAllNodes,
   } = useMindmap();
 
+  useShortcuts([
+    {
+      key: 'Ctrl+A',
+      callback: selectAllNodes,
+    },
+  ]);
+
   const proOptions = { hideAttribution: true };
-
-  useEffect(() => {
-    // Catch Ctrl + A to select all nodes
-    const keyDownHandler = (event: KeyboardEvent) => {
-      if (event.ctrlKey && event.key === 'a') {
-        event.preventDefault();
-        selectAllNodes();
-      }
-    };
-
-    document.addEventListener('keydown', keyDownHandler);
-
-    return () => {
-      document.removeEventListener('keydown', keyDownHandler);
-    };
-  }, [selectAllNodes]);
 
   return (
     <div className="h-screen w-full" style={{ backgroundColor: 'var(--background)' }}>

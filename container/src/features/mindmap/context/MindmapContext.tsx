@@ -7,8 +7,7 @@ import {
   type XYPosition,
   useReactFlow,
 } from '@xyflow/react';
-import type { MindMapNode } from '../components/MindmapNode';
-import type { MindMapEdge } from '../components/MindmapEdge';
+import type { MindMapNode, MindMapEdge, MindmapContextType } from '../types';
 import { DragHandle, MINDMAP_TYPES } from '../constants';
 import { generateId } from '@/shared/lib/utils';
 
@@ -90,25 +89,6 @@ const initialEdges: MindMapEdge[] = [
   //   },
 ];
 
-interface MindmapContextType {
-  nodes: MindMapNode[];
-  edges: MindMapEdge[];
-  setNodes: React.Dispatch<React.SetStateAction<MindMapNode[]>>;
-  setEdges: React.Dispatch<React.SetStateAction<MindMapEdge[]>>;
-  onNodesChange: (changes: any) => void;
-  onEdgesChange: (changes: any) => void;
-  onConnect: (params: MindMapEdge | Connection) => void;
-  onMouseMove: (event: any) => void;
-  addNode: () => void;
-  deleteSelectedNodes: (event: any) => void;
-  addChildNode: (parentNode: Partial<MindMapNode>, position: XYPosition, sourceHandler?: string) => void;
-  markNodeForDeletion: (nodeId: string) => void;
-  finalizeNodeDeletion: (nodeId: string) => void;
-  selectAllNodesAndEdges: (event: any) => void;
-  copySelectedNodesAndEdges: (event: any) => void;
-  pasteClonedNodesAndEdges: (event: any) => void;
-}
-
 const MindmapContext = createContext<MindmapContextType | undefined>(undefined);
 
 interface MindmapProviderProps {
@@ -134,7 +114,7 @@ export const MindmapProvider: React.FC<MindmapProviderProps> = ({ children }) =>
           strokeWidth: 2,
         },
       };
-      setEdges((eds: any) => addEdge(edge, eds));
+      setEdges((eds: MindMapEdge[]) => addEdge(edge, eds));
     },
     [setEdges]
   );

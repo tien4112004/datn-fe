@@ -47,9 +47,37 @@ export const useShortcut = (shortcut: ShortcutConfig, preventDefault = true) => 
 };
 
 export const useShortcuts = (shortcuts: ShortcutConfig[], preventDefault = true) => {
-  shortcuts.forEach((shortcut) => {
-    useShortcut(shortcut, preventDefault);
-  });
+  useEffect(() => {
+    const handlers = shortcuts.map((shortcut) => {
+      const parsed = parseShortcut(shortcut.key);
+
+      return (event: KeyboardEvent) => {
+        if (
+          event.key.toLowerCase() === parsed.key &&
+          !!event.ctrlKey === parsed.ctrlKey &&
+          !!event.shiftKey === parsed.shiftKey &&
+          !!event.altKey === parsed.altKey
+        ) {
+          if (preventDefault) {
+            event.preventDefault();
+          }
+          shortcut.callback(event);
+        }
+      };
+    });
+
+    // Add all handlers
+    handlers.forEach((handler) => {
+      window.addEventListener('keydown', handler);
+    });
+
+    // Cleanup all handlers
+    return () => {
+      handlers.forEach((handler) => {
+        window.removeEventListener('keydown', handler);
+      });
+    };
+  }, [shortcuts, preventDefault]);
 };
 
 const parseShortcut = (shortcutString: string): ParsedShortcut => {

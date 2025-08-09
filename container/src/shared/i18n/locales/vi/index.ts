@@ -42,6 +42,8 @@ export default {
     outlineCards: 'Mục dàn ý',
     downloadOutline: 'Tải dàn ý',
     downloading: 'Đang tải...',
+    noOutlineCards: 'Không tìm thấy mục dàn ý nào.',
+    clickAddToStart: 'Nhấn "Thêm" để bắt đầu tạo dàn ý của bạn.',
   },
 
   presentation: {

@@ -42,6 +42,8 @@ export default {
     outlineCards: 'Outline Cards',
     downloadOutline: 'Download Outline',
     downloading: 'Downloading...',
+    noOutlineCards: 'No outline cards found.',
+    clickAddToStart: 'Click "Add" to start creating your outline.',
   },
 
   presentation: {

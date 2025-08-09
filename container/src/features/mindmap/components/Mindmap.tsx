@@ -6,6 +6,7 @@ import MindMapNodeBlock from './MindmapNode';
 import MindmapEdgeBlock from './MindmapEdge';
 import { Button } from '@/components/ui/button';
 import { useShortcuts } from '../hooks/useShortcut';
+import { useMemo, useCallback } from 'react';
 
 const nodeTypes = {
   mindMapNode: MindMapNodeBlock,
@@ -31,8 +32,19 @@ const MindMapInstructions = () => {
           <li>• Drag nodes to reposition</li>
           <li>• Click a node and drag from handles to connect</li>
           <li>• Double-click node text to edit</li>
-          <li>• Select nodes and click Delete to remove</li>
-          <li>• Use mouse wheel to zoom</li>
+          <li>• Select nodes and press Delete key or use button</li>
+          <li>• Use mouse wheel to zoom and pan</li>
+          <li>
+            • <strong>Ctrl+A:</strong> Select all nodes and edges
+          </li>
+          <li>
+            • <strong>Ctrl+C:</strong> Copy selected nodes/edges
+          </li>
+          <li>
+            • <strong>Ctrl+V:</strong> Paste at mouse position
+          </li>
+          <li>• Click "Add Node" to create new nodes</li>
+          <li>• Multiple nodes can be selected together</li>
         </ul>
       </div>
     </div>
@@ -46,6 +58,7 @@ const MindMap = () => {
     onNodesChange,
     onEdgesChange,
     onConnect,
+    onMouseMove,
     addNode,
     deleteSelectedNodes,
     selectAllNodesAndEdges,
@@ -53,22 +66,45 @@ const MindMap = () => {
     pasteClonedNodesAndEdges,
   } = useMindmap();
 
-  useShortcuts([
-    {
-      key: 'Ctrl+A',
-      callback: selectAllNodesAndEdges,
-    },
-    {
-      key: 'Ctrl+C',
-      callback: copySelectedNodesAndEdges,
-    },
-    {
-      key: 'Ctrl+V',
-      callback: pasteClonedNodesAndEdges,
-    },
-  ]);
+  const shortcuts = useMemo(
+    () => [
+      {
+        key: 'Ctrl+A',
+        callback: selectAllNodesAndEdges,
+      },
+      {
+        key: 'Ctrl+C',
+        callback: copySelectedNodesAndEdges,
+      },
+      {
+        key: 'Ctrl+V',
+        callback: pasteClonedNodesAndEdges,
+      },
+      {
+        key: 'Delete',
+        callback: deleteSelectedNodes,
+      },
+    ],
+    [selectAllNodesAndEdges, copySelectedNodesAndEdges, pasteClonedNodesAndEdges, deleteSelectedNodes]
+  );
 
-  const proOptions = { hideAttribution: true };
+  useShortcuts(shortcuts);
+
+  const proOptions = useMemo(() => ({ hideAttribution: true }), []);
+
+  const onPaneClick = useCallback(() => {
+    if (window.getSelection) {
+      const selection = window.getSelection();
+      if (selection) {
+        selection.removeAllRanges();
+      }
+    }
+  }, []);
+
+  const logData = useCallback(() => {
+    console.log(nodes);
+    console.log(edges);
+  }, [nodes, edges]);
 
   return (
     <div className="h-screen w-full" style={{ backgroundColor: 'var(--background)' }}>
@@ -84,13 +120,7 @@ const MindMap = () => {
           Delete Selected
         </Button>
 
-        <Button
-          variant={'outline'}
-          onClick={() => {
-            console.log(nodes);
-            console.log(edges);
-          }}
-        >
+        <Button variant={'outline'} onClick={logData}>
           <span className="sr-only">Log Nodes and Edges</span>
           <Trash2 size={16} />
           Log Data
@@ -99,7 +129,6 @@ const MindMap = () => {
 
       {/* Instructions */}
       <MindMapInstructions />
-
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -109,7 +138,8 @@ const MindMap = () => {
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
         proOptions={proOptions}
-        onClick={resetSelectionOnClick()}
+        onPaneMouseMove={onMouseMove}
+        onPaneClick={onPaneClick}
       >
         <Controls />
 
@@ -131,19 +161,3 @@ const MindMap = () => {
 };
 
 export default MindMap;
-
-function resetSelectionOnClick() {
-  return (event: any) => {
-    if (window.getSelection) {
-      const selection = window.getSelection();
-
-      if (
-        selection &&
-        typeof event.target.className === 'string' &&
-        event.target.className.includes('react-flow__pane')
-      ) {
-        selection.removeAllRanges();
-      }
-    }
-  };
-}

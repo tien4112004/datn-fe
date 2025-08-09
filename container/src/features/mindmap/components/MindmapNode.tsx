@@ -53,7 +53,7 @@ const MindMapNodeBlock = memo(({ ...node }: NodeProps<MindMapNode>) => {
   const handleContentChange = async (editor: BlockNoteEditor) => {
     // In a real app, you'd update the node data here
     const htmlContent = await editor.blocksToFullHTML(editor.document);
-    console.log('Content updated:', htmlContent);
+    // console.log('Content updated:', htmlContent);
   };
 
   const handleEditSubmit = () => {

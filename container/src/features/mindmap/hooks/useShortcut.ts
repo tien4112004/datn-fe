@@ -27,7 +27,7 @@ export const useShortcut = (shortcut: ShortcutConfig, preventDefault = true) => 
 
     const keyDownHandler = (event: KeyboardEvent) => {
       if (
-        event.key === parsed.key &&
+        event.key.toLowerCase() === parsed.key &&
         !!event.ctrlKey === parsed.ctrlKey &&
         !!event.shiftKey === parsed.shiftKey &&
         !!event.altKey === parsed.altKey
@@ -50,16 +50,6 @@ export const useShortcuts = (shortcuts: ShortcutConfig[], preventDefault = true)
   shortcuts.forEach((shortcut) => {
     useShortcut(shortcut, preventDefault);
   });
-};
-
-export const createShortcut = (
-  shortcutString: ShortcutKey,
-  callback: (event: KeyboardEvent) => void
-): ShortcutConfig => {
-  return {
-    key: shortcutString,
-    callback,
-  };
 };
 
 const parseShortcut = (shortcutString: string): ParsedShortcut => {

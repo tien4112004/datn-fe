@@ -20,7 +20,7 @@ import { PRESENTATION_STYLES, SLIDE_COUNT_OPTIONS } from '@/features/presentatio
 import type { OutlineData, OutlineItem } from '@/features/presentation/types/outline';
 // import { usePresentationOutlines } from '@/features/presentation/hooks/useApi';
 import useFetchStreaming from '@/features/presentation/hooks/useFetchStreaming';
-import GhostOutlineWorkspace from '@/features/presentation/components/GhostOutlineWorkspace';
+// import GhostOutlineWorkspace from '@/features/presentation/components/GhostOutlineWorkspace';
 
 type OutlineFormData = {
   slideCount: string;
@@ -229,9 +229,9 @@ const OutlineSection = ({ items, setItems, isFetching }: OutlineSectionProps) =>
   return (
     <>
       <div className="scroll-m-20 text-xl font-semibold tracking-tight">{t('outlineSection')}</div>
-      {isFetching ? (
+      {/* {isFetching ? (
         <GhostOutlineWorkspace items={items} />
-      ) : (
+      ) : ( */}
         <OutlineWorkspace
           items={items}
           setItems={setItems}
@@ -239,7 +239,7 @@ const OutlineSection = ({ items, setItems, isFetching }: OutlineSectionProps) =>
             await new Promise((resolve) => setTimeout(resolve, 2000));
           }}
         />
-      )}
+      {/* )} */}
     </>
   );
 };

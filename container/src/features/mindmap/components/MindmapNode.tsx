@@ -1,7 +1,7 @@
 import { Plus, GripVertical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ButtonHandle } from '@/components/button-handle';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo } from 'react';
 import { Handle, Position, useNodeConnections, type Node, type NodeProps } from '@xyflow/react';
 import { BaseNode, BaseNodeContent } from '@/components/base-node';
 import { cn } from '@/shared/lib/utils';
@@ -20,16 +20,14 @@ export type MindMapNode = Node<{
   type: MindMapTypes;
 };
 
-const MindMapNodeBlock = ({ ...node }: NodeProps<MindMapNode>) => {
+const MindMapNodeBlock = memo(({ ...node }: NodeProps<MindMapNode>) => {
   const { data, selected, id } = node;
   const { addChildNode, finalizeNodeDeletion } = useMindmap();
   const [, setIsEditing] = useState(false);
   const [isMouseOver, setIsMouseOver] = useState(false);
   const editor = useRichTextEditor({
     trailingBlock: false,
-    placeholders: {
-      default: '',
-    },
+    placeholders: { default: '', heading: '', emptyBlock: '' },
   });
 
   const connections = useNodeConnections({ id });
@@ -44,8 +42,7 @@ const MindMapNodeBlock = ({ ...node }: NodeProps<MindMapNode>) => {
 
   useEffect(() => {
     async function loadInitialHTML() {
-      const htmlContent = data.content;
-      const blocks = await editor.tryParseHTMLToBlocks(htmlContent);
+      const blocks = await editor.tryParseHTMLToBlocks(data.content);
       editor.replaceBlocks(editor.document, blocks);
     }
     loadInitialHTML();
@@ -83,7 +80,7 @@ const MindMapNodeBlock = ({ ...node }: NodeProps<MindMapNode>) => {
         <BaseNode
           className={cn(
             `rounded-lg border-2 shadow-md transition-all duration-200`,
-            selected ? 'ring-1' : 'ring-0'
+            selected ? 'ring-2' : 'ring-0'
           )}
           onMouseEnter={() => setIsMouseOver(true)}
           onMouseLeave={() => setIsMouseOver(false)}
@@ -178,6 +175,6 @@ const MindMapNodeBlock = ({ ...node }: NodeProps<MindMapNode>) => {
       </motion.div>
     </AnimatePresence>
   );
-};
+});
 
 export default MindMapNodeBlock;

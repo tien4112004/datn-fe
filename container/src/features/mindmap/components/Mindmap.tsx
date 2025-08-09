@@ -4,6 +4,8 @@ import { Background, BackgroundVariant, Controls, MiniMap, ReactFlow } from '@xy
 import { useMindmap } from '../context/MindmapContext';
 import MindMapNodeBlock from './MindmapNode';
 import MindmapEdgeBlock from './MindmapEdge';
+import { Button } from '@/components/ui/button';
+import { useEffect } from 'react';
 
 const nodeTypes = {
   mindMapNode: MindMapNodeBlock,
@@ -38,43 +40,51 @@ const MindMapInstructions = () => {
 };
 
 const MindMap = () => {
-  const { nodes, edges, onNodesChange, onEdgesChange, onConnect, addNode, deleteSelectedNodes } =
-    useMindmap();
+  const {
+    nodes,
+    edges,
+    onNodesChange,
+    onEdgesChange,
+    onConnect,
+    addNode,
+    deleteSelectedNodes,
+    selectAllNodes,
+  } = useMindmap();
 
   const proOptions = { hideAttribution: true };
+
+  useEffect(() => {
+    // Catch Ctrl + A to select all nodes
+    const keyDownHandler = (event: KeyboardEvent) => {
+      if (event.ctrlKey && event.key === 'a') {
+        event.preventDefault();
+        selectAllNodes();
+      }
+    };
+
+    document.addEventListener('keydown', keyDownHandler);
+
+    return () => {
+      document.removeEventListener('keydown', keyDownHandler);
+    };
+  }, [selectAllNodes]);
 
   return (
     <div className="h-screen w-full" style={{ backgroundColor: 'var(--background)' }}>
       {/* Toolbar */}
       <div className="absolute left-4 top-4 z-10 flex gap-2">
-        <button
-          onClick={addNode}
-          className="flex items-center gap-2 rounded-lg px-4 py-2 shadow-md transition-colors hover:opacity-90"
-          style={{
-            backgroundColor: 'var(--primary)',
-            color: 'var(--primary-foreground)',
-          }}
-          title="Add new node"
-        >
+        <Button onClick={addNode} title="Add new node" variant={'default'}>
           <Plus size={16} />
           Add Node
-        </button>
+        </Button>
 
-        <button
-          onClick={deleteSelectedNodes}
-          className="flex items-center gap-2 rounded-lg px-4 py-2 shadow-md transition-colors hover:opacity-90"
-          style={{
-            backgroundColor: 'var(--destructive)',
-            color: 'var(--destructive-foreground)',
-          }}
-          title="Delete selected nodes"
-        >
+        <Button onClick={deleteSelectedNodes} title="Delete selected nodes" variant="destructive">
           <Trash2 size={16} />
           Delete Selected
-        </button>
+        </Button>
 
-        <button
-          className="flex items-center gap-2 rounded-lg px-4 py-2 shadow-md transition-colors hover:opacity-90"
+        <Button
+          variant={'outline'}
           onClick={() => {
             console.log(nodes);
             console.log(edges);
@@ -83,7 +93,7 @@ const MindMap = () => {
           <span className="sr-only">Log Nodes and Edges</span>
           <Trash2 size={16} />
           Log Data
-        </button>
+        </Button>
       </div>
 
       {/* Instructions */}
@@ -98,8 +108,9 @@ const MindMap = () => {
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
         proOptions={proOptions}
+        onClick={resetSelectionOnClick()}
       >
-        <Controls className="!border-border !bg-white/90" style={{ border: '1px solid var(--border)' }} />
+        <Controls />
 
         <MiniMap
           className="!border-border !bg-white/90"
@@ -112,16 +123,26 @@ const MindMap = () => {
           nodeBorderRadius={8}
         />
 
-        <Background
-          variant={BackgroundVariant.Dots}
-          gap={20}
-          size={1}
-          style={{ backgroundColor: 'var(--background)' }}
-          color="var(--muted-foreground)"
-        />
+        <Background variant={BackgroundVariant.Dots} gap={20} size={1} />
       </ReactFlow>
     </div>
   );
 };
 
 export default MindMap;
+
+function resetSelectionOnClick() {
+  return (event: any) => {
+    if (window.getSelection) {
+      const selection = window.getSelection();
+
+      if (
+        selection &&
+        typeof event.target.className === 'string' &&
+        event.target.className.includes('react-flow__pane')
+      ) {
+        selection.removeAllRanges();
+      }
+    }
+  };
+}

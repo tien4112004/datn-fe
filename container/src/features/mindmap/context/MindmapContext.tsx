@@ -96,6 +96,7 @@ interface MindmapContextType {
   addChildNode: (parentNode: Partial<MindMapNode>, position: XYPosition, sourceHandler?: string) => void;
   markNodeForDeletion: (nodeId: string) => void;
   finalizeNodeDeletion: (nodeId: string) => void;
+  selectAllNodes: () => void;
 }
 
 const MindmapContext = createContext<MindmapContextType | undefined>(undefined);
@@ -199,6 +200,10 @@ export const MindmapProvider: React.FC<MindmapProviderProps> = ({ children }) =>
     selectedNodeIds.forEach((nodeId) => markNodeForDeletion(nodeId));
   }, [nodes, markNodeForDeletion]);
 
+  const selectAllNodes = useCallback(() => {
+    setNodes((nds: MindMapNode[]) => nds.map((node: MindMapNode) => ({ ...node, selected: true })));
+  }, [setNodes]);
+
   const value = {
     nodes,
     edges,
@@ -212,6 +217,7 @@ export const MindmapProvider: React.FC<MindmapProviderProps> = ({ children }) =>
     addChildNode,
     markNodeForDeletion,
     finalizeNodeDeletion,
+    selectAllNodes,
   };
 
   return <MindmapContext.Provider value={value}>{children}</MindmapContext.Provider>;

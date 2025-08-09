@@ -161,18 +161,22 @@ jobs:
 
       - name: Generate vercel.json with production rewrites
         run: |
-          cat <<EOF > vercel.json
+          cat <<EOF > container/vercel.json
           {
             "rewrites": [
-              {
-                "source": "/vue-remote",
-                "destination": "https://datn-fe-presentation.vercel.app"
-              }
+                {
+                    "source": "/vue-remote",
+                    "destination": "https://datn-fe-presentation.vercel.app"
+                },
+                {
+                    "source": "/((?!api/).*)",
+                    "destination": "/"
+                }
             ]
           }
           EOF
           echo "Generated vercel.json:"
-          cat vercel.json
+          cat container/vercel.json
 
       - name: Build Vercel
         run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}

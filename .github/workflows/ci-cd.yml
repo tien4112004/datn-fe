@@ -196,42 +196,51 @@ jobs:
       - name: Pull Vercel Environment Information
         run: vercel pull --yes --environment=preview --git-branch=${{ github.head_ref }} --token=${{ secrets.VERCEL_TOKEN }}
 
-      - name: Remove Vercel Environment Variable
-        if: ${{ needs.deploy_presentation.result == 'success' && needs.deploy_presentation.outputs.preview_url != '' }}
-        run: vercel env rm PRESENTATION_URL preview ${{ github.head_ref }} --yes --token=${{ secrets.VERCEL_TOKEN }} || true
+      - name: Set Vercel Environment Variable
+        run: |
+          # Always ensure PRESENTATION_URL is set with a fallback
+          if [ "${{ needs.deploy_presentation.result }}" = "success" ] && [ -n "${{ needs.deploy_presentation.outputs.preview_url }}" ]; then
+            PRESENTATION_URL="${{ needs.deploy_presentation.outputs.preview_url }}"
+          else
+            # Use fallback URL if presentation deployment failed or was skipped
+            PRESENTATION_URL="https://datn-fe-presentation.vercel.app"
+          fi
 
-      - name: Update Vercel Environment Variable
-        if: ${{ needs.deploy_presentation.result == 'success' && needs.deploy_presentation.outputs.preview_url != '' }}
-        run: echo "${{ needs.deploy_presentation.outputs.preview_url }}" | vercel env add PRESENTATION_URL preview ${{ github.head_ref }}  --token=${{ secrets.VERCEL_TOKEN }}
+          # Remove existing env var and add new one
+          vercel env rm PRESENTATION_URL preview ${{ github.head_ref }} --yes --token=${{ secrets.VERCEL_TOKEN }} || true
+          echo "$PRESENTATION_URL" | vercel env add PRESENTATION_URL preview ${{ github.head_ref }} --token=${{ secrets.VERCEL_TOKEN }}
 
       - name: Generate vercel.json with dynamic rewrites
         run: |
-          PREVIEW_PRESENTATION_URL="${{ needs.deploy_presentation.outputs.preview_url }}"
-
-          # Use preview URL if available, otherwise get current PRESENTATION_URL from Vercel
-          if [ "${{ needs.deploy_presentation.result }}" = "success" ] && [ -n "$PREVIEW_PRESENTATION_URL" ]; then
-            DESTINATION_URL="$PREVIEW_PRESENTATION_URL"
+          # Always ensure DESTINATION_URL is set with fallback
+          if [ "${{ needs.deploy_presentation.result }}" = "success" ] && [ -n "${{ needs.deploy_presentation.outputs.preview_url }}" ]; then
+            DESTINATION_URL="${{ needs.deploy_presentation.outputs.preview_url }}"
           else
             # Pull environment variables to get actual PRESENTATION_URL value
             vercel env pull .env.local --environment=preview --git-branch=${{ github.head_ref }} --token=${{ secrets.VERCEL_TOKEN }}
-            DESTINATION_URL=$(grep PRESENTATION_URL .env.local | cut -d '=' -f2 | tr -d '"')
+            DESTINATION_URL=$(grep PRESENTATION_URL .env.local | cut -d '=' -f2 | tr -d '"' 2>/dev/null || echo "")
+            # Always use fallback if DESTINATION_URL is empty
             if [ -z "$DESTINATION_URL" ]; then
               DESTINATION_URL="https://datn-fe-presentation.vercel.app"
             fi
           fi
 
-          cat <<EOF > vercel.json
+          cat <<EOF > container/vercel.json
           {
             "rewrites": [
-              {
-                "source": "/vue-remote",
-                "destination": "$DESTINATION_URL"
-              }
+                {
+                    "source": "/vue-remote",
+                    "destination": "$DESTINATION_URL"
+                },
+                {
+                    "source": "/((?!api/).*)",
+                    "destination": "/"
+                }
             ]
           }
           EOF
           echo "Generated vercel.json with destination: $DESTINATION_URL"
-          cat vercel.json
+          cat container/vercel.json
 
       - name: Build Vercel
         run: vercel build --token=${{ secrets.VERCEL_TOKEN }}

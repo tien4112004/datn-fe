@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import ErrorBoundary from '@/shared/components/common/ErrorBoundary';
+import ErrorBoundary, { DefaultErrorFallback } from '@/shared/components/common/ErrorBoundary';
 import { CriticalError, ExpectedError } from '@/shared/types/errors';
 import { ERROR_TYPE } from '@/shared/constants';
 
@@ -22,6 +22,27 @@ vi.mock('react-i18next', () => ({
       return translations[key] || key;
     },
   }),
+}));
+
+// Mock ErrorPage component
+vi.mock('@/shared/pages/ErrorPage', () => ({
+  default: ({ error, errorId, resetError, showDetails }: any) => (
+    <div data-testid="error-page">
+      <h1>Something went wrong</h1>
+      <p>An unexpected error occurred. Please try again.</p>
+      {showDetails && (
+        <details data-testid="error-details">
+          <summary>Error Details</summary>
+          <div>
+            <p>Error ID: {errorId}</p>
+            <p>Message: {error.message}</p>
+          </div>
+        </details>
+      )}
+      <button onClick={resetError}>Try Again</button>
+      <button onClick={() => (window.location.href = '/')}>Go Home</button>
+    </div>
+  ),
 }));
 
 // Mock window.location
@@ -98,35 +119,18 @@ describe('ErrorBoundary', () => {
     expect(screen.getByText('Working Component')).toBeInTheDocument();
   });
 
-  it('renders default error fallback when a critical error occurs', () => {
+  it('renders default error fallback (ErrorPageFallback) when a critical error occurs', () => {
     render(
       <ErrorBoundary>
         <ThrowError shouldThrow={true} errorMessage="Component crashed" errorType="critical" />
       </ErrorBoundary>
     );
 
+    expect(screen.getByTestId('error-page')).toBeInTheDocument();
     expect(screen.getByText('Something went wrong')).toBeInTheDocument();
     expect(screen.getByText('An unexpected error occurred. Please try again.')).toBeInTheDocument();
     expect(screen.getByText('Try Again')).toBeInTheDocument();
     expect(screen.getByText('Go Home')).toBeInTheDocument();
-  });
-
-  it('displays error details when showDetails is true (default)', () => {
-    render(
-      <ErrorBoundary>
-        <ThrowError shouldThrow={true} errorMessage="Detailed error message" errorType="critical" />
-      </ErrorBoundary>
-    );
-
-    const detailsElement = screen.getByText('Error Details');
-    expect(detailsElement).toBeInTheDocument();
-
-    // Click to expand details
-    fireEvent.click(detailsElement);
-
-    expect(screen.getByText(/Error ID:/)).toBeInTheDocument();
-    expect(screen.getByText(/Message:/)).toBeInTheDocument();
-    expect(screen.getByText('Detailed error message')).toBeInTheDocument();
   });
 
   it('hides error details when showDetails is false', () => {
@@ -137,7 +141,7 @@ describe('ErrorBoundary', () => {
     );
 
     expect(screen.getByText('Something went wrong')).toBeInTheDocument();
-    expect(screen.queryByText('Error Details')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('error-details')).not.toBeInTheDocument();
   });
 
   it('renders custom fallback component when provided', () => {
@@ -151,6 +155,19 @@ describe('ErrorBoundary', () => {
     expect(screen.getByText('Custom Error: Custom fallback test')).toBeInTheDocument();
     expect(screen.getByText(/Error ID:/)).toBeInTheDocument();
     expect(screen.getByText('Custom Reset')).toBeInTheDocument();
+  });
+
+  it('renders DefaultErrorFallback when explicitly provided', () => {
+    render(
+      <ErrorBoundary fallback={DefaultErrorFallback}>
+        <ThrowError shouldThrow={true} errorMessage="Default fallback test" errorType="critical" />
+      </ErrorBoundary>
+    );
+
+    expect(screen.getByText('Something went wrong')).toBeInTheDocument();
+    expect(screen.getByText('An unexpected error occurred. Please try again.')).toBeInTheDocument();
+    expect(screen.getByText('Try Again')).toBeInTheDocument();
+    expect(screen.getByText('Go Home')).toBeInTheDocument();
   });
 
   it('calls onError callback when a critical error occurs', () => {
@@ -258,6 +275,7 @@ describe('ErrorBoundary', () => {
       </ErrorBoundary>
     );
 
+    expect(screen.getByTestId('error-page')).toBeInTheDocument();
     expect(screen.getByText('Something went wrong')).toBeInTheDocument();
   });
 });

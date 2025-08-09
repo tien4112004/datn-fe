@@ -150,5 +150,10 @@ export default {
 
   page: {
     presentations: 'Bài trình bày',
+    notFound: '404 Không tìm thấy',
+    pageNotFound: 'Không tìm thấy trang',
+    pageNotFoundDescription: 'Xin lỗi, trang bạn đang tìm kiếm không tồn tại hoặc có thể đã được di chuyển.',
+    goBack: 'Quay lại',
+    goHome: 'Về trang chủ',
   },
 };

@@ -42,7 +42,7 @@ interface WorkspaceViewProps {
 const WorkspaceView = ({ initialOutlineData }: WorkspaceViewProps) => {
   const { t } = useTranslation('presentation', { keyPrefix: 'workspace' });
   // const { outlineItems, refetch, isFetching } = usePresentationOutlines();
-  const { outlineItems, isStreaming, startStream, stopStream, clearContent } = useFetchStreaming();
+  const { outlineItems, isStreaming, startStream } = useFetchStreaming();
   const [items, setItems] = useState<OutlineItem[]>([]);
   const { control: outlineControl, handleSubmit: handleRegenerateSubmit } = useForm<OutlineFormData>({
     defaultValues: {

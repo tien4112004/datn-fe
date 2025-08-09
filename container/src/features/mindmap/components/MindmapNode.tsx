@@ -57,7 +57,7 @@ const MindMapNodeBlock = memo(({ ...node }: NodeProps<MindMapNode>) => {
   const handleContentChange = async (editor: BlockNoteEditor) => {
     // In a real app, you'd update the node data here
     const htmlContent = await editor.blocksToFullHTML(editor.document);
-    // console.log('Content updated:', htmlContent);
+    console.log('Content updated:', htmlContent);
   };
 
   const handleEditSubmit = () => {
@@ -117,6 +117,7 @@ const MindMapNodeBlock = memo(({ ...node }: NodeProps<MindMapNode>) => {
             style={{
               opacity: (isMouseOver || selected) && canCreateLeft ? 1 : 0,
               visibility: (isMouseOver || selected) && canCreateLeft ? 'visible' : 'hidden',
+              zIndex: 1000,
             }}
             id={`left-source-${id}`}
           >
@@ -142,6 +143,7 @@ const MindMapNodeBlock = memo(({ ...node }: NodeProps<MindMapNode>) => {
             style={{
               opacity: (isMouseOver || selected) && canCreateRight ? 1 : 0,
               visibility: (isMouseOver || selected) && canCreateRight ? 'visible' : 'hidden',
+              zIndex: 1000,
             }}
             id={`right-source-${id}`}
           >

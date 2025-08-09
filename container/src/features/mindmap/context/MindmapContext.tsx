@@ -10,7 +10,7 @@ import {
 import type { MindMapNode, MindMapEdge, MindmapContextType } from '../types';
 import { DragHandle, MINDMAP_TYPES } from '../constants';
 import { generateId } from '@/shared/lib/utils';
-import { stratify, tree } from 'd3-hierarchy';
+import dagre from '@dagrejs/dagre';
 
 const initialNodes: MindMapNode[] = [
   {
@@ -89,48 +89,6 @@ const initialEdges: MindMapEdge[] = [
   //     type: 'smoothstep',
   //   },
 ];
-
-const g = tree();
-
-const getLayoutedElements = (nodes: any[], edges: any[], direction: string) => {
-  if (nodes.length === 0) return { nodes, edges };
-
-  try {
-    const hierarchy = stratify()
-      .id((node: any) => node.id)
-      .parentId((node: any) => {
-        const parentEdge = edges.find((edge: any) => edge.target === node.id);
-        return parentEdge ? parentEdge.source : null;
-      });
-
-    const root = hierarchy(nodes);
-
-    if (direction === 'vertical') {
-      const layout = g.nodeSize([120, 320])(root);
-      return {
-        nodes: layout.descendants().map((node: any) => ({
-          ...node.data,
-          position: { x: node.y, y: node.x },
-        })),
-        edges,
-      };
-    } else {
-      const layout = g
-        .nodeSize([180, 160])
-        .separation((a: any, b: any) => (a.parent === b.parent ? 1 : 1.25))(root);
-      return {
-        nodes: layout.descendants().map((node: any) => ({
-          ...node.data,
-          position: { x: node.x, y: node.y },
-        })),
-        edges,
-      };
-    }
-  } catch (error) {
-    console.warn('Layout calculation failed:', error);
-    return { nodes, edges };
-  }
-};
 
 const MindmapContext = createContext<MindmapContextType | undefined>(undefined);
 
@@ -320,9 +278,70 @@ export const MindmapProvider: React.FC<MindmapProviderProps> = ({ children }) =>
     offset.current = 0;
   }, []);
 
+  const getLayoutedElements = useCallback((nodes: any[], edges: any[], direction: string) => {
+    if (nodes.length === 0) return { nodes, edges };
+
+    try {
+      // Create a new directed graph
+      const g = new dagre.graphlib.Graph();
+
+      // Set an object for the graph label
+      g.setDefaultEdgeLabel(() => ({}));
+
+      // Configure the graph based on direction
+      if (direction === 'vertical') {
+        g.setGraph({ rankdir: 'TB', ranksep: 120 });
+      } else if (direction === 'horizontal') {
+        g.setGraph({ rankdir: 'LR', ranksep: 120 });
+      } else {
+        // No layout - return nodes as is
+        return { nodes, edges };
+      }
+
+      // Add nodes to the graph
+      nodes.forEach((node: any) => {
+        g.setNode(node.id, {
+          width: node.measured?.width || 220,
+          height: node.measured?.height || 40,
+        });
+      });
+
+      // Add edges to the graph
+      edges.forEach((edge: any) => {
+        g.setEdge(edge.source, edge.target);
+      });
+
+      // Calculate the layout
+      dagre.layout(g);
+
+      // Update node positions based on dagre layout
+      const layoutedNodes = nodes.map((node: any) => {
+        const nodeWithPosition = g.node(node.id);
+        return {
+          ...node,
+          position: {
+            // Dagre gives us the center position, adjust to top-left
+            x: nodeWithPosition.x - (nodeWithPosition.width || 150) / 2,
+            y: nodeWithPosition.y - (nodeWithPosition.height || 40) / 2,
+          },
+        };
+      });
+
+      return {
+        nodes: layoutedNodes,
+        edges,
+      };
+    } catch (error) {
+      console.warn('Layout calculation failed:', error);
+      return { nodes, edges };
+    }
+  }, []);
+
   const updateLayout = useCallback(
     (direction: string) => {
       if (!nodes?.length || !edges) return;
+
+      console.log('Updating layout with direction:', direction);
 
       const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(nodes, edges, direction);
 

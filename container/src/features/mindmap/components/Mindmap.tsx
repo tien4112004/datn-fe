@@ -1,12 +1,12 @@
 import '@xyflow/react/dist/style.css';
-import { Background, BackgroundVariant, Controls, MiniMap, ReactFlow, useReactFlow } from '@xyflow/react';
+import { Background, BackgroundVariant, Controls, MiniMap, ReactFlow } from '@xyflow/react';
 import { useMindmap } from '../context/MindmapContext';
 import MindMapNodeBlock from './MindmapNode';
 import MindmapEdgeBlock from './MindmapEdge';
 import MindmapToolbar from './MindmapToolbar';
 import MindmapInstructions from './MindmapInstructions';
 import { useShortcuts } from '../hooks/useShortcut';
-import { useMemo, useCallback, useEffect } from 'react';
+import { useMemo, useCallback } from 'react';
 
 const nodeTypes = {
   mindMapNode: MindMapNodeBlock,
@@ -20,8 +20,6 @@ const MindMap = () => {
   const {
     nodes,
     edges,
-    setEdges,
-    setNodes,
     onNodesChange,
     onEdgesChange,
     onConnect,

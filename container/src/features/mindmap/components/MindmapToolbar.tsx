@@ -42,6 +42,9 @@ const MindmapToolbar = () => {
         <ToggleGroupItem value="vertical" className="px-4 py-2">
           Vertical
         </ToggleGroupItem>
+        <ToggleGroupItem value="" className="px-4 py-2">
+          None
+        </ToggleGroupItem>
       </ToggleGroup>
     </div>
   );

@@ -102,6 +102,7 @@ export const MindmapProvider: React.FC<MindmapProviderProps> = ({ children }) =>
   const [cloningEdges, setCloningEdges] = useState<MindMapEdge[]>([]);
   const [nodeId, setNodeId] = useState(1);
   const mousePositionRef = useRef({ x: 0, y: 0 });
+  const offset = useRef(0);
   const { screenToFlowPosition } = useReactFlow();
 
   const onConnect = useCallback(
@@ -200,6 +201,11 @@ export const MindmapProvider: React.FC<MindmapProviderProps> = ({ children }) =>
     setEdges((eds: MindMapEdge[]) => eds.map((edge: MindMapEdge) => ({ ...edge, selected: true })));
   }, [setNodes, setEdges]);
 
+  const deselectAllNodesAndEdges = useCallback(() => {
+    setNodes((nds: MindMapNode[]) => nds.map((node: MindMapNode) => ({ ...node, selected: false })));
+    setEdges((eds: MindMapEdge[]) => eds.map((edge: MindMapEdge) => ({ ...edge, selected: false })));
+  }, [setNodes, setEdges]);
+
   const copySelectedNodesAndEdges = useCallback(() => {
     const selectedNodes = nodes.filter((node) => node.selected);
     const selectedEdges = edges.filter((edge) => edge.selected);
@@ -252,19 +258,22 @@ export const MindmapProvider: React.FC<MindmapProviderProps> = ({ children }) =>
         return {
           ...node,
           position: {
-            x: x - rootPosition.x + node.position.x,
-            y: y - rootPosition.y + node.position.y,
+            x: x - rootPosition.x + node.position.x + offset.current,
+            y: y - rootPosition.y + node.position.y + offset.current,
           },
           selected: true,
         };
       }),
     ]);
     setEdges((eds: MindMapEdge[]) => [...eds, ...freshEdges]);
+
+    offset.current += 20; // Increment offset for next paste
   }, [cloningNodes, cloningEdges, setNodes, setEdges, screenToFlowPosition]);
 
   const onMouseMove = useCallback((event: any) => {
     const { clientX, clientY } = event;
     mousePositionRef.current = { x: clientX, y: clientY };
+    offset.current = 0;
   }, []);
 
   const value = useMemo(
@@ -283,6 +292,7 @@ export const MindmapProvider: React.FC<MindmapProviderProps> = ({ children }) =>
       markNodeForDeletion,
       finalizeNodeDeletion,
       selectAllNodesAndEdges,
+      deselectAllNodesAndEdges,
       copySelectedNodesAndEdges,
       pasteClonedNodesAndEdges,
     }),
@@ -301,6 +311,7 @@ export const MindmapProvider: React.FC<MindmapProviderProps> = ({ children }) =>
       markNodeForDeletion,
       finalizeNodeDeletion,
       selectAllNodesAndEdges,
+      deselectAllNodesAndEdges,
       copySelectedNodesAndEdges,
       pasteClonedNodesAndEdges,
     ]

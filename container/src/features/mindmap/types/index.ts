@@ -32,6 +32,7 @@ export interface MindmapContextType {
   markNodeForDeletion: (nodeId: string) => void;
   finalizeNodeDeletion: (nodeId: string) => void;
   selectAllNodesAndEdges: (event: any) => void;
+  deselectAllNodesAndEdges: (event: any) => void;
   copySelectedNodesAndEdges: (event: any) => void;
   pasteClonedNodesAndEdges: (event: any) => void;
 }

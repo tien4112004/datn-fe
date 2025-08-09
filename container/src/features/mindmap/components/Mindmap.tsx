@@ -28,6 +28,7 @@ const MindMap = () => {
     copySelectedNodesAndEdges,
     pasteClonedNodesAndEdges,
     deleteSelectedNodes,
+    deselectAllNodesAndEdges,
   } = useMindmap();
 
   const shortcuts = useMemo(
@@ -48,8 +49,18 @@ const MindMap = () => {
         key: 'Delete',
         callback: deleteSelectedNodes,
       },
+      {
+        key: 'Escape',
+        callback: deselectAllNodesAndEdges,
+      },
     ],
-    [selectAllNodesAndEdges, copySelectedNodesAndEdges, pasteClonedNodesAndEdges, deleteSelectedNodes]
+    [
+      selectAllNodesAndEdges,
+      copySelectedNodesAndEdges,
+      pasteClonedNodesAndEdges,
+      deleteSelectedNodes,
+      deselectAllNodesAndEdges,
+    ]
   );
 
   useShortcuts(shortcuts);

@@ -16,6 +16,8 @@ export type MindMapNode = Node<{
   level: number;
   content: string;
   isDeleting?: boolean;
+  parentId?: string;
+  metadata?: Record<string, any>;
 }> & {
   type: MindMapTypes;
 };

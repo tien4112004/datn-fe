@@ -48,13 +48,23 @@ const MindMap = () => {
     onConnect,
     addNode,
     deleteSelectedNodes,
-    selectAllNodes,
+    selectAllNodesAndEdges,
+    copySelectedNodesAndEdges,
+    pasteClonedNodesAndEdges,
   } = useMindmap();
 
   useShortcuts([
     {
       key: 'Ctrl+A',
-      callback: selectAllNodes,
+      callback: selectAllNodesAndEdges,
+    },
+    {
+      key: 'Ctrl+C',
+      callback: copySelectedNodesAndEdges,
+    },
+    {
+      key: 'Ctrl+V',
+      callback: pasteClonedNodesAndEdges,
     },
   ]);
 

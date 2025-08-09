@@ -96,7 +96,9 @@ interface MindmapContextType {
   addChildNode: (parentNode: Partial<MindMapNode>, position: XYPosition, sourceHandler?: string) => void;
   markNodeForDeletion: (nodeId: string) => void;
   finalizeNodeDeletion: (nodeId: string) => void;
-  selectAllNodes: () => void;
+  selectAllNodesAndEdges: () => void;
+  copySelectedNodesAndEdges: () => void;
+  pasteClonedNodesAndEdges: () => void;
 }
 
 const MindmapContext = createContext<MindmapContextType | undefined>(undefined);
@@ -108,6 +110,8 @@ interface MindmapProviderProps {
 export const MindmapProvider: React.FC<MindmapProviderProps> = ({ children }) => {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  const [cloningNodes, setCloningNodes] = useState<MindMapNode[]>([]);
+  const [cloningEdges, setCloningEdges] = useState<MindMapEdge[]>([]);
   const [nodeId, setNodeId] = useState(1);
 
   const onConnect = useCallback(
@@ -133,6 +137,7 @@ export const MindmapProvider: React.FC<MindmapProviderProps> = ({ children }) =>
         data: {
           level: parentNode.data?.level ? parentNode.data.level + 1 : 1,
           content: '<p>New Node</p>',
+          parentId: parentNode.id,
         },
         dragHandle: DragHandle.SELECTOR,
         position,
@@ -200,9 +205,125 @@ export const MindmapProvider: React.FC<MindmapProviderProps> = ({ children }) =>
     selectedNodeIds.forEach((nodeId) => markNodeForDeletion(nodeId));
   }, [nodes, markNodeForDeletion]);
 
-  const selectAllNodes = useCallback(() => {
+  const selectAllNodesAndEdges = useCallback(() => {
     setNodes((nds: MindMapNode[]) => nds.map((node: MindMapNode) => ({ ...node, selected: true })));
-  }, [setNodes]);
+    setEdges((eds: MindMapEdge[]) => eds.map((edge: MindMapEdge) => ({ ...edge, selected: true })));
+  }, [setNodes, setEdges]);
+
+  //   const findChildrenIds = useCallback(
+  //     (parentId: string): string[] => {
+  //       const children = nodes.filter((node) => node.data.parentId === parentId);
+  //       return children.reduce((acc: string[], child) => {
+  //         return [...acc, child.id, ...findChildrenIds(child.id)];
+  //       }, []);
+  //     },
+  //     [nodes]
+  //   );
+
+  //   const cloneNode = useCallback(
+  //     (nodeId: string) => {
+  //       return () => {
+  //         const nodeToClone = nodes.find((node) => node.id === nodeId);
+  //         if (!nodeToClone) return;
+
+  //         const newNodes: MindMapNode[] = [];
+
+  //         const clonedNode: MindMapNode = {
+  //           ...nodeToClone,
+  //           id: generateId(),
+  //           position: {
+  //             x: nodeToClone.position.x + 20,
+  //             y: nodeToClone.position.y + 20,
+  //           },
+  //           data: { ...nodeToClone.data, content: `<p>Cloned: ${nodeToClone.data.content}</p>` },
+  //         };
+
+  //         newNodes.push(clonedNode);
+
+  //         const childrenIds = findChildrenIds(nodeId);
+  //         childrenIds.forEach((childId) => {
+  //           const childNode = nodes.find((node) => node.id === childId);
+  //           if (childNode) {
+  //             const clonedChildNode: MindMapNode = {
+  //               ...childNode,
+  //               id: generateId(),
+  //               position: {
+  //                 x: childNode.position.x + 20,
+  //                 y: childNode.position.y + 20,
+  //               },
+  //             };
+  //             newNodes.push(clonedChildNode);
+  //           }
+  //         });
+
+  //         console.log('Cloned nodes:', newNodes);
+  //       };
+  //     },
+
+  //     [nodes, setNodes, findChildrenIds]
+  //   );
+
+  const copySelectedNodesAndEdges = useCallback(() => {
+    const selectedNodes = nodes.filter((node) => node.selected);
+    const selectedEdges = edges.filter((edge) => edge.selected);
+
+    if (selectedNodes.length === 0) return;
+
+    const newNodes: MindMapNode[] = selectedNodes.map((node) => ({
+      ...node,
+      id: generateId(),
+      data: {
+        ...node.data,
+        content: `<p>Cloned: ${node.data.content}</p>`,
+        metadata: {
+          oldId: node.id,
+        },
+      },
+      selected: false, // Deselect cloned nodes
+    }));
+
+    const newEdges: MindMapEdge[] = selectedEdges.map((edge) => {
+      const newSource = newNodes.find((node) => node.data.metadata?.oldId === edge.source);
+      const newTarget = newNodes.find((node) => node.data.metadata?.oldId === edge.target);
+
+      return {
+        ...edge,
+        id: generateId(),
+        source: newSource ? newSource.id : edge.source,
+        target: newTarget ? newTarget.id : edge.target,
+        sourceHandle: edge.sourceHandle?.replace(edge.source, newSource?.id || edge.source),
+        targetHandle: edge.targetHandle?.replace(edge.target, newTarget?.id || edge.target),
+        selected: false, // Deselect cloned edges
+      };
+    });
+
+    setCloningNodes((nds: MindMapNode[]) => [...nds, ...newNodes]);
+    setCloningEdges((eds: MindMapEdge[]) => [...eds, ...newEdges]);
+  }, [nodes, edges, setNodes, setEdges]);
+
+  const pasteClonedNodesAndEdges = useCallback(() => {
+    if (cloningNodes.length === 0) return;
+
+    const offsetX = 200;
+    const offsetY = 200;
+
+    setNodes((nds: MindMapNode[]) => [
+      ...nds.map((node) => ({ ...node, selected: false })),
+      ...cloningNodes.map((node) => ({
+        ...node,
+        position: {
+          x: node.position.x + offsetX,
+          y: node.position.y + offsetY,
+        },
+        selected: true,
+      })),
+    ]);
+    setEdges((eds: MindMapEdge[]) => [...eds, ...cloningEdges]);
+
+    // Clear cloning state after pasting
+    setCloningNodes([]);
+    setCloningEdges([]);
+  }, [cloningNodes, cloningEdges, setNodes, setEdges]);
 
   const value = {
     nodes,
@@ -217,7 +338,9 @@ export const MindmapProvider: React.FC<MindmapProviderProps> = ({ children }) =>
     addChildNode,
     markNodeForDeletion,
     finalizeNodeDeletion,
-    selectAllNodes,
+    selectAllNodesAndEdges,
+    copySelectedNodesAndEdges,
+    pasteClonedNodesAndEdges,
   };
 
   return <MindmapContext.Provider value={value}>{children}</MindmapContext.Provider>;

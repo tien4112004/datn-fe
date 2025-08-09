@@ -1,22 +1,17 @@
 import React, { createContext, useContext, useCallback, useState } from 'react';
-import {
-  useEdgesState,
-  useNodesState,
-  addEdge,
-  type Connection,
-  type Edge,
-  type Node,
-  type XYPosition,
-} from '@xyflow/react';
-import type { MindMapNodeData } from '../components/MindmapNode';
+import { useEdgesState, useNodesState, addEdge, type Connection, type XYPosition } from '@xyflow/react';
+import type { MindMapNode } from '../components/MindmapNode';
+import type { MindMapEdge } from '../components/MindmapEdge';
+import { DragHandle, MINDMAP_TYPES } from '../constants';
+import { generateId } from '@/shared/lib/utils';
 
-const initialNodes: Node[] = [
+const initialNodes: MindMapNode[] = [
   {
     id: '1',
     type: 'mindMapNode',
     position: { x: 400, y: 300 },
-    data: { label: 'Central Idea', level: 0, htmlContent: '<p>Central Idea</p>' },
-    dragHandle: '.dragHandle',
+    data: { level: 0, content: '<p>Central Idea</p>' },
+    dragHandle: DragHandle.SELECTOR,
   },
   //   {
   //     id: '2',
@@ -55,7 +50,7 @@ const initialNodes: Node[] = [
   //   },
 ];
 
-const initialEdges: Edge[] = [
+const initialEdges: MindMapEdge[] = [
   //   {
   //     id: 'e1-2',
   //     source: '1',
@@ -89,16 +84,18 @@ const initialEdges: Edge[] = [
 ];
 
 interface MindmapContextType {
-  nodes: Node[];
-  edges: Edge[];
-  setNodes: React.Dispatch<React.SetStateAction<Node[]>>;
-  setEdges: React.Dispatch<React.SetStateAction<Edge[]>>;
+  nodes: MindMapNode[];
+  edges: MindMapEdge[];
+  setNodes: React.Dispatch<React.SetStateAction<MindMapNode[]>>;
+  setEdges: React.Dispatch<React.SetStateAction<MindMapEdge[]>>;
   onNodesChange: (changes: any) => void;
   onEdgesChange: (changes: any) => void;
-  onConnect: (params: Edge | Connection) => void;
+  onConnect: (params: MindMapEdge | Connection) => void;
   addNode: () => void;
   deleteSelectedNodes: () => void;
-  addChildNode: (parentNode: Partial<MindMapNodeData>, position: XYPosition, sourceHandler?: string) => void;
+  addChildNode: (parentNode: Partial<MindMapNode>, position: XYPosition, sourceHandler?: string) => void;
+  markNodeForDeletion: (nodeId: string) => void;
+  finalizeNodeDeletion: (nodeId: string) => void;
 }
 
 const MindmapContext = createContext<MindmapContextType | undefined>(undefined);
@@ -110,14 +107,17 @@ interface MindmapProviderProps {
 export const MindmapProvider: React.FC<MindmapProviderProps> = ({ children }) => {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
-  const [nodeId, setNodeId] = useState(7);
+  const [nodeId, setNodeId] = useState(1);
 
   const onConnect = useCallback(
-    (params: Edge | Connection) => {
+    (params: MindMapEdge | Connection) => {
       const edge = {
         ...params,
-        type: 'smoothstep',
-        style: { stroke: 'var(--primary)', strokeWidth: 2 },
+        type: MINDMAP_TYPES.MINDMAP_EDGE,
+        data: {
+          strokeColor: 'var(--primary)',
+          strokeWidth: 2,
+        },
       };
       setEdges((eds: any) => addEdge(edge, eds));
     },
@@ -125,19 +125,15 @@ export const MindmapProvider: React.FC<MindmapProviderProps> = ({ children }) =>
   );
 
   const addChildNode = useCallback(
-    (parentNode: Partial<MindMapNodeData>, position: XYPosition, sourceHandler?: string) => {
-      const generateId = () => Math.random().toString(36).substr(2, 9);
-
-      const newNode = {
+    (parentNode: Partial<MindMapNode>, position: XYPosition, sourceHandler?: string) => {
+      const newNode: MindMapNode = {
         id: generateId(),
-        type: 'mindMapNode',
+        type: MINDMAP_TYPES.MINDMAP_NODE,
         data: {
-          label: 'New Node',
           level: parentNode.data?.level ? parentNode.data.level + 1 : 1,
-          htmlContent: '<p>New Node</p>',
-          isNew: true,
+          content: '<p>New Node</p>',
         },
-        dragHandle: '.dragHandle',
+        dragHandle: DragHandle.SELECTOR,
         position,
       };
 
@@ -145,44 +141,63 @@ export const MindmapProvider: React.FC<MindmapProviderProps> = ({ children }) =>
         id: generateId(),
         source: parentNode.id,
         target: newNode.id,
-        type: 'smoothstep',
+        type: MINDMAP_TYPES.MINDMAP_EDGE,
         sourceHandle: sourceHandler,
         targetHandle: sourceHandler?.startsWith('left')
           ? `right-target-${newNode.id}`
           : `left-target-${newNode.id}`,
+        data: {
+          strokeColor: 'var(--primary)',
+          strokeWidth: 2,
+        },
       };
 
-      setNodes((nds: any) => [...nds, newNode]);
-      setEdges((eds: any) => [...eds, newEdge]);
+      setNodes((nds: MindMapNode[]) => [...nds, newNode]);
+      setEdges((eds: MindMapEdge[]) => [...eds, newEdge]);
     },
     [setNodes, setEdges]
   );
 
   const addNode = useCallback(() => {
-    const newNode: Node = {
-      id: nodeId.toString(),
-      type: 'mindMapNode',
+    const newNode: MindMapNode = {
+      id: generateId(),
+      type: MINDMAP_TYPES.MINDMAP_NODE,
       position: {
         x: Math.random() * 500 + 100,
         y: Math.random() * 400 + 100,
       },
-      data: { label: `New Node ${nodeId}`, level: 1, htmlContent: `<p>New Node ${nodeId}</p>` },
+      data: { level: 1, content: `<p>New Node ${nodes.length + 1}</p>` },
     };
 
-    setNodes((nds: any) => [...nds, newNode]);
+    setNodes((nds: MindMapNode[]) => [...nds, newNode]);
     setNodeId((id) => id + 1);
   }, [nodeId, setNodes]);
 
+  const markNodeForDeletion = useCallback(
+    (nodeId: string) => {
+      setNodes((nds: MindMapNode[]) =>
+        nds.map((node: MindMapNode) =>
+          node.id === nodeId ? { ...node, data: { ...node.data, isDeleting: true } } : node
+        )
+      );
+    },
+    [setNodes]
+  );
+
+  const finalizeNodeDeletion = useCallback(
+    (nodeId: string) => {
+      setNodes((nds: MindMapNode[]) => nds.filter((node: MindMapNode) => node.id !== nodeId));
+      setEdges((eds: MindMapEdge[]) =>
+        eds.filter((edge: MindMapEdge) => edge.source !== nodeId && edge.target !== nodeId)
+      );
+    },
+    [setNodes, setEdges]
+  );
+
   const deleteSelectedNodes = useCallback(() => {
-    setNodes((nds: any) => nds.filter((node: any) => !node.selected));
-    setEdges((eds: any) =>
-      eds.filter((edge: any) => {
-        const sourceExists = nodes.some((node) => node.id === edge.source && !node.selected);
-        const targetExists = nodes.some((node) => node.id === edge.target && !node.selected);
-        return sourceExists && targetExists;
-      })
-    );
-  }, [setNodes, setEdges, nodes]);
+    const selectedNodeIds = nodes.filter((node) => node.selected).map((node) => node.id);
+    selectedNodeIds.forEach((nodeId) => markNodeForDeletion(nodeId));
+  }, [nodes, markNodeForDeletion]);
 
   const value = {
     nodes,
@@ -195,6 +210,8 @@ export const MindmapProvider: React.FC<MindmapProviderProps> = ({ children }) =>
     addNode,
     deleteSelectedNodes,
     addChildNode,
+    markNodeForDeletion,
+    finalizeNodeDeletion,
   };
 
   return <MindmapContext.Provider value={value}>{children}</MindmapContext.Provider>;

@@ -1,30 +1,29 @@
-import { Trash2, SquarePen, Plus, GripVertical } from 'lucide-react';
+import { Plus, GripVertical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ButtonHandle } from '@/components/button-handle';
 import { useState, useEffect } from 'react';
-import { Background, Handle, Position, type Node, type NodeProps } from '@xyflow/react';
+import { Handle, Position, useNodeConnections, type Node, type NodeProps } from '@xyflow/react';
 import { BaseNode, BaseNodeContent } from '@/components/base-node';
 import { cn } from '@/shared/lib/utils';
 import { useMindmap } from '../context/MindmapContext';
 import RichTextEditor from '@/shared/components/rte/RichTextEditor';
 import { useRichTextEditor } from '@/shared/components/rte/useRichTextEditor';
 import { BlockNoteEditor } from '@blocknote/core';
+import { DragHandle, type MindMapTypes } from '../constants';
+import { AnimatePresence, motion } from 'motion/react';
 
-export type MindMapNodeData = Node<{
-  label: string;
+export type MindMapNode = Node<{
   level: number;
-  htmlContent?: string;
-}>;
+  content: string;
+  isDeleting?: boolean;
+}> & {
+  type: MindMapTypes;
+};
 
-interface MindMapNodeProps extends NodeProps {
-  data: MindMapNodeData;
-  onCreateChild: (nodeId: string) => void;
-}
-
-const MindMapNode = ({ ...node }: NodeProps<MindMapNodeData>) => {
+const MindMapNodeBlock = ({ ...node }: NodeProps<MindMapNode>) => {
   const { data, selected, id } = node;
-  const { addChildNode } = useMindmap();
-  const [isEditing, setIsEditing] = useState(false);
+  const { addChildNode, finalizeNodeDeletion } = useMindmap();
+  const [, setIsEditing] = useState(false);
   const [isMouseOver, setIsMouseOver] = useState(false);
   const editor = useRichTextEditor({
     trailingBlock: false,
@@ -33,14 +32,24 @@ const MindMapNode = ({ ...node }: NodeProps<MindMapNodeData>) => {
     },
   });
 
+  const connections = useNodeConnections({ id });
+
+  const canCreateLeft = !connections.some(
+    (conn) => conn.sourceHandle === `left-source-${id}` || conn.targetHandle === `left-target-${id}`
+  );
+
+  const canCreateRight = !connections.some(
+    (conn) => conn.sourceHandle === `right-source-${id}` || conn.targetHandle === `right-target-${id}`
+  );
+
   useEffect(() => {
     async function loadInitialHTML() {
-      const htmlContent = data.htmlContent || `<p>${data.label}</p>`;
+      const htmlContent = data.content;
       const blocks = await editor.tryParseHTMLToBlocks(htmlContent);
       editor.replaceBlocks(editor.document, blocks);
     }
     loadInitialHTML();
-  }, [editor, data.htmlContent, data.label]);
+  }, [editor, data.content]);
 
   const handleContentChange = async (editor: BlockNoteEditor) => {
     // In a real app, you'd update the node data here
@@ -59,97 +68,116 @@ const MindMapNode = ({ ...node }: NodeProps<MindMapNodeData>) => {
   };
 
   return (
-    <BaseNode
-      className={cn(
-        `rounded-lg border-2 shadow-md transition-all duration-200`,
-        selected ? 'ring-1' : 'ring-0'
-      )}
-      onMouseEnter={() => setIsMouseOver(true)}
-      onMouseLeave={() => setIsMouseOver(false)}
-    >
-      <BaseNodeContent className="flex flex-row items-stretch gap-2 p-0">
-        <div className="dragHandle p-2 pr-0">
-          <GripVertical
-            className={cn('h-full w-5 cursor-move', isMouseOver || selected ? 'opacity-100' : 'opacity-50')}
-          />
-        </div>
-        <div className="min-w-[100px] max-w-[300px] cursor-text p-2 pl-0" onKeyDown={handleKeyPress}>
-          <RichTextEditor
-            editor={editor}
-            onChange={handleContentChange}
-            sideMenu={false}
-            slashMenu={false}
-            className="m-0 min-h-[24px] border-none p-0"
-            onBlur={handleEditSubmit}
-          />
-        </div>
-      </BaseNodeContent>
-      {data.level === 0 && (
-        <ButtonHandle
-          type="source"
-          position={Position.Left}
-          style={{
-            opacity: isMouseOver || selected ? 1 : 0,
-          }}
-          id={`left-source-${id}`}
-        >
-          <Button
-            onClick={() =>
-              addChildNode(
-                node,
-                { x: node.positionAbsoluteX - 250, y: node.positionAbsoluteY },
-                `left-source-${id}`
-              )
-            }
-            size="icon"
-            variant="secondary"
-            className="cursor-pointer rounded-full"
-          >
-            <Plus />
-          </Button>
-        </ButtonHandle>
-      )}
-      <ButtonHandle
-        type="source"
-        position={Position.Right}
-        style={{
-          opacity: isMouseOver || selected ? 1 : 0,
-        }}
-        id={`right-source-${id}`}
-      >
-        <Button
-          onClick={() =>
-            addChildNode(
-              node,
-              { x: node.positionAbsoluteX + 250, y: node.positionAbsoluteY },
-              `right-source-${id}`
-            )
+    <AnimatePresence>
+      <motion.div
+        key={`mindmap-node-${id}`}
+        initial={{ opacity: 0, scale: 0 }}
+        animate={data.isDeleting ? { opacity: 0, scale: 0 } : { opacity: 1, scale: 1 }}
+        transition={{ duration: 0.3 }}
+        onAnimationComplete={() => {
+          if (data.isDeleting) {
+            finalizeNodeDeletion(id);
           }
-          size="icon"
-          variant="secondary"
-          className="cursor-pointer rounded-full"
+        }}
+      >
+        <BaseNode
+          className={cn(
+            `rounded-lg border-2 shadow-md transition-all duration-200`,
+            selected ? 'ring-1' : 'ring-0'
+          )}
+          onMouseEnter={() => setIsMouseOver(true)}
+          onMouseLeave={() => setIsMouseOver(false)}
         >
-          <Plus />
-        </Button>
-      </ButtonHandle>
-      <Handle
-        type="target"
-        position={Position.Left}
-        style={{
-          opacity: 0,
-        }}
-        id={`left-target-${id}`}
-      />
-      <Handle
-        type="target"
-        position={Position.Right}
-        style={{
-          opacity: 0,
-        }}
-        id={`right-target-${id}`}
-      />
-    </BaseNode>
+          <BaseNodeContent className="flex flex-row items-stretch gap-2 p-0">
+            <div className={cn('p-2 pr-0', DragHandle.CLASS)}>
+              <GripVertical
+                className={cn(
+                  'h-full w-5 cursor-move',
+                  isMouseOver || selected ? 'opacity-100' : 'opacity-50'
+                )}
+              />
+            </div>
+            <div className="min-w-[100px] max-w-[300px] cursor-text p-2 pl-0" onKeyDown={handleKeyPress}>
+              <RichTextEditor
+                editor={editor}
+                onChange={handleContentChange}
+                sideMenu={false}
+                slashMenu={false}
+                className="m-0 min-h-[24px] border-none p-0"
+                onBlur={handleEditSubmit}
+              />
+            </div>
+          </BaseNodeContent>
+          <ButtonHandle
+            type="source"
+            position={Position.Left}
+            style={{
+              opacity: (isMouseOver || selected) && canCreateLeft ? 1 : 0,
+              visibility: (isMouseOver || selected) && canCreateLeft ? 'visible' : 'hidden',
+            }}
+            id={`left-source-${id}`}
+          >
+            <Button
+              onClick={() =>
+                addChildNode(
+                  node,
+                  { x: node.positionAbsoluteX - 250, y: node.positionAbsoluteY },
+                  `left-source-${id}`
+                )
+              }
+              disabled={!canCreateLeft}
+              size="icon"
+              variant="secondary"
+              className="cursor-pointer rounded-full"
+            >
+              <Plus />
+            </Button>
+          </ButtonHandle>
+          <ButtonHandle
+            type="source"
+            position={Position.Right}
+            style={{
+              opacity: (isMouseOver || selected) && canCreateRight ? 1 : 0,
+              visibility: (isMouseOver || selected) && canCreateRight ? 'visible' : 'hidden',
+            }}
+            id={`right-source-${id}`}
+          >
+            <Button
+              onClick={() =>
+                addChildNode(
+                  node,
+                  { x: node.positionAbsoluteX + 250, y: node.positionAbsoluteY },
+                  `right-source-${id}`
+                )
+              }
+              disabled={!canCreateRight}
+              size="icon"
+              variant="secondary"
+              className="cursor-pointer rounded-full"
+            >
+              <Plus />
+            </Button>
+          </ButtonHandle>
+          <Handle
+            type="target"
+            position={Position.Left}
+            style={{
+              opacity: 0,
+            }}
+            id={`left-target-${id}`}
+          />
+          <Handle
+            type="target"
+            position={Position.Right}
+            style={{
+              opacity: 0,
+            }}
+            id={`right-target-${id}`}
+          />
+        </BaseNode>
+      </motion.div>
+    </AnimatePresence>
   );
 };
 
-export default MindMapNode;
+export default MindMapNodeBlock;

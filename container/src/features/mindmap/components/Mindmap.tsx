@@ -1,16 +1,43 @@
-import React from 'react';
-
 import '@xyflow/react/dist/style.css';
 import { Plus, Trash2 } from 'lucide-react';
-import MindMapNode from './MindmapNode';
 import { Background, BackgroundVariant, Controls, MiniMap, ReactFlow } from '@xyflow/react';
 import { useMindmap } from '../context/MindmapContext';
+import MindMapNodeBlock from './MindmapNode';
+import MindmapEdgeBlock from './MindmapEdge';
 
 const nodeTypes = {
-  mindMapNode: MindMapNode,
+  mindMapNode: MindMapNodeBlock,
 };
 
-const MindMap: React.FC = () => {
+const edgeTypes = {
+  mindmapEdge: MindmapEdgeBlock,
+};
+
+const MindMapInstructions = () => {
+  return (
+    <div className="absolute right-4 top-4 z-10 max-w-xs">
+      <div
+        className="rounded-lg p-4 text-sm shadow-md"
+        style={{
+          backgroundColor: 'var(--card)',
+          color: 'var(--card-foreground)',
+          border: '1px solid var(--border)',
+        }}
+      >
+        <h3 className="mb-2 font-semibold">How to use:</h3>
+        <ul className="space-y-1 text-xs">
+          <li>• Drag nodes to reposition</li>
+          <li>• Click a node and drag from handles to connect</li>
+          <li>• Double-click node text to edit</li>
+          <li>• Select nodes and click Delete to remove</li>
+          <li>• Use mouse wheel to zoom</li>
+        </ul>
+      </div>
+    </div>
+  );
+};
+
+const MindMap = () => {
   const { nodes, edges, onNodesChange, onEdgesChange, onConnect, addNode, deleteSelectedNodes } =
     useMindmap();
 
@@ -60,25 +87,7 @@ const MindMap: React.FC = () => {
       </div>
 
       {/* Instructions */}
-      <div className="absolute right-4 top-4 z-10 max-w-xs">
-        <div
-          className="rounded-lg p-4 text-sm shadow-md"
-          style={{
-            backgroundColor: 'var(--card)',
-            color: 'var(--card-foreground)',
-            border: '1px solid var(--border)',
-          }}
-        >
-          <h3 className="mb-2 font-semibold">How to use:</h3>
-          <ul className="space-y-1 text-xs">
-            <li>• Drag nodes to reposition</li>
-            <li>• Click a node and drag from handles to connect</li>
-            <li>• Double-click node text to edit</li>
-            <li>• Select nodes and click Delete to remove</li>
-            <li>• Use mouse wheel to zoom</li>
-          </ul>
-        </div>
-      </div>
+      <MindMapInstructions />
 
       <ReactFlow
         nodes={nodes}
@@ -87,6 +96,7 @@ const MindMap: React.FC = () => {
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
         nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
         proOptions={proOptions}
       >
         <Controls className="!border-border !bg-white/90" style={{ border: '1px solid var(--border)' }} />

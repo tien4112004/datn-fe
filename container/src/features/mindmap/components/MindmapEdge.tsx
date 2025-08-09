@@ -57,7 +57,15 @@ const getEdgePath = (type: SmoothType, props: any) => {
         targetY,
       });
     default:
-      throw new Error(`Unknown edge type: ${type}`);
+      return getBezierPath({
+        sourceX,
+        sourceY,
+        targetX,
+        targetY,
+        sourcePosition,
+        targetPosition,
+        curvature: 0.25,
+      });
   }
 };
 

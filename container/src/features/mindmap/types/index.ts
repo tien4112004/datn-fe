@@ -26,13 +26,16 @@ export interface MindmapContextType {
   onEdgesChange: (changes: any) => void;
   onConnect: (params: MindMapEdge | Connection) => void;
   onMouseMove: (event: any) => void;
+  onNodeDrag: (event: MouseEvent, node: MindMapNode) => void;
+  updateLayout: (direction: 'horizontal' | 'vertical' | '') => void;
+  onLayoutChange: (direction: 'horizontal' | 'vertical' | '') => void;
   addNode: () => void;
-  deleteSelectedNodes: (event: any) => void;
+  deleteSelectedNodes: () => void;
   addChildNode: (parentNode: Partial<MindMapNode>, position: XYPosition, sourceHandler?: string) => void;
   markNodeForDeletion: (nodeId: string) => void;
   finalizeNodeDeletion: (nodeId: string) => void;
-  selectAllNodesAndEdges: (event: any) => void;
-  deselectAllNodesAndEdges: (event: any) => void;
-  copySelectedNodesAndEdges: (event: any) => void;
-  pasteClonedNodesAndEdges: (event: any) => void;
+  selectAllNodesAndEdges: () => void;
+  deselectAllNodesAndEdges: () => void;
+  copySelectedNodesAndEdges: () => void;
+  pasteClonedNodesAndEdges: () => void;
 }

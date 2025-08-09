@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useCallback, useState, useRef, useMemo } from 'react';
+import React, { createContext, useContext, useCallback, useState, useRef, useMemo, useEffect } from 'react';
 import {
   useEdgesState,
   useNodesState,
@@ -10,6 +10,7 @@ import {
 import type { MindMapNode, MindMapEdge, MindmapContextType } from '../types';
 import { DragHandle, MINDMAP_TYPES } from '../constants';
 import { generateId } from '@/shared/lib/utils';
+import { stratify, tree } from 'd3-hierarchy';
 
 const initialNodes: MindMapNode[] = [
   {
@@ -89,6 +90,48 @@ const initialEdges: MindMapEdge[] = [
   //   },
 ];
 
+const g = tree();
+
+const getLayoutedElements = (nodes: any[], edges: any[], direction: string) => {
+  if (nodes.length === 0) return { nodes, edges };
+
+  try {
+    const hierarchy = stratify()
+      .id((node: any) => node.id)
+      .parentId((node: any) => {
+        const parentEdge = edges.find((edge: any) => edge.target === node.id);
+        return parentEdge ? parentEdge.source : null;
+      });
+
+    const root = hierarchy(nodes);
+
+    if (direction === 'vertical') {
+      const layout = g.nodeSize([120, 320])(root);
+      return {
+        nodes: layout.descendants().map((node: any) => ({
+          ...node.data,
+          position: { x: node.y, y: node.x },
+        })),
+        edges,
+      };
+    } else {
+      const layout = g
+        .nodeSize([180, 160])
+        .separation((a: any, b: any) => (a.parent === b.parent ? 1 : 1.25))(root);
+      return {
+        nodes: layout.descendants().map((node: any) => ({
+          ...node.data,
+          position: { x: node.x, y: node.y },
+        })),
+        edges,
+      };
+    }
+  } catch (error) {
+    console.warn('Layout calculation failed:', error);
+    return { nodes, edges };
+  }
+};
+
 const MindmapContext = createContext<MindmapContextType | undefined>(undefined);
 
 interface MindmapProviderProps {
@@ -103,7 +146,8 @@ export const MindmapProvider: React.FC<MindmapProviderProps> = ({ children }) =>
   const [nodeId, setNodeId] = useState(1);
   const mousePositionRef = useRef({ x: 0, y: 0 });
   const offset = useRef(0);
-  const { screenToFlowPosition } = useReactFlow();
+  const { screenToFlowPosition, getIntersectingNodes, fitView } = useReactFlow();
+  const layout = useRef<string>('horizontal');
 
   const onConnect = useCallback(
     (params: MindMapEdge | Connection) => {
@@ -276,6 +320,56 @@ export const MindmapProvider: React.FC<MindmapProviderProps> = ({ children }) =>
     offset.current = 0;
   }, []);
 
+  const updateLayout = useCallback(
+    (direction: string) => {
+      if (!nodes?.length || !edges) return;
+
+      const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(nodes, edges, direction);
+
+      setNodes([...layoutedNodes]);
+      setEdges([...layoutedEdges]);
+    },
+    [nodes, edges, setNodes, setEdges]
+  );
+
+  const onLayoutChange = useCallback(
+    (direction: string) => {
+      layout.current = direction;
+      updateLayout(direction);
+
+      // Ensure fitView is called after layout update
+      window.requestAnimationFrame(() => {
+        fitView();
+      });
+    },
+    [updateLayout, fitView]
+  );
+
+  useEffect(() => {
+    if (nodes.length > 0) {
+      // Add a small delay to ensure DOM is fully rendered
+      const timeoutId = setTimeout(() => {
+        updateLayout(layout.current);
+      }, 10);
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [nodes.length, edges.length, updateLayout]);
+
+  const onNodeDrag = useCallback(
+    (_: MouseEvent, node: MindMapNode) => {
+      const intersections = getIntersectingNodes(node).map((n) => n.id);
+
+      if (intersections.length > 0) {
+        const intersectingNode = nodes.find((n) => n.id === intersections[0]);
+        if (intersectingNode) {
+          // TODO: Implement logic to make dragging node a child of the intersecting node after auto layout
+        }
+      }
+    },
+    [getIntersectingNodes]
+  );
+
   const value = useMemo(
     () => ({
       nodes,
@@ -286,6 +380,9 @@ export const MindmapProvider: React.FC<MindmapProviderProps> = ({ children }) =>
       onEdgesChange,
       onConnect,
       onMouseMove,
+      onNodeDrag,
+      updateLayout,
+      onLayoutChange,
       addNode,
       deleteSelectedNodes,
       addChildNode,
@@ -305,6 +402,9 @@ export const MindmapProvider: React.FC<MindmapProviderProps> = ({ children }) =>
       onEdgesChange,
       onConnect,
       onMouseMove,
+      onNodeDrag,
+      updateLayout,
+      onLayoutChange,
       addNode,
       deleteSelectedNodes,
       addChildNode,

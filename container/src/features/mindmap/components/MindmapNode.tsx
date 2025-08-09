@@ -34,13 +34,17 @@ const MindMapNodeBlock = memo(({ ...node }: NodeProps<MindMapNode>) => {
 
   const connections = useNodeConnections({ id });
 
-  const canCreateLeft = !connections.some(
-    (conn) => conn.sourceHandle === `left-source-${id}` || conn.targetHandle === `left-target-${id}`
-  );
+  const canCreateLeft =
+    !connections.some(
+      (conn) => conn.sourceHandle === `left-source-${id}` || conn.targetHandle === `left-target-${id}`
+    ) || node.data.level === 0;
 
-  const canCreateRight = !connections.some(
-    (conn) => conn.sourceHandle === `right-source-${id}` || conn.targetHandle === `right-target-${id}`
-  );
+  //   const canCreateRight =
+  //     !connections.some(
+  //       (conn) => conn.sourceHandle === `right-source-${id}` || conn.targetHandle === `right-target-${id}`
+  //     ) || node.data.level === 0;
+
+  const canCreateRight = true; // Temporarily allow right connections for simplicity
 
   useEffect(() => {
     async function loadInitialHTML() {

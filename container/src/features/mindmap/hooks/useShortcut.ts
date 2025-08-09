@@ -21,31 +21,6 @@ interface ParsedShortcut {
   altKey: boolean;
 }
 
-export const useShortcut = (shortcut: ShortcutConfig, preventDefault = true) => {
-  useEffect(() => {
-    const parsed = parseShortcut(shortcut.key);
-
-    const keyDownHandler = (event: KeyboardEvent) => {
-      if (
-        event.key.toLowerCase() === parsed.key &&
-        !!event.ctrlKey === parsed.ctrlKey &&
-        !!event.shiftKey === parsed.shiftKey &&
-        !!event.altKey === parsed.altKey
-      ) {
-        if (preventDefault) {
-          event.preventDefault();
-        }
-        shortcut.callback(event);
-      }
-    };
-
-    window.addEventListener('keydown', keyDownHandler);
-    return () => {
-      window.removeEventListener('keydown', keyDownHandler);
-    };
-  }, [shortcut, preventDefault]);
-};
-
 export const useShortcuts = (shortcuts: ShortcutConfig[], preventDefault = true) => {
   useEffect(() => {
     const handlers = shortcuts.map((shortcut) => {

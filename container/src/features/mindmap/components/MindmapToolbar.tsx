@@ -2,9 +2,10 @@ import { Plus, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useMindmap } from '../context/MindmapContext';
 import { useCallback } from 'react';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 
 const MindmapToolbar = () => {
-  const { addNode, deleteSelectedNodes, nodes, edges } = useMindmap();
+  const { addNode, deleteSelectedNodes, nodes, edges, onLayoutChange } = useMindmap();
 
   const logData = useCallback(() => {
     console.log('Nodes:', nodes);
@@ -28,6 +29,20 @@ const MindmapToolbar = () => {
         <Trash2 size={16} />
         Log Data
       </Button>
+
+      <ToggleGroup
+        type="single"
+        defaultValue="vertical"
+        className="rounded-md border border-gray-300 bg-white shadow-sm"
+        onValueChange={onLayoutChange}
+      >
+        <ToggleGroupItem value="horizontal" className="px-4 py-2">
+          Horizontal
+        </ToggleGroupItem>
+        <ToggleGroupItem value="vertical" className="px-4 py-2">
+          Vertical
+        </ToggleGroupItem>
+      </ToggleGroup>
     </div>
   );
 };

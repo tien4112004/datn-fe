@@ -50,6 +50,7 @@ export default {
       subtitle: 'Generate a slide outline with AI',
       promptSection: 'Prompt',
       regenerate: 'Regenerate',
+      stop: 'Stop',
       promptTitle: "What's your presentation about (Be specific)?",
       promptPlaceholder: 'Describe your topic or what you want to present...',
       slideCountPlaceholder: 'How many slides?',

@@ -50,6 +50,7 @@ export default {
       subtitle: 'Tạo dàn ý slide với AI',
       promptSection: 'Đầu vào',
       regenerate: 'Tạo lại',
+      stop: 'Dừng',
       promptTitle: 'Bài thuyết trình của bạn về cái gì (Hãy cụ thể)?',
       promptPlaceholder: 'Mô tả chủ đề hoặc nội dung bạn muốn trình bày...',
       slideCountPlaceholder: 'Số lượng trang?',

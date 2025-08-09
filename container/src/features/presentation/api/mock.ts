@@ -1,5 +1,10 @@
 import { API_MODE, type ApiMode } from '@/shared/constants';
-import { type OutlineItem, type OutlinePromptRequest, type PresentationApiService, type PresentationItem } from '../types';
+import {
+  type OutlineItem,
+  type OutlinePromptRequest,
+  type PresentationApiService,
+  type PresentationItem,
+} from '../types';
 
 const mockOutlineOutput = `\`\`\`markdown
 ### The Amazing World of Artificial Intelligence!
@@ -82,32 +87,35 @@ const mockPresentationItems: PresentationItem[] = [
 ];
 
 export default class PresentationMockService implements PresentationApiService {
-  async getStreamedOutline(_request: OutlinePromptRequest, signal: AbortSignal): Promise<ReadableStream<Uint8Array>> {
+  async getStreamedOutline(
+    _request: OutlinePromptRequest,
+    signal: AbortSignal
+  ): Promise<ReadableStream<Uint8Array>> {
     const encoder = new TextEncoder();
-    
+
     return new ReadableStream({
       start(controller) {
         const chunks = mockOutlineOutput.split(' ');
         let index = 0;
-        
+
         const sendChunk = () => {
           if (signal.aborted) {
             controller.close();
             return;
           }
-          
+
           if (index < chunks.length) {
             const chunk = chunks[index] + (index < chunks.length - 1 ? ' ' : '');
             controller.enqueue(encoder.encode(chunk));
             index++;
-            setTimeout(sendChunk, 50); // Simulate network delay
+            setTimeout(sendChunk, 5); // Simulate network delay
           } else {
             controller.close();
           }
         };
-        
-        setTimeout(sendChunk, 100); // Initial delay
-      }
+
+        setTimeout(sendChunk, 50); // Initial delay
+      },
     });
   }
 

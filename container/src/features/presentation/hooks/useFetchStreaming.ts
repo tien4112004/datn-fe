@@ -21,7 +21,7 @@ interface StreamingHookReturn {
   clearContent: () => void;
 }
 
-function useFetchStreaming(): StreamingHookReturn {
+function useFetchStreaming(autoStartData?: OutlinePromptRequest): StreamingHookReturn {
   const presentationApiService = usePresentationApiService();
   const [streamedContent, setStreamedContent] = React.useState<string>('');
   const [outlineItems, setOutlineItems] = React.useState<OutlineItem[]>([]);
@@ -29,56 +29,62 @@ function useFetchStreaming(): StreamingHookReturn {
   const [error, setError] = React.useState<string | null>(null);
   const abortControllerRef = React.useRef<AbortController | null>(null);
 
-  const startStream = React.useCallback(async (requestData: OutlinePromptRequest): Promise<void> => {
-    // Reset state
-    setStreamedContent('');
-    setOutlineItems([]);
-    setError(null);
-    setIsStreaming(true);
+  const startStream = React.useCallback(
+    async (requestData: OutlinePromptRequest): Promise<void> => {
+      // Reset state
+      setStreamedContent('');
+      setOutlineItems([]);
+      setError(null);
+      setIsStreaming(true);
 
-    // Create abort controller for cancellation
-    abortControllerRef.current = new AbortController();
-
-    try {
-      const stream = await presentationApiService.getStreamedOutline(requestData, abortControllerRef.current.signal);
-      const reader = stream.getReader();
-      const decoder = new TextDecoder();
-      let fullContent = '';
+      // Create abort controller for cancellation
+      abortControllerRef.current = new AbortController();
 
       try {
-        while (true) {
-          const { done, value } = await reader.read();
+        const stream = await presentationApiService.getStreamedOutline(
+          requestData,
+          abortControllerRef.current.signal
+        );
+        const reader = stream.getReader();
+        const decoder = new TextDecoder();
+        let fullContent = '';
 
-          if (done) {
-            break;
+        try {
+          while (true) {
+            const { done, value } = await reader.read();
+
+            if (done) {
+              break;
+            }
+
+            // Decode the chunk and add it to our content
+            const chunk = decoder.decode(value, { stream: true });
+            fullContent += chunk;
+
+            setStreamedContent((prev) => prev + chunk);
+            setOutlineItems([...splitMarkdownToOutlineItems(fullContent)]);
+
+            // Log each chunk as it arrives
+            console.log('Received chunk:', chunk);
           }
-
-          // Decode the chunk and add it to our content
-          const chunk = decoder.decode(value, { stream: true });
-          fullContent += chunk;
-
-          setStreamedContent((prev) => prev + chunk);
-          setOutlineItems([...splitMarkdownToOutlineItems(fullContent)]);
-
-          // Log each chunk as it arrives
-          console.log('Received chunk:', chunk);
+        } finally {
+          reader.releaseLock();
+        }
+      } catch (err) {
+        if (err instanceof Error) {
+          if (err.name !== 'AbortError') {
+            setError(`${err.message}`);
+          }
+        } else {
+          setError('Unknown error occurred');
         }
       } finally {
-        reader.releaseLock();
+        setIsStreaming(false);
+        abortControllerRef.current = null;
       }
-    } catch (err) {
-      if (err instanceof Error) {
-        if (err.name !== 'AbortError') {
-          setError(`${err.message}`);
-        }
-      } else {
-        setError('Unknown error occurred');
-      }
-    } finally {
-      setIsStreaming(false);
-      abortControllerRef.current = null;
-    }
-  }, [presentationApiService]);
+    },
+    [presentationApiService]
+  );
 
   const stopStream = React.useCallback((): void => {
     if (abortControllerRef.current) {
@@ -94,6 +100,12 @@ function useFetchStreaming(): StreamingHookReturn {
     setError(null);
   }, []);
 
+  React.useEffect(() => {
+    if (autoStartData) {
+      startStream(autoStartData);
+    }
+  }, [autoStartData, startStream]);
+
   return {
     streamedContent,
     outlineItems,
@@ -106,7 +118,7 @@ function useFetchStreaming(): StreamingHookReturn {
 }
 
 // Khi nao du manh se quay ve day tra thu
-// 
+//
 // function useFetchStreaming(): StreamingHookReturn {
 //   const presentationApiService = usePresentationApiService();
 //   const [isStreaming, setIsStreaming] = React.useState(false);
@@ -122,7 +134,7 @@ function useFetchStreaming(): StreamingHookReturn {
 //               method: 'POST',
 //               headers: {
 //                 'Content-Type': 'application/json',
-//                 Accept: 'text/plain', 
+//                 Accept: 'text/plain',
 //               },
 //               signal
 //             })

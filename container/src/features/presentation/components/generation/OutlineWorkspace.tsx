@@ -20,6 +20,7 @@ import { Download, Loader, Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import useOutlineStore from '@/features/presentation/stores/useOutlineStore';
 import { useShallow } from 'zustand/react/shallow';
+import { Card } from '@/components/ui/card';
 // import { useOutlineContext } from '../../context/OutlineContext';
 
 type OutlineWorkspaceProps = {
@@ -79,23 +80,30 @@ const OutlineWorkspace = ({ onDownload }: OutlineWorkspaceProps) => {
   };
 
   return (
-    <div className="bg-card w-3xl flex flex-col gap-6 rounded-xl p-8">
-      <DndContext sensors={sensors} onDragEnd={handleOutlineCardDragEnd}>
-        <SortableContext
-          items={safeItems.map((item) => `outline-card-${item.id}`)}
-          strategy={verticalListSortingStrategy}
-        >
-          {safeItems.map((item, index) => (
-            <OutlineCard
-              key={item.id}
-              id={item.id}
-              title={`${index + 1}`}
-              item={item}
-              onDelete={() => handleDelete(item.id)}
-            />
-          ))}
-        </SortableContext>
-      </DndContext>
+    <Card className="w-3xl flex flex-col gap-6 rounded-xl p-8">
+      {safeItems.length > 0 ? (
+        <DndContext sensors={sensors} onDragEnd={handleOutlineCardDragEnd}>
+          <SortableContext
+            items={safeItems.map((item) => `outline-card-${item.id}`)}
+            strategy={verticalListSortingStrategy}
+          >
+            {safeItems.map((item, index) => (
+              <OutlineCard
+                key={item.id}
+                id={item.id}
+                title={`${index + 1}`}
+                item={item}
+                onDelete={() => handleDelete(item.id)}
+              />
+            ))}
+          </SortableContext>
+        </DndContext>
+      ) : (
+        <div className="text-muted-foreground flex flex-col items-center justify-center text-center">
+          <div className="text-lg font-medium">{t('noOutlineCards')}</div>
+          <div className="text-sm">{t('clickAddToStart')}</div>
+        </div>
+      )}
 
       {/* Add button */}
       <Button
@@ -123,7 +131,7 @@ const OutlineWorkspace = ({ onDownload }: OutlineWorkspaceProps) => {
           {isDownloading ? t('downloading') : t('downloadOutline')}
         </Button>
       </div>
-    </div>
+    </Card>
   );
 };
 

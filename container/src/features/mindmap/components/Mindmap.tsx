@@ -93,7 +93,6 @@ const MindMap = () => {
         onPaneMouseMove={onMouseMove}
         onPaneClick={onPaneClick}
         onNodeDrag={onNodeDrag}
-        fitView
       >
         <Controls />
 

@@ -1,10 +1,11 @@
 import type { Node, Edge, XYPosition, Connection } from '@xyflow/react';
-import type { MindMapTypes } from '../constants';
+import type { Direction, MindMapTypes } from '../constants';
 
 export type MindMapNode = Node<{
   level: number;
   content: string;
   isDeleting?: boolean;
+  isLayouting?: boolean;
   parentId?: string;
   metadata?: Record<string, any>;
 }> & {
@@ -20,6 +21,8 @@ export type MindMapEdge = Edge<{
 export interface MindmapContextType {
   nodes: MindMapNode[];
   edges: MindMapEdge[];
+  layout: Direction;
+  isLayouting: boolean;
   setNodes: React.Dispatch<React.SetStateAction<MindMapNode[]>>;
   setEdges: React.Dispatch<React.SetStateAction<MindMapEdge[]>>;
   onNodesChange: (changes: any) => void;
@@ -27,8 +30,8 @@ export interface MindmapContextType {
   onConnect: (params: MindMapEdge | Connection) => void;
   onMouseMove: (event: any) => void;
   onNodeDrag: (event: MouseEvent, node: MindMapNode) => void;
-  updateLayout: (direction: 'horizontal' | 'vertical' | '') => void;
-  onLayoutChange: (direction: 'horizontal' | 'vertical' | '') => void;
+  updateLayout: (direction: Direction) => void;
+  onLayoutChange: (direction: Direction) => void;
   addNode: () => void;
   deleteSelectedNodes: () => void;
   addChildNode: (parentNode: Partial<MindMapNode>, position: XYPosition, sourceHandler?: string) => void;

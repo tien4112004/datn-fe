@@ -6,11 +6,14 @@ import {
   type Connection,
   type XYPosition,
   useReactFlow,
+  useNodesInitialized,
 } from '@xyflow/react';
 import type { MindMapNode, MindMapEdge, MindmapContextType } from '../types';
-import { DragHandle, MINDMAP_TYPES } from '../constants';
+import { DragHandle, MINDMAP_TYPES, type Direction } from '../constants';
 import { generateId } from '@/shared/lib/utils';
 import dagre from '@dagrejs/dagre';
+import { timer } from 'd3-timer';
+import { interpolate } from 'd3-interpolate';
 
 const initialNodes: MindMapNode[] = [
   {
@@ -102,10 +105,13 @@ export const MindmapProvider: React.FC<MindmapProviderProps> = ({ children }) =>
   const [cloningNodes, setCloningNodes] = useState<MindMapNode[]>([]);
   const [cloningEdges, setCloningEdges] = useState<MindMapEdge[]>([]);
   const [nodeId, setNodeId] = useState(1);
+  const [isLayouting, setIsLayouting] = useState(false);
   const mousePositionRef = useRef({ x: 0, y: 0 });
   const offset = useRef(0);
+  const animationTimer = useRef<any>(null);
   const { screenToFlowPosition, getIntersectingNodes, fitView } = useReactFlow();
-  const layout = useRef<string>('horizontal');
+  const layout = useRef<Direction>('horizontal');
+  const nodesInitialized = useNodesInitialized();
 
   const onConnect = useCallback(
     (params: MindMapEdge | Connection) => {
@@ -312,7 +318,9 @@ export const MindmapProvider: React.FC<MindmapProviderProps> = ({ children }) =>
       });
 
       // Calculate the layout
-      dagre.layout(g);
+      dagre.layout(g, {
+        disableOptimalOrderHeuristic: true,
+      });
 
       // Update node positions based on dagre layout
       const layoutedNodes = nodes.map((node: any) => {
@@ -338,28 +346,86 @@ export const MindmapProvider: React.FC<MindmapProviderProps> = ({ children }) =>
   }, []);
 
   const updateLayout = useCallback(
-    (direction: string) => {
+    (direction: Direction) => {
       if (!nodes?.length || !edges) return;
 
-      console.log('Updating layout with direction:', direction);
+      console.log('Updating layout to:', direction);
 
+      // Stop any existing animation
+      if (animationTimer.current) {
+        animationTimer.current.stop();
+      }
+
+      setIsLayouting(true);
+
+      // Calculate new positions
       const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(nodes, edges, direction);
 
-      setNodes([...layoutedNodes]);
-      setEdges([...layoutedEdges]);
+      // Create position interpolators for each node
+      const nodeInterpolators = nodes
+        .map((currentNode) => {
+          const targetNode = layoutedNodes.find((n) => n.id === currentNode.id);
+          if (!targetNode) return null;
+
+          return {
+            id: currentNode.id,
+            interpolator: interpolate(
+              { x: currentNode.position.x, y: currentNode.position.y },
+              { x: targetNode.position.x, y: targetNode.position.y }
+            ),
+          };
+        })
+        .filter(Boolean);
+
+      // Set up the animation
+      const duration = 800; // 800ms animation
+      const startTime = Date.now();
+
+      animationTimer.current = timer((elapsed) => {
+        const progress = Math.min(elapsed / duration, 1);
+
+        // Use easeOutCubic for smooth animation
+        const easedProgress = 1 - Math.pow(1 - progress, 3);
+
+        // Update node positions
+        setNodes((prevNodes: MindMapNode[]) =>
+          prevNodes.map((node) => {
+            const interpolator = nodeInterpolators.find((i) => i?.id === node.id);
+            if (!interpolator) return node;
+
+            const newPosition = interpolator.interpolator(easedProgress);
+            return {
+              ...node,
+              position: newPosition,
+              data: { ...node.data, isLayouting: true },
+            };
+          })
+        );
+
+        // Animation complete
+        if (progress >= 1) {
+          animationTimer.current.stop();
+          animationTimer.current = null;
+
+          // Update edges and remove isLayouting flag
+          setEdges([...layoutedEdges]);
+          setNodes((prevNodes: MindMapNode[]) =>
+            prevNodes.map((node) => ({
+              ...node,
+              data: { ...node.data, isLayouting: false },
+            }))
+          );
+          setIsLayouting(false);
+        }
+      });
     },
-    [nodes, edges, setNodes, setEdges]
+    [nodes, edges, setNodes, setEdges, getLayoutedElements]
   );
 
   const onLayoutChange = useCallback(
-    (direction: string) => {
+    (direction: Direction) => {
       layout.current = direction;
       updateLayout(direction);
-
-      // Ensure fitView is called after layout update
-      window.requestAnimationFrame(() => {
-        fitView();
-      });
     },
     [updateLayout, fitView]
   );
@@ -369,11 +435,20 @@ export const MindmapProvider: React.FC<MindmapProviderProps> = ({ children }) =>
       // Add a small delay to ensure DOM is fully rendered
       const timeoutId = setTimeout(() => {
         updateLayout(layout.current);
-      }, 10);
+      }, 100);
 
       return () => clearTimeout(timeoutId);
     }
-  }, [nodes.length, edges.length, updateLayout]);
+  }, [nodesInitialized]);
+
+  // Cleanup animation timer on unmount
+  useEffect(() => {
+    return () => {
+      if (animationTimer.current) {
+        animationTimer.current.stop();
+      }
+    };
+  }, []);
 
   const onNodeDrag = useCallback(
     (_: MouseEvent, node: MindMapNode) => {
@@ -393,6 +468,8 @@ export const MindmapProvider: React.FC<MindmapProviderProps> = ({ children }) =>
     () => ({
       nodes,
       edges,
+      layout: layout.current,
+      isLayouting,
       setNodes,
       setEdges,
       onNodesChange,
@@ -415,6 +492,8 @@ export const MindmapProvider: React.FC<MindmapProviderProps> = ({ children }) =>
     [
       nodes,
       edges,
+      layout,
+      isLayouting,
       setNodes,
       setEdges,
       onNodesChange,

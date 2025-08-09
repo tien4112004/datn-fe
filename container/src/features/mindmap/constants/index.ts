@@ -9,3 +9,11 @@ export const DragHandle = {
   CLASS: 'dragHandle',
   SELECTOR: '.dragHandle',
 };
+
+export type Direction = 'horizontal' | 'vertical' | '';
+
+export const DIRECTION = {
+  HORIZONTAL: 'horizontal',
+  VERTICAL: 'vertical',
+  NONE: '',
+} as const;

@@ -1,11 +1,15 @@
 import { Plus, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useMindmap } from '../context/MindmapContext';
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 
 const MindmapToolbar = () => {
   const { addNode, deleteSelectedNodes, nodes, edges, onLayoutChange } = useMindmap();
+
+  useEffect(() => {
+    onLayoutChange('horizontal');
+  }, []);
 
   const logData = useCallback(() => {
     console.log('Nodes:', nodes);
@@ -32,7 +36,7 @@ const MindmapToolbar = () => {
 
       <ToggleGroup
         type="single"
-        defaultValue="vertical"
+        defaultValue="horizontal"
         className="rounded-md border border-gray-300 bg-white shadow-sm"
         onValueChange={onLayoutChange}
       >

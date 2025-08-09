@@ -2,29 +2,20 @@ import { Plus, GripVertical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ButtonHandle } from '@/components/button-handle';
 import { useState, useEffect, memo } from 'react';
-import { Handle, Position, useNodeConnections, type Node, type NodeProps } from '@xyflow/react';
+import { Handle, Position, useNodeConnections, type NodeProps } from '@xyflow/react';
 import { BaseNode, BaseNodeContent } from '@/components/base-node';
 import { cn } from '@/shared/lib/utils';
 import { useMindmap } from '../context/MindmapContext';
 import RichTextEditor from '@/shared/components/rte/RichTextEditor';
 import { useRichTextEditor } from '@/shared/components/rte/useRichTextEditor';
 import { BlockNoteEditor } from '@blocknote/core';
-import { DragHandle, type MindMapTypes } from '../constants';
+import { DIRECTION, DragHandle } from '../constants';
 import { AnimatePresence, motion } from 'motion/react';
-
-export type MindMapNode = Node<{
-  level: number;
-  content: string;
-  isDeleting?: boolean;
-  parentId?: string;
-  metadata?: Record<string, any>;
-}> & {
-  type: MindMapTypes;
-};
+import type { MindMapNode } from '../types';
 
 const MindMapNodeBlock = memo(({ ...node }: NodeProps<MindMapNode>) => {
   const { data, selected, id } = node;
-  const { addChildNode, finalizeNodeDeletion } = useMindmap();
+  const { addChildNode, finalizeNodeDeletion, layout, isLayouting } = useMindmap();
   const [, setIsEditing] = useState(false);
   const [isMouseOver, setIsMouseOver] = useState(false);
   const editor = useRichTextEditor({
@@ -76,7 +67,13 @@ const MindMapNodeBlock = memo(({ ...node }: NodeProps<MindMapNode>) => {
         key={`mindmap-node-${id}`}
         initial={{ opacity: 0, scale: 0 }}
         animate={data.isDeleting ? { opacity: 0, scale: 0 } : { opacity: 1, scale: 1 }}
-        transition={{ duration: 0.3 }}
+        // transition={{
+        //   duration: data.isDeleting ? 0.3 : isLayouting ? 0.5 : 0.2,
+        //   type: isLayouting ? 'spring' : 'ease',
+        //   damping: isLayouting ? 20 : undefined,
+        //   stiffness: isLayouting ? 300 : undefined,
+        // }}
+        layout={isLayouting}
         onAnimationComplete={() => {
           if (data.isDeleting) {
             finalizeNodeDeletion(id);
@@ -86,7 +83,8 @@ const MindMapNodeBlock = memo(({ ...node }: NodeProps<MindMapNode>) => {
         <BaseNode
           className={cn(
             `rounded-lg border-2 shadow-md transition-all duration-200`,
-            selected ? 'ring-2' : 'ring-0'
+            selected ? 'ring-2' : 'ring-0',
+            data.isLayouting && 'shadow-lg ring-2 ring-blue-300'
           )}
           onMouseEnter={() => setIsMouseOver(true)}
           onMouseLeave={() => setIsMouseOver(false)}
@@ -95,8 +93,9 @@ const MindMapNodeBlock = memo(({ ...node }: NodeProps<MindMapNode>) => {
             <div className={cn('p-2 pr-0', DragHandle.CLASS)}>
               <GripVertical
                 className={cn(
-                  'h-full w-5 cursor-move',
-                  isMouseOver || selected ? 'opacity-100' : 'opacity-50'
+                  'h-full w-5',
+                  isMouseOver || selected ? 'opacity-100' : 'opacity-50',
+                  layout === DIRECTION.NONE ? 'cursor-move' : 'cursor-default'
                 )}
               />
             </div>

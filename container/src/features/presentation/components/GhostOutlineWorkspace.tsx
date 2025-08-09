@@ -1,11 +1,14 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import type { OutlineItem } from "@/features/presentation/types";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import type { OutlineItem } from '@/features/presentation/types';
 
-const GhostOutlineWorkspace = ({ items } : GhostOutlineWorkspaceProps) => {
+const GhostOutlineWorkspace = ({ items }: GhostOutlineWorkspaceProps) => {
   return (
     <div className="bg-card w-3xl flex flex-col gap-6 rounded-xl p-8">
       {items.map((item, index) => (
-        <Card key={item.id} className='border-primary group relative flex min-h-24 w-full flex-row gap-4 p-0 shadow-md transition-shadow duration-300 hover:shadow-lg'>
+        <Card
+          key={item.id}
+          className="border-primary group relative flex min-h-24 w-full flex-row gap-4 p-0 shadow-md transition-shadow duration-300 hover:shadow-lg"
+        >
           <CardHeader className="bg-accent w-24 rounded-l-xl p-2 text-center">
             <CardTitle>{index + 1}</CardTitle>
           </CardHeader>
@@ -16,7 +19,7 @@ const GhostOutlineWorkspace = ({ items } : GhostOutlineWorkspaceProps) => {
       ))}
     </div>
   );
-}
+};
 
 type GhostOutlineWorkspaceProps = {
   items: OutlineItem[];

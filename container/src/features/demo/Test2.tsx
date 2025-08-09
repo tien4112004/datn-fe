@@ -231,13 +231,11 @@ const StreamingOutlineGenerator2: React.FC = () => {
       )}
 
       {streamedContent && (
-        <div className="mb-4 flex flex-col space-y-2 gap-3">
+        <div className="mb-4 flex flex-col gap-3 space-y-2">
           <h3 className="mb-3 text-lg font-semibold text-gray-800">Generated Outline:</h3>
           {parseToOutlineList(streamedContent).map((item, index) => (
             <div key={index} className="rounded-md border border-gray-200 bg-gray-50 p-4">
-              <pre className="whitespace-pre-wrap font-mono text-sm text-gray-800">
-                {item}
-              </pre>
+              <pre className="whitespace-pre-wrap font-mono text-sm text-gray-800">{item}</pre>
             </div>
           ))}
         </div>

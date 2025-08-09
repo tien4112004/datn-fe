@@ -4,6 +4,7 @@ import { OutlineCreationView, WorkspaceView } from '@/features/presentation/comp
 import type { ModelOption } from '@/features/model';
 import { SidebarTrigger } from '@/shared/components/ui/sidebar';
 import type { OutlineData } from '@/features/presentation/types';
+import { OutlineProvider } from '../context/OutlineContext';
 
 const PresentationViewState = {
   OUTLINE_CREATION: 'outline_creation',
@@ -27,11 +28,13 @@ const PresentationOutlinePage = () => {
   return (
     <>
       <SidebarTrigger className="absolute left-4 top-4 z-50" />
-      {currentView === PresentationViewState.OUTLINE_CREATION ? (
-        <OutlineCreationView defaultModel={defaultModel} onCreateOutline={handleCreateOutline} />
-      ) : (
-        <WorkspaceView initialOutlineData={outlineData} />
-      )}
+      <OutlineProvider>
+        {currentView === PresentationViewState.OUTLINE_CREATION ? (
+          <OutlineCreationView defaultModel={defaultModel} onCreateOutline={handleCreateOutline} />
+        ) : (
+          <WorkspaceView initialOutlineData={outlineData} />
+        )}
+      </OutlineProvider>
     </>
   );
 };

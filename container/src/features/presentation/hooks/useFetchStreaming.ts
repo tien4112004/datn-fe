@@ -1,6 +1,6 @@
-import React from "react";
-import type { OutlineItem } from "../types";
-import { marked } from "marked";
+import React from 'react';
+import type { OutlineItem } from '../types';
+import { marked } from 'marked';
 
 interface OutlinePromptRequest {
   prompt: string;
@@ -138,11 +138,11 @@ function splitMarkdownToOutlineItems(markdown: string): OutlineItem[] {
   // Split the markdown into sections based on headings (## and above)
   const sections = cleanMarkdown.split(/(?=^#{2,}\s)/m).filter(Boolean);
 
-  const items =  sections.map((section, index) => ({
+  const items = sections.map((section, index) => ({
     id: index.toString(),
     htmlContent: marked.parse(section.trim(), {
-      async: false, 
-    })
+      async: false,
+    }),
   }));
 
   return items;

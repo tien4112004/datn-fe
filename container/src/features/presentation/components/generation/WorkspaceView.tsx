@@ -18,9 +18,8 @@ import {
 import { useModels } from '@/features/model';
 import { PRESENTATION_STYLES, SLIDE_COUNT_OPTIONS } from '@/features/presentation/constants';
 import type { OutlineData, OutlineItem } from '@/features/presentation/types/outline';
-// import { usePresentationOutlines } from '@/features/presentation/hooks/useApi';
 import useFetchStreaming from '@/features/presentation/hooks/useFetchStreaming';
-// import GhostOutlineWorkspace from '@/features/presentation/components/GhostOutlineWorkspace';
+import { useOutlineContext } from '../../context/OutlineContext';
 
 type OutlineFormData = {
   slideCount: string;
@@ -43,7 +42,7 @@ const WorkspaceView = ({ initialOutlineData }: WorkspaceViewProps) => {
   const { t } = useTranslation('presentation', { keyPrefix: 'workspace' });
   // const { outlineItems, refetch, isFetching } = usePresentationOutlines();
   const { outlineItems, isStreaming, startStream } = useFetchStreaming();
-  const [items, setItems] = useState<OutlineItem[]>([]);
+  const { content, setContent } = useOutlineContext();
   const { control: outlineControl, handleSubmit: handleRegenerateSubmit } = useForm<OutlineFormData>({
     defaultValues: {
       slideCount: initialOutlineData?.slideCount || '',
@@ -67,7 +66,8 @@ const WorkspaceView = ({ initialOutlineData }: WorkspaceViewProps) => {
   });
 
   useEffect(() => {
-    setItems([...outlineItems]);
+    setContent([...outlineItems]);
+
     console.log('Outline items updated:', outlineItems);
   }, [isStreaming, outlineItems]);
 
@@ -83,7 +83,7 @@ const WorkspaceView = ({ initialOutlineData }: WorkspaceViewProps) => {
   const onSubmitPresentation = (data: CustomizationFormData) => {
     const fullData = {
       ...data,
-      items,
+      content,
     };
     console.log('Form data:', fullData);
   };
@@ -101,7 +101,7 @@ const WorkspaceView = ({ initialOutlineData }: WorkspaceViewProps) => {
           onSubmit={handleRegenerateSubmit(onRegenerateOutline)}
         />
 
-        <OutlineSection items={items} setItems={setItems} isFetching={isStreaming} />
+        <OutlineSection isFetching={isStreaming} />
 
         <CustomizationSection
           control={customizationControl}
@@ -218,12 +218,10 @@ const OutlineFormSection = ({ control, isFetching, onSubmit }: OutlineFormSectio
 };
 
 interface OutlineSectionProps {
-  items: OutlineItem[];
-  setItems: (items: OutlineItem[]) => void;
   isFetching: boolean;
 }
 
-const OutlineSection = ({ items, setItems, isFetching }: OutlineSectionProps) => {
+const OutlineSection = ({ isFetching }: OutlineSectionProps) => {
   const { t } = useTranslation('presentation', { keyPrefix: 'workspace' });
 
   return (
@@ -232,13 +230,11 @@ const OutlineSection = ({ items, setItems, isFetching }: OutlineSectionProps) =>
       {/* {isFetching ? (
         <GhostOutlineWorkspace items={items} />
       ) : ( */}
-        <OutlineWorkspace
-          items={items}
-          setItems={setItems}
-          onDownload={async () => {
-            await new Promise((resolve) => setTimeout(resolve, 2000));
-          }}
-        />
+      <OutlineWorkspace
+        onDownload={async () => {
+          await new Promise((resolve) => setTimeout(resolve, 2000));
+        }}
+      />
       {/* )} */}
     </>
   );

@@ -4,7 +4,7 @@ import { OutlineCreationView, WorkspaceView } from '@/features/presentation/comp
 import type { ModelOption } from '@/features/model';
 import { SidebarTrigger } from '@/shared/components/ui/sidebar';
 import type { OutlineData } from '@/features/presentation/types';
-import { OutlineProvider } from '../context/OutlineContext';
+// import { OutlineProvider } from '../context/OutlineContext';
 
 const PresentationViewState = {
   OUTLINE_CREATION: 'outline_creation',
@@ -18,7 +18,12 @@ const PresentationOutlinePage = () => {
   const [currentView, setCurrentView] = useState<PresentationViewState>(
     PresentationViewState.OUTLINE_CREATION
   );
-  const [outlineData, setOutlineData] = useState<OutlineData | null>(null);
+  const [outlineData, setOutlineData] = useState<OutlineData>({
+    slideCount: '',
+    style: '',
+    model: defaultModel.name,
+    prompt: '',
+  });
 
   const handleCreateOutline = (outlineData: OutlineData) => {
     setOutlineData(outlineData);
@@ -28,13 +33,11 @@ const PresentationOutlinePage = () => {
   return (
     <>
       <SidebarTrigger className="absolute left-4 top-4 z-50" />
-      <OutlineProvider>
-        {currentView === PresentationViewState.OUTLINE_CREATION ? (
-          <OutlineCreationView defaultModel={defaultModel} onCreateOutline={handleCreateOutline} />
-        ) : (
-          <WorkspaceView initialOutlineData={outlineData} />
-        )}
-      </OutlineProvider>
+      {currentView === PresentationViewState.OUTLINE_CREATION ? (
+        <OutlineCreationView defaultModel={defaultModel} onCreateOutline={handleCreateOutline} />
+      ) : (
+        <WorkspaceView initialOutlineData={outlineData} />
+      )}
     </>
   );
 };

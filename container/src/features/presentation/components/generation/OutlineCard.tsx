@@ -7,7 +7,8 @@ import { BlockNoteEditor } from '@blocknote/core';
 import { useSortable } from '@dnd-kit/sortable';
 import { Trash } from 'lucide-react';
 import React from 'react';
-import { useOutlineContext } from '../../context/OutlineContext';
+import useOutlineStore from '@/features/presentation/stores/useOutlineStore';
+// import { useOutlineContext } from '../../context/OutlineContext';
 
 interface OutlineCardProps {
   id: string;
@@ -19,7 +20,8 @@ interface OutlineCardProps {
 
 const OutlineCard = ({ id, title = 'Outline', className = '', item, onDelete }: OutlineCardProps) => {
   const [isDeleting, setIsDeleting] = React.useState(false);
-  const { handleContentChange } = useOutlineContext();
+  // const { handleContentChange } = useOutlineContext();
+  const handleContentChange = useOutlineStore((state) => state.handleContentChange);
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: `outline-card-${id.toString()}`,
   });

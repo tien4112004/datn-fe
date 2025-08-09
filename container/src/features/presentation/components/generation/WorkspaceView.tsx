@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Button } from '@/shared/components/ui/button';
 import { useTranslation } from 'react-i18next';
 import { Controller, useForm, type Control } from 'react-hook-form';
@@ -17,9 +17,10 @@ import {
 } from '@/shared/components/ui/select';
 import { useModels } from '@/features/model';
 import { PRESENTATION_STYLES, SLIDE_COUNT_OPTIONS } from '@/features/presentation/constants';
-import type { OutlineData, OutlineItem } from '@/features/presentation/types/outline';
+import type { OutlineData } from '@/features/presentation/types/outline';
 import useFetchStreaming from '@/features/presentation/hooks/useFetchStreaming';
-import { useOutlineContext } from '../../context/OutlineContext';
+// import { useOutlineContext } from '../../context/OutlineContext';
+import useOutlineStore from '@/features/presentation/stores/useOutlineStore';
 
 type OutlineFormData = {
   slideCount: string;
@@ -35,23 +36,27 @@ type CustomizationFormData = {
 };
 
 interface WorkspaceViewProps {
-  initialOutlineData: OutlineData | null;
+  initialOutlineData: OutlineData;
 }
 
 const WorkspaceView = ({ initialOutlineData }: WorkspaceViewProps) => {
-  const { t } = useTranslation('presentation', { keyPrefix: 'workspace' });
   // const { outlineItems, refetch, isFetching } = usePresentationOutlines();
+  // const { content, setContent } = useOutlineContext();
+  const { t } = useTranslation('presentation', { keyPrefix: 'workspace' });
+  
+  // API
   const { outlineItems, isStreaming, startStream } = useFetchStreaming();
-  const { content, setContent } = useOutlineContext();
+  
+  // STORE
+  const content = useOutlineStore((state) => state.content);
+  const setContent = useOutlineStore((state) => state.setContent);
+
+  // OUTLINE FORM
   const { control: outlineControl, handleSubmit: handleRegenerateSubmit } = useForm<OutlineFormData>({
-    defaultValues: {
-      slideCount: initialOutlineData?.slideCount || '',
-      style: initialOutlineData?.style || '',
-      model: initialOutlineData?.model || '',
-      prompt: initialOutlineData?.prompt || '',
-    },
+    defaultValues: initialOutlineData,
   });
 
+  // CUSTOMIZATION FORM
   const {
     control: customizationControl,
     setValue,

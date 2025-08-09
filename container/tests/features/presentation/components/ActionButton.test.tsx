@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import ActionButton from '@/features/presentation/components/ActionButton';
+import ActionButton from '@/features/presentation/components/table/ActionButton';
 
 const mockUseTranslation = vi.fn();
 

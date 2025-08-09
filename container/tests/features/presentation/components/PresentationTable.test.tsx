@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import PresentationTable from '@/features/presentation/components/PresentationTable';
+import PresentationTable from '@/features/presentation/components/table/PresentationTable';
 import { usePresentations } from '@/features/presentation/hooks/useApi';
 
 const mockUseTranslation = vi.fn();

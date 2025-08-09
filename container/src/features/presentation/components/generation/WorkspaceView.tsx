@@ -43,10 +43,10 @@ const WorkspaceView = ({ initialOutlineData }: WorkspaceViewProps) => {
   // const { outlineItems, refetch, isFetching } = usePresentationOutlines();
   // const { content, setContent } = useOutlineContext();
   const { t } = useTranslation('presentation', { keyPrefix: 'workspace' });
-  
+
   // API
   const { outlineItems, isStreaming, startStream } = useFetchStreaming();
-  
+
   // STORE
   const content = useOutlineStore((state) => state.content);
   const setContent = useOutlineStore((state) => state.setContent);
@@ -72,8 +72,6 @@ const WorkspaceView = ({ initialOutlineData }: WorkspaceViewProps) => {
 
   useEffect(() => {
     setContent([...outlineItems]);
-
-    console.log('Outline items updated:', outlineItems);
   }, [isStreaming, outlineItems]);
 
   const onRegenerateOutline = (data: OutlineFormData) => {
@@ -106,7 +104,7 @@ const WorkspaceView = ({ initialOutlineData }: WorkspaceViewProps) => {
           onSubmit={handleRegenerateSubmit(onRegenerateOutline)}
         />
 
-        <OutlineSection isFetching={isStreaming} />
+        <OutlineSection />
 
         <CustomizationSection
           control={customizationControl}
@@ -222,25 +220,21 @@ const OutlineFormSection = ({ control, isFetching, onSubmit }: OutlineFormSectio
   );
 };
 
-interface OutlineSectionProps {
-  isFetching: boolean;
-}
+// interface OutlineSectionProps {
+//   isFetching: boolean;
+// }
 
-const OutlineSection = ({ isFetching }: OutlineSectionProps) => {
+const OutlineSection = () => {
   const { t } = useTranslation('presentation', { keyPrefix: 'workspace' });
 
   return (
     <>
       <div className="scroll-m-20 text-xl font-semibold tracking-tight">{t('outlineSection')}</div>
-      {/* {isFetching ? (
-        <GhostOutlineWorkspace items={items} />
-      ) : ( */}
-      <OutlineWorkspace
-        onDownload={async () => {
-          await new Promise((resolve) => setTimeout(resolve, 2000));
-        }}
-      />
-      {/* )} */}
+        <OutlineWorkspace
+          onDownload={async () => {
+            await new Promise((resolve) => setTimeout(resolve, 2000));
+          }}
+        />
     </>
   );
 };

@@ -8,12 +8,13 @@ import { useSortable } from '@dnd-kit/sortable';
 import { Trash } from 'lucide-react';
 import React from 'react';
 import useOutlineStore from '@/features/presentation/stores/useOutlineStore';
+import type { OutlineItem } from '../../types';
 // import { useOutlineContext } from '../../context/OutlineContext';
 
 interface OutlineCardProps {
   id: string;
-  title?: string;
-  item?: any;
+  title: string;
+  item: OutlineItem;
   className?: string;
   onDelete?: () => void;
 }
@@ -80,7 +81,7 @@ const OutlineCard = ({ id, title = 'Outline', className = '', item, onDelete }: 
           data-card
           editor={editor}
           onChange={() => async (editor: BlockNoteEditor) => {
-            const htmlContent = await editor.blocksToFullHTML(item.htmlContent);
+            const htmlContent = await editor.blocksToFullHTML(editor.document);
             handleContentChange?.(id, htmlContent);
           }}
           sideMenu={false}

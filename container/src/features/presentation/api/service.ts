@@ -1,5 +1,5 @@
 import { API_MODE, type ApiMode } from '@/shared/constants';
-import { type PresentationApiService, type OutlineItem, type PresentationItem } from '../types';
+import { type PresentationApiService, type OutlineItem, type PresentationItem, type OutlinePromptRequest } from '../types';
 import { marked } from 'marked';
 // import api from '@/shared/api';
 
@@ -61,10 +61,32 @@ function splitMarkdownToOutlineItems(markdown: string): OutlineItem[] {
 }
 
 export default class PresentationRealApiService implements PresentationApiService {
+  async getStreamedOutline(request: OutlinePromptRequest, signal: AbortSignal): Promise<ReadableStream<Uint8Array>> {
+    const response = await fetch('http://localhost:8080/presentations/mock-outline', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(request),
+      signal,
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    if (!response.body) {
+      throw new Error('No response body');
+    }
+
+    return response.body;
+  }
+
   //   async getPresentationItems(): Promise<PresentationItem[]> {
   //     const response = await api.get<PresentationItem[]>('/presentation/items');
   //     return response.data;
   //   }
+
   getType(): ApiMode {
     return API_MODE.real;
   }

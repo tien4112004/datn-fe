@@ -28,7 +28,7 @@ export const usePresentations = () => {
       console.log('Fetch presentations', data);
       return data;
     },
-  });
+  }); 
 
   return {
     presentationItems,

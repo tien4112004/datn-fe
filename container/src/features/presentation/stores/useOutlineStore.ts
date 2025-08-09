@@ -1,4 +1,4 @@
-import { create } from 'zustand'
+import { create } from 'zustand';
 import type { OutlineItem } from '@/features/presentation/types';
 
 interface OutlineStore {
@@ -19,11 +19,10 @@ const useOutlineStore = create<OutlineStore>((set) => ({
   setContent: (value) => set({ content: value }),
   setStreamingContent: (value) => set({ isStreaming: true, streamingContent: value }),
   endStreaming: () => set({ isStreaming: false, streamingContent: '' }),
-  handleContentChange: (id, content) => set((state) => ({
-    content: state.content.map((item) =>
-      item.id === id ? { ...item, htmlContent: content } : item
-    )
-  })),
-}))
+  handleContentChange: (id, content) =>
+    set((state) => ({
+      content: state.content.map((item) => (item.id === id ? { ...item, htmlContent: content } : item)),
+    })),
+}));
 
-export default useOutlineStore
+export default useOutlineStore;

@@ -9,3 +9,10 @@ export type OutlineData = {
   style: string | undefined;
   model: string;
 };
+
+export interface OutlinePromptRequest {
+  prompt: string;
+  topic?: string;
+  maxLength?: number;
+  // Add other properties as needed
+}

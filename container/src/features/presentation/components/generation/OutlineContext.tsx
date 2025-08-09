@@ -1,7 +1,7 @@
 // DEPRECATED: This file will be removed in future versions.
 
 import React, { createContext, useContext, useState } from 'react';
-import type { OutlineItem } from '../types';
+import type { OutlineItem } from '../../types';
 
 type OutlineContextType = {
   content: OutlineItem[];

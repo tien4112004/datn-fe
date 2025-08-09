@@ -1,6 +1,8 @@
 import React from 'react';
 import type { OutlineItem } from '../types';
 import { marked } from 'marked';
+// import { experimental_streamedQuery as streamedQuery, useQuery, useQueryClient } from '@tanstack/react-query';
+import { usePresentationApiService } from '@/features/presentation/api';
 
 interface OutlinePromptRequest {
   prompt: string;
@@ -20,6 +22,7 @@ interface StreamingHookReturn {
 }
 
 function useFetchStreaming(): StreamingHookReturn {
+  const presentationApiService = usePresentationApiService();
   const [streamedContent, setStreamedContent] = React.useState<string>('');
   const [outlineItems, setOutlineItems] = React.useState<OutlineItem[]>([]);
   const [isStreaming, setIsStreaming] = React.useState<boolean>(false);
@@ -37,28 +40,8 @@ function useFetchStreaming(): StreamingHookReturn {
     abortControllerRef.current = new AbortController();
 
     try {
-      console.log('Starting fetch stream with data:', requestData);
-
-      const response = await fetch('http://localhost:8080/presentations/mock-outline', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'text/plain', // Match your backend's produces value
-        },
-        body: JSON.stringify(requestData),
-        signal: abortControllerRef.current.signal,
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
-      }
-
-      // Check if the response body is readable
-      if (!response.body) {
-        throw new Error('ReadableStream not supported');
-      }
-
-      const reader = response.body.getReader();
+      const stream = await presentationApiService.getStreamedOutline(requestData, abortControllerRef.current.signal);
+      const reader = stream.getReader();
       const decoder = new TextDecoder();
       let fullContent = '';
 
@@ -67,8 +50,6 @@ function useFetchStreaming(): StreamingHookReturn {
           const { done, value } = await reader.read();
 
           if (done) {
-            console.log('Streaming complete. Full content length:', fullContent.length);
-            console.log('Full content:', fullContent);
             break;
           }
 
@@ -87,25 +68,20 @@ function useFetchStreaming(): StreamingHookReturn {
       }
     } catch (err) {
       if (err instanceof Error) {
-        if (err.name === 'AbortError') {
-          console.log('Stream was cancelled');
-        } else {
-          console.error('Error during streaming:', err);
+        if (err.name !== 'AbortError') {
           setError(`${err.message}`);
         }
       } else {
-        console.error('Unknown error during streaming:', err);
         setError('Unknown error occurred');
       }
     } finally {
       setIsStreaming(false);
       abortControllerRef.current = null;
     }
-  }, []);
+  }, [presentationApiService]);
 
   const stopStream = React.useCallback((): void => {
     if (abortControllerRef.current) {
-      console.log('Cancelling fetch stream');
       abortControllerRef.current.abort();
       abortControllerRef.current = null;
     }
@@ -128,6 +104,72 @@ function useFetchStreaming(): StreamingHookReturn {
     clearContent,
   };
 }
+
+// Khi nao du manh se quay ve day tra thu
+// 
+// function useFetchStreaming(): StreamingHookReturn {
+//   const presentationApiService = usePresentationApiService();
+//   const [isStreaming, setIsStreaming] = React.useState(false);
+//   const queryClient = useQueryClient();
+
+//   const { data, error, refetch } = useQuery({
+//     queryKey: [presentationApiService.getType(), 'presentationItems'],
+//     queryFn: streamedQuery({
+//       queryFn: ({ signal }) => {
+//         return {
+//           async *[Symbol.asyncIterator]() {
+//             const response = await fetch('http://localhost:8080/presentations/mock-outline', {
+//               method: 'POST',
+//               headers: {
+//                 'Content-Type': 'application/json',
+//                 Accept: 'text/plain', 
+//               },
+//               signal
+//             })
+
+//             const reader = response.body?.getReader();
+//             if (!reader) throw new Error("No reader available");
+
+//             try {
+//               while (true) {
+//                 const { done, value } = await reader.read();
+//                 if (done) break;
+//                 console.log(value)
+
+//                 // Convert the Uint8Array to text
+//                 const text = new TextDecoder().decode(value);
+//                 yield text;
+//               }
+//             } finally {
+//               reader.releaseLock();
+//             }
+//           },
+//         };
+//       },
+//     }),
+//     staleTime: Infinity,
+//     enabled: isStreaming,
+//   });
+
+//   const handleStreamingToggle = () => {
+//     if (isStreaming) {
+//       queryClient.cancelQueries({ queryKey: [presentationApiService.getType(), 'presentationItems'] });
+//     }
+//     setIsStreaming(!isStreaming);
+//   };
+
+//   return {
+//     streamedContent: data?.join('') ?? '',
+//     outlineItems: splitMarkdownToOutlineItems(data?.join('') ?? ''),
+//     isStreaming,
+//     error: error?.message ?? null,
+//     // startStream: () => refetch(),
+//     stopStream: handleStreamingToggle,
+//     clearContent: () => {
+//       queryClient.setQueryData([presentationApiService.getType(), 'presentationItems'], null);
+//     }
+//   }
+// }
 
 function splitMarkdownToOutlineItems(markdown: string): OutlineItem[] {
   const cleanMarkdown = markdown

@@ -5,7 +5,7 @@ import MindMapNodeBlock from './MindmapNode';
 import MindmapEdgeBlock from './MindmapEdge';
 import MindmapToolbar from './MindmapToolbar';
 import MindmapInstructions from './MindmapInstructions';
-import { useShortcuts } from '../hooks/useShortcut';
+import { useShortcuts, useMindmapActions } from '../hooks';
 import { useMemo, useCallback } from 'react';
 import { DevTools } from '@/components/devtools';
 import { useClipboardStore } from '../stores/useClipboardStore';
@@ -19,19 +19,7 @@ const edgeTypes = {
 };
 
 const MindMap = () => {
-  const {
-    nodes,
-    edges,
-    onNodesChange,
-    onEdgesChange,
-    onConnect,
-    selectAllNodesAndEdges,
-    copySelectedNodesAndEdges,
-    pasteClonedNodesAndEdges,
-    deleteSelectedNodes,
-    deselectAllNodesAndEdges,
-    onNodeDrag,
-  } = useMindmap();
+  const { nodes, edges, onNodesChange, onEdgesChange, onConnect, onNodeDrag } = useMindmap();
 
   const setMousePosition = useClipboardStore((state) => state.setMousePosition);
   const onPaneMouseMove = useCallback(
@@ -41,40 +29,6 @@ const MindMap = () => {
     },
     [setMousePosition]
   );
-
-  const shortcuts = useMemo(
-    () => [
-      {
-        key: 'Ctrl+A',
-        callback: selectAllNodesAndEdges,
-      },
-      {
-        key: 'Ctrl+C',
-        callback: copySelectedNodesAndEdges,
-      },
-      {
-        key: 'Ctrl+V',
-        callback: pasteClonedNodesAndEdges,
-      },
-      {
-        key: 'Delete',
-        callback: deleteSelectedNodes,
-      },
-      {
-        key: 'Escape',
-        callback: deselectAllNodesAndEdges,
-      },
-    ],
-    [
-      selectAllNodesAndEdges,
-      copySelectedNodesAndEdges,
-      pasteClonedNodesAndEdges,
-      deleteSelectedNodes,
-      deselectAllNodesAndEdges,
-    ]
-  );
-
-  useShortcuts(shortcuts);
 
   const proOptions = useMemo(() => ({ hideAttribution: true }), []);
 
@@ -122,9 +76,56 @@ const MindMap = () => {
 
         <Background variant={BackgroundVariant.Dots} gap={20} size={1} />
         <DevTools position="bottom-left" />
+        <LogicHandler />
       </ReactFlow>
     </div>
   );
+};
+
+const LogicHandler = () => {
+  const {
+    selectAllNodesAndEdges,
+    copySelectedNodesAndEdges,
+    pasteClonedNodesAndEdges,
+    deleteSelectedNodes,
+    deselectAllNodesAndEdges,
+  } = useMindmapActions();
+
+  const shortcuts = useMemo(
+    () => [
+      {
+        key: 'Ctrl+A',
+        callback: selectAllNodesAndEdges,
+      },
+      {
+        key: 'Ctrl+C',
+        callback: copySelectedNodesAndEdges,
+      },
+      {
+        key: 'Ctrl+V',
+        callback: pasteClonedNodesAndEdges,
+      },
+      {
+        key: 'Delete',
+        callback: deleteSelectedNodes,
+      },
+      {
+        key: 'Escape',
+        callback: deselectAllNodesAndEdges,
+      },
+    ],
+    [
+      selectAllNodesAndEdges,
+      copySelectedNodesAndEdges,
+      pasteClonedNodesAndEdges,
+      deleteSelectedNodes,
+      deselectAllNodesAndEdges,
+    ]
+  );
+
+  useShortcuts(shortcuts);
+
+  return null;
 };
 
 export default MindMap;

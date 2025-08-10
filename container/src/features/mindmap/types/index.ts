@@ -36,8 +36,12 @@ export interface MindmapContextType {
   addChildNode: (parentNode: Partial<MindMapNode>, position: XYPosition, sourceHandler?: string) => void;
   markNodeForDeletion: (nodeId: string) => void;
   finalizeNodeDeletion: (nodeId: string) => void;
+}
+
+export interface MindmapActionsType {
   selectAllNodesAndEdges: () => void;
   deselectAllNodesAndEdges: () => void;
   copySelectedNodesAndEdges: () => void;
   pasteClonedNodesAndEdges: () => void;
+  deleteSelectedNodes: () => void;
 }

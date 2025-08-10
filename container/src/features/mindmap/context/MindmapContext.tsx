@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useCallback, useState, useRef, useMemo, useEffect } from 'react';
+import React, { createContext, useContext, useCallback, useState, useMemo, useEffect } from 'react';
 import {
   useEdgesState,
   useNodesState,
@@ -10,10 +10,9 @@ import {
   useUpdateNodeInternals,
 } from '@xyflow/react';
 import type { MindMapNode, MindMapEdge, MindmapContextType } from '../types';
-import { DIRECTION, DragHandle, MINDMAP_TYPES, type Direction } from '../constants';
+import { DragHandle, MINDMAP_TYPES, type Direction } from '../constants';
 import { generateId } from '@/shared/lib/utils';
-import { useClipboardStore } from '../stores/useClipboardStore';
-import dagre from '@dagrejs/dagre';
+import { useLayoutStore } from '../stores/useLayoutStore';
 
 const initialNodes: MindMapNode[] = [
   {
@@ -105,23 +104,16 @@ export const MindmapProvider: React.FC<MindmapProviderProps> = ({ children }) =>
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const [nodeId, setNodeId] = useState(1);
-  const [isLayouting, setIsLayouting] = useState(false);
-  const { screenToFlowPosition, getIntersectingNodes, fitView } = useReactFlow();
-  const layout = useRef<Direction>('horizontal');
+  const { getIntersectingNodes, fitView } = useReactFlow();
   const nodesInitialized = useNodesInitialized();
   const updateNodeInternals = useUpdateNodeInternals();
 
-  // Clip board
-  const clipboardCopySelectedNodesAndEdges = useClipboardStore((state) => state.copySelectedNodesAndEdges);
-  const clipboardPasteClonedNodesAndEdges = useClipboardStore((state) => state.pasteClonedNodesAndEdges);
+  const layout = useLayoutStore((state) => state.layout);
+  const isLayouting = useLayoutStore((state) => state.isLayouting);
+  const layoutUpdateLayout = useLayoutStore((state) => state.updateLayout);
+  const layoutOnLayoutChange = useLayoutStore((state) => state.onLayoutChange);
 
-  const copySelectedNodesAndEdges = useCallback(() => {
-    clipboardCopySelectedNodesAndEdges(nodes, edges);
-  }, [nodes, edges, clipboardCopySelectedNodesAndEdges]);
-
-  const pasteClonedNodesAndEdges = useCallback(() => {
-    clipboardPasteClonedNodesAndEdges(screenToFlowPosition, setNodes, setEdges);
-  }, [clipboardPasteClonedNodesAndEdges, screenToFlowPosition, setNodes, setEdges]);
+  // Action methods moved to useMindmapActions hook
   console.log('MindmapProvider rendered');
 
   const onConnect = useCallback(
@@ -215,139 +207,34 @@ export const MindmapProvider: React.FC<MindmapProviderProps> = ({ children }) =>
     selectedNodeIds.forEach((nodeId) => markNodeForDeletion(nodeId));
   }, [nodes, markNodeForDeletion]);
 
-  const selectAllNodesAndEdges = useCallback(() => {
-    setNodes((nds: MindMapNode[]) => nds.map((node: MindMapNode) => ({ ...node, selected: true })));
-    setEdges((eds: MindMapEdge[]) => eds.map((edge: MindMapEdge) => ({ ...edge, selected: true })));
-  }, [setNodes, setEdges]);
-
-  const deselectAllNodesAndEdges = useCallback(() => {
-    setNodes((nds: MindMapNode[]) => nds.map((node: MindMapNode) => ({ ...node, selected: false })));
-    setEdges((eds: MindMapEdge[]) => eds.map((edge: MindMapEdge) => ({ ...edge, selected: false })));
-  }, [setNodes, setEdges]);
-
-  const getLayoutedElements = useCallback(
-    (nodes: MindMapNode[], edges: MindMapEdge[], direction: Direction) => {
-      if (nodes.length === 0 || direction === DIRECTION.NONE) return { nodes, edges };
-
-      try {
-        // Create a new directed graph
-        const g = new dagre.graphlib.Graph();
-
-        // Set an object for the graph label
-        g.setDefaultEdgeLabel(() => ({}));
-
-        // Configure the graph based on direction
-        if (direction === DIRECTION.VERTICAL) {
-          g.setGraph({ rankdir: 'TB', ranksep: 120 });
-        } else if (direction === DIRECTION.HORIZONTAL) {
-          g.setGraph({ rankdir: 'LR', ranksep: 120 });
-        } else {
-          return { nodes, edges };
-        }
-
-        // Add nodes to the graph
-        nodes.forEach((node: MindMapNode) => {
-          g.setNode(node.id, {
-            width: node.measured?.width || 220,
-            height: node.measured?.height || 40,
-          });
-        });
-
-        // Add edges to the graph
-        edges.forEach((edge: MindMapEdge) => {
-          g.setEdge(edge.source, edge.target);
-        });
-
-        // Calculate the layout
-        dagre.layout(g, {
-          disableOptimalOrderHeuristic: true,
-        });
-
-        // Update node positions based on dagre layout
-        const layoutedNodes = nodes.map((node: any) => {
-          const nodeWithPosition = g.node(node.id);
-          return {
-            ...node,
-            position: {
-              // Dagre gives us the center position, adjust to top-left
-              x: nodeWithPosition.x - (nodeWithPosition.width || 150) / 2,
-              y: nodeWithPosition.y - (nodeWithPosition.height || 40) / 2,
-            },
-          };
-        });
-
-        return {
-          nodes: layoutedNodes,
-          edges,
-        };
-      } catch (error) {
-        console.warn('Layout calculation failed:', error);
-        return { nodes, edges };
-      }
-    },
-    []
-  );
-
   const updateLayout = useCallback(
     (direction: Direction) => {
-      if (!nodes?.length || !edges) return;
-
-      setIsLayouting(true);
-
-      // Calculate new positions
-      const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(nodes, edges, direction);
-
-      // Update nodes with smooth transitions using React Flow's animation system
-      setNodes([
-        ...layoutedNodes.map((layoutedNode) => {
-          return {
-            ...layoutedNode,
-            // Apply smooth transition using React Flow's built-in animation
-            style: {
-              ...layoutedNode.style,
-              transition: 'all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-            },
-          };
-        }),
-      ]);
-      setEdges([...layoutedEdges]);
-
-      // Remove isLayouting flag after animation completes
-      setTimeout(() => {
-        setIsLayouting(false);
-        setNodes((nds: MindMapNode[]) =>
-          nds.map((node) => ({ ...node, style: { ...node.style, transition: '' } }))
-        );
-      }, 800);
-
-      setTimeout(() => {
-        updateNodeInternals(nodes.map((node) => node.id));
-      }, 0);
+      layoutUpdateLayout(nodes, edges, direction, setNodes, setEdges);
     },
-    [nodes, edges, setNodes, setEdges, getLayoutedElements]
+    [nodes, edges, setNodes, setEdges, updateNodeInternals, layoutUpdateLayout]
   );
 
   const onLayoutChange = useCallback(
     (direction: Direction) => {
-      layout.current = direction;
-      updateLayout(direction);
+      layoutOnLayoutChange(direction, nodes, edges, setNodes, setEdges);
+      fitView();
     },
-    [updateLayout, fitView, updateNodeInternals]
+    [nodes, edges, setNodes, setEdges, updateNodeInternals, layoutOnLayoutChange]
   );
 
-  const hasInitializedRef = useRef(false);
-
   useEffect(() => {
-    if (nodes.length > 0 && nodesInitialized && !hasInitializedRef.current) {
-      hasInitializedRef.current = true;
+    if (nodes.length > 0 && nodesInitialized) {
       // Add a small delay to ensure DOM is fully rendered
       const timeoutId = setTimeout(() => {
-        updateLayout(layout.current);
+        updateLayout(layout);
+        setTimeout(() => {
+          updateNodeInternals(nodes.map((node) => node.id));
+        }, 10);
       }, 10);
 
       return () => clearTimeout(timeoutId);
     }
-  }, [nodes.length, nodesInitialized, updateLayout]);
+  }, [nodes.length, nodesInitialized]);
 
   const onNodeDrag = useCallback(
     (_: MouseEvent, node: MindMapNode) => {
@@ -367,7 +254,7 @@ export const MindmapProvider: React.FC<MindmapProviderProps> = ({ children }) =>
     () => ({
       nodes,
       edges,
-      layout: layout.current,
+      layout,
       isLayouting,
       setNodes,
       setEdges,
@@ -382,10 +269,6 @@ export const MindmapProvider: React.FC<MindmapProviderProps> = ({ children }) =>
       addChildNode,
       markNodeForDeletion,
       finalizeNodeDeletion,
-      selectAllNodesAndEdges,
-      deselectAllNodesAndEdges,
-      copySelectedNodesAndEdges,
-      pasteClonedNodesAndEdges,
     }),
     [
       nodes,
@@ -405,10 +288,6 @@ export const MindmapProvider: React.FC<MindmapProviderProps> = ({ children }) =>
       addChildNode,
       markNodeForDeletion,
       finalizeNodeDeletion,
-      selectAllNodesAndEdges,
-      deselectAllNodesAndEdges,
-      copySelectedNodesAndEdges,
-      pasteClonedNodesAndEdges,
     ]
   );
 

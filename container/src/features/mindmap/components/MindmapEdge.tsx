@@ -1,19 +1,14 @@
 import {
-  BaseEdge,
-  type Edge,
   type EdgeProps,
   getBezierPath,
   getSimpleBezierPath,
   getSmoothStepPath,
   getStraightPath,
 } from '@xyflow/react';
-import { memo } from 'react';
-
-export type MindMapEdge = Edge<{
-  strokeWidth?: number;
-  strokeColor?: string;
-  smoothType?: SmoothType;
-}>;
+import { memo, useRef, useEffect } from 'react';
+import { motion, useAnimation } from 'motion/react';
+import { useMindmap } from '../context/MindmapContext';
+import type { MindMapEdge } from '../types';
 
 type SmoothType = 'smoothstep' | 'straight' | 'bezier' | 'simplebezier';
 
@@ -81,6 +76,8 @@ const MindmapEdgeBlock = memo(
     data,
     selected,
   }: EdgeProps<MindMapEdge> & { smoothType: SmoothType }) => {
+    const { isLayouting } = useMindmap();
+
     const [edgePath] = getEdgePath(data?.smoothType || 'smoothstep', {
       id,
       sourceX,
@@ -92,16 +89,23 @@ const MindmapEdgeBlock = memo(
     });
 
     return (
-      <BaseEdge
+      <motion.path
         id={id}
-        path={edgePath}
+        key={`edge-${id}`}
+        d={edgePath}
+        fill="none"
+        stroke={data?.strokeColor || 'var(--primary)'}
+        strokeWidth={selected ? (data?.strokeWidth || 2) + 1 : data?.strokeWidth || 2}
+        opacity={selected ? 1 : 0.8}
         style={{
-          stroke: data?.strokeColor || 'var(--primary)',
-          strokeWidth: selected ? (data?.strokeWidth || 2) + 1 : data?.strokeWidth || 2,
-          opacity: selected ? 1 : 0.8,
           filter: selected ? 'drop-shadow(0 0 4px var(--primary))' : undefined,
         }}
-        className={'animate-pulse'}
+        animate={{
+          d: edgePath,
+        }}
+        transition={
+          isLayouting ? { duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94], type: 'tween' } : { duration: 0 }
+        }
       />
     );
   }

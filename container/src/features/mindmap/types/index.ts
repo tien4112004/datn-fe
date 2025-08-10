@@ -5,7 +5,6 @@ export type MindMapNode = Node<{
   level: number;
   content: string;
   isDeleting?: boolean;
-  isLayouting?: boolean;
   parentId?: string;
   metadata?: Record<string, any>;
 }> & {
@@ -16,6 +15,7 @@ export type MindMapEdge = Edge<{
   strokeWidth?: number;
   strokeColor?: string;
   smoothType?: 'smoothstep' | 'straight' | 'bezier' | 'simplebezier';
+  isLayouting?: boolean;
 }>;
 
 export interface MindmapContextType {

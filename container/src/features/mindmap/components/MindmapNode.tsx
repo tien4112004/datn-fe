@@ -64,16 +64,10 @@ const MindMapNodeBlock = memo(({ ...node }: NodeProps<MindMapNode>) => {
   return (
     <AnimatePresence>
       <motion.div
-        key={`mindmap-node-${id}`}
+        key={id}
         initial={{ opacity: 0, scale: 0 }}
         animate={data.isDeleting ? { opacity: 0, scale: 0 } : { opacity: 1, scale: 1 }}
-        // transition={{
-        //   duration: data.isDeleting ? 0.3 : isLayouting ? 0.5 : 0.2,
-        //   type: isLayouting ? 'spring' : 'ease',
-        //   damping: isLayouting ? 20 : undefined,
-        //   stiffness: isLayouting ? 300 : undefined,
-        // }}
-        layout={isLayouting}
+        transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94], type: 'tween' }}
         onAnimationComplete={() => {
           if (data.isDeleting) {
             finalizeNodeDeletion(id);
@@ -82,9 +76,9 @@ const MindMapNodeBlock = memo(({ ...node }: NodeProps<MindMapNode>) => {
       >
         <BaseNode
           className={cn(
-            `rounded-lg border-2 shadow-md transition-all duration-200`,
+            `rounded-lg border-2 shadow-md`,
             selected ? 'ring-2' : 'ring-0',
-            data.isLayouting && 'shadow-lg ring-2 ring-blue-300'
+            isLayouting && 'shadow-lg ring-2 ring-blue-300'
           )}
           onMouseEnter={() => setIsMouseOver(true)}
           onMouseLeave={() => setIsMouseOver(false)}

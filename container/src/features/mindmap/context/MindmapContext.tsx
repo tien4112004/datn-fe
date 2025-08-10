@@ -12,8 +12,6 @@ import type { MindMapNode, MindMapEdge, MindmapContextType } from '../types';
 import { DragHandle, MINDMAP_TYPES, type Direction } from '../constants';
 import { generateId } from '@/shared/lib/utils';
 import dagre from '@dagrejs/dagre';
-import { timer } from 'd3-timer';
-import { interpolate } from 'd3-interpolate';
 
 const initialNodes: MindMapNode[] = [
   {
@@ -108,7 +106,6 @@ export const MindmapProvider: React.FC<MindmapProviderProps> = ({ children }) =>
   const [isLayouting, setIsLayouting] = useState(false);
   const mousePositionRef = useRef({ x: 0, y: 0 });
   const offset = useRef(0);
-  const animationTimer = useRef<any>(null);
   const { screenToFlowPosition, getIntersectingNodes, fitView } = useReactFlow();
   const layout = useRef<Direction>('horizontal');
   const nodesInitialized = useNodesInitialized();
@@ -284,66 +281,69 @@ export const MindmapProvider: React.FC<MindmapProviderProps> = ({ children }) =>
     offset.current = 0;
   }, []);
 
-  const getLayoutedElements = useCallback((nodes: any[], edges: any[], direction: string) => {
-    if (nodes.length === 0) return { nodes, edges };
+  const getLayoutedElements = useCallback(
+    (nodes: MindMapNode[], edges: MindMapEdge[], direction: Direction) => {
+      if (nodes.length === 0) return { nodes, edges };
 
-    try {
-      // Create a new directed graph
-      const g = new dagre.graphlib.Graph();
+      try {
+        // Create a new directed graph
+        const g = new dagre.graphlib.Graph();
 
-      // Set an object for the graph label
-      g.setDefaultEdgeLabel(() => ({}));
+        // Set an object for the graph label
+        g.setDefaultEdgeLabel(() => ({}));
 
-      // Configure the graph based on direction
-      if (direction === 'vertical') {
-        g.setGraph({ rankdir: 'TB', ranksep: 120 });
-      } else if (direction === 'horizontal') {
-        g.setGraph({ rankdir: 'LR', ranksep: 120 });
-      } else {
-        // No layout - return nodes as is
+        // Configure the graph based on direction
+        if (direction === 'vertical') {
+          g.setGraph({ rankdir: 'TB', ranksep: 120 });
+        } else if (direction === 'horizontal') {
+          g.setGraph({ rankdir: 'LR', ranksep: 120 });
+        } else {
+          // No layout - return nodes as is
+          return { nodes, edges };
+        }
+
+        // Add nodes to the graph
+        nodes.forEach((node: MindMapNode) => {
+          g.setNode(node.id, {
+            width: node.measured?.width || 220,
+            height: node.measured?.height || 40,
+          });
+        });
+
+        // Add edges to the graph
+        edges.forEach((edge: MindMapEdge) => {
+          g.setEdge(edge.source, edge.target);
+        });
+
+        // Calculate the layout
+        dagre.layout(g, {
+          disableOptimalOrderHeuristic: true,
+        });
+
+        // Update node positions based on dagre layout
+        const layoutedNodes = nodes.map((node: any) => {
+          const nodeWithPosition = g.node(node.id);
+          return {
+            ...node,
+            position: {
+              // Dagre gives us the center position, adjust to top-left
+              x: nodeWithPosition.x - (nodeWithPosition.width || 150) / 2,
+              y: nodeWithPosition.y - (nodeWithPosition.height || 40) / 2,
+            },
+          };
+        });
+
+        return {
+          nodes: layoutedNodes,
+          edges,
+        };
+      } catch (error) {
+        console.warn('Layout calculation failed:', error);
         return { nodes, edges };
       }
-
-      // Add nodes to the graph
-      nodes.forEach((node: any) => {
-        g.setNode(node.id, {
-          width: node.measured?.width || 220,
-          height: node.measured?.height || 40,
-        });
-      });
-
-      // Add edges to the graph
-      edges.forEach((edge: any) => {
-        g.setEdge(edge.source, edge.target);
-      });
-
-      // Calculate the layout
-      dagre.layout(g, {
-        disableOptimalOrderHeuristic: true,
-      });
-
-      // Update node positions based on dagre layout
-      const layoutedNodes = nodes.map((node: any) => {
-        const nodeWithPosition = g.node(node.id);
-        return {
-          ...node,
-          position: {
-            // Dagre gives us the center position, adjust to top-left
-            x: nodeWithPosition.x - (nodeWithPosition.width || 150) / 2,
-            y: nodeWithPosition.y - (nodeWithPosition.height || 40) / 2,
-          },
-        };
-      });
-
-      return {
-        nodes: layoutedNodes,
-        edges,
-      };
-    } catch (error) {
-      console.warn('Layout calculation failed:', error);
-      return { nodes, edges };
-    }
-  }, []);
+    },
+    []
+  );
 
   const updateLayout = useCallback(
     (direction: Direction) => {
@@ -351,73 +351,33 @@ export const MindmapProvider: React.FC<MindmapProviderProps> = ({ children }) =>
 
       console.log('Updating layout to:', direction);
 
-      // Stop any existing animation
-      if (animationTimer.current) {
-        animationTimer.current.stop();
-      }
-
       setIsLayouting(true);
 
       // Calculate new positions
       const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(nodes, edges, direction);
 
-      // Create position interpolators for each node
-      const nodeInterpolators = nodes
-        .map((currentNode) => {
-          const targetNode = layoutedNodes.find((n) => n.id === currentNode.id);
-          if (!targetNode) return null;
-
+      // Update nodes with smooth transitions using React Flow's animation system
+      setNodes([
+        ...layoutedNodes.map((layoutedNode) => {
           return {
-            id: currentNode.id,
-            interpolator: interpolate(
-              { x: currentNode.position.x, y: currentNode.position.y },
-              { x: targetNode.position.x, y: targetNode.position.y }
-            ),
+            ...layoutedNode,
+            // Apply smooth transition using React Flow's built-in animation
+            style: {
+              ...layoutedNode.style,
+              transition: 'all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+            },
           };
-        })
-        .filter(Boolean);
+        }),
+      ]);
+      setEdges([...layoutedEdges]);
 
-      // Set up the animation
-      const duration = 800; // 800ms animation
-      const startTime = Date.now();
-
-      animationTimer.current = timer((elapsed) => {
-        const progress = Math.min(elapsed / duration, 1);
-
-        // Use easeOutCubic for smooth animation
-        const easedProgress = 1 - Math.pow(1 - progress, 3);
-
-        // Update node positions
-        setNodes((prevNodes: MindMapNode[]) =>
-          prevNodes.map((node) => {
-            const interpolator = nodeInterpolators.find((i) => i?.id === node.id);
-            if (!interpolator) return node;
-
-            const newPosition = interpolator.interpolator(easedProgress);
-            return {
-              ...node,
-              position: newPosition,
-              data: { ...node.data, isLayouting: true },
-            };
-          })
+      // Remove isLayouting flag after animation completes
+      setTimeout(() => {
+        setIsLayouting(false);
+        setNodes((nds: MindMapNode[]) =>
+          nds.map((node) => ({ ...node, style: { ...node.style, transition: '' } }))
         );
-
-        // Animation complete
-        if (progress >= 1) {
-          animationTimer.current.stop();
-          animationTimer.current = null;
-
-          // Update edges and remove isLayouting flag
-          setEdges([...layoutedEdges]);
-          setNodes((prevNodes: MindMapNode[]) =>
-            prevNodes.map((node) => ({
-              ...node,
-              data: { ...node.data, isLayouting: false },
-            }))
-          );
-          setIsLayouting(false);
-        }
-      });
+      }, 800);
     },
     [nodes, edges, setNodes, setEdges, getLayoutedElements]
   );
@@ -431,7 +391,7 @@ export const MindmapProvider: React.FC<MindmapProviderProps> = ({ children }) =>
   );
 
   useEffect(() => {
-    if (nodes.length > 0) {
+    if (nodes.length > 0 && nodesInitialized) {
       // Add a small delay to ensure DOM is fully rendered
       const timeoutId = setTimeout(() => {
         updateLayout(layout.current);
@@ -440,15 +400,6 @@ export const MindmapProvider: React.FC<MindmapProviderProps> = ({ children }) =>
       return () => clearTimeout(timeoutId);
     }
   }, [nodesInitialized]);
-
-  // Cleanup animation timer on unmount
-  useEffect(() => {
-    return () => {
-      if (animationTimer.current) {
-        animationTimer.current.stop();
-      }
-    };
-  }, []);
 
   const onNodeDrag = useCallback(
     (_: MouseEvent, node: MindMapNode) => {

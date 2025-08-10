@@ -149,6 +149,27 @@ const MindMapNodeBlock = memo(({ ...node }: NodeProps<MindMapNode>) => {
             <Plus />
           </Button>
 
+          {/* Hub contents */}
+          <div
+            className={cn(
+              layout === DIRECTION.VERTICAL
+                ? 'right-0 top-1/2 -translate-y-1/2 translate-x-[calc(100%+24px)] flex-col'
+                : 'left-1/2 top-0 -translate-x-1/2 -translate-y-[calc(100%+24px)] flex-row',
+              'bg-muted absolute z-[1000] flex items-center justify-center gap-1 rounded-sm transition-all duration-200',
+              selected ? 'visible opacity-100' : 'invisible opacity-0'
+            )}
+          >
+            <button className="hover:bg-accent cursor-pointer rounded-sm p-1">
+              <Plus className="h-3 w-3" />
+            </button>
+            <button className="hover:bg-accent cursor-pointer rounded-sm p-1">
+              <Plus className="h-3 w-3" />
+            </button>
+            <button className="hover:bg-accent cursor-pointer rounded-sm p-1">
+              <Plus className="h-3 w-3" />
+            </button>
+          </div>
+
           {/* Invisible handles for connections */}
           <BaseHandle
             type="source"

@@ -6,9 +6,7 @@ import {
   getStraightPath,
 } from '@xyflow/react';
 import { memo } from 'react';
-import { AnimatePresence, motion } from 'motion/react';
 import type { MindMapEdge } from '../types';
-import { useLayoutStore } from '../stores/useLayoutStore';
 
 type SmoothType = 'smoothstep' | 'straight' | 'bezier' | 'simplebezier';
 
@@ -76,8 +74,6 @@ const MindmapEdgeBlock = memo(
     data,
     selected,
   }: EdgeProps<MindMapEdge> & { smoothType: SmoothType }) => {
-    const isLayouting = useLayoutStore((state) => state.isLayouting);
-
     const [edgePath] = getEdgePath(data?.smoothType || 'smoothstep', {
       id,
       sourceX,
@@ -89,23 +85,16 @@ const MindmapEdgeBlock = memo(
     });
 
     return (
-      <motion.path
+      <path
         id={id}
         key={`edge-${id}`}
         d={edgePath}
         fill="none"
         stroke={data?.strokeColor || 'var(--primary)'}
         strokeWidth={selected ? (data?.strokeWidth || 2) + 1 : data?.strokeWidth || 2}
-        opacity={selected ? 1 : 0.8}
         style={{
           filter: selected ? 'drop-shadow(0 0 4px var(--primary))' : undefined,
         }}
-        animate={{
-          d: edgePath ?? '',
-        }}
-        transition={
-          isLayouting ? { duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94], type: 'tween' } : { duration: 0 }
-        }
       />
     );
   }

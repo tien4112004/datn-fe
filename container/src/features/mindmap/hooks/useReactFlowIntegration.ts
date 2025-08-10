@@ -33,8 +33,6 @@ export const useReactFlowIntegration = () => {
     }
   }, []);
 
-  console.log('useReactFlowIntegration initialized');
-
   // Auto-layout effect when nodes are initialized
   useEffect(() => {
     console.log('useReactFlowIntegration useEffect triggered');
@@ -55,7 +53,7 @@ export const useReactFlowIntegration = () => {
     const timeoutId = setTimeout(() => {
       syncState(updateNodeInternals);
       setStateChanged(false);
-    }, 0);
+    }, 500);
 
     return () => clearTimeout(timeoutId);
   }, [stateChanged]);

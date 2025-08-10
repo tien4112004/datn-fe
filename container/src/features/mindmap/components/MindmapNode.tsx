@@ -1,7 +1,7 @@
 import { Plus, GripVertical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useState, useEffect, memo } from 'react';
-import { Position, useNodeConnections, type NodeProps } from '@xyflow/react';
+import { Position, useNodeConnections, useUpdateNodeInternals, type NodeProps } from '@xyflow/react';
 import { BaseNode, BaseNodeContent } from '@/components/base-node';
 import { cn } from '@/shared/lib/utils';
 import { useMindmapStore } from '../stores/useMindmapStore';
@@ -20,6 +20,7 @@ const MindMapNodeBlock = memo(({ ...node }: NodeProps<MindMapNode>) => {
   const finalizeNodeDeletion = useMindmapStore((state) => state.finalizeNodeDeletion);
   const layout = useLayoutStore((state) => state.layout);
   const isLayouting = useLayoutStore((state) => state.isLayouting);
+  const updateNodeInternals = useUpdateNodeInternals();
   const [, setIsEditing] = useState(false);
   const [isMouseOver, setIsMouseOver] = useState(false);
   const editor = useRichTextEditor({
@@ -28,6 +29,10 @@ const MindMapNodeBlock = memo(({ ...node }: NodeProps<MindMapNode>) => {
   });
 
   const connections = useNodeConnections({ id });
+
+  useEffect(() => {
+    updateNodeInternals(id);
+  }, [layout, isLayouting]);
 
   const canCreateLeft =
     !connections.some(

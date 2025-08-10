@@ -6,21 +6,16 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { useLayoutStore } from '../stores/useLayoutStore';
 import type { Direction } from '../constants';
 import { SidebarTrigger } from '@/components/ui/sidebar';
-import { useUpdateNodeInternals } from '@xyflow/react';
 
 const MindmapToolbar = () => {
   const addNode = useMindmapStore((state) => state.addNode);
   const deleteSelectedNodes = useMindmapStore((state) => state.deleteSelectedNodes);
-  const syncState = useMindmapStore((state) => state.syncState);
   const logData = useMindmapStore((state) => state.logData);
-
-  const updateNodeInternals = useUpdateNodeInternals();
 
   const onLayoutChange = useLayoutStore((state) => state.onLayoutChange);
 
   useEffect(() => {
     onLayoutChange('horizontal');
-    syncState(updateNodeInternals);
   }, [onLayoutChange]);
 
   return (

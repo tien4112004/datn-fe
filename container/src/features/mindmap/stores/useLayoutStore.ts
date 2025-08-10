@@ -1,15 +1,28 @@
 import { create } from 'zustand';
 import dagre from '@dagrejs/dagre';
+import * as d3 from 'd3';
 import type { MindMapNode, MindMapEdge } from '../types';
 import { DIRECTION, type Direction } from '../constants';
 import { useMindmapStore } from './useMindmapStore';
 import { devtools } from 'zustand/middleware';
 
+interface AnimationData {
+  id: string;
+  startPos: { x: number; y: number };
+  targetPos: { x: number; y: number };
+  deltaX: number;
+  deltaY: number;
+}
+
 interface LayoutState {
   layout: Direction;
   isLayouting: boolean;
+  isAnimating: boolean;
+  animationTimer: d3.Timer | null;
+  animationData: AnimationData[];
   setLayout: (direction: Direction) => void;
-  setIsLayouting: (isLayouting: boolean) => void;
+  setIsAnimating: (isAnimating: boolean) => void;
+  stopAnimation: () => void;
   getLayoutedElements: (
     nodes: MindMapNode[],
     edges: MindMapEdge[],
@@ -18,6 +31,10 @@ interface LayoutState {
     nodes: MindMapNode[];
     edges: MindMapEdge[];
   };
+  animateNodesToPositions: (
+    targetPositions: Record<string, { x: number; y: number }>,
+    duration?: number
+  ) => void;
   updateLayout: (direction?: Direction) => void;
   onLayoutChange: (direction: Direction) => void;
 }
@@ -26,10 +43,100 @@ export const useLayoutStore = create<LayoutState>()(
   devtools(
     (set, get) => ({
       layout: 'horizontal',
-      isLayouting: false,
+      isAnimating: false,
+      animationTimer: null,
+      animationData: [],
 
       setLayout: (direction) => set({ layout: direction }, false, 'mindmap-layout/setLayout'),
-      setIsLayouting: (isLayouting) => set({ isLayouting }, false, 'mindmap-layout/setIsLayouting'),
+      setIsAnimating: (isAnimating) => set({ isAnimating }, false, 'mindmap-layout/setIsAnimating'),
+
+      stopAnimation: () => {
+        const { animationTimer } = get();
+        if (animationTimer) {
+          animationTimer.stop();
+          set(
+            {
+              animationTimer: null,
+              isAnimating: false,
+              animationData: [],
+            },
+            false,
+            'mindmap-layout/stopAnimation'
+          );
+        }
+      },
+
+      animateNodesToPositions: (targetPositions, duration = 2000) => {
+        const { animationTimer } = get();
+        const nodes = useMindmapStore.getState().nodes;
+        const setNodes = useMindmapStore.getState().setNodes;
+
+        if (!nodes?.length) return;
+
+        // Stop existing animation
+        if (animationTimer) {
+          animationTimer.stop();
+        }
+
+        // Store initial positions and calculate deltas
+        const animationData = nodes.map((node) => {
+          const target = targetPositions[node.id];
+          return {
+            id: node.id,
+            startPos: { ...node.position },
+            targetPos: target || node.position,
+            deltaX: (target?.x || node.position.x) - node.position.x,
+            deltaY: (target?.y || node.position.y) - node.position.y,
+          };
+        });
+
+        set(
+          {
+            isAnimating: true,
+            animationData,
+          },
+          false,
+          'mindmap-layout/animateNodesToPositions:start'
+        );
+
+        const timer = d3.timer((elapsed) => {
+          const progress = Math.min(elapsed / duration, 1);
+
+          // Use easing function for smoother animation
+          const easedProgress = d3.easeCubicInOut(progress);
+
+          setNodes((currentNodes: MindMapNode[]) =>
+            currentNodes.map((node) => {
+              const animData = animationData.find((d) => d.id === node.id);
+              if (!animData) return node;
+
+              const newX = animData.startPos.x + animData.deltaX * easedProgress;
+              const newY = animData.startPos.y + animData.deltaY * easedProgress;
+
+              return {
+                ...node,
+                position: { x: newX, y: newY },
+              };
+            })
+          );
+
+          // Stop animation when complete
+          if (progress >= 1) {
+            timer.stop();
+            set(
+              {
+                animationTimer: null,
+                isAnimating: false,
+                animationData: [],
+              },
+              false,
+              'mindmap-layout/animateNodesToPositions:complete'
+            );
+          }
+        });
+
+        set({ animationTimer: timer }, false, 'mindmap-layout/animateNodesToPositions:timer');
+      },
 
       getLayoutedElements: (nodes, edges, direction) => {
         if (nodes.length === 0 || direction === DIRECTION.NONE) return { nodes, edges };
@@ -92,10 +199,9 @@ export const useLayoutStore = create<LayoutState>()(
       },
 
       updateLayout: (direction) => {
-        const { getLayoutedElements, layout } = get();
+        const { getLayoutedElements, layout, animateNodesToPositions } = get();
         const nodes = useMindmapStore.getState().nodes;
         const edges = useMindmapStore.getState().edges;
-        const setNodes = useMindmapStore.getState().setNodes;
         const setEdges = useMindmapStore.getState().setEdges;
 
         const layoutDirection = direction || layout;
@@ -111,29 +217,22 @@ export const useLayoutStore = create<LayoutState>()(
           layoutDirection
         );
 
-        // Update nodes with smooth transitions using React Flow's animation system
-        setNodes([
-          ...layoutedNodes.map((layoutedNode) => {
-            return {
-              ...layoutedNode,
-              // Apply smooth transition using React Flow's built-in animation
-              style: {
-                ...layoutedNode.style,
-                transition: 'all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-              },
-            };
-          }),
-        ]);
+        // Update edges immediately
         setEdges([...layoutedEdges]);
+
+        // Create target positions for animation
+        const targetPositions: Record<string, { x: number; y: number }> = {};
+        layoutedNodes.forEach((node) => {
+          targetPositions[node.id] = { x: node.position.x, y: node.position.y };
+        });
+
+        // Animate nodes to new positions using d3-based animation
+        animateNodesToPositions(targetPositions, 800);
 
         // Remove isLayouting flag after animation completes
         setTimeout(() => {
           set({ isLayouting: false }, false, 'mindmap-layout/updateLayout:animationEnd');
-          const setNodes = useMindmapStore.getState().setNodes;
-          setNodes((nds: MindMapNode[]) =>
-            nds.map((node) => ({ ...node, style: { ...node.style, transition: '' } }))
-          );
-        }, 800);
+        }, 900);
       },
 
       onLayoutChange: (direction) => {

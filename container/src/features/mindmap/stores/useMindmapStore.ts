@@ -4,6 +4,7 @@ import type { Connection, XYPosition } from '@xyflow/react';
 import type { MindMapNode, MindMapEdge } from '../types';
 import { DragHandle, MINDMAP_TYPES } from '../constants';
 import { generateId } from '@/shared/lib/utils';
+import { devtools } from 'zustand/middleware';
 
 const initialNodes: MindMapNode[] = [
   {
@@ -27,125 +28,176 @@ interface MindmapState {
   setNodes: (updater: MindMapNode[] | ((nodes: MindMapNode[]) => MindMapNode[])) => void;
   setEdges: (updater: MindMapEdge[] | ((edges: MindMapEdge[]) => MindMapEdge[])) => void;
   addNode: () => void;
+  logData: () => void;
   addChildNode: (parentNode: Partial<MindMapNode>, position: XYPosition, sourceHandler?: string) => void;
   markNodeForDeletion: (nodeId: string) => void;
   finalizeNodeDeletion: (nodeId: string) => void;
   deleteSelectedNodes: () => void;
+  syncState: (updateNodeInternals: any) => void;
 }
 
-export const useMindmapStore = create<MindmapState>((set, get) => ({
-  nodes: initialNodes,
-  edges: initialEdges,
-  nodeId: 1,
+export const useMindmapStore = create<MindmapState>()(
+  devtools((set, get) => ({
+    nodes: initialNodes,
+    edges: initialEdges,
+    nodeId: 1,
 
-  onNodesChange: (changes) => {
-    set((state) => ({
-      nodes: applyNodeChanges(changes, state.nodes),
-    }));
-  },
+    onNodesChange: (changes) => {
+      set(
+        (state) => ({
+          nodes: applyNodeChanges(changes, state.nodes),
+        }),
+        false,
+        'mindmap/onNodesChange'
+      );
+    },
 
-  onEdgesChange: (changes) => {
-    set((state) => ({
-      edges: applyEdgeChanges(changes, state.edges),
-    }));
-  },
+    onEdgesChange: (changes) => {
+      set(
+        (state) => ({
+          edges: applyEdgeChanges(changes, state.edges),
+        }),
+        false,
+        'mindmap/onEdgesChange'
+      );
+    },
 
-  onConnect: (connection) => {
-    const edge = {
-      ...connection,
-      type: MINDMAP_TYPES.MINDMAP_EDGE,
-      data: {
-        strokeColor: 'var(--primary)',
-        strokeWidth: 2,
-      },
-    };
-    set((state) => ({
-      edges: addEdge(edge, state.edges),
-    }));
-  },
+    onConnect: (connection) => {
+      const edge = {
+        ...connection,
+        type: MINDMAP_TYPES.MINDMAP_EDGE,
+        data: {
+          strokeColor: 'var(--primary)',
+          strokeWidth: 2,
+        },
+      };
+      set(
+        (state) => ({
+          edges: addEdge(edge, state.edges),
+        }),
+        false,
+        'mindmap/onConnect'
+      );
+    },
 
-  setNodes: (updater) => {
-    set((state) => ({
-      nodes: typeof updater === 'function' ? updater(state.nodes) : updater,
-    }));
-  },
+    setNodes: (updater) => {
+      set(
+        (state) => ({
+          nodes: typeof updater === 'function' ? updater(state.nodes) : updater,
+        }),
+        false,
+        'mindmap/setNodes'
+      );
+    },
 
-  setEdges: (updater) => {
-    set((state) => ({
-      edges: typeof updater === 'function' ? updater(state.edges) : updater,
-    }));
-  },
+    setEdges: (updater) => {
+      set(
+        (state) => ({
+          edges: typeof updater === 'function' ? updater(state.edges) : updater,
+        }),
+        false,
+        'mindmap/setEdges'
+      );
+    },
 
-  addNode: () => {
-    const { nodes, nodeId } = get();
-    const newNode: MindMapNode = {
-      id: generateId(),
-      type: MINDMAP_TYPES.MINDMAP_NODE,
-      position: {
-        x: Math.random() * 500 + 100,
-        y: Math.random() * 400 + 100,
-      },
-      data: { level: 1, content: `<p>New Node ${nodes.length + 1}</p>` },
-    };
+    addNode: () => {
+      const { nodes, nodeId } = get();
+      const newNode: MindMapNode = {
+        id: generateId(),
+        type: MINDMAP_TYPES.MINDMAP_NODE,
+        position: {
+          x: Math.random() * 500 + 100,
+          y: Math.random() * 400 + 100,
+        },
+        data: { level: 1, content: `<p>New Node ${nodes.length + 1}</p>` },
+      };
 
-    set((state) => ({
-      nodes: [...state.nodes, newNode],
-      nodeId: nodeId + 1,
-    }));
-  },
+      set(
+        (state) => ({
+          nodes: [...state.nodes, newNode],
+          nodeId: nodeId + 1,
+        }),
+        false,
+        'mindmap/addNode'
+      );
+    },
 
-  addChildNode: (parentNode: Partial<MindMapNode>, position: XYPosition, sourceHandler?: string) => {
-    const newNode: MindMapNode = {
-      id: generateId(),
-      type: MINDMAP_TYPES.MINDMAP_NODE,
-      data: {
-        level: parentNode.data?.level ? parentNode.data.level + 1 : 1,
-        content: '<p>New Node</p>',
-        parentId: parentNode.id,
-      },
-      dragHandle: DragHandle.SELECTOR,
-      position,
-    };
+    addChildNode: (parentNode: Partial<MindMapNode>, position: XYPosition, sourceHandler?: string) => {
+      const newNode: MindMapNode = {
+        id: generateId(),
+        type: MINDMAP_TYPES.MINDMAP_NODE,
+        data: {
+          level: parentNode.data?.level ? parentNode.data.level + 1 : 1,
+          content: '<p>New Node</p>',
+          parentId: parentNode.id,
+        },
+        dragHandle: DragHandle.SELECTOR,
+        position,
+      };
 
-    const newEdge = {
-      id: generateId(),
-      source: parentNode.id!,
-      target: newNode.id,
-      type: MINDMAP_TYPES.MINDMAP_EDGE,
-      sourceHandle: sourceHandler,
-      targetHandle: sourceHandler?.startsWith('left')
-        ? `second-target-${newNode.id}`
-        : `first-target-${newNode.id}`,
-      data: {
-        strokeColor: 'var(--primary)',
-        strokeWidth: 2,
-      },
-    };
+      const newEdge = {
+        id: generateId(),
+        source: parentNode.id!,
+        target: newNode.id,
+        type: MINDMAP_TYPES.MINDMAP_EDGE,
+        sourceHandle: sourceHandler,
+        targetHandle: sourceHandler?.startsWith('left')
+          ? `second-target-${newNode.id}`
+          : `first-target-${newNode.id}`,
+        data: {
+          strokeColor: 'var(--primary)',
+          strokeWidth: 2,
+        },
+      };
 
-    set((state) => ({
-      nodes: [...state.nodes, newNode],
-      edges: [...state.edges, newEdge],
-    }));
-  },
+      set(
+        (state) => ({
+          nodes: [...state.nodes, newNode],
+          edges: [...state.edges, newEdge],
+        }),
+        false,
+        'mindmap/addChildNode'
+      );
+    },
 
-  markNodeForDeletion: (nodeId: string) => {
-    set((state) => ({
-      nodes: state.nodes.map((node: MindMapNode) =>
-        node.id === nodeId ? { ...node, data: { ...node.data, isDeleting: true } } : node
-      ),
-    }));
-  },
+    logData: () => {
+      const { nodes, edges } = get();
+      console.log('Nodes:', nodes);
+      console.log('Edges:', edges);
+    },
 
-  finalizeNodeDeletion: (nodeId: string) => {
-    set((state) => ({
-      nodes: state.nodes.filter((node: MindMapNode) => node.id !== nodeId),
-      edges: state.edges.filter((edge: MindMapEdge) => edge.source !== nodeId && edge.target !== nodeId),
-    }));
-  },
+    markNodeForDeletion: (nodeId: string) => {
+      set(
+        (state) => ({
+          nodes: state.nodes.map((node: MindMapNode) =>
+            node.id === nodeId ? { ...node, data: { ...node.data, isDeleting: true } } : node
+          ),
+        }),
+        false,
+        'mindmap/markNodeForDeletion'
+      );
+    },
 
-  deleteSelectedNodes: () => {
-    const { nodes, markNodeForDeletion } = get();
-    const selectedNodeIds = nodes.filter((node) => node.selected).map((node) => node.id);
-    selectedNodeIds.forEach((nodeId) => markNodeForDeletion(nodeId));
-  },
-}));
+    finalizeNodeDeletion: (nodeId: string) => {
+      set(
+        (state) => ({
+          nodes: state.nodes.filter((node: MindMapNode) => node.id !== nodeId),
+          edges: state.edges.filter((edge: MindMapEdge) => edge.source !== nodeId && edge.target !== nodeId),
+        }),
+        false,
+        'mindmap/finalizeNodeDeletion'
+      );
+    },
+
+    deleteSelectedNodes: () => {
+      const { nodes, markNodeForDeletion } = get();
+      const selectedNodeIds = nodes.filter((node) => node.selected).map((node) => node.id);
+      selectedNodeIds.forEach((nodeId) => markNodeForDeletion(nodeId));
+    },
+
+    syncState: (updateNodeInternals: any) => {
+      const { nodes } = get();
+      updateNodeInternals(nodes.map((node) => node.id));
+    },
+  }))
+);

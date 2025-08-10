@@ -9,7 +9,8 @@ import type { MindMapNode, MindMapEdge, MindmapActionsType } from '../types';
  * Contains the actual implementations of mindmap action methods for cleaner separation of concerns.
  */
 export const useMindmapActions = (): MindmapActionsType => {
-  const { setNodes, setEdges } = useMindmapStore();
+  const setNodes = useMindmapStore((state) => state.setNodes);
+  const setEdges = useMindmapStore((state) => state.setEdges);
 
   const { screenToFlowPosition } = useReactFlow();
 
@@ -20,20 +21,20 @@ export const useMindmapActions = (): MindmapActionsType => {
   const selectAllNodesAndEdges = useCallback(() => {
     setNodes((nds: MindMapNode[]) => nds.map((node: MindMapNode) => ({ ...node, selected: true })));
     setEdges((eds: MindMapEdge[]) => eds.map((edge: MindMapEdge) => ({ ...edge, selected: true })));
-  }, [setNodes, setEdges]);
+  }, []);
 
   const deselectAllNodesAndEdges = useCallback(() => {
     setNodes((nds: MindMapNode[]) => nds.map((node: MindMapNode) => ({ ...node, selected: false })));
     setEdges((eds: MindMapEdge[]) => eds.map((edge: MindMapEdge) => ({ ...edge, selected: false })));
-  }, [setNodes, setEdges]);
+  }, []);
 
   const copySelectedNodesAndEdges = useCallback(() => {
     clipboardCopySelectedNodesAndEdges();
-  }, [clipboardCopySelectedNodesAndEdges]);
+  }, []);
 
   const pasteClonedNodesAndEdges = useCallback(() => {
     clipboardPasteClonedNodesAndEdges(screenToFlowPosition);
-  }, [clipboardPasteClonedNodesAndEdges, screenToFlowPosition]);
+  }, []);
 
   const deleteSelectedNodes = useMindmapStore((state) => state.deleteSelectedNodes);
 

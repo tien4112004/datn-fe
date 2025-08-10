@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import type { MindMapNode, MindMapEdge } from '../types';
 import { generateId } from '@/shared/lib/utils';
 import { useMindmapStore } from './useMindmapStore';
+import { devtools } from 'zustand/middleware';
 
 interface ClipboardState {
   cloningNodes: MindMapNode[];
@@ -19,88 +20,98 @@ interface ClipboardState {
   ) => void;
 }
 
-export const useClipboardStore = create<ClipboardState>((set, get) => ({
-  cloningNodes: [],
-  cloningEdges: [],
-  mousePosition: { x: 0, y: 0 },
-  offset: 0,
+export const useClipboardStore = create<ClipboardState>()(
+  devtools((set, get) => ({
+    cloningNodes: [],
+    cloningEdges: [],
+    mousePosition: { x: 0, y: 0 },
+    offset: 0,
 
-  setCloningNodes: (nodes) => set({ cloningNodes: nodes }),
-  setCloningEdges: (edges) => set({ cloningEdges: edges }),
-  setMousePosition: (position) => set({ mousePosition: position, offset: 0 }),
-  resetOffset: () => set({ offset: 0 }),
-  incrementOffset: () => set((state) => ({ offset: state.offset + 20 })),
+    setCloningNodes: (nodes) => set({ cloningNodes: nodes }, false, 'mindmap-clip/setCloningNodes'),
+    setCloningEdges: (edges) => set({ cloningEdges: edges }, false, 'mindmap-clip/setCloningEdges'),
+    setMousePosition: (position) =>
+      set({ mousePosition: position, offset: 0 }, false, 'mindmap-clip/setMousePosition'),
+    resetOffset: () => set({ offset: 0 }, false, 'mindmap-clip/resetOffset'),
+    incrementOffset: () =>
+      set((state) => ({ offset: state.offset + 20 }), false, 'mindmap-clip/incrementOffset'),
 
-  copySelectedNodesAndEdges: () => {
-    const { nodes, edges } = useMindmapStore.getState();
-    const selectedNodes = nodes.filter((node) => node.selected);
-    const selectedEdges = edges.filter((edge) => edge.selected);
+    copySelectedNodesAndEdges: () => {
+      const nodes = useMindmapStore.getState().nodes;
+      const edges = useMindmapStore.getState().edges;
+      const selectedNodes = nodes.filter((node) => node.selected);
+      const selectedEdges = edges.filter((edge) => edge.selected);
 
-    if (selectedNodes.length === 0) return;
+      if (selectedNodes.length === 0) return;
 
-    set({
-      cloningNodes: selectedNodes,
-      cloningEdges: selectedEdges,
-    });
-  },
-
-  pasteClonedNodesAndEdges: (screenToFlowPosition) => {
-    const { cloningNodes, cloningEdges, mousePosition, offset } = get();
-    const { setNodes, setEdges } = useMindmapStore.getState();
-
-    if (cloningNodes.length === 0) return;
-
-    const rootPosition = cloningNodes[0].position || { x: 0, y: 0 };
-
-    // Generate fresh nodes with new IDs to avoid duplicates
-    const freshNodes = cloningNodes.map((node) => ({
-      ...node,
-      id: generateId(),
-      data: {
-        ...node.data,
-        content: `<p>Cloned: ${node.data.content}</p>`,
-        metadata: {
-          oldId: node.id,
+      set(
+        {
+          cloningNodes: selectedNodes,
+          cloningEdges: selectedEdges,
         },
-      },
-      selected: false,
-    }));
+        false,
+        'mindmap-clip/copySelectedNodesAndEdges'
+      );
+    },
 
-    const freshEdges = cloningEdges.map((edge) => {
-      const newSource = freshNodes.find((node) => node.data.metadata?.oldId === edge.source);
-      const newTarget = freshNodes.find((node) => node.data.metadata?.oldId === edge.target);
+    pasteClonedNodesAndEdges: (screenToFlowPosition) => {
+      const { cloningNodes, cloningEdges, mousePosition, offset } = get();
+      const setNodes = useMindmapStore.getState().setNodes;
+      const setEdges = useMindmapStore.getState().setEdges;
 
-      return {
-        ...edge,
+      if (cloningNodes.length === 0) return;
+
+      const rootPosition = cloningNodes[0].position || { x: 0, y: 0 };
+
+      // Generate fresh nodes with new IDs to avoid duplicates
+      const freshNodes = cloningNodes.map((node) => ({
+        ...node,
         id: generateId(),
-        source: newSource ? newSource.id : edge.source,
-        target: newTarget ? newTarget.id : edge.target,
-        sourceHandle: edge.sourceHandle?.replace(edge.source, newSource?.id || edge.source),
-        targetHandle: edge.targetHandle?.replace(edge.target, newTarget?.id || edge.target),
-      };
-    });
+        data: {
+          ...node.data,
+          content: `<p>Cloned: ${node.data.content}</p>`,
+          metadata: {
+            oldId: node.id,
+          },
+        },
+        selected: false,
+      }));
 
-    setNodes((nds: MindMapNode[]) => [
-      ...nds.map((node) => ({ ...node, selected: false })),
-      ...freshNodes.map((node) => {
-        const { x, y } = screenToFlowPosition({
-          x: mousePosition.x,
-          y: mousePosition.y,
-        });
+      const freshEdges = cloningEdges.map((edge) => {
+        const newSource = freshNodes.find((node) => node.data.metadata?.oldId === edge.source);
+        const newTarget = freshNodes.find((node) => node.data.metadata?.oldId === edge.target);
 
         return {
-          ...node,
-          position: {
-            x: x - rootPosition.x + node.position.x + offset,
-            y: y - rootPosition.y + node.position.y + offset,
-          },
-          selected: true,
+          ...edge,
+          id: generateId(),
+          source: newSource ? newSource.id : edge.source,
+          target: newTarget ? newTarget.id : edge.target,
+          sourceHandle: edge.sourceHandle?.replace(edge.source, newSource?.id || edge.source),
+          targetHandle: edge.targetHandle?.replace(edge.target, newTarget?.id || edge.target),
         };
-      }),
-    ]);
-    setEdges((eds: MindMapEdge[]) => [...eds, ...freshEdges]);
+      });
 
-    // Increment offset for next paste
-    set((state) => ({ offset: state.offset + 20 }));
-  },
-}));
+      setNodes((nds: MindMapNode[]) => [
+        ...nds.map((node) => ({ ...node, selected: false })),
+        ...freshNodes.map((node) => {
+          const { x, y } = screenToFlowPosition({
+            x: mousePosition.x,
+            y: mousePosition.y,
+          });
+
+          return {
+            ...node,
+            position: {
+              x: x - rootPosition.x + node.position.x + offset,
+              y: y - rootPosition.y + node.position.y + offset,
+            },
+            selected: true,
+          };
+        }),
+      ]);
+      setEdges((eds: MindMapEdge[]) => [...eds, ...freshEdges]);
+
+      // Increment offset for next paste
+      set((state) => ({ offset: state.offset + 20 }), false, 'mindmap-clip/pasteClonedNodesAndEdges');
+    },
+  }))
+);

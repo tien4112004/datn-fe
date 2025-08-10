@@ -1,42 +1,44 @@
 import { Plus, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useMindmapStore } from '../stores/useMindmapStore';
-import { useCallback, useEffect } from 'react';
+import { useEffect } from 'react';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { useLayoutStore } from '../stores/useLayoutStore';
 import type { Direction } from '../constants';
+import { SidebarTrigger } from '@/components/ui/sidebar';
+import { useUpdateNodeInternals } from '@xyflow/react';
 
 const MindmapToolbar = () => {
-  const { addNode, deleteSelectedNodes, nodes, edges } = useMindmapStore();
+  const addNode = useMindmapStore((state) => state.addNode);
+  const deleteSelectedNodes = useMindmapStore((state) => state.deleteSelectedNodes);
+  const syncState = useMindmapStore((state) => state.syncState);
+  const logData = useMindmapStore((state) => state.logData);
+
+  const updateNodeInternals = useUpdateNodeInternals();
+
   const onLayoutChange = useLayoutStore((state) => state.onLayoutChange);
 
   useEffect(() => {
     onLayoutChange('horizontal');
+    syncState(updateNodeInternals);
   }, [onLayoutChange]);
-
-  const logData = useCallback(() => {
-    console.log('Nodes:', nodes);
-    console.log('Edges:', edges);
-  }, [nodes, edges]);
 
   return (
     <div className="absolute left-4 top-4 z-10 flex gap-2">
+      <SidebarTrigger className="-ml-1" />
       <Button onClick={addNode} title="Add new node" variant={'default'}>
         <Plus size={16} />
         Add Node
       </Button>
-
       <Button onClick={deleteSelectedNodes} title="Delete selected nodes" variant="destructive">
         <Trash2 size={16} />
         Delete Selected
       </Button>
-
       <Button variant={'outline'} onClick={logData}>
         <span className="sr-only">Log Nodes and Edges</span>
         <Trash2 size={16} />
         Log Data
       </Button>
-
       <ToggleGroup
         type="single"
         defaultValue="horizontal"

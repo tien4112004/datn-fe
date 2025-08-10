@@ -16,7 +16,8 @@ import { useLayoutStore } from '../stores/useLayoutStore';
 
 const MindMapNodeBlock = memo(({ ...node }: NodeProps<MindMapNode>) => {
   const { data, selected, id } = node;
-  const { addChildNode, finalizeNodeDeletion } = useMindmapStore();
+  const addChildNode = useMindmapStore((state) => state.addChildNode);
+  const finalizeNodeDeletion = useMindmapStore((state) => state.finalizeNodeDeletion);
   const layout = useLayoutStore((state) => state.layout);
   const isLayouting = useLayoutStore((state) => state.isLayouting);
   const [, setIsEditing] = useState(false);

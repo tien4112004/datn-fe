@@ -6,7 +6,7 @@ import {
   getStraightPath,
 } from '@xyflow/react';
 import { memo } from 'react';
-import { motion } from 'motion/react';
+import { AnimatePresence, motion } from 'motion/react';
 import type { MindMapEdge } from '../types';
 import { useLayoutStore } from '../stores/useLayoutStore';
 

@@ -6,8 +6,11 @@ import MindmapEdgeBlock from './MindmapEdge';
 import MindmapToolbar from './MindmapToolbar';
 import MindmapInstructions from './MindmapInstructions';
 import { useShortcuts, useMindmapActions } from '../hooks';
-import { memo, useMemo } from 'react';
+import { memo, useEffect, useMemo, useRef, type ReactNode } from 'react';
 import { DevTools } from '@/components/devtools';
+import { useMindmapStore } from '../stores';
+import { useShallow } from 'zustand/react/shallow';
+import { useWhyDidYouUpdate } from '@/hooks/use-debug';
 
 const nodeTypes = {
   mindMapNode: MindMapNodeBlock,
@@ -17,32 +20,47 @@ const edgeTypes = {
   mindmapEdge: MindmapEdgeBlock,
 };
 
+const Flow = memo(({ children }: { children: ReactNode }) => {
+  const { onConnect, onNodeDrag, onPaneMouseMove, onPaneClick } = useReactFlowIntegration();
+  const { nodes, edges, onNodesChange, onEdgesChange } = useMindmapStore(
+    useShallow((state) => ({
+      nodes: state.nodes,
+      edges: state.edges,
+      onNodesChange: state.onNodesChange,
+      onEdgesChange: state.onEdgesChange,
+    }))
+  );
+
+  console.log('Rerender');
+
+  useWhyDidYouUpdate('MindMap', { nodes, edges, onNodesChange, onEdgesChange, onConnect });
+
+  return (
+    <ReactFlow
+      nodes={nodes}
+      edges={edges}
+      onNodesChange={onNodesChange}
+      onEdgesChange={onEdgesChange}
+      onConnect={onConnect}
+      nodeTypes={nodeTypes}
+      edgeTypes={edgeTypes}
+      proOptions={{ hideAttribution: true }}
+      onPaneMouseMove={onPaneMouseMove}
+      onPaneClick={onPaneClick}
+      onNodeDrag={onNodeDrag}
+      fitView
+    >
+      {children}
+    </ReactFlow>
+  );
+});
+
 const MindMap = memo(() => {
-  const { nodes, edges, onNodesChange, onEdgesChange, onConnect, onNodeDrag, onPaneMouseMove, onPaneClick } =
-    useReactFlowIntegration();
-
-  console.log('MindMap rendered');
-
   return (
     <div className="h-screen w-full" style={{ backgroundColor: 'var(--background)' }}>
       <MindmapToolbar />
       <MindmapInstructions />
-      <ReactFlow
-        nodes={nodes}
-        edges={edges}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        onConnect={onConnect}
-        nodeTypes={nodeTypes}
-        edgeTypes={edgeTypes}
-        proOptions={{
-          hideAttribution: true,
-        }}
-        onPaneMouseMove={onPaneMouseMove}
-        onPaneClick={onPaneClick}
-        onNodeDrag={onNodeDrag}
-        fitView
-      >
+      <Flow>
         <Controls />
 
         <MiniMap
@@ -59,7 +77,7 @@ const MindMap = memo(() => {
         <Background variant={BackgroundVariant.Dots} gap={20} size={1} />
         <DevTools position="bottom-left" />
         <LogicHandler />
-      </ReactFlow>
+      </Flow>
     </div>
   );
 });

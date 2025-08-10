@@ -7,6 +7,7 @@ import MindmapToolbar from './MindmapToolbar';
 import MindmapInstructions from './MindmapInstructions';
 import { useShortcuts } from '../hooks/useShortcut';
 import { useMemo, useCallback } from 'react';
+import { DevTools } from '@/components/devtools';
 
 const nodeTypes = {
   mindMapNode: MindMapNodeBlock,
@@ -93,6 +94,7 @@ const MindMap = () => {
         onPaneMouseMove={onMouseMove}
         onPaneClick={onPaneClick}
         onNodeDrag={onNodeDrag}
+        fitView
       >
         <Controls />
 
@@ -108,6 +110,7 @@ const MindMap = () => {
         />
 
         <Background variant={BackgroundVariant.Dots} gap={20} size={1} />
+        <DevTools position="bottom-left" />
       </ReactFlow>
     </div>
   );

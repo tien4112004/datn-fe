@@ -101,7 +101,7 @@ const MindmapEdgeBlock = memo(
           filter: selected ? 'drop-shadow(0 0 4px var(--primary))' : undefined,
         }}
         animate={{
-          d: edgePath,
+          d: edgePath ?? '',
         }}
         transition={
           isLayouting ? { duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94], type: 'tween' } : { duration: 0 }

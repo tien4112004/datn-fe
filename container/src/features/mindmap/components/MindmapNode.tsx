@@ -1,8 +1,7 @@
 import { Plus, GripVertical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { ButtonHandle } from '@/components/button-handle';
 import { useState, useEffect, memo } from 'react';
-import { Handle, Position, useNodeConnections, type NodeProps } from '@xyflow/react';
+import { Position, useNodeConnections, type NodeProps } from '@xyflow/react';
 import { BaseNode, BaseNodeContent } from '@/components/base-node';
 import { cn } from '@/shared/lib/utils';
 import { useMindmap } from '../context/MindmapContext';
@@ -12,6 +11,7 @@ import { BlockNoteEditor } from '@blocknote/core';
 import { DIRECTION, DragHandle } from '../constants';
 import { AnimatePresence, motion } from 'motion/react';
 import type { MindMapNode } from '../types';
+import { BaseHandle } from '@/shared/components/base-handle';
 
 const MindMapNodeBlock = memo(({ ...node }: NodeProps<MindMapNode>) => {
   const { data, selected, id } = node;
@@ -27,12 +27,12 @@ const MindMapNodeBlock = memo(({ ...node }: NodeProps<MindMapNode>) => {
 
   const canCreateLeft =
     !connections.some(
-      (conn) => conn.sourceHandle === `left-source-${id}` || conn.targetHandle === `left-target-${id}`
+      (conn) => conn.sourceHandle === `first-source-${id}` || conn.targetHandle === `first-target-${id}`
     ) || node.data.level === 0;
 
   //   const canCreateRight =
   //     !connections.some(
-  //       (conn) => conn.sourceHandle === `right-source-${id}` || conn.targetHandle === `right-target-${id}`
+  //       (conn) => conn.sourceHandle === `second-source-${id}` || conn.targetHandle === `second-target-${id}`
   //     ) || node.data.level === 0;
 
   const canCreateRight = true; // Temporarily allow right connections for simplicity
@@ -104,73 +104,75 @@ const MindMapNodeBlock = memo(({ ...node }: NodeProps<MindMapNode>) => {
               />
             </div>
           </BaseNodeContent>
-          <ButtonHandle
-            type="source"
-            position={Position.Left}
-            style={{
-              opacity: (isMouseOver || selected) && canCreateLeft ? 1 : 0,
-              visibility: (isMouseOver || selected) && canCreateLeft ? 'visible' : 'hidden',
-              zIndex: 1000,
-            }}
-            id={`left-source-${id}`}
+
+          <Button
+            onClick={() =>
+              addChildNode(
+                node,
+                { x: node.positionAbsoluteX - 250, y: node.positionAbsoluteY },
+                `first-source-${id}`
+              )
+            }
+            disabled={!canCreateLeft}
+            size="icon"
+            variant="outline"
+            className={cn(
+              'bg-accent absolute z-[1000] cursor-pointer rounded-full transition-all duration-200',
+              (isMouseOver || selected) && canCreateLeft ? 'visible opacity-100' : 'invisible opacity-0',
+              layout === DIRECTION.VERTICAL
+                ? 'left-1/2 top-0 -translate-x-1/2 -translate-y-[calc(100%+24px)]'
+                : 'left-0 top-1/2 -translate-x-[calc(100%+24px)] -translate-y-1/2'
+            )}
           >
-            <Button
-              onClick={() =>
-                addChildNode(
-                  node,
-                  { x: node.positionAbsoluteX - 250, y: node.positionAbsoluteY },
-                  `left-source-${id}`
-                )
-              }
-              disabled={!canCreateLeft}
-              size="icon"
-              variant="secondary"
-              className="cursor-pointer rounded-full"
-            >
-              <Plus />
-            </Button>
-          </ButtonHandle>
-          <ButtonHandle
-            type="source"
-            position={Position.Right}
-            style={{
-              opacity: (isMouseOver || selected) && canCreateRight ? 1 : 0,
-              visibility: (isMouseOver || selected) && canCreateRight ? 'visible' : 'hidden',
-              zIndex: 1000,
-            }}
-            id={`right-source-${id}`}
+            <Plus />
+          </Button>
+
+          <Button
+            onClick={() =>
+              addChildNode(
+                node,
+                { x: node.positionAbsoluteX + 250, y: node.positionAbsoluteY },
+                `second-source-${id}`
+              )
+            }
+            disabled={!canCreateRight}
+            size="icon"
+            variant="outline"
+            className={cn(
+              'bg-accent absolute z-[1000] cursor-pointer rounded-full transition-all duration-200',
+              (isMouseOver || selected) && canCreateRight ? 'visible opacity-100' : 'invisible opacity-0',
+              layout === DIRECTION.VERTICAL
+                ? 'bottom-0 left-1/2 -translate-x-1/2 translate-y-[calc(100%+24px)]'
+                : 'right-0 top-1/2 -translate-y-1/2 translate-x-[calc(100%+24px)]'
+            )}
           >
-            <Button
-              onClick={() =>
-                addChildNode(
-                  node,
-                  { x: node.positionAbsoluteX + 250, y: node.positionAbsoluteY },
-                  `right-source-${id}`
-                )
-              }
-              disabled={!canCreateRight}
-              size="icon"
-              variant="secondary"
-              className="cursor-pointer rounded-full"
-            >
-              <Plus />
-            </Button>
-          </ButtonHandle>
-          <Handle
-            type="target"
-            position={Position.Left}
-            style={{
-              opacity: 0,
-            }}
-            id={`left-target-${id}`}
+            <Plus />
+          </Button>
+
+          {/* Invisible handles for connections */}
+          <BaseHandle
+            type="source"
+            position={layout === DIRECTION.VERTICAL ? Position.Top : Position.Left}
+            style={{ visibility: 'hidden' }}
+            id={`first-source-${id}`}
           />
-          <Handle
+          <BaseHandle
+            type="source"
+            position={layout === DIRECTION.VERTICAL ? Position.Bottom : Position.Right}
+            style={{ visibility: 'hidden' }}
+            id={`second-source-${id}`}
+          />
+          <BaseHandle
             type="target"
-            position={Position.Right}
-            style={{
-              opacity: 0,
-            }}
-            id={`right-target-${id}`}
+            position={layout === DIRECTION.VERTICAL ? Position.Top : Position.Left}
+            style={{ visibility: 'hidden' }}
+            id={`first-target-${id}`}
+          />
+          <BaseHandle
+            type="target"
+            position={layout === DIRECTION.VERTICAL ? Position.Bottom : Position.Right}
+            style={{ visibility: 'hidden' }}
+            id={`second-target-${id}`}
           />
         </BaseNode>
       </motion.div>

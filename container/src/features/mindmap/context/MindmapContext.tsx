@@ -7,6 +7,7 @@ import {
   type XYPosition,
   useReactFlow,
   useNodesInitialized,
+  useUpdateNodeInternals,
 } from '@xyflow/react';
 import type { MindMapNode, MindMapEdge, MindmapContextType } from '../types';
 import { DragHandle, MINDMAP_TYPES, type Direction } from '../constants';
@@ -25,7 +26,7 @@ const initialNodes: MindMapNode[] = [
   //     id: '2',
   //     type: 'mindMapNode',
   //     position: { x: 200, y: 200 },
-  //     data: { label: 'Branch 1', level: 1 },
+  //     data: { level: 1, content: '<p>Branch 1</p>' },
   //     parentId: '1',
   //   },
   //   {
@@ -62,8 +63,10 @@ const initialEdges: MindMapEdge[] = [
   //   {
   //     id: 'e1-2',
   //     source: '1',
+  //     sourceHandle: 'second-source-1',
   //     target: '2',
-  //     type: 'smoothstep',
+  //     targetHandle: 'first-target-2',
+  //     type: 'mindmapEdge',
   //   },
   //   {
   //     id: 'e1-3',
@@ -109,6 +112,7 @@ export const MindmapProvider: React.FC<MindmapProviderProps> = ({ children }) =>
   const { screenToFlowPosition, getIntersectingNodes, fitView } = useReactFlow();
   const layout = useRef<Direction>('horizontal');
   const nodesInitialized = useNodesInitialized();
+  const updateNodeInternals = useUpdateNodeInternals();
 
   const onConnect = useCallback(
     (params: MindMapEdge | Connection) => {
@@ -146,8 +150,8 @@ export const MindmapProvider: React.FC<MindmapProviderProps> = ({ children }) =>
         type: MINDMAP_TYPES.MINDMAP_EDGE,
         sourceHandle: sourceHandler,
         targetHandle: sourceHandler?.startsWith('left')
-          ? `right-target-${newNode.id}`
-          : `left-target-${newNode.id}`,
+          ? `second-target-${newNode.id}`
+          : `first-target-${newNode.id}`,
         data: {
           strokeColor: 'var(--primary)',
           strokeWidth: 2,
@@ -260,6 +264,8 @@ export const MindmapProvider: React.FC<MindmapProviderProps> = ({ children }) =>
           x: mousePositionRef.current.x,
           y: mousePositionRef.current.y,
         });
+
+        updateNodeInternals(node.id);
         return {
           ...node,
           position: {
@@ -348,8 +354,6 @@ export const MindmapProvider: React.FC<MindmapProviderProps> = ({ children }) =>
   const updateLayout = useCallback(
     (direction: Direction) => {
       if (!nodes?.length || !edges) return;
-
-      console.log('Updating layout to:', direction);
 
       setIsLayouting(true);
 

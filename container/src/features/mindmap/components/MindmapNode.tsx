@@ -4,7 +4,7 @@ import { useState, useEffect, memo } from 'react';
 import { Position, useNodeConnections, type NodeProps } from '@xyflow/react';
 import { BaseNode, BaseNodeContent } from '@/components/base-node';
 import { cn } from '@/shared/lib/utils';
-import { useMindmap } from '../context/MindmapContext';
+import { useMindmapStore } from '../stores/useMindmapStore';
 import RichTextEditor from '@/shared/components/rte/RichTextEditor';
 import { useRichTextEditor } from '@/shared/components/rte/useRichTextEditor';
 import { BlockNoteEditor } from '@blocknote/core';
@@ -16,7 +16,7 @@ import { useLayoutStore } from '../stores/useLayoutStore';
 
 const MindMapNodeBlock = memo(({ ...node }: NodeProps<MindMapNode>) => {
   const { data, selected, id } = node;
-  const { addChildNode, finalizeNodeDeletion } = useMindmap();
+  const { addChildNode, finalizeNodeDeletion } = useMindmapStore();
   const layout = useLayoutStore((state) => state.layout);
   const isLayouting = useLayoutStore((state) => state.isLayouting);
   const [, setIsEditing] = useState(false);

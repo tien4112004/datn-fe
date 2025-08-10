@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import dagre from '@dagrejs/dagre';
 import type { MindMapNode, MindMapEdge } from '../types';
 import { DIRECTION, type Direction } from '../constants';
+import { useMindmapStore } from './useMindmapStore';
 
 interface LayoutState {
   layout: Direction;
@@ -16,20 +17,8 @@ interface LayoutState {
     nodes: MindMapNode[];
     edges: MindMapEdge[];
   };
-  updateLayout: (
-    nodes: MindMapNode[],
-    edges: MindMapEdge[],
-    direction: Direction,
-    setNodes: (updater: (nodes: MindMapNode[]) => MindMapNode[]) => void,
-    setEdges: (updater: (edges: MindMapEdge[]) => MindMapEdge[]) => void
-  ) => void;
-  onLayoutChange: (
-    direction: Direction,
-    nodes: MindMapNode[],
-    edges: MindMapEdge[],
-    setNodes: (updater: (nodes: MindMapNode[]) => MindMapNode[]) => void,
-    setEdges: (updater: (edges: MindMapEdge[]) => MindMapEdge[]) => void
-  ) => void;
+  updateLayout: (direction?: Direction) => void;
+  onLayoutChange: (direction: Direction) => void;
 }
 
 export const useLayoutStore = create<LayoutState>((set, get) => ({
@@ -99,18 +88,20 @@ export const useLayoutStore = create<LayoutState>((set, get) => ({
     }
   },
 
-  updateLayout: (nodes, edges, direction, setNodes, setEdges) => {
-    const { getLayoutedElements } = get();
+  updateLayout: (direction) => {
+    const { getLayoutedElements, layout } = get();
+    const { nodes, edges, setNodes, setEdges } = useMindmapStore.getState();
+    const layoutDirection = direction || layout;
 
     if (!nodes?.length || !edges) return;
 
     set({ isLayouting: true });
 
     // Calculate new positions
-    const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(nodes, edges, direction);
+    const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(nodes, edges, layoutDirection);
 
     // Update nodes with smooth transitions using React Flow's animation system
-    setNodes(() => [
+    setNodes([
       ...layoutedNodes.map((layoutedNode) => {
         return {
           ...layoutedNode,
@@ -122,20 +113,21 @@ export const useLayoutStore = create<LayoutState>((set, get) => ({
         };
       }),
     ]);
-    setEdges(() => [...layoutedEdges]);
+    setEdges([...layoutedEdges]);
 
     // Remove isLayouting flag after animation completes
     setTimeout(() => {
       set({ isLayouting: false });
+      const { setNodes } = useMindmapStore.getState();
       setNodes((nds: MindMapNode[]) =>
         nds.map((node) => ({ ...node, style: { ...node.style, transition: '' } }))
       );
     }, 800);
   },
 
-  onLayoutChange: (direction, nodes, edges, setNodes, setEdges) => {
+  onLayoutChange: (direction) => {
     const { updateLayout } = get();
     set({ layout: direction });
-    updateLayout(nodes, edges, direction, setNodes, setEdges);
+    updateLayout(direction);
   },
 }));

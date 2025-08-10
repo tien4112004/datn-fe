@@ -1,17 +1,17 @@
 import { Plus, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useMindmap } from '../context/MindmapContext';
+import { useMindmapStore } from '../stores/useMindmapStore';
 import { useCallback, useEffect } from 'react';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { useLayoutStore } from '../stores/useLayoutStore';
 import type { Direction } from '../constants';
 
 const MindmapToolbar = () => {
-  const { addNode, deleteSelectedNodes, nodes, edges, setNodes, setEdges } = useMindmap();
+  const { addNode, deleteSelectedNodes, nodes, edges } = useMindmapStore();
   const onLayoutChange = useLayoutStore((state) => state.onLayoutChange);
 
   useEffect(() => {
-    onLayoutChange('horizontal', nodes, edges, setNodes, setEdges);
+    onLayoutChange('horizontal');
   }, [onLayoutChange]);
 
   const logData = useCallback(() => {
@@ -42,7 +42,7 @@ const MindmapToolbar = () => {
         defaultValue="horizontal"
         className="rounded-md border border-gray-300 bg-white shadow-sm"
         onValueChange={(value) => {
-          onLayoutChange(value as Direction, nodes, edges, setNodes, setEdges);
+          onLayoutChange(value as Direction);
         }}
       >
         <ToggleGroupItem value="horizontal" className="px-4 py-2">

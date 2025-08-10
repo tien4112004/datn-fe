@@ -1,14 +1,13 @@
 import '@xyflow/react/dist/style.css';
 import { Background, BackgroundVariant, Controls, MiniMap, ReactFlow } from '@xyflow/react';
-import { useMindmap } from '../context/MindmapContext';
+import { useReactFlowIntegration } from '../hooks/useReactFlowIntegration';
 import MindMapNodeBlock from './MindmapNode';
 import MindmapEdgeBlock from './MindmapEdge';
 import MindmapToolbar from './MindmapToolbar';
 import MindmapInstructions from './MindmapInstructions';
 import { useShortcuts, useMindmapActions } from '../hooks';
-import { useMemo, useCallback } from 'react';
+import { memo, useMemo } from 'react';
 import { DevTools } from '@/components/devtools';
-import { useClipboardStore } from '../stores/useClipboardStore';
 
 const nodeTypes = {
   mindMapNode: MindMapNodeBlock,
@@ -18,30 +17,11 @@ const edgeTypes = {
   mindmapEdge: MindmapEdgeBlock,
 };
 
-const MindMap = () => {
-  const { nodes, edges, onNodesChange, onEdgesChange, onConnect, onNodeDrag } = useMindmap();
+const MindMap = memo(() => {
+  const { nodes, edges, onNodesChange, onEdgesChange, onConnect, onNodeDrag, onPaneMouseMove, onPaneClick } =
+    useReactFlowIntegration();
 
-  const setMousePosition = useClipboardStore((state) => state.setMousePosition);
-  const onPaneMouseMove = useCallback(
-    (event: any) => {
-      const { clientX, clientY } = event;
-      setMousePosition({ x: clientX, y: clientY });
-    },
-    [setMousePosition]
-  );
-
-  const proOptions = useMemo(() => ({ hideAttribution: true }), []);
-
-  const onPaneClick = useCallback(() => {
-    if (window.getSelection) {
-      const selection = window.getSelection();
-      if (selection) {
-        selection.removeAllRanges();
-      }
-    }
-  }, []);
-
-  console.log('Rendering MindMap component');
+  console.log('MindMap rendered');
 
   return (
     <div className="h-screen w-full" style={{ backgroundColor: 'var(--background)' }}>
@@ -55,7 +35,9 @@ const MindMap = () => {
         onConnect={onConnect}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
-        proOptions={proOptions}
+        proOptions={{
+          hideAttribution: true,
+        }}
         onPaneMouseMove={onPaneMouseMove}
         onPaneClick={onPaneClick}
         onNodeDrag={onNodeDrag}
@@ -80,7 +62,7 @@ const MindMap = () => {
       </ReactFlow>
     </div>
   );
-};
+});
 
 const LogicHandler = () => {
   const {

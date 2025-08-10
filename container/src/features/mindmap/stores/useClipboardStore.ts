@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import type { MindMapNode, MindMapEdge } from '../types';
 import { generateId } from '@/shared/lib/utils';
+import { useMindmapStore } from './useMindmapStore';
 
 interface ClipboardState {
   cloningNodes: MindMapNode[];
@@ -12,11 +13,9 @@ interface ClipboardState {
   setMousePosition: (position: { x: number; y: number }) => void;
   resetOffset: () => void;
   incrementOffset: () => void;
-  copySelectedNodesAndEdges: (nodes: MindMapNode[], edges: MindMapEdge[]) => void;
+  copySelectedNodesAndEdges: () => void;
   pasteClonedNodesAndEdges: (
-    screenToFlowPosition: (position: { x: number; y: number }) => { x: number; y: number },
-    setNodes: (updater: (nodes: MindMapNode[]) => MindMapNode[]) => void,
-    setEdges: (updater: (edges: MindMapEdge[]) => MindMapEdge[]) => void
+    screenToFlowPosition: (position: { x: number; y: number }) => { x: number; y: number }
   ) => void;
 }
 
@@ -32,7 +31,8 @@ export const useClipboardStore = create<ClipboardState>((set, get) => ({
   resetOffset: () => set({ offset: 0 }),
   incrementOffset: () => set((state) => ({ offset: state.offset + 20 })),
 
-  copySelectedNodesAndEdges: (nodes, edges) => {
+  copySelectedNodesAndEdges: () => {
+    const { nodes, edges } = useMindmapStore.getState();
     const selectedNodes = nodes.filter((node) => node.selected);
     const selectedEdges = edges.filter((edge) => edge.selected);
 
@@ -44,8 +44,9 @@ export const useClipboardStore = create<ClipboardState>((set, get) => ({
     });
   },
 
-  pasteClonedNodesAndEdges: (screenToFlowPosition, setNodes, setEdges) => {
+  pasteClonedNodesAndEdges: (screenToFlowPosition) => {
     const { cloningNodes, cloningEdges, mousePosition, offset } = get();
+    const { setNodes, setEdges } = useMindmapStore.getState();
 
     if (cloningNodes.length === 0) return;
 

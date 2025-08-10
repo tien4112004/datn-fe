@@ -10,7 +10,7 @@ import {
   useUpdateNodeInternals,
 } from '@xyflow/react';
 import type { MindMapNode, MindMapEdge, MindmapContextType } from '../types';
-import { DragHandle, MINDMAP_TYPES, type Direction } from '../constants';
+import { DIRECTION, DragHandle, MINDMAP_TYPES, type Direction } from '../constants';
 import { generateId } from '@/shared/lib/utils';
 import dagre from '@dagrejs/dagre';
 
@@ -265,7 +265,6 @@ export const MindmapProvider: React.FC<MindmapProviderProps> = ({ children }) =>
           y: mousePositionRef.current.y,
         });
 
-        updateNodeInternals(node.id);
         return {
           ...node,
           position: {
@@ -289,7 +288,7 @@ export const MindmapProvider: React.FC<MindmapProviderProps> = ({ children }) =>
 
   const getLayoutedElements = useCallback(
     (nodes: MindMapNode[], edges: MindMapEdge[], direction: Direction) => {
-      if (nodes.length === 0) return { nodes, edges };
+      if (nodes.length === 0 || direction === DIRECTION.NONE) return { nodes, edges };
 
       try {
         // Create a new directed graph
@@ -299,12 +298,11 @@ export const MindmapProvider: React.FC<MindmapProviderProps> = ({ children }) =>
         g.setDefaultEdgeLabel(() => ({}));
 
         // Configure the graph based on direction
-        if (direction === 'vertical') {
+        if (direction === DIRECTION.VERTICAL) {
           g.setGraph({ rankdir: 'TB', ranksep: 120 });
-        } else if (direction === 'horizontal') {
+        } else if (direction === DIRECTION.HORIZONTAL) {
           g.setGraph({ rankdir: 'LR', ranksep: 120 });
         } else {
-          // No layout - return nodes as is
           return { nodes, edges };
         }
 
@@ -368,7 +366,7 @@ export const MindmapProvider: React.FC<MindmapProviderProps> = ({ children }) =>
             // Apply smooth transition using React Flow's built-in animation
             style: {
               ...layoutedNode.style,
-              transition: 'all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+              transition: 'all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
             },
           };
         }),
@@ -382,6 +380,10 @@ export const MindmapProvider: React.FC<MindmapProviderProps> = ({ children }) =>
           nds.map((node) => ({ ...node, style: { ...node.style, transition: '' } }))
         );
       }, 800);
+
+      setTimeout(() => {
+        updateNodeInternals(nodes.map((node) => node.id));
+      }, 0);
     },
     [nodes, edges, setNodes, setEdges, getLayoutedElements]
   );
@@ -391,7 +393,7 @@ export const MindmapProvider: React.FC<MindmapProviderProps> = ({ children }) =>
       layout.current = direction;
       updateLayout(direction);
     },
-    [updateLayout, fitView]
+    [updateLayout, fitView, updateNodeInternals]
   );
 
   useEffect(() => {
@@ -399,7 +401,7 @@ export const MindmapProvider: React.FC<MindmapProviderProps> = ({ children }) =>
       // Add a small delay to ensure DOM is fully rendered
       const timeoutId = setTimeout(() => {
         updateLayout(layout.current);
-      }, 100);
+      }, 10);
 
       return () => clearTimeout(timeoutId);
     }

@@ -5,8 +5,8 @@ import {
   getSmoothStepPath,
   getStraightPath,
 } from '@xyflow/react';
-import { memo, useRef, useEffect } from 'react';
-import { motion, useAnimation } from 'motion/react';
+import { memo } from 'react';
+import { motion } from 'motion/react';
 import { useMindmap } from '../context/MindmapContext';
 import type { MindMapEdge } from '../types';
 
@@ -104,7 +104,7 @@ const MindmapEdgeBlock = memo(
           d: edgePath ?? '',
         }}
         transition={
-          isLayouting ? { duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94], type: 'tween' } : { duration: 0 }
+          isLayouting ? { duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94], type: 'tween' } : { duration: 0 }
         }
       />
     );

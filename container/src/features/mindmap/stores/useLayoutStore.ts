@@ -1,10 +1,12 @@
 import { create } from 'zustand';
-import dagre from '@dagrejs/dagre';
+import ELK from 'elkjs/lib/elk.bundled.js';
 import * as d3 from 'd3';
 import type { MindMapNode, MindMapEdge } from '../types';
 import { DIRECTION, type Direction } from '../constants';
 import { useMindmapStore } from './useMindmapStore';
 import { devtools } from 'zustand/middleware';
+
+const elk = new ELK();
 
 interface AnimationData {
   id: string;
@@ -27,10 +29,10 @@ interface LayoutState {
     nodes: MindMapNode[],
     edges: MindMapEdge[],
     direction: Direction
-  ) => {
+  ) => Promise<{
     nodes: MindMapNode[];
     edges: MindMapEdge[];
-  };
+  }>;
   animateNodesToPositions: (
     targetPositions: Record<string, { x: number; y: number }>,
     duration?: number
@@ -138,67 +140,75 @@ export const useLayoutStore = create<LayoutState>()(
         set({ animationTimer: timer }, false, 'mindmap-layout/animateNodesToPositions:timer');
       },
 
-      getLayoutedElements: (nodes, edges, direction) => {
-        if (nodes.length === 0 || direction === DIRECTION.NONE) return { nodes, edges };
+      getLayoutedElements: async (nodes, edges, direction) => {
+        if (nodes.length === 0 || direction === DIRECTION.NONE) {
+          return { nodes, edges };
+        }
 
         try {
-          // Create a new directed graph
-          const g = new dagre.graphlib.Graph();
+          // Configure ELK options based on direction
+          const isHorizontal = direction === DIRECTION.HORIZONTAL;
 
-          // Set an object for the graph label
-          g.setDefaultEdgeLabel(() => ({}));
-
-          // Configure the graph based on direction
-          if (direction === DIRECTION.VERTICAL) {
-            g.setGraph({ rankdir: 'TB', ranksep: 120 });
-          } else if (direction === DIRECTION.HORIZONTAL) {
-            g.setGraph({ rankdir: 'LR', ranksep: 120 });
-          } else {
-            return { nodes, edges };
-          }
-
-          // Add nodes to the graph
-          nodes.forEach((node: MindMapNode) => {
-            g.setNode(node.id, {
+          const graph = {
+            id: 'root',
+            layoutOptions: {
+              'elk.algorithm': 'layered',
+              'elk.direction': 'RIGHT',
+              'elk.spacing.nodeNode': '80',
+              'elk.layered.spacing.nodeNodeBetweenLayers': '100',
+              'elk.spacing.componentComponent': '50',
+              'elk.alignment': 'CENTER',
+              'elk.layered.crossingMinimization.strategy': 'LAYER_SWEEP',
+              'elk.layered.nodePlacement.strategy': 'BRANDES_KOEPF',
+              'elk.layered.cycleBreaking.strategy': 'GREEDY',
+            },
+            children: nodes.map((node: MindMapNode) => ({
+              id: node.id,
+              // Adjust handle positions based on layout direction
+              targetPosition: isHorizontal ? 'left' : 'top',
+              sourcePosition: isHorizontal ? 'right' : 'bottom',
+              // Use measured dimensions or fallback values
               width: node.measured?.width || 220,
               height: node.measured?.height || 40,
-            });
-          });
-
-          // Add edges to the graph
-          edges.forEach((edge: MindMapEdge) => {
-            g.setEdge(edge.source, edge.target);
-          });
-
-          // Calculate the layout
-          dagre.layout(g, {
-            disableOptimalOrderHeuristic: true,
-          });
-
-          // Update node positions based on dagre layout
-          const layoutedNodes = nodes.map((node: any) => {
-            const nodeWithPosition = g.node(node.id);
-            return {
-              ...node,
-              position: {
-                // Dagre gives us the center position, adjust to top-left
-                x: nodeWithPosition.x - (nodeWithPosition.width || 150) / 2,
-                y: nodeWithPosition.y - (nodeWithPosition.height || 40) / 2,
+              layoutOptions: {
+                'elk.algorithm': 'mrtree',
+                'elk.direction': 'RIGHT',
+                'elk.mrtree.searchOrder': 'BFS',
+                'elk.spacing.nodeNode': '40',
+                'elk.mrtree.weighting': 'MODEL_ORDER',
               },
-            };
-          });
+            })),
+            edges: edges.map((edge: MindMapEdge) => ({
+              id: edge.id,
+              sources: [edge.source],
+              targets: [edge.target],
+            })),
+          };
+
+          const layoutedGraph = await elk.layout(graph);
+
+          const layoutedNodes =
+            layoutedGraph.children?.map((layoutedNode: any) => {
+              const originalNode = nodes.find((n) => n.id === layoutedNode.id);
+              return {
+                ...originalNode,
+                position: { x: layoutedNode.x, y: layoutedNode.y },
+                targetPosition: layoutedNode.targetPosition,
+                sourcePosition: layoutedNode.sourcePosition,
+              };
+            }) || nodes;
 
           return {
             nodes: layoutedNodes,
             edges,
           };
         } catch (error) {
-          console.warn('Layout calculation failed:', error);
+          console.warn('ELK layout calculation failed:', error);
           return { nodes, edges };
         }
       },
 
-      updateLayout: (direction) => {
+      updateLayout: async (direction) => {
         const { getLayoutedElements, layout, animateNodesToPositions } = get();
         const nodes = useMindmapStore.getState().nodes;
         const edges = useMindmapStore.getState().edges;
@@ -210,29 +220,34 @@ export const useLayoutStore = create<LayoutState>()(
 
         set({ isLayouting: true }, false, 'mindmap-layout/updateLayout');
 
-        // Calculate new positions
-        const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
-          nodes,
-          edges,
-          layoutDirection
-        );
+        try {
+          // Calculate new positions using async ELK layout
+          const { nodes: layoutedNodes, edges: layoutedEdges } = await getLayoutedElements(
+            nodes,
+            edges,
+            layoutDirection
+          );
 
-        // Update edges immediately
-        setEdges([...layoutedEdges]);
+          // Update edges immediately
+          setEdges([...layoutedEdges]);
 
-        // Create target positions for animation
-        const targetPositions: Record<string, { x: number; y: number }> = {};
-        layoutedNodes.forEach((node) => {
-          targetPositions[node.id] = { x: node.position.x, y: node.position.y };
-        });
+          // Create target positions for animation
+          const targetPositions: Record<string, { x: number; y: number }> = {};
+          layoutedNodes.forEach((node) => {
+            targetPositions[node.id] = { x: node.position.x, y: node.position.y };
+          });
 
-        // Animate nodes to new positions using d3-based animation
-        animateNodesToPositions(targetPositions, 800);
+          // Animate nodes to new positions using d3-based animation
+          animateNodesToPositions(targetPositions, 800);
 
-        // Remove isLayouting flag after animation completes
-        setTimeout(() => {
-          set({ isLayouting: false }, false, 'mindmap-layout/updateLayout:animationEnd');
-        }, 900);
+          // Remove isLayouting flag after animation completes
+          setTimeout(() => {
+            set({ isLayouting: false }, false, 'mindmap-layout/updateLayout:animationEnd');
+          }, 900);
+        } catch (error) {
+          console.error('Layout update failed:', error);
+          set({ isLayouting: false }, false, 'mindmap-layout/updateLayout:error');
+        }
       },
 
       onLayoutChange: (direction) => {

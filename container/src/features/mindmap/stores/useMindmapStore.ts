@@ -7,16 +7,106 @@ import { generateId } from '@/shared/lib/utils';
 import { devtools } from 'zustand/middleware';
 
 const initialNodes: MindMapNode[] = [
+  // Central root
   {
-    id: '1',
+    id: 'root',
     type: 'mindMapNode',
     position: { x: 400, y: 300 },
-    data: { level: 0, content: '<p>Central Idea</p>' },
+    data: { level: 0, content: '<p>Central Topic</p>' },
+    dragHandle: DragHandle.SELECTOR,
+  },
+  // Left side branch (going left from center)
+  {
+    id: 'left-1',
+    type: 'mindMapNode',
+    position: { x: 250, y: 300 },
+    data: { level: 1, content: '<p>Left Branch</p>' },
+    dragHandle: DragHandle.SELECTOR,
+  },
+  {
+    id: 'left-2',
+    type: 'mindMapNode',
+    position: { x: 100, y: 250 },
+    data: { level: 2, content: '<p>Left Sub 1</p>' },
+    dragHandle: DragHandle.SELECTOR,
+  },
+  {
+    id: 'left-3',
+    type: 'mindMapNode',
+    position: { x: 100, y: 350 },
+    data: { level: 2, content: '<p>Left Sub 2</p>' },
+    dragHandle: DragHandle.SELECTOR,
+  },
+  // Right side branch (going right from center)
+  {
+    id: 'right-1',
+    type: 'mindMapNode',
+    position: { x: 550, y: 300 },
+    data: { level: 1, content: '<p>Right Branch</p>' },
+    dragHandle: DragHandle.SELECTOR,
+  },
+  {
+    id: 'right-2',
+    type: 'mindMapNode',
+    position: { x: 700, y: 250 },
+    data: { level: 2, content: '<p>Right Sub 1</p>' },
+    dragHandle: DragHandle.SELECTOR,
+  },
+  {
+    id: 'right-3',
+    type: 'mindMapNode',
+    position: { x: 700, y: 350 },
+    data: { level: 2, content: '<p>Right Sub 2</p>' },
     dragHandle: DragHandle.SELECTOR,
   },
 ];
 
-const initialEdges: MindMapEdge[] = [];
+const initialEdges: MindMapEdge[] = [
+  // Left side connections
+  {
+    id: 'root-left-1',
+    source: 'root',
+    target: 'left-1',
+    type: MINDMAP_TYPES.MINDMAP_EDGE,
+    data: { strokeColor: 'var(--primary)', strokeWidth: 2 },
+  },
+  {
+    id: 'left-1-left-2',
+    source: 'left-1',
+    target: 'left-2',
+    type: MINDMAP_TYPES.MINDMAP_EDGE,
+    data: { strokeColor: 'var(--primary)', strokeWidth: 2 },
+  },
+  {
+    id: 'left-1-left-3',
+    source: 'left-1',
+    target: 'left-3',
+    type: MINDMAP_TYPES.MINDMAP_EDGE,
+    data: { strokeColor: 'var(--primary)', strokeWidth: 2 },
+  },
+  // Right side connections
+  {
+    id: 'root-right-1',
+    source: 'root',
+    target: 'right-1',
+    type: MINDMAP_TYPES.MINDMAP_EDGE,
+    data: { strokeColor: 'var(--primary)', strokeWidth: 2 },
+  },
+  {
+    id: 'right-1-right-2',
+    source: 'right-1',
+    target: 'right-2',
+    type: MINDMAP_TYPES.MINDMAP_EDGE,
+    data: { strokeColor: 'var(--primary)', strokeWidth: 2 },
+  },
+  {
+    id: 'right-1-right-3',
+    source: 'right-1',
+    target: 'right-3',
+    type: MINDMAP_TYPES.MINDMAP_EDGE,
+    data: { strokeColor: 'var(--primary)', strokeWidth: 2 },
+  },
+];
 
 interface MindmapState {
   nodes: MindMapNode[];

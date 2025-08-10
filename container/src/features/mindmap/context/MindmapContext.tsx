@@ -12,6 +12,7 @@ import {
 import type { MindMapNode, MindMapEdge, MindmapContextType } from '../types';
 import { DIRECTION, DragHandle, MINDMAP_TYPES, type Direction } from '../constants';
 import { generateId } from '@/shared/lib/utils';
+import { useClipboardStore } from '../stores/useClipboardStore';
 import dagre from '@dagrejs/dagre';
 
 const initialNodes: MindMapNode[] = [
@@ -103,16 +104,25 @@ interface MindmapProviderProps {
 export const MindmapProvider: React.FC<MindmapProviderProps> = ({ children }) => {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
-  const [cloningNodes, setCloningNodes] = useState<MindMapNode[]>([]);
-  const [cloningEdges, setCloningEdges] = useState<MindMapEdge[]>([]);
   const [nodeId, setNodeId] = useState(1);
   const [isLayouting, setIsLayouting] = useState(false);
-  const mousePositionRef = useRef({ x: 0, y: 0 });
-  const offset = useRef(0);
   const { screenToFlowPosition, getIntersectingNodes, fitView } = useReactFlow();
   const layout = useRef<Direction>('horizontal');
   const nodesInitialized = useNodesInitialized();
   const updateNodeInternals = useUpdateNodeInternals();
+
+  // Clip board
+  const clipboardCopySelectedNodesAndEdges = useClipboardStore((state) => state.copySelectedNodesAndEdges);
+  const clipboardPasteClonedNodesAndEdges = useClipboardStore((state) => state.pasteClonedNodesAndEdges);
+
+  const copySelectedNodesAndEdges = useCallback(() => {
+    clipboardCopySelectedNodesAndEdges(nodes, edges);
+  }, [nodes, edges, clipboardCopySelectedNodesAndEdges]);
+
+  const pasteClonedNodesAndEdges = useCallback(() => {
+    clipboardPasteClonedNodesAndEdges(screenToFlowPosition, setNodes, setEdges);
+  }, [clipboardPasteClonedNodesAndEdges, screenToFlowPosition, setNodes, setEdges]);
+  console.log('MindmapProvider rendered');
 
   const onConnect = useCallback(
     (params: MindMapEdge | Connection) => {
@@ -214,77 +224,6 @@ export const MindmapProvider: React.FC<MindmapProviderProps> = ({ children }) =>
     setNodes((nds: MindMapNode[]) => nds.map((node: MindMapNode) => ({ ...node, selected: false })));
     setEdges((eds: MindMapEdge[]) => eds.map((edge: MindMapEdge) => ({ ...edge, selected: false })));
   }, [setNodes, setEdges]);
-
-  const copySelectedNodesAndEdges = useCallback(() => {
-    const selectedNodes = nodes.filter((node) => node.selected);
-    const selectedEdges = edges.filter((edge) => edge.selected);
-
-    if (selectedNodes.length === 0) return;
-
-    setCloningNodes(selectedNodes);
-    setCloningEdges(selectedEdges);
-  }, [nodes, edges]);
-
-  const pasteClonedNodesAndEdges = useCallback(() => {
-    if (cloningNodes.length === 0) return;
-    const rootPosition = cloningNodes[0].position || { x: 0, y: 0 };
-
-    // Generate fresh nodes with new IDs to avoid duplicates
-    const freshNodes = cloningNodes.map((node) => ({
-      ...node,
-      id: generateId(),
-      data: {
-        ...node.data,
-        content: `<p>Cloned: ${node.data.content}</p>`,
-        metadata: {
-          oldId: node.id,
-        },
-      },
-      selected: false,
-    }));
-
-    const freshEdges = cloningEdges.map((edge) => {
-      const newSource = freshNodes.find((node) => node.data.metadata?.oldId === edge.source);
-      const newTarget = freshNodes.find((node) => node.data.metadata?.oldId === edge.target);
-
-      return {
-        ...edge,
-        id: generateId(),
-        source: newSource ? newSource.id : edge.source,
-        target: newTarget ? newTarget.id : edge.target,
-        sourceHandle: edge.sourceHandle?.replace(edge.source, newSource?.id || edge.source),
-        targetHandle: edge.targetHandle?.replace(edge.target, newTarget?.id || edge.target),
-      };
-    });
-
-    setNodes((nds: MindMapNode[]) => [
-      ...nds.map((node) => ({ ...node, selected: false })),
-      ...freshNodes.map((node) => {
-        const { x, y } = screenToFlowPosition({
-          x: mousePositionRef.current.x,
-          y: mousePositionRef.current.y,
-        });
-
-        return {
-          ...node,
-          position: {
-            x: x - rootPosition.x + node.position.x + offset.current,
-            y: y - rootPosition.y + node.position.y + offset.current,
-          },
-          selected: true,
-        };
-      }),
-    ]);
-    setEdges((eds: MindMapEdge[]) => [...eds, ...freshEdges]);
-
-    offset.current += 20; // Increment offset for next paste
-  }, [cloningNodes, cloningEdges, setNodes, setEdges, screenToFlowPosition]);
-
-  const onMouseMove = useCallback((event: any) => {
-    const { clientX, clientY } = event;
-    mousePositionRef.current = { x: clientX, y: clientY };
-    offset.current = 0;
-  }, []);
 
   const getLayoutedElements = useCallback(
     (nodes: MindMapNode[], edges: MindMapEdge[], direction: Direction) => {
@@ -396,8 +335,11 @@ export const MindmapProvider: React.FC<MindmapProviderProps> = ({ children }) =>
     [updateLayout, fitView, updateNodeInternals]
   );
 
+  const hasInitializedRef = useRef(false);
+
   useEffect(() => {
-    if (nodes.length > 0 && nodesInitialized) {
+    if (nodes.length > 0 && nodesInitialized && !hasInitializedRef.current) {
+      hasInitializedRef.current = true;
       // Add a small delay to ensure DOM is fully rendered
       const timeoutId = setTimeout(() => {
         updateLayout(layout.current);
@@ -405,7 +347,7 @@ export const MindmapProvider: React.FC<MindmapProviderProps> = ({ children }) =>
 
       return () => clearTimeout(timeoutId);
     }
-  }, [nodesInitialized]);
+  }, [nodes.length, nodesInitialized, updateLayout]);
 
   const onNodeDrag = useCallback(
     (_: MouseEvent, node: MindMapNode) => {
@@ -432,7 +374,6 @@ export const MindmapProvider: React.FC<MindmapProviderProps> = ({ children }) =>
       onNodesChange,
       onEdgesChange,
       onConnect,
-      onMouseMove,
       onNodeDrag,
       updateLayout,
       onLayoutChange,
@@ -456,7 +397,6 @@ export const MindmapProvider: React.FC<MindmapProviderProps> = ({ children }) =>
       onNodesChange,
       onEdgesChange,
       onConnect,
-      onMouseMove,
       onNodeDrag,
       updateLayout,
       onLayoutChange,

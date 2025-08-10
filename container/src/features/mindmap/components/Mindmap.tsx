@@ -8,6 +8,7 @@ import MindmapInstructions from './MindmapInstructions';
 import { useShortcuts } from '../hooks/useShortcut';
 import { useMemo, useCallback } from 'react';
 import { DevTools } from '@/components/devtools';
+import { useClipboardStore } from '../stores/useClipboardStore';
 
 const nodeTypes = {
   mindMapNode: MindMapNodeBlock,
@@ -24,7 +25,6 @@ const MindMap = () => {
     onNodesChange,
     onEdgesChange,
     onConnect,
-    onMouseMove,
     selectAllNodesAndEdges,
     copySelectedNodesAndEdges,
     pasteClonedNodesAndEdges,
@@ -32,6 +32,15 @@ const MindMap = () => {
     deselectAllNodesAndEdges,
     onNodeDrag,
   } = useMindmap();
+
+  const setMousePosition = useClipboardStore((state) => state.setMousePosition);
+  const onPaneMouseMove = useCallback(
+    (event: any) => {
+      const { clientX, clientY } = event;
+      setMousePosition({ x: clientX, y: clientY });
+    },
+    [setMousePosition]
+  );
 
   const shortcuts = useMemo(
     () => [
@@ -78,6 +87,8 @@ const MindMap = () => {
     }
   }, []);
 
+  console.log('Rendering MindMap component');
+
   return (
     <div className="h-screen w-full" style={{ backgroundColor: 'var(--background)' }}>
       <MindmapToolbar />
@@ -91,7 +102,7 @@ const MindMap = () => {
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
         proOptions={proOptions}
-        onPaneMouseMove={onMouseMove}
+        onPaneMouseMove={onPaneMouseMove}
         onPaneClick={onPaneClick}
         onNodeDrag={onNodeDrag}
         fitView

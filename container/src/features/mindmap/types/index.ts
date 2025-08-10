@@ -28,7 +28,6 @@ export interface MindmapContextType {
   onNodesChange: (changes: any) => void;
   onEdgesChange: (changes: any) => void;
   onConnect: (params: MindMapEdge | Connection) => void;
-  onMouseMove: (event: any) => void;
   onNodeDrag: (event: MouseEvent, node: MindMapNode) => void;
   updateLayout: (direction: Direction) => void;
   onLayoutChange: (direction: Direction) => void;

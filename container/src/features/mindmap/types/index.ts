@@ -21,16 +21,12 @@ export type MindMapEdge = Edge<{
 export interface MindmapContextType {
   nodes: MindMapNode[];
   edges: MindMapEdge[];
-  layout: Direction;
-  isLayouting: boolean;
   setNodes: React.Dispatch<React.SetStateAction<MindMapNode[]>>;
   setEdges: React.Dispatch<React.SetStateAction<MindMapEdge[]>>;
   onNodesChange: (changes: any) => void;
   onEdgesChange: (changes: any) => void;
   onConnect: (params: MindMapEdge | Connection) => void;
   onNodeDrag: (event: MouseEvent, node: MindMapNode) => void;
-  updateLayout: (direction: Direction) => void;
-  onLayoutChange: (direction: Direction) => void;
   addNode: () => void;
   deleteSelectedNodes: () => void;
   addChildNode: (parentNode: Partial<MindMapNode>, position: XYPosition, sourceHandler?: string) => void;
@@ -44,4 +40,9 @@ export interface MindmapActionsType {
   copySelectedNodesAndEdges: () => void;
   pasteClonedNodesAndEdges: () => void;
   deleteSelectedNodes: () => void;
+}
+
+export interface MindmapLayoutType {
+  updateLayout: (direction: Direction) => void;
+  onLayoutChange: (direction: Direction) => void;
 }

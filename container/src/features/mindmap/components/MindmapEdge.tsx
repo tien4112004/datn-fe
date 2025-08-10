@@ -7,8 +7,8 @@ import {
 } from '@xyflow/react';
 import { memo } from 'react';
 import { motion } from 'motion/react';
-import { useMindmap } from '../context/MindmapContext';
 import type { MindMapEdge } from '../types';
+import { useLayoutStore } from '../stores/useLayoutStore';
 
 type SmoothType = 'smoothstep' | 'straight' | 'bezier' | 'simplebezier';
 
@@ -76,7 +76,7 @@ const MindmapEdgeBlock = memo(
     data,
     selected,
   }: EdgeProps<MindMapEdge> & { smoothType: SmoothType }) => {
-    const { isLayouting } = useMindmap();
+    const isLayouting = useLayoutStore((state) => state.isLayouting);
 
     const [edgePath] = getEdgePath(data?.smoothType || 'smoothstep', {
       id,

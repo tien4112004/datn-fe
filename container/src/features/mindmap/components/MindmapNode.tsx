@@ -12,10 +12,13 @@ import { DIRECTION, DragHandle } from '../constants';
 import { AnimatePresence, motion } from 'motion/react';
 import type { MindMapNode } from '../types';
 import { BaseHandle } from '@/shared/components/base-handle';
+import { useLayoutStore } from '../stores/useLayoutStore';
 
 const MindMapNodeBlock = memo(({ ...node }: NodeProps<MindMapNode>) => {
   const { data, selected, id } = node;
-  const { addChildNode, finalizeNodeDeletion, layout, isLayouting } = useMindmap();
+  const { addChildNode, finalizeNodeDeletion } = useMindmap();
+  const layout = useLayoutStore((state) => state.layout);
+  const isLayouting = useLayoutStore((state) => state.isLayouting);
   const [, setIsEditing] = useState(false);
   const [isMouseOver, setIsMouseOver] = useState(false);
   const editor = useRichTextEditor({

@@ -3,13 +3,16 @@ import { Button } from '@/components/ui/button';
 import { useMindmap } from '../context/MindmapContext';
 import { useCallback, useEffect } from 'react';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { useLayoutStore } from '../stores/useLayoutStore';
+import type { Direction } from '../constants';
 
 const MindmapToolbar = () => {
-  const { addNode, deleteSelectedNodes, nodes, edges, onLayoutChange } = useMindmap();
+  const { addNode, deleteSelectedNodes, nodes, edges, setNodes, setEdges } = useMindmap();
+  const onLayoutChange = useLayoutStore((state) => state.onLayoutChange);
 
   useEffect(() => {
-    onLayoutChange('horizontal');
-  }, []);
+    onLayoutChange('horizontal', nodes, edges, setNodes, setEdges);
+  }, [onLayoutChange]);
 
   const logData = useCallback(() => {
     console.log('Nodes:', nodes);
@@ -38,7 +41,9 @@ const MindmapToolbar = () => {
         type="single"
         defaultValue="horizontal"
         className="rounded-md border border-gray-300 bg-white shadow-sm"
-        onValueChange={onLayoutChange}
+        onValueChange={(value) => {
+          onLayoutChange(value as Direction, nodes, edges, setNodes, setEdges);
+        }}
       >
         <ToggleGroupItem value="horizontal" className="px-4 py-2">
           Horizontal

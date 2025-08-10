@@ -6,8 +6,8 @@ import {
   type Connection,
   type XYPosition,
   useReactFlow,
-  useNodesInitialized,
   useUpdateNodeInternals,
+  useNodesInitialized,
 } from '@xyflow/react';
 import type { MindMapNode, MindMapEdge, MindmapContextType } from '../types';
 import { DragHandle, MINDMAP_TYPES, type Direction } from '../constants';
@@ -104,17 +104,28 @@ export const MindmapProvider: React.FC<MindmapProviderProps> = ({ children }) =>
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const [nodeId, setNodeId] = useState(1);
-  const { getIntersectingNodes, fitView } = useReactFlow();
+  const { getIntersectingNodes } = useReactFlow();
   const nodesInitialized = useNodesInitialized();
   const updateNodeInternals = useUpdateNodeInternals();
 
   const layout = useLayoutStore((state) => state.layout);
-  const isLayouting = useLayoutStore((state) => state.isLayouting);
   const layoutUpdateLayout = useLayoutStore((state) => state.updateLayout);
-  const layoutOnLayoutChange = useLayoutStore((state) => state.onLayoutChange);
 
-  // Action methods moved to useMindmapActions hook
-  console.log('MindmapProvider rendered');
+  // Auto-layout effect when nodes are initialized
+  useEffect(() => {
+    if (nodes.length > 0 && nodesInitialized) {
+      // Add a small delay to ensure DOM is fully rendered
+      const timeoutId = setTimeout(() => {
+        layoutUpdateLayout(nodes, edges, layout, setNodes, setEdges);
+
+        setTimeout(() => {
+          updateNodeInternals(nodes.map((node) => node.id));
+        }, 10);
+      }, 10);
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [nodes.length, nodesInitialized]);
 
   const onConnect = useCallback(
     (params: MindMapEdge | Connection) => {
@@ -207,35 +218,6 @@ export const MindmapProvider: React.FC<MindmapProviderProps> = ({ children }) =>
     selectedNodeIds.forEach((nodeId) => markNodeForDeletion(nodeId));
   }, [nodes, markNodeForDeletion]);
 
-  const updateLayout = useCallback(
-    (direction: Direction) => {
-      layoutUpdateLayout(nodes, edges, direction, setNodes, setEdges);
-    },
-    [nodes, edges, setNodes, setEdges, updateNodeInternals, layoutUpdateLayout]
-  );
-
-  const onLayoutChange = useCallback(
-    (direction: Direction) => {
-      layoutOnLayoutChange(direction, nodes, edges, setNodes, setEdges);
-      fitView();
-    },
-    [nodes, edges, setNodes, setEdges, updateNodeInternals, layoutOnLayoutChange]
-  );
-
-  useEffect(() => {
-    if (nodes.length > 0 && nodesInitialized) {
-      // Add a small delay to ensure DOM is fully rendered
-      const timeoutId = setTimeout(() => {
-        updateLayout(layout);
-        setTimeout(() => {
-          updateNodeInternals(nodes.map((node) => node.id));
-        }, 10);
-      }, 10);
-
-      return () => clearTimeout(timeoutId);
-    }
-  }, [nodes.length, nodesInitialized]);
-
   const onNodeDrag = useCallback(
     (_: MouseEvent, node: MindMapNode) => {
       const intersections = getIntersectingNodes(node).map((n) => n.id);
@@ -254,16 +236,12 @@ export const MindmapProvider: React.FC<MindmapProviderProps> = ({ children }) =>
     () => ({
       nodes,
       edges,
-      layout,
-      isLayouting,
       setNodes,
       setEdges,
       onNodesChange,
       onEdgesChange,
       onConnect,
       onNodeDrag,
-      updateLayout,
-      onLayoutChange,
       addNode,
       deleteSelectedNodes,
       addChildNode,
@@ -273,16 +251,12 @@ export const MindmapProvider: React.FC<MindmapProviderProps> = ({ children }) =>
     [
       nodes,
       edges,
-      layout,
-      isLayouting,
       setNodes,
       setEdges,
       onNodesChange,
       onEdgesChange,
       onConnect,
       onNodeDrag,
-      updateLayout,
-      onLayoutChange,
       addNode,
       deleteSelectedNodes,
       addChildNode,

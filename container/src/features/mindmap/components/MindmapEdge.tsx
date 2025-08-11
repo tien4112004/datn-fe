@@ -7,6 +7,8 @@ import {
 } from '@xyflow/react';
 import { memo } from 'react';
 import type { MindMapEdge } from '../types';
+import { motion } from 'motion/react';
+import { useMindmapStore } from '../stores';
 
 type SmoothType = 'smoothstep' | 'straight' | 'bezier' | 'simplebezier';
 
@@ -74,6 +76,8 @@ const MindmapEdgeBlock = memo(
     data,
     selected,
   }: EdgeProps<MindMapEdge> & { smoothType: SmoothType }) => {
+    const finalizeNodeDeletion = useMindmapStore((state) => state.finalizeNodeDeletion);
+
     const [edgePath] = getEdgePath(data?.smoothType || 'smoothstep', {
       id,
       sourceX,
@@ -85,7 +89,7 @@ const MindmapEdgeBlock = memo(
     });
 
     return (
-      <path
+      <motion.path
         id={id}
         key={`edge-${id}`}
         d={edgePath}
@@ -94,6 +98,13 @@ const MindmapEdgeBlock = memo(
         strokeWidth={selected ? (data?.strokeWidth || 2) + 1 : data?.strokeWidth || 2}
         style={{
           filter: selected ? 'drop-shadow(0 0 4px var(--primary))' : undefined,
+        }}
+        animate={data?.isDeleting ? { opacity: 0, scale: 0 } : { opacity: 1, scale: 1 }}
+        transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94], type: 'tween' }}
+        onAnimationComplete={() => {
+          if (data?.isDeleting) {
+            finalizeNodeDeletion();
+          }
         }}
       />
     );

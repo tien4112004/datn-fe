@@ -19,7 +19,7 @@ export type MindMapEdge = Edge<{
   strokeWidth?: number;
   strokeColor?: string;
   smoothType?: 'smoothstep' | 'straight' | 'bezier' | 'simplebezier';
-  isLayouting?: boolean;
+  isDeleting?: boolean;
 }>;
 
 export interface MindmapActionsType {

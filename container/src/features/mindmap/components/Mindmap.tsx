@@ -7,11 +7,10 @@ import MindmapEdgeBlock from './MindmapEdge';
 import MindmapToolbar from './MindmapToolbar';
 import MindmapInstructions from './MindmapInstructions';
 import { useShortcuts, useMindmapActions } from '../hooks';
-import { memo, useEffect, useMemo, useRef, type ReactNode } from 'react';
+import { memo, useMemo, type ReactNode } from 'react';
 import { DevTools } from '@/components/devtools';
 import { useMindmapStore } from '../stores';
 import { useShallow } from 'zustand/react/shallow';
-import { useWhyDidYouUpdate } from '@/hooks/use-debug';
 
 const nodeTypes = {
   mindMapNode: MindMapNodeBlock,
@@ -33,9 +32,9 @@ const Flow = memo(({ children }: { children: ReactNode }) => {
     }))
   );
 
-  console.log('Rerender');
+  //   console.log('Rerender');
 
-  useWhyDidYouUpdate('MindMap', { nodes, edges, onNodesChange, onEdgesChange, onConnect });
+  //   useWhyDidYouUpdate('MindMap', { nodes, edges, onNodesChange, onEdgesChange, onConnect });
 
   return (
     <ReactFlow

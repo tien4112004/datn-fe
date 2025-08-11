@@ -42,7 +42,6 @@ const MindmapRootNodeBlock = memo(({ ...node }: NodeProps<MindMapRootNode>) => {
 
   const handleContentChange = async (editor: BlockNoteEditor) => {
     const htmlContent = await editor.blocksToFullHTML(editor.document);
-    console.log('Root content updated:', htmlContent);
   };
 
   const handleEditSubmit = () => {
@@ -64,7 +63,7 @@ const MindmapRootNodeBlock = memo(({ ...node }: NodeProps<MindMapRootNode>) => {
         transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94], type: 'tween' }}
         onAnimationComplete={() => {
           if (data.isDeleting) {
-            finalizeNodeDeletion(id);
+            finalizeNodeDeletion();
           }
         }}
       >

@@ -20,21 +20,21 @@ const initialNodes: MindMapNode[] = [
     id: 'left-1',
     type: 'mindMapNode',
     position: { x: 250, y: 300 },
-    data: { level: 1, content: '<p>Left Branch</p>' },
+    data: { level: 1, content: '<p>Left Branch</p>', parentId: 'root' },
     dragHandle: DragHandle.SELECTOR,
   },
   {
     id: 'left-2',
     type: 'mindMapNode',
     position: { x: 100, y: 250 },
-    data: { level: 2, content: '<p>Left Sub 1</p>' },
+    data: { level: 2, content: '<p>Left Sub 1</p>', parentId: 'left-1' },
     dragHandle: DragHandle.SELECTOR,
   },
   {
     id: 'left-3',
     type: 'mindMapNode',
     position: { x: 100, y: 350 },
-    data: { level: 2, content: '<p>Left Sub 2</p>' },
+    data: { level: 2, content: '<p>Left Sub 2</p>', parentId: 'left-1' },
     dragHandle: DragHandle.SELECTOR,
   },
   // Right side branch (going right from center)
@@ -42,21 +42,21 @@ const initialNodes: MindMapNode[] = [
     id: 'right-1',
     type: 'mindMapNode',
     position: { x: 550, y: 300 },
-    data: { level: 1, content: '<p>Right Branch</p>' },
+    data: { level: 1, content: '<p>Right Branch</p>', parentId: 'root' },
     dragHandle: DragHandle.SELECTOR,
   },
   {
     id: 'right-2',
     type: 'mindMapNode',
     position: { x: 700, y: 250 },
-    data: { level: 2, content: '<p>Right Sub 1</p>' },
+    data: { level: 2, content: '<p>Right Sub 1</p>', parentId: 'right-1' },
     dragHandle: DragHandle.SELECTOR,
   },
   {
     id: 'right-3',
     type: 'mindMapNode',
     position: { x: 700, y: 350 },
-    data: { level: 2, content: '<p>Right Sub 2</p>' },
+    data: { level: 2, content: '<p>Right Sub 2</p>', parentId: 'right-1' },
     dragHandle: DragHandle.SELECTOR,
   },
 ];
@@ -120,10 +120,12 @@ interface MindmapState {
   addNode: () => void;
   logData: () => void;
   addChildNode: (parentNode: Partial<MindMapNode>, position: XYPosition, sourceHandler?: string) => void;
-  markNodeForDeletion: (nodeId: string) => void;
-  finalizeNodeDeletion: (nodeId: string) => void;
-  deleteSelectedNodes: () => void;
   syncState: (updateNodeInternals: any) => void;
+  getAllDescendantNodes: (parentId: string) => MindMapNode[];
+  nodesToBeDeleted: Set<string>;
+  deleteSelectedNodes: () => void;
+  markNodeForDeletion: (nodeId: string) => void;
+  finalizeNodeDeletion: () => void;
 }
 
 export const useMindmapStore = create<MindmapState>()(
@@ -131,6 +133,7 @@ export const useMindmapStore = create<MindmapState>()(
     nodes: initialNodes,
     edges: initialEdges,
     nodeId: 1,
+    nodesToBeDeleted: new Set<string>(),
 
     onNodesChange: (changes) => {
       set(
@@ -256,11 +259,31 @@ export const useMindmapStore = create<MindmapState>()(
       console.log('Edges:', edges);
     },
 
+    getAllDescendantNodes: (parentId: string): MindMapNode[] => {
+      const { nodes } = get();
+      return nodes.reduce((acc: MindMapNode[], node: MindMapNode) => {
+        if (node.data.parentId === parentId) {
+          acc.push(node);
+          acc.push(...get().getAllDescendantNodes(node.id));
+        }
+        return acc;
+      }, []);
+    },
+
     markNodeForDeletion: (nodeId: string) => {
+      const descendantNodes = get().getAllDescendantNodes(nodeId);
+      const nodeIdsToDelete = new Set([nodeId, ...descendantNodes.map((n) => n.id)]);
+
       set(
         (state) => ({
+          nodesToBeDeleted: nodeIdsToDelete,
           nodes: state.nodes.map((node: MindMapNode) =>
-            node.id === nodeId ? { ...node, data: { ...node.data, isDeleting: true } } : node
+            nodeIdsToDelete.has(node.id) ? { ...node, data: { ...node.data, isDeleting: true } } : node
+          ),
+          edges: state.edges.map((edge: MindMapEdge) =>
+            nodeIdsToDelete.has(edge.source) || nodeIdsToDelete.has(edge.target)
+              ? { ...edge, data: { ...edge.data, isDeleting: true } }
+              : edge
           ),
         }),
         false,
@@ -268,11 +291,16 @@ export const useMindmapStore = create<MindmapState>()(
       );
     },
 
-    finalizeNodeDeletion: (nodeId: string) => {
+    finalizeNodeDeletion: () => {
+      const { nodesToBeDeleted } = get();
+
       set(
         (state) => ({
-          nodes: state.nodes.filter((node: MindMapNode) => node.id !== nodeId),
-          edges: state.edges.filter((edge: MindMapEdge) => edge.source !== nodeId && edge.target !== nodeId),
+          nodes: state.nodes.filter((node: MindMapNode) => !nodesToBeDeleted.has(node.id)),
+          edges: state.edges.filter(
+            (edge: MindMapEdge) => !nodesToBeDeleted.has(edge.source) && !nodesToBeDeleted.has(edge.target)
+          ),
+          nodesToBeDeleted: new Set<string>(),
         }),
         false,
         'mindmap/finalizeNodeDeletion'

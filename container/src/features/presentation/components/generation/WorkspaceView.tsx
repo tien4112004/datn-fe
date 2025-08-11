@@ -16,7 +16,7 @@ import {
   SelectValue,
 } from '@/shared/components/ui/select';
 import { useModels } from '@/features/model';
-import { PRESENTATION_STYLES, SLIDE_COUNT_OPTIONS } from '@/features/presentation/constants';
+import { PRESENTATION_STYLES, SLIDE_COUNT_OPTIONS } from '@/features/presentation/utils';
 import type { OutlineData } from '@/features/presentation/types/outline';
 import useFetchStreaming from '@/features/presentation/hooks/useFetchStreaming';
 // import { useOutlineContext } from '../../context/OutlineContext';

@@ -1,8 +1,8 @@
-import React from 'react';
 import type { OutlineItem } from '../types';
-import { marked } from 'marked';
+import useStreaming from '@/shared/hooks/useStreaming';
 // import { experimental_streamedQuery as streamedQuery, useQuery, useQueryClient } from '@tanstack/react-query';
 import { usePresentationApiService } from '@/features/presentation/api';
+import { splitMarkdownToOutlineItems } from '@/features/presentation/utils';
 
 interface OutlinePromptRequest {
   prompt: string;
@@ -23,92 +23,28 @@ interface StreamingHookReturn {
 
 function useFetchStreaming(autoStartData?: OutlinePromptRequest): StreamingHookReturn {
   const presentationApiService = usePresentationApiService();
-  const [streamedContent, setStreamedContent] = React.useState<string>('');
-  const [outlineItems, setOutlineItems] = React.useState<OutlineItem[]>([]);
-  const [isStreaming, setIsStreaming] = React.useState<boolean>(false);
-  const [error, setError] = React.useState<string | null>(null);
-  const abortControllerRef = React.useRef<AbortController | null>(null);
 
-  const startStream = React.useCallback(
-    async (requestData: OutlinePromptRequest): Promise<void> => {
-      // Reset state
-      setStreamedContent('');
-      setOutlineItems([]);
-      setError(null);
-      setIsStreaming(true);
-
-      // Create abort controller for cancellation
-      abortControllerRef.current = new AbortController();
-
-      try {
-        const stream = await presentationApiService.getStreamedOutline(
-          requestData,
-          abortControllerRef.current.signal
-        );
-        const reader = stream.getReader();
-        const decoder = new TextDecoder();
-        let fullContent = '';
-
-        try {
-          while (true) {
-            const { done, value } = await reader.read();
-
-            if (done) {
-              break;
-            }
-
-            // Decode the chunk and add it to our content
-            const chunk = decoder.decode(value, { stream: true });
-            fullContent += chunk;
-
-            setStreamedContent((prev) => prev + chunk);
-            setOutlineItems([...splitMarkdownToOutlineItems(fullContent)]);
-
-            // Log each chunk as it arrives
-            console.log('Received chunk:', chunk);
-          }
-        } finally {
-          reader.releaseLock();
-        }
-      } catch (err) {
-        if (err instanceof Error) {
-          if (err.name !== 'AbortError') {
-            setError(`${err.message}`);
-          }
-        } else {
-          setError('Unknown error occurred');
-        }
-      } finally {
-        setIsStreaming(false);
-        abortControllerRef.current = null;
-      }
+  const {
+    streamedContent,
+    processedData: outlineItems,
+    isStreaming,
+    error,
+    startStream,
+    stopStream,
+    clearContent,
+  } = useStreaming<OutlinePromptRequest, OutlineItem[]>({
+    streamFunction: (requestData, signal) => presentationApiService.getStreamedOutline(requestData, signal),
+    processContent: (content) => splitMarkdownToOutlineItems(content),
+    onChunkReceived: (chunk) => {
+      // Log each chunk as it arrives
+      console.log('Received chunk:', chunk);
     },
-    [presentationApiService]
-  );
-
-  const stopStream = React.useCallback((): void => {
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-      abortControllerRef.current = null;
-    }
-    setIsStreaming(false);
-  }, []);
-
-  const clearContent = React.useCallback((): void => {
-    setStreamedContent('');
-    setOutlineItems([]);
-    setError(null);
-  }, []);
-
-  React.useEffect(() => {
-    if (autoStartData) {
-      startStream(autoStartData);
-    }
-  }, [autoStartData, startStream]);
+    autoStart: autoStartData,
+  });
 
   return {
     streamedContent,
-    outlineItems,
+    outlineItems: outlineItems || [],
     isStreaming,
     error,
     startStream,
@@ -182,24 +118,5 @@ function useFetchStreaming(autoStartData?: OutlinePromptRequest): StreamingHookR
 //     }
 //   }
 // }
-
-function splitMarkdownToOutlineItems(markdown: string): OutlineItem[] {
-  const cleanMarkdown = markdown
-    .replace(/^```markdown\n/, '')
-    .replace(/\n```$/, '')
-    .trim();
-
-  // Split the markdown into sections based on headings (## and above)
-  const sections = cleanMarkdown.split(/(?=^#{2,}\s)/m).filter(Boolean);
-
-  const items = sections.map((section, index) => ({
-    id: index.toString(),
-    htmlContent: marked.parse(section.trim(), {
-      async: false,
-    }),
-  }));
-
-  return items;
-}
 
 export default useFetchStreaming;

@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import OutlineCard from "@/features/presentation/components/generation/OutlineCard";
+import OutlineCard from '@/features/presentation/components/generation/OutlineCard';
 import { describe, expect, it, vi } from 'vitest';
 // import type { BlockNoteEditor, InlineContentSchema, StyleSchema } from '@blocknote/core';
 
@@ -13,7 +13,7 @@ vi.mock('react-i18next', () => ({
 vi.mock('@/shared/components/rte/RichTextEditor', () => ({
   default: () => {
     return <div>RichTextEditor</div>;
-  }
+  },
 }));
 
 describe('OutlineCard', () => {
@@ -24,10 +24,10 @@ describe('OutlineCard', () => {
       id: 'item-id',
       htmlContent: '<p>Test content</p><h1>Test Heading</h1>',
     },
-  }
-  
+  };
+
   it('should render without crashing', () => {
-    render(<OutlineCard {...standardProps}/>);
+    render(<OutlineCard {...standardProps} />);
 
     const card = screen.getByText('Test Title');
     expect(card).toBeInTheDocument();

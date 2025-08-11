@@ -11,6 +11,10 @@ export type MindMapNode = Node<{
   type: MindMapTypes;
 };
 
+export type MindMapRootNode = MindMapNode & {
+  //
+};
+
 export type MindMapEdge = Edge<{
   strokeWidth?: number;
   strokeColor?: string;

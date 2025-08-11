@@ -1,7 +1,8 @@
-export type MindMapTypes = 'mindMapNode' | 'mindmapEdge';
+export type MindMapTypes = 'mindMapNode' | 'mindMapRootNode' | 'mindmapEdge';
 
 export const MINDMAP_TYPES = {
   MINDMAP_NODE: 'mindMapNode',
+  MINDMAP_ROOT_NODE: 'mindMapRootNode',
   MINDMAP_EDGE: 'mindmapEdge',
 } as const;
 

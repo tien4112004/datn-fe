@@ -10,7 +10,7 @@ const initialNodes: MindMapNode[] = [
   // Central root
   {
     id: 'root',
-    type: 'mindMapNode',
+    type: 'mindMapRootNode',
     position: { x: 400, y: 300 },
     data: { level: 0, content: '<p>Central Topic</p>' },
     dragHandle: DragHandle.SELECTOR,

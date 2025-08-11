@@ -1,0 +1,196 @@
+import { Plus, GripVertical } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { useState, useEffect, memo } from 'react';
+import { Position, useUpdateNodeInternals, type NodeProps } from '@xyflow/react';
+import { BaseNode, BaseNodeContent } from '@/components/base-node';
+import { cn } from '@/shared/lib/utils';
+import { useMindmapStore } from '../stores/useMindmapStore';
+import RichTextEditor from '@/shared/components/rte/RichTextEditor';
+import { useRichTextEditor } from '@/shared/components/rte/useRichTextEditor';
+import { BlockNoteEditor } from '@blocknote/core';
+import { DIRECTION, DragHandle } from '../constants';
+import { AnimatePresence, motion } from 'motion/react';
+import type { MindMapRootNode } from '../types';
+import { BaseHandle } from '@/shared/components/base-handle';
+import { useLayoutStore } from '../stores/useLayoutStore';
+
+const MindmapRootNodeBlock = memo(({ ...node }: NodeProps<MindMapRootNode>) => {
+  const { data, selected, id } = node;
+  const addChildNode = useMindmapStore((state) => state.addChildNode);
+  const finalizeNodeDeletion = useMindmapStore((state) => state.finalizeNodeDeletion);
+  const layout = useLayoutStore((state) => state.layout);
+  const isLayouting = useLayoutStore((state) => state.isLayouting);
+  const updateNodeInternals = useUpdateNodeInternals();
+  const [, setIsEditing] = useState(false);
+  const [isMouseOver, setIsMouseOver] = useState(false);
+  const editor = useRichTextEditor({
+    trailingBlock: false,
+    placeholders: { default: '', heading: '', emptyBlock: '' },
+  });
+
+  useEffect(() => {
+    updateNodeInternals(id);
+  }, [layout, isLayouting]);
+
+  useEffect(() => {
+    async function loadInitialHTML() {
+      const blocks = await editor.tryParseHTMLToBlocks(data.content);
+      editor.replaceBlocks(editor.document, blocks);
+    }
+    loadInitialHTML();
+  }, [editor, data.content]);
+
+  const handleContentChange = async (editor: BlockNoteEditor) => {
+    const htmlContent = await editor.blocksToFullHTML(editor.document);
+    console.log('Root content updated:', htmlContent);
+  };
+
+  const handleEditSubmit = () => {
+    setIsEditing(false);
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      setIsEditing(false);
+    }
+  };
+
+  return (
+    <AnimatePresence>
+      <motion.div
+        key={id}
+        initial={{ opacity: 0, scale: 0 }}
+        animate={data.isDeleting ? { opacity: 0, scale: 0 } : { opacity: 1, scale: 1 }}
+        transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94], type: 'tween' }}
+        onAnimationComplete={() => {
+          if (data.isDeleting) {
+            finalizeNodeDeletion(id);
+          }
+        }}
+      >
+        <BaseNode
+          className={cn(
+            `border-primary from-primary/10 to-primary/20 rounded-xl border-4 shadow-xl`,
+            selected ? 'ring-primary/50 ring-4' : 'ring-0',
+            isLayouting && 'shadow-2xl ring-4 ring-blue-400/50'
+          )}
+          onMouseEnter={() => setIsMouseOver(true)}
+          onMouseLeave={() => setIsMouseOver(false)}
+        >
+          <BaseNodeContent className="flex flex-row items-stretch gap-3 p-0">
+            <div className={cn('p-3 pr-0', DragHandle.CLASS)}>
+              <GripVertical
+                className={cn(
+                  'text-primary h-full w-6',
+                  isMouseOver || selected ? 'opacity-100' : 'opacity-70',
+                  layout === DIRECTION.NONE ? 'cursor-move' : 'cursor-default'
+                )}
+              />
+            </div>
+            <div className="min-w-[150px] max-w-[400px] cursor-text p-3 pl-0" onKeyDown={handleKeyPress}>
+              <RichTextEditor
+                editor={editor}
+                onChange={handleContentChange}
+                sideMenu={false}
+                slashMenu={false}
+                className="m-0 min-h-[32px] border-none p-0 text-lg font-semibold"
+                onBlur={handleEditSubmit}
+              />
+            </div>
+          </BaseNodeContent>
+
+          <Button
+            onClick={() =>
+              addChildNode(
+                node,
+                { x: node.positionAbsoluteX - 280, y: node.positionAbsoluteY },
+                `first-source-${id}`
+              )
+            }
+            size="icon"
+            variant="outline"
+            className={cn(
+              'bg-primary text-primary-foreground hover:bg-primary/90 border-primary absolute z-[1000] cursor-pointer rounded-full transition-all duration-200',
+              isMouseOver || selected ? 'visible opacity-100' : 'invisible opacity-0',
+              layout === DIRECTION.VERTICAL
+                ? 'left-1/2 top-0 -translate-x-1/2 -translate-y-[calc(100%+28px)]'
+                : 'left-0 top-1/2 -translate-x-[calc(100%+28px)] -translate-y-1/2'
+            )}
+          >
+            <Plus className="h-5 w-5" />
+          </Button>
+
+          <Button
+            onClick={() =>
+              addChildNode(
+                node,
+                { x: node.positionAbsoluteX + 280, y: node.positionAbsoluteY },
+                `second-source-${id}`
+              )
+            }
+            size="icon"
+            variant="outline"
+            className={cn(
+              'bg-primary text-primary-foreground hover:bg-primary/90 border-primary absolute z-[1000] cursor-pointer rounded-full transition-all duration-200',
+              isMouseOver || selected ? 'visible opacity-100' : 'invisible opacity-0',
+              layout === DIRECTION.VERTICAL
+                ? 'bottom-0 left-1/2 -translate-x-1/2 translate-y-[calc(100%+28px)]'
+                : 'right-0 top-1/2 -translate-y-1/2 translate-x-[calc(100%+28px)]'
+            )}
+          >
+            <Plus className="h-5 w-5" />
+          </Button>
+
+          {/* Hub contents */}
+          <div
+            className={cn(
+              layout === DIRECTION.VERTICAL
+                ? 'right-0 top-1/2 -translate-y-1/2 translate-x-[calc(100%+28px)] flex-col'
+                : 'left-1/2 top-0 -translate-x-1/2 -translate-y-[calc(100%+28px)] flex-row',
+              'bg-primary/20 border-primary absolute z-[1000] flex items-center justify-center gap-1 rounded-md border transition-all duration-200',
+              selected ? 'visible opacity-100' : 'invisible opacity-0'
+            )}
+          >
+            <button className="hover:bg-primary/30 cursor-pointer rounded-sm p-1">
+              <Plus className="text-primary h-4 w-4" />
+            </button>
+            <button className="hover:bg-primary/30 cursor-pointer rounded-sm p-1">
+              <Plus className="text-primary h-4 w-4" />
+            </button>
+            <button className="hover:bg-primary/30 cursor-pointer rounded-sm p-1">
+              <Plus className="text-primary h-4 w-4" />
+            </button>
+          </div>
+
+          {/* Invisible handles for connections */}
+          <BaseHandle
+            type="source"
+            position={layout === DIRECTION.VERTICAL ? Position.Top : Position.Left}
+            style={{ visibility: 'hidden' }}
+            id={`first-source-${id}`}
+          />
+          <BaseHandle
+            type="source"
+            position={layout === DIRECTION.VERTICAL ? Position.Bottom : Position.Right}
+            style={{ visibility: 'hidden' }}
+            id={`second-source-${id}`}
+          />
+          <BaseHandle
+            type="target"
+            position={layout === DIRECTION.VERTICAL ? Position.Top : Position.Left}
+            style={{ visibility: 'hidden' }}
+            id={`first-target-${id}`}
+          />
+          <BaseHandle
+            type="target"
+            position={layout === DIRECTION.VERTICAL ? Position.Bottom : Position.Right}
+            style={{ visibility: 'hidden' }}
+            id={`second-target-${id}`}
+          />
+        </BaseNode>
+      </motion.div>
+    </AnimatePresence>
+  );
+});
+
+export default MindmapRootNodeBlock;

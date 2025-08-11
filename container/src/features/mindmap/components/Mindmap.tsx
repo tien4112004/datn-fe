@@ -2,6 +2,7 @@ import '@xyflow/react/dist/style.css';
 import { Background, BackgroundVariant, Controls, MiniMap, ReactFlow } from '@xyflow/react';
 import { useReactFlowIntegration } from '../hooks/useReactFlowIntegration';
 import MindMapNodeBlock from './MindmapNode';
+import MindmapRootNodeBlock from './MindmapRootNode';
 import MindmapEdgeBlock from './MindmapEdge';
 import MindmapToolbar from './MindmapToolbar';
 import MindmapInstructions from './MindmapInstructions';
@@ -14,6 +15,7 @@ import { useWhyDidYouUpdate } from '@/hooks/use-debug';
 
 const nodeTypes = {
   mindMapNode: MindMapNodeBlock,
+  mindMapRootNode: MindmapRootNodeBlock,
 };
 
 const edgeTypes = {

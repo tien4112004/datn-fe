@@ -5,6 +5,7 @@ import type { MindMapNode, MindMapEdge } from '../types';
 import { DragHandle, MINDMAP_TYPES } from '../constants';
 import { generateId } from '@/shared/lib/utils';
 import { devtools } from 'zustand/middleware';
+import { useClipboardStore } from './useClipboardStore';
 
 const initialNodes: MindMapNode[] = [
   // Central root
@@ -216,6 +217,8 @@ export const useMindmapStore = create<MindmapState>()(
     },
 
     addChildNode: (parentNode: Partial<MindMapNode>, position: XYPosition, sourceHandler?: string) => {
+      const pushUndo = useClipboardStore.getState().pushToUndoStack;
+      pushUndo(get().nodes, get().edges);
       const newNode: MindMapNode = {
         id: generateId(),
         type: MINDMAP_TYPES.MINDMAP_NODE,
@@ -293,6 +296,9 @@ export const useMindmapStore = create<MindmapState>()(
 
     finalizeNodeDeletion: () => {
       const { nodesToBeDeleted } = get();
+      if (nodesToBeDeleted.size === 0) return;
+      const pushUndo = useClipboardStore.getState().pushToUndoStack;
+      pushUndo(useMindmapStore.getState().nodes, useMindmapStore.getState().edges);
 
       set(
         (state) => ({

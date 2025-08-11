@@ -5,6 +5,7 @@ import type { MindMapNode, MindMapEdge } from '../types';
 import { DIRECTION, type Direction } from '../constants';
 import { useMindmapStore } from './useMindmapStore';
 import { devtools } from 'zustand/middleware';
+import { useClipboardStore } from './useClipboardStore';
 
 const elk = new ELK();
 
@@ -252,6 +253,9 @@ export const useLayoutStore = create<LayoutState>()(
 
       onLayoutChange: (direction) => {
         const { updateLayout } = get();
+        const pushUndo = useClipboardStore.getState().pushToUndoStack;
+        pushUndo(useMindmapStore.getState().nodes, useMindmapStore.getState().edges);
+
         set({ layout: direction }, false, 'mindmap-layout/onLayoutChange');
         updateLayout(direction);
       },

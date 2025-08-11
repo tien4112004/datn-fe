@@ -3,10 +3,13 @@ import type { MindMapNode, MindMapEdge } from '../types';
 import { generateId } from '@/shared/lib/utils';
 import { useMindmapStore } from './useMindmapStore';
 import { devtools } from 'zustand/middleware';
+import { Deque } from '@datastructures-js/deque';
 
 interface ClipboardState {
   cloningNodes: MindMapNode[];
   cloningEdges: MindMapEdge[];
+  undoStack: Deque<[MindMapNode[], MindMapEdge[]]>;
+  redoStack: Deque<[MindMapNode[], MindMapEdge[]]>;
   mousePosition: { x: number; y: number };
   offset: number;
   setCloningNodes: (nodes: MindMapNode[]) => void;
@@ -18,12 +21,17 @@ interface ClipboardState {
   pasteClonedNodesAndEdges: (
     screenToFlowPosition: (position: { x: number; y: number }) => { x: number; y: number }
   ) => void;
+  undo: (nodes: MindMapNode[]) => void;
+  redo: (nodes: MindMapNode[]) => void;
+  pushToUndoStack: (nodes: MindMapNode[], edges: MindMapEdge[]) => void;
 }
 
 export const useClipboardStore = create<ClipboardState>()(
   devtools((set, get) => ({
     cloningNodes: [],
     cloningEdges: [],
+    undoStack: new Deque(),
+    redoStack: new Deque(),
     mousePosition: { x: 0, y: 0 },
     offset: 0,
 
@@ -112,6 +120,57 @@ export const useClipboardStore = create<ClipboardState>()(
 
       // Increment offset for next paste
       set((state) => ({ offset: state.offset + 20 }), false, 'mindmap-clip/pasteClonedNodesAndEdges');
+    },
+
+    undo: () => {
+      const undoStack = get().undoStack;
+      if (undoStack.isEmpty()) return;
+
+      const setNodes = useMindmapStore.getState().setNodes;
+      const setEdges = useMindmapStore.getState().setEdges;
+      const edges = useMindmapStore.getState().edges;
+      const nodes = useMindmapStore.getState().nodes;
+
+      const previousStage = undoStack.popBack();
+      if (previousStage) {
+        const [prevNodes, prevEdges] = previousStage;
+
+        // Push current state to redo stack before changing
+        get().redoStack.pushBack([nodes, edges]);
+
+        setNodes(prevNodes);
+        setEdges(prevEdges);
+      }
+    },
+
+    redo: () => {
+      const redoStack = get().redoStack;
+      if (redoStack.isEmpty()) return;
+
+      const setNodes = useMindmapStore.getState().setNodes;
+      const setEdges = useMindmapStore.getState().setEdges;
+      const edges = useMindmapStore.getState().edges;
+      const nodes = useMindmapStore.getState().nodes;
+
+      const nextStage = redoStack.popBack();
+      if (nextStage) {
+        const [nextNodes, nextEdges] = nextStage;
+
+        // Push current state to undo stack before changing
+        get().undoStack.pushBack([nodes, edges]);
+
+        setNodes(nextNodes);
+        setEdges(nextEdges);
+      }
+    },
+
+    pushToUndoStack: (nodes: MindMapNode[], edges: MindMapEdge[]) => {
+      const undoStack = get().undoStack;
+      if (undoStack.size() >= 50) {
+        undoStack.popFront(); // Limit stack size to 50
+      }
+      undoStack.pushBack([nodes, edges]);
+      get().redoStack.clear();
     },
   }))
 );

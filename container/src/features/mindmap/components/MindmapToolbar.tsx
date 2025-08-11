@@ -6,11 +6,14 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { useLayoutStore } from '../stores/useLayoutStore';
 import type { Direction } from '../constants';
 import { SidebarTrigger } from '@/components/ui/sidebar';
+import { useClipboardStore } from '../stores';
 
 const MindmapToolbar = () => {
   const addNode = useMindmapStore((state) => state.addNode);
   const deleteSelectedNodes = useMindmapStore((state) => state.deleteSelectedNodes);
   const logData = useMindmapStore((state) => state.logData);
+  const undo = useClipboardStore((state) => state.undo);
+  const redo = useClipboardStore((state) => state.redo);
 
   const onLayoutChange = useLayoutStore((state) => state.onLayoutChange);
 
@@ -34,6 +37,18 @@ const MindmapToolbar = () => {
         <Trash2 size={16} />
         Log Data
       </Button>
+      {/* Undo and redo */}
+      <Button variant={'outline'} onClick={() => undo(useMindmapStore.getState().nodes)}>
+        <span className="sr-only">Undo</span>
+        <Trash2 size={16} />
+        Undo
+      </Button>
+      <Button variant={'outline'} onClick={() => redo(useMindmapStore.getState().nodes)}>
+        <span className="sr-only">Redo</span>
+        <Trash2 size={16} />
+        Redo
+      </Button>
+
       <ToggleGroup
         type="single"
         defaultValue="horizontal"

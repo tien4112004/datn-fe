@@ -41,6 +41,12 @@ importers:
       '@dagrejs/dagre':
         specifier: ^1.1.5
         version: 1.1.5
+      '@datastructures-js/deque':
+        specifier: ^1.0.5
+        version: 1.0.5
+      '@datastructures-js/queue':
+        specifier: ^4.2.3
+        version: 4.2.3
       '@dnd-kit/core':
         specifier: ^6.3.1
         version: 6.3.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -714,6 +720,12 @@ packages:
   '@dagrejs/graphlib@2.2.4':
     resolution: {integrity: sha512-mepCf/e9+SKYy1d02/UkvSy6+6MoyXhVxP8lLDfA7BPE1X1d4dR0sZznmbM8/XVJ1GPM+Svnx7Xj6ZweByWUkw==}
     engines: {node: '>17.0.0'}
+
+  '@datastructures-js/deque@1.0.5':
+    resolution: {integrity: sha512-ogeIkpcCGnM+LAZYZqXBXn6Nx0a/ikkKDFPoa1MzZWRFyEdfVUNwkHclET/T8jkyNM1dN6NmPDfenNKcKazjjg==}
+
+  '@datastructures-js/queue@4.2.3':
+    resolution: {integrity: sha512-GWVMorC/xi2V2ta+Z/CPgPGHL2ZJozcj48g7y2nIX5GIGZGRrbShSHgvMViJwHJurUzJYOdIdRZnWDRrROFwJA==}
 
   '@date-fns/tz@1.2.0':
     resolution: {integrity: sha512-LBrd7MiJZ9McsOgxqWX7AaxrDjcFVjWH/tIKJd7pnR7McaslGYOP1QmmiBXdJH/H/yLCT+rcQ7FaPBUxRGUtrg==}
@@ -7143,6 +7155,10 @@ snapshots:
       '@dagrejs/graphlib': 2.2.4
 
   '@dagrejs/graphlib@2.2.4': {}
+
+  '@datastructures-js/deque@1.0.5': {}
+
+  '@datastructures-js/queue@4.2.3': {}
 
   '@date-fns/tz@1.2.0': {}
 

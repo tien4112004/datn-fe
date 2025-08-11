@@ -10,6 +10,7 @@ import { useShortcuts, useMindmapActions } from '../hooks';
 import { memo, useMemo, type ReactNode } from 'react';
 import { DevTools } from '@/components/devtools';
 import { useMindmapStore } from '../stores';
+import { useClipboardStore } from '../stores';
 import { useShallow } from 'zustand/react/shallow';
 
 const nodeTypes = {
@@ -92,6 +93,9 @@ const LogicHandler = () => {
     deselectAllNodesAndEdges,
   } = useMindmapActions();
 
+  const undo = useClipboardStore((state) => state.undo);
+  const redo = useClipboardStore((state) => state.redo);
+
   const shortcuts = useMemo(
     () => [
       {
@@ -114,6 +118,18 @@ const LogicHandler = () => {
         key: 'Escape',
         callback: deselectAllNodesAndEdges,
       },
+      {
+        key: 'Ctrl+Z',
+        callback: undo,
+      },
+      {
+        key: 'Ctrl+Y',
+        callback: redo,
+      },
+      {
+        key: 'Ctrl+Shift+Z',
+        callback: redo,
+      },
     ],
     [
       selectAllNodesAndEdges,
@@ -121,6 +137,8 @@ const LogicHandler = () => {
       pasteClonedNodesAndEdges,
       deleteSelectedNodes,
       deselectAllNodesAndEdges,
+      undo,
+      redo,
     ]
   );
 

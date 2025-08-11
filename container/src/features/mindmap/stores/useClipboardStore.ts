@@ -21,8 +21,8 @@ interface ClipboardState {
   pasteClonedNodesAndEdges: (
     screenToFlowPosition: (position: { x: number; y: number }) => { x: number; y: number }
   ) => void;
-  undo: (nodes: MindMapNode[]) => void;
-  redo: (nodes: MindMapNode[]) => void;
+  undo: () => void;
+  redo: () => void;
   pushToUndoStack: (nodes: MindMapNode[], edges: MindMapEdge[]) => void;
 }
 

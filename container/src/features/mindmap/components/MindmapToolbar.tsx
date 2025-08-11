@@ -1,7 +1,6 @@
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2, Undo, Redo } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useMindmapStore } from '../stores/useMindmapStore';
-import { useEffect } from 'react';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { useLayoutStore } from '../stores/useLayoutStore';
 import type { Direction } from '../constants';
@@ -14,12 +13,10 @@ const MindmapToolbar = () => {
   const logData = useMindmapStore((state) => state.logData);
   const undo = useClipboardStore((state) => state.undo);
   const redo = useClipboardStore((state) => state.redo);
+  const canUndo = useClipboardStore((state) => !state.undoStack.isEmpty());
+  const canRedo = useClipboardStore((state) => !state.redoStack.isEmpty());
 
   const onLayoutChange = useLayoutStore((state) => state.onLayoutChange);
-
-  useEffect(() => {
-    onLayoutChange('horizontal');
-  }, [onLayoutChange]);
 
   return (
     <div className="absolute left-4 top-4 z-10 flex gap-2">
@@ -37,15 +34,12 @@ const MindmapToolbar = () => {
         <Trash2 size={16} />
         Log Data
       </Button>
-      {/* Undo and redo */}
-      <Button variant={'outline'} onClick={() => undo(useMindmapStore.getState().nodes)}>
-        <span className="sr-only">Undo</span>
-        <Trash2 size={16} />
+      <Button variant="outline" onClick={undo} disabled={!canUndo} title="Undo (Ctrl+Z)">
+        <Undo size={16} />
         Undo
       </Button>
-      <Button variant={'outline'} onClick={() => redo(useMindmapStore.getState().nodes)}>
-        <span className="sr-only">Redo</span>
-        <Trash2 size={16} />
+      <Button variant="outline" onClick={redo} disabled={!canRedo} title="Redo (Ctrl+Y)">
+        <Redo size={16} />
         Redo
       </Button>
 

@@ -28,6 +28,12 @@ const MindmapInstructions = () => {
               <li>
                 <strong>Ctrl+V:</strong> Paste at mouse position
               </li>
+              <li>
+                <strong>Ctrl+Z:</strong> Undo last action
+              </li>
+              <li>
+                <strong>Ctrl+Y:</strong> Redo last undone action
+              </li>
               <li> Click "Add Node" to create new nodes</li>
               <li> Multiple nodes can be selected together</li>
             </ul>

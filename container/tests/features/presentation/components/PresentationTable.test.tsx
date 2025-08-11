@@ -136,23 +136,6 @@ describe('PresentationTable', () => {
     expect(screen.getByText('Another Presentation')).toBeInTheDocument();
   });
 
-  // Why this test failed?
-  // it('integrates ActionButton with correct callbacks', () => {
-  //   const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
-  //   render(<PresentationTable />);
-
-  //   const editButtons = screen.getAllByTestId('edit-button');
-  //   const deleteButtons = screen.getAllByTestId('delete-button');
-
-  //   editButtons[0].click();
-  //   expect(consoleSpy).toHaveBeenCalledWith('Edit: ', '1');
-
-  //   deleteButtons[0].click();
-  //   expect(consoleSpy).toHaveBeenCalledWith('Delete: ', '1');
-
-  //   consoleSpy.mockRestore();
-  // });
-
   it('handles sorting state correctly', () => {
     const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
     render(<PresentationTable />);

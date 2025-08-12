@@ -87,36 +87,17 @@ const mockPresentationItems: PresentationItem[] = [
 ];
 
 export default class PresentationMockService implements PresentationApiService {
-  async getStreamedOutline(
-    _request: OutlinePromptRequest,
-    signal: AbortSignal
-  ): Promise<ReadableStream<Uint8Array>> {
-    const encoder = new TextEncoder();
+  async *getStreamedOutline(_request: OutlinePromptRequest, signal: AbortSignal): AsyncGenerator<string> {
+    const chunks = mockOutlineOutput.split(' ');
 
-    return new ReadableStream({
-      start(controller) {
-        const chunks = mockOutlineOutput.split(' ');
-        let index = 0;
+    for (const chunk of chunks) {
+      if (signal.aborted) {
+        return;
+      }
 
-        const sendChunk = () => {
-          if (signal.aborted) {
-            controller.close();
-            return;
-          }
-
-          if (index < chunks.length) {
-            const chunk = chunks[index] + (index < chunks.length - 1 ? ' ' : '');
-            controller.enqueue(encoder.encode(chunk));
-            index++;
-            setTimeout(sendChunk, 5); // Simulate network delay
-          } else {
-            controller.close();
-          }
-        };
-
-        setTimeout(sendChunk, 50); // Initial delay
-      },
-    });
+      yield chunk + ' ';
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    }
   }
 
   getType(): ApiMode {

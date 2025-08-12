@@ -1,7 +1,8 @@
 import { Popover, PopoverContent, PopoverTrigger } from '@/shared/components/ui/popover';
 import { HelpCircle } from 'lucide-react';
+import { memo } from 'react';
 
-const MindmapInstructions = () => {
+const Instructions = memo(() => {
   return (
     <div className="absolute right-4 top-4 z-10">
       <Popover>
@@ -42,6 +43,6 @@ const MindmapInstructions = () => {
       </Popover>
     </div>
   );
-};
+});
 
-export default MindmapInstructions;
+export default Instructions;

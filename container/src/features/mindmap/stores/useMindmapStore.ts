@@ -1,16 +1,16 @@
 import { create } from 'zustand';
 import { addEdge, applyNodeChanges, applyEdgeChanges } from '@xyflow/react';
 import type { Connection, XYPosition } from '@xyflow/react';
-import { type BaseMindMapNode, type MindMapEdge, MINDMAP_TYPES } from '../types';
+import { type BaseNode, type MindMapEdge, MINDMAP_TYPES } from '../types';
 import { DragHandle } from '../constants';
 import { generateId } from '@/shared/lib/utils';
 import { devtools } from 'zustand/middleware';
 import { useClipboardStore } from './useClipboardStore';
 
-const initialNodes: BaseMindMapNode[] = [
+const initialNodes: BaseNode[] = [
   {
     id: 'left-4',
-    type: MINDMAP_TYPES.MINDMAP_SHAPE_NODE,
+    type: MINDMAP_TYPES.SHAPE_NODE,
     position: { x: 150, y: 400 },
     data: {
       level: 2,
@@ -30,7 +30,7 @@ const initialNodes: BaseMindMapNode[] = [
   // Central root
   {
     id: 'root',
-    type: MINDMAP_TYPES.MINDMAP_ROOT_NODE,
+    type: MINDMAP_TYPES.ROOT_NODE,
     position: { x: 400, y: 300 },
     data: { level: 0, content: '<p>Central Topic</p>' },
     dragHandle: DragHandle.SELECTOR,
@@ -38,7 +38,7 @@ const initialNodes: BaseMindMapNode[] = [
   // Left side branch (going left from center)
   {
     id: 'left-1',
-    type: MINDMAP_TYPES.MINDMAP_TEXT_NODE,
+    type: MINDMAP_TYPES.TEXT_NODE,
     position: { x: 250, y: 300 },
     data: { level: 1, content: '<p>Left Branch</p>', parentId: 'root' },
     dragHandle: DragHandle.SELECTOR,
@@ -129,20 +129,20 @@ const initialEdges: MindMapEdge[] = [
 ];
 
 interface MindmapState {
-  nodes: BaseMindMapNode[];
+  nodes: BaseNode[];
   edges: MindMapEdge[];
   nodeId: number;
   onNodesChange: (changes: any) => void;
   onEdgesChange: (changes: any) => void;
   onConnect: (connection: Connection) => void;
-  setNodes: (updater: BaseMindMapNode[] | ((nodes: BaseMindMapNode[]) => BaseMindMapNode[])) => void;
+  setNodes: (updater: BaseNode[] | ((nodes: BaseNode[]) => BaseNode[])) => void;
   setEdges: (updater: MindMapEdge[] | ((edges: MindMapEdge[]) => MindMapEdge[])) => void;
   addNode: () => void;
   logData: () => void;
-  addChildNode: (parentNode: Partial<BaseMindMapNode>, position: XYPosition, sourceHandler?: string) => void;
-  updateNodeData: (nodeId: string, updates: Partial<BaseMindMapNode['data']>) => void;
+  addChildNode: (parentNode: Partial<BaseNode>, position: XYPosition, sourceHandler?: string) => void;
+  updateNodeData: (nodeId: string, updates: Partial<BaseNode['data']>) => void;
   syncState: (updateNodeInternals: any) => void;
-  getAllDescendantNodes: (parentId: string) => BaseMindMapNode[];
+  getAllDescendantNodes: (parentId: string) => BaseNode[];
   nodesToBeDeleted: Set<string>;
   deleteSelectedNodes: () => void;
   markNodeForDeletion: (nodeId: string) => void;
@@ -179,7 +179,7 @@ export const useMindmapStore = create<MindmapState>()(
     onConnect: (connection) => {
       const edge = {
         ...connection,
-        type: MINDMAP_TYPES.MINDMAP_EDGE,
+        type: MINDMAP_TYPES.EDGE,
         data: {
           strokeColor: 'var(--primary)',
           strokeWidth: 2,
@@ -216,9 +216,9 @@ export const useMindmapStore = create<MindmapState>()(
 
     addNode: () => {
       const { nodes, nodeId } = get();
-      const newNode: BaseMindMapNode = {
+      const newNode: BaseNode = {
         id: generateId(),
-        type: MINDMAP_TYPES.MINDMAP_TEXT_NODE,
+        type: MINDMAP_TYPES.TEXT_NODE,
         position: {
           x: Math.random() * 500 + 100,
           y: Math.random() * 400 + 100,
@@ -236,12 +236,12 @@ export const useMindmapStore = create<MindmapState>()(
       );
     },
 
-    addChildNode: (parentNode: Partial<BaseMindMapNode>, position: XYPosition, sourceHandler?: string) => {
+    addChildNode: (parentNode: Partial<BaseNode>, position: XYPosition, sourceHandler?: string) => {
       const pushUndo = useClipboardStore.getState().pushToUndoStack;
       pushUndo(get().nodes, get().edges);
-      const newNode: BaseMindMapNode = {
+      const newNode: BaseNode = {
         id: generateId(),
-        type: MINDMAP_TYPES.MINDMAP_TEXT_NODE,
+        type: MINDMAP_TYPES.TEXT_NODE,
         data: {
           level: parentNode.data?.level ? parentNode.data.level + 1 : 1,
           content: '<p>New Node</p>',
@@ -255,7 +255,7 @@ export const useMindmapStore = create<MindmapState>()(
         id: generateId(),
         source: parentNode.id!,
         target: newNode.id,
-        type: MINDMAP_TYPES.MINDMAP_EDGE,
+        type: MINDMAP_TYPES.EDGE,
         sourceHandle: sourceHandler,
         targetHandle: sourceHandler?.startsWith('left')
           ? `second-target-${newNode.id}`
@@ -276,7 +276,7 @@ export const useMindmapStore = create<MindmapState>()(
       );
     },
 
-    updateNodeData: (nodeId: string, updates: Partial<BaseMindMapNode['data']>) => {
+    updateNodeData: (nodeId: string, updates: Partial<BaseNode['data']>) => {
       set(
         (state) => ({
           nodes: state.nodes.map((node) =>
@@ -294,9 +294,9 @@ export const useMindmapStore = create<MindmapState>()(
       console.log('Edges:', edges);
     },
 
-    getAllDescendantNodes: (parentId: string): BaseMindMapNode[] => {
+    getAllDescendantNodes: (parentId: string): BaseNode[] => {
       const { nodes } = get();
-      return nodes.reduce((acc: BaseMindMapNode[], node: BaseMindMapNode) => {
+      return nodes.reduce((acc: BaseNode[], node: BaseNode) => {
         if (node.data.parentId === parentId) {
           acc.push(node);
           acc.push(...get().getAllDescendantNodes(node.id));
@@ -312,7 +312,7 @@ export const useMindmapStore = create<MindmapState>()(
       set(
         (state) => ({
           nodesToBeDeleted: nodeIdsToDelete,
-          nodes: state.nodes.map((node: BaseMindMapNode) =>
+          nodes: state.nodes.map((node: BaseNode) =>
             nodeIdsToDelete.has(node.id) ? { ...node, data: { ...node.data, isDeleting: true } } : node
           ),
           edges: state.edges.map((edge: MindMapEdge) =>
@@ -334,7 +334,7 @@ export const useMindmapStore = create<MindmapState>()(
 
       set(
         (state) => ({
-          nodes: state.nodes.filter((node: BaseMindMapNode) => !nodesToBeDeleted.has(node.id)),
+          nodes: state.nodes.filter((node: BaseNode) => !nodesToBeDeleted.has(node.id)),
           edges: state.edges.filter(
             (edge: MindMapEdge) => !nodesToBeDeleted.has(edge.source) && !nodesToBeDeleted.has(edge.target)
           ),

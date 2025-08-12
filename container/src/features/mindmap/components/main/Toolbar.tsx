@@ -1,13 +1,13 @@
 import { Plus, Trash2, Undo, Redo } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useMindmapStore } from '../stores/useMindmapStore';
+import { useMindmapStore } from '../../stores/useMindmapStore';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
-import { useLayoutStore } from '../stores/useLayoutStore';
-import type { Direction } from '../constants';
+import { useLayoutStore } from '../../stores/useLayoutStore';
+import type { Direction } from '../../constants';
 import { SidebarTrigger } from '@/components/ui/sidebar';
-import { useClipboardStore } from '../stores';
+import { useClipboardStore } from '../../stores';
 
-const MindmapToolbar = () => {
+const Toolbar = () => {
   const addNode = useMindmapStore((state) => state.addNode);
   const deleteSelectedNodes = useMindmapStore((state) => state.deleteSelectedNodes);
   const logData = useMindmapStore((state) => state.logData);
@@ -65,4 +65,4 @@ const MindmapToolbar = () => {
   );
 };
 
-export default MindmapToolbar;
+export default Toolbar;

@@ -1,18 +1,18 @@
 import { create } from 'zustand';
-import type { BaseMindMapNode, MindMapEdge } from '../types';
+import type { BaseNode, MindMapEdge } from '../types';
 import { generateId } from '@/shared/lib/utils';
 import { useMindmapStore } from './useMindmapStore';
 import { devtools } from 'zustand/middleware';
 import { Deque } from '@datastructures-js/deque';
 
 interface ClipboardState {
-  cloningNodes: BaseMindMapNode[];
+  cloningNodes: BaseNode[];
   cloningEdges: MindMapEdge[];
-  undoStack: Deque<[BaseMindMapNode[], MindMapEdge[]]>;
-  redoStack: Deque<[BaseMindMapNode[], MindMapEdge[]]>;
+  undoStack: Deque<[BaseNode[], MindMapEdge[]]>;
+  redoStack: Deque<[BaseNode[], MindMapEdge[]]>;
   mousePosition: { x: number; y: number };
   offset: number;
-  setCloningNodes: (nodes: BaseMindMapNode[]) => void;
+  setCloningNodes: (nodes: BaseNode[]) => void;
   setCloningEdges: (edges: MindMapEdge[]) => void;
   setMousePosition: (position: { x: number; y: number }) => void;
   resetOffset: () => void;
@@ -23,7 +23,7 @@ interface ClipboardState {
   ) => void;
   undo: () => void;
   redo: () => void;
-  pushToUndoStack: (nodes: BaseMindMapNode[], edges: MindMapEdge[]) => void;
+  pushToUndoStack: (nodes: BaseNode[], edges: MindMapEdge[]) => void;
 }
 
 export const useClipboardStore = create<ClipboardState>()(
@@ -98,7 +98,7 @@ export const useClipboardStore = create<ClipboardState>()(
         };
       });
 
-      setNodes((nds: BaseMindMapNode[]) => [
+      setNodes((nds: BaseNode[]) => [
         ...nds.map((node) => ({ ...node, selected: false })),
         ...freshNodes.map((node) => {
           const { x, y } = screenToFlowPosition({
@@ -164,7 +164,7 @@ export const useClipboardStore = create<ClipboardState>()(
       }
     },
 
-    pushToUndoStack: (nodes: BaseMindMapNode[], edges: MindMapEdge[]) => {
+    pushToUndoStack: (nodes: BaseNode[], edges: MindMapEdge[]) => {
       const undoStack = get().undoStack;
       if (undoStack.size() >= 50) {
         undoStack.popFront(); // Limit stack size to 50

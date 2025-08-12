@@ -1,28 +1,22 @@
 import { Plus, GripVertical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useState, memo } from 'react';
-import { Position, type NodeProps } from '@xyflow/react';
+import { Position, useNodeConnections, type NodeProps } from '@xyflow/react';
 import { cn } from '@/shared/lib/utils';
 import { DIRECTION, DragHandle } from '../../constants';
-import type { MindMapRootNode } from '../../types';
+import type { RootNode } from '../../types';
 import { BaseHandle } from '@/features/mindmap/components/ui/base-handle';
-import { useMindmapNodeCommon } from '../../hooks/useMindmapNodeCommon';
-import { MindmapNodeBase } from './MindmapNodeBase';
+import { useMindmapNodeCommon } from '../../hooks/useNodeCommon';
+import { BaseNodeBlock } from './BaseNode';
 import { Input } from '@/components/ui/input';
 import { BaseNodeContent } from '../ui/base-node';
 
-const MindmapRootNodeBlock = memo(({ ...node }: NodeProps<MindMapRootNode>) => {
-  const { id: nodeId, data: nodeData, selected: isSelected } = node;
-  const {
-    isMouseOver,
-    setIsMouseOver,
-    layout,
-    isLayouting,
-    addChildNode,
-    finalizeNodeDeletion,
-    canCreateLeft,
-    canCreateRight,
-  } = useMindmapNodeCommon<MindMapRootNode>({ node });
+const RootNodeBlock = memo(({ ...node }: NodeProps<RootNode>) => {
+  const { id, data, selected: isSelected } = node;
+  const { isMouseOver, setIsMouseOver, layout, isLayouting, addChildNode, finalizeNodeDeletion } =
+    useMindmapNodeCommon<RootNode>({ node });
+
+  const connections = useNodeConnections({ id });
 
   const [, setIsEditing] = useState(false);
 
@@ -36,16 +30,25 @@ const MindmapRootNodeBlock = memo(({ ...node }: NodeProps<MindMapRootNode>) => {
     }
   };
 
+  // Connection logic
+  const canCreateLeft =
+    !connections.some(
+      (conn) => conn.sourceHandle === `first-source-${id}` || conn.targetHandle === `first-target-${id}`
+    ) || node.data.level === 0;
+
+  const canCreateRight = true; // Temporarily allow right connections for simplicity
+
   return (
-    <MindmapNodeBase
-      nodeId={nodeId}
-      nodeData={nodeData}
+    <BaseNodeBlock
+      id={id}
+      data={data}
       isSelected={isSelected}
       isLayouting={isLayouting}
       isMouseOver={isMouseOver}
       onMouseEnter={() => setIsMouseOver(true)}
       onMouseLeave={() => setIsMouseOver(false)}
       onAnimationComplete={finalizeNodeDeletion}
+      className="border-primary"
     >
       <BaseNodeContent className="flex flex-row items-stretch gap-2 p-0">
         <div className={cn('p-2 pr-0', DragHandle.CLASS)}>
@@ -60,7 +63,7 @@ const MindmapRootNodeBlock = memo(({ ...node }: NodeProps<MindMapRootNode>) => {
         <Input
           type="text"
           className="min-w-[100px] max-w-[300px] cursor-text border-none bg-transparent p-2 pl-0 outline-none"
-          value={nodeData.content || ''}
+          value={data.content || ''}
           onKeyDown={handleKeyPress}
           onBlur={handleEditSubmit}
         />
@@ -72,7 +75,7 @@ const MindmapRootNodeBlock = memo(({ ...node }: NodeProps<MindMapRootNode>) => {
           addChildNode(
             node,
             { x: node.positionAbsoluteX - 250, y: node.positionAbsoluteY },
-            `first-source-${nodeId}`
+            `first-source-${id}`
           )
         }
         disabled={!canCreateLeft}
@@ -94,7 +97,7 @@ const MindmapRootNodeBlock = memo(({ ...node }: NodeProps<MindMapRootNode>) => {
           addChildNode(
             node,
             { x: node.positionAbsoluteX + 250, y: node.positionAbsoluteY },
-            `second-source-${nodeId}`
+            `second-source-${id}`
           )
         }
         disabled={!canCreateRight}
@@ -116,28 +119,28 @@ const MindmapRootNodeBlock = memo(({ ...node }: NodeProps<MindMapRootNode>) => {
         type="source"
         position={layout === DIRECTION.VERTICAL ? Position.Top : Position.Left}
         style={{ visibility: 'hidden' }}
-        id={`first-source-${nodeId}`}
+        id={`first-source-${id}`}
       />
       <BaseHandle
         type="source"
         position={layout === DIRECTION.VERTICAL ? Position.Bottom : Position.Right}
         style={{ visibility: 'hidden' }}
-        id={`second-source-${nodeId}`}
+        id={`second-source-${id}`}
       />
       <BaseHandle
         type="target"
         position={layout === DIRECTION.VERTICAL ? Position.Top : Position.Left}
         style={{ visibility: 'hidden' }}
-        id={`first-target-${nodeId}`}
+        id={`first-target-${id}`}
       />
       <BaseHandle
         type="target"
         position={layout === DIRECTION.VERTICAL ? Position.Bottom : Position.Right}
         style={{ visibility: 'hidden' }}
-        id={`second-target-${nodeId}`}
+        id={`second-target-${id}`}
       />
-    </MindmapNodeBase>
+    </BaseNodeBlock>
   );
 });
 
-export default MindmapRootNodeBlock;
+export default RootNodeBlock;

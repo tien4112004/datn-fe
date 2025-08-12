@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react';
-import { useNodeConnections, useUpdateNodeInternals, type NodeProps } from '@xyflow/react';
+import { useUpdateNodeInternals, type NodeProps } from '@xyflow/react';
 import { useMindmapStore } from '../stores/useMindmapStore';
 import { useLayoutStore } from '../stores/useLayoutStore';
-import type { BaseMindMapNode } from '../types';
+import type { BaseNode } from '../types';
 
-export interface UseMindmapNodeCommonProps<T extends BaseMindMapNode = BaseMindMapNode> {
+export interface UseNodeCommonProps<T extends BaseNode = BaseNode> {
   node: NodeProps<T>;
 }
 
-export interface UseMindmapNodeCommonReturn<T extends BaseMindMapNode = BaseMindMapNode> {
+export interface UseNodeCommonReturn<T extends BaseNode = BaseNode> {
   // State
   isMouseOver: boolean;
   setIsMouseOver: (value: boolean) => void;
@@ -19,16 +19,12 @@ export interface UseMindmapNodeCommonReturn<T extends BaseMindMapNode = BaseMind
   addChildNode: any;
   finalizeNodeDeletion: () => void;
 
-  // Connection logic
-  connections: any[];
-  canCreateLeft: boolean;
-  canCreateRight: boolean;
   node: NodeProps<T>;
 }
 
-export const useMindmapNodeCommon = <T extends BaseMindMapNode = BaseMindMapNode>({
+export const useMindmapNodeCommon = <T extends BaseNode = BaseNode>({
   node,
-}: UseMindmapNodeCommonProps<T>): UseMindmapNodeCommonReturn<T> => {
+}: UseNodeCommonProps<T>): UseNodeCommonReturn<T> => {
   const { id } = node;
   const [isMouseOver, setIsMouseOver] = useState(false);
 
@@ -40,20 +36,11 @@ export const useMindmapNodeCommon = <T extends BaseMindMapNode = BaseMindMapNode
 
   // React Flow hooks
   const updateNodeInternals = useUpdateNodeInternals();
-  const connections = useNodeConnections({ id });
 
   // Effects
   useEffect(() => {
     updateNodeInternals(id);
   }, [layout, isLayouting, id, updateNodeInternals]);
-
-  // Connection logic
-  const canCreateLeft =
-    !connections.some(
-      (conn) => conn.sourceHandle === `first-source-${id}` || conn.targetHandle === `first-target-${id}`
-    ) || node.data.level === 0;
-
-  const canCreateRight = true; // Temporarily allow right connections for simplicity
 
   return {
     // State
@@ -65,11 +52,6 @@ export const useMindmapNodeCommon = <T extends BaseMindMapNode = BaseMindMapNode
     isLayouting,
     addChildNode,
     finalizeNodeDeletion,
-
-    // Connection logic
-    connections,
-    canCreateLeft,
-    canCreateRight,
 
     node: node,
   };

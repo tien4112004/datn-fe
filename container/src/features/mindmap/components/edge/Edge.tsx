@@ -6,9 +6,9 @@ import {
   getStraightPath,
 } from '@xyflow/react';
 import { memo } from 'react';
-import type { MindMapEdge } from '../types';
+import type { MindMapEdge } from '../../types';
 import { motion } from 'motion/react';
-import { useMindmapStore } from '../stores';
+import { useMindmapStore } from '../../stores';
 
 type SmoothType = 'smoothstep' | 'straight' | 'bezier' | 'simplebezier';
 
@@ -64,7 +64,7 @@ const getEdgePath = (type: SmoothType, props: any) => {
   }
 };
 
-const MindmapEdgeBlock = memo(
+const EdgeBlock = memo(
   ({
     id,
     sourceX,
@@ -111,4 +111,4 @@ const MindmapEdgeBlock = memo(
   }
 );
 
-export default MindmapEdgeBlock;
+export default EdgeBlock;

@@ -1,32 +1,26 @@
 import { Plus, GripVertical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useState, useEffect, memo } from 'react';
-import { Position, type NodeProps } from '@xyflow/react';
+import { Position, useNodeConnections, type NodeProps } from '@xyflow/react';
 import { cn } from '@/shared/lib/utils';
 import RichTextEditor from '@/shared/components/rte/RichTextEditor';
 import { useRichTextEditor } from '@/shared/components/rte/useRichTextEditor';
 import { BlockNoteEditor } from '@blocknote/core';
-import { DIRECTION, DragHandle } from '../../constants';
-import type { MindMapTextNode } from '../../types';
+import { DIRECTION, DragHandle } from '@/features/mindmap/constants';
+import type { TextNode } from '@/features/mindmap/types';
 import { BaseHandle } from '@/features/mindmap/components/ui/base-handle';
-import { useMindmapNodeCommon } from '../../hooks/useMindmapNodeCommon';
-import { MindmapNodeBase } from './MindmapNodeBase';
+import { useMindmapNodeCommon } from '@/features/mindmap/hooks';
+import { BaseNodeBlock } from './BaseNode';
 import { BaseNodeContent } from '../ui/base-node';
 
-const MindMapTextNodeBlock = memo(({ ...node }: NodeProps<MindMapTextNode>) => {
-  const { id: nodeId, data: nodeData, selected: isSelected } = node;
-  const {
-    isMouseOver,
-    setIsMouseOver,
-    layout,
-    isLayouting,
-    addChildNode,
-    finalizeNodeDeletion,
-    canCreateLeft,
-    canCreateRight,
-  } = useMindmapNodeCommon<MindMapTextNode>({ node });
+const TextNodeBlock = memo(({ ...node }: NodeProps<TextNode>) => {
+  const { id: id, data: data, selected: isSelected } = node;
+  const { isMouseOver, setIsMouseOver, layout, isLayouting, addChildNode, finalizeNodeDeletion } =
+    useMindmapNodeCommon<TextNode>({ node });
+  const connections = useNodeConnections({ id });
 
   const [, setIsEditing] = useState(false);
+
   const editor = useRichTextEditor({
     trailingBlock: false,
     placeholders: { default: '', heading: '', emptyBlock: '' },
@@ -34,11 +28,11 @@ const MindMapTextNodeBlock = memo(({ ...node }: NodeProps<MindMapTextNode>) => {
 
   useEffect(() => {
     async function loadInitialHTML() {
-      const blocks = await editor.tryParseHTMLToBlocks(nodeData.content);
+      const blocks = await editor.tryParseHTMLToBlocks(data.content);
       editor.replaceBlocks(editor.document, blocks);
     }
     loadInitialHTML();
-  }, [editor, nodeData.content]);
+  }, [editor, data.content]);
 
   const handleContentChange = async (editor: BlockNoteEditor) => {
     // In a real app, you'd update the node data here
@@ -56,10 +50,17 @@ const MindMapTextNodeBlock = memo(({ ...node }: NodeProps<MindMapTextNode>) => {
     }
   };
 
+  const canCreateLeft =
+    !connections.some(
+      (conn) => conn.sourceHandle === `first-source-${id}` || conn.targetHandle === `first-target-${id}`
+    ) || node.data.level === 0;
+
+  const canCreateRight = true; // Temporarily allow right connections for simplicity
+
   return (
-    <MindmapNodeBase
-      nodeId={nodeId}
-      nodeData={nodeData}
+    <BaseNodeBlock
+      id={id}
+      data={data}
       isSelected={isSelected}
       isLayouting={isLayouting}
       isMouseOver={isMouseOver}
@@ -96,7 +97,7 @@ const MindMapTextNodeBlock = memo(({ ...node }: NodeProps<MindMapTextNode>) => {
           addChildNode(
             node,
             { x: node.positionAbsoluteX - 250, y: node.positionAbsoluteY },
-            `first-source-${nodeId}`
+            `first-source-${id}`
           )
         }
         disabled={!canCreateLeft}
@@ -118,7 +119,7 @@ const MindMapTextNodeBlock = memo(({ ...node }: NodeProps<MindMapTextNode>) => {
           addChildNode(
             node,
             { x: node.positionAbsoluteX + 250, y: node.positionAbsoluteY },
-            `second-source-${nodeId}`
+            `second-source-${id}`
           )
         }
         disabled={!canCreateRight}
@@ -140,28 +141,28 @@ const MindMapTextNodeBlock = memo(({ ...node }: NodeProps<MindMapTextNode>) => {
         type="source"
         position={layout === DIRECTION.VERTICAL ? Position.Top : Position.Left}
         style={{ visibility: 'hidden' }}
-        id={`first-source-${nodeId}`}
+        id={`first-source-${id}`}
       />
       <BaseHandle
         type="source"
         position={layout === DIRECTION.VERTICAL ? Position.Bottom : Position.Right}
         style={{ visibility: 'hidden' }}
-        id={`second-source-${nodeId}`}
+        id={`second-source-${id}`}
       />
       <BaseHandle
         type="target"
         position={layout === DIRECTION.VERTICAL ? Position.Top : Position.Left}
         style={{ visibility: 'hidden' }}
-        id={`first-target-${nodeId}`}
+        id={`first-target-${id}`}
       />
       <BaseHandle
         type="target"
         position={layout === DIRECTION.VERTICAL ? Position.Bottom : Position.Right}
         style={{ visibility: 'hidden' }}
-        id={`second-target-${nodeId}`}
+        id={`second-target-${id}`}
       />
-    </MindmapNodeBase>
+    </BaseNodeBlock>
   );
 });
 
-export default MindMapTextNodeBlock;
+export default TextNodeBlock;

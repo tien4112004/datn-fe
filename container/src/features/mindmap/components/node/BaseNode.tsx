@@ -2,12 +2,12 @@ import { forwardRef, type ReactNode, type HTMLAttributes } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { BaseNode } from '@/features/mindmap/components/ui/base-node';
 import { cn } from '@/shared/lib/utils';
-import type { MindMapNode } from '../../types';
+import type { MindMapNode } from '@/features/mindmap/types';
 import { NodeResizer } from '@xyflow/react';
 
-export interface MindmapNodeBaseProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
-  nodeId: string;
-  nodeData: MindMapNode['data'];
+export interface BaseNodeBlockProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
+  id: string;
+  data: MindMapNode['data'];
   isSelected: boolean;
   isLayouting: boolean;
   isMouseOver: boolean;
@@ -18,11 +18,11 @@ export interface MindmapNodeBaseProps extends Omit<HTMLAttributes<HTMLDivElement
   variant?: 'card' | 'replacing';
 }
 
-export const MindmapNodeBase = forwardRef<HTMLDivElement, MindmapNodeBaseProps>(
+export const BaseNodeBlock = forwardRef<HTMLDivElement, BaseNodeBlockProps>(
   (
     {
-      nodeId,
-      nodeData,
+      id,
+      data,
       isSelected,
       isLayouting,
       isMouseOver,
@@ -37,7 +37,7 @@ export const MindmapNodeBase = forwardRef<HTMLDivElement, MindmapNodeBaseProps>(
     ref
   ) => {
     const handleAnimationComplete = () => {
-      if (nodeData.isDeleting && onAnimationComplete) {
+      if (data.isDeleting && onAnimationComplete) {
         onAnimationComplete();
       }
     };
@@ -56,9 +56,9 @@ export const MindmapNodeBase = forwardRef<HTMLDivElement, MindmapNodeBaseProps>(
     return (
       <AnimatePresence>
         <motion.div
-          key={nodeId}
+          key={id}
           initial={{ opacity: 0, scale: 0 }}
-          animate={nodeData.isDeleting ? { opacity: 0, scale: 0 } : { opacity: 1, scale: 1 }}
+          animate={data.isDeleting ? { opacity: 0, scale: 0 } : { opacity: 1, scale: 1 }}
           transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94], type: 'tween' }}
           onAnimationComplete={handleAnimationComplete}
         >
@@ -93,4 +93,4 @@ export const MindmapNodeBase = forwardRef<HTMLDivElement, MindmapNodeBaseProps>(
   }
 );
 
-MindmapNodeBase.displayName = 'MindmapNodeBase';
+BaseNodeBlock.displayName = 'MindmapNodeBase';

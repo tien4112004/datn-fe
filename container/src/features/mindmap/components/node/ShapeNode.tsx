@@ -1,38 +1,39 @@
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { memo } from 'react';
-import { Position, type NodeProps } from '@xyflow/react';
+import { Position, useNodeConnections, type NodeProps } from '@xyflow/react';
 import { cn } from '@/shared/lib/utils';
 import { DIRECTION } from '../../constants';
-import type { MindMapShapeNode } from '../../types';
+import type { ShapeNode } from '../../types';
 import { BaseHandle } from '@/features/mindmap/components/ui/base-handle';
 import { useMindmapStore } from '../../stores/useMindmapStore';
-import { useMindmapNodeCommon } from '../../hooks/useMindmapNodeCommon';
-import { MindmapNodeBase } from './MindmapNodeBase';
+import { useMindmapNodeCommon } from '../../hooks/useNodeCommon';
+import { BaseNodeBlock } from './BaseNode';
 
-const MindMapShapeNodeBlock = memo(({ ...node }: NodeProps<MindMapShapeNode>) => {
-  const { id: nodeId, data: nodeData, selected: isSelected, width, height } = node;
-  const {
-    isMouseOver,
-    setIsMouseOver,
-    layout,
-    isLayouting,
-    addChildNode,
-    finalizeNodeDeletion,
-    canCreateLeft,
-    canCreateRight,
-  } = useMindmapNodeCommon<MindMapShapeNode>({ node });
+const ShapeNodeBlock = memo(({ ...node }: NodeProps<ShapeNode>) => {
+  const { id: id, data: data, selected: isSelected, width, height } = node;
+  const { isMouseOver, setIsMouseOver, layout, isLayouting, addChildNode, finalizeNodeDeletion } =
+    useMindmapNodeCommon<ShapeNode>({ node });
 
-  const updateNodeData = useMindmapStore((state) => state.updateNodeData);
+  const connections = useNodeConnections({ id });
+
+  const updatedata = useMindmapStore((state) => state.updateNodeData);
 
   const handleShapeChange = (newShape: 'rectangle' | 'circle' | 'ellipse') => {
-    updateNodeData(nodeId, { shape: newShape });
+    updatedata(id, { shape: newShape });
   };
 
+  const canCreateLeft =
+    !connections.some(
+      (conn) => conn.sourceHandle === `first-source-${id}` || conn.targetHandle === `first-target-${id}`
+    ) || node.data.level === 0;
+
+  const canCreateRight = true; // Temporarily allow right connections for simplicity
+
   return (
-    <MindmapNodeBase
-      nodeId={nodeId}
-      nodeData={nodeData}
+    <BaseNodeBlock
+      id={id}
+      data={data}
       isSelected={isSelected}
       isLayouting={isLayouting}
       isMouseOver={isMouseOver}
@@ -47,38 +48,38 @@ const MindMapShapeNodeBlock = memo(({ ...node }: NodeProps<MindMapShapeNode>) =>
         className="h-full w-full"
         viewBox={`0 0 ${width || 200} ${height || 100}`}
       >
-        {nodeData.shape === 'circle' && (
+        {data.shape === 'circle' && (
           <circle
             cx={width ? width / 2 : 100}
             cy={height ? height / 2 : 50}
             r={Math.min(width || 200, height || 100) / 2 - 5}
-            fill={nodeData.metadata?.fill || 'lightblue'}
-            stroke={nodeData.metadata?.stroke || 'blue'}
-            strokeWidth={nodeData.metadata?.strokeWidth || 2}
+            fill={data.metadata?.fill || 'lightblue'}
+            stroke={data.metadata?.stroke || 'blue'}
+            strokeWidth={data.metadata?.strokeWidth || 2}
           />
         )}
-        {nodeData.shape === 'ellipse' && (
+        {data.shape === 'ellipse' && (
           <ellipse
             cx={width ? width / 2 : 100}
             cy={height ? height / 2 : 50}
             rx={(width || 200) / 2 - 5}
             ry={(height || 100) / 2 - 5}
-            fill={nodeData.metadata?.fill || 'lightgreen'}
-            stroke={nodeData.metadata?.stroke || 'green'}
-            strokeWidth={nodeData.metadata?.strokeWidth || 2}
+            fill={data.metadata?.fill || 'lightgreen'}
+            stroke={data.metadata?.stroke || 'green'}
+            strokeWidth={data.metadata?.strokeWidth || 2}
           />
         )}
-        {(!nodeData.shape || nodeData.shape === 'rectangle') && (
+        {(!data.shape || data.shape === 'rectangle') && (
           <rect
             x="5"
             y="5"
             width={(width || 200) - 10}
             height={(height || 100) - 10}
-            fill={nodeData.metadata?.fill || 'lightblue'}
-            stroke={nodeData.metadata?.stroke || 'blue'}
-            strokeWidth={nodeData.metadata?.strokeWidth || 2}
-            rx={nodeData.metadata?.borderRadius || 8}
-            ry={nodeData.metadata?.borderRadius || 8}
+            fill={data.metadata?.fill || 'lightblue'}
+            stroke={data.metadata?.stroke || 'blue'}
+            strokeWidth={data.metadata?.strokeWidth || 2}
+            rx={data.metadata?.borderRadius || 8}
+            ry={data.metadata?.borderRadius || 8}
           />
         )}
       </svg>
@@ -89,7 +90,7 @@ const MindMapShapeNodeBlock = memo(({ ...node }: NodeProps<MindMapShapeNode>) =>
           addChildNode(
             node,
             { x: node.positionAbsoluteX - 250, y: node.positionAbsoluteY },
-            `first-source-${nodeId}`
+            `first-source-${id}`
           )
         }
         disabled={!canCreateLeft}
@@ -111,7 +112,7 @@ const MindMapShapeNodeBlock = memo(({ ...node }: NodeProps<MindMapShapeNode>) =>
           addChildNode(
             node,
             { x: node.positionAbsoluteX + 250, y: node.positionAbsoluteY },
-            `second-source-${nodeId}`
+            `second-source-${id}`
           )
         }
         disabled={!canCreateRight}
@@ -142,7 +143,7 @@ const MindMapShapeNodeBlock = memo(({ ...node }: NodeProps<MindMapShapeNode>) =>
           onClick={() => handleShapeChange('rectangle')}
           className={cn(
             'hover:bg-accent cursor-pointer rounded-sm p-1',
-            (!nodeData.shape || nodeData.shape === 'rectangle') && 'bg-accent'
+            (!data.shape || data.shape === 'rectangle') && 'bg-accent'
           )}
           title="Rectangle"
         >
@@ -154,7 +155,7 @@ const MindMapShapeNodeBlock = memo(({ ...node }: NodeProps<MindMapShapeNode>) =>
           onClick={() => handleShapeChange('circle')}
           className={cn(
             'hover:bg-accent cursor-pointer rounded-sm p-1',
-            nodeData.shape === 'circle' && 'bg-accent'
+            data.shape === 'circle' && 'bg-accent'
           )}
           title="Circle"
         >
@@ -166,7 +167,7 @@ const MindMapShapeNodeBlock = memo(({ ...node }: NodeProps<MindMapShapeNode>) =>
           onClick={() => handleShapeChange('ellipse')}
           className={cn(
             'hover:bg-accent cursor-pointer rounded-sm p-1',
-            nodeData.shape === 'ellipse' && 'bg-accent'
+            data.shape === 'ellipse' && 'bg-accent'
           )}
           title="Ellipse"
         >
@@ -181,28 +182,28 @@ const MindMapShapeNodeBlock = memo(({ ...node }: NodeProps<MindMapShapeNode>) =>
         type="source"
         position={layout === DIRECTION.VERTICAL ? Position.Top : Position.Left}
         style={{ visibility: 'hidden' }}
-        id={`first-source-${nodeId}`}
+        id={`first-source-${id}`}
       />
       <BaseHandle
         type="source"
         position={layout === DIRECTION.VERTICAL ? Position.Bottom : Position.Right}
         style={{ visibility: 'hidden' }}
-        id={`second-source-${nodeId}`}
+        id={`second-source-${id}`}
       />
       <BaseHandle
         type="target"
         position={layout === DIRECTION.VERTICAL ? Position.Top : Position.Left}
         style={{ visibility: 'hidden' }}
-        id={`first-target-${nodeId}`}
+        id={`first-target-${id}`}
       />
       <BaseHandle
         type="target"
         position={layout === DIRECTION.VERTICAL ? Position.Bottom : Position.Right}
         style={{ visibility: 'hidden' }}
-        id={`second-target-${nodeId}`}
+        id={`second-target-${id}`}
       />
-    </MindmapNodeBase>
+    </BaseNodeBlock>
   );
 });
 
-export default MindMapShapeNodeBlock;
+export default ShapeNodeBlock;

@@ -1,10 +1,34 @@
 import { ReactFlowProvider } from '@xyflow/react';
-import MindMap from './components/Mindmap';
+import '@xyflow/react/dist/style.css';
+import { Background, BackgroundVariant, Controls, MiniMap } from '@xyflow/react';
+import { DevTools } from '@/features/mindmap/components/ui/devtools';
+import { Flow, LogicHandler, Instructions, Toolbar } from './components';
 
 const MindmapPage = () => {
   return (
     <ReactFlowProvider>
-      <MindMap />
+      <div className="h-screen w-full" style={{ backgroundColor: 'var(--background)' }}>
+        <Toolbar />
+        <Instructions />
+        <Flow>
+          <Controls />
+
+          <MiniMap
+            className="!border-border !bg-white/90"
+            style={{
+              border: '1px solid var(--border)',
+              backgroundColor: 'var(--muted)',
+            }}
+            nodeStrokeColor="var(--primary)"
+            nodeColor="var(--primary)"
+            nodeBorderRadius={8}
+          />
+
+          <Background variant={BackgroundVariant.Dots} gap={20} size={1} />
+          <DevTools position="bottom-left" />
+          <LogicHandler />
+        </Flow>
+      </div>
     </ReactFlowProvider>
   );
 };

@@ -3,6 +3,7 @@ import { useUpdateNodeInternals, type NodeProps } from '@xyflow/react';
 import { useMindmapStore } from '../stores/useMindmapStore';
 import { useLayoutStore } from '../stores/useLayoutStore';
 import type { BaseNode } from '../types';
+import type { Direction } from '../constants';
 
 export interface UseNodeCommonProps<T extends BaseNode = BaseNode> {
   node: NodeProps<T>;
@@ -14,10 +15,10 @@ export interface UseNodeCommonReturn<T extends BaseNode = BaseNode> {
   setIsMouseOver: (value: boolean) => void;
 
   // Store values
-  layout: string;
+  layout: Direction;
   isLayouting: boolean;
   addChildNode: any;
-  finalizeNodeDeletion: () => void;
+  onNodeDelete: () => void;
 
   node: NodeProps<T>;
 }
@@ -30,7 +31,7 @@ export const useMindmapNodeCommon = <T extends BaseNode = BaseNode>({
 
   // Store hooks
   const addChildNode = useMindmapStore((state) => state.addChildNode);
-  const finalizeNodeDeletion = useMindmapStore((state) => state.finalizeNodeDeletion);
+  const onNodeDelete = useMindmapStore((state) => state.finalizeNodeDeletion);
   const layout = useLayoutStore((state) => state.layout);
   const isLayouting = useLayoutStore((state) => state.isLayouting);
 
@@ -51,7 +52,7 @@ export const useMindmapNodeCommon = <T extends BaseNode = BaseNode>({
     layout,
     isLayouting,
     addChildNode,
-    finalizeNodeDeletion,
+    onNodeDelete,
 
     node: node,
   };

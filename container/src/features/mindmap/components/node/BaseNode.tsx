@@ -1,46 +1,49 @@
-import { forwardRef, type ReactNode, type HTMLAttributes } from 'react';
+import { forwardRef, type ReactNode, type HTMLAttributes, useCallback, memo } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { BaseNode } from '@/features/mindmap/components/ui/base-node';
 import { cn } from '@/shared/lib/utils';
 import type { MindMapNode } from '@/features/mindmap/types';
-import { NodeResizer } from '@xyflow/react';
+import { NodeResizer, Position, type NodeProps } from '@xyflow/react';
+import { DIRECTION, type Direction } from '@/features/mindmap/constants';
+import { BaseHandle } from '../ui/base-handle';
+import { Plus } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { useMindmapNodeCommon } from '@/features/mindmap/hooks';
+import { useWhyDidYouUpdate } from '@/hooks/use-debug';
 
 export interface BaseNodeBlockProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
-  id: string;
-  data: MindMapNode['data'];
-  isSelected: boolean;
-  isLayouting: boolean;
-  isMouseOver: boolean;
-  onMouseEnter: () => void;
-  onMouseLeave: () => void;
-  onAnimationComplete?: () => void;
   children: ReactNode;
+  node: NodeProps<MindMapNode>;
   variant?: 'card' | 'replacing';
 }
 
 export const BaseNodeBlock = forwardRef<HTMLDivElement, BaseNodeBlockProps>(
-  (
-    {
-      id,
-      data,
-      isSelected,
-      isLayouting,
-      isMouseOver,
-      onMouseEnter,
-      onMouseLeave,
-      onAnimationComplete,
-      className,
+  ({ className, children, variant = 'card', node, ...props }, ref) => {
+    const { id, data, selected: isSelected } = node;
+
+    const { isMouseOver, setIsMouseOver, layout, isLayouting, addChildNode, onNodeDelete } =
+      useMindmapNodeCommon<MindMapNode>({
+        node,
+      });
+
+    useWhyDidYouUpdate('BaseNodeBlock', {
       children,
-      variant = 'card',
-      ...props
-    },
-    ref
-  ) => {
-    const handleAnimationComplete = () => {
-      if (data.isDeleting && onAnimationComplete) {
-        onAnimationComplete();
+      layout,
+    });
+
+    const handleAnimationComplete = useCallback(() => {
+      if (data.isDeleting && onNodeDelete) {
+        onNodeDelete();
       }
-    };
+    }, [data.isDeleting, onNodeDelete]);
+
+    const onMouseEnter = useCallback(() => {
+      setIsMouseOver(true);
+    }, [setIsMouseOver]);
+
+    const onMouseLeave = useCallback(() => {
+      setIsMouseOver(false);
+    }, [setIsMouseOver]);
 
     const baseStyles = '';
 
@@ -73,6 +76,14 @@ export const BaseNodeBlock = forwardRef<HTMLDivElement, BaseNodeBlockProps>(
             >
               {children}
               <NodeResizer color="#ff0071" isVisible={isSelected} minWidth={100} minHeight={30} />
+              <NodeHandlers layout={data.layout as Direction} id={id} />
+              <CreateChildNodeButtons
+                node={node}
+                addChildNode={addChildNode}
+                isMouseOver={isMouseOver}
+                isSelected={isSelected}
+                layout={layout}
+              />
             </BaseNode>
           ) : (
             <div
@@ -85,10 +96,112 @@ export const BaseNodeBlock = forwardRef<HTMLDivElement, BaseNodeBlockProps>(
             >
               {children}
               <NodeResizer color="#ff0071" isVisible={isSelected} minWidth={100} minHeight={30} />
+              <NodeHandlers layout={data.layout as Direction} id={id} />
+              <CreateChildNodeButtons
+                node={node}
+                addChildNode={addChildNode}
+                isMouseOver={isMouseOver}
+                isSelected={isSelected}
+                layout={layout}
+              />
             </div>
           )}
         </motion.div>
       </AnimatePresence>
+    );
+  }
+);
+
+export const NodeHandlers = memo(({ layout, id }: { layout: Direction; id: string }) => {
+  return (
+    <>
+      <BaseHandle
+        type="source"
+        position={layout === DIRECTION.VERTICAL ? Position.Top : Position.Left}
+        style={{ visibility: 'hidden' }}
+        id={`first-source-${id}`}
+      />
+      <BaseHandle
+        type="source"
+        position={layout === DIRECTION.VERTICAL ? Position.Bottom : Position.Right}
+        style={{ visibility: 'hidden' }}
+        id={`second-source-${id}`}
+      />
+      <BaseHandle
+        type="target"
+        position={layout === DIRECTION.VERTICAL ? Position.Top : Position.Left}
+        style={{ visibility: 'hidden' }}
+        id={`first-target-${id}`}
+      />
+      <BaseHandle
+        type="target"
+        position={layout === DIRECTION.VERTICAL ? Position.Bottom : Position.Right}
+        style={{ visibility: 'hidden' }}
+        id={`second-target-${id}`}
+      />
+    </>
+  );
+});
+
+export const CreateChildNodeButtons = memo(
+  ({
+    node,
+    addChildNode,
+    isMouseOver,
+    isSelected,
+    layout,
+  }: {
+    node: NodeProps<MindMapNode>;
+    addChildNode: any;
+    isMouseOver: boolean;
+    isSelected: boolean;
+    layout: Direction;
+  }) => {
+    return (
+      <>
+        {/* Add Child Buttons */}
+        <Button
+          onClick={() =>
+            addChildNode(
+              node,
+              { x: node.positionAbsoluteX - 250, y: node.positionAbsoluteY },
+              node.data.side || 'left'
+            )
+          }
+          size="icon"
+          variant="outline"
+          className={cn(
+            'bg-accent absolute z-[1000] cursor-pointer rounded-full transition-all duration-200',
+            isMouseOver || isSelected ? 'visible opacity-100' : 'invisible opacity-0',
+            layout === DIRECTION.VERTICAL
+              ? 'left-1/2 top-0 -translate-x-1/2 -translate-y-[calc(100%+24px)]'
+              : 'left-0 top-1/2 -translate-x-[calc(100%+24px)] -translate-y-1/2'
+          )}
+        >
+          <Plus />
+        </Button>
+
+        <Button
+          onClick={() =>
+            addChildNode(
+              node,
+              { x: node.positionAbsoluteX + 250, y: node.positionAbsoluteY },
+              node.data.side || 'right'
+            )
+          }
+          size="icon"
+          variant="outline"
+          className={cn(
+            'bg-accent absolute z-[1000] cursor-pointer rounded-full transition-all duration-200',
+            isMouseOver || isSelected ? 'visible opacity-100' : 'invisible opacity-0',
+            layout === DIRECTION.VERTICAL
+              ? 'bottom-0 left-1/2 -translate-x-1/2 translate-y-[calc(100%+24px)]'
+              : 'right-0 top-1/2 -translate-y-1/2 translate-x-[calc(100%+24px)]'
+          )}
+        >
+          <Plus />
+        </Button>
+      </>
     );
   }
 );

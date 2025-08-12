@@ -1,21 +1,15 @@
-import { Plus } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { memo } from 'react';
-import { Position, useNodeConnections, type NodeProps } from '@xyflow/react';
+import { type NodeProps } from '@xyflow/react';
 import { cn } from '@/shared/lib/utils';
 import { DIRECTION } from '../../constants';
 import type { ShapeNode } from '../../types';
-import { BaseHandle } from '@/features/mindmap/components/ui/base-handle';
 import { useMindmapStore } from '../../stores/useMindmapStore';
-import { useMindmapNodeCommon } from '../../hooks/useNodeCommon';
 import { BaseNodeBlock } from './BaseNode';
+import { useLayoutStore } from '../../stores';
 
 const ShapeNodeBlock = memo(({ ...node }: NodeProps<ShapeNode>) => {
-  const { id: id, data: data, selected: isSelected, width, height } = node;
-  const { isMouseOver, setIsMouseOver, layout, isLayouting, addChildNode, finalizeNodeDeletion } =
-    useMindmapNodeCommon<ShapeNode>({ node });
-
-  const connections = useNodeConnections({ id });
+  const { id, data, selected: isSelected, width, height } = node;
+  const layout = useLayoutStore((state) => state.layout);
 
   const updatedata = useMindmapStore((state) => state.updateNodeData);
 
@@ -23,25 +17,8 @@ const ShapeNodeBlock = memo(({ ...node }: NodeProps<ShapeNode>) => {
     updatedata(id, { shape: newShape });
   };
 
-  const canCreateLeft =
-    !connections.some(
-      (conn) => conn.sourceHandle === `first-source-${id}` || conn.targetHandle === `first-target-${id}`
-    ) || node.data.level === 0;
-
-  const canCreateRight = true; // Temporarily allow right connections for simplicity
-
   return (
-    <BaseNodeBlock
-      id={id}
-      data={data}
-      isSelected={isSelected}
-      isLayouting={isLayouting}
-      isMouseOver={isMouseOver}
-      onMouseEnter={() => setIsMouseOver(true)}
-      onMouseLeave={() => setIsMouseOver(false)}
-      onAnimationComplete={finalizeNodeDeletion}
-      variant="replacing"
-    >
+    <BaseNodeBlock node={node} variant="replacing">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         preserveAspectRatio="none"
@@ -83,51 +60,6 @@ const ShapeNodeBlock = memo(({ ...node }: NodeProps<ShapeNode>) => {
           />
         )}
       </svg>
-
-      {/* Add Child Buttons */}
-      <Button
-        onClick={() =>
-          addChildNode(
-            node,
-            { x: node.positionAbsoluteX - 250, y: node.positionAbsoluteY },
-            `first-source-${id}`
-          )
-        }
-        disabled={!canCreateLeft}
-        size="icon"
-        variant="outline"
-        className={cn(
-          'bg-accent absolute z-[1000] cursor-pointer rounded-full transition-all duration-200',
-          (isMouseOver || isSelected) && canCreateLeft ? 'visible opacity-100' : 'invisible opacity-0',
-          layout === DIRECTION.VERTICAL
-            ? 'left-1/2 top-0 -translate-x-1/2 -translate-y-[calc(100%+24px)]'
-            : 'left-0 top-1/2 -translate-x-[calc(100%+24px)] -translate-y-1/2'
-        )}
-      >
-        <Plus />
-      </Button>
-
-      <Button
-        onClick={() =>
-          addChildNode(
-            node,
-            { x: node.positionAbsoluteX + 250, y: node.positionAbsoluteY },
-            `second-source-${id}`
-          )
-        }
-        disabled={!canCreateRight}
-        size="icon"
-        variant="outline"
-        className={cn(
-          'bg-accent absolute z-[1000] cursor-pointer rounded-full transition-all duration-200',
-          (isMouseOver || isSelected) && canCreateRight ? 'visible opacity-100' : 'invisible opacity-0',
-          layout === DIRECTION.VERTICAL
-            ? 'bottom-0 left-1/2 -translate-x-1/2 translate-y-[calc(100%+24px)]'
-            : 'right-0 top-1/2 -translate-y-1/2 translate-x-[calc(100%+24px)]'
-        )}
-      >
-        <Plus />
-      </Button>
 
       {/* Shape selector */}
       <div
@@ -176,32 +108,6 @@ const ShapeNodeBlock = memo(({ ...node }: NodeProps<ShapeNode>) => {
           </svg>
         </button>
       </div>
-
-      {/* Connection Handles */}
-      <BaseHandle
-        type="source"
-        position={layout === DIRECTION.VERTICAL ? Position.Top : Position.Left}
-        style={{ visibility: 'hidden' }}
-        id={`first-source-${id}`}
-      />
-      <BaseHandle
-        type="source"
-        position={layout === DIRECTION.VERTICAL ? Position.Bottom : Position.Right}
-        style={{ visibility: 'hidden' }}
-        id={`second-source-${id}`}
-      />
-      <BaseHandle
-        type="target"
-        position={layout === DIRECTION.VERTICAL ? Position.Top : Position.Left}
-        style={{ visibility: 'hidden' }}
-        id={`first-target-${id}`}
-      />
-      <BaseHandle
-        type="target"
-        position={layout === DIRECTION.VERTICAL ? Position.Bottom : Position.Right}
-        style={{ visibility: 'hidden' }}
-        id={`second-target-${id}`}
-      />
     </BaseNodeBlock>
   );
 });

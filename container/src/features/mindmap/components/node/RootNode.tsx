@@ -27,8 +27,6 @@ const RootNodeBlock = memo(({ ...node }: NodeProps<RootNode>) => {
     }
   };
 
-  console.log('RootNodeBlock rendered');
-
   return (
     <BaseNodeBlock node={node} className="border-primary">
       <BaseNodeContent className="flex flex-row items-stretch gap-2 p-0">

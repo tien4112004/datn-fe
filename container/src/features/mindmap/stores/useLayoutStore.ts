@@ -2,12 +2,10 @@ import { create } from 'zustand';
 import ELK from 'elkjs/lib/elk.bundled.js';
 import * as d3 from 'd3';
 import type { BaseNode, MindMapEdge } from '../types';
-import { DIRECTION, type Direction } from '../constants';
+import { type Direction } from '../constants';
 import { useMindmapStore } from './useMindmapStore';
 import { devtools } from 'zustand/middleware';
 import { useClipboardStore } from './useClipboardStore';
-
-const elk = new ELK();
 
 interface AnimationData {
   id: string;
@@ -141,72 +139,159 @@ export const useLayoutStore = create<LayoutState>()(
         set({ animationTimer: timer }, false, 'mindmap-layout/animateNodesToPositions:timer');
       },
 
-      getLayoutedElements: async (nodes, edges, direction) => {
-        if (nodes.length === 0 || direction === DIRECTION.NONE) {
+      /**
+       * Logic: Keep Root note as original position.
+       * For Level-1 nodes, position them left/right of the root node.
+       * For deeper levels, use ELK to layout subtrees with level-1 nodes as roots.
+       */
+      getLayoutedElements: async (nodes, edges) => {
+        const elk = new ELK();
+
+        const HORIZONTAL_SPACING = 250;
+        const VERTICAL_SPACING = 125;
+        const LEVEL1_OFFSET_X = 300;
+        const LEVEL1_OFFSET_Y = 100;
+
+        const rootNode = nodes.find((node) => node.data.level === 0);
+        if (!rootNode) {
           return { nodes, edges };
         }
 
-        try {
-          // Configure ELK options based on direction
-          const isHorizontal = direction === DIRECTION.HORIZONTAL;
+        const level1Nodes = nodes.filter((node) => node.data.level === 1);
 
-          const graph = {
+        const layoutedNodes: BaseNode[] = [];
+        const rootX = rootNode.position?.x ?? 0;
+        const rootY = rootNode.position?.y ?? 0;
+
+        layoutedNodes.push({
+          ...rootNode,
+          position: {
+            x: rootX,
+            y: rootY,
+          },
+        });
+
+        const leftLevel1Nodes = level1Nodes.filter((n) => n.data.side === 'left');
+        const rightLevel1Nodes = level1Nodes.filter((n) => n.data.side === 'right');
+
+        leftLevel1Nodes.forEach((node, index) => {
+          const yOffset = (index - (leftLevel1Nodes.length - 1) / 2) * LEVEL1_OFFSET_Y;
+          const targetX = rootX - LEVEL1_OFFSET_X;
+          const targetY = rootY + yOffset;
+          layoutedNodes.push({
+            ...node,
+            position: {
+              // Position calculation breakdown:
+              // 1. Start with targetX (root's X position minus horizontal offset)
+              // 2. Subtract half of current node's width to center it horizontally (React Flow uses center point)
+              // 3. Add half of root node's width to account for root's center point
+              x: targetX - (node.measured?.width ?? 0) / 2 + (rootNode.measured?.width ?? 0) / 2,
+              y: targetY - (node.measured?.height ?? 0) / 2 + (rootNode.measured?.height ?? 0) / 2,
+            },
+          });
+        });
+
+        rightLevel1Nodes.forEach((node, index) => {
+          const yOffset = (index - (rightLevel1Nodes.length - 1) / 2) * LEVEL1_OFFSET_Y;
+          const targetX = rootX + LEVEL1_OFFSET_X;
+          const targetY = rootY + yOffset;
+          layoutedNodes.push({
+            ...node,
+            position: {
+              x: targetX - (node.measured?.width ?? 0) / 2 + (rootNode.measured?.width ?? 0) / 2,
+              y: targetY - (node.measured?.height ?? 0) / 2 + (rootNode.measured?.height ?? 0) / 2,
+            },
+          });
+        });
+
+        // Layout subtrees for each Level-1 node using ELK
+        for (const level1Node of level1Nodes) {
+          const subtreeNodes = useMindmapStore.getState().getAllDescendantNodes(level1Node.id);
+
+          if (subtreeNodes.length === 0) continue;
+
+          const subtreeNodeIds = new Set([level1Node.id, ...subtreeNodes.map((n) => n.id)]);
+          const subtreeEdges = edges.filter(
+            (edge) => subtreeNodeIds.has(edge.source) && subtreeNodeIds.has(edge.target)
+          );
+
+          const elkNodes = [level1Node, ...subtreeNodes].map((node) => ({
+            id: node.id,
+            width: node.width ?? 150,
+            height: node.height ?? 50,
+            properties: {
+              level: node.data.level,
+            },
+          }));
+
+          const elkEdges = subtreeEdges.map((edge) => ({
+            id: edge.id,
+            sources: [edge.source],
+            targets: [edge.target],
+          }));
+
+          const layoutDirection = level1Node.data.side === 'left' ? 'LEFT' : 'RIGHT';
+
+          const elkGraph = {
             id: 'root',
             layoutOptions: {
               'elk.algorithm': 'layered',
-              'elk.direction': 'RIGHT',
-              'elk.spacing.nodeNode': '80',
-              'elk.layered.spacing.nodeNodeBetweenLayers': '100',
-              'elk.spacing.componentComponent': '50',
-              'elk.alignment': 'CENTER',
+              'elk.direction': layoutDirection,
+              'elk.spacing.nodeNode': VERTICAL_SPACING.toString(),
+              'elk.layered.spacing.nodeNodeBetweenLayers': HORIZONTAL_SPACING.toString(),
               'elk.layered.crossingMinimization.strategy': 'LAYER_SWEEP',
-              'elk.layered.nodePlacement.strategy': 'BRANDES_KOEPF',
-              'elk.layered.cycleBreaking.strategy': 'GREEDY',
+              'elk.layered.nodePlacement.strategy': 'NETWORK_SIMPLEX',
+              'elk.layered.nodePlacement.favorStraightEdges': 'true',
+              'elk.layered.thoroughness': '10',
             },
-            children: nodes.map((node: BaseNode) => ({
-              id: node.id,
-              // Adjust handle positions based on layout direction
-              targetPosition: isHorizontal ? 'left' : 'top',
-              sourcePosition: isHorizontal ? 'right' : 'bottom',
-              // Use measured dimensions or fallback values
-              width: node.measured?.width || 220,
-              height: node.measured?.height || 40,
-              layoutOptions: {
-                'elk.algorithm': 'mrtree',
-                'elk.direction': 'RIGHT',
-                'elk.mrtree.searchOrder': 'BFS',
-                'elk.spacing.nodeNode': '40',
-                'elk.mrtree.weighting': 'MODEL_ORDER',
-              },
-            })),
-            edges: edges.map((edge: MindMapEdge) => ({
-              id: edge.id,
-              sources: [edge.source],
-              targets: [edge.target],
-            })),
+            children: elkNodes,
+            edges: elkEdges,
           };
 
-          const layoutedGraph = await elk.layout(graph);
+          try {
+            const layoutedGraph = await elk.layout(elkGraph);
 
-          const layoutedNodes =
-            layoutedGraph.children?.map((layoutedNode: any) => {
-              const originalNode = nodes.find((n) => n.id === layoutedNode.id);
-              return {
-                ...originalNode,
-                position: { x: layoutedNode.x, y: layoutedNode.y },
-                targetPosition: layoutedNode.targetPosition,
-                sourcePosition: layoutedNode.sourcePosition,
-              };
-            }) || nodes;
+            const level1LayoutedNode = layoutedNodes.find((n) => n.id === level1Node.id);
+            if (!level1LayoutedNode) continue;
 
-          return {
-            nodes: layoutedNodes,
-            edges,
-          };
-        } catch (error) {
-          console.warn('ELK layout calculation failed:', error);
-          return { nodes, edges };
+            const level1BaseX = level1LayoutedNode.position.x;
+            const level1BaseY = level1LayoutedNode.position.y;
+
+            const level1ElkNode = layoutedGraph.children?.find((n) => n.id === level1Node.id);
+            if (!level1ElkNode) continue;
+
+            const offsetX = level1BaseX - (level1ElkNode.x ?? 0);
+            const offsetY = level1BaseY - (level1ElkNode.y ?? 0);
+
+            layoutedGraph.children?.forEach((elkNode) => {
+              if (elkNode.id === level1Node.id) return;
+
+              const originalNode = subtreeNodes.find((n) => n.id === elkNode.id);
+              if (originalNode) {
+                const targetX = (elkNode.x ?? 0) + offsetX;
+                const targetY = (elkNode.y ?? 0) + offsetY;
+                layoutedNodes.push({
+                  ...originalNode,
+                  position: {
+                    x:
+                      targetX - (originalNode.measured?.width ?? 0) / 2 + (rootNode.measured?.width ?? 0) / 2,
+                    y:
+                      targetY -
+                      (originalNode.measured?.height ?? 0) / 2 +
+                      (rootNode.measured?.height ?? 0) / 2,
+                  },
+                });
+              }
+            });
+          } catch (error) {
+            console.error('ELK layout error for subtree:', error);
+          }
         }
+
+        return {
+          nodes: layoutedNodes,
+          edges: edges,
+        };
       },
 
       updateLayout: async (direction) => {

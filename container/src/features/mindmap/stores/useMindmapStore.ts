@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { addEdge, applyNodeChanges, applyEdgeChanges } from '@xyflow/react';
+import { addEdge, applyNodeChanges, applyEdgeChanges, useReactFlow } from '@xyflow/react';
 import type { Connection, XYPosition } from '@xyflow/react';
 import { type BaseNode, type MindMapEdge, MINDMAP_TYPES } from '../types';
 import { DragHandle } from '../constants';
@@ -12,8 +12,8 @@ const initialNodes: BaseNode[] = [
   {
     id: 'root',
     type: MINDMAP_TYPES.ROOT_NODE,
-    position: { x: 400, y: 300 },
-    data: { level: 0, content: '<p>Central Topic</p>' },
+    position: { x: 0, y: 0 },
+    data: { level: 0, content: '<p>Central Topic</p>', side: 'mid' },
     dragHandle: DragHandle.SELECTOR,
   },
   // Left side branch (going left from center)
@@ -27,7 +27,7 @@ const initialNodes: BaseNode[] = [
   {
     id: 'left-4',
     type: MINDMAP_TYPES.SHAPE_NODE,
-    position: { x: 150, y: 400 },
+    position: { x: 200, y: 400 },
     data: {
       level: 2,
       content: '<p>Left Shape Node</p>',
@@ -43,44 +43,42 @@ const initialNodes: BaseNode[] = [
     },
     width: 250,
     height: 150,
+  },
+  {
+    id: 'left-2',
+    type: MINDMAP_TYPES.TEXT_NODE,
+    position: { x: 200, y: 200 },
+    data: { level: 2, content: '<p>Left Child</p>', parentId: 'left-1', side: 'left' },
     dragHandle: DragHandle.SELECTOR,
   },
-  //   {
-  //     id: 'left-2',
-  //     type: 'mindMapNode',
-  //     position: { x: 100, y: 250 },
-  //     data: { level: 2, content: '<p>Left Sub 1</p>', parentId: 'left-1' },
-  //     dragHandle: DragHandle.SELECTOR,
-  //   },
-  //   {
-  //     id: 'left-3',
-  //     type: 'mindMapNode',
-  //     position: { x: 100, y: 350 },
-  //     data: { level: 2, content: '<p>Left Sub 2</p>', parentId: 'left-1' },
-  //     dragHandle: DragHandle.SELECTOR,
-  //   },
-  //   // Right side branch (going right from center)
-  //   {
-  //     id: 'right-1',
-  //     type: 'mindMapNode',
-  //     position: { x: 550, y: 300 },
-  //     data: { level: 1, content: '<p>Right Branch</p>', parentId: 'root' },
-  //     dragHandle: DragHandle.SELECTOR,
-  //   },
-  //   {
-  //     id: 'right-2',
-  //     type: 'mindMapNode',
-  //     position: { x: 700, y: 250 },
-  //     data: { level: 2, content: '<p>Right Sub 1</p>', parentId: 'right-1' },
-  //     dragHandle: DragHandle.SELECTOR,
-  //   },
-  //   {
-  //     id: 'right-3',
-  //     type: 'mindMapNode',
-  //     position: { x: 700, y: 350 },
-  //     data: { level: 2, content: '<p>Right Sub 2</p>', parentId: 'right-1' },
-  //     dragHandle: DragHandle.SELECTOR,
-  //   },
+  {
+    id: 'right-1',
+    type: MINDMAP_TYPES.TEXT_NODE,
+    position: { x: 550, y: 300 },
+    data: { level: 1, content: '<p>Right Branch</p>', parent: 'root', side: 'right' },
+    dragHandle: DragHandle.SELECTOR,
+  },
+  {
+    id: 'right-2',
+    type: MINDMAP_TYPES.TEXT_NODE,
+    position: { x: 600, y: 200 },
+    data: { level: 2, content: '<p>Right Child</p>', parentId: 'right-1', side: 'right' },
+    dragHandle: DragHandle.SELECTOR,
+  },
+  {
+    id: 'right-3',
+    type: MINDMAP_TYPES.SHAPE_NODE,
+    position: { x: 600, y: 400 },
+    data: {
+      level: 2,
+      content: '<p>Right Shape Node</p>',
+      parentId: 'right-1',
+      shape: 'circle',
+      side: 'right',
+    },
+    width: 150,
+    height: 150,
+  },
 ];
 
 const initialEdges: MindMapEdge[] = [
@@ -103,6 +101,54 @@ const initialEdges: MindMapEdge[] = [
     type: MINDMAP_TYPES.EDGE,
     sourceHandle: 'first-source-left-1',
     targetHandle: 'second-target-left-4',
+    data: {
+      strokeColor: 'var(--primary)',
+      strokeWidth: 2,
+    },
+  },
+  {
+    id: 'e-left-1-left-2',
+    source: 'left-1',
+    target: 'left-2',
+    type: MINDMAP_TYPES.EDGE,
+    sourceHandle: 'first-source-left-1',
+    targetHandle: 'second-target-left-2',
+    data: {
+      strokeColor: 'var(--primary)',
+      strokeWidth: 2,
+    },
+  },
+  {
+    id: 'e-root-right-1',
+    source: 'root',
+    target: 'right-1',
+    type: MINDMAP_TYPES.EDGE,
+    sourceHandle: 'second-source-root',
+    targetHandle: 'first-target-right-1',
+    data: {
+      strokeColor: 'var(--primary)',
+      strokeWidth: 2,
+    },
+  },
+  {
+    id: 'e-right-1-right-2',
+    source: 'right-1',
+    target: 'right-2',
+    type: MINDMAP_TYPES.EDGE,
+    sourceHandle: 'second-source-right-1',
+    targetHandle: 'first-target-right-2',
+    data: {
+      strokeColor: 'var(--primary)',
+      strokeWidth: 2,
+    },
+  },
+  {
+    id: 'e-right-1-right-3',
+    source: 'right-1',
+    target: 'right-3',
+    type: MINDMAP_TYPES.EDGE,
+    sourceHandle: 'second-source-right-1',
+    targetHandle: 'first-target-right-3',
     data: {
       strokeColor: 'var(--primary)',
       strokeWidth: 2,
@@ -205,7 +251,7 @@ export const useMindmapStore = create<MindmapState>()(
           x: Math.random() * 500 + 100,
           y: Math.random() * 400 + 100,
         },
-        data: { level: 1, content: `<p>New Node ${nodes.length + 1}</p>` },
+        data: { level: 1, content: `<p>New Node ${nodes.length + 1}</p>`, side: 'mid' },
       };
 
       set(
@@ -218,7 +264,7 @@ export const useMindmapStore = create<MindmapState>()(
       );
     },
 
-    addChildNode: (parentNode: Partial<BaseNode>, position: XYPosition, side: string) => {
+    addChildNode: (parentNode: Partial<BaseNode>, position: XYPosition, side: 'left' | 'right' | 'mid') => {
       const pushUndo = useClipboardStore.getState().pushToUndoStack;
       pushUndo(get().nodes, get().edges);
 

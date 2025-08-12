@@ -23,6 +23,7 @@ export interface BaseNodeData extends Record<string, unknown> {
   isDeleting?: boolean;
   parentId?: string;
   metadata?: Record<string, any>;
+  side: 'left' | 'right' | 'mid';
 }
 
 export type BaseNode<
@@ -34,7 +35,6 @@ export type BaseNode<
 
 export interface TextNodeData extends BaseNodeData {
   content: string;
-  side: 'left' | 'right';
 }
 
 export interface TextNode extends BaseNode<TextNodeData, typeof MINDMAP_TYPES.TEXT_NODE> {}
@@ -49,7 +49,6 @@ interface ShapeNodeData extends BaseNodeData {
   shape?: 'rectangle' | 'circle' | 'ellipse';
   width?: number;
   height?: number;
-  side: 'left' | 'right';
 }
 
 export interface ShapeNode extends BaseNode<ShapeNodeData, typeof MINDMAP_TYPES.SHAPE_NODE> {}

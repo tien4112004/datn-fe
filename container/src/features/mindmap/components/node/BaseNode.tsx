@@ -9,7 +9,6 @@ import { BaseHandle } from '../ui/base-handle';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useMindmapNodeCommon } from '@/features/mindmap/hooks';
-import { useWhyDidYouUpdate } from '@/hooks/use-debug';
 
 export interface BaseNodeBlockProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
   children: ReactNode;
@@ -25,11 +24,6 @@ export const BaseNodeBlock = forwardRef<HTMLDivElement, BaseNodeBlockProps>(
       useMindmapNodeCommon<MindMapNode>({
         node,
       });
-
-    useWhyDidYouUpdate('BaseNodeBlock', {
-      children,
-      layout,
-    });
 
     const handleAnimationComplete = useCallback(() => {
       if (data.isDeleting && onNodeDelete) {
@@ -76,7 +70,7 @@ export const BaseNodeBlock = forwardRef<HTMLDivElement, BaseNodeBlockProps>(
             >
               {children}
               <NodeResizer color="#ff0071" isVisible={isSelected} minWidth={100} minHeight={30} />
-              <NodeHandlers layout={data.layout as Direction} id={id} />
+              <NodeHandlers layout={layout} id={id} />
               <CreateChildNodeButtons
                 node={node}
                 addChildNode={addChildNode}
@@ -96,7 +90,7 @@ export const BaseNodeBlock = forwardRef<HTMLDivElement, BaseNodeBlockProps>(
             >
               {children}
               <NodeResizer color="#ff0071" isVisible={isSelected} minWidth={100} minHeight={30} />
-              <NodeHandlers layout={data.layout as Direction} id={id} />
+              <NodeHandlers layout={layout} id={id} />
               <CreateChildNodeButtons
                 node={node}
                 addChildNode={addChildNode}
@@ -157,22 +151,20 @@ export const CreateChildNodeButtons = memo(
     isSelected: boolean;
     layout: Direction;
   }) => {
+    const canCreateLeft = node.data.side === 'left' || node.data.side === 'mid';
+    const canCreateRight = node.data.side === 'right' || node.data.side === 'mid';
     return (
       <>
         {/* Add Child Buttons */}
         <Button
           onClick={() =>
-            addChildNode(
-              node,
-              { x: node.positionAbsoluteX - 250, y: node.positionAbsoluteY },
-              node.data.side || 'left'
-            )
+            addChildNode(node, { x: node.positionAbsoluteX - 250, y: node.positionAbsoluteY }, 'left')
           }
           size="icon"
           variant="outline"
           className={cn(
             'bg-accent absolute z-[1000] cursor-pointer rounded-full transition-all duration-200',
-            isMouseOver || isSelected ? 'visible opacity-100' : 'invisible opacity-0',
+            (isMouseOver || isSelected) && canCreateLeft ? 'visible opacity-100' : 'invisible opacity-0',
             layout === DIRECTION.VERTICAL
               ? 'left-1/2 top-0 -translate-x-1/2 -translate-y-[calc(100%+24px)]'
               : 'left-0 top-1/2 -translate-x-[calc(100%+24px)] -translate-y-1/2'
@@ -183,17 +175,13 @@ export const CreateChildNodeButtons = memo(
 
         <Button
           onClick={() =>
-            addChildNode(
-              node,
-              { x: node.positionAbsoluteX + 250, y: node.positionAbsoluteY },
-              node.data.side || 'right'
-            )
+            addChildNode(node, { x: node.positionAbsoluteX + 250, y: node.positionAbsoluteY }, 'right')
           }
           size="icon"
           variant="outline"
           className={cn(
             'bg-accent absolute z-[1000] cursor-pointer rounded-full transition-all duration-200',
-            isMouseOver || isSelected ? 'visible opacity-100' : 'invisible opacity-0',
+            (isMouseOver || isSelected) && canCreateRight ? 'visible opacity-100' : 'invisible opacity-0',
             layout === DIRECTION.VERTICAL
               ? 'bottom-0 left-1/2 -translate-x-1/2 translate-y-[calc(100%+24px)]'
               : 'right-0 top-1/2 -translate-y-1/2 translate-x-[calc(100%+24px)]'

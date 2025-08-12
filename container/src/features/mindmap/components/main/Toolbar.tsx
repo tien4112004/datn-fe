@@ -6,6 +6,7 @@ import { useLayoutStore } from '../../stores/useLayoutStore';
 import type { Direction } from '../../constants';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { useClipboardStore } from '../../stores';
+import { useReactFlow } from '@xyflow/react';
 
 const Toolbar = () => {
   const addNode = useMindmapStore((state) => state.addNode);
@@ -17,6 +18,7 @@ const Toolbar = () => {
   const canRedo = useClipboardStore((state) => !state.redoStack.isEmpty());
 
   const onLayoutChange = useLayoutStore((state) => state.onLayoutChange);
+  const { fitView } = useReactFlow();
 
   return (
     <div className="absolute left-4 top-4 z-10 flex gap-2">
@@ -49,6 +51,7 @@ const Toolbar = () => {
         className="rounded-md border border-gray-300 bg-white shadow-sm"
         onValueChange={(value) => {
           onLayoutChange(value as Direction);
+          fitView();
         }}
       >
         <ToggleGroupItem value="horizontal" className="px-4 py-2">

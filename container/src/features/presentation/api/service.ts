@@ -5,7 +5,7 @@ import {
   type PresentationItem,
   type OutlinePromptRequest,
 } from '../types';
-import { marked } from 'marked';
+import { splitMarkdownToOutlineItems } from '../utils';
 // import api from '@/shared/api';
 
 const mockOutlineOutput = `\`\`\`markdown
@@ -46,48 +46,60 @@ From your smartphone to your favorite streaming service, AI is everywhere workin
 _AI is like having a super-smart friend who never sleeps and always wants to help!_
 \`\`\``;
 
-function splitMarkdownToOutlineItems(markdown: string): OutlineItem[] {
-  const cleanMarkdown = markdown
-    .replace(/^```markdown\n/, '')
-    .replace(/\n```$/, '')
-    .trim();
-
-  // Split the markdown into sections based on headings (## and above)
-  const sections = cleanMarkdown.split(/(?=^#{2,}\s)/m).filter(Boolean);
-
-  const items = sections.map((section, index) => ({
-    id: index.toString(),
-    htmlContent: marked.parse(section.trim(), {
-      async: false,
-    }),
-  }));
-
-  return items;
-}
-
 export default class PresentationRealApiService implements PresentationApiService {
-  async getStreamedOutline(
-    request: OutlinePromptRequest,
-    signal: AbortSignal
-  ): Promise<ReadableStream<Uint8Array>> {
-    const response = await fetch('http://localhost:8080/presentations/mock-outline', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
+  // async getStreamedOutline(
+  //   request: OutlinePromptRequest,
+  //   signal: AbortSignal
+  // ): Promise<ReadableStream<Uint8Array>> {
+  //   const response = await fetch('http://localhost:8080/presentations/mock-outline', {
+  //     method: 'POST',
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //     },
+  //     body: JSON.stringify(request),
+  //     signal,
+  //   });
+
+  //   if (!response.ok) {
+  //     throw new Error(`HTTP error! status: ${response.status}`);
+  //   }
+
+  //   if (!response.body) {
+  //     throw new Error('No response body');
+  //   }
+
+  //   return response.body;
+  // }
+
+  getStreamedOutline(request: OutlinePromptRequest, signal: AbortSignal): AsyncIterable<string> {
+    return {
+      async *[Symbol.asyncIterator]() {
+        const response = await fetch('http://localhost:8080/presentations/mock-outline', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'text/plain',
+          },
+          body: JSON.stringify(request),
+          signal,
+        });
+
+        const reader = response.body?.getReader();
+        if (!reader) throw new Error('No reader available');
+
+        try {
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            const text = new TextDecoder().decode(value);
+            yield text;
+          }
+        } finally {
+          reader.releaseLock();
+        }
       },
-      body: JSON.stringify(request),
-      signal,
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    if (!response.body) {
-      throw new Error('No response body');
-    }
-
-    return response.body;
+    };
   }
 
   //   async getPresentationItems(): Promise<PresentationItem[]> {

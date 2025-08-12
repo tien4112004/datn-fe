@@ -19,7 +19,6 @@ import { useState } from 'react';
 import { Download, Loader, Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import useOutlineStore from '@/features/presentation/stores/useOutlineStore';
-import { useShallow } from 'zustand/react/shallow';
 import { Card } from '@/components/ui/card';
 // import { useOutlineContext } from '../../context/OutlineContext';
 
@@ -29,7 +28,8 @@ type OutlineWorkspaceProps = {
 
 const OutlineWorkspace = ({ onDownload }: OutlineWorkspaceProps) => {
   // const { content, setContent } = useOutlineContext();
-  const [content, setContent] = useOutlineStore(useShallow((state) => [state.content, state.setContent]));
+  const setContent = useOutlineStore((state) => state.setContent);
+  const content = useOutlineStore((state) => state.content);
   const { t } = useTranslation('outlineWorkspace');
   const [isDownloading, setIsDownloading] = useState(false);
   const sensors = useSensors(

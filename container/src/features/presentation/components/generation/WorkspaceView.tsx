@@ -84,10 +84,10 @@ const WorkspaceView = ({ initialOutlineData }: WorkspaceViewProps) => {
   });
 
   useEffect(() => {
-    if (JSON.stringify(content) !== JSON.stringify(outlineItems)) {
+    if (isStreaming && JSON.stringify(content) !== JSON.stringify(outlineItems)) {
       setContent([...outlineItems]);
     }
-  }, [outlineItems]);
+  }, [isStreaming, outlineItems]);
 
   const onRegenerateOutline = (data: OutlineFormData) => {
     console.log('Regenerating outline with data:', data);

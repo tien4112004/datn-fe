@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import ELK from 'elkjs/lib/elk.bundled.js';
 import * as d3 from 'd3';
-import type { MindMapNode, MindMapEdge } from '../types';
+import type { BaseMindMapNode, MindMapEdge } from '../types';
 import { DIRECTION, type Direction } from '../constants';
 import { useMindmapStore } from './useMindmapStore';
 import { devtools } from 'zustand/middleware';
@@ -27,11 +27,11 @@ interface LayoutState {
   setIsAnimating: (isAnimating: boolean) => void;
   stopAnimation: () => void;
   getLayoutedElements: (
-    nodes: MindMapNode[],
+    nodes: BaseMindMapNode[],
     edges: MindMapEdge[],
     direction: Direction
   ) => Promise<{
-    nodes: MindMapNode[];
+    nodes: BaseMindMapNode[];
     edges: MindMapEdge[];
   }>;
   animateNodesToPositions: (
@@ -108,7 +108,7 @@ export const useLayoutStore = create<LayoutState>()(
           // Use easing function for smoother animation
           const easedProgress = d3.easeCubicInOut(progress);
 
-          setNodes((currentNodes: MindMapNode[]) =>
+          setNodes((currentNodes: BaseMindMapNode[]) =>
             currentNodes.map((node) => {
               const animData = animationData.find((d) => d.id === node.id);
               if (!animData) return node;
@@ -163,7 +163,7 @@ export const useLayoutStore = create<LayoutState>()(
               'elk.layered.nodePlacement.strategy': 'BRANDES_KOEPF',
               'elk.layered.cycleBreaking.strategy': 'GREEDY',
             },
-            children: nodes.map((node: MindMapNode) => ({
+            children: nodes.map((node: BaseMindMapNode) => ({
               id: node.id,
               // Adjust handle positions based on layout direction
               targetPosition: isHorizontal ? 'left' : 'top',

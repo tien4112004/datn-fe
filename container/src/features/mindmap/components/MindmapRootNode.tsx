@@ -6,8 +6,6 @@ import { BaseNode, BaseNodeContent } from '@/components/base-node';
 import { cn } from '@/shared/lib/utils';
 import { useMindmapStore } from '../stores/useMindmapStore';
 import RichTextEditor from '@/shared/components/rte/RichTextEditor';
-import { useRichTextEditor } from '@/shared/components/rte/useRichTextEditor';
-import { BlockNoteEditor } from '@blocknote/core';
 import { DIRECTION, DragHandle } from '../constants';
 import { AnimatePresence, motion } from 'motion/react';
 import type { MindMapRootNode } from '../types';
@@ -23,26 +21,10 @@ const MindmapRootNodeBlock = memo(({ ...node }: NodeProps<MindMapRootNode>) => {
   const updateNodeInternals = useUpdateNodeInternals();
   const [, setIsEditing] = useState(false);
   const [isMouseOver, setIsMouseOver] = useState(false);
-  const editor = useRichTextEditor({
-    trailingBlock: false,
-    placeholders: { default: '', heading: '', emptyBlock: '' },
-  });
 
   useEffect(() => {
     updateNodeInternals(id);
   }, [layout, isLayouting]);
-
-  useEffect(() => {
-    async function loadInitialHTML() {
-      const blocks = await editor.tryParseHTMLToBlocks(data.content);
-      editor.replaceBlocks(editor.document, blocks);
-    }
-    loadInitialHTML();
-  }, [editor, data.content]);
-
-  const handleContentChange = async (editor: BlockNoteEditor) => {
-    const htmlContent = await editor.blocksToFullHTML(editor.document);
-  };
 
   const handleEditSubmit = () => {
     setIsEditing(false);
@@ -87,13 +69,16 @@ const MindmapRootNodeBlock = memo(({ ...node }: NodeProps<MindMapRootNode>) => {
               />
             </div>
             <div className="min-w-[150px] max-w-[400px] cursor-text p-3 pl-0" onKeyDown={handleKeyPress}>
-              <RichTextEditor
-                editor={editor}
-                onChange={handleContentChange}
-                sideMenu={false}
-                slashMenu={false}
-                className="m-0 min-h-[32px] border-none p-0 text-lg font-semibold"
+              <input
+                type="text"
+                value={data.content || ''}
+                onChange={(e) => {
+                  // Update node content - you'll need to implement this in your store
+                  // updateNodeContent(id, e.target.value);
+                }}
+                className="min-h-[32px] w-full border-none bg-transparent p-0 text-lg font-semibold outline-none"
                 onBlur={handleEditSubmit}
+                placeholder="Enter text..."
               />
             </div>
           </BaseNodeContent>

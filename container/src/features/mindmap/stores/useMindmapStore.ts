@@ -1,128 +1,148 @@
 import { create } from 'zustand';
 import { addEdge, applyNodeChanges, applyEdgeChanges } from '@xyflow/react';
 import type { Connection, XYPosition } from '@xyflow/react';
-import type { MindMapNode, MindMapEdge } from '../types';
-import { DragHandle, MINDMAP_TYPES } from '../constants';
+import { type BaseMindMapNode, type MindMapEdge, MINDMAP_TYPES } from '../types';
+import { DragHandle } from '../constants';
 import { generateId } from '@/shared/lib/utils';
 import { devtools } from 'zustand/middleware';
 import { useClipboardStore } from './useClipboardStore';
 
-const initialNodes: MindMapNode[] = [
-  // Central root
+const initialNodes: BaseMindMapNode[] = [
   {
-    id: 'root',
-    type: 'mindMapRootNode',
-    position: { x: 400, y: 300 },
-    data: { level: 0, content: '<p>Central Topic</p>' },
-    dragHandle: DragHandle.SELECTOR,
+    id: 'left-4',
+    type: MINDMAP_TYPES.MINDMAP_SHAPE_NODE,
+    position: { x: 150, y: 400 },
+    data: {
+      level: 2,
+      content: '<p>Left Shape Node</p>',
+      parentId: 'left-1',
+      shape: 'rectangle',
+      width: 200,
+      height: 100,
+      metadata: {
+        fill: 'lightblue',
+        stroke: 'blue',
+        strokeWidth: 2,
+      },
+    },
   },
-  // Left side branch (going left from center)
-  {
-    id: 'left-1',
-    type: 'mindMapNode',
-    position: { x: 250, y: 300 },
-    data: { level: 1, content: '<p>Left Branch</p>', parentId: 'root' },
-    dragHandle: DragHandle.SELECTOR,
-  },
-  {
-    id: 'left-2',
-    type: 'mindMapNode',
-    position: { x: 100, y: 250 },
-    data: { level: 2, content: '<p>Left Sub 1</p>', parentId: 'left-1' },
-    dragHandle: DragHandle.SELECTOR,
-  },
-  {
-    id: 'left-3',
-    type: 'mindMapNode',
-    position: { x: 100, y: 350 },
-    data: { level: 2, content: '<p>Left Sub 2</p>', parentId: 'left-1' },
-    dragHandle: DragHandle.SELECTOR,
-  },
-  // Right side branch (going right from center)
-  {
-    id: 'right-1',
-    type: 'mindMapNode',
-    position: { x: 550, y: 300 },
-    data: { level: 1, content: '<p>Right Branch</p>', parentId: 'root' },
-    dragHandle: DragHandle.SELECTOR,
-  },
-  {
-    id: 'right-2',
-    type: 'mindMapNode',
-    position: { x: 700, y: 250 },
-    data: { level: 2, content: '<p>Right Sub 1</p>', parentId: 'right-1' },
-    dragHandle: DragHandle.SELECTOR,
-  },
-  {
-    id: 'right-3',
-    type: 'mindMapNode',
-    position: { x: 700, y: 350 },
-    data: { level: 2, content: '<p>Right Sub 2</p>', parentId: 'right-1' },
-    dragHandle: DragHandle.SELECTOR,
-  },
+
+  //   // Central root
+  //   {
+  //     id: 'root',
+  //     type: 'mindMapRootNode',
+  //     position: { x: 400, y: 300 },
+  //     data: { level: 0, content: '<p>Central Topic</p>' },
+  //     dragHandle: DragHandle.SELECTOR,
+  //   },
+  //   // Left side branch (going left from center)
+  //   {
+  //     id: 'left-1',
+  //     type: 'mindMapNode',
+  //     position: { x: 250, y: 300 },
+  //     data: { level: 1, content: '<p>Left Branch</p>', parentId: 'root' },
+  //     dragHandle: DragHandle.SELECTOR,
+  //   },
+  //   {
+  //     id: 'left-2',
+  //     type: 'mindMapNode',
+  //     position: { x: 100, y: 250 },
+  //     data: { level: 2, content: '<p>Left Sub 1</p>', parentId: 'left-1' },
+  //     dragHandle: DragHandle.SELECTOR,
+  //   },
+  //   {
+  //     id: 'left-3',
+  //     type: 'mindMapNode',
+  //     position: { x: 100, y: 350 },
+  //     data: { level: 2, content: '<p>Left Sub 2</p>', parentId: 'left-1' },
+  //     dragHandle: DragHandle.SELECTOR,
+  //   },
+  //   // Right side branch (going right from center)
+  //   {
+  //     id: 'right-1',
+  //     type: 'mindMapNode',
+  //     position: { x: 550, y: 300 },
+  //     data: { level: 1, content: '<p>Right Branch</p>', parentId: 'root' },
+  //     dragHandle: DragHandle.SELECTOR,
+  //   },
+  //   {
+  //     id: 'right-2',
+  //     type: 'mindMapNode',
+  //     position: { x: 700, y: 250 },
+  //     data: { level: 2, content: '<p>Right Sub 1</p>', parentId: 'right-1' },
+  //     dragHandle: DragHandle.SELECTOR,
+  //   },
+  //   {
+  //     id: 'right-3',
+  //     type: 'mindMapNode',
+  //     position: { x: 700, y: 350 },
+  //     data: { level: 2, content: '<p>Right Sub 2</p>', parentId: 'right-1' },
+  //     dragHandle: DragHandle.SELECTOR,
+  //   },
 ];
 
 const initialEdges: MindMapEdge[] = [
-  // Left side connections
-  {
-    id: 'root-left-1',
-    source: 'root',
-    target: 'left-1',
-    type: MINDMAP_TYPES.MINDMAP_EDGE,
-    data: { strokeColor: 'var(--primary)', strokeWidth: 2 },
-  },
-  {
-    id: 'left-1-left-2',
-    source: 'left-1',
-    target: 'left-2',
-    type: MINDMAP_TYPES.MINDMAP_EDGE,
-    data: { strokeColor: 'var(--primary)', strokeWidth: 2 },
-  },
-  {
-    id: 'left-1-left-3',
-    source: 'left-1',
-    target: 'left-3',
-    type: MINDMAP_TYPES.MINDMAP_EDGE,
-    data: { strokeColor: 'var(--primary)', strokeWidth: 2 },
-  },
-  // Right side connections
-  {
-    id: 'root-right-1',
-    source: 'root',
-    target: 'right-1',
-    type: MINDMAP_TYPES.MINDMAP_EDGE,
-    data: { strokeColor: 'var(--primary)', strokeWidth: 2 },
-  },
-  {
-    id: 'right-1-right-2',
-    source: 'right-1',
-    target: 'right-2',
-    type: MINDMAP_TYPES.MINDMAP_EDGE,
-    data: { strokeColor: 'var(--primary)', strokeWidth: 2 },
-  },
-  {
-    id: 'right-1-right-3',
-    source: 'right-1',
-    target: 'right-3',
-    type: MINDMAP_TYPES.MINDMAP_EDGE,
-    data: { strokeColor: 'var(--primary)', strokeWidth: 2 },
-  },
+  //   // Left side connections
+  //   {
+  //     id: 'root-left-1',
+  //     source: 'root',
+  //     target: 'left-1',
+  //     type: MINDMAP_TYPES.MINDMAP_EDGE,
+  //     data: { strokeColor: 'var(--primary)', strokeWidth: 2 },
+  //   },
+  //   {
+  //     id: 'left-1-left-2',
+  //     source: 'left-1',
+  //     target: 'left-2',
+  //     type: MINDMAP_TYPES.MINDMAP_EDGE,
+  //     data: { strokeColor: 'var(--primary)', strokeWidth: 2 },
+  //   },
+  //   {
+  //     id: 'left-1-left-3',
+  //     source: 'left-1',
+  //     target: 'left-3',
+  //     type: MINDMAP_TYPES.MINDMAP_EDGE,
+  //     data: { strokeColor: 'var(--primary)', strokeWidth: 2 },
+  //   },
+  //   // Right side connections
+  //   {
+  //     id: 'root-right-1',
+  //     source: 'root',
+  //     target: 'right-1',
+  //     type: MINDMAP_TYPES.MINDMAP_EDGE,
+  //     data: { strokeColor: 'var(--primary)', strokeWidth: 2 },
+  //   },
+  //   {
+  //     id: 'right-1-right-2',
+  //     source: 'right-1',
+  //     target: 'right-2',
+  //     type: MINDMAP_TYPES.MINDMAP_EDGE,
+  //     data: { strokeColor: 'var(--primary)', strokeWidth: 2 },
+  //   },
+  //   {
+  //     id: 'right-1-right-3',
+  //     source: 'right-1',
+  //     target: 'right-3',
+  //     type: MINDMAP_TYPES.MINDMAP_EDGE,
+  //     data: { strokeColor: 'var(--primary)', strokeWidth: 2 },
+  //   },
 ];
 
 interface MindmapState {
-  nodes: MindMapNode[];
+  nodes: BaseMindMapNode[];
   edges: MindMapEdge[];
   nodeId: number;
   onNodesChange: (changes: any) => void;
   onEdgesChange: (changes: any) => void;
   onConnect: (connection: Connection) => void;
-  setNodes: (updater: MindMapNode[] | ((nodes: MindMapNode[]) => MindMapNode[])) => void;
+  setNodes: (updater: BaseMindMapNode[] | ((nodes: BaseMindMapNode[]) => BaseMindMapNode[])) => void;
   setEdges: (updater: MindMapEdge[] | ((edges: MindMapEdge[]) => MindMapEdge[])) => void;
   addNode: () => void;
   logData: () => void;
-  addChildNode: (parentNode: Partial<MindMapNode>, position: XYPosition, sourceHandler?: string) => void;
+  addChildNode: (parentNode: Partial<BaseMindMapNode>, position: XYPosition, sourceHandler?: string) => void;
+  updateNodeData: (nodeId: string, updates: Partial<BaseMindMapNode['data']>) => void;
   syncState: (updateNodeInternals: any) => void;
-  getAllDescendantNodes: (parentId: string) => MindMapNode[];
+  getAllDescendantNodes: (parentId: string) => BaseMindMapNode[];
   nodesToBeDeleted: Set<string>;
   deleteSelectedNodes: () => void;
   markNodeForDeletion: (nodeId: string) => void;
@@ -196,9 +216,9 @@ export const useMindmapStore = create<MindmapState>()(
 
     addNode: () => {
       const { nodes, nodeId } = get();
-      const newNode: MindMapNode = {
+      const newNode: BaseMindMapNode = {
         id: generateId(),
-        type: MINDMAP_TYPES.MINDMAP_NODE,
+        type: MINDMAP_TYPES.MINDMAP_TEXT_NODE,
         position: {
           x: Math.random() * 500 + 100,
           y: Math.random() * 400 + 100,
@@ -216,12 +236,12 @@ export const useMindmapStore = create<MindmapState>()(
       );
     },
 
-    addChildNode: (parentNode: Partial<MindMapNode>, position: XYPosition, sourceHandler?: string) => {
+    addChildNode: (parentNode: Partial<BaseMindMapNode>, position: XYPosition, sourceHandler?: string) => {
       const pushUndo = useClipboardStore.getState().pushToUndoStack;
       pushUndo(get().nodes, get().edges);
-      const newNode: MindMapNode = {
+      const newNode: BaseMindMapNode = {
         id: generateId(),
-        type: MINDMAP_TYPES.MINDMAP_NODE,
+        type: MINDMAP_TYPES.MINDMAP_TEXT_NODE,
         data: {
           level: parentNode.data?.level ? parentNode.data.level + 1 : 1,
           content: '<p>New Node</p>',
@@ -256,15 +276,27 @@ export const useMindmapStore = create<MindmapState>()(
       );
     },
 
+    updateNodeData: (nodeId: string, updates: Partial<BaseMindMapNode['data']>) => {
+      set(
+        (state) => ({
+          nodes: state.nodes.map((node) =>
+            node.id === nodeId ? { ...node, data: { ...node.data, ...updates } } : node
+          ),
+        }),
+        false,
+        'mindmap/updateNodeData'
+      );
+    },
+
     logData: () => {
       const { nodes, edges } = get();
       console.log('Nodes:', nodes);
       console.log('Edges:', edges);
     },
 
-    getAllDescendantNodes: (parentId: string): MindMapNode[] => {
+    getAllDescendantNodes: (parentId: string): BaseMindMapNode[] => {
       const { nodes } = get();
-      return nodes.reduce((acc: MindMapNode[], node: MindMapNode) => {
+      return nodes.reduce((acc: BaseMindMapNode[], node: BaseMindMapNode) => {
         if (node.data.parentId === parentId) {
           acc.push(node);
           acc.push(...get().getAllDescendantNodes(node.id));
@@ -280,7 +312,7 @@ export const useMindmapStore = create<MindmapState>()(
       set(
         (state) => ({
           nodesToBeDeleted: nodeIdsToDelete,
-          nodes: state.nodes.map((node: MindMapNode) =>
+          nodes: state.nodes.map((node: BaseMindMapNode) =>
             nodeIdsToDelete.has(node.id) ? { ...node, data: { ...node.data, isDeleting: true } } : node
           ),
           edges: state.edges.map((edge: MindMapEdge) =>
@@ -302,7 +334,7 @@ export const useMindmapStore = create<MindmapState>()(
 
       set(
         (state) => ({
-          nodes: state.nodes.filter((node: MindMapNode) => !nodesToBeDeleted.has(node.id)),
+          nodes: state.nodes.filter((node: BaseMindMapNode) => !nodesToBeDeleted.has(node.id)),
           edges: state.edges.filter(
             (edge: MindMapEdge) => !nodesToBeDeleted.has(edge.source) && !nodesToBeDeleted.has(edge.target)
           ),

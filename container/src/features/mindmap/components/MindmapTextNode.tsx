@@ -10,11 +10,11 @@ import { useRichTextEditor } from '@/shared/components/rte/useRichTextEditor';
 import { BlockNoteEditor } from '@blocknote/core';
 import { DIRECTION, DragHandle } from '../constants';
 import { AnimatePresence, motion } from 'motion/react';
-import type { MindMapNode } from '../types';
+import type { MindMapTextNode } from '../types';
 import { BaseHandle } from '@/shared/components/base-handle';
 import { useLayoutStore } from '../stores/useLayoutStore';
 
-const MindMapNodeBlock = memo(({ ...node }: NodeProps<MindMapNode>) => {
+const MindMapTextNodeBlock = memo(({ ...node }: NodeProps<MindMapTextNode>) => {
   const { data, selected, id } = node;
   const addChildNode = useMindmapStore((state) => state.addChildNode);
   const finalizeNodeDeletion = useMindmapStore((state) => state.finalizeNodeDeletion);
@@ -57,6 +57,7 @@ const MindMapNodeBlock = memo(({ ...node }: NodeProps<MindMapNode>) => {
   const handleContentChange = async (editor: BlockNoteEditor) => {
     // In a real app, you'd update the node data here
     const htmlContent = await editor.blocksToFullHTML(editor.document);
+    htmlContent;
   };
 
   const handleEditSubmit = () => {
@@ -209,4 +210,4 @@ const MindMapNodeBlock = memo(({ ...node }: NodeProps<MindMapNode>) => {
   );
 });
 
-export default MindMapNodeBlock;
+export default MindMapTextNodeBlock;

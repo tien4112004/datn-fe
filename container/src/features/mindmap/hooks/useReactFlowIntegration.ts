@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useUpdateNodeInternals, useNodesInitialized, type Connection } from '@xyflow/react';
 import { useMindmapStore } from '../stores/useMindmapStore';
 import { useLayoutStore } from '../stores/useLayoutStore';
-import type { MindMapNode } from '../types';
+import type { BaseMindMapNode } from '../types';
 import { useClipboardStore } from '../stores';
 
 export const useReactFlowIntegration = () => {
@@ -65,7 +65,8 @@ export const useReactFlowIntegration = () => {
     [storeOnConnect]
   );
 
-  const onNodeDrag = useCallback((_: MouseEvent, node: MindMapNode) => {
+  const onNodeDrag = useCallback((_: MouseEvent, node: BaseMindMapNode) => {
+    node;
     // TODO: Implement logic to make dragging node a child of the intersecting node after auto layout
   }, []);
 

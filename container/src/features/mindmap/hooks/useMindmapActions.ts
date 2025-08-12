@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import { useReactFlow } from '@xyflow/react';
 import { useMindmapStore } from '../stores/useMindmapStore';
 import { useClipboardStore } from '../stores/useClipboardStore';
-import type { MindMapNode, MindMapEdge, MindmapActionsType } from '../types';
+import type { BaseMindMapNode, MindMapEdge, MindmapActionsType } from '../types';
 
 /**
  * Hook that provides action functions for mindmap operations.
@@ -19,12 +19,12 @@ export const useMindmapActions = (): MindmapActionsType => {
   const clipboardPasteClonedNodesAndEdges = useClipboardStore((state) => state.pasteClonedNodesAndEdges);
 
   const selectAllNodesAndEdges = useCallback(() => {
-    setNodes((nds: MindMapNode[]) => nds.map((node: MindMapNode) => ({ ...node, selected: true })));
+    setNodes((nds: BaseMindMapNode[]) => nds.map((node: BaseMindMapNode) => ({ ...node, selected: true })));
     setEdges((eds: MindMapEdge[]) => eds.map((edge: MindMapEdge) => ({ ...edge, selected: true })));
   }, []);
 
   const deselectAllNodesAndEdges = useCallback(() => {
-    setNodes((nds: MindMapNode[]) => nds.map((node: MindMapNode) => ({ ...node, selected: false })));
+    setNodes((nds: BaseMindMapNode[]) => nds.map((node: BaseMindMapNode) => ({ ...node, selected: false })));
     setEdges((eds: MindMapEdge[]) => eds.map((edge: MindMapEdge) => ({ ...edge, selected: false })));
   }, []);
 

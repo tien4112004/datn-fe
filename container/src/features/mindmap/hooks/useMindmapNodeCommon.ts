@@ -23,17 +23,13 @@ export interface UseMindmapNodeCommonReturn<T extends BaseMindMapNode = BaseMind
   connections: any[];
   canCreateLeft: boolean;
   canCreateRight: boolean;
-
-  // Node data
-  nodeId: string;
-  nodeData: T['data'];
-  isSelected: boolean;
+  node: NodeProps<T>;
 }
 
 export const useMindmapNodeCommon = <T extends BaseMindMapNode = BaseMindMapNode>({
   node,
 }: UseMindmapNodeCommonProps<T>): UseMindmapNodeCommonReturn<T> => {
-  const { data, selected, id } = node;
+  const { id } = node;
   const [isMouseOver, setIsMouseOver] = useState(false);
 
   // Store hooks
@@ -75,9 +71,6 @@ export const useMindmapNodeCommon = <T extends BaseMindMapNode = BaseMindMapNode
     canCreateLeft,
     canCreateRight,
 
-    // Node data
-    nodeId: id,
-    nodeData: data,
-    isSelected: selected || false,
+    node: node,
   };
 };

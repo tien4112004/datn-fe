@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { BaseNode } from '@/features/mindmap/components/ui/base-node';
 import { cn } from '@/shared/lib/utils';
 import type { MindMapNode } from '../../types';
+import { NodeResizer } from '@xyflow/react';
 
 export interface MindmapNodeBaseProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
   nodeId: string;
@@ -41,14 +42,13 @@ export const MindmapNodeBase = forwardRef<HTMLDivElement, MindmapNodeBaseProps>(
       }
     };
 
-    const baseStyles = cn('w-fit h-fit p-2');
+    const baseStyles = '';
 
     const cardStyles = cn(
       'bg-card text-card-foreground relative',
       'hover:ring-1',
       '[.react-flow\\_\\_node.selected_&]:border-muted-foreground',
       '[.react-flow\\_\\_node.selected_&]:shadow-lg',
-      isSelected ? 'ring-2' : 'ring-0',
       isLayouting && 'shadow-lg ring-2 ring-blue-300',
       'rounded-md border rounded-lg border-2 shadow-md'
     );
@@ -72,6 +72,7 @@ export const MindmapNodeBase = forwardRef<HTMLDivElement, MindmapNodeBaseProps>(
               {...props}
             >
               {children}
+              <NodeResizer color="#ff0071" isVisible={isSelected} minWidth={100} minHeight={30} />
             </BaseNode>
           ) : (
             <div
@@ -83,6 +84,7 @@ export const MindmapNodeBase = forwardRef<HTMLDivElement, MindmapNodeBaseProps>(
               {...props}
             >
               {children}
+              <NodeResizer color="#ff0071" isVisible={isSelected} minWidth={100} minHeight={30} />
             </div>
           )}
         </motion.div>

@@ -11,6 +11,7 @@ import { useMindmapNodeCommon } from '../../hooks/useMindmapNodeCommon';
 import { MindmapNodeBase } from './MindmapNodeBase';
 
 const MindMapShapeNodeBlock = memo(({ ...node }: NodeProps<MindMapShapeNode>) => {
+  const { id: nodeId, data: nodeData, selected: isSelected, width, height } = node;
   const {
     isMouseOver,
     setIsMouseOver,
@@ -20,9 +21,6 @@ const MindMapShapeNodeBlock = memo(({ ...node }: NodeProps<MindMapShapeNode>) =>
     finalizeNodeDeletion,
     canCreateLeft,
     canCreateRight,
-    nodeId,
-    nodeData,
-    isSelected,
   } = useMindmapNodeCommon<MindMapShapeNode>({ node });
 
   const updateNodeData = useMindmapStore((state) => state.updateNodeData);
@@ -47,13 +45,13 @@ const MindMapShapeNodeBlock = memo(({ ...node }: NodeProps<MindMapShapeNode>) =>
         xmlns="http://www.w3.org/2000/svg"
         preserveAspectRatio="none"
         className="h-full w-full"
-        viewBox={`0 0 ${nodeData.width || 200} ${nodeData.height || 100}`}
+        viewBox={`0 0 ${width || 200} ${height || 100}`}
       >
         {nodeData.shape === 'circle' && (
           <circle
-            cx={nodeData.width ? nodeData.width / 2 : 100}
-            cy={nodeData.height ? nodeData.height / 2 : 50}
-            r={Math.min(nodeData.width || 200, nodeData.height || 100) / 2 - 5}
+            cx={width ? width / 2 : 100}
+            cy={height ? height / 2 : 50}
+            r={Math.min(width || 200, height || 100) / 2 - 5}
             fill={nodeData.metadata?.fill || 'lightblue'}
             stroke={nodeData.metadata?.stroke || 'blue'}
             strokeWidth={nodeData.metadata?.strokeWidth || 2}
@@ -61,10 +59,10 @@ const MindMapShapeNodeBlock = memo(({ ...node }: NodeProps<MindMapShapeNode>) =>
         )}
         {nodeData.shape === 'ellipse' && (
           <ellipse
-            cx={nodeData.width ? nodeData.width / 2 : 100}
-            cy={nodeData.height ? nodeData.height / 2 : 50}
-            rx={(nodeData.width || 200) / 2 - 5}
-            ry={(nodeData.height || 100) / 2 - 5}
+            cx={width ? width / 2 : 100}
+            cy={height ? height / 2 : 50}
+            rx={(width || 200) / 2 - 5}
+            ry={(height || 100) / 2 - 5}
             fill={nodeData.metadata?.fill || 'lightgreen'}
             stroke={nodeData.metadata?.stroke || 'green'}
             strokeWidth={nodeData.metadata?.strokeWidth || 2}
@@ -74,8 +72,8 @@ const MindMapShapeNodeBlock = memo(({ ...node }: NodeProps<MindMapShapeNode>) =>
           <rect
             x="5"
             y="5"
-            width={(nodeData.width || 200) - 10}
-            height={(nodeData.height || 100) - 10}
+            width={(width || 200) - 10}
+            height={(height || 100) - 10}
             fill={nodeData.metadata?.fill || 'lightblue'}
             stroke={nodeData.metadata?.stroke || 'blue'}
             strokeWidth={nodeData.metadata?.strokeWidth || 2}

@@ -14,6 +14,7 @@ import { MindmapNodeBase } from './MindmapNodeBase';
 import { BaseNodeContent } from '../ui/base-node';
 
 const MindMapTextNodeBlock = memo(({ ...node }: NodeProps<MindMapTextNode>) => {
+  const { id: nodeId, data: nodeData, selected: isSelected } = node;
   const {
     isMouseOver,
     setIsMouseOver,
@@ -23,9 +24,6 @@ const MindMapTextNodeBlock = memo(({ ...node }: NodeProps<MindMapTextNode>) => {
     finalizeNodeDeletion,
     canCreateLeft,
     canCreateRight,
-    nodeId,
-    nodeData,
-    isSelected,
   } = useMindmapNodeCommon<MindMapTextNode>({ node });
 
   const [, setIsEditing] = useState(false);

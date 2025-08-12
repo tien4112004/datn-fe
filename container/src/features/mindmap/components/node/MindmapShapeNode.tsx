@@ -3,12 +3,12 @@ import { Button } from '@/components/ui/button';
 import { memo } from 'react';
 import { Position, type NodeProps } from '@xyflow/react';
 import { cn } from '@/shared/lib/utils';
-import { DIRECTION } from '../constants';
-import type { MindMapShapeNode } from '../types';
+import { DIRECTION } from '../../constants';
+import type { MindMapShapeNode } from '../../types';
 import { BaseHandle } from '@/features/mindmap/components/ui/base-handle';
-import { useMindmapStore } from '../stores/useMindmapStore';
-import { useMindmapNodeCommon } from '../hooks/useMindmapNodeCommon';
-import { MindmapNodeBase } from './shared/MindmapNodeBase';
+import { useMindmapStore } from '../../stores/useMindmapStore';
+import { useMindmapNodeCommon } from '../../hooks/useMindmapNodeCommon';
+import { MindmapNodeBase } from './MindmapNodeBase';
 
 const MindMapShapeNodeBlock = memo(({ ...node }: NodeProps<MindMapShapeNode>) => {
   const {
@@ -41,46 +41,49 @@ const MindMapShapeNodeBlock = memo(({ ...node }: NodeProps<MindMapShapeNode>) =>
       onMouseEnter={() => setIsMouseOver(true)}
       onMouseLeave={() => setIsMouseOver(false)}
       onAnimationComplete={finalizeNodeDeletion}
-      contentClassName="p-0"
+      variant="replacing"
     >
-      <div className="flex items-center justify-center">
-        <svg width={nodeData.width || 200} height={nodeData.height || 100}>
-          {nodeData.shape === 'circle' && (
-            <circle
-              cx={nodeData.width ? nodeData.width / 2 : 100}
-              cy={nodeData.height ? nodeData.height / 2 : 50}
-              r={Math.min(nodeData.width || 200, nodeData.height || 100) / 2 - 5}
-              fill={nodeData.metadata?.fill || 'lightblue'}
-              stroke={nodeData.metadata?.stroke || 'blue'}
-              strokeWidth={nodeData.metadata?.strokeWidth || 2}
-            />
-          )}
-          {nodeData.shape === 'ellipse' && (
-            <ellipse
-              cx={nodeData.width ? nodeData.width / 2 : 100}
-              cy={nodeData.height ? nodeData.height / 2 : 50}
-              rx={(nodeData.width || 200) / 2 - 5}
-              ry={(nodeData.height || 100) / 2 - 5}
-              fill={nodeData.metadata?.fill || 'lightgreen'}
-              stroke={nodeData.metadata?.stroke || 'green'}
-              strokeWidth={nodeData.metadata?.strokeWidth || 2}
-            />
-          )}
-          {(!nodeData.shape || nodeData.shape === 'rectangle') && (
-            <rect
-              x="5"
-              y="5"
-              width={(nodeData.width || 200) - 10}
-              height={(nodeData.height || 100) - 10}
-              fill={nodeData.metadata?.fill || 'lightblue'}
-              stroke={nodeData.metadata?.stroke || 'blue'}
-              strokeWidth={nodeData.metadata?.strokeWidth || 2}
-              rx={nodeData.metadata?.borderRadius || 8}
-              ry={nodeData.metadata?.borderRadius || 8}
-            />
-          )}
-        </svg>
-      </div>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        preserveAspectRatio="none"
+        className="h-full w-full"
+        viewBox={`0 0 ${nodeData.width || 200} ${nodeData.height || 100}`}
+      >
+        {nodeData.shape === 'circle' && (
+          <circle
+            cx={nodeData.width ? nodeData.width / 2 : 100}
+            cy={nodeData.height ? nodeData.height / 2 : 50}
+            r={Math.min(nodeData.width || 200, nodeData.height || 100) / 2 - 5}
+            fill={nodeData.metadata?.fill || 'lightblue'}
+            stroke={nodeData.metadata?.stroke || 'blue'}
+            strokeWidth={nodeData.metadata?.strokeWidth || 2}
+          />
+        )}
+        {nodeData.shape === 'ellipse' && (
+          <ellipse
+            cx={nodeData.width ? nodeData.width / 2 : 100}
+            cy={nodeData.height ? nodeData.height / 2 : 50}
+            rx={(nodeData.width || 200) / 2 - 5}
+            ry={(nodeData.height || 100) / 2 - 5}
+            fill={nodeData.metadata?.fill || 'lightgreen'}
+            stroke={nodeData.metadata?.stroke || 'green'}
+            strokeWidth={nodeData.metadata?.strokeWidth || 2}
+          />
+        )}
+        {(!nodeData.shape || nodeData.shape === 'rectangle') && (
+          <rect
+            x="5"
+            y="5"
+            width={(nodeData.width || 200) - 10}
+            height={(nodeData.height || 100) - 10}
+            fill={nodeData.metadata?.fill || 'lightblue'}
+            stroke={nodeData.metadata?.stroke || 'blue'}
+            strokeWidth={nodeData.metadata?.strokeWidth || 2}
+            rx={nodeData.metadata?.borderRadius || 8}
+            ry={nodeData.metadata?.borderRadius || 8}
+          />
+        )}
+      </svg>
 
       {/* Add Child Buttons */}
       <Button

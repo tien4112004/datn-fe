@@ -65,7 +65,7 @@ export const BaseNodeContent = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDiv
     <div
       ref={ref}
       data-slot="base-node-content"
-      className={cn('flex flex-col gap-y-2 p-3', className)}
+      className={cn('flex flex-col gap-y-2', className)}
       {...props}
     />
   )

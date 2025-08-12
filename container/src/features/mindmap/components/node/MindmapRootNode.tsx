@@ -1,18 +1,17 @@
 import { Plus, GripVertical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useState, useEffect, memo } from 'react';
+import { useState, memo } from 'react';
 import { Position, type NodeProps } from '@xyflow/react';
 import { cn } from '@/shared/lib/utils';
-import RichTextEditor from '@/shared/components/rte/RichTextEditor';
-import { useRichTextEditor } from '@/shared/components/rte/useRichTextEditor';
-import { BlockNoteEditor } from '@blocknote/core';
-import { DIRECTION, DragHandle } from '../constants';
-import type { MindMapTextNode } from '../types';
+import { DIRECTION, DragHandle } from '../../constants';
+import type { MindMapRootNode } from '../../types';
 import { BaseHandle } from '@/features/mindmap/components/ui/base-handle';
-import { useMindmapNodeCommon } from '../hooks/useMindmapNodeCommon';
-import { MindmapNodeBase } from './shared/MindmapNodeBase';
+import { useMindmapNodeCommon } from '../../hooks/useMindmapNodeCommon';
+import { MindmapNodeBase } from './MindmapNodeBase';
+import { Input } from '@/components/ui/input';
+import { BaseNodeContent } from '../ui/base-node';
 
-const MindMapTextNodeBlock = memo(({ ...node }: NodeProps<MindMapTextNode>) => {
+const MindmapRootNodeBlock = memo(({ ...node }: NodeProps<MindMapRootNode>) => {
   const {
     isMouseOver,
     setIsMouseOver,
@@ -25,27 +24,9 @@ const MindMapTextNodeBlock = memo(({ ...node }: NodeProps<MindMapTextNode>) => {
     nodeId,
     nodeData,
     isSelected,
-  } = useMindmapNodeCommon<MindMapTextNode>({ node });
+  } = useMindmapNodeCommon<MindMapRootNode>({ node });
 
   const [, setIsEditing] = useState(false);
-  const editor = useRichTextEditor({
-    trailingBlock: false,
-    placeholders: { default: '', heading: '', emptyBlock: '' },
-  });
-
-  useEffect(() => {
-    async function loadInitialHTML() {
-      const blocks = await editor.tryParseHTMLToBlocks(nodeData.content);
-      editor.replaceBlocks(editor.document, blocks);
-    }
-    loadInitialHTML();
-  }, [editor, nodeData.content]);
-
-  const handleContentChange = async (editor: BlockNoteEditor) => {
-    // In a real app, you'd update the node data here
-    const htmlContent = await editor.blocksToFullHTML(editor.document);
-    htmlContent;
-  };
 
   const handleEditSubmit = () => {
     setIsEditing(false);
@@ -67,27 +48,25 @@ const MindMapTextNodeBlock = memo(({ ...node }: NodeProps<MindMapTextNode>) => {
       onMouseEnter={() => setIsMouseOver(true)}
       onMouseLeave={() => setIsMouseOver(false)}
       onAnimationComplete={finalizeNodeDeletion}
-      contentClassName="flex flex-row items-stretch gap-2 p-0"
     >
-      <div className={cn('p-2 pr-0', DragHandle.CLASS)}>
-        <GripVertical
-          className={cn(
-            'h-full w-5',
-            isMouseOver || isSelected ? 'opacity-100' : 'opacity-50',
-            layout === DIRECTION.NONE ? 'cursor-move' : 'cursor-default'
-          )}
-        />
-      </div>
-      <div className="min-w-[100px] max-w-[300px] cursor-text p-2 pl-0" onKeyDown={handleKeyPress}>
-        <RichTextEditor
-          editor={editor}
-          onChange={handleContentChange}
-          sideMenu={false}
-          slashMenu={false}
-          className="m-0 min-h-[24px] border-none p-0"
+      <BaseNodeContent className="flex flex-row items-stretch gap-2 p-0">
+        <div className={cn('p-2 pr-0', DragHandle.CLASS)}>
+          <GripVertical
+            className={cn(
+              'h-full w-5',
+              isMouseOver || isSelected ? 'opacity-100' : 'opacity-50',
+              layout === DIRECTION.NONE ? 'cursor-move' : 'cursor-default'
+            )}
+          />
+        </div>
+        <Input
+          type="text"
+          className="min-w-[100px] max-w-[300px] cursor-text border-none bg-transparent p-2 pl-0 outline-none"
+          value={nodeData.content || ''}
+          onKeyDown={handleKeyPress}
           onBlur={handleEditSubmit}
         />
-      </div>
+      </BaseNodeContent>
 
       {/* Add Child Buttons */}
       <Button
@@ -163,4 +142,4 @@ const MindMapTextNodeBlock = memo(({ ...node }: NodeProps<MindMapTextNode>) => {
   );
 });
 
-export default MindMapTextNodeBlock;
+export default MindmapRootNodeBlock;

@@ -17,8 +17,8 @@ const initialNodes: BaseMindMapNode[] = [
       content: '<p>Left Shape Node</p>',
       parentId: 'left-1',
       shape: 'rectangle',
-      width: 200,
-      height: 100,
+      width: 250,
+      height: 150,
       metadata: {
         fill: 'lightblue',
         stroke: 'blue',

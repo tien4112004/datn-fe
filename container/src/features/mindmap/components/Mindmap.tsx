@@ -1,8 +1,6 @@
 import '@xyflow/react/dist/style.css';
 import { Background, BackgroundVariant, Controls, MiniMap, ReactFlow } from '@xyflow/react';
 import { useReactFlowIntegration } from '../hooks/useReactFlowIntegration';
-import MindMapTextNodeBlock from './MindmapTextNode';
-import MindmapRootNodeBlock from './MindmapRootNode';
 import MindmapEdgeBlock from './MindmapEdge';
 import MindmapToolbar from './MindmapToolbar';
 import MindmapInstructions from './MindmapInstructions';
@@ -12,7 +10,9 @@ import { DevTools } from '@/features/mindmap/components/ui/devtools';
 import { useMindmapStore } from '../stores';
 import { useClipboardStore } from '../stores';
 import { useShallow } from 'zustand/react/shallow';
-import MindMapShapeNodeBlock from './MindmapShapeNode';
+import MindMapShapeNodeBlock from './node/MindmapShapeNode';
+import MindMapTextNodeBlock from './node/MindmapTextNode';
+import MindmapRootNodeBlock from './node/MindmapRootNode';
 
 const nodeTypes = {
   mindMapNode: MindMapTextNodeBlock,

@@ -27,22 +27,22 @@ const initialNodes: BaseMindMapNode[] = [
     },
   },
 
-  //   // Central root
-  //   {
-  //     id: 'root',
-  //     type: 'mindMapRootNode',
-  //     position: { x: 400, y: 300 },
-  //     data: { level: 0, content: '<p>Central Topic</p>' },
-  //     dragHandle: DragHandle.SELECTOR,
-  //   },
-  //   // Left side branch (going left from center)
-  //   {
-  //     id: 'left-1',
-  //     type: 'mindMapNode',
-  //     position: { x: 250, y: 300 },
-  //     data: { level: 1, content: '<p>Left Branch</p>', parentId: 'root' },
-  //     dragHandle: DragHandle.SELECTOR,
-  //   },
+  // Central root
+  {
+    id: 'root',
+    type: MINDMAP_TYPES.MINDMAP_ROOT_NODE,
+    position: { x: 400, y: 300 },
+    data: { level: 0, content: '<p>Central Topic</p>' },
+    dragHandle: DragHandle.SELECTOR,
+  },
+  // Left side branch (going left from center)
+  {
+    id: 'left-1',
+    type: MINDMAP_TYPES.MINDMAP_TEXT_NODE,
+    position: { x: 250, y: 300 },
+    data: { level: 1, content: '<p>Left Branch</p>', parentId: 'root' },
+    dragHandle: DragHandle.SELECTOR,
+  },
   //   {
   //     id: 'left-2',
   //     type: 'mindMapNode',

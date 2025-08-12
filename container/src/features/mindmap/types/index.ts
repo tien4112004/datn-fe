@@ -36,15 +36,19 @@ export interface MindMapTextNodeData extends BaseMindMapNodeData {
   content: string;
 }
 
-export type MindMapTextNode = BaseMindMapNode<MindMapTextNodeData, typeof MINDMAP_TYPES.MINDMAP_TEXT_NODE>;
+export interface MindMapTextNode
+  extends BaseMindMapNode<MindMapTextNodeData, typeof MINDMAP_TYPES.MINDMAP_TEXT_NODE> {
+  content: string;
+}
 
 export interface MindMapRootNodeData extends BaseMindMapNodeData {
   content: string;
 }
 
-export type MindMapRootNode = BaseMindMapNode<MindMapRootNodeData, typeof MINDMAP_TYPES.MINDMAP_ROOT_NODE> & {
+export interface MindMapRootNode
+  extends BaseMindMapNode<MindMapRootNodeData, typeof MINDMAP_TYPES.MINDMAP_ROOT_NODE> {
   content: string;
-};
+}
 
 interface MindMapShapeNodeData extends BaseMindMapNodeData {
   shape?: 'rectangle' | 'circle' | 'ellipse';
@@ -52,7 +56,8 @@ interface MindMapShapeNodeData extends BaseMindMapNodeData {
   height?: number;
 }
 
-export type MindMapShapeNode = BaseMindMapNode<MindMapShapeNodeData, typeof MINDMAP_TYPES.MINDMAP_SHAPE_NODE>;
+export interface MindMapShapeNode
+  extends BaseMindMapNode<MindMapShapeNodeData, typeof MINDMAP_TYPES.MINDMAP_SHAPE_NODE> {}
 
 export type MindMapEdge = Edge<{
   strokeWidth?: number;
@@ -60,6 +65,9 @@ export type MindMapEdge = Edge<{
   smoothType?: SmoothType;
   isDeleting?: boolean;
 }>;
+
+export type NodeData = MindMapTextNodeData | MindMapRootNodeData | MindMapShapeNodeData;
+export type MindMapNode = MindMapTextNode | MindMapRootNode | MindMapShapeNode;
 
 export interface MindmapActionsType {
   selectAllNodesAndEdges: () => void;

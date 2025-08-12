@@ -1,14 +1,14 @@
 import '@xyflow/react/dist/style.css';
 import { Background, BackgroundVariant, Controls, MiniMap, ReactFlow } from '@xyflow/react';
 import { useReactFlowIntegration } from '../hooks/useReactFlowIntegration';
-import MindMapTextNodeBlock from './MindmapNode';
+import MindMapTextNodeBlock from './MindmapTextNode';
 import MindmapRootNodeBlock from './MindmapRootNode';
 import MindmapEdgeBlock from './MindmapEdge';
 import MindmapToolbar from './MindmapToolbar';
 import MindmapInstructions from './MindmapInstructions';
 import { useShortcuts, useMindmapActions } from '../hooks';
 import { memo, useMemo, type ReactNode } from 'react';
-import { DevTools } from '@/components/devtools';
+import { DevTools } from '@/features/mindmap/components/ui/devtools';
 import { useMindmapStore } from '../stores';
 import { useClipboardStore } from '../stores';
 import { useShallow } from 'zustand/react/shallow';

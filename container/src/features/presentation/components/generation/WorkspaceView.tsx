@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Button } from '@/shared/components/ui/button';
 import { useTranslation } from 'react-i18next';
 import { Controller, useForm, type Control } from 'react-hook-form';
-import { Sparkles, RotateCcw } from 'lucide-react';
+import { Sparkles, RotateCcw, Square, Trash2 } from 'lucide-react';
 import OutlineWorkspace from './OutlineWorkspace';
 import PresentationCustomizationForm from './PresentationCustomizationForm';
 import { AutosizeTextarea } from '@/shared/components/ui/autosize-textarea';
@@ -16,9 +16,11 @@ import {
   SelectValue,
 } from '@/shared/components/ui/select';
 import { useModels } from '@/features/model';
-import { PRESENTATION_STYLES, SLIDE_COUNT_OPTIONS } from '@/features/presentation/constants';
-import type { OutlineData, OutlineItem } from '@/features/presentation/types/outline';
-import { usePresentationOutlines } from '@/features/presentation/hooks/useApi';
+import { PRESENTATION_STYLES, SLIDE_COUNT_OPTIONS } from '@/features/presentation/types';
+import type { OutlineData } from '@/features/presentation/types/outline';
+import useFetchStreamingOutline from '@/features/presentation/hooks/useFetchStreaming';
+// import { useOutlineContext } from '../../context/OutlineContext';
+import useOutlineStore from '@/features/presentation/stores/useOutlineStore';
 
 type OutlineFormData = {
   slideCount: string;
@@ -34,22 +36,40 @@ type CustomizationFormData = {
 };
 
 interface WorkspaceViewProps {
-  initialOutlineData: OutlineData | null;
+  initialOutlineData: OutlineData;
 }
 
 const WorkspaceView = ({ initialOutlineData }: WorkspaceViewProps) => {
+  // const { outlineItems, refetch, isFetching } = usePresentationOutlines();
+  // const { content, setContent } = useOutlineContext();
   const { t } = useTranslation('presentation', { keyPrefix: 'workspace' });
-  const { outlineItems, refetch, isFetching } = usePresentationOutlines();
-  const [items, setItems] = useState<OutlineItem[]>([]);
-  const { control: outlineControl, handleSubmit: handleRegenerateSubmit } = useForm<OutlineFormData>({
-    defaultValues: {
-      slideCount: initialOutlineData?.slideCount || '',
-      style: initialOutlineData?.style || '',
-      model: initialOutlineData?.model || '',
-      prompt: initialOutlineData?.prompt || '',
-    },
+
+  // API
+  const {
+    processedData: outlineItems,
+    isStreaming,
+    error,
+    stopStream,
+    restartStream,
+    clearContent,
+  } = useFetchStreamingOutline({
+    prompt: 'Random',
   });
 
+  if (error) {
+    throw new Error(`Error fetching outline: ${error}`);
+  }
+
+  // STORE
+  const content = useOutlineStore((state) => state.content);
+  const setContent = useOutlineStore((state) => state.setContent);
+
+  // OUTLINE FORM
+  const { control: outlineControl, handleSubmit: handleRegenerateSubmit } = useForm<OutlineFormData>({
+    defaultValues: initialOutlineData,
+  });
+
+  // CUSTOMIZATION FORM
   const {
     control: customizationControl,
     setValue,
@@ -64,21 +84,26 @@ const WorkspaceView = ({ initialOutlineData }: WorkspaceViewProps) => {
   });
 
   useEffect(() => {
-    setItems([...outlineItems]);
-  }, [isFetching]);
+    if (isStreaming && JSON.stringify(content) !== JSON.stringify(outlineItems)) {
+      setContent([...outlineItems]);
+    }
+  }, [isStreaming, outlineItems]);
 
   const onRegenerateOutline = (data: OutlineFormData) => {
     console.log('Regenerating outline with data:', data);
-    // TODO: Implement outline regeneration
 
     //
-    refetch();
+    // refetch();
+    // startStream(data);
+    restartStream({
+      prompt: data.prompt,
+    });
   };
 
   const onSubmitPresentation = (data: CustomizationFormData) => {
     const fullData = {
       ...data,
-      items,
+      content,
     };
     console.log('Form data:', fullData);
   };
@@ -92,11 +117,13 @@ const WorkspaceView = ({ initialOutlineData }: WorkspaceViewProps) => {
 
         <OutlineFormSection
           control={outlineControl}
-          isFetching={isFetching}
+          isFetching={isStreaming}
+          stopStream={stopStream}
+          clearContent={clearContent}
           onSubmit={handleRegenerateSubmit(onRegenerateOutline)}
         />
 
-        <OutlineSection items={items} setItems={setItems} isFetching={isFetching} />
+        <OutlineSection />
 
         <CustomizationSection
           control={customizationControl}
@@ -112,16 +139,23 @@ const WorkspaceView = ({ initialOutlineData }: WorkspaceViewProps) => {
 interface OutlineFormSectionProps {
   control: Control<OutlineFormData>;
   isFetching: boolean;
-  onSubmit: (data: OutlineFormData) => void;
+  stopStream: () => void;
+  clearContent: () => void;
+  onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
 }
 
-const OutlineFormSection = ({ control, isFetching, onSubmit }: OutlineFormSectionProps) => {
+const OutlineFormSection = ({
+  control,
+  isFetching,
+  stopStream,
+  clearContent,
+  onSubmit,
+}: OutlineFormSectionProps) => {
   const { t } = useTranslation('presentation', { keyPrefix: 'createOutline' });
   const { models } = useModels();
-  const { handleSubmit } = useForm<OutlineFormData>();
 
   return (
-    <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
+    <form className="flex flex-col gap-4" onSubmit={onSubmit}>
       <div className="flex w-full flex-row items-center gap-4">
         <div className="scroll-m-20 text-xl font-semibold tracking-tight">{t('promptSection')}</div>
         <div className="my-2 flex flex-1 flex-row gap-2">
@@ -189,55 +223,49 @@ const OutlineFormSection = ({ control, isFetching, onSubmit }: OutlineFormSectio
             )}
           />
         </div>
-        <Button className="ml-auto" type="submit" size="sm" disabled={isFetching}>
-          {isFetching ? (
-            <>
-              <span className="border-primary mr-2 h-4 w-4 animate-spin rounded-full border-2 border-t-transparent" />
-              {t('loading')}
-            </>
-          ) : (
-            <>
-              <RotateCcw className="mr-2 h-4 w-4" />
-              <span>{t('regenerate')}</span>
-            </>
-          )}
-        </Button>
       </div>
       <Controller
         name="prompt"
         control={control}
         render={({ field }) => <AutosizeTextarea className="text-lg" {...field} />}
       />
+      <div className="flex flex-row gap-2">
+        {isFetching && (
+          <Button size="sm" type="button" onClick={stopStream} variant="destructive">
+            <Square className="mr-2 h-4 w-4" />
+            <span>{t('stop')}</span>
+          </Button>
+        )}
+
+        <Button type="submit" size="sm" disabled={isFetching} hidden={isFetching}>
+          <RotateCcw className="mr-2 h-4 w-4" />
+          <span>{t('regenerate')}</span>
+        </Button>
+
+        <Button type="button" size="sm" onClick={clearContent} disabled={isFetching}>
+          <Trash2 className="mr-2 h-4 w-4" />
+          <span>Clear</span>
+        </Button>
+      </div>
     </form>
   );
 };
 
-interface OutlineSectionProps {
-  items: OutlineItem[];
-  setItems: (items: OutlineItem[]) => void;
-  isFetching: boolean;
-}
+// interface OutlineSectionProps {
+//   isFetching: boolean;
+// }
 
-const OutlineSection = ({ items, setItems, isFetching }: OutlineSectionProps) => {
+const OutlineSection = () => {
   const { t } = useTranslation('presentation', { keyPrefix: 'workspace' });
 
   return (
     <>
       <div className="scroll-m-20 text-xl font-semibold tracking-tight">{t('outlineSection')}</div>
-      {isFetching ? (
-        <div className="flex w-full items-center justify-center py-12">
-          <span className="border-primary mr-2 inline-block h-6 w-6 animate-spin rounded-full border-4 border-t-transparent" />
-          <span className="text-lg font-medium">{t('loadingOutline')}</span>
-        </div>
-      ) : (
-        <OutlineWorkspace
-          items={items}
-          setItems={setItems}
-          onDownload={async () => {
-            await new Promise((resolve) => setTimeout(resolve, 2000));
-          }}
-        />
-      )}
+      <OutlineWorkspace
+        onDownload={async () => {
+          await new Promise((resolve) => setTimeout(resolve, 2000));
+        }}
+      />
     </>
   );
 };
@@ -246,15 +274,14 @@ interface CustomizationSectionProps {
   control: Control<CustomizationFormData>;
   watch: any;
   setValue: any;
-  onSubmit: (data: CustomizationFormData) => void;
+  onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
 }
 
 const CustomizationSection = ({ control, watch, setValue, onSubmit }: CustomizationSectionProps) => {
   const { t } = useTranslation('presentation', { keyPrefix: 'workspace' });
-  const { handleSubmit } = useForm<CustomizationFormData>();
 
   return (
-    <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
+    <form className="flex flex-col gap-4" onSubmit={onSubmit}>
       <div className="scroll-m-20 text-xl font-semibold tracking-tight">{t('customizeSection')}</div>
       <PresentationCustomizationForm control={control} watch={watch} setValue={setValue} />
       <Button className="mt-5" type="submit">

@@ -1,10 +1,10 @@
 import { createColumnHelper, getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { PresentationItem } from '../types/presentation';
+import type { PresentationItem } from '../../types/presentation';
 import { Badge } from '@/components/ui/badge';
 import ActionButton from './ActionButton';
-import { usePresentations } from '../hooks/useApi';
+import { usePresentations } from '../../hooks/useApi';
 import DataTable from '@/components/table/DataTable';
 
 const PresentationTable = () => {

@@ -1,17 +1,13 @@
 import { useState } from 'react';
 import { Button } from '@/shared/components/ui/button';
 import { useTranslation } from 'react-i18next';
-import OutlineForm from './OutlineForm';
+import OutlineForm from '@/features/presentation/components/generation/OutlineForm';
 import type { ModelOption } from '@/features/model';
+import type { OutlineData } from '@/features/presentation/types';
 
 interface OutlineCreationViewProps {
   defaultModel: ModelOption;
-  onCreateOutline: (outlineData: {
-    prompt: string;
-    slideCount: string | undefined;
-    style: string | undefined;
-    model: string;
-  }) => void;
+  onCreateOutline: (outlineData: OutlineData) => void;
 }
 
 const OutlineCreationView = ({ defaultModel, onCreateOutline }: OutlineCreationViewProps) => {

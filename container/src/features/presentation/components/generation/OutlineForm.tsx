@@ -11,7 +11,7 @@ import { Card, CardContent, CardTitle } from '@/shared/components/ui/card';
 import { AutosizeTextarea } from '@/shared/components/ui/autosize-textarea';
 import { useTranslation } from 'react-i18next';
 import ExamplePrompts from './ExamplePrompts';
-import { PRESENTATION_STYLES, SLIDE_COUNT_OPTIONS } from '../../constants';
+import { PRESENTATION_STYLES, SLIDE_COUNT_OPTIONS } from '@/features/presentation/types';
 import { useModels } from '@/features/model';
 
 export interface OutlineFormProps {

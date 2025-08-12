@@ -18,15 +18,18 @@ import {
 import { useState } from 'react';
 import { Download, Loader, Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import type { OutlineItem } from '../../types/outline';
+import useOutlineStore from '@/features/presentation/stores/useOutlineStore';
+import { Card } from '@/components/ui/card';
+// import { useOutlineContext } from '../../context/OutlineContext';
 
 type OutlineWorkspaceProps = {
-  items: OutlineItem[];
-  setItems: (items: OutlineItem[]) => void;
   onDownload?: () => Promise<void>;
 };
 
-const OutlineWorkspace = ({ items, setItems, onDownload }: OutlineWorkspaceProps) => {
+const OutlineWorkspace = ({ onDownload }: OutlineWorkspaceProps) => {
+  // const { content, setContent } = useOutlineContext();
+  const setContent = useOutlineStore((state) => state.setContent);
+  const content = useOutlineStore((state) => state.content);
   const { t } = useTranslation('outlineWorkspace');
   const [isDownloading, setIsDownloading] = useState(false);
   const sensors = useSensors(
@@ -36,7 +39,7 @@ const OutlineWorkspace = ({ items, setItems, onDownload }: OutlineWorkspaceProps
     })
   );
 
-  const safeItems = Array.isArray(items) ? items : [];
+  const safeItems = Array.isArray(content) ? content : [];
 
   const handleOutlineCardDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
@@ -52,7 +55,7 @@ const OutlineWorkspace = ({ items, setItems, onDownload }: OutlineWorkspaceProps
         const overItemId = overId.replace('outline-card-', '');
         const oldIndex = safeItems.findIndex((item) => item.id === activeItemId);
         const newIndex = safeItems.findIndex((item) => item.id === overItemId);
-        setItems(arrayMove(safeItems, oldIndex, newIndex));
+        setContent(arrayMove(safeItems, oldIndex, newIndex));
       }
     }
   };
@@ -73,38 +76,40 @@ const OutlineWorkspace = ({ items, setItems, onDownload }: OutlineWorkspaceProps
   };
 
   const handleDelete = (id: string) => {
-    setItems(safeItems.filter((item) => item.id !== id));
-  };
-
-  const handleContentChange = (id: string, html: string) => {
-    setItems(items.map((item) => (item.id === id ? { ...item, htmlContent: html } : item)));
+    setContent(safeItems.filter((item) => item.id !== id));
   };
 
   return (
-    <div className="bg-card w-3xl flex flex-col gap-6 rounded-xl p-8">
-      <DndContext sensors={sensors} onDragEnd={handleOutlineCardDragEnd}>
-        <SortableContext
-          items={safeItems.map((item) => `outline-card-${item.id}`)}
-          strategy={verticalListSortingStrategy}
-        >
-          {safeItems.map((item, index) => (
-            <OutlineCard
-              key={item.id}
-              id={item.id}
-              title={`${index + 1}`}
-              htmlContent={item.htmlContent}
-              onDelete={() => handleDelete(item.id)}
-              onContentChange={(html) => handleContentChange(item.id, html)}
-            />
-          ))}
-        </SortableContext>
-      </DndContext>
+    <Card className="w-3xl flex flex-col gap-6 rounded-xl p-8">
+      {safeItems.length > 0 ? (
+        <DndContext sensors={sensors} onDragEnd={handleOutlineCardDragEnd}>
+          <SortableContext
+            items={safeItems.map((item) => `outline-card-${item.id}`)}
+            strategy={verticalListSortingStrategy}
+          >
+            {safeItems.map((item, index) => (
+              <OutlineCard
+                key={item.id}
+                id={item.id}
+                title={`${index + 1}`}
+                item={item}
+                onDelete={() => handleDelete(item.id)}
+              />
+            ))}
+          </SortableContext>
+        </DndContext>
+      ) : (
+        <div className="text-muted-foreground flex flex-col items-center justify-center text-center">
+          <div className="text-lg font-medium">{t('noOutlineCards')}</div>
+          <div className="text-sm">{t('clickAddToStart')}</div>
+        </div>
+      )}
 
       {/* Add button */}
       <Button
         variant={'outline'}
         className="mt-4 w-full"
-        onClick={() => setItems([...safeItems, { id: Date.now().toString(), htmlContent: '' }])}
+        onClick={() => setContent([...safeItems, { id: Date.now().toString(), htmlContent: '' }])}
       >
         <Plus className="h-4 w-4" />
         {t('addOutlineCard')}
@@ -126,7 +131,7 @@ const OutlineWorkspace = ({ items, setItems, onDownload }: OutlineWorkspaceProps
           {isDownloading ? t('downloading') : t('downloadOutline')}
         </Button>
       </div>
-    </div>
+    </Card>
   );
 };
 

@@ -7,25 +7,22 @@ import { BlockNoteEditor } from '@blocknote/core';
 import { useSortable } from '@dnd-kit/sortable';
 import { Trash } from 'lucide-react';
 import React from 'react';
+import useOutlineStore from '@/features/presentation/stores/useOutlineStore';
+import type { OutlineItem } from '../../types';
+// import { useOutlineContext } from '../../context/OutlineContext';
 
 interface OutlineCardProps {
   id: string;
-  title?: string;
+  title: string;
+  item: OutlineItem;
   className?: string;
-  htmlContent?: string;
   onDelete?: () => void;
-  onContentChange: (html: string) => void;
 }
 
-const OutlineCard = ({
-  id,
-  title = 'Outline',
-  className = '',
-  htmlContent = '',
-  onDelete,
-  onContentChange,
-}: OutlineCardProps) => {
+const OutlineCard = ({ id, title = 'Outline', className = '', item, onDelete }: OutlineCardProps) => {
   const [isDeleting, setIsDeleting] = React.useState(false);
+  // const { handleContentChange } = useOutlineContext();
+  const handleContentChange = useOutlineStore((state) => state.handleContentChange);
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: `outline-card-${id.toString()}`,
   });
@@ -35,11 +32,11 @@ const OutlineCard = ({
 
   React.useEffect(() => {
     async function loadInitialHTML() {
-      const blocks = await editor.tryParseHTMLToBlocks(htmlContent);
+      const blocks = await editor.tryParseHTMLToBlocks(item.htmlContent);
       editor.replaceBlocks(editor.document, blocks);
     }
     loadInitialHTML();
-  }, [editor]);
+  }, [item.htmlContent]);
 
   const handleDelete = () => {
     if (!onDelete) return;
@@ -48,11 +45,6 @@ const OutlineCard = ({
     setTimeout(() => {
       onDelete();
     }, 300);
-  };
-
-  const handleContentChange = async (editor: BlockNoteEditor) => {
-    const htmlContent = await editor.blocksToFullHTML(editor.document);
-    onContentChange(htmlContent);
   };
 
   const style = {
@@ -88,7 +80,10 @@ const OutlineCard = ({
         <RichTextEditor
           data-card
           editor={editor}
-          onChange={handleContentChange}
+          onChange={() => async (editor: BlockNoteEditor) => {
+            const htmlContent = await editor.blocksToFullHTML(editor.document);
+            handleContentChange?.(id, htmlContent);
+          }}
           sideMenu={false}
           className="-mx-2"
         />

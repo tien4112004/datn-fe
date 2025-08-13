@@ -53,7 +53,12 @@ const WorkspaceView = ({ initialOutlineData }: WorkspaceViewProps) => {
     restartStream,
     clearContent,
   } = useFetchStreamingOutline({
-    prompt: 'Random',
+    topic: initialOutlineData.prompt,
+    slideCount: parseInt(initialOutlineData.slideCount || '0', 10),
+    model: 'gemini-2.5-flash',
+    language: 'vn',
+    targetAge: '7-10',
+    learningObjective: 'something',
   });
 
   if (error) {
@@ -96,7 +101,12 @@ const WorkspaceView = ({ initialOutlineData }: WorkspaceViewProps) => {
     // refetch();
     // startStream(data);
     restartStream({
-      prompt: data.prompt,
+      topic: data.prompt,
+      slideCount: parseInt(data.slideCount, 10),
+      model: 'gemini-2.5-flash',
+      language: 'vn',
+      targetAge: '7-10',
+      learningObjective: 'something',
     });
   };
 

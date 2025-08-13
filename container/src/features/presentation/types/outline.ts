@@ -11,8 +11,10 @@ export type OutlineData = {
 };
 
 export interface OutlinePromptRequest {
-  prompt: string;
-  topic?: string;
-  maxLength?: number;
-  // Add other properties as needed
+  topic: string;
+  slideCount: number;
+  language: string;
+  model: string;
+  targetAge: string;
+  learningObjective: string;
 }

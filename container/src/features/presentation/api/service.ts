@@ -74,7 +74,7 @@ export default class PresentationRealApiService implements PresentationApiServic
   getStreamedOutline(request: OutlinePromptRequest, signal: AbortSignal): AsyncIterable<string> {
     return {
       async *[Symbol.asyncIterator]() {
-        const response = await fetch('http://localhost:8080/presentations/mock-outline', {
+        const response = await fetch('http://localhost:8080/api/ai/presentations/outline-generate', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

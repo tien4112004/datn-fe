@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { useMindmapStore } from '../../stores/useMindmapStore';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { useLayoutStore } from '../../stores/useLayoutStore';
-import type { Direction } from '../../constants';
+import type { Direction } from '../../types/constants';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { useClipboardStore } from '../../stores';
 import { useReactFlow } from '@xyflow/react';

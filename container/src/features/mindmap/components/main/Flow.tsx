@@ -18,7 +18,7 @@ const edgeTypes = {
   mindmapEdge: EdgeBlock,
 };
 
-const Flow = memo(({ children }: { children: ReactNode }) => {
+const Flow = memo(({ children, isPanOnDrag }: { children: ReactNode; isPanOnDrag: boolean }) => {
   const { onConnect, onNodeDrag, onPaneMouseMove, onPaneClick } = useReactFlowIntegration();
   const { nodes, edges, onNodesChange, onEdgesChange } = useMindmapStore(
     useShallow((state) => ({
@@ -46,6 +46,8 @@ const Flow = memo(({ children }: { children: ReactNode }) => {
       onPaneMouseMove={onPaneMouseMove}
       onPaneClick={onPaneClick}
       onNodeDrag={onNodeDrag}
+      panOnDrag={isPanOnDrag}
+      selectionOnDrag={!isPanOnDrag}
       fitView
     >
       {children}

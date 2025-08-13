@@ -1,5 +1,5 @@
 import type { Node, Edge } from '@xyflow/react';
-import type { Direction } from '../constants';
+import type { Direction } from './constants';
 
 export const MINDMAP_TYPES = {
   TEXT_NODE: 'mindMapNode',
@@ -61,7 +61,7 @@ export type MindMapEdge = Edge<{
 }>;
 
 export type NodeData = TextNodeData | RootNodeData | ShapeNodeData;
-export type MindMapNode = TextNode | RootNode | ShapeNode;
+export type MindMapNode = TextNode | RootNode | ShapeNode | BaseNode;
 
 export interface MindmapActionsType {
   selectAllNodesAndEdges: () => void;

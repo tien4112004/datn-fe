@@ -3,7 +3,7 @@ import { useUpdateNodeInternals, type NodeProps } from '@xyflow/react';
 import { useMindmapStore } from '../stores/useMindmapStore';
 import { useLayoutStore } from '../stores/useLayoutStore';
 import type { BaseNode } from '../types';
-import type { Direction } from '../constants';
+import type { Direction } from '../types/constants';
 
 export interface UseNodeCommonProps<T extends BaseNode = BaseNode> {
   node: NodeProps<T>;

@@ -1,13 +1,14 @@
 import { create } from 'zustand';
-import { addEdge, applyNodeChanges, applyEdgeChanges, useReactFlow } from '@xyflow/react';
+import { addEdge, applyNodeChanges, applyEdgeChanges } from '@xyflow/react';
 import type { Connection, XYPosition } from '@xyflow/react';
-import { type BaseNode, type MindMapEdge, MINDMAP_TYPES } from '../types';
-import { DragHandle } from '../constants';
+import { type MindMapNode, type MindMapEdge, MINDMAP_TYPES } from '../types';
+import { DragHandle } from '../types/constants';
 import { generateId } from '@/shared/lib/utils';
 import { devtools } from 'zustand/middleware';
 import { useClipboardStore } from './useClipboardStore';
+import { getAllDescendantNodes } from '../services/utils';
 
-const initialNodes: BaseNode[] = [
+const initialNodes: MindMapNode[] = [
   // Central root
   {
     id: 'root',
@@ -15,6 +16,8 @@ const initialNodes: BaseNode[] = [
     position: { x: 0, y: 0 },
     data: { level: 0, content: '<p>Central Topic</p>', side: 'mid' },
     dragHandle: DragHandle.SELECTOR,
+    width: 250,
+    height: 100,
   },
   // Left side branch (going left from center)
   {
@@ -23,6 +26,8 @@ const initialNodes: BaseNode[] = [
     position: { x: 250, y: 300 },
     data: { level: 1, content: '<p>Left Branch</p>', parentId: 'root', side: 'left' },
     dragHandle: DragHandle.SELECTOR,
+    width: 400,
+    height: 80,
   },
   {
     id: 'left-4',
@@ -33,7 +38,6 @@ const initialNodes: BaseNode[] = [
       content: '<p>Left Shape Node</p>',
       parentId: 'left-1',
       shape: 'rectangle',
-
       metadata: {
         fill: 'lightblue',
         stroke: 'blue',
@@ -41,7 +45,7 @@ const initialNodes: BaseNode[] = [
       },
       side: 'left',
     },
-    width: 250,
+    width: 300,
     height: 150,
   },
   {
@@ -50,6 +54,8 @@ const initialNodes: BaseNode[] = [
     position: { x: 200, y: 200 },
     data: { level: 2, content: '<p>Left Child</p>', parentId: 'left-1', side: 'left' },
     dragHandle: DragHandle.SELECTOR,
+    width: 150,
+    height: 60,
   },
   {
     id: 'right-1',
@@ -57,6 +63,8 @@ const initialNodes: BaseNode[] = [
     position: { x: 550, y: 300 },
     data: { level: 1, content: '<p>Right Branch</p>', parent: 'root', side: 'right' },
     dragHandle: DragHandle.SELECTOR,
+    width: 200,
+    height: 80,
   },
   {
     id: 'right-2',
@@ -64,6 +72,8 @@ const initialNodes: BaseNode[] = [
     position: { x: 600, y: 200 },
     data: { level: 2, content: '<p>Right Child</p>', parentId: 'right-1', side: 'right' },
     dragHandle: DragHandle.SELECTOR,
+    width: 500,
+    height: 60,
   },
   {
     id: 'right-3',
@@ -76,7 +86,7 @@ const initialNodes: BaseNode[] = [
       shape: 'circle',
       side: 'right',
     },
-    width: 150,
+    width: 180,
     height: 150,
   },
 ];
@@ -157,20 +167,20 @@ const initialEdges: MindMapEdge[] = [
 ];
 
 interface MindmapState {
-  nodes: BaseNode[];
+  nodes: MindMapNode[];
   edges: MindMapEdge[];
   nodeId: number;
   onNodesChange: (changes: any) => void;
   onEdgesChange: (changes: any) => void;
   onConnect: (connection: Connection) => void;
-  setNodes: (updater: BaseNode[] | ((nodes: BaseNode[]) => BaseNode[])) => void;
+  setNodes: (updater: MindMapNode[] | ((nodes: MindMapNode[]) => MindMapNode[])) => void;
   setEdges: (updater: MindMapEdge[] | ((edges: MindMapEdge[]) => MindMapEdge[])) => void;
   addNode: () => void;
   logData: () => void;
-  addChildNode: (parentNode: Partial<BaseNode>, position: XYPosition, side: string) => void;
-  updateNodeData: (nodeId: string, updates: Partial<BaseNode['data']>) => void;
+  addChildNode: (parentNode: Partial<MindMapNode>, position: XYPosition, side: string) => void;
+  updateNodeData: (nodeId: string, updates: Partial<MindMapNode['data']>) => void;
+  updateNodeDataWithUndo: (nodeId: string, updates: Partial<MindMapNode['data']>) => void;
   syncState: (updateNodeInternals: any) => void;
-  getAllDescendantNodes: (parentId: string) => BaseNode[];
   nodesToBeDeleted: Set<string>;
   deleteSelectedNodes: () => void;
   markNodeForDeletion: (nodeId: string) => void;
@@ -244,7 +254,7 @@ export const useMindmapStore = create<MindmapState>()(
 
     addNode: () => {
       const { nodes, nodeId } = get();
-      const newNode: BaseNode = {
+      const newNode: MindMapNode = {
         id: generateId(),
         type: MINDMAP_TYPES.TEXT_NODE,
         position: {
@@ -264,16 +274,21 @@ export const useMindmapStore = create<MindmapState>()(
       );
     },
 
-    addChildNode: (parentNode: Partial<BaseNode>, position: XYPosition, side: 'left' | 'right' | 'mid') => {
+    addChildNode: (
+      parentNode: Partial<MindMapNode>,
+      position: XYPosition,
+      side: 'left' | 'right' | 'mid'
+    ) => {
       const pushUndo = useClipboardStore.getState().pushToUndoStack;
       pushUndo(get().nodes, get().edges);
 
-      const newNode: BaseNode = {
-        id: generateId(),
+      const id = generateId();
+      const newNode: MindMapNode = {
+        id,
         type: MINDMAP_TYPES.TEXT_NODE,
         data: {
           level: parentNode.data?.level ? parentNode.data.level + 1 : 1,
-          content: '<p>New Node</p>',
+          content: `<p>${id}</p>`,
           parentId: parentNode.id,
           side: side,
         },
@@ -304,7 +319,7 @@ export const useMindmapStore = create<MindmapState>()(
       );
     },
 
-    updateNodeData: (nodeId: string, updates: Partial<BaseNode['data']>) => {
+    updateNodeData: (nodeId: string, updates: Partial<MindMapNode['data']>) => {
       set(
         (state) => ({
           nodes: state.nodes.map((node) =>
@@ -316,31 +331,35 @@ export const useMindmapStore = create<MindmapState>()(
       );
     },
 
+    updateNodeDataWithUndo: (nodeId: string, updates: Partial<MindMapNode['data']>) => {
+      const pushUndo = useClipboardStore.getState().pushToUndoStack;
+      pushUndo(get().nodes, get().edges);
+
+      set(
+        (state) => ({
+          nodes: state.nodes.map((node) =>
+            node.id === nodeId ? { ...node, data: { ...node.data, ...updates } } : node
+          ),
+        }),
+        false,
+        'mindmap/updateNodeDataWithUndo'
+      );
+    },
+
     logData: () => {
       const { nodes, edges } = get();
       console.log('Nodes:', nodes);
       console.log('Edges:', edges);
     },
 
-    getAllDescendantNodes: (parentId: string): BaseNode[] => {
-      const { nodes } = get();
-      return nodes.reduce((acc: BaseNode[], node: BaseNode) => {
-        if (node.data.parentId === parentId) {
-          acc.push(node);
-          acc.push(...get().getAllDescendantNodes(node.id));
-        }
-        return acc;
-      }, []);
-    },
-
     markNodeForDeletion: (nodeId: string) => {
-      const descendantNodes = get().getAllDescendantNodes(nodeId);
+      const descendantNodes = getAllDescendantNodes(nodeId, get().nodes);
       const nodeIdsToDelete = new Set([nodeId, ...descendantNodes.map((n) => n.id)]);
 
       set(
         (state) => ({
           nodesToBeDeleted: nodeIdsToDelete,
-          nodes: state.nodes.map((node: BaseNode) =>
+          nodes: state.nodes.map((node: MindMapNode) =>
             nodeIdsToDelete.has(node.id) ? { ...node, data: { ...node.data, isDeleting: true } } : node
           ),
           edges: state.edges.map((edge: MindMapEdge) =>
@@ -362,7 +381,7 @@ export const useMindmapStore = create<MindmapState>()(
 
       set(
         (state) => ({
-          nodes: state.nodes.filter((node: BaseNode) => !nodesToBeDeleted.has(node.id)),
+          nodes: state.nodes.filter((node: MindMapNode) => !nodesToBeDeleted.has(node.id)),
           edges: state.edges.filter(
             (edge: MindMapEdge) => !nodesToBeDeleted.has(edge.source) && !nodesToBeDeleted.has(edge.target)
           ),

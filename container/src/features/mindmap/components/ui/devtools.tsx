@@ -13,7 +13,10 @@ import {
   type OnNodesChange,
   type NodeChange,
   type XYPosition,
+  applyNodeChanges,
 } from '@xyflow/react';
+
+import { useMindmapStore } from '../../stores/useMindmapStore';
 
 import { ToggleGroup, ToggleGroupItem } from '@/shared/components/ui/toggle-group';
 
@@ -59,21 +62,9 @@ const ChangeInfo = ({ change }: ChangeInfoProps) => {
 
 export const ChangeLogger = ({ limit = 20 }: ChangeLoggerProps) => {
   const [changes, setChanges] = useState<NodeChange[]>([]);
-  const store = useStoreApi();
 
-  // Memoize the callback for handling node changes
-  const handleNodeChanges: OnNodesChange = useCallback(
-    (newChanges: NodeChange[]) => {
-      setChanges((prevChanges) => [...newChanges, ...prevChanges].slice(0, limit));
-    },
-    [limit]
-  );
-
-  useEffect(() => {
-    store.setState({ onNodesChange: handleNodeChanges });
-
-    return () => store.setState({ onNodesChange: undefined });
-  }, [handleNodeChanges, store]);
+  // For now, disable the devtools override to prevent infinite loops
+  // TODO: Implement proper change logging without interfering with the onNodesChange handler
 
   const NoChanges = () => <div>No Changes Triggered</div>;
 

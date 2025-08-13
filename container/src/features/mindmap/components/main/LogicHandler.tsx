@@ -17,36 +17,53 @@ const LogicHandler = memo(() => {
   const shortcuts = useMemo(
     () => [
       {
-        key: 'Ctrl+A',
-        callback: selectAllNodesAndEdges,
+        shortcutKey: 'Ctrl+A',
+        onKeyPressed: selectAllNodesAndEdges,
+        shouldExecute: () => {
+          const activeElement = document.activeElement as HTMLElement;
+
+          return (
+            activeElement.tagName !== 'INPUT' &&
+            activeElement.tagName !== 'TEXTAREA' &&
+            !activeElement.classList.contains('bn-editor')
+          );
+        },
       },
       {
-        key: 'Ctrl+C',
-        callback: copySelectedNodesAndEdges,
+        shortcutKey: 'Ctrl+C',
+        onKeyPressed: copySelectedNodesAndEdges,
+        shouldExecute: () => {
+          const activeElement = document.activeElement as HTMLElement;
+          return (
+            activeElement.tagName !== 'INPUT' &&
+            activeElement.tagName !== 'TEXTAREA' &&
+            !activeElement.classList.contains('bn-editor')
+          );
+        },
       },
       {
-        key: 'Ctrl+V',
-        callback: pasteClonedNodesAndEdges,
+        shortcutKey: 'Ctrl+V',
+        onKeyPressed: pasteClonedNodesAndEdges,
       },
       {
-        key: 'Delete',
-        callback: deleteSelectedNodes,
+        shortcutKey: 'Delete',
+        onKeyPressed: deleteSelectedNodes,
       },
       {
-        key: 'Escape',
-        callback: deselectAllNodesAndEdges,
+        shortcutKey: 'Escape',
+        onKeyPressed: deselectAllNodesAndEdges,
       },
       {
-        key: 'Ctrl+Z',
-        callback: undo,
+        shortcutKey: 'Ctrl+Z',
+        onKeyPressed: undo,
       },
       {
-        key: 'Ctrl+Y',
-        callback: redo,
+        shortcutKey: 'Ctrl+Y',
+        onKeyPressed: redo,
       },
       {
-        key: 'Ctrl+Shift+Z',
-        callback: redo,
+        shortcutKey: 'Ctrl+Shift+Z',
+        onKeyPressed: redo,
       },
     ],
     [

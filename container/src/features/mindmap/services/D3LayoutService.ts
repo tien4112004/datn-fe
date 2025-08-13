@@ -1,4 +1,4 @@
-import type { Direction } from '../constants';
+import type { Direction } from '../types/constants';
 import { MINDMAP_TYPES, type MindMapEdge, type MindMapNode } from '../types';
 import * as d3 from 'd3';
 

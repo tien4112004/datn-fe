@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import * as d3 from 'd3';
 import type { BaseNode, MindMapEdge, MindMapNode } from '../types';
-import { type Direction } from '../constants';
+import { type Direction } from '../types/constants';
 import { useMindmapStore } from './useMindmapStore';
 import { devtools } from 'zustand/middleware';
 import { useClipboardStore } from './useClipboardStore';

@@ -4,7 +4,7 @@ import { BaseNode } from '@/features/mindmap/components/ui/base-node';
 import { cn } from '@/shared/lib/utils';
 import type { MindMapNode } from '@/features/mindmap/types';
 import { NodeResizer, Position, type NodeProps } from '@xyflow/react';
-import { DIRECTION, type Direction } from '@/features/mindmap/constants';
+import { DIRECTION, type Direction } from '@/features/mindmap/types/constants';
 import { BaseHandle } from '../ui/base-handle';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -18,7 +18,7 @@ export interface BaseNodeBlockProps extends Omit<HTMLAttributes<HTMLDivElement>,
 
 export const BaseNodeBlock = forwardRef<HTMLDivElement, BaseNodeBlockProps>(
   ({ className, children, variant = 'card', node, ...props }, ref) => {
-    const { id, data, selected: isSelected } = node;
+    const { id, data, selected: isSelected, width, height } = node;
 
     const { isMouseOver, setIsMouseOver, layout, isLayouting, addChildNode, onNodeDelete } =
       useMindmapNodeCommon<MindMapNode>({
@@ -63,6 +63,11 @@ export const BaseNodeBlock = forwardRef<HTMLDivElement, BaseNodeBlockProps>(
             <BaseNode
               ref={ref}
               className={cn(cardStyles, className)}
+              style={{
+                width: width ? `${width}px` : undefined,
+                minHeight: height ? `${height}px` : undefined,
+                ...props.style,
+              }}
               onMouseEnter={onMouseEnter}
               onMouseLeave={onMouseLeave}
               tabIndex={0}
@@ -83,6 +88,11 @@ export const BaseNodeBlock = forwardRef<HTMLDivElement, BaseNodeBlockProps>(
             <div
               ref={ref}
               className={cn(baseStyles, className)}
+              style={{
+                width: width ? `${width}px` : undefined,
+                minHeight: height ? `${height}px` : undefined,
+                ...props.style,
+              }}
               onMouseEnter={onMouseEnter}
               onMouseLeave={onMouseLeave}
               tabIndex={0}

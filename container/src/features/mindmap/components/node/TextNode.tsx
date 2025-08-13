@@ -5,14 +5,14 @@ import { cn } from '@/shared/lib/utils';
 import RichTextEditor from '@/shared/components/rte/RichTextEditor';
 import { useRichTextEditor } from '@/shared/components/rte/useRichTextEditor';
 import { BlockNoteEditor } from '@blocknote/core';
-import { DIRECTION, DragHandle } from '@/features/mindmap/constants';
+import { DIRECTION, DragHandle } from '@/features/mindmap/types/constants';
 import type { TextNode } from '@/features/mindmap/types';
 import { BaseNodeBlock } from './BaseNode';
 import { BaseNodeContent } from '../ui/base-node';
 import { useMindmapNodeCommon } from '../../hooks';
 
 const TextNodeBlock = memo(({ ...node }: NodeProps<TextNode>) => {
-  const { data, selected: isSelected } = node;
+  const { data, selected: isSelected, width, height } = node;
   const { isMouseOver, layout } = useMindmapNodeCommon<TextNode>({
     node,
   });
@@ -50,23 +50,30 @@ const TextNodeBlock = memo(({ ...node }: NodeProps<TextNode>) => {
 
   return (
     <BaseNodeBlock node={node} variant="card">
-      <BaseNodeContent className="flex flex-row items-stretch gap-2 p-0">
-        <div className={cn('p-2 pr-0', DragHandle.CLASS)}>
+      <BaseNodeContent className="flex min-h-full flex-row items-start gap-2 p-0">
+        <div className={cn('flex-shrink-0 p-2 pr-0', DragHandle.CLASS)}>
           <GripVertical
             className={cn(
-              'h-full w-5',
+              'h-6 w-5',
               isMouseOver || isSelected ? 'opacity-100' : 'opacity-50',
               layout === DIRECTION.NONE ? 'cursor-move' : 'cursor-default'
             )}
           />
         </div>
-        <div className="min-w-[100px] max-w-[300px] cursor-text p-2 pl-0" onKeyDown={handleKeyPress}>
+        <div
+          className="min-h-full flex-1 cursor-text p-2 pl-0"
+          style={{
+            width: width ? `${width - 40}px` : undefined,
+            minWidth: '60px',
+          }}
+          onKeyDown={handleKeyPress}
+        >
           <RichTextEditor
             editor={editor}
             onChange={handleContentChange}
             sideMenu={false}
             slashMenu={false}
-            className="m-0 min-h-[24px] border-none p-0"
+            className="m-0 min-h-[24px] w-full border-none p-0"
             onBlur={handleEditSubmit}
           />
         </div>

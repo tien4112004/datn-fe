@@ -10,8 +10,9 @@ export type ShortcutKey =
   | `${Modifier}+${Modifier}+${Modifier}+${string}`;
 
 export interface ShortcutConfig {
-  key: ShortcutKey;
-  callback: (event: KeyboardEvent) => void;
+  shortcutKey: ShortcutKey;
+  onKeyPressed: (event: KeyboardEvent) => void;
+  shouldExecute?: (event: KeyboardEvent) => boolean;
 }
 
 interface ParsedShortcut {
@@ -21,10 +22,10 @@ interface ParsedShortcut {
   altKey: boolean;
 }
 
-export const useShortcuts = (shortcuts: ShortcutConfig[], preventDefault = true) => {
+export const useShortcuts = (shortcuts: ShortcutConfig[]) => {
   useEffect(() => {
     const handlers = shortcuts.map((shortcut) => {
-      const parsed = parseShortcut(shortcut.key);
+      const parsed = parseShortcut(shortcut.shortcutKey);
 
       return (event: KeyboardEvent) => {
         if (
@@ -33,10 +34,11 @@ export const useShortcuts = (shortcuts: ShortcutConfig[], preventDefault = true)
           !!event.shiftKey === parsed.shiftKey &&
           !!event.altKey === parsed.altKey
         ) {
-          if (preventDefault) {
+          if (!shortcut.shouldExecute || shortcut.shouldExecute(event)) {
             event.preventDefault();
+            shortcut.onKeyPressed(event);
+            return;
           }
-          shortcut.callback(event);
         }
       };
     });
@@ -52,7 +54,7 @@ export const useShortcuts = (shortcuts: ShortcutConfig[], preventDefault = true)
         window.removeEventListener('keydown', handler);
       });
     };
-  }, [shortcuts, preventDefault]);
+  }, [shortcuts]);
 };
 
 const parseShortcut = (shortcutString: string): ParsedShortcut => {

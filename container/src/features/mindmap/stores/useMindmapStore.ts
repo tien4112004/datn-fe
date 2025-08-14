@@ -15,7 +15,7 @@ const initialNodes: MindMapNode[] = [
     id: 'root',
     type: MINDMAP_TYPES.ROOT_NODE,
     position: { x: 0, y: 0 },
-    data: { level: 0, content: '<p>Central Topic</p>', side: 'mid' },
+    data: { level: 0, content: '<p>Central Topic</p>', side: 'mid', isCollapsed: false },
     dragHandle: DragHandle.SELECTOR,
     width: 250,
     height: 100,
@@ -25,7 +25,7 @@ const initialNodes: MindMapNode[] = [
     id: 'left-1',
     type: MINDMAP_TYPES.TEXT_NODE,
     position: { x: 250, y: 300 },
-    data: { level: 1, content: '<p>Left Branch</p>', parentId: 'root', side: 'left' },
+    data: { level: 1, content: '<p>Left Branch</p>', parentId: 'root', side: 'left', isCollapsed: false },
     dragHandle: DragHandle.SELECTOR,
     width: 400,
     height: 80,
@@ -45,6 +45,7 @@ const initialNodes: MindMapNode[] = [
         strokeWidth: 2,
       },
       side: 'left',
+      isCollapsed: false,
     },
     width: 300,
     height: 150,
@@ -53,7 +54,7 @@ const initialNodes: MindMapNode[] = [
     id: 'left-2',
     type: MINDMAP_TYPES.TEXT_NODE,
     position: { x: 200, y: 200 },
-    data: { level: 2, content: '<p>Left Child</p>', parentId: 'left-1', side: 'left' },
+    data: { level: 2, content: '<p>Left Child</p>', parentId: 'left-1', side: 'left', isCollapsed: false },
     dragHandle: DragHandle.SELECTOR,
     width: 150,
     height: 60,
@@ -62,7 +63,7 @@ const initialNodes: MindMapNode[] = [
     id: 'right-1',
     type: MINDMAP_TYPES.TEXT_NODE,
     position: { x: 550, y: 300 },
-    data: { level: 1, content: '<p>Right Branch</p>', parentId: 'root', side: 'right' },
+    data: { level: 1, content: '<p>Right Branch</p>', parentId: 'root', side: 'right', isCollapsed: false },
     dragHandle: DragHandle.SELECTOR,
     width: 200,
     height: 80,
@@ -71,7 +72,13 @@ const initialNodes: MindMapNode[] = [
     id: 'right-2',
     type: MINDMAP_TYPES.TEXT_NODE,
     position: { x: 600, y: 200 },
-    data: { level: 2, content: '<p>Right Child</p>', parentId: 'right-1', side: 'right' },
+    data: {
+      level: 2,
+      content: '<p>Right Child</p>',
+      parentId: 'right-1',
+      side: 'right',
+      isCollapsed: false,
+    },
     dragHandle: DragHandle.SELECTOR,
     width: 500,
     height: 60,
@@ -86,6 +93,7 @@ const initialNodes: MindMapNode[] = [
       parentId: 'right-1',
       shape: 'circle',
       side: 'right',
+      isCollapsed: false,
     },
     width: 180,
     height: 150,
@@ -187,6 +195,9 @@ interface MindmapState {
   deleteSelectedNodes: () => void;
   markNodeForDeletion: (nodeId: string) => void;
   finalizeNodeDeletion: () => void;
+  collapse: (nodeId: string, side: 'left' | 'right') => void;
+  expand: (nodeId: string, side: 'left' | 'right') => void;
+  toggleCollapse: (nodeId: string, side: 'left' | 'right', shouldCollapse: boolean) => void;
   moveToChild: (sourceId: string, targetId: string, side: 'left' | 'right') => void;
 }
 
@@ -267,7 +278,7 @@ export const useMindmapStore = create<MindmapState>()(
           x: Math.random() * 500 + 100,
           y: Math.random() * 400 + 100,
         },
-        data: { level: 1, content: `<p>New Node ${nodes.length + 1}</p>`, side: 'mid' },
+        data: { level: 1, content: `<p>New Node ${nodes.length + 1}</p>`, side: 'mid', isCollapsed: false },
       };
 
       set(
@@ -296,6 +307,7 @@ export const useMindmapStore = create<MindmapState>()(
           content: `<p>${id}</p>`,
           parentId: parentNode.id,
           side: side,
+          isCollapsed: false,
         },
         dragHandle: DragHandle.SELECTOR,
         position,
@@ -411,6 +423,78 @@ export const useMindmapStore = create<MindmapState>()(
     getNode: (nodeId: string) => {
       const { nodes } = get();
       return nodes.find((node) => node.id === nodeId);
+    },
+
+    toggleCollapse: (nodeId: string, side: 'left' | 'right', shouldCollapse: boolean) => {
+      const { nodes, edges } = get();
+      const node = nodes.find((n) => n.id === nodeId);
+      if (!node) return;
+
+      const pushUndo = useClipboardStore.getState().pushToUndoStack;
+      pushUndo(nodes, edges);
+
+      const descendantNodes = getAllDescendantNodes(nodeId, nodes);
+
+      const updatedNodes = nodes.map((n) => {
+        if (n.id === nodeId) {
+          return {
+            ...n,
+            data: {
+              ...n.data,
+              isLeftChildrenCollapsed: side === 'left' ? shouldCollapse : n.data.isLeftChildrenCollapsed,
+              isRightChildrenCollapsed: side === 'right' ? shouldCollapse : n.data.isRightChildrenCollapsed,
+            },
+          };
+        }
+
+        if (descendantNodes.some((descendant) => descendant.id === n.id && descendant.data.side === side)) {
+          return {
+            ...n,
+            data: { ...n.data, isCollapsed: shouldCollapse },
+          };
+        }
+        return n;
+      });
+
+      const updatedEdges = edges.map((edge) => {
+        const sourceNode = nodes.find((n) => n.id === edge.source);
+        const targetNode = nodes.find((n) => n.id === edge.target);
+
+        if (
+          descendantNodes.some(
+            (descendant) =>
+              (descendant.id === edge.source && descendant.data.side === side) ||
+              (descendant.id === edge.target && descendant.data.side === side)
+          ) ||
+          (sourceNode &&
+            targetNode &&
+            ((sourceNode.data.side === side && descendantNodes.some((d) => d.id === sourceNode.id)) ||
+              (targetNode.data.side === side && descendantNodes.some((d) => d.id === targetNode.id))))
+        ) {
+          return {
+            ...edge,
+            data: { ...edge.data, isCollapsed: shouldCollapse },
+          };
+        }
+        return edge;
+      });
+
+      set(
+        () => ({
+          nodes: updatedNodes,
+          edges: updatedEdges,
+        }),
+        false,
+        shouldCollapse ? 'mindmap/collapse' : 'mindmap/expand'
+      );
+    },
+
+    expand: (nodeId: string, side: 'left' | 'right') => {
+      get().toggleCollapse(nodeId, side, false);
+    },
+
+    collapse: (nodeId: string, side: 'left' | 'right') => {
+      get().toggleCollapse(nodeId, side, true);
     },
 
     moveToChild: (sourceId: string, targetId: string, side?: 'left' | 'right') => {

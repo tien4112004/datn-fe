@@ -21,9 +21,12 @@ export type SmoothType = (typeof SMOOTH_TYPES)[keyof typeof SMOOTH_TYPES];
 export interface BaseNodeData extends Record<string, unknown> {
   level: number;
   isDeleting?: boolean;
+  isCollapsed: boolean;
   parentId?: string;
   metadata?: Record<string, any>;
   side: 'left' | 'right' | 'mid';
+  isLeftChildrenCollapsed?: boolean;
+  isRightChildrenCollapsed?: boolean;
 }
 
 export type BaseNode<
@@ -58,6 +61,7 @@ export type MindMapEdge = Edge<{
   strokeColor?: string;
   smoothType?: SmoothType;
   isDeleting?: boolean;
+  isCollapsed?: boolean;
 }>;
 
 export type NodeData = TextNodeData | RootNodeData | ShapeNodeData;

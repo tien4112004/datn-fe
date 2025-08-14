@@ -6,10 +6,10 @@ import type { MindMapNode } from '@/features/mindmap/types';
 import { NodeResizer, Position, type NodeProps } from '@xyflow/react';
 import { DIRECTION, type Direction } from '@/features/mindmap/types/constants';
 import { BaseHandle } from '../ui/base-handle';
-import { Plus } from 'lucide-react';
+import { ArrowLeftFromLine, ArrowRightFromLine, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useMindmapNodeCommon } from '@/features/mindmap/hooks';
-import { useClipboardStore } from '@/features/mindmap/stores';
+import { useClipboardStore, useMindmapStore } from '@/features/mindmap/stores';
 
 export interface BaseNodeBlockProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
   children: ReactNode;
@@ -71,6 +71,7 @@ export const BaseNodeBlock = memo(
               style={{
                 width: width ? `${width}px` : undefined,
                 minHeight: height ? `${height}px` : undefined,
+                visibility: data.isCollapsed ? 'hidden' : 'visible',
                 ...props.style,
               }}
               onMouseEnter={onMouseEnter}
@@ -95,6 +96,7 @@ export const BaseNodeBlock = memo(
               style={{
                 width: width ? `${width}px` : undefined,
                 minHeight: height ? `${height}px` : undefined,
+                visibility: data.isCollapsed ? 'hidden' : 'visible',
                 ...props.style,
               }}
               onMouseEnter={onMouseEnter}
@@ -184,42 +186,73 @@ export const CreateChildNodeButtons = memo(
   ({ node, addChildNode, isMouseOver, isSelected, layout }: CreateChildNodeButtonsProps) => {
     const canCreateLeft = node.data.side === 'left' || node.data.side === 'mid';
     const canCreateRight = node.data.side === 'right' || node.data.side === 'mid';
+
+    const toggleCollapse = useMindmapStore((state) => state.toggleCollapse);
     return (
       <>
         {/* Add Child Buttons */}
-        <Button
-          onClick={() =>
-            addChildNode(node, { x: node.positionAbsoluteX - 250, y: node.positionAbsoluteY }, 'left')
-          }
-          size="icon"
-          variant="outline"
+        <div
           className={cn(
-            'bg-accent absolute z-[1000] cursor-pointer rounded-full transition-all duration-200',
-            (isMouseOver || isSelected) && canCreateLeft ? 'visible opacity-100' : 'invisible opacity-0',
+            'absolute z-[1000] flex items-center justify-center gap-1 rounded-sm transition-all duration-200',
             layout === DIRECTION.VERTICAL
               ? 'left-1/2 top-0 -translate-x-1/2 -translate-y-[calc(100%+24px)]'
-              : 'left-0 top-1/2 -translate-x-[calc(100%+24px)] -translate-y-1/2'
+              : 'left-0 top-1/2 -translate-x-[calc(100%+24px)] -translate-y-1/2',
+            (isMouseOver || isSelected) && canCreateLeft ? 'visible opacity-100' : 'invisible opacity-0'
           )}
         >
-          <Plus />
-        </Button>
+          <Button
+            onClick={() =>
+              addChildNode(node, { x: node.positionAbsoluteX - 250, y: node.positionAbsoluteY }, 'left')
+            }
+            size="icon"
+            variant="outline"
+            className={cn('bg-accent cursor-pointer rounded-full transition-all duration-200')}
+          >
+            <Plus />
+          </Button>
+          <Button
+            onClick={() => {
+              toggleCollapse(node.id, 'left', !node.data.isLeftChildrenCollapsed);
+            }}
+            size="icon"
+            variant="outline"
+            className={cn('bg-accent cursor-pointer rounded-full transition-all duration-200')}
+          >
+            {node.data.isLeftChildrenCollapsed ? <ArrowLeftFromLine /> : <ArrowRightFromLine />}
+          </Button>
+        </div>
 
-        <Button
-          onClick={() =>
-            addChildNode(node, { x: node.positionAbsoluteX + 250, y: node.positionAbsoluteY }, 'right')
-          }
-          size="icon"
-          variant="outline"
+        <div
           className={cn(
-            'bg-accent absolute z-[1000] cursor-pointer rounded-full transition-all duration-200',
-            (isMouseOver || isSelected) && canCreateRight ? 'visible opacity-100' : 'invisible opacity-0',
+            'absolute z-[1000] flex items-center justify-center gap-1 rounded-sm transition-all duration-200',
             layout === DIRECTION.VERTICAL
               ? 'bottom-0 left-1/2 -translate-x-1/2 translate-y-[calc(100%+24px)]'
-              : 'right-0 top-1/2 -translate-y-1/2 translate-x-[calc(100%+24px)]'
+              : 'right-0 top-1/2 -translate-y-1/2 translate-x-[calc(100%+24px)]',
+            (isMouseOver || isSelected) && canCreateRight ? 'visible opacity-100' : 'invisible opacity-0'
           )}
         >
-          <Plus />
-        </Button>
+          <Button
+            onClick={() =>
+              addChildNode(node, { x: node.positionAbsoluteX + 250, y: node.positionAbsoluteY }, 'right')
+            }
+            size="icon"
+            variant="outline"
+            className={cn('bg-accent cursor-pointer rounded-full transition-all duration-200')}
+          >
+            <Plus />
+          </Button>
+
+          <Button
+            onClick={() => {
+              toggleCollapse(node.id, 'right', !node.data.isRightChildrenCollapsed);
+            }}
+            size="icon"
+            variant="outline"
+            className={cn('bg-accent cursor-pointer rounded-full transition-all duration-200')}
+          >
+            {node.data.isRightChildrenCollapsed ? <ArrowRightFromLine /> : <ArrowLeftFromLine />}
+          </Button>
+        </div>
       </>
     );
   },
@@ -228,6 +261,7 @@ export const CreateChildNodeButtons = memo(
     return (
       prevProps.node.id === nextProps.node.id &&
       prevProps.layout === nextProps.layout &&
+      prevProps.node.data === nextProps.node.data &&
       (prevProps.isMouseOver || prevProps.isSelected) === (nextProps.isMouseOver || nextProps.isSelected)
     );
   }

@@ -78,15 +78,17 @@ const EdgeBlock = memo(
   }: EdgeProps<MindMapEdge> & { smoothType: SmoothType }) => {
     const finalizeNodeDeletion = useMindmapStore((state) => state.finalizeNodeDeletion);
 
-    const [edgePath] = getEdgePath(data?.smoothType || 'smoothstep', {
-      id,
-      sourceX,
-      sourceY,
-      targetX,
-      targetY,
-      sourcePosition,
-      targetPosition,
-    });
+    const [edgePath] = data?.isCollapsed
+      ? ['']
+      : getEdgePath(data?.smoothType || 'smoothstep', {
+          id,
+          sourceX,
+          sourceY,
+          targetX,
+          targetY,
+          sourcePosition,
+          targetPosition,
+        });
 
     return (
       <motion.path

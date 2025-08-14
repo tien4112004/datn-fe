@@ -4,6 +4,7 @@ import { useMindmapStore } from '../stores/useMindmapStore';
 import { useLayoutStore } from '../stores/useLayoutStore';
 import type { BaseNode } from '../types';
 import { useClipboardStore } from '../stores';
+import { DIRECTION } from '../types/constants';
 
 export const useReactFlowIntegration = () => {
   const nodeLength = useMindmapStore((state) => state.nodes.length);
@@ -13,6 +14,8 @@ export const useReactFlowIntegration = () => {
 
   const updateLayout = useLayoutStore((state) => state.updateLayout);
   const setMousePosition = useClipboardStore((state) => state.setMousePosition);
+  const setDragTarget = useClipboardStore((state) => state.setDragTarget);
+  const layout = useLayoutStore((state) => state.layout);
 
   const [stateChanged, setStateChanged] = useState(false);
 
@@ -36,7 +39,7 @@ export const useReactFlowIntegration = () => {
 
   // Auto-layout effect when nodes are initialized
   useEffect(() => {
-    if (nodeLength > 0 && nodesInitialized) {
+    if (nodeLength > 0 && nodesInitialized && layout !== DIRECTION.NONE) {
       // Add a small delay to ensure DOM is fully rendered
       const timeoutId = setTimeout(() => {
         updateLayout();
@@ -58,29 +61,62 @@ export const useReactFlowIntegration = () => {
     return () => clearTimeout(timeoutId);
   }, [stateChanged]);
 
-  const onNodeDragStop = useCallback((_: MouseEvent, node: BaseNode) => {
-    const intersections = getIntersectingNodes(node).map((n) => n.id);
-
-    const determineSideFromPosition = (draggedNode: BaseNode, targetNode: any) => {
-      const targetCenterX = targetNode.position.x + (targetNode.measured?.width ?? 0) / 2;
-      const draggedCenterX = draggedNode.position.x + (draggedNode.measured?.width ?? 0) / 2;
-
-      return draggedCenterX < targetCenterX ? 'left' : 'right';
-    };
-
-    if (intersections.length === 0) return;
-
-    const targetNodeId = intersections[0];
-    if (targetNodeId === node.id) return;
-
-    const targetNode = getNode(targetNodeId);
-    if (!targetNode) return;
-
-    const side = determineSideFromPosition(node, targetNode);
-    moveToChild(node.id, targetNodeId, side);
+  const determineSideFromPosition = useCallback((draggedNode: BaseNode, targetNode: any) => {
+    const targetCenterX = targetNode.position.x + (targetNode.measured?.width ?? 0) / 2;
+    const draggedCenterX = draggedNode.position.x + (draggedNode.measured?.width ?? 0) / 2;
+    return draggedCenterX < targetCenterX ? 'left' : 'right';
   }, []);
 
+  const onNodeDragStart = useCallback(
+    (_: MouseEvent) => {
+      setDragTarget(null);
+    },
+    [setDragTarget]
+  );
+
+  const onNodeDrag = useCallback(
+    (_: MouseEvent, node: BaseNode) => {
+      const intersections = getIntersectingNodes(node).map((n) => n.id);
+
+      if (intersections.length === 0) {
+        setDragTarget(null);
+        return;
+      }
+
+      const targetNodeId = intersections[0];
+      if (targetNodeId === node.id) {
+        setDragTarget(null);
+        return;
+      }
+
+      setDragTarget(targetNodeId);
+    },
+    [getIntersectingNodes, setDragTarget]
+  );
+
+  const onNodeDragStop = useCallback(
+    (_: MouseEvent, node: BaseNode) => {
+      const intersections = getIntersectingNodes(node).map((n) => n.id);
+
+      setDragTarget(null);
+
+      if (intersections.length === 0) return;
+
+      const targetNodeId = intersections[0];
+      if (targetNodeId === node.id) return;
+
+      const targetNode = getNode(targetNodeId);
+      if (!targetNode) return;
+
+      const side = determineSideFromPosition(node, targetNode);
+      moveToChild(node.id, targetNodeId, side);
+    },
+    [getIntersectingNodes, getNode, moveToChild, determineSideFromPosition, setDragTarget]
+  );
+
   return {
+    onNodeDragStart,
+    onNodeDrag,
     onNodeDragStop,
     onPaneMouseMove,
     onPaneClick,

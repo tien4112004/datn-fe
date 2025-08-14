@@ -9,6 +9,7 @@ import { BaseHandle } from '../ui/base-handle';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useMindmapNodeCommon } from '@/features/mindmap/hooks';
+import { useClipboardStore } from '@/features/mindmap/stores';
 
 export interface BaseNodeBlockProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
   children: ReactNode;
@@ -19,6 +20,8 @@ export interface BaseNodeBlockProps extends Omit<HTMLAttributes<HTMLDivElement>,
 export const BaseNodeBlock = memo(
   ({ className, children, variant = 'card', node, ...props }: BaseNodeBlockProps) => {
     const { id, data, selected: isSelected, width, height } = node;
+    const dragTargetNodeId = useClipboardStore((state) => state.dragTargetNodeId);
+    const isDragTarget = dragTargetNodeId === id;
 
     const [isMouseOver, setIsMouseOver] = useState(false);
 
@@ -40,7 +43,7 @@ export const BaseNodeBlock = memo(
       setIsMouseOver(false);
     }, [setIsMouseOver]);
 
-    const baseStyles = '';
+    const baseStyles = cn(isDragTarget && 'ring-2 ring-green-400 bg-green-50');
 
     const cardStyles = cn(
       'bg-card text-card-foreground relative',
@@ -48,6 +51,7 @@ export const BaseNodeBlock = memo(
       '[.react-flow\\_\\_node.selected_&]:border-muted-foreground',
       '[.react-flow\\_\\_node.selected_&]:shadow-lg',
       isLayouting && 'shadow-lg ring-2 ring-blue-300',
+      isDragTarget && 'ring-2 ring-green-400 bg-green-50',
       'rounded-md border rounded-lg border-2 shadow-md'
     );
 

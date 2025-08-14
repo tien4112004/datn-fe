@@ -86,8 +86,8 @@ export const useLayoutStore = create<LayoutState>()(
             id: node.id,
             startPos: { ...node.position },
             targetPos: target || node.position,
-            deltaX: target.x - node.position.x,
-            deltaY: target.y - node.position.y,
+            deltaX: target.x - (node.position.x ?? 0),
+            deltaY: target.y - (node.position.y ?? 0),
           };
         });
 

@@ -12,6 +12,7 @@ interface ClipboardState {
   redoStack: Deque<[BaseNode[], MindMapEdge[]]>;
   mousePosition: { x: number; y: number };
   offset: number;
+  dragTargetNodeId: string | null;
   setCloningNodes: (nodes: BaseNode[]) => void;
   setCloningEdges: (edges: MindMapEdge[]) => void;
   setMousePosition: (position: { x: number; y: number }) => void;
@@ -24,6 +25,7 @@ interface ClipboardState {
   undo: () => void;
   redo: () => void;
   pushToUndoStack: (nodes: BaseNode[], edges: MindMapEdge[]) => void;
+  setDragTarget: (nodeId: string | null) => void;
 }
 
 export const useClipboardStore = create<ClipboardState>()(
@@ -34,6 +36,7 @@ export const useClipboardStore = create<ClipboardState>()(
     redoStack: new Deque(),
     mousePosition: { x: 0, y: 0 },
     offset: 0,
+    dragTargetNodeId: null,
 
     setCloningNodes: (nodes) => set({ cloningNodes: nodes }, false, 'mindmap-clip/setCloningNodes'),
     setCloningEdges: (edges) => set({ cloningEdges: edges }, false, 'mindmap-clip/setCloningEdges'),
@@ -171,6 +174,10 @@ export const useClipboardStore = create<ClipboardState>()(
       }
       undoStack.pushBack([nodes, edges]);
       get().redoStack.clear();
+    },
+
+    setDragTarget: (nodeId: string | null) => {
+      set({ dragTargetNodeId: nodeId }, false, 'mindmap-clip/setDragTarget');
     },
   }))
 );

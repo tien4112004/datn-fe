@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { addEdge, applyNodeChanges, applyEdgeChanges } from '@xyflow/react';
 import type { Connection, XYPosition } from '@xyflow/react';
 import { type MindMapNode, type MindMapEdge, MINDMAP_TYPES } from '../types';
-import { DragHandle, type Direction } from '../types/constants';
+import { DragHandle } from '../types/constants';
 import { generateId } from '@/shared/lib/utils';
 import { devtools } from 'zustand/middleware';
 import { useClipboardStore } from './useClipboardStore';
@@ -62,7 +62,7 @@ const initialNodes: MindMapNode[] = [
     id: 'right-1',
     type: MINDMAP_TYPES.TEXT_NODE,
     position: { x: 550, y: 300 },
-    data: { level: 1, content: '<p>Right Branch</p>', parent: 'root', side: 'right' },
+    data: { level: 1, content: '<p>Right Branch</p>', parentId: 'root', side: 'right' },
     dragHandle: DragHandle.SELECTOR,
     width: 200,
     height: 80,
@@ -260,7 +260,6 @@ export const useMindmapStore = create<MindmapState>()(
 
     addNode: () => {
       const { nodes } = get();
-      const nodeId = generateId();
       const newNode: MindMapNode = {
         id: generateId(),
         type: MINDMAP_TYPES.TEXT_NODE,
@@ -274,7 +273,6 @@ export const useMindmapStore = create<MindmapState>()(
       set(
         (state) => ({
           nodes: [...state.nodes, newNode],
-          nodeId: nodeId,
         }),
         false,
         'mindmap/addNode'
@@ -427,6 +425,7 @@ export const useMindmapStore = create<MindmapState>()(
       if (!sourceNode || !targetNode) return;
 
       const descendantNodes = getAllDescendantNodes(sourceId, nodes);
+
       if (descendantNodes.some((node) => node.id === targetId)) {
         toast.error('Cannot move a node to one of its descendants.');
         return;
@@ -475,8 +474,10 @@ export const useMindmapStore = create<MindmapState>()(
         return `${position}-${handleType}-${nodeId}`;
       };
 
+      let isEdgeEstablished = false;
       const updatedEdges = edges.map((edge) => {
         if (edge.target === sourceId) {
+          isEdgeEstablished = true;
           return {
             ...edge,
             source: targetId,
@@ -496,10 +497,26 @@ export const useMindmapStore = create<MindmapState>()(
         return edge;
       });
 
+      if (!isEdgeEstablished) {
+        const newEdge: MindMapEdge = {
+          id: generateId(),
+          source: targetId,
+          target: sourceId,
+          type: MINDMAP_TYPES.EDGE,
+          sourceHandle: getHandles(newSide!, targetId, true),
+          targetHandle: getHandles(newSide!, sourceId, false),
+          data: {
+            strokeColor: 'var(--primary)',
+            strokeWidth: 2,
+          },
+        };
+        updatedEdges.push(newEdge);
+      }
+
       set(
-        (state) => ({
-          nodes: state.nodes.map((node) => updatedNodes.find((n) => n.id === node.id) || node),
-          edges: state.edges.map((edge) => updatedEdges.find((e) => e.id === edge.id) || edge),
+        () => ({
+          nodes: updatedNodes,
+          edges: updatedEdges,
         }),
         false,
         'mindmap/moveToChild'

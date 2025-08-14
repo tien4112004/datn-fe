@@ -9,7 +9,6 @@ export default React.memo(function RichTextEditor({
   children,
   ...props
 }: React.PropsWithChildren<BlockNoteViewProps<any, any, any> & { className?: string; onBlur?: () => void }>) {
-  console.log('Rendering RichTextEditor');
   return (
     <>
       {children}

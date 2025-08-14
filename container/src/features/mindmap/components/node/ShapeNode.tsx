@@ -5,6 +5,7 @@ import type { ShapeNode } from '../../types';
 import { BaseNodeBlock } from './BaseNode';
 import type { NodeProps } from '@xyflow/react';
 import { useMindmapNodeCommon } from '../../hooks';
+import { Button } from '@/components/ui/button';
 
 const ShapeNodeBlock = memo(
   ({ ...node }: NodeProps<ShapeNode>) => {
@@ -70,42 +71,39 @@ const ShapeNodeBlock = memo(
             isSelected ? 'visible opacity-100' : 'invisible opacity-0'
           )}
         >
-          <button
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={() => handleShapeChange('rectangle')}
-            className={cn(
-              'hover:bg-accent cursor-pointer rounded-sm p-1',
-              (!data.shape || data.shape === 'rectangle') && 'bg-accent'
-            )}
+            className={cn('h-6 w-6 p-1', (!data.shape || data.shape === 'rectangle') && 'bg-accent')}
             title="Rectangle"
           >
             <svg className="h-3 w-3" viewBox="0 0 12 8" fill="currentColor">
               <rect width="12" height="8" rx="1" />
             </svg>
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={() => handleShapeChange('circle')}
-            className={cn(
-              'hover:bg-accent cursor-pointer rounded-sm p-1',
-              data.shape === 'circle' && 'bg-accent'
-            )}
+            className={cn('h-6 w-6 p-1', data.shape === 'circle' && 'bg-accent')}
             title="Circle"
           >
             <svg className="h-3 w-3" viewBox="0 0 12 12" fill="currentColor">
               <circle cx="6" cy="6" r="6" />
             </svg>
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={() => handleShapeChange('ellipse')}
-            className={cn(
-              'hover:bg-accent cursor-pointer rounded-sm p-1',
-              data.shape === 'ellipse' && 'bg-accent'
-            )}
+            className={cn('h-6 w-6 p-1', data.shape === 'ellipse' && 'bg-accent')}
             title="Ellipse"
           >
             <svg className="h-3 w-3" viewBox="0 0 12 8" fill="currentColor">
               <ellipse cx="6" cy="4" rx="6" ry="4" />
             </svg>
-          </button>
+          </Button>
         </div>
       </BaseNodeBlock>
     );
@@ -114,15 +112,11 @@ const ShapeNodeBlock = memo(
     // Only re-render if these specific properties change
     return (
       prevProps.id === nextProps.id &&
-      prevProps.data.content === nextProps.data.content &&
+      prevProps.data === nextProps.data &&
       prevProps.selected === nextProps.selected &&
       prevProps.dragging === nextProps.dragging &&
       prevProps.width === nextProps.width &&
-      prevProps.height === nextProps.height &&
-      prevProps.data.shape === nextProps.data.shape &&
-      prevProps.data.metadata?.fill === nextProps.data.metadata?.fill &&
-      prevProps.data.metadata?.stroke === nextProps.data.metadata?.stroke &&
-      prevProps.data.metadata?.strokeWidth === nextProps.data.metadata?.strokeWidth
+      prevProps.height === nextProps.height
     );
   }
 );

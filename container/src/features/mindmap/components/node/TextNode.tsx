@@ -38,9 +38,9 @@ const TextNodeBlock = memo(
       loadInitialHTML();
     }, [editor, data.content, shouldUseRichEditor]);
 
-    const handleEditSubmit = useCallback(() => {
+    const handleEditSubmit = useCallback(async () => {
       setIsEditing(false);
-      const htmlContent = editor.blocksToFullHTML(editor.document);
+      const htmlContent = await editor.blocksToFullHTML(editor.document);
       updateNodeData(node.id, { content: htmlContent });
     }, [editor, node.id, updateNodeData]);
 
@@ -96,7 +96,7 @@ const TextNodeBlock = memo(
     // Return false if props changed (allow re-render)
     return (
       prevProps.id === nextProps.id &&
-      prevProps.data.content === nextProps.data.content &&
+      prevProps.data === nextProps.data &&
       prevProps.selected === nextProps.selected &&
       prevProps.dragging === nextProps.dragging &&
       prevProps.width === nextProps.width &&

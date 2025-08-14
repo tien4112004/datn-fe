@@ -52,6 +52,7 @@ const RootNodeBlock = memo(
             value={data.content || ''}
             onKeyDown={handleKeyPress}
             onBlur={handleEditSubmit}
+            onChange={(e) => updateNodeData(node.id, { content: e.target.value })}
           />
         </BaseNodeContent>
       </BaseNodeBlock>
@@ -61,11 +62,10 @@ const RootNodeBlock = memo(
     // Only re-render if these specific properties change
     return (
       prevProps.id === nextProps.id &&
-      prevProps.data.content === nextProps.data.content &&
+      prevProps.data === nextProps.data &&
       prevProps.selected === nextProps.selected &&
       prevProps.width === nextProps.width &&
-      prevProps.height === nextProps.height &&
-      prevProps.data.isDeleting === nextProps.data.isDeleting
+      prevProps.height === nextProps.height
     );
   }
 );

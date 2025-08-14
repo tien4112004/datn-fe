@@ -27,7 +27,7 @@ const handlersSelector = (state: any) => ({
 });
 
 const Flow = memo(({ children, isPanOnDrag }: { children: ReactNode; isPanOnDrag: boolean }) => {
-  const { onNodeDrag, onPaneMouseMove, onPaneClick } = useReactFlowIntegration();
+  const { onNodeDragStop, onPaneMouseMove, onPaneClick } = useReactFlowIntegration();
 
   const { nodes, edges, onNodesChange, onEdgesChange, onConnect } = useMindmapStore(
     useShallow(handlersSelector)
@@ -45,7 +45,7 @@ const Flow = memo(({ children, isPanOnDrag }: { children: ReactNode; isPanOnDrag
       proOptions={{ hideAttribution: true }}
       onPaneMouseMove={onPaneMouseMove}
       onPaneClick={onPaneClick}
-      onNodeDrag={onNodeDrag}
+      onNodeDragStop={onNodeDragStop}
       panOnDrag={isPanOnDrag}
       panActivationKeyCode={!isPanOnDrag ? 'Shift' : null}
       selectionOnDrag={!isPanOnDrag}

@@ -125,36 +125,42 @@ export const BaseNodeBlock = memo(
       prevNode.dragging === nextNode.dragging &&
       prevNode.width === nextNode.width &&
       prevNode.height === nextNode.height &&
-      prevNode.data?.isDeleting === nextNode.data?.isDeleting &&
+      prevNode.data === nextNode.data &&
       prevProps.variant === nextProps.variant
     );
   }
 );
 
 export const NodeHandlers = memo(({ layout, id }: { layout: Direction; id: string }) => {
+  const [currentLayout, setCurrentLayout] = useState(layout);
+
+  if (currentLayout !== layout && layout !== DIRECTION.NONE) {
+    setCurrentLayout(layout);
+  }
+
   return (
     <>
       <BaseHandle
         type="source"
-        position={layout === DIRECTION.VERTICAL ? Position.Top : Position.Left}
+        position={currentLayout === DIRECTION.VERTICAL ? Position.Top : Position.Left}
         style={{ visibility: 'hidden' }}
         id={`first-source-${id}`}
       />
       <BaseHandle
         type="source"
-        position={layout === DIRECTION.VERTICAL ? Position.Bottom : Position.Right}
+        position={currentLayout === DIRECTION.VERTICAL ? Position.Bottom : Position.Right}
         style={{ visibility: 'hidden' }}
         id={`second-source-${id}`}
       />
       <BaseHandle
         type="target"
-        position={layout === DIRECTION.VERTICAL ? Position.Top : Position.Left}
+        position={currentLayout === DIRECTION.VERTICAL ? Position.Top : Position.Left}
         style={{ visibility: 'hidden' }}
         id={`first-target-${id}`}
       />
       <BaseHandle
         type="target"
-        position={layout === DIRECTION.VERTICAL ? Position.Bottom : Position.Right}
+        position={currentLayout === DIRECTION.VERTICAL ? Position.Bottom : Position.Right}
         style={{ visibility: 'hidden' }}
         id={`second-target-${id}`}
       />

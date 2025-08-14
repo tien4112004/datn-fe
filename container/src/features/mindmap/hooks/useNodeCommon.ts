@@ -16,6 +16,7 @@ export interface UseNodeCommonReturn {
   addChildNode: any;
   onNodeDelete: () => void;
   updateNodeData: (id: string, data: Partial<BaseNode['data']>) => void;
+  moveToChild: (sourceId: string, targetId: string) => void;
 }
 
 export const useMindmapNodeCommon = <T extends BaseNode = BaseNode>({
@@ -26,14 +27,13 @@ export const useMindmapNodeCommon = <T extends BaseNode = BaseNode>({
   const layout = useLayoutStore((state) => state.layout);
   const isLayouting = useLayoutStore((state) => state.isLayouting);
   const updateNodeData = useMindmapStore((state) => state.updateNodeData);
+  const moveToChild = useMindmapStore((state) => state.moveToChild);
 
   // React Flow hooks
   const updateNodeInternals = useUpdateNodeInternals();
 
   useEffect(() => {
-    if (!isLayouting && layout) {
-      updateNodeInternals(node.id);
-    }
+    updateNodeInternals(node.id);
   }, [layout, isLayouting, node.id, updateNodeInternals]);
 
   return {
@@ -42,5 +42,6 @@ export const useMindmapNodeCommon = <T extends BaseNode = BaseNode>({
     addChildNode,
     onNodeDelete,
     updateNodeData,
+    moveToChild,
   };
 };

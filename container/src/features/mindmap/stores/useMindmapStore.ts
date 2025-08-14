@@ -2,11 +2,12 @@ import { create } from 'zustand';
 import { addEdge, applyNodeChanges, applyEdgeChanges } from '@xyflow/react';
 import type { Connection, XYPosition } from '@xyflow/react';
 import { type MindMapNode, type MindMapEdge, MINDMAP_TYPES } from '../types';
-import { DragHandle } from '../types/constants';
+import { DragHandle, type Direction } from '../types/constants';
 import { generateId } from '@/shared/lib/utils';
 import { devtools } from 'zustand/middleware';
 import { useClipboardStore } from './useClipboardStore';
 import { getAllDescendantNodes } from '../services/utils';
+import { toast } from 'sonner';
 
 const initialNodes: MindMapNode[] = [
   // Central root
@@ -172,6 +173,7 @@ interface MindmapState {
   onNodesChange: (changes: any) => void;
   onEdgesChange: (changes: any) => void;
   onConnect: (connection: Connection) => void;
+  getNode: (nodeId: string) => MindMapNode | undefined;
   getNodeLength: () => number;
   setNodes: (updater: MindMapNode[] | ((nodes: MindMapNode[]) => MindMapNode[])) => void;
   setEdges: (updater: MindMapEdge[] | ((edges: MindMapEdge[]) => MindMapEdge[])) => void;
@@ -185,6 +187,7 @@ interface MindmapState {
   deleteSelectedNodes: () => void;
   markNodeForDeletion: (nodeId: string) => void;
   finalizeNodeDeletion: () => void;
+  moveToChild: (sourceId: string, targetId: string, side: 'left' | 'right') => void;
 }
 
 export const useMindmapStore = create<MindmapState>()(
@@ -194,12 +197,6 @@ export const useMindmapStore = create<MindmapState>()(
     nodesToBeDeleted: new Set<string>(),
 
     onNodesChange: (changes) => {
-      // Debug multi-node drag performance
-      if (changes.length > 1) {
-        console.log('Multi-node change:', changes.length, 'nodes moving');
-        console.time('multi-node-applyNodeChanges');
-      }
-
       set(
         (state) => ({
           nodes: applyNodeChanges(changes, state.nodes),
@@ -207,10 +204,6 @@ export const useMindmapStore = create<MindmapState>()(
         false,
         'mindmap/onNodesChange'
       );
-
-      if (changes.length > 1) {
-        console.timeEnd('multi-node-applyNodeChanges');
-      }
     },
 
     onEdgesChange: (changes) => {
@@ -415,6 +408,102 @@ export const useMindmapStore = create<MindmapState>()(
     syncState: (updateNodeInternals: any) => {
       const { nodes } = get();
       updateNodeInternals(nodes.map((node) => node.id));
+    },
+
+    getNode: (nodeId: string) => {
+      const { nodes } = get();
+      return nodes.find((node) => node.id === nodeId);
+    },
+
+    moveToChild: (sourceId: string, targetId: string, side?: 'left' | 'right') => {
+      if (sourceId === targetId) return;
+
+      const state = get();
+      const { nodes, edges } = state;
+
+      const sourceNode = nodes.find((node) => node.id === sourceId);
+      const targetNode = nodes.find((node) => node.id === targetId);
+
+      if (!sourceNode || !targetNode) return;
+
+      const descendantNodes = getAllDescendantNodes(sourceId, nodes);
+      if (descendantNodes.some((node) => node.id === targetId)) {
+        toast.error('Cannot move a node to one of its descendants.');
+        return;
+      }
+
+      const pushUndo = useClipboardStore.getState().pushToUndoStack;
+      pushUndo(nodes, edges);
+
+      const isTargetRoot = targetNode.data?.level === 0;
+      const newSourceLevel = (targetNode.data?.level ?? 0) + 1;
+      const oldSourceLevel = sourceNode.data?.level ?? 0;
+      const newSide = isTargetRoot ? (side ?? 'left') : targetNode.data?.side;
+      const oldSide = sourceNode.data?.side;
+      const levelDifference = newSourceLevel - oldSourceLevel;
+
+      const updatedNodes = nodes.map((node) => {
+        if (node.id === sourceId) {
+          return {
+            ...node,
+            data: {
+              ...node.data,
+              parentId: targetId,
+              level: newSourceLevel,
+              side: newSide,
+            },
+          };
+        }
+
+        if (descendantNodes.some((descendant) => descendant.id === node.id)) {
+          return {
+            ...node,
+            data: {
+              ...node.data,
+              level: node.data.level + levelDifference,
+              side: newSide,
+            },
+          };
+        }
+
+        return node;
+      });
+
+      const getHandles = (side: string, nodeId: string, isSource: boolean) => {
+        const handleType = isSource ? 'source' : 'target';
+        const position = side === 'left' ? (isSource ? 'first' : 'second') : isSource ? 'second' : 'first';
+        return `${position}-${handleType}-${nodeId}`;
+      };
+
+      const updatedEdges = edges.map((edge) => {
+        if (edge.target === sourceId) {
+          return {
+            ...edge,
+            source: targetId,
+            sourceHandle: getHandles(newSide!, targetId, true),
+            targetHandle: getHandles(newSide!, edge.target, false),
+          };
+        }
+
+        if (newSide !== oldSide && descendantNodes.some((descendant) => descendant.id === edge.target)) {
+          return {
+            ...edge,
+            sourceHandle: getHandles(newSide!, edge.source, true),
+            targetHandle: getHandles(newSide!, edge.target, false),
+          };
+        }
+
+        return edge;
+      });
+
+      set(
+        (state) => ({
+          nodes: state.nodes.map((node) => updatedNodes.find((n) => n.id === node.id) || node),
+          edges: state.edges.map((edge) => updatedEdges.find((e) => e.id === edge.id) || edge),
+        }),
+        false,
+        'mindmap/moveToChild'
+      );
     },
   }))
 );

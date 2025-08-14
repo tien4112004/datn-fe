@@ -1,4 +1,4 @@
-import type { Direction } from '../types/constants';
+import { DIRECTION, type Direction } from '../types/constants';
 import { MINDMAP_TYPES, type MindMapEdge, type MindMapNode } from '../types';
 import * as d3 from 'd3';
 
@@ -293,6 +293,7 @@ class D3LayoutService {
   }
 
   async getLayoutedElements(nodes: MindMapNode[], edges: MindMapEdge[], direction: Direction) {
+    if (direction === DIRECTION.NONE) return { nodes, edges };
     const rootNode = nodes.find((node) => node.type === MINDMAP_TYPES.ROOT_NODE);
 
     if (!rootNode) {

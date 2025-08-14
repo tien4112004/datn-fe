@@ -185,6 +185,8 @@ interface MindmapState {
   getNodeLength: () => number;
   setNodes: (updater: MindMapNode[] | ((nodes: MindMapNode[]) => MindMapNode[])) => void;
   setEdges: (updater: MindMapEdge[] | ((edges: MindMapEdge[]) => MindMapEdge[])) => void;
+  hasLeftChildren: (nodeId: string) => boolean;
+  hasRightChildren: (nodeId: string) => boolean;
   addNode: () => void;
   logData: () => void;
   addChildNode: (parentNode: Partial<MindMapNode>, position: XYPosition, side: string) => void;
@@ -361,6 +363,16 @@ export const useMindmapStore = create<MindmapState>()(
         false,
         'mindmap/updateNodeDataWithUndo'
       );
+    },
+
+    hasLeftChildren: (nodeId: string) => {
+      const { nodes } = get();
+      return nodes.some((node) => node.data.parentId === nodeId && node.data.side === 'left');
+    },
+
+    hasRightChildren: (nodeId: string) => {
+      const { nodes } = get();
+      return nodes.some((node) => node.data.parentId === nodeId && node.data.side === 'right');
     },
 
     logData: () => {

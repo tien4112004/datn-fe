@@ -60,9 +60,19 @@ export const BaseNodeBlock = memo(
         <motion.div
           key={id}
           initial={{ opacity: 0, scale: 0 }}
-          animate={data && data.isDeleting ? { opacity: 0, scale: 0 } : { opacity: 1, scale: 1 }}
+          animate={
+            data && data.isDeleting
+              ? { opacity: 0, scale: 0 }
+              : data.isCollapsed
+                ? { opacity: 0, scale: 0.8 }
+                : { opacity: 1, scale: 1 }
+          }
           exit={{ opacity: 0, scale: 0 }}
-          transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94], type: 'tween' }}
+          transition={{
+            duration: data?.isCollapsed ? 0.2 : 0.6,
+            ease: [0.25, 0.46, 0.45, 0.94],
+            type: 'tween',
+          }}
           onAnimationComplete={handleAnimationComplete}
         >
           {variant === 'card' ? (
@@ -71,7 +81,6 @@ export const BaseNodeBlock = memo(
               style={{
                 width: width ? `${width}px` : undefined,
                 minHeight: height ? `${height}px` : undefined,
-                visibility: data.isCollapsed ? 'hidden' : 'visible',
                 ...props.style,
               }}
               onMouseEnter={onMouseEnter}
@@ -96,7 +105,6 @@ export const BaseNodeBlock = memo(
               style={{
                 width: width ? `${width}px` : undefined,
                 minHeight: height ? `${height}px` : undefined,
-                visibility: data.isCollapsed ? 'hidden' : 'visible',
                 ...props.style,
               }}
               onMouseEnter={onMouseEnter}
@@ -188,6 +196,9 @@ export const CreateChildNodeButtons = memo(
     const canCreateRight = node.data.side === 'right' || node.data.side === 'mid';
 
     const toggleCollapse = useMindmapStore((state) => state.toggleCollapse);
+    const hasLeftChildren = useMindmapStore((state) => state.hasLeftChildren);
+    const hasRightChildren = useMindmapStore((state) => state.hasRightChildren);
+
     return (
       <>
         {/* Add Child Buttons */}
@@ -201,25 +212,40 @@ export const CreateChildNodeButtons = memo(
           )}
         >
           <Button
-            onClick={() =>
-              addChildNode(node, { x: node.positionAbsoluteX - 250, y: node.positionAbsoluteY }, 'left')
-            }
+            onClick={() => {
+              toggleCollapse(node.id, 'left', false);
+              setTimeout(() => {
+                addChildNode(node, { x: node.positionAbsoluteX - 250, y: node.positionAbsoluteY }, 'left');
+              }, 300);
+            }}
             size="icon"
             variant="outline"
             className={cn('bg-accent cursor-pointer rounded-full transition-all duration-200')}
           >
             <Plus />
           </Button>
-          <Button
-            onClick={() => {
-              toggleCollapse(node.id, 'left', !node.data.isLeftChildrenCollapsed);
-            }}
-            size="icon"
-            variant="outline"
-            className={cn('bg-accent cursor-pointer rounded-full transition-all duration-200')}
+          <motion.div
+            whileTap={{ scale: 0.95 }}
+            whileHover={{ scale: 1.05 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+            className={cn(hasLeftChildren(node.id) ? 'visible opacity-100' : 'invisible opacity-0')}
           >
-            {node.data.isLeftChildrenCollapsed ? <ArrowLeftFromLine /> : <ArrowRightFromLine />}
-          </Button>
+            <Button
+              onClick={() => {
+                toggleCollapse(node.id, 'left', !node.data.isLeftChildrenCollapsed);
+              }}
+              size="icon"
+              variant="outline"
+              className={cn('bg-accent cursor-pointer rounded-full transition-all duration-200')}
+            >
+              <motion.div
+                animate={{ rotate: node.data.isLeftChildrenCollapsed ? 0 : 180 }}
+                transition={{ duration: 0.2, ease: 'easeInOut' }}
+              >
+                <ArrowLeftFromLine />
+              </motion.div>
+            </Button>
+          </motion.div>
         </div>
 
         <div
@@ -232,9 +258,12 @@ export const CreateChildNodeButtons = memo(
           )}
         >
           <Button
-            onClick={() =>
-              addChildNode(node, { x: node.positionAbsoluteX + 250, y: node.positionAbsoluteY }, 'right')
-            }
+            onClick={() => {
+              toggleCollapse(node.id, 'right', false);
+              setTimeout(() => {
+                addChildNode(node, { x: node.positionAbsoluteX + 250, y: node.positionAbsoluteY }, 'right');
+              }, 300);
+            }}
             size="icon"
             variant="outline"
             className={cn('bg-accent cursor-pointer rounded-full transition-all duration-200')}
@@ -242,16 +271,28 @@ export const CreateChildNodeButtons = memo(
             <Plus />
           </Button>
 
-          <Button
-            onClick={() => {
-              toggleCollapse(node.id, 'right', !node.data.isRightChildrenCollapsed);
-            }}
-            size="icon"
-            variant="outline"
-            className={cn('bg-accent cursor-pointer rounded-full transition-all duration-200')}
+          <motion.div
+            whileTap={{ scale: 0.95 }}
+            whileHover={{ scale: 1.05 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+            className={cn(hasRightChildren(node.id) ? 'visible opacity-100' : 'invisible opacity-0')}
           >
-            {node.data.isRightChildrenCollapsed ? <ArrowRightFromLine /> : <ArrowLeftFromLine />}
-          </Button>
+            <Button
+              onClick={() => {
+                toggleCollapse(node.id, 'right', !node.data.isRightChildrenCollapsed);
+              }}
+              size="icon"
+              variant="outline"
+              className={cn('bg-accent cursor-pointer rounded-full transition-all duration-200')}
+            >
+              <motion.div
+                animate={{ rotate: node.data.isRightChildrenCollapsed ? 0 : 180 }}
+                transition={{ duration: 0.2, ease: 'easeInOut' }}
+              >
+                <ArrowRightFromLine />
+              </motion.div>
+            </Button>
+          </motion.div>
         </div>
       </>
     );

@@ -78,17 +78,15 @@ const EdgeBlock = memo(
   }: EdgeProps<MindMapEdge> & { smoothType: SmoothType }) => {
     const finalizeNodeDeletion = useMindmapStore((state) => state.finalizeNodeDeletion);
 
-    const [edgePath] = data?.isCollapsed
-      ? ['']
-      : getEdgePath(data?.smoothType || 'smoothstep', {
-          id,
-          sourceX,
-          sourceY,
-          targetX,
-          targetY,
-          sourcePosition,
-          targetPosition,
-        });
+    const [edgePath] = getEdgePath(data?.smoothType || 'smoothstep', {
+      id,
+      sourceX,
+      sourceY,
+      targetX,
+      targetY,
+      sourcePosition,
+      targetPosition,
+    });
 
     return (
       <motion.path
@@ -101,10 +99,21 @@ const EdgeBlock = memo(
         style={{
           filter: selected ? 'drop-shadow(0 0 4px var(--primary))' : undefined,
         }}
-        animate={data && data.isDeleting ? { opacity: 0, scale: 0 } : { opacity: 1, scale: 1 }}
+        animate={
+          data && data.isDeleting
+            ? { opacity: 0, scale: 0 }
+            : data?.isCollapsed
+              ? { opacity: 0, scale: 0.8 }
+              : { opacity: 1, scale: 1 }
+        }
         exit={{ opacity: 0, scale: 0 }}
         initial={{ opacity: 0, scale: 0 }}
-        transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94], type: 'tween' }}
+        transition={{
+          duration: data?.isCollapsed ? 0.2 : 0.6,
+          ease: [0.25, 0.46, 0.45, 0.94],
+          type: 'tween',
+          delay: data?.isCollapsed ? 0 : 0.1,
+        }}
         onAnimationComplete={() => {
           if (data?.isDeleting) {
             finalizeNodeDeletion();

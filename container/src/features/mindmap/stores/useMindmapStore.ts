@@ -169,10 +169,10 @@ const initialEdges: MindMapEdge[] = [
 interface MindmapState {
   nodes: MindMapNode[];
   edges: MindMapEdge[];
-  nodeId: number;
   onNodesChange: (changes: any) => void;
   onEdgesChange: (changes: any) => void;
   onConnect: (connection: Connection) => void;
+  getNodeLength: () => number;
   setNodes: (updater: MindMapNode[] | ((nodes: MindMapNode[]) => MindMapNode[])) => void;
   setEdges: (updater: MindMapEdge[] | ((edges: MindMapEdge[]) => MindMapEdge[])) => void;
   addNode: () => void;
@@ -191,10 +191,15 @@ export const useMindmapStore = create<MindmapState>()(
   devtools((set, get) => ({
     nodes: initialNodes,
     edges: initialEdges,
-    nodeId: 1,
     nodesToBeDeleted: new Set<string>(),
 
     onNodesChange: (changes) => {
+      // Debug multi-node drag performance
+      if (changes.length > 1) {
+        console.log('Multi-node change:', changes.length, 'nodes moving');
+        console.time('multi-node-applyNodeChanges');
+      }
+
       set(
         (state) => ({
           nodes: applyNodeChanges(changes, state.nodes),
@@ -202,6 +207,10 @@ export const useMindmapStore = create<MindmapState>()(
         false,
         'mindmap/onNodesChange'
       );
+
+      if (changes.length > 1) {
+        console.timeEnd('multi-node-applyNodeChanges');
+      }
     },
 
     onEdgesChange: (changes) => {
@@ -252,8 +261,13 @@ export const useMindmapStore = create<MindmapState>()(
       );
     },
 
+    getNodeLength: () => {
+      return get().nodes.length;
+    },
+
     addNode: () => {
-      const { nodes, nodeId } = get();
+      const { nodes } = get();
+      const nodeId = generateId();
       const newNode: MindMapNode = {
         id: generateId(),
         type: MINDMAP_TYPES.TEXT_NODE,
@@ -267,7 +281,7 @@ export const useMindmapStore = create<MindmapState>()(
       set(
         (state) => ({
           nodes: [...state.nodes, newNode],
-          nodeId: nodeId + 1,
+          nodeId: nodeId,
         }),
         false,
         'mindmap/addNode'

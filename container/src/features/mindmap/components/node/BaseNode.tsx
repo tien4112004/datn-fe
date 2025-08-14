@@ -1,4 +1,4 @@
-import { forwardRef, type ReactNode, type HTMLAttributes, useCallback, memo } from 'react';
+import { type ReactNode, type HTMLAttributes, useCallback, memo, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { BaseNode } from '@/features/mindmap/components/ui/base-node';
 import { cn } from '@/shared/lib/utils';
@@ -16,14 +16,15 @@ export interface BaseNodeBlockProps extends Omit<HTMLAttributes<HTMLDivElement>,
   variant?: 'card' | 'replacing';
 }
 
-export const BaseNodeBlock = forwardRef<HTMLDivElement, BaseNodeBlockProps>(
-  ({ className, children, variant = 'card', node, ...props }, ref) => {
+export const BaseNodeBlock = memo(
+  ({ className, children, variant = 'card', node, ...props }: BaseNodeBlockProps) => {
     const { id, data, selected: isSelected, width, height } = node;
 
-    const { isMouseOver, setIsMouseOver, layout, isLayouting, addChildNode, onNodeDelete } =
-      useMindmapNodeCommon<MindMapNode>({
-        node,
-      });
+    const [isMouseOver, setIsMouseOver] = useState(false);
+
+    const { layout, isLayouting, addChildNode, onNodeDelete } = useMindmapNodeCommon<MindMapNode>({
+      node,
+    });
 
     const handleAnimationComplete = useCallback(() => {
       if (data.isDeleting && onNodeDelete) {
@@ -55,13 +56,13 @@ export const BaseNodeBlock = forwardRef<HTMLDivElement, BaseNodeBlockProps>(
         <motion.div
           key={id}
           initial={{ opacity: 0, scale: 0 }}
-          animate={data.isDeleting ? { opacity: 0, scale: 0 } : { opacity: 1, scale: 1 }}
+          animate={data && data.isDeleting ? { opacity: 0, scale: 0 } : { opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0 }}
           transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94], type: 'tween' }}
           onAnimationComplete={handleAnimationComplete}
         >
           {variant === 'card' ? (
             <BaseNode
-              ref={ref}
               className={cn(cardStyles, className)}
               style={{
                 width: width ? `${width}px` : undefined,
@@ -80,13 +81,12 @@ export const BaseNodeBlock = forwardRef<HTMLDivElement, BaseNodeBlockProps>(
                 node={node}
                 addChildNode={addChildNode}
                 isMouseOver={isMouseOver}
-                isSelected={isSelected}
+                isSelected={isSelected ?? false}
                 layout={layout}
               />
             </BaseNode>
           ) : (
             <div
-              ref={ref}
               className={cn(baseStyles, className)}
               style={{
                 width: width ? `${width}px` : undefined,
@@ -105,13 +105,28 @@ export const BaseNodeBlock = forwardRef<HTMLDivElement, BaseNodeBlockProps>(
                 node={node}
                 addChildNode={addChildNode}
                 isMouseOver={isMouseOver}
-                isSelected={isSelected}
+                isSelected={isSelected ?? false}
                 layout={layout}
               />
             </div>
           )}
         </motion.div>
       </AnimatePresence>
+    );
+  },
+  (prevProps, nextProps) => {
+    // Only re-render BaseNode if these specific properties change
+    const prevNode = prevProps.node;
+    const nextNode = nextProps.node;
+
+    return (
+      prevNode.id === nextNode.id &&
+      prevNode.selected === nextNode.selected &&
+      prevNode.dragging === nextNode.dragging &&
+      prevNode.width === nextNode.width &&
+      prevNode.height === nextNode.height &&
+      prevNode.data?.isDeleting === nextNode.data?.isDeleting &&
+      prevProps.variant === nextProps.variant
     );
   }
 );
@@ -147,20 +162,16 @@ export const NodeHandlers = memo(({ layout, id }: { layout: Direction; id: strin
   );
 });
 
+interface CreateChildNodeButtonsProps {
+  node: NodeProps<MindMapNode>;
+  addChildNode: any;
+  isMouseOver: boolean;
+  isSelected: boolean;
+  layout: Direction;
+}
+
 export const CreateChildNodeButtons = memo(
-  ({
-    node,
-    addChildNode,
-    isMouseOver,
-    isSelected,
-    layout,
-  }: {
-    node: NodeProps<MindMapNode>;
-    addChildNode: any;
-    isMouseOver: boolean;
-    isSelected: boolean;
-    layout: Direction;
-  }) => {
+  ({ node, addChildNode, isMouseOver, isSelected, layout }: CreateChildNodeButtonsProps) => {
     const canCreateLeft = node.data.side === 'left' || node.data.side === 'mid';
     const canCreateRight = node.data.side === 'right' || node.data.side === 'mid';
     return (
@@ -200,6 +211,14 @@ export const CreateChildNodeButtons = memo(
           <Plus />
         </Button>
       </>
+    );
+  },
+  (prevProps, nextProps) => {
+    // Only re-render if these specific properties change
+    return (
+      prevProps.node.id === nextProps.node.id &&
+      prevProps.layout === nextProps.layout &&
+      (prevProps.isMouseOver || prevProps.isSelected) === (nextProps.isMouseOver || nextProps.isSelected)
     );
   }
 );

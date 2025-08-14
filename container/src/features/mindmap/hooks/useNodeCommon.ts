@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useUpdateNodeInternals, type NodeProps } from '@xyflow/react';
 import { useMindmapStore } from '../stores/useMindmapStore';
 import { useLayoutStore } from '../stores/useLayoutStore';
@@ -9,51 +9,38 @@ export interface UseNodeCommonProps<T extends BaseNode = BaseNode> {
   node: NodeProps<T>;
 }
 
-export interface UseNodeCommonReturn<T extends BaseNode = BaseNode> {
-  // State
-  isMouseOver: boolean;
-  setIsMouseOver: (value: boolean) => void;
-
+export interface UseNodeCommonReturn {
   // Store values
   layout: Direction;
   isLayouting: boolean;
   addChildNode: any;
   onNodeDelete: () => void;
-
-  node: NodeProps<T>;
+  updateNodeData: (id: string, data: Partial<BaseNode['data']>) => void;
 }
 
 export const useMindmapNodeCommon = <T extends BaseNode = BaseNode>({
   node,
-}: UseNodeCommonProps<T>): UseNodeCommonReturn<T> => {
-  const { id } = node;
-  const [isMouseOver, setIsMouseOver] = useState(false);
-
-  // Store hooks
+}: UseNodeCommonProps<T>): UseNodeCommonReturn => {
   const addChildNode = useMindmapStore((state) => state.addChildNode);
   const onNodeDelete = useMindmapStore((state) => state.finalizeNodeDeletion);
   const layout = useLayoutStore((state) => state.layout);
   const isLayouting = useLayoutStore((state) => state.isLayouting);
+  const updateNodeData = useMindmapStore((state) => state.updateNodeData);
 
   // React Flow hooks
   const updateNodeInternals = useUpdateNodeInternals();
 
-  // Effects
   useEffect(() => {
-    updateNodeInternals(id);
-  }, [layout, isLayouting, id, updateNodeInternals]);
+    if (!isLayouting && layout) {
+      updateNodeInternals(node.id);
+    }
+  }, [layout, isLayouting, node.id, updateNodeInternals]);
 
   return {
-    // State
-    isMouseOver,
-    setIsMouseOver,
-
-    // Store values
     layout,
     isLayouting,
     addChildNode,
     onNodeDelete,
-
-    node: node,
+    updateNodeData,
   };
 };

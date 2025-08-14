@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useUpdateNodeInternals, useNodesInitialized, type Connection } from '@xyflow/react';
+import { useUpdateNodeInternals, useNodesInitialized } from '@xyflow/react';
 import { useMindmapStore } from '../stores/useMindmapStore';
 import { useLayoutStore } from '../stores/useLayoutStore';
 import type { BaseNode } from '../types';
@@ -8,8 +8,6 @@ import { useClipboardStore } from '../stores';
 export const useReactFlowIntegration = () => {
   const nodeLength = useMindmapStore((state) => state.nodes.length);
   const syncState = useMindmapStore((state) => state.syncState);
-
-  const storeOnConnect = useMindmapStore((state) => state.onConnect);
 
   const updateLayout = useLayoutStore((state) => state.updateLayout);
   const setMousePosition = useClipboardStore((state) => state.setMousePosition);
@@ -51,19 +49,14 @@ export const useReactFlowIntegration = () => {
     if (!stateChanged) return;
 
     const timeoutId = setTimeout(() => {
-      syncState(updateNodeInternals);
+      if (nodesInitialized) {
+        syncState(updateNodeInternals);
+      }
       setStateChanged(false);
-    }, 500);
+    }, 100);
 
     return () => clearTimeout(timeoutId);
-  }, [stateChanged]);
-
-  const onConnect = useCallback(
-    (params: Connection) => {
-      storeOnConnect(params);
-    },
-    [storeOnConnect]
-  );
+  }, [stateChanged, nodesInitialized]);
 
   const onNodeDrag = useCallback((_: MouseEvent, node: BaseNode) => {
     node;
@@ -71,7 +64,6 @@ export const useReactFlowIntegration = () => {
   }, []);
 
   return {
-    onConnect,
     onNodeDrag,
     onPaneMouseMove,
     onPaneClick,

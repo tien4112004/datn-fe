@@ -1,12 +1,12 @@
 import splitMarkdownToOutlineItems from '@/features/presentation/utils/splitMarkdownToOutlineItems';
 import { usePresentationApiService } from '@/features/presentation/api';
-import type { OutlineItem, OutlinePromptRequest } from '@/features/presentation/types';
+import type { OutlineItem, OutlineData } from '@/features/presentation/types';
 import useStreaming from '@/hooks/useStreaming';
 
-function useFetchStreamingOutline(initialRequestData: OutlinePromptRequest) {
+function useFetchStreamingOutline(initialRequestData: OutlineData) {
   const presentationApiService = usePresentationApiService();
 
-  return useStreaming<OutlinePromptRequest, OutlineItem[]>({
+  return useStreaming<OutlineData, OutlineItem[]>({
     extractFn: presentationApiService.getStreamedOutline,
     transformFn: splitMarkdownToOutlineItems,
     input: initialRequestData,

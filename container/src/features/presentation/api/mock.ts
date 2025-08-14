@@ -1,7 +1,7 @@
 import { API_MODE, type ApiMode } from '@/shared/constants';
 import {
   type OutlineItem,
-  type OutlinePromptRequest,
+  type OutlineData,
   type PresentationApiService,
   type PresentationItem,
 } from '../types';
@@ -87,7 +87,7 @@ const mockPresentationItems: PresentationItem[] = [
 ];
 
 export default class PresentationMockService implements PresentationApiService {
-  async *getStreamedOutline(_request: OutlinePromptRequest, signal: AbortSignal): AsyncGenerator<string> {
+  async *getStreamedOutline(_request: OutlineData, signal: AbortSignal): AsyncGenerator<string> {
     const chunks = mockOutlineOutput.split(' ');
 
     for (const chunk of chunks) {

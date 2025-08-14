@@ -35,6 +35,7 @@ const ExamplePrompts = ({
           <div className="mt-2 grid grid-cols-3 gap-2">
             {examplePrompts.map((prompt, idx) => (
               <Button
+                type="button"
                 key={'prompt' + idx}
                 variant="prompt"
                 className="h-auto w-full whitespace-normal px-4 py-2 text-left"

@@ -3,8 +3,9 @@ import type { ModelApiService, ModelOption } from '../types';
 // import api from '@/shared/api';
 
 const realApiModels: ModelOption[] = [
-  { id: 'gpt-4o-mini', name: 'gpt-4o-mini', displayName: 'GPT-4o Mini' },
-  { id: 'gemini-2.0-flash', name: 'gemini-2.0-flash', displayName: 'Gemini 2.0 Flash' },
+  { id: 'gpt-4.1-nano-2025-04-14', name: 'gpt-4.1-nano-2025-04-14', displayName: 'GPT-4.1 Nano' },
+  { id: 'gpt-4o-mini-2024-07-18', name: 'gpt-4o-mini-2024-07-18', displayName: 'GPT-4o Mini' },
+  { id: 'gemini-2.5-flash', name: 'gemini-2.5-flash', displayName: 'Gemini 2.5 Flash' },
 ];
 
 export default class ModelRealApiService implements ModelApiService {

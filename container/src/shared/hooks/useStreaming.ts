@@ -61,7 +61,7 @@ function useStreaming<TRequest = any, TProcessed = any>({
   return {
     processedData: transformFn(data?.join('') ?? ''),
     isStreaming,
-    error: error?.message ?? null,
+    error: error && error.message !== 'CancelledError' ? error.message : null,
     restartStream,
     stopStream,
     clearContent,

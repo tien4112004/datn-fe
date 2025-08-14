@@ -35,6 +35,7 @@ const OutlineCreationView = ({ defaultModel, onCreateOutline }: OutlineCreationV
       language: 'en',
       model: defaultModel.name,
       targetAge: '7-10',
+      learningObjective: 'something',
     },
   });
 

@@ -18,20 +18,20 @@ const edgeTypes = {
   mindmapEdge: EdgeBlock,
 };
 
+const handlersSelector = (state: any) => ({
+  nodes: state.nodes,
+  edges: state.edges,
+  onNodesChange: state.onNodesChange,
+  onEdgesChange: state.onEdgesChange,
+  onConnect: state.onConnect,
+});
+
 const Flow = memo(({ children, isPanOnDrag }: { children: ReactNode; isPanOnDrag: boolean }) => {
-  const { onConnect, onNodeDrag, onPaneMouseMove, onPaneClick } = useReactFlowIntegration();
-  const { nodes, edges, onNodesChange, onEdgesChange } = useMindmapStore(
-    useShallow((state) => ({
-      nodes: state.nodes,
-      edges: state.edges,
-      onNodesChange: state.onNodesChange,
-      onEdgesChange: state.onEdgesChange,
-    }))
+  const { onNodeDrag, onPaneMouseMove, onPaneClick } = useReactFlowIntegration();
+
+  const { nodes, edges, onNodesChange, onEdgesChange, onConnect } = useMindmapStore(
+    useShallow(handlersSelector)
   );
-
-  //   console.log('Rerender');
-
-  //   useWhyDidYouUpdate('MindMap', { nodes, edges, onNodesChange, onEdgesChange, onConnect });
 
   return (
     <ReactFlow
@@ -47,7 +47,9 @@ const Flow = memo(({ children, isPanOnDrag }: { children: ReactNode; isPanOnDrag
       onPaneClick={onPaneClick}
       onNodeDrag={onNodeDrag}
       panOnDrag={isPanOnDrag}
+      panActivationKeyCode={!isPanOnDrag ? 'Shift' : null}
       selectionOnDrag={!isPanOnDrag}
+      selectionKeyCode={isPanOnDrag ? 'Shift' : null}
       fitView
     >
       {children}

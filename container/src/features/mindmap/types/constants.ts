@@ -18,3 +18,11 @@ export const SIDE = {
 } as const;
 
 export type Side = (typeof SIDE)[keyof typeof SIDE];
+
+export const SHAPES = {
+  RECTANGLE: 'rectangle',
+  CIRCLE: 'circle',
+  ELLIPSE: 'ellipse',
+} as const;
+
+export type Shape = (typeof SHAPES)[keyof typeof SHAPES];

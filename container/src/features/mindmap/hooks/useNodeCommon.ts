@@ -15,7 +15,6 @@ export interface UseNodeCommonReturn {
   isLayouting: boolean;
   addChildNode: any;
   onNodeDelete: () => void;
-  updateNodeData: (id: string, data: Partial<BaseNode['data']>) => void;
   moveToChild: (sourceId: string, targetId: string, side: Side) => void;
 }
 
@@ -26,7 +25,6 @@ export const useMindmapNodeCommon = <T extends BaseNode = BaseNode>({
   const onNodeDelete = useMindmapStore((state) => state.finalizeNodeDeletion);
   const layout = useLayoutStore((state) => state.layout);
   const isLayouting = useLayoutStore((state) => state.isLayouting);
-  const updateNodeData = useMindmapStore((state) => state.updateNodeData);
   const moveToChild = useMindmapStore((state) => state.moveToChild);
 
   // React Flow hooks
@@ -41,7 +39,6 @@ export const useMindmapNodeCommon = <T extends BaseNode = BaseNode>({
     isLayouting,
     addChildNode,
     onNodeDelete,
-    updateNodeData,
     moveToChild,
   };
 };

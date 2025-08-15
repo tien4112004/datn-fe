@@ -8,12 +8,15 @@ import type { NodeProps } from '@xyflow/react';
 import { useMindmapNodeCommon } from '../../hooks';
 import { Button } from '@/components/ui/button';
 import { Upload, X, Loader2 } from 'lucide-react';
+import { useMindmapStore } from '../../stores';
 
 const ImageNodeBlock = memo(
   ({ ...node }: NodeProps<ImageNode>) => {
     const { id, data, selected: isSelected, width, height } = node;
 
-    const { layout, updateNodeData } = useMindmapNodeCommon<ImageNode>({ node });
+    const { layout } = useMindmapNodeCommon<ImageNode>({ node });
+    const updateNodeData = useMindmapStore((state) => state.updateNodeDataWithUndo);
+    const updateNodeDataWithUndo = useMindmapStore((state) => state.updateNodeDataWithUndo);
 
     const [isEditing, setIsEditing] = useState(!data.imageUrl);
     const [isLoadingImage, setIsLoadingImage] = useState(false);
@@ -27,7 +30,7 @@ const ImageNodeBlock = memo(
           // Create a temporary image to get dimensions
           const img = new Image();
           img.onload = () => {
-            updateNodeData(id, {
+            updateNodeDataWithUndo(id, {
               imageUrl,
               width: img.naturalWidth,
               height: img.naturalHeight,
@@ -93,7 +96,7 @@ const ImageNodeBlock = memo(
     }, []);
 
     const handleRemoveImage = useCallback(() => {
-      updateNodeData(id, {
+      updateNodeDataWithUndo(id, {
         imageUrl: undefined,
         width: 250,
         height: 180,

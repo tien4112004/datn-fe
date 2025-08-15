@@ -1,19 +1,21 @@
 import { memo } from 'react';
 import { cn } from '@/shared/lib/utils';
-import { DIRECTION } from '../../types/constants';
+import { DIRECTION, SHAPES, type Shape } from '../../types/constants';
 import type { ShapeNode } from '../../types';
 import { BaseNodeBlock } from './BaseNode';
 import type { NodeProps } from '@xyflow/react';
 import { useMindmapNodeCommon } from '../../hooks';
 import { Button } from '@/components/ui/button';
+import { useMindmapStore } from '../../stores';
 
 const ShapeNodeBlock = memo(
   ({ ...node }: NodeProps<ShapeNode>) => {
     const { id, data, selected: isSelected, width, height } = node;
 
-    const { layout, updateNodeData } = useMindmapNodeCommon<ShapeNode>({ node });
+    const { layout } = useMindmapNodeCommon<ShapeNode>({ node });
+    const updateNodeData = useMindmapStore((state) => state.updateNodeDataWithUndo);
 
-    const handleShapeChange = (newShape: 'rectangle' | 'circle' | 'ellipse') => {
+    const handleShapeChange = (newShape: Shape) => {
       updateNodeData(id, { shape: newShape });
     };
 
@@ -25,7 +27,7 @@ const ShapeNodeBlock = memo(
           className="h-full w-full"
           viewBox={`0 0 ${width || 200} ${height || 100}`}
         >
-          {data.shape === 'circle' && (
+          {data.shape === SHAPES.CIRCLE && (
             <circle
               cx={width ? width / 2 : 100}
               cy={height ? height / 2 : 50}
@@ -35,7 +37,7 @@ const ShapeNodeBlock = memo(
               strokeWidth={data.metadata?.strokeWidth || 2}
             />
           )}
-          {data.shape === 'ellipse' && (
+          {data.shape === SHAPES.ELLIPSE && (
             <ellipse
               cx={width ? width / 2 : 100}
               cy={height ? height / 2 : 50}
@@ -46,7 +48,7 @@ const ShapeNodeBlock = memo(
               strokeWidth={data.metadata?.strokeWidth || 2}
             />
           )}
-          {(!data.shape || data.shape === 'rectangle') && (
+          {(!data.shape || data.shape === SHAPES.RECTANGLE) && (
             <rect
               x="5"
               y="5"
@@ -74,8 +76,8 @@ const ShapeNodeBlock = memo(
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => handleShapeChange('rectangle')}
-            className={cn('h-6 w-6 p-1', (!data.shape || data.shape === 'rectangle') && 'bg-accent')}
+            onClick={() => handleShapeChange(SHAPES.RECTANGLE)}
+            className={cn('h-6 w-6 p-1', (!data.shape || data.shape === SHAPES.RECTANGLE) && 'bg-accent')}
             title="Rectangle"
           >
             <svg className="h-3 w-3" viewBox="0 0 12 8" fill="currentColor">
@@ -85,8 +87,8 @@ const ShapeNodeBlock = memo(
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => handleShapeChange('circle')}
-            className={cn('h-6 w-6 p-1', data.shape === 'circle' && 'bg-accent')}
+            onClick={() => handleShapeChange(SHAPES.CIRCLE)}
+            className={cn('h-6 w-6 p-1', data.shape === SHAPES.CIRCLE && 'bg-accent')}
             title="Circle"
           >
             <svg className="h-3 w-3" viewBox="0 0 12 12" fill="currentColor">
@@ -96,8 +98,8 @@ const ShapeNodeBlock = memo(
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => handleShapeChange('ellipse')}
-            className={cn('h-6 w-6 p-1', data.shape === 'ellipse' && 'bg-accent')}
+            onClick={() => handleShapeChange(SHAPES.ELLIPSE)}
+            className={cn('h-6 w-6 p-1', data.shape === SHAPES.ELLIPSE && 'bg-accent')}
             title="Ellipse"
           >
             <svg className="h-3 w-3" viewBox="0 0 12 8" fill="currentColor">

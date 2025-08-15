@@ -8,13 +8,16 @@ import { BaseNodeBlock } from './BaseNode';
 import { Input } from '@/components/ui/input';
 import { BaseNodeContent } from '../ui/base-node';
 import type { NodeProps } from '@xyflow/react';
+import { useMindmapStore } from '../../stores';
 
 const RootNodeBlock = memo(
   ({ ...node }: NodeProps<RootNode>) => {
     const { data, selected: isSelected, width } = node;
-    const { layout, updateNodeData } = useMindmapNodeCommon<RootNode>({
+    const { layout } = useMindmapNodeCommon<RootNode>({
       node,
     });
+
+    const updateNodeData = useMindmapStore((state) => state.updateNodeDataWithUndo);
 
     const [, setIsEditing] = useState(false);
 

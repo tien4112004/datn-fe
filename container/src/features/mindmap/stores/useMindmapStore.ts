@@ -201,7 +201,7 @@ interface MindmapState {
     side: string,
     nodeType?: MindMapTypes
   ) => void;
-  updateNodeData: (nodeId: string, updates: Partial<MindMapNode['data']>) => void;
+  updateNodeDataWithUndo: (nodeId: string, updates: Partial<MindMapNode['data']>) => void;
   updateNodeDataWithUndo: (nodeId: string, updates: Partial<MindMapNode['data']>) => void;
   syncState: (updateNodeInternals: any) => void;
   nodesToBeDeleted: Set<string>;

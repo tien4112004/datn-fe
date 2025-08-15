@@ -9,14 +9,17 @@ import { BaseNodeContent } from '../ui/base-node';
 import { useMindmapNodeCommon } from '../../hooks';
 import type { NodeProps } from '@xyflow/react';
 import RichTextEditor from '@/components/rte/RichTextEditor';
+import { useMindmapStore } from '../../stores';
 
 const TextNodeBlock = memo(
   ({ ...node }: NodeProps<TextNode>) => {
     const { data, selected: isSelected, width, dragging } = node;
 
-    const { layout, isLayouting, updateNodeData } = useMindmapNodeCommon<TextNode>({
+    const { layout, isLayouting } = useMindmapNodeCommon<TextNode>({
       node,
     });
+
+    const updateNodeData = useMindmapStore((state) => state.updateNodeDataWithUndo);
 
     const [isEditing, setIsEditing] = useState(false);
 

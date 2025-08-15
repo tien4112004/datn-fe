@@ -421,4 +421,34 @@ export const CreateChildNodeButtons = memo(
   }
 );
 
+interface BaseNodeControlProps {
+  layout: Direction;
+  isSelected: boolean;
+  children: ReactNode;
+  spacing?: 'sm' | 'lg';
+  padding?: boolean;
+}
+
+export const BaseNodeControl = memo(
+  ({ layout, isSelected, children, spacing = 'lg', padding = false }: BaseNodeControlProps) => {
+    const offset = spacing === 'sm' ? '12px' : '24px';
+
+    return (
+      <div
+        className={cn(
+          layout === DIRECTION.VERTICAL
+            ? `right-0 top-1/2 -translate-y-1/2 translate-x-[calc(100%+${offset})] flex-col`
+            : `left-1/2 top-0 -translate-x-1/2 -translate-y-[calc(100%+${offset})] flex-row`,
+          'bg-muted absolute z-[1000] flex items-center justify-center gap-1 rounded-sm transition-all duration-200',
+          padding && 'p-1',
+          isSelected ? 'visible opacity-100' : 'invisible opacity-0'
+        )}
+      >
+        {children}
+      </div>
+    );
+  }
+);
+
+BaseNodeControl.displayName = 'BaseNodeControl';
 BaseNodeBlock.displayName = 'MindmapNodeBase';

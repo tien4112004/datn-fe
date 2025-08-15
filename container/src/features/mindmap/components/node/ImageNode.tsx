@@ -2,7 +2,7 @@ import { memo, useState, useCallback, useRef } from 'react';
 import { cn } from '@/shared/lib/utils';
 import { DIRECTION, DragHandle } from '../../types/constants';
 import type { ImageNode } from '../../types';
-import { BaseNodeBlock } from './BaseNode';
+import { BaseNodeBlock, BaseNodeControl } from './BaseNode';
 import { BaseNodeContent } from '../ui/base-node';
 import type { NodeProps } from '@xyflow/react';
 import { useMindmapNodeCommon } from '../../hooks';
@@ -123,16 +123,7 @@ const ImageNodeBlock = memo(
               draggable={false}
             />
 
-            {/* Image controls */}
-            <div
-              className={cn(
-                layout === DIRECTION.VERTICAL
-                  ? 'right-0 top-1/2 -translate-y-1/2 translate-x-[calc(100%+12px)] flex-col'
-                  : 'left-1/2 top-0 -translate-x-1/2 -translate-y-[calc(100%+12px)] flex-row',
-                'bg-muted absolute z-[1000] flex items-center justify-center gap-1 rounded-sm p-1 transition-all duration-200',
-                isSelected ? 'visible opacity-100' : 'invisible opacity-0'
-              )}
-            >
+            <BaseNodeControl layout={layout} isSelected={isSelected ?? false} spacing="sm" padding>
               <Button
                 variant="ghost"
                 size="sm"
@@ -142,7 +133,7 @@ const ImageNodeBlock = memo(
               >
                 <X className="h-3 w-3" />
               </Button>
-            </div>
+            </BaseNodeControl>
           </div>
         ) : (
           // Upload mode - using "card" variant

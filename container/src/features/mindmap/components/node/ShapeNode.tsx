@@ -2,7 +2,7 @@ import { memo } from 'react';
 import { cn } from '@/shared/lib/utils';
 import { DIRECTION, SHAPES, type Shape } from '../../types/constants';
 import type { ShapeNode } from '../../types';
-import { BaseNodeBlock } from './BaseNode';
+import { BaseNodeBlock, BaseNodeControl } from './BaseNode';
 import type { NodeProps } from '@xyflow/react';
 import { useMindmapNodeCommon } from '../../hooks';
 import { Button } from '@/components/ui/button';
@@ -63,16 +63,7 @@ const ShapeNodeBlock = memo(
           )}
         </svg>
 
-        {/* Shape selector */}
-        <div
-          className={cn(
-            layout === DIRECTION.VERTICAL
-              ? 'right-0 top-1/2 -translate-y-1/2 translate-x-[calc(100%+24px)] flex-col'
-              : 'left-1/2 top-0 -translate-x-1/2 -translate-y-[calc(100%+24px)] flex-row',
-            'bg-muted absolute z-[1000] flex items-center justify-center gap-1 rounded-sm transition-all duration-200',
-            isSelected ? 'visible opacity-100' : 'invisible opacity-0'
-          )}
-        >
+        <BaseNodeControl layout={layout} isSelected={isSelected ?? false}>
           <Button
             variant="ghost"
             size="sm"
@@ -106,7 +97,7 @@ const ShapeNodeBlock = memo(
               <ellipse cx="6" cy="4" rx="6" ry="4" />
             </svg>
           </Button>
-        </div>
+        </BaseNodeControl>
       </BaseNodeBlock>
     );
   },

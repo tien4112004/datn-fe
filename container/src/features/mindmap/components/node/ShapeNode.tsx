@@ -1,12 +1,14 @@
 import { memo } from 'react';
 import { cn } from '@/shared/lib/utils';
-import { DIRECTION, SHAPES, type Shape } from '../../types/constants';
+import { SHAPES, type Shape } from '../../types/constants';
 import type { ShapeNode } from '../../types';
 import { BaseNodeBlock, BaseNodeControl } from './BaseNode';
 import type { NodeProps } from '@xyflow/react';
 import { useMindmapNodeCommon } from '../../hooks';
 import { Button } from '@/components/ui/button';
 import { useMindmapStore } from '../../stores';
+import { useLayoutStore } from '../../stores/useLayoutStore';
+import { Network } from 'lucide-react';
 
 const ShapeNodeBlock = memo(
   ({ ...node }: NodeProps<ShapeNode>) => {
@@ -14,9 +16,14 @@ const ShapeNodeBlock = memo(
 
     const { layout } = useMindmapNodeCommon<ShapeNode>({ node });
     const updateNodeData = useMindmapStore((state) => state.updateNodeDataWithUndo);
+    const updateSubtreeLayout = useLayoutStore((state) => state.updateSubtreeLayout);
 
     const handleShapeChange = (newShape: Shape) => {
       updateNodeData(id, { shape: newShape });
+    };
+
+    const handleLayoutClick = () => {
+      updateSubtreeLayout(id, layout);
     };
 
     return (
@@ -64,6 +71,15 @@ const ShapeNodeBlock = memo(
         </svg>
 
         <BaseNodeControl layout={layout} isSelected={isSelected ?? false}>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleLayoutClick}
+            className="h-6 w-6 p-1"
+            title="Update Subtree Layout"
+          >
+            <Network className="h-3 w-3" />
+          </Button>
           <Button
             variant="ghost"
             size="sm"

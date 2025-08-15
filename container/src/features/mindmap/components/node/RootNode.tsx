@@ -4,11 +4,14 @@ import { cn } from '@/shared/lib/utils';
 import { DIRECTION, DragHandle } from '../../types/constants';
 import type { RootNode } from '../../types';
 import { useMindmapNodeCommon } from '../../hooks/useNodeCommon';
-import { BaseNodeBlock } from './BaseNode';
+import { BaseNodeBlock, BaseNodeControl } from './BaseNode';
 import { Input } from '@/components/ui/input';
 import { BaseNodeContent } from '../ui/base-node';
 import type { NodeProps } from '@xyflow/react';
 import { useMindmapStore } from '../../stores';
+import { useLayoutStore } from '../../stores/useLayoutStore';
+import { Button } from '@/components/ui/button';
+import { Network } from 'lucide-react';
 
 const RootNodeBlock = memo(
   ({ ...node }: NodeProps<RootNode>) => {
@@ -18,6 +21,7 @@ const RootNodeBlock = memo(
     });
 
     const updateNodeData = useMindmapStore((state) => state.updateNodeDataWithUndo);
+    const updateSubtreeLayout = useLayoutStore((state) => state.updateSubtreeLayout);
 
     const [, setIsEditing] = useState(false);
 
@@ -32,6 +36,10 @@ const RootNodeBlock = memo(
         setIsEditing(false);
       }
     }, []);
+
+    const handleLayoutClick = () => {
+      updateSubtreeLayout(node.id, layout);
+    };
 
     return (
       <BaseNodeBlock node={node} className="border-primary">
@@ -58,6 +66,18 @@ const RootNodeBlock = memo(
             onChange={(e) => updateNodeData(node.id, { content: e.target.value })}
           />
         </BaseNodeContent>
+
+        <BaseNodeControl layout={layout} isSelected={isSelected ?? false}>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleLayoutClick}
+            className="h-6 w-6 p-1"
+            title="Update Subtree Layout"
+          >
+            <Network className="h-3 w-3" />
+          </Button>
+        </BaseNodeControl>
       </BaseNodeBlock>
     );
   },

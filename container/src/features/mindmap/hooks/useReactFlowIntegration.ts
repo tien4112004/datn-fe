@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useUpdateNodeInternals, useNodesInitialized, useReactFlow } from '@xyflow/react';
 import { useMindmapStore } from '../stores/useMindmapStore';
 import { useLayoutStore } from '../stores/useLayoutStore';
-import type { BaseNode } from '../types';
+import type { MindMapNode } from '../types';
 import { useClipboardStore } from '../stores';
 import { DIRECTION, SIDE } from '../types/constants';
 
@@ -61,7 +61,7 @@ export const useReactFlowIntegration = () => {
     return () => clearTimeout(timeoutId);
   }, [stateChanged]);
 
-  const determineSideFromPosition = useCallback((draggedNode: BaseNode, targetNode: any) => {
+  const determineSideFromPosition = useCallback((draggedNode: MindMapNode, targetNode: any) => {
     const targetCenterX = targetNode.position.x + (targetNode.measured?.width ?? 0) / 2;
     const draggedCenterX = draggedNode.position.x + (draggedNode.measured?.width ?? 0) / 2;
     return draggedCenterX < targetCenterX ? SIDE.LEFT : SIDE.RIGHT;
@@ -75,7 +75,7 @@ export const useReactFlowIntegration = () => {
   );
 
   const onNodeDrag = useCallback(
-    (_: MouseEvent, node: BaseNode) => {
+    (_: MouseEvent, node: MindMapNode) => {
       const intersections = getIntersectingNodes(node).map((n) => n.id);
 
       if (intersections.length === 0) {
@@ -95,7 +95,7 @@ export const useReactFlowIntegration = () => {
   );
 
   const onNodeDragStop = useCallback(
-    (_: MouseEvent, node: BaseNode) => {
+    (_: MouseEvent, node: MindMapNode) => {
       const intersections = getIntersectingNodes(node).map((n) => n.id);
 
       setDragTarget(null);

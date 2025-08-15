@@ -4,12 +4,15 @@ import { cn } from '@/shared/lib/utils';
 import { useRichTextEditor } from '@/shared/components/rte/useRichTextEditor';
 import { DIRECTION, DragHandle } from '@/features/mindmap/types/constants';
 import type { TextNode } from '@/features/mindmap/types';
-import { BaseNodeBlock } from './BaseNode';
+import { BaseNodeBlock, BaseNodeControl } from './BaseNode';
 import { BaseNodeContent } from '../ui/base-node';
 import { useMindmapNodeCommon } from '../../hooks';
 import type { NodeProps } from '@xyflow/react';
 import RichTextEditor from '@/components/rte/RichTextEditor';
 import { useMindmapStore } from '../../stores';
+import { useLayoutStore } from '../../stores/useLayoutStore';
+import { Button } from '@/components/ui/button';
+import { Network } from 'lucide-react';
 
 const TextNodeBlock = memo(
   ({ ...node }: NodeProps<TextNode>) => {
@@ -20,6 +23,7 @@ const TextNodeBlock = memo(
     });
 
     const updateNodeData = useMindmapStore((state) => state.updateNodeDataWithUndo);
+    const updateSubtreeLayout = useLayoutStore((state) => state.updateSubtreeLayout);
 
     const [isEditing, setIsEditing] = useState(false);
 
@@ -52,6 +56,10 @@ const TextNodeBlock = memo(
         setIsEditing(false);
       }
     }, []);
+
+    const handleLayoutClick = () => {
+      updateSubtreeLayout(node.id, layout);
+    };
 
     return (
       <BaseNodeBlock node={node} variant="card">
@@ -91,6 +99,18 @@ const TextNodeBlock = memo(
             )}
           </div>
         </BaseNodeContent>
+
+        <BaseNodeControl layout={layout} isSelected={isSelected ?? false}>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleLayoutClick}
+            className="h-6 w-6 p-1"
+            title="Update Subtree Layout"
+          >
+            <Network className="h-3 w-3" />
+          </Button>
+        </BaseNodeControl>
       </BaseNodeBlock>
     );
   },

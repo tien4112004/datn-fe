@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import * as d3 from 'd3';
-import type { BaseNode, MindMapEdge, MindMapNode } from '../types';
+import type { MindMapEdge, MindMapNode } from '../types';
 import { type Direction } from '../types/constants';
 import { useMindmapStore } from './useMindmapStore';
 import { devtools } from 'zustand/middleware';
@@ -81,15 +81,19 @@ export const useLayoutStore = create<LayoutState>()(
         }
 
         // Store initial positions and calculate deltas
-        const animationData = nodes.map((node) => {
+        const animationData: AnimationData[] = [];
+        nodes.forEach((node) => {
           const target = targetPositions[node.id];
-          return {
+
+          if (!target) return;
+
+          animationData.push({
             id: node.id,
             startPos: { ...node.position },
             targetPos: target || node.position,
             deltaX: target.x - (node.position.x ?? 0),
             deltaY: target.y - (node.position.y ?? 0),
-          };
+          });
         });
 
         set(
@@ -107,7 +111,7 @@ export const useLayoutStore = create<LayoutState>()(
           // Use easing function for smoother animation
           const easedProgress = d3.easeCubicInOut(progress);
 
-          setNodes((currentNodes: BaseNode[]) =>
+          setNodes((currentNodes: MindMapNode[]) =>
             currentNodes.map((node) => {
               const animData = animationData.find((d) => d.id === node.id);
               if (!animData) return node;
@@ -153,26 +157,21 @@ export const useLayoutStore = create<LayoutState>()(
         set({ isLayouting: true }, false, 'mindmap-layout/updateLayout');
 
         try {
-          // Calculate new positions using async D3 layout
           const { nodes: layoutedNodes, edges: layoutedEdges } = await d3LayoutService.layoutAllTrees(
             nodes,
             edges,
             layoutDirection
           );
 
-          // Update edges immediately
           setEdges([...layoutedEdges]);
 
-          // Create target positions for animation
           const targetPositions: Record<string, { x: number; y: number }> = {};
           layoutedNodes.forEach((node) => {
             targetPositions[node.id] = { x: node.position.x, y: node.position.y };
           });
 
-          // Animate nodes to new positions using d3-based animation
           animateNodesToPositions(targetPositions, 800);
 
-          // Remove isLayouting flag after animation completes
           setTimeout(() => {
             set({ isLayouting: false }, false, 'mindmap-layout/updateLayout:animationEnd');
           }, 900);
@@ -193,7 +192,6 @@ export const useLayoutStore = create<LayoutState>()(
         set({ isLayouting: true }, false, 'mindmap-layout/updateSubtreeLayout');
 
         try {
-          // Find the root node for the subtree
           const rootNode = nodes.find((node) => node.id === nodeId);
           if (!rootNode) {
             console.error('Root node not found for subtree layout');
@@ -201,18 +199,15 @@ export const useLayoutStore = create<LayoutState>()(
             return;
           }
 
-          // Get descendant nodes for this root
           const descendantNodes = d3LayoutService
             .getSubtreeNodes(nodeId, nodes)
             .filter((node) => node.id !== nodeId);
 
-          // Get edges that connect nodes in this subtree
           const subtreeNodeIds = new Set([nodeId, ...descendantNodes.map((n) => n.id)]);
           const subtreeEdges = edges.filter(
             (edge) => subtreeNodeIds.has(edge.source) && subtreeNodeIds.has(edge.target)
           );
 
-          // Calculate new positions for subtree using D3 layout service
           const { nodes: layoutedNodes, edges: layoutedEdges } = await d3LayoutService.layoutSubtree(
             rootNode,
             descendantNodes,
@@ -220,27 +215,22 @@ export const useLayoutStore = create<LayoutState>()(
             direction
           );
 
-          // Update edges immediately
-          setEdges([...layoutedEdges]);
-
-          // Create target positions for animation (only for changed nodes)
-          const targetPositions: Record<string, { x: number; y: number }> = {};
-          layoutedNodes.forEach((node) => {
-            const originalNode = nodes.find((n) => n.id === node.id);
-            if (
-              originalNode &&
-              (originalNode.position.x !== node.position.x || originalNode.position.y !== node.position.y)
-            ) {
-              targetPositions[node.id] = { x: node.position.x, y: node.position.y };
-            }
+          setEdges((prevEdges) => {
+            const updatedEdges = prevEdges.map((edge) => {
+              const layoutedEdge = layoutedEdges.find((e) => e.id === edge.id);
+              return layoutedEdge ? { ...edge, ...layoutedEdge } : edge;
+            });
+            return updatedEdges;
           });
 
-          // Only animate if there are position changes
+          const targetPositions: Record<string, { x: number; y: number }> = {};
+          layoutedNodes.forEach((node) => {
+            targetPositions[node.id] = { x: node.position.x, y: node.position.y };
+          });
+
           if (Object.keys(targetPositions).length > 0) {
-            // Animate nodes to new positions using d3-based animation
             animateNodesToPositions(targetPositions, 800);
 
-            // Remove isLayouting flag after animation completes
             setTimeout(() => {
               set({ isLayouting: false }, false, 'mindmap-layout/updateSubtreeLayout:animationEnd');
             }, 900);
@@ -251,10 +241,6 @@ export const useLayoutStore = create<LayoutState>()(
           console.error('Subtree layout update failed:', error);
           set({ isLayouting: false }, false, 'mindmap-layout/updateSubtreeLayout:error');
         }
-      },
-
-      layoutAllTrees: async (nodes: MindMapNode[], edges: MindMapEdge[], direction: Direction) => {
-        return await d3LayoutService.layoutAllTrees(nodes, edges, direction);
       },
 
       onLayoutChange: (direction) => {

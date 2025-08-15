@@ -37,6 +37,14 @@ const Instructions = memo(() => {
               </li>
               <li> Click "Add Node" to create new nodes</li>
               <li> Multiple nodes can be selected together</li>
+              <li>Hover over nodes to see child creation buttons</li>
+              <li>Click + buttons to add different node types (Text, Shape, Image)</li>
+              <li>Use collapse/expand buttons to hide/show child nodes</li>
+              <li>Image nodes support drag & drop or click to upload</li>
+              <li>Shape nodes with circle, rectangle, and ellipse options</li>
+              <li>Smooth animations for node creation and deletion</li>
+              <li>Layout controls for horizontal/vertical arrangement</li>
+              <li>Node resizing with visual handles when selected</li>
             </ul>
           </div>
         </PopoverContent>

@@ -1,19 +1,19 @@
 import { create } from 'zustand';
-import type { BaseNode, MindMapEdge } from '../types';
+import type { MindMapNode, MindMapEdge } from '../types';
 import { generateId } from '@/shared/lib/utils';
 import { useMindmapStore } from './useMindmapStore';
 import { devtools } from 'zustand/middleware';
 import { Deque } from '@datastructures-js/deque';
 
 interface ClipboardState {
-  cloningNodes: BaseNode[];
+  cloningNodes: MindMapNode[];
   cloningEdges: MindMapEdge[];
-  undoStack: Deque<[BaseNode[], MindMapEdge[]]>;
-  redoStack: Deque<[BaseNode[], MindMapEdge[]]>;
+  undoStack: Deque<[MindMapNode[], MindMapEdge[]]>;
+  redoStack: Deque<[MindMapNode[], MindMapEdge[]]>;
   mousePosition: { x: number; y: number };
   offset: number;
   dragTargetNodeId: string | null;
-  setCloningNodes: (nodes: BaseNode[]) => void;
+  setCloningNodes: (nodes: MindMapNode[]) => void;
   setCloningEdges: (edges: MindMapEdge[]) => void;
   setMousePosition: (position: { x: number; y: number }) => void;
   resetOffset: () => void;
@@ -24,7 +24,7 @@ interface ClipboardState {
   ) => void;
   undo: () => void;
   redo: () => void;
-  pushToUndoStack: (nodes: BaseNode[], edges: MindMapEdge[]) => void;
+  pushToUndoStack: (nodes: MindMapNode[], edges: MindMapEdge[]) => void;
   setDragTarget: (nodeId: string | null) => void;
 }
 
@@ -101,7 +101,7 @@ export const useClipboardStore = create<ClipboardState>()(
         };
       });
 
-      setNodes((nds: BaseNode[]) => [
+      setNodes((nds: MindMapNode[]) => [
         ...nds.map((node) => ({ ...node, selected: false })),
         ...freshNodes.map((node) => {
           const { x, y } = screenToFlowPosition({
@@ -167,7 +167,7 @@ export const useClipboardStore = create<ClipboardState>()(
       }
     },
 
-    pushToUndoStack: (nodes: BaseNode[], edges: MindMapEdge[]) => {
+    pushToUndoStack: (nodes: MindMapNode[], edges: MindMapEdge[]) => {
       const undoStack = get().undoStack;
       if (undoStack.size() >= 50) {
         undoStack.popFront(); // Limit stack size to 50

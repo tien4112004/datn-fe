@@ -1,14 +1,15 @@
 import { memo, useState, useCallback, useRef } from 'react';
 import { cn } from '@/shared/lib/utils';
-import { DIRECTION, DragHandle } from '../../types/constants';
+import { DragHandle } from '../../types/constants';
 import type { ImageNode } from '../../types';
 import { BaseNodeBlock, BaseNodeControl } from './BaseNode';
 import { BaseNodeContent } from '../ui/base-node';
 import type { NodeProps } from '@xyflow/react';
 import { useMindmapNodeCommon } from '../../hooks';
 import { Button } from '@/components/ui/button';
-import { Upload, X, Loader2 } from 'lucide-react';
+import { Upload, X, Loader2, Network } from 'lucide-react';
 import { useMindmapStore } from '../../stores';
+import { useLayoutStore } from '../../stores/useLayoutStore';
 
 const ImageNodeBlock = memo(
   ({ ...node }: NodeProps<ImageNode>) => {
@@ -17,6 +18,7 @@ const ImageNodeBlock = memo(
     const { layout } = useMindmapNodeCommon<ImageNode>({ node });
     const updateNodeData = useMindmapStore((state) => state.updateNodeDataWithUndo);
     const updateNodeDataWithUndo = useMindmapStore((state) => state.updateNodeDataWithUndo);
+    const updateSubtreeLayout = useLayoutStore((state) => state.updateSubtreeLayout);
 
     const [isEditing, setIsEditing] = useState(!data.imageUrl);
     const [isLoadingImage, setIsLoadingImage] = useState(false);
@@ -104,6 +106,10 @@ const ImageNodeBlock = memo(
       setIsEditing(true);
     }, [id, updateNodeData]);
 
+    const handleLayoutClick = () => {
+      updateSubtreeLayout(id, layout);
+    };
+
     return (
       <BaseNodeBlock node={node} variant={data.imageUrl && !isEditing ? 'replacing' : 'card'}>
         {data.imageUrl && !isEditing ? (
@@ -124,6 +130,15 @@ const ImageNodeBlock = memo(
             />
 
             <BaseNodeControl layout={layout} isSelected={isSelected ?? false} spacing="sm" padding>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleLayoutClick}
+                className="h-6 w-6 p-1"
+                title="Update Subtree Layout"
+              >
+                <Network className="h-3 w-3" />
+              </Button>
               <Button
                 variant="ghost"
                 size="sm"

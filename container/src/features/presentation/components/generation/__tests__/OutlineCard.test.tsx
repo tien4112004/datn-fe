@@ -23,6 +23,7 @@ describe('OutlineCard', () => {
     item: {
       id: 'item-id',
       htmlContent: '<p>Test content</p><h1>Test Heading</h1>',
+      markdownContent: '# Test Heading\n\nTest content',
     },
   };
 

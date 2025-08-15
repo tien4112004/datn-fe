@@ -66,9 +66,9 @@ vi.mock('lucide-react', () => ({
 // Test suite for OutlineWorkspace component
 describe('OutlineWorkspace', () => {
   const mockItems: OutlineItem[] = [
-    { id: '1', htmlContent: '<p>Content 1</p>' },
-    { id: '2', htmlContent: '<p>Content 2</p>' },
-    { id: '3', htmlContent: '<p>Content 3</p>' },
+    { id: '1', htmlContent: '<p>Content 1</p>', markdownContent: 'Content 1' },
+    { id: '2', htmlContent: '<p>Content 2</p>', markdownContent: 'Content 2' },
+    { id: '3', htmlContent: '<p>Content 3</p>', markdownContent: 'Content 3' },
   ];
 
   const mockSetItems = vi.fn();

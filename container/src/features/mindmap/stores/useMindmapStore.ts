@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { addEdge, applyNodeChanges, applyEdgeChanges } from '@xyflow/react';
 import type { Connection, XYPosition } from '@xyflow/react';
-import { type MindMapNode, type MindMapEdge, MINDMAP_TYPES } from '../types';
+import { type MindMapNode, type MindMapEdge, MINDMAP_TYPES, type MindMapTypes } from '../types';
 import { DragHandle, SIDE } from '../types/constants';
 import { generateId } from '@/shared/lib/utils';
 import { devtools } from 'zustand/middleware';
@@ -195,7 +195,12 @@ interface MindmapState {
   hasRightChildren: (nodeId: string) => boolean;
   addNode: () => void;
   logData: () => void;
-  addChildNode: (parentNode: Partial<MindMapNode>, position: XYPosition, side: string) => void;
+  addChildNode: (
+    parentNode: Partial<MindMapNode>,
+    position: XYPosition,
+    side: string,
+    nodeType?: MindMapTypes
+  ) => void;
   updateNodeData: (nodeId: string, updates: Partial<MindMapNode['data']>) => void;
   updateNodeDataWithUndo: (nodeId: string, updates: Partial<MindMapNode['data']>) => void;
   syncState: (updateNodeInternals: any) => void;
@@ -306,7 +311,8 @@ export const useMindmapStore = create<MindmapState>()(
     addChildNode: (
       parentNode: Partial<MindMapNode>,
       position: XYPosition,
-      side: 'left' | 'right' | 'mid'
+      side: 'left' | 'right' | 'mid',
+      nodeType: MindMapTypes = MINDMAP_TYPES.TEXT_NODE
     ) => {
       const pushUndo = useClipboardStore.getState().pushToUndoStack;
       pushUndo(get().nodes, get().edges);
@@ -314,13 +320,18 @@ export const useMindmapStore = create<MindmapState>()(
       const id = generateId();
       const newNode: MindMapNode = {
         id,
-        type: MINDMAP_TYPES.TEXT_NODE,
+        type: nodeType,
         data: {
           level: parentNode.data?.level ? parentNode.data.level + 1 : 1,
           content: `<p>${id}</p>`,
           parentId: parentNode.id,
           side: side,
           isCollapsed: false,
+          ...(nodeType === MINDMAP_TYPES.SHAPE_NODE && {
+            shape: 'rectangle' as const,
+            width: 120,
+            height: 60,
+          }),
         },
         dragHandle: DragHandle.SELECTOR,
         position,

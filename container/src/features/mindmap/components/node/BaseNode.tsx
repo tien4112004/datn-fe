@@ -3,11 +3,13 @@ import { AnimatePresence, motion } from 'motion/react';
 import { BaseNode } from '@/features/mindmap/components/ui/base-node';
 import { cn } from '@/shared/lib/utils';
 import type { MindMapNode } from '@/features/mindmap/types';
+import { MINDMAP_TYPES } from '@/features/mindmap/types';
 import { NodeResizer, Position, type NodeProps } from '@xyflow/react';
 import { DIRECTION, type Direction, SIDE } from '@/features/mindmap/types/constants';
 import { BaseHandle } from '../ui/base-handle';
-import { ArrowLeftFromLine, ArrowRightFromLine, Plus } from 'lucide-react';
+import { ArrowLeftFromLine, ArrowRightFromLine, Plus, Type, Square } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Popover, PopoverContent, PopoverTrigger } from '@/shared/components/ui/popover';
 import { useMindmapNodeCommon } from '@/features/mindmap/hooks';
 import { useClipboardStore, useMindmapStore } from '@/features/mindmap/stores';
 
@@ -211,19 +213,57 @@ export const CreateChildNodeButtons = memo(
             (isMouseOver || isSelected) && canCreateLeft ? 'visible opacity-100' : 'invisible opacity-0'
           )}
         >
-          <Button
-            onClick={() => {
-              toggleCollapse(node.id, SIDE.LEFT, false);
-              setTimeout(() => {
-                addChildNode(node, { x: node.positionAbsoluteX - 250, y: node.positionAbsoluteY }, SIDE.LEFT);
-              }, 300);
-            }}
-            size="icon"
-            variant="outline"
-            className={cn('bg-accent cursor-pointer rounded-full transition-all duration-200')}
-          >
-            <Plus />
-          </Button>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                size="icon"
+                variant="outline"
+                className={cn('bg-accent cursor-pointer rounded-full transition-all duration-200')}
+              >
+                <Plus />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent side="left" className="w-48 p-2">
+              <div className="space-y-2">
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start gap-2"
+                  onClick={() => {
+                    toggleCollapse(node.id, SIDE.LEFT, false);
+                    setTimeout(() => {
+                      addChildNode(
+                        node,
+                        { x: node.positionAbsoluteX - 250, y: node.positionAbsoluteY },
+                        SIDE.LEFT,
+                        MINDMAP_TYPES.TEXT_NODE
+                      );
+                    }, 300);
+                  }}
+                >
+                  <Type className="h-4 w-4" />
+                  Text Node
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start gap-2"
+                  onClick={() => {
+                    toggleCollapse(node.id, SIDE.LEFT, false);
+                    setTimeout(() => {
+                      addChildNode(
+                        node,
+                        { x: node.positionAbsoluteX - 250, y: node.positionAbsoluteY },
+                        SIDE.LEFT,
+                        MINDMAP_TYPES.SHAPE_NODE
+                      );
+                    }, 300);
+                  }}
+                >
+                  <Square className="h-4 w-4" />
+                  Shape Node
+                </Button>
+              </div>
+            </PopoverContent>
+          </Popover>
           <motion.div
             whileTap={{ scale: 0.95 }}
             whileHover={{ scale: 1.05 }}
@@ -257,24 +297,6 @@ export const CreateChildNodeButtons = memo(
             (isMouseOver || isSelected) && canCreateRight ? 'visible opacity-100' : 'invisible opacity-0'
           )}
         >
-          <Button
-            onClick={() => {
-              toggleCollapse(node.id, SIDE.RIGHT, false);
-              setTimeout(() => {
-                addChildNode(
-                  node,
-                  { x: node.positionAbsoluteX + 250, y: node.positionAbsoluteY },
-                  SIDE.RIGHT
-                );
-              }, 300);
-            }}
-            size="icon"
-            variant="outline"
-            className={cn('bg-accent cursor-pointer rounded-full transition-all duration-200')}
-          >
-            <Plus />
-          </Button>
-
           <motion.div
             whileTap={{ scale: 0.95 }}
             whileHover={{ scale: 1.05 }}
@@ -297,6 +319,57 @@ export const CreateChildNodeButtons = memo(
               </motion.div>
             </Button>
           </motion.div>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                size="icon"
+                variant="outline"
+                className={cn('bg-accent cursor-pointer rounded-full transition-all duration-200')}
+              >
+                <Plus />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent side="right" className="w-48 p-2">
+              <div className="space-y-2">
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start gap-2"
+                  onClick={() => {
+                    toggleCollapse(node.id, SIDE.RIGHT, false);
+                    setTimeout(() => {
+                      addChildNode(
+                        node,
+                        { x: node.positionAbsoluteX + 250, y: node.positionAbsoluteY },
+                        SIDE.RIGHT,
+                        MINDMAP_TYPES.TEXT_NODE
+                      );
+                    }, 300);
+                  }}
+                >
+                  <Type className="h-4 w-4" />
+                  Text Node
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start gap-2"
+                  onClick={() => {
+                    toggleCollapse(node.id, SIDE.RIGHT, false);
+                    setTimeout(() => {
+                      addChildNode(
+                        node,
+                        { x: node.positionAbsoluteX + 250, y: node.positionAbsoluteY },
+                        SIDE.RIGHT,
+                        MINDMAP_TYPES.SHAPE_NODE
+                      );
+                    }, 300);
+                  }}
+                >
+                  <Square className="h-4 w-4" />
+                  Shape Node
+                </Button>
+              </div>
+            </PopoverContent>
+          </Popover>
         </div>
       </>
     );

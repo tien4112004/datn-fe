@@ -4,7 +4,7 @@ import { BaseNode } from '@/features/mindmap/components/ui/base-node';
 import { cn } from '@/shared/lib/utils';
 import type { MindMapNode } from '@/features/mindmap/types';
 import { NodeResizer, Position, type NodeProps } from '@xyflow/react';
-import { DIRECTION, type Direction } from '@/features/mindmap/types/constants';
+import { DIRECTION, type Direction, SIDE } from '@/features/mindmap/types/constants';
 import { BaseHandle } from '../ui/base-handle';
 import { ArrowLeftFromLine, ArrowRightFromLine, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -192,8 +192,8 @@ interface CreateChildNodeButtonsProps {
 
 export const CreateChildNodeButtons = memo(
   ({ node, addChildNode, isMouseOver, isSelected, layout }: CreateChildNodeButtonsProps) => {
-    const canCreateLeft = node.data.side === 'left' || node.data.side === 'mid';
-    const canCreateRight = node.data.side === 'right' || node.data.side === 'mid';
+    const canCreateLeft = node.data.side === SIDE.LEFT || node.data.side === SIDE.MID;
+    const canCreateRight = node.data.side === SIDE.RIGHT || node.data.side === SIDE.MID;
 
     const toggleCollapse = useMindmapStore((state) => state.toggleCollapse);
     const hasLeftChildren = useMindmapStore((state) => state.hasLeftChildren);
@@ -213,9 +213,9 @@ export const CreateChildNodeButtons = memo(
         >
           <Button
             onClick={() => {
-              toggleCollapse(node.id, 'left', false);
+              toggleCollapse(node.id, SIDE.LEFT, false);
               setTimeout(() => {
-                addChildNode(node, { x: node.positionAbsoluteX - 250, y: node.positionAbsoluteY }, 'left');
+                addChildNode(node, { x: node.positionAbsoluteX - 250, y: node.positionAbsoluteY }, SIDE.LEFT);
               }, 300);
             }}
             size="icon"
@@ -232,7 +232,7 @@ export const CreateChildNodeButtons = memo(
           >
             <Button
               onClick={() => {
-                toggleCollapse(node.id, 'left', !node.data.isLeftChildrenCollapsed);
+                toggleCollapse(node.id, SIDE.LEFT, !node.data.isLeftChildrenCollapsed);
               }}
               size="icon"
               variant="outline"
@@ -259,9 +259,13 @@ export const CreateChildNodeButtons = memo(
         >
           <Button
             onClick={() => {
-              toggleCollapse(node.id, 'right', false);
+              toggleCollapse(node.id, SIDE.RIGHT, false);
               setTimeout(() => {
-                addChildNode(node, { x: node.positionAbsoluteX + 250, y: node.positionAbsoluteY }, 'right');
+                addChildNode(
+                  node,
+                  { x: node.positionAbsoluteX + 250, y: node.positionAbsoluteY },
+                  SIDE.RIGHT
+                );
               }, 300);
             }}
             size="icon"
@@ -279,7 +283,7 @@ export const CreateChildNodeButtons = memo(
           >
             <Button
               onClick={() => {
-                toggleCollapse(node.id, 'right', !node.data.isRightChildrenCollapsed);
+                toggleCollapse(node.id, SIDE.RIGHT, !node.data.isRightChildrenCollapsed);
               }}
               size="icon"
               variant="outline"

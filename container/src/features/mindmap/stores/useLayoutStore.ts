@@ -24,7 +24,7 @@ interface LayoutState {
   setLayout: (direction: Direction) => void;
   setIsAnimating: (isAnimating: boolean) => void;
   stopAnimation: () => void;
-  getLayoutedElements: (
+  layoutAllTrees: (
     nodes: MindMapNode[],
     edges: MindMapEdge[],
     direction: Direction
@@ -37,6 +37,7 @@ interface LayoutState {
     duration?: number
   ) => void;
   updateLayout: (direction?: Direction) => void;
+  updateSubtreeLayout: (nodeId: string, direction: Direction) => void;
   onLayoutChange: (direction: Direction) => void;
 }
 
@@ -153,7 +154,7 @@ export const useLayoutStore = create<LayoutState>()(
 
         try {
           // Calculate new positions using async D3 layout
-          const { nodes: layoutedNodes, edges: layoutedEdges } = await d3LayoutService.getLayoutedElements(
+          const { nodes: layoutedNodes, edges: layoutedEdges } = await d3LayoutService.layoutAllTrees(
             nodes,
             edges,
             layoutDirection
@@ -179,6 +180,81 @@ export const useLayoutStore = create<LayoutState>()(
           console.error('Layout update failed:', error);
           set({ isLayouting: false }, false, 'mindmap-layout/updateLayout:error');
         }
+      },
+
+      updateSubtreeLayout: async (nodeId: string, direction: Direction) => {
+        const { animateNodesToPositions } = get();
+        const nodes = useMindmapStore.getState().nodes;
+        const edges = useMindmapStore.getState().edges;
+        const setEdges = useMindmapStore.getState().setEdges;
+
+        if (!nodes?.length || !edges) return;
+
+        set({ isLayouting: true }, false, 'mindmap-layout/updateSubtreeLayout');
+
+        try {
+          // Find the root node for the subtree
+          const rootNode = nodes.find((node) => node.id === nodeId);
+          if (!rootNode) {
+            console.error('Root node not found for subtree layout');
+            set({ isLayouting: false }, false, 'mindmap-layout/updateSubtreeLayout:error');
+            return;
+          }
+
+          // Get descendant nodes for this root
+          const descendantNodes = d3LayoutService
+            .getSubtreeNodes(nodeId, nodes)
+            .filter((node) => node.id !== nodeId);
+
+          // Get edges that connect nodes in this subtree
+          const subtreeNodeIds = new Set([nodeId, ...descendantNodes.map((n) => n.id)]);
+          const subtreeEdges = edges.filter(
+            (edge) => subtreeNodeIds.has(edge.source) && subtreeNodeIds.has(edge.target)
+          );
+
+          // Calculate new positions for subtree using D3 layout service
+          const { nodes: layoutedNodes, edges: layoutedEdges } = await d3LayoutService.layoutSubtree(
+            rootNode,
+            descendantNodes,
+            subtreeEdges,
+            direction
+          );
+
+          // Update edges immediately
+          setEdges([...layoutedEdges]);
+
+          // Create target positions for animation (only for changed nodes)
+          const targetPositions: Record<string, { x: number; y: number }> = {};
+          layoutedNodes.forEach((node) => {
+            const originalNode = nodes.find((n) => n.id === node.id);
+            if (
+              originalNode &&
+              (originalNode.position.x !== node.position.x || originalNode.position.y !== node.position.y)
+            ) {
+              targetPositions[node.id] = { x: node.position.x, y: node.position.y };
+            }
+          });
+
+          // Only animate if there are position changes
+          if (Object.keys(targetPositions).length > 0) {
+            // Animate nodes to new positions using d3-based animation
+            animateNodesToPositions(targetPositions, 800);
+
+            // Remove isLayouting flag after animation completes
+            setTimeout(() => {
+              set({ isLayouting: false }, false, 'mindmap-layout/updateSubtreeLayout:animationEnd');
+            }, 900);
+          } else {
+            set({ isLayouting: false }, false, 'mindmap-layout/updateSubtreeLayout:noChanges');
+          }
+        } catch (error) {
+          console.error('Subtree layout update failed:', error);
+          set({ isLayouting: false }, false, 'mindmap-layout/updateSubtreeLayout:error');
+        }
+      },
+
+      layoutAllTrees: async (nodes: MindMapNode[], edges: MindMapEdge[], direction: Direction) => {
+        return await d3LayoutService.layoutAllTrees(nodes, edges, direction);
       },
 
       onLayoutChange: (direction) => {

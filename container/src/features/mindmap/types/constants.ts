@@ -10,3 +10,11 @@ export const DIRECTION = {
 } as const;
 
 export type Direction = (typeof DIRECTION)[keyof typeof DIRECTION];
+
+export const SIDE = {
+  LEFT: 'left',
+  RIGHT: 'right',
+  MID: 'mid',
+} as const;
+
+export type Side = (typeof SIDE)[keyof typeof SIDE];

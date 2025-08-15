@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { addEdge, applyNodeChanges, applyEdgeChanges } from '@xyflow/react';
 import type { Connection, XYPosition } from '@xyflow/react';
 import { type MindMapNode, type MindMapEdge, MINDMAP_TYPES } from '../types';
-import { DragHandle } from '../types/constants';
+import { DragHandle, SIDE } from '../types/constants';
 import { generateId } from '@/shared/lib/utils';
 import { devtools } from 'zustand/middleware';
 import { useClipboardStore } from './useClipboardStore';
@@ -15,7 +15,7 @@ const initialNodes: MindMapNode[] = [
     id: 'root',
     type: MINDMAP_TYPES.ROOT_NODE,
     position: { x: 0, y: 0 },
-    data: { level: 0, content: '<p>Central Topic</p>', side: 'mid', isCollapsed: false },
+    data: { level: 0, content: '<p>Central Topic</p>', side: SIDE.MID, isCollapsed: false },
     dragHandle: DragHandle.SELECTOR,
     width: 250,
     height: 100,
@@ -25,7 +25,7 @@ const initialNodes: MindMapNode[] = [
     id: 'left-1',
     type: MINDMAP_TYPES.TEXT_NODE,
     position: { x: 250, y: 300 },
-    data: { level: 1, content: '<p>Left Branch</p>', parentId: 'root', side: 'left', isCollapsed: false },
+    data: { level: 1, content: '<p>Left Branch</p>', parentId: 'root', side: SIDE.LEFT, isCollapsed: false },
     dragHandle: DragHandle.SELECTOR,
     width: 400,
     height: 80,
@@ -44,7 +44,7 @@ const initialNodes: MindMapNode[] = [
         stroke: 'blue',
         strokeWidth: 2,
       },
-      side: 'left',
+      side: SIDE.LEFT,
       isCollapsed: false,
     },
     width: 300,
@@ -54,7 +54,7 @@ const initialNodes: MindMapNode[] = [
     id: 'left-2',
     type: MINDMAP_TYPES.TEXT_NODE,
     position: { x: 200, y: 200 },
-    data: { level: 2, content: '<p>Left Child</p>', parentId: 'left-1', side: 'left', isCollapsed: false },
+    data: { level: 2, content: '<p>Left Child</p>', parentId: 'left-1', side: SIDE.LEFT, isCollapsed: false },
     dragHandle: DragHandle.SELECTOR,
     width: 150,
     height: 60,
@@ -63,7 +63,13 @@ const initialNodes: MindMapNode[] = [
     id: 'right-1',
     type: MINDMAP_TYPES.TEXT_NODE,
     position: { x: 550, y: 300 },
-    data: { level: 1, content: '<p>Right Branch</p>', parentId: 'root', side: 'right', isCollapsed: false },
+    data: {
+      level: 1,
+      content: '<p>Right Branch</p>',
+      parentId: 'root',
+      side: SIDE.RIGHT,
+      isCollapsed: false,
+    },
     dragHandle: DragHandle.SELECTOR,
     width: 200,
     height: 80,
@@ -76,7 +82,7 @@ const initialNodes: MindMapNode[] = [
       level: 2,
       content: '<p>Right Child</p>',
       parentId: 'right-1',
-      side: 'right',
+      side: SIDE.RIGHT,
       isCollapsed: false,
     },
     dragHandle: DragHandle.SELECTOR,
@@ -92,7 +98,7 @@ const initialNodes: MindMapNode[] = [
       content: '<p>Right Shape Node</p>',
       parentId: 'right-1',
       shape: 'circle',
-      side: 'right',
+      side: SIDE.RIGHT,
       isCollapsed: false,
     },
     width: 180,
@@ -275,12 +281,17 @@ export const useMindmapStore = create<MindmapState>()(
       const { nodes } = get();
       const newNode: MindMapNode = {
         id: generateId(),
-        type: MINDMAP_TYPES.TEXT_NODE,
+        type: MINDMAP_TYPES.ROOT_NODE,
         position: {
           x: Math.random() * 500 + 100,
           y: Math.random() * 400 + 100,
         },
-        data: { level: 1, content: `<p>New Node ${nodes.length + 1}</p>`, side: 'mid', isCollapsed: false },
+        data: {
+          level: 0,
+          content: `<p>New Node ${nodes.length + 1}</p>`,
+          side: SIDE.MID,
+          isCollapsed: false,
+        },
       };
 
       set(
@@ -320,8 +331,8 @@ export const useMindmapStore = create<MindmapState>()(
         source: parentNode.id!,
         target: newNode.id,
         type: MINDMAP_TYPES.EDGE,
-        sourceHandle: side === 'left' ? `first-source-${parentNode.id}` : `second-source-${parentNode.id}`,
-        targetHandle: side === 'left' ? `second-target-${newNode.id}` : `first-target-${newNode.id}`,
+        sourceHandle: side === SIDE.LEFT ? `first-source-${parentNode.id}` : `second-source-${parentNode.id}`,
+        targetHandle: side === SIDE.LEFT ? `second-target-${newNode.id}` : `first-target-${newNode.id}`,
         data: {
           strokeColor: 'var(--primary)',
           strokeWidth: 2,
@@ -367,12 +378,12 @@ export const useMindmapStore = create<MindmapState>()(
 
     hasLeftChildren: (nodeId: string) => {
       const { nodes } = get();
-      return nodes.some((node) => node.data.parentId === nodeId && node.data.side === 'left');
+      return nodes.some((node) => node.data.parentId === nodeId && node.data.side === SIDE.LEFT);
     },
 
     hasRightChildren: (nodeId: string) => {
       const { nodes } = get();
-      return nodes.some((node) => node.data.parentId === nodeId && node.data.side === 'right');
+      return nodes.some((node) => node.data.parentId === nodeId && node.data.side === SIDE.RIGHT);
     },
 
     logData: () => {
@@ -453,8 +464,9 @@ export const useMindmapStore = create<MindmapState>()(
             ...n,
             data: {
               ...n.data,
-              isLeftChildrenCollapsed: side === 'left' ? shouldCollapse : n.data.isLeftChildrenCollapsed,
-              isRightChildrenCollapsed: side === 'right' ? shouldCollapse : n.data.isRightChildrenCollapsed,
+              isLeftChildrenCollapsed: side === SIDE.LEFT ? shouldCollapse : n.data.isLeftChildrenCollapsed,
+              isRightChildrenCollapsed:
+                side === SIDE.RIGHT ? shouldCollapse : n.data.isRightChildrenCollapsed,
             },
           };
         }
@@ -533,7 +545,7 @@ export const useMindmapStore = create<MindmapState>()(
       const isTargetRoot = targetNode.data?.level === 0;
       const newSourceLevel = (targetNode.data?.level ?? 0) + 1;
       const oldSourceLevel = sourceNode.data?.level ?? 0;
-      const newSide = isTargetRoot ? (side ?? 'left') : targetNode.data?.side;
+      const newSide = isTargetRoot ? (side ?? SIDE.LEFT) : targetNode.data?.side;
       const oldSide = sourceNode.data?.side;
       const levelDifference = newSourceLevel - oldSourceLevel;
 
@@ -566,7 +578,7 @@ export const useMindmapStore = create<MindmapState>()(
 
       const getHandles = (side: string, nodeId: string, isSource: boolean) => {
         const handleType = isSource ? 'source' : 'target';
-        const position = side === 'left' ? (isSource ? 'first' : 'second') : isSource ? 'second' : 'first';
+        const position = side === SIDE.LEFT ? (isSource ? 'first' : 'second') : isSource ? 'second' : 'first';
         return `${position}-${handleType}-${nodeId}`;
       };
 

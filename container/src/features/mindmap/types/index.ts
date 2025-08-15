@@ -1,5 +1,5 @@
 import type { Node, Edge } from '@xyflow/react';
-import type { Direction } from './constants';
+import type { Direction, Side } from './constants';
 
 export const MINDMAP_TYPES = {
   TEXT_NODE: 'mindMapNode',
@@ -24,7 +24,7 @@ export interface BaseNodeData extends Record<string, unknown> {
   isCollapsed: boolean;
   parentId?: string;
   metadata?: Record<string, any>;
-  side: 'left' | 'right' | 'mid';
+  side: Side;
   isLeftChildrenCollapsed?: boolean;
   isRightChildrenCollapsed?: boolean;
 }

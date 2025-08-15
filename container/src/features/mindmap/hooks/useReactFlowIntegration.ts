@@ -4,7 +4,7 @@ import { useMindmapStore } from '../stores/useMindmapStore';
 import { useLayoutStore } from '../stores/useLayoutStore';
 import type { BaseNode } from '../types';
 import { useClipboardStore } from '../stores';
-import { DIRECTION } from '../types/constants';
+import { DIRECTION, SIDE } from '../types/constants';
 
 export const useReactFlowIntegration = () => {
   const nodeLength = useMindmapStore((state) => state.nodes.length);
@@ -64,7 +64,7 @@ export const useReactFlowIntegration = () => {
   const determineSideFromPosition = useCallback((draggedNode: BaseNode, targetNode: any) => {
     const targetCenterX = targetNode.position.x + (targetNode.measured?.width ?? 0) / 2;
     const draggedCenterX = draggedNode.position.x + (draggedNode.measured?.width ?? 0) / 2;
-    return draggedCenterX < targetCenterX ? 'left' : 'right';
+    return draggedCenterX < targetCenterX ? SIDE.LEFT : SIDE.RIGHT;
   }, []);
 
   const onNodeDragStart = useCallback(

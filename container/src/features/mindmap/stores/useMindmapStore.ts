@@ -1,12 +1,19 @@
 import { create } from 'zustand';
 import { addEdge, applyNodeChanges, applyEdgeChanges } from '@xyflow/react';
 import type { Connection, XYPosition } from '@xyflow/react';
-import { type MindMapNode, type MindMapEdge, MINDMAP_TYPES, type MindMapTypes } from '../types';
+import {
+  type MindMapNode,
+  type MindMapEdge,
+  MINDMAP_TYPES,
+  type MindMapTypes,
+  type SmoothType,
+  SMOOTH_TYPES,
+} from '../types';
 import { DragHandle, SIDE, type Side } from '../types/constants';
 import { generateId } from '@/shared/lib/utils';
 import { devtools } from 'zustand/middleware';
 import { useClipboardStore } from './useClipboardStore';
-import { getAllDescendantNodes } from '../services/utils';
+import { getAllDescendantNodes, getRootNodeOfSubtree } from '../services/utils';
 import { toast } from 'sonner';
 
 const initialNodes: MindMapNode[] = [
@@ -15,7 +22,13 @@ const initialNodes: MindMapNode[] = [
     id: 'root',
     type: MINDMAP_TYPES.ROOT_NODE,
     position: { x: 0, y: 0 },
-    data: { level: 0, content: '<p>Central Topic</p>', side: SIDE.MID, isCollapsed: false },
+    data: {
+      level: 0,
+      content: '<p>Central Topic</p>',
+      side: SIDE.MID,
+      isCollapsed: false,
+      smoothType: SMOOTH_TYPES.SMOOTHSTEP,
+    },
     dragHandle: DragHandle.SELECTOR,
     width: 250,
     height: 100,
@@ -211,6 +224,7 @@ interface MindmapState {
   expand: (nodeId: string, side: Side) => void;
   toggleCollapse: (nodeId: string, side: Side, shouldCollapse: boolean) => void;
   moveToChild: (sourceId: string, targetId: string, side: Side) => void;
+  updateSubtreeEdgeSmoothType: (rootNodeId: string, smoothType: SmoothType) => void;
 }
 
 export const useMindmapStore = create<MindmapState>()(
@@ -240,12 +254,21 @@ export const useMindmapStore = create<MindmapState>()(
     },
 
     onConnect: (connection) => {
+      const { nodes } = get();
+
+      // Try to find the root node from either source or target
+      const sourceRootNode = getRootNodeOfSubtree(connection.source!, nodes);
+      const targetRootNode = getRootNodeOfSubtree(connection.target!, nodes);
+      const rootNode = sourceRootNode || targetRootNode;
+      const smoothType = rootNode?.data?.smoothType || SMOOTH_TYPES.SMOOTHSTEP;
+
       const edge = {
         ...connection,
         type: MINDMAP_TYPES.EDGE,
         data: {
           strokeColor: 'var(--primary)',
           strokeWidth: 2,
+          smoothType,
         },
       };
       set(
@@ -295,6 +318,7 @@ export const useMindmapStore = create<MindmapState>()(
           content: `<p>New Node ${nodes.length + 1}</p>`,
           side: SIDE.MID,
           isCollapsed: false,
+          smoothType: SMOOTH_TYPES.SMOOTHSTEP,
         },
       };
 
@@ -315,6 +339,12 @@ export const useMindmapStore = create<MindmapState>()(
     ) => {
       const pushUndo = useClipboardStore.getState().pushToUndoStack;
       pushUndo(get().nodes, get().edges);
+
+      const { nodes } = get();
+
+      // Find the root node to get the smoothType
+      const rootNode = getRootNodeOfSubtree(parentNode.id!, nodes);
+      const smoothType = rootNode?.data?.smoothType || SMOOTH_TYPES.SMOOTHSTEP;
 
       const id = generateId();
       const newNode: MindMapNode = {
@@ -351,6 +381,7 @@ export const useMindmapStore = create<MindmapState>()(
         data: {
           strokeColor: 'var(--primary)',
           strokeWidth: 2,
+          smoothType,
         },
       };
 
@@ -621,6 +652,10 @@ export const useMindmapStore = create<MindmapState>()(
       });
 
       if (!isEdgeEstablished) {
+        // Find the root node to get the smoothType
+        const rootNode = getRootNodeOfSubtree(targetId, nodes);
+        const smoothType = rootNode?.data?.smoothType || SMOOTH_TYPES.SMOOTHSTEP;
+
         const newEdge: MindMapEdge = {
           id: generateId(),
           source: targetId,
@@ -631,6 +666,7 @@ export const useMindmapStore = create<MindmapState>()(
           data: {
             strokeColor: 'var(--primary)',
             strokeWidth: 2,
+            smoothType,
           },
         };
         updatedEdges.push(newEdge);
@@ -643,6 +679,55 @@ export const useMindmapStore = create<MindmapState>()(
         }),
         false,
         'mindmap/moveToChild'
+      );
+    },
+
+    updateSubtreeEdgeSmoothType: (rootNodeId: string, smoothType: SmoothType) => {
+      const { nodes, edges } = get();
+
+      const descendantNodes = getAllDescendantNodes(rootNodeId, nodes);
+      const allNodeIds = new Set([rootNodeId, ...descendantNodes.map((n) => n.id)]);
+
+      const pushUndo = useClipboardStore.getState().pushToUndoStack;
+      pushUndo(nodes, edges);
+
+      // Update the root node's smoothType data
+      const updatedNodes = nodes.map((node) => {
+        if (node.id === rootNodeId && node.type === MINDMAP_TYPES.ROOT_NODE) {
+          return {
+            ...node,
+            data: {
+              ...node.data,
+              smoothType,
+            },
+          };
+        }
+        return node;
+      });
+
+      const updatedEdges = edges.map((edge) => {
+        const isSubtreeEdge = allNodeIds.has(edge.source) || allNodeIds.has(edge.target);
+
+        if (isSubtreeEdge) {
+          return {
+            ...edge,
+            data: {
+              ...edge.data,
+              smoothType,
+            },
+          };
+        }
+
+        return edge;
+      });
+
+      set(
+        () => ({
+          nodes: updatedNodes,
+          edges: updatedEdges,
+        }),
+        false,
+        'mindmap/updateSubtreeEdgeSmoothType'
       );
     },
   }))

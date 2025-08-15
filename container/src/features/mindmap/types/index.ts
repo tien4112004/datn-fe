@@ -13,7 +13,6 @@ export const SMOOTH_TYPES = {
   SMOOTHSTEP: 'smoothstep',
   STRAIGHT: 'straight',
   BEZIER: 'bezier',
-  SIMPLE_BEZIER: 'simplebezier',
 } as const;
 
 export type MindMapTypes = (typeof MINDMAP_TYPES)[keyof typeof MINDMAP_TYPES];
@@ -45,6 +44,7 @@ export interface TextNode extends BaseNode<TextNodeData, typeof MINDMAP_TYPES.TE
 
 export interface RootNodeData extends BaseNodeData {
   content: string;
+  smoothType?: SmoothType;
 }
 
 export interface RootNode extends BaseNode<RootNodeData, typeof MINDMAP_TYPES.ROOT_NODE> {}

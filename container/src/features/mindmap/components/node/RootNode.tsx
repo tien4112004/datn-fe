@@ -1,8 +1,9 @@
-import { GripVertical } from 'lucide-react';
+import { GripVertical, Network, Workflow } from 'lucide-react';
 import { useState, memo, useCallback } from 'react';
 import { cn } from '@/shared/lib/utils';
 import { DIRECTION, DragHandle } from '../../types/constants';
 import type { RootNode } from '../../types';
+import { SMOOTH_TYPES, type SmoothType } from '../../types';
 import { useMindmapNodeCommon } from '../../hooks/useNodeCommon';
 import { BaseNodeBlock, BaseNodeControl } from './BaseNode';
 import { Input } from '@/components/ui/input';
@@ -11,7 +12,8 @@ import type { NodeProps } from '@xyflow/react';
 import { useMindmapStore } from '../../stores';
 import { useLayoutStore } from '../../stores/useLayoutStore';
 import { Button } from '@/components/ui/button';
-import { Network } from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger } from '@/shared/components/ui/popover';
+import { BezierIcon, SmoothStepIcon, StraightIcon } from '../ui/icon';
 
 const RootNodeBlock = memo(
   ({ ...node }: NodeProps<RootNode>) => {
@@ -22,6 +24,7 @@ const RootNodeBlock = memo(
 
     const updateNodeData = useMindmapStore((state) => state.updateNodeDataWithUndo);
     const updateSubtreeLayout = useLayoutStore((state) => state.updateSubtreeLayout);
+    const updateSubtreeEdgeSmoothType = useMindmapStore((state) => state.updateSubtreeEdgeSmoothType);
 
     const [, setIsEditing] = useState(false);
 
@@ -40,6 +43,13 @@ const RootNodeBlock = memo(
     const handleLayoutClick = () => {
       updateSubtreeLayout(node.id, layout);
     };
+
+    const handleSmoothTypeChange = useCallback(
+      (smoothType: SmoothType) => {
+        updateSubtreeEdgeSmoothType(node.id, smoothType);
+      },
+      [node.id, updateSubtreeEdgeSmoothType]
+    );
 
     return (
       <BaseNodeBlock node={node} className="border-primary">
@@ -77,6 +87,41 @@ const RootNodeBlock = memo(
           >
             <Network className="h-3 w-3" />
           </Button>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="ghost" size="sm" className="h-6 w-6 p-1" title="Change Edge Smooth Type">
+                <Workflow className="h-3 w-3" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent side="top" className="w-48 p-2">
+              <div className="space-y-2">
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start text-xs"
+                  onClick={() => handleSmoothTypeChange(SMOOTH_TYPES.SMOOTHSTEP)}
+                >
+                  <SmoothStepIcon />
+                  Smooth Step
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start text-xs"
+                  onClick={() => handleSmoothTypeChange(SMOOTH_TYPES.BEZIER)}
+                >
+                  <BezierIcon />
+                  Bezier
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start text-xs"
+                  onClick={() => handleSmoothTypeChange(SMOOTH_TYPES.STRAIGHT)}
+                >
+                  <StraightIcon />
+                  Straight
+                </Button>
+              </div>
+            </PopoverContent>
+          </Popover>
         </BaseNodeControl>
       </BaseNodeBlock>
     );

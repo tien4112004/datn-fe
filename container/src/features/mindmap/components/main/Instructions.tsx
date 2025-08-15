@@ -45,6 +45,8 @@ const Instructions = memo(() => {
               <li>Smooth animations for node creation and deletion</li>
               <li>Layout controls for horizontal/vertical arrangement</li>
               <li>Node resizing with visual handles when selected</li>
+              <li>Edge smooth type control for root nodes (smoothstep, bezier, straight)</li>
+              <li>New child nodes inherit the root's preferred edge style</li>
             </ul>
           </div>
         </PopoverContent>

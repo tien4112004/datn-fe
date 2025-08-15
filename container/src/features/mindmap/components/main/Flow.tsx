@@ -9,8 +9,8 @@ import ShapeNodeBlock from '../node/ShapeNode';
 import TextNodeBlock from '../node/TextNode';
 
 const nodeTypes = {
-  mindMapNode: TextNodeBlock,
-  mindMapRootNode: RootNodeBlock,
+  mindmapTextNode: TextNodeBlock,
+  mindmapRootNode: RootNodeBlock,
   mindmapShapeNode: ShapeNodeBlock,
 };
 

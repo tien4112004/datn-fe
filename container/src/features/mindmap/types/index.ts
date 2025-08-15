@@ -2,8 +2,8 @@ import type { Node, Edge } from '@xyflow/react';
 import type { Direction, Side } from './constants';
 
 export const MINDMAP_TYPES = {
-  TEXT_NODE: 'mindMapNode',
-  ROOT_NODE: 'mindMapRootNode',
+  TEXT_NODE: 'mindmapTextNode',
+  ROOT_NODE: 'mindmapRootNode',
   EDGE: 'mindmapEdge',
   SHAPE_NODE: 'mindmapShapeNode',
 } as const;

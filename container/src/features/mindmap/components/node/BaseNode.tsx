@@ -7,7 +7,7 @@ import { MINDMAP_TYPES } from '@/features/mindmap/types';
 import { NodeResizer, Position, type NodeProps } from '@xyflow/react';
 import { DIRECTION, type Direction, SIDE } from '@/features/mindmap/types/constants';
 import { BaseHandle } from '../ui/base-handle';
-import { ArrowLeftFromLine, ArrowRightFromLine, Plus, Type, Square } from 'lucide-react';
+import { ArrowLeftFromLine, ArrowRightFromLine, Plus, Type, Square, Image } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/shared/components/ui/popover';
 import { useMindmapNodeCommon } from '@/features/mindmap/hooks';
@@ -261,6 +261,24 @@ export const CreateChildNodeButtons = memo(
                   <Square className="h-4 w-4" />
                   Shape Node
                 </Button>
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start gap-2"
+                  onClick={() => {
+                    toggleCollapse(node.id, SIDE.LEFT, false);
+                    setTimeout(() => {
+                      addChildNode(
+                        node,
+                        { x: node.positionAbsoluteX - 250, y: node.positionAbsoluteY },
+                        SIDE.LEFT,
+                        MINDMAP_TYPES.IMAGE_NODE
+                      );
+                    }, 300);
+                  }}
+                >
+                  <Image className="h-4 w-4" />
+                  Image Node
+                </Button>
               </div>
             </PopoverContent>
           </Popover>
@@ -366,6 +384,24 @@ export const CreateChildNodeButtons = memo(
                 >
                   <Square className="h-4 w-4" />
                   Shape Node
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start gap-2"
+                  onClick={() => {
+                    toggleCollapse(node.id, SIDE.RIGHT, false);
+                    setTimeout(() => {
+                      addChildNode(
+                        node,
+                        { x: node.positionAbsoluteX + 250, y: node.positionAbsoluteY },
+                        SIDE.RIGHT,
+                        MINDMAP_TYPES.IMAGE_NODE
+                      );
+                    }, 300);
+                  }}
+                >
+                  <Image className="h-4 w-4" />
+                  Image Node
                 </Button>
               </div>
             </PopoverContent>

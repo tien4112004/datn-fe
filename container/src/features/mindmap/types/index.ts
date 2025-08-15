@@ -6,6 +6,7 @@ export const MINDMAP_TYPES = {
   ROOT_NODE: 'mindmapRootNode',
   EDGE: 'mindmapEdge',
   SHAPE_NODE: 'mindmapShapeNode',
+  IMAGE_NODE: 'mindmapImageNode',
 } as const;
 
 export const SMOOTH_TYPES = {
@@ -56,6 +57,17 @@ interface ShapeNodeData extends BaseNodeData {
 
 export interface ShapeNode extends BaseNode<ShapeNodeData, typeof MINDMAP_TYPES.SHAPE_NODE> {}
 
+interface ImageNodeData extends BaseNodeData {
+  imageUrl?: string;
+  imageFile?: File;
+  isLoading?: boolean;
+  alt?: string;
+  width?: number;
+  height?: number;
+}
+
+export interface ImageNode extends BaseNode<ImageNodeData, typeof MINDMAP_TYPES.IMAGE_NODE> {}
+
 export type MindMapEdge = Edge<{
   strokeWidth?: number;
   strokeColor?: string;
@@ -64,8 +76,8 @@ export type MindMapEdge = Edge<{
   isCollapsed?: boolean;
 }>;
 
-export type NodeData = TextNodeData | RootNodeData | ShapeNodeData;
-export type MindMapNode = TextNode | RootNode | ShapeNode | BaseNode;
+export type NodeData = TextNodeData | RootNodeData | ShapeNodeData | ImageNodeData;
+export type MindMapNode = TextNode | RootNode | ShapeNode | ImageNode | BaseNode;
 
 export interface MindmapActionsType {
   selectAllNodesAndEdges: () => void;

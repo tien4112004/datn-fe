@@ -7,11 +7,13 @@ import EdgeBlock from '../edge/Edge';
 import RootNodeBlock from '../node/RootNode';
 import ShapeNodeBlock from '../node/ShapeNode';
 import TextNodeBlock from '../node/TextNode';
+import ImageNodeBlock from '../node/ImageNode';
 
 const nodeTypes = {
   mindmapTextNode: TextNodeBlock,
   mindmapRootNode: RootNodeBlock,
   mindmapShapeNode: ShapeNodeBlock,
+  mindmapImageNode: ImageNodeBlock,
 };
 
 const edgeTypes = {

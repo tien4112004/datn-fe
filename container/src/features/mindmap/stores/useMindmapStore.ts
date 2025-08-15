@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { addEdge, applyNodeChanges, applyEdgeChanges } from '@xyflow/react';
 import type { Connection, XYPosition } from '@xyflow/react';
 import { type MindMapNode, type MindMapEdge, MINDMAP_TYPES, type MindMapTypes } from '../types';
-import { DragHandle, SIDE } from '../types/constants';
+import { DragHandle, SIDE, type Side } from '../types/constants';
 import { generateId } from '@/shared/lib/utils';
 import { devtools } from 'zustand/middleware';
 import { useClipboardStore } from './useClipboardStore';
@@ -208,10 +208,10 @@ interface MindmapState {
   deleteSelectedNodes: () => void;
   markNodeForDeletion: (nodeId: string) => void;
   finalizeNodeDeletion: () => void;
-  collapse: (nodeId: string, side: 'left' | 'right') => void;
-  expand: (nodeId: string, side: 'left' | 'right') => void;
-  toggleCollapse: (nodeId: string, side: 'left' | 'right', shouldCollapse: boolean) => void;
-  moveToChild: (sourceId: string, targetId: string, side: 'left' | 'right') => void;
+  collapse: (nodeId: string, side: Side) => void;
+  expand: (nodeId: string, side: Side) => void;
+  toggleCollapse: (nodeId: string, side: Side, shouldCollapse: boolean) => void;
+  moveToChild: (sourceId: string, targetId: string, side: Side) => void;
 }
 
 export const useMindmapStore = create<MindmapState>()(
@@ -311,7 +311,7 @@ export const useMindmapStore = create<MindmapState>()(
     addChildNode: (
       parentNode: Partial<MindMapNode>,
       position: XYPosition,
-      side: 'left' | 'right' | 'mid',
+      side: Side | 'mid',
       nodeType: MindMapTypes = MINDMAP_TYPES.TEXT_NODE
     ) => {
       const pushUndo = useClipboardStore.getState().pushToUndoStack;
@@ -331,6 +331,11 @@ export const useMindmapStore = create<MindmapState>()(
             shape: 'rectangle' as const,
             width: 120,
             height: 60,
+          }),
+          ...(nodeType === MINDMAP_TYPES.IMAGE_NODE && {
+            width: 250,
+            height: 180,
+            alt: 'Image',
           }),
         },
         dragHandle: DragHandle.SELECTOR,
@@ -459,7 +464,7 @@ export const useMindmapStore = create<MindmapState>()(
       return nodes.find((node) => node.id === nodeId);
     },
 
-    toggleCollapse: (nodeId: string, side: 'left' | 'right', shouldCollapse: boolean) => {
+    toggleCollapse: (nodeId: string, side: Side, shouldCollapse: boolean) => {
       const { nodes, edges } = get();
       const node = nodes.find((n) => n.id === nodeId);
       if (!node) return;
@@ -524,15 +529,15 @@ export const useMindmapStore = create<MindmapState>()(
       );
     },
 
-    expand: (nodeId: string, side: 'left' | 'right') => {
+    expand: (nodeId: string, side: Side) => {
       get().toggleCollapse(nodeId, side, false);
     },
 
-    collapse: (nodeId: string, side: 'left' | 'right') => {
+    collapse: (nodeId: string, side: Side) => {
       get().toggleCollapse(nodeId, side, true);
     },
 
-    moveToChild: (sourceId: string, targetId: string, side?: 'left' | 'right') => {
+    moveToChild: (sourceId: string, targetId: string, side?: Side) => {
       if (sourceId === targetId) return;
 
       const state = get();

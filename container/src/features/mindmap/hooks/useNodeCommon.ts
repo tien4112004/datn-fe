@@ -3,7 +3,7 @@ import { useUpdateNodeInternals, type NodeProps } from '@xyflow/react';
 import { useMindmapStore } from '../stores/useMindmapStore';
 import { useLayoutStore } from '../stores/useLayoutStore';
 import type { BaseNode } from '../types';
-import type { Direction } from '../types/constants';
+import type { Direction, Side } from '../types/constants';
 
 export interface UseNodeCommonProps<T extends BaseNode = BaseNode> {
   node: NodeProps<T>;
@@ -16,7 +16,7 @@ export interface UseNodeCommonReturn {
   addChildNode: any;
   onNodeDelete: () => void;
   updateNodeData: (id: string, data: Partial<BaseNode['data']>) => void;
-  moveToChild: (sourceId: string, targetId: string) => void;
+  moveToChild: (sourceId: string, targetId: string, side: Side) => void;
 }
 
 export const useMindmapNodeCommon = <T extends BaseNode = BaseNode>({

@@ -107,11 +107,11 @@ const OutlineCreationView = ({ defaultModel, onCreateOutline }: OutlineCreationV
                     render={({ field }) => (
                       <Select value={field.value} onValueChange={field.onChange}>
                         <SelectTrigger className="w-fit">
-                          <SelectValue placeholder={t('languagePlaceholder')} />
+                          <SelectValue placeholder={t('language.placeholder')} />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectGroup>
-                            <SelectLabel>{t('languageLabel')}</SelectLabel>
+                            <SelectLabel>{t('language.label')}</SelectLabel>
                             {LANGUAGE_OPTIONS.map((languageOption) => (
                               <SelectItem key={languageOption.value} value={languageOption.value}>
                                 {t(languageOption.labelKey)}
@@ -128,11 +128,11 @@ const OutlineCreationView = ({ defaultModel, onCreateOutline }: OutlineCreationV
                     render={({ field }) => (
                       <Select value={field.value} onValueChange={field.onChange}>
                         <SelectTrigger className="w-fit">
-                          <SelectValue placeholder={t('targetAgePlaceholder')} />
+                          <SelectValue placeholder={t('targetAge.placeholder')} />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectGroup>
-                            <SelectLabel>{t('targetAgeLabel')}</SelectLabel>
+                            <SelectLabel>{t('targetAge.label')}</SelectLabel>
                             {TARGET_AGE_OPTIONS.map((ageOption) => (
                               <SelectItem key={ageOption.value} value={ageOption.value}>
                                 {t(ageOption.labelKey)}

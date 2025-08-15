@@ -3,6 +3,10 @@ export interface StyleOption {
   labelKey: string;
 }
 
+/**
+ * @deprecated This component is deprecated and will be removed in a future version.
+ * Please use the updated outline form component instead.
+ */
 export const PRESENTATION_STYLES: StyleOption[] = [
   { value: 'business', labelKey: 'styleBusiness' },
   { value: 'education', labelKey: 'styleEducation' },
@@ -18,8 +22,8 @@ export interface LanguageOption {
 }
 
 export const LANGUAGE_OPTIONS: LanguageOption[] = [
-  { value: 'en', labelKey: 'languageEnglish' },
-  { value: 'vi', labelKey: 'languageVietnamese' },
+  { value: 'en', labelKey: 'language.english' },
+  { value: 'vi', labelKey: 'language.vietnamese' },
 ];
 
 export interface TargetAgeOption {
@@ -28,11 +32,11 @@ export interface TargetAgeOption {
 }
 
 export const TARGET_AGE_OPTIONS: TargetAgeOption[] = [
-  { value: '3-5', labelKey: 'targetAgePreschool' },
-  { value: '5-7', labelKey: 'targetAgeEarlyElementary' },
-  { value: '7-10', labelKey: 'targetAgeElementary' },
-  { value: '10-13', labelKey: 'targetAgeMiddleSchool' },
-  { value: '13-16', labelKey: 'targetAgeHighSchool' },
-  { value: '16-18', labelKey: 'targetAgeSeniorHigh' },
-  { value: '18+', labelKey: 'targetAgeAdult' },
+  { value: '3-5', labelKey: 'targetAge.preschool' },
+  { value: '5-7', labelKey: 'targetAge.earlyElementary' },
+  { value: '7-10', labelKey: 'targetAge.elementary' },
+  { value: '10-13', labelKey: 'targetAge.middleSchool' },
+  { value: '13-16', labelKey: 'targetAge.highSchool' },
+  { value: '16-18', labelKey: 'targetAge.seniorHigh' },
+  { value: '18+', labelKey: 'targetAge.adult' },
 ];

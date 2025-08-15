@@ -21,6 +21,7 @@ import type { OutlineData } from '@/features/presentation/types/outline';
 import useFetchStreamingOutline from '@/features/presentation/hooks/useFetchStreaming';
 // import { useOutlineContext } from '../../context/OutlineContext';
 import useOutlineStore from '@/features/presentation/stores/useOutlineStore';
+import { mapOutlineItemsToMarkdown } from '@/features/presentation/utils';
 
 type OutlineFormData = {
   topic: string;
@@ -98,11 +99,12 @@ const WorkspaceView = ({ initialOutlineData }: WorkspaceViewProps) => {
     restartStream(data);
   };
 
-  const onSubmitPresentation = (data: CustomizationFormData) => {
-    const fullData = {
-      ...data,
-      content,
-    };
+  const onSubmitPresentation = (_data: CustomizationFormData) => {
+    // const fullData = {
+    //   ...data,
+    //   content,
+    // };
+    const fullData = mapOutlineItemsToMarkdown(content);
     console.log('Form data:', fullData);
   };
 

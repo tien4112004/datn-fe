@@ -4,7 +4,7 @@ import { marked } from 'marked';
 export default function splitMarkdownToOutlineItems(markdown: string): OutlineItem[] {
   const cleanMarkdown = markdown
     .replace(/^```markdown\n/, '')
-    .replace(/\n```$/, '')
+    .replace(/```/, '')
     .trim();
 
   // Split the markdown into sections based on headings (## and above)
@@ -15,6 +15,7 @@ export default function splitMarkdownToOutlineItems(markdown: string): OutlineIt
     htmlContent: marked.parse(section.trim(), {
       async: false,
     }),
+    markdownContent: section.trim(),
   }));
 
   return items;

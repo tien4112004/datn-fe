@@ -32,7 +32,8 @@ const OutlineCard = ({ id, title = 'Outline', className = '', item, onDelete }: 
 
   React.useEffect(() => {
     async function loadInitialHTML() {
-      const blocks = await editor.tryParseHTMLToBlocks(item.htmlContent);
+      // const blocks = await editor.tryParseHTMLToBlocks(item.htmlContent);
+      const blocks = await editor.tryParseMarkdownToBlocks(item.markdownContent);
       editor.replaceBlocks(editor.document, blocks);
     }
     loadInitialHTML();
@@ -81,8 +82,10 @@ const OutlineCard = ({ id, title = 'Outline', className = '', item, onDelete }: 
           data-card
           editor={editor}
           onChange={() => async (editor: BlockNoteEditor) => {
-            const htmlContent = await editor.blocksToFullHTML(editor.document);
-            handleContentChange?.(id, htmlContent);
+            // const htmlContent = await editor.blocksToFullHTML(editor.document);
+            const markdownContent = await editor.blocksToMarkdownLossy(editor.document);
+            // handleContentChange?.(id, htmlContent);
+            handleContentChange?.(id, markdownContent);
           }}
           sideMenu={false}
           className="-mx-2"

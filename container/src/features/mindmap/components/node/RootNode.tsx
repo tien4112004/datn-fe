@@ -1,9 +1,8 @@
 import { GripVertical, Network, Workflow } from 'lucide-react';
 import { useState, memo, useCallback } from 'react';
 import { cn } from '@/shared/lib/utils';
-import { DIRECTION, DragHandle } from '../../types/constants';
-import type { RootNode } from '../../types';
-import { PATH_TYPES, type PathType } from '../../types';
+import type { RootNode, PathType, EdgeColor } from '../../types';
+import { PATH_TYPES, EDGE_COLORS, DIRECTION, DRAGHANDLE } from '../../types';
 import { useMindmapNodeCommon } from '../../hooks/useNodeCommon';
 import { BaseNodeBlock, BaseNodeControl } from './BaseNode';
 import { Input } from '@/components/ui/input';
@@ -13,6 +12,8 @@ import { useNodeManipulationStore, useNodeOperationsStore, useLayoutStore } from
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/shared/components/ui/popover';
 import { BezierIcon, SmoothStepIcon, StraightIcon } from '../ui/icon';
+
+import ColorPickerControl from './ColorPickerControl';
 
 const RootNodeBlock = memo(
   ({ ...node }: NodeProps<RootNode>) => {
@@ -24,6 +25,9 @@ const RootNodeBlock = memo(
     const updateNodeData = useNodeOperationsStore((state) => state.updateNodeDataWithUndo);
     const updateSubtreeLayout = useLayoutStore((state) => state.updateSubtreeLayout);
     const updateSubtreeEdgePathType = useNodeManipulationStore((state) => state.updateSubtreeEdgePathType);
+    const updateSubtreeEdgeColor = useNodeManipulationStore((state) => state.updateSubtreeEdgeColor);
+
+    const [hex, setHex] = useState<string>(data.edgeColor as string);
 
     const [, setIsEditing] = useState(false);
 
@@ -50,10 +54,17 @@ const RootNodeBlock = memo(
       [node.id, updateSubtreeEdgePathType]
     );
 
+    const handleEdgeColorChange = useCallback(
+      (edgeColor: EdgeColor) => {
+        updateSubtreeEdgeColor(node.id, edgeColor);
+      },
+      [node.id, updateSubtreeEdgeColor]
+    );
+
     return (
       <BaseNodeBlock node={node} className="border-primary">
         <BaseNodeContent className="flex min-h-full flex-row items-start gap-2 p-0">
-          <div className={cn('flex-shrink-0 p-2 pr-0', DragHandle.CLASS)}>
+          <div className={cn('flex-shrink-0 p-2 pr-0', DRAGHANDLE.CLASS)}>
             <GripVertical
               className={cn(
                 'h-6 w-5',
@@ -121,6 +132,17 @@ const RootNodeBlock = memo(
               </div>
             </PopoverContent>
           </Popover>
+
+          <ColorPickerControl
+            hex={hex}
+            setHex={(color: any) => {
+              const edgeColor = Object.entries(EDGE_COLORS).find(([, value]) => value === color.hex)?.[1];
+              if (edgeColor) {
+                handleEdgeColorChange(edgeColor);
+                setHex(edgeColor);
+              }
+            }}
+          />
         </BaseNodeControl>
       </BaseNodeBlock>
     );

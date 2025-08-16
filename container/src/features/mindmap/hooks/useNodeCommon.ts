@@ -1,8 +1,7 @@
 import { useEffect } from 'react';
 import { useUpdateNodeInternals, type NodeProps } from '@xyflow/react';
 import { useLayoutStore } from '../stores/layout';
-import type { BaseNode } from '../types';
-import type { Direction, Side } from '../types/constants';
+import type { Direction, Side, BaseNode } from '../types';
 import { useNodeManipulationStore, useNodeOperationsStore } from '../stores';
 
 export interface UseNodeCommonProps<T extends BaseNode = BaseNode> {

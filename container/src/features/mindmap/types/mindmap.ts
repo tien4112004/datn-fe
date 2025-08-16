@@ -1,8 +1,12 @@
 import type { Node, Edge } from '@xyflow/react';
-import type { Direction, MINDMAP_TYPES, Side, PATH_TYPES } from './constants';
+import type { MINDMAP_TYPES, PATH_TYPES, EDGE_COLORS, DIRECTION, SHAPES, SIDE } from './constants';
 
 export type MindMapTypes = (typeof MINDMAP_TYPES)[keyof typeof MINDMAP_TYPES];
 export type PathType = (typeof PATH_TYPES)[keyof typeof PATH_TYPES];
+export type EdgeColor = (typeof EDGE_COLORS)[keyof typeof EDGE_COLORS];
+export type Shape = (typeof SHAPES)[keyof typeof SHAPES];
+export type Side = (typeof SIDE)[keyof typeof SIDE];
+export type Direction = (typeof DIRECTION)[keyof typeof DIRECTION];
 
 export interface BaseNodeData extends Record<string, unknown> {
   level: number;

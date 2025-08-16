@@ -1,5 +1,5 @@
-import { DIRECTION, type Direction, type Side, SIDE } from '../types/constants';
-import { MINDMAP_TYPES, type MindMapEdge, type MindMapNode } from '../types';
+import type { Direction, Side, MindMapEdge, MindMapNode } from '../types';
+import { MINDMAP_TYPES, DIRECTION, SIDE } from '../types';
 import * as d3 from 'd3';
 
 interface HierarchyNode {

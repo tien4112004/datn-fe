@@ -1,9 +1,8 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { toast } from 'sonner';
-import type { MindMapEdge, PathType } from '../types';
-import { MINDMAP_TYPES, PATH_TYPES } from '../types';
-import { SIDE, type Side } from '../types/constants';
+import type { MindMapEdge, PathType, EdgeColor, Side } from '../types';
+import { MINDMAP_TYPES, PATH_TYPES, SIDE } from '../types';
 import { generateId } from '@/shared/lib/utils';
 import { getAllDescendantNodes, getRootNodeOfSubtree } from '../services/utils';
 import { useCoreStore } from './core';
@@ -15,6 +14,7 @@ interface NodeManipulationState {
   expand: (nodeId: string, side: Side) => void;
   moveToChild: (sourceId: string, targetId: string, side?: Side) => void;
   updateSubtreeEdgePathType: (rootNodeId: string, pathType: PathType) => void;
+  updateSubtreeEdgeColor: (rootNodeId: string, edgeColor: EdgeColor) => void;
 }
 
 export const useNodeManipulationStore = create<NodeManipulationState>()(
@@ -235,6 +235,34 @@ export const useNodeManipulationStore = create<NodeManipulationState>()(
         });
 
         setNodes(updatedNodes);
+        setEdges(updatedEdges);
+      },
+
+      updateSubtreeEdgeColor: (rootNodeId: string, edgeColor: EdgeColor) => {
+        const { nodes, edges, setEdges } = useCoreStore.getState();
+
+        const pushUndo = useClipboardStore.getState().pushToUndoStack;
+        pushUndo(nodes, edges);
+
+        const descendantNodes = getAllDescendantNodes(rootNodeId, nodes);
+        const allNodeIds = new Set([rootNodeId, ...descendantNodes.map((n) => n.id)]);
+
+        const updatedEdges = edges.map((edge) => {
+          const isSubtreeEdge = allNodeIds.has(edge.source) || allNodeIds.has(edge.target);
+
+          if (isSubtreeEdge) {
+            return {
+              ...edge,
+              data: {
+                ...edge.data,
+                strokeColor: edgeColor,
+              },
+            };
+          }
+
+          return edge;
+        });
+
         setEdges(updatedEdges);
       },
     }),

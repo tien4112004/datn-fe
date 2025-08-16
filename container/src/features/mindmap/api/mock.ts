@@ -1,6 +1,6 @@
 import { API_MODE, type ApiMode } from '@/shared/constants';
 import { type MindmapApiService, type MindmapData, MINDMAP_TYPES, PATH_TYPES } from '../types';
-import { DragHandle, SIDE } from '../types/constants';
+import { DRAGHANDLE, SIDE } from '../types/constants';
 
 const mockMindmaps: MindmapData[] = [
   {
@@ -19,7 +19,7 @@ const mockMindmaps: MindmapData[] = [
           isCollapsed: false,
           pathType: PATH_TYPES.SMOOTHSTEP,
         },
-        dragHandle: DragHandle.SELECTOR,
+        dragHandle: DRAGHANDLE.SELECTOR,
         width: 250,
         height: 100,
       },
@@ -35,7 +35,7 @@ const mockMindmaps: MindmapData[] = [
           side: SIDE.LEFT,
           isCollapsed: false,
         },
-        dragHandle: DragHandle.SELECTOR,
+        dragHandle: DRAGHANDLE.SELECTOR,
         width: 400,
         height: 80,
       },
@@ -70,7 +70,7 @@ const mockMindmaps: MindmapData[] = [
           side: SIDE.LEFT,
           isCollapsed: false,
         },
-        dragHandle: DragHandle.SELECTOR,
+        dragHandle: DRAGHANDLE.SELECTOR,
         width: 150,
         height: 60,
       },
@@ -85,7 +85,7 @@ const mockMindmaps: MindmapData[] = [
           side: SIDE.RIGHT,
           isCollapsed: false,
         },
-        dragHandle: DragHandle.SELECTOR,
+        dragHandle: DRAGHANDLE.SELECTOR,
         width: 200,
         height: 80,
       },
@@ -100,7 +100,7 @@ const mockMindmaps: MindmapData[] = [
           side: SIDE.RIGHT,
           isCollapsed: false,
         },
-        dragHandle: DragHandle.SELECTOR,
+        dragHandle: DRAGHANDLE.SELECTOR,
         width: 500,
         height: 60,
       },

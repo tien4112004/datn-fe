@@ -1,6 +1,6 @@
 import { memo, useState, useCallback, useRef } from 'react';
 import { cn } from '@/shared/lib/utils';
-import { DragHandle } from '../../types/constants';
+import { DRAGHANDLE } from '../../types/constants';
 import type { ImageNode } from '../../types';
 import { BaseNodeBlock, BaseNodeControl } from './BaseNode';
 import { BaseNodeContent } from '../ui/base-node';
@@ -113,7 +113,7 @@ const ImageNodeBlock = memo(
       <BaseNodeBlock node={node} variant={data.imageUrl && !isEditing ? 'replacing' : 'card'}>
         {data.imageUrl && !isEditing ? (
           <div
-            className={cn('relative h-full w-full', DragHandle.CLASS)}
+            className={cn('relative h-full w-full', DRAGHANDLE.CLASS)}
             style={{
               width: width ? `${width}px` : '200px',
               height: height ? `${height}px` : '150px',

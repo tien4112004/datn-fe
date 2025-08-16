@@ -1,7 +1,7 @@
 import { memo } from 'react';
 import { cn } from '@/shared/lib/utils';
-import { SHAPES, type Shape } from '../../types/constants';
-import type { ShapeNode } from '../../types';
+import { SHAPES } from '../../types';
+import type { ShapeNode, Shape } from '../../types';
 import { BaseNodeBlock, BaseNodeControl } from './BaseNode';
 import type { NodeProps } from '@xyflow/react';
 import { useMindmapNodeCommon } from '../../hooks';

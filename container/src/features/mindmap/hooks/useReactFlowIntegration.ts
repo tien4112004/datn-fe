@@ -3,7 +3,7 @@ import { useUpdateNodeInternals, useNodesInitialized, useReactFlow } from '@xyfl
 import { useLayoutStore } from '../stores/layout';
 import type { MindMapNode } from '../types';
 import { useClipboardStore, useCoreStore, useNodeManipulationStore } from '../stores';
-import { DIRECTION, SIDE } from '../types/constants';
+import { DIRECTION, SIDE } from '../types';
 
 export const useReactFlowIntegration = () => {
   const nodeLength = useCoreStore((state) => state.nodes.length);

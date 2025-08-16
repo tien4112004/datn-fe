@@ -1,4 +1,4 @@
-export const DragHandle = {
+export const DRAGHANDLE = {
   CLASS: 'dragHandle',
   SELECTOR: '.dragHandle',
 };
@@ -9,23 +9,17 @@ export const DIRECTION = {
   NONE: '',
 } as const;
 
-export type Direction = (typeof DIRECTION)[keyof typeof DIRECTION];
-
 export const SIDE = {
   LEFT: 'left',
   RIGHT: 'right',
   MID: 'mid',
 } as const;
 
-export type Side = (typeof SIDE)[keyof typeof SIDE];
-
 export const SHAPES = {
   RECTANGLE: 'rectangle',
   CIRCLE: 'circle',
   ELLIPSE: 'ellipse',
 } as const;
-
-export type Shape = (typeof SHAPES)[keyof typeof SHAPES];
 
 export const MINDMAP_TYPES = {
   TEXT_NODE: 'mindmapTextNode',
@@ -39,4 +33,13 @@ export const PATH_TYPES = {
   SMOOTHSTEP: 'smoothstep',
   STRAIGHT: 'straight',
   BEZIER: 'bezier',
+} as const;
+
+export const EDGE_COLORS = {
+  PRIMARY: 'var(--primary)',
+  BLUE: '#3b82f6',
+  GREEN: '#10b981',
+  PURPLE: '#8b5cf6',
+  ORANGE: '#f59e0b',
+  RED: '#ef4444',
 } as const;

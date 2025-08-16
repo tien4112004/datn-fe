@@ -2,10 +2,9 @@ import { type ReactNode, type HTMLAttributes, useCallback, memo, useState } from
 import { AnimatePresence, motion } from 'motion/react';
 import { BaseNode } from '@/features/mindmap/components/ui/base-node';
 import { cn } from '@/shared/lib/utils';
-import type { MindMapNode } from '@/features/mindmap/types';
-import { MINDMAP_TYPES } from '@/features/mindmap/types';
+import type { MindMapNode, Direction } from '@/features/mindmap/types';
 import { NodeResizer, Position, type NodeProps } from '@xyflow/react';
-import { DIRECTION, type Direction, SIDE } from '@/features/mindmap/types/constants';
+import { DIRECTION, SIDE, MINDMAP_TYPES } from '@/features/mindmap/types';
 import { BaseHandle } from '../ui/base-handle';
 import { ArrowLeftFromLine, ArrowRightFromLine, Plus, Type, Square, Image } from 'lucide-react';
 import { Button } from '@/components/ui/button';

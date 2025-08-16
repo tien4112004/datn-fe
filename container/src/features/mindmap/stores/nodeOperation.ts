@@ -1,9 +1,8 @@
 import { create } from 'zustand';
 import type { XYPosition } from '@xyflow/react';
 import { devtools } from 'zustand/middleware';
-import type { MindMapNode, MindMapEdge, MindMapTypes, PathType } from '../types';
-import { MINDMAP_TYPES, PATH_TYPES } from '../types';
-import { DragHandle, SIDE, type Side } from '../types/constants';
+import type { MindMapNode, MindMapEdge, MindMapTypes, PathType, Side } from '../types';
+import { MINDMAP_TYPES, PATH_TYPES, DRAGHANDLE, SIDE } from '../types';
 import { generateId } from '@/shared/lib/utils';
 import { getRootNodeOfSubtree, getAllDescendantNodes } from '../services/utils';
 import { useCoreStore } from './core';
@@ -91,7 +90,7 @@ export const useNodeOperationsStore = create<NodeOperationsState>()(
               alt: 'Image',
             }),
           },
-          dragHandle: DragHandle.SELECTOR,
+          dragHandle: DRAGHANDLE.SELECTOR,
           position,
         };
 

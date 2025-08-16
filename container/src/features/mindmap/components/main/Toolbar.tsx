@@ -2,10 +2,10 @@ import { Plus, Trash2, Undo, Redo } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { useLayoutStore } from '../../stores/layout';
-import type { Direction } from '../../types/constants';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { useClipboardStore, useCoreStore, useNodeOperationsStore } from '../../stores';
 import { useReactFlow } from '@xyflow/react';
+import type { Direction } from '../../types';
 
 const Toolbar = () => {
   const addNode = useNodeOperationsStore((state) => state.addNode);

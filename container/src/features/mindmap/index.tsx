@@ -4,10 +4,22 @@ import { Background, BackgroundVariant, Controls, MiniMap, ControlButton } from 
 import { Move, MousePointer2 } from 'lucide-react';
 import { DevTools } from '@/features/mindmap/components/ui/devtools';
 import { Flow, LogicHandler, Instructions, Toolbar } from './components';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useLoaderData } from 'react-router-dom';
+import { useMindmapStore } from './stores/useMindmapStore';
+import type { MindmapData } from './types/service';
 
 const MindmapPage = () => {
   const [isPanOnDrag, setIsPanOnDrag] = useState(false);
+  const loaderData = useLoaderData() as { mindmap: MindmapData };
+  const { setNodes, setEdges } = useMindmapStore();
+
+  useEffect(() => {
+    if (loaderData?.mindmap) {
+      setNodes(loaderData.mindmap.nodes);
+      setEdges(loaderData.mindmap.edges);
+    }
+  }, [loaderData, setNodes, setEdges]);
 
   const togglePanOnDrag = () => {
     setIsPanOnDrag(!isPanOnDrag);
@@ -48,4 +60,5 @@ const MindmapPage = () => {
   );
 };
 
+export * from './hooks/loaders';
 export default { MindmapPage };

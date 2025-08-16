@@ -26,3 +26,17 @@ export const SHAPES = {
 } as const;
 
 export type Shape = (typeof SHAPES)[keyof typeof SHAPES];
+
+export const MINDMAP_TYPES = {
+  TEXT_NODE: 'mindmapTextNode',
+  ROOT_NODE: 'mindmapRootNode',
+  EDGE: 'mindmapEdge',
+  SHAPE_NODE: 'mindmapShapeNode',
+  IMAGE_NODE: 'mindmapImageNode',
+} as const;
+
+export const SMOOTH_TYPES = {
+  SMOOTHSTEP: 'smoothstep',
+  STRAIGHT: 'straight',
+  BEZIER: 'bezier',
+} as const;

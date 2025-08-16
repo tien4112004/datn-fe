@@ -3,7 +3,7 @@ import NavLayout from '../shared/layouts/SidebarLayout';
 import Presentation from '@/features/presentation';
 import Demo from '@/features/demo';
 import { getDefaultModel } from '@/features/model';
-import Mindmap from '@/features/mindmap';
+import Mindmap, { getMindmapById } from '@/features/mindmap';
 
 const router = createBrowserRouter([
   {
@@ -22,8 +22,12 @@ const router = createBrowserRouter([
         Component: Presentation.EditorPage,
       },
       {
-        path: 'demo',
+        path: 'mindmap',
         Component: Mindmap.MindmapPage,
+        loader: async () => {
+          const mindmap = await getMindmapById('');
+          return { mindmap };
+        },
       },
       {
         path: 'presentation/:presentationId',

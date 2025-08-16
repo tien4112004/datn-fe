@@ -34,12 +34,3 @@ export const PATH_TYPES = {
   STRAIGHT: 'straight',
   BEZIER: 'bezier',
 } as const;
-
-export const EDGE_COLORS = {
-  PRIMARY: 'var(--primary)',
-  BLUE: '#3b82f6',
-  GREEN: '#10b981',
-  PURPLE: '#8b5cf6',
-  ORANGE: '#f59e0b',
-  RED: '#ef4444',
-} as const;

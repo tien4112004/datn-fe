@@ -18,6 +18,7 @@ const mockMindmaps: MindmapData[] = [
           side: SIDE.MID,
           isCollapsed: false,
           pathType: PATH_TYPES.SMOOTHSTEP,
+          edgeColor: 'var(--primary)',
         },
         dragHandle: DRAGHANDLE.SELECTOR,
         width: 250,

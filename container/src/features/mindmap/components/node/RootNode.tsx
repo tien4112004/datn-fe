@@ -1,8 +1,8 @@
 import { GripVertical, Network, Workflow } from 'lucide-react';
 import { useState, memo, useCallback } from 'react';
 import { cn } from '@/shared/lib/utils';
-import type { RootNode, PathType, EdgeColor } from '../../types';
-import { PATH_TYPES, EDGE_COLORS, DIRECTION, DRAGHANDLE } from '../../types';
+import type { RootNode, PathType } from '../../types';
+import { PATH_TYPES, DIRECTION, DRAGHANDLE } from '../../types';
 import { useMindmapNodeCommon } from '../../hooks/useNodeCommon';
 import { BaseNodeBlock, BaseNodeControl } from './BaseNode';
 import { Input } from '@/components/ui/input';
@@ -55,7 +55,7 @@ const RootNodeBlock = memo(
     );
 
     const handleEdgeColorChange = useCallback(
-      (edgeColor: EdgeColor) => {
+      (edgeColor: string) => {
         updateSubtreeEdgeColor(node.id, edgeColor);
       },
       [node.id, updateSubtreeEdgeColor]
@@ -135,12 +135,9 @@ const RootNodeBlock = memo(
 
           <ColorPickerControl
             hex={hex}
-            setHex={(color: any) => {
-              const edgeColor = Object.entries(EDGE_COLORS).find(([, value]) => value === color.hex)?.[1];
-              if (edgeColor) {
-                handleEdgeColorChange(edgeColor);
-                setHex(edgeColor);
-              }
+            setHex={(color: string) => {
+              handleEdgeColorChange(color);
+              setHex(color);
             }}
           />
         </BaseNodeControl>

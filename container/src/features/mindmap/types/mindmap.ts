@@ -11,6 +11,7 @@ export interface BaseNodeData extends Record<string, unknown> {
   level: number;
   isDeleting?: boolean;
   isCollapsed: boolean;
+  collapsedBy?: string;
   parentId?: string;
   metadata?: Record<string, any>;
   side: Side;

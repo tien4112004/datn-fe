@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { toast } from 'sonner';
-import type { MindMapEdge, PathType, EdgeColor, Side } from '../types';
+import type { MindMapEdge, PathType, Side } from '../types';
 import { MINDMAP_TYPES, PATH_TYPES, SIDE } from '../types';
 import { generateId } from '@/shared/lib/utils';
 import { getAllDescendantNodes, getRootNodeOfSubtree } from '../services/utils';
@@ -14,7 +14,7 @@ interface NodeManipulationState {
   expand: (nodeId: string, side: Side) => void;
   moveToChild: (sourceId: string, targetId: string, side?: Side) => void;
   updateSubtreeEdgePathType: (rootNodeId: string, pathType: PathType) => void;
-  updateSubtreeEdgeColor: (rootNodeId: string, edgeColor: EdgeColor) => void;
+  updateSubtreeEdgeColor: (rootNodeId: string, edgeColor: string) => void;
 }
 
 export const useNodeManipulationStore = create<NodeManipulationState>()(
@@ -24,10 +24,12 @@ export const useNodeManipulationStore = create<NodeManipulationState>()(
         const { nodes, edges, setNodes, setEdges } = useCoreStore.getState();
         const node = nodes.find((n) => n.id === nodeId);
         if (!node) return;
+
         const pushUndo = useClipboardStore.getState().pushToUndoStack;
         pushUndo(nodes, edges);
 
         const descendantNodes = getAllDescendantNodes(nodeId, nodes);
+        const affectedDescendants = descendantNodes.filter((d) => d.data.side === side);
 
         const updatedNodes = nodes.map((n) => {
           if (n.id === nodeId) {
@@ -42,35 +44,54 @@ export const useNodeManipulationStore = create<NodeManipulationState>()(
             };
           }
 
-          if (descendantNodes.some((descendant) => descendant.id === n.id && descendant.data.side === side)) {
+          const isAffectedDescendant = affectedDescendants.some((d) => d.id === n.id);
+          if (!isAffectedDescendant) {
+            return n;
+          }
+
+          if (shouldCollapse) {
+            // Collapsing
             return {
               ...n,
-              data: { ...n.data, isCollapsed: shouldCollapse },
+              data: {
+                ...n.data,
+                isCollapsed: true,
+                collapsedBy: n.data.collapsedBy || nodeId,
+              },
             };
+          } else {
+            // Expanding: only show nodes that were hidden by this specific ancestor
+            if (n.data.collapsedBy === nodeId) {
+              return {
+                ...n,
+                data: {
+                  ...n.data,
+                  isCollapsed: false,
+                  collapsedBy: undefined,
+                },
+              };
+            }
           }
+
           return n;
         });
 
         const updatedEdges = edges.map((edge) => {
-          const sourceNode = nodes.find((n) => n.id === edge.source);
-          const targetNode = nodes.find((n) => n.id === edge.target);
+          const targetNode = updatedNodes.find((n) => n.id === edge.target);
+          const isAffectedEdge = affectedDescendants.some(
+            (d) => d.id === edge.source || d.id === edge.target
+          );
 
-          if (
-            descendantNodes.some(
-              (descendant) =>
-                (descendant.id === edge.source && descendant.data.side === side) ||
-                (descendant.id === edge.target && descendant.data.side === side)
-            ) ||
-            (sourceNode &&
-              targetNode &&
-              ((sourceNode.data.side === side && descendantNodes.some((d) => d.id === sourceNode.id)) ||
-                (targetNode.data.side === side && descendantNodes.some((d) => d.id === targetNode.id))))
-          ) {
+          if (isAffectedEdge) {
             return {
               ...edge,
-              data: { ...edge.data, isCollapsed: shouldCollapse },
+              data: {
+                ...edge.data,
+                isCollapsed: targetNode?.data.isCollapsed || false,
+              },
             };
           }
+
           return edge;
         });
 
@@ -238,7 +259,7 @@ export const useNodeManipulationStore = create<NodeManipulationState>()(
         setEdges(updatedEdges);
       },
 
-      updateSubtreeEdgeColor: (rootNodeId: string, edgeColor: EdgeColor) => {
+      updateSubtreeEdgeColor: (rootNodeId: string, edgeColor: string) => {
         const { nodes, edges, setEdges } = useCoreStore.getState();
 
         const pushUndo = useClipboardStore.getState().pushToUndoStack;

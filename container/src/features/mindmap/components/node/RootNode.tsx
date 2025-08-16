@@ -13,7 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/shared/components/ui/popover';
 import { BezierIcon, SmoothStepIcon, StraightIcon } from '../ui/icon';
 
-import ColorPickerControl from './ColorPickerControl';
+import ColorPickerControl from '../controls/ColorPickerControl';
 
 const RootNodeBlock = memo(
   ({ ...node }: NodeProps<RootNode>) => {

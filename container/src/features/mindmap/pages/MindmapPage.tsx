@@ -12,17 +12,15 @@ import { useCoreStore } from '../stores';
 const MindmapPage = () => {
   const [isPanOnDrag, setIsPanOnDrag] = useState(false);
   const loaderData = useLoaderData() as { mindmap: MindmapData };
-  const { setNodes, setEdges } = useCoreStore((state) => ({
-    setNodes: state.setNodes,
-    setEdges: state.setEdges,
-  }));
+  const setNodes = useCoreStore((state) => state.setNodes);
+  const setEdges = useCoreStore((state) => state.setEdges);
 
   useEffect(() => {
     if (loaderData?.mindmap) {
       setNodes(loaderData.mindmap.nodes);
       setEdges(loaderData.mindmap.edges);
     }
-  }, [loaderData, setNodes, setEdges]);
+  }, [loaderData]);
 
   const togglePanOnDrag = () => {
     setIsPanOnDrag(!isPanOnDrag);

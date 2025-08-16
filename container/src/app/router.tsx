@@ -3,7 +3,8 @@ import NavLayout from '../shared/layouts/SidebarLayout';
 import Presentation from '@/features/presentation';
 import Demo from '@/features/demo';
 import { getDefaultModel } from '@/features/model';
-import Mindmap, { getMindmapById } from '@/features/mindmap';
+import Mindmap from '@/features/mindmap';
+import { getMindmapById } from '@/features/mindmap/hooks/loaders';
 
 const router = createBrowserRouter([
   {

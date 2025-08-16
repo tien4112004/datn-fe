@@ -1,22 +1,17 @@
 'use client';
 
-import { useEffect, useState, useCallback, type Dispatch, type SetStateAction } from 'react';
+import { useState, type Dispatch, type SetStateAction } from 'react';
 
 import {
   useNodes,
   Panel,
   useStore,
-  useStoreApi,
   ViewportPortal,
   useReactFlow,
   type PanelPosition,
-  type OnNodesChange,
   type NodeChange,
   type XYPosition,
-  applyNodeChanges,
 } from '@xyflow/react';
-
-import { useMindmapStore } from '../../stores/useMindmapStore';
 
 import { ToggleGroup, ToggleGroupItem } from '@/shared/components/ui/toggle-group';
 

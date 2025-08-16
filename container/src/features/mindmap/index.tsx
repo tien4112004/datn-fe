@@ -1,1 +1,5 @@
-export { default as MindmapPage } from './pages/MindmapPage';
+import MindmapPage from './pages/MindmapPage';
+
+export default {
+  MindmapPage,
+};

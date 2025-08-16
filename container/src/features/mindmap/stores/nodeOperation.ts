@@ -6,7 +6,7 @@ import { MINDMAP_TYPES, SMOOTH_TYPES } from '../types';
 import { DragHandle, SIDE, type Side } from '../types/constants';
 import { generateId } from '@/shared/lib/utils';
 import { getRootNodeOfSubtree, getAllDescendantNodes } from '../services/utils';
-import { useCoreStore } from './useCoreStore';
+import { useCoreStore } from './core';
 
 interface NodeOperationsState {
   nodesToBeDeleted: Set<string>;

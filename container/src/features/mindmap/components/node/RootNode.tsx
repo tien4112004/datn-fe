@@ -9,8 +9,7 @@ import { BaseNodeBlock, BaseNodeControl } from './BaseNode';
 import { Input } from '@/components/ui/input';
 import { BaseNodeContent } from '../ui/base-node';
 import type { NodeProps } from '@xyflow/react';
-import { useMindmapStore } from '../../stores';
-import { useLayoutStore } from '../../stores/useLayoutStore';
+import { useNodeManipulationStore, useNodeOperationsStore, useLayoutStore } from '../../stores';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/shared/components/ui/popover';
 import { BezierIcon, SmoothStepIcon, StraightIcon } from '../ui/icon';
@@ -22,9 +21,11 @@ const RootNodeBlock = memo(
       node,
     });
 
-    const updateNodeData = useMindmapStore((state) => state.updateNodeDataWithUndo);
+    const updateNodeData = useNodeOperationsStore((state) => state.updateNodeData);
     const updateSubtreeLayout = useLayoutStore((state) => state.updateSubtreeLayout);
-    const updateSubtreeEdgeSmoothType = useMindmapStore((state) => state.updateSubtreeEdgeSmoothType);
+    const updateSubtreeEdgeSmoothType = useNodeManipulationStore(
+      (state) => state.updateSubtreeEdgeSmoothType
+    );
 
     const [, setIsEditing] = useState(false);
 

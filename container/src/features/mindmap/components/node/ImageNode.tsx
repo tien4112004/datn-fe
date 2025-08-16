@@ -9,7 +9,7 @@ import { useMindmapNodeCommon } from '../../hooks';
 import { Button } from '@/components/ui/button';
 import { Upload, X, Loader2, Network } from 'lucide-react';
 import { useMindmapStore } from '../../stores';
-import { useLayoutStore } from '../../stores/useLayoutStore';
+import { useLayoutStore } from '../../stores/layout';
 
 const ImageNodeBlock = memo(
   ({ ...node }: NodeProps<ImageNode>) => {

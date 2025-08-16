@@ -1,16 +1,15 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useUpdateNodeInternals, useNodesInitialized, useReactFlow } from '@xyflow/react';
-import { useMindmapStore } from '../stores/useMindmapStore';
-import { useLayoutStore } from '../stores/useLayoutStore';
+import { useLayoutStore } from '../stores/layout';
 import type { MindMapNode } from '../types';
-import { useClipboardStore } from '../stores';
+import { useClipboardStore, useCoreStore, useNodeManipulationStore } from '../stores';
 import { DIRECTION, SIDE } from '../types/constants';
 
 export const useReactFlowIntegration = () => {
-  const nodeLength = useMindmapStore((state) => state.nodes.length);
-  const syncState = useMindmapStore((state) => state.syncState);
-  const moveToChild = useMindmapStore((state) => state.moveToChild);
-  const getNode = useMindmapStore((state) => state.getNode);
+  const nodeLength = useCoreStore((state) => state.nodes.length);
+  const syncState = useCoreStore((state) => state.syncState);
+  const moveToChild = useNodeManipulationStore((state) => state.moveToChild);
+  const getNode = useCoreStore((state) => state.getNode);
 
   const updateLayout = useLayoutStore((state) => state.updateLayout);
   const setMousePosition = useClipboardStore((state) => state.setMousePosition);

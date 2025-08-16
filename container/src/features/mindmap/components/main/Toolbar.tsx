@@ -2,7 +2,7 @@ import { Plus, Trash2, Undo, Redo } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useMindmapStore } from '../../stores/useMindmapStore';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
-import { useLayoutStore } from '../../stores/useLayoutStore';
+import { useLayoutStore } from '../../stores/layout';
 import type { Direction } from '../../types/constants';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { useClipboardStore } from '../../stores';

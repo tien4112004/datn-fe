@@ -1,3 +1,5 @@
-export { useMindmapStore } from './useMindmapStore';
-export { useLayoutStore } from './useLayoutStore';
-export { useClipboardStore } from './useClipboardStore';
+export { useLayoutStore } from './layout';
+export { useClipboardStore } from './clipboard';
+export { useCoreStore } from './core';
+export { useNodeManipulationStore } from './nodeManipulation';
+export { useNodeOperationsStore } from './nodeOperation';

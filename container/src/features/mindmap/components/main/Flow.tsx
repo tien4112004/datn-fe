@@ -2,12 +2,12 @@ import { ReactFlow } from '@xyflow/react';
 import { memo, type ReactNode } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { useReactFlowIntegration } from '@/features/mindmap/hooks';
-import { useMindmapStore } from '@/features/mindmap/stores';
 import EdgeBlock from '../edge/Edge';
 import RootNodeBlock from '../node/RootNode';
 import ShapeNodeBlock from '../node/ShapeNode';
 import TextNodeBlock from '../node/TextNode';
 import ImageNodeBlock from '../node/ImageNode';
+import { useCoreStore } from '../../stores';
 
 const nodeTypes = {
   mindmapTextNode: TextNodeBlock,
@@ -32,7 +32,7 @@ const Flow = memo(({ children, isPanOnDrag }: { children: ReactNode; isPanOnDrag
   const { onNodeDragStart, onNodeDrag, onNodeDragStop, onPaneMouseMove, onPaneClick } =
     useReactFlowIntegration();
 
-  const { nodes, edges, onNodesChange, onEdgesChange, onConnect } = useMindmapStore(
+  const { nodes, edges, onNodesChange, onEdgesChange, onConnect } = useCoreStore(
     useShallow(handlersSelector)
   );
 

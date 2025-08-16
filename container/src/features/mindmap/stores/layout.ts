@@ -2,9 +2,9 @@ import { create } from 'zustand';
 import * as d3 from 'd3';
 import type { MindMapEdge, MindMapNode } from '../types';
 import { type Direction } from '../types/constants';
-import { useMindmapStore } from './useMindmapStore';
+import { useCoreStore } from './core';
 import { devtools } from 'zustand/middleware';
-import { useClipboardStore } from './useClipboardStore';
+import { useClipboardStore } from './clipboard';
 import { d3LayoutService } from '../services/D3LayoutService';
 
 interface AnimationData {
@@ -70,8 +70,8 @@ export const useLayoutStore = create<LayoutState>()(
 
       animateNodesToPositions: (targetPositions, duration = 2000) => {
         const { animationTimer } = get();
-        const nodes = useMindmapStore.getState().nodes;
-        const setNodes = useMindmapStore.getState().setNodes;
+        const nodes = useCoreStore.getState().nodes;
+        const setNodes = useCoreStore.getState().setNodes;
 
         if (!nodes?.length) return;
 
@@ -146,9 +146,9 @@ export const useLayoutStore = create<LayoutState>()(
 
       updateLayout: async (direction) => {
         const { layout, animateNodesToPositions } = get();
-        const nodes = useMindmapStore.getState().nodes;
-        const edges = useMindmapStore.getState().edges;
-        const setEdges = useMindmapStore.getState().setEdges;
+        const nodes = useCoreStore.getState().nodes;
+        const edges = useCoreStore.getState().edges;
+        const setEdges = useCoreStore.getState().setEdges;
 
         const layoutDirection = direction || layout;
 
@@ -183,9 +183,9 @@ export const useLayoutStore = create<LayoutState>()(
 
       updateSubtreeLayout: async (nodeId: string, direction: Direction) => {
         const { animateNodesToPositions } = get();
-        const nodes = useMindmapStore.getState().nodes;
-        const edges = useMindmapStore.getState().edges;
-        const setEdges = useMindmapStore.getState().setEdges;
+        const nodes = useCoreStore.getState().nodes;
+        const edges = useCoreStore.getState().edges;
+        const setEdges = useCoreStore.getState().setEdges;
 
         if (!nodes?.length || !edges) return;
 
@@ -246,7 +246,7 @@ export const useLayoutStore = create<LayoutState>()(
       onLayoutChange: (direction) => {
         const { updateLayout } = get();
         const pushUndo = useClipboardStore.getState().pushToUndoStack;
-        pushUndo(useMindmapStore.getState().nodes, useMindmapStore.getState().edges);
+        pushUndo(useCoreStore.getState().nodes, useCoreStore.getState().edges);
 
         set({ layout: direction }, false, 'mindmap-layout/onLayoutChange');
         updateLayout(direction);

@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { addEdge, applyNodeChanges, applyEdgeChanges } from '@xyflow/react';
 import type { Connection } from '@xyflow/react';
 import { devtools } from 'zustand/middleware';
-import type { MindMapNode, MindMapEdge, SmoothType } from '../types';
+import type { MindMapNode, MindMapEdge } from '../types';
 import { MINDMAP_TYPES, SMOOTH_TYPES } from '../types';
 import { SIDE } from '../types/constants';
 import { getRootNodeOfSubtree } from '../services/utils';

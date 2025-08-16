@@ -6,7 +6,7 @@ import { MINDMAP_TYPES, SMOOTH_TYPES } from '../types';
 import { SIDE, type Side } from '../types/constants';
 import { generateId } from '@/shared/lib/utils';
 import { getAllDescendantNodes, getRootNodeOfSubtree } from '../services/utils';
-import { useCoreStore } from './useCoreStore';
+import { useCoreStore } from './core';
 
 interface NodeManipulationState {
   toggleCollapse: (nodeId: string, side: Side, shouldCollapse: boolean) => void;

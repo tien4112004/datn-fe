@@ -1,9 +1,9 @@
 import { create } from 'zustand';
 import type { MindMapNode, MindMapEdge } from '../types';
 import { generateId } from '@/shared/lib/utils';
-import { useMindmapStore } from './useMindmapStore';
 import { devtools } from 'zustand/middleware';
 import { Deque } from '@datastructures-js/deque';
+import { useCoreStore } from './core';
 
 interface ClipboardState {
   cloningNodes: MindMapNode[];
@@ -47,8 +47,8 @@ export const useClipboardStore = create<ClipboardState>()(
       set((state) => ({ offset: state.offset + 20 }), false, 'mindmap-clip/incrementOffset'),
 
     copySelectedNodesAndEdges: () => {
-      const nodes = useMindmapStore.getState().nodes;
-      const edges = useMindmapStore.getState().edges;
+      const nodes = useCoreStore.getState().nodes;
+      const edges = useCoreStore.getState().edges;
       const selectedNodes = nodes.filter((node) => node.selected);
       const selectedEdges = edges.filter((edge) => edge.selected);
 
@@ -66,8 +66,8 @@ export const useClipboardStore = create<ClipboardState>()(
 
     pasteClonedNodesAndEdges: (screenToFlowPosition) => {
       const { cloningNodes, cloningEdges, mousePosition, offset } = get();
-      const setNodes = useMindmapStore.getState().setNodes;
-      const setEdges = useMindmapStore.getState().setEdges;
+      const setNodes = useCoreStore.getState().setNodes;
+      const setEdges = useCoreStore.getState().setEdges;
 
       if (cloningNodes.length === 0) return;
 
@@ -129,10 +129,10 @@ export const useClipboardStore = create<ClipboardState>()(
       const undoStack = get().undoStack;
       if (undoStack.isEmpty()) return;
 
-      const setNodes = useMindmapStore.getState().setNodes;
-      const setEdges = useMindmapStore.getState().setEdges;
-      const edges = useMindmapStore.getState().edges;
-      const nodes = useMindmapStore.getState().nodes;
+      const setNodes = useCoreStore.getState().setNodes;
+      const setEdges = useCoreStore.getState().setEdges;
+      const edges = useCoreStore.getState().edges;
+      const nodes = useCoreStore.getState().nodes;
 
       const previousStage = undoStack.popBack();
       if (previousStage) {
@@ -150,10 +150,10 @@ export const useClipboardStore = create<ClipboardState>()(
       const redoStack = get().redoStack;
       if (redoStack.isEmpty()) return;
 
-      const setNodes = useMindmapStore.getState().setNodes;
-      const setEdges = useMindmapStore.getState().setEdges;
-      const edges = useMindmapStore.getState().edges;
-      const nodes = useMindmapStore.getState().nodes;
+      const setNodes = useCoreStore.getState().setNodes;
+      const setEdges = useCoreStore.getState().setEdges;
+      const edges = useCoreStore.getState().edges;
+      const nodes = useCoreStore.getState().nodes;
 
       const nextStage = redoStack.popBack();
       if (nextStage) {

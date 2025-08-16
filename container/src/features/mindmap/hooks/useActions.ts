@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { useReactFlow } from '@xyflow/react';
 import { useMindmapStore } from '../stores/useMindmapStore';
-import { useClipboardStore } from '../stores/useClipboardStore';
+import { useClipboardStore } from '../stores/clipboard';
 import type { MindMapNode, MindMapEdge, MindmapActionsType } from '../types';
 
 /**

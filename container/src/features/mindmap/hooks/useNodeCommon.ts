@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useUpdateNodeInternals, type NodeProps } from '@xyflow/react';
 import { useMindmapStore } from '../stores/useMindmapStore';
-import { useLayoutStore } from '../stores/useLayoutStore';
+import { useLayoutStore } from '../stores/layout';
 import type { BaseNode } from '../types';
 import type { Direction, Side } from '../types/constants';
 

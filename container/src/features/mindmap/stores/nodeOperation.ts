@@ -7,6 +7,7 @@ import { DragHandle, SIDE, type Side } from '../types/constants';
 import { generateId } from '@/shared/lib/utils';
 import { getRootNodeOfSubtree, getAllDescendantNodes } from '../services/utils';
 import { useCoreStore } from './core';
+import { useClipboardStore } from './clipboard';
 
 interface NodeOperationsState {
   nodesToBeDeleted: Set<string>;
@@ -18,6 +19,7 @@ interface NodeOperationsState {
     nodeType?: MindMapTypes
   ) => void;
   updateNodeData: (nodeId: string, updates: Partial<MindMapNode['data']>) => void;
+  updateNodeDataWithUndo: (nodeId: string, updates: Partial<MindMapNode['data']>) => void;
   markNodeForDeletion: (nodeId: string) => void;
   finalizeNodeDeletion: () => void;
   deleteSelectedNodes: () => void;
@@ -29,7 +31,11 @@ export const useNodeOperationsStore = create<NodeOperationsState>()(
       nodesToBeDeleted: new Set<string>(),
 
       addNode: () => {
-        const { nodes, setNodes } = useCoreStore.getState();
+        const { nodes, setNodes, edges } = useCoreStore.getState();
+
+        const pushUndo = useClipboardStore.getState().pushToUndoStack;
+        pushUndo(nodes, edges);
+
         const newNode: MindMapNode = {
           id: generateId(),
           type: MINDMAP_TYPES.ROOT_NODE,
@@ -55,7 +61,10 @@ export const useNodeOperationsStore = create<NodeOperationsState>()(
         side: Side | 'mid',
         nodeType: MindMapTypes = MINDMAP_TYPES.TEXT_NODE
       ) => {
-        const { nodes, setNodes, setEdges } = useCoreStore.getState();
+        const { nodes, edges, setNodes, setEdges } = useCoreStore.getState();
+
+        const pushUndo = useClipboardStore.getState().pushToUndoStack;
+        pushUndo(nodes, edges);
 
         // Find the root node to get the smoothType
         const rootNode = getRootNodeOfSubtree(parentNode.id!, nodes);
@@ -112,8 +121,21 @@ export const useNodeOperationsStore = create<NodeOperationsState>()(
         );
       },
 
+      updateNodeDataWithUndo: (nodeId: string, updates: Partial<MindMapNode['data']>) => {
+        const { setNodes } = useCoreStore.getState();
+        const pushUndo = useClipboardStore.getState().pushToUndoStack;
+        pushUndo(useCoreStore.getState().nodes, useCoreStore.getState().edges);
+
+        setNodes((state) =>
+          state.map((node) => (node.id === nodeId ? { ...node, data: { ...node.data, ...updates } } : node))
+        );
+      },
+
       markNodeForDeletion: (nodeId: string) => {
-        const { nodes, setNodes, setEdges } = useCoreStore.getState();
+        const { nodes, edges, setNodes, setEdges } = useCoreStore.getState();
+        const pushUndo = useClipboardStore.getState().pushToUndoStack;
+        pushUndo(nodes, edges);
+
         const descendantNodes = getAllDescendantNodes(nodeId, nodes);
         const nodeIdsToDelete = new Set([nodeId, ...descendantNodes.map((n) => n.id)]);
 

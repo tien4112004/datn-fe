@@ -22,7 +22,7 @@ const TextNodeBlock = memo(
       node,
     });
 
-    const updateNodeData = useNodeOperationsStore((state) => state.updateNodeData);
+    const updateNodeData = useNodeOperationsStore((state) => state.updateNodeDataWithUndo);
     const updateSubtreeLayout = useLayoutStore((state) => state.updateSubtreeLayout);
 
     const [isEditing, setIsEditing] = useState(false);

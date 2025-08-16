@@ -21,7 +21,7 @@ const RootNodeBlock = memo(
       node,
     });
 
-    const updateNodeData = useNodeOperationsStore((state) => state.updateNodeData);
+    const updateNodeData = useNodeOperationsStore((state) => state.updateNodeDataWithUndo);
     const updateSubtreeLayout = useLayoutStore((state) => state.updateSubtreeLayout);
     const updateSubtreeEdgeSmoothType = useNodeManipulationStore(
       (state) => state.updateSubtreeEdgeSmoothType

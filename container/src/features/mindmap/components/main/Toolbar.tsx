@@ -1,17 +1,16 @@
 import { Plus, Trash2, Undo, Redo } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useMindmapStore } from '../../stores/useMindmapStore';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { useLayoutStore } from '../../stores/layout';
 import type { Direction } from '../../types/constants';
 import { SidebarTrigger } from '@/components/ui/sidebar';
-import { useClipboardStore } from '../../stores';
+import { useClipboardStore, useCoreStore, useNodeOperationsStore } from '../../stores';
 import { useReactFlow } from '@xyflow/react';
 
 const Toolbar = () => {
-  const addNode = useMindmapStore((state) => state.addNode);
-  const deleteSelectedNodes = useMindmapStore((state) => state.deleteSelectedNodes);
-  const logData = useMindmapStore((state) => state.logData);
+  const addNode = useNodeOperationsStore((state) => state.addNode);
+  const deleteSelectedNodes = useNodeOperationsStore((state) => state.deleteSelectedNodes);
+  const logData = useCoreStore((state) => state.logData);
   const undo = useClipboardStore((state) => state.undo);
   const redo = useClipboardStore((state) => state.redo);
   const canUndo = useClipboardStore((state) => !state.undoStack.isEmpty());

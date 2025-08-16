@@ -7,6 +7,7 @@ import { SIDE, type Side } from '../types/constants';
 import { generateId } from '@/shared/lib/utils';
 import { getAllDescendantNodes, getRootNodeOfSubtree } from '../services/utils';
 import { useCoreStore } from './core';
+import { useClipboardStore } from './clipboard';
 
 interface NodeManipulationState {
   toggleCollapse: (nodeId: string, side: Side, shouldCollapse: boolean) => void;
@@ -23,6 +24,8 @@ export const useNodeManipulationStore = create<NodeManipulationState>()(
         const { nodes, edges, setNodes, setEdges } = useCoreStore.getState();
         const node = nodes.find((n) => n.id === nodeId);
         if (!node) return;
+        const pushUndo = useClipboardStore.getState().pushToUndoStack;
+        pushUndo(nodes, edges);
 
         const descendantNodes = getAllDescendantNodes(nodeId, nodes);
 
@@ -92,6 +95,9 @@ export const useNodeManipulationStore = create<NodeManipulationState>()(
         const targetNode = nodes.find((node) => node.id === targetId);
 
         if (!sourceNode || !targetNode) return;
+
+        const pushUndo = useClipboardStore.getState().pushToUndoStack;
+        pushUndo(nodes, edges);
 
         const descendantNodes = getAllDescendantNodes(sourceId, nodes);
 
@@ -191,6 +197,9 @@ export const useNodeManipulationStore = create<NodeManipulationState>()(
 
       updateSubtreeEdgeSmoothType: (rootNodeId: string, smoothType: SmoothType) => {
         const { nodes, edges, setNodes, setEdges } = useCoreStore.getState();
+
+        const pushUndo = useClipboardStore.getState().pushToUndoStack;
+        pushUndo(nodes, edges);
 
         const descendantNodes = getAllDescendantNodes(rootNodeId, nodes);
         const allNodeIds = new Set([rootNodeId, ...descendantNodes.map((n) => n.id)]);

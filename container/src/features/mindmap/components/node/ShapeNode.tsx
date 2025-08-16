@@ -14,7 +14,7 @@ const ShapeNodeBlock = memo(
     const { id, data, selected: isSelected, width, height } = node;
 
     const { layout } = useMindmapNodeCommon<ShapeNode>({ node });
-    const updateNodeData = useNodeOperationsStore((state) => state.updateNodeData);
+    const updateNodeData = useNodeOperationsStore((state) => state.updateNodeDataWithUndo);
     const updateSubtreeLayout = useLayoutStore((state) => state.updateSubtreeLayout);
 
     const handleShapeChange = (newShape: Shape) => {

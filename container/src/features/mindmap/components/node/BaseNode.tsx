@@ -11,7 +11,7 @@ import { ArrowLeftFromLine, ArrowRightFromLine, Plus, Type, Square, Image } from
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/shared/components/ui/popover';
 import { useMindmapNodeCommon } from '@/features/mindmap/hooks';
-import { useClipboardStore, useMindmapStore } from '@/features/mindmap/stores';
+import { useClipboardStore, useCoreStore, useNodeManipulationStore } from '@/features/mindmap/stores';
 
 export interface BaseNodeBlockProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
   children: ReactNode;
@@ -197,9 +197,9 @@ export const CreateChildNodeButtons = memo(
     const canCreateLeft = node.data.side === SIDE.LEFT || node.data.side === SIDE.MID;
     const canCreateRight = node.data.side === SIDE.RIGHT || node.data.side === SIDE.MID;
 
-    const toggleCollapse = useMindmapStore((state) => state.toggleCollapse);
-    const hasLeftChildren = useMindmapStore((state) => state.hasLeftChildren);
-    const hasRightChildren = useMindmapStore((state) => state.hasRightChildren);
+    const toggleCollapse = useNodeManipulationStore((state) => state.toggleCollapse);
+    const hasLeftChildren = useCoreStore((state) => state.hasLeftChildren);
+    const hasRightChildren = useCoreStore((state) => state.hasRightChildren);
 
     return (
       <>

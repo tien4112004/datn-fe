@@ -1,8 +1,8 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { toast } from 'sonner';
-import type { MindMapEdge, SmoothType } from '../types';
-import { MINDMAP_TYPES, SMOOTH_TYPES } from '../types';
+import type { MindMapEdge, PathType } from '../types';
+import { MINDMAP_TYPES, PATH_TYPES } from '../types';
 import { SIDE, type Side } from '../types/constants';
 import { generateId } from '@/shared/lib/utils';
 import { getAllDescendantNodes, getRootNodeOfSubtree } from '../services/utils';
@@ -14,7 +14,7 @@ interface NodeManipulationState {
   collapse: (nodeId: string, side: Side) => void;
   expand: (nodeId: string, side: Side) => void;
   moveToChild: (sourceId: string, targetId: string, side?: Side) => void;
-  updateSubtreeEdgeSmoothType: (rootNodeId: string, smoothType: SmoothType) => void;
+  updateSubtreeEdgePathType: (rootNodeId: string, pathType: PathType) => void;
 }
 
 export const useNodeManipulationStore = create<NodeManipulationState>()(
@@ -171,9 +171,9 @@ export const useNodeManipulationStore = create<NodeManipulationState>()(
         });
 
         if (!isEdgeEstablished) {
-          // Find the root node to get the smoothType
+          // Find the root node to get the pathType
           const rootNode = getRootNodeOfSubtree(targetId, nodes);
-          const smoothType = (rootNode?.data?.smoothType || SMOOTH_TYPES.SMOOTHSTEP) as SmoothType;
+          const pathType = (rootNode?.data?.pathType || PATH_TYPES.SMOOTHSTEP) as PathType;
 
           const newEdge: MindMapEdge = {
             id: generateId(),
@@ -185,7 +185,7 @@ export const useNodeManipulationStore = create<NodeManipulationState>()(
             data: {
               strokeColor: 'var(--primary)',
               strokeWidth: 2,
-              smoothType,
+              pathType,
             },
           };
           updatedEdges.push(newEdge);
@@ -195,7 +195,7 @@ export const useNodeManipulationStore = create<NodeManipulationState>()(
         setEdges(updatedEdges);
       },
 
-      updateSubtreeEdgeSmoothType: (rootNodeId: string, smoothType: SmoothType) => {
+      updateSubtreeEdgePathType: (rootNodeId: string, pathType: PathType) => {
         const { nodes, edges, setNodes, setEdges } = useCoreStore.getState();
 
         const pushUndo = useClipboardStore.getState().pushToUndoStack;
@@ -204,14 +204,14 @@ export const useNodeManipulationStore = create<NodeManipulationState>()(
         const descendantNodes = getAllDescendantNodes(rootNodeId, nodes);
         const allNodeIds = new Set([rootNodeId, ...descendantNodes.map((n) => n.id)]);
 
-        // Update the root node's smoothType data
+        // Update the root node's pathType data
         const updatedNodes = nodes.map((node) => {
           if (node.id === rootNodeId && node.type === MINDMAP_TYPES.ROOT_NODE) {
             return {
               ...node,
               data: {
                 ...node.data,
-                smoothType,
+                pathType,
               },
             };
           }
@@ -226,7 +226,7 @@ export const useNodeManipulationStore = create<NodeManipulationState>()(
               ...edge,
               data: {
                 ...edge.data,
-                smoothType,
+                pathType,
               },
             };
           }

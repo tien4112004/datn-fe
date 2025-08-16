@@ -1,8 +1,8 @@
 import type { Node, Edge } from '@xyflow/react';
-import type { Direction, MINDMAP_TYPES, Side, SMOOTH_TYPES } from './constants';
+import type { Direction, MINDMAP_TYPES, Side, PATH_TYPES } from './constants';
 
 export type MindMapTypes = (typeof MINDMAP_TYPES)[keyof typeof MINDMAP_TYPES];
-export type SmoothType = (typeof SMOOTH_TYPES)[keyof typeof SMOOTH_TYPES];
+export type PathType = (typeof PATH_TYPES)[keyof typeof PATH_TYPES];
 
 export interface BaseNodeData extends Record<string, unknown> {
   level: number;
@@ -30,7 +30,7 @@ export interface TextNode extends BaseNode<TextNodeData, typeof MINDMAP_TYPES.TE
 
 export interface RootNodeData extends BaseNodeData {
   content: string;
-  smoothType?: SmoothType;
+  pathType?: PathType;
 }
 
 export interface RootNode extends BaseNode<RootNodeData, typeof MINDMAP_TYPES.ROOT_NODE> {}
@@ -57,7 +57,7 @@ export interface ImageNode extends BaseNode<ImageNodeData, typeof MINDMAP_TYPES.
 export type MindMapEdge = Edge<{
   strokeWidth?: number;
   strokeColor?: string;
-  smoothType?: SmoothType;
+  pathType?: PathType;
   isDeleting?: boolean;
   isCollapsed?: boolean;
 }>;

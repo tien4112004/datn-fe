@@ -1,8 +1,8 @@
 import { create } from 'zustand';
 import type { XYPosition } from '@xyflow/react';
 import { devtools } from 'zustand/middleware';
-import type { MindMapNode, MindMapEdge, MindMapTypes, SmoothType } from '../types';
-import { MINDMAP_TYPES, SMOOTH_TYPES } from '../types';
+import type { MindMapNode, MindMapEdge, MindMapTypes, PathType } from '../types';
+import { MINDMAP_TYPES, PATH_TYPES } from '../types';
 import { DragHandle, SIDE, type Side } from '../types/constants';
 import { generateId } from '@/shared/lib/utils';
 import { getRootNodeOfSubtree, getAllDescendantNodes } from '../services/utils';
@@ -48,7 +48,7 @@ export const useNodeOperationsStore = create<NodeOperationsState>()(
             content: `<p>New Node ${nodes.length + 1}</p>`,
             side: SIDE.MID,
             isCollapsed: false,
-            smoothType: SMOOTH_TYPES.SMOOTHSTEP,
+            pathType: PATH_TYPES.SMOOTHSTEP,
           },
         };
 
@@ -66,9 +66,9 @@ export const useNodeOperationsStore = create<NodeOperationsState>()(
         const pushUndo = useClipboardStore.getState().pushToUndoStack;
         pushUndo(nodes, edges);
 
-        // Find the root node to get the smoothType
+        // Find the root node to get the pathType
         const rootNode = getRootNodeOfSubtree(parentNode.id!, nodes);
-        const smoothType = (rootNode?.data?.smoothType || SMOOTH_TYPES.SMOOTHSTEP) as SmoothType;
+        const pathType = (rootNode?.data?.pathType || PATH_TYPES.SMOOTHSTEP) as PathType;
 
         const id = generateId();
         const newNode: MindMapNode = {
@@ -106,7 +106,7 @@ export const useNodeOperationsStore = create<NodeOperationsState>()(
           data: {
             strokeColor: 'var(--primary)',
             strokeWidth: 2,
-            smoothType,
+            pathType,
           },
         };
 

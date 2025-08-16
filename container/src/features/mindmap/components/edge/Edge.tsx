@@ -1,10 +1,10 @@
 import { type EdgeProps, getBezierPath, getSmoothStepPath, getStraightPath } from '@xyflow/react';
 import { memo } from 'react';
-import type { MindMapEdge, SmoothType } from '../../types';
+import type { MindMapEdge, PathType } from '../../types';
 import { motion } from 'motion/react';
 import { useNodeOperationsStore } from '../../stores';
 
-const getEdgePath = (type: SmoothType, props: any) => {
+const getEdgePath = (type: PathType, props: any) => {
   const { sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition } = props;
 
   switch (type) {
@@ -58,10 +58,10 @@ const EdgeBlock = memo(
     targetPosition,
     data,
     selected,
-  }: EdgeProps<MindMapEdge> & { smoothType: SmoothType }) => {
+  }: EdgeProps<MindMapEdge> & { pathType: PathType }) => {
     const finalizeNodeDeletion = useNodeOperationsStore((state) => state.finalizeNodeDeletion);
 
-    const [edgePath] = getEdgePath(data?.smoothType || 'smoothstep', {
+    const [edgePath] = getEdgePath(data?.pathType || 'smoothstep', {
       id,
       sourceX,
       sourceY,

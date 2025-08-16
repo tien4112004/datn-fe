@@ -35,7 +35,7 @@ export const MINDMAP_TYPES = {
   IMAGE_NODE: 'mindmapImageNode',
 } as const;
 
-export const SMOOTH_TYPES = {
+export const PATH_TYPES = {
   SMOOTHSTEP: 'smoothstep',
   STRAIGHT: 'straight',
   BEZIER: 'bezier',

@@ -3,7 +3,7 @@ import { addEdge, applyNodeChanges, applyEdgeChanges } from '@xyflow/react';
 import type { Connection } from '@xyflow/react';
 import { devtools } from 'zustand/middleware';
 import type { MindMapNode, MindMapEdge } from '../types';
-import { MINDMAP_TYPES, SMOOTH_TYPES } from '../types';
+import { MINDMAP_TYPES, PATH_TYPES } from '../types';
 import { SIDE } from '../types/constants';
 import { getRootNodeOfSubtree } from '../services/utils';
 
@@ -56,7 +56,7 @@ export const useCoreStore = create<CoreState>()(
         const sourceRootNode = getRootNodeOfSubtree(connection.source!, nodes);
         const targetRootNode = getRootNodeOfSubtree(connection.target!, nodes);
         const rootNode = sourceRootNode || targetRootNode;
-        const smoothType = rootNode?.data?.smoothType || SMOOTH_TYPES.SMOOTHSTEP;
+        const pathType = rootNode?.data?.pathType || PATH_TYPES.SMOOTHSTEP;
 
         const edge = {
           ...connection,
@@ -64,7 +64,7 @@ export const useCoreStore = create<CoreState>()(
           data: {
             strokeColor: 'var(--primary)',
             strokeWidth: 2,
-            smoothType,
+            pathType,
           },
         };
 

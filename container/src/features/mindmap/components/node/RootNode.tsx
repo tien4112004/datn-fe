@@ -3,7 +3,7 @@ import { useState, memo, useCallback } from 'react';
 import { cn } from '@/shared/lib/utils';
 import { DIRECTION, DragHandle } from '../../types/constants';
 import type { RootNode } from '../../types';
-import { SMOOTH_TYPES, type SmoothType } from '../../types';
+import { PATH_TYPES, type PathType } from '../../types';
 import { useMindmapNodeCommon } from '../../hooks/useNodeCommon';
 import { BaseNodeBlock, BaseNodeControl } from './BaseNode';
 import { Input } from '@/components/ui/input';
@@ -23,9 +23,7 @@ const RootNodeBlock = memo(
 
     const updateNodeData = useNodeOperationsStore((state) => state.updateNodeDataWithUndo);
     const updateSubtreeLayout = useLayoutStore((state) => state.updateSubtreeLayout);
-    const updateSubtreeEdgeSmoothType = useNodeManipulationStore(
-      (state) => state.updateSubtreeEdgeSmoothType
-    );
+    const updateSubtreeEdgePathType = useNodeManipulationStore((state) => state.updateSubtreeEdgePathType);
 
     const [, setIsEditing] = useState(false);
 
@@ -45,11 +43,11 @@ const RootNodeBlock = memo(
       updateSubtreeLayout(node.id, layout);
     };
 
-    const handleSmoothTypeChange = useCallback(
-      (smoothType: SmoothType) => {
-        updateSubtreeEdgeSmoothType(node.id, smoothType);
+    const handlePathTypeChange = useCallback(
+      (pathType: PathType) => {
+        updateSubtreeEdgePathType(node.id, pathType);
       },
-      [node.id, updateSubtreeEdgeSmoothType]
+      [node.id, updateSubtreeEdgePathType]
     );
 
     return (
@@ -90,7 +88,7 @@ const RootNodeBlock = memo(
           </Button>
           <Popover>
             <PopoverTrigger asChild>
-              <Button variant="ghost" size="sm" className="h-6 w-6 p-1" title="Change Edge Smooth Type">
+              <Button variant="ghost" size="sm" className="h-6 w-6 p-1" title="Change Edge Path Type">
                 <Workflow className="h-3 w-3" />
               </Button>
             </PopoverTrigger>
@@ -99,7 +97,7 @@ const RootNodeBlock = memo(
                 <Button
                   variant="ghost"
                   className="w-full justify-start text-xs"
-                  onClick={() => handleSmoothTypeChange(SMOOTH_TYPES.SMOOTHSTEP)}
+                  onClick={() => handlePathTypeChange(PATH_TYPES.SMOOTHSTEP)}
                 >
                   <SmoothStepIcon />
                   Smooth Step
@@ -107,7 +105,7 @@ const RootNodeBlock = memo(
                 <Button
                   variant="ghost"
                   className="w-full justify-start text-xs"
-                  onClick={() => handleSmoothTypeChange(SMOOTH_TYPES.BEZIER)}
+                  onClick={() => handlePathTypeChange(PATH_TYPES.BEZIER)}
                 >
                   <BezierIcon />
                   Bezier
@@ -115,7 +113,7 @@ const RootNodeBlock = memo(
                 <Button
                   variant="ghost"
                   className="w-full justify-start text-xs"
-                  onClick={() => handleSmoothTypeChange(SMOOTH_TYPES.STRAIGHT)}
+                  onClick={() => handlePathTypeChange(PATH_TYPES.STRAIGHT)}
                 >
                   <StraightIcon />
                   Straight

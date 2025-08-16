@@ -1,5 +1,5 @@
 import { API_MODE, type ApiMode } from '@/shared/constants';
-import { type MindmapApiService, type MindmapData, MINDMAP_TYPES, SMOOTH_TYPES } from '../types';
+import { type MindmapApiService, type MindmapData, MINDMAP_TYPES, PATH_TYPES } from '../types';
 import { DragHandle, SIDE } from '../types/constants';
 
 const mockMindmaps: MindmapData[] = [
@@ -17,7 +17,7 @@ const mockMindmaps: MindmapData[] = [
           content: '<p>Central Topic</p>',
           side: SIDE.MID,
           isCollapsed: false,
-          smoothType: SMOOTH_TYPES.SMOOTHSTEP,
+          pathType: PATH_TYPES.SMOOTHSTEP,
         },
         dragHandle: DragHandle.SELECTOR,
         width: 250,

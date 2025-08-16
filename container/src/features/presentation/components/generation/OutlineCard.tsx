@@ -81,7 +81,7 @@ const OutlineCard = ({ id, title = 'Outline', className = '', item, onDelete }: 
         <RichTextEditor
           data-card
           editor={editor}
-          onChange={() => async (editor: BlockNoteEditor) => {
+          onChange={async () => {
             // const htmlContent = await editor.blocksToFullHTML(editor.document);
             const markdownContent = await editor.blocksToMarkdownLossy(editor.document);
             // handleContentChange?.(id, htmlContent);

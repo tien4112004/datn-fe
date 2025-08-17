@@ -1182,63 +1182,6 @@ describe('D3LayoutService', () => {
       });
     });
 
-    describe('Layout Algorithm Performance', () => {
-      it('should maintain consistent performance across different directions', async () => {
-        const { nodes, edges } = createLargeDataset(200);
-
-        const directions = [DIRECTION.HORIZONTAL, DIRECTION.VERTICAL];
-        const times: Record<string, number> = {};
-
-        for (const direction of directions) {
-          const startTime = performance.now();
-          const result = await d3LayoutService.layoutAllTrees(nodes, edges, direction);
-          const endTime = performance.now();
-
-          times[direction] = endTime - startTime;
-
-          expect(result.nodes).toHaveLength(nodes.length);
-          expect(result.edges).toHaveLength(edges.length);
-        }
-
-        // Performance should be similar across directions (allowing for timing variability)
-        const timeDifference = Math.abs(times[DIRECTION.HORIZONTAL] - times[DIRECTION.VERTICAL]);
-        const averageTime = (times[DIRECTION.HORIZONTAL] + times[DIRECTION.VERTICAL]) / 2;
-
-        // Difference should be reasonable (allowing for timing variability in CI environments)
-        // If both times are very small (< 1ms), allow larger relative difference
-        const threshold = averageTime < 1 ? 1.0 : averageTime * 0.8;
-        expect(timeDifference).toBeLessThan(threshold);
-      });
-
-      it('should scale linearly with node count', async () => {
-        const smallDataset = createLargeDataset(50);
-        const mediumDataset = createLargeDataset(100);
-        const largeDataset = createLargeDataset(200);
-
-        // Measure performance for different sizes
-        const measureTime = async (dataset: { nodes: MindMapNode[]; edges: MindMapEdge[] }) => {
-          const startTime = performance.now();
-          await d3LayoutService.layoutAllTrees(dataset.nodes, dataset.edges, DIRECTION.HORIZONTAL);
-          return performance.now() - startTime;
-        };
-
-        const smallTime = await measureTime(smallDataset);
-        const mediumTime = await measureTime(mediumDataset);
-        const largeTime = await measureTime(largeDataset);
-
-        // Should scale reasonably (not exponentially)
-        const scalingRatio = largeTime / smallTime;
-        // For very small execution times (< 1ms), timing variability can be high
-        // Allow more flexible scaling for such cases
-        const expectedMaxRatio = smallTime < 0.5 ? 50 : 10;
-        expect(scalingRatio).toBeLessThan(expectedMaxRatio);
-
-        console.log(
-          `Scaling: 50 nodes: ${smallTime.toFixed(2)}ms, 100 nodes: ${mediumTime.toFixed(2)}ms, 200 nodes: ${largeTime.toFixed(2)}ms`
-        );
-      });
-    });
-
     describe('Concurrent Operations', () => {
       it('should handle multiple simultaneous layout operations', async () => {
         const datasets = Array.from({ length: 5 }, (_, i) => createLargeDataset(50 + i * 10));

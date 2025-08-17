@@ -32,7 +32,7 @@ export const BaseNodeBlock = memo(
 
     const handleAnimationComplete = useCallback(() => {
       if (data.isDeleting && onNodeDelete) {
-        onNodeDelete();
+        onNodeDelete(id);
       }
     }, [data.isDeleting, onNodeDelete]);
 

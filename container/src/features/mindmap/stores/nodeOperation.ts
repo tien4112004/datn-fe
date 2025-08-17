@@ -20,7 +20,7 @@ interface NodeOperationsState {
   updateNodeData: (nodeId: string, updates: Partial<MindMapNode['data']>) => void;
   updateNodeDataWithUndo: (nodeId: string, updates: Partial<MindMapNode['data']>) => void;
   markNodeForDeletion: (nodeId: string) => void;
-  finalizeNodeDeletion: () => void;
+  finalizeNodeDeletion: (nodeId: string) => void;
   deleteSelectedNodes: () => void;
 }
 
@@ -155,21 +155,22 @@ export const useNodeOperationsStore = create<NodeOperationsState>()(
         );
       },
 
-      finalizeNodeDeletion: () => {
-        const { nodesToBeDeleted } = get();
-        if (nodesToBeDeleted.size === 0) return;
+      finalizeNodeDeletion: (nodeId: string) => {
+        const { nodes, setNodes, setEdges } = useCoreStore.getState();
 
-        const { setNodes, setEdges } = useCoreStore.getState();
+        if (!get().nodesToBeDeleted.has(nodeId)) {
+          return;
+        }
 
-        setNodes((state) => state.filter((node: MindMapNode) => !nodesToBeDeleted.has(node.id)));
+        const descendantNodes = getAllDescendantNodes(nodeId, nodes);
+        const nodeIdsToDelete = new Set([nodeId, ...descendantNodes.map((n) => n.id)]);
 
+        setNodes((state) => state.filter((node) => !nodeIdsToDelete.has(node.id)));
         setEdges((state) =>
-          state.filter(
-            (edge: MindMapEdge) => !nodesToBeDeleted.has(edge.source) && !nodesToBeDeleted.has(edge.target)
-          )
+          state.filter((edge) => !nodeIdsToDelete.has(edge.source) && !nodeIdsToDelete.has(edge.target))
         );
 
-        set({ nodesToBeDeleted: new Set<string>() });
+        set({ nodesToBeDeleted: new Set() });
       },
 
       deleteSelectedNodes: () => {

@@ -13,7 +13,7 @@ export interface UseNodeCommonReturn {
   layout: Direction;
   isLayouting: boolean;
   addChildNode: any;
-  onNodeDelete: () => void;
+  onNodeDelete: (id: string) => void;
   moveToChild: (sourceId: string, targetId: string, side: Side) => void;
 }
 

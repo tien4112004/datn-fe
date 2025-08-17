@@ -1,12 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useUpdateNodeInternals, useNodesInitialized, useReactFlow } from '@xyflow/react';
+import { useUpdateNodeInternals, useReactFlow } from '@xyflow/react';
 import { useLayoutStore } from '../stores/layout';
 import type { MindMapNode } from '../types';
 import { useClipboardStore, useCoreStore, useNodeManipulationStore } from '../stores';
-import { DIRECTION, SIDE } from '../types';
+import { SIDE } from '../types';
 
 export const useReactFlowIntegration = () => {
-  const nodeLength = useCoreStore((state) => state.nodes.length);
   const syncState = useCoreStore((state) => state.syncState);
   const moveToChild = useNodeManipulationStore((state) => state.moveToChild);
   const getNode = useCoreStore((state) => state.getNode);
@@ -14,13 +13,11 @@ export const useReactFlowIntegration = () => {
   const updateLayout = useLayoutStore((state) => state.updateLayout);
   const setMousePosition = useClipboardStore((state) => state.setMousePosition);
   const setDragTarget = useClipboardStore((state) => state.setDragTarget);
-  const layout = useLayoutStore((state) => state.layout);
 
   const [stateChanged, setStateChanged] = useState(false);
 
   const updateNodeInternals = useUpdateNodeInternals();
-  const nodesInitialized = useNodesInitialized();
-  const { getIntersectingNodes } = useReactFlow();
+  const { getIntersectingNodes, fitView } = useReactFlow();
 
   const onPaneMouseMove = useCallback((event: any) => {
     const { clientX, clientY } = event;
@@ -36,18 +33,14 @@ export const useReactFlowIntegration = () => {
     }
   }, []);
 
-  // Auto-layout effect when nodes are initialized
-  useEffect(() => {
-    if (nodeLength > 0 && nodesInitialized && layout !== DIRECTION.NONE) {
-      // Add a small delay to ensure DOM is fully rendered
-      const timeoutId = setTimeout(() => {
-        updateLayout();
-        setStateChanged(true);
-      }, 10);
+  const onInit = useCallback(async () => {
+    updateLayout();
+    setStateChanged(true);
 
-      return () => clearTimeout(timeoutId);
-    }
-  }, [nodesInitialized]);
+    setTimeout(() => {
+      fitView({ duration: 2000, padding: 0.1 });
+    }, 800);
+  }, []);
 
   useEffect(() => {
     if (!stateChanged) return;
@@ -120,5 +113,6 @@ export const useReactFlowIntegration = () => {
     onPaneMouseMove,
     onPaneClick,
     updateNodeInternals,
+    onInit,
   };
 };

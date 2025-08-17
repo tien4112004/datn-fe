@@ -128,7 +128,7 @@ const ImageNodeBlock = memo(
               draggable={false}
             />
 
-            <BaseNodeControl layout={layout} isSelected={isSelected ?? false} spacing="sm" padding>
+            <BaseNodeControl layout={layout} isSelected={isSelected ?? false} spacing="lg" padding>
               <Button
                 variant="ghost"
                 size="sm"

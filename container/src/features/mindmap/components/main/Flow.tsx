@@ -29,12 +29,12 @@ const handlersSelector = (state: any) => ({
 });
 
 const Flow = memo(({ children, isPanOnDrag }: { children: ReactNode; isPanOnDrag: boolean }) => {
-  const { onNodeDragStart, onNodeDrag, onNodeDragStop, onPaneMouseMove, onPaneClick } =
-    useReactFlowIntegration();
-
   const { nodes, edges, onNodesChange, onEdgesChange, onConnect } = useCoreStore(
     useShallow(handlersSelector)
   );
+
+  const { onNodeDragStart, onNodeDrag, onNodeDragStop, onPaneMouseMove, onPaneClick, onInit } =
+    useReactFlowIntegration();
 
   return (
     <ReactFlow
@@ -51,11 +51,11 @@ const Flow = memo(({ children, isPanOnDrag }: { children: ReactNode; isPanOnDrag
       onNodeDragStart={onNodeDragStart}
       onNodeDrag={onNodeDrag}
       onNodeDragStop={onNodeDragStop}
+      onInit={onInit}
       panOnDrag={isPanOnDrag}
       panActivationKeyCode={!isPanOnDrag ? 'Shift' : null}
       selectionOnDrag={!isPanOnDrag}
       selectionKeyCode={isPanOnDrag ? 'Shift' : null}
-      fitView
     >
       {children}
     </ReactFlow>

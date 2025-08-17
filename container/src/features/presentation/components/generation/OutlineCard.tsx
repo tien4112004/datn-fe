@@ -30,16 +30,21 @@ const OutlineCard = ({ id, title = 'Outline', className = '', onDelete }: Outlin
   });
   const hasInitialized = React.useRef(false);
 
+  async function loadInitialHTML() {
+    const blocks = await editor.tryParseMarkdownToBlocks(content?.markdownContent || '');
+    editor.replaceBlocks(editor.document, blocks);
+  }
+
   React.useEffect(() => {
-    async function loadInitialHTML() {
-      const blocks = await editor.tryParseMarkdownToBlocks(content?.markdownContent || '');
-      editor.replaceBlocks(editor.document, blocks);
-    }
     if (isStreaming || !content || !hasInitialized.current) {
       loadInitialHTML();
       hasInitialized.current = true;
     }
   }, [content?.markdownContent]);
+
+  React.useEffect(() => {
+    loadInitialHTML();
+  }, [editor]);
 
   const handleDelete = () => {
     if (!onDelete) return;

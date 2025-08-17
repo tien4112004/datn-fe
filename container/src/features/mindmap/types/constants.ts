@@ -34,3 +34,10 @@ export const PATH_TYPES = {
   STRAIGHT: 'straight',
   BEZIER: 'bezier',
 } as const;
+
+export const POSITION = {
+  LEFT: 'left',
+  RIGHT: 'right',
+  TOP: 'top',
+  BOTTOM: 'bottom',
+} as const;

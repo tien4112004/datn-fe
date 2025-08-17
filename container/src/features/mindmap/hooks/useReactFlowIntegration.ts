@@ -1,23 +1,29 @@
-import { useCallback, useEffect, useState } from 'react';
-import { useUpdateNodeInternals, useReactFlow } from '@xyflow/react';
+import { useCallback, useEffect } from 'react';
+import {
+  useUpdateNodeInternals,
+  useReactFlow,
+  type FinalConnectionState,
+  useNodesInitialized,
+} from '@xyflow/react';
 import { useLayoutStore } from '../stores/layout';
 import type { MindMapNode } from '../types';
-import { useClipboardStore, useCoreStore, useNodeManipulationStore } from '../stores';
-import { SIDE } from '../types';
+import { useClipboardStore, useCoreStore, useNodeManipulationStore, useNodeOperationsStore } from '../stores';
+import { MINDMAP_TYPES, SIDE } from '../types';
+import { getSideFromPosition } from '../services/utils';
 
 export const useReactFlowIntegration = () => {
   const syncState = useCoreStore((state) => state.syncState);
   const moveToChild = useNodeManipulationStore((state) => state.moveToChild);
   const getNode = useCoreStore((state) => state.getNode);
+  const addChildNode = useNodeOperationsStore((state) => state.addChildNode);
 
   const updateLayout = useLayoutStore((state) => state.updateLayout);
   const setMousePosition = useClipboardStore((state) => state.setMousePosition);
   const setDragTarget = useClipboardStore((state) => state.setDragTarget);
 
-  const [stateChanged, setStateChanged] = useState(false);
-
   const updateNodeInternals = useUpdateNodeInternals();
-  const { getIntersectingNodes, fitView } = useReactFlow();
+  const nodesInitialized = useNodesInitialized();
+  const { getIntersectingNodes, fitView, screenToFlowPosition } = useReactFlow();
 
   const onPaneMouseMove = useCallback((event: any) => {
     const { clientX, clientY } = event;
@@ -35,7 +41,6 @@ export const useReactFlowIntegration = () => {
 
   const onInit = useCallback(async () => {
     updateLayout();
-    setStateChanged(true);
 
     setTimeout(() => {
       fitView({ duration: 2000, padding: 0.1 });
@@ -43,15 +48,8 @@ export const useReactFlowIntegration = () => {
   }, []);
 
   useEffect(() => {
-    if (!stateChanged) return;
-
-    const timeoutId = setTimeout(() => {
-      syncState(updateNodeInternals);
-      setStateChanged(false);
-    }, 500);
-
-    return () => clearTimeout(timeoutId);
-  }, [stateChanged]);
+    syncState(updateNodeInternals);
+  }, [nodesInitialized]);
 
   const determineSideFromPosition = useCallback((draggedNode: MindMapNode, targetNode: any) => {
     const targetCenterX = targetNode.position.x + (targetNode.measured?.width ?? 0) / 2;
@@ -106,6 +104,28 @@ export const useReactFlowIntegration = () => {
     [getIntersectingNodes, getNode, moveToChild, determineSideFromPosition, setDragTarget]
   );
 
+  const onConnectEnd = useCallback(
+    (event: MouseEvent | TouchEvent, connectionState: FinalConnectionState) => {
+      // when a connection is dropped on the pane it's not valid
+      if (!connectionState.isValid) {
+        const { clientX, clientY } = 'changedTouches' in event ? event.changedTouches[0] : event;
+        const position = screenToFlowPosition({
+          x: clientX,
+          y: clientY,
+        });
+
+        if (!connectionState.fromNode || !connectionState.fromHandle) return;
+
+        const parentNode = getNode(connectionState.fromNode.id);
+        if (!parentNode) return;
+
+        const side = getSideFromPosition(connectionState.fromHandle.position);
+        addChildNode(parentNode, position, side, MINDMAP_TYPES.TEXT_NODE);
+      }
+    },
+    []
+  );
+
   return {
     onNodeDragStart,
     onNodeDrag,
@@ -114,5 +134,6 @@ export const useReactFlowIntegration = () => {
     onPaneClick,
     updateNodeInternals,
     onInit,
+    onConnectEnd,
   };
 };

@@ -260,13 +260,26 @@ export const useNodeManipulationStore = create<NodeManipulationState>()(
       },
 
       updateSubtreeEdgeColor: (rootNodeId: string, edgeColor: string) => {
-        const { nodes, edges, setEdges } = useCoreStore.getState();
+        const { nodes, edges, setEdges, setNodes } = useCoreStore.getState();
 
         const pushUndo = useClipboardStore.getState().pushToUndoStack;
         pushUndo(nodes, edges);
 
         const descendantNodes = getAllDescendantNodes(rootNodeId, nodes);
         const allNodeIds = new Set([rootNodeId, ...descendantNodes.map((n) => n.id)]);
+
+        const updatedNodes = nodes.map((node) => {
+          if (node.id === rootNodeId && node.type === MINDMAP_TYPES.ROOT_NODE) {
+            return {
+              ...node,
+              data: {
+                ...node.data,
+                edgeColor,
+              },
+            };
+          }
+          return node;
+        });
 
         const updatedEdges = edges.map((edge) => {
           const isSubtreeEdge = allNodeIds.has(edge.source) || allNodeIds.has(edge.target);
@@ -284,6 +297,7 @@ export const useNodeManipulationStore = create<NodeManipulationState>()(
           return edge;
         });
 
+        setNodes(updatedNodes);
         setEdges(updatedEdges);
       },
     }),

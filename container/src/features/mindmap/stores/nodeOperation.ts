@@ -103,7 +103,7 @@ export const useNodeOperationsStore = create<NodeOperationsState>()(
             side === SIDE.LEFT ? `first-source-${parentNode.id}` : `second-source-${parentNode.id}`,
           targetHandle: side === SIDE.LEFT ? `second-target-${newNode.id}` : `first-target-${newNode.id}`,
           data: {
-            strokeColor: 'var(--primary)',
+            strokeColor: (rootNode?.data.edgeColor as string) || 'var(--primary)',
             strokeWidth: 2,
             pathType,
           },

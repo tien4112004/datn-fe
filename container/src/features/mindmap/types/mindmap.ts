@@ -1,11 +1,12 @@
 import type { Node, Edge } from '@xyflow/react';
-import type { MINDMAP_TYPES, PATH_TYPES, DIRECTION, SHAPES, SIDE } from './constants';
+import type { MINDMAP_TYPES, PATH_TYPES, DIRECTION, SHAPES, SIDE, POSITION } from './constants';
 
 export type MindMapTypes = (typeof MINDMAP_TYPES)[keyof typeof MINDMAP_TYPES];
 export type PathType = (typeof PATH_TYPES)[keyof typeof PATH_TYPES];
 export type Shape = (typeof SHAPES)[keyof typeof SHAPES];
 export type Side = (typeof SIDE)[keyof typeof SIDE];
 export type Direction = (typeof DIRECTION)[keyof typeof DIRECTION];
+export type Position = (typeof POSITION)[keyof typeof POSITION];
 
 export interface BaseNodeData extends Record<string, unknown> {
   level: number;

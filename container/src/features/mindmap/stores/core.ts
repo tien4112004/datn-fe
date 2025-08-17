@@ -14,6 +14,7 @@ interface CoreState {
   onEdgesChange: (changes: any) => void;
   onConnect: (connection: Connection) => void;
   getNode: (nodeId: string) => MindMapNode | undefined;
+  getRoot: (nodeId: string) => MindMapNode | undefined;
   getNodeLength: () => number;
   setNodes: (updater: MindMapNode[] | ((nodes: MindMapNode[]) => MindMapNode[])) => void;
   setEdges: (updater: MindMapEdge[] | ((edges: MindMapEdge[]) => MindMapEdge[])) => void;
@@ -100,6 +101,11 @@ export const useCoreStore = create<CoreState>()(
       getNode: (nodeId: string) => {
         const { nodes } = get();
         return nodes.find((node) => node.id === nodeId);
+      },
+
+      getRoot: (nodeId: string) => {
+        const { nodes } = get();
+        return getRootNodeOfSubtree(nodeId, nodes);
       },
 
       getNodeLength: () => {

@@ -91,7 +91,7 @@ export const BaseNodeBlock = memo(
             >
               {children}
               <NodeResizer color={NODE_RESIZER_COLOR} isVisible={isSelected} minWidth={100} minHeight={30} />
-              <NodeHandlers layout={layout} id={id} />
+              <NodeHandlers layout={layout} id={id} side={data.side} />
               <CreateChildNodeButtons
                 node={node}
                 isMouseOver={isMouseOver}
@@ -114,7 +114,7 @@ export const BaseNodeBlock = memo(
             >
               {children}
               <NodeResizer color={NODE_RESIZER_COLOR} isVisible={isSelected} minWidth={100} minHeight={30} />
-              <NodeHandlers layout={layout} id={id} />
+              <NodeHandlers layout={layout} id={id} side={data.side} />
               <CreateChildNodeButtons
                 node={node}
                 isMouseOver={isMouseOver}

@@ -2,7 +2,7 @@ import { ReactFlow } from '@xyflow/react';
 import { memo, type ReactNode } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { useReactFlowIntegration } from '@/features/mindmap/hooks';
-import EdgeBlock from '../edge/Edge';
+import EdgeBlock, { ConnectionLine } from '../edge/Edge';
 import RootNodeBlock from '../node/RootNode';
 import ShapeNodeBlock from '../node/ShapeNode';
 import TextNodeBlock from '../node/TextNode';
@@ -33,7 +33,7 @@ const Flow = memo(({ children, isPanOnDrag }: { children: ReactNode; isPanOnDrag
     useShallow(handlersSelector)
   );
 
-  const { onNodeDragStart, onNodeDrag, onNodeDragStop, onPaneMouseMove, onPaneClick, onInit } =
+  const { onNodeDragStart, onNodeDrag, onNodeDragStop, onPaneMouseMove, onPaneClick, onInit, onConnectEnd } =
     useReactFlowIntegration();
 
   return (
@@ -52,6 +52,8 @@ const Flow = memo(({ children, isPanOnDrag }: { children: ReactNode; isPanOnDrag
       onNodeDrag={onNodeDrag}
       onNodeDragStop={onNodeDragStop}
       onInit={onInit}
+      onConnectEnd={onConnectEnd}
+      connectionLineComponent={ConnectionLine}
       panOnDrag={isPanOnDrag}
       panActivationKeyCode={!isPanOnDrag ? 'Shift' : null}
       selectionOnDrag={!isPanOnDrag}

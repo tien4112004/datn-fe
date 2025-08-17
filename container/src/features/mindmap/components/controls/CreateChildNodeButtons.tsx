@@ -115,7 +115,7 @@ export const CreateChildNodeButtons = memo(
             >
               <motion.div
                 animate={
-                  layout === DIRECTION.VERTICAL
+                  layout === DIRECTION.HORIZONTAL
                     ? { rotate: node.data.isLeftChildrenCollapsed ? 0 : 180 }
                     : { rotate: node.data.isLeftChildrenCollapsed ? 90 : 270 }
                 }
@@ -222,7 +222,7 @@ export const CreateChildNodeButtons = memo(
   }
 );
 
-export const NodeHandlers = memo(({ layout, id }: { layout: Direction; id: string }) => {
+export const NodeHandlers = memo(({ layout, side, id }: { layout: Direction; side: Side; id: string }) => {
   const [currentLayout, setCurrentLayout] = useState(layout);
 
   if (currentLayout !== layout && layout !== DIRECTION.NONE) {
@@ -234,11 +234,13 @@ export const NodeHandlers = memo(({ layout, id }: { layout: Direction; id: strin
       <BaseHandle
         type="source"
         position={currentLayout === DIRECTION.VERTICAL ? Position.Top : Position.Left}
+        style={side === SIDE.LEFT || side === SIDE.MID ? {} : { visibility: 'hidden' }}
         id={`first-source-${id}`}
       />
       <BaseHandle
         type="source"
         position={currentLayout === DIRECTION.VERTICAL ? Position.Bottom : Position.Right}
+        style={side === SIDE.RIGHT || side === SIDE.MID ? {} : { visibility: 'hidden' }}
         id={`second-source-${id}`}
       />
       <BaseHandle

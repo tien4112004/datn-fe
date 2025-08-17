@@ -16,7 +16,8 @@ const useOutlineStore = create<OutlineStore>((set) => ({
   },
   handleContentChange: (id, content) =>
     set((state) => ({
-      content: state.content.map((item) => (item.id === id ? { ...item, htmlContent: content } : item)),
+      // content: state.content.map((item) => (item.id === id ? { ...item, htmlContent: content } : item)),
+      content: state.content.map((item) => (item.id === id ? { ...item, markdownContent: content } : item)),
     })),
 }));
 

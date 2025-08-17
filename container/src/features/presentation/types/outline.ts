@@ -1,18 +1,14 @@
 export type OutlineItem = {
   id: string;
   htmlContent: string;
+  markdownContent: string;
 };
 
 export type OutlineData = {
-  prompt: string;
-  slideCount: string | undefined;
-  style: string | undefined;
+  topic: string;
+  slideCount: number;
+  language: string;
   model: string;
+  targetAge: string;
+  learningObjective: string;
 };
-
-export interface OutlinePromptRequest {
-  prompt: string;
-  topic?: string;
-  maxLength?: number;
-  // Add other properties as needed
-}

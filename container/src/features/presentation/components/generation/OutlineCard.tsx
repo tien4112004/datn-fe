@@ -3,7 +3,6 @@ import { useRichTextEditor } from '@/shared/components/rte/useRichTextEditor';
 import { Button } from '@/shared/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
 import { cn } from '@/shared/lib/utils';
-import { BlockNoteEditor } from '@blocknote/core';
 import { useSortable } from '@dnd-kit/sortable';
 import { Trash } from 'lucide-react';
 import React from 'react';
@@ -32,7 +31,8 @@ const OutlineCard = ({ id, title = 'Outline', className = '', item, onDelete }: 
 
   React.useEffect(() => {
     async function loadInitialHTML() {
-      const blocks = await editor.tryParseHTMLToBlocks(item.htmlContent);
+      // const blocks = await editor.tryParseHTMLToBlocks(item.htmlContent);
+      const blocks = await editor.tryParseMarkdownToBlocks(item.markdownContent);
       editor.replaceBlocks(editor.document, blocks);
     }
     loadInitialHTML();
@@ -80,9 +80,11 @@ const OutlineCard = ({ id, title = 'Outline', className = '', item, onDelete }: 
         <RichTextEditor
           data-card
           editor={editor}
-          onChange={() => async (editor: BlockNoteEditor) => {
-            const htmlContent = await editor.blocksToFullHTML(editor.document);
-            handleContentChange?.(id, htmlContent);
+          onChange={async () => {
+            // const htmlContent = await editor.blocksToFullHTML(editor.document);
+            const markdownContent = await editor.blocksToMarkdownLossy(editor.document);
+            // handleContentChange?.(id, htmlContent);
+            handleContentChange?.(id, markdownContent);
           }}
           sideMenu={false}
           className="-mx-2"

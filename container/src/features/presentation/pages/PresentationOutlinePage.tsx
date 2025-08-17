@@ -19,10 +19,12 @@ const PresentationOutlinePage = () => {
     PresentationViewState.OUTLINE_CREATION
   );
   const [outlineData, setOutlineData] = useState<OutlineData>({
-    slideCount: '',
-    style: '',
+    topic: '',
+    slideCount: 0,
+    language: '',
     model: defaultModel.name,
-    prompt: '',
+    targetAge: '',
+    learningObjective: '',
   });
 
   const handleCreateOutline = (outlineData: OutlineData) => {

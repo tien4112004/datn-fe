@@ -25,6 +25,10 @@ export interface OutlineFormProps {
   setModel: (val: string) => void;
 }
 
+/**
+ * @deprecated This component is deprecated and will be removed in a future version.
+ * Please use the updated outline form component instead.
+ */
 const OutlineForm = ({
   promptInput,
   setPromptInput,

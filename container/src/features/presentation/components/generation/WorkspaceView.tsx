@@ -16,17 +16,20 @@ import {
   SelectValue,
 } from '@/shared/components/ui/select';
 import { useModels } from '@/features/model';
-import { PRESENTATION_STYLES, SLIDE_COUNT_OPTIONS } from '@/features/presentation/types';
+import { SLIDE_COUNT_OPTIONS } from '@/features/presentation/types';
 import type { OutlineData } from '@/features/presentation/types/outline';
 import useFetchStreamingOutline from '@/features/presentation/hooks/useFetchStreaming';
 // import { useOutlineContext } from '../../context/OutlineContext';
 import useOutlineStore from '@/features/presentation/stores/useOutlineStore';
+import { mapOutlineItemsToMarkdown } from '@/features/presentation/utils';
 
 type OutlineFormData = {
-  slideCount: string;
-  style: string;
+  topic: string;
+  slideCount: number;
+  language: string;
   model: string;
-  prompt: string;
+  targetAge: string;
+  learningObjective: string;
 };
 
 type CustomizationFormData = {
@@ -52,9 +55,7 @@ const WorkspaceView = ({ initialOutlineData }: WorkspaceViewProps) => {
     stopStream,
     restartStream,
     clearContent,
-  } = useFetchStreamingOutline({
-    prompt: 'Random',
-  });
+  } = useFetchStreamingOutline(initialOutlineData);
 
   if (error) {
     throw new Error(`Error fetching outline: ${error}`);
@@ -95,16 +96,15 @@ const WorkspaceView = ({ initialOutlineData }: WorkspaceViewProps) => {
     //
     // refetch();
     // startStream(data);
-    restartStream({
-      prompt: data.prompt,
-    });
+    restartStream(data);
   };
 
-  const onSubmitPresentation = (data: CustomizationFormData) => {
-    const fullData = {
-      ...data,
-      content,
-    };
+  const onSubmitPresentation = (_data: CustomizationFormData) => {
+    // const fullData = {
+    //   ...data,
+    //   content,
+    // };
+    const fullData = mapOutlineItemsToMarkdown(content);
     console.log('Form data:', fullData);
   };
 
@@ -163,7 +163,10 @@ const OutlineFormSection = ({
             name="slideCount"
             control={control}
             render={({ field }) => (
-              <Select value={field.value} onValueChange={field.onChange}>
+              <Select
+                value={field.value?.toString()}
+                onValueChange={(value) => field.onChange(Number(value))}
+              >
                 <SelectTrigger className="bg-card w-fit">
                   <SelectValue placeholder={t('slideCountPlaceholder')} />
                 </SelectTrigger>
@@ -180,7 +183,7 @@ const OutlineFormSection = ({
               </Select>
             )}
           />
-          <Controller
+          {/* <Controller
             name="style"
             control={control}
             render={({ field }) => (
@@ -200,7 +203,7 @@ const OutlineFormSection = ({
                 </SelectContent>
               </Select>
             )}
-          />
+          /> */}
           <Controller
             name="model"
             control={control}
@@ -225,7 +228,7 @@ const OutlineFormSection = ({
         </div>
       </div>
       <Controller
-        name="prompt"
+        name="topic"
         control={control}
         render={({ field }) => <AutosizeTextarea className="text-lg" {...field} />}
       />

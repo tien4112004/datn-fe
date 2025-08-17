@@ -109,7 +109,9 @@ const OutlineWorkspace = ({ onDownload }: OutlineWorkspaceProps) => {
       <Button
         variant={'outline'}
         className="mt-4 w-full"
-        onClick={() => setContent([...safeItems, { id: Date.now().toString(), htmlContent: '' }])}
+        onClick={() =>
+          setContent([...safeItems, { id: Date.now().toString(), htmlContent: '', markdownContent: '' }])
+        }
       >
         <Plus className="h-4 w-4" />
         {t('addOutlineCard')}

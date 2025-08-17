@@ -3,7 +3,7 @@ import {
   type PresentationApiService,
   type OutlineItem,
   type PresentationItem,
-  type OutlinePromptRequest,
+  type OutlineData,
 } from '../types';
 import { splitMarkdownToOutlineItems } from '../utils';
 // import api from '@/shared/api';
@@ -71,10 +71,10 @@ export default class PresentationRealApiService implements PresentationApiServic
   //   return response.body;
   // }
 
-  getStreamedOutline(request: OutlinePromptRequest, signal: AbortSignal): AsyncIterable<string> {
+  getStreamedOutline(request: OutlineData, signal: AbortSignal): AsyncIterable<string> {
     return {
       async *[Symbol.asyncIterator]() {
-        const response = await fetch('http://localhost:8080/presentations/mock-outline', {
+        const response = await fetch('http://localhost:8080/api/ai/presentations/outline-generate', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

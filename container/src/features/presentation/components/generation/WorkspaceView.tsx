@@ -21,7 +21,6 @@ import type { OutlineData } from '@/features/presentation/types/outline';
 import useFetchStreamingOutline from '@/features/presentation/hooks/useFetchStreaming';
 // import { useOutlineContext } from '../../context/OutlineContext';
 import useOutlineStore from '@/features/presentation/stores/useOutlineStore';
-import { mapOutlineItemsToMarkdown } from '@/features/presentation/utils';
 
 type OutlineFormData = {
   topic: string;
@@ -63,6 +62,7 @@ const WorkspaceView = ({ initialOutlineData }: WorkspaceViewProps) => {
 
   //   // STORE
   //   const content = useOutlineStore((state) => state.content);
+  const markdownContent = useOutlineStore((state) => state.markdownContent);
   const setContent = useOutlineStore((state) => state.setContent);
   const startStream = useOutlineStore((state) => state.startStreaming);
   const endStream = useOutlineStore((state) => state.endStreaming);
@@ -110,7 +110,7 @@ const WorkspaceView = ({ initialOutlineData }: WorkspaceViewProps) => {
     //   content,
     // };
     // const fullData = mapOutlineItemsToMarkdown(content);
-    const fullData = mapOutlineItemsToMarkdown(outlineItems);
+    const fullData = markdownContent();
     console.log('Form data:', fullData);
   };
 

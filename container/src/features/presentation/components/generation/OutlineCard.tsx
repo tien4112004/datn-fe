@@ -44,6 +44,7 @@ const OutlineCard = ({ id, title = 'Outline', className = '', onDelete }: Outlin
 
   React.useEffect(() => {
     loadInitialHTML();
+    console.log('OutlineCard mounted');
   }, [editor]);
 
   const handleDelete = () => {

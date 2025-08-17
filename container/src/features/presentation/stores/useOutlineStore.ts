@@ -1,11 +1,13 @@
 import { create } from 'zustand';
 import type { OutlineItem } from '@/features/presentation/types';
 import { arrayMove } from '@dnd-kit/sortable';
+import { mapOutlineItemsToMarkdown } from '@/features/presentation/utils';
 
 interface OutlineStore {
   content: OutlineItem[];
   contentIds: string[];
   isStreaming?: boolean;
+  markdownContent: () => string;
   setContent: (value: OutlineItem[]) => void;
   startStreaming: () => void;
   endStreaming: () => void;
@@ -20,6 +22,10 @@ const useOutlineStore = create<OutlineStore>((set, get) => ({
   content: [],
   contentIds: [],
   isStreaming: false,
+
+  markdownContent: () => {
+    return mapOutlineItemsToMarkdown(get().content);
+  },
 
   setContent: (value) => {
     set({ content: value });

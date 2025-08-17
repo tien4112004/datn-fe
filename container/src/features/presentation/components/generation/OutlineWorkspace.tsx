@@ -8,12 +8,7 @@ import {
   useSensors,
   type DragEndEvent,
 } from '@dnd-kit/core';
-import {
-  arrayMove,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
+import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
 
 import { useState } from 'react';
 import { Download, Loader, Plus } from 'lucide-react';
@@ -27,19 +22,19 @@ type OutlineWorkspaceProps = {
 };
 
 const OutlineWorkspace = ({ onDownload }: OutlineWorkspaceProps) => {
-  // const { content, setContent } = useOutlineContext();
-  const setContent = useOutlineStore((state) => state.setContent);
-  const content = useOutlineStore((state) => state.content);
+  const deleteContent = useOutlineStore((state) => state.deleteContent);
+  const contentIds = useOutlineStore((state) => state.contentIds);
+  const addContent = useOutlineStore((state) => state.addContent);
+  const swap = useOutlineStore((state) => state.swap);
   const { t } = useTranslation('outlineWorkspace');
   const [isDownloading, setIsDownloading] = useState(false);
+
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })
   );
-
-  const safeItems = Array.isArray(content) ? content : [];
 
   const handleOutlineCardDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
@@ -53,9 +48,8 @@ const OutlineWorkspace = ({ onDownload }: OutlineWorkspaceProps) => {
       if (activeId.startsWith('outline-card-') && overId.startsWith('outline-card-')) {
         const activeItemId = activeId.replace('outline-card-', '');
         const overItemId = overId.replace('outline-card-', '');
-        const oldIndex = safeItems.findIndex((item) => item.id === activeItemId);
-        const newIndex = safeItems.findIndex((item) => item.id === overItemId);
-        setContent(arrayMove(safeItems, oldIndex, newIndex));
+
+        swap(activeItemId, overItemId);
       }
     }
   };
@@ -75,26 +69,16 @@ const OutlineWorkspace = ({ onDownload }: OutlineWorkspaceProps) => {
     }
   };
 
-  const handleDelete = (id: string) => {
-    setContent(safeItems.filter((item) => item.id !== id));
-  };
-
   return (
     <Card className="w-3xl flex flex-col gap-6 rounded-xl p-8">
-      {safeItems.length > 0 ? (
+      {contentIds.length > 0 ? (
         <DndContext sensors={sensors} onDragEnd={handleOutlineCardDragEnd}>
           <SortableContext
-            items={safeItems.map((item) => `outline-card-${item.id}`)}
+            items={contentIds.map((id) => `outline-card-${id}`)}
             strategy={verticalListSortingStrategy}
           >
-            {safeItems.map((item, index) => (
-              <OutlineCard
-                key={item.id}
-                id={item.id}
-                title={`${index + 1}`}
-                item={item}
-                onDelete={() => handleDelete(item.id)}
-              />
+            {contentIds.map((item, index) => (
+              <OutlineCard key={item} id={item} title={`${index + 1}`} onDelete={() => deleteContent(item)} />
             ))}
           </SortableContext>
         </DndContext>
@@ -109,9 +93,9 @@ const OutlineWorkspace = ({ onDownload }: OutlineWorkspaceProps) => {
       <Button
         variant={'outline'}
         className="mt-4 w-full"
-        onClick={() =>
-          setContent([...safeItems, { id: Date.now().toString(), htmlContent: '', markdownContent: '' }])
-        }
+        onClick={() => {
+          addContent({ id: Date.now().toString(), htmlContent: '', markdownContent: '' });
+        }}
       >
         <Plus className="h-4 w-4" />
         {t('addOutlineCard')}
@@ -119,7 +103,7 @@ const OutlineWorkspace = ({ onDownload }: OutlineWorkspaceProps) => {
 
       <div className="flex w-full items-center justify-between">
         <div>
-          {safeItems.length} {t('outlineCards')}
+          {contentIds.length} {t('outlineCards')}
         </div>
 
         {/* Download button */}

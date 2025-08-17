@@ -7,36 +7,39 @@ import { useSortable } from '@dnd-kit/sortable';
 import { Trash } from 'lucide-react';
 import React from 'react';
 import useOutlineStore from '@/features/presentation/stores/useOutlineStore';
-import type { OutlineItem } from '../../types';
 // import { useOutlineContext } from '../../context/OutlineContext';
 
 interface OutlineCardProps {
   id: string;
   title: string;
-  item: OutlineItem;
   className?: string;
   onDelete?: () => void;
 }
 
-const OutlineCard = ({ id, title = 'Outline', className = '', item, onDelete }: OutlineCardProps) => {
+const OutlineCard = ({ id, title = 'Outline', className = '', onDelete }: OutlineCardProps) => {
   const [isDeleting, setIsDeleting] = React.useState(false);
   // const { handleContentChange } = useOutlineContext();
   const handleContentChange = useOutlineStore((state) => state.handleContentChange);
+  const content = useOutlineStore((state) => state.content.find((item) => item.id === id));
+  const isStreaming = useOutlineStore((state) => state.isStreaming);
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: `outline-card-${id.toString()}`,
   });
   const editor = useRichTextEditor({
     trailingBlock: false,
   });
+  const hasInitialized = React.useRef(false);
 
   React.useEffect(() => {
     async function loadInitialHTML() {
-      // const blocks = await editor.tryParseHTMLToBlocks(item.htmlContent);
-      const blocks = await editor.tryParseMarkdownToBlocks(item.markdownContent);
+      const blocks = await editor.tryParseMarkdownToBlocks(content?.markdownContent || '');
       editor.replaceBlocks(editor.document, blocks);
     }
-    loadInitialHTML();
-  }, [item.htmlContent]);
+    if (isStreaming || !content || !hasInitialized.current) {
+      loadInitialHTML();
+      hasInitialized.current = true;
+    }
+  }, [content?.markdownContent]);
 
   const handleDelete = () => {
     if (!onDelete) return;

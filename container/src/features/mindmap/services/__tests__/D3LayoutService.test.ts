@@ -603,8 +603,6 @@ describe('D3LayoutService', () => {
             child.subtreeHeight = 50;
           });
 
-          const initialPositions = testHierarchy.children.map((child: any) => ({ x: child.x, y: child.y }));
-
           // Apply spacing adjustment
           d3LayoutService.adjustSpacing(testHierarchy, DIRECTION.HORIZONTAL, 80);
 
@@ -622,8 +620,6 @@ describe('D3LayoutService', () => {
             child.width = 100;
             child.height = 50;
           });
-
-          const initialPositions = testHierarchy.children.map((child: any) => ({ x: child.x, y: child.y }));
 
           // Apply spacing adjustment
           d3LayoutService.adjustSpacing(testHierarchy, DIRECTION.VERTICAL, 120);

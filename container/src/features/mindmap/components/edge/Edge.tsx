@@ -2,7 +2,6 @@ import { type EdgeProps, getBezierPath, getSmoothStepPath, getStraightPath } fro
 import { memo } from 'react';
 import type { MindMapEdge, PathType } from '../../types';
 import { motion } from 'motion/react';
-import { useNodeOperationsStore } from '../../stores';
 
 const getEdgePath = (type: PathType, props: any) => {
   const { sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition } = props;
@@ -59,8 +58,6 @@ const EdgeBlock = memo(
     data,
     selected,
   }: EdgeProps<MindMapEdge> & { pathType: PathType }) => {
-    const finalizeNodeDeletion = useNodeOperationsStore((state) => state.finalizeNodeDeletion);
-
     const [edgePath] = getEdgePath(data?.pathType || 'smoothstep', {
       id,
       sourceX,
@@ -96,11 +93,6 @@ const EdgeBlock = memo(
           ease: [0.25, 0.46, 0.45, 0.94],
           type: 'tween',
           delay: data?.isCollapsed ? 0 : 0.1,
-        }}
-        onAnimationComplete={() => {
-          if (data?.isDeleting) {
-            finalizeNodeDeletion();
-          }
         }}
       />
     );

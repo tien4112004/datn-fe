@@ -15,16 +15,13 @@ export const getRootNodeOfSubtree = (nodeId: string, nodes: MindMapNode[]): Mind
   const node = nodes.find((n) => n.id === nodeId);
   if (!node) return null;
 
-  // If this is already a root node, return it
   if (node.type === MINDMAP_TYPES.ROOT_NODE) {
     return node;
   }
 
-  // If it has no parent, but it's not a root node type, return null
   if (!node.data.parentId) {
     return null;
   }
 
-  // Recursively find the root
   return getRootNodeOfSubtree(node.data.parentId, nodes);
 };

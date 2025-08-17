@@ -55,8 +55,8 @@ const ChangeInfo = ({ change }: ChangeInfoProps) => {
   );
 };
 
-export const ChangeLogger = ({ limit = 20 }: ChangeLoggerProps) => {
-  const [changes, setChanges] = useState<NodeChange[]>([]);
+export const ChangeLogger = ({}: ChangeLoggerProps) => {
+  const [changes] = useState<NodeChange[]>([]);
 
   // For now, disable the devtools override to prevent infinite loops
   // TODO: Implement proper change logging without interfering with the onNodesChange handler

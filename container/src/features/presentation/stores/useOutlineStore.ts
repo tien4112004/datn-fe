@@ -46,14 +46,12 @@ const useOutlineStore = create<OutlineStore>((set, get) => ({
   },
 
   startStreaming: () =>
-    set((state) => ({
-      content: state.content,
+    set(() => ({
       isStreaming: true,
     })),
 
   endStreaming: () => {
-    set((state) => ({
-      content: state.content,
+    set(() => ({
       isStreaming: false,
     }));
   },

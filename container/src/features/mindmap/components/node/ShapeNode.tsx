@@ -8,6 +8,7 @@ import { useMindmapNodeCommon } from '../../hooks';
 import { Button } from '@/components/ui/button';
 import { useLayoutStore, useNodeOperationsStore } from '../../stores';
 import { Network } from 'lucide-react';
+import ColorPickerControl from '../controls/ColorPickerControl';
 
 const ShapeNodeBlock = memo(
   ({ ...node }: NodeProps<ShapeNode>) => {
@@ -19,6 +20,24 @@ const ShapeNodeBlock = memo(
 
     const handleShapeChange = (newShape: Shape) => {
       updateNodeData(id, { shape: newShape });
+    };
+
+    const handleFillColorChange = (color: string) => {
+      updateNodeData(id, {
+        metadata: {
+          ...data.metadata,
+          fill: color,
+        },
+      });
+    };
+
+    const handleStrokeColorChange = (color: string) => {
+      updateNodeData(id, {
+        metadata: {
+          ...data.metadata,
+          stroke: color,
+        },
+      });
     };
 
     const handleLayoutClick = () => {
@@ -112,6 +131,20 @@ const ShapeNodeBlock = memo(
               <ellipse cx="6" cy="4" rx="6" ry="4" />
             </svg>
           </Button>
+          <div className="flex items-center gap-1" title="Fill Color">
+            <ColorPickerControl
+              hex={data.metadata?.fill || (data.shape === SHAPES.ELLIPSE ? '#90EE90' : '#ADD8E6')}
+              setHex={handleFillColorChange}
+              hasPicker={true}
+            />
+          </div>
+          <div className="flex items-center gap-1" title="Border Color">
+            <ColorPickerControl
+              hex={data.metadata?.stroke || (data.shape === SHAPES.ELLIPSE ? '#008000' : '#0000FF')}
+              setHex={handleStrokeColorChange}
+              hasPicker={true}
+            />
+          </div>
         </BaseNodeControl>
       </BaseNodeBlock>
     );

@@ -1,9 +1,17 @@
-import { ColorPicker, Row } from 'antd';
+import { ColorPicker, Row, Col, Divider } from 'antd';
 import type { ColorPickerProps } from 'antd';
 import type { AggregationColor } from 'antd/es/color-picker/color';
 import type { PresetsItem } from 'antd/es/color-picker/interface';
 
-const ColorPickerControl = ({ hex, setHex }: { hex: string; setHex: (color: string) => void }) => {
+const ColorPickerControl = ({
+  hex,
+  setHex,
+  hasPicker = false,
+}: {
+  hex: string;
+  setHex: (color: string) => void;
+  hasPicker?: boolean;
+}) => {
   const presets: PresetsItem[] = [
     {
       label: 'Primary Colors',
@@ -17,16 +25,32 @@ const ColorPickerControl = ({ hex, setHex }: { hex: string; setHex: (color: stri
     },
   ];
 
-  const customPanelRender: ColorPickerProps['panelRender'] = (_, { components: { Presets } }) => (
-    <Row justify="space-between" wrap={false}>
-      <Presets />
-    </Row>
-  );
+  const customPanelRender: ColorPickerProps['panelRender'] = (_, { components: { Presets, Picker } }) => {
+    if (hasPicker) {
+      return (
+        <Row justify="space-between" wrap={false}>
+          <Col span={12}>
+            <Presets />
+          </Col>
+          <Divider type="vertical" style={{ height: 'auto' }} />
+          <Col flex="auto">
+            <Picker />
+          </Col>
+        </Row>
+      );
+    } else {
+      return (
+        <Row justify="space-between" wrap={false}>
+          <Presets />
+        </Row>
+      );
+    }
+  };
 
   return (
     <ColorPicker
       defaultValue={hex}
-      styles={{ popupOverlayInner: { width: 240 } }}
+      styles={{ popupOverlayInner: { width: 'auto' } }}
       presets={presets}
       panelRender={customPanelRender}
       onChange={(color: AggregationColor) => {

@@ -139,6 +139,7 @@ const RootNodeBlock = memo(
               handleEdgeColorChange(color);
               setHex(color);
             }}
+            hasPicker={false}
           />
         </BaseNodeControl>
       </BaseNodeBlock>

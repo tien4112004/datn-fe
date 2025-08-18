@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Bell, BookOpen, Command, File, Home, Plus, Settings2 } from 'lucide-react';
 
 import { NavMain } from '@/shared/components/navigation/NavMain';
-import { NavSubjects } from '@/shared/components/navigation/NavSubjects';
+// import { NavSubjects } from '@/shared/components/navigation/NavSubjects';
 import { NavSecondary } from '@/shared/components/navigation/NavSecondary';
 import { NavUser } from '@/shared/components/navigation/NavUser';
 import {
@@ -122,7 +122,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   };
 
   return (
-    <Sidebar variant="inset" {...props}>
+    <Sidebar variant="inset" collapsible="lg-icon" {...props}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
@@ -142,7 +142,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
-        <NavSubjects subjects={data.subjects} />
+        {/* <NavSubjects subjects={data.subjects} /> */}
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>

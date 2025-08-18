@@ -6,7 +6,7 @@ import { MINDMAP_TYPES, PATH_TYPES, SIDE } from '../types';
 import { generateId } from '@/shared/lib/utils';
 import { getAllDescendantNodes, getRootNodeOfSubtree } from '../services/utils';
 import { useCoreStore } from './core';
-import { useClipboardStore } from './clipboard';
+import { useUndoRedoStore } from './undoredo';
 
 interface NodeManipulationState {
   toggleCollapse: (nodeId: string, side: Side, shouldCollapse: boolean) => void;
@@ -24,10 +24,8 @@ export const useNodeManipulationStore = create<NodeManipulationState>()(
         const { nodes, edges, setNodes, setEdges } = useCoreStore.getState();
         const node = nodes.find((n) => n.id === nodeId);
         if (!node) return;
-
-        const pushUndo = useClipboardStore.getState().pushToUndoStack;
-        pushUndo(nodes, edges);
-
+        const tempNodes = [...nodes];
+        const tempEdges = [...edges];
         const descendantNodes = getAllDescendantNodes(nodeId, nodes);
         const affectedDescendants = descendantNodes.filter((d) => d.data.side === side);
 
@@ -97,6 +95,9 @@ export const useNodeManipulationStore = create<NodeManipulationState>()(
 
         setNodes(updatedNodes);
         setEdges(updatedEdges);
+
+        const pushUndo = useUndoRedoStore.getState().pushToUndoStack;
+        pushUndo(tempNodes, tempEdges);
       },
 
       expand: (nodeId: string, side: Side) => {
@@ -111,14 +112,13 @@ export const useNodeManipulationStore = create<NodeManipulationState>()(
         if (sourceId === targetId) return;
 
         const { nodes, edges, setNodes, setEdges } = useCoreStore.getState();
+        const tempNodes = [...nodes];
+        const tempEdges = [...edges];
 
         const sourceNode = nodes.find((node) => node.id === sourceId);
         const targetNode = nodes.find((node) => node.id === targetId);
 
         if (!sourceNode || !targetNode) return;
-
-        const pushUndo = useClipboardStore.getState().pushToUndoStack;
-        pushUndo(nodes, edges);
 
         const descendantNodes = getAllDescendantNodes(sourceId, nodes);
 
@@ -214,13 +214,15 @@ export const useNodeManipulationStore = create<NodeManipulationState>()(
 
         setNodes(updatedNodes);
         setEdges(updatedEdges);
+
+        const pushUndo = useUndoRedoStore.getState().pushToUndoStack;
+        pushUndo(tempNodes, tempEdges);
       },
 
       updateSubtreeEdgePathType: (rootNodeId: string, pathType: PathType) => {
         const { nodes, edges, setNodes, setEdges } = useCoreStore.getState();
-
-        const pushUndo = useClipboardStore.getState().pushToUndoStack;
-        pushUndo(nodes, edges);
+        const tempNodes = [...nodes];
+        const tempEdges = [...edges];
 
         const descendantNodes = getAllDescendantNodes(rootNodeId, nodes);
         const allNodeIds = new Set([rootNodeId, ...descendantNodes.map((n) => n.id)]);
@@ -257,13 +259,15 @@ export const useNodeManipulationStore = create<NodeManipulationState>()(
 
         setNodes(updatedNodes);
         setEdges(updatedEdges);
+
+        const pushUndo = useUndoRedoStore.getState().pushToUndoStack;
+        pushUndo(tempNodes, tempEdges);
       },
 
       updateSubtreeEdgeColor: (rootNodeId: string, edgeColor: string) => {
         const { nodes, edges, setEdges, setNodes } = useCoreStore.getState();
-
-        const pushUndo = useClipboardStore.getState().pushToUndoStack;
-        pushUndo(nodes, edges);
+        const tempNodes = [...nodes];
+        const tempEdges = [...edges];
 
         const descendantNodes = getAllDescendantNodes(rootNodeId, nodes);
         const allNodeIds = new Set([rootNodeId, ...descendantNodes.map((n) => n.id)]);
@@ -299,6 +303,9 @@ export const useNodeManipulationStore = create<NodeManipulationState>()(
 
         setNodes(updatedNodes);
         setEdges(updatedEdges);
+
+        const pushUndo = useUndoRedoStore.getState().pushToUndoStack;
+        pushUndo(tempNodes, tempEdges);
       },
     }),
     { name: 'NodeManipulationStore' }

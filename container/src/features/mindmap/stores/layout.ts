@@ -3,8 +3,8 @@ import * as d3 from 'd3';
 import type { MindMapEdge, MindMapNode, Direction } from '../types';
 import { useCoreStore } from './core';
 import { devtools } from 'zustand/middleware';
-import { useClipboardStore } from './clipboard';
 import { d3LayoutService } from '../services/D3LayoutService';
+import { useUndoRedoStore } from './undoredo';
 
 interface AnimationData {
   id: string;
@@ -244,11 +244,15 @@ export const useLayoutStore = create<LayoutState>()(
 
       onLayoutChange: (direction) => {
         const { updateLayout } = get();
-        const pushUndo = useClipboardStore.getState().pushToUndoStack;
-        pushUndo(useCoreStore.getState().nodes, useCoreStore.getState().edges);
+        const { nodes, edges } = useCoreStore.getState();
+        const tempNodes = [...nodes];
+        const tempEdges = [...edges];
 
         set({ layout: direction }, false, 'mindmap-layout/onLayoutChange');
         updateLayout(direction);
+
+        const pushUndo = useUndoRedoStore.getState().pushToUndoStack;
+        pushUndo(tempNodes, tempEdges);
       },
     }),
     { name: 'LayoutStore' }

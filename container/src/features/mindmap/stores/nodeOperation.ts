@@ -6,7 +6,7 @@ import { MINDMAP_TYPES, PATH_TYPES, DRAGHANDLE, SIDE } from '../types';
 import { generateId } from '@/shared/lib/utils';
 import { getRootNodeOfSubtree, getAllDescendantNodes } from '../services/utils';
 import { useCoreStore } from './core';
-import { useClipboardStore } from './clipboard';
+import { useUndoRedoStore } from './undoredo';
 
 interface NodeOperationsState {
   nodesToBeDeleted: Set<string>;
@@ -31,10 +31,8 @@ export const useNodeOperationsStore = create<NodeOperationsState>()(
 
       addNode: () => {
         const { nodes, setNodes, edges } = useCoreStore.getState();
-
-        const pushUndo = useClipboardStore.getState().pushToUndoStack;
-        pushUndo(nodes, edges);
-
+        const tempNodes = [...nodes];
+        const tempEdges = [...edges];
         const newNode: MindMapNode = {
           id: generateId(),
           type: MINDMAP_TYPES.ROOT_NODE,
@@ -52,6 +50,9 @@ export const useNodeOperationsStore = create<NodeOperationsState>()(
         };
 
         setNodes((state) => [...state, newNode]);
+
+        const pushUndo = useUndoRedoStore.getState().pushToUndoStack;
+        pushUndo(tempNodes, tempEdges);
       },
 
       addChildNode: (
@@ -61,10 +62,8 @@ export const useNodeOperationsStore = create<NodeOperationsState>()(
         nodeType: MindMapTypes = MINDMAP_TYPES.TEXT_NODE
       ) => {
         const { nodes, edges, setNodes, setEdges } = useCoreStore.getState();
-
-        const pushUndo = useClipboardStore.getState().pushToUndoStack;
-        pushUndo(nodes, edges);
-
+        const tempNodes = [...nodes];
+        const tempEdges = [...edges];
         // Find the root node to get the pathType
         const rootNode = getRootNodeOfSubtree(parentNode.id!, nodes);
         const pathType = (rootNode?.data?.pathType || PATH_TYPES.SMOOTHSTEP) as PathType;
@@ -111,6 +110,9 @@ export const useNodeOperationsStore = create<NodeOperationsState>()(
 
         setNodes((state) => [...state, newNode]);
         setEdges((state) => [...state, newEdge]);
+
+        const pushUndo = useUndoRedoStore.getState().pushToUndoStack;
+        pushUndo(tempNodes, tempEdges);
       },
 
       updateNodeData: (nodeId: string, updates: Partial<MindMapNode['data']>) => {
@@ -121,20 +123,21 @@ export const useNodeOperationsStore = create<NodeOperationsState>()(
       },
 
       updateNodeDataWithUndo: (nodeId: string, updates: Partial<MindMapNode['data']>) => {
-        const { setNodes } = useCoreStore.getState();
-        const pushUndo = useClipboardStore.getState().pushToUndoStack;
-        pushUndo(useCoreStore.getState().nodes, useCoreStore.getState().edges);
-
+        const { nodes, edges, setNodes } = useCoreStore.getState();
+        const tempNodes = [...nodes];
+        const tempEdges = [...edges];
         setNodes((state) =>
           state.map((node) => (node.id === nodeId ? { ...node, data: { ...node.data, ...updates } } : node))
         );
+
+        const pushUndo = useUndoRedoStore.getState().pushToUndoStack;
+        pushUndo(tempNodes, tempEdges);
       },
 
       markNodeForDeletion: (nodeId: string) => {
         const { nodes, edges, setNodes, setEdges } = useCoreStore.getState();
-        const pushUndo = useClipboardStore.getState().pushToUndoStack;
-        pushUndo(nodes, edges);
-
+        const tempNodes = [...nodes];
+        const tempEdges = [...edges];
         const descendantNodes = getAllDescendantNodes(nodeId, nodes);
         const nodeIdsToDelete = new Set([nodeId, ...descendantNodes.map((n) => n.id)]);
 
@@ -153,6 +156,9 @@ export const useNodeOperationsStore = create<NodeOperationsState>()(
               : edge
           )
         );
+
+        const pushUndo = useUndoRedoStore.getState().pushToUndoStack;
+        pushUndo(tempNodes, tempEdges);
       },
 
       finalizeNodeDeletion: (nodeId: string) => {

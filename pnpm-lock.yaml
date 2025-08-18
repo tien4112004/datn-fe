@@ -219,12 +219,6 @@ importers:
       '@eslint/js':
         specifier: ^9.29.0
         version: 9.31.0
-      '@stagewise-plugins/react':
-        specifier: ^0.5.1
-        version: 0.5.2(@stagewise/toolbar@0.5.2)
-      '@stagewise/toolbar-react':
-        specifier: ^0.5.1
-        version: 0.5.2(@types/react@19.1.8)(react@19.1.0)
       '@tanstack/react-query-devtools':
         specifier: ^5.83.0
         version: 5.83.0(@tanstack/react-query@5.83.0(react@19.1.0))(react@19.1.0)
@@ -421,12 +415,6 @@ importers:
       '@rushstack/eslint-patch':
         specifier: ^1.3.3
         version: 1.12.0
-      '@stagewise-plugins/vue':
-        specifier: ^0.5.0
-        version: 0.5.2(@stagewise/toolbar@0.5.2)
-      '@stagewise/toolbar-vue':
-        specifier: ^0.5.0
-        version: 0.5.2(vue@3.5.17(typescript@5.3.3))
       '@tsconfig/node18':
         specifier: ^18.2.2
         version: 18.2.4
@@ -3315,34 +3303,6 @@ packages:
 
   '@sinonjs/fake-timers@8.1.0':
     resolution: {integrity: sha512-OAPJUAtgeINhh/TAlUID4QTs53Njm7xzddaVlEs/SXwgtiD1tW22zAB/W1wdqfrpmikgaWQ9Fw6Ws+hsiRm5Vg==}
-
-  '@stagewise-plugins/react@0.5.2':
-    resolution: {integrity: sha512-nNyaooMMPzRRqjN3ZqQneuQfuFYWEwYlWT7uYip0C+iHGuOJE+V3dUK6cJ8+q1YRAMBvzQYeDFqVZA01Cz9Ysw==}
-    deprecated: 'This package is deprecated and has been replaced by the stagewise CLI. Get started with the CLI here: https://stagewise.io/docs'
-    peerDependencies:
-      '@stagewise/toolbar': 0.5.2
-
-  '@stagewise-plugins/vue@0.5.2':
-    resolution: {integrity: sha512-5raAU1Uy2x9eOLI/3lJ8EhXRH7zC4GvBQKmRXm3vwEEQw2tye78G6AIpAcgQm13mVrl66IkjL0JmVvf5nIG4Cw==}
-    deprecated: 'This package is deprecated and has been replaced by the stagewise CLI. Get started with the CLI here: https://stagewise.io/docs'
-    peerDependencies:
-      '@stagewise/toolbar': 0.5.2
-
-  '@stagewise/toolbar-react@0.5.2':
-    resolution: {integrity: sha512-9TfmIFvqkpfGIGrpNIgmkKGKY9Fj/anypCQGgOcYICYQhHBFSQywz87fsdqk5tYrZVHlTyZlR0v2ixKd1+v2GQ==}
-    deprecated: 'This package is deprecated and has been replaced by the stagewise CLI. Get started with the CLI here: https://stagewise.io/docs'
-    peerDependencies:
-      '@types/react': '>=18.0.0'
-      react: '>=18.0.0'
-
-  '@stagewise/toolbar-vue@0.5.2':
-    resolution: {integrity: sha512-7VNGgNer/e9FoMdAbjkCQekTrGA3jiqHdLnv+llPDKX57P8mx4bNGNw6Duum6h7CiM5mfBsKtNgDirHYedjQOg==}
-    deprecated: 'This package is deprecated and has been replaced by the stagewise CLI. Get started with the CLI here: https://stagewise.io/docs'
-    peerDependencies:
-      vue: '>=3.0.0'
-
-  '@stagewise/toolbar@0.5.2':
-    resolution: {integrity: sha512-QxowY55dhYJS4iD3KuYCvmLl3jA74boYziEr9lent+NZpO1rjtF0KpDyld+hClA4lWnCVLPxhMwW69Qv2+xzjg==}
 
   '@standard-schema/utils@0.3.0':
     resolution: {integrity: sha512-e7Mew686owMaPJVNNLs55PUvgz371nKgwsc4vxE49zsODpJEnxgxRo2y/OKrqueavXgZNMDVj3DdHFlaSAeU8g==}
@@ -14937,27 +14897,6 @@ snapshots:
   '@sinonjs/fake-timers@8.1.0':
     dependencies:
       '@sinonjs/commons': 1.8.6
-
-  '@stagewise-plugins/react@0.5.2(@stagewise/toolbar@0.5.2)':
-    dependencies:
-      '@stagewise/toolbar': 0.5.2
-
-  '@stagewise-plugins/vue@0.5.2(@stagewise/toolbar@0.5.2)':
-    dependencies:
-      '@stagewise/toolbar': 0.5.2
-
-  '@stagewise/toolbar-react@0.5.2(@types/react@19.1.8)(react@19.1.0)':
-    dependencies:
-      '@stagewise/toolbar': 0.5.2
-      '@types/react': 19.1.8
-      react: 19.1.0
-
-  '@stagewise/toolbar-vue@0.5.2(vue@3.5.17(typescript@5.3.3))':
-    dependencies:
-      '@stagewise/toolbar': 0.5.2
-      vue: 3.5.17(typescript@5.3.3)
-
-  '@stagewise/toolbar@0.5.2': {}
 
   '@standard-schema/utils@0.3.0': {}
 

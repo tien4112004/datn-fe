@@ -21,7 +21,6 @@ import type { OutlineData } from '@/features/presentation/types/outline';
 import useFetchStreamingOutline from '@/features/presentation/hooks/useFetchStreaming';
 // import { useOutlineContext } from '../../context/OutlineContext';
 import useOutlineStore from '@/features/presentation/stores/useOutlineStore';
-import { mapOutlineItemsToMarkdown } from '@/features/presentation/utils';
 
 type OutlineFormData = {
   topic: string;
@@ -61,9 +60,12 @@ const WorkspaceView = ({ initialOutlineData }: WorkspaceViewProps) => {
     throw new Error(`Error fetching outline: ${error}`);
   }
 
-  // STORE
-  const content = useOutlineStore((state) => state.content);
+  //   // STORE
+  //   const content = useOutlineStore((state) => state.content);
+  const markdownContent = useOutlineStore((state) => state.markdownContent);
   const setContent = useOutlineStore((state) => state.setContent);
+  const startStream = useOutlineStore((state) => state.startStreaming);
+  const endStream = useOutlineStore((state) => state.endStreaming);
 
   // OUTLINE FORM
   const { control: outlineControl, handleSubmit: handleRegenerateSubmit } = useForm<OutlineFormData>({
@@ -85,8 +87,11 @@ const WorkspaceView = ({ initialOutlineData }: WorkspaceViewProps) => {
   });
 
   useEffect(() => {
-    if (isStreaming && JSON.stringify(content) !== JSON.stringify(outlineItems)) {
+    if (isStreaming) {
+      startStream();
       setContent([...outlineItems]);
+    } else {
+      endStream();
     }
   }, [isStreaming, outlineItems]);
 
@@ -104,7 +109,8 @@ const WorkspaceView = ({ initialOutlineData }: WorkspaceViewProps) => {
     //   ...data,
     //   content,
     // };
-    const fullData = mapOutlineItemsToMarkdown(content);
+    // const fullData = mapOutlineItemsToMarkdown(content);
+    const fullData = markdownContent();
     console.log('Form data:', fullData);
   };
 

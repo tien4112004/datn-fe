@@ -8,16 +8,16 @@ import type { NodeProps } from '@xyflow/react';
 import { useMindmapNodeCommon } from '../../hooks';
 import { Button } from '@/components/ui/button';
 import { Upload, X, Loader2, Network } from 'lucide-react';
-import { useNodeOperationsStore, useLayoutStore } from '../../stores';
+import { useMindmapStore } from '../../stores';
 
 const ImageNodeBlock = memo(
   ({ ...node }: NodeProps<ImageNode>) => {
     const { id, data, selected: isSelected, width, height } = node;
 
     const { layout } = useMindmapNodeCommon<ImageNode>({ node });
-    const updateNodeData = useNodeOperationsStore((state) => state.updateNodeData);
-    const updateNodeDataWithUndo = useNodeOperationsStore((state) => state.updateNodeDataWithUndo);
-    const updateSubtreeLayout = useLayoutStore((state) => state.updateSubtreeLayout);
+    const updateNodeData = useMindmapStore((state) => state.updateNodeData);
+    const updateNodeDataWithUndo = useMindmapStore((state) => state.updateNodeDataWithUndo);
+    const updateSubtreeLayout = useMindmapStore((state) => state.updateSubtreeLayout);
 
     const [isEditing, setIsEditing] = useState(!data.imageUrl);
     const [isLoadingImage, setIsLoadingImage] = useState(false);

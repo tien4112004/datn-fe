@@ -7,7 +7,7 @@ import RootNodeBlock from '../node/RootNode';
 import ShapeNodeBlock from '../node/ShapeNode';
 import TextNodeBlock from '../node/TextNode';
 import ImageNodeBlock from '../node/ImageNode';
-import { useCoreStore } from '../../stores';
+import { useMindmapStore } from '../../stores';
 
 const nodeTypes = {
   mindmapTextNode: TextNodeBlock,
@@ -29,7 +29,7 @@ const handlersSelector = (state: any) => ({
 });
 
 const Flow = memo(({ children, isPanOnDrag }: { children: ReactNode; isPanOnDrag: boolean }) => {
-  const { nodes, edges, onNodesChange, onEdgesChange, onConnect } = useCoreStore(
+  const { nodes, edges, onNodesChange, onEdgesChange, onConnect } = useMindmapStore(
     useShallow(handlersSelector)
   );
 

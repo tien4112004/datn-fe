@@ -1,10 +1,9 @@
-import { create } from 'zustand';
+import { type StateCreator } from 'zustand';
 import * as d3 from 'd3';
 import type { MindMapEdge, MindMapNode, Direction } from '../types';
-import { useCoreStore } from './core';
-import { devtools } from 'zustand/middleware';
 import { d3LayoutService } from '../services/D3LayoutService';
-import { useUndoRedoStore } from './undoredo';
+import type { CoreState } from './core';
+import type { UndoRedoState } from './undoredo';
 
 interface AnimationData {
   id: string;
@@ -14,7 +13,7 @@ interface AnimationData {
   deltaY: number;
 }
 
-interface LayoutState {
+export interface LayoutState {
   layout: Direction;
   isLayouting: boolean;
   isAnimating: boolean;
@@ -40,221 +39,216 @@ interface LayoutState {
   onLayoutChange: (direction: Direction) => void;
 }
 
-export const useLayoutStore = create<LayoutState>()(
-  devtools(
-    (set, get) => ({
-      layout: 'horizontal',
-      isAnimating: false,
-      animationTimer: null,
-      animationData: [],
+const layoutSlice: StateCreator<
+  CoreState & LayoutState & UndoRedoState,
+  [['zustand/devtools', never]],
+  [],
+  LayoutState
+> = (set, get): LayoutState => ({
+  layout: 'horizontal',
+  isLayouting: false,
+  isAnimating: false,
+  animationTimer: null,
+  animationData: [],
 
-      setLayout: (direction) => set({ layout: direction }, false, 'mindmap-layout/setLayout'),
-      setIsAnimating: (isAnimating) => set({ isAnimating }, false, 'mindmap-layout/setIsAnimating'),
+  setLayout: (direction) => set({ layout: direction }, false, 'mindmap-layout/setLayout'),
+  setIsAnimating: (isAnimating) => set({ isAnimating }, false, 'mindmap-layout/setIsAnimating'),
 
-      stopAnimation: () => {
-        const { animationTimer } = get();
-        if (animationTimer) {
-          animationTimer.stop();
-          set(
-            {
-              animationTimer: null,
-              isAnimating: false,
-              animationData: [],
-            },
-            false,
-            'mindmap-layout/stopAnimation'
-          );
-        }
+  stopAnimation: () => {
+    const { animationTimer } = get();
+    if (animationTimer) {
+      animationTimer.stop();
+      set(
+        {
+          animationTimer: null,
+          isAnimating: false,
+          animationData: [],
+        },
+        false,
+        'mindmap-layout/stopAnimation'
+      );
+    }
+  },
+
+  layoutAllTrees: async (nodes, edges, direction) => {
+    return await d3LayoutService.layoutAllTrees(nodes, edges, direction);
+  },
+
+  animateNodesToPositions: (targetPositions, duration = 2000) => {
+    const { animationTimer, nodes, setNodes } = get();
+
+    if (!nodes?.length) return;
+
+    // Stop existing animation
+    if (animationTimer) {
+      animationTimer.stop();
+    }
+
+    // Store initial positions and calculate deltas
+    const animationData: AnimationData[] = [];
+    nodes.forEach((node) => {
+      const target = targetPositions[node.id];
+
+      if (!target) return;
+
+      animationData.push({
+        id: node.id,
+        startPos: { ...node.position },
+        targetPos: target || node.position,
+        deltaX: target.x - (node.position.x ?? 0),
+        deltaY: target.y - (node.position.y ?? 0),
+      });
+    });
+
+    set(
+      {
+        isAnimating: true,
+        animationData,
       },
+      false,
+      'mindmap-layout/animateNodesToPositions:start'
+    );
 
-      animateNodesToPositions: (targetPositions, duration = 2000) => {
-        const { animationTimer } = get();
-        const nodes = useCoreStore.getState().nodes;
-        const setNodes = useCoreStore.getState().setNodes;
+    const timer = d3.timer((elapsed) => {
+      const progress = Math.min(elapsed / duration, 1);
 
-        if (!nodes?.length) return;
+      // Use easing function for smoother animation
+      const easedProgress = d3.easeCubicInOut(progress);
 
-        // Stop existing animation
-        if (animationTimer) {
-          animationTimer.stop();
-        }
+      setNodes((currentNodes: MindMapNode[]) =>
+        currentNodes.map((node) => {
+          const animData = animationData.find((d) => d.id === node.id);
+          if (!animData) return node;
 
-        // Store initial positions and calculate deltas
-        const animationData: AnimationData[] = [];
-        nodes.forEach((node) => {
-          const target = targetPositions[node.id];
+          const newX = animData.startPos.x + animData.deltaX * easedProgress;
+          const newY = animData.startPos.y + animData.deltaY * easedProgress;
 
-          if (!target) return;
+          return {
+            ...node,
+            position: { x: newX, y: newY },
+          };
+        })
+      );
 
-          animationData.push({
-            id: node.id,
-            startPos: { ...node.position },
-            targetPos: target || node.position,
-            deltaX: target.x - (node.position.x ?? 0),
-            deltaY: target.y - (node.position.y ?? 0),
-          });
-        });
-
+      // Stop animation when complete
+      if (progress >= 1) {
+        timer.stop();
         set(
           {
-            isAnimating: true,
-            animationData,
+            animationTimer: null,
+            isAnimating: false,
+            animationData: [],
           },
           false,
-          'mindmap-layout/animateNodesToPositions:start'
+          'mindmap-layout/animateNodesToPositions:complete'
         );
+      }
+    });
 
-        const timer = d3.timer((elapsed) => {
-          const progress = Math.min(elapsed / duration, 1);
+    set({ animationTimer: timer }, false, 'mindmap-layout/animateNodesToPositions:timer');
+  },
 
-          // Use easing function for smoother animation
-          const easedProgress = d3.easeCubicInOut(progress);
+  updateLayout: async (direction) => {
+    const { layout, animateNodesToPositions, nodes, edges, setEdges } = get();
+    const layoutDirection = direction || layout;
 
-          setNodes((currentNodes: MindMapNode[]) =>
-            currentNodes.map((node) => {
-              const animData = animationData.find((d) => d.id === node.id);
-              if (!animData) return node;
+    if (!nodes?.length || !edges) return;
 
-              const newX = animData.startPos.x + animData.deltaX * easedProgress;
-              const newY = animData.startPos.y + animData.deltaY * easedProgress;
+    set({ isLayouting: true }, false, 'mindmap-layout/updateLayout');
 
-              return {
-                ...node,
-                position: { x: newX, y: newY },
-              };
-            })
-          );
+    try {
+      const { nodes: layoutedNodes, edges: layoutedEdges } = await d3LayoutService.layoutAllTrees(
+        nodes,
+        edges,
+        layoutDirection
+      );
 
-          // Stop animation when complete
-          if (progress >= 1) {
-            timer.stop();
-            set(
-              {
-                animationTimer: null,
-                isAnimating: false,
-                animationData: [],
-              },
-              false,
-              'mindmap-layout/animateNodesToPositions:complete'
-            );
-          }
+      setEdges([...layoutedEdges]);
+
+      const targetPositions: Record<string, { x: number; y: number }> = {};
+      layoutedNodes.forEach((node) => {
+        targetPositions[node.id] = { x: node.position.x, y: node.position.y };
+      });
+
+      animateNodesToPositions(targetPositions, 800);
+
+      setTimeout(() => {
+        set({ isLayouting: false }, false, 'mindmap-layout/updateLayout:animationEnd');
+      }, 900);
+    } catch (error) {
+      console.error('Layout update failed:', error);
+      set({ isLayouting: false }, false, 'mindmap-layout/updateLayout:error');
+    }
+  },
+
+  updateSubtreeLayout: async (nodeId: string, direction: Direction) => {
+    const { animateNodesToPositions, nodes, edges, setEdges } = get();
+
+    if (!nodes?.length || !edges) return;
+
+    set({ isLayouting: true }, false, 'mindmap-layout/updateSubtreeLayout');
+
+    try {
+      const rootNode = nodes.find((node) => node.id === nodeId);
+      if (!rootNode) {
+        console.error('Root node not found for subtree layout');
+        set({ isLayouting: false }, false, 'mindmap-layout/updateSubtreeLayout:error');
+        return;
+      }
+
+      const descendantNodes = d3LayoutService
+        .getSubtreeNodes(nodeId, nodes)
+        .filter((node) => node.id !== nodeId);
+
+      const subtreeNodeIds = new Set([nodeId, ...descendantNodes.map((n) => n.id)]);
+      const subtreeEdges = edges.filter(
+        (edge) => subtreeNodeIds.has(edge.source) && subtreeNodeIds.has(edge.target)
+      );
+
+      const { nodes: layoutedNodes, edges: layoutedEdges } = await d3LayoutService.layoutSubtree(
+        rootNode,
+        descendantNodes,
+        subtreeEdges,
+        direction
+      );
+
+      setEdges((prevEdges) => {
+        const updatedEdges = prevEdges.map((edge) => {
+          const layoutedEdge = layoutedEdges.find((e) => e.id === edge.id);
+          return layoutedEdge ? { ...edge, ...layoutedEdge } : edge;
         });
+        return updatedEdges;
+      });
 
-        set({ animationTimer: timer }, false, 'mindmap-layout/animateNodesToPositions:timer');
-      },
+      const targetPositions: Record<string, { x: number; y: number }> = {};
+      layoutedNodes.forEach((node) => {
+        targetPositions[node.id] = { x: node.position.x, y: node.position.y };
+      });
 
-      updateLayout: async (direction) => {
-        const { layout, animateNodesToPositions } = get();
-        const nodes = useCoreStore.getState().nodes;
-        const edges = useCoreStore.getState().edges;
-        const setEdges = useCoreStore.getState().setEdges;
+      if (Object.keys(targetPositions).length > 0) {
+        animateNodesToPositions(targetPositions, 800);
 
-        const layoutDirection = direction || layout;
+        setTimeout(() => {
+          set({ isLayouting: false }, false, 'mindmap-layout/updateSubtreeLayout:animationEnd');
+        }, 900);
+      } else {
+        set({ isLayouting: false }, false, 'mindmap-layout/updateSubtreeLayout:noChanges');
+      }
+    } catch (error) {
+      console.error('Subtree layout update failed:', error);
+      set({ isLayouting: false }, false, 'mindmap-layout/updateSubtreeLayout:error');
+    }
+  },
 
-        if (!nodes?.length || !edges) return;
+  onLayoutChange: (direction) => {
+    const { updateLayout, pushToUndoStack, prepareToPushUndo } = get();
+    prepareToPushUndo();
 
-        set({ isLayouting: true }, false, 'mindmap-layout/updateLayout');
+    set({ layout: direction }, false, 'mindmap-layout/onLayoutChange');
+    updateLayout(direction);
 
-        try {
-          const { nodes: layoutedNodes, edges: layoutedEdges } = await d3LayoutService.layoutAllTrees(
-            nodes,
-            edges,
-            layoutDirection
-          );
+    pushToUndoStack();
+  },
+});
 
-          setEdges([...layoutedEdges]);
-
-          const targetPositions: Record<string, { x: number; y: number }> = {};
-          layoutedNodes.forEach((node) => {
-            targetPositions[node.id] = { x: node.position.x, y: node.position.y };
-          });
-
-          animateNodesToPositions(targetPositions, 800);
-
-          setTimeout(() => {
-            set({ isLayouting: false }, false, 'mindmap-layout/updateLayout:animationEnd');
-          }, 900);
-        } catch (error) {
-          console.error('Layout update failed:', error);
-          set({ isLayouting: false }, false, 'mindmap-layout/updateLayout:error');
-        }
-      },
-
-      updateSubtreeLayout: async (nodeId: string, direction: Direction) => {
-        const { animateNodesToPositions } = get();
-        const nodes = useCoreStore.getState().nodes;
-        const edges = useCoreStore.getState().edges;
-        const setEdges = useCoreStore.getState().setEdges;
-
-        if (!nodes?.length || !edges) return;
-
-        set({ isLayouting: true }, false, 'mindmap-layout/updateSubtreeLayout');
-
-        try {
-          const rootNode = nodes.find((node) => node.id === nodeId);
-          if (!rootNode) {
-            console.error('Root node not found for subtree layout');
-            set({ isLayouting: false }, false, 'mindmap-layout/updateSubtreeLayout:error');
-            return;
-          }
-
-          const descendantNodes = d3LayoutService
-            .getSubtreeNodes(nodeId, nodes)
-            .filter((node) => node.id !== nodeId);
-
-          const subtreeNodeIds = new Set([nodeId, ...descendantNodes.map((n) => n.id)]);
-          const subtreeEdges = edges.filter(
-            (edge) => subtreeNodeIds.has(edge.source) && subtreeNodeIds.has(edge.target)
-          );
-
-          const { nodes: layoutedNodes, edges: layoutedEdges } = await d3LayoutService.layoutSubtree(
-            rootNode,
-            descendantNodes,
-            subtreeEdges,
-            direction
-          );
-
-          setEdges((prevEdges) => {
-            const updatedEdges = prevEdges.map((edge) => {
-              const layoutedEdge = layoutedEdges.find((e) => e.id === edge.id);
-              return layoutedEdge ? { ...edge, ...layoutedEdge } : edge;
-            });
-            return updatedEdges;
-          });
-
-          const targetPositions: Record<string, { x: number; y: number }> = {};
-          layoutedNodes.forEach((node) => {
-            targetPositions[node.id] = { x: node.position.x, y: node.position.y };
-          });
-
-          if (Object.keys(targetPositions).length > 0) {
-            animateNodesToPositions(targetPositions, 800);
-
-            setTimeout(() => {
-              set({ isLayouting: false }, false, 'mindmap-layout/updateSubtreeLayout:animationEnd');
-            }, 900);
-          } else {
-            set({ isLayouting: false }, false, 'mindmap-layout/updateSubtreeLayout:noChanges');
-          }
-        } catch (error) {
-          console.error('Subtree layout update failed:', error);
-          set({ isLayouting: false }, false, 'mindmap-layout/updateSubtreeLayout:error');
-        }
-      },
-
-      onLayoutChange: (direction) => {
-        const { updateLayout } = get();
-        const { nodes, edges } = useCoreStore.getState();
-        const tempNodes = [...nodes];
-        const tempEdges = [...edges];
-
-        set({ layout: direction }, false, 'mindmap-layout/onLayoutChange');
-        updateLayout(direction);
-
-        const pushUndo = useUndoRedoStore.getState().pushToUndoStack;
-        pushUndo(tempNodes, tempEdges);
-      },
-    }),
-    { name: 'LayoutStore' }
-  )
-);
+export default layoutSlice;

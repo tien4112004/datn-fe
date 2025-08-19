@@ -1,6 +1,6 @@
 import { memo, useMemo } from 'react';
 import { useMindmapActions, useShortcuts } from '../../hooks';
-import { useClipboardStore } from '../../stores';
+import { useMindmapStore } from '../../stores';
 
 const LogicHandler = memo(() => {
   const {
@@ -11,8 +11,8 @@ const LogicHandler = memo(() => {
     deselectAllNodesAndEdges,
   } = useMindmapActions();
 
-  const undo = useClipboardStore((state) => state.undo);
-  const redo = useClipboardStore((state) => state.redo);
+  const undo = useMindmapStore((state) => state.undo);
+  const redo = useMindmapStore((state) => state.redo);
 
   const shortcuts = useMemo(
     () => [
@@ -21,7 +21,9 @@ const LogicHandler = memo(() => {
         onKeyPressed: selectAllNodesAndEdges,
         shouldExecute: () => {
           const activeElement = document.activeElement as HTMLElement;
-
+          navigator.clipboard.readText().then((text) => {
+            console.log('Clipboard content:', text);
+          });
           return (
             activeElement.tagName !== 'INPUT' &&
             activeElement.tagName !== 'TEXTAREA' &&

@@ -1,8 +1,7 @@
 import { useEffect } from 'react';
 import { useUpdateNodeInternals, type NodeProps } from '@xyflow/react';
-import { useLayoutStore } from '../stores/layout';
 import { type Direction, type Side, type BaseNode } from '../types';
-import { useNodeManipulationStore, useNodeOperationsStore } from '../stores';
+import { useMindmapStore } from '../stores';
 
 export interface UseNodeCommonProps<T extends BaseNode = BaseNode> {
   node: NodeProps<T>;
@@ -19,10 +18,10 @@ export interface UseNodeCommonReturn {
 export const useMindmapNodeCommon = <T extends BaseNode = BaseNode>({
   node,
 }: UseNodeCommonProps<T>): UseNodeCommonReturn => {
-  const onNodeDelete = useNodeOperationsStore((state) => state.finalizeNodeDeletion);
-  const layout = useLayoutStore((state) => state.layout);
-  const isLayouting = useLayoutStore((state) => state.isLayouting);
-  const moveToChild = useNodeManipulationStore((state) => state.moveToChild);
+  const onNodeDelete = useMindmapStore((state) => state.finalizeNodeDeletion);
+  const layout = useMindmapStore((state) => state.layout);
+  const isLayouting = useMindmapStore((state) => state.isLayouting);
+  const moveToChild = useMindmapStore((state) => state.moveToChild);
 
   // React Flow hooks
   const updateNodeInternals = useUpdateNodeInternals();

@@ -7,7 +7,7 @@ import { NodeResizer, type NodeProps } from '@xyflow/react';
 import { DIRECTION, DRAGHANDLE } from '@/features/mindmap/types';
 
 import { useMindmapNodeCommon } from '@/features/mindmap/hooks';
-import { useClipboardStore } from '@/features/mindmap/stores';
+import { useMindmapStore } from '@/features/mindmap/stores';
 import { CreateChildNodeButtons, NodeHandlers } from '../controls/CreateChildNodeButtons';
 
 export interface BaseNodeBlockProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
@@ -19,7 +19,7 @@ export interface BaseNodeBlockProps extends Omit<HTMLAttributes<HTMLDivElement>,
 export const BaseNodeBlock = memo(
   ({ className, children, variant = 'card', node, ...props }: BaseNodeBlockProps) => {
     const { id, data, selected: isSelected, width, height } = node;
-    const dragTargetNodeId = useClipboardStore((state) => state.dragTargetNodeId);
+    const dragTargetNodeId = useMindmapStore((state) => state.dragTargetNodeId);
     const isDragTarget = dragTargetNodeId === id;
 
     const [isMouseOver, setIsMouseOver] = useState(false);

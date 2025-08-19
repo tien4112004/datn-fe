@@ -5,21 +5,20 @@ import {
   type FinalConnectionState,
   useNodesInitialized,
 } from '@xyflow/react';
-import { useLayoutStore } from '../stores/layout';
 import type { MindMapNode } from '../types';
-import { useClipboardStore, useCoreStore, useNodeManipulationStore, useNodeOperationsStore } from '../stores';
 import { MINDMAP_TYPES, SIDE } from '../types';
 import { getSideFromPosition } from '../services/utils';
+import { useMindmapStore } from '../stores';
 
 export const useReactFlowIntegration = () => {
-  const syncState = useCoreStore((state) => state.syncState);
-  const moveToChild = useNodeManipulationStore((state) => state.moveToChild);
-  const getNode = useCoreStore((state) => state.getNode);
-  const addChildNode = useNodeOperationsStore((state) => state.addChildNode);
+  const syncState = useMindmapStore((state) => state.syncState);
+  const moveToChild = useMindmapStore((state) => state.moveToChild);
+  const getNode = useMindmapStore((state) => state.getNode);
+  const addChildNode = useMindmapStore((state) => state.addChildNode);
 
-  const updateLayout = useLayoutStore((state) => state.updateLayout);
-  const setMousePosition = useClipboardStore((state) => state.setMousePosition);
-  const setDragTarget = useClipboardStore((state) => state.setDragTarget);
+  const updateLayout = useMindmapStore((state) => state.updateLayout);
+  const setMousePosition = useMindmapStore((state) => state.setMousePosition);
+  const setDragTarget = useMindmapStore((state) => state.setDragTarget);
 
   const updateNodeInternals = useUpdateNodeInternals();
   const nodesInitialized = useNodesInitialized();

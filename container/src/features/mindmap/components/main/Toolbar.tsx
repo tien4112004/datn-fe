@@ -1,22 +1,21 @@
 import { Plus, Trash2, Undo, Redo } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
-import { useLayoutStore } from '../../stores/layout';
 import { SidebarTrigger } from '@/components/ui/sidebar';
-import { useClipboardStore, useCoreStore, useNodeOperationsStore } from '../../stores';
+import { useMindmapStore } from '../../stores';
 import { useReactFlow } from '@xyflow/react';
 import type { Direction } from '../../types';
 
 const Toolbar = () => {
-  const addNode = useNodeOperationsStore((state) => state.addNode);
-  const deleteSelectedNodes = useNodeOperationsStore((state) => state.deleteSelectedNodes);
-  const logData = useCoreStore((state) => state.logData);
-  const undo = useClipboardStore((state) => state.undo);
-  const redo = useClipboardStore((state) => state.redo);
-  const canUndo = useClipboardStore((state) => !state.undoStack.isEmpty());
-  const canRedo = useClipboardStore((state) => !state.redoStack.isEmpty());
+  const addNode = useMindmapStore((state) => state.addNode);
+  const deleteSelectedNodes = useMindmapStore((state) => state.deleteSelectedNodes);
+  const logData = useMindmapStore((state) => state.logData);
+  const undo = useMindmapStore((state) => state.undo);
+  const redo = useMindmapStore((state) => state.redo);
+  const canUndo = useMindmapStore((state) => !state.undoStack.isEmpty());
+  const canRedo = useMindmapStore((state) => !state.redoStack.isEmpty());
 
-  const onLayoutChange = useLayoutStore((state) => state.onLayoutChange);
+  const onLayoutChange = useMindmapStore((state) => state.onLayoutChange);
   const { fitView } = useReactFlow();
 
   return (

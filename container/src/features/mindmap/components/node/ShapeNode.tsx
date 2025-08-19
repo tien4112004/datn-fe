@@ -6,7 +6,7 @@ import { BaseNodeBlock, BaseNodeControl } from './BaseNode';
 import type { NodeProps } from '@xyflow/react';
 import { useMindmapNodeCommon } from '../../hooks';
 import { Button } from '@/components/ui/button';
-import { useLayoutStore, useNodeOperationsStore } from '../../stores';
+import { useMindmapStore } from '../../stores';
 import { Network } from 'lucide-react';
 import ColorPickerControl from '../controls/ColorPickerControl';
 
@@ -15,8 +15,8 @@ const ShapeNodeBlock = memo(
     const { id, data, selected: isSelected, width, height } = node;
 
     const { layout } = useMindmapNodeCommon<ShapeNode>({ node });
-    const updateNodeData = useNodeOperationsStore((state) => state.updateNodeDataWithUndo);
-    const updateSubtreeLayout = useLayoutStore((state) => state.updateSubtreeLayout);
+    const updateNodeData = useMindmapStore((state) => state.updateNodeDataWithUndo);
+    const updateSubtreeLayout = useMindmapStore((state) => state.updateSubtreeLayout);
 
     const handleShapeChange = (newShape: Shape) => {
       updateNodeData(id, { shape: newShape });

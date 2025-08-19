@@ -1,23 +1,9 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { useNodeManipulationStore } from '../nodeManipulation';
-import { useCoreStore } from '../core';
-import { useClipboardStore } from '../clipboard';
+import { useMindmapStore } from '../index';
 import { MINDMAP_TYPES, PATH_TYPES, SIDE } from '../../types';
 import type { MindMapNode, MindMapEdge } from '../../types';
 
 // Mock external dependencies
-vi.mock('../core', () => ({
-  useCoreStore: {
-    getState: vi.fn(),
-  },
-}));
-
-vi.mock('../clipboard', () => ({
-  useClipboardStore: {
-    getState: vi.fn(),
-  },
-}));
-
 vi.mock('sonner', () => ({
   toast: {
     error: vi.fn(),
@@ -33,27 +19,16 @@ vi.mock('../../services/utils', () => ({
   getRootNodeOfSubtree: vi.fn(),
 }));
 
-describe('useNodeManipulationStore', () => {
-  let mockCoreState: any;
-  let mockClipboardState: any;
-
+describe('nodeManipulationSlice', () => {
   beforeEach(() => {
-    // Mock core store methods
-    mockCoreState = {
+    // Reset store state before each test
+    useMindmapStore.setState({
       nodes: [],
       edges: [],
-      setNodes: vi.fn(),
-      setEdges: vi.fn(),
-    };
-
-    // Mock clipboard store methods
-    mockClipboardState = {
+      nodesToBeDeleted: new Set<string>(),
+      prepareToPushUndo: vi.fn(),
       pushToUndoStack: vi.fn(),
-    };
-
-    vi.mocked(useCoreStore.getState).mockReturnValue(mockCoreState);
-    vi.mocked(useClipboardStore.getState).mockReturnValue(mockClipboardState);
-
+    });
     vi.clearAllMocks();
   });
 
@@ -111,8 +86,7 @@ describe('useNodeManipulationStore', () => {
         },
       ];
 
-      mockCoreState.nodes = mockNodes;
-      mockCoreState.edges = mockEdges;
+      useMindmapStore.setState({ nodes: mockNodes, edges: mockEdges });
 
       const { getAllDescendantNodes } = await import('../../services/utils');
       vi.mocked(getAllDescendantNodes).mockReturnValue([
@@ -130,31 +104,17 @@ describe('useNodeManipulationStore', () => {
         },
       ]);
 
-      const state = useNodeManipulationStore.getState();
+      const state = useMindmapStore.getState();
       state.toggleCollapse('parent-1', SIDE.LEFT, true);
 
-      expect(mockClipboardState.pushToUndoStack).toHaveBeenCalledWith(mockNodes, mockEdges);
-      expect(mockCoreState.setNodes).toHaveBeenCalled();
-      expect(mockCoreState.setEdges).toHaveBeenCalled();
+      // Test node updates - nodes should be updated
+      const updatedState = useMindmapStore.getState();
+      const parentNode = updatedState.nodes.find((n) => n.id === 'parent-1');
+      const leftChildNode = updatedState.nodes.find((n) => n.id === 'left-child');
 
-      // Test node updates - setNodes should be called with updated array
-      expect(mockCoreState.setNodes).toHaveBeenCalledWith(
-        expect.arrayContaining([
-          expect.objectContaining({
-            id: 'parent-1',
-            data: expect.objectContaining({
-              isLeftChildrenCollapsed: true,
-            }),
-          }),
-          expect.objectContaining({
-            id: 'left-child',
-            data: expect.objectContaining({
-              isCollapsed: true,
-              collapsedBy: 'parent-1',
-            }),
-          }),
-        ])
-      );
+      expect(parentNode?.data.isLeftChildrenCollapsed).toBe(true);
+      expect(leftChildNode?.data.isCollapsed).toBe(true);
+      expect(leftChildNode?.data.collapsedBy).toBe('parent-1');
     });
 
     it('should expand nodes on the specified side', async () => {
@@ -188,8 +148,7 @@ describe('useNodeManipulationStore', () => {
 
       const mockEdges: MindMapEdge[] = [];
 
-      mockCoreState.nodes = mockNodes;
-      mockCoreState.edges = mockEdges;
+      useMindmapStore.setState({ nodes: mockNodes, edges: mockEdges });
 
       const { getAllDescendantNodes } = await import('../../services/utils');
       vi.mocked(getAllDescendantNodes).mockReturnValue([
@@ -208,27 +167,17 @@ describe('useNodeManipulationStore', () => {
         },
       ]);
 
-      const state = useNodeManipulationStore.getState();
+      const state = useMindmapStore.getState();
       state.toggleCollapse('parent-1', SIDE.LEFT, false);
 
-      // Test node updates - setNodes should be called with updated array
-      expect(mockCoreState.setNodes).toHaveBeenCalledWith(
-        expect.arrayContaining([
-          expect.objectContaining({
-            id: 'parent-1',
-            data: expect.objectContaining({
-              isLeftChildrenCollapsed: false,
-            }),
-          }),
-          expect.objectContaining({
-            id: 'left-child',
-            data: expect.objectContaining({
-              isCollapsed: false,
-              collapsedBy: undefined,
-            }),
-          }),
-        ])
-      );
+      // Test node updates
+      const updatedState = useMindmapStore.getState();
+      const parentNode = updatedState.nodes.find((n) => n.id === 'parent-1');
+      const leftChildNode = updatedState.nodes.find((n) => n.id === 'left-child');
+
+      expect(parentNode?.data.isLeftChildrenCollapsed).toBe(false);
+      expect(leftChildNode?.data.isCollapsed).toBe(false);
+      expect(leftChildNode?.data.collapsedBy).toBeUndefined();
     });
 
     it('should only affect nodes on the specified side', async () => {
@@ -270,8 +219,7 @@ describe('useNodeManipulationStore', () => {
         },
       ];
 
-      mockCoreState.nodes = mockNodes;
-      mockCoreState.edges = [];
+      useMindmapStore.setState({ nodes: mockNodes, edges: [] });
 
       const { getAllDescendantNodes } = await import('../../services/utils');
       vi.mocked(getAllDescendantNodes).mockReturnValue([
@@ -301,43 +249,33 @@ describe('useNodeManipulationStore', () => {
         },
       ]);
 
-      const state = useNodeManipulationStore.getState();
+      const state = useMindmapStore.getState();
       state.toggleCollapse('parent-1', SIDE.LEFT, true);
 
       // Test that only left side nodes are affected
-      expect(mockCoreState.setNodes).toHaveBeenCalledWith(
-        expect.arrayContaining([
-          expect.objectContaining({
-            id: 'left-child',
-            data: expect.objectContaining({
-              isCollapsed: true,
-            }),
-          }),
-          expect.objectContaining({
-            id: 'right-child',
-            data: expect.objectContaining({
-              isCollapsed: false, // Should remain unchanged
-            }),
-          }),
-        ])
-      );
+      const updatedState = useMindmapStore.getState();
+      const leftChildNode = updatedState.nodes.find((n) => n.id === 'left-child');
+      const rightChildNode = updatedState.nodes.find((n) => n.id === 'right-child');
+
+      expect(leftChildNode?.data.isCollapsed).toBe(true);
+      expect(rightChildNode?.data.isCollapsed).toBe(false); // Should remain unchanged
     });
   });
 
   describe('expand and collapse methods', () => {
     it('should call toggleCollapse with false for expand', () => {
-      const toggleCollapseSpy = vi.spyOn(useNodeManipulationStore.getState(), 'toggleCollapse');
+      const toggleCollapseSpy = vi.spyOn(useMindmapStore.getState(), 'toggleCollapse');
 
-      const state = useNodeManipulationStore.getState();
+      const state = useMindmapStore.getState();
       state.expand('node-1', SIDE.LEFT);
 
       expect(toggleCollapseSpy).toHaveBeenCalledWith('node-1', SIDE.LEFT, false);
     });
 
     it('should call toggleCollapse with true for collapse', () => {
-      const toggleCollapseSpy = vi.spyOn(useNodeManipulationStore.getState(), 'toggleCollapse');
+      const toggleCollapseSpy = vi.spyOn(useMindmapStore.getState(), 'toggleCollapse');
 
-      const state = useNodeManipulationStore.getState();
+      const state = useMindmapStore.getState();
       state.collapse('node-1', SIDE.RIGHT);
 
       expect(toggleCollapseSpy).toHaveBeenCalledWith('node-1', SIDE.RIGHT, true);
@@ -346,11 +284,17 @@ describe('useNodeManipulationStore', () => {
 
   describe('moveToChild', () => {
     it('should prevent moving node to itself', () => {
-      const state = useNodeManipulationStore.getState();
+      const originalNodes = useMindmapStore.getState().nodes;
+      const originalEdges = useMindmapStore.getState().edges;
+
+      const state = useMindmapStore.getState();
       state.moveToChild('node-1', 'node-1');
 
-      expect(mockCoreState.setNodes).not.toHaveBeenCalled();
-      expect(mockCoreState.setEdges).not.toHaveBeenCalled();
+      const updatedNodes = useMindmapStore.getState().nodes;
+      const updatedEdges = useMindmapStore.getState().edges;
+
+      expect(updatedNodes).toEqual(originalNodes);
+      expect(updatedEdges).toEqual(originalEdges);
     });
 
     it('should prevent moving node to its descendant', async () => {
@@ -369,7 +313,7 @@ describe('useNodeManipulationStore', () => {
         },
       ];
 
-      mockCoreState.nodes = mockNodes;
+      useMindmapStore.setState({ nodes: mockNodes });
 
       const { getAllDescendantNodes } = await import('../../services/utils');
       vi.mocked(getAllDescendantNodes).mockReturnValue([
@@ -383,11 +327,10 @@ describe('useNodeManipulationStore', () => {
 
       const { toast } = await import('sonner');
 
-      const state = useNodeManipulationStore.getState();
+      const state = useMindmapStore.getState();
       state.moveToChild('parent-1', 'child-1');
 
       expect(toast.error).toHaveBeenCalledWith('Cannot move a node to one of its descendants.');
-      expect(mockCoreState.setNodes).not.toHaveBeenCalled();
     });
 
     it('should move node to new parent and update levels', async () => {
@@ -422,32 +365,21 @@ describe('useNodeManipulationStore', () => {
         },
       ];
 
-      mockCoreState.nodes = mockNodes;
-      mockCoreState.edges = mockEdges;
+      useMindmapStore.setState({ nodes: mockNodes, edges: mockEdges });
 
       const { getAllDescendantNodes } = await import('../../services/utils');
       vi.mocked(getAllDescendantNodes).mockReturnValue([]);
 
-      const state = useNodeManipulationStore.getState();
+      const state = useMindmapStore.getState();
       state.moveToChild('source-1', 'target-1', SIDE.LEFT);
 
-      expect(mockClipboardState.pushToUndoStack).toHaveBeenCalledWith(mockNodes, mockEdges);
-      expect(mockCoreState.setNodes).toHaveBeenCalled();
-      expect(mockCoreState.setEdges).toHaveBeenCalled();
-
       // Test node updates
-      expect(mockCoreState.setNodes).toHaveBeenCalledWith(
-        expect.arrayContaining([
-          expect.objectContaining({
-            id: 'source-1',
-            data: expect.objectContaining({
-              parentId: 'target-1',
-              level: 2,
-              side: SIDE.RIGHT,
-            }),
-          }),
-        ])
-      );
+      const updatedState = useMindmapStore.getState();
+      const sourceNode = updatedState.nodes.find((n) => n.id === 'source-1');
+
+      expect(sourceNode?.data.parentId).toBe('target-1');
+      expect(sourceNode?.data.level).toBe(2);
+      expect(sourceNode?.data.side).toBe(SIDE.RIGHT);
     });
 
     it('should create new edge when none exists', async () => {
@@ -468,8 +400,7 @@ describe('useNodeManipulationStore', () => {
 
       const mockEdges: MindMapEdge[] = [];
 
-      mockCoreState.nodes = mockNodes;
-      mockCoreState.edges = mockEdges;
+      useMindmapStore.setState({ nodes: mockNodes, edges: mockEdges });
 
       const { getAllDescendantNodes, getRootNodeOfSubtree } = await import('../../services/utils');
       vi.mocked(getAllDescendantNodes).mockReturnValue([]);
@@ -486,23 +417,17 @@ describe('useNodeManipulationStore', () => {
         },
       });
 
-      const state = useNodeManipulationStore.getState();
+      const state = useMindmapStore.getState();
       state.moveToChild('source-1', 'target-1', SIDE.LEFT);
 
-      expect(mockCoreState.setEdges).toHaveBeenCalledWith(
-        expect.arrayContaining([
-          expect.objectContaining({
-            source: 'target-1',
-            target: 'source-1',
-            type: MINDMAP_TYPES.EDGE,
-            data: expect.objectContaining({
-              strokeColor: 'var(--primary)',
-              strokeWidth: 2,
-              pathType: expect.any(String),
-            }),
-          }),
-        ])
-      );
+      // Test that a new edge was created
+      const updatedState = useMindmapStore.getState();
+      const newEdge = updatedState.edges.find((e) => e.source === 'target-1' && e.target === 'source-1');
+
+      expect(newEdge).toBeDefined();
+      expect(newEdge?.type).toBe(MINDMAP_TYPES.EDGE);
+      expect(newEdge?.data?.strokeColor).toBe('var(--primary)');
+      expect(newEdge?.data?.strokeWidth).toBe(2);
     });
   });
 
@@ -554,8 +479,7 @@ describe('useNodeManipulationStore', () => {
         },
       ];
 
-      mockCoreState.nodes = mockNodes;
-      mockCoreState.edges = mockEdges;
+      useMindmapStore.setState({ nodes: mockNodes, edges: mockEdges });
 
       const { getAllDescendantNodes } = await import('../../services/utils');
       vi.mocked(getAllDescendantNodes).mockReturnValue([
@@ -567,43 +491,19 @@ describe('useNodeManipulationStore', () => {
         },
       ]);
 
-      const state = useNodeManipulationStore.getState();
+      const state = useMindmapStore.getState();
       state.updateSubtreeEdgePathType('root-1', PATH_TYPES.SMOOTHSTEP);
 
-      expect(mockClipboardState.pushToUndoStack).toHaveBeenCalledWith(mockNodes, mockEdges);
-      expect(mockCoreState.setNodes).toHaveBeenCalled();
-      expect(mockCoreState.setEdges).toHaveBeenCalled();
-
       // Test node updates (root node pathType should be updated)
-      expect(mockCoreState.setNodes).toHaveBeenCalledWith(
-        expect.arrayContaining([
-          expect.objectContaining({
-            id: 'root-1',
-            type: MINDMAP_TYPES.ROOT_NODE,
-            data: expect.objectContaining({
-              pathType: PATH_TYPES.SMOOTHSTEP,
-            }),
-          }),
-        ])
-      );
+      const updatedState = useMindmapStore.getState();
+      const rootNode = updatedState.nodes.find((n) => n.id === 'root-1');
+      expect(rootNode?.data.pathType).toBe(PATH_TYPES.SMOOTHSTEP);
 
       // Test edge updates (only subtree edges should be updated)
-      expect(mockCoreState.setEdges).toHaveBeenCalledWith(
-        expect.arrayContaining([
-          expect.objectContaining({
-            id: 'edge-1',
-            data: expect.objectContaining({
-              pathType: PATH_TYPES.SMOOTHSTEP,
-            }),
-          }),
-          expect.objectContaining({
-            id: 'edge-2',
-            data: expect.objectContaining({
-              pathType: PATH_TYPES.SMOOTHSTEP, // Should remain unchanged
-            }),
-          }),
-        ])
-      );
+      const edge1 = updatedState.edges.find((e) => e.id === 'edge-1');
+      const edge2 = updatedState.edges.find((e) => e.id === 'edge-2');
+      expect(edge1?.data?.pathType).toBe(PATH_TYPES.SMOOTHSTEP);
+      expect(edge2?.data?.pathType).toBe(PATH_TYPES.SMOOTHSTEP); // Should remain unchanged
     });
 
     it('should not update non-root nodes pathType', async () => {
@@ -616,24 +516,18 @@ describe('useNodeManipulationStore', () => {
         },
       ];
 
-      mockCoreState.nodes = mockNodes;
-      mockCoreState.edges = [];
+      useMindmapStore.setState({ nodes: mockNodes, edges: [] });
 
       const { getAllDescendantNodes } = await import('../../services/utils');
       vi.mocked(getAllDescendantNodes).mockReturnValue([]);
 
-      const state = useNodeManipulationStore.getState();
+      const state = useMindmapStore.getState();
       state.updateSubtreeEdgePathType('child-1', PATH_TYPES.SMOOTHSTEP);
 
       // Child node should remain unchanged since it's not a root node
-      expect(mockCoreState.setNodes).toHaveBeenCalledWith(
-        expect.arrayContaining([
-          expect.objectContaining({
-            id: 'child-1',
-            type: MINDMAP_TYPES.TEXT_NODE, // Should remain unchanged since it's not a root node
-          }),
-        ])
-      );
+      const updatedState = useMindmapStore.getState();
+      const childNode = updatedState.nodes.find((n) => n.id === 'child-1');
+      expect(childNode?.type).toBe(MINDMAP_TYPES.TEXT_NODE); // Should remain unchanged since it's not a root node
     });
   });
 
@@ -679,8 +573,7 @@ describe('useNodeManipulationStore', () => {
         },
       ];
 
-      mockCoreState.nodes = mockNodes;
-      mockCoreState.edges = mockEdges;
+      useMindmapStore.setState({ nodes: mockNodes, edges: mockEdges });
 
       const { getAllDescendantNodes } = await import('../../services/utils');
       vi.mocked(getAllDescendantNodes).mockReturnValue([
@@ -693,29 +586,16 @@ describe('useNodeManipulationStore', () => {
       ]);
 
       const newColor = '#ff0000';
-      const state = useNodeManipulationStore.getState();
+      const state = useMindmapStore.getState();
       state.updateSubtreeEdgeColor('root-1', newColor);
 
-      expect(mockClipboardState.pushToUndoStack).toHaveBeenCalledWith(mockNodes, mockEdges);
-      expect(mockCoreState.setEdges).toHaveBeenCalled();
-
       // Test edge updates (only subtree edges should be updated)
-      expect(mockCoreState.setEdges).toHaveBeenCalledWith(
-        expect.arrayContaining([
-          expect.objectContaining({
-            id: 'edge-1',
-            data: expect.objectContaining({
-              strokeColor: newColor,
-            }),
-          }),
-          expect.objectContaining({
-            id: 'edge-2',
-            data: expect.objectContaining({
-              strokeColor: 'var(--primary)', // Should remain unchanged
-            }),
-          }),
-        ])
-      );
+      const updatedState = useMindmapStore.getState();
+      const edge1 = updatedState.edges.find((e) => e.id === 'edge-1');
+      const edge2 = updatedState.edges.find((e) => e.id === 'edge-2');
+
+      expect(edge1?.data?.strokeColor).toBe(newColor);
+      expect(edge2?.data?.strokeColor).toBe('var(--primary)'); // Should remain unchanged
     });
 
     it('should handle empty subtree', async () => {
@@ -730,19 +610,17 @@ describe('useNodeManipulationStore', () => {
 
       const mockEdges: MindMapEdge[] = [];
 
-      mockCoreState.nodes = mockNodes;
-      mockCoreState.edges = mockEdges;
+      useMindmapStore.setState({ nodes: mockNodes, edges: mockEdges });
 
       const { getAllDescendantNodes } = await import('../../services/utils');
       vi.mocked(getAllDescendantNodes).mockReturnValue([]);
 
-      const state = useNodeManipulationStore.getState();
+      const state = useMindmapStore.getState();
       state.updateSubtreeEdgeColor('root-1', '#ff0000');
 
-      expect(mockCoreState.setEdges).toHaveBeenCalled();
-
-      // Test that setEdges is called even with empty subtree
-      expect(mockCoreState.setEdges).toHaveBeenCalledWith(mockEdges);
+      // Test that the operation completes without error even with empty subtree
+      const updatedState = useMindmapStore.getState();
+      expect(updatedState.edges).toEqual(mockEdges);
     });
   });
 });

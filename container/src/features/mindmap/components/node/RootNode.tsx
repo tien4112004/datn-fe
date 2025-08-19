@@ -8,7 +8,7 @@ import { BaseNodeBlock, BaseNodeControl } from './BaseNode';
 import { Input } from '@/components/ui/input';
 import { BaseNodeContent } from '../ui/base-node';
 import type { NodeProps } from '@xyflow/react';
-import { useNodeManipulationStore, useNodeOperationsStore, useLayoutStore } from '../../stores';
+import { useMindmapStore } from '../../stores';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/shared/components/ui/popover';
 import { BezierIcon, SmoothStepIcon, StraightIcon } from '../ui/icon';
@@ -22,10 +22,10 @@ const RootNodeBlock = memo(
       node,
     });
 
-    const updateNodeData = useNodeOperationsStore((state) => state.updateNodeDataWithUndo);
-    const updateSubtreeLayout = useLayoutStore((state) => state.updateSubtreeLayout);
-    const updateSubtreeEdgePathType = useNodeManipulationStore((state) => state.updateSubtreeEdgePathType);
-    const updateSubtreeEdgeColor = useNodeManipulationStore((state) => state.updateSubtreeEdgeColor);
+    const updateNodeData = useMindmapStore((state) => state.updateNodeDataWithUndo);
+    const updateSubtreeLayout = useMindmapStore((state) => state.updateSubtreeLayout);
+    const updateSubtreeEdgePathType = useMindmapStore((state) => state.updateSubtreeEdgePathType);
+    const updateSubtreeEdgeColor = useMindmapStore((state) => state.updateSubtreeEdgeColor);
 
     const [hex, setHex] = useState<string>(data.edgeColor as string);
 

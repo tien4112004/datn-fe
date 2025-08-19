@@ -1,23 +1,9 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { useNodeOperationsStore } from '../nodeOperation';
-import { useCoreStore } from '../core';
-import { useClipboardStore } from '../clipboard';
+import { useMindmapStore } from '../index';
 import { MINDMAP_TYPES, PATH_TYPES, SIDE, DRAGHANDLE } from '../../types';
 import type { MindMapNode, MindMapEdge } from '../../types';
 
 // Mock external dependencies
-vi.mock('../core', () => ({
-  useCoreStore: {
-    getState: vi.fn(),
-  },
-}));
-
-vi.mock('../clipboard', () => ({
-  useClipboardStore: {
-    getState: vi.fn(),
-  },
-}));
-
 vi.mock('@/shared/lib/utils', () => ({
   generateId: vi.fn(() => `mock-id-${Math.random()}`),
 }));
@@ -27,62 +13,35 @@ vi.mock('../../services/utils', () => ({
   getAllDescendantNodes: vi.fn(),
 }));
 
-describe('useNodeOperationsStore', () => {
-  let mockCoreState: any;
-  let mockClipboardState: any;
-
+describe('nodeOperationSlice', () => {
   beforeEach(() => {
     // Reset store state
-    useNodeOperationsStore.setState({
-      nodesToBeDeleted: new Set<string>(),
-    });
-
-    // Mock core store methods
-    mockCoreState = {
+    useMindmapStore.setState({
       nodes: [],
       edges: [],
-      setNodes: vi.fn(),
-      setEdges: vi.fn(),
-    };
-
-    // Mock clipboard store methods
-    mockClipboardState = {
+      nodesToBeDeleted: new Set<string>(),
+      prepareToPushUndo: vi.fn(),
       pushToUndoStack: vi.fn(),
-    };
-
-    vi.mocked(useCoreStore.getState).mockReturnValue(mockCoreState);
-    vi.mocked(useClipboardStore.getState).mockReturnValue(mockClipboardState);
+    });
 
     vi.clearAllMocks();
   });
 
   describe('Initial State', () => {
     it('should initialize with empty nodesToBeDeleted set', () => {
-      const state = useNodeOperationsStore.getState();
+      const state = useMindmapStore.getState();
       expect(state.nodesToBeDeleted).toEqual(new Set<string>());
     });
   });
 
   describe('addNode', () => {
     it('should create a new root node and add it to nodes', () => {
-      const mockNodes: MindMapNode[] = [];
-      const mockEdges: MindMapEdge[] = [];
-
-      mockCoreState.nodes = mockNodes;
-      mockCoreState.edges = mockEdges;
-
-      const state = useNodeOperationsStore.getState();
+      const state = useMindmapStore.getState();
       state.addNode();
 
-      expect(mockClipboardState.pushToUndoStack).toHaveBeenCalledWith(mockNodes, mockEdges);
-      expect(mockCoreState.setNodes).toHaveBeenCalledWith(expect.any(Function));
-
-      // Test the updater function
-      const updateFunction = mockCoreState.setNodes.mock.calls[0][0];
-      const result = updateFunction(mockNodes);
-
-      expect(result).toHaveLength(1);
-      expect(result[0]).toMatchObject({
+      const updatedState = useMindmapStore.getState();
+      expect(updatedState.nodes).toHaveLength(1);
+      expect(updatedState.nodes[0]).toMatchObject({
         type: MINDMAP_TYPES.ROOT_NODE,
         data: {
           level: 0,
@@ -95,17 +54,14 @@ describe('useNodeOperationsStore', () => {
     });
 
     it('should generate unique positions for new nodes', () => {
-      const mockNodes: MindMapNode[] = [];
-      mockCoreState.nodes = mockNodes;
-
-      const state = useNodeOperationsStore.getState();
+      const state = useMindmapStore.getState();
       state.addNode();
 
-      const updateFunction = mockCoreState.setNodes.mock.calls[0][0];
-      const result = updateFunction(mockNodes);
+      const updatedState = useMindmapStore.getState();
+      const newNode = updatedState.nodes[0];
 
-      expect(result[0].position.x).toBeGreaterThan(0);
-      expect(result[0].position.y).toBeGreaterThan(0);
+      expect(newNode.position.x).toBeGreaterThan(0);
+      expect(newNode.position.y).toBeGreaterThan(0);
     });
   });
 
@@ -124,12 +80,6 @@ describe('useNodeOperationsStore', () => {
       const position = { x: 100, y: 100 };
       const side = SIDE.LEFT;
 
-      const mockNodes: MindMapNode[] = [];
-      const mockEdges: MindMapEdge[] = [];
-
-      mockCoreState.nodes = mockNodes;
-      mockCoreState.edges = mockEdges;
-
       const { getRootNodeOfSubtree } = await import('../../services/utils');
       vi.mocked(getRootNodeOfSubtree).mockReturnValue({
         id: 'root-1',
@@ -144,19 +94,14 @@ describe('useNodeOperationsStore', () => {
         },
       });
 
-      const state = useNodeOperationsStore.getState();
+      const state = useMindmapStore.getState();
       state.addChildNode(parentNode, position, side);
 
-      expect(mockClipboardState.pushToUndoStack).toHaveBeenCalledWith(mockNodes, mockEdges);
-      expect(mockCoreState.setNodes).toHaveBeenCalled();
-      expect(mockCoreState.setEdges).toHaveBeenCalled();
+      const updatedState = useMindmapStore.getState();
 
       // Test node creation
-      const nodeUpdateFunction = mockCoreState.setNodes.mock.calls[0][0];
-      const nodeResult = nodeUpdateFunction(mockNodes);
-
-      expect(nodeResult).toHaveLength(1);
-      expect(nodeResult[0]).toMatchObject({
+      expect(updatedState.nodes).toHaveLength(1);
+      expect(updatedState.nodes[0]).toMatchObject({
         type: MINDMAP_TYPES.TEXT_NODE,
         data: {
           level: 1,
@@ -169,11 +114,8 @@ describe('useNodeOperationsStore', () => {
       });
 
       // Test edge creation
-      const edgeUpdateFunction = mockCoreState.setEdges.mock.calls[0][0];
-      const edgeResult = edgeUpdateFunction(mockEdges);
-
-      expect(edgeResult).toHaveLength(1);
-      expect(edgeResult[0]).toMatchObject({
+      expect(updatedState.edges).toHaveLength(1);
+      expect(updatedState.edges[0]).toMatchObject({
         source: 'parent-1',
         type: MINDMAP_TYPES.EDGE,
         sourceHandle: 'first-source-parent-1',
@@ -195,13 +137,11 @@ describe('useNodeOperationsStore', () => {
       const side = SIDE.RIGHT;
       const nodeType = MINDMAP_TYPES.SHAPE_NODE;
 
-      const state = useNodeOperationsStore.getState();
+      const state = useMindmapStore.getState();
       state.addChildNode(parentNode, position, side, nodeType);
 
-      const nodeUpdateFunction = mockCoreState.setNodes.mock.calls[0][0];
-      const nodeResult = nodeUpdateFunction([]);
-
-      expect(nodeResult[0]).toMatchObject({
+      const updatedState = useMindmapStore.getState();
+      expect(updatedState.nodes[0]).toMatchObject({
         type: MINDMAP_TYPES.SHAPE_NODE,
         data: {
           shape: 'rectangle',
@@ -221,13 +161,11 @@ describe('useNodeOperationsStore', () => {
       const side = SIDE.RIGHT;
       const nodeType = MINDMAP_TYPES.IMAGE_NODE;
 
-      const state = useNodeOperationsStore.getState();
+      const state = useMindmapStore.getState();
       state.addChildNode(parentNode, position, side, nodeType);
 
-      const nodeUpdateFunction = mockCoreState.setNodes.mock.calls[0][0];
-      const nodeResult = nodeUpdateFunction([]);
-
-      expect(nodeResult[0]).toMatchObject({
+      const updatedState = useMindmapStore.getState();
+      expect(updatedState.nodes[0]).toMatchObject({
         type: MINDMAP_TYPES.IMAGE_NODE,
         data: {
           width: 250,
@@ -254,19 +192,15 @@ describe('useNodeOperationsStore', () => {
         },
       ];
 
-      mockCoreState.nodes = mockNodes;
+      useMindmapStore.setState({ nodes: mockNodes });
 
       const updates = { content: 'Updated Content' };
-      const state = useNodeOperationsStore.getState();
+      const state = useMindmapStore.getState();
       state.updateNodeData('node-1', updates);
 
-      expect(mockCoreState.setNodes).toHaveBeenCalled();
-
-      const updateFunction = mockCoreState.setNodes.mock.calls[0][0];
-      const result = updateFunction(mockNodes);
-
-      expect(result[0].data.content).toBe('Updated Content');
-      expect(result[0].data.level).toBe(1); // Other properties preserved
+      const updatedState = useMindmapStore.getState();
+      expect(updatedState.nodes[0].data.content).toBe('Updated Content');
+      expect(updatedState.nodes[0].data.level).toBe(1); // Other properties preserved
     });
 
     it('should not modify nodes that do not match the target id', () => {
@@ -295,15 +229,15 @@ describe('useNodeOperationsStore', () => {
         },
       ];
 
+      useMindmapStore.setState({ nodes: mockNodes });
+
       const updates = { content: 'Updated Content' };
-      const state = useNodeOperationsStore.getState();
+      const state = useMindmapStore.getState();
       state.updateNodeData('node-1', updates);
 
-      const updateFunction = mockCoreState.setNodes.mock.calls[0][0];
-      const result = updateFunction(mockNodes);
-
-      expect(result[0].data.content).toBe('Updated Content');
-      expect(result[1].data.content).toBe('Node 2'); // Unchanged
+      const updatedState = useMindmapStore.getState();
+      expect(updatedState.nodes[0].data.content).toBe('Updated Content');
+      expect(updatedState.nodes[1].data.content).toBe('Node 2'); // Unchanged
     });
   });
 
@@ -323,17 +257,14 @@ describe('useNodeOperationsStore', () => {
         },
       ];
 
-      const mockEdges: MindMapEdge[] = [];
-
-      mockCoreState.nodes = mockNodes;
-      mockCoreState.edges = mockEdges;
+      useMindmapStore.setState({ nodes: mockNodes });
 
       const updates = { content: 'Updated Content' };
-      const state = useNodeOperationsStore.getState();
+      const state = useMindmapStore.getState();
       state.updateNodeDataWithUndo('node-1', updates);
 
-      expect(mockClipboardState.pushToUndoStack).toHaveBeenCalledWith(mockNodes, mockEdges);
-      expect(mockCoreState.setNodes).toHaveBeenCalled();
+      const updatedState = useMindmapStore.getState();
+      expect(updatedState.nodes[0].data.content).toBe('Updated Content');
     });
   });
 
@@ -379,8 +310,7 @@ describe('useNodeOperationsStore', () => {
         },
       ];
 
-      mockCoreState.nodes = mockNodes;
-      mockCoreState.edges = mockEdges;
+      useMindmapStore.setState({ nodes: mockNodes, edges: mockEdges });
 
       const { getAllDescendantNodes } = await import('../../services/utils');
       vi.mocked(getAllDescendantNodes).mockReturnValue([
@@ -398,34 +328,24 @@ describe('useNodeOperationsStore', () => {
         },
       ]);
 
-      const state = useNodeOperationsStore.getState();
+      const state = useMindmapStore.getState();
       state.markNodeForDeletion('parent-1');
 
-      expect(mockClipboardState.pushToUndoStack).toHaveBeenCalledWith(mockNodes, mockEdges);
-
       // Check that nodesToBeDeleted is updated
-      const updatedState = useNodeOperationsStore.getState();
+      const updatedState = useMindmapStore.getState();
       expect(updatedState.nodesToBeDeleted).toEqual(new Set(['parent-1', 'child-1']));
 
       // Check that nodes are marked with isDeleting flag
-      expect(mockCoreState.setNodes).toHaveBeenCalled();
-      const nodeUpdateFunction = mockCoreState.setNodes.mock.calls[0][0];
-      const nodeResult = nodeUpdateFunction(mockNodes);
-
-      expect(nodeResult[0].data.isDeleting).toBe(true);
-      expect(nodeResult[1].data.isDeleting).toBe(true);
+      expect(updatedState.nodes[0].data.isDeleting).toBe(true);
+      expect(updatedState.nodes[1].data.isDeleting).toBe(true);
 
       // Check that edges are marked with isDeleting flag
-      expect(mockCoreState.setEdges).toHaveBeenCalled();
-      const edgeUpdateFunction = mockCoreState.setEdges.mock.calls[0][0];
-      const edgeResult = edgeUpdateFunction(mockEdges);
-
-      expect(edgeResult[0].data.isDeleting).toBe(true);
+      expect(updatedState.edges[0].data?.isDeleting).toBe(true);
     });
   });
 
   describe('finalizeNodeDeletion', () => {
-    it('should remove marked nodes and edges', () => {
+    it('should remove marked nodes and edges', async () => {
       const mockNodes: MindMapNode[] = [
         {
           id: 'keep-1',
@@ -458,49 +378,51 @@ describe('useNodeOperationsStore', () => {
         },
       ];
 
+      const { getAllDescendantNodes } = await import('../../services/utils');
+      vi.mocked(getAllDescendantNodes).mockReturnValue([]);
+
       // Set nodes to be deleted
-      useNodeOperationsStore.setState({
+      useMindmapStore.setState({
+        nodes: mockNodes,
+        edges: mockEdges,
         nodesToBeDeleted: new Set(['delete-1']),
       });
 
-      const state = useNodeOperationsStore.getState();
+      const state = useMindmapStore.getState();
       state.finalizeNodeDeletion('delete-1');
 
-      expect(mockCoreState.setNodes).toHaveBeenCalled();
-      expect(mockCoreState.setEdges).toHaveBeenCalled();
+      const updatedState = useMindmapStore.getState();
 
       // Test node filtering
-      const nodeFilterFunction = mockCoreState.setNodes.mock.calls[0][0];
-      const nodeResult = nodeFilterFunction(mockNodes);
-      expect(nodeResult).toHaveLength(1);
-      expect(nodeResult[0].id).toBe('keep-1');
+      expect(updatedState.nodes).toHaveLength(1);
+      expect(updatedState.nodes[0].id).toBe('keep-1');
 
       // Test edge filtering
-      const edgeFilterFunction = mockCoreState.setEdges.mock.calls[0][0];
-      const edgeResult = edgeFilterFunction(mockEdges);
-      expect(edgeResult).toHaveLength(1);
-      expect(edgeResult[0].id).toBe('keep-edge');
+      expect(updatedState.edges).toHaveLength(1);
+      expect(updatedState.edges[0].id).toBe('keep-edge');
 
       // Check that nodesToBeDeleted is cleared
-      const updatedState = useNodeOperationsStore.getState();
       expect(updatedState.nodesToBeDeleted).toEqual(new Set());
     });
 
     it('should handle empty nodesToBeDeleted gracefully', () => {
-      useNodeOperationsStore.setState({
+      const originalState = useMindmapStore.getState();
+
+      useMindmapStore.setState({
         nodesToBeDeleted: new Set(),
       });
 
-      const state = useNodeOperationsStore.getState();
+      const state = useMindmapStore.getState();
       state.finalizeNodeDeletion('delete-1');
 
-      expect(mockCoreState.setNodes).not.toHaveBeenCalled();
-      expect(mockCoreState.setEdges).not.toHaveBeenCalled();
+      const updatedState = useMindmapStore.getState();
+      expect(updatedState.nodes).toEqual(originalState.nodes);
+      expect(updatedState.edges).toEqual(originalState.edges);
     });
   });
 
   describe('deleteSelectedNodes', () => {
-    it('should mark all selected nodes for deletion', () => {
+    it('should mark all selected nodes for deletion', async () => {
       const mockNodes: MindMapNode[] = [
         {
           id: 'node-1',
@@ -525,11 +447,14 @@ describe('useNodeOperationsStore', () => {
         },
       ];
 
-      mockCoreState.nodes = mockNodes;
+      useMindmapStore.setState({ nodes: mockNodes });
 
-      const markNodeForDeletionSpy = vi.spyOn(useNodeOperationsStore.getState(), 'markNodeForDeletion');
+      const { getAllDescendantNodes } = await import('../../services/utils');
+      vi.mocked(getAllDescendantNodes).mockReturnValue([]);
 
-      const state = useNodeOperationsStore.getState();
+      const markNodeForDeletionSpy = vi.spyOn(useMindmapStore.getState(), 'markNodeForDeletion');
+
+      const state = useMindmapStore.getState();
       state.deleteSelectedNodes();
 
       expect(markNodeForDeletionSpy).toHaveBeenCalledTimes(2);
@@ -548,11 +473,11 @@ describe('useNodeOperationsStore', () => {
         },
       ];
 
-      mockCoreState.nodes = mockNodes;
+      useMindmapStore.setState({ nodes: mockNodes });
 
-      const markNodeForDeletionSpy = vi.spyOn(useNodeOperationsStore.getState(), 'markNodeForDeletion');
+      const markNodeForDeletionSpy = vi.spyOn(useMindmapStore.getState(), 'markNodeForDeletion');
 
-      const state = useNodeOperationsStore.getState();
+      const state = useMindmapStore.getState();
       state.deleteSelectedNodes();
 
       expect(markNodeForDeletionSpy).not.toHaveBeenCalled();

@@ -8,8 +8,8 @@ import {
 import { memo } from 'react';
 import type { MindMapEdge, PathType, RootNode } from '../../types';
 import { motion } from 'motion/react';
-import { useCoreStore } from '../../stores';
 import { getOppositePosition } from '../../services/utils';
+import { useMindmapStore } from '../../stores';
 
 const getEdgePath = (type: PathType, props: any) => {
   const { sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition } = props;
@@ -115,7 +115,7 @@ export const ConnectionLine = ({
   fromHandle,
   fromNode,
 }: ConnectionLineComponentProps) => {
-  const getRoot = useCoreStore((state) => state.getRoot);
+  const getRoot = useMindmapStore((state) => state.getRoot);
 
   const rootNode = getRoot(fromNode.id) as RootNode;
 

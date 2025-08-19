@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { useCoreStore } from '../core';
+import { useMindmapStore } from '../index';
 import { MINDMAP_TYPES, PATH_TYPES, SIDE } from '../../types';
 import type { MindMapNode, MindMapEdge } from '../../types';
 import * as reactFlowUtils from '@xyflow/react';
@@ -16,10 +16,10 @@ vi.mock('../../services/utils', () => ({
   getRootNodeOfSubtree: vi.fn(),
 }));
 
-describe('useCoreStore', () => {
+describe('coreSlice', () => {
   beforeEach(() => {
     // Reset store state before each test
-    useCoreStore.setState({
+    useMindmapStore.setState({
       nodes: [],
       edges: [],
     });
@@ -28,7 +28,7 @@ describe('useCoreStore', () => {
 
   describe('Initial State', () => {
     it('should initialize with empty nodes and edges arrays', () => {
-      const state = useCoreStore.getState();
+      const state = useMindmapStore.getState();
       expect(state.nodes).toEqual([]);
       expect(state.edges).toEqual([]);
     });
@@ -39,7 +39,7 @@ describe('useCoreStore', () => {
       const mockChanges = [{ id: 'node-1', type: 'position', position: { x: 100, y: 100 } }];
       const mockApplyNodeChanges = vi.mocked(reactFlowUtils.applyNodeChanges);
 
-      const state = useCoreStore.getState();
+      const state = useMindmapStore.getState();
       state.onNodesChange(mockChanges);
 
       expect(mockApplyNodeChanges).toHaveBeenCalledWith(mockChanges, []);
@@ -49,7 +49,7 @@ describe('useCoreStore', () => {
       const mockChanges = [{ id: 'edge-1', type: 'remove' }];
       const mockApplyEdgeChanges = vi.mocked(reactFlowUtils.applyEdgeChanges);
 
-      const state = useCoreStore.getState();
+      const state = useMindmapStore.getState();
       state.onEdgesChange(mockChanges);
 
       expect(mockApplyEdgeChanges).toHaveBeenCalledWith(mockChanges, []);
@@ -67,7 +67,7 @@ describe('useCoreStore', () => {
       const { getRootNodeOfSubtree } = await import('../../services/utils');
       vi.mocked(getRootNodeOfSubtree).mockReturnValue(null);
 
-      const state = useCoreStore.getState();
+      const state = useMindmapStore.getState();
       state.onConnect(mockConnection);
 
       expect(mockAddEdge).toHaveBeenCalledWith(
@@ -92,7 +92,7 @@ describe('useCoreStore', () => {
         targetHandle: 'target-handle',
       };
 
-      const state = useCoreStore.getState();
+      const state = useMindmapStore.getState();
       state.onConnect(mockConnection);
 
       expect(vi.mocked(reactFlowUtils.addEdge)).toHaveBeenCalledWith(
@@ -129,10 +129,10 @@ describe('useCoreStore', () => {
         },
       ];
 
-      const state = useCoreStore.getState();
+      const state = useMindmapStore.getState();
       state.setNodes(mockNodes);
 
-      expect(useCoreStore.getState().nodes).toEqual(mockNodes);
+      expect(useMindmapStore.getState().nodes).toEqual(mockNodes);
     });
 
     it('should set nodes with updater function', () => {
@@ -150,9 +150,9 @@ describe('useCoreStore', () => {
         },
       ];
 
-      useCoreStore.setState({ nodes: initialNodes });
+      useMindmapStore.setState({ nodes: initialNodes });
 
-      const state = useCoreStore.getState();
+      const state = useMindmapStore.getState();
       state.setNodes((nodes) => [
         ...nodes,
         {
@@ -168,8 +168,8 @@ describe('useCoreStore', () => {
         },
       ]);
 
-      expect(useCoreStore.getState().nodes).toHaveLength(2);
-      expect(useCoreStore.getState().nodes[1].id).toBe('node-2');
+      expect(useMindmapStore.getState().nodes).toHaveLength(2);
+      expect(useMindmapStore.getState().nodes[1].id).toBe('node-2');
     });
 
     it('should set edges with array', () => {
@@ -187,10 +187,10 @@ describe('useCoreStore', () => {
         },
       ];
 
-      const state = useCoreStore.getState();
+      const state = useMindmapStore.getState();
       state.setEdges(mockEdges);
 
-      expect(useCoreStore.getState().edges).toEqual(mockEdges);
+      expect(useMindmapStore.getState().edges).toEqual(mockEdges);
     });
 
     it('should set edges with updater function', () => {
@@ -208,9 +208,9 @@ describe('useCoreStore', () => {
         },
       ];
 
-      useCoreStore.setState({ edges: initialEdges });
+      useMindmapStore.setState({ edges: initialEdges });
 
-      const state = useCoreStore.getState();
+      const state = useMindmapStore.getState();
       state.setEdges((edges) => [
         ...edges,
         {
@@ -226,8 +226,8 @@ describe('useCoreStore', () => {
         },
       ]);
 
-      expect(useCoreStore.getState().edges).toHaveLength(2);
-      expect(useCoreStore.getState().edges[1].id).toBe('edge-2');
+      expect(useMindmapStore.getState().edges).toHaveLength(2);
+      expect(useMindmapStore.getState().edges[1].id).toBe('edge-2');
     });
   });
 
@@ -271,11 +271,11 @@ describe('useCoreStore', () => {
         },
       ];
 
-      useCoreStore.setState({ nodes: mockNodes });
+      useMindmapStore.setState({ nodes: mockNodes });
     });
 
     it('should get node by id', () => {
-      const state = useCoreStore.getState();
+      const state = useMindmapStore.getState();
       const node = state.getNode('node-2');
 
       expect(node).toBeDefined();
@@ -283,43 +283,43 @@ describe('useCoreStore', () => {
       expect(node?.data.content).toBe('Left Child');
     });
 
-    it('should return undefined for non-existent node', () => {
-      const state = useCoreStore.getState();
+    it('should return null for non-existent node', () => {
+      const state = useMindmapStore.getState();
       const node = state.getNode('non-existent');
 
-      expect(node).toBeUndefined();
+      expect(node).toBeNull();
     });
 
     it('should get correct node length', () => {
-      const state = useCoreStore.getState();
+      const state = useMindmapStore.getState();
       const length = state.getNodeLength();
 
       expect(length).toBe(3);
     });
 
     it('should check if node has left children', () => {
-      const state = useCoreStore.getState();
+      const state = useMindmapStore.getState();
       const hasLeftChildren = state.hasLeftChildren('node-1');
 
       expect(hasLeftChildren).toBe(true);
     });
 
     it('should check if node has right children', () => {
-      const state = useCoreStore.getState();
+      const state = useMindmapStore.getState();
       const hasRightChildren = state.hasRightChildren('node-1');
 
       expect(hasRightChildren).toBe(true);
     });
 
     it('should return false for node without left children', () => {
-      const state = useCoreStore.getState();
+      const state = useMindmapStore.getState();
       const hasLeftChildren = state.hasLeftChildren('node-2');
 
       expect(hasLeftChildren).toBe(false);
     });
 
     it('should return false for node without right children', () => {
-      const state = useCoreStore.getState();
+      const state = useMindmapStore.getState();
       const hasRightChildren = state.hasRightChildren('node-2');
 
       expect(hasRightChildren).toBe(false);
@@ -356,13 +356,13 @@ describe('useCoreStore', () => {
         },
       ];
 
-      useCoreStore.setState({ nodes: mockNodes, edges: mockEdges });
+      useMindmapStore.setState({ nodes: mockNodes, edges: mockEdges });
     });
 
     it('should log data without throwing errors', () => {
       const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
 
-      const state = useCoreStore.getState();
+      const state = useMindmapStore.getState();
       expect(() => state.logData()).not.toThrow();
 
       expect(consoleSpy).toHaveBeenCalledWith('Nodes:', expect.any(Array));
@@ -374,17 +374,17 @@ describe('useCoreStore', () => {
     it('should sync state with update function', () => {
       const mockUpdateNodeInternals = vi.fn();
 
-      const state = useCoreStore.getState();
+      const state = useMindmapStore.getState();
       state.syncState(mockUpdateNodeInternals);
 
       expect(mockUpdateNodeInternals).toHaveBeenCalledWith(['node-1']);
     });
 
     it('should handle syncState with empty nodes', () => {
-      useCoreStore.setState({ nodes: [] });
+      useMindmapStore.setState({ nodes: [] });
       const mockUpdateNodeInternals = vi.fn();
 
-      const state = useCoreStore.getState();
+      const state = useMindmapStore.getState();
       state.syncState(mockUpdateNodeInternals);
 
       expect(mockUpdateNodeInternals).toHaveBeenCalledWith([]);

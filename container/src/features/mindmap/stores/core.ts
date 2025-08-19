@@ -1,20 +1,20 @@
-import { create } from 'zustand';
+import { type StateCreator } from 'zustand';
 import { addEdge, applyNodeChanges, applyEdgeChanges } from '@xyflow/react';
 import type { Connection } from '@xyflow/react';
-import { devtools } from 'zustand/middleware';
 import type { MindMapNode, MindMapEdge } from '../types';
 import { MINDMAP_TYPES, PATH_TYPES } from '../types';
 import { SIDE } from '../types/constants';
 import { getRootNodeOfSubtree } from '../services/utils';
+import type { CombinedState } from './index';
 
-interface CoreState {
+export interface CoreState {
   nodes: MindMapNode[];
   edges: MindMapEdge[];
   onNodesChange: (changes: any) => void;
   onEdgesChange: (changes: any) => void;
   onConnect: (connection: Connection) => void;
-  getNode: (nodeId: string) => MindMapNode | undefined;
-  getRoot: (nodeId: string) => MindMapNode | undefined;
+  getNode: (nodeId: string) => MindMapNode | null;
+  getRoot: (nodeId: string) => MindMapNode | null;
   getNodeLength: () => number;
   setNodes: (updater: MindMapNode[] | ((nodes: MindMapNode[]) => MindMapNode[])) => void;
   setEdges: (updater: MindMapEdge[] | ((edges: MindMapEdge[]) => MindMapEdge[])) => void;
@@ -24,115 +24,117 @@ interface CoreState {
   syncState: (updateNodeInternals: any) => void;
 }
 
-export const useCoreStore = create<CoreState>()(
-  devtools(
-    (set, get) => ({
-      nodes: [],
-      edges: [],
+const coreSlice: StateCreator<
+  CombinedState,
+  [['zustand/devtools', never], ['zustand/persist', unknown]],
+  [],
+  CoreState
+> = (set, get): CoreState => ({
+  nodes: [],
+  edges: [],
 
-      onNodesChange: (changes) => {
-        set(
-          (state) => ({
-            nodes: applyNodeChanges(changes, state.nodes),
-          }),
-          false,
-          'mindmap/onNodesChange'
-        );
+  onNodesChange: (changes) => {
+    set(
+      (state) => ({
+        nodes: applyNodeChanges(changes, state.nodes),
+      }),
+      false,
+      'mindmap/onNodesChange'
+    );
+  },
+
+  onEdgesChange: (changes) => {
+    set(
+      (state) => ({
+        edges: applyEdgeChanges(changes, state.edges),
+      }),
+      false,
+      'mindmap/onEdgesChange'
+    );
+  },
+
+  onConnect: (connection) => {
+    const { nodes } = get();
+
+    // Try to find the root node from either source or target
+    const sourceRootNode = getRootNodeOfSubtree(connection.source!, nodes);
+    const targetRootNode = getRootNodeOfSubtree(connection.target!, nodes);
+    const rootNode = sourceRootNode || targetRootNode;
+    const pathType = rootNode?.data?.pathType || PATH_TYPES.SMOOTHSTEP;
+
+    const edge = {
+      ...connection,
+      type: MINDMAP_TYPES.EDGE,
+      data: {
+        strokeColor: 'var(--primary)',
+        strokeWidth: 2,
+        pathType,
       },
+    };
 
-      onEdgesChange: (changes) => {
-        set(
-          (state) => ({
-            edges: applyEdgeChanges(changes, state.edges),
-          }),
-          false,
-          'mindmap/onEdgesChange'
-        );
-      },
+    set(
+      (state) => ({
+        edges: addEdge(edge, state.edges),
+      }),
+      false,
+      'mindmap/onConnect'
+    );
+  },
 
-      onConnect: (connection) => {
-        const { nodes } = get();
+  setNodes: (updater) => {
+    set(
+      (state) => ({
+        nodes: typeof updater === 'function' ? updater(state.nodes) : updater,
+      }),
+      false,
+      'mindmap/setNodes'
+    );
+  },
 
-        // Try to find the root node from either source or target
-        const sourceRootNode = getRootNodeOfSubtree(connection.source!, nodes);
-        const targetRootNode = getRootNodeOfSubtree(connection.target!, nodes);
-        const rootNode = sourceRootNode || targetRootNode;
-        const pathType = rootNode?.data?.pathType || PATH_TYPES.SMOOTHSTEP;
+  setEdges: (updater) => {
+    set(
+      (state) => ({
+        edges: typeof updater === 'function' ? updater(state.edges) : updater,
+      }),
+      false,
+      'mindmap/setEdges'
+    );
+  },
 
-        const edge = {
-          ...connection,
-          type: MINDMAP_TYPES.EDGE,
-          data: {
-            strokeColor: 'var(--primary)',
-            strokeWidth: 2,
-            pathType,
-          },
-        };
+  getNode: (nodeId: string) => {
+    const { nodes } = get();
+    return nodes.find((node) => node.id === nodeId) || null;
+  },
 
-        set(
-          (state) => ({
-            edges: addEdge(edge, state.edges),
-          }),
-          false,
-          'mindmap/onConnect'
-        );
-      },
+  getRoot: (nodeId: string) => {
+    const { nodes } = get();
+    return getRootNodeOfSubtree(nodeId, nodes);
+  },
 
-      setNodes: (updater) => {
-        set(
-          (state) => ({
-            nodes: typeof updater === 'function' ? updater(state.nodes) : updater,
-          }),
-          false,
-          'mindmap/setNodes'
-        );
-      },
+  getNodeLength: () => {
+    return get().nodes.length;
+  },
 
-      setEdges: (updater) => {
-        set(
-          (state) => ({
-            edges: typeof updater === 'function' ? updater(state.edges) : updater,
-          }),
-          false,
-          'mindmap/setEdges'
-        );
-      },
+  hasLeftChildren: (nodeId: string) => {
+    const { nodes } = get();
+    return nodes.some((node) => node.data.parentId === nodeId && node.data.side === SIDE.LEFT);
+  },
 
-      getNode: (nodeId: string) => {
-        const { nodes } = get();
-        return nodes.find((node) => node.id === nodeId);
-      },
+  hasRightChildren: (nodeId: string) => {
+    const { nodes } = get();
+    return nodes.some((node) => node.data.parentId === nodeId && node.data.side === SIDE.RIGHT);
+  },
 
-      getRoot: (nodeId: string) => {
-        const { nodes } = get();
-        return getRootNodeOfSubtree(nodeId, nodes);
-      },
+  logData: () => {
+    const { nodes, edges } = get();
+    console.log('Nodes:', nodes);
+    console.log('Edges:', edges);
+  },
 
-      getNodeLength: () => {
-        return get().nodes.length;
-      },
+  syncState: (updateNodeInternals: any) => {
+    const { nodes } = get();
+    updateNodeInternals(nodes.map((node) => node.id));
+  },
+});
 
-      hasLeftChildren: (nodeId: string) => {
-        const { nodes } = get();
-        return nodes.some((node) => node.data.parentId === nodeId && node.data.side === SIDE.LEFT);
-      },
-
-      hasRightChildren: (nodeId: string) => {
-        const { nodes } = get();
-        return nodes.some((node) => node.data.parentId === nodeId && node.data.side === SIDE.RIGHT);
-      },
-
-      logData: () => {
-        const { nodes, edges } = get();
-        console.log('Nodes:', nodes);
-        console.log('Edges:', edges);
-      },
-
-      syncState: (updateNodeInternals: any) => {
-        const { nodes } = get();
-        updateNodeInternals(nodes.map((node) => node.id));
-      },
-    }),
-    { name: 'CoreStore' }
-  )
-);
+export default coreSlice;

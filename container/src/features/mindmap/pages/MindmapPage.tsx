@@ -7,13 +7,13 @@ import { Flow, LogicHandler, Instructions, Toolbar } from '@/features/mindmap/co
 import { useState, useEffect } from 'react';
 import { useLoaderData } from 'react-router-dom';
 import type { MindmapData } from '@/features/mindmap/types/service';
-import { useCoreStore } from '../stores';
+import { useMindmapStore } from '../stores';
 
 const MindmapPage = () => {
   const [isPanOnDrag, setIsPanOnDrag] = useState(false);
   const loaderData = useLoaderData() as { mindmap: MindmapData };
-  const setNodes = useCoreStore((state) => state.setNodes);
-  const setEdges = useCoreStore((state) => state.setEdges);
+  const setNodes = useMindmapStore((state) => state.setNodes);
+  const setEdges = useMindmapStore((state) => state.setEdges);
 
   useEffect(() => {
     if (loaderData?.mindmap) {

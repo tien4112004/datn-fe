@@ -9,8 +9,7 @@ import { BaseNodeContent } from '../ui/base-node';
 import { useMindmapNodeCommon } from '../../hooks';
 import type { NodeProps } from '@xyflow/react';
 import RichTextEditor from '@/components/rte/RichTextEditor';
-import { useNodeOperationsStore } from '../../stores';
-import { useLayoutStore } from '../../stores/layout';
+import { useMindmapStore } from '../../stores';
 import { Button } from '@/components/ui/button';
 import { Network } from 'lucide-react';
 
@@ -22,8 +21,8 @@ const TextNodeBlock = memo(
       node,
     });
 
-    const updateNodeData = useNodeOperationsStore((state) => state.updateNodeDataWithUndo);
-    const updateSubtreeLayout = useLayoutStore((state) => state.updateSubtreeLayout);
+    const updateNodeData = useMindmapStore((state) => state.updateNodeDataWithUndo);
+    const updateSubtreeLayout = useMindmapStore((state) => state.updateSubtreeLayout);
 
     const [isEditing, setIsEditing] = useState(false);
 

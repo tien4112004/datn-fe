@@ -1,9 +1,4 @@
-import {
-  useCoreStore,
-  useLayoutStore,
-  useNodeManipulationStore,
-  useNodeOperationsStore,
-} from '@/features/mindmap/stores';
+import { useMindmapStore } from '@/features/mindmap/stores';
 import { ArrowLeftFromLine, ArrowRightFromLine, Plus, Type, Square, Image } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/shared/components/ui/popover';
@@ -27,11 +22,11 @@ export const CreateChildNodeButtons = memo(
     const canCreateLeft = node.data.side === SIDE.LEFT || node.data.side === SIDE.MID;
     const canCreateRight = node.data.side === SIDE.RIGHT || node.data.side === SIDE.MID;
 
-    const toggleCollapse = useNodeManipulationStore((state) => state.toggleCollapse);
-    const hasLeftChildren = useCoreStore((state) => state.hasLeftChildren);
-    const hasRightChildren = useCoreStore((state) => state.hasRightChildren);
-    const addChildNodeStore = useNodeOperationsStore((state) => state.addChildNode);
-    const layoutSubtree = useLayoutStore((state) => state.updateSubtreeLayout);
+    const toggleCollapse = useMindmapStore((state) => state.toggleCollapse);
+    const hasLeftChildren = useMindmapStore((state) => state.hasLeftChildren);
+    const hasRightChildren = useMindmapStore((state) => state.hasRightChildren);
+    const addChildNodeStore = useMindmapStore((state) => state.addChildNode);
+    const layoutSubtree = useMindmapStore((state) => state.updateSubtreeLayout);
 
     const addChildNode = useCallback((side: Side, type: MindMapTypes) => {
       toggleCollapse(node.id, side, false);

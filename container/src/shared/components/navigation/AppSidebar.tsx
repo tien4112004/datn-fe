@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Bell, BookOpen, Command, File, Home, Plus, Settings2 } from 'lucide-react';
+import { Bell, BookOpen, CalendarDays, Command, File, FolderClosed, Home, Users } from 'lucide-react';
 
 import { NavMain } from '@/shared/components/navigation/NavMain';
 // import { NavSubjects } from '@/shared/components/navigation/NavSubjects';
@@ -23,7 +23,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     user: {
       name: 'Boss',
       email: 'luuthaiton@example.com',
-      avatar: '/avatars/shadcn.jpg',
+      avatar: '',
     },
     navMain: [
       {
@@ -32,70 +32,29 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         icon: Home,
       },
       {
-        title: t('create'),
-        url: '#',
-        icon: Plus,
-      },
-      {
-        title: t('resources.index'),
+        title: t('projects'),
+        url: '/presentation',
         icon: File,
-        items: [
-          {
-            title: t('resources.files'),
-            url: '#',
-          },
-          {
-            title: t('resources.presentations'),
-            url: '/presentation',
-          },
-          {
-            title: t('resources.lectures'),
-            url: '#',
-          },
-          {
-            title: t('resources.exercises'),
-            url: '#',
-          },
-          {
-            title: t('resources.videos'),
-            url: '#',
-          },
-          {
-            title: t('resources.images'),
-            url: '#',
-          },
-          {
-            title: t('resources.mindmaps'),
-            url: '#',
-          },
-        ],
       },
       {
-        title: t('management.index'),
-        icon: BookOpen,
-        items: [
-          {
-            title: t('management.classes'),
-            url: '#',
-          },
-          {
-            title: t('management.groups'),
-            url: '#',
-          },
-          {
-            title: t('management.subjects'),
-            url: '#',
-          },
-          {
-            title: t('management.schedules'),
-            url: '#',
-          },
-        ],
-      },
-      {
-        title: t('settings'),
+        title: t('files'),
         url: '#',
-        icon: Settings2,
+        icon: FolderClosed,
+      },
+      {
+        title: t('classes'),
+        url: '#',
+        icon: Users,
+      },
+      {
+        title: t('subjects'),
+        url: '#',
+        icon: BookOpen,
+      },
+      {
+        title: t('schedules'),
+        url: '#',
+        icon: CalendarDays,
       },
     ],
     navSecondary: [
@@ -131,7 +90,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
                   <Command className="size-4" />
                 </div>
-                <div className="grid flex-1 text-left text-sm leading-tight">
+                <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=lg-icon]:hidden">
                   <span className="truncate font-medium">PrimaryToolbox</span>
                   <span className="truncate text-xs">{t('slogan')}</span>
                 </div>

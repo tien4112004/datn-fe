@@ -1,11 +1,11 @@
 <template>
   <div class="editor-header">
     <div class="left">
-      <button class="menu-item" @click="handleToggleSidebar">
+      <!-- <button class="menu-item" @click="handleToggleSidebar">
         <div class="handler-item">
           <IconMoreApp />
         </div>
-      </button>
+      </button> -->
 
       <div class="title">
         <Input
@@ -178,9 +178,9 @@ const editingTitle = ref(false);
 const titleInputRef = ref<InstanceType<typeof Input>>();
 const titleValue = ref('');
 
-const handleToggleSidebar = () => {
-  document.dispatchEvent(new CustomEvent('toggleSidebar', {}));
-};
+// const handleToggleSidebar = () => {
+//   document.dispatchEvent(new CustomEvent('toggleSidebar', {}));
+// };
 
 const startEditTitle = () => {
   titleValue.value = title.value;

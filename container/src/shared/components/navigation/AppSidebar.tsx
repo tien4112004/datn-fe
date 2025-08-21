@@ -11,8 +11,9 @@ import {
   SidebarFooter,
   SidebarHeader,
   SidebarMenu,
-  SidebarMenuButton,
+  // SidebarMenuButton,
   SidebarMenuItem,
+  SidebarTrigger,
 } from '@/shared/components/ui/sidebar';
 import { useTranslation } from 'react-i18next';
 
@@ -64,20 +65,20 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         icon: Bell,
       },
     ],
-    subjects: [
-      {
-        name: t('subjects.math'),
-        url: '#',
-      },
-      {
-        name: t('subjects.vietnamese'),
-        url: '#',
-      },
-      {
-        name: t('subjects.english'),
-        url: '#',
-      },
-    ],
+    // subjects: [
+    //   {
+    //     name: t('subjects.math'),
+    //     url: '#',
+    //   },
+    //   {
+    //     name: t('subjects.vietnamese'),
+    //     url: '#',
+    //   },
+    //   {
+    //     name: t('subjects.english'),
+    //     url: '#',
+    //   },
+    // ],
   };
 
   return (
@@ -85,7 +86,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="lg" asChild>
+            {/* <SidebarMenuButton size="lg" asChild>
               <div>
                 <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
                   <Command className="size-4" />
@@ -95,7 +96,20 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   <span className="truncate text-xs">{t('slogan')}</span>
                 </div>
               </div>
-            </SidebarMenuButton>
+            </SidebarMenuButton> */}
+            <div className="outline-hidden ring-sidebar-ring group-data-[collapsible=lg-icon]:h-14! my-auto flex h-12 w-full flex-row items-center justify-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm transition-[width,height,padding] group-data-[collapsible=lg-icon]:flex-col group-data-[collapsible=lg-icon]:text-xs [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0">
+              <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
+                <Command className="size-4" />
+                <div className="absolute opacity-0 transition-opacity hover:opacity-100 group-data-[state=expanded]:hidden">
+                  <SidebarTrigger className="size-8" />
+                </div>
+              </div>
+              <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=lg-icon]:hidden">
+                <span className="truncate font-medium">PrimaryToolbox</span>
+                <span className="truncate text-xs">{t('slogan')}</span>
+              </div>
+              <SidebarTrigger className="group-data-[collapsible=lg-icon]:hidden" />
+            </div>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>

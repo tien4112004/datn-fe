@@ -1,18 +1,25 @@
 'use client';
 
-import { ChevronRight, type LucideIcon } from 'lucide-react';
+import {
+  // ChevronRight,
+  type LucideIcon,
+} from 'lucide-react';
 
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/shared/components/ui/collapsible';
+import {
+  Collapsible,
+  // CollapsibleContent,
+  // CollapsibleTrigger
+} from '@/shared/components/ui/collapsible';
 import {
   SidebarGroup,
   SidebarGroupLabel,
   SidebarMenu,
-  SidebarMenuAction,
+  // SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
+  // SidebarMenuSub,
+  // SidebarMenuSubButton,
+  // SidebarMenuSubItem,
 } from '@/shared/components/ui/sidebar';
 import { useTranslation } from 'react-i18next';
 import { NavLink } from 'react-router-dom';
@@ -50,19 +57,22 @@ export function NavMain({
       <SidebarMenu>
         {items.map((item) => (
           <Collapsible key={item.title} asChild defaultOpen={item.isExpanded}>
-            {item.url ? (
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip={item.title}>
-                  <NavLink to={item.url}>
-                    <item.icon />
-                    <span>{item.title}</span>
-                  </NavLink>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            ) : (
-              <SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                asChild
+                // tooltip={item.title}
+              >
+                <NavLink to={item.url}>
+                  <item.icon />
+                  <span>{item.title}</span>
+                </NavLink>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            {/* <SidebarMenuItem>
                 <CollapsibleTrigger asChild>
-                  <SidebarMenuButton tooltip={item.title} className="group">
+                  <SidebarMenuButton 
+                    tooltip={item.title} 
+                    className="group">
                     <item.icon />
                     <span>{item.title}</span>
                     <SidebarMenuAction>
@@ -84,8 +94,7 @@ export function NavMain({
                     ))}
                   </SidebarMenuSub>
                 </CollapsibleContent>
-              </SidebarMenuItem>
-            )}
+              </SidebarMenuItem> */}
           </Collapsible>
         ))}
       </SidebarMenu>

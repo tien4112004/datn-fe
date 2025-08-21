@@ -48,6 +48,7 @@ vi.mock('lucide-react', () => ({
   BadgeCheck: () => <div data-testid="badge-check-icon" />,
   CreditCard: () => <div data-testid="credit-card-icon" />,
   LogOut: () => <div data-testid="log-out-icon" />,
+  Settings: () => <div data-testid="settings-icon" />,
 }));
 
 describe('NavUser', () => {

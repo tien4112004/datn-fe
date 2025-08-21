@@ -56,10 +56,7 @@ describe('NavMain', () => {
   const groupItem = {
     title: 'Settings',
     icon: MockIcon,
-    items: [
-      { title: 'Profile', url: '/settings/profile' },
-      { title: 'Account', url: '/settings/account' },
-    ],
+    url: '/settings',
     isActive: false,
   } as any;
   const items = [directLinkItem, groupItem];
@@ -72,36 +69,10 @@ describe('NavMain', () => {
     expect(screen.getByTestId('mock-icon')).toBeInTheDocument();
   });
 
-  it('renders group items as collapsible', () => {
-    render(<NavMain items={[groupItem]} />);
-    expect(screen.getByTestId('sidebar-menu')).toBeInTheDocument();
-    expect(screen.getByText('Settings')).toBeInTheDocument();
-    expect(screen.getByTestId('collapsible')).toBeInTheDocument();
-    expect(screen.getByTestId('collapsible-trigger')).toBeInTheDocument();
-    expect(screen.getByTestId('mock-icon')).toBeInTheDocument();
-  });
-
-  it('renders sub-items inside collapsible group', () => {
-    render(<NavMain items={[groupItem]} />);
-    expect(screen.getByText('Profile')).toBeInTheDocument();
-    expect(screen.getByText('Account')).toBeInTheDocument();
-    // Sub-items should have correct links
-    const profileLink = screen
-      .getAllByTestId('nav-link')
-      .find((a) => a.getAttribute('href') === '/settings/profile');
-    const accountLink = screen
-      .getAllByTestId('nav-link')
-      .find((a) => a.getAttribute('href') === '/settings/account');
-    expect(profileLink).toBeInTheDocument();
-    expect(accountLink).toBeInTheDocument();
-  });
-
   it('renders both direct links and groups', () => {
     render(<NavMain items={items} />);
     expect(screen.getByText('Dashboard')).toBeInTheDocument();
     expect(screen.getByText('Settings')).toBeInTheDocument();
-    expect(screen.getByText('Profile')).toBeInTheDocument();
-    expect(screen.getByText('Account')).toBeInTheDocument();
   });
 
   it('applies active state to group and sub-items', () => {

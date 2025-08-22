@@ -46,5 +46,8 @@ export default defineConfig(({ mode }) => {
         '@ui': path.resolve(__dirname, './src/shared/components/ui'),
       },
     },
+    preview: {
+      allowedHosts: ['*'],
+    },
   };
 });

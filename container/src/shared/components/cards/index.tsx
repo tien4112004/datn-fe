@@ -19,7 +19,7 @@ import {
   BreadcrumbSeparator,
 } from '../ui/breadcrumb';
 import { Separator } from '@radix-ui/react-separator';
-import { SidebarTrigger } from '../ui/sidebar';
+// import { SidebarTrigger } from '../ui/sidebar';
 import { useApi } from '@/features/demo/hooks/useApi';
 import { Button } from '@ui/button';
 
@@ -29,7 +29,7 @@ export default function CardsDemo() {
   return (
     <>
       <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
-        <SidebarTrigger className="-ml-1" />
+        {/* <SidebarTrigger className="-ml-1" /> */}
         <Separator orientation="vertical" className="mr-2 data-[orientation=vertical]:h-4" />
         <Breadcrumb>
           <BreadcrumbList>

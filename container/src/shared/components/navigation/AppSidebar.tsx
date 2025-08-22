@@ -39,29 +39,29 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       },
       {
         title: t('files'),
-        url: '#',
+        url: '/files',
         icon: FolderClosed,
       },
       {
         title: t('classes'),
-        url: '#',
+        url: '/classes',
         icon: Users,
       },
       {
         title: t('subjects'),
-        url: '#',
+        url: '/subjects',
         icon: BookOpen,
       },
       {
         title: t('schedules'),
-        url: '#',
+        url: '/schedules',
         icon: CalendarDays,
       },
     ],
     navSecondary: [
       {
         title: t('notification'),
-        url: '#',
+        url: '/notification',
         icon: Bell,
       },
     ],

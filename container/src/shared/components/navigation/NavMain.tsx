@@ -12,7 +12,7 @@ import {
 } from '@/shared/components/ui/collapsible';
 import {
   SidebarGroup,
-  SidebarGroupLabel,
+  // SidebarGroupLabel,
   SidebarMenu,
   // SidebarMenuAction,
   SidebarMenuButton,
@@ -21,31 +21,20 @@ import {
   // SidebarMenuSubButton,
   // SidebarMenuSubItem,
 } from '@/shared/components/ui/sidebar';
-import { useTranslation } from 'react-i18next';
-import { NavLink } from 'react-router-dom';
+// import { useTranslation } from 'react-i18next';
+import { NavLink, type NavLinkRenderProps } from 'react-router-dom';
 
 export function NavMain({
   items,
 }: {
-  items: ({
+  items: {
     title: string;
     icon: LucideIcon;
     isExpanded?: boolean;
-  } & (
-    | {
-        url: string;
-        items?: never;
-      }
-    | {
-        url?: never;
-        items: {
-          title: string;
-          url: string;
-        }[];
-      }
-  ))[];
+    url: string;
+  }[];
 }) {
-  const { t } = useTranslation('navSidebar');
+  // const { t } = useTranslation('navSidebar');
 
   if (items.length === 0) {
     return null;
@@ -53,20 +42,19 @@ export function NavMain({
 
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>{t('features')}</SidebarGroupLabel>
+      {/* <SidebarGroupLabel>{t('features')}</SidebarGroupLabel> */}
       <SidebarMenu>
         {items.map((item) => (
           <Collapsible key={item.title} asChild defaultOpen={item.isExpanded}>
             <SidebarMenuItem>
-              <SidebarMenuButton
-                asChild
-                // tooltip={item.title}
-              >
-                <NavLink to={item.url}>
-                  <item.icon />
-                  <span>{item.title}</span>
-                </NavLink>
-              </SidebarMenuButton>
+              <NavLink to={item.url} asChild>
+                {({ isActive }: NavLinkRenderProps) => (
+                  <SidebarMenuButton isActive={isActive}>
+                    <item.icon />
+                    <span>{item.title}</span>
+                  </SidebarMenuButton>
+                )}
+              </NavLink>
             </SidebarMenuItem>
             {/* <SidebarMenuItem>
                 <CollapsibleTrigger asChild>

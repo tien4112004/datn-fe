@@ -151,7 +151,6 @@ const ShapeNodeBlock = memo(
     );
   },
   (prevProps, nextProps) => {
-    // Only re-render if these specific properties change
     return (
       prevProps.id === nextProps.id &&
       prevProps.data === nextProps.data &&

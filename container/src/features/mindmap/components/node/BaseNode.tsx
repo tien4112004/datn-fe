@@ -16,7 +16,6 @@ export interface BaseNodeBlockProps extends Omit<HTMLAttributes<HTMLDivElement>,
   variant?: 'card' | 'replacing';
 }
 
-// Optimized store selectors
 const clipboardSelector = (state: any) => state.dragTargetNodeId;
 
 export const BaseNodeBlock = memo(

@@ -3,7 +3,6 @@ import { useClipboardStore } from '../clipboard';
 import { useCoreStore } from '../core';
 import { MINDMAP_TYPES, PATH_TYPES, SIDE } from '../../types';
 import type { MindMapNode, MindMapEdge } from '../../types';
-import { Deque } from '@datastructures-js/deque';
 
 // Mock external dependencies
 vi.mock('../core', () => ({
@@ -24,8 +23,6 @@ describe('useClipboardStore', () => {
     useClipboardStore.setState({
       cloningNodes: [],
       cloningEdges: [],
-      undoStack: new Deque(),
-      redoStack: new Deque(),
       mousePosition: { x: 0, y: 0 },
       offset: 0,
       dragTargetNodeId: null,
@@ -349,7 +346,7 @@ describe('useClipboardStore', () => {
       newNodes.forEach((node: any) => {
         expect(node.selected).toBe(true);
         expect(node.id).toMatch(/mock-id-/);
-        expect(node.data.content).toMatch(/Cloned:/);
+        expect(node.data.content).toEqual(expect.stringContaining('Original Node'));
         expect(node.data.metadata?.oldId).toBeTruthy();
       });
     });

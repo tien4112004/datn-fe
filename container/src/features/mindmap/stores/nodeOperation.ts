@@ -24,9 +24,8 @@ interface NodeOperationsState {
   ) => void;
   updateNodeData: (nodeId: string, updates: Partial<MindMapNode['data']>) => void;
   updateNodeDataWithUndo: (nodeId: string, updates: Partial<MindMapNode['data']>) => void;
-  markNodeForDeletion: (nodeId: string) => void;
-  finalizeNodeDeletion: (nodeId: string) => void;
-  deleteSelectedNodes: () => void;
+  markNodeForDeletion: () => void;
+  finalizeNodeDeletion: () => void;
 }
 
 export const useNodeOperationsStore = create<NodeOperationsState>()(
@@ -137,52 +136,7 @@ export const useNodeOperationsStore = create<NodeOperationsState>()(
         pushToUndoStack();
       },
 
-      markNodeForDeletion: (nodeId: string) => {
-        const { nodes, setNodes, setEdges } = useCoreStore.getState();
-        const { prepareToPushUndo, pushToUndoStack } = useUndoRedoStore.getState();
-        prepareToPushUndo();
-
-        const descendantNodes = getAllDescendantNodes(nodeId, nodes);
-        const nodeIdsToDelete = new Set([nodeId, ...descendantNodes.map((n) => n.id)]);
-
-        set({ nodesToBeDeleted: nodeIdsToDelete });
-
-        setNodes((state) =>
-          state.map((node: MindMapNode) =>
-            nodeIdsToDelete.has(node.id) ? { ...node, data: { ...node.data, isDeleting: true } } : node
-          )
-        );
-
-        setEdges((state) =>
-          state.map((edge: MindMapEdge) =>
-            nodeIdsToDelete.has(edge.source) || nodeIdsToDelete.has(edge.target)
-              ? { ...edge, data: { ...edge.data, isDeleting: true } }
-              : edge
-          )
-        );
-
-        pushToUndoStack();
-      },
-
-      finalizeNodeDeletion: (nodeId: string) => {
-        const { nodes, setNodes, setEdges } = useCoreStore.getState();
-
-        if (!get().nodesToBeDeleted.has(nodeId)) {
-          return;
-        }
-
-        const descendantNodes = getAllDescendantNodes(nodeId, nodes);
-        const nodeIdsToDelete = new Set([nodeId, ...descendantNodes.map((n) => n.id)]);
-
-        setNodes((state) => state.filter((node) => !nodeIdsToDelete.has(node.id)));
-        setEdges((state) =>
-          state.filter((edge) => !nodeIdsToDelete.has(edge.source) && !nodeIdsToDelete.has(edge.target))
-        );
-
-        set({ nodesToBeDeleted: new Set() });
-      },
-
-      deleteSelectedNodes: () => {
+      markNodeForDeletion: () => {
         const { nodes, setNodes, setEdges } = useCoreStore.getState();
         const { prepareToPushUndo, pushToUndoStack } = useUndoRedoStore.getState();
         prepareToPushUndo();
@@ -197,13 +151,37 @@ export const useNodeOperationsStore = create<NodeOperationsState>()(
           descendantNodes.forEach((descendant) => allNodesToDelete.add(descendant.id));
         });
 
-        // Permanently remove nodes and edges
-        setNodes((state) => state.filter((node) => !allNodesToDelete.has(node.id)));
+        set({ nodesToBeDeleted: allNodesToDelete });
+
+        setNodes((state) =>
+          state.map((node: MindMapNode) =>
+            allNodesToDelete.has(node.id) ? { ...node, data: { ...node.data, isDeleting: true } } : node
+          )
+        );
+
         setEdges((state) =>
-          state.filter((edge) => !allNodesToDelete.has(edge.source) && !allNodesToDelete.has(edge.target))
+          state.map((edge: MindMapEdge) =>
+            allNodesToDelete.has(edge.source) || allNodesToDelete.has(edge.target)
+              ? { ...edge, data: { ...edge.data, isDeleting: true } }
+              : edge
+          )
         );
 
         pushToUndoStack();
+      },
+
+      finalizeNodeDeletion: () => {
+        const { setNodes, setEdges } = useCoreStore.getState();
+
+        const nodeIdsToDelete = get().nodesToBeDeleted;
+        if (nodeIdsToDelete.size === 0) return;
+
+        setNodes((state) => state.filter((node) => !nodeIdsToDelete.has(node.id)));
+        setEdges((state) =>
+          state.filter((edge) => !nodeIdsToDelete.has(edge.source) && !nodeIdsToDelete.has(edge.target))
+        );
+
+        set({ nodesToBeDeleted: new Set() });
       },
     }),
     { name: 'NodeOperationsStore' }

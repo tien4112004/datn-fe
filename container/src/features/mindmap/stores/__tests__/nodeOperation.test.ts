@@ -342,12 +342,13 @@ describe('useNodeOperationsStore', () => {
   });
 
   describe('markNodeForDeletion', () => {
-    it('should mark node and descendants for deletion', async () => {
+    it('should mark selected nodes and descendants for deletion', async () => {
       const mockNodes: MindMapNode[] = [
         {
           id: 'parent-1',
           type: MINDMAP_TYPES.TEXT_NODE,
           position: { x: 0, y: 0 },
+          selected: true,
           data: {
             level: 1,
             content: 'Parent',
@@ -364,6 +365,18 @@ describe('useNodeOperationsStore', () => {
             content: 'Child',
             parentId: 'parent-1',
             side: SIDE.LEFT,
+            isCollapsed: false,
+          },
+        },
+        {
+          id: 'unselected-1',
+          type: MINDMAP_TYPES.TEXT_NODE,
+          position: { x: 200, y: 200 },
+          selected: false,
+          data: {
+            level: 1,
+            content: 'Unselected',
+            side: SIDE.RIGHT,
             isCollapsed: false,
           },
         },
@@ -403,7 +416,7 @@ describe('useNodeOperationsStore', () => {
       ]);
 
       const state = useNodeOperationsStore.getState();
-      state.markNodeForDeletion('parent-1');
+      state.markNodeForDeletion();
 
       expect(mockUndoRedoState.prepareToPushUndo).toHaveBeenCalled();
       expect(mockUndoRedoState.pushToUndoStack).toHaveBeenCalled();
@@ -419,6 +432,7 @@ describe('useNodeOperationsStore', () => {
 
       expect(nodeResult[0].data.isDeleting).toBe(true);
       expect(nodeResult[1].data.isDeleting).toBe(true);
+      expect(nodeResult[2].data.isDeleting).toBeUndefined(); // unselected node should not be marked
 
       // Check that edges are marked with isDeleting flag
       expect(mockCoreState.setEdges).toHaveBeenCalled();
@@ -469,7 +483,7 @@ describe('useNodeOperationsStore', () => {
       });
 
       const state = useNodeOperationsStore.getState();
-      state.finalizeNodeDeletion('delete-1');
+      state.finalizeNodeDeletion();
 
       expect(mockCoreState.setNodes).toHaveBeenCalled();
       expect(mockCoreState.setEdges).toHaveBeenCalled();
@@ -497,70 +511,10 @@ describe('useNodeOperationsStore', () => {
       });
 
       const state = useNodeOperationsStore.getState();
-      state.finalizeNodeDeletion('delete-1');
+      state.finalizeNodeDeletion();
 
       expect(mockCoreState.setNodes).not.toHaveBeenCalled();
       expect(mockCoreState.setEdges).not.toHaveBeenCalled();
-    });
-  });
-
-  describe('deleteSelectedNodes', () => {
-    it('should mark all selected nodes for deletion', () => {
-      const mockNodes: MindMapNode[] = [
-        {
-          id: 'node-1',
-          type: MINDMAP_TYPES.TEXT_NODE,
-          position: { x: 0, y: 0 },
-          selected: true,
-          data: { level: 1, content: 'Selected', side: SIDE.LEFT, isCollapsed: false },
-        },
-        {
-          id: 'node-2',
-          type: MINDMAP_TYPES.TEXT_NODE,
-          position: { x: 100, y: 100 },
-          selected: false,
-          data: { level: 1, content: 'Not Selected', side: SIDE.RIGHT, isCollapsed: false },
-        },
-        {
-          id: 'node-3',
-          type: MINDMAP_TYPES.TEXT_NODE,
-          position: { x: 200, y: 200 },
-          selected: true,
-          data: { level: 1, content: 'Also Selected', side: SIDE.LEFT, isCollapsed: false },
-        },
-      ];
-
-      mockCoreState.nodes = mockNodes;
-
-      const markNodeForDeletionSpy = vi.spyOn(useNodeOperationsStore.getState(), 'markNodeForDeletion');
-
-      const state = useNodeOperationsStore.getState();
-      state.deleteSelectedNodes();
-
-      expect(markNodeForDeletionSpy).toHaveBeenCalledTimes(2);
-      expect(markNodeForDeletionSpy).toHaveBeenCalledWith('node-1');
-      expect(markNodeForDeletionSpy).toHaveBeenCalledWith('node-3');
-    });
-
-    it('should handle no selected nodes gracefully', () => {
-      const mockNodes: MindMapNode[] = [
-        {
-          id: 'node-1',
-          type: MINDMAP_TYPES.TEXT_NODE,
-          position: { x: 0, y: 0 },
-          selected: false,
-          data: { level: 1, content: 'Not Selected', side: SIDE.LEFT, isCollapsed: false },
-        },
-      ];
-
-      mockCoreState.nodes = mockNodes;
-
-      const markNodeForDeletionSpy = vi.spyOn(useNodeOperationsStore.getState(), 'markNodeForDeletion');
-
-      const state = useNodeOperationsStore.getState();
-      state.deleteSelectedNodes();
-
-      expect(markNodeForDeletionSpy).not.toHaveBeenCalled();
     });
   });
 });

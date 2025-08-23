@@ -35,21 +35,17 @@ const nodeManipulationSelector = (state: any) => ({
 export const useMindmapNodeCommon = <T extends BaseNode = BaseNode>({
   node,
 }: UseNodeCommonProps<T>): UseNodeCommonReturn => {
-  // Use shallow comparison to prevent unnecessary re-renders
   const { layout, isLayouting } = useLayoutStore(useShallow(layoutSelector));
   const { onNodeDelete } = useNodeOperationsStore(useShallow(nodeOperationsSelector));
   const { moveToChild } = useNodeManipulationStore(useShallow(nodeManipulationSelector));
 
-  // React Flow hooks
   const updateNodeInternals = useUpdateNodeInternals();
 
-  // Memoize the update function to prevent recreating it on every render
   const updateThisNodeInternals = useMemo(
     () => () => updateNodeInternals(node.id),
     [updateNodeInternals, node.id]
   );
 
-  // Only update internals when layout actually changes, not on every render
   useEffect(() => {
     if (!isLayouting) {
       updateThisNodeInternals();

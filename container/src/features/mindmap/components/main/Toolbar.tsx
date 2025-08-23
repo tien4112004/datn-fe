@@ -9,7 +9,7 @@ import type { Direction } from '../../types';
 
 const Toolbar = () => {
   const addNode = useNodeOperationsStore((state) => state.addNode);
-  const deleteSelectedNodes = useNodeOperationsStore((state) => state.deleteSelectedNodes);
+  const deleteSelectedNodes = useNodeOperationsStore((state) => state.markNodeForDeletion);
   const logData = useCoreStore((state) => state.logData);
   const undo = useUndoRedoStore((state) => state.undo);
   const redo = useUndoRedoStore((state) => state.redo);

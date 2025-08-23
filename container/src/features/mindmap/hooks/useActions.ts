@@ -17,7 +17,7 @@ export const useMindmapActions = (): MindmapActionsType => {
   const selectAllNodesAndEdges = useCoreStore((state) => state.selectAllNodesAndEdges);
   const deselectAllNodesAndEdges = useCoreStore((state) => state.deselectAllNodesAndEdges);
 
-  const deleteHandler = useNodeOperationsStore((state) => state.finalizeNodeDeletion);
+  const deleteHandler = useNodeOperationsStore((state) => state.markNodeForDeletion);
 
   return {
     selectAllHandler: selectAllNodesAndEdges,

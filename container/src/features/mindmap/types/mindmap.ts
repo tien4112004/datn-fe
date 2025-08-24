@@ -74,6 +74,11 @@ export type MindMapEdge = Edge<{
 export type NodeData = TextNodeData | RootNodeData | ShapeNodeData | ImageNodeData;
 export type MindMapNode = TextNode | RootNode | ShapeNode | ImageNode | BaseNode;
 
+export type AiGeneratedNode = {
+  data: string;
+  children?: AiGeneratedNode[];
+};
+
 export interface MindmapActionsType {
   selectAllHandler: () => void;
   deselectAllHandler: () => void;

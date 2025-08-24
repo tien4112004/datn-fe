@@ -5,7 +5,8 @@ import { devtools } from 'zustand/middleware';
 import { useCoreStore } from './core';
 import { useUndoRedoStore } from './undoredo';
 import { useNodeOperationsStore } from './nodeOperation';
-import { isValidJson } from '../services/utils';
+import { useLayoutStore } from './layout';
+import { isAiGeneratedNodeStructure, convertAiDataToMindMapNodes } from '../services/utils';
 
 interface ClipboardState {
   cloningNodes: MindMapNode[];
@@ -152,13 +153,16 @@ export const useClipboardStore = create<ClipboardState>()(
 
     pasteFromClipboard: async (screenToFlowPosition: any) => {
       const clipboardData = await navigator.clipboard.readText();
-      const parsedData = isValidJson(clipboardData);
 
       const { prepareToPushUndo, pushToUndoStack } = useUndoRedoStore.getState();
       prepareToPushUndo();
 
-      if (!parsedData) {
-        // Handle invalid JSON data
+      // First, try to parse as JSON
+      let parsedData: any = null;
+      try {
+        parsedData = JSON.parse(clipboardData);
+      } catch {
+        // Not valid JSON - handle as plain text
         const addNode = useNodeOperationsStore.getState().addNode;
         addNode({
           content: clipboardData,
@@ -172,69 +176,116 @@ export const useClipboardStore = create<ClipboardState>()(
         return;
       }
 
-      const { nodes: clipboardNodes, edges: clipboardEdges } = parsedData;
-      const { setNodes, setEdges } = useCoreStore.getState();
+      // Check if it's AI generated structure
+      if (isAiGeneratedNodeStructure(parsedData)) {
+        const { setNodes, setEdges } = useCoreStore.getState();
+        const { updateLayout, layout } = useLayoutStore.getState();
+        const { mousePosition, offset } = get();
 
-      const { mousePosition, offset } = get();
-      const rootPosition = clipboardNodes[0].position || { x: 0, y: 0 };
+        const basePosition = screenToFlowPosition({
+          x: mousePosition.x,
+          y: mousePosition.y,
+        });
 
-      // Create a map to track old IDs to new IDs
-      const freshNodesMap = new Map<string, string>();
-      clipboardNodes.forEach((node) => {
-        const newId = generateId();
-        freshNodesMap.set(node.id, newId);
-      });
+        const { nodes: aiNodes, edges: aiEdges } = convertAiDataToMindMapNodes(parsedData, {
+          x: basePosition.x + offset,
+          y: basePosition.y + offset,
+        });
 
-      // Generate fresh nodes with new IDs to avoid duplicates
-      const freshNodes = clipboardNodes.map((node) => ({
-        ...node,
-        id: freshNodesMap.get(node.id) || generateId(),
-        data: {
-          ...node.data,
-          parentId: freshNodesMap.get(node.data.parentId as string) || undefined,
-        },
-        parentId: freshNodesMap.get(node.parentId as string) || undefined,
-        selected: false,
-      }));
+        // Deselect existing nodes and add new AI nodes as selected
+        setNodes((nds: MindMapNode[]) => [
+          ...nds.map((node) => ({ ...node, selected: false })),
+          ...aiNodes.map((node) => ({ ...node, selected: true })),
+        ]);
+        setEdges((eds: MindMapEdge[]) => [...eds, ...aiEdges]);
 
-      const freshEdges = clipboardEdges.map((edge) => {
-        const newSourceId = freshNodesMap.get(edge.source);
-        const newTargetId = freshNodesMap.get(edge.target);
+        // Trigger layout after nodes are added
+        setTimeout(() => {
+          updateLayout(layout);
+        }, 100);
 
-        return {
-          ...edge,
-          id: generateId(),
-          source: newSourceId ? newSourceId : edge.source,
-          target: newTargetId ? newTargetId : edge.target,
-          sourceHandle: edge.sourceHandle?.replace(edge.source, newSourceId || edge.source),
-          targetHandle: edge.targetHandle?.replace(edge.target, newTargetId || edge.target),
-        };
-      });
+        pushToUndoStack();
+        set((state) => ({ offset: state.offset + 20 }), false, 'mindmap-clip/pasteFromClipboard');
+        return;
+      }
 
-      setNodes((nds: MindMapNode[]) => [
-        ...nds.map((node) => ({ ...node, selected: false })),
-        ...freshNodes.map((node) => {
-          const { x, y } = screenToFlowPosition({
-            x: mousePosition.x,
-            y: mousePosition.y,
-          });
+      // Check if it's standard mindmap JSON format
+      if (parsedData.nodes && parsedData.edges) {
+        const { nodes: clipboardNodes, edges: clipboardEdges } = parsedData;
+        const { setNodes, setEdges } = useCoreStore.getState();
+
+        const { mousePosition, offset } = get();
+        const rootPosition = clipboardNodes[0].position || { x: 0, y: 0 };
+
+        // Create a map to track old IDs to new IDs
+        const freshNodesMap = new Map<string, string>();
+        clipboardNodes.forEach((node: any) => {
+          const newId = generateId();
+          freshNodesMap.set(node.id, newId);
+        });
+
+        // Generate fresh nodes with new IDs to avoid duplicates
+        const freshNodes = clipboardNodes.map((node: any) => ({
+          ...node,
+          id: freshNodesMap.get(node.id) || generateId(),
+          data: {
+            ...node.data,
+            parentId: freshNodesMap.get(node.data.parentId as string) || undefined,
+          },
+          parentId: freshNodesMap.get(node.parentId as string) || undefined,
+          selected: false,
+        }));
+
+        const freshEdges = clipboardEdges.map((edge: any) => {
+          const newSourceId = freshNodesMap.get(edge.source);
+          const newTargetId = freshNodesMap.get(edge.target);
 
           return {
-            ...node,
-            position: {
-              x: x - rootPosition.x + node.position.x + offset,
-              y: y - rootPosition.y + node.position.y + offset,
-            },
-            selected: true,
+            ...edge,
+            id: generateId(),
+            source: newSourceId ? newSourceId : edge.source,
+            target: newTargetId ? newTargetId : edge.target,
+            sourceHandle: edge.sourceHandle?.replace(edge.source, newSourceId || edge.source),
+            targetHandle: edge.targetHandle?.replace(edge.target, newTargetId || edge.target),
           };
+        });
+
+        setNodes((nds: MindMapNode[]) => [
+          ...nds.map((node) => ({ ...node, selected: false })),
+          ...freshNodes.map((node: any) => {
+            const { x, y } = screenToFlowPosition({
+              x: mousePosition.x,
+              y: mousePosition.y,
+            });
+
+            return {
+              ...node,
+              position: {
+                x: x - rootPosition.x + node.position.x + offset,
+                y: y - rootPosition.y + node.position.y + offset,
+              },
+              selected: true,
+            };
+          }),
+        ]);
+        setEdges((eds: MindMapEdge[]) => [...eds, ...freshEdges]);
+
+        pushToUndoStack();
+        set((state) => ({ offset: state.offset + 20 }), false, 'mindmap-clip/pasteFromClipboard');
+        return;
+      }
+
+      // If we get here, it's valid JSON but not recognized format - treat as plain text
+      const addNode = useNodeOperationsStore.getState().addNode;
+      addNode({
+        content: JSON.stringify(parsedData),
+        position: screenToFlowPosition({
+          x: get().mousePosition.x,
+          y: get().mousePosition.y,
         }),
-      ]);
-      setEdges((eds: MindMapEdge[]) => [...eds, ...freshEdges]);
+      });
 
       pushToUndoStack();
-
-      // Increment offset for next paste
-      set((state) => ({ offset: state.offset + 20 }), false, 'mindmap-clip/pasteFromClipboard');
     },
 
     setMouseOverNodeId: (nodeId: string | null) => {

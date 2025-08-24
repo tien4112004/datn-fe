@@ -1,7 +1,12 @@
 import { describe, it, expect } from 'vitest';
-import { getAllDescendantNodes, getRootNodeOfSubtree } from '../utils';
-import { MINDMAP_TYPES, PATH_TYPES, SIDE } from '../../types';
-import type { MindMapNode } from '../../types';
+import {
+  getAllDescendantNodes,
+  getRootNodeOfSubtree,
+  isAiGeneratedNodeStructure,
+  convertAiDataToMindMapNodes,
+} from '../utils';
+import { MINDMAP_TYPES, PATH_TYPES, SIDE, DRAGHANDLE } from '../../types';
+import type { MindMapNode, AiGeneratedNode } from '../../types';
 
 describe('Utils', () => {
   describe('getAllDescendantNodes', () => {
@@ -633,6 +638,411 @@ describe('Utils', () => {
       expect(getRootNodeOfSubtree('text-child', nodes)).toEqual(rootNode);
       expect(getRootNodeOfSubtree('shape-child', nodes)).toEqual(rootNode);
       expect(getRootNodeOfSubtree('image-child', nodes)).toEqual(rootNode);
+    });
+  });
+
+  describe('isAiGeneratedNodeStructure', () => {
+    it('should return true for valid AI generated node structure with single root', () => {
+      const validData: AiGeneratedNode[] = [
+        {
+          data: 'Root Topic',
+          children: [
+            {
+              data: 'Subtopic 1',
+              children: [{ data: 'Detail 1.1' }, { data: 'Detail 1.2' }],
+            },
+            { data: 'Subtopic 2' },
+          ],
+        },
+      ];
+
+      const result = isAiGeneratedNodeStructure(validData);
+      expect(result).toBe(true);
+    });
+
+    it('should return true for valid AI generated node structure with multiple roots', () => {
+      const validData: AiGeneratedNode[] = [
+        {
+          data: 'First Root',
+          children: [{ data: 'Child 1' }],
+        },
+        {
+          data: 'Second Root',
+          children: [{ data: 'Child 2' }],
+        },
+      ];
+
+      const result = isAiGeneratedNodeStructure(validData);
+      expect(result).toBe(true);
+    });
+
+    it('should return true for simple nodes without children', () => {
+      const validData: AiGeneratedNode[] = [{ data: 'Simple Node 1' }, { data: 'Simple Node 2' }];
+
+      const result = isAiGeneratedNodeStructure(validData);
+      expect(result).toBe(true);
+    });
+
+    it('should return true for empty children array', () => {
+      const validData: AiGeneratedNode[] = [
+        {
+          data: 'Root with empty children',
+          children: [],
+        },
+      ];
+
+      const result = isAiGeneratedNodeStructure(validData);
+      expect(result).toBe(true);
+    });
+
+    it('should return false for non-array input', () => {
+      expect(isAiGeneratedNodeStructure('string')).toBe(false);
+      expect(isAiGeneratedNodeStructure(123)).toBe(false);
+      expect(isAiGeneratedNodeStructure({ data: 'not array' })).toBe(false);
+      expect(isAiGeneratedNodeStructure(null)).toBe(false);
+      expect(isAiGeneratedNodeStructure(undefined)).toBe(false);
+    });
+
+    it('should return false for empty array', () => {
+      const result = isAiGeneratedNodeStructure([]);
+      expect(result).toBe(false);
+    });
+
+    it('should return false for objects with wrong field names', () => {
+      const invalidData = [
+        {
+          content: 'Wrong field name', // should be 'data'
+          children: [],
+        },
+      ];
+
+      const result = isAiGeneratedNodeStructure(invalidData);
+      expect(result).toBe(false);
+    });
+
+    it('should return false for objects with non-string data field', () => {
+      const invalidData = [
+        {
+          data: 123, // should be string
+          children: [],
+        },
+      ];
+
+      const result = isAiGeneratedNodeStructure(invalidData);
+      expect(result).toBe(false);
+    });
+
+    it('should return false for objects with invalid children structure', () => {
+      const invalidData = [
+        {
+          data: 'Valid data',
+          children: [
+            {
+              content: 'Invalid child structure', // should be 'data'
+            },
+          ],
+        },
+      ];
+
+      const result = isAiGeneratedNodeStructure(invalidData);
+      expect(result).toBe(false);
+    });
+
+    it('should return false for objects with null values', () => {
+      const invalidData = [
+        null,
+        {
+          data: 'Valid node',
+        },
+      ];
+
+      const result = isAiGeneratedNodeStructure(invalidData);
+      expect(result).toBe(false);
+    });
+
+    it('should handle deeply nested valid structures', () => {
+      const deepData: AiGeneratedNode[] = [
+        {
+          data: 'Level 1',
+          children: [
+            {
+              data: 'Level 2',
+              children: [
+                {
+                  data: 'Level 3',
+                  children: [
+                    {
+                      data: 'Level 4',
+                      children: [{ data: 'Level 5' }],
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ];
+
+      const result = isAiGeneratedNodeStructure(deepData);
+      expect(result).toBe(true);
+    });
+
+    it('should return false for mixed valid and invalid nodes', () => {
+      const mixedData = [
+        {
+          data: 'Valid node',
+        },
+        {
+          content: 'Invalid node', // wrong field name
+        },
+      ];
+
+      const result = isAiGeneratedNodeStructure(mixedData);
+      expect(result).toBe(false);
+    });
+  });
+
+  describe('convertAiDataToMindMapNodes', () => {
+    const basePosition = { x: 100, y: 100 };
+
+    it('should convert single root node without children', () => {
+      const aiData: AiGeneratedNode[] = [{ data: 'Single Root' }];
+
+      const result = convertAiDataToMindMapNodes(aiData, basePosition);
+
+      expect(result.nodes).toHaveLength(1);
+      expect(result.edges).toHaveLength(0);
+
+      const rootNode = result.nodes[0];
+      expect(rootNode.type).toBe(MINDMAP_TYPES.ROOT_NODE);
+      expect(rootNode.position).toEqual(basePosition);
+      expect(rootNode.data.content).toBe('<p>Single Root</p>');
+      expect(rootNode.data.side).toBe(SIDE.MID);
+      expect(rootNode.data.level).toBe(0);
+      expect(rootNode.data.parentId).toBeUndefined();
+      expect(rootNode.data.pathType).toBe(PATH_TYPES.SMOOTHSTEP);
+      expect(rootNode.data.edgeColor).toBe('var(--primary)');
+      expect(rootNode.dragHandle).toBeUndefined();
+    });
+
+    it('should convert root node with direct children', () => {
+      const aiData: AiGeneratedNode[] = [
+        {
+          data: 'Root Topic',
+          children: [{ data: 'Left Child' }, { data: 'Right Child' }],
+        },
+      ];
+
+      const result = convertAiDataToMindMapNodes(aiData, basePosition);
+
+      expect(result.nodes).toHaveLength(3);
+      expect(result.edges).toHaveLength(2);
+
+      const rootNode = result.nodes[0];
+      const leftChild = result.nodes.find((n) => n.data.content === '<p>Left Child</p>');
+      const rightChild = result.nodes.find((n) => n.data.content === '<p>Right Child</p>');
+
+      // Check root node
+      expect(rootNode.type).toBe(MINDMAP_TYPES.ROOT_NODE);
+      expect(rootNode.data.side).toBe(SIDE.MID);
+      expect(rootNode.data.level).toBe(0);
+
+      // Check children
+      expect(leftChild).toBeDefined();
+      expect(leftChild?.type).toBe(MINDMAP_TYPES.TEXT_NODE);
+      expect(leftChild?.data.side).toBe(SIDE.LEFT);
+      expect(leftChild?.data.level).toBe(1);
+      expect(leftChild?.data.parentId).toBe(rootNode.id);
+      expect(leftChild?.dragHandle).toBe(DRAGHANDLE.SELECTOR);
+
+      expect(rightChild).toBeDefined();
+      expect(rightChild?.type).toBe(MINDMAP_TYPES.TEXT_NODE);
+      expect(rightChild?.data.side).toBe(SIDE.RIGHT);
+      expect(rightChild?.data.level).toBe(1);
+      expect(rightChild?.data.parentId).toBe(rootNode.id);
+
+      // Check edges
+      const leftEdge = result.edges.find((e) => e.target === leftChild?.id);
+      const rightEdge = result.edges.find((e) => e.target === rightChild?.id);
+
+      expect(leftEdge).toBeDefined();
+      expect(leftEdge?.source).toBe(rootNode.id);
+      expect(leftEdge?.type).toBe(MINDMAP_TYPES.EDGE);
+      expect(leftEdge?.sourceHandle).toBe(`first-source-${rootNode.id}`);
+      expect(leftEdge?.targetHandle).toBe(`second-target-${leftChild?.id}`);
+
+      expect(rightEdge).toBeDefined();
+      expect(rightEdge?.source).toBe(rootNode.id);
+      expect(rightEdge?.sourceHandle).toBe(`second-source-${rootNode.id}`);
+      expect(rightEdge?.targetHandle).toBe(`first-target-${rightChild?.id}`);
+    });
+
+    it('should handle deeply nested hierarchy', () => {
+      const aiData: AiGeneratedNode[] = [
+        {
+          data: 'Root',
+          children: [
+            {
+              data: 'Branch 1',
+              children: [
+                {
+                  data: 'Leaf 1.1',
+                  children: [{ data: 'Deep Leaf 1.1.1' }],
+                },
+              ],
+            },
+            {
+              data: 'Branch 2',
+              children: [{ data: 'Leaf 2.1' }, { data: 'Leaf 2.2' }],
+            },
+          ],
+        },
+      ];
+
+      const result = convertAiDataToMindMapNodes(aiData, basePosition);
+
+      expect(result.nodes).toHaveLength(7);
+      expect(result.edges).toHaveLength(6);
+
+      // Check levels are correct
+      const rootNode = result.nodes.find((n) => n.data.content === '<p>Root</p>');
+      const branch1 = result.nodes.find((n) => n.data.content === '<p>Branch 1</p>');
+      const leaf11 = result.nodes.find((n) => n.data.content === '<p>Leaf 1.1</p>');
+      const deepLeaf = result.nodes.find((n) => n.data.content === '<p>Deep Leaf 1.1.1</p>');
+
+      expect(rootNode?.data.level).toBe(0);
+      expect(branch1?.data.level).toBe(1);
+      expect(leaf11?.data.level).toBe(2);
+      expect(deepLeaf?.data.level).toBe(3);
+
+      // Check parent relationships
+      expect(branch1?.data.parentId).toBe(rootNode?.id);
+      expect(leaf11?.data.parentId).toBe(branch1?.id);
+      expect(deepLeaf?.data.parentId).toBe(leaf11?.id);
+
+      // Check sides are maintained in subtrees
+      expect(branch1?.data.side).toBe(SIDE.LEFT);
+      expect(leaf11?.data.side).toBe(SIDE.LEFT);
+      expect(deepLeaf?.data.side).toBe(SIDE.LEFT);
+    });
+
+    it('should handle multiple root nodes', () => {
+      const aiData: AiGeneratedNode[] = [
+        {
+          data: 'First Root',
+          children: [{ data: 'Child 1' }],
+        },
+        {
+          data: 'Second Root',
+          children: [{ data: 'Child 2' }],
+        },
+      ];
+
+      const result = convertAiDataToMindMapNodes(aiData, basePosition);
+
+      expect(result.nodes).toHaveLength(4);
+      expect(result.edges).toHaveLength(2);
+
+      const firstRoot = result.nodes.find((n) => n.data.content === '<p>First Root</p>');
+      const secondRoot = result.nodes.find((n) => n.data.content === '<p>Second Root</p>');
+
+      // Both should be root nodes
+      expect(firstRoot?.type).toBe(MINDMAP_TYPES.ROOT_NODE);
+      expect(secondRoot?.type).toBe(MINDMAP_TYPES.ROOT_NODE);
+
+      // First root should have base position
+      expect(firstRoot?.position).toEqual(basePosition);
+
+      // Second root should have offset position
+      expect(secondRoot?.position).toEqual({
+        x: basePosition.x,
+        y: basePosition.y + 200,
+      });
+    });
+
+    it('should handle empty children arrays', () => {
+      const aiData: AiGeneratedNode[] = [
+        {
+          data: 'Root with empty children',
+          children: [],
+        },
+      ];
+
+      const result = convertAiDataToMindMapNodes(aiData, basePosition);
+
+      expect(result.nodes).toHaveLength(1);
+      expect(result.edges).toHaveLength(0);
+
+      const rootNode = result.nodes[0];
+      expect(rootNode.data.content).toBe('<p>Root with empty children</p>');
+    });
+
+    it('should generate unique IDs for all nodes and edges', () => {
+      const aiData: AiGeneratedNode[] = [
+        {
+          data: 'Root',
+          children: [{ data: 'Child 1' }, { data: 'Child 2' }],
+        },
+      ];
+
+      const result = convertAiDataToMindMapNodes(aiData, basePosition);
+
+      const nodeIds = result.nodes.map((n) => n.id);
+      const edgeIds = result.edges.map((e) => e.id);
+
+      // All node IDs should be unique
+      expect(new Set(nodeIds).size).toBe(nodeIds.length);
+
+      // All edge IDs should be unique
+      expect(new Set(edgeIds).size).toBe(edgeIds.length);
+
+      // Node and edge IDs should not overlap
+      const allIds = [...nodeIds, ...edgeIds];
+      expect(new Set(allIds).size).toBe(allIds.length);
+    });
+
+    it('should set correct edge data properties', () => {
+      const aiData: AiGeneratedNode[] = [
+        {
+          data: 'Root',
+          children: [{ data: 'Child' }],
+        },
+      ];
+
+      const result = convertAiDataToMindMapNodes(aiData, basePosition);
+
+      expect(result.edges).toHaveLength(1);
+
+      const edge = result.edges[0];
+      expect(edge.data?.strokeColor).toBe('var(--primary)');
+      expect(edge.data?.strokeWidth).toBe(2);
+      expect(edge.data?.pathType).toBe(PATH_TYPES.SMOOTHSTEP);
+    });
+
+    it('should handle single child node with correct positioning reference', () => {
+      const aiData: AiGeneratedNode[] = [
+        {
+          data: 'Parent',
+          children: [
+            {
+              data: 'Single Child',
+              children: [{ data: 'Grandchild' }],
+            },
+          ],
+        },
+      ];
+
+      const result = convertAiDataToMindMapNodes(aiData, basePosition);
+
+      expect(result.nodes).toHaveLength(3);
+      expect(result.edges).toHaveLength(2);
+
+      const parent = result.nodes.find((n) => n.data.content === '<p>Parent</p>');
+      const child = result.nodes.find((n) => n.data.content === '<p>Single Child</p>');
+      const grandchild = result.nodes.find((n) => n.data.content === '<p>Grandchild</p>');
+
+      expect(child?.data.side).toBe(SIDE.LEFT);
+      expect(grandchild?.data.side).toBe(SIDE.LEFT);
     });
   });
 });

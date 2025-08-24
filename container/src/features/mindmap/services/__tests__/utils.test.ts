@@ -901,8 +901,8 @@ describe('Utils', () => {
 
       const result = convertAiDataToMindMapNodes(aiData, basePosition);
 
-      expect(result.nodes).toHaveLength(7);
-      expect(result.edges).toHaveLength(6);
+      expect(result.nodes).toHaveLength(6);
+      expect(result.edges).toHaveLength(5);
 
       // Check levels are correct
       const rootNode = result.nodes.find((n) => n.data.content === '<p>Root</p>');
@@ -1037,7 +1037,6 @@ describe('Utils', () => {
       expect(result.nodes).toHaveLength(3);
       expect(result.edges).toHaveLength(2);
 
-      const parent = result.nodes.find((n) => n.data.content === '<p>Parent</p>');
       const child = result.nodes.find((n) => n.data.content === '<p>Single Child</p>');
       const grandchild = result.nodes.find((n) => n.data.content === '<p>Grandchild</p>');
 

@@ -8,6 +8,7 @@ const mockModels: ModelOption[] = [
     displayName: 'GPT-4.1 Nano',
     enabled: true,
     default: true,
+    provider: 'OpenAI',
   },
   {
     id: 'gpt-4o-mini-2024-07-18',
@@ -15,6 +16,7 @@ const mockModels: ModelOption[] = [
     displayName: 'GPT-4o Mini',
     enabled: true,
     default: false,
+    provider: 'OpenAI',
   },
   {
     id: 'gemini-2.5-flash',
@@ -22,6 +24,7 @@ const mockModels: ModelOption[] = [
     displayName: 'Gemini 2.5 Flash',
     enabled: false,
     default: false,
+    provider: 'Google',
   },
 ];
 

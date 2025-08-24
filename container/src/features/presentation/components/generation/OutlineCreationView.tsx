@@ -15,18 +15,17 @@ import {
 } from '@/shared/components/ui/select';
 import ExamplePrompts from './ExamplePrompts';
 import { SLIDE_COUNT_OPTIONS, LANGUAGE_OPTIONS, TARGET_AGE_OPTIONS } from '@/features/presentation/types';
-import { useModels } from '@/features/model';
-import type { ModelOption } from '@/features/model';
 import type { OutlineData } from '@/features/presentation/types';
+import type { ModelOption } from '@/features/model';
 
 interface OutlineCreationViewProps {
   defaultModel: ModelOption;
+  models: ModelOption[];
   onCreateOutline: (outlineData: OutlineData) => void;
 }
 
-const OutlineCreationView = ({ defaultModel, onCreateOutline }: OutlineCreationViewProps) => {
+const OutlineCreationView = ({ models, defaultModel, onCreateOutline }: OutlineCreationViewProps) => {
   const { t } = useTranslation('presentation', { keyPrefix: 'createOutline' });
-  const { models } = useModels();
 
   const { control, handleSubmit, setValue, watch } = useForm<OutlineData>({
     defaultValues: {

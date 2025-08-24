@@ -1,6 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
 import { useModelApiService } from '../api';
 
+/**
+ * @deperecated Use loaders instead
+ */
 export const useModels = () => {
   const modelApiService = useModelApiService(false);
 

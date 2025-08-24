@@ -4,4 +4,5 @@ export interface ModelOption {
   displayName: string;
   enabled: boolean;
   default: boolean;
+  provider: string;
 }

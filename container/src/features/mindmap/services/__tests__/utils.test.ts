@@ -901,8 +901,8 @@ describe('Utils', () => {
 
       const result = convertAiDataToMindMapNodes(aiData, basePosition);
 
-      expect(result.nodes).toHaveLength(6);
-      expect(result.edges).toHaveLength(5);
+      expect(result.nodes).toHaveLength(7);
+      expect(result.edges).toHaveLength(6);
 
       // Check levels are correct
       const rootNode = result.nodes.find((n) => n.data.content === '<p>Root</p>');

@@ -18,6 +18,7 @@ export interface BaseNodeBlockProps extends Omit<HTMLAttributes<HTMLDivElement>,
 }
 
 const clipboardSelector = (state: any) => state.dragTargetNodeId;
+const selectedCountSelector = (state: any) => state.selectedNodeIds.size;
 
 export const BaseNodeBlock = memo(
   ({ className, children, variant = 'card', node, ...props }: BaseNodeBlockProps) => {
@@ -92,19 +93,27 @@ export const BaseNodeBlock = memo(
     );
   },
   (prevProps, nextProps) => {
+    const prevData = prevProps.node.data;
+    const nextData = nextProps.node.data;
+
     return (
       prevProps.node.id === nextProps.node.id &&
-      prevProps.node.data === nextProps.node.data &&
+      prevProps.node.selected === nextProps.node.selected &&
+      prevProps.node.dragging === nextProps.node.dragging &&
       prevProps.className === nextProps.className &&
       prevProps.variant === nextProps.variant &&
-      prevProps.children === nextProps.children
+      prevProps.children === nextProps.children &&
+      prevData.isCollapsed === nextData.isCollapsed &&
+      prevData.isDeleting === nextData.isDeleting &&
+      prevData.side === nextData.side &&
+      isEqual(prevData.collapsedChildren, nextData.collapsedChildren)
     );
   }
 );
 
 const Helper = memo(
   ({ node, dragging, selected }: { node: NodeProps<MindMapNode>; dragging: boolean; selected: boolean }) => {
-    const selectedNodeCount = useCoreStore((state) => state.selectedNodeIds.size);
+    const selectedNodeCount = useCoreStore(useShallow(selectedCountSelector));
     if (selectedNodeCount > 1 || dragging) {
       return null;
     }
@@ -120,13 +129,12 @@ const Helper = memo(
     const prevData = prevProps.node.data;
     const nextData = nextProps.node.data;
 
+    // Be more conservative with memoization for Helper component
+    // to ensure selection changes are properly handled
     return (
       prevProps.node.id === nextProps.node.id &&
       prevProps.selected === nextProps.selected &&
       prevProps.dragging === nextProps.dragging &&
-      prevData.isCollapsed === nextData.isCollapsed &&
-      prevData.isDeleting === nextData.isDeleting &&
-      prevData.side === nextData.side &&
       isEqual(prevData.collapsedChildren, nextData.collapsedChildren)
     );
   }

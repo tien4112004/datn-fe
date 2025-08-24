@@ -13,6 +13,7 @@ import { getSideFromPosition } from '../services/utils';
 
 export const useReactFlowIntegration = () => {
   const syncState = useCoreStore((state) => state.syncState);
+  const updateSelectedNodeIds = useCoreStore((state) => state.updateSelectedNodeIds);
   const moveToChild = useNodeManipulationStore((state) => state.moveToChild);
   const getNode = useCoreStore((state) => state.getNode);
   const addChildNode = useNodeOperationsStore((state) => state.addChildNode);
@@ -141,6 +142,10 @@ export const useReactFlowIntegration = () => {
     setMouseOverNodeId(null);
   }, [setMouseOverNodeId]);
 
+  const onSelectionChange = useCallback(() => {
+    updateSelectedNodeIds();
+  }, [updateSelectedNodeIds]);
+
   return {
     onNodeDragStart,
     onNodeDrag,
@@ -152,5 +157,6 @@ export const useReactFlowIntegration = () => {
     onConnectEnd,
     onNodeMouseEnter,
     onNodeMouseLeave,
+    onSelectionChange,
   };
 };

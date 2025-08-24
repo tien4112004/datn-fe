@@ -14,6 +14,7 @@ import { DIRECTION, SIDE, MINDMAP_TYPES } from '@/features/mindmap/types';
 import { cn } from '@/shared/lib/utils';
 import { motion } from 'motion/react';
 import { memo, useCallback, useState } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { BaseHandle } from '../ui/base-handle';
 import { isEqual } from 'lodash';
 
@@ -22,28 +23,57 @@ interface ChildNodeControlsProps {
   selected: boolean;
 }
 
+// Selectors for better memoization
+const nodeManipulationSelector = (state: any) => ({
+  collapse: state.collapse,
+  expand: state.expand,
+});
+
+const coreStoreSelector = (state: any) => ({
+  hasLeftChildren: state.hasLeftChildren,
+  hasRightChildren: state.hasRightChildren,
+});
+
+const nodeOperationsSelector = (state: any) => state.addChildNode;
+
+const layoutStoreSelector = (state: any) => ({
+  updateSubtreeLayout: state.updateSubtreeLayout,
+  layout: state.layout,
+});
+
+const mouseOverSelector = (state: any) => state.mouseOverNodeId;
+
 export const ChildNodeControls = memo(
   ({ node, selected }: ChildNodeControlsProps) => {
     const canCreateLeft = node.data.side === SIDE.LEFT || node.data.side === SIDE.MID;
     const canCreateRight = node.data.side === SIDE.RIGHT || node.data.side === SIDE.MID;
 
-    const collapse = useNodeManipulationStore((state) => state.collapse);
-    const expand = useNodeManipulationStore((state) => state.expand);
-    const hasLeftChildren = useCoreStore((state) => state.hasLeftChildren);
-    const hasRightChildren = useCoreStore((state) => state.hasRightChildren);
-    const addChildNodeStore = useNodeOperationsStore((state) => state.addChildNode);
-    const layoutSubtree = useLayoutStore((state) => state.updateSubtreeLayout);
-    const layout = useLayoutStore((state) => state.layout);
+    const { collapse, expand } = useNodeManipulationStore(useShallow(nodeManipulationSelector));
+    const { hasLeftChildren, hasRightChildren } = useCoreStore(useShallow(coreStoreSelector));
+    const addChildNodeStore = useNodeOperationsStore(nodeOperationsSelector);
+    const { updateSubtreeLayout, layout } = useLayoutStore(useShallow(layoutStoreSelector));
 
-    const addChildNode = useCallback((side: Side, type: MindMapTypes) => {
-      expand(node.id, side);
-      addChildNodeStore(node, { x: node.positionAbsoluteX, y: node.positionAbsoluteY }, side, type);
-      setTimeout(() => {
-        layoutSubtree(node.id, layout);
-      }, 200);
-    }, []);
+    const addChildNode = useCallback(
+      (side: Side, type: MindMapTypes) => {
+        expand(node.id, side);
+        addChildNodeStore(node, { x: node.positionAbsoluteX, y: node.positionAbsoluteY }, side, type);
+        setTimeout(() => {
+          updateSubtreeLayout(node.id, layout);
+        }, 200);
+      },
+      [
+        expand,
+        addChildNodeStore,
+        updateSubtreeLayout,
+        layout,
+        node.id,
+        node.positionAbsoluteX,
+        node.positionAbsoluteY,
+      ]
+    );
 
-    const isMouseOver = useClipboardStore((state) => state.mouseOverNodeId) === node.id;
+    const mouseOverNodeId = useClipboardStore(useShallow(mouseOverSelector));
+    const isMouseOver = mouseOverNodeId === node.id;
 
     const isLeftChildrenCollapsed = (node.data.collapsedChildren?.leftNodes || []).length > 0;
     const isRightChildrenCollapsed = (node.data.collapsedChildren?.rightNodes || []).length > 0;

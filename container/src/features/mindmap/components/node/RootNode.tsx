@@ -65,7 +65,7 @@ const RootNodeBlock = memo(
     );
 
     // Only create heavy rich text editor when not dragging/layouting for better performance
-    const shouldUseRichEditor = !dragging && !isLayouting && isEditing && isSelected;
+    const shouldUseRichEditor = !dragging && !isLayouting && isEditing;
 
     const editor = useRichTextEditor({
       trailingBlock: false,

@@ -25,6 +25,7 @@ interface CoreState {
   syncState: (updateNodeInternals: any) => void;
   selectAllNodesAndEdges: () => void;
   deselectAllNodesAndEdges: () => void;
+  updateSelectedNodeIds: () => void;
 }
 
 export const useCoreStore = create<CoreState>()(
@@ -167,6 +168,17 @@ export const useCoreStore = create<CoreState>()(
             edges: state.edges.map((edge) => ({ ...edge, selected: false })),
             selectedNodeIds: new Set(),
           }));
+        },
+
+        updateSelectedNodeIds: () => {
+          set((state) => {
+            const newSelectedNodeIds = new Set(
+              state.nodes.filter((node) => node.selected).map((node) => node.id)
+            );
+            return {
+              selectedNodeIds: newSelectedNodeIds,
+            };
+          });
         },
       }),
       {

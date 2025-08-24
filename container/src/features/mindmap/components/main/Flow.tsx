@@ -43,6 +43,7 @@ const Flow = memo(({ children, isPanOnDrag }: { children: ReactNode; isPanOnDrag
     onConnectEnd,
     onNodeMouseEnter,
     onNodeMouseLeave,
+    onSelectionChange,
   } = useReactFlowIntegration();
 
   return (
@@ -64,6 +65,7 @@ const Flow = memo(({ children, isPanOnDrag }: { children: ReactNode; isPanOnDrag
       onConnectEnd={onConnectEnd}
       onNodeMouseEnter={onNodeMouseEnter}
       onNodeMouseLeave={onNodeMouseLeave}
+      onSelectionChange={onSelectionChange}
       connectionLineComponent={ConnectionLine}
       panOnDrag={isPanOnDrag}
       panActivationKeyCode={!isPanOnDrag ? 'Shift' : null}

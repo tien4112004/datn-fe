@@ -5,6 +5,8 @@ import Demo from '@/features/demo';
 import { getDefaultModel } from '@/features/model';
 import NotFoundPage from '@/shared/pages/NotFoundPage';
 import { CriticalError } from '@/types/errors';
+import Mindmap from '@/features/mindmap';
+import { getMindmapById } from '@/features/mindmap/hooks/loaders';
 
 const router = createBrowserRouter([
   {
@@ -21,6 +23,14 @@ const router = createBrowserRouter([
       {
         path: 'presentation/editor',
         Component: Presentation.EditorPage,
+      },
+      {
+        path: 'mindmap',
+        Component: Mindmap.MindmapPage,
+        loader: async () => {
+          const mindmap = await getMindmapById('');
+          return { mindmap };
+        },
       },
       {
         path: 'presentation/:presentationId',

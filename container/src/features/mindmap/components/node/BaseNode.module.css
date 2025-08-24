@@ -1,0 +1,17 @@
+@layer components {
+  .base-node-card {
+    @apply bg-card text-card-foreground border-border hover:ring-ring relative rounded-md border-2 shadow-md transition-shadow hover:ring-1;
+  }
+
+  .base-node-card.layouting {
+    @apply shadow-lg ring-2 ring-blue-300;
+  }
+
+  .base-node-card.drag-target {
+    @apply bg-green-50 ring-2 ring-green-400;
+  }
+
+  .react-flow__node.selected .base-node-card {
+    @apply shadow-lg ring-2 ring-blue-500;
+  }
+}

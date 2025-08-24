@@ -20,7 +20,7 @@ vi.mock('react-i18next', () => ({
   })),
 }));
 
-vi.mock('framer-motion', () => ({
+vi.mock('motion/react', () => ({
   AnimatePresence: ({ children }: any) => <div data-testid="animate-presence">{children}</div>,
   motion: {
     div: ({ children, ...props }: any) => (

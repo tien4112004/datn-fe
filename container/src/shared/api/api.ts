@@ -1,15 +1,31 @@
-import axios from 'axios';
+import axios, { type AxiosInstance } from 'axios';
 import { CriticalError, ExpectedError } from '@/types/errors';
 import { ERROR_TYPE } from '@/shared/constants';
 
 const API_BASE_URL = import.meta.env.API_BASE_URL || 'http://localhost:8080';
 
-const api = axios.create({
+interface StreamableAxiosInstance extends AxiosInstance {
+  stream: (url: string, request: any, signal: AbortSignal) => Promise<Response>;
+}
+
+const api: StreamableAxiosInstance = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
-});
+}) as StreamableAxiosInstance;
+
+api.stream = async function (url: string, request: any, signal: AbortSignal) {
+  return await fetch(`${API_BASE_URL}/${url}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'text/plain',
+    },
+    body: JSON.stringify(request),
+    signal,
+  });
+};
 
 api.interceptors.response.use(
   (response) => response,

@@ -14,7 +14,12 @@ import {
   SelectValue,
 } from '@/shared/components/ui/select';
 import ExamplePrompts from './ExamplePrompts';
-import { SLIDE_COUNT_OPTIONS, LANGUAGE_OPTIONS, TARGET_AGE_OPTIONS } from '@/features/presentation/types';
+import {
+  SLIDE_COUNT_OPTIONS,
+  LANGUAGE_OPTIONS,
+  TARGET_AGE_OPTIONS,
+  MODEL_PROVIDERS_LOGO,
+} from '@/features/presentation/types';
 import type { OutlineData } from '@/features/presentation/types';
 import type { ModelOption } from '@/features/model';
 
@@ -155,6 +160,12 @@ const OutlineCreationView = ({ models, defaultModel, onCreateOutline }: OutlineC
                             <SelectLabel>{t('modelLabel')}</SelectLabel>
                             {models?.map((modelOption) => (
                               <SelectItem key={modelOption.id} value={modelOption.name}>
+                                <img
+                                  src={MODEL_PROVIDERS_LOGO[modelOption.provider]}
+                                  alt={modelOption.provider}
+                                  className="mr-2 inline h-4 w-4"
+                                />
+
                                 {modelOption.displayName}
                               </SelectItem>
                             ))}

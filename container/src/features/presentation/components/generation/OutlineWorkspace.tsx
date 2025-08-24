@@ -15,7 +15,6 @@ import { Download, Loader, Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import useOutlineStore from '@/features/presentation/stores/useOutlineStore';
 import { Card } from '@/components/ui/card';
-// import { useOutlineContext } from '../../context/OutlineContext';
 
 type OutlineWorkspaceProps = {
   onDownload?: () => Promise<void>;

@@ -7,7 +7,6 @@ import { useSortable } from '@dnd-kit/sortable';
 import { Trash } from 'lucide-react';
 import React from 'react';
 import useOutlineStore from '@/features/presentation/stores/useOutlineStore';
-// import { useOutlineContext } from '../../context/OutlineContext';
 
 interface OutlineCardProps {
   id: string;
@@ -18,7 +17,6 @@ interface OutlineCardProps {
 
 const OutlineCard = ({ id, title = 'Outline', className = '', onDelete }: OutlineCardProps) => {
   const [isDeleting, setIsDeleting] = React.useState(false);
-  // const { handleContentChange } = useOutlineContext();
   const handleContentChange = useOutlineStore((state) => state.handleContentChange);
   const content = useOutlineStore((state) => state.content.find((item) => item.id === id));
   const isStreaming = useOutlineStore((state) => state.isStreaming);

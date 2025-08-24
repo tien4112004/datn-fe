@@ -2,9 +2,7 @@ import { useState } from 'react';
 import { useLoaderData } from 'react-router-dom';
 import { OutlineCreationView, WorkspaceView } from '@/features/presentation/components';
 import type { ModelOption } from '@/features/model';
-// import { SidebarTrigger } from '@/shared/components/ui/sidebar';
 import type { OutlineData } from '@/features/presentation/types';
-// import { OutlineProvider } from '../context/OutlineContext';
 
 const PresentationViewState = {
   OUTLINE_CREATION: 'outline_creation',
@@ -14,7 +12,7 @@ const PresentationViewState = {
 type PresentationViewState = (typeof PresentationViewState)[keyof typeof PresentationViewState];
 
 const PresentationOutlinePage = () => {
-  const defaultModel = useLoaderData() as ModelOption;
+  const [models, defaultModel] = useLoaderData() as [ModelOption[], ModelOption];
   const [currentView, setCurrentView] = useState<PresentationViewState>(
     PresentationViewState.OUTLINE_CREATION
   );
@@ -36,7 +34,11 @@ const PresentationOutlinePage = () => {
     <>
       {/* <SidebarTrigger className="absolute left-4 top-4 z-50" /> */}
       {currentView === PresentationViewState.OUTLINE_CREATION ? (
-        <OutlineCreationView defaultModel={defaultModel} onCreateOutline={handleCreateOutline} />
+        <OutlineCreationView
+          onCreateOutline={handleCreateOutline}
+          models={models}
+          defaultModel={defaultModel}
+        />
       ) : (
         <WorkspaceView initialOutlineData={outlineData} />
       )}

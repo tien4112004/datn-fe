@@ -1,5 +1,4 @@
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbPage } from '@/components/ui/breadcrumb';
-// import { SidebarTrigger } from '@/components/ui/sidebar';
 import { Separator } from '@radix-ui/react-separator';
 import PresentationTable from '../components/table/PresentationTable';
 import { Button } from '@/components/ui/button';

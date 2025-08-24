@@ -1,14 +1,15 @@
 import { type ReactNode, type HTMLAttributes, useCallback, memo, useMemo } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { cn } from '@/shared/lib/utils';
-import type { Direction, MindMapNode } from '@/features/mindmap/types';
+import type { MindMapNode } from '@/features/mindmap/types';
 import { NodeResizer, type NodeProps } from '@xyflow/react';
 import { DRAGHANDLE } from '@/features/mindmap/types';
 import { useShallow } from 'zustand/react/shallow';
+import { isEqual } from 'lodash';
 
 import { useMindmapNodeCommon } from '@/features/mindmap/hooks';
 import { useClipboardStore, useCoreStore } from '@/features/mindmap/stores';
-import { CreateChildNodeButtons, NodeHandlers } from '../controls/CreateChildNodeButtons';
+import { ChildNodeControls, NodeHandlers } from '../controls/ChildNodeControls';
 
 export interface BaseNodeBlockProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
   children: ReactNode;
@@ -85,7 +86,7 @@ export const BaseNodeBlock = memo(
         >
           {children}
           <NodeHandlers layout={layout} id={id} side={data.side} />
-          <Helper node={node} layout={layout} dragging={dragging} selected={selected} />
+          <Helper node={node} dragging={dragging} selected={selected} />
         </motion.div>
       </AnimatePresence>
     );
@@ -102,17 +103,7 @@ export const BaseNodeBlock = memo(
 );
 
 const Helper = memo(
-  ({
-    node,
-    layout,
-    dragging,
-    selected,
-  }: {
-    node: NodeProps<MindMapNode>;
-    layout: Direction;
-    dragging: boolean;
-    selected: boolean;
-  }) => {
+  ({ node, dragging, selected }: { node: NodeProps<MindMapNode>; dragging: boolean; selected: boolean }) => {
     const selectedNodeCount = useCoreStore((state) => state.selectedNodeIds.size);
     if (selectedNodeCount > 1 || dragging) {
       return null;
@@ -121,16 +112,22 @@ const Helper = memo(
     return (
       <>
         <NodeResizer isVisible={selected} minWidth={100} minHeight={30} />
-        <CreateChildNodeButtons node={node} layout={layout} selected={selected} />
+        <ChildNodeControls node={node} selected={selected} />
       </>
     );
   },
   (prevProps, nextProps) => {
+    const prevData = prevProps.node.data;
+    const nextData = nextProps.node.data;
+
     return (
       prevProps.node.id === nextProps.node.id &&
-      prevProps.layout === nextProps.layout &&
       prevProps.selected === nextProps.selected &&
-      prevProps.dragging === nextProps.dragging
+      prevProps.dragging === nextProps.dragging &&
+      prevData.isCollapsed === nextData.isCollapsed &&
+      prevData.isDeleting === nextData.isDeleting &&
+      prevData.side === nextData.side &&
+      isEqual(prevData.collapsedChildren, nextData.collapsedChildren)
     );
   }
 );

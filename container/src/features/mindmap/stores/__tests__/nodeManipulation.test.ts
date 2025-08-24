@@ -58,7 +58,7 @@ describe('useNodeManipulationStore', () => {
     vi.clearAllMocks();
   });
 
-  describe('toggleCollapse', () => {
+  describe('collapse', () => {
     it('should collapse nodes on the specified side', async () => {
       const mockNodes: MindMapNode[] = [
         {
@@ -132,34 +132,63 @@ describe('useNodeManipulationStore', () => {
       ]);
 
       const state = useNodeManipulationStore.getState();
-      state.toggleCollapse('parent-1', SIDE.LEFT, true);
+      state.collapse('parent-1', SIDE.LEFT);
 
       expect(mockUndoRedoState.prepareToPushUndo).toHaveBeenCalled();
       expect(mockUndoRedoState.pushToUndoStack).toHaveBeenCalled();
       expect(mockCoreState.setNodes).toHaveBeenCalled();
       expect(mockCoreState.setEdges).toHaveBeenCalled();
 
-      // Test node updates - setNodes should be called with updated array
+      // Test node updates - parent should store collapsed children
       expect(mockCoreState.setNodes).toHaveBeenCalledWith(
         expect.arrayContaining([
           expect.objectContaining({
             id: 'parent-1',
             data: expect.objectContaining({
-              isLeftChildrenCollapsed: true,
-            }),
-          }),
-          expect.objectContaining({
-            id: 'left-child',
-            data: expect.objectContaining({
-              isCollapsed: true,
-              collapsedBy: 'parent-1',
+              collapsedChildren: expect.objectContaining({
+                leftNodes: expect.arrayContaining([expect.objectContaining({ id: 'left-child' })]),
+                leftEdges: expect.any(Array),
+                rightNodes: [],
+                rightEdges: [],
+              }),
             }),
           }),
         ])
       );
-    });
 
+      // Test that collapsed nodes are removed from the main nodes array
+      const setNodesCall = mockCoreState.setNodes.mock.calls[0][0];
+      expect(setNodesCall.find((n: any) => n.id === 'left-child')).toBeUndefined();
+    });
+  });
+
+  describe('expand', () => {
     it('should expand nodes on the specified side', async () => {
+      const collapsedChildNode = {
+        id: 'left-child',
+        type: MINDMAP_TYPES.TEXT_NODE,
+        position: { x: -100, y: 50 },
+        data: {
+          level: 1,
+          content: 'Left Child',
+          parentId: 'parent-1',
+          side: SIDE.LEFT,
+          isCollapsed: false,
+        },
+      };
+
+      const collapsedEdge = {
+        id: 'edge-1',
+        source: 'parent-1',
+        target: 'left-child',
+        type: MINDMAP_TYPES.EDGE,
+        data: {
+          strokeColor: 'var(--primary)',
+          strokeWidth: 2,
+          pathType: PATH_TYPES.SMOOTHSTEP,
+        },
+      };
+
       const mockNodes: MindMapNode[] = [
         {
           id: 'parent-1',
@@ -170,20 +199,12 @@ describe('useNodeManipulationStore', () => {
             content: 'Parent',
             side: SIDE.MID,
             isCollapsed: false,
-            isLeftChildrenCollapsed: true,
-          },
-        },
-        {
-          id: 'left-child',
-          type: MINDMAP_TYPES.TEXT_NODE,
-          position: { x: -100, y: 50 },
-          data: {
-            level: 1,
-            content: 'Left Child',
-            parentId: 'parent-1',
-            side: SIDE.LEFT,
-            isCollapsed: true,
-            collapsedBy: 'parent-1',
+            collapsedChildren: {
+              leftNodes: [collapsedChildNode],
+              leftEdges: [collapsedEdge],
+              rightNodes: [],
+              rightEdges: [],
+            },
           },
         },
       ];
@@ -193,44 +214,66 @@ describe('useNodeManipulationStore', () => {
       mockCoreState.nodes = mockNodes;
       mockCoreState.edges = mockEdges;
 
-      const { getAllDescendantNodes } = await import('../../services/utils');
-      vi.mocked(getAllDescendantNodes).mockReturnValue([
-        {
-          id: 'left-child',
-          type: MINDMAP_TYPES.TEXT_NODE,
-          position: { x: -100, y: 50 },
-          data: {
-            level: 1,
-            content: 'Left Child',
-            parentId: 'parent-1',
-            side: SIDE.LEFT,
-            isCollapsed: true,
-            collapsedBy: 'parent-1',
-          },
-        },
-      ]);
-
       const state = useNodeManipulationStore.getState();
-      state.toggleCollapse('parent-1', SIDE.LEFT, false);
+      state.expand('parent-1', SIDE.LEFT);
 
-      // Test node updates - setNodes should be called with updated array
+      expect(mockUndoRedoState.prepareToPushUndo).toHaveBeenCalled();
+      expect(mockUndoRedoState.pushToUndoStack).toHaveBeenCalled();
+      expect(mockCoreState.setNodes).toHaveBeenCalled();
+      expect(mockCoreState.setEdges).toHaveBeenCalled();
+
+      // Test that collapsed children are restored to main arrays
       expect(mockCoreState.setNodes).toHaveBeenCalledWith(
         expect.arrayContaining([
           expect.objectContaining({
             id: 'parent-1',
             data: expect.objectContaining({
-              isLeftChildrenCollapsed: false,
+              collapsedChildren: {
+                leftNodes: [],
+                leftEdges: [],
+                rightNodes: [],
+                rightEdges: [],
+              },
             }),
           }),
-          expect.objectContaining({
-            id: 'left-child',
-            data: expect.objectContaining({
-              isCollapsed: false,
-              collapsedBy: undefined,
-            }),
-          }),
+          expect.objectContaining({ id: 'left-child' }),
         ])
       );
+
+      expect(mockCoreState.setEdges).toHaveBeenCalledWith(
+        expect.arrayContaining([expect.objectContaining({ id: 'edge-1' })])
+      );
+    });
+
+    it('should return early if no collapsed children exist', async () => {
+      const mockNodes: MindMapNode[] = [
+        {
+          id: 'parent-1',
+          type: MINDMAP_TYPES.ROOT_NODE,
+          position: { x: 0, y: 0 },
+          data: {
+            level: 0,
+            content: 'Parent',
+            side: SIDE.MID,
+            isCollapsed: false,
+            collapsedChildren: {
+              leftNodes: [],
+              leftEdges: [],
+              rightNodes: [],
+              rightEdges: [],
+            },
+          },
+        },
+      ];
+
+      mockCoreState.nodes = mockNodes;
+      mockCoreState.edges = [];
+
+      const state = useNodeManipulationStore.getState();
+      state.expand('parent-1', SIDE.LEFT);
+
+      expect(mockCoreState.setNodes).not.toHaveBeenCalled();
+      expect(mockCoreState.setEdges).not.toHaveBeenCalled();
     });
 
     it('should only affect nodes on the specified side', async () => {
@@ -304,45 +347,114 @@ describe('useNodeManipulationStore', () => {
       ]);
 
       const state = useNodeManipulationStore.getState();
-      state.toggleCollapse('parent-1', SIDE.LEFT, true);
+      state.collapse('parent-1', SIDE.LEFT);
 
-      // Test that only left side nodes are affected
+      // Test that only left side nodes are stored in collapsedChildren
       expect(mockCoreState.setNodes).toHaveBeenCalledWith(
         expect.arrayContaining([
           expect.objectContaining({
-            id: 'left-child',
+            id: 'parent-1',
             data: expect.objectContaining({
-              isCollapsed: true,
+              collapsedChildren: expect.objectContaining({
+                leftNodes: expect.arrayContaining([expect.objectContaining({ id: 'left-child' })]),
+                rightNodes: [], // Should be empty
+              }),
             }),
           }),
+          expect.objectContaining({ id: 'right-child' }), // Should remain in main nodes array
+        ])
+      );
+
+      // Test that collapsed left nodes are removed from main nodes array
+      const setNodesCall = mockCoreState.setNodes.mock.calls[0][0];
+      expect(setNodesCall.find((n: any) => n.id === 'left-child')).toBeUndefined();
+      expect(setNodesCall.find((n: any) => n.id === 'right-child')).toBeDefined();
+    });
+  });
+
+  describe('collapse edge cases', () => {
+    it('should return early if node is not found', async () => {
+      mockCoreState.nodes = [];
+      mockCoreState.edges = [];
+
+      const state = useNodeManipulationStore.getState();
+      state.collapse('nonexistent-node', SIDE.LEFT);
+
+      expect(mockCoreState.setNodes).not.toHaveBeenCalled();
+      expect(mockCoreState.setEdges).not.toHaveBeenCalled();
+    });
+
+    it('should handle nodes already collapsed by another ancestor', async () => {
+      const mockNodes: MindMapNode[] = [
+        {
+          id: 'parent-1',
+          type: MINDMAP_TYPES.ROOT_NODE,
+          position: { x: 0, y: 0 },
+          data: {
+            level: 0,
+            content: 'Parent',
+            side: SIDE.MID,
+            isCollapsed: false,
+          },
+        },
+        {
+          id: 'child-1',
+          type: MINDMAP_TYPES.TEXT_NODE,
+          position: { x: -100, y: 50 },
+          data: {
+            level: 1,
+            content: 'Child',
+            parentId: 'parent-1',
+            side: SIDE.LEFT,
+            isCollapsed: false,
+            collapsedBy: 'ancestor-1', // Already collapsed by another ancestor
+          },
+        },
+      ];
+
+      mockCoreState.nodes = mockNodes;
+      mockCoreState.edges = [];
+
+      const { getAllDescendantNodes } = await import('../../services/utils');
+      vi.mocked(getAllDescendantNodes).mockReturnValue([
+        {
+          id: 'child-1',
+          type: MINDMAP_TYPES.TEXT_NODE,
+          position: { x: -100, y: 50 },
+          data: {
+            level: 1,
+            content: 'Child',
+            parentId: 'parent-1',
+            side: SIDE.LEFT,
+            isCollapsed: false,
+            collapsedBy: 'ancestor-1',
+          },
+        },
+      ]);
+
+      const state = useNodeManipulationStore.getState();
+      state.collapse('parent-1', SIDE.LEFT);
+
+      // Test that collapsedBy is preserved from the original ancestor
+      expect(mockCoreState.setNodes).toHaveBeenCalledWith(
+        expect.arrayContaining([
           expect.objectContaining({
-            id: 'right-child',
+            id: 'parent-1',
             data: expect.objectContaining({
-              isCollapsed: false, // Should remain unchanged
+              collapsedChildren: expect.objectContaining({
+                leftNodes: expect.arrayContaining([
+                  expect.objectContaining({
+                    id: 'child-1',
+                    data: expect.objectContaining({
+                      collapsedBy: 'ancestor-1', // Should preserve original collapsedBy
+                    }),
+                  }),
+                ]),
+              }),
             }),
           }),
         ])
       );
-    });
-  });
-
-  describe('expand and collapse methods', () => {
-    it('should call toggleCollapse with false for expand', () => {
-      const toggleCollapseSpy = vi.spyOn(useNodeManipulationStore.getState(), 'toggleCollapse');
-
-      const state = useNodeManipulationStore.getState();
-      state.expand('node-1', SIDE.LEFT);
-
-      expect(toggleCollapseSpy).toHaveBeenCalledWith('node-1', SIDE.LEFT, false);
-    });
-
-    it('should call toggleCollapse with true for collapse', () => {
-      const toggleCollapseSpy = vi.spyOn(useNodeManipulationStore.getState(), 'toggleCollapse');
-
-      const state = useNodeManipulationStore.getState();
-      state.collapse('node-1', SIDE.RIGHT);
-
-      expect(toggleCollapseSpy).toHaveBeenCalledWith('node-1', SIDE.RIGHT, true);
     });
   });
 

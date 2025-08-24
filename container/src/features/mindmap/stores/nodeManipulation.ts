@@ -9,7 +9,6 @@ import { useCoreStore } from './core';
 import { useUndoRedoStore } from './undoredo';
 
 interface NodeManipulationState {
-  toggleCollapse: (nodeId: string, side: Side, shouldCollapse: boolean) => void;
   collapse: (nodeId: string, side: Side) => void;
   expand: (nodeId: string, side: Side) => void;
   moveToChild: (sourceId: string, targetId: string, side?: Side) => void;
@@ -19,8 +18,53 @@ interface NodeManipulationState {
 
 export const useNodeManipulationStore = create<NodeManipulationState>()(
   devtools(
-    (_, get) => ({
-      toggleCollapse: (nodeId: string, side: Side, shouldCollapse: boolean) => {
+    () => ({
+      expand: (nodeId: string, side: Side) => {
+        const { nodes, edges, setNodes, setEdges } = useCoreStore.getState();
+        const parentNode = nodes.find((n) => n.id === nodeId);
+        if (!parentNode || !parentNode.data.collapsedChildren) return;
+
+        const { prepareToPushUndo, pushToUndoStack } = useUndoRedoStore.getState();
+        prepareToPushUndo();
+
+        const collapsedData = parentNode.data.collapsedChildren;
+        const storedNodes =
+          side === SIDE.LEFT ? collapsedData.leftNodes || [] : collapsedData.rightNodes || [];
+        const storedEdges =
+          side === SIDE.LEFT ? collapsedData.leftEdges || [] : collapsedData.rightEdges || [];
+
+        if (storedNodes.length === 0 && storedEdges.length === 0) return;
+
+        const restoredNodes = [...nodes, ...storedNodes];
+
+        const restoredEdges = [...edges, ...storedEdges];
+
+        // Update parent node to clear stored children and update collapse flags
+        const updatedNodes = restoredNodes.map((n) => {
+          if (n.id === nodeId) {
+            return {
+              ...n,
+              data: {
+                ...n.data,
+                collapsedChildren: {
+                  leftNodes: [],
+                  leftEdges: [],
+                  rightNodes: [],
+                  rightEdges: [],
+                },
+              },
+            };
+          }
+          return n;
+        });
+
+        setNodes(updatedNodes);
+        setEdges(restoredEdges);
+
+        pushToUndoStack();
+      },
+
+      collapse: (nodeId: string, side: Side) => {
         const { nodes, edges, setNodes, setEdges } = useCoreStore.getState();
         const node = nodes.find((n) => n.id === nodeId);
         if (!node) return;
@@ -29,26 +73,39 @@ export const useNodeManipulationStore = create<NodeManipulationState>()(
         const descendantNodes = getAllDescendantNodes(nodeId, nodes);
         const affectedDescendants = descendantNodes.filter((d) => d.data.side === side);
 
-        const updatedNodes = nodes.map((n) => {
-          if (n.id === nodeId) {
-            return {
-              ...n,
-              data: {
-                ...n.data,
-                isLeftChildrenCollapsed: side === SIDE.LEFT ? shouldCollapse : n.data.isLeftChildrenCollapsed,
-                isRightChildrenCollapsed:
-                  side === SIDE.RIGHT ? shouldCollapse : n.data.isRightChildrenCollapsed,
-              },
-            };
-          }
+        const updatedNodes = nodes
+          .map((n) => {
+            if (n.id === nodeId) {
+              return {
+                ...n,
+                data: {
+                  ...n.data,
+                  collapsedChildren: {
+                    leftNodes: side === SIDE.LEFT ? affectedDescendants : [],
+                    rightNodes: side === SIDE.RIGHT ? affectedDescendants : [],
+                    leftEdges:
+                      side === SIDE.LEFT
+                        ? edges.filter((edge) =>
+                            affectedDescendants.some((d) => d.id === edge.target || d.id === edge.source)
+                          )
+                        : [],
+                    rightEdges:
+                      side === SIDE.RIGHT
+                        ? edges.filter((edge) =>
+                            affectedDescendants.some((d) => d.id === edge.target || d.id === edge.source)
+                          )
+                        : [],
+                  },
+                },
+              };
+            }
 
-          const isAffectedDescendant = affectedDescendants.some((d) => d.id === n.id);
-          if (!isAffectedDescendant) {
-            return n;
-          }
+            // Don't collapse nodes that are already collapsed by another ancestor
+            const isAffectedDescendant = affectedDescendants.some((d) => d.id === n.id);
+            if (!isAffectedDescendant) {
+              return n;
+            }
 
-          if (shouldCollapse) {
-            // Collapsing
             return {
               ...n,
               data: {
@@ -57,54 +114,20 @@ export const useNodeManipulationStore = create<NodeManipulationState>()(
                 collapsedBy: n.data.collapsedBy || nodeId,
               },
             };
-          } else {
-            // Expanding: only show nodes that were hidden by this specific ancestor
-            if (n.data.collapsedBy === nodeId) {
-              return {
-                ...n,
-                data: {
-                  ...n.data,
-                  isCollapsed: false,
-                  collapsedBy: undefined,
-                },
-              };
-            }
-          }
+          })
+          .filter((n) => {
+            return !n.data.isCollapsed;
+          });
 
-          return n;
-        });
-
-        const updatedEdges = edges.map((edge) => {
-          const targetNode = updatedNodes.find((n) => n.id === edge.target);
-          const isAffectedEdge = affectedDescendants.some(
-            (d) => d.id === edge.source || d.id === edge.target
-          );
-
-          if (isAffectedEdge) {
-            return {
-              ...edge,
-              data: {
-                ...edge.data,
-                isCollapsed: targetNode?.data.isCollapsed || false,
-              },
-            };
-          }
-
-          return edge;
+        const affectedNodeIds = new Set(affectedDescendants.map((n) => n.id));
+        const updatedEdges = edges.filter((edge) => {
+          return !affectedNodeIds.has(edge.source) && !affectedNodeIds.has(edge.target);
         });
 
         setNodes(updatedNodes);
         setEdges(updatedEdges);
 
         pushToUndoStack();
-      },
-
-      expand: (nodeId: string, side: Side) => {
-        get().toggleCollapse(nodeId, side, false);
-      },
-
-      collapse: (nodeId: string, side: Side) => {
-        get().toggleCollapse(nodeId, side, true);
       },
 
       moveToChild: (sourceId: string, targetId: string, side?: Side) => {

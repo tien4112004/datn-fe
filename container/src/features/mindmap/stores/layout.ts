@@ -40,6 +40,8 @@ interface LayoutState {
   onLayoutChange: (direction: Direction) => void;
 }
 
+const ANIMATION_DURATION = 800;
+
 export const useLayoutStore = create<LayoutState>()(
   devtools(
     (set, get) => ({
@@ -169,11 +171,11 @@ export const useLayoutStore = create<LayoutState>()(
             targetPositions[node.id] = { x: node.position.x, y: node.position.y };
           });
 
-          animateNodesToPositions(targetPositions, 800);
+          animateNodesToPositions(targetPositions, ANIMATION_DURATION);
 
           setTimeout(() => {
             set({ isLayouting: false }, false, 'mindmap-layout/updateLayout:animationEnd');
-          }, 900);
+          }, ANIMATION_DURATION);
         } catch (error) {
           console.error('Layout update failed:', error);
           set({ isLayouting: false }, false, 'mindmap-layout/updateLayout:error');
@@ -228,11 +230,11 @@ export const useLayoutStore = create<LayoutState>()(
           });
 
           if (Object.keys(targetPositions).length > 0) {
-            animateNodesToPositions(targetPositions, 800);
+            animateNodesToPositions(targetPositions, ANIMATION_DURATION);
 
             setTimeout(() => {
               set({ isLayouting: false }, false, 'mindmap-layout/updateSubtreeLayout:animationEnd');
-            }, 900);
+            }, ANIMATION_DURATION);
           } else {
             set({ isLayouting: false }, false, 'mindmap-layout/updateSubtreeLayout:noChanges');
           }

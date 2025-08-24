@@ -11,13 +11,16 @@ export type Position = (typeof POSITION)[keyof typeof POSITION];
 export interface BaseNodeData extends Record<string, unknown> {
   level: number;
   isDeleting?: boolean;
-  isCollapsed: boolean;
   collapsedBy?: string;
   parentId?: string;
   metadata?: Record<string, any>;
   side: Side;
-  isLeftChildrenCollapsed?: boolean;
-  isRightChildrenCollapsed?: boolean;
+  collapsedChildren?: {
+    leftNodes: BaseNode[];
+    leftEdges: MindMapEdge[];
+    rightNodes: BaseNode[];
+    rightEdges: MindMapEdge[];
+  };
 }
 
 export type BaseNode<

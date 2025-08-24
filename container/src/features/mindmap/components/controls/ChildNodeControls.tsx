@@ -15,34 +15,38 @@ import { cn } from '@/shared/lib/utils';
 import { motion } from 'motion/react';
 import { memo, useCallback, useState } from 'react';
 import { BaseHandle } from '../ui/base-handle';
+import { isEqual } from 'lodash';
 
-interface CreateChildNodeButtonsProps {
+interface ChildNodeControlsProps {
   node: NodeProps<MindMapNode>;
-  layout: Direction;
   selected: boolean;
 }
 
-export const CreateChildNodeButtons = memo(
-  ({ node, layout, selected }: CreateChildNodeButtonsProps) => {
+export const ChildNodeControls = memo(
+  ({ node, selected }: ChildNodeControlsProps) => {
     const canCreateLeft = node.data.side === SIDE.LEFT || node.data.side === SIDE.MID;
     const canCreateRight = node.data.side === SIDE.RIGHT || node.data.side === SIDE.MID;
 
-    const toggleCollapse = useNodeManipulationStore((state) => state.toggleCollapse);
+    const collapse = useNodeManipulationStore((state) => state.collapse);
+    const expand = useNodeManipulationStore((state) => state.expand);
     const hasLeftChildren = useCoreStore((state) => state.hasLeftChildren);
     const hasRightChildren = useCoreStore((state) => state.hasRightChildren);
     const addChildNodeStore = useNodeOperationsStore((state) => state.addChildNode);
     const layoutSubtree = useLayoutStore((state) => state.updateSubtreeLayout);
+    const layout = useLayoutStore((state) => state.layout);
 
     const addChildNode = useCallback((side: Side, type: MindMapTypes) => {
-      toggleCollapse(node.id, side, false);
+      expand(node.id, side);
+      addChildNodeStore(node, { x: node.positionAbsoluteX, y: node.positionAbsoluteY }, side, type);
       setTimeout(() => {
-        addChildNodeStore(node, { x: node.positionAbsoluteX, y: node.positionAbsoluteY }, side, type);
-
         layoutSubtree(node.id, layout);
-      }, 300);
+      }, 200);
     }, []);
 
     const isMouseOver = useClipboardStore((state) => state.mouseOverNodeId) === node.id;
+
+    const isLeftChildrenCollapsed = (node.data.collapsedChildren?.leftNodes || []).length > 0;
+    const isRightChildrenCollapsed = (node.data.collapsedChildren?.rightNodes || []).length > 0;
 
     return (
       <>
@@ -105,11 +109,16 @@ export const CreateChildNodeButtons = memo(
             whileTap={{ scale: 0.95 }}
             whileHover={{ scale: 1.05 }}
             transition={{ type: 'spring', stiffness: 400, damping: 17 }}
-            className={cn(hasLeftChildren(node.id) ? 'visible opacity-100' : 'invisible opacity-0')}
+            className={cn(
+              hasLeftChildren(node.id) || isLeftChildrenCollapsed
+                ? 'visible opacity-100'
+                : 'invisible opacity-0'
+            )}
           >
             <Button
               onClick={() => {
-                toggleCollapse(node.id, SIDE.LEFT, !node.data.isLeftChildrenCollapsed);
+                if (isLeftChildrenCollapsed) expand(node.id, SIDE.LEFT);
+                else collapse(node.id, SIDE.LEFT);
               }}
               size="icon"
               variant="outline"
@@ -118,8 +127,8 @@ export const CreateChildNodeButtons = memo(
               <motion.div
                 animate={
                   layout === DIRECTION.HORIZONTAL
-                    ? { rotate: node.data.isLeftChildrenCollapsed ? 0 : 180 }
-                    : { rotate: node.data.isLeftChildrenCollapsed ? 90 : 270 }
+                    ? { rotate: isLeftChildrenCollapsed ? 0 : 180 }
+                    : { rotate: isLeftChildrenCollapsed ? 90 : 270 }
                 }
                 transition={{ duration: 0.2, ease: 'easeInOut' }}
               >
@@ -142,11 +151,16 @@ export const CreateChildNodeButtons = memo(
             whileTap={{ scale: 0.95 }}
             whileHover={{ scale: 1.05 }}
             transition={{ type: 'spring', stiffness: 400, damping: 17 }}
-            className={cn(hasRightChildren(node.id) ? 'visible opacity-100' : 'invisible opacity-0')}
+            className={cn(
+              hasRightChildren(node.id) || isRightChildrenCollapsed
+                ? 'visible opacity-100'
+                : 'invisible opacity-0'
+            )}
           >
             <Button
               onClick={() => {
-                toggleCollapse(node.id, SIDE.RIGHT, !node.data.isRightChildrenCollapsed);
+                if (isRightChildrenCollapsed) expand(node.id, SIDE.RIGHT);
+                else collapse(node.id, SIDE.RIGHT);
               }}
               size="icon"
               variant="outline"
@@ -155,8 +169,8 @@ export const CreateChildNodeButtons = memo(
               <motion.div
                 animate={
                   layout === DIRECTION.HORIZONTAL
-                    ? { rotate: node.data.isRightChildrenCollapsed ? 0 : 180 }
-                    : { rotate: node.data.isRightChildrenCollapsed ? 90 : 270 }
+                    ? { rotate: isRightChildrenCollapsed ? 0 : 180 }
+                    : { rotate: isRightChildrenCollapsed ? 90 : 270 }
                 }
                 transition={{ duration: 0.2, ease: 'easeInOut' }}
               >
@@ -215,11 +229,15 @@ export const CreateChildNodeButtons = memo(
   },
   (prevProps, nextProps) => {
     // Only re-render if these specific properties change
+    const prevData = prevProps.node.data;
+    const nextData = nextProps.node.data;
+
     return (
       prevProps.node.id === nextProps.node.id &&
-      prevProps.layout === nextProps.layout &&
-      prevProps.node.data === nextProps.node.data &&
-      prevProps.selected === nextProps.selected
+      prevProps.selected === nextProps.selected &&
+      prevData.side === nextData.side &&
+      isEqual(prevData.collapsedChildren?.leftNodes, nextData.collapsedChildren?.leftNodes) &&
+      isEqual(prevData.collapsedChildren?.rightNodes, nextData.collapsedChildren?.rightNodes)
     );
   }
 );

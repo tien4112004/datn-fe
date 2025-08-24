@@ -7,7 +7,7 @@ export const useModels = () => {
   const { data: models, ...query } = useQuery({
     queryKey: [modelApiService.getType(), 'models'],
     queryFn: async () => {
-      const data = await modelApiService.getAvailableModels();
+      const data = await modelApiService.getModels();
       console.log('Fetch models', data);
       return data;
     },

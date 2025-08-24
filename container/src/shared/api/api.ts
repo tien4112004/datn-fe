@@ -2,7 +2,7 @@ import axios from 'axios';
 import { CriticalError, ExpectedError } from '@/types/errors';
 import { ERROR_TYPE } from '@/shared/constants';
 
-const API_BASE_URL = import.meta.env.API_BASE_URL || 'http://localhost:3000';
+const API_BASE_URL = import.meta.env.API_BASE_URL || 'http://localhost:8080';
 
 const api = axios.create({
   baseURL: API_BASE_URL,

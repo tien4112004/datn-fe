@@ -1,5 +1,5 @@
 import { createBrowserRouter } from 'react-router-dom';
-import NavLayout from '../shared/layouts/SidebarLayout';
+import NavLayout, { NavLayoutErrorBoundary } from '../shared/layouts/SidebarLayout';
 import Presentation from '@/features/presentation';
 import Demo from '@/features/demo';
 import { getDefaultModel } from '@/features/model';
@@ -9,6 +9,7 @@ import { CriticalError } from '@/types/errors';
 const router = createBrowserRouter([
   {
     element: <NavLayout />,
+    errorElement: <NavLayoutErrorBoundary />,
     children: [
       {
         index: true,

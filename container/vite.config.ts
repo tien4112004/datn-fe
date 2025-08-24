@@ -33,6 +33,11 @@ export default defineConfig(({ mode }) => {
         },
       }),
     ],
+    build: {
+      rollupOptions: {
+        treeshake: false,
+      },
+    },
     resolve: {
       alias: {
         '@/components': path.resolve(__dirname, './src/shared/components'),

@@ -14,14 +14,10 @@ import {
   SelectValue,
 } from '@/shared/components/ui/select';
 import ExamplePrompts from './ExamplePrompts';
-import {
-  SLIDE_COUNT_OPTIONS,
-  LANGUAGE_OPTIONS,
-  TARGET_AGE_OPTIONS,
-  MODEL_PROVIDERS_LOGO,
-} from '@/features/presentation/types';
+import { SLIDE_COUNT_OPTIONS, LANGUAGE_OPTIONS, TARGET_AGE_OPTIONS } from '@/features/presentation/types';
 import type { OutlineData } from '@/features/presentation/types';
 import type { ModelOption } from '@/features/model';
+import { ModelSelect } from '@/components/ModelSelect';
 
 interface OutlineCreationViewProps {
   defaultModel: ModelOption;
@@ -151,28 +147,43 @@ const OutlineCreationView = ({ models, defaultModel, onCreateOutline }: OutlineC
                     name="model"
                     control={control}
                     render={({ field }) => (
-                      <Select value={field.value} onValueChange={field.onChange}>
-                        <SelectTrigger className="w-fit">
-                          <SelectValue placeholder={t('modelPlaceholder')} />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectGroup>
-                            <SelectLabel>{t('modelLabel')}</SelectLabel>
-                            {models?.map((modelOption) => (
-                              <SelectItem key={modelOption.id} value={modelOption.name}>
-                                <img
-                                  src={MODEL_PROVIDERS_LOGO[modelOption.provider]}
-                                  alt={modelOption.provider}
-                                  className="mr-2 inline h-4 w-4"
-                                />
-
-                                {modelOption.displayName}
-                              </SelectItem>
-                            ))}
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
+                      <ModelSelect
+                        models={models}
+                        value={field.value}
+                        onValueChange={field.onChange}
+                        placeholder={t('modelPlaceholder')}
+                        label={t('modelLabel')}
+                        showProviderLogo={true}
+                      />
                     )}
+                    // render={({ field }) => (
+                    //   <Select value={field.value} onValueChange={field.onChange}>
+                    //     <SelectTrigger className="w-fit">
+                    //       <SelectValue placeholder={t('modelPlaceholder')} />
+                    //     </SelectTrigger>
+                    //     <SelectContent>
+                    //       <SelectGroup>
+                    //         <SelectLabel>{t('modelLabel')}</SelectLabel>
+                    //         {models?.map((modelOption) => (
+                    //           <SelectItem
+                    //             key={modelOption.id}
+                    //             value={modelOption.name}
+                    //             disabled={!modelOption.enabled}
+                    //             className={!modelOption.enabled ? 'opacity-50' : ''}
+                    //           >
+                    //             <img
+                    //               src={MODEL_PROVIDERS_LOGO[modelOption.provider]}
+                    //               alt={modelOption.provider}
+                    //               className="mr-2 inline h-4 w-4"
+                    //             />
+
+                    //             {modelOption.displayName}
+                    //           </SelectItem>
+                    //         ))}
+                    //       </SelectGroup>
+                    //     </SelectContent>
+                    //   </Select>
+                    // )}
                   />
                 </div>
               </div>

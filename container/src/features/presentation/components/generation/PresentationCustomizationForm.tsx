@@ -21,16 +21,8 @@ import {
   AlignCenter,
   AlignJustify,
 } from 'lucide-react';
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from '@/shared/components/ui/select';
 import { useTranslation } from 'react-i18next';
+import { ModelSelect } from '@/shared/components/ModelSelect';
 import { useModels } from '@/features/model';
 
 type CustomizationFormData = {
@@ -162,22 +154,32 @@ const ImageModelSection = ({ control }: ImageModelSectionProps) => {
         name="imageModel"
         control={control}
         render={({ field }) => (
-          <Select value={field.value} onValueChange={field.onChange}>
-            <SelectTrigger className="bg-card w-fit">
-              <SelectValue placeholder={tOutline('modelPlaceholder')} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectLabel>{tOutline('modelLabel')}</SelectLabel>
-                {models?.map((modelOption) => (
-                  <SelectItem key={modelOption.id} value={modelOption.name}>
-                    {modelOption.displayName}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
+          <ModelSelect
+            models={models}
+            value={field.value}
+            onValueChange={field.onChange}
+            placeholder={tOutline('modelPlaceholder')}
+            label={tOutline('modelLabel')}
+            showProviderLogo={true}
+          />
         )}
+        // render={({ field }) => (
+        //   <Select value={field.value} onValueChange={field.onChange}>
+        //     <SelectTrigger className="bg-card w-fit">
+        //       <SelectValue placeholder={tOutline('modelPlaceholder')} />
+        //     </SelectTrigger>
+        //     <SelectContent>
+        //       <SelectGroup>
+        //         <SelectLabel>{tOutline('modelLabel')}</SelectLabel>
+        //         {models?.map((modelOption) => (
+        //           <SelectItem key={modelOption.id} value={modelOption.name}>
+        //             {modelOption.displayName}
+        //           </SelectItem>
+        //         ))}
+        //       </SelectGroup>
+        //     </SelectContent>
+        //   </Select>
+        // )}
       />
     </CardContent>
   );

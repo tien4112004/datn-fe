@@ -15,12 +15,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/shared/components/ui/select';
-import { useModels } from '@/features/model';
+import { ModelSelect } from '@/shared/components/ModelSelect';
 import { SLIDE_COUNT_OPTIONS } from '@/features/presentation/types';
 import type { OutlineData } from '@/features/presentation/types/outline';
 import useFetchStreamingOutline from '@/features/presentation/hooks/useFetchStreaming';
 // import { useOutlineContext } from '../../context/OutlineContext';
 import useOutlineStore from '@/features/presentation/stores/useOutlineStore';
+import { useModels } from '@/features/model';
 
 type OutlineFormData = {
   topic: string;
@@ -214,22 +215,36 @@ const OutlineFormSection = ({
             name="model"
             control={control}
             render={({ field }) => (
-              <Select value={field.value} onValueChange={field.onChange}>
-                <SelectTrigger className="bg-card w-fit">
-                  <SelectValue placeholder={t('modelPlaceholder')} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectLabel>{t('modelLabel')}</SelectLabel>
-                    {models?.map((modelOption) => (
-                      <SelectItem key={modelOption.id} value={modelOption.name}>
-                        {modelOption.displayName}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
+              <ModelSelect
+                models={models}
+                value={field.value}
+                onValueChange={field.onChange}
+                placeholder={t('modelPlaceholder')}
+                label={t('modelLabel')}
+              />
             )}
+            // render={({ field }) => (
+            //   <Select value={field.value} onValueChange={field.onChange}>
+            //     <SelectTrigger className="bg-card w-fit">
+            //       <SelectValue placeholder={t('modelPlaceholder')} />
+            //     </SelectTrigger>
+            //     <SelectContent>
+            //       <SelectGroup>
+            //         <SelectLabel>{t('modelLabel')}</SelectLabel>
+            //         {models?.map((modelOption) => (
+            //           <SelectItem
+            //             key={modelOption.id}
+            //             value={modelOption.name}
+            //             disabled={!modelOption.enabled}
+            //             className={!modelOption.enabled ? 'opacity-50' : ''}
+            //           >
+            //             {modelOption.displayName}
+            //           </SelectItem>
+            //         ))}
+            //       </SelectGroup>
+            //     </SelectContent>
+            //   </Select>
+            // )}
           />
         </div>
       </div>

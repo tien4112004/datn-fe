@@ -75,7 +75,7 @@ export default class PresentationRealApiService implements PresentationApiServic
   getStreamedOutline(request: OutlineData, signal: AbortSignal): AsyncIterable<string> {
     return {
       async *[Symbol.asyncIterator]() {
-        const response = await api.stream('api/presentations/generate', request, signal);
+        const response = await api.stream('api/presentations/outline-generate', request, signal);
 
         const reader = response.body?.getReader();
         if (!reader) throw new Error('No reader available');

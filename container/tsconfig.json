@@ -18,7 +18,8 @@
       "@/assets/*": ["./src/shared/assets/*"],
       "@/context/*": ["./src/shared/context/*"],
       "@/*": ["./src/*"],
-      "@ui/*": ["./src/shared/components/ui/*"]
+      "@ui/*": ["./src/shared/components/ui/*"],
+      "@/tests/*": ["./tests/*"]
     }
   }
 }

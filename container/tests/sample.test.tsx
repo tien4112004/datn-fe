@@ -1,5 +1,6 @@
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
+import { renderWithProviders } from '@/tests/test-utils';
 
 // Mock component for testing
 const TestComponent = () => {
@@ -8,7 +9,7 @@ const TestComponent = () => {
 
 describe('Sample Test', () => {
   it('renders test component', () => {
-    render(<TestComponent />);
+    renderWithProviders(<TestComponent />);
     expect(screen.getByText('Hello Container App!')).toBeInTheDocument();
   });
 

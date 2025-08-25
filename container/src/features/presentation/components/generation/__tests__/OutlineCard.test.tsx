@@ -1,20 +1,20 @@
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import OutlineCard from '@/features/presentation/components/generation/OutlineCard';
-import { describe, expect, it, vi } from 'vitest';
-// import type { BlockNoteEditor, InlineContentSchema, StyleSchema } from '@blocknote/core';
+import { describe, expect, it } from 'vitest';
+import { renderWithProviders } from '@/tests/test-utils';
 
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({
-    t: (key: string) => key,
-    i18n: { language: 'en' },
-  }),
-}));
+// vi.mock('react-i18next', () => ({
+//   useTranslation: () => ({
+//     t: (key: string) => key,
+//     i18n: { language: 'en' },
+//   }),
+// }));
 
-vi.mock('@/shared/components/rte/RichTextEditor', () => ({
-  default: () => {
-    return <div>RichTextEditor</div>;
-  },
-}));
+// vi.mock('@/shared/components/rte/RichTextEditor', () => ({
+//   default: () => {
+//     return <div>RichTextEditor</div>;
+//   },
+// }));
 
 describe('OutlineCard', () => {
   const standardProps = {
@@ -28,7 +28,7 @@ describe('OutlineCard', () => {
   };
 
   it('should render without crashing', () => {
-    render(<OutlineCard {...standardProps} />);
+    renderWithProviders(<OutlineCard {...standardProps} />);
 
     const card = screen.getByText('Test Title');
     expect(card).toBeInTheDocument();

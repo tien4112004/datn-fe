@@ -1,18 +1,18 @@
-import { flexRender, type Table as TableType } from '@tanstack/react-table';
+import { flexRender, type Row, type Table as TableType } from '@tanstack/react-table';
 import { TableHeader, TableRow, TableHead, TableBody, TableCell, Table } from '@ui/table';
 import TablePagination from './TablePagination';
 import SkeletonTable from './SkeletonTable';
 import { ContextMenu, ContextMenuContent, ContextMenuTrigger } from '@/components/ui/context-menu';
 
-interface DataTableProps {
-  table: TableType<any>;
+interface DataTableProps<TData> {
+  table: TableType<TData>;
   isLoading: boolean;
   emptyState: React.ReactNode;
-  onClickRow?: (row: any) => void;
-  contextMenu?: React.ReactNode;
+  onClickRow?: (row: Row<TData>) => void;
+  contextMenu?: (row: Row<TData>) => React.ReactNode;
 }
 
-const DataTable = ({ table, isLoading, emptyState, onClickRow, contextMenu }: DataTableProps) => {
+function DataTable<TData>({ table, isLoading, emptyState, onClickRow, contextMenu }: DataTableProps<TData>) {
   if (isLoading) {
     return <SkeletonTable rows={5} columns={6} />;
   }
@@ -57,17 +57,19 @@ const DataTable = ({ table, isLoading, emptyState, onClickRow, contextMenu }: Da
                   ))}
                 </TableRow>
               </ContextMenuTrigger>
-              <ContextMenuContent>{contextMenu}</ContextMenuContent>
+              <ContextMenuContent>{contextMenu ? contextMenu(row) : null}</ContextMenuContent>
             </ContextMenu>
           ))}
         </TableBody>
       </Table>
+
       {emptyState && table.getRowModel().rows.length === 0 && (
         <div className="flex min-h-24 items-center justify-center">{emptyState}</div>
       )}
+
       <TablePagination table={table} />
     </>
   );
-};
+}
 
 export default DataTable;

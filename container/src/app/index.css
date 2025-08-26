@@ -182,3 +182,5 @@ textarea,
 input[type='text'] {
   resize: none;
 }
+
+@import '../features/mindmap/components/node/BaseNode.module.css';

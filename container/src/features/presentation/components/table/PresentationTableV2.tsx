@@ -5,7 +5,7 @@ import type { PresentationItem } from '../../types/presentation';
 import { Badge } from '@/components/ui/badge';
 import { usePresentations } from '../../hooks/useApi';
 import DataTable from '@/components/table/DataTable';
-import { ContextMenuItem } from '@/components/ui/context-menu';
+import { ActionContent } from './ActionButton';
 
 const PresentationTableV2 = () => {
   const { t } = useTranslation('table');
@@ -78,14 +78,16 @@ const PresentationTableV2 = () => {
       table={table}
       isLoading={isLoading}
       emptyState={<div className="text-muted-foreground">{t('presentation.emptyState')}</div>}
-      contextMenu={
-        <>
-          <ContextMenuItem>Profile</ContextMenuItem>
-          <ContextMenuItem>Billing</ContextMenuItem>
-          <ContextMenuItem>Team</ContextMenuItem>
-          <ContextMenuItem>Subscription</ContextMenuItem>
-        </>
-      }
+      contextMenu={(row) => (
+        <ActionContent
+          onEdit={() => {
+            console.log('Edit', row.original);
+          }}
+          onDelete={() => {
+            console.log('Delete', row.original);
+          }}
+        />
+      )}
     />
   );
 };

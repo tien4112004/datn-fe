@@ -2,7 +2,6 @@ import { Plus, Trash2, Undo, Redo } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { useLayoutStore } from '../../stores/layout';
-import { SidebarTrigger } from '@/components/ui/sidebar';
 import { useUndoRedoStore, useCoreStore, useNodeOperationsStore } from '../../stores';
 import { useReactFlow } from '@xyflow/react';
 import type { Direction } from '../../types';
@@ -21,7 +20,6 @@ const Toolbar = () => {
 
   return (
     <div className="absolute left-4 top-4 z-10 flex gap-2">
-      <SidebarTrigger className="-ml-1" />
       <Button
         onClick={() => {
           addNode();

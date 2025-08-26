@@ -2,16 +2,17 @@ import { flexRender, type Table as TableType } from '@tanstack/react-table';
 import { TableHeader, TableRow, TableHead, TableBody, TableCell, Table } from '@ui/table';
 import TablePagination from './TablePagination';
 import SkeletonTable from './SkeletonTable';
+import { ContextMenu, ContextMenuContent, ContextMenuTrigger } from '@/components/ui/context-menu';
 
 interface DataTableProps {
   table: TableType<any>;
   isLoading: boolean;
   emptyState: React.ReactNode;
   onClickRow?: (row: any) => void;
-  onRightClickRow?: (row: any) => void;
+  contextMenu?: React.ReactNode;
 }
 
-const DataTable = ({ table, isLoading, emptyState, onClickRow, onRightClickRow }: DataTableProps) => {
+const DataTable = ({ table, isLoading, emptyState, onClickRow, contextMenu }: DataTableProps) => {
   if (isLoading) {
     return <SkeletonTable rows={5} columns={6} />;
   }
@@ -42,21 +43,22 @@ const DataTable = ({ table, isLoading, emptyState, onClickRow, onRightClickRow }
         </TableHeader>
         <TableBody>
           {table.getRowModel().rows.map((row) => (
-            <TableRow
-              key={row.id}
-              onClick={() => onClickRow?.(row)}
-              onContextMenu={() => onRightClickRow?.(row)}
-            >
-              {row.getVisibleCells().map((cell) => (
-                <TableCell
-                  key={cell.id}
-                  className={(cell.column.columnDef.meta as any)?.style?.className}
-                  align={(cell.column.columnDef.meta as any)?.style?.align}
-                >
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </TableCell>
-              ))}
-            </TableRow>
+            <ContextMenu>
+              <ContextMenuTrigger asChild>
+                <TableRow key={row.id} onClick={() => onClickRow?.(row)}>
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell
+                      key={cell.id}
+                      className={(cell.column.columnDef.meta as any)?.style?.className}
+                      align={(cell.column.columnDef.meta as any)?.style?.align}
+                    >
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              </ContextMenuTrigger>
+              <ContextMenuContent>{contextMenu}</ContextMenuContent>
+            </ContextMenu>
           ))}
         </TableBody>
       </Table>

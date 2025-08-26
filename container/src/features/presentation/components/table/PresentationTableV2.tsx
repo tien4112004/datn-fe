@@ -5,6 +5,7 @@ import type { PresentationItem } from '../../types/presentation';
 import { Badge } from '@/components/ui/badge';
 import { usePresentations } from '../../hooks/useApi';
 import DataTable from '@/components/table/DataTable';
+import { ContextMenuItem } from '@/components/ui/context-menu';
 
 const PresentationTableV2 = () => {
   const { t } = useTranslation('table');
@@ -73,14 +74,19 @@ const PresentationTableV2 = () => {
   });
 
   return (
-    <>
-      <DataTable
-        table={table}
-        isLoading={isLoading}
-        emptyState={<div className="text-muted-foreground">{t('presentation.emptyState')}</div>}
-        onRightClickRow={(row) => {}}
-      />
-    </>
+    <DataTable
+      table={table}
+      isLoading={isLoading}
+      emptyState={<div className="text-muted-foreground">{t('presentation.emptyState')}</div>}
+      contextMenu={
+        <>
+          <ContextMenuItem>Profile</ContextMenuItem>
+          <ContextMenuItem>Billing</ContextMenuItem>
+          <ContextMenuItem>Team</ContextMenuItem>
+          <ContextMenuItem>Subscription</ContextMenuItem>
+        </>
+      }
+    />
   );
 };
 

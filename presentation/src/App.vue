@@ -25,6 +25,7 @@ const _isPC = isPC();
 
 const props = defineProps<{
   titleTest: string;
+  isRemote: boolean;
 }>();
 
 const mainStore = useMainStore();

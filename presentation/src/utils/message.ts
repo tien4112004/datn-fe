@@ -13,7 +13,7 @@ export interface MessageOptions {
   onClose?: () => void;
 }
 
-export type MessageTypeOptions = Omit<MessageOptions, 'type' | 'message'>;
+export type MessageTypeOptions = Omit<MessageOptions, 'type' | 'app.message'>;
 export interface MessageIntance {
   id: string;
   close: () => void;
@@ -97,9 +97,8 @@ const isRemote = () => {
 
 message.success = (msg: string, options?: MessageTypeOptions) => {
   if (isRemote()) {
-    window.dispatchEvent(
-      new CustomEvent('message', { detail: { type: 'success', message: msg, ...options } })
-    );
+    window.dispatchEvent(new CustomEvent('app.message', { detail: { type: 'success', message: msg } }));
+
     return null as any;
   }
   return message({ ...options, type: 'success', message: msg });
@@ -107,7 +106,7 @@ message.success = (msg: string, options?: MessageTypeOptions) => {
 
 message.info = (msg: string, options?: MessageTypeOptions) => {
   if (isRemote()) {
-    window.dispatchEvent(new CustomEvent('message', { detail: { type: 'info', message: msg, ...options } }));
+    window.dispatchEvent(new CustomEvent('app.message', { detail: { type: 'info', message: msg } }));
     return null as any;
   }
   return message({ ...options, type: 'info', message: msg });
@@ -115,9 +114,7 @@ message.info = (msg: string, options?: MessageTypeOptions) => {
 
 message.warning = (msg: string, options?: MessageTypeOptions) => {
   if (isRemote()) {
-    window.dispatchEvent(
-      new CustomEvent('message', { detail: { type: 'warning', message: msg, ...options } })
-    );
+    window.dispatchEvent(new CustomEvent('app.message', { detail: { type: 'warning', message: msg } }));
     return null as any;
   }
   return message({ ...options, type: 'warning', message: msg });
@@ -125,7 +122,7 @@ message.warning = (msg: string, options?: MessageTypeOptions) => {
 
 message.error = (msg: string, options?: MessageTypeOptions) => {
   if (isRemote()) {
-    window.dispatchEvent(new CustomEvent('message', { detail: { type: 'error', message: msg, ...options } }));
+    window.dispatchEvent(new CustomEvent('app.message', { detail: { type: 'error', message: msg } }));
     return null as any;
   }
   return message({ ...options, type: 'error', message: msg });

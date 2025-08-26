@@ -16,7 +16,7 @@ import {
   SelectValue,
 } from '@/shared/components/ui/select';
 import { ModelSelect } from '@/shared/components/ModelSelect';
-import { SLIDE_COUNT_OPTIONS } from '@/features/presentation/types';
+import { LANGUAGE_OPTIONS, SLIDE_COUNT_OPTIONS, TARGET_AGE_OPTIONS } from '@/features/presentation/types';
 import type { OutlineData } from '@/features/presentation/types/outline';
 import useFetchStreamingOutline from '@/features/presentation/hooks/useFetchStreaming';
 // import { useOutlineContext } from '../../context/OutlineContext';
@@ -183,6 +183,48 @@ const OutlineFormSection = ({
                     {SLIDE_COUNT_OPTIONS.map((num) => (
                       <SelectItem key={num} value={num.toString()}>
                         {num} {t('slideCountUnit')}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            )}
+          />
+          <Controller
+            name="language"
+            control={control}
+            render={({ field }) => (
+              <Select value={field.value} onValueChange={field.onChange}>
+                <SelectTrigger className="w-fit">
+                  <SelectValue placeholder={t('language.placeholder')} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectLabel>{t('language.label')}</SelectLabel>
+                    {LANGUAGE_OPTIONS.map((languageOption) => (
+                      <SelectItem key={languageOption.value} value={languageOption.value}>
+                        {t(languageOption.labelKey)}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            )}
+          />
+          <Controller
+            name="targetAge"
+            control={control}
+            render={({ field }) => (
+              <Select value={field.value} onValueChange={field.onChange}>
+                <SelectTrigger className="w-fit">
+                  <SelectValue placeholder={t('targetAge.placeholder')} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectLabel>{t('targetAge.label')}</SelectLabel>
+                    {TARGET_AGE_OPTIONS.map((ageOption) => (
+                      <SelectItem key={ageOption.value} value={ageOption.value}>
+                        {t(ageOption.labelKey)}
                       </SelectItem>
                     ))}
                   </SelectGroup>

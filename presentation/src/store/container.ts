@@ -3,11 +3,13 @@ import { defineStore } from 'pinia';
 
 export interface ContainerState {
   titleTest: string;
+  isRemote: boolean;
 }
 
 export const useContainerStore = defineStore('container', {
   state: (): ContainerState => ({
     titleTest: '',
+    isRemote: false,
   }),
 
   getters: {

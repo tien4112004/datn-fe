@@ -1,5 +1,7 @@
 import { createVNode, render, type AppContext } from 'vue';
 import MessageComponent from '@/components/Message.vue';
+import { useContainerStore } from '@/store';
+import Message from '@/components/Message.vue';
 
 export interface MessageOptions {
   type?: 'info' | 'success' | 'warning' | 'error';
@@ -35,7 +37,7 @@ const defaultOptions: MessageOptions = {
   duration: 3000,
 };
 
-const message: Message = (options: MessageOptions) => {
+let message: Message = ((options: MessageOptions) => {
   const id = 'message-' + seed++;
   const props = {
     ...defaultOptions,
@@ -87,18 +89,53 @@ const message: Message = (options: MessageOptions) => {
 
   instances.push(instance);
   return instance;
+}) as Message;
+
+const isRemote = () => {
+  return useContainerStore().isRemote;
 };
 
-message.success = (msg: string, options?: MessageTypeOptions) =>
-  message({ ...options, type: 'success', message: msg });
-message.info = (msg: string, options?: MessageTypeOptions) =>
-  message({ ...options, type: 'info', message: msg });
-message.warning = (msg: string, options?: MessageTypeOptions) =>
-  message({ ...options, type: 'warning', message: msg });
-message.error = (msg: string, options?: MessageTypeOptions) =>
-  message({ ...options, type: 'error', message: msg });
+message.success = (msg: string, options?: MessageTypeOptions) => {
+  if (isRemote()) {
+    window.dispatchEvent(
+      new CustomEvent('message', { detail: { type: 'success', message: msg, ...options } })
+    );
+    return null as any;
+  }
+  return message({ ...options, type: 'success', message: msg });
+};
+
+message.info = (msg: string, options?: MessageTypeOptions) => {
+  if (isRemote()) {
+    window.dispatchEvent(new CustomEvent('message', { detail: { type: 'info', message: msg, ...options } }));
+    return null as any;
+  }
+  return message({ ...options, type: 'info', message: msg });
+};
+
+message.warning = (msg: string, options?: MessageTypeOptions) => {
+  if (isRemote()) {
+    window.dispatchEvent(
+      new CustomEvent('message', { detail: { type: 'warning', message: msg, ...options } })
+    );
+    return null as any;
+  }
+  return message({ ...options, type: 'warning', message: msg });
+};
+
+message.error = (msg: string, options?: MessageTypeOptions) => {
+  if (isRemote()) {
+    window.dispatchEvent(new CustomEvent('message', { detail: { type: 'error', message: msg, ...options } }));
+    return null as any;
+  }
+  return message({ ...options, type: 'error', message: msg });
+};
 
 message.closeAll = function () {
+  if (isRemote()) {
+    window.dispatchEvent(new CustomEvent('message.closeAll'));
+    return;
+  }
   for (let i = instances.length - 1; i >= 0; i--) {
     instances[i].close();
   }

@@ -1,13 +1,13 @@
 import { createApp } from 'vue';
 import { createPinia } from 'pinia';
-import icon from './plugins/icon.ts';
-import directive from './plugins/directive/index.ts';
+import icon from './plugins/icon';
+import directive from './plugins/directive/index';
 import App from './App.vue';
 import '@/assets/styles/prosemirror.scss';
 import '@/assets/styles/scope.scss';
 import i18n from '@/locales';
 
-export function mount(el, props) {
+export function mount(el: any, props: any) {
   const app = createApp(App, props);
 
   const pinia = createPinia();
@@ -16,7 +16,6 @@ export function mount(el, props) {
   icon.install(app);
   directive.install(app);
   app.mount(el);
-  app.use(i18n);
 
   return app;
 }

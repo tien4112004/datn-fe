@@ -2,8 +2,13 @@ import { PresentationWrapper } from '@/features/presentation/components';
 import { useCallback, useEffect } from 'react';
 import { toast } from 'sonner';
 
+export interface MessageDetail {
+  type: 'success' | 'error' | 'warning' | 'info' | string;
+  message: string;
+}
+
 const EditorPage = () => {
-  const handleMessage = useCallback((event: any) => {
+  const handleMessage = useCallback((event: CustomEvent<MessageDetail>) => {
     const { type, message } = event.detail;
     switch (type) {
       case 'success':

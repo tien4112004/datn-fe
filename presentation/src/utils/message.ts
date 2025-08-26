@@ -1,7 +1,6 @@
 import { createVNode, render, type AppContext } from 'vue';
 import MessageComponent from '@/components/Message.vue';
 import { useContainerStore } from '@/store';
-import Message from '@/components/Message.vue';
 
 export interface MessageOptions {
   type?: 'info' | 'success' | 'warning' | 'error';

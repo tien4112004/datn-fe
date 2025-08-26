@@ -9,29 +9,35 @@ type ActionButtonProps = {
 };
 
 const ActionButton = ({ onEdit, onDelete }: ActionButtonProps) => {
-  const { t } = useTranslation('table');
-
   return (
     <Popover>
       <PopoverTrigger asChild>
         <EllipsisVerticalIcon className="h-5 w-5 cursor-pointer text-gray-500 hover:text-gray-700" />
       </PopoverTrigger>
       <PopoverContent className="w-48">
-        <ul className="space-y-2">
-          <li>
-            <Button onClick={onEdit} className="w-full text-left" variant={'ghost'}>
-              {t('actionButton.edit')}
-            </Button>
-          </li>
-          <li>
-            <Button onClick={onDelete} className="w-full text-left" variant={'destructive'}>
-              {t('actionButton.delete')}
-            </Button>
-          </li>
-        </ul>
+        <ActionContent onEdit={onEdit} onDelete={onDelete} />
       </PopoverContent>
     </Popover>
   );
 };
 
 export default ActionButton;
+
+export const ActionContent = ({ onEdit, onDelete }: ActionButtonProps) => {
+  const { t } = useTranslation('table');
+
+  return (
+    <ul className="space-y-2">
+      <li>
+        <Button onClick={onEdit} className="w-full text-left" variant={'ghost'}>
+          {t('actionButton.edit')}
+        </Button>
+      </li>
+      <li>
+        <Button onClick={onDelete} className="w-full text-left" variant={'destructive'}>
+          {t('actionButton.delete')}
+        </Button>
+      </li>
+    </ul>
+  );
+};

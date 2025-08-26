@@ -3,11 +3,15 @@ import { TableHeader, TableRow, TableHead, TableBody, TableCell, Table } from '@
 import TablePagination from './TablePagination';
 import SkeletonTable from './SkeletonTable';
 
-const DataTable: React.FC<{ table: TableType<any>; isLoading: boolean; emptyState: React.ReactNode }> = ({
-  table,
-  isLoading,
-  emptyState,
-}) => {
+interface DataTableProps {
+  table: TableType<any>;
+  isLoading: boolean;
+  emptyState: React.ReactNode;
+  onClickRow?: (row: any) => void;
+  onRightClickRow?: (row: any) => void;
+}
+
+const DataTable = ({ table, isLoading, emptyState, onClickRow, onRightClickRow }: DataTableProps) => {
   if (isLoading) {
     return <SkeletonTable rows={5} columns={6} />;
   }
@@ -38,7 +42,11 @@ const DataTable: React.FC<{ table: TableType<any>; isLoading: boolean; emptyStat
         </TableHeader>
         <TableBody>
           {table.getRowModel().rows.map((row) => (
-            <TableRow key={row.id}>
+            <TableRow
+              key={row.id}
+              onClick={() => onClickRow?.(row)}
+              onContextMenu={() => onRightClickRow?.(row)}
+            >
               {row.getVisibleCells().map((cell) => (
                 <TableCell
                   key={cell.id}

@@ -124,9 +124,8 @@ export default {
     presentation: {
       id: 'ID',
       title: 'Tiêu đề',
-      description: 'Mô tả',
       createdAt: 'Ngày tạo',
-      status: 'Trạng thái',
+      updatedAt: 'Cập nhật gần nhất',
       emptyState: 'Không có bài trình bày nào được tìm thấy',
     },
     actionButton: {

@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import PresentationTableV2 from '../components/table/PresentationTableV2';
+import { createTestPresentations } from '../hooks/loaders';
 
 const PresentationListPage = () => {
   const navigate = useNavigate();
@@ -23,6 +24,11 @@ const PresentationListPage = () => {
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
+        <div>
+          <Button variant="outline" onClick={() => createTestPresentations()}>
+            Create Test Presentation (Using API)
+          </Button>
+        </div>
       </header>
       <div className="px-8 py-4">
         <div className="mb-6 flex items-center justify-between">

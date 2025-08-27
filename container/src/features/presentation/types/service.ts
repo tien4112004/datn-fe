@@ -7,4 +7,5 @@ export interface PresentationApiService extends Service {
   getOutlineItems(): Promise<OutlineItem[]>;
   // getStreamedOutline(request: OutlinePromptRequest, signal: AbortSignal): Promise<ReadableStream<Uint8Array>>;
   getStreamedOutline(request: OutlineData, signal: AbortSignal): AsyncIterable<string>;
+  createPresentation(data: PresentationItem): Promise<PresentationItem>;
 }

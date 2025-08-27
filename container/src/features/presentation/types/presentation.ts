@@ -1,7 +1,13 @@
+import type { Slide, SlideTheme } from './slide';
+
 export interface PresentationItem {
   id: string;
   title: string;
-  description: string;
-  createdAt: string;
-  status: 'active' | 'archived';
+  width?: number;
+  height?: number;
+  theme?: SlideTheme;
+  thumbnail?: Slide;
+  slides?: Slide[];
+  createdAt?: Date | string;
+  updatedAt?: Date | string;
 }

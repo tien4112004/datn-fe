@@ -7,6 +7,7 @@ import {
 } from '../types';
 import { splitMarkdownToOutlineItems } from '../utils';
 import { api } from '@/shared/api';
+import type { ApiResponse } from '@/types/api';
 // import api from '@/shared/api';
 
 const mockOutlineOutput = `\`\`\`markdown
@@ -95,24 +96,33 @@ export default class PresentationRealApiService implements PresentationApiServic
     };
   }
 
-  //   async getPresentationItems(): Promise<PresentationItem[]> {
-  //     const response = await api.get<PresentationItem[]>('/presentation/items');
-  //     return response.data;
-  //   }
-
   getType(): ApiMode {
     return API_MODE.real;
   }
 
   async getPresentationItems(): Promise<PresentationItem[]> {
-    console.warn('getPresentationItems is not implemented in PresentationRealApiService');
-    await new Promise((resolve) => setTimeout(resolve, 50));
-    // TODO: Implement real API call
-    return [];
+    const response = await api.get<ApiResponse<PresentationItem[]>>('/api/presentations/all');
+    return response.data.data.map(this._mapPresentationItem);
   }
 
   async getOutlineItems(): Promise<OutlineItem[]> {
     await new Promise((resolve) => setTimeout(resolve, 50));
     return splitMarkdownToOutlineItems(mockOutlineOutput);
+  }
+
+  async createPresentation(data: PresentationItem): Promise<PresentationItem> {
+    const response = await api.post<ApiResponse<PresentationItem>>('/api/presentations', data);
+    return this._mapPresentationItem(response.data.data);
+  }
+
+  _mapPresentationItem(data: any): PresentationItem {
+    return {
+      id: data.id,
+      title: data.title,
+      thumbnail: data.thumbnail,
+      slides: data.slides,
+      createdAt: data.createdAt,
+      updatedAt: data.updatedAt,
+    };
   }
 }

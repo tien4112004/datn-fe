@@ -3,11 +3,13 @@ import { defineStore } from 'pinia';
 
 export interface ContainerState {
   titleTest: string;
+  isRemote: boolean;
 }
 
 export const useContainerStore = defineStore('container', {
   state: (): ContainerState => ({
     titleTest: '',
+    isRemote: false,
   }),
 
   getters: {
@@ -19,6 +21,7 @@ export const useContainerStore = defineStore('container', {
   actions: {
     initialize(data: Partial<ContainerState>) {
       this.titleTest = data?.titleTest || '';
+      this.isRemote = data?.isRemote || false;
     },
   },
 });

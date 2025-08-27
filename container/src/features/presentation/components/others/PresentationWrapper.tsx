@@ -19,6 +19,7 @@ const PresentationWrapper = () => {
       .then((mod) => {
         mod.mount(containerRef.current, {
           titleTest: 'random',
+          isRemote: true,
         });
         setIsLoading(false);
       })

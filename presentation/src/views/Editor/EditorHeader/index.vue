@@ -22,7 +22,7 @@
     </div>
 
     <div class="right">
-      <Popover trigger="click" placement="bottom-start" v-model:value="mainMenuVisible">
+      <Popover trigger="click" placement="bottom-end" v-model:value="mainMenuVisible">
         <template #content>
           <PopoverMenuItem
             @click="
@@ -77,6 +77,23 @@
             "
             >{{ $t('header.tools.quickActions') }}</PopoverMenuItem
           >
+
+          <!-- Demo message -->
+          <PopoverMenuItem @click="message.success('This is a success message')"
+            >Demo Success Message
+          </PopoverMenuItem>
+
+          <PopoverMenuItem @click="message.info('This is an info message')"
+            >Demo Info Message
+          </PopoverMenuItem>
+
+          <PopoverMenuItem @click="message.warning('This is a warning message')"
+            >Demo Warning Message
+          </PopoverMenuItem>
+
+          <PopoverMenuItem @click="message.error('This is an error message')"
+            >Demo Error Message
+          </PopoverMenuItem>
         </template>
         <div class="menu-item">
           <div class="handler-item">
@@ -155,6 +172,7 @@ import useScreening from '@/hooks/useScreening';
 import useImport from '@/hooks/useImport';
 import useSlideHandler from '@/hooks/useSlideHandler';
 import type { DialogForExportTypes } from '@/types/export';
+import message from '@/utils/message';
 
 import HotkeyDoc from './HotkeyDoc.vue';
 import FileInput from '@/components/FileInput.vue';

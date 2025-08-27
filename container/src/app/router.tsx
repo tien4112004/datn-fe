@@ -8,6 +8,7 @@ import { CriticalError } from '@/types/errors';
 import Mindmap from '@/features/mindmap';
 import { getMindmapById } from '@/features/mindmap/hooks/loaders';
 import { getPresentationById } from '@/features/presentation/hooks/loaders';
+import Settings from '@/features/settings';
 
 const router = createBrowserRouter([
   {
@@ -42,6 +43,10 @@ const router = createBrowserRouter([
         // Component: Presentation.CreateOutlinePage,
         Component: Presentation.PresentationOutlinePage,
         loader: getModels,
+      },
+      {
+        path: 'settings',
+        Component: Settings.SettingsPage,
       },
       // {
       //   path: 'presentation/outline',

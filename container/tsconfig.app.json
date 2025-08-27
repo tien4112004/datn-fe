@@ -33,7 +33,8 @@
       "@/context/*": ["./src/shared/context/*"],
       "@/components/*": ["./src/shared/components/*"],
       "@ui/*": ["./src/shared/components/ui/*"],
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@/tests/*": ["./tests/*"]
     }
   },
   "include": ["src/**/*.ts", "src/**/*.tsx", "tests/**/*.ts", "tests/**/*.tsx"]

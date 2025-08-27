@@ -144,6 +144,8 @@ type CustomizationFormData = {
   imageModel: string;
 };
 
+// Can't test this component properly due to the complexity of the form and its dependencies.
+// Might consider integration tests or refactoring for better testability.
 describe('PresentationCustomizationForm', () => {
   const mockControl = {} as Control<CustomizationFormData>;
   const mockWatch = vi.fn();

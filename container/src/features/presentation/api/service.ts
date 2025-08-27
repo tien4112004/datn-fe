@@ -115,6 +115,11 @@ export default class PresentationRealApiService implements PresentationApiServic
     return this._mapPresentationItem(response.data.data);
   }
 
+  async getPresentationById(id: string): Promise<PresentationItem | null> {
+    const response = await api.get<ApiResponse<PresentationItem>>(`/api/presentations/${id}`);
+    return this._mapPresentationItem(response.data.data);
+  }
+
   _mapPresentationItem(data: any): PresentationItem {
     return {
       id: data.id,

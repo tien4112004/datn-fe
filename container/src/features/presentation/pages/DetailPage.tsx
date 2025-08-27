@@ -7,7 +7,7 @@ export interface MessageDetail {
   message: string;
 }
 
-const EditorPage = () => {
+const DetailPage = () => {
   const handleMessage = useCallback((event: CustomEvent<MessageDetail>) => {
     const { type, message } = event.detail;
     switch (type) {
@@ -38,4 +38,4 @@ const EditorPage = () => {
   return <PresentationWrapper />;
 };
 
-export default EditorPage;
+export default DetailPage;

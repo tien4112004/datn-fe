@@ -800,3 +800,15 @@ export interface SlideTemplate {
   id: string;
   cover: string;
 }
+
+export interface Presentation {
+  id: string;
+  title: string;
+  width?: number;
+  height?: number;
+  theme?: SlideTheme;
+  thumbnail?: Slide;
+  slides?: Slide[];
+  createdAt?: Date | string;
+  updatedAt?: Date | string;
+}

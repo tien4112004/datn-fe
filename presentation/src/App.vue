@@ -20,12 +20,14 @@ import Editor from './views/Editor/index.vue';
 import Screen from './views/Screen/index.vue';
 import Mobile from './views/Mobile/index.vue';
 import FullscreenSpin from '@/components/FullscreenSpin.vue';
+import type { Presentation } from './types/slides';
 
 const _isPC = isPC();
 
 const props = defineProps<{
   titleTest: string;
   isRemote: boolean;
+  presentation: Presentation;
 }>();
 
 const mainStore = useMainStore();
@@ -41,10 +43,15 @@ if (import.meta.env.MODE !== 'development') {
 }
 
 onMounted(async () => {
-  const slides = await api.getFileData('slides');
-  slidesStore.setSlides(slides);
-
   containerStore.initialize(props);
+
+  if (containerStore.isRemote) {
+    console.log('Presentation data in App.vue:', containerStore.presentation);
+    slidesStore.setSlides(containerStore.presentation?.slides || []);
+  } else {
+    const slides = await api.getFileData('slides');
+    slidesStore.setSlides(slides);
+  }
 
   await deleteDiscardedDB();
   snapshotStore.initSnapshotDatabase();

@@ -1,12 +1,15 @@
 import GlobalSpinner from '@/shared/components/common/GlobalSpinner';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useLoaderData } from 'react-router-dom';
+import type { PresentationItem } from '../../types';
 
 const PresentationWrapper = () => {
   const containerRef = useRef(null);
   const hasMounted = useRef(false);
   const [isLoading, setIsLoading] = useState(true);
   const { t } = useTranslation('loading');
+  const { presentation } = useLoaderData() as { presentation: PresentationItem };
 
   useEffect(() => {
     // Prevent re-mounting the Vue component if it has already been mounted
@@ -20,6 +23,7 @@ const PresentationWrapper = () => {
         mod.mount(containerRef.current, {
           titleTest: 'random',
           isRemote: true,
+          presentation: presentation,
         });
         setIsLoading(false);
       })

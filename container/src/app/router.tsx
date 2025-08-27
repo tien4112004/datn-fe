@@ -7,6 +7,7 @@ import NotFoundPage from '@/shared/pages/NotFoundPage';
 import { CriticalError } from '@/types/errors';
 import Mindmap from '@/features/mindmap';
 import { getMindmapById } from '@/features/mindmap/hooks/loaders';
+import { getPresentationById } from '@/features/presentation/hooks/loaders';
 
 const router = createBrowserRouter([
   {
@@ -22,10 +23,6 @@ const router = createBrowserRouter([
         Component: Presentation.PresentationListPage,
       },
       {
-        path: 'presentation/editor',
-        Component: Presentation.EditorPage,
-      },
-      {
         path: 'mindmap',
         Component: Mindmap.MindmapPage,
         loader: async () => {
@@ -34,13 +31,10 @@ const router = createBrowserRouter([
         },
       },
       {
-        path: 'presentation/:presentationId',
-        Component: Presentation.DetailsPage,
+        path: 'presentation/:id',
+        Component: Presentation.DetailPage,
         loader: async ({ params }) => {
-          // Simulate api call
-          await new Promise((resolve) => setTimeout(resolve, 2000));
-
-          return { presentationId: params.presentationId };
+          return await getPresentationById(params.id);
         },
       },
       {

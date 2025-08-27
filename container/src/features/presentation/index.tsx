@@ -1,11 +1,9 @@
-import DetailsPage from '@/features/presentation/pages/DetailsPage';
-import EditorPage from '@/features/presentation/pages/EditorPage';
+import DetailPage from '@/features/presentation/pages/DetailPage';
 import PresentationOutlinePage from '@/features/presentation/pages/PresentationOutlinePage';
 import PresentationListPage from './pages/PresentationListPage';
 
 export default {
-  EditorPage,
-  DetailsPage,
+  DetailPage,
   PresentationOutlinePage,
   PresentationListPage,
 };

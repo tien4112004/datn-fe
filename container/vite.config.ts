@@ -18,7 +18,7 @@ export default defineConfig(({ mode }) => {
           vueRemote: {
             type: 'module',
             name: 'vueRemote',
-            entry: `${env.PRESENTATION_URL}/remoteEntry.js`,
+            entry: `${process.env.PRESENTATION_URL || env.PRESENTATION_URL}/remoteEntry.js`,
             entryGlobalName: 'vueRemote',
             shareScope: 'default',
           },

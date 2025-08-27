@@ -124,9 +124,8 @@ export default {
     presentation: {
       id: 'ID',
       title: 'Title',
-      description: 'Description',
       createdAt: 'Created At',
-      status: 'Status',
+      updatedAt: 'Last Updated',
       emptyState: 'No presentations found',
     },
     actionButton: {

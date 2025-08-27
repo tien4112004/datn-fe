@@ -68,29 +68,16 @@ const mockOutlineItems: OutlineItem[] = [
   },
 ];
 
-const mockPresentationItems: PresentationItem[] = [
-  {
-    id: '1',
-    title: 'Introduction to Web Development',
-    description: 'Learn the basics of web development including HTML, CSS, and JavaScript.',
-    createdAt: new Date().toISOString(),
-    status: 'active',
-  },
-  {
-    id: '2',
-    title: 'Frontend Frameworks Overview',
-    description: 'An overview of popular frontend frameworks like React, Vue, and Angular.',
-    createdAt: new Date().toISOString(),
-    status: 'active',
-  },
-  {
-    id: '3',
-    title: 'Backend Technologies Explained',
-    description: 'Exploring server-side technologies including Node.js and Python.',
-    createdAt: new Date().toISOString(),
-    status: 'archived',
-  },
-];
+const mockPresentationItems: PresentationItem[] = [];
+
+const initMockPresentations = async () => {
+  const responses = await Promise.all([fetch('/data/presentation.json'), fetch('/data/presentation2.json')]);
+  const presentations = await Promise.all(responses.map((res) => res.json()));
+
+  mockPresentationItems.push(...presentations);
+};
+
+initMockPresentations();
 
 export default class PresentationMockService implements PresentationApiService {
   async *getStreamedOutline(_request: OutlineData, signal: AbortSignal): AsyncGenerator<string> {
@@ -119,6 +106,12 @@ export default class PresentationMockService implements PresentationApiService {
   async getOutlineItems(): Promise<OutlineItem[]> {
     return new Promise((resolve) => {
       setTimeout(() => resolve([...mockOutlineItems]), 500);
+    });
+  }
+
+  async createPresentation(data: PresentationItem): Promise<PresentationItem> {
+    return new Promise((resolve) => {
+      setTimeout(() => resolve({ ...data, id: String(Date.now()) }), 500);
     });
   }
 }

@@ -2,7 +2,6 @@ import { createColumnHelper, getCoreRowModel, useReactTable } from '@tanstack/re
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { PresentationItem } from '../../types/presentation';
-import { Badge } from '@/components/ui/badge';
 import { usePresentations } from '../../hooks/useApi';
 import DataTable from '@/components/table/DataTable';
 import { ActionContent } from './ActionButton';
@@ -21,22 +20,21 @@ const PresentationTableV2 = () => {
         header: t('presentation.title'),
         cell: (info) => info.getValue(),
       }),
-      columnHelper.accessor('description', {
-        header: t('presentation.description'),
-        cell: (info) => <i>{info.getValue()}</i>,
-        enableSorting: false,
-      }),
       columnHelper.accessor('createdAt', {
         header: t('presentation.createdAt'),
-        cell: (info) => info.renderValue(),
+        cell: (info) => {
+          const date = info.getValue();
+          if (!date) return '';
+          return new Date(date).toLocaleDateString();
+        },
       }),
-      columnHelper.accessor('status', {
-        header: t('presentation.status'),
-        cell: (info) => (
-          <Badge variant={info.getValue() === 'active' ? 'default' : 'outline'} className="text-sm">
-            {info.getValue()}
-          </Badge>
-        ),
+      columnHelper.accessor('updatedAt', {
+        header: t('presentation.updatedAt'),
+        cell: (info) => {
+          const date = info.getValue();
+          if (!date) return '';
+          return new Date(date).toLocaleDateString();
+        },
       }),
     ],
     [t]

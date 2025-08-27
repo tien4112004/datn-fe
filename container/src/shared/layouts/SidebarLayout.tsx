@@ -1,4 +1,4 @@
-import { Outlet, useNavigation } from 'react-router-dom';
+import { Outlet, useNavigate, useNavigation, useRouteError } from 'react-router-dom';
 import GlobalSpinner from '@/components/common/GlobalSpinner';
 import { SidebarInset, SidebarProvider, useSidebar } from '../components/ui/sidebar';
 import { AppSidebar } from '../components/navigation/AppSidebar';
@@ -6,7 +6,7 @@ import { subscribe, unsubscribe } from '@/shared/lib/event';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Toaster } from 'sonner';
-import ErrorBoundary from '@/components/common/ErrorBoundary';
+import ErrorBoundary, { ErrorPageFallback } from '@/components/common/ErrorBoundary';
 
 function NavLayoutContent() {
   const navigation = useNavigation();
@@ -48,6 +48,33 @@ export default function NavLayout() {
     <SidebarProvider>
       <Toaster />
       <NavLayoutContent />
+    </SidebarProvider>
+  );
+}
+
+export function NavLayoutErrorBoundary() {
+  const error = useRouteError();
+  const navigate = useNavigate();
+
+  const resetError = () => {
+    navigate('/');
+  };
+
+  const errorId = `router_error_${Date.now()}`;
+
+  return (
+    <SidebarProvider>
+      <Toaster />
+      <AppSidebar />
+      <SidebarInset className="bg-white">
+        <ErrorPageFallback
+          error={error as Error}
+          errorInfo={null}
+          resetError={resetError}
+          errorId={errorId}
+          showDetails={true}
+        />
+      </SidebarInset>
     </SidebarProvider>
   );
 }

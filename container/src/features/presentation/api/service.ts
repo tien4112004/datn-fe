@@ -6,6 +6,7 @@ import {
   type OutlineData,
 } from '../types';
 import { splitMarkdownToOutlineItems } from '../utils';
+import { api } from '@/shared/api';
 // import api from '@/shared/api';
 
 const mockOutlineOutput = `\`\`\`markdown
@@ -74,15 +75,7 @@ export default class PresentationRealApiService implements PresentationApiServic
   getStreamedOutline(request: OutlineData, signal: AbortSignal): AsyncIterable<string> {
     return {
       async *[Symbol.asyncIterator]() {
-        const response = await fetch('http://localhost:8080/api/ai/presentations/outline-generate', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Accept: 'text/plain',
-          },
-          body: JSON.stringify(request),
-          signal,
-        });
+        const response = await api.stream('api/presentations/outline-generate', request, signal);
 
         const reader = response.body?.getReader();
         if (!reader) throw new Error('No reader available');

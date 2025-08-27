@@ -1,8 +1,8 @@
 import { createBrowserRouter } from 'react-router-dom';
-import NavLayout from '../shared/layouts/SidebarLayout';
+import NavLayout, { NavLayoutErrorBoundary } from '../shared/layouts/SidebarLayout';
 import Presentation from '@/features/presentation';
 import Demo from '@/features/demo';
-import { getDefaultModel } from '@/features/model';
+import { getModels } from '@/features/model';
 import NotFoundPage from '@/shared/pages/NotFoundPage';
 import { CriticalError } from '@/types/errors';
 import Mindmap from '@/features/mindmap';
@@ -11,6 +11,7 @@ import { getMindmapById } from '@/features/mindmap/hooks/loaders';
 const router = createBrowserRouter([
   {
     element: <NavLayout />,
+    errorElement: <NavLayoutErrorBoundary />,
     children: [
       {
         index: true,
@@ -46,7 +47,7 @@ const router = createBrowserRouter([
         path: 'presentation/create',
         // Component: Presentation.CreateOutlinePage,
         Component: Presentation.PresentationOutlinePage,
-        loader: getDefaultModel,
+        loader: getModels,
       },
       // {
       //   path: 'presentation/outline',

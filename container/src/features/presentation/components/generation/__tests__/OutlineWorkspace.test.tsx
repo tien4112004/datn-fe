@@ -1,81 +1,12 @@
 import { screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import OutlineWorkspace from '@/features/presentation/components/generation/OutlineWorkspace';
-// import OutlineCard from '@/features/presentation/components/generation/OutlineCard';
-// import type { OutlineItem } from '@/features/presentation/types/outline';
 import { renderWithProviders } from '@/tests/test-utils';
 
-// vi.mock('react-i18next', () => ({
-//   useTranslation: vi.fn(() => ({
-//     t: (key: string) => key,
-//   })),
-// }));
-
-// vi.mock('@dnd-kit/core', () => ({
-//   DndContext: vi.fn(({ children, onDragEnd }) => {
-//     // Expose onDragEnd for testing
-//     (globalThis as any).__dndOnDragEnd = onDragEnd;
-//     return <div data-testid="dnd-context">{children}</div>;
-//   }),
-//   useSensors: vi.fn(() => []),
-//   PointerSensor: vi.fn(),
-//   KeyboardSensor: vi.fn(),
-// }));
-
-// vi.mock('@dnd-kit/sortable', () => ({
-//   SortableContext: vi.fn(({ children }) => <div data-testid="sortable-context">{children}</div>),
-//   sortableKeyboardCoordinates: vi.fn(),
-//   verticalListSortingStrategy: vi.fn(),
-//   arrayMove: vi.fn((array, oldIndex, newIndex) => {
-//     const result = [...array];
-//     const [removed] = result.splice(oldIndex, 1);
-//     result.splice(newIndex, 0, removed);
-//     return result;
-//   }),
-// }));
-
-// vi.mock('@/features/presentation/components/generation/OutlineCard', () => ({
-//   default: vi.fn(({ id, title, onDelete, onContentChange }) => (
-//     <div
-//       data-testid={`outline-card-${id}`}
-//       onClick={onDelete}
-//       onInput={(e) => onContentChange?.((e.target as HTMLElement).textContent || '')}
-//     >
-//       OutlineCard {title}
-//     </div>
-//   )),
-// }));
-
-// vi.mock('@/shared/components/ui/button', () => ({
-//   Button: ({ children, onClick, disabled, ...props }: any) => (
-//     <button onClick={onClick} disabled={disabled} {...props}>
-//       {children}
-//     </button>
-//   ),
-// }));
-
-// vi.mock('lucide-react', () => ({
-//   Plus: vi.fn(() => <div data-testid="plus-icon">+</div>),
-//   Download: vi.fn(() => <div data-testid="download-icon">↓</div>),
-//   Loader: vi.fn(() => <div data-testid="loader-icon">...</div>),
-// }));
-
-// const mockOutlineCard = vi.mocked(OutlineCard);
-
-// Test suite for OutlineWorkspace component
 describe('OutlineWorkspace', () => {
-  // const mockItems: OutlineItem[] = [
-  //   { id: '1', htmlContent: '<p>Content 1</p>', markdownContent: 'Content 1' },
-  //   { id: '2', htmlContent: '<p>Content 2</p>', markdownContent: 'Content 2' },
-  //   { id: '3', htmlContent: '<p>Content 3</p>', markdownContent: 'Content 3' },
-  // ];
-
-  // const mockSetItems = vi.fn();
   const mockOnDownload = vi.fn();
 
   const defaultProps = {
-    // items: mockItems,
-    // setItems: mockSetItems,
     onDownload: mockOnDownload,
   };
 
@@ -234,14 +165,4 @@ describe('OutlineWorkspace', () => {
     expect(downloadButton.closest('button')).not.toBeDisabled();
     consoleErrorSpy.mockRestore();
   });
-
-  // it('updates items count dynamically when items change', () => {
-  //   const { rerender } = render(<OutlineWorkspace {...defaultProps} />);
-
-  //   expect(screen.getByText('3 outlineCards')).toBeInTheDocument();
-
-  //   rerender(<OutlineWorkspace {...defaultProps} items={[{ id: '1', htmlContent: '<p>Content 1</p>' }]} />);
-
-  //   expect(screen.getByText('1 outlineCards')).toBeInTheDocument();
-  // });
 });

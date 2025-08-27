@@ -59,44 +59,6 @@ describe('WorkspaceView', () => {
     expect(generateButton).toBeInTheDocument();
   });
 
-  // it('handles null initial outline data', () => {
-  //   renderWithProviders(<WorkspaceView initialOutlineData={null} />);
-
-  //   expect(screen.getByTestId('outline-workspace')).toBeInTheDocument();
-  //   expect(screen.getByTestId('presentation-customization-form')).toBeInTheDocument();
-  // });
-
-  // it('calls refetch when regenerate is triggered', async () => {
-  //   const mockRefetch = vi.fn();
-  //   vi.mocked(require('@/features/presentation/hooks/useApi').usePresentationOutlines).mockReturnValue({
-  //     outlineItems: [],
-  //     isFetching: false,
-  //     refetch: mockRefetch,
-  //   });
-
-  //   renderWithProviders(<WorkspaceView {...defaultProps} />);
-
-  //   const regenerateButton = screen.getByText('Regenerate');
-  //   fireEvent.click(regenerateButton);
-
-  //   await waitFor(() => {
-  //     expect(mockRefetch).toHaveBeenCalled();
-  //   });
-  // });
-
-  // it('updates items when setItems is called', () => {
-  //   renderWithProviders(<WorkspaceView {...defaultProps} />);
-
-  //   // expect(screen.getByTestId('items-count')).toHaveTextContent('2');
-  //   expect(screen.getAllByText('2 slides')).toHaveLength(2);
-
-  //   const clearButton = screen.getByTestId('set-items-button');
-  //   fireEvent.click(clearButton);
-
-  //   // Items should be updated through setValue
-  //   expect(screen.getByTestId('set-items-button')).toBeInTheDocument();
-  // });
-
   it('handles customization form submission', () => {
     renderWithProviders(<WorkspaceView {...defaultProps} />);
 
@@ -106,23 +68,6 @@ describe('WorkspaceView', () => {
     // Should handle the submission without errors
     expect(submitButton).toBeInTheDocument();
   });
-
-  // it('displays loading spinner icon when regenerating', () => {
-  //   vi.mocked(require('@/features/presentation/hooks/useApi').usePresentationOutlines).mockReturnValue({
-  //     outlineItems: [],
-  //     isFetching: true,
-  //     refetch: vi.fn(),
-  //   });
-
-  //   renderWithProviders(<WorkspaceView {...defaultProps} />);
-
-  //   const regenerateButton = screen.getByText('Loading...');
-  //   expect(regenerateButton).toBeDisabled();
-
-  //   // Should show loading spinner
-  //   const spinner = regenerateButton.querySelector('.animate-spin');
-  //   expect(spinner).toBeInTheDocument();
-  // });
 
   it('shows rotate when not fetching', () => {
     renderWithProviders(<WorkspaceView {...defaultProps} />);

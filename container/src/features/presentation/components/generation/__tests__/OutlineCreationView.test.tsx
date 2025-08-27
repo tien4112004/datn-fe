@@ -4,26 +4,12 @@ import { describe, it, expect, vi } from 'vitest';
 import { renderWithProviders } from '@/tests/test-utils';
 import OutlineCreationView from '../OutlineCreationView';
 import type { ModelOption } from '@/features/model';
-// import type { OutlineData } from '@/features/presentation/types';
 
 const defaultModel: ModelOption = {
   id: 'gpt-4o-mini',
   name: 'gpt-4o-mini',
   displayName: 'GPT-4o Mini',
 };
-
-// const models = [
-//   defaultModel,
-//   { id: 'gemini-2.0-flash', name: 'gemini-2.0-flash', displayName: 'Gemini 2.0 Flash' },
-// ];
-
-// vi.mock('@/features/model', () => ({
-//   useModels: () => ({ models }),
-// }));
-
-// vi.mock('react-i18next', () => ({
-//   useTranslation: () => ({ t: (key: string) => key }),
-// }));
 
 describe('OutlineCreationView', () => {
   it('renders all form fields', () => {

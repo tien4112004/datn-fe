@@ -1,10 +1,9 @@
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbPage } from '@/components/ui/breadcrumb';
 import { Separator } from '@radix-ui/react-separator';
-// import PresentationTable from '../components/table/PresentationTable';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import PresentationTableV2 from '../components/table/PresentationTableV2';
+import PresentationTable from '../components/table/PresentationTable';
 import { createTestPresentations } from '../hooks/loaders';
 
 const PresentationListPage = () => {
@@ -42,8 +41,7 @@ const PresentationListPage = () => {
             </Button>
           </div>
         </div>
-        {/* <PresentationTable /> */}
-        <PresentationTableV2 />
+        <PresentationTable />
       </div>
     </>
   );

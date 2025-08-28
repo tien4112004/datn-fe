@@ -2,10 +2,9 @@ import { createColumnHelper, getCoreRowModel, useReactTable } from '@tanstack/re
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { PresentationItem } from '../../types/presentation';
-import { Badge } from '@/components/ui/badge';
-import ActionButton from './ActionButton';
 import { usePresentations } from '../../hooks/useApi';
 import DataTable from '@/components/table/DataTable';
+import { ActionContent } from './ActionButton';
 
 const PresentationTable = () => {
   const { t } = useTranslation('table');
@@ -21,40 +20,20 @@ const PresentationTable = () => {
         header: t('presentation.title'),
         cell: (info) => info.getValue(),
       }),
-      columnHelper.accessor('description', {
-        header: t('presentation.description'),
-        cell: (info) => <i>{info.getValue()}</i>,
-        enableSorting: false,
-      }),
       columnHelper.accessor('createdAt', {
         header: t('presentation.createdAt'),
-        cell: (info) => info.renderValue(),
+        cell: (info) => {
+          const date = info.getValue();
+          if (!date) return '';
+          return new Date(date).toLocaleDateString();
+        },
       }),
-      columnHelper.accessor('status', {
-        header: t('presentation.status'),
-        cell: (info) => (
-          <Badge variant={info.getValue() === 'active' ? 'default' : 'outline'} className="text-sm">
-            {info.getValue()}
-          </Badge>
-        ),
-      }),
-      columnHelper.display({
-        id: 'actions',
-        header: t('actions'),
-        cell: (info) => (
-          <ActionButton
-            onEdit={() => {
-              console.log('Edit: ', info.row.original.id);
-            }}
-            onDelete={() => {
-              console.log('Delete: ', info.row.original.id);
-            }}
-          />
-        ),
-        meta: {
-          style: {
-            align: 'center',
-          },
+      columnHelper.accessor('updatedAt', {
+        header: t('presentation.updatedAt'),
+        cell: (info) => {
+          const date = info.getValue();
+          if (!date) return '';
+          return new Date(date).toLocaleDateString();
         },
       }),
     ],
@@ -97,6 +76,16 @@ const PresentationTable = () => {
       table={table}
       isLoading={isLoading}
       emptyState={<div className="text-muted-foreground">{t('presentation.emptyState')}</div>}
+      contextMenu={(row) => (
+        <ActionContent
+          onEdit={() => {
+            console.log('Edit', row.original);
+          }}
+          onDelete={() => {
+            console.log('Delete', row.original);
+          }}
+        />
+      )}
     />
   );
 };

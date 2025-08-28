@@ -14,9 +14,9 @@ vi.mock('@/features/presentation/hooks/useApi', () => ({
   usePresentations: vi.fn(),
 }));
 
-vi.mock('@/features/presentation/components/ActionButton', () => ({
-  default: vi.fn(({ onEdit, onDelete }) => (
-    <div data-testid="action-button">
+vi.mock('@/features/presentation/components/table/ActionButton', () => ({
+  ActionContent: vi.fn(({ onEdit, onDelete }) => (
+    <div data-testid="action-content">
       <button onClick={onEdit} data-testid="edit-button">
         Edit
       </button>
@@ -28,7 +28,7 @@ vi.mock('@/features/presentation/components/ActionButton', () => ({
 }));
 
 vi.mock('@/components/table/DataTable', () => ({
-  default: vi.fn(({ table, isLoading, emptyState }) => {
+  default: vi.fn(({ table, isLoading, emptyState, contextMenu }) => {
     if (isLoading) {
       return <div data-testid="loading-skeleton">Loading...</div>;
     }
@@ -55,6 +55,7 @@ vi.mock('@/components/table/DataTable', () => ({
                       : cell.getValue()}
                   </td>
                 ))}
+                <td data-testid="context-menu">{contextMenu && contextMenu(row)}</td>
               </tr>
             ))}
           </tbody>
@@ -70,11 +71,9 @@ describe('PresentationTable', () => {
     const translations: Record<string, string> = {
       'presentation.id': 'ID',
       'presentation.title': 'Title',
-      'presentation.description': 'Description',
       'presentation.createdAt': 'Created At',
-      'presentation.status': 'Status',
+      'presentation.updatedAt': 'Updated At',
       'presentation.emptyState': 'No presentations found',
-      actions: 'Actions',
     };
     return translations[key] || key;
   });
@@ -83,16 +82,14 @@ describe('PresentationTable', () => {
     {
       id: '1',
       title: 'Test Presentation',
-      description: 'Test Description',
-      createdAt: '2023-01-01',
-      status: 'active',
+      createdAt: '2023-01-01T00:00:00Z',
+      updatedAt: '2023-01-02T00:00:00Z',
     },
     {
       id: '2',
       title: 'Another Presentation',
-      description: 'Another Description',
-      createdAt: '2023-01-02',
-      status: 'inactive',
+      createdAt: '2023-01-03T00:00:00Z',
+      updatedAt: '2023-01-04T00:00:00Z',
     },
   ];
 
@@ -114,10 +111,15 @@ describe('PresentationTable', () => {
 
     expect(screen.getByText('ID')).toBeInTheDocument();
     expect(screen.getByText('Title')).toBeInTheDocument();
-    expect(screen.getByText('Description')).toBeInTheDocument();
     expect(screen.getByText('Created At')).toBeInTheDocument();
-    expect(screen.getByText('Status')).toBeInTheDocument();
-    expect(screen.getByText('Actions')).toBeInTheDocument();
+    expect(screen.getByText('Updated At')).toBeInTheDocument();
+  });
+
+  it('does not render description and status columns', () => {
+    render(<PresentationTable />);
+
+    expect(screen.queryByText('Description')).not.toBeInTheDocument();
+    expect(screen.queryByText('Status')).not.toBeInTheDocument();
   });
 
   it('uses translation hook correctly', () => {
@@ -126,7 +128,8 @@ describe('PresentationTable', () => {
     expect(mockUseTranslation).toHaveBeenCalledWith('table');
     expect(mockT).toHaveBeenCalledWith('presentation.id');
     expect(mockT).toHaveBeenCalledWith('presentation.title');
-    expect(mockT).toHaveBeenCalledWith('actions');
+    expect(mockT).toHaveBeenCalledWith('presentation.createdAt');
+    expect(mockT).toHaveBeenCalledWith('presentation.updatedAt');
   });
 
   it('renders presentation data correctly', () => {
@@ -134,6 +137,24 @@ describe('PresentationTable', () => {
 
     expect(screen.getByText('Test Presentation')).toBeInTheDocument();
     expect(screen.getByText('Another Presentation')).toBeInTheDocument();
+  });
+
+  it('formats dates correctly', () => {
+    render(<PresentationTable />);
+
+    // Check if dates are formatted (the exact format depends on locale)
+    expect(screen.getByTestId('cell-createdAt')).toBeInTheDocument();
+    expect(screen.getByTestId('cell-updatedAt')).toBeInTheDocument();
+  });
+
+  it('renders context menu for each row', () => {
+    render(<PresentationTable />);
+
+    const contextMenus = screen.getAllByTestId('context-menu');
+    expect(contextMenus).toHaveLength(2);
+
+    const actionContents = screen.getAllByTestId('action-content');
+    expect(actionContents).toHaveLength(2);
   });
 
   it('handles sorting state correctly', () => {

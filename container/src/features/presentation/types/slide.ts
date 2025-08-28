@@ -40,9 +40,7 @@ export type ElementTypes = (typeof ELEMENT_TYPES)[keyof typeof ELEMENT_TYPES];
  * Gradient
  *
  * type: Gradient type (radial, linear)
- *
  * colors: Gradient color list (pos: percentage position; color: color)
- *
  * rotate: Gradient angle (linear gradient)
  */
 export type GradientType = 'linear' | 'radial';

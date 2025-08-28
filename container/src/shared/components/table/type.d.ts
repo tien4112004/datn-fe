@@ -6,8 +6,16 @@ declare module '@tanstack/table-core' {
       className: string;
       align: 'left' | 'center' | 'right';
     };
+    meta: {
+      isGrow?: boolean;
+      widthPercentage?: number;
+    };
+  }
+}
+
+declare module '@tanstack/react-table' {
+  interface ColumnMeta {
     isGrow?: boolean;
     widthPercentage?: number;
-    fixedWidth?: number; // 0 stands for "fit-content"
   }
 }

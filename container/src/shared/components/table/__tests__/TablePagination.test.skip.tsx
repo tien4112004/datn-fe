@@ -181,13 +181,14 @@ describe('TablePagination', () => {
       render(<TablePagination table={table as Table<any>} />);
 
       const selectItems = screen.getAllByTestId('select-item');
-      expect(selectItems).toHaveLength(5); // [10, 20, 30, 40, 50]
+      expect(selectItems).toHaveLength(6); // [5, 10, 20, 30, 40, 50]
 
-      expect(selectItems[0]).toHaveAttribute('data-value', '10');
-      expect(selectItems[1]).toHaveAttribute('data-value', '20');
-      expect(selectItems[2]).toHaveAttribute('data-value', '30');
-      expect(selectItems[3]).toHaveAttribute('data-value', '40');
-      expect(selectItems[4]).toHaveAttribute('data-value', '50');
+      expect(selectItems[0]).toHaveAttribute('data-value', '5');
+      expect(selectItems[1]).toHaveAttribute('data-value', '10');
+      expect(selectItems[2]).toHaveAttribute('data-value', '20');
+      expect(selectItems[3]).toHaveAttribute('data-value', '30');
+      expect(selectItems[4]).toHaveAttribute('data-value', '40');
+      expect(selectItems[5]).toHaveAttribute('data-value', '50');
     });
   });
 

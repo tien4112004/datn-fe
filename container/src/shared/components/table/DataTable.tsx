@@ -4,7 +4,7 @@ import TablePagination from './TablePagination';
 import SkeletonTable from './SkeletonTable';
 import { ContextMenu, ContextMenuContent, ContextMenuTrigger } from '@/components/ui/context-menu';
 import { useLayoutEffect, useRef } from 'react';
-import { calculateTableSizing } from '@/features/presentation/utils';
+import calculateTableSizing from './tableSizing';
 import { useWindowSize } from 'usehooks-ts';
 import './style.css';
 

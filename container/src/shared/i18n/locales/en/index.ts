@@ -115,8 +115,8 @@ export default {
     },
     list: {
       title: 'Presentation List',
-      createNewPresentation: 'Create New Presentation',
-      viewEditor: 'View Editor',
+      generateNewPresentation: 'Generate New Presentation',
+      createBlankPresentation: 'Create Blank Presentation',
     },
   },
 
@@ -128,6 +128,7 @@ export default {
       createdAt: 'Created At',
       updatedAt: 'Last Updated',
       emptyState: 'No presentations found',
+      searchPlaceholder: 'Search by title...',
     },
     actionButton: {
       viewDetails: 'View Details',
@@ -145,6 +146,10 @@ export default {
     goToPage: 'Go to page',
     goToNextPage: 'Go to next page',
     goToLastPage: 'Go to last page',
+    firstPage: 'First',
+    previous: 'Previous',
+    next: 'Next',
+    lastPage: 'Last',
   },
 
   errorBoundary: {

@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import PresentationTable from '../components/table/PresentationTable';
 import { createTestPresentations } from '../hooks/loaders';
+import { Plus, Sparkles } from 'lucide-react';
 
 const PresentationListPage = () => {
   const navigate = useNavigate();
@@ -29,18 +30,27 @@ const PresentationListPage = () => {
           </Button>
         </div>
       </header>
-      <div className="px-8 py-4">
-        <div className="flex items-center justify-between">
-          <h1 className="mb-4 text-center text-2xl font-semibold">{t('title')}</h1>
-          <div className="space-x-2">
-            <Button variant={'secondary'} className="mb-4" onClick={() => navigate('/presentation/create')}>
-              {t('createNewPresentation')}
-            </Button>
-            <Button variant={'secondary'} className="mb-4" onClick={() => navigate('/presentation/editor')}>
-              {t('viewEditor')}
-            </Button>
-          </div>
+      <div className="space-y-4 px-8 py-4">
+        <div className="flex space-x-4">
+          <Button
+            variant={'secondary'}
+            className="text-primary-foreground dark:text-foreground flex h-28 flex-col bg-gradient-to-r from-blue-500 to-indigo-500 shadow hover:to-blue-500"
+            onClick={() => navigate('/presentation/create')}
+          >
+            <Sparkles className="!size-6" />
+            <p className="text-lg font-semibold">{t('generateNewPresentation')}</p>
+          </Button>
+
+          <Button
+            variant={'secondary'}
+            className="text-primary-foreground dark:text-foreground flex h-28 flex-col bg-gradient-to-r from-green-500 to-teal-500 shadow hover:to-green-500"
+            onClick={() => navigate('/presentation/create-blank')}
+          >
+            <Plus className="!size-6" />
+            <p className="text-lg font-semibold">{t('createBlankPresentation')}</p>
+          </Button>
         </div>
+        <h1 className="mb-4 text-2xl font-semibold">{t('title')}</h1>
         <PresentationTable />
       </div>
     </>

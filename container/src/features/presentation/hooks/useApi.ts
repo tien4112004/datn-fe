@@ -1,12 +1,31 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, type UseQueryResult } from '@tanstack/react-query';
+import type { SortingState, PaginationState, Updater } from '@tanstack/react-table';
 import { usePresentationApiService } from '../api';
 import { useEffect, useState } from 'react';
+import type { Presentation, OutlineItem } from '../types';
+import type { ApiResponse } from '@/shared/types/api';
 
-export const usePresentationOutlines = () => {
+// Return types for the hooks
+export interface UsePresentationOutlinesReturn extends Omit<UseQueryResult<OutlineItem[]>, 'data'> {
+  outlineItems: OutlineItem[];
+}
+
+export interface UsePresentationsReturn extends Omit<UseQueryResult<ApiResponse<Presentation[]>>, 'data'> {
+  data: Presentation[];
+  sorting: SortingState;
+  setSorting: (updaterOrValue: Updater<SortingState>) => void;
+  pagination: PaginationState;
+  setPagination: (updaterOrValue: Updater<PaginationState>) => void;
+  search: string;
+  setSearch: (search: string) => void;
+  totalItems: number;
+}
+
+export const usePresentationOutlines = (): UsePresentationOutlinesReturn => {
   const presentationApiService = usePresentationApiService();
-  const { data: outlineItems = [], ...query } = useQuery({
+  const { data: outlineItems = [], ...query } = useQuery<OutlineItem[]>({
     queryKey: [presentationApiService.getType(), 'presentationItems'],
-    queryFn: async () => {
+    queryFn: async (): Promise<OutlineItem[]> => {
       const data = await presentationApiService.getOutlineItems();
       console.log('Fetch data', data);
       return data;
@@ -19,25 +38,30 @@ export const usePresentationOutlines = () => {
   };
 };
 
-export const usePresentations = () => {
+export const usePresentations = (): UsePresentationsReturn => {
   const presentationApiService = usePresentationApiService();
 
-  const [sorting, setSorting] = useState([{ id: 'createdAt', desc: true }]);
-  const [pagination, setPagination] = useState({
+  const [sorting, setSorting] = useState<SortingState>([{ id: 'createdAt', desc: true }]);
+  const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 20,
   });
+  const [search, setSearch] = useState<string>('');
 
-  const { data, ...query } = useQuery({
-    queryKey: [presentationApiService.getType(), 'presentations', sorting, pagination],
-    queryFn: async () => {
+  const { data, ...query } = useQuery<ApiResponse<Presentation[]>>({
+    queryKey: [presentationApiService.getType(), 'presentations', sorting, pagination, search],
+    queryFn: async (): Promise<ApiResponse<Presentation[]>> => {
       const data = await presentationApiService.getPresentations({
         page: pagination.pageIndex,
         pageSize: pagination.pageSize,
         sort: sorting.length > 0 ? (sorting[0].desc ? 'desc' : 'asc') : undefined,
+        filter: search.trim() || undefined,
       });
       return data;
     },
+    enabled: true, // Always enabled
+    staleTime: 30000, // Consider data fresh for 30 seconds
+    gcTime: 300000, // Keep in cache for 5 minutes
   });
 
   useEffect(() => {
@@ -50,12 +74,31 @@ export const usePresentations = () => {
     }
   }, [data?.pagination]);
 
+  const handleSortingChange = (updaterOrValue: Updater<SortingState>) => {
+    const newSorting = typeof updaterOrValue === 'function' ? updaterOrValue(sorting) : updaterOrValue;
+    setSorting(newSorting);
+    setPagination((prev) => ({
+      ...prev,
+      pageIndex: 0,
+    }));
+  };
+
+  const handleSearchChange = (newSearch: string) => {
+    setSearch(newSearch);
+    setPagination((prev) => ({
+      ...prev,
+      pageIndex: 0,
+    }));
+  };
+
   return {
     data: data?.data || [],
     sorting,
-    setSorting,
+    setSorting: handleSortingChange,
     pagination,
     setPagination,
+    search,
+    setSearch: handleSearchChange,
     totalItems: data?.pagination?.totalItems || 0,
     ...query,
   };

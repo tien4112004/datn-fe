@@ -30,7 +30,7 @@ const PresentationListPage = () => {
         </div>
       </header>
       <div className="px-8 py-4">
-        <div className="mb-6 flex items-center justify-between">
+        <div className="flex items-center justify-between">
           <h1 className="mb-4 text-center text-2xl font-semibold">{t('title')}</h1>
           <div className="space-x-2">
             <Button variant={'secondary'} className="mb-4" onClick={() => navigate('/presentation/create')}>

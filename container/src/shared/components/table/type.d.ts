@@ -6,5 +6,8 @@ declare module '@tanstack/table-core' {
       className: string;
       align: 'left' | 'center' | 'right';
     };
+    isGrow?: boolean;
+    widthPercentage?: number;
+    fixedWidth?: number; // 0 stands for "fit-content"
   }
 }

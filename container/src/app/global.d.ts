@@ -16,14 +16,4 @@ declare global {
   }
 }
 
-import '@tanstack/react-table';
-
-declare module '@tanstack/react-table' {
-  interface ColumnMeta {
-    isGrow?: boolean;
-    widthPercentage?: number;
-    fixedWidth?: number; // 0 stands for "fit-content"
-  }
-}
-
 export {};

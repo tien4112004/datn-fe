@@ -22,7 +22,7 @@ import {
   AlignJustify,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { ModelSelect } from '@/shared/components/ModelSelect';
+import { ModelSelect } from '@/components/common/ModelSelect';
 import { useModels } from '@/features/model';
 
 type CustomizationFormData = {

@@ -15,7 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/shared/components/ui/select';
-import { ModelSelect } from '@/shared/components/ModelSelect';
+import { ModelSelect } from '@/components/common/ModelSelect';
 import { LANGUAGE_OPTIONS, SLIDE_COUNT_OPTIONS, TARGET_AGE_OPTIONS } from '@/features/presentation/types';
 import type { OutlineData } from '@/features/presentation/types/outline';
 import useFetchStreamingOutline from '@/features/presentation/hooks/useFetchStreaming';

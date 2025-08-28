@@ -15,4 +15,15 @@ declare global {
     dispatchEvent<K extends keyof CustomEventMap>(ev: CustomEventMap[K]): void;
   }
 }
+
+import '@tanstack/react-table';
+
+declare module '@tanstack/react-table' {
+  interface ColumnMeta {
+    isGrow?: boolean;
+    widthPercentage?: number;
+    fixedWidth?: number; // 0 stands for "fit-content"
+  }
+}
+
 export {};

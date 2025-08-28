@@ -91,6 +91,7 @@ describe('PresentationTable', () => {
     fireEvent.contextMenu(firstRow);
 
     await waitFor(() => {
+      expect(screen.getByRole('button', { name: /view details/i })).toBeInTheDocument();
       expect(screen.getByRole('button', { name: /edit/i })).toBeInTheDocument();
       expect(screen.getByRole('button', { name: /delete/i })).toBeInTheDocument();
     });

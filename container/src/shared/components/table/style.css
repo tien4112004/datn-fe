@@ -1,0 +1,35 @@
+.resizer {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 5px;
+  background: rgba(0, 0, 0, 0.1);
+  cursor: col-resize;
+  user-select: none;
+  touch-action: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.resizer.ltr {
+  right: 0;
+}
+
+.resizer.rtl {
+  left: 0;
+}
+
+.resizer.isResizing {
+  background: #3b82f6;
+  opacity: 1;
+}
+
+/* Show resizer on hover */
+th:hover .resizer {
+  opacity: 1;
+}
+
+/* Make table header position relative for absolute positioning of resizer */
+th {
+  position: relative;
+}

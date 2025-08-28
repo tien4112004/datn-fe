@@ -4,6 +4,7 @@ import ActionButton, { ActionContent } from '@/features/presentation/components/
 import { renderWithProviders } from '@/tests/test-utils';
 
 describe('ActionButton', () => {
+  const mockOnViewDetail = vi.fn();
   const mockOnEdit = vi.fn();
   const mockOnDelete = vi.fn();
 
@@ -21,13 +22,16 @@ describe('ActionButton', () => {
     });
 
     it('opens popover menu when clicked', async () => {
-      renderWithProviders(<ActionButton onEdit={mockOnEdit} onDelete={mockOnDelete} />);
+      renderWithProviders(
+        <ActionButton onViewDetail={mockOnViewDetail} onEdit={mockOnEdit} onDelete={mockOnDelete} />
+      );
 
       // Click the ellipsis icon to open popover
       const triggerButton = document.querySelector('.lucide-ellipsis-vertical');
       fireEvent.click(triggerButton!);
 
       await waitFor(() => {
+        expect(screen.getByRole('button', { name: /view details/i })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: /edit/i })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: /delete/i })).toBeInTheDocument();
       });
@@ -81,26 +85,50 @@ describe('ActionButton', () => {
   });
 
   describe('ActionContent standalone behavior', () => {
-    it('renders edit and delete buttons with correct text', () => {
-      renderWithProviders(<ActionContent onEdit={mockOnEdit} onDelete={mockOnDelete} />);
+    it('renders all action buttons with icons and text', () => {
+      renderWithProviders(
+        <ActionContent onViewDetail={mockOnViewDetail} onEdit={mockOnEdit} onDelete={mockOnDelete} />
+      );
 
+      const viewDetailButton = screen.getByRole('button', { name: /view details/i });
       const editButton = screen.getByRole('button', { name: /edit/i });
       const deleteButton = screen.getByRole('button', { name: /delete/i });
 
+      expect(viewDetailButton).toBeInTheDocument();
       expect(editButton).toBeInTheDocument();
       expect(deleteButton).toBeInTheDocument();
+
+      // Check that icons are present (they render as SVG elements)
+      const icons = document.querySelectorAll('svg');
+      expect(icons.length).toBeGreaterThanOrEqual(3); // At least 3 icons should be present
     });
 
     it('displays internationalized text correctly', () => {
-      renderWithProviders(<ActionContent onEdit={mockOnEdit} onDelete={mockOnDelete} />);
+      renderWithProviders(
+        <ActionContent onViewDetail={mockOnViewDetail} onEdit={mockOnEdit} onDelete={mockOnDelete} />
+      );
 
       // Should show translated text (exact text depends on i18n setup)
+      expect(screen.getByText(/view details/i)).toBeInTheDocument();
       expect(screen.getByText(/edit/i)).toBeInTheDocument();
       expect(screen.getByText(/delete/i)).toBeInTheDocument();
     });
 
+    it('handles view detail action when used standalone', () => {
+      renderWithProviders(
+        <ActionContent onViewDetail={mockOnViewDetail} onEdit={mockOnEdit} onDelete={mockOnDelete} />
+      );
+
+      const viewDetailButton = screen.getByRole('button', { name: /view details/i });
+      fireEvent.click(viewDetailButton);
+
+      expect(mockOnViewDetail).toHaveBeenCalledTimes(1);
+    });
+
     it('handles edit action when used standalone', () => {
-      renderWithProviders(<ActionContent onEdit={mockOnEdit} onDelete={mockOnDelete} />);
+      renderWithProviders(
+        <ActionContent onViewDetail={mockOnViewDetail} onEdit={mockOnEdit} onDelete={mockOnDelete} />
+      );
 
       const editButton = screen.getByRole('button', { name: /edit/i });
       fireEvent.click(editButton);
@@ -109,7 +137,9 @@ describe('ActionButton', () => {
     });
 
     it('handles delete action when used standalone', () => {
-      renderWithProviders(<ActionContent onEdit={mockOnEdit} onDelete={mockOnDelete} />);
+      renderWithProviders(
+        <ActionContent onViewDetail={mockOnViewDetail} onEdit={mockOnEdit} onDelete={mockOnDelete} />
+      );
 
       const deleteButton = screen.getByRole('button', { name: /delete/i });
       fireEvent.click(deleteButton);
@@ -128,15 +158,23 @@ describe('ActionButton', () => {
         updatedAt: '2023-01-02',
       };
 
+      const handleViewDetail = vi.fn();
       const handleEdit = vi.fn();
       const handleDelete = vi.fn();
 
       renderWithProviders(
         <ActionContent
+          onViewDetail={() => handleViewDetail(mockPresentationData)}
           onEdit={() => handleEdit(mockPresentationData)}
           onDelete={() => handleDelete(mockPresentationData)}
         />
       );
+
+      // Test view detail flow
+      const viewDetailButton = screen.getByRole('button', { name: /view details/i });
+      fireEvent.click(viewDetailButton);
+
+      expect(handleViewDetail).toHaveBeenCalledWith(mockPresentationData);
 
       // Test edit flow
       const editButton = screen.getByRole('button', { name: /edit/i });
@@ -152,7 +190,9 @@ describe('ActionButton', () => {
     });
 
     it('shows appropriate hover states', () => {
-      renderWithProviders(<ActionButton onEdit={mockOnEdit} onDelete={mockOnDelete} />);
+      renderWithProviders(
+        <ActionButton onViewDetail={mockOnViewDetail} onEdit={mockOnEdit} onDelete={mockOnDelete} />
+      );
 
       const triggerIcon = document.querySelector('.lucide-ellipsis-vertical');
 

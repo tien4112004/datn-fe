@@ -123,12 +123,14 @@ export default {
   table: {
     presentation: {
       id: 'ID',
+      thumbnail: 'Thumbnail',
       title: 'Title',
       createdAt: 'Created At',
       updatedAt: 'Last Updated',
       emptyState: 'No presentations found',
     },
     actionButton: {
+      viewDetails: 'View Details',
       edit: 'Edit',
       delete: 'Delete',
     },

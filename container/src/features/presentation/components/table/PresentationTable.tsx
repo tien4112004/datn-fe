@@ -5,9 +5,11 @@ import type { PresentationItem } from '../../types/presentation';
 import { usePresentations } from '../../hooks/useApi';
 import DataTable from '@/components/table/DataTable';
 import { ActionContent } from './ActionButton';
+import { useNavigate } from 'react-router-dom';
 
 const PresentationTable = () => {
   const { t } = useTranslation('table');
+  const navigate = useNavigate();
   const columnHelper = createColumnHelper<PresentationItem>();
 
   const columns = useMemo(
@@ -15,10 +17,22 @@ const PresentationTable = () => {
       columnHelper.accessor('id', {
         header: t('presentation.id'),
         cell: (info) => info.getValue(),
+        size: 50,
+        enableResizing: false,
+      }),
+      columnHelper.accessor('thumbnail', {
+        header: t('presentation.thumbnail'),
+        cell: () => <img src="https://placehold.co/600x400" alt="" className="h-16 w-16 object-cover" />,
+        size: 100,
+        enableResizing: false,
       }),
       columnHelper.accessor('title', {
         header: t('presentation.title'),
         cell: (info) => info.getValue(),
+        minSize: 200,
+        meta: {
+          isGrow: true,
+        },
       }),
       columnHelper.accessor('createdAt', {
         header: t('presentation.createdAt'),
@@ -27,6 +41,7 @@ const PresentationTable = () => {
           if (!date) return '';
           return new Date(date).toLocaleDateString();
         },
+        size: 120,
       }),
       columnHelper.accessor('updatedAt', {
         header: t('presentation.updatedAt'),
@@ -35,6 +50,7 @@ const PresentationTable = () => {
           if (!date) return '';
           return new Date(date).toLocaleDateString();
         },
+        size: 120,
       }),
     ],
     [t]
@@ -63,6 +79,9 @@ const PresentationTable = () => {
     getCoreRowModel: getCoreRowModel(),
     manualPagination: true,
     manualSorting: true,
+    enableColumnResizing: true,
+    columnResizeMode: 'onChange',
+    columnResizeDirection: 'ltr',
     state: {
       sorting,
       pagination,
@@ -78,6 +97,9 @@ const PresentationTable = () => {
       emptyState={<div className="text-muted-foreground">{t('presentation.emptyState')}</div>}
       contextMenu={(row) => (
         <ActionContent
+          onViewDetail={() => {
+            navigate(`/presentation/${row.original.id}`);
+          }}
           onEdit={() => {
             console.log('Edit', row.original);
           }}

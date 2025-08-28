@@ -123,12 +123,14 @@ export default {
   table: {
     presentation: {
       id: 'ID',
+      thumbnail: 'Hình',
       title: 'Tiêu đề',
       createdAt: 'Ngày tạo',
       updatedAt: 'Cập nhật gần nhất',
       emptyState: 'Không có bài trình bày nào được tìm thấy',
     },
     actionButton: {
+      viewDetails: 'Xem chi tiết',
       edit: 'Chỉnh sửa',
       delete: 'Xóa',
     },

@@ -73,13 +73,24 @@ const mockOutlineItems: OutlineItem[] = [
 const mockPresentationItems: Presentation[] = [];
 
 const initMockPresentations = async () => {
-  const responses = await Promise.all([fetch('/data/presentation.json'), fetch('/data/presentation2.json')]);
-  const presentations = await Promise.all(responses.map((res) => res.json()));
+  try {
+    const responses = await Promise.all([
+      fetch('/data/presentation.json'),
+      fetch('/data/presentation2.json'),
+    ]);
+    const presentations = await Promise.all(responses.map((res) => res.json()));
 
-  mockPresentationItems.push(...presentations);
+    mockPresentationItems.push(...presentations);
+  } catch (error) {
+    // Silently handle fetch errors in test environment where public/data files don't exist
+    console.warn('Failed to load mock presentation data:', error);
+  }
 };
 
-initMockPresentations();
+// Only initialize in non-test environments
+if (typeof process === 'undefined' || process.env.NODE_ENV !== 'test') {
+  initMockPresentations();
+}
 
 export default class PresentationMockService implements PresentationApiService {
   async *getStreamedOutline(_request: OutlineData, signal: AbortSignal): AsyncGenerator<string> {

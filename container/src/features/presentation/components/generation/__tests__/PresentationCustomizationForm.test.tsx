@@ -88,9 +88,9 @@ vi.mock('@/shared/components/ui/select', () => ({
     </div>
   ),
   SelectItem: ({ children, value, ...props }: any) => (
-    <option data-testid="select-item" value={value} {...props}>
+    <div data-testid="select-item" data-value={value} {...props}>
       {children}
-    </option>
+    </div>
   ),
   SelectLabel: ({ children, ...props }: any) => (
     <div data-testid="select-label" {...props}>
@@ -132,8 +132,20 @@ vi.mock('react-hook-form', () => ({
 vi.mock('@/features/model', () => ({
   useModels: vi.fn(() => ({
     models: [
-      { id: 'gpt-4o-mini', name: 'gpt-4o-mini', displayName: 'GPT-4o Mini' },
-      { id: 'gemini-2.0-flash', name: 'gemini-2.0-flash', displayName: 'Gemini 2.0 Flash' },
+      {
+        id: 'gpt-4o-mini',
+        name: 'gpt-4o-mini',
+        displayName: 'GPT-4o Mini',
+        enabled: true,
+        provider: 'OpenAI',
+      },
+      {
+        id: 'gemini-2.0-flash',
+        name: 'gemini-2.0-flash',
+        displayName: 'Gemini 2.0 Flash',
+        enabled: false,
+        provider: 'Google',
+      },
     ],
   })),
 }));

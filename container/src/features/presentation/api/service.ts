@@ -2,12 +2,13 @@ import { API_MODE, type ApiMode } from '@/shared/constants';
 import {
   type PresentationApiService,
   type OutlineItem,
-  type PresentationItem,
+  type Presentation,
   type OutlineData,
+  type PresentationCollectionRequest,
 } from '../types';
 import { splitMarkdownToOutlineItems } from '../utils';
 import { api } from '@/shared/api';
-import type { ApiResponse } from '@/types/api';
+import { mapPagination, type ApiResponse, type Pagination } from '@/types/api';
 // import api from '@/shared/api';
 
 const mockOutlineOutput = `\`\`\`markdown
@@ -100,8 +101,8 @@ export default class PresentationRealApiService implements PresentationApiServic
     return API_MODE.real;
   }
 
-  async getPresentationItems(): Promise<PresentationItem[]> {
-    const response = await api.get<ApiResponse<PresentationItem[]>>('/api/presentations/all');
+  async getPresentationItems(): Promise<Presentation[]> {
+    const response = await api.get<ApiResponse<Presentation[]>>('/api/presentations/all');
     return response.data.data.map(this._mapPresentationItem);
   }
 
@@ -110,17 +111,33 @@ export default class PresentationRealApiService implements PresentationApiServic
     return splitMarkdownToOutlineItems(mockOutlineOutput);
   }
 
-  async createPresentation(data: PresentationItem): Promise<PresentationItem> {
-    const response = await api.post<ApiResponse<PresentationItem>>('/api/presentations', data);
+  async getPresentations(request: PresentationCollectionRequest): Promise<ApiResponse<Presentation[]>> {
+    const response = await api.get<ApiResponse<Presentation[]>>('api/presentations', {
+      params: {
+        page: (request.page || 0) + 1,
+        pageSize: request.pageSize,
+        sort: request.sort,
+      },
+    });
+
+    return {
+      ...response.data,
+      data: response.data.data.map(this._mapPresentationItem),
+      pagination: mapPagination(response.data.pagination as Pagination),
+    };
+  }
+
+  async createPresentation(data: Presentation): Promise<Presentation> {
+    const response = await api.post<ApiResponse<Presentation>>('/api/presentations', data);
     return this._mapPresentationItem(response.data.data);
   }
 
-  async getPresentationById(id: string): Promise<PresentationItem | null> {
-    const response = await api.get<ApiResponse<PresentationItem>>(`/api/presentations/${id}`);
+  async getPresentationById(id: string): Promise<Presentation | null> {
+    const response = await api.get<ApiResponse<Presentation>>(`/api/presentations/${id}`);
     return this._mapPresentationItem(response.data.data);
   }
 
-  _mapPresentationItem(data: any): PresentationItem {
+  _mapPresentationItem(data: any): Presentation {
     return {
       id: data.id,
       title: data.title,

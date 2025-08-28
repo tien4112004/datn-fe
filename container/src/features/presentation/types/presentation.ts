@@ -1,6 +1,6 @@
 import type { Slide, SlideTheme } from './slide';
 
-export interface PresentationItem {
+export interface Presentation {
   id: string;
   title: string;
   width?: number;
@@ -10,4 +10,12 @@ export interface PresentationItem {
   slides?: Slide[];
   createdAt?: Date | string;
   updatedAt?: Date | string;
+}
+
+export interface PresentationCollectionRequest {
+  page?: number;
+  pageSize?: number;
+  filter?: string;
+  sortBy?: 'createdAt'; // API only supports sorting by createdAt for now
+  sort?: 'asc' | 'desc';
 }

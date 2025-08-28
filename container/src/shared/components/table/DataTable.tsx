@@ -71,27 +71,41 @@ function DataTable<TData>({ table, isLoading, emptyState, onClickRow, contextMen
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows.map((row) => (
-              <ContextMenu>
-                <ContextMenuTrigger asChild>
-                  <TableRow key={row.id} onClick={() => onClickRow?.(row)}>
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell
-                        key={cell.id}
-                        className={(cell.column.columnDef.meta as any)?.style?.className}
-                        align={(cell.column.columnDef.meta as any)?.style?.align}
-                        style={{
-                          width: cell.column.getSize(),
-                        }}
-                      >
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                </ContextMenuTrigger>
-                <ContextMenuContent>{contextMenu ? contextMenu(row) : null}</ContextMenuContent>
-              </ContextMenu>
-            ))}
+            {table.getRowModel().rows.map((row) => {
+              const cells = row.getVisibleCells().map((cell) => (
+                <TableCell
+                  key={cell.id}
+                  className={(cell.column.columnDef.meta as any)?.style?.className}
+                  align={(cell.column.columnDef.meta as any)?.style?.align}
+                  style={{
+                    width: cell.column.getSize(),
+                    maxWidth: cell.column.getSize(),
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                </TableCell>
+              ));
+
+              const tableRow = (
+                <TableRow key={row.id} onClick={() => onClickRow?.(row)}>
+                  {cells}
+                </TableRow>
+              );
+
+              if (contextMenu) {
+                return (
+                  <ContextMenu key={row.id}>
+                    <ContextMenuTrigger asChild>{tableRow}</ContextMenuTrigger>
+                    <ContextMenuContent>{contextMenu(row)}</ContextMenuContent>
+                  </ContextMenu>
+                );
+              }
+
+              return tableRow;
+            })}
           </TableBody>
         </Table>
       </div>

@@ -2,7 +2,7 @@ import { screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import PresentationTable from '@/features/presentation/components/table/PresentationTable';
 import { renderWithProviders } from '@/tests/test-utils';
-import type { PresentationItem } from '@/features/presentation/types/presentation';
+import type { Presentation } from '@/features/presentation/types/presentation';
 
 const { usePresentations } = await import('@/features/presentation/hooks/useApi');
 
@@ -18,7 +18,7 @@ vi.mock('@/features/presentation/hooks/useApi', () => ({
 }));
 
 describe('PresentationTable', () => {
-  const mockPresentationData: PresentationItem[] = [
+  const mockPresentationData: Presentation[] = [
     {
       id: '1',
       title: 'My First Presentation',

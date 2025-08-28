@@ -1,7 +1,7 @@
 import { createColumnHelper, getCoreRowModel, useReactTable } from '@tanstack/react-table';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { PresentationItem } from '../../types/presentation';
+import type { Presentation } from '../../types/presentation';
 import { usePresentations } from '../../hooks/useApi';
 import DataTable from '@/components/table/DataTable';
 import { ActionContent } from './ActionButton';
@@ -10,21 +10,23 @@ import { useNavigate } from 'react-router-dom';
 const PresentationTable = () => {
   const { t } = useTranslation('table');
   const navigate = useNavigate();
-  const columnHelper = createColumnHelper<PresentationItem>();
+  const columnHelper = createColumnHelper<Presentation>();
 
   const columns = useMemo(
     () => [
       columnHelper.accessor('id', {
         header: t('presentation.id'),
         cell: (info) => info.getValue(),
-        size: 50,
+        size: 90,
         enableResizing: false,
+        enableSorting: false,
       }),
       columnHelper.accessor('thumbnail', {
         header: t('presentation.thumbnail'),
         cell: () => <img src="https://placehold.co/600x400" alt="" className="h-16 w-16 object-cover" />,
         size: 100,
         enableResizing: false,
+        enableSorting: false,
       }),
       columnHelper.accessor('title', {
         header: t('presentation.title'),
@@ -33,48 +35,35 @@ const PresentationTable = () => {
         meta: {
           isGrow: true,
         },
+        enableSorting: false,
       }),
       columnHelper.accessor('createdAt', {
         header: t('presentation.createdAt'),
         cell: (info) => {
           const date = info.getValue();
           if (!date) return '';
-          return new Date(date).toLocaleDateString();
+          return new Date(date).toLocaleString();
         },
-        size: 120,
+        size: 160,
       }),
       columnHelper.accessor('updatedAt', {
         header: t('presentation.updatedAt'),
         cell: (info) => {
           const date = info.getValue();
           if (!date) return '';
-          return new Date(date).toLocaleDateString();
+          return new Date(date).toLocaleString();
         },
-        size: 120,
+        size: 160,
+        enableSorting: false,
       }),
     ],
     [t]
   );
 
-  const { presentationItems, isLoading } = usePresentations();
-
-  const [sorting, setSorting] = useState([{ id: 'createdAt', desc: true }]);
-
-  useEffect(() => {
-    console.log('Sorting changed:', sorting);
-  }, [sorting]);
-
-  const [pagination, setPagination] = useState({
-    pageIndex: 0,
-    pageSize: 10,
-  });
-
-  useEffect(() => {
-    console.log('Pagination changed:', pagination);
-  }, [pagination]);
+  const { data, isLoading, sorting, setSorting, pagination, setPagination, totalItems } = usePresentations();
 
   const table = useReactTable({
-    data: presentationItems || [],
+    data: data || [],
     columns: columns,
     getCoreRowModel: getCoreRowModel(),
     manualPagination: true,
@@ -86,6 +75,7 @@ const PresentationTable = () => {
       sorting,
       pagination,
     },
+    rowCount: totalItems,
     onSortingChange: setSorting,
     onPaginationChange: setPagination,
   });

@@ -9,6 +9,8 @@ interface TablePaginationProps {
   table: Table<any>;
 }
 
+const PAGE_SIZE_OPTIONS = [5, 10, 20, 30, 40, 50];
+
 function TablePagination({ table, className, ...props }: TablePaginationProps & React.ComponentProps<'div'>) {
   const { t } = useTranslation('table');
   const { pageIndex, pageSize } = table.getState().pagination;
@@ -50,13 +52,14 @@ function TablePagination({ table, className, ...props }: TablePaginationProps & 
             value={pageSize.toString()}
             onValueChange={(value) => {
               table.setPageSize(Number(value));
+              table.setPageIndex(0);
             }}
           >
             <SelectTrigger className="h-8 w-20">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {[10, 20, 30, 40, 50].map((size) => (
+              {PAGE_SIZE_OPTIONS.map((size) => (
                 <SelectItem key={size} value={size.toString()}>
                   {size}
                 </SelectItem>
@@ -96,11 +99,16 @@ function TablePagination({ table, className, ...props }: TablePaginationProps & 
         {getPageNumbers().map((page) => (
           <Button
             key={page}
-            variant={currentPage === page ? 'default' : 'outline'}
+            variant={'outline'}
             onClick={() => table.setPageIndex(page - 1)}
             aria-label={`${t('goToPage')} ${page}`}
             aria-current={currentPage === page ? 'page' : undefined}
-            className="h-8 w-8"
+            className={cn(
+              'h-8 w-8',
+              currentPage === page
+                ? 'bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground'
+                : ''
+            )}
           >
             {page}
           </Button>

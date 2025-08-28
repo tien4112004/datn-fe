@@ -3,8 +3,10 @@ import {
   type OutlineItem,
   type OutlineData,
   type PresentationApiService,
-  type PresentationItem,
+  type Presentation,
+  type PresentationCollectionRequest,
 } from '../types';
+import type { ApiResponse } from '@/types/api';
 
 const mockOutlineOutput = `\`\`\`markdown
 ### The Amazing World of Artificial Intelligence!
@@ -68,7 +70,7 @@ const mockOutlineItems: OutlineItem[] = [
   },
 ];
 
-const mockPresentationItems: PresentationItem[] = [];
+const mockPresentationItems: Presentation[] = [];
 
 const initMockPresentations = async () => {
   const responses = await Promise.all([fetch('/data/presentation.json'), fetch('/data/presentation2.json')]);
@@ -97,7 +99,7 @@ export default class PresentationMockService implements PresentationApiService {
     return API_MODE.mock;
   }
 
-  async getPresentationItems(): Promise<PresentationItem[]> {
+  async getPresentationItems(): Promise<Presentation[]> {
     return new Promise((resolve) => {
       setTimeout(() => resolve([...mockPresentationItems]), 500);
     });
@@ -109,18 +111,22 @@ export default class PresentationMockService implements PresentationApiService {
     });
   }
 
-  async createPresentation(data: PresentationItem): Promise<PresentationItem> {
+  async createPresentation(data: Presentation): Promise<Presentation> {
     return new Promise((resolve) => {
       setTimeout(() => resolve({ ...data, id: String(Date.now()) }), 500);
     });
   }
 
-  getPresentationById(id: string): Promise<PresentationItem | null> {
+  getPresentationById(id: string): Promise<Presentation | null> {
     return new Promise((resolve) => {
       setTimeout(() => {
         const presentation = mockPresentationItems.find((item) => item.id === id) || null;
         resolve(presentation);
       }, 500);
     });
+  }
+
+  getPresentations(_: PresentationCollectionRequest): Promise<ApiResponse<Presentation[]>> {
+    throw new Error('Method not implemented.');
   }
 }

@@ -1,4 +1,4 @@
-import { useQuery, type UseQueryResult } from '@tanstack/react-query';
+import { useQuery, useMutation, type UseQueryResult } from '@tanstack/react-query';
 import type { SortingState, PaginationState, Updater } from '@tanstack/react-table';
 import { usePresentationApiService } from '../api';
 import { useEffect, useState } from 'react';
@@ -102,4 +102,50 @@ export const usePresentations = (): UsePresentationsReturn => {
     totalItems: data?.pagination?.totalItems || 0,
     ...query,
   };
+};
+
+export const useCreateTestPresentations = () => {
+  const presentationApiService = usePresentationApiService(true);
+
+  return useMutation({
+    mutationFn: async () => {
+      // Read from /public/data/{presentation.json|presentation-2.json}
+      const responses = await Promise.all([
+        fetch('/data/presentation.json'),
+        fetch('/data/presentation2.json'),
+      ]);
+      const presentations = await Promise.all(responses.map((res) => res.json()));
+
+      const createdPresentations = await Promise.all(
+        presentations.map((presentation: any) => presentationApiService.createPresentation(presentation))
+      );
+
+      return createdPresentations;
+    },
+  });
+};
+
+export const useCreateBlankPresentation = () => {
+  const presentationApiService = usePresentationApiService(true);
+
+  return useMutation({
+    mutationFn: async () => {
+      const presentation = await presentationApiService.createPresentation({
+        id: crypto.randomUUID(),
+        title: 'Untitled Presentation',
+        slides: [
+          {
+            id: 'w9LcNwETgw',
+            elements: [],
+            background: {
+              type: 'solid',
+              color: '#fff',
+            },
+          },
+        ],
+      });
+
+      return { presentation };
+    },
+  });
 };

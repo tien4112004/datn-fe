@@ -1,44 +1,46 @@
-export const enum ShapePathFormulasKeys {
-  ROUND_RECT = 'roundRect',
-  ROUND_RECT_DIAGONAL = 'roundRectDiagonal',
-  ROUND_RECT_SINGLE = 'roundRectSingle',
-  ROUND_RECT_SAMESIDE = 'roundRectSameSide',
-  CUT_RECT_DIAGONAL = 'cutRectDiagonal',
-  CUT_RECT_SINGLE = 'cutRectSingle',
-  CUT_RECT_SAMESIDE = 'cutRectSameSide',
-  CUT_ROUND_RECT = 'cutRoundRect',
-  MESSAGE = 'message',
-  ROUND_MESSAGE = 'roundMessage',
-  L = 'L',
-  RING_RECT = 'ringRect',
-  PLUS = 'plus',
-  TRIANGLE = 'triangle',
-  PARALLELOGRAM_LEFT = 'parallelogramLeft',
-  PARALLELOGRAM_RIGHT = 'parallelogramRight',
-  TRAPEZOID = 'trapezoid',
-  BULLET = 'bullet',
-  INDICATOR = 'indicator',
-}
+export const SHAPE_PATH_FORMULAS_KEYS = {
+  ROUND_RECT: 'roundRect',
+  ROUND_RECT_DIAGONAL: 'roundRectDiagonal',
+  ROUND_RECT_SINGLE: 'roundRectSingle',
+  ROUND_RECT_SAMESIDE: 'roundRectSameSide',
+  CUT_RECT_DIAGONAL: 'cutRectDiagonal',
+  CUT_RECT_SINGLE: 'cutRectSingle',
+  CUT_RECT_SAMESIDE: 'cutRectSameSide',
+  CUT_ROUND_RECT: 'cutRoundRect',
+  MESSAGE: 'message',
+  ROUND_MESSAGE: 'roundMessage',
+  L: 'L',
+  RING_RECT: 'ringRect',
+  PLUS: 'plus',
+  TRIANGLE: 'triangle',
+  PARALLELOGRAM_LEFT: 'parallelogramLeft',
+  PARALLELOGRAM_RIGHT: 'parallelogramRight',
+  TRAPEZOID: 'trapezoid',
+  BULLET: 'bullet',
+  INDICATOR: 'indicator',
+} as const;
 
-export const enum ElementTypes {
-  TEXT = 'text',
-  IMAGE = 'image',
-  SHAPE = 'shape',
-  LINE = 'line',
-  CHART = 'chart',
-  TABLE = 'table',
-  LATEX = 'latex',
-  VIDEO = 'video',
-  AUDIO = 'audio',
-}
+export type ShapePathFormulasKeys = (typeof SHAPE_PATH_FORMULAS_KEYS)[keyof typeof SHAPE_PATH_FORMULAS_KEYS];
+
+export const ELEMENT_TYPES = {
+  TEXT: 'text',
+  IMAGE: 'image',
+  SHAPE: 'shape',
+  LINE: 'line',
+  CHART: 'chart',
+  TABLE: 'table',
+  LATEX: 'latex',
+  VIDEO: 'video',
+  AUDIO: 'audio',
+} as const;
+
+export type ElementTypes = (typeof ELEMENT_TYPES)[keyof typeof ELEMENT_TYPES];
 
 /**
  * Gradient
  *
  * type: Gradient type (radial, linear)
- *
  * colors: Gradient color list (pos: percentage position; color: color)
- *
  * rotate: Gradient angle (linear gradient)
  */
 export type GradientType = 'linear' | 'radial';
@@ -58,11 +60,8 @@ export type LineStyleType = 'solid' | 'dashed' | 'dotted';
  * Element shadow
  *
  * h: horizontal offset
- *
  * v: vertical offset
- *
  * blur: blur amount
- *
  * color: shadow color
  */
 export interface PPTElementShadow {
@@ -76,9 +75,7 @@ export interface PPTElementShadow {
  * Element border
  *
  * style?: border style (solid or dashed)
- *
  * width?: border width
- *
  * color?: border color
  */
 export interface PPTElementOutline {
@@ -93,7 +90,6 @@ export type ElementLinkType = 'web' | 'slide';
  * Element hyperlink
  *
  * type: link type (web page, slide page)
- *
  * target: target address (web link, slide page ID)
  */
 export interface PPTElementLink {
@@ -105,23 +101,14 @@ export interface PPTElementLink {
  * Common element properties
  *
  * id: element ID
- *
  * left: element horizontal position (distance from left of canvas)
- *
  * top: element vertical position (distance from top of canvas)
- *
  * lock?: lock element
- *
  * groupId?: group ID (elements with the same group ID are members of the same group)
- *
  * width: element width
- *
  * height: element height
- *
  * rotate: rotation angle
- *
  * link?: hyperlink
- *
  * name?: element name
  */
 interface PPTBaseElement {
@@ -153,29 +140,17 @@ export type TextType =
  * Text element
  *
  * type: element type (text)
- *
  * content: text content (HTML string)
- *
  * defaultFontName: default font (overridden by inline style in HTML content)
- *
  * defaultColor: default color (overridden by inline style in HTML content)
- *
  * outline?: border
- *
  * fill?: fill color
- *
  * lineHeight?: line height (multiplier), default 1.5
- *
  * wordSpace?: word spacing, default 0
- *
  * opacity?: opacity, default 1
- *
  * shadow?: shadow
- *
  * paragraphSpace?: paragraph spacing, default 5px
- *
  * vertical?: vertical text
- *
  * textType?: text type
  */
 export interface PPTTextElement extends PPTBaseElement {
@@ -253,7 +228,6 @@ export type ImageClipDataRange = [[number, number], [number, number]];
  * Image clip
  *
  * range: clip range, for example: [[10, 10], [90, 90]] represents clip the original image from the top left 10%, 10% to 90%, 90%
- *
  * shape: clip shape, see configs/imageClip.ts CLIPPATHS
  */
 export interface ImageElementClip {
@@ -267,27 +241,16 @@ export type ImageType = 'pageFigure' | 'itemFigure' | 'background';
  * Image element
  *
  * type: element type (image)
- *
  * fixedRatio: fixed image aspect ratio
- *
  * src: image address
- *
  * outline?: border
- *
  * filters?: image filter
- *
  * clip?: clip information
- *
  * flipH?: horizontal flip
- *
  * flipV?: vertical flip
- *
  * shadow?: shadow
- *
  * radius?: radius
- *
  * colorMask?: color mask
- *
  * imageType?: image type
  */
 export interface PPTImageElement extends PPTBaseElement {
@@ -311,13 +274,9 @@ export type ShapeTextAlign = 'top' | 'middle' | 'bottom';
  * Shape text
  *
  * content: text content (HTML string)
- *
  * defaultFontName: default font (overridden by inline style in HTML content)
- *
  * defaultColor: default color (overridden by inline style in HTML content)
- *
  * align: text alignment direction (vertical direction)
- *
  * type: text type
  */
 export interface ShapeText {
@@ -332,38 +291,20 @@ export interface ShapeText {
  * Shape element
  *
  * type: element type (shape)
- *
  * viewBox: SVG's viewBox attribute, for example [1000, 1000] represents '0 0 1000 1000'
- *
  * path: shape path, SVG path's d attribute
- *
  * fixedRatio: fixed shape aspect ratio
- *
  * fill: fill, effective when no gradient
- *
  * gradient?: gradient, this attribute will take precedence when filling
- *
  * pattern?: pattern, this attribute will take precedence when filling
- *
  * outline?: border
- *
  * opacity?: opacity
- *
  * flipH?: horizontal flip
- *
  * flipV?: vertical flip
- *
  * shadow?: shadow
- *
  * special?: special shape (mark some shapes that are difficult to parse, for example, the path uses types other than L Q C A, this type of shape will become a picture form after export)
- *
  * text?: shape text
- *
  * pathFormula?: shape path calculation formula
- * In most cases, the size of the shape changes only based on the scaling ratio of width and height based on viewBox, and viewBox itself and path will not change,
- * But some shapes hope to more accurately control the position of some key points when scaling, in which case you need to provide path calculation formulas,
- * By updating viewBox and recalculating path when scaling to redraw shape
- *
  * keypoints?: key point position percentage
  */
 export interface PPTShapeElement extends PPTBaseElement {
@@ -391,25 +332,15 @@ export type LinePoint = '' | 'arrow' | 'dot';
  * Line element
  *
  * type: element type (line)
- *
  * start: start position ([x, y])
- *
  * end: end position ([x, y])
- *
  * style: line style (solid, dashed, dotted)
- *
  * color: line color
- *
  * points: end point style ([start style, end style], optional: none, arrow, dot)
- *
  * shadow?: shadow
- *
  * broken?: broken control point position ([x, y])
- *
  * broken2?: double broken control point position ([x, y])
- *
  * curve?: quadratic curve control point position ([x, y])
- *
  * cubic?: cubic curve control point position ([[x1, y1], [x2, y2]])
  */
 export interface PPTLineElement extends Omit<PPTBaseElement, 'height' | 'rotate'> {
@@ -443,19 +374,12 @@ export interface ChartData {
  * Chart element
  *
  * type: element type (chart)
- *
  * fill?: fill color
- *
  * chartType: chart basic type (bar/line/pie), all chart types are derived from these three basic types
- *
  * data: chart data
- *
  * options: extended options
- *
  * outline?: border
- *
  * themeColors: theme color
- *
  * textColor?: text color
  */
 export interface PPTChartElement extends PPTBaseElement {
@@ -474,21 +398,13 @@ export type TextAlign = 'left' | 'center' | 'right' | 'justify';
  * Table cell style
  *
  * bold?: bold
- *
  * em?: italic
- *
  * underline?: underline
- *
  * strikethrough?: strikethrough
- *
  * color?: font color
- *
  * backcolor?: fill color
- *
  * fontsize?: font size
- *
  * fontname?: font
- *
  * align?: alignment method
  */
 export interface TableCellStyle {
@@ -507,13 +423,9 @@ export interface TableCellStyle {
  * Table cell
  *
  * id: cell ID
- *
  * colspan: merge column number
- *
  * rowspan: merge row number
- *
  * text: text content
- *
  * style?: cell style
  */
 export interface TableCell {
@@ -528,13 +440,9 @@ export interface TableCell {
  * Table theme
  *
  * color: theme color
- *
  * rowHeader: title row
- *
  * rowFooter: summary row
- *
  * colHeader: first column
- *
  * colFooter: last column
  */
 export interface TableTheme {
@@ -549,15 +457,10 @@ export interface TableTheme {
  * Table element
  *
  * type: element type (table)
- *
  * outline: border
- *
  * theme?: theme
- *
  * colWidths: column width array, for example [30, 50, 20] represents three column widths respectively 30%, 50%, 20%
- *
  * cellMinHeight: minimum cell height
- *
  * data: table data
  */
 export interface PPTTableElement extends PPTBaseElement {
@@ -573,17 +476,11 @@ export interface PPTTableElement extends PPTBaseElement {
  * LaTeX element (formula)
  *
  * type: element type (latex)
- *
  * latex: latex code
- *
  * path: svg path
- *
  * color: color
- *
  * strokeWidth: path width
- *
  * viewBox: SVG's viewBox attribute
- *
  * fixedRatio: fixed shape aspect ratio
  */
 export interface PPTLatexElement extends PPTBaseElement {
@@ -600,13 +497,9 @@ export interface PPTLatexElement extends PPTBaseElement {
  * Video element
  *
  * type: element type (video)
- *
  * src: video address
- *
  * autoplay: autoplay
- *
  * poster: preview cover
- *
  * ext: video suffix, use this field to confirm resource type when resource link is missing
  */
 export interface PPTVideoElement extends PPTBaseElement {
@@ -621,17 +514,11 @@ export interface PPTVideoElement extends PPTBaseElement {
  * Audio element
  *
  * type: element type (audio)
- *
  * fixedRatio: fixed icon aspect ratio
- *
  * color: icon color
- *
  * loop: loop play
- *
  * autoplay: autoplay
- *
  * src: audio address
- *
  * ext: audio suffix, use this field to confirm resource type when resource link is missing
  */
 export interface PPTAudioElement extends PPTBaseElement {
@@ -662,15 +549,10 @@ export type AnimationTrigger = 'click' | 'meantime' | 'auto';
  * Element animation
  *
  * id: animation id
- *
  * elId: element ID
- *
  * effect: animation effect
- *
  * type: animation type (entry, exit, emphasis)
- *
  * duration: animation duration
- *
  * trigger: animation trigger method (click - single click, meantime - at the same time as the previous animation, auto - after the previous animation)
  */
 export interface PPTAnimation {
@@ -693,11 +575,8 @@ export interface SlideBackgroundImage {
  * Slide background
  *
  * type: background type (solid, image, gradient)
- *
  * color?: background color (solid)
- *
  * image?: image background
- *
  * gradientType?: gradient background
  */
 export interface SlideBackground {
@@ -748,19 +627,12 @@ export type SlideType = 'cover' | 'contents' | 'transition' | 'content' | 'end';
  * Slide page
  *
  * id: page ID
- *
  * elements: element collection
- *
  * notes?: comments
- *
  * remark?: remark
- *
  * background?: page background
- *
  * animations?: element animation collection
- *
  * turningMode?: turning mode
- *
  * slideType?: page type
  */
 export interface Slide {
@@ -779,11 +651,8 @@ export interface Slide {
  * Slide theme
  *
  * backgroundColor: page background color
- *
  * themeColor: theme color, used for default shape color, etc.
- *
  * fontColor: font color
- *
  * fontName: font
  */
 export interface SlideTheme {
@@ -799,16 +668,4 @@ export interface SlideTemplate {
   name: string;
   id: string;
   cover: string;
-}
-
-export interface Presentation {
-  id: string;
-  title: string;
-  width?: number;
-  height?: number;
-  theme?: SlideTheme;
-  thumbnail?: Slide;
-  slides?: Slide[];
-  createdAt?: Date | string;
-  updatedAt?: Date | string;
 }

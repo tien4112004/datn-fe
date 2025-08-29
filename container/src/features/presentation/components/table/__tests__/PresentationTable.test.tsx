@@ -1,204 +1,277 @@
-import { render, screen } from '@testing-library/react';
+import { screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import PresentationTable from '@/features/presentation/components/table/PresentationTable';
-import { usePresentations } from '@/features/presentation/hooks/useApi';
+import { renderWithProviders } from '@/tests/test-utils';
+import type { Presentation } from '@/features/presentation/types/presentation';
 
-const mockUseTranslation = vi.fn();
+const { usePresentations } = await import('@/features/presentation/hooks/useApi');
 
-// Mock dependencies
-vi.mock('react-i18next', () => ({
-  useTranslation: (namespace?: string) => mockUseTranslation(namespace),
+vi.mock('@/features/presentation/api/service', () => ({
+  presentationService: {
+    getAll: vi.fn(),
+  },
 }));
 
 vi.mock('@/features/presentation/hooks/useApi', () => ({
   usePresentations: vi.fn(),
 }));
 
-vi.mock('@/features/presentation/components/ActionButton', () => ({
-  default: vi.fn(({ onEdit, onDelete }) => (
-    <div data-testid="action-button">
-      <button onClick={onEdit} data-testid="edit-button">
-        Edit
-      </button>
-      <button onClick={onDelete} data-testid="delete-button">
-        Delete
-      </button>
-    </div>
-  )),
-}));
-
-vi.mock('@/components/table/DataTable', () => ({
-  default: vi.fn(({ table, isLoading, emptyState }) => {
-    if (isLoading) {
-      return <div data-testid="loading-skeleton">Loading...</div>;
-    }
-
-    const hasRows = table.getRowModel().rows.length > 0;
-
-    return (
-      <div data-testid="data-table">
-        <table>
-          <thead>
-            <tr>
-              {table.getHeaderGroups()[0]?.headers.map((header: any) => (
-                <th key={header.id}>{header.column.columnDef.header}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {table.getRowModel().rows.map((row: any) => (
-              <tr key={row.id}>
-                {row.getVisibleCells().map((cell: any) => (
-                  <td key={cell.id} data-testid={`cell-${cell.column.id}`}>
-                    {typeof cell.column.columnDef.cell === 'function'
-                      ? cell.column.columnDef.cell(cell.getContext())
-                      : cell.getValue()}
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        {!hasRows && emptyState && <div data-testid="empty-state">{emptyState}</div>}
-      </div>
-    );
-  }),
-}));
-
 describe('PresentationTable', () => {
-  const mockT = vi.fn((key: string) => {
-    const translations: Record<string, string> = {
-      'presentation.id': 'ID',
-      'presentation.title': 'Title',
-      'presentation.description': 'Description',
-      'presentation.createdAt': 'Created At',
-      'presentation.status': 'Status',
-      'presentation.emptyState': 'No presentations found',
-      actions: 'Actions',
-    };
-    return translations[key] || key;
-  });
-
-  const mockPresentationData = [
+  const mockPresentationData: Presentation[] = [
     {
       id: '1',
-      title: 'Test Presentation',
-      description: 'Test Description',
-      createdAt: '2023-01-01',
-      status: 'active',
+      title: 'My First Presentation',
+      createdAt: '2023-01-01T10:00:00Z',
+      updatedAt: '2023-01-02T15:30:00Z',
     },
     {
       id: '2',
-      title: 'Another Presentation',
-      description: 'Another Description',
-      createdAt: '2023-01-02',
-      status: 'inactive',
+      title: 'Advanced React Patterns',
+      createdAt: '2023-01-03T09:15:00Z',
+      updatedAt: '2023-01-04T14:45:00Z',
+    },
+    {
+      id: '3',
+      title: 'Testing Best Practices',
+      createdAt: '2023-01-05T11:20:00Z',
+      updatedAt: '2023-01-05T16:10:00Z',
     },
   ];
 
   beforeEach(() => {
     vi.clearAllMocks();
-    mockUseTranslation.mockReturnValue({
-      t: mockT,
-      i18n: {} as any,
-      ready: true,
-    });
     vi.mocked(usePresentations).mockReturnValue({
-      presentationItems: mockPresentationData,
+      data: mockPresentationData,
       isLoading: false,
+      sorting: [],
+      setSorting: vi.fn(),
+      pagination: { pageIndex: 0, pageSize: 10 },
+      setPagination: vi.fn(),
+      totalItems: 3,
+      search: '',
+      setSearch: vi.fn(),
     } as any);
   });
 
-  it('renders table with correct column headers', () => {
-    render(<PresentationTable />);
+  it('displays presentations with correct data', () => {
+    renderWithProviders(<PresentationTable />);
 
-    expect(screen.getByText('ID')).toBeInTheDocument();
-    expect(screen.getByText('Title')).toBeInTheDocument();
-    expect(screen.getByText('Description')).toBeInTheDocument();
-    expect(screen.getByText('Created At')).toBeInTheDocument();
-    expect(screen.getByText('Status')).toBeInTheDocument();
-    expect(screen.getByText('Actions')).toBeInTheDocument();
+    expect(screen.getByText('My First Presentation')).toBeInTheDocument();
+    expect(screen.getByText('Advanced React Patterns')).toBeInTheDocument();
+    expect(screen.getByText('Testing Best Practices')).toBeInTheDocument();
   });
 
-  it('uses translation hook correctly', () => {
-    render(<PresentationTable />);
+  it('displays table headers correctly', () => {
+    renderWithProviders(<PresentationTable />);
 
-    expect(mockUseTranslation).toHaveBeenCalledWith('table');
-    expect(mockT).toHaveBeenCalledWith('presentation.id');
-    expect(mockT).toHaveBeenCalledWith('presentation.title');
-    expect(mockT).toHaveBeenCalledWith('actions');
+    expect(screen.getByRole('columnheader', { name: /id/i })).toBeInTheDocument();
+    expect(screen.getByRole('columnheader', { name: /title/i })).toBeInTheDocument();
+    expect(screen.getByRole('columnheader', { name: /created/i })).toBeInTheDocument();
+    expect(screen.getByRole('columnheader', { name: /updated/i })).toBeInTheDocument();
   });
 
-  it('renders presentation data correctly', () => {
-    render(<PresentationTable />);
+  it('does not show deprecated columns', () => {
+    renderWithProviders(<PresentationTable />);
 
-    expect(screen.getByText('Test Presentation')).toBeInTheDocument();
-    expect(screen.getByText('Another Presentation')).toBeInTheDocument();
+    expect(screen.queryByText(/description/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/status/i)).not.toBeInTheDocument();
   });
 
-  it('handles sorting state correctly', () => {
-    const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
-    render(<PresentationTable />);
+  it('formats dates in readable format', () => {
+    renderWithProviders(<PresentationTable />);
 
-    expect(consoleSpy).toHaveBeenCalledWith('Sorting changed:', [{ id: 'createdAt', desc: true }]);
-
-    consoleSpy.mockRestore();
+    const dateElements = screen.getAllByText(/\d{1,2}\/\d{1,2}\/\d{4}/);
+    expect(dateElements.length).toBeGreaterThan(0);
   });
 
-  it('handles pagination state correctly', () => {
-    const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
-    render(<PresentationTable />);
+  it('shows context menu when right-clicking on table row', async () => {
+    renderWithProviders(<PresentationTable />);
 
-    expect(consoleSpy).toHaveBeenCalledWith('Pagination changed:', {
-      pageIndex: 0,
-      pageSize: 10,
+    const firstRow = screen.getByText('My First Presentation').closest('tr')!;
+
+    fireEvent.contextMenu(firstRow);
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /view details/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /edit/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /delete/i })).toBeInTheDocument();
+    });
+  });
+
+  it('allows user to access edit option for a presentation', async () => {
+    renderWithProviders(<PresentationTable />);
+
+    const firstRow = screen.getByText('My First Presentation').closest('tr')!;
+    fireEvent.contextMenu(firstRow);
+
+    await waitFor(() => {
+      const editButton = screen.getByRole('button', { name: /edit/i });
+      expect(editButton).toBeInTheDocument();
+      expect(editButton).toBeEnabled();
+
+      fireEvent.click(editButton);
+    });
+  });
+
+  it('allows user to access delete option for a presentation', async () => {
+    renderWithProviders(<PresentationTable />);
+
+    const secondRow = screen.getByText('Advanced React Patterns').closest('tr')!;
+    fireEvent.contextMenu(secondRow);
+
+    await waitFor(() => {
+      const deleteButton = screen.getByRole('button', { name: /delete/i });
+      expect(deleteButton).toBeInTheDocument();
+      expect(deleteButton).toBeEnabled();
+
+      fireEvent.click(deleteButton);
+    });
+  });
+
+  it('provides sortable column headers for user interaction', async () => {
+    renderWithProviders(<PresentationTable />);
+
+    const createdAtHeader = screen.getByRole('columnheader', { name: /created/i });
+    expect(createdAtHeader).toBeInTheDocument();
+    expect(createdAtHeader).toBeVisible();
+
+    fireEvent.click(createdAtHeader);
+
+    expect(createdAtHeader).toBeInTheDocument();
+    expect(screen.getByText('My First Presentation')).toBeInTheDocument();
+    expect(screen.getByText('Advanced React Patterns')).toBeInTheDocument();
+  });
+
+  it('provides accessible search functionality for users', async () => {
+    renderWithProviders(<PresentationTable />);
+
+    const searchInput = screen.getByPlaceholderText(/search by title/i);
+    expect(searchInput).toBeInTheDocument();
+    expect(searchInput).toBeVisible();
+
+    fireEvent.change(searchInput, { target: { value: 'React' } });
+    expect(searchInput).toHaveValue('React');
+
+    fireEvent.change(searchInput, { target: { value: '' } });
+    expect(searchInput).toHaveValue('');
+
+    expect(searchInput).toBeEnabled();
+    expect(searchInput).toHaveAttribute('placeholder');
+  });
+
+  it('shows filtered search results', () => {
+    const filteredData = [mockPresentationData[1]];
+    vi.mocked(usePresentations).mockReturnValue({
+      data: filteredData,
+      isLoading: false,
+      sorting: [],
+      setSorting: vi.fn(),
+      pagination: { pageIndex: 0, pageSize: 10 },
+      setPagination: vi.fn(),
+      totalItems: 1,
+      search: 'React',
+      setSearch: vi.fn(),
+    } as any);
+
+    renderWithProviders(<PresentationTable />);
+
+    expect(screen.getByText('Advanced React Patterns')).toBeInTheDocument();
+    expect(screen.queryByText('My First Presentation')).not.toBeInTheDocument();
+    expect(screen.queryByText('Testing Best Practices')).not.toBeInTheDocument();
+  });
+
+  describe('loading and empty states', () => {
+    it('shows loading indicators when data is being fetched', () => {
+      vi.mocked(usePresentations).mockReturnValue({
+        data: [],
+        isLoading: true,
+        sorting: [],
+        setSorting: vi.fn(),
+        pagination: { pageIndex: 0, pageSize: 10 },
+        setPagination: vi.fn(),
+        totalItems: 0,
+        search: '',
+        setSearch: vi.fn(),
+      } as any);
+
+      renderWithProviders(<PresentationTable />);
+
+      const skeletonElements = document.querySelectorAll('[data-slot="skeleton"]');
+      expect(skeletonElements.length).toBeGreaterThan(0);
+
+      const firstSkeleton = skeletonElements[0];
+      expect(firstSkeleton).toHaveClass('animate-pulse');
     });
 
-    consoleSpy.mockRestore();
+    it('displays empty state message when no presentations exist', () => {
+      vi.mocked(usePresentations).mockReturnValue({
+        data: [],
+        isLoading: false,
+        sorting: [],
+        setSorting: vi.fn(),
+        pagination: { pageIndex: 0, pageSize: 10 },
+        setPagination: vi.fn(),
+        totalItems: 0,
+        search: '',
+        setSearch: vi.fn(),
+      } as any);
+
+      renderWithProviders(<PresentationTable />);
+      expect(screen.queryByRole('table')).toBeInTheDocument();
+      expect(screen.getByText(/no presentations/i)).toBeInTheDocument();
+    });
+
+    it('shows data table when presentations are available', () => {
+      vi.mocked(usePresentations).mockReturnValue({
+        data: mockPresentationData,
+        isLoading: false,
+        sorting: [],
+        setSorting: vi.fn(),
+        pagination: { pageIndex: 0, pageSize: 10 },
+        setPagination: vi.fn(),
+        totalItems: 3,
+        search: '',
+        setSearch: vi.fn(),
+      } as any);
+
+      renderWithProviders(<PresentationTable />);
+
+      expect(screen.getByRole('table')).toBeInTheDocument();
+      expect(screen.getByText('My First Presentation')).toBeInTheDocument();
+    });
   });
 
-  it('shows loading state when isLoading is true', () => {
-    vi.mocked(usePresentations).mockReturnValue({
-      presentationItems: [],
-      isLoading: true,
-    } as any);
+  describe('user interaction scenarios', () => {
+    it('provides complete workflow for managing presentations', async () => {
+      renderWithProviders(<PresentationTable />);
 
-    render(<PresentationTable />);
+      expect(screen.getByText('Testing Best Practices')).toBeInTheDocument();
+      expect(screen.getByText('My First Presentation')).toBeInTheDocument();
+      expect(screen.getByText('Advanced React Patterns')).toBeInTheDocument();
 
-    expect(screen.getByTestId('loading-skeleton')).toBeInTheDocument();
-    expect(screen.getByText('Loading...')).toBeInTheDocument();
-  });
+      const presentationRow = screen.getByText('Testing Best Practices').closest('tr')!;
+      fireEvent.contextMenu(presentationRow);
 
-  it('shows empty state when no data and not loading', () => {
-    vi.mocked(usePresentations).mockReturnValue({
-      presentationItems: [],
-      isLoading: false,
-    } as any);
+      await waitFor(() => {
+        expect(screen.getByRole('button', { name: /view details/i })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /edit/i })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /delete/i })).toBeInTheDocument();
+      });
+    });
 
-    render(<PresentationTable />);
+    it('supports keyboard navigation for accessibility', () => {
+      renderWithProviders(<PresentationTable />);
 
-    expect(screen.getByTestId('empty-state')).toBeInTheDocument();
-    expect(screen.getByText('No presentations found')).toBeInTheDocument();
-    expect(screen.queryByTestId('loading-skeleton')).not.toBeInTheDocument();
-  });
+      const table = screen.getByRole('table');
+      expect(table).toBeInTheDocument();
 
-  it('does not show empty state when loading', () => {
-    vi.mocked(usePresentations).mockReturnValue({
-      presentationItems: [],
-      isLoading: true,
-    } as any);
+      const rows = screen.getAllByRole('row');
+      expect(rows.length).toBeGreaterThan(1);
 
-    render(<PresentationTable />);
-
-    expect(screen.queryByTestId('empty-state')).not.toBeInTheDocument();
-    expect(screen.getByTestId('loading-skeleton')).toBeInTheDocument();
-  });
-
-  it('does not show empty state when there is data', () => {
-    render(<PresentationTable />);
-
-    expect(screen.queryByTestId('empty-state')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('loading-skeleton')).not.toBeInTheDocument();
-    expect(screen.getByTestId('data-table')).toBeInTheDocument();
+      rows.slice(1).forEach((row) => {
+        const cells = row.querySelectorAll('td');
+        expect(cells.length).toBeGreaterThan(0);
+      });
+    });
   });
 });

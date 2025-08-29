@@ -1,8 +1,11 @@
 import type { PresentationApiService } from '../types/service';
 import PresentationMockService from './mock';
 import PresentationRealApiService from './service';
-import { createApiServiceFactory } from '@/shared/api';
+import { createApiServiceFactory, getApiServiceFactory } from '@/shared/api';
 
-export const usePresentationApiService = (): PresentationApiService => {
+export const usePresentationApiService = (isLoader?: boolean): PresentationApiService => {
+  if (isLoader) {
+    return getApiServiceFactory<PresentationApiService>(PresentationMockService, PresentationRealApiService);
+  }
   return createApiServiceFactory<PresentationApiService>(PresentationMockService, PresentationRealApiService);
 };

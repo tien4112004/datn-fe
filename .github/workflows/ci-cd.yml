@@ -136,10 +136,19 @@ jobs:
       - name: Deploy Project and Get URL
         id: deploy_vercel
         run: |
+          # First deployment to get the URL
           DEPLOY_OUTPUT=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})
           echo "$DEPLOY_OUTPUT"
           PREVIEW_URL=$(echo "$DEPLOY_OUTPUT" | grep -oE "https://[a-zA-Z0-9.-]+\.vercel\.app" | tail -n 1)
           echo "preview_url=$PREVIEW_URL" >> "$GITHUB_OUTPUT"
+          
+          # Set VITE_BASE_URL environment variable in Vercel
+          vercel env rm VITE_BASE_URL preview ${{ github.head_ref }} --yes --token=${{ secrets.VERCEL_TOKEN }} || true
+          echo "$PREVIEW_URL" | vercel env add VITE_BASE_URL preview ${{ github.head_ref }} --token=${{ secrets.VERCEL_TOKEN }}
+          
+          # Rebuild and redeploy with the environment variable
+          vercel build --token=${{ secrets.VERCEL_TOKEN }}
+          vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }}
 
   deploy_container:
     name: Deploy Container Preview

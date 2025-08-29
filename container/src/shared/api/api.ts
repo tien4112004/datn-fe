@@ -1,6 +1,7 @@
 import axios, { type AxiosInstance } from 'axios';
 import { CriticalError, ExpectedError } from '@/types/errors';
 import { ERROR_TYPE } from '@/shared/constants';
+import { toast } from 'sonner';
 
 const API_BASE_URL = import.meta.env.API_BASE_URL || 'http://localhost:8080';
 
@@ -35,6 +36,8 @@ api.interceptors.response.use(
       if (response) {
         // Handle expected errors
         if (response.status >= 400 && response.status < 500) {
+          toast.error(response.data.message || 'An error occurred');
+
           return Promise.reject(
             new ExpectedError(
               response.data.message,

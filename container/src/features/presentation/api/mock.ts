@@ -3,8 +3,10 @@ import {
   type OutlineItem,
   type OutlineData,
   type PresentationApiService,
-  type PresentationItem,
+  type Presentation,
+  type PresentationCollectionRequest,
 } from '../types';
+import type { ApiResponse } from '@/types/api';
 
 const mockOutlineOutput = `\`\`\`markdown
 ### The Amazing World of Artificial Intelligence!
@@ -68,29 +70,27 @@ const mockOutlineItems: OutlineItem[] = [
   },
 ];
 
-const mockPresentationItems: PresentationItem[] = [
-  {
-    id: '1',
-    title: 'Introduction to Web Development',
-    description: 'Learn the basics of web development including HTML, CSS, and JavaScript.',
-    createdAt: new Date().toISOString(),
-    status: 'active',
-  },
-  {
-    id: '2',
-    title: 'Frontend Frameworks Overview',
-    description: 'An overview of popular frontend frameworks like React, Vue, and Angular.',
-    createdAt: new Date().toISOString(),
-    status: 'active',
-  },
-  {
-    id: '3',
-    title: 'Backend Technologies Explained',
-    description: 'Exploring server-side technologies including Node.js and Python.',
-    createdAt: new Date().toISOString(),
-    status: 'archived',
-  },
-];
+const mockPresentationItems: Presentation[] = [];
+
+const initMockPresentations = async () => {
+  try {
+    const responses = await Promise.all([
+      fetch('/data/presentation.json'),
+      fetch('/data/presentation2.json'),
+    ]);
+    const presentations = await Promise.all(responses.map((res) => res.json()));
+
+    mockPresentationItems.push(...presentations);
+  } catch (error) {
+    // Silently handle fetch errors in test environment where public/data files don't exist
+    console.warn('Failed to load mock presentation data:', error);
+  }
+};
+
+// Only initialize in non-test environments
+if (typeof process === 'undefined' || process.env.NODE_ENV !== 'test') {
+  initMockPresentations();
+}
 
 export default class PresentationMockService implements PresentationApiService {
   async *getStreamedOutline(_request: OutlineData, signal: AbortSignal): AsyncGenerator<string> {
@@ -110,7 +110,7 @@ export default class PresentationMockService implements PresentationApiService {
     return API_MODE.mock;
   }
 
-  async getPresentationItems(): Promise<PresentationItem[]> {
+  async getPresentationItems(): Promise<Presentation[]> {
     return new Promise((resolve) => {
       setTimeout(() => resolve([...mockPresentationItems]), 500);
     });
@@ -120,5 +120,24 @@ export default class PresentationMockService implements PresentationApiService {
     return new Promise((resolve) => {
       setTimeout(() => resolve([...mockOutlineItems]), 500);
     });
+  }
+
+  async createPresentation(data: Presentation): Promise<Presentation> {
+    return new Promise((resolve) => {
+      setTimeout(() => resolve({ ...data, id: String(Date.now()) }), 500);
+    });
+  }
+
+  getPresentationById(id: string): Promise<Presentation | null> {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const presentation = mockPresentationItems.find((item) => item.id === id) || null;
+        resolve(presentation);
+      }, 500);
+    });
+  }
+
+  getPresentations(_: PresentationCollectionRequest): Promise<ApiResponse<Presentation[]>> {
+    throw new Error('Method not implemented.');
   }
 }

@@ -52,14 +52,16 @@ export const ModelSelect = ({
               disabled={!modelOption.enabled}
               className={!modelOption.enabled ? 'opacity-50' : ''}
             >
-              {showProviderLogo && (
-                <img
-                  src={MODEL_PROVIDERS_LOGO[modelOption.provider]}
-                  alt={modelOption.provider}
-                  className="mr-2 inline h-4 w-4"
-                />
-              )}
-              {modelOption.displayName}
+              <div className="flex items-center">
+                {showProviderLogo && (
+                  <img
+                    src={MODEL_PROVIDERS_LOGO[modelOption.provider]}
+                    alt={modelOption.provider}
+                    className="mr-2 inline h-4 w-4"
+                  />
+                )}
+                <span>{modelOption.displayName}</span>
+              </div>
             </SelectItem>
           ))}
         </SelectGroup>

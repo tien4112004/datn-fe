@@ -1,13 +1,24 @@
 import { cn } from '@/shared/lib/utils';
 import type { Table } from '@tanstack/react-table';
-import { Button } from '@ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@ui/select';
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+  PaginationEllipsis,
+  PaginationStart,
+  PaginationEnd,
+} from '@ui/pagination';
 
 interface TablePaginationProps {
   table: Table<any>;
 }
+
+const PAGE_SIZE_OPTIONS = [5, 10, 20, 30, 40, 50];
 
 function TablePagination({ table, className, ...props }: TablePaginationProps & React.ComponentProps<'div'>) {
   const { t } = useTranslation('table');
@@ -19,16 +30,40 @@ function TablePagination({ table, className, ...props }: TablePaginationProps & 
   const getPageNumbers = () => {
     const pages = [];
     const showPages = 5;
+    const sidePages = 2; // Pages to show on each side of current page
 
-    let start = Math.max(1, currentPage - Math.floor(showPages / 2));
-    let end = Math.min(totalPages, start + showPages - 1);
+    if (totalPages <= showPages) {
+      // Show all pages if total is small
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      // Always show first page
+      pages.push(1);
 
-    if (end === totalPages) {
-      start = Math.max(1, end - showPages + 1);
-    }
+      // Calculate start and end for middle pages
+      let start = Math.max(2, currentPage - sidePages);
+      let end = Math.min(totalPages - 1, currentPage + sidePages);
 
-    for (let i = start; i <= end; i++) {
-      pages.push(i);
+      // Add ellipsis before middle pages if needed
+      if (start > 2) {
+        pages.push('ellipsis-start');
+      }
+
+      // Add middle pages
+      for (let i = start; i <= end; i++) {
+        pages.push(i);
+      }
+
+      // Add ellipsis after middle pages if needed
+      if (end < totalPages - 1) {
+        pages.push('ellipsis-end');
+      }
+
+      // Always show last page if more than 1 page
+      if (totalPages > 1) {
+        pages.push(totalPages);
+      }
     }
 
     return pages;
@@ -50,13 +85,14 @@ function TablePagination({ table, className, ...props }: TablePaginationProps & 
             value={pageSize.toString()}
             onValueChange={(value) => {
               table.setPageSize(Number(value));
+              table.setPageIndex(0);
             }}
           >
             <SelectTrigger className="h-8 w-20">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {[10, 20, 30, 40, 50].map((size) => (
+              {PAGE_SIZE_OPTIONS.map((size) => (
                 <SelectItem key={size} value={size.toString()}>
                   {size}
                 </SelectItem>
@@ -70,64 +106,86 @@ function TablePagination({ table, className, ...props }: TablePaginationProps & 
         </span>
       </div>
 
-      <div className="flex items-center space-x-2">
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={() => table.firstPage()}
-          disabled={!table.getCanPreviousPage()}
-          aria-label={t('goToFirstPage')}
-          className="h-8 w-8"
-        >
-          <ChevronsLeft className="h-4 w-4" />
-        </Button>
+      <Pagination className="mx-0 flex w-auto items-center space-x-2">
+        <PaginationContent>
+          {/* First Page Button */}
+          <PaginationItem>
+            <PaginationStart
+              onClick={() => table.firstPage()}
+              className={cn(
+                'h-8 cursor-pointer',
+                !table.getCanPreviousPage() && 'pointer-events-none opacity-50'
+              )}
+              aria-label={t('goToFirstPage')}
+              label={t('firstPage')}
+            />
+          </PaginationItem>
 
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage()}
-          aria-label={t('goToPreviousPage')}
-          className="h-8 w-8"
-        >
-          <ChevronLeft className="h-4 w-4" />
-        </Button>
+          {/* Previous button */}
+          <PaginationItem>
+            <PaginationPrevious
+              onClick={() => table.previousPage()}
+              className={cn(
+                'h-8 cursor-pointer',
+                !table.getCanPreviousPage() && 'pointer-events-none opacity-50'
+              )}
+              aria-label={t('goToPreviousPage')}
+              label={t('previous')}
+            />
+          </PaginationItem>
 
-        {getPageNumbers().map((page) => (
-          <Button
-            key={page}
-            variant={currentPage === page ? 'default' : 'outline'}
-            onClick={() => table.setPageIndex(page - 1)}
-            aria-label={`${t('goToPage')} ${page}`}
-            aria-current={currentPage === page ? 'page' : undefined}
-            className="h-8 w-8"
-          >
-            {page}
-          </Button>
-        ))}
+          {/* Page numbers */}
+          {getPageNumbers().map((page) => {
+            if (typeof page === 'string') {
+              return (
+                <PaginationItem key={page}>
+                  <PaginationEllipsis />
+                </PaginationItem>
+              );
+            }
 
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage()}
-          aria-label={t('goToNextPage')}
-          className="h-8 w-8"
-        >
-          <ChevronRight className="h-4 w-4" />
-        </Button>
+            return (
+              <PaginationItem key={page}>
+                <PaginationLink
+                  onClick={() => table.setPageIndex(page - 1)}
+                  isActive={currentPage === page}
+                  aria-label={`${t('goToPage')} ${page}`}
+                  aria-current={currentPage === page ? 'page' : undefined}
+                  className="h-8 w-8 cursor-pointer"
+                >
+                  {page}
+                </PaginationLink>
+              </PaginationItem>
+            );
+          })}
 
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={() => table.lastPage()}
-          disabled={!table.getCanNextPage()}
-          aria-label={t('goToLastPage')}
-          className="h-8 w-8"
-        >
-          <ChevronsRight className="h-4 w-4" />
-        </Button>
-      </div>
+          {/* Next button */}
+          <PaginationItem>
+            <PaginationNext
+              onClick={() => table.nextPage()}
+              className={cn(
+                'h-8 cursor-pointer',
+                !table.getCanNextPage() && 'pointer-events-none opacity-50'
+              )}
+              aria-label={t('goToNextPage')}
+              label={t('next')}
+            />
+          </PaginationItem>
+
+          {/* End button */}
+          <PaginationItem>
+            <PaginationEnd
+              onClick={() => table.lastPage()}
+              className={cn(
+                'h-8 cursor-pointer',
+                !table.getCanNextPage() && 'pointer-events-none opacity-50'
+              )}
+              aria-label={t('goToLastPage')}
+              label={t('lastPage')}
+            />
+          </PaginationItem>
+        </PaginationContent>
+      </Pagination>
     </div>
   );
 }

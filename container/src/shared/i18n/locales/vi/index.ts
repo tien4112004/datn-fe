@@ -83,8 +83,8 @@ export default {
     },
     list: {
       title: 'Danh sách bài trình bày',
-      createNewPresentation: 'Tạo bài trình bày mới',
-      viewEditor: 'Xem trình chỉnh sửa',
+      generateNewPresentation: 'Tạo bài trình bày mới',
+      createBlankPresentation: 'Tạo bài trình bày trống',
     },
     workspace: {
       title: 'Tùy chỉnh',
@@ -123,13 +123,15 @@ export default {
   table: {
     presentation: {
       id: 'ID',
+      thumbnail: 'Hình',
       title: 'Tiêu đề',
-      description: 'Mô tả',
       createdAt: 'Ngày tạo',
-      status: 'Trạng thái',
+      updatedAt: 'Cập nhật gần nhất',
       emptyState: 'Không có bài trình bày nào được tìm thấy',
+      searchPlaceholder: 'Tìm kiếm theo tiêu đề...',
     },
     actionButton: {
+      viewDetails: 'Xem chi tiết',
       edit: 'Chỉnh sửa',
       delete: 'Xóa',
     },
@@ -144,6 +146,10 @@ export default {
     goToPage: 'Đi đến trang',
     goToNextPage: 'Đi đến trang tiếp theo',
     goToLastPage: 'Đi đến trang cuối',
+    firstPage: 'Đầu',
+    previous: 'Trước',
+    next: 'Tiếp',
+    lastPage: 'Cuối',
   },
 
   errorBoundary: {

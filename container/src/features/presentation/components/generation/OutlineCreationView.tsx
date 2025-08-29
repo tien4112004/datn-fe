@@ -17,7 +17,7 @@ import ExamplePrompts from './ExamplePrompts';
 import { SLIDE_COUNT_OPTIONS, LANGUAGE_OPTIONS, TARGET_AGE_OPTIONS } from '@/features/presentation/types';
 import type { OutlineData } from '@/features/presentation/types';
 import type { ModelOption } from '@/features/model';
-import { ModelSelect } from '@/components/ModelSelect';
+import { ModelSelect } from '@/components/common/ModelSelect';
 
 interface OutlineCreationViewProps {
   defaultModel: ModelOption;

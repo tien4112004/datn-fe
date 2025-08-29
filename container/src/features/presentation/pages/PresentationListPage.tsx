@@ -1,12 +1,10 @@
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbPage } from '@/components/ui/breadcrumb';
 import { Separator } from '@radix-ui/react-separator';
-import PresentationTable from '../components/table/PresentationTable';
-import { Button } from '@/components/ui/button';
-import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import PresentationTable from '../components/table/PresentationTable';
+import CreatePresentationControls from '../components/others/CreatePresentationControls';
 
 const PresentationListPage = () => {
-  const navigate = useNavigate();
   const { t } = useTranslation('presentation', { keyPrefix: 'list' });
   const { t: tPage } = useTranslation('page');
 
@@ -23,18 +21,9 @@ const PresentationListPage = () => {
           </BreadcrumbList>
         </Breadcrumb>
       </header>
-      <div className="px-8 py-4">
-        <div className="mb-6 flex items-center justify-between">
-          <h1 className="mb-4 text-center text-2xl font-semibold">{t('title')}</h1>
-          <div className="space-x-2">
-            <Button variant={'secondary'} className="mb-4" onClick={() => navigate('/presentation/create')}>
-              {t('createNewPresentation')}
-            </Button>
-            <Button variant={'secondary'} className="mb-4" onClick={() => navigate('/presentation/editor')}>
-              {t('viewEditor')}
-            </Button>
-          </div>
-        </div>
+      <div className="space-y-4 px-8 py-4">
+        <CreatePresentationControls />
+        <h1 className="mb-4 text-2xl font-semibold">{t('title')}</h1>
         <PresentationTable />
       </div>
     </>

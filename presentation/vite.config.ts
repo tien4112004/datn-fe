@@ -9,7 +9,7 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
   const port = env.PORT ? parseInt(env.PORT, 10) : 5174;
   return {
-    base: env.VITE_BASE_URL || 'http://localhost:5174/',
+    base: process.env.VITE_BASE_URL || env.VITE_BASE_URL || 'http://localhost:5174/',
     plugins: [
       vue(),
       federation({

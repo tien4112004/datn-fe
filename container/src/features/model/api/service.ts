@@ -4,17 +4,25 @@ import { api } from '@/shared/api';
 import type { ApiResponse } from '@/types/api';
 
 export default class ModelRealApiService implements ModelApiService {
+  baseUrl: string;
+
+  constructor(baseUrl: string) {
+    this.baseUrl = baseUrl;
+  }
+
   getType(): ApiMode {
     return API_MODE.real;
   }
 
   async getModels(): Promise<ModelOption[]> {
-    const response = await api.get<ApiResponse<ModelOption[]>>('/api/models');
+    const baseUrl = this.baseUrl;
+    const response = await api.get<ApiResponse<ModelOption[]>>(`${baseUrl}/api/models`);
     return response.data.data.map(this._mapModelOption);
   }
 
   async getDefaultModel(): Promise<ModelOption> {
-    const response = await api.get<ApiResponse<ModelOption[]>>('/api/models');
+    const baseUrl = this.baseUrl;
+    const response = await api.get<ApiResponse<ModelOption[]>>(`${baseUrl}/api/models`);
     return this._mapModelOption(response.data.data.find((model) => model.default));
   }
 

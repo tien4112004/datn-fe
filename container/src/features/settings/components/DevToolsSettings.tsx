@@ -1,16 +1,45 @@
 import { useState } from 'react';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { Separator } from '@/components/ui/separator';
-import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
+import { useForm } from 'react-hook-form';
+import { Label } from '@/shared/components/ui/label';
+import { Input } from '@/shared/components/ui/input';
+import { Separator } from '@/shared/components/ui/separator';
+import { Button } from '@/shared/components/ui/button';
+import { Switch } from '@/shared/components/ui/switch';
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+} from '@/shared/components/ui/form';
 import { toast } from 'sonner';
 import { useApiSwitching } from '@/context/api-switching';
 import { API_MODE } from '@/shared/constants';
+import useBackendUrlStore from '@/features/settings/stores/useBackendUrlStore';
+
+type FormData = {
+  backendUrl: string;
+};
 
 const DevToolsSettings = () => {
   const { apiMode, setApiMode } = useApiSwitching();
-  const [backendUrl, setBackendUrl] = useState('https://api.yourapp.com');
+  const { backendUrl, setBackendUrl } = useBackendUrlStore();
+
+  const form = useForm<FormData>({
+    defaultValues: {
+      backendUrl: backendUrl,
+    },
+  });
+
+  const onSubmit = (data: FormData) => {
+    setBackendUrl(data.backendUrl);
+    toast.success('Backend URL saved successfully');
+    form.reset({ backendUrl: data.backendUrl });
+  };
+
+  const isDirty = form.formState.isDirty;
+
   const [models, setModels] = useState([
     {
       id: 'gpt-4o',
@@ -59,28 +88,40 @@ const DevToolsSettings = () => {
         </div>
         <div className="lg:col-span-2">
           <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label>Use mock data</Label>
-                <p className="text-muted-foreground text-sm">Enable mock data for development and testing</p>
-              </div>
+            <div className="flex items-center gap-3">
               <Switch
                 checked={apiMode == API_MODE.mock}
                 onCheckedChange={(checked: boolean) => {
                   setApiMode(checked ? API_MODE.mock : API_MODE.real);
                 }}
               />
+              <div className="space-y-0.5">
+                <Label>Use mock data</Label>
+                <p className="text-muted-foreground text-sm">Enable mock data for development and testing</p>
+              </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="backendUrl">Backend URL</Label>
-              <Input
-                id="backendUrl"
-                value={backendUrl}
-                onChange={(e) => setBackendUrl(e.target.value)}
-                placeholder="Enter backend URL"
-                className="w-full max-w-md"
-              />
-            </div>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="backendUrl"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Backend URL</FormLabel>
+                      <div className="flex gap-2">
+                        <FormControl>
+                          <Input placeholder="Enter backend URL" className="w-full max-w-md" {...field} />
+                        </FormControl>
+                        <Button type="submit" className="h-9" disabled={!isDirty} size="sm">
+                          Save
+                        </Button>
+                      </div>
+                      <FormDescription>The URL of your backend API server</FormDescription>
+                    </FormItem>
+                  )}
+                />
+              </form>
+            </Form>
           </div>
         </div>
       </div>

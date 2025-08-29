@@ -29,6 +29,12 @@ const mockModels: ModelOption[] = [
 ];
 
 export default class ModelMockService implements ModelApiService {
+  baseUrl: string;
+
+  constructor(baseUrl: string = '') {
+    this.baseUrl = baseUrl;
+  }
+
   getType(): ApiMode {
     return API_MODE.mock;
   }

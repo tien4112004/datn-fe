@@ -20,6 +20,8 @@ interface ModelSelectProps {
   className?: string;
   disabled?: boolean;
   showProviderLogo?: boolean;
+  isLoading?: boolean;
+  isError?: boolean;
 }
 
 export const ModelSelect = ({
@@ -31,28 +33,37 @@ export const ModelSelect = ({
   className = 'bg-card w-fit',
   disabled = false,
   showProviderLogo = true,
+  isLoading = false,
+  isError = false,
 }: ModelSelectProps) => {
   const { t } = useTranslation();
 
   const defaultPlaceholder = placeholder || t('common:model.placeholder');
   const defaultLabel = label || t('common:model.label');
 
+  const getPlaceholderText = () => {
+    if (isLoading) return t('common:model.loading') || 'Loading models...';
+    if (isError) return t('common:model.error') || 'Error loading models';
+    return defaultPlaceholder;
+  };
+
   return (
-    <Select value={value} onValueChange={onValueChange} disabled={disabled}>
+    <Select value={value} onValueChange={onValueChange} disabled={disabled || isLoading || isError}>
       <SelectTrigger className={className}>
-        <SelectValue placeholder={defaultPlaceholder} />
+        <SelectValue placeholder={getPlaceholderText()} />
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>
           <SelectLabel>{defaultLabel}</SelectLabel>
-          {models?.map((modelOption) => (
-            <SelectItem
-              key={modelOption.id}
-              value={modelOption.name}
-              disabled={!modelOption.enabled}
-              className={!modelOption.enabled ? 'opacity-50' : ''}
-            >
-              <div className="flex items-center">
+          {!isLoading &&
+            !isError &&
+            models?.map((modelOption) => (
+              <SelectItem
+                key={modelOption.id}
+                value={modelOption.name}
+                disabled={!modelOption.enabled}
+                className={!modelOption.enabled ? 'opacity-50' : ''}
+              >
                 {showProviderLogo && (
                   <img
                     src={MODEL_PROVIDERS_LOGO[modelOption.provider]}
@@ -61,9 +72,8 @@ export const ModelSelect = ({
                   />
                 )}
                 <span>{modelOption.displayName}</span>
-              </div>
-            </SelectItem>
-          ))}
+              </SelectItem>
+            ))}
         </SelectGroup>
       </SelectContent>
     </Select>

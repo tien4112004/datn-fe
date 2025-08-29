@@ -35,6 +35,8 @@ const ErrorPageFallback: React.FC<ErrorFallbackProps> = ({
   errorId,
   showDetails = true,
 }) => {
+  console.trace();
+
   return (
     <div className="bg-background flex min-h-screen w-screen flex-col">
       <ErrorPage

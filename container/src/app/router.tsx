@@ -2,7 +2,6 @@ import { createBrowserRouter } from 'react-router-dom';
 import NavLayout, { NavLayoutErrorBoundary } from '../shared/layouts/SidebarLayout';
 import Presentation from '@/features/presentation';
 import Demo from '@/features/demo';
-import { getModels } from '@/features/model';
 import NotFoundPage from '@/shared/pages/NotFoundPage';
 import { CriticalError } from '@/types/errors';
 import Mindmap from '@/features/mindmap';
@@ -42,7 +41,7 @@ const router = createBrowserRouter([
         path: 'presentation/create',
         // Component: Presentation.CreateOutlinePage,
         Component: Presentation.PresentationOutlinePage,
-        loader: getModels,
+        // loader: getModels,
       },
       {
         path: 'settings',

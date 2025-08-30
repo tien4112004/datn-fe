@@ -1,18 +1,12 @@
-import { useModelApiService } from '../api';
+import { getModelApiService } from '../api';
 
-/**
- * @deprecated Use hooks instead
- */
 export const getDefaultModel = async () => {
-  const modelApiService = useModelApiService(true);
+  const modelApiService = getModelApiService();
   return await modelApiService.getDefaultModel();
 };
 
-/**
- * @deprecated Use hooks instead
- */
 export const getModels = async () => {
-  const modelApiService = useModelApiService(true);
+  const modelApiService = getModelApiService();
   const models = await modelApiService.getModels();
   const defaultModel = models.find((model) => model.default) || models[0];
 

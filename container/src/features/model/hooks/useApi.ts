@@ -3,7 +3,7 @@ import { useModelApiService } from '../api';
 import type { ModelPatchData } from '../types';
 
 export const useModels = () => {
-  const modelApiService = useModelApiService(false);
+  const modelApiService = useModelApiService();
 
   const { data: models, ...query } = useQuery({
     queryKey: [modelApiService.getType(), 'models'],

@@ -1,14 +1,16 @@
-import useBackendUrlStore from '@/features/settings/stores/useBackendUrlStore';
+import { getBackendUrl } from '@/shared/utils/backend-url';
 import type { MindmapApiService } from '../types/service';
 import MindmapMockService from './mock';
 import MindmapRealApiService from './service';
 import { createApiServiceFactory, getApiServiceFactory } from '@/shared/api';
 
-export const useMindmapApiService = (isLoader: boolean): MindmapApiService => {
-  const backendUrl = useBackendUrlStore((state) => state.backendUrl);
+export const useMindmapApiService = (): MindmapApiService => {
+  const baseUrl = getBackendUrl();
+  return createApiServiceFactory<MindmapApiService>(MindmapMockService, MindmapRealApiService, baseUrl);
+};
 
-  if (isLoader) {
-    return getApiServiceFactory<MindmapApiService>(MindmapMockService, MindmapRealApiService, backendUrl);
-  }
-  return createApiServiceFactory<MindmapApiService>(MindmapMockService, MindmapRealApiService, backendUrl);
+export const getMindmapApiService = (): MindmapApiService => {
+  const baseUrl = getBackendUrl();
+
+  return getApiServiceFactory<MindmapApiService>(MindmapMockService, MindmapRealApiService, baseUrl);
 };

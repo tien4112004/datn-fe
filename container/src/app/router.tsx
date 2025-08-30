@@ -6,6 +6,8 @@ import NotFoundPage from '@/shared/pages/NotFoundPage';
 import { CriticalError } from '@/types/errors';
 import Mindmap from '@/features/mindmap';
 import { getMindmapById } from '@/features/mindmap/hooks/loaders';
+import { getPresentationById } from '@/features/presentation/hooks/loaders';
+import { getModels } from '@/features/model/hooks/loaders';
 import Settings from '@/features/settings';
 
 const router = createBrowserRouter([
@@ -33,15 +35,15 @@ const router = createBrowserRouter([
       {
         path: 'presentation/:id',
         Component: Presentation.DetailPage,
-        // loader: async ({ params }) => {
-        //   return await getPresentationById(params.id);
-        // },
+        loader: async ({ params }) => {
+          return await getPresentationById(params.id);
+        },
       },
       {
         path: 'presentation/create',
         // Component: Presentation.CreateOutlinePage,
         Component: Presentation.PresentationOutlinePage,
-        // loader: getModels,
+        loader: getModels,
       },
       {
         path: 'settings',

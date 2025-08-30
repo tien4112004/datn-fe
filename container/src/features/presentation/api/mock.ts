@@ -93,6 +93,12 @@ if (typeof process === 'undefined' || process.env.NODE_ENV !== 'test') {
 }
 
 export default class PresentationMockService implements PresentationApiService {
+  baseUrl: string;
+
+  constructor(baseUrl: string = '') {
+    this.baseUrl = baseUrl;
+  }
+
   async *getStreamedOutline(_request: OutlineData, signal: AbortSignal): AsyncGenerator<string> {
     const chunks = mockOutlineOutput.split(' ');
 

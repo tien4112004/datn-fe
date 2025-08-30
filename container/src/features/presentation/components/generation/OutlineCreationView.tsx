@@ -20,12 +20,20 @@ import type { ModelOption } from '@/features/model';
 import { ModelSelect } from '@/components/common/ModelSelect';
 
 interface OutlineCreationViewProps {
-  defaultModel: ModelOption;
-  models: ModelOption[];
+  defaultModel?: ModelOption;
+  models?: ModelOption[];
   onCreateOutline: (outlineData: OutlineData) => void;
+  isLoadingModels: boolean;
+  isErrorModels: boolean;
 }
 
-const OutlineCreationView = ({ models, defaultModel, onCreateOutline }: OutlineCreationViewProps) => {
+const OutlineCreationView = ({
+  models,
+  defaultModel,
+  onCreateOutline,
+  isLoadingModels,
+  isErrorModels,
+}: OutlineCreationViewProps) => {
   const { t } = useTranslation('presentation', { keyPrefix: 'createOutline' });
 
   const { control, handleSubmit, setValue, watch } = useForm<OutlineData>({
@@ -33,7 +41,7 @@ const OutlineCreationView = ({ models, defaultModel, onCreateOutline }: OutlineC
       topic: '',
       slideCount: 10,
       language: 'en',
-      model: defaultModel.name,
+      model: defaultModel?.name || '',
       targetAge: '7-10',
       learningObjective: 'something',
     },
@@ -154,6 +162,8 @@ const OutlineCreationView = ({ models, defaultModel, onCreateOutline }: OutlineC
                         placeholder={t('modelPlaceholder')}
                         label={t('modelLabel')}
                         showProviderLogo={true}
+                        isLoading={isLoadingModels}
+                        isError={isErrorModels}
                       />
                     )}
                     // render={({ field }) => (

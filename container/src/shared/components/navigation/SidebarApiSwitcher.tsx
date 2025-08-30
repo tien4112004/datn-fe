@@ -4,6 +4,9 @@ import { Label } from '@ui/label';
 import { useApiSwitching } from '@/shared/context/api-switching';
 import { API_MODE } from '@/shared/constants';
 
+/**
+ * @deprecated Use the settings to switch API modes instead for cleaner UI.
+ */
 const SidebarApiSwitcher = () => {
   const { apiMode, setApiMode } = useApiSwitching();
 

@@ -31,6 +31,12 @@ export default class DemoRealApiService implements DemoApiService {
   //     const response = await api.get<DemoItem[]>('/demo/items');
   //     return response.data;
   //   }
+  baseUrl: string;
+
+  constructor(baseUrl: string) {
+    this.baseUrl = baseUrl;
+  }
+
   getType(): ApiMode {
     return API_MODE.real;
   }

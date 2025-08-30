@@ -1,7 +1,6 @@
 import { useState } from 'react';
-import { useLoaderData } from 'react-router-dom';
 import { OutlineCreationView, WorkspaceView } from '@/features/presentation/components';
-import type { ModelOption } from '@/features/model';
+import { useModels } from '@/features/model';
 import type { OutlineData } from '@/features/presentation/types';
 
 const PresentationViewState = {
@@ -12,7 +11,9 @@ const PresentationViewState = {
 type PresentationViewState = (typeof PresentationViewState)[keyof typeof PresentationViewState];
 
 const PresentationOutlinePage = () => {
-  const [models, defaultModel] = useLoaderData() as [ModelOption[], ModelOption];
+  // const [models, defaultModel] = useLoaderData() as [ModelOption[], ModelOption];
+  const { models, defaultModel, isLoading: isLoadingModels, isError: isErrorModels } = useModels();
+
   const [currentView, setCurrentView] = useState<PresentationViewState>(
     PresentationViewState.OUTLINE_CREATION
   );
@@ -20,7 +21,7 @@ const PresentationOutlinePage = () => {
     topic: '',
     slideCount: 0,
     language: '',
-    model: defaultModel.name,
+    model: defaultModel?.name || '',
     targetAge: '',
     learningObjective: '',
   });
@@ -38,6 +39,8 @@ const PresentationOutlinePage = () => {
           onCreateOutline={handleCreateOutline}
           models={models}
           defaultModel={defaultModel}
+          isErrorModels={isErrorModels}
+          isLoadingModels={isLoadingModels}
         />
       ) : (
         <WorkspaceView initialOutlineData={outlineData} />

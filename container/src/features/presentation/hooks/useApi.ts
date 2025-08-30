@@ -104,8 +104,27 @@ export const usePresentations = (): UsePresentationsReturn => {
   };
 };
 
+export const usePresentationById = (id: string | undefined) => {
+  const presentationApiService = usePresentationApiService();
+
+  return useQuery<Presentation>({
+    queryKey: [presentationApiService.getType(), 'presentation', id],
+    queryFn: async (): Promise<Presentation> => {
+      if (!id) {
+        throw new Error('Presentation ID is required');
+      }
+      const presentation = await presentationApiService.getPresentationById(id);
+      if (!presentation) {
+        throw new Error('Presentation not found');
+      }
+      return presentation;
+    },
+    enabled: !!id, // Only run the query if id is provided
+  });
+};
+
 export const useCreateTestPresentations = () => {
-  const presentationApiService = usePresentationApiService(true);
+  const presentationApiService = usePresentationApiService();
 
   return useMutation({
     mutationFn: async () => {
@@ -126,7 +145,7 @@ export const useCreateTestPresentations = () => {
 };
 
 export const useCreateBlankPresentation = () => {
-  const presentationApiService = usePresentationApiService(true);
+  const presentationApiService = usePresentationApiService();
 
   return useMutation({
     mutationFn: async () => {
@@ -144,6 +163,7 @@ export const useCreateBlankPresentation = () => {
           },
         ],
       });
+      console.log('Created blank presentation', presentation);
 
       return { presentation };
     },

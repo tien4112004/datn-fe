@@ -1,5 +1,6 @@
 import { PresentationWrapper } from '@/features/presentation/components';
 import { useCallback, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 
 export interface MessageDetail {
@@ -8,6 +9,7 @@ export interface MessageDetail {
 }
 
 const DetailPage = () => {
+  const { id } = useParams<{ id: string }>();
   const handleMessage = useCallback((event: CustomEvent<MessageDetail>) => {
     const { type, message } = event.detail;
     switch (type) {
@@ -35,7 +37,7 @@ const DetailPage = () => {
     };
   }, [handleMessage]);
 
-  return <PresentationWrapper />;
+  return <PresentationWrapper id={id} />;
 };
 
 export default DetailPage;

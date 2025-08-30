@@ -1,7 +1,6 @@
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { QueryClient } from '@tanstack/react-query';
 import { renderWithProviders } from '@/tests/test-utils';
 import AIModelsTable from '../AIModelsTable';
 import type { ModelOption } from '@/features/model/types/model';

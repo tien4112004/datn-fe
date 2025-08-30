@@ -23,7 +23,7 @@ export const useModels = () => {
 
 export const usePatchModel = () => {
   const queryClient = useQueryClient();
-  const modelApiService = useModelApiService(false);
+  const modelApiService = useModelApiService();
 
   return useMutation({
     mutationFn: async ({ modelId, data }: { modelId: string; data: ModelPatchData }) => {

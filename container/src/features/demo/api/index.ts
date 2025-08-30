@@ -1,10 +1,10 @@
-import useBackendUrlStore from '@/features/settings/stores/useBackendUrlStore';
+import { getBackendUrl } from '@/shared/utils/backend-url';
 import type { DemoApiService } from '../types/service';
 import DemoMockService from './mock';
 import DemoRealApiService from './service';
 import { createApiServiceFactory } from '@/shared/api';
 
 export const useDemoApiService = (): DemoApiService => {
-  const backendUrl = useBackendUrlStore((state) => state.backendUrl);
+  const backendUrl = getBackendUrl();
   return createApiServiceFactory<DemoApiService>(DemoMockService, DemoRealApiService, backendUrl);
 };

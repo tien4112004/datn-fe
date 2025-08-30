@@ -11,7 +11,7 @@ import {
   FormLabel,
 } from '@/shared/components/ui/form';
 import { toast } from 'sonner';
-import useBackendUrlStore from '@/features/settings/stores/useBackendUrlStore';
+import { getBackendUrl, setBackendUrl } from '@/shared/utils/backend-url';
 
 type FormData = {
   backendUrl: string;
@@ -19,11 +19,10 @@ type FormData = {
 
 const BackendUrlForm = () => {
   const { t } = useTranslation('settings');
-  const { backendUrl, setBackendUrl } = useBackendUrlStore();
 
   const form = useForm<FormData>({
     defaultValues: {
-      backendUrl: backendUrl,
+      backendUrl: getBackendUrl(),
     },
   });
 

@@ -24,6 +24,7 @@ const router = createBrowserRouter([
       {
         path: 'mindmap',
         Component: Mindmap.MindmapPage,
+        // TODO: checkout this loader
         loader: async () => {
           const mindmap = await getMindmapById('');
           return { mindmap };

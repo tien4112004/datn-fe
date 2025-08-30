@@ -202,6 +202,12 @@ const mockMindmaps: MindmapData[] = [
 ];
 
 export default class MindmapMockService implements MindmapApiService {
+  baseUrl: string;
+
+  constructor(baseUrl: string) {
+    this.baseUrl = baseUrl;
+  }
+
   getType(): ApiMode {
     return API_MODE.mock;
   }

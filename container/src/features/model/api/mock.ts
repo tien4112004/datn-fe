@@ -1,5 +1,5 @@
 import { API_MODE, type ApiMode } from '@/shared/constants';
-import type { ModelApiService, ModelOption } from '../types';
+import type { ModelApiService, ModelOption, ModelPatchData } from '../types';
 
 const mockModels: ModelOption[] = [
   {
@@ -48,6 +48,32 @@ export default class ModelMockService implements ModelApiService {
   async getDefaultModel(): Promise<ModelOption> {
     return new Promise((resolve) => {
       setTimeout(() => resolve(mockModels[0]), 300);
+    });
+  }
+
+  async patchModel(modelId: string, data: ModelPatchData): Promise<ModelOption> {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const modelIndex = mockModels.findIndex((model) => model.id === modelId);
+        if (modelIndex === -1) {
+          throw new Error(`Model with id ${modelId} not found`);
+        }
+
+        // If setting a model as default, unset other defaults first
+        if (data.default === true) {
+          mockModels.forEach((model) => {
+            model.default = false;
+          });
+        }
+
+        // Update the model
+        mockModels[modelIndex] = {
+          ...mockModels[modelIndex],
+          ...data,
+        };
+
+        resolve({ ...mockModels[modelIndex] });
+      }, 300);
     });
   }
 }

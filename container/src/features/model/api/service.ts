@@ -1,5 +1,5 @@
 import { API_MODE, type ApiMode } from '@/shared/constants';
-import type { ModelApiService, ModelOption } from '../types';
+import type { ModelApiService, ModelOption, ModelPatchData } from '../types';
 import { api } from '@/shared/api';
 import type { ApiResponse } from '@/types/api';
 
@@ -24,6 +24,12 @@ export default class ModelRealApiService implements ModelApiService {
     const baseUrl = this.baseUrl;
     const response = await api.get<ApiResponse<ModelOption[]>>(`${baseUrl}/api/models`);
     return this._mapModelOption(response.data.data.find((model) => model.default));
+  }
+
+  async patchModel(modelId: string, data: ModelPatchData): Promise<ModelOption> {
+    const baseUrl = this.baseUrl;
+    const response = await api.patch<ApiResponse<ModelOption>>(`${baseUrl}/api/models/${modelId}`, data);
+    return this._mapModelOption(response.data.data);
   }
 
   _mapModelOption(data: any): ModelOption {

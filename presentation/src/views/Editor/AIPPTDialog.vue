@@ -36,7 +36,7 @@
       </div>
       <div class="configs">
         <div class="config-item">
-          <div class="label">{{ $t('ai.dialog.settings.language') }}</div>
+          <div class="label">{{ $t('ai.dialog.language') }}</div>
           <Select
             style="width: 120px"
             v-model:value="language"
@@ -48,7 +48,7 @@
           />
         </div>
         <div class="config-item">
-          <div class="label">{{ $t('ai.dialog.settings.style') }}</div>
+          <div class="label">{{ $t('ai.dialog.style') }}</div>
           <Select
             style="width: 120px"
             v-model:value="style"
@@ -62,7 +62,7 @@
           />
         </div>
         <div class="config-item">
-          <div class="label">{{ $t('ai.dialog.settings.model') }}</div>
+          <div class="label">{{ $t('ai.dialog.model') }}</div>
           <Select
             style="width: 190px"
             v-model:value="model"
@@ -81,7 +81,7 @@
           />
         </div>
         <div class="config-item">
-          <div class="label">{{ $t('ai.dialog.settings.images') }}</div>
+          <div class="label">{{ $t('ai.dialog.images') }}</div>
           <Select
             style="width: 100px"
             v-model:value="img"

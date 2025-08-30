@@ -1,4 +1,5 @@
 import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { Input } from '@/shared/components/ui/input';
 import { Button } from '@/shared/components/ui/button';
 import {
@@ -17,6 +18,7 @@ type FormData = {
 };
 
 const BackendUrlForm = () => {
+  const { t } = useTranslation('settings');
   const { backendUrl, setBackendUrl } = useBackendUrlStore();
 
   const form = useForm<FormData>({
@@ -27,7 +29,7 @@ const BackendUrlForm = () => {
 
   const onSubmit = (data: FormData) => {
     setBackendUrl(data.backendUrl);
-    toast.success('Backend URL saved successfully');
+    toast.success(t('devtools.backendUrlSaved'));
     form.reset({ backendUrl: data.backendUrl });
   };
 
@@ -41,16 +43,20 @@ const BackendUrlForm = () => {
           name="backendUrl"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Backend URL</FormLabel>
+              <FormLabel>{t('devtools.backendUrl')}</FormLabel>
               <div className="flex gap-2">
                 <FormControl>
-                  <Input placeholder="Enter backend URL" className="w-full max-w-md" {...field} />
+                  <Input
+                    placeholder={t('devtools.backendUrlPlaceholder')}
+                    className="w-full max-w-md"
+                    {...field}
+                  />
                 </FormControl>
                 <Button type="submit" className="h-9" disabled={!isDirty} size="sm">
-                  Save
+                  {t('devtools.save')}
                 </Button>
               </div>
-              <FormDescription>The URL of your backend API server</FormDescription>
+              <FormDescription>{t('devtools.backendUrlDescription')}</FormDescription>
             </FormItem>
           )}
         />

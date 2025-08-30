@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Switch } from '@/shared/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/shared/components/ui/table';
@@ -18,6 +19,7 @@ interface ExtendedModelOption extends ModelOption {
 }
 
 const AIModelsTable = () => {
+  const { t } = useTranslation('settings');
   const { models: apiModels, isLoading, isError } = useModels();
   const patchModelMutation = usePatchModel();
 
@@ -36,11 +38,11 @@ const AIModelsTable = () => {
       <div className="space-y-6">
         <div className="space-y-4">
           <div>
-            <h3 className="text-lg font-medium">AI Models</h3>
-            <p className="text-muted-foreground text-sm">Loading available AI models...</p>
+            <h3 className="text-lg font-medium">{t('devtools.aiModels.title')}</h3>
+            <p className="text-muted-foreground text-sm">{t('devtools.aiModels.loading')}</p>
           </div>
           <div className="rounded-lg border p-8 text-center">
-            <p className="text-muted-foreground">Loading models...</p>
+            <p className="text-muted-foreground">{t('devtools.aiModels.loadingModels')}</p>
           </div>
         </div>
       </div>
@@ -52,11 +54,11 @@ const AIModelsTable = () => {
       <div className="space-y-6">
         <div className="space-y-4">
           <div>
-            <h3 className="text-lg font-medium">AI Models</h3>
-            <p className="text-muted-foreground text-sm">Failed to load AI models.</p>
+            <h3 className="text-lg font-medium">{t('devtools.aiModels.title')}</h3>
+            <p className="text-muted-foreground text-sm">{t('devtools.aiModels.errorLoading')}</p>
           </div>
           <div className="border-destructive/20 rounded-lg border p-8 text-center">
-            <p className="text-destructive">Error loading models. Please try again later.</p>
+            <p className="text-destructive">{t('devtools.aiModels.errorMessage')}</p>
           </div>
         </div>
       </div>
@@ -111,20 +113,18 @@ const AIModelsTable = () => {
     <div className="space-y-6">
       <div className="space-y-4">
         <div>
-          <h3 className="text-lg font-medium">AI Models</h3>
-          <p className="text-muted-foreground text-sm">
-            Manage available AI models and their configurations.
-          </p>
+          <h3 className="text-lg font-medium">{t('devtools.aiModels.title')}</h3>
+          <p className="text-muted-foreground text-sm">{t('devtools.aiModels.subtitle')}</p>
         </div>
         <div className="rounded-lg border">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Model</TableHead>
-                <TableHead>Provider</TableHead>
-                <TableHead>Media Types</TableHead>
-                <TableHead>Model ID</TableHead>
-                <TableHead>Status</TableHead>
+                <TableHead>{t('devtools.aiModels.columns.model')}</TableHead>
+                <TableHead>{t('devtools.aiModels.columns.provider')}</TableHead>
+                <TableHead>{t('devtools.aiModels.columns.mediaTypes')}</TableHead>
+                <TableHead>{t('devtools.aiModels.columns.modelId')}</TableHead>
+                <TableHead>{t('devtools.aiModels.columns.status')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -161,10 +161,8 @@ const AIModelsTable = () => {
 
       <div className="space-y-4">
         <div>
-          <h3 className="text-lg font-medium">Default Models</h3>
-          <p className="text-muted-foreground text-sm">
-            Set the default model for each media type. Only enabled models are available for selection.
-          </p>
+          <h3 className="text-lg font-medium">{t('devtools.aiModels.defaultModels.title')}</h3>
+          <p className="text-muted-foreground text-sm">{t('devtools.aiModels.defaultModels.subtitle')}</p>
         </div>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {getAvailableMediaTypes().map((mediaType) => {
@@ -183,7 +181,9 @@ const AIModelsTable = () => {
                   <SelectTrigger>
                     <SelectValue
                       placeholder={
-                        availableModels.length === 0 ? 'No models available' : 'Select default model'
+                        availableModels.length === 0
+                          ? t('devtools.aiModels.defaultModels.noModelsAvailable')
+                          : t('devtools.aiModels.defaultModels.selectDefaultModel')
                       }
                     />
                   </SelectTrigger>
@@ -200,7 +200,8 @@ const AIModelsTable = () => {
                 </Select>
                 {defaultModel && (
                   <p className="text-muted-foreground text-xs">
-                    Current: {defaultModel.name} by {defaultModel.provider}
+                    {t('devtools.aiModels.defaultModels.currentModel')}: {defaultModel.name}{' '}
+                    {t('devtools.aiModels.defaultModels.by')} {defaultModel.provider}
                   </p>
                 )}
               </div>
@@ -209,9 +210,7 @@ const AIModelsTable = () => {
         </div>
         {getAvailableMediaTypes().length === 0 && (
           <div className="rounded-lg border border-dashed p-8 text-center">
-            <p className="text-muted-foreground">
-              No enabled models available. Enable at least one model to set defaults.
-            </p>
+            <p className="text-muted-foreground">{t('devtools.aiModels.defaultModels.noEnabledModels')}</p>
           </div>
         )}
       </div>

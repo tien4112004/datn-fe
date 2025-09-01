@@ -163,7 +163,6 @@ export const useCreateBlankPresentation = () => {
           },
         ],
       });
-      console.log('Created blank presentation', presentation);
 
       return { presentation };
     },

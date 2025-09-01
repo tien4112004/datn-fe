@@ -11,7 +11,7 @@ function SettingsPage() {
 
   return (
     <div className="flex flex-col gap-2 px-8 py-4">
-      <h1 className="scroll-m-20 text-balance text-4xl font-extrabold tracking-tight">{t('title')}</h1>
+      <h1 className="scroll-m-20 text-balance text-4xl font-bold tracking-tight">{t('title')}</h1>
 
       <p className="text-muted-foreground text-sm">{t('subtitle')}</p>
 

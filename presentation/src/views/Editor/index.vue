@@ -13,6 +13,7 @@
         />
       </div>
       <Toolbar class="layout-content-right" />
+      <Button @click="handleClick">Click Me</Button>T
     </div>
   </div>
 
@@ -40,7 +41,7 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
 import { storeToRefs } from 'pinia';
-import { useMainStore } from '@/store';
+import { useMainStore, useSlidesStore } from '@/store';
 import useGlobalHotkey from '@/hooks/useGlobalHotkey';
 import usePasteEvent from '@/hooks/usePasteEvent';
 
@@ -57,8 +58,11 @@ import NotesPanel from './NotesPanel.vue';
 import MarkupPanel from './MarkupPanel.vue';
 import AIPPTDialog from './AIPPTDialog.vue';
 import Modal from '@/components/Modal.vue';
+import Button from '@/components/Button.vue';
+import { convertTwoColumnWithImage } from '@/utils/slideLayoutConverter';
 
 const mainStore = useMainStore();
+const slideStore = useSlidesStore();
 const {
   dialogForExport,
   showSelectPanel,
@@ -69,11 +73,46 @@ const {
 } = storeToRefs(mainStore);
 const closeExportDialog = () => mainStore.setDialogForExport('');
 const closeAIPPTDialog = () => mainStore.setAIPPTDialogState(false);
+const appendNewSlide = slideStore.appendNewSlide;
 
 const remarkHeight = ref(45);
 
 useGlobalHotkey();
 usePasteEvent();
+
+const handleClick = () => {
+  const data = {
+    type: 'two_column_with_image',
+    title: 'this is a really long long long long title',
+    data: {
+      items: ['item 1 here', 'item 2 here', 'item 3 here', 'item 4 here', 'item 5 here', 'item 6 here'],
+      image: 'https://placehold.co/600x400',
+    },
+  };
+
+  const slide = convertTwoColumnWithImage(
+    data,
+    {
+      size: slideStore.viewportSize,
+      ratio: slideStore.viewportRatio,
+    },
+    {
+      title: {
+        color: 'red',
+        fontSize: 40,
+        fontName: 'Arial',
+      },
+      text: {
+        color: 'black',
+        fontSize: 24,
+        fontName: 'sans-serif',
+      },
+    }
+  );
+
+  appendNewSlide(slide);
+  console.log(slideStore.slides);
+};
 </script>
 
 <style lang="scss" scoped>

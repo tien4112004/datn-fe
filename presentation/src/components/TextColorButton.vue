@@ -1,5 +1,5 @@
 <template>
-  <Button class="text-color-btn">
+  <Button variant="outline" class="text-color-btn">
     <slot></slot>
     <div class="text-color-block">
       <div class="text-color-block-content" :style="{ backgroundColor: color }"></div>
@@ -8,7 +8,7 @@
 </template>
 
 <script lang="ts" setup>
-import Button from './Button.vue';
+import { Button } from '@/components/ui/button';
 
 defineProps<{
   color: string;

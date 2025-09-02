@@ -1,67 +1,66 @@
 <template>
-  <div class="select-wrap" v-if="disabled">
-    <div class="select disabled" ref="selectRef">
-      <div class="selector">{{ value }}</div>
-      <div class="icon">
-        <slot name="icon">
-          <IconDown :size="14" />
-        </slot>
-      </div>
-    </div>
-  </div>
-  <Popover
-    class="select-wrap"
-    trigger="click"
-    v-model:value="popoverVisible"
-    placement="bottom"
-    :contentStyle="{
-      padding: 0,
-      boxShadow: '0 6px 16px 0 rgba(0, 0, 0, 0.08)',
-    }"
-    v-else
-  >
-    <template #content>
-      <template v-if="search">
-        <Input
-          ref="searchInputRef"
-          simple
-          :placeholder="searchPlaceholder"
-          v-model:value="searchKey"
-          :style="{ width: width + 2 + 'px' }"
-        />
-        <Divider :margin="0" />
-      </template>
-      <div class="options" :style="{ width: width + 2 + 'px' }">
+  <div>
+    <Select
+      :model-value="value"
+      @update:model-value="handleValueUpdate"
+      :disabled="disabled"
+      :open="open"
+      @update:open="handleOpenUpdate"
+    >
+      <SelectTrigger
+        :class="[
+          'bg-background border-border h-8 w-full select-none rounded border pr-8 transition-colors duration-200',
+          'hover:border-primary focus:border-primary focus:outline-none',
+          disabled ? 'cursor-default border-gray-300 bg-gray-50 text-gray-400' : 'cursor-pointer',
+          hasCustomIcon ? 'has-custom-icon' : '',
+        ]"
+      >
+        <SelectValue :placeholder="placeholder">
+          <template v-if="showLabel">{{ showLabel }}</template>
+        </SelectValue>
         <div
-          class="option"
-          :class="{
-            disabled: option.disabled,
-            selected: option.value === value,
-          }"
-          v-for="option in showOptions"
-          :key="option.value"
-          @click="handleSelect(option)"
+          v-if="hasCustomIcon"
+          class="text-muted-foreground pointer-events-none absolute right-0 top-0 flex h-7 w-8 items-center justify-center"
         >
-          {{ option.label }}
+          <slot name="icon">
+            <IconDown :size="14" />
+          </slot>
         </div>
-      </div>
-    </template>
-    <div class="select" ref="selectRef">
-      <div class="selector">{{ showLabel }}</div>
-      <div class="icon">
-        <slot name="icon">
-          <IconDown :size="14" />
-        </slot>
-      </div>
-    </div>
-  </Popover>
+      </SelectTrigger>
+      <SelectContent class="max-h-64 select-none">
+        <template v-if="search">
+          <div class="mb-1.5 border-b border-gray-200 p-1.5">
+            <Input
+              ref="searchInputRef"
+              simple
+              :placeholder="searchPlaceholder"
+              v-model:value="searchKey"
+              class="w-full"
+            />
+          </div>
+        </template>
+        <template v-for="option in showOptions" :key="option.value">
+          <SelectItem
+            :value="option.value"
+            :disabled="option.disabled"
+            :class="[
+              'focus:text-primary h-8 truncate rounded border-none px-1.5 leading-8 focus:font-bold focus:outline-none',
+              option.disabled ? 'text-gray-400' : 'hover:bg-primary/5 focus:bg-primary/5 cursor-pointer',
+              option.value === value ? 'text-primary focus:text-accent font-bold' : '',
+            ]"
+          >
+            {{ option.label }}
+          </SelectItem>
+        </template>
+      </SelectContent>
+    </Select>
+  </div>
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, onUnmounted, ref, watch, nextTick, onBeforeUnmount } from 'vue';
-import Popover from './Popover.vue';
+import { computed, ref, watch, nextTick, onBeforeUnmount, useSlots } from 'vue';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Input from './Input.vue';
-import Divider from './Divider.vue';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
@@ -79,11 +78,13 @@ const props = withDefaults(
     disabled?: boolean;
     search?: boolean;
     searchLabel?: string;
+    placeholder?: string;
   }>(),
   {
     disabled: false,
     search: false,
     searchLabel: '',
+    placeholder: '',
   }
 );
 
@@ -91,11 +92,13 @@ const emit = defineEmits<{
   (event: 'update:value', payload: string | number): void;
 }>();
 
-const popoverVisible = ref(false);
-const selectRef = ref<HTMLElement>();
+const open = ref(false);
 const searchInputRef = ref<InstanceType<typeof Input>>();
-const width = ref(0);
 const searchKey = ref('');
+
+// Check if custom icon slot is being used
+const slots = useSlots();
+const hasCustomIcon = computed(() => !!slots.icon);
 
 const showLabel = computed(() => {
   return props.options.find((item) => item.value === props.value)?.label || props.value;
@@ -114,109 +117,49 @@ const showOptions = computed(() => {
   return opts.length ? opts : props.options;
 });
 
-watch(popoverVisible, () => {
-  if (popoverVisible.value) {
+const handleValueUpdate = (newValue: any) => {
+  if (newValue !== null && newValue !== undefined) {
+    // Convert bigint to string to maintain compatibility, handle any type
+    let value = newValue;
+    if (typeof newValue === 'bigint') {
+      value = newValue.toString();
+    } else if (typeof newValue === 'object') {
+      // For complex objects, try to extract a value property or convert to string
+      value = newValue.value || JSON.stringify(newValue);
+    }
+    emit('update:value', value);
+  }
+};
+
+const handleOpenUpdate = (isOpen: boolean) => {
+  open.value = isOpen;
+  if (isOpen) {
     nextTick(() => {
       if (searchInputRef.value) searchInputRef.value.focus();
     });
-  } else searchKey.value = '';
-});
+  } else {
+    searchKey.value = '';
+  }
+};
+
 onBeforeUnmount(() => {
   searchKey.value = '';
 });
-
-const updateWidth = () => {
-  if (!selectRef.value) return;
-  width.value = selectRef.value.clientWidth;
-};
-const resizeObserver = new ResizeObserver(updateWidth);
-onMounted(() => {
-  if (!selectRef.value) return;
-  resizeObserver.observe(selectRef.value);
-});
-onUnmounted(() => {
-  if (!selectRef.value) return;
-  resizeObserver.unobserve(selectRef.value);
-});
-
-const handleSelect = (option: SelectOption) => {
-  if (option.disabled) return;
-
-  emit('update:value', option.value);
-  popoverVisible.value = false;
-};
 </script>
 
 <style lang="scss" scoped>
-.select {
-  width: 100%;
-  height: 32px;
-  padding-right: 32px;
-  border-radius: $borderRadius;
-  transition: border-color 0.25s;
-  font-size: 13px;
-  user-select: none;
-  background-color: $background;
-  border: 1px solid #d9d9d9;
-  position: relative;
-  cursor: pointer;
-
-  &:not(.disabled):hover {
-    border-color: $themeColor;
-  }
-
-  &.disabled {
-    background-color: $gray-f5f5f5;
-    border-color: #dcdcdc;
-    color: #b7b7b7;
-    cursor: default;
-  }
-
-  .selector {
-    min-width: 50px;
-    height: 30px;
-    line-height: 30px;
-    padding-left: 10px;
-    @include ellipsis-oneline();
-  }
+:deep(.has-custom-icon [data-slot='select-icon']) {
+  display: none;
 }
-.options {
-  max-height: 260px;
-  padding: 5px;
-  overflow: auto;
-  text-align: left;
-  font-size: 13px;
-  user-select: none;
-}
-.option {
-  height: 32px;
-  line-height: 32px;
-  padding: 0 5px;
-  border-radius: $borderRadius;
-  @include ellipsis-oneline();
 
-  &.disabled {
-    color: #b7b7b7;
-  }
-  &:not(.disabled, .selected):hover {
-    background-color: rgba($color: $themeColor, $alpha: 0.05);
-    cursor: pointer;
-  }
-
-  &.selected {
-    color: $themeColor;
-    font-weight: 700;
-  }
-}
-.icon {
-  width: 32px;
+:deep([data-slot='select-value']) {
+  min-width: 50px;
   height: 30px;
-  color: $muted-foreground;
-  position: absolute;
-  top: 0;
-  right: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  line-height: 30px;
+  padding-left: 10px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  justify-content: flex-start;
 }
 </style>

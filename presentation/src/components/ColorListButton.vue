@@ -1,5 +1,5 @@
 <template>
-  <Button class="color-btn">
+  <Button variant="outline" class="color-btn">
     <div class="blocks">
       <div class="color-block" v-for="(color, index) in colors" :key="index">
         <div class="content" :style="{ backgroundColor: color }"></div>
@@ -11,7 +11,7 @@
 
 <script lang="ts" setup>
 import { computed } from 'vue';
-import Button from './Button.vue';
+import { Button } from '@/components/ui/button';
 
 const props = defineProps<{
   colors: string[];

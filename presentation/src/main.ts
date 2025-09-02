@@ -6,6 +6,7 @@ import { initializeFonts } from '@/utils/font';
 
 import 'prosemirror-view/style/prosemirror.css';
 import 'animate.css';
+import '@/assets/styles/tailwind.css';
 import '@/assets/styles/prosemirror.scss';
 import '@/assets/styles/global.scss';
 import '@/assets/styles/font.scss';

@@ -1,11 +1,23 @@
 <template>
+  <!-- Use Shadcn Button for normal button types -->
+  <ShadcnButton
+    v-if="type === 'default' || type === 'primary'"
+    :variant="variant"
+    :size="buttonSize"
+    :disabled="disabled"
+    :class="additionalClasses"
+    @click="handleClick()"
+  >
+    <slot></slot>
+  </ShadcnButton>
+
+  <!-- Keep legacy button implementation for checkbox/radio types -->
   <button
+    v-else
     class="button center"
     :class="{
       disabled: disabled,
       checked: !disabled && checked,
-      default: !disabled && type === 'default',
-      primary: !disabled && type === 'primary',
       checkbox: !disabled && type === 'checkbox',
       radio: !disabled && type === 'radio',
       small: size === 'small',
@@ -19,6 +31,10 @@
 </template>
 
 <script lang="ts" setup>
+import { computed } from 'vue';
+import { Button as ShadcnButton } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+
 const props = withDefaults(
   defineProps<{
     checked?: boolean;
@@ -42,6 +58,27 @@ const emit = defineEmits<{
   (event: 'click'): void;
 }>();
 
+// Map legacy props to Shadcn Button props
+const variant = computed(() => {
+  if (props.type === 'primary') return 'default';
+  if (props.type === 'default') return 'outline';
+  return 'outline';
+});
+
+const buttonSize = computed(() => {
+  if (props.size === 'small') return 'sm';
+  return 'default';
+});
+
+// Additional classes to maintain first/last border radius behavior
+const additionalClasses = computed(() => {
+  return cn({
+    'rounded-l-none': props.first && !props.last,
+    'rounded-r-none': props.last && !props.first,
+    'rounded-none': props.first && props.last,
+  });
+});
+
 const handleClick = () => {
   if (props.disabled) return;
   emit('click');
@@ -53,7 +90,6 @@ const handleClick = () => {
   height: 100%;
   min-height: 32px;
   //   line-height: 32px;
-  outline: 0;
   font-size: 13px;
   padding: 4px 15px;
   text-align: center;

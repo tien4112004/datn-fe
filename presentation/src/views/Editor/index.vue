@@ -83,9 +83,16 @@ usePasteEvent();
 const handleClick = () => {
   const data = {
     type: 'two_column_with_image',
-    title: 'this is a really long long long long title',
+    title: 'Presentation',
     data: {
-      items: ['item 1 here', 'item 2 here', 'item 3 here', 'item 4 here', 'item 5 here', 'item 6 here'],
+      items: [
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+        'item 2 here',
+        'item 3 here',
+        'item 4 here',
+        'item 5 here',
+        'item 6 here',
+      ],
       image: 'https://placehold.co/600x400',
     },
   };

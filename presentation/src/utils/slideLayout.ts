@@ -185,7 +185,7 @@ export class SlideLayoutCalculator {
   }
 
   /**
-   *
+   * Calculates item position in auto-layout with overflow handling
    */
   getItemPositionInAutoLayout(
     elementHeight: number,
@@ -196,7 +196,7 @@ export class SlideLayoutCalculator {
     totalColumns: number = 2
   ): ItemPosition {
     const availableBlock = this.getColumnAvailableBlock(columnIndex, totalColumns, 100, 40);
-    const minSpacing = 10;
+    const minSpacing = 5; // Reduced minimum spacing
     const maxSpacing = 60;
 
     const availableHeight = availableBlock.height;
@@ -208,8 +208,21 @@ export class SlideLayoutCalculator {
     let actualSpacing = minSpacing;
     let startY = availableBlock.top;
 
-    // Center items if there's extra space
-    if (totalNeededHeight < availableHeight) {
+    // Handle overflow: if content doesn't fit, reduce spacing and compress
+    if (totalNeededHeight > availableHeight) {
+      // Calculate maximum possible spacing
+      const maxPossibleSpacing = Math.max(
+        0,
+        (availableHeight - totalItemsHeight) / Math.max(1, totalItems - 1)
+      );
+      actualSpacing = Math.max(2, maxPossibleSpacing); // Minimum 2px spacing
+
+      // If still doesn't fit, we'll let items overflow (better than overlapping)
+      if (totalItemsHeight + (totalItems - 1) * actualSpacing > availableHeight) {
+        actualSpacing = 2; // Very tight spacing
+      }
+    } else {
+      // Center items if there's extra space
       const extraSpace = availableHeight - totalNeededHeight;
 
       if (totalItems > 1) {
@@ -237,5 +250,73 @@ export class SlideLayoutCalculator {
       width: elementWidth,
       height: elementHeight,
     };
+  }
+
+  /**
+   * Calculates positions for items with variable heights in auto-layout
+   * This method considers the actual height of each item to prevent overlapping
+   */
+  getItemPositionsWithVariableHeights(
+    itemDimensions: { width: number; height: number }[],
+    columnIndex: number,
+    totalColumns: number = 2
+  ): ItemPosition[] {
+    const availableBlock = this.getColumnAvailableBlock(columnIndex, totalColumns, 100, 40);
+    const minSpacing = 5;
+    const maxSpacing = 30;
+
+    const totalItemsHeight = itemDimensions.reduce((sum, dim) => sum + dim.height, 0);
+    const totalSpacingHeight = (itemDimensions.length - 1) * minSpacing;
+    const totalNeededHeight = totalItemsHeight + totalSpacingHeight;
+
+    let actualSpacing = minSpacing;
+    let startY = availableBlock.top;
+
+    // Handle overflow: if content doesn't fit, reduce spacing
+    if (totalNeededHeight > availableBlock.height) {
+      const maxPossibleSpacing = Math.max(
+        0,
+        (availableBlock.height - totalItemsHeight) / Math.max(1, itemDimensions.length - 1)
+      );
+      actualSpacing = Math.max(2, maxPossibleSpacing);
+    } else {
+      // Center items if there's extra space
+      const extraSpace = availableBlock.height - totalNeededHeight;
+
+      if (itemDimensions.length > 1) {
+        const potentialSpacing = minSpacing + extraSpace / (itemDimensions.length - 1);
+        actualSpacing = Math.min(potentialSpacing, maxSpacing);
+
+        // If we're not using all the potential spacing, center the content
+        if (actualSpacing < potentialSpacing) {
+          const usedSpacing = (itemDimensions.length - 1) * actualSpacing;
+          const usedHeight = totalItemsHeight + usedSpacing;
+          const remainingSpace = availableBlock.height - usedHeight;
+          startY = availableBlock.top + remainingSpace / 2;
+        }
+      } else {
+        // Single item - center it vertically
+        const centerOffset = Math.min(extraSpace / 2, 60);
+        startY = availableBlock.top + centerOffset;
+      }
+    }
+
+    // Calculate cumulative positions
+    const positions: ItemPosition[] = [];
+    let currentY = startY;
+
+    for (let i = 0; i < itemDimensions.length; i++) {
+      positions.push({
+        top: currentY,
+        left: availableBlock.left,
+        width: itemDimensions[i].width,
+        height: itemDimensions[i].height,
+      });
+
+      // Move to next position (current height + spacing)
+      currentY += itemDimensions[i].height + actualSpacing;
+    }
+
+    return positions;
   }
 }

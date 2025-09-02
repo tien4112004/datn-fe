@@ -29,7 +29,13 @@ const models: ModelOption[] = [
 describe('OutlineCreationView', () => {
   it('renders all form fields', () => {
     renderWithProviders(
-      <OutlineCreationView models={models} defaultModel={defaultModel} onCreateOutline={vi.fn()} />
+      <OutlineCreationView
+        models={models}
+        defaultModel={defaultModel}
+        onCreateOutline={vi.fn()}
+        isLoadingModels={false}
+        isErrorModels={false}
+      />
     );
     expect(
       screen.getByPlaceholderText('Describe your topic or what you want to present...')
@@ -38,7 +44,13 @@ describe('OutlineCreationView', () => {
 
   it('updates topic input', async () => {
     renderWithProviders(
-      <OutlineCreationView models={models} defaultModel={defaultModel} onCreateOutline={vi.fn()} />
+      <OutlineCreationView
+        models={models}
+        defaultModel={defaultModel}
+        onCreateOutline={vi.fn()}
+        isLoadingModels={false}
+        isErrorModels={false}
+      />
     );
     const topicInput = screen.getByPlaceholderText('Describe your topic or what you want to present...');
     await userEvent.type(topicInput, 'AI presentation');
@@ -48,7 +60,13 @@ describe('OutlineCreationView', () => {
   it('submits correct data', async () => {
     const handleCreate = vi.fn();
     renderWithProviders(
-      <OutlineCreationView models={models} defaultModel={defaultModel} onCreateOutline={handleCreate} />
+      <OutlineCreationView
+        models={models}
+        defaultModel={defaultModel}
+        onCreateOutline={handleCreate}
+        isLoadingModels={false}
+        isErrorModels={false}
+      />
     );
     await userEvent.type(
       screen.getByPlaceholderText('Describe your topic or what you want to present...'),

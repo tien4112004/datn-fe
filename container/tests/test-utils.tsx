@@ -6,6 +6,7 @@ import { ApiSwitchingProvider } from '@/shared/context/api-switching';
 import { I18nextProvider } from 'react-i18next';
 import i18n from '@/shared/i18n';
 import { vi } from 'vitest';
+import { SidebarProvider } from '@/components/ui/sidebar';
 
 interface ExtendedRenderOptions extends Omit<RenderOptions, 'wrapper'> {
   route?: string;
@@ -107,6 +108,11 @@ const renderWithProviders = (
     // I18n
     if (!excludeProviders.includes('i18n')) {
       node = <I18nextProvider i18n={i18n}>{node}</I18nextProvider>;
+    }
+
+    // Sidebar
+    if (!excludeProviders.includes('sidebar')) {
+      node = <SidebarProvider>{node}</SidebarProvider>;
     }
 
     return node;

@@ -74,10 +74,17 @@ export default class PresentationRealApiService implements PresentationApiServic
   //   return response.body;
   // }
 
+  baseUrl: string;
+
+  constructor(baseUrl: string = '') {
+    this.baseUrl = baseUrl;
+  }
+
   getStreamedOutline(request: OutlineData, signal: AbortSignal): AsyncIterable<string> {
+    const baseUrl = this.baseUrl;
     return {
       async *[Symbol.asyncIterator]() {
-        const response = await api.stream('api/presentations/outline-generate', request, signal);
+        const response = await api.stream(`${baseUrl}/api/presentations/outline-generate`, request, signal);
 
         const reader = response.body?.getReader();
         if (!reader) throw new Error('No reader available');
@@ -102,7 +109,7 @@ export default class PresentationRealApiService implements PresentationApiServic
   }
 
   async getPresentationItems(): Promise<Presentation[]> {
-    const response = await api.get<ApiResponse<Presentation[]>>('/api/presentations/all');
+    const response = await api.get<ApiResponse<Presentation[]>>(`${this.baseUrl}/api/presentations/all`);
     return response.data.data.map(this._mapPresentationItem);
   }
 

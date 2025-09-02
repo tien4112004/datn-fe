@@ -16,6 +16,12 @@ interface TestService extends Service {
 }
 
 class MockTestService implements TestService {
+  baseUrl: string;
+
+  constructor(baseUrl: string) {
+    this.baseUrl = baseUrl;
+  }
+
   getType(): ApiMode {
     return 'mock';
   }
@@ -25,6 +31,12 @@ class MockTestService implements TestService {
 }
 
 class RealTestService implements TestService {
+  baseUrl: string;
+
+  constructor(baseUrl: string) {
+    this.baseUrl = baseUrl;
+  }
+
   getType(): ApiMode {
     return 'real';
   }
@@ -39,6 +51,12 @@ interface AnotherService extends Service {
 }
 
 class MockAnotherService implements AnotherService {
+  baseUrl: string;
+
+  constructor(baseUrl: string) {
+    this.baseUrl = baseUrl;
+  }
+
   getType(): ApiMode {
     return 'mock';
   }
@@ -48,6 +66,12 @@ class MockAnotherService implements AnotherService {
 }
 
 class RealAnotherService implements AnotherService {
+  baseUrl: string;
+
+  constructor(baseUrl: string) {
+    this.baseUrl = baseUrl;
+  }
+
   getType(): ApiMode {
     return 'real';
   }
@@ -64,7 +88,7 @@ describe('createApiServiceFactory', () => {
   it('returns MockService when apiMode is mock', () => {
     mockUseApiSwitching.mockReturnValue({ apiMode: API_MODE.mock, setApiMode: vi.fn() });
 
-    const service = createApiServiceFactory(MockTestService, RealTestService);
+    const service = createApiServiceFactory(MockTestService, RealTestService, 'test');
 
     expect(service).toBeInstanceOf(MockTestService);
     expect(service.getName()).toBe('Mock Service');
@@ -73,7 +97,7 @@ describe('createApiServiceFactory', () => {
   it('returns RealService when apiMode is real', () => {
     mockUseApiSwitching.mockReturnValue({ apiMode: API_MODE.real, setApiMode: vi.fn() });
 
-    const service = createApiServiceFactory(MockTestService, RealTestService);
+    const service = createApiServiceFactory(MockTestService, RealTestService, 'test');
 
     expect(service).toBeInstanceOf(RealTestService);
     expect(service.getName()).toBe('Real Service');
@@ -83,7 +107,7 @@ describe('createApiServiceFactory', () => {
   it('works with different service types', () => {
     mockUseApiSwitching.mockReturnValue({ apiMode: API_MODE.mock, setApiMode: vi.fn() });
 
-    const service = createApiServiceFactory(MockAnotherService, RealAnotherService);
+    const service = createApiServiceFactory(MockAnotherService, RealAnotherService, 'another');
 
     expect(service).toBeInstanceOf(MockAnotherService);
     expect(service.getServiceMode()).toBe('Mock Service Mode');
@@ -92,7 +116,7 @@ describe('createApiServiceFactory', () => {
   it('maintains proper service interface', () => {
     mockUseApiSwitching.mockReturnValue({ apiMode: API_MODE.mock, setApiMode: vi.fn() });
 
-    const service = createApiServiceFactory(MockTestService, RealTestService);
+    const service = createApiServiceFactory(MockTestService, RealTestService, 'test');
 
     // Service should implement the Service interface
     expect(typeof service).toBe('object');
@@ -106,10 +130,10 @@ describe('createApiServiceFactory', () => {
   it('handles service instantiation correctly', () => {
     // Test both modes to ensure proper instantiation
     mockUseApiSwitching.mockReturnValue({ apiMode: API_MODE.mock, setApiMode: vi.fn() });
-    const mockService = createApiServiceFactory(MockTestService, RealTestService);
+    const mockService = createApiServiceFactory(MockTestService, RealTestService, 'test');
 
     mockUseApiSwitching.mockReturnValue({ apiMode: API_MODE.real, setApiMode: vi.fn() });
-    const realService = createApiServiceFactory(MockTestService, RealTestService);
+    const realService = createApiServiceFactory(MockTestService, RealTestService, 'test');
 
     expect(mockService).toBeInstanceOf(MockTestService);
     expect(realService).toBeInstanceOf(RealTestService);

@@ -2,12 +2,13 @@ import { createBrowserRouter } from 'react-router-dom';
 import NavLayout, { NavLayoutErrorBoundary } from '../shared/layouts/SidebarLayout';
 import Presentation from '@/features/presentation';
 import Demo from '@/features/demo';
-import { getModels } from '@/features/model';
 import NotFoundPage from '@/shared/pages/NotFoundPage';
 import { CriticalError } from '@/types/errors';
 import Mindmap from '@/features/mindmap';
 import { getMindmapById } from '@/features/mindmap/hooks/loaders';
 import { getPresentationById } from '@/features/presentation/hooks/loaders';
+import { getModels } from '@/features/model/hooks/loaders';
+import Settings from '@/features/settings';
 
 const router = createBrowserRouter([
   {
@@ -25,6 +26,7 @@ const router = createBrowserRouter([
       {
         path: 'mindmap',
         Component: Mindmap.MindmapPage,
+        // TODO: checkout this loader
         loader: async () => {
           const mindmap = await getMindmapById('');
           return { mindmap };
@@ -42,6 +44,10 @@ const router = createBrowserRouter([
         // Component: Presentation.CreateOutlinePage,
         Component: Presentation.PresentationOutlinePage,
         loader: getModels,
+      },
+      {
+        path: 'settings',
+        Component: Settings.SettingsPage,
       },
       // {
       //   path: 'presentation/outline',

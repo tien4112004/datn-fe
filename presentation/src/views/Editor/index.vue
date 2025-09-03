@@ -86,12 +86,9 @@ const handleClick = () => {
     title: 'Presentation',
     data: {
       items: [
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
-        'item 2 here',
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. ',
+        'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
         'item 3 here',
-        'item 4 here',
-        'item 5 here',
-        'item 6 here',
       ],
       image: 'https://placehold.co/600x400',
     },
@@ -104,15 +101,20 @@ const handleClick = () => {
       ratio: slideStore.viewportRatio,
     },
     {
-      title: {
-        color: 'red',
-        fontSize: 40,
-        fontName: 'Arial',
+      backgroundColor: '#ffffff',
+      themeColors: ['#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6'],
+      fontColor: '#333333',
+      fontName: 'Arial',
+      outline: {
+        style: 'solid',
+        width: 1,
+        color: '#cccccc',
       },
-      text: {
-        color: 'black',
-        fontSize: 24,
-        fontName: 'sans-serif',
+      shadow: {
+        h: 2,
+        v: 2,
+        blur: 4,
+        color: 'rgba(0, 0, 0, 0.1)',
       },
     }
   );

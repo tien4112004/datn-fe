@@ -185,6 +185,7 @@ export class SlideLayoutCalculator {
   }
 
   /**
+   * @deprecated
    * Calculates item position in auto-layout with overflow handling
    */
   getItemPositionInAutoLayout(
@@ -253,6 +254,51 @@ export class SlideLayoutCalculator {
   }
 
   /**
+   * Calculates positions for items with variable heights and custom spacing
+   * This method considers the actual height of each item and uses provided spacing
+   */
+  getItemPositionsWithCustomSpacing(
+    itemDimensions: { width: number; height: number }[],
+    columnIndex: number,
+    customSpacing: number,
+    totalColumns: number = 2
+  ): ItemPosition[] {
+    const availableBlock = this.getColumnAvailableBlock(columnIndex, totalColumns, 100, 40);
+
+    const totalItemsHeight = itemDimensions.reduce((sum, dim) => sum + dim.height, 0);
+    const totalSpacingHeight = (itemDimensions.length - 1) * customSpacing;
+    const totalNeededHeight = totalItemsHeight + totalSpacingHeight;
+
+    let startY = availableBlock.top;
+
+    // Center the content group if there's extra space
+    if (totalNeededHeight < availableBlock.height) {
+      const extraSpace = availableBlock.height - totalNeededHeight;
+      const maxCenterOffset = Math.min(extraSpace / 2, 80); // More generous centering
+      startY = availableBlock.top + maxCenterOffset;
+    }
+
+    // Calculate cumulative positions with custom spacing
+    const positions: ItemPosition[] = [];
+    let currentY = startY;
+
+    for (let i = 0; i < itemDimensions.length; i++) {
+      positions.push({
+        top: currentY,
+        left: availableBlock.left,
+        width: itemDimensions[i].width,
+        height: itemDimensions[i].height,
+      });
+
+      // Move to next position (current height + custom spacing)
+      currentY += itemDimensions[i].height + customSpacing;
+    }
+
+    return positions;
+  }
+
+  /**
+   * @deprecated
    * Calculates positions for items with variable heights in auto-layout
    * This method considers the actual height of each item to prevent overlapping
    */

@@ -59,7 +59,9 @@ import MarkupPanel from './MarkupPanel.vue';
 import AIPPTDialog from './AIPPTDialog.vue';
 import Modal from '@/components/Modal.vue';
 import Button from '@/components/Button.vue';
-import { convertTwoColumnWithImage } from '@/utils/slideLayout/slideLayoutConverter';
+import { convertToSlide } from '@/utils/slideLayout/slideLayoutConverter';
+import type { SlideTheme } from '@/types/slides';
+import { L } from 'vitest/dist/chunks/reporters.d.BFLkQcL6.js';
 
 const mainStore = useMainStore();
 const slideStore = useSlidesStore();
@@ -81,7 +83,7 @@ useGlobalHotkey();
 usePasteEvent();
 
 const handleClick = () => {
-  const data = {
+  const dataTest1 = {
     type: 'two_column_with_image',
     title: 'Presentation',
     data: {
@@ -94,32 +96,44 @@ const handleClick = () => {
     },
   };
 
-  const slide = convertTwoColumnWithImage(
-    data,
-    {
-      size: slideStore.viewportSize,
-      ratio: slideStore.viewportRatio,
+  const dataTest2 = {
+    type: 'main_image',
+    data: {
+      image: 'https://placehold.co/600x400',
+      content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
     },
-    {
-      backgroundColor: '#ffffff',
-      themeColors: ['#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6'],
-      fontColor: '#333333',
-      fontName: 'Arial',
-      outline: {
-        style: 'solid',
-        width: 1,
-        color: '#cccccc',
-      },
-      shadow: {
-        h: 2,
-        v: 2,
-        blur: 4,
-        color: 'rgba(0, 0, 0, 0.1)',
-      },
-    }
-  );
+  };
 
-  appendNewSlide(slide);
+  const viewport = {
+    size: slideStore.viewportSize,
+    ratio: slideStore.viewportRatio,
+  };
+
+  const theme = {
+    backgroundColor: '#ffffff',
+    themeColors: ['#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6'],
+    fontColor: '#333333',
+    fontName: 'Arial',
+    outline: {
+      style: 'solid',
+      width: 1,
+      color: '#cccccc',
+    },
+    shadow: {
+      h: 2,
+      v: 2,
+      blur: 4,
+      color: 'rgba(0, 0, 0, 0.1)',
+    },
+  } as SlideTheme;
+
+  const slide1 = convertToSlide(dataTest1, viewport, theme);
+
+  const slide2 = convertToSlide(dataTest2, viewport, theme);
+
+  appendNewSlide(slide1);
+  appendNewSlide(slide2);
+
   console.log(slideStore.slides);
 };
 </script>

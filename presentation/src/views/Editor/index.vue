@@ -59,7 +59,7 @@ import MarkupPanel from './MarkupPanel.vue';
 import AIPPTDialog from './AIPPTDialog.vue';
 import Modal from '@/components/Modal.vue';
 import Button from '@/components/Button.vue';
-import { convertTwoColumnWithImage } from '@/utils/slideLayoutConverter';
+import { convertTwoColumnWithImage } from '@/utils/slideLayout/slideLayoutConverter';
 
 const mainStore = useMainStore();
 const slideStore = useSlidesStore();

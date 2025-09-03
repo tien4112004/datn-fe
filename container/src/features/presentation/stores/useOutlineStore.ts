@@ -37,10 +37,12 @@ const useOutlineStore = create<OutlineStore>((set, get) => ({
       content: state.content.map((item) => (item.id === id ? { ...item, markdownContent: content } : item)),
     })),
 
-  deleteContent: (id) =>
+  deleteContent: (id) => {
     set((state) => ({
       content: state.content.filter((item) => item.id !== id),
-    })),
+      contentIds: state.contentIds.filter((itemId) => itemId !== id),
+    }));
+  },
 
   swap: (oldId: string, newId: string) => {
     const { content } = get();

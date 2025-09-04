@@ -9,7 +9,7 @@ import type {
 import { SlideLayoutCalculator, type SlideViewport } from './slideLayout';
 import { calculateFontSizeForAvailableSpace, calculateLargestOptimalFontSize } from './fontSizeCalculator';
 import { generateUniqueId } from './utils';
-import { createTitleLine, createImageElement } from './graphic';
+import { createTitleLine, createImageElement, createItemElements } from './graphic';
 import { getImageSize } from '../image';
 
 export interface TwoColumnWithImageLayoutSchema {
@@ -37,10 +37,6 @@ function formatTitleContent(content: string, fontSize: number): string {
 //   return `<p style="text-align: left;"><span style="font-size: ${fontSize}px;">${content}</span></p>`;
 // }
 
-function formatItemContentWithLineHeight(content: string, fontSize: number, lineHeight: number): string {
-  return `<p style="text-align: left; line-height: ${lineHeight};"><span style="font-size: ${fontSize}px;">${content}</span></p>`;
-}
-
 export const convertTwoColumnWithImage = async (
   data: TwoColumnWithImageLayoutSchema,
   viewport: SlideViewport,
@@ -50,17 +46,11 @@ export const convertTwoColumnWithImage = async (
   const layoutCalculator = new SlideLayoutCalculator(viewport.size, viewport.ratio);
 
   // Calculate available space for content column (column 1, right side)
-  const contentColumnBlock = layoutCalculator.getColumnAvailableBlock(1, 2, 100, 40);
-  const contentAvailableWidth = contentColumnBlock.width - 40; // Padding
-  const contentAvailableHeight = contentColumnBlock.height;
-
-  // Get adaptive styles based on available space
-  const adaptiveStyles = calculateFontSizeForAvailableSpace(
-    data.data.items,
-    contentAvailableWidth,
-    contentAvailableHeight,
-    viewport
-  );
+  const columns = layoutCalculator.getColumnsLayout([50, 50]);
+  const contentColumnBlock = {
+    ...columns[1],
+    height: layoutCalculator.calculateAvailableHeight(100, 40),
+  };
 
   // Calculate title dimensions and font size based on available width
   const titleAvailableWidth = layoutCalculator.slideWidth * 0.9; // 90% of slide width
@@ -82,22 +72,14 @@ export const convertTwoColumnWithImage = async (
     0
   );
 
-  // Pre-calculate all item dimensions for variable height layout
-  const itemContentsAndDimensions = data.data.items.map((item) => {
-    const itemContent = formatItemContentWithLineHeight(
-      item,
-      adaptiveStyles.fontSize,
-      adaptiveStyles.lineHeight
-    );
-    const itemDimensions = layoutCalculator.calculateTextDimensions(itemContent);
-    return { content: itemContent, dimensions: itemDimensions };
-  });
-
-  // Calculate positions using variable heights and adaptive spacing
-  const itemPositions = layoutCalculator.getItemPositionsWithCustomSpacing(
-    itemContentsAndDimensions.map((item) => item.dimensions),
-    1, // Column index 1 (right column)
-    adaptiveStyles.spacing
+  // Create item elements using the helper
+  const itemElements = await createItemElements(
+    data.data.items,
+    contentColumnBlock,
+    layoutCalculator,
+    theme,
+    viewport,
+    { alignment: 'center', leftMargin: 40 }
   );
 
   const titlePositions = [layoutCalculator.getHorizontallyCenterPosition(titleDimensions.width), 15];
@@ -130,26 +112,7 @@ export const convertTwoColumnWithImage = async (
       ),
 
       // Item text elements with variable height positioning
-      ...itemContentsAndDimensions.map((item, index) => {
-        const position = itemPositions[index];
-
-        return {
-          id: generateUniqueId(),
-          type: 'text',
-          // content : itemContent,
-          content: item.content,
-          defaultFontName: theme.fontName,
-          defaultColor: theme.fontColor,
-          // left: itemPosition.left,
-          // top: itemPosition.top,
-          // width: itemDimensions.width,
-          // height: itemDimensions.height,
-          left: position.left,
-          top: position.top,
-          width: position.width,
-          height: position.height,
-        } as PPTTextElement;
-      }),
+      ...itemElements,
     ],
   };
 
@@ -163,21 +126,18 @@ export const convertTwoColumnWithBigImage = async (
 ) => {
   // Initialize layout calculator
   const layoutCalculator = new SlideLayoutCalculator(viewport.size, viewport.ratio);
-  const leftColumnBlock = layoutCalculator.getColumnAvailableBlock(0, 3, 0, 0);
+
+  // Use flexible column layout: 33% for image, 67% for content
+  const columns = layoutCalculator.getColumnsLayout([33, 67]);
+  const leftColumnBlock = columns[0];
+  const contentColumnBlock = {
+    ...columns[1],
+    height: layoutCalculator.calculateAvailableHeight(0, 20),
+  };
 
   // Calculate image dimensions to fit nicely in left column
   const imageHeight = viewport.size * viewport.ratio;
   const imageWidth = leftColumnBlock.width;
-
-  // Calculate content area - 2nd column + 3rd column
-  const secondCol = layoutCalculator.getColumnAvailableBlock(1, 3, 0, 20);
-  const thirdCol = layoutCalculator.getColumnAvailableBlock(2, 3, 0, 20);
-  const contentColumnBlock = {
-    top: secondCol.top,
-    left: secondCol.left,
-    width: secondCol.width + thirdCol.width,
-    height: secondCol.height,
-  };
 
   // Calculate title dimensions and position - position in the combined content area
   const titleAvailableWidth = contentColumnBlock.width;
@@ -195,44 +155,26 @@ export const convertTwoColumnWithBigImage = async (
     top: 15,
   };
 
-  const contentAvailableWidth = contentColumnBlock.width - 20; // Reduced padding
+  const contentAvailableWidth = contentColumnBlock.width;
   const contentAvailableHeight = contentColumnBlock.height - 160; // Reserve space for title
-
-  // Get adaptive styles based on available space
-  const adaptiveStyles = calculateFontSizeForAvailableSpace(
-    data.data.items,
-    contentAvailableWidth,
-    contentAvailableHeight,
-    viewport
-  );
-
-  // Pre-calculate all item dimensions for variable height layout
-  const itemContentsAndDimensions = data.data.items.map((item) => {
-    const itemContent = formatItemContentWithLineHeight(
-      item,
-      adaptiveStyles.fontSize,
-      adaptiveStyles.lineHeight
-    );
-    const itemDimensions = layoutCalculator.calculateTextDimensions(itemContent);
-    return { content: itemContent, dimensions: itemDimensions };
-  });
 
   const titleBottomOffset = titlePosition.top + titleDimensions.height + 40; // 40px spacing after title
 
-  const itemPositions = itemContentsAndDimensions.map((item, index) => {
-    // Calculate cumulative height for previous items
-    let cumulativeHeight = 0;
-    for (let i = 0; i < index; i++) {
-      cumulativeHeight += itemContentsAndDimensions[i].dimensions.height + adaptiveStyles.spacing;
-    }
-
-    return {
-      left: contentColumnBlock.left + 10, // Small left margin
-      top: titleBottomOffset + cumulativeHeight,
-      width: item.dimensions.width,
-      height: item.dimensions.height,
-    };
-  });
+  // Create item elements using the helper with custom available block
+  const customAvailableBlock = {
+    left: contentColumnBlock.left,
+    top: titleBottomOffset,
+    width: contentAvailableWidth,
+    height: contentAvailableHeight,
+  };
+  const itemElements = await createItemElements(
+    data.data.items,
+    customAvailableBlock,
+    layoutCalculator,
+    theme,
+    viewport,
+    { alignment: 'top', leftMargin: 40 }
+  );
 
   // Create slide elements
   const slide: Slide = {
@@ -265,21 +207,7 @@ export const convertTwoColumnWithBigImage = async (
         theme
       ),
       // Item text elements with variable height positioning
-      ...itemContentsAndDimensions.map((item, index) => {
-        const position = itemPositions[index];
-
-        return {
-          id: generateUniqueId(),
-          type: 'text',
-          content: item.content,
-          defaultFontName: theme.fontName,
-          defaultColor: theme.fontColor,
-          left: position.left,
-          top: position.top,
-          width: position.width,
-          height: position.height,
-        } as PPTTextElement;
-      }),
+      ...itemElements,
     ],
   };
 

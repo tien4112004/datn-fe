@@ -1,6 +1,14 @@
-import type { PPTLineElement, PPTImageElement, ImageElementClip, SlideTheme } from '@/types/slides';
+import type {
+  PPTLineElement,
+  PPTImageElement,
+  PPTTextElement,
+  ImageElementClip,
+  SlideTheme,
+} from '@/types/slides';
 import { generateUniqueId } from './utils';
 import { getImageSize } from '../image';
+import { calculateFontSizeForAvailableSpace } from './fontSizeCalculator';
+import type { SlideViewport, SlideLayoutCalculator } from './slideLayout';
 
 export const createImageElement = async (
   src: string,
@@ -41,6 +49,70 @@ export const createImageElement = async (
       ],
     },
   } as PPTImageElement;
+};
+
+interface ItemLayoutOptions {
+  alignment?: 'top' | 'center';
+  leftMargin?: number;
+}
+
+function formatItemContentWithLineHeight(content: string, fontSize: number, lineHeight: number): string {
+  return `<p style="text-align: left; line-height: ${lineHeight};"><span style="font-size: ${fontSize}px;">${content}</span></p>`;
+}
+
+export const createItemElements = async (
+  items: string[],
+  availableBlock: { left: number; top: number; width: number; height: number },
+  layoutCalculator: SlideLayoutCalculator,
+  theme: SlideTheme,
+  viewport: SlideViewport,
+  options: ItemLayoutOptions = {}
+): Promise<PPTTextElement[]> => {
+  // Get adaptive styles based on available space
+  const adaptiveStyles = calculateFontSizeForAvailableSpace(
+    items,
+    availableBlock.width,
+    availableBlock.height,
+    viewport
+  );
+
+  // Pre-calculate all item dimensions using the actual available block
+  const itemContentsAndDimensions = items.map((item) => {
+    const itemContent = formatItemContentWithLineHeight(
+      item,
+      adaptiveStyles.fontSize,
+      adaptiveStyles.lineHeight
+    );
+    const itemDimensions = layoutCalculator.calculateTextDimensionsForBlock(itemContent, availableBlock, {
+      widthUtilization: 0.9,
+    });
+    return { content: itemContent, dimensions: itemDimensions };
+  });
+
+  // Calculate positions using the new unified method
+  const itemPositions = layoutCalculator.layoutItemsInBlock(
+    itemContentsAndDimensions.map((item) => item.dimensions),
+    availableBlock,
+    adaptiveStyles.spacing,
+    options
+  );
+
+  // Create PPTTextElement objects
+  return itemContentsAndDimensions.map((item, index) => {
+    const position = itemPositions[index];
+
+    return {
+      id: generateUniqueId(),
+      type: 'text',
+      content: item.content,
+      defaultFontName: theme.fontName,
+      defaultColor: theme.fontColor,
+      left: position.left,
+      top: position.top,
+      width: position.width,
+      height: position.height,
+    } as PPTTextElement;
+  });
 };
 
 export const createTitleLine = (

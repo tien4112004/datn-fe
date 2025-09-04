@@ -112,6 +112,95 @@ export class SlideLayoutCalculator {
     }
   }
 
+  /**
+   * Calculate text dimensions within a specific available block (not slide-based ratios)
+   * This ensures text utilizes the actual available space instead of hardcoded percentages
+   * @param content HTML content to measure
+   * @param availableBlock The actual available block for the content
+   * @param options Configuration for width utilization and padding
+   * @returns Dimensions that properly utilize the available block space
+   */
+  calculateTextDimensionsForBlock(
+    content: string,
+    availableBlock: AvailableBlock,
+    options: { widthUtilization?: number } = {}
+  ): TextDimensions {
+    const { widthUtilization = 0.9 } = options;
+    const PADDING = 15;
+
+    // Use actual available block width, not slide-based ratios
+    const maxWidth = availableBlock.width * widthUtilization;
+    const maxHeight = availableBlock.height;
+
+    // First, measure natural width
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = content;
+    tempDiv.style.cssText = `
+      visibility: hidden;
+      position: absolute;
+      top: -9999px;
+      white-space: nowrap;
+    `;
+
+    document.body.appendChild(tempDiv);
+    const naturalWidth = tempDiv.offsetWidth;
+    const naturalHeight = tempDiv.offsetHeight;
+    document.body.removeChild(tempDiv);
+
+    // If natural width is less than our target width, expand to fill available space
+    if (naturalWidth < maxWidth - PADDING * 2) {
+      // Force text to expand to utilize available width
+      const expandedDiv = document.createElement('div');
+      expandedDiv.innerHTML = content;
+      expandedDiv.style.cssText = `
+        visibility: hidden;
+        position: absolute;
+        top: -9999px;
+        width: ${maxWidth - PADDING * 2}px;
+        white-space: normal;
+        overflow-wrap: break-word;
+      `;
+
+      document.body.appendChild(expandedDiv);
+      const expandedHeight = Math.min(expandedDiv.offsetHeight, maxHeight - PADDING * 2);
+      document.body.removeChild(expandedDiv);
+
+      return {
+        width: maxWidth,
+        height: expandedHeight + PADDING,
+      };
+    }
+    // If natural width exceeds available width, apply wrapping
+    else if (naturalWidth > maxWidth - PADDING * 2) {
+      const wrappedDiv = document.createElement('div');
+      wrappedDiv.innerHTML = content;
+      wrappedDiv.style.cssText = `
+        visibility: hidden;
+        position: absolute;
+        top: -9999px;
+        width: ${maxWidth - PADDING * 2}px;
+        white-space: normal;
+        overflow-wrap: break-word;
+      `;
+
+      document.body.appendChild(wrappedDiv);
+      const wrappedHeight = Math.min(wrappedDiv.offsetHeight, maxHeight - PADDING * 2);
+      document.body.removeChild(wrappedDiv);
+
+      return {
+        width: maxWidth,
+        height: wrappedHeight + PADDING,
+      };
+    }
+    // Natural width fits perfectly, but still expand to utilize available space
+    else {
+      return {
+        width: maxWidth,
+        height: naturalHeight + PADDING,
+      };
+    }
+  }
+
   // Convenience methods with preset options
   calculateTitleDimensions(content: string): TextDimensions {
     return this.calculateTextDimensions(content, { maxWidthRatio: 0.9 });
@@ -150,6 +239,14 @@ export class SlideLayoutCalculator {
     return (this.slideHeight - elementHeight) / 2;
   }
 
+  /**
+   * @deprecated Use getColumnsLayout instead for flexible percentage-based columns
+   *
+   * Migration example:
+   * OLD: getColumnAvailableBlock(1, 2, 100, 40)
+   * NEW: const columns = getColumnsLayout([50, 50]);
+   *      const block = { ...columns[1], height: calculateAvailableHeight(100, 40) };
+   */
   getColumnAvailableBlock(
     columnIndex: number,
     totalColumns: number = 2,
@@ -254,6 +351,7 @@ export class SlideLayoutCalculator {
   }
 
   /**
+   * @deprecated Use layoutItemsInBlock instead for more flexibility
    * Calculates positions for items with variable heights and custom spacing
    * This method considers the actual height of each item and uses provided spacing
    */
@@ -298,7 +396,93 @@ export class SlideLayoutCalculator {
   }
 
   /**
-   * @deprecated
+   * Layouts items within any available block with configurable options
+   * Replaces getItemPositionsWithCustomSpacing with more flexible approach
+   */
+  layoutItemsInBlock(
+    itemDimensions: { width: number; height: number }[],
+    availableBlock: AvailableBlock,
+    spacing: number,
+    options: { alignment?: 'top' | 'center'; leftMargin?: number } = {}
+  ): ItemPosition[] {
+    const { alignment = 'center', leftMargin = 0 } = options;
+
+    const totalItemsHeight = itemDimensions.reduce((sum, dim) => sum + dim.height, 0);
+    const totalSpacingHeight = (itemDimensions.length - 1) * spacing;
+    const totalNeededHeight = totalItemsHeight + totalSpacingHeight;
+
+    let startY = availableBlock.top;
+
+    // Apply alignment
+    if (alignment === 'center' && totalNeededHeight < availableBlock.height) {
+      const extraSpace = availableBlock.height - totalNeededHeight;
+      const maxCenterOffset = Math.min(extraSpace / 2, 80);
+      startY = availableBlock.top + maxCenterOffset;
+    }
+
+    // Calculate cumulative positions
+    const positions: ItemPosition[] = [];
+    let currentY = startY;
+
+    for (let i = 0; i < itemDimensions.length; i++) {
+      positions.push({
+        top: currentY,
+        left: availableBlock.left + leftMargin,
+        width: itemDimensions[i].width,
+        height: itemDimensions[i].height,
+      });
+
+      // Move to next position
+      currentY += itemDimensions[i].height + spacing;
+    }
+
+    return positions;
+  }
+
+  /**
+   * Creates flexible column layout with percentage-based widths
+   * @param columnWidths Array of percentages (e.g., [20, 20, 60] for 20%, 20%, 60%)
+   * @returns Array of AvailableBlock objects for each column
+   */
+  getColumnsLayout(columnWidths: number[]): AvailableBlock[] {
+    // Validate percentages add up to 100
+    const totalPercentage = columnWidths.reduce((sum, width) => sum + width, 0);
+    if (Math.abs(totalPercentage - 100) > 0.1) {
+      console.warn(`Column widths should add up to 100%, got ${totalPercentage}%`);
+    }
+
+    const columns: AvailableBlock[] = [];
+    let currentLeft = 0;
+
+    columnWidths.forEach((widthPercentage) => {
+      const columnWidth = (this.slideWidth * widthPercentage) / 100;
+
+      columns.push({
+        left: currentLeft,
+        top: 0,
+        width: columnWidth,
+        height: this.slideHeight,
+      });
+
+      // Move to next column position
+      currentLeft += columnWidth;
+    });
+
+    return columns;
+  }
+
+  /**
+   * Calculates available height with top and bottom margins
+   * @param topMargin Top margin in pixels
+   * @param bottomMargin Bottom margin in pixels
+   * @returns Available height for content
+   */
+  calculateAvailableHeight(topMargin: number = 0, bottomMargin: number = 0): number {
+    return this.slideHeight - topMargin - bottomMargin;
+  }
+
+  /**
+   * @deprecated Use layoutItemsInBlock instead
    * Calculates positions for items with variable heights in auto-layout
    * This method considers the actual height of each item to prevent overlapping
    */

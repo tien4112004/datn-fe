@@ -90,6 +90,7 @@ const handleClick = () => {
       items: [
         'Lorem ipsum dolor sit amet, consectetur adipiscing elit. ',
         'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. ',
         'item 3 here',
       ],
       image: 'https://placehold.co/600x400',
@@ -126,6 +127,8 @@ const handleClick = () => {
       color: 'rgba(0, 0, 0, 0.1)',
     },
   } as SlideTheme;
+
+  slideStore.setTheme(theme); // This should be set after initialization
 
   const slide1 = convertToSlide(dataTest1, viewport, theme);
 

@@ -1,16 +1,14 @@
-import type {
-  PPTTextElement,
-  PPTImageElement,
-  Slide,
-  SlideTheme,
-  PPTLineElement,
-  ImageElementClip,
-} from '@/types/slides';
-import { SlideLayoutCalculator, type SlideViewport } from './slideLayout';
-import { calculateFontSizeForAvailableSpace, calculateLargestOptimalFontSize } from './fontSizeCalculator';
+import type { PPTTextElement, Slide, SlideTheme } from '@/types/slides';
+import {
+  SlideLayoutCalculator,
+  type SlideViewport,
+  type Size,
+  type ElementBounds,
+  type ImageBounds,
+} from './slideLayout';
+import { calculateLargestOptimalFontSize } from './fontSizeCalculator';
 import { generateUniqueId } from './utils';
 import { createTitleLine, createImageElement, createItemElements } from './graphic';
-import { getImageSize } from '../image';
 
 export interface TwoColumnWithImageLayoutSchema {
   type: string;
@@ -99,7 +97,10 @@ export const convertTwoColumnWithImage = async (
         width: titleDimensions.width,
         height: titleDimensions.height,
       } as PPTTextElement,
-      await createImageElement(data.data.image, { ...imagePosition, ...imageDimensions }),
+      await createImageElement(data.data.image, {
+        ...imagePosition,
+        ...imageDimensions,
+      } as ImageBounds),
       // Graphic elements
       createTitleLine(
         {
@@ -107,7 +108,7 @@ export const convertTwoColumnWithImage = async (
           height: titleDimensions.height,
           left: titlePositions[0],
           top: titlePositions[1],
-        },
+        } as ElementBounds,
         theme
       ),
 
@@ -193,7 +194,7 @@ export const convertTwoColumnWithBigImage = async (
       } as PPTTextElement,
       await createImageElement(
         data.data.image,
-        { left: 0, top: 0, width: imageWidth, height: imageHeight },
+        { left: 0, top: 0, width: imageWidth, height: imageHeight } as ImageBounds,
         { clip: 'auto' }
       ),
       //   Graphic elements
@@ -203,7 +204,7 @@ export const convertTwoColumnWithBigImage = async (
           height: titleDimensions.height,
           left: titlePosition.left,
           top: titlePosition.top,
-        },
+        } as ElementBounds,
         theme
       ),
       // Item text elements with variable height positioning
@@ -280,7 +281,7 @@ export const convertMainImage = async (
         ...imagePosition,
         width: finalImageWidth,
         height: finalImageHeight,
-      }),
+      } as ImageBounds),
       {
         id: generateUniqueId(),
         type: 'text',

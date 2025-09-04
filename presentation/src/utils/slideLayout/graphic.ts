@@ -8,12 +8,19 @@ import type {
 import { generateUniqueId } from './utils';
 import { getImageSize } from '../image';
 import { calculateFontSizeForAvailableSpace } from './fontSizeCalculator';
-import type { SlideViewport, SlideLayoutCalculator } from './slideLayout';
+import type {
+  SlideViewport,
+  SlideLayoutCalculator,
+  ImageBounds,
+  LayoutBlock,
+  Size,
+  ElementBounds,
+} from './slideLayout';
 
 export const createImageElement = async (
   src: string,
-  bounds: { left: number; top: number; width: number; height: number },
-  options: { fixedRatio?: boolean; clip?: ImageElementClip | 'auto'; rotate?: number } = {}
+  bounds: ImageBounds,
+  options: { clip?: ImageElementClip | 'auto' } = {}
 ): Promise<PPTImageElement> => {
   let finalClip = options.clip;
 
@@ -35,12 +42,12 @@ export const createImageElement = async (
     id: generateUniqueId(),
     type: 'image',
     src,
-    fixedRatio: options.fixedRatio ?? true,
+    fixedRatio: bounds.fixedRatio ?? true,
     left: bounds.left,
     top: bounds.top,
     width: bounds.width,
     height: bounds.height,
-    rotate: options.rotate ?? 0,
+    rotate: bounds.rotate ?? 0,
     clip: finalClip ?? {
       shape: 'rect',
       range: [
@@ -62,7 +69,7 @@ function formatItemContentWithLineHeight(content: string, fontSize: number, line
 
 export const createItemElements = async (
   items: string[],
-  availableBlock: { left: number; top: number; width: number; height: number },
+  availableBlock: LayoutBlock,
   layoutCalculator: SlideLayoutCalculator,
   theme: SlideTheme,
   viewport: SlideViewport,
@@ -115,10 +122,7 @@ export const createItemElements = async (
   });
 };
 
-export const createTitleLine = (
-  titleDimensions: { width: number; height: number; left: number; top: number },
-  theme: SlideTheme
-) => {
+export const createTitleLine = (titleDimensions: ElementBounds, theme: SlideTheme) => {
   return {
     id: generateUniqueId(),
     type: 'line',

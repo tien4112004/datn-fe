@@ -1,6 +1,32 @@
-export interface TextDimensions {
+// Core geometric types
+export interface Point {
+  x: number;
+  y: number;
+}
+
+export interface Size {
   width: number;
   height: number;
+}
+
+export interface Rectangle extends Size {
+  left: number;
+  top: number;
+}
+
+export interface Bounds extends Rectangle {}
+
+// Semantic domain types
+export interface ElementBounds extends Bounds {}
+
+export interface ImageBounds extends ElementBounds {
+  rotate?: number;
+  fixedRatio?: boolean;
+}
+
+export interface TextBounds extends ElementBounds {
+  fontSize?: number;
+  lineHeight?: number;
 }
 
 export interface SlideViewport {
@@ -8,23 +34,31 @@ export interface SlideViewport {
   ratio: number;
 }
 
-export interface Position {
-  top: number;
-  left: number;
-}
-
-export interface AvailableBlock extends Position {
-  width: number;
-  height: number;
-}
-
-export interface ItemPosition extends AvailableBlock {}
-
 export interface TextCalculationOptions {
   maxWidthRatio?: number;
   maxHeightRatio?: number;
   padding?: number;
 }
+
+export interface LayoutBlock extends Bounds {
+  /** Available space for content positioning */
+}
+
+// Legacy types - kept for compatibility
+/** @deprecated Use Size instead */
+export interface TextDimensions extends Size {}
+
+/** @deprecated Use Rectangle with left/top instead of Point with x/y */
+export interface Position {
+  top: number;
+  left: number;
+}
+
+/** @deprecated Use LayoutBlock instead */
+export interface AvailableBlock extends Position, Size {}
+
+/** @deprecated Use ElementBounds instead */
+export interface ItemPosition extends AvailableBlock {}
 
 /**
  * Main class for slide layout calculations
@@ -47,7 +81,7 @@ export class SlideLayoutCalculator {
   }
 
   // Dimension Calculation Functions
-  calculateTextDimensions(content: string, options?: TextCalculationOptions): TextDimensions {
+  calculateTextDimensions(content: string, options?: TextCalculationOptions): Size {
     const { maxWidthRatio = 0.45, maxHeightRatio = 0.6, padding = 20 } = options || {};
 
     const slideWidth = this.slideWidth;
@@ -122,9 +156,9 @@ export class SlideLayoutCalculator {
    */
   calculateTextDimensionsForBlock(
     content: string,
-    availableBlock: AvailableBlock,
+    availableBlock: LayoutBlock,
     options: { widthUtilization?: number } = {}
-  ): TextDimensions {
+  ): Size {
     const { widthUtilization = 0.9 } = options;
     const PADDING = 15;
 
@@ -202,11 +236,11 @@ export class SlideLayoutCalculator {
   }
 
   // Convenience methods with preset options
-  calculateTitleDimensions(content: string): TextDimensions {
+  calculateTitleDimensions(content: string): Size {
     return this.calculateTextDimensions(content, { maxWidthRatio: 0.9 });
   }
 
-  calculateImageDimensions(): TextDimensions {
+  calculateImageDimensions(): Size {
     // Use 40% of slide width for image width
     const imageWidth = this.slideWidth * 0.4;
 
@@ -239,32 +273,6 @@ export class SlideLayoutCalculator {
     return (this.slideHeight - elementHeight) / 2;
   }
 
-  /**
-   * @deprecated Use getColumnsLayout instead for flexible percentage-based columns
-   *
-   * Migration example:
-   * OLD: getColumnAvailableBlock(1, 2, 100, 40)
-   * NEW: const columns = getColumnsLayout([50, 50]);
-   *      const block = { ...columns[1], height: calculateAvailableHeight(100, 40) };
-   */
-  getColumnAvailableBlock(
-    columnIndex: number,
-    totalColumns: number = 2,
-    topMargin: number = 0,
-    bottomMargin: number = 0
-  ): AvailableBlock {
-    const LEFT_PADDING = 20;
-    const TOP_PADDING = 10;
-    const columnWidth = this.slideWidth / totalColumns;
-
-    return {
-      top: TOP_PADDING + topMargin,
-      left: LEFT_PADDING + columnIndex * columnWidth,
-      width: columnWidth - LEFT_PADDING,
-      height: this.slideHeight - topMargin - bottomMargin,
-    };
-  }
-
   getColumnCenterPosition(
     elementHeight: number,
     elementWidth: number,
@@ -278,6 +286,122 @@ export class SlideLayoutCalculator {
     return {
       top: this.getVerticallyCenterPosition(elementHeight) + TOP_PADDING,
       left: columnCenterX - elementWidth / 2,
+    };
+  }
+
+  /**
+   * Layouts items within any available block with configurable options
+   * Replaces getItemPositionsWithCustomSpacing with more flexible approach
+   */
+  layoutItemsInBlock(
+    itemDimensions: Size[],
+    availableBlock: LayoutBlock,
+    spacing: number,
+    options: { alignment?: 'top' | 'center'; leftMargin?: number } = {}
+  ): ElementBounds[] {
+    const { alignment = 'center', leftMargin = 0 } = options;
+
+    const totalItemsHeight = itemDimensions.reduce((sum, dim) => sum + dim.height, 0);
+    const totalSpacingHeight = (itemDimensions.length - 1) * spacing;
+    const totalNeededHeight = totalItemsHeight + totalSpacingHeight;
+
+    let startY = availableBlock.top;
+
+    // Apply alignment
+    if (alignment === 'center' && totalNeededHeight < availableBlock.height) {
+      const extraSpace = availableBlock.height - totalNeededHeight;
+      const maxCenterOffset = Math.min(extraSpace / 2, 80);
+      startY = availableBlock.top + maxCenterOffset;
+    }
+
+    // Calculate cumulative positions
+    const positions: ItemPosition[] = [];
+    let currentY = startY;
+
+    for (let i = 0; i < itemDimensions.length; i++) {
+      positions.push({
+        top: currentY,
+        left: availableBlock.left + leftMargin,
+        width: itemDimensions[i].width,
+        height: itemDimensions[i].height,
+      });
+
+      // Move to next position
+      currentY += itemDimensions[i].height + spacing;
+    }
+
+    return positions;
+  }
+
+  /**
+   * Creates flexible column layout with percentage-based widths
+   * @param columnWidths Array of percentages (e.g., [20, 20, 60] for 20%, 20%, 60%)
+   * @returns Array of LayoutBlock objects for each column
+   */
+  getColumnsLayout(columnWidths: number[]): LayoutBlock[] {
+    // Validate percentages add up to 100
+    const totalPercentage = columnWidths.reduce((sum, width) => sum + width, 0);
+    if (Math.abs(totalPercentage - 100) > 0.1) {
+      console.warn(`Column widths should add up to 100%, got ${totalPercentage}%`);
+    }
+
+    const columns: LayoutBlock[] = [];
+    let currentLeft = 0;
+
+    columnWidths.forEach((widthPercentage) => {
+      const columnWidth = (this.slideWidth * widthPercentage) / 100;
+
+      columns.push({
+        left: currentLeft,
+        top: 0,
+        width: columnWidth,
+        height: this.slideHeight,
+      });
+
+      // Move to next column position
+      currentLeft += columnWidth;
+    });
+
+    return columns;
+  }
+
+  /**
+   * Calculates available height with top and bottom margins
+   * @param topMargin Top margin in pixels
+   * @param bottomMargin Bottom margin in pixels
+   * @returns Available height for content
+   */
+  calculateAvailableHeight(topMargin: number = 0, bottomMargin: number = 0): number {
+    return this.slideHeight - topMargin - bottomMargin;
+  }
+
+  // =============================================
+  // DEPRECATED METHODS - KEPT FOR COMPATIBILITY
+  // =============================================
+
+  /**
+   * @deprecated Use getColumnsLayout instead for flexible percentage-based columns
+   *
+   * Migration example:
+   * OLD: getColumnAvailableBlock(1, 2, 100, 40)
+   * NEW: const columns = getColumnsLayout([50, 50]);
+   *      const block = { ...columns[1], height: calculateAvailableHeight(100, 40) };
+   */
+  getColumnAvailableBlock(
+    columnIndex: number,
+    totalColumns: number = 2,
+    topMargin: number = 0,
+    bottomMargin: number = 0
+  ): LayoutBlock {
+    const LEFT_PADDING = 20;
+    const TOP_PADDING = 10;
+    const columnWidth = this.slideWidth / totalColumns;
+
+    return {
+      top: TOP_PADDING + topMargin,
+      left: LEFT_PADDING + columnIndex * columnWidth,
+      width: columnWidth - LEFT_PADDING,
+      height: this.slideHeight - topMargin - bottomMargin,
     };
   }
 
@@ -393,92 +517,6 @@ export class SlideLayoutCalculator {
     }
 
     return positions;
-  }
-
-  /**
-   * Layouts items within any available block with configurable options
-   * Replaces getItemPositionsWithCustomSpacing with more flexible approach
-   */
-  layoutItemsInBlock(
-    itemDimensions: { width: number; height: number }[],
-    availableBlock: AvailableBlock,
-    spacing: number,
-    options: { alignment?: 'top' | 'center'; leftMargin?: number } = {}
-  ): ItemPosition[] {
-    const { alignment = 'center', leftMargin = 0 } = options;
-
-    const totalItemsHeight = itemDimensions.reduce((sum, dim) => sum + dim.height, 0);
-    const totalSpacingHeight = (itemDimensions.length - 1) * spacing;
-    const totalNeededHeight = totalItemsHeight + totalSpacingHeight;
-
-    let startY = availableBlock.top;
-
-    // Apply alignment
-    if (alignment === 'center' && totalNeededHeight < availableBlock.height) {
-      const extraSpace = availableBlock.height - totalNeededHeight;
-      const maxCenterOffset = Math.min(extraSpace / 2, 80);
-      startY = availableBlock.top + maxCenterOffset;
-    }
-
-    // Calculate cumulative positions
-    const positions: ItemPosition[] = [];
-    let currentY = startY;
-
-    for (let i = 0; i < itemDimensions.length; i++) {
-      positions.push({
-        top: currentY,
-        left: availableBlock.left + leftMargin,
-        width: itemDimensions[i].width,
-        height: itemDimensions[i].height,
-      });
-
-      // Move to next position
-      currentY += itemDimensions[i].height + spacing;
-    }
-
-    return positions;
-  }
-
-  /**
-   * Creates flexible column layout with percentage-based widths
-   * @param columnWidths Array of percentages (e.g., [20, 20, 60] for 20%, 20%, 60%)
-   * @returns Array of AvailableBlock objects for each column
-   */
-  getColumnsLayout(columnWidths: number[]): AvailableBlock[] {
-    // Validate percentages add up to 100
-    const totalPercentage = columnWidths.reduce((sum, width) => sum + width, 0);
-    if (Math.abs(totalPercentage - 100) > 0.1) {
-      console.warn(`Column widths should add up to 100%, got ${totalPercentage}%`);
-    }
-
-    const columns: AvailableBlock[] = [];
-    let currentLeft = 0;
-
-    columnWidths.forEach((widthPercentage) => {
-      const columnWidth = (this.slideWidth * widthPercentage) / 100;
-
-      columns.push({
-        left: currentLeft,
-        top: 0,
-        width: columnWidth,
-        height: this.slideHeight,
-      });
-
-      // Move to next column position
-      currentLeft += columnWidth;
-    });
-
-    return columns;
-  }
-
-  /**
-   * Calculates available height with top and bottom margins
-   * @param topMargin Top margin in pixels
-   * @param bottomMargin Bottom margin in pixels
-   * @returns Available height for content
-   */
-  calculateAvailableHeight(topMargin: number = 0, bottomMargin: number = 0): number {
-    return this.slideHeight - topMargin - bottomMargin;
   }
 
   /**

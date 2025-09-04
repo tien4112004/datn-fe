@@ -46,7 +46,7 @@ export function calculateLargestOptimalFontSize(
   document.body.appendChild(measureEl);
   measureEl.textContent = content;
 
-  // Start from max size and work down (faster for most cases)
+  // Start from max size and work down
   let fontSize = config.maxSize;
   let optimalSize = config.minSize;
 
@@ -62,7 +62,6 @@ export function calculateLargestOptimalFontSize(
       break;
     }
 
-    // Decrement more aggressively for faster convergence
     fontSize -= fontSize > 20 ? 2 : 1;
   }
 

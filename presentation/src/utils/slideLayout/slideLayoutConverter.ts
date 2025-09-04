@@ -1,8 +1,16 @@
-import type { PPTTextElement, PPTImageElement, Slide, SlideTheme, PPTLineElement } from '@/types/slides';
+import type {
+  PPTTextElement,
+  PPTImageElement,
+  Slide,
+  SlideTheme,
+  PPTLineElement,
+  ImageElementClip,
+} from '@/types/slides';
 import { SlideLayoutCalculator, type SlideViewport } from './slideLayout';
-import { calculateFontSizeForAvailableSpace, calculateOptimalFontSize } from './fontSizeCalculator';
+import { calculateFontSizeForAvailableSpace, calculateLargestOptimalFontSize } from './fontSizeCalculator';
 import { generateUniqueId } from './utils';
-import { createTitleLine } from './graphic';
+import { createTitleLine, createImageElement } from './graphic';
+import { getImageSize } from '../image';
 
 export interface TwoColumnWithImageLayoutSchema {
   type: string;
@@ -33,7 +41,7 @@ function formatItemContentWithLineHeight(content: string, fontSize: number, line
   return `<p style="text-align: left; line-height: ${lineHeight};"><span style="font-size: ${fontSize}px;">${content}</span></p>`;
 }
 
-export const convertTwoColumnWithImage = (
+export const convertTwoColumnWithImage = async (
   data: TwoColumnWithImageLayoutSchema,
   viewport: SlideViewport,
   theme: SlideTheme
@@ -56,8 +64,8 @@ export const convertTwoColumnWithImage = (
 
   // Calculate title dimensions and font size based on available width
   const titleAvailableWidth = layoutCalculator.slideWidth * 0.9; // 90% of slide width
-  const titleAvailableHeight = 80; // Reasonable title height
-  const titleFontSize = calculateOptimalFontSize(
+  const titleAvailableHeight = Math.max(120, layoutCalculator.slideHeight * 0.15); // Responsive title height
+  const titleFontSize = calculateLargestOptimalFontSize(
     data.title,
     titleAvailableWidth,
     titleAvailableHeight,
@@ -109,16 +117,7 @@ export const convertTwoColumnWithImage = (
         width: titleDimensions.width,
         height: titleDimensions.height,
       } as PPTTextElement,
-      {
-        id: generateUniqueId(),
-        type: 'image',
-        src: data.data.image,
-        fixedRatio: false,
-        left: imagePosition.left,
-        top: imagePosition.top,
-        width: imageDimensions.width,
-        height: imageDimensions.height,
-      } as PPTImageElement,
+      await createImageElement(data.data.image, { ...imagePosition, ...imageDimensions }),
       // Graphic elements
       createTitleLine(
         {
@@ -157,7 +156,141 @@ export const convertTwoColumnWithImage = (
   return slide;
 };
 
-export const convertMainImage = (data: MainImageLayoutSchema, viewport: SlideViewport, theme: SlideTheme) => {
+export const convertTwoColumnWithBigImage = async (
+  data: TwoColumnWithImageLayoutSchema,
+  viewport: SlideViewport,
+  theme: SlideTheme
+) => {
+  // Initialize layout calculator
+  const layoutCalculator = new SlideLayoutCalculator(viewport.size, viewport.ratio);
+  const leftColumnBlock = layoutCalculator.getColumnAvailableBlock(0, 3, 0, 0);
+
+  // Calculate image dimensions to fit nicely in left column
+  const imageHeight = viewport.size * viewport.ratio;
+  const imageWidth = leftColumnBlock.width;
+
+  // Calculate content area - 2nd column + 3rd column
+  const secondCol = layoutCalculator.getColumnAvailableBlock(1, 3, 0, 20);
+  const thirdCol = layoutCalculator.getColumnAvailableBlock(2, 3, 0, 20);
+  const contentColumnBlock = {
+    top: secondCol.top,
+    left: secondCol.left,
+    width: secondCol.width + thirdCol.width,
+    height: secondCol.height,
+  };
+
+  // Calculate title dimensions and position - position in the combined content area
+  const titleAvailableWidth = contentColumnBlock.width;
+  const titleAvailableHeight = 240;
+  const titleFontSize = calculateLargestOptimalFontSize(
+    data.title,
+    titleAvailableWidth,
+    titleAvailableHeight,
+    'title'
+  );
+  const titleContent = formatTitleContent(data.title, titleFontSize);
+  const titleDimensions = layoutCalculator.calculateTextDimensions(titleContent);
+  const titlePosition = {
+    left: contentColumnBlock.left + (contentColumnBlock.width - titleDimensions.width) / 2,
+    top: 15,
+  };
+
+  const contentAvailableWidth = contentColumnBlock.width - 20; // Reduced padding
+  const contentAvailableHeight = contentColumnBlock.height - 160; // Reserve space for title
+
+  // Get adaptive styles based on available space
+  const adaptiveStyles = calculateFontSizeForAvailableSpace(
+    data.data.items,
+    contentAvailableWidth,
+    contentAvailableHeight,
+    viewport
+  );
+
+  // Pre-calculate all item dimensions for variable height layout
+  const itemContentsAndDimensions = data.data.items.map((item) => {
+    const itemContent = formatItemContentWithLineHeight(
+      item,
+      adaptiveStyles.fontSize,
+      adaptiveStyles.lineHeight
+    );
+    const itemDimensions = layoutCalculator.calculateTextDimensions(itemContent);
+    return { content: itemContent, dimensions: itemDimensions };
+  });
+
+  const titleBottomOffset = titlePosition.top + titleDimensions.height + 40; // 40px spacing after title
+
+  const itemPositions = itemContentsAndDimensions.map((item, index) => {
+    // Calculate cumulative height for previous items
+    let cumulativeHeight = 0;
+    for (let i = 0; i < index; i++) {
+      cumulativeHeight += itemContentsAndDimensions[i].dimensions.height + adaptiveStyles.spacing;
+    }
+
+    return {
+      left: contentColumnBlock.left + 10, // Small left margin
+      top: titleBottomOffset + cumulativeHeight,
+      width: item.dimensions.width,
+      height: item.dimensions.height,
+    };
+  });
+
+  // Create slide elements
+  const slide: Slide = {
+    id: generateUniqueId(),
+    elements: [
+      {
+        id: generateUniqueId(),
+        type: 'text',
+        content: titleContent,
+        defaultFontName: theme.fontName,
+        defaultColor: theme.fontColor,
+        left: titlePosition.left,
+        top: titlePosition.top,
+        width: titleDimensions.width,
+        height: titleDimensions.height,
+      } as PPTTextElement,
+      await createImageElement(
+        data.data.image,
+        { left: 0, top: 0, width: imageWidth, height: imageHeight },
+        { clip: 'auto' }
+      ),
+      //   Graphic elements
+      createTitleLine(
+        {
+          width: titleDimensions.width,
+          height: titleDimensions.height,
+          left: titlePosition.left,
+          top: titlePosition.top,
+        },
+        theme
+      ),
+      // Item text elements with variable height positioning
+      ...itemContentsAndDimensions.map((item, index) => {
+        const position = itemPositions[index];
+
+        return {
+          id: generateUniqueId(),
+          type: 'text',
+          content: item.content,
+          defaultFontName: theme.fontName,
+          defaultColor: theme.fontColor,
+          left: position.left,
+          top: position.top,
+          width: position.width,
+          height: position.height,
+        } as PPTTextElement;
+      }),
+    ],
+  };
+
+  return slide;
+};
+
+export const convertMainImage = async (
+  data: MainImageLayoutSchema,
+  viewport: SlideViewport,
+  theme: SlideTheme
+) => {
   // Initialize layout calculator
   const layoutCalculator = new SlideLayoutCalculator(viewport.size, viewport.ratio);
 
@@ -183,7 +316,7 @@ export const convertMainImage = (data: MainImageLayoutSchema, viewport: SlideVie
   const contentAvailableWidth = layoutCalculator.slideWidth * 0.8; // 80% of slide width
 
   // Calculate optimal font size for content
-  const contentFontSize = calculateOptimalFontSize(
+  const contentFontSize = calculateLargestOptimalFontSize(
     data.data.content,
     contentAvailableWidth,
     contentAvailableHeight,
@@ -215,16 +348,11 @@ export const convertMainImage = (data: MainImageLayoutSchema, viewport: SlideVie
   const slide: Slide = {
     id: generateUniqueId(),
     elements: [
-      {
-        id: generateUniqueId(),
-        type: 'image',
-        src: data.data.image,
-        fixedRatio: false,
-        left: imagePosition.left,
-        top: imagePosition.top,
+      await createImageElement(data.data.image, {
+        ...imagePosition,
         width: finalImageWidth,
         height: finalImageHeight,
-      } as PPTImageElement,
+      }),
       {
         id: generateUniqueId(),
         type: 'text',
@@ -242,12 +370,15 @@ export const convertMainImage = (data: MainImageLayoutSchema, viewport: SlideVie
   return slide;
 };
 
-export const convertToSlide = (data: any, viewport: SlideViewport, theme: SlideTheme) => {
+export const convertToSlide = async (data: any, viewport: SlideViewport, theme: SlideTheme) => {
   if (data.type === 'two_column_with_image') {
-    return convertTwoColumnWithImage(data, viewport, theme);
+    return await convertTwoColumnWithImage(data, viewport, theme);
+  }
+  if (data.type === 'two_column_with_big_image') {
+    return await convertTwoColumnWithBigImage(data, viewport, theme);
   }
   if (data.type === 'main_image') {
-    return convertMainImage(data, viewport, theme);
+    return await convertMainImage(data, viewport, theme);
   }
   throw new Error('Unsupported layout type');
 };

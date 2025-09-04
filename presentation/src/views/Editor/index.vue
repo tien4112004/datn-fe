@@ -13,7 +13,7 @@
         />
       </div>
       <Toolbar class="layout-content-right" />
-      <Button @click="handleClick">Click Me</Button>T
+      <Button @click="handleClick">Click Me</Button>
     </div>
   </div>
 
@@ -61,7 +61,6 @@ import Modal from '@/components/Modal.vue';
 import Button from '@/components/Button.vue';
 import { convertToSlide } from '@/utils/slideLayout/slideLayoutConverter';
 import type { SlideTheme } from '@/types/slides';
-import { L } from 'vitest/dist/chunks/reporters.d.BFLkQcL6.js';
 
 const mainStore = useMainStore();
 const slideStore = useSlidesStore();
@@ -82,9 +81,9 @@ const remarkHeight = ref(45);
 useGlobalHotkey();
 usePasteEvent();
 
-const handleClick = () => {
+const handleClick = async () => {
   const dataTest1 = {
-    type: 'two_column_with_image',
+    type: 'two_column_with_big_image',
     title: 'Presentation',
     data: {
       items: [
@@ -130,9 +129,9 @@ const handleClick = () => {
 
   slideStore.setTheme(theme); // This should be set after initialization
 
-  const slide1 = convertToSlide(dataTest1, viewport, theme);
+  const slide1 = await convertToSlide(dataTest1, viewport, theme);
 
-  const slide2 = convertToSlide(dataTest2, viewport, theme);
+  const slide2 = await convertToSlide(dataTest2, viewport, theme);
 
   appendNewSlide(slide1);
   appendNewSlide(slide2);

@@ -4,7 +4,76 @@
 // }
 
 import type { SlideViewport } from './slideLayout';
+export function calculateLargestOptimalFontSize(
+  content: string,
+  availableWidth: number,
+  availableHeight: number,
+  role: 'title' | 'content' = 'content'
+): number {
+  // Role-specific configurations
+  const config = {
+    title: {
+      minSize: 18,
+      maxSize: 48,
+      maxLines: 3,
+      lineHeight: 1.2,
+      heightMargin: 0.9, // Use 90% of available height
+    },
+    content: {
+      minSize: 12,
+      maxSize: 24,
+      maxLines: 10,
+      lineHeight: 1.4,
+      heightMargin: 0.95, // Use 95% of available height
+    },
+  }[role];
 
+  const targetHeight = availableHeight * config.heightMargin;
+  const maxHeightPerLine = targetHeight / config.maxLines;
+
+  // Create measurement element once
+  const measureEl = document.createElement('div');
+  measureEl.style.cssText = `
+    position: absolute;
+    visibility: hidden;
+    top: -9999px;
+    width: ${availableWidth}px;
+    font-family: inherit;
+    line-height: ${config.lineHeight};
+    word-wrap: break-word;
+  `;
+
+  document.body.appendChild(measureEl);
+  measureEl.textContent = content;
+
+  // Start from max size and work down (faster for most cases)
+  let fontSize = config.maxSize;
+  let optimalSize = config.minSize;
+
+  while (fontSize >= config.minSize) {
+    measureEl.style.fontSize = `${fontSize}px`;
+
+    const height = measureEl.scrollHeight;
+    const estimatedLines = Math.ceil(height / (fontSize * config.lineHeight));
+
+    // Accept if it fits within height and reasonable line count
+    if (height <= targetHeight && estimatedLines <= config.maxLines) {
+      optimalSize = fontSize;
+      break;
+    }
+
+    // Decrement more aggressively for faster convergence
+    fontSize -= fontSize > 20 ? 2 : 1;
+  }
+
+  document.body.removeChild(measureEl);
+  return optimalSize;
+}
+
+/**
+ * @deprecated Use calculateLargestOptimalFontSize instead
+ * Since this function sometimes gives smaller font size than available space allows
+ */
 export function calculateOptimalFontSize(
   content: string,
   availableWidth: number,
@@ -94,7 +163,7 @@ export function calculateFontSizeForAvailableSpace(
   let optimalFontSize = 28; // Start with max reasonable size
 
   for (const item of items) {
-    const itemFontSize = calculateOptimalFontSize(
+    const itemFontSize = calculateLargestOptimalFontSize(
       `<span>${item}</span>`,
       availableWidth,
       avgHeightPerItem,

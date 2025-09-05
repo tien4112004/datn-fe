@@ -27,6 +27,14 @@ export interface MainImageLayoutSchema {
   };
 }
 
+export interface TitleLayoutSchema {
+  type: string;
+  data: {
+    title: string;
+    subtitle?: string;
+  };
+}
+
 function formatTitleContent(content: string, fontSize: number): string {
   return `<p style="text-align: center;"><strong><span style="font-size: ${fontSize}px;">${content}</span></strong></p>`;
 }
@@ -299,6 +307,102 @@ export const convertMainImage = async (
   return slide;
 };
 
+export const convertTitleSlide = async (
+  data: TitleLayoutSchema,
+  viewport: SlideViewport,
+  theme: SlideTheme
+) => {
+  // Initialize layout calculator
+  const layoutCalculator = new SlideLayoutCalculator(viewport.size, viewport.ratio);
+
+  // Calculate available width and height for title
+  const titleAvailableWidth = layoutCalculator.slideWidth * 0.9;
+  const titleAvailableHeight = Math.max(120, layoutCalculator.slideHeight * 0.18);
+  const titleFontSize = calculateLargestOptimalFontSize(
+    data.data.title,
+    titleAvailableWidth,
+    titleAvailableHeight,
+    'title'
+  );
+  const titleContent = formatTitleContent(data.data.title, titleFontSize);
+  const titleDimensions = layoutCalculator.calculateTitleDimensions(titleContent);
+  // Default top position for title
+  let titleTop = layoutCalculator.slideHeight * 0.28;
+
+  // If no subtitle, center the title more vertically
+  if (!data.data.subtitle) {
+    titleTop = (layoutCalculator.slideHeight - titleDimensions.height) / 2;
+  }
+
+  const titlePosition = {
+    left: layoutCalculator.getHorizontallyCenterPosition(titleDimensions.width),
+    top: titleTop,
+  };
+
+  // Subtitle (optional)
+  let subtitleElement = null;
+  if (data.data.subtitle) {
+    const subtitleAvailableWidth = layoutCalculator.slideWidth * 0.88;
+    const subtitleAvailableHeight = Math.max(60, layoutCalculator.slideHeight * 0.08);
+    const subtitleFontSize = calculateLargestOptimalFontSize(
+      data.data.subtitle,
+      subtitleAvailableWidth,
+      subtitleAvailableHeight,
+      'content'
+    );
+    const subtitleContent = `<p style="text-align: center;"><span style="font-size: ${subtitleFontSize}px;">${data.data.subtitle}</span></p>`;
+    // Use a larger maxWidthRatio for subtitle
+    const subtitleDimensions = layoutCalculator.calculateTextDimensions(subtitleContent, {
+      maxWidthRatio: 0.88,
+      padding: 20,
+    });
+    subtitleElement = {
+      id: generateUniqueId(),
+      type: 'text',
+      content: subtitleContent,
+      defaultFontName: theme.fontName,
+      defaultColor: theme.fontColor,
+      left: layoutCalculator.getHorizontallyCenterPosition(subtitleDimensions.width),
+      top: titlePosition.top + titleDimensions.height + 32,
+      width: subtitleDimensions.width,
+      height: subtitleDimensions.height,
+    } as PPTTextElement;
+  }
+
+  // Create slide elements
+  const elements = [
+    {
+      id: generateUniqueId(),
+      type: 'text',
+      content: titleContent,
+      defaultFontName: theme.fontName,
+      defaultColor: theme.fontColor,
+      left: titlePosition.left,
+      top: titlePosition.top,
+      width: titleDimensions.width,
+      height: titleDimensions.height,
+    } as PPTTextElement,
+    createTitleLine(
+      {
+        width: titleDimensions.width,
+        height: titleDimensions.height,
+        left: titlePosition.left,
+        top: titlePosition.top,
+      } as ElementBounds,
+      theme
+    ),
+  ];
+  if (subtitleElement) {
+    elements.push(subtitleElement);
+  }
+
+  const slide: Slide = {
+    id: generateUniqueId(),
+    elements,
+  };
+  return slide;
+};
+
 export const convertToSlide = async (data: any, viewport: SlideViewport, theme: SlideTheme) => {
   if (data.type === 'two_column_with_image') {
     return await convertTwoColumnWithImage(data, viewport, theme);
@@ -308,6 +412,9 @@ export const convertToSlide = async (data: any, viewport: SlideViewport, theme: 
   }
   if (data.type === 'main_image') {
     return await convertMainImage(data, viewport, theme);
+  }
+  if (data.type === 'title') {
+    return await convertTitleSlide(data, viewport, theme);
   }
   throw new Error('Unsupported layout type');
 };

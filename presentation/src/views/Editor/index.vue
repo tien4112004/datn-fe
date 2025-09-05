@@ -82,26 +82,53 @@ useGlobalHotkey();
 usePasteEvent();
 
 const handleClick = async () => {
-  const dataTest1 = {
-    type: 'two_column_with_big_image',
-    title: 'Presentation',
-    data: {
-      items: [
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. ',
-        'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. ',
-      ],
-      image: 'https://placehold.co/600x400',
+  const dataTests = [
+    {
+      type: 'title',
+      data: {
+        title: 'Presentation with really long title',
+      },
     },
-  };
-
-  const dataTest2 = {
-    type: 'main_image',
-    data: {
-      image: 'https://placehold.co/600x400',
-      content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+    {
+      type: 'title',
+      data: {
+        title: 'Presentation with really long title',
+        subtitle:
+          'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+      },
     },
-  };
+    {
+      type: 'two_column_with_image',
+      title: 'Presentation',
+      data: {
+        items: [
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. ',
+          'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. ',
+        ],
+        image: 'https://placehold.co/600x400',
+      },
+    },
+    {
+      type: 'two_column_with_big_image',
+      title: 'Presentation',
+      data: {
+        items: [
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. ',
+          'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. ',
+        ],
+        image: 'https://placehold.co/600x400',
+      },
+    },
+    {
+      type: 'main_image',
+      data: {
+        image: 'https://placehold.co/600x400',
+        content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+      },
+    },
+  ];
 
   const viewport = {
     size: slideStore.viewportSize,
@@ -128,12 +155,10 @@ const handleClick = async () => {
 
   slideStore.setTheme(theme); // This should be set after initialization
 
-  const slide1 = await convertToSlide(dataTest1, viewport, theme);
-
-  const slide2 = await convertToSlide(dataTest2, viewport, theme);
-
-  appendNewSlide(slide1);
-  appendNewSlide(slide2);
+  for (const data of dataTests) {
+    const slide = await convertToSlide(data, viewport, theme);
+    appendNewSlide(slide);
+  }
 
   console.log(slideStore.slides);
 };

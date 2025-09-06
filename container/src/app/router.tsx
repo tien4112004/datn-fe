@@ -20,6 +20,10 @@ const router = createBrowserRouter([
         Component: Demo.CardDemoPage,
       },
       {
+        path: 'presentation/thumbnail',
+        Component: Presentation.ThumbnailDemoPage,
+      },
+      {
         path: 'presentation',
         Component: Presentation.PresentationListPage,
       },

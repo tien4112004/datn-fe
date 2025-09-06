@@ -4,7 +4,6 @@ import { useSnapshotStore } from './snapshot';
 import { useKeyboardStore } from './keyboard';
 import { useScreenStore } from './screen';
 import { useContainerStore } from './container';
-import { useThumbnailDemoStore } from './thumbnailDemo';
 
 export {
   useMainStore,
@@ -13,5 +12,4 @@ export {
   useKeyboardStore,
   useScreenStore,
   useContainerStore,
-  useThumbnailDemoStore,
 };

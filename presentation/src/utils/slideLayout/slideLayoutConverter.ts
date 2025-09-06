@@ -60,7 +60,7 @@ export const convertTwoColumnWithImage = async (
 
   // Calculate title dimensions and font size based on available width
   const titleAvailableWidth = layoutCalculator.slideWidth * 0.9; // 90% of slide width
-  const titleAvailableHeight = Math.max(120, layoutCalculator.slideHeight * 0.15); // Responsive title height
+  const titleAvailableHeight = 120;
   const titleFontSize = calculateLargestOptimalFontSize(
     data.title,
     titleAvailableWidth,
@@ -81,7 +81,10 @@ export const convertTwoColumnWithImage = async (
   // Create item elements using the helper
   const itemElements = await createItemElements(
     data.data.items,
-    contentColumnBlock,
+    {
+      ...contentColumnBlock,
+      top: contentColumnBlock.top + titleDimensions.height + 40,
+    },
     layoutCalculator,
     theme,
     viewport,

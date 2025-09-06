@@ -134,22 +134,14 @@ jobs:
       - name: Build and Deploy Project
         id: deploy_vercel
         run: |
-          # Build with preview URL placeholder
-          VITE_BASE_URL="https://preview-placeholder.vercel.app" vercel build --token=${{ secrets.VERCEL_TOKEN }}
+          # Build the project (no VITE_BASE_URL needed - uses dynamic detection)
+          vercel build --token=${{ secrets.VERCEL_TOKEN }}
 
-          # Deploy to get the actual preview URL
+          # Deploy to get the preview URL
           DEPLOY_OUTPUT=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})
           echo "$DEPLOY_OUTPUT"
           PREVIEW_URL=$(echo "$DEPLOY_OUTPUT" | grep -oE "https://[a-zA-Z0-9.-]+\.vercel\.app" | tail -n 1)
           echo "preview_url=$PREVIEW_URL" >> "$GITHUB_OUTPUT"
-
-          # Set the correct VITE_BASE_URL for future builds
-          vercel env rm VITE_BASE_URL preview ${{ github.head_ref }} --yes --token=${{ secrets.VERCEL_TOKEN }} || true
-          echo "$PREVIEW_URL" | vercel env add VITE_BASE_URL preview ${{ github.head_ref }} --token=${{ secrets.VERCEL_TOKEN }}
-
-          # Rebuild and redeploy with the correct URL
-          VITE_BASE_URL="$PREVIEW_URL" vercel build --token=${{ secrets.VERCEL_TOKEN }}
-          vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }}
 
   deploy_container:
     name: Deploy Container Preview

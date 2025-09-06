@@ -10,7 +10,6 @@
 <script lang="ts" setup>
 import { onMounted } from 'vue';
 import { storeToRefs } from 'pinia';
-import { useRoute } from 'vue-router';
 import { useScreenStore, useMainStore, useSnapshotStore, useSlidesStore, useContainerStore } from '@/store';
 import { LOCALSTORAGE_KEY_DISCARDED_DB } from '@/configs/storage';
 import { deleteDiscardedDB } from '@/utils/database';
@@ -23,7 +22,6 @@ import Screen from './views/Screen/index.vue';
 import FullscreenSpin from '@/components/FullscreenSpin.vue';
 import type { Presentation } from './types/slides';
 
-const route = useRoute();
 const _isPC = isPC();
 
 const props = defineProps<{

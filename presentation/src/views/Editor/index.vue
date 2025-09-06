@@ -128,6 +128,21 @@ const handleClick = async () => {
         content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
       },
     },
+    {
+      type: 'two_column',
+      data: {
+        title: 'this is a title',
+        items1: [
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+        ],
+        items2: [
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+        ],
+      },
+    },
   ];
 
   const viewport = {

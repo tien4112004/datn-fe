@@ -35,6 +35,23 @@ export interface TitleLayoutSchema {
   };
 }
 
+export interface TwoColumnLayoutSchema {
+  type: string;
+  data: {
+    title: string;
+    items1: string[];
+    items2: string[];
+  };
+}
+
+export interface TransitionLayoutSchema {
+  type: string;
+  data: {
+    title: string;
+    subtitle: string;
+  };
+}
+
 function formatTitleContent(content: string, fontSize: number): string {
   return `<p style="text-align: center;"><strong><span style="font-size: ${fontSize}px;">${content}</span></strong></p>`;
 }
@@ -406,6 +423,98 @@ export const convertTitleSlide = async (
   return slide;
 };
 
+export const convertTwoColumn = async (
+  data: TwoColumnLayoutSchema,
+  viewport: SlideViewport,
+  theme: SlideTheme
+) => {
+  // Initialize layout calculator
+  const layoutCalculator = new SlideLayoutCalculator(viewport.size, viewport.ratio);
+
+  // Split slide into two equal columns
+  const columns = layoutCalculator.getColumnsLayout([50, 50]);
+  const leftColumnBlock = {
+    ...columns[0],
+    height: layoutCalculator.calculateAvailableHeight(40, 40),
+  };
+  const rightColumnBlock = {
+    ...columns[1],
+    height: layoutCalculator.calculateAvailableHeight(40, 40),
+  };
+
+  // Title
+  const titleAvailableWidth = layoutCalculator.slideWidth * 0.9;
+  const titleAvailableHeight = 100;
+  const titleFontSize = calculateLargestOptimalFontSize(
+    data.data.title,
+    titleAvailableWidth,
+    titleAvailableHeight,
+    'title'
+  );
+  const titleContent = formatTitleContent(data.data.title, titleFontSize);
+  const titleDimensions = layoutCalculator.calculateTitleDimensions(titleContent);
+  const titleLeft = layoutCalculator.getHorizontallyCenterPosition(titleDimensions.width);
+  const titleTop = 15;
+
+  // Create item elements for each column, positioned below the title with more spacing
+  const titleBottomSpacing = 60; // Increased spacing between title and content
+  const leftItems = await createItemElements(
+    data.data.items1,
+    {
+      ...leftColumnBlock,
+      top: leftColumnBlock.top + titleDimensions.height + titleBottomSpacing,
+      height: leftColumnBlock.height - titleDimensions.height - titleBottomSpacing,
+    },
+    layoutCalculator,
+    theme,
+    viewport,
+    { alignment: 'top', leftMargin: 40 }
+  );
+  const rightItems = await createItemElements(
+    data.data.items2,
+    {
+      ...rightColumnBlock,
+      top: rightColumnBlock.top + titleDimensions.height + titleBottomSpacing,
+      height: rightColumnBlock.height - titleDimensions.height - titleBottomSpacing,
+    },
+    layoutCalculator,
+    theme,
+    viewport,
+    { alignment: 'top', leftMargin: 40 }
+  );
+
+  // Create slide elements
+  const slide: Slide = {
+    id: generateUniqueId(),
+    elements: [
+      {
+        id: generateUniqueId(),
+        type: 'text',
+        content: titleContent,
+        defaultFontName: theme.fontName,
+        defaultColor: theme.fontColor,
+        left: titleLeft,
+        top: titleTop,
+        width: titleDimensions.width,
+        height: titleDimensions.height,
+      } as PPTTextElement,
+      createTitleLine(
+        {
+          width: titleDimensions.width,
+          height: titleDimensions.height,
+          left: titleLeft,
+          top: titleTop,
+        } as ElementBounds,
+        theme
+      ),
+      ...leftItems,
+      ...rightItems,
+    ],
+  };
+
+  return slide;
+};
+
 export const convertToSlide = async (data: any, viewport: SlideViewport, theme: SlideTheme) => {
   if (data.type === 'two_column_with_image') {
     return await convertTwoColumnWithImage(data, viewport, theme);
@@ -417,6 +526,12 @@ export const convertToSlide = async (data: any, viewport: SlideViewport, theme: 
     return await convertMainImage(data, viewport, theme);
   }
   if (data.type === 'title') {
+    return await convertTitleSlide(data, viewport, theme);
+  }
+  if (data.type === 'two_column') {
+    return await convertTwoColumn(data, viewport, theme);
+  }
+  if (data.type === 'transition') {
     return await convertTitleSlide(data, viewport, theme);
   }
   throw new Error('Unsupported layout type');

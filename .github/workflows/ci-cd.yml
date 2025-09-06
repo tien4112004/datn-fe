@@ -142,7 +142,7 @@ jobs:
           echo "$DEPLOY_OUTPUT"
           PREVIEW_URL=$(echo "$DEPLOY_OUTPUT" | grep -oE "https://[a-zA-Z0-9.-]+\.vercel\.app" | tail -n 1)
           echo "preview_url=$PREVIEW_URL" >> "$GITHUB_OUTPUT"
-          s
+
           # Set the correct VITE_BASE_URL for future builds
           vercel env rm VITE_BASE_URL preview ${{ github.head_ref }} --yes --token=${{ secrets.VERCEL_TOKEN }} || true
           echo "$PREVIEW_URL" | vercel env add VITE_BASE_URL preview ${{ github.head_ref }} --token=${{ secrets.VERCEL_TOKEN }}

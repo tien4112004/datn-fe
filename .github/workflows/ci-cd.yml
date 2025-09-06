@@ -9,6 +9,7 @@ on:
 env:
   TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
   TURBO_TEAM: 'datn-fe'
+  PRODUCTION_PRESENTATION_URL: 'https://datn-fe-presentation.vercel.app'
 jobs:
   path_filter:
     name: Check for path changes
@@ -130,24 +131,24 @@ jobs:
       - name: Pull Vercel Environment Information
         run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
 
-      - name: Build Vercel
-        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
-
-      - name: Deploy Project and Get URL
+      - name: Build and Deploy Project
         id: deploy_vercel
         run: |
-          # First deployment to get the URL
+          # Build with preview URL placeholder
+          VITE_BASE_URL="https://preview-placeholder.vercel.app" vercel build --token=${{ secrets.VERCEL_TOKEN }}
+
+          # Deploy to get the actual preview URL
           DEPLOY_OUTPUT=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})
           echo "$DEPLOY_OUTPUT"
           PREVIEW_URL=$(echo "$DEPLOY_OUTPUT" | grep -oE "https://[a-zA-Z0-9.-]+\.vercel\.app" | tail -n 1)
           echo "preview_url=$PREVIEW_URL" >> "$GITHUB_OUTPUT"
-          
-          # Set VITE_BASE_URL environment variable in Vercel
+          s
+          # Set the correct VITE_BASE_URL for future builds
           vercel env rm VITE_BASE_URL preview ${{ github.head_ref }} --yes --token=${{ secrets.VERCEL_TOKEN }} || true
           echo "$PREVIEW_URL" | vercel env add VITE_BASE_URL preview ${{ github.head_ref }} --token=${{ secrets.VERCEL_TOKEN }}
-          
-          # Rebuild and redeploy with the environment variable
-          vercel build --token=${{ secrets.VERCEL_TOKEN }}
+
+          # Rebuild and redeploy with the correct URL
+          VITE_BASE_URL="$PREVIEW_URL" vercel build --token=${{ secrets.VERCEL_TOKEN }}
           vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }}
 
   deploy_container:
@@ -205,41 +206,29 @@ jobs:
       - name: Pull Vercel Environment Information
         run: vercel pull --yes --environment=preview --git-branch=${{ github.head_ref }} --token=${{ secrets.VERCEL_TOKEN }}
 
-      - name: Set Vercel Environment Variable
+      - name: Set Environment Variables and Build
+        id: deploy_vercel
         run: |
-          # Always ensure PRESENTATION_URL is set with a fallback
+          # Determine PRESENTATION_URL with fallback
           if [ "${{ needs.deploy_presentation.result }}" = "success" ] && [ -n "${{ needs.deploy_presentation.outputs.preview_url }}" ]; then
             PRESENTATION_URL="${{ needs.deploy_presentation.outputs.preview_url }}"
           else
-            # Use fallback URL if presentation deployment failed or was skipped
-            PRESENTATION_URL="https://datn-fe-presentation.vercel.app"
+            PRESENTATION_URL="${{ env.PRODUCTION_PRESENTATION_URL }}"
           fi
 
-          # Remove existing env var and add new one
+          echo "Using PRESENTATION_URL: $PRESENTATION_URL"
+
+          # Set environment variable for this branch
           vercel env rm PRESENTATION_URL preview ${{ github.head_ref }} --yes --token=${{ secrets.VERCEL_TOKEN }} || true
           echo "$PRESENTATION_URL" | vercel env add PRESENTATION_URL preview ${{ github.head_ref }} --token=${{ secrets.VERCEL_TOKEN }}
 
-      - name: Generate vercel.json with dynamic rewrites
-        run: |
-          # Always ensure DESTINATION_URL is set with fallback
-          if [ "${{ needs.deploy_presentation.result }}" = "success" ] && [ -n "${{ needs.deploy_presentation.outputs.preview_url }}" ]; then
-            DESTINATION_URL="${{ needs.deploy_presentation.outputs.preview_url }}"
-          else
-            # Pull environment variables to get actual PRESENTATION_URL value
-            vercel env pull .env.local --environment=preview --git-branch=${{ github.head_ref }} --token=${{ secrets.VERCEL_TOKEN }}
-            DESTINATION_URL=$(grep PRESENTATION_URL .env.local | cut -d '=' -f2 | tr -d '"' 2>/dev/null || echo "")
-            # Always use fallback if DESTINATION_URL is empty
-            if [ -z "$DESTINATION_URL" ]; then
-              DESTINATION_URL="https://datn-fe-presentation.vercel.app"
-            fi
-          fi
-
+          # Generate vercel.json with the correct destination
           cat <<EOF > container/vercel.json
           {
             "rewrites": [
                 {
                     "source": "/vue-remote",
-                    "destination": "$DESTINATION_URL"
+                    "destination": "$PRESENTATION_URL"
                 },
                 {
                     "source": "/((?!api/).*)",
@@ -248,24 +237,13 @@ jobs:
             ]
           }
           EOF
-          echo "Generated vercel.json with destination: $DESTINATION_URL"
+          echo "Generated vercel.json:"
           cat container/vercel.json
 
-      - name: Build Vercel
-        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+          # Build with the environment variable
+          PRESENTATION_URL="$PRESENTATION_URL" vercel build --token=${{ secrets.VERCEL_TOKEN }}
 
-      - name: Deploy Project and Get URL
-        id: deploy_vercel
-        run: |
-          # Set PRESENTATION_URL for deployment
-          if [ "${{ needs.deploy_presentation.result }}" = "success" ] && [ -n "${{ needs.deploy_presentation.outputs.preview_url }}" ]; then
-            PRESENTATION_URL="${{ needs.deploy_presentation.outputs.preview_url }}"
-          else
-            # Pull environment variables to get actual PRESENTATION_URL value
-            vercel env pull .env.local --environment=preview --git-branch=${{ github.head_ref }} --token=${{ secrets.VERCEL_TOKEN }}
-            PRESENTATION_URL=$(grep PRESENTATION_URL .env.local | cut -d '=' -f2 | tr -d '"' || echo "https://datn-fe-presentation.vercel.app")
-          fi
-
+          # Deploy the project
           DEPLOY_OUTPUT=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }} --env PRESENTATION_URL="$PRESENTATION_URL")
           echo "$DEPLOY_OUTPUT"
           PREVIEW_URL=$(echo "$DEPLOY_OUTPUT" | grep -oE "https://[a-zA-Z0-9.-]+\.vercel\.app" | tail -n 1)

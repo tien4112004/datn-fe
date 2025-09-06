@@ -72,7 +72,6 @@ const demoSlides = [
   },
 ];
 
-// Simple Vue ThumbnailSlide wrapper following PresentationWrapper pattern
 const VueThumbnailSlide = ({ slide, size, visible }: { slide: any; size: number; visible: boolean }) => {
   const containerRef = useRef(null);
   const hasMounted = useRef(false);
@@ -104,7 +103,6 @@ const VueThumbnailSlide = ({ slide, size, visible }: { slide: any; size: number;
       });
   }, []);
 
-  // vue-remote class matches the style's name in presentation styles
   return (
     <>
       <div ref={containerRef} className="w-90 h-40" />

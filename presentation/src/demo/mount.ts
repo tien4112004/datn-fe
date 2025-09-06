@@ -10,8 +10,6 @@ import i18n from '@/locales';
 export function mount(el: string | Element, props: Record<string, unknown> = {}) {
   const app = createApp(ThumbnailSlide, props);
 
-  console.log('Mounting ThumbnailSlide with props:', props);
-
   const pinia = createPinia();
   app.use(pinia);
   app.use(i18n);

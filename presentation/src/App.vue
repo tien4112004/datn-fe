@@ -1,13 +1,14 @@
 <template>
-  <template v-if="slides.length || isDemo">
+  <template v-if="slides.length">
     <Screen v-if="screening" />
-    <router-view v-else />
+    <Editor v-else-if="_isPC" />
+    <Mobile v-else />
   </template>
   <FullscreenSpin :tip="$t('app.initializing')" v-else loading :mask="false" class="spin" />
 </template>
 
 <script lang="ts" setup>
-import { onMounted, computed } from 'vue';
+import { onMounted } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useRoute } from 'vue-router';
 import { useScreenStore, useMainStore, useSnapshotStore, useSlidesStore, useContainerStore } from '@/store';
@@ -15,7 +16,9 @@ import { LOCALSTORAGE_KEY_DISCARDED_DB } from '@/configs/storage';
 import { deleteDiscardedDB } from '@/utils/database';
 import { isPC } from '@/utils/common';
 import api from '@/services';
-//
+
+import Editor from './views/Editor/index.vue';
+import Mobile from './views/Mobile/index.vue';
 import Screen from './views/Screen/index.vue';
 import FullscreenSpin from '@/components/FullscreenSpin.vue';
 import type { Presentation } from './types/slides';
@@ -36,9 +39,6 @@ const containerStore = useContainerStore();
 const { databaseId } = storeToRefs(mainStore);
 const { slides } = storeToRefs(slidesStore);
 const { screening } = storeToRefs(useScreenStore());
-
-// Check if current route is demo to allow access without slides
-const isDemo = computed(() => route.name === 'demo');
 
 if (import.meta.env.MODE !== 'development') {
   window.onbeforeunload = () => false;

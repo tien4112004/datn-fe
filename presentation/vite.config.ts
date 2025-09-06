@@ -8,8 +8,18 @@ import Icons from 'unplugin-icons/dist/vite.js';
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
   const port = env.PORT ? parseInt(env.PORT, 10) : 5174;
+
+  // Dynamic base URL: use relative path for production, absolute for development
+  const getBaseUrl = () => {
+    if (mode === 'development') {
+      return `http://localhost:${port}/`;
+    }
+    // For production/preview builds, use relative path so it works on any domain
+    return './';
+  };
+
   return {
-    base: process.env.VITE_BASE_URL || env.VITE_BASE_URL || 'http://localhost:5174/',
+    base: getBaseUrl(),
     plugins: [
       vue(),
       federation({
@@ -18,6 +28,7 @@ export default defineConfig(({ mode }) => {
         filename: 'remoteEntry.js',
         exposes: {
           './Editor': './src/mount.ts',
+          './ThumbnailSlide': './src/demo/mount.ts',
         },
       }),
       Icons({ compiler: 'vue3' }),

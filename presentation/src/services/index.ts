@@ -17,20 +17,22 @@ interface AIPPTPayload {
   model: string;
 }
 
+import { getBaseUrl } from '@/utils/base-url';
+
 export default {
   getMockData(filename: string): Promise<any> {
-    return axios.get(`${import.meta.env.VITE_BASE_URL}/mocks/${filename}.json`);
+    return axios.get(`${getBaseUrl()}/mocks/${filename}.json`);
   },
 
   getFileData(filename: string): Promise<any> {
-    return axios.get(`${import.meta.env.VITE_BASE_URL}/mocks/${filename}.json`);
+    return axios.get(`${getBaseUrl()}/mocks/${filename}.json`);
   },
 
   AIPPT_Outline({ content, language, model }: AIPPTOutlinePayload): Promise<any> {
-    return fetch(`${import.meta.env.VITE_BASE_URL}/mocks/AIPPT_Outline.md`);
+    return fetch(`${getBaseUrl()}/mocks/AIPPT_Outline.md`);
   },
 
   AIPPT({ content, language, style, model }: AIPPTPayload): Promise<any> {
-    return fetch(`${import.meta.env.VITE_BASE_URL}/mocks/AIPPT.json`);
+    return fetch(`${getBaseUrl()}/mocks/AIPPT.json`);
   },
 };

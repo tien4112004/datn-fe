@@ -7,6 +7,7 @@ import { useSortable } from '@dnd-kit/sortable';
 import { Trash } from 'lucide-react';
 import React from 'react';
 import useOutlineStore from '@/features/presentation/stores/useOutlineStore';
+import { motion } from 'motion/react';
 
 interface OutlineCardProps {
   id: string;
@@ -42,7 +43,6 @@ const OutlineCard = ({ id, title = 'Outline', className = '', onDelete }: Outlin
 
   React.useEffect(() => {
     loadInitialHTML();
-    console.log('OutlineCard mounted');
   }, [editor]);
 
   const handleDelete = () => {
@@ -77,7 +77,14 @@ const OutlineCard = ({ id, title = 'Outline', className = '', onDelete }: Outlin
           onClick={handleDelete}
           className="absolute right-2 top-2 z-10 h-8 w-8 p-0 text-gray-400 opacity-0 transition-opacity duration-200 hover:bg-transparent hover:text-red-500 group-hover:opacity-100"
         >
-          <Trash className="h-4 w-4" />
+          <motion.div
+            whileHover={{
+              scale: 1.1,
+              rotate: -10,
+            }}
+          >
+            <Trash className="h-4 w-4" />
+          </motion.div>
         </Button>
       )}
       <CardHeader {...attributes} {...listeners} className="bg-accent w-24 rounded-l-xl p-2 text-center">

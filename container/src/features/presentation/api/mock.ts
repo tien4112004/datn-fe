@@ -130,11 +130,13 @@ export default class PresentationMockService implements PresentationApiService {
 
   async createPresentation(data: Presentation): Promise<Presentation> {
     return new Promise((resolve) => {
-      setTimeout(() => resolve({ ...data, id: String(Date.now()) }), 500);
+      const id = String(Date.now());
+      mockPresentationItems.push({ ...data, id });
+      setTimeout(() => resolve({ ...data, id }), 500);
     });
   }
 
-  getPresentationById(id: string): Promise<Presentation | null> {
+  async getPresentationById(id: string): Promise<Presentation | null> {
     return new Promise((resolve) => {
       setTimeout(() => {
         const presentation = mockPresentationItems.find((item) => item.id === id) || null;

@@ -26,7 +26,7 @@ export const useContainerStore = defineStore('container', {
     initialize(data: Partial<ContainerState>) {
       this.titleTest = data?.titleTest || '';
       this.isRemote = data?.isRemote || false;
-      this.presentation = markRaw(data?.presentation as Presentation);
+      this.presentation = data?.presentation ? markRaw(data?.presentation as Presentation) : undefined;
     },
   },
 });

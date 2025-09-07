@@ -7,7 +7,7 @@ import type {
 } from '@/types/slides';
 import { generateUniqueId } from './utils';
 import { getImageSize } from '../image';
-import { calculateFontSizeForAvailableSpace } from './fontSizeCalculator';
+import { calculateFontSizeForAvailableSpace, calculateLargestOptimalFontSize } from './fontSizeCalculator';
 import type {
   SlideViewport,
   SlideLayoutCalculator,
@@ -120,6 +120,87 @@ export const createItemElements = async (
       height: position.height,
     } as PPTTextElement;
   });
+};
+
+interface TitleLayoutOptions {
+  horizontalAlignment?: 'left' | 'center' | 'right';
+  topOffset?: number;
+}
+
+function formatTitleContent(content: string, fontSize: number): string {
+  return `<p style="text-align: center;"><strong><span style="font-size: ${fontSize}px;">${content}</span></strong></p>`;
+}
+
+export const calculateTitleLayout = (
+  title: string,
+  availableBlock: LayoutBlock,
+  layoutCalculator: SlideLayoutCalculator,
+  options: TitleLayoutOptions = {}
+) => {
+  const { horizontalAlignment = 'center', topOffset } = options;
+
+  // Calculate optimal font size using the available block dimensions
+  const titleFontSize = calculateLargestOptimalFontSize(
+    title,
+    availableBlock.width,
+    availableBlock.height,
+    'title'
+  );
+
+  // Format the title content
+  const titleContent = formatTitleContent(title, titleFontSize);
+
+  // Calculate title dimensions
+  const titleDimensions = layoutCalculator.calculateTitleDimensions(titleContent);
+
+  // Calculate horizontal position based on alignment
+  let horizontalPosition: number;
+  switch (horizontalAlignment) {
+    case 'left':
+      horizontalPosition = availableBlock.left;
+      break;
+    case 'right':
+      horizontalPosition = availableBlock.left + availableBlock.width - titleDimensions.width;
+      break;
+    case 'center':
+    default:
+      horizontalPosition = availableBlock.left + (availableBlock.width - titleDimensions.width) / 2;
+      break;
+  }
+
+  // Calculate vertical position
+  const verticalPosition = topOffset !== undefined ? topOffset : availableBlock.top;
+
+  const titlePosition = {
+    left: horizontalPosition,
+    top: verticalPosition,
+  };
+
+  return {
+    titleContent,
+    titleDimensions,
+    titlePosition,
+    titleFontSize,
+  };
+};
+
+export const createTitleElement = (
+  content: string,
+  position: { left: number; top: number },
+  dimensions: { width: number; height: number },
+  theme: SlideTheme
+): PPTTextElement => {
+  return {
+    id: generateUniqueId(),
+    type: 'text',
+    content,
+    defaultFontName: theme.fontName,
+    defaultColor: theme.fontColor,
+    left: position.left,
+    top: position.top,
+    width: dimensions.width,
+    height: dimensions.height,
+  } as PPTTextElement;
 };
 
 export const createTitleLine = (titleDimensions: ElementBounds, theme: SlideTheme) => {

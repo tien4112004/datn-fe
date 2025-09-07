@@ -8,7 +8,13 @@ import {
 } from './slideLayout';
 import { calculateLargestOptimalFontSize } from './fontSizeCalculator';
 import { generateUniqueId } from './utils';
-import { createTitleLine, createImageElement, createItemElements } from './graphic';
+import {
+  createTitleLine,
+  createImageElement,
+  createItemElements,
+  createTitleElement,
+  calculateTitleLayout,
+} from './graphic';
 
 export interface TwoColumnWithImageLayoutSchema {
   type: string;
@@ -59,10 +65,6 @@ export interface TableOfContentsLayoutSchema {
   };
 }
 
-function formatTitleContent(content: string, fontSize: number): string {
-  return `<p style="text-align: center;"><strong><span style="font-size: ${fontSize}px;">${content}</span></strong></p>`;
-}
-
 // function formatItemContent(content: string, fontSize: number): string {
 //   return `<p style="text-align: left;"><span style="font-size: ${fontSize}px;">${content}</span></p>`;
 // }
@@ -82,17 +84,18 @@ export const convertTwoColumnWithImage = async (
     height: layoutCalculator.calculateAvailableHeight(100, 40),
   };
 
-  // Calculate title dimensions and font size based on available width
-  const titleAvailableWidth = layoutCalculator.slideWidth * 0.9; // 90% of slide width
-  const titleAvailableHeight = 120;
-  const titleFontSize = calculateLargestOptimalFontSize(
+  // Calculate title layout using the new helper
+  const titleAvailableBlock = {
+    left: 0,
+    top: 15,
+    width: layoutCalculator.slideWidth,
+    height: 120,
+  };
+  const { titleContent, titleDimensions, titlePosition } = calculateTitleLayout(
     data.title,
-    titleAvailableWidth,
-    titleAvailableHeight,
-    'title'
+    titleAvailableBlock,
+    layoutCalculator
   );
-  const titleContent = formatTitleContent(data.title, titleFontSize);
-  const titleDimensions = layoutCalculator.calculateTitleDimensions(titleContent);
   const imageDimensions = layoutCalculator.calculateImageDimensions();
 
   // Get image position in first column
@@ -115,23 +118,16 @@ export const convertTwoColumnWithImage = async (
     { alignment: 'center', leftMargin: 40 }
   );
 
-  const titlePositions = [layoutCalculator.getHorizontallyCenterPosition(titleDimensions.width), 15];
-
   // Create slide elements
   const slide: Slide = {
     id: generateUniqueId(),
     elements: [
-      {
-        id: generateUniqueId(),
-        type: 'text',
-        content: titleContent,
-        defaultFontName: theme.fontName,
-        defaultColor: theme.fontColor,
-        left: titlePositions[0],
-        top: titlePositions[1],
-        width: titleDimensions.width,
-        height: titleDimensions.height,
-      } as PPTTextElement,
+      createTitleElement(
+        titleContent,
+        { left: titlePosition.left, top: titlePosition.top },
+        { width: titleDimensions.width, height: titleDimensions.height },
+        theme
+      ),
       await createImageElement(data.data.image, {
         ...imagePosition,
         ...imageDimensions,
@@ -141,8 +137,8 @@ export const convertTwoColumnWithImage = async (
         {
           width: titleDimensions.width,
           height: titleDimensions.height,
-          left: titlePositions[0],
-          top: titlePositions[1],
+          left: titlePosition.left,
+          top: titlePosition.top,
         } as ElementBounds,
         theme
       ),
@@ -175,21 +171,18 @@ export const convertTwoColumnWithBigImage = async (
   const imageHeight = viewport.size * viewport.ratio;
   const imageWidth = leftColumnBlock.width;
 
-  // Calculate title dimensions and position - position in the combined content area
-  const titleAvailableWidth = contentColumnBlock.width;
-  const titleAvailableHeight = 240;
-  const titleFontSize = calculateLargestOptimalFontSize(
-    data.title,
-    titleAvailableWidth,
-    titleAvailableHeight,
-    'title'
-  );
-  const titleContent = formatTitleContent(data.title, titleFontSize);
-  const titleDimensions = layoutCalculator.calculateTextDimensions(titleContent);
-  const titlePosition = {
-    left: contentColumnBlock.left + (contentColumnBlock.width - titleDimensions.width) / 2,
+  // Calculate title layout using the new helper
+  const titleAvailableBlock = {
+    left: contentColumnBlock.left,
     top: 15,
+    width: contentColumnBlock.width,
+    height: 240,
   };
+  const { titleContent, titleDimensions, titlePosition } = calculateTitleLayout(
+    data.title,
+    titleAvailableBlock,
+    layoutCalculator
+  );
 
   const contentAvailableWidth = contentColumnBlock.width;
   const contentAvailableHeight = contentColumnBlock.height - 160; // Reserve space for title
@@ -216,17 +209,12 @@ export const convertTwoColumnWithBigImage = async (
   const slide: Slide = {
     id: generateUniqueId(),
     elements: [
-      {
-        id: generateUniqueId(),
-        type: 'text',
-        content: titleContent,
-        defaultFontName: theme.fontName,
-        defaultColor: theme.fontColor,
-        left: titlePosition.left,
-        top: titlePosition.top,
-        width: titleDimensions.width,
-        height: titleDimensions.height,
-      } as PPTTextElement,
+      createTitleElement(
+        titleContent,
+        { left: titlePosition.left, top: titlePosition.top },
+        { width: titleDimensions.width, height: titleDimensions.height },
+        theme
+      ),
       await createImageElement(
         data.data.image,
         { left: 0, top: 0, width: imageWidth, height: imageHeight } as ImageBounds,
@@ -342,29 +330,36 @@ export const convertTitleSlide = async (
   // Initialize layout calculator
   const layoutCalculator = new SlideLayoutCalculator(viewport.size, viewport.ratio);
 
-  // Calculate available width and height for title
-  const titleAvailableWidth = layoutCalculator.slideWidth * 0.9;
+  // Calculate title layout using the new helper
   const titleAvailableHeight = Math.max(120, layoutCalculator.slideHeight * 0.18);
-  const titleFontSize = calculateLargestOptimalFontSize(
-    data.data.title,
-    titleAvailableWidth,
-    titleAvailableHeight,
-    'title'
-  );
-  const titleContent = formatTitleContent(data.data.title, titleFontSize);
-  const titleDimensions = layoutCalculator.calculateTitleDimensions(titleContent);
-  // Default top position for title
   let titleTop = layoutCalculator.slideHeight * 0.28;
 
-  // If no subtitle, center the title more vertically
+  // If no subtitle, center the title more vertically - need to calculate dimensions first
+  const titleAvailableBlock = {
+    left: 0,
+    top: titleTop,
+    width: layoutCalculator.slideWidth,
+    height: titleAvailableHeight,
+  };
+
+  let { titleContent, titleDimensions, titlePosition } = calculateTitleLayout(
+    data.data.title,
+    titleAvailableBlock,
+    layoutCalculator
+  );
+
+  // If no subtitle, recalculate with centered position
   if (!data.data.subtitle) {
     titleTop = (layoutCalculator.slideHeight - titleDimensions.height) / 2;
+    const centeredTitleBlock = {
+      ...titleAvailableBlock,
+      top: titleTop,
+    };
+    const centeredLayout = calculateTitleLayout(data.data.title, centeredTitleBlock, layoutCalculator);
+    titleContent = centeredLayout.titleContent;
+    titleDimensions = centeredLayout.titleDimensions;
+    titlePosition = centeredLayout.titlePosition;
   }
-
-  const titlePosition = {
-    left: layoutCalculator.getHorizontallyCenterPosition(titleDimensions.width),
-    top: titleTop,
-  };
 
   // Subtitle (optional)
   let subtitleElement = null;
@@ -398,17 +393,12 @@ export const convertTitleSlide = async (
 
   // Create slide elements
   const elements = [
-    {
-      id: generateUniqueId(),
-      type: 'text',
-      content: titleContent,
-      defaultFontName: theme.fontName,
-      defaultColor: theme.fontColor,
-      left: titlePosition.left,
-      top: titlePosition.top,
-      width: titleDimensions.width,
-      height: titleDimensions.height,
-    } as PPTTextElement,
+    createTitleElement(
+      titleContent,
+      { left: titlePosition.left, top: titlePosition.top },
+      { width: titleDimensions.width, height: titleDimensions.height },
+      theme
+    ),
     createTitleLine(
       {
         width: titleDimensions.width,
@@ -450,18 +440,17 @@ export const convertTwoColumn = async (
   };
 
   // Title
-  const titleAvailableWidth = layoutCalculator.slideWidth * 0.9;
-  const titleAvailableHeight = 100;
-  const titleFontSize = calculateLargestOptimalFontSize(
+  const titleAvailableBlock = {
+    left: 0,
+    top: 15,
+    width: layoutCalculator.slideWidth,
+    height: 100,
+  };
+  const { titleContent, titleDimensions, titlePosition } = calculateTitleLayout(
     data.data.title,
-    titleAvailableWidth,
-    titleAvailableHeight,
-    'title'
+    titleAvailableBlock,
+    layoutCalculator
   );
-  const titleContent = formatTitleContent(data.data.title, titleFontSize);
-  const titleDimensions = layoutCalculator.calculateTitleDimensions(titleContent);
-  const titleLeft = layoutCalculator.getHorizontallyCenterPosition(titleDimensions.width);
-  const titleTop = 15;
 
   // Create item elements for each column, positioned below the title with more spacing
   const titleBottomSpacing = 60; // Increased spacing between title and content
@@ -494,23 +483,18 @@ export const convertTwoColumn = async (
   const slide: Slide = {
     id: generateUniqueId(),
     elements: [
-      {
-        id: generateUniqueId(),
-        type: 'text',
-        content: titleContent,
-        defaultFontName: theme.fontName,
-        defaultColor: theme.fontColor,
-        left: titleLeft,
-        top: titleTop,
-        width: titleDimensions.width,
-        height: titleDimensions.height,
-      } as PPTTextElement,
+      createTitleElement(
+        titleContent,
+        { left: titlePosition.left, top: titlePosition.top },
+        { width: titleDimensions.width, height: titleDimensions.height },
+        theme
+      ),
       createTitleLine(
         {
           width: titleDimensions.width,
           height: titleDimensions.height,
-          left: titleLeft,
-          top: titleTop,
+          left: titlePosition.left,
+          top: titlePosition.top,
         } as ElementBounds,
         theme
       ),
@@ -557,27 +541,26 @@ export const convertTableOfContents = async (
 
   // Title "Contents"
   const titleText = 'Contents';
-  const titleAvailableWidth = layoutCalculator.slideWidth * 0.9;
-  const titleAvailableHeight = 100;
-  const titleFontSize = calculateLargestOptimalFontSize(
+  const titleAvailableBlock = {
+    left: 0,
+    top: 15,
+    width: layoutCalculator.slideWidth,
+    height: 100,
+  };
+  const { titleContent, titleDimensions, titlePosition } = calculateTitleLayout(
     titleText,
-    titleAvailableWidth,
-    titleAvailableHeight,
-    'title'
+    titleAvailableBlock,
+    layoutCalculator
   );
-  const titleContent = formatTitleContent(titleText, titleFontSize);
-  const titleDimensions = layoutCalculator.calculateTitleDimensions(titleContent);
-  const titleLeft = layoutCalculator.getHorizontallyCenterPosition(titleDimensions.width);
-  const titleTop = 15;
 
   // Create item elements for table of contents
   const items = await createItemElements(
     numberedItems,
     {
       left: 0,
-      top: titleTop + titleDimensions.height + 40, // Position below title with spacing
+      top: titlePosition.top + titleDimensions.height + 40, // Position below title with spacing
       width: layoutCalculator.slideWidth,
-      height: layoutCalculator.slideHeight - (titleTop + titleDimensions.height) - 40,
+      height: layoutCalculator.slideHeight - (titlePosition.top + titleDimensions.height) - 40,
     },
     layoutCalculator,
     theme,
@@ -589,23 +572,18 @@ export const convertTableOfContents = async (
   const slide: Slide = {
     id: generateUniqueId(),
     elements: [
-      {
-        id: generateUniqueId(),
-        type: 'text',
-        content: titleContent,
-        defaultFontName: theme.fontName,
-        defaultColor: theme.fontColor,
-        left: titleLeft,
-        top: titleTop,
-        width: titleDimensions.width,
-        height: titleDimensions.height,
-      } as PPTTextElement,
+      createTitleElement(
+        titleContent,
+        { left: titlePosition.left, top: titlePosition.top },
+        { width: titleDimensions.width, height: titleDimensions.height },
+        theme
+      ),
       createTitleLine(
         {
           width: titleDimensions.width,
           height: titleDimensions.height,
-          left: titleLeft,
-          top: titleTop,
+          left: titlePosition.left,
+          top: titlePosition.top,
         } as ElementBounds,
         theme
       ),

@@ -237,7 +237,37 @@ export class SlideLayoutCalculator {
 
   // Convenience methods with preset options
   calculateTitleDimensions(content: string): Size {
-    return this.calculateTextDimensions(content, { maxWidthRatio: 0.9 });
+    const paddingX = 40;
+    const paddingY = 20;
+
+    // Measure without wrapping to get natural width - never allow wrapping for titles
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = content;
+    tempDiv.style.cssText = `
+      visibility: hidden;
+      position: absolute;
+      top: -9999px;
+      white-space: nowrap;
+    `;
+
+    // Apply nowrap to all child elements to prevent any wrapping
+    const allElements = tempDiv.querySelectorAll('*');
+    allElements.forEach((el) => {
+      (el as HTMLElement).style.whiteSpace = 'nowrap';
+    });
+
+    document.body.appendChild(tempDiv);
+
+    const naturalWidth = tempDiv.offsetWidth;
+    const naturalHeight = tempDiv.offsetHeight;
+
+    document.body.removeChild(tempDiv);
+
+    // Always return natural dimensions with padding - no wrapping allowed
+    return {
+      width: naturalWidth + paddingX,
+      height: naturalHeight + paddingY,
+    };
   }
 
   calculateImageDimensions(): Size {

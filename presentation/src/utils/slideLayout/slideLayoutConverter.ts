@@ -5,6 +5,7 @@ import {
   type Size,
   type ElementBounds,
   type ImageBounds,
+  type LayoutBlock,
 } from './slideLayout';
 import { calculateLargestOptimalFontSize, calculateFontSizeForAvailableSpace } from './fontSizeCalculator';
 import { generateUniqueId } from './utils';
@@ -15,6 +16,9 @@ import {
   createItemElementsWithStyles,
   createTitleElement,
   calculateTitleLayout,
+  createHorizontalItemBlocks,
+  createHorizontalItemElements,
+  calculateRowDistribution,
   type ItemStyles,
 } from './graphic';
 
@@ -57,6 +61,17 @@ export interface VerticalListLayoutSchema {
   title: string;
   data: {
     items: string[];
+  };
+}
+
+export interface HorizontalListLayoutSchema {
+  type: string;
+  title: string;
+  data: {
+    items: {
+      label: string;
+      content: string;
+    }[];
   };
 }
 
@@ -717,6 +732,90 @@ export const convertVerticalList = async (
   }
 };
 
+export const convertHorizontalList = async (
+  data: HorizontalListLayoutSchema,
+  viewport: SlideViewport,
+  theme: SlideTheme
+) => {
+  // Initialize layout calculator
+  const layoutCalculator = new SlideLayoutCalculator(viewport.size, viewport.ratio, theme);
+
+  // Calculate title layout
+  const titleAvailableBlock = {
+    left: 0,
+    top: 15,
+    width: layoutCalculator.slideWidth,
+    height: 120,
+  };
+
+  const { titleContent, titleDimensions, titlePosition } = calculateTitleLayout(
+    data.title,
+    titleAvailableBlock,
+    layoutCalculator
+  );
+
+  // Calculate available space for horizontal items
+  const contentTopMargin = titlePosition.top + titleDimensions.height + 60; // Space after title and line
+  const contentBottomMargin = 40; // Bottom margin
+  const actualContentHeight = layoutCalculator.slideHeight - contentTopMargin - contentBottomMargin;
+
+  const contentAvailableBlock = {
+    left: 40, // Left margin
+    top: contentTopMargin,
+    width: layoutCalculator.slideWidth - 80, // Left and right margins
+    height: actualContentHeight,
+  };
+
+  // Calculate row distribution
+  const { topRowItems, bottomRowItems } = calculateRowDistribution(data.data.items.length);
+
+  // Calculate column width based on the row with more items
+  const maxItemsPerRow = Math.max(topRowItems, bottomRowItems || 0);
+  const columnWidth = contentAvailableBlock.width / maxItemsPerRow;
+
+  // Create horizontal item blocks
+  const itemBlocks = createHorizontalItemBlocks(
+    data.data.items,
+    columnWidth,
+    contentAvailableBlock.height,
+    layoutCalculator,
+    viewport
+  );
+
+  // Create horizontal item elements
+  const itemElements = await createHorizontalItemElements(
+    itemBlocks,
+    contentAvailableBlock,
+    layoutCalculator,
+    theme
+  );
+
+  // Create slide
+  const slide: Slide = {
+    id: generateUniqueId(),
+    elements: [
+      createTitleElement(
+        titleContent,
+        { left: titlePosition.left, top: titlePosition.top },
+        { width: titleDimensions.width, height: titleDimensions.height },
+        theme
+      ),
+      createTitleLine(
+        {
+          width: titleDimensions.width,
+          height: titleDimensions.height,
+          left: titlePosition.left,
+          top: titlePosition.top,
+        } as ElementBounds,
+        theme
+      ),
+      ...itemElements,
+    ],
+  };
+
+  return slide;
+};
+
 export const convertTransition = async (
   data: TransitionLayoutSchema,
   viewport: SlideViewport,
@@ -834,6 +933,9 @@ export const convertToSlide = async (data: any, viewport: SlideViewport, theme: 
   }
   if (data.type === 'vertical_list') {
     return await convertVerticalList(data, viewport, theme);
+  }
+  if (data.type === 'horizontal_list') {
+    return await convertHorizontalList(data, viewport, theme);
   }
   if (data.type === 'transition') {
     return await convertTransition(data, viewport, theme);

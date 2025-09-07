@@ -272,3 +272,229 @@ export const createTitleLine = (titleDimensions: ElementBounds, theme: SlideThem
     points: ['', ''],
   } as PPTLineElement;
 };
+
+// ----------------------------------------------------
+// Horizontal List Layout
+// ----------------------------------------------------
+
+// Utility functions for horizontal list layout
+interface HorizontalItemBlock {
+  labelContent: string;
+  contentContent: string;
+  labelDimensions: Size;
+  contentDimensions: Size;
+  totalHeight: number;
+}
+
+/**
+ * Formats label content with proper styling
+ */
+function formatLabelContent(label: string, fontSize: number): string {
+  return `<p style="text-align: center;"><strong><span style="font-size: ${fontSize}px;">${label}</span></strong></p>`;
+}
+
+/**
+ * Formats item content with proper styling
+ */
+function formatHorizontalItemContent(content: string, fontSize: number, lineHeight: number): string {
+  return `<p style="text-align: center; line-height: ${lineHeight};"><span style="font-size: ${fontSize}px;">${content}</span></p>`;
+}
+
+/**
+ * Creates horizontal item blocks with calculated dimensions
+ */
+export function createHorizontalItemBlocks(
+  items: { label: string; content: string }[],
+  columnWidth: number,
+  availableHeight: number,
+  layoutCalculator: SlideLayoutCalculator,
+  viewport: SlideViewport
+): HorizontalItemBlock[] {
+  const LABEL_CONTENT_SPACING = 10;
+  const ITEM_PADDING = 10;
+
+  return items.map((item) => {
+    // Calculate available space for this item column
+    const itemAvailableBlock: LayoutBlock = {
+      left: 0,
+      top: 0,
+      width: columnWidth - ITEM_PADDING,
+      height: availableHeight,
+    };
+
+    // Calculate optimal font sizes for label and content
+    const labelFontSize = calculateLargestOptimalFontSize(
+      item.label,
+      itemAvailableBlock.width,
+      availableHeight * 0.3, // Labels should take max 30% of height
+      'content'
+    );
+
+    const contentFontSize = calculateLargestOptimalFontSize(
+      item.content,
+      itemAvailableBlock.width,
+      availableHeight * 0.6, // Content should take max 60% of height
+      'content'
+    );
+
+    // Format content
+    const labelContent = formatLabelContent(item.label, labelFontSize);
+    const contentContent = formatHorizontalItemContent(item.content, contentFontSize, contentFontSize * 1.2);
+
+    // Calculate dimensions
+    const labelDimensions = layoutCalculator.calculateTextDimensionsForBlock(
+      labelContent,
+      itemAvailableBlock
+    );
+    const contentDimensions = layoutCalculator.calculateTextDimensionsForBlock(
+      contentContent,
+      itemAvailableBlock
+    );
+
+    const totalHeight = labelDimensions.height + LABEL_CONTENT_SPACING + contentDimensions.height;
+
+    return {
+      labelContent,
+      contentContent,
+      labelDimensions,
+      contentDimensions,
+      totalHeight,
+    };
+  });
+}
+
+/**
+ * Calculates row distribution for horizontal layout
+ */
+export function calculateRowDistribution(totalItems: number): {
+  topRowItems: number;
+  bottomRowItems: number;
+} {
+  if (totalItems <= 4) {
+    return { topRowItems: totalItems, bottomRowItems: 0 };
+  } else {
+    // For 5+ items, distribute with top row having more if odd
+    const topRowItems = Math.ceil(totalItems / 2);
+    const bottomRowItems = totalItems - topRowItems;
+    return { topRowItems, bottomRowItems };
+  }
+}
+
+/**
+ * Creates horizontal item elements positioned in rows
+ */
+export async function createHorizontalItemElements(
+  itemBlocks: HorizontalItemBlock[],
+  availableBlock: LayoutBlock,
+  layoutCalculator: SlideLayoutCalculator,
+  theme: SlideTheme
+): Promise<PPTTextElement[]> {
+  const elements: PPTTextElement[] = [];
+  const { topRowItems, bottomRowItems } = calculateRowDistribution(itemBlocks.length);
+
+  const LABEL_CONTENT_SPACING = 15;
+
+  // Calculate the maximum height needed for alignment
+  const maxTopRowHeight = Math.max(...itemBlocks.slice(0, topRowItems).map((block) => block.totalHeight));
+  console.log(itemBlocks);
+  const maxBottomRowHeight =
+    bottomRowItems > 0 ? Math.max(...itemBlocks.slice(topRowItems).map((block) => block.totalHeight)) : 0;
+
+  const startY = availableBlock.top;
+
+  // Top row
+  const topRowWidth = availableBlock.width;
+  const topColumnWidth = topRowWidth / topRowItems;
+
+  for (let i = 0; i < topRowItems; i++) {
+    const block = itemBlocks[i];
+    const columnLeft = availableBlock.left + i * topColumnWidth;
+    const columnCenterX = columnLeft + topColumnWidth / 2;
+
+    // Center items within their column
+    const labelLeft = columnCenterX - block.labelDimensions.width / 2;
+    const contentLeft = columnCenterX - block.contentDimensions.width / 2;
+
+    // Align items vertically within the row
+    const itemStartY = startY + (maxTopRowHeight - block.totalHeight) / 2;
+
+    // Create label element
+    elements.push({
+      id: generateUniqueId(),
+      type: 'text',
+      content: block.labelContent,
+      defaultFontName: theme.fontName,
+      defaultColor: theme.fontColor,
+      left: labelLeft,
+      top: itemStartY,
+      width: block.labelDimensions.width,
+      height: block.labelDimensions.height,
+      textType: 'content',
+    } as PPTTextElement);
+
+    // Create content element
+    elements.push({
+      id: generateUniqueId(),
+      type: 'text',
+      content: block.contentContent,
+      defaultFontName: theme.fontName,
+      defaultColor: theme.fontColor,
+      left: contentLeft,
+      top: itemStartY + block.labelDimensions.height + LABEL_CONTENT_SPACING,
+      width: block.contentDimensions.width,
+      height: block.contentDimensions.height,
+      textType: 'content',
+    } as PPTTextElement);
+  }
+
+  // Bottom row (if needed)
+  if (bottomRowItems > 0) {
+    // TODO: Fix this
+    let bottomRowY = startY + 128 + 56;
+    // let bottomRowY = startY + maxTopRowHeight;
+    const bottomColumnWidth = availableBlock.width / bottomRowItems;
+
+    for (let i = 0; i < bottomRowItems; i++) {
+      const block = itemBlocks[topRowItems + i];
+      const columnLeft = availableBlock.left + i * bottomColumnWidth;
+      const columnCenterX = columnLeft + bottomColumnWidth / 2;
+
+      // Center items within their column
+      const labelLeft = columnCenterX - block.labelDimensions.width / 2;
+      const contentLeft = columnCenterX - block.contentDimensions.width / 2;
+
+      // Align items vertically within the row
+      const itemStartY = bottomRowY + (maxBottomRowHeight - block.totalHeight) / 2;
+
+      // Create label element
+      elements.push({
+        id: generateUniqueId(),
+        type: 'text',
+        content: block.labelContent,
+        defaultFontName: theme.fontName,
+        defaultColor: theme.fontColor,
+        left: labelLeft,
+        top: itemStartY,
+        width: block.labelDimensions.width,
+        height: block.labelDimensions.height,
+        textType: 'content',
+      } as PPTTextElement);
+
+      // Create content element
+      elements.push({
+        id: generateUniqueId(),
+        type: 'text',
+        content: block.contentContent,
+        defaultFontName: theme.fontName,
+        defaultColor: theme.fontColor,
+        left: contentLeft,
+        top: itemStartY + block.labelDimensions.height + LABEL_CONTENT_SPACING,
+        width: block.contentDimensions.width,
+        height: block.contentDimensions.height,
+        textType: 'content',
+      } as PPTTextElement);
+    }
+  }
+
+  return elements;
+}

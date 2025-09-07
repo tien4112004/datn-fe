@@ -6,14 +6,16 @@ import {
   type ElementBounds,
   type ImageBounds,
 } from './slideLayout';
-import { calculateLargestOptimalFontSize } from './fontSizeCalculator';
+import { calculateLargestOptimalFontSize, calculateFontSizeForAvailableSpace } from './fontSizeCalculator';
 import { generateUniqueId } from './utils';
 import {
   createTitleLine,
   createImageElement,
   createItemElements,
+  createItemElementsWithStyles,
   createTitleElement,
   calculateTitleLayout,
+  type ItemStyles,
 } from './graphic';
 
 export interface TwoColumnWithImageLayoutSchema {
@@ -47,6 +49,14 @@ export interface TwoColumnLayoutSchema {
     title: string;
     items1: string[];
     items2: string[];
+  };
+}
+
+export interface VerticalListLayoutSchema {
+  type: string;
+  title: string;
+  data: {
+    items: string[];
   };
 }
 
@@ -105,16 +115,25 @@ export const convertTwoColumnWithImage = async (
     0
   );
 
-  // Create item elements using the helper
-  const itemElements = await createItemElements(
+  // Calculate unified styles for items
+  const contentAvailableBlock = {
+    ...contentColumnBlock,
+    top: contentColumnBlock.top + titleDimensions.height + 40,
+  };
+  const contentStyles: ItemStyles = calculateFontSizeForAvailableSpace(
     data.data.items,
-    {
-      ...contentColumnBlock,
-      top: contentColumnBlock.top + titleDimensions.height + 40,
-    },
+    contentAvailableBlock.width,
+    contentAvailableBlock.height,
+    viewport
+  );
+
+  // Create item elements using the unified styles
+  const itemElements = await createItemElementsWithStyles(
+    data.data.items,
+    contentAvailableBlock,
     layoutCalculator,
     theme,
-    viewport,
+    contentStyles,
     { alignment: 'center', leftMargin: 40 }
   );
 
@@ -196,12 +215,21 @@ export const convertTwoColumnWithBigImage = async (
     width: contentAvailableWidth,
     height: contentAvailableHeight,
   };
-  const itemElements = await createItemElements(
+
+  // Calculate unified styles for items
+  const contentStyles: ItemStyles = calculateFontSizeForAvailableSpace(
+    data.data.items,
+    customAvailableBlock.width,
+    customAvailableBlock.height,
+    viewport
+  );
+
+  const itemElements = await createItemElementsWithStyles(
     data.data.items,
     customAvailableBlock,
     layoutCalculator,
     theme,
-    viewport,
+    contentStyles,
     { alignment: 'top', leftMargin: 40 }
   );
 
@@ -454,28 +482,46 @@ export const convertTwoColumn = async (
 
   // Create item elements for each column, positioned below the title with more spacing
   const titleBottomSpacing = 60; // Increased spacing between title and content
-  const leftItems = await createItemElements(
+  const leftContentBlock = {
+    ...leftColumnBlock,
+    top: leftColumnBlock.top + titleDimensions.height + titleBottomSpacing,
+    height: leftColumnBlock.height - titleDimensions.height - titleBottomSpacing,
+  };
+  const rightContentBlock = {
+    ...rightColumnBlock,
+    top: rightColumnBlock.top + titleDimensions.height + titleBottomSpacing,
+    height: rightColumnBlock.height - titleDimensions.height - titleBottomSpacing,
+  };
+
+  // Calculate unified styles for both columns combined
+  const allItems = [...data.data.items1, ...data.data.items2];
+  const unifiedBlock = {
+    left: 0,
+    top: 0,
+    width: leftContentBlock.width,
+    height: leftContentBlock.height * 2, // Account for both columns
+  };
+  const contentStyles: ItemStyles = calculateFontSizeForAvailableSpace(
+    allItems,
+    unifiedBlock.width,
+    unifiedBlock.height,
+    viewport
+  );
+
+  const leftItems = await createItemElementsWithStyles(
     data.data.items1,
-    {
-      ...leftColumnBlock,
-      top: leftColumnBlock.top + titleDimensions.height + titleBottomSpacing,
-      height: leftColumnBlock.height - titleDimensions.height - titleBottomSpacing,
-    },
+    leftContentBlock,
     layoutCalculator,
     theme,
-    viewport,
+    contentStyles,
     { alignment: 'top', leftMargin: 40 }
   );
-  const rightItems = await createItemElements(
+  const rightItems = await createItemElementsWithStyles(
     data.data.items2,
-    {
-      ...rightColumnBlock,
-      top: rightColumnBlock.top + titleDimensions.height + titleBottomSpacing,
-      height: rightColumnBlock.height - titleDimensions.height - titleBottomSpacing,
-    },
+    rightContentBlock,
     layoutCalculator,
     theme,
-    viewport,
+    contentStyles,
     { alignment: 'top', leftMargin: 40 }
   );
 
@@ -504,6 +550,171 @@ export const convertTwoColumn = async (
   };
 
   return slide;
+};
+
+export const convertVerticalList = async (
+  data: VerticalListLayoutSchema,
+  viewport: SlideViewport,
+  theme: SlideTheme
+) => {
+  // Initialize layout calculator
+  const layoutCalculator = new SlideLayoutCalculator(viewport.size, viewport.ratio, theme);
+
+  // Title
+  const titleAvailableBlock = {
+    left: 0,
+    top: 15,
+    width: layoutCalculator.slideWidth,
+    height: 100,
+  };
+  const { titleContent, titleDimensions, titlePosition } = calculateTitleLayout(
+    data.title,
+    titleAvailableBlock,
+    layoutCalculator
+  );
+
+  const titleBottomSpacing = 60;
+  const items = data.data.items;
+
+  // Auto-wrapping logic: if items > 5, split into two columns
+  if (items.length > 5) {
+    // Split into two columns
+    const columns = layoutCalculator.getColumnsLayout([50, 50]);
+    const leftColumnBlock = {
+      ...columns[0],
+      height: layoutCalculator.calculateAvailableHeight(40, 40),
+    };
+    const rightColumnBlock = {
+      ...columns[1],
+      height: layoutCalculator.calculateAvailableHeight(40, 40),
+    };
+
+    const columnContentHeight = leftColumnBlock.height - titleDimensions.height - titleBottomSpacing;
+
+    // Create unified block for style calculation
+    const unifiedBlock = {
+      left: 0,
+      top: 0,
+      width: leftColumnBlock.width * 1.25, // Slightly increased width for better fit
+      height: columnContentHeight * 2,
+    };
+
+    // Calculate unified styles using all items
+    const contentStyles: ItemStyles = calculateFontSizeForAvailableSpace(
+      items,
+      unifiedBlock.width,
+      unifiedBlock.height,
+      viewport
+    );
+
+    // Split items into two columns
+    const midpoint = Math.ceil(items.length / 2);
+    const leftItems = items.slice(0, midpoint);
+    const rightItems = items.slice(midpoint);
+
+    // Create item elements for each column
+    const leftItemElements = await createItemElementsWithStyles(
+      leftItems,
+      {
+        ...leftColumnBlock,
+        top: leftColumnBlock.top + titleDimensions.height + titleBottomSpacing,
+        height: columnContentHeight,
+      },
+      layoutCalculator,
+      theme,
+      contentStyles,
+      { alignment: 'top', leftMargin: 20 }
+    );
+    const rightItemsElements = await createItemElementsWithStyles(
+      rightItems,
+      {
+        ...rightColumnBlock,
+        top: rightColumnBlock.top + titleDimensions.height + titleBottomSpacing,
+        height: columnContentHeight,
+      },
+      layoutCalculator,
+      theme,
+      contentStyles,
+      { alignment: 'top', leftMargin: 20 }
+    );
+
+    // Create slide elements
+    const slide: Slide = {
+      id: generateUniqueId(),
+      elements: [
+        createTitleElement(
+          titleContent,
+          { left: titlePosition.left, top: titlePosition.top },
+          { width: titleDimensions.width, height: titleDimensions.height },
+          theme
+        ),
+        createTitleLine(
+          {
+            width: titleDimensions.width,
+            height: titleDimensions.height,
+            left: titlePosition.left,
+            top: titlePosition.top,
+          } as ElementBounds,
+          theme
+        ),
+        ...leftItemElements,
+        ...rightItemsElements,
+      ],
+    };
+
+    return slide;
+  } else {
+    // Single column layout for 5 or fewer items
+    const singleColumnBlock = {
+      left: 0,
+      top: titlePosition.top + titleDimensions.height + titleBottomSpacing,
+      width: layoutCalculator.slideWidth,
+      height: layoutCalculator.calculateAvailableHeight(40, 40) - titleDimensions.height - titleBottomSpacing,
+    };
+
+    // Calculate unified styles for items
+    const contentStyles: ItemStyles = calculateFontSizeForAvailableSpace(
+      items,
+      singleColumnBlock.width,
+      singleColumnBlock.height,
+      viewport
+    );
+
+    // Create item elements using unified styles
+    const itemElements = await createItemElementsWithStyles(
+      items,
+      singleColumnBlock,
+      layoutCalculator,
+      theme,
+      contentStyles,
+      { alignment: 'top', leftMargin: 60 }
+    );
+
+    // Create slide elements
+    const slide: Slide = {
+      id: generateUniqueId(),
+      elements: [
+        createTitleElement(
+          titleContent,
+          { left: titlePosition.left, top: titlePosition.top },
+          { width: titleDimensions.width, height: titleDimensions.height },
+          theme
+        ),
+        createTitleLine(
+          {
+            width: titleDimensions.width,
+            height: titleDimensions.height,
+            left: titlePosition.left,
+            top: titlePosition.top,
+          } as ElementBounds,
+          theme
+        ),
+        ...itemElements,
+      ],
+    };
+
+    return slide;
+  }
 };
 
 export const convertTransition = async (
@@ -553,18 +764,29 @@ export const convertTableOfContents = async (
     layoutCalculator
   );
 
-  // Create item elements for table of contents
-  const items = await createItemElements(
+  // Calculate available block for table of contents items
+  const tocContentBlock = {
+    left: 0,
+    top: titlePosition.top + titleDimensions.height + 40, // Position below title with spacing
+    width: layoutCalculator.slideWidth,
+    height: layoutCalculator.slideHeight - (titlePosition.top + titleDimensions.height) - 40,
+  };
+
+  // Calculate unified styles for items
+  const contentStyles: ItemStyles = calculateFontSizeForAvailableSpace(
     numberedItems,
-    {
-      left: 0,
-      top: titlePosition.top + titleDimensions.height + 40, // Position below title with spacing
-      width: layoutCalculator.slideWidth,
-      height: layoutCalculator.slideHeight - (titlePosition.top + titleDimensions.height) - 40,
-    },
+    tocContentBlock.width,
+    tocContentBlock.height,
+    viewport
+  );
+
+  // Create item elements for table of contents
+  const items = await createItemElementsWithStyles(
+    numberedItems,
+    tocContentBlock,
     layoutCalculator,
     theme,
-    viewport,
+    contentStyles,
     { alignment: 'top', leftMargin: 60 } // Increased left margin for better aesthetics
   );
 
@@ -609,6 +831,9 @@ export const convertToSlide = async (data: any, viewport: SlideViewport, theme: 
   }
   if (data.type === 'two_column') {
     return await convertTwoColumn(data, viewport, theme);
+  }
+  if (data.type === 'vertical_list') {
+    return await convertVerticalList(data, viewport, theme);
   }
   if (data.type === 'transition') {
     return await convertTransition(data, viewport, theme);

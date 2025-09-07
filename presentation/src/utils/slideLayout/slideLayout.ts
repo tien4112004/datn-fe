@@ -99,6 +99,7 @@ export class SlideLayoutCalculator {
     tempDiv.style.cssText = `
       visibility: hidden;
       top: -9999px;
+	  font-family: ${this.theme.fontName};
     `;
 
     // Apply nowrap to all child elements to prevent any wrapping
@@ -122,6 +123,7 @@ export class SlideLayoutCalculator {
         visibility: hidden;
         width: ${maxWidth - padding * 2}px;
         top: -9999px;
+		font-family: ${this.theme.fontName};
       `;
 
       const allWrappedElements = wrappedDiv.querySelectorAll('*');

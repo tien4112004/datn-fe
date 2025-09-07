@@ -63,10 +63,21 @@ interface ItemLayoutOptions {
   leftMargin?: number;
 }
 
+export interface ItemStyles {
+  fontSize: number;
+  lineHeight: number;
+  spacing: number;
+}
+
 function formatItemContentWithLineHeight(content: string, fontSize: number, lineHeight: number): string {
   return `<p style="text-align: left; line-height: ${lineHeight};"><span style="font-size: ${fontSize}px;">${content}</span></p>`;
 }
 
+/**
+ * @deprecated Use createItemElementsWithUnifiedStyles instead for better consistency across layouts
+ * This function will be removed in a future version.
+ * Migration: Replace with createItemElementsWithUnifiedStyles and pass unified styles calculated with calculateFontSizeForAvailableSpace
+ */
 export const createItemElements = async (
   items: string[],
   availableBlock: LayoutBlock,
@@ -101,6 +112,48 @@ export const createItemElements = async (
     itemContentsAndDimensions.map((item) => item.dimensions),
     availableBlock,
     adaptiveStyles.spacing,
+    options
+  );
+
+  // Create PPTTextElement objects
+  return itemContentsAndDimensions.map((item, index) => {
+    const position = itemPositions[index];
+
+    return {
+      id: generateUniqueId(),
+      type: 'text',
+      content: item.content,
+      defaultFontName: theme.fontName,
+      defaultColor: theme.fontColor,
+      left: position.left,
+      top: position.top,
+      width: position.width,
+      height: position.height,
+      textType: 'content',
+    } as PPTTextElement;
+  });
+};
+
+export const createItemElementsWithStyles = async (
+  items: string[],
+  availableBlock: LayoutBlock,
+  layoutCalculator: SlideLayoutCalculator,
+  theme: SlideTheme,
+  itemStyles: ItemStyles,
+  options: ItemLayoutOptions = {}
+): Promise<PPTTextElement[]> => {
+  // Pre-calculate all item dimensions using the unified styles
+  const itemContentsAndDimensions = items.map((item) => {
+    const itemContent = formatItemContentWithLineHeight(item, itemStyles.fontSize, itemStyles.lineHeight);
+    const itemDimensions = layoutCalculator.calculateTextDimensionsForBlock(itemContent, availableBlock);
+    return { content: itemContent, dimensions: itemDimensions };
+  });
+
+  // Calculate positions using the unified spacing
+  const itemPositions = layoutCalculator.layoutItemsInBlock(
+    itemContentsAndDimensions.map((item) => item.dimensions),
+    availableBlock,
+    itemStyles.spacing,
     options
   );
 

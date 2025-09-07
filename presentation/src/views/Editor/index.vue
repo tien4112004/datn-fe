@@ -169,7 +169,7 @@ const handleClick = async () => {
     backgroundColor: '#ffffff',
     themeColors: ['#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6'],
     fontColor: '#333333',
-    fontName: 'Arial',
+    fontName: 'Roboto',
     outline: {
       style: 'solid',
       width: 1,
@@ -181,6 +181,8 @@ const handleClick = async () => {
       blur: 4,
       color: 'rgba(0, 0, 0, 0.1)',
     },
+    titleFontColor: '#0A2540',
+    titleFontName: 'Montserrat',
   } as SlideTheme;
 
   slideStore.setTheme(theme); // This should be set after initialization

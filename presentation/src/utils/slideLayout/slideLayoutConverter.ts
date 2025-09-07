@@ -75,7 +75,7 @@ export const convertTwoColumnWithImage = async (
   theme: SlideTheme
 ) => {
   // Initialize layout calculator
-  const layoutCalculator = new SlideLayoutCalculator(viewport.size, viewport.ratio);
+  const layoutCalculator = new SlideLayoutCalculator(viewport.size, viewport.ratio, theme);
 
   // Calculate available space for content column (column 1, right side)
   const columns = layoutCalculator.getColumnsLayout([50, 50]);
@@ -157,7 +157,7 @@ export const convertTwoColumnWithBigImage = async (
   theme: SlideTheme
 ) => {
   // Initialize layout calculator
-  const layoutCalculator = new SlideLayoutCalculator(viewport.size, viewport.ratio);
+  const layoutCalculator = new SlideLayoutCalculator(viewport.size, viewport.ratio, theme);
 
   // Use flexible column layout: 33% for image, 67% for content
   const columns = layoutCalculator.getColumnsLayout([33, 67]);
@@ -244,7 +244,7 @@ export const convertMainImage = async (
   theme: SlideTheme
 ) => {
   // Initialize layout calculator
-  const layoutCalculator = new SlideLayoutCalculator(viewport.size, viewport.ratio);
+  const layoutCalculator = new SlideLayoutCalculator(viewport.size, viewport.ratio, theme);
 
   // Calculate image dimensions - larger for main image layout
   const imageWidth = layoutCalculator.slideWidth * 0.6; // 60% of slide width
@@ -328,7 +328,7 @@ export const convertTitleSlide = async (
   theme: SlideTheme
 ) => {
   // Initialize layout calculator
-  const layoutCalculator = new SlideLayoutCalculator(viewport.size, viewport.ratio);
+  const layoutCalculator = new SlideLayoutCalculator(viewport.size, viewport.ratio, theme);
 
   // Calculate title layout using the new helper
   const titleAvailableHeight = Math.max(120, layoutCalculator.slideHeight * 0.18);
@@ -426,7 +426,7 @@ export const convertTwoColumn = async (
   theme: SlideTheme
 ) => {
   // Initialize layout calculator
-  const layoutCalculator = new SlideLayoutCalculator(viewport.size, viewport.ratio);
+  const layoutCalculator = new SlideLayoutCalculator(viewport.size, viewport.ratio, theme);
 
   // Split slide into two equal columns
   const columns = layoutCalculator.getColumnsLayout([50, 50]);
@@ -537,7 +537,7 @@ export const convertTableOfContents = async (
   }
 
   // Initialize layout calculator
-  const layoutCalculator = new SlideLayoutCalculator(viewport.size, viewport.ratio);
+  const layoutCalculator = new SlideLayoutCalculator(viewport.size, viewport.ratio, theme);
 
   // Title "Contents"
   const titleText = 'Contents';

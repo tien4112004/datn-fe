@@ -1,3 +1,5 @@
+import type { SlideTheme } from '@/types/slides';
+
 // Core geometric types
 export interface Point {
   x: number;
@@ -66,10 +68,12 @@ export interface ItemPosition extends AvailableBlock {}
 export class SlideLayoutCalculator {
   private viewportSize: number;
   private viewportRatio: number;
+  private theme: SlideTheme;
 
-  constructor(viewportSize: number, viewportRatio: number) {
+  constructor(viewportSize: number, viewportRatio: number, theme: SlideTheme) {
     this.viewportSize = viewportSize;
     this.viewportRatio = viewportRatio;
+    this.theme = theme;
   }
 
   get slideWidth(): number {
@@ -174,6 +178,7 @@ export class SlideLayoutCalculator {
       position: absolute;
       top: -9999px;
       white-space: nowrap;
+	  font-family: ${this.theme.fontName};
     `;
 
     document.body.appendChild(tempDiv);
@@ -193,6 +198,7 @@ export class SlideLayoutCalculator {
         width: ${maxWidth - PADDING * 2}px;
         white-space: normal;
         overflow-wrap: break-word;
+		font-family: ${this.theme.fontName};
       `;
 
       document.body.appendChild(expandedDiv);
@@ -215,6 +221,7 @@ export class SlideLayoutCalculator {
         width: ${maxWidth - PADDING * 2}px;
         white-space: normal;
         overflow-wrap: break-word;
+		font-family: ${this.theme.fontName};
       `;
 
       document.body.appendChild(wrappedDiv);
@@ -248,6 +255,7 @@ export class SlideLayoutCalculator {
       position: absolute;
       top: -9999px;
       white-space: nowrap;
+	  font-family: ${this.theme.titleFontName};
     `;
 
     // Apply nowrap to all child elements to prevent any wrapping

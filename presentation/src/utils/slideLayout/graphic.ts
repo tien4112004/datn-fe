@@ -118,6 +118,7 @@ export const createItemElements = async (
       top: position.top,
       width: position.width,
       height: position.height,
+      textType: 'content',
     } as PPTTextElement;
   });
 };
@@ -194,12 +195,13 @@ export const createTitleElement = (
     id: generateUniqueId(),
     type: 'text',
     content,
-    defaultFontName: theme.fontName,
-    defaultColor: theme.fontColor,
+    defaultFontName: theme.titleFontName || theme.fontName,
+    defaultColor: theme.titleFontColor || theme.fontColor,
     left: position.left,
     top: position.top,
     width: dimensions.width,
     height: dimensions.height,
+    textType: 'title',
   } as PPTTextElement;
 };
 

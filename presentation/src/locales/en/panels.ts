@@ -51,7 +51,7 @@ export default {
         endPage: 'End Page',
       },
       textTypes: {
-        textTitle: 'Title',
+        title: 'Title',
         subtitle: 'Subtitle',
         content: 'Content',
         listItem: 'List Item',

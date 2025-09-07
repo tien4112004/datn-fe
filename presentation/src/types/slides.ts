@@ -791,6 +791,8 @@ export interface SlideTheme {
   themeColors: string[];
   fontColor: string;
   fontName: string;
+  titleFontName: string;
+  titleFontColor: string;
   outline: PPTElementOutline;
   shadow: PPTElementShadow;
 }

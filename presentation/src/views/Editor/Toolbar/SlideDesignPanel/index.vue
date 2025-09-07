@@ -158,6 +158,29 @@
       </Popover>
     </div>
     <div class="row">
+      <div style="width: 40%">{{ $t('styling.slide.design.theme.titleFont') }}</div>
+      <Select
+        style="width: 60%"
+        :value="theme.titleFontName"
+        search
+        :searchLabel="$t('styling.slide.design.theme.searchFont')"
+        @update:value="(value) => updateTheme({ titleFontName: value as string })"
+        :options="FONTS"
+      />
+    </div>
+    <div class="row">
+      <div style="width: 40%">{{ $t('styling.slide.design.theme.titleFontColor') }}</div>
+      <Popover trigger="click" style="width: 60%">
+        <template #content>
+          <ColorPicker
+            :modelValue="theme.titleFontColor"
+            @update:modelValue="(value) => updateTheme({ titleFontColor: value })"
+          />
+        </template>
+        <ColorButton :color="theme.titleFontColor" />
+      </Popover>
+    </div>
+    <div class="row">
       <div style="width: 40%">{{ $t('styling.slide.design.theme.backgroundColor') }}</div>
       <Popover trigger="click" style="width: 60%">
         <template #content>

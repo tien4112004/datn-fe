@@ -143,6 +143,21 @@ const handleClick = async () => {
         ],
       },
     },
+    {
+      type: 'table_of_contents',
+      data: {
+        items: [
+          'What & Why of Microservices',
+          'Monolith vs Microservices',
+          'Service Design Principles',
+          'Communication & Data',
+          'Deployment & Scaling',
+          'Observability & Resilience',
+          'Security & Governance',
+          'Case Study & Q&A',
+        ],
+      },
+    },
   ];
 
   const viewport = {

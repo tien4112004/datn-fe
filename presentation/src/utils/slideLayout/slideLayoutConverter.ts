@@ -52,6 +52,13 @@ export interface TransitionLayoutSchema {
   };
 }
 
+export interface TableOfContentsLayoutSchema {
+  type: string;
+  data: {
+    items: string[];
+  };
+}
+
 function formatTitleContent(content: string, fontSize: number): string {
   return `<p style="text-align: center;"><strong><span style="font-size: ${fontSize}px;">${content}</span></strong></p>`;
 }
@@ -515,6 +522,100 @@ export const convertTwoColumn = async (
   return slide;
 };
 
+export const convertTransition = async (
+  data: TransitionLayoutSchema,
+  viewport: SlideViewport,
+  theme: SlideTheme
+) => {
+  return await convertTitleSlide(data, viewport, theme);
+};
+
+export const convertTableOfContents = async (
+  data: TableOfContentsLayoutSchema,
+  viewport: SlideViewport,
+  theme: SlideTheme
+) => {
+  // Numbering
+  const numberedItems = data.data.items.map((item, index) => `${index + 1}. ${item}`);
+
+  // If too many items, switch to two-column layout
+  if (numberedItems.length >= 8) {
+    const newData = {
+      type: 'two_column',
+      data: {
+        title: 'Contents',
+        items1: numberedItems.slice(0, Math.ceil(numberedItems.length / 2)),
+        items2: numberedItems.slice(Math.ceil(numberedItems.length / 2)),
+      },
+    } as TwoColumnLayoutSchema;
+
+    return await convertTwoColumn(newData, viewport, theme);
+  }
+
+  // Initialize layout calculator
+  const layoutCalculator = new SlideLayoutCalculator(viewport.size, viewport.ratio);
+
+  // Title "Contents"
+  const titleText = 'Contents';
+  const titleAvailableWidth = layoutCalculator.slideWidth * 0.9;
+  const titleAvailableHeight = 100;
+  const titleFontSize = calculateLargestOptimalFontSize(
+    titleText,
+    titleAvailableWidth,
+    titleAvailableHeight,
+    'title'
+  );
+  const titleContent = formatTitleContent(titleText, titleFontSize);
+  const titleDimensions = layoutCalculator.calculateTitleDimensions(titleContent);
+  const titleLeft = layoutCalculator.getHorizontallyCenterPosition(titleDimensions.width);
+  const titleTop = 15;
+
+  // Create item elements for table of contents
+  const items = await createItemElements(
+    numberedItems,
+    {
+      left: 0,
+      top: titleTop + titleDimensions.height + 40, // Position below title with spacing
+      width: layoutCalculator.slideWidth,
+      height: layoutCalculator.slideHeight - (titleTop + titleDimensions.height) - 40,
+    },
+    layoutCalculator,
+    theme,
+    viewport,
+    { alignment: 'top', leftMargin: 60 } // Increased left margin for better aesthetics
+  );
+
+  // Create slide elements
+  const slide: Slide = {
+    id: generateUniqueId(),
+    elements: [
+      {
+        id: generateUniqueId(),
+        type: 'text',
+        content: titleContent,
+        defaultFontName: theme.fontName,
+        defaultColor: theme.fontColor,
+        left: titleLeft,
+        top: titleTop,
+        width: titleDimensions.width,
+        height: titleDimensions.height,
+      } as PPTTextElement,
+      createTitleLine(
+        {
+          width: titleDimensions.width,
+          height: titleDimensions.height,
+          left: titleLeft,
+          top: titleTop,
+        } as ElementBounds,
+        theme
+      ),
+      ...items,
+    ],
+  };
+
+  return slide;
+};
+
 export const convertToSlide = async (data: any, viewport: SlideViewport, theme: SlideTheme) => {
   if (data.type === 'two_column_with_image') {
     return await convertTwoColumnWithImage(data, viewport, theme);
@@ -532,7 +633,10 @@ export const convertToSlide = async (data: any, viewport: SlideViewport, theme: 
     return await convertTwoColumn(data, viewport, theme);
   }
   if (data.type === 'transition') {
-    return await convertTitleSlide(data, viewport, theme);
+    return await convertTransition(data, viewport, theme);
+  }
+  if (data.type === 'table_of_contents') {
+    return await convertTableOfContents(data, viewport, theme);
   }
   throw new Error('Unsupported layout type');
 };

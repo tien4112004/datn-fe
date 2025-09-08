@@ -478,8 +478,8 @@ export async function createHorizontalItemElements(
   // Bottom row (if needed)
   if (bottomRowItems > 0) {
     // TODO: Fix this
-    let bottomRowY = startY + 128 + 56;
-    // let bottomRowY = startY + maxTopRowHeight;
+    // let bottomRowY = startY + 128 + 56;
+    let bottomRowY = startY + maxTopRowHeight;
     const bottomColumnWidth = availableBlock.width / bottomRowItems;
 
     for (let i = 0; i < bottomRowItems; i++) {

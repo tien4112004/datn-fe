@@ -7,7 +7,18 @@ import type {
 } from '@/types/slides';
 import { generateUniqueId } from './utils';
 import { getImageSize } from '../image';
-import { calculateFontSizeForAvailableSpace, calculateLargestOptimalFontSize } from './fontSizeCalculator';
+import {
+  calculateLargestOptimalFontSize,
+  calculateFontSizeForAvailableSpace,
+  applyFontSizeToElements,
+  applyFontSizeToElement,
+} from './fontSizeCalculator';
+import {
+  createItemElement,
+  createTitleElement,
+  createLabelElement,
+  createHorizontalItemContentElement,
+} from './htmlTextCreation';
 import type {
   SlideViewport,
   SlideLayoutCalculator,
@@ -67,18 +78,10 @@ export interface ItemStyles {
   fontSize: number;
   lineHeight: number;
   spacing: number;
+  fontFamily?: string;
 }
 
-function formatItemContentWithLineHeight(content: string, fontSize: number, lineHeight: number): string {
-  return `<p style="text-align: left; line-height: ${lineHeight};"><span style="font-size: ${fontSize}px;">${content}</span></p>`;
-}
-
-/**
- * @deprecated Use createItemElementsWithUnifiedStyles instead for better consistency across layouts
- * This function will be removed in a future version.
- * Migration: Replace with createItemElementsWithUnifiedStyles and pass unified styles calculated with calculateFontSizeForAvailableSpace
- */
-export const createItemElements = async (
+export const createItemElementsWithHTMLElements = async (
   items: string[],
   availableBlock: LayoutBlock,
   layoutCalculator: SlideLayoutCalculator,
@@ -86,43 +89,50 @@ export const createItemElements = async (
   viewport: SlideViewport,
   options: ItemLayoutOptions = {}
 ): Promise<PPTTextElement[]> => {
-  // Get adaptive styles based on available space
-  const adaptiveStyles = calculateFontSizeForAvailableSpace(
-    items,
+  // Create HTML elements for all items
+  const elements = items.map((item) =>
+    createItemElement({
+      content: item,
+      fontSize: 20, // Initial size, will be optimized
+      lineHeight: 1.4,
+      fontFamily: theme.fontName,
+      color: theme.fontColor,
+    })
+  );
+
+  // Calculate optimal styles using HTML elements
+  const styles = calculateFontSizeForAvailableSpace(
+    elements,
     availableBlock.width,
     availableBlock.height,
     viewport
   );
 
-  // Pre-calculate all item dimensions using the actual available block
-  const itemContentsAndDimensions = items.map((item) => {
-    const itemContent = formatItemContentWithLineHeight(
-      item,
-      adaptiveStyles.fontSize,
-      adaptiveStyles.lineHeight
-    );
-    const itemDimensions = layoutCalculator.calculateTextDimensionsForBlock(itemContent, availableBlock, {
-      widthUtilization: 0.9,
-    });
-    return { content: itemContent, dimensions: itemDimensions };
-  });
+  // Apply the calculated styles to all elements
+  applyFontSizeToElements(elements, styles);
 
-  // Calculate positions using the new unified method
+  // Measure all elements with final styling
+  const elementDimensions = elements.map((element) =>
+    layoutCalculator.measureHTMLElementForBlock(element, availableBlock, 0.9)
+  );
+
+  // Calculate positions
   const itemPositions = layoutCalculator.layoutItemsInBlock(
-    itemContentsAndDimensions.map((item) => item.dimensions),
+    elementDimensions,
     availableBlock,
-    adaptiveStyles.spacing,
+    styles.spacing,
     options
   );
 
-  // Create PPTTextElement objects
-  return itemContentsAndDimensions.map((item, index) => {
+  // Convert to PPT elements
+  return elements.map((element, index) => {
     const position = itemPositions[index];
+    const elementContent = element.outerHTML;
 
     return {
       id: generateUniqueId(),
       type: 'text',
-      content: item.content,
+      content: elementContent,
       defaultFontName: theme.fontName,
       defaultColor: theme.fontColor,
       left: position.left,
@@ -144,9 +154,15 @@ export const createItemElementsWithStyles = async (
 ): Promise<PPTTextElement[]> => {
   // Pre-calculate all item dimensions using the unified styles
   const itemContentsAndDimensions = items.map((item) => {
-    const itemContent = formatItemContentWithLineHeight(item, itemStyles.fontSize, itemStyles.lineHeight);
-    const itemDimensions = layoutCalculator.calculateTextDimensionsForBlock(itemContent, availableBlock);
-    return { content: itemContent, dimensions: itemDimensions };
+    const itemElement = createItemElement({
+      content: item,
+      fontSize: itemStyles.fontSize,
+      lineHeight: itemStyles.lineHeight,
+      fontFamily: itemStyles.fontFamily || theme.fontName,
+      color: theme.fontColor,
+    });
+    const itemDimensions = layoutCalculator.measureHTMLElementForBlock(itemElement, availableBlock);
+    return { content: itemElement.outerHTML, dimensions: itemDimensions };
   });
 
   // Calculate positions using the unified spacing
@@ -181,31 +197,36 @@ interface TitleLayoutOptions {
   topOffset?: number;
 }
 
-function formatTitleContent(content: string, fontSize: number): string {
-  return `<p style="text-align: center;"><strong><span style="font-size: ${fontSize}px;">${content}</span></strong></p>`;
-}
-
 export const calculateTitleLayout = (
   title: string,
   availableBlock: LayoutBlock,
   layoutCalculator: SlideLayoutCalculator,
+  theme: SlideTheme,
   options: TitleLayoutOptions = {}
 ) => {
   const { horizontalAlignment = 'center', topOffset } = options;
+  // Create title element
+  const titleElement = createTitleElement({
+    content: title,
+    fontSize: 32, // Initial size, will be optimized
+    lineHeight: 1,
+    fontFamily: theme.titleFontName,
+    color: theme.titleFontColor,
+  });
 
-  // Calculate optimal font size using the available block dimensions
+  // Calculate optimal font size using the actual element
   const titleFontSize = calculateLargestOptimalFontSize(
-    title,
+    titleElement,
     availableBlock.width,
     availableBlock.height,
     'title'
   );
 
-  // Format the title content
-  const titleContent = formatTitleContent(title, titleFontSize);
+  // Apply the calculated font size to the element
+  applyFontSizeToElement(titleElement, titleFontSize, 1.2);
 
-  // Calculate title dimensions
-  const titleDimensions = layoutCalculator.calculateTitleDimensions(titleContent);
+  // Measure the element with optimized font size
+  const titleDimensions = layoutCalculator.measureHTMLElement(titleElement);
 
   // Calculate horizontal position based on alignment
   let horizontalPosition: number;
@@ -231,14 +252,15 @@ export const calculateTitleLayout = (
   };
 
   return {
-    titleContent,
+    titleElement,
+    titleContent: titleElement.outerHTML,
     titleDimensions,
     titlePosition,
     titleFontSize,
   };
 };
 
-export const createTitleElement = (
+export const createTitlePPTElement = (
   content: string,
   position: { left: number; top: number },
   dimensions: { width: number; height: number },
@@ -286,33 +308,27 @@ interface HorizontalItemBlock {
   totalHeight: number;
 }
 
-/**
- * Formats label content with proper styling
- */
-function formatLabelContent(label: string, fontSize: number): string {
-  return `<p style="text-align: center;"><strong><span style="font-size: ${fontSize}px;">${label}</span></strong></p>`;
+interface HorizontalItemElementBlock {
+  labelElement: HTMLElement;
+  contentElement: HTMLElement;
+  labelDimensions: Size;
+  contentDimensions: Size;
+  totalHeight: number;
 }
 
 /**
- * Formats item content with proper styling
- */
-function formatHorizontalItemContent(content: string, fontSize: number, lineHeight: number): string {
-  return `<p style="text-align: center; line-height: ${lineHeight};"><span style="font-size: ${fontSize}px;">${content}</span></p>`;
-}
-
-/**
- * Creates horizontal item blocks with calculated dimensions
+ * Creates horizontal item blocks using HTML elements with calculated dimensions
  */
 export function createHorizontalItemBlocks(
   items: { label: string; content: string }[],
   columnWidth: number,
   availableHeight: number,
   layoutCalculator: SlideLayoutCalculator,
+  theme: SlideTheme,
   viewport: SlideViewport
-): HorizontalItemBlock[] {
+): HorizontalItemElementBlock[] {
   const LABEL_CONTENT_SPACING = 10;
   const ITEM_PADDING = 10;
-
   return items.map((item) => {
     // Calculate available space for this item column
     const itemAvailableBlock: LayoutBlock = {
@@ -322,40 +338,53 @@ export function createHorizontalItemBlocks(
       height: availableHeight,
     };
 
-    // Calculate optimal font sizes for label and content
+    // Create label and content elements
+    const labelElement = createLabelElement({
+      content: item.label,
+      fontSize: 20, // Initial size
+      lineHeight: 1.2,
+      fontFamily: theme.fontName,
+      color: theme.fontColor,
+    });
+
+    const contentElement = createHorizontalItemContentElement({
+      content: item.content,
+      fontSize: 16, // Initial size
+      lineHeight: 1.4,
+      fontFamily: theme.fontName,
+      color: theme.fontColor,
+    });
+
+    // Calculate optimal font sizes using the actual elements
     const labelFontSize = calculateLargestOptimalFontSize(
-      item.label,
+      labelElement,
       itemAvailableBlock.width,
       availableHeight * 0.3, // Labels should take max 30% of height
       'content'
     );
 
     const contentFontSize = calculateLargestOptimalFontSize(
-      item.content,
+      contentElement,
       itemAvailableBlock.width,
       availableHeight * 0.6, // Content should take max 60% of height
       'content'
     );
 
-    // Format content
-    const labelContent = formatLabelContent(item.label, labelFontSize);
-    const contentContent = formatHorizontalItemContent(item.content, contentFontSize, contentFontSize * 1.2);
+    // Apply the calculated font sizes to the elements
+    applyFontSizeToElement(labelElement, labelFontSize, 1.4);
+    applyFontSizeToElement(contentElement, contentFontSize, 1.4);
 
-    // Calculate dimensions
-    const labelDimensions = layoutCalculator.calculateTextDimensionsForBlock(
-      labelContent,
-      itemAvailableBlock
-    );
-    const contentDimensions = layoutCalculator.calculateTextDimensionsForBlock(
-      contentContent,
-      itemAvailableBlock
-    );
+    // Calculate dimensions using the optimized elements
+    const labelDimensions = layoutCalculator.measureHTMLElement(labelElement);
+    const contentDimensions = layoutCalculator.measureHTMLElement(contentElement, {
+      maxWidth: itemAvailableBlock.width,
+    });
 
     const totalHeight = labelDimensions.height + LABEL_CONTENT_SPACING + contentDimensions.height;
 
     return {
-      labelContent,
-      contentContent,
+      labelElement,
+      contentElement,
       labelDimensions,
       contentDimensions,
       totalHeight,
@@ -384,7 +413,7 @@ export function calculateRowDistribution(totalItems: number): {
  * Creates horizontal item elements positioned in rows
  */
 export async function createHorizontalItemElements(
-  itemBlocks: HorizontalItemBlock[],
+  itemBlocks: HorizontalItemElementBlock[],
   availableBlock: LayoutBlock,
   layoutCalculator: SlideLayoutCalculator,
   theme: SlideTheme
@@ -396,7 +425,6 @@ export async function createHorizontalItemElements(
 
   // Calculate the maximum height needed for alignment
   const maxTopRowHeight = Math.max(...itemBlocks.slice(0, topRowItems).map((block) => block.totalHeight));
-  console.log(itemBlocks);
   const maxBottomRowHeight =
     bottomRowItems > 0 ? Math.max(...itemBlocks.slice(topRowItems).map((block) => block.totalHeight)) : 0;
 
@@ -422,7 +450,7 @@ export async function createHorizontalItemElements(
     elements.push({
       id: generateUniqueId(),
       type: 'text',
-      content: block.labelContent,
+      content: block.labelElement.outerHTML,
       defaultFontName: theme.fontName,
       defaultColor: theme.fontColor,
       left: labelLeft,
@@ -436,7 +464,7 @@ export async function createHorizontalItemElements(
     elements.push({
       id: generateUniqueId(),
       type: 'text',
-      content: block.contentContent,
+      content: block.contentElement.outerHTML,
       defaultFontName: theme.fontName,
       defaultColor: theme.fontColor,
       left: contentLeft,
@@ -470,7 +498,7 @@ export async function createHorizontalItemElements(
       elements.push({
         id: generateUniqueId(),
         type: 'text',
-        content: block.labelContent,
+        content: block.labelElement.outerHTML,
         defaultFontName: theme.fontName,
         defaultColor: theme.fontColor,
         left: labelLeft,
@@ -484,7 +512,7 @@ export async function createHorizontalItemElements(
       elements.push({
         id: generateUniqueId(),
         type: 'text',
-        content: block.contentContent,
+        content: block.contentElement.outerHTML,
         defaultFontName: theme.fontName,
         defaultColor: theme.fontColor,
         left: contentLeft,

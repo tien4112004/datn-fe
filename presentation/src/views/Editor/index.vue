@@ -59,7 +59,7 @@ import MarkupPanel from './MarkupPanel.vue';
 import AIPPTDialog from './AIPPTDialog.vue';
 import Modal from '@/components/Modal.vue';
 import Button from '@/components/Button.vue';
-import { convertToSlide } from '@/utils/slideLayout/slideLayoutConverter';
+import { convertToSlide } from '@/utils/slideLayout';
 import type { SlideTheme } from '@/types/slides';
 
 const mainStore = useMainStore();
@@ -83,95 +83,95 @@ usePasteEvent();
 
 const handleClick = async () => {
   const dataTests = [
-    // {
-    //   type: 'title',
-    //   data: {
-    //     title: 'Presentation with really long title',
-    //   },
-    // },
-    // {
-    //   type: 'title',
-    //   data: {
-    //     title: 'Presentation with really long title',
-    //     subtitle:
-    //       'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
-    //   },
-    // },
-    // {
-    //   type: 'two_column_with_image',
-    //   title: 'Presentation',
-    //   data: {
-    //     items: [
-    //       'Lorem ipsum dolor sit amet, consectetur adipiscing elit. ',
-    //       'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
-    //       'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. ',
-    //     ],
-    //     image: 'https://placehold.co/600x400',
-    //   },
-    // },
-    // {
-    //   type: 'two_column_with_big_image',
-    //   title: 'Presentation',
-    //   data: {
-    //     items: [
-    //       'Lorem ipsum dolor sit amet, consectetur adipiscing elit. ',
-    //       'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
-    //       'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. ',
-    //     ],
-    //     image: 'https://placehold.co/600x400',
-    //   },
-    // },
-    // {
-    //   type: 'main_image',
-    //   data: {
-    //     image: 'https://placehold.co/600x400',
-    //     content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-    //   },
-    // },
-    // {
-    //   type: 'two_column',
-    //   data: {
-    //     title: 'this is a title',
-    //     items1: [
-    //       'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-    //       'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-    //     ],
-    //     items2: [
-    //       'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-    //       'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-    //       'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-    //     ],
-    //   },
-    // },
-    // {
-    //   type: 'table_of_contents',
-    //   data: {
-    //     items: [
-    //       'What & Why of Microservices',
-    //       'Monolith vs Microservices',
-    //       'Service Design Principles',
-    //       'Communication & Data',
-    //       'Deployment & Scaling',
-    //       'Observability & Resilience',
-    //       'Security & Governance',
-    //       'Case Study & Q&A',
-    //     ],
-    //   },
-    // },
-    // {
-    //   type: 'vertical_list',
-    //   title: 'This is a title',
-    //   data: {
-    //     items: [
-    //       'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-    //       'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-    //       'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
-    //       'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-    //       'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
-    //       'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-    //     ],
-    //   },
-    // },
+    {
+      type: 'title',
+      data: {
+        title: 'Presentation with really long title',
+      },
+    },
+    {
+      type: 'title',
+      data: {
+        title: 'Presentation with really long title',
+        subtitle:
+          'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+      },
+    },
+    {
+      type: 'two_column_with_image',
+      title: 'Presentation',
+      data: {
+        items: [
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. ',
+          'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. ',
+        ],
+        image: 'https://placehold.co/600x400',
+      },
+    },
+    {
+      type: 'two_column_with_big_image',
+      title: 'Presentation',
+      data: {
+        items: [
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. ',
+          'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. ',
+        ],
+        image: 'https://placehold.co/600x400',
+      },
+    },
+    {
+      type: 'main_image',
+      data: {
+        image: 'https://placehold.co/600x400',
+        content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+      },
+    },
+    {
+      type: 'two_column',
+      data: {
+        title: 'this is a title',
+        items1: [
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+        ],
+        items2: [
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+        ],
+      },
+    },
+    {
+      type: 'table_of_contents',
+      data: {
+        items: [
+          'What & Why of Microservices',
+          'Monolith vs Microservices',
+          'Service Design Principles',
+          'Communication & Data',
+          'Deployment & Scaling',
+          'Observability & Resilience',
+          'Security & Governance',
+          'Case Study & Q&A',
+        ],
+      },
+    },
+    {
+      type: 'vertical_list',
+      title: 'This is a title',
+      data: {
+        items: [
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+          'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+          'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+        ],
+      },
+    },
     {
       type: 'horizontal_list',
       title: 'Five Fundamentals of Microservices',
@@ -224,7 +224,7 @@ const handleClick = async () => {
       color: 'rgba(0, 0, 0, 0.1)',
     },
     titleFontColor: '#0A2540',
-    titleFontName: 'Montserrat',
+    titleFontName: 'Roboto',
   } as SlideTheme;
 
   slideStore.setTheme(theme); // This should be set after initialization

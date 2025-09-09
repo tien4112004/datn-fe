@@ -40,11 +40,11 @@ export const convertVerticalList = async (
     const columns = layoutCalculator.getColumnsLayout([50, 50]);
     const leftColumnBlock = {
       ...columns[0],
-      height: layoutCalculator.calculateAvailableHeight(40, 40),
+      height: layoutCalculator.calculateAvailableHeight(0, 0),
     };
     const rightColumnBlock = {
       ...columns[1],
-      height: layoutCalculator.calculateAvailableHeight(40, 40),
+      height: layoutCalculator.calculateAvailableHeight(0, 0),
     };
 
     const columnContentHeight = leftColumnBlock.height - titleDimensions.height - titleBottomSpacing;
@@ -112,7 +112,7 @@ export const convertVerticalList = async (
       left: 0,
       top: titlePosition.top + titleDimensions.height + titleBottomSpacing,
       width: layoutCalculator.slideWidth,
-      height: layoutCalculator.calculateAvailableHeight(40, 40) - titleDimensions.height - titleBottomSpacing,
+      height: layoutCalculator.calculateAvailableHeight(0, 0) - titleDimensions.height - titleBottomSpacing,
     };
 
     // Create item elements using the new element-based approach

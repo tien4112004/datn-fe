@@ -11,8 +11,6 @@ export interface TextElementConfig {
 export interface ElementMeasurementConstraints {
   maxWidth?: number;
   maxHeight?: number;
-  paddingX?: number;
-  paddingY?: number;
 }
 
 export function createItemElement(config: TextElementConfig): HTMLElement {
@@ -25,8 +23,6 @@ export function createItemElement(config: TextElementConfig): HTMLElement {
   p.style.fontSize = `${config.fontSize}px`;
   p.style.fontFamily = config.fontFamily;
   p.style.margin = '0';
-  p.style.padding = '0';
-  p.style.paddingRight = '20px';
 
   // Apply span styling
   span.style.fontWeight = config.fontWeight || 'normal';
@@ -47,7 +43,6 @@ export function createTitleElement(config: TextElementConfig): HTMLElement {
   // Apply paragraph styling
   p.style.textAlign = 'center';
   p.style.margin = '0';
-  p.style.padding = '10px 40px';
   p.style.lineHeight = `${config.lineHeight}`;
   p.style.fontSize = `${config.fontSize}px`;
   p.style.fontFamily = config.fontFamily;
@@ -72,8 +67,6 @@ export function createLabelElement(config: TextElementConfig): HTMLElement {
   // Apply paragraph styling for labels (center-aligned)
   p.style.textAlign = 'center';
   p.style.margin = '0';
-  p.style.padding = '0';
-  p.style.paddingRight = '20px';
   p.style.lineHeight = `${config.lineHeight}`;
   p.style.fontFamily = config.fontFamily;
   p.style.fontSize = `${config.fontSize}px`;
@@ -96,7 +89,6 @@ export function createHorizontalItemContentElement(config: TextElementConfig): H
   p.style.textAlign = 'center';
   p.style.lineHeight = `${config.lineHeight}`;
   p.style.margin = '0';
-  p.style.padding = '0 10px';
   p.style.fontFamily = config.fontFamily;
   p.style.fontSize = `${config.fontSize}px`;
 

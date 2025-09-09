@@ -46,8 +46,8 @@ export function measureElement(element: HTMLElement, constraints?: ElementMeasur
 
   // Measure
   const size = {
-    width: element.getBoundingClientRect().width,
-    height: element.getBoundingClientRect().height,
+    width: element.getBoundingClientRect().width + 20, // Add padding because of ProseMirror
+    height: element.getBoundingClientRect().height + 20, // Add padding because of ProseMirror
   };
 
   // Remove from DOM and restore original styles

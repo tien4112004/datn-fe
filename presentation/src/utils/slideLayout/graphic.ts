@@ -299,15 +299,6 @@ export const createTitleLine = (titleDimensions: ElementBounds, theme: SlideThem
 // Horizontal List Layout
 // ----------------------------------------------------
 
-// Utility functions for horizontal list layout
-interface HorizontalItemBlock {
-  labelContent: string;
-  contentContent: string;
-  labelDimensions: Size;
-  contentDimensions: Size;
-  totalHeight: number;
-}
-
 interface HorizontalItemElementBlock {
   labelElement: HTMLElement;
   contentElement: HTMLElement;
@@ -327,7 +318,7 @@ export function createHorizontalItemBlocks(
   theme: SlideTheme,
   viewport: SlideViewport
 ): HorizontalItemElementBlock[] {
-  const LABEL_CONTENT_SPACING = 10;
+  const LABEL_CONTENT_SPACING = 15;
   const ITEM_PADDING = 10;
   return items.map((item) => {
     // Calculate available space for this item column
@@ -366,7 +357,7 @@ export function createHorizontalItemBlocks(
     const contentFontSize = calculateLargestOptimalFontSize(
       contentElement,
       itemAvailableBlock.width,
-      availableHeight * 0.6, // Content should take max 60% of height
+      availableHeight * 0.7, // Content should take max 60% of height
       'content'
     );
 

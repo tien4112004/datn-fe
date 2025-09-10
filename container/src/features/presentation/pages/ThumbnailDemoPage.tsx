@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import VueRemoteWrapper from '@/features/presentation/components/remote/VueRemoteWrapper';
 
 // Demo data - hardcoded slides similar to the Vue version
 const demoSlides = [
@@ -73,50 +73,22 @@ const demoSlides = [
 ];
 
 const VueThumbnailSlide = ({ slide, size, visible }: { slide: any; size: number; visible: boolean }) => {
-  const containerRef = useRef(null);
-  const hasMounted = useRef(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isError, setIsError] = useState(false);
-
-  useEffect(() => {
-    // Prevent re-mounting if it has already been mounted
-    if (hasMounted.current) return;
-    hasMounted.current = true;
-
-    setIsLoading(true);
-
-    import('vueRemote/ThumbnailSlide')
-      .then((mod) => {
-        // Use the mount function
-        mod.mount(containerRef.current, {
-          slide,
-          size,
-          visible,
-        });
-
-        setIsLoading(false);
-      })
-      .catch((err) => {
-        console.error('Failed to load Vue ThumbnailSlide:', err);
-        setIsLoading(false);
-        setIsError(true);
-      });
-  }, []);
-
   return (
-    <>
-      <div ref={containerRef} className="w-90 h-40" />
-      {isLoading && (
+    <VueRemoteWrapper
+      modulePath="thumbnail"
+      mountProps={{ slide, size, visible }}
+      className="w-90 h-40"
+      LoadingComponent={() => (
         <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-75">
           Loading...
         </div>
       )}
-      {isError && (
+      ErrorComponent={() => (
         <div className="absolute inset-0 flex items-center justify-center bg-red-100 text-red-600">
           Error loading slide
         </div>
       )}
-    </>
+    />
   );
 };
 

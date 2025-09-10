@@ -5,7 +5,6 @@ export { default as OutlineCreationView } from './generation/OutlineCreationView
 export { default as OutlineWorkspace } from './generation/OutlineWorkspace';
 export { default as PresentationCustomizationForm } from './generation/PresentationCustomizationForm';
 export { default as PresentationTable } from './table/PresentationTable';
-export { default as PresentationWrapper } from './others/PresentationWrapper';
 export { default as WorkspaceView } from './generation/WorkspaceView';
 export * from './generation/WorkspaceView';
 export * from './generation/OutlineCreationView';
@@ -15,4 +14,3 @@ export * from './table/ActionButton';
 export * from './generation/ExamplePrompts';
 export * from './generation/OutlineWorkspace';
 export * from './table/PresentationTable';
-export * from './others/PresentationWrapper';

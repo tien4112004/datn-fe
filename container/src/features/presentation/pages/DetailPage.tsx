@@ -1,5 +1,7 @@
-import { PresentationWrapper } from '@/features/presentation/components';
+import VueRemoteWrapper from '@/features/presentation/components/remote/VueRemoteWrapper';
+import GlobalSpinner from '@/shared/components/common/GlobalSpinner';
 import { useCallback, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useLoaderData } from 'react-router-dom';
 import { toast } from 'sonner';
 import type { Presentation } from '../types';
@@ -11,6 +13,7 @@ export interface MessageDetail {
 
 const DetailPage = () => {
   const { presentation } = useLoaderData() as { presentation: Presentation };
+  const { t } = useTranslation('loading');
 
   const handleMessage = useCallback((event: CustomEvent<MessageDetail>) => {
     const { type, message } = event.detail;
@@ -39,7 +42,18 @@ const DetailPage = () => {
     };
   }, [handleMessage]);
 
-  return <PresentationWrapper presentation={presentation} />;
+  return (
+    <VueRemoteWrapper
+      modulePath="editor"
+      mountProps={{
+        titleTest: 'random',
+        isRemote: true,
+        presentation: presentation,
+      }}
+      className="vue-remote"
+      LoadingComponent={() => <GlobalSpinner text={t('presentation')} />}
+    />
+  );
 };
 
 export default DetailPage;

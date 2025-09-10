@@ -36,6 +36,14 @@ const VueRemoteWrapper = <T,>({
     setIsLoading(true);
     setError(null);
 
+    if (!moduleMap[modulePath]) {
+      const err = new Error(`Unknown module path: ${modulePath}`);
+      setIsLoading(false);
+      setError(err);
+      onMountError?.(err);
+      return;
+    }
+
     moduleMap[modulePath]()
       .then((mod) => {
         mod.mount(containerRef.current, mountProps);
@@ -48,7 +56,7 @@ const VueRemoteWrapper = <T,>({
         setError(err);
         onMountError?.(err);
       });
-  }, []);
+  }, [modulePath, mountProps, onMountSuccess, onMountError]);
 
   return (
     <>

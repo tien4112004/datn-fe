@@ -1,108 +1,123 @@
 <template>
-  <Select
-    :model-value="modelValue"
-    @update:model-value="handleValueUpdate"
-    :disabled="disabled"
-    :open="open"
-    @update:open="handleOpenUpdate"
-  >
-    <SelectTrigger
-      :class="[
-        'bg-background border-border h-8 w-full select-none rounded border pr-8 text-[13px] transition-colors duration-200',
-        'hover:border-primary focus:border-primary focus:outline-none',
-        disabled ? 'cursor-default border-gray-300 bg-gray-50 text-gray-400' : 'cursor-pointer',
-        hasCustomIcon ? 'has-custom-icon' : '',
-      ]"
-    >
-      <SelectValue>
-        <div class="h-7 min-w-12 truncate pl-2.5 leading-7">
-          <slot name="label"></slot>
-        </div>
-      </SelectValue>
-      <div
-        v-if="hasCustomIcon"
-        class="text-muted-foreground pointer-events-none absolute right-0 top-0 flex h-7 w-8 items-center justify-center"
-      >
+  <div class="select-wrap" v-if="disabled">
+    <div class="select disabled" ref="selectRef">
+      <div class="selector"><slot name="label"></slot></div>
+      <div class="icon">
         <slot name="icon">
           <IconDown :size="14" />
         </slot>
       </div>
-    </SelectTrigger>
-    <SelectContent @click="handleContentClick">
-      <div class="max-h-64 select-none overflow-auto p-1.5 text-left text-[13px]">
+    </div>
+  </div>
+  <Popover
+    class="select-wrap"
+    trigger="click"
+    v-model:value="popoverVisible"
+    placement="bottom"
+    :contentStyle="{
+      padding: 0,
+      boxShadow: '0 6px 16px 0 rgba(0, 0, 0, 0.08)',
+    }"
+    v-else
+  >
+    <template #content>
+      <div class="options" :style="{ width: width + 2 + 'px' }" @click="popoverVisible = false">
         <slot name="options"></slot>
       </div>
-    </SelectContent>
-  </Select>
+    </template>
+    <div class="select" ref="selectRef">
+      <div class="selector"><slot name="label"></slot></div>
+      <div class="icon">
+        <slot name="icon">
+          <IconDown :size="14" />
+        </slot>
+      </div>
+    </div>
+  </Popover>
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, useSlots } from 'vue';
-import { Select, SelectContent, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { onMounted, onUnmounted, ref } from 'vue';
+import Popover from './Popover.vue';
 
-const props = withDefaults(
+withDefaults(
   defineProps<{
     disabled?: boolean;
-    modelValue?: string | number | null;
   }>(),
   {
     disabled: false,
-    modelValue: undefined,
   }
 );
 
-const emit = defineEmits<{
-  (event: 'update:modelValue', payload: string | number | null | undefined): void;
-}>();
+const popoverVisible = ref(false);
+const selectRef = ref<HTMLElement>();
+const width = ref(0);
 
-const open = ref(false);
-
-// Check if custom icon slot is being used
-const slots = useSlots();
-const hasCustomIcon = computed(() => !!slots.icon);
-
-const handleValueUpdate = (newValue: any) => {
-  if (newValue !== null && newValue !== undefined) {
-    // Convert bigint to string to maintain compatibility, handle any type
-    let value = newValue;
-    if (typeof newValue === 'bigint') {
-      value = newValue.toString();
-    } else if (typeof newValue === 'object') {
-      // For complex objects, try to extract a value property or convert to string
-      value = newValue.value || JSON.stringify(newValue);
-    }
-    emit('update:modelValue', value);
-  } else {
-    emit('update:modelValue', undefined);
-  }
+const updateWidth = () => {
+  if (!selectRef.value) return;
+  width.value = selectRef.value.clientWidth;
 };
-
-const handleOpenUpdate = (isOpen: boolean) => {
-  open.value = isOpen;
-};
-
-const handleContentClick = () => {
-  // Close dropdown when content is clicked (matches original behavior)
-  open.value = false;
-};
+const resizeObserver = new ResizeObserver(updateWidth);
+onMounted(() => {
+  if (!selectRef.value) return;
+  resizeObserver.observe(selectRef.value);
+});
+onUnmounted(() => {
+  if (!selectRef.value) return;
+  resizeObserver.unobserve(selectRef.value);
+});
 </script>
 
 <style lang="scss" scoped>
-/* Custom styles to override Shadcn defaults and hide default icon when custom icon is present */
-:deep(.has-custom-icon [data-slot='select-icon']) {
-  display: none;
-}
+.select {
+  width: 100%;
+  height: 32px;
+  padding-right: 32px;
+  border-radius: $borderRadius;
+  transition: border-color 0.25s;
+  font-size: 13px;
+  user-select: none;
+  background-color: $background;
+  border: 1px solid #d9d9d9;
+  position: relative;
+  cursor: pointer;
 
-/* Override Shadcn SelectItem default focus/hover styles to remove border */
-:deep([data-slot='select-item']) {
-  border: none !important;
-  outline: none !important;
-
-  &:focus,
-  &:hover {
-    border: none !important;
-    outline: none !important;
-    box-shadow: none !important;
+  &:not(.disabled):hover {
+    border-color: $themeColor;
   }
+
+  &.disabled {
+    background-color: $gray-f5f5f5;
+    border-color: #dcdcdc;
+    color: #b7b7b7;
+    cursor: default;
+  }
+
+  .selector {
+    min-width: 50px;
+    height: 30px;
+    line-height: 30px;
+    padding-left: 10px;
+    @include ellipsis-oneline();
+  }
+}
+.options {
+  max-height: 260px;
+  padding: 5px;
+  overflow: auto;
+  text-align: left;
+  font-size: 13px;
+  user-select: none;
+}
+.icon {
+  width: 32px;
+  height: 30px;
+  color: $muted-foreground;
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 </style>

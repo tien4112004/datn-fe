@@ -47,6 +47,8 @@ export default {
         gradientAngle: 'Góc chuyển sắc:',
         font: 'Phông chữ:',
         fontColor: 'Màu chữ:',
+        titleFont: 'Phông chữ tiêu đề:',
+        titleFontColor: 'Màu chữ tiêu đề:',
         backgroundColor: 'Màu nền:',
         themeColor: 'Màu chủ đề:',
         searchFont: 'Tìm phông chữ',

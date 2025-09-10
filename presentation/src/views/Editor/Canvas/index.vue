@@ -328,12 +328,12 @@ const contextmenus = (): ContextmenuItem[] => {
       ],
     },
     {
-      text: t('canvas.resetCurrentPage'),
+      text: t('canvas.controls.resetCurrentPage'),
       handler: deleteAllElements,
     },
     { divider: true },
     {
-      text: t('canvas.slideShow'),
+      text: t('canvas.controls.slideShow'),
       subText: 'F5',
       handler: enterScreeningFromStart,
     },

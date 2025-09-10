@@ -367,7 +367,16 @@ export default () => {
   // Apply current theme configuration to all pages
   const applyThemeToAllSlides = (applyAll = false) => {
     const newSlides: Slide[] = JSON.parse(JSON.stringify(slides.value));
-    const { themeColors, backgroundColor, fontColor, fontName, outline, shadow } = theme.value;
+    const {
+      themeColors,
+      backgroundColor,
+      fontColor,
+      fontName,
+      outline,
+      shadow,
+      titleFontColor,
+      titleFontName,
+    } = theme.value;
 
     for (const slide of newSlides) {
       if (!slide.background || slide.background.type !== 'image') {
@@ -399,10 +408,16 @@ export default () => {
             const alpha = tinycolor(el.fill).getAlpha();
             if (alpha > 0) el.fill = themeColors[0];
           }
-          el.defaultColor = fontColor;
-          el.defaultFontName = fontName;
-          if (el.content)
+          if (el.textType !== 'title') {
+            el.defaultColor = fontColor;
+            el.defaultFontName = fontName;
+          } else {
+            el.defaultColor = titleFontColor;
+            el.defaultFontName = titleFontName;
+          }
+          if (el.content) {
             el.content = el.content.replace(/color: .+?;/g, '').replace(/font-family: .+?;/g, '');
+          }
         } else if (el.type === 'table') {
           if (el.theme) el.theme.color = themeColors[0];
           for (const rowCells of el.data) {

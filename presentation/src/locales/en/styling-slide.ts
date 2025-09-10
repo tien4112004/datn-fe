@@ -46,6 +46,8 @@ export default {
         gradientAngle: 'Gradient Angle:',
         font: 'Font:',
         fontColor: 'Font Color:',
+        titleFont: 'Title Font:',
+        titleFontColor: 'Title Font Color:',
         backgroundColor: 'Background Color:',
         themeColor: 'Theme Color:',
         searchFont: 'Search Font',

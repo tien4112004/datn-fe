@@ -51,7 +51,7 @@ export default {
         endPage: 'Trang kết thúc',
       },
       textTypes: {
-        textTitle: 'Tiêu đề',
+        title: 'Tiêu đề',
         subtitle: 'Phụ đề',
         content: 'Nội dung',
         listItem: 'Mục danh sách',

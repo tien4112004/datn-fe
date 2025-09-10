@@ -75,7 +75,7 @@ const slideTypeOptions = ref<{ label: string; value: SlideType | '' }[]>([
 
 const textTypeOptions = ref<{ label: string; value: TextType | '' }[]>([
   { label: t('panels.markup.unmarkedType'), value: '' },
-  { label: t('panels.markup.title'), value: 'title' },
+  { label: t('panels.markup.textTypes.title'), value: 'title' },
   { label: t('panels.markup.textTypes.subtitle'), value: 'subtitle' },
   { label: t('panels.markup.textTypes.content'), value: 'content' },
   { label: t('panels.markup.textTypes.listItem'), value: 'item' },

@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { SearchBar } from '@/shared/components/common/SearchBar';
-import VueRemoteWrapper from '@/features/presentation/components/remote/VueRemoteWrapper';
+import ThumbnailWrapper from '@/features/presentation/components/others/ThumbnailWrapper';
 
 const PresentationGrid = () => {
   const { t } = useTranslation('table');
@@ -48,28 +48,7 @@ const PresentationGrid = () => {
       >
         {presentation.slides && presentation.slides[0] ? (
           <div className="flex h-full items-center justify-center">
-            <VueRemoteWrapper
-              modulePath="thumbnail"
-              mountProps={{
-                slide: presentation.slides[0],
-                size: 300,
-                visible: true,
-              }}
-              className="h-auto w-auto"
-              LoadingComponent={() => (
-                <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-75">
-                  Loading...
-                </div>
-              )}
-              ErrorComponent={({ error }: { error: Error }) => (
-                <div className="absolute inset-0 flex items-center justify-center bg-red-100 text-red-600">
-                  Error loading slide: {error.message}
-                </div>
-              )}
-              onMountError={(error) => {
-                console.error('Failed to load Vue ThumbnailSlide:', error);
-              }}
-            />
+            <ThumbnailWrapper slide={presentation.slides[0]} size={300} visible={true} />
             );
           </div>
         ) : (

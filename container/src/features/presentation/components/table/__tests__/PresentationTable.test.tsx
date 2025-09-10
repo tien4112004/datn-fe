@@ -6,6 +6,11 @@ import type { Presentation } from '@/features/presentation/types/presentation';
 
 const { usePresentations } = await import('@/features/presentation/hooks/useApi');
 
+vi.mock('@/features/presentation/components/others/ThumbnailWrapper', () => ({
+  __esModule: true,
+  default: () => <div data-testid="mock-thumbnail-wrapper" />,
+}));
+
 vi.mock('@/features/presentation/api/service', () => ({
   presentationService: {
     getAll: vi.fn(),

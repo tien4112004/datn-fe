@@ -1,20 +1,14 @@
 <template>
-  <ToggleGroup
-    class="radio-group"
-    type="single"
-    variant="outline"
-    :model-value="value"
-    @update:model-value="handleUpdateValue"
-    :disabled="disabled"
-  >
+  <ButtonGroup class="radio-group">
     <slot></slot>
-  </ToggleGroup>
+  </ButtonGroup>
 </template>
 
 <script lang="ts" setup>
 import { computed, provide } from 'vue';
 import { injectKeyRadioGroupValue } from '@/types/injectKey';
-import { ToggleGroup } from '@/components/ui/toggle-group';
+
+import ButtonGroup from './ButtonGroup.vue';
 
 const props = withDefaults(
   defineProps<{
@@ -30,15 +24,6 @@ const emit = defineEmits<{
   (event: 'update:value', payload: string): void;
 }>();
 
-// Handle ToggleGroup's model-value update events
-// ToggleGroup emits AcceptableValue which can be string | number | null for single type
-const handleUpdateValue = (newValue: any) => {
-  if (props.disabled || !newValue) return;
-  // Convert to string to maintain API compatibility
-  const stringValue = typeof newValue === 'string' ? newValue : String(newValue);
-  emit('update:value', stringValue);
-};
-
 const updateValue = (value: string) => {
   if (props.disabled) return;
   emit('update:value', value);
@@ -46,8 +31,6 @@ const updateValue = (value: string) => {
 
 const value = computed(() => props.value);
 
-// Maintain backward compatibility by providing the injection key
-// This allows existing RadioButton components to continue working
 provide(injectKeyRadioGroupValue, {
   value,
   updateValue,

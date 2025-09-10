@@ -49,7 +49,6 @@ const PresentationGrid = () => {
         {presentation.slides && presentation.slides[0] ? (
           <div className="flex h-full items-center justify-center">
             <ThumbnailWrapper slide={presentation.slides[0]} size={300} visible={true} />
-            );
           </div>
         ) : (
           <div className="flex h-full items-center justify-center bg-gray-200 text-gray-500">

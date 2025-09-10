@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { moduleMap } from './module';
 
 interface VueRemoteWrapperProps<T = any> {
   modulePath: string;
@@ -9,11 +10,6 @@ interface VueRemoteWrapperProps<T = any> {
   onMountSuccess?(): void;
   onMountError?(error: Error): void;
 }
-
-const moduleMap = {
-  editor: () => import('vueRemote/Editor'),
-  thumbnail: () => import('vueRemote/ThumbnailSlide'),
-} as Record<string, () => Promise<{ mount: (el: HTMLElement | null, props: any) => void }>>;
 
 const VueRemoteWrapper = <T,>({
   modulePath,

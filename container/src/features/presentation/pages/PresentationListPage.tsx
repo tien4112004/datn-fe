@@ -1,12 +1,26 @@
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbPage } from '@/components/ui/breadcrumb';
 import { Separator } from '@radix-ui/react-separator';
 import { useTranslation } from 'react-i18next';
+import { useSearchParams } from 'react-router-dom';
 import PresentationTable from '../components/table/PresentationTable';
+import PresentationGrid from '../components/others/PresentationGrid';
 import CreatePresentationControls from '../components/others/CreatePresentationControls';
+import ViewToggle, { type ViewMode } from '../components/others/ViewToggle';
 
 const PresentationListPage = () => {
   const { t } = useTranslation('presentation', { keyPrefix: 'list' });
   const { t: tPage } = useTranslation('page');
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const viewMode = (searchParams.get('view') as ViewMode) || 'list';
+
+  const setViewMode = (mode: ViewMode) => {
+    setSearchParams((prev) => {
+      const newParams = new URLSearchParams(prev);
+      newParams.set('view', mode);
+      return newParams;
+    });
+  };
 
   return (
     <>
@@ -23,8 +37,11 @@ const PresentationListPage = () => {
       </header>
       <div className="space-y-4 px-8 py-4">
         <CreatePresentationControls />
-        <h1 className="mb-4 text-2xl font-semibold">{t('title')}</h1>
-        <PresentationTable />
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-semibold">{t('title')}</h1>
+          <ViewToggle value={viewMode} onValueChange={setViewMode} />
+        </div>
+        {viewMode === 'list' ? <PresentationTable /> : <PresentationGrid />}
       </div>
     </>
   );

@@ -146,6 +146,21 @@ export default class PresentationMockService implements PresentationApiService {
   }
 
   getPresentations(_: PresentationCollectionRequest): Promise<ApiResponse<Presentation[]>> {
-    throw new Error('Method not implemented.');
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve({
+          data: [
+            ...mockPresentationItems,
+            ...mockPresentationItems,
+            ...mockPresentationItems,
+            ...mockPresentationItems,
+            ...mockPresentationItems,
+          ],
+          success: true,
+          message: 'Mock presentations fetched successfully',
+          code: 200,
+        });
+      }, 500);
+    });
   }
 }

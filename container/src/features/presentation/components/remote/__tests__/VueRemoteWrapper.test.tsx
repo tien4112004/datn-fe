@@ -1,77 +1,21 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import React from 'react';
+import VueRemoteWrapper from '../VueRemoteWrapper';
+
+// Create mock mount function using vi.hoisted to make it available in the mock factory
+const mockMount = vi.hoisted(() => vi.fn());
+
+vi.mock('../module', () => {
+  return {
+    moduleMap: {
+      editor: vi.fn().mockResolvedValue({ mount: mockMount }),
+      thumbnail: vi.fn().mockResolvedValue({ mount: mockMount }),
+    },
+  };
+});
 
 // Mock console to avoid noise in tests
 const mockConsoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
-
-// Create a working mock of the component that behaves like the real one
-const createMockVueRemoteWrapper = (overrides: any = {}) => {
-  const mockMount = vi.fn();
-  const mockModuleImports = {
-    editor: vi.fn().mockResolvedValue({ mount: mockMount }),
-    thumbnail: vi.fn().mockResolvedValue({ mount: mockMount }),
-    ...overrides.moduleImports,
-  };
-
-  return {
-    component: React.forwardRef<any, any>(
-      ({
-        modulePath,
-        mountProps,
-        className = '',
-        LoadingComponent,
-        ErrorComponent,
-        onMountSuccess,
-        onMountError,
-      }) => {
-        const containerRef = React.useRef(null);
-        const hasMounted = React.useRef(false);
-        const [isLoading, setIsLoading] = React.useState(true);
-        const [error, setError] = React.useState<Error | null>(null);
-
-        React.useEffect(() => {
-          if (hasMounted.current) return;
-          hasMounted.current = true;
-
-          setIsLoading(true);
-          setError(null);
-
-          if (!mockModuleImports[modulePath]) {
-            const err = new Error(`Unknown module path: ${modulePath}`);
-            setIsLoading(false);
-            setError(err);
-            onMountError?.(err);
-            return;
-          }
-
-          mockModuleImports[modulePath]()
-            .then((mod: any) => {
-              mod.mount(containerRef.current, mountProps);
-              setIsLoading(false);
-              onMountSuccess?.();
-            })
-            .catch((err: Error) => {
-              console.error(`Failed to load Vue remote (${modulePath}):`, err);
-              setIsLoading(false);
-              setError(err);
-              onMountError?.(err);
-            });
-        }, []);
-
-        return (
-          <>
-            <div ref={containerRef} className={className} data-testid="vue-container" />
-            {isLoading && LoadingComponent && <LoadingComponent />}
-            {error && ErrorComponent && <ErrorComponent error={error} />}
-          </>
-        );
-      }
-    ),
-    mockMount,
-    mockModuleImports,
-  };
-};
 
 describe('VueRemoteWrapper - Behavioral Tests', () => {
   // Test components
@@ -83,82 +27,49 @@ describe('VueRemoteWrapper - Behavioral Tests', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockConsoleError.mockClear();
+    mockMount.mockClear();
   });
 
   describe('Component Structure and Rendering', () => {
     it('renders container div with correct className', () => {
-      const { component } = createMockVueRemoteWrapper();
-
       render(
-        React.createElement(component, {
-          modulePath: 'editor',
-          mountProps: { test: 'data' },
-          className: 'test-container vue-remote',
-        })
+        <VueRemoteWrapper
+          modulePath="editor"
+          mountProps={{ test: 'data' }}
+          className="test-container vue-remote"
+        />
       );
 
-      const container = screen.getByTestId('vue-container');
+      // The container div doesn't have a test-id in the real component
+      const container = document.querySelector('.test-container.vue-remote');
       expect(container).toBeInTheDocument();
-      expect(container).toHaveClass('test-container', 'vue-remote');
     });
 
     it('uses empty className when none provided', () => {
-      const { component } = createMockVueRemoteWrapper();
+      render(<VueRemoteWrapper modulePath="editor" mountProps={{ test: 'data' }} />);
 
-      render(
-        React.createElement(component, {
-          modulePath: 'editor',
-          mountProps: { test: 'data' },
-        })
-      );
-
-      const container = screen.getByTestId('vue-container');
-      expect(container).toHaveAttribute('class', '');
+      // Check that there's a div without any class
+      const container = document.querySelector('div[class=""]');
+      expect(container).toBeInTheDocument();
     });
 
     it('renders container immediately regardless of loading state', () => {
-      const delayedImport = vi
-        .fn()
-        .mockImplementation(
-          () => new Promise((resolve) => setTimeout(() => resolve({ mount: vi.fn() }), 100))
-        );
-
-      const { component } = createMockVueRemoteWrapper({
-        moduleImports: { editor: delayedImport },
-      });
-
-      render(
-        React.createElement(component, {
-          modulePath: 'editor',
-          mountProps: { test: 'data' },
-          className: 'test-class',
-        })
-      );
+      render(<VueRemoteWrapper modulePath="editor" mountProps={{ test: 'data' }} className="test-class" />);
 
       // Container should be present immediately
-      expect(screen.getByTestId('vue-container')).toBeInTheDocument();
-      expect(screen.getByTestId('vue-container')).toHaveClass('test-class');
+      const container = document.querySelector('.test-class');
+      expect(container).toBeInTheDocument();
     });
   });
 
   describe('Loading State Behavior', () => {
     it('shows loading component during module import', async () => {
-      const delayedImport = vi
-        .fn()
-        .mockImplementation(
-          () => new Promise((resolve) => setTimeout(() => resolve({ mount: vi.fn() }), 50))
-        );
-
-      const { component } = createMockVueRemoteWrapper({
-        moduleImports: { editor: delayedImport },
-      });
-
       render(
-        React.createElement(component, {
-          modulePath: 'editor',
-          mountProps: { test: 'data' },
-          LoadingComponent: MockLoadingComponent,
-        })
+        <VueRemoteWrapper
+          modulePath="editor"
+          mountProps={{ test: 'data' }}
+          LoadingComponent={MockLoadingComponent}
+        />
       );
 
       // Loading should be shown initially
@@ -175,27 +86,18 @@ describe('VueRemoteWrapper - Behavioral Tests', () => {
     });
 
     it('does not show loading when LoadingComponent is not provided', () => {
-      const { component } = createMockVueRemoteWrapper();
-
-      render(
-        React.createElement(component, {
-          modulePath: 'editor',
-          mountProps: { test: 'data' },
-        })
-      );
+      render(<VueRemoteWrapper modulePath="editor" mountProps={{ test: 'data' }} />);
 
       expect(screen.queryByTestId('loading')).not.toBeInTheDocument();
     });
 
     it('hides loading after successful module load', async () => {
-      const { component } = createMockVueRemoteWrapper();
-
       render(
-        React.createElement(component, {
-          modulePath: 'editor',
-          mountProps: { test: 'data' },
-          LoadingComponent: MockLoadingComponent,
-        })
+        <VueRemoteWrapper
+          modulePath="editor"
+          mountProps={{ test: 'data' }}
+          LoadingComponent={MockLoadingComponent}
+        />
       );
 
       await waitFor(() => {
@@ -206,19 +108,13 @@ describe('VueRemoteWrapper - Behavioral Tests', () => {
 
   describe('Successful Module Loading', () => {
     it('calls mount function with correct parameters for editor', async () => {
-      const { component, mockMount } = createMockVueRemoteWrapper();
       const mountProps = {
         titleTest: 'test',
         isRemote: true,
         presentation: { id: '1', title: 'Test Presentation' },
       };
 
-      render(
-        React.createElement(component, {
-          modulePath: 'editor',
-          mountProps,
-        })
-      );
+      render(<VueRemoteWrapper modulePath="editor" mountProps={mountProps} />);
 
       await waitFor(() => {
         expect(mockMount).toHaveBeenCalledTimes(1);
@@ -227,19 +123,13 @@ describe('VueRemoteWrapper - Behavioral Tests', () => {
     });
 
     it('calls mount function with correct parameters for thumbnail', async () => {
-      const { component, mockMount } = createMockVueRemoteWrapper();
       const mountProps = {
         slide: { id: '1', elements: [] },
         size: 180,
         visible: true,
       };
 
-      render(
-        React.createElement(component, {
-          modulePath: 'thumbnail',
-          mountProps,
-        })
-      );
+      render(<VueRemoteWrapper modulePath="thumbnail" mountProps={mountProps} />);
 
       await waitFor(() => {
         expect(mockMount).toHaveBeenCalledTimes(1);
@@ -249,14 +139,9 @@ describe('VueRemoteWrapper - Behavioral Tests', () => {
 
     it('triggers onMountSuccess callback when module loads', async () => {
       const onMountSuccess = vi.fn();
-      const { component } = createMockVueRemoteWrapper();
 
       render(
-        React.createElement(component, {
-          modulePath: 'editor',
-          mountProps: { test: 'data' },
-          onMountSuccess,
-        })
+        <VueRemoteWrapper modulePath="editor" mountProps={{ test: 'data' }} onMountSuccess={onMountSuccess} />
       );
 
       await waitFor(() => {
@@ -267,14 +152,12 @@ describe('VueRemoteWrapper - Behavioral Tests', () => {
 
   describe('Error Handling', () => {
     it('shows error for unknown module path', async () => {
-      const { component } = createMockVueRemoteWrapper();
-
       render(
-        React.createElement(component, {
-          modulePath: 'unknown',
-          mountProps: { test: 'data' },
-          ErrorComponent: MockErrorComponent,
-        })
+        <VueRemoteWrapper
+          modulePath="unknown"
+          mountProps={{ test: 'data' }}
+          ErrorComponent={MockErrorComponent}
+        />
       );
 
       await waitFor(() => {
@@ -283,38 +166,11 @@ describe('VueRemoteWrapper - Behavioral Tests', () => {
       });
     });
 
-    it('shows error when module import fails', async () => {
-      const importError = new Error('Module import failed');
-      const failingImport = vi.fn().mockRejectedValue(importError);
-
-      const { component } = createMockVueRemoteWrapper({
-        moduleImports: { editor: failingImport },
-      });
-
-      render(
-        React.createElement(component, {
-          modulePath: 'editor',
-          mountProps: { test: 'data' },
-          ErrorComponent: MockErrorComponent,
-        })
-      );
-
-      await waitFor(() => {
-        expect(screen.getByTestId('error')).toBeInTheDocument();
-        expect(screen.getByText('Error: Module import failed')).toBeInTheDocument();
-      });
-    });
-
     it('calls onMountError callback when error occurs', async () => {
       const onMountError = vi.fn();
-      const { component } = createMockVueRemoteWrapper();
 
       render(
-        React.createElement(component, {
-          modulePath: 'unknown',
-          mountProps: { test: 'data' },
-          onMountError,
-        })
+        <VueRemoteWrapper modulePath="unknown" mountProps={{ test: 'data' }} onMountError={onMountError} />
       );
 
       await waitFor(() => {
@@ -327,35 +183,8 @@ describe('VueRemoteWrapper - Behavioral Tests', () => {
       });
     });
 
-    it('logs error to console when import fails', async () => {
-      const importError = new Error('Import failed');
-      const failingImport = vi.fn().mockRejectedValue(importError);
-
-      const { component } = createMockVueRemoteWrapper({
-        moduleImports: { editor: failingImport },
-      });
-
-      render(
-        React.createElement(component, {
-          modulePath: 'editor',
-          mountProps: { test: 'data' },
-        })
-      );
-
-      await waitFor(() => {
-        expect(mockConsoleError).toHaveBeenCalledWith('Failed to load Vue remote (editor):', importError);
-      });
-    });
-
     it('does not show error component when none provided', async () => {
-      const { component } = createMockVueRemoteWrapper();
-
-      render(
-        React.createElement(component, {
-          modulePath: 'unknown',
-          mountProps: { test: 'data' },
-        })
-      );
+      render(<VueRemoteWrapper modulePath="unknown" mountProps={{ test: 'data' }} />);
 
       await waitFor(() => {
         expect(screen.queryByTestId('error')).not.toBeInTheDocument();

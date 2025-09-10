@@ -1,50 +1,39 @@
 import React from 'react';
+import VueRemoteWrapper from '@/features/presentation/components/remote/VueRemoteWrapper';
+import type { Slide } from '@/features/presentation/types/slide';
 
-const ThumbnailSlide = ({ slide, size, visible }: { slide: any; size: number; visible: boolean }) => {
-  const containerRef = React.useRef(null);
-  const hasMounted = React.useRef(false);
-  const [isLoading, setIsLoading] = React.useState(true);
-  const [isError, setIsError] = React.useState(false);
+interface ThumbnailSlideProps {
+  slide: Slide;
+  size: number;
+  visible: boolean;
+}
 
-  React.useEffect(() => {
-    // Prevent re-mounting if it has already been mounted
-    if (hasMounted.current) return;
-    hasMounted.current = true;
+const LoadingComponent = () => (
+  <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-75">Loading...</div>
+);
 
-    setIsLoading(true);
+const ErrorComponent = ({ error }: { error: Error }) => (
+  <div className="absolute inset-0 flex items-center justify-center bg-red-100 text-red-600">
+    Error loading slide: {error.message}
+  </div>
+);
 
-    import('vueRemote/ThumbnailSlide')
-      .then((mod) => {
-        // Use the mount function
-        mod.mount(containerRef.current, {
-          slide,
-          size,
-          visible,
-        });
-
-        setIsLoading(false);
-      })
-      .catch((err) => {
-        console.error('Failed to load Vue ThumbnailSlide:', err);
-        setIsLoading(false);
-        setIsError(true);
-      });
-  }, []);
-
+const ThumbnailSlide: React.FC<ThumbnailSlideProps> = ({ slide, size, visible }) => {
   return (
-    <>
-      <div ref={containerRef} className="h-auto w-auto" />
-      {isLoading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-75">
-          Loading...
-        </div>
-      )}
-      {isError && (
-        <div className="absolute inset-0 flex items-center justify-center bg-red-100 text-red-600">
-          Error loading slide
-        </div>
-      )}
-    </>
+    <VueRemoteWrapper
+      modulePath="thumbnail"
+      mountProps={{
+        slide,
+        size,
+        visible,
+      }}
+      className="h-auto w-auto"
+      LoadingComponent={LoadingComponent}
+      ErrorComponent={ErrorComponent}
+      onMountError={(error) => {
+        console.error('Failed to load Vue ThumbnailSlide:', error);
+      }}
+    />
   );
 };
 

@@ -1,8 +1,8 @@
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import type { Presentation } from '../../types/presentation';
-import { usePresentations } from '../../hooks/useApi';
+import type { Presentation } from '@/features/presentation/types/presentation';
+import { usePresentations } from '@/features/presentation/hooks/useApi';
 import { Button } from '@/components/ui/button';
 import { MoreHorizontal } from 'lucide-react';
 import {
@@ -11,7 +11,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { SearchBar } from '../../../../shared/components/common/SearchBar';
+import { SearchBar } from '@/shared/components/common/SearchBar';
 import ThumbnailSlide from './ThumbnailSlide';
 
 const PresentationGrid = () => {
@@ -59,17 +59,37 @@ const PresentationGrid = () => {
         <div className="absolute right-2 top-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="secondary" size="sm" className="h-8 w-8 bg-white/90 p-0 hover:bg-white">
+              <Button
+                variant="secondary"
+                size="sm"
+                className="h-8 w-8 bg-white/90 p-0 hover:bg-white"
+                onClick={(e) => e.stopPropagation()}
+              >
                 <MoreHorizontal className="h-4 w-4 text-gray-700" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => navigate(`/presentation/${presentation.id}`)}>
+              <DropdownMenuItem
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate(`/presentation/${presentation.id}`);
+                }}
+              >
                 View Details
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => console.log('Edit', presentation)}>Edit</DropdownMenuItem>
               <DropdownMenuItem
-                onClick={() => console.log('Delete', presentation)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  console.log('Edit', presentation);
+                }}
+              >
+                Edit
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={(e) => {
+                  e.stopPropagation();
+                  console.log('Delete', presentation);
+                }}
                 className="text-red-600 focus:text-red-600"
               >
                 Delete

@@ -34,7 +34,7 @@ const PresentationTable = () => {
         cell: (info) => {
           const slides = info.getValue();
           return slides && slides[0] ? (
-            <ThumbnailWrapper slide={slides[0]} size={300} visible={true} />
+            <ThumbnailWrapper slide={slides[0]} size={160} visible={true} />
           ) : null;
         },
         size: 176,

@@ -149,13 +149,7 @@ export default class PresentationMockService implements PresentationApiService {
     return new Promise((resolve) => {
       setTimeout(() => {
         resolve({
-          data: [
-            ...mockPresentationItems,
-            ...mockPresentationItems,
-            ...mockPresentationItems,
-            ...mockPresentationItems,
-            ...mockPresentationItems,
-          ],
+          data: [...mockPresentationItems],
           success: true,
           message: 'Mock presentations fetched successfully',
           code: 200,

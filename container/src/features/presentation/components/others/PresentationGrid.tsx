@@ -1,4 +1,5 @@
-import { useCallback } from 'react';
+import { createColumnHelper, getCoreRowModel, useReactTable } from '@tanstack/react-table';
+import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import type { Presentation } from '@/features/presentation/types/presentation';
@@ -13,32 +14,43 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { SearchBar } from '@/shared/components/common/SearchBar';
 import ThumbnailWrapper from '@/features/presentation/components/others/ThumbnailWrapper';
+import TablePagination from '@/shared/components/table/TablePagination';
 
 const PresentationGrid = () => {
   const { t } = useTranslation('table');
   const navigate = useNavigate();
+  const columnHelper = createColumnHelper<Presentation>();
 
   const formatDate = useCallback((date: Date | string | undefined): string => {
     if (!date) return '';
     return new Date(date).toLocaleDateString();
   }, []);
 
-  const { data, isLoading, pagination, setPagination, totalItems, search, setSearch } = usePresentations();
+  const { data, isLoading, sorting, setSorting, pagination, setPagination, totalItems, search, setSearch } =
+    usePresentations();
 
-  const handlePreviousPage = () => {
-    setPagination((prev) => ({
-      ...prev,
-      pageIndex: Math.max(0, prev.pageIndex - 1),
-    }));
-  };
+  const columns = useMemo(
+    () => [
+      columnHelper.accessor('id', { header: 'ID' }),
+      columnHelper.accessor('title', { header: 'Title' }),
+    ],
+    [columnHelper]
+  );
 
-  const handleNextPage = () => {
-    const maxPageIndex = Math.ceil(totalItems / pagination.pageSize) - 1;
-    setPagination((prev) => ({
-      ...prev,
-      pageIndex: Math.min(maxPageIndex, prev.pageIndex + 1),
-    }));
-  };
+  const table = useReactTable({
+    data: data || [],
+    columns: columns,
+    getCoreRowModel: getCoreRowModel(),
+    manualPagination: true,
+    manualSorting: true,
+    state: {
+      sorting,
+      pagination,
+    },
+    rowCount: totalItems,
+    onSortingChange: setSorting,
+    onPaginationChange: setPagination,
+  });
 
   const PresentationCard = ({ presentation }: { presentation: Presentation }) => (
     <div className="group cursor-pointer">
@@ -52,7 +64,7 @@ const PresentationGrid = () => {
           </div>
         ) : (
           <div className="flex h-full items-center justify-center bg-gray-200 text-gray-500">
-            No thumbnail
+            {t('presentation.noThumbnail', 'No thumbnail')}
           </div>
         )}
 
@@ -75,7 +87,7 @@ const PresentationGrid = () => {
                   navigate(`/presentation/${presentation.id}`);
                 }}
               >
-                View Details
+                {t('actionButton.viewDetails', 'View Details')}
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={(e) => {
@@ -83,7 +95,7 @@ const PresentationGrid = () => {
                   console.log('Edit', presentation);
                 }}
               >
-                Edit
+                {t('actionButton.edit', 'Edit')}
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={(e) => {
@@ -92,22 +104,23 @@ const PresentationGrid = () => {
                 }}
                 className="text-red-600 focus:text-red-600"
               >
-                Delete
+                {t('actionButton.delete', 'Delete')}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
       </div>
 
-      {/* Title and metadata */}
       <div className="mt-3 space-y-1">
         <h3
           className="cursor-pointer truncate text-sm font-medium text-gray-900 transition-colors hover:text-blue-600"
           onClick={() => navigate(`/presentation/${presentation.id}`)}
         >
-          {presentation.title || 'Untitled Presentation'}
+          {presentation.title || t('presentation.untitled', 'Untitled Presentation')}
         </h3>
-        <p className="text-xs text-gray-500">Last modified: {formatDate(presentation.updatedAt)}</p>
+        <p className="text-xs text-gray-500">
+          {t('presentation.lastModified', 'Last modified')}: {formatDate(presentation.updatedAt)}
+        </p>
       </div>
     </div>
   );
@@ -151,34 +164,14 @@ const PresentationGrid = () => {
             ))}
           </div>
 
-          <div className="mt-6 flex justify-center">
-            <div className="flex items-center space-x-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handlePreviousPage}
-                disabled={pagination.pageIndex === 0}
-              >
-                Previous
-              </Button>
-              <span className="text-sm text-gray-600">
-                Page {pagination.pageIndex + 1} of {Math.ceil(totalItems / pagination.pageSize)}
-              </span>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleNextPage}
-                disabled={pagination.pageIndex >= Math.ceil(totalItems / pagination.pageSize) - 1}
-              >
-                Next
-              </Button>
-            </div>
-          </div>
+          <TablePagination table={table} />
         </>
       ) : (
         <div className="flex flex-col items-center justify-center py-12 text-center">
           <div className="mb-2 text-lg text-gray-500">{t('presentation.emptyState')}</div>
-          <div className="text-sm text-gray-400">Create your first presentation to get started</div>
+          <div className="text-sm text-gray-400">
+            {t('presentation.createFirst', 'Create your first presentation to get started')}
+          </div>
         </div>
       )}
     </div>

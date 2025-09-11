@@ -127,6 +127,7 @@ export default {
       title: 'Title',
       createdAt: 'Created At',
       updatedAt: 'Last Updated',
+      lastModified: 'Last Modified',
       emptyState: 'No presentations found',
       searchPlaceholder: 'Search by title...',
     },

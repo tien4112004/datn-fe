@@ -122,11 +122,12 @@ export default {
 
   table: {
     presentation: {
-      id: 'ID',
+      id: 'Mã',
       thumbnail: 'Hình',
       title: 'Tiêu đề',
       createdAt: 'Ngày tạo',
       updatedAt: 'Cập nhật gần nhất',
+      lastModified: 'Cập nhật gần nhất',
       emptyState: 'Không có bài trình bày nào được tìm thấy',
       searchPlaceholder: 'Tìm kiếm theo tiêu đề...',
     },

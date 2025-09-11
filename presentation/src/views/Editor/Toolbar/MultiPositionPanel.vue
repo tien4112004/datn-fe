@@ -1,6 +1,6 @@
 <template>
   <div class="multi-position-panel">
-    <ButtonGroup class="row">
+    <ShadcnButtonGroup class="row">
       <Button
         style="flex: 1"
         v-tooltip="$t('styling.position.multi.leftAlign')"
@@ -19,8 +19,8 @@
         @click="alignElement(ElementAlignCommands.RIGHT)"
         ><IconAlignRight
       /></Button>
-    </ButtonGroup>
-    <ButtonGroup class="row">
+    </ShadcnButtonGroup>
+    <ShadcnButtonGroup class="row">
       <Button
         style="flex: 1"
         v-tooltip="$t('styling.position.multi.topAlign')"
@@ -39,26 +39,26 @@
         @click="alignElement(ElementAlignCommands.BOTTOM)"
         ><IconAlignBottom
       /></Button>
-    </ButtonGroup>
-    <ButtonGroup class="row" v-if="displayItemCount > 2">
+    </ShadcnButtonGroup>
+    <ShadcnButtonGroup class="row" v-if="displayItemCount > 2">
       <Button style="flex: 1" @click="uniformHorizontalDisplay()">{{
         $t('styling.position.multi.horizontalDistribute')
       }}</Button>
       <Button style="flex: 1" @click="uniformVerticalDisplay()">{{
         $t('styling.position.multi.verticalDistribute')
       }}</Button>
-    </ButtonGroup>
+    </ShadcnButtonGroup>
 
     <Divider />
 
-    <ButtonGroup class="row">
+    <ShadcnButtonGroup class="row">
       <Button :disabled="!canCombine" @click="combineElements()" style="flex: 1"
         ><IconGroup style="margin-right: 3px" />{{ $t('styling.position.multi.group') }}</Button
       >
       <Button :disabled="canCombine" @click="uncombineElements()" style="flex: 1"
         ><IconUngroup style="margin-right: 3px" />{{ $t('styling.position.multi.ungroup') }}</Button
       >
-    </ButtonGroup>
+    </ShadcnButtonGroup>
   </div>
 </template>
 
@@ -70,7 +70,7 @@ import useAlignElementToCanvas from '@/hooks/useAlignElementToCanvas';
 import useUniformDisplayElement from '@/hooks/useUniformDisplayElement';
 import Divider from '@/components/Divider.vue';
 import Button from '@/components/Button.vue';
-import ButtonGroup from '@/components/ButtonGroup.vue';
+import ShadcnShadcnButtonGroup from '@/components/ShadcnShadcnButtonGroup.vue';
 
 const { canCombine, combineElements, uncombineElements } = useCombineElement();
 const { alignActiveElement } = useAlignActiveElement();

@@ -1,88 +1,55 @@
 <template>
-  <div class="button-group" :class="{ passive: passive }" ref="groupRef">
+  <ToggleGroup
+    :type="type"
+    :modelValue="modelValue"
+    @update="handleUpdate"
+    :variant="variant"
+    :size="size"
+    :class="className"
+    :disabled="disabled"
+  >
     <slot></slot>
-  </div>
+  </ToggleGroup>
 </template>
 
 <script lang="ts" setup>
-withDefaults(
+import { computed } from 'vue';
+import { ToggleGroup } from '@/components/ui/toggle-group';
+
+type ToggleType = 'single' | 'multiple' | undefined;
+type VariantType = 'default' | 'outline';
+type SizeType = 'default' | 'sm' | 'lg';
+
+const props = withDefaults(
   defineProps<{
+    // ToggleGroup props
+    type?: ToggleType;
+    modelValue?: string | string[];
+    variant?: VariantType;
+    size?: SizeType;
+    disabled?: boolean;
+
+    // Legacy ButtonGroup props
     passive?: boolean;
+    class?: string;
   }>(),
   {
+    type: undefined,
     passive: false,
+    variant: 'outline',
+    size: 'default',
+    disabled: false,
+    class: '',
   }
 );
+
+const emit = defineEmits<{
+  'update:modelValue': [value: string | string[] | undefined];
+}>();
+
+const className = computed(() => props.class);
+
+const handleUpdate = (value: string | string[] | undefined) => {
+  emit('update:modelValue', value);
+};
 </script>
-
-<style lang="scss" scoped>
-.button-group {
-  display: flex;
-  align-items: center;
-
-  ::v-deep(button.button) {
-    border-radius: 0;
-    border-left-width: 1px;
-    border-right-width: 0;
-  }
-
-  &:not(.passive) {
-    ::v-deep(button.button) {
-      &:not(:last-child, .radio, .checkbox):hover {
-        position: relative;
-
-        &::after {
-          content: '';
-          width: 1px;
-          height: calc(100% + 2px);
-          background-color: $themeColor;
-          position: absolute;
-          top: -1px;
-          right: -1px;
-        }
-      }
-
-      &:first-child {
-        border-top-left-radius: $borderRadius;
-        border-bottom-left-radius: $borderRadius;
-        border-left-width: 1px;
-      }
-
-      &:last-child {
-        border-top-right-radius: $borderRadius;
-        border-bottom-right-radius: $borderRadius;
-        border-right-width: 1px;
-      }
-    }
-  }
-  &.passive {
-    ::v-deep(button.button) {
-      &:not(.last, .radio, .checkbox):hover {
-        position: relative;
-
-        &::after {
-          content: '';
-          width: 1px;
-          height: calc(100% + 2px);
-          background-color: $themeColor;
-          position: absolute;
-          top: -1px;
-          right: -1px;
-        }
-      }
-
-      &.first {
-        border-top-left-radius: $borderRadius;
-        border-bottom-left-radius: $borderRadius;
-        border-left-width: 1px;
-      }
-
-      &.last {
-        border-top-right-radius: $borderRadius;
-        border-bottom-right-radius: $borderRadius;
-        border-right-width: 1px;
-      }
-    }
-  }
-}
-</style>

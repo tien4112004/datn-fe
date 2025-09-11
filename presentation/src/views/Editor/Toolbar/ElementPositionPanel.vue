@@ -1,7 +1,7 @@
 <template>
   <div class="element-positopn-panel">
     <div class="title title-panel">{{ $t('styling.position.single.layer') }}</div>
-    <ButtonGroup class="row">
+    <ShadcnButtonGroup class="row">
       <Button style="flex-grow: 1" @click="orderElement(handleElement!, ElementOrderCommands.TOP)">
         <div class="center">
           <IconSendToBack class="btn-icon" />
@@ -14,8 +14,8 @@
           <p>{{ $t('styling.position.single.sendToBack') }}</p>
         </div>
       </Button>
-    </ButtonGroup>
-    <ButtonGroup class="row">
+    </ShadcnButtonGroup>
+    <ShadcnButtonGroup class="row">
       <Button style="flex-grow: 1" @click="orderElement(handleElement!, ElementOrderCommands.UP)">
         <div class="center">
           <IconBringToFront class="btn-icon" />
@@ -28,12 +28,12 @@
           <p>{{ $t('styling.position.single.moveDown') }}</p>
         </div>
       </Button>
-    </ButtonGroup>
+    </ShadcnButtonGroup>
 
     <Divider />
 
     <div class="title title-panel">{{ $t('styling.position.single.alignment') }}</div>
-    <ButtonGroup class="row">
+    <ShadcnButtonGroup class="row">
       <Button
         style="flex-grow: 1"
         v-tooltip="$t('styling.position.single.leftAlign')"
@@ -52,8 +52,8 @@
         @click="alignElementToCanvas(ElementAlignCommands.RIGHT)"
         ><IconAlignRight
       /></Button>
-    </ButtonGroup>
-    <ButtonGroup class="row">
+    </ShadcnButtonGroup>
+    <ShadcnButtonGroup class="row">
       <Button
         style="flex-grow: 1"
         v-tooltip="$t('styling.position.single.topAlign')"
@@ -72,7 +72,7 @@
         @click="alignElementToCanvas(ElementAlignCommands.BOTTOM)"
         ><IconAlignBottom
       /></Button>
-    </ButtonGroup>
+    </ShadcnButtonGroup>
 
     <Divider />
     <div class="title title-panel">{{ $t('styling.position.single.properties') }}</div>
@@ -188,7 +188,7 @@ import useAlignElementToCanvas from '@/hooks/useAlignElementToCanvas';
 import useHistorySnapshot from '@/hooks/useHistorySnapshot';
 import Divider from '@/components/Divider.vue';
 import Button from '@/components/Button.vue';
-import ButtonGroup from '@/components/ButtonGroup.vue';
+import ShadcnButtonGroup from '@/components/ShadcnButtonGroup.vue';
 import NumberInput from '@/components/NumberInput.vue';
 
 const slidesStore = useSlidesStore();

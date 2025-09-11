@@ -1,14 +1,20 @@
 <template>
-  <ButtonGroup class="radio-group">
+  <ToggleGroup
+    class="radio-group"
+    type="single"
+    variant="outline"
+    :model-value="value"
+    @update:model-value="handleUpdateValue"
+    :disabled="disabled"
+  >
     <slot></slot>
-  </ButtonGroup>
+  </ToggleGroup>
 </template>
 
 <script lang="ts" setup>
 import { computed, provide } from 'vue';
 import { injectKeyRadioGroupValue } from '@/types/injectKey';
-
-import ButtonGroup from './ButtonGroup.vue';
+import { ToggleGroup } from '@/components/ui/toggle-group';
 
 const props = withDefaults(
   defineProps<{
@@ -23,6 +29,12 @@ const props = withDefaults(
 const emit = defineEmits<{
   (event: 'update:value', payload: string): void;
 }>();
+
+const handleUpdateValue = (newValue: any) => {
+  if (props.disabled || !newValue) return;
+  const stringValue = typeof newValue === 'string' ? newValue : String(newValue);
+  emit('update:value', stringValue);
+};
 
 const updateValue = (value: string) => {
   if (props.disabled) return;

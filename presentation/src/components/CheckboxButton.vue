@@ -1,11 +1,21 @@
 <template>
-  <Button :checked="checked" :disabled="disabled" type="checkbox">
+  <Button
+    :variant="checked ? 'default' : 'outline'"
+    :disabled="disabled"
+    :class="
+      cn('transition-colors', {
+        'bg-primary text-primary-foreground hover:bg-primary/90': checked && !disabled,
+        'hover:text-primary hover:border-primary': !checked && !disabled,
+      })
+    "
+  >
     <slot></slot>
   </Button>
 </template>
 
 <script lang="ts" setup>
-import Button from './Button.vue';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 withDefaults(
   defineProps<{

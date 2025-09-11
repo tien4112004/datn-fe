@@ -1,7 +1,7 @@
 <template>
   <div class="theme-styles-extract">
     <Tabs
-      :tabs="tabs.map((tab) => ({ ...tab, label: $t(`themeStylesExtract.${tab.key}`) }))"
+      :tabs="tabs"
       v-model:value="activeTab"
       :tabsStyle="{ marginBottom: '12px' }"
       :tabStyle="{ padding: '8px 12px' }"

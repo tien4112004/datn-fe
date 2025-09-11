@@ -15,7 +15,7 @@
       </div>
       <div class="row" v-if="rangeType === 'custom'">
         <div class="title" :data-range="`（${range[0]} ~ ${range[1]}）`">
-          {{ $t('exportDialog.common.customRange', { min: range[0], max: range[1] }) }}
+          {{ $t('files.export.common.customRange', { min: range[0], max: range[1] }) }}
         </div>
         <Slider class="config-item" range :min="1" :max="slides.length" :step="1" v-model:value="range" />
       </div>

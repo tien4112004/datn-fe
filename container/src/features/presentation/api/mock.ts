@@ -70,7 +70,7 @@ const mockOutlineItems: OutlineItem[] = [
   },
 ];
 
-const mockPresentationItems: Presentation[] = [];
+let mockPresentationItems: Presentation[] = [];
 
 const initMockPresentations = async () => {
   try {
@@ -79,7 +79,6 @@ const initMockPresentations = async () => {
       fetch('/data/presentation2.json'),
     ]);
     const presentations = await Promise.all(responses.map((res) => res.json()));
-
     mockPresentationItems.push(...presentations);
   } catch (error) {
     // Silently handle fetch errors in test environment where public/data files don't exist
@@ -145,14 +144,37 @@ export default class PresentationMockService implements PresentationApiService {
     });
   }
 
-  getPresentations(_: PresentationCollectionRequest): Promise<ApiResponse<Presentation[]>> {
+  getPresentations(request: PresentationCollectionRequest): Promise<ApiResponse<Presentation[]>> {
     return new Promise((resolve) => {
       setTimeout(() => {
+        const duplicationCount = 20;
+        const items: Presentation[] = [];
+        for (let i = 0; i < duplicationCount; i++) {
+          mockPresentationItems.forEach((p, idx) => {
+            items.push({
+              ...p,
+              id: `${p.id || idx}-${i}`,
+              title: p.title ? `${p.title} (${i + 1})` : `Presentation ${i + 1}`,
+            });
+          });
+        }
+        const page = request.page ?? 0;
+        const pageSize = request.pageSize ?? 10;
+        const start = page * pageSize;
+        const end = start + pageSize;
+        const pagedItems = items.slice(start, end);
+
         resolve({
-          data: [...mockPresentationItems],
+          data: pagedItems,
           success: true,
           message: 'Mock presentations fetched successfully',
           code: 200,
+          pagination: {
+            currentPage: page,
+            pageSize,
+            totalItems: items.length,
+            totalPages: Math.ceil(items.length / pageSize),
+          },
         });
       }, 500);
     });

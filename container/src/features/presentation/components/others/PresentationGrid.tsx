@@ -135,7 +135,7 @@ const PresentationGrid = () => {
           className="w-full rounded-lg border-2 border-slate-200"
         />
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-          {Array.from({ length: 8 }).map((_, index) => (
+          {Array.from({ length: 10 }).map((_, index) => (
             <div key={index} className="animate-pulse">
               <div className="mb-3 aspect-video w-full rounded-lg bg-gray-200" />
               <div className="mb-2 h-4 rounded bg-gray-200" />

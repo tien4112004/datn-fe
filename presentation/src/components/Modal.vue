@@ -1,7 +1,15 @@
 <template>
   <Teleport to="body">
     <Transition name="modal-fade">
-      <div class="modal" ref="modalRef" v-show="visible" tabindex="-1" @keyup.esc="onEsc()">
+      <div
+        class="modal"
+        ref="modalRef"
+        v-show="visible"
+        tabindex="-1"
+        aria-modal="true"
+        role="dialog"
+        @keyup.esc="onEsc()"
+      >
         <div class="mask" @click="onClickMask()"></div>
         <Transition
           name="modal-zoom"

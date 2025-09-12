@@ -5,7 +5,7 @@
     <Input
       class="input"
       v-if="type === 'web'"
-      v-model:value="address"
+      v-model="address"
       :placeholder="t('canvas.linkDialog.enterWebAddress')"
     />
 
@@ -32,7 +32,7 @@ import useLink from '@/hooks/useLink';
 
 import ThumbnailSlide from '@/views/components/ThumbnailSlide/index.vue';
 import Tabs from '@/components/Tabs.vue';
-import Input from '@/components/Input.vue';
+import { Input } from '@/components/ui/input';
 import Button from '@/components/Button.vue';
 import Select from '@/components/Select.vue';
 

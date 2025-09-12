@@ -1,38 +1,16 @@
 <template>
-  <Button class="text-color-btn">
+  <Button variant="outline" size="default" class="h-auto min-h-9 w-full flex-col p-0">
     <slot></slot>
-    <div class="text-color-block">
-      <div class="text-color-block-content" :style="{ backgroundColor: color }"></div>
+    <div class="relative mt-[-4px] h-1 w-[17px]">
+      <div class="absolute inset-0" :style="{ backgroundColor: color }"></div>
     </div>
   </Button>
 </template>
 
 <script lang="ts" setup>
-import Button from './Button.vue';
+import { Button } from './ui/button';
 
 defineProps<{
   color: string;
 }>();
 </script>
-
-<style lang="scss" scoped>
-.text-color-btn {
-  width: 100%;
-  display: flex !important;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 0;
-}
-.text-color-block {
-  width: 17px;
-  height: 4px;
-  margin-top: 1px;
-  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAAXNSR0IArs4c6QAAACdJREFUGFdjfPbs2X8GBgYGSUlJEMXAiCHw//9/sIrnz59DVKALAADNxxVfaiODNQAAAABJRU5ErkJggg==);
-
-  .text-color-block-content {
-    width: 100%;
-    height: 100%;
-  }
-}
-</style>

@@ -1,29 +1,27 @@
 <template>
-  <ToggleGroupItem
-    :value="value"
+  <Button
+    :checked="!disabled && _value === value"
     :disabled="disabled"
+    type="radio"
+    @click="!disabled && updateValue(value)"
     :class="
       cn('transition-colors', {
-        'text-primary-foreground bg-primary': !disabled && _value === value,
-        'hover:text-primary-foreground hover:border-primary': !disabled && _value !== value,
+        'text-primary-foreground bg-primary hover:text-primary-foreground': !disabled && _value === value,
+        'hover:text-primary hover:border-primary': !disabled && _value !== value,
       })
     "
   >
     <slot></slot>
-  </ToggleGroupItem>
+  </Button>
 </template>
 
 <script lang="ts" setup>
 import { inject } from 'vue';
 import { injectKeyRadioGroupValue, type RadioGroupValue } from '@/types/injectKey';
-import { ToggleGroupItem } from '@/components/ui/toggle-group';
 import { cn } from '@/lib/utils';
+import Button from './Button.vue';
 
-// Maintain backward compatibility by still injecting the radio group context
-// This allows the component to work with the existing API
-const radioGroupContext = inject(injectKeyRadioGroupValue, null) as RadioGroupValue | null;
-const _value = radioGroupContext?.value;
-const updateValue = radioGroupContext?.updateValue;
+const { value: _value, updateValue } = inject(injectKeyRadioGroupValue) as RadioGroupValue;
 
 withDefaults(
   defineProps<{

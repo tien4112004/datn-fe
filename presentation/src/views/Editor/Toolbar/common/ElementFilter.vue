@@ -3,7 +3,7 @@
     <div class="row">
       <div style="flex: 2">{{ t('styling.effects.filter.enableFilter') }}</div>
       <div class="switch-wrapper" style="flex: 3">
-        <Switch :value="hasFilters" @update:value="(value) => toggleFilters(value)" />
+        <Switch :value="hasFilters" @update:value="(value) => toggleFilters(value)" size="small" />
       </div>
     </div>
     <template v-if="hasFilters">

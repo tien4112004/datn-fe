@@ -1,5 +1,9 @@
 <template>
-  <div class="popover-menu-item" :class="{ center: center }" @click="emit('click')">
+  <div
+    class="min-w-[80px] cursor-pointer rounded px-2.5 py-1.5 text-sm hover:bg-gray-100 [&+&]:mt-0.5"
+    :class="center ? 'text-center' : ''"
+    @click="emit('click')"
+  >
     <slot></slot>
   </div>
 </template>
@@ -18,24 +22,3 @@ const emit = defineEmits<{
   (event: 'click'): void;
 }>();
 </script>
-
-<style lang="scss" scoped>
-.popover-menu-item {
-  min-width: 80px;
-  padding: 6px 10px;
-  border-radius: $borderRadius;
-  font-size: $smTextSize;
-  cursor: pointer;
-
-  &.center {
-    text-align: center;
-  }
-
-  &:hover {
-    background-color: #f1f1f1;
-  }
-  & + .popover-menu-item {
-    margin-top: 2px;
-  }
-}
-</style>

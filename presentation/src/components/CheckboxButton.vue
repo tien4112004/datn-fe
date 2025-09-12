@@ -4,7 +4,7 @@
     :disabled="disabled"
     :class="
       cn('transition-colors', {
-        'bg-primary text-primary-foreground hover:bg-primary/90': checked && !disabled,
+        'bg-primary text-primary-foreground hover:bg-accent': checked && !disabled,
         'hover:text-primary hover:border-primary': !checked && !disabled,
       })
     "

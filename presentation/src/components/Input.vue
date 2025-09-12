@@ -1,30 +1,45 @@
 <template>
   <div
-    class="input"
-    :class="{
-      disabled: disabled,
-      focused: focused,
-      simple: simple,
-    }"
+    :class="[
+      'bg-background duration-250 flex min-h-[30px] items-center rounded border border-gray-300 px-[5px] transition-colors',
+      {
+        'border-gray-200 bg-gray-100 text-gray-400': disabled,
+        'border-blue-500': focused || (hovering && !disabled),
+        'border-0': simple,
+      },
+    ]"
+    @mouseenter="!disabled && (hovering = true)"
+    @mouseleave="hovering = false"
   >
-    <span class="prefix">
+    <span v-if="$slots.prefix" class="flex select-none items-center justify-center leading-[30px]">
       <slot name="prefix"></slot>
     </span>
-    <input
-      type="text"
+    <Input
       ref="inputRef"
+      :model-value="value"
+      type="text"
       :disabled="disabled"
-      :value="value"
       :placeholder="placeholder"
       :maxlength="maxlength"
-      @input="($event) => handleInput($event)"
-      @focus="($event) => handleFocus($event)"
-      @blur="($event) => handleBlur($event)"
-      @change="($event) => emit('change', $event)"
-      @keydown.enter="($event) => emit('enter', $event)"
-      @keydown.backspace="($event) => emit('backspace', $event)"
+      :class="[
+        'h-[30px] min-w-0 flex-1 border-0 bg-transparent px-0 leading-[30px] shadow-none focus-visible:border-0 focus-visible:ring-0',
+        {
+          'text-gray-400': disabled,
+        },
+      ]"
+      style="
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
+          sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+      "
+      @update:model-value="(newValue: string | number) => emit('update:value', String(newValue))"
+      @focus="($event: Event) => handleFocus($event)"
+      @blur="($event: Event) => handleBlur($event)"
+      @change="($event: Event) => emit('change', $event)"
+      @keydown.enter="($event: Event) => emit('enter', $event)"
+      @keydown.backspace="($event: Event) => emit('backspace', $event)"
     />
-    <span class="suffix">
+    <span v-if="$slots.suffix" class="flex select-none items-center justify-center leading-[30px]">
       <slot name="suffix"></slot>
     </span>
   </div>
@@ -32,6 +47,7 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue';
+import { Input } from '@/components/ui/input';
 
 withDefaults(
   defineProps<{
@@ -59,10 +75,8 @@ const emit = defineEmits<{
 }>();
 
 const focused = ref(false);
+const hovering = ref(false);
 
-const handleInput = (e: Event) => {
-  emit('update:value', (e.target as HTMLInputElement).value);
-};
 const handleBlur = (e: Event) => {
   focused.value = false;
   emit('blur', e);
@@ -72,72 +86,16 @@ const handleFocus = (e: Event) => {
   emit('focus', e);
 };
 
-const inputRef = ref<HTMLInputElement>();
+const inputRef = ref();
 const focus = () => {
-  if (inputRef.value) inputRef.value.focus();
+  if (inputRef.value?.$el) {
+    inputRef.value.$el.focus();
+  } else if (inputRef.value?.focus) {
+    inputRef.value.focus();
+  }
 };
 
 defineExpose({
   focus,
 });
 </script>
-
-<style lang="scss" scoped>
-.input {
-  background-color: $background;
-  border: 1px solid #d9d9d9;
-  padding: 0 5px;
-  border-radius: $borderRadius;
-  transition: border-color 0.25s;
-  font-size: 13px;
-  display: flex;
-
-  input {
-    min-width: 0;
-    height: 30px;
-    outline: 0;
-    border: 0;
-    line-height: 30px;
-    vertical-align: top;
-    color: $textColor;
-    padding: 0 5px;
-    flex: 1;
-    font-size: 13px;
-    font-family:
-      -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif,
-      'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
-
-    &::placeholder {
-      color: $muted-foreground;
-    }
-  }
-
-  &:not(.disabled):hover,
-  &.focused {
-    border-color: $themeColor;
-  }
-
-  &.disabled {
-    background-color: $gray-f5f5f5;
-    border-color: #dcdcdc;
-    color: #b7b7b7;
-
-    input {
-      color: #b7b7b7;
-    }
-  }
-
-  &.simple {
-    border: 0;
-  }
-
-  .prefix,
-  .suffix {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    line-height: 30px;
-    user-select: none;
-  }
-}
-</style>

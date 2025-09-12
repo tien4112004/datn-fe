@@ -1,8 +1,13 @@
 <template>
-  <div class="select-wrap" v-if="disabled">
-    <div class="select disabled" ref="selectRef">
-      <div class="selector"><slot name="label"></slot></div>
-      <div class="icon">
+  <div v-if="disabled">
+    <div
+      ref="selectRef"
+      class="relative h-8 w-full cursor-default select-none border border-gray-300 bg-gray-50 pr-8 text-sm text-gray-500 transition-colors duration-200"
+    >
+      <div class="h-[30px] min-w-[50px] truncate pl-2.5 leading-[30px]">
+        <slot name="label"></slot>
+      </div>
+      <div class="absolute right-0 top-0 flex h-[30px] w-8 items-center justify-center text-gray-400">
         <slot name="icon">
           <IconDown :size="14" />
         </slot>
@@ -10,7 +15,6 @@
     </div>
   </div>
   <Popover
-    class="select-wrap"
     trigger="click"
     v-model:value="popoverVisible"
     placement="bottom"
@@ -21,13 +25,22 @@
     v-else
   >
     <template #content>
-      <div class="options" :style="{ width: width + 2 + 'px' }" @click="popoverVisible = false">
+      <div
+        class="max-h-[260px] select-none overflow-auto p-1.5 text-left text-sm"
+        :style="{ width: width + 2 + 'px' }"
+        @click="popoverVisible = false"
+      >
         <slot name="options"></slot>
       </div>
     </template>
-    <div class="select" ref="selectRef">
-      <div class="selector"><slot name="label"></slot></div>
-      <div class="icon">
+    <div
+      ref="selectRef"
+      class="relative h-8 w-full cursor-pointer select-none rounded-md border border-gray-300 bg-white pr-8 text-sm transition-colors duration-200 hover:border-blue-500"
+    >
+      <div class="h-[30px] min-w-[50px] truncate pl-2.5 leading-[30px]">
+        <slot name="label"></slot>
+      </div>
+      <div class="absolute right-0 top-0 flex h-[30px] w-8 items-center justify-center text-gray-400">
         <slot name="icon">
           <IconDown :size="14" />
         </slot>
@@ -67,57 +80,3 @@ onUnmounted(() => {
   resizeObserver.unobserve(selectRef.value);
 });
 </script>
-
-<style lang="scss" scoped>
-.select {
-  width: 100%;
-  height: 32px;
-  padding-right: 32px;
-  border-radius: $borderRadius;
-  transition: border-color 0.25s;
-  font-size: 13px;
-  user-select: none;
-  background-color: $background;
-  border: 1px solid #d9d9d9;
-  position: relative;
-  cursor: pointer;
-
-  &:not(.disabled):hover {
-    border-color: $themeColor;
-  }
-
-  &.disabled {
-    background-color: $gray-f5f5f5;
-    border-color: #dcdcdc;
-    color: #b7b7b7;
-    cursor: default;
-  }
-
-  .selector {
-    min-width: 50px;
-    height: 30px;
-    line-height: 30px;
-    padding-left: 10px;
-    @include ellipsis-oneline();
-  }
-}
-.options {
-  max-height: 260px;
-  padding: 5px;
-  overflow: auto;
-  text-align: left;
-  font-size: 13px;
-  user-select: none;
-}
-.icon {
-  width: 32px;
-  height: 30px;
-  color: $muted-foreground;
-  position: absolute;
-  top: 0;
-  right: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-</style>

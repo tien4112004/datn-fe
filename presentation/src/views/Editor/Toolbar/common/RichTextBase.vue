@@ -1,8 +1,8 @@
 <template>
   <div class="rich-text-base">
-    <SelectGroup class="row">
+    <ButtonGroup class="row">
       <Select
-        style="width: 60%"
+        style="width: 50%"
         :value="richTextAttrs.fontname"
         search
         :searchLabel="$t('elements.text.editor.searchFont')"
@@ -14,7 +14,7 @@
         </template>
       </Select>
       <Select
-        style="width: 40%"
+        style="width: 50%"
         :value="richTextAttrs.fontsize"
         search
         :searchLabel="$t('elements.text.editor.searchFontSize')"
@@ -30,21 +30,21 @@
           <IconAddText />
         </template>
       </Select>
-    </SelectGroup>
+    </ButtonGroup>
 
-    <ButtonGroup class="row" passive>
-      <Popover trigger="click" style="width: 30%">
+    <ButtonGroup class="row">
+      <Popover trigger="click" triggerClass="w-[30%]">
         <template #content>
           <ColorPicker
             :modelValue="richTextAttrs.color"
             @update:modelValue="(value) => emitRichTextCommand('color', value)"
           />
         </template>
-        <TextColorButton first v-tooltip="t('elements.text.editor.textColor')" :color="richTextAttrs.color">
+        <TextColorButton v-tooltip="t('elements.text.editor.textColor')" :color="richTextAttrs.color">
           <IconText />
         </TextColorButton>
       </Popover>
-      <Popover trigger="click" style="width: 30%">
+      <Popover trigger="click" triggerClass="w-[30%]">
         <template #content>
           <ColorPicker
             :modelValue="richTextAttrs.backcolor"
@@ -63,7 +63,6 @@
         ><IconFontSize />+</Button
       >
       <Button
-        last
         class="font-size-btn"
         style="width: 20%"
         v-tooltip="t('elements.text.editor.decreaseFontSize')"
@@ -74,28 +73,28 @@
 
     <ButtonGroup class="row">
       <CheckboxButton
-        style="flex: 1"
+        class="flex-1"
         :checked="richTextAttrs.bold"
         v-tooltip="t('elements.text.editor.bold')"
         @click="emitRichTextCommand('bold')"
         ><IconTextBold
       /></CheckboxButton>
       <CheckboxButton
-        style="flex: 1"
+        class="flex-1"
         :checked="richTextAttrs.em"
         v-tooltip="t('elements.text.editor.italic')"
         @click="emitRichTextCommand('em')"
         ><IconTextItalic
       /></CheckboxButton>
       <CheckboxButton
-        style="flex: 1"
+        class="flex-1"
         :checked="richTextAttrs.underline"
         v-tooltip="t('elements.text.editor.underline')"
         @click="emitRichTextCommand('underline')"
         ><IconTextUnderline
       /></CheckboxButton>
       <CheckboxButton
-        style="flex: 1"
+        class="flex-1"
         :checked="richTextAttrs.strikethrough"
         v-tooltip="t('elements.text.editor.strikethrough')"
         @click="emitRichTextCommand('strikethrough')"
@@ -105,28 +104,28 @@
 
     <ButtonGroup class="row">
       <CheckboxButton
-        style="flex: 1"
+        class="flex-1"
         :checked="richTextAttrs.superscript"
         v-tooltip="t('elements.text.editor.superscript')"
         @click="emitRichTextCommand('superscript')"
         >A²</CheckboxButton
       >
       <CheckboxButton
-        style="flex: 1"
+        class="flex-1"
         :checked="richTextAttrs.subscript"
         v-tooltip="t('elements.text.editor.subscript')"
         @click="emitRichTextCommand('subscript')"
         >A₂</CheckboxButton
       >
       <CheckboxButton
-        style="flex: 1"
+        class="flex-1"
         :checked="richTextAttrs.code"
         v-tooltip="t('elements.text.editor.inlineCode')"
         @click="emitRichTextCommand('code')"
         ><IconCode
       /></CheckboxButton>
       <CheckboxButton
-        style="flex: 1"
+        class="flex-1"
         :checked="richTextAttrs.blockquote"
         v-tooltip="t('elements.text.editor.blockquote')"
         @click="emitRichTextCommand('blockquote')"
@@ -134,16 +133,15 @@
       /></CheckboxButton>
     </ButtonGroup>
 
-    <ButtonGroup class="row" passive>
+    <ButtonGroup class="row">
       <CheckboxButton
-        first
-        style="flex: 1"
+        class="flex-1"
         v-tooltip="t('elements.text.editor.clearFormatting')"
         @click="emitRichTextCommand('clear')"
         ><IconFormat
       /></CheckboxButton>
       <CheckboxButton
-        style="flex: 1"
+        class="flex-1"
         :checked="!!textFormatPainter"
         v-tooltip="t('elements.text.editor.formatPainter')"
         @click="toggleTextFormatPainter()"
@@ -158,7 +156,7 @@
       >
         <template #content>
           <div class="link-popover">
-            <Input v-model:value="link" :placeholder="t('elements.text.editor.enterHyperlink')" />
+            <Input v-model="link" :placeholder="t('elements.text.editor.enterHyperlink')" />
             <div class="btns">
               <Button
                 size="small"
@@ -174,7 +172,6 @@
           </div>
         </template>
         <CheckboxButton
-          last
           style="width: 100%"
           :checked="!!richTextAttrs.link"
           v-tooltip="$t('elements.text.editor.hyperlink')"
@@ -191,26 +188,25 @@
       :value="richTextAttrs.align"
       @update:value="(value) => emitRichTextCommand('align', value)"
     >
-      <RadioButton value="left" v-tooltip="$t('elements.text.editor.alignLeft')" style="flex: 1"
+      <RadioButton value="left" v-tooltip="$t('elements.text.editor.alignLeft')" class="flex-1"
         ><IconAlignTextLeft
       /></RadioButton>
-      <RadioButton value="center" v-tooltip="$t('elements.text.editor.alignCenter')" style="flex: 1"
+      <RadioButton value="center" v-tooltip="$t('elements.text.editor.alignCenter')" class="flex-1"
         ><IconAlignTextCenter
       /></RadioButton>
-      <RadioButton value="right" v-tooltip="$t('elements.text.editor.alignRight')" style="flex: 1"
+      <RadioButton value="right" v-tooltip="$t('elements.text.editor.alignRight')" class="flex-1"
         ><IconAlignTextRight
       /></RadioButton>
-      <RadioButton value="justify" v-tooltip="$t('elements.text.editor.justify')" style="flex: 1"
+      <RadioButton value="justify" v-tooltip="$t('elements.text.editor.justify')" class="flex-1"
         ><IconAlignTextBoth
       /></RadioButton>
     </RadioGroup>
 
     <div class="row">
-      <ButtonGroup style="flex: 1" passive>
+      <ButtonGroup class="flex-1">
         <Button
-          first
           :type="richTextAttrs.bulletList ? 'primary' : 'default'"
-          style="flex: 1"
+          class="flex-1"
           v-tooltip="$t('elements.text.editor.bulletList')"
           @click="emitRichTextCommand('bulletList')"
           ><IconList
@@ -231,15 +227,14 @@
               </ul>
             </div>
           </template>
-          <Button last class="popover-btn"><IconDown /></Button>
+          <Button class="popover-btn"><IconDown /></Button>
         </Popover>
       </ButtonGroup>
       <div style="width: 10px"></div>
-      <ButtonGroup style="flex: 1" passive>
+      <ButtonGroup class="flex-1">
         <Button
-          first
           :type="richTextAttrs.orderedList ? 'primary' : 'default'"
-          style="flex: 1"
+          class="flex-1"
           v-tooltip="$t('elements.text.editor.numberedList')"
           @click="emitRichTextCommand('orderedList')"
           ><IconOrderedList
@@ -260,16 +255,15 @@
               </ul>
             </div>
           </template>
-          <Button last class="popover-btn"><IconDown /></Button>
+          <Button class="popover-btn"><IconDown /></Button>
         </Popover>
       </ButtonGroup>
     </div>
 
     <div class="row">
-      <ButtonGroup style="flex: 1" passive>
+      <ButtonGroup class="flex-1">
         <Button
-          first
-          style="flex: 1"
+          class="flex-1"
           v-tooltip="$t('elements.text.editor.decreaseIndent')"
           @click="emitRichTextCommand('indent', '-1')"
           ><IconIndentLeft
@@ -280,14 +274,13 @@
               $t('elements.text.editor.reduceFirstLineIndent')
             }}</PopoverMenuItem>
           </template>
-          <Button last class="popover-btn"><IconDown /></Button>
+          <Button class="popover-btn"><IconDown /></Button>
         </Popover>
       </ButtonGroup>
       <div style="width: 10px"></div>
-      <ButtonGroup style="flex: 1" passive>
+      <ButtonGroup class="flex-1">
         <Button
-          first
-          style="flex: 1"
+          class="flex-1"
           v-tooltip="$t('elements.text.editor.increaseIndent')"
           @click="emitRichTextCommand('indent', '+1')"
           ><IconIndentRight
@@ -298,7 +291,7 @@
               $t('elements.text.editor.increaseFirstLineIndent')
             }}</PopoverMenuItem>
           </template>
-          <Button last class="popover-btn"><IconDown /></Button>
+          <Button class="popover-btn"><IconDown /></Button>
         </Popover>
       </ButtonGroup>
     </div>
@@ -318,11 +311,10 @@ import { useI18n } from 'vue-i18n';
 import TextColorButton from '@/components/TextColorButton.vue';
 import CheckboxButton from '@/components/CheckboxButton.vue';
 import ColorPicker from '@/components/ColorPicker/index.vue';
-import Input from '@/components/Input.vue';
+import { Input } from '@/components/ui/input';
 import Button from '@/components/Button.vue';
 import ButtonGroup from '@/components/ButtonGroup.vue';
 import Select from '@/components/Select.vue';
-import SelectGroup from '@/components/SelectGroup.vue';
 import Divider from '@/components/Divider.vue';
 import Popover from '@/components/Popover.vue';
 import RadioButton from '@/components/RadioButton.vue';

@@ -3,7 +3,7 @@
     <div class="row" v-if="!fixed">
       <div style="width: 40%">{{ $t('styling.effects.outline.border') }}</div>
       <div class="switch-wrapper" style="width: 60%">
-        <Switch :value="hasOutline" @update:value="(value) => toggleOutline(value)" />
+        <Switch :value="hasOutline" @update:value="(value) => toggleOutline(value)" size="small" />
       </div>
     </div>
     <template v-if="hasOutline && outline">

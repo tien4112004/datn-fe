@@ -8,7 +8,7 @@
       ></textarea>
     </div>
     <div class="toolbar">
-      <ShadcnButtonGroup class="row">
+      <ButtonGroup class="row">
         <Button style="flex: 1" @click="createSlide()"
           ><IconPlus class="icon" /> {{ $t('mobile.toolbar.slide.newSlide') }}</Button
         >
@@ -18,8 +18,8 @@
         <Button style="flex: 1" @click="deleteSlide()"
           ><IconDelete class="icon" /> {{ $t('mobile.toolbar.slide.delete') }}</Button
         >
-      </ShadcnButtonGroup>
-      <ShadcnButtonGroup class="row">
+      </ButtonGroup>
+      <ButtonGroup class="row">
         <Button style="flex: 1" @click="insertTextElement()"
           ><IconFontSize class="icon" /> {{ $t('mobile.toolbar.slide.text') }}</Button
         >
@@ -34,7 +34,7 @@
         <Button style="flex: 1" @click="insertShapeElement('round')"
           ><IconRound class="icon" /> {{ $t('mobile.toolbar.slide.circle') }}</Button
         >
-      </ShadcnButtonGroup>
+      </ButtonGroup>
     </div>
 
     <MobileThumbnails />
@@ -54,7 +54,7 @@ import { useI18n } from 'vue-i18n';
 import MobileThumbnails from '../MobileThumbnails.vue';
 import FileInput from '@/components/FileInput.vue';
 import Button from '@/components/Button.vue';
-import ShadcnShadcnButtonGroup from '@/components/ShadcnShadcnButtonGroup.vue';
+import ButtonGroup from '@/components/ButtonGroup.vue';
 
 const slidesStore = useSlidesStore();
 const { viewportRatio, currentSlide, viewportSize } = storeToRefs(slidesStore);

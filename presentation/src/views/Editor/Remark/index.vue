@@ -1,6 +1,14 @@
 <template>
   <div class="remark">
-    <div class="resize-handler" @mousedown="($event) => resize($event)"></div>
+    <div class="resize-handler" @mousedown="($event) => resize($event)">
+      <div class="resize-indicator">
+        <div class="resize-dots">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </div>
+    </div>
     <Editor :value="remark" ref="editorRef" @update="(value) => handleInput(value)" />
   </div>
 </template>
@@ -74,13 +82,71 @@ const resize = (e: MouseEvent) => {
   position: relative;
   border-top: 1px solid $borderColor;
 }
+
 .resize-handler {
-  height: 7px;
+  height: 12px;
   position: absolute;
-  top: -3px;
+  top: -6px;
   left: 0;
   right: 0;
   cursor: n-resize;
   z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+
+  &:hover {
+    .resize-indicator {
+      opacity: 1;
+      transform: scale(1.1);
+    }
+  }
+}
+
+.resize-indicator {
+  padding: 2px 8px;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+  opacity: 0.6;
+  transition: all 0.2s ease;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+
+  .resize-dots {
+    display: flex;
+    gap: 2px;
+    align-items: center;
+
+    span {
+      width: 3px;
+      height: 3px;
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 50%;
+      display: block;
+      transition: background 0.2s ease;
+    }
+  }
+}
+
+.resize-handler:hover {
+  .resize-indicator {
+    background: rgba(0, 0, 0, 0.08);
+    border-color: rgba(0, 0, 0, 0.15);
+
+    .resize-dots span {
+      background: rgba(0, 0, 0, 0.6);
+    }
+  }
+}
+
+.resize-handler:active {
+  .resize-indicator {
+    background: rgba(0, 0, 0, 0.12);
+    transform: scale(1.05);
+
+    .resize-dots span {
+      background: rgba(0, 0, 0, 0.8);
+    }
+  }
 }
 </style>

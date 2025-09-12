@@ -235,16 +235,16 @@ onUnmounted(() => {
 
   ::v-deep(.ProseMirror) {
     height: 100%;
-    font-size: $xsTextSize;
+    font-size: $baseTextSize;
     overflow: auto;
     padding: 8px;
-    line-height: 1.5;
+    line-height: 2;
 
     & > p[data-placeholder]::before {
       content: attr(data-placeholder);
       pointer-events: none;
       position: absolute;
-      font-size: $xsTextSize;
+      font-size: $baseTextSize;
       color: rgba($gray-666, 0.5);
     }
   }

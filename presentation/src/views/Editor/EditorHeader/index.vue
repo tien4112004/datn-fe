@@ -11,7 +11,7 @@
         <Input
           class="title-input"
           ref="titleInputRef"
-          v-model="titleValue"
+          v-model:value="titleValue"
           @blur="handleUpdateTitle()"
           v-if="editingTitle"
         />
@@ -77,23 +77,6 @@
             "
             >{{ $t('header.tools.quickActions') }}</PopoverMenuItem
           >
-
-          <!-- Demo message -->
-          <PopoverMenuItem @click="message.success('This is a success message')"
-            >Demo Success Message
-          </PopoverMenuItem>
-
-          <PopoverMenuItem @click="message.info('This is an info message')"
-            >Demo Info Message
-          </PopoverMenuItem>
-
-          <PopoverMenuItem @click="message.warning('This is a warning message')"
-            >Demo Warning Message
-          </PopoverMenuItem>
-
-          <PopoverMenuItem @click="message.error('This is an error message')"
-            >Demo Error Message
-          </PopoverMenuItem>
         </template>
         <div class="menu-item">
           <div class="handler-item">
@@ -178,7 +161,7 @@ import HotkeyDoc from './HotkeyDoc.vue';
 import FileInput from '@/components/FileInput.vue';
 import FullscreenSpin from '@/components/FullscreenSpin.vue';
 import Drawer from '@/components/Drawer.vue';
-import { Input } from '@/components/ui/input';
+import Input from '@/components/Input.vue';
 import Popover from '@/components/Popover.vue';
 import PopoverMenuItem from '@/components/PopoverMenuItem.vue';
 import LanguageSwitcher from '@/components/LanguageSwitcher.vue';

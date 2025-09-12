@@ -1,24 +1,38 @@
 <template>
-  <Popover class="language-switcher" v-model:value="dropdownVisible" trigger="click" placement="bottom-end">
-    <div class="language-icon" :title="$t('header.tools.changeLanguage')">
-      <span class="current-flag">{{ getCurrentFlag() }}</span>
-      <svg class="dropdown-arrow" viewBox="0 0 16 16" width="12" height="12">
+  <Popover class="relative flex" v-model:value="dropdownVisible" trigger="click" placement="bottom-end">
+    <div
+      class="flex cursor-pointer select-none items-center gap-1 rounded-md px-2 py-1.5 transition-colors duration-200"
+      :title="$t('header.tools.changeLanguage')"
+    >
+      <span class="text-base leading-none">{{ getCurrentFlag() }}</span>
+      <svg
+        class="opacity-60 transition-all duration-200 hover:opacity-100"
+        :class="{ 'rotate-180': dropdownVisible }"
+        viewBox="0 0 16 16"
+        width="12"
+        height="12"
+      >
         <path d="M8 10.5L4 6.5h8L8 10.5z" fill="currentColor" />
       </svg>
     </div>
     <template #content>
-      <div class="language-menu">
-        <PopoverMenuItem
+      <div class="min-w-[140px]">
+        <div
           v-for="locale in getAvailableLocales()"
           :key="locale.code"
           @click="handleLocaleChange(locale.code)"
-          :class="{ active: locale.code === currentLocale }"
+          :class="[
+            'flex min-w-[80px] cursor-pointer items-center gap-2 rounded px-3 py-2 text-sm transition-colors duration-200',
+            locale.code === currentLocale
+              ? 'bg-primary text-primary-foreground'
+              : 'hover:bg-accent hover:text-accent-foreground',
+          ]"
         >
-          <span class="flag">{{ locale.flag }}</span>
-          <span class="locale-name">{{ locale.name }}</span>
+          <span class="flex-shrink-0 text-sm">{{ locale.flag }}</span>
+          <span class="flex-1 text-xs">{{ locale.name }}</span>
           <svg
             v-if="locale.code === currentLocale"
-            class="check-icon"
+            class="flex-shrink-0 opacity-80"
             viewBox="0 0 16 16"
             width="12"
             height="12"
@@ -28,7 +42,7 @@
               fill="currentColor"
             />
           </svg>
-        </PopoverMenuItem>
+        </div>
       </div>
     </template>
   </Popover>
@@ -39,7 +53,6 @@ import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { changeLocale, getCurrentLocale, getAvailableLocales } from '@/locales';
 import Popover from '@/components/Popover.vue';
-import PopoverMenuItem from '@/components/PopoverMenuItem.vue';
 
 const { locale } = useI18n();
 
@@ -57,67 +70,3 @@ const handleLocaleChange = (newLocale: string) => {
   }
 };
 </script>
-
-<style scoped lang="scss">
-@use 'sass:color';
-
-.language-switcher {
-  position: relative;
-
-  .language-icon {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    padding: 6px 8px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-    user-select: none;
-
-    .current-flag {
-      font-size: 16px;
-      line-height: 1;
-    }
-
-    .dropdown-arrow {
-      opacity: 0.6;
-      transition: transform 0.2s ease;
-    }
-
-    &:hover .dropdown-arrow {
-      opacity: 1;
-    }
-  }
-}
-
-.language-menu {
-  min-width: 140px;
-
-  :deep(.popover-menu-item) {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 12px;
-
-    &.active {
-      background-color: color.adjust($primary, $lightness: +25%);
-      color: $textColor;
-    }
-
-    .flag {
-      font-size: 14px;
-      flex-shrink: 0;
-    }
-
-    .locale-name {
-      flex: 1;
-      font-size: 13px;
-    }
-
-    .check-icon {
-      opacity: 0.8;
-      flex-shrink: 0;
-    }
-  }
-}
-</style>

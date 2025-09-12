@@ -7,6 +7,7 @@ import DataTable from '@/components/table/DataTable';
 import { ActionContent } from './ActionButton';
 import { SearchBar } from '../../../../shared/components/common/SearchBar';
 import { useNavigate } from 'react-router-dom';
+import ThumbnailWrapper from '../others/ThumbnailWrapper';
 
 const PresentationTable = () => {
   const { t } = useTranslation('table');
@@ -27,10 +28,16 @@ const PresentationTable = () => {
         enableResizing: false,
         enableSorting: false,
       }),
-      columnHelper.accessor('thumbnail', {
+      columnHelper.accessor('slides', {
         header: t('presentation.thumbnail'),
-        cell: () => <img src="https://placehold.co/600x400" alt="" className="h-16 w-16 object-cover" />,
-        size: 100,
+        // cell: () => <img src="https://placehold.co/600x400" alt="" className="h-16 w-16 object-cover" />,
+        cell: (info) => {
+          const slides = info.getValue();
+          return slides && slides[0] ? (
+            <ThumbnailWrapper slide={slides[0]} size={160} visible={true} />
+          ) : null;
+        },
+        size: 176,
         enableResizing: false,
         enableSorting: false,
       }),

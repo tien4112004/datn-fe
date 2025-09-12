@@ -41,7 +41,6 @@ declare module 'vue' {
     Saturation: typeof import('./src/components/ColorPicker/Saturation.vue')['default']
     Select: typeof import('./src/components/Select.vue')['default']
     SelectCustom: typeof import('./src/components/SelectCustom.vue')['default']
-    SelectGroup: typeof import('./src/components/SelectGroup.vue')['default']
     Slider: typeof import('./src/components/Slider.vue')['default']
     Switch: typeof import('./src/components/Switch.vue')['default']
     SymbolContent: typeof import('./src/components/LaTeXEditor/SymbolContent.vue')['default']

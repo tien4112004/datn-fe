@@ -3,9 +3,10 @@
     class="radio-group"
     type="single"
     variant="outline"
-    :model-value="value"
-    @update:model-value="handleUpdateValue"
+    :value="value"
+    @update:value="handleUpdateValue"
     :disabled="disabled"
+    :class="className"
   >
     <slot></slot>
   </ToggleGroup>
@@ -42,9 +43,24 @@ const updateValue = (value: string) => {
 };
 
 const value = computed(() => props.value);
+const className = computed(() => 'radio-group');
 
 provide(injectKeyRadioGroupValue, {
   value,
   updateValue,
 });
 </script>
+
+<style scoped>
+.radio-group > *:first-child {
+  border-radius: var(--radius) 0 0 var(--radius);
+}
+
+.radio-group > *:last-child {
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+
+.radio-group > *:not(:first-child):not(:last-child) {
+  border-radius: 0;
+}
+</style>

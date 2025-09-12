@@ -1,8 +1,11 @@
 <template>
-  <div class="select-wrap" v-if="disabled">
-    <div class="select disabled" ref="selectRef">
-      <div class="selector">{{ value }}</div>
-      <div class="icon">
+  <div v-if="disabled">
+    <div
+      ref="selectRef"
+      class="relative h-8 w-full cursor-default select-none border border-gray-300 bg-gray-50 pr-8 text-sm text-gray-500 transition-colors duration-200"
+    >
+      <div class="h-[30px] min-w-[50px] truncate pl-2.5 leading-[30px]">{{ value }}</div>
+      <div class="absolute right-0 top-0 flex h-[30px] w-8 items-center justify-center text-gray-400">
         <slot name="icon">
           <IconDown :size="14" />
         </slot>
@@ -10,7 +13,6 @@
     </div>
   </div>
   <Popover
-    class="select-wrap"
     trigger="click"
     v-model:value="popoverVisible"
     placement="bottom"
@@ -18,6 +20,7 @@
       padding: 0,
       boxShadow: '0 6px 16px 0 rgba(0, 0, 0, 0.08)',
     }"
+    :style="style"
     v-else
   >
     <template #content>
@@ -31,24 +34,31 @@
         />
         <Divider :margin="0" />
       </template>
-      <div class="options" :style="{ width: width + 2 + 'px' }">
+      <div
+        class="max-h-[260px] select-none overflow-auto p-1.5 text-left text-sm"
+        :style="{ width: width + 2 + 'px' }"
+      >
         <div
-          class="option"
-          :class="{
-            disabled: option.disabled,
-            selected: option.value === value,
-          }"
           v-for="option in showOptions"
           :key="option.value"
+          :class="{
+            'text-gray-500': option.disabled,
+            'font-bold text-blue-600': option.value === value && !option.disabled,
+            'cursor-pointer hover:bg-blue-50': !option.disabled && option.value !== value,
+          }"
+          class="h-8 truncate rounded-md px-1.5 leading-8"
           @click="handleSelect(option)"
         >
           {{ option.label }}
         </div>
       </div>
     </template>
-    <div class="select" ref="selectRef">
-      <div class="selector">{{ showLabel }}</div>
-      <div class="icon">
+    <div
+      ref="selectRef"
+      class="relative h-8 w-full cursor-pointer select-none rounded-md border border-gray-300 bg-white pr-8 text-sm transition-colors duration-200 hover:border-blue-500"
+    >
+      <div class="h-[30px] min-w-[50px] truncate pl-2.5 leading-[30px]">{{ showLabel }}</div>
+      <div class="absolute right-0 top-0 flex h-[30px] w-8 items-center justify-center text-gray-400">
         <slot name="icon">
           <IconDown :size="14" />
         </slot>
@@ -58,11 +68,20 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, onUnmounted, ref, watch, nextTick, onBeforeUnmount } from 'vue';
-import Popover from './Popover.vue';
-import Input from './Input.vue';
+import {
+  computed,
+  onMounted,
+  onUnmounted,
+  ref,
+  watch,
+  nextTick,
+  onBeforeUnmount,
+  type CSSProperties,
+} from 'vue';
 import Divider from './Divider.vue';
 import { useI18n } from 'vue-i18n';
+import Popover from './Popover.vue';
+import Input from './Input.vue';
 
 const { t } = useI18n();
 
@@ -79,6 +98,7 @@ const props = withDefaults(
     disabled?: boolean;
     search?: boolean;
     searchLabel?: string;
+    style?: CSSProperties;
   }>(),
   {
     disabled: false,
@@ -146,77 +166,3 @@ const handleSelect = (option: SelectOption) => {
   popoverVisible.value = false;
 };
 </script>
-
-<style lang="scss" scoped>
-.select {
-  width: 100%;
-  height: 32px;
-  padding-right: 32px;
-  border-radius: $borderRadius;
-  transition: border-color 0.25s;
-  font-size: 13px;
-  user-select: none;
-  background-color: $background;
-  border: 1px solid #d9d9d9;
-  position: relative;
-  cursor: pointer;
-
-  &:not(.disabled):hover {
-    border-color: $themeColor;
-  }
-
-  &.disabled {
-    background-color: $gray-f5f5f5;
-    border-color: #dcdcdc;
-    color: #b7b7b7;
-    cursor: default;
-  }
-
-  .selector {
-    min-width: 50px;
-    height: 30px;
-    line-height: 30px;
-    padding-left: 10px;
-    @include ellipsis-oneline();
-  }
-}
-.options {
-  max-height: 260px;
-  padding: 5px;
-  overflow: auto;
-  text-align: left;
-  font-size: 13px;
-  user-select: none;
-}
-.option {
-  height: 32px;
-  line-height: 32px;
-  padding: 0 5px;
-  border-radius: $borderRadius;
-  @include ellipsis-oneline();
-
-  &.disabled {
-    color: #b7b7b7;
-  }
-  &:not(.disabled, .selected):hover {
-    background-color: rgba($color: $themeColor, $alpha: 0.05);
-    cursor: pointer;
-  }
-
-  &.selected {
-    color: $themeColor;
-    font-weight: 700;
-  }
-}
-.icon {
-  width: 32px;
-  height: 30px;
-  color: $muted-foreground;
-  position: absolute;
-  top: 0;
-  right: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-</style>

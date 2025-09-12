@@ -1,34 +1,46 @@
 <template>
-  <div
-    class="tabs"
-    :class="{
-      card: card,
-      'space-around': spaceAround,
-      'space-between': spaceBetween,
-    }"
-    :style="{
-      ...(tabsStyle || {}),
-      '--tab-count': tabs.length,
-    }"
-  >
-    <div
-      class="tab"
-      :class="{ active: tab.key === value }"
-      v-for="tab in tabs"
-      :key="tab.key"
-      :style="{
-        ...(tabStyle || {}),
-        '--color': tab.color,
-      }"
-      @click="emit('update:value', tab.key)"
+  <Tabs :model-value="value" @update:model-value="emit('update:value', $event)">
+    <TabsList
+      :class="
+        cn(
+          card
+            ? 'h-11 border border-gray-200 bg-gray-100'
+            : 'h-auto rounded-none border-b border-gray-200 bg-transparent p-0',
+          spaceAround ? 'justify-around' : '',
+          spaceBetween ? 'justify-between' : '',
+          'w-full'
+        )
+      "
+      :style="tabsStyle"
     >
-      {{ tab.label }}
-    </div>
-  </div>
+      <TabsTrigger
+        v-for="tab in tabs"
+        :key="tab.key"
+        :value="tab.key"
+        :class="
+          cn(
+            card
+              ? 'data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-md h-full data-[state=active]:shadow-sm'
+              : 'h-auto rounded-none border-0 border-b-2 border-transparent px-3 py-2 data-[state=active]:border-current data-[state=active]:bg-transparent data-[state=active]:shadow-none'
+          )
+        "
+        :style="{
+          ...tabStyle,
+          ...(tab.color
+            ? { '--tw-border-color': tab.color, color: value === tab.key ? tab.color : undefined }
+            : {}),
+        }"
+      >
+        {{ tab.label }}
+      </TabsTrigger>
+    </TabsList>
+  </Tabs>
 </template>
 
 <script lang="ts" setup>
 import { type CSSProperties } from 'vue';
+import { Tabs, TabsList, TabsTrigger } from './ui/tabs';
+import { cn } from '@/lib/utils';
 
 interface TabItem {
   key: string;
@@ -54,80 +66,6 @@ withDefaults(
 );
 
 const emit = defineEmits<{
-  (event: 'update:value', payload: string): void;
+  'update:value': [payload: string | number];
 }>();
 </script>
-
-<style lang="scss" scoped>
-.tabs {
-  display: grid;
-  user-select: none;
-  line-height: 1;
-  overflow-x: auto;
-  border-radius: $borderRadius;
-  gap: $normalSpacing;
-  grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
-  text-align: center;
-
-  &:not(.card) {
-    align-items: center;
-    justify-content: flex-start;
-    border-bottom: 1px solid $borderColor;
-    display: flex;
-
-    &.space-around {
-      justify-content: space-around;
-    }
-    &.space-between {
-      justify-content: space-between;
-    }
-
-    .tab {
-      text-align: center;
-      border-bottom: 2px solid transparent;
-      padding: 8px 10px;
-      cursor: pointer;
-
-      &.active {
-        border-bottom: 2px solid var(--color, $themeColor);
-      }
-    }
-  }
-
-  &.card {
-    height: 40px;
-    font-size: $baseTextSize;
-    flex-shrink: 0;
-    background-color: $lightGray;
-    border: 1px solid $borderColor;
-
-    .tab {
-      flex: 1;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      transition:
-        background-color 0.2s ease,
-        opacity 0.2s ease;
-
-      cursor: pointer;
-      border-radius: $borderRadius;
-      padding: 0 8px;
-
-      &.active {
-        background-color: $secondary;
-        color: $secondary-foreground;
-      }
-
-      &.active:hover {
-        background-color: $secondary;
-        opacity: 0.9;
-      }
-
-      &:hover {
-        background-color: $card;
-      }
-    }
-  }
-}
-</style>

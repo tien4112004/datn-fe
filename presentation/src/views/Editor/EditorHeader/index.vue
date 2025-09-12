@@ -11,10 +11,10 @@
         <Input
           class="title-input"
           ref="titleInputRef"
-          v-model:value="titleValue"
+          v-model="titleValue"
           @blur="handleUpdateTitle()"
           v-if="editingTitle"
-        ></Input>
+        />
         <div class="title-text" @click="startEditTitle()" :title="title" v-else>
           {{ title }}
         </div>
@@ -178,7 +178,7 @@ import HotkeyDoc from './HotkeyDoc.vue';
 import FileInput from '@/components/FileInput.vue';
 import FullscreenSpin from '@/components/FullscreenSpin.vue';
 import Drawer from '@/components/Drawer.vue';
-import Input from '@/components/Input.vue';
+import { Input } from '@/components/ui/input';
 import Popover from '@/components/Popover.vue';
 import PopoverMenuItem from '@/components/PopoverMenuItem.vue';
 import LanguageSwitcher from '@/components/LanguageSwitcher.vue';

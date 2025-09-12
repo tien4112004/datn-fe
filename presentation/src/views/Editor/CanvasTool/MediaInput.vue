@@ -3,7 +3,7 @@
     <Tabs :tabs="tabs" v-model:value="type" :tabsStyle="{ marginBottom: '15px' }" />
 
     <template v-if="type === 'video'">
-      <Input v-model:value="videoSrc" :placeholder="t('toolbar.media.input.videoPlaceholder')"></Input>
+      <Input v-model="videoSrc" :placeholder="t('toolbar.media.input.videoPlaceholder')" />
       <div class="btns">
         <Button @click="emit('close')" style="margin-right: 10px">{{ $t('ui.actions.cancel') }}</Button>
         <Button type="primary" @click="insertVideo()">{{ $t('ui.actions.confirm') }}</Button>
@@ -11,7 +11,7 @@
     </template>
 
     <template v-if="type === 'audio'">
-      <Input v-model:value="audioSrc" :placeholder="t('toolbar.media.input.audioPlaceholder')"></Input>
+      <Input v-model="audioSrc" :placeholder="t('toolbar.media.input.audioPlaceholder')" />
       <div class="btns">
         <Button @click="emit('close')" style="margin-right: 10px">{{ $t('ui.actions.cancel') }}</Button>
         <Button type="primary" @click="insertAudio()">{{ $t('ui.actions.confirm') }}</Button>
@@ -25,7 +25,7 @@ import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import message from '@/utils/message';
 import Tabs from '@/components/Tabs.vue';
-import Input from '@/components/Input.vue';
+import { Input } from '@/components/ui/input';
 import Button from '@/components/Button.vue';
 
 const { t } = useI18n();

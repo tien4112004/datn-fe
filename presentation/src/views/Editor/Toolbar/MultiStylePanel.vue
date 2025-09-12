@@ -53,7 +53,7 @@
 
     <Divider />
 
-    <SelectGroup class="row">
+    <ButtonGroup class="row">
       <Select
         style="width: 60%"
         :value="richTextAttrs.fontname"
@@ -83,7 +83,7 @@
           <IconAddText />
         </template>
       </Select>
-    </SelectGroup>
+    </ButtonGroup>
     <ButtonGroup class="row" passive>
       <Popover trigger="click" style="width: 30%">
         <template #content>
@@ -173,7 +173,6 @@ import RadioButton from '@/components/RadioButton.vue';
 import RadioGroup from '@/components/RadioGroup.vue';
 import NumberInput from '@/components/NumberInput.vue';
 import Select from '@/components/Select.vue';
-import SelectGroup from '@/components/SelectGroup.vue';
 import SelectCustom from '@/components/SelectCustom.vue';
 import Popover from '@/components/Popover.vue';
 

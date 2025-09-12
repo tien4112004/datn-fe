@@ -3,7 +3,7 @@
     <div class="row">
       <div style="width: 40%">{{ $t('styling.effects.shadow.shadow') }}</div>
       <div class="switch-wrapper" style="width: 60%">
-        <Switch :value="hasShadow" @update:value="(value) => toggleShadow(value)" />
+        <Switch :value="hasShadow" @update:value="(value) => toggleShadow(value)" size="small" />
       </div>
     </div>
     <template v-if="hasShadow && shadow">

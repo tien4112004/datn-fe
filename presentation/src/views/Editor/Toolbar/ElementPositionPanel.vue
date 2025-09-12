@@ -1,7 +1,7 @@
 <template>
   <div class="element-positopn-panel">
     <div class="title title-panel">{{ $t('styling.position.single.layer') }}</div>
-    <ShadcnButtonGroup class="row">
+    <ButtonGroup class="row">
       <Button style="flex-grow: 1" @click="orderElement(handleElement!, ElementOrderCommands.TOP)">
         <div class="center">
           <IconSendToBack class="btn-icon" />
@@ -14,8 +14,8 @@
           <p>{{ $t('styling.position.single.sendToBack') }}</p>
         </div>
       </Button>
-    </ShadcnButtonGroup>
-    <ShadcnButtonGroup class="row">
+    </ButtonGroup>
+    <ButtonGroup class="row">
       <Button style="flex-grow: 1" @click="orderElement(handleElement!, ElementOrderCommands.UP)">
         <div class="center">
           <IconBringToFront class="btn-icon" />
@@ -28,12 +28,12 @@
           <p>{{ $t('styling.position.single.moveDown') }}</p>
         </div>
       </Button>
-    </ShadcnButtonGroup>
+    </ButtonGroup>
 
     <Divider />
 
     <div class="title title-panel">{{ $t('styling.position.single.alignment') }}</div>
-    <ShadcnButtonGroup class="row">
+    <ButtonGroup class="row">
       <Button
         style="flex-grow: 1"
         v-tooltip="$t('styling.position.single.leftAlign')"
@@ -52,8 +52,8 @@
         @click="alignElementToCanvas(ElementAlignCommands.RIGHT)"
         ><IconAlignRight
       /></Button>
-    </ShadcnButtonGroup>
-    <ShadcnButtonGroup class="row">
+    </ButtonGroup>
+    <ButtonGroup class="row">
       <Button
         style="flex-grow: 1"
         v-tooltip="$t('styling.position.single.topAlign')"
@@ -72,7 +72,7 @@
         @click="alignElementToCanvas(ElementAlignCommands.BOTTOM)"
         ><IconAlignBottom
       /></Button>
-    </ShadcnButtonGroup>
+    </ButtonGroup>
 
     <Divider />
     <div class="title title-panel">{{ $t('styling.position.single.properties') }}</div>
@@ -160,15 +160,16 @@
           :step="5"
           :value="rotate"
           @update:value="(value) => updateRotate(value)"
-          style="width: 50%"
         >
           <template #prefix> {{ $t('styling.position.single.rotation') }} </template>
         </NumberInput>
-        <div style="width: 6%"></div>
-        <div class="text-btn" @click="updateRotate45('-')" style="width: 24%"><IconRotate /> -45°</div>
-        <div class="text-btn" @click="updateRotate45('+')" style="width: 24%">
+      </div>
+
+      <div class="row flex gap-2">
+        <Button @click="updateRotate45('-')" class="flex-1"><IconRotate /> -45°</Button>
+        <Button @click="updateRotate45('+')" class="flex-1">
           <IconRotate :style="{ transform: 'rotateY(180deg)' }" /> +45°
-        </div>
+        </Button>
       </div>
     </template>
   </div>
@@ -188,8 +189,8 @@ import useAlignElementToCanvas from '@/hooks/useAlignElementToCanvas';
 import useHistorySnapshot from '@/hooks/useHistorySnapshot';
 import Divider from '@/components/Divider.vue';
 import Button from '@/components/Button.vue';
-import ShadcnButtonGroup from '@/components/ShadcnButtonGroup.vue';
 import NumberInput from '@/components/NumberInput.vue';
+import ButtonGroup from '@/components/ButtonGroup.vue';
 
 const slidesStore = useSlidesStore();
 const { handleElement, handleElementId } = storeToRefs(useMainStore());

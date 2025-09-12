@@ -1,6 +1,6 @@
 <template>
   <div class="table-style-panel">
-    <SelectGroup class="row">
+    <ButtonGroup class="row">
       <Select
         style="width: 50%"
         :value="textAttrs.fontname"
@@ -30,7 +30,7 @@
           <IconAddText />
         </template>
       </Select>
-    </SelectGroup>
+    </ButtonGroup>
 
     <ButtonGroup class="row" passive>
       <Popover trigger="click" style="width: 50%">
@@ -215,7 +215,6 @@ import ButtonGroup from '@/components/ButtonGroup.vue';
 import RadioButton from '@/components/RadioButton.vue';
 import RadioGroup from '@/components/RadioGroup.vue';
 import Select from '@/components/Select.vue';
-import SelectGroup from '@/components/SelectGroup.vue';
 import Popover from '@/components/Popover.vue';
 
 const slidesStore = useSlidesStore();

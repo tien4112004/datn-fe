@@ -2,13 +2,13 @@
   <div class="element-positopn-panel">
     <div class="title title-panel">{{ $t('styling.position.single.layer') }}</div>
     <ButtonGroup class="row">
-      <Button style="flex-grow: 1" @click="orderElement(handleElement!, ElementOrderCommands.TOP)">
+      <Button style="width: 50%" @click="orderElement(handleElement!, ElementOrderCommands.TOP)">
         <div class="center">
           <IconSendToBack class="btn-icon" />
           <p>{{ $t('styling.position.single.bringToFront') }}</p>
         </div>
       </Button>
-      <Button style="flex-grow: 1" @click="orderElement(handleElement!, ElementOrderCommands.BOTTOM)">
+      <Button style="width: 50%" @click="orderElement(handleElement!, ElementOrderCommands.BOTTOM)">
         <div class="center">
           <IconBringToFrontOne class="btn-icon" />
           <p>{{ $t('styling.position.single.sendToBack') }}</p>
@@ -16,13 +16,13 @@
       </Button>
     </ButtonGroup>
     <ButtonGroup class="row">
-      <Button style="flex-grow: 1" @click="orderElement(handleElement!, ElementOrderCommands.UP)">
+      <Button style="width: 50%" @click="orderElement(handleElement!, ElementOrderCommands.UP)">
         <div class="center">
           <IconBringToFront class="btn-icon" />
           <p>{{ $t('styling.position.single.moveUp') }}</p>
         </div>
       </Button>
-      <Button style="flex-grow: 1" @click="orderElement(handleElement!, ElementOrderCommands.DOWN)">
+      <Button style="width: 50%" @click="orderElement(handleElement!, ElementOrderCommands.DOWN)">
         <div class="center">
           <IconSentToBack class="btn-icon" />
           <p>{{ $t('styling.position.single.moveDown') }}</p>

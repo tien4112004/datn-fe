@@ -29,6 +29,8 @@
   margin: 0;
   padding: 0;
   font-size: 100%;
+  border-width: 0;
+  border-style: solid;
   vertical-align: baseline;
   box-sizing: border-box;
 }
@@ -125,7 +127,14 @@ button,
 select,
 optgroup,
 textarea {
+  font: inherit;
+  font-feature-settings: inherit;
+  font-variation-settings: inherit;
+  letter-spacing: inherit;
   color: inherit;
+  border-radius: 0;
+  background-color: transparent;
+  opacity: 1;
 }
 
 button,
@@ -136,6 +145,14 @@ input {
 button,
 select {
   text-transform: none;
+  border: 1px solid var(--border);
+  cursor: pointer;
+}
+
+button,
+input:where([type='button'], [type='reset'], [type='submit']),
+::file-selector-button {
+  appearance: button;
 }
 
 textarea {

@@ -2,7 +2,7 @@
   <div v-if="disabled">
     <div
       ref="selectRef"
-      class="relative h-8 w-full cursor-default select-none border border-gray-300 bg-gray-50 pr-8 text-sm text-gray-500 transition-colors duration-200"
+      class="border-border relative h-8 w-full cursor-pointer select-none bg-gray-50 pr-8 text-sm text-gray-500 transition-colors duration-200"
     >
       <div class="h-[30px] min-w-[50px] truncate pl-2.5 leading-[30px]">{{ value }}</div>
       <div class="absolute right-0 top-0 flex h-[30px] w-8 items-center justify-center text-gray-400">

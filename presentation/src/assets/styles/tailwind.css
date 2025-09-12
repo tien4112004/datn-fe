@@ -1,6 +1,5 @@
 @import 'tw-animate-css';
 
-@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
@@ -54,17 +53,14 @@
   --tracking-normal: -0.025em;
   --spacing: 0.25rem;
 }
-body {
+
+body:not(.canvas) body:not(.viewport-wrapper) {
   letter-spacing: var(--tracking-normal);
 }
 
-@layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
+body {
+  background-color: var(--background);
+  color: var(--foreground);
 }
 
 ::-webkit-resizer {

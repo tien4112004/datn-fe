@@ -1,41 +1,33 @@
 <template>
-  <div class="popover-menu-item" :class="{ center: center }" @click="emit('click')">
+  <div :class="computedClass" @click="emit('click')">
     <slot></slot>
   </div>
 </template>
 
 <script lang="ts" setup>
-withDefaults(
+import { cn } from '@/lib/utils';
+import { computed } from 'vue';
+
+const props = withDefaults(
   defineProps<{
     center?: boolean;
+    class?: string;
   }>(),
   {
     center: false,
+    class: '',
   }
 );
 
 const emit = defineEmits<{
   (event: 'click'): void;
 }>();
+
+const computedClass = computed(() =>
+  cn(
+    'min-w-[80px] cursor-pointer rounded px-2.5 py-1.5 [&+&]:mt-0.5 hover:text-accent flex items-center gap-2',
+    props.center ? 'text-center' : 'text-left',
+    props.class
+  )
+);
 </script>
-
-<style lang="scss" scoped>
-.popover-menu-item {
-  min-width: 80px;
-  padding: 6px 10px;
-  border-radius: $borderRadius;
-  font-size: $smTextSize;
-  cursor: pointer;
-
-  &.center {
-    text-align: center;
-  }
-
-  &:hover {
-    background-color: #f1f1f1;
-  }
-  & + .popover-menu-item {
-    margin-top: 2px;
-  }
-}
-</style>

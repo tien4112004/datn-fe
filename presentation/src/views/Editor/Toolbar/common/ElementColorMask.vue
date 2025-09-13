@@ -3,7 +3,7 @@
     <div class="row">
       <div style="width: 40%">{{ $t('styling.effects.colorMask.coloringMask') }}</div>
       <div class="switch-wrapper" style="width: 60%">
-        <Switch :value="hasColorMask" @update:value="(value) => toggleColorMask(value)" />
+        <Switch :value="hasColorMask" @update:value="(value) => toggleColorMask(value)" size="small" />
       </div>
     </div>
     <template v-if="hasColorMask">

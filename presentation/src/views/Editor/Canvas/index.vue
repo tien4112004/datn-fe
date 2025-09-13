@@ -358,7 +358,7 @@ provide(injectKeySlideScale, canvasScale);
   position: absolute;
   box-shadow:
     0 0 0 1px rgba(0, 0, 0, 0.01),
-    0 0 12px 0 $shadow-light;
+    0 0 12px 0 rgba(0, 0, 0, 0.1);
 }
 .viewport {
   position: absolute;

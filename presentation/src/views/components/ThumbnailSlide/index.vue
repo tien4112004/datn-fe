@@ -59,7 +59,7 @@ provide(injectKeySlideScale, scale);
 
 <style lang="scss" scoped>
 .thumbnail-slide {
-  background-color: $background;
+  background-color: var(--background);
   border-radius: 10px;
   overflow: hidden;
   user-select: none;

@@ -21,5 +21,33 @@ export default {
       medium: 'Trung bình',
       large: 'Lớn',
     },
+
+    // Menu ngữ cảnh Phần tử có thể chỉnh sửa
+    editableElement: {
+      unlock: 'Mở khóa',
+      cut: 'Cắt',
+      copy: 'Sao chép',
+      paste: 'Dán',
+      alignHorizontalCenter: 'Căn giữa theo chiều ngang',
+      alignCenter: 'Căn giữa',
+      alignLeft: 'Căn trái',
+      alignRight: 'Căn phải',
+      alignVerticalCenter: 'Căn giữa theo chiều dọc',
+      alignTop: 'Căn trên',
+      alignBottom: 'Căn dưới',
+      bringToFront: 'Đưa lên trước',
+      bringForward: 'Đưa lên trước một lớp',
+      sendToBack: 'Đưa ra sau',
+      sendBackward: 'Đưa ra sau một lớp',
+      setLink: 'Đặt liên kết',
+      ungroup: 'Hủy nhóm',
+      group: 'Nhóm',
+      selectAll: 'Chọn tất cả',
+      lock: 'Khóa',
+      delete: 'Xóa',
+    },
+
+    resetCurrentPage: 'Đặt lại trang hiện tại',
+    slideShow: 'Trình chiếu',
   },
 };

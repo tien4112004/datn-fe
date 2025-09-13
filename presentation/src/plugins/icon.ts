@@ -184,7 +184,7 @@ export const icons: Icons = {
   IconRotate: RotateCw,
   IconLeftTwo: ChevronLeft,
   IconRightTwo: ChevronRight,
-  IconPlatte: Palette,
+  IconPalette: Palette,
   IconClose: X,
   IconCloseSmall: XCircle,
   IconUndo: Undo,

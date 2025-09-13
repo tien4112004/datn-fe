@@ -78,10 +78,10 @@ const applyAllSlide = () => {
   padding: 20px 0 15px 0;
   position: relative;
   cursor: pointer;
-  border-radius: $borderRadius;
+  border-radius: var(--radius);
 
   &.active {
-    border-color: $themeColor;
+    border-color: var(--primary);
     z-index: 1;
   }
 
@@ -106,12 +106,12 @@ const applyAllSlide = () => {
     position: absolute;
     left: 0;
     top: 0;
-    background-color: rgba($color: $themeColor, $alpha: 0.75);
+    background-color: rgba($color: var(--primary), $alpha: 0.75);
     color: #fff;
     display: flex;
     justify-content: center;
     align-items: center;
-    animation: $animationType $transitionDelaySlow linear;
+    animation: $animationType 0.3s linear;
   }
 
   &.fade:hover {
@@ -167,7 +167,7 @@ const applyAllSlide = () => {
   }
 }
 .animation-text {
-  font-size: $smTextSize;
+  font-size: 0.8125rem;
   width: 90%;
   color: #333;
   text-align: center;

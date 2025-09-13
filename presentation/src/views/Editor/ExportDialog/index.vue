@@ -61,13 +61,13 @@ const currentDialogComponent = computed<unknown>(() => {
 <style lang="scss" scoped>
 .export-dialog {
   margin: -20px;
-  border-radius: $cardBorderRadius;
-  padding: $extraLargeSpacing;
+  border-radius: var(--radius);
+  padding: 1rem;
 }
 .content {
   height: 460px;
   padding: 12px;
-  font-size: $baseTextSize;
+  font-size: 0.875rem;
 
   @include overflow-overlay();
 }

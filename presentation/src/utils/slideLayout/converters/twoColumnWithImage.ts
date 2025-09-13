@@ -59,6 +59,7 @@ export const convertTwoColumnWithImage = async (
   const contentAvailableBlock = {
     ...contentColumnBlock,
     top: contentColumnBlock.top + titleDimensions.height + 40,
+    height: contentColumnBlock.height - titleDimensions.height,
   };
 
   const tempItemElements = data.data.items.map((item) =>

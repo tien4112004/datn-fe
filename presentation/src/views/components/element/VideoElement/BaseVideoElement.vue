@@ -38,7 +38,7 @@ defineProps<{
 .element-content {
   width: 100%;
   height: 100%;
-  background-color: $foreground;
+  background-color: var(--foreground);
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -48,6 +48,6 @@ defineProps<{
 }
 .icon {
   font-size: 140px;
-  color: $gray-aaa;
+  color: #aaaaaa;
 }
 </style>

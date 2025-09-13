@@ -1,46 +1,62 @@
 <template>
   <div
-    class="number-input"
-    :class="{
-      disabled: disabled,
-      focused: focused,
-    }"
+    :class="[
+      'group relative inline-flex min-h-9 items-center rounded-md border border-gray-300 bg-white transition-all duration-200',
+      disabled ? 'cursor-not-allowed bg-gray-50 text-gray-500' : 'hover:border-blue-500',
+      focused ? 'border-blue-500 ring-[3px] ring-blue-500/50' : '',
+    ]"
   >
-    <span class="prefix" v-if="$slots.prefix">
+    <span
+      v-if="$slots.prefix"
+      class="flex select-none items-center justify-center border-r border-gray-300 px-3 text-gray-600"
+    >
       <slot name="prefix"></slot>
     </span>
-    <div class="input-container">
-      <input
+
+    <div class="relative flex flex-1 items-center">
+      <Input
         type="text"
+        :model-value="String(number)"
+        @update:model-value="handleInputChange"
         :disabled="disabled"
-        v-model="number"
         :placeholder="placeholder"
-        @input="($event) => emit('input', $event)"
-        @focus="($event) => handleFocus($event)"
-        @blur="($event) => handleBlur($event)"
-        @change="($event) => emit('change', $event)"
-        @keydown.enter="($event) => handleEnter($event)"
+        @input="($event: Event) => emit('input', $event)"
+        @focus="($event: Event) => handleFocus($event)"
+        @blur="($event: Event) => handleBlur($event)"
+        @change="($event: Event) => emit('change', $event)"
+        @keydown.enter="($event: Event) => handleEnter($event)"
+        :class="[
+          'border-0 bg-transparent shadow-none focus-visible:border-transparent focus-visible:ring-0',
+          $slots.suffix ? 'pr-16' : 'pr-12',
+        ]"
       />
-      <div class="handlers">
+
+      <div
+        :class="[
+          'absolute right-1 top-1/2 flex -translate-y-1/2 transform flex-col gap-px transition-opacity duration-200',
+          disabled ? 'hidden' : 'opacity-0 group-hover:opacity-100',
+        ]"
+      >
         <button
-          class="handler handler-up"
+          type="button"
           :disabled="disabled || number >= max"
           @click="increment"
-          type="button"
+          class="flex h-4 w-5 cursor-pointer items-center justify-center rounded-sm border-0 bg-transparent p-0 text-gray-600 transition-all duration-200 hover:bg-black/5 hover:text-blue-500 active:bg-black/10 disabled:cursor-not-allowed disabled:text-gray-300"
         >
-          <svg fill="currentColor" width="8" height="8" viewBox="64 64 896 896">
+          <svg fill="currentColor" width="8" height="8" viewBox="64 64 896 896" class="pointer-events-none">
             <path
               d="M890.5 755.3L537.9 269.2c-12.8-17.6-39-17.6-51.7 0L133.5 755.3A8 8 0 00140 768h75c5.1 0 9.9-2.5 12.9-6.6L512 369.8l284.1 391.6c3 4.1 7.8 6.6 12.9 6.6h75c6.5 0 10.3-7.4 6.5-12.7z"
             ></path>
           </svg>
         </button>
+
         <button
-          class="handler handler-down"
+          type="button"
           :disabled="disabled || number <= min"
           @click="decrement"
-          type="button"
+          class="flex h-4 w-5 cursor-pointer items-center justify-center rounded-sm border-0 bg-transparent p-0 text-gray-600 transition-all duration-200 hover:bg-black/5 hover:text-blue-500 active:bg-black/10 disabled:cursor-not-allowed disabled:text-gray-300"
         >
-          <svg fill="currentColor" width="8" height="8" viewBox="64 64 896 896">
+          <svg fill="currentColor" width="8" height="8" viewBox="64 64 896 896" class="pointer-events-none">
             <path
               d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"
             ></path>
@@ -48,7 +64,11 @@
         </button>
       </div>
     </div>
-    <span class="suffix" v-if="$slots.suffix">
+
+    <span
+      v-if="$slots.suffix"
+      class="flex select-none items-center justify-center border-l border-gray-300 px-3 text-gray-600"
+    >
       <slot name="suffix"></slot>
     </span>
   </div>
@@ -56,6 +76,8 @@
 
 <script lang="ts" setup>
 import { ref, watch } from 'vue';
+import { Input } from './ui/input';
+import type { Event } from 'clipboard';
 
 const props = withDefaults(
   defineProps<{
@@ -109,6 +131,10 @@ watch(number, () => {
   emit('update:value', number.value);
 });
 
+const handleInputChange = (value: string | number) => {
+  number.value = +value;
+};
+
 const checkAndEmitValue = () => {
   let value = +number.value;
   if (isNaN(value)) value = props.min;
@@ -144,128 +170,3 @@ const decrement = () => {
   number.value = Math.max(props.min, number.value - props.step);
 };
 </script>
-
-<style lang="scss" scoped>
-.number-input {
-  background-color: $background;
-  border: 1px solid #d9d9d9;
-  border-radius: $borderRadius;
-  transition: border-color 0.25s;
-  font-size: 13px;
-  display: inline-flex;
-  align-items: center;
-  min-height: 32px;
-
-  .input-container {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    position: relative;
-
-    input {
-      width: 100%;
-      min-width: 0;
-      padding: 6px 8px;
-      padding-right: 28px; // Make space for handlers
-      height: 100%;
-      line-height: 1.5;
-      outline: 0;
-      border: 0;
-      background: transparent;
-      color: $textColor;
-
-      &::placeholder {
-        color: $muted-foreground;
-      }
-
-      &:disabled {
-        color: #b7b7b7;
-        cursor: not-allowed;
-      }
-    }
-
-    .handlers {
-      position: absolute;
-      right: 4px;
-      top: 50%;
-      transform: translateY(-50%);
-      display: flex;
-      flex-direction: column;
-      gap: 1px;
-      opacity: 0;
-      transition: opacity 0.25s;
-
-      .handler {
-        width: 20px;
-        height: 12px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        cursor: pointer;
-        background: transparent;
-        border: none;
-        border-radius: 2px;
-        color: $gray-999;
-        transition: all 0.25s;
-        padding: 0;
-
-        &:hover:not(:disabled) {
-          color: $themeColor;
-          background-color: rgba(0, 0, 0, 0.04);
-        }
-
-        &:active:not(:disabled) {
-          background-color: rgba(0, 0, 0, 0.08);
-        }
-
-        &:disabled {
-          color: #d9d9d9;
-          cursor: not-allowed;
-        }
-
-        svg {
-          pointer-events: none;
-        }
-      }
-    }
-  }
-
-  &:not(.disabled):hover .handlers {
-    opacity: 1;
-  }
-
-  &:not(.disabled):hover,
-  &.focused {
-    border-color: $themeColor;
-  }
-
-  &.disabled {
-    background-color: $gray-f5f5f5;
-    color: #b7b7b7;
-    cursor: not-allowed;
-
-    .handlers {
-      display: none;
-    }
-  }
-
-  .prefix,
-  .suffix {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 0 8px;
-    line-height: 1.5;
-    user-select: none;
-    color: $gray-999;
-  }
-
-  .prefix {
-    border-right: 1px solid #d9d9d9;
-  }
-
-  .suffix {
-    border-left: 1px solid #d9d9d9;
-  }
-}
-</style>

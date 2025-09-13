@@ -58,11 +58,11 @@ const turnSlide = (index: number) => {
 
   .icon {
     color: #fff;
-    font-size: $xxxlTextSize;
+    font-size: 2.25rem;
     cursor: pointer;
 
     &:hover {
-      color: $themeColor;
+      color: var(--primary);
     }
   }
 }
@@ -82,12 +82,12 @@ const turnSlide = (index: number) => {
     margin-bottom: 12px;
 
     &:hover {
-      outline-color: $themeColor;
+      outline-color: var(--primary);
     }
 
     &.active {
       outline-width: 3px;
-      outline-color: $themeColor;
+      outline-color: var(--primary);
     }
   }
 }

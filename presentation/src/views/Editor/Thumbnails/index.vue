@@ -590,7 +590,19 @@ const contextmenusThumbnailItem = (): ContextmenuItem[] => {
 }
 
 :deep(.sortable-ghost) {
-  opacity: 0.5;
+  .label {
+    opacity: 0;
+  }
+
+  .thumbnail * {
+    display: none;
+  }
+
+  .thumbnail {
+    height: 4px !important;
+    background-color: $borderColor;
+    outline-color: $borderColor !important;
+  }
 }
 
 :deep(.sortable-drag) {

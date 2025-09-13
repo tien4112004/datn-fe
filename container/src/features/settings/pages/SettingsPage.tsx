@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { useSearchParams } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/shared/components/ui/separator';
 import GeneralSettings from '../components/GeneralSettings';
@@ -8,6 +9,17 @@ import LanguageSettings from '../components/LanguageSettings';
 
 function SettingsPage() {
   const { t } = useTranslation('settings');
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const currentTab = searchParams.get('tab') || 'general';
+
+  const handleTabChange = (value: string) => {
+    setSearchParams((prev) => {
+      const newParams = new URLSearchParams(prev);
+      newParams.set('tab', value);
+      return newParams;
+    });
+  };
 
   return (
     <div className="flex flex-col gap-2 px-8 py-4">
@@ -16,7 +28,7 @@ function SettingsPage() {
       <p className="text-muted-foreground text-sm">{t('subtitle')}</p>
 
       <div className="flex w-full flex-col gap-6">
-        <Tabs defaultValue="general" className="w-full">
+        <Tabs value={currentTab} onValueChange={handleTabChange} className="w-full">
           <TabsList className="bg-card flex w-full flex-row justify-start rounded-none border-b p-0">
             <TabsTrigger
               key="general"

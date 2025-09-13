@@ -39,30 +39,30 @@
       <div
         class="pen"
         :style="{
-          left: mouse.x - penSize / 2 + 'px',
-          top: mouse.y - penSize * 6 + penSize / 2 + 'px',
+          left: mouse.x + 'px',
+          top: mouse.y + 'px',
           color: color,
         }"
         v-if="model === 'pen'"
       >
-        <IconWrite class="icon" :size="penSize * 6" />
+        <IconWrite class="icon" />
       </div>
       <div
         class="pen"
         :style="{
-          left: mouse.x - markSize / 2 + 'px',
-          top: mouse.y + 'px',
+          left: mouse.x + 'px',
+          top: mouse.y - 20 + 'px',
           color: color,
         }"
         v-if="model === 'mark'"
       >
-        <IconHighLight class="icon" :size="markSize * 1.5" />
+        <IconHighLight class="icon" />
       </div>
       <div
         class="pen"
         :style="{
-          left: mouse.x - 20 + 'px',
-          top: mouse.y - 20 + 'px',
+          left: mouse.x - 16 + 'px',
+          top: mouse.y - 16 + 'px',
           color: color,
         }"
         v-if="model === 'shape'"
@@ -460,6 +460,10 @@ defineExpose({
   .icon {
     filter: drop-shadow(2px 2px 2px var(--muted-foreground));
   }
+}
+.lucide {
+  width: 2rem;
+  height: 2rem;
 }
 .eraser {
   display: flex;

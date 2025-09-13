@@ -231,7 +231,7 @@ const textAttrs = ref({
   color: 'var(--foreground)',
   backcolor: '',
   fontsize: '12px',
-  fontname: '',
+  fontname: 'sans-serif',
   align: 'left',
 });
 
@@ -283,7 +283,7 @@ const updateTextAttrState = () => {
       color: 'var(--foreground)',
       backcolor: '',
       fontsize: '12px',
-      fontname: '',
+      fontname: 'sans-serif',
       align: 'left',
     };
   } else {

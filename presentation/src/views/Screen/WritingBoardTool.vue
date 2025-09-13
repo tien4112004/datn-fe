@@ -26,7 +26,7 @@
         <div class="tool-content">
           <Popover
             placement="top"
-            trigger="manual"
+            trigger="click"
             :value="sizePopoverType === 'pen'"
             @hide="sizePopoverType = ''"
           >
@@ -40,14 +40,14 @@
               class="btn"
               :class="{ active: writingBoardModel === 'pen' }"
               v-tooltip="$t('presentation.writingBoard.pen')"
-              @click="changeModel('pen')"
+              @click.stop="changeModel('pen')"
             >
               <IconWrite class="icon" />
             </div>
           </Popover>
           <Popover
             placement="top"
-            trigger="manual"
+            trigger="click"
             :value="sizePopoverType === 'shape'"
             @hide="sizePopoverType = ''"
           >
@@ -79,14 +79,14 @@
               class="btn"
               :class="{ active: writingBoardModel === 'shape' }"
               v-tooltip="$t('presentation.writingBoard.shape')"
-              @click="changeModel('shape')"
+              @click.stop="changeModel('shape')"
             >
               <IconGraphicDesign class="icon" />
             </div>
           </Popover>
           <Popover
             placement="top"
-            trigger="manual"
+            trigger="click"
             :value="sizePopoverType === 'mark'"
             @hide="sizePopoverType = ''"
           >
@@ -100,14 +100,14 @@
               class="btn"
               :class="{ active: writingBoardModel === 'mark' }"
               v-tooltip="$t('presentation.writingBoard.highlighter')"
-              @click="changeModel('mark')"
+              @click.stop="changeModel('mark')"
             >
               <IconHighLight class="icon" />
             </div>
           </Popover>
           <Popover
             placement="top"
-            trigger="manual"
+            trigger="click"
             :value="sizePopoverType === 'eraser'"
             @hide="sizePopoverType = ''"
           >
@@ -121,7 +121,7 @@
               class="btn"
               :class="{ active: writingBoardModel === 'eraser' }"
               v-tooltip="$t('presentation.writingBoard.eraser')"
-              @click="changeModel('eraser')"
+              @click.stop="changeModel('eraser')"
             >
               <IconErase class="icon" />
             </div>
@@ -223,7 +223,11 @@ const shapeSize = ref(4);
 
 const changeModel = (model: WritingBoardModel) => {
   writingBoardModel.value = model;
-  sizePopoverType.value = sizePopoverType.value === model ? '' : model;
+  if (sizePopoverType.value === model) {
+    sizePopoverType.value = '';
+  } else {
+    sizePopoverType.value = model;
+  }
 };
 
 // Clear ink on canvas

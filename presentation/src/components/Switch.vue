@@ -1,15 +1,23 @@
 <template>
-  <Switch :checked="value" :disabled="disabled" @click="handleChange" :size="size" />
+  <span
+    class="switch"
+    :class="{
+      active: value,
+      disabled: disabled,
+      [`switch--${size}`]: true,
+    }"
+    @click="handleChange()"
+  >
+    <span class="switch-core"></span>
+  </span>
 </template>
 
 <script lang="ts" setup>
-import Switch from './ui/switch/Switch.vue';
-
 const props = withDefaults(
   defineProps<{
     value: boolean;
     disabled?: boolean;
-    size?: 'small' | 'medium';
+    size?: 'medium' | 'small';
   }>(),
   {
     disabled: false,
@@ -18,10 +26,110 @@ const props = withDefaults(
 );
 
 const emit = defineEmits<{
-  'update:value': [payload: boolean];
+  (event: 'update:value', payload: boolean): void;
 }>();
 
 const handleChange = () => {
+  if (props.disabled) return;
   emit('update:value', !props.value);
 };
 </script>
+
+<style lang="scss" scoped>
+.switch {
+  height: 20px;
+  display: inline-block;
+  cursor: pointer;
+
+  &--small {
+    height: 16px;
+
+    .switch-core {
+      width: 32px;
+      height: 16px;
+      border-radius: 8px;
+
+      &::after {
+        width: 12px;
+        height: 12px;
+        top: 1px;
+        left: 1px;
+      }
+    }
+
+    &:not(.disabled).active {
+      .switch-core::after {
+        left: 100%;
+        margin-left: -13px;
+      }
+    }
+  }
+
+  &--medium {
+    height: 20px;
+
+    .switch-core {
+      width: 40px;
+      height: 20px;
+      border-radius: 10px;
+
+      &::after {
+        width: 16px;
+        height: 16px;
+        top: 1px;
+        left: 1px;
+      }
+    }
+
+    &:not(.disabled).active {
+      .switch-core::after {
+        left: 100%;
+        margin-left: -17px;
+      }
+    }
+  }
+
+  &:not(.disabled).active {
+    .switch-core {
+      border-color: var(--primary);
+      background-color: var(--primary);
+    }
+  }
+
+  &.disabled {
+    cursor: default;
+
+    .switch-core::after {
+      background-color: #d9d9d9;
+    }
+  }
+}
+.switch-core {
+  margin: 0;
+  display: inline-block;
+  position: relative;
+  width: 40px;
+  height: 20px;
+  border: 1px solid #d9d9d9;
+  outline: none;
+  border-radius: 10px;
+  box-sizing: border-box;
+  background: #d9d9d9;
+  transition:
+    border-color 0.3s,
+    background-color 0.3s;
+  vertical-align: middle;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 1px;
+    left: 1px;
+    border-radius: 100%;
+    transition: all 0.3s;
+    width: 16px;
+    height: 16px;
+    background-color: var(--background);
+  }
+}
+</style>

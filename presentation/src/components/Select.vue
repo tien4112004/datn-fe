@@ -2,10 +2,10 @@
   <div v-if="disabled">
     <div
       ref="selectRef"
-      class="border-border relative h-8 w-full cursor-pointer select-none bg-gray-50 pr-8 text-sm text-gray-500 transition-colors duration-200"
+      class="border-border flex h-8 w-full cursor-pointer select-none items-center bg-gray-50 text-sm text-gray-500 transition-colors duration-200"
     >
-      <div class="h-[30px] min-w-[50px] truncate pl-2.5 leading-[30px]">{{ value }}</div>
-      <div class="absolute right-0 top-0 flex h-[30px] w-8 items-center justify-center text-gray-400">
+      <div class="flex-1 truncate pl-2.5">{{ value }}</div>
+      <div class="flex w-8 items-center justify-center text-gray-400">
         <slot name="icon">
           <IconDown :size="14" />
         </slot>
@@ -55,10 +55,10 @@
     </template>
     <div
       ref="selectRef"
-      class="relative h-8 w-full cursor-pointer select-none rounded-md border border-gray-300 bg-white pr-8 text-sm transition-colors duration-200 hover:border-blue-500"
+      class="flex h-8 w-full cursor-pointer select-none items-center rounded-md border border-gray-300 bg-white text-sm transition-colors duration-200 hover:border-blue-500"
     >
-      <div class="h-[30px] min-w-[50px] truncate pl-2.5 leading-[30px]">{{ showLabel }}</div>
-      <div class="absolute right-0 top-0 flex h-[30px] w-8 items-center justify-center text-gray-400">
+      <div class="flex-1 truncate pl-2.5">{{ showLabel }}</div>
+      <div class="flex w-8 items-center justify-center text-gray-400">
         <slot name="icon">
           <IconDown :size="14" />
         </slot>

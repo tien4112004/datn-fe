@@ -438,7 +438,7 @@ $attentionColor: #e8b76a;
 }
 .type-title {
   width: 100%;
-  font-size: $baseTextSize;
+  font-size: 0.875rem;
   margin-bottom: 10px;
   border-left: 4px solid #aaa;
   background-color: #eee;
@@ -459,8 +459,8 @@ $attentionColor: #e8b76a;
   align-items: center;
   height: 45px;
   line-height: 16px;
-  background-color: $gray-eee;
-  border-radius: $borderRadius;
+  background-color: #eeeeee;
+  border-radius: var(--radius);
   padding: 0px 8px;
 }
 
@@ -472,9 +472,9 @@ $attentionColor: #e8b76a;
   @include overflow-overlay();
 }
 .sequence-item {
-  border: 1px solid $borderColor;
+  border: 1px solid var(--border);
   padding: 8px;
-  border-radius: $borderRadius;
+  border-radius: var(--radius);
   margin-bottom: 8px;
   transition: all 0.5s;
 
@@ -508,7 +508,7 @@ $attentionColor: #e8b76a;
     }
     .handler {
       flex: 2;
-      font-size: $baseTextSize;
+      font-size: 0.875rem;
       text-align: right;
     }
     .handler-btn {

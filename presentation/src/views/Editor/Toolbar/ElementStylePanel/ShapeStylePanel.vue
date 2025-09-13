@@ -182,14 +182,14 @@ const { handleElement, handleElementId, shapeFormatPainter } = storeToRefs(mainS
 
 const handleShapeElement = handleElement as Ref<PPTShapeElement>;
 
-const fill = ref<string>('$foreground');
+const fill = ref<string>('var(--foreground)');
 const pattern = ref<string>('');
 const gradient = ref<Gradient>({
   type: 'linear',
   rotate: 0,
   colors: [
-    { pos: 0, color: '$background' },
-    { pos: 100, color: '$background' },
+    { pos: 0, color: 'var(--background)' },
+    { pos: 100, color: 'var(--background)' },
   ],
 });
 const fillType = ref('fill');
@@ -202,10 +202,10 @@ watch(
   () => {
     if (!handleElement.value || handleElement.value.type !== 'shape') return;
 
-    fill.value = handleElement.value.fill || '$background';
+    fill.value = handleElement.value.fill || 'var(--background)';
     const defaultGradientColor = [
       { pos: 0, color: fill.value },
-      { pos: 100, color: '$background' },
+      { pos: 100, color: 'var(--background)' },
     ];
     gradient.value = handleElement.value.gradient || {
       type: 'linear',
@@ -323,7 +323,7 @@ const updateTextAlign = (align: 'top' | 'middle' | 'bottom') => {
   const defaultText: ShapeText = {
     content: '',
     defaultFontName: '',
-    defaultColor: '$foreground',
+    defaultColor: 'var(--foreground)',
     align: 'middle',
   };
   const _text = _handleElement.text || defaultText;
@@ -356,7 +356,7 @@ const updateTextAlign = (align: 'top' | 'middle' | 'bottom') => {
   overflow: auto;
   padding: 5px;
   padding-right: 10px;
-  border: 1px solid $borderColor;
+  border: 1px solid var(--border);
   margin-bottom: 20px;
 }
 .shape-list {
@@ -376,14 +376,14 @@ const updateTextAlign = (align: 'top' | 'middle' | 'bottom') => {
 .pattern-image {
   height: 0;
   padding-bottom: 56.25%;
-  border: 1px dashed $borderColor;
-  border-radius: $borderRadius;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
   position: relative;
-  transition: all $transitionDelay;
+  transition: all 0.2s;
 
   &:hover {
-    border-color: $themeColor;
-    color: $themeColor;
+    border-color: var(--primary);
+    color: var(--primary);
   }
 
   .content {

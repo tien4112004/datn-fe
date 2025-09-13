@@ -22,11 +22,11 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits);
 const sizeClasses = {
   small: {
     root: 'h-[1.15rem] w-10 ',
-    thumb: 'size-4 data-[state=checked]:translate-x-[calc(100%+5px)]',
+    thumb: 'size-4',
   },
   medium: {
     root: 'h-[1.5rem] w-12 ',
-    thumb: 'size-5 data-[state=checked]:translate-x-[calc(100%+4px)]',
+    thumb: 'size-5 ',
   },
 };
 
@@ -49,7 +49,7 @@ const currentSize = props.size || 'medium';
       data-slot="switch-thumb"
       :class="
         cn(
-          'pointer-events-none block rounded-full bg-white ring-0 transition-transform data-[state=unchecked]:translate-x-0 dark:data-[state=checked]:bg-white dark:data-[state=unchecked]:bg-gray-200',
+          'pointer-events-none block rounded-full bg-white ring-0 transition-transform data-[state=checked]:translate-x-[calc(100%+5px)] data-[state=unchecked]:translate-x-0.5 dark:data-[state=checked]:bg-white dark:data-[state=unchecked]:bg-gray-200',
           sizeClasses[currentSize].thumb
         )
       "
@@ -58,3 +58,7 @@ const currentSize = props.size || 'medium';
     </SwitchThumb>
   </SwitchRoot>
 </template>
+
+<style scoped>
+@tailwind base;
+</style>

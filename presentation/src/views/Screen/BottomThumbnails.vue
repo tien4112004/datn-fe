@@ -60,7 +60,7 @@ watch(slideIndex, () => {
   left: 0;
   bottom: -120px;
   z-index: 4;
-  transition: bottom $transitionDelay;
+  transition: bottom 0.2s;
 
   &::after {
     content: '';
@@ -94,12 +94,12 @@ watch(slideIndex, () => {
   }
 
   &:hover {
-    outline-color: $themeColor;
+    outline-color: var(--primary);
   }
 
   &.active {
     outline-width: 3px;
-    outline-color: $themeColor;
+    outline-color: var(--primary);
   }
 }
 

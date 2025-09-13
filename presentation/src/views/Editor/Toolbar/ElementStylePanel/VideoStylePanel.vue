@@ -84,14 +84,14 @@ const setVideoPoster = (files: FileList) => {
 .background-image {
   height: 0;
   padding-bottom: 56.25%;
-  border: 1px dashed $borderColor;
-  border-radius: $borderRadius;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
   position: relative;
-  transition: all $transitionDelay;
+  transition: all 0.2s;
 
   &:hover {
-    border-color: $themeColor;
-    color: $themeColor;
+    border-color: var(--primary);
+    color: var(--primary);
   }
 
   .content {

@@ -48,14 +48,14 @@ const handleInput = (e: Event) => {
     left: 0;
     top: 50%;
     transform: translateY(-50%);
-    color: $gray-999;
+    color: #999999;
   }
 }
 .input-content {
   width: 100%;
   padding: 3px;
   border: 0;
-  border-bottom: 1px solid $gray-ddd;
+  border-bottom: 1px solid #dddddd;
   outline: none;
   text-align: center;
 }

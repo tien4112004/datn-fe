@@ -399,16 +399,16 @@ const toggleNotesPanel = () => {
 <style lang="scss" scoped>
 .canvas-tool {
   position: relative;
-  font-size: $baseTextSize;
+  font-size: 0.875rem;
   margin: 4px 16px;
   display: flex;
-  font-size: $baseTextSize;
+  font-size: 0.875rem;
 
   :deep(.card-content) {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-inline: $extraLargeSpacing;
+    padding-inline: 1rem;
   }
 }
 .left-handler,
@@ -437,19 +437,19 @@ const toggleNotesPanel = () => {
     margin-right: 0;
     flex-shrink: 0;
     padding: 0 8px;
-    border-radius: $borderRadius;
+    border-radius: var(--radius);
 
     .handler-item {
       width: 24px;
       padding: 0;
 
       .active {
-        color: $themeColor;
+        color: var(--primary);
       }
     }
 
     &:hover {
-      background-color: $card-hover;
+      background-color: var(--card)-hover;
     }
 
     .icon,
@@ -474,7 +474,7 @@ const toggleNotesPanel = () => {
   display: flex;
   justify-content: center;
   align-items: center;
-  border-radius: $borderRadius;
+  border-radius: var(--radius);
   overflow: hidden;
   cursor: pointer;
   padding: 0 8px;
@@ -505,7 +505,7 @@ const toggleNotesPanel = () => {
   }
 
   .viewport-size {
-    font-size: $baseTextSize;
+    font-size: 0.875rem;
   }
 }
 
@@ -543,7 +543,7 @@ const toggleNotesPanel = () => {
     margin: 2px 8px;
 
     :deep(.card-content) {
-      padding-inline: $normalSpacing;
+      padding-inline: 0.25rem;
       display: flex;
       justify-content: center;
       align-items: center;

@@ -166,7 +166,7 @@ const insertSymbol = (latex: string) => {
 
   textarea {
     height: 100% !important;
-    border-color: $borderColor !important;
+    border-color: var(--border) !important;
     padding: 10px !important;
     font-family: SFMono-Regular, Consolas, 'Liberation Mono', Menlo, Courier, monospace;
 
@@ -182,7 +182,7 @@ const insertSymbol = (latex: string) => {
   align-items: center;
   text-align: center;
   margin-top: 20px;
-  border: 1px solid $borderColor;
+  border: 1px solid var(--border);
   user-select: none;
 }
 .placeholder {
@@ -196,23 +196,23 @@ const insertSymbol = (latex: string) => {
   display: flex;
   justify-content: center;
   align-items: center;
-  border-radius: $cardBorderRadius;
+  border-radius: var(--radius);
 }
 .right {
   width: 300px;
   height: 100%;
   margin-left: 20px;
-  border: solid 1px $borderColor;
-  background-color: $background;
+  border: solid 1px var(--border);
+  background-color: var(--background);
   display: flex;
   flex-direction: column;
   user-select: none;
-  border-radius: $cardBorderRadius;
+  border-radius: var(--radius);
 }
 .content {
   height: calc(100% - 40px);
-  font-size: $smTextSize;
-  padding: $extraLargeSpacing;
+  font-size: 0.8125rem;
+  padding: 1rem;
 }
 .formula {
   height: 100%;
@@ -233,7 +233,7 @@ const insertSymbol = (latex: string) => {
     padding: 5px;
     display: flex;
     align-items: center;
-    background-color: $lightGray;
+    background-color: var(--muted);
     cursor: pointer;
   }
 }
@@ -256,7 +256,7 @@ const insertSymbol = (latex: string) => {
   align-items: center;
 
   &:hover {
-    background-color: $lightGray;
+    background-color: var(--muted);
     cursor: pointer;
   }
 }

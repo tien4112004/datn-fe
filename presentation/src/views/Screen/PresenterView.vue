@@ -237,7 +237,7 @@ const contextmenus = (): ContextmenuItem[] => {
   height: 100%;
   background-color: #fff;
   border-right: solid 1px #eee;
-  font-size: $xsTextSize;
+  font-size: 0.75rem;
   margin: 20px 0;
 
   .tool-btn {
@@ -254,7 +254,7 @@ const contextmenus = (): ContextmenuItem[] => {
 
     &:hover,
     &.active {
-      color: $themeColor;
+      color: var(--primary);
     }
   }
 
@@ -265,7 +265,7 @@ const contextmenus = (): ContextmenuItem[] => {
 
   .tool-icon {
     margin-bottom: 8px;
-    font-size: $xlgTextSize;
+    font-size: 1.25rem;
   }
 }
 .content {
@@ -304,12 +304,12 @@ const contextmenus = (): ContextmenuItem[] => {
   }
 
   &:hover {
-    outline-color: $themeColor;
+    outline-color: var(--primary);
   }
 
   &.active {
     outline-width: 3px;
-    outline-color: $themeColor;
+    outline-color: var(--primary);
   }
 }
 .remark {
@@ -326,7 +326,7 @@ const contextmenus = (): ContextmenuItem[] => {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: $baseTextSize;
+    font-size: 0.875rem;
     border-bottom: 1px solid #3a3a3a;
   }
 
@@ -346,7 +346,7 @@ const contextmenus = (): ContextmenuItem[] => {
     position: absolute;
     right: 5px;
     bottom: 5px;
-    font-size: $xlgTextSize;
+    font-size: 1.25rem;
     display: flex;
   }
   .scale-btn {

@@ -234,7 +234,7 @@ const removeThemeColor = (index: number) => {
 };
 
 const getMostReadableColor = (color: string) => {
-  const colorList = ['$foreground', '$background'];
+  const colorList = ['var(--foreground)', 'var(--background)'];
   return tinycolor.mostReadable(color, colorList, { includeFallbackColors: true }).toRgbString();
 };
 const getHexColor = (color: string) => {
@@ -259,7 +259,7 @@ const getHexColor = (color: string) => {
 }
 .config-item {
   padding: 12px 0 10px;
-  border-bottom: 1px dashed $gray-f5f5f5;
+  border-bottom: 1px dashed #f5f5f5;
   font-size: 13px;
 }
 .label {
@@ -269,7 +269,7 @@ const getHexColor = (color: string) => {
 
   .tip {
     font-size: 12px;
-    color: $gray-999;
+    color: #999999;
   }
 }
 .values {
@@ -297,7 +297,7 @@ const getHexColor = (color: string) => {
           top: 11px;
           left: -1px;
           transform: rotate(-45deg);
-          background-color: $foreground;
+          background-color: var(--foreground);
         }
         &::before {
           content: '';
@@ -307,7 +307,7 @@ const getHexColor = (color: string) => {
           top: 11px;
           left: -1px;
           transform: rotate(45deg);
-          background-color: $foreground;
+          background-color: var(--foreground);
         }
       }
     }
@@ -342,7 +342,7 @@ const getHexColor = (color: string) => {
       cursor: pointer;
 
       &:hover {
-        color: $themeColor;
+        color: var(--primary);
       }
     }
   }
@@ -351,10 +351,10 @@ const getHexColor = (color: string) => {
     height: 25px;
     line-height: 25px;
     text-align: center;
-    border: 1px solid $borderColor;
+    border: 1px solid var(--border);
     font-size: 12px;
     padding: 0 5px;
-    border-radius: $borderRadius;
+    border-radius: var(--radius);
     @include ellipsis-oneline();
   }
 }

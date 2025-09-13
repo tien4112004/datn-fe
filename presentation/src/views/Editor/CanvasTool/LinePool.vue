@@ -72,12 +72,12 @@ const selectLine = (line: LinePoolItem) => {
 }
 .category-name {
   width: 100%;
-  font-size: $smTextSize;
+  font-size: 13px;
   margin-bottom: 10px;
   border-left: 4px solid #bbb;
   background-color: #f1f1f1;
   padding: 3px 0 3px 8px;
-  color: $gray-555;
+  color: #555555;
 }
 .line-list {
   @include flex-grid-layout();
@@ -99,10 +99,10 @@ const selectLine = (line: LinePoolItem) => {
   display: flex;
   justify-content: center;
   align-items: center;
-  color: $gray-999;
+  color: #999999;
 
   &:hover {
-    color: $themeColor;
+    color: var(--primary);
   }
 
   svg:not(:root) {

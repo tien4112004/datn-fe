@@ -340,11 +340,11 @@
     </div>
   </div>
 
-  <Modal v-model:visible="themeStylesExtractVisible" :width="320" @closed="themeStylesExtractVisible = false">
+  <Modal v-model:visible="themeStylesExtractVisible" :width="400" @closed="themeStylesExtractVisible = false">
     <ThemeStylesExtract @close="themeStylesExtractVisible = false" />
   </Modal>
 
-  <Modal v-model:visible="themeColorsSettingVisible" :width="310" @closed="themeColorsSettingVisible = false">
+  <Modal v-model:visible="themeColorsSettingVisible" :width="400" @closed="themeColorsSettingVisible = false">
     <ThemeColorsSetting @close="themeColorsSettingVisible = false" />
   </Modal>
 </template>

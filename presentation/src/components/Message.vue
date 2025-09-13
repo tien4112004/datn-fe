@@ -96,9 +96,9 @@ defineExpose({
   padding: 10px;
   font-size: 13px;
   overflow: hidden;
-  border-radius: $borderRadius;
+  border-radius: var(--radius);
   box-shadow: 0 1px 8px rgba(0, 0, 0, 0.15);
-  background: $background;
+  background: var(--background);
   pointer-events: all;
   position: relative;
 
@@ -119,7 +119,7 @@ defineExpose({
   }
   .description {
     line-height: 1.5;
-    color: $textColor;
+    color: var(--foreground);
   }
   .title + .description {
     margin-top: 5px;
@@ -131,13 +131,13 @@ defineExpose({
   }
   .close-btn {
     font-size: 15px;
-    color: $gray-666;
+    color: #666666;
     display: flex;
     align-items: center;
     cursor: pointer;
 
     &:hover {
-      color: $themeColor;
+      color: var(--primary);
     }
   }
 }

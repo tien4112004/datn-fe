@@ -194,10 +194,10 @@ const close = () => {
   height: 30px;
   line-height: 30px;
   text-align: center;
-  color: $gray-999;
+  color: #999999;
   font-style: italic;
   border: 1px dashed #ccc;
-  border-radius: $borderRadius;
+  border-radius: var(--radius);
   margin-top: 5px;
 }
 </style>

@@ -57,7 +57,7 @@ let message: Message = ((options: MessageOptions) => {
       display: flex;
       flex-direction: column;
       box-sizing: border-box;
-      padding: $cardPadding;
+      padding: 1rem;
       background-color: rgba(255, 255, 255, 0);
       transition: all 1s ease-in-out;
       align-items: center;

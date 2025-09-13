@@ -148,7 +148,7 @@ const themeColorsSettingVisible = ref(false);
 
 const { addHistorySnapshot } = useHistorySnapshot();
 
-const fill = ref<string>('$foreground');
+const fill = ref<string>('var(--foreground)');
 
 const themeColors = ref<string[]>([]);
 const textColor = ref('');
@@ -159,7 +159,7 @@ watch(
   handleElement,
   () => {
     if (!handleElement.value || handleElement.value.type !== 'chart') return;
-    fill.value = handleElement.value.fill || '$background';
+    fill.value = handleElement.value.fill || 'var(--background)';
 
     lineSmooth.value = false;
     stack.value = false;
@@ -172,7 +172,7 @@ watch(
     }
 
     themeColors.value = handleElement.value.themeColors;
-    textColor.value = handleElement.value.textColor || '$gray-333';
+    textColor.value = handleElement.value.textColor || '#333333';
   },
   { deep: true, immediate: true }
 );
@@ -252,12 +252,12 @@ onUnmounted(() => {
   cursor: pointer;
   border: 1px solid #ccc;
   padding: 2px;
-  border-radius: $borderRadius;
+  border-radius: var(--radius);
   @include flex-grid-layout-children(2, 48%);
 
   &:hover {
-    border-color: $themeColor;
-    transition: border-color $transitionDelayFast;
+    border-color: var(--primary);
+    transition: border-color 0.1s;
   }
 }
 .preset-theme-color {

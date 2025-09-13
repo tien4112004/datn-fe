@@ -414,26 +414,26 @@ const contextmenusThumbnailItem = (): ContextmenuItem[] => {
 
 .add-slide {
   height: 40px;
-  font-size: $smTextSize;
+  font-size: 0.8125rem;
   display: flex;
   flex-shrink: 0;
   cursor: pointer;
   transition:
     background-color 0.2s ease,
     box-shadow 0.2s ease;
-  border-radius: $borderRadius;
-  color: $secondary-foreground;
-  background-color: $secondary;
-  margin: $normalSpacing;
+  border-radius: var(--radius);
+  color: var(--secondary-foreground);
+  background-color: var(--secondary);
+  margin: 0.25rem;
 
   .btn {
     flex: 1;
-    font-size: $baseTextSize;
+    font-size: 0.875rem;
     font-weight: 500;
-    border-radius: $borderRadius 0 0 $borderRadius;
-    background-color: $secondary;
+    border-radius: var(--radius) 0 0 var(--radius);
+    background-color: var(--secondary);
     &:hover {
-      background-color: $primary;
+      background-color: var(--primary);
     }
   }
   .select-btn {
@@ -442,10 +442,10 @@ const contextmenusThumbnailItem = (): ContextmenuItem[] => {
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: $secondary;
-    border-radius: 0 $borderRadius $borderRadius 0;
+    background-color: var(--secondary);
+    border-radius: 0 var(--radius) var(--radius) 0;
     &:hover {
-      background-color: $primary;
+      background-color: var(--primary);
     }
   }
 
@@ -462,34 +462,34 @@ const contextmenusThumbnailItem = (): ContextmenuItem[] => {
   overflow: auto;
   display: flex;
   flex-direction: column;
-  padding-top: $largeSpacing;
-  gap: $largeSpacing;
+  padding-top: 0.5rem;
+  gap: 0.5rem;
 }
 .thumbnail-item {
   position: relative;
 
   .thumbnail {
-    border-radius: $borderRadius;
-    outline: 2px solid rgba($color: $themeColor, $alpha: 0.15);
+    border-radius: var(--radius);
+    outline: 2px solid color-mix(in srgb, var(--primary) 15%, transparent);
   }
 
   &.active {
     .label {
-      color: $themeColor;
+      color: var(--primary);
     }
     .thumbnail {
-      outline-color: $themeColor;
+      outline-color: var(--primary);
     }
   }
   &.selected {
     .thumbnail {
-      outline-color: $themeColor;
+      outline-color: var(--primary);
     }
     .note-flag {
-      background-color: $themeColor;
+      background-color: var(--primary);
 
       &::after {
-        border-top-color: $themeColor;
+        border-top-color: var(--primary);
       }
     }
   }
@@ -502,8 +502,8 @@ const contextmenusThumbnailItem = (): ContextmenuItem[] => {
     left: 8px;
     top: 13px;
     font-size: 8px;
-    background-color: rgba($color: $themeColor, $alpha: 0.75);
-    color: $background;
+    background-color: color-mix(in srgb, var(--primary) 75%, transparent);
+    color: var(--background);
     text-align: center;
     line-height: 12px;
     cursor: pointer;
@@ -516,13 +516,13 @@ const contextmenusThumbnailItem = (): ContextmenuItem[] => {
       top: 10px;
       left: 4px;
       border: 4px solid transparent;
-      border-top-color: rgba($color: $themeColor, $alpha: 0.75);
+      border-top-color: color-mix(in srgb, var(--primary), 0.75);
     }
   }
 }
 .label {
-  font-size: $baseTextSize;
-  color: $gray-999;
+  font-size: 0.875rem;
+  color: #999999;
   width: 20px;
   cursor: grab;
 
@@ -537,24 +537,24 @@ const contextmenusThumbnailItem = (): ContextmenuItem[] => {
 }
 .page-number {
   height: 40px;
-  border-top: 1px solid $borderColor;
+  border-top: 1px solid var(--border);
   line-height: 40px;
   text-align: center;
-  font-size: $smTextSize;
-  color: $gray-666;
+  font-size: 0.8125rem;
+  color: #666666;
 }
 .section-title {
   height: 26px;
   font-size: 12px;
   padding: 6px 8px 2px 18px;
-  color: $gray-555;
+  color: #555555;
 
   &.contextmenu-active {
-    color: $themeColor;
+    color: var(--primary);
 
     .text::before {
-      border-bottom-color: $themeColor;
-      border-right-color: $themeColor;
+      border-bottom-color: var(--primary);
+      border-right-color: var(--primary);
     }
   }
 
@@ -569,8 +569,8 @@ const contextmenusThumbnailItem = (): ContextmenuItem[] => {
       height: 0;
       border-top: 3px solid transparent;
       border-left: 3px solid transparent;
-      border-bottom: 3px solid $gray-555;
-      border-right: 3px solid $gray-555;
+      border-bottom: 3px solid #555555;
+      border-right: 3px solid #555555;
       margin-right: 5px;
     }
 

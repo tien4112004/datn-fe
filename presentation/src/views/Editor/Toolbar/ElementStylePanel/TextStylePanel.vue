@@ -194,7 +194,7 @@ const updateElement = (props: Partial<PPTTextElement>) => {
   addHistorySnapshot();
 };
 
-const fill = ref<string>('$foreground');
+const fill = ref<string>('var(--foreground)');
 const lineHeight = ref<number>();
 const wordSpace = ref<number>();
 const paragraphSpace = ref<number>();
@@ -252,7 +252,7 @@ watch(
   () => {
     if (!handleElement.value || handleElement.value.type !== 'text') return;
 
-    fill.value = handleElement.value.fill || '$background';
+    fill.value = handleElement.value.fill || 'var(--background)';
     lineHeight.value = handleElement.value.lineHeight || 1.5;
     wordSpace.value = handleElement.value.wordSpace || 0;
     paragraphSpace.value =
@@ -310,15 +310,15 @@ const emitBatchRichTextCommand = (action: RichTextAction[]) => {
 .custom-select {
   width: 100%;
   height: 32px;
-  border: 1px solid $borderColor;
-  border-radius: $borderRadius;
-  background-color: $background;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background-color: var(--background);
   cursor: pointer;
   position: relative;
-  transition: all $transitionDelay;
+  transition: all 0.2s;
 
   &:hover {
-    border-color: $themeColor;
+    border-color: var(--primary);
   }
 }
 
@@ -340,8 +340,8 @@ const emitBatchRichTextCommand = (action: RichTextAction[]) => {
   display: flex;
   justify-content: center;
   align-items: center;
-  color: $muted-foreground;
-  transition: transform $transitionDelay;
+  color: var(--muted-foreground);
+  transition: transform 0.2s;
 
   &.open {
     transform: rotate(180deg);
@@ -353,10 +353,10 @@ const emitBatchRichTextCommand = (action: RichTextAction[]) => {
   top: 100%;
   left: 0;
   right: 0;
-  background-color: $background;
-  border: 1px solid $borderColor;
+  background-color: var(--background);
+  border: 1px solid var(--border);
   border-top: none;
-  border-radius: 0 0 $borderRadius $borderRadius;
+  border-radius: 0 0 var(--radius) var(--radius);
   box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.08);
   z-index: 1000;
   max-height: 200px;
@@ -365,20 +365,20 @@ const emitBatchRichTextCommand = (action: RichTextAction[]) => {
 
 .preset-style-item {
   height: 50px;
-  border-bottom: solid 1px $borderColor;
+  border-bottom: solid 1px var(--border);
   box-sizing: border-box;
   display: flex;
   justify-content: center;
   align-items: center;
   position: relative;
   cursor: pointer;
-  transition: all $transitionDelay;
+  transition: all 0.2s;
   padding: 0 10px;
 
   &:hover {
-    border-color: $themeColor;
-    color: $themeColor;
-    background-color: rgba($color: $themeColor, $alpha: 0.05);
+    border-color: var(--primary);
+    color: var(--primary);
+    background-color: rgba($color: var(--primary), $alpha: 0.05);
   }
 
   &:last-child {

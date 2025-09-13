@@ -25,7 +25,7 @@ const emit = defineEmits<{
 
 const computedClass = computed(() =>
   cn(
-    'min-w-[80px] cursor-pointer rounded px-2.5 py-1.5 [&+&]:mt-0.5',
+    'min-w-[80px] cursor-pointer rounded px-2.5 py-1.5 [&+&]:mt-0.5 hover:text-accent flex items-center gap-2',
     props.center ? 'text-center' : 'text-left',
     props.class
   )

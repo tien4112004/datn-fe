@@ -277,7 +277,7 @@ const hanldeWritingEnd = () => {
 
 <style lang="scss" scoped>
 .writing-board-tool {
-  font-size: $xsTextSize;
+  font-size: 0.75rem;
   z-index: 10;
   @include absolute-0();
 
@@ -302,14 +302,14 @@ const hanldeWritingEnd = () => {
   .btn {
     padding: 5px;
     margin-right: 5px;
-    border-radius: $borderRadius;
+    border-radius: var(--radius);
     cursor: pointer;
 
     &:hover {
-      color: $themeColor;
+      color: var(--primary);
     }
     &.active {
-      background-color: rgba($color: $themeColor, $alpha: 0.5);
+      background-color: rgb(from var(--primary) r g b / 0.5);
       color: #fff;
     }
     &.close {
@@ -318,7 +318,7 @@ const hanldeWritingEnd = () => {
     }
   }
   .icon {
-    font-size: $lgTextSize;
+    font-size: 1.125rem;
   }
   .colors {
     display: flex;
@@ -327,7 +327,7 @@ const hanldeWritingEnd = () => {
   .color {
     width: 16px;
     height: 16px;
-    border-radius: $borderRadius;
+    border-radius: var(--radius);
     cursor: pointer;
 
     &:hover {
@@ -350,7 +350,7 @@ const hanldeWritingEnd = () => {
   display: flex;
   align-items: center;
   user-select: none;
-  font-size: $smTextSize;
+  font-size: 0.8125rem;
 
   &.shape {
     width: 280px;
@@ -361,7 +361,7 @@ const hanldeWritingEnd = () => {
     align-items: center;
 
     .icon {
-      font-size: $lgTextSize;
+      font-size: 1.125rem;
       cursor: pointer;
 
       & + .icon {
@@ -369,7 +369,7 @@ const hanldeWritingEnd = () => {
       }
 
       &.active {
-        color: $themeColor;
+        color: var(--primary);
       }
     }
   }

@@ -154,7 +154,7 @@ const updateLine = (props: Partial<PPTLineElement>) => {
   width: 30px;
   font-size: 12px;
   margin-top: 2px;
-  color: $muted-foreground;
+  color: var(--muted-foreground);
 }
 .preset-point-style {
   padding: 0 10px;
@@ -166,15 +166,15 @@ const updateLine = (props: Partial<PPTLineElement>) => {
 .option {
   height: 32px;
   padding: 0 5px;
-  border-radius: $borderRadius;
+  border-radius: var(--radius);
 
   &:not(.selected):hover {
-    background-color: rgba($color: $themeColor, $alpha: 0.05);
+    background-color: rgba($color: var(--primary), $alpha: 0.05);
     cursor: pointer;
   }
 
   &.selected {
-    color: $themeColor;
+    color: var(--primary);
     font-weight: 700;
   }
 }

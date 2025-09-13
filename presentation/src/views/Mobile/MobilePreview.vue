@@ -78,11 +78,11 @@ onMounted(() => {
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: $smTextSize;
+    font-size: 0.8125rem;
 
     .icon {
       margin-right: 8px;
-      font-size: $baseTextSize;
+      font-size: 0.875rem;
     }
   }
 }

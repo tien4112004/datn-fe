@@ -417,7 +417,7 @@ const removeLink = () => {
 }
 .list-wrap {
   width: 176px;
-  color: $gray-666;
+  color: #666666;
   padding: 8px;
   margin: -12px;
   display: flex;
@@ -425,7 +425,7 @@ const removeLink = () => {
   align-content: flex-start;
 }
 .list {
-  background-color: $lightGray;
+  background-color: var(--muted);
   padding: 4px 4px 4px 20px;
   cursor: pointer;
 
@@ -440,10 +440,10 @@ const removeLink = () => {
   }
 
   &:hover {
-    color: $themeColor;
+    color: var(--primary);
 
     span {
-      background-color: $themeColor;
+      background-color: var(--primary);
     }
   }
 }
@@ -460,7 +460,7 @@ const removeLink = () => {
     display: inline-block;
     position: absolute;
     top: 8px;
-    background-color: $gray-666;
+    background-color: #666666;
   }
 }
 .popover-btn {

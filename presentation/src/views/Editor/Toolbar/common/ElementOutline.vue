@@ -34,7 +34,7 @@
               @update:modelValue="(value) => updateOutline({ color: value })"
             />
           </template>
-          <ColorButton :color="outline.color || '$foreground'" />
+          <ColorButton :color="outline.color || 'var(--foreground)'" />
         </Popover>
       </div>
       <div class="row">
@@ -132,15 +132,15 @@ const toggleOutline = (checked: boolean) => {
 .option {
   height: 32px;
   padding: 0 5px;
-  border-radius: $borderRadius;
+  border-radius: var(--radius);
 
   &:not(.selected):hover {
-    background-color: rgba($color: $themeColor, $alpha: 0.05);
+    background-color: rgba($color: var(--primary), $alpha: 0.05);
     cursor: pointer;
   }
 
   &.selected {
-    color: $themeColor;
+    color: var(--primary);
     font-weight: 700;
   }
 }

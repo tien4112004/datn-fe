@@ -23,7 +23,7 @@
         :key="point"
         @mousedown.stop="($event) => scaleClipRange($event, point)"
       >
-        <svg width="16" height="16" fill="$background" stroke="$gray-333">
+        <svg width="16" height="16" fill="var(--background)" stroke="#333333">
           <path
             stroke-width="0.3"
             shape-rendering="crispEdges"
@@ -37,7 +37,7 @@
         :key="point"
         @mousedown.stop="($event) => scaleClipRange($event, point)"
       >
-        <svg width="16" height="16" fill="$background" stroke="$gray-333">
+        <svg width="16" height="16" fill="var(--background)" stroke="#333333">
           <path stroke-width="0.3" shape-rendering="crispEdges" d="M 16 0 L 0 0 L 0 4 L 16 4 Z"></path>
         </svg>
       </div>

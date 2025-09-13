@@ -11,7 +11,7 @@
   }
 
   ::selection {
-    background-color: rgba($themeColor, 0.25);
+    background-color: rgb(from var(--primary) r g b / 0.25);
     color: inherit;
   }
 

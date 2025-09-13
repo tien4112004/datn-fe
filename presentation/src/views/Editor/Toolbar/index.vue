@@ -107,7 +107,7 @@ const currentPanelComponent = computed(() => {
 
 <style lang="scss" scoped>
 .toolbar {
-  color: $textColor;
+  color: var(--foreground);
   height: 100%;
   width: 100%;
   max-width: 100%;
@@ -124,8 +124,8 @@ const currentPanelComponent = computed(() => {
 }
 
 .content {
-  padding: $extraLargeSpacing;
-  font-size: $smTextSize;
+  padding: 1rem;
+  font-size: 0.8125rem;
   flex: 1;
 
   min-width: 0;

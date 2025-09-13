@@ -11,7 +11,7 @@
             <div
               class="remark-content"
               :class="{ empty: !currentSlide?.remark }"
-              v-html="currentSlide?.remark || 'Click to add notes...'"
+              v-html="currentSlide?.remark || ''"
             ></div>
             <div class="remark-hint">
               <span>{{ currentSlide?.remark ? 'Click to edit notes' : 'Click to add notes' }}</span>
@@ -296,9 +296,9 @@ const handleClick = async () => {
 
     .remark-preview {
       height: 100%;
-      border-top: 1px solid $borderColor;
+      border-top: 1px solid var(--border);
       padding: 8px 12px;
-      background: $background;
+      background: var(--background);
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -312,7 +312,7 @@ const handleClick = async () => {
         flex: 1;
         font-size: 13px;
         line-height: 1.4;
-        color: $textColor;
+        color: var(--foreground);
         overflow: hidden;
         display: -webkit-box;
         -webkit-line-clamp: 2;

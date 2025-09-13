@@ -47,15 +47,15 @@ onMounted(() => {
   let colors = [...theme.value.themeColors];
 
   while (colors.length < 6) {
-    colors.push('$foreground00');
+    colors.push('var(--foreground)');
   }
 
   themeColors.value = [...colors];
 });
 
 const setThemeColors = () => {
-  let colors = themeColors.value.filter((item) => item !== '$foreground00');
-  if (!colors.length) colors = ['$foreground00'];
+  let colors = themeColors.value.filter((item) => item !== 'var(--foreground)00');
+  if (!colors.length) colors = ['var(--foreground)00'];
 
   slidesStore.setTheme({ themeColors: colors });
   emit('close');

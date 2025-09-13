@@ -129,9 +129,9 @@ const height = computed(() => ('height' in props.elementInfo ? props.elementInfo
   .index-item {
     width: 18px;
     height: 18px;
-    background-color: $background;
-    color: $themeColor;
-    border: 1px solid $themeColor;
+    background-color: var(--background);
+    color: var(--primary);
+    border: 1px solid var(--primary);
     display: flex;
     justify-content: center;
     align-items: center;

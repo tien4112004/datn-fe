@@ -31,13 +31,13 @@
       <IconLeftTwo
         class="tool-btn big-icon"
         theme="two-tone"
-        :fill="['#111', '$background']"
+        :fill="['#111', 'var(--background)']"
         @click="execPrev()"
       />
       <IconRightTwo
         class="tool-btn big-icon"
         theme="two-tone"
-        :fill="['#111', '$background']"
+        :fill="['#111', 'var(--background)']"
         @click="execNext()"
       />
     </div>
@@ -260,15 +260,15 @@ const contextmenus = (): ContextmenuItem[] => {
   position: fixed;
   bottom: 8px;
   left: 8px;
-  font-size: $xxlMinusTextSize;
-  color: $gray-666;
+  font-size: 1.5rem;
+  color: #666666;
   z-index: 10;
   display: flex;
 
   .tool-btn {
     opacity: 0.3;
     cursor: pointer;
-    transition: opacity $transitionDelay;
+    transition: opacity 0.2s;
 
     &:hover {
       opacity: 0.95;
@@ -279,7 +279,7 @@ const contextmenus = (): ContextmenuItem[] => {
   }
 
   .big-icon {
-    font-size: $xlTextSize;
+    font-size: 1.375rem;
   }
 }
 .tools-right {
@@ -289,7 +289,7 @@ const contextmenus = (): ContextmenuItem[] => {
   right: 0;
   z-index: 5;
   padding: 8px;
-  transition: bottom $transitionDelay;
+  transition: bottom 0.2s;
 
   &.visible {
     bottom: 0;
@@ -310,10 +310,10 @@ const contextmenus = (): ContextmenuItem[] => {
     display: flex;
     justify-content: center;
     align-items: center;
-    border-radius: $borderRadius;
-    font-size: $xxlMinusTextSize;
-    background-color: $background;
-    color: $textColor;
+    border-radius: var(--radius);
+    font-size: 1.5rem;
+    background-color: var(--background);
+    color: var(--foreground);
     padding: 8px 10px;
     box-shadow: 0 2px 12px 0 rgb(56, 56, 56, 0.2);
     border: 1px solid #e2e6ed;
@@ -324,7 +324,7 @@ const contextmenus = (): ContextmenuItem[] => {
 
     &:hover,
     &.active {
-      color: $themeColor;
+      color: var(--primary);
     }
 
     & + .tool-btn {
@@ -332,7 +332,7 @@ const contextmenus = (): ContextmenuItem[] => {
     }
   }
   .page-number {
-    font-size: $xsTextSize;
+    font-size: 0.75rem;
     padding: 0 12px;
     cursor: pointer;
   }

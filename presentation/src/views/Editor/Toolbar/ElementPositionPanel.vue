@@ -378,16 +378,16 @@ const updateRotate45 = (command: '+' | '-') => {
   padding: 6px;
 
   &:hover {
-    color: $themeColor;
+    color: var(--primary);
   }
 
   &.active {
-    color: $lightGray;
-    background-color: $themeColor;
+    color: var(--muted);
+    background-color: var(--primary);
     border-radius: 50%;
 
     &:hover {
-      background-color: color.adjust($themeColor, $lightness: -10%);
+      background-color: rgb(29, 78, 216);
     }
   }
 }
@@ -403,7 +403,7 @@ const updateRotate45 = (command: '+' | '-') => {
 
   &:hover {
     background-color: #efefef;
-    border-radius: $borderRadius;
+    border-radius: var(--radius);
   }
 }
 </style>

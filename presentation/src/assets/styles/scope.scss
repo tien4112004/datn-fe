@@ -3,8 +3,8 @@
   height: calc(100vh - 16px);
 
   .lucide {
-    width: $smIconSize;
-    height: $smIconSize;
+    width: 1rem;
+    height: 1rem;
     opacity: 0.7 !important;
     padding: 0;
     margin: 0;
@@ -12,7 +12,7 @@
   }
 
   .title-panel {
-    font-size: $baseTextSize;
+    font-size: 0.875rem;
   }
 
   .center {

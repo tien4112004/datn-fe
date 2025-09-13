@@ -1,6 +1,6 @@
 <template>
   <Drawer :open="visible" :direction="placement" @update:open="(value) => emit('update:visible', value)">
-    <DrawerContent :class="cn('w-full max-w-none')" :style="drawerStyle">
+    <DrawerContent :class="cn(placement === 'bottom' && 'drawer-full-width')" :style="drawerStyle">
       <DrawerHeader class="flex flex-row items-center justify-between border-b p-4">
         <DrawerTitle class="text-lg font-semibold">
           <slot name="title"></slot>
@@ -65,3 +65,12 @@ const contentStyle = computed(() => {
   };
 });
 </script>
+
+<style>
+.drawer-full-width {
+  width: 100vw !important;
+  max-width: none !important;
+  left: 0 !important;
+  right: 0 !important;
+}
+</style>

@@ -110,7 +110,7 @@ const expPDF = () => {
 
   &::after {
     content: '';
-    background-color: $background;
+    background-color: var(--background);
     @include absolute-0();
   }
 }
@@ -143,8 +143,8 @@ const expPDF = () => {
   }
 
   .tip {
-    font-size: $smTextSize;
-    color: $gray-aaa;
+    font-size: 13px;
+    color: #aaaaaa;
     line-height: 1.8;
     margin-top: 25px;
   }

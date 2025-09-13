@@ -93,21 +93,21 @@ const close = () => {
 .title {
   height: 28px;
   line-height: 28px;
-  background-color: $lightGray;
+  background-color: var(--muted);
   margin: 0 -10px 10px -10px;
   padding: 0 14px;
-  font-size: $smTextSize;
+  font-size: 13px;
   display: flex;
   justify-content: space-between;
-  border-top-left-radius: $borderRadius;
-  border-top-right-radius: $borderRadius;
+  border-top-left-radius: var(--radius);
+  border-top-right-radius: var(--radius);
   user-select: none;
 
   .right {
     cursor: pointer;
 
     &:hover {
-      color: $themeColor;
+      color: var(--primary);
     }
   }
 }
@@ -118,7 +118,7 @@ td {
   width: 23px;
   height: 23px;
   line-height: 23px;
-  border: 2px solid $background;
+  border: 2px solid var(--background);
   background-color: #f7f7f7;
 }
 .cell {
@@ -127,8 +127,8 @@ td {
   border: 1px solid #dcdcdc;
 
   &.active {
-    background-color: rgba($color: $themeColor, $alpha: 0.1);
-    border-color: $themeColor;
+    background-color: rgba($color: var(--primary), $alpha: 0.1);
+    border-color: var(--primary);
   }
 }
 

@@ -63,7 +63,6 @@ export default defineConfig(({ mode }) => {
         scss: {
           api: 'modern',
           additionalData: `
-            @use '@/assets/styles/variable.scss' as *;
             @use '@/assets/styles/mixin.scss' as *;
           `,
         },

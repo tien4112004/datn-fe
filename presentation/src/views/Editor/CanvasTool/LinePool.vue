@@ -102,7 +102,7 @@ const selectLine = (line: LinePoolItem) => {
   color: #999999;
 
   &:hover {
-    color: var(--primary);
+    color: var(--presentation-primary);
   }
 
   svg:not(:root) {

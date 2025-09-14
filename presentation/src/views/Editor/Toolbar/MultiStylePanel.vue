@@ -302,15 +302,15 @@ const updateFontStyle = (command: string, value: string) => {
 .option {
   height: 32px;
   padding: 0 5px;
-  border-radius: var(--radius);
+  border-radius: var(--presentation-radius);
 
   &:not(.selected):hover {
-    background-color: rgba($color: var(--primary), $alpha: 0.05);
+    background-color: rgba($color: var(--presentation-primary), $alpha: 0.05);
     cursor: pointer;
   }
 
   &.selected {
-    color: var(--primary);
+    color: var(--presentation-primary);
     font-weight: 700;
   }
 }

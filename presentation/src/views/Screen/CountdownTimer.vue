@@ -152,7 +152,7 @@ const changeTime = (e: FocusEvent | KeyboardEvent, type: 'minute' | 'second') =>
 
     &:hover,
     &.active {
-      color: var(--primary);
+      color: var(--presentation-primary);
     }
   }
 }
@@ -166,7 +166,7 @@ const changeTime = (e: FocusEvent | KeyboardEvent, type: 'minute' | 'second') =>
   width: 54px;
   height: 54px;
   border-radius: 50%;
-  background-color: rgba($color: var(--primary), $alpha: 0.05);
+  background-color: rgba($color: var(--presentation-primary), $alpha: 0.05);
   overflow: hidden;
 
   input {

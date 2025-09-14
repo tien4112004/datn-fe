@@ -33,6 +33,7 @@
     "echarts": "^5.5.1",
     "embla-carousel-vue": "^8.6.0",
     "file-saver": "^2.0.5",
+    "glob": "^11.0.3",
     "hfmath": "^0.0.2",
     "html-to-image": "^1.11.11",
     "lodash": "^4.17.21",

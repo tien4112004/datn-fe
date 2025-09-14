@@ -18,7 +18,7 @@ const forwardedProps = useForwardProps(delegatedProps);
     v-bind="forwardedProps"
     :class="
       cn(
-        `data-[state=active]:bg-background dark:data-[state=active]:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:outline-ring dark:data-[state=active]:border-input dark:data-[state=active]:bg-input/30 text-foreground dark:text-muted-foreground inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-md border border-transparent px-2 py-1 text-sm font-medium transition-[color,box-shadow] focus-visible:outline-1 focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 data-[state=active]:shadow-sm [&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0`,
+        `data-[state=active]:tw-bg-background dark:data-[state=active]:tw-text-foreground focus-visible:tw-border-ring focus-visible:tw-ring-ring/50 focus-visible:tw-outline-ring dark:data-[state=active]:tw-border-input dark:data-[state=active]:tw-bg-input/30 tw-text-foreground dark:tw-text-muted-foreground tw-h-[calc(100%-1px)] tw-flex-1 tw-items-center tw-justify-center tw-gap-1.5 tw-whitespace-nowrap tw-rounded-md tw-border tw-border-transparent tw-px-2 tw-py-1 tw-text-sm tw-font-medium disabled:tw-pointer-events-none disabled:tw-opacity-50 data-[state=active]:tw-shadow-sm tw-inline-flex tw-transition-[color,box-shadow] focus-visible:tw-outline-1 focus-visible:tw-ring-[3px] [&_svg:not([class*='size-'])]:tw-size-4 [&_svg]:tw-pointer-events-none [&_svg]:tw-shrink-0`,
         props.class
       )
     "

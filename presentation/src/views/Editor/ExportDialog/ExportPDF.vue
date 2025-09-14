@@ -110,7 +110,7 @@ const expPDF = () => {
 
   &::after {
     content: '';
-    background-color: var(--background);
+    background-color: var(--presentation-background);
     @include absolute-0();
   }
 }

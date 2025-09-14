@@ -234,7 +234,7 @@ const removeThemeColor = (index: number) => {
 };
 
 const getMostReadableColor = (color: string) => {
-  const colorList = ['var(--foreground)', 'var(--background)'];
+  const colorList = ['var(--presentation-foreground)', 'var(--presentation-background)'];
   return tinycolor.mostReadable(color, colorList, { includeFallbackColors: true }).toRgbString();
 };
 const getHexColor = (color: string) => {
@@ -297,7 +297,7 @@ const getHexColor = (color: string) => {
           top: 11px;
           left: -1px;
           transform: rotate(-45deg);
-          background-color: var(--foreground);
+          background-color: var(--presentation-foreground);
         }
         &::before {
           content: '';
@@ -307,7 +307,7 @@ const getHexColor = (color: string) => {
           top: 11px;
           left: -1px;
           transform: rotate(45deg);
-          background-color: var(--foreground);
+          background-color: var(--presentation-foreground);
         }
       }
     }
@@ -342,7 +342,7 @@ const getHexColor = (color: string) => {
       cursor: pointer;
 
       &:hover {
-        color: var(--primary);
+        color: var(--presentation-primary);
       }
     }
   }
@@ -351,10 +351,10 @@ const getHexColor = (color: string) => {
     height: 25px;
     line-height: 25px;
     text-align: center;
-    border: 1px solid var(--border);
+    border: 1px solid var(--presentation-border);
     font-size: 12px;
     padding: 0 5px;
-    border-radius: var(--radius);
+    border-radius: var(--presentation-radius);
     @include ellipsis-oneline();
   }
 }

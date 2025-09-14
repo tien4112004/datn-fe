@@ -80,7 +80,7 @@ const resize = (e: MouseEvent) => {
 <style lang="scss" scoped>
 .remark {
   position: relative;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--presentation-border);
 }
 
 .resize-handler {

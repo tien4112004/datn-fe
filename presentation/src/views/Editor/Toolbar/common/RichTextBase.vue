@@ -33,7 +33,7 @@
     </ButtonGroup>
 
     <ButtonGroup class="row">
-      <Popover trigger="click" triggerClass="w-[30%]">
+      <Popover trigger="click" triggerClass="tw-w-[30%]">
         <template #content>
           <ColorPicker
             :modelValue="richTextAttrs.color"
@@ -44,7 +44,7 @@
           <IconText />
         </TextColorButton>
       </Popover>
-      <Popover trigger="click" triggerClass="w-[30%]">
+      <Popover trigger="click" triggerClass="tw-w-[30%]">
         <template #content>
           <ColorPicker
             :modelValue="richTextAttrs.backcolor"
@@ -73,28 +73,28 @@
 
     <ButtonGroup class="row">
       <CheckboxButton
-        class="flex-1"
+        class="tw-flex-1"
         :checked="richTextAttrs.bold"
         v-tooltip="t('elements.text.editor.bold')"
         @click="emitRichTextCommand('bold')"
         ><IconTextBold
       /></CheckboxButton>
       <CheckboxButton
-        class="flex-1"
+        class="tw-flex-1"
         :checked="richTextAttrs.em"
         v-tooltip="t('elements.text.editor.italic')"
         @click="emitRichTextCommand('em')"
         ><IconTextItalic
       /></CheckboxButton>
       <CheckboxButton
-        class="flex-1"
+        class="tw-flex-1"
         :checked="richTextAttrs.underline"
         v-tooltip="t('elements.text.editor.underline')"
         @click="emitRichTextCommand('underline')"
         ><IconTextUnderline
       /></CheckboxButton>
       <CheckboxButton
-        class="flex-1"
+        class="tw-flex-1"
         :checked="richTextAttrs.strikethrough"
         v-tooltip="t('elements.text.editor.strikethrough')"
         @click="emitRichTextCommand('strikethrough')"
@@ -104,28 +104,28 @@
 
     <ButtonGroup class="row">
       <CheckboxButton
-        class="flex-1"
+        class="tw-flex-1"
         :checked="richTextAttrs.superscript"
         v-tooltip="t('elements.text.editor.superscript')"
         @click="emitRichTextCommand('superscript')"
         >A²</CheckboxButton
       >
       <CheckboxButton
-        class="flex-1"
+        class="tw-flex-1"
         :checked="richTextAttrs.subscript"
         v-tooltip="t('elements.text.editor.subscript')"
         @click="emitRichTextCommand('subscript')"
         >A₂</CheckboxButton
       >
       <CheckboxButton
-        class="flex-1"
+        class="tw-flex-1"
         :checked="richTextAttrs.code"
         v-tooltip="t('elements.text.editor.inlineCode')"
         @click="emitRichTextCommand('code')"
         ><IconCode
       /></CheckboxButton>
       <CheckboxButton
-        class="flex-1"
+        class="tw-flex-1"
         :checked="richTextAttrs.blockquote"
         v-tooltip="t('elements.text.editor.blockquote')"
         @click="emitRichTextCommand('blockquote')"
@@ -135,13 +135,13 @@
 
     <ButtonGroup class="row">
       <CheckboxButton
-        class="flex-1"
+        class="tw-flex-1"
         v-tooltip="t('elements.text.editor.clearFormatting')"
         @click="emitRichTextCommand('clear')"
         ><IconFormat
       /></CheckboxButton>
       <CheckboxButton
-        class="flex-1"
+        class="tw-flex-1"
         :checked="!!textFormatPainter"
         v-tooltip="t('elements.text.editor.formatPainter')"
         @click="toggleTextFormatPainter()"
@@ -188,25 +188,25 @@
       :value="richTextAttrs.align"
       @update:value="(value) => emitRichTextCommand('align', value)"
     >
-      <RadioButton value="left" v-tooltip="$t('elements.text.editor.alignLeft')" class="flex-1"
+      <RadioButton value="left" v-tooltip="$t('elements.text.editor.alignLeft')" class="tw-flex-1"
         ><IconAlignTextLeft
       /></RadioButton>
-      <RadioButton value="center" v-tooltip="$t('elements.text.editor.alignCenter')" class="flex-1"
+      <RadioButton value="center" v-tooltip="$t('elements.text.editor.alignCenter')" class="tw-flex-1"
         ><IconAlignTextCenter
       /></RadioButton>
-      <RadioButton value="right" v-tooltip="$t('elements.text.editor.alignRight')" class="flex-1"
+      <RadioButton value="right" v-tooltip="$t('elements.text.editor.alignRight')" class="tw-flex-1"
         ><IconAlignTextRight
       /></RadioButton>
-      <RadioButton value="justify" v-tooltip="$t('elements.text.editor.justify')" class="flex-1"
+      <RadioButton value="justify" v-tooltip="$t('elements.text.editor.justify')" class="tw-flex-1"
         ><IconAlignTextBoth
       /></RadioButton>
     </RadioGroup>
 
     <div class="row">
-      <ButtonGroup class="flex-1">
+      <ButtonGroup class="tw-flex-1">
         <Button
           :type="richTextAttrs.bulletList ? 'primary' : 'default'"
-          class="flex-1"
+          class="tw-flex-1"
           v-tooltip="$t('elements.text.editor.bulletList')"
           @click="emitRichTextCommand('bulletList')"
           ><IconList
@@ -231,10 +231,10 @@
         </Popover>
       </ButtonGroup>
       <div style="width: 10px"></div>
-      <ButtonGroup class="flex-1">
+      <ButtonGroup class="tw-flex-1">
         <Button
           :type="richTextAttrs.orderedList ? 'primary' : 'default'"
-          class="flex-1"
+          class="tw-flex-1"
           v-tooltip="$t('elements.text.editor.numberedList')"
           @click="emitRichTextCommand('orderedList')"
           ><IconOrderedList
@@ -261,9 +261,9 @@
     </div>
 
     <div class="row">
-      <ButtonGroup class="flex-1">
+      <ButtonGroup class="tw-flex-1">
         <Button
-          class="flex-1"
+          class="tw-flex-1"
           v-tooltip="$t('elements.text.editor.decreaseIndent')"
           @click="emitRichTextCommand('indent', '-1')"
           ><IconIndentLeft
@@ -278,9 +278,9 @@
         </Popover>
       </ButtonGroup>
       <div style="width: 10px"></div>
-      <ButtonGroup class="flex-1">
+      <ButtonGroup class="tw-flex-1">
         <Button
-          class="flex-1"
+          class="tw-flex-1"
           v-tooltip="$t('elements.text.editor.increaseIndent')"
           @click="emitRichTextCommand('indent', '+1')"
           ><IconIndentRight
@@ -425,7 +425,7 @@ const removeLink = () => {
   align-content: flex-start;
 }
 .list {
-  background-color: var(--muted);
+  background-color: var(--presentation-muted);
   padding: 4px 4px 4px 20px;
   cursor: pointer;
 
@@ -440,10 +440,10 @@ const removeLink = () => {
   }
 
   &:hover {
-    color: var(--primary);
+    color: var(--presentation-primary);
 
     span {
-      background-color: var(--primary);
+      background-color: var(--presentation-primary);
     }
   }
 }

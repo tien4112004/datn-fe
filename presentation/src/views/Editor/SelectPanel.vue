@@ -207,7 +207,7 @@ const close = () => {
     cursor: pointer;
 
     &:hover {
-      color: var(--primary);
+      color: var(--presentation-primary);
     }
   }
 }
@@ -220,19 +220,19 @@ const close = () => {
 .item {
   padding: 5px;
   font-size: 0.8125rem;
-  border-radius: var(--radius);
+  border-radius: var(--presentation-radius);
   display: flex;
   align-items: center;
   cursor: pointer;
 
   &.active {
-    background-color: rgba($color: var(--primary), $alpha: 0.1);
+    background-color: rgba($color: var(--presentation-primary), $alpha: 0.1);
   }
   &.group-active {
-    background-color: rgba($color: var(--primary), $alpha: 0.2);
+    background-color: rgba($color: var(--presentation-primary), $alpha: 0.2);
   }
   &:hover {
-    background-color: rgba($color: var(--primary), $alpha: 0.25);
+    background-color: rgba($color: var(--presentation-primary), $alpha: 0.25);
   }
 
   .name {

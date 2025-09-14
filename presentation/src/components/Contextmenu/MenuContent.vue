@@ -9,10 +9,7 @@
       >
         <div
           class="menu-item-content"
-          :class="{
-            'has-children': menu.children,
-            'has-handler': menu.handler,
-          }"
+          :class="{ 'has-children': menu.children, 'has-handler': menu.handler }"
           v-if="!menu.divider"
         >
           <span class="text">{{ menu.text }}</span>
@@ -47,12 +44,12 @@ $subMenuWidth: 120px;
 .menu-content {
   width: $menuWidth;
   padding: 5px 0;
-  background: var(--background);
-  border: 1px solid var(--border);
+  background: var(--presentation-background);
+  border: 1px solid var(--presentation-border);
   box-shadow:
     0 4px 6px -1px rgba(0, 0, 0, 0.1),
     0 2px 4px -2px rgba(0, 0, 0, 0.1);
-  border-radius: var(--radius);
+  border-radius: var(--presentation-radius);
   list-style: none;
   margin: 0;
 }
@@ -64,7 +61,7 @@ $subMenuWidth: 120px;
   white-space: nowrap;
   height: $menuHeight;
   line-height: $menuHeight;
-  background-color: var(--background);
+  background-color: var(--presentation-background);
   cursor: pointer;
 
   &:not(.disable):hover > .menu-item-content > .sub-menu {
@@ -76,7 +73,7 @@ $subMenuWidth: 120px;
   }
 
   &:hover:not(.disable) {
-    background-color: rgb(from var(--primary) r g b / 0.2);
+    background-color: rgb(from var(--presentation-primary) r g b / 0.2);
   }
 
   &.divider {
@@ -117,7 +114,7 @@ $subMenuWidth: 120px;
     display: inline-block;
     width: 1px;
     height: 24px;
-    background-color: rgb(from var(--background) r g b / 0.3);
+    background-color: rgb(from var(--presentation-background) r g b / 0.3);
     position: absolute;
     right: 18px;
     top: 3px;

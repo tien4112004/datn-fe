@@ -5,6 +5,7 @@ import directive from './plugins/directive/index';
 import App from './App.vue';
 import '@/assets/styles/prosemirror.scss';
 import '@/assets/styles/scope.scss';
+import '@/assets/styles/tailwind.css';
 import i18n from '@/locales';
 
 export function mount(el: string | Element, props: Record<string, unknown>) {

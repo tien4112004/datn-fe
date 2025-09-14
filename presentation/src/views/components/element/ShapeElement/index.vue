@@ -1,10 +1,7 @@
 <template>
   <div
     class="editable-element-shape"
-    :class="{
-      lock: elementInfo.lock,
-      'format-painter': shapeFormatPainter,
-    }"
+    :class="{ lock: elementInfo.lock, 'format-painter': shapeFormatPainter }"
     :style="{
       top: elementInfo.top + 'px',
       left: elementInfo.left + 'px',
@@ -12,7 +9,7 @@
       height: elementInfo.height + 'px',
     }"
   >
-    <div class="rotate-wrapper" :style="{ transform: `rotate(${elementInfo.rotate}deg)` }">
+    <div class="tw-rotate-wrapper" :style="{ transform: `rotate(${elementInfo.rotate}deg)` }">
       <div
         class="element-content"
         :style="{

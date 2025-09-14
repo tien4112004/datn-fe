@@ -55,14 +55,14 @@ const handleUpdate = (value: string | string[] | undefined) => {
 .button-group > *:first-child > *,
 .button-group > *:first-child [data-slot='popover-trigger'],
 .button-group > *:first-child [data-slot='popover-trigger'] > * {
-  border-radius: var(--radius) 0 0 var(--radius) !important;
+  border-radius: var(--presentation-radius) 0 0 var(--presentation-radius) !important;
 }
 
 .button-group > *:last-child,
 .button-group > *:last-child > *,
 .button-group > *:last-child [data-slot='popover-trigger'],
 .button-group > *:last-child [data-slot='popover-trigger'] > * {
-  border-radius: 0 var(--radius) var(--radius) 0 !important;
+  border-radius: 0 var(--presentation-radius) var(--presentation-radius) 0 !important;
 }
 
 .button-group > *:not(:first-child):not(:last-child),
@@ -74,11 +74,11 @@ const handleUpdate = (value: string | string[] | undefined) => {
 
 /* Special handling for Select components */
 .button-group > *:first-child .relative {
-  border-radius: var(--radius) 0 0 var(--radius) !important;
+  border-radius: var(--presentation-radius) 0 0 var(--presentation-radius) !important;
 }
 
 .button-group > *:last-child .relative {
-  border-radius: 0 var(--radius) var(--radius) 0 !important;
+  border-radius: 0 var(--presentation-radius) var(--presentation-radius) 0 !important;
 }
 
 .button-group > *:not(:first-child):not(:last-child) .relative {

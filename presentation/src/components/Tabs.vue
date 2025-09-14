@@ -4,11 +4,11 @@
       :class="
         cn(
           card
-            ? 'h-11 border border-gray-200 bg-gray-100'
-            : 'h-auto rounded-none border-b border-gray-200 bg-transparent p-0',
-          spaceAround ? 'justify-around' : '',
-          spaceBetween ? 'justify-between' : '',
-          'w-full'
+            ? 'tw-h-fit tw-border tw-border-border'
+            : 'tw-h-auto tw-rounded-none tw-border-b tw-border-gray-200 tw-bg-transparent tw-p-0',
+          spaceAround ? 'tw-justify-around' : '',
+          spaceBetween ? 'tw-justify-between' : '',
+          'tw-w-full'
         )
       "
       :style="tabsStyle"
@@ -20,8 +20,8 @@
         :class="
           cn(
             card
-              ? 'data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-md h-full data-[state=active]:shadow-sm'
-              : 'h-auto rounded-none border-0 border-b-2 border-transparent px-3 py-2 data-[state=active]:border-current data-[state=active]:bg-transparent data-[state=active]:shadow-none'
+              ? 'data-[state=active]:tw-bg-primary data-[state=active]:tw-text-primary-foreground tw-text-md tw-h-full data-[state=active]:tw-shadow-sm tw-py-1'
+              : 'tw-h-auto tw-rounded-none tw-border-0 tw-border-b-2 tw-border-transparent tw-px-3 tw-py-2 data-[state=active]:tw-border-current data-[state=active]:tw-bg-transparent data-[state=active]:tw-shadow-none'
           )
         "
         :style="{

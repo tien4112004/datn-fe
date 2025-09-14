@@ -1,8 +1,8 @@
 <template>
-  <Button variant="outline" size="default" class="h-auto min-h-9 w-full flex-col p-0">
+  <Button variant="outline" size="default" class="tw-h-auto tw-min-h-9 tw-w-full tw-flex-col tw-p-0">
     <slot></slot>
-    <div class="relative mt-[-4px] h-1 w-[17px]">
-      <div class="absolute inset-0" :style="{ backgroundColor: color }"></div>
+    <div class="tw-relative tw-mt-[-4px] tw-h-1 tw-w-[17px]">
+      <div class="tw-absolute tw-inset-0" :style="{ backgroundColor: color }"></div>
     </div>
   </Button>
 </template>

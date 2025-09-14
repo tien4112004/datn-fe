@@ -1,17 +1,20 @@
 <template>
   <div
     :class="[
-      'bg-background duration-250 flex min-h-[30px] items-center rounded border border-gray-300 px-[5px] transition-colors',
+      'tw-bg-background tw-duration-250 tw-flex tw-min-h-[30px] tw-items-center tw-rounded tw-border tw-border-gray-300 tw-px-[5px] tw-transition-colors',
       {
-        'border-gray-200 bg-gray-100 text-gray-400': disabled,
-        'border-blue-500': focused || (hovering && !disabled),
-        'border-0': simple,
+        'tw-border-gray-200 tw-bg-gray-100 tw-text-gray-400': disabled,
+        'tw-border-blue-500': focused || (hovering && !disabled),
+        'tw-border-0': simple,
       },
     ]"
     @mouseenter="!disabled && (hovering = true)"
     @mouseleave="hovering = false"
   >
-    <span v-if="$slots.prefix" class="flex select-none items-center justify-center leading-[30px]">
+    <span
+      v-if="$slots.prefix"
+      class="tw-flex tw-select-none tw-items-center tw-justify-center tw-leading-[30px]"
+    >
       <slot name="prefix"></slot>
     </span>
     <Input
@@ -22,10 +25,8 @@
       :placeholder="placeholder"
       :maxlength="maxlength"
       :class="[
-        'h-[30px] min-w-0 flex-1 border-0 bg-transparent px-0 leading-[30px] shadow-none focus-visible:border-0 focus-visible:ring-0',
-        {
-          'text-gray-400': disabled,
-        },
+        'tw-h-[30px] tw-min-w-0 tw-flex-1 tw-border-0 tw-bg-transparent tw-px-0 tw-leading-[30px] tw-shadow-none focus-visible:tw-border-0 focus-visible:tw-ring-0',
+        { 'tw-text-gray-400': disabled },
       ]"
       style="
         font-family:
@@ -39,7 +40,10 @@
       @keydown.enter="($event: Event) => emit('enter', $event)"
       @keydown.backspace="($event: Event) => emit('backspace', $event)"
     />
-    <span v-if="$slots.suffix" class="flex select-none items-center justify-center leading-[30px]">
+    <span
+      v-if="$slots.suffix"
+      class="tw-flex tw-select-none tw-items-center tw-justify-center tw-leading-[30px]"
+    >
       <slot name="suffix"></slot>
     </span>
   </div>

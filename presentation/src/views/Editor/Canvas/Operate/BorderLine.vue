@@ -23,7 +23,7 @@ withDefaults(
   height: 0;
   left: 0;
   top: 0;
-  border: 0 dashed var(--primary);
+  border: 0 dashed var(--presentation-primary);
 
   &.top {
     border-top-width: 1px;

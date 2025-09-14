@@ -2,10 +2,10 @@
   <div v-if="disabled">
     <div
       ref="selectRef"
-      class="border-border flex h-8 w-full cursor-pointer select-none items-center bg-gray-50 text-sm text-gray-500 transition-colors duration-200"
+      class="tw-border-border tw-flex tw-h-8 tw-w-full tw-cursor-pointer tw-select-none tw-items-center tw-bg-gray-50 tw-text-sm tw-text-gray-500 tw-transition-colors tw-duration-200"
     >
-      <div class="flex-1 truncate pl-2.5">{{ value }}</div>
-      <div class="flex w-8 items-center justify-center text-gray-400">
+      <div class="tw-flex-1 tw-truncate tw-pl-2.5">{{ value }}</div>
+      <div class="tw-flex tw-w-8 tw-items-center tw-justify-center tw-text-gray-400">
         <slot name="icon">
           <IconDown :size="14" />
         </slot>
@@ -35,18 +35,18 @@
         <Divider :margin="0" />
       </template>
       <div
-        class="max-h-[260px] select-none overflow-auto p-1.5 text-left text-sm"
+        class="tw-max-h-[260px] tw-select-none tw-overflow-auto tw-p-1.5 tw-text-left tw-text-sm"
         :style="{ width: width + 2 + 'px' }"
       >
         <div
           v-for="option in showOptions"
           :key="option.value"
           :class="{
-            'text-gray-500': option.disabled,
-            'font-bold text-blue-600': option.value === value && !option.disabled,
-            'cursor-pointer hover:bg-blue-50': !option.disabled && option.value !== value,
+            'tw-text-gray-500': option.disabled,
+            'tw-text-blue-600 font-bold': option.value === value && !option.disabled,
+            'hover:tw-bg-blue-50 cursor-pointer': !option.disabled && option.value !== value,
           }"
-          class="h-8 truncate rounded-md px-1.5 leading-8"
+          class="tw-h-8 tw-truncate tw-rounded-md tw-px-1.5 tw-leading-8"
           @click="handleSelect(option)"
         >
           {{ option.label }}
@@ -55,10 +55,10 @@
     </template>
     <div
       ref="selectRef"
-      class="flex h-8 w-full cursor-pointer select-none items-center rounded-md border border-gray-300 bg-white text-sm transition-colors duration-200 hover:border-blue-500"
+      class="tw-flex tw-h-8 tw-w-full tw-cursor-pointer tw-select-none tw-items-center tw-rounded-md tw-border tw-border-gray-300 tw-bg-white tw-text-sm tw-transition-colors tw-duration-200 hover:tw-border-blue-500"
     >
-      <div class="flex-1 truncate pl-2.5">{{ showLabel }}</div>
-      <div class="flex w-8 items-center justify-center text-gray-400">
+      <div class="tw-flex-1 tw-truncate tw-pl-2.5">{{ showLabel }}</div>
+      <div class="tw-flex tw-w-8 tw-items-center tw-justify-center tw-text-gray-400">
         <slot name="icon">
           <IconDown :size="14" />
         </slot>

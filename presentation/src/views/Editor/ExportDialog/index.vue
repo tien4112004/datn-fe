@@ -61,7 +61,7 @@ const currentDialogComponent = computed<unknown>(() => {
 <style lang="scss" scoped>
 .export-dialog {
   margin: -20px;
-  border-radius: var(--radius);
+  border-radius: var(--presentation-radius);
   padding: 1rem;
 }
 .content {

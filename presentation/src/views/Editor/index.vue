@@ -296,9 +296,9 @@ const handleClick = async () => {
 
     .remark-preview {
       height: 100%;
-      border-top: 1px solid var(--border);
+      border-top: 1px solid var(--presentation-border);
       padding: 8px 12px;
-      background: var(--background);
+      background: var(--presentation-background);
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -312,7 +312,7 @@ const handleClick = async () => {
         flex: 1;
         font-size: 13px;
         line-height: 1.4;
-        color: var(--foreground);
+        color: var(--presentation-foreground);
         overflow: hidden;
         display: -webkit-box;
         -webkit-line-clamp: 2;

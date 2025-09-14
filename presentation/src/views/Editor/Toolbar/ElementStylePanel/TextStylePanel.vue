@@ -194,7 +194,7 @@ const updateElement = (props: Partial<PPTTextElement>) => {
   addHistorySnapshot();
 };
 
-const fill = ref<string>('var(--foreground)');
+const fill = ref<string>('var(--presentation-foreground)');
 const lineHeight = ref<number>();
 const wordSpace = ref<number>();
 const paragraphSpace = ref<number>();
@@ -252,7 +252,7 @@ watch(
   () => {
     if (!handleElement.value || handleElement.value.type !== 'text') return;
 
-    fill.value = handleElement.value.fill || 'var(--background)';
+    fill.value = handleElement.value.fill || 'var(--presentation-background)';
     lineHeight.value = handleElement.value.lineHeight || 1.5;
     wordSpace.value = handleElement.value.wordSpace || 0;
     paragraphSpace.value =
@@ -310,15 +310,15 @@ const emitBatchRichTextCommand = (action: RichTextAction[]) => {
 .custom-select {
   width: 100%;
   height: 32px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background-color: var(--background);
+  border: 1px solid var(--presentation-border);
+  border-radius: var(--presentation-radius);
+  background-color: var(--presentation-background);
   cursor: pointer;
   position: relative;
   transition: all 0.2s;
 
   &:hover {
-    border-color: var(--primary);
+    border-color: var(--presentation-primary);
   }
 }
 
@@ -340,7 +340,7 @@ const emitBatchRichTextCommand = (action: RichTextAction[]) => {
   display: flex;
   justify-content: center;
   align-items: center;
-  color: var(--muted-foreground);
+  color: var(--presentation-muted-foreground);
   transition: transform 0.2s;
 
   &.open {
@@ -353,10 +353,10 @@ const emitBatchRichTextCommand = (action: RichTextAction[]) => {
   top: 100%;
   left: 0;
   right: 0;
-  background-color: var(--background);
-  border: 1px solid var(--border);
+  background-color: var(--presentation-background);
+  border: 1px solid var(--presentation-border);
   border-top: none;
-  border-radius: 0 0 var(--radius) var(--radius);
+  border-radius: 0 0 var(--presentation-radius) var(--presentation-radius);
   box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.08);
   z-index: 1000;
   max-height: 200px;
@@ -365,7 +365,7 @@ const emitBatchRichTextCommand = (action: RichTextAction[]) => {
 
 .preset-style-item {
   height: 50px;
-  border-bottom: solid 1px var(--border);
+  border-bottom: solid 1px var(--presentation-border);
   box-sizing: border-box;
   display: flex;
   justify-content: center;
@@ -376,9 +376,9 @@ const emitBatchRichTextCommand = (action: RichTextAction[]) => {
   padding: 0 10px;
 
   &:hover {
-    border-color: var(--primary);
-    color: var(--primary);
-    background-color: rgba($color: var(--primary), $alpha: 0.05);
+    border-color: var(--presentation-primary);
+    color: var(--presentation-primary);
+    background-color: rgba($color: var(--presentation-primary), $alpha: 0.05);
   }
 
   &:last-child {

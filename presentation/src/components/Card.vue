@@ -1,11 +1,7 @@
 <template>
   <div
     class="card"
-    :class="{
-      hoverable: hoverable,
-      clickable: clickable,
-      [`padding-${padding}`]: padding,
-    }"
+    :class="{ hoverable: hoverable, clickable: clickable, [`padding-${padding}`]: padding }"
     @click="handleClick"
   >
     <div class="card-content">
@@ -42,11 +38,11 @@ const handleClick = () => {
 
 <style lang="scss" scoped>
 .card {
-  background-color: var(--card);
+  background-color: var(--presentation-card);
   display: flex;
   user-select: none;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border: 1px solid var(--presentation-border);
+  border-radius: var(--presentation-radius);
   transition: all 0.2s ease;
   height: 100%;
   margin: 0.25rem;
@@ -71,8 +67,8 @@ const handleClick = () => {
   // Interactive states
   &.hoverable:hover {
     background-color: var(--card-hover);
-    border-color: rgb(from var(--primary) r g b / 0.3);
-    box-shadow: 0 2px 8px rgb(from var(--primary) r g b / 0.1);
+    border-color: rgb(from var(--presentation-primary) r g b / 0.3);
+    box-shadow: 0 2px 8px rgb(from var(--presentation-primary) r g b / 0.1);
   }
 
   &.clickable {
@@ -80,19 +76,19 @@ const handleClick = () => {
 
     &:hover {
       background-color: var(--card-hover);
-      border-color: rgb(from var(--primary) r g b / 0.3);
-      box-shadow: 0 2px 8px rgb(from var(--primary) r g b / 0.1);
+      border-color: rgb(from var(--presentation-primary) r g b / 0.3);
+      box-shadow: 0 2px 8px rgb(from var(--presentation-primary) r g b / 0.1);
     }
 
     &:active {
       transform: translateY(1px);
-      box-shadow: 0 1px 4px rgb(from var(--primary) r g b / 0.1);
+      box-shadow: 0 1px 4px rgb(from var(--presentation-primary) r g b / 0.1);
     }
   }
 }
 
 .card-content {
   width: 100%;
-  color: var(--card-foreground);
+  color: var(--presentation-card-foreground);
 }
 </style>

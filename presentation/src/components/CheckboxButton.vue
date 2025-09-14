@@ -3,9 +3,9 @@
     :variant="checked ? 'default' : 'outline'"
     :disabled="disabled"
     :class="
-      cn('transition-colors', {
-        'bg-primary text-primary-foreground hover:bg-accent': checked && !disabled,
-        'hover:text-primary hover:border-primary': !checked && !disabled,
+      cn('tw-transition-colors', {
+        'tw-bg-primary tw-text-primary-foreground hover:tw-bg-accent': checked && !disabled,
+        'hover:tw-text-primary hover:tw-border-primary': !checked && !disabled,
       })
     "
   >

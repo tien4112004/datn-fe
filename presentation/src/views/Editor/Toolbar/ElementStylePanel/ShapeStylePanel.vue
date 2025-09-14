@@ -182,14 +182,14 @@ const { handleElement, handleElementId, shapeFormatPainter } = storeToRefs(mainS
 
 const handleShapeElement = handleElement as Ref<PPTShapeElement>;
 
-const fill = ref<string>('var(--foreground)');
+const fill = ref<string>('var(--presentation-foreground)');
 const pattern = ref<string>('');
 const gradient = ref<Gradient>({
   type: 'linear',
   rotate: 0,
   colors: [
-    { pos: 0, color: 'var(--background)' },
-    { pos: 100, color: 'var(--background)' },
+    { pos: 0, color: 'var(--presentation-background)' },
+    { pos: 100, color: 'var(--presentation-background)' },
   ],
 });
 const fillType = ref('fill');
@@ -202,10 +202,10 @@ watch(
   () => {
     if (!handleElement.value || handleElement.value.type !== 'shape') return;
 
-    fill.value = handleElement.value.fill || 'var(--background)';
+    fill.value = handleElement.value.fill || 'var(--presentation-background)';
     const defaultGradientColor = [
       { pos: 0, color: fill.value },
-      { pos: 100, color: 'var(--background)' },
+      { pos: 100, color: 'var(--presentation-background)' },
     ];
     gradient.value = handleElement.value.gradient || {
       type: 'linear',
@@ -322,8 +322,8 @@ const updateTextAlign = (align: 'top' | 'middle' | 'bottom') => {
 
   const defaultText: ShapeText = {
     content: '',
-    defaultfontname: 'sans-serif',
-    defaultColor: 'var(--foreground)',
+    defaultFontName: 'sans-serif',
+    defaultColor: 'var(--presentation-foreground)',
     align: 'middle',
   };
   const _text = _handleElement.text || defaultText;
@@ -356,7 +356,7 @@ const updateTextAlign = (align: 'top' | 'middle' | 'bottom') => {
   overflow: auto;
   padding: 5px;
   padding-right: 10px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--presentation-border);
   margin-bottom: 20px;
 }
 .shape-list {
@@ -376,14 +376,14 @@ const updateTextAlign = (align: 'top' | 'middle' | 'bottom') => {
 .pattern-image {
   height: 0;
   padding-bottom: 56.25%;
-  border: 1px dashed var(--border);
-  border-radius: var(--radius);
+  border: 1px dashed var(--presentation-border);
+  border-radius: var(--presentation-radius);
   position: relative;
   transition: all 0.2s;
 
   &:hover {
-    border-color: var(--primary);
-    color: var(--primary);
+    border-color: var(--presentation-primary);
+    color: var(--presentation-primary);
   }
 
   .content {

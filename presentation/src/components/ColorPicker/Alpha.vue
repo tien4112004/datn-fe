@@ -96,7 +96,7 @@ onUnmounted(unbindEventListeners);
   width: 4px;
   height: 8px;
   box-shadow: 0 0 2px rgba(0, 0, 0, 0.6);
-  background: var(--background);
+  background: var(--presentation-background);
   margin-top: 1px;
   transform: translateX(-2px);
 }

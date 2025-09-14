@@ -1,5 +1,5 @@
 <template>
-  <div class="element-positopn-panel">
+  <div class="element-position-panel">
     <div class="title title-panel">{{ $t('styling.position.single.layer') }}</div>
     <ButtonGroup class="row">
       <Button style="width: 50%" @click="orderElement(handleElement!, ElementOrderCommands.TOP)">
@@ -378,12 +378,12 @@ const updateRotate45 = (command: '+' | '-') => {
   padding: 6px;
 
   &:hover {
-    color: var(--primary);
+    color: var(--presentation-primary);
   }
 
   &.active {
-    color: var(--muted);
-    background-color: var(--primary);
+    color: var(--presentation-muted);
+    background-color: var(--presentation-primary);
     border-radius: 50%;
 
     &:hover {
@@ -403,7 +403,7 @@ const updateRotate45 = (command: '+' | '-') => {
 
   &:hover {
     background-color: #efefef;
-    border-radius: var(--radius);
+    border-radius: var(--presentation-radius);
   }
 }
 </style>

@@ -97,8 +97,8 @@ const markerSize = computed(() => {
 // Horizontal ruler
 .h {
   position: absolute;
-  background-color: var(--background);
-  border: 1px solid var(--border);
+  background-color: var(--presentation-background);
+  border: 1px solid var(--presentation-border);
   height: 20px;
   top: 5px;
   display: flex;
@@ -110,7 +110,7 @@ const markerSize = computed(() => {
     position: absolute;
     top: 0;
     bottom: 0;
-    background-color: rgba($color: var(--primary), $alpha: 0.1);
+    background-color: rgba($color: var(--presentation-primary), $alpha: 0.1);
   }
 
   .ruler-marker-100 {
@@ -151,8 +151,8 @@ const markerSize = computed(() => {
 // Vertical ruler
 .v {
   position: absolute;
-  background-color: var(--background);
-  border: 1px solid var(--border);
+  background-color: var(--presentation-background);
+  border: 1px solid var(--presentation-border);
   width: 20px;
   left: 5px;
   overflow: hidden;
@@ -161,7 +161,7 @@ const markerSize = computed(() => {
     position: absolute;
     left: 0;
     right: 0;
-    background-color: rgba($color: var(--primary), $alpha: 0.1);
+    background-color: rgba($color: var(--presentation-primary), $alpha: 0.1);
   }
 
   .ruler-marker-100 {

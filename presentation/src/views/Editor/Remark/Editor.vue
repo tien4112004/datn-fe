@@ -251,17 +251,17 @@ onUnmounted(() => {
 }
 .menu {
   display: flex;
-  background-color: var(--background);
+  background-color: var(--presentation-background);
   padding: 6px 4px;
-  border-radius: var(--radius);
+  border-radius: var(--presentation-radius);
   box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.15);
 
   button {
     outline: 0;
     border: 0;
-    background-color: var(--background);
+    background-color: var(--presentation-background);
     padding: 3px;
-    border-radius: var(--radius);
+    border-radius: var(--presentation-radius);
     font-size: 0.875rem;
     margin: 0 3px;
     display: flex;
@@ -271,8 +271,8 @@ onUnmounted(() => {
 
     &:hover,
     &.active {
-      background-color: var(--primary);
-      color: var(--background);
+      background-color: var(--presentation-primary);
+      color: var(--presentation-background);
     }
   }
 }

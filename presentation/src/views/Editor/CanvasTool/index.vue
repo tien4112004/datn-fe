@@ -437,19 +437,19 @@ const toggleNotesPanel = () => {
     margin-right: 0;
     flex-shrink: 0;
     padding: 0 8px;
-    border-radius: var(--radius);
+    border-radius: var(--presentation-radius);
 
     .handler-item {
       width: 24px;
       padding: 0;
 
       .active {
-        color: var(--primary);
+        color: var(--presentation-primary);
       }
     }
 
     &:hover {
-      background-color: var(--card)-hover;
+      background-color: var(--presentation-card)-hover;
     }
 
     .icon,
@@ -474,7 +474,7 @@ const toggleNotesPanel = () => {
   display: flex;
   justify-content: center;
   align-items: center;
-  border-radius: var(--radius);
+  border-radius: var(--presentation-radius);
   overflow: hidden;
   cursor: pointer;
   padding: 0 8px;

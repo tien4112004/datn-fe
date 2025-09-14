@@ -12,10 +12,10 @@ const delegatedProps = reactiveOmit(props, 'class');
 </script>
 
 <template>
-  <ScrollAreaRoot data-slot="scroll-area" v-bind="delegatedProps" :class="cn('relative', props.class)">
+  <ScrollAreaRoot data-slot="scroll-area" v-bind="delegatedProps" :class="cn('tw-relative', props.class)">
     <ScrollAreaViewport
       data-slot="scroll-area-viewport"
-      class="focus-visible:ring-ring/50 size-full rounded-[inherit] outline-none transition-[color,box-shadow] focus-visible:outline-1 focus-visible:ring-[3px]"
+      class="focus-visible:tw-ring-ring/50 tw-size-full tw-rounded-[inherit] tw-outline-none tw-transition-[color,box-shadow] focus-visible:tw-outline-1 focus-visible:tw-ring-[3px]"
     >
       <slot />
     </ScrollAreaViewport>

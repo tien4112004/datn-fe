@@ -107,7 +107,7 @@ const currentPanelComponent = computed(() => {
 
 <style lang="scss" scoped>
 .toolbar {
-  color: var(--foreground);
+  color: var(--presentation-foreground);
   height: 100%;
   width: 100%;
   max-width: 100%;

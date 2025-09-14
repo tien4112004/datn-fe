@@ -19,13 +19,18 @@ const forwardedProps = useForwardProps(delegatedProps);
     v-bind="forwardedProps"
     :class="
       cn(
-        'border-input text-primary focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 shadow-xs aspect-square size-4 shrink-0 rounded-full border outline-none transition-[color,box-shadow] focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50',
+        'tw-border-input tw-text-primary focus-visible:tw-border-ring focus-visible:tw-ring-ring/50 aria-invalid:tw-ring-destructive/20 dark:aria-invalid:tw-ring-destructive/40 aria-invalid:tw-border-destructive dark:tw-bg-input/30 tw-shadow-xs tw-aspect-square tw-size-4 tw-shrink-0 tw-rounded-full tw-border tw-outline-none tw-transition-[color,box-shadow] focus-visible:tw-ring-[3px] disabled:tw-cursor-not-allowed disabled:tw-opacity-50',
         props.class
       )
     "
   >
-    <RadioGroupIndicator data-slot="radio-group-indicator" class="relative flex items-center justify-center">
-      <CircleIcon class="fill-primary absolute left-1/2 top-1/2 size-2 -translate-x-1/2 -translate-y-1/2" />
+    <RadioGroupIndicator
+      data-slot="radio-group-indicator"
+      class="tw-relative tw-flex tw-items-center tw-justify-center"
+    >
+      <CircleIcon
+        class="tw-fill-primary tw-absolute tw-left-1/2 tw-top-1/2 tw-size-2 -translate-x-1/2 -translate-y-1/2"
+      />
     </RadioGroupIndicator>
   </RadioGroupItem>
 </template>

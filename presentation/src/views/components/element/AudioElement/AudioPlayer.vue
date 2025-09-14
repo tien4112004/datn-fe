@@ -298,7 +298,7 @@ defineExpose({
   user-select: none;
   line-height: 1;
   transform-origin: 0 0;
-  background: var(--foreground);
+  background: var(--presentation-foreground);
 }
 
 .controller {
@@ -330,7 +330,7 @@ defineExpose({
       border-radius: 4px;
       padding: 5px 7px;
       background-color: rgba(0, 0, 0, 0.62);
-      color: var(--background);
+      color: var(--presentation-background);
       font-size: 12px;
       text-align: center;
       opacity: 1;
@@ -368,7 +368,7 @@ defineExpose({
         bottom: 0;
         height: 3px;
         will-change: width;
-        background-color: var(--background);
+        background-color: var(--presentation-background);
 
         .thumb {
           position: absolute;
@@ -382,7 +382,7 @@ defineExpose({
           cursor: pointer;
           transition: all 0.3s ease-in-out;
           transform: scale(0);
-          background-color: var(--background);
+          background-color: var(--presentation-background);
         }
       }
     }
@@ -411,7 +411,7 @@ defineExpose({
       .icon-content {
         transition: all 0.2s ease-in-out;
         opacity: 0.8;
-        color: var(--background);
+        color: var(--presentation-background);
       }
 
       &.active .icon-content {
@@ -466,7 +466,7 @@ defineExpose({
         height: 100%;
         transition: all 0.1s ease;
         will-change: width;
-        background-color: var(--background);
+        background-color: var(--presentation-background);
 
         .thumb {
           position: absolute;
@@ -480,7 +480,7 @@ defineExpose({
           cursor: pointer;
           transition: all 0.3s ease-in-out;
           transform: scale(0);
-          background-color: var(--background);
+          background-color: var(--presentation-background);
         }
       }
     }

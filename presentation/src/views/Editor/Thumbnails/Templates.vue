@@ -116,12 +116,12 @@ onMounted(() => {
   width: 108px;
   margin-right: 10px;
   padding-right: 10px;
-  border-right: 1px solid var(--border);
+  border-right: 1px solid var(--presentation-border);
   overflow: auto;
 
   .catalog {
     padding: 7px 8px;
-    border-radius: var(--radius);
+    border-radius: var(--presentation-radius);
     cursor: pointer;
 
     &:hover {
@@ -129,9 +129,9 @@ onMounted(() => {
     }
 
     &.active {
-      color: var(--primary);
-      background-color: rgba($color: var(--primary), $alpha: 0.05);
-      border-right: 2px solid var(--primary);
+      color: var(--presentation-primary);
+      background-color: rgba($color: var(--presentation-primary), $alpha: 0.05);
+      border-right: 2px solid var(--presentation-primary);
       font-weight: 700;
     }
 
@@ -166,7 +166,7 @@ onMounted(() => {
   display: flex;
 
   .type {
-    border-radius: var(--radius);
+    border-radius: var(--presentation-radius);
     padding: 3px 8px;
     font-size: 0.8125rem;
     cursor: pointer;
@@ -176,8 +176,8 @@ onMounted(() => {
     }
 
     &.active {
-      color: var(--primary);
-      background-color: rgba($color: var(--primary), $alpha: 0.05);
+      color: var(--presentation-primary);
+      background-color: rgba($color: var(--presentation-primary), $alpha: 0.05);
       font-weight: 700;
     }
 
@@ -189,7 +189,7 @@ onMounted(() => {
 .insert-all {
   opacity: 0;
   font-size: 0.8125rem;
-  color: var(--primary);
+  color: var(--presentation-primary);
   text-decoration: underline;
   cursor: pointer;
 }
@@ -213,7 +213,7 @@ onMounted(() => {
   }
 
   &:hover .thumbnail {
-    outline-color: var(--primary);
+    outline-color: var(--presentation-primary);
   }
 
   .btns {
@@ -223,15 +223,15 @@ onMounted(() => {
     justify-content: center;
     align-items: center;
     display: flex;
-    background-color: rgba($color: var(--foreground), $alpha: 0.25);
+    background-color: rgba($color: var(--presentation-foreground), $alpha: 0.25);
     opacity: 0;
     transition: opacity 0.2s;
   }
 
   .thumbnail {
-    outline: 2px solid var(--border);
+    outline: 2px solid var(--presentation-border);
     transition: outline 0.2s;
-    border-radius: var(--radius);
+    border-radius: var(--presentation-radius);
     cursor: pointer;
   }
 }

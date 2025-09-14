@@ -460,7 +460,7 @@ $attentionColor: #e8b76a;
   height: 45px;
   line-height: 16px;
   background-color: #eeeeee;
-  border-radius: var(--radius);
+  border-radius: var(--presentation-radius);
   padding: 0px 8px;
 }
 
@@ -472,9 +472,9 @@ $attentionColor: #e8b76a;
   @include overflow-overlay();
 }
 .sequence-item {
-  border: 1px solid var(--border);
+  border: 1px solid var(--presentation-border);
   padding: 8px;
-  border-radius: var(--radius);
+  border-radius: var(--presentation-radius);
   margin-bottom: 8px;
   transition: all 0.5s;
 

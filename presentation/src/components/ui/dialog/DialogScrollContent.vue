@@ -17,12 +17,12 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits);
 <template>
   <DialogPortal>
     <DialogOverlay
-      class="data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 grid place-items-center overflow-y-auto bg-black/80"
+      class="data-[state=open]:tw-animate-in data-[state=closed]:tw-animate-out data-[state=closed]:tw-fade-out-0 data-[state=open]:tw-fade-in-0 tw-fixed tw-inset-0 tw-z-50 tw-grid tw-place-items-center tw-overflow-y-auto tw-bg-black/80"
     >
       <DialogContent
         :class="
           cn(
-            'border-border bg-background relative z-50 my-8 grid w-full max-w-lg gap-4 border p-6 shadow-lg duration-200 sm:rounded-lg md:w-full',
+            'tw-border-border tw-bg-background tw-relative tw-z-50 tw-my-8 tw-grid tw-w-full tw-max-w-lg tw-gap-4 tw-border tw-p-6 tw-shadow-lg tw-duration-200 sm:tw-rounded-lg md:tw-w-full',
             props.class
           )
         "
@@ -39,9 +39,11 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits);
       >
         <slot />
 
-        <DialogClose class="hover:bg-secondary absolute right-4 top-4 rounded-md p-0.5 transition-colors">
-          <X class="h-4 w-4" />
-          <span class="sr-only">Close</span>
+        <DialogClose
+          class="hover:tw-bg-secondary tw-absolute tw-right-4 tw-top-4 tw-rounded-md tw-p-0.5 tw-transition-colors"
+        >
+          <X class="tw-h-4 tw-w-4" />
+          <span class="tw-sr-only">Close</span>
         </DialogClose>
       </DialogContent>
     </DialogOverlay>

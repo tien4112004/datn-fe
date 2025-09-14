@@ -164,12 +164,12 @@ const startResize = (e: MouseEvent) => {
 <style lang="scss" scoped>
 .moveable-panel {
   position: fixed;
-  background-color: var(--background);
+  background-color: var(--presentation-background);
   box-shadow:
     0 4px 6px -1px rgba(0, 0, 0, 0.1),
     0 2px 4px -2px rgba(0, 0, 0, 0.1);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border: 1px solid var(--presentation-border);
+  border-radius: var(--presentation-radius);
   display: flex;
   flex-direction: column;
   z-index: 999;

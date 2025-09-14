@@ -53,11 +53,11 @@ provide(injectKeyRadioGroupValue, {
 
 <style scoped>
 .radio-group > *:first-child {
-  border-radius: var(--radius) 0 0 var(--radius);
+  border-radius: var(--presentation-radius) 0 0 var(--presentation-radius);
 }
 
 .radio-group > *:last-child {
-  border-radius: 0 var(--radius) var(--radius) 0;
+  border-radius: 0 var(--presentation-radius) var(--presentation-radius) 0;
 }
 
 .radio-group > *:not(:first-child):not(:last-child) {

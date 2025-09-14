@@ -5,9 +5,10 @@
     type="radio"
     @click="!disabled && updateValue(value)"
     :class="
-      cn('transition-colors', {
-        'text-primary-foreground bg-primary hover:text-primary-foreground': !disabled && _value === value,
-        'hover:text-primary hover:border-primary': !disabled && _value !== value,
+      cn('tw-transition-colors', {
+        'tw-text-primary-foreground tw-bg-primary hover:tw-text-primary-foreground':
+          !disabled && _value === value,
+        'hover:tw-text-primary hover:tw-border-primary': !disabled && _value !== value,
       })
     "
   >

@@ -215,7 +215,7 @@ const position = computed(() => {
   opacity: 0.8;
 
   &:not(.line) {
-    border: 1px solid var(--primary);
+    border: 1px solid var(--presentation-primary);
   }
 }
 </style>

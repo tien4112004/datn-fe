@@ -197,7 +197,7 @@ const close = () => {
   color: #999999;
   font-style: italic;
   border: 1px dashed #ccc;
-  border-radius: var(--radius);
+  border-radius: var(--presentation-radius);
   margin-top: 5px;
 }
 </style>

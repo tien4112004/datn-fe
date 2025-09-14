@@ -233,7 +233,7 @@ const openAIPPTDialog = () => {
   align-items: center;
   font-size: 0.875rem;
   padding: 0 10px;
-  border-radius: var(--radius);
+  border-radius: var(--presentation-radius);
   cursor: pointer;
 
   .icon {
@@ -260,7 +260,7 @@ const openAIPPTDialog = () => {
   display: flex;
   margin: 0 8px;
   padding: 0 2px;
-  border-radius: var(--radius);
+  border-radius: var(--presentation-radius);
 
   &:hover {
     background-color: #f1f1f1;
@@ -297,12 +297,12 @@ const openAIPPTDialog = () => {
     max-width: 400px;
     line-height: 30px;
     padding: 0 6px;
-    border-radius: var(--radius);
+    border-radius: var(--presentation-radius);
     cursor: pointer;
     @include ellipsis-oneline();
 
     &:hover {
-      background-color: var(--sidebar);
+      background-color: var(--presentation-sidebar);
     }
   }
 }

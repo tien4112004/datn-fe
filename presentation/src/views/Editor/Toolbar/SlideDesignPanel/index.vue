@@ -21,7 +21,7 @@
             @update:modelValue="(color) => updateBackground({ color })"
           />
         </template>
-        <ColorButton :color="background.color || 'var(--background)'" />
+        <ColorButton :color="background.color || 'var(--presentation-background)'" />
       </Popover>
 
       <Select
@@ -229,7 +229,7 @@
               @update:modelValue="(value) => updateTheme({ outline: { ...theme.outline, color: value } })"
             />
           </template>
-          <ColorButton :color="theme.outline.color || 'var(--foreground)'" />
+          <ColorButton :color="theme.outline.color || 'var(--presentation-foreground)'" />
         </Popover>
       </div>
       <div class="row">
@@ -400,7 +400,7 @@ const background = computed(() => {
   if (!currentSlide.value.background) {
     return {
       type: 'solid',
-      value: 'var(--background)',
+      value: 'var(--presentation-background)',
     } as SlideBackground;
   }
   return currentSlide.value.background;
@@ -420,7 +420,7 @@ const updateBackgroundType = (type: SlideBackgroundType) => {
     const newBackground: SlideBackground = {
       ...background.value,
       type: 'solid',
-      color: background.value.color || 'var(--background)',
+      color: background.value.color || 'var(--presentation-background)',
     };
     slidesStore.updateSlide({ background: newBackground });
   } else if (type === 'image') {
@@ -440,8 +440,8 @@ const updateBackgroundType = (type: SlideBackgroundType) => {
       gradient: background.value.gradient || {
         type: 'linear',
         colors: [
-          { pos: 0, color: 'var(--background)' },
-          { pos: 100, color: 'var(--background)' },
+          { pos: 0, color: 'var(--presentation-background)' },
+          { pos: 100, color: 'var(--presentation-background)' },
         ],
         rotate: 0,
       },
@@ -543,14 +543,14 @@ const toFixed = (num: number) => {
 .background-image {
   height: 0;
   padding-bottom: 56.25%;
-  border: 1px dashed var(--border);
-  border-radius: var(--radius);
+  border: 1px dashed var(--presentation-border);
+  border-radius: var(--presentation-radius);
   position: relative;
   transition: all 0.2s;
 
   &:hover {
-    border-color: var(--primary);
-    color: var(--primary);
+    border-color: var(--presentation-primary);
+    color: var(--presentation-primary);
   }
 
   .content {
@@ -579,7 +579,7 @@ const toFixed = (num: number) => {
   @include flex-grid-layout-children(2, 48%);
 
   padding-bottom: 27%;
-  border-radius: var(--radius);
+  border-radius: var(--presentation-radius);
   position: relative;
   cursor: pointer;
 
@@ -590,8 +590,8 @@ const toFixed = (num: number) => {
     flex-direction: column;
     justify-content: center;
     padding: 8px;
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
+    border: 1px solid var(--presentation-border);
+    border-radius: var(--presentation-radius);
   }
 
   .text {
@@ -618,7 +618,7 @@ const toFixed = (num: number) => {
     justify-content: center;
     align-items: center;
     display: flex;
-    background-color: rgba($color: var(--foreground), $alpha: 0.25);
+    background-color: rgba($color: var(--presentation-foreground), $alpha: 0.25);
     opacity: 0;
     transition: opacity 0.2s;
   }
@@ -626,15 +626,15 @@ const toFixed = (num: number) => {
 .option {
   height: 32px;
   padding: 0 5px;
-  border-radius: var(--radius);
+  border-radius: var(--presentation-radius);
 
   &:not(.selected):hover {
-    background-color: rgba($color: var(--primary), $alpha: 0.05);
+    background-color: rgba($color: var(--presentation-primary), $alpha: 0.05);
     cursor: pointer;
   }
 
   &.selected {
-    color: var(--primary);
+    color: var(--presentation-primary);
     font-weight: 700;
   }
 }

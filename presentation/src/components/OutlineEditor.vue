@@ -1,5 +1,5 @@
 <template>
-  <div class="outline-editor">
+  <div class="tw-outline-editor">
     <div
       class="item"
       :class="[{ title: item.title }, `lv-${item.lv}`]"
@@ -259,10 +259,10 @@ const contextmenus = (el: HTMLElement): ContextmenuItem[] => {
     position: relative;
 
     &.contextmenu-active {
-      color: var(--primary);
+      color: var(--presentation-primary);
 
       .text {
-        background-color: rgb(from var(--primary) r g b / 0.08);
+        background-color: rgb(from var(--presentation-primary) r g b / 0.08);
       }
     }
 
@@ -287,13 +287,13 @@ const contextmenus = (el: HTMLElement): ContextmenuItem[] => {
     height: 100%;
     padding: 0 11px;
     line-height: 32px;
-    border-radius: var(--radius);
+    border-radius: var(--presentation-radius);
     transition: background-color 0.2s;
     cursor: pointer;
     @include ellipsis-oneline();
 
     &:hover {
-      background-color: rgb(from var(--primary) r g b / 0.08);
+      background-color: rgb(from var(--presentation-primary) r g b / 0.08);
     }
   }
   .flag {
@@ -314,16 +314,16 @@ const contextmenus = (el: HTMLElement): ContextmenuItem[] => {
       height: 100%;
       position: absolute;
       left: 50%;
-      background-color: rgb(from var(--primary) r g b / 0.1);
+      background-color: rgb(from var(--presentation-primary) r g b / 0.1);
     }
     &::after {
       content: '';
       width: 32px;
       height: 22px;
       border-radius: 2px;
-      background-color: var(--background);
-      border: 1px solid var(--primary);
-      color: var(--primary);
+      background-color: var(--presentation-background);
+      border: 1px solid var(--presentation-primary);
+      color: var(--presentation-primary);
       position: relative;
       display: flex;
       justify-content: center;

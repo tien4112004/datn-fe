@@ -4,63 +4,67 @@
 @tailwind utilities;
 
 :root {
-  --background: rgb(248, 250, 252);
-  --foreground: rgb(2, 6, 23);
-  --card: rgb(255, 255, 255);
-  --card-foreground: rgb(2, 6, 23);
-  --popover: rgb(255, 255, 255);
-  --popover-foreground: rgb(2, 6, 23);
-  --primary: rgb(37, 99, 235);
-  --primary-foreground: rgb(240, 249, 255);
-  --secondary: rgb(84, 132, 242);
-  --secondary-foreground: rgb(255, 255, 255);
-  --muted: rgb(223, 223, 223);
-  --muted-foreground: rgb(107, 114, 128);
-  --accent: rgb(42, 134, 255);
-  --accent-foreground: rgb(255, 255, 255);
-  --destructive: rgb(220, 38, 38);
-  --destructive-foreground: rgb(248, 250, 252);
-  --border: rgb(229, 231, 235);
-  --input: rgb(248, 250, 252);
-  --ring: rgb(37, 99, 235);
-  --chart-1: rgb(255, 107, 107);
-  --chart-2: rgb(79, 134, 198);
-  --chart-3: rgb(144, 238, 144);
-  --chart-4: rgb(255, 215, 0);
-  --chart-5: rgb(128, 0, 128);
-  --sidebar: rgb(243, 244, 246);
-  --sidebar-foreground: rgb(55, 65, 81);
-  --sidebar-primary: rgb(59, 130, 246);
-  --sidebar-primary-foreground: rgb(240, 249, 255);
-  --sidebar-accent: rgb(37, 99, 235);
-  --sidebar-accent-foreground: rgb(240, 249, 255);
-  --sidebar-border: rgb(209, 213, 219);
-  --sidebar-ring: rgb(191, 219, 254);
-  --font-sans:
+  --presentation-background: rgb(248, 250, 252);
+  --presentation-foreground: rgb(2, 6, 23);
+  --presentation-card: rgb(255, 255, 255);
+  --presentation-card-foreground: rgb(2, 6, 23);
+  --presentation-popover: rgb(255, 255, 255);
+  --presentation-popover-foreground: rgb(2, 6, 23);
+  --presentation-primary: rgb(37, 99, 235);
+  --presentation-primary-foreground: rgb(240, 249, 255);
+  --presentation-secondary: rgb(84, 132, 242);
+  --presentation-secondary-foreground: rgb(255, 255, 255);
+  --presentation-muted: rgb(223, 223, 223);
+  --presentation-muted-foreground: rgb(107, 114, 128);
+  --presentation-accent: rgb(42, 134, 255);
+  --presentation-accent-foreground: rgb(255, 255, 255);
+  --presentation-destructive: rgb(220, 38, 38);
+  --presentation-destructive-foreground: rgb(248, 250, 252);
+  --presentation-border: rgb(229, 231, 235);
+  --presentation-input: rgb(248, 250, 252);
+  --presentation-ring: rgb(37, 99, 235);
+  --presentation-chart-1: rgb(255, 107, 107);
+  --presentation-chart-2: rgb(79, 134, 198);
+  --presentation-chart-3: rgb(144, 238, 144);
+  --presentation-chart-4: rgb(255, 215, 0);
+  --presentation-chart-5: rgb(128, 0, 128);
+  --presentation-sidebar: rgb(243, 244, 246);
+  --presentation-sidebar-foreground: rgb(55, 65, 81);
+  --presentation-sidebar-primary: rgb(59, 130, 246);
+  --presentation-sidebar-primary-foreground: rgb(240, 249, 255);
+  --presentation-sidebar-accent: rgb(37, 99, 235);
+  --presentation-sidebar-accent-foreground: rgb(240, 249, 255);
+  --presentation-sidebar-border: rgb(209, 213, 219);
+  --presentation-sidebar-ring: rgb(191, 219, 254);
+  --presentation-font-sans:
     ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial,
     Noto Sans, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
-  --font-serif: ui-serif, Georgia, Cambria, Times New Roman, serif;
-  --font-mono: Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace;
-  --radius: 0.5rem;
-  --shadow-2xs: 0.1rem 0.1rem 0.5rem 0rem hsl(0 0% 0% / 0.05);
-  --shadow-xs: 0.1rem 0.1rem 0.5rem 0rem hsl(0 0% 0% / 0.05);
-  --shadow-sm: 0.1rem 0.1rem 0.5rem 0rem hsl(0 0% 0% / 0.1), 0.1rem 1px 2px -1px hsl(0 0% 0% / 0.1);
-  --shadow: 0.1rem 0.1rem 0.5rem 0rem hsl(0 0% 0% / 0.1), 0.1rem 1px 2px -1px hsl(0 0% 0% / 0.1);
-  --shadow-md: 0.1rem 0.1rem 0.5rem 0rem hsl(0 0% 0% / 0.1), 0.1rem 2px 4px -1px hsl(0 0% 0% / 0.1);
-  --shadow-lg: 0.1rem 0.1rem 0.5rem 0rem hsl(0 0% 0% / 0.1), 0.1rem 4px 6px -1px hsl(0 0% 0% / 0.1);
-  --shadow-xl: 0.1rem 0.1rem 0.5rem 0rem hsl(0 0% 0% / 0.1), 0.1rem 8px 10px -1px hsl(0 0% 0% / 0.1);
-  --shadow-2xl: 0.1rem 0.1rem 0.5rem 0rem hsl(0 0% 0% / 0.25);
-  --tracking-normal: -0.025em;
-  --spacing: 0.25rem;
+  --presentation-font-serif: ui-serif, Georgia, Cambria, Times New Roman, serif;
+  --presentation-font-mono: Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace;
+  --presentation-radius: 0.5rem;
+  --presentation-shadow-2xs: 0.1rem 0.1rem 0.5rem 0rem hsl(0 0% 0% / 0.05);
+  --presentation-shadow-xs: 0.1rem 0.1rem 0.5rem 0rem hsl(0 0% 0% / 0.05);
+  --presentation-shadow-sm:
+    0.1rem 0.1rem 0.5rem 0rem hsl(0 0% 0% / 0.1), 0.1rem 1px 2px -1px hsl(0 0% 0% / 0.1);
+  --presentation-shadow: 0.1rem 0.1rem 0.5rem 0rem hsl(0 0% 0% / 0.1), 0.1rem 1px 2px -1px hsl(0 0% 0% / 0.1);
+  --presentation-shadow-md:
+    0.1rem 0.1rem 0.5rem 0rem hsl(0 0% 0% / 0.1), 0.1rem 2px 4px -1px hsl(0 0% 0% / 0.1);
+  --presentation-shadow-lg:
+    0.1rem 0.1rem 0.5rem 0rem hsl(0 0% 0% / 0.1), 0.1rem 4px 6px -1px hsl(0 0% 0% / 0.1);
+  --presentation-shadow-xl:
+    0.1rem 0.1rem 0.5rem 0rem hsl(0 0% 0% / 0.1), 0.1rem 8px 10px -1px hsl(0 0% 0% / 0.1);
+  --presentation-shadow-2xl: 0.1rem 0.1rem 0.5rem 0rem hsl(0 0% 0% / 0.25);
+  --presentation-tracking-normal: -0.025em;
+  --presentation-spacing: 0.25rem;
 }
 
 body:not(.canvas) body:not(.viewport-wrapper) body:not(.presenter-view) body:not(.base-view) {
-  letter-spacing: var(--tracking-normal);
+  letter-spacing: var(--presentation-tracking-normal);
 }
 
 body {
-  background-color: var(--background);
-  color: var(--foreground);
+  background-color: var(--presentation-background);
+  color: var(--presentation-foreground);
 }
 
 ::-webkit-resizer {

@@ -33,11 +33,8 @@ const forwardedProps = useForwardProps(delegatedProps);
     v-bind="forwardedProps"
     :class="
       cn(
-        toggleVariants({
-          variant: context?.variant || variant,
-          size: context?.size || size,
-        }),
-        'min-w-0 flex-1 shrink-0 rounded-none shadow-none first:rounded-l-md last:rounded-r-md focus:z-10 focus-visible:z-10 data-[variant=outline]:border-l-0 data-[variant=outline]:first:border-l',
+        toggleVariants({ variant: context?.variant || variant, size: context?.size || size }),
+        'tw-min-w-0 tw-flex-1 tw-shrink-0 tw-rounded-none tw-shadow-none first:tw-rounded-l-md last:tw-rounded-r-md focus:tw-z-10 focus-visible:tw-z-10 data-[variant=outline]:tw-border-l-0 data-[variant=outline]:first:tw-border-l',
         props.class
       )
     "

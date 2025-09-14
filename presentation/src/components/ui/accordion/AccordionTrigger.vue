@@ -12,13 +12,13 @@ const delegatedProps = reactiveOmit(props, 'class');
 </script>
 
 <template>
-  <AccordionHeader class="flex">
+  <AccordionHeader class="tw-flex">
     <AccordionTrigger
       data-slot="accordion-trigger"
       v-bind="delegatedProps"
       :class="
         cn(
-          'focus-visible:border-ring focus-visible:ring-ring/50 flex flex-1 items-start justify-between gap-4 rounded-md py-4 text-left text-sm font-medium outline-none transition-all hover:underline focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&[data-state=open]>svg]:rotate-180',
+          'focus-visible:tw-border-ring focus-visible:tw-ring-ring/50 tw-flex tw-flex-1 tw-items-start tw-justify-between tw-gap-4 tw-rounded-md tw-py-4 tw-text-left tw-text-sm tw-font-medium tw-outline-none tw-transition-all hover:tw-underline focus-visible:tw-ring-[3px] disabled:tw-pointer-events-none disabled:tw-opacity-50 [&[data-state=open]>svg]:tw-rotate-180',
           props.class
         )
       "
@@ -26,7 +26,7 @@ const delegatedProps = reactiveOmit(props, 'class');
       <slot />
       <slot name="icon">
         <ChevronDown
-          class="text-muted-foreground pointer-events-none size-4 shrink-0 translate-y-0.5 transition-transform duration-200"
+          class="tw-text-muted-foreground tw-pointer-events-none tw-size-4 tw-shrink-0 tw-translate-y-0.5 tw-transition-transform tw-duration-200"
         />
       </slot>
     </AccordionTrigger>

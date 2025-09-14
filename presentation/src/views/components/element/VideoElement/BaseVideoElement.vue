@@ -38,7 +38,7 @@ defineProps<{
 .element-content {
   width: 100%;
   height: 100%;
-  background-color: var(--foreground);
+  background-color: var(--presentation-foreground);
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;

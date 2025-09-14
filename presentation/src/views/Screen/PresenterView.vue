@@ -255,7 +255,7 @@ const contextmenus = (): ContextmenuItem[] => {
 
     &:hover,
     &.active {
-      color: var(--primary);
+      color: var(--presentation-primary);
     }
   }
 
@@ -305,12 +305,12 @@ const contextmenus = (): ContextmenuItem[] => {
   }
 
   &:hover {
-    outline-color: var(--primary);
+    outline-color: var(--presentation-primary);
   }
 
   &.active {
     outline-width: 3px;
-    outline-color: var(--primary);
+    outline-color: var(--presentation-primary);
   }
 }
 .remark {

@@ -13,7 +13,7 @@ const props = defineProps<{
     data-slot="input"
     :class="
       cn(
-        'border-input placeholder:text-muted-foreground focus-visible:ring-ring flex h-9 w-full rounded-md border bg-transparent py-1 text-center text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 disabled:cursor-not-allowed disabled:opacity-50',
+        'tw-border-input placeholder:tw-text-muted-foreground focus-visible:tw-ring-ring tw-flex tw-h-9 tw-w-full tw-rounded-md tw-border tw-bg-transparent tw-py-1 tw-text-center tw-text-sm tw-shadow-sm tw-transition-colors focus-visible:tw-outline-none focus-visible:tw-ring-1 disabled:tw-cursor-not-allowed disabled:tw-opacity-50',
         props.class
       )
     "

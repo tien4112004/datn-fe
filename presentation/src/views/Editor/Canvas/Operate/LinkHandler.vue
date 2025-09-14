@@ -52,13 +52,13 @@ const turnTarget = (slideId: string) => {
   left: 0;
   font-size: 12px;
   padding: 0 10px;
-  background-color: var(--background);
+  background-color: var(--presentation-background);
   box-shadow:
     0 4px 6px -1px rgba(0, 0, 0, 0.1),
     0 2px 4px -2px rgba(0, 0, 0, 0.1);
   display: flex;
   align-items: center;
-  color: var(--primary);
+  color: var(--presentation-primary);
 }
 .link {
   max-width: 300px;

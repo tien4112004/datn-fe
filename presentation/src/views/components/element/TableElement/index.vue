@@ -189,8 +189,8 @@ const updateSelectedCells = (cells: string[]) => {
     position: absolute;
     top: 5px;
     left: 5px;
-    background-color: rgb(from var(--foreground) r g b / 0.5);
-    color: var(--background);
+    background-color: rgb(from var(--presentation-foreground) r g b / 0.5);
+    color: var(--presentation-background);
     padding: 6px 12px;
     font-size: 0.75rem;
     transform-origin: 0 0;

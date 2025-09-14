@@ -115,8 +115,8 @@ const onClickMask = () => {
 .modal-content {
   z-index: 5001;
   padding: 20px;
-  background: var(--background);
-  border-radius: var(--radius);
+  background: var(--presentation-background);
+  border-radius: var(--presentation-radius);
   overflow: hidden;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
   position: relative;

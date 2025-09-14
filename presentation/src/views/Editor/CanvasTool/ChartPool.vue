@@ -61,7 +61,7 @@ const selectChart = (chart: ChartType) => {
   color: #999999;
 
   &:hover {
-    color: var(--primary);
+    color: var(--presentation-primary);
   }
 
   .name {

@@ -342,8 +342,8 @@ const createPPT = async () => {
     @include flex-grid-layout();
 
     .template {
-      border: 2px solid var(--border);
-      border-radius: var(--radius);
+      border: 2px solid var(--presentation-border);
+      border-radius: var(--presentation-radius);
       width: 324px;
       height: 184px;
       margin-bottom: 12px;
@@ -353,7 +353,7 @@ const createPPT = async () => {
       }
 
       &.selected {
-        border-color: var(--primary);
+        border-color: var(--presentation-primary);
       }
 
       img {
@@ -380,14 +380,14 @@ const createPPT = async () => {
   .recommend {
     font-size: 0.75rem;
     background-color: #f1f1f1;
-    border-radius: var(--radius);
+    border-radius: var(--presentation-radius);
     padding: 3px 5px;
     margin-right: 5px;
     margin-top: 5px;
     cursor: pointer;
 
     &:hover {
-      color: var(--primary);
+      color: var(--presentation-primary);
     }
   }
 }
@@ -411,16 +411,16 @@ const createPPT = async () => {
 .submit {
   height: 20px;
   font-size: 0.8125rem;
-  background-color: var(--primary);
-  color: var(--background);
+  background-color: var(--presentation-primary);
+  color: var(--presentation-background);
   display: flex;
   align-items: center;
   padding: 0 8px 0 6px;
-  border-radius: var(--radius);
+  border-radius: var(--presentation-radius);
   cursor: pointer;
 
   &:hover {
-    background-color: var(--secondary);
+    background-color: var(--presentation-secondary);
   }
 
   .icon {

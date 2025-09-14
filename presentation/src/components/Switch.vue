@@ -1,11 +1,7 @@
 <template>
   <span
     class="switch"
-    :class="{
-      active: value,
-      disabled: disabled,
-      [`switch--${size}`]: true,
-    }"
+    :class="{ active: value, disabled: disabled, [`switch--${size}`]: true }"
     @click="handleChange()"
   >
     <span class="switch-core"></span>
@@ -91,8 +87,8 @@ const handleChange = () => {
 
   &:not(.disabled).active {
     .switch-core {
-      border-color: var(--primary);
-      background-color: var(--primary);
+      border-color: var(--presentation-primary);
+      background-color: var(--presentation-primary);
     }
   }
 
@@ -129,7 +125,7 @@ const handleChange = () => {
     transition: all 0.3s;
     width: 16px;
     height: 16px;
-    background-color: var(--background);
+    background-color: var(--presentation-background);
   }
 }
 </style>

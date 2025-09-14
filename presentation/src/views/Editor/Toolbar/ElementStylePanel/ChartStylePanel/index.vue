@@ -148,7 +148,7 @@ const themeColorsSettingVisible = ref(false);
 
 const { addHistorySnapshot } = useHistorySnapshot();
 
-const fill = ref<string>('var(--foreground)');
+const fill = ref<string>('var(--presentation-foreground)');
 
 const themeColors = ref<string[]>([]);
 const textColor = ref('');
@@ -159,7 +159,7 @@ watch(
   handleElement,
   () => {
     if (!handleElement.value || handleElement.value.type !== 'chart') return;
-    fill.value = handleElement.value.fill || 'var(--background)';
+    fill.value = handleElement.value.fill || 'var(--presentation-background)';
 
     lineSmooth.value = false;
     stack.value = false;
@@ -252,11 +252,11 @@ onUnmounted(() => {
   cursor: pointer;
   border: 1px solid #ccc;
   padding: 2px;
-  border-radius: var(--radius);
+  border-radius: var(--presentation-radius);
   @include flex-grid-layout-children(2, 48%);
 
   &:hover {
-    border-color: var(--primary);
+    border-color: var(--presentation-primary);
     transition: border-color 0.1s;
   }
 }

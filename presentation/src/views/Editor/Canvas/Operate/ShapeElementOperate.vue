@@ -121,7 +121,7 @@ const keypoints = computed(() => {
   left: 0;
   top: 0;
   margin: -5px 0 0 -5px;
-  border: 1px solid var(--primary);
+  border: 1px solid var(--presentation-primary);
   background-color: #ffe873;
   border-radius: 1px;
 }

@@ -321,7 +321,7 @@ const setBackgroundImage = () => {
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
-  background-color: var(--muted);
+  background-color: var(--presentation-muted);
   margin-bottom: 10px;
 }
 .full-width-btn {

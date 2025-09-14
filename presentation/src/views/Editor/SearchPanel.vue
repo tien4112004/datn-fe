@@ -124,7 +124,7 @@ watch(type, () => {
   cursor: pointer;
 
   &.active {
-    color: var(--primary);
+    color: var(--presentation-primary);
   }
 }
 .next-btn {
@@ -137,7 +137,7 @@ watch(type, () => {
   cursor: pointer;
 
   &:hover {
-    color: var(--primary);
+    color: var(--presentation-primary);
   }
 }
 .footer {

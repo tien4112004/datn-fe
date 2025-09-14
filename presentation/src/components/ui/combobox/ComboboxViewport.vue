@@ -16,7 +16,7 @@ const forwarded = useForwardProps(delegatedProps);
   <ComboboxViewport
     data-slot="combobox-viewport"
     v-bind="forwarded"
-    :class="cn('max-h-[300px] scroll-py-1 overflow-y-auto overflow-x-hidden', props.class)"
+    :class="cn('tw-max-h-[300px] tw-scroll-py-1 tw-overflow-y-auto tw-overflow-x-hidden', props.class)"
   >
     <slot />
   </ComboboxViewport>

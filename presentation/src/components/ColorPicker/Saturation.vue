@@ -94,10 +94,10 @@ onUnmounted(unbindEventListeners);
   cursor: pointer;
 }
 .saturation-white {
-  background: linear-gradient(to right, var(--background), rgba(255, 255, 255, 0));
+  background: linear-gradient(to right, var(--presentation-background), rgba(255, 255, 255, 0));
 }
 .saturation-black {
-  background: linear-gradient(to top, var(--foreground), rgba(0, 0, 0, 0));
+  background: linear-gradient(to top, var(--presentation-foreground), rgba(0, 0, 0, 0));
 }
 .saturation-pointer {
   cursor: pointer;
@@ -107,7 +107,7 @@ onUnmounted(unbindEventListeners);
   width: 4px;
   height: 4px;
   box-shadow:
-    0 0 0 1.5px var(--background),
+    0 0 0 1.5px var(--presentation-background),
     inset 0 0 1px 1px rgba(0, 0, 0, 0.3),
     0 0 1px 2px rgba(0, 0, 0, 0.4);
   border-radius: 50%;

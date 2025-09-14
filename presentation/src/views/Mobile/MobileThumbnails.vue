@@ -69,10 +69,10 @@ const handleDragEnd = (eventData: { newIndex: number; oldIndex: number }) => {
   }
 
   &.active {
-    outline-color: var(--primary);
+    outline-color: var(--presentation-primary);
 
     .label {
-      background-color: var(--primary);
+      background-color: var(--presentation-primary);
     }
   }
   .label {

@@ -94,12 +94,12 @@ watch(slideIndex, () => {
   }
 
   &:hover {
-    outline-color: var(--primary);
+    outline-color: var(--presentation-primary);
   }
 
   &.active {
     outline-width: 3px;
-    outline-color: var(--primary);
+    outline-color: var(--presentation-primary);
   }
 }
 

@@ -1,10 +1,10 @@
 <template>
-  <Button variant="outline" class="h-9 w-full justify-center gap-0.5 overflow-hidden p-0">
-    <div class="border-border/20 ml-2 h-5 flex-1 border border-dashed">
-      <div class="h-full w-full" :style="{ backgroundColor: color }" />
+  <Button variant="outline" class="tw-h-9 tw-w-full tw-justify-center tw-gap-0.5 tw-overflow-hidden tw-p-0">
+    <div class="tw-border-border/20 tw-ml-2 tw-h-5 tw-flex-1 tw-border tw-border-dashed">
+      <div class="tw-h-full tw-w-full" :style="{ backgroundColor: color }" />
     </div>
-    <div class="flex w-8 items-center justify-center">
-      <IconPalette class="h-3.5 w-3.5" />
+    <div class="tw-flex tw-w-8 tw-items-center tw-justify-center">
+      <IconPalette class="tw-h-3.5 tw-w-3.5" />
     </div>
   </Button>
 </template>

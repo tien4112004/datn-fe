@@ -2,12 +2,14 @@
   <div v-if="disabled">
     <div
       ref="selectRef"
-      class="relative h-8 w-full cursor-default select-none border border-gray-300 bg-gray-50 pr-8 text-sm text-gray-500 transition-colors duration-200"
+      class="tw-relative tw-h-8 tw-w-full tw-cursor-default tw-select-none tw-border tw-border-gray-300 tw-bg-gray-50 tw-pr-8 tw-text-sm tw-text-gray-500 tw-transition-colors tw-duration-200"
     >
-      <div class="h-[30px] min-w-[50px] truncate pl-2.5 leading-[30px]">
+      <div class="tw-h-[30px] tw-min-w-[50px] tw-truncate tw-pl-2.5 tw-leading-[30px]">
         <slot name="label"></slot>
       </div>
-      <div class="absolute right-0 top-0 flex h-[30px] w-8 items-center justify-center text-gray-400">
+      <div
+        class="tw-absolute tw-right-0 tw-top-0 tw-flex tw-h-[30px] tw-w-8 tw-items-center tw-justify-center tw-text-gray-400"
+      >
         <slot name="icon">
           <IconDown :size="14" />
         </slot>
@@ -26,7 +28,7 @@
   >
     <template #content>
       <div
-        class="max-h-[260px] select-none overflow-auto p-1.5 text-left text-sm"
+        class="tw-max-h-[260px] tw-select-none tw-overflow-auto tw-p-1.5 tw-text-left tw-text-sm"
         :style="{ width: width + 2 + 'px' }"
         @click="popoverVisible = false"
       >
@@ -35,12 +37,14 @@
     </template>
     <div
       ref="selectRef"
-      class="relative h-8 w-full cursor-pointer select-none rounded-md border border-gray-300 bg-white pr-8 text-sm transition-colors duration-200 hover:border-blue-500"
+      class="tw-relative tw-h-8 tw-w-full tw-cursor-pointer tw-select-none tw-rounded-md tw-border tw-border-gray-300 tw-bg-white tw-pr-8 tw-text-sm tw-transition-colors tw-duration-200 hover:tw-border-blue-500"
     >
-      <div class="h-[30px] min-w-[50px] truncate pl-2.5 leading-[30px]">
+      <div class="tw-h-[30px] tw-min-w-[50px] tw-truncate tw-pl-2.5 tw-leading-[30px]">
         <slot name="label"></slot>
       </div>
-      <div class="absolute right-0 top-0 flex h-[30px] w-8 items-center justify-center text-gray-400">
+      <div
+        class="tw-absolute tw-right-0 tw-top-0 tw-flex tw-h-[30px] tw-w-8 tw-items-center tw-justify-center tw-text-gray-400"
+      >
         <slot name="icon">
           <IconDown :size="14" />
         </slot>

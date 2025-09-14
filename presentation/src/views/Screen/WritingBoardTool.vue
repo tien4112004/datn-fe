@@ -140,10 +140,7 @@
           <div class="colors">
             <div
               class="color"
-              :class="{
-                active: color === writingBoardColor,
-                white: color === '#ffffff',
-              }"
+              :class="{ active: color === writingBoardColor, white: color === '#ffffff' }"
               v-for="color in writingBoardColors"
               :key="color"
               :style="{ backgroundColor: color }"
@@ -306,14 +303,14 @@ const hanldeWritingEnd = () => {
   .btn {
     padding: 5px;
     margin-right: 5px;
-    border-radius: var(--radius);
+    border-radius: var(--presentation-radius);
     cursor: pointer;
 
     &:hover {
-      color: var(--primary);
+      color: var(--presentation-primary);
     }
     &.active {
-      background-color: rgb(from var(--primary) r g b / 0.5);
+      background-color: rgb(from var(--presentation-primary) r g b / 0.5);
       color: #fff;
     }
     &.close {
@@ -331,7 +328,7 @@ const hanldeWritingEnd = () => {
   .color {
     width: 16px;
     height: 16px;
-    border-radius: var(--radius);
+    border-radius: var(--presentation-radius);
     cursor: pointer;
 
     &:hover {
@@ -373,7 +370,7 @@ const hanldeWritingEnd = () => {
       }
 
       &.active {
-        color: var(--primary);
+        color: var(--presentation-primary);
       }
     }
   }

@@ -771,7 +771,7 @@ table {
   --subThemeColor2: themeColor;
 
   &.theme {
-    background-color: var(--background);
+    background-color: var(--presentation-background);
 
     tr:nth-child(2n) .cell {
       background-color: var(--subThemeColor1);

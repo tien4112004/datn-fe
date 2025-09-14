@@ -1,12 +1,16 @@
 <template>
-  <Button variant="outline" class="flex w-full items-center justify-center gap-0.5 p-0">
-    <div class="border-muted-foreground/20 ml-2 flex flex-1 border border-dashed">
-      <div v-for="(color, index) in limitedColors" :key="index" class="ml-0.5 h-5 flex-1 first:ml-0">
-        <div class="h-full w-full" :style="{ backgroundColor: color }"></div>
+  <Button variant="outline" class="tw-flex tw-w-full tw-items-center tw-justify-center tw-gap-0.5 tw-p-0">
+    <div class="tw-border-muted-foreground/20 tw-ml-2 tw-flex tw-flex-1 tw-border tw-border-dashed">
+      <div
+        v-for="(color, index) in limitedColors"
+        :key="index"
+        class="tw-ml-0.5 tw-h-5 tw-flex-1 first:tw-ml-0"
+      >
+        <div class="tw-h-full tw-w-full" :style="{ backgroundColor: color }"></div>
       </div>
     </div>
-    <div class="flex w-8 items-center justify-center">
-      <IconPalette class="h-3.5 w-3.5" />
+    <div class="tw-flex tw-w-8 tw-items-center tw-justify-center">
+      <IconPalette class="tw-h-3.5 tw-w-3.5" />
     </div>
   </Button>
 </template>

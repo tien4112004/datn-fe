@@ -55,10 +55,10 @@ const selectSymbol = (value: string) => {
     padding-bottom: 18%;
     position: relative;
     cursor: pointer;
-    border: 1px solid var(--border);
+    border: 1px solid var(--presentation-border);
 
     &:hover {
-      color: var(--primary);
+      color: var(--presentation-primary);
     }
 
     .symbol {

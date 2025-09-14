@@ -458,7 +458,7 @@ defineExpose({
   z-index: 9;
 
   .icon {
-    filter: drop-shadow(2px 2px 2px var(--muted-foreground));
+    filter: drop-shadow(2px 2px 2px var(--presentation-muted-foreground));
   }
 }
 .lucide {
@@ -470,7 +470,7 @@ defineExpose({
   justify-content: center;
   align-items: center;
   border-radius: 50%;
-  border: 4px solid rgb(from var(--muted-foreground) r g b / 0.15);
-  color: rgb(from var(--muted-foreground) r g b / 0.75);
+  border: 4px solid rgb(from var(--presentation-muted-foreground) r g b / 0.15);
+  color: rgb(from var(--presentation-muted-foreground) r g b / 0.75);
 }
 </style>

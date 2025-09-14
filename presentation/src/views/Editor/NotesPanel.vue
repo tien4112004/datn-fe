@@ -300,7 +300,7 @@ const close = () => {
       height: 30px;
       border-radius: 50%;
       background-color: #42ba97;
-      color: var(--background);
+      color: var(--presentation-background);
       font-size: 18px;
       display: flex;
       justify-content: center;
@@ -327,7 +327,7 @@ const close = () => {
 
       &:hover {
         text-decoration: underline;
-        color: var(--primary);
+        color: var(--presentation-primary);
       }
     }
   }

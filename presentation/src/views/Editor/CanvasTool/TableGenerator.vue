@@ -12,9 +12,7 @@
           <td @mouseenter="endCell = [row, col]" v-for="col in 10" :key="col">
             <div
               class="cell"
-              :class="{
-                active: endCell.length && row <= endCell[0] && col <= endCell[1],
-              }"
+              :class="{ active: endCell.length && row <= endCell[0] && col <= endCell[1] }"
             ></div>
           </td>
         </tr>
@@ -93,21 +91,21 @@ const close = () => {
 .title {
   height: 28px;
   line-height: 28px;
-  background-color: var(--muted);
+  background-color: var(--presentation-muted);
   margin: 0 -10px 10px -10px;
   padding: 0 14px;
   font-size: 13px;
   display: flex;
   justify-content: space-between;
-  border-top-left-radius: var(--radius);
-  border-top-right-radius: var(--radius);
+  border-top-left-radius: var(--presentation-radius);
+  border-top-right-radius: var(--presentation-radius);
   user-select: none;
 
   .right {
     cursor: pointer;
 
     &:hover {
-      color: var(--primary);
+      color: var(--presentation-primary);
     }
   }
 }
@@ -118,7 +116,7 @@ td {
   width: 23px;
   height: 23px;
   line-height: 23px;
-  border: 2px solid var(--background);
+  border: 2px solid var(--presentation-background);
   background-color: #f7f7f7;
 }
 .cell {
@@ -127,8 +125,8 @@ td {
   border: 1px solid #dcdcdc;
 
   &.active {
-    background-color: rgba($color: var(--primary), $alpha: 0.1);
-    border-color: var(--primary);
+    background-color: rgba($color: var(--presentation-primary), $alpha: 0.1);
+    border-color: var(--presentation-primary);
   }
 }
 

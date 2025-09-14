@@ -31,7 +31,7 @@ const forwardedProps = useForwardProps(delegatedProps);
     v-bind="forwardedProps"
     :class="
       cn(
-        `focus:bg-accent focus:text-accent-foreground data-[variant=destructive]:text-destructive-foreground data-[variant=destructive]:focus:bg-destructive/10 dark:data-[variant=destructive]:focus:bg-destructive/40 data-[variant=destructive]:focus:text-destructive-foreground data-[variant=destructive]:*:[svg]:!text-destructive-foreground [&_svg:not([class*='text-'])]:text-muted-foreground outline-hidden relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm data-[disabled]:pointer-events-none data-[inset]:pl-8 data-[disabled]:opacity-50 [&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0`,
+        `focus:tw-bg-accent focus:tw-text-accent-foreground data-[variant=destructive]:tw-text-destructive-foreground data-[variant=destructive]:focus:tw-bg-destructive/10 dark:data-[variant=destructive]:focus:tw-bg-destructive/40 data-[variant=destructive]:focus:tw-text-destructive-foreground data-[variant=destructive]:*:[svg]:!tw-text-destructive-foreground [&_svg:not([class*='text-'])]:tw-text-muted-foreground tw-outline-hidden tw-relative tw-flex tw-cursor-default tw-select-none tw-items-center tw-gap-2 tw-rounded-sm tw-px-2 tw-py-1.5 tw-text-sm data-[disabled]:tw-pointer-events-none data-[inset]:tw-pl-8 data-[disabled]:tw-opacity-50 [&_svg:not([class*='size-'])]:tw-size-4 [&_svg]:tw-pointer-events-none [&_svg]:tw-shrink-0`,
         props.class
       )
     "

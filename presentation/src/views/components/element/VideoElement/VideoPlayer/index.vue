@@ -404,7 +404,7 @@ useMSE(props.src, videoRef);
 
 .video-wrap {
   position: relative;
-  background: var(--foreground);
+  background: var(--presentation-foreground);
   font-size: 0;
   width: 100%;
   height: 100%;
@@ -453,7 +453,7 @@ useMSE(props.src, videoRef);
       border-radius: 4px;
       padding: 5px 7px;
       background-color: rgba(0, 0, 0, 0.62);
-      color: var(--background);
+      color: var(--presentation-background);
       font-size: 0.75rem;
       text-align: center;
       opacity: 1;
@@ -491,7 +491,7 @@ useMSE(props.src, videoRef);
         bottom: 0;
         height: 3px;
         will-change: width;
-        background-color: var(--background);
+        background-color: var(--presentation-background);
 
         .thumb {
           position: absolute;
@@ -505,7 +505,7 @@ useMSE(props.src, videoRef);
           cursor: pointer;
           transition: all 0.3s ease-in-out;
           transform: scale(0);
-          background-color: var(--background);
+          background-color: var(--presentation-background);
         }
       }
     }
@@ -545,7 +545,7 @@ useMSE(props.src, videoRef);
       .icon-content {
         transition: all 0.2s ease-in-out;
         opacity: 0.8;
-        color: var(--background);
+        color: var(--presentation-background);
       }
       &.loop-icon {
         font-size: 0.75rem;
@@ -573,11 +573,11 @@ useMSE(props.src, videoRef);
 
           &:hover {
             background-color: #393833;
-            color: var(--background);
+            color: var(--presentation-background);
           }
           &.active {
             font-weight: 700;
-            color: var(--background);
+            color: var(--presentation-background);
           }
         }
       }
@@ -634,7 +634,7 @@ useMSE(props.src, videoRef);
         height: 100%;
         transition: all 0.1s ease;
         will-change: width;
-        background-color: var(--background);
+        background-color: var(--presentation-background);
 
         .thumb {
           position: absolute;
@@ -648,7 +648,7 @@ useMSE(props.src, videoRef);
           cursor: pointer;
           transition: all 0.3s ease-in-out;
           transform: scale(0);
-          background-color: var(--background);
+          background-color: var(--presentation-background);
         }
       }
     }
@@ -666,7 +666,7 @@ useMSE(props.src, videoRef);
   top: 0;
   bottom: 0;
   font-size: 1.25rem;
-  color: var(--background);
+  color: var(--presentation-background);
   pointer-events: none;
 
   .bezel-icon {
@@ -710,7 +710,7 @@ useMSE(props.src, videoRef);
   top: 0;
   bottom: 0;
   font-size: 0.875rem;
-  color: var(--background);
+  color: var(--presentation-background);
   pointer-events: none;
   display: flex;
   justify-content: center;

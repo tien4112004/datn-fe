@@ -1,13 +1,13 @@
 <template>
-  <Popover class="relative flex" v-model:value="dropdownVisible" trigger="click" placement="bottom-end">
+  <Popover class="tw-relative tw-flex" v-model:value="dropdownVisible" trigger="click" placement="bottom-end">
     <div
-      class="flex cursor-pointer select-none items-center gap-1 rounded-md px-2 py-1.5 transition-colors duration-200"
+      class="tw-flex tw-cursor-pointer tw-select-none tw-items-center tw-gap-1 tw-rounded-md tw-px-2 tw-py-1.5 tw-transition-colors tw-duration-200"
       :title="$t('header.tools.changeLanguage')"
     >
-      <span class="text-base leading-none">{{ getCurrentFlag() }}</span>
+      <span class="tw-text-base tw-leading-none">{{ getCurrentFlag() }}</span>
       <svg
-        class="opacity-60 transition-all duration-200 hover:opacity-100"
-        :class="{ 'rotate-180': dropdownVisible }"
+        class="tw-opacity-60 tw-transition-all tw-duration-200 hover:tw-opacity-100"
+        :class="{ 'tw-rotate-180': dropdownVisible }"
         viewBox="0 0 16 16"
         width="12"
         height="12"
@@ -16,23 +16,23 @@
       </svg>
     </div>
     <template #content>
-      <div class="min-w-[140px]">
+      <div class="tw-min-w-[140px]">
         <div
           v-for="locale in getAvailableLocales()"
           :key="locale.code"
           @click="handleLocaleChange(locale.code)"
           :class="[
-            'flex min-w-[80px] cursor-pointer items-center gap-2 rounded px-3 py-2 text-sm transition-colors duration-200',
+            'tw-flex tw-min-w-[80px] tw-cursor-pointer tw-items-center tw-gap-2 tw-rounded tw-px-3 tw-py-2 tw-text-sm tw-transition-colors tw-duration-200',
             locale.code === currentLocale
-              ? 'bg-primary text-primary-foreground'
-              : 'hover:bg-accent hover:text-accent-foreground',
+              ? 'tw-bg-primary tw-text-primary-foreground'
+              : 'hover:tw-bg-accent hover:tw-text-accent-foreground',
           ]"
         >
-          <span class="flex-shrink-0 text-sm">{{ locale.flag }}</span>
-          <span class="flex-1 text-xs">{{ locale.name }}</span>
+          <span class="tw-flex-shrink-0 tw-text-sm">{{ locale.flag }}</span>
+          <span class="tw-flex-1 tw-text-xs">{{ locale.name }}</span>
           <svg
             v-if="locale.code === currentLocale"
-            class="flex-shrink-0 opacity-80"
+            class="tw-flex-shrink-0 tw-opacity-80"
             viewBox="0 0 16 16"
             width="12"
             height="12"

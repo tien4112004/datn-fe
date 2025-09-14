@@ -19,7 +19,7 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits);
     data-slot="slider"
     :class="
       cn(
-        'relative flex w-full touch-none select-none items-center data-[orientation=vertical]:h-full data-[orientation=vertical]:min-h-44 data-[orientation=vertical]:w-auto data-[orientation=vertical]:flex-col data-[disabled]:opacity-50',
+        'tw-relative tw-flex tw-w-full tw-touch-none tw-select-none tw-items-center data-[orientation=vertical]:tw-h-full data-[orientation=vertical]:tw-min-h-44 data-[orientation=vertical]:tw-w-auto data-[orientation=vertical]:tw-flex-col data-[disabled]:tw-opacity-50',
         props.class
       )
     "
@@ -27,11 +27,11 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits);
   >
     <SliderTrack
       data-slot="slider-track"
-      class="bg-muted relative grow overflow-hidden rounded-full data-[orientation=horizontal]:h-1.5 data-[orientation=vertical]:h-full data-[orientation=horizontal]:w-full data-[orientation=vertical]:w-1.5"
+      class="tw-bg-muted tw-relative tw-grow tw-overflow-hidden tw-rounded-full data-[orientation=horizontal]:tw-h-1.5 data-[orientation=vertical]:tw-h-full data-[orientation=horizontal]:tw-w-full data-[orientation=vertical]:tw-w-1.5"
     >
       <SliderRange
         data-slot="slider-range"
-        class="bg-primary absolute data-[orientation=horizontal]:h-full data-[orientation=vertical]:w-full"
+        class="tw-bg-primary tw-absolute data-[orientation=horizontal]:tw-h-full data-[orientation=vertical]:tw-w-full"
       />
     </SliderTrack>
 
@@ -39,7 +39,7 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits);
       v-for="(_, key) in modelValue"
       :key="key"
       data-slot="slider-thumb"
-      class="border-primary ring-ring/50 focus-visible:outline-hidden block size-4 shrink-0 rounded-full border bg-gray-100 shadow-sm transition-[color,box-shadow] hover:ring-4 focus-visible:ring-4 disabled:pointer-events-none disabled:opacity-50"
+      class="tw-border-primary tw-ring-ring/50 focus-visible:tw-outline-hidden tw-block tw-size-4 tw-shrink-0 tw-rounded-full tw-border tw-bg-gray-100 tw-shadow-sm tw-transition-[color,box-shadow] hover:tw-ring-4 focus-visible:tw-ring-4 disabled:tw-pointer-events-none disabled:tw-opacity-50"
     />
   </SliderRoot>
 </template>

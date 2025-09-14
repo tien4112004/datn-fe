@@ -96,12 +96,12 @@ table {
   word-wrap: break-word;
   user-select: none;
 
-  --themeColor: var(--primary);
-  --subThemeColor1: var(--primary);
-  --subThemeColor2: var(--primary);
+  --themeColor: var(--presentation-primary);
+  --subThemeColor1: var(--presentation-primary);
+  --subThemeColor2: var(--presentation-primary);
 
   &.theme {
-    background-color: var(--background);
+    background-color: var(--presentation-background);
 
     tr:nth-child(2n) .cell {
       background-color: var(--subThemeColor1);

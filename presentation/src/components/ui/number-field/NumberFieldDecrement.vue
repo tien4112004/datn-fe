@@ -19,13 +19,13 @@ const forwarded = useForwardProps(delegatedProps);
     v-bind="forwarded"
     :class="
       cn(
-        'absolute left-0 top-1/2 -translate-y-1/2 p-3 disabled:cursor-not-allowed disabled:opacity-20',
+        'tw-absolute tw-left-0 tw-top-1/2 tw-p-3 disabled:tw-cursor-not-allowed disabled:tw-opacity-20 -translate-y-1/2',
         props.class
       )
     "
   >
     <slot>
-      <Minus class="h-4 w-4" />
+      <Minus class="tw-h-4 tw-w-4" />
     </slot>
   </NumberFieldDecrement>
 </template>

@@ -4,17 +4,18 @@ import { cva } from 'class-variance-authority';
 export { default as Toggle } from './Toggle.vue';
 
 export const toggleVariants = cva(
-  "inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium hover:bg-muted hover:text-muted-foreground disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 [&_svg]:shrink-0 focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] outline-none transition-[color,box-shadow] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive whitespace-nowrap",
+  "tw-inline-flex tw-items-center tw-justify-center tw-gap-2 tw-rounded-md tw-text-sm tw-font-medium hover:tw-bg-muted hover:tw-text-muted-foreground disabled:tw-pointer-events-none disabled:tw-opacity-50 [&_svg]:tw-pointer-events-none [&_svg:not([class*='size-'])]:tw-size-4 [&_svg]:tw-shrink-0 focus-visible:tw-border-ring focus-visible:tw-ring-ring/50 focus-visible:tw-ring-[3px] tw-outline-none tw-transition-[color,box-shadow] aria-invalid:tw-ring-destructive/20 dark:aria-invalid:tw-ring-destructive/40 aria-invalid:tw-border-destructive tw-whitespace-nowrap",
   {
     variants: {
       variant: {
-        default: 'bg-transparent',
-        outline: 'border border-muted bg-transparent shadow-xs hover:bg-accent hover:text-accent-foreground',
+        default: 'tw-bg-transparent',
+        outline:
+          'tw-border tw-border-muted tw-bg-transparent tw-shadow-xs hover:tw-bg-accent hover:tw-text-accent-foreground',
       },
       size: {
-        default: 'h-9 px-2 min-w-9',
-        sm: 'h-8 px-1.5 min-w-8',
-        lg: 'h-10 px-2.5 min-w-10',
+        default: 'tw-h-9 tw-px-2 tw-min-w-9',
+        sm: 'tw-h-8 tw-px-1.5 tw-min-w-8',
+        lg: 'tw-h-10 tw-px-2.5 tw-min-w-10',
       },
     },
     defaultVariants: {

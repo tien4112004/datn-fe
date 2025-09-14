@@ -62,7 +62,7 @@ const turnSlide = (index: number) => {
     cursor: pointer;
 
     &:hover {
-      color: var(--primary);
+      color: var(--presentation-primary);
     }
   }
 }
@@ -82,12 +82,12 @@ const turnSlide = (index: number) => {
     margin-bottom: 12px;
 
     &:hover {
-      outline-color: var(--primary);
+      outline-color: var(--presentation-primary);
     }
 
     &.active {
       outline-width: 3px;
-      outline-color: var(--primary);
+      outline-color: var(--presentation-primary);
     }
   }
 }

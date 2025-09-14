@@ -29,7 +29,7 @@ const { redo, undo } = useHistorySnapshot();
 <style lang="scss" scoped>
 .mobile-editor-header {
   height: 50px;
-  background-color: var(--background);
+  background-color: var(--presentation-background);
   display: flex;
   justify-content: space-between;
   align-items: center;

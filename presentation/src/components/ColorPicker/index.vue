@@ -21,7 +21,7 @@
     <div class="picker-field">
       <EditableInput class="input" :value="color" @colorChange="(value) => changeColor(value)" />
       <div class="straw" @click="openEyeDropper()"><IconNeedle /></div>
-      <div class="transparent" @click="selectPresetColor('var(--foreground)00')">
+      <div class="transparent" @click="selectPresetColor('var(--presentation-foreground)00')">
         <Checkboard />
       </div>
     </div>
@@ -147,8 +147,8 @@ const getPresetColors = () => {
 };
 
 const themeColors = [
-  'var(--foreground)',
-  'var(--background)',
+  'var(--presentation-foreground)',
+  'var(--presentation-background)',
   '#eeece1',
   '#1e497b',
   '#4e81bb',
@@ -276,7 +276,7 @@ const customEyeDropper = () => {
 
   const colorBlockRef = document.createElement('div');
   colorBlockRef.style.cssText =
-    'position: absolute; top: -100px; left: -100px; width: 16px; height: 16px; border: 1px solid var(--foreground); z-index: 999';
+    'position: absolute; top: -100px; left: -100px; width: 16px; height: 16px; border: 1px solid var(--presentation-foreground); z-index: 999';
   maskRef.appendChild(colorBlockRef);
 
   const { left, top, width, height } = targetRef.getBoundingClientRect();
@@ -355,7 +355,7 @@ const customEyeDropper = () => {
 .color-picker {
   position: relative;
   width: 240px;
-  background: var(--background);
+  background: var(--presentation-background);
   user-select: none;
   margin-bottom: -10px;
 }

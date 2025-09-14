@@ -1,6 +1,6 @@
 <template>
   <div class="latex-editor">
-    <div class="container">
+    <div class="tw-container">
       <div class="left">
         <div class="input-area">
           <TextArea
@@ -166,7 +166,7 @@ const insertSymbol = (latex: string) => {
 
   textarea {
     height: 100% !important;
-    border-color: var(--border) !important;
+    border-color: var(--presentation-border) !important;
     padding: 10px !important;
     font-family: SFMono-Regular, Consolas, 'Liberation Mono', Menlo, Courier, monospace;
 
@@ -182,7 +182,7 @@ const insertSymbol = (latex: string) => {
   align-items: center;
   text-align: center;
   margin-top: 20px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--presentation-border);
   user-select: none;
 }
 .placeholder {
@@ -196,18 +196,18 @@ const insertSymbol = (latex: string) => {
   display: flex;
   justify-content: center;
   align-items: center;
-  border-radius: var(--radius);
+  border-radius: var(--presentation-radius);
 }
 .right {
   width: 300px;
   height: 100%;
   margin-left: 20px;
-  border: solid 1px var(--border);
-  background-color: var(--background);
+  border: solid 1px var(--presentation-border);
+  background-color: var(--presentation-background);
   display: flex;
   flex-direction: column;
   user-select: none;
-  border-radius: var(--radius);
+  border-radius: var(--presentation-radius);
 }
 .content {
   height: calc(100% - 40px);
@@ -233,7 +233,7 @@ const insertSymbol = (latex: string) => {
     padding: 5px;
     display: flex;
     align-items: center;
-    background-color: var(--muted);
+    background-color: var(--presentation-muted);
     cursor: pointer;
   }
 }
@@ -256,7 +256,7 @@ const insertSymbol = (latex: string) => {
   align-items: center;
 
   &:hover {
-    background-color: var(--muted);
+    background-color: var(--presentation-muted);
     cursor: pointer;
   }
 }

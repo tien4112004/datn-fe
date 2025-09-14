@@ -78,10 +78,10 @@ const applyAllSlide = () => {
   padding: 20px 0 15px 0;
   position: relative;
   cursor: pointer;
-  border-radius: var(--radius);
+  border-radius: var(--presentation-radius);
 
   &.active {
-    border-color: var(--primary);
+    border-color: var(--presentation-primary);
     z-index: 1;
   }
 
@@ -106,7 +106,7 @@ const applyAllSlide = () => {
     position: absolute;
     left: 0;
     top: 0;
-    background-color: rgba($color: var(--primary), $alpha: 0.75);
+    background-color: rgba($color: var(--presentation-primary), $alpha: 0.75);
     color: #fff;
     display: flex;
     justify-content: center;

@@ -64,7 +64,7 @@
               "
             />
             <span class="text" v-else>
-              <div class="text-content">
+              <div class="tw-text-content">
                 {{
                   element?.sectionTag
                     ? element?.sectionTag?.title || $t('thumbnails.sections.untitledSection')
@@ -75,10 +75,7 @@
           </div>
           <div
             class="thumbnail-item center"
-            :class="{
-              active: slideIndex === index,
-              selected: selectedSlidesIndex.includes(index),
-            }"
+            :class="{ active: slideIndex === index, selected: selectedSlidesIndex.includes(index) }"
             @mousedown="($event) => handleClickSlideThumbnail($event, index)"
             @dblclick="enterScreening()"
             v-contextmenu="contextmenusThumbnailItem"
@@ -421,19 +418,19 @@ const contextmenusThumbnailItem = (): ContextmenuItem[] => {
   transition:
     background-color 0.2s ease,
     box-shadow 0.2s ease;
-  border-radius: var(--radius);
-  color: var(--secondary-foreground);
-  background-color: var(--secondary);
+  border-radius: var(--presentation-radius);
+  color: var(--presentation-secondary-foreground);
+  background-color: var(--presentation-secondary);
   margin: 0.25rem;
 
   .btn {
     flex: 1;
     font-size: 0.875rem;
     font-weight: 500;
-    border-radius: var(--radius) 0 0 var(--radius);
-    background-color: var(--secondary);
+    border-radius: var(--presentation-radius) 0 0 var(--presentation-radius);
+    background-color: var(--presentation-secondary);
     &:hover {
-      background-color: var(--primary);
+      background-color: var(--presentation-primary);
     }
   }
   .select-btn {
@@ -442,10 +439,10 @@ const contextmenusThumbnailItem = (): ContextmenuItem[] => {
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: var(--secondary);
-    border-radius: 0 var(--radius) var(--radius) 0;
+    background-color: var(--presentation-secondary);
+    border-radius: 0 var(--presentation-radius) var(--presentation-radius) 0;
     &:hover {
-      background-color: var(--primary);
+      background-color: var(--presentation-primary);
     }
   }
 
@@ -469,27 +466,27 @@ const contextmenusThumbnailItem = (): ContextmenuItem[] => {
   position: relative;
 
   .thumbnail {
-    border-radius: var(--radius);
-    outline: 2px solid color-mix(in srgb, var(--primary) 15%, transparent);
+    border-radius: var(--presentation-radius);
+    outline: 2px solid color-mix(in srgb, var(--presentation-primary) 15%, transparent);
   }
 
   &.active {
     .label {
-      color: var(--primary);
+      color: var(--presentation-primary);
     }
     .thumbnail {
-      outline-color: var(--primary);
+      outline-color: var(--presentation-primary);
     }
   }
   &.selected {
     .thumbnail {
-      outline-color: var(--primary);
+      outline-color: var(--presentation-primary);
     }
     .note-flag {
-      background-color: var(--primary);
+      background-color: var(--presentation-primary);
 
       &::after {
-        border-top-color: var(--primary);
+        border-top-color: var(--presentation-primary);
       }
     }
   }
@@ -502,8 +499,8 @@ const contextmenusThumbnailItem = (): ContextmenuItem[] => {
     left: 8px;
     top: 13px;
     font-size: 8px;
-    background-color: color-mix(in srgb, var(--primary) 75%, transparent);
-    color: var(--background);
+    background-color: color-mix(in srgb, var(--presentation-primary) 75%, transparent);
+    color: var(--presentation-background);
     text-align: center;
     line-height: 12px;
     cursor: pointer;
@@ -516,7 +513,7 @@ const contextmenusThumbnailItem = (): ContextmenuItem[] => {
       top: 10px;
       left: 4px;
       border: 4px solid transparent;
-      border-top-color: color-mix(in srgb, var(--primary), 0.75);
+      border-top-color: color-mix(in srgb, var(--presentation-primary), 0.75);
     }
   }
 }
@@ -537,7 +534,7 @@ const contextmenusThumbnailItem = (): ContextmenuItem[] => {
 }
 .page-number {
   height: 40px;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--presentation-border);
   line-height: 40px;
   text-align: center;
   font-size: 0.8125rem;
@@ -550,11 +547,11 @@ const contextmenusThumbnailItem = (): ContextmenuItem[] => {
   color: #555555;
 
   &.contextmenu-active {
-    color: var(--primary);
+    color: var(--presentation-primary);
 
     .text::before {
-      border-bottom-color: var(--primary);
-      border-right-color: var(--primary);
+      border-bottom-color: var(--presentation-primary);
+      border-right-color: var(--presentation-primary);
     }
   }
 

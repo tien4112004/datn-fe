@@ -563,8 +563,8 @@ const contextmenusThumbnailItem = (): ContextmenuItem[] => {
 
   .thumbnail {
     height: 4px !important;
-    background-color: $borderColor;
-    outline-color: $borderColor !important;
+    background-color: var(--presentation-border);
+    outline-color: var(--presentation-border) !important;
   }
 }
 

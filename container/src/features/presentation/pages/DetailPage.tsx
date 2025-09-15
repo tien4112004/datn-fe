@@ -1,10 +1,14 @@
 import VueRemoteWrapper from '@/features/presentation/components/remote/VueRemoteWrapper';
 import GlobalSpinner from '@/shared/components/common/GlobalSpinner';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLoaderData } from 'react-router-dom';
+import { useLoaderData, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import type { Presentation } from '../types';
+import usePresentationStore from '../stores/usePresentationStore';
+import { usePresentationById } from '../hooks/useApi';
+import { processGeneratedSlides } from '../utils';
+import { getDefaultPresentationTheme } from '../api/mock';
 
 export interface MessageDetail {
   type: 'success' | 'error' | 'warning' | 'info' | string;
@@ -12,8 +16,59 @@ export interface MessageDetail {
 }
 
 const DetailPage = () => {
-  const { presentation } = useLoaderData() as { presentation: Presentation };
+  const { presentation: loaderPresentation } = useLoaderData() as { presentation: Presentation };
+  const { id } = useParams<{ id: string }>();
+  const [presentation, setPresentation] = useState<Presentation>(loaderPresentation);
+  const [isProcessing, setIsProcessing] = useState(false);
+
   const { t } = useTranslation('loading');
+  const generatedPresentation = usePresentationStore((state) => state.generatedPresentation);
+  const clearGeneratedPresentation = usePresentationStore((state) => state.clearGeneratedPresentation);
+  const { refetch } = usePresentationById(id);
+
+  // Process generated presentation if needed
+  useEffect(() => {
+    const processPresentation = async () => {
+      if (
+        generatedPresentation &&
+        (!presentation.isParsed || presentation.id === generatedPresentation.presentation.id)
+      ) {
+        setIsProcessing(true);
+        try {
+          const viewport = {
+            size: 1000,
+            ratio: 9 / 16,
+          };
+
+          const theme = getDefaultPresentationTheme();
+          const processedSlides = await processGeneratedSlides(
+            generatedPresentation.aiResult,
+            viewport,
+            theme
+          );
+
+          const processedPresentation = {
+            ...generatedPresentation.presentation,
+            slides: processedSlides,
+            isParsed: true,
+          };
+
+          setPresentation(processedPresentation);
+          clearGeneratedPresentation();
+        } catch (error) {
+          console.error('Error processing generated presentation:', error);
+          toast.error('Failed to process presentation');
+        } finally {
+          setIsProcessing(false);
+        }
+      } else if (!presentation.isParsed && !generatedPresentation) {
+        // If presentation is not parsed and no generated data, refetch from API
+        refetch();
+      }
+    };
+
+    processPresentation();
+  }, [generatedPresentation, presentation.isParsed, presentation.id, clearGeneratedPresentation, refetch]);
 
   const handleMessage = useCallback((event: CustomEvent<MessageDetail>) => {
     const { type, message } = event.detail;
@@ -41,6 +96,10 @@ const DetailPage = () => {
       window.removeEventListener('app.message', handleMessage);
     };
   }, [handleMessage]);
+
+  if (isProcessing) {
+    return <GlobalSpinner text="Processing presentation..." />;
+  }
 
   return (
     <VueRemoteWrapper

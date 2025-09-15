@@ -29,8 +29,9 @@ export default defineConfig(({ mode }) => {
         manifest: true,
         filename: 'remoteEntry.js',
         exposes: {
-          './Editor': './src/mount.ts',
-          './ThumbnailSlide': './src/demo/mount.ts',
+          './Editor': './src/mount/appMount.ts',
+          './ThumbnailSlide': './src/mount/thumbnailMount.ts',
+          './convertToSlide': './src/mount/layoutMount.ts',
         },
       }),
       Icons({ compiler: 'vue3' }),

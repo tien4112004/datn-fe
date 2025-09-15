@@ -331,24 +331,30 @@ export default class PresentationMockService implements PresentationApiService {
     return new Promise((resolve) => {
       setTimeout(() => {
         const mockSlides = getMockSlideData();
+        const presentation = {
+          id: crypto.randomUUID(),
+          title: `Generated Presentation`,
+          slides: [
+            {
+              id: crypto.randomUUID(),
+              elements: [],
+              background: {
+                type: 'solid' as const,
+                color: '#ffffff',
+              },
+            },
+          ],
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          isParsed: false,
+        };
+
+        // Add the new presentation to the mock list
+        mockPresentationItems = [{ ...presentation }, ...mockPresentationItems];
+
         const responses: PresentationGenerationResponse = {
           aiResult: mockSlides,
-          presentation: {
-            id: crypto.randomUUID(),
-            title: `Generated Presentation`,
-            slides: [
-              {
-                id: crypto.randomUUID(),
-                elements: [],
-                background: {
-                  type: 'solid' as const,
-                  color: '#ffffff',
-                },
-              },
-            ],
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          },
+          presentation: presentation,
         };
 
         resolve(responses);

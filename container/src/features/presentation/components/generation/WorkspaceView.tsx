@@ -21,10 +21,11 @@ import type { OutlineData } from '@/features/presentation/types/outline';
 import useFetchStreamingOutline from '@/features/presentation/hooks/useFetchStreaming';
 // import { useOutlineContext } from '../../context/OutlineContext';
 import useOutlineStore from '@/features/presentation/stores/useOutlineStore';
+import usePresentationStore from '@/features/presentation/stores/usePresentationStore';
 import { useModels } from '@/features/model';
 import { useGeneratePresentation } from '@/features/presentation/hooks/useApi';
-import { processGeneratedSlides } from '@/features/presentation/utils';
-import { getDefaultPresentationTheme } from '../../api/mock';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 type OutlineFormData = {
   topic: string;
@@ -49,6 +50,7 @@ const WorkspaceView = ({ initialOutlineData }: WorkspaceViewProps) => {
   // const { outlineItems, refetch, isFetching } = usePresentationOutlines();
   // const { content, setContent } = useOutlineContext();
   const { t } = useTranslation('presentation', { keyPrefix: 'workspace' });
+  const navigate = useNavigate();
 
   // API
   const {
@@ -61,7 +63,7 @@ const WorkspaceView = ({ initialOutlineData }: WorkspaceViewProps) => {
   } = useFetchStreamingOutline(initialOutlineData);
 
   if (error) {
-    throw new Error(`Error fetching outline: ${error}`);
+    toast.error('Error generating outline. Please try again.');
   }
 
   //   // STORE
@@ -73,6 +75,10 @@ const WorkspaceView = ({ initialOutlineData }: WorkspaceViewProps) => {
 
   // PRESENTATION GENERATION
   const generatePresentationMutation = useGeneratePresentation();
+
+  // PRESENTATION STORE
+  const setGeneratedPresentation = usePresentationStore((state) => state.setGeneratedPresentation);
+  const setIsGenerating = usePresentationStore((state) => state.setIsGenerating);
 
   // OUTLINE FORM
   const { control: outlineControl, handleSubmit: handleRegenerateSubmit } = useForm<OutlineFormData>({
@@ -111,8 +117,19 @@ const WorkspaceView = ({ initialOutlineData }: WorkspaceViewProps) => {
     restartStream(data);
   };
 
+  //   const onSubmitPresentation = (_data: CustomizationFormData) => {
+  //     // const fullData = {
+  //     //   ...data,
+  //     //   content,
+  //     // };
+  //     // const fullData = mapOutlineItemsToMarkdown(content);
+  //     const fullData = markdownContent();
+  //     console.log('Form data:', fullData);
+  //   };
+
   const onSubmitPresentation = async (data: CustomizationFormData) => {
     try {
+      setIsGenerating(true);
       const outline = markdownContent();
 
       const generationRequest = {
@@ -124,18 +141,12 @@ const WorkspaceView = ({ initialOutlineData }: WorkspaceViewProps) => {
 
       const generatedPresentation = await generatePresentationMutation.mutateAsync(generationRequest);
 
-      const viewport = {
-        size: '16:9',
-        ratio: 16 / 9,
-      };
+      setGeneratedPresentation(generatedPresentation);
 
-      const theme = getDefaultPresentationTheme();
-
-      const processedSlides = await processGeneratedSlides(generatedPresentation.aiResult, viewport, theme);
-
-      console.log('Generated presentation slides:', processedSlides);
+      navigate(`/presentation/${generatedPresentation.presentation.id}`);
     } catch (error) {
       console.error('Error generating presentation:', error);
+      setIsGenerating(false);
       // TODO: Show error notification to user
     }
   };
@@ -162,7 +173,7 @@ const WorkspaceView = ({ initialOutlineData }: WorkspaceViewProps) => {
           watch={watch}
           setValue={setValue}
           onSubmit={handleCustomizationSubmit(onSubmitPresentation)}
-          isGenerating={generatePresentationMutation.isPending}
+          isGenerating={usePresentationStore((state) => state.isGenerating)}
         />
       </div>
     </div>

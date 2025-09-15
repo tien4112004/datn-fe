@@ -7,7 +7,7 @@ function useFetchStreamingOutline(initialRequestData: OutlineData) {
   const presentationApiService = usePresentationApiService();
 
   return useStreaming<OutlineData, OutlineItem[]>({
-    extractFn: presentationApiService.getStreamedOutline,
+    extractFn: presentationApiService.getStreamedOutline.bind(presentationApiService),
     transformFn: splitMarkdownToOutlineItems,
     input: initialRequestData,
     queryKey: [presentationApiService.getType(), 'presentationOutline'],

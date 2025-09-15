@@ -1,8 +1,8 @@
 import { createApp } from 'vue';
 import { createPinia } from 'pinia';
-import icon from './plugins/icon';
-import directive from './plugins/directive/index';
-import App from './App.vue';
+import icon from '../plugins/icon';
+import directive from '../plugins/directive/index';
+import App from '../App.vue';
 import 'prosemirror-view/style/prosemirror.css';
 import 'animate.css';
 import '@/assets/styles/tailwind.css';

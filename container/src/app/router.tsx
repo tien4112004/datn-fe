@@ -39,9 +39,7 @@ const router = createBrowserRouter([
       {
         path: 'presentation/:id',
         Component: Presentation.DetailPage,
-        loader: async ({ params }) => {
-          return await getPresentationById(params.id);
-        },
+        loader: getPresentationById,
       },
       {
         path: 'presentation/create',

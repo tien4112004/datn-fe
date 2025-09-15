@@ -3,6 +3,7 @@
   "title": "Tondeptraivcl",
   "width": 1000,
   "height": 562.5,
+  "isParsed": true,
   "theme": {
     "themeColors": ["rgb(96, 84, 111)"],
     "fontColor": "rgb(51, 51, 51)",

@@ -1,7 +1,7 @@
 import type { SlideTheme } from '@/features/presentation/types/slide';
 
 export interface SlideViewport {
-  size: string;
+  size: number;
   ratio: number;
 }
 
@@ -21,21 +21,20 @@ export const processGeneratedSlides = async (
   viewport: SlideViewport,
   theme: SlideTheme
 ): Promise<any[]> => {
-  // This will be implemented to call the convertToSlide utility from the presentation package
-  // For now, we'll return the data structure that matches what the presentation editor expects
+  const convertToSlide = await import('vueRemote/convertToSlide').then((mod) => mod.default);
 
   const processedSlides = [];
 
   for (const slideData of generatedData) {
     // Process each slide according to its type
-    const processedSlide = {
-      id: crypto.randomUUID(),
-      type: slideData.type,
-      title: slideData.title,
-      data: slideData.data,
-      viewport,
-      theme,
-    };
+    const processedSlide = await convertToSlide(
+      slideData,
+      {
+        size: viewport.size,
+        ratio: viewport.ratio,
+      },
+      theme
+    );
 
     processedSlides.push(processedSlide);
   }

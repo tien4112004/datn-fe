@@ -106,7 +106,7 @@ const applyAllSlide = () => {
     position: absolute;
     left: 0;
     top: 0;
-    background-color: rgba($color: var(--presentation-primary), $alpha: 0.75);
+    background-color: color-mix(in srgb, var(--presentation-primary) 75%, transparent);
     color: #fff;
     display: flex;
     justify-content: center;

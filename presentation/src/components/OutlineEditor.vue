@@ -1,5 +1,5 @@
 <template>
-  <div class="tw-outline-editor">
+  <div class="outline-editor">
     <div
       class="item"
       :class="[{ title: item.title }, `lv-${item.lv}`]"

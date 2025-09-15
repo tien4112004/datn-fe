@@ -8,7 +8,7 @@ const props = defineProps<{
 </script>
 
 <template>
-  <li data-slot="breadcrumb-item" :class="cn('tw-items-center tw-gap-1.5 inline-flex', props.class)">
+  <li data-slot="breadcrumb-item" :class="cn('tw-items-center tw-gap-1.5 tw-inline-flex', props.class)">
     <slot />
   </li>
 </template>

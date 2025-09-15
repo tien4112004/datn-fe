@@ -66,7 +66,7 @@ onMounted(() => {
 .menu {
   height: 50px;
   position: relative;
-  box-shadow: 0 -2px 4px 0 rgba($color: #333, $alpha: 0.05);
+  box-shadow: 0 -2px 4px 0 rgba(51, 51, 51, 0.05);
   background: #fff;
   display: flex;
   justify-content: center;

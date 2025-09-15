@@ -9,7 +9,7 @@
       height: elementInfo.height + 'px',
     }"
   >
-    <div class="tw-rotate-wrapper" :style="{ transform: `rotate(${elementInfo.rotate}deg)` }">
+    <div class="rotate-wrapper" :style="{ transform: `rotate(${elementInfo.rotate}deg)` }">
       <div
         class="element-content"
         :style="{

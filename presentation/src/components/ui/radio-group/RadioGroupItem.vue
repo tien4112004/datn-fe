@@ -29,7 +29,7 @@ const forwardedProps = useForwardProps(delegatedProps);
       class="tw-relative tw-flex tw-items-center tw-justify-center"
     >
       <CircleIcon
-        class="tw-fill-primary tw-absolute tw-left-1/2 tw-top-1/2 tw-size-2 -translate-x-1/2 -translate-y-1/2"
+        class="tw-fill-primary tw-absolute tw-left-1/2 tw-top-1/2 tw-size-2 tw--translate-x-1/2 tw--translate-y-1/2"
       />
     </RadioGroupIndicator>
   </RadioGroupItem>

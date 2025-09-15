@@ -3,12 +3,12 @@
     ref="textareaRef"
     v-model="modelValue"
     :class="[
-      'duration-250 tw-box-border tw-w-full tw-resize-none tw-rounded-md tw-border tw-border-gray-300 tw-leading-relaxed tw-outline-none transition-colors',
-      'tw-text-base font-sans',
-      'focus:tw-shadow-none focus:tw-outline-none focus:border-blue-500',
-      'disabled:tw-bg-gray-100 disabled:tw-text-gray-500 disabled:border-gray-300',
-      'placeholder:text-gray-500',
-      { 'resize-y': resizable },
+      'tw-duration-250 tw-box-border tw-w-full tw-resize-none tw-rounded-md tw-border tw-border-gray-300 tw-leading-relaxed tw-outline-none tw-transition-colors',
+      'tw-text-base tw-font-sans',
+      'focus:tw-shadow-none focus:tw-outline-none focus:tw-border-blue-500',
+      'disabled:tw-bg-gray-100 disabled:tw-text-gray-500 disabled:tw-border-gray-300',
+      'placeholder:tw-text-gray-500',
+      { 'tw-resize-y': resizable },
     ]"
     :disabled="disabled"
     :rows="rows"

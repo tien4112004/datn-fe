@@ -6,30 +6,39 @@
     v-contextmenu="contextmenusThumbnails"
     padding="normal"
   >
-    <div class="add-slide">
-      <div class="btn center" @click="createSlide()">
-        <IconPlus class="icon" />{{ $t('thumbnails.slides.addSlide') }}
-      </div>
-      <Divider type="vertical" :margin="0" />
-      <Popover trigger="click" placement="bottom-start" v-model:value="presetLayoutPopoverVisible" center>
-        <template #content>
-          <Templates
-            @select="
-              (slide) => {
-                createSlideByTemplate(slide);
-                presetLayoutPopoverVisible = false;
-              }
-            "
-            @selectAll="
-              (slides) => {
-                insertAllTemplates(slides);
-                presetLayoutPopoverVisible = false;
-              }
-            "
-          />
-        </template>
-        <div class="select-btn"><IconDown /></div>
-      </Popover>
+    <div class="tw-w-full tw-flex tw-justify-center tw-items-center tw-mb-1">
+      <ButtonGroup
+        class="tw-flex tw-gap-[1px] tw-h-10 tw-cursor-pointer tw-rounded-md tw-text-sm tw-transition-all tw-duration-200 tw-ease-in-out"
+      >
+        <Button
+          class="tw-w-32 tw-bg-secondary tw-text-secondary-foreground hover:tw-bg-primary hover:tw-text-primary-foreground tw-flex tw-flex-1 tw-items-center tw-justify-center tw-text-sm tw-font-medium tw-transition-colors tw-border-0"
+          @click="createSlide()"
+        >
+          <IconPlus class="tw-h-3.5 tw-w-3.5" />{{ $t('thumbnails.slides.addSlide') }}
+        </Button>
+        <Popover trigger="click" placement="bottom-start" v-model:value="presetLayoutPopoverVisible" center>
+          <template #content>
+            <Templates
+              @select="
+                (slide) => {
+                  createSlideByTemplate(slide);
+                  presetLayoutPopoverVisible = false;
+                }
+              "
+              @selectAll="
+                (slides) => {
+                  insertAllTemplates(slides);
+                  presetLayoutPopoverVisible = false;
+                }
+              "
+            />
+          </template>
+          <Button
+            class="tw-bg-secondary tw-text-secondary-foreground hover:tw-bg-primary hover:tw-text-primary-foreground tw-flex tw-items-center tw-justify-center tw-transition-colors tw-border-0"
+            ><IconDown class="tw-h-3.5 tw-w-3.5"
+          /></Button>
+        </Popover>
+      </ButtonGroup>
     </div>
 
     <Draggable
@@ -64,7 +73,7 @@
               "
             />
             <span class="text" v-else>
-              <div class="tw-text-content">
+              <div class="text-content">
                 {{
                   element?.sectionTag
                     ? element?.sectionTag?.title || $t('thumbnails.sections.untitledSection')
@@ -125,6 +134,8 @@ import Draggable from 'vuedraggable';
 import Divider from '@/components/Divider.vue';
 import Card from '@/components/Card.vue';
 import { useI18n } from 'vue-i18n';
+import ButtonGroup from '@/components/ButtonGroup.vue';
+import Button from '@/components/Button.vue';
 const { t } = useI18n();
 const mainStore = useMainStore();
 const slidesStore = useSlidesStore();
@@ -409,51 +420,6 @@ const contextmenusThumbnailItem = (): ContextmenuItem[] => {
   }
 }
 
-.add-slide {
-  height: 40px;
-  font-size: 0.8125rem;
-  display: flex;
-  flex-shrink: 0;
-  cursor: pointer;
-  transition:
-    background-color 0.2s ease,
-    box-shadow 0.2s ease;
-  border-radius: var(--presentation-radius);
-  color: var(--presentation-secondary-foreground);
-  background-color: var(--presentation-secondary);
-  margin: 0.25rem;
-
-  .btn {
-    flex: 1;
-    font-size: 0.875rem;
-    font-weight: 500;
-    border-radius: var(--presentation-radius) 0 0 var(--presentation-radius);
-    background-color: var(--presentation-secondary);
-    &:hover {
-      background-color: var(--presentation-primary);
-    }
-  }
-  .select-btn {
-    width: 30px;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: var(--presentation-secondary);
-    border-radius: 0 var(--presentation-radius) var(--presentation-radius) 0;
-    &:hover {
-      background-color: var(--presentation-primary);
-    }
-  }
-
-  .icon {
-    margin-right: 3px;
-    font-size: 14px !important;
-    width: 14px !important;
-    height: 14px !important;
-    display: inline-block;
-  }
-}
 .thumbnail-list {
   flex: 1;
   overflow: auto;

@@ -113,7 +113,8 @@ const save = () => {
   margin-top: 12px;
 }
 .thumbnail {
-  border: 1px solid rgba($color: var(--presentation-primary), $alpha: 0.15);
+  border: 1px solid color-mix(in srgb, var(--presentation-primary) 15%, transparent);
+
   margin-top: 5px;
   border-radius: var(--presentation-radius);
 }

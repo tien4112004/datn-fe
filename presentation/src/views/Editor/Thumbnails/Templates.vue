@@ -118,6 +118,7 @@ onMounted(() => {
   padding-right: 10px;
   border-right: 1px solid var(--presentation-border);
   overflow: auto;
+  font-size: 0.8rem;
 
   .catalog {
     padding: 7px 8px;
@@ -130,7 +131,7 @@ onMounted(() => {
 
     &.active {
       color: var(--presentation-primary);
-      background-color: rgba($color: var(--presentation-primary), $alpha: 0.05);
+      background-color: color-mix(in srgb, var(--presentation-primary) 5%, transparent);
       border-right: 2px solid var(--presentation-primary);
       font-weight: 700;
     }
@@ -177,7 +178,7 @@ onMounted(() => {
 
     &.active {
       color: var(--presentation-primary);
-      background-color: rgba($color: var(--presentation-primary), $alpha: 0.05);
+      background-color: color-mix(in srgb, var(--presentation-primary) 5%, transparent);
       font-weight: 700;
     }
 
@@ -223,7 +224,7 @@ onMounted(() => {
     justify-content: center;
     align-items: center;
     display: flex;
-    background-color: rgba($color: var(--presentation-foreground), $alpha: 0.25);
+    background-color: color-mix(in srgb, var(--presentation-background) 80%, transparent);
     opacity: 0;
     transition: opacity 0.2s;
   }

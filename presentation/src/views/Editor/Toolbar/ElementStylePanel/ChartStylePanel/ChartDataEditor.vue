@@ -406,7 +406,7 @@ const changeSelectRange = (e: MouseEvent) => {
   position: absolute;
   top: 0;
   left: 0;
-  background-color: rgba($color: #888, $alpha: 0.3);
+  background-color: rgba(136, 136, 136, 0.3);
 }
 .range-line {
   width: 0;
@@ -471,7 +471,7 @@ table {
     height: 32px;
 
     &.head {
-      background-color: rgba($color: var(--presentation-primary), $alpha: 0.08);
+      background-color: color-mix(in srgb, var(--presentation-primary) 8%, transparent);
     }
   }
   .item {

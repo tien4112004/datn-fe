@@ -82,7 +82,7 @@ watch(slideIndex, () => {
   white-space: nowrap;
   overflow-x: auto;
   overflow-y: hidden;
-  background-color: rgba($color: #000, $alpha: 0.75);
+  background-color: rgba(0, 0, 0, 0.75);
   position: relative;
 }
 .thumbnail {

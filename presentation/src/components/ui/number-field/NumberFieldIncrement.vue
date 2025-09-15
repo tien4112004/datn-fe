@@ -19,7 +19,7 @@ const forwarded = useForwardProps(delegatedProps);
     v-bind="forwarded"
     :class="
       cn(
-        'tw-absolute tw-right-0 tw-top-1/2 tw-p-3 disabled:tw-cursor-not-allowed disabled:tw-opacity-20 -translate-y-1/2',
+        'tw-absolute tw-right-0 tw-top-1/2 tw--translate-y-1/2 tw-p-3 disabled:tw-cursor-not-allowed disabled:tw-opacity-20',
         props.class
       )
     "

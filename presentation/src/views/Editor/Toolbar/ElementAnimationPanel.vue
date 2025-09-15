@@ -422,15 +422,15 @@ $attentionColor: #e8b76a;
 
   &.in .type-title {
     border-left-color: $inColor;
-    background-color: rgba($color: $inColor, $alpha: 0.15);
+    background-color: rgba(104, 164, 144, 0.15);
   }
   &.out .type-title {
     border-left-color: $outColor;
-    background-color: rgba($color: $outColor, $alpha: 0.15);
+    background-color: rgba(216, 99, 68, 0.15);
   }
   &.attention .type-title {
     border-left-color: $attentionColor;
-    background-color: rgba($color: $attentionColor, $alpha: 0.15);
+    background-color: rgba(232, 183, 106, 0.15);
   }
 }
 .pool-type:not(:last-child) {

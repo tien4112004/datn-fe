@@ -225,14 +225,14 @@ const close = () => {
   align-items: center;
   cursor: pointer;
 
-  &.active {
-    background-color: rgba($color: var(--presentation-primary), $alpha: 0.1);
+  &.primary {
+    background-color: color-mix(in srgb, var(--presentation-primary) 10%, transparent);
   }
-  &.group-active {
-    background-color: rgba($color: var(--presentation-primary), $alpha: 0.2);
+  &.secondary {
+    background-color: color-mix(in srgb, var(--presentation-primary) 20%, transparent);
   }
-  &:hover {
-    background-color: rgba($color: var(--presentation-primary), $alpha: 0.25);
+  &.tertiary {
+    background-color: color-mix(in srgb, var(--presentation-primary) 25%, transparent);
   }
 
   .name {

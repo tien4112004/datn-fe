@@ -26,10 +26,10 @@ const forwarded = useForwardPropsEmits(props, emits);
       :class="
         cn(
           `group/drawer-content tw-bg-background tw-fixed tw-z-50 tw-flex tw-h-auto tw-flex-col`,
-          `data-[vaul-drawer-direction=top]:tw-top-0 data-[vaul-drawer-direction=top]:tw-mb-24 data-[vaul-drawer-direction=top]:tw-max-h-[80vh] data-[vaul-drawer-direction=top]:tw-rounded-b-lg data-[vaul-drawer-direction=top]:inset-x-0`,
-          `data-[vaul-drawer-direction=bottom]:tw-bottom-0 data-[vaul-drawer-direction=bottom]:tw-mt-24 data-[vaul-drawer-direction=bottom]:tw-max-h-[80vh] data-[vaul-drawer-direction=bottom]:tw-rounded-t-lg data-[vaul-drawer-direction=bottom]:inset-x-0`,
-          `data-[vaul-drawer-direction=right]:tw-right-0 data-[vaul-drawer-direction=right]:tw-w-3/4 data-[vaul-drawer-direction=right]:inset-y-0 data-[vaul-drawer-direction=right]:sm:max-w-sm`,
-          `data-[vaul-drawer-direction=left]:tw-left-0 data-[vaul-drawer-direction=left]:tw-w-3/4 data-[vaul-drawer-direction=left]:inset-y-0 data-[vaul-drawer-direction=left]:sm:max-w-sm`,
+          `data-[vaul-drawer-direction=top]:tw-top-0 data-[vaul-drawer-direction=top]:tw-mb-24 data-[vaul-drawer-direction=top]:tw-max-h-[80vh] data-[vaul-drawer-direction=top]:tw-rounded-b-lg data-[vaul-drawer-direction=top]:tw-inset-x-0`,
+          `data-[vaul-drawer-direction=bottom]:tw-bottom-0 data-[vaul-drawer-direction=bottom]:tw-mt-24 data-[vaul-drawer-direction=bottom]:tw-max-h-[80vh] data-[vaul-drawer-direction=bottom]:tw-rounded-t-lg data-[vaul-drawer-direction=bottom]:tw-inset-x-0`,
+          `data-[vaul-drawer-direction=right]:tw-right-0 data-[vaul-drawer-direction=right]:tw-w-3/4 data-[vaul-drawer-direction=right]:tw-inset-y-0 data-[vaul-drawer-direction=right]:sm:tw-max-w-sm`,
+          `data-[vaul-drawer-direction=left]:tw-left-0 data-[vaul-drawer-direction=left]:tw-w-3/4 data-[vaul-drawer-direction=left]:tw-inset-y-0 data-[vaul-drawer-direction=left]:sm:tw-max-w-sm`,
           props.class
         )
       "

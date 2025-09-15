@@ -166,7 +166,7 @@ const changeTime = (e: FocusEvent | KeyboardEvent, type: 'minute' | 'second') =>
   width: 54px;
   height: 54px;
   border-radius: 50%;
-  background-color: rgba($color: var(--presentation-primary), $alpha: 0.05);
+  background-color: color-mix(in srgb, var(--presentation-primary) 5%, transparent);
   overflow: hidden;
 
   input {

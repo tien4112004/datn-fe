@@ -618,7 +618,7 @@ const toFixed = (num: number) => {
     justify-content: center;
     align-items: center;
     display: flex;
-    background-color: rgba($color: var(--presentation-foreground), $alpha: 0.25);
+    background-color: color-mix(in srgb, var(--presentation-foreground) 25%, transparent);
     opacity: 0;
     transition: opacity 0.2s;
   }
@@ -629,7 +629,7 @@ const toFixed = (num: number) => {
   border-radius: var(--presentation-radius);
 
   &:not(.selected):hover {
-    background-color: rgba($color: var(--presentation-primary), $alpha: 0.05);
+    background-color: color-mix(in srgb, var(--presentation-primary) 5%, transparent);
     cursor: pointer;
   }
 

@@ -110,7 +110,7 @@ const markerSize = computed(() => {
     position: absolute;
     top: 0;
     bottom: 0;
-    background-color: rgba($color: var(--presentation-primary), $alpha: 0.1);
+    background-color: color-mix(in srgb, var(--presentation-primary) 10%, transparent);
   }
 
   .ruler-marker-100 {
@@ -161,7 +161,7 @@ const markerSize = computed(() => {
     position: absolute;
     left: 0;
     right: 0;
-    background-color: rgba($color: var(--presentation-primary), $alpha: 0.1);
+    background-color: color-mix(in srgb, var(--presentation-primary) 10%, transparent);
   }
 
   .ruler-marker-100 {

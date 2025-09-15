@@ -378,7 +378,7 @@ const emitBatchRichTextCommand = (action: RichTextAction[]) => {
   &:hover {
     border-color: var(--presentation-primary);
     color: var(--presentation-primary);
-    background-color: rgba($color: var(--presentation-primary), $alpha: 0.05);
+    background-color: color-mix(in srgb, var(--presentation-primary) 5%, transparent);
   }
 
   &:last-child {

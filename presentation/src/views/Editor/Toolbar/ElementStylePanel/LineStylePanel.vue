@@ -169,7 +169,7 @@ const updateLine = (props: Partial<PPTLineElement>) => {
   border-radius: var(--presentation-radius);
 
   &:not(.selected):hover {
-    background-color: rgba($color: var(--presentation-primary), $alpha: 0.05);
+    background-color: color-mix(in srgb, var(--presentation-primary) 5%, transparent);
     cursor: pointer;
   }
 

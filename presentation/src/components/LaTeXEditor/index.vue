@@ -1,6 +1,6 @@
 <template>
   <div class="latex-editor">
-    <div class="tw-container">
+    <div class="container">
       <div class="left">
         <div class="input-area">
           <TextArea

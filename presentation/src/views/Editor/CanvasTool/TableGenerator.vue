@@ -125,7 +125,7 @@ td {
   border: 1px solid #dcdcdc;
 
   &.active {
-    background-color: rgba($color: var(--presentation-primary), $alpha: 0.1);
+    background-color: color-mix(in srgb, var(--presentation-primary) 10%, transparent);
     border-color: var(--presentation-primary);
   }
 }

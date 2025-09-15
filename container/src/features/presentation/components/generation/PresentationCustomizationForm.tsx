@@ -163,23 +163,6 @@ const ImageModelSection = ({ control }: ImageModelSectionProps) => {
             showProviderLogo={true}
           />
         )}
-        // render={({ field }) => (
-        //   <Select value={field.value} onValueChange={field.onChange}>
-        //     <SelectTrigger className="bg-card w-fit">
-        //       <SelectValue placeholder={tOutline('modelPlaceholder')} />
-        //     </SelectTrigger>
-        //     <SelectContent>
-        //       <SelectGroup>
-        //         <SelectLabel>{tOutline('modelLabel')}</SelectLabel>
-        //         {models?.map((modelOption) => (
-        //           <SelectItem key={modelOption.id} value={modelOption.name}>
-        //             {modelOption.displayName}
-        //           </SelectItem>
-        //         ))}
-        //       </SelectGroup>
-        //     </SelectContent>
-        //   </Select>
-        // )}
       />
     </CardContent>
   );

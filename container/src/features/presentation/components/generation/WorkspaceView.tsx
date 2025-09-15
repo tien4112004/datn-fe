@@ -22,6 +22,9 @@ import useFetchStreamingOutline from '@/features/presentation/hooks/useFetchStre
 // import { useOutlineContext } from '../../context/OutlineContext';
 import useOutlineStore from '@/features/presentation/stores/useOutlineStore';
 import { useModels } from '@/features/model';
+import { useGeneratePresentation } from '@/features/presentation/hooks/useApi';
+import { processGeneratedSlides } from '@/features/presentation/utils';
+import { getDefaultPresentationTheme } from '../../api/mock';
 
 type OutlineFormData = {
   topic: string;
@@ -68,6 +71,9 @@ const WorkspaceView = ({ initialOutlineData }: WorkspaceViewProps) => {
   const startStream = useOutlineStore((state) => state.startStreaming);
   const endStream = useOutlineStore((state) => state.endStreaming);
 
+  // PRESENTATION GENERATION
+  const generatePresentationMutation = useGeneratePresentation();
+
   // OUTLINE FORM
   const { control: outlineControl, handleSubmit: handleRegenerateSubmit } = useForm<OutlineFormData>({
     defaultValues: initialOutlineData,
@@ -105,14 +111,33 @@ const WorkspaceView = ({ initialOutlineData }: WorkspaceViewProps) => {
     restartStream(data);
   };
 
-  const onSubmitPresentation = (_data: CustomizationFormData) => {
-    // const fullData = {
-    //   ...data,
-    //   content,
-    // };
-    // const fullData = mapOutlineItemsToMarkdown(content);
-    const fullData = markdownContent();
-    console.log('Form data:', fullData);
+  const onSubmitPresentation = async (data: CustomizationFormData) => {
+    try {
+      const outline = markdownContent();
+
+      const generationRequest = {
+        outline,
+        theme: data.theme,
+        contentLength: data.contentLength,
+        imageModel: data.imageModel,
+      };
+
+      const generatedPresentation = await generatePresentationMutation.mutateAsync(generationRequest);
+
+      const viewport = {
+        size: '16:9',
+        ratio: 16 / 9,
+      };
+
+      const theme = getDefaultPresentationTheme();
+
+      const processedSlides = await processGeneratedSlides(generatedPresentation.aiResult, viewport, theme);
+
+      console.log('Generated presentation slides:', processedSlides);
+    } catch (error) {
+      console.error('Error generating presentation:', error);
+      // TODO: Show error notification to user
+    }
   };
 
   return (
@@ -137,6 +162,7 @@ const WorkspaceView = ({ initialOutlineData }: WorkspaceViewProps) => {
           watch={watch}
           setValue={setValue}
           onSubmit={handleCustomizationSubmit(onSubmitPresentation)}
+          isGenerating={generatePresentationMutation.isPending}
         />
       </div>
     </div>
@@ -265,28 +291,6 @@ const OutlineFormSection = ({
                 label={t('modelLabel')}
               />
             )}
-            // render={({ field }) => (
-            //   <Select value={field.value} onValueChange={field.onChange}>
-            //     <SelectTrigger className="bg-card w-fit">
-            //       <SelectValue placeholder={t('modelPlaceholder')} />
-            //     </SelectTrigger>
-            //     <SelectContent>
-            //       <SelectGroup>
-            //         <SelectLabel>{t('modelLabel')}</SelectLabel>
-            //         {models?.map((modelOption) => (
-            //           <SelectItem
-            //             key={modelOption.id}
-            //             value={modelOption.name}
-            //             disabled={!modelOption.enabled}
-            //             className={!modelOption.enabled ? 'opacity-50' : ''}
-            //           >
-            //             {modelOption.displayName}
-            //           </SelectItem>
-            //         ))}
-            //       </SelectGroup>
-            //     </SelectContent>
-            //   </Select>
-            // )}
           />
         </div>
       </div>
@@ -341,18 +345,25 @@ interface CustomizationSectionProps {
   watch: any;
   setValue: any;
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+  isGenerating?: boolean;
 }
 
-const CustomizationSection = ({ control, watch, setValue, onSubmit }: CustomizationSectionProps) => {
+const CustomizationSection = ({
+  control,
+  watch,
+  setValue,
+  onSubmit,
+  isGenerating,
+}: CustomizationSectionProps) => {
   const { t } = useTranslation('presentation', { keyPrefix: 'workspace' });
 
   return (
     <form className="flex flex-col gap-4" onSubmit={onSubmit}>
       <div className="scroll-m-20 text-xl font-semibold tracking-tight">{t('customizeSection')}</div>
       <PresentationCustomizationForm control={control} watch={watch} setValue={setValue} />
-      <Button className="mt-5" type="submit">
+      <Button className="mt-5" type="submit" disabled={isGenerating}>
         <Sparkles />
-        {t('generatePresentation')}
+        {isGenerating ? 'Generating...' : t('generatePresentation')}
       </Button>
     </form>
   );

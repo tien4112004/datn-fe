@@ -5,8 +5,159 @@ import {
   type PresentationApiService,
   type Presentation,
   type PresentationCollectionRequest,
+  type PresentationGenerationRequest,
+  type PresentationGenerationResponse,
 } from '../types';
 import type { ApiResponse } from '@/types/api';
+import type { SlideData } from '../utils';
+import type { SlideTheme } from '../types/slide';
+
+/**
+ * Default theme configuration for generated presentations
+ */
+export const getDefaultPresentationTheme = (): SlideTheme => ({
+  backgroundColor: '#ffffff',
+  themeColors: ['#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6'],
+  fontColor: '#333333',
+  fontName: 'Roboto',
+  outline: {
+    style: 'solid',
+    width: 1,
+    color: '#cccccc',
+  },
+  shadow: {
+    h: 2,
+    v: 2,
+    blur: 4,
+    color: 'rgba(0, 0, 0, 0.1)',
+  },
+  titleFontColor: '#0A2540',
+  titleFontName: 'Roboto',
+});
+
+/**
+ * Mock data for testing presentation generation
+ * This matches the structure from the original handleClick function
+ */
+export const getMockSlideData = (): SlideData[] => [
+  {
+    type: 'title',
+    data: {
+      title: 'Presentation with really long title',
+    },
+  },
+  {
+    type: 'title',
+    data: {
+      title: 'Presentation with really long title',
+      subtitle:
+        'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+    },
+  },
+  {
+    type: 'two_column_with_image',
+    title: 'Presentation',
+    data: {
+      items: [
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. ',
+        'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. ',
+      ],
+      image: 'https://placehold.co/600x400',
+    },
+  },
+  {
+    type: 'two_column_with_big_image',
+    title: 'Presentation',
+    data: {
+      items: [
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. ',
+        'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. ',
+      ],
+      image: 'https://placehold.co/600x400',
+    },
+  },
+  {
+    type: 'main_image',
+    data: {
+      image: 'https://placehold.co/600x400',
+      content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+    },
+  },
+  {
+    type: 'two_column',
+    data: {
+      title: 'this is a title',
+      items1: [
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+      ],
+      items2: [
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+      ],
+    },
+  },
+  {
+    type: 'table_of_contents',
+    data: {
+      items: [
+        'What & Why of Microservices',
+        'Monolith vs Microservices',
+        'Service Design Principles',
+        'Communication & Data',
+        'Deployment & Scaling',
+        'Observability & Resilience',
+        'Security & Governance',
+        'Case Study & Q&A',
+      ],
+    },
+  },
+  {
+    type: 'vertical_list',
+    title: 'This is a title',
+    data: {
+      items: [
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+        'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+        'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+      ],
+    },
+  },
+  {
+    type: 'horizontal_list',
+    title: 'Five Fundamentals of Microservices',
+    data: {
+      items: [
+        {
+          label: 'Boundaries',
+          content: 'Define services around business capabilities and domains.',
+        },
+        {
+          label: 'APIs',
+          content: 'Use clear contracts (REST/gRPC) and versioning.',
+        },
+        {
+          label: 'Data',
+          content: 'Own your data; avoid shared databases.',
+        },
+        {
+          label: 'Delivery',
+          content: 'Automate CI/CD per service for rapid iteration.',
+        },
+        {
+          label: 'Observe',
+          content: 'Centralize logs, metrics, and traces for each service.',
+        },
+      ],
+    },
+  },
+];
 
 const mockOutlineOutput = `\`\`\`markdown
 ### The Amazing World of Artificial Intelligence!
@@ -173,6 +324,35 @@ export default class PresentationMockService implements PresentationApiService {
           },
         });
       }, 500);
+    });
+  }
+
+  async generatePresentation(_: PresentationGenerationRequest): Promise<PresentationGenerationResponse> {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const mockSlides = getMockSlideData();
+        const responses: PresentationGenerationResponse = {
+          aiResult: mockSlides,
+          presentation: {
+            id: crypto.randomUUID(),
+            title: `Generated Presentation`,
+            slides: [
+              {
+                id: crypto.randomUUID(),
+                elements: [],
+                background: {
+                  type: 'solid' as const,
+                  color: '#ffffff',
+                },
+              },
+            ],
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          },
+        };
+
+        resolve(responses);
+      }, 1000);
     });
   }
 }

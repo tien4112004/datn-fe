@@ -5,6 +5,8 @@ import {
   type Presentation,
   type OutlineData,
   type PresentationCollectionRequest,
+  type PresentationGenerationRequest,
+  type PresentationGenerationResponse,
 } from '../types';
 import { splitMarkdownToOutlineItems } from '../utils';
 import { api } from '@/shared/api';
@@ -119,7 +121,7 @@ export default class PresentationRealApiService implements PresentationApiServic
   }
 
   async getPresentations(request: PresentationCollectionRequest): Promise<ApiResponse<Presentation[]>> {
-    const response = await api.get<ApiResponse<Presentation[]>>('api/presentations', {
+    const response = await api.get<ApiResponse<Presentation[]>>(`${this.baseUrl}/api/presentations`, {
       params: {
         page: (request.page || 0) + 1,
         pageSize: request.pageSize,
@@ -135,13 +137,24 @@ export default class PresentationRealApiService implements PresentationApiServic
   }
 
   async createPresentation(data: Presentation): Promise<Presentation> {
-    const response = await api.post<ApiResponse<Presentation>>('/api/presentations', data);
+    const response = await api.post<ApiResponse<Presentation>>(`${this.baseUrl}/api/presentations`, data);
     return this._mapPresentationItem(response.data.data);
   }
 
   async getPresentationById(id: string): Promise<Presentation | null> {
-    const response = await api.get<ApiResponse<Presentation>>(`/api/presentations/${id}`);
+    const response = await api.get<ApiResponse<Presentation>>(`${this.baseUrl}/api/presentations/${id}`);
     return this._mapPresentationItem(response.data.data);
+  }
+
+  async generatePresentation(
+    request: PresentationGenerationRequest
+  ): Promise<PresentationGenerationResponse> {
+    const response = await api.post<ApiResponse<PresentationGenerationResponse>>(
+      `${this.baseUrl}/api/presentations/generate/batch`,
+      request
+    );
+
+    return response.data.data;
   }
 
   _mapPresentationItem(data: any): Presentation {

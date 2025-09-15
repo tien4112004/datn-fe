@@ -2,7 +2,7 @@ import { useQuery, useMutation, type UseQueryResult } from '@tanstack/react-quer
 import type { SortingState, PaginationState, Updater } from '@tanstack/react-table';
 import { usePresentationApiService } from '../api';
 import { useEffect, useState } from 'react';
-import type { Presentation, OutlineItem } from '../types';
+import type { Presentation, OutlineItem, PresentationGenerationRequest } from '../types';
 import type { ApiResponse } from '@/shared/types/api';
 
 // Return types for the hooks
@@ -165,6 +165,17 @@ export const useCreateBlankPresentation = () => {
       });
 
       return { presentation };
+    },
+  });
+};
+
+export const useGeneratePresentation = () => {
+  const presentationApiService = usePresentationApiService();
+
+  return useMutation({
+    mutationFn: async (request: PresentationGenerationRequest) => {
+      const generatedSlides = await presentationApiService.generatePresentation(request);
+      return generatedSlides;
     },
   });
 };

@@ -33,7 +33,7 @@
 
       <div
         :class="[
-          'tw-absolute tw-right-1 tw-top-1/2 tw-flex tw--translate-y-1/2 tw-transform tw-flex-col tw-gap-px tw-transition-opacity tw-duration-200',
+          'tw-flex tw-transform tw-flex-col tw-gap-px tw-transition-opacity tw-duration-200',
           disabled ? 'tw-hidden' : 'tw-opacity-0 group-hover:tw-opacity-100',
         ]"
       >

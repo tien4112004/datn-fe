@@ -148,37 +148,34 @@
         @dblclick="toggleTextFormatPainter(true)"
         ><IconFormatBrush
       /></CheckboxButton>
-      <Popover
-        placement="bottom-end"
-        trigger="click"
-        v-model:value="linkPopoverVisible"
-        style="width: 33.33%"
-      >
-        <template #content>
-          <div class="link-popover">
-            <Input v-model="link" :placeholder="t('elements.text.editor.enterHyperlink')" />
-            <div class="btns">
-              <Button
-                size="small"
-                :disabled="!richTextAttrs.link"
-                @click="removeLink()"
-                style="margin-right: 5px"
-                >{{ t('elements.text.editor.remove') }}</Button
-              >
-              <Button size="small" type="primary" @click="updateLink(link)">{{
-                $t('elements.text.editor.confirm')
-              }}</Button>
+      <div class="tw-flex-1">
+        <Popover placement="bottom-end" trigger="click" v-model:value="linkPopoverVisible">
+          <template #content>
+            <div class="link-popover">
+              <Input v-model="link" :placeholder="t('elements.text.editor.enterHyperlink')" />
+              <div class="btns">
+                <Button
+                  size="small"
+                  :disabled="!richTextAttrs.link"
+                  @click="removeLink()"
+                  style="margin-right: 5px"
+                  >{{ t('elements.text.editor.remove') }}</Button
+                >
+                <Button size="small" type="primary" @click="updateLink(link)">{{
+                  $t('elements.text.editor.confirm')
+                }}</Button>
+              </div>
             </div>
-          </div>
-        </template>
-        <CheckboxButton
-          style="width: 100%"
-          :checked="!!richTextAttrs.link"
-          v-tooltip="$t('elements.text.editor.hyperlink')"
-          @click="openLinkPopover()"
-          ><IconLinkOne
-        /></CheckboxButton>
-      </Popover>
+          </template>
+          <CheckboxButton
+            class="tw-w-full"
+            :checked="!!richTextAttrs.link"
+            v-tooltip="$t('elements.text.editor.hyperlink')"
+            @click="openLinkPopover()"
+            ><IconLinkOne
+          /></CheckboxButton>
+        </Popover>
+      </div>
     </ButtonGroup>
     <Divider />
 

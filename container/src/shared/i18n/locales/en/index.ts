@@ -136,6 +136,7 @@ export default {
       viewDetails: 'View Details',
       edit: 'Edit',
       delete: 'Delete',
+      rename: 'Rename',
     },
     actions: 'Actions',
     rowsPerPage: 'Rows per page',

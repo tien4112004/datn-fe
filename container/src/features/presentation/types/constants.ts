@@ -31,6 +31,9 @@ export interface TargetAgeOption {
   labelKey: string;
 }
 
+/**
+ * @deprecated This component is deprecated and will be removed in a future version.
+ */
 export const TARGET_AGE_OPTIONS: TargetAgeOption[] = [
   { value: '3-5', labelKey: 'targetAge.preschool' },
   { value: '5-7', labelKey: 'targetAge.earlyElementary' },

@@ -24,6 +24,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { ModelSelect } from '@/components/common/ModelSelect';
 import { useModels } from '@/features/model';
+import type { UnifiedFormData } from '../../hooks';
 
 type CustomizationFormData = {
   theme: string;
@@ -69,7 +70,7 @@ const ThemeSection = ({ selectedTheme, onThemeSelect }: ThemeSectionProps) => {
         <CardTitle>{t('themeTitle')}</CardTitle>
         <CardDescription>{t('themeDescription')}</CardDescription>
         <CardAction>
-          <Button variant="ghost" size="sm" className="shadow-none">
+          <Button variant="ghost" size="sm" className="shadow-none" type="button">
             <Palette className="h-4 w-4" />
             {t('viewMore')}
           </Button>
@@ -181,4 +182,60 @@ const PresentationCustomizationForm = ({ control, watch, setValue }: Presentatio
   );
 };
 
+interface CustomizationSectionProps {
+  control: Control<UnifiedFormData>;
+  watch: any;
+  setValue: any;
+  onGeneratePresentation: () => void;
+  isGenerating: boolean;
+}
+
+const CustomizationSection = ({
+  control,
+  watch,
+  setValue,
+  onGeneratePresentation,
+  isGenerating,
+}: CustomizationSectionProps) => {
+  const { t } = useTranslation('presentation', { keyPrefix: 'workspace' });
+  const { t: tCustomization } = useTranslation('presentation', { keyPrefix: 'customization' });
+  const { t: tOutline } = useTranslation('presentation', { keyPrefix: 'createOutline' });
+  const { models } = useModels();
+
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="scroll-m-20 text-xl font-semibold tracking-tight">{t('customizeSection')}</div>
+      <Card className="w-full max-w-3xl">
+        <ThemeSection selectedTheme={watch('theme')} onThemeSelect={(theme) => setValue('theme', theme)} />
+        <ContentSection
+          selectedContentLength={watch('contentLength')}
+          onContentLengthSelect={(length) => setValue('contentLength', length)}
+        />
+        <CardContent className="flex flex-row items-center gap-2">
+          <CardTitle>{tCustomization('imageModelsTitle')}</CardTitle>
+          <Controller
+            name="imageModel"
+            control={control}
+            render={({ field }) => (
+              <ModelSelect
+                models={models}
+                value={field.value}
+                onValueChange={field.onChange}
+                placeholder={tOutline('modelPlaceholder')}
+                label={tOutline('modelLabel')}
+                showProviderLogo={true}
+              />
+            )}
+          />
+        </CardContent>
+      </Card>
+      <Button className="mt-5" type="button" onClick={onGeneratePresentation} disabled={isGenerating}>
+        <Sparkles />
+        {isGenerating ? 'Generating...' : t('generatePresentation')}
+      </Button>
+    </div>
+  );
+};
+
 export default PresentationCustomizationForm;
+export { ImageModelSection, ContentSection, ThemeSection, CustomizationSection };

@@ -1,5 +1,6 @@
 import '@testing-library/jest-dom';
 import '@testing-library/user-event';
+import { vi } from 'vitest';
 
 // Mock window.scrollTo for jsdom compatibility
 Object.defineProperty(window, 'scrollTo', {
@@ -30,3 +31,18 @@ global.ResizeObserver = class ResizeObserver {
   unobserve() {}
   disconnect() {}
 };
+
+// Mock Vue Remote modules for module federation
+const mockMount = vi.fn();
+
+vi.mock('/src/features/presentation/components/remote/module', () => {
+  return {
+    moduleMap: {
+      editor: vi.fn().mockResolvedValue({ mount: mockMount }),
+      thumbnail: vi.fn().mockResolvedValue({ mount: mockMount }),
+    },
+    moduleMethodMap: {
+      convertToSlide: vi.fn().mockResolvedValue({ default: vi.fn().mockResolvedValue({ success: true }) }),
+    },
+  };
+});

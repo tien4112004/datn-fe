@@ -6,6 +6,7 @@ export { default as OutlineWorkspace } from './generation/OutlineWorkspace';
 export { default as PresentationCustomizationForm } from './generation/PresentationCustomizationForm';
 export { default as PresentationTable } from './table/PresentationTable';
 export { default as WorkspaceView } from './generation/WorkspaceView';
+export { default as WorkspaceView2 } from './generation/WorkspaceView2';
 export * from './generation/WorkspaceView';
 export * from './generation/OutlineCreationView';
 export * from './generation/OutlineCard';

@@ -21,11 +21,7 @@ import type { OutlineData } from '@/features/presentation/types/outline';
 import useFetchStreamingOutline from '@/features/presentation/hooks/useFetchStreaming';
 // import { useOutlineContext } from '../../context/OutlineContext';
 import useOutlineStore from '@/features/presentation/stores/useOutlineStore';
-import usePresentationStore from '@/features/presentation/stores/usePresentationStore';
 import { useModels } from '@/features/model';
-import { useGeneratePresentation } from '@/features/presentation/hooks/useApi';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'sonner';
 
 type OutlineFormData = {
   topic: string;
@@ -50,7 +46,6 @@ const WorkspaceView = ({ initialOutlineData }: WorkspaceViewProps) => {
   // const { outlineItems, refetch, isFetching } = usePresentationOutlines();
   // const { content, setContent } = useOutlineContext();
   const { t } = useTranslation('presentation', { keyPrefix: 'workspace' });
-  const navigate = useNavigate();
 
   // API
   const {
@@ -63,7 +58,7 @@ const WorkspaceView = ({ initialOutlineData }: WorkspaceViewProps) => {
   } = useFetchStreamingOutline(initialOutlineData);
 
   if (error) {
-    toast.error('Error generating outline. Please try again.');
+    throw new Error(`Error fetching outline: ${error}`);
   }
 
   //   // STORE
@@ -72,13 +67,6 @@ const WorkspaceView = ({ initialOutlineData }: WorkspaceViewProps) => {
   const setContent = useOutlineStore((state) => state.setContent);
   const startStream = useOutlineStore((state) => state.startStreaming);
   const endStream = useOutlineStore((state) => state.endStreaming);
-
-  // PRESENTATION GENERATION
-  const generatePresentationMutation = useGeneratePresentation();
-
-  // PRESENTATION STORE
-  const setGeneratedPresentation = usePresentationStore((state) => state.setGeneratedPresentation);
-  const setIsGenerating = usePresentationStore((state) => state.setIsGenerating);
 
   // OUTLINE FORM
   const { control: outlineControl, handleSubmit: handleRegenerateSubmit } = useForm<OutlineFormData>({
@@ -117,38 +105,14 @@ const WorkspaceView = ({ initialOutlineData }: WorkspaceViewProps) => {
     restartStream(data);
   };
 
-  //   const onSubmitPresentation = (_data: CustomizationFormData) => {
-  //     // const fullData = {
-  //     //   ...data,
-  //     //   content,
-  //     // };
-  //     // const fullData = mapOutlineItemsToMarkdown(content);
-  //     const fullData = markdownContent();
-  //     console.log('Form data:', fullData);
-  //   };
-
-  const onSubmitPresentation = async (data: CustomizationFormData) => {
-    try {
-      setIsGenerating(true);
-      const outline = markdownContent();
-
-      const generationRequest = {
-        outline,
-        theme: data.theme,
-        contentLength: data.contentLength,
-        imageModel: data.imageModel,
-      };
-
-      const generatedPresentation = await generatePresentationMutation.mutateAsync(generationRequest);
-
-      setGeneratedPresentation(generatedPresentation);
-
-      navigate(`/presentation/${generatedPresentation.presentation.id}`);
-    } catch (error) {
-      console.error('Error generating presentation:', error);
-      setIsGenerating(false);
-      // TODO: Show error notification to user
-    }
+  const onSubmitPresentation = (_data: CustomizationFormData) => {
+    // const fullData = {
+    //   ...data,
+    //   content,
+    // };
+    // const fullData = mapOutlineItemsToMarkdown(content);
+    const fullData = markdownContent();
+    console.log('Form data:', fullData);
   };
 
   return (
@@ -173,7 +137,6 @@ const WorkspaceView = ({ initialOutlineData }: WorkspaceViewProps) => {
           watch={watch}
           setValue={setValue}
           onSubmit={handleCustomizationSubmit(onSubmitPresentation)}
-          isGenerating={usePresentationStore((state) => state.isGenerating)}
         />
       </div>
     </div>
@@ -302,6 +265,28 @@ const OutlineFormSection = ({
                 label={t('modelLabel')}
               />
             )}
+            // render={({ field }) => (
+            //   <Select value={field.value} onValueChange={field.onChange}>
+            //     <SelectTrigger className="bg-card w-fit">
+            //       <SelectValue placeholder={t('modelPlaceholder')} />
+            //     </SelectTrigger>
+            //     <SelectContent>
+            //       <SelectGroup>
+            //         <SelectLabel>{t('modelLabel')}</SelectLabel>
+            //         {models?.map((modelOption) => (
+            //           <SelectItem
+            //             key={modelOption.id}
+            //             value={modelOption.name}
+            //             disabled={!modelOption.enabled}
+            //             className={!modelOption.enabled ? 'opacity-50' : ''}
+            //           >
+            //             {modelOption.displayName}
+            //           </SelectItem>
+            //         ))}
+            //       </SelectGroup>
+            //     </SelectContent>
+            //   </Select>
+            // )}
           />
         </div>
       </div>
@@ -356,25 +341,18 @@ interface CustomizationSectionProps {
   watch: any;
   setValue: any;
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
-  isGenerating?: boolean;
 }
 
-const CustomizationSection = ({
-  control,
-  watch,
-  setValue,
-  onSubmit,
-  isGenerating,
-}: CustomizationSectionProps) => {
+const CustomizationSection = ({ control, watch, setValue, onSubmit }: CustomizationSectionProps) => {
   const { t } = useTranslation('presentation', { keyPrefix: 'workspace' });
 
   return (
     <form className="flex flex-col gap-4" onSubmit={onSubmit}>
       <div className="scroll-m-20 text-xl font-semibold tracking-tight">{t('customizeSection')}</div>
       <PresentationCustomizationForm control={control} watch={watch} setValue={setValue} />
-      <Button className="mt-5" type="submit" disabled={isGenerating}>
+      <Button className="mt-5" type="submit">
         <Sparkles />
-        {isGenerating ? 'Generating...' : t('generatePresentation')}
+        {t('generatePresentation')}
       </Button>
     </form>
   );

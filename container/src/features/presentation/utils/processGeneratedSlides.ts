@@ -1,4 +1,5 @@
 import type { SlideTheme } from '@/features/presentation/types/slide';
+import { moduleMethodMap } from '../components/remote/module';
 
 export interface SlideViewport {
   size: number;
@@ -21,7 +22,7 @@ export const processGeneratedSlides = async (
   viewport: SlideViewport,
   theme: SlideTheme
 ): Promise<any[]> => {
-  const convertToSlide = await import('vueRemote/convertToSlide').then((mod) => mod.default);
+  const convertToSlide = await moduleMethodMap['convertToSlide']().then((mod) => mod.default);
 
   const processedSlides = [];
 

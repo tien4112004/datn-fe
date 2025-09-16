@@ -14,7 +14,7 @@ import {
   SelectValue,
 } from '@/shared/components/ui/select';
 import ExamplePrompts from './ExamplePrompts';
-import { SLIDE_COUNT_OPTIONS, LANGUAGE_OPTIONS, TARGET_AGE_OPTIONS } from '@/features/presentation/types';
+import { SLIDE_COUNT_OPTIONS, LANGUAGE_OPTIONS } from '@/features/presentation/types';
 import type { OutlineData } from '@/features/presentation/types';
 import type { ModelOption } from '@/features/model';
 import { ModelSelect } from '@/components/common/ModelSelect';
@@ -130,27 +130,7 @@ const OutlineCreationView = ({
                       </Select>
                     )}
                   />
-                  <Controller
-                    name="targetAge"
-                    control={control}
-                    render={({ field }) => (
-                      <Select value={field.value} onValueChange={field.onChange}>
-                        <SelectTrigger className="w-fit">
-                          <SelectValue placeholder={t('targetAge.placeholder')} />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectGroup>
-                            <SelectLabel>{t('targetAge.label')}</SelectLabel>
-                            {TARGET_AGE_OPTIONS.map((ageOption) => (
-                              <SelectItem key={ageOption.value} value={ageOption.value}>
-                                {t(ageOption.labelKey)}
-                              </SelectItem>
-                            ))}
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
-                    )}
-                  />
+
                   <Controller
                     name="model"
                     control={control}

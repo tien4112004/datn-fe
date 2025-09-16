@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { OutlineCreationView, WorkspaceView } from '@/features/presentation/components';
+import { OutlineCreationView, WorkspaceView2 } from '@/features/presentation/components';
 import { useModels } from '@/features/model';
 import type { OutlineData } from '@/features/presentation/types';
 
@@ -43,7 +43,7 @@ const PresentationOutlinePage = () => {
           isLoadingModels={isLoadingModels}
         />
       ) : (
-        <WorkspaceView initialOutlineData={outlineData} />
+        <WorkspaceView2 initialOutlineData={outlineData} />
       )}
     </>
   );

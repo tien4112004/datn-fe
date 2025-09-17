@@ -15,15 +15,18 @@ import { Download, Loader, Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import useOutlineStore from '@/features/presentation/stores/useOutlineStore';
 import { Card } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 
 type OutlineWorkspaceProps = {
   onDownload?: () => Promise<void>;
+  totalSlide: number;
 };
 
-const OutlineWorkspace = ({ onDownload }: OutlineWorkspaceProps) => {
+const OutlineWorkspace = ({ onDownload, totalSlide }: OutlineWorkspaceProps) => {
   const deleteContent = useOutlineStore((state) => state.deleteOutline);
   const contentIds = useOutlineStore((state) => state.outlineIds);
   const addContent = useOutlineStore((state) => state.addOutline);
+  const isStreaming = useOutlineStore((state) => state.isStreaming);
   const swap = useOutlineStore((state) => state.swap);
   const { t } = useTranslation('outlineWorkspace');
   const [isDownloading, setIsDownloading] = useState(false);
@@ -88,6 +91,14 @@ const OutlineWorkspace = ({ onDownload }: OutlineWorkspaceProps) => {
         </div>
       )}
 
+      {isStreaming && (
+        <div className="flex flex-col gap-2">
+          {Array.from({ length: totalSlide - contentIds.length }).map((_, index) => (
+            <Skeleton key={'skeleton-slide-' + index} className="h-12 w-full" />
+          ))}
+        </div>
+      )}
+
       {/* Add button */}
       <Button
         variant={'outline'}
@@ -99,7 +110,6 @@ const OutlineWorkspace = ({ onDownload }: OutlineWorkspaceProps) => {
         <Plus className="h-4 w-4" />
         {t('addOutlineCard')}
       </Button>
-
       <div className="flex w-full items-center justify-between">
         <div>
           {contentIds.length} {t('outlineCards')}

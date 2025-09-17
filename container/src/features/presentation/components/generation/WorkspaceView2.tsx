@@ -183,6 +183,8 @@ const OutlineFormSection = ({
 
 const OutlineSection = () => {
   const { t } = useTranslation('presentation', { keyPrefix: 'workspace' });
+  const { watch } = usePresentationForm();
+  const slideCount = watch('slideCount', 10);
 
   return (
     <div className="flex flex-col gap-4">
@@ -191,6 +193,7 @@ const OutlineSection = () => {
         onDownload={async () => {
           await new Promise((resolve) => setTimeout(resolve, 2000));
         }}
+        totalSlide={slideCount}
       />
     </div>
   );

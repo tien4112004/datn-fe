@@ -1,34 +1,22 @@
 import { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import useFormPersist from 'react-hook-form-persist';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useGeneratePresentation } from '@/features/presentation/hooks/useApi';
 import useFetchStreamingOutline from '@/features/presentation/hooks/useFetchStreaming';
 import useOutlineStore from '@/features/presentation/stores/useOutlineStore';
 import usePresentationStore from '@/features/presentation/stores/usePresentationStore';
-import type { OutlineData } from '@/features/presentation/types/outline';
+import { usePresentationForm } from '@/features/presentation/contexts/PresentationFormContext';
 
-type UnifiedFormData = {
-  // Outline fields
-  topic: string;
-  slideCount: number;
-  language: string;
-  model: string;
-  targetAge: string;
-  learningObjective: string;
-  // Customization fields
-  theme: string;
-  contentLength: string;
-  imageModel: string;
-};
+interface UseWorkspaceProps {}
 
-interface UseWorkspaceProps {
-  initialOutlineData: OutlineData;
-}
-
-export const useWorkspace = ({ initialOutlineData }: UseWorkspaceProps) => {
+export const useWorkspace = ({}: UseWorkspaceProps) => {
   const navigate = useNavigate();
+
+  // Form context
+  const { trigger, getValues, watch } = usePresentationForm();
+
+  // Get current form data for streaming
+  const formData = watch();
 
   // Streaming API
   const {
@@ -38,7 +26,14 @@ export const useWorkspace = ({ initialOutlineData }: UseWorkspaceProps) => {
     stopStream,
     restartStream,
     clearContent,
-  } = useFetchStreamingOutline(initialOutlineData);
+  } = useFetchStreamingOutline({
+    topic: formData.topic,
+    slideCount: formData.slideCount,
+    language: formData.language,
+    model: formData.model,
+    targetAge: formData.targetAge,
+    learningObjective: formData.learningObjective,
+  });
 
   // Stores
   const setContent = useOutlineStore((state) => state.setContent);
@@ -50,24 +45,6 @@ export const useWorkspace = ({ initialOutlineData }: UseWorkspaceProps) => {
   const setGeneratedPresentation = usePresentationStore((state) => state.setGeneratedPresentation);
   const setIsGenerating = usePresentationStore((state) => state.setIsGenerating);
   const isGenerating = usePresentationStore((state) => state.isGenerating);
-
-  // Form management with persistence
-  const { control, watch, setValue, trigger, getValues, reset } = useForm<UnifiedFormData>({
-    defaultValues: {
-      ...initialOutlineData,
-      theme: '',
-      contentLength: '',
-      imageModel: '',
-    },
-  });
-
-  // Persist unified form data
-  useFormPersist('presentation-unified-form', {
-    watch,
-    setValue,
-    storage: window.localStorage,
-    exclude: [],
-  });
 
   // Handle streaming errors
   if (error) {
@@ -143,14 +120,9 @@ export const useWorkspace = ({ initialOutlineData }: UseWorkspaceProps) => {
     stopStream,
     clearContent,
 
-    // Form controls
-    control,
-    watch,
-    setValue,
+    // Form handlers
     handleRegenerateOutline,
     handleGeneratePresentation,
     isGenerating,
   };
 };
-
-export type { UnifiedFormData };

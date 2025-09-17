@@ -1,6 +1,6 @@
 import { Button } from '@/shared/components/ui/button';
 import { useTranslation } from 'react-i18next';
-import { Controller, type Control } from 'react-hook-form';
+import { Controller } from 'react-hook-form';
 import { RotateCcw, Square, Trash2 } from 'lucide-react';
 import OutlineWorkspace from './OutlineWorkspace';
 import { AutosizeTextarea } from '@/shared/components/ui/autosize-textarea';
@@ -16,30 +16,25 @@ import {
 import { ModelSelect } from '@/components/common/ModelSelect';
 import { LANGUAGE_OPTIONS, SLIDE_COUNT_OPTIONS } from '@/features/presentation/types';
 import { useModels } from '@/features/model';
-import type { OutlineData } from '@/features/presentation/types/outline';
-import { useWorkspace, type UnifiedFormData } from '@/features/presentation/hooks/useWorkspace';
+import { useWorkspace } from '@/features/presentation/hooks/useWorkspace';
+import { usePresentationForm } from '@/features/presentation/contexts/PresentationFormContext';
 import { CustomizationSection } from './PresentationCustomizationForm';
 
-interface WorkspaceView2Props {
-  initialOutlineData: OutlineData;
-}
+interface WorkspaceView2Props {}
 
-const WorkspaceView2 = ({ initialOutlineData }: WorkspaceView2Props) => {
+const WorkspaceView2 = ({}: WorkspaceView2Props) => {
   const { t } = useTranslation('presentation', { keyPrefix: 'workspace' });
+
+  const { control, watch, setValue } = usePresentationForm();
 
   const {
     isStreaming,
     stopStream,
     clearContent,
-    control,
-    watch,
-    setValue,
     handleRegenerateOutline,
     handleGeneratePresentation,
     isGenerating,
-  } = useWorkspace({
-    initialOutlineData,
-  });
+  } = useWorkspace({});
 
   return (
     <div className="flex min-h-[calc(100vh-1rem)] w-full max-w-3xl flex-col items-center justify-center self-center p-8">
@@ -50,7 +45,6 @@ const WorkspaceView2 = ({ initialOutlineData }: WorkspaceView2Props) => {
 
         <form className="flex flex-col gap-4" onSubmit={(e) => e.preventDefault()}>
           <OutlineFormSection
-            control={control}
             isFetching={isStreaming}
             stopStream={stopStream}
             clearContent={clearContent}
@@ -73,7 +67,6 @@ const WorkspaceView2 = ({ initialOutlineData }: WorkspaceView2Props) => {
 };
 
 interface OutlineFormSectionProps {
-  control: Control<UnifiedFormData>;
   isFetching: boolean;
   stopStream: () => void;
   clearContent: () => void;
@@ -81,7 +74,6 @@ interface OutlineFormSectionProps {
 }
 
 const OutlineFormSection = ({
-  control,
   isFetching,
   stopStream,
   clearContent,
@@ -89,6 +81,7 @@ const OutlineFormSection = ({
 }: OutlineFormSectionProps) => {
   const { t } = useTranslation('presentation', { keyPrefix: 'createOutline' });
   const { models } = useModels();
+  const { control } = usePresentationForm();
 
   return (
     <div className="flex flex-col gap-4">

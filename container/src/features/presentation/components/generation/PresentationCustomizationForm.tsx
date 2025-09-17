@@ -24,7 +24,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { ModelSelect } from '@/components/common/ModelSelect';
 import { useModels } from '@/features/model';
-import type { UnifiedFormData } from '../../hooks';
+import type { UnifiedFormData } from '../../contexts/PresentationFormContext';
 
 type CustomizationFormData = {
   theme: string;

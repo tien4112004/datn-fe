@@ -1,6 +1,6 @@
 import { Button } from '@/shared/components/ui/button';
 import { useTranslation } from 'react-i18next';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller } from 'react-hook-form';
 import { Sparkles } from 'lucide-react';
 import { Card, CardContent, CardTitle } from '@/shared/components/ui/card';
 import { AutosizeTextarea } from '@/shared/components/ui/autosize-textarea';
@@ -15,37 +15,26 @@ import {
 } from '@/shared/components/ui/select';
 import ExamplePrompts from './ExamplePrompts';
 import { SLIDE_COUNT_OPTIONS, LANGUAGE_OPTIONS } from '@/features/presentation/types';
-import type { OutlineData } from '@/features/presentation/types';
 import type { ModelOption } from '@/features/model';
 import { ModelSelect } from '@/components/common/ModelSelect';
+import { usePresentationForm } from '@/features/presentation/contexts/PresentationFormContext';
 
 interface OutlineCreationViewProps {
   defaultModel?: ModelOption;
   models?: ModelOption[];
-  onCreateOutline: (outlineData: OutlineData) => void;
+  onCreateOutline: () => void;
   isLoadingModels: boolean;
   isErrorModels: boolean;
 }
 
 const OutlineCreationView = ({
   models,
-  defaultModel,
   onCreateOutline,
   isLoadingModels,
   isErrorModels,
 }: OutlineCreationViewProps) => {
   const { t } = useTranslation('presentation', { keyPrefix: 'createOutline' });
-
-  const { control, handleSubmit, setValue, watch } = useForm<OutlineData>({
-    defaultValues: {
-      topic: '',
-      slideCount: 10,
-      language: 'en',
-      model: defaultModel?.name || '',
-      targetAge: '7-10',
-      learningObjective: 'something',
-    },
-  });
+  const { control, setValue, watch, trigger } = usePresentationForm();
 
   const topicValue = watch('topic');
 
@@ -53,8 +42,18 @@ const OutlineCreationView = ({
     setValue('topic', example);
   };
 
-  const onSubmit = (data: OutlineData) => {
-    onCreateOutline(data);
+  const handleSubmit = async () => {
+    const isValid = await trigger([
+      'topic',
+      'slideCount',
+      'language',
+      'model',
+      'targetAge',
+      'learningObjective',
+    ]);
+    if (isValid) {
+      onCreateOutline();
+    }
   };
 
   return (
@@ -62,7 +61,13 @@ const OutlineCreationView = ({
       <h1 className="text-3xl font-bold leading-10 text-neutral-900">{t('title')}</h1>
       <h2 className="text-xl font-bold leading-10 text-sky-500/80">{t('subtitle')}</h2>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="w-full">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleSubmit();
+        }}
+        className="w-full"
+      >
         <Card className="w-full">
           <CardContent>
             <div className="flex flex-col gap-4">

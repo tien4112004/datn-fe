@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { OutlineCreationView, WorkspaceView2 } from '@/features/presentation/components';
+import { OutlineCreationView, WorkspaceView } from '@/features/presentation/components';
 import { PresentationFormProvider } from '@/features/presentation/contexts/PresentationFormContext';
 import { useSearchParams } from 'react-router-dom';
 import useOutlineStore from '../stores/useOutlineStore';
@@ -50,7 +50,7 @@ const PresentationOutlinePage = () => {
       {currentView === PresentationViewState.OUTLINE_CREATION ? (
         <OutlineCreationView onCreateOutline={handleCreateOutline} />
       ) : (
-        <WorkspaceView2 />
+        <WorkspaceView />
       )}
     </PresentationFormProvider>
   );

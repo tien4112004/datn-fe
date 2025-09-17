@@ -41,18 +41,20 @@ interface PresentationCustomizationFormProps {
 interface ThemeSectionProps {
   selectedTheme: string;
   onThemeSelect: (theme: string) => void;
+  disabled?: boolean;
 }
 
 interface ContentSectionProps {
   selectedContentLength: string;
   onContentLengthSelect: (length: string) => void;
+  disabled?: boolean;
 }
 
 interface ImageModelSectionProps {
   control: Control<CustomizationFormData>;
 }
 
-const ThemeSection = ({ selectedTheme, onThemeSelect }: ThemeSectionProps) => {
+const ThemeSection = ({ selectedTheme, onThemeSelect, disabled = false }: ThemeSectionProps) => {
   const { t } = useTranslation('presentation', { keyPrefix: 'customization' });
 
   const themes = [
@@ -70,7 +72,7 @@ const ThemeSection = ({ selectedTheme, onThemeSelect }: ThemeSectionProps) => {
         <CardTitle>{t('themeTitle')}</CardTitle>
         <CardDescription>{t('themeDescription')}</CardDescription>
         <CardAction>
-          <Button variant="ghost" size="sm" className="shadow-none" type="button">
+          <Button variant="ghost" size="sm" className="shadow-none" type="button" disabled={disabled}>
             <Palette className="h-4 w-4" />
             {t('viewMore')}
           </Button>
@@ -81,8 +83,8 @@ const ThemeSection = ({ selectedTheme, onThemeSelect }: ThemeSectionProps) => {
           {themes.map((theme) => (
             <div
               key={theme.name}
-              className={`border-muted flex cursor-pointer flex-col items-center justify-center rounded-lg border p-4 transition hover:scale-105 ${selectedTheme === theme.name ? 'ring-primary ring-2' : ''}`}
-              onClick={() => onThemeSelect(theme.name)}
+              className={`border-muted flex flex-col items-center justify-center rounded-lg border p-4 transition ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer hover:scale-105'} ${selectedTheme === theme.name ? 'ring-primary ring-2' : ''}`}
+              onClick={() => !disabled && onThemeSelect(theme.name)}
             >
               {theme.icon}
               <span className="mt-2 text-sm font-medium">{t(`themes.${theme.name}`)}</span>
@@ -94,7 +96,11 @@ const ThemeSection = ({ selectedTheme, onThemeSelect }: ThemeSectionProps) => {
   );
 };
 
-const ContentSection = ({ selectedContentLength, onContentLengthSelect }: ContentSectionProps) => {
+const ContentSection = ({
+  selectedContentLength,
+  onContentLengthSelect,
+  disabled = false,
+}: ContentSectionProps) => {
   const { t } = useTranslation('presentation', { keyPrefix: 'customization' });
 
   const contentOptions = [
@@ -129,8 +135,8 @@ const ContentSection = ({ selectedContentLength, onContentLengthSelect }: Conten
           {contentOptions.map((content) => (
             <div
               key={content.key}
-              className={`bg-muted border-muted flex cursor-pointer flex-col items-center justify-center rounded-lg border p-4 transition hover:scale-105 ${selectedContentLength === content.key ? 'ring-primary ring-2' : ''}`}
-              onClick={() => onContentLengthSelect(content.key)}
+              className={`bg-muted border-muted flex flex-col items-center justify-center rounded-lg border p-4 transition ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer hover:scale-105'} ${selectedContentLength === content.key ? 'ring-primary ring-2' : ''}`}
+              onClick={() => !disabled && onContentLengthSelect(content.key)}
             >
               {content.icon}
               <span className="mt-2 text-sm font-medium">{t(`contentLength.${content.key}`)}</span>
@@ -188,6 +194,7 @@ interface CustomizationSectionProps {
   setValue: any;
   onGeneratePresentation: () => void;
   isGenerating: boolean;
+  disabled?: boolean;
 }
 
 const CustomizationSection = ({
@@ -196,6 +203,7 @@ const CustomizationSection = ({
   setValue,
   onGeneratePresentation,
   isGenerating,
+  disabled = false,
 }: CustomizationSectionProps) => {
   const { t } = useTranslation('presentation', { keyPrefix: 'workspace' });
   const { t: tCustomization } = useTranslation('presentation', { keyPrefix: 'customization' });
@@ -206,10 +214,15 @@ const CustomizationSection = ({
     <div className="flex flex-col gap-4">
       <div className="scroll-m-20 text-xl font-semibold tracking-tight">{t('customizeSection')}</div>
       <Card className="w-full max-w-3xl">
-        <ThemeSection selectedTheme={watch('theme')} onThemeSelect={(theme) => setValue('theme', theme)} />
+        <ThemeSection
+          selectedTheme={watch('theme')}
+          onThemeSelect={(theme) => setValue('theme', theme)}
+          disabled={disabled}
+        />
         <ContentSection
           selectedContentLength={watch('contentLength')}
           onContentLengthSelect={(length) => setValue('contentLength', length)}
+          disabled={disabled}
         />
         <CardContent className="flex flex-row items-center gap-2">
           <CardTitle>{tCustomization('imageModelsTitle')}</CardTitle>
@@ -224,12 +237,18 @@ const CustomizationSection = ({
                 placeholder={tOutline('modelPlaceholder')}
                 label={tOutline('modelLabel')}
                 showProviderLogo={true}
+                disabled={disabled}
               />
             )}
           />
         </CardContent>
       </Card>
-      <Button className="mt-5" type="button" onClick={onGeneratePresentation} disabled={isGenerating}>
+      <Button
+        className="mt-5"
+        type="button"
+        onClick={onGeneratePresentation}
+        disabled={disabled || isGenerating}
+      >
         <Sparkles />
         {isGenerating ? 'Generating...' : t('generatePresentation')}
       </Button>

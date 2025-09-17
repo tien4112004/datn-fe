@@ -21,9 +21,9 @@ type OutlineWorkspaceProps = {
 };
 
 const OutlineWorkspace = ({ onDownload }: OutlineWorkspaceProps) => {
-  const deleteContent = useOutlineStore((state) => state.deleteContent);
-  const contentIds = useOutlineStore((state) => state.contentIds);
-  const addContent = useOutlineStore((state) => state.addContent);
+  const deleteContent = useOutlineStore((state) => state.deleteOutline);
+  const contentIds = useOutlineStore((state) => state.outlineIds);
+  const addContent = useOutlineStore((state) => state.addOutline);
   const swap = useOutlineStore((state) => state.swap);
   const { t } = useTranslation('outlineWorkspace');
   const [isDownloading, setIsDownloading] = useState(false);

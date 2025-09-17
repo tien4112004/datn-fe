@@ -36,10 +36,11 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
   });
 
   // Stores
-  const setContent = useOutlineStore((state) => state.setContent);
+  const setContent = useOutlineStore((state) => state.setOutlines);
   const startStream = useOutlineStore((state) => state.startStreaming);
   const endStream = useOutlineStore((state) => state.endStreaming);
   const markdownContent = useOutlineStore((state) => state.markdownContent);
+  const clearOutline = useOutlineStore((state) => state.clearOutline);
 
   const generatePresentationMutation = useGeneratePresentation();
   const setGeneratedPresentation = usePresentationStore((state) => state.setGeneratedPresentation);
@@ -72,7 +73,6 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
       targetAge: data.targetAge,
       learningObjective: data.learningObjective,
     };
-    console.log('Regenerating outline with data:', outlineData);
     restartStream(outlineData);
   };
 
@@ -96,11 +96,15 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
 
       setGeneratedPresentation(generatedPresentation);
 
+      // Clear outline store and form data
+      clearOutline();
+
       navigate(`/presentation/${generatedPresentation.presentation.id}`);
     } catch (error) {
       console.error('Error generating presentation:', error);
-      setIsGenerating(false);
       toast.error('Failed to generate presentation. Please try again.');
+    } finally {
+      setIsGenerating(false);
     }
   };
 

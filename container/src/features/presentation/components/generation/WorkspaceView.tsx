@@ -64,7 +64,7 @@ const WorkspaceView = ({ initialOutlineData }: WorkspaceViewProps) => {
   //   // STORE
   //   const content = useOutlineStore((state) => state.content);
   const markdownContent = useOutlineStore((state) => state.markdownContent);
-  const setContent = useOutlineStore((state) => state.setContent);
+  const setContent = useOutlineStore((state) => state.setOutlines);
   const startStream = useOutlineStore((state) => state.startStreaming);
   const endStream = useOutlineStore((state) => state.endStreaming);
 

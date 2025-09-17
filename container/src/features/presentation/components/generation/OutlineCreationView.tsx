@@ -15,26 +15,18 @@ import {
 } from '@/shared/components/ui/select';
 import ExamplePrompts from './ExamplePrompts';
 import { SLIDE_COUNT_OPTIONS, LANGUAGE_OPTIONS } from '@/features/presentation/types';
-import type { ModelOption } from '@/features/model';
+import { useModels } from '@/features/model';
 import { ModelSelect } from '@/components/common/ModelSelect';
 import { usePresentationForm } from '@/features/presentation/contexts/PresentationFormContext';
 
 interface OutlineCreationViewProps {
-  defaultModel?: ModelOption;
-  models?: ModelOption[];
   onCreateOutline: () => void;
-  isLoadingModels: boolean;
-  isErrorModels: boolean;
 }
 
-const OutlineCreationView = ({
-  models,
-  onCreateOutline,
-  isLoadingModels,
-  isErrorModels,
-}: OutlineCreationViewProps) => {
+const OutlineCreationView = ({ onCreateOutline }: OutlineCreationViewProps) => {
   const { t } = useTranslation('presentation', { keyPrefix: 'createOutline' });
   const { control, setValue, watch, trigger } = usePresentationForm();
+  const { models, isLoading: isLoadingModels, isError: isErrorModels } = useModels();
 
   const topicValue = watch('topic');
 

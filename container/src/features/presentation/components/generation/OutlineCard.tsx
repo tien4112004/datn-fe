@@ -18,8 +18,8 @@ interface OutlineCardProps {
 
 const OutlineCard = ({ id, title = 'Outline', className = '', onDelete }: OutlineCardProps) => {
   const [isDeleting, setIsDeleting] = React.useState(false);
-  const handleContentChange = useOutlineStore((state) => state.handleContentChange);
-  const content = useOutlineStore((state) => state.content.find((item) => item.id === id));
+  const handleContentChange = useOutlineStore((state) => state.handleOutlineChange);
+  const content = useOutlineStore((state) => state.outlines.find((item) => item.id === id));
   const isStreaming = useOutlineStore((state) => state.isStreaming);
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: `outline-card-${id.toString()}`,

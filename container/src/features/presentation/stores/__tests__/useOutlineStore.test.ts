@@ -42,22 +42,22 @@ describe('useOutlineStore', () => {
   beforeEach(() => {
     // Reset store state before each test
     useOutlineStore.setState({
-      content: [],
-      contentIds: [],
+      outlines: [],
+      outlineIds: [],
       isStreaming: false,
     });
     vi.clearAllMocks();
   });
 
   describe('Initial State', () => {
-    it('should initialize with empty content array', () => {
+    it('should initialize with empty outline array', () => {
       const state = useOutlineStore.getState();
-      expect(state.content).toEqual([]);
+      expect(state.outlines).toEqual([]);
     });
 
-    it('should initialize with empty contentIds array', () => {
+    it('should initialize with empty outlineIds array', () => {
       const state = useOutlineStore.getState();
-      expect(state.contentIds).toEqual([]);
+      expect(state.outlineIds).toEqual([]);
     });
 
     it('should initialize with isStreaming as false', () => {
@@ -66,33 +66,33 @@ describe('useOutlineStore', () => {
     });
   });
 
-  describe('setContent', () => {
-    it('should set content array correctly', () => {
+  describe('setOutline', () => {
+    it('should set outline array correctly', () => {
       const state = useOutlineStore.getState();
-      state.setContent(mockOutlineItems);
+      state.setOutlines(mockOutlineItems);
 
       const updatedState = useOutlineStore.getState();
-      expect(updatedState.content).toEqual(mockOutlineItems);
+      expect(updatedState.outlines).toEqual(mockOutlineItems);
     });
 
     it('should update contentIds when setting content', () => {
       const state = useOutlineStore.getState();
-      state.setContent(mockOutlineItems);
+      state.setOutlines(mockOutlineItems);
 
       const updatedState = useOutlineStore.getState();
-      expect(updatedState.contentIds).toEqual(['1', '2', '3']);
+      expect(updatedState.outlineIds).toEqual(['1', '2', '3']);
     });
 
     it('should handle empty array', () => {
       // First set some content
-      useOutlineStore.setState({ content: mockOutlineItems, contentIds: ['1', '2', '3'] });
+      useOutlineStore.setState({ outlines: mockOutlineItems, outlineIds: ['1', '2', '3'] });
 
       const state = useOutlineStore.getState();
-      state.setContent([]);
+      state.setOutlines([]);
 
       const updatedState = useOutlineStore.getState();
-      expect(updatedState.content).toEqual([]);
-      expect(updatedState.contentIds).toEqual([]);
+      expect(updatedState.outlines).toEqual([]);
+      expect(updatedState.outlineIds).toEqual([]);
     });
   });
 
@@ -117,16 +117,16 @@ describe('useOutlineStore', () => {
     });
   });
 
-  describe('Content Manipulation', () => {
+  describe('Outline Manipulation', () => {
     beforeEach(() => {
       useOutlineStore.setState({
-        content: mockOutlineItems,
-        contentIds: ['1', '2', '3'],
+        outlines: mockOutlineItems,
+        outlineIds: ['1', '2', '3'],
       });
     });
 
-    describe('addContent', () => {
-      it('should add new content item', () => {
+    describe('addOutline', () => {
+      it('should add new outline item', () => {
         const newItem: OutlineItem = {
           id: '4',
           htmlContent: '<p>New content</p>',
@@ -134,15 +134,15 @@ describe('useOutlineStore', () => {
         };
 
         const state = useOutlineStore.getState();
-        state.addContent(newItem);
+        state.addOutline(newItem);
 
         const updatedState = useOutlineStore.getState();
-        expect(updatedState.content).toHaveLength(4);
-        expect(updatedState.content[3]).toEqual(newItem);
-        expect(updatedState.contentIds).toContain('4');
+        expect(updatedState.outlines).toHaveLength(4);
+        expect(updatedState.outlines[3]).toEqual(newItem);
+        expect(updatedState.outlineIds).toContain('4');
       });
 
-      it('should maintain existing content when adding new item', () => {
+      it('should maintain existing outline when adding new item', () => {
         const newItem: OutlineItem = {
           id: '4',
           htmlContent: '<p>New content</p>',
@@ -150,50 +150,50 @@ describe('useOutlineStore', () => {
         };
 
         const state = useOutlineStore.getState();
-        state.addContent(newItem);
+        state.addOutline(newItem);
 
         const updatedState = useOutlineStore.getState();
-        expect(updatedState.content.slice(0, 3)).toEqual(mockOutlineItems);
+        expect(updatedState.outlines.slice(0, 3)).toEqual(mockOutlineItems);
       });
     });
 
-    describe('deleteContent', () => {
+    describe('deleteOutline', () => {
       it('should delete content by id', () => {
         const state = useOutlineStore.getState();
-        state.deleteContent('2');
+        state.deleteOutline('2');
 
         const updatedState = useOutlineStore.getState();
-        expect(updatedState.content).toHaveLength(2);
-        expect(updatedState.content.find((item) => item.id === '2')).toBeUndefined();
-        expect(updatedState.contentIds).not.toContain('2');
+        expect(updatedState.outlines).toHaveLength(2);
+        expect(updatedState.outlines.find((item) => item.id === '2')).toBeUndefined();
+        expect(updatedState.outlineIds).not.toContain('2');
       });
 
       it('should not affect other content when deleting', () => {
         const state = useOutlineStore.getState();
-        state.deleteContent('2');
+        state.deleteOutline('2');
 
         const updatedState = useOutlineStore.getState();
-        expect(updatedState.content.find((item) => item.id === '1')).toBeDefined();
-        expect(updatedState.content.find((item) => item.id === '3')).toBeDefined();
-        expect(updatedState.contentIds).toContain('1');
-        expect(updatedState.contentIds).toContain('3');
+        expect(updatedState.outlines.find((item) => item.id === '1')).toBeDefined();
+        expect(updatedState.outlines.find((item) => item.id === '3')).toBeDefined();
+        expect(updatedState.outlineIds).toContain('1');
+        expect(updatedState.outlineIds).toContain('3');
       });
 
       it('should handle deleting non-existent id gracefully', () => {
         const state = useOutlineStore.getState();
-        const originalLength = state.content.length;
+        const originalLength = state.outlines.length;
 
-        state.deleteContent('non-existent');
+        state.deleteOutline('non-existent');
 
         const updatedState = useOutlineStore.getState();
-        expect(updatedState.content).toHaveLength(originalLength);
+        expect(updatedState.outlines).toHaveLength(originalLength);
       });
     });
 
-    describe('getContent', () => {
+    describe('getOutline', () => {
       it('should return content item by id', () => {
         const state = useOutlineStore.getState();
-        const item = state.getContent('2');
+        const item = state.getOutline('2');
 
         expect(item).toBeDefined();
         expect(item?.id).toBe('2');
@@ -202,27 +202,27 @@ describe('useOutlineStore', () => {
 
       it('should return undefined for non-existent id', () => {
         const state = useOutlineStore.getState();
-        const item = state.getContent('non-existent');
+        const item = state.getOutline('non-existent');
 
         expect(item).toBeUndefined();
       });
     });
   });
 
-  describe('handleContentChange', () => {
+  describe('handleOutlineChange', () => {
     beforeEach(() => {
       useOutlineStore.setState({
-        content: mockOutlineItems,
-        contentIds: ['1', '2', '3'],
+        outlines: mockOutlineItems,
+        outlineIds: ['1', '2', '3'],
       });
     });
 
     it('should update markdownContent for specified id', () => {
       const state = useOutlineStore.getState();
-      state.handleContentChange?.('2', '## Updated Subtitle');
+      state.handleOutlineChange?.('2', '## Updated Subtitle');
 
       const updatedState = useOutlineStore.getState();
-      const updatedItem = updatedState.content.find((item) => item.id === '2');
+      const updatedItem = updatedState.outlines.find((item) => item.id === '2');
 
       expect(updatedItem?.markdownContent).toBe('## Updated Subtitle');
       expect(updatedItem?.htmlContent).toBe('<h2>Subtitle 2</h2>'); // Should remain unchanged
@@ -231,11 +231,11 @@ describe('useOutlineStore', () => {
 
     it('should not affect other content items', () => {
       const state = useOutlineStore.getState();
-      state.handleContentChange?.('2', '## Updated Subtitle');
+      state.handleOutlineChange?.('2', '## Updated Subtitle');
 
       const updatedState = useOutlineStore.getState();
-      const item1 = updatedState.content.find((item) => item.id === '1');
-      const item3 = updatedState.content.find((item) => item.id === '3');
+      const item1 = updatedState.outlines.find((item) => item.id === '1');
+      const item3 = updatedState.outlines.find((item) => item.id === '3');
 
       expect(item1?.markdownContent).toBe('# Title 1');
       expect(item3?.markdownContent).toBe('Content 3');
@@ -243,20 +243,20 @@ describe('useOutlineStore', () => {
 
     it('should handle updating non-existent id gracefully', () => {
       const state = useOutlineStore.getState();
-      const originalContent = [...state.content];
+      const originalContent = [...state.outlines];
 
-      state.handleContentChange?.('non-existent', 'Updated content');
+      state.handleOutlineChange?.('non-existent', 'Updated content');
 
       const updatedState = useOutlineStore.getState();
-      expect(updatedState.content).toEqual(originalContent);
+      expect(updatedState.outlines).toEqual(originalContent);
     });
   });
 
   describe('swap', () => {
     beforeEach(() => {
       useOutlineStore.setState({
-        content: mockOutlineItems,
-        contentIds: ['1', '2', '3'],
+        outlines: mockOutlineItems,
+        outlineIds: ['1', '2', '3'],
       });
     });
 
@@ -266,9 +266,9 @@ describe('useOutlineStore', () => {
 
       const updatedState = useOutlineStore.getState();
       // After moving index 0 to 2: [item2, item3, item1]
-      expect(updatedState.content[0].id).toBe('2');
-      expect(updatedState.content[1].id).toBe('3');
-      expect(updatedState.content[2].id).toBe('1');
+      expect(updatedState.outlines[0].id).toBe('2');
+      expect(updatedState.outlines[1].id).toBe('3');
+      expect(updatedState.outlines[2].id).toBe('1');
     });
 
     it('should maintain all content items after swap', () => {
@@ -276,9 +276,9 @@ describe('useOutlineStore', () => {
       state.swap('1', '2');
 
       const updatedState = useOutlineStore.getState();
-      expect(updatedState.content).toHaveLength(3);
+      expect(updatedState.outlines).toHaveLength(3);
 
-      const ids = updatedState.content.map((item) => item.id);
+      const ids = updatedState.outlines.map((item) => item.id);
       expect(ids).toContain('1');
       expect(ids).toContain('2');
       expect(ids).toContain('3');
@@ -292,7 +292,7 @@ describe('useOutlineStore', () => {
       const updatedState = useOutlineStore.getState();
       // When one id doesn't exist, arrayMove typically handles it gracefully
       // The exact behavior depends on the arrayMove implementation
-      expect(updatedState.content).toHaveLength(3);
+      expect(updatedState.outlines).toHaveLength(3);
     });
   });
 
@@ -306,8 +306,8 @@ describe('useOutlineStore', () => {
 
     it('should return concatenated markdown content', () => {
       useOutlineStore.setState({
-        content: mockOutlineItems,
-        contentIds: ['1', '2', '3'],
+        outlines: mockOutlineItems,
+        outlineIds: ['1', '2', '3'],
       });
 
       const state = useOutlineStore.getState();
@@ -320,8 +320,8 @@ describe('useOutlineStore', () => {
       const { mapOutlineItemsToMarkdown } = await import('../../utils');
 
       useOutlineStore.setState({
-        content: mockOutlineItems,
-        contentIds: ['1', '2', '3'],
+        outlines: mockOutlineItems,
+        outlineIds: ['1', '2', '3'],
       });
 
       const state = useOutlineStore.getState();
@@ -331,47 +331,58 @@ describe('useOutlineStore', () => {
     });
   });
 
+  describe('clearOutline', () => {
+    it('should clear all outlines and outlineIds', () => {
+      const state = useOutlineStore.getState();
+      state.clearOutline();
+
+      const updatedState = useOutlineStore.getState();
+      expect(updatedState.outlines).toHaveLength(0);
+      expect(updatedState.outlineIds).toHaveLength(0);
+    });
+  });
+
   describe('Integration Tests', () => {
     it('should handle complete workflow: add, modify, swap, delete', () => {
       const state = useOutlineStore.getState();
 
       // Start with empty state, add content
-      state.addContent(mockOutlineItems[0]);
-      state.addContent(mockOutlineItems[1]);
+      state.addOutline(mockOutlineItems[0]);
+      state.addOutline(mockOutlineItems[1]);
 
       let currentState = useOutlineStore.getState();
-      expect(currentState.content).toHaveLength(2);
+      expect(currentState.outlines).toHaveLength(2);
 
       // Modify content
-      state.handleContentChange?.('1', '# Modified Title');
+      state.handleOutlineChange?.('1', '# Modified Title');
 
       currentState = useOutlineStore.getState();
-      expect(currentState.content[0].markdownContent).toBe('# Modified Title');
+      expect(currentState.outlines[0].markdownContent).toBe('# Modified Title');
 
       // Add more content and move
-      state.addContent(mockOutlineItems[2]);
+      state.addOutline(mockOutlineItems[2]);
       state.swap('1', '3'); // Move item '1' from index 0 to index 2
 
       currentState = useOutlineStore.getState();
-      expect(currentState.content[0].id).toBe('2'); // item '2' moves to index 0
-      expect(currentState.content[2].id).toBe('1'); // item '1' moves to index 2
+      expect(currentState.outlines[0].id).toBe('2'); // item '2' moves to index 0
+      expect(currentState.outlines[2].id).toBe('1'); // item '1' moves to index 2
 
       // Delete content
-      state.deleteContent('2');
+      state.deleteOutline('2');
 
       currentState = useOutlineStore.getState();
-      expect(currentState.content).toHaveLength(2);
-      expect(currentState.contentIds).not.toContain('2');
+      expect(currentState.outlines).toHaveLength(2);
+      expect(currentState.outlineIds).not.toContain('2');
     });
 
     it('should maintain state consistency throughout operations', () => {
       const state = useOutlineStore.getState();
 
       // Set initial content
-      state.setContent(mockOutlineItems);
+      state.setOutlines(mockOutlineItems);
 
       let currentState = useOutlineStore.getState();
-      expect(currentState.content.length).toBe(currentState.contentIds.length);
+      expect(currentState.outlines.length).toBe(currentState.outlineIds.length);
 
       // Add content
       const newItem: OutlineItem = {
@@ -379,18 +390,18 @@ describe('useOutlineStore', () => {
         htmlContent: '<p>New</p>',
         markdownContent: 'New',
       };
-      state.addContent(newItem);
+      state.addOutline(newItem);
 
       currentState = useOutlineStore.getState();
-      expect(currentState.content.length).toBe(currentState.contentIds.length);
-      expect(currentState.contentIds[3]).toBe('4');
+      expect(currentState.outlines.length).toBe(currentState.outlineIds.length);
+      expect(currentState.outlineIds[3]).toBe('4');
 
       // Delete content
-      state.deleteContent('2');
+      state.deleteOutline('2');
 
       currentState = useOutlineStore.getState();
-      expect(currentState.content.length).toBe(currentState.contentIds.length);
-      expect(currentState.content.every((item) => currentState.contentIds.includes(item.id))).toBe(true);
+      expect(currentState.outlines.length).toBe(currentState.outlineIds.length);
+      expect(currentState.outlines.every((item) => currentState.outlineIds.includes(item.id))).toBe(true);
     });
   });
 });

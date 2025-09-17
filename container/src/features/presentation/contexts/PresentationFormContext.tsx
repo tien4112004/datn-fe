@@ -65,7 +65,7 @@ export const PresentationFormProvider = ({ children, defaultValues = {} }: Prese
     watch: form.watch,
     setValue: form.setValue,
     storage: window.localStorage,
-    exclude: ['topic'],
+    exclude: [],
   });
 
   const contextValue: PresentationFormContextValue = {

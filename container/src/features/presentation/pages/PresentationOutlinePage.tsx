@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { OutlineCreationView, WorkspaceView2 } from '@/features/presentation/components';
-import { useModels } from '@/features/model';
 import { PresentationFormProvider } from '@/features/presentation/contexts/PresentationFormContext';
+import { useSearchParams } from 'react-router-dom';
+import useOutlineStore from '../stores/useOutlineStore';
 
 const PresentationViewState = {
   OUTLINE_CREATION: 'outline_creation',
@@ -10,31 +11,44 @@ const PresentationViewState = {
 
 type PresentationViewState = (typeof PresentationViewState)[keyof typeof PresentationViewState];
 
-const PresentationOutlinePage = () => {
-  const { models, defaultModel, isLoading: isLoadingModels, isError: isErrorModels } = useModels();
+const getViewFromParams = (searchParams: URLSearchParams): PresentationViewState => {
+  const viewParam = searchParams.get('view');
+  if (viewParam === PresentationViewState.WORKSPACE) {
+    return PresentationViewState.WORKSPACE;
+  }
+  return PresentationViewState.OUTLINE_CREATION;
+};
 
-  const [currentView, setCurrentView] = useState<PresentationViewState>(
-    PresentationViewState.OUTLINE_CREATION
-  );
+const PresentationOutlinePage = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [currentView, setCurrentView] = useState<PresentationViewState>(getViewFromParams(searchParams));
+  const isEmptyOutline = useOutlineStore((state) => state.isEmpty);
+  const startStreaming = useOutlineStore((state) => state.startStreaming);
+
+  // Sync state with URL changes
+  useEffect(() => {
+    setCurrentView(getViewFromParams(searchParams));
+
+    if (currentView === PresentationViewState.WORKSPACE) {
+      setTimeout(() => {
+        if (isEmptyOutline()) {
+          setCurrentView(PresentationViewState.OUTLINE_CREATION);
+          setSearchParams({});
+        }
+      }, 100);
+    }
+  }, [searchParams]);
 
   const handleCreateOutline = () => {
     setCurrentView(PresentationViewState.WORKSPACE);
+    setSearchParams({ view: PresentationViewState.WORKSPACE });
+    startStreaming();
   };
 
   return (
-    <PresentationFormProvider
-      defaultValues={{
-        model: defaultModel?.name || '',
-      }}
-    >
+    <PresentationFormProvider>
       {currentView === PresentationViewState.OUTLINE_CREATION ? (
-        <OutlineCreationView
-          onCreateOutline={handleCreateOutline}
-          models={models}
-          defaultModel={defaultModel}
-          isErrorModels={isErrorModels}
-          isLoadingModels={isLoadingModels}
-        />
+        <OutlineCreationView onCreateOutline={handleCreateOutline} />
       ) : (
         <WorkspaceView2 />
       )}

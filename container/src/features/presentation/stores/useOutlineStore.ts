@@ -1,76 +1,103 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 import type { OutlineItem } from '@/features/presentation/types';
 import { arrayMove } from '@dnd-kit/sortable';
 import { mapOutlineItemsToMarkdown } from '@/features/presentation/utils';
 
 interface OutlineStore {
-  content: OutlineItem[];
-  contentIds: string[];
+  outlines: OutlineItem[];
+  outlineIds: string[];
   isStreaming?: boolean;
   markdownContent: () => string;
-  setContent: (value: OutlineItem[]) => void;
+  setOutlines: (value: OutlineItem[]) => void;
   startStreaming: () => void;
   endStreaming: () => void;
-  handleContentChange?: (id: string, content: string) => void;
-  deleteContent: (id: string) => void;
-  addContent: (item: OutlineItem) => void;
-  getContent: (id: string) => OutlineItem | undefined;
+  handleOutlineChange?: (id: string, content: string) => void;
+  deleteOutline: (id: string) => void;
+  addOutline: (item: OutlineItem) => void;
+  getOutline: (id: string) => OutlineItem | undefined;
   swap: (oldId: string, newId: string) => void;
+  clearOutline: () => void;
+  isEmpty: () => boolean;
 }
 
-const useOutlineStore = create<OutlineStore>((set, get) => ({
-  content: [],
-  contentIds: [],
-  isStreaming: false,
-
-  markdownContent: () => {
-    return mapOutlineItemsToMarkdown(get().content);
-  },
-
-  setContent: (value) => {
-    set({ content: value });
-    set({ contentIds: value.map((item) => item.id) });
-  },
-
-  handleContentChange: (id, content) =>
-    set((state) => ({
-      content: state.content.map((item) => (item.id === id ? { ...item, markdownContent: content } : item)),
-    })),
-
-  deleteContent: (id) => {
-    set((state) => ({
-      content: state.content.filter((item) => item.id !== id),
-      contentIds: state.contentIds.filter((itemId) => itemId !== id),
-    }));
-  },
-
-  swap: (oldId: string, newId: string) => {
-    const { content } = get();
-    const oldIndex = content.findIndex((item) => item.id === oldId);
-    const newIndex = content.findIndex((item) => item.id === newId);
-    set((state) => ({
-      content: arrayMove(state.content, oldIndex, newIndex),
-    }));
-  },
-
-  startStreaming: () =>
-    set(() => ({
-      isStreaming: true,
-    })),
-
-  endStreaming: () => {
-    set(() => ({
+const useOutlineStore = create<OutlineStore>()(
+  persist(
+    (set, get) => ({
+      outlines: [],
+      outlineIds: [],
       isStreaming: false,
-    }));
-  },
 
-  addContent: (item) =>
-    set((state) => ({
-      content: [...state.content, item],
-      contentIds: [...state.contentIds, item.id],
-    })),
+      markdownContent: () => {
+        return mapOutlineItemsToMarkdown(get().outlines);
+      },
 
-  getContent: (id) => get().content.find((item) => item.id === id),
-}));
+      setOutlines: (value) => {
+        set({ outlines: value });
+        set({ outlineIds: value.map((item) => item.id) });
+      },
+
+      handleOutlineChange: (id, content) =>
+        set((state) => ({
+          outlines: state.outlines.map((item) =>
+            item.id === id ? { ...item, markdownContent: content } : item
+          ),
+        })),
+
+      deleteOutline: (id) => {
+        set((state) => ({
+          outlines: state.outlines.filter((item) => item.id !== id),
+          outlineIds: state.outlineIds.filter((itemId) => itemId !== id),
+        }));
+      },
+
+      swap: (oldId: string, newId: string) => {
+        const { outlines: content } = get();
+        const oldIndex = content.findIndex((item) => item.id === oldId);
+        const newIndex = content.findIndex((item) => item.id === newId);
+        set((state) => ({
+          outlines: arrayMove(state.outlines, oldIndex, newIndex),
+        }));
+      },
+
+      startStreaming: () =>
+        set(() => ({
+          isStreaming: true,
+        })),
+
+      endStreaming: () => {
+        set(() => ({
+          isStreaming: false,
+        }));
+      },
+
+      addOutline: (item) =>
+        set((state) => ({
+          outlines: [...state.outlines, item],
+          outlineIds: [...state.outlineIds, item.id],
+        })),
+
+      getOutline: (id) => get().outlines.find((item) => item.id === id),
+
+      clearOutline: () =>
+        set(() => ({
+          outlines: [],
+          outlineIds: [],
+        })),
+
+      isEmpty: () => {
+        const { outlines, outlineIds, isStreaming } = get();
+        return outlines.length === 0 && outlineIds.length === 0 && !isStreaming;
+      },
+    }),
+    {
+      name: 'outline-store',
+      partialize: (state) => ({
+        outlines: state.outlines,
+        outlineIds: state.outlineIds,
+      }),
+    }
+  )
+);
 
 export default useOutlineStore;

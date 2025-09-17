@@ -7,7 +7,7 @@ import { mapOutlineItemsToMarkdown } from '@/features/presentation/utils';
 interface OutlineStore {
   outlines: OutlineItem[];
   outlineIds: string[];
-  isStreaming?: boolean;
+  isStreaming: boolean;
   markdownContent: () => string;
   setOutlines: (value: OutlineItem[]) => void;
   startStreaming: () => void;
@@ -33,8 +33,11 @@ const useOutlineStore = create<OutlineStore>()(
       },
 
       setOutlines: (value) => {
+        const prev = get().outlines;
+        if (value.length !== prev.length) {
+          set({ outlineIds: value.map((item) => item.id) });
+        }
         set({ outlines: value });
-        set({ outlineIds: value.map((item) => item.id) });
       },
 
       handleOutlineChange: (id, content) =>

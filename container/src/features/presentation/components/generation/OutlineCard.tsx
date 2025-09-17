@@ -13,7 +13,7 @@ interface OutlineCardProps {
   id: string;
   title: string;
   className?: string;
-  onDelete?: () => void;
+  onDelete?: (id: string) => void;
 }
 
 const OutlineCard = ({ id, title = 'Outline', className = '', onDelete }: OutlineCardProps) => {
@@ -50,7 +50,7 @@ const OutlineCard = ({ id, title = 'Outline', className = '', onDelete }: Outlin
 
     setIsDeleting(true);
     setTimeout(() => {
-      onDelete();
+      onDelete(id);
     }, 300);
   };
 

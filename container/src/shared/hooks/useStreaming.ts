@@ -1,5 +1,5 @@
 import { experimental_streamedQuery as streamedQuery, useQuery, useQueryClient } from '@tanstack/react-query';
-import React from 'react';
+import React, { useCallback } from 'react';
 
 export interface StreamingOptions<TRequest, TProcessed> {
   extractFn: (request: TRequest, signal: AbortSignal) => AsyncIterable<string>;
@@ -24,7 +24,7 @@ function useStreaming<TRequest = any, TProcessed = any>({
   queryKey,
 }: StreamingOptions<TRequest, TProcessed>): StreamingHookReturn<TRequest, TProcessed> {
   const [isStreamingInternal, setIsStreamingInternal] = React.useState(true);
-  const [requestData, setRequestData] = React.useState<TRequest>(input);
+  const requestData = React.useRef<TRequest>(input);
   const queryClient = useQueryClient();
 
   const {
@@ -35,28 +35,28 @@ function useStreaming<TRequest = any, TProcessed = any>({
   } = useQuery({
     queryKey: [...queryKey, requestData],
     queryFn: streamedQuery({
-      queryFn: ({ signal }) => extractFn(requestData, signal),
+      queryFn: ({ signal }) => extractFn(requestData.current, signal),
     }),
     staleTime: Infinity,
     enabled: isStreamingInternal,
   });
 
-  const stopStream = () => {
+  const stopStream = useCallback(() => {
     if (isStreamingInternal) {
       queryClient.cancelQueries({ queryKey: [...queryKey, requestData] });
     }
     setIsStreamingInternal(!isStreamingInternal);
-  };
+  }, []);
 
-  const restartStream = (requestData: TRequest) => {
-    setRequestData(requestData);
+  const restartStream = useCallback((data: TRequest) => {
+    requestData.current = data;
     setIsStreamingInternal(true);
     refetch();
-  };
+  }, []);
 
-  const clearContent = () => {
+  const clearContent = useCallback(() => {
     queryClient.setQueryData([...queryKey, requestData], null);
-  };
+  }, []);
 
   return {
     processedData: transformFn(data?.join('') ?? ''),

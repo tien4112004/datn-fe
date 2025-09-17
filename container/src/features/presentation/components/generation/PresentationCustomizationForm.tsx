@@ -25,6 +25,7 @@ import { useTranslation } from 'react-i18next';
 import { ModelSelect } from '@/components/common/ModelSelect';
 import { useModels } from '@/features/model';
 import type { UnifiedFormData } from '../../contexts/PresentationFormContext';
+import { useCallback } from 'react';
 
 type CustomizationFormData = {
   theme: string;
@@ -210,18 +211,28 @@ const CustomizationSection = ({
   const { t: tOutline } = useTranslation('presentation', { keyPrefix: 'createOutline' });
   const { models } = useModels();
 
+  const onThemeSelect = useCallback(
+    (theme: string) => {
+      setValue('theme', theme);
+    },
+    [setValue]
+  );
+
+  const onContentLengthSelect = useCallback(
+    (length: string) => {
+      setValue('contentLength', length);
+    },
+    [setValue]
+  );
+
   return (
     <div className="flex flex-col gap-4">
       <div className="scroll-m-20 text-xl font-semibold tracking-tight">{t('customizeSection')}</div>
       <Card className="w-full max-w-3xl">
-        <ThemeSection
-          selectedTheme={watch('theme')}
-          onThemeSelect={(theme) => setValue('theme', theme)}
-          disabled={disabled}
-        />
+        <ThemeSection selectedTheme={watch('theme')} onThemeSelect={onThemeSelect} disabled={disabled} />
         <ContentSection
           selectedContentLength={watch('contentLength')}
-          onContentLengthSelect={(length) => setValue('contentLength', length)}
+          onContentLengthSelect={onContentLengthSelect}
           disabled={disabled}
         />
         <CardContent className="flex flex-row items-center gap-2">

@@ -1,5 +1,6 @@
+import { useWhyDidYouUpdate } from '@/hooks/use-debug';
 import { getLocalStorageData } from '@/shared/lib/utils';
-import { createContext, useContext, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useMemo, type ReactNode } from 'react';
 import {
   useForm,
   type Control,
@@ -42,7 +43,7 @@ interface PresentationFormProviderProps {
 const PRESENTATION_FORM_KEY = 'presentation-unified-form';
 
 export const PresentationFormProvider = ({ children, defaultValues = {} }: PresentationFormProviderProps) => {
-  const persistedData = getLocalStorageData(PRESENTATION_FORM_KEY);
+  const persistedData = useMemo(() => getLocalStorageData(PRESENTATION_FORM_KEY), []);
 
   const form = useForm<UnifiedFormData>({
     defaultValues: {

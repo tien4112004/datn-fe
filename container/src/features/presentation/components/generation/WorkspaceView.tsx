@@ -20,6 +20,8 @@ import { useWorkspace } from '@/features/presentation/hooks/useWorkspace';
 import { usePresentationForm } from '@/features/presentation/contexts/PresentationFormContext';
 import { CustomizationSection } from './PresentationCustomizationForm';
 import LoadingButton from '@/components/common/LoadingButton';
+import useOutlineStore from '../../stores/useOutlineStore';
+import { useCallback } from 'react';
 
 interface WorkspaceViewProps {}
 
@@ -28,14 +30,10 @@ const WorkspaceView = ({}: WorkspaceViewProps) => {
 
   const { control, watch, setValue } = usePresentationForm();
 
-  const {
-    isStreaming,
-    stopStream,
-    clearContent,
-    handleRegenerateOutline,
-    handleGeneratePresentation,
-    isGenerating,
-  } = useWorkspace({});
+  const { stopStream, clearContent, handleRegenerateOutline, handleGeneratePresentation, isGenerating } =
+    useWorkspace({});
+
+  const isStreaming = useOutlineStore((state) => state.isStreaming);
 
   return (
     <div className="flex min-h-[calc(100vh-1rem)] w-full max-w-3xl flex-col items-center justify-center self-center p-8">
@@ -207,15 +205,14 @@ const OutlineSection = () => {
   const { watch } = usePresentationForm();
   const slideCount = watch('slideCount', 10);
 
+  const handleDownload = useCallback(async () => {
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+  }, []);
+
   return (
     <div className="flex flex-col gap-4">
       <div className="scroll-m-20 text-xl font-semibold tracking-tight">{t('outlineSection')}</div>
-      <OutlineWorkspace
-        onDownload={async () => {
-          await new Promise((resolve) => setTimeout(resolve, 2000));
-        }}
-        totalSlide={slideCount}
-      />
+      <OutlineWorkspace onDownload={handleDownload} totalSlide={slideCount} />
     </div>
   );
 };

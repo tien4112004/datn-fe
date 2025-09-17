@@ -10,7 +10,7 @@ import {
 } from '@dnd-kit/core';
 import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { Download, Loader, Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import useOutlineStore from '@/features/presentation/stores/useOutlineStore';
@@ -31,6 +31,13 @@ const OutlineWorkspace = ({ onDownload, totalSlide }: OutlineWorkspaceProps) => 
   const { t } = useTranslation('outlineWorkspace');
   const [isDownloading, setIsDownloading] = useState(false);
 
+  const handleDeleteContent = useCallback(
+    (id: string) => {
+      deleteContent(id);
+    },
+    [deleteContent]
+  );
+
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -38,25 +45,28 @@ const OutlineWorkspace = ({ onDownload, totalSlide }: OutlineWorkspaceProps) => 
     })
   );
 
-  const handleOutlineCardDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
+  const handleOutlineCardDragEnd = useCallback(
+    (event: DragEndEvent) => {
+      const { active, over } = event;
 
-    if (!over) return;
+      if (!over) return;
 
-    if (active.id !== over.id) {
-      const activeId = active.id as string;
-      const overId = over.id as string;
+      if (active.id !== over.id) {
+        const activeId = active.id as string;
+        const overId = over.id as string;
 
-      if (activeId.startsWith('outline-card-') && overId.startsWith('outline-card-')) {
-        const activeItemId = activeId.replace('outline-card-', '');
-        const overItemId = overId.replace('outline-card-', '');
+        if (activeId.startsWith('outline-card-') && overId.startsWith('outline-card-')) {
+          const activeItemId = activeId.replace('outline-card-', '');
+          const overItemId = overId.replace('outline-card-', '');
 
-        swap(activeItemId, overItemId);
+          swap(activeItemId, overItemId);
+        }
       }
-    }
-  };
+    },
+    [swap]
+  );
 
-  const handleDownload = async () => {
+  const handleDownload = useCallback(async () => {
     if (isDownloading) return;
     setIsDownloading(true);
     try {
@@ -69,7 +79,7 @@ const OutlineWorkspace = ({ onDownload, totalSlide }: OutlineWorkspaceProps) => 
     } finally {
       setIsDownloading(false);
     }
-  };
+  }, [isDownloading, onDownload]);
 
   return (
     <Card className="w-3xl flex flex-col gap-6 rounded-xl p-8">
@@ -80,7 +90,7 @@ const OutlineWorkspace = ({ onDownload, totalSlide }: OutlineWorkspaceProps) => 
             strategy={verticalListSortingStrategy}
           >
             {contentIds.map((item, index) => (
-              <OutlineCard key={item} id={item} title={`${index + 1}`} onDelete={() => deleteContent(item)} />
+              <OutlineCard key={item} id={item} title={`${index + 1}`} onDelete={handleDeleteContent} />
             ))}
           </SortableContext>
         </DndContext>

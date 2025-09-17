@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useGeneratePresentation } from '@/features/presentation/hooks/useApi';
@@ -13,10 +13,7 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
   const navigate = useNavigate();
 
   // Form context
-  const { trigger, getValues, watch } = usePresentationForm();
-
-  // Get current form data for streaming
-  const formData = watch();
+  const { trigger, getValues } = usePresentationForm();
 
   // Streaming API
   const {
@@ -27,16 +24,16 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
     restartStream,
     clearContent,
   } = useFetchStreamingOutline({
-    topic: formData.topic,
-    slideCount: formData.slideCount,
-    language: formData.language,
-    model: formData.model,
-    targetAge: formData.targetAge,
-    learningObjective: formData.learningObjective,
+    topic: getValues().topic,
+    slideCount: getValues().slideCount,
+    language: getValues().language,
+    model: getValues().model,
+    targetAge: getValues().targetAge,
+    learningObjective: getValues().learningObjective,
   });
 
   // Stores
-  const setContent = useOutlineStore((state) => state.setOutlines);
+  const setOutlines = useOutlineStore((state) => state.setOutlines);
   const startStream = useOutlineStore((state) => state.startStreaming);
   const endStream = useOutlineStore((state) => state.endStreaming);
   const markdownContent = useOutlineStore((state) => state.markdownContent);
@@ -53,7 +50,7 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
   }
 
   // Form handlers
-  const handleRegenerateOutline = async () => {
+  const handleRegenerateOutline = useCallback(async () => {
     const isValid = await trigger([
       'topic',
       'slideCount',
@@ -74,9 +71,9 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
       learningObjective: data.learningObjective,
     };
     restartStream(outlineData);
-  };
+  }, []);
 
-  const handleGeneratePresentation = async () => {
+  const handleGeneratePresentation = useCallback(async () => {
     const isValid = await trigger(['theme', 'contentLength', 'imageModel']);
     if (!isValid) return;
 
@@ -106,21 +103,19 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
     } finally {
       setIsGenerating(false);
     }
-  };
+  }, []);
 
   // Sync streaming state with store
   useEffect(() => {
     if (isStreaming) {
       startStream();
-      setContent([...outlineItems]);
+      setOutlines([...outlineItems]);
     } else {
       endStream();
     }
-  }, [isStreaming, outlineItems, startStream, setContent, endStream]);
+  }, [isStreaming, outlineItems, startStream, setOutlines, endStream]);
 
   return {
-    // Streaming state
-    isStreaming,
     stopStream,
     clearContent,
 

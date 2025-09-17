@@ -26,7 +26,7 @@ interface OutlineCreationViewProps {
 const OutlineCreationView = ({ onCreateOutline }: OutlineCreationViewProps) => {
   const { t } = useTranslation('presentation', { keyPrefix: 'createOutline' });
   const { control, setValue, watch, trigger } = usePresentationForm();
-  const { models, isLoading: isLoadingModels, isError: isErrorModels } = useModels();
+  const { models } = useModels();
 
   const topicValue = watch('topic');
 
@@ -139,8 +139,6 @@ const OutlineCreationView = ({ onCreateOutline }: OutlineCreationViewProps) => {
                         placeholder={t('modelPlaceholder')}
                         label={t('modelLabel')}
                         showProviderLogo={true}
-                        isLoading={isLoadingModels}
-                        isError={isErrorModels}
                       />
                     )}
                   />

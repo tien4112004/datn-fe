@@ -1,4 +1,3 @@
-@import 'tailwindcss';
 @import 'tw-animate-css';
 
 @custom-variant dark (&:is(.dark *));
@@ -161,17 +160,35 @@
   --tracking-widest: calc(var(--tracking-normal) + 0.1em);
 }
 
-body {
+body:not(.canvas) body:not(.viewport-wrapper) body:not(.presenter-view) body:not(.base-view) {
   letter-spacing: var(--tracking-normal);
 }
 
 @layer base {
+  @import './preflight.css';
+
   * {
-    @apply border-border outline-ring/50;
+    font-family: --theme(--default-font-family, ui-sans-serif, system-ui, sans-serif);
+    border-color: var(--border);
   }
-  body {
-    @apply bg-background text-foreground;
+
+  *::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+    background-color: transparent;
   }
+  *::-webkit-scrollbar-thumb {
+    background-color: #e1e1e1;
+    border-radius: 3px;
+  }
+}
+
+@layer utilities {
+  @import 'tailwindcss/utilities.css';
+}
+
+@layer theme {
+  @import 'tailwindcss/theme.css';
 }
 
 ::-webkit-resizer {

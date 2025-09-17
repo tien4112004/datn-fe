@@ -6,30 +6,39 @@
     v-contextmenu="contextmenusThumbnails"
     padding="normal"
   >
-    <div class="add-slide">
-      <div class="btn center" @click="createSlide()">
-        <IconPlus class="icon" />{{ $t('thumbnails.slides.addSlide') }}
-      </div>
-      <Divider type="vertical" :margin="0" />
-      <Popover trigger="click" placement="bottom-start" v-model:value="presetLayoutPopoverVisible" center>
-        <template #content>
-          <Templates
-            @select="
-              (slide) => {
-                createSlideByTemplate(slide);
-                presetLayoutPopoverVisible = false;
-              }
-            "
-            @selectAll="
-              (slides) => {
-                insertAllTemplates(slides);
-                presetLayoutPopoverVisible = false;
-              }
-            "
-          />
-        </template>
-        <div class="select-btn"><IconDown /></div>
-      </Popover>
+    <div class="tw-w-full tw-flex tw-justify-center tw-items-center tw-mb-1">
+      <ButtonGroup
+        class="tw-flex tw-gap-[1px] tw-h-10 tw-cursor-pointer tw-rounded-md tw-text-sm tw-transition-all tw-duration-200 tw-ease-in-out"
+      >
+        <Button
+          class="tw-w-32 tw-bg-secondary tw-text-secondary-foreground hover:tw-bg-primary hover:tw-text-primary-foreground tw-flex tw-flex-1 tw-items-center tw-justify-center tw-text-sm tw-font-medium tw-transition-colors tw-border-0"
+          @click="createSlide()"
+        >
+          <IconPlus class="tw-h-3.5 tw-w-3.5" />{{ $t('thumbnails.slides.addSlide') }}
+        </Button>
+        <Popover trigger="click" placement="bottom-start" v-model:value="presetLayoutPopoverVisible" center>
+          <template #content>
+            <Templates
+              @select="
+                (slide) => {
+                  createSlideByTemplate(slide);
+                  presetLayoutPopoverVisible = false;
+                }
+              "
+              @selectAll="
+                (slides) => {
+                  insertAllTemplates(slides);
+                  presetLayoutPopoverVisible = false;
+                }
+              "
+            />
+          </template>
+          <Button
+            class="tw-bg-secondary tw-text-secondary-foreground hover:tw-bg-primary hover:tw-text-primary-foreground tw-flex tw-items-center tw-justify-center tw-transition-colors tw-border-0"
+            ><IconDown class="tw-h-3.5 tw-w-3.5"
+          /></Button>
+        </Popover>
+      </ButtonGroup>
     </div>
 
     <Draggable
@@ -75,10 +84,7 @@
           </div>
           <div
             class="thumbnail-item center"
-            :class="{
-              active: slideIndex === index,
-              selected: selectedSlidesIndex.includes(index),
-            }"
+            :class="{ active: slideIndex === index, selected: selectedSlidesIndex.includes(index) }"
             @mousedown="($event) => handleClickSlideThumbnail($event, index)"
             @dblclick="enterScreening()"
             v-contextmenu="contextmenusThumbnailItem"
@@ -128,6 +134,8 @@ import Draggable from 'vuedraggable';
 import Divider from '@/components/Divider.vue';
 import Card from '@/components/Card.vue';
 import { useI18n } from 'vue-i18n';
+import ButtonGroup from '@/components/ButtonGroup.vue';
+import Button from '@/components/Button.vue';
 const { t } = useI18n();
 const mainStore = useMainStore();
 const slidesStore = useSlidesStore();
@@ -412,84 +420,39 @@ const contextmenusThumbnailItem = (): ContextmenuItem[] => {
   }
 }
 
-.add-slide {
-  height: 40px;
-  font-size: $smTextSize;
-  display: flex;
-  flex-shrink: 0;
-  cursor: pointer;
-  transition:
-    background-color 0.2s ease,
-    box-shadow 0.2s ease;
-  border-radius: $borderRadius;
-  color: $secondary-foreground;
-  background-color: $secondary;
-  margin: $normalSpacing;
-
-  .btn {
-    flex: 1;
-    font-size: $baseTextSize;
-    font-weight: 500;
-    border-radius: $borderRadius 0 0 $borderRadius;
-    background-color: $secondary;
-    &:hover {
-      background-color: $primary;
-    }
-  }
-  .select-btn {
-    width: 30px;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: $secondary;
-    border-radius: 0 $borderRadius $borderRadius 0;
-    &:hover {
-      background-color: $primary;
-    }
-  }
-
-  .icon {
-    margin-right: 3px;
-    font-size: 14px !important;
-    width: 14px !important;
-    height: 14px !important;
-    display: inline-block;
-  }
-}
 .thumbnail-list {
   flex: 1;
   overflow: auto;
   display: flex;
   flex-direction: column;
-  padding-top: $largeSpacing;
-  gap: $largeSpacing;
+  padding-top: 0.5rem;
+  gap: 0.5rem;
 }
 .thumbnail-item {
   position: relative;
 
   .thumbnail {
-    border-radius: $borderRadius;
-    outline: 2px solid rgba($color: $themeColor, $alpha: 0.15);
+    border-radius: var(--presentation-radius);
+    outline: 2px solid color-mix(in srgb, var(--presentation-primary) 15%, transparent);
   }
 
   &.active {
     .label {
-      color: $themeColor;
+      color: var(--presentation-primary);
     }
     .thumbnail {
-      outline-color: $themeColor;
+      outline-color: var(--presentation-primary);
     }
   }
   &.selected {
     .thumbnail {
-      outline-color: $themeColor;
+      outline-color: var(--presentation-primary);
     }
     .note-flag {
-      background-color: $themeColor;
+      background-color: var(--presentation-primary);
 
       &::after {
-        border-top-color: $themeColor;
+        border-top-color: var(--presentation-primary);
       }
     }
   }
@@ -502,8 +465,8 @@ const contextmenusThumbnailItem = (): ContextmenuItem[] => {
     left: 8px;
     top: 13px;
     font-size: 8px;
-    background-color: rgba($color: $themeColor, $alpha: 0.75);
-    color: $background;
+    background-color: color-mix(in srgb, var(--presentation-primary) 75%, transparent);
+    color: var(--presentation-background);
     text-align: center;
     line-height: 12px;
     cursor: pointer;
@@ -516,13 +479,13 @@ const contextmenusThumbnailItem = (): ContextmenuItem[] => {
       top: 10px;
       left: 4px;
       border: 4px solid transparent;
-      border-top-color: rgba($color: $themeColor, $alpha: 0.75);
+      border-top-color: color-mix(in srgb, var(--presentation-primary), 0.75);
     }
   }
 }
 .label {
-  font-size: $baseTextSize;
-  color: $gray-999;
+  font-size: 0.875rem;
+  color: #999999;
   width: 20px;
   cursor: grab;
 
@@ -537,24 +500,24 @@ const contextmenusThumbnailItem = (): ContextmenuItem[] => {
 }
 .page-number {
   height: 40px;
-  border-top: 1px solid $borderColor;
+  border-top: 1px solid var(--presentation-border);
   line-height: 40px;
   text-align: center;
-  font-size: $smTextSize;
-  color: $gray-666;
+  font-size: 0.8125rem;
+  color: #666666;
 }
 .section-title {
   height: 26px;
   font-size: 12px;
   padding: 6px 8px 2px 18px;
-  color: $gray-555;
+  color: #555555;
 
   &.contextmenu-active {
-    color: $themeColor;
+    color: var(--presentation-primary);
 
     .text::before {
-      border-bottom-color: $themeColor;
-      border-right-color: $themeColor;
+      border-bottom-color: var(--presentation-primary);
+      border-right-color: var(--presentation-primary);
     }
   }
 
@@ -569,8 +532,8 @@ const contextmenusThumbnailItem = (): ContextmenuItem[] => {
       height: 0;
       border-top: 3px solid transparent;
       border-left: 3px solid transparent;
-      border-bottom: 3px solid $gray-555;
-      border-right: 3px solid $gray-555;
+      border-bottom: 3px solid #555555;
+      border-right: 3px solid #555555;
       margin-right: 5px;
     }
 
@@ -600,8 +563,8 @@ const contextmenusThumbnailItem = (): ContextmenuItem[] => {
 
   .thumbnail {
     height: 4px !important;
-    background-color: $borderColor;
-    outline-color: $borderColor !important;
+    background-color: var(--presentation-border);
+    outline-color: var(--presentation-border) !important;
   }
 }
 

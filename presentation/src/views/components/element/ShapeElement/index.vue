@@ -1,10 +1,7 @@
 <template>
   <div
     class="editable-element-shape"
-    :class="{
-      lock: elementInfo.lock,
-      'format-painter': shapeFormatPainter,
-    }"
+    :class="{ lock: elementInfo.lock, 'format-painter': shapeFormatPainter }"
     :style="{
       top: elementInfo.top + 'px',
       left: elementInfo.left + 'px',

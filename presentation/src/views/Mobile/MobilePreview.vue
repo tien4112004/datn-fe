@@ -66,7 +66,7 @@ onMounted(() => {
 .menu {
   height: 50px;
   position: relative;
-  box-shadow: 0 -2px 4px 0 rgba($color: #333, $alpha: 0.05);
+  box-shadow: 0 -2px 4px 0 rgba(51, 51, 51, 0.05);
   background: #fff;
   display: flex;
   justify-content: center;
@@ -78,11 +78,11 @@ onMounted(() => {
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: $smTextSize;
+    font-size: 0.8125rem;
 
     .icon {
       margin-right: 8px;
-      font-size: $baseTextSize;
+      font-size: 0.875rem;
     }
   }
 }

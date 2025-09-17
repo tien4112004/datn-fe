@@ -27,8 +27,8 @@ const background = computed<SlideBackground | undefined>(() => currentSlide.valu
 
 // Calculate the color of the grid lines to avoid being too close to the background color
 const gridColor = computed(() => {
-  const bgColor = background.value?.color || '$background';
-  const colorList = ['$foreground', '$background'];
+  const bgColor = background.value?.color || 'var(--presentation-background)';
+  const colorList = ['var(--presentation-foreground)', 'var(--presentation-background)'];
   return tinycolor
     .mostReadable(bgColor, colorList, { includeFallbackColors: true })
     .setAlpha(0.5)

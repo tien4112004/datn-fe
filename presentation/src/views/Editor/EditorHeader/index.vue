@@ -14,7 +14,7 @@
           v-model:value="titleValue"
           @blur="handleUpdateTitle()"
           v-if="editingTitle"
-        ></Input>
+        />
         <div class="title-text" @click="startEditTitle()" :title="title" v-else>
           {{ title }}
         </div>
@@ -77,23 +77,6 @@
             "
             >{{ $t('header.tools.quickActions') }}</PopoverMenuItem
           >
-
-          <!-- Demo message -->
-          <PopoverMenuItem @click="message.success('This is a success message')"
-            >Demo Success Message
-          </PopoverMenuItem>
-
-          <PopoverMenuItem @click="message.info('This is an info message')"
-            >Demo Info Message
-          </PopoverMenuItem>
-
-          <PopoverMenuItem @click="message.warning('This is a warning message')"
-            >Demo Warning Message
-          </PopoverMenuItem>
-
-          <PopoverMenuItem @click="message.error('This is an error message')"
-            >Demo Error Message
-          </PopoverMenuItem>
         </template>
         <div class="menu-item">
           <div class="handler-item">
@@ -248,13 +231,13 @@ const openAIPPTDialog = () => {
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: $baseTextSize;
+  font-size: 0.875rem;
   padding: 0 10px;
-  border-radius: $borderRadius;
+  border-radius: var(--presentation-radius);
   cursor: pointer;
 
   .icon {
-    color: $gray-666;
+    color: #666666;
   }
   .text {
     width: 18px;
@@ -277,7 +260,7 @@ const openAIPPTDialog = () => {
   display: flex;
   margin: 0 8px;
   padding: 0 2px;
-  border-radius: $borderRadius;
+  border-radius: var(--presentation-radius);
 
   &:hover {
     background-color: #f1f1f1;
@@ -296,7 +279,7 @@ const openAIPPTDialog = () => {
 .title {
   height: 30px;
   margin-left: 2px;
-  font-size: $baseTextSize;
+  font-size: 0.875rem;
 
   .title-input {
     width: 200px;
@@ -314,12 +297,12 @@ const openAIPPTDialog = () => {
     max-width: 400px;
     line-height: 30px;
     padding: 0 6px;
-    border-radius: $borderRadius;
+    border-radius: var(--presentation-radius);
     cursor: pointer;
     @include ellipsis-oneline();
 
     &:hover {
-      background-color: $light-gray;
+      background-color: var(--presentation-sidebar);
     }
   }
 }

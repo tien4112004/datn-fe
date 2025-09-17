@@ -103,7 +103,7 @@ watch(type, () => {
 
 <style lang="scss" scoped>
 .search-panel {
-  font-size: $smTextSize;
+  font-size: 0.8125rem;
 }
 .content {
   display: flex;
@@ -114,17 +114,17 @@ watch(type, () => {
   margin-top: 10px;
 }
 .count {
-  font-size: $xsTextSize;
+  font-size: 0.75rem;
   margin-right: 8px;
   user-select: none;
 }
 .ignore-case {
-  font-size: $xsTextSize;
+  font-size: 0.75rem;
   user-select: none;
   cursor: pointer;
 
   &.active {
-    color: $themeColor;
+    color: var(--presentation-primary);
   }
 }
 .next-btn {
@@ -137,7 +137,7 @@ watch(type, () => {
   cursor: pointer;
 
   &:hover {
-    color: $themeColor;
+    color: var(--presentation-primary);
   }
 }
 .footer {
@@ -156,7 +156,7 @@ watch(type, () => {
   justify-content: center;
   align-items: center;
   color: #666;
-  font-size: $smTextSize;
+  font-size: 0.8125rem;
   cursor: pointer;
 }
 </style>

@@ -235,34 +235,34 @@ onUnmounted(() => {
 
   ::v-deep(.ProseMirror) {
     height: 100%;
-    font-size: $xsTextSize;
+    font-size: 0.875rem;
     overflow: auto;
     padding: 8px;
-    line-height: 1.5;
+    line-height: 2;
 
     & > p[data-placeholder]::before {
       content: attr(data-placeholder);
       pointer-events: none;
       position: absolute;
-      font-size: $xsTextSize;
-      color: rgba($gray-666, 0.5);
+      font-size: 0.875rem;
+      color: rgba(102, 102, 102, 0.5);
     }
   }
 }
 .menu {
   display: flex;
-  background-color: $background;
+  background-color: var(--presentation-background);
   padding: 6px 4px;
-  border-radius: $borderRadius;
+  border-radius: var(--presentation-radius);
   box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.15);
 
   button {
     outline: 0;
     border: 0;
-    background-color: $background;
+    background-color: var(--presentation-background);
     padding: 3px;
-    border-radius: $borderRadius;
-    font-size: $baseTextSize;
+    border-radius: var(--presentation-radius);
+    font-size: 0.875rem;
     margin: 0 3px;
     display: flex;
     align-items: center;
@@ -271,8 +271,8 @@ onUnmounted(() => {
 
     &:hover,
     &.active {
-      background-color: $themeColor;
-      color: $background;
+      background-color: var(--presentation-primary);
+      color: var(--presentation-background);
     }
   }
 }

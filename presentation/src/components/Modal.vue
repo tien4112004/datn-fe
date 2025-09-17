@@ -1,7 +1,15 @@
 <template>
   <Teleport to="body">
     <Transition name="modal-fade">
-      <div class="modal" ref="modalRef" v-show="visible" tabindex="-1" @keyup.esc="onEsc()">
+      <div
+        class="modal"
+        ref="modalRef"
+        v-show="visible"
+        tabindex="-1"
+        aria-modal="true"
+        role="dialog"
+        @keyup.esc="onEsc()"
+      >
         <div class="mask" @click="onClickMask()"></div>
         <Transition
           name="modal-zoom"
@@ -101,14 +109,14 @@ const onClickMask = () => {
 
 .mask {
   position: absolute;
-  background: $shadow-medium;
+  background: rgba(0, 0, 0, 0.4);
 }
 
 .modal-content {
   z-index: 5001;
   padding: 20px;
-  background: $background;
-  border-radius: $borderRadius;
+  background: var(--presentation-background);
+  border-radius: var(--presentation-radius);
   overflow: hidden;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
   position: relative;

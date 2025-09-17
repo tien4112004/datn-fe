@@ -97,8 +97,8 @@ const markerSize = computed(() => {
 // Horizontal ruler
 .h {
   position: absolute;
-  background-color: $background;
-  border: 1px solid $borderColor;
+  background-color: var(--presentation-background);
+  border: 1px solid var(--presentation-border);
   height: 20px;
   top: 5px;
   display: flex;
@@ -110,7 +110,7 @@ const markerSize = computed(() => {
     position: absolute;
     top: 0;
     bottom: 0;
-    background-color: rgba($color: $themeColor, $alpha: 0.1);
+    background-color: color-mix(in srgb, var(--presentation-primary) 10%, transparent);
   }
 
   .ruler-marker-100 {
@@ -135,7 +135,7 @@ const markerSize = computed(() => {
       position: absolute;
       right: 0;
       bottom: 0;
-      background-color: $gray-999;
+      background-color: #999999;
     }
     &::before {
       content: '';
@@ -144,15 +144,15 @@ const markerSize = computed(() => {
       position: absolute;
       right: 50%;
       bottom: 0;
-      background-color: $gray-999;
+      background-color: #999999;
     }
   }
 }
 // Vertical ruler
 .v {
   position: absolute;
-  background-color: $background;
-  border: 1px solid $borderColor;
+  background-color: var(--presentation-background);
+  border: 1px solid var(--presentation-border);
   width: 20px;
   left: 5px;
   overflow: hidden;
@@ -161,7 +161,7 @@ const markerSize = computed(() => {
     position: absolute;
     left: 0;
     right: 0;
-    background-color: rgba($color: $themeColor, $alpha: 0.1);
+    background-color: color-mix(in srgb, var(--presentation-primary) 10%, transparent);
   }
 
   .ruler-marker-100 {
@@ -186,7 +186,7 @@ const markerSize = computed(() => {
       position: absolute;
       bottom: 0;
       right: 0;
-      background-color: $gray-999;
+      background-color: #999999;
     }
     &::before {
       content: '';
@@ -195,7 +195,7 @@ const markerSize = computed(() => {
       position: absolute;
       bottom: 50%;
       right: 0;
-      background-color: $gray-999;
+      background-color: #999999;
     }
   }
 }

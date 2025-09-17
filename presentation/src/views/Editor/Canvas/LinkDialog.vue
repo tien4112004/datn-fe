@@ -5,7 +5,7 @@
     <Input
       class="input"
       v-if="type === 'web'"
-      v-model:value="address"
+      v-model="address"
       :placeholder="t('canvas.linkDialog.enterWebAddress')"
     />
 
@@ -32,7 +32,7 @@ import useLink from '@/hooks/useLink';
 
 import ThumbnailSlide from '@/views/components/ThumbnailSlide/index.vue';
 import Tabs from '@/components/Tabs.vue';
-import Input from '@/components/Input.vue';
+import { Input } from '@/components/ui/input';
 import Button from '@/components/Button.vue';
 import Select from '@/components/Select.vue';
 
@@ -113,9 +113,10 @@ const save = () => {
   margin-top: 12px;
 }
 .thumbnail {
-  border: 1px solid rgba($color: $themeColor, $alpha: 0.15);
+  border: 1px solid color-mix(in srgb, var(--presentation-primary) 15%, transparent);
+
   margin-top: 5px;
-  border-radius: $borderRadius;
+  border-radius: var(--presentation-radius);
 }
 .btns {
   margin-top: 20px;

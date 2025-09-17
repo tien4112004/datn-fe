@@ -259,10 +259,10 @@ const contextmenus = (el: HTMLElement): ContextmenuItem[] => {
     position: relative;
 
     &.contextmenu-active {
-      color: $themeColor;
+      color: var(--presentation-primary);
 
       .text {
-        background-color: rgba($color: $themeColor, $alpha: 0.08);
+        background-color: rgb(from var(--presentation-primary) r g b / 0.08);
       }
     }
 
@@ -270,16 +270,16 @@ const contextmenus = (el: HTMLElement): ContextmenuItem[] => {
       font-weight: 700;
     }
     &.lv-1 {
-      font-size: $xlgTextSize;
+      font-size: 1.25rem;
     }
     &.lv-2 {
-      font-size: $baseTextSize;
+      font-size: 0.875rem;
     }
     &.lv-3 {
-      font-size: $baseTextSize;
+      font-size: 0.875rem;
     }
     &.lv-4 {
-      font-size: $smTextSize;
+      font-size: 0.8125rem;
       padding-left: 20px;
     }
   }
@@ -287,13 +287,13 @@ const contextmenus = (el: HTMLElement): ContextmenuItem[] => {
     height: 100%;
     padding: 0 11px;
     line-height: 32px;
-    border-radius: $borderRadius;
+    border-radius: var(--presentation-radius);
     transition: background-color 0.2s;
     cursor: pointer;
     @include ellipsis-oneline();
 
     &:hover {
-      background-color: rgba($color: $themeColor, $alpha: 0.08);
+      background-color: rgb(from var(--presentation-primary) r g b / 0.08);
     }
   }
   .flag {
@@ -314,21 +314,21 @@ const contextmenus = (el: HTMLElement): ContextmenuItem[] => {
       height: 100%;
       position: absolute;
       left: 50%;
-      background-color: rgba($color: $themeColor, $alpha: 0.1);
+      background-color: rgb(from var(--presentation-primary) r g b / 0.1);
     }
     &::after {
       content: '';
       width: 32px;
       height: 22px;
       border-radius: 2px;
-      background-color: $background;
-      border: 1px solid $themeColor;
-      color: $themeColor;
+      background-color: var(--presentation-background);
+      border: 1px solid var(--presentation-primary);
+      color: var(--presentation-primary);
       position: relative;
       display: flex;
       justify-content: center;
       align-items: center;
-      font-size: $xsTextSize;
+      font-size: 0.75rem;
       font-weight: 400;
     }
   }

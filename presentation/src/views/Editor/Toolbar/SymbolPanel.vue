@@ -43,7 +43,7 @@ const selectSymbol = (value: string) => {
     padding: 5px 12px;
     margin: 0 -12px;
     flex: 1;
-    font-size: $baseTextSize;
+    font-size: 0.875rem;
 
     @include overflow-overlay();
     @include flex-grid-layout();
@@ -55,10 +55,10 @@ const selectSymbol = (value: string) => {
     padding-bottom: 18%;
     position: relative;
     cursor: pointer;
-    border: 1px solid $borderColor;
+    border: 1px solid var(--presentation-border);
 
     &:hover {
-      color: $themeColor;
+      color: var(--presentation-primary);
     }
 
     .symbol {

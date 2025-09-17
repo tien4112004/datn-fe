@@ -422,15 +422,15 @@ $attentionColor: #e8b76a;
 
   &.in .type-title {
     border-left-color: $inColor;
-    background-color: rgba($color: $inColor, $alpha: 0.15);
+    background-color: rgba(104, 164, 144, 0.15);
   }
   &.out .type-title {
     border-left-color: $outColor;
-    background-color: rgba($color: $outColor, $alpha: 0.15);
+    background-color: rgba(216, 99, 68, 0.15);
   }
   &.attention .type-title {
     border-left-color: $attentionColor;
-    background-color: rgba($color: $attentionColor, $alpha: 0.15);
+    background-color: rgba(232, 183, 106, 0.15);
   }
 }
 .pool-type:not(:last-child) {
@@ -438,7 +438,7 @@ $attentionColor: #e8b76a;
 }
 .type-title {
   width: 100%;
-  font-size: $baseTextSize;
+  font-size: 0.875rem;
   margin-bottom: 10px;
   border-left: 4px solid #aaa;
   background-color: #eee;
@@ -459,8 +459,8 @@ $attentionColor: #e8b76a;
   align-items: center;
   height: 45px;
   line-height: 16px;
-  background-color: $gray-eee;
-  border-radius: $borderRadius;
+  background-color: #eeeeee;
+  border-radius: var(--presentation-radius);
   padding: 0px 8px;
 }
 
@@ -472,9 +472,9 @@ $attentionColor: #e8b76a;
   @include overflow-overlay();
 }
 .sequence-item {
-  border: 1px solid $borderColor;
+  border: 1px solid var(--presentation-border);
   padding: 8px;
-  border-radius: $borderRadius;
+  border-radius: var(--presentation-radius);
   margin-bottom: 8px;
   transition: all 0.5s;
 
@@ -508,7 +508,7 @@ $attentionColor: #e8b76a;
     }
     .handler {
       flex: 2;
-      font-size: $baseTextSize;
+      font-size: 0.875rem;
       text-align: right;
     }
     .handler-btn {

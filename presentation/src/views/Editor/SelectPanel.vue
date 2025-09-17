@@ -181,7 +181,7 @@ const close = () => {
 <style lang="scss" scoped>
 .select-panel {
   height: 100%;
-  font-size: $smTextSize;
+  font-size: 0.8125rem;
   user-select: none;
 }
 .handler {
@@ -207,7 +207,7 @@ const close = () => {
     cursor: pointer;
 
     &:hover {
-      color: $themeColor;
+      color: var(--presentation-primary);
     }
   }
 }
@@ -219,20 +219,20 @@ const close = () => {
 }
 .item {
   padding: 5px;
-  font-size: $smTextSize;
-  border-radius: $borderRadius;
+  font-size: 0.8125rem;
+  border-radius: var(--presentation-radius);
   display: flex;
   align-items: center;
   cursor: pointer;
 
-  &.active {
-    background-color: rgba($color: $themeColor, $alpha: 0.1);
+  &.primary {
+    background-color: color-mix(in srgb, var(--presentation-primary) 10%, transparent);
   }
-  &.group-active {
-    background-color: rgba($color: $themeColor, $alpha: 0.2);
+  &.secondary {
+    background-color: color-mix(in srgb, var(--presentation-primary) 20%, transparent);
   }
-  &:hover {
-    background-color: rgba($color: $themeColor, $alpha: 0.25);
+  &.tertiary {
+    background-color: color-mix(in srgb, var(--presentation-primary) 25%, transparent);
   }
 
   .name {
@@ -268,12 +268,12 @@ const close = () => {
   padding-left: 0;
   padding-right: 0;
   flex: 1;
-  font-size: $smTextSize;
+  font-size: 0.8125rem;
   background-color: transparent;
 }
 
 .visibility-icon {
-  font-size: $baseTextSize;
+  font-size: 0.875rem;
 }
 
 .btns {

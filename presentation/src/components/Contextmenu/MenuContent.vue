@@ -9,10 +9,7 @@
       >
         <div
           class="menu-item-content"
-          :class="{
-            'has-children': menu.children,
-            'has-handler': menu.handler,
-          }"
+          :class="{ 'has-children': menu.children, 'has-handler': menu.handler }"
           v-if="!menu.divider"
         >
           <span class="text">{{ menu.text }}</span>
@@ -47,22 +44,24 @@ $subMenuWidth: 120px;
 .menu-content {
   width: $menuWidth;
   padding: 5px 0;
-  background: $background;
-  border: 1px solid $borderColor;
-  box-shadow: $boxShadow;
-  border-radius: $borderRadius;
+  background: var(--presentation-background);
+  border: 1px solid var(--presentation-border);
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  border-radius: var(--presentation-radius);
   list-style: none;
   margin: 0;
 }
 .menu-item {
   padding: 0 20px;
-  color: $gray-555;
+  color: #555555;
   font-size: 12px;
-  transition: all $transitionDelayFast;
+  transition: all 0.1s;
   white-space: nowrap;
   height: $menuHeight;
   line-height: $menuHeight;
-  background-color: $background;
+  background-color: var(--presentation-background);
   cursor: pointer;
 
   &:not(.disable):hover > .menu-item-content > .sub-menu {
@@ -74,7 +73,7 @@ $subMenuWidth: 120px;
   }
 
   &:hover:not(.disable) {
-    background-color: rgba($color: $themeColor, $alpha: 0.2);
+    background-color: rgb(from var(--presentation-primary) r g b / 0.2);
   }
 
   &.divider {
@@ -104,7 +103,7 @@ $subMenuWidth: 120px;
     height: 8px;
     border-width: 1px;
     border-style: solid;
-    border-color: $gray-666 $gray-666 transparent transparent;
+    border-color: #666666 #666666 transparent transparent;
     position: absolute;
     right: 0;
     top: 50%;
@@ -115,12 +114,12 @@ $subMenuWidth: 120px;
     display: inline-block;
     width: 1px;
     height: 24px;
-    background-color: rgba($color: $background, $alpha: 0.3);
+    background-color: rgb(from var(--presentation-background) r g b / 0.3);
     position: absolute;
     right: 18px;
     top: 3px;
     transform: scale(0);
-    transition: transform $transitionDelay;
+    transition: transform 0.2s;
   }
 
   .sub-text {

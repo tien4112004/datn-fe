@@ -21,7 +21,7 @@
             @update:modelValue="(color) => updateBackground({ color })"
           />
         </template>
-        <ColorButton :color="background.color || '$background'" />
+        <ColorButton :color="background.color || 'var(--presentation-background)'" />
       </Popover>
 
       <Select
@@ -229,7 +229,7 @@
               @update:modelValue="(value) => updateTheme({ outline: { ...theme.outline, color: value } })"
             />
           </template>
-          <ColorButton :color="theme.outline.color || '$foreground'" />
+          <ColorButton :color="theme.outline.color || 'var(--presentation-foreground)'" />
         </Popover>
       </div>
       <div class="row">
@@ -340,11 +340,11 @@
     </div>
   </div>
 
-  <Modal v-model:visible="themeStylesExtractVisible" :width="320" @closed="themeStylesExtractVisible = false">
+  <Modal v-model:visible="themeStylesExtractVisible" :width="400" @closed="themeStylesExtractVisible = false">
     <ThemeStylesExtract @close="themeStylesExtractVisible = false" />
   </Modal>
 
-  <Modal v-model:visible="themeColorsSettingVisible" :width="310" @closed="themeColorsSettingVisible = false">
+  <Modal v-model:visible="themeColorsSettingVisible" :width="400" @closed="themeColorsSettingVisible = false">
     <ThemeColorsSetting @close="themeColorsSettingVisible = false" />
   </Modal>
 </template>
@@ -400,7 +400,7 @@ const background = computed(() => {
   if (!currentSlide.value.background) {
     return {
       type: 'solid',
-      value: '$background',
+      value: 'var(--presentation-background)',
     } as SlideBackground;
   }
   return currentSlide.value.background;
@@ -420,7 +420,7 @@ const updateBackgroundType = (type: SlideBackgroundType) => {
     const newBackground: SlideBackground = {
       ...background.value,
       type: 'solid',
-      color: background.value.color || '$background',
+      color: background.value.color || 'var(--presentation-background)',
     };
     slidesStore.updateSlide({ background: newBackground });
   } else if (type === 'image') {
@@ -440,8 +440,8 @@ const updateBackgroundType = (type: SlideBackgroundType) => {
       gradient: background.value.gradient || {
         type: 'linear',
         colors: [
-          { pos: 0, color: '$background' },
-          { pos: 100, color: '$background' },
+          { pos: 0, color: 'var(--presentation-background)' },
+          { pos: 100, color: 'var(--presentation-background)' },
         ],
         rotate: 0,
       },
@@ -543,14 +543,14 @@ const toFixed = (num: number) => {
 .background-image {
   height: 0;
   padding-bottom: 56.25%;
-  border: 1px dashed $borderColor;
-  border-radius: $borderRadius;
+  border: 1px dashed var(--presentation-border);
+  border-radius: var(--presentation-radius);
   position: relative;
-  transition: all $transitionDelay;
+  transition: all 0.2s;
 
   &:hover {
-    border-color: $themeColor;
-    color: $themeColor;
+    border-color: var(--presentation-primary);
+    color: var(--presentation-primary);
   }
 
   .content {
@@ -568,7 +568,7 @@ const toFixed = (num: number) => {
 .canvas-size {
   width: 100%;
   color: #888;
-  font-size: $xsTextSize;
+  font-size: 0.75rem;
   text-align: center;
 }
 
@@ -579,7 +579,7 @@ const toFixed = (num: number) => {
   @include flex-grid-layout-children(2, 48%);
 
   padding-bottom: 27%;
-  border-radius: $borderRadius;
+  border-radius: var(--presentation-radius);
   position: relative;
   cursor: pointer;
 
@@ -590,12 +590,12 @@ const toFixed = (num: number) => {
     flex-direction: column;
     justify-content: center;
     padding: 8px;
-    border: 1px solid $borderColor;
-    border-radius: $borderRadius;
+    border: 1px solid var(--presentation-border);
+    border-radius: var(--presentation-radius);
   }
 
   .text {
-    font-size: $baseTextSize;
+    font-size: 0.875rem;
   }
   .colors {
     display: flex;
@@ -618,23 +618,23 @@ const toFixed = (num: number) => {
     justify-content: center;
     align-items: center;
     display: flex;
-    background-color: rgba($color: $foreground, $alpha: 0.25);
+    background-color: color-mix(in srgb, var(--presentation-foreground) 25%, transparent);
     opacity: 0;
-    transition: opacity $transitionDelay;
+    transition: opacity 0.2s;
   }
 }
 .option {
   height: 32px;
   padding: 0 5px;
-  border-radius: $borderRadius;
+  border-radius: var(--presentation-radius);
 
   &:not(.selected):hover {
-    background-color: rgba($color: $themeColor, $alpha: 0.05);
+    background-color: color-mix(in srgb, var(--presentation-primary) 5%, transparent);
     cursor: pointer;
   }
 
   &.selected {
-    color: $themeColor;
+    color: var(--presentation-primary);
     font-weight: 700;
   }
 }

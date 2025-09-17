@@ -3,8 +3,11 @@ import { createPinia } from 'pinia';
 import icon from '../plugins/icon';
 import directive from '../plugins/directive/index';
 import ThumbnailSlide from '../views/components/ThumbnailSlide/index.vue';
+import 'prosemirror-view/style/prosemirror.css';
 import '@/assets/styles/prosemirror.scss';
 import '@/assets/styles/scope.scss';
+import '@/assets/styles/tailwind.css';
+import 'animate.css';
 import i18n from '@/locales';
 
 export function mount(el: string | Element, props: Record<string, unknown> = {}) {

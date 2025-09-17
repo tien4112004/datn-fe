@@ -70,6 +70,6 @@ const lineDashArray = computed(() => {
 
 <style lang="scss" scoped>
 svg {
-  stroke: $gray-333;
+  stroke: #333333;
 }
 </style>

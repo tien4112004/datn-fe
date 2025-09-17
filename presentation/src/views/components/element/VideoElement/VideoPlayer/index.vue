@@ -404,7 +404,7 @@ useMSE(props.src, videoRef);
 
 .video-wrap {
   position: relative;
-  background: $foreground;
+  background: var(--presentation-foreground);
   font-size: 0;
   width: 100%;
   height: 100%;
@@ -453,8 +453,8 @@ useMSE(props.src, videoRef);
       border-radius: 4px;
       padding: 5px 7px;
       background-color: rgba(0, 0, 0, 0.62);
-      color: $background;
-      font-size: $xsTextSize;
+      color: var(--presentation-background);
+      font-size: 0.75rem;
       text-align: center;
       opacity: 1;
       transition: opacity 0.1s ease-in-out;
@@ -491,7 +491,7 @@ useMSE(props.src, videoRef);
         bottom: 0;
         height: 3px;
         will-change: width;
-        background-color: $background;
+        background-color: var(--presentation-background);
 
         .thumb {
           position: absolute;
@@ -505,7 +505,7 @@ useMSE(props.src, videoRef);
           cursor: pointer;
           transition: all 0.3s ease-in-out;
           transform: scale(0);
-          background-color: $background;
+          background-color: var(--presentation-background);
         }
       }
     }
@@ -522,10 +522,10 @@ useMSE(props.src, videoRef);
     }
     .time {
       line-height: 38px;
-      color: $gray-eee;
+      color: #eeeeee;
       text-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
       vertical-align: middle;
-      font-size: $smTextSize;
+      font-size: 0.8125rem;
       cursor: default;
     }
     .icon {
@@ -536,26 +536,26 @@ useMSE(props.src, videoRef);
       display: flex;
       margin-inline: 5px;
       align-items: center;
-      font-size: $lgTextSize;
+      font-size: 1.125rem;
 
       &.play-icon {
-        font-size: $xxlMinusTextSize;
+        font-size: 1.5rem;
       }
 
       .icon-content {
         transition: all 0.2s ease-in-out;
         opacity: 0.8;
-        color: $background;
+        color: var(--presentation-background);
       }
       &.loop-icon {
-        font-size: $xsTextSize;
+        font-size: 0.75rem;
 
         .icon-content {
           opacity: 0.5;
         }
       }
       &.speed-icon {
-        font-size: $xsTextSize;
+        font-size: 0.75rem;
         position: relative;
       }
       .speed-menu {
@@ -565,7 +565,7 @@ useMSE(props.src, videoRef);
         left: -23px;
         background-color: #22211b;
         padding: 5px 0;
-        color: $gray-ddd;
+        color: #dddddd;
 
         .speed-menu-item {
           padding: 8px 0;
@@ -573,11 +573,11 @@ useMSE(props.src, videoRef);
 
           &:hover {
             background-color: #393833;
-            color: $background;
+            color: var(--presentation-background);
           }
           &.active {
             font-weight: 700;
-            color: $background;
+            color: var(--presentation-background);
           }
         }
       }
@@ -624,7 +624,7 @@ useMSE(props.src, videoRef);
       top: 17px;
       width: 0;
       height: 3px;
-      background: $gray-aaa;
+      background: #aaaaaa;
       transition: all 0.3s ease-in-out;
 
       .volume-bar-inner {
@@ -634,7 +634,7 @@ useMSE(props.src, videoRef);
         height: 100%;
         transition: all 0.1s ease;
         will-change: width;
-        background-color: $background;
+        background-color: var(--presentation-background);
 
         .thumb {
           position: absolute;
@@ -648,7 +648,7 @@ useMSE(props.src, videoRef);
           cursor: pointer;
           transition: all 0.3s ease-in-out;
           transform: scale(0);
-          background-color: $background;
+          background-color: var(--presentation-background);
         }
       }
     }
@@ -665,8 +665,8 @@ useMSE(props.src, videoRef);
   right: 0;
   top: 0;
   bottom: 0;
-  font-size: $xlgTextSize;
-  color: $background;
+  font-size: 1.25rem;
+  color: var(--presentation-background);
   pointer-events: none;
 
   .bezel-icon {
@@ -684,7 +684,7 @@ useMSE(props.src, videoRef);
     border-radius: 50%;
     opacity: 0;
     pointer-events: none;
-    font-size: $xxxlTextSize;
+    font-size: 2.25rem;
 
     &.bezel-transition {
       animation: bezel-hide 0.5s linear;
@@ -709,8 +709,8 @@ useMSE(props.src, videoRef);
   right: 0;
   top: 0;
   bottom: 0;
-  font-size: $baseTextSize;
-  color: $background;
+  font-size: 0.875rem;
+  color: var(--presentation-background);
   pointer-events: none;
   display: flex;
   justify-content: center;

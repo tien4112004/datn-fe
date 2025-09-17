@@ -60,7 +60,7 @@ watch(slideIndex, () => {
   left: 0;
   bottom: -120px;
   z-index: 4;
-  transition: bottom $transitionDelay;
+  transition: bottom 0.2s;
 
   &::after {
     content: '';
@@ -82,7 +82,7 @@ watch(slideIndex, () => {
   white-space: nowrap;
   overflow-x: auto;
   overflow-y: hidden;
-  background-color: rgba($color: #000, $alpha: 0.75);
+  background-color: rgba(0, 0, 0, 0.75);
   position: relative;
 }
 .thumbnail {
@@ -94,12 +94,12 @@ watch(slideIndex, () => {
   }
 
   &:hover {
-    outline-color: $themeColor;
+    outline-color: var(--presentation-primary);
   }
 
   &.active {
     outline-width: 3px;
-    outline-color: $themeColor;
+    outline-color: var(--presentation-primary);
   }
 }
 

@@ -39,8 +39,8 @@ const rotateClassName = computed(() => {
   left: 0;
   top: 0;
   margin: -5px 0 0 -5px;
-  border: 1px solid $themeColor;
-  background-color: $background;
+  border: 1px solid var(--presentation-primary);
+  background-color: var(--presentation-background);
   border-radius: 1px;
   cursor: pointer;
 

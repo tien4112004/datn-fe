@@ -123,7 +123,7 @@ const handleClickBlankArea = () => {
 .mobile-editor {
   height: 100%;
   position: relative;
-  background-color: $lightGray;
+  background-color: var(--presentation-muted);
 }
 .content {
   height: calc(100% - 280px);
@@ -138,7 +138,7 @@ const handleClickBlankArea = () => {
   position: relative;
   box-shadow:
     0 0 0 1px rgba(0, 0, 0, 0.01),
-    0 0 12px 0 $shadow-light;
+    0 0 12px 0 rgba(0, 0, 0, 0.1);
 }
 .background {
   width: 100%;

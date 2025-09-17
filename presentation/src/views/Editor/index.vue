@@ -6,11 +6,18 @@
       <div class="layout-content-center">
         <CanvasTool class="center-top" />
         <Canvas class="center-body" />
-        <Remark
-          class="center-bottom"
-          v-model:height="remarkHeight"
-          :style="{ height: `${remarkHeight}px` }"
-        />
+        <div class="center-bottom" @click="openRemarkDrawer">
+          <div class="remark-preview">
+            <div
+              class="remark-content"
+              :class="{ empty: !currentSlide?.remark }"
+              v-html="currentSlide?.remark || ''"
+            ></div>
+            <div class="remark-hint">
+              <span>{{ currentSlide?.remark ? 'Click to edit notes' : 'Click to add notes' }}</span>
+            </div>
+          </div>
+        </div>
       </div>
       <Toolbar class="layout-content-right" />
       <Button @click="handleClick">Click Me</Button>
@@ -21,6 +28,13 @@
   <SearchPanel v-if="showSearchPanel" />
   <NotesPanel v-if="showNotesPanel" />
   <MarkupPanel v-if="showMarkupPanel" />
+
+  <Drawer v-model:visible="showRemarkDrawer" placement="bottom">
+    <template #title>
+      <span>Slide Remarks</span>
+    </template>
+    <Remark v-model:height="remarkHeight" :style="{ height: `${remarkHeight}px` }" />
+  </Drawer>
 
   <Modal :visible="!!dialogForExport" :width="800" @closed="closeExportDialog()">
     <ExportDialog />
@@ -39,7 +53,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useMainStore, useSlidesStore } from '@/store';
 import useGlobalHotkey from '@/hooks/useGlobalHotkey';
@@ -61,9 +75,10 @@ import Modal from '@/components/Modal.vue';
 import Button from '@/components/Button.vue';
 import { convertToSlide } from '@/utils/slideLayout';
 import type { SlideTheme } from '@/types/slides';
+import Drawer from '@/components/Drawer.vue';
 
 const mainStore = useMainStore();
-const slideStore = useSlidesStore();
+const slidesStore = useSlidesStore();
 const {
   dialogForExport,
   showSelectPanel,
@@ -72,11 +87,17 @@ const {
   showMarkupPanel,
   showAIPPTDialog,
 } = storeToRefs(mainStore);
+const { currentSlide } = storeToRefs(slidesStore);
 const closeExportDialog = () => mainStore.setDialogForExport('');
 const closeAIPPTDialog = () => mainStore.setAIPPTDialogState(false);
-const appendNewSlide = slideStore.appendNewSlide;
 
-const remarkHeight = ref(45);
+const remarkHeight = ref(240);
+const showRemarkDrawer = ref(false);
+
+// Function to open the drawer for editing
+const openRemarkDrawer = () => {
+  showRemarkDrawer.value = true;
+};
 
 useGlobalHotkey();
 usePasteEvent();
@@ -203,8 +224,8 @@ const handleClick = async () => {
   ];
 
   const viewport = {
-    size: slideStore.viewportSize,
-    ratio: slideStore.viewportRatio,
+    size: slidesStore.viewportSize,
+    ratio: slidesStore.viewportRatio,
   };
 
   const theme = {
@@ -227,14 +248,14 @@ const handleClick = async () => {
     titleFontName: 'Roboto',
   } as SlideTheme;
 
-  slideStore.setTheme(theme); // This should be set after initialization
+  slidesStore.setTheme(theme); // This should be set after initialization
 
   for (const data of dataTests) {
     const slide = await convertToSlide(data, viewport, theme);
-    appendNewSlide(slide);
+    slidesStore.appendNewSlide(slide);
   }
 
-  console.log(slideStore.slides);
+  console.log(slidesStore.slides);
 };
 </script>
 
@@ -270,6 +291,51 @@ const handleClick = async () => {
   }
   .center-bottom {
     flex-shrink: 0;
+    height: 45px;
+    cursor: pointer;
+
+    .remark-preview {
+      height: 100%;
+      border-top: 1px solid var(--presentation-border);
+      padding: 8px 12px;
+      background: var(--presentation-background);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: background-color 0.2s;
+
+      &:hover {
+        background: rgba(0, 0, 0, 0.02);
+      }
+
+      .remark-content {
+        flex: 1;
+        font-size: 13px;
+        line-height: 1.4;
+        color: var(--presentation-foreground);
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        -webkit-box-orient: vertical;
+        word-wrap: break-word;
+
+        &.empty {
+          color: #999;
+          font-style: italic;
+          display: block;
+          -webkit-line-clamp: none;
+          line-clamp: none;
+        }
+      }
+
+      .remark-hint {
+        font-size: 11px;
+        color: #999;
+        margin-left: 8px;
+        white-space: nowrap;
+      }
+    }
   }
 }
 .layout-content-right {

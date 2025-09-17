@@ -36,7 +36,7 @@
       </div>
       <div class="configs">
         <div class="config-item">
-          <div class="label">{{ $t('ai.dialog.language') }}</div>
+          <div class="label">{{ $t('ai.dialog.settings.language') }}</div>
           <Select
             style="width: 120px"
             v-model:value="language"
@@ -48,7 +48,7 @@
           />
         </div>
         <div class="config-item">
-          <div class="label">{{ $t('ai.dialog.style') }}</div>
+          <div class="label">{{ $t('ai.dialog.settings.style') }}</div>
           <Select
             style="width: 120px"
             v-model:value="style"
@@ -62,7 +62,7 @@
           />
         </div>
         <div class="config-item">
-          <div class="label">{{ $t('ai.dialog.model') }}</div>
+          <div class="label">{{ $t('ai.dialog.settings.model') }}</div>
           <Select
             style="width: 190px"
             v-model:value="model"
@@ -81,7 +81,7 @@
           />
         </div>
         <div class="config-item">
-          <div class="label">{{ $t('ai.dialog.images') }}</div>
+          <div class="label">{{ $t('ai.dialog.settings.images') }}</div>
           <Select
             style="width: 100px"
             v-model:value="img"
@@ -296,7 +296,7 @@ const createPPT = async () => {
 
   .title {
     font-weight: 700;
-    font-size: $lgTextSize;
+    font-size: 1.125rem;
     margin-right: 8px;
     background: linear-gradient(270deg, #d897fd, #33bcfc);
     background-clip: text;
@@ -306,7 +306,7 @@ const createPPT = async () => {
   }
   .subtite {
     color: #888;
-    font-size: $smTextSize;
+    font-size: 0.8125rem;
   }
 }
 .preview {
@@ -342,8 +342,8 @@ const createPPT = async () => {
     @include flex-grid-layout();
 
     .template {
-      border: 2px solid $borderColor;
-      border-radius: $borderRadius;
+      border: 2px solid var(--presentation-border);
+      border-radius: var(--presentation-radius);
       width: 324px;
       height: 184px;
       margin-bottom: 12px;
@@ -353,7 +353,7 @@ const createPPT = async () => {
       }
 
       &.selected {
-        border-color: $themeColor;
+        border-color: var(--presentation-primary);
       }
 
       img {
@@ -378,16 +378,16 @@ const createPPT = async () => {
   margin-top: 10px;
 
   .recommend {
-    font-size: $xsTextSize;
+    font-size: 0.75rem;
     background-color: #f1f1f1;
-    border-radius: $borderRadius;
+    border-radius: var(--presentation-radius);
     padding: 3px 5px;
     margin-right: 5px;
     margin-top: 5px;
     cursor: pointer;
 
     &:hover {
-      color: $themeColor;
+      color: var(--presentation-primary);
     }
   }
 }
@@ -397,34 +397,34 @@ const createPPT = async () => {
   justify-content: space-between;
 
   .config-item {
-    font-size: $smTextSize;
+    font-size: 0.8125rem;
     display: flex;
     align-items: center;
-    gap: $normalSpacing;
+    gap: 0.25rem;
   }
 }
 .count {
-  font-size: $xsTextSize;
-  color: $gray-999;
+  font-size: 0.75rem;
+  color: #999999;
   margin-right: 10px;
 }
 .submit {
   height: 20px;
-  font-size: $smTextSize;
-  background-color: $themeColor;
-  color: $background;
+  font-size: 0.8125rem;
+  background-color: var(--presentation-primary);
+  color: var(--presentation-background);
   display: flex;
   align-items: center;
   padding: 0 8px 0 6px;
-  border-radius: $borderRadius;
+  border-radius: var(--presentation-radius);
   cursor: pointer;
 
   &:hover {
-    background-color: $themeHoverColor;
+    background-color: var(--presentation-secondary);
   }
 
   .icon {
-    font-size: $baseTextSize;
+    font-size: 0.875rem;
     margin-right: 3px;
   }
 }

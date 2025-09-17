@@ -1,44 +1,18 @@
 <template>
-  <Button class="color-btn">
-    <div class="color-block">
-      <div class="content" :style="{ backgroundColor: color }"></div>
+  <Button variant="outline" class="tw-h-9 tw-w-full tw-justify-center tw-gap-0.5 tw-overflow-hidden tw-p-0">
+    <div class="tw-border-border/20 tw-h-5 tw-flex-1 tw-border tw-border-dashed">
+      <div class="tw-h-full tw-w-full" :style="{ backgroundColor: color }" />
     </div>
-    <div class="handler-item">
-      <IconPlatte class="color-btn-icon" />
+    <div class="tw-flex tw-w-fit tw-items-center tw-justify-center">
+      <IconPalette class="tw-h-3.5 tw-w-3.5" />
     </div>
   </Button>
 </template>
 
 <script lang="ts" setup>
-import Button from './Button.vue';
+import { Button } from '@/components/ui/button';
 
 defineProps<{
   color: string;
 }>();
 </script>
-
-<style lang="scss" scoped>
-.color-btn {
-  width: 100%;
-  display: flex !important;
-  align-items: center;
-  justify-content: center;
-  padding: 0 !important;
-  gap: 2px;
-}
-.color-block {
-  height: 20px;
-  margin-left: 8px;
-  flex: 1;
-  outline: 1px dashed rgba($color: $gray-666, $alpha: 0.12);
-  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IArs4c6QAAAEBJREFUOE9jfPbs2X8GIoCkpCQRqhgYGEcNxBlOo2GIM2iGQLL5//8/UTnl+fPnxOWUUQNxhtNoGOLOKYM+2QAAh2Nq10DwkukAAAAASUVORK5CYII=);
-}
-.content {
-  width: 100%;
-  height: 100%;
-}
-.color-btn-icon {
-  width: 32px;
-  font-size: 13px;
-}
-</style>

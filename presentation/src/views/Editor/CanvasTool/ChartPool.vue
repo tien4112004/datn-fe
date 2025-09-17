@@ -58,10 +58,10 @@ const selectChart = (chart: ChartType) => {
   justify-content: center;
   align-items: center;
   text-align: center;
-  color: $gray-999;
+  color: #999999;
 
   &:hover {
-    color: $themeColor;
+    color: var(--presentation-primary);
   }
 
   .name {

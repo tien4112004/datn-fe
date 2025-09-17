@@ -116,22 +116,23 @@ onMounted(() => {
   width: 108px;
   margin-right: 10px;
   padding-right: 10px;
-  border-right: 1px solid $borderColor;
+  border-right: 1px solid var(--presentation-border);
   overflow: auto;
+  font-size: 0.8rem;
 
   .catalog {
     padding: 7px 8px;
-    border-radius: $borderRadius;
+    border-radius: var(--presentation-radius);
     cursor: pointer;
 
     &:hover {
-      background-color: $gray-f5f5f5;
+      background-color: #f5f5f5;
     }
 
     &.active {
-      color: $themeColor;
-      background-color: rgba($color: $themeColor, $alpha: 0.05);
-      border-right: 2px solid $themeColor;
+      color: var(--presentation-primary);
+      background-color: color-mix(in srgb, var(--presentation-primary) 5%, transparent);
+      border-right: 2px solid var(--presentation-primary);
       font-weight: 700;
     }
 
@@ -159,16 +160,16 @@ onMounted(() => {
 
   &:hover .insert-all {
     opacity: 1;
-    transition: opacity $transitionDelay;
+    transition: opacity 0.2s;
   }
 }
 .types {
   display: flex;
 
   .type {
-    border-radius: $borderRadius;
+    border-radius: var(--presentation-radius);
     padding: 3px 8px;
-    font-size: $smTextSize;
+    font-size: 0.8125rem;
     cursor: pointer;
 
     & + .type {
@@ -176,20 +177,20 @@ onMounted(() => {
     }
 
     &.active {
-      color: $themeColor;
-      background-color: rgba($color: $themeColor, $alpha: 0.05);
+      color: var(--presentation-primary);
+      background-color: color-mix(in srgb, var(--presentation-primary) 5%, transparent);
       font-weight: 700;
     }
 
     &:hover {
-      background-color: $gray-f5f5f5;
+      background-color: #f5f5f5;
     }
   }
 }
 .insert-all {
   opacity: 0;
-  font-size: $smTextSize;
-  color: $themeColor;
+  font-size: 0.8125rem;
+  color: var(--presentation-primary);
   text-decoration: underline;
   cursor: pointer;
 }
@@ -213,7 +214,7 @@ onMounted(() => {
   }
 
   &:hover .thumbnail {
-    outline-color: $themeColor;
+    outline-color: var(--presentation-primary);
   }
 
   .btns {
@@ -223,15 +224,15 @@ onMounted(() => {
     justify-content: center;
     align-items: center;
     display: flex;
-    background-color: rgba($color: $foreground, $alpha: 0.25);
+    background-color: color-mix(in srgb, var(--presentation-background) 80%, transparent);
     opacity: 0;
-    transition: opacity $transitionDelay;
+    transition: opacity 0.2s;
   }
 
   .thumbnail {
-    outline: 2px solid $borderColor;
-    transition: outline $transitionDelay;
-    border-radius: $borderRadius;
+    outline: 2px solid var(--presentation-border);
+    transition: outline 0.2s;
+    border-radius: var(--presentation-radius);
     cursor: pointer;
   }
 }

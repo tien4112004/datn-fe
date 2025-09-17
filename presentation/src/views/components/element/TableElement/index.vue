@@ -183,16 +183,16 @@ const updateSelectedCells = (cells: string[]) => {
   @include absolute-0();
 
   opacity: 0;
-  transition: opacity $transitionDelay;
+  transition: opacity 0.2s;
 
   .mask-tip {
     position: absolute;
     top: 5px;
     left: 5px;
-    background-color: rgba($color: $foreground, $alpha: 0.5);
-    color: $background;
+    background-color: rgb(from var(--presentation-foreground) r g b / 0.5);
+    color: var(--presentation-background);
     padding: 6px 12px;
-    font-size: $xsTextSize;
+    font-size: 0.75rem;
     transform-origin: 0 0;
   }
 

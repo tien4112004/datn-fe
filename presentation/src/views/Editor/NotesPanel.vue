@@ -244,7 +244,7 @@ const close = () => {
 <style lang="scss" scoped>
 .notes-panel {
   height: 100%;
-  font-size: $smTextSize;
+  font-size: 0.8125rem;
   user-select: none;
 }
 .container {
@@ -261,14 +261,14 @@ const close = () => {
 .empty {
   width: 100%;
   height: 100%;
-  color: $gray-999;
+  color: #999999;
   font-style: italic;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 .note {
-  border: 1px solid $gray-eee;
+  border: 1px solid #eeeeee;
   border-radius: 4px;
   padding: 10px;
 
@@ -300,7 +300,7 @@ const close = () => {
       height: 30px;
       border-radius: 50%;
       background-color: #42ba97;
-      color: $background;
+      color: var(--presentation-background);
       font-size: 18px;
       display: flex;
       justify-content: center;
@@ -309,11 +309,11 @@ const close = () => {
     }
 
     .username {
-      font-size: $baseTextSize;
+      font-size: 0.875rem;
     }
     .time {
-      font-size: $xsTextSize;
-      color: $gray-aaa;
+      font-size: 0.75rem;
+      color: #aaaaaa;
     }
   }
   .btns {
@@ -327,7 +327,7 @@ const close = () => {
 
       &:hover {
         text-decoration: underline;
-        color: $themeColor;
+        color: var(--presentation-primary);
       }
     }
   }
@@ -375,7 +375,7 @@ const close = () => {
       &.icon {
         width: 32px;
         height: 32px;
-        color: $gray-666;
+        color: #666666;
         cursor: pointer;
       }
     }

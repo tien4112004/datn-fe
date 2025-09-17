@@ -64,7 +64,7 @@ const setThemeColors = () => {
 };
 
 const addThemeColor = () => {
-  const colors = [...themeColors.value, '$foreground00'];
+  const colors = [...themeColors.value, 'var(--presentation-foreground)'];
   themeColors.value = colors;
 };
 
@@ -109,7 +109,7 @@ const deleteThemeColor = (index: number) => {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: $background;
+  background-color: var(--presentation-background);
   cursor: pointer;
 }
 </style>

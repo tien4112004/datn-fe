@@ -107,7 +107,7 @@ onUnmounted(unbindEventListeners);
   width: 4px;
   height: 8px;
   box-shadow: 0 0 2px rgba(0, 0, 0, 0.6);
-  background: $background;
+  background: var(--presentation-background);
   transform: translateX(-2px);
 }
 </style>

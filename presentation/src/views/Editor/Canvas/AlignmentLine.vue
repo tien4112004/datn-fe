@@ -34,7 +34,7 @@ const sizeStyle = computed(() => {
   .line {
     width: 0;
     height: 0;
-    border: 0 dashed $themeColor;
+    border: 0 dashed var(--presentation-primary);
 
     &.vertical {
       transform: translateY(-0.5px);

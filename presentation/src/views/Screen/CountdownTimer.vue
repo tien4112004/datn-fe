@@ -141,7 +141,7 @@ const changeTime = (e: FocusEvent | KeyboardEvent, type: 'minute' | 'second') =>
 }
 .header {
   height: 16px;
-  font-size: $smTextSize;
+  font-size: 0.8125rem;
   margin-bottom: 16px;
   display: flex;
   align-items: center;
@@ -152,7 +152,7 @@ const changeTime = (e: FocusEvent | KeyboardEvent, type: 'minute' | 'second') =>
 
     &:hover,
     &.active {
-      color: $themeColor;
+      color: var(--presentation-primary);
     }
   }
 }
@@ -166,7 +166,7 @@ const changeTime = (e: FocusEvent | KeyboardEvent, type: 'minute' | 'second') =>
   width: 54px;
   height: 54px;
   border-radius: 50%;
-  background-color: rgba($color: $themeColor, $alpha: 0.05);
+  background-color: color-mix(in srgb, var(--presentation-primary) 5%, transparent);
   overflow: hidden;
 
   input {
@@ -176,13 +176,13 @@ const changeTime = (e: FocusEvent | KeyboardEvent, type: 'minute' | 'second') =>
     outline: 0;
     background-color: transparent;
     text-align: center;
-    font-size: $xlgTextSize;
+    font-size: 1.25rem;
   }
 }
 .colon {
   height: 54px;
   line-height: 54px;
-  font-size: $xlgTextSize;
+  font-size: 1.25rem;
 }
 .icon-btn {
   width: 20px;
@@ -194,10 +194,10 @@ const changeTime = (e: FocusEvent | KeyboardEvent, type: 'minute' | 'second') =>
 }
 .pause,
 .play {
-  font-size: $baseTextSize;
+  font-size: 0.875rem;
 }
 .reset {
-  font-size: $xsTextSize;
+  font-size: 0.75rem;
 }
 .close-btn {
   position: absolute;

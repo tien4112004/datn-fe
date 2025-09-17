@@ -15,12 +15,12 @@
         :type="point.direction"
         :rotate="elementInfo.rotate"
         :style="point.style"
-        @mousedown.stop="($event) => scaleElement($event, elementInfo, point.direction)"
+        @mousedown.stop="($event: any) => scaleElement($event, elementInfo, point.direction)"
       />
       <RotateHandler
         class="operate-rotate-handler"
         :style="{ left: scaleWidth / 2 + 'px' }"
-        @mousedown.stop="($event) => rotateElement($event, elementInfo)"
+        @mousedown.stop="($event: any) => rotateElement($event, elementInfo)"
       />
     </template>
   </div>

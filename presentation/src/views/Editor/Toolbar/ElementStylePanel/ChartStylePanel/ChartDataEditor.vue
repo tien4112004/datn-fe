@@ -406,7 +406,7 @@ const changeSelectRange = (e: MouseEvent) => {
   position: absolute;
   top: 0;
   left: 0;
-  background-color: rgba($color: #888, $alpha: 0.3);
+  background-color: rgba(136, 136, 136, 0.3);
 }
 .range-line {
   width: 0;
@@ -414,7 +414,7 @@ const changeSelectRange = (e: MouseEvent) => {
   position: absolute;
   left: 0;
   top: 0;
-  border: 0 solid $themeColor;
+  border: 0 solid var(--presentation-primary);
 
   &.t {
     border-top-width: 1px;
@@ -445,7 +445,7 @@ const changeSelectRange = (e: MouseEvent) => {
     height: 12px;
     right: 0;
     top: 0;
-    background-color: $themeColor;
+    background-color: var(--presentation-primary);
   }
   &::before {
     content: '';
@@ -454,7 +454,7 @@ const changeSelectRange = (e: MouseEvent) => {
     height: 4px;
     right: 0;
     bottom: 0;
-    background-color: $themeColor;
+    background-color: var(--presentation-primary);
   }
 }
 table {
@@ -471,7 +471,7 @@ table {
     height: 32px;
 
     &.head {
-      background-color: rgba($color: $themeColor, $alpha: 0.08);
+      background-color: color-mix(in srgb, var(--presentation-primary) 8%, transparent);
     }
   }
   .item {
@@ -521,7 +521,7 @@ table {
   border: 1px solid #ccc;
   border-bottom: 0;
   border-right: 0;
-  background-color: $lightGray;
+  background-color: var(--presentation-muted);
 }
 .col-header-item {
   width: 100px;
@@ -542,7 +542,7 @@ table {
   border: 1px solid #ccc;
   border-bottom: 0;
   border-right: 0;
-  background-color: $lightGray;
+  background-color: var(--presentation-muted);
 }
 .row-header-item {
   height: 32px;
@@ -566,7 +566,7 @@ table {
   border: 1px solid #ccc;
   border-bottom: 0;
   border-right: 0;
-  background-color: $lightGray;
+  background-color: var(--presentation-muted);
 
   .triangle {
     position: absolute;

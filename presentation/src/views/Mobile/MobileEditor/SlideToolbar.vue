@@ -128,7 +128,7 @@ const handleInputMark = (e: Event) => {
 .remark {
   position: relative;
   flex: 1;
-  border-bottom: 1px solid $borderColor;
+  border-bottom: 1px solid var(--presentation-border);
   line-height: 1.5;
 
   textarea {
@@ -147,7 +147,7 @@ const handleInputMark = (e: Event) => {
 }
 .toolbar {
   height: 100px;
-  border-bottom: 1px solid $borderColor;
+  border-bottom: 1px solid var(--presentation-border);
   padding: 10px;
 }
 .row {

@@ -1,34 +1,53 @@
 <template>
-  <div class="popover" :class="{ center: center }" ref="triggerRef">
-    <div class="popover-content" :style="contentStyle" ref="contentRef">
-      <slot name="content" v-if="contentVisible"></slot>
-    </div>
-    <slot></slot>
-  </div>
+  <Popover :open="internalOpen" @update:open="handleOpenChange" :modal="true">
+    <PopoverTrigger as-child>
+      <div
+        ref="triggerRef"
+        :class="[center ? 'tw-flex tw-items-center tw-justify-center' : '', props.triggerClass]"
+        :style="props.style"
+      >
+        <slot></slot>
+      </div>
+    </PopoverTrigger>
+    <PopoverContent
+      :side="getSide(placement)"
+      :align="getAlign(placement)"
+      :sideOffset="offset"
+      :style="contentStyle"
+      :class="[
+        'data-[state=open]:tw-animate-in data-[state=closed]:tw-animate-out data-[state=closed]:tw-fade-out-0 data-[state=open]:tw-fade-in-0 data-[state=closed]:tw-zoom-out-95 data-[state=open]:tw-zoom-in-95 data-[side=bottom]:tw-slide-in-from-top-2 data-[side=left]:tw-slide-in-from-right-2 data-[side=right]:tw-slide-in-from-left-2 data-[side=top]:tw-slide-in-from-bottom-2 tw-w-fit',
+        props.contentClass,
+      ]"
+    >
+      <slot name="content"></slot>
+    </PopoverContent>
+  </Popover>
 </template>
 
 <script lang="ts" setup>
-import { type CSSProperties, onMounted, onUnmounted, ref, watch, computed } from 'vue';
-import tippy, { type Instance, type Placement } from 'tippy.js';
-
-import 'tippy.js/animations/scale.css';
+import { type CSSProperties, watch, ref } from 'vue';
+import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
+import type { Placement } from 'tippy.js';
 
 const props = withDefaults(
   defineProps<{
     value?: boolean;
-    trigger?: 'click' | 'mouseenter' | 'manual';
     placement?: Placement;
+    style?: CSSProperties;
     appendTo?: HTMLElement | 'parent';
     contentStyle?: CSSProperties;
     center?: boolean;
     offset?: number;
+    triggerClass?: string;
+    contentClass?: string;
   }>(),
   {
     value: false,
-    trigger: 'click',
     placement: 'bottom',
     center: false,
     offset: 8,
+    triggerClass: '',
+    contentClass: '',
   }
 );
 
@@ -38,80 +57,41 @@ const emit = defineEmits<{
   (event: 'hide'): void;
 }>();
 
-const instance = ref<Instance>();
 const triggerRef = ref<HTMLElement>();
-const contentRef = ref<HTMLElement>();
-const contentVisible = ref(false);
+const internalOpen = ref(props.value);
 
-const contentStyle = computed(() => {
-  return props.contentStyle || {};
-});
+// Convert tippy.js placement to reka-ui placement
+const getSide = (placement: Placement) => {
+  if (placement.includes('top')) return 'top';
+  if (placement.includes('right')) return 'right';
+  if (placement.includes('bottom')) return 'bottom';
+  if (placement.includes('left')) return 'left';
+  return 'bottom';
+};
 
+const getAlign = (placement: Placement) => {
+  if (placement.includes('start')) return 'start';
+  if (placement.includes('end')) return 'end';
+  return 'center';
+};
+
+// Handle open state changes
+const handleOpenChange = (open: boolean) => {
+  internalOpen.value = open;
+  emit('update:value', open);
+
+  if (open) {
+    emit('show');
+  } else {
+    emit('hide');
+  }
+};
+
+// Watch for external changes to value prop
 watch(
   () => props.value,
-  () => {
-    if (!instance.value) return;
-    if (props.value) instance.value.show();
-    else instance.value.hide();
+  (newValue) => {
+    internalOpen.value = newValue;
   }
 );
-
-onUnmounted(() => {
-  if (instance.value) instance.value.destroy();
-});
-
-onMounted(() => {
-  instance.value = tippy(triggerRef.value!, {
-    content: contentRef.value!,
-    allowHTML: true,
-    trigger: props.trigger,
-    placement: props.placement,
-    interactive: true,
-    appendTo: props.appendTo || document.body,
-    maxWidth: 'none',
-    offset: [0, props.offset],
-    duration: 200,
-    animation: 'scale',
-    theme: 'popover',
-    onShow() {
-      contentVisible.value = true;
-    },
-    onShown() {
-      if (!props.value) {
-        emit('update:value', true);
-        emit('show');
-      }
-    },
-    onHidden() {
-      if (props.value) {
-        emit('update:value', false);
-        emit('hide');
-      }
-      contentVisible.value = false;
-    },
-  });
-});
 </script>
-
-<style lang="scss" scoped>
-.popover.center {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-.popover-content {
-  background-color: $background;
-  padding: 10px;
-  border: 1px solid $borderColor;
-  box-shadow: $boxShadow;
-  border-radius: $cardBorderRadius;
-  font-size: $smTextSize;
-}
-</style>
-
-<style lang="scss">
-.tippy-box[data-theme~='popover'] {
-  border: 0;
-  outline: 0;
-}
-</style>

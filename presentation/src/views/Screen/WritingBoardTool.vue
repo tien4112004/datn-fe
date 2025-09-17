@@ -26,7 +26,7 @@
         <div class="tool-content">
           <Popover
             placement="top"
-            trigger="manual"
+            trigger="click"
             :value="sizePopoverType === 'pen'"
             @hide="sizePopoverType = ''"
           >
@@ -40,14 +40,14 @@
               class="btn"
               :class="{ active: writingBoardModel === 'pen' }"
               v-tooltip="$t('presentation.writingBoard.pen')"
-              @click="changeModel('pen')"
+              @click.stop="changeModel('pen')"
             >
               <IconWrite class="icon" />
             </div>
           </Popover>
           <Popover
             placement="top"
-            trigger="manual"
+            trigger="click"
             :value="sizePopoverType === 'shape'"
             @hide="sizePopoverType = ''"
           >
@@ -79,14 +79,14 @@
               class="btn"
               :class="{ active: writingBoardModel === 'shape' }"
               v-tooltip="$t('presentation.writingBoard.shape')"
-              @click="changeModel('shape')"
+              @click.stop="changeModel('shape')"
             >
               <IconGraphicDesign class="icon" />
             </div>
           </Popover>
           <Popover
             placement="top"
-            trigger="manual"
+            trigger="click"
             :value="sizePopoverType === 'mark'"
             @hide="sizePopoverType = ''"
           >
@@ -100,14 +100,14 @@
               class="btn"
               :class="{ active: writingBoardModel === 'mark' }"
               v-tooltip="$t('presentation.writingBoard.highlighter')"
-              @click="changeModel('mark')"
+              @click.stop="changeModel('mark')"
             >
               <IconHighLight class="icon" />
             </div>
           </Popover>
           <Popover
             placement="top"
-            trigger="manual"
+            trigger="click"
             :value="sizePopoverType === 'eraser'"
             @hide="sizePopoverType = ''"
           >
@@ -121,7 +121,7 @@
               class="btn"
               :class="{ active: writingBoardModel === 'eraser' }"
               v-tooltip="$t('presentation.writingBoard.eraser')"
-              @click="changeModel('eraser')"
+              @click.stop="changeModel('eraser')"
             >
               <IconErase class="icon" />
             </div>
@@ -140,10 +140,7 @@
           <div class="colors">
             <div
               class="color"
-              :class="{
-                active: color === writingBoardColor,
-                white: color === '#ffffff',
-              }"
+              :class="{ active: color === writingBoardColor, white: color === '#ffffff' }"
               v-for="color in writingBoardColors"
               :key="color"
               :style="{ backgroundColor: color }"
@@ -223,7 +220,11 @@ const shapeSize = ref(4);
 
 const changeModel = (model: WritingBoardModel) => {
   writingBoardModel.value = model;
-  sizePopoverType.value = sizePopoverType.value === model ? '' : model;
+  if (sizePopoverType.value === model) {
+    sizePopoverType.value = '';
+  } else {
+    sizePopoverType.value = model;
+  }
 };
 
 // Clear ink on canvas
@@ -277,7 +278,7 @@ const hanldeWritingEnd = () => {
 
 <style lang="scss" scoped>
 .writing-board-tool {
-  font-size: $xsTextSize;
+  font-size: 0.75rem;
   z-index: 10;
   @include absolute-0();
 
@@ -302,14 +303,14 @@ const hanldeWritingEnd = () => {
   .btn {
     padding: 5px;
     margin-right: 5px;
-    border-radius: $borderRadius;
+    border-radius: var(--presentation-radius);
     cursor: pointer;
 
     &:hover {
-      color: $themeColor;
+      color: var(--presentation-primary);
     }
     &.active {
-      background-color: rgba($color: $themeColor, $alpha: 0.5);
+      background-color: rgb(from var(--presentation-primary) r g b / 0.5);
       color: #fff;
     }
     &.close {
@@ -318,7 +319,7 @@ const hanldeWritingEnd = () => {
     }
   }
   .icon {
-    font-size: $lgTextSize;
+    font-size: 1.125rem;
   }
   .colors {
     display: flex;
@@ -327,7 +328,7 @@ const hanldeWritingEnd = () => {
   .color {
     width: 16px;
     height: 16px;
-    border-radius: $borderRadius;
+    border-radius: var(--presentation-radius);
     cursor: pointer;
 
     &:hover {
@@ -350,7 +351,7 @@ const hanldeWritingEnd = () => {
   display: flex;
   align-items: center;
   user-select: none;
-  font-size: $smTextSize;
+  font-size: 0.8125rem;
 
   &.shape {
     width: 280px;
@@ -361,7 +362,7 @@ const hanldeWritingEnd = () => {
     align-items: center;
 
     .icon {
-      font-size: $lgTextSize;
+      font-size: 1.125rem;
       cursor: pointer;
 
       & + .icon {
@@ -369,7 +370,7 @@ const hanldeWritingEnd = () => {
       }
 
       &.active {
-        color: $themeColor;
+        color: var(--presentation-primary);
       }
     }
   }

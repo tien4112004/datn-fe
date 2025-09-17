@@ -4,6 +4,8 @@ import { defineConfig, loadEnv } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import path from 'node:path';
 import Icons from 'unplugin-icons/dist/vite.js';
+import autoprefixer from 'autoprefixer';
+import tailwindcss from 'tailwindcss';
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
@@ -61,10 +63,12 @@ export default defineConfig(({ mode }) => {
         scss: {
           api: 'modern',
           additionalData: `
-            @use '@/assets/styles/variable.scss' as *;
             @use '@/assets/styles/mixin.scss' as *;
           `,
         },
+      },
+      postcss: {
+        plugins: [tailwindcss, autoprefixer],
       },
     },
     resolve: {

@@ -1,29 +1,32 @@
 <template>
-  <textarea
-    class="textarea"
-    :class="{
-      disabled: disabled,
-      resizable: resizable,
-    }"
+  <Textarea
     ref="textareaRef"
+    v-model="modelValue"
+    :class="[
+      'tw-duration-250 tw-box-border tw-w-full tw-resize-none tw-rounded-md tw-border tw-border-gray-300 tw-leading-relaxed tw-outline-none tw-transition-colors',
+      'tw-text-base tw-font-sans',
+      'focus:tw-shadow-none focus:tw-outline-none focus:tw-border-blue-500',
+      'disabled:tw-bg-gray-100 disabled:tw-text-gray-500 disabled:tw-border-gray-300',
+      'placeholder:tw-text-gray-500',
+      { 'tw-resize-y': resizable },
+    ]"
     :disabled="disabled"
-    :value="value"
     :rows="rows"
     :placeholder="placeholder"
     :style="{
       padding: padding ? `${padding}px` : '10px',
     }"
-    @input="($event) => handleInput($event)"
-    @focus="($event) => emit('focus', $event)"
-    @blur="($event) => emit('blur', $event)"
-    @keydown.enter="($event) => emit('enter', $event)"
-  ></textarea>
+    @focus="($event: FocusEvent) => emit('focus', $event)"
+    @blur="($event: FocusEvent) => emit('blur', $event)"
+    @keydown.enter="($event: KeyboardEvent) => emit('enter', $event)"
+  />
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
+import { Textarea } from '@/components/ui/textarea';
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     value: string;
     rows?: number;
@@ -47,53 +50,20 @@ const emit = defineEmits<{
   (event: 'enter', payload: KeyboardEvent): void;
 }>();
 
-const handleInput = (e: Event) => {
-  emit('update:value', (e.target as HTMLInputElement).value);
-};
+// Create computed property to bridge v-model:value to v-model
+const modelValue = computed({
+  get: () => props.value,
+  set: (newValue: string) => emit('update:value', newValue),
+});
 
-const textareaRef = ref<HTMLTextAreaElement>();
+const textareaRef = ref();
 const focus = () => {
-  if (textareaRef.value) textareaRef.value.focus();
+  if (textareaRef.value?.$el) {
+    textareaRef.value.$el.focus();
+  }
 };
 
 defineExpose({
   focus,
 });
 </script>
-
-<style lang="scss" scoped>
-.textarea {
-  outline: 0;
-  width: 100%;
-  background-color: $background;
-  border: 1px solid #d9d9d9;
-  border-radius: $cardBorderRadius;
-  padding: 10px;
-  transition: border-color 0.25s;
-  box-sizing: border-box;
-  line-height: 1.675;
-  resize: none;
-  font-family:
-    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif,
-    'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
-
-  &:focus {
-    border-color: $themeColor;
-    background-color: $background;
-  }
-
-  &.resizable {
-    resize: vertical;
-  }
-
-  &.disabled {
-    background-color: $gray-f5f5f5;
-    border-color: #dcdcdc;
-    color: #b7b7b7;
-  }
-
-  &::placeholder {
-    color: $muted-foreground;
-  }
-}
-</style>

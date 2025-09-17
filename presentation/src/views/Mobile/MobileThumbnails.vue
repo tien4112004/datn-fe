@@ -69,10 +69,10 @@ const handleDragEnd = (eventData: { newIndex: number; oldIndex: number }) => {
   }
 
   &.active {
-    outline-color: $themeColor;
+    outline-color: var(--presentation-primary);
 
     .label {
-      background-color: $themeColor;
+      background-color: var(--presentation-primary);
     }
   }
   .label {
@@ -85,7 +85,7 @@ const handleDragEnd = (eventData: { newIndex: number; oldIndex: number }) => {
     color: #fff;
     background-color: #aaa;
     z-index: 1;
-    font-size: $xsTextSize;
+    font-size: 0.75rem;
     text-align: center;
     padding: 0 5px;
   }

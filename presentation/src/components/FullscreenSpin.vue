@@ -35,7 +35,7 @@ withDefaults(
   align-items: center;
 
   &.mask {
-    background-color: rgba($color: #f1f1f1, $alpha: 0.7);
+    background-color: rgba(241, 241, 241, 0.7);
   }
 }
 .spin {
@@ -54,14 +54,14 @@ withDefaults(
 .spinner {
   width: 36px;
   height: 36px;
-  border: 3px solid $themeColor;
+  border: 3px solid var(--presentation-primary);
   border-top-color: transparent;
   border-radius: 50%;
   animation: spinner 0.8s linear infinite;
 }
 .text {
   margin-top: 20px;
-  color: $themeColor;
+  color: var(--presentation-primary);
 }
 @keyframes spinner {
   0% {

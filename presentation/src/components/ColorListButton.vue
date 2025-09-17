@@ -1,57 +1,26 @@
 <template>
-  <Button class="color-btn">
-    <div class="blocks">
-      <div class="color-block" v-for="(color, index) in colors" :key="index">
-        <div class="content" :style="{ backgroundColor: color }"></div>
+  <Button variant="outline" class="tw-flex tw-w-full tw-items-center tw-justify-center tw-gap-0.5 tw-p-0">
+    <div class="tw-border-muted-foreground/20 tw-flex tw-gap-0.5 tw-flex-1 tw-border tw-border-dashed">
+      <div v-for="(color, index) in limitedColors" :key="index" class="tw-h-5 tw-flex-1">
+        <div class="tw-h-full tw-w-full" :style="{ backgroundColor: color }"></div>
       </div>
     </div>
-    <IconPlatte class="color-btn-icon" />
+    <div class="tw-flex tw-w-fit tw-items-center tw-justify-center">
+      <IconPalette class="tw-h-3.5 tw-w-3.5" />
+    </div>
   </Button>
 </template>
 
 <script lang="ts" setup>
 import { computed } from 'vue';
-import Button from './Button.vue';
+import { Button } from '@/components/ui/button';
 
 const props = defineProps<{
   colors: string[];
 }>();
 
-const colors = computed(() => {
+const limitedColors = computed(() => {
   if (props.colors.length > 12) return props.colors.slice(0, 12);
   return props.colors;
 });
 </script>
-
-<style lang="scss" scoped>
-.color-btn {
-  width: 100%;
-  display: flex !important;
-  align-items: center;
-  justify-content: center;
-  padding: 0 !important;
-}
-.blocks {
-  display: flex;
-  flex: 1;
-  margin-left: 8px;
-  outline: 1px dashed rgba($color: $gray-666, $alpha: 0.12);
-}
-.color-block {
-  height: 20px;
-  flex: 1;
-  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IArs4c6QAAAEBJREFUOE9jfPbs2X8GIoCkpCQRqhgYGEcNxBlOo2GIM2iGQLL5//8/UTnl+fPnxOWUUQNxhtNoGOLOKYM+2QAAh2Nq10DwkukAAAAASUVORK5CYII=);
-
-  & + & {
-    margin-left: 2px;
-  }
-}
-.content {
-  width: 100%;
-  height: 100%;
-}
-.color-btn-icon {
-  width: 32px;
-  font-size: 13px;
-}
-</style>

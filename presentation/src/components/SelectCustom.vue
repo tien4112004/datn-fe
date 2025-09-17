@@ -1,8 +1,15 @@
 <template>
-  <div class="select-wrap" v-if="disabled">
-    <div class="select disabled" ref="selectRef">
-      <div class="selector"><slot name="label"></slot></div>
-      <div class="icon">
+  <div v-if="disabled">
+    <div
+      ref="selectRef"
+      class="tw-relative tw-h-8 tw-w-full tw-cursor-default tw-select-none tw-border tw-border-gray-300 tw-bg-gray-50 tw-pr-8 tw-text-sm tw-text-gray-500 tw-transition-colors tw-duration-200"
+    >
+      <div class="tw-h-[30px] tw-min-w-[50px] tw-truncate tw-pl-2.5 tw-leading-[30px]">
+        <slot name="label"></slot>
+      </div>
+      <div
+        class="tw-absolute tw-right-0 tw-top-0 tw-flex tw-h-[30px] tw-w-8 tw-items-center tw-justify-center tw-text-gray-400"
+      >
         <slot name="icon">
           <IconDown :size="14" />
         </slot>
@@ -10,7 +17,6 @@
     </div>
   </div>
   <Popover
-    class="select-wrap"
     trigger="click"
     v-model:value="popoverVisible"
     placement="bottom"
@@ -21,13 +27,24 @@
     v-else
   >
     <template #content>
-      <div class="options" :style="{ width: width + 2 + 'px' }" @click="popoverVisible = false">
+      <div
+        class="tw-max-h-[260px] tw-select-none tw-overflow-auto tw-p-1.5 tw-text-left tw-text-sm"
+        :style="{ width: width + 2 + 'px' }"
+        @click="popoverVisible = false"
+      >
         <slot name="options"></slot>
       </div>
     </template>
-    <div class="select" ref="selectRef">
-      <div class="selector"><slot name="label"></slot></div>
-      <div class="icon">
+    <div
+      ref="selectRef"
+      class="tw-relative tw-h-8 tw-w-full tw-cursor-pointer tw-select-none tw-rounded-md tw-border tw-border-gray-300 tw-bg-white tw-pr-8 tw-text-sm tw-transition-colors tw-duration-200 hover:tw-border-blue-500"
+    >
+      <div class="tw-h-[30px] tw-min-w-[50px] tw-truncate tw-pl-2.5 tw-leading-[30px]">
+        <slot name="label"></slot>
+      </div>
+      <div
+        class="tw-absolute tw-right-0 tw-top-0 tw-flex tw-h-[30px] tw-w-8 tw-items-center tw-justify-center tw-text-gray-400"
+      >
         <slot name="icon">
           <IconDown :size="14" />
         </slot>
@@ -67,57 +84,3 @@ onUnmounted(() => {
   resizeObserver.unobserve(selectRef.value);
 });
 </script>
-
-<style lang="scss" scoped>
-.select {
-  width: 100%;
-  height: 32px;
-  padding-right: 32px;
-  border-radius: $borderRadius;
-  transition: border-color 0.25s;
-  font-size: 13px;
-  user-select: none;
-  background-color: $background;
-  border: 1px solid #d9d9d9;
-  position: relative;
-  cursor: pointer;
-
-  &:not(.disabled):hover {
-    border-color: $themeColor;
-  }
-
-  &.disabled {
-    background-color: $gray-f5f5f5;
-    border-color: #dcdcdc;
-    color: #b7b7b7;
-    cursor: default;
-  }
-
-  .selector {
-    min-width: 50px;
-    height: 30px;
-    line-height: 30px;
-    padding-left: 10px;
-    @include ellipsis-oneline();
-  }
-}
-.options {
-  max-height: 260px;
-  padding: 5px;
-  overflow: auto;
-  text-align: left;
-  font-size: 13px;
-  user-select: none;
-}
-.icon {
-  width: 32px;
-  height: 30px;
-  color: $muted-foreground;
-  position: absolute;
-  top: 0;
-  right: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-</style>

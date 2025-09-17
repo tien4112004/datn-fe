@@ -1,10 +1,7 @@
 <template>
   <span
     class="switch"
-    :class="{
-      active: value,
-      disabled: disabled,
-    }"
+    :class="{ active: value, disabled: disabled, [`switch--${size}`]: true }"
     @click="handleChange()"
   >
     <span class="switch-core"></span>
@@ -16,9 +13,11 @@ const props = withDefaults(
   defineProps<{
     value: boolean;
     disabled?: boolean;
+    size?: 'medium' | 'small';
   }>(),
   {
     disabled: false,
+    size: 'medium',
   }
 );
 
@@ -38,15 +37,58 @@ const handleChange = () => {
   display: inline-block;
   cursor: pointer;
 
-  &:not(.disabled).active {
+  &--small {
+    height: 16px;
+
     .switch-core {
-      border-color: $themeColor;
-      background-color: $themeColor;
+      width: 32px;
+      height: 16px;
+      border-radius: 8px;
 
       &::after {
+        width: 12px;
+        height: 12px;
+        top: 1px;
+        left: 1px;
+      }
+    }
+
+    &:not(.disabled).active {
+      .switch-core::after {
+        left: 100%;
+        margin-left: -13px;
+      }
+    }
+  }
+
+  &--medium {
+    height: 20px;
+
+    .switch-core {
+      width: 40px;
+      height: 20px;
+      border-radius: 10px;
+
+      &::after {
+        width: 16px;
+        height: 16px;
+        top: 1px;
+        left: 1px;
+      }
+    }
+
+    &:not(.disabled).active {
+      .switch-core::after {
         left: 100%;
         margin-left: -17px;
       }
+    }
+  }
+
+  &:not(.disabled).active {
+    .switch-core {
+      border-color: var(--presentation-primary);
+      background-color: var(--presentation-primary);
     }
   }
 
@@ -54,7 +96,7 @@ const handleChange = () => {
     cursor: default;
 
     .switch-core::after {
-      background-color: $gray-f5f5f5;
+      background-color: #d9d9d9;
     }
   }
 }
@@ -83,7 +125,7 @@ const handleChange = () => {
     transition: all 0.3s;
     width: 16px;
     height: 16px;
-    background-color: $background;
+    background-color: var(--presentation-background);
   }
 }
 </style>

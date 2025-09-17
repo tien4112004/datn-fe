@@ -46,10 +46,10 @@ defineProps<{
 
   &:hover .shape-path {
     &:not(.outlined) {
-      stroke: $themeColor;
+      stroke: var(--presentation-primary);
     }
     &.outlined {
-      fill: $themeColor;
+      fill: var(--presentation-primary);
     }
   }
 

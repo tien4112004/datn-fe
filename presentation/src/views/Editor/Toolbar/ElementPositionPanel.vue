@@ -1,14 +1,14 @@
 <template>
-  <div class="element-positopn-panel">
+  <div class="element-position-panel">
     <div class="title title-panel">{{ $t('styling.position.single.layer') }}</div>
     <ButtonGroup class="row">
-      <Button style="flex-grow: 1" @click="orderElement(handleElement!, ElementOrderCommands.TOP)">
+      <Button style="width: 50%" @click="orderElement(handleElement!, ElementOrderCommands.TOP)">
         <div class="center">
           <IconSendToBack class="btn-icon" />
           <p>{{ $t('styling.position.single.bringToFront') }}</p>
         </div>
       </Button>
-      <Button style="flex-grow: 1" @click="orderElement(handleElement!, ElementOrderCommands.BOTTOM)">
+      <Button style="width: 50%" @click="orderElement(handleElement!, ElementOrderCommands.BOTTOM)">
         <div class="center">
           <IconBringToFrontOne class="btn-icon" />
           <p>{{ $t('styling.position.single.sendToBack') }}</p>
@@ -16,13 +16,13 @@
       </Button>
     </ButtonGroup>
     <ButtonGroup class="row">
-      <Button style="flex-grow: 1" @click="orderElement(handleElement!, ElementOrderCommands.UP)">
+      <Button style="width: 50%" @click="orderElement(handleElement!, ElementOrderCommands.UP)">
         <div class="center">
           <IconBringToFront class="btn-icon" />
           <p>{{ $t('styling.position.single.moveUp') }}</p>
         </div>
       </Button>
-      <Button style="flex-grow: 1" @click="orderElement(handleElement!, ElementOrderCommands.DOWN)">
+      <Button style="width: 50%" @click="orderElement(handleElement!, ElementOrderCommands.DOWN)">
         <div class="center">
           <IconSentToBack class="btn-icon" />
           <p>{{ $t('styling.position.single.moveDown') }}</p>
@@ -160,15 +160,16 @@
           :step="5"
           :value="rotate"
           @update:value="(value) => updateRotate(value)"
-          style="width: 50%"
         >
           <template #prefix> {{ $t('styling.position.single.rotation') }} </template>
         </NumberInput>
-        <div style="width: 6%"></div>
-        <div class="text-btn" @click="updateRotate45('-')" style="width: 24%"><IconRotate /> -45°</div>
-        <div class="text-btn" @click="updateRotate45('+')" style="width: 24%">
+      </div>
+
+      <div class="row flex gap-2">
+        <Button @click="updateRotate45('-')" class="flex-1"><IconRotate /> -45°</Button>
+        <Button @click="updateRotate45('+')" class="flex-1">
           <IconRotate :style="{ transform: 'rotateY(180deg)' }" /> +45°
-        </div>
+        </Button>
       </div>
     </template>
   </div>
@@ -188,8 +189,8 @@ import useAlignElementToCanvas from '@/hooks/useAlignElementToCanvas';
 import useHistorySnapshot from '@/hooks/useHistorySnapshot';
 import Divider from '@/components/Divider.vue';
 import Button from '@/components/Button.vue';
-import ButtonGroup from '@/components/ButtonGroup.vue';
 import NumberInput from '@/components/NumberInput.vue';
+import ButtonGroup from '@/components/ButtonGroup.vue';
 
 const slidesStore = useSlidesStore();
 const { handleElement, handleElementId } = storeToRefs(useMainStore());
@@ -377,16 +378,16 @@ const updateRotate45 = (command: '+' | '-') => {
   padding: 6px;
 
   &:hover {
-    color: $themeColor;
+    color: var(--presentation-primary);
   }
 
   &.active {
-    color: $lightGray;
-    background-color: $themeColor;
+    color: var(--presentation-muted);
+    background-color: var(--presentation-primary);
     border-radius: 50%;
 
     &:hover {
-      background-color: color.adjust($themeColor, $lightness: -10%);
+      background-color: rgb(29, 78, 216);
     }
   }
 }
@@ -402,7 +403,7 @@ const updateRotate45 = (command: '+' | '-') => {
 
   &:hover {
     background-color: #efefef;
-    border-radius: $borderRadius;
+    border-radius: var(--presentation-radius);
   }
 }
 </style>

@@ -158,8 +158,8 @@ interface TabItem {
 }
 
 const colors = [
-  '$foreground',
-  '$background',
+  'var(--presentation-foreground)',
+  'var(--presentation-background)',
   '#eeece1',
   '#1e497b',
   '#4e81bb',
@@ -262,8 +262,8 @@ const updateFill = (color: string) => {
   z-index: 99;
   bottom: 0;
   left: 0;
-  background-color: $background;
-  box-shadow: 0 0 15px 0 $shadow-light;
+  background-color: var(--presentation-background);
+  box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
   animation: slideInUp 0.15s;
@@ -295,8 +295,8 @@ const updateFill = (color: string) => {
 }
 .row-block {
   margin-bottom: 10px;
-  background-color: $lightGray;
-  border-radius: $borderRadius;
+  background-color: var(--presentation-muted);
+  border-radius: var(--presentation-radius);
   padding: 10px;
 }
 .label {

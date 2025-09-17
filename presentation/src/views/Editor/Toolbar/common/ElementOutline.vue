@@ -3,7 +3,7 @@
     <div class="row" v-if="!fixed">
       <div style="width: 40%">{{ $t('styling.effects.outline.border') }}</div>
       <div class="switch-wrapper" style="width: 60%">
-        <Switch :value="hasOutline" @update:value="(value) => toggleOutline(value)" />
+        <Switch :value="hasOutline" @update:value="(value) => toggleOutline(value)" size="small" />
       </div>
     </div>
     <template v-if="hasOutline && outline">
@@ -34,7 +34,7 @@
               @update:modelValue="(value) => updateOutline({ color: value })"
             />
           </template>
-          <ColorButton :color="outline.color || '$foreground'" />
+          <ColorButton :color="outline.color || 'var(--presentation-foreground)'" />
         </Popover>
       </div>
       <div class="row">
@@ -132,15 +132,15 @@ const toggleOutline = (checked: boolean) => {
 .option {
   height: 32px;
   padding: 0 5px;
-  border-radius: $borderRadius;
+  border-radius: var(--presentation-radius);
 
   &:not(.selected):hover {
-    background-color: rgba($color: $themeColor, $alpha: 0.05);
+    background-color: color-mix(in srgb, var(--presentation-primary) 5%, transparent);
     cursor: pointer;
   }
 
   &.selected {
-    color: $themeColor;
+    color: var(--presentation-primary);
     font-weight: 700;
   }
 }

@@ -110,7 +110,7 @@ const expPDF = () => {
 
   &::after {
     content: '';
-    background-color: $background;
+    background-color: var(--presentation-background);
     @include absolute-0();
   }
 }
@@ -129,7 +129,6 @@ const expPDF = () => {
 
   .row {
     display: flex;
-    justify-content: center;
     align-items: center;
     margin-bottom: 25px;
   }
@@ -143,8 +142,8 @@ const expPDF = () => {
   }
 
   .tip {
-    font-size: $smTextSize;
-    color: $gray-aaa;
+    font-size: 13px;
+    color: #aaaaaa;
     line-height: 1.8;
     margin-top: 25px;
   }

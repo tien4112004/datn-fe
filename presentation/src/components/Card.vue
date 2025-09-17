@@ -1,11 +1,7 @@
 <template>
   <div
     class="card"
-    :class="{
-      hoverable: hoverable,
-      clickable: clickable,
-      [`padding-${padding}`]: padding,
-    }"
+    :class="{ hoverable: hoverable, clickable: clickable, [`padding-${padding}`]: padding }"
     @click="handleClick"
   >
     <div class="card-content">
@@ -42,14 +38,14 @@ const handleClick = () => {
 
 <style lang="scss" scoped>
 .card {
-  background-color: $card;
+  background-color: var(--presentation-card);
   display: flex;
   user-select: none;
-  border: 1px solid $borderColor;
-  border-radius: $borderRadius;
+  border: 1px solid var(--presentation-border);
+  border-radius: var(--presentation-radius);
   transition: all 0.2s ease;
   height: 100%;
-  margin: $normalSpacing;
+  margin: 0.25rem;
 
   // Padding variations
   &.padding-none {
@@ -57,42 +53,42 @@ const handleClick = () => {
   }
 
   &.padding-small {
-    padding: $normalSpacing;
+    padding: 0.25rem;
   }
 
   &.padding-normal {
-    padding: $largeSpacing;
+    padding: 0.5rem;
   }
 
   &.padding-large {
-    padding: $extraLargeSpacing;
+    padding: 1rem;
   }
 
   // Interactive states
   &.hoverable:hover {
-    background-color: $card-hover;
-    border-color: rgba($color: $themeColor, $alpha: 0.3);
-    box-shadow: 0 2px 8px rgba($color: $themeColor, $alpha: 0.1);
+    background-color: var(--card-hover);
+    border-color: rgb(from var(--presentation-primary) r g b / 0.3);
+    box-shadow: 0 2px 8px rgb(from var(--presentation-primary) r g b / 0.1);
   }
 
   &.clickable {
     cursor: pointer;
 
     &:hover {
-      background-color: $card-hover;
-      border-color: rgba($color: $themeColor, $alpha: 0.3);
-      box-shadow: 0 2px 8px rgba($color: $themeColor, $alpha: 0.1);
+      background-color: var(--card-hover);
+      border-color: rgb(from var(--presentation-primary) r g b / 0.3);
+      box-shadow: 0 2px 8px rgb(from var(--presentation-primary) r g b / 0.1);
     }
 
     &:active {
       transform: translateY(1px);
-      box-shadow: 0 1px 4px rgba($color: $themeColor, $alpha: 0.1);
+      box-shadow: 0 1px 4px rgb(from var(--presentation-primary) r g b / 0.1);
     }
   }
 }
 
 .card-content {
   width: 100%;
-  color: $card-foreground;
+  color: var(--presentation-card-foreground);
 }
 </style>

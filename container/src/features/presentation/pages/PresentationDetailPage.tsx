@@ -36,22 +36,19 @@ const DetailPage = () => {
       ) {
         setIsProcessing(true);
         try {
-          const viewport = {
-            size: 1000,
-            ratio: 9 / 16,
-          };
-
           const theme = getDefaultPresentationTheme();
           const processedSlides = await processGeneratedSlides(
             generatedPresentation.aiResult,
-            viewport,
+            {
+              size: 1000,
+              ratio: 9 / 16,
+            },
             theme
           );
 
           const processedPresentation = {
             ...generatedPresentation.presentation,
             slides: processedSlides,
-            isParsed: true,
           };
 
           setPresentation(processedPresentation);
@@ -66,14 +63,14 @@ const DetailPage = () => {
         // If presentation is not parsed and no generated data, call AI Result
         setIsProcessing(true);
         const aiResult = await getAiResult.mutateAsync();
-        console.log('AI Result fetched:', aiResult);
+
         if (aiResult) {
           const processedSlides = await processGeneratedSlides(
             aiResult,
             { size: 1000, ratio: 9 / 16 },
             getDefaultPresentationTheme()
           );
-          setPresentation({ ...presentation, slides: processedSlides, isParsed: true });
+          setPresentation({ ...presentation, slides: processedSlides });
         }
 
         setIsProcessing(false);

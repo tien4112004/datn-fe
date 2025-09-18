@@ -3,20 +3,14 @@ import { OutlineCreationView, WorkspaceView } from '@/features/presentation/comp
 import { PresentationFormProvider } from '@/features/presentation/contexts/PresentationFormContext';
 import { useSearchParams } from 'react-router-dom';
 import useOutlineStore from '../stores/useOutlineStore';
-
-const PresentationViewState = {
-  OUTLINE_CREATION: 'outline_creation',
-  WORKSPACE: 'workspace',
-} as const;
-
-type PresentationViewState = (typeof PresentationViewState)[keyof typeof PresentationViewState];
+import { PRESENTATION_VIEW_STATE, type PresentationViewState } from '../types';
 
 const getViewFromParams = (searchParams: URLSearchParams): PresentationViewState => {
   const viewParam = searchParams.get('view');
-  if (viewParam === PresentationViewState.WORKSPACE) {
-    return PresentationViewState.WORKSPACE;
+  if (viewParam === PRESENTATION_VIEW_STATE.WORKSPACE) {
+    return PRESENTATION_VIEW_STATE.WORKSPACE;
   }
-  return PresentationViewState.OUTLINE_CREATION;
+  return PRESENTATION_VIEW_STATE.OUTLINE_CREATION;
 };
 
 const PresentationOutlinePage = () => {
@@ -29,10 +23,10 @@ const PresentationOutlinePage = () => {
   useEffect(() => {
     setCurrentView(getViewFromParams(searchParams));
 
-    if (currentView === PresentationViewState.WORKSPACE) {
+    if (currentView === PRESENTATION_VIEW_STATE.WORKSPACE) {
       setTimeout(() => {
         if (isEmptyOutline()) {
-          setCurrentView(PresentationViewState.OUTLINE_CREATION);
+          setCurrentView(PRESENTATION_VIEW_STATE.OUTLINE_CREATION);
           setSearchParams({});
         }
       }, 100);
@@ -40,14 +34,14 @@ const PresentationOutlinePage = () => {
   }, [searchParams]);
 
   const handleCreateOutline = () => {
-    setCurrentView(PresentationViewState.WORKSPACE);
-    setSearchParams({ view: PresentationViewState.WORKSPACE });
+    setCurrentView(PRESENTATION_VIEW_STATE.WORKSPACE);
+    setSearchParams({ view: PRESENTATION_VIEW_STATE.WORKSPACE });
     startStreaming();
   };
 
   return (
-    <PresentationFormProvider>
-      {currentView === PresentationViewState.OUTLINE_CREATION ? (
+    <PresentationFormProvider currentView={currentView}>
+      {currentView === PRESENTATION_VIEW_STATE.OUTLINE_CREATION ? (
         <OutlineCreationView onCreateOutline={handleCreateOutline} />
       ) : (
         <WorkspaceView />

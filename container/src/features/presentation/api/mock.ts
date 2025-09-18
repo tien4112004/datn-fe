@@ -256,6 +256,21 @@ export default class PresentationMockService implements PresentationApiService {
     this.baseUrl = baseUrl;
   }
 
+  async getAiResultById(id: string): Promise<any> {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        if (id === 'ai123') {
+          const slideData = {
+            slides: getMockSlideData(),
+          };
+          resolve(slideData);
+        } else {
+          reject(new Error(`AI result not found for id: ${id}`));
+        }
+      }, 500);
+    });
+  }
+
   async *getStreamedOutline(_request: OutlineData, signal: AbortSignal): AsyncGenerator<string> {
     const chunks = mockOutlineOutput.split(' ');
 

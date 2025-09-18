@@ -49,3 +49,10 @@ export const MODEL_PROVIDERS_LOGO: Record<string, string> = {
   Deepseek: '/images/providers/deepseek.png',
   Google: '/images/providers/google.png',
 };
+
+export const PRESENTATION_VIEW_STATE = {
+  OUTLINE_CREATION: 'outline_creation',
+  WORKSPACE: 'workspace',
+} as const;
+
+export type PresentationViewState = (typeof PRESENTATION_VIEW_STATE)[keyof typeof PRESENTATION_VIEW_STATE];

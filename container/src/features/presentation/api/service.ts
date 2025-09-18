@@ -153,23 +153,8 @@ export default class PresentationRealApiService implements PresentationApiServic
     let parsedAiResult = rawData.result;
 
     if (typeof rawData.result === 'string') {
-      // Remove ```json and ``` wrappers and parse each JSON block
-      const jsonBlocks = rawData.result
-        .split('---')
-        .map((block) => block.trim())
-        .filter((block) => block.startsWith('```json') && block.endsWith('```'))
-        .map((block) => {
-          const jsonContent = block.replace(/^```json\n/, '').replace(/\n```$/, '');
-          try {
-            return JSON.parse(jsonContent);
-          } catch (error) {
-            console.warn('Failed to parse JSON block:', jsonContent, error);
-            return null;
-          }
-        })
-        .filter((parsed) => parsed !== null);
-
-      parsedAiResult = jsonBlocks[0].slides;
+      const jsonBlocks = this._parseJsonBlocks(rawData.result);
+      parsedAiResult = jsonBlocks[0]?.slides || jsonBlocks;
     }
 
     return parsedAiResult;
@@ -188,31 +173,32 @@ export default class PresentationRealApiService implements PresentationApiServic
     // Parse the aiResult which contains JSON wrapped in ```json code blocks
     let parsedAiResult = rawData.aiResult;
     if (typeof rawData.aiResult === 'string') {
-      // Remove ```json and ``` wrappers and parse each JSON block
-      const jsonBlocks = rawData.aiResult
-        .split('---')
-        .map((block) => block.trim())
-        .filter((block) => block.startsWith('```json') && block.endsWith('```'))
-        .map((block) => {
-          const jsonContent = block.replace(/^```json\n/, '').replace(/\n```$/, '');
-          try {
-            return JSON.parse(jsonContent);
-          } catch (error) {
-            console.warn('Failed to parse JSON block:', jsonContent, error);
-            return null;
-          }
-        })
-        .filter((parsed) => parsed !== null);
-
-      parsedAiResult = jsonBlocks[0].slides;
+      const jsonBlocks = this._parseJsonBlocks(rawData.aiResult);
+      parsedAiResult = jsonBlocks[0]?.slides || jsonBlocks;
     }
-
-    console.log('Parsed AI Result:', parsedAiResult);
 
     return {
       aiResult: parsedAiResult,
       presentation: rawData.presentation,
     };
+  }
+
+  private _parseJsonBlocks(input: string): any[] {
+    // Remove ```json and ``` wrappers and parse each JSON block
+    return input
+      .split('---')
+      .map((block: string) => block.trim())
+      .filter((block: string) => block.startsWith('```json') && block.endsWith('```'))
+      .map((block: string) => {
+        const jsonContent = block.replace(/^```json\n/, '').replace(/\n```$/, '');
+        try {
+          return JSON.parse(jsonContent);
+        } catch (error) {
+          console.warn('Failed to parse JSON block:', jsonContent, error);
+          return null;
+        }
+      })
+      .filter((parsed: any) => parsed !== null);
   }
 
   _mapPresentationItem(data: any): Presentation {

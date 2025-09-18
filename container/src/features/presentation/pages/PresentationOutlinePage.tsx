@@ -16,35 +16,30 @@ const getViewFromParams = (searchParams: URLSearchParams): PresentationViewState
 const PresentationOutlinePage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [currentView, setCurrentView] = useState<PresentationViewState>(getViewFromParams(searchParams));
-  const isEmptyOutline = useOutlineStore((state) => state.isEmpty);
   const startStreaming = useOutlineStore((state) => state.startStreaming);
 
   // Sync state with URL changes
   useEffect(() => {
     setCurrentView(getViewFromParams(searchParams));
-
-    if (currentView === PRESENTATION_VIEW_STATE.WORKSPACE) {
-      setTimeout(() => {
-        if (isEmptyOutline()) {
-          setCurrentView(PRESENTATION_VIEW_STATE.OUTLINE_CREATION);
-          setSearchParams({});
-        }
-      }, 100);
-    }
   }, [searchParams]);
 
-  const handleCreateOutline = () => {
+  const switchToWorkspace = () => {
     setCurrentView(PRESENTATION_VIEW_STATE.WORKSPACE);
     setSearchParams({ view: PRESENTATION_VIEW_STATE.WORKSPACE });
     startStreaming();
   };
 
+  const switchToOutlineCreation = () => {
+    setCurrentView(PRESENTATION_VIEW_STATE.OUTLINE_CREATION);
+    setSearchParams({ view: PRESENTATION_VIEW_STATE.OUTLINE_CREATION });
+  };
+
   return (
-    <PresentationFormProvider currentView={currentView}>
+    <PresentationFormProvider>
       {currentView === PRESENTATION_VIEW_STATE.OUTLINE_CREATION ? (
-        <OutlineCreationView onCreateOutline={handleCreateOutline} />
+        <OutlineCreationView onCreateOutline={switchToWorkspace} />
       ) : (
-        <WorkspaceView />
+        <WorkspaceView onWorkspaceEmpty={switchToOutlineCreation} />
       )}
     </PresentationFormProvider>
   );

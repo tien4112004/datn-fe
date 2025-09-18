@@ -13,7 +13,7 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
   const navigate = useNavigate();
 
   // Form context
-  const { trigger, getValues } = usePresentationForm();
+  const { trigger, getValues, setValue } = usePresentationForm();
 
   // Streaming API
   const {
@@ -110,6 +110,7 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
 
       // Clear outline store and form data
       clearOutline();
+      setValue('topic', '');
 
       navigate(`/presentation/${generatedPresentation.presentation.id}`);
     } catch (error) {

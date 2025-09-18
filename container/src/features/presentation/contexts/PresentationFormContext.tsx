@@ -9,7 +9,6 @@ import {
   type UseFormGetValues,
 } from 'react-hook-form';
 import useFormPersist from 'react-hook-form-persist';
-import { PRESENTATION_VIEW_STATE, type PresentationViewState } from '../types';
 
 export type UnifiedFormData = {
   // Outline fields
@@ -37,17 +36,11 @@ const PresentationFormContext = createContext<PresentationFormContextValue | nul
 
 interface PresentationFormProviderProps {
   children: ReactNode;
-  currentView?: PresentationViewState;
-  defaultValues?: Partial<UnifiedFormData>;
 }
 
 const PRESENTATION_FORM_KEY = 'presentation-unified-form';
 
-export const PresentationFormProvider = ({
-  children,
-  defaultValues = {},
-  currentView,
-}: PresentationFormProviderProps) => {
+export const PresentationFormProvider = ({ children }: PresentationFormProviderProps) => {
   const persistedData = useMemo(() => getLocalStorageData(PRESENTATION_FORM_KEY), []);
 
   const form = useForm<UnifiedFormData>({
@@ -61,7 +54,6 @@ export const PresentationFormProvider = ({
       theme: '',
       contentLength: '',
       imageModel: '',
-      ...defaultValues,
       ...persistedData,
     },
   });
@@ -71,7 +63,7 @@ export const PresentationFormProvider = ({
     watch: form.watch,
     setValue: form.setValue,
     storage: window.localStorage,
-    exclude: currentView === PRESENTATION_VIEW_STATE.WORKSPACE ? ['topic'] : [],
+    exclude: [],
   });
 
   const contextValue: PresentationFormContextValue = {

@@ -23,12 +23,18 @@ import LoadingButton from '@/components/common/LoadingButton';
 import { useCallback } from 'react';
 import useOutlineStore from '../../stores/useOutlineStore';
 
-interface WorkspaceViewProps {}
+interface WorkspaceViewProps {
+  onWorkspaceEmpty: () => void;
+}
 
-const WorkspaceView = ({}: WorkspaceViewProps) => {
+const WorkspaceView = ({ onWorkspaceEmpty }: WorkspaceViewProps) => {
   const { t } = useTranslation('presentation', { keyPrefix: 'workspace' });
+  const isEmptyOutline = useOutlineStore((state) => state.isEmpty);
 
-  const { control, watch, setValue } = usePresentationForm();
+  const { control, watch, setValue, getValues } = usePresentationForm();
+  if (isEmptyOutline() || getValues().topic.trim() === '') {
+    onWorkspaceEmpty();
+  }
 
   const {
     stopStream,

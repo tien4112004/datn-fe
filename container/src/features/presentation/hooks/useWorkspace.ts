@@ -38,6 +38,7 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
   const endStream = useOutlineStore((state) => state.endStreaming);
   const markdownContent = useOutlineStore((state) => state.markdownContent);
   const clearOutline = useOutlineStore((state) => state.clearOutline);
+  const isStreamingStore = useOutlineStore((state) => state.isStreaming);
 
   const generatePresentationMutation = useGeneratePresentation();
   const setGeneratedPresentation = usePresentationStore((state) => state.setGeneratedPresentation);
@@ -130,6 +131,7 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
   }, [isStreaming, outlineItems, startStream, setOutlines, endStream]);
 
   return {
+    isStreaming: isStreamingStore,
     stopStream,
     clearContent,
 

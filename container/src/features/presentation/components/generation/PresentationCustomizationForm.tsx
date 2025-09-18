@@ -26,6 +26,7 @@ import { ModelSelect } from '@/components/common/ModelSelect';
 import { useModels } from '@/features/model';
 import type { UnifiedFormData } from '../../contexts/PresentationFormContext';
 import { useCallback } from 'react';
+import useOutlineStore from '../../stores/useOutlineStore';
 
 type CustomizationFormData = {
   theme: string;
@@ -176,6 +177,9 @@ const ImageModelSection = ({ control }: ImageModelSectionProps) => {
   );
 };
 
+/**
+ * @deprecated Use `CustomizationSection` instead
+ */
 const PresentationCustomizationForm = ({ control, watch, setValue }: PresentationCustomizationFormProps) => {
   return (
     <Card className="w-full max-w-3xl">
@@ -195,7 +199,6 @@ interface CustomizationSectionProps {
   setValue: any;
   onGeneratePresentation: () => void;
   isGenerating: boolean;
-  disabled?: boolean;
 }
 
 const CustomizationSection = ({
@@ -204,11 +207,11 @@ const CustomizationSection = ({
   setValue,
   onGeneratePresentation,
   isGenerating,
-  disabled = false,
 }: CustomizationSectionProps) => {
   const { t } = useTranslation('presentation', { keyPrefix: 'workspace' });
   const { t: tCustomization } = useTranslation('presentation', { keyPrefix: 'customization' });
   const { t: tOutline } = useTranslation('presentation', { keyPrefix: 'createOutline' });
+  const disabled = useOutlineStore((state) => state.isStreaming);
   const { models } = useModels();
 
   const onThemeSelect = useCallback(

@@ -20,8 +20,8 @@ import { useWorkspace } from '@/features/presentation/hooks/useWorkspace';
 import { usePresentationForm } from '@/features/presentation/contexts/PresentationFormContext';
 import { CustomizationSection } from './PresentationCustomizationForm';
 import LoadingButton from '@/components/common/LoadingButton';
-import useOutlineStore from '../../stores/useOutlineStore';
 import { useCallback } from 'react';
+import useOutlineStore from '../../stores/useOutlineStore';
 
 interface WorkspaceViewProps {}
 
@@ -30,10 +30,14 @@ const WorkspaceView = ({}: WorkspaceViewProps) => {
 
   const { control, watch, setValue } = usePresentationForm();
 
-  const { stopStream, clearContent, handleRegenerateOutline, handleGeneratePresentation, isGenerating } =
-    useWorkspace({});
-
-  const isStreaming = useOutlineStore((state) => state.isStreaming);
+  const {
+    stopStream,
+    clearContent,
+    handleRegenerateOutline,
+    handleGeneratePresentation,
+    isGenerating,
+    isStreaming,
+  } = useWorkspace({});
 
   return (
     <div className="flex min-h-[calc(100vh-1rem)] w-full max-w-3xl flex-col items-center justify-center self-center p-8">
@@ -48,7 +52,6 @@ const WorkspaceView = ({}: WorkspaceViewProps) => {
             stopStream={stopStream}
             clearContent={clearContent}
             onRegenerateOutline={handleRegenerateOutline}
-            disabled={isStreaming}
           />
 
           <OutlineSection />
@@ -59,7 +62,6 @@ const WorkspaceView = ({}: WorkspaceViewProps) => {
             setValue={setValue}
             onGeneratePresentation={handleGeneratePresentation}
             isGenerating={isGenerating}
-            disabled={isStreaming}
           />
         </form>
       </div>
@@ -72,7 +74,6 @@ interface OutlineFormSectionProps {
   stopStream: () => void;
   clearContent: () => void;
   onRegenerateOutline: () => void;
-  disabled?: boolean;
 }
 
 const OutlineFormSection = ({
@@ -80,11 +81,11 @@ const OutlineFormSection = ({
   stopStream,
   clearContent,
   onRegenerateOutline,
-  disabled = false,
 }: OutlineFormSectionProps) => {
   const { t } = useTranslation('presentation', { keyPrefix: 'createOutline' });
   const { models } = useModels();
   const { control } = usePresentationForm();
+  const disabled = useOutlineStore((state) => state.isStreaming);
 
   return (
     <div className="flex flex-col gap-4">

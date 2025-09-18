@@ -3,6 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import WorkspaceView from '@/features/presentation/components/generation/WorkspaceView';
 import { renderWithProviders } from '@/tests/test-utils';
 import { PresentationFormProvider } from '@/features/presentation/contexts/PresentationFormContext';
+import useOutlineStore from '@/features/presentation/stores/useOutlineStore';
 
 // Mock the hooks and dependencies
 vi.mock('@/features/presentation/hooks/useWorkspace', () => ({
@@ -15,14 +16,30 @@ vi.mock('@/features/presentation/hooks/useWorkspace', () => ({
   }),
 }));
 
-vi.mock('@/features/presentation/stores/useOutlineStore', () => ({
-  default: vi.fn((selector) => {
+vi.mock('@/features/presentation/stores/useOutlineStore', () => {
+  const mockUseOutlineStore = vi.fn((selector) => {
     const state = {
+      outlines: [],
+      outlineIds: [],
       isStreaming: false,
+      markdownContent: () => '',
+      setOutlines: vi.fn(),
+      startStreaming: vi.fn(),
+      endStreaming: vi.fn(),
+      handleOutlineChange: vi.fn(),
+      deleteOutline: vi.fn(),
+      addOutline: vi.fn(),
+      getOutline: vi.fn(),
+      swap: vi.fn(),
+      clearOutline: vi.fn(),
+      isEmpty: () => false,
     };
     return typeof selector === 'function' ? selector(state) : state;
-  }),
-}));
+  });
+  return {
+    default: mockUseOutlineStore,
+  };
+});
 
 vi.mock('@/features/model', () => ({
   useModels: () => ({
@@ -99,14 +116,17 @@ vi.mock('@/components/common/LoadingButton', () => ({
 }));
 
 describe('WorkspaceView', () => {
+  const mockOnWorkspaceEmpty = vi.fn();
+
   beforeEach(() => {
     vi.clearAllMocks();
+    mockOnWorkspaceEmpty.mockClear();
   });
 
   it('renders workspace header with title', () => {
     renderWithProviders(
       <PresentationFormProvider>
-        <WorkspaceView />
+        <WorkspaceView onWorkspaceEmpty={mockOnWorkspaceEmpty} />
       </PresentationFormProvider>
     );
 
@@ -117,7 +137,7 @@ describe('WorkspaceView', () => {
   it('renders prompt section with correct elements', () => {
     renderWithProviders(
       <PresentationFormProvider>
-        <WorkspaceView />
+        <WorkspaceView onWorkspaceEmpty={mockOnWorkspaceEmpty} />
       </PresentationFormProvider>
     );
 
@@ -129,7 +149,7 @@ describe('WorkspaceView', () => {
   it('renders outline section', () => {
     renderWithProviders(
       <PresentationFormProvider>
-        <WorkspaceView />
+        <WorkspaceView onWorkspaceEmpty={mockOnWorkspaceEmpty} />
       </PresentationFormProvider>
     );
 
@@ -140,7 +160,7 @@ describe('WorkspaceView', () => {
   it('renders customization section', () => {
     renderWithProviders(
       <PresentationFormProvider>
-        <WorkspaceView />
+        <WorkspaceView onWorkspaceEmpty={mockOnWorkspaceEmpty} />
       </PresentationFormProvider>
     );
 
@@ -150,7 +170,7 @@ describe('WorkspaceView', () => {
   it('renders generate presentation button', () => {
     renderWithProviders(
       <PresentationFormProvider>
-        <WorkspaceView />
+        <WorkspaceView onWorkspaceEmpty={mockOnWorkspaceEmpty} />
       </PresentationFormProvider>
     );
 
@@ -161,7 +181,7 @@ describe('WorkspaceView', () => {
   it('handles form interactions without errors', () => {
     renderWithProviders(
       <PresentationFormProvider>
-        <WorkspaceView />
+        <WorkspaceView onWorkspaceEmpty={mockOnWorkspaceEmpty} />
       </PresentationFormProvider>
     );
 
@@ -175,7 +195,7 @@ describe('WorkspaceView', () => {
   it('shows outline workspace with correct slide count', () => {
     renderWithProviders(
       <PresentationFormProvider>
-        <WorkspaceView />
+        <WorkspaceView onWorkspaceEmpty={mockOnWorkspaceEmpty} />
       </PresentationFormProvider>
     );
 
@@ -185,10 +205,52 @@ describe('WorkspaceView', () => {
   it('shows development buttons when not streaming', () => {
     renderWithProviders(
       <PresentationFormProvider>
-        <WorkspaceView />
+        <WorkspaceView onWorkspaceEmpty={mockOnWorkspaceEmpty} />
       </PresentationFormProvider>
     );
 
     expect(screen.getByText('Clear (Dev)')).toBeInTheDocument();
+  });
+
+  it('calls onWorkspaceEmpty when outline is empty', () => {
+    // Mock the store to return true for isEmpty
+    const mockIsEmpty = vi.fn(() => true);
+    vi.mocked(useOutlineStore).mockImplementation((selector: any) => {
+      const state = {
+        outlines: [],
+        outlineIds: [],
+        isStreaming: false,
+        markdownContent: () => '',
+        setOutlines: vi.fn(),
+        startStreaming: vi.fn(),
+        endStreaming: vi.fn(),
+        handleOutlineChange: vi.fn(),
+        deleteOutline: vi.fn(),
+        addOutline: vi.fn(),
+        getOutline: vi.fn(),
+        swap: vi.fn(),
+        clearOutline: vi.fn(),
+        isEmpty: mockIsEmpty,
+      };
+      return typeof selector === 'function' ? selector(state) : state;
+    });
+
+    renderWithProviders(
+      <PresentationFormProvider>
+        <WorkspaceView onWorkspaceEmpty={mockOnWorkspaceEmpty} />
+      </PresentationFormProvider>
+    );
+
+    expect(mockOnWorkspaceEmpty).toHaveBeenCalled();
+  });
+
+  it('calls onWorkspaceEmpty when topic is empty', () => {
+    renderWithProviders(
+      <PresentationFormProvider>
+        <WorkspaceView onWorkspaceEmpty={mockOnWorkspaceEmpty} />
+      </PresentationFormProvider>
+    );
+
+    expect(mockOnWorkspaceEmpty).toHaveBeenCalled();
   });
 });

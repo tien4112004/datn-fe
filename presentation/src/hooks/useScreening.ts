@@ -7,20 +7,21 @@ export default () => {
 
   // Enter presentation mode (start from current slide)
   const enterScreening = () => {
-    document.dispatchEvent(new CustomEvent('hideSidebar', {}));
+    document.dispatchEvent(new CustomEvent('enableFullscreen', {}));
     enterFullscreen();
     screenStore.setScreening(true);
   };
 
   // Enter presentation mode (start from first slide)
   const enterScreeningFromStart = () => {
-    document.dispatchEvent(new CustomEvent('hideSidebar', {}));
+    document.dispatchEvent(new CustomEvent('enableFullscreen', {}));
     slidesStore.updateSlideIndex(0);
     enterScreening();
   };
 
   // Exit presentation mode
   const exitScreening = () => {
+    document.dispatchEvent(new CustomEvent('disableFullscreen', {}));
     screenStore.setScreening(false);
     if (isFullscreen()) exitFullscreen();
   };

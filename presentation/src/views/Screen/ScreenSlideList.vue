@@ -1,5 +1,5 @@
 <template>
-  <div class="screen-slide-list">
+  <div class="screen-slide-list select-none">
     <div
       :class="[
         'slide-item',

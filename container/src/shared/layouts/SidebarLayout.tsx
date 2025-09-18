@@ -11,7 +11,7 @@ import ErrorBoundary, { ErrorPageFallback } from '@/components/common/ErrorBound
 function NavLayoutContent() {
   const navigation = useNavigation();
   const isLoading = navigation.state === 'loading';
-  const { state, toggleSidebar } = useSidebar();
+  const { state, toggleSidebar, setFullscreen } = useSidebar();
   const { t } = useTranslation('loading');
 
   const hideSidebar = () => {
@@ -23,12 +23,16 @@ function NavLayoutContent() {
   React.useEffect(() => {
     subscribe('toggleSidebar', () => toggleSidebar());
     subscribe('hideSidebar', hideSidebar);
+    subscribe('enableFullscreen', () => setFullscreen(true));
+    subscribe('disableFullscreen', () => setFullscreen(false));
 
     return () => {
       unsubscribe('toggleSidebar', () => toggleSidebar());
       unsubscribe('hideSidebar', hideSidebar);
+      unsubscribe('enableFullscreen', () => setFullscreen(true));
+      unsubscribe('disableFullscreen', () => setFullscreen(false));
     };
-  }, [toggleSidebar, state]);
+  }, [toggleSidebar, state, setFullscreen]);
 
   return (
     <>

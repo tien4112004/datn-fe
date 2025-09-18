@@ -21,13 +21,14 @@ const SIDEBAR_WIDTH_LARGE_ICON = '4rem';
 const SIDEBAR_KEYBOARD_SHORTCUT = 'p';
 
 type SidebarContextProps = {
-  state: 'expanded' | 'collapsed';
+  state: 'expanded' | 'collapsed' | 'fullscreen';
   open: boolean;
   setOpen: (open: boolean) => void;
   openMobile: boolean;
   setOpenMobile: (open: boolean) => void;
   isMobile: boolean;
   toggleSidebar: () => void;
+  setFullscreen: (fullscreen: boolean) => void;
 };
 
 const SidebarContext = React.createContext<SidebarContextProps | null>(null);
@@ -76,6 +77,9 @@ function SidebarProvider({
     [setOpenProp, open]
   );
 
+  // Same for the fullscreen state.
+  const [fullscreen, setFullscreen] = React.useState(false);
+
   // Helper to toggle the sidebar.
   const toggleSidebar = React.useCallback(() => {
     return isMobile ? setOpenMobile((open) => !open) : setOpen((open) => !open);
@@ -96,7 +100,7 @@ function SidebarProvider({
 
   // We add a state so that we can do data-state="expanded" or "collapsed".
   // This makes it easier to style the sidebar with Tailwind classes.
-  const state = open ? 'expanded' : 'collapsed';
+  const state = fullscreen ? 'fullscreen' : open ? 'expanded' : 'collapsed';
 
   const contextValue = React.useMemo<SidebarContextProps>(
     () => ({
@@ -107,6 +111,7 @@ function SidebarProvider({
       openMobile,
       setOpenMobile,
       toggleSidebar,
+      setFullscreen,
     }),
     [state, open, setOpen, isMobile, openMobile, setOpenMobile, toggleSidebar]
   );
@@ -195,7 +200,7 @@ function Sidebar({
     <div
       className="text-sidebar-foreground group peer hidden md:block"
       data-state={state}
-      data-collapsible={state === 'collapsed' ? collapsible : ''}
+      data-collapsible={state === 'fullscreen' ? 'offcanvas' : state === 'collapsed' ? collapsible : ''}
       data-variant={variant}
       data-side={side}
       data-slot="sidebar"

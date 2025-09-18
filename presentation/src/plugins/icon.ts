@@ -109,6 +109,8 @@ import {
   LineSquiggle,
   MousePointer2,
   Sigma,
+  Undo2,
+  Redo2,
 } from 'lucide-vue-next';
 
 export interface Icons {
@@ -139,8 +141,8 @@ export const icons: Icons = {
   IconBackgroundColor: Palette,
   IconGroup: Group,
   IconUngroup: Ungroup,
-  IconBack: ArrowLeft,
-  IconNext: ArrowRight,
+  IconBack: Undo2,
+  IconNext: Redo2,
   IconFullwidth: Maximize2,
   IconAlignTop: AlignStartVertical,
   IconAlignLeft: AlignStartHorizontal,

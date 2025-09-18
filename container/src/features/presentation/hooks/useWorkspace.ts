@@ -127,6 +127,7 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
       setOutlines([...outlineItems]);
     } else {
       endStream();
+      setOutlines([...outlineItems]);
     }
   }, [isStreaming, outlineItems, startStream, setOutlines, endStream]);
 

@@ -58,8 +58,10 @@ function useStreaming<TRequest = any, TProcessed = any>({
     queryClient.setQueryData([...queryKey, requestData], null);
   }, []);
 
+  const processedData = transformFn(data?.join('') ?? '');
+
   return {
-    processedData: transformFn(data?.join('') ?? ''),
+    processedData,
     isStreaming,
     error: error && error.message !== 'CancelledError' ? error.message : null,
     restartStream,

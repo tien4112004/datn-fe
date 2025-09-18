@@ -25,8 +25,8 @@ export const convertTableOfContents = async (
   if (numberedItems.length >= 8) {
     const newData = {
       type: 'two_column',
+      title: 'Contents',
       data: {
-        title: 'Contents',
         items1: numberedItems.slice(0, Math.ceil(numberedItems.length / 2)),
         items2: numberedItems.slice(Math.ceil(numberedItems.length / 2)),
       },

@@ -23,5 +23,6 @@ export interface PresentationApiService extends Service {
   getPresentations(request: PresentationCollectionRequest): Promise<ApiResponse<Presentation[]>>;
   createPresentation(data: Presentation): Promise<Presentation>;
   getPresentationById(id: string): Promise<Presentation | null>;
+  getAiResultById(id: string): Promise<any>;
   generatePresentation(request: PresentationGenerationRequest): Promise<PresentationGenerationResponse>;
 }

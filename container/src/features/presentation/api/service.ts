@@ -146,6 +146,35 @@ export default class PresentationRealApiService implements PresentationApiServic
     return this._mapPresentationItem(response.data.data);
   }
 
+  async getAiResultById(id: string): Promise<any> {
+    const response = await api.get<ApiResponse<any>>(`${this.baseUrl}/api/presentations/${id}/ai-result`);
+
+    const rawData = response.data.data;
+    let parsedAiResult = rawData.result;
+
+    if (typeof rawData.result === 'string') {
+      // Remove ```json and ``` wrappers and parse each JSON block
+      const jsonBlocks = rawData.result
+        .split('---')
+        .map((block) => block.trim())
+        .filter((block) => block.startsWith('```json') && block.endsWith('```'))
+        .map((block) => {
+          const jsonContent = block.replace(/^```json\n/, '').replace(/\n```$/, '');
+          try {
+            return JSON.parse(jsonContent);
+          } catch (error) {
+            console.warn('Failed to parse JSON block:', jsonContent, error);
+            return null;
+          }
+        })
+        .filter((parsed) => parsed !== null);
+
+      parsedAiResult = jsonBlocks[0].slides;
+    }
+
+    return parsedAiResult;
+  }
+
   async generatePresentation(
     request: PresentationGenerationRequest
   ): Promise<PresentationGenerationResponse> {
@@ -154,7 +183,36 @@ export default class PresentationRealApiService implements PresentationApiServic
       request
     );
 
-    return response.data.data;
+    const rawData = response.data.data;
+
+    // Parse the aiResult which contains JSON wrapped in ```json code blocks
+    let parsedAiResult = rawData.aiResult;
+    if (typeof rawData.aiResult === 'string') {
+      // Remove ```json and ``` wrappers and parse each JSON block
+      const jsonBlocks = rawData.aiResult
+        .split('---')
+        .map((block) => block.trim())
+        .filter((block) => block.startsWith('```json') && block.endsWith('```'))
+        .map((block) => {
+          const jsonContent = block.replace(/^```json\n/, '').replace(/\n```$/, '');
+          try {
+            return JSON.parse(jsonContent);
+          } catch (error) {
+            console.warn('Failed to parse JSON block:', jsonContent, error);
+            return null;
+          }
+        })
+        .filter((parsed) => parsed !== null);
+
+      parsedAiResult = jsonBlocks[0].slides;
+    }
+
+    console.log('Parsed AI Result:', parsedAiResult);
+
+    return {
+      aiResult: parsedAiResult,
+      presentation: rawData.presentation,
+    };
   }
 
   _mapPresentationItem(data: any): Presentation {
@@ -165,6 +223,7 @@ export default class PresentationRealApiService implements PresentationApiServic
       slides: data.slides,
       createdAt: data.createdAt,
       updatedAt: data.updatedAt,
+      isParsed: data.parsed || false,
     };
   }
 }

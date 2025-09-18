@@ -6,7 +6,7 @@ import { useLoaderData, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import type { Presentation } from '../types';
 import usePresentationStore from '../stores/usePresentationStore';
-import { usePresentationById } from '../hooks/useApi';
+import { useAiResultById, usePresentationById } from '../hooks/useApi';
 import { processGeneratedSlides } from '../utils';
 import { getDefaultPresentationTheme } from '../api/mock';
 
@@ -25,6 +25,7 @@ const DetailPage = () => {
   const generatedPresentation = usePresentationStore((state) => state.generatedPresentation);
   const clearGeneratedPresentation = usePresentationStore((state) => state.clearGeneratedPresentation);
   const { refetch } = usePresentationById(id);
+  const getAiResult = useAiResultById(id);
 
   // Process generated presentation if needed
   useEffect(() => {
@@ -62,8 +63,20 @@ const DetailPage = () => {
           setIsProcessing(false);
         }
       } else if (!presentation.isParsed && !generatedPresentation) {
-        // If presentation is not parsed and no generated data, refetch from API
-        refetch();
+        // If presentation is not parsed and no generated data, call AI Result
+        setIsProcessing(true);
+        const aiResult = await getAiResult.mutateAsync();
+        console.log('AI Result fetched:', aiResult);
+        if (aiResult) {
+          const processedSlides = await processGeneratedSlides(
+            aiResult,
+            { size: 1000, ratio: 9 / 16 },
+            getDefaultPresentationTheme()
+          );
+          setPresentation({ ...presentation, slides: processedSlides, isParsed: true });
+        }
+
+        setIsProcessing(false);
       }
     };
 

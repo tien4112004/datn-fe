@@ -58,7 +58,7 @@ export const convertTwoColumnWithImage = async (
   // Calculate unified styles for items using element-based approach
   const contentAvailableBlock = {
     ...contentColumnBlock,
-    top: contentColumnBlock.top + titleDimensions.height + 40,
+    top: contentColumnBlock.top + titleDimensions.height + 60,
     height: contentColumnBlock.height - titleDimensions.height,
   };
 

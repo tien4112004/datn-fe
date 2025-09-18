@@ -179,3 +179,21 @@ export const useGeneratePresentation = () => {
     },
   });
 };
+
+export const useAiResultById = (id: string | undefined) => {
+  const presentationApiService = usePresentationApiService();
+
+  return useMutation({
+    mutationFn: async () => {
+      if (!id) {
+        throw new Error('Presentation ID is required');
+      }
+      const aiResult = await presentationApiService.getAiResultById(id);
+      if (!aiResult) {
+        throw new Error('AI Result not found');
+      }
+      console.log(aiResult);
+      return aiResult;
+    },
+  });
+};

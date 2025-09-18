@@ -74,7 +74,16 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
   }, []);
 
   const handleGeneratePresentation = useCallback(async () => {
-    const isValid = await trigger(['theme', 'contentLength', 'imageModel']);
+    const isValid = await trigger([
+      'theme',
+      'contentLength',
+      'imageModel',
+      'slideCount',
+      'targetAge',
+      'learningObjective',
+      'model',
+      'language',
+    ]);
     if (!isValid) return;
 
     try {
@@ -87,6 +96,11 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
         theme: data.theme,
         contentLength: data.contentLength,
         imageModel: data.imageModel,
+        slideCount: data.slideCount,
+        language: data.language,
+        model: data.model,
+        targetAge: data.targetAge,
+        learningObjective: data.learningObjective,
       };
 
       const generatedPresentation = await generatePresentationMutation.mutateAsync(generationRequest);

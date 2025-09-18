@@ -52,7 +52,7 @@ export const PresentationFormProvider = ({ children, defaultValues = {} }: Prese
       language: 'en',
       model: '',
       targetAge: '7-10',
-      learningObjective: 'something',
+      learningObjective: 'Help student understand the topic',
       theme: '',
       contentLength: '',
       imageModel: '',

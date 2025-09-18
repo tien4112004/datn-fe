@@ -25,8 +25,8 @@ export interface TitleLayoutSchema {
 
 export interface TwoColumnLayoutSchema {
   type: string;
+  title: string;
   data: {
-    title: string;
     items1: string[];
     items2: string[];
   };

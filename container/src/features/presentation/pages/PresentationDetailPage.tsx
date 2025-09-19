@@ -6,7 +6,7 @@ import { useLoaderData, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import type { Presentation } from '../types';
 import usePresentationStore from '../stores/usePresentationStore';
-import { useAiResultById, usePresentationById } from '../hooks/useApi';
+import { useAiResultById } from '../hooks/useApi';
 import { processGeneratedSlides } from '../utils';
 import { getDefaultPresentationTheme } from '../api/mock';
 

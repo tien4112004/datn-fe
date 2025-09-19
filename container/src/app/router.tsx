@@ -8,6 +8,7 @@ import Mindmap from '@/features/mindmap';
 import { getMindmapById } from '@/features/mindmap/hooks/loaders';
 import { getPresentationById } from '@/features/presentation/hooks/loaders';
 import { getModels } from '@/features/model/hooks/loaders';
+import Projects from '@/features/projects';
 import Settings from '@/features/settings';
 
 const router = createBrowserRouter([
@@ -22,6 +23,10 @@ const router = createBrowserRouter([
       {
         path: 'presentation/thumbnail',
         Component: Presentation.ThumbnailDemoPage,
+      },
+      {
+        path: 'projects',
+        Component: Projects.ProjectListPage,
       },
       {
         path: 'presentation',

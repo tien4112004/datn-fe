@@ -24,7 +24,6 @@ const DetailPage = () => {
   const { t } = useTranslation('loading');
   const generatedPresentation = usePresentationStore((state) => state.generatedPresentation);
   const clearGeneratedPresentation = usePresentationStore((state) => state.clearGeneratedPresentation);
-  const { refetch } = usePresentationById(id);
   const getAiResult = useAiResultById(id);
 
   // Process generated presentation if needed
@@ -78,13 +77,7 @@ const DetailPage = () => {
     };
 
     processPresentation();
-  }, [
-    generatedPresentation,
-    presentation.isParsed,
-    presentation.id,
-    clearGeneratedPresentation,
-    getAiResult,
-  ]);
+  }, [generatedPresentation, presentation.isParsed, presentation.id, clearGeneratedPresentation]);
 
   const handleMessage = useCallback((event: CustomEvent<MessageDetail>) => {
     const { type, message } = event.detail;

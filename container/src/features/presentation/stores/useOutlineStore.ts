@@ -8,8 +8,10 @@ interface OutlineStore {
   outlines: OutlineItem[];
   outlineIds: string[];
   isStreaming: boolean;
+  isGenerating?: boolean;
   markdownContent: () => string;
   setOutlines: (value: OutlineItem[]) => void;
+  startGenerating: () => void;
   startStreaming: () => void;
   endStreaming: () => void;
   handleOutlineChange?: (id: string, content: string) => void;
@@ -27,6 +29,7 @@ const useOutlineStore = create<OutlineStore>()(
       outlines: [],
       outlineIds: [],
       isStreaming: false,
+      isGenerating: false, // Flag to indicate if the generation is started via CreateOutlineView
 
       markdownContent: () => {
         return mapOutlineItemsToMarkdown(get().outlines);
@@ -63,6 +66,11 @@ const useOutlineStore = create<OutlineStore>()(
         }));
       },
 
+      startGenerating: () =>
+        set(() => ({
+          isGenerating: true,
+        })),
+
       startStreaming: () =>
         set(() => ({
           isStreaming: true,
@@ -71,6 +79,7 @@ const useOutlineStore = create<OutlineStore>()(
       endStreaming: () => {
         set(() => ({
           isStreaming: false,
+          isGenerating: false,
         }));
       },
 

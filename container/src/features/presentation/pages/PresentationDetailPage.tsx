@@ -78,7 +78,13 @@ const DetailPage = () => {
     };
 
     processPresentation();
-  }, [generatedPresentation, presentation.isParsed, presentation.id, clearGeneratedPresentation, refetch]);
+  }, [
+    generatedPresentation,
+    presentation.isParsed,
+    presentation.id,
+    clearGeneratedPresentation,
+    getAiResult,
+  ]);
 
   const handleMessage = useCallback((event: CustomEvent<MessageDetail>) => {
     const { type, message } = event.detail;

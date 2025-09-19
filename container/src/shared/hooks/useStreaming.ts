@@ -6,6 +6,7 @@ export interface StreamingOptions<TRequest, TProcessed> {
   transformFn: (content: string) => TProcessed;
   input: TRequest;
   queryKey: string[];
+  enabled?: boolean;
 }
 
 export interface StreamingHookReturn<TRequest, TProcessed> {
@@ -15,6 +16,7 @@ export interface StreamingHookReturn<TRequest, TProcessed> {
   restartStream: (requestData: TRequest) => void;
   stopStream: () => void;
   clearContent: () => void;
+  fetch: () => void;
 }
 
 function useStreaming<TRequest = any, TProcessed = any>({
@@ -22,8 +24,9 @@ function useStreaming<TRequest = any, TProcessed = any>({
   transformFn,
   input,
   queryKey,
+  enabled = true,
 }: StreamingOptions<TRequest, TProcessed>): StreamingHookReturn<TRequest, TProcessed> {
-  const [isStreamingInternal, setIsStreamingInternal] = React.useState(true);
+  const [isStreamingInternal, setIsStreamingInternal] = React.useState(enabled);
   const requestData = React.useRef<TRequest>(input);
   const queryClient = useQueryClient();
 
@@ -41,11 +44,18 @@ function useStreaming<TRequest = any, TProcessed = any>({
     enabled: isStreamingInternal,
   });
 
+  const fetch = useCallback(() => {
+    if (!isStreamingInternal) {
+      setIsStreamingInternal(true);
+      refetch();
+    }
+  }, [refetch]);
+
   const stopStream = useCallback(() => {
     if (isStreamingInternal) {
       queryClient.cancelQueries({ queryKey: [...queryKey, requestData] });
     }
-    setIsStreamingInternal(!isStreamingInternal);
+    setIsStreamingInternal(false);
   }, []);
 
   const restartStream = useCallback((data: TRequest) => {
@@ -67,6 +77,7 @@ function useStreaming<TRequest = any, TProcessed = any>({
     restartStream,
     stopStream,
     clearContent,
+    fetch,
   };
 }
 

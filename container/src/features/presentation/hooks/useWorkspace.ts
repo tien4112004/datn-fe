@@ -23,14 +23,18 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
     stopStream,
     restartStream,
     clearContent,
-  } = useFetchStreamingOutline({
-    topic: getValues().topic,
-    slideCount: getValues().slideCount,
-    language: getValues().language,
-    model: getValues().model,
-    targetAge: getValues().targetAge,
-    learningObjective: getValues().learningObjective,
-  });
+    fetch,
+  } = useFetchStreamingOutline(
+    {
+      topic: getValues().topic,
+      slideCount: getValues().slideCount,
+      language: getValues().language,
+      model: getValues().model,
+      targetAge: getValues().targetAge,
+      learningObjective: getValues().learningObjective,
+    },
+    { enabled: false }
+  );
 
   // Stores
   const setOutlines = useOutlineStore((state) => state.setOutlines);
@@ -39,16 +43,23 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
   const markdownContent = useOutlineStore((state) => state.markdownContent);
   const clearOutline = useOutlineStore((state) => state.clearOutline);
   const isStreamingStore = useOutlineStore((state) => state.isStreaming);
+  const isGeneratingOutline = useOutlineStore((state) => state.isGenerating);
 
   const generatePresentationMutation = useGeneratePresentation();
   const setGeneratedPresentation = usePresentationStore((state) => state.setGeneratedPresentation);
   const setIsGenerating = usePresentationStore((state) => state.setIsGenerating);
   const isGenerating = usePresentationStore((state) => state.isGenerating);
 
+  useEffect(() => {
+    if (isGeneratingOutline) fetch();
+  }, [isGeneratingOutline, fetch]);
+
   // Handle streaming errors
-  if (error) {
-    toast.error('Error generating outline. Please try again.');
-  }
+  useEffect(() => {
+    if (error) {
+      toast.error('Error generating outline. Please try again.');
+    }
+  }, [error]);
 
   // Form handlers
   const handleRegenerateOutline = useCallback(async () => {
@@ -125,12 +136,17 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
   useEffect(() => {
     if (isStreaming) {
       startStream();
-      setOutlines([...outlineItems]);
     } else {
       endStream();
+    }
+  }, [isStreaming, startStream, endStream]);
+
+  // Only update outlines when streaming produces new data
+  useEffect(() => {
+    if (isStreaming && outlineItems.length > 0) {
       setOutlines([...outlineItems]);
     }
-  }, [isStreaming, outlineItems, startStream, setOutlines, endStream]);
+  }, [isStreaming, outlineItems, setOutlines]);
 
   return {
     isStreaming: isStreamingStore,

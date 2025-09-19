@@ -20,7 +20,7 @@ import { useWorkspace } from '@/features/presentation/hooks/useWorkspace';
 import { usePresentationForm } from '@/features/presentation/contexts/PresentationFormContext';
 import { CustomizationSection } from './PresentationCustomizationForm';
 import LoadingButton from '@/components/common/LoadingButton';
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import useOutlineStore from '../../stores/useOutlineStore';
 
 interface WorkspaceViewProps {
@@ -29,12 +29,15 @@ interface WorkspaceViewProps {
 
 const WorkspaceView = ({ onWorkspaceEmpty }: WorkspaceViewProps) => {
   const { t } = useTranslation('presentation', { keyPrefix: 'workspace' });
-  const isEmptyOutline = useOutlineStore((state) => state.isEmpty);
 
   const { control, watch, setValue, getValues } = usePresentationForm();
-  if (isEmptyOutline() || getValues().topic.trim() === '') {
-    onWorkspaceEmpty();
-  }
+  const isEmpty = useOutlineStore((state) => state.isEmpty);
+
+  useEffect(() => {
+    if (isEmpty() && getValues().topic.trim() === '') {
+      onWorkspaceEmpty();
+    }
+  }, [isEmpty, getValues, onWorkspaceEmpty]);
 
   const {
     stopStream,

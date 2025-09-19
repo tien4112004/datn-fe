@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 import { OutlineCreationView, WorkspaceView } from '@/features/presentation/components';
 import { PresentationFormProvider } from '@/features/presentation/contexts/PresentationFormContext';
 import { useSearchParams } from 'react-router-dom';
-import useOutlineStore from '../stores/useOutlineStore';
 import { PRESENTATION_VIEW_STATE, type PresentationViewState } from '../types';
+import useOutlineStore from '../stores/useOutlineStore';
 
 const getViewFromParams = (searchParams: URLSearchParams): PresentationViewState => {
   const viewParam = searchParams.get('view');
@@ -16,7 +16,8 @@ const getViewFromParams = (searchParams: URLSearchParams): PresentationViewState
 const PresentationOutlinePage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [currentView, setCurrentView] = useState<PresentationViewState>(getViewFromParams(searchParams));
-  const startStreaming = useOutlineStore((state) => state.startStreaming);
+  const startGeneration = useOutlineStore((state) => state.startGenerating);
+  const clearOutline = useOutlineStore((state) => state.clearOutline);
 
   // Sync state with URL changes
   useEffect(() => {
@@ -26,7 +27,8 @@ const PresentationOutlinePage = () => {
   const switchToWorkspace = () => {
     setCurrentView(PRESENTATION_VIEW_STATE.WORKSPACE);
     setSearchParams({ view: PRESENTATION_VIEW_STATE.WORKSPACE });
-    startStreaming();
+    clearOutline();
+    startGeneration();
   };
 
   const switchToOutlineCreation = () => {

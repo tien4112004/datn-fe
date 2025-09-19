@@ -3,7 +3,7 @@ import { usePresentationApiService } from '@/features/presentation/api';
 import type { OutlineItem, OutlineData } from '@/features/presentation/types';
 import useStreaming from '@/hooks/useStreaming';
 
-function useFetchStreamingOutline(initialRequestData: OutlineData) {
+function useFetchStreamingOutline(initialRequestData: OutlineData, options?: { enabled?: boolean }) {
   const presentationApiService = usePresentationApiService();
 
   return useStreaming<OutlineData, OutlineItem[]>({
@@ -11,6 +11,7 @@ function useFetchStreamingOutline(initialRequestData: OutlineData) {
     transformFn: splitMarkdownToOutlineItems,
     input: initialRequestData,
     queryKey: [presentationApiService.getType(), 'presentationOutline'],
+    enabled: options?.enabled ?? true,
   });
 }
 

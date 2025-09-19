@@ -24,7 +24,7 @@ export interface UsePresentationsReturn extends Omit<UseQueryResult<ApiResponse<
 export const usePresentationOutlines = (): UsePresentationOutlinesReturn => {
   const presentationApiService = usePresentationApiService();
   const { data: outlineItems = [], ...query } = useQuery<OutlineItem[]>({
-    queryKey: [presentationApiService.getType(), 'presentationItems'],
+    queryKey: [presentationApiService.getType(), 'outlineItems'],
     queryFn: async (): Promise<OutlineItem[]> => {
       const data = await presentationApiService.getOutlineItems();
       console.log('Fetch data', data);

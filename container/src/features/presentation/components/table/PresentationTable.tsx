@@ -2,7 +2,7 @@ import { createColumnHelper, getCoreRowModel, useReactTable } from '@tanstack/re
 import { useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Presentation } from '../../types/presentation';
-import { usePresentations } from '../../hooks/useApi';
+import { usePresentations, useUpdatePresentationTitle } from '../../hooks/useApi';
 import DataTable from '@/components/table/DataTable';
 import { ActionContent } from './ActionButton';
 import { SearchBar } from '../../../../shared/components/common/SearchBar';
@@ -10,6 +10,8 @@ import { useNavigate } from 'react-router-dom';
 import ThumbnailWrapper from '../others/ThumbnailWrapper';
 import * as React from 'react';
 import { RenameFileDialog } from '@/shared/components/modals/RenameFileDialog';
+import { toast } from 'sonner';
+import { useQueryClient } from '@tanstack/react-query';
 
 const PresentationTable = () => {
   const { t } = useTranslation('table');
@@ -20,6 +22,22 @@ const PresentationTable = () => {
     if (!date) return '';
     return new Date(date).toLocaleString();
   }, []);
+
+  // Callback for forcing data refresh
+  const refreshData = useCallback(() => {
+    queryClient.invalidateQueries({
+      queryKey: ['presentations'],
+      refetchType: 'active',
+    });
+  }, []);
+
+  // Add a manual refresh trigger
+  React.useEffect(() => {
+    window.addEventListener('forceRefreshPresentations', refreshData);
+    return () => {
+      window.removeEventListener('forceRefreshPresentations', refreshData);
+    };
+  }, [refreshData]);
 
   const columns = useMemo(
     () => [
@@ -76,6 +94,8 @@ const PresentationTable = () => {
     usePresentations();
   const [isRenameOpen, setIsRenameOpen] = React.useState(false);
   const [selectedPresentation, setSelectedPresentation] = React.useState<Presentation | null>(null);
+  const updatePresentationTitle = useUpdatePresentationTitle();
+  const queryClient = useQueryClient();
   const table = useReactTable({
     data: data || [],
     columns: columns,
@@ -128,19 +148,65 @@ const PresentationTable = () => {
         isOpen={isRenameOpen}
         onOpenChange={setIsRenameOpen}
         currentName={selectedPresentation?.title || ''}
+        isLoading={updatePresentationTitle.isPending}
         onRename={(newName) => {
-          console.log('Renaming', selectedPresentation?.id, 'to', newName);
-          // Add your rename logic here
-          setSelectedPresentation(null);
-          setIsRenameOpen(false);
+          if (!selectedPresentation) return;
+
+          updatePresentationTitle.mutate(
+            { id: selectedPresentation.id, name: newName },
+            {
+              onSuccess: () => {
+                setIsRenameOpen(false);
+
+                // Update local selected presentation state
+                setSelectedPresentation((prev) => {
+                  return prev ? { ...prev, title: newName } : null;
+                });
+
+                // We need to create a new array reference to force table to rerender
+                const updatedData = data.map((presentation) =>
+                  presentation.id === selectedPresentation.id
+                    ? { ...presentation, title: newName }
+                    : presentation
+                );
+
+                // Force the table to update by setting new data directly
+                table.setOptions((prev) => ({
+                  ...prev,
+                  data: updatedData,
+                }));
+
+                toast.success(`Presentation renamed to "${newName}" successfully`);
+              },
+              onError: (error) => {
+                console.error('Failed to rename presentation:', error);
+
+                // Get a user-friendly error message
+                let errorMessage = 'Unknown error occurred';
+                if (error instanceof Error) {
+                  errorMessage = error.message;
+                } else if (typeof error === 'string') {
+                  errorMessage = error;
+                } else if (
+                  error &&
+                  typeof error === 'object' &&
+                  'message' in (error as Record<string, unknown>)
+                ) {
+                  errorMessage = String((error as Record<string, unknown>).message);
+                }
+
+                // Show error notification
+                toast.error(`Failed to rename presentation: ${errorMessage}`);
+              },
+            }
+          );
         }}
         checkDuplicate={(name) =>
+          // call api to check due to pagiation -> not all filename fetched
           !!data?.some(
             (p) => p.id !== selectedPresentation?.id && p.title.toLowerCase() === name.toLowerCase()
           )
         }
-        titleKey="presentation.rename"
-        placeholderKey="presentation.newTitlePlaceholder"
       />
     </div>
   );

@@ -118,6 +118,14 @@ export default {
       title: 'Presentation List',
       generateNewPresentation: 'Generate New Presentation',
       createBlankPresentation: 'Create Blank Presentation',
+      filenameDialog: {
+        title: 'Rename Presentation',
+        placeholder: 'Enter new name for the presentation',
+      },
+      common: {
+        confirm: 'Confirm',
+        cancel: 'Cancel',
+      },
     },
   },
 

@@ -1,4 +1,4 @@
-import { useQuery, useMutation, type UseQueryResult } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, type UseQueryResult } from '@tanstack/react-query';
 import type { SortingState, PaginationState, Updater } from '@tanstack/react-table';
 import { usePresentationApiService } from '../api';
 import { useEffect, useState } from 'react';
@@ -194,6 +194,27 @@ export const useAiResultById = (id: string | undefined) => {
       }
       console.log(aiResult);
       return aiResult;
+    },
+  });
+};
+
+export const useUpdatePresentationTitle = () => {
+  const presentationApiService = usePresentationApiService();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, name }: { id: string; name: string }) => {
+      const result = await presentationApiService.updatePresentationTitle(id, name);
+      return { id, name, result };
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({
+        queryKey: ['presentations'],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: [presentationApiService.getType(), 'presentation', data.id],
+      });
     },
   });
 };

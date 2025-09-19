@@ -97,7 +97,7 @@ function DataTable<TData>({ table, isLoading, emptyState, onClickRow, contextMen
 
               if (contextMenu) {
                 return (
-                  <ContextMenu key={row.id}>
+                  <ContextMenu key={row.id} modal={false}>
                     <ContextMenuTrigger asChild>{tableRow}</ContextMenuTrigger>
                     <ContextMenuContent>{contextMenu(row)}</ContextMenuContent>
                   </ContextMenu>

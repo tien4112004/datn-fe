@@ -3,7 +3,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import PresentationTable from '@/features/presentation/components/table/PresentationTable';
 import { renderWithProviders } from '@/tests/test-utils';
 import type { Presentation } from '@/features/presentation/types/presentation';
-import { use } from 'react';
 
 const { usePresentations } = await import('@/features/presentation/hooks/useApi');
 

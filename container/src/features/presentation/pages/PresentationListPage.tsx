@@ -7,6 +7,9 @@ import PresentationGrid from '../components/others/PresentationGrid';
 import CreatePresentationControls from '../components/others/CreatePresentationControls';
 import ViewToggle, { type ViewMode } from '../components/others/ViewToggle';
 
+/**
+ * @deprecated Use `ProjectsListPage` instead
+ */
 const PresentationListPage = () => {
   const { t } = useTranslation('presentation', { keyPrefix: 'list' });
   const { t: tPage } = useTranslation('page');

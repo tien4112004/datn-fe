@@ -2,14 +2,16 @@ import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import PresentationTable from '@/features/presentation/components/table/PresentationTable';
 import PresentationGrid from '@/features/presentation/components/others/PresentationGrid';
-import CreatePresentationControls from '@/features/presentation/components/others/CreatePresentationControls';
+import ProjectControls from '@/features/projects/components/ProjectControls';
 import ViewToggle, { type ViewMode } from '@/features/presentation/components/others/ViewToggle';
+import CommonTabs, { type TabItem } from '@/shared/components/common/CommonTabs';
 
 const ProjectListPage = () => {
-  const { t } = useTranslation('presentation', { keyPrefix: 'list' });
+  const { t } = useTranslation('projects');
   const [searchParams, setSearchParams] = useSearchParams();
 
   const viewMode = (searchParams.get('view') as ViewMode) || 'list';
+  const resourceType = searchParams.get('resource') || 'presentation';
 
   const setViewMode = (mode: ViewMode) => {
     setSearchParams((prev) => {
@@ -19,15 +21,66 @@ const ProjectListPage = () => {
     });
   };
 
+  const handleResourceChange = (value: string) => {
+    setSearchParams((prev) => {
+      const newParams = new URLSearchParams(prev);
+      newParams.set('resource', value);
+      return newParams;
+    });
+  };
+
+  const tabItems: TabItem[] = [
+    {
+      key: 'presentation',
+      value: 'presentation',
+      label: t('resources.presentation', 'Presentation'),
+      // content: viewMode === 'list' ? <PresentationTable /> : <PresentationGrid />,
+      content: (
+        <>
+          <ViewToggle value={viewMode} onValueChange={setViewMode} />
+          {viewMode === 'list' ? <PresentationTable /> : <PresentationGrid />}
+        </>
+      ),
+    },
+    {
+      key: 'document',
+      value: 'document',
+      label: t('resources.document', 'Document'),
+      content: <div className="text-muted-foreground py-8 text-center">Document resource coming soon...</div>,
+    },
+    {
+      key: 'video',
+      value: 'video',
+      label: t('resources.video', 'Video'),
+      content: <div className="text-muted-foreground py-8 text-center">Video resource coming soon...</div>,
+    },
+    {
+      key: 'mindmap',
+      value: 'mindmap',
+      label: t('resources.mindmap', 'Mindmap'),
+      content: <div className="text-muted-foreground py-8 text-center">Mindmap resource coming soon...</div>,
+    },
+    {
+      key: 'image',
+      value: 'image',
+      label: t('resources.image', 'Image'),
+      content: <div className="text-muted-foreground py-8 text-center">Image resource coming soon...</div>,
+    },
+  ];
+
   return (
     <>
       <div className="space-y-4 px-8 py-4">
-        <CreatePresentationControls />
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-semibold">{t('title')}</h1>
-          <ViewToggle value={viewMode} onValueChange={setViewMode} />
-        </div>
-        {viewMode === 'list' ? <PresentationTable /> : <PresentationGrid />}
+        <h1 className="text-2xl font-semibold">{t('title')}</h1>
+        <ProjectControls />
+        <CommonTabs
+          value={resourceType}
+          onValueChange={handleResourceChange}
+          items={tabItems}
+          tabsListClassName="bg-card flex w-full flex-row justify-start rounded-none border-b p-0 mb-2"
+          tabsClassName="w-full"
+          tabsContentClassName="flex flex-col gap-2"
+        />
       </div>
     </>
   );

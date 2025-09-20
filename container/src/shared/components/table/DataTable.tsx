@@ -21,6 +21,7 @@ function DataTable<TData>({ table, isLoading, emptyState, onClickRow, contextMen
   const tableContainerRef = useRef<HTMLDivElement>(null);
   const windowDimensions = useWindowSize();
   const headers = table.getFlatHeaders();
+
   useLayoutEffect(() => {
     if (tableContainerRef.current) {
       const initialColumnSizing = calculateTableSizing(headers, tableContainerRef.current?.clientWidth);

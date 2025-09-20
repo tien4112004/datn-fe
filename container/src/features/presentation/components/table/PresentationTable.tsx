@@ -10,7 +10,6 @@ import { useNavigate } from 'react-router-dom';
 import ThumbnailWrapper from '../others/ThumbnailWrapper';
 import * as React from 'react';
 import { RenameFileDialog } from '@/shared/components/modals/RenameFileDialog';
-import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
 
 const PresentationTable = () => {
@@ -23,21 +22,21 @@ const PresentationTable = () => {
     return new Date(date).toLocaleString();
   }, []);
 
-  // Callback for forcing data refresh
-  const refreshData = useCallback(() => {
-    queryClient.invalidateQueries({
-      queryKey: ['presentations'],
-      refetchType: 'active',
-    });
-  }, []);
+  // // Callback for forcing data refresh
+  // const refreshData = useCallback(() => {
+  //   queryClient.invalidateQueries({
+  //     queryKey: ['presentations'],
+  //     refetchType: 'active',
+  //   });
+  // }, []);
 
-  // Add a manual refresh trigger
-  React.useEffect(() => {
-    window.addEventListener('forceRefreshPresentations', refreshData);
-    return () => {
-      window.removeEventListener('forceRefreshPresentations', refreshData);
-    };
-  }, [refreshData]);
+  // // Add a manual refresh trigger
+  // React.useEffect(() => {
+  //   window.addEventListener('forceRefreshPresentations', refreshData);
+  //   return () => {
+  //     window.removeEventListener('forceRefreshPresentations', refreshData);
+  //   };
+  // }, [refreshData]);
 
   const columns = useMemo(
     () => [
@@ -97,7 +96,7 @@ const PresentationTable = () => {
   const updatePresentationTitle = useUpdatePresentationTitle();
   const queryClient = useQueryClient();
   const table = useReactTable({
-    data: data || [],
+    data: [...data],
     columns: columns,
     getCoreRowModel: getCoreRowModel(),
     manualPagination: true,
@@ -150,21 +149,16 @@ const PresentationTable = () => {
         presentation={selectedPresentation}
         updatePresentationMutation={updatePresentationTitle}
         onSuccess={(newName) => {
-          // Update local selected presentation state
-          setSelectedPresentation((prev) => {
-            return prev ? { ...prev, title: newName } : null;
+          if (selectedPresentation) {
+            setSelectedPresentation({
+              ...selectedPresentation,
+              title: newName,
+            });
+          }
+
+          queryClient.invalidateQueries({
+            queryKey: ['presentation', selectedPresentation?.id],
           });
-
-          // We need to create a new array reference to force table to rerender
-          const updatedData = data.map((presentation) =>
-            presentation.id === selectedPresentation?.id ? { ...presentation, title: newName } : presentation
-          );
-
-          // Force the table to update by setting new data directly
-          table.setOptions((prev) => ({
-            ...prev,
-            data: updatedData,
-          }));
         }}
       />
     </div>

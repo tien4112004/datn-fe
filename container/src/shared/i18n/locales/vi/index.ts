@@ -32,6 +32,7 @@ export default {
       promptSection: 'Đầu vào',
       regenerate: 'Tạo lại',
       stop: 'Dừng',
+      generatingOutlineWarning: 'Đang tạo dàn ý. Vui lòng không điều hướng đi nơi khác.',
       promptTitle: 'Bài thuyết trình của bạn về cái gì (Hãy cụ thể)?',
       promptPlaceholder: 'Mô tả chủ đề hoặc nội dung bạn muốn trình bày...',
       slideCountPlaceholder: 'Số lượng trang?',

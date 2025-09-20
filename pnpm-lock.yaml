@@ -182,6 +182,9 @@ importers:
       react-hook-form:
         specifier: ^7.61.1
         version: 7.61.1(react@19.1.0)
+      react-hook-form-persist:
+        specifier: ^3.0.0
+        version: 3.0.0(react-hook-form@7.61.1(react@19.1.0))(react@19.1.0)
       react-i18next:
         specifier: ^15.6.0
         version: 15.6.0(i18next@25.3.2(typescript@5.8.3))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(typescript@5.8.3)
@@ -211,7 +214,7 @@ importers:
         version: 4.0.10
       zustand:
         specifier: ^5.0.7
-        version: 5.0.7(@types/react@19.1.8)(immer@9.0.21)(react@19.1.0)(use-sync-external-store@1.5.0(react@19.1.0))
+        version: 5.0.8(@types/react@19.1.8)(immer@9.0.21)(react@19.1.0)(use-sync-external-store@1.5.0(react@19.1.0))
     devDependencies:
       '@eslint/js':
         specifier: ^9.29.0
@@ -8572,6 +8575,12 @@ packages:
     peerDependencies:
       react: '>=16.13.1'
 
+  react-hook-form-persist@3.0.0:
+    resolution: {integrity: sha512-6nwW65JyFpBem9RjLYAWvIFxOLoCk0E13iB9e5yeF5jeHlwx1ua0M77FvwhPpD8eaCz7hG4ziCdOxRcnJVUSxQ==}
+    peerDependencies:
+      react: '>= 16.3'
+      react-hook-form: '>= 6'
+
   react-hook-form@7.61.1:
     resolution: {integrity: sha512-2vbXUFDYgqEgM2RcXcAT2PwDW/80QARi+PKmHy5q2KhuKvOlG8iIYgf7eIlIANR5trW9fJbP4r5aub3a4egsew==}
     engines: {node: '>=18.0.0'}
@@ -10472,8 +10481,8 @@ packages:
       react:
         optional: true
 
-  zustand@5.0.7:
-    resolution: {integrity: sha512-Ot6uqHDW/O2VdYsKLLU8GQu8sCOM1LcoE8RwvLv9uuRT9s6SOHCKs0ZEOhxg+I1Ld+A1Q5lwx+UlKXXUoCZITg==}
+  zustand@5.0.8:
+    resolution: {integrity: sha512-gyPKpIaxY9XcO2vSMrLbiER7QMAMGOQZVRdJ6Zi782jkbzZygq5GI9nG8g+sMgitRtndwaBSl7uiqC49o1SSiw==}
     engines: {node: '>=12.20.0'}
     peerDependencies:
       '@types/react': '>=18.0.0'
@@ -19608,6 +19617,11 @@ snapshots:
       '@babel/runtime': 7.27.6
       react: 19.1.0
 
+  react-hook-form-persist@3.0.0(react-hook-form@7.61.1(react@19.1.0))(react@19.1.0):
+    dependencies:
+      react: 19.1.0
+      react-hook-form: 7.61.1(react@19.1.0)
+
   react-hook-form@7.61.1(react@19.1.0):
     dependencies:
       react: 19.1.0
@@ -21632,7 +21646,7 @@ snapshots:
       immer: 9.0.21
       react: 19.1.0
 
-  zustand@5.0.7(@types/react@19.1.8)(immer@9.0.21)(react@19.1.0)(use-sync-external-store@1.5.0(react@19.1.0)):
+  zustand@5.0.8(@types/react@19.1.8)(immer@9.0.21)(react@19.1.0)(use-sync-external-store@1.5.0(react@19.1.0)):
     optionalDependencies:
       '@types/react': 19.1.8
       immer: 9.0.21

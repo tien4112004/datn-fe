@@ -5,6 +5,8 @@ import {
   type Presentation,
   type OutlineData,
   type PresentationCollectionRequest,
+  type PresentationGenerationRequest,
+  type PresentationGenerationResponse,
 } from '../types';
 import { splitMarkdownToOutlineItems } from '../utils';
 import { api } from '@/shared/api';
@@ -119,7 +121,7 @@ export default class PresentationRealApiService implements PresentationApiServic
   }
 
   async getPresentations(request: PresentationCollectionRequest): Promise<ApiResponse<Presentation[]>> {
-    const response = await api.get<ApiResponse<Presentation[]>>('api/presentations', {
+    const response = await api.get<ApiResponse<Presentation[]>>(`${this.baseUrl}/api/presentations`, {
       params: {
         page: (request.page || 0) + 1,
         pageSize: request.pageSize,
@@ -135,13 +137,68 @@ export default class PresentationRealApiService implements PresentationApiServic
   }
 
   async createPresentation(data: Presentation): Promise<Presentation> {
-    const response = await api.post<ApiResponse<Presentation>>('/api/presentations', data);
+    const response = await api.post<ApiResponse<Presentation>>(`${this.baseUrl}/api/presentations`, data);
     return this._mapPresentationItem(response.data.data);
   }
 
   async getPresentationById(id: string): Promise<Presentation | null> {
-    const response = await api.get<ApiResponse<Presentation>>(`/api/presentations/${id}`);
+    const response = await api.get<ApiResponse<Presentation>>(`${this.baseUrl}/api/presentations/${id}`);
     return this._mapPresentationItem(response.data.data);
+  }
+
+  async getAiResultById(id: string): Promise<any> {
+    const response = await api.get<ApiResponse<any>>(`${this.baseUrl}/api/presentations/${id}/ai-result`);
+
+    const rawData = response.data.data;
+    let parsedAiResult = rawData.result;
+
+    if (typeof rawData.result === 'string') {
+      const jsonBlocks = this._parseJsonBlocks(rawData.result);
+      parsedAiResult = jsonBlocks[0]?.slides || jsonBlocks;
+    }
+
+    return parsedAiResult;
+  }
+
+  async generatePresentation(
+    request: PresentationGenerationRequest
+  ): Promise<PresentationGenerationResponse> {
+    const response = await api.post<ApiResponse<PresentationGenerationResponse>>(
+      `${this.baseUrl}/api/presentations/generate/batch`,
+      request
+    );
+
+    const rawData = response.data.data;
+
+    // Parse the aiResult which contains JSON wrapped in ```json code blocks
+    let parsedAiResult = rawData.aiResult;
+    if (typeof rawData.aiResult === 'string') {
+      const jsonBlocks = this._parseJsonBlocks(rawData.aiResult);
+      parsedAiResult = jsonBlocks[0]?.slides || jsonBlocks;
+    }
+
+    return {
+      aiResult: parsedAiResult,
+      presentation: rawData.presentation,
+    };
+  }
+
+  private _parseJsonBlocks(input: string): any[] {
+    // Remove ```json and ``` wrappers and parse each JSON block
+    return input
+      .split('---')
+      .map((block: string) => block.trim())
+      .filter((block: string) => block.startsWith('```json') && block.endsWith('```'))
+      .map((block: string) => {
+        const jsonContent = block.replace(/^```json\n/, '').replace(/\n```$/, '');
+        try {
+          return JSON.parse(jsonContent);
+        } catch (error) {
+          console.warn('Failed to parse JSON block:', jsonContent, error);
+          return null;
+        }
+      })
+      .filter((parsed: any) => parsed !== null);
   }
 
   _mapPresentationItem(data: any): Presentation {
@@ -152,6 +209,7 @@ export default class PresentationRealApiService implements PresentationApiServic
       slides: data.slides,
       createdAt: data.createdAt,
       updatedAt: data.updatedAt,
+      isParsed: data.parsed || false,
     };
   }
 }

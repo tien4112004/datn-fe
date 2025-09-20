@@ -50,6 +50,11 @@ const PresentationTable = () => {
         },
         enableSorting: false,
       }),
+      columnHelper.accessor('isParsed', {
+        header: 'isParsed (Dev Only)',
+        cell: (info) => (info.getValue() ? 'true' : 'false'),
+        enableSorting: false,
+      }),
       columnHelper.accessor('createdAt', {
         header: t('presentation.createdAt'),
         cell: (info) => formatDate(info.getValue()),

@@ -39,7 +39,7 @@ export const convertTwoColumn = async (
     height: 100,
   };
   const { titleContent, titleDimensions, titlePosition } = calculateTitleLayout(
-    data.data.title,
+    data.title,
     titleAvailableBlock,
     layoutCalculator,
     theme

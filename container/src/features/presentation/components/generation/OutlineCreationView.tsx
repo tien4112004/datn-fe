@@ -1,6 +1,6 @@
 import { Button } from '@/shared/components/ui/button';
 import { useTranslation } from 'react-i18next';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller } from 'react-hook-form';
 import { Sparkles } from 'lucide-react';
 import { Card, CardContent, CardTitle } from '@/shared/components/ui/card';
 import { AutosizeTextarea } from '@/shared/components/ui/autosize-textarea';
@@ -14,38 +14,19 @@ import {
   SelectValue,
 } from '@/shared/components/ui/select';
 import ExamplePrompts from './ExamplePrompts';
-import { SLIDE_COUNT_OPTIONS, LANGUAGE_OPTIONS, TARGET_AGE_OPTIONS } from '@/features/presentation/types';
-import type { OutlineData } from '@/features/presentation/types';
-import type { ModelOption } from '@/features/model';
+import { SLIDE_COUNT_OPTIONS, LANGUAGE_OPTIONS } from '@/features/presentation/types';
+import { useModels } from '@/features/model';
 import { ModelSelect } from '@/components/common/ModelSelect';
+import { usePresentationForm } from '@/features/presentation/contexts/PresentationFormContext';
 
 interface OutlineCreationViewProps {
-  defaultModel?: ModelOption;
-  models?: ModelOption[];
-  onCreateOutline: (outlineData: OutlineData) => void;
-  isLoadingModels: boolean;
-  isErrorModels: boolean;
+  onCreateOutline: () => void;
 }
 
-const OutlineCreationView = ({
-  models,
-  defaultModel,
-  onCreateOutline,
-  isLoadingModels,
-  isErrorModels,
-}: OutlineCreationViewProps) => {
+const OutlineCreationView = ({ onCreateOutline }: OutlineCreationViewProps) => {
   const { t } = useTranslation('presentation', { keyPrefix: 'createOutline' });
-
-  const { control, handleSubmit, setValue, watch } = useForm<OutlineData>({
-    defaultValues: {
-      topic: '',
-      slideCount: 10,
-      language: 'en',
-      model: defaultModel?.name || '',
-      targetAge: '7-10',
-      learningObjective: 'something',
-    },
-  });
+  const { control, setValue, watch, trigger } = usePresentationForm();
+  const { models } = useModels();
 
   const topicValue = watch('topic');
 
@@ -53,8 +34,18 @@ const OutlineCreationView = ({
     setValue('topic', example);
   };
 
-  const onSubmit = (data: OutlineData) => {
-    onCreateOutline(data);
+  const handleSubmit = async () => {
+    const isValid = await trigger([
+      'topic',
+      'slideCount',
+      'language',
+      'model',
+      'targetAge',
+      'learningObjective',
+    ]);
+    if (isValid) {
+      onCreateOutline();
+    }
   };
 
   return (
@@ -62,7 +53,13 @@ const OutlineCreationView = ({
       <h1 className="text-3xl font-bold leading-10 text-neutral-900">{t('title')}</h1>
       <h2 className="text-xl font-bold leading-10 text-sky-500/80">{t('subtitle')}</h2>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="w-full">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleSubmit();
+        }}
+        className="w-full"
+      >
         <Card className="w-full">
           <CardContent>
             <div className="flex flex-col gap-4">
@@ -130,27 +127,7 @@ const OutlineCreationView = ({
                       </Select>
                     )}
                   />
-                  <Controller
-                    name="targetAge"
-                    control={control}
-                    render={({ field }) => (
-                      <Select value={field.value} onValueChange={field.onChange}>
-                        <SelectTrigger className="w-fit">
-                          <SelectValue placeholder={t('targetAge.placeholder')} />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectGroup>
-                            <SelectLabel>{t('targetAge.label')}</SelectLabel>
-                            {TARGET_AGE_OPTIONS.map((ageOption) => (
-                              <SelectItem key={ageOption.value} value={ageOption.value}>
-                                {t(ageOption.labelKey)}
-                              </SelectItem>
-                            ))}
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
-                    )}
-                  />
+
                   <Controller
                     name="model"
                     control={control}
@@ -162,38 +139,8 @@ const OutlineCreationView = ({
                         placeholder={t('modelPlaceholder')}
                         label={t('modelLabel')}
                         showProviderLogo={true}
-                        isLoading={isLoadingModels}
-                        isError={isErrorModels}
                       />
                     )}
-                    // render={({ field }) => (
-                    //   <Select value={field.value} onValueChange={field.onChange}>
-                    //     <SelectTrigger className="w-fit">
-                    //       <SelectValue placeholder={t('modelPlaceholder')} />
-                    //     </SelectTrigger>
-                    //     <SelectContent>
-                    //       <SelectGroup>
-                    //         <SelectLabel>{t('modelLabel')}</SelectLabel>
-                    //         {models?.map((modelOption) => (
-                    //           <SelectItem
-                    //             key={modelOption.id}
-                    //             value={modelOption.name}
-                    //             disabled={!modelOption.enabled}
-                    //             className={!modelOption.enabled ? 'opacity-50' : ''}
-                    //           >
-                    //             <img
-                    //               src={MODEL_PROVIDERS_LOGO[modelOption.provider]}
-                    //               alt={modelOption.provider}
-                    //               className="mr-2 inline h-4 w-4"
-                    //             />
-
-                    //             {modelOption.displayName}
-                    //           </SelectItem>
-                    //         ))}
-                    //       </SelectGroup>
-                    //     </SelectContent>
-                    //   </Select>
-                    // )}
                   />
                 </div>
               </div>

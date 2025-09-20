@@ -1,10 +1,8 @@
-import { useEffect } from 'react';
 import { Button } from '@/shared/components/ui/button';
 import { useTranslation } from 'react-i18next';
-import { Controller, useForm, type Control } from 'react-hook-form';
-import { Sparkles, RotateCcw, Square, Trash2 } from 'lucide-react';
+import { Controller } from 'react-hook-form';
+import { CircleAlert, RotateCcw, Square, Trash2 } from 'lucide-react';
 import OutlineWorkspace from './OutlineWorkspace';
-import PresentationCustomizationForm from './PresentationCustomizationForm';
 import { AutosizeTextarea } from '@/shared/components/ui/autosize-textarea';
 import {
   Select,
@@ -16,104 +14,39 @@ import {
   SelectValue,
 } from '@/shared/components/ui/select';
 import { ModelSelect } from '@/components/common/ModelSelect';
-import { LANGUAGE_OPTIONS, SLIDE_COUNT_OPTIONS, TARGET_AGE_OPTIONS } from '@/features/presentation/types';
-import type { OutlineData } from '@/features/presentation/types/outline';
-import useFetchStreamingOutline from '@/features/presentation/hooks/useFetchStreaming';
-// import { useOutlineContext } from '../../context/OutlineContext';
-import useOutlineStore from '@/features/presentation/stores/useOutlineStore';
+import { LANGUAGE_OPTIONS, SLIDE_COUNT_OPTIONS } from '@/features/presentation/types';
 import { useModels } from '@/features/model';
-
-type OutlineFormData = {
-  topic: string;
-  slideCount: number;
-  language: string;
-  model: string;
-  targetAge: string;
-  learningObjective: string;
-};
-
-type CustomizationFormData = {
-  theme: string;
-  contentLength: string;
-  imageModel: string;
-};
+import { useWorkspace } from '@/features/presentation/hooks/useWorkspace';
+import { usePresentationForm } from '@/features/presentation/contexts/PresentationFormContext';
+import { CustomizationSection } from './PresentationCustomizationForm';
+import LoadingButton from '@/components/common/LoadingButton';
+import { useCallback, useEffect } from 'react';
+import useOutlineStore from '../../stores/useOutlineStore';
 
 interface WorkspaceViewProps {
-  initialOutlineData: OutlineData;
+  onWorkspaceEmpty: () => void;
 }
 
-const WorkspaceView = ({ initialOutlineData }: WorkspaceViewProps) => {
-  // const { outlineItems, refetch, isFetching } = usePresentationOutlines();
-  // const { content, setContent } = useOutlineContext();
+const WorkspaceView = ({ onWorkspaceEmpty }: WorkspaceViewProps) => {
   const { t } = useTranslation('presentation', { keyPrefix: 'workspace' });
 
-  // API
-  const {
-    processedData: outlineItems,
-    isStreaming,
-    error,
-    stopStream,
-    restartStream,
-    clearContent,
-  } = useFetchStreamingOutline(initialOutlineData);
-
-  if (error) {
-    throw new Error(`Error fetching outline: ${error}`);
-  }
-
-  //   // STORE
-  //   const content = useOutlineStore((state) => state.content);
-  const markdownContent = useOutlineStore((state) => state.markdownContent);
-  const setContent = useOutlineStore((state) => state.setContent);
-  const startStream = useOutlineStore((state) => state.startStreaming);
-  const endStream = useOutlineStore((state) => state.endStreaming);
-
-  // OUTLINE FORM
-  const { control: outlineControl, handleSubmit: handleRegenerateSubmit } = useForm<OutlineFormData>({
-    defaultValues: initialOutlineData,
-  });
-
-  // CUSTOMIZATION FORM
-  const {
-    control: customizationControl,
-    setValue,
-    watch,
-    handleSubmit: handleCustomizationSubmit,
-  } = useForm<CustomizationFormData>({
-    defaultValues: {
-      theme: '',
-      contentLength: '',
-      imageModel: '',
-    },
-  });
+  const { control, watch, setValue, getValues } = usePresentationForm();
+  const isEmpty = useOutlineStore((state) => state.isEmpty);
 
   useEffect(() => {
-    if (isStreaming) {
-      startStream();
-      setContent([...outlineItems]);
-    } else {
-      endStream();
+    if (isEmpty() && getValues().topic.trim() === '') {
+      onWorkspaceEmpty();
     }
-  }, [isStreaming, outlineItems]);
+  }, [isEmpty, getValues, onWorkspaceEmpty]);
 
-  const onRegenerateOutline = (data: OutlineFormData) => {
-    console.log('Regenerating outline with data:', data);
-
-    //
-    // refetch();
-    // startStream(data);
-    restartStream(data);
-  };
-
-  const onSubmitPresentation = (_data: CustomizationFormData) => {
-    // const fullData = {
-    //   ...data,
-    //   content,
-    // };
-    // const fullData = mapOutlineItemsToMarkdown(content);
-    const fullData = markdownContent();
-    console.log('Form data:', fullData);
-  };
+  const {
+    stopStream,
+    clearContent,
+    handleRegenerateOutline,
+    handleGeneratePresentation,
+    isGenerating,
+    isStreaming,
+  } = useWorkspace({});
 
   return (
     <div className="flex min-h-[calc(100vh-1rem)] w-full max-w-3xl flex-col items-center justify-center self-center p-8">
@@ -122,47 +55,49 @@ const WorkspaceView = ({ initialOutlineData }: WorkspaceViewProps) => {
           <h1 className="text-3xl font-bold leading-10 text-neutral-900">{t('title')}</h1>
         </div>
 
-        <OutlineFormSection
-          control={outlineControl}
-          isFetching={isStreaming}
-          stopStream={stopStream}
-          clearContent={clearContent}
-          onSubmit={handleRegenerateSubmit(onRegenerateOutline)}
-        />
+        <form className="flex flex-col gap-4" onSubmit={(e) => e.preventDefault()}>
+          <OutlineFormSection
+            isFetching={isStreaming}
+            stopStream={stopStream}
+            clearContent={clearContent}
+            onRegenerateOutline={handleRegenerateOutline}
+          />
 
-        <OutlineSection />
+          <OutlineSection />
 
-        <CustomizationSection
-          control={customizationControl}
-          watch={watch}
-          setValue={setValue}
-          onSubmit={handleCustomizationSubmit(onSubmitPresentation)}
-        />
+          <CustomizationSection
+            control={control}
+            watch={watch}
+            setValue={setValue}
+            onGeneratePresentation={handleGeneratePresentation}
+            isGenerating={isGenerating}
+          />
+        </form>
       </div>
     </div>
   );
 };
 
 interface OutlineFormSectionProps {
-  control: Control<OutlineFormData>;
   isFetching: boolean;
   stopStream: () => void;
   clearContent: () => void;
-  onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+  onRegenerateOutline: () => void;
 }
 
 const OutlineFormSection = ({
-  control,
   isFetching,
   stopStream,
   clearContent,
-  onSubmit,
+  onRegenerateOutline,
 }: OutlineFormSectionProps) => {
   const { t } = useTranslation('presentation', { keyPrefix: 'createOutline' });
   const { models } = useModels();
+  const { control } = usePresentationForm();
+  const disabled = useOutlineStore((state) => state.isStreaming);
 
   return (
-    <form className="flex flex-col gap-4" onSubmit={onSubmit}>
+    <div className="flex flex-col gap-4">
       <div className="flex w-full flex-row items-center gap-4">
         <div className="scroll-m-20 text-xl font-semibold tracking-tight">{t('promptSection')}</div>
         <div className="my-2 flex flex-1 flex-row gap-2">
@@ -173,6 +108,7 @@ const OutlineFormSection = ({
               <Select
                 value={field.value?.toString()}
                 onValueChange={(value) => field.onChange(Number(value))}
+                disabled={disabled}
               >
                 <SelectTrigger className="bg-card w-fit">
                   <SelectValue placeholder={t('slideCountPlaceholder')} />
@@ -194,7 +130,7 @@ const OutlineFormSection = ({
             name="language"
             control={control}
             render={({ field }) => (
-              <Select value={field.value} onValueChange={field.onChange}>
+              <Select value={field.value} onValueChange={field.onChange} disabled={disabled}>
                 <SelectTrigger className="w-fit">
                   <SelectValue placeholder={t('language.placeholder')} />
                 </SelectTrigger>
@@ -212,48 +148,6 @@ const OutlineFormSection = ({
             )}
           />
           <Controller
-            name="targetAge"
-            control={control}
-            render={({ field }) => (
-              <Select value={field.value} onValueChange={field.onChange}>
-                <SelectTrigger className="w-fit">
-                  <SelectValue placeholder={t('targetAge.placeholder')} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectLabel>{t('targetAge.label')}</SelectLabel>
-                    {TARGET_AGE_OPTIONS.map((ageOption) => (
-                      <SelectItem key={ageOption.value} value={ageOption.value}>
-                        {t(ageOption.labelKey)}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            )}
-          />
-          {/* <Controller
-            name="style"
-            control={control}
-            render={({ field }) => (
-              <Select value={field.value} onValueChange={field.onChange}>
-                <SelectTrigger className="bg-card w-fit">
-                  <SelectValue placeholder={t('stylePlaceholder')} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectLabel>{t('styleLabel')}</SelectLabel>
-                    {PRESENTATION_STYLES.map((styleOption) => (
-                      <SelectItem key={styleOption.value} value={styleOption.value}>
-                        {t(styleOption.labelKey)}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            )}
-          /> */}
-          <Controller
             name="model"
             control={control}
             render={({ field }) => (
@@ -263,100 +157,75 @@ const OutlineFormSection = ({
                 onValueChange={field.onChange}
                 placeholder={t('modelPlaceholder')}
                 label={t('modelLabel')}
+                disabled={disabled}
               />
             )}
-            // render={({ field }) => (
-            //   <Select value={field.value} onValueChange={field.onChange}>
-            //     <SelectTrigger className="bg-card w-fit">
-            //       <SelectValue placeholder={t('modelPlaceholder')} />
-            //     </SelectTrigger>
-            //     <SelectContent>
-            //       <SelectGroup>
-            //         <SelectLabel>{t('modelLabel')}</SelectLabel>
-            //         {models?.map((modelOption) => (
-            //           <SelectItem
-            //             key={modelOption.id}
-            //             value={modelOption.name}
-            //             disabled={!modelOption.enabled}
-            //             className={!modelOption.enabled ? 'opacity-50' : ''}
-            //           >
-            //             {modelOption.displayName}
-            //           </SelectItem>
-            //         ))}
-            //       </SelectGroup>
-            //     </SelectContent>
-            //   </Select>
-            // )}
           />
         </div>
       </div>
       <Controller
         name="topic"
         control={control}
-        render={({ field }) => <AutosizeTextarea className="text-lg" {...field} />}
-      />
-      <div className="flex flex-row gap-2">
-        {isFetching && (
-          <Button size="sm" type="button" onClick={stopStream} variant="destructive">
-            <Square className="mr-2 h-4 w-4" />
-            <span>{t('stop')}</span>
-          </Button>
+        render={({ field }) => (
+          <div className="relative">
+            <AutosizeTextarea className="pr-12 text-lg" {...field} disabled={disabled} />
+            <LoadingButton
+              type="button"
+              size="sm"
+              variant={'ghost'}
+              onClick={onRegenerateOutline}
+              disabled={disabled || isFetching}
+              loading={isFetching}
+              className="absolute right-3 top-1/2 h-8 w-8 -translate-y-1/2 p-0"
+            >
+              <RotateCcw className="h-4 w-4" />
+            </LoadingButton>
+          </div>
         )}
+      />
+      <div className="flex w-full justify-between">
+        <div className="flex flex-row gap-2">
+          {isFetching && (
+            <Button size="sm" type="button" onClick={stopStream} variant="destructive">
+              <Square className="mr-2 h-4 w-4" />
+              <span>{t('stop')} (Dev)</span>
+            </Button>
+          )}
 
-        <Button type="submit" size="sm" disabled={isFetching} hidden={isFetching}>
-          <RotateCcw className="mr-2 h-4 w-4" />
-          <span>{t('regenerate')}</span>
-        </Button>
+          <Button type="button" size="sm" onClick={clearContent} disabled={isFetching}>
+            <Trash2 className="mr-2 h-4 w-4" />
+            <span>Clear (Dev)</span>
+          </Button>
+        </div>
 
-        <Button type="button" size="sm" onClick={clearContent} disabled={isFetching}>
-          <Trash2 className="mr-2 h-4 w-4" />
-          <span>Clear</span>
-        </Button>
+        {/* // Warning user to not navigate while generating */}
+        {isFetching && (
+          <div className="flex items-center">
+            <CircleAlert className="mr-1 h-4 w-4 text-orange-600" />
+            <span className="text-xs text-orange-600">{t('generatingOutlineWarning')}</span>
+          </div>
+        )}
       </div>
-    </form>
+    </div>
   );
 };
-
-// interface OutlineSectionProps {
-//   isFetching: boolean;
-// }
 
 const OutlineSection = () => {
   const { t } = useTranslation('presentation', { keyPrefix: 'workspace' });
+  const { watch } = usePresentationForm();
+  const slideCount = watch('slideCount', 10);
+
+  const handleDownload = useCallback(async () => {
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+  }, []);
 
   return (
-    <>
+    <div className="flex flex-col gap-4">
       <div className="scroll-m-20 text-xl font-semibold tracking-tight">{t('outlineSection')}</div>
-      <OutlineWorkspace
-        onDownload={async () => {
-          await new Promise((resolve) => setTimeout(resolve, 2000));
-        }}
-      />
-    </>
-  );
-};
-
-interface CustomizationSectionProps {
-  control: Control<CustomizationFormData>;
-  watch: any;
-  setValue: any;
-  onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
-}
-
-const CustomizationSection = ({ control, watch, setValue, onSubmit }: CustomizationSectionProps) => {
-  const { t } = useTranslation('presentation', { keyPrefix: 'workspace' });
-
-  return (
-    <form className="flex flex-col gap-4" onSubmit={onSubmit}>
-      <div className="scroll-m-20 text-xl font-semibold tracking-tight">{t('customizeSection')}</div>
-      <PresentationCustomizationForm control={control} watch={watch} setValue={setValue} />
-      <Button className="mt-5" type="submit">
-        <Sparkles />
-        {t('generatePresentation')}
-      </Button>
-    </form>
+      <OutlineWorkspace onDownload={handleDownload} totalSlide={slideCount} />
+    </div>
   );
 };
 
 export default WorkspaceView;
-export { OutlineFormSection, OutlineSection, CustomizationSection };
+export { OutlineFormSection, OutlineSection };

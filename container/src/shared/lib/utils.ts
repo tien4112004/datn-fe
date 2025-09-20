@@ -14,3 +14,12 @@ export function debounce<T extends (...args: any[]) => void>(fn: T, delay: numbe
     timer = setTimeout(() => fn(...args), delay);
   };
 }
+
+export const getLocalStorageData = (key: string) => {
+  try {
+    const stored = localStorage.getItem(key);
+    return stored ? JSON.parse(stored) : {};
+  } catch {
+    return {};
+  }
+};

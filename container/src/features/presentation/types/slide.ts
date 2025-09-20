@@ -662,6 +662,8 @@ export interface SlideTheme {
   fontName: string;
   outline: PPTElementOutline;
   shadow: PPTElementShadow;
+  titleFontName?: string;
+  titleFontColor?: string;
 }
 
 export interface SlideTemplate {

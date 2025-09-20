@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui
 import { cn } from '@/shared/lib/utils';
 import { useSortable } from '@dnd-kit/sortable';
 import { Trash } from 'lucide-react';
-import React from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import useOutlineStore from '@/features/presentation/stores/useOutlineStore';
 import { motion } from 'motion/react';
 
@@ -13,46 +13,90 @@ interface OutlineCardProps {
   id: string;
   title: string;
   className?: string;
-  onDelete?: () => void;
+  onDelete?: (id: string) => void;
 }
 
 const OutlineCard = ({ id, title = 'Outline', className = '', onDelete }: OutlineCardProps) => {
-  const [isDeleting, setIsDeleting] = React.useState(false);
-  const handleContentChange = useOutlineStore((state) => state.handleContentChange);
-  const content = useOutlineStore((state) => state.content.find((item) => item.id === id));
-  const isStreaming = useOutlineStore((state) => state.isStreaming);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [htmlContent, setHtmlContent] = useState('');
+
+  const handleContentChange = useOutlineStore((state) => state.handleOutlineChange);
+  const content = useOutlineStore((state) => state.outlines.find((item) => item.id === id));
+
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: `outline-card-${id.toString()}`,
   });
+
   const editor = useRichTextEditor({
     trailingBlock: false,
   });
-  const hasInitialized = React.useRef(false);
 
-  async function loadInitialHTML() {
-    const blocks = await editor.tryParseMarkdownToBlocks(content?.markdownContent || '');
-    editor.replaceBlocks(editor.document, blocks);
-  }
+  // Convert markdown to HTML for display
+  const convertMarkdownToHtml = useCallback(
+    async (markdownContent: string) => {
+      if (!markdownContent) {
+        setHtmlContent('');
+        return;
+      }
 
-  React.useEffect(() => {
-    if (isStreaming || !content || !hasInitialized.current) {
-      loadInitialHTML();
-      hasInitialized.current = true;
+      try {
+        const blocks = await editor.tryParseMarkdownToBlocks(markdownContent);
+        const html = await editor.blocksToFullHTML(blocks);
+        setHtmlContent(html);
+      } catch (error) {
+        console.error('Failed to convert markdown to HTML:', error);
+        setHtmlContent('');
+      }
+    },
+    [editor]
+  );
+
+  // Load initial content into editor (only when editing)
+  const loadInitialHTML = useCallback(async () => {
+    try {
+      const blocks = await editor.tryParseMarkdownToBlocks(content?.markdownContent || '');
+      editor.replaceBlocks(editor.document, blocks);
+    } catch (error) {
+      console.error('Failed to load initial HTML:', error);
     }
-  }, [content?.markdownContent]);
+  }, [editor, content?.markdownContent]);
 
-  React.useEffect(() => {
-    loadInitialHTML();
-  }, [editor]);
+  // Convert markdown to HTML when content changes (for display mode)
+  useEffect(() => {
+    if (!isEditing) {
+      convertMarkdownToHtml(content?.markdownContent || '');
+    }
+  }, [content?.markdownContent, isEditing, convertMarkdownToHtml]);
+
+  // Initialize editor content when entering edit mode
+  useEffect(() => {
+    if (isEditing) {
+      loadInitialHTML();
+    }
+  }, [isEditing, loadInitialHTML]);
 
   const handleDelete = () => {
     if (!onDelete) return;
 
     setIsDeleting(true);
     setTimeout(() => {
-      onDelete();
+      onDelete(id);
     }, 300);
   };
+
+  const handleEditingComplete = () => {
+    setIsEditing(false);
+  };
+
+  const handleEditorChange = useCallback(async () => {
+    try {
+      const markdownContent = await editor.blocksToMarkdownLossy(editor.document);
+      handleContentChange?.(id, markdownContent);
+    } catch (error) {
+      console.error('Failed to convert blocks to markdown:', error);
+    }
+  }, [editor, handleContentChange, id]);
 
   const style = {
     transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
@@ -67,6 +111,7 @@ const OutlineCard = ({ id, title = 'Outline', className = '', onDelete }: Outlin
         `border-primary group relative flex min-h-24 w-full flex-row gap-4 p-0 shadow-md transition-shadow duration-300 hover:shadow-lg`,
         isDragging ? 'z-1000 opacity-50' : '',
         isDeleting ? 'scale-0 transition-all' : '',
+        isEditing ? 'border-2' : '',
         className
       )}
     >
@@ -87,22 +132,36 @@ const OutlineCard = ({ id, title = 'Outline', className = '', onDelete }: Outlin
           </motion.div>
         </Button>
       )}
+
       <CardHeader {...attributes} {...listeners} className="bg-accent w-24 rounded-l-xl p-2 text-center">
         <CardTitle>{title}</CardTitle>
       </CardHeader>
-      <CardContent className="flex-start flex-1 p-2">
-        <RichTextEditor
-          data-card
-          editor={editor}
-          onChange={async () => {
-            // const htmlContent = await editor.blocksToFullHTML(editor.document);
-            const markdownContent = await editor.blocksToMarkdownLossy(editor.document);
-            // handleContentChange?.(id, htmlContent);
-            handleContentChange?.(id, markdownContent);
-          }}
-          sideMenu={false}
-          className="-mx-2"
-        />
+
+      <CardContent className={cn('flex-start flex-1 p-2')}>
+        {isEditing ? (
+          <RichTextEditor
+            data-card
+            editor={editor}
+            onChange={handleEditorChange}
+            onBlur={handleEditingComplete}
+            sideMenu={false}
+            className="-mx-2"
+          />
+        ) : (
+          <div
+            dangerouslySetInnerHTML={{ __html: htmlContent }}
+            onClick={() => setIsEditing(true)}
+            className="-mx-2 cursor-text rounded transition-colors"
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                setIsEditing(true);
+              }
+            }}
+          />
+        )}
       </CardContent>
     </Card>
   );

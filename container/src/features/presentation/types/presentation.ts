@@ -8,6 +8,7 @@ export interface Presentation {
   theme?: SlideTheme;
   thumbnail?: Slide;
   slides?: Slide[];
+  isParsed?: boolean;
   createdAt?: Date | string;
   updatedAt?: Date | string;
 }

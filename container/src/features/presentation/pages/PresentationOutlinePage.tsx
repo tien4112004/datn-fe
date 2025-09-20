@@ -1,51 +1,49 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { OutlineCreationView, WorkspaceView } from '@/features/presentation/components';
-import { useModels } from '@/features/model';
-import type { OutlineData } from '@/features/presentation/types';
+import { PresentationFormProvider } from '@/features/presentation/contexts/PresentationFormContext';
+import { useSearchParams } from 'react-router-dom';
+import { PRESENTATION_VIEW_STATE, type PresentationViewState } from '../types';
+import useOutlineStore from '../stores/useOutlineStore';
 
-const PresentationViewState = {
-  OUTLINE_CREATION: 'outline_creation',
-  WORKSPACE: 'workspace',
-} as const;
-
-type PresentationViewState = (typeof PresentationViewState)[keyof typeof PresentationViewState];
+const getViewFromParams = (searchParams: URLSearchParams): PresentationViewState => {
+  const viewParam = searchParams.get('view');
+  if (viewParam === PRESENTATION_VIEW_STATE.WORKSPACE) {
+    return PRESENTATION_VIEW_STATE.WORKSPACE;
+  }
+  return PRESENTATION_VIEW_STATE.OUTLINE_CREATION;
+};
 
 const PresentationOutlinePage = () => {
-  // const [models, defaultModel] = useLoaderData() as [ModelOption[], ModelOption];
-  const { models, defaultModel, isLoading: isLoadingModels, isError: isErrorModels } = useModels();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [currentView, setCurrentView] = useState<PresentationViewState>(getViewFromParams(searchParams));
+  const startGeneration = useOutlineStore((state) => state.startGenerating);
+  const clearOutline = useOutlineStore((state) => state.clearOutline);
 
-  const [currentView, setCurrentView] = useState<PresentationViewState>(
-    PresentationViewState.OUTLINE_CREATION
-  );
-  const [outlineData, setOutlineData] = useState<OutlineData>({
-    topic: '',
-    slideCount: 0,
-    language: '',
-    model: defaultModel?.name || '',
-    targetAge: '',
-    learningObjective: '',
-  });
+  // Sync state with URL changes
+  useEffect(() => {
+    setCurrentView(getViewFromParams(searchParams));
+  }, [searchParams]);
 
-  const handleCreateOutline = (outlineData: OutlineData) => {
-    setOutlineData(outlineData);
-    setCurrentView(PresentationViewState.WORKSPACE);
+  const switchToWorkspace = () => {
+    setCurrentView(PRESENTATION_VIEW_STATE.WORKSPACE);
+    setSearchParams({ view: PRESENTATION_VIEW_STATE.WORKSPACE });
+    clearOutline();
+    startGeneration();
+  };
+
+  const switchToOutlineCreation = () => {
+    setCurrentView(PRESENTATION_VIEW_STATE.OUTLINE_CREATION);
+    setSearchParams({ view: PRESENTATION_VIEW_STATE.OUTLINE_CREATION });
   };
 
   return (
-    <>
-      {/* <SidebarTrigger className="absolute left-4 top-4 z-50" /> */}
-      {currentView === PresentationViewState.OUTLINE_CREATION ? (
-        <OutlineCreationView
-          onCreateOutline={handleCreateOutline}
-          models={models}
-          defaultModel={defaultModel}
-          isErrorModels={isErrorModels}
-          isLoadingModels={isLoadingModels}
-        />
+    <PresentationFormProvider>
+      {currentView === PRESENTATION_VIEW_STATE.OUTLINE_CREATION ? (
+        <OutlineCreationView onCreateOutline={switchToWorkspace} />
       ) : (
-        <WorkspaceView initialOutlineData={outlineData} />
+        <WorkspaceView onWorkspaceEmpty={switchToOutlineCreation} />
       )}
-    </>
+    </PresentationFormProvider>
   );
 };
 

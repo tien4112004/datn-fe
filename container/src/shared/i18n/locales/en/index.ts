@@ -32,6 +32,7 @@ export default {
       promptSection: 'Prompt',
       regenerate: 'Regenerate',
       stop: 'Stop',
+      generatingOutlineWarning: 'Generating outline. Please do not navigate away.',
       promptTitle: "What's your presentation about (Be specific)?",
       promptPlaceholder: 'Describe your topic or what you want to present...',
       slideCountPlaceholder: 'How many slides?',

@@ -31,6 +31,9 @@ export interface TargetAgeOption {
   labelKey: string;
 }
 
+/**
+ * @deprecated This component is deprecated and will be removed in a future version.
+ */
 export const TARGET_AGE_OPTIONS: TargetAgeOption[] = [
   { value: '3-5', labelKey: 'targetAge.preschool' },
   { value: '5-7', labelKey: 'targetAge.earlyElementary' },
@@ -46,3 +49,10 @@ export const MODEL_PROVIDERS_LOGO: Record<string, string> = {
   Deepseek: '/images/providers/deepseek.png',
   Google: '/images/providers/google.png',
 };
+
+export const PRESENTATION_VIEW_STATE = {
+  OUTLINE_CREATION: 'outline_creation',
+  WORKSPACE: 'workspace',
+} as const;
+
+export type PresentationViewState = (typeof PRESENTATION_VIEW_STATE)[keyof typeof PRESENTATION_VIEW_STATE];

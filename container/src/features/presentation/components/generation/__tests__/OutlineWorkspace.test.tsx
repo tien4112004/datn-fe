@@ -8,6 +8,7 @@ describe('OutlineWorkspace', () => {
 
   const defaultProps = {
     onDownload: mockOnDownload,
+    totalSlide: 5,
   };
 
   beforeEach(() => {
@@ -105,7 +106,7 @@ describe('OutlineWorkspace', () => {
   });
 
   it('handles missing onDownload prop', async () => {
-    renderWithProviders(<OutlineWorkspace />);
+    renderWithProviders(<OutlineWorkspace totalSlide={3} />);
     const downloadButton = screen.getByText(/download/i);
 
     // Should not throw error

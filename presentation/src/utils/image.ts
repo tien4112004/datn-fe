@@ -29,6 +29,8 @@ export const getImageSize = (src: string): Promise<ImageSize> => {
     img.onerror = () => {
       img.onload = null;
       img.onerror = null;
+
+      resolve({ width: 0, height: 0 });
     };
   });
 };

@@ -2,7 +2,7 @@ import { useQuery, useMutation, type UseQueryResult } from '@tanstack/react-quer
 import type { SortingState, PaginationState, Updater } from '@tanstack/react-table';
 import { usePresentationApiService } from '../api';
 import { useEffect, useState } from 'react';
-import type { Presentation, OutlineItem } from '../types';
+import type { Presentation, OutlineItem, PresentationGenerationRequest } from '../types';
 import type { ApiResponse } from '@/shared/types/api';
 
 // Return types for the hooks
@@ -24,7 +24,7 @@ export interface UsePresentationsReturn extends Omit<UseQueryResult<ApiResponse<
 export const usePresentationOutlines = (): UsePresentationOutlinesReturn => {
   const presentationApiService = usePresentationApiService();
   const { data: outlineItems = [], ...query } = useQuery<OutlineItem[]>({
-    queryKey: [presentationApiService.getType(), 'presentationItems'],
+    queryKey: [presentationApiService.getType(), 'outlineItems'],
     queryFn: async (): Promise<OutlineItem[]> => {
       const data = await presentationApiService.getOutlineItems();
       console.log('Fetch data', data);
@@ -165,6 +165,35 @@ export const useCreateBlankPresentation = () => {
       });
 
       return { presentation };
+    },
+  });
+};
+
+export const useGeneratePresentation = () => {
+  const presentationApiService = usePresentationApiService();
+
+  return useMutation({
+    mutationFn: async (request: PresentationGenerationRequest) => {
+      const generatedSlides = await presentationApiService.generatePresentation(request);
+      return generatedSlides;
+    },
+  });
+};
+
+export const useAiResultById = (id: string | undefined) => {
+  const presentationApiService = usePresentationApiService();
+
+  return useMutation({
+    mutationFn: async () => {
+      if (!id) {
+        throw new Error('Presentation ID is required');
+      }
+      const aiResult = await presentationApiService.getAiResultById(id);
+      if (!aiResult) {
+        throw new Error('AI Result not found');
+      }
+      console.log(aiResult);
+      return aiResult;
     },
   });
 };

@@ -1,11 +1,13 @@
 <template>
   <div class="editor-header">
     <div class="left">
-      <!-- <button class="menu-item" @click="handleToggleSidebar">
-        <div class="handler-item">
-          <IconMoreApp />
-        </div>
-      </button> -->
+      <Button
+        class="tw-border-0 tw-bg-transparent hover:tw-bg-gray-100"
+        @click="goBack"
+        v-if="showBackButton"
+      >
+        <IconLeft class="!tw-w-4 !tw-h-4" />
+      </Button>
 
       <div class="title">
         <Input
@@ -148,7 +150,7 @@
 </template>
 
 <script lang="ts" setup>
-import { nextTick, ref } from 'vue';
+import { nextTick, ref, computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useMainStore, useSlidesStore } from '@/store';
 import useScreening from '@/hooks/useScreening';
@@ -165,7 +167,7 @@ import Input from '@/components/Input.vue';
 import Popover from '@/components/Popover.vue';
 import PopoverMenuItem from '@/components/PopoverMenuItem.vue';
 import LanguageSwitcher from '@/components/LanguageSwitcher.vue';
-
+import Button from '@/components/Button.vue';
 const mainStore = useMainStore();
 const slidesStore = useSlidesStore();
 const { title } = storeToRefs(slidesStore);
@@ -211,6 +213,20 @@ const openMarkupPanel = () => {
 const openAIPPTDialog = () => {
   mainStore.setAIPPTDialogState(true);
 };
+
+const goBack = () => {
+  window.history.back();
+};
+
+const showBackButton = computed(() => {
+  return (
+    typeof window !== 'undefined' &&
+    window.location.pathname !== '/' &&
+    window.history.length > 1 &&
+    document.referrer !== '' &&
+    new URL(document.referrer).origin === window.location.origin
+  );
+});
 </script>
 
 <style lang="scss" scoped>

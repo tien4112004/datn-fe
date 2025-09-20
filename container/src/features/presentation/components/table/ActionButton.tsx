@@ -7,16 +7,17 @@ type ActionButtonProps = {
   onViewDetail?: () => void;
   onEdit?: () => void;
   onDelete?: () => void;
+  onRename?: () => void;
 };
 
-const ActionButton = ({ onViewDetail, onEdit, onDelete }: ActionButtonProps) => {
+const ActionButton = ({ onViewDetail, onEdit, onDelete, onRename }: ActionButtonProps) => {
   return (
     <Popover>
       <PopoverTrigger asChild>
         <EllipsisVerticalIcon className="h-5 w-5 cursor-pointer text-gray-500 hover:text-gray-700" />
       </PopoverTrigger>
       <PopoverContent className="w-48">
-        <ActionContent onEdit={onEdit} onDelete={onDelete} onViewDetail={onViewDetail} />
+        <ActionContent onEdit={onEdit} onDelete={onDelete} onViewDetail={onViewDetail} onRename={onRename} />
       </PopoverContent>
     </Popover>
   );
@@ -24,7 +25,7 @@ const ActionButton = ({ onViewDetail, onEdit, onDelete }: ActionButtonProps) => 
 
 export default ActionButton;
 
-export const ActionContent = ({ onViewDetail, onEdit, onDelete }: ActionButtonProps) => {
+export const ActionContent = ({ onViewDetail, onEdit, onDelete, onRename }: ActionButtonProps) => {
   const { t } = useTranslation('table');
 
   return (
@@ -44,6 +45,10 @@ export const ActionContent = ({ onViewDetail, onEdit, onDelete }: ActionButtonPr
       >
         <Trash2 className="mr-2 h-4 w-4" />
         {t('actionButton.delete')}
+      </Button>
+      <Button onClick={onRename} className="justify-start" variant={'ghost'}>
+        <Edit className="mr-2 h-4 w-4" />
+        {t('actionButton.rename')}
       </Button>
     </div>
   );

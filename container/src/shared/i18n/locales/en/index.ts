@@ -118,6 +118,14 @@ export default {
       title: 'Presentation List',
       generateNewPresentation: 'Generate New Presentation',
       createBlankPresentation: 'Create Blank Presentation',
+      filenameDialog: {
+        title: 'Rename Presentation',
+        placeholder: 'Enter new name for the presentation',
+      },
+      common: {
+        confirm: 'Confirm',
+        cancel: 'Cancel',
+      },
     },
   },
 
@@ -136,6 +144,7 @@ export default {
       viewDetails: 'View Details',
       edit: 'Edit',
       delete: 'Delete',
+      rename: 'Rename',
     },
     actions: 'Actions',
     rowsPerPage: 'Rows per page',

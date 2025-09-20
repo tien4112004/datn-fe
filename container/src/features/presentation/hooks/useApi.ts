@@ -1,4 +1,4 @@
-import { useQuery, useMutation, type UseQueryResult } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, type UseQueryResult } from '@tanstack/react-query';
 import type { SortingState, PaginationState, Updater } from '@tanstack/react-table';
 import { usePresentationApiService } from '../api';
 import { useEffect, useState } from 'react';
@@ -194,6 +194,39 @@ export const useAiResultById = (id: string | undefined) => {
       }
       console.log(aiResult);
       return aiResult;
+    },
+  });
+};
+
+export const useUpdatePresentationTitle = () => {
+  const presentationApiService = usePresentationApiService();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, name }: { id: string; name: string }) => {
+      const result = await presentationApiService.updatePresentationTitle(id, name);
+
+      // Handle API errors here
+      if (result && typeof result === 'object' && 'code' in result) {
+        // If there's a conflict (duplicate title), throw a specific error
+        if (result.code === 409) {
+          throw new Error('A presentation with this name already exists');
+        }
+
+        // For other errors, throw a generic error with the message from the API
+        throw new Error(result.message || 'An error occurred');
+      }
+
+      return { id, name, result };
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({
+        queryKey: [presentationApiService.getType(), 'presentations'],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: [presentationApiService.getType(), 'presentation', data.id],
+      });
     },
   });
 };

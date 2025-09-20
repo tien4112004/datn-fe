@@ -86,6 +86,14 @@ export default {
       title: 'Danh sách bài trình bày',
       generateNewPresentation: 'Tạo bài trình bày mới',
       createBlankPresentation: 'Tạo bài trình bày trống',
+      filenameDialog: {
+        title: 'Đổi tên bài trình bày',
+        placeholder: 'Nhập tên mới cho bài trình bày',
+      },
+      common: {
+        confirm: 'Xác nhận',
+        cancel: 'Hủy',
+      },
     },
     workspace: {
       title: 'Tùy chỉnh',
@@ -136,6 +144,7 @@ export default {
       viewDetails: 'Xem chi tiết',
       edit: 'Chỉnh sửa',
       delete: 'Xóa',
+      rename: 'Đổi tên',
     },
     actions: 'Hành động',
     rowsPerPage: 'Số hàng mỗi trang',

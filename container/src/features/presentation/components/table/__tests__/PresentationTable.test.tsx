@@ -19,6 +19,7 @@ vi.mock('@/features/presentation/api/service', () => ({
 
 vi.mock('@/features/presentation/hooks/useApi', () => ({
   usePresentations: vi.fn(),
+  useUpdatePresentationTitle: () => ({ mutate: vi.fn() }),
 }));
 
 describe('PresentationTable', () => {

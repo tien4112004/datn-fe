@@ -17,10 +17,6 @@ interface DataTableProps<TData> {
 }
 
 function DataTable<TData>({ table, isLoading, emptyState, onClickRow, contextMenu }: DataTableProps<TData>) {
-  if (isLoading) {
-    return <SkeletonTable rows={5} columns={6} />;
-  }
-
   // Resize logic. Source: https://github.com/TanStack/table/discussions/3192#discussioncomment-11896090
   const tableContainerRef = useRef<HTMLDivElement>(null);
   const windowDimensions = useWindowSize();
@@ -31,6 +27,10 @@ function DataTable<TData>({ table, isLoading, emptyState, onClickRow, contextMen
       table.setColumnSizing(initialColumnSizing);
     }
   }, [headers, windowDimensions.width, table]);
+
+  if (isLoading) {
+    return <SkeletonTable rows={5} columns={6} />;
+  }
 
   return (
     <>

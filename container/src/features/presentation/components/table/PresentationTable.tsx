@@ -147,66 +147,25 @@ const PresentationTable = () => {
       <RenameFileDialog
         isOpen={isRenameOpen}
         onOpenChange={setIsRenameOpen}
-        currentName={selectedPresentation?.title || ''}
-        isLoading={updatePresentationTitle.isPending}
-        onRename={(newName) => {
-          if (!selectedPresentation) return;
+        presentation={selectedPresentation}
+        updatePresentationMutation={updatePresentationTitle}
+        onSuccess={(newName) => {
+          // Update local selected presentation state
+          setSelectedPresentation((prev) => {
+            return prev ? { ...prev, title: newName } : null;
+          });
 
-          updatePresentationTitle.mutate(
-            { id: selectedPresentation.id, name: newName },
-            {
-              onSuccess: () => {
-                setIsRenameOpen(false);
-
-                // Update local selected presentation state
-                setSelectedPresentation((prev) => {
-                  return prev ? { ...prev, title: newName } : null;
-                });
-
-                // We need to create a new array reference to force table to rerender
-                const updatedData = data.map((presentation) =>
-                  presentation.id === selectedPresentation.id
-                    ? { ...presentation, title: newName }
-                    : presentation
-                );
-
-                // Force the table to update by setting new data directly
-                table.setOptions((prev) => ({
-                  ...prev,
-                  data: updatedData,
-                }));
-
-                toast.success(`Presentation renamed to "${newName}" successfully`);
-              },
-              onError: (error) => {
-                console.error('Failed to rename presentation:', error);
-
-                // Get a user-friendly error message
-                let errorMessage = 'Unknown error occurred';
-                if (error instanceof Error) {
-                  errorMessage = error.message;
-                } else if (typeof error === 'string') {
-                  errorMessage = error;
-                } else if (
-                  error &&
-                  typeof error === 'object' &&
-                  'message' in (error as Record<string, unknown>)
-                ) {
-                  errorMessage = String((error as Record<string, unknown>).message);
-                }
-
-                // Show error notification
-                toast.error(`Failed to rename presentation: ${errorMessage}`);
-              },
-            }
+          // We need to create a new array reference to force table to rerender
+          const updatedData = data.map((presentation) =>
+            presentation.id === selectedPresentation?.id ? { ...presentation, title: newName } : presentation
           );
+
+          // Force the table to update by setting new data directly
+          table.setOptions((prev) => ({
+            ...prev,
+            data: updatedData,
+          }));
         }}
-        checkDuplicate={(name) =>
-          // call api to check due to pagiation -> not all filename fetched
-          !!data?.some(
-            (p) => p.id !== selectedPresentation?.id && p.title.toLowerCase() === name.toLowerCase()
-          )
-        }
       />
     </div>
   );

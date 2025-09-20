@@ -4,26 +4,28 @@ import { Input } from '@ui/input';
 import { Button } from '@ui/button';
 import { useTranslation } from 'react-i18next';
 import { Description } from '@radix-ui/react-dialog';
+import { toast } from 'sonner';
+import type { Presentation } from '@/features/presentation/types';
 
 interface RenameFileDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  currentName: string;
-  onRename: (newName: string) => void;
-  checkDuplicate?: (name: string) => boolean;
-  isLoading?: boolean;
+  presentation?: Presentation | null;
+  updatePresentationMutation?: any; // The mutation hook result
+  onSuccess?: (newName: string) => void;
 }
 
 export const RenameFileDialog: React.FC<RenameFileDialogProps> = ({
   isOpen,
   onOpenChange,
-  currentName,
-  onRename,
-  checkDuplicate,
-  isLoading = false,
+  presentation,
+  updatePresentationMutation,
+  onSuccess,
 }) => {
   const { t } = useTranslation('presentation', { keyPrefix: 'list' });
+  const currentName = presentation?.title || '';
   const [filename, setFilename] = React.useState(currentName);
+  const isLoading = updatePresentationMutation?.isPending || false;
 
   // Reset filename and set focus when dialog opens
   const inputRef = React.useRef<HTMLInputElement>(null);
@@ -61,27 +63,54 @@ export const RenameFileDialog: React.FC<RenameFileDialogProps> = ({
   }, [isOpen]);
 
   const [duplicateError, setDuplicateError] = React.useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = React.useState<string>('');
 
-  // Check for duplicates when filename changes
+  // Reset error state when filename changes
   React.useEffect(() => {
-    if (filename.trim() && checkDuplicate && checkDuplicate(filename.trim())) {
-      setDuplicateError(true);
-    } else {
-      setDuplicateError(false);
-    }
-  }, [filename, checkDuplicate]);
+    setDuplicateError(false);
+    setErrorMessage('');
+  }, [filename]);
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    if (filename.trim() === '') return;
+    if (filename.trim() === '') return; // Only proceed if we have both the presentation and mutation function
+    if (presentation && updatePresentationMutation) {
+      updatePresentationMutation.mutate(
+        { id: presentation.id, name: filename.trim() },
+        {
+          onSuccess: () => {
+            handleOpenChange(false);
+            if (onSuccess) onSuccess(filename.trim());
+            toast.success(`Presentation renamed to "${filename.trim()}" successfully`);
+          },
+          onError: (error: unknown) => {
+            console.error('Failed to rename presentation:', error);
+            // Get a user-friendly error message
+            let message = 'Unknown error occurred';
+            if (error instanceof Error) {
+              message = error.message;
+            } else if (typeof error === 'string') {
+              message = error;
+            } else if (
+              error &&
+              typeof error === 'object' &&
+              'message' in (error as Record<string, unknown>)
+            ) {
+              message = String((error as Record<string, unknown>).message);
+            }
 
-    if (checkDuplicate?.(filename.trim())) {
-      setDuplicateError(true);
-      return;
+            // Check if it's a duplicate title error (409 Conflict)
+            if (message.includes('already exists')) {
+              setDuplicateError(true);
+              setErrorMessage(message);
+            } else {
+              // Show general error notification for other errors
+              toast.error(`Failed to rename presentation: ${message}`);
+            }
+          },
+        }
+      );
     }
-
-    onRename(filename.trim());
-    handleOpenChange(false);
   };
 
   const handleCancel = () => {
@@ -115,7 +144,8 @@ export const RenameFileDialog: React.FC<RenameFileDialogProps> = ({
             />
             {duplicateError && (
               <p className="text-sm text-red-500">
-                {t('filenameDialog.duplicateError', 'A presentation with this name already exists')}
+                {errorMessage ||
+                  t('filenameDialog.duplicateError', 'A presentation with this name already exists')}
               </p>
             )}
           </div>

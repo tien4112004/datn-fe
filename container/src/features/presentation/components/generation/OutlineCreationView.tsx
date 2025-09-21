@@ -18,6 +18,7 @@ import { SLIDE_COUNT_OPTIONS, LANGUAGE_OPTIONS } from '@/features/presentation/t
 import { useModels } from '@/features/model';
 import { ModelSelect } from '@/components/common/ModelSelect';
 import { usePresentationForm } from '@/features/presentation/contexts/PresentationFormContext';
+import ResourceTypeSwitcher from '@/features/projects/components/ResourceTypeSwitcher';
 
 interface OutlineCreationViewProps {
   onCreateOutline: () => void;
@@ -51,6 +52,7 @@ const OutlineCreationView = ({ onCreateOutline }: OutlineCreationViewProps) => {
   return (
     <div className="lg:w-4xl flex min-h-[calc(100vh-1rem)] flex-col items-center justify-center gap-4 self-center sm:w-full">
       <h1 className="text-3xl font-bold leading-10 text-neutral-900">{t('title')}</h1>
+      <ResourceTypeSwitcher />
       <h2 className="text-xl font-bold leading-10 text-sky-500/80">{t('subtitle')}</h2>
 
       <form

@@ -24,7 +24,7 @@ const CreatePresentationControls = () => {
 
       <Button
         variant={'secondary'}
-        className="text-primary-foreground dark:text-foreground flex h-28 flex-col bg-gradient-to-r from-orange-500 to-yellow-500 shadow hover:to-orange-500"
+        className="text-primary-foreground dark:text-foreground flex h-28 flex-col bg-gradient-to-r from-green-500 to-teal-500 shadow hover:to-green-500"
         onClick={() =>
           createBlankPresentation
             .mutateAsync()
@@ -33,19 +33,6 @@ const CreatePresentationControls = () => {
       >
         <Plus className="!size-6" />
         <p className="text-lg font-semibold">{t('controls.createBlank')}</p>
-      </Button>
-
-      <Button
-        variant={'secondary'}
-        className="text-primary-foreground dark:text-foreground flex h-28 flex-col bg-gradient-to-r from-green-500 to-teal-500 shadow hover:to-green-500"
-        onClick={() =>
-          createBlankPresentation
-            .mutateAsync()
-            .then((res) => navigate(`/presentation/${res.presentation.id}`))
-        }
-      >
-        <p className="text-lg font-semibold">Create Blank Presentation</p>
-        <span className="text-xs opacity-75">(For development only)</span>
       </Button>
 
       <Button

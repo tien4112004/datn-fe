@@ -8,16 +8,16 @@ export interface ResourceTypeSwitcherProps {
 }
 
 const ResourceTypeSwitcher = ({ className }: ResourceTypeSwitcherProps) => {
-  const { t } = useTranslation('common');
+  const { t } = useTranslation('projects');
   const navigate = useNavigate();
   const location = useLocation();
 
   const resources = [
-    { type: 'presentation', label: t('presentation', { defaultValue: 'Presentation' }), icon: Presentation },
-    { type: 'video', label: t('video', { defaultValue: 'Video' }), icon: Video },
-    { type: 'image', label: t('image', { defaultValue: 'Image' }), icon: Image },
-    { type: 'document', label: t('document', { defaultValue: 'Document' }), icon: FileText },
-    { type: 'mindmap', label: t('mindmap', { defaultValue: 'Mindmap' }), icon: Brain },
+    { type: 'presentation', label: t('resources.presentation'), icon: Presentation },
+    { type: 'video', label: t('resources.video'), icon: Video },
+    { type: 'image', label: t('resources.image'), icon: Image },
+    { type: 'document', label: t('resources.document'), icon: FileText },
+    { type: 'mindmap', label: t('resources.mindmap'), icon: Brain },
   ];
 
   const getActiveResourceType = () => {

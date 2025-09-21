@@ -1,5 +1,3 @@
-// DEPRECATED: This file is no longer in use.
-
 import { useTranslation } from 'react-i18next';
 import { Popover, PopoverTrigger, PopoverContent } from '@/shared/components/ui/popover';
 import { Button } from '@/shared/components/ui/button';
@@ -12,6 +10,9 @@ const LANGUAGES = [
   { code: 'vi', name: 'Tiếng Việt', flag: '🇻🇳' },
 ];
 
+/**
+ * @deprecated Use `SidebarLanguageSwitcher` instead
+ */
 const LanguageSwitcher = () => {
   const { i18n } = useTranslation();
   const [open, setOpen] = useState(false);

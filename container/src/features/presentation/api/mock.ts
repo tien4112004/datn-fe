@@ -273,6 +273,24 @@ export default class PresentationMockService implements PresentationApiService {
     }
   }
 
+  async *getStreamedPresentation(
+    _request: PresentationGenerationRequest,
+    signal: AbortSignal
+  ): AsyncGenerator<string> {
+    const mockSlides = getMockSlideData();
+
+    // Stream each slide as a separate JSON block
+    for (const slide of mockSlides) {
+      if (signal.aborted) {
+        return;
+      }
+
+      const jsonBlock = `${JSON.stringify({ ...slide }, null, 2)}`;
+      yield jsonBlock;
+      await new Promise((resolve) => setTimeout(resolve, 500));
+    }
+  }
+
   getType(): ApiMode {
     return API_MODE.mock;
   }

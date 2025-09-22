@@ -7,6 +7,7 @@ import {
   type PresentationCollectionRequest,
   type PresentationGenerationRequest,
   type PresentationGenerationResponse,
+  type SlideLayoutSchema,
 } from '../types';
 import { splitMarkdownToOutlineItems } from '../utils';
 import { api } from '@/shared/api';
@@ -82,6 +83,13 @@ export default class PresentationRealApiService implements PresentationApiServic
     this.baseUrl = baseUrl;
   }
 
+  getStreamedPresentation(
+    request: PresentationGenerationRequest,
+    signal: AbortSignal
+  ): AsyncIterable<string> {
+    throw new Error('Method not implemented.');
+  }
+
   getStreamedOutline(request: OutlineData, signal: AbortSignal): AsyncIterable<string> {
     const baseUrl = this.baseUrl;
     return {
@@ -146,7 +154,7 @@ export default class PresentationRealApiService implements PresentationApiServic
     return this._mapPresentationItem(response.data.data);
   }
 
-  async getAiResultById(id: string): Promise<any> {
+  async getAiResultById(id: string): Promise<SlideLayoutSchema[]> {
     const response = await api.get<ApiResponse<any>>(`${this.baseUrl}/api/presentations/${id}/ai-result`);
 
     const rawData = response.data.data;

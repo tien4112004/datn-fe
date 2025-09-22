@@ -3,10 +3,10 @@ import React, { useCallback } from 'react';
 
 export interface StreamingOptions<TRequest, TProcessed> {
   extractFn: (request: TRequest, signal: AbortSignal) => AsyncIterable<string>;
-  transformFn: (content: string) => TProcessed;
+  transformFn: (content: string[]) => TProcessed;
   input: TRequest;
   queryKey: string[];
-  enabled?: boolean;
+  manual?: boolean;
 }
 
 export interface StreamingHookReturn<TRequest, TProcessed> {
@@ -24,9 +24,9 @@ function useStreaming<TRequest = any, TProcessed = any>({
   transformFn,
   input,
   queryKey,
-  enabled = true,
+  manual = false,
 }: StreamingOptions<TRequest, TProcessed>): StreamingHookReturn<TRequest, TProcessed> {
-  const [isStreamingInternal, setIsStreamingInternal] = React.useState(enabled);
+  const [shouldStream, setShouldStream] = React.useState(!manual);
   const requestData = React.useRef<TRequest>(input);
   const queryClient = useQueryClient();
 
@@ -41,26 +41,22 @@ function useStreaming<TRequest = any, TProcessed = any>({
       queryFn: ({ signal }) => extractFn(requestData.current, signal),
     }),
     staleTime: Infinity,
-    enabled: isStreamingInternal,
+    enabled: shouldStream,
   });
 
   const fetch = useCallback(() => {
-    if (!isStreamingInternal) {
-      setIsStreamingInternal(true);
-      refetch();
-    }
-  }, [refetch]);
+    setShouldStream(true);
+    refetch();
+  }, [shouldStream, refetch]);
 
   const stopStream = useCallback(() => {
-    if (isStreamingInternal) {
-      queryClient.cancelQueries({ queryKey: [...queryKey, requestData] });
-    }
-    setIsStreamingInternal(false);
-  }, []);
+    queryClient.cancelQueries({ queryKey: [...queryKey, requestData] });
+    setShouldStream(false);
+  }, [queryClient, queryKey]);
 
   const restartStream = useCallback((data: TRequest) => {
     requestData.current = data;
-    setIsStreamingInternal(true);
+    setShouldStream(true);
     refetch();
   }, []);
 
@@ -68,7 +64,7 @@ function useStreaming<TRequest = any, TProcessed = any>({
     queryClient.setQueryData([...queryKey, requestData], null);
   }, []);
 
-  const processedData = transformFn(data?.join('') ?? '');
+  const processedData = transformFn(data || []);
 
   return {
     processedData,

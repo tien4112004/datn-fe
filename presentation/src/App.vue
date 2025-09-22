@@ -46,7 +46,6 @@ onMounted(async () => {
   containerStore.initialize(props);
 
   if (containerStore.isRemote) {
-    console.log('Presentation data in App.vue:', containerStore.presentation);
     slidesStore.setSlides(containerStore.presentation?.slides || []);
   } else {
     const slides = await api.getFileData('slides');

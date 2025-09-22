@@ -1,15 +1,10 @@
 import type { ExtendedSlideTheme } from '@/features/presentation/types/slide';
 import { moduleMethodMap } from '../components/remote/module';
+import type { SlideLayoutSchema } from '../types';
 
 export interface SlideViewport {
   size: number;
   ratio: number;
-}
-
-export interface SlideData {
-  type: string;
-  title?: string;
-  data: any;
 }
 
 /**
@@ -18,7 +13,7 @@ export interface SlideData {
  * that can be consumed by the presentation editor
  */
 export const processGeneratedSlides = async (
-  generatedData: SlideData[],
+  generatedData: SlideLayoutSchema[],
   viewport: SlideViewport,
   theme: ExtendedSlideTheme
 ): Promise<any[]> => {

@@ -4,7 +4,7 @@
     <Editor v-else-if="_isPC" />
     <Mobile v-else />
   </template>
-  <FullscreenSpin :tip="$t('app.initializing')" v-else loading :mask="false" class="spin" />
+  <!-- <FullscreenSpin :tip="$t('app.initializing')" v-else loading :mask="false" class="spin" /> -->
 </template>
 
 <script lang="ts" setup>
@@ -55,6 +55,10 @@ onMounted(async () => {
   await deleteDiscardedDB();
   snapshotStore.initSnapshotDatabase();
 });
+
+const test = async () => {
+  console.log('HEHE');
+};
 
 // When the application is unloaded, record the current indexedDB database ID in localStorage for later database cleanup
 window.addEventListener('unload', () => {

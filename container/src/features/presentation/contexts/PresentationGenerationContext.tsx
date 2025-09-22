@@ -1,8 +1,9 @@
-import { createContext, useContext, useState, useEffect, type ReactNode, useRef } from 'react';
+import { createContext, useContext, useState, useEffect, type ReactNode, useRef, useCallback } from 'react';
 import type { PresentationGenerationRequest } from '@/features/presentation/types';
 import { useFetchStreamingPresentation } from '@/features/presentation/hooks/useFetchStreaming';
 import usePresentationStore from '@/features/presentation/stores/usePresentationStore';
 import { toast } from 'sonner';
+import '../components/remote/module';
 
 interface PresentationGenerationContextValue {
   startGeneration: (request: PresentationGenerationRequest) => Promise<{ presentationId: string } | null>;
@@ -40,22 +41,25 @@ export const PresentationGenerationProvider = ({ children }: PresentationGenerat
     resultRef.current = result;
   }, [result]);
 
-  const startGeneration = async (newRequest: PresentationGenerationRequest) => {
-    setRequest(newRequest);
+  const startGeneration = useCallback(
+    async (newRequest: PresentationGenerationRequest) => {
+      setRequest(newRequest);
 
-    // Start the streaming process
-    fetch();
+      // Start the streaming process
+      fetch();
 
-    let attempts = 0;
-    const maxAttempts = 50;
+      let attempts = 0;
+      const maxAttempts = 50;
 
-    while (!resultRef.current && attempts < maxAttempts) {
-      await new Promise((resolve) => setTimeout(resolve, 100));
-      attempts++;
-    }
+      while (!resultRef.current && attempts < maxAttempts) {
+        await new Promise((resolve) => setTimeout(resolve, 100));
+        attempts++;
+      }
 
-    return resultRef.current || null;
-  };
+      return resultRef.current || null;
+    },
+    [fetch]
+  );
 
   useEffect(() => {
     if (error) {

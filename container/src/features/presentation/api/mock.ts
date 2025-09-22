@@ -286,27 +286,27 @@ export default class PresentationMockService implements PresentationApiService {
     const presentationId = crypto.randomUUID();
     const mockSlides = getMockSlideData();
 
-    // // Create and append new presentation to the mock list
-    // const newPresentation: Presentation = {
-    //   id: presentationId,
-    //   title: `Streamed Presentation`,
-    //   slides: [
-    //     {
-    //       id: crypto.randomUUID(),
-    //       elements: [],
-    //       background: {
-    //         type: 'solid' as const,
-    //         color: '#ffffff',
-    //       },
-    //     },
-    //   ],
-    //   createdAt: new Date().toISOString(),
-    //   updatedAt: new Date().toISOString(),
-    //   isParsed: false,
-    // };
+    // Create and append new presentation to the mock list
+    const newPresentation: Presentation = {
+      id: presentationId,
+      title: `Streamed Presentation`,
+      slides: [
+        {
+          id: crypto.randomUUID(),
+          elements: [],
+          background: {
+            type: 'solid' as const,
+            color: '#ffffff',
+          },
+        },
+      ],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      isParsed: false,
+    };
 
-    // // Add the new presentation to the mock list
-    // mockPresentationItems = [{ ...newPresentation }, ...mockPresentationItems];
+    // Add the new presentation to the mock list
+    mockPresentationItems = [{ ...newPresentation }, ...mockPresentationItems];
 
     const stream = {
       async *[Symbol.asyncIterator]() {

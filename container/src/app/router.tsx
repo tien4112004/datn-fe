@@ -48,7 +48,7 @@ const router = createBrowserRouter([
           {
             path: ':id',
             Component: Presentation.DetailPage2,
-            loader: getPresentationById,
+            // loader: getPresentationById,
           },
           {
             path: 'create',

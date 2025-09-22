@@ -86,13 +86,16 @@ export default class PresentationRealApiService implements PresentationApiServic
   getStreamedPresentation(
     request: PresentationGenerationRequest,
     signal: AbortSignal
-  ): AsyncIterable<string> {
+  ): {
+    presentationId: string;
+    stream: AsyncIterable<string>;
+  } {
     throw new Error('Method not implemented.');
   }
 
-  getStreamedOutline(request: OutlineData, signal: AbortSignal): AsyncIterable<string> {
+  getStreamedOutline(request: OutlineData, signal: AbortSignal): { stream: AsyncIterable<string> } {
     const baseUrl = this.baseUrl;
-    return {
+    const stream = {
       async *[Symbol.asyncIterator]() {
         const response = await api.stream(`${baseUrl}/api/presentations/outline-generate`, request, signal);
 
@@ -112,6 +115,8 @@ export default class PresentationRealApiService implements PresentationApiServic
         }
       },
     };
+
+    return { stream };
   }
 
   getType(): ApiMode {

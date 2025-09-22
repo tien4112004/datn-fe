@@ -66,6 +66,16 @@ export interface TableOfContentsLayoutSchema {
   };
 }
 
+export type SlideLayoutSchema =
+  | TwoColumnWithImageLayoutSchema
+  | MainImageLayoutSchema
+  | TitleLayoutSchema
+  | TwoColumnLayoutSchema
+  | VerticalListLayoutSchema
+  | HorizontalListLayoutSchema
+  | TransitionLayoutSchema
+  | TableOfContentsLayoutSchema;
+
 // Layout Template System
 export interface LayoutBlock {
   left: number;

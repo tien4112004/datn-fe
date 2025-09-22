@@ -260,35 +260,73 @@ export default class PresentationMockService implements PresentationApiService {
     });
   }
 
-  async *getStreamedOutline(_request: OutlineData, signal: AbortSignal): AsyncGenerator<string> {
+  getStreamedOutline(_request: OutlineData, signal: AbortSignal): { stream: AsyncIterable<string> } {
     const chunks = mockOutlineOutput.split(' ');
 
-    for (const chunk of chunks) {
-      if (signal.aborted) {
-        return;
-      }
+    const stream = {
+      async *[Symbol.asyncIterator]() {
+        for (const chunk of chunks) {
+          if (signal.aborted) {
+            return;
+          }
 
-      yield chunk + ' ';
-      await new Promise((resolve) => setTimeout(resolve, 50));
-    }
+          yield chunk + ' ';
+          await new Promise((resolve) => setTimeout(resolve, 50));
+        }
+      },
+    };
+
+    return { stream };
   }
 
-  async *getStreamedPresentation(
+  getStreamedPresentation(
     _request: PresentationGenerationRequest,
     signal: AbortSignal
-  ): AsyncGenerator<string> {
+  ): { presentationId: string; stream: AsyncIterable<string> } {
+    const presentationId = crypto.randomUUID();
     const mockSlides = getMockSlideData();
 
-    // Stream each slide as a separate JSON block
-    for (const slide of mockSlides) {
-      if (signal.aborted) {
-        return;
-      }
+    // // Create and append new presentation to the mock list
+    // const newPresentation: Presentation = {
+    //   id: presentationId,
+    //   title: `Streamed Presentation`,
+    //   slides: [
+    //     {
+    //       id: crypto.randomUUID(),
+    //       elements: [],
+    //       background: {
+    //         type: 'solid' as const,
+    //         color: '#ffffff',
+    //       },
+    //     },
+    //   ],
+    //   createdAt: new Date().toISOString(),
+    //   updatedAt: new Date().toISOString(),
+    //   isParsed: false,
+    // };
 
-      const jsonBlock = `${JSON.stringify({ ...slide }, null, 2)}`;
-      yield jsonBlock;
-      await new Promise((resolve) => setTimeout(resolve, 500));
-    }
+    // // Add the new presentation to the mock list
+    // mockPresentationItems = [{ ...newPresentation }, ...mockPresentationItems];
+
+    const stream = {
+      async *[Symbol.asyncIterator]() {
+        // Stream each slide as a separate JSON block
+        for (const slide of mockSlides) {
+          if (signal.aborted) {
+            return;
+          }
+
+          const jsonBlock = `${JSON.stringify({ ...slide }, null, 2)}`;
+          yield jsonBlock;
+          await new Promise((resolve) => setTimeout(resolve, 500));
+        }
+      },
+    };
+
+    return {
+      presentationId,
+      stream,
+    };
   }
 
   getType(): ApiMode {

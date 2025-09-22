@@ -6,6 +6,7 @@ import useFetchStreamingOutline from '@/features/presentation/hooks/useFetchStre
 import useOutlineStore from '@/features/presentation/stores/useOutlineStore';
 import usePresentationStore from '@/features/presentation/stores/usePresentationStore';
 import { usePresentationForm } from '@/features/presentation/contexts/PresentationFormContext';
+import { usePresentationGeneration } from '../contexts/PresentationGenerationContext';
 
 interface UseWorkspaceProps {}
 
@@ -13,7 +14,7 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
   const navigate = useNavigate();
 
   // Form context
-  const { trigger, getValues, setValue } = usePresentationForm();
+  const { trigger, getValues } = usePresentationForm();
 
   // Streaming API
   const {
@@ -45,10 +46,7 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
   const isStreamingStore = useOutlineStore((state) => state.isStreaming);
   const isGeneratingOutline = useOutlineStore((state) => state.isGenerating);
 
-  const generatePresentationMutation = useGeneratePresentation();
-  const setGeneratedPresentation = usePresentationStore((state) => state.setGeneratedPresentation);
-  const setIsGenerating = usePresentationStore((state) => state.setIsGenerating);
-  const isGenerating = usePresentationStore((state) => state.isGenerating);
+  const { isStreaming: isGenerating, startGeneration } = usePresentationGeneration();
 
   useEffect(() => {
     if (isGeneratingOutline) fetch();
@@ -86,51 +84,23 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
   }, []);
 
   const handleGeneratePresentation = useCallback(async () => {
-    const isValid = await trigger([
-      'theme',
-      'contentLength',
-      'imageModel',
-      'slideCount',
-      'targetAge',
-      'learningObjective',
-      'model',
-      'language',
-    ]);
+    const isValid = await trigger(['theme', 'contentLength', 'imageModel']);
     if (!isValid) return;
 
-    try {
-      setIsGenerating(true);
-      const outline = markdownContent();
-      const data = getValues();
+    const outline = markdownContent();
+    const data = getValues();
 
-      const generationRequest = {
-        outline,
-        theme: data.theme,
-        contentLength: data.contentLength,
-        imageModel: data.imageModel,
-        slideCount: data.slideCount,
-        language: data.language,
-        model: data.model,
-        targetAge: data.targetAge,
-        learningObjective: data.learningObjective,
-      };
+    const generationRequest = {
+      outline,
+      theme: data.theme,
+      contentLength: data.contentLength,
+      imageModel: data.imageModel,
+    };
 
-      const generatedPresentation = await generatePresentationMutation.mutateAsync(generationRequest);
+    const result = await startGeneration(generationRequest);
 
-      setGeneratedPresentation(generatedPresentation);
-
-      // Clear outline store and form data
-      clearOutline();
-      setValue('topic', '');
-
-      navigate(`/presentation/${generatedPresentation.presentation.id}`);
-    } catch (error) {
-      console.error('Error generating presentation:', error);
-      toast.error('Failed to generate presentation. Please try again.');
-    } finally {
-      setIsGenerating(false);
-    }
-  }, []);
+    navigate(`/presentation/${result?.presentationId}`);
+  }, [trigger, markdownContent, getValues, startGeneration]);
 
   const stopStream = useCallback(() => {
     stopStreamOutline();

@@ -26,14 +26,14 @@ function useFetchStreamingOutline(initialRequestData: OutlineData, options?: { m
 function useFetchStreamingPresentation(initialRequestData: PresentationGenerationRequest) {
   const presentationApiService = usePresentationApiService();
 
-  return useStreaming<PresentationGenerationRequest, SlideLayoutSchema[]>({
+  return useStreaming<PresentationGenerationRequest, SlideLayoutSchema[], { presentationId: string }>({
     extractFn: presentationApiService.getStreamedPresentation.bind(presentationApiService),
     transformFn: (slides) => {
       return slides.map((slide) => JSON.parse(slide));
     },
     input: initialRequestData,
     queryKey: [presentationApiService.getType(), 'presentationGeneration'],
-    manual: false,
+    manual: true,
   });
 }
 

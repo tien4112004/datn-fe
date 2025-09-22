@@ -2,14 +2,14 @@ import { experimental_streamedQuery as streamedQuery, useQuery, useQueryClient }
 import React, { useCallback } from 'react';
 
 export interface StreamingOptions<TRequest, TProcessed> {
-  extractFn: (request: TRequest, signal: AbortSignal) => AsyncIterable<string>;
+  extractFn: (request: TRequest, signal: AbortSignal) => { stream: AsyncIterable<string> };
   transformFn: (content: string[]) => TProcessed;
   input: TRequest;
   queryKey: string[];
   manual?: boolean;
 }
 
-export interface StreamingHookReturn<TRequest, TProcessed> {
+export interface StreamingHookReturn<TRequest, TProcessed, TExtractResult> {
   processedData: TProcessed;
   isStreaming: boolean;
   error: string | null;
@@ -17,17 +17,20 @@ export interface StreamingHookReturn<TRequest, TProcessed> {
   stopStream: () => void;
   clearContent: () => void;
   fetch: () => void;
+  result?: TExtractResult;
 }
 
-function useStreaming<TRequest = any, TProcessed = any>({
+function useStreaming<TRequest = any, TProcessed = any, TExtractResult = any>({
   extractFn,
   transformFn,
   input,
   queryKey,
   manual = false,
-}: StreamingOptions<TRequest, TProcessed>): StreamingHookReturn<TRequest, TProcessed> {
+}: StreamingOptions<TRequest, TProcessed>): StreamingHookReturn<TRequest, TProcessed, TExtractResult> {
   const [shouldStream, setShouldStream] = React.useState(!manual);
   const requestData = React.useRef<TRequest>(input);
+  const [result, setExtractResult] = React.useState<TExtractResult>();
+
   const queryClient = useQueryClient();
 
   const {
@@ -38,7 +41,11 @@ function useStreaming<TRequest = any, TProcessed = any>({
   } = useQuery({
     queryKey: [...queryKey, requestData],
     queryFn: streamedQuery({
-      queryFn: ({ signal }) => extractFn(requestData.current, signal),
+      queryFn: ({ signal }) => {
+        const { stream, ...rest } = extractFn(requestData.current, signal);
+        setExtractResult(rest as TExtractResult);
+        return stream;
+      },
     }),
     staleTime: Infinity,
     enabled: shouldStream,
@@ -74,6 +81,7 @@ function useStreaming<TRequest = any, TProcessed = any>({
     stopStream,
     clearContent,
     fetch,
+    result,
   };
 }
 

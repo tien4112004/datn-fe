@@ -1,10 +1,11 @@
-import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, type ReactNode, useRef } from 'react';
 import type { PresentationGenerationRequest } from '@/features/presentation/types';
 import { useFetchStreamingPresentation } from '@/features/presentation/hooks/useFetchStreaming';
 import usePresentationStore from '@/features/presentation/stores/usePresentationStore';
+import { toast } from 'sonner';
 
 interface PresentationGenerationContextValue {
-  startGeneration: (request: PresentationGenerationRequest) => void;
+  startGeneration: (request: PresentationGenerationRequest) => Promise<{ presentationId: string } | null>;
   error: string | null;
 }
 
@@ -28,8 +29,39 @@ export const PresentationGenerationProvider = ({ children }: PresentationGenerat
     processedData: streamedData,
     isStreaming,
     error,
-    restartStream,
+    result,
+    fetch,
   } = useFetchStreamingPresentation(request || ({} as PresentationGenerationRequest));
+
+  const resultRef = useRef(result);
+
+  // Keep ref updated
+  useEffect(() => {
+    resultRef.current = result;
+  }, [result]);
+
+  const startGeneration = async (newRequest: PresentationGenerationRequest) => {
+    setRequest(newRequest);
+
+    // Start the streaming process
+    fetch();
+
+    let attempts = 0;
+    const maxAttempts = 50;
+
+    while (!resultRef.current && attempts < maxAttempts) {
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      attempts++;
+    }
+
+    return resultRef.current || null;
+  };
+
+  useEffect(() => {
+    if (error) {
+      toast.error('Error generating presentation. Please try again.');
+    }
+  }, [error]);
 
   // Sync all state with store
   useEffect(() => {
@@ -39,13 +71,6 @@ export const PresentationGenerationProvider = ({ children }: PresentationGenerat
   useEffect(() => {
     setStreamedData(streamedData || []);
   }, [streamedData, setStreamedData]);
-
-  const startGeneration = (newRequest: PresentationGenerationRequest) => {
-    setRequest(newRequest);
-    if (request) {
-      restartStream(newRequest);
-    }
-  };
 
   const contextValue: PresentationGenerationContextValue = {
     startGeneration,

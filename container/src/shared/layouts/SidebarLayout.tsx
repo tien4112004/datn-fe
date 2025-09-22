@@ -1,4 +1,4 @@
-import { Outlet, useNavigate, useNavigation, useRouteError } from 'react-router-dom';
+import { Outlet, useNavigate, useNavigation, useRouteError, useLocation } from 'react-router-dom';
 import GlobalSpinner from '@/components/common/GlobalSpinner';
 import { SidebarInset, SidebarProvider, useSidebar } from '../components/ui/sidebar';
 import { AppSidebar } from '../components/navigation/AppSidebar';
@@ -7,9 +7,11 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Toaster } from 'sonner';
 import ErrorBoundary, { ErrorPageFallback } from '@/components/common/ErrorBoundary';
+import type { AppError } from '@/types/errors';
 
 function NavLayoutContent() {
   const navigation = useNavigation();
+  const location = useLocation();
   const isLoading = navigation.state === 'loading';
   const { state, toggleSidebar, setFullscreen } = useSidebar();
   const { t } = useTranslation('loading');
@@ -39,7 +41,7 @@ function NavLayoutContent() {
       <AppSidebar />
       <SidebarInset className="bg-white">
         {isLoading && <GlobalSpinner text={t('page')} />}
-        <ErrorBoundary>
+        <ErrorBoundary pathname={location.pathname}>
           <Outlet />
         </ErrorBoundary>
       </SidebarInset>
@@ -72,7 +74,7 @@ export function NavLayoutErrorBoundary() {
       <AppSidebar />
       <SidebarInset className="bg-white">
         <ErrorPageFallback
-          error={error as Error}
+          error={error as AppError}
           errorInfo={null}
           resetError={resetError}
           errorId={errorId}

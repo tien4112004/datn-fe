@@ -1,10 +1,8 @@
 import { useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { useGeneratePresentation } from '@/features/presentation/hooks/useApi';
 import useFetchStreamingOutline from '@/features/presentation/hooks/useFetchStreaming';
 import useOutlineStore from '@/features/presentation/stores/useOutlineStore';
-import usePresentationStore from '@/features/presentation/stores/usePresentationStore';
 import { usePresentationForm } from '@/features/presentation/contexts/PresentationFormContext';
 import { usePresentationGeneration } from '../contexts/PresentationGenerationContext';
 
@@ -14,7 +12,8 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
   const navigate = useNavigate();
 
   // Form context
-  const { trigger, getValues } = usePresentationForm();
+  const formHook = usePresentationForm();
+  const { getValues, trigger, setValue } = formHook;
 
   // Streaming API
   const {
@@ -99,7 +98,9 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
 
     const result = await startGeneration(generationRequest);
 
-    navigate(`/presentation/${result?.presentationId}`);
+    navigate(`/presentation/${result?.presentationId}?isGenerating=true`);
+    setValue('topic', '');
+    clearOutline();
   }, [trigger, markdownContent, getValues, startGeneration]);
 
   const stopStream = useCallback(() => {
@@ -137,5 +138,7 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
     handleRegenerateOutline,
     handleGeneratePresentation,
     isGenerating,
+
+    ...formHook,
   };
 };

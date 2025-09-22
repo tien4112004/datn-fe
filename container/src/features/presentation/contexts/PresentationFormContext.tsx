@@ -1,5 +1,5 @@
 import { getLocalStorageData } from '@/shared/lib/utils';
-import { createContext, useContext, useMemo, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useMemo, type ReactNode } from 'react';
 import {
   useForm,
   type Control,
@@ -9,6 +9,7 @@ import {
   type UseFormGetValues,
 } from 'react-hook-form';
 import useFormPersist from 'react-hook-form-persist';
+import { moduleMap, moduleMethodMap } from '../components/remote/module';
 
 export type UnifiedFormData = {
   // Outline fields
@@ -65,6 +66,12 @@ export const PresentationFormProvider = ({ children }: PresentationFormProviderP
     storage: window.localStorage,
     exclude: [],
   });
+
+  useEffect(() => {
+    moduleMap.editor();
+    moduleMap.thumbnail();
+    moduleMethodMap.convertToSlide();
+  }, []);
 
   const contextValue: PresentationFormContextValue = {
     control: form.control,

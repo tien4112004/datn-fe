@@ -14,6 +14,7 @@ export default {
   loading: {
     page: 'Loading page...',
     presentation: 'Loading presentation editor...',
+    generatingPresentation: 'Generating presentation...',
   },
 
   outlineWorkspace: {

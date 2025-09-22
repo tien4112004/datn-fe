@@ -206,14 +206,12 @@ export const useUpdatePresentationTitle = () => {
     mutationFn: async ({ id, name }: { id: string; name: string }) => {
       const result = await presentationApiService.updatePresentationTitle(id, name);
 
-      // Handle API errors here
+      const CONFLICT_HTTP_STATUS = 409;
       if (result && typeof result === 'object' && 'code' in result) {
-        // If there's a conflict (duplicate title), throw a specific error
-        if (result.code === 409) {
+        if (result.code === CONFLICT_HTTP_STATUS) {
           throw new Error('A presentation with this name already exists');
         }
 
-        // For other errors, throw a generic error with the message from the API
         throw new Error(result.message || 'An error occurred');
       }
 
@@ -228,5 +226,9 @@ export const useUpdatePresentationTitle = () => {
         queryKey: [presentationApiService.getType(), 'presentation', data.id],
       });
     },
+    // onError: (error: unknown) => {
+    //   console.error('Failed to update presentation title:', error);
+    //   throw error;
+    // },
   });
 };

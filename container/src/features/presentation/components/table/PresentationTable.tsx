@@ -10,7 +10,6 @@ import { useNavigate } from 'react-router-dom';
 import ThumbnailWrapper from '../others/ThumbnailWrapper';
 import * as React from 'react';
 import { RenameFileDialog } from '@/shared/components/modals/RenameFileDialog';
-import { useQueryClient } from '@tanstack/react-query';
 
 const PresentationTable = () => {
   const { t } = useTranslation('table');
@@ -21,22 +20,6 @@ const PresentationTable = () => {
     if (!date) return '';
     return new Date(date).toLocaleString();
   }, []);
-
-  // // Callback for forcing data refresh
-  // const refreshData = useCallback(() => {
-  //   queryClient.invalidateQueries({
-  //     queryKey: ['presentations'],
-  //     refetchType: 'active',
-  //   });
-  // }, []);
-
-  // // Add a manual refresh trigger
-  // React.useEffect(() => {
-  //   window.addEventListener('forceRefreshPresentations', refreshData);
-  //   return () => {
-  //     window.removeEventListener('forceRefreshPresentations', refreshData);
-  //   };
-  // }, [refreshData]);
 
   const columns = useMemo(
     () => [
@@ -94,7 +77,6 @@ const PresentationTable = () => {
   const [isRenameOpen, setIsRenameOpen] = React.useState(false);
   const [selectedPresentation, setSelectedPresentation] = React.useState<Presentation | null>(null);
   const updatePresentationTitle = useUpdatePresentationTitle();
-  const queryClient = useQueryClient();
   const table = useReactTable({
     data: [...data],
     columns: columns,
@@ -147,18 +129,9 @@ const PresentationTable = () => {
         isOpen={isRenameOpen}
         onOpenChange={setIsRenameOpen}
         presentation={selectedPresentation}
-        updatePresentationMutation={updatePresentationTitle}
-        onSuccess={(newName) => {
-          if (selectedPresentation) {
-            setSelectedPresentation({
-              ...selectedPresentation,
-              title: newName,
-            });
-          }
-
-          queryClient.invalidateQueries({
-            queryKey: ['presentation', selectedPresentation?.id],
-          });
+        isLoading={updatePresentationTitle.isPending}
+        onRename={async (id: string, newName: string) => {
+          await updatePresentationTitle.mutateAsync({ id, name: newName });
         }}
       />
     </div>

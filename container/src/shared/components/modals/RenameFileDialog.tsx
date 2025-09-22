@@ -11,21 +11,21 @@ interface RenameFileDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   presentation?: Presentation | null;
-  updatePresentationMutation?: any; // The mutation hook result
-  onSuccess?: (newName: string) => void;
+  onRename?: (id: string, name: string) => Promise<void>;
+  isLoading?: boolean;
+  // updatePresentationMutation?: any;
 }
 
 export const RenameFileDialog: React.FC<RenameFileDialogProps> = ({
   isOpen,
   onOpenChange,
   presentation,
-  updatePresentationMutation,
-  onSuccess,
+  onRename,
+  isLoading = false,
 }) => {
   const { t } = useTranslation('presentation', { keyPrefix: 'list' });
   const currentName = presentation?.title || '';
   const [filename, setFilename] = React.useState(currentName);
-  const isLoading = updatePresentationMutation?.isPending || false;
 
   // Reset filename and set focus when dialog opens
   const inputRef = React.useRef<HTMLInputElement>(null);
@@ -71,45 +71,34 @@ export const RenameFileDialog: React.FC<RenameFileDialogProps> = ({
     setErrorMessage('');
   }, [filename]);
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    if (filename.trim() === '') return; // Only proceed if we have both the presentation and mutation function
-    if (presentation && updatePresentationMutation) {
-      updatePresentationMutation.mutate(
-        { id: presentation.id, name: filename.trim() },
-        {
-          onSuccess: () => {
-            handleOpenChange(false);
-            if (onSuccess) onSuccess(filename.trim());
-            toast.success(`Presentation renamed to "${filename.trim()}" successfully`);
-          },
-          onError: (error: unknown) => {
-            console.error('Failed to rename presentation:', error);
-            // Get a user-friendly error message
-            let message = 'Unknown error occurred';
-            if (error instanceof Error) {
-              message = error.message;
-            } else if (typeof error === 'string') {
-              message = error;
-            } else if (
-              error &&
-              typeof error === 'object' &&
-              'message' in (error as Record<string, unknown>)
-            ) {
-              message = String((error as Record<string, unknown>).message);
-            }
+    if (filename.trim() === '' || !presentation || !onRename) return;
 
-            // Check if it's a duplicate title error (409 Conflict)
-            if (message.includes('already exists')) {
-              setDuplicateError(true);
-              setErrorMessage(message);
-            } else {
-              // Show general error notification for other errors
-              toast.error(`Failed to rename presentation: ${message}`);
-            }
-          },
-        }
-      );
+    try {
+      await onRename(presentation.id, filename.trim());
+      handleOpenChange(false);
+      toast.success(`Presentation renamed to "${filename.trim()}" successfully`);
+    } catch (error: unknown) {
+      console.error('Failed to rename presentation:', error); //TODO: remove
+
+      // TODO: move to utils
+      // Get a user-friendly error message
+      let message = 'Unknown error occurred';
+      if (error instanceof Error) {
+        message = error.message;
+      } else if (typeof error === 'string') {
+        message = error;
+      } else if (error && typeof error === 'object' && 'message' in (error as Record<string, unknown>)) {
+        message = String((error as Record<string, unknown>).message);
+      }
+
+      if (message.includes('already exists')) {
+        setDuplicateError(true);
+        setErrorMessage(message);
+      } else {
+        throw error;
+      }
     }
   };
 
@@ -117,16 +106,12 @@ export const RenameFileDialog: React.FC<RenameFileDialogProps> = ({
     handleOpenChange(false);
   };
 
-  // Force cleanup of dialog when closed
   if (!isOpen) return null;
 
   return (
     <Dialog modal open={isOpen} onOpenChange={handleOpenChange}>
       <DialogContent className="fixed left-[50%] top-[50%] z-50 translate-x-[-50%] translate-y-[-50%] sm:max-w-[425px]">
         <Description></Description>
-        {
-          // Đéo hiểu tại sao lại phải có cái này, không là nó warning
-        }
         <DialogHeader>
           <DialogTitle>{t('filenameDialog.title')}</DialogTitle>
         </DialogHeader>

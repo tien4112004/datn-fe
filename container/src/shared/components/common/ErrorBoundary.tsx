@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import ErrorPage from '@/shared/pages/ErrorPage';
+import { toast } from 'sonner';
 
 interface ErrorBoundaryState {
   hasError: boolean;
@@ -141,6 +142,8 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
     if (!isCriticalError(error)) {
       return;
     }
+
+    toast.error(error.message);
 
     const errorId = this.state.errorId || `error_${Date.now()}`;
 

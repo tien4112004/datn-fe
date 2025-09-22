@@ -1,6 +1,6 @@
 import type { Service } from '@/shared/api';
 import type { OutlineItem, OutlineData } from './outline';
-import type { Presentation, PresentationCollectionRequest } from './presentation';
+import type { Presentation, PresentationCollectionRequest, SlideLayoutSchema } from './presentation';
 import type { ApiResponse } from '@/types/api';
 
 export interface PresentationGenerationRequest {
@@ -11,7 +11,7 @@ export interface PresentationGenerationRequest {
 }
 
 export interface PresentationGenerationResponse {
-  aiResult: any;
+  aiResult: SlideLayoutSchema[];
   presentation: Presentation;
 }
 
@@ -23,7 +23,8 @@ export interface PresentationApiService extends Service {
   getPresentations(request: PresentationCollectionRequest): Promise<ApiResponse<Presentation[]>>;
   createPresentation(data: Presentation): Promise<Presentation>;
   getPresentationById(id: string): Promise<Presentation | null>;
-  getAiResultById(id: string): Promise<any>;
+  getAiResultById(id: string): Promise<SlideLayoutSchema[]>;
   generatePresentation(request: PresentationGenerationRequest): Promise<PresentationGenerationResponse>;
   updatePresentationTitle(id: string, name: string): Promise<any | null>;
+  getStreamedPresentation(request: PresentationGenerationRequest, signal: AbortSignal): AsyncIterable<string>;
 }

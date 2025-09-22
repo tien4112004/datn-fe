@@ -20,9 +20,9 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
     processedData: outlineItems,
     isStreaming,
     error,
-    stopStream,
+    stopStream: stopStreamOutline,
     restartStream,
-    clearContent,
+    clearContent: clearOutlineContent,
     fetch,
   } = useFetchStreamingOutline(
     {
@@ -33,7 +33,7 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
       targetAge: getValues().targetAge,
       learningObjective: getValues().learningObjective,
     },
-    { enabled: false }
+    { manual: true }
   );
 
   // Stores
@@ -131,6 +131,16 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
       setIsGenerating(false);
     }
   }, []);
+
+  const stopStream = useCallback(() => {
+    stopStreamOutline();
+    endStream();
+  }, [stopStreamOutline, endStream]);
+
+  const clearContent = useCallback(() => {
+    clearOutlineContent();
+    clearOutline();
+  }, [clearOutlineContent, clearOutline]);
 
   // Sync streaming state with store
   useEffect(() => {

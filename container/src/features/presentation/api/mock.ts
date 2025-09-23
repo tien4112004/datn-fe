@@ -221,7 +221,20 @@ const mockOutlineItems: OutlineItem[] = [
   },
 ];
 
-let mockPresentationItems: Presentation[] = [];
+let mockPresentationItems: Presentation[] = [
+  {
+    id: 'ai123',
+    title: 'AI Generated Presentation',
+    slides: [
+      {
+        id: 'slide1',
+        elements: [],
+        background: { type: 'solid', color: '#ffffff' },
+      },
+    ],
+    isParsed: false,
+  },
+];
 
 const initMockPresentations = async () => {
   try {

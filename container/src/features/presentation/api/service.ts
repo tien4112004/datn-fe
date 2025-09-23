@@ -60,6 +60,10 @@ export default class PresentationRealApiService implements PresentationApiServic
     this.baseUrl = baseUrl;
   }
 
+  setPresentationAsParsed(_: string): Promise<Presentation> {
+    throw new Error('Method not implemented.');
+  }
+
   async upsertPresentationSlide(id: string, slide: Slide): Promise<Presentation> {
     const response = await api.put<ApiResponse<Presentation>>(
       `${this.baseUrl}/api/presentations/${id}/slides/${slide.id}`,

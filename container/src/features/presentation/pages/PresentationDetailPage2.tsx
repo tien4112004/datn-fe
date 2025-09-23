@@ -9,8 +9,8 @@ import { usePresentationGeneration } from '../contexts/PresentationGenerationCon
 import { getDefaultPresentationTheme } from '../api/mock';
 import { CriticalError } from '@/types/errors';
 import { ERROR_TYPE } from '@/shared/constants';
-import { getSearchParamAsBoolean, setSearchParams } from '@/shared/utils/searchParams';
-import { useAiResultById, useUpdatePresentationSlides } from '../hooks/useApi';
+import { getSearchParamAsBoolean, removeSearchParams } from '@/shared/utils/searchParams';
+import { useAiResultById, useSetParsedPresentation, useUpdatePresentationSlides } from '../hooks/useApi';
 import { useMessageRemote } from '../hooks/useMessageRemote';
 import type { Slide, SlideTheme } from '../types/slide';
 
@@ -47,6 +47,7 @@ const DetailPage = () => {
 
   const { isStreaming, streamedData } = usePresentationGeneration();
   const updateSlides = useUpdatePresentationSlides(id);
+  const setParsed = useSetParsedPresentation(id);
   const getAiResult = useAiResultById(id);
 
   // Track processed streamed data to only update new slides
@@ -66,6 +67,8 @@ const DetailPage = () => {
 
           // Update presentation as parsed
           await updateSlides.mutateAsync(slides);
+
+          await setParsed.mutateAsync();
         }
       } catch (error) {
         console.error('Error processing AI result:', error);
@@ -102,7 +105,8 @@ const DetailPage = () => {
       } else {
         // Reset processed data when streaming stops
         processedStreamDataRef.current = [];
-        setSearchParams({ isGenerating: null });
+        removeSearchParams(['isGenerating']);
+        await setParsed.mutateAsync();
       }
     };
     execute();

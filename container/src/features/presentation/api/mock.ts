@@ -376,4 +376,36 @@ export default class PresentationMockService implements PresentationApiService {
       }, 1000);
     });
   }
+
+  async updatePresentationTitle(id: string, name: string): Promise<any | null> {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const index = mockPresentationItems.findIndex((item) => item.id === id);
+        if (index !== -1) {
+          const isSuccess = Math.random() > 0.5;
+
+          if (isSuccess) {
+            mockPresentationItems[index].title = name;
+            resolve(null);
+          } else {
+            resolve({
+              success: false,
+              message: 'Duplicated',
+              code: 409,
+              errorCode: 'CONFLICT',
+              timestamp: Date.now(),
+            });
+          }
+        } else {
+          resolve({
+            success: false,
+            message: 'Presentation not found',
+            code: 404,
+            errorCode: 'NOT_FOUND',
+            timestamp: Date.now(),
+          });
+        }
+      }, 500);
+    });
+  }
 }

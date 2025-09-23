@@ -201,6 +201,14 @@ export default class PresentationRealApiService implements PresentationApiServic
       .filter((parsed: any) => parsed !== null);
   }
 
+  async updatePresentationTitle(id: string, name: string): Promise<any | null> {
+    await api.patch(`/api/presentations/${id}/title`, {
+      title: name,
+    });
+    // API returns 204 No Content
+    return null;
+  }
+
   _mapPresentationItem(data: any): Presentation {
     return {
       id: data.id,

@@ -2,12 +2,14 @@ import { createColumnHelper, getCoreRowModel, useReactTable } from '@tanstack/re
 import { useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Presentation } from '../../types/presentation';
-import { usePresentations } from '../../hooks/useApi';
+import { usePresentations, useUpdatePresentationTitle } from '../../hooks/useApi';
 import DataTable from '@/components/table/DataTable';
 import { ActionContent } from './ActionButton';
 import { SearchBar } from '../../../../shared/components/common/SearchBar';
 import { useNavigate } from 'react-router-dom';
 import ThumbnailWrapper from '../others/ThumbnailWrapper';
+import * as React from 'react';
+import { RenameFileDialog } from '@/shared/components/modals/RenameFileDialog';
 
 const PresentationTable = () => {
   const { t } = useTranslation('table');
@@ -72,9 +74,11 @@ const PresentationTable = () => {
 
   const { data, isLoading, sorting, setSorting, pagination, setPagination, totalItems, search, setSearch } =
     usePresentations();
-
+  const [isRenameOpen, setIsRenameOpen] = React.useState(false);
+  const [selectedPresentation, setSelectedPresentation] = React.useState<Presentation | null>(null);
+  const updatePresentationTitle = useUpdatePresentationTitle();
   const table = useReactTable({
-    data: data || [],
+    data: [...data],
     columns: columns,
     getCoreRowModel: getCoreRowModel(),
     manualPagination: true,
@@ -114,8 +118,21 @@ const PresentationTable = () => {
             onDelete={() => {
               console.log('Delete', row.original);
             }}
+            onRename={() => {
+              setSelectedPresentation(row.original);
+              setIsRenameOpen(true);
+            }}
           />
         )}
+      />
+      <RenameFileDialog
+        isOpen={isRenameOpen}
+        onOpenChange={setIsRenameOpen}
+        presentation={selectedPresentation}
+        isLoading={updatePresentationTitle.isPending}
+        onRename={async (id: string, newName: string) => {
+          await updatePresentationTitle.mutateAsync({ id, name: newName });
+        }}
       />
     </div>
   );

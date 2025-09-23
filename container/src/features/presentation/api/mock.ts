@@ -221,7 +221,20 @@ const mockOutlineItems: OutlineItem[] = [
   },
 ];
 
-let mockPresentationItems: Presentation[] = [];
+let mockPresentationItems: Presentation[] = [
+  {
+    id: 'ai123',
+    title: 'Not Parsed Presentation 1',
+    slides: [
+      {
+        id: 'slide1',
+        elements: [],
+        background: { type: 'solid', color: '#ffffff' },
+      },
+    ],
+    isParsed: false,
+  },
+];
 
 const initMockPresentations = async () => {
   try {
@@ -260,10 +273,7 @@ export default class PresentationMockService implements PresentationApiService {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         if (id === 'ai123') {
-          const slideData = {
-            slides: getMockSlideData(),
-          };
-          resolve(slideData);
+          resolve(getMockSlideData());
         } else {
           reject(new Error(`AI result not found for id: ${id}`));
         }

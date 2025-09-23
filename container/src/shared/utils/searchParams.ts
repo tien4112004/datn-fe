@@ -46,7 +46,7 @@ export const getSearchParamAsBoolean = (key: string, defaultValue?: boolean): bo
 /**
  * Set multiple search parameters and update the URL
  */
-export const setSearchParams = (params: Record<string, SearchParamValue>, replace: boolean = false): void => {
+export const setSearchParams = (params: Record<string, SearchParamValue>, replace: boolean = true): void => {
   const searchParams = getCurrentSearchParams();
 
   Object.entries(params).forEach(([key, value]) => {
@@ -57,7 +57,7 @@ export const setSearchParams = (params: Record<string, SearchParamValue>, replac
     }
   });
 
-  const newUrl = `${window.location.pathname}?${searchParams.toString()}`;
+  const newUrl = `${window.location.pathname}${searchParams.toString() ? '?' + searchParams.toString() : ''}`;
 
   if (replace) {
     window.history.replaceState({}, '', newUrl);
@@ -90,5 +90,5 @@ export const removeSearchParams = (keys: string[]): void => {
 
   const newUrl = `${window.location.pathname}${searchParams.toString() ? '?' + searchParams.toString() : ''}`;
 
-  window.history.pushState({}, '', newUrl);
+  window.history.replaceState({}, '', newUrl);
 };

@@ -14,15 +14,13 @@ import i18n from '@/locales';
 import { useSlidesStore } from '@/store';
 import type { SlideLayoutSchema } from '@/utils/slideLayout/converters';
 import { convertToSlide, type SlideViewport } from '@/utils/slideLayout';
-import type { SlideTheme } from '@/types/slides';
+import type { Slide, SlideTheme } from '@/types/slides';
 
 export function mount(el: string | Element, props: Record<string, unknown>) {
   const app = createApp(AppComponent, props) as App<Element> & {
-    onStreamData?: (data: {
-      slides: SlideLayoutSchema[];
-      viewport: SlideViewport;
-      theme: SlideTheme;
-    }) => void;
+    replaceSlides?: (data: SlideLayoutSchema[]) => Promise<Slide[]>;
+    addSlide?: (data: SlideLayoutSchema, order?: number) => Promise<Slide>;
+    updateThemeAndViewport?: (theme: SlideTheme, viewport: SlideViewport) => void;
   };
 
   const pinia = createPinia();
@@ -31,16 +29,51 @@ export function mount(el: string | Element, props: Record<string, unknown>) {
   icon.install(app);
   directive.install(app);
 
-  app.onStreamData = async (data) => {
+  app.replaceSlides = async (dataArray) => {
     const slidesStore = useSlidesStore();
+    const viewport = {
+      size: slidesStore.viewportSize,
+      ratio: slidesStore.viewportRatio,
+    };
+    const theme = slidesStore.theme;
 
-    const slides = data.slides.map(async (slide) => await convertToSlide(slide, data.viewport, data.theme));
+    const newSlides: Slide[] = [];
+    for (let i = 0; i < dataArray.length; i++) {
+      const slide = await convertToSlide(dataArray[i], viewport, theme, (i + 1).toString());
+      newSlides.push(slide);
+    }
 
-    slidesStore.setSlides(await Promise.all(slides));
-    slidesStore.setTheme(data.theme);
-    slidesStore.setViewportSize(data.viewport.size);
-    slidesStore.setViewportRatio(data.viewport.ratio);
-    slidesStore.updateSlideIndex(data.slides.length - 1);
+    // Replace all slides with new ones
+    slidesStore.setSlides(newSlides);
+    slidesStore.updateSlideIndex(newSlides.length - 1);
+
+    return newSlides;
+  };
+
+  app.addSlide = async (data, order) => {
+    const slidesStore = useSlidesStore();
+    const viewport = {
+      size: slidesStore.viewportSize,
+      ratio: slidesStore.viewportRatio,
+    };
+    const theme = slidesStore.theme;
+
+    const slide = await convertToSlide(data, viewport, theme, order?.toString());
+
+    // Add new slides to existing ones
+    const currentSlides = slidesStore.slides;
+    const updatedSlides = [...currentSlides, slide];
+    slidesStore.setSlides(updatedSlides);
+    slidesStore.updateSlideIndex(updatedSlides.length - 1);
+
+    return slide;
+  };
+
+  app.updateThemeAndViewport = (theme: SlideTheme, viewport: SlideViewport) => {
+    const slidesStore = useSlidesStore();
+    slidesStore.setTheme(theme);
+    slidesStore.setViewportSize(viewport.size);
+    slidesStore.setViewportRatio(viewport.ratio);
   };
 
   app.mount(el);

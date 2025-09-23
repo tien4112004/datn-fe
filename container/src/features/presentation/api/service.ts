@@ -12,6 +12,7 @@ import {
 import { splitMarkdownToOutlineItems } from '../utils';
 import { api } from '@/shared/api';
 import { mapPagination, type ApiResponse, type Pagination } from '@/types/api';
+import type { Slide } from '../types/slide';
 // import api from '@/shared/api';
 
 const mockOutlineOutput = `\`\`\`markdown
@@ -53,39 +54,23 @@ _AI is like having a super-smart friend who never sleeps and always wants to hel
 \`\`\``;
 
 export default class PresentationRealApiService implements PresentationApiService {
-  // async getStreamedOutline(
-  //   request: OutlinePromptRequest,
-  //   signal: AbortSignal
-  // ): Promise<ReadableStream<Uint8Array>> {
-  //   const response = await fetch('http://localhost:8080/presentations/mock-outline', {
-  //     method: 'POST',
-  //     headers: {
-  //       'Content-Type': 'application/json',
-  //     },
-  //     body: JSON.stringify(request),
-  //     signal,
-  //   });
-
-  //   if (!response.ok) {
-  //     throw new Error(`HTTP error! status: ${response.status}`);
-  //   }
-
-  //   if (!response.body) {
-  //     throw new Error('No response body');
-  //   }
-
-  //   return response.body;
-  // }
-
   baseUrl: string;
 
   constructor(baseUrl: string = '') {
     this.baseUrl = baseUrl;
   }
 
+  async upsertPresentationSlide(id: string, slide: Slide): Promise<Presentation> {
+    const response = await api.put<ApiResponse<Presentation>>(
+      `${this.baseUrl}/api/presentations/${id}/slides/${slide.id}`,
+      slide
+    );
+    return this._mapPresentationItem(response.data.data);
+  }
+
   getStreamedPresentation(
-    request: PresentationGenerationRequest,
-    signal: AbortSignal
+    _request: PresentationGenerationRequest,
+    _signal: AbortSignal
   ): {
     presentationId: string;
     stream: AsyncIterable<string>;
@@ -123,11 +108,17 @@ export default class PresentationRealApiService implements PresentationApiServic
     return API_MODE.real;
   }
 
+  /**
+   * @deprecated
+   */
   async getPresentationItems(): Promise<Presentation[]> {
     const response = await api.get<ApiResponse<Presentation[]>>(`${this.baseUrl}/api/presentations/all`);
     return response.data.data.map(this._mapPresentationItem);
   }
 
+  /**
+   * @deprecated
+   */
   async getOutlineItems(): Promise<OutlineItem[]> {
     await new Promise((resolve) => setTimeout(resolve, 50));
     return splitMarkdownToOutlineItems(mockOutlineOutput);

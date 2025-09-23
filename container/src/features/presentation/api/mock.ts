@@ -7,15 +7,39 @@ import {
   type PresentationCollectionRequest,
   type PresentationGenerationRequest,
   type PresentationGenerationResponse,
+  type SlideLayoutSchema,
 } from '../types';
 import type { ApiResponse } from '@/types/api';
 import type { SlideData } from '../utils';
+import type { Slide, SlideTheme } from '../types/slide';
 
 /**
- * Mock data for testing presentation generation
- * This matches the structure from the original handleClick function
+ * Default theme configuration for generated presentations
  */
-export const getMockSlideData = (): SlideData[] => [
+export const getDefaultPresentationTheme = (): SlideTheme => ({
+  backgroundColor: '#ffffff',
+  themeColors: ['#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6'],
+  fontColor: '#333333',
+  fontName: 'Roboto',
+  outline: {
+    style: 'solid',
+    width: 1,
+    color: '#cccccc',
+  },
+  shadow: {
+    h: 2,
+    v: 2,
+    blur: 4,
+    color: 'rgba(0, 0, 0, 0.1)',
+  },
+  titleFontColor: '#0A2540',
+  titleFontName: 'Roboto',
+});
+
+/**
+ * Mock slide data for testing
+ */
+const mockSlideData: SlideData[] = [
   {
     type: 'title',
     data: {
@@ -63,8 +87,8 @@ export const getMockSlideData = (): SlideData[] => [
   },
   {
     type: 'two_column',
+    title: 'this is a title',
     data: {
-      title: 'this is a title',
       items1: [
         'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
         'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
@@ -197,6 +221,11 @@ const mockOutlineItems: OutlineItem[] = [
   },
 ];
 
+/**
+ * Mock data for testing presentation generation
+ */
+export const getMockSlideData = (): SlideData[] => mockSlideData;
+
 let mockPresentationItems: Presentation[] = [
   {
     id: 'ai123',
@@ -245,16 +274,49 @@ export default class PresentationMockService implements PresentationApiService {
     this.baseUrl = baseUrl;
   }
 
-  async getAiResultById(id: string): Promise<any> {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        if (id === 'ai123') {
-          resolve(getMockSlideData());
-        } else {
-          reject(new Error(`AI result not found for id: ${id}`));
-        }
-      }, 500);
-    });
+  async upsertPresentationSlide(id: string, slide: Slide): Promise<Presentation> {
+    // Simulate API delay
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
+    const presentationIndex = mockPresentationItems.findIndex((item) => item.id === id);
+
+    if (presentationIndex === -1) {
+      throw new Error(`Presentation with id ${id} not found`);
+    }
+
+    const presentation = mockPresentationItems[presentationIndex];
+    const slides = [...(presentation.slides || [])];
+
+    // Upsert
+    const slideIndex = slides.findIndex((s) => s.id === slide.id);
+    if (slideIndex === -1) {
+      slides.push(slide);
+    } else {
+      slides[slideIndex] = slide;
+    }
+
+    const updatedPresentation = {
+      ...presentation,
+      slides: slides,
+      updatedAt: new Date().toISOString(),
+      isParsed: true,
+    };
+
+    // Update the mock data
+    mockPresentationItems[presentationIndex] = updatedPresentation;
+
+    return updatedPresentation;
+  }
+
+  async getAiResultById(id: string): Promise<SlideLayoutSchema[]> {
+    // Simulate API delay
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    if (id === 'ai123') {
+      return getMockSlideData();
+    } else {
+      throw new Error(`AI result not found for id: ${id}`);
+    }
   }
 
   getStreamedOutline(_request: OutlineData, signal: AbortSignal): { stream: AsyncIterable<string> } {
@@ -330,12 +392,18 @@ export default class PresentationMockService implements PresentationApiService {
     return API_MODE.mock;
   }
 
+  /**
+   * @deprecated
+   */
   async getPresentationItems(): Promise<Presentation[]> {
     return new Promise((resolve) => {
       setTimeout(() => resolve([...mockPresentationItems]), 500);
     });
   }
 
+  /**
+   * @deprecated
+   */
   async getOutlineItems(): Promise<OutlineItem[]> {
     return new Promise((resolve) => {
       setTimeout(() => resolve([...mockOutlineItems]), 500);
@@ -345,8 +413,9 @@ export default class PresentationMockService implements PresentationApiService {
   async createPresentation(data: Presentation): Promise<Presentation> {
     return new Promise((resolve) => {
       const id = String(Date.now());
-      mockPresentationItems.push({ ...data, id, isParsed: true });
-      setTimeout(() => resolve({ ...data, id, isParsed: true }), 500);
+      const newPresentation = { ...data, id, isParsed: true };
+      mockPresentationItems.push(newPresentation);
+      setTimeout(() => resolve(newPresentation), 500);
     });
   }
 

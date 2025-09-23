@@ -1,12 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { OutlineCreationView, WorkspaceView } from '@/features/presentation/components';
 import { PresentationFormProvider } from '@/features/presentation/contexts/PresentationFormContext';
-import { useSearchParams } from 'react-router-dom';
 import { PRESENTATION_VIEW_STATE, type PresentationViewState } from '../types';
 import useOutlineStore from '../stores/useOutlineStore';
+import { getSearchParam, setSearchParams } from '@/shared/utils/searchParams';
 
-const getViewFromParams = (searchParams: URLSearchParams): PresentationViewState => {
-  const viewParam = searchParams.get('view');
+const getViewFromParams = (): PresentationViewState => {
+  const viewParam = getSearchParam('view');
   if (viewParam === PRESENTATION_VIEW_STATE.WORKSPACE) {
     return PRESENTATION_VIEW_STATE.WORKSPACE;
   }
@@ -14,15 +14,9 @@ const getViewFromParams = (searchParams: URLSearchParams): PresentationViewState
 };
 
 const PresentationOutlinePage = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const [currentView, setCurrentView] = useState<PresentationViewState>(getViewFromParams(searchParams));
+  const [currentView, setCurrentView] = useState<PresentationViewState>(getViewFromParams);
   const startGeneration = useOutlineStore((state) => state.startGenerating);
   const clearOutline = useOutlineStore((state) => state.clearOutline);
-
-  // Sync state with URL changes
-  useEffect(() => {
-    setCurrentView(getViewFromParams(searchParams));
-  }, [searchParams]);
 
   const switchToWorkspace = () => {
     setCurrentView(PRESENTATION_VIEW_STATE.WORKSPACE);

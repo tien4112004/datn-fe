@@ -66,6 +66,20 @@ export interface TableOfContentsLayoutSchema {
   };
 }
 
+export const SLIDE_LAYOUT_TYPE = {
+  TWO_COLUMN_WITH_IMAGE: 'two_column_with_image',
+  TWO_COLUMN_WITH_BIG_IMAGE: 'two_column_with_big_image',
+  MAIN_IMAGE: 'main_image',
+  TITLE: 'title',
+  TWO_COLUMN: 'two_column',
+  VERTICAL_LIST: 'vertical_list',
+  HORIZONTAL_LIST: 'horizontal_list',
+  TRANSITION: 'transition',
+  TABLE_OF_CONTENTS: 'table_of_contents',
+} as const;
+
+export type SlideLayoutTypeKey = (typeof SLIDE_LAYOUT_TYPE)[keyof typeof SLIDE_LAYOUT_TYPE];
+
 export type SlideLayoutSchema =
   | TwoColumnWithImageLayoutSchema
   | MainImageLayoutSchema

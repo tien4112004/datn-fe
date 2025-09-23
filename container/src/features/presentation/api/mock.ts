@@ -303,8 +303,8 @@ export default class PresentationMockService implements PresentationApiService {
   async createPresentation(data: Presentation): Promise<Presentation> {
     return new Promise((resolve) => {
       const id = String(Date.now());
-      mockPresentationItems.push({ ...data, id });
-      setTimeout(() => resolve({ ...data, id }), 500);
+      mockPresentationItems.push({ ...data, id, isParsed: true });
+      setTimeout(() => resolve({ ...data, id, isParsed: true }), 500);
     });
   }
 

@@ -129,6 +129,21 @@ export default {
     },
   },
 
+  projects: {
+    title: 'My Project',
+    controls: {
+      generateNew: 'Generate New',
+      createBlank: 'Create Blank?',
+    },
+    resources: {
+      presentation: 'Presentation',
+      document: 'Document',
+      video: 'Video',
+      mindmap: 'Mindmap',
+      image: 'Image',
+    },
+  },
+
   table: {
     presentation: {
       id: 'ID',

@@ -1,13 +1,9 @@
-import type { ExtendedSlideTheme } from '@/features/presentation/types/slide';
+import type { ExtendedSlideTheme, SlideViewport } from '@/features/presentation/types/slide';
 import { moduleMethodMap } from '../components/remote/module';
 import type { SlideLayoutSchema } from '../types';
 
-export interface SlideViewport {
-  size: number;
-  ratio: number;
-}
-
 /**
+ * @deprecated
  * Processes AI-generated slide data and converts it to presentation format
  * This function takes the raw AI response and transforms it into slide objects
  * that can be consumed by the presentation editor

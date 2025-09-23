@@ -24,7 +24,7 @@ const DetailPage = () => {
   const { t } = useTranslation('loading');
   const generatedPresentation = usePresentationStore((state) => state.generatedPresentation);
   const clearGeneratedPresentation = usePresentationStore((state) => state.clearGeneratedPresentation);
-  const getAiResult = useAiResultById(id);
+  const getAiResult = useAiResultById(id!);
 
   // Process generated presentation if needed
   useEffect(() => {

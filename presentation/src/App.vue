@@ -56,10 +56,6 @@ onMounted(async () => {
   snapshotStore.initSnapshotDatabase();
 });
 
-const test = async () => {
-  console.log('HEHE');
-};
-
 // When the application is unloaded, record the current indexedDB database ID in localStorage for later database cleanup
 window.addEventListener('unload', () => {
   const discardedDB = localStorage.getItem(LOCALSTORAGE_KEY_DISCARDED_DB);

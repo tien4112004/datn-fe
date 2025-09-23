@@ -87,7 +87,8 @@ export const removeSearchParams = (keys: string[]): void => {
   keys.forEach((key) => {
     searchParams.delete(key);
   });
-  const newUrl = `${window.location.pathname}?${searchParams.toString()}`;
+
+  const newUrl = `${window.location.pathname}${searchParams.toString() ? '?' + searchParams.toString() : ''}`;
 
   window.history.pushState({}, '', newUrl);
 };

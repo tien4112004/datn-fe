@@ -35,6 +35,7 @@ export function mount(el: string | Element, props: Record<string, unknown>) {
     const slidesStore = useSlidesStore();
 
     const slides = data.slides.map(async (slide) => await convertToSlide(slide, data.viewport, data.theme));
+
     slidesStore.setSlides(await Promise.all(slides));
     slidesStore.setTheme(data.theme);
     slidesStore.setViewportSize(data.viewport.size);

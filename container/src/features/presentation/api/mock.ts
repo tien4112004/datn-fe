@@ -10,7 +10,6 @@ import {
   type SlideLayoutSchema,
 } from '../types';
 import type { ApiResponse } from '@/types/api';
-import type { SlideData } from '../utils';
 import type { Slide, SlideTheme } from '../types/slide';
 
 /**
@@ -41,7 +40,7 @@ export const getDefaultPresentationTheme = (): SlideTheme => ({
 =======
  * Mock data for testing presentation generation
  */
-export const getMockSlideData = (): SlideData[] => mockSlideData;
+export const getMockSlideData = (): SlideLayoutSchema[] => mockSlideData;
 
 let mockPresentationItems: Presentation[] = [
   {
@@ -318,7 +317,7 @@ export default class PresentationMockService implements PresentationApiService {
 >>>>>>> ad8143f (feat: add isparsed)
  * Mock slide data for testing
  */
-const mockSlideData: SlideData[] = [
+const mockSlideData: SlideLayoutSchema[] = [
   {
     type: 'title',
     data: {

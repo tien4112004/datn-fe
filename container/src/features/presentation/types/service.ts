@@ -37,4 +37,5 @@ export interface PresentationApiService extends Service {
     signal: AbortSignal
   ): { presentationId: string; stream: AsyncIterable<string> };
   upsertPresentationSlide(id: string, slide: Slide): Promise<Presentation>;
+  setPresentationAsParsed(id: string): Promise<Presentation>;
 }

@@ -247,3 +247,14 @@ export const useUpdatePresentationSlides = (id: string) => {
     },
   });
 };
+
+export const useSetParsedPresentation = (id: string) => {
+  const presentationApiService = usePresentationApiService();
+
+  return useMutation({
+    mutationFn: async () => {
+      const updatedPresentation = await presentationApiService.setPresentationAsParsed(id);
+      return updatedPresentation;
+    },
+  });
+};

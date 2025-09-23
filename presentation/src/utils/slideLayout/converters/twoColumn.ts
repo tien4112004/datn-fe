@@ -15,7 +15,8 @@ import type { TwoColumnLayoutSchema } from './types';
 export const convertTwoColumn = async (
   data: TwoColumnLayoutSchema,
   viewport: SlideViewport,
-  theme: SlideTheme
+  theme: SlideTheme,
+  slideId?: string
 ) => {
   // Initialize layout calculator
   const layoutCalculator = new SlideLayoutCalculator(viewport.size, viewport.ratio, theme);
@@ -104,7 +105,7 @@ export const convertTwoColumn = async (
 
   // Create slide elements
   const slide: Slide = {
-    id: generateUniqueId(),
+    id: slideId ?? generateUniqueId(),
     elements: [
       createTitlePPTElement(
         titleContent,

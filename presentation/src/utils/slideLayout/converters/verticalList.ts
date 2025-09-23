@@ -12,7 +12,8 @@ import type { VerticalListLayoutSchema } from './types';
 export const convertVerticalList = async (
   data: VerticalListLayoutSchema,
   viewport: SlideViewport,
-  theme: SlideTheme
+  theme: SlideTheme,
+  slideId?: string
 ) => {
   // Initialize layout calculator
   const layoutCalculator = new SlideLayoutCalculator(viewport.size, viewport.ratio, theme);

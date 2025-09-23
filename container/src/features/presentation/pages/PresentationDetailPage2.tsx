@@ -4,24 +4,20 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLoaderData, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
-import type { Presentation } from '../types';
+import type { Presentation, SlideLayoutSchema } from '../types';
 import { usePresentationGeneration } from '../contexts/PresentationGenerationContext';
 import { getDefaultPresentationTheme } from '../api/mock';
 import { CriticalError } from '@/types/errors';
 import { ERROR_TYPE } from '@/shared/constants';
 import { getSearchParamAsBoolean, setSearchParams } from '@/shared/utils/searchParams';
-import { useAiResultById } from '../hooks/useApi';
+import { useAiResultById, useUpdatePresentationSlides } from '../hooks/useApi';
 import { useMessageRemote } from '../hooks/useMessageRemote';
+import type { Slide, SlideTheme } from '../types/slide';
 
 interface VueEditorApp {
-  onStreamData: (data: {
-    slides: any[];
-    viewport: {
-      size: number;
-      ratio: number;
-    };
-    theme: any;
-  }) => Promise<void>;
+  replaceSlides: (data: SlideLayoutSchema[]) => Promise<Slide[]>;
+  addSlide: (data: SlideLayoutSchema, order?: number) => Promise<Slide>;
+  updateThemeAndViewport: (theme: SlideTheme, viewport: { size: number; ratio: number }) => void;
 }
 
 const DetailPage = () => {
@@ -33,15 +29,30 @@ const DetailPage = () => {
   const app = useRef<VueEditorApp | null>(null);
   const updateApp = useCallback((newInstance: VueEditorApp) => {
     app.current = newInstance;
-  }, []);
-  const { isStreaming, streamedData } = usePresentationGeneration();
-  const getAiResult = useAiResultById(id);
 
-  useMessageRemote(); // Handle messages from remote Vue components
+    // TODO: Update theme based on presentation or generation data
+    app.current.updateThemeAndViewport(getDefaultPresentationTheme(), {
+      size: 1000,
+      ratio: 9 / 16,
+    });
+  }, []);
+
+  if (!id) {
+    throw new CriticalError('Presentation ID is required', ERROR_TYPE.RESOURCE_NOT_FOUND);
+  }
 
   if (!presentation && !isGeneratingParam) {
     throw new CriticalError(`Presentation with ID ${id} not found`, ERROR_TYPE.RESOURCE_NOT_FOUND);
   }
+
+  const { isStreaming, streamedData } = usePresentationGeneration();
+  const updateSlides = useUpdatePresentationSlides(id);
+  const getAiResult = useAiResultById(id);
+
+  // Track processed streamed data to only update new slides
+  const processedStreamDataRef = useRef<SlideLayoutSchema[]>([]);
+
+  useMessageRemote(); // Handle messages from remote Vue components
 
   // Process AI result if presentation isn't parsed
   useEffect(() => {
@@ -51,14 +62,10 @@ const DetailPage = () => {
         const aiResult = await getAiResult.mutateAsync();
 
         if (app.current) {
-          await app.current.onStreamData({
-            slides: aiResult,
-            theme: getDefaultPresentationTheme(),
-            viewport: {
-              size: 1000,
-              ratio: 9 / 16,
-            },
-          });
+          const slides = await app.current.replaceSlides(aiResult);
+
+          // Update presentation as parsed
+          await updateSlides.mutateAsync(slides);
         }
       } catch (error) {
         console.error('Error processing AI result:', error);
@@ -80,22 +87,26 @@ const DetailPage = () => {
   }, []);
 
   useEffect(() => {
-    if (isStreaming) {
-      // During streaming, update the presentation with streamed data
-      if (app.current) {
-        app.current.onStreamData({
-          slides: streamedData,
-          theme: getDefaultPresentationTheme(),
-          viewport: {
-            size: 1000,
-            ratio: 9 / 16,
-          },
-        });
+    const execute = async () => {
+      if (isStreaming) {
+        // During streaming, check if there's new data to process
+        if (app.current && streamedData.length > processedStreamDataRef.current.length) {
+          const newData = streamedData.slice(processedStreamDataRef.current.length);
+          processedStreamDataRef.current = [...processedStreamDataRef.current, ...newData];
+
+          for (let i = 0; i < newData.length; i++) {
+            const slide = await app.current.addSlide(newData[i], processedStreamDataRef.current.length + i);
+            await updateSlides.mutateAsync([slide]);
+          }
+        }
+      } else {
+        // Reset processed data when streaming stops
+        processedStreamDataRef.current = [];
+        setSearchParams({ isGenerating: null });
       }
-    } else {
-      setSearchParams({ isGenerating: null });
-    }
-  }, [isStreaming, streamedData]);
+    };
+    execute();
+  }, [isStreaming, streamedData, updateSlides]);
 
   const { t } = useTranslation('loading');
 

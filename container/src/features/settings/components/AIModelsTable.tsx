@@ -5,6 +5,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/shared/components/ui/table';
 import { useModels, usePatchModel } from '@/features/model/hooks/useApi';
 import type { Model } from '@/features/model/types/model';
+import { createColumnHelper, getCoreRowModel, useReactTable } from '@tanstack/react-table';
+import DataTable from '@/components/table/DataTable';
 
 const MEDIA_TYPE_COLORS = {
   presentation: 'bg-purple-50 text-purple-700 ring-purple-700/10',
@@ -20,8 +22,10 @@ interface ExtendedModelOption extends Model {
 
 const AIModelsTable = () => {
   const { t } = useTranslation('settings');
-  const { models: apiModels, isLoading, isError } = useModels(null);
+  const { models: apiModels, isLoading, isError } = useModels('TEXT');
+  const { models: imageModels } = useModels('IMAGE');
   const patchModelMutation = usePatchModel();
+  const columnHelper = createColumnHelper<Model>();
 
   // Extend API models with mock media types
   const extendedModels = useMemo((): ExtendedModelOption[] => {
@@ -33,37 +37,76 @@ const AIModelsTable = () => {
     }));
   }, [apiModels]);
 
-  if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <div className="space-y-4">
-          <div>
-            <h3 className="text-lg font-medium">{t('devtools.aiModels.title')}</h3>
-            <p className="text-muted-foreground text-sm">{t('devtools.aiModels.loading')}</p>
-          </div>
-          <div className="rounded-lg border p-8 text-center">
-            <p className="text-muted-foreground">{t('devtools.aiModels.loadingModels')}</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const modelsColumns = useMemo(
+    () => [
+      columnHelper.accessor((row) => row.displayName || row.name, {
+        header: t('devtools.aiModels.columns.model'),
+        cell: (info) => {
+          return <div className="font-medium">{info.getValue()}</div>;
+        },
+        enableSorting: false,
+      }),
+      columnHelper.accessor('provider', {
+        header: t('devtools.aiModels.columns.provider'),
+        cell: (info) => {
+          return <div className="text-muted-foreground">{info.getValue()}</div>;
+        },
+        enableSorting: false,
+      }),
+      columnHelper.accessor(() => ['presentation'], {
+        header: t('devtools.aiModels.columns.mediaTypes'),
+        cell: (info) => {
+          return (
+            <div className="flex flex-wrap gap-1">
+              {info.getValue().map((type: string) => (
+                <span
+                  key={type}
+                  className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${getMediaTypeColor(type)}`}
+                >
+                  {type}
+                </span>
+              ))}
+            </div>
+          );
+        },
+        enableSorting: false,
+      }),
+      columnHelper.accessor('id', {
+        header: t('devtools.aiModels.columns.modelId'),
+        cell: (info) => {
+          return <div className="text-muted-foreground">{info.getValue()}</div>;
+        },
+        enableSorting: false,
+      }),
+      columnHelper.accessor('enabled', {
+        header: t('devtools.aiModels.columns.status'),
+        cell: (info) => {
+          const model = info.row.original;
+          return (
+            <Switch
+              checked={model.enabled}
+              onCheckedChange={() => toggleModelEnabled(model.id)}
+              disabled={patchModelMutation.isPending}
+            />
+          );
+        },
+        enableSorting: false,
+      }),
+    ],
+    []
+  );
 
-  if (isError || !apiModels) {
-    return (
-      <div className="space-y-6">
-        <div className="space-y-4">
-          <div>
-            <h3 className="text-lg font-medium">{t('devtools.aiModels.title')}</h3>
-            <p className="text-muted-foreground text-sm">{t('devtools.aiModels.errorLoading')}</p>
-          </div>
-          <div className="border-destructive/20 rounded-lg border p-8 text-center">
-            <p className="text-destructive">{t('devtools.aiModels.errorMessage')}</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const textModelsTable = useReactTable({
+    data: [...(apiModels || [])],
+    columns: modelsColumns,
+    getCoreRowModel: getCoreRowModel(),
+  });
+
+  const imageModelsTable = useReactTable({
+    data: [...(imageModels || [])],
+    columns: modelsColumns,
+    getCoreRowModel: getCoreRowModel(),
+  });
 
   // Get default model for a specific media type
   const getDefaultModelForMediaType = (mediaType: string) => {
@@ -109,6 +152,38 @@ const AIModelsTable = () => {
     });
   };
 
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="space-y-4">
+          <div>
+            <h3 className="text-lg font-medium">{t('devtools.aiModels.title')}</h3>
+            <p className="text-muted-foreground text-sm">{t('devtools.aiModels.loading')}</p>
+          </div>
+          <div className="rounded-lg border p-8 text-center">
+            <p className="text-muted-foreground">{t('devtools.aiModels.loadingModels')}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (isError || !apiModels || !imageModels) {
+    return (
+      <div className="space-y-6">
+        <div className="space-y-4">
+          <div>
+            <h3 className="text-lg font-medium">{t('devtools.aiModels.title')}</h3>
+            <p className="text-muted-foreground text-sm">{t('devtools.aiModels.errorLoading')}</p>
+          </div>
+          <div className="border-destructive/20 rounded-lg border p-8 text-center">
+            <p className="text-destructive">{t('devtools.aiModels.errorMessage')}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div className="space-y-4">
@@ -116,7 +191,31 @@ const AIModelsTable = () => {
           <h3 className="text-lg font-medium">{t('devtools.aiModels.title')}</h3>
           <p className="text-muted-foreground text-sm">{t('devtools.aiModels.subtitle')}</p>
         </div>
-        <div className="rounded-lg border">
+        <DataTable
+          table={textModelsTable}
+          className="rounded-lg border"
+          isLoading={isLoading}
+          emptyState={
+            <div className="p-8 text-center">
+              <p className="text-muted-foreground">{t('devtools.aiModels.emptyState')}</p>
+            </div>
+          }
+          showPagination={false}
+        />
+
+        <DataTable
+          table={imageModelsTable}
+          className="rounded-lg border"
+          isLoading={isLoading}
+          emptyState={
+            <div className="p-8 text-center">
+              <p className="text-muted-foreground">{t('devtools.aiModels.emptyState')}</p>
+            </div>
+          }
+          showPagination={false}
+        />
+
+        {/* <div className="rounded-lg border">
           <Table>
             <TableHeader>
               <TableRow>
@@ -156,7 +255,7 @@ const AIModelsTable = () => {
               ))}
             </TableBody>
           </Table>
-        </div>
+        </div> */}
       </div>
 
       <div className="space-y-4">

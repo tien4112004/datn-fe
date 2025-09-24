@@ -10,13 +10,23 @@ import './style.css';
 
 interface DataTableProps<TData> {
   table: TableType<TData>;
+  className?: string;
   isLoading: boolean;
   emptyState: React.ReactNode;
   onClickRow?: (row: Row<TData>) => void;
   contextMenu?: (row: Row<TData>) => React.ReactNode;
+  showPagination?: boolean;
 }
 
-function DataTable<TData>({ table, isLoading, emptyState, onClickRow, contextMenu }: DataTableProps<TData>) {
+function DataTable<TData>({
+  table,
+  isLoading,
+  emptyState,
+  onClickRow,
+  contextMenu,
+  className,
+  showPagination = true,
+}: DataTableProps<TData>) {
   // Resize logic. Source: https://github.com/TanStack/table/discussions/3192#discussioncomment-11896090
   const tableContainerRef = useRef<HTMLDivElement>(null);
   const windowDimensions = useWindowSize();
@@ -35,7 +45,11 @@ function DataTable<TData>({ table, isLoading, emptyState, onClickRow, contextMen
 
   return (
     <>
-      <div ref={tableContainerRef} style={{ direction: table.options.columnResizeDirection }}>
+      <div
+        ref={tableContainerRef}
+        style={{ direction: table.options.columnResizeDirection }}
+        className={className}
+      >
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -115,7 +129,7 @@ function DataTable<TData>({ table, isLoading, emptyState, onClickRow, contextMen
         <div className="flex min-h-24 items-center justify-center">{emptyState}</div>
       )}
 
-      <TablePagination table={table} />
+      {showPagination && <TablePagination table={table} />}
     </>
   );
 }

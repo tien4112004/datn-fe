@@ -30,14 +30,18 @@ const models: Model[] = [
 ];
 
 // Mock useModels hook
-vi.mock('@/features/model', () => ({
-  useModels: vi.fn(() => ({
-    models,
-    defaultModel,
-    isLoading: false,
-    isError: false,
-  })),
-}));
+vi.mock(import('@/features/model'), async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...(actual as any),
+    useModels: vi.fn(() => ({
+      models,
+      defaultModel,
+      isLoading: false,
+      isError: false,
+    })),
+  };
+});
 
 describe('OutlineCreationView', () => {
   it('renders all form fields', () => {

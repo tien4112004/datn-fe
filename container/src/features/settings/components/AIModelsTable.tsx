@@ -4,7 +4,7 @@ import { Switch } from '@/shared/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/shared/components/ui/table';
 import { useModels, usePatchModel } from '@/features/model/hooks/useApi';
-import type { ModelOption } from '@/features/model/types/model';
+import type { Model } from '@/features/model/types/model';
 
 const MEDIA_TYPE_COLORS = {
   presentation: 'bg-purple-50 text-purple-700 ring-purple-700/10',
@@ -14,13 +14,13 @@ const MEDIA_TYPE_COLORS = {
   mindmap: 'bg-orange-50 text-orange-700 ring-orange-700/10',
 } as const;
 
-interface ExtendedModelOption extends ModelOption {
+interface ExtendedModelOption extends Model {
   mediaTypes: string[];
 }
 
 const AIModelsTable = () => {
   const { t } = useTranslation('settings');
-  const { models: apiModels, isLoading, isError } = useModels();
+  const { models: apiModels, isLoading, isError } = useModels(null);
   const patchModelMutation = usePatchModel();
 
   // Extend API models with mock media types

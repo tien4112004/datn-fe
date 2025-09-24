@@ -4,9 +4,9 @@ import { describe, it, expect, vi } from 'vitest';
 import { renderWithProviders } from '@/tests/test-utils';
 import OutlineCreationView from '../OutlineCreationView';
 import { PresentationFormProvider } from '@/features/presentation/contexts/PresentationFormContext';
-import type { ModelOption } from '@/features/model';
+import type { Model } from '@/features/model';
 
-const defaultModel: ModelOption = {
+const defaultModel: Model = {
   id: 'gpt-4o-mini',
   name: 'gpt-4o-mini',
   displayName: 'GPT-4o Mini',
@@ -15,7 +15,7 @@ const defaultModel: ModelOption = {
   provider: 'openai',
 };
 
-const models: ModelOption[] = [
+const models: Model[] = [
   defaultModel,
   {
     id: 'gpt-3.5-turbo',

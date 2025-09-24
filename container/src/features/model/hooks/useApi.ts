@@ -1,14 +1,14 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useModelApiService } from '../api';
-import type { ModelPatchData } from '../types';
+import type { ModelPatchData, ModelType } from '../types';
 
-export const useModels = () => {
+export const useModels = (type: ModelType | null) => {
   const modelApiService = useModelApiService();
 
   const { data: models, ...query } = useQuery({
-    queryKey: [modelApiService.getType(), 'models'],
+    queryKey: [modelApiService.getType(), 'models', type],
     queryFn: async () => {
-      const data = await modelApiService.getModels();
+      const data = await modelApiService.getModels(type);
       return data;
     },
   });

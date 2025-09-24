@@ -27,7 +27,7 @@ interface OutlineCreationViewProps {
 const OutlineCreationView = ({ onCreateOutline }: OutlineCreationViewProps) => {
   const { t } = useTranslation('presentation', { keyPrefix: 'createOutline' });
   const { control, setValue, watch, trigger } = usePresentationForm();
-  const { models } = useModels();
+  const { models } = useModels('text');
 
   const topicValue = watch('topic');
 

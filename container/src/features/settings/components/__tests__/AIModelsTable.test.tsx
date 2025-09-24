@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderWithProviders } from '@/tests/test-utils';
 import AIModelsTable from '../AIModelsTable';
-import type { ModelOption } from '@/features/model/types/model';
+import type { Model } from '@/features/model/types/model';
 
 // Mock the hooks
 vi.mock('@/features/model/hooks/useApi', () => ({
@@ -13,7 +13,7 @@ vi.mock('@/features/model/hooks/useApi', () => ({
 
 import { useModels, usePatchModel } from '@/features/model/hooks/useApi';
 
-const mockModels: ModelOption[] = [
+const mockModels: Model[] = [
   {
     id: 'gpt-4o-mini',
     name: 'gpt-4o-mini',
@@ -21,6 +21,7 @@ const mockModels: ModelOption[] = [
     enabled: true,
     default: true,
     provider: 'openai',
+    type: 'TEXT',
   },
   {
     id: 'gpt-3.5-turbo',
@@ -29,6 +30,7 @@ const mockModels: ModelOption[] = [
     enabled: false,
     default: false,
     provider: 'openai',
+    type: 'TEXT',
   },
   {
     id: 'claude-3-sonnet',
@@ -37,6 +39,7 @@ const mockModels: ModelOption[] = [
     enabled: true,
     default: false,
     provider: 'anthropic',
+    type: 'TEXT',
   },
 ];
 

@@ -15,7 +15,7 @@ import {
 } from '@/shared/components/ui/select';
 import { ModelSelect } from '@/components/common/ModelSelect';
 import { LANGUAGE_OPTIONS, SLIDE_COUNT_OPTIONS } from '@/features/presentation/types';
-import { useModels } from '@/features/model';
+import { MODEL_TYPES, useModels } from '@/features/model';
 import { useWorkspace } from '@/features/presentation/hooks/useWorkspace';
 import { usePresentationForm } from '@/features/presentation/contexts/PresentationFormContext';
 import { CustomizationSection } from './PresentationCustomizationForm';
@@ -92,7 +92,7 @@ const OutlineFormSection = ({
   onRegenerateOutline,
 }: OutlineFormSectionProps) => {
   const { t } = useTranslation('presentation', { keyPrefix: 'createOutline' });
-  const { models } = useModels();
+  const { models } = useModels(MODEL_TYPES.TEXT);
   const { control } = usePresentationForm();
   const disabled = useOutlineStore((state) => state.isStreaming);
 

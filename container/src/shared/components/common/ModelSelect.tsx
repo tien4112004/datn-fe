@@ -7,12 +7,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/shared/components/ui/select';
-import { type ModelOption } from '@/features/model';
+import { type Model } from '@/features/model';
 import { MODEL_PROVIDERS_LOGO } from '@/features/presentation/types';
 import { useTranslation } from 'react-i18next';
 
 interface ModelSelectProps {
-  models?: ModelOption[];
+  models?: Model[];
   value?: string;
   onValueChange?: (value: string) => void;
   placeholder?: string;

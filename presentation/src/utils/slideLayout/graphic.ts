@@ -412,7 +412,7 @@ export async function createHorizontalItemElements(
   const elements: PPTTextElement[] = [];
   const { topRowItems, bottomRowItems } = calculateRowDistribution(itemBlocks.length);
 
-  const LABEL_CONTENT_SPACING = 15;
+  const LABEL_CONTENT_SPACING = 5;
 
   // Calculate the maximum height needed for alignment
   const maxTopRowHeight = Math.max(...itemBlocks.slice(0, topRowItems).map((block) => block.totalHeight));
@@ -422,12 +422,13 @@ export async function createHorizontalItemElements(
   const startY = availableBlock.top;
 
   // Top row
+  const GAP = 50; // Gap between columns
   const topRowWidth = availableBlock.width;
-  const topColumnWidth = topRowWidth / topRowItems;
+  const topColumnWidth = (topRowWidth - GAP * (topRowItems - 1)) / topRowItems;
 
   for (let i = 0; i < topRowItems; i++) {
     const block = itemBlocks[i];
-    const columnLeft = availableBlock.left + i * topColumnWidth;
+    const columnLeft = availableBlock.left + i * (topColumnWidth + GAP);
     const columnCenterX = columnLeft + topColumnWidth / 2;
 
     // Center items within their column

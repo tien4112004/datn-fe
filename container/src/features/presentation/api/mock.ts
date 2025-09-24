@@ -10,12 +10,12 @@ import {
 } from '../types';
 import type { ApiResponse } from '@/types/api';
 import type { SlideData } from '../utils';
-import type { SlideTheme } from '../types/slide';
+import type { ExtendedSlideTheme } from '../types/slide';
 
 /**
  * Default theme configuration for generated presentations
  */
-export const getDefaultPresentationTheme = (): SlideTheme => ({
+export const getDefaultPresentationTheme = (): ExtendedSlideTheme => ({
   backgroundColor: '#ffffff',
   themeColors: ['#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6'],
   fontColor: '#333333',
@@ -33,6 +33,19 @@ export const getDefaultPresentationTheme = (): SlideTheme => ({
   },
   titleFontColor: '#0A2540',
   titleFontName: 'Roboto',
+  accentImageShape: 'default',
+  card: {
+    enabled: true,
+    borderRadius: 8,
+    borderWidth: 1,
+    fill: 'semi',
+    shadow: {
+      h: 0,
+      v: 2,
+      blur: 8,
+      color: 'rgba(0, 0, 0, 0.1)',
+    },
+  },
 });
 
 /**
@@ -52,6 +65,13 @@ export const getMockSlideData = (): SlideData[] => [
       title: 'Presentation with really long title',
       subtitle:
         'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+    },
+  },
+  {
+    type: 'title',
+    data: {
+      title: 'Title',
+      subtitle: 'Subtitle',
     },
   },
   {

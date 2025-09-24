@@ -32,37 +32,41 @@ export default class ModelMockService implements ModelApiService {
   async patchModel(modelId: string, data: ModelPatchData): Promise<Model> {
     return new Promise((resolve) => {
       setTimeout(() => {
-        const modelIndex = mockTextModels.findIndex((model) => model.id === modelId);
-        if (modelIndex === -1) {
+        const model = [...mockTextModels, ...mockImageModels].find((model) => model.id === modelId);
+        if (!model) {
           throw new Error(`Model with id ${modelId} not found`);
         }
 
-        // If setting a model as default, unset other defaults first
-        if (data.default === true) {
-          if (mockTextModels[modelIndex].type === 'TEXT') {
-            mockTextModels.forEach((model) => {
-              if (model.type === 'TEXT') {
-                model.default = false;
-              }
-            });
-          } else if (mockTextModels[modelIndex].type === 'IMAGE') {
-            mockImageModels.forEach((model) => {
-              if (model.type === 'IMAGE') {
-                model.default = false;
-              }
-            });
-          }
+        if (model.type === 'TEXT') {
+          const updatedModel = this.updateModelStatus(mockTextModels, modelId, data);
+          return resolve({ ...updatedModel });
+        } else if (model.type === 'IMAGE') {
+          const updatedModel = this.updateModelStatus(mockImageModels, modelId, data);
+          return resolve({ ...updatedModel });
         }
-
-        // Update the model
-        mockTextModels[modelIndex] = {
-          ...mockTextModels[modelIndex],
-          ...data,
-        };
-
-        resolve({ ...mockTextModels[modelIndex] });
       }, 300);
     });
+  }
+
+  private updateModelStatus(mockModels: Model[], modelId: string, data: ModelPatchData): Model {
+    const modelIndex = mockModels.findIndex((model) => model.id === modelId);
+    if (modelIndex === -1) {
+      throw new Error(`Model with id ${modelId} not found`);
+    }
+
+    // If setting a model as default, unset other defaults first
+    if (data.default === true) {
+      mockModels.forEach((model) => {
+        model.default = false;
+      });
+    }
+
+    // Update the model
+    mockModels[modelIndex] = {
+      ...mockModels[modelIndex],
+      ...data,
+    };
+    return mockModels[modelIndex];
   }
 }
 
@@ -74,7 +78,7 @@ const mockTextModels: Model[] = [
     enabled: true,
     default: true,
     provider: 'OpenAI',
-    type: 'text',
+    type: 'TEXT',
   },
   {
     id: 'gpt-4o-mini-2024-07-18',
@@ -83,7 +87,7 @@ const mockTextModels: Model[] = [
     enabled: true,
     default: false,
     provider: 'OpenAI',
-    type: 'text',
+    type: 'TEXT',
   },
   {
     id: 'gemini-2.5-flash',
@@ -92,7 +96,7 @@ const mockTextModels: Model[] = [
     enabled: false,
     default: false,
     provider: 'Google',
-    type: 'text',
+    type: 'TEXT',
   },
 ];
 
@@ -104,7 +108,7 @@ const mockImageModels: Model[] = [
     enabled: true,
     default: true,
     provider: 'OpenAI',
-    type: 'image',
+    type: 'IMAGE',
   },
   {
     id: 'dall-e-2',
@@ -113,7 +117,7 @@ const mockImageModels: Model[] = [
     enabled: true,
     default: false,
     provider: 'OpenAI',
-    type: 'image',
+    type: 'IMAGE',
   },
   {
     id: 'midjourney-v6',
@@ -122,6 +126,6 @@ const mockImageModels: Model[] = [
     enabled: false,
     default: false,
     provider: 'Midjourney',
-    type: 'image',
+    type: 'IMAGE',
   },
 ];

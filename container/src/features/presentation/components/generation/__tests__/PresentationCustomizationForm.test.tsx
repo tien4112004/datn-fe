@@ -129,26 +129,30 @@ vi.mock('react-hook-form', () => ({
   },
 }));
 
-vi.mock('@/features/model', () => ({
-  useModels: vi.fn(() => ({
-    models: [
-      {
-        id: 'gpt-4o-mini',
-        name: 'gpt-4o-mini',
-        displayName: 'GPT-4o Mini',
-        enabled: true,
-        provider: 'OpenAI',
-      },
-      {
-        id: 'gemini-2.0-flash',
-        name: 'gemini-2.0-flash',
-        displayName: 'Gemini 2.0 Flash',
-        enabled: false,
-        provider: 'Google',
-      },
-    ],
-  })),
-}));
+vi.mock('@/features/model', async (importOriginal) => {
+  const originalModule = await importOriginal();
+  return {
+    ...(originalModule as any),
+    useModels: vi.fn(() => ({
+      models: [
+        {
+          id: 'gpt-4o-mini',
+          name: 'gpt-4o-mini',
+          displayName: 'GPT-4o Mini',
+          enabled: true,
+          provider: 'OpenAI',
+        },
+        {
+          id: 'gemini-2.0-flash',
+          name: 'gemini-2.0-flash',
+          displayName: 'Gemini 2.0 Flash',
+          enabled: false,
+          provider: 'Google',
+        },
+      ],
+    })),
+  };
+});
 
 type CustomizationFormData = {
   theme: string;

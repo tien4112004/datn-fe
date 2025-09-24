@@ -15,7 +15,7 @@ import {
 } from '@/shared/components/ui/select';
 import ExamplePrompts from './ExamplePrompts';
 import { SLIDE_COUNT_OPTIONS, LANGUAGE_OPTIONS } from '@/features/presentation/types';
-import { useModels } from '@/features/model';
+import { MODEL_TYPES, useModels } from '@/features/model';
 import { ModelSelect } from '@/components/common/ModelSelect';
 import { usePresentationForm } from '@/features/presentation/contexts/PresentationFormContext';
 import ResourceTypeSwitcher from '@/features/projects/components/ResourceTypeSwitcher';
@@ -27,7 +27,7 @@ interface OutlineCreationViewProps {
 const OutlineCreationView = ({ onCreateOutline }: OutlineCreationViewProps) => {
   const { t } = useTranslation('presentation', { keyPrefix: 'createOutline' });
   const { control, setValue, watch, trigger } = usePresentationForm();
-  const { models } = useModels('text');
+  const { models } = useModels(MODEL_TYPES.TEXT);
 
   const topicValue = watch('topic');
 

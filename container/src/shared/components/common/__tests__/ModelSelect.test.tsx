@@ -34,6 +34,7 @@ const mockModels: Model[] = [
     enabled: true,
     default: false,
     provider: 'OpenAI',
+    type: 'TEXT',
   },
   {
     id: '2',
@@ -42,6 +43,7 @@ const mockModels: Model[] = [
     enabled: true,
     default: true,
     provider: 'OpenAI',
+    type: 'TEXT',
   },
   {
     id: '3',
@@ -50,6 +52,7 @@ const mockModels: Model[] = [
     enabled: false,
     default: false,
     provider: 'Anthropic',
+    type: 'TEXT',
   },
   {
     id: '4',
@@ -58,6 +61,7 @@ const mockModels: Model[] = [
     enabled: true,
     default: false,
     provider: 'Deepseek',
+    type: 'TEXT',
   },
 ];
 

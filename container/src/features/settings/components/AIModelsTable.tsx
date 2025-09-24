@@ -12,11 +12,53 @@ const MEDIA_TYPE_COLORS = {
   IMAGE: 'bg-green-50 text-green-700 ring-green-700/10',
 } as const;
 
+const getMediaTypeColor = (type: string) =>
+  MEDIA_TYPE_COLORS[type as keyof typeof MEDIA_TYPE_COLORS] || 'bg-gray-50 text-gray-700 ring-gray-700/10';
+
+const getDefaultModelForMediaType = (mediaType: string, models: Model[]) => {
+  return models.find((model) => model.default && model.type === mediaType)?.id || '';
+};
+
+const getModelsForMediaType = (mediaType: string, models: Model[]) => {
+  return models.filter((model) => model.enabled && model.type === mediaType) || [];
+};
+
+// Create column helper outside component to prevent recreation
+const columnHelper = createColumnHelper<Model>();
+
 const AIModelsTable = () => {
   const { t } = useTranslation('settings');
-  const { models: apiModels, isLoading, isError } = useModels(null);
+  const { models, isLoading, isError } = useModels(null);
   const patchModelMutation = usePatchModel();
-  const columnHelper = createColumnHelper<Model>();
+
+  const toggleModelEnabled = useCallback(
+    async (model: Model) => {
+      const newStatus = !model.enabled;
+      model.enabled = newStatus;
+      try {
+        await patchModelMutation.mutateAsync({
+          modelId: model.id,
+          data: { enabled: newStatus },
+        });
+      } catch (error) {
+        model.enabled = !newStatus; // Revert on error
+        console.error('Failed to update model status:', error);
+      }
+    },
+    [patchModelMutation]
+  );
+
+  const setDefaultModelForMediaType = useCallback(
+    async (_mediaType: string, modelId: string) => {
+      // Set the selected model as default
+      // Note: The API handles unsetting other models' default flag automatically
+      await patchModelMutation.mutateAsync({
+        modelId,
+        data: { default: true },
+      });
+    },
+    [patchModelMutation]
+  );
 
   const modelsColumns = useMemo(
     () => [
@@ -61,7 +103,7 @@ const AIModelsTable = () => {
           return (
             <Switch
               checked={model.enabled}
-              onCheckedChange={() => toggleModelEnabled(model.id)}
+              onCheckedChange={() => toggleModelEnabled(model)}
               disabled={patchModelMutation.isPending}
             />
           );
@@ -69,60 +111,14 @@ const AIModelsTable = () => {
         enableSorting: false,
       }),
     ],
-    []
+    [patchModelMutation.isPending]
   );
 
   const modelsTable = useReactTable({
-    data: apiModels || [],
+    data: models || [],
     columns: modelsColumns,
     getCoreRowModel: getCoreRowModel(),
   });
-
-  // Get default model for a specific media type
-  const getDefaultModelForMediaType = useCallback(
-    (mediaType: string) => {
-      return apiModels?.find((model) => model.default && model.type === mediaType)?.id || '';
-    },
-    [apiModels]
-  );
-
-  const getModelsForMediaType = useCallback(
-    (mediaType: string) => {
-      return apiModels?.filter((model) => model.enabled && model.type === mediaType) || [];
-    },
-    [apiModels]
-  );
-
-  const getMediaTypeColor = useCallback((type: string) => {
-    return (
-      MEDIA_TYPE_COLORS[type as keyof typeof MEDIA_TYPE_COLORS] || 'bg-gray-50 text-gray-700 ring-gray-700/10'
-    );
-  }, []);
-
-  const toggleModelEnabled = useCallback(
-    (modelId: string) => {
-      const model = apiModels?.find((m) => m.id === modelId);
-      if (!model) return;
-
-      patchModelMutation.mutate({
-        modelId,
-        data: { enabled: !model.enabled },
-      });
-    },
-    [apiModels, patchModelMutation]
-  );
-
-  const setDefaultModelForMediaType = useCallback(
-    (_mediaType: string, modelId: string) => {
-      // Set the selected model as default
-      // Note: The API handles unsetting other models' default flag automatically
-      patchModelMutation.mutate({
-        modelId,
-        data: { default: true },
-      });
-    },
-    [patchModelMutation]
-  );
 
   if (isLoading) {
     return (
@@ -184,9 +180,9 @@ const AIModelsTable = () => {
         </div>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {Object.values(MODEL_TYPES).map((mediaType) => {
-            const availableModels = getModelsForMediaType(mediaType);
-            const currentDefault = getDefaultModelForMediaType(mediaType);
-            const defaultModel = apiModels.find((m: Model) => m.id === currentDefault);
+            const availableModels = getModelsForMediaType(mediaType, models);
+            const currentDefault = getDefaultModelForMediaType(mediaType, models);
+            const defaultModel = models.find((m: Model) => m.id === currentDefault);
 
             return (
               <div key={mediaType} className="space-y-2">
@@ -218,8 +214,10 @@ const AIModelsTable = () => {
                 </Select>
                 {defaultModel && (
                   <p className="text-muted-foreground text-xs">
-                    {t('devtools.aiModels.defaultModels.currentModel')}: {defaultModel.name}{' '}
-                    {t('devtools.aiModels.defaultModels.by')} {defaultModel.provider}
+                    {t('devtools.aiModels.defaultModels.currentModel', {
+                      modelName: defaultModel.name,
+                      provider: defaultModel.provider,
+                    })}
                   </p>
                 )}
               </div>

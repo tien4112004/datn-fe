@@ -13,6 +13,7 @@ const defaultModel: Model = {
   enabled: true,
   default: true,
   provider: 'openai',
+  type: 'TEXT',
 };
 
 const models: Model[] = [
@@ -24,6 +25,7 @@ const models: Model[] = [
     enabled: true,
     default: false,
     provider: 'openai',
+    type: 'TEXT',
   },
 ];
 

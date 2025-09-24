@@ -226,6 +226,7 @@ export default {
         loadingModels: 'Loading models...',
         errorLoading: 'Failed to load AI models.',
         errorMessage: 'Error loading models. Please try again later.',
+        emptyState: 'No models available.',
         columns: {
           model: 'Model',
           provider: 'Provider',
@@ -239,8 +240,7 @@ export default {
             'Set the default model for each media type. Only enabled models are available for selection.',
           noModelsAvailable: 'No models available',
           selectDefaultModel: 'Select default model',
-          currentModel: 'Current',
-          by: 'by',
+          currentModel: `Current: {{modelName}} by {{provider}}`,
           noEnabledModels: 'No enabled models available. Enable at least one model to set defaults.',
         },
       },

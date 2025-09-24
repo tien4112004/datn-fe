@@ -11,6 +11,7 @@ export const useModels = (type: ModelType | null) => {
       const data = await modelApiService.getModels(type);
       return data;
     },
+    staleTime: 5 * 60 * 1000,
   });
 
   return {
@@ -31,11 +32,8 @@ export const usePatchModel = () => {
     onSuccess: () => {
       // Invalidate and refetch models query
       queryClient.invalidateQueries({
-        queryKey: [modelApiService.getType(), 'models'],
+        queryKey: [modelApiService.getType(), 'models', null],
       });
-    },
-    onError: (error) => {
-      console.error('Failed to patch model:', error);
     },
   });
 };

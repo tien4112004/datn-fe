@@ -32,7 +32,10 @@ export default class ModelRealApiService implements ModelApiService {
 
   async patchModel(modelId: string, data: ModelPatchData): Promise<Model> {
     const baseUrl = this.baseUrl;
-    const response = await api.patch<ApiResponse<Model>>(`${baseUrl}/api/models/${modelId}`, data);
+    const response = await api.patch<ApiResponse<Model>>(`${baseUrl}/api/models/${modelId}`, {
+      isDefault: data.default,
+      isEnabled: data.enabled,
+    });
     return this._mapModelOption(response.data.data);
   }
 
@@ -44,7 +47,7 @@ export default class ModelRealApiService implements ModelApiService {
       enabled: data.enabled,
       default: data.default,
       provider: data.provider,
-      type: data.type,
+      type: data.modelType,
     };
   }
 }

@@ -1,41 +1,22 @@
-import { useMemo } from 'react';
+import { useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Switch } from '@/shared/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/shared/components/ui/table';
 import { useModels, usePatchModel } from '@/features/model/hooks/useApi';
-import type { Model } from '@/features/model/types/model';
+import { MODEL_TYPES, type Model } from '@/features/model/types/model';
 import { createColumnHelper, getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import DataTable from '@/components/table/DataTable';
 
 const MEDIA_TYPE_COLORS = {
-  presentation: 'bg-purple-50 text-purple-700 ring-purple-700/10',
-  document: 'bg-blue-50 text-blue-700 ring-blue-700/10',
-  image: 'bg-green-50 text-green-700 ring-green-700/10',
-  video: 'bg-red-50 text-red-700 ring-red-700/10',
-  mindmap: 'bg-orange-50 text-orange-700 ring-orange-700/10',
+  TEXT: 'bg-blue-50 text-blue-700 ring-blue-700/10',
+  IMAGE: 'bg-green-50 text-green-700 ring-green-700/10',
 } as const;
-
-interface ExtendedModelOption extends Model {
-  mediaTypes: string[];
-}
 
 const AIModelsTable = () => {
   const { t } = useTranslation('settings');
-  const { models: apiModels, isLoading, isError } = useModels('TEXT');
-  const { models: imageModels } = useModels('IMAGE');
+  const { models: apiModels, isLoading, isError } = useModels(null);
   const patchModelMutation = usePatchModel();
   const columnHelper = createColumnHelper<Model>();
-
-  // Extend API models with mock media types
-  const extendedModels = useMemo((): ExtendedModelOption[] => {
-    if (!apiModels) return [];
-
-    return apiModels.map((model) => ({
-      ...model,
-      mediaTypes: ['presentation'], // fallback to document
-    }));
-  }, [apiModels]);
 
   const modelsColumns = useMemo(
     () => [
@@ -53,20 +34,15 @@ const AIModelsTable = () => {
         },
         enableSorting: false,
       }),
-      columnHelper.accessor(() => ['presentation'], {
+      columnHelper.accessor('type', {
         header: t('devtools.aiModels.columns.mediaTypes'),
         cell: (info) => {
           return (
-            <div className="flex flex-wrap gap-1">
-              {info.getValue().map((type: string) => (
-                <span
-                  key={type}
-                  className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${getMediaTypeColor(type)}`}
-                >
-                  {type}
-                </span>
-              ))}
-            </div>
+            <span
+              className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${getMediaTypeColor(info.getValue())}`}
+            >
+              {info.getValue()}
+            </span>
           );
         },
         enableSorting: false,
@@ -96,61 +72,57 @@ const AIModelsTable = () => {
     []
   );
 
-  const textModelsTable = useReactTable({
-    data: [...(apiModels || [])],
-    columns: modelsColumns,
-    getCoreRowModel: getCoreRowModel(),
-  });
-
-  const imageModelsTable = useReactTable({
-    data: [...(imageModels || [])],
+  const modelsTable = useReactTable({
+    data: apiModels || [],
     columns: modelsColumns,
     getCoreRowModel: getCoreRowModel(),
   });
 
   // Get default model for a specific media type
-  const getDefaultModelForMediaType = (mediaType: string) => {
-    return extendedModels.find((model) => model.default && model.mediaTypes.includes(mediaType))?.id || '';
-  };
+  const getDefaultModelForMediaType = useCallback(
+    (mediaType: string) => {
+      return apiModels?.find((model) => model.default && model.type === mediaType)?.id || '';
+    },
+    [apiModels]
+  );
 
-  const getAvailableMediaTypes = () => {
-    const mediaTypes = new Set<string>();
-    extendedModels
-      .filter((model) => model.enabled)
-      .forEach((model) => {
-        model.mediaTypes.forEach((type: string) => mediaTypes.add(type));
-      });
-    return Array.from(mediaTypes).sort();
-  };
+  const getModelsForMediaType = useCallback(
+    (mediaType: string) => {
+      return apiModels?.filter((model) => model.enabled && model.type === mediaType) || [];
+    },
+    [apiModels]
+  );
 
-  const getModelsForMediaType = (mediaType: string) => {
-    return extendedModels.filter((model) => model.enabled && model.mediaTypes.includes(mediaType));
-  };
-
-  const getMediaTypeColor = (type: string) => {
+  const getMediaTypeColor = useCallback((type: string) => {
     return (
       MEDIA_TYPE_COLORS[type as keyof typeof MEDIA_TYPE_COLORS] || 'bg-gray-50 text-gray-700 ring-gray-700/10'
     );
-  };
+  }, []);
 
-  const toggleModelEnabled = (modelId: string) => {
-    const model = extendedModels.find((m) => m.id === modelId);
-    if (!model) return;
+  const toggleModelEnabled = useCallback(
+    (modelId: string) => {
+      const model = apiModels?.find((m) => m.id === modelId);
+      if (!model) return;
 
-    patchModelMutation.mutate({
-      modelId,
-      data: { enabled: !model.enabled },
-    });
-  };
+      patchModelMutation.mutate({
+        modelId,
+        data: { enabled: !model.enabled },
+      });
+    },
+    [apiModels, patchModelMutation]
+  );
 
-  const setDefaultModelForMediaType = (_mediaType: string, modelId: string) => {
-    // Set the selected model as default
-    // Note: The API handles unsetting other models' default flag automatically
-    patchModelMutation.mutate({
-      modelId,
-      data: { default: true },
-    });
-  };
+  const setDefaultModelForMediaType = useCallback(
+    (_mediaType: string, modelId: string) => {
+      // Set the selected model as default
+      // Note: The API handles unsetting other models' default flag automatically
+      patchModelMutation.mutate({
+        modelId,
+        data: { default: true },
+      });
+    },
+    [patchModelMutation]
+  );
 
   if (isLoading) {
     return (
@@ -168,7 +140,7 @@ const AIModelsTable = () => {
     );
   }
 
-  if (isError || !apiModels || !imageModels) {
+  if (isError) {
     return (
       <div className="space-y-6">
         <div className="space-y-4">
@@ -191,8 +163,9 @@ const AIModelsTable = () => {
           <h3 className="text-lg font-medium">{t('devtools.aiModels.title')}</h3>
           <p className="text-muted-foreground text-sm">{t('devtools.aiModels.subtitle')}</p>
         </div>
+
         <DataTable
-          table={textModelsTable}
+          table={modelsTable}
           className="rounded-lg border"
           isLoading={isLoading}
           emptyState={
@@ -202,60 +175,6 @@ const AIModelsTable = () => {
           }
           showPagination={false}
         />
-
-        <DataTable
-          table={imageModelsTable}
-          className="rounded-lg border"
-          isLoading={isLoading}
-          emptyState={
-            <div className="p-8 text-center">
-              <p className="text-muted-foreground">{t('devtools.aiModels.emptyState')}</p>
-            </div>
-          }
-          showPagination={false}
-        />
-
-        {/* <div className="rounded-lg border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>{t('devtools.aiModels.columns.model')}</TableHead>
-                <TableHead>{t('devtools.aiModels.columns.provider')}</TableHead>
-                <TableHead>{t('devtools.aiModels.columns.mediaTypes')}</TableHead>
-                <TableHead>{t('devtools.aiModels.columns.modelId')}</TableHead>
-                <TableHead>{t('devtools.aiModels.columns.status')}</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {extendedModels.map((model) => (
-                <TableRow key={model.id}>
-                  <TableCell className="font-medium">{model.displayName || model.name}</TableCell>
-                  <TableCell className="text-muted-foreground text-sm">{model.provider}</TableCell>
-                  <TableCell>
-                    <div className="flex flex-wrap gap-1">
-                      {model.mediaTypes.map((type: string) => (
-                        <span
-                          key={type}
-                          className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${getMediaTypeColor(type)}`}
-                        >
-                          {type}
-                        </span>
-                      ))}
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-muted-foreground font-mono text-sm">{model.id}</TableCell>
-                  <TableCell>
-                    <Switch
-                      checked={model.enabled}
-                      onCheckedChange={() => toggleModelEnabled(model.id)}
-                      disabled={patchModelMutation.isPending}
-                    />
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div> */}
       </div>
 
       <div className="space-y-4">
@@ -264,10 +183,10 @@ const AIModelsTable = () => {
           <p className="text-muted-foreground text-sm">{t('devtools.aiModels.defaultModels.subtitle')}</p>
         </div>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {getAvailableMediaTypes().map((mediaType) => {
+          {Object.values(MODEL_TYPES).map((mediaType) => {
             const availableModels = getModelsForMediaType(mediaType);
             const currentDefault = getDefaultModelForMediaType(mediaType);
-            const defaultModel = extendedModels.find((m: ExtendedModelOption) => m.id === currentDefault);
+            const defaultModel = apiModels.find((m: Model) => m.id === currentDefault);
 
             return (
               <div key={mediaType} className="space-y-2">
@@ -307,7 +226,7 @@ const AIModelsTable = () => {
             );
           })}
         </div>
-        {getAvailableMediaTypes().length === 0 && (
+        {Object.values(MODEL_TYPES).length === 0 && (
           <div className="rounded-lg border border-dashed p-8 text-center">
             <p className="text-muted-foreground">{t('devtools.aiModels.defaultModels.noEnabledModels')}</p>
           </div>

@@ -14,7 +14,7 @@ export const useModels = (type: ModelType | null) => {
   });
 
   return {
-    models,
+    models: models || [],
     defaultModel: models?.find((model) => model.default) || models?.[0],
     ...query,
   };
@@ -26,7 +26,7 @@ export const usePatchModel = () => {
 
   return useMutation({
     mutationFn: async ({ modelId, data }: { modelId: string; data: ModelPatchData }) => {
-      return modelApiService.patchModel(modelId, data);
+      return await modelApiService.patchModel(modelId, data);
     },
     onSuccess: () => {
       // Invalidate and refetch models query

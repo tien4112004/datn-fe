@@ -13,6 +13,11 @@ vi.mock('@/features/presentation/hooks/useWorkspace', () => ({
     handleRegenerateOutline: vi.fn(),
     handleGeneratePresentation: vi.fn(),
     isGenerating: false,
+    isStreaming: false,
+    control: {},
+    watch: vi.fn(),
+    setValue: vi.fn(),
+    getValues: vi.fn(() => ({ topic: '' })),
   }),
 }));
 
@@ -216,7 +221,7 @@ describe('WorkspaceView', () => {
     expect(screen.getByText('Clear (Dev)')).toBeInTheDocument();
   });
 
-  it('calls onWorkspaceEmpty when outline is empty', () => {
+  it('calls onWorkspaceEmpty when outline and topic is empty and is not generating', () => {
     // Mock the store to return true for isEmpty
     const mockIsEmpty = vi.fn(() => true);
     vi.mocked(useOutlineStore).mockImplementation((selector: any) => {
@@ -224,6 +229,7 @@ describe('WorkspaceView', () => {
         outlines: [],
         outlineIds: [],
         isStreaming: false,
+        isGenerating: false,
         markdownContent: () => '',
         setOutlines: vi.fn(),
         startStreaming: vi.fn(),
@@ -236,8 +242,25 @@ describe('WorkspaceView', () => {
         clearOutline: vi.fn(),
         isEmpty: mockIsEmpty,
       };
+
       return typeof selector === 'function' ? selector(state) : state;
     });
+
+    // Mock useWorkspace to return empty topic
+    vi.doMock('@/features/presentation/hooks/useWorkspace', () => ({
+      useWorkspace: () => ({
+        stopStream: vi.fn(),
+        clearContent: vi.fn(),
+        handleRegenerateOutline: vi.fn(),
+        handleGeneratePresentation: vi.fn(),
+        isGenerating: false,
+        isStreaming: false,
+        control: {},
+        watch: vi.fn(),
+        setValue: vi.fn(),
+        getValues: vi.fn(() => ({ topic: '' })),
+      }),
+    }));
 
     renderWithProviders(
       <PresentationFormProvider>
@@ -248,13 +271,53 @@ describe('WorkspaceView', () => {
     expect(mockOnWorkspaceEmpty).toHaveBeenCalled();
   });
 
-  it('calls onWorkspaceEmpty when topic is empty', () => {
+  it('does not call onWorkspaceEmpty when outline is not empty', () => {
+    // Mock the store to return false for isEmpty
+    const mockIsEmpty = vi.fn(() => false);
+    vi.mocked(useOutlineStore).mockImplementation((selector: any) => {
+      const state = {
+        outlines: [],
+        outlineIds: [],
+        isStreaming: false,
+        isGenerating: false,
+        markdownContent: () => '',
+        setOutlines: vi.fn(),
+        startStreaming: vi.fn(),
+        endStreaming: vi.fn(),
+        handleOutlineChange: vi.fn(),
+        deleteOutline: vi.fn(),
+        addOutline: vi.fn(),
+        getOutline: vi.fn(),
+        swap: vi.fn(),
+        clearOutline: vi.fn(),
+        isEmpty: mockIsEmpty,
+      };
+
+      return typeof selector === 'function' ? selector(state) : state;
+    });
+
+    // Mock useWorkspace to return non-empty topic
+    vi.doMock('@/features/presentation/hooks/useWorkspace', () => ({
+      useWorkspace: () => ({
+        stopStream: vi.fn(),
+        clearContent: vi.fn(),
+        handleRegenerateOutline: vi.fn(),
+        handleGeneratePresentation: vi.fn(),
+        isGenerating: false,
+        isStreaming: false,
+        control: {},
+        watch: vi.fn(),
+        setValue: vi.fn(),
+        getValues: vi.fn(() => ({ topic: 'some topic' })),
+      }),
+    }));
+
     renderWithProviders(
       <PresentationFormProvider>
         <WorkspaceView onWorkspaceEmpty={mockOnWorkspaceEmpty} />
       </PresentationFormProvider>
     );
 
-    expect(mockOnWorkspaceEmpty).toHaveBeenCalled();
+    expect(mockOnWorkspaceEmpty).not.toHaveBeenCalled();
   });
 });

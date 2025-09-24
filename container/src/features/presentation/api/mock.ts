@@ -153,7 +153,7 @@ export default class PresentationMockService implements PresentationApiService {
     if (id === 'ai123') {
       return getMockSlideData();
     } else {
-      throw new Error(`AI result not found for id: ${id}`);
+      return [];
     }
   }
 
@@ -187,16 +187,7 @@ export default class PresentationMockService implements PresentationApiService {
     const newPresentation: Presentation = {
       id: presentationId,
       title: `Streamed Presentation`,
-      slides: [
-        {
-          id: crypto.randomUUID(),
-          elements: [],
-          background: {
-            type: 'solid' as const,
-            color: '#ffffff',
-          },
-        },
-      ],
+      slides: [],
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       isParsed: false,
@@ -251,9 +242,8 @@ export default class PresentationMockService implements PresentationApiService {
   async createPresentation(data: Presentation): Promise<Presentation> {
     return new Promise((resolve) => {
       const id = String(Date.now());
-      const newPresentation = { ...data, id, isParsed: true };
-      mockPresentationItems.push(newPresentation);
-      setTimeout(() => resolve(newPresentation), 500);
+      mockPresentationItems.push({ ...data, id });
+      setTimeout(() => resolve({ ...data, id }), 500);
     });
   }
 
@@ -502,7 +492,7 @@ The secret ingredient is massive amounts of **data**! AI systems feed on informa
 **Data: The Brain Food of AI**
 
 - **Machine Learning** is like teaching a computer to recognize patterns
-- **AI systems use algorithms** to process and understand information
+- AI systems use **algorithms** to process and understand information
 - Without quality data, AI cannot make good decisions
 
 > Just like we learn from our mistakes, AI gets better with every example!

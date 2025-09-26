@@ -94,7 +94,7 @@ export const convertTwoColumnWithImage = async (
 
   // Create slide elements
   const slide: Slide = {
-    id: generateUniqueId(),
+    id: slideId ?? generateUniqueId(),
     elements: [
       createTitlePPTElement(
         titleContent,

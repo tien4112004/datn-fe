@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLoaderData, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
-import type { Presentation, SlideLayoutSchema } from '../types';
+import type { AiResultSlide, Presentation, SlideLayoutSchema } from '../types';
 import { usePresentationGeneration } from '../contexts/PresentationGenerationContext';
 import { getDefaultPresentationTheme } from '../api/mock';
 import { CriticalError } from '@/types/errors';
@@ -51,7 +51,7 @@ const DetailPage = () => {
   const getAiResult = useAiResultById(id);
 
   // Track processed streamed data to only update new slides
-  const processedStreamDataRef = useRef<SlideLayoutSchema[]>([]);
+  const processedStreamDataRef = useRef<AiResultSlide[]>([]);
 
   useMessageRemote(); // Handle messages from remote Vue components
 
@@ -60,6 +60,7 @@ const DetailPage = () => {
     const processAiResult = async () => {
       try {
         setIsProcessing(true);
+
         const aiResult = await getAiResult.mutateAsync();
 
         if (app.current) {
@@ -98,7 +99,7 @@ const DetailPage = () => {
           processedStreamDataRef.current = [...processedStreamDataRef.current, ...newData];
 
           for (let i = 0; i < newData.length; i++) {
-            const slide = await app.current.addSlide(newData[i], processedStreamDataRef.current.length + i);
+            const slide = await app.current.addSlide(newData[i].result, newData[i].order);
             await updateSlides.mutateAsync([slide]);
           }
         }
@@ -110,7 +111,7 @@ const DetailPage = () => {
       }
     };
     execute();
-  }, [isStreaming, streamedData, updateSlides]);
+  }, [isStreaming, streamedData]);
 
   const { t } = useTranslation('loading');
 

@@ -36,8 +36,6 @@ export const PresentationGenerationProvider = ({ children }: PresentationGenerat
 
   const resultRef = useRef(result);
 
-  console.log('Streaming presentation data:', streamedData);
-
   // Keep ref updated
   useEffect(() => {
     resultRef.current = result;

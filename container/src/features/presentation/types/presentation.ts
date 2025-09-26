@@ -98,3 +98,8 @@ export type SlideLayoutSchema =
   | HorizontalListLayoutSchema
   | TransitionLayoutSchema
   | TableOfContentsLayoutSchema;
+
+export interface AiResultSlide {
+  result: SlideLayoutSchema;
+  order: number;
+}

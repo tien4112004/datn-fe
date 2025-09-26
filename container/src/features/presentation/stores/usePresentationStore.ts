@@ -1,12 +1,12 @@
 import { create } from 'zustand';
-import type { PresentationGenerationResponse, SlideLayoutSchema } from '@/features/presentation/types';
+import type { AiResultSlide, PresentationGenerationResponse } from '@/features/presentation/types';
 
 interface PresentationStore {
   generatedPresentation: PresentationGenerationResponse | null;
-  streamedData: SlideLayoutSchema[];
+  streamedData: AiResultSlide[];
   isGenerating: boolean;
   setGeneratedPresentation: (presentation: PresentationGenerationResponse) => void;
-  setStreamedData: (data: SlideLayoutSchema[]) => void;
+  setStreamedData: (data: AiResultSlide[]) => void;
   setIsGenerating: (isGenerating: boolean) => void;
   clearGeneratedPresentation: () => void;
   clearStreamedData: () => void;

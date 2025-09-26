@@ -9,24 +9,15 @@ import {
   CardTitle,
 } from '@/shared/components/ui/card';
 import { Button } from '@/shared/components/ui/button';
-import {
-  Palette,
-  Briefcase,
-  GraduationCap,
-  Sparkles,
-  Square,
-  Monitor,
-  BookText,
-  AlignLeft,
-  AlignCenter,
-  AlignJustify,
-} from 'lucide-react';
+import { Palette, Sparkles, AlignLeft, AlignCenter, AlignJustify } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { ModelSelect } from '@/components/common/ModelSelect';
 import { MODEL_TYPES, useModels } from '@/features/model';
 import type { UnifiedFormData } from '../../contexts/PresentationFormContext';
 import { useCallback } from 'react';
 import useOutlineStore from '../../stores/useOutlineStore';
+import { getPresentationThemes } from '../../utils';
+import { ThemePreviewCard } from './ThemePreviewCard';
 
 type CustomizationFormData = {
   theme: string;
@@ -58,7 +49,10 @@ interface ImageModelSectionProps {
 
 const ThemeSection = ({ selectedTheme, onThemeSelect, disabled = false }: ThemeSectionProps) => {
   const { t } = useTranslation('presentation', { keyPrefix: 'customization' });
+  const mockThemes = getPresentationThemes();
 
+  // Old theme selection with icons - commented out for preservation
+  /*
   const themes = [
     { name: 'business', icon: <Briefcase className="h-5 w-5" /> },
     { name: 'education', icon: <GraduationCap className="h-5 w-5" /> },
@@ -67,6 +61,7 @@ const ThemeSection = ({ selectedTheme, onThemeSelect, disabled = false }: ThemeS
     { name: 'modern', icon: <Monitor className="h-5 w-5" /> },
     { name: 'classic', icon: <BookText className="h-5 w-5" /> },
   ];
+  */
 
   return (
     <>
@@ -81,6 +76,19 @@ const ThemeSection = ({ selectedTheme, onThemeSelect, disabled = false }: ThemeS
         </CardAction>
       </CardHeader>
       <CardContent className="flex flex-col gap-2">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {mockThemes.map((theme) => (
+            <div
+              key={theme.id}
+              className={`transition-all ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer hover:scale-105'} ${selectedTheme === theme.id ? 'rounded-lg ring-2 ring-blue-500' : ''}`}
+              onClick={() => !disabled && onThemeSelect(theme.id)}
+            >
+              <ThemePreviewCard theme={theme} title={theme.name} isSelected={selectedTheme === theme.id} />
+            </div>
+          ))}
+        </div>
+
+        {/*
         <div className="grid grid-cols-3 grid-rows-2 gap-4">
           {themes.map((theme) => (
             <div
@@ -93,6 +101,7 @@ const ThemeSection = ({ selectedTheme, onThemeSelect, disabled = false }: ThemeS
             </div>
           ))}
         </div>
+        */}
       </CardContent>
     </>
   );

@@ -6,65 +6,57 @@ interface ThemePreviewCardProps {
   isSelected?: boolean;
   onClick?: () => void;
   title?: string;
+  width?: number;
+  height?: number;
 }
 
 export const ThemePreviewCard: React.FC<ThemePreviewCardProps> = ({
   theme,
   isSelected = false,
   onClick,
-  title = 'Theme Preview',
+  title = 'Title',
+  width,
+  height,
 }) => {
-  // Mini slide dimensions (16:9 aspect ratio scaled down)
-  const slideWidth = 200;
-  const slideHeight = 112;
-
-  // Calculate scaled dimensions for elements
-  const titleHeight = slideHeight * 0.35;
-  const contentAreaHeight = slideHeight * 0.35;
-  const margin = slideWidth * 0.08;
-
   return (
     <div
-      className={`relative cursor-pointer overflow-hidden rounded-lg border-2 shadow-sm transition-all hover:shadow-md ${
+      className={`relative w-full cursor-pointer overflow-hidden rounded-lg border-2 shadow-sm transition-all hover:shadow-md ${
         isSelected ? 'border-blue-500' : 'border-gray-300 hover:border-gray-400'
       }`}
       style={{
-        width: slideWidth,
-        height: slideHeight,
+        aspectRatio: height && width ? `${width}/${height}` : '16/9',
         backgroundColor: theme.backgroundColor,
+        minHeight: '100px',
       }}
       onClick={onClick}
     >
-      {/* Theme title */}
       {title && (
         <div
-          className="absolute flex items-center"
+          className="absolute flex items-center font-bold"
           style={{
-            left: margin,
-            top: margin,
-            width: slideWidth - margin * 2,
-            height: titleHeight,
+            left: '8%',
+            top: '8%',
+            width: '84%',
+            height: '35%',
             color: theme.titleFontColor || theme.fontColor,
             fontFamily: theme.titleFontName || theme.fontName,
-            fontSize: '18px',
-            fontWeight: 'bold',
+            fontSize: 'clamp(12px, 4vw, 18px)',
           }}
         >
           {title}
         </div>
       )}
 
-      {/* Body text */}
       <div
         className="absolute flex items-center"
         style={{
-          left: margin,
-          top: margin + titleHeight - 8,
-          width: slideWidth - margin * 2,
-          height: contentAreaHeight,
+          left: '8%',
+          top: '35%',
+          width: '84%',
+          height: '35%',
           color: theme.fontColor,
           fontFamily: theme.fontName,
-          fontSize: '14px',
+          fontSize: 'clamp(10px, 3vw, 14px)',
         }}
       >
         Body

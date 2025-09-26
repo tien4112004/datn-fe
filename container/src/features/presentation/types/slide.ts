@@ -673,6 +673,8 @@ export interface SlideTemplate {
 }
 
 export interface ExtendedSlideTheme extends SlideTheme {
+  id: string;
+  name: string;
   additionalElements?: PPTElement[];
   accentImageShape: 'default' | 'big' | 'mixed';
   card: {

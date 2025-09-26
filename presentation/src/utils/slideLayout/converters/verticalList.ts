@@ -84,7 +84,7 @@ export const convertVerticalList = async (
 
     // Create slide elements
     const slide: Slide = {
-      id: generateUniqueId(),
+      id: slideId ?? generateUniqueId(),
       elements: [
         createTitlePPTElement(
           titleContent,
@@ -128,7 +128,7 @@ export const convertVerticalList = async (
 
     // Create slide elements
     const slide: Slide = {
-      id: generateUniqueId(),
+      id: slideId ?? generateUniqueId(),
       elements: [
         createTitlePPTElement(
           titleContent,

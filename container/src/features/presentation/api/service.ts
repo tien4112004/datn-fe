@@ -60,16 +60,27 @@ export default class PresentationRealApiService implements PresentationApiServic
     this.baseUrl = baseUrl;
   }
 
-  setPresentationAsParsed(_: string): Promise<Presentation> {
-    // return;
+  setPresentationAsParsed(id: string): Promise<any> {
+    return api.patch<ApiResponse<Presentation>>(`${this.baseUrl}/api/presentations/${id}/parse`);
   }
 
-  async upsertPresentationSlide(id: string, slide: Slide): Promise<Presentation> {
+  async upsertPresentationSlide(id: string, slide: Slide): Promise<any> {
     const response = await api.put<ApiResponse<Presentation>>(
-      `${this.baseUrl}/api/presentations/${id}/slides/${slide.id}`,
-      slide
+      `${this.baseUrl}/api/presentations/${id}/slides`,
+      {
+        slides: [
+          {
+            ...slide,
+            slideId: slide.id,
+          },
+        ],
+      },
+      {
+        headers: {
+          'Idempotency-Key': `${id}:${slide.id}:update`,
+        },
+      }
     );
-    return this._mapPresentationItem(response.data.data);
   }
 
   async getStreamedPresentation(
@@ -106,10 +117,7 @@ export default class PresentationRealApiService implements PresentationApiServic
             if (done) break;
 
             const text = new TextDecoder().decode(value);
-            // Remove data:
-            const cleanedText = text.replace(/^data:\s*/i, '').replace(/\n/g, '');
-            yield cleanedText;
-            await new Promise((resolve) => setTimeout(resolve, 5));
+            yield text;
           }
         } finally {
           reader.releaseLock();
@@ -148,7 +156,6 @@ export default class PresentationRealApiService implements PresentationApiServic
 
             const text = new TextDecoder().decode(value);
             yield text;
-            await new Promise((resolve) => setTimeout(resolve, 5));
           }
         } finally {
           reader.releaseLock();

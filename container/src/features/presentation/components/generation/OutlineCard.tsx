@@ -108,7 +108,7 @@ const OutlineCard = ({ id, title = 'Outline', className = '', onDelete }: Outlin
       ref={setNodeRef}
       style={style}
       className={cn(
-        `border-primary group relative flex min-h-24 w-full flex-row gap-4 p-0 shadow-md transition-shadow duration-300 hover:shadow-lg`,
+        `border-primary group relative flex min-h-24 w-full flex-row gap-4 p-0 pr-6 shadow-md transition-shadow duration-300 hover:shadow-lg`,
         isDragging ? 'z-1000 opacity-50' : '',
         isDeleting ? 'scale-0 transition-all' : '',
         isEditing ? 'border-2' : '',

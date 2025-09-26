@@ -14,6 +14,7 @@ export interface PresentationGenerationRequest {
     provider: string;
   };
   slideCount: number;
+  language: string;
 }
 
 export interface PresentationGenerationResponse {
@@ -30,7 +31,7 @@ export interface PresentationApiService extends Service {
    * @deprecated
    */
   getOutlineItems(): Promise<OutlineItem[]>;
-  getStreamedOutline(request: OutlineData, signal: AbortSignal): { stream: AsyncIterable<string> };
+  getStreamedOutline(request: OutlineData, signal: AbortSignal): Promise<{ stream: AsyncIterable<string> }>;
   getPresentations(request: PresentationCollectionRequest): Promise<ApiResponse<Presentation[]>>;
   createPresentation(data: Presentation): Promise<Presentation>;
   getPresentationById(id: string): Promise<Presentation | null>;
@@ -40,7 +41,7 @@ export interface PresentationApiService extends Service {
   getStreamedPresentation(
     request: PresentationGenerationRequest,
     signal: AbortSignal
-  ): { presentationId: Promise<String>; stream: AsyncIterable<string> };
+  ): Promise<{ presentationId: string; stream: AsyncIterable<string> }>;
   upsertPresentationSlide(id: string, slide: Slide): Promise<Presentation>;
   setPresentationAsParsed(id: string): Promise<Presentation>;
 }

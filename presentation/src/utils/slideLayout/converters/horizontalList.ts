@@ -1,4 +1,4 @@
-import type { Slide, SlideTheme } from '@/types/slides';
+import type { Slide } from '@/types/slides';
 import { SlideLayoutCalculator, type SlideViewport, type ElementBounds } from '../slideLayout';
 import { generateUniqueId } from '../utils';
 import {
@@ -10,11 +10,12 @@ import {
   createHorizontalItemElements,
 } from '../graphic';
 import type { HorizontalListLayoutSchema } from './types';
+import type { ExtendedSlideTheme } from '../theme';
 
 export const convertHorizontalList = async (
   data: HorizontalListLayoutSchema,
   viewport: SlideViewport,
-  theme: SlideTheme
+  theme: ExtendedSlideTheme
 ) => {
   // Initialize layout calculator
   const layoutCalculator = new SlideLayoutCalculator(viewport.size, viewport.ratio, theme);

@@ -9,6 +9,11 @@ export interface PresentationGenerationRequest {
   theme?: string;
   contentLength?: string;
   imageModel?: string;
+  model: {
+    name: string;
+    provider: string;
+  };
+  slideCount: number;
 }
 
 export interface PresentationGenerationResponse {
@@ -35,7 +40,7 @@ export interface PresentationApiService extends Service {
   getStreamedPresentation(
     request: PresentationGenerationRequest,
     signal: AbortSignal
-  ): { presentationId: string; stream: AsyncIterable<string> };
+  ): { presentationId: Promise<String>; stream: AsyncIterable<string> };
   upsertPresentationSlide(id: string, slide: Slide): Promise<Presentation>;
   setPresentationAsParsed(id: string): Promise<Presentation>;
 }

@@ -30,8 +30,6 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
       slideCount: getValues().slideCount,
       language: getValues().language,
       model: getValues().model,
-      targetAge: getValues().targetAge,
-      learningObjective: getValues().learningObjective,
     },
     { manual: true }
   );
@@ -60,14 +58,7 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
 
   // Form handlers
   const handleRegenerateOutline = useCallback(async () => {
-    const isValid = await trigger([
-      'topic',
-      'slideCount',
-      'language',
-      'model',
-      'targetAge',
-      'learningObjective',
-    ]);
+    const isValid = await trigger(['topic', 'slideCount', 'language', 'model']);
     if (!isValid) return;
 
     const data = getValues();
@@ -76,8 +67,6 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
       slideCount: data.slideCount,
       language: data.language,
       model: data.model,
-      targetAge: data.targetAge,
-      learningObjective: data.learningObjective,
     };
     restartStream(outlineData);
   }, []);
@@ -94,11 +83,15 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
       theme: data.theme,
       contentLength: data.contentLength,
       imageModel: data.imageModel,
+      model: data.model,
+      slideCount: data.slideCount,
     };
 
     const result = await startGeneration(generationRequest);
 
-    navigate(`/presentation/${result?.presentationId}?isGenerating=true`);
+    console.log('Generation result:', result);
+
+    // navigate(`/presentation/${result?.presentationId}?isGenerating=true`);
     setValue('topic', '');
     clearOutline();
   }, [trigger, markdownContent, getValues, startGeneration]);

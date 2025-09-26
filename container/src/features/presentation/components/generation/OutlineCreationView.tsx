@@ -36,14 +36,7 @@ const OutlineCreationView = ({ onCreateOutline }: OutlineCreationViewProps) => {
   };
 
   const handleSubmit = async () => {
-    const isValid = await trigger([
-      'topic',
-      'slideCount',
-      'language',
-      'model',
-      'targetAge',
-      'learningObjective',
-    ]);
+    const isValid = await trigger(['topic', 'slideCount', 'language', 'model']);
     if (isValid) {
       onCreateOutline();
     }

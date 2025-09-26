@@ -16,9 +16,10 @@ export type UnifiedFormData = {
   topic: string;
   slideCount: number;
   language: string;
-  model: string;
-  targetAge: string;
-  learningObjective: string;
+  model: {
+    name: string;
+    provider: string;
+  };
   // Customization fields
   theme: string;
   contentLength: string;
@@ -49,9 +50,10 @@ export const PresentationFormProvider = ({ children }: PresentationFormProviderP
       topic: '',
       slideCount: 10,
       language: 'en',
-      model: '',
-      targetAge: '7-10',
-      learningObjective: 'Help student understand the topic',
+      model: {
+        name: '',
+        provider: '',
+      },
       theme: '',
       contentLength: '',
       imageModel: '',

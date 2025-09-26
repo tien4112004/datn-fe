@@ -73,20 +73,33 @@ export default class PresentationRealApiService implements PresentationApiServic
   }
 
   getStreamedPresentation(
-    _request: PresentationGenerationRequest,
-    _signal: AbortSignal
+    request: PresentationGenerationRequest,
+    signal: AbortSignal
   ): {
-    presentationId: string;
+    presentationId: Promise<string>;
     stream: AsyncIterable<string>;
   } {
-    throw new Error('Method not implemented.');
-  }
-
-  getStreamedOutline(request: OutlineData, signal: AbortSignal): { stream: AsyncIterable<string> } {
     const baseUrl = this.baseUrl;
+    let presentationIdResolver: (id: string) => void;
+    const presentationIdPromise = new Promise<string>((resolve) => {
+      presentationIdResolver = resolve;
+    });
+
     const stream = {
       async *[Symbol.asyncIterator]() {
-        const response = await api.stream(`${baseUrl}/api/presentations/outline-generate`, request, signal);
+        const response = await api.stream(
+          `${baseUrl}/api/presentations/generate`,
+          {
+            ...request,
+            model: request.model.name,
+            provider: request.model.provider.toLowerCase(),
+            slide_count: request.slideCount,
+          },
+          signal
+        );
+
+        const presentationId = response.headers.get('presentationId') || '';
+        presentationIdResolver(presentationId);
 
         const reader = response.body?.getReader();
         if (!reader) throw new Error('No reader available');
@@ -98,6 +111,43 @@ export default class PresentationRealApiService implements PresentationApiServic
 
             const text = new TextDecoder().decode(value);
             yield text;
+            await new Promise((resolve) => setTimeout(resolve, 5));
+          }
+        } finally {
+          reader.releaseLock();
+        }
+      },
+    };
+
+    return { presentationId: presentationIdPromise, stream };
+  }
+
+  getStreamedOutline(request: OutlineData, signal: AbortSignal): { stream: AsyncIterable<string> } {
+    const baseUrl = this.baseUrl;
+    const stream = {
+      async *[Symbol.asyncIterator]() {
+        const response = await api.stream(
+          `${baseUrl}/api/presentations/outline-generate`,
+          {
+            ...request,
+            model: request.model.name,
+            provider: request.model.provider.toLowerCase(),
+            slide_count: request.slideCount,
+          },
+          signal
+        );
+
+        const reader = response.body?.getReader();
+        if (!reader) throw new Error('No reader available');
+
+        try {
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            const text = new TextDecoder().decode(value);
+            yield text;
+            await new Promise((resolve) => setTimeout(resolve, 5));
           }
         } finally {
           reader.releaseLock();

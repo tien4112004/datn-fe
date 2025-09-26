@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 import '../components/remote/module';
 
 interface PresentationGenerationContextValue {
-  startGeneration: (request: PresentationGenerationRequest) => Promise<{ presentationId: string } | null>;
+  startGeneration: (request: PresentationGenerationRequest) => Promise<{ presentationId: string }>;
   error: string | null;
 }
 
@@ -36,6 +36,8 @@ export const PresentationGenerationProvider = ({ children }: PresentationGenerat
 
   const resultRef = useRef(result);
 
+  console.log('Streaming presentation data:', streamedData);
+
   // Keep ref updated
   useEffect(() => {
     resultRef.current = result;
@@ -46,7 +48,7 @@ export const PresentationGenerationProvider = ({ children }: PresentationGenerat
       setRequest(newRequest);
 
       // Start the streaming process
-      fetch();
+      fetch(newRequest);
 
       let attempts = 0;
       const maxAttempts = 50;
@@ -56,7 +58,7 @@ export const PresentationGenerationProvider = ({ children }: PresentationGenerat
         attempts++;
       }
 
-      return resultRef.current || null;
+      return resultRef.current || { presentationId: '' };
     },
     [fetch]
   );

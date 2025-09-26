@@ -61,7 +61,7 @@ export default class PresentationRealApiService implements PresentationApiServic
   }
 
   setPresentationAsParsed(_: string): Promise<Presentation> {
-    throw new Error('Method not implemented.');
+    // return;
   }
 
   async upsertPresentationSlide(id: string, slide: Slide): Promise<Presentation> {
@@ -72,35 +72,31 @@ export default class PresentationRealApiService implements PresentationApiServic
     return this._mapPresentationItem(response.data.data);
   }
 
-  getStreamedPresentation(
+  async getStreamedPresentation(
     request: PresentationGenerationRequest,
     signal: AbortSignal
-  ): {
-    presentationId: Promise<string>;
+  ): Promise<{
+    presentationId: string;
     stream: AsyncIterable<string>;
-  } {
+  }> {
     const baseUrl = this.baseUrl;
-    let presentationIdResolver: (id: string) => void;
-    const presentationIdPromise = new Promise<string>((resolve) => {
-      presentationIdResolver = resolve;
-    });
+    let presentationId = '';
+
+    // First, make the request to get the presentationId
+    const response = await api.stream(
+      `${baseUrl}/api/presentations/generate`,
+      {
+        ...request,
+        model: request.model.name,
+        provider: request.model.provider.toLowerCase(),
+      },
+      signal
+    );
+
+    presentationId = response.headers.get('X-Presentation') || '';
 
     const stream = {
       async *[Symbol.asyncIterator]() {
-        const response = await api.stream(
-          `${baseUrl}/api/presentations/generate`,
-          {
-            ...request,
-            model: request.model.name,
-            provider: request.model.provider.toLowerCase(),
-            slide_count: request.slideCount,
-          },
-          signal
-        );
-
-        const presentationId = response.headers.get('presentationId') || '';
-        presentationIdResolver(presentationId);
-
         const reader = response.body?.getReader();
         if (!reader) throw new Error('No reader available');
 
@@ -110,7 +106,9 @@ export default class PresentationRealApiService implements PresentationApiServic
             if (done) break;
 
             const text = new TextDecoder().decode(value);
-            yield text;
+            // Remove data:
+            const cleanedText = text.replace(/^data:\s*/i, '').replace(/\n/g, '');
+            yield cleanedText;
             await new Promise((resolve) => setTimeout(resolve, 5));
           }
         } finally {
@@ -119,24 +117,27 @@ export default class PresentationRealApiService implements PresentationApiServic
       },
     };
 
-    return { presentationId: presentationIdPromise, stream };
+    return { presentationId, stream };
   }
 
-  getStreamedOutline(request: OutlineData, signal: AbortSignal): { stream: AsyncIterable<string> } {
+  async getStreamedOutline(
+    request: OutlineData,
+    signal: AbortSignal
+  ): Promise<{ stream: AsyncIterable<string> }> {
     const baseUrl = this.baseUrl;
+
+    const response = await api.stream(
+      `${baseUrl}/api/presentations/outline-generate`,
+      {
+        ...request,
+        model: request.model.name,
+        provider: request.model.provider.toLowerCase(),
+      },
+      signal
+    );
+
     const stream = {
       async *[Symbol.asyncIterator]() {
-        const response = await api.stream(
-          `${baseUrl}/api/presentations/outline-generate`,
-          {
-            ...request,
-            model: request.model.name,
-            provider: request.model.provider.toLowerCase(),
-            slide_count: request.slideCount,
-          },
-          signal
-        );
-
         const reader = response.body?.getReader();
         if (!reader) throw new Error('No reader available');
 

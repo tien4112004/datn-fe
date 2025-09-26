@@ -151,7 +151,10 @@ export default class PresentationMockService implements PresentationApiService {
     }
   }
 
-  getStreamedOutline(_request: OutlineData, signal: AbortSignal): { stream: AsyncIterable<string> } {
+  async getStreamedOutline(
+    _request: OutlineData,
+    signal: AbortSignal
+  ): Promise<{ stream: AsyncIterable<string> }> {
     const chunks = mockOutlineOutput.split(' ');
 
     const stream = {
@@ -170,10 +173,10 @@ export default class PresentationMockService implements PresentationApiService {
     return { stream };
   }
 
-  getStreamedPresentation(
+  async getStreamedPresentation(
     _request: PresentationGenerationRequest,
     signal: AbortSignal
-  ): { presentationId: string; stream: AsyncIterable<string> } {
+  ): Promise<{ presentationId: string; stream: AsyncIterable<string> }> {
     const presentationId = crypto.randomUUID();
     const mockSlides = getMockSlideData();
 

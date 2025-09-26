@@ -72,7 +72,14 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
   }, []);
 
   const handleGeneratePresentation = useCallback(async () => {
-    const isValid = await trigger(['theme', 'contentLength', 'imageModel']);
+    const isValid = await trigger([
+      'theme',
+      'contentLength',
+      'imageModel',
+      'model',
+      'slideCount',
+      'language',
+    ]);
     if (!isValid) return;
 
     const outline = markdownContent();
@@ -85,13 +92,12 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
       imageModel: data.imageModel,
       model: data.model,
       slideCount: data.slideCount,
+      language: data.language,
     };
 
     const result = await startGeneration(generationRequest);
 
-    console.log('Generation result:', result);
-
-    // navigate(`/presentation/${result?.presentationId}?isGenerating=true`);
+    navigate(`/presentation/${result.presentationId}?isGenerating=true`);
     setValue('topic', '');
     clearOutline();
   }, [trigger, markdownContent, getValues, startGeneration]);

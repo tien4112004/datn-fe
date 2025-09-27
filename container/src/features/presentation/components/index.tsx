@@ -1,5 +1,4 @@
 export { default as ActionButton } from './table/ActionButton';
-export { default as ExamplePrompts } from './generation/ExamplePrompts';
 export { default as OutlineCard } from './generation/OutlineCard';
 export { default as OutlineCreationView } from './generation/OutlineCreationView';
 export { default as OutlineWorkspace } from './generation/OutlineWorkspace';
@@ -11,6 +10,5 @@ export * from './generation/OutlineCreationView';
 export * from './generation/OutlineCard';
 export * from './generation/PresentationCustomizationForm';
 export * from './table/ActionButton';
-export * from './generation/ExamplePrompts';
 export * from './generation/OutlineWorkspace';
 export * from './table/PresentationTable';

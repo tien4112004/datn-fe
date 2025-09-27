@@ -9,6 +9,8 @@ import { getMindmapById } from '@/features/mindmap/hooks/loaders';
 import { getPresentationById } from '@/features/presentation/hooks/loaders';
 import Projects from '@/features/projects';
 import Settings from '@/features/settings';
+import Image from '@/features/image';
+import { PresentationFormProvider } from '@/features/presentation/contexts/PresentationFormContext';
 
 const router = createBrowserRouter([
   {
@@ -30,6 +32,14 @@ const router = createBrowserRouter([
       {
         path: 'presentation',
         Component: Presentation.PresentationListPage,
+      },
+      {
+        path: 'image/create',
+        Component: () => (
+          <PresentationFormProvider>
+            <Image.CreateImagePage />
+          </PresentationFormProvider>
+        ),
       },
       {
         path: 'mindmap',

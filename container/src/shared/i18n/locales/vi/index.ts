@@ -131,6 +131,51 @@ export default {
     },
   },
 
+  image: {
+    createImage: {
+      title: 'Tạo hình ảnh AI',
+      subtitle: 'Tạo ra những hình ảnh tuyệt đẹp với AI',
+      promptTitle: 'Mô tả hình ảnh bạn muốn tạo',
+      promptPlaceholder: 'Nhập mô tả hình ảnh của bạn...',
+      slideCountPlaceholder: 'Bao nhiêu hình ảnh?',
+      slideCountLabel: 'Hình ảnh',
+      slideCountUnit: 'hình ảnh',
+      language: {
+        placeholder: 'Ngôn ngữ nào?',
+        label: 'Ngôn ngữ',
+        english: 'Tiếng Anh',
+        vietnamese: 'Tiếng Việt',
+        spanish: 'Tiếng Tây Ban Nha',
+        french: 'Tiếng Pháp',
+        german: 'Tiếng Đức',
+        chinese: 'Tiếng Trung',
+        japanese: 'Tiếng Nhật',
+        korean: 'Tiếng Hàn',
+      },
+      modelPlaceholder: 'Mô hình nào?',
+      modelLabel: 'Mô hình',
+      examplePromptTitle: 'Ví dụ mẫu hình ảnh',
+      examplePrompt1: 'Cảnh quan thành phố tương lai lúc hoàng hôn với xe hơi bay',
+      examplePrompt2: 'Rừng huyền bí với nấm phát sáng và đèn tiên',
+      examplePrompt3: 'Quán cà phê vintage với ánh sáng ấm áp và đồ nội thất gỗ',
+      examplePrompt4: 'Mẫu hình học trừu tượng với màu sắc rực rỡ',
+      examplePrompt5: 'Hồ núi thanh bình với phản chiếu của đỉnh núi phủ tuyết',
+      examplePrompt6: 'Robot phong cách steampunk trong khung cảnh thời Victorian',
+      generateImage: 'Tạo hình ảnh',
+      advancedOptions: {
+        title: 'Tùy chọn nâng cao',
+        imageModel: 'Mô hình hình ảnh',
+        imageDimension: 'Kích thước hình ảnh',
+        artStyle: 'Phong cách nghệ thuật',
+        theme: 'Chủ đề',
+        negativePrompt: 'Từ khóa loại trừ',
+        negativePromptPlaceholder: 'Nhập từ khóa muốn tránh (ví dụ: mờ, chất lượng thấp, méo mó)',
+        negativePromptDescription:
+          'Chỉ định những gì bạn không muốn trong hình ảnh. Phân tách các từ khóa bằng dấu phẩy.',
+      },
+    },
+  },
+
   projects: {
     title: 'Dự án của tôi',
     controls: {

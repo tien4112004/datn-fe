@@ -13,7 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/shared/components/ui/select';
-import ExamplePrompts from './ExamplePrompts';
+import ExamplePrompts from '@/features/projects/components/ExamplePrompts';
 import { SLIDE_COUNT_OPTIONS, LANGUAGE_OPTIONS } from '@/features/presentation/types';
 import { MODEL_TYPES, useModels } from '@/features/model';
 import { ModelSelect } from '@/components/common/ModelSelect';
@@ -29,7 +29,18 @@ const OutlineCreationView = ({ onCreateOutline }: OutlineCreationViewProps) => {
   const { control, setValue, watch, trigger } = usePresentationForm();
   const { models } = useModels(MODEL_TYPES.TEXT);
 
-  const topicValue = watch('topic');
+  // const topicValue = watch('topic');
+  const showExamplePrompts = watch('topic') === '';
+
+  // Presentation-specific example prompts
+  const presentationExamplePrompts = [
+    t('examplePrompt1'),
+    t('examplePrompt2'),
+    t('examplePrompt3'),
+    t('examplePrompt4'),
+    t('examplePrompt5'),
+    t('examplePrompt6'),
+  ];
 
   const handleExampleClick = (example: string) => {
     setValue('topic', example);
@@ -140,7 +151,12 @@ const OutlineCreationView = ({ onCreateOutline }: OutlineCreationViewProps) => {
                 </div>
               </div>
             </div>
-            <ExamplePrompts onExampleClick={handleExampleClick} promptInput={topicValue} />
+            <ExamplePrompts
+              onExampleClick={handleExampleClick}
+              isShown={showExamplePrompts}
+              prompts={presentationExamplePrompts}
+              title={t('examplePromptTitle')}
+            />
           </CardContent>
         </Card>
 

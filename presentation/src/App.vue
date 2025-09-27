@@ -4,7 +4,7 @@
     <Editor v-else-if="_isPC" />
     <Mobile v-else />
   </template>
-  <FullscreenSpin :tip="$t('app.initializing')" v-else loading :mask="false" class="spin" />
+  <!-- <FullscreenSpin :tip="$t('app.initializing')" v-else loading :mask="false" class="spin" /> -->
 </template>
 
 <script lang="ts" setup>
@@ -46,7 +46,6 @@ onMounted(async () => {
   containerStore.initialize(props);
 
   if (containerStore.isRemote) {
-    console.log('Presentation data in App.vue:', containerStore.presentation);
     slidesStore.setSlides(containerStore.presentation?.slides || []);
   } else {
     const slides = await api.getFileData('slides');

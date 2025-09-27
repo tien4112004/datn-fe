@@ -9,7 +9,8 @@ import type { MainImageLayoutSchema } from './types';
 export const convertMainImage = async (
   data: MainImageLayoutSchema,
   viewport: SlideViewport,
-  theme: SlideTheme
+  theme: SlideTheme,
+  slideId?: string
 ) => {
   // Initialize layout calculator
   const layoutCalculator = new SlideLayoutCalculator(viewport.size, viewport.ratio, theme);
@@ -76,7 +77,7 @@ export const convertMainImage = async (
 
   // Create slide elements
   const slide: Slide = {
-    id: generateUniqueId(),
+    id: slideId ?? generateUniqueId(),
     elements: [
       await createImageElement(data.data.image, {
         ...imagePosition,

@@ -7,7 +7,7 @@ interface VueRemoteWrapperProps<T = any> {
   className?: string;
   LoadingComponent?: React.ComponentType;
   ErrorComponent?: React.ComponentType<{ error: Error }>;
-  onMountSuccess?(): void;
+  onMountSuccess?(mountedInstance: any): void;
   onMountError?(error: Error): void;
 }
 
@@ -42,9 +42,9 @@ const VueRemoteWrapper = <T,>({
 
     moduleMap[modulePath]()
       .then((mod) => {
-        mod.mount(containerRef.current, mountProps);
+        const mountedInstance = mod.mount(containerRef.current, mountProps);
         setIsLoading(false);
-        onMountSuccess?.();
+        onMountSuccess?.(mountedInstance);
       })
       .catch((err) => {
         console.error(`Failed to load Vue remote (${modulePath}):`, err);

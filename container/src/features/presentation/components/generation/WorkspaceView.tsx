@@ -30,14 +30,7 @@ interface WorkspaceViewProps {
 const WorkspaceView = ({ onWorkspaceEmpty }: WorkspaceViewProps) => {
   const { t } = useTranslation('presentation', { keyPrefix: 'workspace' });
 
-  const { control, watch, setValue, getValues } = usePresentationForm();
   const isEmpty = useOutlineStore((state) => state.isEmpty);
-
-  useEffect(() => {
-    if (isEmpty() && getValues().topic.trim() === '') {
-      onWorkspaceEmpty();
-    }
-  }, [isEmpty, getValues, onWorkspaceEmpty]);
 
   const {
     stopStream,
@@ -46,7 +39,17 @@ const WorkspaceView = ({ onWorkspaceEmpty }: WorkspaceViewProps) => {
     handleGeneratePresentation,
     isGenerating,
     isStreaming,
+    control,
+    watch,
+    setValue,
+    getValues,
   } = useWorkspace({});
+
+  useEffect(() => {
+    if (isEmpty() && getValues().topic.trim() === '' && !isGenerating) {
+      onWorkspaceEmpty();
+    }
+  }, [isEmpty, getValues, onWorkspaceEmpty]);
 
   return (
     <div className="flex min-h-[calc(100vh-1rem)] w-full max-w-3xl flex-col items-center justify-center self-center p-8">

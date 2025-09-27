@@ -671,3 +671,8 @@ export interface SlideTemplate {
   id: string;
   cover: string;
 }
+
+export interface SlideViewport {
+  size: number;
+  ratio: number;
+}

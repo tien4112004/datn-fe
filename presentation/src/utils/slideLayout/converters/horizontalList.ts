@@ -14,7 +14,8 @@ import type { HorizontalListLayoutSchema } from './types';
 export const convertHorizontalList = async (
   data: HorizontalListLayoutSchema,
   viewport: SlideViewport,
-  theme: SlideTheme
+  theme: SlideTheme,
+  slideId?: string
 ) => {
   // Initialize layout calculator
   const layoutCalculator = new SlideLayoutCalculator(viewport.size, viewport.ratio, theme);
@@ -73,7 +74,7 @@ export const convertHorizontalList = async (
 
   // Create slide
   const slide: Slide = {
-    id: generateUniqueId(),
+    id: slideId ?? generateUniqueId(),
     elements: [
       createTitlePPTElement(
         titleContent,

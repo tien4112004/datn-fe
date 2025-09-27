@@ -11,10 +11,15 @@ import { type Model } from '@/features/model';
 import { MODEL_PROVIDERS_LOGO } from '@/features/presentation/types';
 import { useTranslation } from 'react-i18next';
 
+interface ModelValue {
+  name: string;
+  provider: string;
+}
+
 interface ModelSelectProps {
+  value?: ModelValue | string;
+  onValueChange?: (value: ModelValue | string) => void;
   models?: Model[];
-  value?: string;
-  onValueChange?: (value: string) => void;
   placeholder?: string;
   label?: string;
   className?: string;
@@ -48,7 +53,13 @@ export const ModelSelect = ({
   };
 
   return (
-    <Select value={value} onValueChange={onValueChange} disabled={disabled || isLoading || isError}>
+    <Select
+      value={typeof value === 'string' ? value : value?.name}
+      onValueChange={(name) =>
+        onValueChange?.({ name, provider: models?.find((m) => m.name === name)?.provider || '' })
+      }
+      disabled={disabled || isLoading || isError}
+    >
       <SelectTrigger className={className}>
         <SelectValue placeholder={getPlaceholderText()} />
       </SelectTrigger>

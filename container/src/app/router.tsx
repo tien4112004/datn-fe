@@ -41,13 +41,19 @@ const router = createBrowserRouter([
         },
       },
       {
-        path: 'presentation/:id',
-        Component: Presentation.DetailPage,
-        loader: getPresentationById,
-      },
-      {
-        path: 'presentation/create',
-        Component: Presentation.PresentationOutlinePage,
+        path: 'presentation',
+        element: <Presentation.Layout />,
+        children: [
+          {
+            path: ':id',
+            Component: Presentation.DetailPage2,
+            loader: getPresentationById,
+          },
+          {
+            path: 'create',
+            Component: Presentation.PresentationOutlinePage,
+          },
+        ],
       },
       {
         path: 'settings',

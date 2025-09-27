@@ -9,7 +9,6 @@ import { getMindmapById } from '@/features/mindmap/hooks/loaders';
 import { getPresentationById } from '@/features/presentation/hooks/loaders';
 import Projects from '@/features/projects';
 import Settings from '@/features/settings';
-import { getModels } from '@/features/model/hooks/loaders';
 
 const router = createBrowserRouter([
   {
@@ -53,7 +52,6 @@ const router = createBrowserRouter([
           {
             path: 'create',
             Component: Presentation.PresentationOutlinePage,
-            loader: getModels,
           },
         ],
       },

@@ -65,7 +65,7 @@ export default class PresentationRealApiService implements PresentationApiServic
   }
 
   async upsertPresentationSlide(id: string, slide: Slide): Promise<any> {
-    const response = await api.put<ApiResponse<Presentation>>(
+    await api.put<ApiResponse<Presentation>>(
       `${this.baseUrl}/api/presentations/${id}/slides`,
       {
         slides: [

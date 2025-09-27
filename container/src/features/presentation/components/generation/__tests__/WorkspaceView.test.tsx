@@ -41,14 +41,18 @@ vi.mock('@/features/presentation/stores/useOutlineStore', () => {
   };
 });
 
-vi.mock('@/features/model', () => ({
-  useModels: () => ({
-    models: [
-      { id: 'gpt-4.1-nano-2025-04-14', name: 'GPT-4.1 Nano' },
-      { id: 'gpt-3.5-turbo', name: 'GPT-3.5 Turbo' },
-    ],
-  }),
-}));
+vi.mock('@/features/model', async (importOriginal) => {
+  const originalModule = await importOriginal();
+  return {
+    ...(originalModule as any),
+    useModels: () => ({
+      models: [
+        { id: 'gpt-4.1-nano-2025-04-14', name: 'GPT-4.1 Nano' },
+        { id: 'gpt-3.5-turbo', name: 'GPT-3.5 Turbo' },
+      ],
+    }),
+  };
+});
 
 // Mock the child components
 vi.mock('@/features/presentation/components/generation/OutlineWorkspace', () => ({

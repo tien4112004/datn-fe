@@ -226,6 +226,7 @@ export default {
         loadingModels: 'Đang tải mô hình...',
         errorLoading: 'Không thể tải các mô hình AI.',
         errorMessage: 'Lỗi khi tải mô hình. Vui lòng thử lại sau.',
+        emptyState: 'Không có mô hình nào.',
         columns: {
           model: 'Mô hình',
           provider: 'Nhà cung cấp',
@@ -238,8 +239,7 @@ export default {
           subtitle: 'Đặt mô hình mặc định cho từng loại kết quả. Chỉ có các mô hình đã bật mới có thể chọn.',
           noModelsAvailable: 'Không có mô hình nào',
           selectDefaultModel: 'Chọn mô hình mặc định',
-          currentModel: 'Hiện tại',
-          by: 'bởi',
+          currentModel: 'Hiện tại: {{modelName}} bởi {{provider}}',
           noEnabledModels: 'Không có mô hình nào được bật. Bật ít nhất một mô hình để đặt mặc định.',
         },
       },

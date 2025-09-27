@@ -4,18 +4,19 @@ import { describe, it, expect, vi } from 'vitest';
 import { renderWithProviders } from '@/tests/test-utils';
 import OutlineCreationView from '../OutlineCreationView';
 import { PresentationFormProvider } from '@/features/presentation/contexts/PresentationFormContext';
-import type { ModelOption } from '@/features/model';
+import type { Model } from '@/features/model';
 
-const defaultModel: ModelOption = {
+const defaultModel: Model = {
   id: 'gpt-4o-mini',
   name: 'gpt-4o-mini',
   displayName: 'GPT-4o Mini',
   enabled: true,
   default: true,
   provider: 'openai',
+  type: 'TEXT',
 };
 
-const models: ModelOption[] = [
+const models: Model[] = [
   defaultModel,
   {
     id: 'gpt-3.5-turbo',
@@ -24,18 +25,23 @@ const models: ModelOption[] = [
     enabled: true,
     default: false,
     provider: 'openai',
+    type: 'TEXT',
   },
 ];
 
 // Mock useModels hook
-vi.mock('@/features/model', () => ({
-  useModels: vi.fn(() => ({
-    models,
-    defaultModel,
-    isLoading: false,
-    isError: false,
-  })),
-}));
+vi.mock(import('@/features/model'), async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...(actual as any),
+    useModels: vi.fn(() => ({
+      models,
+      defaultModel,
+      isLoading: false,
+      isError: false,
+    })),
+  };
+});
 
 describe('OutlineCreationView', () => {
   it('renders all form fields', () => {

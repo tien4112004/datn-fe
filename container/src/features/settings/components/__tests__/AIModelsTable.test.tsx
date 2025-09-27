@@ -3,7 +3,8 @@ import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderWithProviders } from '@/tests/test-utils';
 import AIModelsTable from '../AIModelsTable';
-import type { ModelOption } from '@/features/model/types/model';
+import type { Model } from '@/features/model/types/model';
+import { useModels, usePatchModel } from '@/features/model/hooks/useApi';
 
 // Mock the hooks
 vi.mock('@/features/model/hooks/useApi', () => ({
@@ -11,9 +12,19 @@ vi.mock('@/features/model/hooks/useApi', () => ({
   usePatchModel: vi.fn(),
 }));
 
-import { useModels, usePatchModel } from '@/features/model/hooks/useApi';
+vi.mock('react-i18next', async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...(actual as any),
+    useTranslation: vi.fn(() => ({
+      t: (key: string) => {
+        return key;
+      },
+    })),
+  };
+});
 
-const mockModels: ModelOption[] = [
+const mockModels: Model[] = [
   {
     id: 'gpt-4o-mini',
     name: 'gpt-4o-mini',
@@ -21,6 +32,7 @@ const mockModels: ModelOption[] = [
     enabled: true,
     default: true,
     provider: 'openai',
+    type: 'TEXT',
   },
   {
     id: 'gpt-3.5-turbo',
@@ -29,6 +41,7 @@ const mockModels: ModelOption[] = [
     enabled: false,
     default: false,
     provider: 'openai',
+    type: 'TEXT',
   },
   {
     id: 'claude-3-sonnet',
@@ -37,6 +50,7 @@ const mockModels: ModelOption[] = [
     enabled: true,
     default: false,
     provider: 'anthropic',
+    type: 'TEXT',
   },
 ];
 
@@ -90,9 +104,9 @@ describe('AIModelsTable', () => {
 
       renderWithProviders(<AIModelsTable />);
 
-      expect(screen.getByText('AI Models')).toBeInTheDocument();
-      expect(screen.getByText('Loading available AI models...')).toBeInTheDocument();
-      expect(screen.getByText('Loading models...')).toBeInTheDocument();
+      expect(screen.getByText('devtools.aiModels.title')).toBeInTheDocument();
+      expect(screen.getByText('devtools.aiModels.loading')).toBeInTheDocument();
+      expect(screen.getByText('devtools.aiModels.loadingModels')).toBeInTheDocument();
     });
   });
 
@@ -109,9 +123,9 @@ describe('AIModelsTable', () => {
 
       renderWithProviders(<AIModelsTable />);
 
-      expect(screen.getByText('AI Models')).toBeInTheDocument();
-      expect(screen.getByText('Failed to load AI models.')).toBeInTheDocument();
-      expect(screen.getByText('Error loading models. Please try again later.')).toBeInTheDocument();
+      expect(screen.getByText('devtools.aiModels.title')).toBeInTheDocument();
+      expect(screen.getByText('devtools.aiModels.errorLoading')).toBeInTheDocument();
+      expect(screen.getByText('devtools.aiModels.errorMessage')).toBeInTheDocument();
     });
   });
 
@@ -119,11 +133,11 @@ describe('AIModelsTable', () => {
     it('renders models table with correct headers', () => {
       renderWithProviders(<AIModelsTable />);
 
-      expect(screen.getByText('Model')).toBeInTheDocument();
-      expect(screen.getByText('Provider')).toBeInTheDocument();
-      expect(screen.getByText('Media Types')).toBeInTheDocument();
-      expect(screen.getByText('Model ID')).toBeInTheDocument();
-      expect(screen.getByText('Status')).toBeInTheDocument();
+      expect(screen.getByText('devtools.aiModels.columns.model')).toBeInTheDocument();
+      expect(screen.getByText('devtools.aiModels.columns.provider')).toBeInTheDocument();
+      expect(screen.getByText('devtools.aiModels.columns.mediaTypes')).toBeInTheDocument();
+      expect(screen.getByText('devtools.aiModels.columns.modelId')).toBeInTheDocument();
+      expect(screen.getByText('devtools.aiModels.columns.status')).toBeInTheDocument();
     });
 
     it('renders all models in the table', () => {
@@ -145,6 +159,26 @@ describe('AIModelsTable', () => {
 
   describe('Model Toggle Functionality', () => {
     it('calls patch model when toggle switch is clicked', async () => {
+      const mockMutateAsync = vi.fn().mockResolvedValue(undefined);
+      mockUsePatchModel.mockReturnValue({
+        mutate: mockPatchModelMutate,
+        mutateAsync: mockMutateAsync,
+        isPending: false,
+        isError: false,
+        error: null,
+        data: undefined,
+        isSuccess: false,
+        isIdle: true,
+        reset: vi.fn(),
+        variables: undefined,
+        failureCount: 0,
+        failureReason: null,
+        isPaused: false,
+        status: 'idle',
+        submittedAt: 0,
+        context: undefined,
+      } as any);
+
       const user = userEvent.setup();
       renderWithProviders(<AIModelsTable />);
 
@@ -152,7 +186,7 @@ describe('AIModelsTable', () => {
 
       await user.click(switches[0]); // Toggle GPT-4o Mini
 
-      expect(mockPatchModelMutate).toHaveBeenCalledWith({
+      expect(mockMutateAsync).toHaveBeenCalledWith({
         modelId: 'gpt-4o-mini',
         data: { enabled: false }, // Should toggle from true to false
       });
@@ -191,18 +225,14 @@ describe('AIModelsTable', () => {
     it('renders default models section', () => {
       renderWithProviders(<AIModelsTable />);
 
-      expect(screen.getByText('Default Models')).toBeInTheDocument();
-      expect(
-        screen.getByText(
-          'Set the default model for each media type. Only enabled models are available for selection.'
-        )
-      ).toBeInTheDocument();
+      expect(screen.getByText('devtools.aiModels.defaultModels.title')).toBeInTheDocument();
+      expect(screen.getByText('devtools.aiModels.defaultModels.subtitle')).toBeInTheDocument();
     });
 
     it('shows current default model information', () => {
       renderWithProviders(<AIModelsTable />);
 
-      expect(screen.getByText(/Current: gpt-4o-mini by openai/)).toBeInTheDocument();
+      expect(screen.getByText('devtools.aiModels.defaultModels.currentModel')).toBeInTheDocument();
     });
 
     it('disables select during patch operation', () => {
@@ -227,8 +257,10 @@ describe('AIModelsTable', () => {
 
       renderWithProviders(<AIModelsTable />);
 
-      const selectTrigger = screen.getByRole('combobox');
-      expect(selectTrigger).toBeDisabled();
+      const selectTriggers = screen.getAllByRole('combobox');
+      selectTriggers.forEach((selectTrigger) => {
+        expect(selectTrigger).toBeDisabled();
+      });
     });
 
     it('shows no models available message when no enabled models exist', () => {
@@ -243,9 +275,9 @@ describe('AIModelsTable', () => {
 
       renderWithProviders(<AIModelsTable />);
 
-      expect(
-        screen.getByText('No enabled models available. Enable at least one model to set defaults.')
-      ).toBeInTheDocument();
+      // Should show "devtools.aiModels.defaultModels.noModelsAvailable" in select placeholders
+      const noModelsText = screen.getAllByText('devtools.aiModels.defaultModels.noModelsAvailable');
+      expect(noModelsText.length).toBeGreaterThan(0);
     });
   });
 
@@ -262,10 +294,10 @@ describe('AIModelsTable', () => {
 
       renderWithProviders(<AIModelsTable />);
 
-      expect(screen.getByText('AI Models')).toBeInTheDocument();
-      expect(
-        screen.getByText('No enabled models available. Enable at least one model to set defaults.')
-      ).toBeInTheDocument();
+      expect(screen.getByText('devtools.aiModels.title')).toBeInTheDocument();
+      // Should show "devtools.aiModels.defaultModels.noModelsAvailable" in select placeholders
+      const noModelsText = screen.getAllByText('devtools.aiModels.defaultModels.noModelsAvailable');
+      expect(noModelsText.length).toBeGreaterThan(0);
     });
   });
 });

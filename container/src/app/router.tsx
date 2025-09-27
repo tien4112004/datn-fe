@@ -7,7 +7,6 @@ import { CriticalError } from '@/types/errors';
 import Mindmap from '@/features/mindmap';
 import { getMindmapById } from '@/features/mindmap/hooks/loaders';
 import { getPresentationById } from '@/features/presentation/hooks/loaders';
-import { getModels } from '@/features/model/hooks/loaders';
 import Projects from '@/features/projects';
 import Settings from '@/features/settings';
 
@@ -48,18 +47,12 @@ const router = createBrowserRouter([
       },
       {
         path: 'presentation/create',
-        // Component: Presentation.CreateOutlinePage,
         Component: Presentation.PresentationOutlinePage,
-        loader: getModels,
       },
       {
         path: 'settings',
         Component: Settings.SettingsPage,
       },
-      // {
-      //   path: 'presentation/outline',
-      //   Component: Presentation.OutlineWorkspacePage,
-      // },
       {
         path: 'error',
         Component: () => {

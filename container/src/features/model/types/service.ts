@@ -1,5 +1,5 @@
 import type { Service } from '@/shared/api';
-import type { ModelOption } from './model';
+import type { Model, ModelType } from './model';
 
 export interface ModelPatchData {
   default?: boolean;
@@ -7,7 +7,7 @@ export interface ModelPatchData {
 }
 
 export interface ModelApiService extends Service {
-  getModels(): Promise<ModelOption[]>;
-  getDefaultModel(): Promise<ModelOption>;
-  patchModel(modelId: string, data: ModelPatchData): Promise<ModelOption>;
+  getModels(type: ModelType | null): Promise<Model[]>;
+  getDefaultModel(type: ModelType): Promise<Model>;
+  patchModel(modelId: string, data: ModelPatchData): Promise<Model>;
 }

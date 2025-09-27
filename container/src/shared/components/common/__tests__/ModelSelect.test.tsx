@@ -2,7 +2,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ModelSelect } from '../ModelSelect';
-import { type ModelOption } from '@/features/model/types/model';
+import { type Model } from '@/features/model/types/model';
 
 // Mock react-i18next
 vi.mock('react-i18next', () => ({
@@ -26,7 +26,7 @@ vi.mock('@/features/presentation/types', () => ({
   },
 }));
 
-const mockModels: ModelOption[] = [
+const mockModels: Model[] = [
   {
     id: '1',
     name: 'gpt-4',
@@ -34,6 +34,7 @@ const mockModels: ModelOption[] = [
     enabled: true,
     default: false,
     provider: 'OpenAI',
+    type: 'TEXT',
   },
   {
     id: '2',
@@ -42,6 +43,7 @@ const mockModels: ModelOption[] = [
     enabled: true,
     default: true,
     provider: 'OpenAI',
+    type: 'TEXT',
   },
   {
     id: '3',
@@ -50,6 +52,7 @@ const mockModels: ModelOption[] = [
     enabled: false,
     default: false,
     provider: 'Anthropic',
+    type: 'TEXT',
   },
   {
     id: '4',
@@ -58,6 +61,7 @@ const mockModels: ModelOption[] = [
     enabled: true,
     default: false,
     provider: 'Deepseek',
+    type: 'TEXT',
   },
 ];
 

@@ -23,7 +23,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { ModelSelect } from '@/components/common/ModelSelect';
-import { useModels } from '@/features/model';
+import { MODEL_TYPES, useModels } from '@/features/model';
 import type { UnifiedFormData } from '../../contexts/PresentationFormContext';
 import { useCallback } from 'react';
 import useOutlineStore from '../../stores/useOutlineStore';
@@ -151,10 +151,13 @@ const ContentSection = ({
   );
 };
 
+/**
+ * @deprecated Use `CustomizationSection` instead
+ */
 const ImageModelSection = ({ control }: ImageModelSectionProps) => {
   const { t: tCustomization } = useTranslation('presentation', { keyPrefix: 'customization' });
   const { t: tOutline } = useTranslation('presentation', { keyPrefix: 'createOutline' });
-  const { models } = useModels();
+  const { models } = useModels(MODEL_TYPES.IMAGE);
 
   return (
     <CardContent className="flex flex-row items-center gap-2">
@@ -212,7 +215,7 @@ const CustomizationSection = ({
   const { t: tCustomization } = useTranslation('presentation', { keyPrefix: 'customization' });
   const { t: tOutline } = useTranslation('presentation', { keyPrefix: 'createOutline' });
   const disabled = useOutlineStore((state) => state.isStreaming);
-  const { models } = useModels();
+  const { models } = useModels(MODEL_TYPES.IMAGE);
 
   const onThemeSelect = useCallback(
     (theme: string) => {

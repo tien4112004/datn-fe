@@ -258,3 +258,30 @@ export const useSetParsedPresentation = (id: string) => {
     },
   });
 };
+
+export const useGeneratePresentationImage = (id: string) => {
+  const presentationApiService = usePresentationApiService();
+
+  return useMutation({
+    mutationFn: async ({
+      slideId,
+      elementId,
+      prompt,
+      style,
+    }: {
+      slideId: string;
+      elementId: string;
+      prompt: string;
+      style: string;
+    }) => {
+      const imageUrl = await presentationApiService.generatePresentationImage(
+        id,
+        slideId,
+        elementId,
+        prompt,
+        style
+      );
+      return imageUrl;
+    },
+  });
+};

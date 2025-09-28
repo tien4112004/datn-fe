@@ -88,6 +88,21 @@ export default class PresentationMockService implements PresentationApiService {
     this.baseUrl = baseUrl;
   }
 
+  generatePresentationImage(
+    _id: string,
+    _slideId: string,
+    _elementId: string,
+    _prompt: string,
+    _style: string
+  ): Promise<string> {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        // Return a mock image URL
+        resolve('https://images.pexels.com/photos/33728147/pexels-photo-33728147.jpeg');
+      }, 1000);
+    });
+  }
+
   async setPresentationAsParsed(id: string): Promise<Presentation> {
     // Simulate API delay
     await new Promise((resolve) => setTimeout(resolve, 100));

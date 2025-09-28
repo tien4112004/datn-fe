@@ -18,6 +18,7 @@ import type { Slide, SlideTheme } from '@/types/slides';
 
 export function mount(el: string | Element, props: Record<string, unknown>) {
   const app = createApp(AppComponent, props) as App<Element> & {
+    updateImageElement?: (slideId: string, elementId: string, image: string) => void;
     replaceSlides?: (data: SlideLayoutSchema[]) => Promise<Slide[]>;
     addSlide?: (data: SlideLayoutSchema, order?: number) => Promise<Slide>;
     updateThemeAndViewport?: (theme: SlideTheme, viewport: SlideViewport) => void;
@@ -28,6 +29,37 @@ export function mount(el: string | Element, props: Record<string, unknown>) {
   app.use(i18n);
   icon.install(app);
   directive.install(app);
+
+  app.updateImageElement = (slideId: string, elementId: string, image: string) => {
+    const slidesStore = useSlidesStore();
+
+    const slideIndex = slidesStore.slides.findIndex((s) => s.id === slideId);
+    if (slideIndex === -1) return;
+
+    const slide = slidesStore.slides[slideIndex];
+    const elementIndex = slide.elements.findIndex((el) => el.id === elementId);
+    if (elementIndex === -1) return;
+
+    const element = slide.elements[elementIndex];
+    if (element.type !== 'image') return;
+
+    const updatedElement = {
+      ...element,
+      src: image,
+    };
+
+    const updatedElements = [...slide.elements];
+    updatedElements[elementIndex] = updatedElement;
+
+    const updatedSlide = {
+      ...slide,
+      elements: updatedElements,
+    };
+    const updatedSlides = [...slidesStore.slides];
+
+    updatedSlides[slideIndex] = updatedSlide;
+    slidesStore.setSlides(updatedSlides);
+  };
 
   app.replaceSlides = async (dataArray) => {
     const slidesStore = useSlidesStore();
@@ -40,6 +72,7 @@ export function mount(el: string | Element, props: Record<string, unknown>) {
     const newSlides: Slide[] = [];
     for (let i = 0; i < dataArray.length; i++) {
       const slide = await convertToSlide(dataArray[i], viewport, theme, (i + 1).toString());
+
       newSlides.push(slide);
     }
 
@@ -59,6 +92,16 @@ export function mount(el: string | Element, props: Record<string, unknown>) {
     const theme = slidesStore.theme;
 
     const slide = await convertToSlide(data, viewport, theme, order?.toString());
+
+    window.dispatchEvent(
+      new CustomEvent('app.image.need-generation', {
+        detail: {
+          slideId: slide.id,
+          elementId: slide.elements.find((el) => el.type === 'image')?.id,
+          prompt: (data as any).data.image,
+        },
+      })
+    );
 
     // Add new slides to existing ones
     const currentSlides = slidesStore.slides;

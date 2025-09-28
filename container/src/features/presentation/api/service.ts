@@ -64,8 +64,19 @@ export default class PresentationRealApiService implements PresentationApiServic
     return api.patch<ApiResponse<Presentation>>(`${this.baseUrl}/api/presentations/${id}/parse`);
   }
 
-  async upsertPresentationSlide(id: string, slide: Slide): Promise<any> {
-    await api.put<ApiResponse<Presentation>>(
+  async generatePresentationImage(
+    _id: string,
+    _slideId: string,
+    _elementId: string,
+    _prompt: string,
+    _style: string
+  ): Promise<string> {
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    return `https://via.placeholder.com/300x200.png?text=${_prompt}`;
+  }
+
+  upsertPresentationSlide(id: string, slide: Slide): Promise<any> {
+    return api.put<ApiResponse<Presentation>>(
       `${this.baseUrl}/api/presentations/${id}/slides`,
       {
         slides: [

@@ -87,7 +87,7 @@ describe('ModelSelect - Behavioral Tests', () => {
 
       await user.click(gpt4Option);
 
-      expect(mockOnValueChange).toHaveBeenCalledWith('gpt-4');
+      expect(mockOnValueChange).toHaveBeenCalledWith({ name: 'gpt-4', provider: 'OpenAI' });
     });
 
     it('prevents user from selecting disabled models', async () => {
@@ -122,7 +122,7 @@ describe('ModelSelect - Behavioral Tests', () => {
       await user.keyboard('{Enter}');
 
       await waitFor(() => {
-        expect(mockOnValueChange).toHaveBeenCalledWith('gpt-3.5-turbo');
+        expect(mockOnValueChange).toHaveBeenCalledWith({ name: 'gpt-3.5-turbo', provider: 'OpenAI' });
       });
     });
   });
@@ -181,12 +181,12 @@ describe('ModelSelect - Behavioral Tests', () => {
       // First selection
       await user.click(trigger);
       await user.click(await screen.findByText('GPT-4'));
-      expect(mockOnValueChange).toHaveBeenCalledWith('gpt-4');
+      expect(mockOnValueChange).toHaveBeenCalledWith({ name: 'gpt-4', provider: 'OpenAI' });
 
       // Second selection
       await user.click(trigger);
       await user.click(await screen.findByText('DeepSeek Coder'));
-      expect(mockOnValueChange).toHaveBeenCalledWith('deepseek-coder');
+      expect(mockOnValueChange).toHaveBeenCalledWith({ name: 'deepseek-coder', provider: 'Deepseek' });
 
       expect(mockOnValueChange).toHaveBeenCalledTimes(2);
     });

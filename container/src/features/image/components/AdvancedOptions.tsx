@@ -6,7 +6,7 @@ import { CardTitle } from '@/shared/components/ui/card';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-import { useModels } from '@/features/model';
+import { MODEL_TYPES, useModels } from '@/features/model';
 import { ModelSelect } from '@/shared/components/common/ModelSelect';
 import { IMAGE_DIMENSION_OPTIONS, ART_STYLE_OPTIONS, THEME_OPTIONS } from '@/features/image/types';
 import type { CreateImageFormData } from '@/features/image/types';
@@ -22,7 +22,7 @@ interface AdvancedOptionsProps {
 
 const AdvancedOptions = ({ register, control, isOpen, onToggle }: AdvancedOptionsProps) => {
   const { t } = useTranslation('image', { keyPrefix: 'createImage' });
-  const { models, isLoading, isError } = useModels();
+  const { models, isLoading, isError } = useModels(MODEL_TYPES.IMAGE);
 
   const toggleOptions = () => {
     onToggle(!isOpen);

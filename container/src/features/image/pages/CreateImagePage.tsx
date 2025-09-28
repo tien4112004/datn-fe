@@ -6,18 +6,42 @@ import { Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
 import { useForm, Controller } from 'react-hook-form';
+import { useSearchParams } from 'react-router-dom';
 import AdvancedOptions from '@/features/image/components/AdvancedOptions';
+import type { CreateImageFormData } from '@/features/image/types';
 
 const CreateImagePage = () => {
   const { t } = useTranslation('image', { keyPrefix: 'createImage' });
-  const { setValue, watch, control } = useForm({
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const form = useForm<CreateImageFormData>({
     defaultValues: {
       topic: '',
+      imageModel: '',
+      imageDimension: '',
+      artStyle: '',
+      theme: '',
+      negativePrompt: '',
     },
   });
+  const { setValue, watch, control, register, handleSubmit } = form;
+
+  // Read advanced options state directly from URL
+  const isAdvancedOpen = searchParams.get('advanced') === 'true';
+
+  // Update URL when advanced options state changes
+  const toggleAdvancedOptions = (open: boolean) => {
+    const newParams = new URLSearchParams(searchParams);
+    if (open) {
+      newParams.set('advanced', 'true');
+    } else {
+      newParams.delete('advanced');
+    }
+    setSearchParams(newParams);
+  };
 
   // const topicValue = watch('topic') as string;
-  const showExamplePrompts = watch('topic').trim() === '';
+  const showExamplePrompts = watch('topic').trim() === '' && !isAdvancedOpen;
 
   // Image-specific example prompts
   const imageExamplePrompts = [
@@ -33,18 +57,18 @@ const CreateImagePage = () => {
     setValue('topic', example);
   };
 
+  const onSubmit = (data: CreateImageFormData) => {
+    console.log('Form data:', data);
+    // TODO: Implement image generation logic
+  };
+
   return (
     <div className="lg:w-4xl flex min-h-[calc(100vh-1rem)] flex-col items-center justify-center gap-4 self-center sm:w-full">
       <h1 className="text-3xl font-bold leading-10 text-neutral-900">{t('title')}</h1>
       <ResourceTypeSwitcher />
       <h2 className="text-xl font-bold leading-10 text-sky-500/80">{t('subtitle')}</h2>
 
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-        }}
-        className="w-full"
-      >
+      <form onSubmit={handleSubmit(onSubmit)} className="w-full">
         <Card className="w-full">
           <CardContent>
             <div className="flex flex-col gap-4">
@@ -75,7 +99,12 @@ const CreateImagePage = () => {
               title={t('examplePromptTitle')}
             />
 
-            <AdvancedOptions />
+            <AdvancedOptions
+              register={register}
+              control={control}
+              isOpen={isAdvancedOpen}
+              onToggle={toggleAdvancedOptions}
+            />
           </CardContent>
         </Card>
 

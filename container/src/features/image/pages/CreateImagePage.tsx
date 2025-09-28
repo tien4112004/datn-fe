@@ -6,13 +6,20 @@ import { Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
 import { useForm, Controller } from 'react-hook-form';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import AdvancedOptions from '@/features/image/components/AdvancedOptions';
 import type { CreateImageFormData } from '@/features/image/types';
+import { useImageApiService } from '@/features/image/api';
 
 const CreateImagePage = () => {
   const { t } = useTranslation('image', { keyPrefix: 'createImage' });
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const imageApiService = useImageApiService();
+
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const form = useForm<CreateImageFormData>({
     defaultValues: {
@@ -57,9 +64,32 @@ const CreateImagePage = () => {
     setValue('topic', example);
   };
 
-  const onSubmit = (data: CreateImageFormData) => {
-    console.log('Form data:', data);
-    // TODO: Implement image generation logic
+  // Transform form data to API request format
+  const transformToApiRequest = (formData: CreateImageFormData) => {
+    return {
+      prompt: formData.topic,
+      style: formData.artStyle || undefined,
+      size: formData.imageDimension || undefined,
+      quality: formData.imageModel || undefined,
+    };
+  };
+
+  const onSubmit = async (data: CreateImageFormData) => {
+    setIsGenerating(true);
+    setError(null);
+
+    try {
+      const apiRequest = transformToApiRequest(data);
+      const response = await imageApiService.generateImage(apiRequest);
+
+      // Navigate to the image details page with the generated image ID
+      navigate(`/image/${response.id}`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to generate image');
+      console.error('Image generation failed:', err);
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   return (
@@ -108,9 +138,11 @@ const CreateImagePage = () => {
           </CardContent>
         </Card>
 
-        <Button type="submit" className="mt-4 w-full">
+        {error && <div className="mt-2 rounded-md bg-red-50 p-3 text-sm text-red-600">{error}</div>}
+
+        <Button type="submit" className="mt-4 w-full" disabled={isGenerating}>
           <Sparkles className="mr-2 h-4 w-4" />
-          {t('generateImage')}
+          {isGenerating ? t('generating') : t('generateImage')}
         </Button>
       </form>
     </div>

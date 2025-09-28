@@ -195,6 +195,7 @@ export default {
       examplePrompt5: 'A serene mountain lake with reflection of snow-capped peaks',
       examplePrompt6: 'A steampunk-inspired robot in a Victorian setting',
       generateImage: 'Generate Image',
+      generating: 'Generating...',
       advancedOptions: 'Advanced Options',
       imageModel: 'Image Model',
       imageModelPlaceholder: 'Which model?',

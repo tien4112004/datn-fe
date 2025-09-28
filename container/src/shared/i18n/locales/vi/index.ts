@@ -184,6 +184,7 @@ export default {
       examplePrompt5: 'Hồ núi thanh bình với phản chiếu của đỉnh núi phủ tuyết',
       examplePrompt6: 'Robot phong cách steampunk trong khung cảnh thời Victorian',
       generateImage: 'Tạo hình ảnh',
+      generating: 'Đang tạo...',
       advancedOptions: 'Tùy chọn nâng cao',
       imageModel: 'Mô hình hình ảnh',
       imageModelPlaceholder: 'Mô hình nào?',

@@ -10,7 +10,6 @@ import { getPresentationById } from '@/features/presentation/hooks/loaders';
 import Projects from '@/features/projects';
 import Settings from '@/features/settings';
 import Image from '@/features/image';
-import { PresentationFormProvider } from '@/features/presentation/contexts/PresentationFormContext';
 
 const router = createBrowserRouter([
   {
@@ -35,11 +34,11 @@ const router = createBrowserRouter([
       },
       {
         path: 'image/create',
-        Component: () => (
-          <PresentationFormProvider>
-            <Image.CreateImagePage />
-          </PresentationFormProvider>
-        ),
+        Component: Image.CreateImagePage,
+      },
+      {
+        path: 'image/:id',
+        Component: Image.ImageDetailPage,
       },
       {
         path: 'mindmap',

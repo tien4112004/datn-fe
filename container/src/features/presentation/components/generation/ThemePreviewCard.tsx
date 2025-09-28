@@ -30,22 +30,20 @@ export const ThemePreviewCard: React.FC<ThemePreviewCardProps> = ({
       }}
       onClick={onClick}
     >
-      {title && (
-        <div
-          className="absolute flex items-center font-bold"
-          style={{
-            left: '8%',
-            top: '8%',
-            width: '84%',
-            height: '35%',
-            color: theme.titleFontColor || theme.fontColor,
-            fontFamily: theme.titleFontName || theme.fontName,
-            fontSize: 'clamp(12px, 4vw, 18px)',
-          }}
-        >
-          {title}
-        </div>
-      )}
+      <div
+        className="absolute flex items-center font-bold"
+        style={{
+          left: '8%',
+          top: '8%',
+          width: '84%',
+          height: '35%',
+          color: theme.titleFontColor || theme.fontColor,
+          fontFamily: theme.titleFontName || theme.fontName,
+          fontSize: 'clamp(12px, 4vw, 18px)',
+        }}
+      >
+        {title}
+      </div>
 
       <div
         className="absolute flex items-center"

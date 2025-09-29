@@ -1,101 +1,83 @@
-import type { PPTTextElement, Slide, SlideTheme } from '@/types/slides';
-import { SlideLayoutCalculator, type SlideViewport, type ElementBounds } from '../slideLayout';
-import { calculateLargestOptimalFontSize, applyFontSizeToElement } from '../fontSizeCalculator';
-import { createItemElement } from '../htmlTextCreation';
-import { generateUniqueId } from '../utils';
-import { createTitlePPTElement, calculateTitleLayout, createTitleLine } from '../graphic';
+import type { Slide, SlideTheme } from '@/types/slides';
+import { createTitleLine } from '../graphic';
 import type { TitleLayoutSchema, TransitionLayoutSchema } from './types';
+import type { Bounds, TextLayoutBlockInstance, TemplateConfig, TextTemplateContainer } from '../types';
+import LayoutPrimitives from '../layoutPrimitives';
 
-export const convertTitleSlide = async (
-  data: TitleLayoutSchema,
-  viewport: SlideViewport,
-  theme: SlideTheme,
-  slideId?: string
-) => {
-  // Initialize layout calculator
-  const layoutCalculator = new SlideLayoutCalculator(viewport.size, viewport.ratio, theme);
+const SLIDE_WIDTH = 1000;
+const SLIDE_HEIGHT = 562.5;
 
-  // Calculate title layout using the new helper
-  const titleAvailableHeight = Math.max(120, layoutCalculator.slideHeight * 0.18);
-  let titleTop = layoutCalculator.slideHeight * 0.28;
-
-  // If no subtitle, center the title more vertically - need to calculate dimensions first
-  const titleAvailableBlock = {
+export const getTitleLayoutTemplate = (theme: SlideTheme): TemplateConfig => {
+  const titleBounds: Bounds = {
     left: 0,
-    top: titleTop,
-    width: layoutCalculator.slideWidth,
-    height: titleAvailableHeight,
+    top: SLIDE_HEIGHT * 0.28,
+    width: SLIDE_WIDTH,
+    height: 120,
   };
 
-  let { titleContent, titleDimensions, titlePosition } = calculateTitleLayout(
+  const subtitleBounds: Bounds = {
+    left: SLIDE_WIDTH * 0.06,
+    top: 0, // Will be calculated relative to title
+    width: SLIDE_WIDTH * 0.88,
+    height: 80,
+  };
+
+  return {
+    containers: {
+      title: {
+        bounds: titleBounds,
+        padding: { top: 0, bottom: 0, left: 0, right: 0 },
+        horizontalAlignment: 'center',
+        verticalAlignment: 'center',
+        text: {
+          color: theme.titleFontColor,
+          fontFamily: theme.titleFontName,
+          fontWeight: 'bold',
+          fontStyle: 'normal',
+        },
+      } satisfies TextTemplateContainer,
+      subtitle: {
+        bounds: subtitleBounds,
+        padding: { top: 0, bottom: 0, left: 0, right: 0 },
+        horizontalAlignment: 'center',
+        verticalAlignment: 'top',
+        text: {
+          color: theme.fontColor,
+          fontFamily: theme.fontName,
+          fontWeight: 'normal',
+          fontStyle: 'normal',
+        },
+      } satisfies TextTemplateContainer,
+    },
+    theme,
+  } satisfies TemplateConfig;
+};
+
+export const convertTitleLayout = async (
+  data: TitleLayoutSchema | TransitionLayoutSchema,
+
+  template: TemplateConfig,
+  slideId?: string
+): Promise<Slide> => {
+  const hasSubtitle = !!data.data.subtitle;
+
+  // Merge template config with bounds to create instances
+  const titleInstance = {
+    ...template.containers.title,
+    ...template.containers.title.bounds,
+  } as TextLayoutBlockInstance;
+
+  const { titleContent, titleDimensions, titlePosition } = LayoutPrimitives.calculateTitleLayout(
     data.data.title,
-    titleAvailableBlock,
-    layoutCalculator,
-    theme
+    titleInstance
   );
 
-  // If no subtitle, recalculate with centered position
-  if (!data.data.subtitle) {
-    titleTop = (layoutCalculator.slideHeight - titleDimensions.height) / 2;
-    const centeredTitleBlock = {
-      ...titleAvailableBlock,
-      top: titleTop,
-    };
-    const centeredLayout = calculateTitleLayout(data.data.title, centeredTitleBlock, layoutCalculator, theme);
-    titleContent = centeredLayout.titleContent;
-    titleDimensions = centeredLayout.titleDimensions;
-    titlePosition = centeredLayout.titlePosition;
-  }
-
-  // Subtitle (optional)
-  let subtitleElement = null;
-  if (data.data.subtitle) {
-    const subtitleAvailableWidth = layoutCalculator.slideWidth * 0.88;
-    const subtitleAvailableHeight = Math.max(60, layoutCalculator.slideHeight * 0.08);
-
-    const subtitleTempElement = createItemElement({
-      content: data.data.subtitle,
-      fontSize: 20, // Initial size, will be optimized
-      lineHeight: 1.4,
-      fontFamily: theme.fontName,
-      color: theme.fontColor,
-    });
-
-    const subtitleFontSize = calculateLargestOptimalFontSize(
-      subtitleTempElement,
-      subtitleAvailableWidth,
-      subtitleAvailableHeight,
-      'content'
-    );
-
-    // Apply the calculated font size to the element
-    applyFontSizeToElement(subtitleTempElement, subtitleFontSize, 1.4);
-    const subtitleContent = `<p style="text-align: center;"><span style="font-size: ${subtitleFontSize}px;">${data.data.subtitle}</span></p>`;
-    // Calculate subtitle dimensions using element-based measurement
-    const subtitleDimensions = layoutCalculator.measureHTMLElement(subtitleTempElement, {
-      maxWidth: subtitleAvailableWidth,
-      maxHeight: subtitleAvailableHeight,
-    });
-    subtitleElement = {
-      id: generateUniqueId(),
-      type: 'text',
-      content: subtitleContent,
-      defaultFontName: theme.fontName,
-      defaultColor: theme.fontColor,
-      left: layoutCalculator.getHorizontallyCenterPosition(subtitleDimensions.width),
-      top: titlePosition.top + titleDimensions.height + 32,
-      width: subtitleDimensions.width,
-      height: subtitleDimensions.height,
-    } as PPTTextElement;
-  }
-
-  // Create slide elements
   const elements = [
-    createTitlePPTElement(
+    LayoutPrimitives.createTitlePPTElement(
       titleContent,
       { left: titlePosition.left, top: titlePosition.top },
       { width: titleDimensions.width, height: titleDimensions.height },
-      theme
+      titleInstance
     ),
     createTitleLine(
       {
@@ -103,26 +85,46 @@ export const convertTitleSlide = async (
         height: titleDimensions.height,
         left: titlePosition.left,
         top: titlePosition.top,
-      } as ElementBounds,
-      theme
+      } as Bounds,
+      template.theme
     ),
   ];
-  if (subtitleElement) {
-    elements.push(subtitleElement);
+
+  // Add subtitle if present
+  if (hasSubtitle && data.data.subtitle) {
+    const subtitleInstance = {
+      ...template.containers.subtitle,
+      ...template.containers.subtitle.bounds,
+      top: titlePosition.top + titleDimensions.height + 32, // Position below title
+    } as TextLayoutBlockInstance;
+
+    const subtitleElements = await LayoutPrimitives.createItemElementsWithStyles(
+      [data.data.subtitle],
+      subtitleInstance
+    );
+    elements.push(...subtitleElements);
+  }
+
+  // If no subtitle, recenter the title vertically
+  if (!hasSubtitle) {
+    const centeredTop = (SLIDE_HEIGHT - titleDimensions.height) / 2;
+    const diff = centeredTop - titlePosition.top;
+    elements[0].top += diff / 2;
+    elements[1].top += diff / 2;
   }
 
   const slide: Slide = {
-    id: slideId ?? generateUniqueId(),
+    id: slideId ?? crypto.randomUUID(),
     elements,
   };
+
   return slide;
 };
 
-export const convertTransition = async (
+export const convertTransitionLayout = async (
   data: TransitionLayoutSchema,
-  viewport: SlideViewport,
-  theme: SlideTheme,
+  template: TemplateConfig,
   slideId?: string
 ) => {
-  return await convertTitleSlide(data, viewport, theme, slideId);
+  return await convertTitleLayout(data, template, slideId);
 };

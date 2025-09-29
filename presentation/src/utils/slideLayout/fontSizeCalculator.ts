@@ -24,7 +24,7 @@ export function calculateLargestOptimalFontSize(
   element: HTMLElement,
   availableWidth: number,
   availableHeight: number,
-  role: 'title' | 'content' = 'content'
+  role: 'title' | 'content' | 'label' = 'content'
 ): number {
   // Role-specific configurations
   const config = {
@@ -33,20 +33,24 @@ export function calculateLargestOptimalFontSize(
       maxSize: 48,
       maxLines: 3,
       lineHeight: 1.2,
-      heightMargin: 0.9,
     },
     content: {
       minSize: 12,
-      maxSize: 24,
+      maxSize: 32,
       maxLines: 10,
       lineHeight: 1.4,
-      heightMargin: 0.95,
+    },
+    label: {
+      minSize: 10,
+      maxSize: 24,
+      maxLines: 2,
+      lineHeight: 1.2,
     },
   }[role];
 
   const clonedElement = element.cloneNode(true) as HTMLElement;
 
-  const targetHeight = availableHeight * config.heightMargin;
+  const targetHeight = availableHeight;
   // Start from max size and work down
   let fontSize = config.maxSize;
   let optimalSize = config.minSize;
@@ -77,8 +81,7 @@ export function calculateLargestOptimalFontSize(
 export function calculateFontSizeForAvailableSpace(
   elements: HTMLElement[],
   availableWidth: number,
-  availableHeight: number,
-  viewport: SlideViewport
+  availableHeight: number
 ): FontSizeCalculationResult {
   if (elements.length === 0) {
     return { fontSize: 16, lineHeight: 1.4, spacing: 12 };

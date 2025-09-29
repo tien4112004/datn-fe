@@ -1,237 +1,215 @@
 import type { Slide, SlideTheme } from '@/types/slides';
-import {
-  SlideLayoutCalculator,
-  type SlideViewport,
-  type ElementBounds,
-  type ImageBounds,
-} from '../slideLayout';
-import { calculateFontSizeForAvailableSpace, applyFontSizeToElements } from '../fontSizeCalculator';
-import { createItemElement } from '../htmlTextCreation';
-import { generateUniqueId } from '../utils';
-import {
-  createImageElement,
-  createItemElementsWithStyles,
-  createTitlePPTElement,
-  calculateTitleLayout,
-  type ItemStyles,
-  createTitleLine,
-} from '../graphic';
+import { createTitleLine } from '../graphic';
 import type { TwoColumnWithImageLayoutSchema } from './types';
+import type {
+  Bounds,
+  ImageLayoutBlockInstance,
+  TemplateConfig,
+  TextLayoutBlockInstance,
+  TextTemplateContainer,
+  ImageTemplateContainer,
+} from '../types';
+import LayoutPrimitives from '../layoutPrimitives';
 
-export const convertTwoColumnWithImage = async (
-  data: TwoColumnWithImageLayoutSchema,
-  viewport: SlideViewport,
-  theme: SlideTheme,
-  slideId?: string
-) => {
-  // Initialize layout calculator
-  const layoutCalculator = new SlideLayoutCalculator(viewport.size, viewport.ratio, theme);
+const SLIDE_WIDTH = 1000;
+const SLIDE_HEIGHT = 562.5;
 
-  // Calculate available space for content column (column 1, right side)
-  const columns = layoutCalculator.getColumnsLayout([50, 50]);
-  const contentColumnBlock = columns[1];
+export const getTwoColumnWithImageLayoutTemplate = (theme: SlideTheme): TemplateConfig => {
+  const columns = LayoutPrimitives.getColumnsLayout([50, 50]);
+  const imageDimensions = { width: 400, height: 300 };
 
-  // Calculate title layout using the new helper
-  const titleAvailableBlock = {
-    left: 0,
+  const titleBounds: Bounds = {
+    left: 15,
     top: 15,
-    width: layoutCalculator.slideWidth,
+    width: SLIDE_WIDTH - 30,
     height: 120,
   };
-  const { titleContent, titleDimensions, titlePosition } = calculateTitleLayout(
-    data.title,
-    titleAvailableBlock,
-    layoutCalculator,
-    theme
-  );
-  const imageDimensions = layoutCalculator.calculateImageDimensions();
 
-  //   // Get image position in first column
-  //   const imagePosition = layoutCalculator.getColumnCenterPosition(
-  //     imageDimensions.height,
-  //     imageDimensions.width,
-  //     0
-  //   );
-  const imagePosition = layoutCalculator.layoutItemInBlock(imageDimensions, columns[0], {
-    alignment: 'center',
+  const imagePosition = LayoutPrimitives.getPosition(columns[0], imageDimensions, {
+    horizontalAlignment: 'center',
+    verticalAlignment: 'center',
   });
 
-  // Calculate unified styles for items using element-based approach
-  const contentAvailableBlock = {
-    ...contentColumnBlock,
-    top: contentColumnBlock.top + titleDimensions.height + 60,
-    height: contentColumnBlock.height - titleDimensions.height,
+  const imageBounds: Bounds = {
+    ...imagePosition,
+    ...imageDimensions,
   };
 
-  const tempItemElements = data.data.items.map((item) =>
-    createItemElement({
-      content: item,
-      fontSize: 20, // Initial size, will be optimized
-      lineHeight: 1.4,
-      fontFamily: theme.fontName,
-      color: theme.fontColor,
-    })
-  );
-  const contentStyles: ItemStyles = calculateFontSizeForAvailableSpace(
-    tempItemElements,
-    contentAvailableBlock.width,
-    contentAvailableBlock.height,
-    viewport
-  );
+  const contentBounds: Bounds = {
+    left: columns[1].left,
+    top: columns[1].top + 120,
+    width: columns[1].width,
+    height: columns[1].height - 120,
+  };
 
-  // Apply the calculated styles to the temporary elements
-  applyFontSizeToElements(tempItemElements, contentStyles);
-
-  // Create item elements using the unified styles
-  const itemElements = await createItemElementsWithStyles(
-    data.data.items,
-    contentAvailableBlock,
-    layoutCalculator,
+  return {
+    containers: {
+      title: {
+        bounds: titleBounds,
+        padding: { top: 0, bottom: 0, left: 40, right: 40 },
+        horizontalAlignment: 'center',
+        verticalAlignment: 'top',
+        text: {
+          color: theme.titleFontColor,
+          fontFamily: theme.titleFontName,
+          fontWeight: 'bold',
+          fontStyle: 'normal',
+        },
+        border: {
+          width: 1,
+          color: theme.themeColors[0],
+          radius: 50,
+        },
+      },
+      image: {
+        bounds: imageBounds,
+        padding: { top: 0, bottom: 0, left: 0, right: 0 },
+        border: {
+          width: 1,
+          color: 'transparent',
+          radius: 50,
+        },
+      },
+      content: {
+        bounds: contentBounds,
+        padding: { top: 0, bottom: 40, left: 0, right: 0 },
+        distribution: 'space-between',
+        spacingBetweenItems: 20,
+        horizontalAlignment: 'center',
+        verticalAlignment: 'top',
+        text: {
+          color: theme.fontColor,
+          fontFamily: theme.fontName,
+          fontWeight: 'normal',
+          fontStyle: 'normal',
+        },
+      },
+    },
     theme,
-    contentStyles,
-    { alignment: 'top', leftMargin: 0 }
-  );
-
-  // Create slide elements
-  const slide: Slide = {
-    id: slideId ?? generateUniqueId(),
-    elements: [
-      createTitlePPTElement(
-        titleContent,
-        { left: titlePosition.left, top: titlePosition.top },
-        { width: titleDimensions.width, height: titleDimensions.height },
-        theme
-      ),
-      await createImageElement(
-        data.data.image,
-        {
-          ...imagePosition,
-          ...imageDimensions,
-        } as ImageBounds,
-        { clip: 'auto' }
-      ),
-      // Graphic elements
-      createTitleLine(
-        {
-          width: titleDimensions.width,
-          height: titleDimensions.height,
-          left: titlePosition.left,
-          top: titlePosition.top,
-        } as ElementBounds,
-        theme
-      ),
-
-      // Item text elements with variable height positioning
-      ...itemElements,
-    ],
   };
-
-  return slide;
 };
 
-export const convertTwoColumnWithBigImage = async (
-  data: TwoColumnWithImageLayoutSchema,
-  viewport: SlideViewport,
-  theme: SlideTheme,
-  slideId?: string
-) => {
-  // Initialize layout calculator
-  const layoutCalculator = new SlideLayoutCalculator(viewport.size, viewport.ratio, theme);
+// ============================================================================
 
-  // Use flexible column layout: 33% for image, 67% for content
-  const columns = layoutCalculator.getColumnsLayout([33, 67]);
+export const getTwoColumnBigImageLayoutTemplate = (theme: SlideTheme): TemplateConfig => {
+  const columns = LayoutPrimitives.getColumnsLayout([33, 67]);
   const leftColumnBlock = columns[0];
-  const contentColumnBlock = {
-    ...columns[1],
-    height: layoutCalculator.calculateAvailableHeight(0, 20),
-  };
+  const rightColumnBlock = columns[1];
 
-  // Calculate image dimensions to fit nicely in left column
-  const imageHeight = viewport.size * viewport.ratio;
+  const imageHeight = SLIDE_HEIGHT;
   const imageWidth = leftColumnBlock.width;
 
-  // Calculate title layout using the new helper
-  const titleAvailableBlock = {
-    left: contentColumnBlock.left,
+  const imageBounds: Bounds = {
+    left: 0,
+    top: 0,
+    width: imageWidth,
+    height: imageHeight,
+  };
+
+  const titleBounds: Bounds = {
+    left: rightColumnBlock.left,
     top: 15,
-    width: contentColumnBlock.width,
-    height: 240,
-  };
-  const { titleContent, titleDimensions, titlePosition } = calculateTitleLayout(
-    data.title,
-    titleAvailableBlock,
-    layoutCalculator,
-    theme
-  );
-
-  const contentAvailableWidth = contentColumnBlock.width;
-  const contentAvailableHeight = contentColumnBlock.height - 160; // Reserve space for title
-
-  const titleBottomOffset = titlePosition.top + titleDimensions.height + 40; // 40px spacing after title
-
-  // Create item elements using the helper with custom available block
-  const customAvailableBlock = {
-    left: contentColumnBlock.left,
-    top: titleBottomOffset,
-    width: contentAvailableWidth,
-    height: contentAvailableHeight,
+    width: rightColumnBlock.width,
+    height: 120,
   };
 
-  // Calculate unified styles for items using element-based approach
-  const tempItemElements2 = data.data.items.map((item) =>
-    createItemElement({
-      content: item,
-      fontSize: 20, // Initial size, will be optimized
-      lineHeight: 1.4,
-      fontFamily: theme.fontName,
-      color: theme.fontColor,
-    })
-  );
-  const contentStyles: ItemStyles = calculateFontSizeForAvailableSpace(
-    tempItemElements2,
-    customAvailableBlock.width,
-    customAvailableBlock.height,
-    viewport
-  );
+  const contentBounds: Bounds = {
+    left: rightColumnBlock.left,
+    top: 15 + 120, // title position + title height + spacing
+    width: rightColumnBlock.width,
+    height: SLIDE_HEIGHT - (15 + 120) - 20, // remaining height with bottom margin
+  };
 
-  // Apply the calculated styles to the temporary elements
-  applyFontSizeToElements(tempItemElements2, contentStyles);
-
-  const itemElements = await createItemElementsWithStyles(
-    data.data.items,
-    customAvailableBlock,
-    layoutCalculator,
+  return {
+    containers: {
+      title: {
+        bounds: titleBounds,
+        padding: { top: 0, bottom: 0, left: 0, right: 0 },
+        horizontalAlignment: 'center',
+        verticalAlignment: 'top',
+        text: {
+          color: theme.titleFontColor,
+          fontFamily: theme.titleFontName,
+          fontWeight: 'bold',
+          fontStyle: 'normal',
+        },
+      },
+      image: {
+        bounds: imageBounds,
+        padding: { top: 0, bottom: 0, left: 0, right: 0 },
+        border: {
+          width: 1,
+          color: 'transparent',
+          radius: 0,
+        },
+      },
+      content: {
+        bounds: contentBounds,
+        padding: { top: 0, bottom: 0, left: 40, right: 0 },
+        distribution: 'equal',
+        spacingBetweenItems: 20,
+        horizontalAlignment: 'left',
+        verticalAlignment: 'top',
+        text: {
+          color: theme.fontColor,
+          fontFamily: theme.fontName,
+          fontWeight: 'normal',
+          fontStyle: 'normal',
+        },
+      },
+    },
     theme,
-    contentStyles,
-    { alignment: 'top', leftMargin: 40 }
+  };
+};
+
+export const convertTwoColumnWithImageLayout = async (
+  data: TwoColumnWithImageLayoutSchema,
+  template: TemplateConfig,
+  slideId?: string
+): Promise<Slide> => {
+  // Merge template config with bounds to create instances
+  const titleInstance = {
+    ...template.containers.title,
+    ...template.containers.title.bounds,
+  } as TextLayoutBlockInstance;
+  const contentInstance = {
+    ...template.containers.content,
+    ...template.containers.content.bounds,
+  } as TextLayoutBlockInstance;
+  const imageInstance = {
+    ...template.containers.image,
+    ...template.containers.image.bounds,
+  } as ImageLayoutBlockInstance;
+
+  const { titleContent, titleDimensions, titlePosition } = LayoutPrimitives.calculateTitleLayout(
+    data.title,
+    titleInstance
   );
 
-  // Create slide elements
+  // Create item elements with automatic font size optimization
+  const itemElements = await LayoutPrimitives.createItemElementsWithStyles(data.data.items, contentInstance);
+
+  const imageElement = await LayoutPrimitives.createImageElement(data.data.image, imageInstance);
+
   const slide: Slide = {
-    id: slideId ?? generateUniqueId(),
+    id: slideId ?? crypto.randomUUID(),
     elements: [
-      createTitlePPTElement(
+      LayoutPrimitives.createTitlePPTElement(
         titleContent,
         { left: titlePosition.left, top: titlePosition.top },
         { width: titleDimensions.width, height: titleDimensions.height },
-        theme
+        titleInstance
       ),
-      await createImageElement(
-        data.data.image,
-        { left: 0, top: 0, width: imageWidth, height: imageHeight } as ImageBounds,
-        { clip: 'auto' }
-      ),
-      //   Graphic elements
+      imageElement,
       createTitleLine(
         {
           width: titleDimensions.width,
           height: titleDimensions.height,
           left: titlePosition.left,
           top: titlePosition.top,
-        } as ElementBounds,
-        theme
+        } as Bounds,
+        template.theme
       ),
-      // Item text elements with variable height positioning
       ...itemElements,
     ],
   };

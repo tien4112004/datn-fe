@@ -5,7 +5,6 @@ import type {
   ImageElementClip,
   SlideTheme,
 } from '@/types/slides';
-import { generateUniqueId } from './utils';
 import { getImageSize } from '../image';
 import {
   calculateLargestOptimalFontSize,
@@ -28,6 +27,9 @@ import type {
   ElementBounds,
 } from './slideLayout';
 
+/**
+ * @deprecated
+ */
 export const createImageElement = async (
   src: string,
   bounds: ImageBounds,
@@ -50,7 +52,7 @@ export const createImageElement = async (
   }
 
   return {
-    id: generateUniqueId(),
+    id: crypto.randomUUID(),
     type: 'image',
     src,
     fixedRatio: false,
@@ -81,6 +83,9 @@ export interface ItemStyles {
   fontFamily?: string;
 }
 
+/**
+ * @deprecated
+ */
 export const createItemElementsWithHTMLElements = async (
   items: string[],
   availableBlock: LayoutBlock,
@@ -101,12 +106,7 @@ export const createItemElementsWithHTMLElements = async (
   );
 
   // Calculate optimal styles using HTML elements
-  const styles = calculateFontSizeForAvailableSpace(
-    elements,
-    availableBlock.width,
-    availableBlock.height,
-    viewport
-  );
+  const styles = calculateFontSizeForAvailableSpace(elements, availableBlock.width, availableBlock.height);
 
   // Apply the calculated styles to all elements
   applyFontSizeToElements(elements, styles);
@@ -130,7 +130,7 @@ export const createItemElementsWithHTMLElements = async (
     const elementContent = element.outerHTML;
 
     return {
-      id: generateUniqueId(),
+      id: crypto.randomUUID(),
       type: 'text',
       content: elementContent,
       defaultFontName: theme.fontName,
@@ -144,6 +144,9 @@ export const createItemElementsWithHTMLElements = async (
   });
 };
 
+/**
+ * @deprecated
+ */
 export const createItemElementsWithStyles = async (
   items: string[],
   availableBlock: LayoutBlock,
@@ -178,7 +181,7 @@ export const createItemElementsWithStyles = async (
     const position = itemPositions[index];
 
     return {
-      id: generateUniqueId(),
+      id: crypto.randomUUID(),
       type: 'text',
       content: item.content,
       defaultFontName: theme.fontName,
@@ -197,6 +200,9 @@ interface TitleLayoutOptions {
   topOffset?: number;
 }
 
+/**
+ * @deprecated
+ */
 export const calculateTitleLayout = (
   title: string,
   availableBlock: LayoutBlock,
@@ -260,6 +266,9 @@ export const calculateTitleLayout = (
   };
 };
 
+/**
+ * @deprecated
+ */
 export const createTitlePPTElement = (
   content: string,
   position: { left: number; top: number },
@@ -267,7 +276,7 @@ export const createTitlePPTElement = (
   theme: SlideTheme
 ): PPTTextElement => {
   return {
-    id: generateUniqueId(),
+    id: crypto.randomUUID(),
     type: 'text',
     content,
     defaultFontName: theme.titleFontName || theme.fontName,
@@ -282,7 +291,7 @@ export const createTitlePPTElement = (
 
 export const createTitleLine = (titleDimensions: ElementBounds, theme: SlideTheme) => {
   return {
-    id: generateUniqueId(),
+    id: crypto.randomUUID(),
     type: 'line',
     style: 'solid',
     left: titleDimensions.left,
@@ -308,6 +317,7 @@ interface HorizontalItemElementBlock {
 }
 
 /**
+ * @deprecated
  * Creates horizontal item blocks using HTML elements with calculated dimensions
  */
 export function createHorizontalItemBlocks(
@@ -440,7 +450,7 @@ export async function createHorizontalItemElements(
 
     // Create label element
     elements.push({
-      id: generateUniqueId(),
+      id: crypto.randomUUID(),
       type: 'text',
       content: block.labelElement.outerHTML,
       defaultFontName: theme.fontName,
@@ -454,7 +464,7 @@ export async function createHorizontalItemElements(
 
     // Create content element
     elements.push({
-      id: generateUniqueId(),
+      id: crypto.randomUUID(),
       type: 'text',
       content: block.contentElement.outerHTML,
       defaultFontName: theme.fontName,
@@ -488,7 +498,7 @@ export async function createHorizontalItemElements(
 
       // Create label element
       elements.push({
-        id: generateUniqueId(),
+        id: crypto.randomUUID(),
         type: 'text',
         content: block.labelElement.outerHTML,
         defaultFontName: theme.fontName,
@@ -502,7 +512,7 @@ export async function createHorizontalItemElements(
 
       // Create content element
       elements.push({
-        id: generateUniqueId(),
+        id: crypto.randomUUID(),
         type: 'text',
         content: block.contentElement.outerHTML,
         defaultFontName: theme.fontName,

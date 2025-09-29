@@ -1,14 +1,5 @@
 import { type SlideViewport } from './slideLayout';
 import {
-  convertTwoColumnWithImage,
-  convertTwoColumnWithBigImage,
-  convertMainImage,
-  convertTitleSlide,
-  convertTwoColumn,
-  convertVerticalList,
-  convertHorizontalList,
-  convertTransition,
-  convertTableOfContents,
   type SlideLayoutSchema,
   type TwoColumnWithImageLayoutSchema,
   type MainImageLayoutSchema,
@@ -19,7 +10,19 @@ import {
   type TransitionLayoutSchema,
   type TableOfContentsLayoutSchema,
   SLIDE_LAYOUT_TYPE,
+  getTransitionLayoutTemplate,
 } from './converters';
+import {
+  convertTwoColumnWithImageLayout,
+  getTwoColumnBigImageLayoutTemplate,
+  getTwoColumnWithImageLayoutTemplate,
+} from './converters/twoColumnWithImage';
+import { convertVerticalListLayout, getVerticalListLayoutTemplate } from './converters/verticalList';
+import { convertTwoColumnLayout, getTwoColumnLayoutTemplate } from './converters/twoColumn';
+import { convertMainImageLayout, getMainImageLayoutTemplate } from './converters/mainImage';
+import { convertTitleLayout, convertTransitionLayout, getTitleLayoutTemplate } from './converters/title';
+import { convertTableOfContentsLayout, getTableOfContentsLayoutTemplate } from './converters/tableOfContents';
+import { convertHorizontalListLayout, getHorizontalListLayoutTemplate } from './converters/horizontalList';
 import type { SlideTheme } from '@/types/slides';
 
 // Export font size calculation utilities
@@ -41,36 +44,40 @@ export const convertToSlide = async (
   slideId?: string
 ) => {
   if (data.type === SLIDE_LAYOUT_TYPE.TWO_COLUMN_WITH_IMAGE) {
-    return await convertTwoColumnWithImage(data as TwoColumnWithImageLayoutSchema, viewport, theme, slideId);
+    const template = getTwoColumnWithImageLayoutTemplate(theme);
+    return await convertTwoColumnWithImageLayout(data as TwoColumnWithImageLayoutSchema, template, slideId);
   }
   if (data.type === SLIDE_LAYOUT_TYPE.TWO_COLUMN_WITH_BIG_IMAGE) {
-    return await convertTwoColumnWithBigImage(
-      data as TwoColumnWithImageLayoutSchema,
-      viewport,
-      theme,
-      slideId
-    );
+    const template = getTwoColumnBigImageLayoutTemplate(theme);
+    return await convertTwoColumnWithImageLayout(data as TwoColumnWithImageLayoutSchema, template, slideId);
   }
   if (data.type === SLIDE_LAYOUT_TYPE.MAIN_IMAGE) {
-    return await convertMainImage(data as MainImageLayoutSchema, viewport, theme, slideId);
+    const template = getMainImageLayoutTemplate(theme);
+    return await convertMainImageLayout(data as MainImageLayoutSchema, template, slideId);
   }
   if (data.type === SLIDE_LAYOUT_TYPE.TITLE) {
-    return await convertTitleSlide(data as TitleLayoutSchema, viewport, theme, slideId);
+    const template = getTitleLayoutTemplate(theme);
+    return await convertTitleLayout(data as TitleLayoutSchema, template, slideId);
   }
   if (data.type === SLIDE_LAYOUT_TYPE.TWO_COLUMN) {
-    return await convertTwoColumn(data as TwoColumnLayoutSchema, viewport, theme, slideId);
+    const template = getTwoColumnLayoutTemplate(theme);
+    return await convertTwoColumnLayout(data as TwoColumnLayoutSchema, template, slideId);
   }
   if (data.type === SLIDE_LAYOUT_TYPE.VERTICAL_LIST) {
-    return await convertVerticalList(data as VerticalListLayoutSchema, viewport, theme, slideId);
+    const template = getVerticalListLayoutTemplate(theme);
+    return await convertVerticalListLayout(data as VerticalListLayoutSchema, template, slideId);
   }
   if (data.type === SLIDE_LAYOUT_TYPE.HORIZONTAL_LIST) {
-    return await convertHorizontalList(data as HorizontalListLayoutSchema, viewport, theme, slideId);
+    const template = getHorizontalListLayoutTemplate(theme);
+    return await convertHorizontalListLayout(data as HorizontalListLayoutSchema, template, slideId);
   }
   if (data.type === SLIDE_LAYOUT_TYPE.TRANSITION) {
-    return await convertTransition(data as TransitionLayoutSchema, viewport, theme, slideId);
+    const template = getTransitionLayoutTemplate(theme);
+    return await convertTransitionLayout(data as TransitionLayoutSchema, template, slideId);
   }
   if (data.type === SLIDE_LAYOUT_TYPE.TABLE_OF_CONTENTS) {
-    return await convertTableOfContents(data as TableOfContentsLayoutSchema, viewport, theme, slideId);
+    const template = getTableOfContentsLayoutTemplate(theme);
+    return await convertTableOfContentsLayout(data as TableOfContentsLayoutSchema, template, slideId);
   }
   throw new Error('Unsupported layout type');
 };

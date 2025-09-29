@@ -1,8 +1,22 @@
 export * from './types';
-export { convertTwoColumnWithImage, convertTwoColumnWithBigImage } from './twoColumnWithImage';
-export { convertMainImage } from './mainImage';
-export { convertTitleSlide, convertTransition } from './title';
-export { convertTwoColumn } from './twoColumn';
-export { convertVerticalList } from './verticalList';
-export { convertHorizontalList } from './horizontalList';
-export { convertTableOfContents } from './tableOfContents';
+
+// Layout converters
+export { convertTwoColumnWithImageLayout } from './twoColumnWithImage';
+export { convertMainImageLayout } from './mainImage';
+export { convertTitleLayout, convertTransitionLayout } from './title';
+export { convertTwoColumnLayout } from './twoColumn';
+export { convertVerticalListLayout } from './verticalList';
+export { convertHorizontalListLayout } from './horizontalList';
+export { convertTableOfContentsLayout } from './tableOfContents';
+
+// Template configuration getters
+export {
+  getTwoColumnWithImageLayoutTemplate,
+  getTwoColumnBigImageLayoutTemplate,
+} from './twoColumnWithImage';
+export { getMainImageLayoutTemplate } from './mainImage';
+export { getTitleLayoutTemplate, getTransitionLayoutTemplate } from './title';
+export { getTwoColumnLayoutTemplate } from './twoColumn';
+export { getVerticalListLayoutTemplate } from './verticalList';
+export { getHorizontalListLayoutTemplate } from './horizontalList';
+export { getTableOfContentsLayoutTemplate } from './tableOfContents';

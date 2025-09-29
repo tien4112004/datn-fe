@@ -1,29 +1,71 @@
 import type { Slide, SlideTheme } from '@/types/slides';
-import { SlideLayoutCalculator, type SlideViewport, type ElementBounds } from '../slideLayout';
-import { calculateFontSizeForAvailableSpace, applyFontSizeToElements } from '../fontSizeCalculator';
-import { createItemElement } from '../htmlTextCreation';
-import { generateUniqueId } from '../utils';
-import {
-  createItemElementsWithStyles,
-  createTitlePPTElement,
-  calculateTitleLayout,
-  type ItemStyles,
-  createTitleLine,
-} from '../graphic';
+import { createTitleLine } from '../graphic';
 import type { TableOfContentsLayoutSchema, TwoColumnLayoutSchema } from './types';
-import { convertTwoColumn } from './twoColumn';
+import { convertTwoColumnLayout, getTwoColumnLayoutTemplate } from './twoColumn';
+import type { Bounds, TextLayoutBlockInstance, TemplateConfig, TextTemplateContainer } from '../types';
+import LayoutPrimitives from '../layoutPrimitives';
 
-export const convertTableOfContents = async (
+const SLIDE_WIDTH = 1000;
+const SLIDE_HEIGHT = 562.5;
+
+export const getTableOfContentsLayoutTemplate = (theme: SlideTheme): TemplateConfig => {
+  return {
+    containers: {
+      title: {
+        bounds: {
+          left: 15,
+          top: 15,
+          width: SLIDE_WIDTH - 30,
+          height: 100,
+        },
+        padding: { top: 0, bottom: 0, left: 40, right: 40 },
+        horizontalAlignment: 'center',
+        verticalAlignment: 'top',
+        text: {
+          color: theme.titleFontColor,
+          fontFamily: theme.titleFontName,
+          fontWeight: 'bold',
+          fontStyle: 'normal',
+        },
+      } satisfies TextTemplateContainer,
+      content: {
+        bounds: {
+          left: 60,
+          top: 155, // title height + spacing
+          width: SLIDE_WIDTH - 120, // leave margins
+          height: SLIDE_HEIGHT - 155 - 40, // remaining height with bottom margin
+        },
+        padding: { top: 0, bottom: 0, left: 0, right: 0 },
+        distribution: 'equal',
+        spacingBetweenItems: 25,
+        horizontalAlignment: 'left',
+        verticalAlignment: 'top',
+        text: {
+          color: theme.fontColor,
+          fontFamily: theme.fontName,
+          fontWeight: 'normal',
+          fontStyle: 'normal',
+        },
+      } satisfies TextTemplateContainer,
+    },
+    theme,
+  } satisfies TemplateConfig;
+};
+
+export const convertTableOfContentsLayout = async (
   data: TableOfContentsLayoutSchema,
-  viewport: SlideViewport,
-  theme: SlideTheme,
+  template: TemplateConfig,
   slideId?: string
-) => {
-  // Numbering
+): Promise<Slide> => {
+  // Add numbering to items
   const numberedItems = data.data.items.map((item, index) => `${index + 1}. ${item}`);
 
-  // If too many items, switch to two-column layout
-  if (numberedItems.length >= 8) {
+  // Determine if two columns are needed
+  const useTwoColumns = numberedItems.length >= 8;
+
+  // If too many items, delegate to two-column layout
+  if (useTwoColumns) {
+    const twoColumnTemplate = getTwoColumnLayoutTemplate(template.theme);
     const newData = {
       type: 'two_column',
       title: 'Contents',
@@ -33,74 +75,35 @@ export const convertTableOfContents = async (
       },
     } as TwoColumnLayoutSchema;
 
-    return await convertTwoColumn(newData, viewport, theme, slideId);
+    return await convertTwoColumnLayout(newData, twoColumnTemplate, slideId);
   }
 
-  // Initialize layout calculator
-  const layoutCalculator = new SlideLayoutCalculator(viewport.size, viewport.ratio, theme);
+  // Single column layout - merge template config with bounds
+  const titleInstance = {
+    ...template.containers.title,
+    ...template.containers.title.bounds,
+  } as TextLayoutBlockInstance;
+  const contentInstance = {
+    ...template.containers.content,
+    ...template.containers.content.bounds,
+  } as TextLayoutBlockInstance;
 
-  // Title "Contents"
-  const titleText = 'Contents';
-  const titleAvailableBlock = {
-    left: 0,
-    top: 15,
-    width: layoutCalculator.slideWidth,
-    height: 100,
-  };
-  const { titleContent, titleDimensions, titlePosition } = calculateTitleLayout(
-    titleText,
-    titleAvailableBlock,
-    layoutCalculator,
-    theme
+  const { titleContent, titleDimensions, titlePosition } = LayoutPrimitives.calculateTitleLayout(
+    'Contents',
+    titleInstance
   );
 
-  // Calculate available block for table of contents items
-  const tocContentBlock = {
-    left: 0,
-    top: titlePosition.top + titleDimensions.height + 40, // Position below title with spacing
-    width: layoutCalculator.slideWidth,
-    height: layoutCalculator.slideHeight - (titlePosition.top + titleDimensions.height) - 40,
-  };
+  // Create item elements using template
+  const itemElements = await LayoutPrimitives.createItemElementsWithStyles(numberedItems, contentInstance);
 
-  // Calculate unified styles for items using element-based approach
-  const tempItemElements4 = numberedItems.map((item) =>
-    createItemElement({
-      content: item,
-      fontSize: 20, // Initial size, will be optimized
-      lineHeight: 1.4,
-      fontFamily: theme.fontName,
-      color: theme.fontColor,
-    })
-  );
-  const contentStyles: ItemStyles = calculateFontSizeForAvailableSpace(
-    tempItemElements4,
-    tocContentBlock.width,
-    tocContentBlock.height,
-    viewport
-  );
-
-  // Apply the calculated styles to the temporary elements
-  applyFontSizeToElements(tempItemElements4, contentStyles);
-
-  // Create item elements for table of contents
-  const items = await createItemElementsWithStyles(
-    numberedItems,
-    tocContentBlock,
-    layoutCalculator,
-    theme,
-    contentStyles,
-    { alignment: 'top', leftMargin: 60 } // Increased left margin for better aesthetics
-  );
-
-  // Create slide elements
   const slide: Slide = {
-    id: slideId ?? generateUniqueId(),
+    id: slideId ?? crypto.randomUUID(),
     elements: [
-      createTitlePPTElement(
+      LayoutPrimitives.createTitlePPTElement(
         titleContent,
         { left: titlePosition.left, top: titlePosition.top },
         { width: titleDimensions.width, height: titleDimensions.height },
-        theme
+        titleInstance
       ),
       createTitleLine(
         {
@@ -108,10 +111,10 @@ export const convertTableOfContents = async (
           height: titleDimensions.height,
           left: titlePosition.left,
           top: titlePosition.top,
-        } as ElementBounds,
-        theme
+        } as Bounds,
+        template.theme
       ),
-      ...items,
+      ...itemElements,
     ],
   };
 

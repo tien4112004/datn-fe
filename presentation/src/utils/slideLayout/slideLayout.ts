@@ -48,6 +48,7 @@ export interface LayoutBlock extends Bounds {
 }
 
 /**
+ * @deprecated
  * Main class for slide layout calculations
  */
 export class SlideLayoutCalculator {

@@ -85,6 +85,7 @@ export interface PPTElementOutline {
   style?: LineStyleType;
   width?: number;
   color?: string;
+  borderRadius?: string;
 }
 
 export type ElementLinkType = 'web' | 'slide';

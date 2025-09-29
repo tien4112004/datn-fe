@@ -87,7 +87,7 @@ export const usePresentationDataProcessor = (
       };
       waitForApp();
     }
-  }, [presentation, app, isStreaming, isProcessing, getAiResult, updateSlides, setParsed]);
+  }, [presentation, app]);
 
   useEffect(() => {
     const execute = async () => {
@@ -108,7 +108,7 @@ export const usePresentationDataProcessor = (
       }
     };
     execute();
-  }, [isStreaming, streamedData, app, updateSlides, setParsed]);
+  }, [isStreaming, streamedData, app]);
 
   useEffect(() => {
     const generateImageListener = async (event: Event) => {

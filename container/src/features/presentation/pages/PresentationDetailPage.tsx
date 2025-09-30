@@ -8,7 +8,7 @@ import type { Presentation } from '../types';
 import usePresentationStore from '../stores/usePresentationStore';
 import { useAiResultById } from '../hooks/useApi';
 import { processGeneratedSlides } from '../utils';
-import { getDefaultPresentationTheme } from '../api/mock';
+import { getDefaultPresentationTheme } from '../utils';
 
 export interface MessageDetail {
   type: 'success' | 'error' | 'warning' | 'info' | string;
@@ -65,7 +65,7 @@ const DetailPage = () => {
 
         if (aiResult) {
           const processedSlides = await processGeneratedSlides(
-            aiResult,
+            aiResult.slides,
             { size: 1000, ratio: 9 / 16 },
             getDefaultPresentationTheme()
           );

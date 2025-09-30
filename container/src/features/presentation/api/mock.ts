@@ -10,30 +10,6 @@ import {
 } from '../types';
 import type { ApiResponse } from '@/types/api';
 import type { SlideData } from '../utils';
-import type { SlideTheme } from '../types/slide';
-
-/**
- * Default theme configuration for generated presentations
- */
-export const getDefaultPresentationTheme = (): SlideTheme => ({
-  backgroundColor: '#ffffff',
-  themeColors: ['#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6'],
-  fontColor: '#333333',
-  fontName: 'Roboto',
-  outline: {
-    style: 'solid',
-    width: 1,
-    color: '#cccccc',
-  },
-  shadow: {
-    h: 2,
-    v: 2,
-    blur: 4,
-    color: 'rgba(0, 0, 0, 0.1)',
-  },
-  titleFontColor: '#0A2540',
-  titleFontName: 'Roboto',
-});
 
 /**
  * Mock data for testing presentation generation
@@ -221,7 +197,20 @@ const mockOutlineItems: OutlineItem[] = [
   },
 ];
 
-let mockPresentationItems: Presentation[] = [];
+let mockPresentationItems: Presentation[] = [
+  {
+    id: 'ai123',
+    title: 'AI Generated Presentation',
+    slides: [
+      {
+        id: 'slide1',
+        elements: [],
+        background: { type: 'solid', color: '#ffffff' },
+      },
+    ],
+    isParsed: false,
+  },
+];
 
 const initMockPresentations = async () => {
   try {

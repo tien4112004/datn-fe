@@ -1,4 +1,3 @@
-import type { SlideTheme } from '@/types/slides';
 import { type SlideViewport } from './slideLayout';
 import {
   convertTwoColumnWithImage,
@@ -11,6 +10,7 @@ import {
   convertTransition,
   convertTableOfContents,
 } from './converters';
+import type { ExtendedSlideTheme } from './theme';
 
 // Export font size calculation utilities
 export {
@@ -24,7 +24,7 @@ export {
 // Export layout utilities
 export { SlideLayoutCalculator, type SlideViewport } from './slideLayout';
 
-export const convertToSlide = async (data: any, viewport: SlideViewport, theme: SlideTheme) => {
+export const convertToSlide = async (data: any, viewport: SlideViewport, theme: ExtendedSlideTheme) => {
   if (data.type === 'two_column_with_image') {
     return await convertTwoColumnWithImage(data, viewport, theme);
   }

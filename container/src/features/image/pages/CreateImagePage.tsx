@@ -27,7 +27,6 @@ const CreateImagePage = () => {
       imageModel: '',
       imageDimension: '',
       artStyle: '',
-      theme: '',
       negativePrompt: '',
     },
   });

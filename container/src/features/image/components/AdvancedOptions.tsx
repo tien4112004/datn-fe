@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 
 import { MODEL_TYPES, useModels } from '@/features/model';
 import { ModelSelect } from '@/shared/components/common/ModelSelect';
-import { IMAGE_DIMENSION_OPTIONS, ART_STYLE_OPTIONS, THEME_OPTIONS } from '@/features/image/types';
+import { IMAGE_DIMENSION_OPTIONS, ART_STYLE_OPTIONS } from '@/features/image/types';
 import type { CreateImageFormData } from '@/features/image/types';
 import type { Control, UseFormRegister, ControllerRenderProps } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
@@ -52,7 +52,7 @@ const AdvancedOptions = ({ register, control, isOpen, onToggle }: AdvancedOption
             style={{ overflow: 'hidden' }}
           >
             <div className="mt-4 space-y-4 px-1">
-              {/* 2x2 Grid for Dropdowns */}
+              {/* 1x2 Grid for Model and Art Style */}
               <div className="grid grid-cols-2 gap-4">
                 {/* Image Models */}
                 <div className="space-y-2">
@@ -74,33 +74,6 @@ const AdvancedOptions = ({ register, control, isOpen, onToggle }: AdvancedOption
                         isLoading={isLoading}
                         isError={isError}
                       />
-                    )}
-                  />
-                </div>
-
-                {/* Image Dimension */}
-                <div className="space-y-2">
-                  <Label>{t('imageDimension')}</Label>
-                  <Controller
-                    name="imageDimension"
-                    control={control}
-                    render={({
-                      field,
-                    }: {
-                      field: ControllerRenderProps<CreateImageFormData, 'imageDimension'>;
-                    }) => (
-                      <Select value={field.value} onValueChange={field.onChange} defaultValue="">
-                        <SelectTrigger>
-                          <SelectValue placeholder={t('imageDimensionPlaceholder')} />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {IMAGE_DIMENSION_OPTIONS.map((opt) => (
-                            <SelectItem key={opt.value} value={opt.value}>
-                              {t(`dimensions.${opt.labelKey}`)}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
                     )}
                   />
                 </div>
@@ -131,29 +104,63 @@ const AdvancedOptions = ({ register, control, isOpen, onToggle }: AdvancedOption
                     )}
                   />
                 </div>
+              </div>
 
-                {/* Theme */}
-                <div className="space-y-2">
-                  <Label>{t('theme')}</Label>
-                  <Controller
-                    name="theme"
-                    control={control}
-                    render={({ field }: { field: ControllerRenderProps<CreateImageFormData, 'theme'> }) => (
-                      <Select value={field.value} onValueChange={field.onChange} defaultValue="">
-                        <SelectTrigger>
-                          <SelectValue placeholder={t('themePlaceholder')} />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {THEME_OPTIONS.map((opt) => (
-                            <SelectItem key={opt.value} value={opt.value}>
-                              {t(`themes.${opt.labelKey}`)}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    )}
-                  />
-                </div>
+              {/* Image Dimensions - Full Width Visual Options */}
+              <div className="space-y-3">
+                <Label>{t('imageDimension')}</Label>
+                <Controller
+                  name="imageDimension"
+                  control={control}
+                  render={({
+                    field,
+                  }: {
+                    field: ControllerRenderProps<CreateImageFormData, 'imageDimension'>;
+                  }) => (
+                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+                      {IMAGE_DIMENSION_OPTIONS.map((opt) => {
+                        const [width, height] = opt.value.split('x').map(Number);
+                        const aspectRatio = width / height;
+                        const isSelected = field.value === opt.value;
+
+                        return (
+                          <div
+                            key={opt.value}
+                            className={`relative cursor-pointer rounded-lg border-2 p-3 transition-all duration-200 hover:shadow-md ${
+                              isSelected
+                                ? 'border-primary bg-primary/5 shadow-sm'
+                                : 'border-border hover:border-primary/50'
+                            } `}
+                            onClick={() => field.onChange(opt.value)}
+                          >
+                            {/* Visual representation of aspect ratio */}
+                            <div className="mb-2 flex items-center justify-center">
+                              <div
+                                className={`rounded border-2 transition-colors ${isSelected ? 'border-primary bg-primary/10' : 'border-muted-foreground/40 bg-muted/30'} `}
+                                style={{
+                                  width: aspectRatio >= 1 ? '40px' : `${40 * aspectRatio}px`,
+                                  height: aspectRatio >= 1 ? `${40 / aspectRatio}px` : '40px',
+                                }}
+                              />
+                            </div>
+
+                            {/* Dimension text */}
+                            <div className="text-center">
+                              <div
+                                className={`text-sm font-medium ${isSelected ? 'text-primary' : 'text-foreground'}`}
+                              >
+                                {t(`dimensions.${opt.labelKey}`)}
+                              </div>
+                              <div className="text-muted-foreground text-xs">
+                                {aspectRatio > 1 ? 'Landscape' : aspectRatio < 1 ? 'Portrait' : 'Square'}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                />
               </div>
 
               {/* Negative Prompt */}

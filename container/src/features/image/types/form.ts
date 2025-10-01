@@ -3,6 +3,5 @@ export interface CreateImageFormData {
   imageModel: string;
   imageDimension: string;
   artStyle: string;
-  theme: string;
   negativePrompt: string;
 }

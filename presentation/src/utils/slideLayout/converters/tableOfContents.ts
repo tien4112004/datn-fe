@@ -16,7 +16,8 @@ import { convertTwoColumn } from './twoColumn';
 export const convertTableOfContents = async (
   data: TableOfContentsLayoutSchema,
   viewport: SlideViewport,
-  theme: SlideTheme
+  theme: SlideTheme,
+  slideId?: string
 ) => {
   // Numbering
   const numberedItems = data.data.items.map((item, index) => `${index + 1}. ${item}`);
@@ -32,7 +33,7 @@ export const convertTableOfContents = async (
       },
     } as TwoColumnLayoutSchema;
 
-    return await convertTwoColumn(newData, viewport, theme);
+    return await convertTwoColumn(newData, viewport, theme, slideId);
   }
 
   // Initialize layout calculator
@@ -93,7 +94,7 @@ export const convertTableOfContents = async (
 
   // Create slide elements
   const slide: Slide = {
-    id: generateUniqueId(),
+    id: slideId ?? generateUniqueId(),
     elements: [
       createTitlePPTElement(
         titleContent,

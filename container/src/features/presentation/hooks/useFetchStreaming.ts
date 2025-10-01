@@ -1,18 +1,41 @@
 import splitMarkdownToOutlineItems from '@/features/presentation/utils/splitMarkdownToOutlineItems';
 import { usePresentationApiService } from '@/features/presentation/api';
-import type { OutlineItem, OutlineData } from '@/features/presentation/types';
+import type {
+  OutlineItem,
+  OutlineData,
+  PresentationGenerationRequest,
+  AiResultSlide,
+} from '@/features/presentation/types';
 import useStreaming from '@/hooks/useStreaming';
 
-function useFetchStreamingOutline(initialRequestData: OutlineData, options?: { enabled?: boolean }) {
+function useFetchStreamingOutline(initialRequestData: OutlineData, options?: { manual?: boolean }) {
   const presentationApiService = usePresentationApiService();
 
   return useStreaming<OutlineData, OutlineItem[]>({
     extractFn: presentationApiService.getStreamedOutline.bind(presentationApiService),
-    transformFn: splitMarkdownToOutlineItems,
+    transformFn: (data) => {
+      const combinedData = data.join('');
+      return splitMarkdownToOutlineItems(combinedData);
+    },
     input: initialRequestData,
     queryKey: [presentationApiService.getType(), 'presentationOutline'],
-    enabled: options?.enabled ?? true,
+    manual: options?.manual ?? true,
   });
 }
 
+function useFetchStreamingPresentation(initialRequestData: PresentationGenerationRequest) {
+  const presentationApiService = usePresentationApiService();
+
+  return useStreaming<PresentationGenerationRequest, AiResultSlide[], { presentationId: string }>({
+    extractFn: presentationApiService.getStreamedPresentation.bind(presentationApiService),
+    transformFn: (slides) => {
+      return slides.map((slide, index) => ({ result: JSON.parse(slide), order: index }));
+    },
+    input: initialRequestData,
+    queryKey: [presentationApiService.getType(), 'presentationGeneration'],
+    manual: true,
+  });
+}
+
+export { useFetchStreamingPresentation };
 export default useFetchStreamingOutline;

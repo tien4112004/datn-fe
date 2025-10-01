@@ -1,29 +1,54 @@
 import type { Service } from '@/shared/api';
 import type { OutlineItem, OutlineData } from './outline';
-import type { Presentation, PresentationCollectionRequest } from './presentation';
+import type { Presentation, PresentationCollectionRequest, SlideLayoutSchema } from './presentation';
 import type { ApiResponse } from '@/types/api';
+import type { Slide } from './slide';
 
 export interface PresentationGenerationRequest {
   outline: string;
   theme?: string;
   contentLength?: string;
   imageModel?: string;
+  model: {
+    name: string;
+    provider: string;
+  };
+  slideCount: number;
+  language: string;
 }
 
 export interface PresentationGenerationResponse {
-  aiResult: any;
+  aiResult: SlideLayoutSchema[];
   presentation: Presentation;
 }
 
 export interface PresentationApiService extends Service {
+  /**
+   * @deprecated
+   */
   getPresentationItems(): Promise<Presentation[]>;
+  /**
+   * @deprecated
+   */
   getOutlineItems(): Promise<OutlineItem[]>;
-  // getStreamedOutline(request: OutlinePromptRequest, signal: AbortSignal): Promise<ReadableStream<Uint8Array>>;
-  getStreamedOutline(request: OutlineData, signal: AbortSignal): AsyncIterable<string>;
+  getStreamedOutline(request: OutlineData, signal: AbortSignal): Promise<{ stream: AsyncIterable<string> }>;
   getPresentations(request: PresentationCollectionRequest): Promise<ApiResponse<Presentation[]>>;
   createPresentation(data: Presentation): Promise<Presentation>;
   getPresentationById(id: string): Promise<Presentation | null>;
-  getAiResultById(id: string): Promise<any>;
+  getAiResultById(id: string): Promise<SlideLayoutSchema[]>;
   generatePresentation(request: PresentationGenerationRequest): Promise<PresentationGenerationResponse>;
   updatePresentationTitle(id: string, name: string): Promise<any | null>;
+  getStreamedPresentation(
+    request: PresentationGenerationRequest,
+    signal: AbortSignal
+  ): Promise<{ presentationId: string; stream: AsyncIterable<string> }>;
+  upsertPresentationSlide(id: string, slide: Slide): Promise<Presentation>;
+  setPresentationAsParsed(id: string): Promise<Presentation>;
+  generatePresentationImage(
+    id: string,
+    slideId: string,
+    elementId: string,
+    prompt: string,
+    style: string
+  ): Promise<string>;
 }

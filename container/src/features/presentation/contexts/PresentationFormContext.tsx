@@ -1,5 +1,5 @@
 import { getLocalStorageData } from '@/shared/lib/utils';
-import { createContext, useContext, useMemo, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useMemo, type ReactNode } from 'react';
 import {
   useForm,
   type Control,
@@ -9,15 +9,17 @@ import {
   type UseFormGetValues,
 } from 'react-hook-form';
 import useFormPersist from 'react-hook-form-persist';
+import { moduleMap, moduleMethodMap } from '../components/remote/module';
 
 export type UnifiedFormData = {
   // Outline fields
   topic: string;
   slideCount: number;
   language: string;
-  model: string;
-  targetAge: string;
-  learningObjective: string;
+  model: {
+    name: string;
+    provider: string;
+  };
   // Customization fields
   theme: string;
   contentLength: string;
@@ -48,9 +50,10 @@ export const PresentationFormProvider = ({ children }: PresentationFormProviderP
       topic: '',
       slideCount: 10,
       language: 'en',
-      model: '',
-      targetAge: '7-10',
-      learningObjective: 'Help student understand the topic',
+      model: {
+        name: '',
+        provider: '',
+      },
       theme: '',
       contentLength: '',
       imageModel: '',
@@ -65,6 +68,12 @@ export const PresentationFormProvider = ({ children }: PresentationFormProviderP
     storage: window.localStorage,
     exclude: [],
   });
+
+  useEffect(() => {
+    moduleMap.editor();
+    moduleMap.thumbnail();
+    moduleMethodMap.convertToSlide();
+  }, []);
 
   const contextValue: PresentationFormContextValue = {
     control: form.control,

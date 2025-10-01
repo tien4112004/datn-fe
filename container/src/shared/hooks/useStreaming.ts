@@ -2,32 +2,35 @@ import { experimental_streamedQuery as streamedQuery, useQuery, useQueryClient }
 import React, { useCallback } from 'react';
 
 export interface StreamingOptions<TRequest, TProcessed> {
-  extractFn: (request: TRequest, signal: AbortSignal) => AsyncIterable<string>;
-  transformFn: (content: string) => TProcessed;
+  extractFn: (request: TRequest, signal: AbortSignal) => Promise<{ stream: AsyncIterable<string> }>;
+  transformFn: (content: string[]) => TProcessed;
   input: TRequest;
   queryKey: string[];
-  enabled?: boolean;
+  manual?: boolean;
 }
 
-export interface StreamingHookReturn<TRequest, TProcessed> {
+export interface StreamingHookReturn<TRequest, TProcessed, TExtractResult> {
   processedData: TProcessed;
   isStreaming: boolean;
   error: string | null;
   restartStream: (requestData: TRequest) => void;
   stopStream: () => void;
   clearContent: () => void;
-  fetch: () => void;
+  fetch: (request?: TRequest) => void;
+  result?: TExtractResult;
 }
 
-function useStreaming<TRequest = any, TProcessed = any>({
+function useStreaming<TRequest = any, TProcessed = any, TExtractResult = any>({
   extractFn,
   transformFn,
   input,
   queryKey,
-  enabled = true,
-}: StreamingOptions<TRequest, TProcessed>): StreamingHookReturn<TRequest, TProcessed> {
-  const [isStreamingInternal, setIsStreamingInternal] = React.useState(enabled);
+  manual = false,
+}: StreamingOptions<TRequest, TProcessed>): StreamingHookReturn<TRequest, TProcessed, TExtractResult> {
+  const [shouldStream, setShouldStream] = React.useState(!manual);
   const requestData = React.useRef<TRequest>(input);
+  const [result, setExtractResult] = React.useState<TExtractResult>();
+
   const queryClient = useQueryClient();
 
   const {
@@ -38,29 +41,35 @@ function useStreaming<TRequest = any, TProcessed = any>({
   } = useQuery({
     queryKey: [...queryKey, requestData],
     queryFn: streamedQuery({
-      queryFn: ({ signal }) => extractFn(requestData.current, signal),
+      queryFn: async ({ signal }) => {
+        const { stream, ...rest } = await extractFn(requestData.current, signal);
+        setExtractResult(rest as TExtractResult);
+        return stream;
+      },
     }),
     staleTime: Infinity,
-    enabled: isStreamingInternal,
+    enabled: shouldStream,
   });
 
-  const fetch = useCallback(() => {
-    if (!isStreamingInternal) {
-      setIsStreamingInternal(true);
+  const fetch = useCallback(
+    (request?: TRequest) => {
+      if (request) {
+        requestData.current = request;
+      }
+      setShouldStream(true);
       refetch();
-    }
-  }, [refetch]);
+    },
+    [shouldStream, refetch]
+  );
 
   const stopStream = useCallback(() => {
-    if (isStreamingInternal) {
-      queryClient.cancelQueries({ queryKey: [...queryKey, requestData] });
-    }
-    setIsStreamingInternal(false);
-  }, []);
+    queryClient.cancelQueries({ queryKey: [...queryKey, requestData] });
+    setShouldStream(false);
+  }, [queryClient, queryKey]);
 
   const restartStream = useCallback((data: TRequest) => {
     requestData.current = data;
-    setIsStreamingInternal(true);
+    setShouldStream(true);
     refetch();
   }, []);
 
@@ -68,7 +77,7 @@ function useStreaming<TRequest = any, TProcessed = any>({
     queryClient.setQueryData([...queryKey, requestData], null);
   }, []);
 
-  const processedData = transformFn(data?.join('') ?? '');
+  const processedData = transformFn(data || []);
 
   return {
     processedData,
@@ -78,6 +87,7 @@ function useStreaming<TRequest = any, TProcessed = any>({
     stopStream,
     clearContent,
     fetch,
+    result,
   };
 }
 

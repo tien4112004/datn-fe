@@ -150,7 +150,6 @@ export const useSlidesStore = defineStore('slides', {
 
     setSlides(slides: Slide[]) {
       this.slides = slides;
-      console.log(this.slides.values);
     },
 
     setTemplates(templates: SlideTemplate[]) {

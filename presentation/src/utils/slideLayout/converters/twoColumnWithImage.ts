@@ -21,7 +21,8 @@ import type { TwoColumnWithImageLayoutSchema } from './types';
 export const convertTwoColumnWithImage = async (
   data: TwoColumnWithImageLayoutSchema,
   viewport: SlideViewport,
-  theme: SlideTheme
+  theme: SlideTheme,
+  slideId?: string
 ) => {
   // Initialize layout calculator
   const layoutCalculator = new SlideLayoutCalculator(viewport.size, viewport.ratio, theme);
@@ -93,7 +94,7 @@ export const convertTwoColumnWithImage = async (
 
   // Create slide elements
   const slide: Slide = {
-    id: generateUniqueId(),
+    id: slideId ?? generateUniqueId(),
     elements: [
       createTitlePPTElement(
         titleContent,
@@ -131,7 +132,8 @@ export const convertTwoColumnWithImage = async (
 export const convertTwoColumnWithBigImage = async (
   data: TwoColumnWithImageLayoutSchema,
   viewport: SlideViewport,
-  theme: SlideTheme
+  theme: SlideTheme,
+  slideId?: string
 ) => {
   // Initialize layout calculator
   const layoutCalculator = new SlideLayoutCalculator(viewport.size, viewport.ratio, theme);
@@ -206,7 +208,7 @@ export const convertTwoColumnWithBigImage = async (
 
   // Create slide elements
   const slide: Slide = {
-    id: generateUniqueId(),
+    id: slideId ?? generateUniqueId(),
     elements: [
       createTitlePPTElement(
         titleContent,

@@ -7,15 +7,370 @@ import {
   type PresentationCollectionRequest,
   type PresentationGenerationRequest,
   type PresentationGenerationResponse,
+  type SlideLayoutSchema,
 } from '../types';
 import type { ApiResponse } from '@/types/api';
-import type { SlideData } from '../utils';
+import type { Slide, SlideTheme } from '../types/slide';
+
+/**
+ * Default theme configuration for generated presentations
+ */
+export const getDefaultPresentationTheme = (): SlideTheme => ({
+  backgroundColor: '#ffffff',
+  themeColors: ['#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6'],
+  fontColor: '#333333',
+  fontName: 'Roboto',
+  outline: {
+    style: 'solid',
+    width: 1,
+    color: '#cccccc',
+  },
+  shadow: {
+    h: 2,
+    v: 2,
+    blur: 4,
+    color: 'rgba(0, 0, 0, 0.1)',
+  },
+  titleFontColor: '#0A2540',
+  titleFontName: 'Roboto',
+});
 
 /**
  * Mock data for testing presentation generation
- * This matches the structure from the original handleClick function
  */
-export const getMockSlideData = (): SlideData[] => [
+export const getMockSlideData = (): SlideLayoutSchema[] => mockSlideData;
+
+let mockPresentationItems: Presentation[] = [
+  {
+    id: 'ai123',
+    title: 'Not Parsed Presentation 1',
+    slides: [
+      {
+        id: 'slide1',
+        elements: [],
+        background: { type: 'solid', color: '#ffffff' },
+      },
+    ],
+    isParsed: false,
+  },
+];
+
+const initMockPresentations = async () => {
+  try {
+    const responses = await Promise.all([
+      fetch('/data/presentation.json'),
+      fetch('/data/presentation2.json'),
+    ]);
+    const presentations = await Promise.all(responses.map((res) => res.json()));
+    for (let i = 0; i < 20; i++) {
+      presentations.forEach((p, idx) => {
+        mockPresentationItems.push({
+          ...p,
+          id: `${p.id || idx}-${i}`,
+          title: p.title ? `${p.title} (${i + 1})` : `Presentation ${i + 1}`,
+        });
+      });
+    }
+  } catch (error) {
+    console.warn('Failed to load mock presentation data:', error);
+  }
+};
+
+// Only initialize in non-test environments
+if (typeof process === 'undefined' || process.env.NODE_ENV !== 'test') {
+  initMockPresentations();
+}
+
+export default class PresentationMockService implements PresentationApiService {
+  baseUrl: string;
+
+  constructor(baseUrl: string = '') {
+    this.baseUrl = baseUrl;
+  }
+
+  generatePresentationImage(
+    _id: string,
+    _slideId: string,
+    _elementId: string,
+    _prompt: string,
+    _style: string
+  ): Promise<string> {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        // Return a mock image URL
+        resolve('https://images.pexels.com/photos/33728147/pexels-photo-33728147.jpeg');
+      }, 1000);
+    });
+  }
+
+  async setPresentationAsParsed(id: string): Promise<Presentation> {
+    // Simulate API delay
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
+    const presentationIndex = mockPresentationItems.findIndex((item) => item.id === id);
+
+    if (presentationIndex === -1) {
+      throw new Error(`Presentation with id ${id} not found`);
+    }
+
+    const presentation = mockPresentationItems[presentationIndex];
+
+    const updatedPresentation = {
+      ...presentation,
+      isParsed: true,
+      updatedAt: new Date().toISOString(),
+    };
+
+    // Update the mock data
+    mockPresentationItems[presentationIndex] = updatedPresentation;
+
+    return updatedPresentation;
+  }
+
+  async upsertPresentationSlide(id: string, slide: Slide): Promise<Presentation> {
+    // Simulate API delay
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
+    const presentationIndex = mockPresentationItems.findIndex((item) => item.id === id);
+
+    if (presentationIndex === -1) {
+      throw new Error(`Presentation with id ${id} not found`);
+    }
+
+    const presentation = mockPresentationItems[presentationIndex];
+    const slides = [...(presentation.slides || [])];
+
+    // Upsert
+    const slideIndex = slides.findIndex((s) => s.id === slide.id);
+    if (slideIndex === -1) {
+      slides.push(slide);
+    } else {
+      slides[slideIndex] = slide;
+    }
+
+    const updatedPresentation = {
+      ...presentation,
+      slides: slides,
+      updatedAt: new Date().toISOString(),
+      isParsed: true,
+    };
+
+    // Update the mock data
+    mockPresentationItems[presentationIndex] = updatedPresentation;
+
+    return updatedPresentation;
+  }
+
+  async getAiResultById(id: string): Promise<SlideLayoutSchema[]> {
+    // Simulate API delay
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    if (id === 'ai123') {
+      return getMockSlideData();
+    } else {
+      return [];
+    }
+  }
+
+  async getStreamedOutline(
+    _request: OutlineData,
+    signal: AbortSignal
+  ): Promise<{ stream: AsyncIterable<string> }> {
+    const chunks = mockOutlineOutput.split(' ');
+
+    const stream = {
+      async *[Symbol.asyncIterator]() {
+        for (const chunk of chunks) {
+          if (signal.aborted) {
+            return;
+          }
+
+          yield chunk + ' ';
+          await new Promise((resolve) => setTimeout(resolve, 50));
+        }
+      },
+    };
+
+    return { stream };
+  }
+
+  async getStreamedPresentation(
+    _request: PresentationGenerationRequest,
+    signal: AbortSignal
+  ): Promise<{ presentationId: string; stream: AsyncIterable<string> }> {
+    const presentationId = crypto.randomUUID();
+    const mockSlides = getMockSlideData();
+
+    // Create and append new presentation to the mock list
+    const newPresentation: Presentation = {
+      id: presentationId,
+      title: `Streamed Presentation`,
+      slides: [],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      isParsed: false,
+    };
+
+    // Add the new presentation to the mock list
+    mockPresentationItems = [{ ...newPresentation }, ...mockPresentationItems];
+
+    const stream = {
+      async *[Symbol.asyncIterator]() {
+        // Stream each slide as a separate JSON block
+        for (const slide of mockSlides) {
+          if (signal.aborted) {
+            return;
+          }
+
+          const jsonBlock = `${JSON.stringify({ ...slide }, null, 2)}`;
+          yield jsonBlock;
+          await new Promise((resolve) => setTimeout(resolve, 500));
+        }
+      },
+    };
+
+    return {
+      presentationId,
+      stream,
+    };
+  }
+
+  getType(): ApiMode {
+    return API_MODE.mock;
+  }
+
+  /**
+   * @deprecated
+   */
+  async getPresentationItems(): Promise<Presentation[]> {
+    return new Promise((resolve) => {
+      setTimeout(() => resolve([...mockPresentationItems]), 500);
+    });
+  }
+
+  /**
+   * @deprecated
+   */
+  async getOutlineItems(): Promise<OutlineItem[]> {
+    return new Promise((resolve) => {
+      setTimeout(() => resolve([...mockOutlineItems]), 500);
+    });
+  }
+
+  async createPresentation(data: Presentation): Promise<Presentation> {
+    return new Promise((resolve) => {
+      const id = String(Date.now());
+      mockPresentationItems.push({ ...data, id });
+      setTimeout(() => resolve({ ...data, id }), 500);
+    });
+  }
+
+  async getPresentationById(id: string): Promise<Presentation | null> {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const presentation = mockPresentationItems.find((item) => item.id === id) || null;
+        resolve(presentation);
+      }, 500);
+    });
+  }
+
+  getPresentations(request: PresentationCollectionRequest): Promise<ApiResponse<Presentation[]>> {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const page = request.page ?? 0;
+        const pageSize = request.pageSize ?? 10;
+        const start = page * pageSize;
+        const end = start + pageSize;
+        const pagedItems = mockPresentationItems.slice(start, end);
+
+        resolve({
+          data: pagedItems,
+          success: true,
+          message: 'Mock presentations fetched successfully',
+          code: 200,
+          pagination: {
+            currentPage: page,
+            pageSize,
+            totalItems: mockPresentationItems.length,
+            totalPages: Math.ceil(mockPresentationItems.length / pageSize),
+          },
+        });
+      }, 500);
+    });
+  }
+
+  async generatePresentation(_: PresentationGenerationRequest): Promise<PresentationGenerationResponse> {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const mockSlides = getMockSlideData();
+        const presentation = {
+          id: crypto.randomUUID(),
+          title: `Generated Presentation`,
+          slides: [
+            {
+              id: crypto.randomUUID(),
+              elements: [],
+              background: {
+                type: 'solid' as const,
+                color: '#ffffff',
+              },
+            },
+          ],
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          isParsed: false,
+        };
+
+        // Add the new presentation to the mock list
+        mockPresentationItems = [{ ...presentation }, ...mockPresentationItems];
+
+        const responses: PresentationGenerationResponse = {
+          aiResult: mockSlides,
+          presentation: presentation,
+        };
+
+        resolve(responses);
+      }, 1000);
+    });
+  }
+
+  async updatePresentationTitle(id: string, name: string): Promise<any | null> {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const index = mockPresentationItems.findIndex((item) => item.id === id);
+        if (index !== -1) {
+          const isSuccess = Math.random() > 0.5;
+
+          if (isSuccess) {
+            mockPresentationItems[index].title = name;
+            resolve(null);
+          } else {
+            resolve({
+              success: false,
+              message: 'Duplicated',
+              code: 409,
+              errorCode: 'CONFLICT',
+              timestamp: Date.now(),
+            });
+          }
+        } else {
+          resolve({
+            success: false,
+            message: 'Presentation not found',
+            code: 404,
+            errorCode: 'NOT_FOUND',
+            timestamp: Date.now(),
+          });
+        }
+      }, 500);
+    });
+  }
+}
+
+/**
+ * Mock slide data for testing
+ */
+const mockSlideData: SlideLayoutSchema[] = [
   {
     type: 'title',
     data: {
@@ -63,8 +418,8 @@ export const getMockSlideData = (): SlideData[] => [
   },
   {
     type: 'two_column',
+    title: 'this is a title',
     data: {
-      title: 'this is a title',
       items1: [
         'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
         'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
@@ -196,205 +551,3 @@ const mockOutlineItems: OutlineItem[] = [
       Exploring server-side technologies including Node.js, Python, and database management systems.`,
   },
 ];
-
-let mockPresentationItems: Presentation[] = [
-  {
-    id: 'ai123',
-    title: 'AI Generated Presentation',
-    slides: [
-      {
-        id: 'slide1',
-        elements: [],
-        background: { type: 'solid', color: '#ffffff' },
-      },
-    ],
-    isParsed: false,
-  },
-];
-
-const initMockPresentations = async () => {
-  try {
-    const responses = await Promise.all([
-      fetch('/data/presentation.json'),
-      fetch('/data/presentation2.json'),
-    ]);
-    const presentations = await Promise.all(responses.map((res) => res.json()));
-    for (let i = 0; i < 20; i++) {
-      presentations.forEach((p, idx) => {
-        mockPresentationItems.push({
-          ...p,
-          id: `${p.id || idx}-${i}`,
-          title: p.title ? `${p.title} (${i + 1})` : `Presentation ${i + 1}`,
-        });
-      });
-    }
-  } catch (error) {
-    console.warn('Failed to load mock presentation data:', error);
-  }
-};
-
-// Only initialize in non-test environments
-if (typeof process === 'undefined' || process.env.NODE_ENV !== 'test') {
-  initMockPresentations();
-}
-
-export default class PresentationMockService implements PresentationApiService {
-  baseUrl: string;
-
-  constructor(baseUrl: string = '') {
-    this.baseUrl = baseUrl;
-  }
-
-  async getAiResultById(id: string): Promise<any> {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        if (id === 'ai123') {
-          const slideData = {
-            slides: getMockSlideData(),
-          };
-          resolve(slideData);
-        } else {
-          reject(new Error(`AI result not found for id: ${id}`));
-        }
-      }, 500);
-    });
-  }
-
-  async *getStreamedOutline(_request: OutlineData, signal: AbortSignal): AsyncGenerator<string> {
-    const chunks = mockOutlineOutput.split(' ');
-
-    for (const chunk of chunks) {
-      if (signal.aborted) {
-        return;
-      }
-
-      yield chunk + ' ';
-      await new Promise((resolve) => setTimeout(resolve, 50));
-    }
-  }
-
-  getType(): ApiMode {
-    return API_MODE.mock;
-  }
-
-  async getPresentationItems(): Promise<Presentation[]> {
-    return new Promise((resolve) => {
-      setTimeout(() => resolve([...mockPresentationItems]), 500);
-    });
-  }
-
-  async getOutlineItems(): Promise<OutlineItem[]> {
-    return new Promise((resolve) => {
-      setTimeout(() => resolve([...mockOutlineItems]), 500);
-    });
-  }
-
-  async createPresentation(data: Presentation): Promise<Presentation> {
-    return new Promise((resolve) => {
-      const id = String(Date.now());
-      mockPresentationItems.push({ ...data, id, isParsed: true });
-      setTimeout(() => resolve({ ...data, id, isParsed: true }), 500);
-    });
-  }
-
-  async getPresentationById(id: string): Promise<Presentation | null> {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const presentation = mockPresentationItems.find((item) => item.id === id) || null;
-        resolve(presentation);
-      }, 500);
-    });
-  }
-
-  getPresentations(request: PresentationCollectionRequest): Promise<ApiResponse<Presentation[]>> {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const page = request.page ?? 0;
-        const pageSize = request.pageSize ?? 10;
-        const start = page * pageSize;
-        const end = start + pageSize;
-        const pagedItems = mockPresentationItems.slice(start, end);
-
-        resolve({
-          data: pagedItems,
-          success: true,
-          message: 'Mock presentations fetched successfully',
-          code: 200,
-          pagination: {
-            currentPage: page,
-            pageSize,
-            totalItems: mockPresentationItems.length,
-            totalPages: Math.ceil(mockPresentationItems.length / pageSize),
-          },
-        });
-      }, 500);
-    });
-  }
-
-  async generatePresentation(_: PresentationGenerationRequest): Promise<PresentationGenerationResponse> {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const mockSlides = getMockSlideData();
-        const presentation = {
-          id: crypto.randomUUID(),
-          title: `Generated Presentation`,
-          slides: [
-            {
-              id: crypto.randomUUID(),
-              elements: [],
-              background: {
-                type: 'solid' as const,
-                color: '#ffffff',
-              },
-            },
-          ],
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-          isParsed: false,
-        };
-
-        // Add the new presentation to the mock list
-        mockPresentationItems = [{ ...presentation }, ...mockPresentationItems];
-
-        const responses: PresentationGenerationResponse = {
-          aiResult: mockSlides,
-          presentation: presentation,
-        };
-
-        resolve(responses);
-      }, 1000);
-    });
-  }
-
-  async updatePresentationTitle(id: string, name: string): Promise<any | null> {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const index = mockPresentationItems.findIndex((item) => item.id === id);
-        if (index !== -1) {
-          const isSuccess = Math.random() > 0.5;
-
-          if (isSuccess) {
-            mockPresentationItems[index].title = name;
-            resolve(null);
-          } else {
-            resolve({
-              success: false,
-              message: 'Duplicated',
-              code: 409,
-              errorCode: 'CONFLICT',
-              timestamp: Date.now(),
-            });
-          }
-        } else {
-          resolve({
-            success: false,
-            message: 'Presentation not found',
-            code: 404,
-            errorCode: 'NOT_FOUND',
-            timestamp: Date.now(),
-          });
-        }
-      }, 500);
-    });
-  }
-}

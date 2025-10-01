@@ -9,7 +9,8 @@ import type { TitleLayoutSchema, TransitionLayoutSchema } from './types';
 export const convertTitleSlide = async (
   data: TitleLayoutSchema,
   viewport: SlideViewport,
-  theme: SlideTheme
+  theme: SlideTheme,
+  slideId?: string
 ) => {
   // Initialize layout calculator
   const layoutCalculator = new SlideLayoutCalculator(viewport.size, viewport.ratio, theme);
@@ -111,7 +112,7 @@ export const convertTitleSlide = async (
   }
 
   const slide: Slide = {
-    id: generateUniqueId(),
+    id: slideId ?? generateUniqueId(),
     elements,
   };
   return slide;
@@ -120,7 +121,8 @@ export const convertTitleSlide = async (
 export const convertTransition = async (
   data: TransitionLayoutSchema,
   viewport: SlideViewport,
-  theme: SlideTheme
+  theme: SlideTheme,
+  slideId?: string
 ) => {
-  return await convertTitleSlide(data, viewport, theme);
+  return await convertTitleSlide(data, viewport, theme, slideId);
 };

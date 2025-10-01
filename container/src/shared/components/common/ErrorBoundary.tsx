@@ -5,24 +5,28 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import ErrorPage from '@/shared/pages/ErrorPage';
+import { ERROR_TYPE } from '@/shared/constants';
+import NotFoundPage from '@/shared/pages/NotFoundPage';
 import { toast } from 'sonner';
 
 interface ErrorBoundaryState {
   hasError: boolean;
-  error: Error | null;
+  error: AppError | null;
   errorInfo: React.ErrorInfo | null;
   errorId: string | null;
+  pathname: string | null;
 }
 
 interface ErrorBoundaryProps {
   children: ReactNode;
   fallback?: React.ComponentType<ErrorFallbackProps>;
-  onError?: (error: Error, errorInfo: React.ErrorInfo, errorId: string) => void;
+  onError?: (error: AppError, errorInfo: React.ErrorInfo, errorId: string) => void;
   showDetails?: boolean;
+  pathname?: string;
 }
 
 interface ErrorFallbackProps {
-  error: Error;
+  error: AppError;
   errorInfo: React.ErrorInfo | null;
   resetError: () => void;
   errorId: string;
@@ -38,13 +42,17 @@ const ErrorPageFallback: React.FC<ErrorFallbackProps> = ({
 }) => {
   return (
     <div className="bg-background flex min-h-screen w-screen flex-col">
-      <ErrorPage
-        error={error}
-        errorInfo={errorInfo}
-        resetError={resetError}
-        errorId={errorId}
-        showDetails={showDetails}
-      />
+      {error.type === ERROR_TYPE.RESOURCE_NOT_FOUND ? (
+        <NotFoundPage />
+      ) : (
+        <ErrorPage
+          error={error}
+          errorInfo={errorInfo}
+          resetError={resetError}
+          errorId={errorId}
+          showDetails={showDetails}
+        />
+      )}
     </div>
   );
 };
@@ -121,10 +129,11 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
       error: null,
       errorInfo: null,
       errorId: null,
+      pathname: props.pathname || null,
     };
   }
 
-  static getDerivedStateFromError(error: Error): Partial<ErrorBoundaryState> {
+  static getDerivedStateFromError(error: AppError): Partial<ErrorBoundaryState> {
     if (!isCriticalError(error)) {
       throw error;
     }
@@ -138,7 +147,14 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
     };
   }
 
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+  componentDidUpdate(prevProps: ErrorBoundaryProps) {
+    // Reset error state when pathname changes
+    if (prevProps.pathname !== this.props.pathname && this.state.hasError) {
+      this.resetError();
+    }
+  }
+
+  componentDidCatch(error: AppError, errorInfo: React.ErrorInfo) {
     if (!isCriticalError(error)) {
       return;
     }

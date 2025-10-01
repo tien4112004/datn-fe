@@ -7,10 +7,12 @@ import {
   type PresentationCollectionRequest,
   type PresentationGenerationRequest,
   type PresentationGenerationResponse,
+  type SlideLayoutSchema,
 } from '../types';
 import { splitMarkdownToOutlineItems } from '../utils';
 import { api } from '@/shared/api';
 import { mapPagination, type ApiResponse, type Pagination } from '@/types/api';
+import type { Slide } from '../types/slide';
 // import api from '@/shared/api';
 
 const mockOutlineOutput = `\`\`\`markdown
@@ -52,42 +54,71 @@ _AI is like having a super-smart friend who never sleeps and always wants to hel
 \`\`\``;
 
 export default class PresentationRealApiService implements PresentationApiService {
-  // async getStreamedOutline(
-  //   request: OutlinePromptRequest,
-  //   signal: AbortSignal
-  // ): Promise<ReadableStream<Uint8Array>> {
-  //   const response = await fetch('http://localhost:8080/presentations/mock-outline', {
-  //     method: 'POST',
-  //     headers: {
-  //       'Content-Type': 'application/json',
-  //     },
-  //     body: JSON.stringify(request),
-  //     signal,
-  //   });
-
-  //   if (!response.ok) {
-  //     throw new Error(`HTTP error! status: ${response.status}`);
-  //   }
-
-  //   if (!response.body) {
-  //     throw new Error('No response body');
-  //   }
-
-  //   return response.body;
-  // }
-
   baseUrl: string;
 
   constructor(baseUrl: string = '') {
     this.baseUrl = baseUrl;
   }
 
-  getStreamedOutline(request: OutlineData, signal: AbortSignal): AsyncIterable<string> {
-    const baseUrl = this.baseUrl;
-    return {
-      async *[Symbol.asyncIterator]() {
-        const response = await api.stream(`${baseUrl}/api/presentations/outline-generate`, request, signal);
+  setPresentationAsParsed(id: string): Promise<any> {
+    return api.patch<ApiResponse<Presentation>>(`${this.baseUrl}/api/presentations/${id}/parse`);
+  }
 
+  async generatePresentationImage(
+    _id: string,
+    _slideId: string,
+    _elementId: string,
+    _prompt: string,
+    _style: string
+  ): Promise<string> {
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    return `https://via.placeholder.com/300x200.png?text=${_prompt}`;
+  }
+
+  upsertPresentationSlide(id: string, slide: Slide): Promise<any> {
+    return api.put<ApiResponse<Presentation>>(
+      `${this.baseUrl}/api/presentations/${id}/slides`,
+      {
+        slides: [
+          {
+            ...slide,
+            slideId: slide.id,
+          },
+        ],
+      },
+      {
+        headers: {
+          'Idempotency-Key': `${id}:${slide.id}:update`,
+        },
+      }
+    );
+  }
+
+  async getStreamedPresentation(
+    request: PresentationGenerationRequest,
+    signal: AbortSignal
+  ): Promise<{
+    presentationId: string;
+    stream: AsyncIterable<string>;
+  }> {
+    const baseUrl = this.baseUrl;
+    let presentationId = '';
+
+    // First, make the request to get the presentationId
+    const response = await api.stream(
+      `${baseUrl}/api/presentations/generate`,
+      {
+        ...request,
+        model: request.model.name,
+        provider: request.model.provider.toLowerCase(),
+      },
+      signal
+    );
+
+    presentationId = response.headers.get('X-Presentation') || '';
+
+    const stream = {
+      async *[Symbol.asyncIterator]() {
         const reader = response.body?.getReader();
         if (!reader) throw new Error('No reader available');
 
@@ -104,17 +135,63 @@ export default class PresentationRealApiService implements PresentationApiServic
         }
       },
     };
+
+    return { presentationId, stream };
+  }
+
+  async getStreamedOutline(
+    request: OutlineData,
+    signal: AbortSignal
+  ): Promise<{ stream: AsyncIterable<string> }> {
+    const baseUrl = this.baseUrl;
+
+    const response = await api.stream(
+      `${baseUrl}/api/presentations/outline-generate`,
+      {
+        ...request,
+        model: request.model.name,
+        provider: request.model.provider.toLowerCase(),
+      },
+      signal
+    );
+
+    const stream = {
+      async *[Symbol.asyncIterator]() {
+        const reader = response.body?.getReader();
+        if (!reader) throw new Error('No reader available');
+
+        try {
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            const text = new TextDecoder().decode(value);
+            yield text;
+          }
+        } finally {
+          reader.releaseLock();
+        }
+      },
+    };
+
+    return { stream };
   }
 
   getType(): ApiMode {
     return API_MODE.real;
   }
 
+  /**
+   * @deprecated
+   */
   async getPresentationItems(): Promise<Presentation[]> {
     const response = await api.get<ApiResponse<Presentation[]>>(`${this.baseUrl}/api/presentations/all`);
     return response.data.data.map(this._mapPresentationItem);
   }
 
+  /**
+   * @deprecated
+   */
   async getOutlineItems(): Promise<OutlineItem[]> {
     await new Promise((resolve) => setTimeout(resolve, 50));
     return splitMarkdownToOutlineItems(mockOutlineOutput);
@@ -146,7 +223,7 @@ export default class PresentationRealApiService implements PresentationApiServic
     return this._mapPresentationItem(response.data.data);
   }
 
-  async getAiResultById(id: string): Promise<any> {
+  async getAiResultById(id: string): Promise<SlideLayoutSchema[]> {
     const response = await api.get<ApiResponse<any>>(`${this.baseUrl}/api/presentations/${id}/ai-result`);
 
     const rawData = response.data.data;

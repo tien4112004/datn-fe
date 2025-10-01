@@ -15,6 +15,9 @@ export interface MessageDetail {
   message: string;
 }
 
+/**
+ * @deprecated Use the DetailPage2 component instead
+ */
 const DetailPage = () => {
   const { presentation: loaderPresentation } = useLoaderData() as { presentation: Presentation };
   const { id } = useParams<{ id: string }>();
@@ -24,7 +27,7 @@ const DetailPage = () => {
   const { t } = useTranslation('loading');
   const generatedPresentation = usePresentationStore((state) => state.generatedPresentation);
   const clearGeneratedPresentation = usePresentationStore((state) => state.clearGeneratedPresentation);
-  const getAiResult = useAiResultById(id);
+  const getAiResult = useAiResultById(id!);
 
   // Process generated presentation if needed
   useEffect(() => {
@@ -65,7 +68,7 @@ const DetailPage = () => {
 
         if (aiResult) {
           const processedSlides = await processGeneratedSlides(
-            aiResult.slides,
+            aiResult,
             { size: 1000, ratio: 9 / 16 },
             getDefaultPresentationTheme()
           );

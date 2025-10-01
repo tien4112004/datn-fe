@@ -8,7 +8,8 @@ export type OutlineData = {
   topic: string;
   slideCount: number;
   language: string;
-  model: string;
-  targetAge: string;
-  learningObjective: string;
+  model: {
+    name: string;
+    provider: string;
+  };
 };

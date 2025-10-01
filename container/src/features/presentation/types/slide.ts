@@ -685,3 +685,8 @@ export interface ExtendedSlideTheme extends SlideTheme {
     shadow: PPTElementShadow;
   };
 }
+
+export interface SlideViewport {
+  size: number;
+  ratio: number;
+}

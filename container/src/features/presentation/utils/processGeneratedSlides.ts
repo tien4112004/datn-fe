@@ -1,24 +1,15 @@
-import type { ExtendedSlideTheme } from '@/features/presentation/types/slide';
+import type { ExtendedSlideTheme, SlideViewport } from '@/features/presentation/types/slide';
 import { moduleMethodMap } from '../components/remote/module';
-
-export interface SlideViewport {
-  size: number;
-  ratio: number;
-}
-
-export interface SlideData {
-  type: string;
-  title?: string;
-  data: any;
-}
+import type { SlideLayoutSchema } from '../types';
 
 /**
+ * @deprecated
  * Processes AI-generated slide data and converts it to presentation format
  * This function takes the raw AI response and transforms it into slide objects
  * that can be consumed by the presentation editor
  */
 export const processGeneratedSlides = async (
-  generatedData: SlideData[],
+  generatedData: SlideLayoutSchema[],
   viewport: SlideViewport,
   theme: ExtendedSlideTheme
 ): Promise<any[]> => {

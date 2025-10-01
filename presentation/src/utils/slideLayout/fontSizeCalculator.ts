@@ -1,6 +1,6 @@
 import { measureElement } from './elementMeasurement';
-import type { SlideViewport } from './slideLayout';
 import { updateElementFontSize, updateElementLineHeight } from './htmlTextCreation';
+import type { TextLayoutBlockInstance } from './types';
 
 export interface FontSizeCalculationResult {
   fontSize: number;
@@ -36,7 +36,7 @@ export function calculateLargestOptimalFontSize(
     },
     content: {
       minSize: 12,
-      maxSize: 32,
+      maxSize: 28,
       maxLines: 10,
       lineHeight: 1.4,
     },
@@ -50,7 +50,6 @@ export function calculateLargestOptimalFontSize(
 
   const clonedElement = element.cloneNode(true) as HTMLElement;
 
-  const targetHeight = availableHeight;
   // Start from max size and work down
   let fontSize = config.maxSize;
   let optimalSize = config.minSize;
@@ -63,11 +62,11 @@ export function calculateLargestOptimalFontSize(
     // Measure the element with updated styling
     const measured = measureElement(clonedElement, {
       maxWidth: availableWidth,
-      maxHeight: targetHeight,
+      maxHeight: availableHeight,
     });
 
     // Accept if it fits within constraints
-    if (measured.height <= targetHeight) {
+    if (measured.height <= availableHeight) {
       optimalSize = fontSize;
       break;
     }
@@ -175,3 +174,43 @@ export function calculateFontSizeForAvailableSpace(
     spacing: Math.round(spacing),
   };
 }
+
+export const calculateUnifiedFontSizeForBlocks = (
+  items: HTMLElement[],
+  containers: TextLayoutBlockInstance[],
+  type?: 'title' | 'content' | 'label'
+): { fontSize: number; lineHeight: number } => {
+  if (items.length === 0 || containers.length === 0 || items.length !== containers.length) {
+    return { fontSize: 16, lineHeight: 1.4 };
+  }
+
+  // Calculate optimal font size for each block independently
+  const blockFontSizes: { fontSize: number; lineHeight: number }[] = [];
+
+  for (let i = 0; i < items.length; i++) {
+    const item = items[i];
+    const container = containers[i];
+
+    const optimalFontSize = calculateLargestOptimalFontSize(
+      item,
+      container.bounds.width,
+      container.bounds.height,
+      type
+    );
+
+    blockFontSizes.push({
+      fontSize: optimalFontSize,
+      lineHeight: optimalFontSize * 1.4,
+    });
+  }
+
+  // Take average size
+  const minFontSize = Math.min(...blockFontSizes.map((b) => b.fontSize));
+  const correspondingLineHeight =
+    blockFontSizes.find((b) => b.fontSize === minFontSize)?.lineHeight || minFontSize * 1.4;
+
+  return {
+    fontSize: minFontSize,
+    lineHeight: correspondingLineHeight / minFontSize,
+  };
+};

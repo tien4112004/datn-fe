@@ -1,4 +1,13 @@
-import type { PPTImageElement, PPTTextElement, SlideTheme } from '@/types/slides';
+import {
+  type PPTElement,
+  type PPTImageElement,
+  type PPTTextElement,
+  type PPTShapeElement,
+  type SlideBackground,
+  type SlideTheme,
+  ShapePathFormulasKeys,
+  type PPTLineElement,
+} from '@/types/slides';
 import {
   calculateLargestOptimalFontSize,
   applyFontSizeToElement,
@@ -6,7 +15,6 @@ import {
   applyFontSizeToElements,
 } from './fontSizeCalculator';
 import { createItemElement, createTitleElement, createLabelElement } from './htmlTextCreation';
-import type { LayoutBlock } from './slideLayout';
 import { measureElementForBlock, measureElementWithStyle, measureElement } from './elementMeasurement';
 import type {
   ImageLayoutBlockInstance,
@@ -15,21 +23,31 @@ import type {
   Bounds,
   TextLayoutBlockInstance,
   LayoutBlockInstance,
+  WrapConfig,
+  SlideLayoutBlockConfig,
+  LayoutBlockConfig,
+  DistributionType,
+  ConvergenceOptions,
+  TextStyleConfig,
+  TemplateContainerConfig,
+  SlideViewport,
+  RelativePositioning,
 } from './types';
 import { getImageSize } from '../image';
-import { calculateRowDistribution } from './graphic';
+import { SHAPE_PATH_FORMULAS } from '../../configs/shapes';
 
 const slideWidth = 1000;
 const slideHeight = 562.5;
+
 const LayoutPrimitives = {
-  getColumnsLayout(columnWidths: number[]): LayoutBlock[] {
+  getColumnsLayout(columnWidths: number[]): Bounds[] {
     // Validate percentages add up to 100
     const totalPercentage = columnWidths.reduce((sum, width) => sum + width, 0);
     if (Math.abs(totalPercentage - 100) > 0.1) {
       console.warn(`Column widths should add up to 100%, got ${totalPercentage}%`);
     }
 
-    const columns: LayoutBlock[] = [];
+    const columns: Bounds[] = [];
     let currentLeft = 0;
 
     columnWidths.forEach((widthPercentage) => {
@@ -62,8 +80,8 @@ const LayoutPrimitives = {
     // Calculate optimal font size using the actual element
     const titleFontSize = calculateLargestOptimalFontSize(
       titleElement,
-      container.width,
-      container.height,
+      container.bounds.width,
+      container.bounds.height,
       'title'
     );
 
@@ -73,13 +91,13 @@ const LayoutPrimitives = {
     // Measure the element with optimized font size
     const titleDimensions = measureElementWithStyle(titleElement, container);
 
-    const horizontalPosition = this.getPosition(container, titleDimensions, {
+    const horizontalPosition = this.getPosition(container.bounds, titleDimensions, {
       horizontalAlignment: container.horizontalAlignment,
     }).left;
 
     const titlePosition = {
       left: horizontalPosition,
-      top: container.top,
+      top: container.bounds.top,
     };
 
     return {
@@ -92,65 +110,197 @@ const LayoutPrimitives = {
   },
 
   getPosition(
-    container: LayoutBlock,
+    containerBounds: Bounds,
     itemDimensions: Size,
     options: {
       horizontalAlignment?: 'left' | 'center' | 'right';
       verticalAlignment?: 'top' | 'center' | 'bottom';
     }
   ): Position {
-    let left = container.left;
-    let top = container.top;
+    let left = containerBounds.left;
+    let top = containerBounds.top;
 
     // Apply horizontal alignment
     if (options.horizontalAlignment === 'center') {
-      left = container.left + (container.width - itemDimensions.width) / 2;
+      left = containerBounds.left + (containerBounds.width - itemDimensions.width) / 2;
     } else if (options.horizontalAlignment === 'right') {
-      left = container.left + container.width - itemDimensions.width;
+      left = containerBounds.left + containerBounds.width - itemDimensions.width;
     }
 
     // Apply vertical alignment
     if (options.verticalAlignment === 'center') {
-      top = container.top + (container.height - itemDimensions.height) / 2;
+      top = containerBounds.top + (containerBounds.height - itemDimensions.height) / 2;
     } else if (options.verticalAlignment === 'bottom') {
-      top = container.top + container.height - itemDimensions.height;
+      top = containerBounds.top + containerBounds.height - itemDimensions.height;
     }
 
     return { left, top };
   },
 
-  getChildrenMaxBounds(container: LayoutBlockInstance): Bounds[] {
-    if (container.distribution !== 'equal') {
-      console.warn(`getChildrenMaxBounds only supports 'equal' distribution currently.`);
+  getChildrenMaxBounds(
+    bounds: Bounds,
+    options?: {
+      distribution?: DistributionType;
+      childCount?: number;
+      orientation?: 'horizontal' | 'vertical';
+      spacingBetweenItems?: number;
     }
+  ): Bounds[] {
+    const {
+      distribution = '50/50',
+      childCount = 0,
+      orientation = 'vertical',
+      spacingBetweenItems = 0,
+    } = options || {};
 
-    if (!container.children || container.children.length === 0) {
+    if (childCount === 0) {
       return [];
     }
 
     const positions: Bounds[] = [];
 
-    if (container.orientation === 'horizontal') {
-      // Horizontal layout
-      const itemWidth = container.width / container.children.length;
-      for (let i = 0; i < container.children.length; i++) {
-        positions.push({
-          left: container.left + i * itemWidth,
-          top: container.top,
-          width: itemWidth,
-          height: container.height,
-        });
+    // Calculate base item dimensions assuming equal distribution
+    const totalSpacing = spacingBetweenItems * (childCount - 1);
+    const availableSpace =
+      orientation === 'horizontal' ? bounds.width - totalSpacing : bounds.height - totalSpacing;
+    const itemSize = availableSpace / childCount;
+
+    if (orientation === 'horizontal') {
+      if (distribution === 'space-between' && childCount > 1) {
+        // Space between: distribute remaining space evenly between items
+        const totalItemWidth = childCount * itemSize;
+        const remainingSpace = bounds.width - totalItemWidth;
+        const spacing = remainingSpace / (childCount - 1);
+
+        for (let i = 0; i < childCount; i++) {
+          positions.push({
+            left: bounds.left + i * (itemSize + spacing),
+            top: bounds.top,
+            width: itemSize,
+            height: bounds.height,
+          });
+        }
+      } else if (distribution === 'space-around' && childCount > 1) {
+        // Space around: distribute remaining space evenly around items
+        const totalItemWidth = childCount * itemSize;
+        const remainingSpace = bounds.width - totalItemWidth;
+        const spacing = remainingSpace / (childCount + 1);
+
+        for (let i = 0; i < childCount; i++) {
+          positions.push({
+            left: bounds.left + spacing + i * (itemSize + spacing),
+            top: bounds.top,
+            width: itemSize,
+            height: bounds.height,
+          });
+        }
+      } else if (distribution.includes('/')) {
+        // Handle ratio distribution like '30/70'
+        const parts = distribution.split('/');
+        if (parts.length === childCount && parts.every((p) => !isNaN(Number(p)))) {
+          const ratios = parts.map(Number);
+          const totalRatio = ratios.reduce((sum, r) => sum + r, 0);
+          const widths = ratios.map((r) => (bounds.width * r) / totalRatio);
+
+          let currentLeft = bounds.left;
+          for (let i = 0; i < childCount; i++) {
+            positions.push({
+              left: currentLeft,
+              top: bounds.top,
+              width: widths[i],
+              height: bounds.height,
+            });
+            currentLeft += widths[i];
+          }
+        } else {
+          // Fallback to equal distribution
+          for (let i = 0; i < childCount; i++) {
+            positions.push({
+              left: bounds.left + i * (itemSize + spacingBetweenItems),
+              top: bounds.top,
+              width: itemSize,
+              height: bounds.height,
+            });
+          }
+        }
+      } else {
+        // Equal distribution (default)
+        for (let i = 0; i < childCount; i++) {
+          positions.push({
+            left: bounds.left + i * (itemSize + spacingBetweenItems),
+            top: bounds.top,
+            width: itemSize,
+            height: bounds.height,
+          });
+        }
       }
     } else {
-      // Vertical layout (default)
-      const itemHeight = container.height / container.children.length;
-      for (let i = 0; i < container.children.length; i++) {
-        positions.push({
-          left: container.left,
-          top: container.top + i * itemHeight,
-          width: container.width,
-          height: itemHeight,
-        });
+      // Vertical layout
+      if (distribution === 'space-between' && childCount > 1) {
+        const totalItemHeight = childCount * itemSize;
+        const remainingSpace = bounds.height - totalItemHeight;
+        const spacing = remainingSpace / (childCount - 1);
+
+        for (let i = 0; i < childCount; i++) {
+          positions.push({
+            left: bounds.left,
+            top: bounds.top + i * (itemSize + spacing),
+            width: bounds.width,
+            height: itemSize,
+          });
+        }
+      } else if (distribution === 'space-around' && childCount > 1) {
+        const totalItemHeight = childCount * itemSize;
+        const remainingSpace = bounds.height - totalItemHeight;
+        const spacing = remainingSpace / (childCount + 1);
+
+        for (let i = 0; i < childCount; i++) {
+          positions.push({
+            left: bounds.left,
+            top: bounds.top + spacing + i * (itemSize + spacing),
+            width: bounds.width,
+            height: itemSize,
+          });
+        }
+      } else if (distribution.includes('/')) {
+        // Handle ratio distribution
+        const parts = distribution.split('/');
+        if (parts.length === childCount && parts.every((p) => !isNaN(Number(p)))) {
+          const ratios = parts.map(Number);
+          const totalRatio = ratios.reduce((sum, r) => sum + r, 0);
+          const heights = ratios.map((r) => (bounds.height * r) / totalRatio);
+
+          let currentTop = bounds.top;
+          for (let i = 0; i < childCount; i++) {
+            positions.push({
+              left: bounds.left,
+              top: currentTop,
+              width: bounds.width,
+              height: heights[i],
+            });
+            currentTop += heights[i];
+          }
+        } else {
+          // Fallback to equal distribution
+          for (let i = 0; i < childCount; i++) {
+            positions.push({
+              left: bounds.left,
+              top: bounds.top + i * (itemSize + spacingBetweenItems),
+              width: bounds.width,
+              height: itemSize,
+            });
+          }
+        }
+      } else {
+        // Equal distribution (default)
+        for (let i = 0; i < childCount; i++) {
+          positions.push({
+            left: bounds.left,
+            top: bounds.top + i * (itemSize + spacingBetweenItems),
+            width: bounds.width,
+            height: itemSize,
+          });
+        }
       }
     }
 
@@ -162,10 +312,11 @@ const LayoutPrimitives = {
     const alignment = container.verticalAlignment || 'top';
 
     const totalItemsHeight = itemDimensions.reduce((sum, dim) => sum + dim.height, 0);
-    const availableHeight = container.height - (container.padding.top || 0) - (container.padding.bottom || 0);
+    const availableHeight =
+      container.bounds.height - (container.padding.top || 0) - (container.padding.bottom || 0);
 
     let positions: Bounds[] = [];
-    let startY = container.top + (container.padding.top || 0);
+    let startY = container.bounds.top + (container.padding.top || 0);
 
     switch (distribution) {
       case 'space-between': {
@@ -176,7 +327,7 @@ const LayoutPrimitives = {
           positions = [
             {
               top: centerY,
-              left: container.left + (container.padding.left || 0),
+              left: container.bounds.left + (container.padding.left || 0),
               width: itemDimensions[0].width,
               height: itemDimensions[0].height,
             },
@@ -189,7 +340,7 @@ const LayoutPrimitives = {
           positions = itemDimensions.map((dim, index) => {
             const position = {
               top: currentY,
-              left: container.left + (container.padding.left || 0),
+              left: container.bounds.left + (container.padding.left || 0),
               width: dim.width,
               height: dim.height,
             };
@@ -209,7 +360,7 @@ const LayoutPrimitives = {
         positions = itemDimensions.map((dim) => {
           const position = {
             top: currentY,
-            left: container.left + (container.padding.left || 0),
+            left: container.bounds.left + (container.padding.left || 0),
             width: dim.width,
             height: dim.height,
           };
@@ -237,7 +388,7 @@ const LayoutPrimitives = {
         positions = itemDimensions.map((dim) => {
           const position = {
             top: currentY,
-            left: container.left + (container.padding.left || 0),
+            left: container.bounds.left + (container.padding.left || 0),
             width: dim.width,
             height: dim.height,
           };
@@ -283,8 +434,8 @@ const LayoutPrimitives = {
       // Calculate font size for this column
       const contentStyles = calculateFontSizeForAvailableSpace(
         tempElements,
-        container.width,
-        container.height
+        container.bounds.width,
+        container.bounds.height
       );
 
       columnFontSizes.push({
@@ -321,8 +472,8 @@ const LayoutPrimitives = {
 
     const contentStyles = calculateFontSizeForAvailableSpace(
       tempItemElements,
-      container.width,
-      container.height
+      container.bounds.width,
+      container.bounds.height
     );
 
     const finalFontSize = contentStyles.fontSize;
@@ -348,7 +499,11 @@ const LayoutPrimitives = {
         fontFamily: itemStyles.fontFamily,
         color: itemStyles.color,
       });
-      const itemDimensions = measureElementForBlock(itemElement, container.width, container.height);
+      const itemDimensions = measureElementForBlock(
+        itemElement,
+        container.bounds.width,
+        container.bounds.height
+      );
       return { content: itemElement.outerHTML, dimensions: itemDimensions };
     });
 
@@ -402,7 +557,11 @@ const LayoutPrimitives = {
         fontFamily: itemStyles.fontFamily,
         color: itemStyles.color,
       });
-      const itemDimensions = measureElementForBlock(itemElement, container.width, container.height);
+      const itemDimensions = measureElementForBlock(
+        itemElement,
+        container.bounds.width,
+        container.bounds.height
+      );
       return { content: itemElement.outerHTML, dimensions: itemDimensions };
     });
 
@@ -417,7 +576,7 @@ const LayoutPrimitives = {
       const position = itemPositions[index];
 
       return {
-        id: generateUniqueId(),
+        id: crypto.randomUUID(),
         type: 'text',
         content: item.content,
         defaultFontName: itemStyles.fontFamily,
@@ -448,10 +607,10 @@ const LayoutPrimitives = {
       type: 'image',
       src,
       fixedRatio: false,
-      left: container.left,
-      top: container.top,
-      width: container.width,
-      height: container.height,
+      left: container.bounds.left,
+      top: container.bounds.top,
+      width: container.bounds.width,
+      height: container.bounds.height,
       rotate: 0,
       clip: finalClip,
       outline: {
@@ -462,22 +621,93 @@ const LayoutPrimitives = {
     } as PPTImageElement;
   },
 
-  createTitlePPTElement(
-    content: string,
-    position: { left: number; top: number },
-    dimensions: { width: number; height: number },
-    block: TextLayoutBlockInstance
-  ): PPTTextElement {
+  createTitleLine(titleDimensions: Bounds, theme: SlideTheme) {
+    return {
+      id: crypto.randomUUID(),
+      type: 'line',
+      style: 'solid',
+      left: titleDimensions.left,
+      top: titleDimensions.top + titleDimensions.height + 10,
+      start: [0, 0],
+      end: [titleDimensions.width, 0],
+      width: 2,
+      color: theme.themeColors[0],
+      points: ['', ''],
+    } as PPTLineElement;
+  },
+
+  createCard(container: LayoutBlockInstance): PPTShapeElement {
+    const formula = SHAPE_PATH_FORMULAS[ShapePathFormulasKeys.ROUND_RECT];
+    const radiusMultiplier = container.border?.radius
+      ? container.border.radius / Math.min(container.bounds.width, container.bounds.height)
+      : 0.125;
+    const path = formula.formula(container.bounds.width, container.bounds.height, [radiusMultiplier]);
+
+    return {
+      id: crypto.randomUUID(),
+      type: 'shape',
+      shapeType: 'roundedRect',
+      left: container.bounds.left,
+      top: container.bounds.top,
+      width: container.bounds.width,
+      height: container.bounds.height,
+      viewBox: [container.bounds.width, container.bounds.height],
+      path,
+      fixedRatio: false,
+      rotate: 0,
+      fill: 'transparent',
+      outline: container.border
+        ? {
+            color: container.border.color,
+            width: container.border.width,
+          }
+        : undefined,
+      radius: container.border?.radius || 0,
+    } as PPTShapeElement;
+  },
+
+  createTextElement(content: string, config: TextStyleConfig): HTMLElement {
+    const p = document.createElement('p');
+    const span = document.createElement('span');
+
+    // Font weight mapping
+    const fontWeightMap: Record<string, string> = {
+      normal: '400',
+      bold: '700',
+      bolder: 'bolder',
+      lighter: 'lighter',
+    };
+
+    // Apply paragraph styling
+    p.style.textAlign = config.textAlign || 'left';
+    p.style.lineHeight = `${config.lineHeight}`;
+    p.style.fontSize = `${config.fontSize}px`;
+    p.style.fontFamily = config.fontFamily || 'Roboto';
+    p.style.margin = '0';
+
+    // Apply span styling
+    const fontWeightValue = config.fontWeight || 'normal';
+    span.style.fontWeight = fontWeightMap[fontWeightValue.toString()] || fontWeightValue.toString();
+    if (config.color) {
+      span.style.color = config.color;
+    }
+    span.textContent = content;
+
+    p.appendChild(span);
+    return p;
+  },
+
+  createTextPPTElement(content: string, block: TextLayoutBlockInstance): PPTTextElement {
     return {
       id: crypto.randomUUID(),
       type: 'text',
       content,
       defaultFontName: block.text?.fontFamily || 'Arial',
       defaultColor: block.text?.color || '#000000',
-      left: position.left,
-      top: position.top,
-      width: dimensions.width,
-      height: dimensions.height,
+      left: block.bounds.left,
+      top: block.bounds.top,
+      width: block.bounds.width,
+      height: block.bounds.height,
       textType: 'title',
       outline: {
         color: block.border?.color || '#000000',
@@ -489,12 +719,18 @@ const LayoutPrimitives = {
   },
 
   recursivelyPreprocessDescendants(container: LayoutBlockInstance): void {
-    const items = this.getChildrenMaxBounds(container);
+    if (!container.children || container.children.length === 0) return;
 
-    container.children?.forEach((child, index) => {
+    const items = this.getChildrenMaxBounds(container.bounds, {
+      distribution: container.distribution,
+      childCount: container.children.length,
+      orientation: container.orientation,
+    });
+
+    container.children.forEach((child, index) => {
       if (!items[index]) return;
 
-      container.children![index] = { ...child, ...items[index] } as TextLayoutBlockInstance;
+      container.children![index] = { ...child, bounds: items[index] } as TextLayoutBlockInstance;
 
       if (child.children && child.children.length > 0) {
         this.recursivelyPreprocessDescendants(container.children![index]);
@@ -502,223 +738,544 @@ const LayoutPrimitives = {
     });
   },
 
-  // Horizontal List Layout Methods
-  calculateHorizontalLayout(
-    itemCount: number,
-    contentContainer: TextLayoutBlockInstance
-  ): {
-    topRowItems: number;
-    bottomRowItems: number;
-    columnWidth: number;
-    rowHeight: number;
-    hasBottomRow: boolean;
-    spacing: number;
-  } {
-    const { topRowItems, bottomRowItems } = calculateRowDistribution(itemCount);
-    const maxItemsPerRow = Math.max(topRowItems, bottomRowItems || 0);
+  recursivelyGetAllLabelInstances(container: LayoutBlockInstance, label: string): TextLayoutBlockInstance[] {
+    let labels: LayoutBlockInstance[] = [];
 
-    return {
-      topRowItems,
-      bottomRowItems,
-      columnWidth: contentContainer.width / maxItemsPerRow,
-      rowHeight: bottomRowItems > 0 ? contentContainer.height / 2 : contentContainer.height,
-      hasBottomRow: bottomRowItems > 0,
-      spacing: contentContainer.spacingBetweenItems || 50,
-    };
-  },
+    if (!container.children || container.children.length === 0) return labels;
 
-  async createHorizontalItemPairs(
-    items: { label: string; content: string }[],
-    layoutInfo: {
-      topRowItems: number;
-      bottomRowItems: number;
-      columnWidth: number;
-      rowHeight: number;
-      hasBottomRow: boolean;
-      spacing: number;
-    },
-    theme: SlideTheme
-  ): Promise<
-    {
-      labelElement: HTMLElement;
-      contentElement: HTMLElement;
-      labelDimensions: Size;
-      contentDimensions: Size;
-      totalHeight: number;
-    }[]
-  > {
-    const LABEL_CONTENT_SPACING = 15;
-    const availableWidth = layoutInfo.columnWidth - 20; // padding
-    const availableHeight = layoutInfo.rowHeight;
+    for (const child of container.children) {
+      if (child.label === label) {
+        labels.push(child);
+      }
 
-    const allElements = items.map((item) => ({
-      labelElement: createLabelElement({
-        content: item.label,
-        fontSize: 20,
-        lineHeight: 1.2,
-        fontFamily: theme.fontName,
-        color: theme.fontColor,
-      }),
-      contentElement: createItemElement({
-        content: item.content,
-        fontSize: 16,
-        lineHeight: 1.4,
-        fontFamily: theme.fontName,
-        color: theme.fontColor,
-      }),
-    }));
-
-    let optimalLabelFontSize = 20;
-    for (const { labelElement } of allElements) {
-      const labelFontSize = calculateLargestOptimalFontSize(
-        labelElement,
-        availableWidth,
-        availableHeight * 0.4,
-        'label'
-      );
-      optimalLabelFontSize = Math.min(optimalLabelFontSize, labelFontSize);
-    }
-
-    let optimalContentFontSize = 16;
-    for (const { contentElement } of allElements) {
-      const contentFontSize = calculateLargestOptimalFontSize(
-        contentElement,
-        availableWidth,
-        availableHeight * 0.6,
-        'content'
-      );
-      optimalContentFontSize = Math.min(optimalContentFontSize, contentFontSize);
-    }
-
-    return allElements.map(({ labelElement, contentElement }) => {
-      applyFontSizeToElement(labelElement, optimalLabelFontSize, 1.2);
-      applyFontSizeToElement(contentElement, optimalContentFontSize, 1.4);
-
-      const labelDimensions = measureElement(labelElement, {
-        maxWidth: availableWidth,
-        maxHeight: availableHeight * 0.4,
-      });
-      const contentDimensions = measureElement(contentElement, {
-        maxWidth: availableWidth,
-        maxHeight: availableHeight * 0.6,
-      });
-
-      return {
-        labelElement,
-        contentElement,
-        labelDimensions,
-        contentDimensions,
-        totalHeight: labelDimensions.height + contentDimensions.height + LABEL_CONTENT_SPACING,
-      };
-    });
-  },
-
-  async positionHorizontalElements(
-    pairs: {
-      labelElement: HTMLElement;
-      contentElement: HTMLElement;
-      labelDimensions: Size;
-      contentDimensions: Size;
-      totalHeight: number;
-    }[],
-    layoutInfo: {
-      topRowItems: number;
-      bottomRowItems: number;
-      columnWidth: number;
-      rowHeight: number;
-      hasBottomRow: boolean;
-      spacing: number;
-    },
-    contentContainer: TextLayoutBlockInstance,
-    theme: SlideTheme
-  ): Promise<PPTTextElement[]> {
-    const elements: PPTTextElement[] = [];
-    const LABEL_CONTENT_SPACING = 15;
-
-    const topRowPairs = pairs.slice(0, layoutInfo.topRowItems);
-    const bottomRowPairs = layoutInfo.hasBottomRow ? pairs.slice(layoutInfo.topRowItems) : [];
-
-    const maxTopRowLabelHeight = Math.max(...topRowPairs.map((p) => p.labelDimensions.height));
-    const maxTopRowContentHeight = Math.max(...topRowPairs.map((p) => p.contentDimensions.height));
-
-    const maxBottomRowLabelHeight =
-      bottomRowPairs.length > 0 ? Math.max(...bottomRowPairs.map((p) => p.labelDimensions.height)) : 0;
-    const maxBottomRowContentHeight =
-      bottomRowPairs.length > 0 ? Math.max(...bottomRowPairs.map((p) => p.contentDimensions.height)) : 0;
-
-    const topRowY = contentContainer.top;
-    const bottomRowY = layoutInfo.hasBottomRow
-      ? contentContainer.top +
-        maxTopRowLabelHeight +
-        LABEL_CONTENT_SPACING +
-        maxTopRowContentHeight +
-        layoutInfo.spacing
-      : 0;
-
-    for (let i = 0; i < layoutInfo.topRowItems; i++) {
-      const pair = pairs[i];
-      const columnX = contentContainer.left + i * layoutInfo.columnWidth;
-      const centerX = columnX + layoutInfo.columnWidth / 2;
-
-      elements.push({
-        id: crypto.randomUUID(),
-        type: 'text',
-        content: pair.labelElement.outerHTML,
-        defaultFontName: theme.fontName,
-        defaultColor: theme.fontColor,
-        left: centerX - pair.labelDimensions.width / 2,
-        top: topRowY,
-        width: pair.labelDimensions.width,
-        height: pair.labelDimensions.height,
-      } as PPTTextElement);
-
-      elements.push({
-        id: crypto.randomUUID(),
-        type: 'text',
-        content: pair.contentElement.outerHTML,
-        defaultFontName: theme.fontName,
-        defaultColor: theme.fontColor,
-        left: centerX - pair.contentDimensions.width / 2,
-        top: topRowY + maxTopRowLabelHeight + LABEL_CONTENT_SPACING,
-        width: pair.contentDimensions.width,
-        height: pair.contentDimensions.height,
-      } as PPTTextElement);
-    }
-
-    if (layoutInfo.hasBottomRow) {
-      for (let i = 0; i < layoutInfo.bottomRowItems; i++) {
-        const pairIndex = layoutInfo.topRowItems + i;
-        const pair = pairs[pairIndex];
-        const columnX = contentContainer.left + i * layoutInfo.columnWidth;
-        const centerX = columnX + layoutInfo.columnWidth / 2;
-
-        elements.push({
-          id: crypto.randomUUID(),
-          type: 'text',
-          content: pair.labelElement.outerHTML,
-          defaultFontName: theme.fontName,
-          defaultColor: theme.fontColor,
-          left: centerX - pair.labelDimensions.width / 2,
-          top: bottomRowY,
-          width: pair.labelDimensions.width,
-          height: pair.labelDimensions.height,
-        } as PPTTextElement);
-
-        elements.push({
-          id: crypto.randomUUID(),
-          type: 'text',
-          content: pair.contentElement.outerHTML,
-          defaultFontName: theme.fontName,
-          defaultColor: theme.fontColor,
-          left: centerX - pair.contentDimensions.width / 2,
-          top: bottomRowY + maxBottomRowLabelHeight + LABEL_CONTENT_SPACING,
-          width: pair.contentDimensions.width,
-          height: pair.contentDimensions.height,
-        } as PPTTextElement);
+      if (child.children && child.children.length > 0) {
+        labels = labels.concat(this.recursivelyGetAllLabelInstances(child, label));
       }
     }
 
-    return elements;
+    return labels;
+  },
+
+  /**
+   * Measure elements and apply final positioning
+   */
+  measureAndPositionElements(
+    instance: LayoutBlockInstance,
+    labelGroups: Map<string, TextLayoutBlockInstance[]>,
+    allElements: Record<string, HTMLElement[]>,
+    dataMap: Map<string, any[]>
+  ): void {
+    // For each parent with labeled children, measure and position
+    if (!instance.children) return;
+
+    instance.children.forEach((child) => {
+      if (!child.children || child.children.length === 0) {
+        // Recurse for nested structures
+        this.measureAndPositionElements(child, labelGroups, allElements, dataMap);
+        return;
+      }
+
+      // Find all labeled children
+      const labeledChildren = child.children.filter((c) => c.label);
+      if (labeledChildren.length === 0) return;
+
+      // Measure dimensions for each labeled child
+      const dimensions = labeledChildren.map((labeledChild, idx) => {
+        const label = labeledChild.label!;
+        const elements = allElements[label];
+        if (!elements) return { width: child.bounds.width, height: 20 };
+
+        // Find which element index this is
+        const instances = labelGroups.get(label) || [];
+        const elementIndex = instances.indexOf(labeledChild as TextLayoutBlockInstance);
+        if (elementIndex === -1 || !elements[elementIndex]) {
+          return { width: child.bounds.width, height: 20 };
+        }
+
+        const measured = measureElement(elements[elementIndex], {
+          maxWidth: child.bounds.width,
+        });
+
+        return { width: child.bounds.width, height: measured.height };
+      });
+
+      // Position using layoutItemsInBlock
+      const positionedBounds = this.layoutItemsInBlock(dimensions, child);
+
+      // Apply positioned bounds
+      labeledChildren.forEach((labeledChild, idx) => {
+        labeledChild.bounds = positionedBounds[idx];
+      });
+    });
+  },
+
+  /**
+   * Helper to calculate unified font size for a group of labeled elements
+   */
+  calculateUnifiedFontSizeForLabels(
+    elements: HTMLElement[],
+    containers: TextLayoutBlockInstance[],
+    type: 'title' | 'content' | 'label' = 'content'
+  ): { fontSize: number; lineHeight: number } {
+    if (elements.length === 0 || containers.length === 0 || elements.length !== containers.length) {
+      return { fontSize: 16, lineHeight: 1.4 };
+    }
+
+    // Calculate optimal font size for each element independently
+    const fontSizes: number[] = [];
+
+    for (let i = 0; i < elements.length; i++) {
+      const element = elements[i];
+      const container = containers[i];
+
+      const optimalFontSize = calculateLargestOptimalFontSize(
+        element,
+        container.bounds.width,
+        container.bounds.height,
+        type
+      );
+
+      fontSizes.push(optimalFontSize);
+    }
+
+    // Take minimum size (most constrained)
+    const minFontSize = Math.min(...fontSizes);
+    const lineHeight = type === 'label' ? 1.2 : 1.4;
+
+    return {
+      fontSize: minFontSize,
+      lineHeight,
+    };
+  },
+
+  /**
+   * Expands a childTemplate into N child instances with calculated bounds
+   * @param templateContainer - Container config with childTemplate
+   * @param parentBounds - Bounds of parent container
+   * @param data - Array of data items to map to children (length determines count if auto)
+   */
+  buildChildrenFromChildTemplate(
+    templateContainer: LayoutBlockConfig,
+    parentBounds: Bounds,
+    data: any[]
+  ): LayoutBlockInstance[] {
+    if (!templateContainer.childTemplate) return [];
+
+    const childTemplate = templateContainer.childTemplate;
+
+    // Determine count from data or template
+    const count = childTemplate.count === 'auto' ? data.length : childTemplate.count;
+
+    if (!childTemplate.structure || count === 0) {
+      return [];
+    }
+
+    // Calculate bounds using wrap layout
+    const wrapConfig = childTemplate.wrap || {
+      enabled: true,
+      maxItemsPerLine: 50, // Effectively infinite for non-wrap
+    };
+
+    const wrapLayout = this.calculateWrapLayout(
+      count,
+      parentBounds,
+      wrapConfig,
+      templateContainer.orientation || 'vertical',
+      templateContainer.spacingBetweenItems || 0,
+      wrapConfig.alternating
+    );
+
+    // Create instances with calculated bounds, passing corresponding data item
+    const children: LayoutBlockInstance[] = [];
+    for (let i = 0; i < count; i++) {
+      const itemData = data[i]; // Could be object, string, number, etc.
+      const instance = this.buildInstanceWithBounds(
+        childTemplate.structure,
+        wrapLayout.itemBounds[i],
+        itemData ? [itemData] : undefined // Wrap in array for nested templates,
+      );
+      children.push(instance);
+    }
+
+    return children;
+  },
+
+  /**
+   * Recursively builds layout instance tree with calculated bounds for all descendants
+   * @param config - Layout block configuration
+   * @param bounds - Bounds for this instance
+   * @param data - Data array for child population (undefined for leaf nodes)
+   */
+  buildInstanceWithBounds(config: SlideLayoutBlockConfig, bounds: Bounds, data?: any[]): LayoutBlockInstance {
+    // Create base instance with assigned bounds
+    const instance: LayoutBlockInstance = {
+      id: config.id,
+      bounds,
+      label: config.label,
+      padding: config.padding || { top: 0, bottom: 0, left: 0, right: 0 },
+      border: config.border,
+      shadow: config.shadow,
+      verticalAlignment: config.verticalAlignment,
+      horizontalAlignment: config.horizontalAlignment,
+      distribution: config.distribution,
+      orientation: config.orientation,
+      spacingBetweenItems: config.spacingBetweenItems,
+    };
+
+    // Add type-specific properties
+    if ('text' in config) {
+      (instance as TextLayoutBlockInstance).text = config.text;
+      (instance as TextLayoutBlockInstance).background = config.background;
+    }
+
+    // Handle children - either static or from template
+    if (config.children) {
+      // Static children - calculate bounds using getChildrenMaxBounds
+      const childrenBounds = this.getChildrenMaxBounds(bounds, {
+        distribution: config.distribution,
+        childCount: config.children.length,
+        orientation: config.orientation,
+        spacingBetweenItems: config.spacingBetweenItems,
+      });
+
+      // Pass same data to all static children
+      instance.children = config.children.map((childConfig, index) =>
+        this.buildInstanceWithBounds(childConfig, childrenBounds[index], data)
+      );
+    } else if (config.childTemplate) {
+      // Dynamic children from template - expand with data mapping
+      instance.children = this.buildChildrenFromChildTemplate(config, bounds, data || []);
+    }
+
+    return instance;
+  },
+
+  calculateWrapLayout(
+    itemCount: number,
+    containerBounds: Bounds,
+    wrapConfig: WrapConfig,
+    orientation: 'horizontal' | 'vertical',
+    spacingBetweenItems: number,
+    alternating?: boolean
+  ): {
+    lines: number; // Number of rows/columns
+    itemsPerLine: number[]; // Items in each line [4, 3] for 7 items in 2 rows
+    itemBounds: Bounds[]; // Bounds for each item
+  } {
+    if (!wrapConfig || !wrapConfig.enabled) {
+      return {
+        lines: 1,
+        itemsPerLine: [itemCount],
+        itemBounds: [],
+      };
+    }
+
+    let maxPerLine: number = wrapConfig.maxItemsPerLine || itemCount;
+
+    const distributions = this.distributeItems(itemCount, maxPerLine, wrapConfig.distribution || 'balanced');
+
+    // Handle orientation = horizontal first
+    const lines = distributions.length;
+    const itemsPerLine = distributions;
+    let lineBounds: Bounds[] = [];
+    const lineSpacing = wrapConfig.lineSpacing || 0;
+    let itemBounds: Bounds[] = [];
+
+    if (orientation === 'horizontal') {
+      lineBounds = distributions.map((count, lineIndex) => {
+        const lineHeight = (containerBounds.height - (lines - 1) * lineSpacing) / lines;
+        return {
+          left: containerBounds.left,
+          top: containerBounds.top + lineIndex * (lineHeight + lineSpacing),
+          width: containerBounds.width,
+          height: lineHeight,
+        };
+      });
+
+      // Calculate item bounds within each line
+      itemBounds = lineBounds
+        .map((line, lineIndex) => {
+          const count = distributions[lineIndex];
+          const totalSpacing = (count - 1) * spacingBetweenItems;
+          let itemWidth = (containerBounds.width - totalSpacing) / count;
+
+          return Array.from({ length: count }, (_, itemIndex) => {
+            let leftStart = line.left + itemIndex * (itemWidth + spacingBetweenItems);
+            if (alternating && lineIndex % 2 === 1) {
+              leftStart += spacingBetweenItems;
+              itemWidth -= spacingBetweenItems;
+            }
+            return {
+              left: leftStart,
+              top: line.top,
+              width: itemWidth,
+              height: line.height,
+            };
+          });
+        })
+        .flat();
+    } else {
+      // Vertical orientation (columns)
+      lineBounds = distributions.map((count, lineIndex) => {
+        const lineWidth = (containerBounds.width - (lines - 1) * lineSpacing) / lines;
+        return {
+          left: containerBounds.left + lineIndex * (lineWidth + lineSpacing),
+          top: containerBounds.top,
+          width: lineWidth,
+          height: containerBounds.height,
+        };
+      });
+
+      // Calculate item bounds within each column
+      itemBounds = lineBounds
+        .map((line, lineIndex) => {
+          const count = distributions[lineIndex];
+          const totalSpacing = (count - 1) * spacingBetweenItems;
+          let itemHeight = (containerBounds.height - totalSpacing) / count;
+
+          return Array.from({ length: count }, (_, itemIndex) => {
+            let topStart = line.top + itemIndex * (itemHeight + spacingBetweenItems);
+            if (alternating && lineIndex % 2 === 1) {
+              topStart += spacingBetweenItems;
+              itemHeight -= spacingBetweenItems;
+            }
+            return {
+              left: line.left,
+              top: topStart,
+              width: line.width,
+              height: itemHeight,
+            };
+          });
+        })
+        .flat();
+    }
+
+    return {
+      lines,
+      itemsPerLine,
+      itemBounds,
+    };
+  },
+
+  distributeItems(
+    itemCount: number,
+    maxPerLine: number,
+    type: 'balanced' | 'top-heavy' | 'bottom-heavy'
+  ): number[] {
+    if (itemCount <= 0) return [];
+    if (maxPerLine <= 0) {
+      console.warn('maxPerLine should be greater than 0');
+    }
+    if (itemCount <= maxPerLine) return [itemCount];
+
+    if (type === 'balanced') {
+      const lineCount = Math.ceil(itemCount / maxPerLine);
+      const baseItemsPerLine = Math.floor(itemCount / lineCount);
+      const remainder = itemCount % lineCount;
+
+      // Create array with base distribution
+      const distribution = Array(lineCount).fill(baseItemsPerLine);
+
+      // Distribute remainder items (one extra to first 'remainder' lines)
+      for (let i = 0; i < remainder; i++) {
+        distribution[i]++;
+      }
+
+      return distribution;
+    }
+
+    if (type === 'top-heavy') {
+      const distribution: number[] = [];
+      let remaining = itemCount;
+      let currentMax = maxPerLine;
+
+      while (remaining > 0) {
+        const itemsInLine = Math.min(remaining, currentMax);
+        distribution.push(itemsInLine);
+        remaining -= itemsInLine;
+
+        // Decrease items per line for pyramid effect
+        currentMax = Math.max(1, currentMax - 1);
+      }
+
+      return distribution;
+    }
+
+    if (type === 'bottom-heavy') {
+      const distribution: number[] = [];
+      let remaining = itemCount;
+      let currentMin = 1;
+
+      while (remaining > 0) {
+        const itemsInLine = Math.min(remaining, currentMin);
+        distribution.push(itemsInLine);
+        remaining -= itemsInLine;
+
+        // Increase items per line for reverse pyramid effect
+        currentMin = Math.min(maxPerLine, currentMin + 1);
+      }
+
+      return distribution;
+    }
+
+    return [itemCount];
+  },
+
+  processBackground(theme: SlideTheme): SlideBackground {
+    if (typeof theme.backgroundColor === 'string') {
+      return { type: 'solid', color: theme.backgroundColor };
+    } else {
+      return {
+        type: 'gradient',
+        gradient: {
+          type: theme.backgroundColor.type,
+          colors: theme.backgroundColor.colors,
+          rotate: theme.backgroundColor.rotate || 0,
+        },
+      };
+    }
+  },
+
+  /**
+   * Resolve container positions with priority:
+   * 1. If bounds exists, use it (absolute positioning)
+   * 2. Otherwise use positioning (relative positioning)
+   */
+  resolveContainerPositions(
+    containers: Record<string, TemplateContainerConfig>,
+    viewport: SlideViewport
+  ): Record<string, Bounds> {
+    const resolved: Record<string, Bounds> = {};
+    const pending = new Set(Object.keys(containers));
+
+    // Process containers in dependency order
+    while (pending.size > 0) {
+      let madeProgress = false;
+
+      for (const id of pending) {
+        const container = containers[id];
+
+        // PRIORITY 1: Use absolute bounds if specified
+        if (container.bounds) {
+          resolved[id] = container.bounds;
+          pending.delete(id);
+          madeProgress = true;
+          continue;
+        }
+
+        // PRIORITY 2: Use relative positioning
+        if (container.positioning) {
+          const pos = container.positioning;
+          const parentId = pos.relativeTo;
+
+          // No parent = relative to viewport
+          if (!parentId) {
+            resolved[id] = this.calculateBoundsFromPositioning(
+              pos,
+              { left: 0, top: 0, width: viewport.width, height: viewport.height },
+              viewport
+            );
+            pending.delete(id);
+            madeProgress = true;
+            continue;
+          }
+
+          // Parent is resolved - calculate relative position
+          if (resolved[parentId]) {
+            resolved[id] = this.calculateBoundsFromPositioning(pos, resolved[parentId], viewport);
+            pending.delete(id);
+            madeProgress = true;
+          }
+        } else {
+          // Neither bounds nor positioning specified
+          throw new Error(`Container '${id}' must have either bounds or positioning`);
+        }
+      }
+
+      if (!madeProgress) {
+        throw new Error('Circular dependency in container positioning');
+      }
+    }
+
+    return resolved;
+  },
+
+  calculateBoundsFromPositioning(
+    positioning: RelativePositioning,
+    parentBounds: Bounds,
+    viewport: SlideViewport
+  ): Bounds {
+    const anchor = positioning.anchor || {};
+    const offset = positioning.offset || {};
+    const fillRemaining = positioning.fillRemaining || {};
+
+    let left = parentBounds.left;
+    let top = parentBounds.top;
+    let width = parentBounds.width;
+    let height = parentBounds.height;
+
+    // === HORIZONTAL POSITIONING ===
+
+    if (fillRemaining.horizontal) {
+      // Fill from current position to right edge
+      left = parentBounds.left + (offset.left || 0);
+      width = viewport.width - left - (offset.right || 0);
+    } else if (offset.left !== undefined && offset.right !== undefined) {
+      // Both left and right specified = absolute positioning within viewport
+      left = offset.left;
+      width = offset.right - offset.left;
+    } else if (anchor.horizontal === 'left') {
+      left = parentBounds.left + (offset.left || 0);
+      // Keep parent width unless overridden
+      if (offset.right !== undefined) {
+        width = offset.right - left;
+      }
+    } else if (anchor.horizontal === 'right') {
+      left = parentBounds.left + parentBounds.width + (offset.left || 0);
+      if (offset.right !== undefined) {
+        width = offset.right - left;
+      }
+    } else if (anchor.horizontal === 'center') {
+      left = parentBounds.left + parentBounds.width / 2 + (offset.left || 0);
+      if (offset.right !== undefined) {
+        width = offset.right - left;
+      }
+    } else {
+      // anchor.horizontal === 'none' or undefined - use parent left + offset
+      left = parentBounds.left + (offset.left || 0);
+    }
+
+    // === VERTICAL POSITIONING ===
+
+    if (fillRemaining.vertical) {
+      // Fill from current position to bottom edge
+      top = parentBounds.top + (offset.top || 0);
+      height = viewport.height - top - (offset.bottom || 0);
+    } else if (offset.top !== undefined && offset.bottom !== undefined) {
+      // Both top and bottom specified = absolute positioning within viewport
+      top = offset.top;
+      height = offset.bottom - offset.top;
+    } else if (anchor.vertical === 'top') {
+      top = parentBounds.top + (offset.top || 0);
+      if (offset.bottom !== undefined) {
+        height = offset.bottom - top;
+      }
+    } else if (anchor.vertical === 'bottom') {
+      top = parentBounds.top + parentBounds.height + (offset.top || 0);
+      if (offset.bottom !== undefined) {
+        height = offset.bottom - top;
+      }
+    } else if (anchor.vertical === 'center') {
+      top = parentBounds.top + parentBounds.height / 2 + (offset.top || 0);
+      if (offset.bottom !== undefined) {
+        height = offset.bottom - top;
+      }
+    } else {
+      // anchor.vertical === 'none' or undefined - use parent top + offset
+      top = parentBounds.top + (offset.top || 0);
+    }
+
+    return { left, top, width, height };
   },
 };
 

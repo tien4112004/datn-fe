@@ -1,15 +1,8 @@
 import type { Slide, SlideTheme } from '@/types/slides';
-import { createTitleLine } from '../graphic';
 import type { TwoColumnWithImageLayoutSchema } from './types';
-import type {
-  Bounds,
-  ImageLayoutBlockInstance,
-  TemplateConfig,
-  TextLayoutBlockInstance,
-  TextTemplateContainer,
-  ImageTemplateContainer,
-} from '../types';
+import type { Bounds, TemplateConfig, TextLayoutBlockInstance } from '../types';
 import LayoutPrimitives from '../layoutPrimitives';
+import LayoutProBuilder from '../layoutProbuild';
 
 const SLIDE_WIDTH = 1000;
 const SLIDE_HEIGHT = 562.5;
@@ -167,51 +160,24 @@ export const convertTwoColumnWithImageLayout = async (
   template: TemplateConfig,
   slideId?: string
 ): Promise<Slide> => {
-  // Merge template config with bounds to create instances
-  const titleInstance = {
-    ...template.containers.title,
-    ...template.containers.title.bounds,
-  } as TextLayoutBlockInstance;
   const contentInstance = {
     ...template.containers.content,
-    ...template.containers.content.bounds,
+    bounds: template.containers.content.bounds,
   } as TextLayoutBlockInstance;
-  const imageInstance = {
-    ...template.containers.image,
-    ...template.containers.image.bounds,
-  } as ImageLayoutBlockInstance;
-
-  const { titleContent, titleDimensions, titlePosition } = LayoutPrimitives.calculateTitleLayout(
-    data.title,
-    titleInstance
-  );
 
   // Create item elements with automatic font size optimization
   const itemElements = await LayoutPrimitives.createItemElementsWithStyles(data.data.items, contentInstance);
 
-  const imageElement = await LayoutPrimitives.createImageElement(data.data.image, imageInstance);
+  const imageElement = await LayoutProBuilder.buildImageElement(data.data.image, template.containers.image);
 
   const slide: Slide = {
     id: slideId ?? crypto.randomUUID(),
     elements: [
-      LayoutPrimitives.createTitlePPTElement(
-        titleContent,
-        { left: titlePosition.left, top: titlePosition.top },
-        { width: titleDimensions.width, height: titleDimensions.height },
-        titleInstance
-      ),
+      ...LayoutProBuilder.buildTitle(data.title, template.containers.title, template.theme),
       imageElement,
-      createTitleLine(
-        {
-          width: titleDimensions.width,
-          height: titleDimensions.height,
-          left: titlePosition.left,
-          top: titlePosition.top,
-        } as Bounds,
-        template.theme
-      ),
       ...itemElements,
     ],
+    background: LayoutPrimitives.processBackground(template.theme),
   };
 
   return slide;

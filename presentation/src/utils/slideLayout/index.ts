@@ -1,4 +1,3 @@
-import { type SlideViewport } from './slideLayout';
 import {
   type SlideLayoutSchema,
   type TwoColumnWithImageLayoutSchema,
@@ -10,7 +9,6 @@ import {
   type TransitionLayoutSchema,
   type TableOfContentsLayoutSchema,
   SLIDE_LAYOUT_TYPE,
-  getTransitionLayoutTemplate,
 } from './converters';
 import {
   convertTwoColumnWithImageLayout,
@@ -20,10 +18,16 @@ import {
 import { convertVerticalListLayout, getVerticalListLayoutTemplate } from './converters/verticalList';
 import { convertTwoColumnLayout, getTwoColumnLayoutTemplate } from './converters/twoColumn';
 import { convertMainImageLayout, getMainImageLayoutTemplate } from './converters/mainImage';
-import { convertTitleLayout, convertTransitionLayout, getTitleLayoutTemplate } from './converters/title';
+import {
+  convertTitleLayout,
+  convertTransitionLayout,
+  getTitleLayoutTemplate,
+  getTransitionLayoutTemplate,
+} from './converters/title';
 import { convertTableOfContentsLayout, getTableOfContentsLayoutTemplate } from './converters/tableOfContents';
 import { convertHorizontalListLayout, getHorizontalListLayoutTemplate } from './converters/horizontalList';
 import type { SlideTheme } from '@/types/slides';
+import type { SlideViewport } from './types';
 
 // Export font size calculation utilities
 export {
@@ -33,9 +37,6 @@ export {
   applyFontSizeToElement,
   type FontSizeCalculationResult,
 } from './fontSizeCalculator';
-
-// Export layout utilities
-export { SlideLayoutCalculator, type SlideViewport } from './slideLayout';
 
 export const convertToSlide = async (
   data: SlideLayoutSchema,

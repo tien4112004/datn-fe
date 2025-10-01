@@ -89,8 +89,8 @@ export function measureElementWithStyle(element: HTMLElement, container?: Layout
   element.style.left = '-9999px';
 
   // Apply configurations
-  if (container?.width) {
-    element.style.maxWidth = `${container?.width}px`;
+  if (container?.bounds?.width) {
+    element.style.maxWidth = `${container.bounds.width}px`;
     element.style.whiteSpace = 'normal';
     element.style.overflowWrap = 'break-word';
     element.style.wordWrap = 'break-word';
@@ -98,8 +98,8 @@ export function measureElementWithStyle(element: HTMLElement, container?: Layout
     element.style.whiteSpace = 'nowrap';
   }
 
-  if (container?.height) {
-    element.style.maxHeight = `${container?.height}px`;
+  if (container?.bounds?.height) {
+    element.style.maxHeight = `${container.bounds.height}px`;
     element.style.overflow = 'hidden';
   }
 

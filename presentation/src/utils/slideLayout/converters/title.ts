@@ -1,8 +1,8 @@
 import type { Slide, SlideTheme } from '@/types/slides';
-import { createTitleLine } from '../graphic';
 import type { TitleLayoutSchema, TransitionLayoutSchema } from './types';
 import type { Bounds, TextLayoutBlockInstance, TemplateConfig, TextTemplateContainer } from '../types';
 import LayoutPrimitives from '../layoutPrimitives';
+import LayoutProBuilder from '../layoutProbuild';
 
 const SLIDE_WIDTH = 1000;
 const SLIDE_HEIGHT = 562.5;
@@ -34,8 +34,9 @@ export const getTitleLayoutTemplate = (theme: SlideTheme): TemplateConfig => {
           fontFamily: theme.titleFontName,
           fontWeight: 'bold',
           fontStyle: 'normal',
+          textAlign: 'center',
         },
-      } satisfies TextTemplateContainer,
+      },
       subtitle: {
         bounds: subtitleBounds,
         padding: { top: 0, bottom: 0, left: 0, right: 0 },
@@ -46,11 +47,12 @@ export const getTitleLayoutTemplate = (theme: SlideTheme): TemplateConfig => {
           fontFamily: theme.fontName,
           fontWeight: 'normal',
           fontStyle: 'normal',
+          textAlign: 'center',
         },
-      } satisfies TextTemplateContainer,
+      },
     },
     theme,
-  } satisfies TemplateConfig;
+  };
 };
 
 export const convertTitleLayout = async (
@@ -64,7 +66,7 @@ export const convertTitleLayout = async (
   // Merge template config with bounds to create instances
   const titleInstance = {
     ...template.containers.title,
-    ...template.containers.title.bounds,
+    bounds: template.containers.title.bounds,
   } as TextLayoutBlockInstance;
 
   const { titleContent, titleDimensions, titlePosition } = LayoutPrimitives.calculateTitleLayout(
@@ -73,29 +75,17 @@ export const convertTitleLayout = async (
   );
 
   const elements = [
-    LayoutPrimitives.createTitlePPTElement(
-      titleContent,
-      { left: titlePosition.left, top: titlePosition.top },
-      { width: titleDimensions.width, height: titleDimensions.height },
-      titleInstance
-    ),
-    createTitleLine(
-      {
-        width: titleDimensions.width,
-        height: titleDimensions.height,
-        left: titlePosition.left,
-        top: titlePosition.top,
-      } as Bounds,
-      template.theme
-    ),
+    ...LayoutProBuilder.buildTitle(data.data.title, template.containers.title, template.theme),
   ];
 
   // Add subtitle if present
   if (hasSubtitle && data.data.subtitle) {
     const subtitleInstance = {
       ...template.containers.subtitle,
-      ...template.containers.subtitle.bounds,
-      top: titlePosition.top + titleDimensions.height + 32, // Position below title
+      bounds: {
+        ...template.containers.subtitle.bounds,
+        top: titlePosition.top + titleDimensions.height + 32, // Position below title
+      },
     } as TextLayoutBlockInstance;
 
     const subtitleElements = await LayoutPrimitives.createItemElementsWithStyles(
@@ -116,9 +106,14 @@ export const convertTitleLayout = async (
   const slide: Slide = {
     id: slideId ?? crypto.randomUUID(),
     elements,
+    background: LayoutPrimitives.processBackground(template.theme),
   };
 
   return slide;
+};
+
+export const getTransitionLayoutTemplate = (theme: SlideTheme): TemplateConfig => {
+  return getTitleLayoutTemplate(theme);
 };
 
 export const convertTransitionLayout = async (

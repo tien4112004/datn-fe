@@ -788,7 +788,7 @@ export interface Slide {
  * fontName: font
  */
 export interface SlideTheme {
-  backgroundColor: string;
+  backgroundColor: string | Gradient;
   themeColors: string[];
   fontColor: string;
   fontName: string;

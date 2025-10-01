@@ -185,11 +185,11 @@
       <Popover trigger="click" style="width: 60%">
         <template #content>
           <ColorPicker
-            :modelValue="theme.backgroundColor"
+            :modelValue="typeof theme.backgroundColor === 'string' ? theme.backgroundColor : '#ffffff'"
             @update:modelValue="(value) => updateTheme({ backgroundColor: value })"
           />
         </template>
-        <ColorButton :color="theme.backgroundColor" />
+        <ColorButton :color="themeBackgroundColor" />
       </Popover>
     </div>
     <div class="row">
@@ -510,6 +510,29 @@ const toFixed = (num: number) => {
   }
   return Math.floor(num);
 };
+
+// Convert theme backgroundColor to CSS string
+const themeBackgroundColor = computed(() => {
+  const bgColor = theme.value.backgroundColor;
+
+  // If it's already a string, return it
+  if (typeof bgColor === 'string') {
+    return bgColor;
+  }
+
+  // If it's a Gradient object, convert to CSS gradient string
+  if (bgColor && typeof bgColor === 'object') {
+    const { type, colors, rotate } = bgColor;
+    const list = colors.map((item) => `${item.color} ${item.pos}%`);
+
+    if (type === 'radial') {
+      return `radial-gradient(${list.join(',')})`;
+    }
+    return `linear-gradient(${rotate}deg, ${list.join(',')})`;
+  }
+
+  return '#ffffff';
+});
 </script>
 
 <style lang="scss" scoped>

@@ -1,8 +1,8 @@
 import type { Slide, SlideTheme } from '@/types/slides';
-import { createTitleLine } from '../graphic';
 import type { VerticalListLayoutSchema } from './types';
 import type { Bounds, TextLayoutBlockInstance, TemplateConfig, TextTemplateContainer } from '../types';
 import LayoutPrimitives from '../layoutPrimitives';
+import LayoutProBuilder from '../layoutProbuild';
 
 const SLIDE_WIDTH = 1000;
 const SLIDE_HEIGHT = 562.5;
@@ -113,17 +113,6 @@ export const convertVerticalListLayout = async (
   template: TemplateConfig,
   slideId?: string
 ): Promise<Slide> => {
-  // Merge template config with bounds to create instances
-  const titleInstance = {
-    ...template.containers.title,
-    ...template.containers.title.bounds,
-  } as TextLayoutBlockInstance;
-
-  const { titleContent, titleDimensions, titlePosition } = LayoutPrimitives.calculateTitleLayout(
-    data.title,
-    titleInstance
-  );
-
   const items = data.data.items;
   const useTwoColumns = items.length > 5;
 
@@ -131,10 +120,14 @@ export const convertVerticalListLayout = async (
     // Two column layout
     const contentInstance = {
       ...template.containers.content,
-      ...template.containers.content.bounds,
+      bounds: template.containers.content.bounds,
     } as TextLayoutBlockInstance;
 
-    const childContainers = LayoutPrimitives.getChildrenMaxBounds(contentInstance);
+    const childContainers = LayoutPrimitives.getChildrenMaxBounds(contentInstance.bounds, {
+      distribution: contentInstance.distribution,
+      childCount: contentInstance.children?.length || 0,
+      orientation: contentInstance.orientation,
+    });
 
     // Split items into two columns
     const midpoint = Math.ceil(items.length / 2);
@@ -143,32 +136,18 @@ export const convertVerticalListLayout = async (
 
     const leftItemElements = await LayoutPrimitives.createItemElementsWithStyles(leftItems, {
       ...contentInstance.children?.[0],
-      ...childContainers[0],
+      bounds: childContainers[0],
     } as TextLayoutBlockInstance);
 
     const rightItemElements = await LayoutPrimitives.createItemElementsWithStyles(rightItems, {
       ...contentInstance.children?.[1],
-      ...childContainers[1],
+      bounds: childContainers[1],
     } as TextLayoutBlockInstance);
 
     const slide: Slide = {
       id: slideId ?? crypto.randomUUID(),
       elements: [
-        LayoutPrimitives.createTitlePPTElement(
-          titleContent,
-          { left: titlePosition.left, top: titlePosition.top },
-          { width: titleDimensions.width, height: titleDimensions.height },
-          titleInstance
-        ),
-        createTitleLine(
-          {
-            width: titleDimensions.width,
-            height: titleDimensions.height,
-            left: titlePosition.left,
-            top: titlePosition.top,
-          } as Bounds,
-          template.theme
-        ),
+        ...LayoutProBuilder.buildTitle(data.title, template.containers.title, template.theme),
         ...leftItemElements,
         ...rightItemElements,
       ],
@@ -179,7 +158,7 @@ export const convertVerticalListLayout = async (
     // Single column layout
     const singleColumnInstance = {
       ...template.containers.singleColumn,
-      ...template.containers.singleColumn.bounds,
+      bounds: template.containers.singleColumn.bounds,
     } as TextLayoutBlockInstance;
 
     const itemElements = await LayoutPrimitives.createItemElementsWithStyles(items, singleColumnInstance);
@@ -187,23 +166,10 @@ export const convertVerticalListLayout = async (
     const slide: Slide = {
       id: slideId ?? crypto.randomUUID(),
       elements: [
-        LayoutPrimitives.createTitlePPTElement(
-          titleContent,
-          { left: titlePosition.left, top: titlePosition.top },
-          { width: titleDimensions.width, height: titleDimensions.height },
-          titleInstance
-        ),
-        createTitleLine(
-          {
-            width: titleDimensions.width,
-            height: titleDimensions.height,
-            left: titlePosition.left,
-            top: titlePosition.top,
-          } as Bounds,
-          template.theme
-        ),
+        ...LayoutProBuilder.buildTitle(data.title, template.containers.title, template.theme),
         ...itemElements,
       ],
+      background: LayoutPrimitives.processBackground(template.theme),
     };
 
     return slide;

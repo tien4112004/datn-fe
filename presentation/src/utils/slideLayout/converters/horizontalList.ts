@@ -1,8 +1,8 @@
-import type { Slide, SlideTheme } from '@/types/slides';
-import { createTitleLine } from '../graphic';
 import type { HorizontalListLayoutSchema } from './types';
-import type { Bounds, TextLayoutBlockInstance, TemplateConfig } from '../types';
+import type { Bounds, TemplateConfig } from '../types';
 import LayoutPrimitives from '../layoutPrimitives';
+import type { PPTTextElement, Slide, SlideTheme } from '@/types/slides';
+import LayoutProBuilder from '../layoutProbuild';
 
 const SLIDE_WIDTH = 1000;
 const SLIDE_HEIGHT = 562.5;
@@ -43,59 +43,58 @@ export const getHorizontalListLayoutTemplate = (theme: SlideTheme): TemplateConf
         spacingBetweenItems: 25,
         horizontalAlignment: 'center',
         verticalAlignment: 'top',
-        orientation: 'vertical',
-        text: {
-          color: theme.fontColor,
-          fontFamily: theme.fontName,
-          fontWeight: 'normal',
-          fontStyle: 'normal',
-        },
+        orientation: 'horizontal',
         childTemplate: {
-          label: 'row',
-          count: 2,
+          count: 'auto',
+          wrap: {
+            enabled: true,
+            maxItemsPerLine: 4,
+            lineCount: 'auto',
+            distribution: 'balanced',
+            lineSpacing: 15,
+            alternating: true,
+          },
           structure: {
+            label: 'item',
             padding: { top: 0, bottom: 0, left: 0, right: 0 },
             distribution: 'equal',
-            spacingBetweenItems: 0,
+            spacingBetweenItems: -10,
             horizontalAlignment: 'center',
             verticalAlignment: 'top',
-            orientation: 'horizontal',
-            childTemplate: {
-              label: 'item',
-              count: 'auto',
-              structure: {
+            orientation: 'vertical',
+            border: {
+              color: theme.themeColors[0],
+              width: 1,
+              radius: 8,
+            },
+            children: [
+              {
                 padding: { top: 0, bottom: 0, left: 0, right: 0 },
-                distribution: 'equal',
-                spacingBetweenItems: 15,
                 horizontalAlignment: 'center',
                 verticalAlignment: 'center',
-                orientation: 'vertical',
-                children: [
-                  {
-                    padding: { top: 0, bottom: 0, left: 0, right: 0 },
-                    horizontalAlignment: 'center',
-                    verticalAlignment: 'center',
-                    text: {
-                      color: theme.fontColor,
-                      fontFamily: theme.fontName,
-                      fontWeight: 'bold',
-                      fontStyle: 'normal',
-                    },
-                  },
-                  {
-                    padding: { top: 0, bottom: 0, left: 0, right: 0 },
-                    horizontalAlignment: 'center',
-                    verticalAlignment: 'center',
-                    text: {
-                      color: theme.fontColor,
-                      fontFamily: theme.fontName,
-                      fontWeight: 'normal',
-                      fontStyle: 'normal',
-                    },
-                  },
-                ],
+                label: 'label',
+                text: {
+                  color: theme.fontColor,
+                  fontFamily: theme.fontName,
+                  fontWeight: 'bold',
+                  fontStyle: 'normal',
+                  textAlign: 'center',
+                },
               },
-            },
+              {
+                padding: { top: 0, bottom: 0, left: 0, right: 0 },
+                horizontalAlignment: 'center',
+                verticalAlignment: 'center',
+                label: 'content',
+                text: {
+                  color: theme.fontColor,
+                  fontFamily: theme.fontName,
+                  fontWeight: 'normal',
+                  fontStyle: 'normal',
+                  textAlign: 'center',
+                },
+              },
+            ],
           },
         },
       },
@@ -109,93 +108,66 @@ export const convertHorizontalListLayout = async (
   template: TemplateConfig,
   slideId?: string
 ): Promise<Slide> => {
-  // Merge template config with bounds to create instances
-  const titleInstance = {
-    ...template.containers.title,
-    ...template.containers.title.bounds,
-  } as TextLayoutBlockInstance;
-  const contentInstance = {
-    ...template.containers.content,
-    ...template.containers.content.bounds,
-  } as TextLayoutBlockInstance;
-
-  const { titleContent, titleDimensions, titlePosition } = LayoutPrimitives.calculateTitleLayout(
-    data.title,
-    titleInstance
+  // Content container - use unified font sizing
+  const contentContainer = template.containers.content;
+  const { instance: contentInstance, elements } = LayoutProBuilder.buildLayoutWithUnifiedFontSizing(
+    contentContainer,
+    contentContainer.bounds,
+    {
+      label: data.data.items.map((item) => item.label),
+      content: data.data.items.map((item) => item.content),
+    }
   );
 
-  const rows = LayoutPrimitives.getChildrenMaxBounds(template.containers.content);
+  // Get labeled instances for bounds
+  const labels = LayoutPrimitives.recursivelyGetAllLabelInstances(contentInstance, 'label');
+  const contents = LayoutPrimitives.recursivelyGetAllLabelInstances(contentInstance, 'content');
+  const itemInstances = LayoutPrimitives.recursivelyGetAllLabelInstances(contentInstance, 'item');
 
-  // Flatten items for each row: labels and content separately
-  const topRowLabels = data.data.items
-    .slice(0, rows[0] ? Math.ceil(data.data.items.length / 2) : 0)
-    .map((item) => item.label);
-  const topRowContents = data.data.items
-    .slice(0, rows[0] ? Math.ceil(data.data.items.length / 2) : 0)
-    .map((item) => item.content);
+  // Extract elements by label
+  const labelElements = elements['label'] || [];
+  const contentElements = elements['content'] || [];
 
-  const bottomRowLabels = rows[1]
-    ? data.data.items.slice(Math.ceil(data.data.items.length / 2)).map((item) => item.label)
-    : [];
-  const bottomRowContents = rows[1]
-    ? data.data.items.slice(Math.ceil(data.data.items.length / 2)).map((item) => item.content)
-    : [];
-
-  // Create label and content elements for top row
-  const topRowLabelElements = await LayoutPrimitives.createItemElementsWithStyles(topRowLabels, {
-    ...template.containers.content.children?.[0],
-    ...rows[0],
-    height: rows[0] ? rows[0].height * 0.3 : 0,
-  } as TextLayoutBlockInstance);
-
-  const topRowContentElements = await LayoutPrimitives.createItemElementsWithStyles(topRowContents, {
-    ...template.containers.content.children?.[0],
-    ...rows[0],
-    top: rows[0] ? rows[0].top + rows[0].height * 0.3 + 15 : 0,
-    height: rows[0] ? rows[0].height * 0.7 - 15 : 0,
-  } as TextLayoutBlockInstance);
-
-  // Create label and content elements for bottom row
-  const bottomRowLabelElements = rows[1]
-    ? await LayoutPrimitives.createItemElementsWithStyles(bottomRowLabels, {
-        ...template.containers.content.children?.[1],
-        ...rows[1],
-        height: rows[1].height * 0.3,
-      } as TextLayoutBlockInstance)
-    : [];
-
-  const bottomRowContentElements = rows[1]
-    ? await LayoutPrimitives.createItemElementsWithStyles(bottomRowContents, {
-        ...template.containers.content.children?.[1],
-        ...rows[1],
-        top: rows[1].top + rows[1].height * 0.3 + 15,
-        height: rows[1].height * 0.7 - 15,
-      } as TextLayoutBlockInstance)
-    : [];
+  // Generate PPT elements from pre-created elements
+  const itemElements = labelElements
+    .map((labelEl, index) => {
+      return [
+        LayoutPrimitives.createCard(itemInstances[index]),
+        {
+          id: crypto.randomUUID(),
+          type: 'text',
+          content: labelEl.outerHTML,
+          defaultFontName: labels[index].text?.fontFamily,
+          defaultColor: labels[index].text?.color,
+          left: labels[index].bounds.left,
+          top: labels[index].bounds.top,
+          width: labels[index].bounds.width,
+          height: labels[index].bounds.height,
+          textType: 'content',
+        } as PPTTextElement,
+        {
+          id: crypto.randomUUID(),
+          type: 'text',
+          content: contentElements[index].outerHTML,
+          defaultFontName: contents[index].text?.fontFamily,
+          defaultColor: contents[index].text?.color,
+          left: contents[index].bounds.left,
+          top: contents[index].bounds.top,
+          width: contents[index].bounds.width,
+          height: contents[index].bounds.height,
+          textType: 'content',
+        } as PPTTextElement,
+      ];
+    })
+    .flat();
 
   const slide: Slide = {
     id: slideId ?? crypto.randomUUID(),
     elements: [
-      LayoutPrimitives.createTitlePPTElement(
-        titleContent,
-        { left: titlePosition.left, top: titlePosition.top },
-        { width: titleDimensions.width, height: titleDimensions.height },
-        titleInstance
-      ),
-      createTitleLine(
-        {
-          width: titleDimensions.width,
-          height: titleDimensions.height,
-          left: titlePosition.left,
-          top: titlePosition.top,
-        } as Bounds,
-        template.theme
-      ),
-      ...topRowLabelElements,
-      ...topRowContentElements,
-      ...bottomRowLabelElements,
-      ...bottomRowContentElements,
+      ...LayoutProBuilder.buildTitle(data.title, template.containers.title, template.theme),
+      ...itemElements,
     ],
+    background: LayoutPrimitives.processBackground(template.theme),
   };
 
   return slide;

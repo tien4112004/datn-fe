@@ -1,9 +1,9 @@
 import type { Slide, SlideTheme } from '@/types/slides';
-import { createTitleLine } from '../graphic';
 import type { TableOfContentsLayoutSchema, TwoColumnLayoutSchema } from './types';
 import { convertTwoColumnLayout, getTwoColumnLayoutTemplate } from './twoColumn';
 import type { Bounds, TextLayoutBlockInstance, TemplateConfig, TextTemplateContainer } from '../types';
 import LayoutPrimitives from '../layoutPrimitives';
+import LayoutProBuilder from '../layoutProbuild';
 
 const SLIDE_WIDTH = 1000;
 const SLIDE_HEIGHT = 562.5;
@@ -27,7 +27,7 @@ export const getTableOfContentsLayoutTemplate = (theme: SlideTheme): TemplateCon
           fontWeight: 'bold',
           fontStyle: 'normal',
         },
-      } satisfies TextTemplateContainer,
+      },
       content: {
         bounds: {
           left: 60,
@@ -46,10 +46,10 @@ export const getTableOfContentsLayoutTemplate = (theme: SlideTheme): TemplateCon
           fontWeight: 'normal',
           fontStyle: 'normal',
         },
-      } satisfies TextTemplateContainer,
+      },
     },
     theme,
-  } satisfies TemplateConfig;
+  };
 };
 
 export const convertTableOfContentsLayout = async (
@@ -81,17 +81,12 @@ export const convertTableOfContentsLayout = async (
   // Single column layout - merge template config with bounds
   const titleInstance = {
     ...template.containers.title,
-    ...template.containers.title.bounds,
+    bounds: template.containers.title.bounds,
   } as TextLayoutBlockInstance;
   const contentInstance = {
     ...template.containers.content,
-    ...template.containers.content.bounds,
+    bounds: template.containers.content.bounds,
   } as TextLayoutBlockInstance;
-
-  const { titleContent, titleDimensions, titlePosition } = LayoutPrimitives.calculateTitleLayout(
-    'Contents',
-    titleInstance
-  );
 
   // Create item elements using template
   const itemElements = await LayoutPrimitives.createItemElementsWithStyles(numberedItems, contentInstance);
@@ -99,23 +94,10 @@ export const convertTableOfContentsLayout = async (
   const slide: Slide = {
     id: slideId ?? crypto.randomUUID(),
     elements: [
-      LayoutPrimitives.createTitlePPTElement(
-        titleContent,
-        { left: titlePosition.left, top: titlePosition.top },
-        { width: titleDimensions.width, height: titleDimensions.height },
-        titleInstance
-      ),
-      createTitleLine(
-        {
-          width: titleDimensions.width,
-          height: titleDimensions.height,
-          left: titlePosition.left,
-          top: titlePosition.top,
-        } as Bounds,
-        template.theme
-      ),
+      ...LayoutProBuilder.buildTitle('Contents', template.containers.title, template.theme),
       ...itemElements,
     ],
+    background: LayoutPrimitives.processBackground(template.theme),
   };
 
   return slide;

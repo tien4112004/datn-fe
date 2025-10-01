@@ -75,7 +75,7 @@ import Modal from '@/components/Modal.vue';
 import Drawer from '@/components/Drawer.vue';
 import type { SlideTheme } from '@/types/slides';
 import { convertToSlide } from '@/utils/slideLayout';
-import type { ExtendedSlideTheme } from '@/utils/slideLayout/theme';
+import Button from '@/components/Button.vue';
 
 const mainStore = useMainStore();
 const slidesStore = useSlidesStore();
@@ -104,132 +104,164 @@ usePasteEvent();
 
 const handleClick = async () => {
   const dataTests = [
-    // {
-    //   type: 'title',
-    //   data: {
-    //     title: 'Presentation with really long title',
-    //   },
-    // },
-    // {
-    //   type: 'title',
-    //   data: {
-    //     title: 'Presentation with really long title',
-    //     subtitle:
-    //       'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
-    //   },
-    // },
-    // {
-    //   type: 'two_column_with_image',
-    //   title: 'Presentation',
-    //   data: {
-    //     items: [
-    //       'Lorem ipsum dolor sit amet, consectetur adipiscing elit. ',
-    //       'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
-    //       'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. ',
-    //     ],
-    //     image: 'https://placehold.co/600x400',
-    //   },
-    // },
-    // {
-    //   type: 'two_column_with_big_image',
-    //   title: 'Presentation',
-    //   data: {
-    //     items: [
-    //       'Lorem ipsum dolor sit amet, consectetur adipiscing elit. ',
-    //       'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
-    //       'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. ',
-    //     ],
-    //     image: 'https://placehold.co/600x400',
-    //   },
-    // },
-    // {
-    //   type: 'main_image',
-    //   data: {
-    //     image: 'https://placehold.co/600x400',
-    //     content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-    //   },
-    // },
+    {
+      type: 'title',
+      data: {
+        title: 'Presentation with really long title',
+      },
+    },
+    {
+      type: 'title',
+      data: {
+        title: 'Presentation with really long title',
+        subtitle:
+          'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+      },
+    },
+    {
+      type: 'two_column_with_image',
+      title: 'Presentation',
+      data: {
+        items: [
+          'Item1: Lorem ipsum dolor sit amet, consectetur adipiscing elit. ',
+          'Item2: Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+          'Item3: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. ',
+        ],
+        image: 'https://placehold.co/600x400',
+      },
+    },
+    {
+      type: 'two_column_with_big_image',
+      title: 'Presentation',
+      data: {
+        items: [
+          'Item1: Lorem ipsum dolor sit amet, consectetur adipiscing elit. ',
+          'Item2: Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+          'Item3: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. ',
+        ],
+        image: 'https://placehold.co/600x400',
+      },
+    },
+    {
+      type: 'main_image',
+      data: {
+        image: 'https://placehold.co/600x400',
+        content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+      },
+    },
     {
       type: 'two_column',
+      title: 'this is a title',
       data: {
-        title: 'this is a title',
         items1: [
-          'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-          'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
-          'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+          'Item1-1: Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+          'Item1-2: Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.  nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+          'Item1-3: Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
         ],
         items2: [
-          'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-          'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+          'Item2-1: Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+          'Item2-2: Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
         ],
       },
     },
-    // {
-    //   type: 'table_of_contents',
-    //   data: {
-    //     items: [
-    //       'What & Why of Microservices',
-    //       'Monolith vs Microservices',
-    //       'Service Design Principles',
-    //       'Communication & Data',
-    //       'Deployment & Scaling',
-    //       'Observability & Resilience',
-    //       'Security & Governance',
-    //       'Case Study & Q&A',
-    //     ],
-    //   },
-    // },
-    // {
-    //   type: 'vertical_list',
-    //   title: 'This is a title',
-    //   data: {
-    //     items: [
-    //       'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-    //       'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-    //       'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
-    //       'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-    //       'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
-    //       'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-    //     ],
-    //   },
-    // },
-    // {
-    //   type: 'horizontal_list',
-    //   title: 'Five Fundamentals of Microservices',
-    //   data: {
-    //     items: [
-    //       {
-    //         label: 'Boundaries',
-    //         content: 'Define services around business capabilities and domains.',
-    //       },
-    //       {
-    //         label: 'APIs',
-    //         content: 'Use clear contracts (REST/gRPC) and versioning.',
-    //       },
-    //       {
-    //         label: 'Data',
-    //         content: 'Own your data; avoid shared databases.',
-    //       },
-    //       {
-    //         label: 'Delivery',
-    //         content: 'Automate CI/CD per service for rapid iteration.',
-    //       },
-    //       {
-    //         label: 'Observe',
-    //         content: 'Centralize logs, metrics, and traces for each service.',
-    //       },
-    //     ],
-    //   },
-    // },
+    {
+      type: 'table_of_contents',
+      data: {
+        items: [
+          'Item1: What & Why of Microservices',
+          'Item2: Monolith vs Microservices',
+          'Item3: Service Design Principles',
+          'Item4: Communication & Data',
+          'Item5: Deployment & Scaling',
+          'Item6: Observability & Resilience',
+          'Item7: Security & Governance',
+          'Item8: Case Study & Q&A',
+        ],
+      },
+    },
+    {
+      type: 'vertical_list',
+      title: 'This is a title',
+      data: {
+        items: [
+          'Item1: Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+          'Item2: Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+          'Item3: Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+          'Item4: Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+          'Item5: Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+          'Item6: Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+        ],
+      },
+    },
+    {
+      type: 'horizontal_list',
+      title: 'Five Fundamentals of Microservices',
+      data: {
+        items: [
+          {
+            label: 'Label 1',
+            content: 'Item1: Define services around business capabilities and domains.',
+          },
+          {
+            label: 'Label 2',
+            content: 'Item2: Use clear contracts (REST/gRPC) and versioning.',
+          },
+          {
+            label: 'Label 3',
+            content: 'Item3: Own your data; avoid shared databases.',
+          },
+          {
+            label: 'Label 4',
+            content: 'Item4: Automate CI/CD per service for rapid iteration.',
+          },
+          {
+            label: 'Label 5',
+            content: 'Item5: Centralize logs, metrics, and traces for each service.',
+          },
+        ],
+      },
+    },
+    {
+      type: 'horizontal_list',
+      title: 'Five Fundamentals of Microservices',
+      data: {
+        items: [
+          {
+            label: 'Boundaries',
+            content: 'Define services around business capabilities and domains.',
+          },
+          {
+            label: 'APIs',
+            content: 'Use clear contracts (REST/gRPC) and versioning.',
+          },
+          {
+            label: 'Data',
+            content: 'Own your data; avoid shared databases.',
+          },
+          {
+            label: 'Delivery',
+            content: 'Automate CI/CD per service for rapid iteration.',
+          },
+        ],
+      },
+    },
   ];
 
   const viewport = {
-    size: slidesStore.viewportSize,
-    ratio: slidesStore.viewportRatio,
+    width: 1000,
+    height: 562.5,
   };
 
   const theme = {
-    backgroundColor: '#ffffff',
+    backgroundColor: {
+      type: 'linear',
+      colors: [
+        { color: '#e3f2fd', pos: 0 }, // soft bluish tint
+        { color: '#f5f7fa', pos: 50 }, // very light gray
+        { color: '#ffffff', pos: 100 }, // pure white at top
+      ],
+      rotate: 0,
+    },
     themeColors: ['#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6'],
     fontColor: '#333333',
     fontName: 'Roboto',
@@ -246,7 +278,7 @@ const handleClick = async () => {
     },
     titleFontColor: '#0A2540',
     titleFontName: 'Roboto',
-  } as ExtendedSlideTheme;
+  } as SlideTheme;
 
   slidesStore.setTheme(theme); // This should be set after initialization
 

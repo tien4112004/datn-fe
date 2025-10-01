@@ -1,22 +1,37 @@
 export * from './types';
 
-// Layout converters
-export { convertTwoColumnWithImageLayout } from './twoColumnWithImage';
-export { convertMainImageLayout } from './mainImage';
-export { convertTitleLayout, convertTransitionLayout } from './title';
-export { convertTwoColumnLayout } from './twoColumn';
-export { convertVerticalListLayout } from './verticalList';
-export { convertHorizontalListLayout } from './horizontalList';
-export { convertTableOfContentsLayout } from './tableOfContents';
+export * from './twoColumn';
+export * from './twoColumnWithImage';
+export * from './title';
+export * from './tableOfContents';
+export * from './mainImage';
+export * from './verticalList';
+export * from './horizontalList';
 
-// Template configuration getters
-export {
-  getTwoColumnWithImageLayoutTemplate,
-  getTwoColumnBigImageLayoutTemplate,
-} from './twoColumnWithImage';
-export { getMainImageLayoutTemplate } from './mainImage';
-export { getTitleLayoutTemplate, getTransitionLayoutTemplate } from './title';
-export { getTwoColumnLayoutTemplate } from './twoColumn';
-export { getVerticalListLayoutTemplate } from './verticalList';
-export { getHorizontalListLayoutTemplate } from './horizontalList';
-export { getTableOfContentsLayoutTemplate } from './tableOfContents';
+// Helper utilities
+import type { TemplateConfig, TemplateContainerConfig } from '../types';
+import LayoutPrimitives from '../layoutPrimitives';
+
+const SLIDE_WIDTH = 1000;
+const SLIDE_HEIGHT = 562.5;
+
+/**
+ * Resolve all container positions and return containers with absolute bounds
+ */
+export function resolveTemplateContainers(template: TemplateConfig): Record<string, TemplateContainerConfig> {
+  const resolvedBounds = LayoutPrimitives.resolveContainerPositions(template.containers, {
+    width: SLIDE_WIDTH,
+    height: SLIDE_HEIGHT,
+  });
+
+  const resolvedContainers: Record<string, TemplateContainerConfig> = {};
+
+  for (const [id, container] of Object.entries(template.containers)) {
+    resolvedContainers[id] = {
+      ...container,
+      bounds: resolvedBounds[id],
+    };
+  }
+
+  return resolvedContainers;
+}

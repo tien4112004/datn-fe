@@ -15,13 +15,14 @@ import { useSlidesStore } from '@/store';
 import type { SlideLayoutSchema } from '@/utils/slideLayout/converters';
 import { convertToSlide, type SlideViewport } from '@/utils/slideLayout';
 import type { Slide, SlideTheme } from '@/types/slides';
+import type { ExtendedSlideTheme } from '@/utils/slideLayout/theme';
 
 export function mount(el: string | Element, props: Record<string, unknown>) {
   const app = createApp(AppComponent, props) as App<Element> & {
     updateImageElement?: (slideId: string, elementId: string, image: string) => void;
     replaceSlides?: (data: SlideLayoutSchema[]) => Promise<Slide[]>;
     addSlide?: (data: SlideLayoutSchema, order?: number) => Promise<Slide>;
-    updateThemeAndViewport?: (theme: SlideTheme, viewport: SlideViewport) => void;
+    updateThemeAndViewport?: (theme: ExtendedSlideTheme, viewport: SlideViewport) => void;
   };
 
   const pinia = createPinia();
@@ -71,7 +72,12 @@ export function mount(el: string | Element, props: Record<string, unknown>) {
 
     const newSlides: Slide[] = [];
     for (let i = 0; i < dataArray.length; i++) {
-      const slide = await convertToSlide(dataArray[i], viewport, theme, (i + 1).toString());
+      const slide = await convertToSlide(
+        dataArray[i],
+        viewport,
+        theme as ExtendedSlideTheme,
+        (i + 1).toString()
+      );
 
       newSlides.push(slide);
     }
@@ -91,7 +97,7 @@ export function mount(el: string | Element, props: Record<string, unknown>) {
     };
     const theme = slidesStore.theme;
 
-    const slide = await convertToSlide(data, viewport, theme, order?.toString());
+    const slide = await convertToSlide(data, viewport, theme as ExtendedSlideTheme, order?.toString());
 
     window.dispatchEvent(
       new CustomEvent('app.image.need-generation', {

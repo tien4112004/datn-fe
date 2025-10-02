@@ -65,30 +65,6 @@ export default class PresentationRealApiService implements PresentationApiServic
     return api.patch<ApiResponse<Presentation>>(`${this.baseUrl}/api/presentations/${id}/parse`);
   }
 
-  async generatePresentationImage(
-    _id: string,
-    _slideId: string,
-    _elementId: string,
-    _prompt: string,
-    _model: { name: string; provider: string }
-  ): Promise<string> {
-    const res = await api.post<ApiResponse<{ cdnUrls: string[] }>>(
-      `${this.baseUrl}/api/images/generate`,
-      {
-        prompt: _prompt,
-        model: _model.name,
-        provider: _model.provider.toLowerCase(),
-      },
-      {
-        headers: {
-          'Idempotency-Key': `${_id}:${_slideId}:${_elementId}:image`,
-        },
-      }
-    );
-
-    return res.data.data.cdnUrls[0] ?? '';
-  }
-
   upsertPresentationSlide(id: string, slide: Slide): Promise<any> {
     return api.put<ApiResponse<Presentation>>(
       `${this.baseUrl}/api/presentations/${id}/slides`,

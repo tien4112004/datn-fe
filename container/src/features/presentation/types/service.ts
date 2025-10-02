@@ -56,11 +56,4 @@ export interface PresentationApiService extends Service {
   ): Promise<{ stream: AsyncIterable<string> } & PresentationGenerationStartResponse>;
   upsertPresentationSlide(id: string, slide: Slide): Promise<Presentation>;
   setPresentationAsParsed(id: string): Promise<Presentation>;
-  generatePresentationImage(
-    id: string,
-    slideId: string,
-    elementId: string,
-    prompt: string,
-    model: { name: string; provider: string }
-  ): Promise<string>;
 }

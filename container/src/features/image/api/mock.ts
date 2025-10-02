@@ -73,13 +73,7 @@ export default class ImageMockService implements ImageApiService {
         mockImageStore = [newImage, ...mockImageStore];
 
         const response: ImageGenerationResponse = {
-          id: newImage.id,
-          url: newImage.url,
-          prompt: newImage.prompt,
-          style: newImage.style,
-          size: newImage.size,
-          quality: newImage.quality,
-          createdAt: newImage.createdAt,
+          urls: [newImage.url],
         };
 
         resolve(response);
@@ -93,6 +87,23 @@ export default class ImageMockService implements ImageApiService {
         const image = mockImageStore.find((img) => img.id === id) || null;
         resolve(image);
       }, 500);
+    });
+  }
+
+  async generatePresentationImage(
+    _id: string,
+    _slideId: string,
+    _elementId: string,
+    _request: ImageGenerationRequest
+  ): Promise<ImageGenerationResponse> {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        // Return a mock image URL
+        const response: ImageGenerationResponse = {
+          urls: [`https://picsum.photos/800/600?random=${Date.now()}`],
+        };
+        resolve(response);
+      }, 10000);
     });
   }
 }

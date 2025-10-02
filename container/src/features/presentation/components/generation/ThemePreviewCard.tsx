@@ -1,4 +1,3 @@
-import React from 'react';
 import type { SlideTheme } from '../../types/slide';
 
 interface ThemePreviewCardProps {

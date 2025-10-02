@@ -97,19 +97,20 @@ export function mount(el: string | Element, props: Record<string, unknown>) {
     // Update image
     const imageUrl = 'https://upload.wikimedia.org/wikipedia/commons/b/b1/Loading_icon.gif';
     const imageElement = slide.elements.find((el) => el.type === 'image') as PPTImageElement;
+
     if (imageElement) {
       imageElement.src = imageUrl;
-    }
 
-    window.dispatchEvent(
-      new CustomEvent('app.image.need-generation', {
-        detail: {
-          slideId: slide.id,
-          elementId: imageElement.id,
-          prompt: (data as any).data.image,
-        },
-      })
-    );
+      window.dispatchEvent(
+        new CustomEvent('app.image.need-generation', {
+          detail: {
+            slideId: slide.id,
+            elementId: imageElement.id,
+            prompt: (data as any).data.image,
+          },
+        })
+      );
+    }
 
     // Add new slides to existing ones
     const currentSlides = slidesStore.slides;

@@ -73,7 +73,7 @@ export default class ImageMockService implements ImageApiService {
         mockImageStore = [newImage, ...mockImageStore];
 
         const response: ImageGenerationResponse = {
-          urls: [newImage.url],
+          images: [newImage],
         };
 
         resolve(response);
@@ -100,7 +100,12 @@ export default class ImageMockService implements ImageApiService {
       setTimeout(() => {
         // Return a mock image URL
         const response: ImageGenerationResponse = {
-          urls: [`https://picsum.photos/800/600?random=${Date.now()}`],
+          images: [
+            {
+              id: crypto.randomUUID(),
+              url: `https://picsum.photos/800/600?random=${Date.now()}`,
+            },
+          ],
         };
         resolve(response);
       }, 10000);

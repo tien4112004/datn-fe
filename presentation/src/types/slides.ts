@@ -795,8 +795,9 @@ export interface SlideTheme {
   titleFontColor: string;
   outline: PPTElementOutline;
   shadow: PPTElementShadow;
-  additionalElements?: PPTElement[];
 
+  // For Layouts
+  additionalElements?: PPTElement[];
   accentImageShape?: 'default' | 'big' | 'mixed';
   card?: {
     enabled: boolean;

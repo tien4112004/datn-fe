@@ -135,7 +135,7 @@ export const usePresentationDataProcessor = (
             model: getRequest()?.others.imageModel,
           })
           .then((response) => {
-            app.updateImageElement(slideId, elementId, response.urls[0]);
+            app.updateImageElement(slideId, elementId, response.images[0].url);
           })
           .finally(() => {
             pendingImageGenerations.current.delete(promise);

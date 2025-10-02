@@ -1,8 +1,7 @@
-import React from 'react';
 import { Skeleton } from '@/shared/components/ui/skeleton';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/shared/components/ui/table';
 
-const SkeletonTable: React.FC<{ rows: number; columns: number }> = ({ rows, columns }) => {
+const SkeletonTable = ({ rows, columns }: { rows: number; columns: number }) => {
   return (
     <Table>
       <TableHeader>

@@ -16,13 +16,13 @@ interface RenameFileDialogProps {
   // updatePresentationMutation?: any;
 }
 
-export const RenameFileDialog: React.FC<RenameFileDialogProps> = ({
+export const RenameFileDialog = ({
   isOpen,
   onOpenChange,
   presentation,
   onRename,
   isLoading = false,
-}) => {
+}: RenameFileDialogProps) => {
   const { t } = useTranslation('presentation', { keyPrefix: 'list' });
   const currentName = presentation?.title || '';
   const [filename, setFilename] = React.useState(currentName);

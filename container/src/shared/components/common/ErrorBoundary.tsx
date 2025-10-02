@@ -33,13 +33,13 @@ interface ErrorFallbackProps {
   showDetails?: boolean;
 }
 
-const ErrorPageFallback: React.FC<ErrorFallbackProps> = ({
+const ErrorPageFallback = ({
   error,
   errorInfo,
   resetError,
   errorId,
   showDetails = true,
-}) => {
+}: ErrorFallbackProps) => {
   return (
     <div className="bg-background flex min-h-screen w-screen flex-col">
       {error.type === ERROR_TYPE.RESOURCE_NOT_FOUND ? (
@@ -57,13 +57,13 @@ const ErrorPageFallback: React.FC<ErrorFallbackProps> = ({
   );
 };
 
-const DefaultErrorFallback: React.FC<ErrorFallbackProps> = ({
+const DefaultErrorFallback = ({
   error,
   errorInfo,
   resetError,
   errorId,
   showDetails = true,
-}) => {
+}: ErrorFallbackProps) => {
   const { t } = useTranslation('errorBoundary');
 
   const goHome = () => {

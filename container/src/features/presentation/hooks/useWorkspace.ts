@@ -96,6 +96,10 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
     };
 
     const result = await startGeneration(generationRequest);
+    if (result.error) {
+      toast.error('Error generating presentation. Please try again.');
+      return;
+    }
 
     navigate(`/presentation/${result.presentationId}?isGenerating=true`);
     setValue('topic', '');

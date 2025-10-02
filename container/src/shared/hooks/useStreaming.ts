@@ -6,7 +6,9 @@ export interface StreamingOptions<TRequest, TProcessed> {
   transformFn: (content: string[]) => TProcessed;
   input: TRequest;
   queryKey: string[];
-  manual?: boolean;
+  options?: {
+    manual?: boolean;
+  };
 }
 
 export interface StreamingHookReturn<TRequest, TProcessed, TExtractResult> {
@@ -25,9 +27,9 @@ function useStreaming<TRequest = any, TProcessed = any, TExtractResult = any>({
   transformFn,
   input,
   queryKey,
-  manual = false,
+  options = { manual: false },
 }: StreamingOptions<TRequest, TProcessed>): StreamingHookReturn<TRequest, TProcessed, TExtractResult> {
-  const [shouldStream, setShouldStream] = React.useState(!manual);
+  const [shouldStream, setShouldStream] = React.useState(!options.manual);
   const requestData = React.useRef<TRequest>(input);
   const [result, setExtractResult] = React.useState<TExtractResult>();
 
@@ -59,7 +61,7 @@ function useStreaming<TRequest = any, TProcessed = any, TExtractResult = any>({
       setShouldStream(true);
       refetch();
     },
-    [shouldStream, refetch]
+    [refetch]
   );
 
   const stopStream = useCallback(() => {
@@ -67,15 +69,18 @@ function useStreaming<TRequest = any, TProcessed = any, TExtractResult = any>({
     setShouldStream(false);
   }, [queryClient, queryKey]);
 
-  const restartStream = useCallback((data: TRequest) => {
-    requestData.current = data;
-    setShouldStream(true);
-    refetch();
-  }, []);
+  const restartStream = useCallback(
+    (data: TRequest) => {
+      requestData.current = data;
+      setShouldStream(true);
+      refetch();
+    },
+    [refetch]
+  );
 
   const clearContent = useCallback(() => {
     queryClient.setQueryData([...queryKey, requestData], null);
-  }, []);
+  }, [queryClient, queryKey]);
 
   const processedData = transformFn(data || []);
 

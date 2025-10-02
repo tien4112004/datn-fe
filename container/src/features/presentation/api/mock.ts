@@ -99,7 +99,7 @@ export default class PresentationMockService implements PresentationApiService {
       setTimeout(() => {
         // Return a mock image URL
         resolve('https://images.pexels.com/photos/33728147/pexels-photo-33728147.jpeg');
-      }, 1000);
+      }, 10000);
     });
   }
 

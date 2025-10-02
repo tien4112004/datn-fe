@@ -2,11 +2,11 @@ import type { Service } from '@/shared/api';
 import type { OutlineItem, OutlineData } from './outline';
 import type { Presentation, PresentationCollectionRequest, SlideLayoutSchema } from './presentation';
 import type { ApiResponse } from '@/types/api';
-import type { Slide } from './slide';
+import type { Slide, SlideTheme } from './slide';
 
 export interface PresentationGenerationRequest {
   outline: string;
-  theme?: string;
+  theme: SlideTheme;
   contentLength?: string;
   imageModel?: string;
   model: {
@@ -20,6 +20,11 @@ export interface PresentationGenerationRequest {
 export interface PresentationGenerationResponse {
   aiResult: SlideLayoutSchema[];
   presentation: Presentation;
+}
+
+export interface PresentationGenerationStartResponse {
+  presentationId: string;
+  error?: unknown;
 }
 
 export interface PresentationApiService extends Service {
@@ -41,7 +46,7 @@ export interface PresentationApiService extends Service {
   getStreamedPresentation(
     request: PresentationGenerationRequest,
     signal: AbortSignal
-  ): Promise<{ presentationId: string; stream: AsyncIterable<string> }>;
+  ): Promise<{ stream: AsyncIterable<string> } & PresentationGenerationStartResponse>;
   upsertPresentationSlide(id: string, slide: Slide): Promise<Presentation>;
   setPresentationAsParsed(id: string): Promise<Presentation>;
   generatePresentationImage(

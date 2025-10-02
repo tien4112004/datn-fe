@@ -15,8 +15,8 @@ import {
 import type { Slide, SlideTheme } from '../types/slide';
 
 interface VueEditorApp {
-  replaceSlides: (data: any[]) => Promise<Slide[]>;
-  addSlide: (data: any, order?: number) => Promise<Slide>;
+  replaceSlides: (data: any[], theme?: SlideTheme) => Promise<Slide[]>;
+  addSlide: (data: any, order?: number, theme?: SlideTheme) => Promise<Slide>;
   updateThemeAndViewport: (theme: SlideTheme, viewport: { size: number; ratio: number }) => void;
   updateImageElement: (slideId: string, elementId: string, image: string) => void;
 }
@@ -26,14 +26,13 @@ interface MessageDetail {
   message: string;
 }
 
-export const useVueApp = () => {
+export const useVueApp = (presentation: Presentation | null) => {
   const app = useRef<VueEditorApp | null>(null);
 
   const updateApp = useCallback((newInstance: VueEditorApp) => {
     app.current = newInstance;
 
-    // TODO: Update theme based on presentation or generation data
-    app.current.updateThemeAndViewport(getDefaultPresentationTheme(), {
+    app.current.updateThemeAndViewport(presentation?.theme || getDefaultPresentationTheme(), {
       size: 1000,
       ratio: 9 / 16,
     });
@@ -56,6 +55,7 @@ export const usePresentationDataProcessor = (
   const setParsed = useSetParsedPresentation(presentationId);
   const getAiResult = useAiResultById(presentationId);
   const generateImage = useGeneratePresentationImage(presentationId);
+  const { getRequest } = usePresentationGeneration();
 
   useEffect(() => {
     const processAiResult = async () => {
@@ -97,7 +97,11 @@ export const usePresentationDataProcessor = (
           processedStreamDataRef.current = [...processedStreamDataRef.current, ...newData];
 
           for (let i = 0; i < newData.length; i++) {
-            const slide = await app.addSlide(newData[i].result, newData[i].order);
+            const slide = await app.addSlide(
+              newData[i].result,
+              newData[i].order,
+              getRequest?.()?.theme || getDefaultPresentationTheme()
+            );
             await updateSlides.mutateAsync([slide]);
           }
         }
@@ -183,7 +187,7 @@ export const useDetailPresentation = (
   isGeneratingParam: boolean
 ) => {
   const validatedId = usePresentationValidation(id, presentation, isGeneratingParam);
-  const { app, updateApp } = useVueApp();
+  const { app, updateApp } = useVueApp(presentation);
 
   const { isStreaming, streamedData } = usePresentationGeneration();
   const { isProcessing } = usePresentationDataProcessor(

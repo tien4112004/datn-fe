@@ -795,6 +795,16 @@ export interface SlideTheme {
   titleFontColor: string;
   outline: PPTElementOutline;
   shadow: PPTElementShadow;
+  additionalElements?: PPTElement[];
+
+  accentImageShape?: 'default' | 'big' | 'mixed';
+  card?: {
+    enabled: boolean;
+    borderRadius: number;
+    borderWidth: number;
+    fill: 'none' | 'full' | 'semi';
+    shadow: PPTElementShadow;
+  };
 }
 
 export interface SlideTemplate {

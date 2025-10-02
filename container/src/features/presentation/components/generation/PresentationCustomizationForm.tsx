@@ -1,5 +1,5 @@
 import { Controller } from 'react-hook-form';
-import type { Control, UseFormWatch, UseFormSetValue } from 'react-hook-form';
+import type { Control } from 'react-hook-form';
 import {
   Card,
   CardAction,
@@ -18,6 +18,8 @@ import { useCallback } from 'react';
 import useOutlineStore from '../../stores/useOutlineStore';
 import { getPresentationThemes } from '../../utils';
 import { ThemePreviewCard } from './ThemePreviewCard';
+import type { SlideTheme } from '../../types/slide';
+import { cn } from '@/shared/lib/utils';
 
 type CustomizationFormData = {
   theme: string;
@@ -25,15 +27,9 @@ type CustomizationFormData = {
   imageModel: string;
 };
 
-interface PresentationCustomizationFormProps {
-  control: Control<CustomizationFormData>;
-  watch: UseFormWatch<CustomizationFormData>;
-  setValue: UseFormSetValue<CustomizationFormData>;
-}
-
 interface ThemeSectionProps {
-  selectedTheme: string;
-  onThemeSelect: (theme: string) => void;
+  selectedTheme: SlideTheme;
+  onThemeSelect: (theme: SlideTheme) => void;
   disabled?: boolean;
 }
 
@@ -80,10 +76,14 @@ const ThemeSection = ({ selectedTheme, onThemeSelect, disabled = false }: ThemeS
           {mockThemes.map((theme) => (
             <div
               key={theme.id}
-              className={`transition-all ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer hover:scale-105'} ${selectedTheme === theme.id ? 'rounded-lg ring-2 ring-blue-500' : ''}`}
-              onClick={() => !disabled && onThemeSelect(theme.id)}
+              className={cn(
+                'transition-all',
+                disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer hover:scale-105',
+                selectedTheme.id === theme.id && 'rounded-lg ring-2 ring-blue-500'
+              )}
+              onClick={() => !disabled && onThemeSelect(theme)}
             >
-              <ThemePreviewCard theme={theme} title={theme.name} isSelected={selectedTheme === theme.id} />
+              <ThemePreviewCard theme={theme} title={theme.name} isSelected={selectedTheme.id === theme.id} />
             </div>
           ))}
         </div>
@@ -189,22 +189,6 @@ const ImageModelSection = ({ control }: ImageModelSectionProps) => {
   );
 };
 
-/**
- * @deprecated Use `CustomizationSection` instead
- */
-const PresentationCustomizationForm = ({ control, watch, setValue }: PresentationCustomizationFormProps) => {
-  return (
-    <Card className="w-full max-w-3xl">
-      <ThemeSection selectedTheme={watch('theme')} onThemeSelect={(theme) => setValue('theme', theme)} />
-      <ContentSection
-        selectedContentLength={watch('contentLength')}
-        onContentLengthSelect={(length) => setValue('contentLength', length)}
-      />
-      <ImageModelSection control={control} />
-    </Card>
-  );
-};
-
 interface CustomizationSectionProps {
   control: Control<UnifiedFormData>;
   watch: any;
@@ -227,7 +211,7 @@ const CustomizationSection = ({
   const { models } = useModels(MODEL_TYPES.IMAGE);
 
   const onThemeSelect = useCallback(
-    (theme: string) => {
+    (theme: SlideTheme) => {
       setValue('theme', theme);
     },
     [setValue]
@@ -282,5 +266,5 @@ const CustomizationSection = ({
   );
 };
 
-export default PresentationCustomizationForm;
-export { ImageModelSection, ContentSection, ThemeSection, CustomizationSection };
+export default CustomizationSection;
+export { ImageModelSection, ContentSection, ThemeSection };

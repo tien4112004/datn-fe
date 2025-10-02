@@ -5,6 +5,7 @@ import type {
   OutlineData,
   PresentationGenerationRequest,
   AiResultSlide,
+  PresentationGenerationStartResponse,
 } from '@/features/presentation/types';
 import useStreaming from '@/hooks/useStreaming';
 
@@ -19,21 +20,25 @@ function useFetchStreamingOutline(initialRequestData: OutlineData, options?: { m
     },
     input: initialRequestData,
     queryKey: [presentationApiService.getType(), 'presentationOutline'],
-    manual: options?.manual ?? true,
+    options: { manual: options?.manual },
   });
 }
 
 function useFetchStreamingPresentation(initialRequestData: PresentationGenerationRequest) {
   const presentationApiService = usePresentationApiService();
 
-  return useStreaming<PresentationGenerationRequest, AiResultSlide[], { presentationId: string }>({
+  return useStreaming<PresentationGenerationRequest, AiResultSlide[], PresentationGenerationStartResponse>({
     extractFn: presentationApiService.getStreamedPresentation.bind(presentationApiService),
     transformFn: (slides) => {
-      return slides.map((slide, index) => ({ result: JSON.parse(slide), order: index }));
+      return slides.map((slide, index) => ({
+        result: JSON.parse(slide),
+        order: index,
+        theme: initialRequestData.theme,
+      }));
     },
     input: initialRequestData,
     queryKey: [presentationApiService.getType(), 'presentationGeneration'],
-    manual: true,
+    options: { manual: true },
   });
 }
 

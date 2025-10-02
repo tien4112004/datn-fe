@@ -53,7 +53,7 @@ export const createImageElement = async (
     id: generateUniqueId(),
     type: 'image',
     src,
-    fixedRatio: bounds.fixedRatio ?? true,
+    fixedRatio: false,
     left: bounds.left,
     top: bounds.top,
     width: bounds.width,

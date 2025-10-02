@@ -1,4 +1,3 @@
-import React from 'react';
 import type { ExtendedSlideTheme } from '../../types/slide';
 
 interface ThemePreviewCardProps {
@@ -10,14 +9,14 @@ interface ThemePreviewCardProps {
   height?: number;
 }
 
-export const ThemePreviewCard: React.FC<ThemePreviewCardProps> = ({
+export const ThemePreviewCard = ({
   theme,
   isSelected = false,
   onClick,
   title = 'Title',
   width,
   height,
-}) => {
+}: ThemePreviewCardProps) => {
   return (
     <div
       className={`relative w-full cursor-pointer overflow-hidden rounded-lg border-2 shadow-sm transition-all hover:shadow-md ${

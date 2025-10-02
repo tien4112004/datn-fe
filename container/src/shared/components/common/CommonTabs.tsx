@@ -17,14 +17,14 @@ export interface CommonTabsProps {
   tabsContentClassName?: string;
 }
 
-const CommonTabs: React.FC<CommonTabsProps> = ({
+const CommonTabs = ({
   value,
   onValueChange,
   items,
   tabsListClassName = '',
   tabsClassName = '',
   tabsContentClassName = '',
-}) => (
+}: CommonTabsProps) => (
   <Tabs value={value} onValueChange={onValueChange} className={tabsClassName}>
     <TabsList className={tabsListClassName}>
       {items.map((item) => (

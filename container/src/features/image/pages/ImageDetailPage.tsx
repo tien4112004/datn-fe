@@ -42,7 +42,7 @@ const mockComments: Comment[] = [
   },
 ];
 
-const CommentSection: React.FC = () => {
+const CommentSection = () => {
   return (
     <div className="space-y-6 sm:space-y-4">
       <h2 className="flex items-center gap-2 text-lg font-medium">
@@ -95,11 +95,7 @@ const CommentSection: React.FC = () => {
   );
 };
 
-interface ImageDetailPageProps {
-  imageId?: string;
-}
-
-const ImageDetailPage: React.FC<ImageDetailPageProps> = () => {
+const ImageDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const { image, isLoading } = useImageById(id);
 

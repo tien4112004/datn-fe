@@ -6,17 +6,22 @@ import type { Slide, SlideTheme } from './slide';
 
 export interface PresentationGenerationRequest {
   outline: string;
-  theme: SlideTheme;
-  imageModel: {
-    name: string;
-    provider: string;
-  };
   model: {
     name: string;
     provider: string;
   };
   slideCount: number;
   language: string;
+
+  // This field is not used in the backend
+  others: {
+    contentLength: string;
+    theme: SlideTheme;
+    imageModel: {
+      name: string;
+      provider: string;
+    };
+  };
 }
 
 export interface PresentationGenerationResponse {

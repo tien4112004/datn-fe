@@ -50,6 +50,7 @@ export const usePresentationDataProcessor = (
 ) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const processedStreamDataRef = useRef<AiResultSlide[]>([]);
+  const pendingImageGenerations = useRef<Set<Promise<any>>>(new Set());
 
   const updateSlides = useUpdatePresentationSlides(presentationId);
   const setParsed = useSetParsedPresentation(presentationId);
@@ -100,7 +101,7 @@ export const usePresentationDataProcessor = (
             const slide = await app.addSlide(
               newData[i].result,
               newData[i].order,
-              getRequest?.()?.theme || getDefaultPresentationTheme()
+              getRequest?.()?.others.theme || getDefaultPresentationTheme()
             );
             await updateSlides.mutateAsync([slide]);
           }
@@ -108,6 +109,12 @@ export const usePresentationDataProcessor = (
       } else {
         processedStreamDataRef.current = [];
         removeSearchParams(['isGenerating']);
+
+        // Wait for all pending image generations to complete before setting parsed
+        if (pendingImageGenerations.current.size > 0) {
+          await Promise.all(Array.from(pendingImageGenerations.current));
+        }
+
         await setParsed.mutateAsync();
       }
     };
@@ -120,13 +127,21 @@ export const usePresentationDataProcessor = (
       const { slideId, elementId, prompt } = customEvent.detail;
 
       if (app) {
-        const src = await generateImage.mutateAsync({
-          slideId,
-          elementId,
-          prompt,
-          model: getRequest()?.imageModel,
-        });
-        app.updateImageElement(slideId, elementId, src);
+        const promise = generateImage
+          .mutateAsync({
+            slideId,
+            elementId,
+            prompt,
+            model: getRequest()?.others.imageModel,
+          })
+          .then((src) => {
+            app.updateImageElement(slideId, elementId, src);
+          })
+          .finally(() => {
+            pendingImageGenerations.current.delete(promise);
+          });
+
+        pendingImageGenerations.current.add(promise);
       }
     };
 

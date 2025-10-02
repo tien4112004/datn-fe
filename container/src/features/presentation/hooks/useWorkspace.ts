@@ -87,12 +87,15 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
 
     const generationRequest = {
       outline,
-      theme: data.theme,
-      contentLength: data.contentLength,
-      imageModel: data.imageModel,
       model: data.model,
       slideCount: data.slideCount,
       language: data.language,
+
+      others: {
+        theme: data.theme,
+        contentLength: data.contentLength,
+        imageModel: data.imageModel,
+      },
     };
 
     const result = await startGeneration(generationRequest);

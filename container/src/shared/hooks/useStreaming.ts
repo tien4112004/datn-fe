@@ -32,16 +32,16 @@ function useStreaming<TRequest = any, TProcessed = any, TExtractResult = any>({
   const [shouldStream, setShouldStream] = React.useState(!options.manual);
   const requestData = React.useRef<TRequest>(input);
   const [result, setExtractResult] = React.useState<TExtractResult>();
+  const [queryCounter, setQueryCounter] = React.useState(0);
 
   const queryClient = useQueryClient();
 
   const {
     data,
     error,
-    refetch,
     isFetching: isStreaming,
   } = useQuery({
-    queryKey: [...queryKey, requestData],
+    queryKey: [...queryKey, queryCounter],
     queryFn: streamedQuery({
       queryFn: async ({ signal }) => {
         const { stream, ...rest } = await extractFn(requestData.current, signal);
@@ -53,34 +53,28 @@ function useStreaming<TRequest = any, TProcessed = any, TExtractResult = any>({
     enabled: shouldStream,
   });
 
-  const fetch = useCallback(
-    (request?: TRequest) => {
-      if (request) {
-        requestData.current = request;
-      }
-      setShouldStream(true);
-      refetch();
-    },
-    [refetch]
-  );
+  const fetch = useCallback((request?: TRequest) => {
+    if (request) {
+      requestData.current = request;
+    }
+    setQueryCounter((prev) => prev + 1);
+    setShouldStream(true);
+  }, []);
 
   const stopStream = useCallback(() => {
-    queryClient.cancelQueries({ queryKey: [...queryKey, requestData] });
+    queryClient.cancelQueries({ queryKey: [...queryKey, queryCounter] });
     setShouldStream(false);
-  }, [queryClient, queryKey]);
+  }, [queryClient, queryKey, queryCounter]);
 
-  const restartStream = useCallback(
-    (data: TRequest) => {
-      requestData.current = data;
-      setShouldStream(true);
-      refetch();
-    },
-    [refetch]
-  );
+  const restartStream = useCallback((data: TRequest) => {
+    requestData.current = data;
+    setQueryCounter((prev) => prev + 1);
+    setShouldStream(true);
+  }, []);
 
   const clearContent = useCallback(() => {
-    queryClient.setQueryData([...queryKey, requestData], null);
-  }, [queryClient, queryKey]);
+    queryClient.setQueryData([...queryKey, queryCounter], null);
+  }, [queryClient, queryKey, queryCounter]);
 
   const processedData = transformFn(data || []);
 

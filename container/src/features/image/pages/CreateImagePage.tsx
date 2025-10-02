@@ -43,7 +43,7 @@ const CreateImagePage = () => {
     } else {
       newParams.delete('advanced');
     }
-    setSearchParams(newParams);
+    setSearchParams(newParams, { replace: true });
   };
 
   // const topicValue = watch('topic') as string;

@@ -24,7 +24,10 @@ export type UnifiedFormData = {
   // Customization fields
   theme: SlideTheme;
   contentLength: string;
-  imageModel: string;
+  imageModel: {
+    name: string;
+    provider: string;
+  };
 };
 
 interface PresentationFormContextValue {
@@ -59,7 +62,10 @@ export const PresentationFormProvider = ({ children }: PresentationFormProviderP
         id: 'classic',
       },
       contentLength: '',
-      imageModel: '',
+      imageModel: {
+        name: '',
+        provider: '',
+      },
       ...persistedData,
     },
   });

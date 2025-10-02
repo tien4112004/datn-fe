@@ -21,12 +21,6 @@ import { ThemePreviewCard } from './ThemePreviewCard';
 import type { SlideTheme } from '../../types/slide';
 import { cn } from '@/shared/lib/utils';
 
-type CustomizationFormData = {
-  theme: string;
-  contentLength: string;
-  imageModel: string;
-};
-
 interface ThemeSectionProps {
   selectedTheme: SlideTheme;
   onThemeSelect: (theme: SlideTheme) => void;
@@ -37,10 +31,6 @@ interface ContentSectionProps {
   selectedContentLength: string;
   onContentLengthSelect: (length: string) => void;
   disabled?: boolean;
-}
-
-interface ImageModelSectionProps {
-  control: Control<CustomizationFormData>;
 }
 
 const ThemeSection = ({ selectedTheme, onThemeSelect, disabled = false }: ThemeSectionProps) => {
@@ -160,35 +150,6 @@ const ContentSection = ({
   );
 };
 
-/**
- * @deprecated Use `CustomizationSection` instead
- */
-const ImageModelSection = ({ control }: ImageModelSectionProps) => {
-  const { t: tCustomization } = useTranslation('presentation', { keyPrefix: 'customization' });
-  const { t: tOutline } = useTranslation('presentation', { keyPrefix: 'createOutline' });
-  const { models } = useModels(MODEL_TYPES.IMAGE);
-
-  return (
-    <CardContent className="flex flex-row items-center gap-2">
-      <CardTitle>{tCustomization('imageModelsTitle')}</CardTitle>
-      <Controller
-        name="imageModel"
-        control={control}
-        render={({ field }) => (
-          <ModelSelect
-            models={models}
-            value={field.value}
-            onValueChange={field.onChange}
-            placeholder={tOutline('modelPlaceholder')}
-            label={tOutline('modelLabel')}
-            showProviderLogo={true}
-          />
-        )}
-      />
-    </CardContent>
-  );
-};
-
 interface CustomizationSectionProps {
   control: Control<UnifiedFormData>;
   watch: any;
@@ -260,11 +221,11 @@ const CustomizationSection = ({
         disabled={disabled || isGenerating}
       >
         <Sparkles />
-        {isGenerating ? 'Generating...' : t('generatePresentation')}
+        {isGenerating ? t('generatingPresentation') : t('generatePresentation')}
       </Button>
     </div>
   );
 };
 
 export default CustomizationSection;
-export { ImageModelSection, ContentSection, ThemeSection };
+export { ContentSection, ThemeSection };

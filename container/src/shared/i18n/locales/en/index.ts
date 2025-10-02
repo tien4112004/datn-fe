@@ -91,6 +91,7 @@ export default {
       loadingOutline: 'Loading outline...',
       customizeSection: 'Customize your presentation',
       generatePresentation: 'Generate Presentation',
+      generatingPresentation: 'Generating Presentation...',
     },
     customization: {
       themeTitle: 'Theme',

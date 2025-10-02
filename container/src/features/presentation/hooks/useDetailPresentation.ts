@@ -117,10 +117,15 @@ export const usePresentationDataProcessor = (
   useEffect(() => {
     const generateImageListener = async (event: Event) => {
       const customEvent = event as CustomEvent;
-      const { slideId, elementId, image } = customEvent.detail;
+      const { slideId, elementId, prompt } = customEvent.detail;
 
       if (app) {
-        const src = await generateImage.mutateAsync({ slideId, elementId, prompt: image, style: 'cartoon' });
+        const src = await generateImage.mutateAsync({
+          slideId,
+          elementId,
+          prompt,
+          model: getRequest()?.imageModel,
+        });
         app.updateImageElement(slideId, elementId, src);
       }
     };

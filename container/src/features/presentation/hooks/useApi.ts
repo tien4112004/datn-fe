@@ -267,19 +267,22 @@ export const useGeneratePresentationImage = (id: string) => {
       slideId,
       elementId,
       prompt,
-      style,
+      model,
     }: {
       slideId: string;
       elementId: string;
       prompt: string;
-      style: string;
+      model: {
+        name: string;
+        provider: string;
+      };
     }) => {
       const imageUrl = await presentationApiService.generatePresentationImage(
         id,
         slideId,
         elementId,
         prompt,
-        style
+        model
       );
       return imageUrl;
     },

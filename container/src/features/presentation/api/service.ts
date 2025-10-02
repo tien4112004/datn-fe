@@ -70,12 +70,14 @@ export default class PresentationRealApiService implements PresentationApiServic
     _slideId: string,
     _elementId: string,
     _prompt: string,
-    _style: string
+    _model: { name: string; provider: string }
   ): Promise<string> {
-    const res = await api.post<ApiResponse<any>>(
+    const res = await api.post<ApiResponse<{ cdnUrls: string[] }>>(
       `${this.baseUrl}/api/images/generate`,
       {
         prompt: _prompt,
+        model: _model.name,
+        provider: _model.provider.toLowerCase(),
       },
       {
         headers: {
@@ -84,7 +86,7 @@ export default class PresentationRealApiService implements PresentationApiServic
       }
     );
 
-    return res.data.data.imageUrl;
+    return res.data.data.cdnUrls[0] ?? '';
   }
 
   upsertPresentationSlide(id: string, slide: Slide): Promise<any> {

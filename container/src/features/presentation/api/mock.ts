@@ -93,7 +93,7 @@ export default class PresentationMockService implements PresentationApiService {
     _slideId: string,
     _elementId: string,
     _prompt: string,
-    _style: string
+    _model: { name: string; provider: string }
   ): Promise<string> {
     return new Promise((resolve) => {
       setTimeout(() => {

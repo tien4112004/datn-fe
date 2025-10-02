@@ -7,8 +7,10 @@ import type { Slide, SlideTheme } from './slide';
 export interface PresentationGenerationRequest {
   outline: string;
   theme: SlideTheme;
-  contentLength?: string;
-  imageModel?: string;
+  imageModel: {
+    name: string;
+    provider: string;
+  };
   model: {
     name: string;
     provider: string;
@@ -54,6 +56,6 @@ export interface PresentationApiService extends Service {
     slideId: string,
     elementId: string,
     prompt: string,
-    style: string
+    model: { name: string; provider: string }
   ): Promise<string>;
 }

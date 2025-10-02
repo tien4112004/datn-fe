@@ -14,7 +14,7 @@ import i18n from '@/locales';
 import { useSlidesStore } from '@/store';
 import type { SlideLayoutSchema } from '@/utils/slideLayout/converters';
 import { convertToSlide, type SlideViewport } from '@/utils/slideLayout';
-import type { Slide, SlideTheme } from '@/types/slides';
+import type { PPTImageElement, Slide, SlideTheme } from '@/types/slides';
 
 export function mount(el: string | Element, props: Record<string, unknown>) {
   const app = createApp(AppComponent, props) as App<Element> & {
@@ -96,7 +96,7 @@ export function mount(el: string | Element, props: Record<string, unknown>) {
 
     // Update image
     const imageUrl = 'https://upload.wikimedia.org/wikipedia/commons/b/b1/Loading_icon.gif';
-    const imageElement = slide.elements.find((el) => el.type === 'image');
+    const imageElement = slide.elements.find((el) => el.type === 'image') as PPTImageElement;
     if (imageElement) {
       imageElement.src = imageUrl;
     }
@@ -105,7 +105,7 @@ export function mount(el: string | Element, props: Record<string, unknown>) {
       new CustomEvent('app.image.need-generation', {
         detail: {
           slideId: slide.id,
-          elementId: slide.elements.find((el) => el.type === 'image')?.id,
+          elementId: imageElement.id,
           prompt: (data as any).data.image,
         },
       })

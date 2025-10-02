@@ -10,7 +10,7 @@ import '../components/remote/module';
 
 interface PresentationGenerationContextValue {
   startGeneration: (request: PresentationGenerationRequest) => Promise<PresentationGenerationStartResponse>;
-  getRequest?: () => PresentationGenerationRequest | null;
+  getRequest: () => PresentationGenerationRequest;
   error: string | null;
 }
 
@@ -82,8 +82,8 @@ export const PresentationGenerationProvider = ({ children }: PresentationGenerat
 
   const contextValue: PresentationGenerationContextValue = {
     startGeneration,
+    getRequest: () => request as PresentationGenerationRequest,
     error,
-    getRequest: () => request,
   };
 
   return (

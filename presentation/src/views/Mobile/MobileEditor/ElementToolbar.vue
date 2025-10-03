@@ -90,6 +90,8 @@
           <Button style="flex: 1" @click="orderElement(handleElement!, ElementOrderCommands.BOTTOM)"
             ><IconBringToFrontOne class="icon" /> {{ $t('mobile.toolbar.element.sendToBack') }}</Button
           >
+        </ButtonGroup>
+        <ButtonGroup class="row">
           <Button style="flex: 1" @click="orderElement(handleElement!, ElementOrderCommands.UP)"
             ><IconBringToFront class="icon" /> {{ $t('mobile.toolbar.element.moveForward') }}</Button
           >
@@ -102,26 +104,24 @@
 
         <ButtonGroup class="row">
           <Button style="flex: 1" @click="alignElementToCanvas(ElementAlignCommands.LEFT)"
-            ><IconAlignLeft class="icon" /> {{ $t('mobile.toolbar.element.alignLeft') }}</Button
+            ><IconAlignLeft class="icon" /></Button
           >
           <Button style="flex: 1" @click="alignElementToCanvas(ElementAlignCommands.HORIZONTAL)"
-            ><IconAlignVertically class="icon" />
-            {{ $t('mobile.toolbar.element.centerHorizontally') }}</Button
+            ><IconAlignVertically class="icon" /></Button
           >
           <Button style="flex: 1" @click="alignElementToCanvas(ElementAlignCommands.RIGHT)"
-            ><IconAlignRight class="icon" /> {{ $t('mobile.toolbar.element.alignRight') }}</Button
+            ><IconAlignRight class="icon" /></Button
           >
         </ButtonGroup>
         <ButtonGroup class="row">
           <Button style="flex: 1" @click="alignElementToCanvas(ElementAlignCommands.TOP)"
-            ><IconAlignTop class="icon" /> {{ $t('mobile.toolbar.element.alignTop') }}</Button
+            ><IconAlignTop class="icon" /></Button
           >
           <Button style="flex: 1" @click="alignElementToCanvas(ElementAlignCommands.VERTICAL)"
-            ><IconAlignHorizontally class="icon" />
-            {{ $t('mobile.toolbar.element.centerVertically') }}</Button
+            ><IconAlignHorizontally class="icon" /></Button
           >
           <Button style="flex: 1" @click="alignElementToCanvas(ElementAlignCommands.BOTTOM)"
-            ><IconAlignBottom class="icon" /> {{ $t('mobile.toolbar.element.alignBottom') }}</Button
+            ><IconAlignBottom class="icon" /></Button
           >
         </ButtonGroup>
       </div>

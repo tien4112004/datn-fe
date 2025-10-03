@@ -1,9 +1,9 @@
-import type { ExtendedSlideTheme } from '../types/slide';
+import type { SlideTheme } from '../types/slide';
 
 /**
  * Default theme configuration for generated presentations
  */
-export const getDefaultPresentationTheme = (): ExtendedSlideTheme => ({
+export const getDefaultPresentationTheme = (): SlideTheme => ({
   id: 'default',
   name: 'Default',
   backgroundColor: '#ffffff',
@@ -41,7 +41,7 @@ export const getDefaultPresentationTheme = (): ExtendedSlideTheme => ({
 /**
  * Business theme - Professional and corporate
  */
-export const getBusinessTheme = (): ExtendedSlideTheme => ({
+export const getBusinessTheme = (): SlideTheme => ({
   id: 'business',
   name: 'Business',
   backgroundColor: '#f8fafc',
@@ -79,7 +79,7 @@ export const getBusinessTheme = (): ExtendedSlideTheme => ({
 /**
  * Education theme - Friendly and approachable
  */
-export const getEducationTheme = (): ExtendedSlideTheme => ({
+export const getEducationTheme = (): SlideTheme => ({
   id: 'education',
   name: 'Education',
   backgroundColor: '#fefefe',
@@ -117,7 +117,7 @@ export const getEducationTheme = (): ExtendedSlideTheme => ({
 /**
  * Creative theme - Vibrant and artistic
  */
-export const getCreativeTheme = (): ExtendedSlideTheme => ({
+export const getCreativeTheme = (): SlideTheme => ({
   id: 'creative',
   name: 'Creative',
   backgroundColor: '#faf5ff',
@@ -155,7 +155,7 @@ export const getCreativeTheme = (): ExtendedSlideTheme => ({
 /**
  * Minimal theme - Clean and simple
  */
-export const getMinimalTheme = (): ExtendedSlideTheme => ({
+export const getMinimalTheme = (): SlideTheme => ({
   id: 'minimal',
   name: 'Minimal',
   backgroundColor: '#ffffff',
@@ -193,7 +193,7 @@ export const getMinimalTheme = (): ExtendedSlideTheme => ({
 /**
  * Modern theme - Sleek and contemporary
  */
-export const getModernTheme = (): ExtendedSlideTheme => ({
+export const getModernTheme = (): SlideTheme => ({
   id: 'modern',
   name: 'Modern',
   backgroundColor: '#0f172a',
@@ -231,7 +231,7 @@ export const getModernTheme = (): ExtendedSlideTheme => ({
 /**
  * Classic theme - Traditional and elegant
  */
-export const getClassicTheme = (): ExtendedSlideTheme => ({
+export const getClassicTheme = (): SlideTheme => ({
   id: 'classic',
   name: 'Classic',
   backgroundColor: '#fefcf0',

@@ -70,7 +70,7 @@ vi.mock('@/features/presentation/components/generation/OutlineWorkspace', () => 
 }));
 
 vi.mock('@/features/presentation/components/generation/PresentationCustomizationForm', () => ({
-  CustomizationSection: ({ onGeneratePresentation, isGenerating, disabled }: any) => (
+  default: ({ onGeneratePresentation, isGenerating, disabled }: any) => (
     <div data-testid="customization-section">
       <button onClick={onGeneratePresentation} disabled={disabled || isGenerating}>
         Generate Presentation

@@ -1,4 +1,4 @@
-import type { ExtendedSlideTheme, SlideViewport } from '@/features/presentation/types/slide';
+import type { SlideTheme, SlideViewport } from '@/features/presentation/types/slide';
 import { moduleMethodMap } from '../components/remote/module';
 import type { SlideLayoutSchema } from '../types';
 
@@ -11,7 +11,7 @@ import type { SlideLayoutSchema } from '../types';
 export const processGeneratedSlides = async (
   generatedData: SlideLayoutSchema[],
   viewport: SlideViewport,
-  theme: ExtendedSlideTheme
+  theme: SlideTheme
 ): Promise<any[]> => {
   const convertToSlide = await moduleMethodMap['convertToSlide']().then((mod) => mod.default);
 

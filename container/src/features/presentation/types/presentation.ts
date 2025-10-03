@@ -102,4 +102,5 @@ export type SlideLayoutSchema =
 export interface AiResultSlide {
   result: SlideLayoutSchema;
   order: number;
+  theme: SlideTheme;
 }

@@ -87,15 +87,22 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
 
     const generationRequest = {
       outline,
-      theme: data.theme,
-      contentLength: data.contentLength,
-      imageModel: data.imageModel,
       model: data.model,
       slideCount: data.slideCount,
       language: data.language,
+
+      others: {
+        theme: data.theme,
+        contentLength: data.contentLength,
+        imageModel: data.imageModel,
+      },
     };
 
     const result = await startGeneration(generationRequest);
+    if (result.error) {
+      toast.error('Error generating presentation. Please try again.');
+      return;
+    }
 
     navigate(`/presentation/${result.presentationId}?isGenerating=true`);
     setValue('topic', '');

@@ -8,6 +8,7 @@ import {
   type PresentationGenerationRequest,
   type PresentationGenerationResponse,
   type SlideLayoutSchema,
+  type PresentationGenerationStartResponse,
 } from '../types';
 import { splitMarkdownToOutlineItems } from '../utils';
 import { api } from '@/shared/api';
@@ -64,17 +65,6 @@ export default class PresentationRealApiService implements PresentationApiServic
     return api.patch<ApiResponse<Presentation>>(`${this.baseUrl}/api/presentations/${id}/parse`);
   }
 
-  async generatePresentationImage(
-    _id: string,
-    _slideId: string,
-    _elementId: string,
-    _prompt: string,
-    _style: string
-  ): Promise<string> {
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    return `https://via.placeholder.com/300x200.png?text=${_prompt}`;
-  }
-
   upsertPresentationSlide(id: string, slide: Slide): Promise<any> {
     return api.put<ApiResponse<Presentation>>(
       `${this.baseUrl}/api/presentations/${id}/slides`,
@@ -97,46 +87,49 @@ export default class PresentationRealApiService implements PresentationApiServic
   async getStreamedPresentation(
     request: PresentationGenerationRequest,
     signal: AbortSignal
-  ): Promise<{
-    presentationId: string;
-    stream: AsyncIterable<string>;
-  }> {
+  ): Promise<
+    {
+      stream: AsyncIterable<string>;
+    } & PresentationGenerationStartResponse
+  > {
     const baseUrl = this.baseUrl;
-    let presentationId = '';
 
-    // First, make the request to get the presentationId
-    const response = await api.stream(
-      `${baseUrl}/api/presentations/generate`,
-      {
-        ...request,
-        model: request.model.name,
-        provider: request.model.provider.toLowerCase(),
-      },
-      signal
-    );
+    try {
+      const response = await api.stream(
+        `${baseUrl}/api/presentations/generate`,
+        {
+          ...request,
+          model: request.model.name,
+          provider: request.model.provider.toLowerCase(),
+        },
+        signal
+      );
 
-    presentationId = response.headers.get('X-Presentation') || '';
+      const presentationId = response.headers.get('X-Presentation') || '';
 
-    const stream = {
-      async *[Symbol.asyncIterator]() {
-        const reader = response.body?.getReader();
-        if (!reader) throw new Error('No reader available');
+      const stream: AsyncIterable<string> = {
+        async *[Symbol.asyncIterator]() {
+          const reader = response.body?.getReader();
+          if (!reader) throw new Error('No reader available');
 
-        try {
-          while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
+          try {
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
 
-            const text = new TextDecoder().decode(value);
-            yield text;
+              const text = new TextDecoder().decode(value);
+              yield text;
+            }
+          } finally {
+            reader.releaseLock();
           }
-        } finally {
-          reader.releaseLock();
-        }
-      },
-    };
+        },
+      };
 
-    return { presentationId, stream };
+      return { presentationId, stream };
+    } catch (error) {
+      return { presentationId: '', error, stream: (async function* () {})() };
+    }
   }
 
   async getStreamedOutline(

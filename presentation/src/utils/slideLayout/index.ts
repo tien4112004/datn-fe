@@ -20,7 +20,7 @@ import {
   type TableOfContentsLayoutSchema,
   SLIDE_LAYOUT_TYPE,
 } from './converters';
-import type { ExtendedSlideTheme } from './theme';
+import type { SlideTheme } from '@/types/slides';
 
 // Export font size calculation utilities
 export {
@@ -37,7 +37,7 @@ export { SlideLayoutCalculator, type SlideViewport } from './slideLayout';
 export const convertToSlide = async (
   data: SlideLayoutSchema,
   viewport: SlideViewport,
-  theme: ExtendedSlideTheme,
+  theme: SlideTheme,
   slideId?: string
 ) => {
   if (data.type === SLIDE_LAYOUT_TYPE.TWO_COLUMN_WITH_IMAGE) {

@@ -664,26 +664,25 @@ export interface SlideTheme {
   shadow: PPTElementShadow;
   titleFontName?: string;
   titleFontColor?: string;
-}
 
-export interface SlideTemplate {
-  name: string;
-  id: string;
-  cover: string;
-}
-
-export interface ExtendedSlideTheme extends SlideTheme {
-  id: string;
-  name: string;
+  // Extended properties
+  id?: string;
+  name?: string;
   additionalElements?: PPTElement[];
-  accentImageShape: 'default' | 'big' | 'mixed';
-  card: {
+  accentImageShape?: 'default' | 'big' | 'mixed';
+  card?: {
     enabled: boolean;
     borderRadius: number;
     borderWidth: number;
     fill: 'none' | 'full' | 'semi';
     shadow: PPTElementShadow;
   };
+}
+
+export interface SlideTemplate {
+  name: string;
+  id: string;
+  cover: string;
 }
 
 export interface SlideViewport {

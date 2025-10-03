@@ -10,6 +10,7 @@ import {
 } from 'react-hook-form';
 import useFormPersist from 'react-hook-form-persist';
 import { moduleMap, moduleMethodMap } from '../components/remote/module';
+import type { SlideTheme } from '../types/slide';
 
 export type UnifiedFormData = {
   // Outline fields
@@ -21,9 +22,12 @@ export type UnifiedFormData = {
     provider: string;
   };
   // Customization fields
-  theme: string;
+  theme: SlideTheme;
   contentLength: string;
-  imageModel: string;
+  imageModel: {
+    name: string;
+    provider: string;
+  };
 };
 
 interface PresentationFormContextValue {
@@ -54,9 +58,14 @@ export const PresentationFormProvider = ({ children }: PresentationFormProviderP
         name: '',
         provider: '',
       },
-      theme: '',
+      theme: {
+        id: 'classic',
+      },
       contentLength: '',
-      imageModel: '',
+      imageModel: {
+        name: '',
+        provider: '',
+      },
       ...persistedData,
     },
   });

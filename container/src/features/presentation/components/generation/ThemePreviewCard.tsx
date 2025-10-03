@@ -1,7 +1,7 @@
-import type { ExtendedSlideTheme } from '../../types/slide';
+import type { SlideTheme } from '../../types/slide';
 
 interface ThemePreviewCardProps {
-  theme: ExtendedSlideTheme;
+  theme: SlideTheme;
   isSelected?: boolean;
   onClick?: () => void;
   title?: string;

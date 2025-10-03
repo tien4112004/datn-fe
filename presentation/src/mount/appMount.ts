@@ -14,15 +14,14 @@ import i18n from '@/locales';
 import { useSlidesStore } from '@/store';
 import type { SlideLayoutSchema } from '@/utils/slideLayout/converters';
 import { convertToSlide, type SlideViewport } from '@/utils/slideLayout';
-import type { Slide, SlideTheme } from '@/types/slides';
-import type { ExtendedSlideTheme } from '@/utils/slideLayout/theme';
+import type { PPTImageElement, Slide, SlideTheme } from '@/types/slides';
 
 export function mount(el: string | Element, props: Record<string, unknown>) {
   const app = createApp(AppComponent, props) as App<Element> & {
     updateImageElement?: (slideId: string, elementId: string, image: string) => void;
-    replaceSlides?: (data: SlideLayoutSchema[]) => Promise<Slide[]>;
-    addSlide?: (data: SlideLayoutSchema, order?: number) => Promise<Slide>;
-    updateThemeAndViewport?: (theme: ExtendedSlideTheme, viewport: SlideViewport) => void;
+    replaceSlides?: (data: SlideLayoutSchema[], theme?: SlideTheme) => Promise<Slide[]>;
+    addSlide?: (data: SlideLayoutSchema, order?: number, theme?: SlideTheme) => Promise<Slide>;
+    updateThemeAndViewport?: (theme: SlideTheme, viewport: SlideViewport) => void;
   };
 
   const pinia = createPinia();
@@ -62,22 +61,18 @@ export function mount(el: string | Element, props: Record<string, unknown>) {
     slidesStore.setSlides(updatedSlides);
   };
 
-  app.replaceSlides = async (dataArray) => {
+  app.replaceSlides = async (dataArray, theme) => {
     const slidesStore = useSlidesStore();
     const viewport = {
       size: slidesStore.viewportSize,
       ratio: slidesStore.viewportRatio,
     };
-    const theme = slidesStore.theme;
+
+    const themeToUse = theme || slidesStore.theme;
 
     const newSlides: Slide[] = [];
     for (let i = 0; i < dataArray.length; i++) {
-      const slide = await convertToSlide(
-        dataArray[i],
-        viewport,
-        theme as ExtendedSlideTheme,
-        (i + 1).toString()
-      );
+      const slide = await convertToSlide(dataArray[i], viewport, themeToUse, (i + 1).toString());
 
       newSlides.push(slide);
     }
@@ -89,25 +84,33 @@ export function mount(el: string | Element, props: Record<string, unknown>) {
     return newSlides;
   };
 
-  app.addSlide = async (data, order) => {
+  app.addSlide = async (data, order, theme) => {
     const slidesStore = useSlidesStore();
     const viewport = {
       size: slidesStore.viewportSize,
       ratio: slidesStore.viewportRatio,
     };
-    const theme = slidesStore.theme;
+    const themeToUse = theme || slidesStore.theme;
 
-    const slide = await convertToSlide(data, viewport, theme as ExtendedSlideTheme, order?.toString());
+    const slide = await convertToSlide(data, viewport, themeToUse, order?.toString());
 
-    window.dispatchEvent(
-      new CustomEvent('app.image.need-generation', {
-        detail: {
-          slideId: slide.id,
-          elementId: slide.elements.find((el) => el.type === 'image')?.id,
-          prompt: (data as any).data.image,
-        },
-      })
-    );
+    // Update image
+    const imageUrl = 'https://upload.wikimedia.org/wikipedia/commons/b/b1/Loading_icon.gif';
+    const imageElement = slide.elements.find((el) => el.type === 'image') as PPTImageElement;
+
+    if (imageElement) {
+      imageElement.src = imageUrl;
+
+      window.dispatchEvent(
+        new CustomEvent('app.image.need-generation', {
+          detail: {
+            slideId: slide.id,
+            elementId: imageElement.id,
+            prompt: (data as any).data.image,
+          },
+        })
+      );
+    }
 
     // Add new slides to existing ones
     const currentSlides = slidesStore.slides;

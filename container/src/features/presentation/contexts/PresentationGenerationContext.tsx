@@ -1,12 +1,16 @@
 import { createContext, useContext, useState, useEffect, type ReactNode, useRef, useCallback } from 'react';
-import type { PresentationGenerationRequest } from '@/features/presentation/types';
+import type {
+  PresentationGenerationRequest,
+  PresentationGenerationStartResponse,
+} from '@/features/presentation/types';
 import { useFetchStreamingPresentation } from '@/features/presentation/hooks/useFetchStreaming';
 import usePresentationStore from '@/features/presentation/stores/usePresentationStore';
 import { toast } from 'sonner';
 import '../components/remote/module';
 
 interface PresentationGenerationContextValue {
-  startGeneration: (request: PresentationGenerationRequest) => Promise<{ presentationId: string }>;
+  startGeneration: (request: PresentationGenerationRequest) => Promise<PresentationGenerationStartResponse>;
+  getRequest: () => PresentationGenerationRequest;
   error: string | null;
 }
 
@@ -78,6 +82,7 @@ export const PresentationGenerationProvider = ({ children }: PresentationGenerat
 
   const contextValue: PresentationGenerationContextValue = {
     startGeneration,
+    getRequest: () => request as PresentationGenerationRequest,
     error,
   };
 

@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient, type UseQueryResult } from '@tanstack/react-query';
 import type { SortingState, PaginationState, Updater } from '@tanstack/react-table';
 import { usePresentationApiService } from '../api';
+import { useImageApiService } from '@/features/image/api';
 import { useEffect, useState } from 'react';
 import type { Presentation, OutlineItem, PresentationGenerationRequest } from '../types';
 import type { ApiResponse } from '@/shared/types/api';
@@ -260,27 +261,27 @@ export const useSetParsedPresentation = (id: string) => {
 };
 
 export const useGeneratePresentationImage = (id: string) => {
-  const presentationApiService = usePresentationApiService();
+  const imageApiService = useImageApiService();
 
   return useMutation({
     mutationFn: async ({
       slideId,
       elementId,
       prompt,
-      style,
+      model,
     }: {
       slideId: string;
       elementId: string;
       prompt: string;
-      style: string;
+      model: {
+        name: string;
+        provider: string;
+      };
     }) => {
-      const imageUrl = await presentationApiService.generatePresentationImage(
-        id,
-        slideId,
-        elementId,
+      const imageUrl = await imageApiService.generatePresentationImage(id, slideId, elementId, {
         prompt,
-        style
-      );
+        model,
+      });
       return imageUrl;
     },
   });

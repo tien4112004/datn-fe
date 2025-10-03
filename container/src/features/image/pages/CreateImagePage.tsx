@@ -7,30 +7,47 @@ import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
 import { useForm, Controller } from 'react-hook-form';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import AdvancedOptions from '@/features/image/components/AdvancedOptions';
 import type { CreateImageFormData } from '@/features/image/types';
-import { useImageApiService } from '@/features/image/api';
+import { useGenerateImage } from '../hooks';
+import useFormPersist from 'react-hook-form-persist';
+import { getLocalStorageData } from '@/shared/lib/utils';
+
+const IMAGE_FORM_PERSIST = 'create-image-form';
 
 const CreateImagePage = () => {
   const { t } = useTranslation('image', { keyPrefix: 'createImage' });
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
-  const imageApiService = useImageApiService();
+  const generate = useGenerateImage();
 
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const persistedData = useMemo(() => getLocalStorageData(IMAGE_FORM_PERSIST), []);
 
   const form = useForm<CreateImageFormData>({
     defaultValues: {
       topic: '',
-      imageModel: '',
+      model: {
+        name: '',
+        provider: '',
+      },
       imageDimension: '',
       artStyle: '',
       negativePrompt: '',
+      ...persistedData,
     },
   });
+
   const { setValue, watch, control, register, handleSubmit } = form;
+
+  useFormPersist(IMAGE_FORM_PERSIST, {
+    watch: form.watch,
+    setValue: form.setValue,
+    storage: window.localStorage,
+    exclude: ['negativePrompt'],
+  });
 
   // Read advanced options state directly from URL
   const isAdvancedOpen = searchParams.get('advanced') === 'true';
@@ -67,9 +84,9 @@ const CreateImagePage = () => {
   const transformToApiRequest = (formData: CreateImageFormData) => {
     return {
       prompt: formData.topic,
-      style: formData.artStyle || undefined,
-      size: formData.imageDimension || undefined,
-      quality: formData.imageModel || undefined,
+      style: formData.artStyle,
+      size: formData.imageDimension,
+      model: formData.model,
     };
   };
 
@@ -79,10 +96,11 @@ const CreateImagePage = () => {
 
     try {
       const apiRequest = transformToApiRequest(data);
-      const response = await imageApiService.generateImage(apiRequest);
+      const response = await generate.mutateAsync(apiRequest);
 
       // Navigate to the image details page with the generated image ID
-      navigate(`/image/${response.id}`);
+      navigate(`/image/${response.images[0].id}`);
+      setValue('topic', '');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to generate image');
       console.error('Image generation failed:', err);

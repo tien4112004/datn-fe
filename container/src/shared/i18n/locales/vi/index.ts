@@ -104,6 +104,7 @@ export default {
       loadingOutline: 'Đang tải dàn ý...',
       customizeSection: 'Tùy chỉnh bài trình bày của bạn',
       generatePresentation: 'Tạo bài trình bày',
+      generatingPresentation: 'Đang tạo bài trình bày...',
     },
     customization: {
       themeTitle: 'Chủ đề',

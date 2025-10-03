@@ -1,5 +1,5 @@
 import { Controller } from 'react-hook-form';
-import type { Control, UseFormWatch, UseFormSetValue } from 'react-hook-form';
+import type { Control } from 'react-hook-form';
 import {
   Card,
   CardAction,
@@ -18,22 +18,12 @@ import { useCallback } from 'react';
 import useOutlineStore from '../../stores/useOutlineStore';
 import { getPresentationThemes } from '../../utils';
 import { ThemePreviewCard } from './ThemePreviewCard';
-
-type CustomizationFormData = {
-  theme: string;
-  contentLength: string;
-  imageModel: string;
-};
-
-interface PresentationCustomizationFormProps {
-  control: Control<CustomizationFormData>;
-  watch: UseFormWatch<CustomizationFormData>;
-  setValue: UseFormSetValue<CustomizationFormData>;
-}
+import type { SlideTheme } from '../../types/slide';
+import { cn } from '@/shared/lib/utils';
 
 interface ThemeSectionProps {
-  selectedTheme: string;
-  onThemeSelect: (theme: string) => void;
+  selectedTheme: SlideTheme;
+  onThemeSelect: (theme: SlideTheme) => void;
   disabled?: boolean;
 }
 
@@ -41,10 +31,6 @@ interface ContentSectionProps {
   selectedContentLength: string;
   onContentLengthSelect: (length: string) => void;
   disabled?: boolean;
-}
-
-interface ImageModelSectionProps {
-  control: Control<CustomizationFormData>;
 }
 
 const ThemeSection = ({ selectedTheme, onThemeSelect, disabled = false }: ThemeSectionProps) => {
@@ -80,10 +66,14 @@ const ThemeSection = ({ selectedTheme, onThemeSelect, disabled = false }: ThemeS
           {mockThemes.map((theme) => (
             <div
               key={theme.id}
-              className={`transition-all ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer hover:scale-105'} ${selectedTheme === theme.id ? 'rounded-lg ring-2 ring-blue-500' : ''}`}
-              onClick={() => !disabled && onThemeSelect(theme.id)}
+              className={cn(
+                'transition-all',
+                disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer hover:scale-105',
+                selectedTheme.id === theme.id && 'rounded-lg ring-2 ring-blue-500'
+              )}
+              onClick={() => !disabled && onThemeSelect(theme)}
             >
-              <ThemePreviewCard theme={theme} title={theme.name} isSelected={selectedTheme === theme.id} />
+              <ThemePreviewCard theme={theme} title={theme.name} isSelected={selectedTheme.id === theme.id} />
             </div>
           ))}
         </div>
@@ -160,51 +150,6 @@ const ContentSection = ({
   );
 };
 
-/**
- * @deprecated Use `CustomizationSection` instead
- */
-const ImageModelSection = ({ control }: ImageModelSectionProps) => {
-  const { t: tCustomization } = useTranslation('presentation', { keyPrefix: 'customization' });
-  const { t: tOutline } = useTranslation('presentation', { keyPrefix: 'createOutline' });
-  const { models } = useModels(MODEL_TYPES.IMAGE);
-
-  return (
-    <CardContent className="flex flex-row items-center gap-2">
-      <CardTitle>{tCustomization('imageModelsTitle')}</CardTitle>
-      <Controller
-        name="imageModel"
-        control={control}
-        render={({ field }) => (
-          <ModelSelect
-            models={models}
-            value={field.value}
-            onValueChange={field.onChange}
-            placeholder={tOutline('modelPlaceholder')}
-            label={tOutline('modelLabel')}
-            showProviderLogo={true}
-          />
-        )}
-      />
-    </CardContent>
-  );
-};
-
-/**
- * @deprecated Use `CustomizationSection` instead
- */
-const PresentationCustomizationForm = ({ control, watch, setValue }: PresentationCustomizationFormProps) => {
-  return (
-    <Card className="w-full max-w-3xl">
-      <ThemeSection selectedTheme={watch('theme')} onThemeSelect={(theme) => setValue('theme', theme)} />
-      <ContentSection
-        selectedContentLength={watch('contentLength')}
-        onContentLengthSelect={(length) => setValue('contentLength', length)}
-      />
-      <ImageModelSection control={control} />
-    </Card>
-  );
-};
-
 interface CustomizationSectionProps {
   control: Control<UnifiedFormData>;
   watch: any;
@@ -227,7 +172,7 @@ const CustomizationSection = ({
   const { models } = useModels(MODEL_TYPES.IMAGE);
 
   const onThemeSelect = useCallback(
-    (theme: string) => {
+    (theme: SlideTheme) => {
       setValue('theme', theme);
     },
     [setValue]
@@ -276,11 +221,11 @@ const CustomizationSection = ({
         disabled={disabled || isGenerating}
       >
         <Sparkles />
-        {isGenerating ? 'Generating...' : t('generatePresentation')}
+        {isGenerating ? t('generatingPresentation') : t('generatePresentation')}
       </Button>
     </div>
   );
 };
 
-export default PresentationCustomizationForm;
-export { ImageModelSection, ContentSection, ThemeSection, CustomizationSection };
+export default CustomizationSection;
+export { ContentSection, ThemeSection };

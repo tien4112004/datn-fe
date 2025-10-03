@@ -15,8 +15,8 @@ import {
 import type { Slide, SlideTheme } from '../types/slide';
 
 interface VueEditorApp {
-  replaceSlides: (data: any[]) => Promise<Slide[]>;
-  addSlide: (data: any, order?: number) => Promise<Slide>;
+  replaceSlides: (data: any[], theme?: SlideTheme) => Promise<Slide[]>;
+  addSlide: (data: any, order?: number, theme?: SlideTheme) => Promise<Slide>;
   updateThemeAndViewport: (theme: SlideTheme, viewport: { size: number; ratio: number }) => void;
   updateImageElement: (slideId: string, elementId: string, image: string) => void;
 }
@@ -26,14 +26,13 @@ interface MessageDetail {
   message: string;
 }
 
-export const useVueApp = () => {
+export const useVueApp = (presentation: Presentation | null) => {
   const app = useRef<VueEditorApp | null>(null);
 
   const updateApp = useCallback((newInstance: VueEditorApp) => {
     app.current = newInstance;
 
-    // TODO: Update theme based on presentation or generation data
-    app.current.updateThemeAndViewport(getDefaultPresentationTheme(), {
+    app.current.updateThemeAndViewport(presentation?.theme || getDefaultPresentationTheme(), {
       size: 1000,
       ratio: 9 / 16,
     });
@@ -51,11 +50,13 @@ export const usePresentationDataProcessor = (
 ) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const processedStreamDataRef = useRef<AiResultSlide[]>([]);
+  const pendingImageGenerations = useRef<Set<Promise<any>>>(new Set());
 
   const updateSlides = useUpdatePresentationSlides(presentationId);
   const setParsed = useSetParsedPresentation(presentationId);
   const getAiResult = useAiResultById(presentationId);
   const generateImage = useGeneratePresentationImage(presentationId);
+  const { getRequest } = usePresentationGeneration();
 
   useEffect(() => {
     const processAiResult = async () => {
@@ -97,13 +98,23 @@ export const usePresentationDataProcessor = (
           processedStreamDataRef.current = [...processedStreamDataRef.current, ...newData];
 
           for (let i = 0; i < newData.length; i++) {
-            const slide = await app.addSlide(newData[i].result, newData[i].order);
+            const slide = await app.addSlide(
+              newData[i].result,
+              newData[i].order,
+              getRequest?.()?.others.theme || getDefaultPresentationTheme()
+            );
             await updateSlides.mutateAsync([slide]);
           }
         }
       } else {
         processedStreamDataRef.current = [];
         removeSearchParams(['isGenerating']);
+
+        // Wait for all pending image generations to complete before setting parsed
+        if (pendingImageGenerations.current.size > 0) {
+          await Promise.all(Array.from(pendingImageGenerations.current));
+        }
+
         await setParsed.mutateAsync();
       }
     };
@@ -113,11 +124,24 @@ export const usePresentationDataProcessor = (
   useEffect(() => {
     const generateImageListener = async (event: Event) => {
       const customEvent = event as CustomEvent;
-      const { slideId, elementId, image } = customEvent.detail;
+      const { slideId, elementId, prompt } = customEvent.detail;
 
       if (app) {
-        const src = await generateImage.mutateAsync({ slideId, elementId, prompt: image, style: 'cartoon' });
-        app.updateImageElement(slideId, elementId, src);
+        const promise = generateImage
+          .mutateAsync({
+            slideId,
+            elementId,
+            prompt,
+            model: getRequest()?.others.imageModel,
+          })
+          .then((response) => {
+            app.updateImageElement(slideId, elementId, response.images[0].url);
+          })
+          .finally(() => {
+            pendingImageGenerations.current.delete(promise);
+          });
+
+        pendingImageGenerations.current.add(promise);
       }
     };
 
@@ -183,7 +207,7 @@ export const useDetailPresentation = (
   isGeneratingParam: boolean
 ) => {
   const validatedId = usePresentationValidation(id, presentation, isGeneratingParam);
-  const { app, updateApp } = useVueApp();
+  const { app, updateApp } = useVueApp(presentation);
 
   const { isStreaming, streamedData } = usePresentationGeneration();
   const { isProcessing } = usePresentationDataProcessor(

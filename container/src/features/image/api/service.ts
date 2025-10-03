@@ -24,7 +24,7 @@ export default class ImageRealApiService implements ImageApiService {
       `${this.baseUrl}/api/images/generate`,
       request
     );
-    return this._mapImageItem(response.data.data);
+    return this._mapImageResponse(response.data.data);
   }
 
   async getImageById(id: string): Promise<ImageData | null> {
@@ -37,6 +37,29 @@ export default class ImageRealApiService implements ImageApiService {
     }
   }
 
+  async generatePresentationImage(
+    id: string,
+    slideId: string,
+    elementId: string,
+    request: ImageGenerationRequest
+  ): Promise<ImageGenerationResponse> {
+    const res = await api.post<ApiResponse<{ cdnUrls: string[] }>>(
+      `${this.baseUrl}/api/images/generate`,
+      {
+        prompt: request.prompt,
+        model: request.model.name,
+        provider: request.model.provider.toLowerCase(),
+      },
+      {
+        headers: {
+          'Idempotency-Key': `${id}:${slideId}:${elementId}:image`,
+        },
+      }
+    );
+
+    return this._mapImageResponse(res.data.data);
+  }
+
   private _mapImageItem(data: any): ImageData {
     return {
       id: data.id,
@@ -47,6 +70,12 @@ export default class ImageRealApiService implements ImageApiService {
       quality: data.quality,
       createdAt: data.createdAt,
       updatedAt: data.updatedAt,
+    };
+  }
+
+  private _mapImageResponse(data: any): ImageGenerationResponse {
+    return {
+      images: data.cdnUrls.map((url: string) => ({ id: crypto.randomUUID(), url })),
     };
   }
 }

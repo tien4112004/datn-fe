@@ -10,7 +10,7 @@ import { MODEL_TYPES, useModels } from '@/features/model';
 import { ModelSelect } from '@/shared/components/common/ModelSelect';
 import { IMAGE_DIMENSION_OPTIONS, ART_STYLE_OPTIONS } from '@/features/image/types';
 import type { CreateImageFormData } from '@/features/image/types';
-import type { Control, UseFormRegister, ControllerRenderProps } from 'react-hook-form';
+import type { Control, UseFormRegister } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
 
 interface AdvancedOptionsProps {
@@ -58,13 +58,9 @@ const AdvancedOptions = ({ register, control, isOpen, onToggle }: AdvancedOption
                 <div className="space-y-2">
                   <Label>{t('imageModel')}</Label>
                   <Controller
-                    name="imageModel"
+                    name="model"
                     control={control}
-                    render={({
-                      field,
-                    }: {
-                      field: ControllerRenderProps<CreateImageFormData, 'imageModel'>;
-                    }) => (
+                    render={({ field }) => (
                       <ModelSelect
                         models={models}
                         value={field.value}
@@ -84,11 +80,7 @@ const AdvancedOptions = ({ register, control, isOpen, onToggle }: AdvancedOption
                   <Controller
                     name="artStyle"
                     control={control}
-                    render={({
-                      field,
-                    }: {
-                      field: ControllerRenderProps<CreateImageFormData, 'artStyle'>;
-                    }) => (
+                    render={({ field }) => (
                       <Select value={field.value} onValueChange={field.onChange} defaultValue="">
                         <SelectTrigger>
                           <SelectValue placeholder={t('artStylePlaceholder')} />
@@ -112,11 +104,7 @@ const AdvancedOptions = ({ register, control, isOpen, onToggle }: AdvancedOption
                 <Controller
                   name="imageDimension"
                   control={control}
-                  render={({
-                    field,
-                  }: {
-                    field: ControllerRenderProps<CreateImageFormData, 'imageDimension'>;
-                  }) => (
+                  render={({ field }) => (
                     <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
                       {IMAGE_DIMENSION_OPTIONS.map((opt) => {
                         const [width, height] = opt.value.split('x').map(Number);

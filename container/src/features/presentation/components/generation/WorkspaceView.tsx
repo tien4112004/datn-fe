@@ -18,7 +18,7 @@ import { LANGUAGE_OPTIONS, SLIDE_COUNT_OPTIONS } from '@/features/presentation/t
 import { MODEL_TYPES, useModels } from '@/features/model';
 import { useWorkspace } from '@/features/presentation/hooks/useWorkspace';
 import { usePresentationForm } from '@/features/presentation/contexts/PresentationFormContext';
-import { CustomizationSection } from './PresentationCustomizationForm';
+import CustomizationSection from './PresentationCustomizationForm';
 import LoadingButton from '@/components/common/LoadingButton';
 import { useCallback, useEffect } from 'react';
 import useOutlineStore from '../../stores/useOutlineStore';

@@ -104,25 +104,25 @@
 
         <ButtonGroup class="row">
           <Button style="flex: 1" @click="alignElementToCanvas(ElementAlignCommands.LEFT)"
-            ><IconAlignLeft class="icon" /></Button
-          >
+            ><IconAlignLeft class="icon"
+          /></Button>
           <Button style="flex: 1" @click="alignElementToCanvas(ElementAlignCommands.HORIZONTAL)"
-            ><IconAlignVertically class="icon" /></Button
-          >
+            ><IconAlignVertically class="icon"
+          /></Button>
           <Button style="flex: 1" @click="alignElementToCanvas(ElementAlignCommands.RIGHT)"
-            ><IconAlignRight class="icon" /></Button
-          >
+            ><IconAlignRight class="icon"
+          /></Button>
         </ButtonGroup>
         <ButtonGroup class="row">
           <Button style="flex: 1" @click="alignElementToCanvas(ElementAlignCommands.TOP)"
-            ><IconAlignTop class="icon" /></Button
-          >
+            ><IconAlignTop class="icon"
+          /></Button>
           <Button style="flex: 1" @click="alignElementToCanvas(ElementAlignCommands.VERTICAL)"
-            ><IconAlignHorizontally class="icon" /></Button
-          >
+            ><IconAlignHorizontally class="icon"
+          /></Button>
           <Button style="flex: 1" @click="alignElementToCanvas(ElementAlignCommands.BOTTOM)"
-            ><IconAlignBottom class="icon" /></Button
-          >
+            ><IconAlignBottom class="icon"
+          /></Button>
         </ButtonGroup>
       </div>
     </div>

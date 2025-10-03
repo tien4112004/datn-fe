@@ -29,5 +29,6 @@ const currentComponent = computed(() => {
 <style lang="scss" scoped>
 .mobile {
   height: 100%;
+  overflow-x: hidden;
 }
 </style>

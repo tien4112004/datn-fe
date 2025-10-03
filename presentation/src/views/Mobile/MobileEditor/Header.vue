@@ -2,13 +2,16 @@
   <div class="mobile-editor-header">
     <div class="history">
       <div class="history-item" :class="{ disable: !canUndo }" @click.stop="undo()">
-        <IconBack /> {{ $t('header.undo') }}
+        <IconBack />
+        <span>{{ $t('header.edit.undo') }}</span>
       </div>
       <div class="history-item" :class="{ disable: !canRedo }" @click.stop="redo()">
-        <IconNext /> {{ $t('header.redo') }}
+        <IconNext /> <span>{{ $t('header.edit.redo') }}</span>
       </div>
     </div>
-    <div class="back" @click="changeMode('preview')"><IconLogout /> {{ $t('header.exitEdit') }}</div>
+    <div class="back" @click="changeMode('preview')">
+      <IconLogout /><span>{{ $t('header.edit.exitEdit') }}</span>
+    </div>
   </div>
 </template>
 
@@ -46,9 +49,20 @@ const { redo, undo } = useHistorySnapshot();
 }
 .history-item {
   margin-right: 20px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
 
   &.disable {
     opacity: 0.5;
   }
+}
+
+.back {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
 }
 </style>

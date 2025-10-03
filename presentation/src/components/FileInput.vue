@@ -45,4 +45,10 @@ const handleChange = (e: Event) => {
 .input {
   display: none;
 }
+
+.file-input {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 </style>

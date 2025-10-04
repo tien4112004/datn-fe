@@ -1,6 +1,5 @@
-import type { Size } from './slideLayout';
 import type { ElementMeasurementConstraints } from './htmlTextCreation';
-import type { LayoutBlockInstance } from './types';
+import type { LayoutBlockInstance, Size } from './types';
 
 /**
  * Simple, direct DOM measurement - no cloning, no complex caching, no style conflicts

@@ -15,20 +15,13 @@ export interface SlideViewport {
 
 export interface RelativePositioning {
   relativeTo?: string; // Container ID to position relative to (undefined = viewport)
-  anchor?: {
-    horizontal?: 'left' | 'right' | 'center' | 'none';
-    vertical?: 'top' | 'bottom' | 'center' | 'none';
-  };
-  offset?: {
-    left?: number;
-    top?: number;
-    right?: number;
-    bottom?: number;
-  };
-  fillRemaining?: {
-    horizontal?: boolean;
-    vertical?: boolean;
-  };
+  axis: 'horizontal' | 'vertical'; // Which axis to position (other axis inherits from parent)
+
+  // Positioning for the specified axis
+  anchor?: 'start' | 'end' | 'center'; // 'start' = left/top, 'end' = right/bottom
+  offset?: number; // Offset from anchor point
+  size?: number | 'fill'; // Explicit size or 'fill' to fill remaining space
+  margin?: PaddingConfig; // Margin to apply when calculating position/size
 }
 
 export interface Position {

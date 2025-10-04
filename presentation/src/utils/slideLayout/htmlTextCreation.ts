@@ -1,11 +1,4 @@
-export interface TextElementConfig {
-  fontSize: number;
-  lineHeight: number;
-  fontFamily?: string;
-  fontWeight?: 'normal' | 'bold' | 'bolder' | 'lighter' | number;
-  textAlign?: 'left' | 'center' | 'right';
-  color?: string;
-}
+import type { TextStyleConfig } from './types';
 
 // Font weight mapping
 const fontWeightMap: Record<string, string> = {
@@ -20,14 +13,20 @@ export interface ElementMeasurementConstraints {
   maxHeight?: number;
 }
 
-export function createTextElement(content: string, config: TextElementConfig): HTMLElement {
+/**
+ * Unified element creation function - single source of truth for all text element creation
+ */
+export function createElement(content: string, config: TextStyleConfig): HTMLElement {
   const p = document.createElement('p');
   const span = document.createElement('span');
 
-  // Apply paragraph styling
+  // Apply paragraph styling with defaults
+  const fontSize = config.fontSize ?? 16;
+  const lineHeight = config.lineHeight ?? 1.4;
+
   p.style.textAlign = config.textAlign || 'left';
-  p.style.lineHeight = `${config.lineHeight}`;
-  p.style.fontSize = `${config.fontSize}px`;
+  p.style.lineHeight = `${lineHeight}`;
+  p.style.fontSize = `${fontSize}px`;
   p.style.fontFamily = config.fontFamily || 'Arial, sans-serif';
   p.style.margin = '0';
 
@@ -35,81 +34,10 @@ export function createTextElement(content: string, config: TextElementConfig): H
   const fontWeightValue = config.fontWeight || 'normal';
   span.style.fontWeight = fontWeightMap[fontWeightValue.toString()] || fontWeightValue.toString();
 
-  if (config.color) {
-    span.style.color = config.color;
+  if (config.fontStyle) {
+    span.style.fontStyle = config.fontStyle;
   }
-  span.textContent = content;
 
-  p.appendChild(span);
-  return p;
-}
-
-export function createTitleElement(content: string, config: TextElementConfig): HTMLElement {
-  const p = document.createElement('p');
-  const strong = document.createElement('strong');
-  const span = document.createElement('span');
-
-  // Apply paragraph styling
-  p.style.textAlign = 'center';
-  p.style.margin = '0';
-  p.style.lineHeight = `${config.lineHeight}`;
-  p.style.fontSize = `${config.fontSize}px`;
-  p.style.fontFamily = config.fontFamily || 'Arial, sans-serif';
-
-  // Apply span styling
-  const fontWeightValue = config.fontWeight || 'normal';
-  span.style.fontWeight = fontWeightMap[fontWeightValue.toString()] || fontWeightValue.toString();
-
-  if (config.color) {
-    span.style.color = config.color;
-  }
-  span.textContent = content;
-
-  strong.appendChild(span);
-  p.appendChild(strong);
-  return p;
-}
-
-export function createLabelElement(content: string, config: TextElementConfig): HTMLElement {
-  const p = document.createElement('p');
-  const strong = document.createElement('strong');
-  const span = document.createElement('span');
-
-  // Apply paragraph styling for labels (center-aligned)
-  p.style.textAlign = 'center';
-  p.style.margin = '0';
-  p.style.lineHeight = `${config.lineHeight}`;
-  p.style.fontFamily = config.fontFamily || 'Arial, sans-serif';
-  p.style.fontSize = `${config.fontSize}px`;
-
-  const fontWeightValue = config.fontWeight || 'normal';
-  span.style.fontWeight = fontWeightMap[fontWeightValue.toString()] || fontWeightValue.toString();
-
-  if (config.color) {
-    span.style.color = config.color;
-  }
-  span.textContent = content;
-
-  strong.appendChild(span);
-  p.appendChild(strong);
-  return p;
-}
-
-export function createHorizontalItemContentElement(content: string, config: TextElementConfig): HTMLElement {
-  const p = document.createElement('p');
-  const span = document.createElement('span');
-
-  // Apply paragraph styling for horizontal content (center-aligned)
-  p.style.textAlign = 'center';
-  p.style.lineHeight = `${config.lineHeight}`;
-  p.style.margin = '0';
-  p.style.fontFamily = config.fontFamily || 'Arial, sans-serif';
-  p.style.fontSize = `${config.fontSize}px`;
-
-  const fontWeightValue = config.fontWeight || 'normal';
-  span.style.fontWeight = fontWeightMap[fontWeightValue.toString()] || fontWeightValue.toString();
-
-  // Apply span styling
   if (config.color) {
     span.style.color = config.color;
   }

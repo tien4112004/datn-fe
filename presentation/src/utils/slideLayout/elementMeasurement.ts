@@ -25,6 +25,7 @@ export function measureElement(element: HTMLElement, constraints?: ElementMeasur
   element.style.visibility = 'hidden';
   element.style.top = '-9999px';
   element.style.left = '-9999px';
+  element.style.padding = '10px';
 
   // Apply constraints
   if (constraints?.maxWidth) {

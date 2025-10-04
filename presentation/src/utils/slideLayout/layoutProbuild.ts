@@ -4,12 +4,12 @@ import type {
   ImageLayoutBlockInstance,
   TextLayoutBlockInstance,
   Bounds,
-  SlideLayoutBlockConfig,
   LayoutBlockInstance,
   LayoutBlockConfig,
   ConvergenceOptions,
 } from './types';
 import LayoutPrimitives from './layoutPrimitives';
+import { createTextElement } from './htmlTextCreation';
 
 const LayoutProBuilder = {
   async buildImageElement(src: string, container: TemplateContainerConfig): Promise<PPTImageElement> {
@@ -174,7 +174,7 @@ const LayoutProBuilder = {
       if (labelData.length === 0) continue;
 
       allElements[label] = labelData.map((item) => {
-        return LayoutPrimitives.createTextElement(item, {
+        return createTextElement(item, {
           fontSize: fontSizes[label],
           lineHeight: label === 'label' ? 1.2 : 1.4,
           ...instances[0].text,
@@ -291,7 +291,7 @@ const LayoutProBuilder = {
   ): { fontSize: number; lineHeight: number } {
     // Create HTML elements for font size calculation
     const elements = labelData.map((item) => {
-      return LayoutPrimitives.createTextElement(item, {
+      return createTextElement(item, {
         fontSize: 16,
         lineHeight: 1.4,
         ...instances[0].text,

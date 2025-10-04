@@ -27,7 +27,7 @@ const LayoutProBuilder = {
       bounds: config.bounds,
     } as TextLayoutBlockInstance;
 
-    const { titleContent, titleDimensions, titlePosition } = LayoutPrimitives.calculateTitleLayout(
+    const { titleElement, titleDimensions, titlePosition } = LayoutPrimitives.calculateTitleLayout(
       title,
       titleInstance
     );
@@ -38,7 +38,7 @@ const LayoutProBuilder = {
     };
 
     return [
-      LayoutPrimitives.createTextPPTElement(titleContent, titleInstance),
+      LayoutPrimitives.createTextPPTElement(titleElement, titleInstance),
       LayoutPrimitives.createTitleLine(
         {
           width: titleDimensions.width,

@@ -31,9 +31,11 @@ export const getTwoColumnLayoutTemplate = (theme: SlideTheme): TemplateConfig =>
         // Using relative positioning - positioned below title
         positioning: {
           relativeTo: 'title',
-          anchor: { vertical: 'bottom', horizontal: 'none' },
-          offset: { left: 60, top: 25, right: 80 },
-          fillRemaining: { vertical: true },
+          axis: 'vertical',
+          anchor: 'end',
+          offset: 20,
+          size: 'fill',
+          margin: { left: 30, right: 30, top: 0, bottom: 40 },
         },
         padding: { top: 0, bottom: 0, left: 0, right: 0 },
         distribution: 'space-between',

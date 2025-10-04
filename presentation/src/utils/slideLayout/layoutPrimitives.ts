@@ -455,6 +455,60 @@ const LayoutPrimitives = {
     };
   },
 
+  async createElement(content: string, container: TextLayoutBlockInstance): Promise<PPTTextElement> {
+    // Create initial text element with default styling
+    const initialElement = this.createTextElement(content, {
+      fontSize: 32, // Initial size for optimization
+      lineHeight: 1.2,
+      fontFamily: container.text?.fontFamily || 'Arial',
+      color: container.text?.color || '#000000',
+      textAlign: container.text?.textAlign || 'left',
+      fontWeight: container.text?.fontWeight || 'normal',
+    });
+
+    // Calculate optimal font size for the content to fit within bounds
+    const optimalFontSize = calculateLargestOptimalFontSize(
+      initialElement,
+      container.bounds.width,
+      container.bounds.height,
+      'content'
+    );
+
+    // Apply the calculated font size to the element
+    applyFontSizeToElement(initialElement, optimalFontSize, 1.2);
+
+    // Measure the element with optimized font size
+    const dimensions = measureElementWithStyle(initialElement, container);
+
+    // Calculate positioning within the container
+    const position = this.getPosition(container.bounds, dimensions, {
+      horizontalAlignment: container.horizontalAlignment,
+      verticalAlignment: container.verticalAlignment,
+    });
+
+    // Create and return the PPT text element
+    return {
+      id: crypto.randomUUID(),
+      type: 'text',
+      content: initialElement.outerHTML,
+      defaultFontName: container.text?.fontFamily || 'Arial',
+      defaultColor: container.text?.color || '#000000',
+      left: position.left,
+      top: position.top,
+      width: dimensions.width,
+      height: dimensions.height,
+      textType: 'content',
+      outline: container.border
+        ? {
+            color: container.border.color,
+            width: container.border.width,
+            borderRadius: container.border.radius || '0',
+          }
+        : undefined,
+      shadow: container.shadow,
+    } as PPTTextElement;
+  },
+
   async createItemElementsWithStyles(
     items: string[],
     container: TextLayoutBlockInstance
@@ -467,6 +521,7 @@ const LayoutPrimitives = {
         lineHeight: 1.4,
         fontFamily: container.text?.fontFamily || 'Arial',
         color: container.text?.color || '#000000',
+        textAlign: container.text?.textAlign || 'left',
       })
     );
 
@@ -488,6 +543,7 @@ const LayoutPrimitives = {
       lineHeight: finalLineHeight,
       fontFamily: container.text?.fontFamily || 'Arial',
       color: container.text?.color || '#000000',
+      textAlign: container.text?.textAlign || 'left',
     };
 
     // Pre-calculate all item dimensions using the unified styles
@@ -498,6 +554,7 @@ const LayoutPrimitives = {
         lineHeight: itemStyles.lineHeight,
         fontFamily: itemStyles.fontFamily,
         color: itemStyles.color,
+        textAlign: itemStyles.textAlign,
       });
       const itemDimensions = measureElementForBlock(
         itemElement,
@@ -697,11 +754,11 @@ const LayoutPrimitives = {
     return p;
   },
 
-  createTextPPTElement(content: string, block: TextLayoutBlockInstance): PPTTextElement {
+  createTextPPTElement(content: HTMLElement, block: TextLayoutBlockInstance): PPTTextElement {
     return {
       id: crypto.randomUUID(),
       type: 'text',
-      content,
+      content: content.outerHTML,
       defaultFontName: block.text?.fontFamily || 'Arial',
       defaultColor: block.text?.color || '#000000',
       left: block.bounds.left,
@@ -1205,74 +1262,73 @@ const LayoutPrimitives = {
     parentBounds: Bounds,
     viewport: SlideViewport
   ): Bounds {
-    const anchor = positioning.anchor || {};
-    const offset = positioning.offset || {};
-    const fillRemaining = positioning.fillRemaining || {};
-
+    // Start with parent bounds (non-positioned axis inherits from parent)
     let left = parentBounds.left;
     let top = parentBounds.top;
     let width = parentBounds.width;
     let height = parentBounds.height;
 
-    // === HORIZONTAL POSITIONING ===
+    const anchor = positioning.anchor || 'start';
+    const offset = positioning.offset || 0;
+    const size = positioning.size;
+    const margin = positioning.margin || {};
 
-    if (fillRemaining.horizontal) {
-      // Fill from current position to right edge
-      left = parentBounds.left + (offset.left || 0);
-      width = viewport.width - left - (offset.right || 0);
-    } else if (offset.left !== undefined && offset.right !== undefined) {
-      // Both left and right specified = absolute positioning within viewport
-      left = offset.left;
-      width = offset.right - offset.left;
-    } else if (anchor.horizontal === 'left') {
-      left = parentBounds.left + (offset.left || 0);
-      // Keep parent width unless overridden
-      if (offset.right !== undefined) {
-        width = offset.right - left;
+    if (positioning.axis === 'horizontal') {
+      // === HORIZONTAL POSITIONING (modify left and width only) ===
+
+      // Calculate starting position based on anchor
+      if (anchor === 'start') {
+        // Anchor to left edge of parent
+        left = parentBounds.left + offset + (margin.left || 0);
+      } else if (anchor === 'end') {
+        // Anchor to right edge of parent
+        left = parentBounds.left + parentBounds.width + offset + (margin.left || 0);
+      } else if (anchor === 'center') {
+        // Anchor to center of parent
+        left = parentBounds.left + parentBounds.width / 2 + offset + (margin.left || 0);
       }
-    } else if (anchor.horizontal === 'right') {
-      left = parentBounds.left + parentBounds.width + (offset.left || 0);
-      if (offset.right !== undefined) {
-        width = offset.right - left;
+
+      // Calculate width based on size
+      if (size === 'fill') {
+        // Fill remaining width to viewport right edge, accounting for right margin
+        width = viewport.width - left - (margin.right || 0);
+      } else if (typeof size === 'number') {
+        // Explicit width
+        width = size;
       }
-    } else if (anchor.horizontal === 'center') {
-      left = parentBounds.left + parentBounds.width / 2 + (offset.left || 0);
-      if (offset.right !== undefined) {
-        width = offset.right - left;
-      }
+      // else: keep parent width
+
+      // Top and height are inherited from parent, but apply vertical margins
+      top = parentBounds.top + (margin.top || 0);
+      height = parentBounds.height - (margin.top || 0) - (margin.bottom || 0);
     } else {
-      // anchor.horizontal === 'none' or undefined - use parent left + offset
-      left = parentBounds.left + (offset.left || 0);
-    }
+      // === VERTICAL POSITIONING (modify top and height only) ===
 
-    // === VERTICAL POSITIONING ===
+      // Calculate starting position based on anchor
+      if (anchor === 'start') {
+        // Anchor to top edge of parent
+        top = parentBounds.top + offset + (margin.top || 0);
+      } else if (anchor === 'end') {
+        // Anchor to bottom edge of parent
+        top = parentBounds.top + parentBounds.height + offset + (margin.top || 0);
+      } else if (anchor === 'center') {
+        // Anchor to center of parent
+        top = parentBounds.top + parentBounds.height / 2 + offset + (margin.top || 0);
+      }
 
-    if (fillRemaining.vertical) {
-      // Fill from current position to bottom edge
-      top = parentBounds.top + (offset.top || 0);
-      height = viewport.height - top - (offset.bottom || 0);
-    } else if (offset.top !== undefined && offset.bottom !== undefined) {
-      // Both top and bottom specified = absolute positioning within viewport
-      top = offset.top;
-      height = offset.bottom - offset.top;
-    } else if (anchor.vertical === 'top') {
-      top = parentBounds.top + (offset.top || 0);
-      if (offset.bottom !== undefined) {
-        height = offset.bottom - top;
+      // Calculate height based on size
+      if (size === 'fill') {
+        // Fill remaining height to viewport bottom edge, accounting for bottom margin
+        height = viewport.height - top - (margin.bottom || 0);
+      } else if (typeof size === 'number') {
+        // Explicit height
+        height = size;
       }
-    } else if (anchor.vertical === 'bottom') {
-      top = parentBounds.top + parentBounds.height + (offset.top || 0);
-      if (offset.bottom !== undefined) {
-        height = offset.bottom - top;
-      }
-    } else if (anchor.vertical === 'center') {
-      top = parentBounds.top + parentBounds.height / 2 + (offset.top || 0);
-      if (offset.bottom !== undefined) {
-        height = offset.bottom - top;
-      }
-    } else {
-      // anchor.vertical === 'none' or undefined - use parent top + offset
-      top = parentBounds.top + (offset.top || 0);
+      // else: keep parent height
+
+      // Left and width are inherited from parent, but apply horizontal margins
+      left = parentBounds.left + (margin.left || 0);
+      width = parentBounds.width - (margin.left || 0) - (margin.right || 0);
     }
 
     return { left, top, width, height };

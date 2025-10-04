@@ -15,13 +15,6 @@ export const getTitleLayoutTemplate = (theme: SlideTheme): TemplateConfig => {
     height: 120,
   };
 
-  const subtitleBounds: Bounds = {
-    left: SLIDE_WIDTH * 0.06,
-    top: 0, // Will be calculated relative to title
-    width: SLIDE_WIDTH * 0.88,
-    height: 80,
-  };
-
   return {
     containers: {
       title: {
@@ -38,7 +31,14 @@ export const getTitleLayoutTemplate = (theme: SlideTheme): TemplateConfig => {
         },
       },
       subtitle: {
-        bounds: subtitleBounds,
+        positioning: {
+          relativeTo: 'title',
+          axis: 'vertical',
+          anchor: 'end',
+          offset: 0,
+          size: 120,
+          margin: { left: 30, right: 30, top: 0, bottom: 40 },
+        },
         padding: { top: 0, bottom: 0, left: 0, right: 0 },
         horizontalAlignment: 'center',
         verticalAlignment: 'top',
@@ -63,10 +63,21 @@ export const convertTitleLayout = async (
 ): Promise<Slide> => {
   const hasSubtitle = !!data.data.subtitle;
 
+  // Resolve container positions (handles both absolute and relative positioning)
+  const resolvedBounds = LayoutPrimitives.resolveContainerPositions(template.containers, {
+    width: SLIDE_WIDTH,
+    height: SLIDE_HEIGHT,
+  });
+
   // Merge template config with bounds to create instances
   const titleInstance = {
     ...template.containers.title,
-    bounds: template.containers.title.bounds,
+    bounds: resolvedBounds.title,
+  } as TextLayoutBlockInstance;
+
+  const subtitleInstance = {
+    ...template.containers.subtitle,
+    bounds: resolvedBounds.subtitle,
   } as TextLayoutBlockInstance;
 
   const { titleContent, titleDimensions, titlePosition } = LayoutPrimitives.calculateTitleLayout(
@@ -80,19 +91,9 @@ export const convertTitleLayout = async (
 
   // Add subtitle if present
   if (hasSubtitle && data.data.subtitle) {
-    const subtitleInstance = {
-      ...template.containers.subtitle,
-      bounds: {
-        ...template.containers.subtitle.bounds,
-        top: titlePosition.top + titleDimensions.height + 32, // Position below title
-      },
-    } as TextLayoutBlockInstance;
+    const subtitleElement = await LayoutPrimitives.createElement(data.data.subtitle, subtitleInstance);
 
-    const subtitleElements = await LayoutPrimitives.createItemElementsWithStyles(
-      [data.data.subtitle],
-      subtitleInstance
-    );
-    elements.push(...subtitleElements);
+    elements.push(subtitleElement);
   }
 
   // If no subtitle, recenter the title vertically

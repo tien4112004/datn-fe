@@ -71,7 +71,7 @@ export function calculateLargestOptimalFontSize(
       break;
     }
 
-    fontSize -= fontSize > 20 ? 2 : 1;
+    fontSize -= fontSize > 20 ? 1 : 0.5;
   }
 
   return optimalSize;

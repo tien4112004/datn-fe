@@ -42,45 +42,37 @@ export const getTwoColumnLayoutTemplate = (theme: SlideTheme): TemplateConfig =>
         spacingBetweenItems: 20,
         horizontalAlignment: 'center',
         verticalAlignment: 'top',
-        orientation: 'horizontal',
-        children: [
-          {
+        orientation: 'vertical',
+        childTemplate: {
+          count: 'auto',
+          wrap: {
+            enabled: true,
+            maxItemsPerLine: 4,
+            lineCount: 2,
+            distribution: 'balanced',
+            lineSpacing: 15,
+            alternating: true,
+          },
+          structure: {
+            label: 'item',
             padding: { top: 0, bottom: 0, left: 0, right: 0 },
-            distribution: 'space-between',
+            distribution: 'equal',
             horizontalAlignment: 'left',
             verticalAlignment: 'top',
-            childTemplate: {
-              count: 'auto',
-              structure: {
-                label: 'item',
-                text: {
-                  color: theme.fontColor,
-                  fontFamily: theme.fontName,
-                  fontWeight: 'normal',
-                  fontStyle: 'normal',
-                },
-              },
+            text: {
+              color: theme.fontColor,
+              fontFamily: theme.fontName,
+              fontWeight: 'normal',
+              fontStyle: 'normal',
+              lineHeight: 1.7,
+            },
+            border: {
+              color: theme.themeColors[0],
+              width: 1,
+              radius: 8,
             },
           },
-          {
-            padding: { top: 0, bottom: 0, left: 0, right: 0 },
-            distribution: 'space-between',
-            horizontalAlignment: 'left',
-            verticalAlignment: 'top',
-            childTemplate: {
-              count: 'auto',
-              structure: {
-                label: 'item',
-                text: {
-                  color: theme.fontColor,
-                  fontFamily: theme.fontName,
-                  fontWeight: 'normal',
-                  fontStyle: 'normal',
-                },
-              },
-            },
-          },
-        ],
+        },
       },
     },
     theme,
@@ -150,55 +142,38 @@ export const convertTwoColumnLayout = async (
 
   // Content container - use unified font sizing with nested data
   const contentContainer = { ...template.containers.content, bounds: resolvedBounds.content };
+
   const { instance: contentInstance, elements } = LayoutProBuilder.buildLayoutWithUnifiedFontSizing(
     contentContainer,
     contentContainer.bounds!,
     {
-      items1: data.data.items1,
-      items2: data.data.items2,
+      item: [...data.data.items1, ...data.data.items2].map((item) => item),
     }
   );
 
-  // Extract elements (they're all labeled as 'item')
-  const itemElements = elements['item'] || [];
+  const itemInstances = LayoutPrimitives.recursivelyGetAllLabelInstances(contentInstance, 'item');
+  const contentElements = elements['item'] || [];
 
-  // Split into left and right based on which column they belong to
-  const leftItems = (contentInstance.children?.[0]?.children || []) as TextLayoutBlockInstance[];
-  const rightItems = (contentInstance.children?.[1]?.children || []) as TextLayoutBlockInstance[];
-
-  // Create PPT elements for left column
-  const leftItemElements = leftItems.map(
-    (item, index) =>
-      ({
-        id: crypto.randomUUID(),
-        type: 'text',
-        content: itemElements[index]?.outerHTML || '',
-        defaultFontName: item.text?.fontFamily,
-        defaultColor: item.text?.color,
-        left: item.bounds.left,
-        top: item.bounds.top,
-        width: item.bounds.width,
-        height: item.bounds.height,
-        textType: 'content',
-      }) as PPTTextElement
-  );
-
-  // Create PPT elements for right column
-  const rightItemElements = rightItems.map(
-    (item, index) =>
-      ({
-        id: crypto.randomUUID(),
-        type: 'text',
-        content: itemElements[leftItems.length + index]?.outerHTML || '',
-        defaultFontName: item.text?.fontFamily,
-        defaultColor: item.text?.color,
-        left: item.bounds.left,
-        top: item.bounds.top,
-        width: item.bounds.width,
-        height: item.bounds.height,
-        textType: 'content',
-      }) as PPTTextElement
-  );
+  const itemElements = contentElements
+    .map((labelEl, index) => {
+      return [
+        LayoutPrimitives.createCard(itemInstances[index]),
+        {
+          id: crypto.randomUUID(),
+          type: 'text',
+          content: labelEl.outerHTML,
+          defaultFontName: itemInstances[index].text?.fontFamily,
+          defaultColor: itemInstances[index].text?.color,
+          left: itemInstances[index].bounds.left,
+          top: itemInstances[index].bounds.top,
+          width: itemInstances[index].bounds.width,
+          height: itemInstances[index].bounds.height,
+          textType: 'content',
+          lineHeight: itemInstances[index].text?.lineHeight,
+        } as PPTTextElement,
+      ];
+    })
+    .flat();
 
   const slide: Slide = {
     id: slideId ?? crypto.randomUUID(),
@@ -208,8 +183,7 @@ export const convertTwoColumnLayout = async (
         { ...template.containers.title, bounds: resolvedBounds.title },
         template.theme
       ),
-      ...leftItemElements,
-      ...rightItemElements,
+      ...itemElements,
     ],
     background: LayoutPrimitives.processBackground(template.theme),
   };

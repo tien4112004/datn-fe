@@ -14,7 +14,7 @@ import {
   calculateFontSizeForAvailableSpace,
   applyFontSizeToElements,
 } from './fontSizeCalculator';
-import { createItemElement, createTitleElement, createLabelElement } from './htmlTextCreation';
+import { createTitleElement, createLabelElement, createTextElement } from './htmlTextCreation';
 import { measureElementForBlock, measureElementWithStyle, measureElement } from './elementMeasurement';
 import type {
   ImageLayoutBlockInstance,
@@ -69,8 +69,7 @@ const LayoutPrimitives = {
 
   calculateTitleLayout(title: string, container: TextLayoutBlockInstance) {
     // Create title element
-    const titleElement = createTitleElement({
-      content: title,
+    const titleElement = createTitleElement(title, {
       fontSize: 32, // Initial size, will be optimized
       lineHeight: 1,
       fontFamily: container.text?.fontFamily || 'Arial',
@@ -422,8 +421,7 @@ const LayoutPrimitives = {
 
       // Create temporary elements for this column
       const tempElements = items.map((item) =>
-        createItemElement({
-          content: item,
+        createTextElement(item, {
           fontSize: 20, // Initial size for optimization
           lineHeight: 1.4,
           fontFamily,
@@ -457,7 +455,7 @@ const LayoutPrimitives = {
 
   async createElement(content: string, container: TextLayoutBlockInstance): Promise<PPTTextElement> {
     // Create initial text element with default styling
-    const initialElement = this.createTextElement(content, {
+    const initialElement = createTextElement(content, {
       fontSize: 32, // Initial size for optimization
       lineHeight: 1.2,
       fontFamily: container.text?.fontFamily || 'Arial',
@@ -515,8 +513,7 @@ const LayoutPrimitives = {
   ): Promise<PPTTextElement[]> {
     // Always optimize font size - create temporary elements to calculate optimal size
     const tempItemElements = items.map((item) =>
-      createItemElement({
-        content: item,
+      createTextElement(item, {
         fontSize: 20, // Initial size for optimization
         lineHeight: 1.4,
         fontFamily: container.text?.fontFamily || 'Arial',
@@ -548,8 +545,7 @@ const LayoutPrimitives = {
 
     // Pre-calculate all item dimensions using the unified styles
     const itemContentsAndDimensions = items.map((item) => {
-      const itemElement = createItemElement({
-        content: item,
+      const itemElement = createTextElement(item, {
         fontSize: itemStyles.fontSize,
         lineHeight: itemStyles.lineHeight,
         fontFamily: itemStyles.fontFamily,
@@ -589,7 +585,7 @@ const LayoutPrimitives = {
     });
   },
 
-  async createItemElementsWithUnifiedStyles(
+  async createTextElementsWithUnifiedStyles(
     items: string[],
     container: TextLayoutBlockInstance,
     unifiedFontSize: { fontSize: number; lineHeight: number }
@@ -607,8 +603,7 @@ const LayoutPrimitives = {
 
     // Pre-calculate all item dimensions using the unified styles
     const itemContentsAndDimensions = items.map((item) => {
-      const itemElement = createItemElement({
-        content: item,
+      const itemElement = createTextElement(item, {
         fontSize: itemStyles.fontSize,
         lineHeight: itemStyles.lineHeight,
         fontFamily: itemStyles.fontFamily,
@@ -721,37 +716,6 @@ const LayoutPrimitives = {
         : undefined,
       radius: container.border?.radius || 0,
     } as PPTShapeElement;
-  },
-
-  createTextElement(content: string, config: TextStyleConfig): HTMLElement {
-    const p = document.createElement('p');
-    const span = document.createElement('span');
-
-    // Font weight mapping
-    const fontWeightMap: Record<string, string> = {
-      normal: '400',
-      bold: '700',
-      bolder: 'bolder',
-      lighter: 'lighter',
-    };
-
-    // Apply paragraph styling
-    p.style.textAlign = config.textAlign || 'left';
-    p.style.lineHeight = `${config.lineHeight}`;
-    p.style.fontSize = `${config.fontSize}px`;
-    p.style.fontFamily = config.fontFamily || 'Roboto';
-    p.style.margin = '0';
-
-    // Apply span styling
-    const fontWeightValue = config.fontWeight || 'normal';
-    span.style.fontWeight = fontWeightMap[fontWeightValue.toString()] || fontWeightValue.toString();
-    if (config.color) {
-      span.style.color = config.color;
-    }
-    span.textContent = content;
-
-    p.appendChild(span);
-    return p;
   },
 
   createTextPPTElement(content: HTMLElement, block: TextLayoutBlockInstance): PPTTextElement {

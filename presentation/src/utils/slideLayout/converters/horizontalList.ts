@@ -112,7 +112,7 @@ export const convertHorizontalListLayout = async (
   const contentContainer = template.containers.content;
   const { instance: contentInstance, elements } = LayoutProBuilder.buildLayoutWithUnifiedFontSizing(
     contentContainer,
-    contentContainer.bounds,
+    contentContainer.bounds!,
     {
       label: data.data.items.map((item) => item.label),
       content: data.data.items.map((item) => item.content),

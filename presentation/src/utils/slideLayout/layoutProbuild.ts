@@ -22,11 +22,11 @@ const LayoutProBuilder = {
   },
 
   buildCards(instance: LayoutBlockInstance): PPTElement[] {
-    // LayoutPrimitives.createCard(itemInstances[index]);
-    //
-    return LayoutPrimitives.fromInstanceToArray(instance).map((inst) =>
-      LayoutPrimitives.createCard(inst as LayoutBlockInstance)
-    );
+    const list = LayoutPrimitives.getAllDescendantInstances(instance).map((inst) => {
+      if (!inst.border) return null;
+      return LayoutPrimitives.createCard(inst as LayoutBlockInstance);
+    });
+    return list.filter((el) => el !== null);
   },
 
   buildTitle(title: string, config: TemplateContainerConfig, theme: SlideTheme): PPTElement[] {

@@ -54,8 +54,8 @@ export const getVerticalListLayoutTemplate = (theme: SlideTheme): TemplateConfig
           count: 'auto',
           wrap: {
             enabled: true,
-            maxItemsPerLine: 4,
-            lineCount: 'auto',
+            maxItemsPerLine: 3,
+            lineCount: 3,
             distribution: 'balanced',
             lineSpacing: 20,
             alternating: false,
@@ -139,9 +139,9 @@ export const convertVerticalListLayout = async (
   const slide: Slide = {
     id: slideId ?? crypto.randomUUID(),
     elements: [
+      ...LayoutProBuilder.buildCards(contentInstance),
       ...LayoutProBuilder.buildTitle(data.title, template.containers.title, template.theme),
       ...contentElements,
-      ...LayoutProBuilder.buildCards(contentInstance),
     ],
     background: LayoutPrimitives.processBackground(template.theme),
   };

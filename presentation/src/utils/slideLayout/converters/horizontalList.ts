@@ -15,17 +15,10 @@ export const getHorizontalListLayoutTemplate = (theme: SlideTheme): TemplateConf
     height: 120,
   };
 
-  const contentBounds: Bounds = {
-    left: 40,
-    top: 15 + 120,
-    width: SLIDE_WIDTH - 80,
-    height: SLIDE_HEIGHT - (15 + 120) - 40,
-  };
-
   return {
     containers: {
       title: {
-        type: 'text' as const,
+        type: 'text',
         bounds: titleBounds,
         padding: { top: 0, bottom: 0, left: 0, right: 0 },
         layout: {
@@ -40,9 +33,16 @@ export const getHorizontalListLayoutTemplate = (theme: SlideTheme): TemplateConf
         },
       },
       content: {
-        type: 'block' as const,
+        type: 'block',
         id: 'content',
-        bounds: contentBounds,
+        positioning: {
+          relativeTo: 'title',
+          axis: 'vertical',
+          anchor: 'end',
+          offset: 20,
+          size: 'fill',
+          margin: { left: 30, right: 30, top: 0, bottom: 40 },
+        },
         padding: { top: 0, bottom: 0, left: 0, right: 0 },
         layout: {
           distribution: 'space-around',
@@ -62,7 +62,7 @@ export const getHorizontalListLayoutTemplate = (theme: SlideTheme): TemplateConf
             alternating: true,
           },
           structure: {
-            type: 'block' as const,
+            type: 'block',
             label: 'item',
             padding: { top: 0, bottom: 0, left: 0, right: 0 },
             layout: {
@@ -79,7 +79,7 @@ export const getHorizontalListLayoutTemplate = (theme: SlideTheme): TemplateConf
             },
             children: [
               {
-                type: 'text' as const,
+                type: 'text',
                 id: 'label',
                 padding: { top: 0, bottom: 0, left: 0, right: 0 },
                 layout: {
@@ -96,7 +96,7 @@ export const getHorizontalListLayoutTemplate = (theme: SlideTheme): TemplateConf
                 },
               },
               {
-                type: 'text' as const,
+                type: 'text',
                 id: 'content',
                 padding: { top: 0, bottom: 0, left: 0, right: 0 },
                 layout: {
@@ -160,7 +160,6 @@ export const convertHorizontalListLayout = async (
   const itemElements = labelElements
     .map((labelEl, index) => {
       return [
-        LayoutPrimitives.createCard(itemInstances[index]),
         {
           id: crypto.randomUUID(),
           type: 'text',
@@ -192,6 +191,7 @@ export const convertHorizontalListLayout = async (
   const slide: Slide = {
     id: slideId ?? crypto.randomUUID(),
     elements: [
+      ...LayoutProBuilder.buildCards(contentInstance),
       ...LayoutProBuilder.buildTitle(data.title, template.containers.title, template.theme),
       ...itemElements,
     ],

@@ -28,6 +28,7 @@ export const getTwoColumnLayoutTemplate = (theme: SlideTheme): TemplateConfig =>
           fontFamily: theme.titleFontName,
           fontWeight: 'bold',
           fontStyle: 'normal',
+          textAlign: 'center',
         },
       },
       content: {
@@ -176,7 +177,6 @@ export const convertTwoColumnLayout = async (
   const itemElements = contentElements
     .map((labelEl, index) => {
       return [
-        LayoutPrimitives.createCard(itemInstances[index]),
         {
           id: crypto.randomUUID(),
           type: 'text',
@@ -197,6 +197,7 @@ export const convertTwoColumnLayout = async (
   const slide: Slide = {
     id: slideId ?? crypto.randomUUID(),
     elements: [
+      ...LayoutProBuilder.buildCards(contentInstance),
       ...LayoutProBuilder.buildTitle(
         data.title,
         { ...template.containers.title, bounds: resolvedBounds.title },

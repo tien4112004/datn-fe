@@ -284,23 +284,3 @@ export function distributeItems(
 
   return [itemCount];
 }
-
-/**
- * Convert layout instance tree to flat array
- */
-export function fromInstanceToArray(instance: LayoutBlockInstance): LayoutBlockInstance[] {
-  const result: LayoutBlockInstance[] = [];
-
-  function traverse(node: LayoutBlockInstance | undefined) {
-    if (!node) return;
-    result.push(node);
-    if (node.children && node.children.length) {
-      for (const child of node.children) {
-        traverse(child);
-      }
-    }
-  }
-
-  traverse(instance);
-  return result;
-}

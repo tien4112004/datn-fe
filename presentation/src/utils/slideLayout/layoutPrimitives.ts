@@ -59,14 +59,12 @@ import {
   buildInstanceWithBounds,
   calculateWrapLayout,
   distributeItems,
-  fromInstanceToArray,
 } from './primitives/layoutInstanceBuilder';
 export {
   buildChildrenFromChildTemplate,
   buildInstanceWithBounds,
   calculateWrapLayout,
   distributeItems,
-  fromInstanceToArray,
 } from './primitives/layoutInstanceBuilder';
 
 // Re-export from layoutDataProcessing
@@ -88,6 +86,8 @@ export {
   collectLabelGroupsRecursive,
   getColumnsLayout,
 } from './primitives/layoutDataProcessing';
+
+import { getAllDescendantInstances } from './primitives/layoutUtils';
 
 // Legacy alias for backward compatibility
 export { createTextElement as createElement };
@@ -126,7 +126,6 @@ const LayoutPrimitives = {
   buildInstanceWithBounds,
   calculateWrapLayout,
   distributeItems,
-  fromInstanceToArray,
 
   // From layoutDataProcessing
   normalizeDataStructure,
@@ -136,6 +135,8 @@ const LayoutPrimitives = {
   processChildrenData,
   collectLabelGroupsRecursive,
   getColumnsLayout,
+
+  getAllDescendantInstances,
 };
 
 export default LayoutPrimitives;

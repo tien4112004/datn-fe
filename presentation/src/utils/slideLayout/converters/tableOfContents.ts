@@ -1,7 +1,6 @@
-import type { Slide, SlideTheme } from '@/types/slides';
-import type { TableOfContentsLayoutSchema, TwoColumnLayoutSchema } from './types';
-import { convertTwoColumnLayout, getTwoColumnLayoutTemplate } from './twoColumn';
-import type { Bounds, TextLayoutBlockInstance, TemplateConfig, TextTemplateContainer } from '../types';
+import type { Slide, SlideTheme, PPTTextElement } from '@/types/slides';
+import type { TableOfContentsLayoutSchema } from './types';
+import type { TextLayoutBlockInstance, TemplateConfig } from '../types';
 import LayoutPrimitives from '../layoutPrimitives';
 import LayoutProBuilder from '../layoutProbuild';
 
@@ -32,25 +31,49 @@ export const getTableOfContentsLayoutTemplate = (theme: SlideTheme): TemplateCon
         },
       },
       content: {
-        type: 'text' as const,
-        bounds: {
-          left: 60,
-          top: 155, // title height + spacing
-          width: SLIDE_WIDTH - 120, // leave margins
-          height: SLIDE_HEIGHT - 155 - 40, // remaining height with bottom margin
+        type: 'block' as const,
+        // Using relative positioning - positioned below title
+        positioning: {
+          relativeTo: 'title',
+          axis: 'vertical',
+          anchor: 'end',
+          offset: 20,
+          size: 'fill',
+          margin: { left: 60, right: 60, top: 0, bottom: 40 },
         },
         padding: { top: 0, bottom: 0, left: 0, right: 0 },
         layout: {
-          distribution: 'equal',
+          distribution: 'space-between',
           spacingBetweenItems: 25,
           horizontalAlignment: 'left',
           verticalAlignment: 'top',
+          orientation: 'vertical',
         },
-        text: {
-          color: theme.fontColor,
-          fontFamily: theme.fontName,
-          fontWeight: 'normal',
-          fontStyle: 'normal',
+        childTemplate: {
+          count: 'auto',
+          wrap: {
+            enabled: true,
+            maxItemsPerLine: 4,
+            lineCount: 2,
+            distribution: 'balanced',
+            lineSpacing: 20,
+            alternating: false,
+          },
+          structure: {
+            type: 'text' as const,
+            label: 'item',
+            padding: { top: 0, bottom: 0, left: 0, right: 0 },
+            layout: {
+              horizontalAlignment: 'left',
+              verticalAlignment: 'top',
+            },
+            text: {
+              color: theme.fontColor,
+              fontFamily: theme.fontName,
+              fontWeight: 'normal',
+              fontStyle: 'normal',
+            },
+          },
         },
       },
     },
@@ -66,42 +89,57 @@ export const convertTableOfContentsLayout = async (
   // Add numbering to items
   const numberedItems = data.data.items.map((item, index) => `${index + 1}. ${item}`);
 
-  // Determine if two columns are needed
-  const useTwoColumns = numberedItems.length >= 8;
+  // Resolve container positions (handles both absolute and relative positioning)
+  const resolvedBounds = LayoutPrimitives.resolveContainerPositions(template.containers, {
+    width: SLIDE_WIDTH,
+    height: SLIDE_HEIGHT,
+  });
 
-  // If too many items, delegate to two-column layout
-  if (useTwoColumns) {
-    const twoColumnTemplate = getTwoColumnLayoutTemplate(template.theme);
-    const newData = {
-      type: 'two_column',
-      title: 'Contents',
-      data: {
-        items1: numberedItems.slice(0, Math.ceil(numberedItems.length / 2)),
-        items2: numberedItems.slice(Math.ceil(numberedItems.length / 2)),
-      },
-    } as TwoColumnLayoutSchema;
+  // Content container - use unified font sizing
+  const contentContainer = template.containers.content;
+  const { instance: contentInstance, elements } = LayoutProBuilder.buildLayoutWithUnifiedFontSizing(
+    contentContainer,
+    resolvedBounds.content,
+    {
+      item: numberedItems,
+    }
+  );
 
-    return await convertTwoColumnLayout(newData, twoColumnTemplate, slideId);
-  }
+  // Get labeled instances for bounds
+  const itemInstances = LayoutPrimitives.recursivelyGetAllLabelInstances(
+    contentInstance,
+    'item'
+  ) as TextLayoutBlockInstance[];
 
-  // Single column layout - merge template config with bounds
-  const titleInstance = {
-    ...template.containers.title,
-    bounds: template.containers.title.bounds,
-  } as TextLayoutBlockInstance;
-  const contentInstance = {
-    ...template.containers.content,
-    bounds: template.containers.content.bounds,
-  } as TextLayoutBlockInstance;
+  // Extract elements by label
+  const itemElements = elements['item'] || [];
 
-  // Create item elements using template
-  const itemElements = await LayoutPrimitives.createItemElementsWithStyles(numberedItems, contentInstance);
+  // Generate PPT elements from pre-created elements
+  const contentElements = itemElements
+    .map((itemEl, index) => {
+      return [
+        {
+          id: crypto.randomUUID(),
+          type: 'text',
+          content: itemEl.outerHTML,
+          defaultFontName: itemInstances[index].text?.fontFamily,
+          defaultColor: itemInstances[index].text?.color,
+          left: itemInstances[index].bounds.left,
+          top: itemInstances[index].bounds.top,
+          width: itemInstances[index].bounds.width,
+          height: itemInstances[index].bounds.height,
+          textType: 'content',
+        } as PPTTextElement,
+      ];
+    })
+    .flat();
 
   const slide: Slide = {
     id: slideId ?? crypto.randomUUID(),
     elements: [
+      ...LayoutProBuilder.buildCards(contentInstance),
       ...LayoutProBuilder.buildTitle('Contents', template.containers.title, template.theme),
-      ...itemElements,
+      ...contentElements,
     ],
     background: LayoutPrimitives.processBackground(template.theme),
   };

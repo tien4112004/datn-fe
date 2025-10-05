@@ -7,9 +7,78 @@ import type {
   DistributionType,
   RelativePositioning,
   SlideViewport,
+  ChildLayoutConfig,
+  PaddingConfig,
 } from '../types';
 import { measureElement } from '../elementMeasurement';
 import { DEFAULT_SPACING_BETWEEN_ITEMS } from './layoutConstants';
+
+/**
+ * Calculate parent bounds that would fit all children with the given layout configuration
+ * Non-recursive - only calculates for immediate children
+ */
+export function calculateParentBoundsFromChildren(
+  childrenBounds: Bounds[],
+  layoutConfig?: ChildLayoutConfig,
+  padding?: PaddingConfig
+): Bounds {
+  if (childrenBounds.length === 0) {
+    return { left: 0, top: 0, width: 0, height: 0 };
+  }
+
+  const orientation = layoutConfig?.orientation || 'vertical';
+  const spacingBetweenItems = layoutConfig?.spacingBetweenItems || 0;
+  const paddingTop = padding?.top || 0;
+  const paddingBottom = padding?.bottom || 0;
+  const paddingLeft = padding?.left || 0;
+  const paddingRight = padding?.right || 0;
+
+  // Find the bounding box that contains all children
+  let minLeft = Infinity;
+  let minTop = Infinity;
+  let maxRight = -Infinity;
+  let maxBottom = -Infinity;
+
+  childrenBounds.forEach((child) => {
+    minLeft = Math.min(minLeft, child.left);
+    minTop = Math.min(minTop, child.top);
+    maxRight = Math.max(maxRight, child.left + child.width);
+    maxBottom = Math.max(maxBottom, child.top + child.height);
+  });
+
+  // Calculate dimensions based on orientation and spacing
+  let width: number;
+  let height: number;
+
+  if (orientation === 'horizontal') {
+    // Horizontal: width = sum of widths + spacing, height = max height
+    const totalItemWidth = childrenBounds.reduce((sum, child) => sum + child.width, 0);
+    const totalSpacing = (childrenBounds.length - 1) * spacingBetweenItems;
+    width = totalItemWidth + totalSpacing + paddingLeft + paddingRight;
+
+    const maxChildHeight = Math.max(...childrenBounds.map((child) => child.height));
+    height = maxChildHeight + paddingTop + paddingBottom;
+  } else {
+    // Vertical: height = sum of heights + spacing, width = max width
+    const totalItemHeight = childrenBounds.reduce((sum, child) => sum + child.height, 0);
+    const totalSpacing = (childrenBounds.length - 1) * spacingBetweenItems;
+    height = totalItemHeight + totalSpacing + paddingTop + paddingBottom;
+
+    const maxChildWidth = Math.max(...childrenBounds.map((child) => child.width));
+    width = maxChildWidth + paddingLeft + paddingRight;
+  }
+
+  // Use the minimum left/top from children, adjusted for padding
+  const left = minLeft - paddingLeft;
+  const top = minTop - paddingTop;
+
+  return {
+    left,
+    top,
+    width,
+    height,
+  };
+}
 
 /**
  * Get position within container bounds

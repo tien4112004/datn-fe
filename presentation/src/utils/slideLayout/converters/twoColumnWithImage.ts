@@ -1,4 +1,4 @@
-import type { Slide, SlideTheme } from '@/types/slides';
+import type { Slide, SlideTheme, PPTTextElement } from '@/types/slides';
 import type { TwoColumnWithImageLayoutSchema } from './types';
 import type { Bounds, TemplateConfig, TextLayoutBlockInstance } from '../types';
 import LayoutPrimitives from '../layoutPrimitives';
@@ -38,7 +38,7 @@ export const getTwoColumnWithImageLayoutTemplate = (theme: SlideTheme): Template
   return {
     containers: {
       title: {
-        type: 'text' as const,
+        type: 'text',
         bounds: titleBounds,
         padding: { top: 0, bottom: 0, left: 40, right: 40 },
         layout: {
@@ -59,7 +59,7 @@ export const getTwoColumnWithImageLayoutTemplate = (theme: SlideTheme): Template
         },
       },
       image: {
-        type: 'image' as const,
+        type: 'image',
         bounds: imageBounds,
         padding: { top: 0, bottom: 0, left: 0, right: 0 },
         border: {
@@ -69,7 +69,7 @@ export const getTwoColumnWithImageLayoutTemplate = (theme: SlideTheme): Template
         },
       },
       content: {
-        type: 'text' as const,
+        type: 'block',
         bounds: contentBounds,
         padding: { top: 0, bottom: 40, left: 0, right: 0 },
         layout: {
@@ -77,12 +77,29 @@ export const getTwoColumnWithImageLayoutTemplate = (theme: SlideTheme): Template
           spacingBetweenItems: 20,
           horizontalAlignment: 'center',
           verticalAlignment: 'top',
+          orientation: 'vertical',
         },
-        text: {
-          color: theme.fontColor,
-          fontFamily: theme.fontName,
-          fontWeight: 'normal',
-          fontStyle: 'normal',
+        childTemplate: {
+          count: 'auto',
+          structure: {
+            type: 'text',
+            label: 'item',
+            padding: { top: 0, bottom: 0, left: 0, right: 0 },
+            layout: {
+              horizontalAlignment: 'center',
+              verticalAlignment: 'top',
+            },
+            border: {
+              width: 1,
+              color: theme.themeColors[1],
+            },
+            text: {
+              color: theme.fontColor,
+              fontFamily: theme.fontName,
+              fontWeight: 'normal',
+              fontStyle: 'normal',
+            },
+          },
         },
       },
     },
@@ -124,7 +141,7 @@ export const getTwoColumnBigImageLayoutTemplate = (theme: SlideTheme): TemplateC
   return {
     containers: {
       title: {
-        type: 'text' as const,
+        type: 'text',
         bounds: titleBounds,
         padding: { top: 0, bottom: 0, left: 0, right: 0 },
         layout: {
@@ -139,7 +156,7 @@ export const getTwoColumnBigImageLayoutTemplate = (theme: SlideTheme): TemplateC
         },
       },
       image: {
-        type: 'image' as const,
+        type: 'image',
         bounds: imageBounds,
         padding: { top: 0, bottom: 0, left: 0, right: 0 },
         border: {
@@ -149,7 +166,7 @@ export const getTwoColumnBigImageLayoutTemplate = (theme: SlideTheme): TemplateC
         },
       },
       content: {
-        type: 'text' as const,
+        type: 'block',
         bounds: contentBounds,
         padding: { top: 0, bottom: 0, left: 40, right: 0 },
         layout: {
@@ -157,12 +174,29 @@ export const getTwoColumnBigImageLayoutTemplate = (theme: SlideTheme): TemplateC
           spacingBetweenItems: 20,
           horizontalAlignment: 'left',
           verticalAlignment: 'top',
+          orientation: 'vertical',
         },
-        text: {
-          color: theme.fontColor,
-          fontFamily: theme.fontName,
-          fontWeight: 'normal',
-          fontStyle: 'normal',
+        childTemplate: {
+          count: 'auto',
+          structure: {
+            type: 'text',
+            label: 'item',
+            padding: { top: 0, bottom: 0, left: 0, right: 0 },
+            layout: {
+              horizontalAlignment: 'left',
+              verticalAlignment: 'top',
+            },
+            border: {
+              width: 1,
+              color: theme.themeColors[1],
+            },
+            text: {
+              color: theme.fontColor,
+              fontFamily: theme.fontName,
+              fontWeight: 'normal',
+              fontStyle: 'normal',
+            },
+          },
         },
       },
     },
@@ -175,22 +209,50 @@ export const convertTwoColumnWithImageLayout = async (
   template: TemplateConfig,
   slideId?: string
 ): Promise<Slide> => {
-  const contentInstance = {
-    ...template.containers.content,
-    bounds: template.containers.content.bounds,
-  } as TextLayoutBlockInstance;
+  // Content container - use unified font sizing
+  const contentContainer = template.containers.content;
+  const { instance: contentInstance, elements } = LayoutProBuilder.buildLayoutWithUnifiedFontSizing(
+    contentContainer,
+    contentContainer.bounds!,
+    {
+      item: data.data.items,
+    }
+  );
 
-  // Create item elements with automatic font size optimization
-  const itemElements = await LayoutPrimitives.createItemElementsWithStyles(data.data.items, contentInstance);
+  // Get labeled instances for bounds
+  const itemInstances = LayoutPrimitives.recursivelyGetAllLabelInstances(
+    contentInstance,
+    'item'
+  ) as TextLayoutBlockInstance[];
+
+  // Extract elements by label
+  const itemElements = elements['item'] || [];
+
+  // Generate PPT elements from pre-created elements
+  const contentElements = itemElements.map((itemEl, index) => {
+    return {
+      id: crypto.randomUUID(),
+      type: 'text',
+      content: itemEl.outerHTML,
+      defaultFontName: itemInstances[index].text?.fontFamily,
+      defaultColor: itemInstances[index].text?.color,
+      left: itemInstances[index].bounds.left,
+      top: itemInstances[index].bounds.top,
+      width: itemInstances[index].bounds.width,
+      height: itemInstances[index].bounds.height,
+      textType: 'content',
+    } as PPTTextElement;
+  });
 
   const imageElement = await LayoutProBuilder.buildImageElement(data.data.image, template.containers.image);
 
   const slide: Slide = {
     id: slideId ?? crypto.randomUUID(),
     elements: [
+      ...LayoutProBuilder.buildCards(contentInstance),
       ...LayoutProBuilder.buildTitle(data.title, template.containers.title, template.theme),
       imageElement,
-      ...itemElements,
+      ...contentElements,
     ],
     background: LayoutPrimitives.processBackground(template.theme),
   };

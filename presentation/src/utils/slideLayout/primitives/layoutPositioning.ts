@@ -81,37 +81,6 @@ export function calculateParentBoundsFromChildren(
 }
 
 /**
- * Get position within container bounds
- */
-export function getPosition(
-  containerBounds: Bounds,
-  itemDimensions: Size,
-  options: {
-    horizontalAlignment?: 'left' | 'center' | 'right';
-    verticalAlignment?: 'top' | 'center' | 'bottom';
-  }
-): Position {
-  let left = containerBounds.left;
-  let top = containerBounds.top;
-
-  // Apply horizontal alignment
-  if (options.horizontalAlignment === 'center') {
-    left = containerBounds.left + (containerBounds.width - itemDimensions.width) / 2;
-  } else if (options.horizontalAlignment === 'right') {
-    left = containerBounds.left + containerBounds.width - itemDimensions.width;
-  }
-
-  // Apply vertical alignment
-  if (options.verticalAlignment === 'center') {
-    top = containerBounds.top + (containerBounds.height - itemDimensions.height) / 2;
-  } else if (options.verticalAlignment === 'bottom') {
-    top = containerBounds.top + containerBounds.height - itemDimensions.height;
-  }
-
-  return { left, top };
-}
-
-/**
  * Calculate bounds for child elements within a parent container
  */
 export function getChildrenMaxBounds(
@@ -283,31 +252,45 @@ export function getChildrenMaxBounds(
 
   return positions;
 }
-
-/**
- * Layout items within a block container
- */
 export function layoutItemsInBlock(itemDimensions: Size[], container: LayoutBlockInstance): Bounds[] {
   const distribution = container.layout?.distribution || 'equal';
-  const alignment = container.layout?.verticalAlignment || 'top';
+  const verticalAlignment = container.layout?.verticalAlignment || 'top';
+  const horizontalAlignment = container.layout?.horizontalAlignment || 'left';
 
   const totalItemsHeight = itemDimensions.reduce((sum, dim) => sum + dim.height, 0);
   const availableHeight =
     container.bounds.height - (container.padding.top || 0) - (container.padding.bottom || 0);
+  const availableWidth =
+    container.bounds.width - (container.padding.left || 0) - (container.padding.right || 0);
 
   let positions: Bounds[] = [];
   let startY = container.bounds.top + (container.padding.top || 0);
+
+  // Helper function to calculate horizontal position based on alignment
+  const getHorizontalPosition = (itemWidth: number): number => {
+    const startX = container.bounds.left + (container.padding.left || 0);
+
+    switch (horizontalAlignment) {
+      case 'center':
+        return startX + (availableWidth - itemWidth) / 2;
+      case 'right':
+        return startX + availableWidth - itemWidth;
+      case 'left':
+      default:
+        return startX;
+    }
+  };
 
   switch (distribution) {
     case 'space-between': {
       // Space between: distribute extra space evenly between items
       if (itemDimensions.length === 1) {
-        // Single item: center it
+        // Single item: center it vertically
         const centerY = startY + (availableHeight - itemDimensions[0].height) / 2;
         positions = [
           {
             top: centerY,
-            left: container.bounds.left + (container.padding.left || 0),
+            left: getHorizontalPosition(itemDimensions[0].width),
             width: itemDimensions[0].width,
             height: itemDimensions[0].height,
           },
@@ -317,10 +300,10 @@ export function layoutItemsInBlock(itemDimensions: Size[], container: LayoutBloc
         const spaceBetween = extraSpace / (itemDimensions.length - 1);
         let currentY = startY;
 
-        positions = itemDimensions.map((dim, index) => {
+        positions = itemDimensions.map((dim) => {
           const position = {
             top: currentY,
-            left: container.bounds.left + (container.padding.left || 0),
+            left: getHorizontalPosition(dim.width),
             width: dim.width,
             height: dim.height,
           };
@@ -340,7 +323,7 @@ export function layoutItemsInBlock(itemDimensions: Size[], container: LayoutBloc
       positions = itemDimensions.map((dim) => {
         const position = {
           top: currentY,
-          left: container.bounds.left + (container.padding.left || 0),
+          left: getHorizontalPosition(dim.width),
           width: dim.width,
           height: dim.height,
         };
@@ -357,10 +340,10 @@ export function layoutItemsInBlock(itemDimensions: Size[], container: LayoutBloc
       const totalNeededHeight = totalItemsHeight + (itemDimensions.length - 1) * actualSpacing;
 
       // Apply vertical alignment
-      if (alignment === 'center' && totalNeededHeight < availableHeight) {
+      if (verticalAlignment === 'center' && totalNeededHeight < availableHeight) {
         const extraSpace = availableHeight - totalNeededHeight;
         startY += Math.min(extraSpace / 2, 80); // Max center offset of 80px
-      } else if (alignment === 'bottom' && totalNeededHeight < availableHeight) {
+      } else if (verticalAlignment === 'bottom' && totalNeededHeight < availableHeight) {
         startY += availableHeight - totalNeededHeight;
       }
 
@@ -368,7 +351,7 @@ export function layoutItemsInBlock(itemDimensions: Size[], container: LayoutBloc
       positions = itemDimensions.map((dim) => {
         const position = {
           top: currentY,
-          left: container.bounds.left + (container.padding.left || 0),
+          left: getHorizontalPosition(dim.width),
           width: dim.width,
           height: dim.height,
         };
@@ -624,4 +607,31 @@ export function calculateBoundsFromPositioning(
   }
 
   return { left, top, width, height };
+}
+
+export function getColumnsLayout(columnWidths: number[]): Bounds[] {
+  // Validate percentages add up to 100
+  const totalPercentage = columnWidths.reduce((sum, width) => sum + width, 0);
+  if (Math.abs(totalPercentage - 100) > 0.1) {
+    console.warn(`Column widths should add up to 100%, got ${totalPercentage}%`);
+  }
+
+  const columns: Bounds[] = [];
+  let currentLeft = 0;
+
+  columnWidths.forEach((widthPercentage) => {
+    const columnWidth = (1000 * widthPercentage) / 100; // Assuming slide width of 1000
+
+    columns.push({
+      left: currentLeft,
+      top: 0,
+      width: columnWidth,
+      height: 562.5, // Assuming slide height
+    });
+
+    // Move to next column position
+    currentLeft += columnWidth;
+  });
+
+  return columns;
 }

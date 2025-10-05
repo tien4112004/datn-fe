@@ -1,13 +1,8 @@
-import {
-  calculateLargestOptimalFontSize,
-  applyFontSizeToElement,
-  calculateFontSizeForAvailableSpace,
-  applyFontSizeToElements,
-} from '../fontSizeCalculator';
-import { measureElementForBlock, measureElementWithStyle, measureElement } from '../elementMeasurement';
+import { calculateLargestOptimalFontSize, applyFontSizeToElement } from '../fontSizeCalculator';
+import { measureElementWithStyle } from '../elementMeasurement';
 import { createElement } from '../htmlTextCreation';
-import type { TextLayoutBlockInstance, ConvergenceOptions } from '../types';
-import { DEFAULT_MIN_FONT_SIZE, DEFAULT_LABEL_TO_VALUE_RATIO } from './layoutConstants';
+import type { TextLayoutBlockInstance } from '../types';
+import { layoutItemsInBlock } from './layoutPositioning';
 
 /**
  * Calculate title layout with optimal font sizing
@@ -33,9 +28,7 @@ export function calculateTitleLayout(title: string, container: TextLayoutBlockIn
   // Measure the element with optimized font size
   const titleDimensions = measureElementWithStyle(titleElement, container);
 
-  const horizontalPosition = getPosition(container.bounds, titleDimensions, {
-    horizontalAlignment: container.layout?.horizontalAlignment,
-  }).left;
+  const horizontalPosition = layoutItemsInBlock([titleDimensions], container)[0].left;
 
   const titlePosition = {
     left: horizontalPosition,
@@ -86,35 +79,4 @@ export function calculateUnifiedFontSizeForLabels(
   return {
     fontSize: minFontSize,
   };
-}
-
-/**
- * Get position within container bounds
- */
-function getPosition(
-  containerBounds: { left: number; top: number; width: number; height: number },
-  itemDimensions: { width: number; height: number },
-  options: {
-    horizontalAlignment?: 'left' | 'center' | 'right';
-    verticalAlignment?: 'top' | 'center' | 'bottom';
-  }
-): { left: number; top: number } {
-  let left = containerBounds.left;
-  let top = containerBounds.top;
-
-  // Apply horizontal alignment
-  if (options.horizontalAlignment === 'center') {
-    left = containerBounds.left + (containerBounds.width - itemDimensions.width) / 2;
-  } else if (options.horizontalAlignment === 'right') {
-    left = containerBounds.left + containerBounds.width - itemDimensions.width;
-  }
-
-  // Apply vertical alignment
-  if (options.verticalAlignment === 'center') {
-    top = containerBounds.top + (containerBounds.height - itemDimensions.height) / 2;
-  } else if (options.verticalAlignment === 'bottom') {
-    top = containerBounds.top + containerBounds.height - itemDimensions.height;
-  }
-
-  return { left, top };
 }

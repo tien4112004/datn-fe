@@ -11,7 +11,6 @@ export { calculateTitleLayout, calculateUnifiedFontSizeForLabels } from './primi
 
 // Re-export from layoutPositioning
 import {
-  getPosition,
   getChildrenMaxBounds,
   layoutItemsInBlock,
   measureAndPositionElements,
@@ -19,9 +18,9 @@ import {
   recursivelyGetAllLabelInstances,
   resolveContainerPositions,
   calculateBoundsFromPositioning,
+  getColumnsLayout,
 } from './primitives/layoutPositioning';
 export {
-  getPosition,
   getChildrenMaxBounds,
   layoutItemsInBlock,
   measureAndPositionElements,
@@ -67,26 +66,6 @@ export {
   distributeItems,
 } from './primitives/layoutInstanceBuilder';
 
-// Re-export from layoutDataProcessing
-import {
-  normalizeDataStructure,
-  collectLabelGroups,
-  processFlatObjectData,
-  processNestedData,
-  processChildrenData,
-  collectLabelGroupsRecursive,
-  getColumnsLayout,
-} from './primitives/layoutDataProcessing';
-export {
-  normalizeDataStructure,
-  collectLabelGroups,
-  processFlatObjectData,
-  processNestedData,
-  processChildrenData,
-  collectLabelGroupsRecursive,
-  getColumnsLayout,
-} from './primitives/layoutDataProcessing';
-
 import { getAllDescendantInstances } from './primitives/layoutUtils';
 
 // Legacy alias for backward compatibility
@@ -102,7 +81,6 @@ const LayoutPrimitives = {
   calculateUnifiedFontSizeForLabels,
 
   // From layoutPositioning
-  getPosition,
   getChildrenMaxBounds,
   layoutItemsInBlock,
   measureAndPositionElements,
@@ -127,13 +105,6 @@ const LayoutPrimitives = {
   calculateWrapLayout,
   distributeItems,
 
-  // From layoutDataProcessing
-  normalizeDataStructure,
-  collectLabelGroups,
-  processFlatObjectData,
-  processNestedData,
-  processChildrenData,
-  collectLabelGroupsRecursive,
   getColumnsLayout,
 
   getAllDescendantInstances,

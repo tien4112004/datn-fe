@@ -4,9 +4,8 @@ import type {
   SlideLayoutBlockConfig,
   Bounds,
   WrapConfig,
-  DistributionType,
 } from '../types';
-import { DEFAULT_WRAP_CONFIG, DEFAULT_LINE_SPACING } from './layoutConstants';
+import { DEFAULT_WRAP_CONFIG } from './layoutConstants';
 import { getChildrenMaxBounds } from './layoutPositioning';
 
 /**
@@ -108,9 +107,6 @@ export function buildInstanceWithBounds(
   return instance;
 }
 
-/**
- * Calculate wrap layout for items
- */
 /**
  * Calculate wrap layout for items
  */

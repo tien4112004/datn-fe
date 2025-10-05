@@ -20,7 +20,7 @@ import { getImageSize } from '../../image';
 import { SHAPE_PATH_FORMULAS } from '../../../configs/shapes';
 import type { ImageLayoutBlockInstance, TextLayoutBlockInstance, Bounds } from '../types';
 import { DEFAULT_RADIUS_MULTIPLIER } from './layoutConstants';
-import { getPosition, layoutItemsInBlock } from './layoutPositioning';
+import { layoutItemsInBlock } from './layoutPositioning';
 
 /**
  * Create a text element with optimal font sizing
@@ -47,10 +47,7 @@ export function createTextElement(content: string, container: TextLayoutBlockIns
   const dimensions = measureElementWithStyle(initialElement, container);
 
   // Calculate positioning within the container
-  const position = getPosition(container.bounds, dimensions, {
-    horizontalAlignment: container.layout?.horizontalAlignment,
-    verticalAlignment: container.layout?.verticalAlignment,
-  });
+  const position = layoutItemsInBlock([dimensions], container)[0];
 
   // Create and return the PPT text element
   return {

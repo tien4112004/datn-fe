@@ -22,12 +22,17 @@ export const getMainImageLayoutTemplate = (theme: SlideTheme): TemplateConfig =>
     finalImageWidth = finalImageHeight * (3 / 2);
   }
 
-  // Calculate image position (centered)
-  const imagePosition = LayoutPrimitives.getPosition(
-    { left: 0, top: 0, width: SLIDE_WIDTH, height: SLIDE_HEIGHT },
-    { width: finalImageWidth, height: finalImageHeight },
-    { horizontalAlignment: 'center', verticalAlignment: 'center' }
-  );
+  const imagePosition = LayoutPrimitives.layoutItemsInBlock(
+    [{ width: finalImageWidth, height: finalImageHeight }],
+    {
+      layout: {
+        horizontalAlignment: 'center',
+        verticalAlignment: 'center',
+      },
+      bounds: { left: 0, top: 0, width: SLIDE_WIDTH, height: SLIDE_HEIGHT },
+      padding: { top: 0, bottom: 0, left: 0, right: 0 },
+    } as any
+  )[0];
 
   // Adjust image position slightly up to make room for content
   const contentMarginTop = 40;

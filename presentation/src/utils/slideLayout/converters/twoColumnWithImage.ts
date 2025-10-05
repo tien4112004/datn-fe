@@ -18,10 +18,24 @@ export const getTwoColumnWithImageLayoutTemplate = (theme: SlideTheme): Template
     height: 120,
   };
 
-  const imagePosition = LayoutPrimitives.getPosition(columns[0], imageDimensions, {
-    horizontalAlignment: 'center',
-    verticalAlignment: 'center',
-  });
+  const imagePosition = LayoutPrimitives.layoutItemsInBlock([imageDimensions], {
+    layout: {
+      horizontalAlignment: 'center',
+      verticalAlignment: 'top',
+    },
+    bounds: {
+      left: columns[0].left,
+      top: columns[0].top + 140,
+      width: columns[0].width,
+      height: columns[0].height - 120,
+    },
+    padding: {
+      top: 0,
+      bottom: 0,
+      left: 0,
+      right: 0,
+    },
+  } as any)[0];
 
   const imageBounds: Bounds = {
     ...imagePosition,
@@ -124,13 +138,6 @@ export const getTwoColumnBigImageLayoutTemplate = (theme: SlideTheme): TemplateC
     top: 15,
     width: rightColumnBlock.width,
     height: 120,
-  };
-
-  const contentBounds: Bounds = {
-    left: rightColumnBlock.left,
-    top: 15 + 120, // title position + title height + spacing
-    width: rightColumnBlock.width,
-    height: SLIDE_HEIGHT - (15 + 120) - 20, // remaining height with bottom margin
   };
 
   return {

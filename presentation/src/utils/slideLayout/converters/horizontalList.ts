@@ -37,12 +37,13 @@ export const getHorizontalListLayoutTemplate = (theme: SlideTheme): TemplateConf
         },
       },
       content: {
+        id: 'content',
         bounds: contentBounds,
         padding: { top: 0, bottom: 0, left: 0, right: 0 },
-        distribution: 'equal',
+        distribution: 'space-around',
         spacingBetweenItems: 25,
         horizontalAlignment: 'center',
-        verticalAlignment: 'top',
+        verticalAlignment: 'center',
         orientation: 'horizontal',
         childTemplate: {
           count: 'auto',
@@ -58,7 +59,7 @@ export const getHorizontalListLayoutTemplate = (theme: SlideTheme): TemplateConf
             label: 'item',
             padding: { top: 0, bottom: 0, left: 0, right: 0 },
             distribution: 'equal',
-            spacingBetweenItems: -10,
+            spacingBetweenItems: -20,
             horizontalAlignment: 'center',
             verticalAlignment: 'top',
             orientation: 'vertical',
@@ -69,6 +70,7 @@ export const getHorizontalListLayoutTemplate = (theme: SlideTheme): TemplateConf
             },
             children: [
               {
+                id: 'label',
                 padding: { top: 0, bottom: 0, left: 0, right: 0 },
                 horizontalAlignment: 'center',
                 verticalAlignment: 'center',
@@ -82,6 +84,7 @@ export const getHorizontalListLayoutTemplate = (theme: SlideTheme): TemplateConf
                 },
               },
               {
+                id: 'content',
                 padding: { top: 0, bottom: 0, left: 0, right: 0 },
                 horizontalAlignment: 'center',
                 verticalAlignment: 'center',
@@ -108,11 +111,15 @@ export const convertHorizontalListLayout = async (
   template: TemplateConfig,
   slideId?: string
 ): Promise<Slide> => {
-  // Content container - use unified font sizing
+  const resolvedBounds = LayoutPrimitives.resolveContainerPositions(template.containers, {
+    width: SLIDE_WIDTH,
+    height: SLIDE_HEIGHT,
+  });
+
   const contentContainer = template.containers.content;
   const { instance: contentInstance, elements } = LayoutProBuilder.buildLayoutWithUnifiedFontSizing(
     contentContainer,
-    contentContainer.bounds!,
+    resolvedBounds.content,
     {
       label: data.data.items.map((item) => item.label),
       content: data.data.items.map((item) => item.content),

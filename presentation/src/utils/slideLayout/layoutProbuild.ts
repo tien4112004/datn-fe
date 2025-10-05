@@ -21,6 +21,14 @@ const LayoutProBuilder = {
     return await LayoutPrimitives.createImageElement(src, imageInstance);
   },
 
+  buildCards(instance: LayoutBlockInstance): PPTElement[] {
+    // LayoutPrimitives.createCard(itemInstances[index]);
+    //
+    return LayoutPrimitives.fromInstanceToArray(instance).map((inst) =>
+      LayoutPrimitives.createCard(inst as LayoutBlockInstance)
+    );
+  },
+
   buildTitle(title: string, config: TemplateContainerConfig, theme: SlideTheme): PPTElement[] {
     const titleInstance = {
       ...config,

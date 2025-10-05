@@ -79,6 +79,15 @@ export type DistributionType = 'equal' | 'space-between' | 'space-around';
 // Config Types (Templates - no positioning)
 // ============================================================================
 
+export interface ChildrenTemplate {
+  count: number | 'auto';
+  distribution?: DistributionType;
+  orientation?: 'horizontal' | 'vertical';
+  spacingBetweenItems?: number;
+  wrap?: WrapConfig;
+  structure?: SlideLayoutBlockConfig;
+}
+
 export interface LayoutBlockConfig {
   id?: string;
   padding?: PaddingConfig;
@@ -92,11 +101,7 @@ export interface LayoutBlockConfig {
   spacingBetweenItems?: number;
 
   // Template-specific fields
-  childTemplate?: {
-    count: number | 'auto';
-    wrap?: WrapConfig;
-    structure?: SlideLayoutBlockConfig;
-  };
+  childTemplate?: ChildrenTemplate;
   children?: SlideLayoutBlockConfig[];
 }
 

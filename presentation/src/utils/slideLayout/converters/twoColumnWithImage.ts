@@ -47,6 +47,7 @@ export const getTwoColumnWithImageLayoutTemplate = (theme: SlideTheme): Template
           fontFamily: theme.titleFontName,
           fontWeight: 'bold',
           fontStyle: 'normal',
+          textAlign: 'center',
         },
         border: {
           width: 1,

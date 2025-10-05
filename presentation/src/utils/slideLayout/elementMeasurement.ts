@@ -1,5 +1,9 @@
-import type { ElementMeasurementConstraints } from './htmlTextCreation';
 import type { LayoutBlockInstance, Size } from './types';
+
+export interface ElementMeasurementConstraints {
+  maxWidth?: number;
+  maxHeight?: number;
+}
 
 /**
  * Simple, direct DOM measurement - no cloning, no complex caching, no style conflicts

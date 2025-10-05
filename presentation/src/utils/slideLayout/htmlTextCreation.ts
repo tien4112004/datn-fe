@@ -8,11 +8,6 @@ const fontWeightMap: Record<string, string> = {
   lighter: 'lighter',
 };
 
-export interface ElementMeasurementConstraints {
-  maxWidth?: number;
-  maxHeight?: number;
-}
-
 /**
  * Unified element creation function - single source of truth for all text element creation
  */

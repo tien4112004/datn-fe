@@ -107,25 +107,6 @@ export function measureElementWithStyle(element: HTMLElement, container?: Layout
     element.style.overflow = 'hidden';
   }
 
-  // Padding
-  if (container?.padding) {
-    if (container.padding.top) {
-      element.style.paddingTop = `${container.padding.top}px`;
-    }
-
-    if (container.padding.bottom) {
-      element.style.paddingBottom = `${container.padding.bottom}px`;
-    }
-
-    if (container.padding.left) {
-      element.style.paddingLeft = `${container.padding.left}px`;
-    }
-
-    if (container.padding.right) {
-      element.style.paddingRight = `${container.padding.right}px`;
-    }
-  }
-
   // Border width
   if (container?.border?.width) {
     element.style.borderWidth = `${container.border.width}px`;

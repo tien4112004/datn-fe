@@ -230,7 +230,7 @@ const LayoutProBuilder = {
         distribution: config.layout?.distribution,
         childCount: config.children.length,
         orientation: config.layout?.orientation,
-        spacingBetweenItems: config.layout?.spacingBetweenItems,
+        gap: config.layout?.gap,
       });
 
       const dataArray = Array.isArray(data) ? data : Object.values(data);
@@ -277,7 +277,6 @@ const LayoutProBuilder = {
       return {
         ...childConfig,
         bounds: childrenBounds[index],
-        padding: childConfig.padding || { top: 0, bottom: 0, left: 0, right: 0 },
         children: childInstance,
       } as LayoutBlockInstance;
     });

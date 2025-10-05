@@ -30,7 +30,6 @@ export const getMainImageLayoutTemplate = (theme: SlideTheme): TemplateConfig =>
         verticalAlignment: 'center',
       },
       bounds: { left: 0, top: 0, width: SLIDE_WIDTH, height: SLIDE_HEIGHT },
-      padding: { top: 0, bottom: 0, left: 0, right: 0 },
     } as any
   )[0];
 
@@ -62,15 +61,13 @@ export const getMainImageLayoutTemplate = (theme: SlideTheme): TemplateConfig =>
       image: {
         type: 'image' as const,
         bounds: imageBounds,
-        padding: { top: 0, bottom: 0, left: 0, right: 0 },
       },
       content: {
         type: 'text' as const,
         bounds: contentBounds,
-        padding: { top: 0, bottom: 0, left: 0, right: 0 },
         layout: {
           distribution: 'equal',
-          spacingBetweenItems: 10,
+          gap: 10,
           horizontalAlignment: 'center',
           verticalAlignment: 'center',
         },

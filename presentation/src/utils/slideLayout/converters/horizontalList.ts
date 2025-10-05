@@ -20,7 +20,6 @@ export const getHorizontalListLayoutTemplate = (theme: SlideTheme): TemplateConf
       title: {
         type: 'text',
         bounds: titleBounds,
-        padding: { top: 0, bottom: 0, left: 0, right: 0 },
         layout: {
           horizontalAlignment: 'center',
           verticalAlignment: 'top',
@@ -43,10 +42,9 @@ export const getHorizontalListLayoutTemplate = (theme: SlideTheme): TemplateConf
           size: 'fill',
           margin: { left: 30, right: 30, top: 0, bottom: 40 },
         },
-        padding: { top: 0, bottom: 0, left: 0, right: 0 },
         layout: {
           distribution: 'space-around',
-          spacingBetweenItems: 25,
+          gap: 25,
           horizontalAlignment: 'center',
           verticalAlignment: 'center',
           orientation: 'horizontal',
@@ -64,10 +62,9 @@ export const getHorizontalListLayoutTemplate = (theme: SlideTheme): TemplateConf
           structure: {
             type: 'block',
             label: 'item',
-            padding: { top: 0, bottom: 0, left: 0, right: 0 },
             layout: {
               distribution: 'equal',
-              spacingBetweenItems: -20,
+              gap: -20,
               horizontalAlignment: 'center',
               verticalAlignment: 'top',
               orientation: 'vertical',
@@ -81,7 +78,6 @@ export const getHorizontalListLayoutTemplate = (theme: SlideTheme): TemplateConf
               {
                 type: 'text',
                 id: 'label',
-                padding: { top: 0, bottom: 0, left: 0, right: 0 },
                 layout: {
                   horizontalAlignment: 'center',
                   verticalAlignment: 'center',
@@ -98,7 +94,6 @@ export const getHorizontalListLayoutTemplate = (theme: SlideTheme): TemplateConf
               {
                 type: 'text',
                 id: 'content',
-                padding: { top: 0, bottom: 0, left: 0, right: 0 },
                 layout: {
                   horizontalAlignment: 'center',
                   verticalAlignment: 'center',

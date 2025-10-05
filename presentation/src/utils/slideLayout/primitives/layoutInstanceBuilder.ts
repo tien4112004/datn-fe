@@ -38,7 +38,7 @@ export function buildChildrenFromChildTemplate(
     parentBounds,
     wrapConfig,
     templateContainer.layout?.orientation || 'vertical',
-    templateContainer.layout?.spacingBetweenItems || 0
+    templateContainer.layout?.gap || 0
   );
 
   // Create instances with calculated bounds, passing corresponding data item
@@ -73,7 +73,6 @@ export function buildInstanceWithBounds(
     id: config.id,
     bounds,
     label: config.label,
-    padding: config.padding || { top: 0, bottom: 0, left: 0, right: 0 },
     border: config.border,
     shadow: config.shadow,
     layout: config.layout,
@@ -92,7 +91,7 @@ export function buildInstanceWithBounds(
       distribution: config.layout?.distribution,
       childCount: config.children.length,
       orientation: config.layout?.orientation,
-      spacingBetweenItems: config.layout?.spacingBetweenItems,
+      gap: config.layout?.gap,
     });
 
     // Pass same data to all static children
@@ -115,7 +114,7 @@ export function calculateWrapLayout(
   containerBounds: Bounds,
   wrapConfig: WrapConfig,
   orientation: 'horizontal' | 'vertical',
-  spacingBetweenItems: number
+  gap: number
 ): {
   lines: number;
   itemsPerLine: number[];
@@ -150,7 +149,7 @@ export function calculateWrapLayout(
         : containerBounds.width;
 
       // Calculate spacing and item width based on effective container width
-      const totalSpacing = (itemsInLine - 1) * spacingBetweenItems;
+      const totalSpacing = (itemsInLine - 1) * gap;
       const itemWidth = (effectiveContainerWidth - totalSpacing) / itemsInLine;
 
       // Center the line if it's shrunk
@@ -161,7 +160,7 @@ export function calculateWrapLayout(
 
       // Position items in the line
       for (let itemIndex = 0; itemIndex < itemsInLine; itemIndex++) {
-        const left = containerBounds.left + lineOffset + itemIndex * (itemWidth + spacingBetweenItems);
+        const left = containerBounds.left + lineOffset + itemIndex * (itemWidth + gap);
 
         itemBounds.push({
           left,
@@ -184,7 +183,7 @@ export function calculateWrapLayout(
         : containerBounds.height;
 
       // Calculate spacing and item height based on effective container height
-      const totalSpacing = (itemsInLine - 1) * spacingBetweenItems;
+      const totalSpacing = (itemsInLine - 1) * gap;
       const itemHeight = (effectiveContainerHeight - totalSpacing) / itemsInLine;
 
       // Center the column if it's shrunk
@@ -195,7 +194,7 @@ export function calculateWrapLayout(
 
       // Position items in the column
       for (let itemIndex = 0; itemIndex < itemsInLine; itemIndex++) {
-        const top = containerBounds.top + columnOffset + itemIndex * (itemHeight + spacingBetweenItems);
+        const top = containerBounds.top + columnOffset + itemIndex * (itemHeight + gap);
 
         itemBounds.push({
           left: lineLeft,

@@ -20,7 +20,6 @@ export const getTitleLayoutTemplate = (theme: SlideTheme): TemplateConfig => {
       title: {
         type: 'text' as const,
         bounds: titleBounds,
-        padding: { top: 0, bottom: 0, left: 0, right: 0 },
         layout: {
           horizontalAlignment: 'center',
           verticalAlignment: 'center',
@@ -43,7 +42,6 @@ export const getTitleLayoutTemplate = (theme: SlideTheme): TemplateConfig => {
           size: 120,
           margin: { left: 30, right: 30, top: 0, bottom: 40 },
         },
-        padding: { top: 0, bottom: 0, left: 0, right: 0 },
         layout: {
           horizontalAlignment: 'center',
           verticalAlignment: 'top',

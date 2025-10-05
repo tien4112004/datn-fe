@@ -29,12 +29,6 @@ export const getTwoColumnWithImageLayoutTemplate = (theme: SlideTheme): Template
       width: columns[0].width,
       height: columns[0].height - 120,
     },
-    padding: {
-      top: 0,
-      bottom: 0,
-      left: 0,
-      right: 0,
-    },
   } as any)[0];
 
   const imageBounds: Bounds = {
@@ -54,7 +48,6 @@ export const getTwoColumnWithImageLayoutTemplate = (theme: SlideTheme): Template
       title: {
         type: 'text',
         bounds: titleBounds,
-        padding: { top: 0, bottom: 0, left: 40, right: 40 },
         layout: {
           horizontalAlignment: 'center',
           verticalAlignment: 'top',
@@ -70,7 +63,6 @@ export const getTwoColumnWithImageLayoutTemplate = (theme: SlideTheme): Template
       image: {
         type: 'image',
         bounds: imageBounds,
-        padding: { top: 0, bottom: 0, left: 0, right: 0 },
         border: {
           width: 1,
           color: 'transparent',
@@ -80,10 +72,9 @@ export const getTwoColumnWithImageLayoutTemplate = (theme: SlideTheme): Template
       content: {
         type: 'block',
         bounds: contentBounds,
-        padding: { top: 0, bottom: 40, left: 0, right: 0 },
         layout: {
           distribution: 'space-between',
-          spacingBetweenItems: 20,
+          gap: 20,
           horizontalAlignment: 'center',
           verticalAlignment: 'top',
           orientation: 'vertical',
@@ -93,7 +84,6 @@ export const getTwoColumnWithImageLayoutTemplate = (theme: SlideTheme): Template
           structure: {
             type: 'text',
             label: 'item',
-            padding: { top: 0, bottom: 0, left: 0, right: 0 },
             layout: {
               horizontalAlignment: 'center',
               verticalAlignment: 'top',
@@ -145,7 +135,6 @@ export const getTwoColumnBigImageLayoutTemplate = (theme: SlideTheme): TemplateC
       title: {
         type: 'text',
         bounds: titleBounds,
-        padding: { top: 0, bottom: 0, left: 0, right: 0 },
         layout: {
           horizontalAlignment: 'center',
           verticalAlignment: 'top',
@@ -160,7 +149,6 @@ export const getTwoColumnBigImageLayoutTemplate = (theme: SlideTheme): TemplateC
       image: {
         type: 'image',
         bounds: imageBounds,
-        padding: { top: 0, bottom: 0, left: 0, right: 0 },
         border: {
           width: 1,
           color: 'transparent',
@@ -177,10 +165,9 @@ export const getTwoColumnBigImageLayoutTemplate = (theme: SlideTheme): TemplateC
           size: 'fill',
           margin: { left: 30, right: 30, top: 0, bottom: 40 },
         },
-        padding: { top: 0, bottom: 0, left: 40, right: 40 },
         layout: {
           distribution: 'equal',
-          spacingBetweenItems: 20,
+          gap: 20,
           horizontalAlignment: 'left',
           verticalAlignment: 'top',
           orientation: 'vertical',
@@ -193,7 +180,6 @@ export const getTwoColumnBigImageLayoutTemplate = (theme: SlideTheme): TemplateC
               horizontalAlignment: 'left',
               verticalAlignment: 'top',
             },
-            padding: { top: 0, bottom: 0, left: 40, right: 40 },
             border: {
               width: 1,
               color: theme.themeColors[0],

@@ -18,7 +18,6 @@ export const getTwoColumnLayoutTemplate = (theme: SlideTheme): TemplateConfig =>
           width: SLIDE_WIDTH - 30,
           height: 100,
         },
-        padding: { top: 0, bottom: 0, left: 40, right: 40 },
         layout: {
           horizontalAlignment: 'center',
           verticalAlignment: 'top',
@@ -42,10 +41,9 @@ export const getTwoColumnLayoutTemplate = (theme: SlideTheme): TemplateConfig =>
           size: 'fill',
           margin: { left: 30, right: 30, top: 0, bottom: 40 },
         },
-        padding: { top: 0, bottom: 0, left: 0, right: 0 },
         layout: {
           distribution: 'space-between',
-          spacingBetweenItems: 20,
+          gap: 20,
           horizontalAlignment: 'center',
           verticalAlignment: 'top',
           orientation: 'vertical',
@@ -63,7 +61,6 @@ export const getTwoColumnLayoutTemplate = (theme: SlideTheme): TemplateConfig =>
           structure: {
             type: 'text' as const,
             label: 'item',
-            padding: { top: 0, bottom: 0, left: 0, right: 0 },
             layout: {
               distribution: 'equal',
               horizontalAlignment: 'left',
@@ -100,7 +97,6 @@ export const getHorizontalListLayoutTemplateOneRow = (theme: SlideTheme): Templa
           width: SLIDE_WIDTH - 30,
           height: 100,
         },
-        padding: { top: 0, bottom: 0, left: 40, right: 40 },
         layout: {
           horizontalAlignment: 'center',
           verticalAlignment: 'top',
@@ -120,7 +116,6 @@ export const getHorizontalListLayoutTemplateOneRow = (theme: SlideTheme): Templa
           width: SLIDE_WIDTH - 120,
           height: SLIDE_HEIGHT - 155 - 40,
         },
-        padding: { top: 0, bottom: 0, left: 0, right: 0 },
         layout: {
           distribution: 'space-around',
           horizontalAlignment: 'center',

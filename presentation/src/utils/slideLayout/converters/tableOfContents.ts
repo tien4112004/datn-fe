@@ -18,7 +18,6 @@ export const getTableOfContentsLayoutTemplate = (theme: SlideTheme): TemplateCon
           width: SLIDE_WIDTH - 30,
           height: 100,
         },
-        padding: { top: 0, bottom: 0, left: 40, right: 40 },
         layout: {
           horizontalAlignment: 'center',
           verticalAlignment: 'top',
@@ -41,10 +40,9 @@ export const getTableOfContentsLayoutTemplate = (theme: SlideTheme): TemplateCon
           size: 'fill',
           margin: { left: 60, right: 60, top: 0, bottom: 40 },
         },
-        padding: { top: 0, bottom: 0, left: 0, right: 0 },
         layout: {
           distribution: 'space-between',
-          spacingBetweenItems: 25,
+          gap: 25,
           horizontalAlignment: 'left',
           verticalAlignment: 'top',
           orientation: 'vertical',
@@ -62,7 +60,6 @@ export const getTableOfContentsLayoutTemplate = (theme: SlideTheme): TemplateCon
           structure: {
             type: 'text' as const,
             label: 'item',
-            padding: { top: 0, bottom: 0, left: 0, right: 0 },
             layout: {
               horizontalAlignment: 'left',
               verticalAlignment: 'top',

@@ -21,7 +21,7 @@ export interface RelativePositioning {
   anchor?: 'start' | 'end' | 'center'; // 'start' = left/top, 'end' = right/bottom
   offset?: number; // Offset from anchor point
   size?: number | 'fill'; // Explicit size or 'fill' to fill remaining space
-  margin?: PaddingConfig; // Margin to apply when calculating position/size
+  margin?: { top?: number; bottom?: number; left?: number; right?: number }; // Margin to apply when calculating position/size
 }
 
 export interface Position {
@@ -35,13 +35,6 @@ export interface Size {
 }
 
 export interface Bounds extends Position, Size {}
-
-export interface PaddingConfig {
-  top?: number;
-  bottom?: number;
-  left?: number;
-  right?: number;
-}
 
 export interface BorderConfig {
   width: number;
@@ -83,7 +76,7 @@ export interface ChildLayoutConfig {
   verticalAlignment?: 'top' | 'center' | 'bottom';
   horizontalAlignment?: 'left' | 'center' | 'right';
   distribution?: DistributionType;
-  spacingBetweenItems?: number;
+  gap?: number;
   orientation?: 'horizontal' | 'vertical';
 }
 
@@ -96,7 +89,6 @@ export interface ChildrenTemplate {
 export interface LayoutBlockConfig {
   type: 'block' | 'text' | 'image';
   id?: string;
-  padding?: PaddingConfig;
   border?: BorderConfig;
   shadow?: PPTElementShadow;
   label?: string;
@@ -158,7 +150,6 @@ export interface LayoutBlockInstance {
   type: 'block' | 'text' | 'image';
   id?: string;
   bounds: Bounds;
-  padding: PaddingConfig;
   label?: string;
   border?: BorderConfig;
   shadow?: PPTElementShadow;

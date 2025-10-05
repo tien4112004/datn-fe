@@ -8,7 +8,6 @@ import type {
   RelativePositioning,
   SlideViewport,
   ChildLayoutConfig,
-  PaddingConfig,
 } from '../types';
 import { measureElement } from '../elementMeasurement';
 import { DEFAULT_SPACING_BETWEEN_ITEMS } from './layoutConstants';
@@ -19,19 +18,14 @@ import { DEFAULT_SPACING_BETWEEN_ITEMS } from './layoutConstants';
  */
 export function calculateParentBoundsFromChildren(
   childrenBounds: Bounds[],
-  layoutConfig?: ChildLayoutConfig,
-  padding?: PaddingConfig
+  layoutConfig?: ChildLayoutConfig
 ): Bounds {
   if (childrenBounds.length === 0) {
     return { left: 0, top: 0, width: 0, height: 0 };
   }
 
   const orientation = layoutConfig?.orientation || 'vertical';
-  const spacingBetweenItems = layoutConfig?.spacingBetweenItems || 0;
-  const paddingTop = padding?.top || 0;
-  const paddingBottom = padding?.bottom || 0;
-  const paddingLeft = padding?.left || 0;
-  const paddingRight = padding?.right || 0;
+  const gap = layoutConfig?.gap || 0;
 
   // Find the bounding box that contains all children
   let minLeft = Infinity;
@@ -53,24 +47,24 @@ export function calculateParentBoundsFromChildren(
   if (orientation === 'horizontal') {
     // Horizontal: width = sum of widths + spacing, height = max height
     const totalItemWidth = childrenBounds.reduce((sum, child) => sum + child.width, 0);
-    const totalSpacing = (childrenBounds.length - 1) * spacingBetweenItems;
-    width = totalItemWidth + totalSpacing + paddingLeft + paddingRight;
+    const totalSpacing = (childrenBounds.length - 1) * gap;
+    width = totalItemWidth + totalSpacing;
 
     const maxChildHeight = Math.max(...childrenBounds.map((child) => child.height));
-    height = maxChildHeight + paddingTop + paddingBottom;
+    height = maxChildHeight;
   } else {
     // Vertical: height = sum of heights + spacing, width = max width
     const totalItemHeight = childrenBounds.reduce((sum, child) => sum + child.height, 0);
-    const totalSpacing = (childrenBounds.length - 1) * spacingBetweenItems;
-    height = totalItemHeight + totalSpacing + paddingTop + paddingBottom;
+    const totalSpacing = (childrenBounds.length - 1) * gap;
+    height = totalItemHeight + totalSpacing;
 
     const maxChildWidth = Math.max(...childrenBounds.map((child) => child.width));
-    width = maxChildWidth + paddingLeft + paddingRight;
+    width = maxChildWidth;
   }
 
-  // Use the minimum left/top from children, adjusted for padding
-  const left = minLeft - paddingLeft;
-  const top = minTop - paddingTop;
+  // Use the minimum left/top from children
+  const left = minLeft;
+  const top = minTop;
 
   return {
     left,
@@ -89,14 +83,14 @@ export function getChildrenMaxBounds(
     distribution?: DistributionType;
     childCount?: number;
     orientation?: 'horizontal' | 'vertical';
-    spacingBetweenItems?: number;
+    gap?: number;
   }
 ): Bounds[] {
   const {
     distribution = '50/50',
     childCount = 0,
     orientation = 'vertical',
-    spacingBetweenItems = DEFAULT_SPACING_BETWEEN_ITEMS,
+    gap = DEFAULT_SPACING_BETWEEN_ITEMS,
   } = options || {};
 
   if (childCount === 0) {
@@ -106,7 +100,7 @@ export function getChildrenMaxBounds(
   const positions: Bounds[] = [];
 
   // Calculate base item dimensions assuming equal distribution
-  const totalSpacing = spacingBetweenItems * (childCount - 1);
+  const totalSpacing = gap * (childCount - 1);
   const availableSpace =
     orientation === 'horizontal' ? bounds.width - totalSpacing : bounds.height - totalSpacing;
   const itemSize = availableSpace / childCount;
@@ -162,7 +156,7 @@ export function getChildrenMaxBounds(
         // Fallback to equal distribution
         for (let i = 0; i < childCount; i++) {
           positions.push({
-            left: bounds.left + i * (itemSize + spacingBetweenItems),
+            left: bounds.left + i * (itemSize + gap),
             top: bounds.top,
             width: itemSize,
             height: bounds.height,
@@ -173,7 +167,7 @@ export function getChildrenMaxBounds(
       // Equal distribution (default)
       for (let i = 0; i < childCount; i++) {
         positions.push({
-          left: bounds.left + i * (itemSize + spacingBetweenItems),
+          left: bounds.left + i * (itemSize + gap),
           top: bounds.top,
           width: itemSize,
           height: bounds.height,
@@ -231,7 +225,7 @@ export function getChildrenMaxBounds(
         for (let i = 0; i < childCount; i++) {
           positions.push({
             left: bounds.left,
-            top: bounds.top + i * (itemSize + spacingBetweenItems),
+            top: bounds.top + i * (itemSize + gap),
             width: bounds.width,
             height: itemSize,
           });
@@ -242,7 +236,7 @@ export function getChildrenMaxBounds(
       for (let i = 0; i < childCount; i++) {
         positions.push({
           left: bounds.left,
-          top: bounds.top + i * (itemSize + spacingBetweenItems),
+          top: bounds.top + i * (itemSize + gap),
           width: bounds.width,
           height: itemSize,
         });
@@ -258,17 +252,15 @@ export function layoutItemsInBlock(itemDimensions: Size[], container: LayoutBloc
   const horizontalAlignment = container.layout?.horizontalAlignment || 'left';
 
   const totalItemsHeight = itemDimensions.reduce((sum, dim) => sum + dim.height, 0);
-  const availableHeight =
-    container.bounds.height - (container.padding.top || 0) - (container.padding.bottom || 0);
-  const availableWidth =
-    container.bounds.width - (container.padding.left || 0) - (container.padding.right || 0);
+  const availableHeight = container.bounds.height;
+  const availableWidth = container.bounds.width;
 
   let positions: Bounds[] = [];
-  let startY = container.bounds.top + (container.padding.top || 0);
+  let startY = container.bounds.top;
 
   // Helper function to calculate horizontal position based on alignment
   const getHorizontalPosition = (itemWidth: number): number => {
-    const startX = container.bounds.left + (container.padding.left || 0);
+    const startX = container.bounds.left;
 
     switch (horizontalAlignment) {
       case 'center':
@@ -336,7 +328,7 @@ export function layoutItemsInBlock(itemDimensions: Size[], container: LayoutBloc
     case 'equal':
     default: {
       // Equal: use fixed spacing defined by spacingBetweenItems
-      const actualSpacing = container.layout?.spacingBetweenItems || DEFAULT_SPACING_BETWEEN_ITEMS;
+      const actualSpacing = container.layout?.gap || DEFAULT_SPACING_BETWEEN_ITEMS;
       const totalNeededHeight = totalItemsHeight + (itemDimensions.length - 1) * actualSpacing;
 
       // Apply vertical alignment

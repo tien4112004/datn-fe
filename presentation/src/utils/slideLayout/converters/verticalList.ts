@@ -20,7 +20,6 @@ export const getVerticalListLayoutTemplate = (theme: SlideTheme): TemplateConfig
       title: {
         type: 'text' as const,
         bounds: titleBounds,
-        padding: { top: 0, bottom: 0, left: 0, right: 0 },
         layout: {
           horizontalAlignment: 'center',
           verticalAlignment: 'top',
@@ -44,10 +43,9 @@ export const getVerticalListLayoutTemplate = (theme: SlideTheme): TemplateConfig
           size: 'fill',
           margin: { left: 30, right: 30, top: 0, bottom: 40 },
         },
-        padding: { top: 0, bottom: 0, left: 50, right: 50 },
         layout: {
           distribution: 'space-between',
-          spacingBetweenItems: 20,
+          gap: 20,
           verticalAlignment: 'top',
           orientation: 'vertical',
         },
@@ -64,7 +62,6 @@ export const getVerticalListLayoutTemplate = (theme: SlideTheme): TemplateConfig
           structure: {
             type: 'text' as const,
             label: 'item',
-            padding: { top: 0, bottom: 0, left: 0, right: 0 },
             layout: {
               horizontalAlignment: 'left',
               verticalAlignment: 'center',

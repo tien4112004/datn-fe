@@ -1449,7 +1449,7 @@ export function initializeMockLessonPlans(teachers: Teacher[]): LessonPlan[] {
   let objectiveIdCounter = 1;
   let resourceIdCounter = 1;
 
-  const baseDate = new Date('2024-10-01');
+  const baseDate = new Date('2024-10-08');
 
   // Lesson Plans for Class 1A (Grade 1)
   const class1ALessons = [

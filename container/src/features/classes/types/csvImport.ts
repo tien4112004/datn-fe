@@ -2,7 +2,7 @@
  * CSV Student Import Type Definitions
  *
  * This module defines all types and constants used in the CSV import feature.
- * Includes student row data, file validation, parse results, and import session state.
+ * Includes student row data, file validation, parse results, and import state.
  */
 
 // ===== CORE ENTITIES =====
@@ -99,22 +99,30 @@ export interface CsvParseResult {
   warnings: ImportWarning[]; // Non-critical issues
 }
 
-export type ImportStatus =
-  | 'idle' // No file selected
-  | 'file_selected' // File chosen, not yet parsed
-  | 'parsing' // CSV parsing in progress
-  | 'parsed_warning' // Parsing complete with warnings
-  | 'parsed_success' // Parsing complete, ready to preview
-  | 'parsed_error' // Parsing failed
-  | 'submitting' // Sending to backend
-  | 'backend_validating' // Backend processing
-  | 'completed_success' // Backend accepted, students created
-  | 'completed_error'; // Backend rejected with errors
+// ===== IMPORT STATE MACHINE =====
+
+export type ImportStatus = 'idle' | 'parsing' | 'preview' | 'submitting' | 'success' | 'error';
+
+export interface ImportState {
+  status: ImportStatus;
+  fileInfo?: CsvFileInfo;
+  parseResult?: CsvParseResult;
+  error?: string; // For backend errors
+}
+
+export type ImportAction =
+  | { type: 'FILE_SELECT'; payload: { fileInfo: CsvFileInfo; errors: ImportError[] } }
+  | { type: 'PARSE_SUCCESS'; payload: CsvParseResult }
+  | { type: 'PARSE_ERROR'; payload: CsvParseResult }
+  | { type: 'SUBMIT' }
+  | { type: 'SUBMIT_SUCCESS' }
+  | { type: 'SUBMIT_ERROR'; payload: string }
+  | { type: 'RESET' };
 
 // ===== CONSTANTS =====
 
 export const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB in bytes
-export const MAX_PREVIEW_ROWS = 10;
+export const MAX_PREVIEW_ROWS = 50;
 export const ACCEPTED_MIME_TYPES = ['text/csv', 'application/csv', 'text/plain'] as const;
 export const REQUIRED_COLUMNS = ['firstName', 'lastName', 'email'] as const;
 

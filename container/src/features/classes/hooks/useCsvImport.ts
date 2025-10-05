@@ -1,133 +1,88 @@
-import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 
 import { classApiService } from '../api';
 import { prepareFileInfo, validateAndParseCsv } from '../utils/csvValidators';
-import { type ImportStatus, type CsvFileInfo, type CsvParseResult, IMPORT_ERROR } from '../types/csvImport';
-
-interface UseCsvImportReturn {
-  status: ImportStatus;
-  fileInfo: CsvFileInfo | undefined;
-  parseResult: CsvParseResult | undefined;
-  isLoading: boolean;
-  handleFileSelect: (file: File | null) => Promise<void>;
-  handleSubmit: () => void;
-  handleReset: () => void;
-}
+import { useCsvImportStore } from '../stores/useCsvImportStore';
+import type { CsvFileInfo, CsvParseResult } from '../types';
 
 interface UseCsvImportOptions {
   classId: string;
   onSuccess?: () => void;
 }
 
-export function useCsvImport({ classId, onSuccess }: UseCsvImportOptions): UseCsvImportReturn {
+export function useCsvImport({ classId, onSuccess }: UseCsvImportOptions) {
   const { t } = useTranslation('classes');
-  const [status, setStatus] = useState<ImportStatus>('idle');
-  const [fileInfo, setFileInfo] = useState<CsvFileInfo | undefined>(undefined);
-  const [parseResult, setParseResult] = useState<CsvParseResult | undefined>(undefined);
+  const [state, dispatch] = useCsvImportStore();
 
-  // Mutation for submitting to backend
   const importMutation = useMutation({
-    mutationFn: () => {
-      if (!fileInfo) {
-        throw new Error('No file selected');
-      }
-      return classApiService.submitImport(classId, fileInfo.file);
-    },
+    mutationFn: (file: File) => classApiService.submitImport(classId, file),
     onMutate: () => {
-      setStatus('submitting');
+      dispatch({ type: 'SUBMIT' });
     },
     onSuccess: () => {
       toast.success(t('csvImport.toast.importSuccess'));
-      onSuccess?.(); // Call parent callback for data refetch
-      // Reset state after successful import
-      setStatus('idle');
-      setFileInfo(undefined);
-      setParseResult(undefined);
+      dispatch({ type: 'SUBMIT_SUCCESS' });
+      onSuccess?.();
     },
     onError: (error: Error) => {
-      setStatus('parsed_success'); // Reset to preview state so user can retry
       toast.error(error.message || t('csvImport.toast.importFailed'));
+      dispatch({ type: 'SUBMIT_ERROR', payload: error.message });
     },
   });
 
-  const handleFileSelect = async (file: File | null): Promise<void> => {
+  const handleFileSelect = async (file: File | null) => {
     if (!file) {
-      setStatus('idle');
-      setFileInfo(undefined);
-      setParseResult(undefined);
+      dispatch({ type: 'RESET' });
       return;
     }
 
-    setStatus('parsing');
+    const { fileInfo, errors } = prepareFileInfo(file);
+    dispatch({ type: 'FILE_SELECT', payload: { fileInfo, errors } });
 
-    // Prepare file info and validate
-    const { fileInfo: preparedFileInfo, errors } = prepareFileInfo(file);
-    setFileInfo(preparedFileInfo);
+    if (errors.length > 0) return;
 
-    if (errors.length > 0) {
-      setStatus('parsed_error');
-      setParseResult({
-        success: false,
-        data: [],
-        totalRows: 0,
-        previewRows: [],
-        errors,
-        warnings: [],
-      });
-      return;
-    }
-
-    // Parse CSV
     try {
       const result = await validateAndParseCsv(file);
-      setParseResult(result);
-      if (result.warnings.length > 0 && result.success) {
-        setStatus('parsed_warning');
+      if (result.success) {
+        dispatch({ type: 'PARSE_SUCCESS', payload: result });
       } else {
-        setStatus('parsed_success');
+        dispatch({ type: 'PARSE_ERROR', payload: result });
       }
     } catch (error) {
-      setStatus('parsed_error');
-      setParseResult({
+      const result: CsvParseResult = {
         success: false,
         data: [],
         totalRows: 0,
         previewRows: [],
         errors: [
           {
-            type: IMPORT_ERROR.MALFORMED_CSV,
+            type: 'malformed_csv',
             message: error instanceof Error ? error.message : t('csvImport.toast.parseError'),
           },
         ],
         warnings: [],
-      });
+      };
+      dispatch({ type: 'PARSE_ERROR', payload: result });
     }
   };
 
-  const handleSubmit = (): void => {
-    if (!parseResult || !parseResult.success || parseResult.data.length === 0) {
+  const handleSubmit = () => {
+    if (state.parseResult?.success && state.fileInfo) {
+      importMutation.mutate(state.fileInfo.file);
+    } else {
       toast.error(t('csvImport.toast.genericError'));
-      return;
     }
-
-    importMutation.mutate();
   };
 
-  const handleReset = (): void => {
-    setStatus('idle');
-    setFileInfo(undefined);
-    setParseResult(undefined);
-    importMutation.reset();
+  const handleReset = () => {
+    dispatch({ type: 'RESET' });
   };
 
   return {
-    status,
-    fileInfo,
-    parseResult,
-    isLoading: status === 'parsing' || importMutation.isPending,
+    state,
+    isLoading: state.status === 'parsing' || state.status === 'submitting',
     handleFileSelect,
     handleSubmit,
     handleReset,

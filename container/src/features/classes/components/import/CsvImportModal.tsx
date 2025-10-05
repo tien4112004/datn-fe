@@ -1,9 +1,8 @@
 /**
  * CSV Import Modal Component
  *
- * Simplified main orchestrator for CSV import workflow.
- * Manages the flow: Upload → Parse → Preview → Submit
- * Toast notifications handle all feedback (success/error).
+ * Orchestrates the CSV import workflow using a state machine (`useCsvImport`).
+ * Manages the UI for each state: idle, parsing, preview, submitting, success, and error.
  */
 
 import { useEffect } from 'react';
@@ -15,6 +14,7 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
+  DialogFooter,
 } from '@/shared/components/ui/dialog';
 import { Button } from '@/shared/components/ui/button';
 import { FileUploadZone } from './FileUploadZone';
@@ -31,41 +31,18 @@ interface CsvImportModalProps {
   onSuccess?: () => void;
 }
 
-/**
- * CsvImportModal - Main modal for CSV student import
- *
- * Simplified workflow:
- * - Upload and parse CSV file (with frontend validation)
- * - Show preview of parsed data
- * - Submit to backend
- * - Toast notifications for success/error feedback
- * - Auto-close on success
- *
- * @example
- * ```tsx
- * <CsvImportModal
- *   open={isOpen}
- *   onOpenChange={setIsOpen}
- *   classId="class-123"
- *   onSuccess={() => console.log('Import complete')}
- * />
- * ```
- */
 export function CsvImportModal({ open, onOpenChange, classId, onSuccess }: CsvImportModalProps) {
   const { t } = useTranslation('classes');
-  const { status, fileInfo, parseResult, isLoading, handleFileSelect, handleSubmit, handleReset } =
-    useCsvImport({
-      classId,
-      onSuccess: () => {
-        onSuccess?.();
-        // Auto-close after 2 seconds on success
-        setTimeout(() => {
-          onOpenChange(false);
-        }, 2000);
-      },
-    });
+  const { state, isLoading, handleFileSelect, handleSubmit, handleReset } = useCsvImport({
+    classId,
+    onSuccess: () => {
+      onSuccess?.();
+      setTimeout(() => onOpenChange(false), 2000);
+    },
+  });
 
-  // Download template CSV file
+  const { status, fileInfo, parseResult } = state;
+
   const handleDownloadTemplate = () => {
     fetch('/templates/student-import-template.csv')
       .then((response) => response.blob())
@@ -81,59 +58,53 @@ export function CsvImportModal({ open, onOpenChange, classId, onSuccess }: CsvIm
       });
   };
 
-  // Reset session when modal closes
   useEffect(() => {
     if (!open) {
-      // Small delay to allow exit animation
       const timeout = setTimeout(handleReset, 300);
       return () => clearTimeout(timeout);
     }
   }, [open, handleReset]);
 
-  // Determine if submit button should be enabled
   const canSubmit =
-    status === 'parsed_success' &&
-    parseResult &&
-    parseResult.success &&
+    status === 'preview' &&
+    parseResult?.success &&
     parseResult.data.length > 0 &&
     parseResult.data.every((row) => row._isValid);
 
-  // Get modal title based on status
   const getTitle = () => {
     switch (status) {
       case 'idle':
-      case 'file_selected':
       case 'parsing':
-      case 'parsed_error':
+      case 'error':
         return t('csvImport.modal.titleIdle');
-      case 'parsed_success':
+      case 'preview':
       case 'submitting':
         return t('csvImport.modal.titleParsed');
-      case 'completed_success':
-      case 'completed_error':
+      case 'success':
         return t('csvImport.modal.titleSuccess');
       default:
         return t('csvImport.modal.titleIdle');
     }
   };
 
-  // Get modal description based on status
   const getDescription = () => {
     switch (status) {
       case 'idle':
-      case 'file_selected':
         return t('csvImport.modal.descriptionIdle');
       case 'parsing':
         return t('csvImport.modal.descriptionParsing');
-      case 'parsed_success':
+      case 'preview':
       case 'submitting':
         return t('csvImport.modal.descriptionParsed');
-      case 'parsed_error':
+      case 'error':
         return t('csvImport.modal.descriptionError');
       default:
         return '';
     }
   };
+
+  const showUploadZone = status === 'idle' || status === 'parsing' || status === 'error';
+  const showPreview = status === 'preview' || status === 'submitting';
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -144,84 +115,44 @@ export function CsvImportModal({ open, onOpenChange, classId, onSuccess }: CsvIm
         </DialogHeader>
 
         <div className="space-y-4">
-          {/* Template Download and Format Info */}
-          <div className="flex justify-between">
-            {(status === 'idle' || status === 'file_selected' || status === 'parsed_error') && (
-              <div className="flex gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={handleDownloadTemplate}
-                  className="gap-2"
-                >
-                  <Download className="h-4 w-4" />
-                  {t('csvImport.modal.downloadTemplate')}
-                </Button>
-              </div>
-            )}
-
+          {showUploadZone && (
             <div className="flex gap-2">
-              {/* Try Again Button (on error) */}
-              {(status === 'parsed_error' || status === 'parsed_warning') && (
-                <Button type="button" variant="secondary" onClick={handleReset}>
-                  {t('csvImport.modal.tryAgain')}
-                </Button>
-              )}
-
-              {/* Import Button (on preview) */}
-              {status === 'parsed_success' && (
-                <Button type="button" onClick={handleSubmit} disabled={!canSubmit || isLoading}>
-                  {isLoading
-                    ? t('csvImport.modal.importing')
-                    : `${t('csvImport.modal.import')} ${parseResult?.data.length || 0} ${t('csvImport.preview.validRows')}`}
-                </Button>
-              )}
-
-              {/* Show Import Button during submission */}
-              {status === 'submitting' && (
-                <Button type="button" disabled>
-                  {t('csvImport.modal.importing')}
-                </Button>
-              )}
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleDownloadTemplate}
+                className="gap-2"
+              >
+                <Download className="h-4 w-4" />
+                {t('csvImport.modal.downloadTemplate')}
+              </Button>
             </div>
-          </div>
+          )}
 
-          {/* File Upload Zone */}
-          {(status === 'idle' ||
-            status === 'file_selected' ||
-            status === 'parsing' ||
-            status === 'parsed_error') && (
+          {showUploadZone && (
             <>
               <FileUploadZone
                 onFileSelect={handleFileSelect}
                 fileInfo={fileInfo}
-                errors={parseResult && !parseResult.success ? parseResult.errors : undefined}
+                errors={parseResult?.errors}
                 disabled={status === 'parsing'}
-                className="flex w-60 w-full items-center justify-center gap-4"
+                className="flex w-full items-center justify-center gap-4"
               />
-
               {status === 'parsing' && <ImportProgress message={t('csvImport.modal.parsingFile')} />}
-
-              {/* Show parse errors in modal */}
-              {status === 'parsed_error' && parseResult && (
+              {status === 'error' && parseResult && (
                 <ImportErrors
                   parseErrors={parseResult.errors}
                   title={t('csvImport.modal.csvValidationFailed')}
                 />
               )}
-
-              {/* Format Requirements */}
               <FormatRequirements className="mt-4" />
             </>
           )}
 
-          {/* Preview (parsed_success or submitting) */}
-          {(status === 'parsed_success' || status === 'submitting') && parseResult && (
+          {showPreview && parseResult && (
             <>
               <CsvPreviewTable data={parseResult.previewRows} totalRows={parseResult.totalRows} />
-
-              {/* Warnings */}
               {parseResult.warnings.length > 0 && (
                 <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-3">
                   <p className="mb-1 text-sm font-medium text-yellow-900">
@@ -234,12 +165,30 @@ export function CsvImportModal({ open, onOpenChange, classId, onSuccess }: CsvIm
                   </ul>
                 </div>
               )}
-
-              {/* Show progress during submission */}
               {status === 'submitting' && <ImportProgress message={t('csvImport.modal.importingStudents')} />}
             </>
           )}
         </div>
+
+        <DialogFooter className="flex gap-2">
+          {status === 'error' && (
+            <Button type="button" variant="secondary" onClick={handleReset}>
+              {t('csvImport.modal.tryAgain')}
+            </Button>
+          )}
+          {status === 'preview' && (
+            <Button type="button" onClick={handleSubmit} disabled={!canSubmit || isLoading}>
+              {isLoading
+                ? t('csvImport.modal.importing')
+                : `${t('csvImport.modal.import')} ${parseResult?.data.length || 0} ${t('csvImport.preview.validRows')}`}
+            </Button>
+          )}
+          {status === 'submitting' && (
+            <Button type="button" disabled>
+              {t('csvImport.modal.importing')}
+            </Button>
+          )}
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

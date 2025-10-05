@@ -52,8 +52,8 @@ export function createTextElement(content: string, container: TextLayoutBlockIns
 
   // Calculate positioning within the container
   const position = getPosition(container.bounds, dimensions, {
-    horizontalAlignment: container.horizontalAlignment,
-    verticalAlignment: container.verticalAlignment,
+    horizontalAlignment: container.layout?.horizontalAlignment,
+    verticalAlignment: container.layout?.verticalAlignment,
   });
 
   // Create and return the PPT text element

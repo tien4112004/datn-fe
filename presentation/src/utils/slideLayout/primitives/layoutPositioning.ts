@@ -219,8 +219,8 @@ export function getChildrenMaxBounds(
  * Layout items within a block container
  */
 export function layoutItemsInBlock(itemDimensions: Size[], container: LayoutBlockInstance): Bounds[] {
-  const distribution = container.distribution || 'equal';
-  const alignment = container.verticalAlignment || 'top';
+  const distribution = container.layout?.distribution || 'equal';
+  const alignment = container.layout?.verticalAlignment || 'top';
 
   const totalItemsHeight = itemDimensions.reduce((sum, dim) => sum + dim.height, 0);
   const availableHeight =
@@ -284,7 +284,7 @@ export function layoutItemsInBlock(itemDimensions: Size[], container: LayoutBloc
     case 'equal':
     default: {
       // Equal: use fixed spacing defined by spacingBetweenItems
-      const actualSpacing = container.spacingBetweenItems || DEFAULT_SPACING_BETWEEN_ITEMS;
+      const actualSpacing = container.layout?.spacingBetweenItems || DEFAULT_SPACING_BETWEEN_ITEMS;
       const totalNeededHeight = totalItemsHeight + (itemDimensions.length - 1) * actualSpacing;
 
       // Apply vertical alignment
@@ -373,9 +373,9 @@ export function recursivelyPreprocessDescendants(container: LayoutBlockInstance)
   if (!container.children || container.children.length === 0) return;
 
   const items = getChildrenMaxBounds(container.bounds, {
-    distribution: container.distribution,
+    distribution: container.layout?.distribution,
     childCount: container.children.length,
-    orientation: container.orientation,
+    orientation: container.layout?.orientation,
   });
 
   container.children.forEach((child, index) => {
@@ -395,7 +395,7 @@ export function recursivelyPreprocessDescendants(container: LayoutBlockInstance)
 export function recursivelyGetAllLabelInstances(
   container: LayoutBlockInstance,
   label: string
-): TextLayoutBlockInstance[] {
+): LayoutBlockInstance[] {
   let labels: LayoutBlockInstance[] = [];
 
   if (!container.children || container.children.length === 0) return labels;

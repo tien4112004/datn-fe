@@ -79,26 +79,30 @@ export type DistributionType = 'equal' | 'space-between' | 'space-around';
 // Config Types (Templates - no positioning)
 // ============================================================================
 
+export interface ChildLayoutConfig {
+  verticalAlignment?: 'top' | 'center' | 'bottom';
+  horizontalAlignment?: 'left' | 'center' | 'right';
+  distribution?: DistributionType;
+  spacingBetweenItems?: number;
+  orientation?: 'horizontal' | 'vertical';
+}
+
 export interface ChildrenTemplate {
   count: number | 'auto';
-  distribution?: DistributionType;
-  orientation?: 'horizontal' | 'vertical';
-  spacingBetweenItems?: number;
   wrap?: WrapConfig;
   structure?: SlideLayoutBlockConfig;
 }
 
 export interface LayoutBlockConfig {
+  type: 'block' | 'text' | 'image';
   id?: string;
   padding?: PaddingConfig;
   border?: BorderConfig;
   shadow?: PPTElementShadow;
   label?: string;
-  verticalAlignment?: 'top' | 'center' | 'bottom';
-  horizontalAlignment?: 'left' | 'center' | 'right';
-  distribution?: DistributionType;
-  orientation?: 'horizontal' | 'vertical';
-  spacingBetweenItems?: number;
+
+  // Child layout configuration
+  layout?: ChildLayoutConfig;
 
   // Template-specific fields
   childTemplate?: ChildrenTemplate;
@@ -106,15 +110,24 @@ export interface LayoutBlockConfig {
 }
 
 export interface ImageLayoutBlockConfig extends LayoutBlockConfig {
+  type: 'image';
   // Image-specific config fields
 }
 
 export interface TextLayoutBlockConfig extends LayoutBlockConfig {
+  type: 'text';
   background?: BackgroundConfig;
   text?: TextStyleConfig;
 }
 
-export type SlideLayoutBlockConfig = TextLayoutBlockConfig | ImageLayoutBlockConfig;
+export interface NonTextLayoutBlockConfig extends LayoutBlockConfig {
+  type: 'block';
+}
+
+export type SlideLayoutBlockConfig =
+  | TextLayoutBlockConfig
+  | ImageLayoutBlockConfig
+  | NonTextLayoutBlockConfig;
 
 // ============================================================================
 // Template Container Types (Config with Bounds or Relative Positioning)
@@ -128,39 +141,54 @@ export interface ImageTemplateContainer extends ImageLayoutBlockConfig {
   bounds?: Bounds; // Absolute positioning (higher priority)
   positioning?: RelativePositioning; // Relative positioning (lower priority)
 }
-export type TemplateContainerConfig = TextTemplateContainer | ImageTemplateContainer;
+export interface NonTextTemplateContainer extends NonTextLayoutBlockConfig {
+  bounds?: Bounds; // Absolute positioning (higher priority)
+  positioning?: RelativePositioning; // Relative positioning (lower priority)
+}
+export type TemplateContainerConfig =
+  | TextTemplateContainer
+  | ImageTemplateContainer
+  | NonTextTemplateContainer;
 
 // ============================================================================
 // Instance Types (Resolved - with computed positions)
 // ============================================================================
 
 export interface LayoutBlockInstance {
+  type: 'block' | 'text' | 'image';
   id?: string;
   bounds: Bounds;
   padding: PaddingConfig;
   label?: string;
   border?: BorderConfig;
   shadow?: PPTElementShadow;
-  verticalAlignment?: 'top' | 'center' | 'bottom';
-  horizontalAlignment?: 'left' | 'center' | 'right';
-  distribution?: DistributionType;
-  orientation?: 'horizontal' | 'vertical';
-  spacingBetweenItems?: number;
+
+  // Child layout configuration
+  layout?: ChildLayoutConfig;
 
   // Resolved children (no templates)
   children?: LayoutBlockInstance[];
 }
 
 export interface ImageLayoutBlockInstance extends LayoutBlockInstance {
+  type: 'image';
   // Image-specific instance fields
 }
 
 export interface TextLayoutBlockInstance extends LayoutBlockInstance {
+  type: 'text';
   background?: BackgroundConfig;
   text?: TextStyleConfig;
 }
 
-export type SlideLayoutBlockInstance = TextLayoutBlockInstance | ImageLayoutBlockInstance;
+export interface NonTextLayoutBlockInstance extends LayoutBlockInstance {
+  type: 'block';
+}
+
+export type SlideLayoutBlockInstance =
+  | TextLayoutBlockInstance
+  | ImageLayoutBlockInstance
+  | NonTextLayoutBlockInstance;
 
 // ============================================================================
 // Template Config

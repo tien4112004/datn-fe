@@ -34,7 +34,7 @@ export function calculateTitleLayout(title: string, container: TextLayoutBlockIn
   const titleDimensions = measureElementWithStyle(titleElement, container);
 
   const horizontalPosition = getPosition(container.bounds, titleDimensions, {
-    horizontalAlignment: container.horizontalAlignment,
+    horizontalAlignment: container.layout?.horizontalAlignment,
   }).left;
 
   const titlePosition = {

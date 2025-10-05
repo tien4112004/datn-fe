@@ -60,10 +60,10 @@ export function processNestedData(
 
   if (config.children && instance.children) {
     const childrenBounds = getChildrenMaxBounds(bounds, {
-      distribution: config.distribution,
+      distribution: config.layout?.distribution,
       childCount: config.children.length,
-      orientation: config.orientation,
-      spacingBetweenItems: config.spacingBetweenItems,
+      orientation: config.layout?.orientation,
+      spacingBetweenItems: config.layout?.spacingBetweenItems,
     });
 
     const dataArray = Array.isArray(data) ? data : Object.values(data);

@@ -55,16 +55,20 @@ export const getMainImageLayoutTemplate = (theme: SlideTheme): TemplateConfig =>
   return {
     containers: {
       image: {
+        type: 'image' as const,
         bounds: imageBounds,
         padding: { top: 0, bottom: 0, left: 0, right: 0 },
       },
       content: {
+        type: 'text' as const,
         bounds: contentBounds,
         padding: { top: 0, bottom: 0, left: 0, right: 0 },
-        distribution: 'equal',
-        spacingBetweenItems: 10,
-        horizontalAlignment: 'center',
-        verticalAlignment: 'center',
+        layout: {
+          distribution: 'equal',
+          spacingBetweenItems: 10,
+          horizontalAlignment: 'center',
+          verticalAlignment: 'center',
+        },
         text: {
           color: theme.fontColor,
           fontFamily: theme.fontName,

@@ -1,5 +1,5 @@
 import type { HorizontalListLayoutSchema } from './types';
-import type { Bounds, TemplateConfig } from '../types';
+import type { Bounds, TemplateConfig, TextLayoutBlockInstance } from '../types';
 import LayoutPrimitives from '../layoutPrimitives';
 import type { PPTTextElement, Slide, SlideTheme } from '@/types/slides';
 import LayoutProBuilder from '../layoutProbuild';
@@ -25,10 +25,13 @@ export const getHorizontalListLayoutTemplate = (theme: SlideTheme): TemplateConf
   return {
     containers: {
       title: {
+        type: 'text' as const,
         bounds: titleBounds,
         padding: { top: 0, bottom: 0, left: 0, right: 0 },
-        horizontalAlignment: 'center',
-        verticalAlignment: 'top',
+        layout: {
+          horizontalAlignment: 'center',
+          verticalAlignment: 'top',
+        },
         text: {
           color: theme.titleFontColor,
           fontFamily: theme.titleFontName,
@@ -37,14 +40,17 @@ export const getHorizontalListLayoutTemplate = (theme: SlideTheme): TemplateConf
         },
       },
       content: {
+        type: 'block' as const,
         id: 'content',
         bounds: contentBounds,
         padding: { top: 0, bottom: 0, left: 0, right: 0 },
-        distribution: 'space-around',
-        spacingBetweenItems: 25,
-        horizontalAlignment: 'center',
-        verticalAlignment: 'center',
-        orientation: 'horizontal',
+        layout: {
+          distribution: 'space-around',
+          spacingBetweenItems: 25,
+          horizontalAlignment: 'center',
+          verticalAlignment: 'center',
+          orientation: 'horizontal',
+        },
         childTemplate: {
           count: 'auto',
           wrap: {
@@ -56,13 +62,16 @@ export const getHorizontalListLayoutTemplate = (theme: SlideTheme): TemplateConf
             alternating: true,
           },
           structure: {
+            type: 'block' as const,
             label: 'item',
             padding: { top: 0, bottom: 0, left: 0, right: 0 },
-            distribution: 'equal',
-            spacingBetweenItems: -20,
-            horizontalAlignment: 'center',
-            verticalAlignment: 'top',
-            orientation: 'vertical',
+            layout: {
+              distribution: 'equal',
+              spacingBetweenItems: -20,
+              horizontalAlignment: 'center',
+              verticalAlignment: 'top',
+              orientation: 'vertical',
+            },
             border: {
               color: theme.themeColors[0],
               width: 1,
@@ -70,10 +79,13 @@ export const getHorizontalListLayoutTemplate = (theme: SlideTheme): TemplateConf
             },
             children: [
               {
+                type: 'text' as const,
                 id: 'label',
                 padding: { top: 0, bottom: 0, left: 0, right: 0 },
-                horizontalAlignment: 'center',
-                verticalAlignment: 'center',
+                layout: {
+                  horizontalAlignment: 'center',
+                  verticalAlignment: 'center',
+                },
                 label: 'label',
                 text: {
                   color: theme.fontColor,
@@ -84,10 +96,13 @@ export const getHorizontalListLayoutTemplate = (theme: SlideTheme): TemplateConf
                 },
               },
               {
+                type: 'text' as const,
                 id: 'content',
                 padding: { top: 0, bottom: 0, left: 0, right: 0 },
-                horizontalAlignment: 'center',
-                verticalAlignment: 'center',
+                layout: {
+                  horizontalAlignment: 'center',
+                  verticalAlignment: 'center',
+                },
                 label: 'content',
                 text: {
                   color: theme.fontColor,
@@ -127,8 +142,14 @@ export const convertHorizontalListLayout = async (
   );
 
   // Get labeled instances for bounds
-  const labels = LayoutPrimitives.recursivelyGetAllLabelInstances(contentInstance, 'label');
-  const contents = LayoutPrimitives.recursivelyGetAllLabelInstances(contentInstance, 'content');
+  const labels = LayoutPrimitives.recursivelyGetAllLabelInstances(
+    contentInstance,
+    'label'
+  ) as TextLayoutBlockInstance[];
+  const contents = LayoutPrimitives.recursivelyGetAllLabelInstances(
+    contentInstance,
+    'content'
+  ) as TextLayoutBlockInstance[];
   const itemInstances = LayoutPrimitives.recursivelyGetAllLabelInstances(contentInstance, 'item');
 
   // Extract elements by label

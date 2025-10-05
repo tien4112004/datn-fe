@@ -18,10 +18,13 @@ export const getTitleLayoutTemplate = (theme: SlideTheme): TemplateConfig => {
   return {
     containers: {
       title: {
+        type: 'text' as const,
         bounds: titleBounds,
         padding: { top: 0, bottom: 0, left: 0, right: 0 },
-        horizontalAlignment: 'center',
-        verticalAlignment: 'center',
+        layout: {
+          horizontalAlignment: 'center',
+          verticalAlignment: 'center',
+        },
         text: {
           color: theme.titleFontColor,
           fontFamily: theme.titleFontName,
@@ -31,6 +34,7 @@ export const getTitleLayoutTemplate = (theme: SlideTheme): TemplateConfig => {
         },
       },
       subtitle: {
+        type: 'text' as const,
         positioning: {
           relativeTo: 'title',
           axis: 'vertical',
@@ -40,8 +44,10 @@ export const getTitleLayoutTemplate = (theme: SlideTheme): TemplateConfig => {
           margin: { left: 30, right: 30, top: 0, bottom: 40 },
         },
         padding: { top: 0, bottom: 0, left: 0, right: 0 },
-        horizontalAlignment: 'center',
-        verticalAlignment: 'top',
+        layout: {
+          horizontalAlignment: 'center',
+          verticalAlignment: 'top',
+        },
         text: {
           color: theme.fontColor,
           fontFamily: theme.fontName,

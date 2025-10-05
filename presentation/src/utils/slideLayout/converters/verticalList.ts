@@ -1,6 +1,6 @@
 import type { Slide, SlideTheme, PPTTextElement } from '@/types/slides';
 import type { VerticalListLayoutSchema } from './types';
-import type { Bounds, TemplateConfig } from '../types';
+import type { Bounds, TemplateConfig, TextLayoutBlockInstance } from '../types';
 import LayoutPrimitives from '../layoutPrimitives';
 import LayoutProBuilder from '../layoutProbuild';
 
@@ -18,10 +18,13 @@ export const getVerticalListLayoutTemplate = (theme: SlideTheme): TemplateConfig
   return {
     containers: {
       title: {
+        type: 'text' as const,
         bounds: titleBounds,
         padding: { top: 0, bottom: 0, left: 0, right: 0 },
-        horizontalAlignment: 'center',
-        verticalAlignment: 'top',
+        layout: {
+          horizontalAlignment: 'center',
+          verticalAlignment: 'top',
+        },
         text: {
           color: theme.titleFontColor,
           fontFamily: theme.titleFontName,
@@ -30,6 +33,7 @@ export const getVerticalListLayoutTemplate = (theme: SlideTheme): TemplateConfig
         },
       },
       content: {
+        type: 'block' as const,
         id: 'content',
         positioning: {
           relativeTo: 'title',
@@ -40,10 +44,12 @@ export const getVerticalListLayoutTemplate = (theme: SlideTheme): TemplateConfig
           margin: { left: 30, right: 30, top: 0, bottom: 40 },
         },
         padding: { top: 0, bottom: 0, left: 0, right: 0 },
-        distribution: 'space-between',
-        spacingBetweenItems: 20,
-        verticalAlignment: 'top',
-        orientation: 'vertical',
+        layout: {
+          distribution: 'space-between',
+          spacingBetweenItems: 20,
+          verticalAlignment: 'top',
+          orientation: 'vertical',
+        },
         childTemplate: {
           count: 'auto',
           wrap: {
@@ -55,10 +61,13 @@ export const getVerticalListLayoutTemplate = (theme: SlideTheme): TemplateConfig
             alternating: false,
           },
           structure: {
+            type: 'text' as const,
             label: 'item',
             padding: { top: 0, bottom: 0, left: 0, right: 0 },
-            horizontalAlignment: 'left',
-            verticalAlignment: 'center',
+            layout: {
+              horizontalAlignment: 'left',
+              verticalAlignment: 'center',
+            },
             border: {
               width: 1,
               color: theme.themeColors[0],
@@ -99,7 +108,10 @@ export const convertVerticalListLayout = async (
   );
 
   // Get labeled instances for bounds
-  const itemInstances = LayoutPrimitives.recursivelyGetAllLabelInstances(contentInstance, 'item');
+  const itemInstances = LayoutPrimitives.recursivelyGetAllLabelInstances(
+    contentInstance,
+    'item'
+  ) as TextLayoutBlockInstance[];
 
   // Extract elements by label
   const itemElements = elements['item'] || [];

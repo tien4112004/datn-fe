@@ -38,10 +38,13 @@ export const getTwoColumnWithImageLayoutTemplate = (theme: SlideTheme): Template
   return {
     containers: {
       title: {
+        type: 'text' as const,
         bounds: titleBounds,
         padding: { top: 0, bottom: 0, left: 40, right: 40 },
-        horizontalAlignment: 'center',
-        verticalAlignment: 'top',
+        layout: {
+          horizontalAlignment: 'center',
+          verticalAlignment: 'top',
+        },
         text: {
           color: theme.titleFontColor,
           fontFamily: theme.titleFontName,
@@ -56,6 +59,7 @@ export const getTwoColumnWithImageLayoutTemplate = (theme: SlideTheme): Template
         },
       },
       image: {
+        type: 'image' as const,
         bounds: imageBounds,
         padding: { top: 0, bottom: 0, left: 0, right: 0 },
         border: {
@@ -65,12 +69,15 @@ export const getTwoColumnWithImageLayoutTemplate = (theme: SlideTheme): Template
         },
       },
       content: {
+        type: 'text' as const,
         bounds: contentBounds,
         padding: { top: 0, bottom: 40, left: 0, right: 0 },
-        distribution: 'space-between',
-        spacingBetweenItems: 20,
-        horizontalAlignment: 'center',
-        verticalAlignment: 'top',
+        layout: {
+          distribution: 'space-between',
+          spacingBetweenItems: 20,
+          horizontalAlignment: 'center',
+          verticalAlignment: 'top',
+        },
         text: {
           color: theme.fontColor,
           fontFamily: theme.fontName,
@@ -117,10 +124,13 @@ export const getTwoColumnBigImageLayoutTemplate = (theme: SlideTheme): TemplateC
   return {
     containers: {
       title: {
+        type: 'text' as const,
         bounds: titleBounds,
         padding: { top: 0, bottom: 0, left: 0, right: 0 },
-        horizontalAlignment: 'center',
-        verticalAlignment: 'top',
+        layout: {
+          horizontalAlignment: 'center',
+          verticalAlignment: 'top',
+        },
         text: {
           color: theme.titleFontColor,
           fontFamily: theme.titleFontName,
@@ -129,6 +139,7 @@ export const getTwoColumnBigImageLayoutTemplate = (theme: SlideTheme): TemplateC
         },
       },
       image: {
+        type: 'image' as const,
         bounds: imageBounds,
         padding: { top: 0, bottom: 0, left: 0, right: 0 },
         border: {
@@ -138,12 +149,15 @@ export const getTwoColumnBigImageLayoutTemplate = (theme: SlideTheme): TemplateC
         },
       },
       content: {
+        type: 'text' as const,
         bounds: contentBounds,
         padding: { top: 0, bottom: 0, left: 40, right: 0 },
-        distribution: 'equal',
-        spacingBetweenItems: 20,
-        horizontalAlignment: 'left',
-        verticalAlignment: 'top',
+        layout: {
+          distribution: 'equal',
+          spacingBetweenItems: 20,
+          horizontalAlignment: 'left',
+          verticalAlignment: 'top',
+        },
         text: {
           color: theme.fontColor,
           fontFamily: theme.fontName,

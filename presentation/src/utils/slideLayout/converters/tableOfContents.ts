@@ -12,6 +12,7 @@ export const getTableOfContentsLayoutTemplate = (theme: SlideTheme): TemplateCon
   return {
     containers: {
       title: {
+        type: 'text' as const,
         bounds: {
           left: 15,
           top: 15,
@@ -19,8 +20,10 @@ export const getTableOfContentsLayoutTemplate = (theme: SlideTheme): TemplateCon
           height: 100,
         },
         padding: { top: 0, bottom: 0, left: 40, right: 40 },
-        horizontalAlignment: 'center',
-        verticalAlignment: 'top',
+        layout: {
+          horizontalAlignment: 'center',
+          verticalAlignment: 'top',
+        },
         text: {
           color: theme.titleFontColor,
           fontFamily: theme.titleFontName,
@@ -29,6 +32,7 @@ export const getTableOfContentsLayoutTemplate = (theme: SlideTheme): TemplateCon
         },
       },
       content: {
+        type: 'text' as const,
         bounds: {
           left: 60,
           top: 155, // title height + spacing
@@ -36,10 +40,12 @@ export const getTableOfContentsLayoutTemplate = (theme: SlideTheme): TemplateCon
           height: SLIDE_HEIGHT - 155 - 40, // remaining height with bottom margin
         },
         padding: { top: 0, bottom: 0, left: 0, right: 0 },
-        distribution: 'equal',
-        spacingBetweenItems: 25,
-        horizontalAlignment: 'left',
-        verticalAlignment: 'top',
+        layout: {
+          distribution: 'equal',
+          spacingBetweenItems: 25,
+          horizontalAlignment: 'left',
+          verticalAlignment: 'top',
+        },
         text: {
           color: theme.fontColor,
           fontFamily: theme.fontName,

@@ -38,8 +38,8 @@ export function buildChildrenFromChildTemplate(
     count,
     parentBounds,
     wrapConfig,
-    templateContainer.orientation || 'vertical',
-    templateContainer.spacingBetweenItems || 0
+    templateContainer.layout?.orientation || 'vertical',
+    templateContainer.layout?.spacingBetweenItems || 0
   );
 
   // Create instances with calculated bounds, passing corresponding data item
@@ -70,17 +70,14 @@ export function buildInstanceWithBounds(
 ): LayoutBlockInstance {
   // Create base instance with assigned bounds
   const instance: LayoutBlockInstance = {
+    type: config.type,
     id: config.id,
     bounds,
     label: config.label,
     padding: config.padding || { top: 0, bottom: 0, left: 0, right: 0 },
     border: config.border,
     shadow: config.shadow,
-    verticalAlignment: config.verticalAlignment,
-    horizontalAlignment: config.horizontalAlignment,
-    distribution: config.distribution,
-    orientation: config.orientation,
-    spacingBetweenItems: config.spacingBetweenItems,
+    layout: config.layout,
   };
 
   // Add type-specific properties
@@ -93,10 +90,10 @@ export function buildInstanceWithBounds(
   if (config.children) {
     // Static children - calculate bounds using getChildrenMaxBounds
     const childrenBounds = getChildrenMaxBounds(bounds, {
-      distribution: config.distribution,
+      distribution: config.layout?.distribution,
       childCount: config.children.length,
-      orientation: config.orientation,
-      spacingBetweenItems: config.spacingBetweenItems,
+      orientation: config.layout?.orientation,
+      spacingBetweenItems: config.layout?.spacingBetweenItems,
     });
 
     // Pass same data to all static children

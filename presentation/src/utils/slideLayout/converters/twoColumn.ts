@@ -11,6 +11,7 @@ export const getTwoColumnLayoutTemplate = (theme: SlideTheme): TemplateConfig =>
   return {
     containers: {
       title: {
+        type: 'text' as const,
         bounds: {
           left: 15,
           top: 15,
@@ -18,8 +19,10 @@ export const getTwoColumnLayoutTemplate = (theme: SlideTheme): TemplateConfig =>
           height: 100,
         },
         padding: { top: 0, bottom: 0, left: 40, right: 40 },
-        horizontalAlignment: 'center',
-        verticalAlignment: 'top',
+        layout: {
+          horizontalAlignment: 'center',
+          verticalAlignment: 'top',
+        },
         text: {
           color: theme.titleFontColor,
           fontFamily: theme.titleFontName,
@@ -28,6 +31,7 @@ export const getTwoColumnLayoutTemplate = (theme: SlideTheme): TemplateConfig =>
         },
       },
       content: {
+        type: 'block' as const,
         // Using relative positioning - positioned below title
         positioning: {
           relativeTo: 'title',
@@ -38,11 +42,13 @@ export const getTwoColumnLayoutTemplate = (theme: SlideTheme): TemplateConfig =>
           margin: { left: 30, right: 30, top: 0, bottom: 40 },
         },
         padding: { top: 0, bottom: 0, left: 0, right: 0 },
-        distribution: 'space-between',
-        spacingBetweenItems: 20,
-        horizontalAlignment: 'center',
-        verticalAlignment: 'top',
-        orientation: 'vertical',
+        layout: {
+          distribution: 'space-between',
+          spacingBetweenItems: 20,
+          horizontalAlignment: 'center',
+          verticalAlignment: 'top',
+          orientation: 'vertical',
+        },
         childTemplate: {
           count: 'auto',
           wrap: {
@@ -54,11 +60,14 @@ export const getTwoColumnLayoutTemplate = (theme: SlideTheme): TemplateConfig =>
             alternating: true,
           },
           structure: {
+            type: 'text' as const,
             label: 'item',
             padding: { top: 0, bottom: 0, left: 0, right: 0 },
-            distribution: 'equal',
-            horizontalAlignment: 'left',
-            verticalAlignment: 'top',
+            layout: {
+              distribution: 'equal',
+              horizontalAlignment: 'left',
+              verticalAlignment: 'top',
+            },
             text: {
               color: theme.fontColor,
               fontFamily: theme.fontName,
@@ -83,6 +92,7 @@ export const getHorizontalListLayoutTemplateOneRow = (theme: SlideTheme): Templa
   return {
     containers: {
       title: {
+        type: 'text' as const,
         bounds: {
           left: 15,
           top: 15,
@@ -90,8 +100,10 @@ export const getHorizontalListLayoutTemplateOneRow = (theme: SlideTheme): Templa
           height: 100,
         },
         padding: { top: 0, bottom: 0, left: 40, right: 40 },
-        horizontalAlignment: 'center',
-        verticalAlignment: 'top',
+        layout: {
+          horizontalAlignment: 'center',
+          verticalAlignment: 'top',
+        },
         text: {
           color: theme.titleFontColor,
           fontFamily: theme.titleFontName,
@@ -100,6 +112,7 @@ export const getHorizontalListLayoutTemplateOneRow = (theme: SlideTheme): Templa
         },
       },
       content: {
+        type: 'block' as const,
         bounds: {
           left: 60,
           top: 140,
@@ -107,13 +120,16 @@ export const getHorizontalListLayoutTemplateOneRow = (theme: SlideTheme): Templa
           height: SLIDE_HEIGHT - 155 - 40,
         },
         padding: { top: 0, bottom: 0, left: 0, right: 0 },
-        distribution: 'space-around',
-        horizontalAlignment: 'center',
-        verticalAlignment: 'center',
-        orientation: 'horizontal',
+        layout: {
+          distribution: 'space-around',
+          horizontalAlignment: 'center',
+          verticalAlignment: 'center',
+          orientation: 'horizontal',
+        },
         childTemplate: {
           count: 'auto',
           structure: {
+            type: 'text' as const,
             label: 'item',
             text: {
               color: theme.fontColor,
@@ -151,7 +167,10 @@ export const convertTwoColumnLayout = async (
     }
   );
 
-  const itemInstances = LayoutPrimitives.recursivelyGetAllLabelInstances(contentInstance, 'item');
+  const itemInstances = LayoutPrimitives.recursivelyGetAllLabelInstances(
+    contentInstance,
+    'item'
+  ) as TextLayoutBlockInstance[];
   const contentElements = elements['item'] || [];
 
   const itemElements = contentElements

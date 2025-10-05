@@ -124,7 +124,7 @@ const handleInputMark = (e: Event) => {
 
 <style lang="scss" scoped>
 .slide-toolbar {
-  height: 230px;
+  height: 230px; // fixed height of the toolbar for all mobile size, scroll when overflow
   background-color: #fff;
   box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.1);
   display: flex;

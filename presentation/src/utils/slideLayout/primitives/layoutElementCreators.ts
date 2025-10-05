@@ -29,11 +29,7 @@ export function createTextElement(content: string, container: TextLayoutBlockIns
   // Create initial text element with default styling
   const initialElement = createHTMLElement(content, {
     fontSize: 32, // Initial size for optimization
-    lineHeight: 1.2,
-    fontFamily: container.text?.fontFamily || 'Arial',
-    color: container.text?.color || '#000000',
-    textAlign: container.text?.textAlign || 'left',
-    fontWeight: container.text?.fontWeight || 'normal',
+    ...container.text,
   });
 
   // Calculate optimal font size for the content to fit within bounds
@@ -45,7 +41,7 @@ export function createTextElement(content: string, container: TextLayoutBlockIns
   );
 
   // Apply the calculated font size to the element
-  applyFontSizeToElement(initialElement, optimalFontSize, 1.2);
+  applyFontSizeToElement(initialElement, optimalFontSize, container.text?.lineHeight || 1.4);
 
   // Measure the element with optimized font size
   const dimensions = measureElementWithStyle(initialElement, container);
@@ -90,10 +86,7 @@ export async function createItemElementsWithStyles(
   const tempItemElements = items.map((item) =>
     createHTMLElement(item, {
       fontSize: 20, // Initial size for optimization
-      lineHeight: 1.4,
-      fontFamily: container.text?.fontFamily || 'Arial',
-      color: container.text?.color || '#000000',
-      textAlign: container.text?.textAlign || 'left',
+      ...container.text,
     })
   );
 
@@ -113,20 +106,12 @@ export async function createItemElementsWithStyles(
   const itemStyles = {
     fontSize: finalFontSize,
     lineHeight: finalLineHeight,
-    fontFamily: container.text?.fontFamily || 'Arial',
-    color: container.text?.color || '#000000',
-    textAlign: container.text?.textAlign || 'left',
+    ...container.text,
   };
 
   // Pre-calculate all item dimensions using the unified styles
   const itemContentsAndDimensions = items.map((item) => {
-    const itemElement = createHTMLElement(item, {
-      fontSize: itemStyles.fontSize,
-      lineHeight: itemStyles.lineHeight,
-      fontFamily: itemStyles.fontFamily,
-      color: itemStyles.color,
-      textAlign: itemStyles.textAlign,
-    });
+    const itemElement = createHTMLElement(item, itemStyles);
     const itemDimensions = measureElementForBlock(
       itemElement,
       container.bounds.width,
@@ -175,18 +160,12 @@ export async function createTextElementsWithUnifiedStyles(
   const itemStyles = {
     fontSize: finalFontSize,
     lineHeight: finalLineHeight,
-    fontFamily: container.text?.fontFamily || 'Arial',
-    color: container.text?.color || '#000000',
+    ...container.text,
   };
 
   // Pre-calculate all item dimensions using the unified styles
   const itemContentsAndDimensions = items.map((item) => {
-    const itemElement = createHTMLElement(item, {
-      fontSize: itemStyles.fontSize,
-      lineHeight: itemStyles.lineHeight,
-      fontFamily: itemStyles.fontFamily,
-      color: itemStyles.color,
-    });
+    const itemElement = createHTMLElement(item, itemStyles);
     const itemDimensions = measureElementForBlock(
       itemElement,
       container.bounds.width,

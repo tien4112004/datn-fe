@@ -58,9 +58,9 @@ export function calculateUnifiedFontSizeForLabels(
   elements: HTMLElement[],
   containers: TextLayoutBlockInstance[],
   type: 'title' | 'content' | 'label' = 'content'
-): { fontSize: number; lineHeight: number } {
+): { fontSize: number } {
   if (elements.length === 0 || containers.length === 0 || elements.length !== containers.length) {
-    return { fontSize: 16, lineHeight: 1.4 };
+    return { fontSize: 16 };
   }
 
   // Calculate optimal font size for each element independently
@@ -82,11 +82,9 @@ export function calculateUnifiedFontSizeForLabels(
 
   // Take minimum size (most constrained)
   const minFontSize = Math.min(...fontSizes);
-  const lineHeight = type === 'label' ? 1.2 : 1.4;
 
   return {
     fontSize: minFontSize,
-    lineHeight,
   };
 }
 

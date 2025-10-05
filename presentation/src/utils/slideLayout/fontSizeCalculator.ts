@@ -24,27 +24,22 @@ export function calculateLargestOptimalFontSize(
   element: HTMLElement,
   availableWidth: number,
   availableHeight: number,
-  role: 'title' | 'content' | 'label' = 'content'
+  role: 'title' | 'content' | 'label' = 'content',
+  lineHeight: number = 1.4
 ): number {
   // Role-specific configurations
   const config = {
     title: {
       minSize: 18,
       maxSize: 48,
-      maxLines: 3,
-      lineHeight: 1.2,
     },
     content: {
       minSize: 12,
       maxSize: 28,
-      maxLines: 10,
-      lineHeight: 1.4,
     },
     label: {
       minSize: 10,
       maxSize: 24,
-      maxLines: 2,
-      lineHeight: 1.2,
     },
   }[role];
 
@@ -57,7 +52,7 @@ export function calculateLargestOptimalFontSize(
   while (fontSize >= config.minSize) {
     // Update the cloned element's font size for testing
     updateElementFontSize(clonedElement, fontSize);
-    updateElementLineHeight(clonedElement, config.lineHeight);
+    updateElementLineHeight(clonedElement, lineHeight);
 
     // Measure the element with updated styling
     const measured = measureElement(clonedElement, {
@@ -110,12 +105,7 @@ export function calculateFontSizeForAvailableSpace(
   let optimalFontSize = 28;
 
   for (const element of clonedElements) {
-    const itemFontSize = calculateLargestOptimalFontSize(
-      element,
-      availableWidth,
-      avgHeightPerItem,
-      'content'
-    );
+    const itemFontSize = calculateLargestOptimalFontSize(element, availableWidth, avgHeightPerItem);
     optimalFontSize = Math.min(optimalFontSize, itemFontSize);
   }
 
@@ -177,8 +167,7 @@ export function calculateFontSizeForAvailableSpace(
 
 export const calculateUnifiedFontSizeForBlocks = (
   items: HTMLElement[],
-  containers: TextLayoutBlockInstance[],
-  type?: 'title' | 'content' | 'label'
+  containers: TextLayoutBlockInstance[]
 ): { fontSize: number; lineHeight: number } => {
   if (items.length === 0 || containers.length === 0 || items.length !== containers.length) {
     return { fontSize: 16, lineHeight: 1.4 };
@@ -194,8 +183,7 @@ export const calculateUnifiedFontSizeForBlocks = (
     const optimalFontSize = calculateLargestOptimalFontSize(
       item,
       container.bounds.width,
-      container.bounds.height,
-      type
+      container.bounds.height
     );
 
     blockFontSizes.push({

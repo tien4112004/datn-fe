@@ -184,7 +184,6 @@ const LayoutProBuilder = {
       allElements[label] = labelData.map((item) => {
         return createElement(item, {
           fontSize: fontSizes[label],
-          lineHeight: label === 'label' ? 1.2 : 1.4,
           ...instances[0].text,
         });
       });
@@ -296,12 +295,11 @@ const LayoutProBuilder = {
     label: string,
     instances: TextLayoutBlockInstance[],
     labelData: string[]
-  ): { fontSize: number; lineHeight: number } {
+  ): { fontSize: number } {
     // Create HTML elements for font size calculation
     const elements = labelData.map((item) => {
       return createElement(item, {
         fontSize: 16,
-        lineHeight: 1.4,
         ...instances[0].text,
       });
     });

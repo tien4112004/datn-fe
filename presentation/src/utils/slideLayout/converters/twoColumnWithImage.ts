@@ -52,11 +52,6 @@ export const getTwoColumnWithImageLayoutTemplate = (theme: SlideTheme): Template
           fontStyle: 'normal',
           textAlign: 'center',
         },
-        border: {
-          width: 1,
-          color: theme.themeColors[0],
-          radius: 50,
-        },
       },
       image: {
         type: 'image',
@@ -91,7 +86,7 @@ export const getTwoColumnWithImageLayoutTemplate = (theme: SlideTheme): Template
             },
             border: {
               width: 1,
-              color: theme.themeColors[1],
+              color: theme.themeColors[0],
             },
             text: {
               color: theme.fontColor,
@@ -167,8 +162,15 @@ export const getTwoColumnBigImageLayoutTemplate = (theme: SlideTheme): TemplateC
       },
       content: {
         type: 'block',
-        bounds: contentBounds,
-        padding: { top: 0, bottom: 0, left: 40, right: 0 },
+        positioning: {
+          relativeTo: 'title',
+          axis: 'vertical',
+          anchor: 'end',
+          offset: 20,
+          size: 'fill',
+          margin: { left: 30, right: 30, top: 0, bottom: 40 },
+        },
+        padding: { top: 0, bottom: 0, left: 40, right: 40 },
         layout: {
           distribution: 'equal',
           spacingBetweenItems: 20,
@@ -180,22 +182,28 @@ export const getTwoColumnBigImageLayoutTemplate = (theme: SlideTheme): TemplateC
           count: 'auto',
           structure: {
             type: 'text',
-            label: 'item',
-            padding: { top: 0, bottom: 0, left: 0, right: 0 },
             layout: {
               horizontalAlignment: 'left',
               verticalAlignment: 'top',
             },
+            padding: { top: 0, bottom: 0, left: 40, right: 40 },
             border: {
               width: 1,
-              color: theme.themeColors[1],
+              color: theme.themeColors[0],
             },
-            text: {
-              color: theme.fontColor,
-              fontFamily: theme.fontName,
-              fontWeight: 'normal',
-              fontStyle: 'normal',
-            },
+            children: [
+              {
+                label: 'item',
+                type: 'text',
+                text: {
+                  color: theme.fontColor,
+                  fontFamily: theme.fontName,
+                  fontWeight: 'normal',
+                  fontStyle: 'normal',
+                  lineHeight: 1.4,
+                },
+              },
+            ],
           },
         },
       },
@@ -211,9 +219,15 @@ export const convertTwoColumnWithImageLayout = async (
 ): Promise<Slide> => {
   // Content container - use unified font sizing
   const contentContainer = template.containers.content;
+
+  const resolvedBounds = LayoutPrimitives.resolveContainerPositions(template.containers, {
+    width: SLIDE_WIDTH,
+    height: SLIDE_HEIGHT,
+  });
+
   const { instance: contentInstance, elements } = LayoutProBuilder.buildLayoutWithUnifiedFontSizing(
     contentContainer,
-    contentContainer.bounds!,
+    resolvedBounds.content,
     {
       item: data.data.items,
     }

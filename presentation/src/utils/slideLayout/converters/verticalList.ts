@@ -30,6 +30,7 @@ export const getVerticalListLayoutTemplate = (theme: SlideTheme): TemplateConfig
           fontFamily: theme.titleFontName,
           fontWeight: 'bold',
           fontStyle: 'normal',
+          textAlign: 'center',
         },
       },
       content: {
@@ -43,7 +44,7 @@ export const getVerticalListLayoutTemplate = (theme: SlideTheme): TemplateConfig
           size: 'fill',
           margin: { left: 30, right: 30, top: 0, bottom: 40 },
         },
-        padding: { top: 0, bottom: 0, left: 0, right: 0 },
+        padding: { top: 0, bottom: 0, left: 50, right: 50 },
         layout: {
           distribution: 'space-between',
           spacingBetweenItems: 20,

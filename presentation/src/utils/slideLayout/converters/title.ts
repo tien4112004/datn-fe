@@ -1,4 +1,4 @@
-import type { Slide, SlideTheme } from '@/types/slides';
+import type { Slide, SlideTheme, PPTTextElement, PPTLineElement } from '@/types/slides';
 import type { TitleLayoutSchema, TransitionLayoutSchema } from './types';
 import type { Bounds, TextLayoutBlockInstance, TemplateConfig, TextTemplateContainer } from '../types';
 import LayoutPrimitives from '../layoutPrimitives';
@@ -86,11 +86,6 @@ export const convertTitleLayout = async (
     bounds: resolvedBounds.subtitle,
   } as TextLayoutBlockInstance;
 
-  const { titleContent, titleDimensions, titlePosition } = LayoutPrimitives.calculateTitleLayout(
-    data.data.title,
-    titleInstance
-  );
-
   const elements = [
     ...LayoutProBuilder.buildTitle(data.data.title, template.containers.title, template.theme),
   ];
@@ -104,10 +99,11 @@ export const convertTitleLayout = async (
 
   // If no subtitle, recenter the title vertically
   if (!hasSubtitle) {
-    const centeredTop = (SLIDE_HEIGHT - titleDimensions.height) / 2;
-    const diff = centeredTop - titlePosition.top;
-    elements[0].top += diff / 2;
-    elements[1].top += diff / 2;
+    const titleElement = elements[0] as PPTTextElement;
+    const centeredTop = (SLIDE_HEIGHT - titleElement.height) / 2;
+    const diff = centeredTop - titleElement.top;
+    titleElement.top += diff / 2;
+    (elements[1] as PPTLineElement).top += diff / 2;
   }
 
   const slide: Slide = {

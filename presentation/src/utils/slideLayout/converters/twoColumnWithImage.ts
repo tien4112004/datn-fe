@@ -44,9 +44,9 @@ export const getTwoColumnWithImageLayoutTemplate = (theme: SlideTheme): Template
 
   const contentBounds: Bounds = {
     left: columns[1].left,
-    top: columns[1].top + 120,
+    top: columns[1].top + 140,
     width: columns[1].width,
-    height: columns[1].height - 120,
+    height: columns[1].height - 180,
   };
 
   return {

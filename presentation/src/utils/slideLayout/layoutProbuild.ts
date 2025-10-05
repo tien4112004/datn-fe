@@ -35,24 +35,19 @@ const LayoutProBuilder = {
       bounds: config.bounds,
     } as TextLayoutBlockInstance;
 
-    const { titleElement, titleDimensions, titlePosition } = LayoutPrimitives.calculateTitleLayout(
-      title,
-      titleInstance
-    );
-
-    titleInstance.bounds = {
-      ...titleDimensions,
-      ...titlePosition,
-    };
+    const titleElement = LayoutPrimitives.createTextElement(title, titleInstance, {
+      minSize: 18,
+      maxSize: 48,
+    });
 
     return [
-      LayoutPrimitives.createTextPPTElement(titleElement, titleInstance),
+      titleElement,
       LayoutPrimitives.createTitleLine(
         {
-          width: titleDimensions.width,
-          height: titleDimensions.height,
-          left: titlePosition.left,
-          top: titlePosition.top,
+          width: titleElement.width,
+          height: titleElement.height,
+          left: titleElement.left,
+          top: titleElement.top,
         } as Bounds,
         theme
       ),
@@ -304,12 +299,11 @@ const LayoutProBuilder = {
       });
     });
 
+    // Determine font size range based on label type
+    const fontSizeRange = label === 'label' ? { minSize: 10, maxSize: 24 } : { minSize: 12, maxSize: 28 };
+
     // Calculate unified font size for this group
-    return LayoutPrimitives.calculateUnifiedFontSizeForLabels(
-      elements,
-      instances,
-      label === 'label' ? 'label' : 'content'
-    );
+    return LayoutPrimitives.calculateUnifiedFontSizeForLabels(elements, instances, fontSizeRange);
   },
 
   /**

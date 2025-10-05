@@ -6,8 +6,8 @@
 export * from './primitives/layoutConstants';
 
 // Re-export from layoutCalculations
-import { calculateTitleLayout, calculateUnifiedFontSizeForLabels } from './primitives/layoutCalculations';
-export { calculateTitleLayout, calculateUnifiedFontSizeForLabels } from './primitives/layoutCalculations';
+import { calculateUnifiedFontSizeForLabels } from './primitives/layoutCalculations';
+export { calculateUnifiedFontSizeForLabels } from './primitives/layoutCalculations';
 
 // Re-export from layoutPositioning
 import {
@@ -77,7 +77,6 @@ export { createTextElement as createElement };
 
 const LayoutPrimitives = {
   // From layoutCalculations
-  calculateTitleLayout,
   calculateUnifiedFontSizeForLabels,
 
   // From layoutPositioning
@@ -91,6 +90,7 @@ const LayoutPrimitives = {
 
   // From layoutElementCreators
   createElement: createTextElement,
+  createTextElement,
   createItemElementsWithStyles,
   createTextElementsWithUnifiedStyles,
   createImageElement,

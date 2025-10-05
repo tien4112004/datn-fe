@@ -13,6 +13,7 @@ import {
   applyFontSizeToElement,
   calculateFontSizeForAvailableSpace,
   applyFontSizeToElements,
+  type FontSizeRange,
 } from '../fontSizeCalculator';
 import { measureElementForBlock, measureElementWithStyle } from '../elementMeasurement';
 import { createElement as createHTMLElement } from '../htmlTextCreation';
@@ -25,7 +26,11 @@ import { layoutItemsInBlock } from './layoutPositioning';
 /**
  * Create a text element with optimal font sizing
  */
-export function createTextElement(content: string, container: TextLayoutBlockInstance): PPTTextElement {
+export function createTextElement(
+  content: string,
+  container: TextLayoutBlockInstance,
+  fontSizeRange?: FontSizeRange
+): PPTTextElement {
   // Create initial text element with default styling
   const initialElement = createHTMLElement(content, {
     fontSize: 32, // Initial size for optimization
@@ -37,7 +42,7 @@ export function createTextElement(content: string, container: TextLayoutBlockIns
     initialElement,
     container.bounds.width,
     container.bounds.height,
-    'content'
+    fontSizeRange
   );
 
   // Apply the calculated font size to the element
@@ -60,7 +65,6 @@ export function createTextElement(content: string, container: TextLayoutBlockIns
     top: position.top,
     width: dimensions.width,
     height: dimensions.height,
-    textType: 'content',
     outline: container.border
       ? {
           color: container.border.color,

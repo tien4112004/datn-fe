@@ -8,6 +8,11 @@ export interface FontSizeCalculationResult {
   spacing: number;
 }
 
+export interface FontSizeRange {
+  minSize: number;
+  maxSize: number;
+}
+
 export function applyFontSizeToElements(elements: HTMLElement[], result: FontSizeCalculationResult): void {
   elements.forEach((element) => {
     updateElementFontSize(element, result.fontSize);
@@ -24,32 +29,16 @@ export function calculateLargestOptimalFontSize(
   element: HTMLElement,
   availableWidth: number,
   availableHeight: number,
-  role: 'title' | 'content' | 'label' = 'content',
+  fontSizeRange: FontSizeRange = { minSize: 12, maxSize: 28 },
   lineHeight: number = 1.4
 ): number {
-  // Role-specific configurations
-  const config = {
-    title: {
-      minSize: 18,
-      maxSize: 48,
-    },
-    content: {
-      minSize: 12,
-      maxSize: 28,
-    },
-    label: {
-      minSize: 10,
-      maxSize: 24,
-    },
-  }[role];
-
   const clonedElement = element.cloneNode(true) as HTMLElement;
 
   // Start from max size and work down
-  let fontSize = config.maxSize;
-  let optimalSize = config.minSize;
+  let fontSize = fontSizeRange.maxSize;
+  let optimalSize = fontSizeRange.minSize;
 
-  while (fontSize >= config.minSize) {
+  while (fontSize >= fontSizeRange.minSize) {
     // Update the cloned element's font size for testing
     updateElementFontSize(clonedElement, fontSize);
     updateElementLineHeight(clonedElement, lineHeight);

@@ -647,3 +647,24 @@ export function getColumnsLayout(columnWidths: number[]): Bounds[] {
 
   return columns;
 }
+
+/**
+ * Resolve all container positions and return containers with absolute bounds
+ */
+export function resolveTemplateContainers<T extends Record<string, any>>(
+  containers: T,
+  viewport: SlideViewport
+): Record<keyof T, T[keyof T] & { bounds: Bounds }> {
+  // Resolve all bounds (expressions + relative positioning)
+  const resolvedBounds = resolveContainerPositions(containers, viewport);
+
+  const resolvedContainers: Record<keyof T, T[keyof T] & { bounds: Bounds }> = {} as any;
+  for (const id in containers) {
+    resolvedContainers[id] = {
+      ...containers[id],
+      bounds: resolvedBounds[id],
+    };
+  }
+
+  return resolvedContainers;
+}

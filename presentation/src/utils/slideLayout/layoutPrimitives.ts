@@ -19,6 +19,7 @@ import {
   resolveContainerPositions,
   calculateBoundsFromPositioning,
   getColumnsLayout,
+  resolveTemplateContainers,
 } from './primitives/layoutPositioning';
 export {
   getChildrenMaxBounds,
@@ -28,6 +29,7 @@ export {
   recursivelyGetAllLabelInstances,
   resolveContainerPositions,
   calculateBoundsFromPositioning,
+  resolveTemplateContainers,
 } from './primitives/layoutPositioning';
 
 // Re-export from layoutElementCreators
@@ -87,6 +89,7 @@ const LayoutPrimitives = {
   recursivelyGetAllLabelInstances,
   resolveContainerPositions,
   calculateBoundsFromPositioning,
+  resolveTemplateContainers,
 
   // From layoutElementCreators
   createElement: createTextElement,

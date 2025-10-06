@@ -1,46 +1,10 @@
 export * from './types';
 
-export * from './twoColumn';
-export * from './twoColumnWithImage';
-export * from './title';
-export * from './tableOfContents';
-export * from './mainImage';
-export * from './verticalList';
-export * from './horizontalList';
-
 // Helper utilities
-import type { TemplateConfig, TemplateContainerConfig, TextLayoutBlockInstance } from '../types';
+import type { TemplateConfig, TextLayoutBlockInstance } from '../types';
 import type { PPTTextElement, Slide } from '@/types/slides';
 import LayoutPrimitives from '../layoutPrimitives';
 import LayoutProBuilder from '../layoutProbuild';
-
-const SLIDE_WIDTH = 1000;
-const SLIDE_HEIGHT = 562.5;
-
-/**
- * Resolve all container positions and return containers with absolute bounds
- */
-export function resolveTemplateContainers(template: TemplateConfig): Record<string, TemplateContainerConfig> {
-  // Resolve all bounds (expressions + relative positioning)
-  const resolvedBounds = LayoutPrimitives.resolveContainerPositions(template.containers, {
-    width: SLIDE_WIDTH,
-    height: SLIDE_HEIGHT,
-  });
-
-  const resolvedContainers: Record<string, TemplateContainerConfig> = {};
-  for (const [id, container] of Object.entries(template.containers)) {
-    resolvedContainers[id] = {
-      ...container,
-      bounds: resolvedBounds[id],
-    };
-  }
-
-  return resolvedContainers;
-}
-
-// ============================================================================
-// Generic Converter System
-// ============================================================================
 
 /**
  * Mapped layout data structure that normalizes all layout schemas
@@ -79,9 +43,9 @@ export async function convertLayoutGeneric<T = any>(
   const mappedData = mapData(data);
 
   // Resolve all container bounds (expressions + relative positioning)
-  const resolvedBounds = LayoutPrimitives.resolveContainerPositions(template.containers, {
-    width: SLIDE_WIDTH,
-    height: SLIDE_HEIGHT,
+  const resolvedContainers = LayoutPrimitives.resolveTemplateContainers(template.containers, {
+    width: template.viewport.width,
+    height: template.viewport.height,
   });
 
   const allElements: any[] = [];
@@ -90,7 +54,7 @@ export async function convertLayoutGeneric<T = any>(
   // Process block containers with labeled children
   if (mappedData.blocks) {
     for (const [containerId, labelData] of Object.entries(mappedData.blocks)) {
-      const container = template.containers[containerId];
+      const container = resolvedContainers[containerId];
       if (!container || container.type !== 'block') {
         continue;
       }
@@ -98,7 +62,7 @@ export async function convertLayoutGeneric<T = any>(
       // Build layout with unified font sizing
       const { instance, elements } = LayoutProBuilder.buildLayoutWithUnifiedFontSizing(
         container,
-        resolvedBounds[containerId],
+        container.bounds,
         labelData
       );
 
@@ -137,17 +101,20 @@ export async function convertLayoutGeneric<T = any>(
   // Process simple text containers (like titles)
   if (mappedData.texts) {
     for (const [containerId, textContent] of Object.entries(mappedData.texts)) {
-      const container = template.containers[containerId];
+      const container = resolvedContainers[containerId];
       if (!container || container.type !== 'text') {
         continue;
       }
 
-      // Use buildTitle for title-like elements
-      const textElements = LayoutProBuilder.buildTitle(
-        textContent,
-        { ...container, bounds: resolvedBounds[containerId] },
-        template.theme
-      );
+      // Skip optional containers with missing data
+      if (container.optional && !textContent) {
+        continue;
+      }
+
+      const instance = container as TextLayoutBlockInstance;
+
+      // Always use buildTitle for text containers
+      const textElements = LayoutProBuilder.buildTitle(textContent, instance, template.theme);
 
       allElements.push(...textElements);
     }
@@ -157,15 +124,12 @@ export async function convertLayoutGeneric<T = any>(
   const imageElements: any[] = [];
   if (mappedData.images) {
     for (const [containerId, imageSrc] of Object.entries(mappedData.images)) {
-      const container = template.containers[containerId];
+      const container = resolvedContainers[containerId];
       if (!container || container.type !== 'image') {
         continue;
       }
 
-      const imageElement = await LayoutProBuilder.buildImageElement(imageSrc, {
-        ...container,
-        bounds: resolvedBounds[containerId],
-      });
+      const imageElement = await LayoutProBuilder.buildImageElement(imageSrc, container);
       imageElements.push(imageElement);
     }
   }

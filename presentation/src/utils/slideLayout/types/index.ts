@@ -1,4 +1,8 @@
 import type { PPTElement, PPTElementShadow, SlideTheme } from '@/types/slides';
+import type { BoundsExpression } from './expressions';
+
+// Export expression types
+export * from './expressions';
 
 // ============================================================================
 // Base Types
@@ -126,15 +130,15 @@ export type SlideLayoutBlockConfig =
 // ============================================================================
 
 export interface TextTemplateContainer extends TextLayoutBlockConfig {
-  bounds?: Bounds; // Absolute positioning (higher priority)
+  bounds?: Bounds | BoundsExpression; // Absolute positioning (higher priority) - can be computed or expression
   positioning?: RelativePositioning; // Relative positioning (lower priority)
 }
 export interface ImageTemplateContainer extends ImageLayoutBlockConfig {
-  bounds?: Bounds; // Absolute positioning (higher priority)
+  bounds?: Bounds | BoundsExpression; // Absolute positioning (higher priority) - can be computed or expression
   positioning?: RelativePositioning; // Relative positioning (lower priority)
 }
 export interface NonTextTemplateContainer extends NonTextLayoutBlockConfig {
-  bounds?: Bounds; // Absolute positioning (higher priority)
+  bounds?: Bounds | BoundsExpression; // Absolute positioning (higher priority) - can be computed or expression
   positioning?: RelativePositioning; // Relative positioning (lower priority)
 }
 export type TemplateContainerConfig =

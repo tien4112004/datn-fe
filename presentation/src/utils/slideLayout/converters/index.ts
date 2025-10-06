@@ -21,13 +21,13 @@ const SLIDE_HEIGHT = 562.5;
  * Resolve all container positions and return containers with absolute bounds
  */
 export function resolveTemplateContainers(template: TemplateConfig): Record<string, TemplateContainerConfig> {
+  // Resolve all bounds (expressions + relative positioning)
   const resolvedBounds = LayoutPrimitives.resolveContainerPositions(template.containers, {
     width: SLIDE_WIDTH,
     height: SLIDE_HEIGHT,
   });
 
   const resolvedContainers: Record<string, TemplateContainerConfig> = {};
-
   for (const [id, container] of Object.entries(template.containers)) {
     resolvedContainers[id] = {
       ...container,
@@ -78,7 +78,7 @@ export async function convertLayoutGeneric<T = any>(
 ): Promise<Slide> {
   const mappedData = mapData(data);
 
-  // Resolve all container positions (handles both absolute and relative positioning)
+  // Resolve all container bounds (expressions + relative positioning)
   const resolvedBounds = LayoutPrimitives.resolveContainerPositions(template.containers, {
     width: SLIDE_WIDTH,
     height: SLIDE_HEIGHT,

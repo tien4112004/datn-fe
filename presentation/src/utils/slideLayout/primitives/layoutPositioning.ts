@@ -8,9 +8,11 @@ import type {
   RelativePositioning,
   SlideViewport,
   ChildLayoutConfig,
+  BoundsExpression,
 } from '../types';
 import { measureElement } from '../elementMeasurement';
 import { DEFAULT_SPACING_BETWEEN_ITEMS } from './layoutConstants';
+import { resolveTemplateBounds } from '../expressionResolver';
 
 /**
  * Calculate parent bounds that would fit all children with the given layout configuration
@@ -463,18 +465,36 @@ export function recursivelyGetAllLabelInstances(
  * 2. Otherwise use positioning (relative positioning)
  */
 export function resolveContainerPositions(
-  containers: Record<string, { bounds?: Bounds; positioning?: RelativePositioning }>,
+  containers: Record<string, { bounds?: Bounds | BoundsExpression; positioning?: RelativePositioning }>,
   viewport: SlideViewport
 ): Record<string, Bounds> {
-  const resolved: Record<string, Bounds> = {};
-  const pending = new Set(Object.keys(containers));
+  // STEP 1: Resolve expression-based bounds first
+  const resolvedExpressionBounds = resolveTemplateBounds(containers, {
+    SLIDE_WIDTH: viewport.width,
+    SLIDE_HEIGHT: viewport.height,
+  });
 
-  // Process containers in dependency order
+  // STEP 2: Create containers with resolved expression bounds
+  const containersWithResolvedExpressions: Record<
+    string,
+    { bounds?: Bounds; positioning?: RelativePositioning }
+  > = {};
+  for (const [id, container] of Object.entries(containers)) {
+    containersWithResolvedExpressions[id] = {
+      ...container,
+      bounds: resolvedExpressionBounds[id] || (container.bounds as Bounds),
+    };
+  }
+
+  // STEP 3: Process remaining relative positioning
+  const resolved: Record<string, Bounds> = {};
+  const pending = new Set(Object.keys(containersWithResolvedExpressions));
+
   while (pending.size > 0) {
     let madeProgress = false;
 
     for (const id of pending) {
-      const container = containers[id];
+      const container = containersWithResolvedExpressions[id];
 
       // PRIORITY 1: Use absolute bounds if specified
       if (container.bounds) {

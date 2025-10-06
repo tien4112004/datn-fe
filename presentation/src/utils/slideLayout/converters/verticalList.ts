@@ -1,24 +1,21 @@
 import type { Slide, SlideTheme } from '@/types/slides';
 import type { VerticalListLayoutSchema } from './types';
-import type { Bounds, TemplateConfig } from '../types';
+import type { BoundsExpression, TemplateConfig } from '../types';
 import { convertLayoutGeneric } from './index';
 
-const SLIDE_WIDTH = 1000;
-const SLIDE_HEIGHT = 562.5;
-
 export const getVerticalListLayoutTemplate = (theme: SlideTheme): TemplateConfig => {
-  const titleBounds: Bounds = {
-    left: 0,
-    top: 15,
-    width: SLIDE_WIDTH,
-    height: 120,
-  };
-
   return {
     containers: {
       title: {
         type: 'text' as const,
-        bounds: titleBounds,
+        bounds: {
+          left: 0,
+          top: 15,
+          width: {
+            expr: 'SLIDE_WIDTH',
+          },
+          height: 120,
+        },
         layout: {
           horizontalAlignment: 'center',
           verticalAlignment: 'top',

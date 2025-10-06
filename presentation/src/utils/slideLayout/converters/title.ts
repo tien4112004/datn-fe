@@ -1,6 +1,6 @@
 import type { Slide, SlideTheme, PPTTextElement, PPTLineElement } from '@/types/slides';
 import type { TitleLayoutSchema, TransitionLayoutSchema } from './types';
-import type { Bounds, TextLayoutBlockInstance, TemplateConfig, TextTemplateContainer } from '../types';
+import type { TextLayoutBlockInstance, TemplateConfig, TextTemplateContainer } from '../types';
 import LayoutPrimitives from '../layoutPrimitives';
 import LayoutProBuilder from '../layoutProbuild';
 
@@ -8,18 +8,20 @@ const SLIDE_WIDTH = 1000;
 const SLIDE_HEIGHT = 562.5;
 
 export const getTitleLayoutTemplate = (theme: SlideTheme): TemplateConfig => {
-  const titleBounds: Bounds = {
-    left: 0,
-    top: SLIDE_HEIGHT * 0.28,
-    width: SLIDE_WIDTH,
-    height: 120,
-  };
-
   return {
     containers: {
       title: {
-        type: 'text' as const,
-        bounds: titleBounds,
+        type: 'text',
+        bounds: {
+          left: 0,
+          top: {
+            expr: 'SLIDE_HEIGHT * 0.28',
+          },
+          width: {
+            expr: 'SLIDE_WIDTH',
+          },
+          height: 120,
+        },
         layout: {
           horizontalAlignment: 'center',
           verticalAlignment: 'center',
@@ -33,7 +35,7 @@ export const getTitleLayoutTemplate = (theme: SlideTheme): TemplateConfig => {
         },
       },
       subtitle: {
-        type: 'text' as const,
+        type: 'text',
         positioning: {
           relativeTo: 'title',
           axis: 'vertical',
@@ -67,7 +69,7 @@ export const convertTitleLayout = async (
 ): Promise<Slide> => {
   const hasSubtitle = !!data.data.subtitle;
 
-  // Resolve container positions (handles both absolute and relative positioning)
+  // Resolve all container bounds (expressions + relative positioning)
   const resolvedBounds = LayoutPrimitives.resolveContainerPositions(template.containers, {
     width: SLIDE_WIDTH,
     height: SLIDE_HEIGHT,

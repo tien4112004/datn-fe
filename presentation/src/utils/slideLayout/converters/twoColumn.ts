@@ -3,18 +3,17 @@ import type { TwoColumnLayoutSchema } from './types';
 import type { TemplateConfig } from '../types';
 import { convertLayoutGeneric } from './index';
 
-const SLIDE_WIDTH = 1000;
-const SLIDE_HEIGHT = 562.5;
-
 export const getTwoColumnLayoutTemplate = (theme: SlideTheme): TemplateConfig => {
   return {
     containers: {
       title: {
-        type: 'text' as const,
+        type: 'text',
         bounds: {
           left: 15,
           top: 15,
-          width: SLIDE_WIDTH - 30,
+          width: {
+            expr: 'SLIDE_WIDTH - 30',
+          },
           height: 100,
         },
         layout: {
@@ -30,7 +29,7 @@ export const getTwoColumnLayoutTemplate = (theme: SlideTheme): TemplateConfig =>
         },
       },
       content: {
-        type: 'block' as const,
+        type: 'block',
         // Using relative positioning - positioned below title
         positioning: {
           relativeTo: 'title',
@@ -58,7 +57,7 @@ export const getTwoColumnLayoutTemplate = (theme: SlideTheme): TemplateConfig =>
             alternating: true,
           },
           structure: {
-            type: 'text' as const,
+            type: 'text',
             label: 'item',
             layout: {
               distribution: 'equal',
@@ -89,11 +88,13 @@ export const getHorizontalListLayoutTemplateOneRow = (theme: SlideTheme): Templa
   return {
     containers: {
       title: {
-        type: 'text' as const,
+        type: 'text',
         bounds: {
           left: 15,
           top: 15,
-          width: SLIDE_WIDTH - 30,
+          width: {
+            expr: 'SLIDE_WIDTH - 30',
+          },
           height: 100,
         },
         layout: {
@@ -108,12 +109,16 @@ export const getHorizontalListLayoutTemplateOneRow = (theme: SlideTheme): Templa
         },
       },
       content: {
-        type: 'block' as const,
+        type: 'block',
         bounds: {
           left: 60,
           top: 140,
-          width: SLIDE_WIDTH - 120,
-          height: SLIDE_HEIGHT - 155 - 40,
+          width: {
+            expr: 'SLIDE_WIDTH - 120',
+          },
+          height: {
+            expr: 'SLIDE_HEIGHT - 155 - 40',
+          },
         },
         layout: {
           distribution: 'space-around',
@@ -124,7 +129,7 @@ export const getHorizontalListLayoutTemplateOneRow = (theme: SlideTheme): Templa
         childTemplate: {
           count: 'auto',
           structure: {
-            type: 'text' as const,
+            type: 'text',
             label: 'item',
             text: {
               color: theme.fontColor,

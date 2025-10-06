@@ -1,53 +1,21 @@
 import type { Slide, SlideTheme } from '@/types/slides';
 import type { TwoColumnWithImageLayoutSchema } from './types';
-import type { Bounds, TemplateConfig } from '../types';
+import type { TemplateConfig } from '../types';
 import { convertLayoutGeneric } from './index';
-import LayoutPrimitives from '../layoutPrimitives';
-
-const SLIDE_WIDTH = 1000;
-const SLIDE_HEIGHT = 562.5;
 
 export const getTwoColumnWithImageLayoutTemplate = (theme: SlideTheme): TemplateConfig => {
-  const columns = LayoutPrimitives.getColumnsLayout([50, 50]);
-  const imageDimensions = { width: 400, height: 300 };
-
-  const titleBounds: Bounds = {
-    left: 15,
-    top: 15,
-    width: SLIDE_WIDTH - 30,
-    height: 120,
-  };
-
-  const imagePosition = LayoutPrimitives.layoutItemsInBlock([imageDimensions], {
-    layout: {
-      horizontalAlignment: 'center',
-      verticalAlignment: 'top',
-    },
-    bounds: {
-      left: columns[0].left,
-      top: columns[0].top + 140,
-      width: columns[0].width,
-      height: columns[0].height - 120,
-    },
-  } as any)[0];
-
-  const imageBounds: Bounds = {
-    ...imagePosition,
-    ...imageDimensions,
-  };
-
-  const contentBounds: Bounds = {
-    left: columns[1].left,
-    top: columns[1].top + 140,
-    width: columns[1].width,
-    height: columns[1].height - 180,
-  };
-
   return {
     containers: {
       title: {
         type: 'text',
-        bounds: titleBounds,
+        bounds: {
+          left: 15,
+          top: 15,
+          width: {
+            expr: 'SLIDE_WIDTH - 30',
+          },
+          height: 120,
+        },
         layout: {
           horizontalAlignment: 'center',
           verticalAlignment: 'top',
@@ -62,7 +30,18 @@ export const getTwoColumnWithImageLayoutTemplate = (theme: SlideTheme): Template
       },
       image: {
         type: 'image',
-        bounds: imageBounds,
+        bounds: {
+          width: 400,
+          height: 300,
+          left: {
+            expr: '15 + ((SLIDE_WIDTH - 30) / 2 - 400) / 2',
+          },
+          top: {
+            expr: 'after',
+            relativeTo: 'title',
+            offset: 20,
+          },
+        },
         border: {
           width: 1,
           color: 'transparent',
@@ -71,7 +50,20 @@ export const getTwoColumnWithImageLayoutTemplate = (theme: SlideTheme): Template
       },
       content: {
         type: 'block',
-        bounds: contentBounds,
+        bounds: {
+          left: {
+            expr: '15 + (SLIDE_WIDTH - 30) / 2',
+          },
+          top: {
+            expr: 'image.top',
+          },
+          width: {
+            expr: '(SLIDE_WIDTH - 30) / 2',
+          },
+          height: {
+            expr: 'SLIDE_HEIGHT - image.top - 40',
+          },
+        },
         layout: {
           distribution: 'space-between',
           gap: 20,
@@ -106,40 +98,21 @@ export const getTwoColumnWithImageLayoutTemplate = (theme: SlideTheme): Template
   };
 };
 
-// ============================================================================
-
 export const getTwoColumnBigImageLayoutTemplate = (theme: SlideTheme): TemplateConfig => {
-  // Static column layout: 33/67 split
-  const GAP = 30;
-  const MARGIN = 15;
-  const leftColumnWidth = (SLIDE_WIDTH - 2 * MARGIN - GAP) * 0.33;
-  const rightColumnWidth = (SLIDE_WIDTH - 2 * MARGIN - GAP) * 0.67;
-
-  const leftColumnLeft = MARGIN;
-  const rightColumnLeft = MARGIN + leftColumnWidth + GAP;
-
-  const imageHeight = SLIDE_HEIGHT;
-  const imageWidth = leftColumnWidth;
-
-  const imageBounds: Bounds = {
-    left: 0,
-    top: 0,
-    width: imageWidth,
-    height: imageHeight,
-  };
-
-  const titleBounds: Bounds = {
-    left: rightColumnLeft,
-    top: 15,
-    width: rightColumnWidth,
-    height: 120,
-  };
-
   return {
     containers: {
       title: {
         type: 'text',
-        bounds: titleBounds,
+        bounds: {
+          left: {
+            expr: '15 + image.width + 30',
+          },
+          top: 15,
+          width: {
+            expr: '(SLIDE_WIDTH - 2 * 15 - 30) * 0.67',
+          },
+          height: 120,
+        },
         layout: {
           horizontalAlignment: 'center',
           verticalAlignment: 'top',
@@ -153,7 +126,16 @@ export const getTwoColumnBigImageLayoutTemplate = (theme: SlideTheme): TemplateC
       },
       image: {
         type: 'image',
-        bounds: imageBounds,
+        bounds: {
+          left: 0,
+          top: 0,
+          width: {
+            expr: '(SLIDE_WIDTH - 2 * 15 - 30) * 0.33',
+          },
+          height: {
+            expr: 'SLIDE_HEIGHT',
+          },
+        },
         border: {
           width: 1,
           color: 'transparent',

@@ -9,31 +9,38 @@
     </div>
     <div class="toolbar">
       <ButtonGroup class="row">
-        <Button style="flex: 1" @click="createSlide()"
-          ><IconPlus class="icon" /> {{ $t('mobile.toolbar.slide.newSlide') }}</Button
-        >
-        <Button style="flex: 1" @click="copyAndPasteSlide()"
-          ><IconCopy class="icon" /> {{ $t('mobile.toolbar.slide.copy') }}</Button
-        >
-        <Button style="flex: 1" @click="deleteSlide()"
-          ><IconDelete class="icon" /> {{ $t('mobile.toolbar.slide.delete') }}</Button
-        >
+        <Button style="flex: 1" @click="createSlide()">
+          <IconPlus class="icon" />
+          <!-- {{ $t('mobile.toolbar.slide.newSlide') }} -->
+        </Button>
+        <Button style="flex: 1" @click="copyAndPasteSlide()">
+          <IconCopy class="icon" />
+          <!-- {{ $t('mobile.toolbar.slide.copy') }} -->
+        </Button>
+        <Button style="flex: 1" @click="deleteSlide()">
+          <IconDelete class="icon" />
+          <!-- {{ $t('mobile.toolbar.slide.delete') }} -->
+        </Button>
       </ButtonGroup>
       <ButtonGroup class="row">
-        <Button style="flex: 1" @click="insertTextElement()"
-          ><IconFontSize class="icon" /> {{ $t('mobile.toolbar.slide.text') }}</Button
-        >
+        <Button style="flex: 1" @click="insertTextElement()">
+          <IconFontSize class="icon" />
+          <!-- {{ $t('mobile.toolbar.slide.text') }} -->
+        </Button>
         <Button style="flex: 1">
           <FileInput @change="(files) => insertImageElement(files)">
-            <IconPicture class="icon" />Image
+            <IconPicture class="icon" />
+            <!-- Image -->
           </FileInput>
         </Button>
-        <Button style="flex: 1" @click="insertShapeElement('square')"
-          ><IconSquare class="icon" /> {{ $t('mobile.toolbar.slide.rectangle') }}</Button
-        >
-        <Button style="flex: 1" @click="insertShapeElement('round')"
-          ><IconRound class="icon" /> {{ $t('mobile.toolbar.slide.circle') }}</Button
-        >
+        <Button style="flex: 1" @click="insertShapeElement('square')">
+          <IconSquare class="icon" />
+          <!-- {{ $t('mobile.toolbar.slide.rectangle') }} -->
+        </Button>
+        <Button style="flex: 1" @click="insertShapeElement('round')">
+          <IconRound class="icon" />
+          <!-- {{ $t('mobile.toolbar.slide.circle') }} -->
+        </Button>
       </ButtonGroup>
     </div>
 
@@ -117,7 +124,7 @@ const handleInputMark = (e: Event) => {
 
 <style lang="scss" scoped>
 .slide-toolbar {
-  height: 100%;
+  height: 230px; // fixed height of the toolbar for all mobile size, scroll when overflow
   background-color: #fff;
   box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.1);
   display: flex;

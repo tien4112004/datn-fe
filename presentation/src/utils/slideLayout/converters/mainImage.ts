@@ -1,8 +1,8 @@
 import type { Slide, SlideTheme } from '@/types/slides';
 import type { MainImageLayoutSchema } from './types';
-import type { TextLayoutBlockInstance, TemplateConfig, Bounds } from '../types';
+import type { TemplateConfig, Bounds } from '../types';
+import { convertLayoutGeneric } from './index';
 import LayoutPrimitives from '../layoutPrimitives';
-import LayoutProBuilder from '../layoutProbuild';
 
 const SLIDE_WIDTH = 1000;
 const SLIDE_HEIGHT = 562.5;
@@ -63,20 +63,32 @@ export const getMainImageLayoutTemplate = (theme: SlideTheme): TemplateConfig =>
         bounds: imageBounds,
       },
       content: {
-        type: 'text' as const,
+        type: 'block' as const,
         bounds: contentBounds,
         layout: {
           distribution: 'equal',
           gap: 10,
           horizontalAlignment: 'center',
           verticalAlignment: 'center',
+          orientation: 'vertical',
         },
-        text: {
-          color: theme.fontColor,
-          fontFamily: theme.fontName,
-          fontWeight: 'normal',
-          fontStyle: 'normal',
-          textAlign: 'center',
+        childTemplate: {
+          count: 'auto',
+          structure: {
+            type: 'text' as const,
+            label: 'content',
+            layout: {
+              horizontalAlignment: 'center',
+              verticalAlignment: 'center',
+            },
+            text: {
+              color: theme.fontColor,
+              fontFamily: theme.fontName,
+              fontWeight: 'normal',
+              fontStyle: 'normal',
+              textAlign: 'center',
+            },
+          },
         },
       },
     },
@@ -86,29 +98,16 @@ export const getMainImageLayoutTemplate = (theme: SlideTheme): TemplateConfig =>
 
 export const convertMainImageLayout = async (
   data: MainImageLayoutSchema,
-
   template: TemplateConfig,
   slideId?: string
 ): Promise<Slide> => {
-  // Merge template config with bounds to create instances
-  const contentInstance = {
-    ...template.containers.content,
-    bounds: template.containers.content.bounds,
-  } as TextLayoutBlockInstance;
-
-  const contentElements = await LayoutPrimitives.createItemElementsWithStyles(
-    [data.data.content],
-    contentInstance
+  return convertLayoutGeneric(
+    data,
+    template,
+    (d) => ({
+      blocks: { content: { content: [d.data.content] } },
+      images: { image: d.data.image },
+    }),
+    slideId
   );
-
-  // Create image element
-  const imageElement = await LayoutProBuilder.buildImageElement(data.data.image, template.containers.image);
-
-  const slide: Slide = {
-    id: slideId ?? crypto.randomUUID(),
-    elements: [imageElement, ...contentElements],
-    background: LayoutPrimitives.processBackground(template.theme),
-  };
-
-  return slide;
 };

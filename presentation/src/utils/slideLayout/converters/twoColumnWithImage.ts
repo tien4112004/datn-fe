@@ -1,8 +1,8 @@
-import type { Slide, SlideTheme, PPTTextElement } from '@/types/slides';
+import type { Slide, SlideTheme } from '@/types/slides';
 import type { TwoColumnWithImageLayoutSchema } from './types';
-import type { Bounds, TemplateConfig, TextLayoutBlockInstance } from '../types';
+import type { Bounds, TemplateConfig } from '../types';
+import { convertLayoutGeneric } from './index';
 import LayoutPrimitives from '../layoutPrimitives';
-import LayoutProBuilder from '../layoutProbuild';
 
 const SLIDE_WIDTH = 1000;
 const SLIDE_HEIGHT = 562.5;
@@ -109,12 +109,17 @@ export const getTwoColumnWithImageLayoutTemplate = (theme: SlideTheme): Template
 // ============================================================================
 
 export const getTwoColumnBigImageLayoutTemplate = (theme: SlideTheme): TemplateConfig => {
-  const columns = LayoutPrimitives.getColumnsLayout([33, 67]);
-  const leftColumnBlock = columns[0];
-  const rightColumnBlock = columns[1];
+  // Static column layout: 33/67 split
+  const GAP = 30;
+  const MARGIN = 15;
+  const leftColumnWidth = (SLIDE_WIDTH - 2 * MARGIN - GAP) * 0.33;
+  const rightColumnWidth = (SLIDE_WIDTH - 2 * MARGIN - GAP) * 0.67;
+
+  const leftColumnLeft = MARGIN;
+  const rightColumnLeft = MARGIN + leftColumnWidth + GAP;
 
   const imageHeight = SLIDE_HEIGHT;
-  const imageWidth = leftColumnBlock.width;
+  const imageWidth = leftColumnWidth;
 
   const imageBounds: Bounds = {
     left: 0,
@@ -124,9 +129,9 @@ export const getTwoColumnBigImageLayoutTemplate = (theme: SlideTheme): TemplateC
   };
 
   const titleBounds: Bounds = {
-    left: rightColumnBlock.left,
+    left: rightColumnLeft,
     top: 15,
-    width: rightColumnBlock.width,
+    width: rightColumnWidth,
     height: 120,
   };
 
@@ -210,59 +215,14 @@ export const convertTwoColumnWithImageLayout = async (
   template: TemplateConfig,
   slideId?: string
 ): Promise<Slide> => {
-  // Content container - use unified font sizing
-  const contentContainer = template.containers.content;
-
-  const resolvedBounds = LayoutPrimitives.resolveContainerPositions(template.containers, {
-    width: SLIDE_WIDTH,
-    height: SLIDE_HEIGHT,
-  });
-
-  const { instance: contentInstance, elements } = LayoutProBuilder.buildLayoutWithUnifiedFontSizing(
-    contentContainer,
-    resolvedBounds.content,
-    {
-      item: data.data.items,
-    }
+  return convertLayoutGeneric(
+    data,
+    template,
+    (d) => ({
+      texts: { title: d.title },
+      blocks: { content: { item: d.data.items } },
+      images: { image: d.data.image },
+    }),
+    slideId
   );
-
-  // Get labeled instances for bounds
-  const itemInstances = LayoutPrimitives.recursivelyGetAllLabelInstances(
-    contentInstance,
-    'item'
-  ) as TextLayoutBlockInstance[];
-
-  // Extract elements by label
-  const itemElements = elements['item'] || [];
-
-  // Generate PPT elements from pre-created elements
-  const contentElements = itemElements.map((itemEl, index) => {
-    return {
-      id: crypto.randomUUID(),
-      type: 'text',
-      content: itemEl.outerHTML,
-      defaultFontName: itemInstances[index].text?.fontFamily,
-      defaultColor: itemInstances[index].text?.color,
-      left: itemInstances[index].bounds.left,
-      top: itemInstances[index].bounds.top,
-      width: itemInstances[index].bounds.width,
-      height: itemInstances[index].bounds.height,
-      textType: 'content',
-    } as PPTTextElement;
-  });
-
-  const imageElement = await LayoutProBuilder.buildImageElement(data.data.image, template.containers.image);
-
-  const slide: Slide = {
-    id: slideId ?? crypto.randomUUID(),
-    elements: [
-      ...LayoutProBuilder.buildCards(contentInstance),
-      ...LayoutProBuilder.buildTitle(data.title, template.containers.title, template.theme),
-      imageElement,
-      ...contentElements,
-    ],
-    background: LayoutPrimitives.processBackground(template.theme),
-  };
-
-  return slide;
 };

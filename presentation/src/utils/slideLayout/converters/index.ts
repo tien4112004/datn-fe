@@ -9,8 +9,10 @@ export * from './verticalList';
 export * from './horizontalList';
 
 // Helper utilities
-import type { TemplateConfig, TemplateContainerConfig } from '../types';
+import type { TemplateConfig, TemplateContainerConfig, TextLayoutBlockInstance } from '../types';
+import type { PPTTextElement, Slide } from '@/types/slides';
 import LayoutPrimitives from '../layoutPrimitives';
+import LayoutProBuilder from '../layoutProbuild';
 
 const SLIDE_WIDTH = 1000;
 const SLIDE_HEIGHT = 562.5;
@@ -34,4 +36,146 @@ export function resolveTemplateContainers(template: TemplateConfig): Record<stri
   }
 
   return resolvedContainers;
+}
+
+// ============================================================================
+// Generic Converter System
+// ============================================================================
+
+/**
+ * Mapped layout data structure that normalizes all layout schemas
+ */
+export interface MappedLayoutData {
+  /** Simple text containers (e.g., title, subtitle) - container ID -> text content */
+  texts?: Record<string, string>;
+
+  /** Block containers with labeled children - container ID -> label -> array of content */
+  blocks?: Record<string, Record<string, string[]>>;
+
+  /** Image containers - container ID -> image source */
+  images?: Record<string, string>;
+}
+
+/**
+ * Data mapper function type - converts layout schema to MappedLayoutData
+ */
+export type DataMapper<T = any> = (data: T) => MappedLayoutData;
+
+/**
+ * Generic layout converter - eliminates duplicate conversion logic across all layouts
+ *
+ * @param data - Original layout schema data
+ * @param template - Template configuration with container definitions
+ * @param mapData - Function that maps the schema data to MappedLayoutData format
+ * @param slideId - Optional slide ID (generates UUID if not provided)
+ * @returns Promise<Slide> - The final slide with all elements positioned
+ */
+export async function convertLayoutGeneric<T = any>(
+  data: T,
+  template: TemplateConfig,
+  mapData: DataMapper<T>,
+  slideId?: string
+): Promise<Slide> {
+  const mappedData = mapData(data);
+
+  // Resolve all container positions (handles both absolute and relative positioning)
+  const resolvedBounds = LayoutPrimitives.resolveContainerPositions(template.containers, {
+    width: SLIDE_WIDTH,
+    height: SLIDE_HEIGHT,
+  });
+
+  const allElements: any[] = [];
+  const allCards: any[] = [];
+
+  // Process block containers with labeled children
+  if (mappedData.blocks) {
+    for (const [containerId, labelData] of Object.entries(mappedData.blocks)) {
+      const container = template.containers[containerId];
+      if (!container || container.type !== 'block') {
+        continue;
+      }
+
+      // Build layout with unified font sizing
+      const { instance, elements } = LayoutProBuilder.buildLayoutWithUnifiedFontSizing(
+        container,
+        resolvedBounds[containerId],
+        labelData
+      );
+
+      // Extract cards (border decorations)
+      allCards.push(...LayoutProBuilder.buildCards(instance));
+
+      // For each label, extract instances and create PPT elements
+      for (const [label, _] of Object.entries(labelData)) {
+        const labelInstances = LayoutPrimitives.recursivelyGetAllLabelInstances(
+          instance,
+          label
+        ) as TextLayoutBlockInstance[];
+
+        const labelElements = elements[label] || [];
+
+        // Map to PPT elements
+        const pptElements = labelElements.map((el, index) => ({
+          id: crypto.randomUUID(),
+          type: 'text',
+          content: el.outerHTML,
+          defaultFontName: labelInstances[index].text?.fontFamily,
+          defaultColor: labelInstances[index].text?.color,
+          left: labelInstances[index].bounds.left,
+          top: labelInstances[index].bounds.top,
+          width: labelInstances[index].bounds.width,
+          height: labelInstances[index].bounds.height,
+          textType: 'content',
+          lineHeight: labelInstances[index].text?.lineHeight,
+        })) as PPTTextElement[];
+
+        allElements.push(...pptElements);
+      }
+    }
+  }
+
+  // Process simple text containers (like titles)
+  if (mappedData.texts) {
+    for (const [containerId, textContent] of Object.entries(mappedData.texts)) {
+      const container = template.containers[containerId];
+      if (!container || container.type !== 'text') {
+        continue;
+      }
+
+      // Use buildTitle for title-like elements
+      const textElements = LayoutProBuilder.buildTitle(
+        textContent,
+        { ...container, bounds: resolvedBounds[containerId] },
+        template.theme
+      );
+
+      allElements.push(...textElements);
+    }
+  }
+
+  // Process image containers
+  const imageElements: any[] = [];
+  if (mappedData.images) {
+    for (const [containerId, imageSrc] of Object.entries(mappedData.images)) {
+      const container = template.containers[containerId];
+      if (!container || container.type !== 'image') {
+        continue;
+      }
+
+      const imageElement = await LayoutProBuilder.buildImageElement(imageSrc, {
+        ...container,
+        bounds: resolvedBounds[containerId],
+      });
+      imageElements.push(imageElement);
+    }
+  }
+
+  // Combine all elements in the correct order
+  const slide: Slide = {
+    id: slideId ?? crypto.randomUUID(),
+    elements: [...allCards, ...allElements, ...imageElements],
+    background: LayoutPrimitives.processBackground(template.theme),
+  };
+
+  return slide;
 }

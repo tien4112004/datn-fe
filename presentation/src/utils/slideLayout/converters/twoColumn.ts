@@ -1,8 +1,7 @@
-import type { PPTTextElement, Slide, SlideTheme } from '@/types/slides';
+import type { Slide, SlideTheme } from '@/types/slides';
 import type { TwoColumnLayoutSchema } from './types';
-import type { TextLayoutBlockInstance, TemplateConfig } from '../types';
-import LayoutPrimitives from '../layoutPrimitives';
-import LayoutProBuilder from '../layoutProbuild';
+import type { TemplateConfig } from '../types';
+import { convertLayoutGeneric } from './index';
 
 const SLIDE_WIDTH = 1000;
 const SLIDE_HEIGHT = 562.5;
@@ -146,62 +145,13 @@ export const convertTwoColumnLayout = async (
   template: TemplateConfig,
   slideId?: string
 ): Promise<Slide> => {
-  // Resolve container positions (handles both absolute and relative positioning)
-  const resolvedBounds = LayoutPrimitives.resolveContainerPositions(template.containers, {
-    width: SLIDE_WIDTH,
-    height: SLIDE_HEIGHT,
-  });
-
-  // Content container - use unified font sizing with nested data
-  const contentContainer = { ...template.containers.content, bounds: resolvedBounds.content };
-
-  const { instance: contentInstance, elements } = LayoutProBuilder.buildLayoutWithUnifiedFontSizing(
-    contentContainer,
-    contentContainer.bounds!,
-    {
-      item: [...data.data.items1, ...data.data.items2].map((item) => item),
-    }
+  return convertLayoutGeneric(
+    data,
+    template,
+    (d) => ({
+      texts: { title: d.title },
+      blocks: { content: { item: [...d.data.items1, ...d.data.items2] } },
+    }),
+    slideId
   );
-
-  const itemInstances = LayoutPrimitives.recursivelyGetAllLabelInstances(
-    contentInstance,
-    'item'
-  ) as TextLayoutBlockInstance[];
-  const contentElements = elements['item'] || [];
-
-  const itemElements = contentElements
-    .map((labelEl, index) => {
-      return [
-        {
-          id: crypto.randomUUID(),
-          type: 'text',
-          content: labelEl.outerHTML,
-          defaultFontName: itemInstances[index].text?.fontFamily,
-          defaultColor: itemInstances[index].text?.color,
-          left: itemInstances[index].bounds.left,
-          top: itemInstances[index].bounds.top,
-          width: itemInstances[index].bounds.width,
-          height: itemInstances[index].bounds.height,
-          textType: 'content',
-          lineHeight: itemInstances[index].text?.lineHeight,
-        } as PPTTextElement,
-      ];
-    })
-    .flat();
-
-  const slide: Slide = {
-    id: slideId ?? crypto.randomUUID(),
-    elements: [
-      ...LayoutProBuilder.buildCards(contentInstance),
-      ...LayoutProBuilder.buildTitle(
-        data.title,
-        { ...template.containers.title, bounds: resolvedBounds.title },
-        template.theme
-      ),
-      ...itemElements,
-    ],
-    background: LayoutPrimitives.processBackground(template.theme),
-  };
-
-  return slide;
 };

@@ -1,8 +1,7 @@
-import type { Slide, SlideTheme, PPTTextElement } from '@/types/slides';
+import type { Slide, SlideTheme } from '@/types/slides';
 import type { VerticalListLayoutSchema } from './types';
-import type { Bounds, TemplateConfig, TextLayoutBlockInstance } from '../types';
-import LayoutPrimitives from '../layoutPrimitives';
-import LayoutProBuilder from '../layoutProbuild';
+import type { Bounds, TemplateConfig } from '../types';
+import { convertLayoutGeneric } from './index';
 
 const SLIDE_WIDTH = 1000;
 const SLIDE_HEIGHT = 562.5;
@@ -90,59 +89,13 @@ export const convertVerticalListLayout = async (
   template: TemplateConfig,
   slideId?: string
 ): Promise<Slide> => {
-  // Content container - use unified font sizing
-  const contentContainer = template.containers.content;
-  const resolvedBounds = LayoutPrimitives.resolveContainerPositions(template.containers, {
-    width: SLIDE_WIDTH,
-    height: SLIDE_HEIGHT,
-  });
-
-  const { instance: contentInstance, elements } = LayoutProBuilder.buildLayoutWithUnifiedFontSizing(
-    contentContainer,
-    resolvedBounds.content,
-    {
-      item: data.data.items,
-    }
+  return convertLayoutGeneric(
+    data,
+    template,
+    (d) => ({
+      texts: { title: d.title },
+      blocks: { content: { item: d.data.items } },
+    }),
+    slideId
   );
-
-  // Get labeled instances for bounds
-  const itemInstances = LayoutPrimitives.recursivelyGetAllLabelInstances(
-    contentInstance,
-    'item'
-  ) as TextLayoutBlockInstance[];
-
-  // Extract elements by label
-  const itemElements = elements['item'] || [];
-
-  // Generate PPT elements from pre-created elements
-  const contentElements = itemElements
-    .map((itemEl, index) => {
-      return [
-        {
-          id: crypto.randomUUID(),
-          type: 'text',
-          content: itemEl.outerHTML,
-          defaultFontName: itemInstances[index].text?.fontFamily,
-          defaultColor: itemInstances[index].text?.color,
-          left: itemInstances[index].bounds.left,
-          top: itemInstances[index].bounds.top,
-          width: itemInstances[index].bounds.width,
-          height: itemInstances[index].bounds.height,
-          textType: 'content',
-        } as PPTTextElement,
-      ];
-    })
-    .flat();
-
-  const slide: Slide = {
-    id: slideId ?? crypto.randomUUID(),
-    elements: [
-      ...LayoutProBuilder.buildCards(contentInstance),
-      ...LayoutProBuilder.buildTitle(data.title, template.containers.title, template.theme),
-      ...contentElements,
-    ],
-    background: LayoutPrimitives.processBackground(template.theme),
-  };
-
-  return slide;
 };

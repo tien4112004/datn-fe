@@ -8,20 +8,18 @@ import {
   ShapePathFormulasKeys,
   type PPTLineElement,
 } from '@/types/slides';
-import {
-  calculateLargestOptimalFontSize,
-  applyFontSizeToElement,
-  calculateFontSizeForAvailableSpace,
-  applyFontSizeToElements,
-  type FontSizeRange,
-} from '../fontSizeCalculator';
-import { measureElementForBlock, measureElementWithStyle } from '../elementMeasurement';
-import { createElement as createHTMLElement } from '../htmlTextCreation';
 import { getImageSize } from '../../image';
 import { SHAPE_PATH_FORMULAS } from '../../../configs/shapes';
 import type { ImageLayoutBlockInstance, TextLayoutBlockInstance, Bounds } from '../types';
 import { DEFAULT_RADIUS_MULTIPLIER } from './layoutConstants';
-import { layoutItemsInBlock } from './layoutPositioning';
+import { layoutItemsInBlock } from './positioning';
+import {
+  calculateLargestOptimalFontSize,
+  applyFontSizeToElement,
+  type FontSizeRange,
+} from './fontSizeCalculations';
+import { measureElementWithStyle } from './elementMeasurement';
+import type { TextStyleConfig } from '../types';
 
 /**
  * Create a text element with optimal font sizing
@@ -32,7 +30,7 @@ export function createTextElement(
   fontSizeRange?: FontSizeRange
 ): PPTTextElement {
   // Create initial text element with default styling
-  const initialElement = createHTMLElement(content, {
+  const initialElement = createHtmlElement(content, {
     fontSize: 32, // Initial size for optimization
     ...container.text,
   });
@@ -74,130 +72,6 @@ export function createTextElement(
       : undefined,
     shadow: container.shadow,
   } as PPTTextElement;
-}
-
-/**
- * Create item elements with unified styles
- */
-export async function createItemElementsWithStyles(
-  items: string[],
-  container: TextLayoutBlockInstance
-): Promise<PPTTextElement[]> {
-  // Always optimize font size - create temporary elements to calculate optimal size
-  const tempItemElements = items.map((item) =>
-    createHTMLElement(item, {
-      fontSize: 20, // Initial size for optimization
-      ...container.text,
-    })
-  );
-
-  const contentStyles = calculateFontSizeForAvailableSpace(
-    tempItemElements,
-    container.bounds.width,
-    container.bounds.height
-  );
-
-  const finalFontSize = contentStyles.fontSize;
-  const finalLineHeight = contentStyles.lineHeight;
-
-  // Apply calculated styles to temp elements for measurement
-  applyFontSizeToElements(tempItemElements, contentStyles);
-
-  // Calculate item styles with final font size
-  const itemStyles = {
-    fontSize: finalFontSize,
-    lineHeight: finalLineHeight,
-    ...container.text,
-  };
-
-  // Pre-calculate all item dimensions using the unified styles
-  const itemContentsAndDimensions = items.map((item) => {
-    const itemElement = createHTMLElement(item, itemStyles);
-    const itemDimensions = measureElementForBlock(
-      itemElement,
-      container.bounds.width,
-      container.bounds.height
-    );
-    return { content: itemElement.outerHTML, dimensions: itemDimensions };
-  });
-
-  // Calculate positions using the enhanced distribution logic
-  const itemPositions = layoutItemsInBlock(
-    itemContentsAndDimensions.map((item) => item.dimensions),
-    container
-  );
-
-  // Create PPTTextElement objects
-  return itemContentsAndDimensions.map((item, index) => {
-    const position = itemPositions[index];
-
-    return {
-      id: crypto.randomUUID(),
-      type: 'text',
-      content: item.content,
-      defaultFontName: itemStyles.fontFamily,
-      defaultColor: itemStyles.color,
-      left: position.left,
-      top: position.top,
-      width: position.width,
-      height: position.height,
-      textType: 'content',
-    } as PPTTextElement;
-  });
-}
-
-/**
- * Create text elements with unified styles
- */
-export async function createTextElementsWithUnifiedStyles(
-  items: string[],
-  container: TextLayoutBlockInstance,
-  unifiedFontSize: { fontSize: number; lineHeight: number }
-): Promise<PPTTextElement[]> {
-  const finalFontSize = unifiedFontSize.fontSize;
-  const finalLineHeight = unifiedFontSize.lineHeight;
-
-  // Calculate item styles with unified font size
-  const itemStyles = {
-    fontSize: finalFontSize,
-    lineHeight: finalLineHeight,
-    ...container.text,
-  };
-
-  // Pre-calculate all item dimensions using the unified styles
-  const itemContentsAndDimensions = items.map((item) => {
-    const itemElement = createHTMLElement(item, itemStyles);
-    const itemDimensions = measureElementForBlock(
-      itemElement,
-      container.bounds.width,
-      container.bounds.height
-    );
-    return { content: itemElement.outerHTML, dimensions: itemDimensions };
-  });
-
-  // Calculate positions using the enhanced distribution logic
-  const itemPositions = layoutItemsInBlock(
-    itemContentsAndDimensions.map((item) => item.dimensions),
-    container
-  );
-
-  // Create PPTTextElement objects
-  return itemContentsAndDimensions.map((item, index) => {
-    const position = itemPositions[index];
-
-    return {
-      id: crypto.randomUUID(),
-      type: 'text',
-      content: item.content,
-      defaultFontName: itemStyles.fontFamily,
-      defaultColor: itemStyles.color,
-      left: position.left,
-      top: position.top,
-      width: position.width,
-      height: position.height,
-      textType: 'content',
-    } as PPTTextElement;
-  });
 }
 
 /**
@@ -331,4 +205,54 @@ export function processBackground(theme: SlideTheme): SlideBackground {
       },
     };
   }
+}
+
+// Font weight mapping
+const fontWeightMap: Record<string, string> = {
+  normal: '400',
+  bold: '700',
+  bolder: 'bolder',
+  lighter: 'lighter',
+};
+
+/**
+ * Unified element creation function - single source of truth for all text element creation
+ */
+export function createHtmlElement(content: string, config: TextStyleConfig): HTMLElement {
+  const p = document.createElement('p');
+  const span = document.createElement('span');
+
+  // Apply paragraph styling with defaults
+  const fontSize = config.fontSize ?? 16;
+  const lineHeight = config.lineHeight ?? 1.4;
+
+  p.style.textAlign = config.textAlign || 'left';
+  p.style.lineHeight = `${lineHeight}`;
+  p.style.fontSize = `${fontSize}px`;
+  p.style.fontFamily = config.fontFamily || 'Arial, sans-serif';
+  p.style.margin = '0';
+
+  // Apply span styling
+  const fontWeightValue = config.fontWeight || 'normal';
+  span.style.fontWeight = fontWeightMap[fontWeightValue.toString()] || fontWeightValue.toString();
+
+  if (config.fontStyle) {
+    span.style.fontStyle = config.fontStyle;
+  }
+
+  if (config.color) {
+    span.style.color = config.color;
+  }
+  span.textContent = content;
+
+  p.appendChild(span);
+  return p;
+}
+
+export function updateElementFontSize(element: HTMLElement, newFontSize: number): void {
+  element.style.fontSize = `${newFontSize}px`;
+}
+
+export function updateElementLineHeight(element: HTMLElement, newLineHeight: number): void {
+  element.style.lineHeight = `${newLineHeight}`;
 }

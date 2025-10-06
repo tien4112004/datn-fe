@@ -6,7 +6,7 @@ import type {
   WrapConfig,
 } from '../types';
 import { DEFAULT_WRAP_CONFIG } from './layoutConstants';
-import { getChildrenMaxBounds } from './layoutPositioning';
+import { getChildrenMaxBounds } from './positioning';
 
 /**
  * Expands a childTemplate into N child instances with calculated bounds

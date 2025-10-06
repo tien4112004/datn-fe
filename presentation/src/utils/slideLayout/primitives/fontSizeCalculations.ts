@@ -1,0 +1,99 @@
+import type { TextLayoutBlockInstance } from '../types';
+import { updateElementFontSize, updateElementLineHeight } from './elementCreators';
+import { measureElement } from './elementMeasurement';
+
+export interface FontSizeCalculationResult {
+  fontSize: number;
+  lineHeight: number;
+  spacing: number;
+}
+
+export interface FontSizeRange {
+  minSize: number;
+  maxSize: number;
+}
+
+/**
+ * Calculate unified font size for a group of labeled elements
+ */
+export function calculateUnifiedFontSizeForLabels(
+  elements: HTMLElement[],
+  containers: TextLayoutBlockInstance[],
+  fontSizeRange?: FontSizeRange
+): { fontSize: number } {
+  if (elements.length === 0 || containers.length === 0 || elements.length !== containers.length) {
+    return { fontSize: 16 };
+  }
+
+  // Calculate optimal font size for each element independently
+  const fontSizes: number[] = [];
+
+  for (let i = 0; i < elements.length; i++) {
+    const element = elements[i];
+    const container = containers[i];
+
+    const optimalFontSize = calculateLargestOptimalFontSize(
+      element,
+      container.bounds.width,
+      container.bounds.height,
+      fontSizeRange
+    );
+
+    fontSizes.push(optimalFontSize);
+  }
+
+  // Take minimum size (most constrained)
+  const minFontSize = Math.min(...fontSizes);
+
+  return {
+    fontSize: minFontSize,
+  };
+}
+
+export function applyFontSizeToElements(elements: HTMLElement[], result: FontSizeCalculationResult): void {
+  elements.forEach((element) => {
+    updateElementFontSize(element, result.fontSize);
+    updateElementLineHeight(element, result.lineHeight);
+  });
+}
+
+export function applyFontSizeToElement(element: HTMLElement, fontSize: number, lineHeight: number): void {
+  updateElementFontSize(element, fontSize);
+  updateElementLineHeight(element, lineHeight);
+}
+
+export function calculateLargestOptimalFontSize(
+  element: HTMLElement,
+  availableWidth: number,
+  availableHeight: number,
+  fontSizeRange: FontSizeRange = { minSize: 12, maxSize: 28 },
+  lineHeight: number = 1.4
+): number {
+  const clonedElement = element.cloneNode(true) as HTMLElement;
+
+  // Start from max size and work down
+  let fontSize = fontSizeRange.maxSize;
+  let optimalSize = fontSizeRange.minSize;
+
+  while (fontSize >= fontSizeRange.minSize) {
+    // Update the cloned element's font size for testing
+    updateElementFontSize(clonedElement, fontSize);
+    updateElementLineHeight(clonedElement, lineHeight);
+
+    // Measure the element with updated styling
+    const measured = measureElement(clonedElement, {
+      maxWidth: availableWidth,
+      maxHeight: availableHeight,
+    });
+
+    // Accept if it fits within constraints
+    if (measured.height <= availableHeight) {
+      optimalSize = fontSize;
+      break;
+    }
+
+    fontSize -= fontSize > 20 ? 1 : 0.5;
+  }
+
+  return optimalSize;
+}

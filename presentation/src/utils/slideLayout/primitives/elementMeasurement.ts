@@ -1,4 +1,4 @@
-import type { LayoutBlockInstance, Size } from './types';
+import type { LayoutBlockInstance, Size } from '../types';
 
 export interface ElementMeasurementConstraints {
   maxWidth?: number;

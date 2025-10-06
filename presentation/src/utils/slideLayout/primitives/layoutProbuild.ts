@@ -7,9 +7,9 @@ import type {
   LayoutBlockInstance,
   LayoutBlockConfig,
   ConvergenceOptions,
-} from './types';
-import LayoutPrimitives from './layoutPrimitives';
-import { createElement } from './htmlTextCreation';
+} from '../types';
+import LayoutPrimitives from '.';
+import { createHtmlElement } from './elementCreators';
 
 const LayoutProBuilder = {
   async buildImageElement(src: string, container: TemplateContainerConfig): Promise<PPTImageElement> {
@@ -177,7 +177,7 @@ const LayoutProBuilder = {
       if (labelData.length === 0) continue;
 
       allElements[label] = labelData.map((item) => {
-        return createElement(item, {
+        return createHtmlElement(item, {
           fontSize: fontSizes[label],
           ...instances[0].text,
         });
@@ -292,7 +292,7 @@ const LayoutProBuilder = {
   ): { fontSize: number } {
     // Create HTML elements for font size calculation
     const elements = labelData.map((item) => {
-      return createElement(item, {
+      return createHtmlElement(item, {
         fontSize: 16,
         ...instances[0].text,
       });

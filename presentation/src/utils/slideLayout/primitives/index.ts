@@ -3,11 +3,11 @@
 // ============================================================================
 
 // Re-export from layoutConstants
-export * from './primitives/layoutConstants';
+export * from './layoutConstants';
 
 // Re-export from layoutCalculations
-import { calculateUnifiedFontSizeForLabels } from './primitives/layoutCalculations';
-export { calculateUnifiedFontSizeForLabels } from './primitives/layoutCalculations';
+import { calculateUnifiedFontSizeForLabels } from './fontSizeCalculations';
+export { calculateUnifiedFontSizeForLabels } from './fontSizeCalculations';
 
 // Re-export from layoutPositioning
 import {
@@ -16,43 +16,34 @@ import {
   measureAndPositionElements,
   recursivelyPreprocessDescendants,
   recursivelyGetAllLabelInstances,
-  resolveContainerPositions,
-  calculateBoundsFromPositioning,
   getColumnsLayout,
-  resolveTemplateContainers,
-} from './primitives/layoutPositioning';
+} from './positioning';
 export {
   getChildrenMaxBounds,
   layoutItemsInBlock,
   measureAndPositionElements,
   recursivelyPreprocessDescendants,
   recursivelyGetAllLabelInstances,
-  resolveContainerPositions,
-  calculateBoundsFromPositioning,
-  resolveTemplateContainers,
-} from './primitives/layoutPositioning';
+  getColumnsLayout,
+} from './positioning';
 
 // Re-export from layoutElementCreators
-import { createTextElement } from './primitives/layoutElementCreators';
+import { createTextElement } from './elementCreators';
 import {
-  createItemElementsWithStyles,
-  createTextElementsWithUnifiedStyles,
   createImageElement,
   createTitleLine,
   createCard,
   createTextPPTElement,
   processBackground,
-} from './primitives/layoutElementCreators';
+} from './elementCreators';
 export {
   createTextElement,
-  createItemElementsWithStyles,
-  createTextElementsWithUnifiedStyles,
   createImageElement,
   createTitleLine,
   createCard,
   createTextPPTElement,
   processBackground,
-} from './primitives/layoutElementCreators';
+} from './elementCreators';
 
 // Re-export from layoutInstanceBuilder
 import {
@@ -60,22 +51,25 @@ import {
   buildInstanceWithBounds,
   calculateWrapLayout,
   distributeItems,
-} from './primitives/layoutInstanceBuilder';
+} from './instanceBuilder';
 export {
   buildChildrenFromChildTemplate,
   buildInstanceWithBounds,
   calculateWrapLayout,
   distributeItems,
-} from './primitives/layoutInstanceBuilder';
+} from './instanceBuilder';
 
-import { getAllDescendantInstances } from './primitives/layoutUtils';
+import { getAllDescendantInstances } from './layoutUtils';
+export { getAllDescendantInstances } from './layoutUtils';
+
+import { resolveTemplateBounds } from './expressionResolver';
+export { resolveTemplateBounds } from './expressionResolver';
+
+import { resolveTemplateContainers } from './boundsResolver';
+export { resolveTemplateContainers } from './boundsResolver';
 
 // Legacy alias for backward compatibility
 export { createTextElement as createElement };
-
-// ============================================================================
-// Default export for backward compatibility
-// ============================================================================
 
 const LayoutPrimitives = {
   // From layoutCalculations
@@ -87,15 +81,10 @@ const LayoutPrimitives = {
   measureAndPositionElements,
   recursivelyPreprocessDescendants,
   recursivelyGetAllLabelInstances,
-  resolveContainerPositions,
-  calculateBoundsFromPositioning,
-  resolveTemplateContainers,
 
   // From layoutElementCreators
   createElement: createTextElement,
   createTextElement,
-  createItemElementsWithStyles,
-  createTextElementsWithUnifiedStyles,
   createImageElement,
   createTitleLine,
   createCard,
@@ -110,7 +99,14 @@ const LayoutPrimitives = {
 
   getColumnsLayout,
 
+  // From layoutUtils
   getAllDescendantInstances,
+
+  // From expressionResolver
+  resolveTemplateBounds,
+
+  // From boundsResolver
+  resolveTemplateContainers,
 };
 
 export default LayoutPrimitives;

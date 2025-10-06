@@ -1,10 +1,11 @@
 export * from './types';
 
 // Helper utilities
-import type { TemplateConfig, TextLayoutBlockInstance } from '../types';
-import type { PPTTextElement, Slide } from '@/types/slides';
-import LayoutPrimitives from '../layoutPrimitives';
-import LayoutProBuilder from '../layoutProbuild';
+import type { PartialTemplateConfig, SlideViewport, TemplateConfig, TextLayoutBlockInstance } from '../types';
+import type { PPTTextElement, Slide, SlideTheme } from '@/types/slides';
+import LayoutPrimitives from '../primitives';
+import LayoutProBuilder from '../primitives/layoutProbuild';
+import { cloneDeepWith, template } from 'lodash';
 
 /**
  * Mapped layout data structure that normalizes all layout schemas
@@ -142,4 +143,32 @@ export async function convertLayoutGeneric<T = any>(
   };
 
   return slide;
+}
+
+export function resolveTemplate(
+  partialTemplate: PartialTemplateConfig,
+  theme: SlideTheme,
+  viewport: SlideViewport
+): TemplateConfig {
+  // Use lodash cloneDeepWith to traverse and transform the object tree
+  const resolvedContainers = cloneDeepWith(partialTemplate.containers, (value) => {
+    // Only process string values that contain template syntax
+    if (typeof value === 'string' && value.includes('{{')) {
+      try {
+        const compiled = template(value, { interpolate: /\{\{(.+?)\}\}/g });
+        return compiled({ theme });
+      } catch (e) {
+        // If template compilation fails, return original string
+        return value;
+      }
+    }
+    // Return undefined to let cloneDeepWith handle other types normally
+    return undefined;
+  });
+
+  return {
+    containers: resolvedContainers,
+    theme,
+    viewport,
+  };
 }

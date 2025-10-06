@@ -1,17 +1,4 @@
 import {
-  type SlideLayoutSchema,
-  type TwoColumnWithImageLayoutSchema,
-  type MainImageLayoutSchema,
-  type TitleLayoutSchema,
-  type TwoColumnLayoutSchema,
-  type VerticalListLayoutSchema,
-  type HorizontalListLayoutSchema,
-  type TransitionLayoutSchema,
-  type TableOfContentsLayoutSchema,
-  SLIDE_LAYOUT_TYPE,
-  convertLayoutGeneric,
-} from './converters';
-import {
   twoColumnWithImageLayoutTemplate,
   twoColumnBigImageLayoutTemplate,
   verticalListLayoutTemplate,
@@ -23,192 +10,157 @@ import {
   horizontalListLayoutTemplate,
 } from './converters/template';
 import type { Slide, SlideTheme } from '@/types/slides';
-import type { SlideViewport, TemplateConfig } from './types';
-import { resolveTemplate } from './templateResolver';
+import type { SlideViewport } from './types';
+import { convertLayoutGeneric, resolveTemplate, SLIDE_LAYOUT_TYPE } from './converters';
+import type {
+  SlideLayoutSchema,
+  TwoColumnWithImageLayoutSchema,
+  MainImageLayoutSchema,
+  TitleLayoutSchema,
+  TransitionLayoutSchema,
+  TwoColumnLayoutSchema,
+  VerticalListLayoutSchema,
+  HorizontalListLayoutSchema,
+  TableOfContentsLayoutSchema,
+} from './converters';
 
-// Export font size calculation utilities
-export {
-  calculateLargestOptimalFontSize,
-  calculateFontSizeForAvailableSpace,
-  applyFontSizeToElements,
-  applyFontSizeToElement,
-  type FontSizeCalculationResult,
-} from './fontSizeCalculator';
-
-// Layout Converter Functions
-const convertTwoColumnWithImageLayout = async (
-  data: TwoColumnWithImageLayoutSchema,
-  template: TemplateConfig,
-  slideId?: string
-): Promise<Slide> => {
-  return convertLayoutGeneric(
-    data,
-    template,
-    (d) => ({
-      texts: { title: d.title },
-      blocks: { content: { item: d.data.items } },
-      images: { image: d.data.image },
-    }),
-    slideId
-  );
-};
-
-const convertMainImageLayout = async (
-  data: MainImageLayoutSchema,
-  template: TemplateConfig,
-  slideId?: string
-): Promise<Slide> => {
-  return convertLayoutGeneric(
-    data,
-    template,
-    (d) => ({
-      blocks: { content: { content: [d.data.content] } },
-      images: { image: d.data.image },
-    }),
-    slideId
-  );
-};
-
-const convertTitleLayout = async (
-  data: TitleLayoutSchema | TransitionLayoutSchema,
-  template: TemplateConfig,
-  slideId?: string
-): Promise<Slide> => {
-  return convertLayoutGeneric(
-    data,
-    template,
-    (d) => ({
-      texts: {
-        title: d.data.title,
-      },
-      blocks: {
-        content: {
-          subtitle: d.data.subtitle ? [d.data.subtitle] : [],
-        },
-      },
-    }),
-    slideId
-  );
-};
-
-const convertTransitionLayout = async (
-  data: TransitionLayoutSchema,
-  template: TemplateConfig,
-  slideId?: string
-) => {
-  return await convertTitleLayout(data, template, slideId);
-};
-
-const convertTwoColumnLayout = async (
-  data: TwoColumnLayoutSchema,
-  template: TemplateConfig,
-  slideId?: string
-): Promise<Slide> => {
-  return convertLayoutGeneric(
-    data,
-    template,
-    (d) => ({
-      texts: { title: d.title },
-      blocks: { content: { item: [...d.data.items1, ...d.data.items2] } },
-    }),
-    slideId
-  );
-};
-
-const convertVerticalListLayout = async (
-  data: VerticalListLayoutSchema,
-  template: TemplateConfig,
-  slideId?: string
-): Promise<Slide> => {
-  return convertLayoutGeneric(
-    data,
-    template,
-    (d) => ({
-      texts: { title: d.title },
-      blocks: { content: { item: d.data.items } },
-    }),
-    slideId
-  );
-};
-
-const convertHorizontalListLayout = async (
-  data: HorizontalListLayoutSchema,
-  template: TemplateConfig,
-  slideId?: string
-): Promise<Slide> => {
-  return convertLayoutGeneric(
-    data,
-    template,
-    (d) => ({
-      texts: { title: d.title },
-      blocks: {
-        content: {
-          label: d.data.items.map((item) => item.label),
-          content: d.data.items.map((item) => item.content),
-        },
-      },
-    }),
-    slideId
-  );
-};
-
-const convertTableOfContentsLayout = async (
-  data: TableOfContentsLayoutSchema,
-  template: TemplateConfig,
-  slideId?: string
-): Promise<Slide> => {
-  return convertLayoutGeneric(
-    data,
-    template,
-    (d) => ({
-      texts: { title: 'Contents' },
-      blocks: { content: { item: d.data.items.map((item, index) => `${index + 1}. ${item}`) } },
-    }),
-    slideId
-  );
-};
-
+/**
+ * Converts layout schema to slide based on layout type
+ *
+ * @param data - The slide layout schema to convert
+ * @param viewport - The viewport configuration
+ * @param theme - The slide theme
+ * @param slideId - Optional slide ID
+ * @returns Promise resolving to a Slide object
+ * @throws Error if layout type is not supported
+ */
 export const convertToSlide = async (
   data: SlideLayoutSchema,
   viewport: SlideViewport,
   theme: SlideTheme,
   slideId?: string
-) => {
-  if (data.type === SLIDE_LAYOUT_TYPE.TWO_COLUMN_WITH_IMAGE) {
+): Promise<Slide> => {
+  const layoutType = data.type;
+
+  if (layoutType === SLIDE_LAYOUT_TYPE.TWO_COLUMN_WITH_IMAGE) {
     const template = resolveTemplate(twoColumnWithImageLayoutTemplate, theme, viewport);
-    return await convertTwoColumnWithImageLayout(data as TwoColumnWithImageLayoutSchema, template, slideId);
-  }
-  if (data.type === SLIDE_LAYOUT_TYPE.TWO_COLUMN_WITH_BIG_IMAGE) {
+    return convertLayoutGeneric(
+      data as TwoColumnWithImageLayoutSchema,
+      template,
+      (d) => ({
+        texts: { title: d.title },
+        blocks: { content: { item: d.data.items } },
+        images: { image: d.data.image },
+      }),
+      slideId
+    );
+  } else if (layoutType === SLIDE_LAYOUT_TYPE.TWO_COLUMN_WITH_BIG_IMAGE) {
     const template = resolveTemplate(twoColumnBigImageLayoutTemplate, theme, viewport);
-    return await convertTwoColumnWithImageLayout(data as TwoColumnWithImageLayoutSchema, template, slideId);
-  }
-  if (data.type === SLIDE_LAYOUT_TYPE.MAIN_IMAGE) {
+    return convertLayoutGeneric(
+      data as TwoColumnWithImageLayoutSchema,
+      template,
+      (d) => ({
+        texts: { title: d.title },
+        blocks: { content: { item: d.data.items } },
+        images: { image: d.data.image },
+      }),
+      slideId
+    );
+  } else if (layoutType === SLIDE_LAYOUT_TYPE.MAIN_IMAGE) {
     const template = resolveTemplate(mainImageLayoutTemplate, theme, viewport);
-    return await convertMainImageLayout(data as MainImageLayoutSchema, template, slideId);
-  }
-  if (data.type === SLIDE_LAYOUT_TYPE.TITLE) {
+    return convertLayoutGeneric(
+      data as MainImageLayoutSchema,
+      template,
+      (d) => ({
+        blocks: { content: { content: [d.data.content] } },
+        images: { image: d.data.image },
+      }),
+      slideId
+    );
+  } else if (layoutType === SLIDE_LAYOUT_TYPE.TITLE) {
     const template = resolveTemplate(titleLayoutTemplate, theme, viewport);
-    return await convertTitleLayout(data as TitleLayoutSchema, template, slideId);
-  }
-  if (data.type === SLIDE_LAYOUT_TYPE.TWO_COLUMN) {
+    return convertLayoutGeneric(
+      data as TitleLayoutSchema,
+      template,
+      (d) => ({
+        texts: {
+          title: d.data.title,
+        },
+        blocks: {
+          content: {
+            subtitle: d.data.subtitle ? [d.data.subtitle] : [],
+          },
+        },
+      }),
+      slideId
+    );
+  } else if (layoutType === SLIDE_LAYOUT_TYPE.TWO_COLUMN) {
     const template = resolveTemplate(twoColumnLayoutTemplate, theme, viewport);
-    return await convertTwoColumnLayout(data as TwoColumnLayoutSchema, template, slideId);
-  }
-  if (data.type === SLIDE_LAYOUT_TYPE.VERTICAL_LIST) {
+    return convertLayoutGeneric(
+      data as TwoColumnLayoutSchema,
+      template,
+      (d) => ({
+        texts: { title: d.title },
+        blocks: { content: { item: [...d.data.items1, ...d.data.items2] } },
+      }),
+      slideId
+    );
+  } else if (layoutType === SLIDE_LAYOUT_TYPE.VERTICAL_LIST) {
     const template = resolveTemplate(verticalListLayoutTemplate, theme, viewport);
-    return await convertVerticalListLayout(data as VerticalListLayoutSchema, template, slideId);
-  }
-  if (data.type === SLIDE_LAYOUT_TYPE.HORIZONTAL_LIST) {
+    return convertLayoutGeneric(
+      data as VerticalListLayoutSchema,
+      template,
+      (d) => ({
+        texts: { title: d.title },
+        blocks: { content: { item: d.data.items } },
+      }),
+      slideId
+    );
+  } else if (layoutType === SLIDE_LAYOUT_TYPE.HORIZONTAL_LIST) {
     const template = resolveTemplate(horizontalListLayoutTemplate, theme, viewport);
-    return await convertHorizontalListLayout(data as HorizontalListLayoutSchema, template, slideId);
-  }
-  if (data.type === SLIDE_LAYOUT_TYPE.TRANSITION) {
+    return convertLayoutGeneric(
+      data as HorizontalListLayoutSchema,
+      template,
+      (d) => ({
+        texts: { title: d.title },
+        blocks: {
+          content: {
+            label: d.data.items.map((item) => item.label),
+            content: d.data.items.map((item) => item.content),
+          },
+        },
+      }),
+      slideId
+    );
+  } else if (layoutType === SLIDE_LAYOUT_TYPE.TRANSITION) {
     const template = resolveTemplate(transitionLayoutTemplate, theme, viewport);
-    return await convertTransitionLayout(data as TransitionLayoutSchema, template, slideId);
-  }
-  if (data.type === SLIDE_LAYOUT_TYPE.TABLE_OF_CONTENTS) {
+    return convertLayoutGeneric(
+      data as TransitionLayoutSchema,
+      template,
+      (d) => ({
+        texts: {
+          title: d.data.title,
+        },
+        blocks: {
+          content: {
+            subtitle: d.data.subtitle ? [d.data.subtitle] : [],
+          },
+        },
+      }),
+      slideId
+    );
+  } else if (layoutType === SLIDE_LAYOUT_TYPE.TABLE_OF_CONTENTS) {
     const template = resolveTemplate(tableOfContentsLayoutTemplate, theme, viewport);
-    return await convertTableOfContentsLayout(data as TableOfContentsLayoutSchema, template, slideId);
+    return convertLayoutGeneric(
+      data as TableOfContentsLayoutSchema,
+      template,
+      (d) => ({
+        texts: { title: 'Contents' },
+        blocks: { content: { item: d.data.items.map((item, index) => `${index + 1}. ${item}`) } },
+      }),
+      slideId
+    );
+  } else {
+    throw new Error(`Unsupported layout type: ${layoutType}`);
   }
-  throw new Error('Unsupported layout type');
 };

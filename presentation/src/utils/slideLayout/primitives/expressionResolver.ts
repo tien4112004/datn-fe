@@ -6,7 +6,7 @@ import type {
   ExpressionContext,
   ResolvedBounds,
   ExpressionConstants,
-} from './types';
+} from '../types';
 
 const DEFAULT_CONSTANTS: ExpressionConstants = {
   SLIDE_WIDTH: 1000,

@@ -52,7 +52,7 @@ export const horizontalListLayoutTemplate: Template = {
             lineCount: 2,
             wrapDistribution: 'balanced',
             lineSpacing: 15,
-            alternating: true,
+            alternating: { start: 20, end: 20 },
           },
           structure: {
             type: 'block',
@@ -158,7 +158,7 @@ export const horizontalListGridTemplate: Template = {
             lineCount: 2,
             wrapDistribution: 'balanced',
             lineSpacing: 20,
-            alternating: false,
+            syncSize: true,
           },
           structure: {
             type: 'block',
@@ -187,102 +187,6 @@ export const horizontalListGridTemplate: Template = {
                 layout: {
                   horizontalAlignment: 'center',
                   verticalAlignment: 'center',
-                },
-                text: {
-                  color: '{{theme.labelFontColor}}',
-                  fontFamily: '{{theme.labelFontName}}',
-                  fontWeight: 'bold',
-                  textAlign: 'center',
-                },
-              },
-              {
-                type: 'text',
-                label: 'content',
-                layout: {
-                  horizontalAlignment: 'center',
-                  verticalAlignment: 'center',
-                },
-                text: {
-                  color: '{{theme.fontColor}}',
-                  fontFamily: '{{theme.fontName}}',
-                  fontWeight: 'normal',
-                  textAlign: 'center',
-                },
-              },
-            ],
-          },
-        },
-      },
-    },
-  },
-};
-
-// Variation: Horizontal List - Timeline (sequential flow)
-export const horizontalListTimelineTemplate: Template = {
-  id: 'horizontal-list-timeline',
-  name: 'Horizontal List - Timeline',
-  config: {
-    containers: {
-      title: {
-        type: 'text',
-        bounds: {
-          left: 0,
-          top: 20,
-          width: { expr: 'SLIDE_WIDTH' },
-          height: 90,
-        },
-        layout: {
-          horizontalAlignment: 'center',
-          verticalAlignment: 'top',
-        },
-        text: {
-          color: '{{theme.titleFontColor}}',
-          fontFamily: '{{theme.titleFontName}}',
-          fontWeight: 'bold',
-          textAlign: 'center',
-        },
-      },
-      content: {
-        type: 'block',
-        positioning: {
-          relativeTo: 'title',
-          axis: 'vertical',
-          anchor: 'end',
-          offset: 30,
-          size: 'fill',
-          margin: { left: 50, right: 50, top: 0, bottom: 60 },
-        },
-        layout: {
-          distribution: 'space-between',
-          gap: 15,
-          orientation: 'horizontal',
-        },
-        childTemplate: {
-          count: 'auto',
-          structure: {
-            type: 'block',
-            layout: {
-              distribution: '30/70',
-              gap: 15,
-              horizontalAlignment: 'center',
-              verticalAlignment: 'center',
-              orientation: 'vertical',
-            },
-            border: {
-              color: '{{theme.themeColors[0]}}',
-              width: 1.5,
-              radius: 8,
-            },
-            children: [
-              {
-                type: 'text',
-                label: 'label',
-                layout: {
-                  horizontalAlignment: 'center',
-                  verticalAlignment: 'center',
-                },
-                background: {
-                  color: '{{theme.themeColors[0]}}',
                 },
                 text: {
                   color: '{{theme.labelFontColor}}',

@@ -243,64 +243,34 @@ const slideTemplates: Record<string, any[]> = {
       ],
     },
   }),
-  'horizontal-list': [
-    {
-      type: 'horizontal_list',
-      title: 'Five Fundamentals of Microservices',
-      data: {
-        items: [
-          {
-            label: 'Label 1',
-            content: 'Item1: Define services around business capabilities and domains.',
-          },
-          {
-            label: 'Label 2',
-            content: 'Item2: Use clear contracts (REST/gRPC) and versioning.',
-          },
-          {
-            label: 'Label 3',
-            content: 'Item3: Own your data; avoid shared databases.',
-          },
-          {
-            label: 'Label 4',
-            content: 'Item4: Automate CI/CD per service for rapid iteration.',
-          },
-          {
-            label: 'Label 5',
-            content: 'Item5: Centralize logs, metrics, and traces for each service.',
-          },
-        ],
-      },
+  'horizontal-list': Array(4).fill({
+    type: 'horizontal_list',
+    title: 'Five Fundamentals of Microservices',
+    data: {
+      items: [
+        {
+          label: 'Boundaries',
+          content: 'Define services around business capabilities and domains.',
+        },
+        {
+          label: 'APIs',
+          content: 'Use clear contracts (REST/gRPC) and versioning.',
+        },
+        {
+          label: 'Data',
+          content: 'Own your data; avoid shared databases.',
+        },
+        {
+          label: 'Delivery',
+          content: 'Automate CI/CD per service for rapid iteration.',
+        },
+        {
+          label: 'Observability',
+          content: 'Centralize logs, metrics, and traces for each service.',
+        },
+      ],
     },
-    ...Array(4).fill({
-      type: 'horizontal_list',
-      title: 'Five Fundamentals of Microservices',
-      data: {
-        items: [
-          {
-            label: 'Boundaries',
-            content: 'Define services around business capabilities and domains.',
-          },
-          {
-            label: 'APIs',
-            content: 'Use clear contracts (REST/gRPC) and versioning.',
-          },
-          {
-            label: 'Data',
-            content: 'Own your data; avoid shared databases.',
-          },
-          {
-            label: 'Delivery',
-            content: 'Automate CI/CD per service for rapid iteration.',
-          },
-          {
-            label: 'Observability',
-            content: 'Centralize logs, metrics, and traces for each service.',
-          },
-        ],
-      },
-    }),
-  ],
+  }),
 };
 
 const createSlide = async (slideType: string) => {

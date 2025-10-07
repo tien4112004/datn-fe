@@ -42,32 +42,40 @@ export const twoColumnLayoutTemplate: Template = {
           gap: 20,
           horizontalAlignment: 'left',
           verticalAlignment: 'top',
-          orientation: 'horizontal',
+          orientation: 'vertical',
         },
         childTemplate: {
           count: 'auto',
           wrap: {
             enabled: true,
-            maxItemsPerLine: 2,
+            maxItemsPerLine: 5,
             lineCount: 'auto',
             wrapDistribution: 'balanced',
             lineSpacing: 30,
-            alternating: false,
           },
           structure: {
-            type: 'text',
-            label: 'item',
-            border: {
-              color: '{{theme.themeColors[0]}}',
-              width: 1,
-              radius: 8,
+            type: 'block',
+            layout: {
+              verticalAlignment: 'center',
+              horizontalAlignment: 'center',
             },
-            text: {
-              color: '{{theme.fontColor}}',
-              fontFamily: '{{theme.fontName}}',
-              fontWeight: 'normal',
-              textAlign: 'left',
-            },
+            children: [
+              {
+                type: 'text',
+                label: 'item',
+                border: {
+                  color: '{{theme.themeColors[0]}}',
+                  width: 1,
+                  radius: 8,
+                },
+                text: {
+                  color: '{{theme.fontColor}}',
+                  fontFamily: '{{theme.fontName}}',
+                  fontWeight: 'normal',
+                  textAlign: 'left',
+                },
+              },
+            ],
           },
         },
       },
@@ -115,38 +123,47 @@ export const twoColumnSplitTemplate: Template = {
           gap: 20,
           horizontalAlignment: 'center',
           verticalAlignment: 'top',
-          orientation: 'horizontal',
+          orientation: 'vertical',
         },
         childTemplate: {
           count: 'auto',
           wrap: {
             enabled: true,
-            maxItemsPerLine: 2,
+            maxItemsPerLine: 5,
             lineCount: 'auto',
             wrapDistribution: 'balanced',
             lineSpacing: 35,
-            alternating: true,
           },
           structure: {
-            type: 'text',
-            label: 'item',
+            type: 'block',
+            layout: {
+              verticalAlignment: 'center',
+              horizontalAlignment: 'center',
+            },
             border: {
               color: '{{theme.themeColors[0]}}',
               width: 1,
               radius: 10,
             },
-            shadow: {
-              h: 0,
-              v: 3,
-              blur: 8,
-              color: 'rgba(0,0,0,0.1)',
-            },
-            text: {
-              color: '{{theme.fontColor}}',
-              fontFamily: '{{theme.fontName}}',
-              fontWeight: 'normal',
-              textAlign: 'center',
-            },
+            children: [
+              {
+                type: 'text',
+                label: 'item',
+
+                shadow: {
+                  h: 0,
+                  v: 3,
+                  blur: 8,
+                  color: 'rgba(0,0,0,0.1)',
+                },
+                text: {
+                  color: '{{theme.fontColor}}',
+                  fontFamily: '{{theme.fontName}}',
+                  fontWeight: 'normal',
+                  textAlign: 'center',
+                },
+              },
+            ],
           },
         },
       },
@@ -194,27 +211,35 @@ export const twoColumnAsymmetricTemplate: Template = {
           gap: 12,
           horizontalAlignment: 'left',
           verticalAlignment: 'top',
-          orientation: 'horizontal',
+          orientation: 'vertical',
         },
         childTemplate: {
           count: 'auto',
           wrap: {
             enabled: true,
-            maxItemsPerLine: 2,
+            maxItemsPerLine: 5,
             lineCount: 'auto',
             wrapDistribution: 'balanced',
             lineSpacing: 25,
-            alternating: false,
           },
           structure: {
-            type: 'text',
-            label: 'item',
-            text: {
-              color: '{{theme.fontColor}}',
-              fontFamily: '{{theme.fontName}}',
-              fontWeight: 'normal',
-              textAlign: 'left',
+            type: 'block',
+            layout: {
+              verticalAlignment: 'center',
+              horizontalAlignment: 'center',
             },
+            children: [
+              {
+                type: 'text',
+                label: 'item',
+                text: {
+                  color: '{{theme.fontColor}}',
+                  fontFamily: '{{theme.fontName}}',
+                  fontWeight: 'normal',
+                  textAlign: 'left',
+                },
+              },
+            ],
           },
         },
       },

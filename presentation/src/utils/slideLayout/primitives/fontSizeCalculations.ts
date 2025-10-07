@@ -75,7 +75,6 @@ export function calculateLargestOptimalFontSize(
       maxHeight: availableHeight,
     });
 
-    // Accept if it fits within constraints
     if (measured.height <= availableHeight * 0.9) {
       optimalSize = fontSize;
       break;

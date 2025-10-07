@@ -52,7 +52,6 @@ export const tableOfContentsLayoutTemplate: Template = {
             lineCount: 2,
             wrapDistribution: 'balanced',
             lineSpacing: 20,
-            alternating: false,
           },
           structure: {
             type: 'text',
@@ -123,7 +122,6 @@ export const tableOfContentsGridTemplate: Template = {
             lineCount: 'auto',
             wrapDistribution: 'balanced',
             lineSpacing: 20,
-            alternating: false,
           },
           structure: {
             type: 'text',
@@ -207,7 +205,6 @@ export const tableOfContentsTwoColumnTemplate: Template = {
             lineCount: 'auto',
             wrapDistribution: 'balanced',
             lineSpacing: 25,
-            alternating: false,
           },
           structure: {
             type: 'text',

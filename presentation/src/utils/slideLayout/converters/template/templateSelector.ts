@@ -16,7 +16,6 @@ import { twoColumnLayoutTemplate, twoColumnSplitTemplate, twoColumnAsymmetricTem
 import {
   horizontalListLayoutTemplate,
   horizontalListGridTemplate,
-  horizontalListTimelineTemplate,
   horizontalListSingleRowTemplate,
 } from './horizontalList';
 import {
@@ -69,7 +68,6 @@ const TEMPLATE_VARIATIONS: Record<string, Template[]> = {
   [SLIDE_LAYOUT_TYPE.HORIZONTAL_LIST]: [
     horizontalListLayoutTemplate,
     horizontalListGridTemplate,
-    horizontalListTimelineTemplate,
     horizontalListSingleRowTemplate,
   ],
   [SLIDE_LAYOUT_TYPE.TITLE]: [

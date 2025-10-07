@@ -5,7 +5,7 @@ import type {
   Bounds,
   WrapConfig,
 } from '../types';
-import { DEFAULT_WRAP_CONFIG, FILL_SHRINK_FACTOR } from './layoutConstants';
+import { DEFAULT_WRAP_CONFIG } from './layoutConstants';
 import { getChildrenMaxBounds } from './positioning';
 
 /**
@@ -38,7 +38,8 @@ export function buildChildrenFromChildTemplate(
     parentBounds,
     wrapConfig,
     templateContainer.layout?.orientation || 'vertical',
-    templateContainer.layout?.gap || 0
+    templateContainer.layout?.gap || 0,
+    templateContainer.layout?.distribution
   );
 
   // Create instances with calculated bounds, passing corresponding data item
@@ -114,7 +115,8 @@ export function calculateWrapLayout(
   containerBounds: Bounds,
   wrapConfig: WrapConfig,
   orientation: 'horizontal' | 'vertical',
-  gap: number
+  gap: number,
+  distribution?: 'equal' | 'space-between' | 'space-around' | string
 ): {
   lines: number;
   itemsPerLine: number[];
@@ -173,24 +175,61 @@ export function calculateWrapLayout(
     distributions.forEach((itemsInLine, lineIndex) => {
       const isAlternatingLine = wrapConfig.alternating && lineIndex % 2 === 1;
 
-      // Calculate effective container width for this line
-      const effectiveContainerWidth = isAlternatingLine
-        ? containerBounds.width * FILL_SHRINK_FACTOR
-        : containerBounds.width;
+      // Calculate effective container width and offsets for this line
+      let effectiveContainerWidth = containerBounds.width;
+      let lineStartOffset = 0;
 
-      // Calculate spacing and item width based on effective container width
-      const totalSpacing = (itemsInLine - 1) * gap;
-      const itemWidth = (effectiveContainerWidth - totalSpacing) / itemsInLine;
+      if (isAlternatingLine && wrapConfig.alternating) {
+        // Apply alternating offsets: shrink width by start + end, shift left by start
+        effectiveContainerWidth =
+          containerBounds.width - wrapConfig.alternating.start - wrapConfig.alternating.end;
+        lineStartOffset = wrapConfig.alternating.start;
+      }
 
-      // Center the line if it's shrunk
-      const lineOffset = isAlternatingLine ? (containerBounds.width - effectiveContainerWidth) / 2 : 0;
+      // Calculate item width
+      let itemWidth: number;
+      let lineContentWidth: number;
+      let itemGap = gap; // Local gap that may be adjusted for distribution
+
+      if (wrapConfig.syncSize) {
+        // Fixed-size mode: use size based on the fullest line
+        const totalSpacing = (maxPerLine - 1) * gap;
+        itemWidth = (effectiveContainerWidth - totalSpacing) / maxPerLine;
+        lineContentWidth = itemsInLine * itemWidth + (itemsInLine - 1) * gap;
+      } else {
+        // Original mode: divide space equally among items in this line
+        const totalSpacing = (itemsInLine - 1) * gap;
+        itemWidth = (effectiveContainerWidth - totalSpacing) / itemsInLine;
+        lineContentWidth = effectiveContainerWidth;
+      }
+
+      // Calculate line offset based on distribution (for spare items in partial lines)
+      let additionalOffset = 0;
+
+      if (wrapConfig.syncSize && itemsInLine < maxPerLine) {
+        const availableSpace = effectiveContainerWidth - lineContentWidth;
+
+        // Use parent distribution for alignment
+        if (distribution === 'space-between') {
+          // Adjust gap to distribute space between items
+          const extraGap = itemsInLine > 1 ? availableSpace / (itemsInLine - 1) : 0;
+          itemGap = gap + extraGap;
+        } else if (distribution === 'space-around') {
+          // Distribute space around items
+          const extraGap = availableSpace / itemsInLine;
+          additionalOffset = extraGap / 2;
+          itemGap = gap + extraGap;
+        }
+        // 'equal' or other: items stay left-aligned (no additional offset)
+      }
 
       // Calculate line top position
       const lineTop = containerBounds.top + lineIndex * (lineHeight + lineSpacing);
 
       // Position items in the line
       for (let itemIndex = 0; itemIndex < itemsInLine; itemIndex++) {
-        const left = containerBounds.left + lineOffset + itemIndex * (itemWidth + gap);
+        const left =
+          containerBounds.left + lineStartOffset + additionalOffset + itemIndex * (itemWidth + itemGap);
 
         itemBounds.push({
           left,
@@ -207,24 +246,61 @@ export function calculateWrapLayout(
     distributions.forEach((itemsInLine, lineIndex) => {
       const isAlternatingLine = wrapConfig.alternating && lineIndex % 2 === 1;
 
-      // Calculate effective container height for this column
-      const effectiveContainerHeight = isAlternatingLine
-        ? containerBounds.height * FILL_SHRINK_FACTOR
-        : containerBounds.height;
+      // Calculate effective container height and offsets for this column
+      let effectiveContainerHeight = containerBounds.height;
+      let columnStartOffset = 0;
 
-      // Calculate spacing and item height based on effective container height
-      const totalSpacing = (itemsInLine - 1) * gap;
-      const itemHeight = (effectiveContainerHeight - totalSpacing) / itemsInLine;
+      if (isAlternatingLine && wrapConfig.alternating) {
+        // Apply alternating offsets: shrink height by start + end, shift top by start
+        effectiveContainerHeight =
+          containerBounds.height - wrapConfig.alternating.start - wrapConfig.alternating.end;
+        columnStartOffset = wrapConfig.alternating.start;
+      }
 
-      // Center the column if it's shrunk
-      const columnOffset = isAlternatingLine ? (containerBounds.height - effectiveContainerHeight) / 2 : 0;
+      // Calculate item height
+      let itemHeight: number;
+      let columnContentHeight: number;
+      let itemGap = gap; // Local gap that may be adjusted for distribution
+
+      if (wrapConfig.syncSize) {
+        // Fixed-size mode: use size based on the fullest column
+        const totalSpacing = (maxPerLine - 1) * gap;
+        itemHeight = (effectiveContainerHeight - totalSpacing) / maxPerLine;
+        columnContentHeight = itemsInLine * itemHeight + (itemsInLine - 1) * gap;
+      } else {
+        // Original mode: divide space equally among items in this column
+        const totalSpacing = (itemsInLine - 1) * gap;
+        itemHeight = (effectiveContainerHeight - totalSpacing) / itemsInLine;
+        columnContentHeight = effectiveContainerHeight;
+      }
+
+      // Calculate column offset based on distribution (for spare items in partial columns)
+      let additionalOffset = 0;
+
+      if (wrapConfig.syncSize && itemsInLine < maxPerLine) {
+        const availableSpace = effectiveContainerHeight - columnContentHeight;
+
+        // Use parent distribution for alignment
+        if (distribution === 'space-between') {
+          // Adjust gap to distribute space between items
+          const extraGap = itemsInLine > 1 ? availableSpace / (itemsInLine - 1) : 0;
+          itemGap = gap + extraGap;
+        } else if (distribution === 'space-around') {
+          // Distribute space around items
+          const extraGap = availableSpace / itemsInLine;
+          additionalOffset = extraGap / 2;
+          itemGap = gap + extraGap;
+        }
+        // 'equal' or other: items stay top-aligned (no additional offset)
+      }
 
       // Calculate column left position
       const lineLeft = containerBounds.left + lineIndex * (lineWidth + lineSpacing);
 
       // Position items in the column
       for (let itemIndex = 0; itemIndex < itemsInLine; itemIndex++) {
-        const top = containerBounds.top + columnOffset + itemIndex * (itemHeight + gap);
+        const top =
+          containerBounds.top + columnStartOffset + additionalOffset + itemIndex * (itemHeight + itemGap);
 
         itemBounds.push({
           left: lineLeft,
@@ -235,8 +311,6 @@ export function calculateWrapLayout(
       }
     });
   }
-
-  console.log(itemBounds);
 
   return {
     lines,

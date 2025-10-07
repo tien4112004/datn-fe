@@ -52,7 +52,7 @@ export const verticalListLayoutTemplate: Template = {
             lineCount: 'auto',
             wrapDistribution: 'balanced',
             lineSpacing: 20,
-            alternating: true,
+            syncSize: true,
           },
           structure: {
             type: 'block',
@@ -165,7 +165,7 @@ export const verticalListCardsTemplate: Template = {
         type: 'text',
         bounds: {
           left: 0,
-          top: 20,
+          top: 15,
           width: { expr: 'SLIDE_WIDTH' },
           height: 100,
         },
@@ -204,13 +204,14 @@ export const verticalListCardsTemplate: Template = {
             lineCount: 2,
             wrapDistribution: 'top-heavy',
             lineSpacing: 20,
-            alternating: false,
+            syncSize: true,
+            alternating: { start: 20, end: 20 },
           },
           structure: {
             type: 'text',
             label: 'item',
             border: {
-              width: 2,
+              width: 1,
               color: '{{theme.themeColors[0]}}',
               radius: 12,
             },

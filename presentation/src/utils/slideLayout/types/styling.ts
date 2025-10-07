@@ -25,5 +25,6 @@ export interface WrapConfig {
   lineCount?: number | 'auto';
   lineSpacing?: number;
   wrapDistribution?: 'balanced' | 'top-heavy' | 'bottom-heavy';
-  alternating?: boolean;
+  alternating?: { start: number; end: number }; // Shrink alternating lines by these pixel offsets (supports negative values)
+  syncSize?: boolean; // Use uniform size based on the fullest line
 }

@@ -1,7 +1,3 @@
-// ============================================================================
-// Layout Primitives - Main Facade
-// ============================================================================
-
 // Re-export from layoutConstants
 export * from './layoutConstants';
 
@@ -16,7 +12,6 @@ import {
   measureAndPositionElements,
   recursivelyPreprocessDescendants,
   recursivelyGetAllLabelInstances,
-  getColumnsLayout,
 } from './positioning';
 export {
   getChildrenMaxBounds,
@@ -24,7 +19,6 @@ export {
   measureAndPositionElements,
   recursivelyPreprocessDescendants,
   recursivelyGetAllLabelInstances,
-  getColumnsLayout,
 } from './positioning';
 
 // Re-export from layoutElementCreators
@@ -96,8 +90,6 @@ const LayoutPrimitives = {
   buildInstanceWithBounds,
   calculateWrapLayout,
   distributeItems,
-
-  getColumnsLayout,
 
   // From layoutUtils
   getAllDescendantInstances,

@@ -10,6 +10,13 @@ import type {
 } from '../types';
 import LayoutPrimitives from '.';
 import { createHtmlElement } from './elementCreators';
+import {
+  DEFAULT_MIN_FONT_SIZE,
+  DEFAULT_LABEL_TO_VALUE_RATIO,
+  FONT_SIZE_RANGE_LABEL,
+  FONT_SIZE_RANGE_CONTENT,
+  FONT_SIZE_RANGE_TITLE,
+} from './layoutConstants';
 
 const LayoutProBuilder = {
   async buildImageElement(src: string, container: TemplateContainerConfig): Promise<PPTImageElement> {
@@ -22,11 +29,13 @@ const LayoutProBuilder = {
   },
 
   buildCards(instance: LayoutBlockInstance): PPTElement[] {
-    const list = LayoutPrimitives.getAllDescendantInstances(instance).map((inst) => {
-      if (!inst.border) return null;
-      return LayoutPrimitives.createCard(inst as LayoutBlockInstance);
-    });
-    return list.filter((el) => el !== null);
+    const list = LayoutPrimitives.getAllDescendantInstances(instance)
+      .map((inst) => {
+        if (!inst.border) return null;
+        return LayoutPrimitives.createCard(inst as LayoutBlockInstance);
+      })
+      .filter((el) => el !== null) as PPTElement[];
+    return list;
   },
 
   buildTitle(title: string, config: TemplateContainerConfig, theme: SlideTheme): PPTElement[] {
@@ -35,10 +44,7 @@ const LayoutProBuilder = {
       bounds: config.bounds,
     } as TextLayoutBlockInstance;
 
-    const titleElement = LayoutPrimitives.createTextElement(title, titleInstance, {
-      minSize: 18,
-      maxSize: 48,
-    });
+    const titleElement = LayoutPrimitives.createTextElement(title, titleInstance, FONT_SIZE_RANGE_TITLE);
 
     return [
       titleElement,
@@ -144,8 +150,8 @@ const LayoutProBuilder = {
     options?: ConvergenceOptions
   ): Record<string, number> {
     const fontSizes: Record<string, number> = {};
-    const minFontSize = options?.minFontSize ?? 8;
-    const labelToValueRatio = options?.labelToValueRatio ?? 1.2;
+    const minFontSize = options?.minFontSize ?? DEFAULT_MIN_FONT_SIZE;
+    const labelToValueRatio = options?.labelToValueRatio ?? DEFAULT_LABEL_TO_VALUE_RATIO;
 
     // Calculate font size for each label group
     for (const [label, instances] of labelGroups.entries()) {
@@ -299,7 +305,7 @@ const LayoutProBuilder = {
     });
 
     // Determine font size range based on label type
-    const fontSizeRange = label === 'label' ? { minSize: 10, maxSize: 24 } : { minSize: 12, maxSize: 28 };
+    const fontSizeRange = label === 'label' ? FONT_SIZE_RANGE_LABEL : FONT_SIZE_RANGE_CONTENT;
 
     // Calculate unified font size for this group
     return LayoutPrimitives.calculateUnifiedFontSizeForLabels(elements, instances, fontSizeRange);

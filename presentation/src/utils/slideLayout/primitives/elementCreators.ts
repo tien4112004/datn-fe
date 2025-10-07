@@ -11,13 +11,10 @@ import {
 import { getImageSize } from '../../image';
 import { SHAPE_PATH_FORMULAS } from '../../../configs/shapes';
 import type { ImageLayoutBlockInstance, TextLayoutBlockInstance, Bounds } from '../types';
-import { DEFAULT_RADIUS_MULTIPLIER } from './layoutConstants';
+import { DEFAULT_RADIUS_MULTIPLIER, DEFAULT_TITLE_LINE_SPACING } from './layoutConstants';
 import { layoutItemsInBlock } from './positioning';
-import {
-  calculateLargestOptimalFontSize,
-  applyFontSizeToElement,
-  type FontSizeRange,
-} from './fontSizeCalculations';
+import { calculateLargestOptimalFontSize, applyFontSizeToElement } from './fontSizeCalculations';
+import type { FontSizeRange } from '../types';
 import { measureElementWithStyle } from './elementMeasurement';
 import type { TextStyleConfig } from '../types';
 
@@ -120,7 +117,7 @@ export function createTitleLine(titleDimensions: Bounds, theme: SlideTheme): PPT
     type: 'line',
     style: 'solid',
     left: titleDimensions.left,
-    top: titleDimensions.top + titleDimensions.height + 10,
+    top: titleDimensions.top + titleDimensions.height + DEFAULT_TITLE_LINE_SPACING,
     start: [0, 0],
     end: [titleDimensions.width, 0],
     width: 2,

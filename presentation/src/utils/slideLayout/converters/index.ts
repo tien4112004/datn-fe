@@ -1,5 +1,3 @@
-export * from './types';
-
 // Helper utilities
 import type { PartialTemplateConfig, SlideViewport, TemplateConfig, TextLayoutBlockInstance } from '../types';
 import type { PPTTextElement, Slide, SlideTheme } from '@/types/slides';

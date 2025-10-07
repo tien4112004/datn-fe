@@ -1,17 +1,6 @@
-import type { TextLayoutBlockInstance } from '../types';
+import type { TextLayoutBlockInstance, FontSizeCalculationResult, FontSizeRange } from '../types';
 import { updateElementFontSize, updateElementLineHeight } from './elementCreators';
 import { measureElement } from './elementMeasurement';
-
-export interface FontSizeCalculationResult {
-  fontSize: number;
-  lineHeight: number;
-  spacing: number;
-}
-
-export interface FontSizeRange {
-  minSize: number;
-  maxSize: number;
-}
 
 /**
  * Calculate unified font size for a group of labeled elements

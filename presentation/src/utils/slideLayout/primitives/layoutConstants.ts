@@ -3,6 +3,7 @@
  */
 export const SLIDE_WIDTH = 1000;
 export const SLIDE_HEIGHT = 562.5;
+export const DEFAULT_VIEWPORT = { width: SLIDE_WIDTH, height: SLIDE_HEIGHT };
 
 /**
  * Default font sizing options
@@ -15,6 +16,7 @@ export const DEFAULT_LABEL_TO_VALUE_RATIO = 1.2;
  */
 export const DEFAULT_SPACING_BETWEEN_ITEMS = 10;
 export const DEFAULT_LINE_SPACING = 0;
+export const DEFAULT_TITLE_LINE_SPACING = 10;
 
 /**
  * Default border radius multiplier for rounded rectangles
@@ -38,30 +40,13 @@ export const DEFAULT_CONVERGENCE_OPTIONS = {
 };
 
 /**
- * Default padding configuration
+ * Font size ranges for different label types
  */
-export const DEFAULT_PADDING = {
-  top: 0,
-  bottom: 0,
-  left: 0,
-  right: 0,
-};
+export const FONT_SIZE_RANGE_LABEL = { minSize: 10, maxSize: 24 };
+export const FONT_SIZE_RANGE_CONTENT = { minSize: 12, maxSize: 28 };
+export const FONT_SIZE_RANGE_TITLE = { minSize: 18, maxSize: 48 };
 
 /**
- * Default text style configuration
+ * Layout shrink factor for fill calculations
  */
-export const DEFAULT_TEXT_STYLE = {
-  fontFamily: 'Arial',
-  color: '#000000',
-  fontWeight: 'normal' as const,
-  textAlign: 'left' as const,
-};
-
-/**
- * Default border configuration
- */
-export const DEFAULT_BORDER = {
-  width: 0,
-  color: '#000000',
-  radius: 0,
-};
+export const FILL_SHRINK_FACTOR = 0.8;

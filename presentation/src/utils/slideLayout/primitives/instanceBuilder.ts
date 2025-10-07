@@ -5,7 +5,7 @@ import type {
   Bounds,
   WrapConfig,
 } from '../types';
-import { DEFAULT_WRAP_CONFIG } from './layoutConstants';
+import { DEFAULT_WRAP_CONFIG, FILL_SHRINK_FACTOR } from './layoutConstants';
 import { getChildrenMaxBounds } from './positioning';
 
 /**
@@ -132,7 +132,6 @@ export function calculateWrapLayout(
   const distributions = distributeItems(itemCount, maxPerLine, wrapConfig.distribution || 'balanced');
   const lines = distributions.length;
   const lineSpacing = wrapConfig.lineSpacing || 0;
-  const shrinkFactor = 0.8;
 
   const itemBounds: Bounds[] = [];
 
@@ -145,7 +144,7 @@ export function calculateWrapLayout(
 
       // Calculate effective container width for this line
       const effectiveContainerWidth = isAlternatingLine
-        ? containerBounds.width * shrinkFactor
+        ? containerBounds.width * FILL_SHRINK_FACTOR
         : containerBounds.width;
 
       // Calculate spacing and item width based on effective container width
@@ -179,7 +178,7 @@ export function calculateWrapLayout(
 
       // Calculate effective container height for this column
       const effectiveContainerHeight = isAlternatingLine
-        ? containerBounds.height * shrinkFactor
+        ? containerBounds.height * FILL_SHRINK_FACTOR
         : containerBounds.height;
 
       // Calculate spacing and item height based on effective container height

@@ -7,11 +7,7 @@ import type {
   ResolvedBounds,
   ExpressionConstants,
 } from '../types';
-
-const DEFAULT_CONSTANTS: ExpressionConstants = {
-  SLIDE_WIDTH: 1000,
-  SLIDE_HEIGHT: 562.5,
-};
+import { DEFAULT_VIEWPORT } from './layoutConstants';
 
 /**
  * Evaluates an arithmetic expression string with context
@@ -289,7 +285,10 @@ function extractDependencies(bounds: BoundsExpression | undefined): string[] {
  */
 export function resolveTemplateBounds(
   containers: Record<string, { bounds?: BoundsExpression | ResolvedBounds; [key: string]: any }>,
-  constants: ExpressionConstants = DEFAULT_CONSTANTS
+  constants: ExpressionConstants = {
+    SLIDE_WIDTH: DEFAULT_VIEWPORT.width,
+    SLIDE_HEIGHT: DEFAULT_VIEWPORT.height,
+  }
 ): Record<string, ResolvedBounds> {
   const resolvedContainers: Record<string, ResolvedBounds> = {};
 

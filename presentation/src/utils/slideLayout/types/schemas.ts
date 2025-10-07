@@ -1,3 +1,7 @@
+// ============================================================================
+// Slide Layout Schemas
+// ============================================================================
+
 export interface TwoColumnWithImageLayoutSchema {
   type: string;
   title: string;
@@ -78,6 +82,8 @@ export const SLIDE_LAYOUT_TYPE = {
   TABLE_OF_CONTENTS: 'table_of_contents',
 } as const;
 
+export { SLIDE_LAYOUT_TYPE as default };
+
 export type SlideLayoutTypeKey = (typeof SLIDE_LAYOUT_TYPE)[keyof typeof SLIDE_LAYOUT_TYPE];
 
 export type SlideLayoutSchema =
@@ -90,8 +96,11 @@ export type SlideLayoutSchema =
   | TransitionLayoutSchema
   | TableOfContentsLayoutSchema;
 
-// Layout Template System
-export interface LayoutBlock {
+// ============================================================================
+// Legacy Layout Template System (deprecated)
+// ============================================================================
+
+export interface LegacyLayoutBlock {
   left: number;
   top: number;
   width: number;
@@ -115,6 +124,6 @@ export interface LayoutTemplate {
     size: number;
     ratio: number;
   };
-  areas: Record<string, LayoutBlock>;
+  areas: Record<string, LegacyLayoutBlock>;
   graphics?: LayoutGraphics;
 }

@@ -10,9 +10,8 @@ import {
   horizontalListLayoutTemplate,
 } from './converters/template';
 import type { Slide, SlideTheme } from '@/types/slides';
-import type { SlideViewport } from './types';
-import { convertLayoutGeneric, resolveTemplate, SLIDE_LAYOUT_TYPE } from './converters';
 import type {
+  SlideViewport,
   SlideLayoutSchema,
   TwoColumnWithImageLayoutSchema,
   MainImageLayoutSchema,
@@ -22,7 +21,9 @@ import type {
   VerticalListLayoutSchema,
   HorizontalListLayoutSchema,
   TableOfContentsLayoutSchema,
-} from './converters';
+} from './types';
+import { SLIDE_LAYOUT_TYPE } from './types';
+import { convertLayoutGeneric, resolveTemplate } from './converters';
 
 /**
  * Converts layout schema to slide based on layout type
@@ -125,8 +126,8 @@ export const convertToSlide = async (
         texts: { title: d.title },
         blocks: {
           content: {
-            label: d.data.items.map((item) => item.label),
-            content: d.data.items.map((item) => item.content),
+            label: d.data.items.map((item: { label: string; content: string }) => item.label),
+            content: d.data.items.map((item: { label: string; content: string }) => item.content),
           },
         },
       }),
@@ -156,7 +157,9 @@ export const convertToSlide = async (
       template,
       (d) => ({
         texts: { title: 'Contents' },
-        blocks: { content: { item: d.data.items.map((item, index) => `${index + 1}. ${item}`) } },
+        blocks: {
+          content: { item: d.data.items.map((item: string, index: number) => `${index + 1}. ${item}`) },
+        },
       }),
       slideId
     );

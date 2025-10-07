@@ -1,17 +1,12 @@
 import type {
   Bounds,
-  Position,
   Size,
   LayoutBlockInstance,
   TextLayoutBlockInstance,
   DistributionType,
-  RelativePositioning,
-  SlideViewport,
   ChildLayoutConfig,
-  BoundsExpression,
 } from '../types';
 import { DEFAULT_SPACING_BETWEEN_ITEMS } from './layoutConstants';
-import { resolveTemplateBounds } from './expressionResolver';
 import { measureElement } from './elementMeasurement';
 
 /**
@@ -457,31 +452,4 @@ export function recursivelyGetAllLabelInstances(
   }
 
   return labels;
-}
-
-export function getColumnsLayout(columnWidths: number[]): Bounds[] {
-  // Validate percentages add up to 100
-  const totalPercentage = columnWidths.reduce((sum, width) => sum + width, 0);
-  if (Math.abs(totalPercentage - 100) > 0.1) {
-    console.warn(`Column widths should add up to 100%, got ${totalPercentage}%`);
-  }
-
-  const columns: Bounds[] = [];
-  let currentLeft = 0;
-
-  columnWidths.forEach((widthPercentage) => {
-    const columnWidth = (1000 * widthPercentage) / 100; // Assuming slide width of 1000
-
-    columns.push({
-      left: currentLeft,
-      top: 0,
-      width: columnWidth,
-      height: 562.5, // Assuming slide height
-    });
-
-    // Move to next column position
-    currentLeft += columnWidth;
-  });
-
-  return columns;
 }

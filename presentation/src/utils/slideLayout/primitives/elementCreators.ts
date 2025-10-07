@@ -80,14 +80,30 @@ export async function createImageElement(
 ): Promise<PPTImageElement> {
   const imageOriginalSize = await getImageSize(src);
   const imageRatio = imageOriginalSize.width / imageOriginalSize.height;
+  const containerRatio = container.bounds.width / container.bounds.height;
 
-  const finalClip = {
-    shape: 'rect',
-    range: [
-      [100 / (imageRatio + 1), 0],
-      [100 - 100 / (imageRatio + 1), 100],
-    ],
-  };
+  let finalClip;
+  if (imageRatio > containerRatio) {
+    // Image is wider - clip left/right sides
+    const clipPercent = ((1 - containerRatio / imageRatio) / 2) * 100;
+    finalClip = {
+      shape: 'rect',
+      range: [
+        [clipPercent, 0],
+        [100 - clipPercent, 100],
+      ],
+    };
+  } else {
+    // Image is taller - clip top/bottom
+    const clipPercent = ((1 - imageRatio / containerRatio) / 2) * 100;
+    finalClip = {
+      shape: 'rect',
+      range: [
+        [0, clipPercent],
+        [100, 100 - clipPercent],
+      ],
+    };
+  }
 
   return {
     id: crypto.randomUUID(),

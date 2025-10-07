@@ -6,7 +6,12 @@ import {
   verticalListCardsTemplate,
   verticalListNumberedTemplate,
 } from './verticalList';
-import { twoColumnWithImageLayoutTemplate, twoColumnBigImageLayoutTemplate } from './twoColumnWithImage';
+import {
+  twoColumnWithImageLayoutTemplate,
+  twoColumnLeftBigImageTemplate,
+  twoColumnRightBigImageTemplate,
+  twoColumnRightImageTemplate,
+} from './twoColumnWithImage';
 import { twoColumnLayoutTemplate, twoColumnSplitTemplate, twoColumnAsymmetricTemplate } from './twoColumn';
 import {
   horizontalListLayoutTemplate,
@@ -18,13 +23,12 @@ import {
   titleLayoutTemplate,
   transitionLayoutTemplate,
   titleTopTemplate,
-  titleBottomTemplate,
-  titleLeftTemplate,
-  titleAccentTemplate,
+  titleLeftAlignTemplate,
+  titleRightAlignTemplate,
 } from './title';
 import {
   mainImageLayoutTemplate,
-  mainImageFullBleedTemplate,
+  mainImageCenteredTemplate,
   mainImageSplitTemplate,
   mainImageWithTitleOverlayTemplate,
 } from './mainImage';
@@ -53,7 +57,9 @@ const TEMPLATE_VARIATIONS: Record<string, Template[]> = {
   ],
   [SLIDE_LAYOUT_TYPE.TWO_COLUMN_WITH_IMAGE]: [
     twoColumnWithImageLayoutTemplate,
-    twoColumnBigImageLayoutTemplate,
+    twoColumnLeftBigImageTemplate,
+    twoColumnRightBigImageTemplate,
+    twoColumnRightImageTemplate,
   ],
   [SLIDE_LAYOUT_TYPE.TWO_COLUMN]: [
     twoColumnLayoutTemplate,
@@ -69,14 +75,13 @@ const TEMPLATE_VARIATIONS: Record<string, Template[]> = {
   [SLIDE_LAYOUT_TYPE.TITLE]: [
     titleLayoutTemplate,
     titleTopTemplate,
-    titleBottomTemplate,
-    titleLeftTemplate,
-    titleAccentTemplate,
+    titleLeftAlignTemplate,
+    titleRightAlignTemplate,
   ],
   [SLIDE_LAYOUT_TYPE.TRANSITION]: [transitionLayoutTemplate],
   [SLIDE_LAYOUT_TYPE.MAIN_IMAGE]: [
     mainImageLayoutTemplate,
-    mainImageFullBleedTemplate,
+    mainImageCenteredTemplate,
     mainImageSplitTemplate,
     mainImageWithTitleOverlayTemplate,
   ],

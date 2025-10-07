@@ -29,7 +29,6 @@ export const twoColumnLayoutTemplate: Template = {
       },
       content: {
         type: 'block',
-        // Using relative positioning - positioned below title
         positioning: {
           relativeTo: 'title',
           axis: 'vertical',
@@ -41,39 +40,37 @@ export const twoColumnLayoutTemplate: Template = {
         layout: {
           distribution: 'space-between',
           gap: 20,
-          horizontalAlignment: 'center',
+          horizontalAlignment: 'left',
           verticalAlignment: 'top',
-          orientation: 'vertical',
+          orientation: 'horizontal',
         },
         childTemplate: {
           count: 'auto',
           wrap: {
             enabled: true,
-            maxItemsPerLine: 4,
-            lineCount: 2,
+            maxItemsPerLine: 2,
+            lineCount: 'auto',
             wrapDistribution: 'balanced',
-            lineSpacing: 15,
-            alternating: true,
+            lineSpacing: 30,
+            alternating: false,
           },
           structure: {
             type: 'text',
             label: 'item',
             layout: {
-              distribution: 'equal',
               horizontalAlignment: 'left',
-              verticalAlignment: 'top',
-            },
-            text: {
-              color: '{{theme.fontColor}}',
-              fontFamily: '{{theme.fontName}}',
-              fontWeight: 'normal',
-              fontStyle: 'normal',
-              lineHeight: 1.7,
+              verticalAlignment: 'center',
             },
             border: {
               color: '{{theme.themeColors[0]}}',
               width: 1,
               radius: 8,
+            },
+            text: {
+              color: '{{theme.fontColor}}',
+              fontFamily: '{{theme.fontName}}',
+              fontWeight: 'normal',
+              textAlign: 'left',
             },
           },
         },
@@ -82,10 +79,10 @@ export const twoColumnLayoutTemplate: Template = {
   },
 };
 
-// Variation: Two Column - Split 50/50
+// Variation: Two Column - Cards (alternating)
 export const twoColumnSplitTemplate: Template = {
-  id: 'two-column-split',
-  name: 'Two Column - Split 50/50',
+  id: 'two-column-cards',
+  name: 'Two Column - Cards',
   config: {
     containers: {
       title: {
@@ -115,84 +112,60 @@ export const twoColumnSplitTemplate: Template = {
           anchor: 'end',
           offset: 20,
           size: 'fill',
-          margin: { left: 30, right: 30, top: 0, bottom: 40 },
+          margin: { left: 40, right: 40, top: 0, bottom: 40 },
         },
         layout: {
-          distribution: '50/50',
-          gap: 30,
+          distribution: 'space-around',
+          gap: 20,
+          horizontalAlignment: 'center',
+          verticalAlignment: 'top',
           orientation: 'horizontal',
         },
-        children: [
-          {
-            type: 'block',
+        childTemplate: {
+          count: 'auto',
+          wrap: {
+            enabled: true,
+            maxItemsPerLine: 2,
+            lineCount: 'auto',
+            wrapDistribution: 'balanced',
+            lineSpacing: 35,
+            alternating: true,
+          },
+          structure: {
+            type: 'text',
+            label: 'item',
             layout: {
-              distribution: 'equal',
-              gap: 20,
-              verticalAlignment: 'top',
-              orientation: 'vertical',
+              horizontalAlignment: 'center',
+              verticalAlignment: 'center',
             },
-            childTemplate: {
-              count: 'auto',
-              structure: {
-                type: 'text',
-                label: 'item',
-                layout: {
-                  horizontalAlignment: 'left',
-                  verticalAlignment: 'center',
-                },
-                border: {
-                  color: '{{theme.themeColors[0]}}',
-                  width: 1,
-                  radius: 6,
-                },
-                text: {
-                  color: '{{theme.fontColor}}',
-                  fontFamily: '{{theme.fontName}}',
-                  fontWeight: 'normal',
-                },
-              },
+            border: {
+              color: '{{theme.themeColors[0]}}',
+              width: 2,
+              radius: 10,
+            },
+            shadow: {
+              h: 0,
+              v: 3,
+              blur: 8,
+              color: 'rgba(0,0,0,0.1)',
+            },
+            text: {
+              color: '{{theme.fontColor}}',
+              fontFamily: '{{theme.fontName}}',
+              fontWeight: 'normal',
+              textAlign: 'center',
             },
           },
-          {
-            type: 'block',
-            layout: {
-              distribution: 'equal',
-              gap: 20,
-              verticalAlignment: 'top',
-              orientation: 'vertical',
-            },
-            childTemplate: {
-              count: 'auto',
-              structure: {
-                type: 'text',
-                label: 'item',
-                layout: {
-                  horizontalAlignment: 'left',
-                  verticalAlignment: 'center',
-                },
-                border: {
-                  color: '{{theme.themeColors[1]}}',
-                  width: 1,
-                  radius: 6,
-                },
-                text: {
-                  color: '{{theme.fontColor}}',
-                  fontFamily: '{{theme.fontName}}',
-                  fontWeight: 'normal',
-                },
-              },
-            },
-          },
-        ],
+        },
       },
     },
   },
 };
 
-// Variation: Two Column - 70/30 split
+// Variation: Two Column - Compact (tight spacing)
 export const twoColumnAsymmetricTemplate: Template = {
-  id: 'two-column-asymmetric',
-  name: 'Two Column - Asymmetric 70/30',
+  id: 'two-column-compact',
+  name: 'Two Column - Compact',
   config: {
     containers: {
       title: {
@@ -204,13 +177,14 @@ export const twoColumnAsymmetricTemplate: Template = {
           height: 90,
         },
         layout: {
-          horizontalAlignment: 'left',
+          horizontalAlignment: 'center',
           verticalAlignment: 'top',
         },
         text: {
           color: '{{theme.titleFontColor}}',
           fontFamily: '{{theme.titleFontName}}',
           fontWeight: 'bold',
+          textAlign: 'center',
         },
       },
       content: {
@@ -221,71 +195,40 @@ export const twoColumnAsymmetricTemplate: Template = {
           anchor: 'end',
           offset: 20,
           size: 'fill',
-          margin: { left: 30, right: 30, top: 0, bottom: 40 },
+          margin: { left: 60, right: 60, top: 0, bottom: 40 },
         },
         layout: {
-          distribution: '70/30',
-          gap: 25,
+          distribution: 'equal',
+          gap: 12,
+          horizontalAlignment: 'left',
+          verticalAlignment: 'top',
           orientation: 'horizontal',
         },
-        children: [
-          {
-            type: 'block',
-            layout: {
-              distribution: 'equal',
-              gap: 18,
-              verticalAlignment: 'top',
-              orientation: 'vertical',
-            },
-            childTemplate: {
-              count: 'auto',
-              structure: {
-                type: 'text',
-                label: 'item',
-                layout: {
-                  horizontalAlignment: 'left',
-                  verticalAlignment: 'center',
-                },
-                text: {
-                  color: '{{theme.fontColor}}',
-                  fontFamily: '{{theme.fontName}}',
-                  fontWeight: 'normal',
-                },
-              },
-            },
+        childTemplate: {
+          count: 'auto',
+          wrap: {
+            enabled: true,
+            maxItemsPerLine: 2,
+            lineCount: 'auto',
+            wrapDistribution: 'balanced',
+            lineSpacing: 25,
+            alternating: false,
           },
-          {
-            type: 'block',
+          structure: {
+            type: 'text',
+            label: 'item',
             layout: {
-              distribution: 'space-around',
-              gap: 18,
+              horizontalAlignment: 'left',
               verticalAlignment: 'center',
-              orientation: 'vertical',
             },
-            childTemplate: {
-              count: 'auto',
-              structure: {
-                type: 'text',
-                label: 'item',
-                layout: {
-                  horizontalAlignment: 'center',
-                  verticalAlignment: 'center',
-                },
-                border: {
-                  color: '{{theme.themeColors[0]}}',
-                  width: 2,
-                  radius: 10,
-                },
-                text: {
-                  color: '{{theme.fontColor}}',
-                  fontFamily: '{{theme.fontName}}',
-                  fontWeight: 'bold',
-                  textAlign: 'center',
-                },
-              },
+            text: {
+              color: '{{theme.fontColor}}',
+              fontFamily: '{{theme.fontName}}',
+              fontWeight: 'normal',
+              textAlign: 'left',
             },
           },
-        ],
+        },
       },
     },
   },

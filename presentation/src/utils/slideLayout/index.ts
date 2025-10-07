@@ -55,6 +55,7 @@ export const convertToSlide = async (
       data as MainImageLayoutSchema,
       template,
       (d) => ({
+        texts: { content: d.data.content },
         blocks: { content: { content: [d.data.content] } },
         images: { image: d.data.image },
       }),

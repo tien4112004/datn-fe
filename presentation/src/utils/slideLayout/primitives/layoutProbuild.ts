@@ -72,6 +72,17 @@ export function buildTitle(title: string, config: TemplateContainerConfig, theme
   ];
 }
 
+export function buildText(content: string, config: TemplateContainerConfig): PPTElement[] {
+  const textInstance = {
+    ...config,
+    bounds: config.bounds,
+  } as TextLayoutBlockInstance;
+
+  const textElement = createTextElement(content, textInstance, FONT_SIZE_RANGE_CONTENT);
+
+  return [textElement];
+}
+
 /**
  * Build layout with unified font sizing (single pass, no redundant iteration)
  * Supports both flat and nested data structures

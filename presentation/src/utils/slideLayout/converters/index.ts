@@ -6,6 +6,7 @@ import {
   buildLayoutWithUnifiedFontSizing,
   buildCards,
   buildTitle,
+  buildText,
   buildImageElement,
 } from '../primitives/layoutProbuild';
 import { cloneDeepWith, template } from 'lodash';
@@ -110,8 +111,11 @@ export async function convertLayoutGeneric<T = any>(
 
       const instance = container as TextLayoutBlockInstance;
 
-      // Always use buildTitle for text containers
-      const textElements = buildTitle(textContent, instance, template.theme);
+      // Use buildTitle for title containers (with decorative line), buildText for others
+      const textElements =
+        containerId === 'title'
+          ? buildTitle(textContent, instance, template.theme)
+          : buildText(textContent, instance);
 
       allElements.push(...textElements);
     }

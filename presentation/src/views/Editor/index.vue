@@ -161,7 +161,7 @@ const theme = {
 slidesStore.setTheme(theme);
 
 const slideTemplates: Record<string, any[]> = {
-  'title-with-subtitle': Array(5).fill({
+  'title-with-subtitle': Array(4).fill({
     type: 'title',
     data: {
       title: 'Presentation with really long title',
@@ -169,13 +169,13 @@ const slideTemplates: Record<string, any[]> = {
         'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
     },
   }),
-  'title-no-subtitle': Array(5).fill({
+  'title-no-subtitle': Array(4).fill({
     type: 'title',
     data: {
       title: 'Presentation with really long title',
     },
   }),
-  'two-column-with-image': Array(4).fill({
+  'two-column-with-image': Array(6).fill({
     type: 'two_column_with_image',
     title: 'Presentation',
     data: {
@@ -193,7 +193,7 @@ const slideTemplates: Record<string, any[]> = {
     data: {
       items1: [
         'Item1-1: Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-        'Item1-2: Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.  nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+        'Item1-2: Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
         'Item1-3: Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
       ],
       items2: [

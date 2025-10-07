@@ -112,22 +112,18 @@ export const verticalListCompactTemplate: Template = {
           anchor: 'end',
           offset: 15,
           size: 'fill',
-          margin: { left: 60, right: 60, top: 0, bottom: 40 },
+          margin: { left: 80, right: 80, top: 0, bottom: 40 },
         },
         layout: {
-          distribution: 'equal',
-          gap: 10,
+          distribution: 'space-between',
+          gap: 12,
           verticalAlignment: 'top',
           orientation: 'vertical',
         },
         childTemplate: {
           count: 'auto',
           wrap: {
-            enabled: true,
-            maxItemsPerLine: 5,
-            lineCount: 'auto',
-            wrapDistribution: 'top-heavy',
-            alternating: true,
+            enabled: false,
           },
           structure: {
             type: 'text',
@@ -267,9 +263,9 @@ export const verticalListNumberedTemplate: Template = {
           margin: { left: 80, right: 80, top: 0, bottom: 40 },
         },
         layout: {
-          distribution: 'space-around',
+          distribution: 'space-between',
           gap: 15,
-          verticalAlignment: 'center',
+          verticalAlignment: 'top',
           orientation: 'vertical',
         },
         childTemplate: {

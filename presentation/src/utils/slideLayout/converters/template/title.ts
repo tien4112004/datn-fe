@@ -131,90 +131,23 @@ export const titleTopTemplate: Template = {
   },
 };
 
-// Variation: Bottom-aligned title
-export const titleBottomTemplate: Template = {
-  id: 'title-bottom',
-  name: 'Title - Bottom',
-  config: {
-    containers: {
-      title: {
-        type: 'text',
-        bounds: {
-          left: 0,
-          top: {
-            expr: 'SLIDE_HEIGHT * 0.55',
-          },
-          width: {
-            expr: 'SLIDE_WIDTH',
-          },
-          height: 130,
-        },
-        layout: {
-          horizontalAlignment: 'center',
-          verticalAlignment: 'center',
-        },
-        text: {
-          color: '{{theme.titleFontColor}}',
-          fontFamily: '{{theme.titleFontName}}',
-          fontWeight: 'bold',
-          fontStyle: 'normal',
-          textAlign: 'center',
-        },
-      },
-      content: {
-        type: 'block',
-        positioning: {
-          relativeTo: 'title',
-          axis: 'vertical',
-          anchor: 'end',
-          offset: 5,
-          size: 100,
-          margin: { left: 50, right: 50, top: 0, bottom: 0 },
-        },
-        layout: {
-          horizontalAlignment: 'center',
-          verticalAlignment: 'top',
-        },
-        childTemplate: {
-          count: 'auto',
-          structure: {
-            type: 'text',
-            label: 'subtitle',
-            layout: {
-              horizontalAlignment: 'center',
-              verticalAlignment: 'top',
-            },
-            text: {
-              color: '{{theme.fontColor}}',
-              fontFamily: '{{theme.fontName}}',
-              fontWeight: 'normal',
-              fontStyle: 'normal',
-              textAlign: 'center',
-            },
-          },
-        },
-      },
-    },
-  },
-};
-
 // Variation: Left-aligned title
-export const titleLeftTemplate: Template = {
-  id: 'title-left',
-  name: 'Title - Left',
+export const titleLeftAlignTemplate: Template = {
+  id: 'title-left-align',
+  name: 'Title - Left Aligned',
   config: {
     containers: {
       title: {
         type: 'text',
         bounds: {
-          left: 60,
+          left: 40,
           top: {
-            expr: 'SLIDE_HEIGHT * 0.3',
+            expr: 'SLIDE_HEIGHT * 0.28',
           },
           width: {
-            expr: 'SLIDE_WIDTH - 120',
+            expr: 'SLIDE_WIDTH - 80',
           },
-          height: 120,
+          height: 140,
         },
         layout: {
           horizontalAlignment: 'left',
@@ -234,9 +167,9 @@ export const titleLeftTemplate: Template = {
           relativeTo: 'title',
           axis: 'vertical',
           anchor: 'end',
-          offset: 10,
-          size: 120,
-          margin: { left: 60, right: 60, top: 0, bottom: 0 },
+          offset: 0,
+          size: 100,
+          margin: { left: 0, right: 0, top: 0, bottom: 0 },
         },
         layout: {
           horizontalAlignment: 'left',
@@ -265,50 +198,34 @@ export const titleLeftTemplate: Template = {
   },
 };
 
-// Variation: Title with accent box
-export const titleAccentTemplate: Template = {
-  id: 'title-accent',
-  name: 'Title - Accent Box',
+// Variation: Right-aligned title
+export const titleRightAlignTemplate: Template = {
+  id: 'title-right-align',
+  name: 'Title - Right Aligned',
   config: {
     containers: {
       title: {
         type: 'text',
         bounds: {
-          left: {
-            expr: 'center',
-          },
+          left: 80,
           top: {
-            expr: 'SLIDE_HEIGHT * 0.32',
+            expr: 'SLIDE_HEIGHT * 0.28',
           },
           width: {
-            expr: 'SLIDE_WIDTH * 0.8',
+            expr: 'SLIDE_WIDTH - 125',
           },
-          height: 110,
+          height: 140,
         },
         layout: {
-          horizontalAlignment: 'center',
+          horizontalAlignment: 'right',
           verticalAlignment: 'center',
         },
-        background: {
-          color: '{{theme.themeColors[0]}}',
-        },
-        border: {
-          width: 0,
-          color: 'transparent',
-          radius: 12,
-        },
-        shadow: {
-          h: 0,
-          v: 6,
-          blur: 12,
-          color: 'rgba(0,0,0,0.15)',
-        },
         text: {
-          color: '#FFFFFF',
+          color: '{{theme.titleFontColor}}',
           fontFamily: '{{theme.titleFontName}}',
           fontWeight: 'bold',
           fontStyle: 'normal',
-          textAlign: 'center',
+          textAlign: 'right',
         },
       },
       content: {
@@ -317,12 +234,12 @@ export const titleAccentTemplate: Template = {
           relativeTo: 'title',
           axis: 'vertical',
           anchor: 'end',
-          offset: 20,
+          offset: 0,
           size: 100,
-          margin: { left: 50, right: 50, top: 0, bottom: 0 },
+          margin: { left: 0, right: 0, top: 0, bottom: 0 },
         },
         layout: {
-          horizontalAlignment: 'center',
+          horizontalAlignment: 'right',
           verticalAlignment: 'top',
         },
         childTemplate: {
@@ -331,7 +248,7 @@ export const titleAccentTemplate: Template = {
             type: 'text',
             label: 'subtitle',
             layout: {
-              horizontalAlignment: 'center',
+              horizontalAlignment: 'right',
               verticalAlignment: 'top',
             },
             text: {
@@ -339,7 +256,7 @@ export const titleAccentTemplate: Template = {
               fontFamily: '{{theme.fontName}}',
               fontWeight: 'normal',
               fontStyle: 'normal',
-              textAlign: 'center',
+              textAlign: 'right',
             },
           },
         },

@@ -59,9 +59,9 @@ export const horizontalListLayoutTemplate: Template = {
             label: 'item',
             layout: {
               distribution: 'equal',
-              gap: -20,
+              gap: 10,
               horizontalAlignment: 'center',
-              verticalAlignment: 'top',
+              verticalAlignment: 'center',
               orientation: 'vertical',
             },
             border: {

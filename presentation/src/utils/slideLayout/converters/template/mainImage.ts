@@ -61,8 +61,8 @@ export const mainImageLayoutTemplate: Template = {
               verticalAlignment: 'center',
             },
             text: {
-              color: '{{theme.fontColor}}',
-              fontFamily: '{{theme.fontName}}',
+              color: '{{theme.titleFontColor}}',
+              fontFamily: '{{theme.titleFontName}}',
               fontWeight: 'normal',
               fontStyle: 'normal',
               textAlign: 'center',
@@ -74,37 +74,50 @@ export const mainImageLayoutTemplate: Template = {
   },
 };
 
-// Variation: Full-bleed image (fills entire slide with caption overlay)
-export const mainImageFullBleedTemplate: Template = {
-  id: 'main-image-full-bleed',
-  name: 'Main Image - Full Bleed',
+// Variation: Centered image with caption below
+export const mainImageCenteredTemplate: Template = {
+  id: 'main-image-centered',
+  name: 'Main Image - Centered with Caption',
   config: {
     containers: {
       image: {
         type: 'image',
         bounds: {
           width: {
-            expr: 'SLIDE_WIDTH',
+            expr: 'SLIDE_WIDTH * 0.75',
+            max: 'SLIDE_HEIGHT * 0.65 * (16/9)',
           },
           height: {
-            expr: 'SLIDE_HEIGHT',
+            expr: 'SLIDE_WIDTH * 0.75 * (9/16)',
+            max: 'SLIDE_HEIGHT * 0.65',
           },
-          left: 0,
-          top: 0,
-        },
-      },
-      content: {
-        type: 'text',
-        bounds: {
-          width: {
-            expr: 'SLIDE_WIDTH * 0.8',
-          },
-          height: 100,
           left: {
             expr: 'center',
           },
           top: {
-            expr: 'SLIDE_HEIGHT - 150',
+            expr: 'SLIDE_HEIGHT * 0.15',
+          },
+        },
+        shadow: {
+          h: 0,
+          v: 6,
+          blur: 12,
+          color: 'rgba(0,0,0,0.15)',
+        },
+      },
+      content: {
+        type: 'text',
+        label: 'content',
+        bounds: {
+          width: {
+            expr: 'SLIDE_WIDTH * 0.7',
+          },
+          height: 80,
+          left: {
+            expr: 'center',
+          },
+          top: {
+            expr: 'image.top + image.height + 25',
           },
         },
         layout: {
@@ -112,9 +125,9 @@ export const mainImageFullBleedTemplate: Template = {
           verticalAlignment: 'center',
         },
         text: {
-          color: '#FFFFFF',
-          fontFamily: '{{theme.fontName}}',
-          fontWeight: 'bold',
+          color: '{{theme.titleFontColor}}',
+          fontFamily: '{{theme.titleFontName}}',
+          fontWeight: 'normal',
           fontStyle: 'normal',
           textAlign: 'center',
         },
@@ -143,43 +156,30 @@ export const mainImageSplitTemplate: Template = {
         },
       },
       content: {
-        type: 'block',
+        type: 'text',
+        label: 'content',
         bounds: {
           width: {
             expr: 'SLIDE_WIDTH * 0.5 - 60',
           },
-          height: {
-            expr: 'SLIDE_HEIGHT - 80',
-          },
+          height: 200,
           left: {
             expr: 'SLIDE_WIDTH * 0.5 + 30',
           },
-          top: 40,
+          top: {
+            expr: 'SLIDE_HEIGHT * 0.5 - 100',
+          },
         },
         layout: {
-          distribution: 'space-around',
-          gap: 20,
-          horizontalAlignment: 'left',
+          horizontalAlignment: 'center',
           verticalAlignment: 'center',
-          orientation: 'vertical',
         },
-        childTemplate: {
-          count: 'auto',
-          structure: {
-            type: 'text',
-            label: 'content',
-            layout: {
-              horizontalAlignment: 'left',
-              verticalAlignment: 'center',
-            },
-            text: {
-              color: '{{theme.fontColor}}',
-              fontFamily: '{{theme.fontName}}',
-              fontWeight: 'normal',
-              fontStyle: 'normal',
-              textAlign: 'left',
-            },
-          },
+        text: {
+          color: '{{theme.titleFontColor}}',
+          fontFamily: '{{theme.titleFontName}}',
+          fontWeight: 'normal',
+          fontStyle: 'normal',
+          textAlign: 'center',
         },
       },
     },
@@ -196,23 +196,13 @@ export const mainImageWithTitleOverlayTemplate: Template = {
         type: 'image',
         bounds: {
           width: {
-            expr: 'SLIDE_WIDTH * 0.85',
+            expr: 'SLIDE_WIDTH',
           },
           height: {
-            expr: 'SLIDE_HEIGHT * 0.7',
+            expr: 'SLIDE_HEIGHT',
           },
-          left: {
-            expr: 'center',
-          },
-          top: {
-            expr: 'center',
-            offset: -10,
-          },
-        },
-        border: {
-          width: 2,
-          color: '{{theme.themeColors[0]}}',
-          radius: 8,
+          left: 0,
+          top: 0,
         },
         shadow: {
           h: 0,
@@ -223,6 +213,7 @@ export const mainImageWithTitleOverlayTemplate: Template = {
       },
       content: {
         type: 'text',
+        label: 'content',
         bounds: {
           width: {
             expr: 'SLIDE_WIDTH * 0.7',
@@ -240,9 +231,68 @@ export const mainImageWithTitleOverlayTemplate: Template = {
           verticalAlignment: 'center',
         },
         text: {
-          color: '#FFFFFF',
-          fontFamily: '{{theme.fontName}}',
+          color: '{{theme.titleFontColor}}',
+          fontFamily: '{{theme.titleFontName}}',
           fontWeight: 'bold',
+          fontStyle: 'normal',
+          textAlign: 'center',
+        },
+      },
+    },
+  },
+};
+
+export const mainImageTopTemplate: Template = {
+  id: 'main-image-top',
+  name: 'Main Image - Top',
+  config: {
+    containers: {
+      image: {
+        type: 'image',
+        bounds: {
+          width: {
+            expr: 'SLIDE_WIDTH',
+            max: 'SLIDE_HEIGHT * (16/9)',
+          },
+          height: {
+            expr: 'SLIDE_HEIGHT * 0.6',
+            max: 'SLIDE_HEIGHT',
+          },
+          left: 0,
+          top: 0,
+        },
+        shadow: {
+          h: 0,
+          v: 6,
+          blur: 12,
+          color: 'rgba(0,0,0,0.12)',
+        },
+      },
+      content: {
+        type: 'text',
+        label: 'content',
+        bounds: {
+          width: {
+            expr: 'SLIDE_WIDTH * 0.9',
+          },
+          height: {
+            expr: 'SLIDE_HEIGHT - image.height - 40',
+          },
+          left: {
+            expr: 'center',
+          },
+          top: {
+            expr: 'image.top + image.height + 20',
+          },
+        },
+        layout: {
+          horizontalAlignment: 'center',
+          verticalAlignment: 'center',
+        },
+        text: {
+          color: '{{theme.titleFontColor}}',
+          fontFamily: '{{theme.titleFontName}}',
+          fontWeight: 'normal',
           fontStyle: 'normal',
           textAlign: 'center',
         },

@@ -48,7 +48,7 @@ export const twoColumnLayoutTemplate: PartialTemplateConfig = {
           enabled: true,
           maxItemsPerLine: 4,
           lineCount: 2,
-          distribution: 'balanced',
+          wrapDistribution: 'balanced',
           lineSpacing: 15,
           alternating: true,
         },

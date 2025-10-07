@@ -47,7 +47,7 @@ export const tableOfContentsLayoutTemplate: PartialTemplateConfig = {
           enabled: true,
           maxItemsPerLine: 4,
           lineCount: 2,
-          distribution: 'balanced',
+          wrapDistribution: 'balanced',
           lineSpacing: 20,
           alternating: false,
         },

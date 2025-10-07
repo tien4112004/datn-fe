@@ -129,7 +129,7 @@ export function calculateWrapLayout(
   }
 
   const maxPerLine: number = wrapConfig.maxItemsPerLine || itemCount;
-  const distributions = distributeItems(itemCount, maxPerLine, wrapConfig.distribution || 'balanced');
+  const distributions = distributeItems(itemCount, maxPerLine, wrapConfig.wrapDistribution || 'balanced');
   const lines = distributions.length;
   const lineSpacing = wrapConfig.lineSpacing || 0;
 

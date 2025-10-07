@@ -1,9 +1,3 @@
-import type { PPTElementShadow } from '@/types/slides';
-
-// ============================================================================
-// Visual and Style Configuration Types
-// ============================================================================
-
 export interface BorderConfig {
   width: number;
   color: string;
@@ -30,8 +24,6 @@ export interface WrapConfig {
   maxItemsPerLine?: number;
   lineCount?: number | 'auto';
   lineSpacing?: number;
-  distribution?: 'balanced' | 'top-heavy' | 'bottom-heavy';
+  wrapDistribution?: 'balanced' | 'top-heavy' | 'bottom-heavy';
   alternating?: boolean;
 }
-
-export type { PPTElementShadow };

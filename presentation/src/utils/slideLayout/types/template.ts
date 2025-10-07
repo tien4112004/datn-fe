@@ -6,8 +6,8 @@ import type {
   TextLayoutBlockConfig,
   ImageLayoutBlockConfig,
   NonTextLayoutBlockConfig,
-} from './layout-config';
-import type { SlideLayoutBlockInstance } from './layout-instance';
+  SlideLayoutBlockInstance,
+} from './layout';
 
 // ============================================================================
 // Template Container Types (Config with Bounds or Relative Positioning)

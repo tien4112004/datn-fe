@@ -47,7 +47,7 @@ export const verticalListLayoutTemplate: PartialTemplateConfig = {
           enabled: true,
           maxItemsPerLine: 3,
           lineCount: 3,
-          distribution: 'balanced',
+          wrapDistribution: 'balanced',
           lineSpacing: 20,
           alternating: false,
         },

@@ -1,4 +1,5 @@
-import type { LayoutBlockInstance } from '../types';
+import type { LayoutBlockInstance, TextLayoutBlockInstance } from '../types';
+import { getChildrenMaxBounds } from './positioning';
 
 export function getAllDescendantInstances(instance: LayoutBlockInstance): LayoutBlockInstance[] {
   const result: LayoutBlockInstance[] = [];
@@ -15,4 +16,28 @@ export function getAllDescendantInstances(instance: LayoutBlockInstance): Layout
 
   traverse(instance);
   return result;
+}
+
+/**
+ * Recursively get all label instances
+ */
+export function recursivelyGetAllLabelInstances(
+  container: LayoutBlockInstance,
+  label: string
+): LayoutBlockInstance[] {
+  let labels: LayoutBlockInstance[] = [];
+
+  if (!container.children || container.children.length === 0) return labels;
+
+  for (const child of container.children) {
+    if (child.label === label) {
+      labels.push(child);
+    }
+
+    if (child.children && child.children.length > 0) {
+      labels = labels.concat(recursivelyGetAllLabelInstances(child, label));
+    }
+  }
+
+  return labels;
 }

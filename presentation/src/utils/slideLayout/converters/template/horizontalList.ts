@@ -47,7 +47,7 @@ export const horizontalListLayoutTemplate: PartialTemplateConfig = {
           enabled: true,
           maxItemsPerLine: 4,
           lineCount: 'auto',
-          distribution: 'balanced',
+          wrapDistribution: 'balanced',
           lineSpacing: 15,
           alternating: true,
         },

@@ -1,11 +1,11 @@
-import type { DistributionType } from './base';
-import type {
-  BorderConfig,
-  TextStyleConfig,
-  BackgroundConfig,
-  WrapConfig,
-  PPTElementShadow,
-} from './styling';
+import type { PPTElementShadow } from '@/types/slides';
+import type { Bounds } from './base';
+import type { BorderConfig, TextStyleConfig, BackgroundConfig, WrapConfig } from './styling';
+
+export type DistributionType = 'equal' | 'space-between' | 'space-around' | `${number}/${number}`;
+export type HorizontalAlignment = 'left' | 'center' | 'right';
+export type VerticalAlignment = 'top' | 'center' | 'bottom';
+export type Orientation = 'horizontal' | 'vertical';
 
 // ============================================================================
 // Relative Positioning Types
@@ -13,7 +13,7 @@ import type {
 
 export interface RelativePositioning {
   relativeTo?: string; // Container ID to position relative to (undefined = viewport)
-  axis: 'horizontal' | 'vertical'; // Which axis to position (other axis inherits from parent)
+  axis: Orientation; // Which axis to position (other axis inherits from parent)
 
   // Positioning for the specified axis
   anchor?: 'start' | 'end' | 'center'; // 'start' = left/top, 'end' = right/bottom
@@ -27,11 +27,11 @@ export interface RelativePositioning {
 // ============================================================================
 
 export interface ChildLayoutConfig {
-  verticalAlignment?: 'top' | 'center' | 'bottom';
-  horizontalAlignment?: 'left' | 'center' | 'right';
+  verticalAlignment?: VerticalAlignment;
+  horizontalAlignment?: HorizontalAlignment;
   distribution?: DistributionType;
   gap?: number;
-  orientation?: 'horizontal' | 'vertical';
+  orientation?: Orientation;
 }
 
 export interface ChildrenTemplate {
@@ -74,3 +74,42 @@ export type SlideLayoutBlockConfig =
   | TextLayoutBlockConfig
   | ImageLayoutBlockConfig
   | NonTextLayoutBlockConfig;
+
+// ============================================================================
+// Instance Types (Resolved - with computed positions)
+// ============================================================================
+
+export interface LayoutBlockInstance {
+  type: 'block' | 'text' | 'image';
+  id?: string;
+  bounds: Bounds;
+  label?: string;
+  border?: BorderConfig;
+  shadow?: PPTElementShadow;
+
+  // Child layout configuration
+  layout?: ChildLayoutConfig;
+
+  // Resolved children (no templates)
+  children?: LayoutBlockInstance[];
+}
+
+export interface ImageLayoutBlockInstance extends LayoutBlockInstance {
+  type: 'image';
+  // Image-specific instance fields
+}
+
+export interface TextLayoutBlockInstance extends LayoutBlockInstance {
+  type: 'text';
+  background?: BackgroundConfig;
+  text?: TextStyleConfig;
+}
+
+export interface NonTextLayoutBlockInstance extends LayoutBlockInstance {
+  type: 'block';
+}
+
+export type SlideLayoutBlockInstance =
+  | TextLayoutBlockInstance
+  | ImageLayoutBlockInstance
+  | NonTextLayoutBlockInstance;

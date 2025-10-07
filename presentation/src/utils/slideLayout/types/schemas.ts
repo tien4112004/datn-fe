@@ -1,7 +1,3 @@
-// ============================================================================
-// Slide Layout Schemas
-// ============================================================================
-
 export interface TwoColumnWithImageLayoutSchema {
   type: string;
   title: string;
@@ -95,35 +91,3 @@ export type SlideLayoutSchema =
   | HorizontalListLayoutSchema
   | TransitionLayoutSchema
   | TableOfContentsLayoutSchema;
-
-// ============================================================================
-// Legacy Layout Template System (deprecated)
-// ============================================================================
-
-export interface LegacyLayoutBlock {
-  left: number;
-  top: number;
-  width: number;
-  height: number;
-}
-
-export interface LayoutGraphics {
-  titleLine?: {
-    enabled: boolean;
-    offset?: number;
-    style?: 'solid' | 'dashed';
-    color?: string;
-    width?: number;
-  };
-}
-
-export interface LayoutTemplate {
-  id: string;
-  name?: string;
-  viewport: {
-    size: number;
-    ratio: number;
-  };
-  areas: Record<string, LegacyLayoutBlock>;
-  graphics?: LayoutGraphics;
-}

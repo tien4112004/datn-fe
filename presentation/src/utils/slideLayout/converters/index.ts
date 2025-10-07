@@ -1,8 +1,13 @@
 // Helper utilities
 import type { PartialTemplateConfig, SlideViewport, TemplateConfig, TextLayoutBlockInstance } from '../types';
 import type { PPTTextElement, Slide, SlideTheme } from '@/types/slides';
-import LayoutPrimitives from '../primitives';
-import LayoutProBuilder from '../primitives/layoutProbuild';
+import { resolveTemplateContainers, recursivelyGetAllLabelInstances, processBackground } from '../primitives';
+import {
+  buildLayoutWithUnifiedFontSizing,
+  buildCards,
+  buildTitle,
+  buildImageElement,
+} from '../primitives/layoutProbuild';
 import { cloneDeepWith, template } from 'lodash';
 
 /**
@@ -42,7 +47,7 @@ export async function convertLayoutGeneric<T = any>(
   const mappedData = mapData(data);
 
   // Resolve all container bounds (expressions + relative positioning)
-  const resolvedContainers = LayoutPrimitives.resolveTemplateContainers(template.containers, {
+  const resolvedContainers = resolveTemplateContainers(template.containers, {
     width: template.viewport.width,
     height: template.viewport.height,
   });
@@ -59,21 +64,14 @@ export async function convertLayoutGeneric<T = any>(
       }
 
       // Build layout with unified font sizing
-      const { instance, elements } = LayoutProBuilder.buildLayoutWithUnifiedFontSizing(
-        container,
-        container.bounds,
-        labelData
-      );
+      const { instance, elements } = buildLayoutWithUnifiedFontSizing(container, container.bounds, labelData);
 
       // Extract cards (border decorations)
-      allCards.push(...LayoutProBuilder.buildCards(instance));
+      allCards.push(...buildCards(instance));
 
       // For each label, extract instances and create PPT elements
       for (const [label, _] of Object.entries(labelData)) {
-        const labelInstances = LayoutPrimitives.recursivelyGetAllLabelInstances(
-          instance,
-          label
-        ) as TextLayoutBlockInstance[];
+        const labelInstances = recursivelyGetAllLabelInstances(instance, label) as TextLayoutBlockInstance[];
 
         const labelElements = elements[label] || [];
 
@@ -113,7 +111,7 @@ export async function convertLayoutGeneric<T = any>(
       const instance = container as TextLayoutBlockInstance;
 
       // Always use buildTitle for text containers
-      const textElements = LayoutProBuilder.buildTitle(textContent, instance, template.theme);
+      const textElements = buildTitle(textContent, instance, template.theme);
 
       allElements.push(...textElements);
     }
@@ -128,7 +126,7 @@ export async function convertLayoutGeneric<T = any>(
         continue;
       }
 
-      const imageElement = await LayoutProBuilder.buildImageElement(imageSrc, container);
+      const imageElement = await buildImageElement(imageSrc, container);
       imageElements.push(imageElement);
     }
   }
@@ -137,7 +135,7 @@ export async function convertLayoutGeneric<T = any>(
   const slide: Slide = {
     id: slideId ?? crypto.randomUUID(),
     elements: [...allCards, ...allElements, ...imageElements],
-    background: LayoutPrimitives.processBackground(template.theme),
+    background: processBackground(template.theme),
   };
 
   return slide;

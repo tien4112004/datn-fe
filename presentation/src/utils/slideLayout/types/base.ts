@@ -1,7 +1,3 @@
-// ============================================================================
-// Base Types
-// ============================================================================
-
 export interface SlideViewport {
   width: number;
   height: number;
@@ -18,5 +14,3 @@ export interface Size {
 }
 
 export interface Bounds extends Position, Size {}
-
-export type DistributionType = 'equal' | 'space-between' | 'space-around';

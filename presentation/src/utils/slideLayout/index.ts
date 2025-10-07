@@ -1,14 +1,4 @@
-import {
-  twoColumnWithImageLayoutTemplate,
-  twoColumnBigImageLayoutTemplate,
-  verticalListLayoutTemplate,
-  twoColumnLayoutTemplate,
-  mainImageLayoutTemplate,
-  titleLayoutTemplate,
-  transitionLayoutTemplate,
-  tableOfContentsLayoutTemplate,
-  horizontalListLayoutTemplate,
-} from './converters/template';
+import { selectTemplate } from './converters/template/templateSelector';
 import type { Slide, SlideTheme } from '@/types/slides';
 import type {
   SlideViewport,
@@ -32,6 +22,7 @@ import { convertLayoutGeneric, resolveTemplate } from './converters';
  * @param viewport - The viewport configuration
  * @param theme - The slide theme
  * @param slideId - Optional slide ID
+ * @param seed - Optional seed for deterministic template selection (useful for testing)
  * @returns Promise resolving to a Slide object
  * @throws Error if layout type is not supported
  */
@@ -39,24 +30,14 @@ export const convertToSlide = async (
   data: SlideLayoutSchema,
   viewport: SlideViewport,
   theme: SlideTheme,
-  slideId?: string
+  slideId?: string,
+  seed?: string
 ): Promise<Slide> => {
   const layoutType = data.type;
 
   if (layoutType === SLIDE_LAYOUT_TYPE.TWO_COLUMN_WITH_IMAGE) {
-    const template = resolveTemplate(twoColumnWithImageLayoutTemplate, theme, viewport);
-    return convertLayoutGeneric(
-      data as TwoColumnWithImageLayoutSchema,
-      template,
-      (d) => ({
-        texts: { title: d.title },
-        blocks: { content: { item: d.data.items } },
-        images: { image: d.data.image },
-      }),
-      slideId
-    );
-  } else if (layoutType === SLIDE_LAYOUT_TYPE.TWO_COLUMN_WITH_BIG_IMAGE) {
-    const template = resolveTemplate(twoColumnBigImageLayoutTemplate, theme, viewport);
+    const selectedTemplate = selectTemplate(layoutType, seed);
+    const template = resolveTemplate(selectedTemplate.config, theme, viewport);
     return convertLayoutGeneric(
       data as TwoColumnWithImageLayoutSchema,
       template,
@@ -68,7 +49,8 @@ export const convertToSlide = async (
       slideId
     );
   } else if (layoutType === SLIDE_LAYOUT_TYPE.MAIN_IMAGE) {
-    const template = resolveTemplate(mainImageLayoutTemplate, theme, viewport);
+    const selectedTemplate = selectTemplate(layoutType, seed);
+    const template = resolveTemplate(selectedTemplate.config, theme, viewport);
     return convertLayoutGeneric(
       data as MainImageLayoutSchema,
       template,
@@ -79,7 +61,8 @@ export const convertToSlide = async (
       slideId
     );
   } else if (layoutType === SLIDE_LAYOUT_TYPE.TITLE) {
-    const template = resolveTemplate(titleLayoutTemplate, theme, viewport);
+    const selectedTemplate = selectTemplate(layoutType, seed);
+    const template = resolveTemplate(selectedTemplate.config, theme, viewport);
     return convertLayoutGeneric(
       data as TitleLayoutSchema,
       template,
@@ -96,7 +79,8 @@ export const convertToSlide = async (
       slideId
     );
   } else if (layoutType === SLIDE_LAYOUT_TYPE.TWO_COLUMN) {
-    const template = resolveTemplate(twoColumnLayoutTemplate, theme, viewport);
+    const selectedTemplate = selectTemplate(layoutType, seed);
+    const template = resolveTemplate(selectedTemplate.config, theme, viewport);
     return convertLayoutGeneric(
       data as TwoColumnLayoutSchema,
       template,
@@ -107,7 +91,8 @@ export const convertToSlide = async (
       slideId
     );
   } else if (layoutType === SLIDE_LAYOUT_TYPE.VERTICAL_LIST) {
-    const template = resolveTemplate(verticalListLayoutTemplate, theme, viewport);
+    const selectedTemplate = selectTemplate(layoutType, seed);
+    const template = resolveTemplate(selectedTemplate.config, theme, viewport);
     return convertLayoutGeneric(
       data as VerticalListLayoutSchema,
       template,
@@ -118,7 +103,8 @@ export const convertToSlide = async (
       slideId
     );
   } else if (layoutType === SLIDE_LAYOUT_TYPE.HORIZONTAL_LIST) {
-    const template = resolveTemplate(horizontalListLayoutTemplate, theme, viewport);
+    const selectedTemplate = selectTemplate(layoutType, seed);
+    const template = resolveTemplate(selectedTemplate.config, theme, viewport);
     return convertLayoutGeneric(
       data as HorizontalListLayoutSchema,
       template,
@@ -134,7 +120,8 @@ export const convertToSlide = async (
       slideId
     );
   } else if (layoutType === SLIDE_LAYOUT_TYPE.TRANSITION) {
-    const template = resolveTemplate(transitionLayoutTemplate, theme, viewport);
+    const selectedTemplate = selectTemplate(layoutType, seed);
+    const template = resolveTemplate(selectedTemplate.config, theme, viewport);
     return convertLayoutGeneric(
       data as TransitionLayoutSchema,
       template,
@@ -151,7 +138,8 @@ export const convertToSlide = async (
       slideId
     );
   } else if (layoutType === SLIDE_LAYOUT_TYPE.TABLE_OF_CONTENTS) {
-    const template = resolveTemplate(tableOfContentsLayoutTemplate, theme, viewport);
+    const selectedTemplate = selectTemplate(layoutType, seed);
+    const template = resolveTemplate(selectedTemplate.config, theme, viewport);
     return convertLayoutGeneric(
       data as TableOfContentsLayoutSchema,
       template,

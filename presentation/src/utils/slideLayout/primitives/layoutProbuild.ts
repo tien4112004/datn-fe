@@ -98,8 +98,11 @@ export function buildLayoutWithUnifiedFontSizing(
   } = _normalizeDataStructure(data, config, bounds);
 
   // Step 2: Build layout tree (skip if already built for nested structures)
-  const instance = prebuiltInstance || buildInstanceWithBounds(config, bounds, processedData); // Step 3: Collect label groups
-  const labelGroups = _collectLabelGroups(instance);
+  const instance = prebuiltInstance || buildInstanceWithBounds(config, bounds, processedData);
+
+  // Step 3: Collect label groups
+  const labelGroups = new Map<string, TextLayoutBlockInstance[]>();
+  _collectLabelGroupsRecursive(instance, labelGroups);
 
   // Early return if no labels
   if (labelGroups.size === 0) {
@@ -137,15 +140,6 @@ function _normalizeDataStructure(
     const result = _processNestedData(data, config, dataMap, bounds);
     return result;
   }
-}
-
-/**
- * Extract label group collection
- */
-function _collectLabelGroups(container: LayoutBlockInstance): Map<string, TextLayoutBlockInstance[]> {
-  const groups = new Map<string, TextLayoutBlockInstance[]>();
-  _collectLabelGroupsRecursive(container, groups);
-  return groups;
 }
 
 /**

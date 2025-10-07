@@ -42,11 +42,11 @@ export const DEFAULT_CONVERGENCE_OPTIONS = {
 /**
  * Font size ranges for different label types
  */
-export const FONT_SIZE_RANGE_LABEL = { minSize: 10, maxSize: 24 };
-export const FONT_SIZE_RANGE_CONTENT = { minSize: 12, maxSize: 28 };
-export const FONT_SIZE_RANGE_TITLE = { minSize: 18, maxSize: 48 };
+export const FONT_SIZE_RANGE_LABEL = { minSize: 16, maxSize: 24 };
+export const FONT_SIZE_RANGE_CONTENT = { minSize: 14, maxSize: 28 };
+export const FONT_SIZE_RANGE_TITLE = { minSize: 28, maxSize: 48 };
 
 /**
  * Layout shrink factor for fill calculations
  */
-export const FILL_SHRINK_FACTOR = 0.8;
+export const FILL_SHRINK_FACTOR = 1;

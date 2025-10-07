@@ -121,10 +121,41 @@ export function calculateWrapLayout(
   itemBounds: Bounds[];
 } {
   if (!wrapConfig || !wrapConfig.enabled) {
+    // Calculate bounds for single line/column layout
+    const itemBounds: Bounds[] = [];
+
+    if (orientation === 'vertical') {
+      // Stack items vertically
+      const totalSpacing = (itemCount - 1) * gap;
+      const itemHeight = (containerBounds.height - totalSpacing) / itemCount;
+
+      for (let i = 0; i < itemCount; i++) {
+        itemBounds.push({
+          left: containerBounds.left,
+          top: containerBounds.top + i * (itemHeight + gap),
+          width: containerBounds.width,
+          height: itemHeight,
+        });
+      }
+    } else {
+      // Stack items horizontally
+      const totalSpacing = (itemCount - 1) * gap;
+      const itemWidth = (containerBounds.width - totalSpacing) / itemCount;
+
+      for (let i = 0; i < itemCount; i++) {
+        itemBounds.push({
+          left: containerBounds.left + i * (itemWidth + gap),
+          top: containerBounds.top,
+          width: itemWidth,
+          height: containerBounds.height,
+        });
+      }
+    }
+
     return {
       lines: 1,
       itemsPerLine: [itemCount],
-      itemBounds: [],
+      itemBounds,
     };
   }
 

@@ -63,3 +63,12 @@ export interface TemplateInstance {
   theme: SlideTheme;
   viewport: SlideViewport;
 }
+
+/**
+ * Template wrapper with metadata
+ */
+export interface Template {
+  id: string;
+  name: string;
+  config: PartialTemplateConfig;
+}

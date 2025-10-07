@@ -1,7 +1,7 @@
 // Helper utilities
 import type { PartialTemplateConfig, SlideViewport, TemplateConfig, TextLayoutBlockInstance } from '../types';
-import type { PPTTextElement, Slide, SlideTheme } from '@/types/slides';
-import { resolveTemplateContainers, recursivelyGetAllLabelInstances, processBackground } from '../primitives';
+import type { Slide, SlideTheme } from '@/types/slides';
+import { resolveTemplateContainers, processBackground } from '../primitives';
 import {
   buildLayoutWithUnifiedFontSizing,
   buildCards,
@@ -70,27 +70,9 @@ export async function convertLayoutGeneric<T = any>(
       // Extract cards (border decorations)
       allCards.push(...buildCards(instance));
 
-      // For each label, extract instances and create PPT elements
+      // Add all PPT elements from each label
       for (const [label, _] of Object.entries(labelData)) {
-        const labelInstances = recursivelyGetAllLabelInstances(instance, label) as TextLayoutBlockInstance[];
-
-        const labelElements = elements[label] || [];
-
-        // Map to PPT elements
-        const pptElements = labelElements.map((el, index) => ({
-          id: crypto.randomUUID(),
-          type: 'text',
-          content: el.outerHTML,
-          defaultFontName: labelInstances[index].text?.fontFamily,
-          defaultColor: labelInstances[index].text?.color,
-          left: labelInstances[index].bounds.left,
-          top: labelInstances[index].bounds.top,
-          width: labelInstances[index].bounds.width,
-          height: labelInstances[index].bounds.height,
-          textType: 'content',
-          lineHeight: labelInstances[index].text?.lineHeight,
-        })) as PPTTextElement[];
-
+        const pptElements = elements[label] || [];
         allElements.push(...pptElements);
       }
     }

@@ -236,6 +236,8 @@ export function calculateWrapLayout(
     });
   }
 
+  console.log(itemBounds);
+
   return {
     lines,
     itemsPerLine: distributions,

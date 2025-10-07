@@ -48,30 +48,44 @@ export const verticalListLayoutTemplate: Template = {
           count: 'auto',
           wrap: {
             enabled: true,
-            maxItemsPerLine: 3,
-            lineCount: 3,
+            maxItemsPerLine: 5,
+            lineCount: 'auto',
             wrapDistribution: 'balanced',
             lineSpacing: 20,
-            alternating: false,
+            alternating: true,
           },
           structure: {
-            type: 'text',
+            type: 'block',
             label: 'item',
             layout: {
-              horizontalAlignment: 'left',
+              distribution: 'equal',
+              gap: 10,
+              horizontalAlignment: 'center',
               verticalAlignment: 'center',
+              orientation: 'vertical',
             },
             border: {
               width: 1,
               color: '{{theme.themeColors[0]}}',
             },
-            text: {
-              color: '{{theme.fontColor}}',
-              fontFamily: '{{theme.fontName}}',
-              fontWeight: 'normal',
-              fontStyle: 'normal',
-              textAlign: 'left',
-            },
+            children: [
+              {
+                type: 'text',
+                id: 'label',
+                label: 'label',
+                layout: {
+                  horizontalAlignment: 'left',
+                  verticalAlignment: 'center',
+                },
+                text: {
+                  color: '{{theme.fontColor}}',
+                  fontFamily: '{{theme.fontName}}',
+                  fontWeight: 'normal',
+                  fontStyle: 'normal',
+                  textAlign: 'left',
+                },
+              },
+            ],
           },
         },
       },
@@ -128,10 +142,6 @@ export const verticalListCompactTemplate: Template = {
           structure: {
             type: 'text',
             label: 'item',
-            layout: {
-              horizontalAlignment: 'left',
-              verticalAlignment: 'center',
-            },
             text: {
               color: '{{theme.fontColor}}',
               fontFamily: '{{theme.fontName}}',
@@ -190,19 +200,15 @@ export const verticalListCardsTemplate: Template = {
           count: 'auto',
           wrap: {
             enabled: true,
-            maxItemsPerLine: 3,
-            lineCount: 'auto',
-            wrapDistribution: 'balanced',
+            maxItemsPerLine: 5,
+            lineCount: 2,
+            wrapDistribution: 'top-heavy',
             lineSpacing: 20,
             alternating: false,
           },
           structure: {
             type: 'text',
             label: 'item',
-            layout: {
-              horizontalAlignment: 'center',
-              verticalAlignment: 'center',
-            },
             border: {
               width: 2,
               color: '{{theme.themeColors[0]}}',
@@ -276,10 +282,6 @@ export const verticalListNumberedTemplate: Template = {
           structure: {
             type: 'text',
             label: 'item',
-            layout: {
-              horizontalAlignment: 'left',
-              verticalAlignment: 'center',
-            },
             border: {
               width: 1.5,
               color: '{{theme.themeColors[0]}}',

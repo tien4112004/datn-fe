@@ -19,7 +19,7 @@ import {
   buildChildrenFromChildTemplate,
   calculateUnifiedFontSizeForLabels,
 } from '.';
-import { createHtmlElement } from './elementCreators';
+import { createHtmlElement, createTextPPTElement } from './elementCreators';
 import {
   DEFAULT_MIN_FONT_SIZE,
   DEFAULT_LABEL_TO_VALUE_RATIO,
@@ -44,7 +44,7 @@ export function buildCards(instance: LayoutBlockInstance): PPTElement[] {
   const list = getAllDescendantInstances(instance)
     .map((inst) => {
       if (!inst.border) return null;
-      return createCard(inst as LayoutBlockInstance);
+      return createCard(inst);
     })
     .filter((el) => el !== null) as PPTElement[];
   return list;
@@ -90,7 +90,7 @@ export function buildText(content: string, config: TemplateContainerConfig): PPT
  * @param bounds - Fixed content bounds (from parent allocation)
  * @param data - Data items as object mapping labels to string arrays
  * @param theme - Slide theme for creating elements
- * @returns Layout instance with unified font sizes organized by label
+ * @returns Layout instance with unified font sizes and PPT elements organized by label
  */
 export function buildLayoutWithUnifiedFontSizing(
   config: LayoutBlockConfig,
@@ -98,7 +98,7 @@ export function buildLayoutWithUnifiedFontSizing(
   data: Record<string, string[]>
 ): {
   instance: LayoutBlockInstance;
-  elements: Record<string, HTMLElement[]>;
+  elements: Record<string, PPTElement[]>;
   fontSizes: Record<string, number>;
 } {
   // Step 1: Process and normalize data
@@ -123,11 +123,14 @@ export function buildLayoutWithUnifiedFontSizing(
   // Step 4: Calculate font sizes
   const fontSizes = _calculateUnifiedFontSizes(labelGroups, dataMap);
 
-  // Step 5: Create elements
-  const elements = _createElementsWithFontSizes(labelGroups, dataMap, fontSizes);
+  // Step 5: Create HTML elements
+  const htmlElements = _createElementsWithFontSizes(labelGroups, dataMap, fontSizes);
 
   // Step 6: Apply positioning
-  _applyPositioning(instance, labelGroups, elements, dataMap);
+  _applyPositioning(instance, labelGroups, htmlElements, dataMap);
+
+  // Step 7: Convert HTML elements to PPT elements
+  const elements = _convertToPPTElements(htmlElements, labelGroups);
 
   return { instance, elements, fontSizes };
 }
@@ -346,4 +349,29 @@ function _collectLabelGroupsRecursive(
   if (container.children) {
     container.children.forEach((child) => _collectLabelGroupsRecursive(child, groups));
   }
+}
+
+/**
+ * Convert HTML elements to PPT elements
+ */
+function _convertToPPTElements(
+  htmlElements: Record<string, HTMLElement[]>,
+  labelGroups: Map<string, TextLayoutBlockInstance[]>
+): Record<string, PPTElement[]> {
+  const pptElements: Record<string, PPTElement[]> = {};
+
+  for (const [label, elements] of Object.entries(htmlElements)) {
+    const instances = labelGroups.get(label) || [];
+
+    pptElements[label] = elements.map((htmlEl, index) => {
+      const instance = instances[index];
+      if (!instance) {
+        throw new Error(`No instance found for label "${label}" at index ${index}`);
+      }
+
+      return createTextPPTElement(htmlEl, instance);
+    });
+  }
+
+  return pptElements;
 }

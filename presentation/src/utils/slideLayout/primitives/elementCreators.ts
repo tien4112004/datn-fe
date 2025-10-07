@@ -10,7 +10,12 @@ import {
 } from '@/types/slides';
 import { getImageSize } from '../../image';
 import { SHAPE_PATH_FORMULAS } from '../../../configs/shapes';
-import type { ImageLayoutBlockInstance, TextLayoutBlockInstance, Bounds } from '../types';
+import type {
+  ImageLayoutBlockInstance,
+  TextLayoutBlockInstance,
+  Bounds,
+  LayoutBlockInstance,
+} from '../types';
 import { DEFAULT_RADIUS_MULTIPLIER, DEFAULT_TITLE_LINE_SPACING } from './layoutConstants';
 import { layoutItemsInBlock } from './positioning';
 import { calculateLargestOptimalFontSize, applyFontSizeToElement } from './fontSizeCalculations';
@@ -145,10 +150,7 @@ export function createTitleLine(titleDimensions: Bounds, theme: SlideTheme): PPT
 /**
  * Create a card (shape) element
  */
-export function createCard(container: {
-  bounds: Bounds;
-  border?: { color: string; width: number; radius?: number };
-}): PPTShapeElement {
+export function createCard(container: LayoutBlockInstance): PPTShapeElement {
   const formula = SHAPE_PATH_FORMULAS[ShapePathFormulasKeys.ROUND_RECT];
   const radiusMultiplier = container.border?.radius
     ? container.border.radius / Math.min(container.bounds.width, container.bounds.height)
@@ -175,6 +177,7 @@ export function createCard(container: {
         }
       : undefined,
     radius: container.border?.radius || 0,
+    shadow: container.shadow,
   } as PPTShapeElement;
 }
 
@@ -182,6 +185,10 @@ export function createCard(container: {
  * Create a text PPT element
  */
 export function createTextPPTElement(content: HTMLElement, block: TextLayoutBlockInstance): PPTTextElement {
+  const dimensions = measureElementWithStyle(content, block);
+
+  const position = layoutItemsInBlock([dimensions], block)[0];
+
   return {
     id: crypto.randomUUID(),
     type: 'text',
@@ -189,16 +196,11 @@ export function createTextPPTElement(content: HTMLElement, block: TextLayoutBloc
     defaultFontName: block.text?.fontFamily || 'Arial',
     defaultColor: block.text?.color || '#000000',
     left: block.bounds.left,
-    top: block.bounds.top,
+    top: position.top,
     width: block.bounds.width,
     height: block.bounds.height,
     textType: 'title',
-    outline: {
-      color: block.border?.color || '#000000',
-      width: block.border?.width || 0,
-      borderRadius: block.border?.radius || '0',
-    },
-    shadow: block.shadow,
+    lineHeight: block.text?.lineHeight,
   } as PPTTextElement;
 }
 
@@ -256,7 +258,7 @@ export function createHtmlElement(content: string, config: TextStyleConfig): HTM
   if (config.color) {
     span.style.color = config.color;
   }
-  span.textContent = content;
+  span.innerHTML = content;
 
   p.appendChild(span);
   return p;

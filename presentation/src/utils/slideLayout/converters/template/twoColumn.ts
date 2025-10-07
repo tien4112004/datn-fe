@@ -57,10 +57,6 @@ export const twoColumnLayoutTemplate: Template = {
           structure: {
             type: 'text',
             label: 'item',
-            layout: {
-              horizontalAlignment: 'left',
-              verticalAlignment: 'center',
-            },
             border: {
               color: '{{theme.themeColors[0]}}',
               width: 1,
@@ -134,13 +130,9 @@ export const twoColumnSplitTemplate: Template = {
           structure: {
             type: 'text',
             label: 'item',
-            layout: {
-              horizontalAlignment: 'center',
-              verticalAlignment: 'center',
-            },
             border: {
               color: '{{theme.themeColors[0]}}',
-              width: 2,
+              width: 1,
               radius: 10,
             },
             shadow: {
@@ -217,10 +209,6 @@ export const twoColumnAsymmetricTemplate: Template = {
           structure: {
             type: 'text',
             label: 'item',
-            layout: {
-              horizontalAlignment: 'left',
-              verticalAlignment: 'center',
-            },
             text: {
               color: '{{theme.fontColor}}',
               fontFamily: '{{theme.fontName}}',

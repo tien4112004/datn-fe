@@ -98,12 +98,6 @@ export const mainImageCenteredTemplate: Template = {
             expr: 'SLIDE_HEIGHT * 0.15',
           },
         },
-        shadow: {
-          h: 0,
-          v: 6,
-          blur: 12,
-          color: 'rgba(0,0,0,0.15)',
-        },
       },
       content: {
         type: 'text',
@@ -204,12 +198,6 @@ export const mainImageWithTitleOverlayTemplate: Template = {
           left: 0,
           top: 0,
         },
-        shadow: {
-          h: 0,
-          v: 8,
-          blur: 16,
-          color: 'rgba(0,0,0,0.15)',
-        },
       },
       content: {
         type: 'text',
@@ -261,12 +249,6 @@ export const mainImageTopTemplate: Template = {
           left: 0,
           top: 0,
         },
-        shadow: {
-          h: 0,
-          v: 6,
-          blur: 12,
-          color: 'rgba(0,0,0,0.12)',
-        },
       },
       content: {
         type: 'text',
@@ -284,10 +266,6 @@ export const mainImageTopTemplate: Template = {
           top: {
             expr: 'image.top + image.height + 20',
           },
-        },
-        layout: {
-          horizontalAlignment: 'center',
-          verticalAlignment: 'center',
         },
         text: {
           color: '{{theme.titleFontColor}}',

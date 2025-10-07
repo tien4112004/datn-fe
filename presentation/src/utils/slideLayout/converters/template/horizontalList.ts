@@ -48,8 +48,8 @@ export const horizontalListLayoutTemplate: Template = {
           count: 'auto',
           wrap: {
             enabled: true,
-            maxItemsPerLine: 4,
-            lineCount: 'auto',
+            maxItemsPerLine: 5,
+            lineCount: 2,
             wrapDistribution: 'balanced',
             lineSpacing: 15,
             alternating: true,
@@ -59,7 +59,7 @@ export const horizontalListLayoutTemplate: Template = {
             label: 'item',
             layout: {
               distribution: 'equal',
-              gap: 10,
+              gap: -5,
               horizontalAlignment: 'center',
               verticalAlignment: 'center',
               orientation: 'vertical',
@@ -377,10 +377,6 @@ export const horizontalListSingleRowTemplate: Template = {
               {
                 type: 'text',
                 label: 'label',
-                layout: {
-                  horizontalAlignment: 'center',
-                  verticalAlignment: 'center',
-                },
                 text: {
                   color: '{{theme.labelFontColor}}',
                   fontFamily: '{{theme.labelFontName}}',

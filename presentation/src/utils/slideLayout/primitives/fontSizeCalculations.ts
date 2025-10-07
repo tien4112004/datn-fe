@@ -56,7 +56,7 @@ export function calculateLargestOptimalFontSize(
   availableWidth: number,
   availableHeight: number,
   fontSizeRange: FontSizeRange = { minSize: 12, maxSize: 28 },
-  lineHeight: number = 1.4
+  lineHeight: number = 1.5
 ): number {
   const clonedElement = element.cloneNode(true) as HTMLElement;
 
@@ -76,7 +76,7 @@ export function calculateLargestOptimalFontSize(
     });
 
     // Accept if it fits within constraints
-    if (measured.height <= availableHeight) {
+    if (measured.height <= availableHeight * 0.9) {
       optimalSize = fontSize;
       break;
     }

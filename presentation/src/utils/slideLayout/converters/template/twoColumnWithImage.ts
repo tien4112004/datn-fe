@@ -75,10 +75,6 @@ export const twoColumnWithImageLayoutTemplate: Template = {
           structure: {
             type: 'text',
             label: 'item',
-            layout: {
-              horizontalAlignment: 'center',
-              verticalAlignment: 'top',
-            },
             border: {
               width: 1,
               color: '{{theme.themeColors[0]}}',
@@ -259,10 +255,6 @@ export const twoColumnRightBigImageTemplate: Template = {
           structure: {
             type: 'text',
             label: 'item',
-            layout: {
-              horizontalAlignment: 'left',
-              verticalAlignment: 'center',
-            },
             border: {
               width: 1,
               color: '{{theme.themeColors[0]}}',
@@ -336,10 +328,6 @@ export const twoColumnRightImageTemplate: Template = {
           structure: {
             type: 'text',
             label: 'item',
-            layout: {
-              horizontalAlignment: 'left',
-              verticalAlignment: 'center',
-            },
             border: {
               width: 1,
               color: '{{theme.themeColors[0]}}',

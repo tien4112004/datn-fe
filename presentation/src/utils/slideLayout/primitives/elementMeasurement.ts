@@ -24,7 +24,7 @@ export function measureElement(element: HTMLElement, constraints?: ElementMeasur
   element.style.visibility = 'hidden';
   element.style.top = '-9999px';
   element.style.left = '-9999px';
-  element.style.padding = '10px';
+  element.style.paddingInline = '10px'; // Add padding because of ProseMirror
 
   // Apply constraints
   if (constraints?.maxWidth) {
@@ -86,6 +86,7 @@ export function measureElementWithStyle(element: HTMLElement, container?: Layout
   element.style.visibility = 'hidden';
   element.style.top = '-9999px';
   element.style.left = '-9999px';
+  element.style.paddingInline = '10px'; // Add padding because of ProseMirror
 
   // Apply configurations
   if (container?.bounds?.width) {

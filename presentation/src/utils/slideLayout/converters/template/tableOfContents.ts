@@ -57,10 +57,6 @@ export const tableOfContentsLayoutTemplate: Template = {
           structure: {
             type: 'text',
             label: 'item',
-            layout: {
-              horizontalAlignment: 'left',
-              verticalAlignment: 'top',
-            },
             text: {
               color: '{{theme.fontColor}}',
               fontFamily: '{{theme.fontName}}',
@@ -216,10 +212,6 @@ export const tableOfContentsTwoColumnTemplate: Template = {
           structure: {
             type: 'text',
             label: 'item',
-            layout: {
-              horizontalAlignment: 'left',
-              verticalAlignment: 'center',
-            },
             text: {
               color: '{{theme.fontColor}}',
               fontFamily: '{{theme.fontName}}',
@@ -287,10 +279,6 @@ export const tableOfContentsNumberedTemplate: Template = {
           structure: {
             type: 'text',
             label: 'item',
-            layout: {
-              horizontalAlignment: 'left',
-              verticalAlignment: 'center',
-            },
             border: {
               width: 1,
               color: '{{theme.themeColors[0]}}',

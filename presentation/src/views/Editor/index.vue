@@ -20,25 +20,26 @@
         </div>
       </div>
       <Toolbar class="layout-content-right" />
+
       <div class="tw-flex tw-flex-col tw-gap-4 tw-w-16">
-        <Button class="tw-text-wrap tw-h-20" @click="() => createSlide('title-with-subtitle')"
+        <Button class="tw-text-wrap tw-h-24" @click="() => createSlide('title-with-subtitle')"
           >Title (with Subtitle)</Button
         >
-        <Button class="tw-text-wrap tw-h-20" @click="() => createSlide('title-no-subtitle')"
+        <Button class="tw-text-wrap tw-h-24" @click="() => createSlide('title-no-subtitle')"
           >Title (no Subtitle)</Button
         >
-        <Button class="tw-text-wrap tw-h-20" @click="() => createSlide('two-column-with-image')"
+        <Button class="tw-text-wrap tw-h-24" @click="() => createSlide('two-column-with-image')"
           >Two Column with Image</Button
         >
-        <Button class="tw-text-wrap tw-h-20" @click="() => createSlide('two-column')">Two Column</Button>
-        <Button class="tw-text-wrap tw-h-20" @click="() => createSlide('main-image')">Main Image</Button>
-        <Button class="tw-text-wrap tw-h-20" @click="() => createSlide('table-of-contents')"
+        <Button class="tw-text-wrap tw-h-24" @click="() => createSlide('two-column')">Two Column</Button>
+        <Button class="tw-text-wrap tw-h-24" @click="() => createSlide('main-image')">Main Image</Button>
+        <Button class="tw-text-wrap tw-h-24" @click="() => createSlide('table-of-contents')"
           >Table of Contents</Button
         >
-        <Button class="tw-text-wrap tw-h-20" @click="() => createSlide('vertical-list')"
+        <Button class="tw-text-wrap tw-h-24" @click="() => createSlide('vertical-list')"
           >Vertical List</Button
         >
-        <Button class="tw-text-wrap tw-h-20" @click="() => createSlide('horizontal-list')"
+        <Button class="tw-text-wrap tw-h-24" @click="() => createSlide('horizontal-list')"
           >Horizontal List</Button
         >
       </div>
@@ -238,6 +239,7 @@ const slideTemplates: Record<string, any[]> = {
         'Item4: Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
         'Item5: Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
         'Item6: Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+        'Item7: Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
       ],
     },
   }),

@@ -243,13 +243,25 @@ export const convertToSlide = async (
   } else if (layoutType === SLIDE_LAYOUT_TYPE.TABLE_OF_CONTENTS) {
     const selectedTemplate = selectTemplate(layoutType, seed);
     const template = resolveTemplate(selectedTemplate.config, theme, viewport);
+
+    // Check if the template has numbering enabled
+    const contentContainer = template.containers.content;
+    const hasNumbering =
+      contentContainer?.type === 'block' &&
+      contentContainer.childTemplate?.structure?.children?.some(
+        (child: any) => child.label === 'label' && child.numbering === true
+      );
+
     return convertLayoutGeneric(
       data as TableOfContentsLayoutSchema,
       template,
       (d) => ({
         texts: { title: 'Contents' },
         blocks: {
-          content: { item: d.data.items.map((item: string, index: number) => `${index + 1}. ${item}`) },
+          content: {
+            content: d.data.items,
+            label: hasNumbering ? d.data.items.map((_, index) => String(index + 1).padStart(2, '0')) : [],
+          },
         },
       }),
       slideId

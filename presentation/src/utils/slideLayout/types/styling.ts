@@ -1,9 +1,21 @@
-import type { FontSizeRange } from './primitives';
+import type { Gradient } from '@/types/slides';
+
+export interface FontSizeRange {
+  minSize: number;
+  maxSize: number;
+}
 
 export interface BorderConfig {
-  width: number;
+  width: number | string;
   color: string;
-  radius?: number;
+  radius?: number | string;
+}
+
+export interface ShadowConfig {
+  h: number | string;
+  v: number | string;
+  blur: number | string;
+  color: string; // Shadow color
 }
 
 export interface TextStyleConfig {
@@ -17,8 +29,7 @@ export interface TextStyleConfig {
 }
 
 export interface BackgroundConfig {
-  color?: string;
-  image?: string;
+  color: string | Gradient;
 }
 
 export interface WrapConfig {

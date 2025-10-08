@@ -54,14 +54,47 @@ export const tableOfContentsLayoutTemplate: Template = {
             lineSpacing: 20,
           },
           structure: {
-            type: 'text',
+            type: 'block',
             label: 'item',
-            text: {
-              color: '{{theme.fontColor}}',
-              fontFamily: '{{theme.fontName}}',
-              fontWeight: 'normal',
-              fontStyle: 'normal',
+            layout: {
+              distribution: '1/6',
+              gap: 10,
+              horizontalAlignment: 'left',
+              verticalAlignment: 'center',
+              orientation: 'horizontal',
             },
+            border: {
+              width: '{{theme.card.borderWidth}}',
+              color: '{{theme.themeColors[0]}}',
+              radius: '{{theme.card.borderRadius}}',
+            },
+            children: [
+              {
+                type: 'text',
+                id: 'label',
+                label: 'label',
+                numbering: true,
+                text: {
+                  color: '{{theme.labelFontColor}}',
+                  fontFamily: '{{theme.labelFontName}}',
+                  fontWeight: 'bold',
+                  textAlign: 'center',
+                  fontSizeRange: { minSize: 16, maxSize: 24 },
+                },
+              },
+              {
+                type: 'text',
+                id: 'content',
+                label: 'content',
+                text: {
+                  color: '{{theme.fontColor}}',
+                  fontFamily: '{{theme.fontName}}',
+                  fontWeight: 'normal',
+                  fontStyle: 'normal',
+                  textAlign: 'left',
+                },
+              },
+            ],
           },
         },
       },
@@ -122,29 +155,58 @@ export const tableOfContentsGridTemplate: Template = {
             lineCount: 'auto',
             wrapDistribution: 'balanced',
             lineSpacing: 20,
+            syncSize: true,
           },
           structure: {
-            type: 'text',
+            type: 'block',
             label: 'item',
             layout: {
+              distribution: '1/4',
+              gap: -10,
               horizontalAlignment: 'center',
               verticalAlignment: 'center',
+              orientation: 'horizontal',
             },
             border: {
-              width: 2,
+              width: '{{theme.card.borderWidth}}',
               color: '{{theme.themeColors[0]}}',
-              radius: 10,
+              radius: '{{theme.card.borderRadius}}',
             },
-            background: {
-              color: 'rgba({{theme.themeColors[0]}}, 0.05)',
-            },
-            text: {
-              color: '{{theme.fontColor}}',
-              fontFamily: '{{theme.fontName}}',
-              fontWeight: 'normal',
-              fontStyle: 'normal',
-              textAlign: 'center',
-            },
+            children: [
+              {
+                type: 'text',
+                id: 'label',
+                label: 'label',
+                numbering: true,
+                layout: {
+                  horizontalAlignment: 'center',
+                  verticalAlignment: 'center',
+                },
+                text: {
+                  color: '{{theme.themeColors[0]}}',
+                  fontFamily: '{{theme.labelFontName}}',
+                  fontWeight: 'bold',
+                  textAlign: 'center',
+                  fontSizeRange: { minSize: 16, maxSize: 24 },
+                },
+              },
+              {
+                type: 'text',
+                id: 'content',
+                label: 'content',
+                layout: {
+                  horizontalAlignment: 'center',
+                  verticalAlignment: 'center',
+                },
+                text: {
+                  color: '{{theme.fontColor}}',
+                  fontFamily: '{{theme.fontName}}',
+                  fontWeight: 'normal',
+                  fontStyle: 'normal',
+                  textAlign: 'center',
+                },
+              },
+            ],
           },
         },
       },
@@ -153,7 +215,7 @@ export const tableOfContentsGridTemplate: Template = {
 };
 
 // Variation: Two-column layout
-export const tableOfContentsTwoColumnTemplate: Template = {
+export const tableOfContentsTwoRowTemplate: Template = {
   id: 'table-of-contents-two-column',
   name: 'Table of Contents - Two Column',
   config: {
@@ -195,99 +257,60 @@ export const tableOfContentsTwoColumnTemplate: Template = {
           gap: 20,
           horizontalAlignment: 'left',
           verticalAlignment: 'top',
-          orientation: 'vertical',
+          orientation: 'horizontal',
         },
         childTemplate: {
           count: 'auto',
           wrap: {
             enabled: true,
-            maxItemsPerLine: 2,
+            maxItemsPerLine: 4,
             lineCount: 'auto',
             wrapDistribution: 'balanced',
-            lineSpacing: 25,
+            lineSpacing: 10,
           },
           structure: {
-            type: 'text',
+            type: 'block',
             label: 'item',
-            text: {
-              color: '{{theme.fontColor}}',
-              fontFamily: '{{theme.fontName}}',
-              fontWeight: 'normal',
-              fontStyle: 'normal',
-              textAlign: 'left',
+            layout: {
+              distribution: 'equal',
+              gap: -5,
+              horizontalAlignment: 'center',
+              verticalAlignment: 'center',
+              orientation: 'vertical',
             },
-          },
-        },
-      },
-    },
-  },
-};
-
-// Variation: Numbered list
-export const tableOfContentsNumberedTemplate: Template = {
-  id: 'table-of-contents-numbered',
-  name: 'Table of Contents - Numbered',
-  config: {
-    containers: {
-      title: {
-        type: 'text',
-        bounds: {
-          left: 15,
-          top: 20,
-          width: {
-            expr: 'SLIDE_WIDTH - 30',
-          },
-          height: 90,
-        },
-        layout: {
-          horizontalAlignment: 'center',
-          verticalAlignment: 'top',
-        },
-        text: {
-          color: '{{theme.titleFontColor}}',
-          fontFamily: '{{theme.titleFontName}}',
-          fontWeight: 'bold',
-          fontStyle: 'normal',
-          textAlign: 'center',
-        },
-      },
-      content: {
-        type: 'block',
-        positioning: {
-          relativeTo: 'title',
-          axis: 'vertical',
-          anchor: 'end',
-          offset: 20,
-          size: 'fill',
-          margin: { left: 100, right: 100, top: 0, bottom: 40 },
-        },
-        layout: {
-          distribution: 'space-around',
-          gap: 15,
-          horizontalAlignment: 'left',
-          verticalAlignment: 'center',
-          orientation: 'vertical',
-        },
-        childTemplate: {
-          count: 'auto',
-          wrap: {
-            enabled: false,
-          },
-          structure: {
-            type: 'text',
-            label: 'item',
             border: {
-              width: 1,
+              width: '{{theme.card.borderWidth}}',
               color: '{{theme.themeColors[0]}}',
-              radius: 6,
+              radius: '{{theme.card.borderRadius}}',
             },
-            text: {
-              color: '{{theme.fontColor}}',
-              fontFamily: '{{theme.fontName}}',
-              fontWeight: 'normal',
-              fontStyle: 'normal',
-              textAlign: 'left',
-            },
+            children: [
+              {
+                type: 'text',
+                id: 'label',
+                label: 'label',
+                numbering: true,
+                text: {
+                  color: '{{theme.labelFontColor}}',
+                  fontFamily: '{{theme.labelFontName}}',
+                  fontWeight: 'bold',
+                  textAlign: 'center',
+                  fontSizeRange: { minSize: 18, maxSize: 26 },
+                },
+              },
+              {
+                type: 'text',
+                id: 'content',
+                label: 'content',
+                text: {
+                  color: '{{theme.fontColor}}',
+                  fontFamily: '{{theme.fontName}}',
+                  fontWeight: 'normal',
+                  fontStyle: 'normal',
+                  textAlign: 'center',
+                  fontSizeRange: { minSize: 18, maxSize: 24 },
+                },
+              },
+            ],
           },
         },
       },

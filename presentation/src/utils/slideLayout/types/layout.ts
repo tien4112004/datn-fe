@@ -1,6 +1,5 @@
-import type { PPTElementShadow } from '@/types/slides';
 import type { Bounds } from './base';
-import type { BorderConfig, TextStyleConfig, BackgroundConfig, WrapConfig } from './styling';
+import type { BorderConfig, TextStyleConfig, BackgroundConfig, WrapConfig, ShadowConfig } from './styling';
 
 /**
  * Distribution strategies for laying out children within a container
@@ -60,7 +59,8 @@ export interface LayoutBlockConfig {
   type: 'block' | 'text' | 'image';
   id?: string;
   border?: BorderConfig;
-  shadow?: PPTElementShadow;
+  shadow?: ShadowConfig;
+  background?: BackgroundConfig;
   label?: string;
 
   // Child layout configuration
@@ -104,7 +104,8 @@ export interface LayoutBlockInstance {
   bounds: Bounds;
   label?: string;
   border?: BorderConfig;
-  shadow?: PPTElementShadow;
+  shadow?: ShadowConfig;
+  background?: BackgroundConfig;
 
   // Child layout configuration
   layout?: ChildLayoutConfig;

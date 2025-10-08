@@ -1,10 +1,13 @@
-import type {
-  LayoutBlockInstance,
-  Size,
-  TextLayoutBlockInstance,
-  FontSizeCalculationResult,
-  FontSizeRange,
-} from '../types';
+import type { LayoutBlockInstance, Size, TextLayoutBlockInstance, FontSizeRange } from '../types';
+
+/**
+ * Font Size Calculation Result
+ */
+export interface FontSizeCalculationResult {
+  fontSize: number;
+  lineHeight: number;
+  spacing: number;
+}
 
 /**
  * Measures an HTML element's dimensions by temporarily adding it to the DOM.
@@ -145,8 +148,8 @@ export function applyFontSizeToElement(element: HTMLElement, fontSize: number, l
  * Starts from maxSize and decreases until content fits within 90% of container height.
  *
  * Step sizes:
- * - Fonts > 20px: decrease by 1px per iteration (faster for large fonts)
- * - Fonts <= 20px: decrease by 0.5px per iteration (finer control for small fonts)
+ * - Fonts > 20px: decrease by 0.5px per iteration (faster for large fonts)
+ * - Fonts <= 20px: decrease by 0.2px per iteration (finer control for small fonts)
  *
  * @param element - Element to optimize
  * @param container - Container with bounds constraints
@@ -157,7 +160,7 @@ export function applyFontSizeToElement(element: HTMLElement, fontSize: number, l
 export function calculateLargestOptimalFontSize(
   element: HTMLElement,
   container: TextLayoutBlockInstance,
-  fontSizeRange: FontSizeRange = { minSize: 12, maxSize: 28 },
+  fontSizeRange: FontSizeRange = { minSize: 14, maxSize: 28 },
   lineHeight: number = 1.5
 ): number {
   const clonedElement = element.cloneNode(true) as HTMLElement;
@@ -179,13 +182,12 @@ export function calculateLargestOptimalFontSize(
       break;
     }
 
-    fontSize -= fontSize > 20 ? 1 : 0.5;
+    fontSize -= fontSize > 20 ? 0.5 : 0.2;
   }
 
   return optimalSize;
 }
 
-// Moved updateElementFontSize and updateElementLineHeight from elementCreators.ts
 export function updateElementFontSize(element: HTMLElement, newFontSize: number): void {
   element.style.fontSize = `${newFontSize}px`;
 }

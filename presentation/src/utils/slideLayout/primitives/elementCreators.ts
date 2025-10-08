@@ -170,9 +170,10 @@ export function createTitleLine(titleDimensions: Bounds, theme: SlideTheme): PPT
  */
 export function createCard(container: LayoutBlockInstance): PPTShapeElement {
   const formula = SHAPE_PATH_FORMULAS[ShapePathFormulasKeys.ROUND_RECT];
-  const radiusMultiplier = container.border?.radius
-    ? container.border.radius / Math.min(container.bounds.width, container.bounds.height)
-    : DEFAULT_RADIUS_MULTIPLIER;
+  const radiusMultiplier =
+    container.border?.radius && typeof container.border.radius === 'number'
+      ? container.border.radius / Math.min(container.bounds.width, container.bounds.height)
+      : DEFAULT_RADIUS_MULTIPLIER;
   const path = formula.formula(container.bounds.width, container.bounds.height, [radiusMultiplier]);
 
   return {
@@ -187,7 +188,7 @@ export function createCard(container: LayoutBlockInstance): PPTShapeElement {
     path,
     fixedRatio: false,
     rotate: 0,
-    fill: 'transparent',
+    fill: container.background ? container.background.color : 'transparent',
     outline: container.border
       ? {
           color: container.border.color,

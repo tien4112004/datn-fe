@@ -72,7 +72,6 @@ import MarkupPanel from './MarkupPanel.vue';
 import AIPPTDialog from './AIPPTDialog.vue';
 import Modal from '@/components/Modal.vue';
 import Drawer from '@/components/Drawer.vue';
-import type { SlideTheme } from '@/types/slides';
 
 const mainStore = useMainStore();
 const slidesStore = useSlidesStore();

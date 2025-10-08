@@ -65,8 +65,9 @@ export const verticalListLayoutTemplate: Template = {
               orientation: 'vertical',
             },
             border: {
-              width: 1,
+              width: '{{theme.card.borderWidth}}',
               color: '{{theme.themeColors[0]}}',
+              radius: '{{theme.card.borderRadius}}',
             },
             children: [
               {
@@ -213,15 +214,15 @@ export const verticalListCardsTemplate: Template = {
             type: 'text',
             label: 'item',
             border: {
-              width: 1,
+              width: '{{theme.card.borderWidth}}',
               color: '{{theme.themeColors[0]}}',
-              radius: 12,
+              radius: '{{theme.card.borderRadius}}',
             },
             shadow: {
-              h: 0,
-              v: 4,
-              blur: 8,
-              color: 'rgba(0,0,0,0.1)',
+              h: '{{theme.card.shadow.h}}',
+              v: '{{theme.card.shadow.v}}',
+              blur: '{{theme.card.shadow.blur}}',
+              color: '{{theme.card.shadow.color}}',
             },
             text: {
               color: '{{theme.fontColor}}',
@@ -312,9 +313,9 @@ export const verticalListNumberedTemplate: Template = {
                 id: 'content',
                 label: 'content',
                 border: {
-                  width: 1.5,
+                  width: '{{theme.card.borderWidth}}',
                   color: '{{theme.themeColors[0]}}',
-                  radius: 8,
+                  radius: '{{theme.card.borderRadius}}',
                 },
                 text: {
                   color: '{{theme.fontColor}}',
@@ -481,7 +482,7 @@ export const verticalListNumberedCardsTemplate: Template = {
             wrapDistribution: 'balanced',
             lineSpacing: 20,
             syncSize: true,
-            alternating: { start: 15, end: 15 },
+            alternating: { start: 15, end: -15 },
           },
           structure: {
             type: 'block',
@@ -494,15 +495,18 @@ export const verticalListNumberedCardsTemplate: Template = {
               orientation: 'horizontal',
             },
             border: {
-              width: 2,
+              width: '{{theme.card.borderWidth}}',
               color: '{{theme.themeColors[0]}}',
-              radius: 12,
+              radius: '{{theme.card.borderRadius}}',
             },
             shadow: {
-              h: 0,
-              v: 4,
-              blur: 8,
-              color: 'rgba(0,0,0,0.1)',
+              h: '{{theme.card.shadow.h}}',
+              v: '{{theme.card.shadow.v}}',
+              blur: '{{theme.card.shadow.blur}}',
+              color: '{{theme.card.shadow.color}}',
+            },
+            background: {
+              color: '{{theme.themeColors[0]}}',
             },
             children: [
               {
@@ -514,11 +518,9 @@ export const verticalListNumberedCardsTemplate: Template = {
                   horizontalAlignment: 'center',
                   verticalAlignment: 'center',
                 },
-                background: {
-                  color: '{{theme.themeColors[0]}}',
-                },
+
                 text: {
-                  color: '{{theme.labelFontColor}}',
+                  color: '#fff',
                   fontFamily: '{{theme.labelFontName}}',
                   fontWeight: 'bold',
                   textAlign: 'center',
@@ -534,7 +536,7 @@ export const verticalListNumberedCardsTemplate: Template = {
                   verticalAlignment: 'center',
                 },
                 text: {
-                  color: '{{theme.fontColor}}',
+                  color: '#fff',
                   fontFamily: '{{theme.fontName}}',
                   fontWeight: 'normal',
                   textAlign: 'left',

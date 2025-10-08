@@ -41,11 +41,6 @@ export const twoColumnWithImageLayoutTemplate: Template = {
             offset: 20,
           },
         },
-        border: {
-          width: 1,
-          color: 'transparent',
-          radius: 50,
-        },
       },
       content: {
         type: 'block',
@@ -76,8 +71,9 @@ export const twoColumnWithImageLayoutTemplate: Template = {
             type: 'text',
             label: 'item',
             border: {
-              width: 1,
+              width: '{{theme.card.borderWidth}}',
               color: '{{theme.themeColors[0]}}',
+              radius: '{{theme.card.borderRadius}}',
             },
             text: {
               color: '{{theme.fontColor}}',
@@ -167,9 +163,9 @@ export const twoColumnLeftBigImageTemplate: Template = {
               verticalAlignment: 'center',
             },
             border: {
-              width: 1,
+              width: '{{theme.card.borderWidth}}',
               color: '{{theme.themeColors[0]}}',
-              radius: 6,
+              radius: '{{theme.card.borderRadius}}',
             },
             text: {
               color: '{{theme.fontColor}}',
@@ -256,9 +252,9 @@ export const twoColumnRightBigImageTemplate: Template = {
             type: 'text',
             label: 'item',
             border: {
-              width: 1,
+              width: '{{theme.card.borderWidth}}',
               color: '{{theme.themeColors[0]}}',
-              radius: 6,
+              radius: '{{theme.card.borderRadius}}',
             },
             text: {
               color: '{{theme.fontColor}}',
@@ -329,9 +325,9 @@ export const twoColumnRightImageTemplate: Template = {
             type: 'text',
             label: 'item',
             border: {
-              width: 1,
+              width: '{{theme.card.borderWidth}}',
               color: '{{theme.themeColors[0]}}',
-              radius: 6,
+              radius: '{{theme.card.borderRadius}}',
             },
             text: {
               color: '{{theme.fontColor}}',
@@ -361,10 +357,10 @@ export const twoColumnRightImageTemplate: Template = {
         },
 
         shadow: {
-          h: 0,
-          v: 4,
-          blur: 12,
-          color: 'rgba(0,0,0,0.12)',
+          h: '{{theme.card.shadow.h}}',
+          v: '{{theme.card.shadow.v}}',
+          blur: '{{theme.card.shadow.blur}}',
+          color: '{{theme.card.shadow.color}}',
         },
       },
     },

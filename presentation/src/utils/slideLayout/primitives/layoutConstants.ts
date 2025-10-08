@@ -9,7 +9,7 @@ export const DEFAULT_VIEWPORT = { width: SLIDE_WIDTH, height: SLIDE_HEIGHT };
  * Default font sizing options
  */
 export const DEFAULT_MIN_FONT_SIZE = 8;
-export const DEFAULT_LABEL_TO_VALUE_RATIO = 1.2;
+export const DEFAULT_LABEL_TO_VALUE_RATIO = 1.1;
 
 /**
  * Default spacing values

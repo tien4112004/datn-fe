@@ -41,8 +41,7 @@ import {
 import {
   tableOfContentsLayoutTemplate,
   tableOfContentsGridTemplate,
-  tableOfContentsTwoColumnTemplate,
-  tableOfContentsNumberedTemplate,
+  tableOfContentsTwoRowTemplate,
 } from './template/tableOfContents';
 import { SLIDE_LAYOUT_TYPE } from '../types';
 
@@ -96,8 +95,7 @@ const TEMPLATE_VARIATIONS: Record<string, Template[]> = {
   [SLIDE_LAYOUT_TYPE.TABLE_OF_CONTENTS]: [
     tableOfContentsLayoutTemplate,
     tableOfContentsGridTemplate,
-    tableOfContentsTwoColumnTemplate,
-    tableOfContentsNumberedTemplate,
+    tableOfContentsTwoRowTemplate,
   ],
 };
 

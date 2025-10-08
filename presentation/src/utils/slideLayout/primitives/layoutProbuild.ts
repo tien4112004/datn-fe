@@ -350,7 +350,7 @@ function _applyFontSizeHierarchy(
 ): void {
   if (fontSizes['label'] && fontSizes['content']) {
     if (fontSizes['label'] <= fontSizes['content'] * labelToValueRatio) {
-      fontSizes['content'] = fontSizes['label'] / labelToValueRatio;
+      fontSizes['content'] = Math.round(fontSizes['label'] / labelToValueRatio);
       fontSizes['content'] = Math.max(fontSizes['content'], minFontSize);
     }
   }

@@ -87,6 +87,7 @@ export function buildInstanceWithBounds(
     border: config.border,
     shadow: config.shadow,
     layout: config.layout,
+    background: config.background,
   };
 
   // Add type-specific properties

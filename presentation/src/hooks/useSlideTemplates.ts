@@ -57,23 +57,21 @@ const slideTemplates: Record<string, any[]> = {
       content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
     },
   }),
-  'table-of-contents': [
-    {
-      type: 'table_of_contents',
-      data: {
-        items: [
-          'Item1: What & Why of Microservices',
-          'Item2: Monolith vs Microservices',
-          'Item3: Service Design Principles',
-          'Item4: Communication & Data',
-          'Item5: Deployment & Scaling',
-          'Item6: Observability & Resilience',
-          'Item7: Security & Governance',
-          'Item8: Case Study & Q&A',
-        ],
-      },
+  'table-of-contents': Array(4).fill({
+    type: 'table_of_contents',
+    data: {
+      items: [
+        'What & Why of Microservices',
+        'Monolith vs Microservices',
+        'Service Design Principles',
+        'Communication & Data',
+        'Deployment & Scaling',
+        'Observability & Resilience',
+        'Security & Governance',
+        'Case Study & Q&A',
+      ],
     },
-  ],
+  }),
   'vertical-list': Array(6).fill({
     type: 'vertical_list',
     title: 'This is a title',

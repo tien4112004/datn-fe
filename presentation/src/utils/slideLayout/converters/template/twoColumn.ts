@@ -64,9 +64,9 @@ export const twoColumnLayoutTemplate: Template = {
                 type: 'text',
                 label: 'item',
                 border: {
+                  width: '{{theme.card.borderWidth}}',
                   color: '{{theme.themeColors[0]}}',
-                  width: 1,
-                  radius: 8,
+                  radius: '{{theme.card.borderRadius}}',
                 },
                 text: {
                   color: '{{theme.fontColor}}',
@@ -141,9 +141,9 @@ export const twoColumnSplitTemplate: Template = {
               horizontalAlignment: 'center',
             },
             border: {
+              width: '{{theme.card.borderWidth}}',
               color: '{{theme.themeColors[0]}}',
-              width: 1,
-              radius: 10,
+              radius: '{{theme.card.borderRadius}}',
             },
             children: [
               {
@@ -151,10 +151,10 @@ export const twoColumnSplitTemplate: Template = {
                 label: 'item',
 
                 shadow: {
-                  h: 0,
-                  v: 3,
-                  blur: 8,
-                  color: 'rgba(0,0,0,0.1)',
+                  h: '{{theme.card.shadow.h}}',
+                  v: '{{theme.card.shadow.v}}',
+                  blur: '{{theme.card.shadow.blur}}',
+                  color: '{{theme.card.shadow.color}}',
                 },
                 text: {
                   color: '{{theme.fontColor}}',

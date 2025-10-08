@@ -56,49 +56,40 @@ export const horizontalListLayoutTemplate: Template = {
           },
           structure: {
             type: 'block',
-            label: 'item',
             layout: {
               distribution: 'equal',
-              gap: -5,
+              gap: 10,
               horizontalAlignment: 'center',
               verticalAlignment: 'center',
               orientation: 'vertical',
             },
             border: {
+              width: '{{theme.card.borderWidth}}',
               color: '{{theme.themeColors[0]}}',
-              width: 1,
-              radius: 8,
+              radius: '{{theme.card.borderRadius}}',
             },
             children: [
               {
                 type: 'text',
-                id: 'label',
-                layout: {
-                  horizontalAlignment: 'center',
-                  verticalAlignment: 'center',
-                },
                 label: 'label',
                 text: {
                   color: '{{theme.labelFontColor}}',
                   fontFamily: '{{theme.labelFontName}}',
                   fontWeight: 'bold',
-                  fontStyle: 'normal',
                   textAlign: 'center',
                 },
               },
               {
                 type: 'text',
-                id: 'content',
+                label: 'content',
                 layout: {
                   horizontalAlignment: 'center',
                   verticalAlignment: 'center',
                 },
-                label: 'content',
                 text: {
                   color: '{{theme.fontColor}}',
                   fontFamily: '{{theme.fontName}}',
                   fontWeight: 'normal',
-                  fontStyle: 'normal',
                   textAlign: 'center',
                 },
               },
@@ -170,15 +161,15 @@ export const horizontalListGridTemplate: Template = {
               orientation: 'vertical',
             },
             border: {
+              width: '{{theme.card.borderWidth}}',
               color: '{{theme.themeColors[0]}}',
-              width: 2,
-              radius: 10,
+              radius: '{{theme.card.borderRadius}}',
             },
             shadow: {
-              h: 0,
-              v: 2,
-              blur: 6,
-              color: 'rgba(0,0,0,0.08)',
+              h: '{{theme.card.shadow.h}}',
+              v: '{{theme.card.shadow.v}}',
+              blur: '{{theme.card.shadow.blur}}',
+              color: '{{theme.card.shadow.color}}',
             },
             children: [
               {
@@ -273,9 +264,9 @@ export const horizontalListSingleRowTemplate: Template = {
               orientation: 'vertical',
             },
             border: {
+              width: '{{theme.card.borderWidth}}',
               color: '{{theme.themeColors[0]}}',
-              width: 1,
-              radius: 8,
+              radius: '{{theme.card.borderRadius}}',
             },
             children: [
               {
@@ -376,9 +367,9 @@ export const horizontalListNumberedTemplate: Template = {
               orientation: 'vertical',
             },
             border: {
+              width: '{{theme.card.borderWidth}}',
               color: '{{theme.themeColors[0]}}',
-              width: 1,
-              radius: 8,
+              radius: '{{theme.card.borderRadius}}',
             },
             children: [
               {

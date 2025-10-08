@@ -90,6 +90,7 @@ export function mount(el: string | Element, props: Record<string, unknown>) {
       width: slidesStore.viewportSize,
       height: slidesStore.viewportSize * slidesStore.viewportRatio,
     };
+
     const themeToUse = theme || slidesStore.theme;
 
     const slide = await convertToSlide(data, viewport, themeToUse, order?.toString());

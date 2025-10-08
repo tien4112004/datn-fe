@@ -44,7 +44,7 @@ export default () => {
         } else
           backgroundColorValues.push({
             area: 1,
-            value: theme.value.backgroundColor,
+            value: typeof theme.value.backgroundColor === 'string' ? theme.value.backgroundColor : '#ffffff',
           });
       }
       for (const el of slide.elements) {
@@ -382,7 +382,7 @@ export default () => {
       if (!slide.background || slide.background.type !== 'image') {
         slide.background = {
           type: 'solid',
-          color: backgroundColor,
+          color: typeof backgroundColor === 'string' ? backgroundColor : '#ffffff',
         };
       }
 

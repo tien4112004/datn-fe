@@ -133,18 +133,12 @@ export function selectTemplate(layoutType: string, seed?: string): Template {
     // Move to next template for next call
     cycleIndexes[layoutType] = (currentIndex + 1) % templates.length;
 
-    console.log(
-      `Cycling template for layout type "${layoutType}": ${selectedTemplate.id} (index ${currentIndex})`
-    );
-
     return selectedTemplate;
   }
 
   // Use seeded random if seed is provided, otherwise use Math.random
   const rng = seed ? seedrandom(seed) : Math.random;
   const randomIndex = Math.floor(rng() * templates.length);
-
-  console.log(`Selected template index for layout type "${layoutType}": ${templates[randomIndex].id}`);
 
   return templates[randomIndex];
 }

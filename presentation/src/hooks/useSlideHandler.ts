@@ -35,7 +35,7 @@ export default () => {
       elements: [],
       background: {
         type: 'solid',
-        color: theme.value.backgroundColor,
+        color: typeof theme.value.backgroundColor === 'string' ? theme.value.backgroundColor : '#ffffff',
       },
     };
     slidesStore.updateSlideIndex(0);
@@ -85,10 +85,16 @@ export default () => {
     const emptySlide: Slide = {
       id: nanoid(10),
       elements: [],
-      background: {
-        type: 'solid',
-        color: theme.value.backgroundColor,
-      },
+      background:
+        typeof theme.value.backgroundColor === 'string'
+          ? {
+              type: 'solid',
+              color: theme.value.backgroundColor,
+            }
+          : {
+              type: 'gradient',
+              gradient: theme.value.backgroundColor,
+            },
     };
     mainStore.setActiveElementIdList([]);
     slidesStore.addSlide(emptySlide);

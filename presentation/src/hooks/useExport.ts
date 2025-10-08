@@ -432,7 +432,9 @@ export default () => {
     } else pptx.layout = 'LAYOUT_16x9';
 
     if (masterOverwrite) {
-      const { color: bgColor, alpha: bgAlpha } = formatColor(theme.value.backgroundColor);
+      const { color: bgColor, alpha: bgAlpha } = formatColor(
+        typeof theme.value.backgroundColor === 'string' ? theme.value.backgroundColor : '#ffffff'
+      );
       pptx.defineSlideMaster({
         title: 'PPTIST_MASTER',
         background: { color: bgColor, transparency: (1 - bgAlpha) * 100 },

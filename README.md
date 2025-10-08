@@ -89,6 +89,49 @@ Run the full hygiene suite:
 pnpm lint && pnpm format && pnpm typecheck
 ```
 
+## Docker Deployment
+
+### Production Build
+
+Build and run both applications using Docker Compose:
+
+```bash
+# Build and start containers
+docker-compose up -d
+
+# Stop containers
+docker-compose down
+```
+
+This will start:
+- **Container app** at http://localhost:3000
+- **Presentation app** at http://localhost:3001
+
+### Development with Docker
+
+Run the development environment in Docker:
+
+```bash
+# Start dev environment with hot-reload
+docker-compose --profile development up dev
+```
+
+### Individual Container Builds
+
+Build specific applications:
+
+```bash
+# Build container app
+docker build --target container-production -t container-app .
+
+# Build presentation app
+docker build --target presentation-production -t presentation-app .
+
+# Run individually
+docker run -p 3000:3000 container-app
+docker run -p 3001:3001 presentation-app
+```
+
 ## Adding Dependencies
 
 ```bash

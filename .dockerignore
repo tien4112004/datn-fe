@@ -1,0 +1,77 @@
+# Dependencies
+node_modules
+**/node_modules
+
+# Build outputs
+dist
+**/dist
+build
+**/build
+.turbo
+**/.turbo
+
+# Development files
+.git
+.gitignore
+.github
+**/.github
+.vscode
+**/.vscode
+.vercel
+**/.vercel
+.claude
+**/.claude
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Testing
+coverage
+**/__tests__
+**/tests
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+
+# Environment files (security)
+.env
+.env.*
+!.env.sample
+**/.env
+**/.env.*
+!**/.env.sample
+
+# Temporary files
+*.tmp
+*.temp
+.DS_Store
+Thumbs.db
+
+# Documentation
+README.md
+**/README.md
+README_zh.md
+LICENSE
+**/LICENSE
+doc
+**/doc
+
+# CI/CD
+.husky
+**/.husky
+
+# Build info
+*.tsbuildinfo
+
+# Module federation temporary
+.__mf__temp
+**/__mf__temp
+
+# Misc
+*.md
+!package.json
+!pnpm-lock.yaml
+!pnpm-workspace.yaml

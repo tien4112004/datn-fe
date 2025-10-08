@@ -7,7 +7,23 @@ import type {
 } from '../types';
 
 /**
- * Simple, direct DOM measurement - no cloning, no complex caching, no style conflicts
+ * Measures an HTML element's dimensions by temporarily adding it to the DOM.
+ *
+ * Process:
+ * 1. Store original styles
+ * 2. Apply measurement styles (absolute positioning, off-screen)
+ * 3. Apply container constraints (maxWidth, maxHeight)
+ * 4. Add to DOM and measure using getBoundingClientRect
+ * 5. Remove from DOM and restore original styles
+ *
+ * Why this approach:
+ * - No cloning issues (preserves computed styles)
+ * - No style conflicts (temporary positioning)
+ * - Accurate measurements with word wrapping
+ *
+ * @param element - HTML element to measure
+ * @param container - Container providing size constraints
+ * @returns Measured dimensions including padding
  */
 export function measureElement(element: HTMLElement, container: LayoutBlockInstance): Size {
   // Store original styles to restore later
@@ -73,7 +89,15 @@ export function measureElement(element: HTMLElement, container: LayoutBlockInsta
 }
 
 /**
- * Calculate unified font size for a group of labeled elements
+ * Calculates a single unified font size for a group of elements sharing a label.
+ * Takes the minimum (most constrained) size to ensure all elements fit.
+ *
+ * This ensures visual consistency - all elements with the same label have identical font size.
+ *
+ * @param elements - HTML elements to size (all share same label)
+ * @param containers - Corresponding container instances with bounds
+ * @param fontSizeRange - Min/max font size constraints
+ * @returns Unified font size that fits all elements
  */
 export function calculateUnifiedFontSizeForLabels(
   elements: HTMLElement[],
@@ -116,6 +140,20 @@ export function applyFontSizeToElement(element: HTMLElement, fontSize: number, l
   updateElementLineHeight(element, lineHeight);
 }
 
+/**
+ * Binary-search-like optimization to find the largest font size that fits.
+ * Starts from maxSize and decreases until content fits within 90% of container height.
+ *
+ * Step sizes:
+ * - Fonts > 20px: decrease by 1px per iteration (faster for large fonts)
+ * - Fonts <= 20px: decrease by 0.5px per iteration (finer control for small fonts)
+ *
+ * @param element - Element to optimize
+ * @param container - Container with bounds constraints
+ * @param fontSizeRange - Min/max size range
+ * @param lineHeight - Line height multiplier
+ * @returns Optimal font size in pixels
+ */
 export function calculateLargestOptimalFontSize(
   element: HTMLElement,
   container: TextLayoutBlockInstance,

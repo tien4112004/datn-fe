@@ -24,7 +24,20 @@ import { measureElement } from './elementMeasurement';
 import type { TextStyleConfig } from '../types';
 
 /**
- * Create a text element with optimal font sizing
+ * Creates a PPT text element with automatically optimized font size.
+ *
+ * Process:
+ * 1. Create initial HTML element with default size
+ * 2. Calculate optimal font size that fits container
+ * 3. Apply calculated font size
+ * 4. Measure final dimensions
+ * 5. Calculate position within container
+ * 6. Convert to PPT element format
+ *
+ * @param content - Text content (can include HTML)
+ * @param container - Container with bounds and styling
+ * @param fontSizeRange - Optional font size constraints
+ * @returns PPT text element ready for slide insertion
  */
 export function createTextElement(
   content: string,
@@ -73,7 +86,16 @@ export function createTextElement(
 }
 
 /**
- * Create an image element
+ * Creates a PPT image element with automatic aspect-ratio cropping.
+ * Centers the image and clips overflow to fit container bounds.
+ *
+ * Cropping logic:
+ * - Image wider than container: clips left/right sides
+ * - Image taller than container: clips top/bottom
+ *
+ * @param src - Image source URL
+ * @param container - Container with bounds
+ * @returns PPT image element with calculated clip region
  */
 export async function createImageElement(
   src: string,
@@ -227,7 +249,17 @@ const fontWeightMap: Record<string, string> = {
 };
 
 /**
- * Unified element creation function - single source of truth for all text element creation
+ * Unified HTML element creation - single source of truth for all text element creation.
+ * Creates a styled <p> element with <span> for text styling.
+ *
+ * Structure: <p style="..."><span style="...">content</span></p>
+ * - <p>: paragraph-level styling (alignment, line height, font size)
+ * - <span>: inline styling (color, weight, style)
+ *
+ * @param content - Text content (can include HTML)
+ * @param fontSize - Font size in pixels
+ * @param config - Text styling configuration
+ * @returns Configured HTML element ready for measurement or insertion
  */
 export function createHtmlElement(content: string, fontSize: number, config: TextStyleConfig): HTMLElement {
   const p = document.createElement('p');

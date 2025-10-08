@@ -12,7 +12,8 @@ import {
 import { cloneDeepWith, template } from 'lodash';
 
 /**
- * Mapped layout data structure that normalizes all layout schemas
+ * Normalized data structure for all layout types.
+ * All layout schemas are mapped to this format before processing.
  */
 export interface MappedLayoutData {
   /** Simple text containers (e.g., title, subtitle) - container ID -> text content */
@@ -31,13 +32,23 @@ export interface MappedLayoutData {
 export type DataMapper<T = any> = (data: T) => MappedLayoutData;
 
 /**
- * Generic layout converter - eliminates duplicate conversion logic across all layouts
+ * Generic layout converter - core conversion pipeline used by all layout types.
+ * Eliminates duplicate code by using a data mapper pattern.
  *
- * @param data - Original layout schema data
- * @param template - Template configuration with container definitions
- * @param mapData - Function that maps the schema data to MappedLayoutData format
+ * Pipeline:
+ * 1. Map input data to normalized format (texts/blocks/images)
+ * 2. Resolve all container bounds (expressions and relative positioning)
+ * 3. Process blocks with unified font sizing
+ * 4. Process text containers (titles, subtitles)
+ * 5. Process image containers with cropping
+ * 6. Combine elements and sort by zIndex
+ * 7. Return final Slide object
+ *
+ * @param data - Original layout schema data (type-specific)
+ * @param template - Resolved template with theme and viewport
+ * @param mapData - Function that maps schema data to MappedLayoutData format
  * @param slideId - Optional slide ID (generates UUID if not provided)
- * @returns Promise<Slide> - The final slide with all elements positioned
+ * @returns Promise<Slide> - Complete slide with all elements positioned
  */
 export async function convertLayoutGeneric<T = any>(
   data: T,
@@ -135,6 +146,21 @@ export async function convertLayoutGeneric<T = any>(
   return slide;
 }
 
+/**
+ * Resolves template placeholders with theme values.
+ * Replaces {{theme.xxx}} syntax with actual theme values.
+ *
+ * Uses lodash template engine with custom interpolation syntax.
+ *
+ * @example
+ * // Template: { color: "{{theme.themeColors[0]}}" }
+ * // Result: { color: "#FF5733" }
+ *
+ * @param partialTemplate - Template with {{theme.xxx}} placeholders
+ * @param theme - Theme object with colors, fonts, etc.
+ * @param viewport - Viewport dimensions
+ * @returns Fully resolved template config
+ */
 export function resolveTemplate(
   partialTemplate: PartialTemplateConfig,
   theme: SlideTheme,

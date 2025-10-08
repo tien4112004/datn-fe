@@ -2,7 +2,17 @@ import type { Bounds, Size, LayoutBlockInstance, DistributionType, WrapConfig } 
 import { DEFAULT_SPACING_BETWEEN_ITEMS } from './layoutConstants';
 
 /**
- * Main layout function with unified axis-based calculation
+ * Calculates final bounds for items within a container based on measured dimensions.
+ * Uses axis-agnostic algorithm to support both horizontal and vertical orientations.
+ *
+ * Key features:
+ * - Supports multiple distribution strategies (equal, space-between, ratios)
+ * - Handles alignment in both primary and secondary axes
+ * - Works identically for horizontal and vertical layouts via axis mapping
+ *
+ * @param itemDimensions - Pre-measured dimensions of each item
+ * @param container - Parent container with layout configuration and bounds
+ * @returns Array of calculated bounds for each item in order
  */
 export function layoutItemsInBlock(itemDimensions: Size[], container: LayoutBlockInstance): Bounds[] {
   const distribution = container.layout?.distribution || 'equal';
@@ -31,7 +41,15 @@ export function layoutItemsInBlock(itemDimensions: Size[], container: LayoutBloc
 }
 
 /**
- * Calculate bounds for child elements within a parent container
+ * Pre-calculates maximum available bounds for static children before measuring.
+ * Divides parent container space according to distribution strategy.
+ *
+ * Used when child count is known beforehand (static children).
+ * For dynamic children (from templates), use calculateWrapLayout instead.
+ *
+ * @param bounds - Parent container bounds
+ * @param options - Distribution and orientation settings
+ * @returns Array of pre-allocated bounds for each child
  */
 export function getChildrenMaxBounds(
   bounds: Bounds,
@@ -58,7 +76,7 @@ export function getChildrenMaxBounds(
 }
 
 /**
- * Options for calculateWrapLayout function
+ * Configuration for multi-line/multi-column wrap layout calculation
  */
 export interface WrapLayoutOptions {
   itemCount?: number;
@@ -75,7 +93,21 @@ export interface WrapLayoutResult {
 }
 
 /**
- * Calculate wrap layout for items using unified axis-based approach
+ * Calculates multi-line/multi-column layout for items that wrap.
+ *
+ * Features:
+ * - Balanced, top-heavy, or bottom-heavy distributions
+ * - Alternating line offsets (e.g., zigzag patterns)
+ * - Synchronized sizing across lines (prevents uneven item sizes)
+ * - Works for both horizontal wrap (multiple columns) and vertical wrap (multiple rows)
+ *
+ * @example
+ * // 6 items, max 4 per line, balanced distribution -> 3/3 split
+ * calculateWrapLayout(bounds, { itemCount: 6, wrapConfig: { maxItemsPerLine: 4, wrapDistribution: 'balanced' }})
+ *
+ * @param bounds - Container bounds to wrap within
+ * @param options - Wrap configuration options
+ * @returns Layout result with line counts and calculated item bounds
  */
 export function calculateWrapLayout(bounds: Bounds, options?: WrapLayoutOptions): WrapLayoutResult {
   const {
@@ -446,7 +478,17 @@ function calculateWrapLayoutInternal(
 }
 
 /**
- * Distribute items across lines/columns
+ * Distributes items across multiple lines/columns based on strategy.
+ *
+ * Strategies:
+ * - 'balanced': Equal items per line (e.g., 7 items, max 3 -> [3,2,2] or [3,3,1])
+ * - 'top-heavy': Decreasing pyramid (e.g., 6 items -> [3,2,1])
+ * - 'bottom-heavy': Increasing pyramid (e.g., 6 items -> [1,2,3])
+ *
+ * @param itemCount - Total number of items to distribute
+ * @param maxPerLine - Maximum items allowed per line
+ * @param type - Distribution strategy
+ * @returns Array where each element is the count of items in that line
  */
 function distributeItems(
   itemCount: number,

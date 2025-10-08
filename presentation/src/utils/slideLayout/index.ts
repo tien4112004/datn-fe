@@ -1,3 +1,46 @@
+/**
+ * Slide Layout Engine
+ *
+ * A declarative layout system for generating presentation slides from data.
+ *
+ * ## Architecture
+ *
+ * The engine uses a two-phase approach:
+ * 1. **Config Phase**: Define layout templates (structure without positioning)
+ * 2. **Instance Phase**: Resolve templates with data into positioned elements
+ *
+ * ## Key Concepts
+ *
+ * ### Config vs Instance
+ * - **Config**: Template definition (LayoutBlockConfig) - describes structure without bounds
+ * - **Instance**: Resolved layout (LayoutBlockInstance) - all bounds calculated and assigned
+ *
+ * ### Template System
+ * - Templates define container structure with {{theme.xxx}} placeholders
+ * - Supports static children (predefined) and dynamic children (data-driven via childTemplate)
+ * - Multiple templates per layout type, selected deterministically or randomly
+ *
+ * ### Layout Algorithms
+ * - **Positioning**: Axis-agnostic layout supporting horizontal/vertical orientations
+ * - **Distribution**: equal, space-between, space-around, or ratio-based (e.g., '30/70')
+ * - **Wrapping**: Multi-line/column layouts with balanced, top-heavy, or bottom-heavy distribution
+ *
+ * ### Font Sizing
+ * - **Unified Sizing**: Elements with same label share font size for visual consistency
+ * - **Optimization**: Binary-search-like algorithm finds largest size that fits
+ * - **Label Groups**: 'label', 'content', 'item' - each group sized independently
+ *
+ * ## Usage
+ *
+ * ```typescript
+ * const slide = await convertToSlide(
+ *   { type: 'VERTICAL_LIST', title: 'Features', data: { items: ['Fast', 'Easy'] }},
+ *   { width: 1000, height: 562.5 },
+ *   theme
+ * );
+ * ```
+ */
+
 import { selectTemplate } from './converters/templateSelector';
 import type { Slide, SlideTheme } from '@/types/slides';
 import type {
@@ -16,15 +59,40 @@ import { SLIDE_LAYOUT_TYPE } from './types';
 import { convertLayoutGeneric, resolveTemplate } from './converters';
 
 /**
- * Converts layout schema to slide based on layout type
+ * Main entry point: Converts layout schema to a complete slide.
  *
- * @param data - The slide layout schema to convert
- * @param viewport - The viewport configuration
- * @param theme - The slide theme
- * @param slideId - Optional slide ID
+ * This is the primary public API for the slide layout engine.
+ *
+ * Process:
+ * 1. Select template based on layout type and optional seed
+ * 2. Resolve template with theme and viewport (replace {{theme.xxx}} placeholders)
+ * 3. Map input data to template containers (texts, blocks, images)
+ * 4. Convert to final Slide object with all PPT elements
+ *
+ * Supported layout types:
+ * - TWO_COLUMN_WITH_IMAGE: Two-column content with side image
+ * - MAIN_IMAGE: Full-screen image with caption
+ * - TITLE: Title slide with optional subtitle
+ * - TWO_COLUMN: Two-column text layout
+ * - VERTICAL_LIST: Vertical bullet list
+ * - HORIZONTAL_LIST: Horizontal multi-column list
+ * - TRANSITION: Section transition slide
+ * - TABLE_OF_CONTENTS: Auto-numbered contents page
+ *
+ * @param data - Layout schema with type and content data
+ * @param viewport - Slide dimensions (typically 1000x562.5 for 16:9)
+ * @param theme - Visual theme (colors, fonts, backgrounds)
+ * @param slideId - Optional custom slide ID
  * @param seed - Optional seed for deterministic template selection (useful for testing)
- * @returns Promise resolving to a Slide object
+ * @returns Promise resolving to a complete Slide object
  * @throws Error if layout type is not supported
+ *
+ * @example
+ * const slide = await convertToSlide(
+ *   { type: 'VERTICAL_LIST', title: 'Features', data: { items: ['Fast', 'Easy', 'Powerful'] }},
+ *   { width: 1000, height: 562.5 },
+ *   theme
+ * );
  */
 export const convertToSlide = async (
   data: SlideLayoutSchema,

@@ -93,13 +93,39 @@ export function buildText(content: string, config: TemplateContainerConfig): PPT
 }
 
 /**
- * Build layout with unified font sizing (single pass, no redundant iteration)
- * Supports both flat and nested data structures
- * @param config - Content container configuration
+ * Builds layout with unified font sizing across all labeled elements.
+ * This is the main function for creating content-heavy layouts (lists, tables, etc.)
+ *
+ * Algorithm (single-pass optimization):
+ * 1. Normalize data structure (flat vs nested)
+ * 2. Build layout tree with bounds
+ * 3. Collect elements by label
+ * 4. Calculate unified font size per label (smallest size that fits all instances)
+ * 5. Create HTML elements with calculated sizes
+ * 6. Measure and position elements
+ * 7. Convert to PPT elements
+ *
+ * Key concept: Elements with the same label share a unified font size to ensure
+ * visual consistency (e.g., all "content" items have the same font size)
+ *
+ * @param config - Content container configuration template
  * @param bounds - Fixed content bounds (from parent allocation)
  * @param data - Data items as object mapping labels to string arrays
- * @param theme - Slide theme for creating elements
  * @returns Layout instance with unified font sizes and PPT elements organized by label
+ *
+ * @example
+ * // Flat structure with label/value split
+ * buildLayoutWithUnifiedFontSizing(config, bounds, {
+ *   label: ['Q1', 'Q2', 'Q3'],
+ *   content: ['Revenue: $100K', 'Revenue: $150K', 'Revenue: $200K']
+ * })
+ *
+ * @example
+ * // Nested structure
+ * buildLayoutWithUnifiedFontSizing(config, bounds, {
+ *   column1: ['Item 1', 'Item 2'],
+ *   column2: ['Item A', 'Item B']
+ * })
  */
 export function buildLayoutWithUnifiedFontSizing(
   config: LayoutBlockConfig,
@@ -145,7 +171,12 @@ export function buildLayoutWithUnifiedFontSizing(
 }
 
 /**
- * Extract data structure detection and normalization
+ * Detects and normalizes data structure (flat vs nested).
+ *
+ * Flat structure: { label: [...], content: [...] }
+ * Nested structure: { column1: [...], column2: [...] } with config.children
+ *
+ * Returns dataMap for tracking label->data associations.
  */
 function _normalizeDataStructure(
   data: Record<string, string[]>,
@@ -166,7 +197,8 @@ function _normalizeDataStructure(
 }
 
 /**
- * Extract font size calculation
+ * Calculates unified font sizes for all label groups.
+ * Also applies font size hierarchy (e.g., labels 1.2x larger than content).
  */
 function _calculateUnifiedFontSizes(
   labelGroups: Map<string, TextLayoutBlockInstance[]>,
@@ -308,7 +340,8 @@ function _calculateFontSizeForLabel(
 }
 
 /**
- * Extract font size hierarchy application
+ * Enforces font size hierarchy: labels should be larger than content.
+ * If labels are too small relative to content, shrinks content proportionally.
  */
 function _applyFontSizeHierarchy(
   fontSizes: Record<string, number>,
@@ -367,6 +400,15 @@ function _convertToPPTElements(
   return pptElements;
 }
 
+/**
+ * Measures actual element dimensions and positions them within their containers.
+ * Recursively processes nested structures.
+ *
+ * For each parent with labeled children:
+ * 1. Measure actual heights of HTML elements
+ * 2. Use layoutItemsInBlock to position based on measurements
+ * 3. Apply calculated bounds back to instances
+ */
 function _measureAndPositionElements(
   instance: LayoutBlockInstance,
   labelGroups: Map<string, TextLayoutBlockInstance[]>,

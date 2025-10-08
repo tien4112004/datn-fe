@@ -2,6 +2,13 @@ import type { PPTElementShadow } from '@/types/slides';
 import type { Bounds } from './base';
 import type { BorderConfig, TextStyleConfig, BackgroundConfig, WrapConfig } from './styling';
 
+/**
+ * Distribution strategies for laying out children within a container
+ * - 'equal': Divide space equally with fixed gaps
+ * - 'space-between': Items at edges, equal space between
+ * - 'space-around': Equal space around each item
+ * - Ratio (e.g., '30/70', '1/2/1'): Proportional sizing
+ */
 export type DistributionType = 'equal' | 'space-between' | 'space-around' | `${number}/${number}`;
 export type HorizontalAlignment = 'left' | 'center' | 'right';
 export type VerticalAlignment = 'top' | 'center' | 'bottom';
@@ -24,6 +31,8 @@ export interface RelativePositioning {
 
 // ============================================================================
 // Config Types (Templates - no positioning)
+// Config types define the TEMPLATE/STRUCTURE without resolved bounds.
+// They are transformed into Instance types during layout resolution.
 // ============================================================================
 
 export interface ChildLayoutConfig {
@@ -34,9 +43,16 @@ export interface ChildLayoutConfig {
   orientation?: Orientation;
 }
 
+/**
+ * Template for dynamically generating child elements
+ * Enables data-driven child creation (e.g., create N items from an array)
+ */
 export interface ChildrenTemplate {
+  /** Number of children to generate ('auto' = based on data length) */
   count: number | 'auto';
+  /** Wrapping configuration for multi-line layouts */
   wrap?: WrapConfig;
+  /** Structure template to apply to each generated child */
   structure?: SlideLayoutBlockConfig;
 }
 
@@ -78,6 +94,8 @@ export type SlideLayoutBlockConfig =
 
 // ============================================================================
 // Instance Types (Resolved - with computed positions)
+// Instance types represent the FINAL layout with all bounds calculated.
+// Templates are expanded, positioning is resolved, and bounds are assigned.
 // ============================================================================
 
 export interface LayoutBlockInstance {

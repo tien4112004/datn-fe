@@ -5,7 +5,8 @@ export * from './layoutConstants';
 export { calculateUnifiedFontSizeForLabels } from './elementMeasurement';
 
 // Re-export from layoutPositioning
-export { getChildrenMaxBounds, layoutItemsInBlock } from './positioning';
+export { getChildrenMaxBounds, layoutItemsInBlock, calculateWrapLayout } from './positioning';
+export type { WrapLayoutOptions } from './positioning';
 
 // Re-export from layoutElementCreators
 import { createTextElement } from './elementCreators';
@@ -19,12 +20,7 @@ export {
   processBackground,
 } from './elementCreators';
 
-export {
-  buildChildrenFromChildTemplate,
-  buildInstanceWithBounds,
-  calculateWrapLayout,
-  distributeItems,
-} from './instanceBuilder';
+export { buildChildrenFromChildTemplate, buildInstanceWithBounds } from './instanceBuilder';
 
 export { getAllDescendantInstances, recursivelyGetAllLabelInstances } from './layoutUtils';
 

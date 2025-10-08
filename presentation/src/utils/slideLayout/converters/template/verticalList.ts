@@ -371,6 +371,7 @@ export const verticalListNumberedCompactTemplate: Template = {
           distribution: 'space-between',
           gap: 12,
           verticalAlignment: 'top',
+          horizontalAlignment: 'center',
           orientation: 'vertical',
         },
         childTemplate: {
@@ -474,14 +475,20 @@ export const verticalListNumberedCardsTemplate: Template = {
         childTemplate: {
           count: 'auto',
           wrap: {
-            enabled: false,
+            enabled: true,
+            maxItemsPerLine: 4,
+            lineCount: 2,
+            wrapDistribution: 'balanced',
+            lineSpacing: 20,
+            syncSize: true,
+            alternating: { start: 15, end: 15 },
           },
           structure: {
             type: 'block',
             label: 'item',
             layout: {
-              distribution: '1/5',
-              gap: 15,
+              distribution: '1/6',
+              gap: 10,
               horizontalAlignment: 'left',
               verticalAlignment: 'center',
               orientation: 'horizontal',

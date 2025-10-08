@@ -1,6 +1,5 @@
-import type { Bounds, Size, LayoutBlockInstance, TextLayoutBlockInstance, DistributionType } from '../types';
+import type { Bounds, Size, LayoutBlockInstance, DistributionType, WrapConfig } from '../types';
 import { DEFAULT_SPACING_BETWEEN_ITEMS } from './layoutConstants';
-import { measureElement } from './elementMeasurement';
 
 /**
  * Main layout function with unified axis-based calculation
@@ -56,6 +55,38 @@ export function getChildrenMaxBounds(
 
   const axis = getAxisMapping(orientation);
   return calculateChildrenBounds(bounds, childCount, distribution, gap, axis);
+}
+
+/**
+ * Options for calculateWrapLayout function
+ */
+export interface WrapLayoutOptions {
+  itemCount?: number;
+  wrapConfig?: WrapConfig;
+  orientation?: 'horizontal' | 'vertical';
+  gap?: number;
+  distribution?: DistributionType;
+}
+
+export interface WrapLayoutResult {
+  lines: number;
+  itemsPerLine: number[];
+  itemBounds: Bounds[];
+}
+
+/**
+ * Calculate wrap layout for items using unified axis-based approach
+ */
+export function calculateWrapLayout(bounds: Bounds, options?: WrapLayoutOptions): WrapLayoutResult {
+  const {
+    itemCount = 0,
+    wrapConfig,
+    orientation = 'vertical',
+    gap = DEFAULT_SPACING_BETWEEN_ITEMS,
+    distribution = 'equal',
+  } = options || {};
+
+  return calculateWrapLayoutInternal(itemCount, bounds, wrapConfig, orientation, gap, distribution);
 }
 
 /**
@@ -289,4 +320,194 @@ function calculateLayout(
     currentPrimary += primarySize + spacing;
     return position;
   });
+}
+
+/**
+ * Internal implementation of wrap layout calculation
+ */
+function calculateWrapLayoutInternal(
+  itemCount: number,
+  containerBounds: Bounds,
+  wrapConfig: WrapConfig | undefined,
+  orientation: 'horizontal' | 'vertical',
+  gap: number,
+  distribution: DistributionType
+): WrapLayoutResult {
+  // Non-wrap case: use simple stacking
+  if (!wrapConfig || !wrapConfig.enabled) {
+    const itemBounds = getChildrenMaxBounds(containerBounds, {
+      distribution: 'equal',
+      childCount: itemCount,
+      orientation,
+      gap,
+    });
+
+    return {
+      lines: 1,
+      itemsPerLine: [itemCount],
+      itemBounds,
+    };
+  }
+
+  // Wrap case: multi-line/column layout
+  const maxPerLine = wrapConfig.maxItemsPerLine || itemCount;
+  const distributions = distributeItems(itemCount, maxPerLine, wrapConfig.wrapDistribution || 'balanced');
+  const lineCount = distributions.length;
+  const lineSpacing = wrapConfig.lineSpacing || 0;
+
+  const axis = getAxisMapping(orientation);
+  const itemBounds: Bounds[] = [];
+
+  // Calculate line/column size (perpendicular to primary axis)
+  const lineSize = (containerBounds[axis.secondary] - (lineCount - 1) * lineSpacing) / lineCount;
+
+  distributions.forEach((itemsInLine, lineIndex) => {
+    const isAlternatingLine = wrapConfig.alternating && lineIndex % 2 === 1;
+
+    // Calculate effective container size and offsets for this line/column
+    let effectiveContainerSize = containerBounds[axis.primary];
+    let lineStartOffset = 0;
+
+    if (isAlternatingLine && wrapConfig.alternating) {
+      effectiveContainerSize =
+        containerBounds[axis.primary] - wrapConfig.alternating.start - wrapConfig.alternating.end;
+      lineStartOffset = wrapConfig.alternating.start;
+    }
+
+    // Calculate item primary size
+    let itemPrimarySize: number;
+    let lineContentSize: number;
+    let itemGap = gap;
+
+    if (wrapConfig.syncSize) {
+      // Fixed-size mode: use size based on the fullest line
+      const totalSpacing = (maxPerLine - 1) * gap;
+      itemPrimarySize = (effectiveContainerSize - totalSpacing) / maxPerLine;
+      lineContentSize = itemsInLine * itemPrimarySize + (itemsInLine - 1) * gap;
+    } else {
+      // Original mode: divide space equally among items in this line
+      const totalSpacing = (itemsInLine - 1) * gap;
+      itemPrimarySize = (effectiveContainerSize - totalSpacing) / itemsInLine;
+      lineContentSize = effectiveContainerSize;
+    }
+
+    // Calculate offset based on distribution (for spare items in partial lines)
+    let additionalOffset = 0;
+
+    if (wrapConfig.syncSize && itemsInLine < maxPerLine) {
+      const availableSpace = effectiveContainerSize - lineContentSize;
+
+      if (distribution === 'space-between') {
+        const extraGap = itemsInLine > 1 ? availableSpace / (itemsInLine - 1) : 0;
+        itemGap = gap + extraGap;
+      } else if (distribution === 'space-around') {
+        const extraGap = availableSpace / itemsInLine;
+        additionalOffset = extraGap / 2;
+        itemGap = gap + extraGap;
+      }
+    }
+
+    // Calculate line/column secondary position
+    const lineSecondaryPos = containerBounds[axis.secondaryStart] + lineIndex * (lineSize + lineSpacing);
+
+    // Position items in the line/column
+    for (let itemIndex = 0; itemIndex < itemsInLine; itemIndex++) {
+      const primaryPos =
+        containerBounds[axis.primaryStart] +
+        lineStartOffset +
+        additionalOffset +
+        itemIndex * (itemPrimarySize + itemGap);
+
+      // Build bounds by mapping primary/secondary to actual coordinates
+      const bounds: Bounds =
+        axis.primary === 'width'
+          ? {
+              left: primaryPos,
+              top: lineSecondaryPos,
+              width: itemPrimarySize,
+              height: lineSize,
+            }
+          : {
+              left: lineSecondaryPos,
+              top: primaryPos,
+              width: lineSize,
+              height: itemPrimarySize,
+            };
+
+      itemBounds.push(bounds);
+    }
+  });
+
+  return {
+    lines: lineCount,
+    itemsPerLine: distributions,
+    itemBounds,
+  };
+}
+
+/**
+ * Distribute items across lines/columns
+ */
+function distributeItems(
+  itemCount: number,
+  maxPerLine: number,
+  type: 'balanced' | 'top-heavy' | 'bottom-heavy'
+): number[] {
+  if (itemCount <= 0) return [];
+  if (maxPerLine <= 0) {
+    console.warn('maxPerLine should be greater than 0');
+  }
+  if (itemCount <= maxPerLine) return [itemCount];
+
+  if (type === 'balanced') {
+    const lineCount = Math.ceil(itemCount / maxPerLine);
+    const baseItemsPerLine = Math.floor(itemCount / lineCount);
+    const remainder = itemCount % lineCount;
+
+    // Create array with base distribution
+    const distribution = Array(lineCount).fill(baseItemsPerLine);
+
+    // Distribute remainder items (one extra to first 'remainder' lines)
+    for (let i = 0; i < remainder; i++) {
+      distribution[i]++;
+    }
+
+    return distribution;
+  }
+
+  if (type === 'top-heavy') {
+    const distribution: number[] = [];
+    let remaining = itemCount;
+    let currentMax = maxPerLine;
+
+    while (remaining > 0) {
+      const itemsInLine = Math.min(remaining, currentMax);
+      distribution.push(itemsInLine);
+      remaining -= itemsInLine;
+
+      // Decrease items per line for pyramid effect
+      currentMax = Math.max(1, currentMax - 1);
+    }
+
+    return distribution;
+  }
+
+  if (type === 'bottom-heavy') {
+    const distribution: number[] = [];
+    let remaining = itemCount;
+    let currentMin = 1;
+
+    while (remaining > 0) {
+      const itemsInLine = Math.min(remaining, currentMin);
+      distribution.push(itemsInLine);
+      remaining -= itemsInLine;
+
+      // Increase items per line for reverse pyramid effect
+      currentMin = Math.min(maxPerLine, currentMin + 1);
+    }
+
+    return distribution;
+  }
+
+  return [itemCount];
 }

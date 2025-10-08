@@ -17,18 +17,21 @@ export interface TextTemplateContainer extends TextLayoutBlockConfig {
   bounds?: Bounds | BoundsExpression; // Absolute positioning (higher priority) - can be computed or expression
   positioning?: RelativePositioning; // Relative positioning (lower priority)
   optional?: boolean; // Skip this container if data is missing
+  zIndex?: number; // Layering order (higher = on top)
 }
 
 export interface ImageTemplateContainer extends ImageLayoutBlockConfig {
   bounds?: Bounds | BoundsExpression; // Absolute positioning (higher priority) - can be computed or expression
   positioning?: RelativePositioning; // Relative positioning (lower priority)
   optional?: boolean; // Skip this container if data is missing
+  zIndex?: number; // Layering order (higher = on top)
 }
 
 export interface NonTextTemplateContainer extends NonTextLayoutBlockConfig {
   bounds?: Bounds | BoundsExpression; // Absolute positioning (higher priority) - can be computed or expression
   positioning?: RelativePositioning; // Relative positioning (lower priority)
   optional?: boolean; // Skip this container if data is missing
+  zIndex?: number; // Layering order (higher = on top)
 }
 
 export type TemplateContainerConfig =

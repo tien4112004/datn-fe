@@ -20,7 +20,7 @@ import { DEFAULT_RADIUS_MULTIPLIER, DEFAULT_TITLE_LINE_SPACING } from './layoutC
 import { layoutItemsInBlock } from './positioning';
 import { calculateLargestOptimalFontSize, applyFontSizeToElement } from './fontSizeCalculations';
 import type { FontSizeRange } from '../types';
-import { measureElementWithStyle } from './elementMeasurement';
+import { measureElement } from './elementMeasurement';
 import type { TextStyleConfig } from '../types';
 
 /**
@@ -32,24 +32,20 @@ export function createTextElement(
   fontSizeRange?: FontSizeRange
 ): PPTTextElement {
   // Create initial text element with default styling
-  const initialElement = createHtmlElement(content, {
-    fontSize: 32, // Initial size for optimization
-    ...container.text,
-  });
+  const initialElement = createHtmlElement(
+    content,
+    32, // Initial size for optimization
+    container.text || {}
+  );
 
   // Calculate optimal font size for the content to fit within bounds
-  const optimalFontSize = calculateLargestOptimalFontSize(
-    initialElement,
-    container.bounds.width,
-    container.bounds.height,
-    fontSizeRange
-  );
+  const optimalFontSize = calculateLargestOptimalFontSize(initialElement, container, fontSizeRange);
 
   // Apply the calculated font size to the element
   applyFontSizeToElement(initialElement, optimalFontSize, container.text?.lineHeight || 1.4);
 
   // Measure the element with optimized font size
-  const dimensions = measureElementWithStyle(initialElement, container);
+  const dimensions = measureElement(initialElement, container);
 
   // Calculate positioning within the container
   const position = layoutItemsInBlock([dimensions], container)[0];
@@ -185,7 +181,7 @@ export function createCard(container: LayoutBlockInstance): PPTShapeElement {
  * Create a text PPT element
  */
 export function createTextPPTElement(content: HTMLElement, block: TextLayoutBlockInstance): PPTTextElement {
-  const dimensions = measureElementWithStyle(content, block);
+  const dimensions = measureElement(content, block);
 
   const position = layoutItemsInBlock([dimensions], block)[0];
 
@@ -233,12 +229,11 @@ const fontWeightMap: Record<string, string> = {
 /**
  * Unified element creation function - single source of truth for all text element creation
  */
-export function createHtmlElement(content: string, config: TextStyleConfig): HTMLElement {
+export function createHtmlElement(content: string, fontSize: number, config: TextStyleConfig): HTMLElement {
   const p = document.createElement('p');
   const span = document.createElement('span');
 
   // Apply paragraph styling with defaults
-  const fontSize = config.fontSize ?? 16;
   const lineHeight = config.lineHeight ?? 1.4;
 
   p.style.textAlign = config.textAlign || 'left';

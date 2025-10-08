@@ -204,14 +204,14 @@ export const mainImageWithTitleOverlayTemplate: Template = {
         label: 'content',
         bounds: {
           width: {
-            expr: 'SLIDE_WIDTH * 0.7',
+            expr: 'SLIDE_WIDTH * 0.9',
           },
-          height: 80,
+          height: 160,
           left: {
             expr: 'center',
           },
           top: {
-            expr: 'image.top + 30',
+            expr: 'SLIDE_HEIGHT * 0.8 - 80',
           },
         },
         layout: {
@@ -221,10 +221,12 @@ export const mainImageWithTitleOverlayTemplate: Template = {
         text: {
           color: '{{theme.titleFontColor}}',
           fontFamily: '{{theme.titleFontName}}',
-          fontWeight: 'bold',
+          fontWeight: 'normal',
           fontStyle: 'normal',
           textAlign: 'center',
+          fontSizeRange: { minSize: 24, maxSize: 32 },
         },
+        zIndex: 1,
       },
     },
   },

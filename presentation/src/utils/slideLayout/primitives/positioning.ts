@@ -321,9 +321,7 @@ export function measureAndPositionElements(
         return { width: child.bounds.width, height: 20 };
       }
 
-      const measured = measureElement(elements[elementIndex], {
-        maxWidth: child.bounds.width,
-      });
+      const measured = measureElement(elements[elementIndex], labeledChild as LayoutBlockInstance);
 
       return { width: child.bounds.width, height: measured.height };
     });

@@ -21,12 +21,7 @@ export function calculateUnifiedFontSizeForLabels(
     const element = elements[i];
     const container = containers[i];
 
-    const optimalFontSize = calculateLargestOptimalFontSize(
-      element,
-      container.bounds.width,
-      container.bounds.height,
-      fontSizeRange
-    );
+    const optimalFontSize = calculateLargestOptimalFontSize(element, container, fontSizeRange);
 
     fontSizes.push(optimalFontSize);
   }
@@ -53,8 +48,7 @@ export function applyFontSizeToElement(element: HTMLElement, fontSize: number, l
 
 export function calculateLargestOptimalFontSize(
   element: HTMLElement,
-  availableWidth: number,
-  availableHeight: number,
+  container: TextLayoutBlockInstance,
   fontSizeRange: FontSizeRange = { minSize: 12, maxSize: 28 },
   lineHeight: number = 1.5
 ): number {
@@ -70,12 +64,9 @@ export function calculateLargestOptimalFontSize(
     updateElementLineHeight(clonedElement, lineHeight);
 
     // Measure the element with updated styling
-    const measured = measureElement(clonedElement, {
-      maxWidth: availableWidth,
-      maxHeight: availableHeight,
-    });
+    const measured = measureElement(clonedElement, container);
 
-    if (measured.height <= availableHeight * 0.9) {
+    if (measured.height <= container.bounds.height * 0.9) {
       optimalSize = fontSize;
       break;
     }

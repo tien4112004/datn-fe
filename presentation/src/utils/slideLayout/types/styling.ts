@@ -1,3 +1,5 @@
+import type { FontSizeRange } from './primitives';
+
 export interface BorderConfig {
   width: number;
   color: string;
@@ -9,7 +11,7 @@ export interface TextStyleConfig {
   fontFamily?: string;
   fontWeight?: 'normal' | 'bold' | 'bolder' | 'lighter' | number;
   fontStyle?: 'normal' | 'italic' | 'oblique';
-  fontSize?: number;
+  fontSizeRange?: FontSizeRange;
   lineHeight?: number;
   textAlign?: 'left' | 'center' | 'right';
 }

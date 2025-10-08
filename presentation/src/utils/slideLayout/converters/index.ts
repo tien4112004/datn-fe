@@ -53,8 +53,8 @@ export async function convertLayoutGeneric<T = any>(
     height: template.viewport.height,
   });
 
-  const allElements: any[] = [];
-  const allCards: any[] = [];
+  const allElements: Array<{ element: any; zIndex: number }> = [];
+  const allCards: Array<{ element: any; zIndex: number }> = [];
 
   // Process block containers with labeled children
   if (mappedData.blocks) {
@@ -64,16 +64,19 @@ export async function convertLayoutGeneric<T = any>(
         continue;
       }
 
+      const zIndex = container.zIndex ?? 0;
+
       // Build layout with unified font sizing
       const { instance, elements } = buildLayoutWithUnifiedFontSizing(container, container.bounds, labelData);
 
       // Extract cards (border decorations)
-      allCards.push(...buildCards(instance));
+      const cards = buildCards(instance);
+      allCards.push(...cards.map((element) => ({ element, zIndex })));
 
       // Add all PPT elements from each label
       for (const [label, _] of Object.entries(labelData)) {
         const pptElements = elements[label] || [];
-        allElements.push(...pptElements);
+        allElements.push(...pptElements.map((element) => ({ element, zIndex })));
       }
     }
   }
@@ -92,6 +95,7 @@ export async function convertLayoutGeneric<T = any>(
       }
 
       const instance = container as TextLayoutBlockInstance;
+      const zIndex = container.zIndex ?? 0;
 
       // Use buildTitle for title containers (with decorative line), buildText for others
       const textElements =
@@ -99,12 +103,12 @@ export async function convertLayoutGeneric<T = any>(
           ? buildTitle(textContent, instance, template.theme)
           : buildText(textContent, instance);
 
-      allElements.push(...textElements);
+      allElements.push(...textElements.map((element) => ({ element, zIndex })));
     }
   }
 
   // Process image containers
-  const imageElements: any[] = [];
+  const imageElements: Array<{ element: any; zIndex: number }> = [];
   if (mappedData.images) {
     for (const [containerId, imageSrc] of Object.entries(mappedData.images)) {
       const container = resolvedContainers[containerId];
@@ -112,15 +116,19 @@ export async function convertLayoutGeneric<T = any>(
         continue;
       }
 
+      const zIndex = container.zIndex ?? 0;
       const imageElement = await buildImageElement(imageSrc, container);
-      imageElements.push(imageElement);
+      imageElements.push({ element: imageElement, zIndex });
     }
   }
 
-  // Combine all elements in the correct order
+  // Combine all elements and sort by zIndex (lower values render first/behind)
+  const combinedElements = [...allCards, ...allElements, ...imageElements];
+  combinedElements.sort((a, b) => a.zIndex - b.zIndex);
+
   const slide: Slide = {
     id: slideId ?? crypto.randomUUID(),
-    elements: [...allCards, ...allElements, ...imageElements],
+    elements: combinedElements.map((item) => item.element),
     background: processBackground(template.theme),
   };
 

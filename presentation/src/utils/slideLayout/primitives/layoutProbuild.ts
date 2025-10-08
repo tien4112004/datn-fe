@@ -56,7 +56,11 @@ export function buildTitle(title: string, config: TemplateContainerConfig, theme
     bounds: config.bounds,
   } as TextLayoutBlockInstance;
 
-  const titleElement = createTextElement(title, titleInstance, FONT_SIZE_RANGE_TITLE);
+  const titleElement = createTextElement(
+    title,
+    titleInstance,
+    titleInstance.text?.fontSizeRange || FONT_SIZE_RANGE_TITLE
+  );
 
   return [
     titleElement,
@@ -78,7 +82,11 @@ export function buildText(content: string, config: TemplateContainerConfig): PPT
     bounds: config.bounds,
   } as TextLayoutBlockInstance;
 
-  const textElement = createTextElement(content, textInstance, FONT_SIZE_RANGE_CONTENT);
+  const textElement = createTextElement(
+    content,
+    textInstance,
+    textInstance.text?.fontSizeRange || FONT_SIZE_RANGE_CONTENT
+  );
 
   return [textElement];
 }
@@ -197,10 +205,7 @@ function _createElementsWithFontSizes(
     if (labelData.length === 0) continue;
 
     allElements[label] = labelData.map((item) => {
-      return createHtmlElement(item, {
-        fontSize: fontSizes[label],
-        ...instances[0].text,
-      });
+      return createHtmlElement(item, fontSizes[label], instances[0].text || {});
     });
   }
 
@@ -303,10 +308,7 @@ function _calculateFontSizeForLabel(
 ): { fontSize: number } {
   // Create HTML elements for font size calculation
   const elements = labelData.map((item) => {
-    return createHtmlElement(item, {
-      fontSize: 16,
-      ...instances[0].text,
-    });
+    return createHtmlElement(item, 16, instances[0].text || {});
   });
 
   // Determine font size range based on label type

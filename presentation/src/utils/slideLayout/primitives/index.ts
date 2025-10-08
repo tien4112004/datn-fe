@@ -5,7 +5,7 @@ export * from './layoutConstants';
 export { calculateUnifiedFontSizeForLabels } from './elementMeasurement';
 
 // Re-export from layoutPositioning
-export { getChildrenMaxBounds, layoutItemsInBlock, measureAndPositionElements } from './positioning';
+export { getChildrenMaxBounds, layoutItemsInBlock } from './positioning';
 
 // Re-export from layoutElementCreators
 import { createTextElement } from './elementCreators';

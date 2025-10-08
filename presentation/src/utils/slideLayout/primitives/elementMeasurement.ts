@@ -31,7 +31,7 @@ export function measureElement(element: HTMLElement, container: LayoutBlockInsta
   element.style.visibility = 'hidden';
   element.style.top = '-9999px';
   element.style.left = '-9999px';
-  element.style.padding = '10px'; // Add padding to match actual rendering
+  element.style.paddingInline = '10px'; // Add padding to match actual rendering
 
   // Apply constraints from container
   if (container.bounds?.width) {

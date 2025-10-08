@@ -1,43 +1,50 @@
 import seedrandom from 'seedrandom';
-import type { Template } from '../../types';
+import type { Template } from '../types';
 import {
   verticalListLayoutTemplate,
   verticalListCompactTemplate,
   verticalListCardsTemplate,
   verticalListNumberedTemplate,
-} from './verticalList';
+  verticalListNumberedCompactTemplate,
+  verticalListNumberedCardsTemplate,
+} from './template/verticalList';
 import {
   twoColumnWithImageLayoutTemplate,
   twoColumnLeftBigImageTemplate,
   twoColumnRightBigImageTemplate,
   twoColumnRightImageTemplate,
-} from './twoColumnWithImage';
-import { twoColumnLayoutTemplate, twoColumnSplitTemplate, twoColumnAsymmetricTemplate } from './twoColumn';
+} from './template/twoColumnWithImage';
+import {
+  twoColumnLayoutTemplate,
+  twoColumnSplitTemplate,
+  twoColumnAsymmetricTemplate,
+} from './template/twoColumn';
 import {
   horizontalListLayoutTemplate,
   horizontalListGridTemplate,
   horizontalListSingleRowTemplate,
-} from './horizontalList';
+  horizontalListNumberedTemplate,
+} from './template/horizontalList';
 import {
   titleLayoutTemplate,
   transitionLayoutTemplate,
   titleTopTemplate,
   titleLeftAlignTemplate,
   titleRightAlignTemplate,
-} from './title';
+} from './template/title';
 import {
   mainImageLayoutTemplate,
   mainImageCenteredTemplate,
   mainImageSplitTemplate,
   mainImageWithTitleOverlayTemplate,
-} from './mainImage';
+} from './template/mainImage';
 import {
   tableOfContentsLayoutTemplate,
   tableOfContentsGridTemplate,
   tableOfContentsTwoColumnTemplate,
   tableOfContentsNumberedTemplate,
-} from './tableOfContents';
-import { SLIDE_LAYOUT_TYPE } from '../../types';
+} from './template/tableOfContents';
+import { SLIDE_LAYOUT_TYPE } from '../types';
 
 /**
  * Tracks the current index for cycling through templates when seed = '1'
@@ -53,6 +60,8 @@ const TEMPLATE_VARIATIONS: Record<string, Template[]> = {
     verticalListCompactTemplate,
     verticalListCardsTemplate,
     verticalListNumberedTemplate,
+    verticalListNumberedCompactTemplate,
+    verticalListNumberedCardsTemplate,
   ],
   [SLIDE_LAYOUT_TYPE.TWO_COLUMN_WITH_IMAGE]: [
     twoColumnWithImageLayoutTemplate,
@@ -69,6 +78,7 @@ const TEMPLATE_VARIATIONS: Record<string, Template[]> = {
     horizontalListLayoutTemplate,
     horizontalListGridTemplate,
     horizontalListSingleRowTemplate,
+    horizontalListNumberedTemplate,
   ],
   [SLIDE_LAYOUT_TYPE.TITLE]: [
     titleLayoutTemplate,

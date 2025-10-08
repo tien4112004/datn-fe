@@ -14,10 +14,10 @@ import {
   createTextElement,
   createTitleLine,
   buildInstanceWithBounds,
-  measureAndPositionElements,
   getChildrenMaxBounds,
   buildChildrenFromChildTemplate,
   calculateUnifiedFontSizeForLabels,
+  layoutItemsInBlock,
 } from '.';
 import { createHtmlElement, createTextPPTElement } from './elementCreators';
 import {
@@ -27,6 +27,7 @@ import {
   FONT_SIZE_RANGE_CONTENT,
   FONT_SIZE_RANGE_TITLE,
 } from './layoutConstants';
+import { measureElement } from './elementMeasurement';
 
 export async function buildImageElement(
   src: string,
@@ -135,7 +136,7 @@ export function buildLayoutWithUnifiedFontSizing(
   const htmlElements = _createElementsWithFontSizes(labelGroups, dataMap, fontSizes);
 
   // Step 6: Apply positioning
-  _applyPositioning(instance, labelGroups, htmlElements, dataMap);
+  _measureAndPositionElements(instance, labelGroups, htmlElements, dataMap);
 
   // Step 7: Convert HTML elements to PPT elements
   const elements = _convertToPPTElements(htmlElements, labelGroups);
@@ -210,18 +211,6 @@ function _createElementsWithFontSizes(
   }
 
   return allElements;
-}
-
-/**
- * Extract positioning application
- */
-function _applyPositioning(
-  instance: LayoutBlockInstance,
-  labelGroups: Map<string, TextLayoutBlockInstance[]>,
-  elements: Record<string, HTMLElement[]>,
-  dataMap: Map<string, any[]>
-): void {
-  measureAndPositionElements(instance, labelGroups, elements, dataMap);
 }
 
 /**
@@ -376,4 +365,52 @@ function _convertToPPTElements(
   }
 
   return pptElements;
+}
+
+function _measureAndPositionElements(
+  instance: LayoutBlockInstance,
+  labelGroups: Map<string, TextLayoutBlockInstance[]>,
+  allElements: Record<string, HTMLElement[]>,
+  dataMap: Map<string, any[]>
+): void {
+  // For each parent with labeled children, measure and position
+  if (!instance.children) return;
+
+  instance.children.forEach((child) => {
+    if (!child.children || child.children.length === 0) {
+      // Recurse for nested structures
+      _measureAndPositionElements(child, labelGroups, allElements, dataMap);
+      return;
+    }
+
+    // Find all labeled children
+    const labeledChildren = child.children.filter((c) => c.label);
+    if (labeledChildren.length === 0) return;
+
+    // Measure dimensions for each labeled child
+    const dimensions = labeledChildren.map((labeledChild, idx) => {
+      const label = labeledChild.label!;
+      const elements = allElements[label];
+      if (!elements) return { width: child.bounds.width, height: 20 };
+
+      // Find which element index this is
+      const instances = labelGroups.get(label) || [];
+      const elementIndex = instances.indexOf(labeledChild as TextLayoutBlockInstance);
+      if (elementIndex === -1 || !elements[elementIndex]) {
+        return { width: child.bounds.width, height: 20 };
+      }
+
+      const measured = measureElement(elements[elementIndex], labeledChild as LayoutBlockInstance);
+
+      return { width: child.bounds.width, height: measured.height };
+    });
+
+    // Position using layoutItemsInBlock
+    const positionedBounds = layoutItemsInBlock(dimensions, child);
+
+    // Apply positioned bounds
+    labeledChildren.forEach((labeledChild, idx) => {
+      labeledChild.bounds = positionedBounds[idx];
+    });
+  });
 }

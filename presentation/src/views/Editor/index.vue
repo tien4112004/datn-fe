@@ -228,7 +228,7 @@ const slideTemplates: Record<string, any[]> = {
       },
     },
   ],
-  'vertical-list': Array(4).fill({
+  'vertical-list': Array(6).fill({
     type: 'vertical_list',
     title: 'This is a title',
     data: {

@@ -1,4 +1,4 @@
-import { selectTemplate } from './converters/template/templateSelector';
+import { selectTemplate } from './converters/templateSelector';
 import type { Slide, SlideTheme } from '@/types/slides';
 import type {
   SlideViewport,
@@ -94,18 +94,49 @@ export const convertToSlide = async (
   } else if (layoutType === SLIDE_LAYOUT_TYPE.VERTICAL_LIST) {
     const selectedTemplate = selectTemplate(layoutType, seed);
     const template = resolveTemplate(selectedTemplate.config, theme, viewport);
+
+    // Check if the template has numbering enabled (label/content structure)
+    const contentContainer = template.containers.content;
+    const hasNumbering =
+      contentContainer?.type === 'block' &&
+      contentContainer.childTemplate?.structure?.children?.some(
+        (child: any) => child.label === 'label' && child.numbering === true
+      );
+
     return convertLayoutGeneric(
       data as VerticalListLayoutSchema,
       template,
-      (d) => ({
-        texts: { title: d.title },
-        blocks: { content: { item: d.data.items } },
-      }),
+      (d) => {
+        // For numbered templates: split into label (numbers) and content (text)
+        // For non-numbered templates: single 'item' field
+        const contentData: Record<string, string[]> = hasNumbering
+          ? {
+              label: d.data.items.map((_, index) => String(index + 1).padStart(2, '0')),
+              content: d.data.items,
+            }
+          : {
+              item: d.data.items,
+            };
+
+        return {
+          texts: { title: d.title },
+          blocks: { content: contentData },
+        };
+      },
       slideId
     );
   } else if (layoutType === SLIDE_LAYOUT_TYPE.HORIZONTAL_LIST) {
     const selectedTemplate = selectTemplate(layoutType, seed);
     const template = resolveTemplate(selectedTemplate.config, theme, viewport);
+
+    // Check if the template has numbering enabled
+    const contentContainer = template.containers.content;
+    const hasNumbering =
+      contentContainer?.type === 'block' &&
+      contentContainer.childTemplate?.structure?.children?.some(
+        (child: any) => child.label === 'label' && child.numbering === true
+      );
+
     return convertLayoutGeneric(
       data as HorizontalListLayoutSchema,
       template,
@@ -113,7 +144,9 @@ export const convertToSlide = async (
         texts: { title: d.title },
         blocks: {
           content: {
-            label: d.data.items.map((item: { label: string; content: string }) => item.label),
+            label: hasNumbering
+              ? d.data.items.map((_, index) => String(index + 1).padStart(2, '0'))
+              : d.data.items.map((item: { label: string; content: string }) => item.label),
             content: d.data.items.map((item: { label: string; content: string }) => item.content),
           },
         },
@@ -123,6 +156,7 @@ export const convertToSlide = async (
   } else if (layoutType === SLIDE_LAYOUT_TYPE.TRANSITION) {
     const selectedTemplate = selectTemplate(layoutType, seed);
     const template = resolveTemplate(selectedTemplate.config, theme, viewport);
+
     return convertLayoutGeneric(
       data as TransitionLayoutSchema,
       template,

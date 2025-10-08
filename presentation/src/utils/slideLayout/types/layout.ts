@@ -64,6 +64,7 @@ export interface TextLayoutBlockConfig extends LayoutBlockConfig {
   type: 'text';
   background?: BackgroundConfig;
   text?: TextStyleConfig;
+  numbering?: boolean; // Auto-generate sequential numbers as content
 }
 
 export interface NonTextLayoutBlockConfig extends LayoutBlockConfig {

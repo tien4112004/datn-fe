@@ -5,4 +5,4 @@ export * from './title';
 export * from './twoColumnWithImage';
 export * from './mainImage';
 export * from './tableOfContents';
-export * from './templateSelector';
+export * from '../templateSelector';

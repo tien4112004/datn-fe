@@ -178,13 +178,16 @@ export function layoutItemsInBlock(itemDimensions: Size[], container: LayoutBloc
   const distribution = container.layout?.distribution || 'equal';
   const verticalAlignment = container.layout?.verticalAlignment || 'top';
   const horizontalAlignment = container.layout?.horizontalAlignment || 'left';
+  const orientation = container.layout?.orientation || 'vertical';
 
   const totalItemsHeight = itemDimensions.reduce((sum, dim) => sum + dim.height, 0);
+  const totalItemsWidth = itemDimensions.reduce((sum, dim) => sum + dim.width, 0);
   const availableHeight = container.bounds.height;
   const availableWidth = container.bounds.width;
 
   let positions: Bounds[] = [];
   let startY = container.bounds.top;
+  let startX = container.bounds.left;
 
   // Helper function to calculate horizontal position based on alignment
   const getHorizontalPosition = (itemWidth: number): number => {
@@ -201,11 +204,174 @@ export function layoutItemsInBlock(itemDimensions: Size[], container: LayoutBloc
     }
   };
 
-  switch (distribution) {
-    case 'space-between': {
-      // Space between: distribute extra space evenly between items
+  // Helper function to calculate vertical position based on alignment
+  const getVerticalPosition = (itemHeight: number): number => {
+    const startY = container.bounds.top;
+
+    switch (verticalAlignment) {
+      case 'center':
+        return startY + (availableHeight - itemHeight) / 2;
+      case 'bottom':
+        return startY + availableHeight - itemHeight;
+      case 'top':
+      default:
+        return startY;
+    }
+  };
+
+  // Handle horizontal orientation
+  if (orientation === 'horizontal') {
+    // Check if distribution is a ratio pattern like '1/8'
+    if (distribution.includes('/')) {
+      const parts = distribution.split('/');
+      if (parts.length === itemDimensions.length && parts.every((p) => !isNaN(Number(p)))) {
+        const ratios = parts.map(Number);
+        const totalRatio = ratios.reduce((sum, r) => sum + r, 0);
+        const actualSpacing = container.layout?.gap || 0;
+        const totalSpacing = actualSpacing * (itemDimensions.length - 1);
+        const availableWidthForItems = availableWidth - totalSpacing;
+
+        let currentLeft = startX;
+        positions = itemDimensions.map((dim, idx) => {
+          const itemWidth = (availableWidthForItems * ratios[idx]) / totalRatio;
+          const position = {
+            left: currentLeft,
+            top: getVerticalPosition(dim.height),
+            width: itemWidth,
+            height: dim.height,
+          };
+          currentLeft += itemWidth + actualSpacing;
+          return position;
+        });
+      } else {
+        // Fallback to equal distribution
+        const actualSpacing = container.layout?.gap || DEFAULT_SPACING_BETWEEN_ITEMS;
+        const totalSpacing = actualSpacing * (itemDimensions.length - 1);
+        const itemWidth = (availableWidth - totalSpacing) / itemDimensions.length;
+
+        let currentLeft = startX;
+        positions = itemDimensions.map((dim) => {
+          const position = {
+            left: currentLeft,
+            top: getVerticalPosition(dim.height),
+            width: itemWidth,
+            height: dim.height,
+          };
+          currentLeft += itemWidth + actualSpacing;
+          return position;
+        });
+      }
+    } else if (distribution === 'space-between') {
       if (itemDimensions.length === 1) {
-        // Single item: center it vertically
+        const centerX = startX + (availableWidth - itemDimensions[0].width) / 2;
+        positions = [
+          {
+            left: centerX,
+            top: getVerticalPosition(itemDimensions[0].height),
+            width: itemDimensions[0].width,
+            height: itemDimensions[0].height,
+          },
+        ];
+      } else {
+        const extraSpace = availableWidth - totalItemsWidth;
+        const spaceBetween = extraSpace / (itemDimensions.length - 1);
+        let currentX = startX;
+
+        positions = itemDimensions.map((dim) => {
+          const position = {
+            left: currentX,
+            top: getVerticalPosition(dim.height),
+            width: dim.width,
+            height: dim.height,
+          };
+          currentX += dim.width + spaceBetween;
+          return position;
+        });
+      }
+    } else if (distribution === 'space-around') {
+      const extraSpace = availableWidth - totalItemsWidth;
+      const spaceAroundEach = extraSpace / (itemDimensions.length + 1);
+      let currentX = startX + spaceAroundEach;
+
+      positions = itemDimensions.map((dim) => {
+        const position = {
+          left: currentX,
+          top: getVerticalPosition(dim.height),
+          width: dim.width,
+          height: dim.height,
+        };
+        currentX += dim.width + spaceAroundEach;
+        return position;
+      });
+    } else {
+      // Equal: use fixed spacing
+      const actualSpacing = container.layout?.gap || DEFAULT_SPACING_BETWEEN_ITEMS;
+      const totalNeededWidth = totalItemsWidth + (itemDimensions.length - 1) * actualSpacing;
+
+      // Apply horizontal alignment
+      if (horizontalAlignment === 'center' && totalNeededWidth < availableWidth) {
+        const extraSpace = availableWidth - totalNeededWidth;
+        startX += extraSpace / 2;
+      } else if (horizontalAlignment === 'right' && totalNeededWidth < availableWidth) {
+        startX += availableWidth - totalNeededWidth;
+      }
+
+      let currentX = startX;
+      positions = itemDimensions.map((dim) => {
+        const position = {
+          left: currentX,
+          top: getVerticalPosition(dim.height),
+          width: dim.width,
+          height: dim.height,
+        };
+        currentX += dim.width + actualSpacing;
+        return position;
+      });
+    }
+  } else {
+    // Vertical orientation
+    // Check if distribution is a ratio pattern
+    if (distribution.includes('/')) {
+      const parts = distribution.split('/');
+      if (parts.length === itemDimensions.length && parts.every((p) => !isNaN(Number(p)))) {
+        const ratios = parts.map(Number);
+        const totalRatio = ratios.reduce((sum, r) => sum + r, 0);
+        const actualSpacing = container.layout?.gap || 0;
+        const totalSpacing = actualSpacing * (itemDimensions.length - 1);
+        const availableHeightForItems = availableHeight - totalSpacing;
+
+        let currentTop = startY;
+        positions = itemDimensions.map((dim, idx) => {
+          const itemHeight = (availableHeightForItems * ratios[idx]) / totalRatio;
+          const position = {
+            top: currentTop,
+            left: getHorizontalPosition(dim.width),
+            width: dim.width,
+            height: itemHeight,
+          };
+          currentTop += itemHeight + actualSpacing;
+          return position;
+        });
+      } else {
+        // Fallback to equal distribution
+        const actualSpacing = container.layout?.gap || DEFAULT_SPACING_BETWEEN_ITEMS;
+        const totalSpacing = actualSpacing * (itemDimensions.length - 1);
+        const itemHeight = (availableHeight - totalSpacing) / itemDimensions.length;
+
+        let currentTop = startY;
+        positions = itemDimensions.map((dim) => {
+          const position = {
+            top: currentTop,
+            left: getHorizontalPosition(dim.width),
+            width: dim.width,
+            height: itemHeight,
+          };
+          currentTop += itemHeight + actualSpacing;
+          return position;
+        });
+      }
+    } else if (distribution === 'space-between') {
+      if (itemDimensions.length === 1) {
         const centerY = startY + (availableHeight - itemDimensions[0].height) / 2;
         positions = [
           {
@@ -231,11 +397,7 @@ export function layoutItemsInBlock(itemDimensions: Size[], container: LayoutBloc
           return position;
         });
       }
-      break;
-    }
-
-    case 'space-around': {
-      // Space around: distribute space evenly around items
+    } else if (distribution === 'space-around') {
       const extraSpace = availableHeight - totalItemsHeight;
       const spaceAroundEach = extraSpace / (itemDimensions.length + 1);
       let currentY = startY + spaceAroundEach;
@@ -250,12 +412,8 @@ export function layoutItemsInBlock(itemDimensions: Size[], container: LayoutBloc
         currentY += dim.height + spaceAroundEach;
         return position;
       });
-      break;
-    }
-
-    case 'equal':
-    default: {
-      // Equal: use fixed spacing defined by spacingBetweenItems
+    } else {
+      // Equal: use fixed spacing defined by gap
       const actualSpacing = container.layout?.gap || DEFAULT_SPACING_BETWEEN_ITEMS;
       const totalNeededHeight = totalItemsHeight + (itemDimensions.length - 1) * actualSpacing;
 
@@ -278,60 +436,8 @@ export function layoutItemsInBlock(itemDimensions: Size[], container: LayoutBloc
         currentY += dim.height + actualSpacing;
         return position;
       });
-      break;
     }
   }
 
   return positions;
-}
-
-/**
- * Measure elements and apply final positioning
- */
-export function measureAndPositionElements(
-  instance: LayoutBlockInstance,
-  labelGroups: Map<string, TextLayoutBlockInstance[]>,
-  allElements: Record<string, HTMLElement[]>,
-  dataMap: Map<string, any[]>
-): void {
-  // For each parent with labeled children, measure and position
-  if (!instance.children) return;
-
-  instance.children.forEach((child) => {
-    if (!child.children || child.children.length === 0) {
-      // Recurse for nested structures
-      measureAndPositionElements(child, labelGroups, allElements, dataMap);
-      return;
-    }
-
-    // Find all labeled children
-    const labeledChildren = child.children.filter((c) => c.label);
-    if (labeledChildren.length === 0) return;
-
-    // Measure dimensions for each labeled child
-    const dimensions = labeledChildren.map((labeledChild, idx) => {
-      const label = labeledChild.label!;
-      const elements = allElements[label];
-      if (!elements) return { width: child.bounds.width, height: 20 };
-
-      // Find which element index this is
-      const instances = labelGroups.get(label) || [];
-      const elementIndex = instances.indexOf(labeledChild as TextLayoutBlockInstance);
-      if (elementIndex === -1 || !elements[elementIndex]) {
-        return { width: child.bounds.width, height: 20 };
-      }
-
-      const measured = measureElement(elements[elementIndex], labeledChild as LayoutBlockInstance);
-
-      return { width: child.bounds.width, height: measured.height };
-    });
-
-    // Position using layoutItemsInBlock
-    const positionedBounds = layoutItemsInBlock(dimensions, child);
-
-    // Apply positioned bounds
-    labeledChildren.forEach((labeledChild, idx) => {
-      labeledChild.bounds = positionedBounds[idx];
-    });
-  });
 }

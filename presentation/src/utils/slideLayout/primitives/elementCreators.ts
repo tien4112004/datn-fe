@@ -18,7 +18,7 @@ import type {
 } from '../types';
 import { DEFAULT_RADIUS_MULTIPLIER, DEFAULT_TITLE_LINE_SPACING } from './layoutConstants';
 import { layoutItemsInBlock } from './positioning';
-import { calculateLargestOptimalFontSize, applyFontSizeToElement } from './fontSizeCalculations';
+import { calculateLargestOptimalFontSize, applyFontSizeToElement } from './elementMeasurement';
 import type { FontSizeRange } from '../types';
 import { measureElement } from './elementMeasurement';
 import type { TextStyleConfig } from '../types';
@@ -241,6 +241,7 @@ export function createHtmlElement(content: string, fontSize: number, config: Tex
   p.style.fontSize = `${fontSize}px`;
   p.style.fontFamily = config.fontFamily || 'Arial, sans-serif';
   p.style.margin = '0';
+  p.style.padding = '0px';
 
   // Apply span styling
   const fontWeightValue = config.fontWeight || 'normal';
@@ -257,12 +258,4 @@ export function createHtmlElement(content: string, fontSize: number, config: Tex
 
   p.appendChild(span);
   return p;
-}
-
-export function updateElementFontSize(element: HTMLElement, newFontSize: number): void {
-  element.style.fontSize = `${newFontSize}px`;
-}
-
-export function updateElementLineHeight(element: HTMLElement, newLineHeight: number): void {
-  element.style.lineHeight = `${newLineHeight}`;
 }

@@ -1,8 +1,8 @@
 // Re-export from layoutConstants
 export * from './layoutConstants';
 
-// Re-export from layoutCalculations
-export { calculateUnifiedFontSizeForLabels } from './fontSizeCalculations';
+// Re-export from elementMeasurement
+export { calculateUnifiedFontSizeForLabels } from './elementMeasurement';
 
 // Re-export from layoutPositioning
 export { getChildrenMaxBounds, layoutItemsInBlock, measureAndPositionElements } from './positioning';

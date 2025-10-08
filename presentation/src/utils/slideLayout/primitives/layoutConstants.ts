@@ -32,21 +32,8 @@ export const DEFAULT_WRAP_CONFIG = {
 };
 
 /**
- * Default convergence options for font sizing
- */
-export const DEFAULT_CONVERGENCE_OPTIONS = {
-  minFontSize: DEFAULT_MIN_FONT_SIZE,
-  labelToValueRatio: DEFAULT_LABEL_TO_VALUE_RATIO,
-};
-
-/**
  * Font size ranges for different label types
  */
 export const FONT_SIZE_RANGE_LABEL = { minSize: 18, maxSize: 24 };
 export const FONT_SIZE_RANGE_CONTENT = { minSize: 16, maxSize: 22 };
 export const FONT_SIZE_RANGE_TITLE = { minSize: 28, maxSize: 48 };
-
-/**
- * Layout shrink factor for fill calculations
- */
-export const FILL_SHRINK_FACTOR = 1;

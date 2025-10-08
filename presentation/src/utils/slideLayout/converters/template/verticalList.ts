@@ -511,7 +511,7 @@ export const verticalListNumberedCardsTemplate: Template = {
                   color: '{{theme.themeColors[0]}}',
                 },
                 text: {
-                  color: '#FFFFFF',
+                  color: '{{theme.labelFontColor}}',
                   fontFamily: '{{theme.labelFontName}}',
                   fontWeight: 'bold',
                   textAlign: 'center',

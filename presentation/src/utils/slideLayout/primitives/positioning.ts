@@ -3,6 +3,35 @@ import { DEFAULT_SPACING_BETWEEN_ITEMS } from './layoutConstants';
 import { measureElement } from './elementMeasurement';
 
 /**
+ * Main layout function with unified axis-based calculation
+ */
+export function layoutItemsInBlock(itemDimensions: Size[], container: LayoutBlockInstance): Bounds[] {
+  const distribution = container.layout?.distribution || 'equal';
+  const orientation = container.layout?.orientation || 'vertical';
+  const gap = container.layout?.gap || DEFAULT_SPACING_BETWEEN_ITEMS;
+  const horizontalAlignment = container.layout?.horizontalAlignment || 'left';
+  const verticalAlignment = container.layout?.verticalAlignment || 'top';
+
+  const axis = getAxisMapping(orientation);
+  const isVertical = orientation === 'vertical';
+
+  // Determine primary and secondary alignments
+  const primaryAlignment = isVertical ? verticalAlignment : horizontalAlignment;
+  const secondaryAlignment = isVertical ? horizontalAlignment : verticalAlignment;
+
+  return calculateLayout(
+    itemDimensions,
+    distribution,
+    gap,
+    container.bounds,
+    axis,
+    primaryAlignment,
+    secondaryAlignment,
+    isVertical
+  );
+}
+
+/**
  * Calculate bounds for child elements within a parent container
  */
 export function getChildrenMaxBounds(
@@ -25,419 +54,239 @@ export function getChildrenMaxBounds(
     return [];
   }
 
-  const positions: Bounds[] = [];
-
-  // Calculate base item dimensions assuming equal distribution
-  const totalSpacing = gap * (childCount - 1);
-  const availableSpace =
-    orientation === 'horizontal' ? bounds.width - totalSpacing : bounds.height - totalSpacing;
-  const itemSize = availableSpace / childCount;
-
-  if (orientation === 'horizontal') {
-    if (distribution === 'space-between' && childCount > 1) {
-      // Space between: distribute remaining space evenly between items
-      const totalItemWidth = childCount * itemSize;
-      const remainingSpace = bounds.width - totalItemWidth;
-      const spacing = remainingSpace / (childCount - 1);
-
-      for (let i = 0; i < childCount; i++) {
-        positions.push({
-          left: bounds.left + i * (itemSize + spacing),
-          top: bounds.top,
-          width: itemSize,
-          height: bounds.height,
-        });
-      }
-    } else if (distribution === 'space-around' && childCount > 1) {
-      // Space around: distribute remaining space evenly around items
-      const totalItemWidth = childCount * itemSize;
-      const remainingSpace = bounds.width - totalItemWidth;
-      const spacing = remainingSpace / (childCount + 1);
-
-      for (let i = 0; i < childCount; i++) {
-        positions.push({
-          left: bounds.left + spacing + i * (itemSize + spacing),
-          top: bounds.top,
-          width: itemSize,
-          height: bounds.height,
-        });
-      }
-    } else if (distribution.includes('/')) {
-      // Handle ratio distribution like '30/70'
-      const parts = distribution.split('/');
-      if (parts.length === childCount && parts.every((p) => !isNaN(Number(p)))) {
-        const ratios = parts.map(Number);
-        const totalRatio = ratios.reduce((sum, r) => sum + r, 0);
-        const widths = ratios.map((r) => (bounds.width * r) / totalRatio);
-
-        let currentLeft = bounds.left;
-        for (let i = 0; i < childCount; i++) {
-          positions.push({
-            left: currentLeft,
-            top: bounds.top,
-            width: widths[i],
-            height: bounds.height,
-          });
-          currentLeft += widths[i];
-        }
-      } else {
-        // Fallback to equal distribution
-        for (let i = 0; i < childCount; i++) {
-          positions.push({
-            left: bounds.left + i * (itemSize + gap),
-            top: bounds.top,
-            width: itemSize,
-            height: bounds.height,
-          });
-        }
-      }
-    } else {
-      // Equal distribution (default)
-      for (let i = 0; i < childCount; i++) {
-        positions.push({
-          left: bounds.left + i * (itemSize + gap),
-          top: bounds.top,
-          width: itemSize,
-          height: bounds.height,
-        });
-      }
-    }
-  } else {
-    // Vertical layout
-    if (distribution === 'space-between' && childCount > 1) {
-      const totalItemHeight = childCount * itemSize;
-      const remainingSpace = bounds.height - totalItemHeight;
-      const spacing = remainingSpace / (childCount - 1);
-
-      for (let i = 0; i < childCount; i++) {
-        positions.push({
-          left: bounds.left,
-          top: bounds.top + i * (itemSize + spacing),
-          width: bounds.width,
-          height: itemSize,
-        });
-      }
-    } else if (distribution === 'space-around' && childCount > 1) {
-      const totalItemHeight = childCount * itemSize;
-      const remainingSpace = bounds.height - totalItemHeight;
-      const spacing = remainingSpace / (childCount + 1);
-
-      for (let i = 0; i < childCount; i++) {
-        positions.push({
-          left: bounds.left,
-          top: bounds.top + spacing + i * (itemSize + spacing),
-          width: bounds.width,
-          height: itemSize,
-        });
-      }
-    } else if (distribution.includes('/')) {
-      // Handle ratio distribution
-      const parts = distribution.split('/');
-      if (parts.length === childCount && parts.every((p) => !isNaN(Number(p)))) {
-        const ratios = parts.map(Number);
-        const totalRatio = ratios.reduce((sum, r) => sum + r, 0);
-        const heights = ratios.map((r) => (bounds.height * r) / totalRatio);
-
-        let currentTop = bounds.top;
-        for (let i = 0; i < childCount; i++) {
-          positions.push({
-            left: bounds.left,
-            top: currentTop,
-            width: bounds.width,
-            height: heights[i],
-          });
-          currentTop += heights[i];
-        }
-      } else {
-        // Fallback to equal distribution
-        for (let i = 0; i < childCount; i++) {
-          positions.push({
-            left: bounds.left,
-            top: bounds.top + i * (itemSize + gap),
-            width: bounds.width,
-            height: itemSize,
-          });
-        }
-      }
-    } else {
-      // Equal distribution (default)
-      for (let i = 0; i < childCount; i++) {
-        positions.push({
-          left: bounds.left,
-          top: bounds.top + i * (itemSize + gap),
-          width: bounds.width,
-          height: itemSize,
-        });
-      }
-    }
-  }
-
-  return positions;
+  const axis = getAxisMapping(orientation);
+  return calculateChildrenBounds(bounds, childCount, distribution, gap, axis);
 }
-export function layoutItemsInBlock(itemDimensions: Size[], container: LayoutBlockInstance): Bounds[] {
-  const distribution = container.layout?.distribution || 'equal';
-  const verticalAlignment = container.layout?.verticalAlignment || 'top';
-  const horizontalAlignment = container.layout?.horizontalAlignment || 'left';
-  const orientation = container.layout?.orientation || 'vertical';
 
-  const totalItemsHeight = itemDimensions.reduce((sum, dim) => sum + dim.height, 0);
-  const totalItemsWidth = itemDimensions.reduce((sum, dim) => sum + dim.width, 0);
-  const availableHeight = container.bounds.height;
-  const availableWidth = container.bounds.width;
+/**
+ * Axis mapping for orientation-agnostic calculations
+ */
+interface AxisMapping {
+  primary: 'width' | 'height';
+  secondary: 'height' | 'width';
+  primaryStart: 'left' | 'top';
+  secondaryStart: 'top' | 'left';
+}
 
-  let positions: Bounds[] = [];
-  let startY = container.bounds.top;
-  let startX = container.bounds.left;
+/**
+ * Get axis mapping based on orientation
+ */
+function getAxisMapping(orientation: 'horizontal' | 'vertical'): AxisMapping {
+  return orientation === 'horizontal'
+    ? { primary: 'width', secondary: 'height', primaryStart: 'left', secondaryStart: 'top' }
+    : { primary: 'height', secondary: 'width', primaryStart: 'top', secondaryStart: 'left' };
+}
 
-  // Helper function to calculate horizontal position based on alignment
-  const getHorizontalPosition = (itemWidth: number): number => {
-    const startX = container.bounds.left;
+/**
+ * Calculate max bounds for children in an axis-agnostic way
+ */
+function calculateChildrenBounds(
+  bounds: Bounds,
+  childCount: number,
+  distribution: string,
+  gap: number,
+  axis: AxisMapping
+): Bounds[] {
+  // Calculate base item size assuming equal distribution
+  const totalSpacing = gap * (childCount - 1);
+  const availableSpace = bounds[axis.primary] - totalSpacing;
+  const baseItemSize = availableSpace / childCount;
 
-    switch (horizontalAlignment) {
-      case 'center':
-        return startX + (availableWidth - itemWidth) / 2;
-      case 'right':
-        return startX + availableWidth - itemWidth;
-      case 'left':
-      default:
-        return startX;
-    }
-  };
+  let sizes: number[] = [];
+  let spacing = gap;
+  let offset = 0;
 
-  // Helper function to calculate vertical position based on alignment
-  const getVerticalPosition = (itemHeight: number): number => {
-    const startY = container.bounds.top;
-
-    switch (verticalAlignment) {
-      case 'center':
-        return startY + (availableHeight - itemHeight) / 2;
-      case 'bottom':
-        return startY + availableHeight - itemHeight;
-      case 'top':
-      default:
-        return startY;
-    }
-  };
-
-  // Handle horizontal orientation
-  if (orientation === 'horizontal') {
-    // Check if distribution is a ratio pattern like '1/8'
-    if (distribution.includes('/')) {
-      const parts = distribution.split('/');
-      if (parts.length === itemDimensions.length && parts.every((p) => !isNaN(Number(p)))) {
-        const ratios = parts.map(Number);
-        const totalRatio = ratios.reduce((sum, r) => sum + r, 0);
-        const actualSpacing = container.layout?.gap || 0;
-        const totalSpacing = actualSpacing * (itemDimensions.length - 1);
-        const availableWidthForItems = availableWidth - totalSpacing;
-
-        let currentLeft = startX;
-        positions = itemDimensions.map((dim, idx) => {
-          const itemWidth = (availableWidthForItems * ratios[idx]) / totalRatio;
-          const position = {
-            left: currentLeft,
-            top: getVerticalPosition(dim.height),
-            width: itemWidth,
-            height: dim.height,
-          };
-          currentLeft += itemWidth + actualSpacing;
-          return position;
-        });
-      } else {
-        // Fallback to equal distribution
-        const actualSpacing = container.layout?.gap || DEFAULT_SPACING_BETWEEN_ITEMS;
-        const totalSpacing = actualSpacing * (itemDimensions.length - 1);
-        const itemWidth = (availableWidth - totalSpacing) / itemDimensions.length;
-
-        let currentLeft = startX;
-        positions = itemDimensions.map((dim) => {
-          const position = {
-            left: currentLeft,
-            top: getVerticalPosition(dim.height),
-            width: itemWidth,
-            height: dim.height,
-          };
-          currentLeft += itemWidth + actualSpacing;
-          return position;
-        });
-      }
-    } else if (distribution === 'space-between') {
-      if (itemDimensions.length === 1) {
-        const centerX = startX + (availableWidth - itemDimensions[0].width) / 2;
-        positions = [
-          {
-            left: centerX,
-            top: getVerticalPosition(itemDimensions[0].height),
-            width: itemDimensions[0].width,
-            height: itemDimensions[0].height,
-          },
-        ];
-      } else {
-        const extraSpace = availableWidth - totalItemsWidth;
-        const spaceBetween = extraSpace / (itemDimensions.length - 1);
-        let currentX = startX;
-
-        positions = itemDimensions.map((dim) => {
-          const position = {
-            left: currentX,
-            top: getVerticalPosition(dim.height),
-            width: dim.width,
-            height: dim.height,
-          };
-          currentX += dim.width + spaceBetween;
-          return position;
-        });
-      }
-    } else if (distribution === 'space-around') {
-      const extraSpace = availableWidth - totalItemsWidth;
-      const spaceAroundEach = extraSpace / (itemDimensions.length + 1);
-      let currentX = startX + spaceAroundEach;
-
-      positions = itemDimensions.map((dim) => {
-        const position = {
-          left: currentX,
-          top: getVerticalPosition(dim.height),
-          width: dim.width,
-          height: dim.height,
-        };
-        currentX += dim.width + spaceAroundEach;
-        return position;
-      });
+  // Ratio distribution (e.g., '30/70', '1/8')
+  if (distribution.includes('/')) {
+    const parts = distribution.split('/');
+    if (parts.length === childCount && parts.every((p) => !isNaN(Number(p)))) {
+      const ratios = parts.map(Number);
+      const totalRatio = ratios.reduce((sum, r) => sum + r, 0);
+      sizes = ratios.map((r) => (bounds[axis.primary] * r) / totalRatio);
+      spacing = 0; // Ratio distribution doesn't use gap
+      offset = 0;
     } else {
-      // Equal: use fixed spacing
-      const actualSpacing = container.layout?.gap || DEFAULT_SPACING_BETWEEN_ITEMS;
-      const totalNeededWidth = totalItemsWidth + (itemDimensions.length - 1) * actualSpacing;
-
-      // Apply horizontal alignment
-      if (horizontalAlignment === 'center' && totalNeededWidth < availableWidth) {
-        const extraSpace = availableWidth - totalNeededWidth;
-        startX += extraSpace / 2;
-      } else if (horizontalAlignment === 'right' && totalNeededWidth < availableWidth) {
-        startX += availableWidth - totalNeededWidth;
-      }
-
-      let currentX = startX;
-      positions = itemDimensions.map((dim) => {
-        const position = {
-          left: currentX,
-          top: getVerticalPosition(dim.height),
-          width: dim.width,
-          height: dim.height,
-        };
-        currentX += dim.width + actualSpacing;
-        return position;
-      });
-    }
-  } else {
-    // Vertical orientation
-    // Check if distribution is a ratio pattern
-    if (distribution.includes('/')) {
-      const parts = distribution.split('/');
-      if (parts.length === itemDimensions.length && parts.every((p) => !isNaN(Number(p)))) {
-        const ratios = parts.map(Number);
-        const totalRatio = ratios.reduce((sum, r) => sum + r, 0);
-        const actualSpacing = container.layout?.gap || 0;
-        const totalSpacing = actualSpacing * (itemDimensions.length - 1);
-        const availableHeightForItems = availableHeight - totalSpacing;
-
-        let currentTop = startY;
-        positions = itemDimensions.map((dim, idx) => {
-          const itemHeight = (availableHeightForItems * ratios[idx]) / totalRatio;
-          const position = {
-            top: currentTop,
-            left: getHorizontalPosition(dim.width),
-            width: dim.width,
-            height: itemHeight,
-          };
-          currentTop += itemHeight + actualSpacing;
-          return position;
-        });
-      } else {
-        // Fallback to equal distribution
-        const actualSpacing = container.layout?.gap || DEFAULT_SPACING_BETWEEN_ITEMS;
-        const totalSpacing = actualSpacing * (itemDimensions.length - 1);
-        const itemHeight = (availableHeight - totalSpacing) / itemDimensions.length;
-
-        let currentTop = startY;
-        positions = itemDimensions.map((dim) => {
-          const position = {
-            top: currentTop,
-            left: getHorizontalPosition(dim.width),
-            width: dim.width,
-            height: itemHeight,
-          };
-          currentTop += itemHeight + actualSpacing;
-          return position;
-        });
-      }
-    } else if (distribution === 'space-between') {
-      if (itemDimensions.length === 1) {
-        const centerY = startY + (availableHeight - itemDimensions[0].height) / 2;
-        positions = [
-          {
-            top: centerY,
-            left: getHorizontalPosition(itemDimensions[0].width),
-            width: itemDimensions[0].width,
-            height: itemDimensions[0].height,
-          },
-        ];
-      } else {
-        const extraSpace = availableHeight - totalItemsHeight;
-        const spaceBetween = extraSpace / (itemDimensions.length - 1);
-        let currentY = startY;
-
-        positions = itemDimensions.map((dim) => {
-          const position = {
-            top: currentY,
-            left: getHorizontalPosition(dim.width),
-            width: dim.width,
-            height: dim.height,
-          };
-          currentY += dim.height + spaceBetween;
-          return position;
-        });
-      }
-    } else if (distribution === 'space-around') {
-      const extraSpace = availableHeight - totalItemsHeight;
-      const spaceAroundEach = extraSpace / (itemDimensions.length + 1);
-      let currentY = startY + spaceAroundEach;
-
-      positions = itemDimensions.map((dim) => {
-        const position = {
-          top: currentY,
-          left: getHorizontalPosition(dim.width),
-          width: dim.width,
-          height: dim.height,
-        };
-        currentY += dim.height + spaceAroundEach;
-        return position;
-      });
-    } else {
-      // Equal: use fixed spacing defined by gap
-      const actualSpacing = container.layout?.gap || DEFAULT_SPACING_BETWEEN_ITEMS;
-      const totalNeededHeight = totalItemsHeight + (itemDimensions.length - 1) * actualSpacing;
-
-      // Apply vertical alignment
-      if (verticalAlignment === 'center' && totalNeededHeight < availableHeight) {
-        const extraSpace = availableHeight - totalNeededHeight;
-        startY += Math.min(extraSpace / 2, 80); // Max center offset of 80px
-      } else if (verticalAlignment === 'bottom' && totalNeededHeight < availableHeight) {
-        startY += availableHeight - totalNeededHeight;
-      }
-
-      let currentY = startY;
-      positions = itemDimensions.map((dim) => {
-        const position = {
-          top: currentY,
-          left: getHorizontalPosition(dim.width),
-          width: dim.width,
-          height: dim.height,
-        };
-        currentY += dim.height + actualSpacing;
-        return position;
-      });
+      // Fallback to equal distribution
+      sizes = Array(childCount).fill(baseItemSize);
+      spacing = gap;
+      offset = 0;
     }
   }
+  // Space-between distribution
+  else if (distribution === 'space-between' && childCount > 1) {
+    const totalItemSize = childCount * baseItemSize;
+    const remainingSpace = bounds[axis.primary] - totalItemSize;
+    sizes = Array(childCount).fill(baseItemSize);
+    spacing = remainingSpace / (childCount - 1);
+    offset = 0;
+  }
+  // Space-around distribution
+  else if (distribution === 'space-around' && childCount > 1) {
+    const totalItemSize = childCount * baseItemSize;
+    const remainingSpace = bounds[axis.primary] - totalItemSize;
+    const spaceUnit = remainingSpace / (childCount + 1);
+    sizes = Array(childCount).fill(baseItemSize);
+    spacing = spaceUnit;
+    offset = spaceUnit;
+  }
+  // Equal distribution (default)
+  else {
+    sizes = Array(childCount).fill(baseItemSize);
+    spacing = gap;
+    offset = 0;
+  }
 
-  return positions;
+  // Build bounds array
+  let currentPrimary = bounds[axis.primaryStart] + offset;
+  const secondarySize = bounds[axis.secondary];
+  const secondaryStart = bounds[axis.secondaryStart];
+
+  return sizes.map((primarySize) => {
+    const position: Bounds =
+      axis.primary === 'width'
+        ? {
+            left: currentPrimary,
+            top: secondaryStart,
+            width: primarySize,
+            height: secondarySize,
+          }
+        : {
+            left: secondaryStart,
+            top: currentPrimary,
+            width: secondarySize,
+            height: primarySize,
+          };
+
+    currentPrimary += primarySize + spacing;
+    return position;
+  });
+}
+
+/**
+ * Calculate alignment position
+ */
+function calculateAlignment(
+  alignment: string,
+  itemSize: number,
+  containerSize: number,
+  containerStart: number
+): number {
+  switch (alignment) {
+    case 'center':
+      return containerStart + (containerSize - itemSize) / 2;
+    case 'right':
+    case 'bottom':
+      return containerStart + containerSize - itemSize;
+    default:
+      return containerStart;
+  }
+}
+
+/**
+ * Orientation-agnostic layout calculator
+ */
+function calculateLayout(
+  itemDimensions: Size[],
+  distribution: string,
+  gap: number,
+  bounds: Bounds,
+  axis: AxisMapping,
+  primaryAlignment: string,
+  secondaryAlignment: string,
+  isVertical: boolean
+): Bounds[] {
+  const itemSizes = itemDimensions.map((dim) => dim[axis.primary]);
+  const totalItemsSize = itemSizes.reduce((sum, size) => sum + size, 0);
+
+  let sizes: number[] = itemSizes;
+  let spacing = gap;
+  let offset = 0;
+
+  // Ratio distribution (e.g., '1/8')
+  if (distribution.includes('/')) {
+    const parts = distribution.split('/');
+    if (parts.length === itemDimensions.length && parts.every((p) => !isNaN(Number(p)))) {
+      const ratios = parts.map(Number);
+      const totalRatio = ratios.reduce((sum, r) => sum + r, 0);
+      const totalSpacing = gap * (itemDimensions.length - 1);
+      const availableForItems = bounds[axis.primary] - totalSpacing;
+
+      sizes = ratios.map((ratio) => (availableForItems * ratio) / totalRatio);
+      spacing = gap;
+      offset = 0;
+    }
+  }
+  // Space-between distribution
+  else if (distribution === 'space-between') {
+    if (itemDimensions.length === 1) {
+      spacing = 0;
+      offset = (bounds[axis.primary] - totalItemsSize) / 2;
+    } else {
+      spacing = (bounds[axis.primary] - totalItemsSize) / (itemDimensions.length - 1);
+      offset = 0;
+    }
+  }
+  // Space-around distribution
+  else if (distribution === 'space-around') {
+    const spaceUnit = (bounds[axis.primary] - totalItemsSize) / (itemDimensions.length + 1);
+    spacing = spaceUnit;
+    offset = spaceUnit;
+  }
+  // Equal distribution (default)
+  else {
+    const totalNeeded = totalItemsSize + (itemDimensions.length - 1) * gap;
+    const extraSpace = bounds[axis.primary] - totalNeeded;
+
+    if (extraSpace > 0) {
+      // Apply primary alignment
+      if (primaryAlignment === 'center') {
+        offset = extraSpace / 2;
+      } else if (primaryAlignment === 'right' || primaryAlignment === 'bottom') {
+        offset = extraSpace;
+      } else {
+        offset = 0; // left or top
+      }
+
+      const maxOffset = isVertical ? 80 : Infinity;
+      offset = Math.min(offset, maxOffset);
+    } else {
+      offset = 0;
+    }
+
+    spacing = gap;
+  }
+
+  // Position items along primary axis
+  let currentPrimary = bounds[axis.primaryStart] + offset;
+
+  return itemDimensions.map((dim, idx) => {
+    const primarySize = sizes[idx];
+    const secondarySize = dim[axis.secondary];
+
+    const secondaryPosition = calculateAlignment(
+      secondaryAlignment,
+      secondarySize,
+      bounds[axis.secondary],
+      bounds[axis.secondaryStart]
+    );
+
+    // Build bounds object by mapping primary/secondary to actual coordinates
+    const position: Bounds =
+      axis.primary === 'width'
+        ? {
+            left: currentPrimary,
+            top: secondaryPosition,
+            width: primarySize,
+            height: secondarySize,
+          }
+        : {
+            left: secondaryPosition,
+            top: currentPrimary,
+            width: secondarySize,
+            height: primarySize,
+          };
+
+    currentPrimary += primarySize + spacing;
+    return position;
+  });
 }

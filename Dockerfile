@@ -1,14 +1,18 @@
-FROM node:20-alpine AS builder
+FROM node:20-slim AS base
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
 
-RUN corepack enable && corepack prepare pnpm@10.12.0 --activate
-
+COPY . /app
 WORKDIR /app
 
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-COPY container/package.json ./container/
-COPY presentation/package.json ./presentation/
-
-RUN pnpm install --frozen-lockfile
+FROM base AS builder
+COPY pnpm-lock.yaml ./
+RUN --mount=type=cache,target=/pnpm/store \
+    pnpm fetch --frozen-lockfile
+COPY package.json ./
+RUN --mount=type=cache,target=/pnpm/store \
+    pnpm install --frozen-lockfile 
 
 COPY . .
 
@@ -20,7 +24,6 @@ FROM node:20-alpine AS container-production
 WORKDIR /app
 
 COPY --from=builder /app/container/dist ./dist
-COPY --from=builder /app/container/package.json ./
 
 RUN npm install -g serve
 
@@ -34,7 +37,6 @@ FROM node:20-alpine AS presentation-production
 WORKDIR /app
 
 COPY --from=builder /app/presentation/dist ./dist
-COPY --from=builder /app/presentation/package.json ./
 
 RUN npm install -g serve
 

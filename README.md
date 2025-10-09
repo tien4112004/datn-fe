@@ -97,13 +97,14 @@ Build and run both applications using Docker Compose:
 
 ```bash
 # Build and start containers
-docker-compose up -d
+docker-compose -f docker-compose.prod.yml up -d
 
 # Stop containers
-docker-compose down
+docker-compose -f docker-compose.prod.yml down
 ```
 
 This will start:
+
 - **Container app** at http://localhost:3000
 - **Presentation app** at http://localhost:3001
 
@@ -113,7 +114,7 @@ Run the development environment in Docker:
 
 ```bash
 # Start dev environment with hot-reload
-docker-compose --profile development up dev
+docker-compose up
 ```
 
 ### Individual Container Builds

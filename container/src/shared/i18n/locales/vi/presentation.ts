@@ -75,6 +75,7 @@ export default {
       addCard: 'Thêm mục dàn ý',
       cards: 'Mục dàn ý',
       download: 'Tải dàn ý',
+      downloading: 'Đang tải...',
       noCards: 'Không tìm thấy mục dàn ý nào.',
       clickAddToStart: 'Nhấn "Thêm" để bắt đầu tạo dàn ý của bạn.',
     },

@@ -49,4 +49,10 @@ export default {
       lastPage: 'Cuối',
     },
   },
+  model: {
+    placeholder: 'Chọn mô hình?',
+    label: 'Mô hình',
+    loading: 'Đang tải mô hình...',
+    error: 'Lỗi khi tải mô hình',
+  },
 };

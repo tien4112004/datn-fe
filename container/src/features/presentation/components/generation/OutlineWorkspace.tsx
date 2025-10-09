@@ -28,7 +28,7 @@ const OutlineWorkspace = ({ onDownload, totalSlide }: OutlineWorkspaceProps) => 
   const addContent = useOutlineStore((state) => state.addOutline);
   const isStreaming = useOutlineStore((state) => state.isStreaming);
   const swap = useOutlineStore((state) => state.swap);
-  const { t } = useTranslation('outlineWorkspace');
+  const { t } = useTranslation('presentation', { keyPrefix: 'workspace.outline' });
   const [isDownloading, setIsDownloading] = useState(false);
 
   const handleDeleteContent = useCallback(
@@ -96,7 +96,7 @@ const OutlineWorkspace = ({ onDownload, totalSlide }: OutlineWorkspaceProps) => 
         </DndContext>
       ) : (
         <div className="text-muted-foreground flex flex-col items-center justify-center text-center">
-          <div className="text-lg font-medium">{t('noOutlineCards')}</div>
+          <div className="text-lg font-medium">{t('noCards')}</div>
           <div className="text-sm">{t('clickAddToStart')}</div>
         </div>
       )}
@@ -118,11 +118,11 @@ const OutlineWorkspace = ({ onDownload, totalSlide }: OutlineWorkspaceProps) => 
         }}
       >
         <Plus className="h-4 w-4" />
-        {t('addOutlineCard')}
+        {t('addCard')}
       </Button>
       <div className="flex w-full items-center justify-between">
         <div>
-          {contentIds.length} {t('outlineCards')}
+          {contentIds.length} {t('cards')}
         </div>
 
         {/* Download button */}
@@ -133,7 +133,7 @@ const OutlineWorkspace = ({ onDownload, totalSlide }: OutlineWorkspaceProps) => 
           disabled={isDownloading}
         >
           {isDownloading ? <Loader className="animate-spin" /> : <Download className="h-4 w-4" />}
-          {isDownloading ? t('downloading') : t('downloadOutline')}
+          {isDownloading ? t('downloading') : t('download')}
         </Button>
       </div>
     </Card>

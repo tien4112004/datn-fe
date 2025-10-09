@@ -14,7 +14,7 @@ function NavLayoutContent() {
   const location = useLocation();
   const isLoading = navigation.state === 'loading';
   const { state, toggleSidebar, setFullscreen } = useSidebar();
-  const { t } = useTranslation('loading');
+  const { t } = useTranslation('glossary', { keyPrefix: 'loading' });
 
   const hideSidebar = () => {
     if (state === 'expanded') {

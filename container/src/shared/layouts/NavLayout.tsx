@@ -1,20 +1,23 @@
 // DEPRECATED: This file is no longer in use.
 
 import Nav from '@/shared/layouts/Nav';
-import { Outlet, useNavigation } from 'react-router-dom';
-import GlobalSpinner from '@/components/common/GlobalSpinner';
-import { useTranslation } from 'react-i18next';
+import { Outlet } from 'react-router-dom';
+// import GlobalSpinner from '@/components/common/GlobalSpinner';
+// import { useTranslation } from 'react-i18next';
 
+/**
+ * @deprecated This layout is no longer in use.
+ */
 export default function NavLayout() {
-  const navigation = useNavigation();
-  const isLoading = navigation.state === 'loading';
-  const { t } = useTranslation('loading');
+  // const navigation = useNavigation();
+  // const isLoading = navigation.state === 'loading';
+  // const { t } = useTranslation('loading');
 
   return (
     <>
       <Nav />
       <main className="flex h-fit flex-col">
-        {isLoading && <GlobalSpinner text={t('page')} />}
+        {/* {isLoading && <GlobalSpinner text={t('page')} />} */}
         <Outlet />
       </main>
     </>

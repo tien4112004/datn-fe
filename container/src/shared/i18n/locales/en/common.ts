@@ -49,4 +49,10 @@ export default {
       lastPage: 'Last',
     },
   },
+  model: {
+    placeholder: 'Which model?',
+    label: 'Models',
+    loading: 'Loading models...',
+    error: 'Error loading models',
+  },
 };

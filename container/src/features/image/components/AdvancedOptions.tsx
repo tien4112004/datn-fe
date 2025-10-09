@@ -21,7 +21,7 @@ interface AdvancedOptionsProps {
 }
 
 const AdvancedOptions = ({ register, control, isOpen, onToggle }: AdvancedOptionsProps) => {
-  const { t } = useTranslation('image', { keyPrefix: 'createImage' });
+  const { t } = useTranslation('image', { keyPrefix: 'create' });
   const { models, isLoading, isError } = useModels(MODEL_TYPES.IMAGE);
 
   const toggleOptions = () => {
@@ -56,7 +56,7 @@ const AdvancedOptions = ({ register, control, isOpen, onToggle }: AdvancedOption
               <div className="grid grid-cols-2 gap-4">
                 {/* Image Models */}
                 <div className="space-y-2">
-                  <Label>{t('imageModel')}</Label>
+                  <Label>{t('model.label')}</Label>
                   <Controller
                     name="model"
                     control={control}
@@ -65,8 +65,8 @@ const AdvancedOptions = ({ register, control, isOpen, onToggle }: AdvancedOption
                         models={models}
                         value={field.value}
                         onValueChange={field.onChange}
-                        placeholder={t('imageModelPlaceholder')}
-                        label={t('imageModel')}
+                        placeholder={t('model.placeholder')}
+                        label={t('model.label')}
                         isLoading={isLoading}
                         isError={isError}
                       />
@@ -76,19 +76,19 @@ const AdvancedOptions = ({ register, control, isOpen, onToggle }: AdvancedOption
 
                 {/* Art Styles */}
                 <div className="space-y-2">
-                  <Label>{t('artStyle')}</Label>
+                  <Label>{t('artStyle.label')}</Label>
                   <Controller
                     name="artStyle"
                     control={control}
                     render={({ field }) => (
                       <Select value={field.value} onValueChange={field.onChange} defaultValue="">
                         <SelectTrigger>
-                          <SelectValue placeholder={t('artStylePlaceholder')} />
+                          <SelectValue placeholder={t('artStyle.placeholder')} />
                         </SelectTrigger>
                         <SelectContent>
                           {ART_STYLE_OPTIONS.map((opt) => (
                             <SelectItem key={opt.value} value={opt.value}>
-                              {t(`artStyles.${opt.labelKey}`)}
+                              {t(`artStyle.${opt.labelKey}` as never)}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -100,7 +100,7 @@ const AdvancedOptions = ({ register, control, isOpen, onToggle }: AdvancedOption
 
               {/* Image Dimensions - Full Width Visual Options */}
               <div className="space-y-3">
-                <Label>{t('imageDimension')}</Label>
+                <Label>{t('dimension.label')}</Label>
                 <Controller
                   name="imageDimension"
                   control={control}
@@ -137,7 +137,8 @@ const AdvancedOptions = ({ register, control, isOpen, onToggle }: AdvancedOption
                               <div
                                 className={`text-sm font-medium ${isSelected ? 'text-primary' : 'text-foreground'}`}
                               >
-                                {t(`dimensions.${opt.labelKey}`)}
+                                {/* as never = trust me bro */}
+                                {t(`dimension.${opt.labelKey}` as never)}
                               </div>
                               <div className="text-muted-foreground text-xs">
                                 {aspectRatio > 1 ? 'Landscape' : aspectRatio < 1 ? 'Portrait' : 'Square'}
@@ -153,15 +154,15 @@ const AdvancedOptions = ({ register, control, isOpen, onToggle }: AdvancedOption
 
               {/* Negative Prompt */}
               <div className="space-y-2">
-                <Label>{t('negativePrompt')}</Label>
+                <Label>{t('negativePrompt.label')}</Label>
                 <AutosizeTextarea
-                  placeholder={t('negativePromptPlaceholder')}
+                  placeholder={t('negativePrompt.placeholder')}
                   minHeight={60}
                   maxHeight={120}
                   className="text-sm"
                   {...register('negativePrompt')}
                 />
-                <p className="text-muted-foreground text-xs">{t('negativePromptDescription')}</p>
+                <p className="text-muted-foreground text-xs">{t('negativePrompt.description')}</p>
               </div>
             </div>
           </motion.div>

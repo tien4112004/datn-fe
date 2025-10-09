@@ -18,7 +18,7 @@ import {
 import { useTranslation } from 'react-i18next';
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { t } = useTranslation('navSidebar');
+  const { t } = useTranslation('common', { keyPrefix: 'navigation.sidebar' });
 
   const data = {
     user: {

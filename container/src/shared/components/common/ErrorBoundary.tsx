@@ -64,7 +64,7 @@ const DefaultErrorFallback = ({
   errorId,
   showDetails = true,
 }: ErrorFallbackProps) => {
-  const { t } = useTranslation('errorBoundary');
+  const { t } = useTranslation('errors', { keyPrefix: 'boundary' });
 
   const goHome = () => {
     window.location.href = '/';

@@ -1,12 +1,15 @@
 // DEPRECATED: This file is no longer in use.
 
 import React from 'react';
-import { useTranslation } from 'react-i18next';
+// import { useTranslation } from 'react-i18next';
 import { NavLink } from 'react-router-dom';
 import LanguageSwitcher from '../components/common/LanguageSwitcher';
 
+/**
+ * @deprecated This component is no longer in use.
+ */
 const Nav = () => {
-  const { t } = useTranslation('nav');
+  // const { t } = useTranslation('nav');
 
   const [isFullscreen, setIsFullscreen] = React.useState(document.fullscreenElement !== null);
 
@@ -40,13 +43,13 @@ const Nav = () => {
       <nav className="flex items-center justify-between bg-gray-100 px-4 py-2">
         <div className="flex gap-4">
           <NavLink to="/" className="hover:underline">
-            {t('home')}
+            {/* {t('home')} */}
           </NavLink>
           <NavLink to="/presentation" className="hover:underline">
-            {t('presentation')}
+            {/* {t('presentation')} */}
           </NavLink>
           <NavLink to="/presentation/123" className="hover:underline">
-            {t('presentationDetails')}
+            {/* {t('presentationDetails')} */}
           </NavLink>
         </div>
 

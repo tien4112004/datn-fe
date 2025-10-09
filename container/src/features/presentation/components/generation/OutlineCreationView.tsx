@@ -34,12 +34,12 @@ const OutlineCreationView = ({ onCreateOutline }: OutlineCreationViewProps) => {
 
   // Presentation-specific example prompts
   const presentationExamplePrompts = [
-    t('examplePrompt1'),
-    t('examplePrompt2'),
-    t('examplePrompt3'),
-    t('examplePrompt4'),
-    t('examplePrompt5'),
-    t('examplePrompt6'),
+    t('examples.prompt1'),
+    t('examples.prompt2'),
+    t('examples.prompt3'),
+    t('examples.prompt4'),
+    t('examples.prompt5'),
+    t('examples.prompt6'),
   ];
 
   const handleExampleClick = (example: string) => {
@@ -125,7 +125,7 @@ const OutlineCreationView = ({ onCreateOutline }: OutlineCreationViewProps) => {
                             <SelectLabel>{t('language.label')}</SelectLabel>
                             {LANGUAGE_OPTIONS.map((languageOption) => (
                               <SelectItem key={languageOption.value} value={languageOption.value}>
-                                {t(languageOption.labelKey)}
+                                {t(languageOption.labelKey as never)}
                               </SelectItem>
                             ))}
                           </SelectGroup>
@@ -142,8 +142,8 @@ const OutlineCreationView = ({ onCreateOutline }: OutlineCreationViewProps) => {
                         models={models}
                         value={field.value}
                         onValueChange={field.onChange}
-                        placeholder={t('modelPlaceholder')}
-                        label={t('modelLabel')}
+                        placeholder={t('model.placeholder')}
+                        label={t('model.label')}
                         showProviderLogo={true}
                       />
                     )}
@@ -155,7 +155,7 @@ const OutlineCreationView = ({ onCreateOutline }: OutlineCreationViewProps) => {
               onExampleClick={handleExampleClick}
               isShown={showExamplePrompts}
               prompts={presentationExamplePrompts}
-              title={t('examplePromptTitle')}
+              title={t('examples.title')}
             />
           </CardContent>
         </Card>

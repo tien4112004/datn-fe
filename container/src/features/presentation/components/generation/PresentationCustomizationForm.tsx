@@ -52,12 +52,12 @@ const ThemeSection = ({ selectedTheme, onThemeSelect, disabled = false }: ThemeS
   return (
     <>
       <CardHeader>
-        <CardTitle>{t('themeTitle')}</CardTitle>
-        <CardDescription>{t('themeDescription')}</CardDescription>
+        <CardTitle>{t('theme.title')}</CardTitle>
+        <CardDescription>{t('theme.description')}</CardDescription>
         <CardAction>
           <Button variant="ghost" size="sm" className="shadow-none" type="button" disabled={disabled}>
             <Palette className="h-4 w-4" />
-            {t('viewMore')}
+            {t('theme.viewMore')}
           </Button>
         </CardAction>
       </CardHeader>
@@ -107,20 +107,20 @@ const ContentSection = ({
   const contentOptions = [
     {
       key: 'short',
-      label: t('contentLength.short'),
-      desc: t('contentLength.shortDesc'),
+      label: t('content.short'),
+      desc: t('content.shortDesc'),
       icon: <AlignLeft className="h-5 w-5" />,
     },
     {
       key: 'medium',
-      label: t('contentLength.medium'),
-      desc: t('contentLength.mediumDesc'),
+      label: t('content.medium'),
+      desc: t('content.mediumDesc'),
       icon: <AlignCenter className="h-5 w-5" />,
     },
     {
       key: 'long',
-      label: t('contentLength.long'),
-      desc: t('contentLength.longDesc'),
+      label: t('content.long'),
+      desc: t('content.longDesc'),
       icon: <AlignJustify className="h-5 w-5" />,
     },
   ];
@@ -128,8 +128,8 @@ const ContentSection = ({
   return (
     <>
       <CardHeader>
-        <CardTitle>{t('contentTitle')}</CardTitle>
-        <CardDescription>{t('contentDescription')}</CardDescription>
+        <CardTitle>{t('content.title')}</CardTitle>
+        <CardDescription>{t('content.description')}</CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-2">
         <div className="grid grid-cols-3 gap-4">
@@ -140,7 +140,7 @@ const ContentSection = ({
               onClick={() => !disabled && onContentLengthSelect(content.key)}
             >
               {content.icon}
-              <span className="mt-2 text-sm font-medium">{t(`contentLength.${content.key}`)}</span>
+              <span className="mt-2 text-sm font-medium">{t(`content.${content.key}` as never)}</span>
               <span className="text-muted-foreground text-xs">{content.desc}</span>
             </div>
           ))}
@@ -165,9 +165,7 @@ const CustomizationSection = ({
   onGeneratePresentation,
   isGenerating,
 }: CustomizationSectionProps) => {
-  const { t } = useTranslation('presentation', { keyPrefix: 'workspace' });
-  const { t: tCustomization } = useTranslation('presentation', { keyPrefix: 'customization' });
-  const { t: tOutline } = useTranslation('presentation', { keyPrefix: 'createOutline' });
+  const { t } = useTranslation('presentation');
   const disabled = useOutlineStore((state) => state.isStreaming);
   const { models } = useModels(MODEL_TYPES.IMAGE);
 
@@ -187,7 +185,9 @@ const CustomizationSection = ({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="scroll-m-20 text-xl font-semibold tracking-tight">{t('customizeSection')}</div>
+      <div className="scroll-m-20 text-xl font-semibold tracking-tight">
+        {t('workspace.customizeSection')}
+      </div>
       <Card className="w-full max-w-3xl">
         <ThemeSection selectedTheme={watch('theme')} onThemeSelect={onThemeSelect} disabled={disabled} />
         <ContentSection
@@ -196,7 +196,7 @@ const CustomizationSection = ({
           disabled={disabled}
         />
         <CardContent className="flex flex-row items-center gap-2">
-          <CardTitle>{tCustomization('imageModelsTitle')}</CardTitle>
+          <CardTitle>{t('customization.imageModels.title')}</CardTitle>
           <Controller
             name="imageModel"
             control={control}
@@ -205,8 +205,8 @@ const CustomizationSection = ({
                 models={models}
                 value={field.value}
                 onValueChange={field.onChange}
-                placeholder={tOutline('modelPlaceholder')}
-                label={tOutline('modelLabel')}
+                placeholder={t('createOutline.model.placeholder')}
+                label={t('createOutline.model.label')}
                 showProviderLogo={true}
                 disabled={disabled}
               />
@@ -221,7 +221,7 @@ const CustomizationSection = ({
         disabled={disabled || isGenerating}
       >
         <Sparkles />
-        {isGenerating ? t('generatingPresentation') : t('generatePresentation')}
+        {isGenerating ? t('workspace.generatingPresentation') : t('workspace.generatePresentation')}
       </Button>
     </div>
   );

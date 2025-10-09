@@ -12,7 +12,7 @@ import ViewToggle, { type ViewMode } from '../components/others/ViewToggle';
  */
 const PresentationListPage = () => {
   const { t } = useTranslation('presentation', { keyPrefix: 'list' });
-  const { t: tPage } = useTranslation('page');
+  const { t: tPage } = useTranslation('common', { keyPrefix: 'pages' });
   const [searchParams, setSearchParams] = useSearchParams();
 
   const viewMode = (searchParams.get('view') as ViewMode) || 'list';

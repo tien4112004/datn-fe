@@ -17,8 +17,9 @@ import {
   useSidebar,
 } from '@/shared/components/ui/sidebar';
 import { NavLink } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
+// import { useTranslation } from 'react-i18next';
 
+// Unused
 export function NavSubjects({
   subjects,
 }: {
@@ -28,11 +29,11 @@ export function NavSubjects({
   }[];
 }) {
   const { isMobile } = useSidebar();
-  const { t } = useTranslation('navSidebar');
+  // const { t } = useTranslation('common', { keyPrefix: 'navigation' });
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-      <SidebarGroupLabel>{t('subjects.index')}</SidebarGroupLabel>
+      <SidebarGroupLabel>Subjects</SidebarGroupLabel>
       <SidebarMenu>
         {subjects.map((item) => (
           <SidebarMenuItem key={item.name}>
@@ -45,7 +46,7 @@ export function NavSubjects({
               <DropdownMenuTrigger asChild>
                 <SidebarMenuAction showOnHover>
                   <MoreHorizontal />
-                  <span className="sr-only">{t('subjects.more')}</span>
+                  <span className="sr-only">More</span>
                 </SidebarMenuAction>
               </DropdownMenuTrigger>
               <DropdownMenuContent
@@ -73,7 +74,7 @@ export function NavSubjects({
         <SidebarMenuItem>
           <SidebarMenuButton>
             <MoreHorizontal />
-            <span>{t('subjects.more')}</span>
+            <span>More</span>
           </SidebarMenuButton>
         </SidebarMenuItem>
       </SidebarMenu>

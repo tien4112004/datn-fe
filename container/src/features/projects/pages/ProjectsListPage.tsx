@@ -5,6 +5,7 @@ import PresentationGrid from '@/features/presentation/components/others/Presenta
 import ProjectControls from '@/features/projects/components/ProjectControls';
 import ViewToggle, { type ViewMode } from '@/features/presentation/components/others/ViewToggle';
 import CommonTabs, { type TabItem } from '@/shared/components/common/CommonTabs';
+import MindmapTable from '@/features/mindmap/components/table/MindmapTable';
 
 const ProjectListPage = () => {
   const { t } = useTranslation('projects');
@@ -58,7 +59,11 @@ const ProjectListPage = () => {
       key: 'mindmap',
       value: 'mindmap',
       label: t('resources.mindmap', 'Mindmap'),
-      content: <div className="text-muted-foreground py-8 text-center">Mindmap resource coming soon...</div>,
+      content: (
+        <>
+          <MindmapTable />
+        </>
+      ),
     },
     {
       key: 'image',

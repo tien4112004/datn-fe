@@ -1,6 +1,14 @@
 import { API_MODE, type ApiMode } from '@/shared/constants';
-import { type MindmapApiService, type MindmapData, MINDMAP_TYPES, PATH_TYPES } from '../types';
+import {
+  type MindmapApiService,
+  type MindmapData,
+  type MindmapCollectionRequest,
+  MINDMAP_TYPES,
+  PATH_TYPES,
+} from '../types';
 import { DRAGHANDLE, SIDE } from '../types/constants';
+import type { ApiResponse, Pagination } from '@/shared/types/api';
+import { mapPagination } from '@/shared/types/api';
 
 const mockMindmaps: MindmapData[] = [
   {
@@ -195,11 +203,67 @@ const mockMindmaps: MindmapData[] = [
       //     },
       //   },
     ],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+    createdAt: new Date('2024-01-15T10:30:00Z').toISOString(),
+    updatedAt: new Date('2024-03-20T14:22:00Z').toISOString(),
     status: 'active',
   },
+  {
+    id: '2',
+    title: 'Project Planning',
+    description: 'Planning phases and milestones for the new project',
+    nodes: [
+      {
+        id: 'root-2',
+        type: MINDMAP_TYPES.ROOT_NODE,
+        position: { x: 0, y: 0 },
+        data: {
+          level: 0,
+          content: '<p>Project Plan</p>',
+          side: SIDE.MID,
+          isCollapsed: false,
+          pathType: PATH_TYPES.SMOOTHSTEP,
+          edgeColor: 'var(--primary)',
+        },
+        dragHandle: DRAGHANDLE.SELECTOR,
+        width: 250,
+        height: 100,
+      },
+    ],
+    edges: [],
+    createdAt: new Date('2024-02-10T09:15:00Z').toISOString(),
+    updatedAt: new Date('2024-03-18T11:45:00Z').toISOString(),
+    status: 'active',
+  },
+  {
+    id: '3',
+    title: 'Learning Roadmap',
+    description: 'Personal learning path for web development',
+    nodes: [
+      {
+        id: 'root-3',
+        type: MINDMAP_TYPES.ROOT_NODE,
+        position: { x: 0, y: 0 },
+        data: {
+          level: 0,
+          content: '<p>Learning Path</p>',
+          side: SIDE.MID,
+          isCollapsed: false,
+          pathType: PATH_TYPES.SMOOTHSTEP,
+          edgeColor: 'var(--primary)',
+        },
+        dragHandle: DRAGHANDLE.SELECTOR,
+        width: 250,
+        height: 100,
+      },
+    ],
+    edges: [],
+    createdAt: new Date('2024-01-05T08:00:00Z').toISOString(),
+    updatedAt: new Date('2024-03-15T16:30:00Z').toISOString(),
+    status: 'draft',
+  },
 ];
+
+let mindmapStorage = [...mockMindmaps];
 
 export default class MindmapMockService implements MindmapApiService {
   baseUrl: string;
@@ -212,11 +276,95 @@ export default class MindmapMockService implements MindmapApiService {
     return API_MODE.mock;
   }
 
-  async getMindmapById(): Promise<MindmapData> {
+  async getMindmaps(request: MindmapCollectionRequest): Promise<ApiResponse<MindmapData[]>> {
     return new Promise((resolve) => {
       setTimeout(() => {
-        const mindmap = mockMindmaps[0];
-        resolve({ ...mindmap });
+        const { page = 0, pageSize = 20, sort = 'desc', filter = '' } = request;
+
+        // Filter mindmaps
+        let filtered = [...mindmapStorage];
+        if (filter) {
+          const searchTerm = filter.toLowerCase();
+          filtered = filtered.filter(
+            (m) =>
+              m.title.toLowerCase().includes(searchTerm) ||
+              (m.description || '').toLowerCase().includes(searchTerm)
+          );
+        }
+
+        // Sort mindmaps
+        filtered.sort((a, b) => {
+          const dateA = new Date(a.updatedAt).getTime();
+          const dateB = new Date(b.updatedAt).getTime();
+          return sort === 'desc' ? dateB - dateA : dateA - dateB;
+        });
+
+        // Paginate
+        const totalItems = filtered.length;
+        const totalPages = Math.ceil(totalItems / pageSize);
+        const start = page * pageSize;
+        const end = start + pageSize;
+        const paginatedData = filtered.slice(start, end);
+
+        const pagination: Pagination = {
+          currentPage: page + 1,
+          pageSize,
+          totalItems,
+          totalPages,
+        };
+
+        resolve({
+          success: true,
+          code: 200,
+          data: paginatedData,
+          pagination: mapPagination(pagination),
+        });
+      }, 500);
+    });
+  }
+
+  async getMindmapById(id: string): Promise<MindmapData> {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        const mindmap = mindmapStorage.find((m) => m.id === id);
+        if (mindmap) {
+          resolve({ ...mindmap });
+        } else {
+          reject(new Error(`Mindmap with id ${id} not found`));
+        }
+      }, 300);
+    });
+  }
+
+  async createMindmap(data: MindmapData): Promise<MindmapData> {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const newMindmap: MindmapData = {
+          ...data,
+          id: data.id || crypto.randomUUID(),
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        };
+        mindmapStorage.push(newMindmap);
+        resolve({ ...newMindmap });
+      }, 300);
+    });
+  }
+
+  async updateMindmapTitle(id: string, name: string): Promise<any | null> {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        const index = mindmapStorage.findIndex((m) => m.id === id);
+        if (index !== -1) {
+          mindmapStorage[index] = {
+            ...mindmapStorage[index],
+            title: name,
+            updatedAt: new Date().toISOString(),
+          };
+          resolve(null);
+        } else {
+          reject(new Error(`Mindmap with id ${id} not found`));
+        }
       }, 300);
     });
   }

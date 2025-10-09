@@ -62,7 +62,7 @@ const PresentationTable = () => {
         meta: {
           isGrow: true,
         },
-        enableSorting: false,
+        enableSorting: true,
       }),
       columnHelper.accessor('createdAt', {
         header: t('presentation.createdAt'),

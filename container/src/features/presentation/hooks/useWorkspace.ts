@@ -104,9 +104,9 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
       return;
     }
 
-    navigate(`/presentation/${result.presentationId}?isGenerating=true`);
-    setValue('topic', '');
     clearOutline();
+    setValue('topic', '');
+    navigate(`/presentation/${result.presentationId}?isGenerating=true`);
   }, [trigger, markdownContent, getValues, startGeneration]);
 
   const stopStream = useCallback(() => {

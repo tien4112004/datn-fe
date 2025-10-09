@@ -33,6 +33,64 @@
             "
             >{{ $t('header.ai.aiGeneratePPT') }}</PopoverMenuItem
           >
+          <div class="menu-divider"></div>
+          <PopoverMenuItem
+            @click="
+              handleCreateSlide('title-with-subtitle');
+              mainMenuVisible = false;
+            "
+            >Create Title (with Subtitle)</PopoverMenuItem
+          >
+          <PopoverMenuItem
+            @click="
+              handleCreateSlide('title-no-subtitle');
+              mainMenuVisible = false;
+            "
+            >Create Title (no Subtitle)</PopoverMenuItem
+          >
+          <PopoverMenuItem
+            @click="
+              handleCreateSlide('two-column-with-image');
+              mainMenuVisible = false;
+            "
+            >Create Two Column with Image</PopoverMenuItem
+          >
+          <PopoverMenuItem
+            @click="
+              handleCreateSlide('two-column');
+              mainMenuVisible = false;
+            "
+            >Create Two Column</PopoverMenuItem
+          >
+          <PopoverMenuItem
+            @click="
+              handleCreateSlide('main-image');
+              mainMenuVisible = false;
+            "
+            >Create Main Image</PopoverMenuItem
+          >
+          <PopoverMenuItem
+            @click="
+              handleCreateSlide('table-of-contents');
+              mainMenuVisible = false;
+            "
+            >Create Table of Contents</PopoverMenuItem
+          >
+          <PopoverMenuItem
+            @click="
+              handleCreateSlide('vertical-list');
+              mainMenuVisible = false;
+            "
+            >Create Vertical List</PopoverMenuItem
+          >
+          <PopoverMenuItem
+            @click="
+              handleCreateSlide('horizontal-list');
+              mainMenuVisible = false;
+            "
+            >Create Horizontal List</PopoverMenuItem
+          >
+          <div class="menu-divider"></div>
           <FileInput
             accept="application/vnd.openxmlformats-officedocument.presentationml.presentation"
             @change="
@@ -156,6 +214,7 @@ import { useMainStore, useSlidesStore } from '@/store';
 import useScreening from '@/hooks/useScreening';
 import useImport from '@/hooks/useImport';
 import useSlideHandler from '@/hooks/useSlideHandler';
+import useSlideTemplates from '@/hooks/useSlideTemplates';
 import type { DialogForExportTypes } from '@/types/export';
 import message from '@/utils/message';
 
@@ -170,10 +229,11 @@ import LanguageSwitcher from '@/components/LanguageSwitcher.vue';
 import Button from '@/components/Button.vue';
 const mainStore = useMainStore();
 const slidesStore = useSlidesStore();
-const { title } = storeToRefs(slidesStore);
+const { title, theme } = storeToRefs(slidesStore);
 const { enterScreening, enterScreeningFromStart } = useScreening();
 const { importSpecificFile, importPPTXFile, exporting } = useImport();
 const { resetSlides } = useSlideHandler();
+const { createSlide } = useSlideTemplates();
 
 const mainMenuVisible = ref(false);
 const hotkeyDrawerVisible = ref(false);
@@ -212,6 +272,10 @@ const openMarkupPanel = () => {
 
 const openAIPPTDialog = () => {
   mainStore.setAIPPTDialogState(true);
+};
+
+const handleCreateSlide = async (slideType: string) => {
+  await createSlide(slideType);
 };
 
 const goBack = () => {
@@ -325,5 +389,11 @@ const showBackButton = computed(() => {
 .github-link {
   display: inline-block;
   height: 30px;
+}
+
+.menu-divider {
+  height: 1px;
+  background-color: #e0e0e0;
+  margin: 4px 0;
 }
 </style>

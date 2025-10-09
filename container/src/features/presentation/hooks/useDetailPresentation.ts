@@ -17,7 +17,7 @@ import type { Slide, SlideTheme } from '../types/slide';
 interface VueEditorApp {
   replaceSlides: (data: any[], theme?: SlideTheme) => Promise<Slide[]>;
   addSlide: (data: any, order?: number, theme?: SlideTheme) => Promise<Slide>;
-  updateThemeAndViewport: (theme: SlideTheme, viewport: { size: number; ratio: number }) => void;
+  updateThemeAndViewport: (theme: SlideTheme, viewport: { width: number; height: number }) => void;
   updateImageElement: (slideId: string, elementId: string, image: string) => void;
 }
 
@@ -33,8 +33,8 @@ export const useVueApp = (presentation: Presentation | null) => {
     app.current = newInstance;
 
     app.current.updateThemeAndViewport(presentation?.theme || getDefaultPresentationTheme(), {
-      size: 1000,
-      ratio: 9 / 16,
+      width: 1000,
+      height: 562.5,
     });
   }, []);
 

@@ -85,6 +85,7 @@ export interface PPTElementOutline {
   style?: LineStyleType;
   width?: number;
   color?: string;
+  borderRadius?: string;
 }
 
 export type ElementLinkType = 'web' | 'slide';
@@ -787,7 +788,7 @@ export interface Slide {
  * fontName: font
  */
 export interface SlideTheme {
-  backgroundColor: string;
+  backgroundColor: string | Gradient;
   themeColors: string[];
   fontColor: string;
   fontName: string;

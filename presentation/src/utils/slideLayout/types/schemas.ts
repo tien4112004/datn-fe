@@ -68,7 +68,6 @@ export interface TableOfContentsLayoutSchema {
 
 export const SLIDE_LAYOUT_TYPE = {
   TWO_COLUMN_WITH_IMAGE: 'two_column_with_image',
-  TWO_COLUMN_WITH_BIG_IMAGE: 'two_column_with_big_image',
   MAIN_IMAGE: 'main_image',
   TITLE: 'title',
   TWO_COLUMN: 'two_column',
@@ -77,6 +76,8 @@ export const SLIDE_LAYOUT_TYPE = {
   TRANSITION: 'transition',
   TABLE_OF_CONTENTS: 'table_of_contents',
 } as const;
+
+export { SLIDE_LAYOUT_TYPE as default };
 
 export type SlideLayoutTypeKey = (typeof SLIDE_LAYOUT_TYPE)[keyof typeof SLIDE_LAYOUT_TYPE];
 
@@ -89,32 +90,3 @@ export type SlideLayoutSchema =
   | HorizontalListLayoutSchema
   | TransitionLayoutSchema
   | TableOfContentsLayoutSchema;
-
-// Layout Template System
-export interface LayoutBlock {
-  left: number;
-  top: number;
-  width: number;
-  height: number;
-}
-
-export interface LayoutGraphics {
-  titleLine?: {
-    enabled: boolean;
-    offset?: number;
-    style?: 'solid' | 'dashed';
-    color?: string;
-    width?: number;
-  };
-}
-
-export interface LayoutTemplate {
-  id: string;
-  name?: string;
-  viewport: {
-    size: number;
-    ratio: number;
-  };
-  areas: Record<string, LayoutBlock>;
-  graphics?: LayoutGraphics;
-}

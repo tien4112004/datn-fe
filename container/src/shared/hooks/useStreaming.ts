@@ -32,7 +32,7 @@ function useStreaming<TRequest = any, TProcessed = any, TExtractResult = any>({
   const [shouldStream, setShouldStream] = React.useState(!options.manual);
   const requestData = React.useRef<TRequest>(input);
   const [result, setExtractResult] = React.useState<TExtractResult>();
-  const [queryCounter, setQueryCounter] = React.useState(0);
+  const [queryCounter, setQueryCounter] = React.useState(() => Date.now());
 
   const queryClient = useQueryClient();
 

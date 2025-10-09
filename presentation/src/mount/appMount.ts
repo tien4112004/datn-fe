@@ -12,8 +12,8 @@ import '@/assets/styles/scope.scss';
 import '@/assets/styles/tailwind.css';
 import i18n from '@/locales';
 import { useSlidesStore } from '@/store';
-import type { SlideLayoutSchema } from '@/utils/slideLayout/converters';
-import { convertToSlide, type SlideViewport } from '@/utils/slideLayout';
+import { convertToSlide } from '@/utils/slideLayout';
+import type { SlideLayoutSchema, SlideViewport } from '@/utils/slideLayout/types';
 import type { PPTImageElement, Slide, SlideTheme } from '@/types/slides';
 
 export function mount(el: string | Element, props: Record<string, unknown>) {
@@ -63,9 +63,9 @@ export function mount(el: string | Element, props: Record<string, unknown>) {
 
   app.replaceSlides = async (dataArray, theme) => {
     const slidesStore = useSlidesStore();
-    const viewport = {
-      size: slidesStore.viewportSize,
-      ratio: slidesStore.viewportRatio,
+    const viewport: SlideViewport = {
+      width: slidesStore.viewportSize,
+      height: slidesStore.viewportSize * slidesStore.viewportRatio,
     };
 
     const themeToUse = theme || slidesStore.theme;
@@ -86,10 +86,11 @@ export function mount(el: string | Element, props: Record<string, unknown>) {
 
   app.addSlide = async (data, order, theme) => {
     const slidesStore = useSlidesStore();
-    const viewport = {
-      size: slidesStore.viewportSize,
-      ratio: slidesStore.viewportRatio,
+    const viewport: SlideViewport = {
+      width: slidesStore.viewportSize,
+      height: slidesStore.viewportSize * slidesStore.viewportRatio,
     };
+
     const themeToUse = theme || slidesStore.theme;
 
     const slide = await convertToSlide(data, viewport, themeToUse, order?.toString());
@@ -124,8 +125,8 @@ export function mount(el: string | Element, props: Record<string, unknown>) {
   app.updateThemeAndViewport = (theme: SlideTheme, viewport: SlideViewport) => {
     const slidesStore = useSlidesStore();
     slidesStore.setTheme(theme);
-    slidesStore.setViewportSize(viewport.size);
-    slidesStore.setViewportRatio(viewport.ratio);
+    slidesStore.setViewportSize(viewport.width);
+    slidesStore.setViewportRatio(viewport.height / viewport.width);
   };
 
   app.mount(el);

@@ -32,9 +32,12 @@
       <div style="width: 10px" v-if="fillType !== 'pattern'"></div>
       <Popover trigger="click" v-if="fillType === 'fill'" style="flex: 1">
         <template #content>
-          <ColorPicker :modelValue="fill" @update:modelValue="(value) => updateFill(value)" />
+          <ColorPicker
+            :modelValue="typeof fill === 'string' ? fill : '#ffffff'"
+            @update:modelValue="(value) => updateFill(value)"
+          />
         </template>
-        <ColorButton :color="fill" />
+        <ColorButton :color="typeof fill === 'string' ? fill : '#ffffff'" />
       </Popover>
       <Select
         style="flex: 1"

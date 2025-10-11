@@ -31,6 +31,18 @@ export default {
       emptyState: 'Không có bài trình bày nào được tìm thấy',
       searchPlaceholder: 'Tìm kiếm theo tiêu đề...',
     },
+    mindmap: {
+      id: 'Mã',
+      thumbnail: 'Hình',
+      title: 'Tiêu đề',
+      createdAt: 'Ngày tạo',
+      updatedAt: 'Cập nhật gần nhất',
+      lastModified: 'Cập nhật gần nhất',
+      emptyState: 'Không có bản đồ tư duy nào được tìm thấy',
+      searchPlaceholder: 'Tìm kiếm theo tên bản đồ tư duy...',
+      renameFileDialogTitle: 'Đổi tên bản đồ tư duy',
+      renameSuccess: 'Đổi tên thành công',
+    },
     actions: 'Hành động',
     pagination: {
       rowsPerPage: 'Số hàng mỗi trang',

@@ -31,6 +31,18 @@ export default {
       emptyState: 'No presentations found',
       searchPlaceholder: 'Search by title...',
     },
+    mindmap: {
+      id: 'ID',
+      thumbnail: 'Thumbnail',
+      title: 'Title',
+      createdAt: 'Created At',
+      updatedAt: 'Last Updated',
+      lastModified: 'Last Modified',
+      emptyState: 'No mindmaps found',
+      searchPlaceholder: 'Search by mindmap name...',
+      renameFileDialogTitle: 'Rename Mindmap',
+      renameSuccess: 'Renamed successfully',
+    },
     actions: 'Actions',
     pagination: {
       rowsPerPage: 'Rows per page',

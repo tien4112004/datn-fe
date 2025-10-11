@@ -8,7 +8,7 @@ on:
 
 env:
   TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
-  TURBO_TEAM: 'datn-fe'
+  TURBO_TEAM: "datn-fe"
 
 jobs:
   ci:
@@ -33,7 +33,7 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 10.12.0
+          version: 10.18.1
 
       - name: Setup Node.js
         uses: actions/setup-node@v4

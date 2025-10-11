@@ -36,59 +36,10 @@
           <div class="menu-divider"></div>
           <PopoverMenuItem
             @click="
-              handleCreateSlide('title-with-subtitle');
+              slideCreationDialogVisible = true;
               mainMenuVisible = false;
             "
-            >Create Title (with Subtitle)</PopoverMenuItem
-          >
-          <PopoverMenuItem
-            @click="
-              handleCreateSlide('title-no-subtitle');
-              mainMenuVisible = false;
-            "
-            >Create Title (no Subtitle)</PopoverMenuItem
-          >
-          <PopoverMenuItem
-            @click="
-              handleCreateSlide('two-column-with-image');
-              mainMenuVisible = false;
-            "
-            >Create Two Column with Image</PopoverMenuItem
-          >
-          <PopoverMenuItem
-            @click="
-              handleCreateSlide('two-column');
-              mainMenuVisible = false;
-            "
-            >Create Two Column</PopoverMenuItem
-          >
-          <PopoverMenuItem
-            @click="
-              handleCreateSlide('main-image');
-              mainMenuVisible = false;
-            "
-            >Create Main Image</PopoverMenuItem
-          >
-          <PopoverMenuItem
-            @click="
-              handleCreateSlide('table-of-contents');
-              mainMenuVisible = false;
-            "
-            >Create Table of Contents</PopoverMenuItem
-          >
-          <PopoverMenuItem
-            @click="
-              handleCreateSlide('vertical-list');
-              mainMenuVisible = false;
-            "
-            >Create Vertical List</PopoverMenuItem
-          >
-          <PopoverMenuItem
-            @click="
-              handleCreateSlide('horizontal-list');
-              mainMenuVisible = false;
-            "
-            >Create Horizontal List</PopoverMenuItem
+            >Create New Slide</PopoverMenuItem
           >
           <div class="menu-divider"></div>
           <FileInput
@@ -203,6 +154,13 @@
       <template v-slot:title>{{ $t('header.tools.quickActions') }}</template>
     </Drawer>
 
+    <SlideCreationDialog
+      :visible="slideCreationDialogVisible"
+      :themes="availableThemes"
+      @close="slideCreationDialogVisible = false"
+      @create="handleCreateSlide"
+    />
+
     <FullscreenSpin :loading="exporting" :tip="$t('header.file.importing')" />
   </div>
 </template>
@@ -219,6 +177,7 @@ import type { DialogForExportTypes } from '@/types/export';
 import message from '@/utils/message';
 
 import HotkeyDoc from './HotkeyDoc.vue';
+import SlideCreationDialog from './SlideCreationDialog.vue';
 import FileInput from '@/components/FileInput.vue';
 import FullscreenSpin from '@/components/FullscreenSpin.vue';
 import Drawer from '@/components/Drawer.vue';
@@ -233,13 +192,16 @@ const { title, theme } = storeToRefs(slidesStore);
 const { enterScreening, enterScreeningFromStart } = useScreening();
 const { importSpecificFile, importPPTXFile, exporting } = useImport();
 const { resetSlides } = useSlideHandler();
-const { createSlide } = useSlideTemplates();
+const { createSlide, getThemes } = useSlideTemplates();
 
 const mainMenuVisible = ref(false);
 const hotkeyDrawerVisible = ref(false);
+const slideCreationDialogVisible = ref(false);
 const editingTitle = ref(false);
 const titleInputRef = ref<InstanceType<typeof Input>>();
 const titleValue = ref('');
+
+const availableThemes = getThemes();
 
 // const handleToggleSidebar = () => {
 //   document.dispatchEvent(new CustomEvent('toggleSidebar', {}));
@@ -274,8 +236,8 @@ const openAIPPTDialog = () => {
   mainStore.setAIPPTDialogState(true);
 };
 
-const handleCreateSlide = async (slideType: string) => {
-  await createSlide(slideType);
+const handleCreateSlide = async (slideType: string, themeName: string) => {
+  await createSlide(slideType, themeName);
 };
 
 const goBack = () => {

@@ -22,7 +22,7 @@ const slideTemplates: Record<string, any[]> = {
       title: 'Presentation with really long title',
     },
   }),
-  'two-column-with-image': Array(6).fill({
+  'two-column-with-image': Array(7).fill({
     type: 'two_column_with_image',
     title: 'Presentation',
     data: {
@@ -34,7 +34,7 @@ const slideTemplates: Record<string, any[]> = {
       image: 'https://placehold.co/600x400',
     },
   }),
-  'two-column': Array(4).fill({
+  'two-column': Array(9).fill({
     type: 'two_column',
     title: 'this is a title',
     data: {
@@ -50,14 +50,14 @@ const slideTemplates: Record<string, any[]> = {
       ],
     },
   }),
-  'main-image': Array(4).fill({
+  'main-image': Array(8).fill({
     type: 'main_image',
     data: {
       image: 'https://placehold.co/600x400',
       content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
     },
   }),
-  'table-of-contents': Array(4).fill({
+  'table-of-contents': Array(6).fill({
     type: 'table_of_contents',
     data: {
       items: [
@@ -72,7 +72,7 @@ const slideTemplates: Record<string, any[]> = {
       ],
     },
   }),
-  'vertical-list': Array(6).fill({
+  'vertical-list': Array(8).fill({
     type: 'vertical_list',
     title: 'This is a title',
     data: {
@@ -87,7 +87,7 @@ const slideTemplates: Record<string, any[]> = {
       ],
     },
   }),
-  'horizontal-list': Array(4).fill({
+  'horizontal-list': Array(6).fill({
     type: 'horizontal_list',
     title: 'Five Fundamentals of Microservices',
     data: {
@@ -128,41 +128,41 @@ export default function useSlideTemplates() {
     }
 
     const theme = {
-      id: 'modern',
-      name: 'Modern',
-      backgroundColor: '#0f172a',
-      themeColors: ['#06b6d4', '#8b5cf6', '#f59e0b', '#ef4444', '#10b981'],
-      fontColor: '#e2e8f0',
-      fontName: 'Montserrat',
+      id: 'classic',
+      name: 'Classic',
+      backgroundColor: '#fefcf0',
+      themeColors: ['#92400e', '#7c2d12', '#a16207', '#166534', '#1e40af'],
+      fontColor: '#451a03',
+      fontName: 'Merriweather',
       outline: {
         style: 'solid',
-        width: 1,
-        color: '#334155',
+        width: 2,
+        color: '#fde68a',
       },
       shadow: {
-        h: 0,
+        h: 2,
         v: 4,
-        blur: 8,
-        color: 'rgba(6, 182, 212, 0.2)',
+        blur: 6,
+        color: 'rgba(146, 64, 14, 0.15)',
       },
-      titleFontColor: '#06b6d4',
-      titleFontName: 'Montserrat',
-      labelFontColor: '#06b6d4',
-      labelFontName: 'Oswald',
+      titleFontColor: '#92400e',
+      titleFontName: 'Playfair Display',
+      labelFontColor: '#a16207',
+      labelFontName: 'Lora',
       accentImageShape: 'default',
       card: {
         enabled: true,
-        borderRadius: 8,
-        borderWidth: 1,
+        borderRadius: 6,
+        borderWidth: 2,
         fill: 'semi',
         shadow: {
-          h: 0,
-          v: 4,
-          blur: 12,
-          color: 'rgba(6, 182, 212, 0.3)',
+          h: 1,
+          v: 3,
+          blur: 6,
+          color: 'rgba(146, 64, 14, 0.2)',
         },
-        backgroundColor: '#74a8faff',
-        textColor: '#3d4b5eff',
+        backgroundColor: '#fffbeb',
+        textColor: '#78350f',
       },
     } as SlideTheme;
 

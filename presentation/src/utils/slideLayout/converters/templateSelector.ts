@@ -7,23 +7,36 @@ import {
   verticalListNumberedTemplate,
   verticalListNumberedCompactTemplate,
   verticalListNumberedCardsTemplate,
+  verticalListContainerBorderTemplate,
+  verticalListContainerBorderNumberedTemplate,
 } from './template/verticalList';
 import {
   twoColumnWithImageLayoutTemplate,
   twoColumnLeftBigImageTemplate,
   twoColumnRightBigImageTemplate,
   twoColumnRightImageTemplate,
+  twoColumnWithImageContainerBorderTemplate,
+  twoColumnLeftBigImageContainerBorderTemplate,
+  twoColumnRightBigImageContainerBorderTemplate,
 } from './template/twoColumnWithImage';
 import {
   twoColumnLayoutTemplate,
   twoColumnSplitTemplate,
   twoColumnAsymmetricTemplate,
+  twoColumnContainerBorderTemplate,
+  twoColumnContainerBorderShadowTemplate,
+  twoColumnContainerBorderLeftTemplate,
+  twoColumnBorderedItemsTemplate,
+  twoColumnBorderedItemsShadowTemplate,
+  twoColumnBorderedItemsCompactTemplate,
 } from './template/twoColumn';
 import {
   horizontalListLayoutTemplate,
   horizontalListGridTemplate,
   horizontalListSingleRowTemplate,
   horizontalListNumberedTemplate,
+  horizontalListContainerBorderTemplate,
+  horizontalListNoBorderTemplate,
 } from './template/horizontalList';
 import {
   titleLayoutTemplate,
@@ -35,13 +48,19 @@ import {
 import {
   mainImageLayoutTemplate,
   mainImageCenteredTemplate,
-  mainImageSplitTemplate,
+  mainImageLeftTemplate,
+  mainImageRightTemplate,
+  mainImageBottomTemplate,
   mainImageWithTitleOverlayTemplate,
+  mainImageTopTemplate,
+  mainImageFramedTemplate,
 } from './template/mainImage';
 import {
   tableOfContentsLayoutTemplate,
   tableOfContentsGridTemplate,
   tableOfContentsTwoRowTemplate,
+  tableOfContentsContainerBorderTemplate,
+  tableOfContentsContainerBorderShadowTemplate,
 } from './template/tableOfContents';
 import { SLIDE_LAYOUT_TYPE } from '../types';
 
@@ -61,23 +80,36 @@ const TEMPLATE_VARIATIONS: Record<string, Template[]> = {
     verticalListNumberedTemplate,
     verticalListNumberedCompactTemplate,
     verticalListNumberedCardsTemplate,
+    verticalListContainerBorderTemplate,
+    verticalListContainerBorderNumberedTemplate,
   ],
   [SLIDE_LAYOUT_TYPE.TWO_COLUMN_WITH_IMAGE]: [
     twoColumnWithImageLayoutTemplate,
     twoColumnLeftBigImageTemplate,
     twoColumnRightBigImageTemplate,
     twoColumnRightImageTemplate,
+    twoColumnWithImageContainerBorderTemplate,
+    twoColumnLeftBigImageContainerBorderTemplate,
+    twoColumnRightBigImageContainerBorderTemplate,
   ],
   [SLIDE_LAYOUT_TYPE.TWO_COLUMN]: [
     twoColumnLayoutTemplate,
     twoColumnSplitTemplate,
     twoColumnAsymmetricTemplate,
+    twoColumnContainerBorderTemplate,
+    twoColumnContainerBorderShadowTemplate,
+    twoColumnContainerBorderLeftTemplate,
+    twoColumnBorderedItemsTemplate,
+    twoColumnBorderedItemsShadowTemplate,
+    twoColumnBorderedItemsCompactTemplate,
   ],
   [SLIDE_LAYOUT_TYPE.HORIZONTAL_LIST]: [
     horizontalListLayoutTemplate,
     horizontalListGridTemplate,
     horizontalListSingleRowTemplate,
     horizontalListNumberedTemplate,
+    horizontalListContainerBorderTemplate,
+    horizontalListNoBorderTemplate,
   ],
   [SLIDE_LAYOUT_TYPE.TITLE]: [
     titleLayoutTemplate,
@@ -89,13 +121,19 @@ const TEMPLATE_VARIATIONS: Record<string, Template[]> = {
   [SLIDE_LAYOUT_TYPE.MAIN_IMAGE]: [
     mainImageLayoutTemplate,
     mainImageCenteredTemplate,
-    mainImageSplitTemplate,
+    mainImageLeftTemplate,
+    mainImageRightTemplate,
+    mainImageBottomTemplate,
     mainImageWithTitleOverlayTemplate,
+    mainImageTopTemplate,
+    mainImageFramedTemplate,
   ],
   [SLIDE_LAYOUT_TYPE.TABLE_OF_CONTENTS]: [
     tableOfContentsLayoutTemplate,
     tableOfContentsGridTemplate,
     tableOfContentsTwoRowTemplate,
+    tableOfContentsContainerBorderTemplate,
+    tableOfContentsContainerBorderShadowTemplate,
   ],
 };
 

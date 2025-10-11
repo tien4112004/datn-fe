@@ -57,7 +57,7 @@ export const tableOfContentsLayoutTemplate: Template = {
             type: 'block',
             label: 'item',
             layout: {
-              distribution: '1/6',
+              distribution: '1/5',
               gap: 10,
               horizontalAlignment: 'left',
               verticalAlignment: 'center',
@@ -308,6 +308,221 @@ export const tableOfContentsTwoRowTemplate: Template = {
                   fontStyle: 'normal',
                   textAlign: 'center',
                   fontSizeRange: { minSize: 18, maxSize: 24 },
+                },
+              },
+            ],
+          },
+        },
+      },
+    },
+  },
+};
+
+// Variation: Table of Contents - Container Border
+export const tableOfContentsContainerBorderTemplate: Template = {
+  id: 'table-of-contents-container-border',
+  name: 'Table of Contents - Container Border',
+  config: {
+    containers: {
+      title: {
+        type: 'text',
+        bounds: {
+          left: 0,
+          top: 15,
+          width: {
+            expr: 'SLIDE_WIDTH',
+          },
+          height: 100,
+        },
+        layout: {
+          horizontalAlignment: 'center',
+          verticalAlignment: 'top',
+        },
+        text: {
+          color: '{{theme.titleFontColor}}',
+          fontFamily: '{{theme.titleFontName}}',
+          fontWeight: 'bold',
+          fontStyle: 'normal',
+          textAlign: 'center',
+        },
+      },
+      content: {
+        type: 'block',
+        positioning: {
+          relativeTo: 'title',
+          axis: 'vertical',
+          anchor: 'end',
+          offset: 20,
+          size: 'fill',
+          margin: { left: 80, right: 80, top: 0, bottom: 40 },
+        },
+        border: {
+          width: '{{theme.card.borderWidth}}',
+          color: '{{theme.themeColors[0]}}',
+          radius: '{{theme.card.borderRadius}}',
+        },
+        layout: {
+          distribution: 'space-between',
+          gap: 20,
+          horizontalAlignment: 'left',
+          verticalAlignment: 'top',
+          orientation: 'vertical',
+        },
+        childTemplate: {
+          count: 'auto',
+          wrap: {
+            enabled: true,
+            maxItemsPerLine: 4,
+            lineCount: 2,
+            wrapDistribution: 'balanced',
+            lineSpacing: 18,
+          },
+          structure: {
+            type: 'block',
+            label: 'item',
+            layout: {
+              distribution: '1/5',
+              gap: 10,
+              horizontalAlignment: 'left',
+              verticalAlignment: 'center',
+              orientation: 'horizontal',
+            },
+            children: [
+              {
+                type: 'text',
+                id: 'label',
+                label: 'label',
+                numbering: true,
+                text: {
+                  color: '{{theme.labelFontColor}}',
+                  fontFamily: '{{theme.labelFontName}}',
+                  fontWeight: 'bold',
+                  textAlign: 'center',
+                  fontSizeRange: { minSize: 16, maxSize: 24 },
+                },
+              },
+              {
+                type: 'text',
+                id: 'content',
+                label: 'content',
+                text: {
+                  color: '{{theme.fontColor}}',
+                  fontFamily: '{{theme.fontName}}',
+                  fontWeight: 'normal',
+                  fontStyle: 'normal',
+                  textAlign: 'left',
+                },
+              },
+            ],
+          },
+        },
+      },
+    },
+  },
+};
+
+// Variation: Table of Contents - Container Border Shadow
+export const tableOfContentsContainerBorderShadowTemplate: Template = {
+  id: 'table-of-contents-container-border-shadow',
+  name: 'Table of Contents - Container Border Shadow',
+  config: {
+    containers: {
+      title: {
+        type: 'text',
+        bounds: {
+          left: 0,
+          top: 15,
+          width: {
+            expr: 'SLIDE_WIDTH',
+          },
+          height: 100,
+        },
+        layout: {
+          horizontalAlignment: 'center',
+          verticalAlignment: 'top',
+        },
+        text: {
+          color: '{{theme.titleFontColor}}',
+          fontFamily: '{{theme.titleFontName}}',
+          fontWeight: 'bold',
+          fontStyle: 'normal',
+          textAlign: 'center',
+        },
+      },
+      content: {
+        type: 'block',
+        positioning: {
+          relativeTo: 'title',
+          axis: 'vertical',
+          anchor: 'end',
+          offset: 20,
+          size: 'fill',
+          margin: { left: 80, right: 80, top: 0, bottom: 50 },
+        },
+        border: {
+          width: 0,
+          color: 'transparent',
+          radius: '{{theme.card.borderRadius}}',
+        },
+        shadow: {
+          h: '{{theme.card.shadow.h}}',
+          v: '{{theme.card.shadow.v}}',
+          blur: '{{theme.card.shadow.blur}}',
+          color: '{{theme.card.shadow.color}}',
+        },
+        background: {
+          color: '{{theme.card.backgroundColor}}',
+        },
+        layout: {
+          distribution: 'space-between',
+          gap: 20,
+          horizontalAlignment: 'left',
+          verticalAlignment: 'top',
+          orientation: 'vertical',
+        },
+        childTemplate: {
+          count: 'auto',
+          wrap: {
+            enabled: true,
+            maxItemsPerLine: 4,
+            lineCount: 2,
+            wrapDistribution: 'balanced',
+            lineSpacing: 18,
+          },
+          structure: {
+            type: 'block',
+            label: 'item',
+            layout: {
+              distribution: '1/6',
+              gap: 10,
+              horizontalAlignment: 'left',
+              verticalAlignment: 'center',
+              orientation: 'horizontal',
+            },
+            children: [
+              {
+                type: 'text',
+                id: 'label',
+                label: 'label',
+                numbering: true,
+                text: {
+                  color: '{{theme.labelFontColor}}',
+                  fontFamily: '{{theme.labelFontName}}',
+                  fontWeight: 'bold',
+                  textAlign: 'center',
+                  fontSizeRange: { minSize: 16, maxSize: 24 },
+                },
+              },
+              {
+                type: 'text',
+                id: 'content',
+                label: 'content',
+                text: {
+                  color: '{{theme.card.textColor}}',
+                  fontFamily: '{{theme.fontName}}',
+                  fontWeight: 'normal',
+                  fontStyle: 'normal',
+                  textAlign: 'left',
                 },
               },
             ],

@@ -152,6 +152,7 @@ export const useCreateTestPresentations = () => {
 
 export const useCreateBlankPresentation = () => {
   const presentationApiService = usePresentationApiService();
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async () => {
@@ -172,16 +173,28 @@ export const useCreateBlankPresentation = () => {
 
       return { presentation };
     },
+    onSuccess: () => {
+      // Invalidate and refetch
+      queryClient.invalidateQueries({
+        queryKey: [presentationApiService.getType(), 'presentations'],
+      });
+    },
   });
 };
 
 export const useGeneratePresentation = () => {
   const presentationApiService = usePresentationApiService();
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (request: PresentationGenerationRequest) => {
       const generatedSlides = await presentationApiService.generatePresentation(request);
       return generatedSlides;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [presentationApiService.getType(), 'presentations'],
+      });
     },
   });
 };
@@ -234,6 +247,7 @@ export const useUpdatePresentationTitle = () => {
 
 export const useUpdatePresentationSlides = (id: string) => {
   const presentationApiService = usePresentationApiService();
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (slides: Slide[]) => {
@@ -246,22 +260,35 @@ export const useUpdatePresentationSlides = (id: string) => {
 
       return updatedPresentation!;
     },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [presentationApiService.getType(), 'presentation', id],
+      });
+    },
   });
 };
 
 export const useSetParsedPresentation = (id: string) => {
   const presentationApiService = usePresentationApiService();
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async () => {
       const updatedPresentation = await presentationApiService.setPresentationAsParsed(id);
       return updatedPresentation;
     },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [presentationApiService.getType(), 'presentation', id],
+      });
+    },
   });
 };
 
 export const useGeneratePresentationImage = (id: string) => {
   const imageApiService = useImageApiService();
+  const presentationApiService = usePresentationApiService();
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async ({
@@ -283,6 +310,12 @@ export const useGeneratePresentationImage = (id: string) => {
         model,
       });
       return imageUrl;
+    },
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [presentationApiService.getType(), 'presentation', id],
+      });
     },
   });
 };

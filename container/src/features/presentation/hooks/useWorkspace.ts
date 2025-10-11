@@ -110,8 +110,10 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
 
     clearOutline();
     setValue('topic', '');
-    navigate(`/presentation/${result.presentationId}?isGenerating=true`);
-  }, [trigger, markdownContent, getValues, startGeneration]);
+
+    // Navigate to the detail page
+    navigate(`/presentation/${result.presentationId}?isGenerating=true`, { replace: true });
+  }, [trigger, markdownContent, getValues, startGeneration, navigate]);
 
   const stopStream = useCallback(() => {
     stopStreamOutline();
@@ -132,12 +134,12 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
     }
   }, [isStreaming, startStream, endStream]);
 
-  // Only update outlines when streaming produces new data
+  // Update outlines when streaming produces new data
   useEffect(() => {
-    if (isStreaming && outlineItems.length > 0) {
+    if (outlineItems.length > 0) {
       setOutlines([...outlineItems]);
     }
-  }, [isStreaming, outlineItems, setOutlines]);
+  }, [outlineItems, setOutlines]);
 
   return {
     isStreaming: isStreamingStore,

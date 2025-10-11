@@ -22,6 +22,7 @@ export function mount(el: string | Element, props: Record<string, unknown>) {
     replaceSlides?: (data: SlideLayoutSchema[], theme?: SlideTheme) => Promise<Slide[]>;
     addSlide?: (data: SlideLayoutSchema, order?: number, theme?: SlideTheme) => Promise<Slide>;
     updateThemeAndViewport?: (theme: SlideTheme, viewport: SlideViewport) => void;
+    clearSlides?: () => void;
   };
 
   const pinia = createPinia();
@@ -142,6 +143,12 @@ export function mount(el: string | Element, props: Record<string, unknown>) {
     slidesStore.setTheme(theme);
     slidesStore.setViewportSize(viewport.width);
     slidesStore.setViewportRatio(viewport.height / viewport.width);
+  };
+
+  app.clearSlides = () => {
+    const slidesStore = useSlidesStore();
+    slidesStore.setSlides([]);
+    slidesStore.updateSlideIndex(0);
   };
 
   app.mount(el);

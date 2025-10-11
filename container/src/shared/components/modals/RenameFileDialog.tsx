@@ -5,26 +5,25 @@ import { Button } from '@ui/button';
 import { useTranslation } from 'react-i18next';
 import { Description } from '@radix-ui/react-dialog';
 import { toast } from 'sonner';
-import type { Presentation } from '@/features/presentation/types';
 
-interface RenameFileDialogProps {
+interface RenameFileDialogProps<TData = { id: string; title: string; projectType: string } | null> {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  presentation?: Presentation | null;
+  project: TData | null;
   onRename?: (id: string, name: string) => Promise<void>;
   isLoading?: boolean;
-  // updatePresentationMutation?: any;
 }
 
 export const RenameFileDialog = ({
   isOpen,
   onOpenChange,
-  presentation,
+  project,
   onRename,
   isLoading = false,
 }: RenameFileDialogProps) => {
   const { t } = useTranslation(['presentation', 'glossary']);
-  const currentName = presentation?.title || '';
+  // const { t } = useTranslation('presentation', { keyPrefix: 'list' });
+  const currentName = project?.title || '';
   const [filename, setFilename] = React.useState(currentName);
 
   // Reset filename and set focus when dialog opens
@@ -73,14 +72,14 @@ export const RenameFileDialog = ({
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    if (filename.trim() === '' || !presentation || !onRename) return;
+    if (filename.trim() === '' || !project || !onRename) return;
 
     try {
-      await onRename(presentation.id, filename.trim());
+      await onRename(project.id, filename.trim());
       handleOpenChange(false);
-      toast.success(`Presentation renamed to "${filename.trim()}" successfully`);
+      toast.success(`${project.projectType} renamed to "${filename.trim()}" successfully`);
     } catch (error: unknown) {
-      console.error('Failed to rename presentation:', error); //TODO: remove
+      console.error(`Failed to rename ${project.projectType}}:`, error); //TODO: remove
 
       // TODO: move to utils
       // Get a user-friendly error message
@@ -130,7 +129,10 @@ export const RenameFileDialog = ({
             {duplicateError && (
               <p className="text-sm text-red-500">
                 {errorMessage ||
-                  t('filenameDialog.duplicateError', 'A presentation with this name already exists')}
+                  t(
+                    'filenameDialog.duplicateError',
+                    `A ${project?.projectType} with this name already exists`
+                  )}
               </p>
             )}
           </div>

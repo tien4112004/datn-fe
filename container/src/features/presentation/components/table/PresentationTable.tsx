@@ -135,7 +135,11 @@ const PresentationTable = () => {
       <RenameFileDialog
         isOpen={isRenameOpen}
         onOpenChange={setIsRenameOpen}
-        presentation={selectedPresentation}
+        project={{
+          id: selectedPresentation?.id || '',
+          title: selectedPresentation?.title || '',
+          projectType: t('presentation.presentation', 'presentation'),
+        }}
         isLoading={updatePresentationTitle.isPending}
         onRename={async (id: string, newName: string) => {
           await updatePresentationTitle.mutateAsync({ id, name: newName });

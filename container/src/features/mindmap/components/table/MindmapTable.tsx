@@ -159,7 +159,11 @@ const MindmapTable: React.FC = () => {
         isOpen={isRenameOpen}
         onOpenChange={(o) => setIsRenameOpen(o)}
         // RenameFileDialog expects a Presentation shape; cast to any to reuse it for mindmaps
-        presentation={selectedMindmap as any}
+        project={{
+          id: selectedMindmap?.id || '',
+          title: selectedMindmap?.title || '',
+          projectType: t('mindmap', 'mindmap'),
+        }}
         isLoading={updateMindmapTitleMutation.isPending}
         onRename={handleRename}
       />

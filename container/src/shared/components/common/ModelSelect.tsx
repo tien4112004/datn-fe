@@ -41,14 +41,14 @@ export const ModelSelect = ({
   isLoading = false,
   isError = false,
 }: ModelSelectProps) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation('common');
 
-  const defaultPlaceholder = placeholder || t('common:model.placeholder');
-  const defaultLabel = label || t('common:model.label');
+  const defaultPlaceholder = placeholder || t('model.placeholder');
+  const defaultLabel = label || t('model.label');
 
   const getPlaceholderText = () => {
-    if (isLoading) return t('common:model.loading') || 'Loading models...';
-    if (isError) return t('common:model.error') || 'Error loading models';
+    if (isLoading) return t('model.loading') || 'Loading models...';
+    if (isError) return t('model.error') || 'Error loading models';
     return defaultPlaceholder;
   };
 

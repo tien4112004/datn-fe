@@ -24,7 +24,7 @@ const DetailPage = () => {
   const [presentation, setPresentation] = useState<Presentation>(loaderPresentation);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const { t } = useTranslation('loading');
+  const { t } = useTranslation('glossary', { keyPrefix: 'loading' });
   const generatedPresentation = usePresentationStore((state) => state.generatedPresentation);
   const clearGeneratedPresentation = usePresentationStore((state) => state.clearGeneratedPresentation);
   const getAiResult = useAiResultById(id!);

@@ -21,7 +21,7 @@ interface TablePaginationProps {
 const PAGE_SIZE_OPTIONS = [5, 10, 20, 30, 40, 50];
 
 function TablePagination({ table, className, ...props }: TablePaginationProps & React.ComponentProps<'div'>) {
-  const { t } = useTranslation('table');
+  const { t } = useTranslation('common', { keyPrefix: 'table.pagination' });
   const { pageIndex, pageSize } = table.getState().pagination;
   const currentPage = pageIndex + 1;
   const totalPages = table.getPageCount();

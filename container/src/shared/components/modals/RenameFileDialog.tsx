@@ -23,7 +23,7 @@ export const RenameFileDialog = ({
   onRename,
   isLoading = false,
 }: RenameFileDialogProps) => {
-  const { t } = useTranslation('presentation', { keyPrefix: 'list' });
+  const { t } = useTranslation(['presentation', 'glossary']);
   const currentName = presentation?.title || '';
   const [filename, setFilename] = React.useState(currentName);
 
@@ -113,14 +113,14 @@ export const RenameFileDialog = ({
       <DialogContent className="fixed left-[50%] top-[50%] z-50 translate-x-[-50%] translate-y-[-50%] sm:max-w-[425px]">
         <Description></Description>
         <DialogHeader>
-          <DialogTitle>{t('filenameDialog.title')}</DialogTitle>
+          <DialogTitle>{t('list.filenameDialog.title')}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Input
               ref={inputRef}
               id="filename"
-              placeholder={t('filenameDialog.newNamePlaceholder')}
+              placeholder={t('list.filenameDialog.placeholder')}
               value={filename}
               onChange={(event) => setFilename(event.target.value)}
               autoComplete="off"
@@ -136,14 +136,14 @@ export const RenameFileDialog = ({
           </div>
           <div className="flex justify-end gap-2">
             <Button type="button" variant="outline" onClick={handleCancel} disabled={isLoading}>
-              {t('common.cancel')}
+              {t('glossary:actions.cancel')}
             </Button>
             <Button
               type="submit"
               disabled={filename.trim() === '' || isLoading || duplicateError}
               onClick={handleSubmit}
             >
-              {isLoading ? `${t('common.loading')}...` : t('common.confirm')}
+              {isLoading ? `${t('glossary:states.loading')}...` : t('glossary:actions.confirm')}
             </Button>
           </div>
         </form>

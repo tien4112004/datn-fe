@@ -17,7 +17,7 @@ const DetailPage = () => {
     isGeneratingParam
   );
 
-  const { t } = useTranslation('loading');
+  const { t } = useTranslation('glossary', { keyPrefix: 'loading' });
 
   return (
     <>

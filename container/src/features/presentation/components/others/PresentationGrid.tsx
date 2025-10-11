@@ -17,7 +17,7 @@ import ThumbnailWrapper from '@/features/presentation/components/others/Thumbnai
 import TablePagination from '@/shared/components/table/TablePagination';
 
 const PresentationGrid = () => {
-  const { t } = useTranslation('table');
+  const { t } = useTranslation('common', { keyPrefix: 'table' });
   const navigate = useNavigate();
   const columnHelper = createColumnHelper<Presentation>();
 

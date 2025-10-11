@@ -12,7 +12,7 @@ import * as React from 'react';
 import { RenameFileDialog } from '@/shared/components/modals/RenameFileDialog';
 
 const PresentationTable = () => {
-  const { t } = useTranslation('table');
+  const { t } = useTranslation('common', { keyPrefix: 'table' });
   const navigate = useNavigate();
   const columnHelper = createColumnHelper<Presentation>();
 

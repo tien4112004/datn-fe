@@ -17,7 +17,7 @@ interface ErrorPageProps {
 
 const ErrorPage = ({ error, errorInfo, resetError, errorId, showDetails = false }: ErrorPageProps) => {
   const { open, toggleSidebar } = useSidebar();
-  const { t } = useTranslation('errorBoundary');
+  const { t } = useTranslation('errors', { keyPrefix: 'boundary' });
 
   const goHome = () => {
     window.location.href = '/';

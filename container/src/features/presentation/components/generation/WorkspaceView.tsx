@@ -142,7 +142,7 @@ const OutlineFormSection = ({
                     <SelectLabel>{t('language.label')}</SelectLabel>
                     {LANGUAGE_OPTIONS.map((languageOption) => (
                       <SelectItem key={languageOption.value} value={languageOption.value}>
-                        {t(languageOption.labelKey)}
+                        {t(languageOption.labelKey as never)}
                       </SelectItem>
                     ))}
                   </SelectGroup>
@@ -158,8 +158,8 @@ const OutlineFormSection = ({
                 models={models}
                 value={field.value}
                 onValueChange={field.onChange}
-                placeholder={t('modelPlaceholder')}
-                label={t('modelLabel')}
+                placeholder={t('model.placeholder')}
+                label={t('model.label')}
                 disabled={disabled}
               />
             )}

@@ -8,7 +8,7 @@ import React from 'react';
 
 const NotFoundPage = () => {
   const navigate = useNavigate();
-  const { t } = useTranslation('page');
+  const { t } = useTranslation(['errors', 'glossary']);
   const { open, toggleSidebar } = useSidebar();
 
   React.useEffect(() => {
@@ -25,7 +25,7 @@ const NotFoundPage = () => {
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem className="hidden md:block">
-              <BreadcrumbPage>{t('notFound')}</BreadcrumbPage>
+              <BreadcrumbPage>{t('notFound.title')}</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
@@ -33,13 +33,13 @@ const NotFoundPage = () => {
       <div className="flex flex-1 flex-col items-center justify-center px-8 py-16">
         <div className="text-center">
           <h1 className="text-muted-foreground mb-4 text-6xl font-bold">404</h1>
-          <h2 className="mb-2 text-2xl font-semibold">{t('pageNotFound')}</h2>
-          <p className="text-muted-foreground mb-8 max-w-md">{t('pageNotFoundDescription')}</p>
+          <h2 className="mb-2 text-2xl font-semibold">{t('notFound.pageNotFound')}</h2>
+          <p className="text-muted-foreground mb-8 max-w-md">{t('notFound.description')}</p>
           <div className="space-x-4">
             <Button onClick={() => navigate(-1)} variant="outline">
-              {t('goBack')}
+              {t('glossary:actions.goBack')}
             </Button>
-            <Button onClick={() => navigate('/')}>{t('goHome')}</Button>
+            <Button onClick={() => navigate('/')}>{t('glossary:actions.goHome')}</Button>
           </div>
         </div>
       </div>

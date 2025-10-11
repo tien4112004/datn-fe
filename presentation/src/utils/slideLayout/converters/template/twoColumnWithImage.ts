@@ -366,3 +366,285 @@ export const twoColumnRightImageTemplate: Template = {
     },
   },
 };
+
+// Variation: Two Column with Image - Container Border
+export const twoColumnWithImageContainerBorderTemplate: Template = {
+  id: 'two-column-with-image-container-border',
+  name: 'Two Column with Image - Container Border',
+  config: {
+    containers: {
+      title: {
+        type: 'text',
+        bounds: {
+          left: 15,
+          top: 15,
+          width: {
+            expr: 'SLIDE_WIDTH - 30',
+          },
+          height: 100,
+        },
+        layout: {
+          horizontalAlignment: 'center',
+          verticalAlignment: 'top',
+        },
+        text: {
+          color: '{{theme.titleFontColor}}',
+          fontFamily: '{{theme.titleFontName}}',
+          fontWeight: 'bold',
+          fontStyle: 'normal',
+          textAlign: 'center',
+        },
+      },
+      image: {
+        type: 'image',
+        bounds: {
+          width: 360,
+          height: 300,
+          left: {
+            expr: '15 + ((SLIDE_WIDTH - 30) / 2 - 360) / 2',
+          },
+          top: {
+            expr: 'after',
+            relativeTo: 'title',
+            offset: 20,
+          },
+        },
+        shadow: {
+          h: '{{theme.card.shadow.h}}',
+          v: '{{theme.card.shadow.v}}',
+          blur: '{{theme.card.shadow.blur}}',
+          color: '{{theme.card.shadow.color}}',
+        },
+      },
+      content: {
+        type: 'block',
+        bounds: {
+          left: {
+            expr: '15 + (SLIDE_WIDTH - 30) / 2',
+          },
+          top: {
+            expr: 'image.top',
+          },
+          width: {
+            expr: '(SLIDE_WIDTH - 30) / 2 - 30',
+          },
+          height: {
+            expr: 'SLIDE_HEIGHT - image.top - 50',
+          },
+        },
+        border: {
+          width: '{{theme.card.borderWidth}}',
+          color: '{{theme.themeColors[0]}}',
+          radius: '{{theme.card.borderRadius}}',
+        },
+        layout: {
+          distribution: 'space-between',
+          gap: 15,
+          horizontalAlignment: 'center',
+          verticalAlignment: 'top',
+          orientation: 'vertical',
+        },
+        childTemplate: {
+          count: 'auto',
+          structure: {
+            type: 'text',
+            label: 'item',
+            text: {
+              color: '{{theme.fontColor}}',
+              fontFamily: '{{theme.fontName}}',
+              fontWeight: 'normal',
+              fontStyle: 'normal',
+              textAlign: 'left',
+            },
+          },
+        },
+      },
+    },
+  },
+};
+
+// Variation: Two Column Left Big Image - Container Border
+export const twoColumnLeftBigImageContainerBorderTemplate: Template = {
+  id: 'two-column-left-big-image-container-border',
+  name: 'Two Column - Left Big Image Container Border',
+  config: {
+    containers: {
+      image: {
+        type: 'image',
+        bounds: {
+          left: 0,
+          top: 0,
+          width: {
+            expr: 'SLIDE_WIDTH * 0.4',
+          },
+          height: {
+            expr: 'SLIDE_HEIGHT',
+          },
+        },
+        border: {
+          width: 0,
+          color: 'transparent',
+          radius: 0,
+        },
+      },
+      title: {
+        type: 'text',
+        bounds: {
+          left: {
+            expr: 'image.width + 30',
+          },
+          top: 20,
+          width: {
+            expr: 'SLIDE_WIDTH - image.width - 60',
+          },
+          height: 90,
+        },
+        layout: {
+          horizontalAlignment: 'center',
+          verticalAlignment: 'top',
+        },
+        text: {
+          color: '{{theme.titleFontColor}}',
+          fontFamily: '{{theme.titleFontName}}',
+          fontWeight: 'bold',
+          fontStyle: 'normal',
+          textAlign: 'center',
+        },
+      },
+      content: {
+        type: 'block',
+        positioning: {
+          relativeTo: 'title',
+          axis: 'vertical',
+          anchor: 'end',
+          offset: 20,
+          size: 'fill',
+          margin: { left: 0, right: 0, top: 0, bottom: 40 },
+        },
+        border: {
+          width: '{{theme.card.borderWidth}}',
+          color: '{{theme.themeColors[0]}}',
+          radius: '{{theme.card.borderRadius}}',
+        },
+        layout: {
+          distribution: 'space-between',
+          gap: 15,
+          horizontalAlignment: 'left',
+          verticalAlignment: 'top',
+          orientation: 'vertical',
+        },
+        childTemplate: {
+          count: 'auto',
+          structure: {
+            type: 'text',
+            label: 'item',
+            layout: {
+              horizontalAlignment: 'left',
+              verticalAlignment: 'center',
+            },
+            text: {
+              color: '{{theme.fontColor}}',
+              fontFamily: '{{theme.fontName}}',
+              fontWeight: 'normal',
+              fontStyle: 'normal',
+              textAlign: 'left',
+            },
+          },
+        },
+      },
+    },
+  },
+};
+
+// Variation: Two Column Right Big Image - Container Border Shadow
+export const twoColumnRightBigImageContainerBorderTemplate: Template = {
+  id: 'two-column-right-big-image-container-border',
+  name: 'Two Column - Right Big Image Container Border',
+  config: {
+    containers: {
+      image: {
+        type: 'image',
+        bounds: {
+          left: {
+            expr: 'SLIDE_WIDTH * 0.6',
+          },
+          top: 0,
+          width: {
+            expr: 'SLIDE_WIDTH * 0.4',
+          },
+          height: {
+            expr: 'SLIDE_HEIGHT',
+          },
+        },
+      },
+      title: {
+        type: 'text',
+        bounds: {
+          left: 30,
+          top: 20,
+          width: {
+            expr: 'SLIDE_WIDTH * 0.6 - 60',
+          },
+          height: 90,
+        },
+        layout: {
+          horizontalAlignment: 'center',
+          verticalAlignment: 'top',
+        },
+        text: {
+          color: '{{theme.titleFontColor}}',
+          fontFamily: '{{theme.titleFontName}}',
+          fontWeight: 'bold',
+          fontStyle: 'normal',
+          textAlign: 'center',
+        },
+      },
+      content: {
+        type: 'block',
+        positioning: {
+          relativeTo: 'title',
+          axis: 'vertical',
+          anchor: 'end',
+          offset: 20,
+          size: 'fill',
+          margin: { left: 0, right: 0, top: 0, bottom: 50 },
+        },
+        shadow: {
+          h: '{{theme.card.shadow.h}}',
+          v: '{{theme.card.shadow.v}}',
+          blur: '{{theme.card.shadow.blur}}',
+          color: '{{theme.card.shadow.color}}',
+        },
+        border: {
+          width: 0,
+          color: 'transparent',
+          radius: '{{theme.card.borderRadius}}',
+        },
+        background: {
+          color: '{{theme.card.backgroundColor}}',
+        },
+        layout: {
+          distribution: 'space-between',
+          gap: 15,
+          horizontalAlignment: 'left',
+          verticalAlignment: 'top',
+          orientation: 'vertical',
+        },
+        childTemplate: {
+          count: 'auto',
+          structure: {
+            type: 'text',
+            label: 'item',
+            text: {
+              color: '{{theme.card.textColor}}',
+              fontFamily: '{{theme.fontName}}',
+              fontWeight: 'normal',
+              fontStyle: 'normal',
+              textAlign: 'left',
+            },
+          },
+        },
+      },
+    },
+  },
+};

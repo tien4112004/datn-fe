@@ -538,3 +538,174 @@ export const verticalListNumberedCardsTemplate: Template = {
     },
   },
 };
+
+// Variation: Vertical List - Container Border (border around all content)
+export const verticalListContainerBorderTemplate: Template = {
+  id: 'vertical-list-container-border',
+  name: 'Vertical List - Container Border',
+  config: {
+    containers: {
+      title: {
+        type: 'text',
+        bounds: {
+          left: 0,
+          top: 15,
+          width: { expr: 'SLIDE_WIDTH' },
+          height: 110,
+        },
+        layout: {
+          horizontalAlignment: 'center',
+          verticalAlignment: 'top',
+        },
+        text: {
+          color: '{{theme.titleFontColor}}',
+          fontFamily: '{{theme.titleFontName}}',
+          fontWeight: 'bold',
+          textAlign: 'center',
+        },
+      },
+      content: {
+        type: 'block',
+        positioning: {
+          relativeTo: 'title',
+          axis: 'vertical',
+          anchor: 'end',
+          offset: 20,
+          size: 'fill',
+          margin: { left: 50, right: 50, top: 0, bottom: 50 },
+        },
+        border: {
+          width: '{{theme.card.borderWidth}}',
+          color: '{{theme.themeColors[0]}}',
+          radius: '{{theme.card.borderRadius}}',
+        },
+        layout: {
+          distribution: 'space-between',
+          gap: 15,
+          verticalAlignment: 'top',
+          orientation: 'vertical',
+        },
+        childTemplate: {
+          count: 'auto',
+          wrap: {
+            enabled: false,
+          },
+          structure: {
+            type: 'text',
+            label: 'item',
+            text: {
+              color: '{{theme.fontColor}}',
+              fontFamily: '{{theme.fontName}}',
+              fontWeight: 'normal',
+              textAlign: 'center',
+              fontSizeRange: { minSize: 15, maxSize: 22 },
+            },
+          },
+        },
+      },
+    },
+  },
+};
+
+// Variation: Vertical List - Container Border Numbered
+export const verticalListContainerBorderNumberedTemplate: Template = {
+  id: 'vertical-list-container-border-numbered',
+  name: 'Vertical List - Container Border Numbered',
+  config: {
+    containers: {
+      title: {
+        type: 'text',
+        bounds: {
+          left: 0,
+          top: 15,
+          width: { expr: 'SLIDE_WIDTH' },
+          height: 100,
+        },
+        layout: {
+          horizontalAlignment: 'center',
+          verticalAlignment: 'top',
+        },
+        text: {
+          color: '{{theme.titleFontColor}}',
+          fontFamily: '{{theme.titleFontName}}',
+          fontWeight: 'bold',
+          textAlign: 'center',
+        },
+      },
+      content: {
+        type: 'block',
+        positioning: {
+          relativeTo: 'title',
+          axis: 'vertical',
+          anchor: 'end',
+          offset: 20,
+          size: 'fill',
+          margin: { left: 70, right: 70, top: 0, bottom: 50 },
+        },
+        border: {
+          width: '{{theme.card.borderWidth}}',
+          color: '{{theme.themeColors[0]}}',
+          radius: '{{theme.card.borderRadius}}',
+        },
+        layout: {
+          distribution: 'space-between',
+          gap: 12,
+          verticalAlignment: 'top',
+          orientation: 'vertical',
+        },
+        childTemplate: {
+          count: 'auto',
+          wrap: {
+            enabled: false,
+          },
+          structure: {
+            type: 'block',
+            label: 'item',
+            layout: {
+              distribution: '1/8',
+              gap: 12,
+              horizontalAlignment: 'left',
+              verticalAlignment: 'center',
+              orientation: 'horizontal',
+            },
+            children: [
+              {
+                type: 'text',
+                id: 'label',
+                label: 'label',
+                numbering: true,
+                layout: {
+                  horizontalAlignment: 'center',
+                  verticalAlignment: 'center',
+                },
+                text: {
+                  color: '{{theme.themeColors[0]}}',
+                  fontFamily: '{{theme.labelFontName}}',
+                  fontWeight: 'bold',
+                  textAlign: 'right',
+                  fontSizeRange: { minSize: 14, maxSize: 20 },
+                },
+              },
+              {
+                type: 'text',
+                id: 'content',
+                label: 'content',
+                layout: {
+                  horizontalAlignment: 'left',
+                  verticalAlignment: 'center',
+                },
+                text: {
+                  color: '{{theme.fontColor}}',
+                  fontFamily: '{{theme.fontName}}',
+                  fontWeight: 'normal',
+                  textAlign: 'left',
+                  fontSizeRange: { minSize: 15, maxSize: 22 },
+                },
+              },
+            ],
+          },
+        },
+      },
+    },
+  },
+};

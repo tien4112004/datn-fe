@@ -130,10 +130,10 @@ export const mainImageCenteredTemplate: Template = {
   },
 };
 
-// Variation: Split layout (image on left, content on right)
-export const mainImageSplitTemplate: Template = {
-  id: 'main-image-split',
-  name: 'Main Image - Split',
+// Variation: Image on left, content on right
+export const mainImageLeftTemplate: Template = {
+  id: 'main-image-left',
+  name: 'Main Image - Left',
   config: {
     containers: {
       image: {
@@ -271,6 +271,176 @@ export const mainImageTopTemplate: Template = {
         },
         text: {
           color: '{{theme.themeColors[1]}}',
+          fontFamily: '{{theme.titleFontName}}',
+          fontWeight: 'normal',
+          fontStyle: 'normal',
+          textAlign: 'center',
+        },
+      },
+    },
+  },
+};
+
+// Variation: Image on right, content on left
+export const mainImageRightTemplate: Template = {
+  id: 'main-image-right',
+  name: 'Main Image - Right',
+  config: {
+    containers: {
+      content: {
+        type: 'text',
+        label: 'content',
+        bounds: {
+          width: {
+            expr: 'SLIDE_WIDTH * 0.5 - 60',
+          },
+          height: 200,
+          left: 30,
+          top: {
+            expr: 'SLIDE_HEIGHT * 0.5 - 100',
+          },
+        },
+        layout: {
+          horizontalAlignment: 'center',
+          verticalAlignment: 'center',
+        },
+        text: {
+          color: '{{theme.titleFontColor}}',
+          fontFamily: '{{theme.titleFontName}}',
+          fontWeight: 'normal',
+          fontStyle: 'normal',
+          textAlign: 'center',
+        },
+      },
+      image: {
+        type: 'image',
+        bounds: {
+          width: {
+            expr: 'SLIDE_WIDTH * 0.5',
+          },
+          height: {
+            expr: 'SLIDE_HEIGHT',
+          },
+          left: {
+            expr: 'SLIDE_WIDTH * 0.5',
+          },
+          top: 0,
+        },
+      },
+    },
+  },
+};
+
+// Variation: Image on bottom, content on top
+export const mainImageBottomTemplate: Template = {
+  id: 'main-image-bottom',
+  name: 'Main Image - Bottom',
+  config: {
+    containers: {
+      content: {
+        type: 'text',
+        label: 'content',
+        bounds: {
+          width: {
+            expr: 'SLIDE_WIDTH * 0.9',
+          },
+          height: {
+            expr: 'SLIDE_HEIGHT * 0.35',
+          },
+          left: {
+            expr: 'center',
+          },
+          top: 30,
+        },
+        layout: {
+          horizontalAlignment: 'center',
+          verticalAlignment: 'center',
+        },
+        text: {
+          color: '{{theme.titleFontColor}}',
+          fontFamily: '{{theme.titleFontName}}',
+          fontWeight: 'normal',
+          fontStyle: 'normal',
+          textAlign: 'center',
+        },
+      },
+      image: {
+        type: 'image',
+        bounds: {
+          width: {
+            expr: 'SLIDE_WIDTH',
+          },
+          height: {
+            expr: 'SLIDE_HEIGHT * 0.6',
+          },
+          left: 0,
+          top: {
+            expr: 'SLIDE_HEIGHT * 0.4',
+          },
+        },
+      },
+    },
+  },
+};
+
+// Variation: Main Image - Framed (image with prominent border)
+export const mainImageFramedTemplate: Template = {
+  id: 'main-image-framed',
+  name: 'Main Image - Framed',
+  config: {
+    containers: {
+      image: {
+        type: 'image',
+        bounds: {
+          width: {
+            expr: 'SLIDE_WIDTH * 0.65',
+            max: 'SLIDE_HEIGHT * 0.55 * (3/2)',
+          },
+          height: {
+            expr: 'SLIDE_WIDTH * 0.65 * (2/3)',
+            max: 'SLIDE_HEIGHT * 0.55',
+          },
+          left: {
+            expr: 'center',
+          },
+          top: {
+            expr: 'center',
+            offset: -30,
+          },
+        },
+        border: {
+          width: '{{theme.card.borderWidth}}',
+          color: '{{theme.themeColors[0]}}',
+          radius: '{{theme.card.borderRadius}}',
+        },
+        shadow: {
+          h: '{{theme.card.shadow.h}}',
+          v: '{{theme.card.shadow.v}}',
+          blur: '{{theme.card.shadow.blur}}',
+          color: '{{theme.card.shadow.color}}',
+        },
+      },
+      content: {
+        type: 'text',
+        label: 'content',
+        bounds: {
+          width: {
+            expr: 'SLIDE_WIDTH * 0.75',
+          },
+          height: 90,
+          left: {
+            expr: 'center',
+          },
+          top: {
+            expr: 'image.top + image.height + 35',
+          },
+        },
+        layout: {
+          horizontalAlignment: 'center',
+          verticalAlignment: 'center',
+        },
+        text: {
+          color: '{{theme.titleFontColor}}',
           fontFamily: '{{theme.titleFontName}}',
           fontWeight: 'normal',
           fontStyle: 'normal',

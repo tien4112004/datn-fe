@@ -151,13 +151,32 @@ export const convertToSlide = async (
   } else if (layoutType === SLIDE_LAYOUT_TYPE.TWO_COLUMN) {
     const selectedTemplate = selectTemplate(layoutType, seed);
     const template = resolveTemplate(selectedTemplate.config, theme, viewport);
+
+    // Check if template has separate leftColumn/rightColumn containers
+    const hasLeftRightColumns = template.containers.leftColumn && template.containers.rightColumn;
+
     return convertLayoutGeneric(
       data as TwoColumnLayoutSchema,
       template,
-      (d) => ({
-        texts: { title: d.title },
-        blocks: { content: { item: [...d.data.items1, ...d.data.items2] } },
-      }),
+      (d) => {
+        const texts = { title: d.title };
+        let blocks: Record<string, Record<string, string[]>>;
+
+        if (hasLeftRightColumns) {
+          // Map to separate columns
+          blocks = {
+            leftColumn: { item: d.data.items1 },
+            rightColumn: { item: d.data.items2 },
+          };
+        } else {
+          // Map to single content container (legacy templates)
+          blocks = {
+            content: { item: [...d.data.items1, ...d.data.items2] },
+          };
+        }
+
+        return { texts, blocks };
+      },
       slideId
     );
   } else if (layoutType === SLIDE_LAYOUT_TYPE.VERTICAL_LIST) {

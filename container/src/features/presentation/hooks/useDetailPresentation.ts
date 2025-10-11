@@ -12,12 +12,12 @@ import {
   useSetParsedPresentation,
   useUpdatePresentationSlides,
 } from './useApi';
-import type { Slide, SlideTheme } from '../types/slide';
+import type { Slide, SlideTheme, SlideViewport } from '../types/slide';
 
 interface VueEditorApp {
   replaceSlides: (data: any[], theme?: SlideTheme) => Promise<Slide[]>;
   addSlide: (data: any, order?: number, theme?: SlideTheme) => Promise<Slide>;
-  updateThemeAndViewport: (theme: SlideTheme, viewport: { width: number; height: number }) => void;
+  updateThemeAndViewport: (theme: SlideTheme, viewport: SlideViewport) => void;
   updateImageElement: (slideId: string, elementId: string, image: string) => void;
 }
 
@@ -32,10 +32,10 @@ export const useVueApp = (presentation: Presentation | null) => {
   const updateApp = useCallback((newInstance: VueEditorApp) => {
     app.current = newInstance;
 
-    app.current.updateThemeAndViewport(presentation?.theme || getDefaultPresentationTheme(), {
-      width: 1000,
-      height: 562.5,
-    });
+    app.current.updateThemeAndViewport(
+      presentation?.theme || getDefaultPresentationTheme(),
+      presentation?.viewport || { width: 1000, height: 562.5 }
+    );
   }, []);
 
   return { app: app.current, updateApp };
@@ -101,14 +101,18 @@ export const usePresentationDataProcessor = (
             const slide = await app.addSlide(
               newData[i].result,
               newData[i].order,
-              getRequest?.()?.others.theme || getDefaultPresentationTheme()
+              getRequest?.()?.presentation.theme || getDefaultPresentationTheme()
             );
             await updateSlides.mutateAsync([slide]);
           }
         }
-      } else {
+      } else if (processedStreamDataRef.current.length > 0) {
+        // Only process when streaming has ended and we have processed data
         processedStreamDataRef.current = [];
         removeSearchParams(['isGenerating']);
+
+        // Wait a bit to ensure all image generation events are dispatched
+        await new Promise((resolve) => setTimeout(resolve, 100));
 
         // Wait for all pending image generations to complete before setting parsed
         if (pendingImageGenerations.current.size > 0) {
@@ -136,6 +140,9 @@ export const usePresentationDataProcessor = (
           })
           .then((response) => {
             app.updateImageElement(slideId, elementId, response.images[0].url);
+          })
+          .catch((_) => {
+            app.updateImageElement(slideId, elementId, '');
           })
           .finally(() => {
             pendingImageGenerations.current.delete(promise);

@@ -387,14 +387,20 @@ function _convertToPPTElements(
   for (const [label, elements] of Object.entries(htmlElements)) {
     const instances = labelGroups.get(label) || [];
 
-    pptElements[label] = elements.map((htmlEl, index) => {
-      const instance = instances[index];
-      if (!instance) {
-        throw new Error(`No instance found for label "${label}" at index ${index}`);
-      }
+    pptElements[label] = elements
+      .map((htmlEl, index) => {
+        const instance = instances[index];
+        if (!instance) {
+          throw new Error(`No instance found for label "${label}" at index ${index}`);
+        }
 
-      return createTextPPTElement(htmlEl, instance);
-    });
+        if (instance.type !== 'text') {
+          return null;
+        }
+
+        return createTextPPTElement(htmlEl, instance);
+      })
+      .filter((el) => el !== null) as PPTElement[];
   }
 
   return pptElements;

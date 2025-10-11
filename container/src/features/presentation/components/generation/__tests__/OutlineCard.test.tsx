@@ -25,10 +25,12 @@ vi.mock('@/shared/components/rte/RichTextEditor', () => ({
 
 vi.mock('@/shared/components/rte/useRichTextEditor', () => ({
   useRichTextEditor: () => ({
-    tryParseMarkdownToBlocks: vi.fn().mockResolvedValue([]),
+    tryParseMarkdownToBlocks: vi.fn().mockResolvedValue([{ type: 'paragraph', content: 'test' }]),
+    tryParseHTMLToBlocks: vi.fn().mockResolvedValue([{ type: 'paragraph', content: 'test' }]),
     blocksToFullHTML: vi.fn().mockResolvedValue('<p>Converted HTML content</p>'),
     replaceBlocks: vi.fn(),
-    document: {},
+    focus: vi.fn(),
+    document: [{ type: 'paragraph', content: 'test' }],
     blocksToMarkdownLossy: vi.fn().mockResolvedValue('# Updated markdown content'),
   }),
 }));
@@ -51,7 +53,6 @@ describe('OutlineCard', () => {
 
   const mockOutlineItem = {
     id: 'test-id',
-    htmlContent: '<p>Test content</p><h1>Test Heading</h1>',
     markdownContent: '# Test Heading\n\nTest content',
   };
 
@@ -61,16 +62,27 @@ describe('OutlineCard', () => {
     onDelete: mockOnDelete,
   };
 
+  let mockEditingId = '';
+  let mockSetEditingId: any;
+
   beforeEach(() => {
     vi.clearAllMocks();
+    mockEditingId = '';
 
     // Setup store mock
-    const mockStore = {
-      handleOutlineChange: mockHandleOutlineChange,
-      outlines: [mockOutlineItem],
-    };
+    mockSetEditingId = vi.fn((id: string) => {
+      mockEditingId = id;
+    });
 
     (useOutlineStore as any).mockImplementation((selector: any) => {
+      const mockStore = {
+        editingId: mockEditingId,
+        handleMarkdownChange: mockHandleOutlineChange,
+        outlines: [mockOutlineItem],
+        isStreaming: false,
+        setEditingId: mockSetEditingId,
+      };
+
       if (typeof selector === 'function') {
         return selector(mockStore);
       }
@@ -101,7 +113,7 @@ describe('OutlineCard', () => {
   });
 
   describe('Edit Mode Interactions', () => {
-    it('enters edit mode when content area is clicked', async () => {
+    it('calls setEditingId when content area is clicked', async () => {
       await act(async () => {
         renderWithProviders(<OutlineCard {...standardProps} />);
       });
@@ -116,11 +128,11 @@ describe('OutlineCard', () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByTestId('rich-text-editor')).toBeInTheDocument();
+        expect(mockSetEditingId).toHaveBeenCalledWith('test-id');
       });
     });
 
-    it('enters edit mode when Enter key is pressed on content area', async () => {
+    it('calls setEditingId when Enter key is pressed on content area', async () => {
       await act(async () => {
         renderWithProviders(<OutlineCard {...standardProps} />);
       });
@@ -135,11 +147,11 @@ describe('OutlineCard', () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByTestId('rich-text-editor')).toBeInTheDocument();
+        expect(mockSetEditingId).toHaveBeenCalledWith('test-id');
       });
     });
 
-    it('enters edit mode when Space key is pressed on content area', async () => {
+    it('calls setEditingId when Space key is pressed on content area', async () => {
       await act(async () => {
         renderWithProviders(<OutlineCard {...standardProps} />);
       });
@@ -154,25 +166,35 @@ describe('OutlineCard', () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByTestId('rich-text-editor')).toBeInTheDocument();
+        expect(mockSetEditingId).toHaveBeenCalledWith('test-id');
       });
     });
   });
 
   describe('Content Management', () => {
-    it('saves content changes to store when editor changes', async () => {
+    it('saves content changes to store when editor changes in edit mode', async () => {
+      // Setup store to return editing state
+      mockEditingId = 'test-id';
+      (useOutlineStore as any).mockImplementation((selector: any) => {
+        const mockStore = {
+          editingId: mockEditingId,
+          handleMarkdownChange: mockHandleOutlineChange,
+          outlines: [mockOutlineItem],
+          isStreaming: false,
+          setEditingId: mockSetEditingId,
+        };
+
+        if (typeof selector === 'function') {
+          return selector(mockStore);
+        }
+        return mockStore;
+      });
+
       await act(async () => {
         renderWithProviders(<OutlineCard {...standardProps} />);
       });
 
-      // Enter edit mode
-      const buttons = screen.getAllByRole('button');
-      const contentArea = buttons.find((btn) => btn.getAttribute('tabindex') === '0');
-
-      await act(async () => {
-        fireEvent.click(contentArea!);
-      });
-
+      // Should render editor in edit mode
       await waitFor(() => {
         expect(screen.getByTestId('rich-text-editor')).toBeInTheDocument();
       });
@@ -189,17 +211,26 @@ describe('OutlineCard', () => {
       });
     });
 
-    it('exits edit mode when editor loses focus', async () => {
-      await act(async () => {
-        renderWithProviders(<OutlineCard {...standardProps} />);
+    it('calls setEditingId with empty string when editor loses focus', async () => {
+      // Setup store to return editing state
+      mockEditingId = 'test-id';
+      (useOutlineStore as any).mockImplementation((selector: any) => {
+        const mockStore = {
+          editingId: mockEditingId,
+          handleMarkdownChange: mockHandleOutlineChange,
+          outlines: [mockOutlineItem],
+          isStreaming: false,
+          setEditingId: mockSetEditingId,
+        };
+
+        if (typeof selector === 'function') {
+          return selector(mockStore);
+        }
+        return mockStore;
       });
 
-      // Enter edit mode
-      const buttons = screen.getAllByRole('button');
-      const contentArea = buttons.find((btn) => btn.getAttribute('tabindex') === '0');
-
       await act(async () => {
-        fireEvent.click(contentArea!);
+        renderWithProviders(<OutlineCard {...standardProps} />);
       });
 
       await waitFor(() => {
@@ -214,11 +245,11 @@ describe('OutlineCard', () => {
       });
 
       await waitFor(() => {
-        expect(screen.queryByTestId('rich-text-editor')).not.toBeInTheDocument();
+        expect(mockSetEditingId).toHaveBeenCalledWith('');
       });
     });
 
-    it('displays converted HTML content in view mode', async () => {
+    it('displays content in view mode when not editing', async () => {
       await act(async () => {
         renderWithProviders(<OutlineCard {...standardProps} />);
       });

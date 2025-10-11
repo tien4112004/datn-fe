@@ -1,4 +1,6 @@
+import { useEffect, useState } from 'react';
 import type { SlideTheme } from '../../types/slide';
+import { moduleMethodMap } from '../remote/module';
 
 interface ThemePreviewCardProps {
   theme: SlideTheme;
@@ -17,6 +19,21 @@ export const ThemePreviewCard = ({
   width,
   height,
 }: ThemePreviewCardProps) => {
+  const [getBackgroundStyle, setGetBackgroundStyle] = useState<
+    ((background: string | any) => React.CSSProperties) | null
+  >(null);
+
+  useEffect(() => {
+    // Get the background style function from the method module
+    moduleMethodMap['method']().then((mod) => {
+      setGetBackgroundStyle(() => (mod.default as any).getBackgroundStyle);
+    });
+  }, []);
+
+  const backgroundStyle = getBackgroundStyle
+    ? getBackgroundStyle(theme.backgroundColor)
+    : { backgroundColor: '#fff' };
+
   return (
     <div
       className={`relative w-full cursor-pointer overflow-hidden rounded-lg border-2 shadow-sm transition-all hover:shadow-md ${
@@ -24,7 +41,7 @@ export const ThemePreviewCard = ({
       }`}
       style={{
         aspectRatio: height && width ? `${width}/${height}` : '16/9',
-        backgroundColor: theme.backgroundColor,
+        ...backgroundStyle,
         minHeight: '100px',
       }}
       onClick={onClick}

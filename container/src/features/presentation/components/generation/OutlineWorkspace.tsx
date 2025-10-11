@@ -83,7 +83,7 @@ const OutlineWorkspace = ({ onDownload, totalSlide }: OutlineWorkspaceProps) => 
 
   return (
     <Card className="w-3xl flex flex-col gap-6 rounded-xl p-8">
-      {contentIds.length > 0 ? (
+      {contentIds.length > 0 && (
         <DndContext sensors={sensors} onDragEnd={handleOutlineCardDragEnd}>
           <SortableContext
             items={contentIds.map((id) => `outline-card-${id}`)}
@@ -94,7 +94,9 @@ const OutlineWorkspace = ({ onDownload, totalSlide }: OutlineWorkspaceProps) => 
             ))}
           </SortableContext>
         </DndContext>
-      ) : (
+      )}
+
+      {!isStreaming && contentIds.length === 0 && (
         <div className="text-muted-foreground flex flex-col items-center justify-center text-center">
           <div className="text-lg font-medium">{t('noCards')}</div>
           <div className="text-sm">{t('clickAddToStart')}</div>
@@ -114,7 +116,7 @@ const OutlineWorkspace = ({ onDownload, totalSlide }: OutlineWorkspaceProps) => 
         variant={'outline'}
         className="mt-4 w-full"
         onClick={() => {
-          addContent({ id: Date.now().toString(), htmlContent: '', markdownContent: '' });
+          addContent({ id: Date.now().toString(), markdownContent: '' });
         }}
       >
         <Plus className="h-4 w-4" />

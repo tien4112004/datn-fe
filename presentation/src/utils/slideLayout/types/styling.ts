@@ -15,8 +15,40 @@ export interface ShadowConfig {
   h: number | string;
   v: number | string;
   blur: number | string;
-  color: string; // Shadow color
+  color: string;
 }
+
+export interface BorderInstance {
+  width: number;
+  color: string;
+  radius?: number;
+}
+
+export interface ShadowInstance {
+  h: number;
+  v: number;
+  blur: number;
+  color: string;
+}
+
+export const fromBorderConfigToInstance = (config?: BorderConfig): BorderInstance | undefined => {
+  if (!config) return undefined;
+  return {
+    width: typeof config.width === 'number' ? config.width : parseFloat(config.width),
+    color: config.color,
+    radius: typeof config.radius === 'number' ? config.radius : parseFloat(config.radius || '0'),
+  };
+};
+
+export const fromShadowConfigToInstance = (config?: ShadowConfig): ShadowInstance | undefined => {
+  if (!config) return undefined;
+  return {
+    h: typeof config.h === 'number' ? config.h : parseFloat(config.h),
+    v: typeof config.v === 'number' ? config.v : parseFloat(config.v),
+    blur: typeof config.blur === 'number' ? config.blur : parseFloat(config.blur),
+    color: config.color,
+  };
+};
 
 export interface TextStyleConfig {
   color?: string;

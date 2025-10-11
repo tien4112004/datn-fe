@@ -32,14 +32,23 @@ const props = defineProps<{
 const currentElementComponent = computed<unknown>(() => {
   const elementTypeMap = {
     [ElementTypes.IMAGE]: BaseImageElement,
+    [ElementTypes.IMAGE.toUpperCase()]: BaseImageElement,
     [ElementTypes.TEXT]: BaseTextElement,
+    [ElementTypes.TEXT.toUpperCase()]: BaseTextElement,
     [ElementTypes.SHAPE]: BaseShapeElement,
+    [ElementTypes.SHAPE.toUpperCase()]: BaseShapeElement,
     [ElementTypes.LINE]: BaseLineElement,
+    [ElementTypes.LINE.toUpperCase()]: BaseLineElement,
     [ElementTypes.CHART]: BaseChartElement,
+    [ElementTypes.CHART.toUpperCase()]: BaseChartElement,
     [ElementTypes.TABLE]: BaseTableElement,
+    [ElementTypes.TABLE.toUpperCase()]: BaseTableElement,
     [ElementTypes.LATEX]: BaseLatexElement,
+    [ElementTypes.LATEX.toUpperCase()]: BaseLatexElement,
     [ElementTypes.VIDEO]: BaseVideoElement,
+    [ElementTypes.VIDEO.toUpperCase()]: BaseVideoElement,
     [ElementTypes.AUDIO]: BaseAudioElement,
+    [ElementTypes.AUDIO.toUpperCase()]: BaseAudioElement,
   };
   return elementTypeMap[props.elementInfo.type] || null;
 });

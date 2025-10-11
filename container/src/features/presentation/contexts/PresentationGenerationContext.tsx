@@ -29,6 +29,8 @@ export const PresentationGenerationProvider = ({ children }: PresentationGenerat
   // Zustand store actions
   const setIsGenerating = usePresentationStore((state) => state.setIsGenerating);
   const setStreamedData = usePresentationStore((state) => state.setStreamedData);
+  const clearStreamedData = usePresentationStore((state) => state.clearStreamedData);
+  const clearGeneratedPresentation = usePresentationStore((state) => state.clearGeneratedPresentation);
 
   const {
     processedData: streamedData,
@@ -47,6 +49,8 @@ export const PresentationGenerationProvider = ({ children }: PresentationGenerat
 
   const startGeneration = useCallback(
     async (newRequest: PresentationGenerationRequest) => {
+      clearGeneratedPresentation();
+      clearStreamedData();
       setRequest(newRequest);
 
       // Start the streaming process

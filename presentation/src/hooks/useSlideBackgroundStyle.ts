@@ -1,5 +1,5 @@
 import { type Ref, computed } from 'vue';
-import type { SlideBackground } from '@/types/slides';
+import type { Gradient, SlideBackground } from '@/types/slides';
 
 // Convert page background data to CSS styles
 export default (background: Ref<SlideBackground | undefined>) => {
@@ -46,4 +46,20 @@ export default (background: Ref<SlideBackground | undefined>) => {
   return {
     backgroundStyle,
   };
+};
+
+export const getBackgroundStyle = (background: string | Gradient) => {
+  if (!background) return { backgroundColor: '#fff' };
+
+  if (typeof background === 'string') {
+    return { backgroundColor: background };
+  } else {
+    const { type, colors, rotate } = background;
+    const list = colors.map((item) => `${item.color} ${item.pos}%`);
+
+    if (type === 'radial') return { backgroundImage: `radial-gradient(${list.join(',')})` };
+    return {
+      backgroundImage: `linear-gradient(${rotate}deg, ${list.join(',')})`,
+    };
+  }
 };

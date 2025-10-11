@@ -796,6 +796,8 @@ export interface SlideTheme {
   titleFontColor: string;
   outline: PPTElementOutline;
   shadow: PPTElementShadow;
+  labelFontColor?: string;
+  labelFontName?: string;
 
   // For Layouts
   additionalElements?: PPTElement[];
@@ -805,6 +807,8 @@ export interface SlideTheme {
     borderRadius: number;
     borderWidth: number;
     fill: 'none' | 'full' | 'semi';
+    backgroundColor: string;
+    textColor: string;
     shadow: PPTElementShadow;
   };
 }

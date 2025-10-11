@@ -9,7 +9,7 @@ export const getDefaultPresentationTheme = (): SlideTheme => ({
   backgroundColor: '#ffffff',
   themeColors: ['#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6'],
   fontColor: '#333333',
-  fontName: 'Roboto, -apple-system, BlinkMacSystemFont, sans-serif',
+  fontName: 'Roboto',
   outline: {
     style: 'solid',
     width: 1,
@@ -22,7 +22,7 @@ export const getDefaultPresentationTheme = (): SlideTheme => ({
     color: 'rgba(0, 0, 0, 0.1)',
   },
   titleFontColor: '#0A2540',
-  titleFontName: 'Roboto, -apple-system, BlinkMacSystemFont, sans-serif',
+  titleFontName: 'Roboto',
   accentImageShape: 'default',
   card: {
     enabled: true,
@@ -35,6 +35,8 @@ export const getDefaultPresentationTheme = (): SlideTheme => ({
       blur: 8,
       color: 'rgba(0, 0, 0, 0.1)',
     },
+    backgroundColor: 'transparent',
+    textColor: '#333333',
   },
 });
 
@@ -47,7 +49,7 @@ export const getBusinessTheme = (): SlideTheme => ({
   backgroundColor: '#f8fafc',
   themeColors: ['#1e40af', '#0f172a', '#475569', '#64748b', '#94a3b8'],
   fontColor: '#1e293b',
-  fontName: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif',
+  fontName: 'Inter',
   outline: {
     style: 'solid',
     width: 1,
@@ -60,7 +62,9 @@ export const getBusinessTheme = (): SlideTheme => ({
     color: 'rgba(0, 0, 0, 0.07)',
   },
   titleFontColor: '#1e40af',
-  titleFontName: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif',
+  titleFontName: 'Inter',
+  labelFontColor: '#64748b',
+  labelFontName: 'Inter',
   accentImageShape: 'default',
   card: {
     enabled: true,
@@ -73,6 +77,8 @@ export const getBusinessTheme = (): SlideTheme => ({
       blur: 4,
       color: 'rgba(30, 64, 175, 0.1)',
     },
+    backgroundColor: '#ffffff',
+    textColor: '#1e293b',
   },
 });
 
@@ -82,10 +88,17 @@ export const getBusinessTheme = (): SlideTheme => ({
 export const getEducationTheme = (): SlideTheme => ({
   id: 'education',
   name: 'Education',
-  backgroundColor: '#fefefe',
+  backgroundColor: {
+    type: 'linear',
+    colors: [
+      { color: '#d2f5e9ff', pos: 0 },
+      { color: '#f0fdf4', pos: 100 },
+    ],
+    rotate: 45,
+  },
   themeColors: ['#059669', '#0891b2', '#7c3aed', '#dc2626', '#ea580c'],
   fontColor: '#374151',
-  fontName: 'Nunito, -apple-system, BlinkMacSystemFont, sans-serif',
+  fontName: 'Open Sans',
   outline: {
     style: 'solid',
     width: 2,
@@ -98,7 +111,9 @@ export const getEducationTheme = (): SlideTheme => ({
     color: 'rgba(5, 150, 105, 0.15)',
   },
   titleFontColor: '#059669',
-  titleFontName: 'Nunito, -apple-system, BlinkMacSystemFont, sans-serif',
+  titleFontName: 'Quicksand',
+  labelFontColor: '#0891b2',
+  labelFontName: 'Nunito',
   accentImageShape: 'default',
   card: {
     enabled: true,
@@ -111,6 +126,8 @@ export const getEducationTheme = (): SlideTheme => ({
       blur: 10,
       color: 'rgba(5, 150, 105, 0.2)',
     },
+    backgroundColor: '#f0fdf4',
+    textColor: '#065f46',
   },
 });
 
@@ -120,10 +137,17 @@ export const getEducationTheme = (): SlideTheme => ({
 export const getCreativeTheme = (): SlideTheme => ({
   id: 'creative',
   name: 'Creative',
-  backgroundColor: '#faf5ff',
+  backgroundColor: {
+    type: 'linear',
+    colors: [
+      { color: '#d7d0ffff', pos: 0 },
+      { color: '#f7f4f7ff', pos: 100 },
+    ],
+    rotate: 45,
+  },
   themeColors: ['#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#3b82f6'],
   fontColor: '#581c87',
-  fontName: 'Poppins, -apple-system, BlinkMacSystemFont, sans-serif',
+  fontName: 'Poppins',
   outline: {
     style: 'solid',
     width: 2,
@@ -136,7 +160,9 @@ export const getCreativeTheme = (): SlideTheme => ({
     color: 'rgba(139, 92, 246, 0.25)',
   },
   titleFontColor: '#7c3aed',
-  titleFontName: 'Poppins, -apple-system, BlinkMacSystemFont, sans-serif',
+  titleFontName: 'Comfortaa',
+  labelFontColor: '#ec4899',
+  labelFontName: 'Fredoka',
   accentImageShape: 'default',
   card: {
     enabled: true,
@@ -149,6 +175,8 @@ export const getCreativeTheme = (): SlideTheme => ({
       blur: 16,
       color: 'rgba(139, 92, 246, 0.2)',
     },
+    backgroundColor: '#faf5ff',
+    textColor: '#6b21a8',
   },
 });
 
@@ -161,7 +189,7 @@ export const getMinimalTheme = (): SlideTheme => ({
   backgroundColor: '#ffffff',
   themeColors: ['#000000', '#6b7280', '#9ca3af', '#d1d5db', '#f3f4f6'],
   fontColor: '#111827',
-  fontName: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif',
+  fontName: 'Work Sans',
   outline: {
     style: 'solid',
     width: 1,
@@ -174,7 +202,9 @@ export const getMinimalTheme = (): SlideTheme => ({
     color: 'rgba(0, 0, 0, 0.05)',
   },
   titleFontColor: '#000000',
-  titleFontName: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif',
+  titleFontName: 'Space Grotesk',
+  labelFontColor: '#6b7280',
+  labelFontName: 'DM Sans',
   accentImageShape: 'default',
   card: {
     enabled: true,
@@ -187,6 +217,8 @@ export const getMinimalTheme = (): SlideTheme => ({
       blur: 3,
       color: 'rgba(0, 0, 0, 0.1)',
     },
+    backgroundColor: '#fafafa',
+    textColor: '#111827',
   },
 });
 
@@ -199,7 +231,7 @@ export const getModernTheme = (): SlideTheme => ({
   backgroundColor: '#0f172a',
   themeColors: ['#06b6d4', '#8b5cf6', '#f59e0b', '#ef4444', '#10b981'],
   fontColor: '#e2e8f0',
-  fontName: 'Montserrat, -apple-system, BlinkMacSystemFont, sans-serif',
+  fontName: 'Montserrat',
   outline: {
     style: 'solid',
     width: 1,
@@ -212,7 +244,9 @@ export const getModernTheme = (): SlideTheme => ({
     color: 'rgba(6, 182, 212, 0.2)',
   },
   titleFontColor: '#06b6d4',
-  titleFontName: 'Montserrat, -apple-system, BlinkMacSystemFont, sans-serif',
+  titleFontName: 'Montserrat',
+  labelFontColor: '#06b6d4',
+  labelFontName: 'Oswald',
   accentImageShape: 'default',
   card: {
     enabled: true,
@@ -225,6 +259,8 @@ export const getModernTheme = (): SlideTheme => ({
       blur: 12,
       color: 'rgba(6, 182, 212, 0.3)',
     },
+    backgroundColor: '#74a8fa',
+    textColor: '#3d4b5e',
   },
 });
 
@@ -237,7 +273,7 @@ export const getClassicTheme = (): SlideTheme => ({
   backgroundColor: '#fefcf0',
   themeColors: ['#92400e', '#7c2d12', '#a16207', '#166534', '#1e40af'],
   fontColor: '#451a03',
-  fontName: 'Georgia, "Times New Roman", serif',
+  fontName: 'Merriweather',
   outline: {
     style: 'solid',
     width: 2,
@@ -250,7 +286,9 @@ export const getClassicTheme = (): SlideTheme => ({
     color: 'rgba(146, 64, 14, 0.15)',
   },
   titleFontColor: '#92400e',
-  titleFontName: 'Georgia, "Times New Roman", serif',
+  titleFontName: 'Playfair Display',
+  labelFontColor: '#a16207',
+  labelFontName: 'Lora',
   accentImageShape: 'default',
   card: {
     enabled: true,
@@ -263,6 +301,8 @@ export const getClassicTheme = (): SlideTheme => ({
       blur: 6,
       color: 'rgba(146, 64, 14, 0.2)',
     },
+    backgroundColor: '#fffbeb',
+    textColor: '#78350f',
   },
 });
 

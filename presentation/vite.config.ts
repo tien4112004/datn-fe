@@ -31,7 +31,7 @@ export default defineConfig(({ mode }) => {
         exposes: {
           './Editor': './src/mount/appMount.ts',
           './ThumbnailSlide': './src/mount/thumbnailMount.ts',
-          './convertToSlide': './src/mount/layoutMount.ts',
+          './method': './src/mount/methodMount.ts',
         },
       }),
       Icons({ compiler: 'vue3' }),

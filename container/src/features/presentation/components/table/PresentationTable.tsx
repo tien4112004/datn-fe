@@ -30,14 +30,26 @@ const PresentationTable = () => {
         enableResizing: false,
         enableSorting: false,
       }),
-      columnHelper.accessor('slides', {
+      columnHelper.display({
         header: t('presentation.thumbnail'),
-        // cell: () => <img src="https://placehold.co/600x400" alt="" className="h-16 w-16 object-cover" />,
         cell: (info) => {
-          const slides = info.getValue();
-          return slides && slides[0] ? (
-            <ThumbnailWrapper slide={slides[0]} size={160} visible={true} />
-          ) : null;
+          const presentation = info.row.original;
+
+          if (presentation.thumbnail && typeof presentation.thumbnail === 'object') {
+            return <ThumbnailWrapper slide={presentation.thumbnail} size={160} visible={true} />;
+          } else if (typeof presentation.thumbnail === 'string') {
+            return <img src={presentation.thumbnail} alt="Presentation Thumbnail" className={`w-[160px]`} />;
+          } else if (presentation.slides && presentation.slides[0]) {
+            return <ThumbnailWrapper slide={presentation.slides[0]} size={160} visible={true} />;
+          } else {
+            return (
+              <img
+                src="/images/placeholder-image.webp"
+                alt="No Thumbnail"
+                className={`aspect-[16/9] w-full`}
+              />
+            );
+          }
         },
         size: 176,
         enableResizing: false,
@@ -50,11 +62,6 @@ const PresentationTable = () => {
         meta: {
           isGrow: true,
         },
-        enableSorting: false,
-      }),
-      columnHelper.accessor('isParsed', {
-        header: 'isParsed (Dev Only)',
-        cell: (info) => (info.getValue() ? 'true' : 'false'),
         enableSorting: false,
       }),
       columnHelper.accessor('createdAt', {

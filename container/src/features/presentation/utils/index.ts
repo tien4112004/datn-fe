@@ -10,4 +10,3 @@ export {
   getClassicTheme,
   getPresentationThemes,
 } from './themes';
-export { processGeneratedSlides } from './processGeneratedSlides';

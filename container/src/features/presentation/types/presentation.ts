@@ -3,8 +3,7 @@ import type { Slide, SlideTheme } from './slide';
 export interface Presentation {
   id: string;
   title: string;
-  width?: number;
-  height?: number;
+  viewport?: { width: number; height: number };
   theme?: SlideTheme;
   thumbnail?: Slide;
   slides?: Slide[];

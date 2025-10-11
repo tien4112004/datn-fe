@@ -9,18 +9,20 @@ interface OutlineStore {
   outlineIds: string[];
   isStreaming: boolean;
   isGenerating?: boolean;
+  editingId?: string;
   markdownContent: () => string;
   setOutlines: (value: OutlineItem[]) => void;
   startGenerating: () => void;
   startStreaming: () => void;
   endStreaming: () => void;
-  handleOutlineChange?: (id: string, content: string) => void;
+  handleMarkdownChange: (id: string, content: string) => void;
   deleteOutline: (id: string) => void;
   addOutline: (item: OutlineItem) => void;
   getOutline: (id: string) => OutlineItem | undefined;
   swap: (oldId: string, newId: string) => void;
   clearOutline: () => void;
   isEmpty: () => boolean;
+  setEditingId: (id: string) => void;
 }
 
 const useOutlineStore = create<OutlineStore>()(
@@ -43,7 +45,7 @@ const useOutlineStore = create<OutlineStore>()(
         set({ outlines: value });
       },
 
-      handleOutlineChange: (id, content) =>
+      handleMarkdownChange: (id, content) =>
         set((state) => ({
           outlines: state.outlines.map((item) =>
             item.id === id ? { ...item, markdownContent: content } : item
@@ -61,8 +63,12 @@ const useOutlineStore = create<OutlineStore>()(
         const { outlines: content } = get();
         const oldIndex = content.findIndex((item) => item.id === oldId);
         const newIndex = content.findIndex((item) => item.id === newId);
-        set((state) => ({
-          outlines: arrayMove(state.outlines, oldIndex, newIndex),
+
+        const newOutline = arrayMove(content, oldIndex, newIndex);
+
+        set((_) => ({
+          outlines: newOutline,
+          outlineIds: newOutline.map((item) => item.id),
         }));
       },
 
@@ -101,6 +107,8 @@ const useOutlineStore = create<OutlineStore>()(
         const { outlines, outlineIds, isStreaming } = get();
         return outlines.length === 0 && outlineIds.length === 0 && !isStreaming;
       },
+
+      setEditingId: (id) => set(() => ({ editingId: id })),
     }),
     {
       name: 'outline-store',

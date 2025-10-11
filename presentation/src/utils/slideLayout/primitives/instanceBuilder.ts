@@ -1,4 +1,12 @@
-import type { LayoutBlockInstance, LayoutBlockConfig, SlideLayoutBlockConfig, Bounds } from '../types';
+import {
+  type LayoutBlockInstance,
+  type LayoutBlockConfig,
+  type SlideLayoutBlockConfig,
+  type Bounds,
+  fromBorderConfigToInstance,
+  fromShadowConfigToInstance,
+  type SlideLayoutBlockInstance,
+} from '../types';
 import { DEFAULT_WRAP_CONFIG } from './layoutConstants';
 import { calculateWrapLayout, getChildrenMaxBounds } from './positioning';
 
@@ -21,7 +29,7 @@ export function buildChildrenFromChildTemplate(
   templateContainer: LayoutBlockConfig,
   parentBounds: Bounds,
   data: any[]
-): LayoutBlockInstance[] {
+): SlideLayoutBlockInstance[] {
   if (!templateContainer.childTemplate) return [];
 
   const childTemplate = templateContainer.childTemplate;
@@ -45,7 +53,7 @@ export function buildChildrenFromChildTemplate(
   });
 
   // Create instances with calculated bounds, passing corresponding data item
-  const children: LayoutBlockInstance[] = [];
+  const children: SlideLayoutBlockInstance[] = [];
   for (let i = 0; i < count; i++) {
     const itemData = data[i]; // Could be object, string, number, etc.
     const instance = buildInstanceWithBounds(
@@ -77,18 +85,19 @@ export function buildInstanceWithBounds(
   config: SlideLayoutBlockConfig,
   bounds: Bounds,
   data?: any[]
-): LayoutBlockInstance {
+): SlideLayoutBlockInstance {
   // Create base instance with assigned bounds
-  const instance: LayoutBlockInstance = {
+  const instance: SlideLayoutBlockInstance = {
+    ...config,
     type: config.type,
     id: config.id,
     bounds,
     label: config.label,
-    border: config.border,
-    shadow: config.shadow,
+    border: fromBorderConfigToInstance(config.border),
+    shadow: fromShadowConfigToInstance(config.shadow),
     layout: config.layout,
     background: config.background,
-  };
+  } as SlideLayoutBlockInstance;
 
   // Add type-specific properties
   if ('text' in config) {

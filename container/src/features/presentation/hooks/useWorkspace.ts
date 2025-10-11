@@ -91,8 +91,12 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
       slideCount: data.slideCount,
       language: data.language,
 
-      others: {
+      presentation: {
         theme: data.theme,
+        viewport: { width: 1000, height: 562.5 },
+      },
+
+      others: {
         contentLength: data.contentLength,
         imageModel: data.imageModel,
       },

@@ -176,12 +176,12 @@ const CustomizationSection = ({
     [setValue]
   );
 
-  const onContentLengthSelect = useCallback(
-    (length: string) => {
-      setValue('contentLength', length);
-    },
-    [setValue]
-  );
+  //   const onContentLengthSelect = useCallback(
+  //     (length: string) => {
+  //       setValue('contentLength', length);
+  //     },
+  //     [setValue]
+  //   );
 
   return (
     <div className="flex flex-col gap-4">
@@ -190,11 +190,11 @@ const CustomizationSection = ({
       </div>
       <Card className="w-full max-w-3xl">
         <ThemeSection selectedTheme={watch('theme')} onThemeSelect={onThemeSelect} disabled={disabled} />
-        <ContentSection
+        {/* <ContentSection
           selectedContentLength={watch('contentLength')}
           onContentLengthSelect={onContentLengthSelect}
           disabled={disabled}
-        />
+        /> */}
         <CardContent className="flex flex-row items-center gap-2">
           <CardTitle>{t('customization.imageModels.title')}</CardTitle>
           <Controller

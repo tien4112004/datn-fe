@@ -270,7 +270,7 @@ export const mainImageTopTemplate: Template = {
           },
         },
         text: {
-          color: '{{theme.titleFontColor}}',
+          color: '{{theme.themeColors[1]}}',
           fontFamily: '{{theme.titleFontName}}',
           fontWeight: 'normal',
           fontStyle: 'normal',

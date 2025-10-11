@@ -63,7 +63,7 @@ export default class ImageRealApiService implements ImageApiService {
   private _mapImageItem(data: any): ImageData {
     return {
       id: data.id,
-      url: data.url,
+      url: data.url || data.cdnUrl,
       prompt: data.prompt,
       style: data.style,
       size: data.size,
@@ -75,7 +75,7 @@ export default class ImageRealApiService implements ImageApiService {
 
   private _mapImageResponse(data: any): ImageGenerationResponse {
     return {
-      images: data.cdnUrls.map((url: string) => ({ id: crypto.randomUUID(), url })),
+      images: data.images.map((img: any) => this._mapImageItem(img)),
     };
   }
 }

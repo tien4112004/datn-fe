@@ -55,7 +55,7 @@ export const verticalListLayoutTemplate: Template = {
             syncSize: true,
           },
           structure: {
-            type: 'block',
+            type: 'text',
             label: 'item',
             layout: {
               distribution: 'equal',
@@ -69,25 +69,14 @@ export const verticalListLayoutTemplate: Template = {
               color: '{{theme.themeColors[0]}}',
               radius: '{{theme.card.borderRadius}}',
             },
-            children: [
-              {
-                type: 'text',
-                id: 'content',
-                label: 'content',
-                layout: {
-                  horizontalAlignment: 'left',
-                  verticalAlignment: 'center',
-                },
-                text: {
-                  color: '{{theme.fontColor}}',
-                  fontFamily: '{{theme.fontName}}',
-                  fontWeight: 'normal',
-                  fontStyle: 'normal',
-                  textAlign: 'left',
-                  fontSizeRange: { minSize: 15, maxSize: 22 },
-                },
-              },
-            ],
+            text: {
+              color: '{{theme.fontColor}}',
+              fontFamily: '{{theme.fontName}}',
+              fontWeight: 'normal',
+              fontStyle: 'normal',
+              textAlign: 'left',
+              fontSizeRange: { minSize: 15, maxSize: 22 },
+            },
           },
         },
       },
@@ -168,9 +157,9 @@ export const verticalListCardsTemplate: Template = {
         type: 'text',
         bounds: {
           left: 0,
-          top: 15,
+          top: 10,
           width: { expr: 'SLIDE_WIDTH' },
-          height: 100,
+          height: 90,
         },
         layout: {
           horizontalAlignment: 'center',
@@ -506,7 +495,7 @@ export const verticalListNumberedCardsTemplate: Template = {
               color: '{{theme.card.shadow.color}}',
             },
             background: {
-              color: '{{theme.themeColors[0]}}',
+              color: '{{theme.card.backgroundColor}}',
             },
             children: [
               {
@@ -518,9 +507,8 @@ export const verticalListNumberedCardsTemplate: Template = {
                   horizontalAlignment: 'center',
                   verticalAlignment: 'center',
                 },
-
                 text: {
-                  color: '#fff',
+                  color: '{{theme.card.textColor}}',
                   fontFamily: '{{theme.labelFontName}}',
                   fontWeight: 'bold',
                   textAlign: 'center',
@@ -536,7 +524,7 @@ export const verticalListNumberedCardsTemplate: Template = {
                   verticalAlignment: 'center',
                 },
                 text: {
-                  color: '#fff',
+                  color: '{{theme.card.textColor}}',
                   fontFamily: '{{theme.fontName}}',
                   fontWeight: 'normal',
                   textAlign: 'left',

@@ -30,4 +30,9 @@ export const FONTS = [
   { label: 'Barlow', value: 'Barlow' },
   { label: 'Bungee', value: 'Bungee' },
   { label: 'Noto Serif', value: 'Noto Serif' },
+  { label: 'Poppins', value: 'Poppins' },
+  { label: 'Comfortaa', value: 'Comfortaa' },
+  { label: 'Fredoka', value: 'Fredoka' },
+  { label: 'Space Grotesk', value: 'Space Grotesk' },
+  { label: 'DM Sans', value: 'DM Sans' },
 ];

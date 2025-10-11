@@ -53,19 +53,17 @@ const PresentationGrid = () => {
   });
 
   const PresentationCard = ({ presentation }: { presentation: Presentation }) => (
-    <div className="group cursor-pointer">
+    <div className="group w-full cursor-pointer">
       <div
         className="relative aspect-video w-full overflow-hidden rounded-lg bg-gray-100 transition-shadow duration-200 hover:shadow-md"
         onClick={() => navigate(`/presentation/${presentation.id}`)}
       >
-        {presentation.slides && presentation.slides[0] ? (
+        {presentation.thumbnail && typeof presentation.thumbnail === 'object' ? (
           <div className="flex h-full items-center justify-center">
-            <ThumbnailWrapper slide={presentation.slides[0]} size={300} visible={true} />
+            <ThumbnailWrapper slide={presentation.thumbnail} size={'auto'} visible={true} />
           </div>
         ) : (
-          <div className="flex h-full items-center justify-center bg-gray-200 text-gray-500">
-            {t('presentation.noThumbnail', 'No thumbnail')}
-          </div>
+          <img src="/images/placeholder-image.webp" alt="No Thumbnail" className={`aspect-[16/9] w-full`} />
         )}
 
         <div className="absolute right-2 top-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
@@ -134,9 +132,9 @@ const PresentationGrid = () => {
           placeholder={t('presentation.searchPlaceholder', 'Search presentations...')}
           className="w-full rounded-lg border-2 border-slate-200"
         />
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+        <div className="grid auto-rows-fr grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-6">
           {Array.from({ length: 10 }).map((_, index) => (
-            <div key={index} className="animate-pulse">
+            <div key={index} className="w-full animate-pulse">
               <div className="mb-3 aspect-video w-full rounded-lg bg-gray-200" />
               <div className="mb-2 h-4 rounded bg-gray-200" />
               <div className="h-3 w-2/3 rounded bg-gray-200" />

@@ -1,5 +1,4 @@
-import type { LayoutBlockInstance, TextLayoutBlockInstance } from '../types';
-import { getChildrenMaxBounds } from './positioning';
+import type { LayoutBlockInstance } from '../types';
 
 export function getAllDescendantInstances(instance: LayoutBlockInstance): LayoutBlockInstance[] {
   const result: LayoutBlockInstance[] = [];

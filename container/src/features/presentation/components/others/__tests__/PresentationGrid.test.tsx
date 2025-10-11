@@ -30,6 +30,7 @@ describe('PresentationGrid', () => {
       createdAt: '2023-01-01T10:00:00Z',
       updatedAt: '2023-01-02T15:30:00Z',
       slides: [{ id: 'slide1' } as any],
+      thumbnail: { id: 'slide1' } as any,
     },
     {
       id: '2',
@@ -37,6 +38,7 @@ describe('PresentationGrid', () => {
       createdAt: '2023-01-03T09:15:00Z',
       updatedAt: '2023-01-04T14:45:00Z',
       slides: [{ id: 'slide2' } as any],
+      thumbnail: { id: 'slide2' } as any,
     },
     {
       id: '3',
@@ -67,14 +69,14 @@ describe('PresentationGrid', () => {
     expect(screen.getByText('Testing Best Practices')).toBeInTheDocument();
   });
 
-  it('renders ThumbnailWrapper for presentations with slides', () => {
+  it('renders ThumbnailWrapper for presentations with thumbnails', () => {
     renderWithProviders(<PresentationGrid />);
     expect(screen.getAllByTestId('mock-thumbnail-wrapper').length).toBe(2);
   });
 
-  it('shows "No thumbnail" for presentations without slides', () => {
+  it('shows "No Thumbnail" for presentations without thumbnail', () => {
     renderWithProviders(<PresentationGrid />);
-    expect(screen.getByText('No thumbnail')).toBeInTheDocument();
+    expect(screen.getByAltText('No Thumbnail')).toBeInTheDocument();
   });
 
   it('shows search bar and allows typing', () => {

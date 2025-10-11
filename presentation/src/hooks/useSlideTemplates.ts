@@ -128,33 +128,42 @@ export default function useSlideTemplates() {
     }
 
     const theme = {
-      backgroundColor: {
-        type: 'linear',
-        colors: [
-          { color: '#e3f2fd', pos: 0 }, // soft bluish tint
-          { color: '#f5f7fa', pos: 50 }, // very light gray
-          { color: '#ffffff', pos: 100 }, // pure white at top
-        ],
-        rotate: 0,
-      },
-      themeColors: ['#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6'],
-      fontColor: '#333333',
-      fontName: 'Roboto',
+      id: 'modern',
+      name: 'Modern',
+      backgroundColor: '#0f172a',
+      themeColors: ['#06b6d4', '#8b5cf6', '#f59e0b', '#ef4444', '#10b981'],
+      fontColor: '#e2e8f0',
+      fontName: 'Montserrat',
       outline: {
         style: 'solid',
         width: 1,
-        color: '#cccccc',
+        color: '#334155',
       },
       shadow: {
-        h: 2,
-        v: 2,
-        blur: 4,
-        color: 'rgba(0, 0, 0, 0.1)',
+        h: 0,
+        v: 4,
+        blur: 8,
+        color: 'rgba(6, 182, 212, 0.2)',
       },
-      titleFontColor: '#0A2540',
-      titleFontName: 'Roboto',
-      labelFontColor: '#0A2540',
+      titleFontColor: '#06b6d4',
+      titleFontName: 'Montserrat',
+      labelFontColor: '#06b6d4',
       labelFontName: 'Oswald',
+      accentImageShape: 'default',
+      card: {
+        enabled: true,
+        borderRadius: 8,
+        borderWidth: 1,
+        fill: 'semi',
+        shadow: {
+          h: 0,
+          v: 4,
+          blur: 12,
+          color: 'rgba(6, 182, 212, 0.3)',
+        },
+        backgroundColor: '#74a8faff',
+        textColor: '#3d4b5eff',
+      },
     } as SlideTheme;
 
     for (const data of slideData) {

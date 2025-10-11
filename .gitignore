@@ -29,6 +29,8 @@ coverage
 
 *.tsbuildinfo
 
+.pnpm-store
+
 .__mf__temp/
 .env
 .turbo

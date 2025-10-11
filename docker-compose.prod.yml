@@ -1,0 +1,33 @@
+version: "3.8"
+
+services:
+  container:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: container-production
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+    networks:
+      - frontend-network
+
+  # Presentation application
+  presentation:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: presentation-production
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+    networks:
+      - frontend-network
+
+networks:
+  frontend-network:
+    driver: bridge

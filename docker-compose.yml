@@ -1,0 +1,17 @@
+version: "3.8"
+
+services:
+  dev:
+    image: node:20-alpine
+    working_dir: /app
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/container/node_modules
+      - /app/presentation/node_modules
+    ports:
+      - "5173:5173" # Container dev port
+      - "5174:5174" # Presentation dev port
+    command: sh -c "corepack enable && corepack prepare pnpm@10.18.1 --activate && pnpm install && pnpm dev -- --host"
+    environment:
+      - NODE_ENV=development

@@ -5,15 +5,12 @@ import ThumbnailDemoPage from './pages/ThumbnailDemoPage';
 import { Outlet } from 'react-router-dom';
 import { PresentationGenerationProvider } from './contexts/PresentationGenerationContext';
 import { moduleMethodMap } from './components/remote/module';
-import { useEffect } from 'react';
+
+moduleMethodMap['method']().then((mod) => {
+  (mod.default as any).initializeFonts();
+});
 
 const Layout = () => {
-  useEffect(() => {
-    moduleMethodMap['method']().then((mod) => {
-      (mod.default as any).initializeFonts();
-    });
-  }, []);
-
   return (
     <PresentationGenerationProvider>
       <Outlet />

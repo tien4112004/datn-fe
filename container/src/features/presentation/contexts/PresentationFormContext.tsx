@@ -9,7 +9,7 @@ import {
   type UseFormGetValues,
 } from 'react-hook-form';
 import useFormPersist from 'react-hook-form-persist';
-import { moduleMap, moduleMethodMap } from '../components/remote/module';
+import { moduleMap } from '../components/remote/module';
 import type { SlideTheme } from '../types/slide';
 
 export type UnifiedFormData = {
@@ -81,7 +81,6 @@ export const PresentationFormProvider = ({ children }: PresentationFormProviderP
   useEffect(() => {
     moduleMap.editor();
     moduleMap.thumbnail();
-    moduleMethodMap.convertToSlide();
   }, []);
 
   const contextValue: PresentationFormContextValue = {

@@ -46,7 +46,7 @@ const PresentationTable = () => {
               <img
                 src="/images/placeholder-image.webp"
                 alt="No Thumbnail"
-                className={`aspect-[16/9] w-full`}
+                className={`aspect-[16/9] w-[160px]`}
               />
             );
           }

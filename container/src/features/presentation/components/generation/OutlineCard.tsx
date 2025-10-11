@@ -19,6 +19,7 @@ interface OutlineCardProps {
 const OutlineCard = ({ id, title = 'Outline', className = '', onDelete }: OutlineCardProps) => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [displayHtml, setDisplayHtml] = useState('');
+  const [parsedBlocks, setParsedBlocks] = useState<any[] | null>(null);
   const isStreaming = useOutlineStore((state) => state.isStreaming);
 
   const editingId = useOutlineStore((state) => state.editingId);
@@ -45,7 +46,12 @@ const OutlineCard = ({ id, title = 'Outline', className = '', onDelete }: Outlin
 
     const loadContent = async () => {
       try {
+        // Try to parse the markdown with additional checks
         const blocks = await editor.tryParseMarkdownToBlocks(content.markdownContent);
+
+        // Store parsed blocks for HTML generation
+        setParsedBlocks(blocks);
+
         editor.replaceBlocks(editor.document, blocks);
         hasLoadedContentRef.current = true;
       } catch (error) {
@@ -59,31 +65,35 @@ const OutlineCard = ({ id, title = 'Outline', className = '', onDelete }: Outlin
     }
   }, [content?.markdownContent, editor, isStreaming, isEditing]);
 
-  // FLOW 2: Generate HTML from editor blocks for display when not editing
+  // FLOW 2: Generate HTML from parsed blocks for display when not editing
   useEffect(() => {
-    if (isEditing || !editor || !hasLoadedContentRef.current) return;
+    if (isEditing || !editor || !parsedBlocks) return;
 
     const generateHtml = async () => {
       try {
-        const html = await editor.blocksToFullHTML(editor.document);
+        // Generate HTML directly from parsed blocks, not from editor.document
+        const html = await editor.blocksToFullHTML(parsedBlocks);
         setDisplayHtml(html);
       } catch (error) {
         console.error('Failed to generate HTML from editor blocks:', error);
       }
     };
 
-    // Generate HTML when exiting edit mode or when markdown changes (streaming)
+    // Generate HTML when exiting edit mode or when parsed blocks change
     generateHtml();
-  }, [isEditing, editor, content?.markdownContent]);
+  }, [isEditing, editor, parsedBlocks]);
 
-  // FLOW 3: Focus editor when entering edit mode
+  // FLOW 3: Ensure blocks are loaded when entering edit mode
   useEffect(() => {
-    if (isEditing && editor) {
+    if (isEditing && editor && parsedBlocks && parsedBlocks.length > 0) {
+      // Always reload blocks when entering edit mode to ensure they're present
+      editor.replaceBlocks(editor.document, parsedBlocks);
+
       setTimeout(() => {
         editor.focus();
       }, 0);
     }
-  }, [isEditing, editor]);
+  }, [isEditing, editor, parsedBlocks]);
 
   const handleDelete = () => {
     if (!onDelete) return;
@@ -121,7 +131,7 @@ const OutlineCard = ({ id, title = 'Outline', className = '', onDelete }: Outlin
       ref={setNodeRef}
       style={style}
       className={cn(
-        `outline-card border-primary group relative flex min-h-24 w-full cursor-pointer flex-row gap-4 p-0 pr-6 shadow-md transition-shadow duration-300 hover:shadow-lg`,
+        `outline-card border-primary group relative flex w-full cursor-pointer flex-row gap-4 p-0 pr-6 shadow-md transition-shadow duration-300 hover:shadow-lg`,
         isDragging ? 'z-1000 opacity-50' : '',
         isDeleting ? 'scale-0 transition-all' : '',
         isEditing ? 'border-2' : '',
@@ -155,7 +165,7 @@ const OutlineCard = ({ id, title = 'Outline', className = '', onDelete }: Outlin
         <CardTitle>{title}</CardTitle>
       </CardHeader>
 
-      <CardContent className={cn('flex-start flex-1 p-2')}>
+      <CardContent className={cn('flex-1 p-2')}>
         {isEditing ? (
           <RichTextEditor
             data-card
@@ -167,7 +177,12 @@ const OutlineCard = ({ id, title = 'Outline', className = '', onDelete }: Outlin
           />
         ) : (
           <div
-            style={{ letterSpacing: 'var(--tracking-normal)', fontSize: 'inherit', fontFamily: 'inherit' }}
+            style={{
+              letterSpacing: 'var(--tracking-normal)',
+              fontSize: 'inherit',
+              fontFamily: 'inherit',
+              paddingInline: '1px',
+            }}
             dangerouslySetInnerHTML={{ __html: displayHtml }}
             className="break-word -mx-2 cursor-text rounded transition-colors"
             role="button"

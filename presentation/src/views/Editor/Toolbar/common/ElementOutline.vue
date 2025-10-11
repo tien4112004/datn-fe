@@ -40,7 +40,7 @@
       <div class="row">
         <div style="width: 40%">{{ $t('styling.effects.outline.thickness') }}</div>
         <NumberInput
-          :value="outline.width || 0"
+          :value="Number(outline.width) || 0"
           @update:value="(value) => updateOutline({ width: value })"
           style="width: 60%"
         />

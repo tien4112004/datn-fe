@@ -58,28 +58,31 @@
       </FileInput>
     </div>
 
-    <div class="background-gradient-wrapper" v-if="background.type === 'gradient'">
+    <div
+      class="background-gradient-wrapper"
+      v-if="background.type === 'gradient' && background.gradient?.colors"
+    >
       <div class="row">
         <GradientBar
-          :value="background.gradient?.colors || []"
+          :value="background.gradient.colors"
           :index="currentGradientIndex"
           @update:value="(value) => updateGradientBackground({ colors: value })"
           @update:index="(index) => (currentGradientIndex = index)"
         />
       </div>
-      <div class="row">
+      <div class="row" v-if="background.gradient.colors[currentGradientIndex]">
         <div style="width: 40%">{{ $t('styling.slide.design.theme.currentColorBlock') }}</div>
         <Popover trigger="click" style="width: 60%">
           <template #content>
             <ColorPicker
-              :modelValue="background.gradient!.colors[currentGradientIndex].color"
+              :modelValue="background.gradient.colors[currentGradientIndex].color"
               @update:modelValue="(value) => updateGradientBackgroundColors(value)"
             />
           </template>
-          <ColorButton :color="background.gradient!.colors[currentGradientIndex].color" />
+          <ColorButton :color="background.gradient.colors[currentGradientIndex].color" />
         </Popover>
       </div>
-      <div class="row" v-if="background.gradient?.type === 'linear'">
+      <div class="row" v-if="background.gradient.type === 'linear'">
         <div style="width: 40%">{{ $t('styling.slide.design.theme.gradientAngle') }}</div>
         <Slider
           :min="0"
@@ -235,7 +238,7 @@
       <div class="row">
         <div style="width: 40%">{{ $t('styling.slide.design.style.borderWidth') }}</div>
         <NumberInput
-          :value="theme.outline.width || 0"
+          :value="Number(theme.outline.width) || 0"
           @update:value="(value) => updateTheme({ outline: { ...theme.outline, width: value } })"
           style="width: 60%"
         />

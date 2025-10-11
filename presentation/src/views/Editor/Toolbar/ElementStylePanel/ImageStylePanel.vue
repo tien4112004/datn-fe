@@ -47,7 +47,7 @@
     <div class="row">
       <div style="width: 40%">{{ t('styling.elements.image.borderRadius') }}:</div>
       <NumberInput
-        :value="handleImageElement.radius || 0"
+        :value="Number(handleImageElement.radius) || 0"
         @update:value="(value) => updateImage({ radius: value })"
         style="width: 60%"
       />

@@ -19,6 +19,7 @@ interface VueEditorApp {
   addSlide: (data: any, order?: number, theme?: SlideTheme) => Promise<Slide>;
   updateThemeAndViewport: (theme: SlideTheme, viewport: SlideViewport) => void;
   updateImageElement: (slideId: string, elementId: string, image: string) => void;
+  clearSlides: () => void;
 }
 
 interface MessageDetail {
@@ -94,6 +95,11 @@ export const usePresentationDataProcessor = (
     const execute = async () => {
       if (isStreaming) {
         if (app && streamedData.length > processedStreamDataRef.current.length) {
+          // Clear slides before adding new ones if this is the start of a new generation
+          if (processedStreamDataRef.current.length === 0 && streamedData.length > 0) {
+            app.clearSlides();
+          }
+
           const newData = streamedData.slice(processedStreamDataRef.current.length);
           processedStreamDataRef.current = [...processedStreamDataRef.current, ...newData];
 

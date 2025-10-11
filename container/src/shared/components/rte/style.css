@@ -35,6 +35,18 @@
 
 .bn-editor {
   padding: 0;
+  letter-spacing: var(--tracking-normal);
+  font-size: inherit;
+  font-family: inherit;
+}
+
+.bn-editor * {
+  font-family: inherit;
+}
+
+.bn-inline-content {
+  font-size: inherit;
+  font-family: inherit;
 }
 
 .mantine-Badge-root {

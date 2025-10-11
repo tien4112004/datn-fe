@@ -4,27 +4,30 @@ import { Input } from '@ui/input';
 import { Button } from '@ui/button';
 import { useTranslation } from 'react-i18next';
 import { Description } from '@radix-ui/react-dialog';
-import { toast } from 'sonner';
-import type { Presentation } from '@/features/presentation/types';
 
-interface RenameFileDialogProps {
+interface RenameFileDialogProps<TData = { id: string; filename: string; projectType: string } | null> {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  presentation?: Presentation | null;
+  project: TData | null;
+  renameDialogTitle?: string;
+  renameDuplicatedMessage?: string;
+  placeholder?: string;
   onRename?: (id: string, name: string) => Promise<void>;
   isLoading?: boolean;
-  // updatePresentationMutation?: any;
 }
 
 export const RenameFileDialog = ({
   isOpen,
   onOpenChange,
-  presentation,
+  project,
+  renameDialogTitle = 'Rename File',
+  renameDuplicatedMessage = 'A file with this name already exists',
+  placeholder = 'Enter new filename',
   onRename,
   isLoading = false,
 }: RenameFileDialogProps) => {
   const { t } = useTranslation(['presentation', 'glossary']);
-  const currentName = presentation?.title || '';
+  const currentName = project?.filename || '';
   const [filename, setFilename] = React.useState(currentName);
 
   // Reset filename and set focus when dialog opens
@@ -73,15 +76,12 @@ export const RenameFileDialog = ({
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    if (filename.trim() === '' || !presentation || !onRename) return;
+    if (filename.trim() === '' || !project || !onRename) return;
 
     try {
-      await onRename(presentation.id, filename.trim());
+      await onRename(project.id, filename.trim());
       handleOpenChange(false);
-      toast.success(`Presentation renamed to "${filename.trim()}" successfully`);
     } catch (error: unknown) {
-      console.error('Failed to rename presentation:', error); //TODO: remove
-
       // TODO: move to utils
       // Get a user-friendly error message
       let message = 'Unknown error occurred';
@@ -113,14 +113,14 @@ export const RenameFileDialog = ({
       <DialogContent className="fixed left-[50%] top-[50%] z-50 translate-x-[-50%] translate-y-[-50%] sm:max-w-[425px]">
         <Description></Description>
         <DialogHeader>
-          <DialogTitle>{t('list.filenameDialog.title')}</DialogTitle>
+          <DialogTitle>{renameDialogTitle}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Input
               ref={inputRef}
               id="filename"
-              placeholder={t('list.filenameDialog.placeholder')}
+              placeholder={placeholder}
               value={filename}
               onChange={(event) => setFilename(event.target.value)}
               autoComplete="off"
@@ -128,10 +128,7 @@ export const RenameFileDialog = ({
               className={duplicateError ? 'border-red-500' : ''}
             />
             {duplicateError && (
-              <p className="text-sm text-red-500">
-                {errorMessage ||
-                  t('filenameDialog.duplicateError', 'A presentation with this name already exists')}
-              </p>
+              <p className="text-sm text-red-500">{errorMessage || renameDuplicatedMessage}</p>
             )}
           </div>
           <div className="flex justify-end gap-2">

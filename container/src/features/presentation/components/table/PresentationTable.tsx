@@ -62,7 +62,7 @@ const PresentationTable = () => {
         meta: {
           isGrow: true,
         },
-        enableSorting: false,
+        enableSorting: true,
       }),
       columnHelper.accessor('createdAt', {
         header: t('presentation.createdAt'),
@@ -135,7 +135,17 @@ const PresentationTable = () => {
       <RenameFileDialog
         isOpen={isRenameOpen}
         onOpenChange={setIsRenameOpen}
-        presentation={selectedPresentation}
+        project={{
+          id: selectedPresentation?.id || '',
+          filename: selectedPresentation?.title || '',
+          projectType: t('presentation.presentation', 'presentation'),
+        }}
+        renameDialogTitle={t('presentation.renamneFileDialogTitle', 'Rename Presentation')}
+        renameDuplicatedMessage={t(
+          'presentation.renameDuplicatedMessage',
+          'A presentation with this name already exists'
+        )}
+        placeholder={t('presentation.title', 'Title')}
         isLoading={updatePresentationTitle.isPending}
         onRename={async (id: string, newName: string) => {
           await updatePresentationTitle.mutateAsync({ id, name: newName });

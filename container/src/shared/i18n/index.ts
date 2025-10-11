@@ -15,6 +15,7 @@ import viTranslation from './locales/vi';
  * - image: Image generation features
  * - projects: Project management page
  * - settings: Settings page
+ * - mindmaps: Mindmap creation and management
  *
  * Usage:
  * const { t } = useTranslation('namespace');
@@ -40,7 +41,7 @@ i18n
     // Default namespace if none specified
     defaultNS: 'common',
     // Namespaces to load by default
-    ns: ['common', 'glossary', 'errors', 'presentation', 'image', 'projects', 'settings'],
+    ns: ['common', 'glossary', 'errors', 'presentation', 'image', 'projects', 'settings', 'mindmap'],
     interpolation: {
       escapeValue: false,
     },

@@ -7,6 +7,7 @@ import glossary from './glossary';
 import errors from './errors';
 
 import presentation from './presentation';
+import mindmap from './mindmap';
 import image from './image';
 import projects from './projects';
 import settings from './settings';
@@ -17,6 +18,7 @@ export default {
   errors,
 
   presentation,
+  mindmap,
   image,
   projects,
   settings,

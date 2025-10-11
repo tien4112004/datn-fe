@@ -7,6 +7,8 @@ import type { Presentation, OutlineItem, PresentationGenerationRequest } from '.
 import type { ApiResponse } from '@/shared/types/api';
 import { ExpectedError } from '@/types/errors';
 import type { Slide } from '../types/slide';
+import { toast } from 'sonner';
+import { t } from 'i18next';
 
 // Return types for the hooks
 export interface UsePresentationOutlinesReturn extends Omit<UseQueryResult<OutlineItem[]>, 'data'> {
@@ -237,6 +239,12 @@ export const useUpdatePresentationTitle = () => {
       queryClient.invalidateQueries({
         queryKey: [presentationApiService.getType(), 'presentation', data.id],
       });
+
+      toast.success(
+        t('common:table.presentation.renameSuccess', {
+          filename: data.name,
+        })
+      ); // TODO: i18n
     },
     // onError: (error: unknown) => {
     //   console.error('Failed to update presentation title:', error);

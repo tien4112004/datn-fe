@@ -81,7 +81,7 @@ export const PresentationFormProvider = ({ children }: PresentationFormProviderP
   useEffect(() => {
     moduleMap.editor();
     moduleMap.thumbnail();
-    moduleMethodMap.convertToSlide();
+    moduleMethodMap.method();
   }, []);
 
   const contextValue: PresentationFormContextValue = {

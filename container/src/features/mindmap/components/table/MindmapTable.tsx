@@ -20,7 +20,8 @@ import { ActionContent } from '@/features/presentation/components';
 const columnHelper = createColumnHelper<MindmapData>();
 
 const MindmapTable: React.FC = () => {
-  const { t } = useTranslation('mindmap');
+  const { t: tc } = useTranslation('common', { keyPrefix: 'table' });
+  const { t: tm } = useTranslation('mindmap');
   const navigate = useNavigate();
 
   const [isRenameOpen, setIsRenameOpen] = useState(false);
@@ -40,43 +41,43 @@ const MindmapTable: React.FC = () => {
   const columns = useMemo(
     () => [
       columnHelper.accessor('id', {
-        header: 'ID',
-        cell: (info) => info.getValue(),
+        header: tc('presentation.id', 'ID'),
         size: 90,
+        cell: (info) => info.getValue(),
         enableResizing: true,
         enableSorting: false,
       }),
       columnHelper.accessor('title', {
-        header: t('title', 'Title'),
+        header: tc('presentation.title', 'Title'),
         cell: (info) => info.getValue(),
         minSize: 200,
         meta: { isGrow: true },
         enableSorting: true,
       }),
       columnHelper.accessor('nodes', {
-        header: t('nodes', 'Nodes'),
+        header: tc('nodes', 'Nodes'),
         cell: (info) => (info.getValue() ? (info.getValue() as any).length : 0),
         enableSorting: false,
         size: 100,
       }),
       columnHelper.accessor('edges', {
-        header: t('edges', 'Edges'),
+        header: tc('edges', 'Edges'),
         cell: (info) => (info.getValue() ? (info.getValue() as any).length : 0),
         enableSorting: false,
         size: 100,
       }),
       columnHelper.accessor('createdAt', {
-        header: t('createdAt', 'Created At'),
+        header: tc('presentation.createdAt', 'Created At'),
         cell: (info) => formatDate(info.getValue()),
         size: 180,
       }),
       columnHelper.accessor('updatedAt', {
-        header: t('updatedAt', 'Last modified'),
+        header: tc('presentation.updatedAt', 'Last modified'),
         cell: (info) => formatDate(info.getValue()),
         size: 180,
       }),
     ],
-    [t, formatDate]
+    [tc, formatDate]
   );
 
   // Clone data to ensure fresh references for table
@@ -116,9 +117,9 @@ const MindmapTable: React.FC = () => {
     try {
       await updateMindmapTitleMutation.mutateAsync({ id, name: newName });
       setSelectedMindmap((prev) => (prev ? { ...prev, title: newName } : prev));
-      toast.success(t('renameSuccess', 'Renamed successfully'));
+      toast.success(tm('list.renameSuccess', 'Renamed successfully')); // TODO: move to hook, set i18n
     } catch (error) {
-      toast.error(t('renameError', 'Failed to rename mindmap'));
+      toast.error(tc('renameError', 'Failed to rename mindmap'));
       console.error('Failed to rename mindmap:', error);
     }
   };
@@ -128,14 +129,14 @@ const MindmapTable: React.FC = () => {
       <SearchBar
         value={search}
         onChange={handleSearchChange}
-        placeholder={t('searchPlaceholder', 'Search mindmaps...')}
+        placeholder={tm('list.searchBarPlaceholder')}
         className="w-full rounded-lg border-2 border-slate-200"
       />
 
       <DataTable
         table={table}
         isLoading={isLoading}
-        emptyState={<div className="text-muted-foreground">{t('emptyState', 'No mindmaps found')}</div>}
+        emptyState={<div className="text-muted-foreground">{tc('emptyState', 'No mindmaps found')}</div>}
         contextMenu={(row) => (
           <ActionContent
             onViewDetail={() => {
@@ -158,12 +159,12 @@ const MindmapTable: React.FC = () => {
       <RenameFileDialog
         isOpen={isRenameOpen}
         onOpenChange={(o) => setIsRenameOpen(o)}
-        // RenameFileDialog expects a Presentation shape; cast to any to reuse it for mindmaps
         project={{
           id: selectedMindmap?.id || '',
-          title: selectedMindmap?.title || '',
-          projectType: t('mindmap', 'mindmap'),
+          filename: selectedMindmap?.title || '',
+          projectType: tc('mindmap', 'mindmap'),
         }}
+        renameDialogTitle={tm('list.renameFileDialogTitle', 'Rename Mindmap')}
         isLoading={updateMindmapTitleMutation.isPending}
         onRename={handleRename}
       />

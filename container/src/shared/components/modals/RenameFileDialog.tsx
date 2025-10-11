@@ -4,12 +4,12 @@ import { Input } from '@ui/input';
 import { Button } from '@ui/button';
 import { useTranslation } from 'react-i18next';
 import { Description } from '@radix-ui/react-dialog';
-import { toast } from 'sonner';
 
-interface RenameFileDialogProps<TData = { id: string; title: string; projectType: string } | null> {
+interface RenameFileDialogProps<TData = { id: string; filename: string; projectType: string } | null> {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   project: TData | null;
+  renameDialogTitle?: string;
   onRename?: (id: string, name: string) => Promise<void>;
   isLoading?: boolean;
 }
@@ -18,12 +18,12 @@ export const RenameFileDialog = ({
   isOpen,
   onOpenChange,
   project,
+  renameDialogTitle = 'Rename File',
   onRename,
   isLoading = false,
 }: RenameFileDialogProps) => {
   const { t } = useTranslation(['presentation', 'glossary']);
-  // const { t } = useTranslation('presentation', { keyPrefix: 'list' });
-  const currentName = project?.title || '';
+  const currentName = project?.filename || '';
   const [filename, setFilename] = React.useState(currentName);
 
   // Reset filename and set focus when dialog opens
@@ -77,10 +77,7 @@ export const RenameFileDialog = ({
     try {
       await onRename(project.id, filename.trim());
       handleOpenChange(false);
-      toast.success(`${project.projectType} renamed to "${filename.trim()}" successfully`);
     } catch (error: unknown) {
-      console.error(`Failed to rename ${project.projectType}}:`, error); //TODO: remove
-
       // TODO: move to utils
       // Get a user-friendly error message
       let message = 'Unknown error occurred';
@@ -112,7 +109,7 @@ export const RenameFileDialog = ({
       <DialogContent className="fixed left-[50%] top-[50%] z-50 translate-x-[-50%] translate-y-[-50%] sm:max-w-[425px]">
         <Description></Description>
         <DialogHeader>
-          <DialogTitle>{t('list.filenameDialog.title')}</DialogTitle>
+          <DialogTitle>{renameDialogTitle}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">

@@ -137,7 +137,7 @@ const PresentationTable = () => {
         onOpenChange={setIsRenameOpen}
         project={{
           id: selectedPresentation?.id || '',
-          title: selectedPresentation?.title || '',
+          filename: selectedPresentation?.title || '',
           projectType: t('presentation.presentation', 'presentation'),
         }}
         isLoading={updatePresentationTitle.isPending}

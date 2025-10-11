@@ -9,6 +9,7 @@ import glossary from './locales/en/glossary';
 import errors from './locales/en/errors';
 
 import presentation from './locales/en/presentation';
+import mindmap from './locales/en/mindmap';
 import image from './locales/en/image';
 import projects from './locales/en/projects';
 import settings from './locales/en/settings';
@@ -22,6 +23,7 @@ export interface Resources {
   errors: typeof errors;
 
   presentation: typeof presentation;
+  mindmap: typeof mindmap;
   image: typeof image;
   projects: typeof projects;
   settings: typeof settings;

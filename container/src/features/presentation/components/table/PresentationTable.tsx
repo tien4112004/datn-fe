@@ -140,6 +140,12 @@ const PresentationTable = () => {
           filename: selectedPresentation?.title || '',
           projectType: t('presentation.presentation', 'presentation'),
         }}
+        renameDialogTitle={t('presentation.renamneFileDialogTitle', 'Rename Presentation')}
+        renameDuplicatedMessage={t(
+          'presentation.renameDuplicatedMessage',
+          'A presentation with this name already exists'
+        )}
+        placeholder={t('presentation.title', 'Title')}
         isLoading={updatePresentationTitle.isPending}
         onRename={async (id: string, newName: string) => {
           await updatePresentationTitle.mutateAsync({ id, name: newName });

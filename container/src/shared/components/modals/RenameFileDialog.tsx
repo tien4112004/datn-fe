@@ -10,6 +10,8 @@ interface RenameFileDialogProps<TData = { id: string; filename: string; projectT
   onOpenChange: (open: boolean) => void;
   project: TData | null;
   renameDialogTitle?: string;
+  renameDuplicatedMessage?: string;
+  placeholder?: string;
   onRename?: (id: string, name: string) => Promise<void>;
   isLoading?: boolean;
 }
@@ -19,6 +21,8 @@ export const RenameFileDialog = ({
   onOpenChange,
   project,
   renameDialogTitle = 'Rename File',
+  renameDuplicatedMessage = 'A file with this name already exists',
+  placeholder = 'Enter new filename',
   onRename,
   isLoading = false,
 }: RenameFileDialogProps) => {
@@ -116,7 +120,7 @@ export const RenameFileDialog = ({
             <Input
               ref={inputRef}
               id="filename"
-              placeholder={t('list.filenameDialog.placeholder')}
+              placeholder={placeholder}
               value={filename}
               onChange={(event) => setFilename(event.target.value)}
               autoComplete="off"
@@ -124,13 +128,7 @@ export const RenameFileDialog = ({
               className={duplicateError ? 'border-red-500' : ''}
             />
             {duplicateError && (
-              <p className="text-sm text-red-500">
-                {errorMessage ||
-                  t(
-                    'filenameDialog.duplicateError',
-                    `A ${project?.projectType} with this name already exists`
-                  )}
-              </p>
+              <p className="text-sm text-red-500">{errorMessage || renameDuplicatedMessage}</p>
             )}
           </div>
           <div className="flex justify-end gap-2">

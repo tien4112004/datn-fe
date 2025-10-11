@@ -118,7 +118,11 @@ const MindmapTable: React.FC = () => {
     try {
       await updateMindmapTitleMutation.mutateAsync({ id, name: newName });
       setSelectedMindmap((prev) => (prev ? { ...prev, title: newName } : prev));
-      toast.success(t('mindmap.renameSuccess', 'Renamed successfully')); // TODO: move to hook, set i18n
+      toast.success(
+        t('mindmap.renameSuccess', {
+          filename: newName,
+        })
+      ); // TODO: move to hook, set i18n
     } catch (error) {
       toast.error(t('renameError', 'Failed to rename mindmap'));
       console.error('Failed to rename mindmap:', error);
@@ -168,6 +172,11 @@ const MindmapTable: React.FC = () => {
           projectType: t('mindmap', 'mindmap'),
         }}
         renameDialogTitle={t('mindmap.renameFileDialogTitle', 'Rename Mindmap')}
+        renameDuplicatedMessage={t(
+          'mindmap.renameDuplicatedMessage',
+          'A mindmap with this name already exists'
+        )}
+        placeholder={t('mindmap.title', 'Title')}
         isLoading={updateMindmapTitleMutation.isPending}
         onRename={handleRename}
       />

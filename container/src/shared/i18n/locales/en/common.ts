@@ -30,6 +30,9 @@ export default {
       lastModified: 'Last Modified',
       emptyState: 'No presentations found',
       searchPlaceholder: 'Search by title...',
+      renameFileDialogTitle: 'Rename Presentation',
+      renameSuccess: 'Renamed to "{{filename}}" successfully',
+      renameDuplicatedMessage: 'A presentation with this name already exists',
     },
     mindmap: {
       id: 'ID',
@@ -41,7 +44,8 @@ export default {
       emptyState: 'No mindmaps found',
       searchPlaceholder: 'Search by mindmap name...',
       renameFileDialogTitle: 'Rename Mindmap',
-      renameSuccess: 'Renamed successfully',
+      renameSuccess: 'Renamed to "{{filename}}" successfully',
+      renameDuplicatedMessage: 'A mindmap with this name already exists',
     },
     actions: 'Actions',
     pagination: {

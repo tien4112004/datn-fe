@@ -30,6 +30,9 @@ export default {
       lastModified: 'Cập nhật gần nhất',
       emptyState: 'Không có bài trình bày nào được tìm thấy',
       searchPlaceholder: 'Tìm kiếm theo tiêu đề...',
+      renameFileDialogTitle: 'Đổi tên bài trình bày',
+      renameSuccess: 'Đổi tên bài thuyết trình "{{filename}}" thành công',
+      renameDuplicatedMessage: 'Đã tồn tại bài trình bày với tên này',
     },
     mindmap: {
       id: 'Mã',
@@ -41,7 +44,8 @@ export default {
       emptyState: 'Không có bản đồ tư duy nào được tìm thấy',
       searchPlaceholder: 'Tìm kiếm theo tên bản đồ tư duy...',
       renameFileDialogTitle: 'Đổi tên bản đồ tư duy',
-      renameSuccess: 'Đổi tên thành công',
+      renameSuccess: 'Đổi tên bản đồ tư duy "{{filename}}" thành công',
+      renameDuplicatedMessage: 'Đã tồn tại bản đồ tư duy với tên này',
     },
     actions: 'Hành động',
     pagination: {

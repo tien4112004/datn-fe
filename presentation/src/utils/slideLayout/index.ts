@@ -42,7 +42,7 @@
  */
 
 import { selectTemplate } from './converters/templateSelector';
-import type { Slide, SlideTheme } from '@/types/slides';
+import type { PPTImageElement, Slide, SlideTheme } from '@/types/slides';
 import type {
   SlideViewport,
   SlideLayoutSchema,
@@ -57,6 +57,7 @@ import type {
 } from './types';
 import { SLIDE_LAYOUT_TYPE } from './types';
 import { convertLayoutGeneric, resolveTemplate } from './converters';
+import { getImageSize } from '../image';
 
 /**
  * Main entry point: Converts layout schema to a complete slide.
@@ -269,4 +270,42 @@ export const convertToSlide = async (
   } else {
     throw new Error(`Unsupported layout type: ${layoutType}`);
   }
+};
+
+export const updateImageSource = async (
+  element: PPTImageElement,
+  newSrc: string
+): Promise<PPTImageElement> => {
+  const imageOriginalSize = await getImageSize(newSrc);
+  const imageRatio = imageOriginalSize.width / imageOriginalSize.height;
+  const containerRatio = element.width / element.height;
+
+  let finalClip;
+  if (imageRatio > containerRatio) {
+    // Image is wider - clip left/right sides
+    const clipPercent = ((1 - containerRatio / imageRatio) / 2) * 100;
+    finalClip = {
+      shape: 'rect',
+      range: [
+        [clipPercent, 0],
+        [100 - clipPercent, 100],
+      ],
+    };
+  } else {
+    // Image is taller - clip top/bottom
+    const clipPercent = ((1 - imageRatio / containerRatio) / 2) * 100;
+    finalClip = {
+      shape: 'rect',
+      range: [
+        [0, clipPercent],
+        [100, 100 - clipPercent],
+      ],
+    };
+  }
+
+  return {
+    ...element,
+    src: newSrc,
+    clip: finalClip,
+  } as PPTImageElement;
 };

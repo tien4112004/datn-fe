@@ -33,7 +33,7 @@ function useFetchStreamingPresentation(initialRequestData: PresentationGeneratio
       return slides.map((slide, index) => ({
         result: JSON.parse(slide),
         order: index,
-        theme: initialRequestData.others.theme,
+        theme: initialRequestData.presentation.theme,
       }));
     },
     input: initialRequestData,

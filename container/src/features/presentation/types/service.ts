@@ -2,7 +2,7 @@ import type { Service } from '@/shared/api';
 import type { OutlineItem, OutlineData } from './outline';
 import type { Presentation, PresentationCollectionRequest, SlideLayoutSchema } from './presentation';
 import type { ApiResponse } from '@/types/api';
-import type { Slide, SlideTheme } from './slide';
+import type { Slide, SlideTheme, SlideViewport } from './slide';
 
 export interface PresentationGenerationRequest {
   outline: string;
@@ -12,11 +12,14 @@ export interface PresentationGenerationRequest {
   };
   slideCount: number;
   language: string;
+  presentation: {
+    theme: SlideTheme;
+    viewport: SlideViewport;
+  };
 
   // This field is not used in the backend
   others: {
     contentLength: string;
-    theme: SlideTheme;
     imageModel: {
       name: string;
       provider: string;

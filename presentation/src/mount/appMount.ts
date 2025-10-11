@@ -12,7 +12,7 @@ import '@/assets/styles/scope.scss';
 import '@/assets/styles/tailwind.css';
 import i18n from '@/locales';
 import { useSlidesStore } from '@/store';
-import { convertToSlide } from '@/utils/slideLayout';
+import { convertToSlide, updateImageSource } from '@/utils/slideLayout';
 import type { SlideLayoutSchema, SlideViewport } from '@/utils/slideLayout/types';
 import type { PPTImageElement, Slide, SlideTheme } from '@/types/slides';
 
@@ -30,7 +30,7 @@ export function mount(el: string | Element, props: Record<string, unknown>) {
   icon.install(app);
   directive.install(app);
 
-  app.updateImageElement = (slideId: string, elementId: string, image: string) => {
+  app.updateImageElement = async (slideId: string, elementId: string, image: string) => {
     const slidesStore = useSlidesStore();
 
     const slideIndex = slidesStore.slides.findIndex((s) => s.id === slideId);
@@ -43,10 +43,7 @@ export function mount(el: string | Element, props: Record<string, unknown>) {
     const element = slide.elements[elementIndex];
     if (element.type !== 'image') return;
 
-    const updatedElement = {
-      ...element,
-      src: image,
-    };
+    const updatedElement = await updateImageSource(element as PPTImageElement, image);
 
     const updatedElements = [...slide.elements];
     updatedElements[elementIndex] = updatedElement;
@@ -95,12 +92,19 @@ export function mount(el: string | Element, props: Record<string, unknown>) {
 
     const slide = await convertToSlide(data, viewport, themeToUse, order?.toString());
 
-    // Update image
-    const imageUrl = 'https://upload.wikimedia.org/wikipedia/commons/b/b1/Loading_icon.gif';
-    const imageElement = slide.elements.find((el) => el.type === 'image') as PPTImageElement;
+    // Find image element
+    const imageUrl =
+      'https://upload.wikimedia.org/wikipedia/commons/a/ad/YouTube_loading_symbol_3_%28transparent%29.gif';
+    const imageElementIndex = slide.elements.findIndex((el) => el.type === 'image');
 
-    if (imageElement) {
-      imageElement.src = imageUrl;
+    // Create a slide for the store with loading gif
+    const slideForStore = { ...slide };
+    if (imageElementIndex !== -1) {
+      const imageElement = slide.elements[imageElementIndex] as PPTImageElement;
+
+      // Clone elements array and update image src for store
+      slideForStore.elements = [...slide.elements];
+      slideForStore.elements[imageElementIndex] = await updateImageSource(imageElement, imageUrl);
 
       window.dispatchEvent(
         new CustomEvent('app.image.need-generation', {
@@ -113,13 +117,24 @@ export function mount(el: string | Element, props: Record<string, unknown>) {
       );
     }
 
-    // Add new slides to existing ones
+    // Add slide with loading gif to store
     const currentSlides = slidesStore.slides;
-    const updatedSlides = [...currentSlides, slide];
+    const updatedSlides = [...currentSlides, slideForStore];
     slidesStore.setSlides(updatedSlides);
     slidesStore.updateSlideIndex(updatedSlides.length - 1);
 
-    return slide;
+    // Return slide with empty image src
+    const slideToReturn = { ...slide };
+    if (imageElementIndex !== -1) {
+      const imageElement = slide.elements[imageElementIndex] as PPTImageElement;
+      slideToReturn.elements = [...slide.elements];
+      slideToReturn.elements[imageElementIndex] = {
+        ...imageElement,
+        src: '',
+      };
+    }
+
+    return slideToReturn;
   };
 
   app.updateThemeAndViewport = (theme: SlideTheme, viewport: SlideViewport) => {

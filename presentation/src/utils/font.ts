@@ -66,26 +66,34 @@ export async function initializeFonts(): Promise<void> {
 
   FONTS.forEach((font) => {
     const available = testFontRendering(font.value);
-    // console.log(`${font.label}: ${available ? 'AVAILABLE' : 'FALLBACK'}`);
+    console.log(`${font.label}: ${available ? 'AVAILABLE' : 'FALLBACK'}`);
 
     if (!available && font.value !== 'sans-serif') {
       fallbackFonts.push(font.value);
     }
   });
 
-  if (fallbackFonts.length > 0) {
-    // console.log(`Loading ${fallbackFonts.length} Google Fonts...`);
-
-    try {
-      await Promise.all(fallbackFonts.map((font) => loadGoogleFont(font)));
-      //   console.log('Google Fonts loaded successfully');
-
-      FONTS.forEach((font) => {
-        const available = testFontRendering(font.value);
-        // console.log(`${font.label}: ${available ? 'AVAILABLE' : 'STILL_FALLBACK'}`);
-      });
-    } catch (error) {
-      //   console.error('Error loading some Google Fonts:', error);
+  async function retryLoadGoogleFont(font: string, retries = 3): Promise<void> {
+    for (let attempt = 1; attempt <= retries; attempt++) {
+      try {
+        await loadGoogleFont(font);
+        return;
+      } catch (error) {
+        if (attempt === retries) throw error;
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+      }
     }
+  }
+
+  try {
+    await Promise.all(fallbackFonts.map((font) => retryLoadGoogleFont(font, 3)));
+    console.log('Google Fonts loaded successfully');
+
+    FONTS.forEach((font) => {
+      const available = testFontRendering(font.value);
+      console.log(`${font.label}: ${available ? 'AVAILABLE' : 'STILL_FALLBACK'}`);
+    });
+  } catch (error) {
+    console.error('Error loading some Google Fonts:', error);
   }
 }

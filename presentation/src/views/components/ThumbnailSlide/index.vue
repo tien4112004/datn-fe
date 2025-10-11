@@ -1,9 +1,10 @@
 <template>
   <div
     class="thumbnail-slide"
+    ref="thumbnail"
     :style="{
-      width: size + 'px',
-      height: size * viewportRatio + 'px',
+      width: size === 'auto' ? '100%' : size + 'px',
+      height: size === 'auto' ? '100%' : size * viewportRatio + 'px',
     }"
   >
     <div
@@ -28,7 +29,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, provide } from 'vue';
+import { computed, onMounted, provide, ref, watchEffect } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useSlidesStore } from '@/store';
 import type { Slide } from '@/types/slides';
@@ -40,7 +41,7 @@ import ThumbnailElement from './ThumbnailElement.vue';
 const props = withDefaults(
   defineProps<{
     slide: Slide;
-    size: number;
+    size: number | 'auto';
     visible?: boolean;
   }>(),
   {
@@ -53,7 +54,40 @@ const { viewportRatio, viewportSize } = storeToRefs(useSlidesStore());
 const background = computed(() => props.slide.background);
 const { backgroundStyle } = useSlideBackgroundStyle(background);
 
-const scale = computed(() => props.size / viewportSize.value);
+const thumbnail = ref<HTMLElement | null>(null);
+
+const scale = ref(1);
+
+watchEffect(() => {
+  if (props.size !== 'auto') {
+    scale.value = props.size / viewportSize.value;
+  }
+});
+
+onMounted(() => {
+  if (thumbnail.value) {
+    if (props.size === 'auto') {
+      const width = thumbnail.value.offsetWidth;
+      scale.value = width / viewportSize.value;
+    }
+
+    // Watch for resize changes
+    const resizeObserver = new ResizeObserver(() => {
+      if (props.size === 'auto' && thumbnail.value) {
+        const width = thumbnail.value.offsetWidth;
+        scale.value = width / viewportSize.value;
+      }
+    });
+
+    resizeObserver.observe(thumbnail.value);
+
+    // Cleanup on unmount
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }
+});
+
 provide(injectKeySlideScale, scale);
 </script>
 

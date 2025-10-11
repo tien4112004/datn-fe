@@ -1,5 +1,13 @@
 import type { Bounds } from './base';
-import type { BorderConfig, TextStyleConfig, BackgroundConfig, WrapConfig, ShadowConfig } from './styling';
+import type {
+  BorderConfig,
+  TextStyleConfig,
+  BackgroundConfig,
+  WrapConfig,
+  ShadowConfig,
+  BorderInstance,
+  ShadowInstance,
+} from './styling';
 
 /**
  * Distribution strategies for laying out children within a container
@@ -103,8 +111,8 @@ export interface LayoutBlockInstance {
   id?: string;
   bounds: Bounds;
   label?: string;
-  border?: BorderConfig;
-  shadow?: ShadowConfig;
+  border?: BorderInstance;
+  shadow?: ShadowInstance;
   background?: BackgroundConfig;
 
   // Child layout configuration
@@ -122,7 +130,7 @@ export interface ImageLayoutBlockInstance extends LayoutBlockInstance {
 export interface TextLayoutBlockInstance extends LayoutBlockInstance {
   type: 'text';
   background?: BackgroundConfig;
-  text?: TextStyleConfig;
+  text: TextStyleConfig;
 }
 
 export interface NonTextLayoutBlockInstance extends LayoutBlockInstance {

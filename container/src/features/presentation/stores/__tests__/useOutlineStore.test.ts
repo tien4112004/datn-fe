@@ -24,17 +24,14 @@ describe('useOutlineStore', () => {
   const mockOutlineItems: OutlineItem[] = [
     {
       id: '1',
-      htmlContent: '<h1>Title 1</h1>',
       markdownContent: '# Title 1',
     },
     {
       id: '2',
-      htmlContent: '<h2>Subtitle 2</h2>',
       markdownContent: '## Subtitle 2',
     },
     {
       id: '3',
-      htmlContent: '<p>Content 3</p>',
       markdownContent: 'Content 3',
     },
   ];
@@ -129,7 +126,6 @@ describe('useOutlineStore', () => {
       it('should add new outline item', () => {
         const newItem: OutlineItem = {
           id: '4',
-          htmlContent: '<p>New content</p>',
           markdownContent: 'New content',
         };
 
@@ -145,7 +141,6 @@ describe('useOutlineStore', () => {
       it('should maintain existing outline when adding new item', () => {
         const newItem: OutlineItem = {
           id: '4',
-          htmlContent: '<p>New content</p>',
           markdownContent: 'New content',
         };
 
@@ -219,19 +214,18 @@ describe('useOutlineStore', () => {
 
     it('should update markdownContent for specified id', () => {
       const state = useOutlineStore.getState();
-      state.handleOutlineChange?.('2', '## Updated Subtitle');
+      state.handleMarkdownChange?.('2', '## Updated Subtitle');
 
       const updatedState = useOutlineStore.getState();
       const updatedItem = updatedState.outlines.find((item) => item.id === '2');
 
       expect(updatedItem?.markdownContent).toBe('## Updated Subtitle');
-      expect(updatedItem?.htmlContent).toBe('<h2>Subtitle 2</h2>'); // Should remain unchanged
       expect(updatedItem?.id).toBe('2'); // Should remain unchanged
     });
 
     it('should not affect other content items', () => {
       const state = useOutlineStore.getState();
-      state.handleOutlineChange?.('2', '## Updated Subtitle');
+      state.handleMarkdownChange?.('2', '## Updated Subtitle');
 
       const updatedState = useOutlineStore.getState();
       const item1 = updatedState.outlines.find((item) => item.id === '1');
@@ -245,7 +239,7 @@ describe('useOutlineStore', () => {
       const state = useOutlineStore.getState();
       const originalContent = [...state.outlines];
 
-      state.handleOutlineChange?.('non-existent', 'Updated content');
+      state.handleMarkdownChange?.('non-existent', 'Updated content');
 
       const updatedState = useOutlineStore.getState();
       expect(updatedState.outlines).toEqual(originalContent);
@@ -354,7 +348,7 @@ describe('useOutlineStore', () => {
       expect(currentState.outlines).toHaveLength(2);
 
       // Modify content
-      state.handleOutlineChange?.('1', '# Modified Title');
+      state.handleMarkdownChange?.('1', '# Modified Title');
 
       currentState = useOutlineStore.getState();
       expect(currentState.outlines[0].markdownContent).toBe('# Modified Title');
@@ -387,7 +381,6 @@ describe('useOutlineStore', () => {
       // Add content
       const newItem: OutlineItem = {
         id: '4',
-        htmlContent: '<p>New</p>',
         markdownContent: 'New',
       };
       state.addOutline(newItem);

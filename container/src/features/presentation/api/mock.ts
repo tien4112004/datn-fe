@@ -171,7 +171,7 @@ export default class PresentationMockService implements PresentationApiService {
           }
 
           yield chunk + ' ';
-          await new Promise((resolve) => setTimeout(resolve, 50));
+          await new Promise((resolve) => setTimeout(resolve, 10));
         }
       },
     };
@@ -356,67 +356,56 @@ export default class PresentationMockService implements PresentationApiService {
  * Mock slide data for testing
  */
 const mockSlideData: SlideLayoutSchema[] = [
-  {
-    type: 'title',
-    data: {
-      title: 'Presentation with really long title',
-    },
-  },
-  {
+  ...Array(4).fill({
     type: 'title',
     data: {
       title: 'Presentation with really long title',
       subtitle:
         'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
     },
-  },
-  {
+  }),
+  ...Array(4).fill({
+    type: 'title',
+    data: {
+      title: 'Presentation with really long title',
+    },
+  }),
+  ...Array(6).fill({
     type: 'two_column_with_image',
     title: 'Presentation',
     data: {
       items: [
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. ',
-        'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. ',
+        'Item1: Lorem ipsum dolor sit amet, consectetur adipiscing elit. ',
+        'Item2: Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+        'Item3: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. ',
       ],
       image: 'https://placehold.co/600x400',
     },
-  },
-  {
-    type: 'two_column_with_big_image',
-    title: 'Presentation',
+  }),
+  ...Array(4).fill({
+    type: 'two_column',
+    title: 'this is a title',
     data: {
-      items: [
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. ',
-        'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. ',
+      items1: [
+        'Item1-1: Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+        'Item1-2: Lorem ipsum dolor sit amet, adipiscing elit.',
+        'Item1-3: Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
       ],
-      image: 'https://placehold.co/600x400',
+      items2: [
+        'Item2-1: Lorem ipsum dolor sit amet ametamet, consectetur adipiscing elit.',
+        'Item2-2: Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+        'Item2-3: Lorem ipsum dolor sit amet, adipiscing elit.',
+      ],
     },
-  },
-  {
+  }),
+  ...Array(4).fill({
     type: 'main_image',
     data: {
       image: 'https://placehold.co/600x400',
       content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
     },
-  },
-  {
-    type: 'two_column',
-    title: 'this is a title',
-    data: {
-      items1: [
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-      ],
-      items2: [
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-      ],
-    },
-  },
-  {
+  }),
+  ...Array(4).fill({
     type: 'table_of_contents',
     data: {
       items: [
@@ -430,22 +419,23 @@ const mockSlideData: SlideLayoutSchema[] = [
         'Case Study & Q&A',
       ],
     },
-  },
-  {
+  }),
+  ...Array(6).fill({
     type: 'vertical_list',
     title: 'This is a title',
     data: {
       items: [
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-        'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-        'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+        'Item1: Lorem ipsum dolor sit amet, consectetur elit.',
+        'Item2: Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+        'Item3: Lorem ipsum dolor sit amet, consectetur consectetur adipiscing elit.',
+        'Item4: Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+        'Item5: Lorem ipsum dolor sit amet, consectetur consectetur adipiscing elit.',
+        'Item6: Lorem ipsum dolor sit, consectetu  elit.',
+        'Item7: Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
       ],
     },
-  },
-  {
+  }),
+  ...Array(4).fill({
     type: 'horizontal_list',
     title: 'Five Fundamentals of Microservices',
     data: {
@@ -467,12 +457,12 @@ const mockSlideData: SlideLayoutSchema[] = [
           content: 'Automate CI/CD per service for rapid iteration.',
         },
         {
-          label: 'Observe',
+          label: 'Observability',
           content: 'Centralize logs, metrics, and traces for each service.',
         },
       ],
     },
-  },
+  }),
 ];
 
 const mockOutlineOutput = `\`\`\`markdown
@@ -516,22 +506,16 @@ _AI is like having a super-smart friend who never sleeps and always wants to hel
 const mockOutlineItems: OutlineItem[] = [
   {
     id: '1',
-    htmlContent:
-      '<div><h1>Introduction to Web Development</h1><p>This slide covers the basics of web development including HTML, CSS, and JavaScript fundamentals.</p></div>',
     markdownContent: `# Introduction to Web Development\r\n
       This slide covers the basics of web development including HTML, CSS, and JavaScript fundamentals.`,
   },
   {
     id: '2',
-    htmlContent:
-      '<div><h1>Frontend Frameworks</h1><p>Overview of popular frontend frameworks like React, Vue, and Angular with their key features and use cases.</p></div>',
     markdownContent: `# Frontend Frameworks\r\n
       Overview of popular frontend frameworks like React, Vue, and Angular with their key features and use cases.`,
   },
   {
     id: '3',
-    htmlContent:
-      '<div><h1>Backend Technologies</h1><p>Exploring server-side technologies including Node.js, Python, and database management systems.</p></div>',
     markdownContent: `# Backend Technologies\r\n
       Exploring server-side technologies including Node.js, Python, and database management systems.`,
   },

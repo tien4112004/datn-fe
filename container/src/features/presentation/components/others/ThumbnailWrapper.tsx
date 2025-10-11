@@ -3,7 +3,7 @@ import VueRemoteWrapper from '../remote/VueRemoteWrapper';
 
 interface ThumbnailWrapperProps {
   slide: Slide;
-  size: number;
+  size: number | 'auto';
   visible: boolean;
 }
 
@@ -16,7 +16,7 @@ const ThumbnailWrapper = ({ slide, size, visible }: ThumbnailWrapperProps) => {
         size,
         visible,
       }}
-      className="h-auto w-auto"
+      className="h-full w-full"
       LoadingComponent={() => (
         <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-75">
           Loading...

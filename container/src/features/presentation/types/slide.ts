@@ -656,7 +656,7 @@ export interface Slide {
  * fontName: font
  */
 export interface SlideTheme {
-  backgroundColor: string;
+  backgroundColor: string | Gradient;
   themeColors: string[];
   fontColor: string;
   fontName: string;
@@ -664,6 +664,8 @@ export interface SlideTheme {
   shadow: PPTElementShadow;
   titleFontName?: string;
   titleFontColor?: string;
+  labelFontColor?: string;
+  labelFontName?: string;
 
   // Extended properties
   id?: string;
@@ -676,6 +678,8 @@ export interface SlideTheme {
     borderWidth: number;
     fill: 'none' | 'full' | 'semi';
     shadow: PPTElementShadow;
+    backgroundColor: string;
+    textColor: string;
   };
 }
 
@@ -686,6 +690,6 @@ export interface SlideTemplate {
 }
 
 export interface SlideViewport {
-  size: number;
-  ratio: number;
+  width: number;
+  height: number;
 }

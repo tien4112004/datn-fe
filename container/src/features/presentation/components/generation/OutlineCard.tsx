@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui
 import { cn } from '@/shared/lib/utils';
 import { useSortable } from '@dnd-kit/sortable';
 import { Trash } from 'lucide-react';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import useOutlineStore from '@/features/presentation/stores/useOutlineStore';
 import { motion } from 'motion/react';
 
@@ -18,11 +18,17 @@ interface OutlineCardProps {
 
 const OutlineCard = ({ id, title = 'Outline', className = '', onDelete }: OutlineCardProps) => {
   const [isDeleting, setIsDeleting] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
-  const [htmlContent, setHtmlContent] = useState('');
+  const [displayHtml, setDisplayHtml] = useState('');
+  const isStreaming = useOutlineStore((state) => state.isStreaming);
 
-  const handleContentChange = useOutlineStore((state) => state.handleOutlineChange);
+  const editingId = useOutlineStore((state) => state.editingId);
+  const setEditingId = useOutlineStore((state) => state.setEditingId);
+  const handleMarkdownChange = useOutlineStore((state) => state.handleMarkdownChange);
+  const isEditing = editingId === id;
   const content = useOutlineStore((state) => state.outlines.find((item) => item.id === id));
+
+  // Track if we've loaded initial content to prevent re-loading
+  const hasLoadedContentRef = useRef(false);
 
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: `outline-card-${id.toString()}`,
@@ -32,49 +38,52 @@ const OutlineCard = ({ id, title = 'Outline', className = '', onDelete }: Outlin
     trailingBlock: false,
   });
 
-  // Convert markdown to HTML for display
-  const convertMarkdownToHtml = useCallback(
-    async (markdownContent: string) => {
-      if (!markdownContent) {
-        setHtmlContent('');
-        return;
-      }
+  // FLOW 1: Load markdown into editor blocks on mount and when markdown changes (streaming)
+  useEffect(() => {
+    if (!editor || !content?.markdownContent) return;
+    if (isEditing) return; // Don't reload while editing to preserve cursor
 
+    const loadContent = async () => {
       try {
-        const blocks = await editor.tryParseMarkdownToBlocks(markdownContent);
-        const html = await editor.blocksToFullHTML(blocks);
-        setHtmlContent(html);
+        const blocks = await editor.tryParseMarkdownToBlocks(content.markdownContent);
+        editor.replaceBlocks(editor.document, blocks);
+        hasLoadedContentRef.current = true;
       } catch (error) {
-        console.error('Failed to convert markdown to HTML:', error);
-        setHtmlContent('');
+        console.error('Failed to load markdown to editor:', error);
       }
-    },
-    [editor]
-  );
+    };
 
-  // Load initial content into editor (only when editing)
-  const loadInitialHTML = useCallback(async () => {
-    try {
-      const blocks = await editor.tryParseMarkdownToBlocks(content?.markdownContent || '');
-      editor.replaceBlocks(editor.document, blocks);
-    } catch (error) {
-      console.error('Failed to load initial HTML:', error);
+    // Load content initially or when streaming updates markdown
+    if (!hasLoadedContentRef.current || isStreaming) {
+      loadContent();
     }
-  }, [editor, content?.markdownContent]);
+  }, [content?.markdownContent, editor, isStreaming, isEditing]);
 
-  // Convert markdown to HTML when content changes (for display mode)
+  // FLOW 2: Generate HTML from editor blocks for display when not editing
   useEffect(() => {
-    if (!isEditing) {
-      convertMarkdownToHtml(content?.markdownContent || '');
-    }
-  }, [content?.markdownContent, isEditing, convertMarkdownToHtml]);
+    if (isEditing || !editor || !hasLoadedContentRef.current) return;
 
-  // Initialize editor content when entering edit mode
+    const generateHtml = async () => {
+      try {
+        const html = await editor.blocksToFullHTML(editor.document);
+        setDisplayHtml(html);
+      } catch (error) {
+        console.error('Failed to generate HTML from editor blocks:', error);
+      }
+    };
+
+    // Generate HTML when exiting edit mode or when markdown changes (streaming)
+    generateHtml();
+  }, [isEditing, editor, content?.markdownContent]);
+
+  // FLOW 3: Focus editor when entering edit mode
   useEffect(() => {
-    if (isEditing) {
-      loadInitialHTML();
+    if (isEditing && editor) {
+      setTimeout(() => {
+        editor.focus();
+      }, 0);
     }
-  }, [isEditing, loadInitialHTML]);
+  }, [isEditing, editor]);
 
   const handleDelete = () => {
     if (!onDelete) return;
@@ -86,18 +95,22 @@ const OutlineCard = ({ id, title = 'Outline', className = '', onDelete }: Outlin
   };
 
   const handleEditingComplete = () => {
-    setIsEditing(false);
+    setEditingId('');
   };
 
+  // FLOW 4: Save editor blocks as markdown when editing
   const handleEditorChange = useCallback(async () => {
+    if (isStreaming) return; // Don't update during streaming
+
     try {
-      const markdownContent = await editor.blocksToMarkdownLossy(editor.document);
-      handleContentChange?.(id, markdownContent);
+      // Convert editor blocks to markdown and save to store
+      const blocks = editor.document;
+      const markdown = await editor.blocksToMarkdownLossy(blocks);
+      handleMarkdownChange(id, markdown);
     } catch (error) {
       console.error('Failed to convert blocks to markdown:', error);
     }
-  }, [editor, handleContentChange, id]);
-
+  }, [editor, handleMarkdownChange, id, isStreaming]);
   const style = {
     transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
     transition,
@@ -108,12 +121,17 @@ const OutlineCard = ({ id, title = 'Outline', className = '', onDelete }: Outlin
       ref={setNodeRef}
       style={style}
       className={cn(
-        `border-primary group relative flex min-h-24 w-full flex-row gap-4 p-0 pr-6 shadow-md transition-shadow duration-300 hover:shadow-lg`,
+        `outline-card border-primary group relative flex min-h-24 w-full cursor-pointer flex-row gap-4 p-0 pr-6 shadow-md transition-shadow duration-300 hover:shadow-lg`,
         isDragging ? 'z-1000 opacity-50' : '',
         isDeleting ? 'scale-0 transition-all' : '',
         isEditing ? 'border-2' : '',
+        isStreaming ? 'pointer-events-none select-none opacity-80' : '',
         className
       )}
+      onClick={() => {
+        setEditingId(id);
+      }}
+      onBlur={handleEditingComplete}
     >
       {onDelete && (
         <Button
@@ -149,15 +167,15 @@ const OutlineCard = ({ id, title = 'Outline', className = '', onDelete }: Outlin
           />
         ) : (
           <div
-            dangerouslySetInnerHTML={{ __html: htmlContent }}
-            onClick={() => setIsEditing(true)}
-            className="-mx-2 cursor-text rounded transition-colors"
+            style={{ letterSpacing: 'var(--tracking-normal)', fontSize: 'inherit', fontFamily: 'inherit' }}
+            dangerouslySetInnerHTML={{ __html: displayHtml }}
+            className="break-word -mx-2 cursor-text rounded transition-colors"
             role="button"
             tabIndex={0}
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
-                setIsEditing(true);
+                setEditingId(id);
               }
             }}
           />

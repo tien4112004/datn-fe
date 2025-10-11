@@ -140,6 +140,11 @@ export function selectTemplate(layoutType: string, seed?: string): Template {
   const rng = seed ? seedrandom(seed) : Math.random;
   const randomIndex = Math.floor(rng() * templates.length);
 
+  // Log selected template for debugging
+  console.log(
+    `Selected template for layout type "${layoutType}" with seed "${seed}": ${templates[randomIndex].id}`
+  );
+
   return templates[randomIndex];
 }
 

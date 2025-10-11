@@ -169,8 +169,11 @@ body:not(.canvas) body:not(.viewport-wrapper) body:not(.presenter-view) body:not
   @import './preflight.css';
 
   * {
-    font-family: --theme(--default-font-family, ui-sans-serif, system-ui, sans-serif);
     border-color: var(--border);
+  }
+
+  body {
+    font-family: --theme(--default-font-family, ui-sans-serif, system-ui, sans-serif);
   }
 
   *::-webkit-scrollbar {

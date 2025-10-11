@@ -208,18 +208,20 @@ export function createTextPPTElement(content: HTMLElement, block: TextLayoutBloc
 
   const position = layoutItemsInBlock([dimensions], block)[0];
 
+  const textConfig = block.text || {};
+
   return {
     id: crypto.randomUUID(),
     type: 'text',
     content: content.outerHTML,
-    defaultFontName: block.text?.fontFamily || 'Arial',
-    defaultColor: block.text?.color || '#000000',
+    defaultFontName: textConfig.fontFamily,
+    defaultColor: textConfig.color,
     left: block.bounds.left,
     top: position.top,
     width: block.bounds.width,
     height: block.bounds.height,
     textType: 'title',
-    lineHeight: block.text?.lineHeight,
+    lineHeight: textConfig.lineHeight,
   } as PPTTextElement;
 }
 

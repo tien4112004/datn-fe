@@ -104,7 +104,19 @@ const OutlineCard = ({ id, title = 'Outline', className = '', onDelete }: Outlin
     }, 300);
   };
 
-  const handleEditingComplete = () => {
+  const handleEditingComplete = async () => {
+    // Save any pending changes and update parsedBlocks before exiting edit mode
+    if (editor && isEditing) {
+      try {
+        // Get current editor state
+        const blocks = editor.document;
+
+        // Update parsedBlocks immediately for HTML generation
+        setParsedBlocks(blocks);
+      } catch (error) {
+        console.error('Failed to save changes on exit:', error);
+      }
+    }
     setEditingId('');
   };
 

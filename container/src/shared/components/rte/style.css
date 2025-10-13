@@ -47,8 +47,14 @@
 .bn-inline-content {
   font-size: inherit;
   font-family: inherit;
+  min-height: 1.5em;
 }
 
 .mantine-Badge-root {
   color: var(--muted-foreground) !important;
+}
+
+[data-content-type='heading'] {
+  font-size: 1.5em !important;
+  font-weight: bold;
 }

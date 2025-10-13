@@ -8,8 +8,10 @@ import {
   buildTitle,
   buildText,
   buildImageElement,
+  buildCombinedList,
 } from '../primitives/layoutProbuild';
 import { cloneDeepWith, template } from 'lodash';
+import { collectDescendantTextsByLabel } from '../primitives/layoutUtils';
 
 /**
  * Normalized data structure for all layout types.
@@ -71,11 +73,46 @@ export async function convertLayoutGeneric<T = any>(
   if (mappedData.blocks) {
     for (const [containerId, labelData] of Object.entries(mappedData.blocks)) {
       const container = resolvedContainers[containerId];
-      if (!container || container.type !== 'block') {
+      if (!container) {
         continue;
       }
 
       const zIndex = container.zIndex ?? 0;
+
+      // Check if this is a text container with combined enabled
+      if (container.type === 'text' && container.combined?.enabled) {
+        const pattern = container.combined.pattern;
+
+        const textsByLabel = collectDescendantTextsByLabel(labelData);
+
+        const listContents = textsByLabel.map((item) => {
+          let formatted = pattern;
+
+          // Replace all placeholders in the pattern with values from item
+          for (const [key, value] of Object.entries(item)) {
+            const placeholder = `{${key}}`;
+            formatted = formatted.replace(new RegExp(placeholder.replace(/[{}]/g, '\\$&'), 'g'), value || '');
+          }
+
+          return formatted;
+        });
+
+        // Build combined list with unified font sizing
+        const textElements = buildCombinedList(listContents, container);
+        allElements.push(...textElements.map((element) => ({ element, zIndex })));
+
+        // Extract border/shadow if present
+        if (container.border || container.shadow) {
+          const textInstance = {
+            ...container,
+            bounds: container.bounds,
+          } as TextLayoutBlockInstance;
+          const cards = buildCards(textInstance);
+          allCards.push(...cards.map((element) => ({ element, zIndex })));
+        }
+
+        continue; // Skip normal block processing
+      }
 
       // Build layout with unified font sizing
       const { instance, elements } = buildLayoutWithUnifiedFontSizing(container, container.bounds, labelData);

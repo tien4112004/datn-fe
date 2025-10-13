@@ -19,7 +19,7 @@ import {
   calculateUnifiedFontSizeForLabels,
   layoutItemsInBlock,
 } from '.';
-import { createHtmlElement, createTextPPTElement } from './elementCreators';
+import { createHtmlElement, createTextPPTElement, createListElements } from './elementCreators';
 import {
   DEFAULT_MIN_FONT_SIZE,
   DEFAULT_LABEL_TO_VALUE_RATIO,
@@ -91,6 +91,29 @@ export function buildText(content: string, config: TemplateContainerConfig): PPT
   );
 
   return [textElement];
+}
+
+/**
+ * Builds a combined list element with unified font sizing.
+ * Creates ProseMirror-compatible <ul><li><p> structure.
+ *
+ * @param contents - Array of HTML content strings for each list item
+ * @param config - Container configuration
+ * @returns Array containing single list element
+ */
+export function buildCombinedList(contents: string[], config: TemplateContainerConfig): PPTElement[] {
+  const textInstance = {
+    ...config,
+    bounds: config.bounds,
+  } as TextLayoutBlockInstance;
+
+  const listElement = createListElements(
+    contents,
+    textInstance,
+    textInstance.text?.fontSizeRange || FONT_SIZE_RANGE_CONTENT
+  );
+
+  return [listElement];
 }
 
 /**

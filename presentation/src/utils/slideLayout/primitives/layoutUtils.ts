@@ -40,3 +40,33 @@ export function recursivelyGetAllLabelInstances(
 
   return labels;
 }
+
+/**
+ * Collects descendant texts by label into structured items.
+ * Works with any label names (e.g., 'label', 'content', 'item', 'title', etc.)
+ *
+ * @param data - Record mapping label names to arrays of values
+ * @returns Array of objects where each object has keys matching label names
+ *
+ * @example
+ * collectDescendantTextsByLabel({
+ *   label: ['Q1', 'Q2'],
+ *   content: ['Data 1', 'Data 2']
+ * })
+ * // Returns: [{ label: 'Q1', content: 'Data 1' }, { label: 'Q2', content: 'Data 2' }]
+ */
+export function collectDescendantTextsByLabel(data: Record<string, string[]>): Array<Record<string, string>> {
+  const maxLength = Math.max(...Object.values(data).map((arr) => arr.length));
+
+  return Array.from({ length: maxLength }, (_, i) => {
+    const result: Record<string, string> = {};
+
+    for (const [labelKey, values] of Object.entries(data)) {
+      if (values[i] !== undefined) {
+        result[labelKey] = values[i];
+      }
+    }
+
+    return result;
+  });
+}

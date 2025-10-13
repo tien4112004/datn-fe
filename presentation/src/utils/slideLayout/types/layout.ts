@@ -89,6 +89,10 @@ export interface TextLayoutBlockConfig extends LayoutBlockConfig {
   background?: BackgroundConfig;
   text?: TextStyleConfig;
   numbering?: boolean; // Auto-generate sequential numbers as content
+  combined?: {
+    enabled: boolean; // Whether to combine multiple text items into one
+    pattern: string; // Pattern to combine multiple text items into one (e.g., "{0}. {1}")
+  };
 }
 
 export interface NonTextLayoutBlockConfig extends LayoutBlockConfig {
@@ -131,6 +135,10 @@ export interface TextLayoutBlockInstance extends LayoutBlockInstance {
   type: 'text';
   background?: BackgroundConfig;
   text: TextStyleConfig;
+  combined?: {
+    enabled: boolean; // Whether to combine multiple text items into one
+    pattern: string; // Pattern to combine multiple text items into one (e.g., "{0}. {1}")
+  };
 }
 
 export interface NonTextLayoutBlockInstance extends LayoutBlockInstance {

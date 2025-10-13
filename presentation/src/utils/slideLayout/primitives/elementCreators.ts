@@ -74,14 +74,70 @@ export function createTextElement(
     top: position.top,
     width: dimensions.width,
     height: dimensions.height,
-    outline: container.border
-      ? {
-          color: container.border.color,
-          width: container.border.width,
-          borderRadius: `${container.border.radius || 0}`,
-        }
-      : undefined,
     shadow: container.shadow,
+  } as PPTTextElement;
+}
+
+/**
+ * Creates a PPT combined text element with unified font sizing across all items.
+ * Pattern defines the structure, this function handles measurement and sizing.
+ *
+ * @param contents - Array of HTML content for each item (already formatted with pattern)
+ * @param container - Container with bounds and styling
+ * @param fontSizeRange - Optional font size constraints
+ * @returns PPT text element with optimized font sizing
+ */
+export function createListElements(
+  contents: string[],
+  container: TextLayoutBlockInstance,
+  fontSizeRange?: FontSizeRange
+): PPTTextElement {
+  // Create HTML elements for each content item
+  const htmlElements = contents.map((content) => createHtmlElement(content, 32, container.text || {}));
+
+  // Calculate optimal font size that fits all items
+  const listFontSize = htmlElements.map((el) =>
+    calculateLargestOptimalFontSize(el, container, fontSizeRange)
+  );
+  const optimalFontSize = Math.min(...listFontSize);
+
+  // Apply unified font size to all elements
+  htmlElements.forEach((el) => {
+    applyFontSizeToElement(el, optimalFontSize, container.text?.lineHeight || 1.4);
+    el.style.marginBottom = '25px'; // Paragraph spacing
+  });
+
+  // Create wrapper ol with proper font size
+  const ol = document.createElement('ol');
+  ol.style.fontSize = `${optimalFontSize}px`;
+  ol.style.fontFamily = container.text.fontFamily || '';
+  ol.append(
+    ...htmlElements.map((html) => {
+      const li = document.createElement('li');
+
+      li.appendChild(html);
+      return li;
+    })
+  );
+
+  // Measure the complete container
+  const dimensions = measureElement(ol, container);
+
+  // Calculate positioning within the container
+  const position = layoutItemsInBlock([dimensions], container)[0];
+
+  return {
+    id: crypto.randomUUID(),
+    type: 'text',
+    content: ol.outerHTML,
+    defaultFontName: container.text.fontFamily || 'Arial',
+    defaultColor: container.text.color || '#000000',
+    left: position.left + 10, // Padding left
+    top: position.top - 25, // Reduce an amount of paragraph space
+    width: container.bounds.width - 20,
+    height: container.bounds.height,
+    shadow: container.shadow,
+    paragraphSpace: 25,
   } as PPTTextElement;
 }
 
@@ -210,6 +266,7 @@ export function createCard(container: LayoutBlockInstance): PPTShapeElement {
     outline: container.border
       ? {
           color: container.border.color,
+          width: container.border.width,
           borderRadius: `${container.border.radius || 0}`,
         }
       : undefined,
@@ -284,7 +341,6 @@ const fontWeightMap: Record<string, string> = {
  */
 export function createHtmlElement(content: string, fontSize: number, config: TextStyleConfig): HTMLElement {
   const p = document.createElement('p');
-  const span = document.createElement('span');
 
   // Apply paragraph styling with defaults
   const lineHeight = config.lineHeight ?? 1.4;
@@ -298,17 +354,16 @@ export function createHtmlElement(content: string, fontSize: number, config: Tex
 
   // Apply span styling
   const fontWeightValue = config.fontWeight || 'normal';
-  span.style.fontWeight = fontWeightMap[fontWeightValue.toString()] || fontWeightValue.toString();
+  p.style.fontWeight = fontWeightMap[fontWeightValue.toString()] || fontWeightValue.toString();
 
   if (config.fontStyle) {
-    span.style.fontStyle = config.fontStyle;
+    p.style.fontStyle = config.fontStyle;
   }
 
   if (config.color) {
-    span.style.color = config.color;
+    p.style.color = config.color;
   }
-  span.innerHTML = content;
+  p.innerHTML = content;
 
-  p.appendChild(span);
   return p;
 }

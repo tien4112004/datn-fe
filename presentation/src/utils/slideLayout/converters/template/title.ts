@@ -264,9 +264,3 @@ export const titleRightAlignTemplate: Template = {
     },
   },
 };
-
-export const transitionLayoutTemplate: Template = {
-  id: 'transition',
-  name: 'Transition',
-  config: titleLayoutTemplate.config,
-};

@@ -49,10 +49,9 @@ import type {
   TwoColumnWithImageLayoutSchema,
   MainImageLayoutSchema,
   TitleLayoutSchema,
-  TransitionLayoutSchema,
   TwoColumnLayoutSchema,
-  VerticalListLayoutSchema,
-  HorizontalListLayoutSchema,
+  ListLayoutSchema,
+  LabeledListLayoutSchema,
   TableOfContentsLayoutSchema,
 } from './types';
 import { SLIDE_LAYOUT_TYPE } from './types';
@@ -179,7 +178,7 @@ export const convertToSlide = async (
       },
       slideId
     );
-  } else if (layoutType === SLIDE_LAYOUT_TYPE.VERTICAL_LIST) {
+  } else if (layoutType === SLIDE_LAYOUT_TYPE.LIST) {
     const selectedTemplate = selectTemplate(layoutType, seed);
     const template = resolveTemplate(selectedTemplate.config, theme, viewport);
 
@@ -192,7 +191,7 @@ export const convertToSlide = async (
       );
 
     return convertLayoutGeneric(
-      data as VerticalListLayoutSchema,
+      data as ListLayoutSchema,
       template,
       (d) => {
         // For numbered templates: split into label (numbers) and content (text)
@@ -213,7 +212,7 @@ export const convertToSlide = async (
       },
       slideId
     );
-  } else if (layoutType === SLIDE_LAYOUT_TYPE.HORIZONTAL_LIST) {
+  } else if (layoutType === SLIDE_LAYOUT_TYPE.LABELED_LIST) {
     const selectedTemplate = selectTemplate(layoutType, seed);
     const template = resolveTemplate(selectedTemplate.config, theme, viewport);
 
@@ -226,7 +225,7 @@ export const convertToSlide = async (
       );
 
     return convertLayoutGeneric(
-      data as HorizontalListLayoutSchema,
+      data as LabeledListLayoutSchema,
       template,
       (d) => ({
         texts: { title: d.title },
@@ -236,25 +235,6 @@ export const convertToSlide = async (
               ? d.data.items.map((_, index) => String(index + 1).padStart(2, '0'))
               : d.data.items.map((item: { label: string; content: string }) => item.label),
             content: d.data.items.map((item: { label: string; content: string }) => item.content),
-          },
-        },
-      }),
-      slideId
-    );
-  } else if (layoutType === SLIDE_LAYOUT_TYPE.TRANSITION) {
-    const selectedTemplate = selectTemplate(layoutType, seed);
-    const template = resolveTemplate(selectedTemplate.config, theme, viewport);
-
-    return convertLayoutGeneric(
-      data as TransitionLayoutSchema,
-      template,
-      (d) => ({
-        texts: {
-          title: d.data.title,
-        },
-        blocks: {
-          content: {
-            subtitle: d.data.subtitle ? [d.data.subtitle] : [],
           },
         },
       }),

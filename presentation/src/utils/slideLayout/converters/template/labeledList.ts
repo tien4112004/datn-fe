@@ -1,6 +1,6 @@
 import type { Template } from '../../types';
 
-export const horizontalListLayoutTemplate: Template = {
+export const labeledListLayoutTemplate: Template = {
   id: 'horizontal-list-default',
   name: 'Horizontal List - Default',
   config: {
@@ -102,7 +102,7 @@ export const horizontalListLayoutTemplate: Template = {
 };
 
 // Variation: Horizontal List - Grid (2x2, 2x3 layout)
-export const horizontalListGridTemplate: Template = {
+export const labeledListGridTemplate: Template = {
   id: 'horizontal-list-grid',
   name: 'Horizontal List - Grid',
   config: {
@@ -209,7 +209,7 @@ export const horizontalListGridTemplate: Template = {
 };
 
 // Variation: Horizontal List - Single Row (no wrapping)
-export const horizontalListSingleRowTemplate: Template = {
+export const labeledListSingleRowTemplate: Template = {
   id: 'horizontal-list-single-row',
   name: 'Horizontal List - Single Row',
   config: {
@@ -302,7 +302,7 @@ export const horizontalListSingleRowTemplate: Template = {
 };
 
 // Variation: Horizontal List - Numbered (auto-generated sequential labels)
-export const horizontalListNumberedTemplate: Template = {
+export const labeledListNumberedTemplate: Template = {
   id: 'horizontal-list-numbered',
   name: 'Horizontal List - Numbered',
   config: {

@@ -108,8 +108,8 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
       return;
     }
 
-    clearOutline();
-    setValue('topic', '');
+    // clearOutline();
+    // setValue('topic', '');
 
     // Navigate to the detail page
     navigate(`/presentation/${result.presentationId}?isGenerating=true`, { replace: true });

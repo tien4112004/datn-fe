@@ -1,6 +1,6 @@
 import type { Template } from '../../types';
 
-export const verticalListLayoutTemplate: Template = {
+export const listLayoutTemplate: Template = {
   id: 'vertical-list-default',
   name: 'Vertical List - Default',
   config: {
@@ -85,7 +85,7 @@ export const verticalListLayoutTemplate: Template = {
 };
 
 // Variation: Vertical List - Compact (no borders, tighter spacing)
-export const verticalListCompactTemplate: Template = {
+export const listCompactTemplate: Template = {
   id: 'vertical-list-compact',
   name: 'Vertical List - Compact',
   config: {
@@ -148,7 +148,7 @@ export const verticalListCompactTemplate: Template = {
 };
 
 // Variation: Vertical List - Cards (larger borders, shadow effect)
-export const verticalListCardsTemplate: Template = {
+export const listCardsTemplate: Template = {
   id: 'vertical-list-cards',
   name: 'Vertical List - Cards',
   config: {
@@ -228,7 +228,7 @@ export const verticalListCardsTemplate: Template = {
 };
 
 // Variation: Vertical List - Numbered (with auto-numbered labels)
-export const verticalListNumberedTemplate: Template = {
+export const listNumberedTemplate: Template = {
   id: 'vertical-list-numbered',
   name: 'Vertical List - Numbered',
   config: {
@@ -323,7 +323,7 @@ export const verticalListNumberedTemplate: Template = {
 };
 
 // Variation: Vertical List - Numbered Compact
-export const verticalListNumberedCompactTemplate: Template = {
+export const listNumberedCompactTemplate: Template = {
   id: 'vertical-list-numbered-compact',
   name: 'Vertical List - Numbered Compact',
   config: {
@@ -422,7 +422,7 @@ export const verticalListNumberedCompactTemplate: Template = {
 };
 
 // Variation: Vertical List - Numbered Cards (with shadow)
-export const verticalListNumberedCardsTemplate: Template = {
+export const listNumberedCardsTemplate: Template = {
   id: 'vertical-list-numbered-cards',
   name: 'Vertical List - Numbered Cards',
   config: {

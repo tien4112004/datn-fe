@@ -1,5 +1,5 @@
-export * from './horizontalList';
-export * from './verticalList';
+export * from './labeledList';
+export * from './list';
 export * from './twoColumn';
 export * from './title';
 export * from './twoColumnWithImage';

@@ -32,7 +32,7 @@ export interface TwoColumnLayoutSchema {
   };
 }
 
-export interface VerticalListLayoutSchema {
+export interface ListLayoutSchema {
   type: string;
   title: string;
   data: {
@@ -40,7 +40,7 @@ export interface VerticalListLayoutSchema {
   };
 }
 
-export interface HorizontalListLayoutSchema {
+export interface LabeledListLayoutSchema {
   type: string;
   title: string;
   data: {
@@ -48,14 +48,6 @@ export interface HorizontalListLayoutSchema {
       label: string;
       content: string;
     }[];
-  };
-}
-
-export interface TransitionLayoutSchema {
-  type: string;
-  data: {
-    title: string;
-    subtitle: string;
   };
 }
 
@@ -71,9 +63,8 @@ export const SLIDE_LAYOUT_TYPE = {
   MAIN_IMAGE: 'main_image',
   TITLE: 'title',
   TWO_COLUMN: 'two_column',
-  VERTICAL_LIST: 'vertical_list',
-  HORIZONTAL_LIST: 'horizontal_list',
-  TRANSITION: 'transition',
+  LIST: 'vertical_list',
+  LABELED_LIST: 'horizontal_list',
   TABLE_OF_CONTENTS: 'table_of_contents',
 } as const;
 
@@ -86,7 +77,6 @@ export type SlideLayoutSchema =
   | MainImageLayoutSchema
   | TitleLayoutSchema
   | TwoColumnLayoutSchema
-  | VerticalListLayoutSchema
-  | HorizontalListLayoutSchema
-  | TransitionLayoutSchema
+  | ListLayoutSchema
+  | LabeledListLayoutSchema
   | TableOfContentsLayoutSchema;

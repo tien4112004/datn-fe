@@ -105,8 +105,8 @@ const slideTemplates: Record<string, any[]> = {
       ],
     },
   }),
-  'vertical-list': Array(8).fill({
-    type: 'vertical_list',
+  list: Array(6).fill({
+    type: 'list',
     title: 'This is a title',
     data: {
       items: [
@@ -120,8 +120,8 @@ const slideTemplates: Record<string, any[]> = {
       ],
     },
   }),
-  'horizontal-list': Array(6).fill({
-    type: 'horizontal_list',
+  'labeled-list': Array(4).fill({
+    type: 'labeled_list',
     title: 'Five Fundamentals of Microservices',
     data: {
       items: [

@@ -1,15 +1,13 @@
 import seedrandom from 'seedrandom';
 import type { Template } from '../types';
 import {
-  verticalListLayoutTemplate,
-  verticalListCompactTemplate,
-  verticalListCardsTemplate,
-  verticalListNumberedTemplate,
-  verticalListNumberedCompactTemplate,
-  verticalListNumberedCardsTemplate,
-  verticalListContainerBorderTemplate,
-  verticalListContainerBorderNumberedTemplate,
-} from './template/verticalList';
+  listLayoutTemplate,
+  listCompactTemplate,
+  listCardsTemplate,
+  listNumberedTemplate,
+  listNumberedCompactTemplate,
+  listNumberedCardsTemplate,
+} from './template/list';
 import {
   twoColumnWithImageLayoutTemplate,
   twoColumnLeftBigImageTemplate,
@@ -31,16 +29,13 @@ import {
   twoColumnBorderedItemsCompactTemplate,
 } from './template/twoColumn';
 import {
-  horizontalListLayoutTemplate,
-  horizontalListGridTemplate,
-  horizontalListSingleRowTemplate,
-  horizontalListNumberedTemplate,
-  horizontalListContainerBorderTemplate,
-  horizontalListNoBorderTemplate,
-} from './template/horizontalList';
+  labeledListLayoutTemplate,
+  labeledListGridTemplate,
+  labeledListSingleRowTemplate,
+  labeledListNumberedTemplate,
+} from './template/labeledList';
 import {
   titleLayoutTemplate,
-  transitionLayoutTemplate,
   titleTopTemplate,
   titleLeftAlignTemplate,
   titleRightAlignTemplate,
@@ -73,15 +68,13 @@ const cycleIndexes: Record<string, number> = {};
  * Template variations for each layout type
  */
 const TEMPLATE_VARIATIONS: Record<string, Template[]> = {
-  [SLIDE_LAYOUT_TYPE.VERTICAL_LIST]: [
-    verticalListLayoutTemplate,
-    verticalListCompactTemplate,
-    verticalListCardsTemplate,
-    verticalListNumberedTemplate,
-    verticalListNumberedCompactTemplate,
-    verticalListNumberedCardsTemplate,
-    verticalListContainerBorderTemplate,
-    verticalListContainerBorderNumberedTemplate,
+  [SLIDE_LAYOUT_TYPE.LIST]: [
+    listLayoutTemplate,
+    listCompactTemplate,
+    listCardsTemplate,
+    listNumberedTemplate,
+    listNumberedCompactTemplate,
+    listNumberedCardsTemplate,
   ],
   [SLIDE_LAYOUT_TYPE.TWO_COLUMN_WITH_IMAGE]: [
     twoColumnWithImageLayoutTemplate,
@@ -103,13 +96,11 @@ const TEMPLATE_VARIATIONS: Record<string, Template[]> = {
     twoColumnBorderedItemsShadowTemplate,
     twoColumnBorderedItemsCompactTemplate,
   ],
-  [SLIDE_LAYOUT_TYPE.HORIZONTAL_LIST]: [
-    horizontalListLayoutTemplate,
-    horizontalListGridTemplate,
-    horizontalListSingleRowTemplate,
-    horizontalListNumberedTemplate,
-    horizontalListContainerBorderTemplate,
-    horizontalListNoBorderTemplate,
+  [SLIDE_LAYOUT_TYPE.LABELED_LIST]: [
+    labeledListLayoutTemplate,
+    labeledListGridTemplate,
+    labeledListSingleRowTemplate,
+    labeledListNumberedTemplate,
   ],
   [SLIDE_LAYOUT_TYPE.TITLE]: [
     titleLayoutTemplate,
@@ -117,7 +108,6 @@ const TEMPLATE_VARIATIONS: Record<string, Template[]> = {
     titleLeftAlignTemplate,
     titleRightAlignTemplate,
   ],
-  [SLIDE_LAYOUT_TYPE.TRANSITION]: [transitionLayoutTemplate],
   [SLIDE_LAYOUT_TYPE.MAIN_IMAGE]: [
     mainImageLayoutTemplate,
     mainImageCenteredTemplate,

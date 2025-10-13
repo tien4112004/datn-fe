@@ -351,11 +351,6 @@ export const tableOfContentsTemplates: Template[] = [
             size: 'fill',
             margin: { left: 80, right: 80, top: 0, bottom: 40 },
           },
-          border: {
-            width: '{{theme.card.borderWidth}}',
-            color: '{{theme.themeColors[0]}}',
-            radius: '{{theme.card.borderRadius}}',
-          },
           layout: {
             distribution: 'space-between',
             gap: 20,
@@ -554,6 +549,8 @@ export const tableOfContentsTemplates: Template[] = [
           combined: {
             enabled: true,
             pattern: '{content}',
+            ordered: true,
+            wrapping: true,
           },
           layout: {
             verticalAlignment: 'center',

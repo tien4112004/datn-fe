@@ -757,7 +757,8 @@ export const listTemplates: Template[] = [
           type: 'text',
           combined: {
             enabled: true,
-            pattern: '{content}',
+            pattern: '{item}',
+            wrapping: true,
           },
           layout: {
             verticalAlignment: 'center',
@@ -781,12 +782,13 @@ export const listTemplates: Template[] = [
             fontWeight: 'normal',
             textAlign: 'left',
             lineHeight: 1.5,
+            fontSizeRange: { minSize: 15, maxSize: 22 },
           },
           children: [
             {
               type: 'text',
-              id: 'content',
-              label: 'content',
+              id: 'item',
+              label: 'item',
               text: {
                 color: '{{theme.fontColor}}',
                 fontFamily: '{{theme.fontName}}',

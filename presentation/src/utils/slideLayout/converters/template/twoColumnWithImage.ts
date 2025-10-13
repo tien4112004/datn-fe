@@ -676,7 +676,8 @@ export const twoColumnWithImageTemplates: Template[] = [
           type: 'text',
           combined: {
             enabled: true,
-            pattern: '• {item}',
+            pattern: '{item}',
+            wrapping: false,
           },
           layout: {
             verticalAlignment: 'center',

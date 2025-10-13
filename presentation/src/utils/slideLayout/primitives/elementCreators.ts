@@ -82,10 +82,12 @@ export function createTextElement(
  * Creates PPT combined text element(s) with unified font sizing across all items.
  * When content overflows, splits into two separate PPTTextElement instances.
  * Pattern defines the structure, this function handles measurement and sizing.
+ * Supports both <ul> (unordered) and <ol> (ordered) lists.
  *
  * @param contents - Array of HTML content for each item (already formatted with pattern)
  * @param container - Container with bounds and styling
  * @param fontSizeRange - Optional font size constraints
+ * @param listType - Type of list: 'ul' for unordered or 'ol' for ordered (default: 'ul')
  * @returns Array of PPT text elements (1 if fits, 2 if column wrap needed)
  */
 export function createListElements(
@@ -93,6 +95,8 @@ export function createListElements(
   container: TextLayoutBlockInstance,
   fontSizeRange?: FontSizeRange
 ): PPTTextElement[] {
+  const paragraphSpace = 25; // Spacing between list items
+
   // Create HTML elements for each content item
   const htmlElements = contents.map((content) => createHtmlElement(content, 32, container.text || {}));
 
@@ -102,17 +106,19 @@ export function createListElements(
   );
   const optimalFontSize = Math.min(...listFontSize);
 
-  // Apply unified font size to all elements
+  // Apply unified font size to all elements (with marginTop for measurement only)
   htmlElements.forEach((el) => {
     applyFontSizeToElement(el, optimalFontSize, container.text?.lineHeight || 1.4);
-    el.style.marginBottom = '25px'; // Paragraph spacing
+    el.style.marginTop = `${paragraphSpace}px`; // Temporarily add for measurement
   });
 
-  // Create wrapper ul with proper font size
-  const ul = document.createElement('ul');
-  ul.style.fontSize = `${optimalFontSize}px`;
-  ul.style.fontFamily = container.text.fontFamily || '';
-  ul.append(
+  const listType = container.combined?.ordered ? 'ol' : 'ul';
+
+  // Create wrapper list element (ul or ol) with proper font size
+  const listElement = document.createElement(listType);
+  listElement.style.fontSize = `${optimalFontSize}px`;
+  listElement.style.fontFamily = container.text.fontFamily || '';
+  listElement.append(
     ...htmlElements.map((html) => {
       const li = document.createElement('li');
       li.appendChild(html);
@@ -121,44 +127,110 @@ export function createListElements(
   );
 
   // Measure the complete list to check for overflow
-  const dimensions = measureElement(ul, container);
+  const dimensions = measureElement(listElement, container);
 
   // Check if content exceeds container height - if so, split into 2 columns
   const needsColumnWrap = dimensions.height > container.bounds.height;
 
-  if (needsColumnWrap) {
+  if (needsColumnWrap && container.combined?.wrapping !== false) {
     // Split items into two columns
     const midpoint = Math.ceil(contents.length / 2);
     const leftColumnContents = contents.slice(0, midpoint);
     const rightColumnContents = contents.slice(midpoint);
 
-    const columnGap = 40;
+    const columnGap = 30;
     const columnWidth = (container.bounds.width - columnGap) / 2;
 
-    // Create left column
-    const leftUl = document.createElement('ul');
-    leftUl.style.fontSize = `${optimalFontSize}px`;
-    leftUl.style.fontFamily = container.text.fontFamily || '';
-    leftUl.append(
+    // Create a temporary container with column width for recalculating font size
+    const columnContainer = {
+      ...container,
+      bounds: {
+        ...container.bounds,
+        width: columnWidth - 10, // Account for padding
+      },
+    } as TextLayoutBlockInstance;
+
+    // Recalculate optimal font size for all items with the new column width constraint
+    const allColumnContents = [...leftColumnContents, ...rightColumnContents];
+    const columnHtmlElements = allColumnContents.map((content) =>
+      createHtmlElement(content, 32, container.text || {})
+    );
+
+    const columnFontSizes = columnHtmlElements.map((el) =>
+      calculateLargestOptimalFontSize(el, columnContainer, fontSizeRange)
+    );
+    let columnOptimalFontSize = Math.min(...columnFontSizes);
+
+    // Create temporary left column to verify height constraint
+    let leftList = document.createElement(listType);
+    leftList.style.fontSize = `${columnOptimalFontSize}px`;
+    leftList.style.fontFamily = container.text.fontFamily || '';
+    leftList.append(
       ...leftColumnContents.map((content) => {
-        const el = createHtmlElement(content, optimalFontSize, container.text || {});
-        applyFontSizeToElement(el, optimalFontSize, container.text?.lineHeight || 1.4);
-        el.style.marginBottom = '25px';
+        const el = createHtmlElement(content, columnOptimalFontSize, container.text || {});
+        applyFontSizeToElement(el, columnOptimalFontSize, container.text?.lineHeight || 1.4);
+        el.style.marginTop = `${paragraphSpace}px`; // Temporarily add for measurement
         const li = document.createElement('li');
         li.appendChild(el);
         return li;
       })
     );
 
-    // Create right column
-    const rightUl = document.createElement('ul');
-    rightUl.style.fontSize = `${optimalFontSize}px`;
-    rightUl.style.fontFamily = container.text.fontFamily || '';
-    rightUl.append(
+    // Measure left column height and adjust font size if it exceeds container height
+    let leftColumnDimensions = measureElement(leftList, columnContainer);
+    const minFontSize = fontSizeRange?.minSize || 12;
+
+    while (leftColumnDimensions.height > container.bounds.height && columnOptimalFontSize > minFontSize) {
+      // Reduce font size and remeasure
+      columnOptimalFontSize = Math.max(columnOptimalFontSize - 1, minFontSize);
+
+      leftList = document.createElement(listType);
+      leftList.style.fontSize = `${columnOptimalFontSize}px`;
+      leftList.style.fontFamily = container.text.fontFamily || '';
+      leftList.append(
+        ...leftColumnContents.map((content) => {
+          const el = createHtmlElement(content, columnOptimalFontSize, container.text || {});
+          applyFontSizeToElement(el, columnOptimalFontSize, container.text?.lineHeight || 1.4);
+          el.style.marginTop = `${paragraphSpace}px`;
+          const li = document.createElement('li');
+          li.appendChild(el);
+          return li;
+        })
+      );
+
+      leftColumnDimensions = measureElement(leftList, columnContainer);
+    }
+
+    // Create final left column without marginTop
+    leftList = document.createElement(listType);
+    leftList.style.fontSize = `${columnOptimalFontSize}px`;
+    leftList.style.fontFamily = container.text.fontFamily || '';
+    leftList.append(
+      ...leftColumnContents.map((content) => {
+        const el = createHtmlElement(content, columnOptimalFontSize, container.text || {});
+        applyFontSizeToElement(el, columnOptimalFontSize, container.text?.lineHeight || 1.4);
+        // Don't apply marginTop here - it will be handled by paragraphSpace
+        const li = document.createElement('li');
+        li.appendChild(el);
+        return li;
+      })
+    );
+
+    // Create right column with proper start attribute for ordered lists
+    const rightList = document.createElement(listType);
+    rightList.style.fontSize = `${columnOptimalFontSize}px`;
+    rightList.style.fontFamily = container.text.fontFamily || '';
+
+    // For ordered lists, set the start attribute to continue numbering
+    if (listType === 'ol') {
+      rightList.setAttribute('start', (midpoint + 1).toString());
+    }
+
+    rightList.append(
       ...rightColumnContents.map((content) => {
-        const el = createHtmlElement(content, optimalFontSize, container.text || {});
-        applyFontSizeToElement(el, optimalFontSize, container.text?.lineHeight || 1.4);
-        el.style.marginBottom = '25px';
+        const el = createHtmlElement(content, columnOptimalFontSize, container.text || {});
+        applyFontSizeToElement(el, columnOptimalFontSize, container.text?.lineHeight || 1.4);
+        // Don't apply marginTop here - it will be handled by paragraphSpace
         const li = document.createElement('li');
         li.appendChild(el);
         return li;
@@ -172,28 +244,28 @@ export function createListElements(
       {
         id: crypto.randomUUID(),
         type: 'text',
-        content: leftUl.outerHTML,
+        content: leftList.outerHTML,
         defaultFontName: container.text.fontFamily || 'Arial',
         defaultColor: container.text.color || '#000000',
         left: leftPosition.left + 10,
-        top: leftPosition.top,
+        top: leftPosition.top - 12.5,
         width: columnWidth - 10,
         height: container.bounds.height,
         shadow: container.shadow,
-        paragraphSpace: 25,
+        paragraphSpace,
       } as PPTTextElement,
       {
         id: crypto.randomUUID(),
         type: 'text',
-        content: rightUl.outerHTML,
+        content: rightList.outerHTML,
         defaultFontName: container.text.fontFamily || 'Arial',
         defaultColor: container.text.color || '#000000',
         left: leftPosition.left + columnWidth + columnGap + 10,
-        top: leftPosition.top - 25,
+        top: leftPosition.top - 12.5,
         width: columnWidth - 10,
         height: container.bounds.height,
         shadow: container.shadow,
-        paragraphSpace: 25,
+        paragraphSpace,
       } as PPTTextElement,
     ];
   }
@@ -205,15 +277,15 @@ export function createListElements(
     {
       id: crypto.randomUUID(),
       type: 'text',
-      content: ul.outerHTML,
+      content: listElement.outerHTML,
       defaultFontName: container.text.fontFamily || 'Arial',
       defaultColor: container.text.color || '#000000',
       left: position.left + 10, // Padding left
-      top: position.top, // Reduce an amount of paragraph space
+      top: position.top - 12.5,
       width: container.bounds.width - 20,
       height: container.bounds.height,
       shadow: container.shadow,
-      paragraphSpace: 25,
+      paragraphSpace,
     } as PPTTextElement,
   ];
 }
@@ -422,6 +494,7 @@ export function createHtmlElement(content: string, fontSize: number, config: Tex
   // Apply paragraph styling with defaults
   const lineHeight = config.lineHeight ?? 1.4;
 
+  p.classList.add('ProseMirror-static');
   p.style.textAlign = config.textAlign || 'left';
   p.style.lineHeight = `${lineHeight}`;
   p.style.fontSize = `${fontSize}px`;

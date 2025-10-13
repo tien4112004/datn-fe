@@ -716,7 +716,7 @@ export const labeledListTemplates: Template[] = [
           type: 'text',
           combined: {
             enabled: true,
-            pattern: '<strong>{label}:</strong> {content}',
+            pattern: '{label}: {content}',
           },
           layout: {
             verticalAlignment: 'center',
@@ -735,22 +735,32 @@ export const labeledListTemplates: Template[] = [
             radius: '{{theme.card.borderRadius}}',
           },
           text: {
-            color: '{{theme.fontColor}}',
+            color: '{{theme.labelFontColor}}',
             fontFamily: '{{theme.fontName}}',
             fontWeight: 'normal',
             textAlign: 'left',
-            lineHeight: 1.6,
+            lineHeight: 1.5,
           },
           children: [
             {
               type: 'text',
               id: 'label',
               label: 'label',
+              text: {
+                color: '{{theme.labelFontColor}}',
+                fontFamily: '{{theme.labelFontName}}',
+                fontWeight: 'bold',
+              },
             },
             {
               type: 'text',
               id: 'content',
               label: 'content',
+              text: {
+                color: '{{theme.fontColor}}',
+                fontFamily: '{{theme.fontName}}',
+                fontWeight: 'normal',
+              },
             },
           ],
         },

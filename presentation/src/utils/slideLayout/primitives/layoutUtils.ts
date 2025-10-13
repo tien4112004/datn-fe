@@ -1,4 +1,4 @@
-import type { LayoutBlockInstance } from '../types';
+import type { LayoutBlockInstance, TextStyleConfig } from '../types';
 
 export function getAllDescendantInstances(instance: LayoutBlockInstance): LayoutBlockInstance[] {
   const result: LayoutBlockInstance[] = [];
@@ -69,4 +69,24 @@ export function collectDescendantTextsByLabel(data: Record<string, string[]>): A
 
     return result;
   });
+}
+
+/**
+ * Extracts text styles for each label from children configuration.
+ *
+ * @param container - Container with children array
+ * @returns Map of label names to their text style configurations
+ */
+export function extractLabelStyles(container: any): Map<string, TextStyleConfig> {
+  const labelStyles = new Map<string, TextStyleConfig>();
+
+  if (container.children) {
+    container.children.forEach((child: any) => {
+      if (child.label && child.type === 'text' && child.text) {
+        labelStyles.set(child.label, child.text);
+      }
+    });
+  }
+
+  return labelStyles;
 }

@@ -43,6 +43,7 @@ vi.mock('/src/features/presentation/components/remote/module', () => {
     },
     moduleMethodMap: {
       convertToSlide: vi.fn().mockResolvedValue({ default: vi.fn().mockResolvedValue({ success: true }) }),
+      method: vi.fn().mockResolvedValue({ default: { getThemes: vi.fn().mockReturnValue({ default: { id: 'default', name: 'Default Theme' } }) } }),
     },
   };
 });

@@ -667,4 +667,73 @@ export const twoColumnTemplates: Template[] = [
       },
     },
   },
+  {
+    id: 'two-column-container-bullet',
+    name: 'Two Column - Container Bullet',
+    config: {
+      containers: {
+        title: {
+          type: 'text',
+          bounds: {
+            left: 0,
+            top: 15,
+            width: { expr: 'SLIDE_WIDTH' },
+            height: 110,
+          },
+          layout: {
+            horizontalAlignment: 'center',
+            verticalAlignment: 'top',
+          },
+          text: {
+            color: '{{theme.titleFontColor}}',
+            fontFamily: '{{theme.titleFontName}}',
+            fontWeight: 'bold',
+            textAlign: 'center',
+          },
+        },
+        content: {
+          type: 'text',
+          combined: {
+            enabled: true,
+            pattern: '• {item}',
+          },
+          layout: {
+            verticalAlignment: 'center',
+          },
+          positioning: {
+            relativeTo: 'title',
+            axis: 'vertical',
+            anchor: 'end',
+            offset: 20,
+            size: 'fill',
+            margin: { left: 40, right: 40, top: 0, bottom: 40 },
+          },
+          border: {
+            width: '{{theme.card.borderWidth}}',
+            color: '{{theme.themeColors[0]}}',
+            radius: '{{theme.card.borderRadius}}',
+          },
+          text: {
+            color: '{{theme.fontColor}}',
+            fontFamily: '{{theme.fontName}}',
+            fontWeight: 'normal',
+            textAlign: 'left',
+            lineHeight: 1.5,
+          },
+          children: [
+            {
+              type: 'text',
+              id: 'item',
+              label: 'item',
+              text: {
+                color: '{{theme.fontColor}}',
+                fontFamily: '{{theme.fontName}}',
+                fontWeight: 'normal',
+              },
+            },
+          ],
+        },
+      },
+    },
+  },
 ];

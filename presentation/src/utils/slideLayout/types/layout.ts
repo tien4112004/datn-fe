@@ -92,6 +92,7 @@ export interface TextLayoutBlockConfig extends LayoutBlockConfig {
   combined?: {
     enabled: boolean; // Whether to combine multiple text items into one
     pattern: string; // Pattern to combine multiple text items into one (e.g., "{0}. {1}")
+    columns?: number; // Number of columns when content overflows (default: 2)
   };
 }
 

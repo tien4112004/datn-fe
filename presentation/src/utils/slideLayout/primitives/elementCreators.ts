@@ -79,19 +79,20 @@ export function createTextElement(
 }
 
 /**
- * Creates a PPT combined text element with unified font sizing across all items.
+ * Creates PPT combined text element(s) with unified font sizing across all items.
+ * When content overflows, splits into two separate PPTTextElement instances.
  * Pattern defines the structure, this function handles measurement and sizing.
  *
  * @param contents - Array of HTML content for each item (already formatted with pattern)
  * @param container - Container with bounds and styling
  * @param fontSizeRange - Optional font size constraints
- * @returns PPT text element with optimized font sizing
+ * @returns Array of PPT text elements (1 if fits, 2 if column wrap needed)
  */
 export function createListElements(
   contents: string[],
   container: TextLayoutBlockInstance,
   fontSizeRange?: FontSizeRange
-): PPTTextElement {
+): PPTTextElement[] {
   // Create HTML elements for each content item
   const htmlElements = contents.map((content) => createHtmlElement(content, 32, container.text || {}));
 
@@ -107,38 +108,114 @@ export function createListElements(
     el.style.marginBottom = '25px'; // Paragraph spacing
   });
 
-  // Create wrapper ol with proper font size
-  const ol = document.createElement('ol');
-  ol.style.fontSize = `${optimalFontSize}px`;
-  ol.style.fontFamily = container.text.fontFamily || '';
-  ol.append(
+  // Create wrapper ul with proper font size
+  const ul = document.createElement('ul');
+  ul.style.fontSize = `${optimalFontSize}px`;
+  ul.style.fontFamily = container.text.fontFamily || '';
+  ul.append(
     ...htmlElements.map((html) => {
       const li = document.createElement('li');
-
       li.appendChild(html);
       return li;
     })
   );
 
-  // Measure the complete container
-  const dimensions = measureElement(ol, container);
+  // Measure the complete list to check for overflow
+  const dimensions = measureElement(ul, container);
 
-  // Calculate positioning within the container
+  // Check if content exceeds container height - if so, split into 2 columns
+  const needsColumnWrap = dimensions.height > container.bounds.height;
+
+  if (needsColumnWrap) {
+    // Split items into two columns
+    const midpoint = Math.ceil(contents.length / 2);
+    const leftColumnContents = contents.slice(0, midpoint);
+    const rightColumnContents = contents.slice(midpoint);
+
+    const columnGap = 40;
+    const columnWidth = (container.bounds.width - columnGap) / 2;
+
+    // Create left column
+    const leftUl = document.createElement('ul');
+    leftUl.style.fontSize = `${optimalFontSize}px`;
+    leftUl.style.fontFamily = container.text.fontFamily || '';
+    leftUl.append(
+      ...leftColumnContents.map((content) => {
+        const el = createHtmlElement(content, optimalFontSize, container.text || {});
+        applyFontSizeToElement(el, optimalFontSize, container.text?.lineHeight || 1.4);
+        el.style.marginBottom = '25px';
+        const li = document.createElement('li');
+        li.appendChild(el);
+        return li;
+      })
+    );
+
+    // Create right column
+    const rightUl = document.createElement('ul');
+    rightUl.style.fontSize = `${optimalFontSize}px`;
+    rightUl.style.fontFamily = container.text.fontFamily || '';
+    rightUl.append(
+      ...rightColumnContents.map((content) => {
+        const el = createHtmlElement(content, optimalFontSize, container.text || {});
+        applyFontSizeToElement(el, optimalFontSize, container.text?.lineHeight || 1.4);
+        el.style.marginBottom = '25px';
+        const li = document.createElement('li');
+        li.appendChild(el);
+        return li;
+      })
+    );
+
+    // Calculate positions for both columns
+    const leftPosition = layoutItemsInBlock([dimensions], container)[0];
+
+    return [
+      {
+        id: crypto.randomUUID(),
+        type: 'text',
+        content: leftUl.outerHTML,
+        defaultFontName: container.text.fontFamily || 'Arial',
+        defaultColor: container.text.color || '#000000',
+        left: leftPosition.left + 10,
+        top: leftPosition.top,
+        width: columnWidth - 10,
+        height: container.bounds.height,
+        shadow: container.shadow,
+        paragraphSpace: 25,
+      } as PPTTextElement,
+      {
+        id: crypto.randomUUID(),
+        type: 'text',
+        content: rightUl.outerHTML,
+        defaultFontName: container.text.fontFamily || 'Arial',
+        defaultColor: container.text.color || '#000000',
+        left: leftPosition.left + columnWidth + columnGap + 10,
+        top: leftPosition.top - 25,
+        width: columnWidth - 10,
+        height: container.bounds.height,
+        shadow: container.shadow,
+        paragraphSpace: 25,
+      } as PPTTextElement,
+    ];
+  }
+
+  // Single column - content fits
   const position = layoutItemsInBlock([dimensions], container)[0];
 
-  return {
-    id: crypto.randomUUID(),
-    type: 'text',
-    content: ol.outerHTML,
-    defaultFontName: container.text.fontFamily || 'Arial',
-    defaultColor: container.text.color || '#000000',
-    left: position.left + 10, // Padding left
-    top: position.top - 25, // Reduce an amount of paragraph space
-    width: container.bounds.width - 20,
-    height: container.bounds.height,
-    shadow: container.shadow,
-    paragraphSpace: 25,
-  } as PPTTextElement;
+  return [
+    {
+      id: crypto.randomUUID(),
+      type: 'text',
+      content: ul.outerHTML,
+      defaultFontName: container.text.fontFamily || 'Arial',
+      defaultColor: container.text.color || '#000000',
+      left: position.left + 10, // Padding left
+      top: position.top, // Reduce an amount of paragraph space
+      width: container.bounds.width - 20,
+      height: container.bounds.height,
+      shadow: container.shadow,
+      paragraphSpace: 25,
+    } as PPTTextElement,
+  ];
 }
 
 /**

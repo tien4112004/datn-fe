@@ -96,10 +96,11 @@ export function buildText(content: string, config: TemplateContainerConfig): PPT
 /**
  * Builds a combined list element with unified font sizing.
  * Creates ProseMirror-compatible <ul><li><p> structure.
+ * Returns 1 or 2 elements depending on whether content needs column wrapping.
  *
  * @param contents - Array of HTML content strings for each list item
  * @param config - Container configuration
- * @returns Array containing single list element
+ * @returns Array containing one or two list elements (split into columns if needed)
  */
 export function buildCombinedList(contents: string[], config: TemplateContainerConfig): PPTElement[] {
   const textInstance = {
@@ -107,13 +108,13 @@ export function buildCombinedList(contents: string[], config: TemplateContainerC
     bounds: config.bounds,
   } as TextLayoutBlockInstance;
 
-  const listElement = createListElements(
+  const listElements = createListElements(
     contents,
     textInstance,
     textInstance.text?.fontSizeRange || FONT_SIZE_RANGE_CONTENT
   );
 
-  return [listElement];
+  return listElements;
 }
 
 /**

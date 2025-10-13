@@ -154,15 +154,6 @@ const slideTemplates: Record<string, any[]> = {
       ],
     },
   })),
-  test: [
-    {
-      type: 'title',
-      data: {
-        title: 'Test Slide Title',
-        subtitle: 'Test Slide Subtitle',
-      },
-    },
-  ],
 };
 
 /**

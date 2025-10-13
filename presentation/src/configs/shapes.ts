@@ -49,6 +49,69 @@ export const SHAPE_PATH_FORMULAS: {
       } L 0 ${radius} Q 0 0 ${radius} 0 Z`;
     },
   },
+  [ShapePathFormulasKeys.ROUND_RECT_CUSTOM]: {
+    editable: false,
+    defaultValue: [0.125, 0.125, 0.125, 0.125],
+    range: [
+      [0, 0.5],
+      [0, 0.5],
+      [0, 0.5],
+      [0, 0.5],
+    ],
+    relative: ['left', 'right', 'right', 'left'],
+    getBaseSize: [
+      (width, height) => Math.min(width, height),
+      (width, height) => Math.min(width, height),
+      (width, height) => Math.min(width, height),
+      (width, height) => Math.min(width, height),
+    ],
+    formula: (width, height, values) => {
+      const minSize = Math.min(width, height);
+      const [tl, tr, br, bl] = values!;
+      const rtl = tl * minSize;
+      const rtr = tr * minSize;
+      const rbr = br * minSize;
+      const rbl = bl * minSize;
+
+      // Build path with conditional quadratic curves for each corner
+      let path = `M ${rtl} 0`;
+
+      // Top edge and top-right corner
+      path += ` L ${width - rtr} 0`;
+      if (rtr > 0) {
+        path += ` Q ${width} 0 ${width} ${rtr}`;
+      } else {
+        path += ` L ${width} 0`;
+      }
+
+      // Right edge and bottom-right corner
+      path += ` L ${width} ${height - rbr}`;
+      if (rbr > 0) {
+        path += ` Q ${width} ${height} ${width - rbr} ${height}`;
+      } else {
+        path += ` L ${width} ${height}`;
+      }
+
+      // Bottom edge and bottom-left corner
+      path += ` L ${rbl} ${height}`;
+      if (rbl > 0) {
+        path += ` Q 0 ${height} 0 ${height - rbl}`;
+      } else {
+        path += ` L 0 ${height}`;
+      }
+
+      // Left edge and top-left corner
+      path += ` L 0 ${rtl}`;
+      if (rtl > 0) {
+        path += ` Q 0 0 ${rtl} 0`;
+      } else {
+        path += ` L 0 0`;
+      }
+
+      path += ' Z';
+      return path;
+    },
+  },
   [ShapePathFormulasKeys.CUT_RECT_DIAGONAL]: {
     editable: true,
     defaultValue: [0.2],
@@ -303,6 +366,12 @@ export const getShapeList = (): ComputedRef<ShapeListItem[]> => {
           viewBox: [200, 200],
           path: 'M 50 0 L 150 0 Q 200 0 200 50 L 200 150 Q 200 200 150 200 L 50 200 Q 0 200 0 150 L 0 50 Q 0 0 50 0 Z',
           pathFormula: ShapePathFormulasKeys.ROUND_RECT,
+          pptxShapeType: 'roundRect',
+        },
+        {
+          viewBox: [200, 200],
+          path: 'M 25 0 L 150 0 Q 200 0 200 50 L 200 175 Q 200 200 175 200 L 25 200 Q 0 200 0 175 L 0 25 Q 0 0 25 0 Z',
+          pathFormula: ShapePathFormulasKeys.ROUND_RECT_CUSTOM,
           pptxShapeType: 'roundRect',
         },
         {

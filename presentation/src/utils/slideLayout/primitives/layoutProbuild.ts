@@ -48,6 +48,7 @@ export function buildCards(instance: LayoutBlockInstance): PPTElement[] {
       return createCard(inst);
     })
     .filter((el) => el !== null) as PPTElement[];
+
   return list;
 }
 

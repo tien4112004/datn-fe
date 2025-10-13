@@ -1,5 +1,6 @@
 export const enum ShapePathFormulasKeys {
   ROUND_RECT = 'roundRect',
+  ROUND_RECT_CUSTOM = 'roundRectCustom',
   ROUND_RECT_DIAGONAL = 'roundRectDiagonal',
   ROUND_RECT_SINGLE = 'roundRectSingle',
   ROUND_RECT_SAMESIDE = 'roundRectSameSide',
@@ -77,14 +78,24 @@ export interface PPTElementShadow {
  *
  * style?: border style (solid or dashed)
  *
- * width?: border width
+ * width?: border width (shorthand for all borders)
  *
- * color?: border color
+ * color?: border color (shorthand for all borders)
+ *
+ * Per-side borders (optional, overrides shorthand):
+ * - top/right/bottom/left: individual border configuration
  */
 export interface PPTElementOutline {
   style?: LineStyleType;
   width?: number;
   color?: string;
+
+  // Per-side configuration
+  top?: { width?: number; color?: string };
+  right?: { width?: number; color?: string };
+  bottom?: { width?: number; color?: string };
+  left?: { width?: number; color?: string };
+
   borderRadius?: string;
 }
 

@@ -9,6 +9,7 @@ export interface BorderConfig {
   width: number | string;
   color: string;
   radius?: number | string;
+  directions?: ('top' | 'right' | 'bottom' | 'left')[];
 }
 
 export interface ShadowConfig {
@@ -22,6 +23,7 @@ export interface BorderInstance {
   width: number;
   color: string;
   radius?: number;
+  directions: ('top' | 'right' | 'bottom' | 'left')[];
 }
 
 export interface ShadowInstance {
@@ -37,6 +39,7 @@ export const fromBorderConfigToInstance = (config?: BorderConfig): BorderInstanc
     width: typeof config.width === 'number' ? config.width : parseFloat(config.width),
     color: config.color,
     radius: typeof config.radius === 'number' ? config.radius : parseFloat(config.radius || '0'),
+    directions: config.directions || ['top', 'right', 'bottom', 'left'],
   };
 };
 

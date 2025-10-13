@@ -78,7 +78,7 @@ export function createTextElement(
       ? {
           color: container.border.color,
           width: container.border.width,
-          borderRadius: container.border.radius || '0',
+          borderRadius: `${container.border.radius || 0}`,
         }
       : undefined,
     shadow: container.shadow,
@@ -169,17 +169,35 @@ export function createTitleLine(titleDimensions: Bounds, theme: SlideTheme): PPT
  * Create a card (shape) element
  */
 export function createCard(container: LayoutBlockInstance): PPTShapeElement {
-  const formula = SHAPE_PATH_FORMULAS[ShapePathFormulasKeys.ROUND_RECT];
-  const radiusMultiplier =
+  const formula = SHAPE_PATH_FORMULAS[ShapePathFormulasKeys.ROUND_RECT_CUSTOM];
+  const radiusValue =
     container.border?.radius && typeof container.border.radius === 'number'
-      ? container.border.radius / Math.min(container.bounds.width, container.bounds.height)
-      : DEFAULT_RADIUS_MULTIPLIER;
-  const path = formula.formula(container.bounds.width, container.bounds.height, [radiusMultiplier]);
+      ? container.border.radius
+      : Math.min(container.bounds.width, container.bounds.height) * DEFAULT_RADIUS_MULTIPLIER;
+
+  const radiusMultiplier = radiusValue / Math.min(container.bounds.width, container.bounds.height);
+
+  // Map border directions to corner keypoints [topLeft, topRight, bottomRight, bottomLeft]
+  const directions = container.border?.directions || ['top', 'right', 'bottom', 'left'];
+  const hasTop = directions.includes('top');
+  const hasRight = directions.includes('right');
+  const hasBottom = directions.includes('bottom');
+  const hasLeft = directions.includes('left');
+
+  // Apply radius only to corners where both adjacent sides have borders
+  const keypoints = [
+    hasTop && hasLeft ? radiusMultiplier : 0, // top-left
+    hasTop && hasRight ? radiusMultiplier : 0, // top-right
+    hasBottom && hasRight ? radiusMultiplier : 0, // bottom-right
+    hasBottom && hasLeft ? radiusMultiplier : 0, // bottom-left
+  ];
+
+  const path = formula.formula(container.bounds.width, container.bounds.height, keypoints);
 
   return {
     id: crypto.randomUUID(),
     type: 'shape',
-    shapeType: 'roundedRect',
+    pathFormula: ShapePathFormulasKeys.ROUND_RECT_CUSTOM,
     left: container.bounds.left,
     top: container.bounds.top,
     width: container.bounds.width,
@@ -192,11 +210,11 @@ export function createCard(container: LayoutBlockInstance): PPTShapeElement {
     outline: container.border
       ? {
           color: container.border.color,
-          width: container.border.width,
+          borderRadius: `${container.border.radius || 0}`,
         }
       : undefined,
-    radius: container.border?.radius || 0,
     shadow: container.shadow,
+    keypoints,
   } as PPTShapeElement;
 }
 

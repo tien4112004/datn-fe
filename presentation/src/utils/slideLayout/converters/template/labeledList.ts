@@ -1,625 +1,691 @@
 import type { Template } from '../../types';
 
-export const labeledListLayoutTemplate: Template = {
-  id: 'horizontal-list-default',
-  name: 'Horizontal List - Default',
-  config: {
-    containers: {
-      title: {
-        type: 'text',
-        bounds: {
-          left: 0,
-          top: 15,
-          width: {
-            expr: 'SLIDE_WIDTH',
-          },
-          height: 120,
-        },
-        layout: {
-          horizontalAlignment: 'center',
-          verticalAlignment: 'top',
-        },
-        text: {
-          color: '{{theme.titleFontColor}}',
-          fontFamily: '{{theme.titleFontName}}',
-          fontWeight: 'bold',
-          fontStyle: 'normal',
-        },
-      },
-      content: {
-        type: 'block',
-        id: 'content',
-        positioning: {
-          relativeTo: 'title',
-          axis: 'vertical',
-          anchor: 'end',
-          offset: 20,
-          size: 'fill',
-          margin: { left: 30, right: 30, top: 0, bottom: 40 },
-        },
-        layout: {
-          distribution: 'space-around',
-          gap: 25,
-          horizontalAlignment: 'center',
-          verticalAlignment: 'center',
-          orientation: 'horizontal',
-        },
-        childTemplate: {
-          count: 'auto',
-          wrap: {
-            enabled: true,
-            maxItemsPerLine: 5,
-            lineCount: 2,
-            wrapDistribution: 'balanced',
-            lineSpacing: 15,
-            alternating: { start: 20, end: 20 },
-          },
-          structure: {
-            type: 'block',
-            layout: {
-              distribution: 'equal',
-              gap: 10,
-              horizontalAlignment: 'center',
-              verticalAlignment: 'center',
-              orientation: 'vertical',
+export const labeledListTemplates: Template[] = [
+  {
+    id: 'labeled-list-default',
+    name: 'Labeled List - Default',
+    config: {
+      containers: {
+        title: {
+          type: 'text',
+          bounds: {
+            left: 0,
+            top: 15,
+            width: {
+              expr: 'SLIDE_WIDTH',
             },
-            border: {
-              width: '{{theme.card.borderWidth}}',
-              color: '{{theme.themeColors[0]}}',
-              radius: '{{theme.card.borderRadius}}',
+            height: 120,
+          },
+          layout: {
+            horizontalAlignment: 'center',
+            verticalAlignment: 'top',
+          },
+          text: {
+            color: '{{theme.titleFontColor}}',
+            fontFamily: '{{theme.titleFontName}}',
+            fontWeight: 'bold',
+            fontStyle: 'normal',
+          },
+        },
+        content: {
+          type: 'block',
+          id: 'content',
+          positioning: {
+            relativeTo: 'title',
+            axis: 'vertical',
+            anchor: 'end',
+            offset: 20,
+            size: 'fill',
+            margin: { left: 30, right: 30, top: 0, bottom: 40 },
+          },
+          layout: {
+            distribution: 'space-around',
+            gap: 25,
+            horizontalAlignment: 'center',
+            verticalAlignment: 'center',
+            orientation: 'horizontal',
+          },
+          childTemplate: {
+            count: 'auto',
+            wrap: {
+              enabled: true,
+              maxItemsPerLine: 4,
+              lineCount: 2,
+              wrapDistribution: 'balanced',
+              lineSpacing: 15,
+              alternating: { start: 20, end: 20 },
             },
-            children: [
-              {
-                type: 'text',
-                label: 'label',
-                text: {
-                  color: '{{theme.labelFontColor}}',
-                  fontFamily: '{{theme.labelFontName}}',
-                  fontWeight: 'bold',
-                  textAlign: 'center',
-                },
+            structure: {
+              type: 'block',
+              layout: {
+                distribution: 'equal',
+                gap: 10,
+                horizontalAlignment: 'center',
+                verticalAlignment: 'center',
+                orientation: 'vertical',
               },
-              {
-                type: 'text',
-                label: 'content',
-                layout: {
-                  horizontalAlignment: 'center',
-                  verticalAlignment: 'center',
-                },
-                text: {
-                  color: '{{theme.fontColor}}',
-                  fontFamily: '{{theme.fontName}}',
-                  fontWeight: 'normal',
-                  textAlign: 'center',
-                },
+              border: {
+                width: '{{theme.card.borderWidth}}',
+                color: '{{theme.themeColors[0]}}',
+                radius: '{{theme.card.borderRadius}}',
               },
-            ],
+              children: [
+                {
+                  type: 'text',
+                  label: 'label',
+                  text: {
+                    color: '{{theme.labelFontColor}}',
+                    fontFamily: '{{theme.labelFontName}}',
+                    fontWeight: 'bold',
+                    textAlign: 'center',
+                  },
+                },
+                {
+                  type: 'text',
+                  label: 'content',
+                  layout: {
+                    horizontalAlignment: 'center',
+                    verticalAlignment: 'center',
+                  },
+                  text: {
+                    color: '{{theme.fontColor}}',
+                    fontFamily: '{{theme.fontName}}',
+                    fontWeight: 'normal',
+                    textAlign: 'center',
+                  },
+                },
+              ],
+            },
           },
         },
       },
     },
   },
-};
-
-// Variation: Horizontal List - Grid (2x2, 2x3 layout)
-export const labeledListGridTemplate: Template = {
-  id: 'horizontal-list-grid',
-  name: 'Horizontal List - Grid',
-  config: {
-    containers: {
-      title: {
-        type: 'text',
-        bounds: {
-          left: 0,
-          top: 15,
-          width: { expr: 'SLIDE_WIDTH' },
-          height: 100,
-        },
-        layout: {
-          horizontalAlignment: 'center',
-          verticalAlignment: 'top',
-        },
-        text: {
-          color: '{{theme.titleFontColor}}',
-          fontFamily: '{{theme.titleFontName}}',
-          fontWeight: 'bold',
-          textAlign: 'center',
-        },
-      },
-      content: {
-        type: 'block',
-        positioning: {
-          relativeTo: 'title',
-          axis: 'vertical',
-          anchor: 'end',
-          offset: 20,
-          size: 'fill',
-          margin: { left: 40, right: 40, top: 0, bottom: 40 },
-        },
-        layout: {
-          distribution: 'space-around',
-          gap: 20,
-          orientation: 'horizontal',
-        },
-        childTemplate: {
-          count: 'auto',
-          wrap: {
-            enabled: true,
-            maxItemsPerLine: 3,
-            lineCount: 2,
-            wrapDistribution: 'balanced',
-            lineSpacing: 20,
-            syncSize: true,
+  {
+    id: 'labeled-list-grid',
+    name: 'Labeled List - Grid',
+    config: {
+      containers: {
+        title: {
+          type: 'text',
+          bounds: {
+            left: 0,
+            top: 15,
+            width: { expr: 'SLIDE_WIDTH' },
+            height: 100,
           },
-          structure: {
-            type: 'block',
-            layout: {
-              distribution: 'equal',
-              gap: 10,
-              horizontalAlignment: 'center',
-              verticalAlignment: 'center',
-              orientation: 'vertical',
+          layout: {
+            horizontalAlignment: 'center',
+            verticalAlignment: 'top',
+          },
+          text: {
+            color: '{{theme.titleFontColor}}',
+            fontFamily: '{{theme.titleFontName}}',
+            fontWeight: 'bold',
+            textAlign: 'center',
+          },
+        },
+        content: {
+          type: 'block',
+          positioning: {
+            relativeTo: 'title',
+            axis: 'vertical',
+            anchor: 'end',
+            offset: 20,
+            size: 'fill',
+            margin: { left: 40, right: 40, top: 0, bottom: 40 },
+          },
+          layout: {
+            distribution: 'space-around',
+            gap: 20,
+            horizontalAlignment: 'center',
+            verticalAlignment: 'center',
+            orientation: 'horizontal',
+          },
+          childTemplate: {
+            count: 'auto',
+            wrap: {
+              enabled: true,
+              maxItemsPerLine: 3,
+              lineCount: 2,
+              wrapDistribution: 'balanced',
+              lineSpacing: 20,
+              syncSize: true,
             },
-            border: {
-              width: '{{theme.card.borderWidth}}',
-              color: '{{theme.themeColors[0]}}',
-              radius: '{{theme.card.borderRadius}}',
-            },
-            shadow: {
-              h: '{{theme.card.shadow.h}}',
-              v: '{{theme.card.shadow.v}}',
-              blur: '{{theme.card.shadow.blur}}',
-              color: '{{theme.card.shadow.color}}',
-            },
-            children: [
-              {
-                type: 'text',
-                label: 'label',
-                layout: {
-                  horizontalAlignment: 'center',
-                  verticalAlignment: 'center',
-                },
-                text: {
-                  color: '{{theme.labelFontColor}}',
-                  fontFamily: '{{theme.labelFontName}}',
-                  fontWeight: 'bold',
-                  textAlign: 'center',
-                },
+            structure: {
+              type: 'block',
+              layout: {
+                distribution: 'equal',
+                gap: 10,
+                horizontalAlignment: 'center',
+                verticalAlignment: 'center',
+                orientation: 'vertical',
               },
-              {
-                type: 'text',
-                label: 'content',
-                layout: {
-                  horizontalAlignment: 'center',
-                  verticalAlignment: 'center',
-                },
-                text: {
-                  color: '{{theme.fontColor}}',
-                  fontFamily: '{{theme.fontName}}',
-                  fontWeight: 'normal',
-                  textAlign: 'center',
-                },
+              border: {
+                width: '{{theme.card.borderWidth}}',
+                color: '{{theme.themeColors[0]}}',
+                radius: '{{theme.card.borderRadius}}',
               },
-            ],
+              shadow: {
+                h: '{{theme.card.shadow.h}}',
+                v: '{{theme.card.shadow.v}}',
+                blur: '{{theme.card.shadow.blur}}',
+                color: '{{theme.card.shadow.color}}',
+              },
+              children: [
+                {
+                  type: 'text',
+                  label: 'label',
+                  layout: {
+                    horizontalAlignment: 'center',
+                    verticalAlignment: 'center',
+                  },
+                  text: {
+                    color: '{{theme.labelFontColor}}',
+                    fontFamily: '{{theme.labelFontName}}',
+                    fontWeight: 'bold',
+                    textAlign: 'center',
+                  },
+                },
+                {
+                  type: 'text',
+                  label: 'content',
+                  layout: {
+                    horizontalAlignment: 'center',
+                    verticalAlignment: 'center',
+                  },
+                  text: {
+                    color: '{{theme.fontColor}}',
+                    fontFamily: '{{theme.fontName}}',
+                    fontWeight: 'normal',
+                    textAlign: 'center',
+                  },
+                },
+              ],
+            },
           },
         },
       },
     },
   },
-};
-
-// Variation: Horizontal List - Single Row (no wrapping)
-export const labeledListSingleRowTemplate: Template = {
-  id: 'horizontal-list-single-row',
-  name: 'Horizontal List - Single Row',
-  config: {
-    containers: {
-      title: {
-        type: 'text',
-        bounds: {
-          left: 15,
-          top: 15,
-          width: { expr: 'SLIDE_WIDTH - 30' },
-          height: 100,
-        },
-        layout: {
-          horizontalAlignment: 'center',
-          verticalAlignment: 'top',
-        },
-        text: {
-          color: '{{theme.titleFontColor}}',
-          fontFamily: '{{theme.titleFontName}}',
-          fontWeight: 'bold',
-        },
-      },
-      content: {
-        type: 'block',
-        positioning: {
-          relativeTo: 'title',
-          axis: 'vertical',
-          anchor: 'end',
-          offset: 25,
-          size: 'fill',
-          margin: { left: 60, right: 60, top: 0, bottom: 40 },
-        },
-        layout: {
-          distribution: 'space-around',
-          gap: 20,
-          horizontalAlignment: 'center',
-          verticalAlignment: 'center',
-          orientation: 'horizontal',
-        },
-        childTemplate: {
-          count: 'auto',
-          wrap: {
-            enabled: false,
+  {
+    id: 'labeled-list-single-row',
+    name: 'Labeled List - Single Row',
+    config: {
+      containers: {
+        title: {
+          type: 'text',
+          bounds: {
+            left: 15,
+            top: 15,
+            width: { expr: 'SLIDE_WIDTH-30' },
+            height: 100,
           },
-          structure: {
-            type: 'block',
-            layout: {
-              distribution: 'equal',
-              gap: 10,
-              horizontalAlignment: 'center',
-              verticalAlignment: 'center',
-              orientation: 'vertical',
+          layout: {
+            horizontalAlignment: 'center',
+            verticalAlignment: 'top',
+          },
+          text: {
+            color: '{{theme.titleFontColor}}',
+            fontFamily: '{{theme.titleFontName}}',
+            fontWeight: 'bold',
+            fontStyle: 'normal',
+          },
+        },
+        content: {
+          type: 'block',
+          id: 'content',
+          positioning: {
+            relativeTo: 'title',
+            axis: 'vertical',
+            anchor: 'end',
+            offset: 25,
+            size: 'fill',
+            margin: { left: 60, right: 60, top: 0, bottom: 40 },
+          },
+          layout: {
+            distribution: 'space-around',
+            gap: 20,
+            horizontalAlignment: 'center',
+            verticalAlignment: 'center',
+            orientation: 'horizontal',
+          },
+          childTemplate: {
+            count: 'auto',
+            wrap: {
+              enabled: false,
             },
-            border: {
-              width: '{{theme.card.borderWidth}}',
-              color: '{{theme.themeColors[0]}}',
-              radius: '{{theme.card.borderRadius}}',
+            structure: {
+              type: 'block',
+              layout: {
+                distribution: 'equal',
+                gap: 10,
+                horizontalAlignment: 'center',
+                verticalAlignment: 'center',
+                orientation: 'vertical',
+              },
+              border: {
+                width: '{{theme.card.borderWidth}}',
+                color: '{{theme.themeColors[0]}}',
+                radius: '{{theme.card.borderRadius}}',
+              },
+              children: [
+                {
+                  type: 'text',
+                  label: 'label',
+                  text: {
+                    color: '{{theme.labelFontColor}}',
+                    fontFamily: '{{theme.labelFontName}}',
+                    fontWeight: 'bold',
+                    textAlign: 'center',
+                  },
+                },
+                {
+                  type: 'text',
+                  label: 'content',
+                  layout: {
+                    horizontalAlignment: 'center',
+                    verticalAlignment: 'center',
+                  },
+                  text: {
+                    color: '{{theme.fontColor}}',
+                    fontFamily: '{{theme.fontName}}',
+                    fontWeight: 'normal',
+                    textAlign: 'center',
+                  },
+                },
+              ],
             },
-            children: [
-              {
-                type: 'text',
-                label: 'label',
-                text: {
-                  color: '{{theme.labelFontColor}}',
-                  fontFamily: '{{theme.labelFontName}}',
-                  fontWeight: 'bold',
-                  textAlign: 'center',
-                },
-              },
-              {
-                type: 'text',
-                label: 'content',
-                layout: {
-                  horizontalAlignment: 'center',
-                  verticalAlignment: 'center',
-                },
-                text: {
-                  color: '{{theme.fontColor}}',
-                  fontFamily: '{{theme.fontName}}',
-                  fontWeight: 'normal',
-                  textAlign: 'center',
-                },
-              },
-            ],
           },
         },
       },
     },
   },
-};
-
-// Variation: Horizontal List - Numbered (auto-generated sequential labels)
-export const labeledListNumberedTemplate: Template = {
-  id: 'horizontal-list-numbered',
-  name: 'Horizontal List - Numbered',
-  config: {
-    containers: {
-      title: {
-        type: 'text',
-        bounds: {
-          left: 0,
-          top: 15,
-          width: {
-            expr: 'SLIDE_WIDTH',
-          },
-          height: 120,
-        },
-        layout: {
-          horizontalAlignment: 'center',
-          verticalAlignment: 'top',
-        },
-        text: {
-          color: '{{theme.titleFontColor}}',
-          fontFamily: '{{theme.titleFontName}}',
-          fontWeight: 'bold',
-          fontStyle: 'normal',
-        },
-      },
-      content: {
-        type: 'block',
-        id: 'content',
-        positioning: {
-          relativeTo: 'title',
-          axis: 'vertical',
-          anchor: 'end',
-          offset: 20,
-          size: 'fill',
-          margin: { left: 30, right: 30, top: 0, bottom: 40 },
-        },
-        layout: {
-          distribution: 'space-around',
-          gap: 25,
-          horizontalAlignment: 'center',
-          verticalAlignment: 'center',
-          orientation: 'horizontal',
-        },
-        childTemplate: {
-          count: 'auto',
-          wrap: {
-            enabled: true,
-            maxItemsPerLine: 5,
-            lineCount: 2,
-            wrapDistribution: 'balanced',
-            lineSpacing: 15,
-            alternating: { start: 20, end: 20 },
-          },
-          structure: {
-            type: 'block',
-            label: 'item',
-            layout: {
-              distribution: 'equal',
-              gap: -5,
-              horizontalAlignment: 'center',
-              verticalAlignment: 'center',
-              orientation: 'vertical',
+  {
+    id: 'labeled-list-container-border',
+    name: 'Labeled List - Container Border',
+    config: {
+      containers: {
+        title: {
+          type: 'text',
+          bounds: {
+            left: 0,
+            top: 15,
+            width: {
+              expr: 'SLIDE_WIDTH',
             },
-            border: {
-              width: '{{theme.card.borderWidth}}',
-              color: '{{theme.themeColors[0]}}',
-              radius: '{{theme.card.borderRadius}}',
+            height: 100,
+          },
+          layout: {
+            horizontalAlignment: 'center',
+            verticalAlignment: 'top',
+          },
+          text: {
+            color: '{{theme.titleFontColor}}',
+            fontFamily: '{{theme.titleFontName}}',
+            fontWeight: 'bold',
+            fontStyle: 'normal',
+            textAlign: 'center',
+          },
+        },
+        content: {
+          type: 'block',
+          id: 'content',
+          positioning: {
+            relativeTo: 'title',
+            axis: 'vertical',
+            anchor: 'end',
+            offset: 20,
+            size: 'fill',
+            margin: { left: 40, right: 40, top: 0, bottom: 40 },
+          },
+          border: {
+            width: '{{theme.card.borderWidth}}',
+            color: '{{theme.themeColors[0]}}',
+            radius: '{{theme.card.borderRadius}}',
+          },
+          layout: {
+            distribution: 'space-around',
+            gap: 20,
+            horizontalAlignment: 'center',
+            verticalAlignment: 'center',
+            orientation: 'horizontal',
+          },
+          childTemplate: {
+            count: 'auto',
+            wrap: {
+              enabled: true,
+              maxItemsPerLine: 5,
+              lineCount: 2,
+              wrapDistribution: 'balanced',
+              lineSpacing: 15,
+              alternating: { start: 20, end: 20 },
             },
-            children: [
-              {
-                type: 'text',
-                id: 'label',
-                layout: {
-                  horizontalAlignment: 'center',
-                  verticalAlignment: 'center',
-                },
-                label: 'label',
-                numbering: true, // Enable auto-numbering
-                text: {
-                  color: '{{theme.labelFontColor}}',
-                  fontFamily: '{{theme.labelFontName}}',
-                  fontWeight: 'bold',
-                  fontStyle: 'normal',
-                  textAlign: 'center',
-                },
+            structure: {
+              type: 'block',
+              layout: {
+                distribution: 'equal',
+                gap: 10,
+                horizontalAlignment: 'center',
+                verticalAlignment: 'center',
+                orientation: 'vertical',
               },
-              {
-                type: 'text',
-                id: 'content',
-                layout: {
-                  horizontalAlignment: 'center',
-                  verticalAlignment: 'center',
+              children: [
+                {
+                  type: 'text',
+                  label: 'label',
+                  layout: {
+                    horizontalAlignment: 'center',
+                    verticalAlignment: 'center',
+                  },
+                  text: {
+                    color: '{{theme.labelFontColor}}',
+                    fontFamily: '{{theme.labelFontName}}',
+                    fontWeight: 'bold',
+                    fontStyle: 'normal',
+                    textAlign: 'center',
+                  },
                 },
-                label: 'content',
-                text: {
-                  color: '{{theme.fontColor}}',
-                  fontFamily: '{{theme.fontName}}',
-                  fontWeight: 'normal',
-                  fontStyle: 'normal',
-                  textAlign: 'center',
+                {
+                  type: 'text',
+                  label: 'content',
+                  layout: {
+                    horizontalAlignment: 'center',
+                    verticalAlignment: 'center',
+                  },
+                  text: {
+                    color: '{{theme.fontColor}}',
+                    fontFamily: '{{theme.fontName}}',
+                    fontWeight: 'normal',
+                    fontStyle: 'normal',
+                    textAlign: 'center',
+                  },
                 },
-              },
-            ],
+              ],
+            },
           },
         },
       },
     },
   },
-};
-
-// Variation: Horizontal List - Container Border
-export const horizontalListContainerBorderTemplate: Template = {
-  id: 'horizontal-list-container-border',
-  name: 'Horizontal List - Container Border',
-  config: {
-    containers: {
-      title: {
-        type: 'text',
-        bounds: {
-          left: 0,
-          top: 15,
-          width: {
-            expr: 'SLIDE_WIDTH',
+  {
+    id: 'labeled-list-vertical-numbered',
+    name: 'Labeled List - Vertical Numbered',
+    config: {
+      containers: {
+        title: {
+          type: 'text',
+          bounds: {
+            left: 0,
+            top: 15,
+            width: { expr: 'SLIDE_WIDTH' },
+            height: 110,
           },
-          height: 100,
-        },
-        layout: {
-          horizontalAlignment: 'center',
-          verticalAlignment: 'top',
-        },
-        text: {
-          color: '{{theme.titleFontColor}}',
-          fontFamily: '{{theme.titleFontName}}',
-          fontWeight: 'bold',
-          fontStyle: 'normal',
-          textAlign: 'center',
-        },
-      },
-      content: {
-        type: 'block',
-        positioning: {
-          relativeTo: 'title',
-          axis: 'vertical',
-          anchor: 'end',
-          offset: 20,
-          size: 'fill',
-          margin: { left: 40, right: 40, top: 0, bottom: 40 },
-        },
-        border: {
-          width: '{{theme.card.borderWidth}}',
-          color: '{{theme.themeColors[0]}}',
-          radius: '{{theme.card.borderRadius}}',
-        },
-        layout: {
-          distribution: 'space-around',
-          gap: 20,
-          horizontalAlignment: 'center',
-          verticalAlignment: 'center',
-          orientation: 'horizontal',
-        },
-        childTemplate: {
-          count: 'auto',
-          wrap: {
-            enabled: true,
-            maxItemsPerLine: 5,
-            lineCount: 2,
-            wrapDistribution: 'balanced',
-            lineSpacing: 15,
-            alternating: { start: 20, end: 20 },
+          layout: {
+            horizontalAlignment: 'center',
+            verticalAlignment: 'top',
           },
-          structure: {
-            type: 'block',
-            layout: {
-              distribution: 'equal',
-              gap: 10,
-              horizontalAlignment: 'center',
-              verticalAlignment: 'center',
-              orientation: 'vertical',
+          text: {
+            color: '{{theme.titleFontColor}}',
+            fontFamily: '{{theme.titleFontName}}',
+            fontWeight: 'bold',
+            textAlign: 'center',
+          },
+        },
+        content: {
+          type: 'block',
+          positioning: {
+            relativeTo: 'title',
+            axis: 'vertical',
+            anchor: 'end',
+            offset: 20,
+            size: 'fill',
+            margin: { left: 40, right: 40, top: 0, bottom: 40 },
+          },
+          layout: {
+            distribution: 'equal',
+            gap: 15,
+            verticalAlignment: 'top',
+            orientation: 'vertical',
+          },
+          childTemplate: {
+            count: 'auto',
+            wrap: {
+              enabled: false,
             },
-            children: [
-              {
-                type: 'text',
-                label: 'label',
-                layout: {
-                  horizontalAlignment: 'center',
-                  verticalAlignment: 'center',
-                },
-                text: {
-                  color: '{{theme.labelFontColor}}',
-                  fontFamily: '{{theme.labelFontName}}',
-                  fontWeight: 'bold',
-                  fontStyle: 'normal',
-                  textAlign: 'center',
-                },
+            structure: {
+              type: 'block',
+              label: 'item',
+              layout: {
+                distribution: '1/3',
+                gap: 15,
+                horizontalAlignment: 'left',
+                verticalAlignment: 'center',
+                orientation: 'horizontal',
               },
-              {
-                type: 'text',
-                label: 'content',
-                layout: {
-                  horizontalAlignment: 'center',
-                  verticalAlignment: 'center',
+              children: [
+                {
+                  type: 'text',
+                  id: 'label',
+                  label: 'label',
+                  text: {
+                    color: '{{theme.labelFontColor}}',
+                    fontFamily: '{{theme.labelFontName}}',
+                    fontWeight: 'bold',
+                    textAlign: 'right',
+                    fontSizeRange: { minSize: 16, maxSize: 24 },
+                  },
                 },
-                text: {
-                  color: '{{theme.fontColor}}',
-                  fontFamily: '{{theme.fontName}}',
-                  fontWeight: 'normal',
-                  fontStyle: 'normal',
-                  textAlign: 'center',
+                {
+                  type: 'text',
+                  id: 'content',
+                  label: 'content',
+                  border: {
+                    width: '{{theme.card.borderWidth}}',
+                    color: '{{theme.themeColors[0]}}',
+                    radius: '{{theme.card.borderRadius}}',
+                  },
+                  text: {
+                    color: '{{theme.fontColor}}',
+                    fontFamily: '{{theme.fontName}}',
+                    fontWeight: 'normal',
+                    textAlign: 'left',
+                    fontSizeRange: { minSize: 15, maxSize: 22 },
+                  },
                 },
-              },
-            ],
+              ],
+            },
           },
         },
       },
     },
   },
-};
-
-// Variation: Horizontal List - Container Border Shadow
-export const horizontalListNoBorderTemplate: Template = {
-  id: 'horizontal-list-container-border-shadow',
-  name: 'Horizontal List - Container Border Shadow',
-  config: {
-    containers: {
-      title: {
-        type: 'text',
-        bounds: {
-          left: 0,
-          top: 15,
-          width: {
-            expr: 'SLIDE_WIDTH',
+  {
+    id: 'labeled-list-vertical-simple',
+    name: 'Labeled List - Vertical Simple',
+    config: {
+      containers: {
+        title: {
+          type: 'text',
+          bounds: {
+            left: 0,
+            top: 15,
+            width: { expr: 'SLIDE_WIDTH' },
+            height: 100,
           },
-          height: 100,
-        },
-        layout: {
-          horizontalAlignment: 'center',
-          verticalAlignment: 'top',
-        },
-        text: {
-          color: '{{theme.titleFontColor}}',
-          fontFamily: '{{theme.titleFontName}}',
-          fontWeight: 'bold',
-          fontStyle: 'normal',
-          textAlign: 'center',
-        },
-      },
-      content: {
-        type: 'block',
-        positioning: {
-          relativeTo: 'title',
-          axis: 'vertical',
-          anchor: 'end',
-          offset: 20,
-          size: 'fill',
-          margin: { left: 40, right: 40, top: 0, bottom: 50 },
-        },
-        layout: {
-          distribution: 'space-around',
-          gap: 20,
-          horizontalAlignment: 'center',
-          verticalAlignment: 'center',
-          orientation: 'horizontal',
-        },
-        childTemplate: {
-          count: 'auto',
-          wrap: {
-            enabled: true,
-            maxItemsPerLine: 5,
-            lineCount: 2,
-            wrapDistribution: 'balanced',
-            lineSpacing: 15,
-            alternating: { start: 20, end: 20 },
+          layout: {
+            horizontalAlignment: 'center',
+            verticalAlignment: 'top',
           },
-          structure: {
-            type: 'block',
-            layout: {
-              distribution: 'equal',
-              gap: 10,
-              horizontalAlignment: 'center',
-              verticalAlignment: 'center',
-              orientation: 'vertical',
+          text: {
+            color: '{{theme.titleFontColor}}',
+            fontFamily: '{{theme.titleFontName}}',
+            fontWeight: 'bold',
+            textAlign: 'center',
+          },
+        },
+        content: {
+          type: 'block',
+          positioning: {
+            relativeTo: 'title',
+            axis: 'vertical',
+            anchor: 'end',
+            offset: 15,
+            size: 'fill',
+            margin: { left: 100, right: 100, top: 0, bottom: 40 },
+          },
+          layout: {
+            distribution: 'space-between',
+            gap: 12,
+            verticalAlignment: 'top',
+            horizontalAlignment: 'center',
+            orientation: 'vertical',
+          },
+          childTemplate: {
+            count: 'auto',
+            wrap: {
+              enabled: false,
             },
-            children: [
-              {
-                type: 'text',
-                label: 'label',
-                layout: {
-                  horizontalAlignment: 'center',
-                  verticalAlignment: 'center',
-                },
-                text: {
-                  color: '{{theme.labelFontColor}}',
-                  fontFamily: '{{theme.labelFontName}}',
-                  fontWeight: 'bold',
-                  fontStyle: 'normal',
-                  textAlign: 'center',
-                },
+            structure: {
+              type: 'block',
+              label: 'item',
+              layout: {
+                distribution: '1/3',
+                gap: 12,
+                horizontalAlignment: 'left',
+                verticalAlignment: 'center',
+                orientation: 'horizontal',
               },
-              {
-                type: 'text',
-                label: 'content',
-                layout: {
-                  horizontalAlignment: 'center',
-                  verticalAlignment: 'center',
+              children: [
+                {
+                  type: 'text',
+                  id: 'label',
+                  label: 'label',
+                  layout: {
+                    horizontalAlignment: 'center',
+                    verticalAlignment: 'center',
+                  },
+                  text: {
+                    color: '{{theme.themeColors[0]}}',
+                    fontFamily: '{{theme.labelFontName}}',
+                    fontWeight: 'bold',
+                    textAlign: 'right',
+                    fontSizeRange: { minSize: 14, maxSize: 20 },
+                  },
                 },
-                text: {
-                  color: '{{theme.card.textColor}}',
-                  fontFamily: '{{theme.fontName}}',
-                  fontWeight: 'normal',
-                  fontStyle: 'normal',
-                  textAlign: 'center',
+                {
+                  type: 'text',
+                  id: 'content',
+                  label: 'content',
+                  layout: {
+                    horizontalAlignment: 'left',
+                    verticalAlignment: 'center',
+                  },
+                  text: {
+                    color: '{{theme.fontColor}}',
+                    fontFamily: '{{theme.fontName}}',
+                    fontWeight: 'normal',
+                    textAlign: 'left',
+                    fontSizeRange: { minSize: 15, maxSize: 22 },
+                  },
                 },
-              },
-            ],
+              ],
+            },
           },
         },
       },
     },
   },
-};
+  {
+    id: 'labeled-list-vertical-container-border',
+    name: 'Labeled List - Vertical Container Border',
+    config: {
+      containers: {
+        title: {
+          type: 'text',
+          bounds: {
+            left: 0,
+            top: 15,
+            width: { expr: 'SLIDE_WIDTH' },
+            height: 110,
+          },
+          layout: {
+            horizontalAlignment: 'center',
+            verticalAlignment: 'top',
+          },
+          text: {
+            color: '{{theme.titleFontColor}}',
+            fontFamily: '{{theme.titleFontName}}',
+            fontWeight: 'bold',
+            textAlign: 'center',
+          },
+        },
+        content: {
+          type: 'block',
+          positioning: {
+            relativeTo: 'title',
+            axis: 'vertical',
+            anchor: 'end',
+            offset: 20,
+            size: 'fill',
+            margin: { left: 40, right: 40, top: 0, bottom: 40 },
+          },
+          border: {
+            width: '{{theme.card.borderWidth}}',
+            color: '{{theme.themeColors[0]}}',
+            radius: '{{theme.card.borderRadius}}',
+          },
+          layout: {
+            distribution: 'equal',
+            gap: 15,
+            verticalAlignment: 'top',
+            orientation: 'vertical',
+          },
+          childTemplate: {
+            count: 'auto',
+            wrap: {
+              enabled: false,
+            },
+            structure: {
+              type: 'block',
+              label: 'item',
+              layout: {
+                distribution: '1/3',
+                gap: 15,
+                horizontalAlignment: 'left',
+                verticalAlignment: 'center',
+                orientation: 'horizontal',
+              },
+              children: [
+                {
+                  type: 'text',
+                  id: 'label',
+                  label: 'label',
+                  text: {
+                    color: '{{theme.labelFontColor}}',
+                    fontFamily: '{{theme.labelFontName}}',
+                    fontWeight: 'bold',
+                    textAlign: 'right',
+                    fontSizeRange: { minSize: 16, maxSize: 24 },
+                  },
+                },
+                {
+                  type: 'text',
+                  id: 'content',
+                  label: 'content',
+                  text: {
+                    color: '{{theme.fontColor}}',
+                    fontFamily: '{{theme.fontName}}',
+                    fontWeight: 'normal',
+                    textAlign: 'left',
+                    fontSizeRange: { minSize: 15, maxSize: 22 },
+                  },
+                },
+              ],
+            },
+          },
+        },
+      },
+    },
+  },
+];

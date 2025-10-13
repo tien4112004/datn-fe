@@ -118,7 +118,8 @@ export function calculateWrapLayout(bounds: Bounds, options?: WrapLayoutOptions)
     distribution = 'equal',
   } = options || {};
 
-  return calculateWrapLayoutInternal(itemCount, bounds, wrapConfig, orientation, gap, distribution);
+  const res = calculateWrapLayoutInternal(itemCount, bounds, wrapConfig, orientation, gap, distribution);
+  return res;
 }
 
 /**
@@ -413,8 +414,9 @@ function calculateWrapLayoutInternal(
 
     if (wrapConfig.syncSize) {
       // Fixed-size mode: use size based on the fullest line
-      const totalSpacing = (maxPerLine - 1) * gap;
-      itemPrimarySize = (effectiveContainerSize - totalSpacing) / maxPerLine;
+      const largestLine = Math.max(...distributions);
+      const totalSpacing = (largestLine - 1) * gap;
+      itemPrimarySize = (effectiveContainerSize - totalSpacing) / largestLine;
       lineContentSize = itemsInLine * itemPrimarySize + (itemsInLine - 1) * gap;
     } else {
       // Original mode: divide space equally among items in this line

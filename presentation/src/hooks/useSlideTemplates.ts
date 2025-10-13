@@ -1,6 +1,8 @@
 import { useSlidesStore } from '@/store';
 import type { SlideTheme } from '@/types/slides';
 import { convertToSlide } from '@/utils/slideLayout';
+import { TEMPLATE_VARIATIONS } from '@/utils/slideLayout/converters/templateSelector';
+import { SLIDE_LAYOUT_TYPE } from '@/utils/slideLayout/types';
 
 export default function useSlideTemplates() {
   const slidesStore = useSlidesStore();
@@ -26,8 +28,6 @@ export default function useSlideTemplates() {
 
   const getTemplateTypes = () => Object.keys(slideTemplates);
 
-  const getThemes = () => THEMES_DATA;
-
   return {
     createSlide,
     getTemplateTypes,
@@ -40,24 +40,28 @@ const viewport = {
   height: 562.5,
 };
 
+export const getThemes = () => THEMES_DATA;
+
 const slideTemplates: Record<string, any[]> = {
-  'title-with-subtitle': Array(4).fill({
+  'title-with-subtitle': TEMPLATE_VARIATIONS[SLIDE_LAYOUT_TYPE.TITLE].map((tmpl) => ({
     type: 'title',
+    title: tmpl.name,
     data: {
       title: 'Presentation with really long title',
       subtitle:
         'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
     },
-  }),
-  'title-no-subtitle': Array(4).fill({
+  })),
+  'title-no-subtitle': TEMPLATE_VARIATIONS[SLIDE_LAYOUT_TYPE.TITLE].map((tmpl) => ({
     type: 'title',
+    title: tmpl.name,
     data: {
       title: 'Presentation with really long title',
     },
-  }),
-  'two-column-with-image': Array(7).fill({
+  })),
+  'two-column-with-image': TEMPLATE_VARIATIONS[SLIDE_LAYOUT_TYPE.TWO_COLUMN_WITH_IMAGE].map((tmpl) => ({
     type: 'two_column_with_image',
-    title: 'Presentation',
+    title: tmpl.name,
     data: {
       items: [
         'Item1: Lorem ipsum dolor sit amet, consectetur adipiscing elit. ',
@@ -66,10 +70,10 @@ const slideTemplates: Record<string, any[]> = {
       ],
       image: 'https://placehold.co/600x400',
     },
-  }),
-  'two-column': Array(9).fill({
+  })),
+  'two-column': TEMPLATE_VARIATIONS[SLIDE_LAYOUT_TYPE.TWO_COLUMN].map((tmpl) => ({
     type: 'two_column',
-    title: 'this is a title',
+    title: tmpl.name,
     data: {
       items1: [
         'Item1-1: Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
@@ -82,16 +86,18 @@ const slideTemplates: Record<string, any[]> = {
         'Item2-3: Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
       ],
     },
-  }),
-  'main-image': Array(8).fill({
+  })),
+  'main-image': TEMPLATE_VARIATIONS[SLIDE_LAYOUT_TYPE.MAIN_IMAGE].map((tmpl) => ({
     type: 'main_image',
+    title: tmpl.name,
     data: {
       image: 'https://placehold.co/600x400',
       content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
     },
-  }),
-  'table-of-contents': Array(6).fill({
+  })),
+  'table-of-contents': TEMPLATE_VARIATIONS[SLIDE_LAYOUT_TYPE.TABLE_OF_CONTENTS].map((tmpl) => ({
     type: 'table_of_contents',
+    title: tmpl.name,
     data: {
       items: [
         'What & Why of Microservices',
@@ -104,10 +110,10 @@ const slideTemplates: Record<string, any[]> = {
         'Case Study & Q&A',
       ],
     },
-  }),
-  list: Array(6).fill({
+  })),
+  list: TEMPLATE_VARIATIONS[SLIDE_LAYOUT_TYPE.LIST].map((tmpl) => ({
     type: 'list',
-    title: 'This is a title',
+    title: tmpl.name,
     data: {
       items: [
         'Item1: Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
@@ -119,10 +125,10 @@ const slideTemplates: Record<string, any[]> = {
         'Item7: Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
       ],
     },
-  }),
-  'labeled-list': Array(4).fill({
+  })),
+  'labeled-list': TEMPLATE_VARIATIONS[SLIDE_LAYOUT_TYPE.LABELED_LIST].map((tmpl) => ({
     type: 'labeled_list',
-    title: 'Five Fundamentals of Microservices',
+    title: tmpl.name,
     data: {
       items: [
         {
@@ -147,7 +153,16 @@ const slideTemplates: Record<string, any[]> = {
         },
       ],
     },
-  }),
+  })),
+  test: [
+    {
+      type: 'title',
+      data: {
+        title: 'Test Slide Title',
+        subtitle: 'Test Slide Subtitle',
+      },
+    },
+  ],
 };
 
 /**

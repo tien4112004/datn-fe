@@ -50,10 +50,10 @@ export function measureElement(element: HTMLElement, container: LayoutBlockInsta
   element.style.visibility = 'hidden';
   element.style.top = '-9999px';
   element.style.left = '-9999px';
-  element.style.paddingInline = '10px'; // Add padding to match actual rendering
+  element.style.paddingInline = '15px'; // Add padding to match actual rendering
 
   // Apply constraints from container
-  if (container.bounds?.width) {
+  if (container.bounds?.width && container.label !== 'label' && container.label !== 'title') {
     element.style.maxWidth = `${container.bounds.width}px`;
     element.style.whiteSpace = 'normal';
     element.style.overflowWrap = 'break-word';
@@ -154,7 +154,6 @@ export function applyFontSizeToElement(element: HTMLElement, fontSize: number, l
  * @param element - Element to optimize
  * @param container - Container with bounds constraints
  * @param fontSizeRange - Min/max size range
- * @param lineHeight - Line height multiplier
  * @returns Optimal font size in pixels
  */
 export function calculateLargestOptimalFontSize(

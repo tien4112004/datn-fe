@@ -1,62 +1,12 @@
 import seedrandom from 'seedrandom';
 import type { Template } from '../types';
-import {
-  listLayoutTemplate,
-  listCompactTemplate,
-  listCardsTemplate,
-  listNumberedTemplate,
-  listNumberedCompactTemplate,
-  listNumberedCardsTemplate,
-} from './template/list';
-import {
-  twoColumnWithImageLayoutTemplate,
-  twoColumnLeftBigImageTemplate,
-  twoColumnRightBigImageTemplate,
-  twoColumnRightImageTemplate,
-  twoColumnWithImageContainerBorderTemplate,
-  twoColumnLeftBigImageContainerBorderTemplate,
-  twoColumnRightBigImageContainerBorderTemplate,
-} from './template/twoColumnWithImage';
-import {
-  twoColumnLayoutTemplate,
-  twoColumnSplitTemplate,
-  twoColumnAsymmetricTemplate,
-  twoColumnContainerBorderTemplate,
-  twoColumnContainerBorderShadowTemplate,
-  twoColumnContainerBorderLeftTemplate,
-  twoColumnBorderedItemsTemplate,
-  twoColumnBorderedItemsShadowTemplate,
-  twoColumnBorderedItemsCompactTemplate,
-} from './template/twoColumn';
-import {
-  labeledListLayoutTemplate,
-  labeledListGridTemplate,
-  labeledListSingleRowTemplate,
-  labeledListNumberedTemplate,
-} from './template/labeledList';
-import {
-  titleLayoutTemplate,
-  titleTopTemplate,
-  titleLeftAlignTemplate,
-  titleRightAlignTemplate,
-} from './template/title';
-import {
-  mainImageLayoutTemplate,
-  mainImageCenteredTemplate,
-  mainImageLeftTemplate,
-  mainImageRightTemplate,
-  mainImageBottomTemplate,
-  mainImageWithTitleOverlayTemplate,
-  mainImageTopTemplate,
-  mainImageFramedTemplate,
-} from './template/mainImage';
-import {
-  tableOfContentsLayoutTemplate,
-  tableOfContentsGridTemplate,
-  tableOfContentsTwoRowTemplate,
-  tableOfContentsContainerBorderTemplate,
-  tableOfContentsContainerBorderShadowTemplate,
-} from './template/tableOfContents';
+import { listTemplates } from './template/list';
+import { twoColumnWithImageTemplates } from './template/twoColumnWithImage';
+import { twoColumnTemplates } from './template/twoColumn';
+import { labeledListTemplates } from './template/labeledList';
+import { titleTemplates } from './template/title';
+import { mainImageTemplates } from './template/mainImage';
+import { tableOfContentsTemplates } from './template/tableOfContents';
 import { SLIDE_LAYOUT_TYPE } from '../types';
 
 /**
@@ -67,64 +17,14 @@ const cycleIndexes: Record<string, number> = {};
 /**
  * Template variations for each layout type
  */
-const TEMPLATE_VARIATIONS: Record<string, Template[]> = {
-  [SLIDE_LAYOUT_TYPE.LIST]: [
-    listLayoutTemplate,
-    listCompactTemplate,
-    listCardsTemplate,
-    listNumberedTemplate,
-    listNumberedCompactTemplate,
-    listNumberedCardsTemplate,
-  ],
-  [SLIDE_LAYOUT_TYPE.TWO_COLUMN_WITH_IMAGE]: [
-    twoColumnWithImageLayoutTemplate,
-    twoColumnLeftBigImageTemplate,
-    twoColumnRightBigImageTemplate,
-    twoColumnRightImageTemplate,
-    twoColumnWithImageContainerBorderTemplate,
-    twoColumnLeftBigImageContainerBorderTemplate,
-    twoColumnRightBigImageContainerBorderTemplate,
-  ],
-  [SLIDE_LAYOUT_TYPE.TWO_COLUMN]: [
-    twoColumnLayoutTemplate,
-    twoColumnSplitTemplate,
-    twoColumnAsymmetricTemplate,
-    twoColumnContainerBorderTemplate,
-    twoColumnContainerBorderShadowTemplate,
-    twoColumnContainerBorderLeftTemplate,
-    twoColumnBorderedItemsTemplate,
-    twoColumnBorderedItemsShadowTemplate,
-    twoColumnBorderedItemsCompactTemplate,
-  ],
-  [SLIDE_LAYOUT_TYPE.LABELED_LIST]: [
-    labeledListLayoutTemplate,
-    labeledListGridTemplate,
-    labeledListSingleRowTemplate,
-    labeledListNumberedTemplate,
-  ],
-  [SLIDE_LAYOUT_TYPE.TITLE]: [
-    titleLayoutTemplate,
-    titleTopTemplate,
-    titleLeftAlignTemplate,
-    titleRightAlignTemplate,
-  ],
-  [SLIDE_LAYOUT_TYPE.MAIN_IMAGE]: [
-    mainImageLayoutTemplate,
-    mainImageCenteredTemplate,
-    mainImageLeftTemplate,
-    mainImageRightTemplate,
-    mainImageBottomTemplate,
-    mainImageWithTitleOverlayTemplate,
-    mainImageTopTemplate,
-    mainImageFramedTemplate,
-  ],
-  [SLIDE_LAYOUT_TYPE.TABLE_OF_CONTENTS]: [
-    tableOfContentsLayoutTemplate,
-    tableOfContentsGridTemplate,
-    tableOfContentsTwoRowTemplate,
-    tableOfContentsContainerBorderTemplate,
-    tableOfContentsContainerBorderShadowTemplate,
-  ],
+export const TEMPLATE_VARIATIONS: Record<string, Template[]> = {
+  [SLIDE_LAYOUT_TYPE.LIST]: listTemplates,
+  [SLIDE_LAYOUT_TYPE.TWO_COLUMN_WITH_IMAGE]: twoColumnWithImageTemplates,
+  [SLIDE_LAYOUT_TYPE.TWO_COLUMN]: twoColumnTemplates,
+  [SLIDE_LAYOUT_TYPE.LABELED_LIST]: labeledListTemplates,
+  [SLIDE_LAYOUT_TYPE.TITLE]: titleTemplates,
+  [SLIDE_LAYOUT_TYPE.MAIN_IMAGE]: mainImageTemplates,
+  [SLIDE_LAYOUT_TYPE.TABLE_OF_CONTENTS]: tableOfContentsTemplates,
 };
 
 /**

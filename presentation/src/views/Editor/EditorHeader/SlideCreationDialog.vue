@@ -111,11 +111,14 @@ const layouts = {
   'table-of-contents': {
     name: 'Table of Contents',
   },
-  'vertical-list': {
-    name: 'Vertical List',
+  list: {
+    name: 'List',
   },
-  'horizontal-list': {
-    name: 'Horizontal List',
+  'labeled-list': {
+    name: 'Labeled List',
+  },
+  test: {
+    name: 'Test Layout',
   },
 };
 
@@ -198,11 +201,11 @@ const handleCreate = () => {
   background: repeating-linear-gradient(to bottom, #9ca3af 0%, #9ca3af 15%, transparent 15%, transparent 20%);
 }
 
-.layout-vertical-list {
+.layout-list {
   background: repeating-linear-gradient(to bottom, #9ca3af 0%, #9ca3af 20%, transparent 20%, transparent 25%);
 }
 
-.layout-horizontal-list {
+.layout-labeled-list {
   background: repeating-linear-gradient(to right, #9ca3af 0%, #9ca3af 20%, transparent 20%, transparent 25%);
 }
 </style>

@@ -63,8 +63,8 @@ export const SLIDE_LAYOUT_TYPE = {
   MAIN_IMAGE: 'main_image',
   TITLE: 'title',
   TWO_COLUMN: 'two_column',
-  LIST: 'vertical_list',
-  LABELED_LIST: 'horizontal_list',
+  LIST: 'list',
+  LABELED_LIST: 'labeled_list',
   TABLE_OF_CONTENTS: 'table_of_contents',
 } as const;
 

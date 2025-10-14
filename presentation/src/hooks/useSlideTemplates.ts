@@ -154,6 +154,38 @@ const slideTemplates: Record<string, any[]> = {
       ],
     },
   })),
+  timeline: TEMPLATE_VARIATIONS[SLIDE_LAYOUT_TYPE.TIMELINE].map((tmpl) => ({
+    type: 'timeline',
+    title: tmpl.name,
+    data: {
+      items: [
+        {
+          label: '2020',
+          content: 'Project Kickoff',
+        },
+        {
+          label: '2021',
+          content: 'Alpha Release',
+        },
+        {
+          label: '2022',
+          content: 'Beta Testing',
+        },
+        {
+          label: '2023',
+          content: 'Version 1.0',
+        },
+        {
+          label: '2024',
+          content: 'Global Launch',
+        },
+        {
+          label: '2025',
+          content: 'First Major Update',
+        },
+      ],
+    },
+  })),
   test: [
     {
       type: 'title',

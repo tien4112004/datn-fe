@@ -53,6 +53,7 @@ import type {
   ListLayoutSchema,
   LabeledListLayoutSchema,
   TableOfContentsLayoutSchema,
+  TimelineLayoutSchema,
 } from './types';
 import { SLIDE_LAYOUT_TYPE } from './types';
 import { convertLayoutGeneric, resolveTemplate } from './converters';
@@ -261,6 +262,24 @@ export const convertToSlide = async (
           content: {
             content: d.data.items,
             label: hasNumbering ? d.data.items.map((_, index) => String(index + 1).padStart(2, '0')) : [],
+          },
+        },
+      }),
+      slideId
+    );
+  } else if (layoutType === SLIDE_LAYOUT_TYPE.TIMELINE) {
+    const selectedTemplate = selectTemplate(layoutType, seed);
+    const template = resolveTemplate(selectedTemplate.config, theme, viewport, selectedTemplate.graphics);
+
+    return convertLayoutGeneric(
+      data as TimelineLayoutSchema,
+      template,
+      (d) => ({
+        texts: { title: d.title },
+        blocks: {
+          content: {
+            label: d.data.items.map((item) => item.label),
+            content: d.data.items.map((item) => item.content),
           },
         },
       }),

@@ -58,6 +58,17 @@ export interface TableOfContentsLayoutSchema {
   };
 }
 
+export interface TimelineLayoutSchema {
+  type: string;
+  title: string;
+  data: {
+    items: {
+      label: string;
+      content: string;
+    }[];
+  };
+}
+
 export const SLIDE_LAYOUT_TYPE = {
   TWO_COLUMN_WITH_IMAGE: 'two_column_with_image',
   MAIN_IMAGE: 'main_image',
@@ -66,6 +77,7 @@ export const SLIDE_LAYOUT_TYPE = {
   LIST: 'list',
   LABELED_LIST: 'labeled_list',
   TABLE_OF_CONTENTS: 'table_of_contents',
+  TIMELINE: 'timeline',
 } as const;
 
 export { SLIDE_LAYOUT_TYPE as default };
@@ -79,4 +91,5 @@ export type SlideLayoutSchema =
   | TwoColumnLayoutSchema
   | ListLayoutSchema
   | LabeledListLayoutSchema
-  | TableOfContentsLayoutSchema;
+  | TableOfContentsLayoutSchema
+  | TimelineLayoutSchema;

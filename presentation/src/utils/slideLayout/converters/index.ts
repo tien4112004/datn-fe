@@ -87,6 +87,9 @@ export async function convertLayoutGeneric<T = any>(
   // Track actual bounds of rendered elements (for graphics rendering)
   const containerActualBounds: Record<string, Bounds> = {};
 
+  // Track child bounds for each container (for timeline graphics)
+  const childBounds: Record<string, Bounds[]> = {};
+
   // Process block containers with labeled children
   if (mappedData.blocks) {
     for (const [containerId, labelData] of Object.entries(mappedData.blocks)) {
@@ -107,6 +110,11 @@ export async function convertLayoutGeneric<T = any>(
 
       // Build layout with unified font sizing
       const { instance, elements } = buildLayoutWithUnifiedFontSizing(container, container.bounds, labelData);
+
+      // Extract child bounds for timeline graphics
+      if (instance.children && instance.children.length > 0) {
+        childBounds[containerId] = instance.children.map((child) => child.bounds);
+      }
 
       // Extract cards (border decorations)
       const cards = buildCards(instance);
@@ -183,6 +191,7 @@ export async function convertLayoutGeneric<T = any>(
       viewport: template.viewport,
       containerBounds,
       containerActualBounds, // Pass actual rendered bounds
+      childBounds, // Pass child bounds for timeline graphics
     };
     const renderedGraphics = renderGraphics(template.graphics, graphicsContext);
     // Graphics render at zIndex 50 by default (above cards but below content)

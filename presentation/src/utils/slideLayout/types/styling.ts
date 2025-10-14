@@ -75,4 +75,6 @@ export interface WrapConfig {
   wrapDistribution?: 'balanced' | 'top-heavy' | 'bottom-heavy';
   alternating?: { start: number; end: number }; // Shrink alternating lines by these pixel offsets (supports negative values)
   syncSize?: boolean; // Use uniform size based on the fullest line
+  snake?: boolean; // Reverse item order in odd rows for snake/zigzag pattern (e.g., 1->2->3->4, 8<-7<-6<-5)
+  zigzag?: boolean; // Stagger items across two rows alternately (e.g., 1  3  5 / 2  4  6)
 }

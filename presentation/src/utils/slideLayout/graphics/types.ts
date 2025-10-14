@@ -42,9 +42,50 @@ export interface CornerDecoration {
 }
 
 /**
+ * Straight horizontal timeline with arrows connecting items
+ * Best for: Linear chronological progressions
+ */
+export interface StraightTimeline {
+  type: 'straightTimeline';
+  containerId: string; // Which container holds the timeline items
+  color?: string; // Arrow/line color (defaults to theme.themeColors[0])
+  thickness?: number; // Arrow line thickness (defaults to 3)
+  verticalOffset?: number; // Offset from item bottom (defaults to 20)
+}
+
+export interface AlternatingTimeline {
+  type: 'alternatingTimeline';
+  containerId: string;
+  color?: string;
+  thickness?: number;
+  centralLineY?: number; // Y position of central line (auto-calculated if not provided)
+  branchLength?: number; // Length of vertical branches (defaults to 40)
+}
+
+/**
+ * Wrapping timeline with snake pattern (rows alternate direction)
+ * Best for: Multi-row timelines with wrapping enabled
+ * Example: 1 -> 2 -> 3 -> 4
+ *                        |
+ *          8 <- 7 <- 6 <- 5
+ */
+export interface WrappingTimeline {
+  type: 'wrappingTimeline';
+  containerId: string; // Which container holds the timeline items
+  color?: string; // Arrow/line color (defaults to theme.themeColors[0])
+  thickness?: number; // Arrow line thickness (defaults to 3)
+}
+
+/**
  * Union of all graphic types
  */
-export type GraphicElement = TitleLine | ContentSeparator | CornerDecoration;
+export type GraphicElement =
+  | TitleLine
+  | ContentSeparator
+  | CornerDecoration
+  | StraightTimeline
+  | AlternatingTimeline
+  | WrappingTimeline;
 
 /**
  * Graphics collection for a template

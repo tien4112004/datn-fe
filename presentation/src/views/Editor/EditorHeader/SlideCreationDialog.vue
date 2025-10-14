@@ -117,6 +117,9 @@ const layouts = {
   'labeled-list': {
     name: 'Labeled List',
   },
+  timeline: {
+    name: 'Timeline',
+  },
   test: {
     name: 'Test Layout',
   },

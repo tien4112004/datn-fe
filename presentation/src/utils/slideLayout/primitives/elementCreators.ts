@@ -130,7 +130,8 @@ export function createListElements(
   const dimensions = measureElement(listElement, container);
 
   // Check if content exceeds container height - if so, split into 2 columns
-  const needsColumnWrap = dimensions.height > container.bounds.height;
+  // OR if twoColumn is explicitly enabled, force two-column layout
+  const needsColumnWrap = dimensions.height > container.bounds.height || container.combined?.twoColumn;
 
   if (needsColumnWrap && container.combined?.wrapping !== false) {
     // Split items into two columns

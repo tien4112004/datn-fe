@@ -84,7 +84,6 @@ function renderContentSeparator(graphic: ContentSeparator, context: GraphicsRend
 
   const color = graphic.color || theme.fontColor;
   const thickness = graphic.thickness || 2;
-  const gap = graphic.gap ?? 0;
 
   let start: [number, number];
   let end: [number, number];
@@ -95,20 +94,20 @@ function renderContentSeparator(graphic: ContentSeparator, context: GraphicsRend
     const y = (bounds1.top + bounds1.height + bounds2.top) / 2;
     const leftmost = Math.min(bounds1.left, bounds2.left);
     const rightmost = Math.max(bounds1.left + bounds1.width, bounds2.left + bounds2.width);
-    const length = rightmost - leftmost - gap * 2;
+    const length = rightmost - leftmost;
 
-    start = [leftmost + gap, y];
-    end = [leftmost + gap + length, y];
+    start = [leftmost, y];
+    end = [rightmost, y];
     lineWidth = length;
   } else {
     // Vertical line between left (container1) and right (container2) containers
     const x = (bounds1.left + bounds1.width + bounds2.left) / 2;
     const topmost = Math.min(bounds1.top, bounds2.top);
     const bottommost = Math.max(bounds1.top + bounds1.height, bounds2.top + bounds2.height);
-    const length = bottommost - topmost - gap * 2;
+    const length = bottommost - topmost;
 
-    start = [x, topmost + gap];
-    end = [x, topmost + gap + length];
+    start = [x, topmost];
+    end = [x, bottommost];
     lineWidth = length;
   }
 

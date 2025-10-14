@@ -27,7 +27,6 @@ export interface ContentSeparator {
   color?: string; // Defaults to theme.fontColor
   thickness?: number; // Defaults to 2
   containers: [string, string]; // [container1, container2] - separator positioned between them
-  gap?: number; // Additional spacing from containers (defaults to 0)
 }
 
 /**

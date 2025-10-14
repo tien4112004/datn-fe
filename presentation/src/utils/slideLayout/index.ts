@@ -105,7 +105,7 @@ export const convertToSlide = async (
 
   if (layoutType === SLIDE_LAYOUT_TYPE.TWO_COLUMN_WITH_IMAGE) {
     const selectedTemplate = selectTemplate(layoutType, seed);
-    const template = resolveTemplate(selectedTemplate.config, theme, viewport);
+    const template = resolveTemplate(selectedTemplate.config, theme, viewport, selectedTemplate.graphics);
     return convertLayoutGeneric(
       data as TwoColumnWithImageLayoutSchema,
       template,
@@ -114,12 +114,11 @@ export const convertToSlide = async (
         blocks: { content: { item: d.data.items } },
         images: { image: d.data.image },
       }),
-      slideId,
-      selectedTemplate.graphics
+      slideId
     );
   } else if (layoutType === SLIDE_LAYOUT_TYPE.MAIN_IMAGE) {
     const selectedTemplate = selectTemplate(layoutType, seed);
-    const template = resolveTemplate(selectedTemplate.config, theme, viewport);
+    const template = resolveTemplate(selectedTemplate.config, theme, viewport, selectedTemplate.graphics);
     return convertLayoutGeneric(
       data as MainImageLayoutSchema,
       template,
@@ -128,12 +127,11 @@ export const convertToSlide = async (
         blocks: { content: { content: [d.data.content] } },
         images: { image: d.data.image },
       }),
-      slideId,
-      selectedTemplate.graphics
+      slideId
     );
   } else if (layoutType === SLIDE_LAYOUT_TYPE.TITLE) {
     const selectedTemplate = selectTemplate(layoutType, seed);
-    const template = resolveTemplate(selectedTemplate.config, theme, viewport);
+    const template = resolveTemplate(selectedTemplate.config, theme, viewport, selectedTemplate.graphics);
     return convertLayoutGeneric(
       data as TitleLayoutSchema,
       template,
@@ -147,12 +145,11 @@ export const convertToSlide = async (
           },
         },
       }),
-      slideId,
-      selectedTemplate.graphics
+      slideId
     );
   } else if (layoutType === SLIDE_LAYOUT_TYPE.TWO_COLUMN) {
     const selectedTemplate = selectTemplate(layoutType, seed);
-    const template = resolveTemplate(selectedTemplate.config, theme, viewport);
+    const template = resolveTemplate(selectedTemplate.config, theme, viewport, selectedTemplate.graphics);
 
     // Check if template has separate leftColumn/rightColumn containers
     const hasLeftRightColumns = template.containers.leftColumn && template.containers.rightColumn;
@@ -179,12 +176,11 @@ export const convertToSlide = async (
 
         return { texts, blocks };
       },
-      slideId,
-      selectedTemplate.graphics
+      slideId
     );
   } else if (layoutType === SLIDE_LAYOUT_TYPE.LIST) {
     const selectedTemplate = selectTemplate(layoutType, seed);
-    const template = resolveTemplate(selectedTemplate.config, theme, viewport);
+    const template = resolveTemplate(selectedTemplate.config, theme, viewport, selectedTemplate.graphics);
 
     // Check if the template has numbering enabled (label/content structure)
     const contentContainer = template.containers.content;
@@ -214,12 +210,11 @@ export const convertToSlide = async (
           blocks: { content: contentData },
         };
       },
-      slideId,
-      selectedTemplate.graphics
+      slideId
     );
   } else if (layoutType === SLIDE_LAYOUT_TYPE.LABELED_LIST) {
     const selectedTemplate = selectTemplate(layoutType, seed);
-    const template = resolveTemplate(selectedTemplate.config, theme, viewport);
+    const template = resolveTemplate(selectedTemplate.config, theme, viewport, selectedTemplate.graphics);
 
     // Check if the template has numbering enabled
     const contentContainer = template.containers.content;
@@ -243,12 +238,11 @@ export const convertToSlide = async (
           },
         },
       }),
-      slideId,
-      selectedTemplate.graphics
+      slideId
     );
   } else if (layoutType === SLIDE_LAYOUT_TYPE.TABLE_OF_CONTENTS) {
     const selectedTemplate = selectTemplate(layoutType, seed);
-    const template = resolveTemplate(selectedTemplate.config, theme, viewport);
+    const template = resolveTemplate(selectedTemplate.config, theme, viewport, selectedTemplate.graphics);
 
     // Check if the template has numbering enabled
     const contentContainer = template.containers.content;
@@ -270,8 +264,7 @@ export const convertToSlide = async (
           },
         },
       }),
-      slideId,
-      selectedTemplate.graphics
+      slideId
     );
   } else {
     throw new Error(`Unsupported layout type: ${layoutType}`);

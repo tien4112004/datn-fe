@@ -65,15 +65,13 @@ export type DataMapper<T = any> = (data: T) => MappedLayoutData;
  * @param template - Resolved template with theme and viewport
  * @param mapData - Function that maps schema data to MappedLayoutData format
  * @param slideId - Optional slide ID (generates UUID if not provided)
- * @param graphics - Optional decorative graphics to render
  * @returns Promise<Slide> - Complete slide with all elements positioned
  */
 export async function convertLayoutGeneric<T = any>(
   data: T,
   template: TemplateConfig,
   mapData: DataMapper<T>,
-  slideId?: string,
-  graphics?: GraphicElement[]
+  slideId?: string
 ): Promise<Slide> {
   const mappedData = mapData(data);
 
@@ -173,7 +171,7 @@ export async function convertLayoutGeneric<T = any>(
 
   // Render decorative graphics if provided
   const graphicElements: Array<{ element: any; zIndex: number }> = [];
-  if (graphics && graphics.length > 0) {
+  if (template.graphics && template.graphics.length > 0) {
     // Extract just the bounds from each container for graphics context
     const containerBounds: Record<string, any> = {};
     for (const [id, container] of Object.entries(resolvedContainers)) {
@@ -186,7 +184,7 @@ export async function convertLayoutGeneric<T = any>(
       containerBounds,
       containerActualBounds, // Pass actual rendered bounds
     };
-    const renderedGraphics = renderGraphics(graphics, graphicsContext);
+    const renderedGraphics = renderGraphics(template.graphics, graphicsContext);
     // Graphics render at zIndex 50 by default (above cards but below content)
     graphicElements.push(...renderedGraphics.map((element) => ({ element, zIndex: -1 })));
   }
@@ -217,12 +215,14 @@ export async function convertLayoutGeneric<T = any>(
  * @param partialTemplate - Template with {{theme.xxx}} placeholders
  * @param theme - Theme object with colors, fonts, etc.
  * @param viewport - Viewport dimensions
+ * @param graphics - Optional decorative graphics
  * @returns Fully resolved template config
  */
 export function resolveTemplate(
   partialTemplate: PartialTemplateConfig,
   theme: SlideTheme,
-  viewport: SlideViewport
+  viewport: SlideViewport,
+  graphics?: GraphicElement[]
 ): TemplateConfig {
   // Use lodash cloneDeepWith to traverse and transform the object tree
   const resolvedContainers = cloneDeepWith(partialTemplate.containers, (value) => {
@@ -240,10 +240,27 @@ export function resolveTemplate(
     return undefined;
   });
 
+  const resolvedGraphics = graphics?.map((graphic) => {
+    return cloneDeepWith(graphic, (value) => {
+      if (typeof value === 'string' && value.includes('{{')) {
+        try {
+          const compiled = template(value, { interpolate: /\{\{(.+?)\}\}/g });
+          return compiled({ theme });
+        } catch (e) {
+          // If template compilation fails, return original string
+          return value;
+        }
+      }
+      // Return undefined to let cloneDeepWith handle other types normally
+      return undefined;
+    });
+  });
+
   return {
     containers: resolvedContainers,
     theme,
     viewport,
+    graphics: resolvedGraphics,
   };
 }
 

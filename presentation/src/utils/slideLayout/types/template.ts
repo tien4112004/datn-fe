@@ -51,6 +51,7 @@ export interface TemplateConfig {
   containers: Record<string, TemplateContainerConfig>;
   theme: SlideTheme;
   viewport: SlideViewport;
+  graphics?: GraphicElement[];
 }
 
 /**

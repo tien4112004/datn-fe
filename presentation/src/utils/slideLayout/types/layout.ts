@@ -94,6 +94,7 @@ export interface TextLayoutBlockConfig extends LayoutBlockConfig {
     pattern: string; // Pattern to combine multiple text items into one (e.g., "{0}. {1}")
     ordered?: boolean; // Whether to use ordered (numbered) list when combining
     wrapping?: boolean; // Whether to enable column wrapping if content exceeds bounds
+    twoColumn?: boolean; // Force two-column layout, always split evenly regardless of overflow
   };
 }
 
@@ -142,6 +143,7 @@ export interface TextLayoutBlockInstance extends LayoutBlockInstance {
     pattern: string; // Pattern to combine multiple text items into one (e.g., "{0}. {1}")
     ordered: boolean; // Whether to use ordered (numbered) list when combining
     wrapping?: boolean; // Whether to enable column wrapping if content exceeds bounds
+    twoColumn?: boolean; // Force two-column layout, always split evenly regardless of overflow
   };
 }
 

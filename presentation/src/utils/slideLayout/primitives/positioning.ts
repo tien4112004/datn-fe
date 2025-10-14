@@ -413,6 +413,78 @@ function calculateLayout(
 }
 
 /**
+ * Calculate pyramid layout where each item is on its own level with progressive width
+ * Level 1 (top) = narrow, Level N (bottom) = wide
+ */
+function calculatePyramidLayout(
+  itemCount: number,
+  containerBounds: Bounds,
+  wrapConfig: WrapConfig,
+  orientation: 'horizontal' | 'vertical',
+  gap: number
+): WrapLayoutResult {
+  if (itemCount === 0) {
+    return { lines: 0, itemsPerLine: [], itemBounds: [] };
+  }
+
+  const pyramidConfig = wrapConfig.pyramid!;
+  const axis = getAxisMapping(orientation);
+  const itemBounds: Bounds[] = [];
+
+  // Calculate level/row height (each item gets its own level)
+  const totalGap = (itemCount - 1) * gap;
+  const levelHeight = (containerBounds[axis.secondary] - totalGap) / itemCount;
+
+  // Calculate width range
+  const maxWidth = pyramidConfig.maxWidth || containerBounds[axis.primary];
+  const widthRatio = pyramidConfig.widthRatio || 0.5; // Default: top is 50% of bottom
+  const minWidth = pyramidConfig.minWidth || maxWidth * widthRatio;
+
+  // Calculate width increment per level
+  // If inverted, swap min and max widths so pyramid is upside down
+  const startWidth = pyramidConfig.inverted ? maxWidth : minWidth;
+  const endWidth = pyramidConfig.inverted ? minWidth : maxWidth;
+  const widthIncrement = (endWidth - startWidth) / Math.max(1, itemCount - 1);
+
+  // Create bounds for each level
+  for (let i = 0; i < itemCount; i++) {
+    // Normal: Level 0 = top (narrowest), Level N-1 = bottom (widest)
+    // Inverted: Level 0 = top (widest), Level N-1 = bottom (narrowest)
+    const levelWidth = startWidth + i * widthIncrement;
+
+    // Calculate secondary position (vertical position for vertical orientation)
+    const secondaryPos = containerBounds[axis.secondaryStart] + i * (levelHeight + gap);
+
+    // Calculate primary position (horizontal position for vertical orientation) - centered
+    const primaryPos = containerBounds[axis.primaryStart] + (containerBounds[axis.primary] - levelWidth) / 2;
+
+    // Build bounds by mapping primary/secondary to actual coordinates
+    const bounds: Bounds =
+      axis.primary === 'width'
+        ? {
+            left: primaryPos,
+            top: secondaryPos,
+            width: levelWidth,
+            height: levelHeight,
+          }
+        : {
+            left: secondaryPos,
+            top: primaryPos,
+            width: levelHeight,
+            height: levelWidth,
+          };
+
+    itemBounds.push(bounds);
+  }
+
+  return {
+    lines: itemCount, // Each item on its own line
+    itemsPerLine: Array(itemCount).fill(1), // 1 item per line
+    itemBounds,
+  };
+}
+
+/**
  * Calculate zigzag layout where items alternate between two rows in staggered pattern
  */
 function calculateZigzagLayout(
@@ -520,6 +592,11 @@ function calculateWrapLayoutInternal(
       itemsPerLine: [itemCount],
       itemBounds,
     };
+  }
+
+  // Pyramid case: progressive width layout with one item per level
+  if (wrapConfig.pyramid?.enabled) {
+    return calculatePyramidLayout(itemCount, containerBounds, wrapConfig, orientation, gap);
   }
 
   // Zigzag case: special layout with alternating rows

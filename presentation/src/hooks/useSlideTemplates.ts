@@ -183,6 +183,27 @@ const slideTemplates: Record<string, any[]> = {
           label: '2025',
           content: 'First Major Update',
         },
+        {
+          label: '2026',
+          content: 'Expansion to New Markets',
+        },
+        {
+          label: '2027',
+          content: 'Integration with Partner Platforms',
+        },
+      ],
+    },
+  })),
+  pyramid: TEMPLATE_VARIATIONS[SLIDE_LAYOUT_TYPE.PYRAMID].map((tmpl) => ({
+    type: 'pyramid',
+    title: tmpl.name,
+    data: {
+      items: [
+        'Vision & Mission',
+        'Strategic Goals',
+        'Key Initiatives',
+        'Action Plans',
+        'Performance Metrics',
       ],
     },
   })),

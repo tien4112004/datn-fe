@@ -4,6 +4,7 @@ import type {
   AlternatingTimeline,
   WrappingTimeline,
   ZigZagTimeline,
+  TrapezoidPyramid,
 } from '../../graphics/types';
 
 const straightTimelineTemplate: Template = {

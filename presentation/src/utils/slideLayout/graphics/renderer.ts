@@ -1,4 +1,9 @@
-import type { PPTLineElement, PPTShapeElement, SlideTheme } from '@/types/slides';
+import {
+  ShapePathFormulasKeys,
+  type PPTLineElement,
+  type PPTShapeElement,
+  type SlideTheme,
+} from '@/types/slides';
 import type {
   GraphicElement,
   TitleLine,
@@ -8,10 +13,12 @@ import type {
   AlternatingTimeline,
   WrappingTimeline,
   ZigZagTimeline,
+  TrapezoidPyramid,
 } from './types';
 import type { Bounds } from '../types';
 import { nanoid } from 'nanoid';
 import { DEFAULT_TITLE_LINE_SPACING } from '../primitives';
+import { SHAPE_PATH_FORMULAS } from '@/configs/shapes';
 
 /**
  * Context needed for rendering graphics
@@ -480,6 +487,76 @@ function renderZigzagTimeline(graphic: ZigZagTimeline, context: GraphicsRenderCo
 }
 
 /**
+ * Render TrapezoidPyramid - trapezoid shapes for each pyramid level
+ * Each level uses its actual layout bounds with progressive trapezoid angles
+ */
+function renderTrapezoidPyramid(
+  graphic: TrapezoidPyramid,
+  context: GraphicsRenderContext
+): PPTShapeElement[] {
+  const { theme, childBounds } = context;
+  const itemBounds = childBounds?.[graphic.containerId];
+
+  if (!itemBounds || itemBounds.length === 0) {
+    return [];
+  }
+
+  const spacing = graphic.spacing || 10;
+  const shapes: PPTShapeElement[] = [];
+
+  // Calculate slope rate of a level
+  // deltaH = level1.top - level0.top
+  // deltaW = level1.height / (level1.height + spacing) * (level1.width - level0.width)
+  // slope = deltaWidth / level1.height
+  const level0 = itemBounds[0];
+  const level1 = itemBounds[1];
+  const deltaH = level1.top - level0.top;
+  const deltaW = (level1.height / (level1.height + spacing)) * (level1.width - level0.width);
+  // Invert slope rate if reversed (pyramid grows downward instead of narrowing)
+  const slopeRate = deltaH !== 0 ? Math.abs(deltaW / level1.height) : 0;
+
+  itemBounds.forEach((bounds, levelIndex) => {
+    // Add vertical spacing only (user's change)
+    const left = bounds.left;
+    const top = bounds.top;
+    const width = bounds.width;
+    const height = bounds.height;
+
+    // Calculate width change across this trapezoid using global slope
+    const top_width = slopeRate * height;
+
+    // Keypoint calculation:
+    // top_width = width * (1 - 2*keypoint)
+    // keypoint = (width - top_width) / (2*width) = top_width / (2*width)
+    const keypoint = Math.max(0, Math.min(0.5, top_width / (2 * width)));
+
+    // Get color from graphic config or theme
+    // When reversed, use the original index for color consistency
+    const colors = graphic.colors || theme.themeColors;
+    const colorIndex = graphic.reverse ? itemBounds.length - 1 - levelIndex : levelIndex;
+    const fill = colors[colorIndex % colors.length];
+
+    shapes.push({
+      type: 'shape',
+      pathFormula: ShapePathFormulasKeys.TRAPEZOID,
+      id: nanoid(10),
+      left,
+      top,
+      width,
+      height,
+      rotate: graphic.reverse ? 180 : 0,
+      fixedRatio: false,
+      fill,
+      keypoints: [keypoint],
+      path: SHAPE_PATH_FORMULAS[ShapePathFormulasKeys.TRAPEZOID].formula(width, height, [keypoint]),
+      viewBox: [width, height],
+    } satisfies PPTShapeElement);
+  });
+
+  return shapes;
+}
+
+/**
  * Main render function - converts GraphicElement to PPT elements
  */
 export function renderGraphic(
@@ -501,6 +578,8 @@ export function renderGraphic(
       return renderWrappingTimeline(graphic, context);
     case 'zigzagTimeline':
       return renderZigzagTimeline(graphic, context);
+    case 'trapezoidPyramid':
+      return renderTrapezoidPyramid(graphic, context);
     default:
       const _exhaustive: never = graphic;
       throw new Error(`Unknown graphic type: ${(_exhaustive as any).type}`);

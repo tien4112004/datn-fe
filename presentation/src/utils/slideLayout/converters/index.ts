@@ -193,8 +193,9 @@ export async function convertLayoutGeneric<T = any>(
       containerActualBounds, // Pass actual rendered bounds
       childBounds, // Pass child bounds for timeline graphics
     };
+
     const renderedGraphics = renderGraphics(template.graphics, graphicsContext);
-    // Graphics render at zIndex 50 by default (above cards but below content)
+    // Graphics render at zIndex -1 by default (behind all content)
     graphicElements.push(...renderedGraphics.map((element) => ({ element, zIndex: -1 })));
   }
 

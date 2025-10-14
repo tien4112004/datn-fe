@@ -120,6 +120,9 @@ const layouts = {
   timeline: {
     name: 'Timeline',
   },
+  pyramid: {
+    name: 'Pyramid',
+  },
   test: {
     name: 'Test Layout',
   },

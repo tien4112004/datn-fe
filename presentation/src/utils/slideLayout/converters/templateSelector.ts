@@ -8,6 +8,7 @@ import { titleTemplates } from './template/title';
 import { mainImageTemplates } from './template/mainImage';
 import { tableOfContentsTemplates } from './template/tableOfContents';
 import { timelineTemplates } from './template/timeline';
+import { pyramidTemplates } from './template/pyramid';
 import { SLIDE_LAYOUT_TYPE } from '../types';
 
 /**
@@ -27,6 +28,7 @@ export const TEMPLATE_VARIATIONS: Record<string, Template[]> = {
   [SLIDE_LAYOUT_TYPE.MAIN_IMAGE]: mainImageTemplates,
   [SLIDE_LAYOUT_TYPE.TABLE_OF_CONTENTS]: tableOfContentsTemplates,
   [SLIDE_LAYOUT_TYPE.TIMELINE]: timelineTemplates,
+  [SLIDE_LAYOUT_TYPE.PYRAMID]: pyramidTemplates,
 };
 
 /**

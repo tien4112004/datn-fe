@@ -54,6 +54,7 @@ import type {
   LabeledListLayoutSchema,
   TableOfContentsLayoutSchema,
   TimelineLayoutSchema,
+  PyramidLayoutSchema,
 } from './types';
 import { SLIDE_LAYOUT_TYPE } from './types';
 import { convertLayoutGeneric, resolveTemplate } from './converters';
@@ -280,6 +281,23 @@ export const convertToSlide = async (
           content: {
             label: d.data.items.map((item) => item.label),
             content: d.data.items.map((item) => item.content),
+          },
+        },
+      }),
+      slideId
+    );
+  } else if (layoutType === SLIDE_LAYOUT_TYPE.PYRAMID) {
+    const selectedTemplate = selectTemplate(layoutType, seed);
+    const template = resolveTemplate(selectedTemplate.config, theme, viewport, selectedTemplate.graphics);
+
+    return convertLayoutGeneric(
+      data as PyramidLayoutSchema,
+      template,
+      (d) => ({
+        texts: { title: d.title },
+        blocks: {
+          content: {
+            item: d.data.items,
           },
         },
       }),

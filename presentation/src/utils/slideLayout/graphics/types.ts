@@ -7,6 +7,8 @@
  * 3. Add to GraphicElement union type
  */
 
+import type { BorderConfig } from '../types';
+
 /**
  * Horizontal line below title
  */
@@ -89,6 +91,15 @@ export interface ZigZagTimeline {
   zigzagWidth?: number; // Width of each zigzag (defaults to 40)
 }
 
+export interface TrapezoidPyramid {
+  type: 'trapezoidPyramid';
+  containerId: string; // Which container holds the pyramid items
+  spacing?: number; // Spacing between levels (defaults to 10)
+  border?: BorderConfig; // Border configuration for pyramid levels
+  colors?: string[]; // Colors for each level (defaults to theme.themeColors)
+  reverse?: boolean; // If true, pyramid is inverted (defaults to false)
+}
+
 /**
  * Union of all graphic types
  */
@@ -99,7 +110,8 @@ export type GraphicElement =
   | StraightTimeline
   | AlternatingTimeline
   | WrappingTimeline
-  | ZigZagTimeline;
+  | ZigZagTimeline
+  | TrapezoidPyramid;
 
 /**
  * Graphics collection for a template

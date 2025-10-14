@@ -77,6 +77,19 @@ export interface WrappingTimeline {
 }
 
 /**
+ * Zigzag timeline with alternating diagonal lines
+ * Best for: Emphasizing progression with a dynamic look
+ */
+export interface ZigZagTimeline {
+  type: 'zigzagTimeline';
+  containerId: string; // Which container holds the timeline items
+  color?: string; // Arrow/line color (defaults to theme.themeColors[0])
+  thickness?: number; // Arrow line thickness (defaults to 3)
+  zigzagHeight?: number; // Height of each zigzag (defaults to 20)
+  zigzagWidth?: number; // Width of each zigzag (defaults to 40)
+}
+
+/**
  * Union of all graphic types
  */
 export type GraphicElement =
@@ -85,7 +98,8 @@ export type GraphicElement =
   | CornerDecoration
   | StraightTimeline
   | AlternatingTimeline
-  | WrappingTimeline;
+  | WrappingTimeline
+  | ZigZagTimeline;
 
 /**
  * Graphics collection for a template

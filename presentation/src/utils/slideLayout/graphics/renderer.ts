@@ -7,6 +7,7 @@ import type {
   StraightTimeline,
   AlternatingTimeline,
   WrappingTimeline,
+  ZigZagTimeline,
 } from './types';
 import type { Bounds } from '../types';
 import { nanoid } from 'nanoid';
@@ -226,15 +227,15 @@ function renderStraightTimeline(graphic: StraightTimeline, context: GraphicsRend
 }
 
 /**
- * Render AlternatingTimeline - items above/below central line
+ * Render AlternatingTimeline - items above/below central line in zigzag layout
+ * Designed specifically for zigzag layouts where items alternate between two rows
  */
 function renderAlternatingTimeline(
   graphic: AlternatingTimeline,
   context: GraphicsRenderContext
 ): PPTLineElement[] {
-  const { theme, childBounds, containerBounds } = context;
+  const { theme, childBounds } = context;
   const itemBounds = childBounds?.[graphic.containerId];
-  const containerBound = containerBounds[graphic.containerId];
 
   if (!itemBounds || itemBounds.length < 2) {
     throw new Error(`AlternatingTimeline requires at least 2 items in container '${graphic.containerId}'`);
@@ -242,11 +243,12 @@ function renderAlternatingTimeline(
 
   const color = graphic.color || theme.themeColors[0];
   const thickness = graphic.thickness || 3;
-
-  // Calculate central line Y position
-  const centralLineY = graphic.centralLineY || containerBound.top + containerBound.height / 2;
-
   const lines: PPTLineElement[] = [];
+
+  // Calculate central line Y position (between the two rows)
+  const row0Y = itemBounds[0].top + itemBounds[0].height;
+  const row1Y = itemBounds[1].top;
+  const centralLineY = (row0Y + row1Y) / 2;
 
   // Main central horizontal line
   const leftmost = Math.min(...itemBounds.map((b) => b.left));
@@ -267,19 +269,32 @@ function renderAlternatingTimeline(
 
   // Create vertical branches for each item
   itemBounds.forEach((bounds, index) => {
-    const isAbove = index % 2 === 0; // Alternate above/below
     const itemCenterX = bounds.left + bounds.width / 2;
 
-    const branchY = isAbove ? bounds.top + bounds.height : bounds.top;
+    // Even-indexed items are in top row, odd-indexed in bottom row
+    const isTopRow = index % 2 === 0;
+
+    let branchStartY: number;
+    let branchEndY: number;
+
+    if (isTopRow) {
+      // Top row: branch extends downward from item bottom to central line
+      branchStartY = bounds.top + bounds.height;
+      branchEndY = centralLineY;
+    } else {
+      // Bottom row: branch extends upward from central line to item top
+      branchStartY = centralLineY;
+      branchEndY = bounds.top;
+    }
 
     lines.push({
       type: 'line',
       id: nanoid(10),
       left: itemCenterX,
-      top: Math.min(branchY, centralLineY),
+      top: Math.min(branchStartY, branchEndY),
       width: thickness,
       start: [0, 0],
-      end: [0, Math.abs(centralLineY - branchY)],
+      end: [0, Math.abs(branchEndY - branchStartY)],
       style: 'solid',
       color: color,
       points: ['', ''],
@@ -415,6 +430,56 @@ function renderWrappingTimeline(graphic: WrappingTimeline, context: GraphicsRend
 }
 
 /**
+ * Render ZigZagTimeline - diagonal arrows connecting items in zigzag pattern
+ * Arrows alternate between starting from bottom and top of items
+ */
+function renderZigzagTimeline(graphic: ZigZagTimeline, context: GraphicsRenderContext): PPTLineElement[] {
+  const { theme, childBounds } = context;
+  const itemBounds = childBounds?.[graphic.containerId];
+
+  if (!itemBounds || itemBounds.length < 2) {
+    throw new Error(`ZigZagTimeline requires at least 2 items in container '${graphic.containerId}'`);
+  }
+
+  const color = graphic.color || theme.themeColors[0];
+  const thickness = graphic.thickness || 3;
+  const lines: PPTLineElement[] = [];
+
+  // Create diagonal arrow between each consecutive pair
+  for (let i = 0; i < itemBounds.length - 1; i++) {
+    const current = itemBounds[i];
+    const next = itemBounds[i + 1];
+
+    // Alternate between bottom and top connections
+    const isEven = i % 2 === 0;
+
+    // Start from 3/4 position (midpoint between center and right edge) of current item
+    const startX = current.left + (current.width * 3) / 4;
+    const startY = isEven ? current.top + current.height + thickness : current.top - thickness;
+
+    // End at 1/4 position (midpoint between left edge and center) of next item
+    const endX = next.left + next.width / 4;
+    const endY = isEven ? next.top - thickness : next.top + next.height + thickness;
+
+    // Create diagonal line
+    lines.push({
+      type: 'line',
+      id: nanoid(10),
+      left: startX,
+      top: startY,
+      width: thickness,
+      start: [0, 0],
+      end: [endX - startX, endY - startY],
+      style: 'solid',
+      color,
+      points: ['', 'arrow'],
+    });
+  }
+
+  return lines;
+}
+
+/**
  * Main render function - converts GraphicElement to PPT elements
  */
 export function renderGraphic(
@@ -434,6 +499,8 @@ export function renderGraphic(
       return renderAlternatingTimeline(graphic, context);
     case 'wrappingTimeline':
       return renderWrappingTimeline(graphic, context);
+    case 'zigzagTimeline':
+      return renderZigzagTimeline(graphic, context);
     default:
       const _exhaustive: never = graphic;
       throw new Error(`Unknown graphic type: ${(_exhaustive as any).type}`);

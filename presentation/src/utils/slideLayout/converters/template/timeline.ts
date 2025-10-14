@@ -1,5 +1,10 @@
 import type { Template } from '../../types';
-import type { StraightTimeline, AlternatingTimeline, WrappingTimeline } from '../../graphics/types';
+import type {
+  StraightTimeline,
+  AlternatingTimeline,
+  WrappingTimeline,
+  ZigZagTimeline,
+} from '../../graphics/types';
 
 const straightTimelineTemplate: Template = {
   id: 'timeline-straight',
@@ -52,7 +57,6 @@ const straightTimelineTemplate: Template = {
             lineSpacing: 40,
             syncSize: true,
             snake: true,
-            zigzag: true,
           },
           structure: {
             type: 'block',
@@ -105,8 +109,9 @@ const straightTimelineTemplate: Template = {
 };
 
 /**
- * Template 3: Stepped Timeline
- * Zigzag progression with vertical steps
+ * Template 2: Stepped Timeline
+ * Alternating timeline with zigzag layout - items alternate between two rows
+ * with vertical branches connecting to a central horizontal line
  */
 const steppedTimelineTemplate: Template = {
   id: 'timeline-stepped',
@@ -138,9 +143,9 @@ const steppedTimelineTemplate: Template = {
           relativeTo: 'title',
           axis: 'vertical',
           anchor: 'end',
-          offset: 60,
+          offset: 10,
           size: 'fill',
-          margin: { left: 20, right: 20, bottom: 100 },
+          margin: { left: 20, right: 20, bottom: 20 },
         },
 
         layout: {
@@ -151,6 +156,11 @@ const steppedTimelineTemplate: Template = {
         },
         childTemplate: {
           count: 'auto',
+          wrap: {
+            enabled: true,
+            zigzag: true,
+            lineSpacing: 80,
+          },
           structure: {
             type: 'block',
             layout: {
@@ -191,10 +201,115 @@ const steppedTimelineTemplate: Template = {
       type: 'alternatingTimeline',
       containerId: 'content',
       thickness: 3,
-      branchLength: 10,
+      branchLength: 40,
     } as AlternatingTimeline,
   ],
 };
 
+/**
+ * Template 3: ZigZag Timeline
+ * Diagonal arrows connecting items in zigzag layout
+ * Creates a dynamic visual flow with alternating diagonal connections
+ */
+const zigZagTimelineTemplate: Template = {
+  id: 'timeline-zigzag',
+  name: 'Timeline - ZigZag',
+  config: {
+    containers: {
+      title: {
+        type: 'text',
+        bounds: {
+          left: 0,
+          top: 15,
+          width: { expr: 'SLIDE_WIDTH' },
+          height: 120,
+        },
+        layout: {
+          horizontalAlignment: 'center',
+          verticalAlignment: 'top',
+        },
+        text: {
+          color: '{{theme.titleFontColor}}',
+          fontFamily: '{{theme.titleFontName}}',
+          fontWeight: 'bold',
+          fontStyle: 'normal',
+        },
+      },
+      content: {
+        type: 'block',
+        positioning: {
+          relativeTo: 'title',
+          axis: 'vertical',
+          anchor: 'end',
+          offset: 10,
+          size: 'fill',
+          margin: { left: 30, right: 30, bottom: 30 },
+        },
+        layout: {
+          orientation: 'horizontal',
+          distribution: 'equal',
+          gap: 60,
+          verticalAlignment: 'center',
+        },
+        childTemplate: {
+          count: 'auto',
+          wrap: {
+            enabled: true,
+            zigzag: true,
+            lineSpacing: 120,
+          },
+          structure: {
+            type: 'block',
+            layout: {
+              orientation: 'vertical',
+              gap: 10,
+              horizontalAlignment: 'center',
+            },
+            border: {
+              color: '{{theme.borderColor}}',
+              width: '{{theme.card.borderWidth}}',
+              radius: '{{theme.card.borderRadius}}',
+            },
+            children: [
+              {
+                type: 'text',
+                label: 'label',
+                text: {
+                  fontSizeRange: { minSize: 14, maxSize: 18 },
+                  fontWeight: 'bold',
+                  color: '{{theme.themeColors[1]}}',
+                  fontFamily: '{{theme.labelFontName}}',
+                  textAlign: 'center',
+                },
+              },
+              {
+                type: 'text',
+                label: 'content',
+                text: {
+                  fontSizeRange: { minSize: 12, maxSize: 16 },
+                  color: '{{theme.fontColor}}',
+                  fontFamily: '{{theme.fontName}}',
+                  textAlign: 'center',
+                },
+              },
+            ],
+          },
+        },
+      },
+    },
+  },
+  graphics: [
+    {
+      type: 'zigzagTimeline',
+      containerId: 'content',
+      thickness: 3,
+    } as ZigZagTimeline,
+  ],
+};
+
 // Export all templates
-export const timelineTemplates: Template[] = [straightTimelineTemplate, steppedTimelineTemplate];
+export const timelineTemplates: Template[] = [
+  straightTimelineTemplate,
+  steppedTimelineTemplate,
+  zigZagTimelineTemplate,
+];

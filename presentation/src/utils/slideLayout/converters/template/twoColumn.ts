@@ -1,4 +1,5 @@
 import type { Template } from '../../types';
+import type { ContentSeparator } from '../../graphics/types';
 
 export const twoColumnTemplates: Template[] = [
   {
@@ -430,6 +431,15 @@ export const twoColumnTemplates: Template[] = [
         },
       },
     },
+    graphics: [
+      {
+        type: 'contentSeparator',
+        orientation: 'vertical',
+        containers: ['leftColumn', 'rightColumn'],
+        gap: 10,
+        color: '{{theme.themeColors[0]}}',
+      } as ContentSeparator,
+    ],
   },
   {
     id: 'two-column-bordered-items-shadow',
@@ -557,6 +567,15 @@ export const twoColumnTemplates: Template[] = [
         },
       },
     },
+    graphics: [
+      {
+        type: 'contentSeparator',
+        orientation: 'vertical',
+        containers: ['leftColumn', 'rightColumn'],
+        gap: 10,
+        color: '{{theme.themeColors[0]}}',
+      } as ContentSeparator,
+    ],
   },
   {
     id: 'two-column-bordered-items-compact',
@@ -617,7 +636,7 @@ export const twoColumnTemplates: Template[] = [
                 color: '{{theme.fontColor}}',
                 fontFamily: '{{theme.fontName}}',
                 fontWeight: 'normal',
-                textAlign: 'left',
+                textAlign: 'right',
               },
             },
           },
@@ -666,6 +685,15 @@ export const twoColumnTemplates: Template[] = [
         },
       },
     },
+    graphics: [
+      {
+        type: 'contentSeparator',
+        orientation: 'vertical',
+        containers: ['leftColumn', 'rightColumn'],
+        gap: 5,
+        color: '{{theme.themeColors[0]}}',
+      } as ContentSeparator,
+    ],
   },
   {
     id: 'two-column-container-bullet',
@@ -695,7 +723,8 @@ export const twoColumnTemplates: Template[] = [
           type: 'text',
           combined: {
             enabled: true,
-            pattern: '• {item}',
+            pattern: '{item}',
+            wrapping: true,
           },
           layout: {
             verticalAlignment: 'center',

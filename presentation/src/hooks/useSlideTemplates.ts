@@ -154,6 +154,114 @@ const slideTemplates: Record<string, any[]> = {
       ],
     },
   })),
+  test: [
+    {
+      type: 'title',
+      data: {
+        title: 'Our Amazing Solar System! 🚀',
+        subtitle: 'A Fun Trip Through Our Cosmic Neighborhood',
+      },
+    },
+    {
+      type: 'two_column_with_image',
+      title: 'What Is Our Solar System?',
+      data: {
+        items: [
+          "It's a giant <strong>family</strong> of planets, moons, and asteroids.",
+          'The super-hot <strong>Sun</strong> is the star right in the middle!',
+          'Everything travels together in a path called an <em>orbit</em>.',
+          "The Sun's powerful pull (gravity) keeps the family together.",
+        ],
+        image: 'A friendly illustration of the Sun at the center and all eight planets orbiting it',
+      },
+    },
+    {
+      type: 'two_column',
+      title: 'Two Planet Teams: Rock vs. Gas',
+      data: {
+        items1: [
+          'Inner Planets (Rock Giants)',
+          'Small and made of <strong>rock</strong>.',
+          'Closer to the Sun.',
+          'The team: Mercury, Venus, Earth, and Mars.',
+        ],
+        items2: [
+          'Outer Planets (Gas Giants)',
+          'Huge and made of swirling <em>gas</em>.',
+          'Much farther from the Sun.',
+          'The team: Jupiter, Saturn, Uranus, and Neptune.',
+        ],
+      },
+    },
+    {
+      type: 'labeled_list',
+      title: 'A Tour of the Rocky Planets ⛰️',
+      data: {
+        items: [
+          {
+            label: 'Mercury',
+            content: 'The smallest and <strong>fastest</strong> planet, closest to the Sun.',
+          },
+          {
+            label: 'Venus',
+            content: 'The <em>hottest</em> planet with thick, poisonous clouds.',
+          },
+          {
+            label: 'Earth',
+            content: 'Our beautiful home, with blue oceans and life!',
+          },
+          {
+            label: 'Mars',
+            content: "The 'Red Planet' with giant volcanoes and huge dust storms.",
+          },
+        ],
+      },
+    },
+    {
+      type: 'labeled_list',
+      title: 'Meet the Giant Gassy Planets 💨',
+      data: {
+        items: [
+          {
+            label: 'Jupiter',
+            content: 'The <strong>biggest</strong> planet with a storm (Great Red Spot) larger than Earth!',
+          },
+          {
+            label: 'Saturn',
+            content: 'Famous for its stunning, <em>icy rings</em> made of rock.',
+          },
+          {
+            label: 'Uranus',
+            content: 'The sideways planet that spins like a rolling ball.',
+          },
+          {
+            label: 'Neptune',
+            content: 'The very cold, windy, and farthest planet from the Sun.',
+          },
+        ],
+      },
+    },
+    {
+      type: 'list',
+      title: 'Out-of-this-World Facts! 🌟',
+      data: {
+        items: [
+          'A day on Venus is longer than its whole <strong>year</strong>!',
+          'You could fit all the other planets inside of <em>Jupiter</em>.',
+          'Mars has the tallest volcano we know of, called Olympus Mons.',
+          'Astronaut footprints on the Moon will stay there for millions of years!',
+        ],
+      },
+    },
+    {
+      type: 'main_image',
+      data: {
+        image: 'A beautiful, bright blue Earth floating in dark space with a tiny satellite nearby',
+        content:
+          "Earth is special! It's in the 'Goldilocks Zone' and it's our job to be <em>caretakers</em> of our wonderful home planet. 💙",
+      },
+    },
+  ],
 };
 
 /**

@@ -1,4 +1,5 @@
 import type { Template } from '../../types';
+import type { TitleLine, CornerDecoration } from '../../graphics/types';
 
 export const titleTemplates: Template[] = [
   {
@@ -9,12 +10,12 @@ export const titleTemplates: Template[] = [
         title: {
           type: 'text',
           bounds: {
-            left: 0,
+            left: 30,
             top: {
               expr: 'SLIDE_HEIGHT * 0.28',
             },
             width: {
-              expr: 'SLIDE_WIDTH',
+              expr: 'SLIDE_WIDTH - 60',
             },
             height: 120,
           },
@@ -65,6 +66,13 @@ export const titleTemplates: Template[] = [
         },
       },
     },
+    graphics: [
+      {
+        type: 'titleLine',
+        thickness: 4,
+        offsetY: -20,
+      } as TitleLine,
+    ],
   },
   {
     id: 'title-top',
@@ -74,10 +82,10 @@ export const titleTemplates: Template[] = [
         title: {
           type: 'text',
           bounds: {
-            left: 0,
+            left: 30,
             top: 40,
             width: {
-              expr: 'SLIDE_WIDTH',
+              expr: 'SLIDE_WIDTH - 60',
             },
             height: 140,
           },
@@ -128,6 +136,27 @@ export const titleTemplates: Template[] = [
         },
       },
     },
+    graphics: [
+      {
+        type: 'titleLine',
+        thickness: 4,
+        offsetY: -20,
+      } as TitleLine,
+      {
+        type: 'cornerDecoration',
+        corner: 'top-left',
+        style: 'bracket',
+        size: 30,
+        thickness: 2,
+      } as CornerDecoration,
+      {
+        type: 'cornerDecoration',
+        corner: 'top-right',
+        style: 'bracket',
+        size: 30,
+        thickness: 2,
+      } as CornerDecoration,
+    ],
   },
   {
     id: 'title-left-align',
@@ -193,6 +222,34 @@ export const titleTemplates: Template[] = [
         },
       },
     },
+    graphics: [
+      {
+        type: 'titleLine',
+        thickness: 3,
+        offsetY: -20,
+      } as TitleLine,
+      {
+        type: 'cornerDecoration',
+        corner: 'top-left',
+        style: 'bracket',
+        size: 40,
+        thickness: 3,
+      } as CornerDecoration,
+      {
+        type: 'cornerDecoration',
+        corner: 'bottom-left',
+        style: 'bracket',
+        size: 40,
+        thickness: 3,
+      } as CornerDecoration,
+      {
+        type: 'cornerDecoration',
+        corner: 'top-right',
+        style: 'bracket',
+        size: 40,
+        thickness: 3,
+      } as CornerDecoration,
+    ],
   },
   {
     id: 'title-right-align',
@@ -258,5 +315,26 @@ export const titleTemplates: Template[] = [
         },
       },
     },
+    graphics: [
+      {
+        type: 'titleLine',
+        thickness: 4,
+        offsetY: -20,
+      } as TitleLine,
+      {
+        type: 'cornerDecoration',
+        corner: 'top-right',
+        style: 'bracket',
+        size: 35,
+        thickness: 3,
+      } as CornerDecoration,
+      {
+        type: 'cornerDecoration',
+        corner: 'bottom-right',
+        style: 'bracket',
+        size: 35,
+        thickness: 3,
+      } as CornerDecoration,
+    ],
   },
 ];

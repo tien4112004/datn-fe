@@ -117,6 +117,9 @@ const layouts = {
   'labeled-list': {
     name: 'Labeled List',
   },
+  test: {
+    name: 'Test Layout',
+  },
 };
 
 const formatThemeName = (name: string): string => {

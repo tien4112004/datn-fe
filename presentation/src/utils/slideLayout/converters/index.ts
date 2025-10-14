@@ -17,7 +17,15 @@ import {
   buildCombinedList,
 } from '../primitives/layoutProbuild';
 import { cloneDeepWith, template } from 'lodash';
-import { collectDescendantTextsByLabel, extractLabelStyles } from '../primitives/layoutUtils';
+import {
+  calculateElementBounds,
+  collectDescendantTextsByLabel,
+  extractLabelStyles,
+} from '../primitives/layoutUtils';
+import type { GraphicElement } from '../graphics/types';
+import { renderGraphics } from '../graphics/renderer';
+import type { Bounds } from '../types';
+import type { PPTElement } from '@/types/slides';
 
 /**
  * Normalized data structure for all layout types.
@@ -49,20 +57,23 @@ export type DataMapper<T = any> = (data: T) => MappedLayoutData;
  * 3. Process blocks with unified font sizing
  * 4. Process text containers (titles, subtitles)
  * 5. Process image containers with cropping
- * 6. Combine elements and sort by zIndex
- * 7. Return final Slide object
+ * 6. Render decorative graphics
+ * 7. Combine elements and sort by zIndex
+ * 8. Return final Slide object
  *
  * @param data - Original layout schema data (type-specific)
  * @param template - Resolved template with theme and viewport
  * @param mapData - Function that maps schema data to MappedLayoutData format
  * @param slideId - Optional slide ID (generates UUID if not provided)
+ * @param graphics - Optional decorative graphics to render
  * @returns Promise<Slide> - Complete slide with all elements positioned
  */
 export async function convertLayoutGeneric<T = any>(
   data: T,
   template: TemplateConfig,
   mapData: DataMapper<T>,
-  slideId?: string
+  slideId?: string,
+  graphics?: GraphicElement[]
 ): Promise<Slide> {
   const mappedData = mapData(data);
 
@@ -74,6 +85,9 @@ export async function convertLayoutGeneric<T = any>(
 
   const allElements: Array<{ element: any; zIndex: number }> = [];
   const allCards: Array<{ element: any; zIndex: number }> = [];
+
+  // Track actual bounds of rendered elements (for graphics rendering)
+  const containerActualBounds: Record<string, Bounds> = {};
 
   // Process block containers with labeled children
   if (mappedData.blocks) {
@@ -131,6 +145,14 @@ export async function convertLayoutGeneric<T = any>(
           : buildText(textContent, instance);
 
       allElements.push(...textElements.map((element) => ({ element, zIndex })));
+
+      // Track actual bounds for title container (used by graphics)
+      if (containerId === 'title') {
+        const actualBounds = calculateElementBounds(textElements);
+        if (actualBounds) {
+          containerActualBounds.title = actualBounds;
+        }
+      }
     }
   }
 
@@ -149,8 +171,28 @@ export async function convertLayoutGeneric<T = any>(
     }
   }
 
+  // Render decorative graphics if provided
+  const graphicElements: Array<{ element: any; zIndex: number }> = [];
+  if (graphics && graphics.length > 0) {
+    // Extract just the bounds from each container for graphics context
+    const containerBounds: Record<string, any> = {};
+    for (const [id, container] of Object.entries(resolvedContainers)) {
+      containerBounds[id] = container.bounds;
+    }
+
+    const graphicsContext = {
+      theme: template.theme,
+      viewport: template.viewport,
+      containerBounds,
+      containerActualBounds, // Pass actual rendered bounds
+    };
+    const renderedGraphics = renderGraphics(graphics, graphicsContext);
+    // Graphics render at zIndex 50 by default (above cards but below content)
+    graphicElements.push(...renderedGraphics.map((element) => ({ element, zIndex: -1 })));
+  }
+
   // Combine all elements and sort by zIndex (lower values render first/behind)
-  const combinedElements = [...allCards, ...allElements, ...imageElements];
+  const combinedElements = [...allCards, ...allElements, ...imageElements, ...graphicElements];
   combinedElements.sort((a, b) => a.zIndex - b.zIndex);
 
   const slide: Slide = {

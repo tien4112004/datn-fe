@@ -64,18 +64,7 @@ export function buildTitle(title: string, config: TemplateContainerConfig, theme
     titleInstance.text?.fontSizeRange || FONT_SIZE_RANGE_TITLE
   );
 
-  return [
-    titleElement,
-    createTitleLine(
-      {
-        width: titleElement.width,
-        height: titleElement.height,
-        left: titleElement.left,
-        top: titleElement.top,
-      } as Bounds,
-      theme
-    ),
-  ];
+  return [titleElement];
 }
 
 export function buildText(content: string, config: TemplateContainerConfig): PPTElement[] {

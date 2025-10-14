@@ -8,6 +8,7 @@ import type {
   NonTextLayoutBlockConfig,
   SlideLayoutBlockInstance,
 } from './layout';
+import type { GraphicElement } from '../graphics/types';
 
 // ============================================================================
 // Template Container Types (Config with Bounds or Relative Positioning)
@@ -74,4 +75,5 @@ export interface Template {
   id: string;
   name: string;
   config: PartialTemplateConfig;
+  graphics?: GraphicElement[]; // Optional decorative graphics
 }

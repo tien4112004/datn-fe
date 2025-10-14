@@ -1,4 +1,5 @@
-import type { LayoutBlockInstance, TextStyleConfig } from '../types';
+import type { PPTElement } from '@/types/slides';
+import type { Bounds, LayoutBlockInstance, TextStyleConfig } from '../types';
 
 export function getAllDescendantInstances(instance: LayoutBlockInstance): LayoutBlockInstance[] {
   const result: LayoutBlockInstance[] = [];
@@ -89,4 +90,46 @@ export function extractLabelStyles(container: any): Map<string, TextStyleConfig>
   }
 
   return labelStyles;
+}
+
+/**
+ * Calculate bounding box from one or more PPT elements.
+ * For single element: uses its dimensions directly.
+ * For multiple elements: calculates combined bounding box.
+ *
+ * @param elements - Array of PPT elements
+ * @returns Bounding box or null if no elements
+ */
+export function calculateElementBounds(elements: PPTElement[]): Bounds | null {
+  if (elements.length === 0) return null;
+
+  if (elements.length === 1) {
+    const el = elements[0];
+    return {
+      left: el.left,
+      top: el.top,
+      width: el.width,
+      height: (el as any).height ?? 0,
+    };
+  }
+
+  // Multiple elements - calculate combined bounding box
+  let minLeft = Infinity;
+  let minTop = Infinity;
+  let maxRight = -Infinity;
+  let maxBottom = -Infinity;
+
+  for (const el of elements) {
+    minLeft = Math.min(minLeft, el.left);
+    minTop = Math.min(minTop, el.top);
+    maxRight = Math.max(maxRight, el.left + el.width);
+    maxBottom = Math.max(maxBottom, el.top + ((el as any).height ?? 0));
+  }
+
+  return {
+    left: minLeft,
+    top: minTop,
+    width: maxRight - minLeft,
+    height: maxBottom - minTop,
+  };
 }

@@ -42,7 +42,7 @@ export function buildChildrenFromChildTemplate(
   }
 
   // Calculate bounds using wrap layout
-  const wrapConfig = childTemplate.wrap || DEFAULT_WRAP_CONFIG;
+  const wrapConfig = childTemplate.wrap;
 
   const wrapLayout = calculateWrapLayout(parentBounds, {
     itemCount: count,
@@ -56,10 +56,15 @@ export function buildChildrenFromChildTemplate(
   const children: SlideLayoutBlockInstance[] = [];
   for (let i = 0; i < count; i++) {
     const itemData = data[i]; // Could be object, string, number, etc.
+
+    // Check if we need to reverse children for this item
+    const shouldReverseChildren = wrapConfig?.zigzag && wrapConfig.reverseOddRowChildren && i % 2 === 1; // Odd index = bottom row in zigzag
+
     const instance = buildInstanceWithBounds(
       childTemplate.structure,
       wrapLayout.itemBounds[i],
-      itemData ? [itemData] : undefined // Wrap in array for nested templates,
+      itemData ? [itemData] : undefined, // Wrap in array for nested templates
+      shouldReverseChildren
     );
     children.push(instance);
   }
@@ -79,12 +84,14 @@ export function buildChildrenFromChildTemplate(
  * @param config - Layout block configuration (template)
  * @param bounds - Bounds for this instance
  * @param data - Data array for child population (undefined for leaf nodes)
+ * @param reverseChildren - If true, reverse the order of static children (for zigzag odd rows)
  * @returns Fully resolved instance with all descendant bounds calculated
  */
 export function buildInstanceWithBounds(
   config: SlideLayoutBlockConfig,
   bounds: Bounds,
-  data?: any[]
+  data?: any[],
+  reverseChildren?: boolean
 ): SlideLayoutBlockInstance {
   // Create base instance with assigned bounds
   const instance: SlideLayoutBlockInstance = {
@@ -108,17 +115,30 @@ export function buildInstanceWithBounds(
   // Handle children - either static or from template
   if (config.children) {
     // Static children - calculate bounds using getChildrenMaxBounds
-    const childrenBounds = getChildrenMaxBounds(bounds, {
-      distribution: config.layout?.distribution,
-      childCount: config.children.length,
-      orientation: config.layout?.orientation,
-      gap: config.layout?.gap,
-    });
+    const childrenBounds = getChildrenMaxBounds(
+      bounds,
+      {
+        distribution: config.layout?.distribution,
+        childCount: config.children.length,
+        orientation: config.layout?.orientation,
+        gap: config.layout?.gap,
+        horizontalAlignment: config.layout?.horizontalAlignment,
+        verticalAlignment: config.layout?.verticalAlignment,
+      },
+      reverseChildren // Swap alignment directions if reverseChildren is true
+    );
+
+    // Determine the order of children (potentially reversed for zigzag odd rows)
+    const childrenToProcess = reverseChildren ? [...config.children].reverse() : config.children;
+    const boundsToUse = reverseChildren ? [...childrenBounds].reverse() : childrenBounds;
 
     // Pass same data to all static children
-    instance.children = config.children.map((childConfig, index) =>
-      buildInstanceWithBounds(childConfig, childrenBounds[index], data)
+    instance.children = childrenToProcess.map((childConfig, index) =>
+      buildInstanceWithBounds(childConfig, boundsToUse[index], data)
     );
+
+    // Store flag for later repositioning
+    instance.childrenReversed = reverseChildren;
   } else if (config.childTemplate) {
     // Dynamic children from template - expand with data mapping
     instance.children = buildChildrenFromChildTemplate(config, bounds, data || []);

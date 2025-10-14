@@ -18,8 +18,20 @@ export function layoutItemsInBlock(itemDimensions: Size[], container: LayoutBloc
   const distribution = container.layout?.distribution || 'equal';
   const orientation = container.layout?.orientation || 'vertical';
   const gap = container.layout?.gap || DEFAULT_SPACING_BETWEEN_ITEMS;
-  const horizontalAlignment = container.layout?.horizontalAlignment || 'left';
-  const verticalAlignment = container.layout?.verticalAlignment || 'top';
+  let horizontalAlignment = container.layout?.horizontalAlignment || 'left';
+  let verticalAlignment = container.layout?.verticalAlignment || 'top';
+
+  // Swap alignments if children were reversed during initial layout
+  if (container.childrenReversed) {
+    horizontalAlignment =
+      horizontalAlignment === 'left'
+        ? 'right'
+        : horizontalAlignment === 'right'
+          ? 'left'
+          : horizontalAlignment;
+    verticalAlignment =
+      verticalAlignment === 'top' ? 'bottom' : verticalAlignment === 'bottom' ? 'top' : verticalAlignment;
+  }
 
   const axis = getAxisMapping(orientation);
   const isVertical = orientation === 'vertical';
@@ -49,6 +61,7 @@ export function layoutItemsInBlock(itemDimensions: Size[], container: LayoutBloc
  *
  * @param bounds - Parent container bounds
  * @param options - Distribution and orientation settings
+ * @param reverseAlignment - If true, swap alignment directions (left↔right, top↔bottom)
  * @returns Array of pre-allocated bounds for each child
  */
 export function getChildrenMaxBounds(
@@ -58,21 +71,51 @@ export function getChildrenMaxBounds(
     childCount?: number;
     orientation?: 'horizontal' | 'vertical';
     gap?: number;
-  }
+    horizontalAlignment?: 'left' | 'center' | 'right';
+    verticalAlignment?: 'top' | 'center' | 'bottom';
+  },
+  reverseAlignment?: boolean
 ): Bounds[] {
   const {
     distribution = '50/50',
     childCount = 0,
     orientation = 'vertical',
     gap = DEFAULT_SPACING_BETWEEN_ITEMS,
+    horizontalAlignment = 'left',
+    verticalAlignment = 'top',
   } = options || {};
 
   if (childCount === 0) {
     return [];
   }
 
+  // Swap alignments if reverseAlignment is true
+  const effectiveHorizontalAlignment = reverseAlignment
+    ? horizontalAlignment === 'left'
+      ? 'right'
+      : horizontalAlignment === 'right'
+        ? 'left'
+        : horizontalAlignment
+    : horizontalAlignment;
+  const effectiveVerticalAlignment = reverseAlignment
+    ? verticalAlignment === 'top'
+      ? 'bottom'
+      : verticalAlignment === 'bottom'
+        ? 'top'
+        : verticalAlignment
+    : verticalAlignment;
+
   const axis = getAxisMapping(orientation);
-  return calculateChildrenBounds(bounds, childCount, distribution, gap, axis);
+  return calculateChildrenBounds(
+    bounds,
+    childCount,
+    distribution,
+    gap,
+    axis,
+    effectiveHorizontalAlignment,
+    effectiveVerticalAlignment,
+    orientation === 'vertical'
+  );
 }
 
 /**
@@ -149,7 +192,10 @@ function calculateChildrenBounds(
   childCount: number,
   distribution: string,
   gap: number,
-  axis: AxisMapping
+  axis: AxisMapping,
+  horizontalAlignment: string = 'left',
+  verticalAlignment: string = 'top',
+  isVertical: boolean = true
 ): Bounds[] {
   // Calculate base item size assuming equal distribution
   const totalSpacing = gap * (childCount - 1);
@@ -205,17 +251,28 @@ function calculateChildrenBounds(
   const secondarySize = bounds[axis.secondary];
   const secondaryStart = bounds[axis.secondaryStart];
 
+  // Determine secondary alignment (perpendicular to flow direction)
+  const secondaryAlignment = isVertical ? horizontalAlignment : verticalAlignment;
+
   return sizes.map((primarySize) => {
+    // Calculate secondary position based on alignment
+    const secondaryPos = calculateAlignment(
+      secondaryAlignment,
+      secondarySize,
+      bounds[axis.secondary],
+      bounds[axis.secondaryStart]
+    );
+
     const position: Bounds =
       axis.primary === 'width'
         ? {
             left: currentPrimary,
-            top: secondaryStart,
+            top: secondaryPos,
             width: primarySize,
             height: secondarySize,
           }
         : {
-            left: secondaryStart,
+            left: secondaryPos,
             top: currentPrimary,
             width: secondarySize,
             height: primarySize,

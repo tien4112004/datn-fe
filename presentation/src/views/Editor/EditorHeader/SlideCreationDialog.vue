@@ -211,4 +211,31 @@ const handleCreate = () => {
 .layout-labeled-list {
   background: repeating-linear-gradient(to right, #9ca3af 0%, #9ca3af 20%, transparent 20%, transparent 25%);
 }
+
+/* Styling for timeline layout */
+.layout-timeline {
+  background: linear-gradient(
+    to right,
+    #9ca3af 0%,
+    #9ca3af 10%,
+    transparent 10%,
+    transparent 20%,
+    #d1d5db 20%,
+    #d1d5db 30%,
+    transparent 30%,
+    transparent 40%,
+    #9ca3af 40%,
+    #9ca3af 50%,
+    transparent 50%,
+    transparent 60%,
+    #d1d5db 60%,
+    #d1d5db 70%,
+    transparent 70%,
+    transparent 80%,
+    #9ca3af 80%,
+    #9ca3af 90%,
+    transparent 90%,
+    transparent 100%
+  );
+}
 </style>

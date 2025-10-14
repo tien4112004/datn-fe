@@ -77,4 +77,5 @@ export interface WrapConfig {
   syncSize?: boolean; // Use uniform size based on the fullest line
   snake?: boolean; // Reverse item order in odd rows for snake/zigzag pattern (e.g., 1->2->3->4, 8<-7<-6<-5)
   zigzag?: boolean; // Stagger items across two rows alternately (e.g., 1  3  5 / 2  4  6)
+  reverseOddRowChildren?: boolean; // In zigzag layout, reverse child element order for bottom row items (items 1, 3, 5...)
 }

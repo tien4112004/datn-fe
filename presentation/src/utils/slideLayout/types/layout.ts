@@ -127,6 +127,9 @@ export interface LayoutBlockInstance {
 
   // Resolved children (no templates)
   children?: LayoutBlockInstance[];
+
+  // Flag to indicate if children were reversed (for zigzag odd rows)
+  childrenReversed?: boolean;
 }
 
 export interface ImageLayoutBlockInstance extends LayoutBlockInstance {

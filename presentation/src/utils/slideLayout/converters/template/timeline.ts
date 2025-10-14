@@ -109,13 +109,13 @@ const straightTimelineTemplate: Template = {
 };
 
 /**
- * Template 2: Stepped Timeline
+ * Template 2: Alternating Timeline
  * Alternating timeline with zigzag layout - items alternate between two rows
  * with vertical branches connecting to a central horizontal line
  */
-const steppedTimelineTemplate: Template = {
-  id: 'timeline-stepped',
-  name: 'Timeline - Stepped',
+const alternatingTimelineTemplate: Template = {
+  id: 'timeline-alternating',
+  name: 'Timeline - Alternating',
   config: {
     containers: {
       title: {
@@ -147,7 +147,6 @@ const steppedTimelineTemplate: Template = {
           size: 'fill',
           margin: { left: 20, right: 20, bottom: 20 },
         },
-
         layout: {
           orientation: 'horizontal',
           distribution: 'equal',
@@ -159,27 +158,18 @@ const steppedTimelineTemplate: Template = {
           wrap: {
             enabled: true,
             zigzag: true,
-            lineSpacing: 80,
+            lineSpacing: 120,
+            reverseOddRowChildren: true,
           },
           structure: {
             type: 'block',
             layout: {
               orientation: 'vertical',
-              gap: 8,
+              gap: 10,
               horizontalAlignment: 'center',
+              verticalAlignment: 'bottom',
             },
             children: [
-              {
-                type: 'text',
-                label: 'label',
-                text: {
-                  fontSizeRange: { minSize: 14, maxSize: 18 },
-                  fontWeight: 'bold',
-                  color: '{{theme.themeColors[0]}}',
-                  fontFamily: '{{theme.labelFontName}}',
-                  textAlign: 'center',
-                },
-              },
               {
                 type: 'text',
                 label: 'content',
@@ -187,6 +177,22 @@ const steppedTimelineTemplate: Template = {
                   fontSizeRange: { minSize: 11, maxSize: 15 },
                   color: '{{theme.fontColor}}',
                   fontFamily: '{{theme.fontName}}',
+                  textAlign: 'center',
+                },
+              },
+              {
+                type: 'text',
+                label: 'label',
+                border: {
+                  color: '{{theme.borderColor}}',
+                  width: '{{theme.card.borderWidth}}',
+                  radius: '{{theme.card.borderRadius}}',
+                },
+                text: {
+                  fontSizeRange: { minSize: 14, maxSize: 18 },
+                  fontWeight: 'bold',
+                  color: '{{theme.themeColors[0]}}',
+                  fontFamily: '{{theme.labelFontName}}',
                   textAlign: 'center',
                 },
               },
@@ -310,6 +316,6 @@ const zigZagTimelineTemplate: Template = {
 // Export all templates
 export const timelineTemplates: Template[] = [
   straightTimelineTemplate,
-  steppedTimelineTemplate,
+  alternatingTimelineTemplate,
   zigZagTimelineTemplate,
 ];

@@ -22,8 +22,8 @@ import {
   collectDescendantTextsByLabel,
   extractLabelStyles,
 } from '../primitives/layoutUtils';
-import type { GraphicElement } from '../graphics/types';
-import { renderGraphics } from '../graphics/renderer';
+import type { GraphicElement } from '../types/graphics';
+import { renderGraphics } from '../primitives/graphicRenderer';
 import type { Bounds } from '../types';
 import type { PPTElement } from '@/types/slides';
 

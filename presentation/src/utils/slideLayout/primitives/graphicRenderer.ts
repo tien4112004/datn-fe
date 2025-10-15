@@ -14,10 +14,10 @@ import type {
   WrappingTimeline,
   ZigZagTimeline,
   TrapezoidPyramid,
-} from './types';
+} from '../types/graphics';
 import type { Bounds } from '../types';
 import { nanoid } from 'nanoid';
-import { DEFAULT_TITLE_LINE_SPACING } from '../primitives';
+import { DEFAULT_TITLE_LINE_SPACING } from '.';
 import { SHAPE_PATH_FORMULAS } from '@/configs/shapes';
 
 /**

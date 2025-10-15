@@ -1,5 +1,4 @@
 import type { Template } from '../../types';
-import type { TitleLine, CornerDecoration } from '../../graphics/types';
 
 export const titleTemplates: Template[] = [
   {
@@ -70,8 +69,7 @@ export const titleTemplates: Template[] = [
       {
         type: 'titleLine',
         thickness: 4,
-        offsetY: -20,
-      } as TitleLine,
+      },
     ],
   },
   {
@@ -140,22 +138,21 @@ export const titleTemplates: Template[] = [
       {
         type: 'titleLine',
         thickness: 4,
-        offsetY: -20,
-      } as TitleLine,
+      },
       {
         type: 'cornerDecoration',
         corner: 'top-left',
         style: 'bracket',
         size: 30,
         thickness: 2,
-      } as CornerDecoration,
+      },
       {
         type: 'cornerDecoration',
         corner: 'top-right',
         style: 'bracket',
         size: 30,
         thickness: 2,
-      } as CornerDecoration,
+      },
     ],
   },
   {
@@ -226,29 +223,28 @@ export const titleTemplates: Template[] = [
       {
         type: 'titleLine',
         thickness: 3,
-        offsetY: -20,
-      } as TitleLine,
+      },
       {
         type: 'cornerDecoration',
         corner: 'top-left',
         style: 'bracket',
         size: 40,
         thickness: 3,
-      } as CornerDecoration,
+      },
       {
         type: 'cornerDecoration',
         corner: 'bottom-left',
         style: 'bracket',
         size: 40,
         thickness: 3,
-      } as CornerDecoration,
+      },
       {
         type: 'cornerDecoration',
         corner: 'top-right',
         style: 'bracket',
         size: 40,
         thickness: 3,
-      } as CornerDecoration,
+      },
     ],
   },
   {
@@ -319,22 +315,21 @@ export const titleTemplates: Template[] = [
       {
         type: 'titleLine',
         thickness: 4,
-        offsetY: -20,
-      } as TitleLine,
+      },
       {
         type: 'cornerDecoration',
         corner: 'top-right',
         style: 'bracket',
         size: 35,
         thickness: 3,
-      } as CornerDecoration,
+      },
       {
         type: 'cornerDecoration',
         corner: 'bottom-right',
         style: 'bracket',
         size: 35,
         thickness: 3,
-      } as CornerDecoration,
+      },
     ],
   },
 ];

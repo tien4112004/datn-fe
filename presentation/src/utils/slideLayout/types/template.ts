@@ -8,7 +8,7 @@ import type {
   NonTextLayoutBlockConfig,
   SlideLayoutBlockInstance,
 } from './layout';
-import type { GraphicElement } from '../graphics/types';
+import type { GraphicElement } from './graphics';
 
 // ============================================================================
 // Template Container Types (Config with Bounds or Relative Positioning)

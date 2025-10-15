@@ -1,11 +1,4 @@
 import type { Template } from '../../types';
-import type {
-  StraightTimeline,
-  AlternatingTimeline,
-  WrappingTimeline,
-  ZigZagTimeline,
-  TrapezoidPyramid,
-} from '../../graphics/types';
 
 const straightTimelineTemplate: Template = {
   id: 'timeline-straight',
@@ -105,7 +98,7 @@ const straightTimelineTemplate: Template = {
       type: 'wrappingTimeline',
       containerId: 'content',
       thickness: 3,
-    } as WrappingTimeline,
+    },
   ],
 };
 
@@ -209,7 +202,7 @@ const alternatingTimelineTemplate: Template = {
       containerId: 'content',
       thickness: 3,
       branchLength: 40,
-    } as AlternatingTimeline,
+    },
   ],
 };
 
@@ -310,7 +303,7 @@ const zigZagTimelineTemplate: Template = {
       type: 'zigzagTimeline',
       containerId: 'content',
       thickness: 3,
-    } as ZigZagTimeline,
+    },
   ],
 };
 

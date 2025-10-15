@@ -7,7 +7,7 @@
  * 3. Add to GraphicElement union type
  */
 
-import type { BorderConfig } from '../types';
+import type { BorderConfig } from '.';
 
 /**
  * Horizontal line below title

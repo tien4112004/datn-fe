@@ -3,14 +3,25 @@ import type { Template } from '../../types';
 const trapezoidPyramidTemplate: Template = {
   id: 'pyramid-triangle',
   name: 'Pyramid - Triangle',
+  parameters: [
+    {
+      key: 'SIDE_PADDING',
+      label: 'Side Padding (px)',
+      defaultValue: 20,
+      min: 0,
+      max: 200,
+      step: 1,
+      description: 'Left/right slide padding',
+    },
+  ],
   config: {
     containers: {
       title: {
         type: 'text',
         bounds: {
-          left: 0,
+          left: { expr: 'SIDE_PADDING' },
           top: 15,
-          width: { expr: 'SLIDE_WIDTH' },
+          width: { expr: 'SLIDE_WIDTH - SIDE_PADDING * 2' },
           height: 120,
         },
         layout: {
@@ -83,14 +94,25 @@ const trapezoidPyramidTemplate: Template = {
 const invertedTrapezoidPyramidTemplate: Template = {
   id: 'pyramid-inverted-triangle',
   name: 'Pyramid - Inverted Triangle',
+  parameters: [
+    {
+      key: 'SIDE_PADDING',
+      label: 'Side Padding (px)',
+      defaultValue: 20,
+      min: 0,
+      max: 200,
+      step: 1,
+      description: 'Left/right slide padding',
+    },
+  ],
   config: {
     containers: {
       title: {
         type: 'text',
         bounds: {
-          left: 0,
+          left: { expr: 'SIDE_PADDING' },
           top: 15,
-          width: { expr: 'SLIDE_WIDTH' },
+          width: { expr: 'SLIDE_WIDTH - SIDE_PADDING * 2' },
           height: 120,
         },
         layout: {
@@ -165,14 +187,25 @@ const invertedTrapezoidPyramidTemplate: Template = {
 const trapezoidPyramidFillTemplate: Template = {
   id: 'pyramid-fill',
   name: 'Pyramid - Fill',
+  parameters: [
+    {
+      key: 'SIDE_PADDING',
+      label: 'Side Padding (px)',
+      defaultValue: 20,
+      min: 0,
+      max: 200,
+      step: 1,
+      description: 'Left/right slide padding',
+    },
+  ],
   config: {
     containers: {
       title: {
         type: 'text',
         bounds: {
-          left: 0,
+          left: { expr: 'SIDE_PADDING' },
           top: 15,
-          width: { expr: 'SLIDE_WIDTH' },
+          width: { expr: 'SLIDE_WIDTH - SIDE_PADDING * 2' },
           height: 120,
         },
         layout: {
@@ -246,14 +279,25 @@ const trapezoidPyramidFillTemplate: Template = {
 const invertedTrapezoidPyramidFillTemplate: Template = {
   id: 'pyramid-fill-inverted',
   name: 'Pyramid - Fill Inverted',
+  parameters: [
+    {
+      key: 'SIDE_PADDING',
+      label: 'Side Padding (px)',
+      defaultValue: 20,
+      min: 0,
+      max: 200,
+      step: 1,
+      description: 'Left/right slide padding',
+    },
+  ],
   config: {
     containers: {
       title: {
         type: 'text',
         bounds: {
-          left: 0,
+          left: { expr: 'SIDE_PADDING' },
           top: 15,
-          width: { expr: 'SLIDE_WIDTH' },
+          width: { expr: 'SLIDE_WIDTH - SIDE_PADDING * 2' },
           height: 120,
         },
         layout: {

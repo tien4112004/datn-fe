@@ -4,15 +4,26 @@ export const labeledListTemplates: Template[] = [
   {
     id: 'labeled-list-default',
     name: 'Labeled List - Default',
+    parameters: [
+      {
+        key: 'SIDE_PADDING',
+        label: 'Side Padding (px)',
+        defaultValue: 20,
+        min: 0,
+        max: 200,
+        step: 1,
+        description: 'Left/right slide padding',
+      },
+    ],
     config: {
       containers: {
         title: {
           type: 'text',
           bounds: {
-            left: 0,
+            left: { expr: 'SIDE_PADDING' },
             top: 15,
             width: {
-              expr: 'SLIDE_WIDTH',
+              expr: 'SLIDE_WIDTH - SIDE_PADDING * 2',
             },
             height: 120,
           },
@@ -104,14 +115,25 @@ export const labeledListTemplates: Template[] = [
   {
     id: 'labeled-list-grid',
     name: 'Labeled List - Grid',
+    parameters: [
+      {
+        key: 'SIDE_PADDING',
+        label: 'Side Padding (px)',
+        defaultValue: 20,
+        min: 0,
+        max: 200,
+        step: 1,
+        description: 'Left/right slide padding',
+      },
+    ],
     config: {
       containers: {
         title: {
           type: 'text',
           bounds: {
-            left: 0,
+            left: { expr: 'SIDE_PADDING' },
             top: 15,
-            width: { expr: 'SLIDE_WIDTH' },
+            width: { expr: 'SLIDE_WIDTH - SIDE_PADDING * 2' },
             height: 100,
           },
           layout: {
@@ -211,14 +233,25 @@ export const labeledListTemplates: Template[] = [
   {
     id: 'labeled-list-single-row',
     name: 'Labeled List - Single Row',
+    parameters: [
+      {
+        key: 'SIDE_PADDING',
+        label: 'Side Padding (px)',
+        defaultValue: 20,
+        min: 0,
+        max: 200,
+        step: 1,
+        description: 'Left/right slide padding',
+      },
+    ],
     config: {
       containers: {
         title: {
           type: 'text',
           bounds: {
-            left: 15,
+            left: { expr: 'SIDE_PADDING' },
             top: 15,
-            width: { expr: 'SLIDE_WIDTH-30' },
+            width: { expr: 'SLIDE_WIDTH - SIDE_PADDING * 2' },
             height: 100,
           },
           layout: {
@@ -304,15 +337,26 @@ export const labeledListTemplates: Template[] = [
   {
     id: 'labeled-list-container-border',
     name: 'Labeled List - Container Border',
+    parameters: [
+      {
+        key: 'SIDE_PADDING',
+        label: 'Side Padding (px)',
+        defaultValue: 20,
+        min: 0,
+        max: 200,
+        step: 1,
+        description: 'Left/right slide padding',
+      },
+    ],
     config: {
       containers: {
         title: {
           type: 'text',
           bounds: {
-            left: 0,
+            left: { expr: 'SIDE_PADDING' },
             top: 15,
             width: {
-              expr: 'SLIDE_WIDTH',
+              expr: 'SLIDE_WIDTH - SIDE_PADDING * 2',
             },
             height: 100,
           },
@@ -411,14 +455,25 @@ export const labeledListTemplates: Template[] = [
   {
     id: 'labeled-list-vertical-numbered',
     name: 'Labeled List - Vertical Numbered',
+    parameters: [
+      {
+        key: 'SIDE_PADDING',
+        label: 'Side Padding (px)',
+        defaultValue: 20,
+        min: 0,
+        max: 200,
+        step: 1,
+        description: 'Left/right slide padding',
+      },
+    ],
     config: {
       containers: {
         title: {
           type: 'text',
           bounds: {
-            left: 0,
+            left: { expr: 'SIDE_PADDING' },
             top: 15,
-            width: { expr: 'SLIDE_WIDTH' },
+            width: { expr: 'SLIDE_WIDTH - SIDE_PADDING * 2' },
             height: 110,
           },
           layout: {
@@ -503,14 +558,25 @@ export const labeledListTemplates: Template[] = [
   {
     id: 'labeled-list-vertical-simple',
     name: 'Labeled List - Vertical Simple',
+    parameters: [
+      {
+        key: 'SIDE_PADDING',
+        label: 'Side Padding (px)',
+        defaultValue: 20,
+        min: 0,
+        max: 200,
+        step: 1,
+        description: 'Left/right slide padding',
+      },
+    ],
     config: {
       containers: {
         title: {
           type: 'text',
           bounds: {
-            left: 0,
+            left: { expr: 'SIDE_PADDING' },
             top: 15,
-            width: { expr: 'SLIDE_WIDTH' },
+            width: { expr: 'SLIDE_WIDTH - SIDE_PADDING * 2' },
             height: 100,
           },
           layout: {
@@ -599,14 +665,25 @@ export const labeledListTemplates: Template[] = [
   {
     id: 'labeled-list-vertical-container-border',
     name: 'Labeled List - Vertical Container Border',
+    parameters: [
+      {
+        key: 'SIDE_PADDING',
+        label: 'Side Padding (px)',
+        defaultValue: 20,
+        min: 0,
+        max: 200,
+        step: 1,
+        description: 'Left/right slide padding',
+      },
+    ],
     config: {
       containers: {
         title: {
           type: 'text',
           bounds: {
-            left: 0,
+            left: { expr: 'SIDE_PADDING' },
             top: 15,
-            width: { expr: 'SLIDE_WIDTH' },
+            width: { expr: 'SLIDE_WIDTH - SIDE_PADDING * 2' },
             height: 110,
           },
           layout: {
@@ -691,14 +768,25 @@ export const labeledListTemplates: Template[] = [
   {
     id: 'labeled-list-vertical-container-bullet',
     name: 'Labeled List - Vertical Container Bullet',
+    parameters: [
+      {
+        key: 'SIDE_PADDING',
+        label: 'Side Padding (px)',
+        defaultValue: 20,
+        min: 0,
+        max: 200,
+        step: 1,
+        description: 'Left/right slide padding',
+      },
+    ],
     config: {
       containers: {
         title: {
           type: 'text',
           bounds: {
-            left: 0,
+            left: { expr: 'SIDE_PADDING' },
             top: 15,
-            width: { expr: 'SLIDE_WIDTH' },
+            width: { expr: 'SLIDE_WIDTH - SIDE_PADDING * 2' },
             height: 110,
           },
           layout: {

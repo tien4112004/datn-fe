@@ -3,14 +3,25 @@ import type { Template } from '../../types';
 const straightTimelineTemplate: Template = {
   id: 'timeline-straight',
   name: 'Timeline - Straight',
+  parameters: [
+    {
+      key: 'SIDE_PADDING',
+      label: 'Side Padding (px)',
+      defaultValue: 20,
+      min: 0,
+      max: 200,
+      step: 1,
+      description: 'Left/right slide padding',
+    },
+  ],
   config: {
     containers: {
       title: {
         type: 'text',
         bounds: {
-          left: 0,
+          left: { expr: 'SIDE_PADDING' },
           top: 15,
-          width: { expr: 'SLIDE_WIDTH' },
+          width: { expr: 'SLIDE_WIDTH - SIDE_PADDING * 2' },
           height: 120,
         },
         layout: {
@@ -110,14 +121,25 @@ const straightTimelineTemplate: Template = {
 const alternatingTimelineTemplate: Template = {
   id: 'timeline-alternating',
   name: 'Timeline - Alternating',
+  parameters: [
+    {
+      key: 'SIDE_PADDING',
+      label: 'Side Padding (px)',
+      defaultValue: 20,
+      min: 0,
+      max: 200,
+      step: 1,
+      description: 'Left/right slide padding',
+    },
+  ],
   config: {
     containers: {
       title: {
         type: 'text',
         bounds: {
-          left: 0,
+          left: { expr: 'SIDE_PADDING' },
           top: 15,
-          width: { expr: 'SLIDE_WIDTH' },
+          width: { expr: 'SLIDE_WIDTH - SIDE_PADDING * 2' },
           height: 120,
         },
         layout: {
@@ -214,14 +236,25 @@ const alternatingTimelineTemplate: Template = {
 const zigZagTimelineTemplate: Template = {
   id: 'timeline-zigzag',
   name: 'Timeline - ZigZag',
+  parameters: [
+    {
+      key: 'SIDE_PADDING',
+      label: 'Side Padding (px)',
+      defaultValue: 20,
+      min: 0,
+      max: 200,
+      step: 1,
+      description: 'Left/right slide padding',
+    },
+  ],
   config: {
     containers: {
       title: {
         type: 'text',
         bounds: {
-          left: 0,
+          left: { expr: 'SIDE_PADDING' },
           top: 15,
-          width: { expr: 'SLIDE_WIDTH' },
+          width: { expr: 'SLIDE_WIDTH - SIDE_PADDING * 2' },
           height: 120,
         },
         layout: {

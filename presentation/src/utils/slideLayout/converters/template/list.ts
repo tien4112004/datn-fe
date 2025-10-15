@@ -4,15 +4,26 @@ export const listTemplates: Template[] = [
   {
     id: 'list-default',
     name: 'List - Bordered Items Grid',
+    parameters: [
+      {
+        key: 'SIDE_PADDING',
+        label: 'Side Padding (px)',
+        defaultValue: 20,
+        min: 0,
+        max: 200,
+        step: 1,
+        description: 'Left/right slide padding',
+      },
+    ],
     config: {
       containers: {
         title: {
           type: 'text',
           bounds: {
-            left: 0,
+            left: { expr: 'SIDE_PADDING' },
             top: 15,
             width: {
-              expr: 'SLIDE_WIDTH',
+              expr: 'SLIDE_WIDTH - SIDE_PADDING * 2',
             },
             height: 120,
           },
@@ -87,14 +98,25 @@ export const listTemplates: Template[] = [
   {
     id: 'list-compact',
     name: 'List - Simple Grid',
+    parameters: [
+      {
+        key: 'SIDE_PADDING',
+        label: 'Side Padding (px)',
+        defaultValue: 20,
+        min: 0,
+        max: 200,
+        step: 1,
+        description: 'Left/right slide padding',
+      },
+    ],
     config: {
       containers: {
         title: {
           type: 'text',
           bounds: {
-            left: 0,
+            left: { expr: 'SIDE_PADDING' },
             top: 15,
-            width: { expr: 'SLIDE_WIDTH' },
+            width: { expr: 'SLIDE_WIDTH - SIDE_PADDING * 2' },
             height: 100,
           },
           layout: {
@@ -158,14 +180,25 @@ export const listTemplates: Template[] = [
   {
     id: 'list-cards',
     name: 'List - Staggered Shadowed Cards',
+    parameters: [
+      {
+        key: 'SIDE_PADDING',
+        label: 'Side Padding (px)',
+        defaultValue: 20,
+        min: 0,
+        max: 200,
+        step: 1,
+        description: 'Left/right slide padding',
+      },
+    ],
     config: {
       containers: {
         title: {
           type: 'text',
           bounds: {
-            left: 0,
+            left: { expr: 'SIDE_PADDING' },
             top: 10,
-            width: { expr: 'SLIDE_WIDTH' },
+            width: { expr: 'SLIDE_WIDTH - SIDE_PADDING * 2' },
             height: 90,
           },
           layout: {
@@ -236,14 +269,25 @@ export const listTemplates: Template[] = [
   {
     id: 'list-numbered',
     name: 'List - Numbered Grid with Bordered Content',
+    parameters: [
+      {
+        key: 'SIDE_PADDING',
+        label: 'Side Padding (px)',
+        defaultValue: 20,
+        min: 0,
+        max: 200,
+        step: 1,
+        description: 'Left/right slide padding',
+      },
+    ],
     config: {
       containers: {
         title: {
           type: 'text',
           bounds: {
-            left: 0,
+            left: { expr: 'SIDE_PADDING' },
             top: 15,
-            width: { expr: 'SLIDE_WIDTH' },
+            width: { expr: 'SLIDE_WIDTH - SIDE_PADDING * 2' },
             height: 110,
           },
           layout: {
@@ -334,14 +378,25 @@ export const listTemplates: Template[] = [
   {
     id: 'list-numbered-compact',
     name: 'List - Simple Numbered Grid',
+    parameters: [
+      {
+        key: 'SIDE_PADDING',
+        label: 'Side Padding (px)',
+        defaultValue: 20,
+        min: 0,
+        max: 200,
+        step: 1,
+        description: 'Left/right slide padding',
+      },
+    ],
     config: {
       containers: {
         title: {
           type: 'text',
           bounds: {
-            left: 0,
+            left: { expr: 'SIDE_PADDING' },
             top: 15,
-            width: { expr: 'SLIDE_WIDTH' },
+            width: { expr: 'SLIDE_WIDTH - SIDE_PADDING * 2' },
             height: 100,
           },
           layout: {
@@ -436,14 +491,25 @@ export const listTemplates: Template[] = [
   {
     id: 'list-numbered-cards',
     name: 'List - Staggered Numbered Shadowed Cards',
+    parameters: [
+      {
+        key: 'SIDE_PADDING',
+        label: 'Side Padding (px)',
+        defaultValue: 20,
+        min: 0,
+        max: 200,
+        step: 1,
+        description: 'Left/right slide padding',
+      },
+    ],
     config: {
       containers: {
         title: {
           type: 'text',
           bounds: {
-            left: 0,
+            left: { expr: 'SIDE_PADDING' },
             top: 15,
-            width: { expr: 'SLIDE_WIDTH' },
+            width: { expr: 'SLIDE_WIDTH - SIDE_PADDING * 2' },
             height: 100,
           },
           layout: {
@@ -552,14 +618,25 @@ export const listTemplates: Template[] = [
   {
     id: 'list-container-border',
     name: 'List - Framed Grid',
+    parameters: [
+      {
+        key: 'SIDE_PADDING',
+        label: 'Side Padding (px)',
+        defaultValue: 20,
+        min: 0,
+        max: 200,
+        step: 1,
+        description: 'Left/right slide padding',
+      },
+    ],
     config: {
       containers: {
         title: {
           type: 'text',
           bounds: {
-            left: 0,
+            left: { expr: 'SIDE_PADDING' },
             top: 15,
-            width: { expr: 'SLIDE_WIDTH' },
+            width: { expr: 'SLIDE_WIDTH - SIDE_PADDING * 2' },
             height: 110,
           },
           layout: {
@@ -623,15 +700,26 @@ export const listTemplates: Template[] = [
   {
     id: 'list-container-border-numbered',
     name: 'List - Framed Numbered Grid',
+    parameters: [
+      {
+        key: 'SIDE_PADDING',
+        label: 'Side Padding (px)',
+        defaultValue: 20,
+        min: 0,
+        max: 200,
+        step: 1,
+        description: 'Left/right slide padding',
+      },
+    ],
     config: {
       containers: {
         title: {
           id: 'title',
           type: 'text',
           bounds: {
-            left: 0,
+            left: { expr: 'SIDE_PADDING' },
             top: 15,
-            width: { expr: 'SLIDE_WIDTH' },
+            width: { expr: 'SLIDE_WIDTH - SIDE_PADDING * 2' },
             height: 100,
           },
           layout: {
@@ -732,14 +820,25 @@ export const listTemplates: Template[] = [
   {
     id: 'list-container-bullet',
     name: 'List - Container Bullet',
+    parameters: [
+      {
+        key: 'SIDE_PADDING',
+        label: 'Side Padding (px)',
+        defaultValue: 20,
+        min: 0,
+        max: 200,
+        step: 1,
+        description: 'Left/right slide padding',
+      },
+    ],
     config: {
       containers: {
         title: {
           type: 'text',
           bounds: {
-            left: 0,
+            left: { expr: 'SIDE_PADDING' },
             top: 15,
-            width: { expr: 'SLIDE_WIDTH' },
+            width: { expr: 'SLIDE_WIDTH - SIDE_PADDING * 2' },
             height: 110,
           },
           layout: {

@@ -4,14 +4,25 @@ export const twoColumnTemplates: Template[] = [
   {
     id: 'two-column-compact',
     name: 'Two Column - Compact',
+    parameters: [
+      {
+        key: 'SIDE_PADDING',
+        label: 'Side Padding (px)',
+        defaultValue: 20,
+        min: 0,
+        max: 200,
+        step: 1,
+        description: 'Left/right slide padding',
+      },
+    ],
     config: {
       containers: {
         title: {
           type: 'text',
           bounds: {
-            left: 15,
+            left: { expr: 'SIDE_PADDING' },
             top: 15,
-            width: { expr: 'SLIDE_WIDTH - 30' },
+            width: { expr: 'SLIDE_WIDTH - SIDE_PADDING * 2' },
             height: 90,
           },
           layout: {

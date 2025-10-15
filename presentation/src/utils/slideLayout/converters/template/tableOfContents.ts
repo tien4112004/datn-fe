@@ -4,15 +4,26 @@ export const tableOfContentsTemplates: Template[] = [
   {
     id: 'table-of-contents-default',
     name: 'Table of Contents - Default',
+    parameters: [
+      {
+        key: 'SIDE_PADDING',
+        label: 'Side Padding (px)',
+        defaultValue: 20,
+        min: 0,
+        max: 200,
+        step: 1,
+        description: 'Left/right slide padding',
+      },
+    ],
     config: {
       containers: {
         title: {
           type: 'text',
           bounds: {
-            left: 15,
+            left: { expr: 'SIDE_PADDING' },
             top: 15,
             width: {
-              expr: 'SLIDE_WIDTH - 30',
+              expr: 'SLIDE_WIDTH - SIDE_PADDING * 2',
             },
             height: 100,
           },

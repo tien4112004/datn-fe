@@ -79,6 +79,62 @@ export function createTextElement(
 }
 
 /**
+ * Creates an HTML list element (<ul> or <ol>) with styled list items.
+ * Centralizes list element creation logic for consistent styling across all list operations.
+ *
+ * @param contents - Array of HTML content for each list item
+ * @param listType - Type of list: 'ul' or 'ol'
+ * @param fontSize - Font size in pixels
+ * @param container - Container with text styling configuration
+ * @param options - Optional configuration
+ * @param options.applyMarginTop - Whether to apply marginTop to items (for measurement)
+ * @param options.paragraphSpace - Space between list items (default: 25)
+ * @param options.startNumber - Starting number for ordered lists (ol only)
+ * @returns Configured HTML list element
+ */
+function createListHtmlElement(
+  contents: string[],
+  listType: 'ul' | 'ol',
+  fontSize: number,
+  container: TextLayoutBlockInstance,
+  options: {
+    applyMarginTop?: boolean;
+    paragraphSpace?: number;
+    startNumber?: number;
+  } = {}
+): HTMLElement {
+  const { applyMarginTop = false, paragraphSpace = 25, startNumber } = options;
+
+  // Create list element (ul or ol)
+  const listElement = document.createElement(listType);
+  listElement.style.fontSize = `${fontSize}px`;
+  listElement.style.fontFamily = container.text.fontFamily || '';
+
+  // Set start attribute for ordered lists if specified
+  if (listType === 'ol' && startNumber !== undefined) {
+    listElement.setAttribute('start', startNumber.toString());
+  }
+
+  // Create and append list items
+  const listItems = contents.map((content) => {
+    const el = createHtmlElement(content, fontSize, container.text || {});
+    applyFontSizeToElement(el, fontSize, container.text?.lineHeight || 1.4);
+
+    if (applyMarginTop) {
+      el.style.marginTop = `${paragraphSpace}px`;
+    }
+
+    const li = document.createElement('li');
+    li.appendChild(el);
+    return li;
+  });
+
+  listElement.append(...listItems);
+
+  return listElement;
+}
+
+/**
  * Creates PPT combined text element(s) with unified font sizing across all items.
  * When content overflows, splits into two separate PPTTextElement instances.
  * Pattern defines the structure, this function handles measurement and sizing.
@@ -96,6 +152,7 @@ export function createListElements(
   fontSizeRange?: FontSizeRange
 ): PPTTextElement[] {
   const paragraphSpace = 25; // Spacing between list items
+  const listType = container.combined?.ordered ? 'ol' : 'ul';
 
   // Create HTML elements for each content item
   const htmlElements = contents.map((content) => createHtmlElement(content, 32, container.text || {}));
@@ -106,28 +163,14 @@ export function createListElements(
   );
   const optimalFontSize = Math.min(...listFontSize);
 
-  // Apply unified font size to all elements (with marginTop for measurement only)
-  htmlElements.forEach((el) => {
-    applyFontSizeToElement(el, optimalFontSize, container.text?.lineHeight || 1.4);
-    el.style.marginTop = `${paragraphSpace}px`; // Temporarily add for measurement
+  // Create wrapper list element with optimal font size (with marginTop for measurement)
+  const listElement = createListHtmlElement(contents, listType, optimalFontSize, container, {
+    applyMarginTop: true,
+    paragraphSpace,
   });
 
-  const listType = container.combined?.ordered ? 'ol' : 'ul';
-
-  // Create wrapper list element (ul or ol) with proper font size
-  const listElement = document.createElement(listType);
-  listElement.style.fontSize = `${optimalFontSize}px`;
-  listElement.style.fontFamily = container.text.fontFamily || '';
-  listElement.append(
-    ...htmlElements.map((html) => {
-      const li = document.createElement('li');
-      li.appendChild(html);
-      return li;
-    })
-  );
-
   // Measure the complete list to check for overflow
-  const dimensions = measureElement(listElement, container);
+  let dimensions = measureElement(listElement, container);
 
   // Check if content exceeds container height - if so, split into 2 columns
   // OR if twoColumn is explicitly enabled, force two-column layout
@@ -163,18 +206,15 @@ export function createListElements(
     let columnOptimalFontSize = Math.min(...columnFontSizes);
 
     // Create temporary left column to verify height constraint
-    let leftList = document.createElement(listType);
-    leftList.style.fontSize = `${columnOptimalFontSize}px`;
-    leftList.style.fontFamily = container.text.fontFamily || '';
-    leftList.append(
-      ...leftColumnContents.map((content) => {
-        const el = createHtmlElement(content, columnOptimalFontSize, container.text || {});
-        applyFontSizeToElement(el, columnOptimalFontSize, container.text?.lineHeight || 1.4);
-        el.style.marginTop = `${paragraphSpace}px`; // Temporarily add for measurement
-        const li = document.createElement('li');
-        li.appendChild(el);
-        return li;
-      })
+    let leftList = createListHtmlElement(
+      leftColumnContents,
+      listType,
+      columnOptimalFontSize,
+      columnContainer,
+      {
+        applyMarginTop: true,
+        paragraphSpace,
+      }
     );
 
     // Measure left column height and adjust font size if it exceeds container height
@@ -185,57 +225,31 @@ export function createListElements(
       // Reduce font size and remeasure
       columnOptimalFontSize = Math.max(columnOptimalFontSize - 1, minFontSize);
 
-      leftList = document.createElement(listType);
-      leftList.style.fontSize = `${columnOptimalFontSize}px`;
-      leftList.style.fontFamily = container.text.fontFamily || '';
-      leftList.append(
-        ...leftColumnContents.map((content) => {
-          const el = createHtmlElement(content, columnOptimalFontSize, container.text || {});
-          applyFontSizeToElement(el, columnOptimalFontSize, container.text?.lineHeight || 1.4);
-          el.style.marginTop = `${paragraphSpace}px`;
-          const li = document.createElement('li');
-          li.appendChild(el);
-          return li;
-        })
-      );
+      leftList = createListHtmlElement(leftColumnContents, listType, columnOptimalFontSize, columnContainer, {
+        applyMarginTop: true,
+        paragraphSpace,
+      });
 
       leftColumnDimensions = measureElement(leftList, columnContainer);
     }
 
     // Create final left column without marginTop
-    leftList = document.createElement(listType);
-    leftList.style.fontSize = `${columnOptimalFontSize}px`;
-    leftList.style.fontFamily = container.text.fontFamily || '';
-    leftList.append(
-      ...leftColumnContents.map((content) => {
-        const el = createHtmlElement(content, columnOptimalFontSize, container.text || {});
-        applyFontSizeToElement(el, columnOptimalFontSize, container.text?.lineHeight || 1.4);
-        // Don't apply marginTop here - it will be handled by paragraphSpace
-        const li = document.createElement('li');
-        li.appendChild(el);
-        return li;
-      })
-    );
+    leftList = createListHtmlElement(leftColumnContents, listType, columnOptimalFontSize, columnContainer, {
+      applyMarginTop: false,
+      paragraphSpace,
+    });
 
     // Create right column with proper start attribute for ordered lists
-    const rightList = document.createElement(listType);
-    rightList.style.fontSize = `${columnOptimalFontSize}px`;
-    rightList.style.fontFamily = container.text.fontFamily || '';
-
-    // For ordered lists, set the start attribute to continue numbering
-    if (listType === 'ol') {
-      rightList.setAttribute('start', (midpoint + 1).toString());
-    }
-
-    rightList.append(
-      ...rightColumnContents.map((content) => {
-        const el = createHtmlElement(content, columnOptimalFontSize, container.text || {});
-        applyFontSizeToElement(el, columnOptimalFontSize, container.text?.lineHeight || 1.4);
-        // Don't apply marginTop here - it will be handled by paragraphSpace
-        const li = document.createElement('li');
-        li.appendChild(el);
-        return li;
-      })
+    const rightList = createListHtmlElement(
+      rightColumnContents,
+      listType,
+      columnOptimalFontSize,
+      columnContainer,
+      {
+        applyMarginTop: false,
+        paragraphSpace,
+        startNumber: listType === 'ol' ? midpoint + 1 : undefined,
+      }
     );
 
     // Calculate positions for both columns
@@ -271,14 +285,43 @@ export function createListElements(
     ];
   }
 
-  // Single column - content fits
+  // Single column - check if content fits, otherwise reduce font size
+  let singleColumnFontSize = optimalFontSize;
+  const minFontSize = fontSizeRange?.minSize || 12;
+
+  // If content doesn't fit and wrapping is disabled, reduce font size iteratively
+  while (dimensions.height > container.bounds.height && singleColumnFontSize > minFontSize) {
+    singleColumnFontSize = Math.max(singleColumnFontSize - 1, minFontSize);
+
+    // Recreate list with reduced font size (with marginTop for measurement)
+    const reducedListElement = createListHtmlElement(contents, listType, singleColumnFontSize, container, {
+      applyMarginTop: true,
+      paragraphSpace,
+    });
+
+    dimensions = measureElement(reducedListElement, container);
+
+    // Update listElement for final output
+    if (singleColumnFontSize > minFontSize || dimensions.height <= container.bounds.height) {
+      listElement.innerHTML = '';
+      listElement.style.fontSize = `${singleColumnFontSize}px`;
+      listElement.append(...Array.from(reducedListElement.children));
+    }
+  }
+
+  // Create final single column without marginTop (paragraphSpace handles spacing)
+  const finalListElement = createListHtmlElement(contents, listType, singleColumnFontSize, container, {
+    applyMarginTop: false,
+    paragraphSpace,
+  });
+
   const position = layoutItemsInBlock([dimensions], container)[0];
 
   return [
     {
       id: crypto.randomUUID(),
       type: 'text',
-      content: listElement.outerHTML,
+      content: finalListElement.outerHTML,
       defaultFontName: container.text.fontFamily || 'Arial',
       defaultColor: container.text.color || '#000000',
       left: position.left + 10, // Padding left

@@ -91,6 +91,17 @@ export const twoColumnWithImageTemplates: Template[] = [
   {
     id: 'two-column-left-big-image',
     name: 'Two Column - Left Big Image',
+    parameters: [
+      {
+        key: 'IMAGE_RATIO',
+        label: 'Image Width Ratio',
+        defaultValue: 0.6,
+        min: 0.2,
+        max: 0.6,
+        step: 0.05,
+        description: 'Width of image as ratio of slide width',
+      },
+    ],
     config: {
       containers: {
         image: {
@@ -99,7 +110,7 @@ export const twoColumnWithImageTemplates: Template[] = [
             left: 0,
             top: 0,
             width: {
-              expr: 'SLIDE_WIDTH * 0.4',
+              expr: 'SLIDE_WIDTH * IMAGE_RATIO',
             },
             height: {
               expr: 'SLIDE_HEIGHT',
@@ -115,11 +126,11 @@ export const twoColumnWithImageTemplates: Template[] = [
           type: 'text',
           bounds: {
             left: {
-              expr: 'image.width + 30',
+              expr: 'SLIDE_WIDTH * IMAGE_RATIO + 30',
             },
             top: 20,
             width: {
-              expr: 'SLIDE_WIDTH - image.width - 60',
+              expr: 'SLIDE_WIDTH * (1 - IMAGE_RATIO) - 60',
             },
             height: 100,
           },
@@ -640,15 +651,48 @@ export const twoColumnWithImageTemplates: Template[] = [
   {
     id: 'two-column-with-image-container-bullet',
     name: 'Two Column with Image - Container Bullet',
+    parameters: [
+      {
+        key: 'IMAGE_RATIO',
+        label: 'Image Width Ratio',
+        defaultValue: 0.6,
+        min: 0.2,
+        max: 0.6,
+        step: 0.05,
+        description: 'Width of image as ratio of slide width',
+      },
+    ],
     config: {
       containers: {
+        image: {
+          type: 'image',
+          bounds: {
+            left: 0,
+            top: 0,
+            width: {
+              expr: 'SLIDE_WIDTH * IMAGE_RATIO',
+            },
+            height: {
+              expr: 'SLIDE_HEIGHT',
+            },
+          },
+          border: {
+            width: 0,
+            color: 'transparent',
+            radius: 0,
+          },
+        },
         title: {
           type: 'text',
           bounds: {
-            left: 0,
-            top: 15,
-            width: { expr: 'SLIDE_WIDTH' },
-            height: 110,
+            left: {
+              expr: 'SLIDE_WIDTH * IMAGE_RATIO + 30',
+            },
+            top: 20,
+            width: {
+              expr: 'SLIDE_WIDTH * (1 - IMAGE_RATIO) - 60',
+            },
+            height: 100,
           },
           layout: {
             horizontalAlignment: 'center',
@@ -658,18 +702,8 @@ export const twoColumnWithImageTemplates: Template[] = [
             color: '{{theme.titleFontColor}}',
             fontFamily: '{{theme.titleFontName}}',
             fontWeight: 'bold',
+            fontStyle: 'normal',
             textAlign: 'center',
-          },
-        },
-        image: {
-          type: 'image',
-          bounds: {
-            width: 300,
-            height: 200,
-            left: 40,
-            top: {
-              expr: 'title.top + title.height + 20',
-            },
           },
         },
         content: {
@@ -683,12 +717,12 @@ export const twoColumnWithImageTemplates: Template[] = [
             verticalAlignment: 'center',
           },
           positioning: {
-            relativeTo: 'image',
-            axis: 'horizontal',
+            relativeTo: 'title',
+            axis: 'vertical',
             anchor: 'end',
             offset: 20,
             size: 'fill',
-            margin: { left: 0, right: 40, top: 0, bottom: 40 },
+            margin: { left: 0, right: 0, top: 0, bottom: 40 },
           },
           border: {
             width: '{{theme.card.borderWidth}}',

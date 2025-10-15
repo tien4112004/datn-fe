@@ -1,15 +1,24 @@
 import { resolveTemplateBounds } from './expressionResolver';
-import type { SlideViewport, Bounds, RelativePositioning, BoundsExpression } from '../types';
+import type {
+  SlideViewport,
+  Bounds,
+  RelativePositioning,
+  BoundsExpression,
+  TemplateParameter,
+} from '../types';
+import { mergeParametersIntoConstants } from './parameterResolver';
 
 /**
  * Resolve all container positions and return containers with absolute bounds
  */
 export function resolveTemplateContainers<T extends Record<string, any>>(
   containers: T,
-  viewport: SlideViewport
+  viewport: SlideViewport,
+  parameters?: TemplateParameter[],
+  parameterOverrides?: Record<string, number>
 ): Record<keyof T, T[keyof T] & { bounds: Bounds }> {
   // Resolve all bounds (expressions + relative positioning)
-  const resolvedBounds = resolveContainerPositions(containers, viewport);
+  const resolvedBounds = resolveContainerPositions(containers, viewport, parameters, parameterOverrides);
 
   const resolvedContainers: Record<keyof T, T[keyof T] & { bounds: Bounds }> = {} as any;
   for (const id in containers) {
@@ -109,13 +118,19 @@ export function calculateBoundsFromPositioning(
  */
 export function resolveContainerPositions(
   containers: Record<string, { bounds?: Bounds | BoundsExpression; positioning?: RelativePositioning }>,
-  viewport: SlideViewport
+  viewport: SlideViewport,
+  parameters?: TemplateParameter[],
+  parameterOverrides?: Record<string, number>
 ): Record<string, Bounds> {
   // STEP 1: Resolve expression-based bounds first
-  const resolvedExpressionBounds = resolveTemplateBounds(containers, {
+  // Merge template parameters into constants for expression evaluation
+  const baseConstants = {
     SLIDE_WIDTH: viewport.width,
     SLIDE_HEIGHT: viewport.height,
-  });
+  };
+
+  const constants = mergeParametersIntoConstants(baseConstants, parameters, parameterOverrides);
+  const resolvedExpressionBounds = resolveTemplateBounds(containers, constants);
 
   // STEP 2: Create containers with resolved expression bounds
   const containersWithResolvedExpressions: Record<

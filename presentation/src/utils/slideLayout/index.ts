@@ -107,7 +107,13 @@ export const convertToSlide = async (
 
   if (layoutType === SLIDE_LAYOUT_TYPE.TWO_COLUMN_WITH_IMAGE) {
     const selectedTemplate = selectTemplate(layoutType, seed);
-    const template = resolveTemplate(selectedTemplate.config, theme, viewport, selectedTemplate.graphics);
+    const template = resolveTemplate(
+      selectedTemplate.config,
+      theme,
+      viewport,
+      selectedTemplate.graphics,
+      selectedTemplate.parameters
+    );
     return convertLayoutGeneric(
       data as TwoColumnWithImageLayoutSchema,
       template,
@@ -120,7 +126,13 @@ export const convertToSlide = async (
     );
   } else if (layoutType === SLIDE_LAYOUT_TYPE.MAIN_IMAGE) {
     const selectedTemplate = selectTemplate(layoutType, seed);
-    const template = resolveTemplate(selectedTemplate.config, theme, viewport, selectedTemplate.graphics);
+    const template = resolveTemplate(
+      selectedTemplate.config,
+      theme,
+      viewport,
+      selectedTemplate.graphics,
+      selectedTemplate.parameters
+    );
     return convertLayoutGeneric(
       data as MainImageLayoutSchema,
       template,
@@ -133,7 +145,13 @@ export const convertToSlide = async (
     );
   } else if (layoutType === SLIDE_LAYOUT_TYPE.TITLE) {
     const selectedTemplate = selectTemplate(layoutType, seed);
-    const template = resolveTemplate(selectedTemplate.config, theme, viewport, selectedTemplate.graphics);
+    const template = resolveTemplate(
+      selectedTemplate.config,
+      theme,
+      viewport,
+      selectedTemplate.graphics,
+      selectedTemplate.parameters
+    );
     return convertLayoutGeneric(
       data as TitleLayoutSchema,
       template,
@@ -151,7 +169,13 @@ export const convertToSlide = async (
     );
   } else if (layoutType === SLIDE_LAYOUT_TYPE.TWO_COLUMN) {
     const selectedTemplate = selectTemplate(layoutType, seed);
-    const template = resolveTemplate(selectedTemplate.config, theme, viewport, selectedTemplate.graphics);
+    const template = resolveTemplate(
+      selectedTemplate.config,
+      theme,
+      viewport,
+      selectedTemplate.graphics,
+      selectedTemplate.parameters
+    );
 
     // Check if template has separate leftColumn/rightColumn containers
     const hasLeftRightColumns = template.containers.leftColumn && template.containers.rightColumn;
@@ -182,7 +206,13 @@ export const convertToSlide = async (
     );
   } else if (layoutType === SLIDE_LAYOUT_TYPE.LIST) {
     const selectedTemplate = selectTemplate(layoutType, seed);
-    const template = resolveTemplate(selectedTemplate.config, theme, viewport, selectedTemplate.graphics);
+    const template = resolveTemplate(
+      selectedTemplate.config,
+      theme,
+      viewport,
+      selectedTemplate.graphics,
+      selectedTemplate.parameters
+    );
 
     // Check if the template has numbering enabled (label/content structure)
     const contentContainer = template.containers.content;
@@ -216,7 +246,13 @@ export const convertToSlide = async (
     );
   } else if (layoutType === SLIDE_LAYOUT_TYPE.LABELED_LIST) {
     const selectedTemplate = selectTemplate(layoutType, seed);
-    const template = resolveTemplate(selectedTemplate.config, theme, viewport, selectedTemplate.graphics);
+    const template = resolveTemplate(
+      selectedTemplate.config,
+      theme,
+      viewport,
+      selectedTemplate.graphics,
+      selectedTemplate.parameters
+    );
 
     // Check if the template has numbering enabled
     const contentContainer = template.containers.content;
@@ -244,7 +280,13 @@ export const convertToSlide = async (
     );
   } else if (layoutType === SLIDE_LAYOUT_TYPE.TABLE_OF_CONTENTS) {
     const selectedTemplate = selectTemplate(layoutType, seed);
-    const template = resolveTemplate(selectedTemplate.config, theme, viewport, selectedTemplate.graphics);
+    const template = resolveTemplate(
+      selectedTemplate.config,
+      theme,
+      viewport,
+      selectedTemplate.graphics,
+      selectedTemplate.parameters
+    );
 
     // Check if the template has numbering enabled
     const contentContainer = template.containers.content;
@@ -270,7 +312,13 @@ export const convertToSlide = async (
     );
   } else if (layoutType === SLIDE_LAYOUT_TYPE.TIMELINE) {
     const selectedTemplate = selectTemplate(layoutType, seed);
-    const template = resolveTemplate(selectedTemplate.config, theme, viewport, selectedTemplate.graphics);
+    const template = resolveTemplate(
+      selectedTemplate.config,
+      theme,
+      viewport,
+      selectedTemplate.graphics,
+      selectedTemplate.parameters
+    );
 
     return convertLayoutGeneric(
       data as TimelineLayoutSchema,
@@ -288,7 +336,13 @@ export const convertToSlide = async (
     );
   } else if (layoutType === SLIDE_LAYOUT_TYPE.PYRAMID) {
     const selectedTemplate = selectTemplate(layoutType, seed);
-    const template = resolveTemplate(selectedTemplate.config, theme, viewport, selectedTemplate.graphics);
+    const template = resolveTemplate(
+      selectedTemplate.config,
+      theme,
+      viewport,
+      selectedTemplate.graphics,
+      selectedTemplate.parameters
+    );
 
     return convertLayoutGeneric(
       data as PyramidLayoutSchema,

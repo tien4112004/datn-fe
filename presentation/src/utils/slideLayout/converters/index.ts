@@ -3,8 +3,8 @@ import type {
   PartialTemplateConfig,
   SlideViewport,
   TemplateConfig,
+  TemplateParameter,
   TextLayoutBlockInstance,
-  TextStyleConfig,
 } from '../types';
 import type { Slide, SlideTheme } from '@/types/slides';
 import { resolveTemplateContainers, processBackground, processCombinedTextContainer } from '../primitives';
@@ -14,18 +14,12 @@ import {
   buildTitle,
   buildText,
   buildImageElement,
-  buildCombinedList,
 } from '../primitives/layoutProbuild';
 import { cloneDeepWith, template } from 'lodash';
-import {
-  calculateElementBounds,
-  collectDescendantTextsByLabel,
-  extractLabelStyles,
-} from '../primitives/layoutUtils';
+import { calculateElementBounds } from '../primitives/layoutUtils';
 import type { GraphicElement } from '../types/graphics';
 import { renderGraphics } from '../primitives/graphicRenderer';
 import type { Bounds } from '../types';
-import type { PPTElement } from '@/types/slides';
 
 /**
  * Normalized data structure for all layout types.
@@ -75,11 +69,16 @@ export async function convertLayoutGeneric<T = any>(
 ): Promise<Slide> {
   const mappedData = mapData(data);
 
-  // Resolve all container bounds (expressions + relative positioning)
-  const resolvedContainers = resolveTemplateContainers(template.containers, {
-    width: template.viewport.width,
-    height: template.viewport.height,
-  });
+  // Resolve all container bounds (expressions + relative positioning + parameters)
+  const resolvedContainers = resolveTemplateContainers(
+    template.containers,
+    {
+      width: template.viewport.width,
+      height: template.viewport.height,
+    },
+    template.parameters
+    // TODO: Add parameterOverrides parameter here if you want user customization
+  );
 
   const allElements: Array<{ element: any; zIndex: number }> = [];
   const allCards: Array<{ element: any; zIndex: number }> = [];
@@ -226,13 +225,15 @@ export async function convertLayoutGeneric<T = any>(
  * @param theme - Theme object with colors, fonts, etc.
  * @param viewport - Viewport dimensions
  * @param graphics - Optional decorative graphics
+ * @param parameters - Optional template parameters for customization
  * @returns Fully resolved template config
  */
 export function resolveTemplate(
   partialTemplate: PartialTemplateConfig,
   theme: SlideTheme,
   viewport: SlideViewport,
-  graphics?: GraphicElement[]
+  graphics?: GraphicElement[],
+  parameters?: TemplateParameter[]
 ): TemplateConfig {
   // Use lodash cloneDeepWith to traverse and transform the object tree
   const resolvedContainers = cloneDeepWith(partialTemplate.containers, (value) => {
@@ -271,5 +272,6 @@ export function resolveTemplate(
     theme,
     viewport,
     graphics: resolvedGraphics,
+    parameters,
   };
 }

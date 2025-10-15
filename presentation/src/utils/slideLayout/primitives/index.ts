@@ -32,3 +32,5 @@ export { resolveTemplateContainers } from './boundsResolver';
 export { createTextElement as createElement };
 
 export { processCombinedTextContainer } from './textCombiner';
+
+export { resolveTemplateParameters, mergeParametersIntoConstants } from './parameterResolver';

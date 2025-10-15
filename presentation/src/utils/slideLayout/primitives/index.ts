@@ -30,3 +30,5 @@ export { resolveTemplateContainers } from './boundsResolver';
 
 // Legacy alias for backward compatibility
 export { createTextElement as createElement };
+
+export { processCombinedTextContainer } from './textCombiner';

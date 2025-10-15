@@ -7,6 +7,7 @@ import {
   type SlideTheme,
   ShapePathFormulasKeys,
   type PPTLineElement,
+  type ImageElementClip,
 } from '@/types/slides';
 import { getImageSize } from '../../image';
 import { SHAPE_PATH_FORMULAS } from '../../../configs/shapes';
@@ -266,9 +267,9 @@ export function createListElements(
         top: leftPosition.top - 12.5,
         width: columnWidth - 10,
         height: container.bounds.height,
-        shadow: container.shadow,
         paragraphSpace,
-      } as PPTTextElement,
+        rotate: 0,
+      },
       {
         id: crypto.randomUUID(),
         type: 'text',
@@ -279,9 +280,9 @@ export function createListElements(
         top: leftPosition.top - 12.5,
         width: columnWidth - 10,
         height: container.bounds.height,
-        shadow: container.shadow,
         paragraphSpace,
-      } as PPTTextElement,
+        rotate: 0,
+      },
     ];
   }
 
@@ -328,9 +329,9 @@ export function createListElements(
       top: position.top - 12.5,
       width: container.bounds.width - 20,
       height: container.bounds.height,
-      shadow: container.shadow,
       paragraphSpace,
-    } as PPTTextElement,
+      rotate: 0,
+    },
   ];
 }
 
@@ -354,7 +355,7 @@ export async function createImageElement(
   const imageRatio = imageOriginalSize.width / imageOriginalSize.height;
   const containerRatio = container.bounds.width / container.bounds.height;
 
-  let finalClip;
+  let finalClip: ImageElementClip;
   if (imageRatio > containerRatio) {
     // Image is wider - clip left/right sides
     const clipPercent = ((1 - containerRatio / imageRatio) / 2) * 100;
@@ -392,8 +393,8 @@ export async function createImageElement(
       color: container.border?.color || '#000000',
       width: container.border?.width || 0,
     },
-    radius: container.border?.radius || '0',
-  } as PPTImageElement;
+    radius: container.border?.radius || 0,
+  };
 }
 
 /**

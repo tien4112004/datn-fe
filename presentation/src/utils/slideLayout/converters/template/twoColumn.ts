@@ -94,6 +94,17 @@ export const twoColumnTemplates: Template[] = [
   {
     id: 'two-column-container-border',
     name: 'Two Column - Container Border',
+    parameters: [
+      {
+        key: 'SIDE_PADDING',
+        label: 'Side Padding (px)',
+        defaultValue: 50,
+        min: 0,
+        max: 200,
+        step: 1,
+        description: 'Left/right content padding',
+      },
+    ],
     config: {
       containers: {
         title: {
@@ -174,6 +185,17 @@ export const twoColumnTemplates: Template[] = [
   {
     id: 'two-column-container-border-shadow',
     name: 'Two Column - Container Border Shadow',
+    parameters: [
+      {
+        key: 'SIDE_PADDING',
+        label: 'Side Padding (px)',
+        defaultValue: 60,
+        min: 0,
+        max: 200,
+        step: 1,
+        description: 'Left/right content padding',
+      },
+    ],
     config: {
       containers: {
         title: {
@@ -262,6 +284,26 @@ export const twoColumnTemplates: Template[] = [
   {
     id: 'two-column-bordered-items',
     name: 'Two Column - Each Column Border',
+    parameters: [
+      {
+        key: 'SIDE_PADDING',
+        label: 'Side Padding (px)',
+        defaultValue: 30,
+        min: 0,
+        max: 200,
+        step: 1,
+        description: 'Left/right slide padding',
+      },
+      {
+        key: 'COLUMN_SPACING',
+        label: 'Column Spacing (px)',
+        defaultValue: 60,
+        min: 0,
+        max: 200,
+        step: 1,
+        description: 'Horizontal spacing between columns',
+      },
+    ],
     config: {
       containers: {
         title: {
@@ -286,12 +328,12 @@ export const twoColumnTemplates: Template[] = [
         leftColumn: {
           type: 'block',
           bounds: {
-            left: 35,
+            left: { expr: 'SIDE_PADDING' },
             top: {
               expr: 'title.top + title.height + 20',
             },
             width: {
-              expr: '(SLIDE_WIDTH - 100) / 2 - 20',
+              expr: '(SLIDE_WIDTH - SIDE_PADDING * 2 - COLUMN_SPACING) / 2',
             },
             height: {
               expr: 'SLIDE_HEIGHT - title.top - title.height - 55',
@@ -327,7 +369,7 @@ export const twoColumnTemplates: Template[] = [
           type: 'block',
           bounds: {
             left: {
-              expr: 'leftColumn.left + leftColumn.width + 50',
+              expr: 'leftColumn.left + leftColumn.width + COLUMN_SPACING',
             },
             top: {
               expr: 'leftColumn.top',
@@ -379,6 +421,26 @@ export const twoColumnTemplates: Template[] = [
   {
     id: 'two-column-bordered-items-shadow',
     name: 'Two Column - Each Column Border Shadow',
+    parameters: [
+      {
+        key: 'SIDE_PADDING',
+        label: 'Side Padding (px)',
+        defaultValue: 30,
+        min: 0,
+        max: 200,
+        step: 1,
+        description: 'Left/right slide padding',
+      },
+      {
+        key: 'COLUMN_SPACING',
+        label: 'Column Spacing (px)',
+        defaultValue: 60,
+        min: 0,
+        max: 200,
+        step: 1,
+        description: 'Horizontal spacing between columns',
+      },
+    ],
     config: {
       containers: {
         title: {
@@ -403,12 +465,12 @@ export const twoColumnTemplates: Template[] = [
         leftColumn: {
           type: 'block',
           bounds: {
-            left: 35,
+            left: { expr: 'SIDE_PADDING' },
             top: {
               expr: 'title.top + title.height + 25',
             },
             width: {
-              expr: '(SLIDE_WIDTH - 100) / 2',
+              expr: '(SLIDE_WIDTH - SIDE_PADDING * 2 - COLUMN_SPACING) / 2',
             },
             height: {
               expr: 'SLIDE_HEIGHT - title.top - title.height - 60',
@@ -453,7 +515,7 @@ export const twoColumnTemplates: Template[] = [
           type: 'block',
           bounds: {
             left: {
-              expr: 'leftColumn.left + leftColumn.width + 30',
+              expr: 'leftColumn.left + leftColumn.width + COLUMN_SPACING',
             },
             top: {
               expr: 'leftColumn.top',
@@ -514,6 +576,17 @@ export const twoColumnTemplates: Template[] = [
   {
     id: 'two-column-container-bullet',
     name: 'Two Column - Container Bullet',
+    parameters: [
+      {
+        key: 'SIDE_PADDING',
+        label: 'Side Padding (px)',
+        defaultValue: 40,
+        min: 0,
+        max: 200,
+        step: 1,
+        description: 'Left/right content padding',
+      },
+    ],
     config: {
       containers: {
         title: {

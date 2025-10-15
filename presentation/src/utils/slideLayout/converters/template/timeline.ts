@@ -57,8 +57,8 @@ const straightTimelineTemplate: Template = {
           wrap: {
             enabled: true,
             maxItemsPerLine: 4,
-            lineCount: 'auto',
-            wrapDistribution: 'top-heavy',
+            lineCount: 2,
+            wrapDistribution: 'balanced',
             lineSpacing: 40,
             syncSize: true,
             snake: true,

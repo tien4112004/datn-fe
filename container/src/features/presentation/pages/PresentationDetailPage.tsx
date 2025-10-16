@@ -5,17 +5,21 @@ import { useLoaderData, useParams } from 'react-router-dom';
 import type { Presentation } from '../types';
 import { getSearchParamAsBoolean } from '@/shared/utils/searchParams';
 import { useDetailPresentation } from '../hooks/useDetailPresentation';
+import { useUnsavedChangesBlocker } from '../hooks/useUnsavedChangesBlocker';
+import { UnsavedChangesDialog } from '../components/UnsavedChangesDialog';
 
 const DetailPage = () => {
   const { presentation } = useLoaderData() as { presentation: Presentation | null };
   const { id } = useParams<{ id: string }>();
   const isGeneratingParam = getSearchParamAsBoolean('isGenerating', false) ?? false;
 
-  const { app, updateApp, isProcessing, isStreaming } = useDetailPresentation(
+  const { app, updateApp, isProcessing, isStreaming, isSaving } = useDetailPresentation(
     presentation,
     id,
     isGeneratingParam
   );
+
+  const { showDialog, setShowDialog, handleStay, handleProceed } = useUnsavedChangesBlocker();
 
   const { t } = useTranslation('glossary', { keyPrefix: 'loading' });
 
@@ -34,6 +38,13 @@ const DetailPage = () => {
       />
       {isStreaming && app && <Spinner text={t('generatingPresentation')} />}
       {!isStreaming && isProcessing && <Spinner text={t('processingPresentation')} />}
+      {isSaving && <GlobalSpinner text={t('savingPresentation') || 'Saving presentation...'} />}
+      <UnsavedChangesDialog
+        open={showDialog}
+        onOpenChange={setShowDialog}
+        onStay={handleStay}
+        onLeave={handleProceed}
+      />
     </>
   );
 };

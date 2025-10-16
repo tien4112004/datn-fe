@@ -350,6 +350,26 @@ export default class PresentationMockService implements PresentationApiService {
       }, 500);
     });
   }
+
+  async updatePresentation(id: string, data: Presentation): Promise<Presentation> {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        const index = mockPresentationItems.findIndex((item) => item.id === id);
+        if (index !== -1) {
+          const updatedPresentation = {
+            ...mockPresentationItems[index],
+            title: data.title,
+            slides: data.slides,
+            updatedAt: new Date().toISOString(),
+          };
+          mockPresentationItems[index] = updatedPresentation;
+          resolve(updatedPresentation);
+        } else {
+          reject(new Error('Presentation not found'));
+        }
+      }, 500);
+    });
+  }
 }
 
 /**

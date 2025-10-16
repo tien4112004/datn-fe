@@ -279,6 +279,13 @@ export default class PresentationRealApiService implements PresentationApiServic
     return null;
   }
 
+  async updatePresentation(id: string, data: Presentation): Promise<any> {
+    await api.put<ApiResponse<Presentation>>(`${this.baseUrl}/api/presentations/${id}`, {
+      title: data.title,
+      slides: data.slides,
+    });
+  }
+
   _mapPresentationItem(data: any): Presentation {
     return {
       id: data.id,

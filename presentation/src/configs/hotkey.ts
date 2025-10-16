@@ -14,6 +14,7 @@ export const enum KEYS {
   P = 'P',
   O = 'O',
   R = 'R',
+  S = 'S',
   T = 'T',
   MINUS = '-',
   EQUAL = '=',

@@ -9,6 +9,7 @@ export default {
     presentation: 'Loading presentation editor...',
     generatingPresentation: 'Generating presentation...',
     processingPresentation: 'Processing presentation...',
+    savingPresentation: 'Saving presentation...',
   },
   actions: {
     confirm: 'Confirm',

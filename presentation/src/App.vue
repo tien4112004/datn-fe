@@ -8,9 +8,16 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted } from 'vue';
+import { onMounted, watch } from 'vue';
 import { storeToRefs } from 'pinia';
-import { useScreenStore, useMainStore, useSnapshotStore, useSlidesStore, useContainerStore } from '@/store';
+import {
+  useScreenStore,
+  useMainStore,
+  useSnapshotStore,
+  useSlidesStore,
+  useContainerStore,
+  useSaveStore,
+} from '@/store';
 import { LOCALSTORAGE_KEY_DISCARDED_DB } from '@/configs/storage';
 import { deleteDiscardedDB } from '@/utils/database';
 import { isPC } from '@/utils/common';
@@ -34,16 +41,21 @@ const mainStore = useMainStore();
 const slidesStore = useSlidesStore();
 const snapshotStore = useSnapshotStore();
 const containerStore = useContainerStore();
+const saveStore = useSaveStore();
 const { databaseId } = storeToRefs(mainStore);
 const { slides } = storeToRefs(slidesStore);
 const { screening } = storeToRefs(useScreenStore());
 
-if (import.meta.env.MODE !== 'development') {
-  window.onbeforeunload = () => false;
-}
+// Track if this is the initial load to avoid marking as dirty
+let isInitialLoad = true;
 
 onMounted(async () => {
   containerStore.initialize(props);
+
+  // Reset save state on mount to ensure clean state
+  if (containerStore.isRemote) {
+    saveStore.reset();
+  }
 
   if (containerStore.isRemote) {
     slidesStore.setSlides(containerStore.presentation?.slides || []);
@@ -54,7 +66,36 @@ onMounted(async () => {
 
   await deleteDiscardedDB();
   snapshotStore.initSnapshotDatabase();
+
+  // After initial load is complete, allow dirty tracking
+  setTimeout(() => {
+    isInitialLoad = false;
+  }, 100);
+
+  // Handle browser/tab close with unsaved changes
+  // Note: Browsers only allow generic messages, not custom dialogs
+  const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+    if (containerStore.isRemote && saveStore.hasUnsavedChanges) {
+      e.preventDefault();
+      e.returnValue = '';
+      return '';
+    }
+  };
+
+  window.addEventListener('beforeunload', handleBeforeUnload);
 });
+
+// Watch for changes in slides to mark as dirty
+watch(
+  slides,
+  () => {
+    // Skip marking as dirty during initial load
+    if (containerStore.isRemote && !isInitialLoad) {
+      saveStore.markDirty();
+    }
+  },
+  { deep: true }
+);
 
 // When the application is unloaded, record the current indexedDB database ID in localStorage for later database cleanup
 window.addEventListener('unload', () => {

@@ -10,7 +10,7 @@ import {
 } from '@dnd-kit/core';
 import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, memo } from 'react';
 import { Download, Loader, Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import useOutlineStore from '@/features/presentation/stores/useOutlineStore';
@@ -22,7 +22,7 @@ type OutlineWorkspaceProps = {
   totalSlide: number;
 };
 
-const OutlineWorkspace = ({ onDownload, totalSlide }: OutlineWorkspaceProps) => {
+const OutlineWorkspace = memo(({ onDownload, totalSlide }: OutlineWorkspaceProps) => {
   const deleteContent = useOutlineStore((state) => state.deleteOutline);
   const contentIds = useOutlineStore((state) => state.outlineIds);
   const addContent = useOutlineStore((state) => state.addOutline);
@@ -140,6 +140,8 @@ const OutlineWorkspace = ({ onDownload, totalSlide }: OutlineWorkspaceProps) => 
       </div>
     </Card>
   );
-};
+});
+
+OutlineWorkspace.displayName = 'OutlineWorkspace';
 
 export default OutlineWorkspace;

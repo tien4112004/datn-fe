@@ -32,13 +32,10 @@ export const PresentationGenerationProvider = ({ children }: PresentationGenerat
   const clearStreamedData = usePresentationStore((state) => state.clearStreamedData);
   const clearGeneratedPresentation = usePresentationStore((state) => state.clearGeneratedPresentation);
 
-  const {
-    processedData: streamedData,
-    isStreaming,
-    error,
-    result,
-    fetch,
-  } = useFetchStreamingPresentation(request || ({} as PresentationGenerationRequest));
+  const { isStreaming, error, result, fetch } = useFetchStreamingPresentation(
+    request || ({} as PresentationGenerationRequest),
+    setStreamedData
+  );
 
   const resultRef = useRef(result);
 
@@ -79,10 +76,6 @@ export const PresentationGenerationProvider = ({ children }: PresentationGenerat
   useEffect(() => {
     setIsGenerating(isStreaming);
   }, [isStreaming, setIsGenerating]);
-
-  useEffect(() => {
-    setStreamedData(streamedData || []);
-  }, [streamedData, setStreamedData]);
 
   const contextValue: PresentationGenerationContextValue = {
     startGeneration,

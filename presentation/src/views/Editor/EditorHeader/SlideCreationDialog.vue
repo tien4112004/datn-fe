@@ -1,5 +1,5 @@
 <template>
-  <Modal :visible="visible" :width="800" @closed="handleClose">
+  <Modal :visible="visible" :width="1200" @closed="handleClose">
     <div class="tw-flex tw-flex-col tw-h-full">
       <!-- Header -->
       <div class="tw-mb-5 tw-pb-4 tw-border-b tw-border-gray-200">

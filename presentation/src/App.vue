@@ -70,8 +70,11 @@ window.addEventListener('unload', () => {
 
 <style lang="scss">
 #app {
+  width: 100%;
   height: 100%;
   max-height: 100%;
   overflow-y: auto;
+  margin: 0;
+  padding: 0;
 }
 </style>

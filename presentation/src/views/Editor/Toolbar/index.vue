@@ -26,6 +26,7 @@ import ElementPositionPanel from './ElementPositionPanel.vue';
 import ElementAnimationPanel from './ElementAnimationPanel.vue';
 import SlideDesignPanel from './SlideDesignPanel/index.vue';
 import SlideAnimationPanel from './SlideTransitionPanel.vue';
+import SlideTemplatePanel from './SlideTemplatePanel.vue';
 import MultiPositionPanel from './MultiPositionPanel.vue';
 import MultiStylePanel from './MultiStylePanel.vue';
 import SymbolPanel from './SymbolPanel.vue';
@@ -59,6 +60,7 @@ const elementTabs = computed<ElementTabs[]>(() => {
 });
 const slideTabs = computed(() => [
   { label: t('toolbar.categories.design'), key: ToolbarStates.SLIDE_DESIGN },
+  { label: t('toolbar.categories.template'), key: ToolbarStates.SLIDE_TEMPLATE },
   { label: t('toolbar.categories.transition'), key: ToolbarStates.SLIDE_ANIMATION },
   { label: t('toolbar.categories.animation'), key: ToolbarStates.EL_ANIMATION },
 ]);
@@ -96,6 +98,7 @@ const currentPanelComponent = computed(() => {
     [ToolbarStates.EL_POSITION]: ElementPositionPanel,
     [ToolbarStates.EL_ANIMATION]: ElementAnimationPanel,
     [ToolbarStates.SLIDE_DESIGN]: SlideDesignPanel,
+    [ToolbarStates.SLIDE_TEMPLATE]: SlideTemplatePanel,
     [ToolbarStates.SLIDE_ANIMATION]: SlideAnimationPanel,
     [ToolbarStates.MULTI_STYLE]: MultiStylePanel,
     [ToolbarStates.MULTI_POSITION]: MultiPositionPanel,

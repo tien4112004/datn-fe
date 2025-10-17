@@ -30,9 +30,19 @@ export default {
       position: 'Vị trí',
       animation: 'Hiệu ứng',
       design: 'Thiết kế',
+      template: 'Mẫu slide',
       transition: 'Chuyển trang',
       styleMulti: 'Kiểu dáng (Chọn nhiều)',
       positionMulti: 'Vị trí (Chọn nhiều)',
+    },
+
+    // Bảng chọn mẫu slide
+    slideTemplate: {
+      title: 'Chuyển đổi mẫu',
+      description: 'Chọn một kiểu bố cục khác cho slide này trong khi vẫn giữ nguyên nội dung.',
+      noTemplatesAvailable: 'Không có mẫu nào khả dụng cho slide này.',
+      onlyForAIGenerated: 'Chuyển đổi mẫu chỉ khả dụng cho các slide được tạo bởi AI.',
+      active: 'Đang dùng',
     },
 
     // Công cụ biểu đồ

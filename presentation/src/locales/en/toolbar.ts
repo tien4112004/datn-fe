@@ -30,9 +30,19 @@ export default {
       position: 'Position',
       animation: 'Animation',
       design: 'Design',
+      template: 'Template',
       transition: 'Transition',
       styleMulti: 'Style (Multi-select)',
       positionMulti: 'Position (Multi-select)',
+    },
+
+    // Slide Template Panel
+    slideTemplate: {
+      title: 'Switch Template',
+      description: 'Choose a different layout style for this slide while keeping your content.',
+      noTemplatesAvailable: 'No templates available for this slide.',
+      onlyForAIGenerated: 'Template switching is only available for AI-generated slides.',
+      active: 'Active',
     },
 
     // Chart Tools

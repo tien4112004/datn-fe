@@ -5,6 +5,7 @@ export const enum ToolbarStates {
   EL_POSITION = 'elPosition',
   SLIDE_DESIGN = 'slideDesign',
   SLIDE_ANIMATION = 'slideAnimation',
+  SLIDE_TEMPLATE = 'slideTemplate',
   MULTI_STYLE = 'multiStyle',
   MULTI_POSITION = 'multiPosition',
 }

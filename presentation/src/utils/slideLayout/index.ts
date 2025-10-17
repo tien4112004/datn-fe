@@ -122,7 +122,12 @@ export const convertToSlide = async (
         blocks: { content: { item: d.data.items } },
         images: { image: d.data.image },
       }),
-      slideId
+      slideId,
+      {
+        layoutSchema: data,
+        templateId: selectedTemplate.id,
+        layoutType: layoutType,
+      }
     );
   } else if (layoutType === SLIDE_LAYOUT_TYPE.MAIN_IMAGE) {
     const selectedTemplate = selectTemplate(layoutType, seed);
@@ -141,7 +146,12 @@ export const convertToSlide = async (
         blocks: { content: { content: [d.data.content] } },
         images: { image: d.data.image },
       }),
-      slideId
+      slideId,
+      {
+        layoutSchema: data,
+        templateId: selectedTemplate.id,
+        layoutType: layoutType,
+      }
     );
   } else if (layoutType === SLIDE_LAYOUT_TYPE.TITLE) {
     const selectedTemplate = selectTemplate(layoutType, seed);
@@ -165,7 +175,12 @@ export const convertToSlide = async (
           },
         },
       }),
-      slideId
+      slideId,
+      {
+        layoutSchema: data,
+        templateId: selectedTemplate.id,
+        layoutType: layoutType,
+      }
     );
   } else if (layoutType === SLIDE_LAYOUT_TYPE.TWO_COLUMN) {
     const selectedTemplate = selectTemplate(layoutType, seed);
@@ -202,7 +217,12 @@ export const convertToSlide = async (
 
         return { texts, blocks };
       },
-      slideId
+      slideId,
+      {
+        layoutSchema: data,
+        templateId: selectedTemplate.id,
+        layoutType: layoutType,
+      }
     );
   } else if (layoutType === SLIDE_LAYOUT_TYPE.LIST) {
     const selectedTemplate = selectTemplate(layoutType, seed);
@@ -242,7 +262,12 @@ export const convertToSlide = async (
           blocks: { content: contentData },
         };
       },
-      slideId
+      slideId,
+      {
+        layoutSchema: data,
+        templateId: selectedTemplate.id,
+        layoutType: layoutType,
+      }
     );
   } else if (layoutType === SLIDE_LAYOUT_TYPE.LABELED_LIST) {
     const selectedTemplate = selectTemplate(layoutType, seed);
@@ -276,7 +301,12 @@ export const convertToSlide = async (
           },
         },
       }),
-      slideId
+      slideId,
+      {
+        layoutSchema: data,
+        templateId: selectedTemplate.id,
+        layoutType: layoutType,
+      }
     );
   } else if (layoutType === SLIDE_LAYOUT_TYPE.TABLE_OF_CONTENTS) {
     const selectedTemplate = selectTemplate(layoutType, seed);
@@ -308,7 +338,12 @@ export const convertToSlide = async (
           },
         },
       }),
-      slideId
+      slideId,
+      {
+        layoutSchema: data,
+        templateId: selectedTemplate.id,
+        layoutType: layoutType,
+      }
     );
   } else if (layoutType === SLIDE_LAYOUT_TYPE.TIMELINE) {
     const selectedTemplate = selectTemplate(layoutType, seed);
@@ -332,7 +367,12 @@ export const convertToSlide = async (
           },
         },
       }),
-      slideId
+      slideId,
+      {
+        layoutSchema: data,
+        templateId: selectedTemplate.id,
+        layoutType: layoutType,
+      }
     );
   } else if (layoutType === SLIDE_LAYOUT_TYPE.PYRAMID) {
     const selectedTemplate = selectTemplate(layoutType, seed);
@@ -355,7 +395,12 @@ export const convertToSlide = async (
           },
         },
       }),
-      slideId
+      slideId,
+      {
+        layoutSchema: data,
+        templateId: selectedTemplate.id,
+        layoutType: layoutType,
+      }
     );
   } else {
     throw new Error(`Unsupported layout type: ${layoutType}`);

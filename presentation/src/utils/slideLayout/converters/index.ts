@@ -65,7 +65,8 @@ export async function convertLayoutGeneric<T = any>(
   data: T,
   template: TemplateConfig,
   mapData: DataMapper<T>,
-  slideId?: string
+  slideId?: string,
+  layoutMetadata?: { layoutSchema: any; templateId: string; layoutType: string }
 ): Promise<Slide> {
   const mappedData = mapData(data);
 
@@ -206,6 +207,13 @@ export async function convertLayoutGeneric<T = any>(
     id: slideId ?? crypto.randomUUID(),
     elements: combinedElements.map((item) => item.element),
     background: processBackground(template.theme),
+    ...(layoutMetadata && {
+      layout: {
+        schema: layoutMetadata.layoutSchema,
+        templateId: layoutMetadata.templateId,
+        layoutType: layoutMetadata.layoutType,
+      },
+    }),
   };
 
   return slide;

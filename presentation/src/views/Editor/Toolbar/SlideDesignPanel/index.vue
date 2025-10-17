@@ -104,6 +104,14 @@
     <Divider />
 
     <div class="row">
+      <Button style="flex: 1" @click="pageNumberSettingVisible = true">
+        {{ $t('styling.slide.design.pageNumbers.title') }}
+      </Button>
+    </div>
+
+    <Divider />
+
+    <div class="row">
       <Select
         style="width: 100%"
         :value="viewportRatio"
@@ -350,6 +358,10 @@
   <Modal v-model:visible="themeColorsSettingVisible" :width="400" @closed="themeColorsSettingVisible = false">
     <ThemeColorsSetting @close="themeColorsSettingVisible = false" />
   </Modal>
+
+  <Modal v-model:visible="pageNumberSettingVisible" :width="400" @closed="pageNumberSettingVisible = false">
+    <PageNumberSetting @close="pageNumberSettingVisible = false" />
+  </Modal>
 </template>
 
 <script lang="ts" setup>
@@ -375,6 +387,7 @@ import { useI18n } from 'vue-i18n';
 
 import ThemeStylesExtract from './ThemeStylesExtract.vue';
 import ThemeColorsSetting from './ThemeColorsSetting.vue';
+import PageNumberSetting from './PageNumberSetting.vue';
 import SVGLine from '../common/SVGLine.vue';
 import ColorButton from '@/components/ColorButton.vue';
 import ColorListButton from '@/components/ColorListButton.vue';
@@ -389,6 +402,7 @@ import SelectCustom from '@/components/SelectCustom.vue';
 import NumberInput from '@/components/NumberInput.vue';
 import Modal from '@/components/Modal.vue';
 import GradientBar from '@/components/GradientBar.vue';
+import useCreateElement from '@/hooks/useCreateElement';
 
 const slidesStore = useSlidesStore();
 const { slides, currentSlide, slideIndex, viewportRatio, viewportSize, theme } = storeToRefs(slidesStore);
@@ -396,6 +410,7 @@ const { slides, currentSlide, slideIndex, viewportRatio, viewportSize, theme } =
 const moreThemeConfigsVisible = ref(false);
 const themeStylesExtractVisible = ref(false);
 const themeColorsSettingVisible = ref(false);
+const pageNumberSettingVisible = ref(false);
 const currentGradientIndex = ref(0);
 const lineStyleOptions = ref<LineStyleType[]>(['solid', 'dashed', 'dotted']);
 
@@ -411,6 +426,7 @@ const background = computed(() => {
 
 const { addHistorySnapshot } = useHistorySnapshot();
 const { applyPresetTheme, applyThemeToAllSlides } = useSlideTheme();
+const { createTextElement } = useCreateElement();
 const { t } = useI18n();
 
 watch(slideIndex, () => {

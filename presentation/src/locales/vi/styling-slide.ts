@@ -64,6 +64,22 @@ export default {
         blurDistance: 'Độ mờ:',
         shadowColor: 'Màu bóng:',
       },
+
+      // Số trang
+      pageNumbers: {
+        title: 'Cài đặt số trang',
+        showPageNumbers: 'Hiển thị số trang',
+        position: 'Vị trí số trang',
+        skipTitlePage: 'Bỏ qua trang tiêu đề',
+        positions: {
+          topLeft: 'Trên trái',
+          topCenter: 'Trên giữa',
+          topRight: 'Trên phải',
+          bottomLeft: 'Dưới trái',
+          bottomCenter: 'Dưới giữa',
+          bottomRight: 'Dưới phải',
+        },
+      },
     },
 
     // Màu chủ đề

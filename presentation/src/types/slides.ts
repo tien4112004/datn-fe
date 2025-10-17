@@ -159,7 +159,8 @@ export type TextType =
   | 'header'
   | 'footer'
   | 'partNumber'
-  | 'itemNumber';
+  | 'itemNumber'
+  | 'pageNumber';
 
 /**
  * Text element

@@ -63,6 +63,22 @@ export default {
         blurDistance: 'Blur Distance:',
         shadowColor: 'Shadow Color:',
       },
+
+      // Page Numbers
+      pageNumbers: {
+        title: 'Page Number Settings',
+        showPageNumbers: 'Show page numbers',
+        position: 'Page Number Position',
+        skipTitlePage: 'Skip title page',
+        positions: {
+          topLeft: 'Top Left',
+          topCenter: 'Top Center',
+          topRight: 'Top Right',
+          bottomLeft: 'Bottom Left',
+          bottomCenter: 'Bottom Center',
+          bottomRight: 'Bottom Right',
+        },
+      },
     },
 
     // Theme Colors

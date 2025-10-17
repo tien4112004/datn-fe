@@ -43,6 +43,7 @@ export default {
       noTemplatesAvailable: 'Không có mẫu nào khả dụng cho slide này.',
       onlyForAIGenerated: 'Chuyển đổi mẫu chỉ khả dụng cho các slide được tạo bởi AI.',
       active: 'Đang dùng',
+      confirmButton: 'Dùng mẫu này & Bắt đầu chỉnh sửa',
     },
 
     // Công cụ biểu đồ

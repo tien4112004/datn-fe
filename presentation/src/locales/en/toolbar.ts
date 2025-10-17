@@ -43,6 +43,7 @@ export default {
       noTemplatesAvailable: 'No templates available for this slide.',
       onlyForAIGenerated: 'Template switching is only available for AI-generated slides.',
       active: 'Active',
+      confirmButton: 'Use This Template & Start Editing',
     },
 
     // Chart Tools

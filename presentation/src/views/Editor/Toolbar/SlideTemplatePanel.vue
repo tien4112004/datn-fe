@@ -21,7 +21,11 @@
         <div class="tw-text-sm tw-text-gray-500">Loading previews...</div>
       </div>
 
-      <div v-else class="tw-grid tw-grid-cols-2 tw-gap-3">
+      <div
+        v-else
+        class="tw-grid tw-grid-cols-2 tw-gap-3"
+        :class="{ 'tw-mb-3': !isInPreviewMode, 'tw-pb-20': isInPreviewMode }"
+      >
         <div
           v-for="preview in templatePreviews"
           :key="preview.template.id"
@@ -44,12 +48,35 @@
             </div>
             <div
               v-if="preview.template.id === currentTemplateId"
-              class="tw-text-[10px] tw-px-1.5 tw-py-0.5 tw-bg-[var(--presentation-primary)] tw-text-white tw-rounded"
+              class="tw-text-[10px] tw-px-1.5 tw-py-0.5 tw-bg-[var(--presentation-primary)] tw-text-white tw-rounded tw-flex-shrink-0"
             >
               {{ $t('toolbar.slideTemplate.active') }}
             </div>
           </div>
         </div>
+      </div>
+
+      <!-- Confirm Template Button (only shown in preview mode) -->
+      <div
+        v-if="isInPreviewMode"
+        class="tw-p-3 tw-border-t tw-border-gray-200 tw-bg-white tw-z-10"
+        style="width: inherit"
+      >
+        <button
+          class="tw-w-full tw-py-2.5 tw-px-4 tw-bg-[var(--presentation-primary)] tw-text-white tw-rounded tw-font-medium tw-text-sm tw-transition-all hover:tw-opacity-90 tw-flex tw-items-center tw-justify-center tw-gap-2"
+          @click="confirmAndStartEditing"
+        >
+          <svg
+            class="tw-w-4 tw-h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+          </svg>
+          {{ $t('toolbar.slideTemplate.confirmButton') }}
+        </button>
       </div>
     </template>
   </div>
@@ -59,11 +86,15 @@
 import { ref, computed, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useSlidesStore } from '@/store';
+import { useMainStore } from '@/store';
 import useSwitchTemplate from '@/hooks/useSwitchTemplate';
+import useSlideEditLock from '@/hooks/useSlideEditLock';
 import { convertToSlide } from '@/utils/slideLayout';
 import type { Template } from '@/utils/slideLayout/types';
 import type { Slide } from '@/types/slides';
+import { ToolbarStates } from '@/types/toolbar';
 import ThumbnailSlide from '@/views/components/ThumbnailSlide/index.vue';
+import message from '@/utils/message';
 
 interface TemplatePreview {
   template: Template;
@@ -71,9 +102,11 @@ interface TemplatePreview {
 }
 
 const slidesStore = useSlidesStore();
+const mainStore = useMainStore();
 const { currentSlide, theme, viewportSize, viewportRatio } = storeToRefs(slidesStore);
 
 const { getAvailableTemplates, switchTemplate, canSwitchTemplate } = useSwitchTemplate();
+const { isCurrentSlideLocked, confirmCurrentTemplate } = useSlideEditLock();
 
 const templatePreviews = ref<TemplatePreview[]>([]);
 const isLoading = ref(false);
@@ -84,12 +117,26 @@ const canSwitch = computed(() => {
 
 const currentTemplateId = computed(() => currentSlide.value?.layout?.templateId || '');
 
+const isInPreviewMode = computed(() => isCurrentSlideLocked.value);
+
 const handleTemplateClick = async (templateId: string) => {
   if (!currentSlide.value?.id || templateId === currentTemplateId.value) {
     return;
   }
 
   await switchTemplate(currentSlide.value.id, templateId);
+};
+
+const confirmAndStartEditing = () => {
+  if (!currentSlide.value?.id) return;
+
+  confirmCurrentTemplate();
+
+  // Switch back to design panel (template tab will be hidden automatically)
+  mainStore.setToolbarState(ToolbarStates.SLIDE_DESIGN);
+
+  // Show success message
+  message.success('Template confirmed! You can now edit your slide.');
 };
 
 /**

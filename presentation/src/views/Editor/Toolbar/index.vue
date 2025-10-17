@@ -17,9 +17,10 @@
 <script lang="ts" setup>
 import { computed, watch } from 'vue';
 import { storeToRefs } from 'pinia';
-import { useMainStore } from '@/store';
+import { useMainStore, useSlidesStore } from '@/store';
 import { ToolbarStates } from '@/types/toolbar';
 import { useI18n } from 'vue-i18n';
+import useSlideEditLock from '@/hooks/useSlideEditLock';
 
 import ElementStylePanel from './ElementStylePanel/index.vue';
 import ElementPositionPanel from './ElementPositionPanel.vue';
@@ -40,8 +41,11 @@ interface ElementTabs {
 
 const { t } = useI18n();
 const mainStore = useMainStore();
+const slidesStore = useSlidesStore();
 const { activeElementIdList, activeElementList, activeGroupElementId, handleElement, toolbarState } =
   storeToRefs(mainStore);
+const { currentSlide } = storeToRefs(slidesStore);
+const { isCurrentSlideLocked } = useSlideEditLock();
 
 const elementTabs = computed<ElementTabs[]>(() => {
   if (handleElement.value?.type === 'text') {
@@ -58,12 +62,24 @@ const elementTabs = computed<ElementTabs[]>(() => {
     { label: t('toolbar.categories.animation'), key: ToolbarStates.EL_ANIMATION },
   ];
 });
-const slideTabs = computed(() => [
-  { label: t('toolbar.categories.design'), key: ToolbarStates.SLIDE_DESIGN },
-  { label: t('toolbar.categories.template'), key: ToolbarStates.SLIDE_TEMPLATE },
-  { label: t('toolbar.categories.transition'), key: ToolbarStates.SLIDE_ANIMATION },
-  { label: t('toolbar.categories.animation'), key: ToolbarStates.EL_ANIMATION },
-]);
+const slideTabs = computed(() => {
+  const baseTabs = [
+    { label: t('toolbar.categories.design'), key: ToolbarStates.SLIDE_DESIGN },
+    { label: t('toolbar.categories.transition'), key: ToolbarStates.SLIDE_ANIMATION },
+    { label: t('toolbar.categories.animation'), key: ToolbarStates.EL_ANIMATION },
+  ];
+
+  // Only show template tab if slide is in preview mode (locked) and has layout metadata
+  if (isCurrentSlideLocked.value && currentSlide.value?.layout) {
+    // Insert template tab at position 1 (after design)
+    baseTabs.splice(1, 0, {
+      label: t('toolbar.categories.template'),
+      key: ToolbarStates.SLIDE_TEMPLATE,
+    });
+  }
+
+  return baseTabs;
+});
 const multiSelectTabs = computed(() => [
   { label: t('toolbar.categories.styleMulti'), key: ToolbarStates.MULTI_STYLE },
   { label: t('toolbar.categories.positionMulti'), key: ToolbarStates.MULTI_POSITION },

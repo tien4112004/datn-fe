@@ -74,6 +74,11 @@ export default function useSwitchTemplate() {
       newSlide.sectionTag = slide.sectionTag;
       newSlide.type = slide.type;
 
+      // Preserve template preview mode state when switching
+      if (newSlide.layout && slide.layout?.isTemplatePreview !== undefined) {
+        newSlide.layout.isTemplatePreview = slide.layout.isTemplatePreview;
+      }
+
       // Update background only if the new slide doesn't override it
       if (!newSlide.background && slide.background) {
         newSlide.background = slide.background;

@@ -212,6 +212,8 @@ export async function convertLayoutGeneric<T = any>(
         schema: layoutMetadata.layoutSchema,
         templateId: layoutMetadata.templateId,
         layoutType: layoutMetadata.layoutType,
+        // New AI slides start in preview mode (locked for editing until template confirmed)
+        isTemplatePreview: true,
       },
     }),
   };

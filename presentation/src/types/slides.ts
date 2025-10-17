@@ -766,6 +766,8 @@ export interface SlideLayoutMetadata {
   templateId: string;
   /** Layout type (e.g., 'two_column') */
   layoutType: string;
+  /** Template preview mode - true means slide is locked for editing until template is confirmed */
+  isTemplatePreview?: boolean;
 }
 
 /**

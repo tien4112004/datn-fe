@@ -5,6 +5,52 @@
       <Thumbnails class="layout-content-left" />
       <div class="layout-content-center">
         <CanvasTool class="center-top" />
+
+        <!-- Template Preview Mode Banner -->
+        <div v-if="isCurrentSlideLocked" class="preview-mode-banner">
+          <div class="banner-content">
+            <div class="banner-icon">
+              <svg
+                class="tw-w-5 tw-h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"
+                ></path>
+              </svg>
+            </div>
+            <div class="banner-text">
+              <div class="banner-title">Template Preview Mode</div>
+              <div class="banner-subtitle">
+                Choose your preferred layout. Editing will unlock after you confirm your template choice.
+              </div>
+            </div>
+            <button class="banner-button" @click="confirmCurrentTemplate">
+              <svg
+                class="tw-w-4 tw-h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 13l4 4L19 7"
+                ></path>
+              </svg>
+              Confirm & Start Editing
+            </button>
+          </div>
+        </div>
+
         <Canvas class="center-body" />
         <div class="center-bottom" @click="openRemarkDrawer">
           <div class="remark-preview">
@@ -57,6 +103,9 @@ import { storeToRefs } from 'pinia';
 import { useMainStore, useSlidesStore } from '@/store';
 import useGlobalHotkey from '@/hooks/useGlobalHotkey';
 import usePasteEvent from '@/hooks/usePasteEvent';
+import useSlideEditLock from '@/hooks/useSlideEditLock';
+import message from '@/utils/message';
+import { ToolbarStates } from '@/types/toolbar';
 
 import EditorHeader from './EditorHeader/index.vue';
 import Canvas from './Canvas/index.vue';
@@ -84,6 +133,8 @@ const {
   showAIPPTDialog,
 } = storeToRefs(mainStore);
 const { currentSlide } = storeToRefs(slidesStore);
+const { isCurrentSlideLocked, confirmCurrentTemplate: confirmTemplate } = useSlideEditLock();
+
 const closeExportDialog = () => mainStore.setDialogForExport('');
 const closeAIPPTDialog = () => mainStore.setAIPPTDialogState(false);
 
@@ -93,6 +144,13 @@ const showRemarkDrawer = ref(false);
 // Function to open the drawer for editing
 const openRemarkDrawer = () => {
   showRemarkDrawer.value = true;
+};
+
+// Function to confirm template from banner
+const confirmCurrentTemplate = () => {
+  confirmTemplate();
+  mainStore.setToolbarState(ToolbarStates.SLIDE_DESIGN);
+  message.success('Template confirmed! You can now edit your slide.');
 };
 
 useGlobalHotkey();
@@ -181,5 +239,75 @@ usePasteEvent();
 .layout-content-right {
   width: 320px;
   height: 100%;
+}
+
+.preview-mode-banner {
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 12px 16px;
+  color: white;
+
+  .banner-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    max-width: 100%;
+  }
+
+  .banner-icon {
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+  }
+
+  .banner-text {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .banner-title {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+
+  .banner-subtitle {
+    font-size: 12px;
+    opacity: 0.9;
+    line-height: 1.4;
+  }
+
+  .banner-button {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: white;
+    color: #667eea;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.95);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
 }
 </style>

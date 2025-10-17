@@ -8,6 +8,7 @@ import type {
   NonTextLayoutBlockConfig,
   SlideLayoutBlockInstance,
 } from './layout';
+import type { GraphicElement } from './graphics';
 
 // ============================================================================
 // Template Container Types (Config with Bounds or Relative Positioning)
@@ -50,6 +51,8 @@ export interface TemplateConfig {
   containers: Record<string, TemplateContainerConfig>;
   theme: SlideTheme;
   viewport: SlideViewport;
+  graphics?: GraphicElement[];
+  parameters?: TemplateParameter[]; // Template parameters for user customization
 }
 
 /**
@@ -68,10 +71,25 @@ export interface TemplateInstance {
 }
 
 /**
+ * Template parameter definition for user customization
+ */
+export interface TemplateParameter {
+  key: string; // Variable name used in expressions (e.g., "IMAGE_RATIO")
+  label: string; // User-friendly name for UI
+  defaultValue: number; // Default value if not overridden
+  min?: number; // Minimum allowed value
+  max?: number; // Maximum allowed value
+  step?: number; // Step increment for UI controls
+  description?: string; // Help text for users
+}
+
+/**
  * Template wrapper with metadata
  */
 export interface Template {
   id: string;
   name: string;
   config: PartialTemplateConfig;
+  graphics?: GraphicElement[]; // Optional decorative graphics
+  parameters?: TemplateParameter[]; // Customizable parameters
 }

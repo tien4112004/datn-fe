@@ -18,8 +18,20 @@ export function layoutItemsInBlock(itemDimensions: Size[], container: LayoutBloc
   const distribution = container.layout?.distribution || 'equal';
   const orientation = container.layout?.orientation || 'vertical';
   const gap = container.layout?.gap || DEFAULT_SPACING_BETWEEN_ITEMS;
-  const horizontalAlignment = container.layout?.horizontalAlignment || 'left';
-  const verticalAlignment = container.layout?.verticalAlignment || 'top';
+  let horizontalAlignment = container.layout?.horizontalAlignment || 'left';
+  let verticalAlignment = container.layout?.verticalAlignment || 'top';
+
+  // Swap alignments if children were reversed during initial layout
+  if (container.childrenReversed) {
+    horizontalAlignment =
+      horizontalAlignment === 'left'
+        ? 'right'
+        : horizontalAlignment === 'right'
+          ? 'left'
+          : horizontalAlignment;
+    verticalAlignment =
+      verticalAlignment === 'top' ? 'bottom' : verticalAlignment === 'bottom' ? 'top' : verticalAlignment;
+  }
 
   const axis = getAxisMapping(orientation);
   const isVertical = orientation === 'vertical';
@@ -49,6 +61,7 @@ export function layoutItemsInBlock(itemDimensions: Size[], container: LayoutBloc
  *
  * @param bounds - Parent container bounds
  * @param options - Distribution and orientation settings
+ * @param reverseAlignment - If true, swap alignment directions (left↔right, top↔bottom)
  * @returns Array of pre-allocated bounds for each child
  */
 export function getChildrenMaxBounds(
@@ -58,21 +71,51 @@ export function getChildrenMaxBounds(
     childCount?: number;
     orientation?: 'horizontal' | 'vertical';
     gap?: number;
-  }
+    horizontalAlignment?: 'left' | 'center' | 'right';
+    verticalAlignment?: 'top' | 'center' | 'bottom';
+  },
+  reverseAlignment?: boolean
 ): Bounds[] {
   const {
     distribution = '50/50',
     childCount = 0,
     orientation = 'vertical',
     gap = DEFAULT_SPACING_BETWEEN_ITEMS,
+    horizontalAlignment = 'left',
+    verticalAlignment = 'top',
   } = options || {};
 
   if (childCount === 0) {
     return [];
   }
 
+  // Swap alignments if reverseAlignment is true
+  const effectiveHorizontalAlignment = reverseAlignment
+    ? horizontalAlignment === 'left'
+      ? 'right'
+      : horizontalAlignment === 'right'
+        ? 'left'
+        : horizontalAlignment
+    : horizontalAlignment;
+  const effectiveVerticalAlignment = reverseAlignment
+    ? verticalAlignment === 'top'
+      ? 'bottom'
+      : verticalAlignment === 'bottom'
+        ? 'top'
+        : verticalAlignment
+    : verticalAlignment;
+
   const axis = getAxisMapping(orientation);
-  return calculateChildrenBounds(bounds, childCount, distribution, gap, axis);
+  return calculateChildrenBounds(
+    bounds,
+    childCount,
+    distribution,
+    gap,
+    axis,
+    effectiveHorizontalAlignment,
+    effectiveVerticalAlignment,
+    orientation === 'vertical'
+  );
 }
 
 /**
@@ -118,7 +161,8 @@ export function calculateWrapLayout(bounds: Bounds, options?: WrapLayoutOptions)
     distribution = 'equal',
   } = options || {};
 
-  return calculateWrapLayoutInternal(itemCount, bounds, wrapConfig, orientation, gap, distribution);
+  const res = calculateWrapLayoutInternal(itemCount, bounds, wrapConfig, orientation, gap, distribution);
+  return res;
 }
 
 /**
@@ -148,7 +192,10 @@ function calculateChildrenBounds(
   childCount: number,
   distribution: string,
   gap: number,
-  axis: AxisMapping
+  axis: AxisMapping,
+  horizontalAlignment: string = 'left',
+  verticalAlignment: string = 'top',
+  isVertical: boolean = true
 ): Bounds[] {
   // Calculate base item size assuming equal distribution
   const totalSpacing = gap * (childCount - 1);
@@ -204,17 +251,28 @@ function calculateChildrenBounds(
   const secondarySize = bounds[axis.secondary];
   const secondaryStart = bounds[axis.secondaryStart];
 
+  // Determine secondary alignment (perpendicular to flow direction)
+  const secondaryAlignment = isVertical ? horizontalAlignment : verticalAlignment;
+
   return sizes.map((primarySize) => {
+    // Calculate secondary position based on alignment
+    const secondaryPos = calculateAlignment(
+      secondaryAlignment,
+      secondarySize,
+      bounds[axis.secondary],
+      bounds[axis.secondaryStart]
+    );
+
     const position: Bounds =
       axis.primary === 'width'
         ? {
             left: currentPrimary,
-            top: secondaryStart,
+            top: secondaryPos,
             width: primarySize,
             height: secondarySize,
           }
         : {
-            left: secondaryStart,
+            left: secondaryPos,
             top: currentPrimary,
             width: secondarySize,
             height: primarySize,
@@ -355,6 +413,161 @@ function calculateLayout(
 }
 
 /**
+ * Calculate pyramid layout where each item is on its own level with progressive width
+ * Level 1 (top) = narrow, Level N (bottom) = wide
+ */
+function calculatePyramidLayout(
+  itemCount: number,
+  containerBounds: Bounds,
+  wrapConfig: WrapConfig,
+  orientation: 'horizontal' | 'vertical',
+  gap: number
+): WrapLayoutResult {
+  if (itemCount === 0) {
+    return { lines: 0, itemsPerLine: [], itemBounds: [] };
+  }
+
+  const pyramidConfig = wrapConfig.pyramid!;
+  const axis = getAxisMapping(orientation);
+  const itemBounds: Bounds[] = [];
+
+  // Calculate level/row height (each item gets its own level)
+  const totalGap = (itemCount - 1) * gap;
+  const levelHeight = (containerBounds[axis.secondary] - totalGap) / itemCount;
+
+  // Calculate width range
+  const maxWidth = pyramidConfig.maxWidth || containerBounds[axis.primary];
+  const widthRatio = pyramidConfig.widthRatio || 0.5; // Default: top is 50% of bottom
+  const minWidth = pyramidConfig.minWidth || maxWidth * widthRatio;
+
+  // Calculate width increment per level
+  // If inverted, swap min and max widths so pyramid is upside down
+  const startWidth = pyramidConfig.inverted ? maxWidth : minWidth;
+  const endWidth = pyramidConfig.inverted ? minWidth : maxWidth;
+  const widthIncrement = (endWidth - startWidth) / Math.max(1, itemCount - 1);
+
+  // Create bounds for each level
+  for (let i = 0; i < itemCount; i++) {
+    // Normal: Level 0 = top (narrowest), Level N-1 = bottom (widest)
+    // Inverted: Level 0 = top (widest), Level N-1 = bottom (narrowest)
+    const levelWidth = startWidth + i * widthIncrement;
+
+    // Calculate secondary position (vertical position for vertical orientation)
+    const secondaryPos = containerBounds[axis.secondaryStart] + i * (levelHeight + gap);
+
+    // Calculate primary position (horizontal position for vertical orientation) - centered
+    const primaryPos = containerBounds[axis.primaryStart] + (containerBounds[axis.primary] - levelWidth) / 2;
+
+    // Build bounds by mapping primary/secondary to actual coordinates
+    const bounds: Bounds =
+      axis.primary === 'width'
+        ? {
+            left: primaryPos,
+            top: secondaryPos,
+            width: levelWidth,
+            height: levelHeight,
+          }
+        : {
+            left: secondaryPos,
+            top: primaryPos,
+            width: levelHeight,
+            height: levelWidth,
+          };
+
+    itemBounds.push(bounds);
+  }
+
+  return {
+    lines: itemCount, // Each item on its own line
+    itemsPerLine: Array(itemCount).fill(1), // 1 item per line
+    itemBounds,
+  };
+}
+
+/**
+ * Calculate zigzag layout where items alternate between two rows in staggered pattern
+ */
+function calculateZigzagLayout(
+  itemCount: number,
+  containerBounds: Bounds,
+  wrapConfig: WrapConfig,
+  orientation: 'horizontal' | 'vertical',
+  gap: number
+): WrapLayoutResult {
+  if (itemCount === 0) {
+    return { lines: 0, itemsPerLine: [], itemBounds: [] };
+  }
+
+  const axis = getAxisMapping(orientation);
+  const itemBounds: Bounds[] = [];
+  const lineSpacing = wrapConfig.lineSpacing || 0;
+
+  // Force 2 rows for zigzag
+  const lineCount = 2;
+  const lineSize = (containerBounds[axis.secondary] - lineSpacing) / lineCount;
+
+  // Calculate items per row
+  const row0Count = Math.ceil(itemCount / 2); // Items 0, 2, 4, 6...
+  const row1Count = Math.floor(itemCount / 2); // Items 1, 3, 5, 7...
+
+  // Calculate item size considering both rows
+  // Row 0 constraint: row0Count * itemWidth + (row0Count - 1) * gap <= containerWidth
+  // Row 1 constraint: offset + row1Count * itemWidth + (row1Count - 1) * gap <= containerWidth
+  //                   where offset = (itemWidth + gap) / 2
+  // Row 1 expands to: itemWidth * (row1Count + 0.5) + gap * (row1Count - 0.5) <= containerWidth
+
+  const containerSize = containerBounds[axis.primary];
+  const itemWidthForRow0 =
+    row0Count > 0 ? (containerSize - gap * (row0Count - 1)) / row0Count : containerSize;
+  const itemWidthForRow1 =
+    row1Count > 0 ? (containerSize - gap * (row1Count - 0.5)) / (row1Count + 0.5) : containerSize;
+
+  // Use the tighter constraint (smaller value)
+  const itemPrimarySize = Math.min(itemWidthForRow0, itemWidthForRow1);
+
+  // Calculate offset for row 1 (stagger effect)
+  const row1Offset = (itemPrimarySize + gap) / 2;
+
+  // Position items in order: 0, 1, 2, 3, 4, 5...
+  // But physically place them in zigzag: row0, row1, row0, row1...
+  for (let i = 0; i < itemCount; i++) {
+    const rowIndex = i % 2; // 0 for even indices, 1 for odd indices
+    const columnIndex = Math.floor(i / 2); // Which column in that row
+
+    // Calculate primary position (horizontal for horizontal orientation)
+    const rowOffset = rowIndex === 1 ? row1Offset : 0;
+    const primaryPos = containerBounds[axis.primaryStart] + rowOffset + columnIndex * (itemPrimarySize + gap);
+
+    // Calculate secondary position (vertical for horizontal orientation)
+    const secondaryPos = containerBounds[axis.secondaryStart] + rowIndex * (lineSize + lineSpacing);
+
+    // Build bounds by mapping primary/secondary to actual coordinates
+    const bounds: Bounds =
+      axis.primary === 'width'
+        ? {
+            left: primaryPos,
+            top: secondaryPos,
+            width: itemPrimarySize,
+            height: lineSize,
+          }
+        : {
+            left: secondaryPos,
+            top: primaryPos,
+            width: lineSize,
+            height: itemPrimarySize,
+          };
+
+    itemBounds.push(bounds);
+  }
+
+  return {
+    lines: lineCount,
+    itemsPerLine: [row0Count, row1Count],
+    itemBounds,
+  };
+}
+
+/**
  * Internal implementation of wrap layout calculation
  */
 function calculateWrapLayoutInternal(
@@ -379,6 +592,16 @@ function calculateWrapLayoutInternal(
       itemsPerLine: [itemCount],
       itemBounds,
     };
+  }
+
+  // Pyramid case: progressive width layout with one item per level
+  if (wrapConfig.pyramid?.enabled) {
+    return calculatePyramidLayout(itemCount, containerBounds, wrapConfig, orientation, gap);
+  }
+
+  // Zigzag case: special layout with alternating rows
+  if (wrapConfig.zigzag) {
+    return calculateZigzagLayout(itemCount, containerBounds, wrapConfig, orientation, gap);
   }
 
   // Wrap case: multi-line/column layout
@@ -413,8 +636,9 @@ function calculateWrapLayoutInternal(
 
     if (wrapConfig.syncSize) {
       // Fixed-size mode: use size based on the fullest line
-      const totalSpacing = (maxPerLine - 1) * gap;
-      itemPrimarySize = (effectiveContainerSize - totalSpacing) / maxPerLine;
+      const largestLine = Math.max(...distributions);
+      const totalSpacing = (largestLine - 1) * gap;
+      itemPrimarySize = (effectiveContainerSize - totalSpacing) / largestLine;
       lineContentSize = itemsInLine * itemPrimarySize + (itemsInLine - 1) * gap;
     } else {
       // Original mode: divide space equally among items in this line
@@ -426,6 +650,9 @@ function calculateWrapLayoutInternal(
     // Calculate offset based on distribution (for spare items in partial lines)
     let additionalOffset = 0;
 
+    // Check if this is a snake line (odd rows in snake pattern)
+    const isSnakeLine = wrapConfig.snake && lineIndex % 2 === 1;
+
     if (wrapConfig.syncSize && itemsInLine < maxPerLine) {
       const availableSpace = effectiveContainerSize - lineContentSize;
 
@@ -436,6 +663,12 @@ function calculateWrapLayoutInternal(
         const extraGap = availableSpace / itemsInLine;
         additionalOffset = extraGap / 2;
         itemGap = gap + extraGap;
+      } else if (distribution === 'equal') {
+        // For snake pattern on odd rows, align items to the right
+        // For even rows or non-snake, keep items on the left (default)
+        if (isSnakeLine) {
+          additionalOffset = availableSpace;
+        }
       }
     }
 
@@ -443,7 +676,12 @@ function calculateWrapLayoutInternal(
     const lineSecondaryPos = containerBounds[axis.secondaryStart] + lineIndex * (lineSize + lineSpacing);
 
     // Position items in the line/column
-    for (let itemIndex = 0; itemIndex < itemsInLine; itemIndex++) {
+    // For snake pattern, reverse the order for odd rows
+
+    for (let i = 0; i < itemsInLine; i++) {
+      // For snake pattern on odd rows, place items from right to left
+      const itemIndex = isSnakeLine ? itemsInLine - 1 - i : i;
+
       const primaryPos =
         containerBounds[axis.primaryStart] +
         lineStartOffset +

@@ -32,7 +32,7 @@ export interface TwoColumnLayoutSchema {
   };
 }
 
-export interface VerticalListLayoutSchema {
+export interface ListLayoutSchema {
   type: string;
   title: string;
   data: {
@@ -40,7 +40,7 @@ export interface VerticalListLayoutSchema {
   };
 }
 
-export interface HorizontalListLayoutSchema {
+export interface LabeledListLayoutSchema {
   type: string;
   title: string;
   data: {
@@ -51,16 +51,27 @@ export interface HorizontalListLayoutSchema {
   };
 }
 
-export interface TransitionLayoutSchema {
+export interface TableOfContentsLayoutSchema {
   type: string;
   data: {
-    title: string;
-    subtitle: string;
+    items: string[];
   };
 }
 
-export interface TableOfContentsLayoutSchema {
+export interface TimelineLayoutSchema {
   type: string;
+  title: string;
+  data: {
+    items: {
+      label: string;
+      content: string;
+    }[];
+  };
+}
+
+export interface PyramidLayoutSchema {
+  type: string;
+  title: string;
   data: {
     items: string[];
   };
@@ -71,10 +82,11 @@ export const SLIDE_LAYOUT_TYPE = {
   MAIN_IMAGE: 'main_image',
   TITLE: 'title',
   TWO_COLUMN: 'two_column',
-  VERTICAL_LIST: 'vertical_list',
-  HORIZONTAL_LIST: 'horizontal_list',
-  TRANSITION: 'transition',
+  LIST: 'list',
+  LABELED_LIST: 'labeled_list',
   TABLE_OF_CONTENTS: 'table_of_contents',
+  TIMELINE: 'timeline',
+  PYRAMID: 'pyramid',
 } as const;
 
 export { SLIDE_LAYOUT_TYPE as default };
@@ -86,7 +98,8 @@ export type SlideLayoutSchema =
   | MainImageLayoutSchema
   | TitleLayoutSchema
   | TwoColumnLayoutSchema
-  | VerticalListLayoutSchema
-  | HorizontalListLayoutSchema
-  | TransitionLayoutSchema
-  | TableOfContentsLayoutSchema;
+  | ListLayoutSchema
+  | LabeledListLayoutSchema
+  | TableOfContentsLayoutSchema
+  | TimelineLayoutSchema
+  | PyramidLayoutSchema;

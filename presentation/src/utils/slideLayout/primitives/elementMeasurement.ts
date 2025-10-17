@@ -10,18 +10,19 @@ export interface FontSizeCalculationResult {
 }
 
 /**
- * Measures an HTML element's dimensions by temporarily adding it to the DOM.
+ * Measures an HTML element's dimensions by cloning and temporarily adding it to the DOM.
  *
  * Process:
- * 1. Store original styles
+ * 1. Clone the element (deep copy)
  * 2. Apply measurement styles (absolute positioning, off-screen)
  * 3. Apply container constraints (maxWidth, maxHeight)
  * 4. Add to DOM and measure using getBoundingClientRect
- * 5. Remove from DOM and restore original styles
+ * 5. Remove from DOM
  *
- * Why this approach:
- * - No cloning issues (preserves computed styles)
- * - No style conflicts (temporary positioning)
+ * Why cloning:
+ * - No side effects on original element
+ * - No need to store/restore styles
+ * - Preserves computed styles and structure
  * - Accurate measurements with word wrapping
  *
  * @param element - HTML element to measure
@@ -29,64 +30,43 @@ export interface FontSizeCalculationResult {
  * @returns Measured dimensions including padding
  */
 export function measureElement(element: HTMLElement, container: LayoutBlockInstance): Size {
-  // Store original styles to restore later
-  const originalStyles = {
-    position: element.style.position,
-    visibility: element.style.visibility,
-    top: element.style.top,
-    left: element.style.left,
-    width: element.style.width,
-    whiteSpace: element.style.whiteSpace,
-    overflowWrap: element.style.overflowWrap,
-    wordWrap: element.style.wordWrap,
-    maxHeight: element.style.maxHeight,
-    overflow: element.style.overflow,
-    padding: element.style.padding,
-  };
+  // Clone the element to avoid modifying the original
+  const clonedElement = element.cloneNode(true) as HTMLElement;
 
-  // Apply measurement styles temporarily
-  element.style.position = 'absolute';
-  element.style.width = 'auto';
-  element.style.visibility = 'hidden';
-  element.style.top = '-9999px';
-  element.style.left = '-9999px';
-  element.style.paddingInline = '10px'; // Add padding to match actual rendering
+  // Apply measurement styles
+  clonedElement.style.position = 'absolute';
+  clonedElement.style.width = 'auto';
+  clonedElement.style.visibility = 'hidden';
+  clonedElement.style.top = '-9999px';
+  clonedElement.style.left = '-9999px';
+  clonedElement.style.paddingInline = '15px'; // Add padding to match actual rendering
 
   // Apply constraints from container
-  if (container.bounds?.width) {
-    element.style.maxWidth = `${container.bounds.width}px`;
-    element.style.whiteSpace = 'normal';
-    element.style.overflowWrap = 'break-word';
-    element.style.wordWrap = 'break-word';
+  if (container.bounds?.width && container.label !== 'label' && container.label !== 'title') {
+    clonedElement.style.maxWidth = `${container.bounds.width}px`;
+    clonedElement.style.whiteSpace = 'normal';
+    clonedElement.style.overflowWrap = 'break-word';
+    clonedElement.style.wordWrap = 'break-word';
   } else {
-    element.style.whiteSpace = 'nowrap';
+    clonedElement.style.whiteSpace = 'nowrap';
   }
 
   if (container.bounds?.height) {
-    element.style.maxHeight = `${container.bounds.height}px`;
-    element.style.overflow = 'hidden';
+    clonedElement.style.maxHeight = `${container.bounds.height}px`;
+    clonedElement.style.overflow = 'hidden';
   }
 
   // Add to DOM for measurement
-  document.body.appendChild(element);
+  document.body.appendChild(clonedElement);
 
   // Measure (getBoundingClientRect already includes the padding)
   const size = {
-    width: element.getBoundingClientRect().width + 20,
-    height: element.getBoundingClientRect().height + 20,
+    width: clonedElement.getBoundingClientRect().width + 20,
+    height: clonedElement.getBoundingClientRect().height + 20,
   };
 
-  // Remove from DOM and restore original styles
-  document.body.removeChild(element);
-
-  // Restore original styles
-  Object.entries(originalStyles).forEach(([property, value]) => {
-    if (value) {
-      element.style[property as any] = value;
-    } else {
-      element.style.removeProperty(property);
-    }
-  });
+  // Remove cloned element from DOM
+  document.body.removeChild(clonedElement);
 
   return size;
 }
@@ -154,7 +134,6 @@ export function applyFontSizeToElement(element: HTMLElement, fontSize: number, l
  * @param element - Element to optimize
  * @param container - Container with bounds constraints
  * @param fontSizeRange - Min/max size range
- * @param lineHeight - Line height multiplier
  * @returns Optimal font size in pixels
  */
 export function calculateLargestOptimalFontSize(

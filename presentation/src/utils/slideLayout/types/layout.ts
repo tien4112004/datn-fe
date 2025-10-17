@@ -89,6 +89,13 @@ export interface TextLayoutBlockConfig extends LayoutBlockConfig {
   background?: BackgroundConfig;
   text?: TextStyleConfig;
   numbering?: boolean; // Auto-generate sequential numbers as content
+  combined?: {
+    enabled: boolean; // Whether to combine multiple text items into one
+    pattern: string; // Pattern to combine multiple text items into one (e.g., "{0}. {1}")
+    ordered?: boolean; // Whether to use ordered (numbered) list when combining
+    wrapping?: boolean; // Whether to enable column wrapping if content exceeds bounds
+    twoColumn?: boolean; // Force two-column layout, always split evenly regardless of overflow
+  };
 }
 
 export interface NonTextLayoutBlockConfig extends LayoutBlockConfig {
@@ -120,6 +127,9 @@ export interface LayoutBlockInstance {
 
   // Resolved children (no templates)
   children?: LayoutBlockInstance[];
+
+  // Flag to indicate if children were reversed (for zigzag odd rows)
+  childrenReversed?: boolean;
 }
 
 export interface ImageLayoutBlockInstance extends LayoutBlockInstance {
@@ -131,6 +141,13 @@ export interface TextLayoutBlockInstance extends LayoutBlockInstance {
   type: 'text';
   background?: BackgroundConfig;
   text: TextStyleConfig;
+  combined?: {
+    enabled: boolean; // Whether to combine multiple text items into one
+    pattern: string; // Pattern to combine multiple text items into one (e.g., "{0}. {1}")
+    ordered: boolean; // Whether to use ordered (numbered) list when combining
+    wrapping?: boolean; // Whether to enable column wrapping if content exceeds bounds
+    twoColumn?: boolean; // Force two-column layout, always split evenly regardless of overflow
+  };
 }
 
 export interface NonTextLayoutBlockInstance extends LayoutBlockInstance {

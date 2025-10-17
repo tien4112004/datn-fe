@@ -19,7 +19,7 @@ import {
   calculateUnifiedFontSizeForLabels,
   layoutItemsInBlock,
 } from '.';
-import { createHtmlElement, createTextPPTElement } from './elementCreators';
+import { createHtmlElement, createTextPPTElement, createListElements } from './elementCreators';
 import {
   DEFAULT_MIN_FONT_SIZE,
   DEFAULT_LABEL_TO_VALUE_RATIO,
@@ -48,6 +48,7 @@ export function buildCards(instance: LayoutBlockInstance): PPTElement[] {
       return createCard(inst);
     })
     .filter((el) => el !== null) as PPTElement[];
+
   return list;
 }
 
@@ -63,18 +64,7 @@ export function buildTitle(title: string, config: TemplateContainerConfig, theme
     titleInstance.text?.fontSizeRange || FONT_SIZE_RANGE_TITLE
   );
 
-  return [
-    titleElement,
-    createTitleLine(
-      {
-        width: titleElement.width,
-        height: titleElement.height,
-        left: titleElement.left,
-        top: titleElement.top,
-      } as Bounds,
-      theme
-    ),
-  ];
+  return [titleElement];
 }
 
 export function buildText(content: string, config: TemplateContainerConfig): PPTElement[] {
@@ -90,6 +80,31 @@ export function buildText(content: string, config: TemplateContainerConfig): PPT
   );
 
   return [textElement];
+}
+
+/**
+ * Builds a combined list element with unified font sizing.
+ * Creates ProseMirror-compatible <ul><li><p> or <ol><li><p> structure.
+ * Returns 1 or 2 elements depending on whether content needs column wrapping.
+ *
+ * @param contents - Array of HTML content strings for each list item
+ * @param config - Container configuration
+ * @param listType - Type of list: 'ul' for unordered or 'ol' for ordered (default: 'ul')
+ * @returns Array containing one or two list elements (split into columns if needed)
+ */
+export function buildCombinedList(contents: string[], config: TemplateContainerConfig): PPTElement[] {
+  const textInstance = {
+    ...config,
+    bounds: config.bounds,
+  } as TextLayoutBlockInstance;
+
+  const listElements = createListElements(
+    contents,
+    textInstance,
+    textInstance.text?.fontSizeRange || FONT_SIZE_RANGE_CONTENT
+  );
+
+  return listElements;
 }
 
 /**

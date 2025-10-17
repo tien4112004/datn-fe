@@ -1,248 +1,658 @@
 import type { Template } from '../../types';
 
-export const twoColumnLayoutTemplate: Template = {
-  id: 'two-column-default',
-  name: 'Two Column - Default',
-  config: {
-    containers: {
-      title: {
-        type: 'text',
-        bounds: {
-          left: 15,
-          top: 15,
-          width: {
-            expr: 'SLIDE_WIDTH - 30',
-          },
-          height: 100,
-        },
-        layout: {
-          horizontalAlignment: 'center',
-          verticalAlignment: 'top',
-        },
-        text: {
-          color: '{{theme.titleFontColor}}',
-          fontFamily: '{{theme.titleFontName}}',
-          fontWeight: 'bold',
-          fontStyle: 'normal',
-          textAlign: 'center',
-        },
+export const twoColumnTemplates: Template[] = [
+  {
+    id: 'two-column-compact',
+    name: 'Two Column - Compact',
+    parameters: [
+      {
+        key: 'SIDE_PADDING',
+        label: 'Side Padding (px)',
+        defaultValue: 20,
+        min: 0,
+        max: 200,
+        step: 1,
+        description: 'Left/right slide padding',
       },
-      content: {
-        type: 'block',
-        positioning: {
-          relativeTo: 'title',
-          axis: 'vertical',
-          anchor: 'end',
-          offset: 20,
-          size: 'fill',
-          margin: { left: 30, right: 30, top: 0, bottom: 40 },
-        },
-        layout: {
-          distribution: 'space-between',
-          gap: 20,
-          horizontalAlignment: 'left',
-          verticalAlignment: 'top',
-          orientation: 'vertical',
-        },
-        childTemplate: {
-          count: 'auto',
-          wrap: {
-            enabled: true,
-            maxItemsPerLine: 5,
-            lineCount: 'auto',
-            wrapDistribution: 'balanced',
-            lineSpacing: 30,
+    ],
+    config: {
+      containers: {
+        title: {
+          type: 'text',
+          bounds: {
+            left: { expr: 'SIDE_PADDING' },
+            top: 15,
+            width: { expr: 'SLIDE_WIDTH - SIDE_PADDING * 2' },
+            height: 90,
           },
-          structure: {
-            type: 'block',
-            layout: {
-              verticalAlignment: 'center',
-              horizontalAlignment: 'center',
+          layout: {
+            horizontalAlignment: 'center',
+            verticalAlignment: 'top',
+          },
+          text: {
+            color: '{{theme.titleFontColor}}',
+            fontFamily: '{{theme.titleFontName}}',
+            fontWeight: 'bold',
+            textAlign: 'center',
+          },
+        },
+        content: {
+          type: 'block',
+          positioning: {
+            relativeTo: 'title',
+            axis: 'vertical',
+            anchor: 'end',
+            offset: 20,
+            size: 'fill',
+            margin: { left: 60, right: 60, top: 0, bottom: 40 },
+          },
+          layout: {
+            distribution: 'equal',
+            gap: 12,
+            horizontalAlignment: 'left',
+            verticalAlignment: 'top',
+            orientation: 'vertical',
+          },
+          childTemplate: {
+            count: 'auto',
+            wrap: {
+              enabled: true,
+              maxItemsPerLine: 5,
+              lineCount: 'auto',
+              wrapDistribution: 'balanced',
+              lineSpacing: 25,
             },
-            children: [
-              {
-                type: 'text',
-                label: 'item',
-                border: {
-                  width: '{{theme.card.borderWidth}}',
-                  color: '{{theme.themeColors[0]}}',
-                  radius: '{{theme.card.borderRadius}}',
-                },
-                text: {
-                  color: '{{theme.fontColor}}',
-                  fontFamily: '{{theme.fontName}}',
-                  fontWeight: 'normal',
-                  textAlign: 'left',
-                },
+            structure: {
+              type: 'block',
+              layout: {
+                verticalAlignment: 'center',
+                horizontalAlignment: 'center',
               },
-            ],
+              border: {
+                width: '{{theme.card.borderWidth}}',
+                color: '{{theme.card.borderColor}}',
+                radius: '{{theme.card.borderRadius}}',
+              },
+              children: [
+                {
+                  type: 'text',
+                  label: 'item',
+                  text: {
+                    color: '{{theme.fontColor}}',
+                    fontFamily: '{{theme.fontName}}',
+                    fontWeight: 'normal',
+                    textAlign: 'center',
+                  },
+                },
+              ],
+            },
           },
         },
       },
     },
   },
-};
-
-// Variation: Two Column - Cards (alternating)
-export const twoColumnSplitTemplate: Template = {
-  id: 'two-column-cards',
-  name: 'Two Column - Cards',
-  config: {
-    containers: {
-      title: {
-        type: 'text',
-        bounds: {
-          left: 0,
-          top: 15,
-          width: { expr: 'SLIDE_WIDTH' },
-          height: 100,
-        },
-        layout: {
-          horizontalAlignment: 'center',
-          verticalAlignment: 'top',
-        },
-        text: {
-          color: '{{theme.titleFontColor}}',
-          fontFamily: '{{theme.titleFontName}}',
-          fontWeight: 'bold',
-          textAlign: 'center',
-        },
+  {
+    id: 'two-column-container-border',
+    name: 'Two Column - Container Border',
+    parameters: [
+      {
+        key: 'SIDE_PADDING',
+        label: 'Side Padding (px)',
+        defaultValue: 50,
+        min: 0,
+        max: 200,
+        step: 1,
+        description: 'Left/right content padding',
       },
-      content: {
-        type: 'block',
-        positioning: {
-          relativeTo: 'title',
-          axis: 'vertical',
-          anchor: 'end',
-          offset: 20,
-          size: 'fill',
-          margin: { left: 40, right: 40, top: 0, bottom: 40 },
-        },
-        layout: {
-          distribution: 'space-around',
-          gap: 20,
-          horizontalAlignment: 'center',
-          verticalAlignment: 'top',
-          orientation: 'vertical',
-        },
-        childTemplate: {
-          count: 'auto',
-          wrap: {
-            enabled: true,
-            maxItemsPerLine: 5,
-            lineCount: 'auto',
-            wrapDistribution: 'balanced',
-            lineSpacing: 35,
+    ],
+    config: {
+      containers: {
+        title: {
+          type: 'text',
+          bounds: {
+            left: 0,
+            top: 15,
+            width: { expr: 'SLIDE_WIDTH' },
+            height: 100,
           },
-          structure: {
-            type: 'block',
-            layout: {
-              verticalAlignment: 'center',
-              horizontalAlignment: 'center',
+          layout: {
+            horizontalAlignment: 'center',
+            verticalAlignment: 'top',
+          },
+          text: {
+            color: '{{theme.titleFontColor}}',
+            fontFamily: '{{theme.titleFontName}}',
+            fontWeight: 'bold',
+            textAlign: 'center',
+          },
+        },
+        content: {
+          type: 'block',
+          positioning: {
+            relativeTo: 'title',
+            axis: 'vertical',
+            anchor: 'end',
+            offset: 20,
+            size: 'fill',
+            margin: { left: 50, right: 50, top: 0, bottom: 50 },
+          },
+          border: {
+            width: 1,
+            color: '{{theme.themeColors[0]}}',
+            radius: 20,
+            directions: ['top', 'right', 'bottom'],
+          },
+          layout: {
+            distribution: 'space-between',
+            gap: 25,
+            horizontalAlignment: 'center',
+            verticalAlignment: 'top',
+            orientation: 'vertical',
+          },
+          childTemplate: {
+            count: 'auto',
+            wrap: {
+              enabled: true,
+              maxItemsPerLine: 5,
+              lineCount: 'auto',
+              wrapDistribution: 'balanced',
+              lineSpacing: 25,
             },
-            border: {
-              width: '{{theme.card.borderWidth}}',
-              color: '{{theme.themeColors[0]}}',
-              radius: '{{theme.card.borderRadius}}',
-            },
-            children: [
-              {
-                type: 'text',
-                label: 'item',
-
-                shadow: {
-                  h: '{{theme.card.shadow.h}}',
-                  v: '{{theme.card.shadow.v}}',
-                  blur: '{{theme.card.shadow.blur}}',
-                  color: '{{theme.card.shadow.color}}',
-                },
-                text: {
-                  color: '{{theme.fontColor}}',
-                  fontFamily: '{{theme.fontName}}',
-                  fontWeight: 'normal',
-                  textAlign: 'center',
-                },
+            structure: {
+              type: 'block',
+              layout: {
+                verticalAlignment: 'center',
+                horizontalAlignment: 'center',
               },
-            ],
+              children: [
+                {
+                  type: 'text',
+                  label: 'item',
+                  text: {
+                    color: '{{theme.fontColor}}',
+                    fontFamily: '{{theme.fontName}}',
+                    fontWeight: 'normal',
+                    textAlign: 'center',
+                  },
+                },
+              ],
+            },
           },
         },
       },
     },
   },
-};
-
-// Variation: Two Column - Compact (tight spacing)
-export const twoColumnAsymmetricTemplate: Template = {
-  id: 'two-column-compact',
-  name: 'Two Column - Compact',
-  config: {
-    containers: {
-      title: {
-        type: 'text',
-        bounds: {
-          left: 15,
-          top: 15,
-          width: { expr: 'SLIDE_WIDTH - 30' },
-          height: 90,
-        },
-        layout: {
-          horizontalAlignment: 'center',
-          verticalAlignment: 'top',
-        },
-        text: {
-          color: '{{theme.titleFontColor}}',
-          fontFamily: '{{theme.titleFontName}}',
-          fontWeight: 'bold',
-          textAlign: 'center',
-        },
+  {
+    id: 'two-column-container-border-shadow',
+    name: 'Two Column - Container Border Shadow',
+    parameters: [
+      {
+        key: 'SIDE_PADDING',
+        label: 'Side Padding (px)',
+        defaultValue: 60,
+        min: 0,
+        max: 200,
+        step: 1,
+        description: 'Left/right content padding',
       },
-      content: {
-        type: 'block',
-        positioning: {
-          relativeTo: 'title',
-          axis: 'vertical',
-          anchor: 'end',
-          offset: 20,
-          size: 'fill',
-          margin: { left: 60, right: 60, top: 0, bottom: 40 },
-        },
-        layout: {
-          distribution: 'equal',
-          gap: 12,
-          horizontalAlignment: 'left',
-          verticalAlignment: 'top',
-          orientation: 'vertical',
-        },
-        childTemplate: {
-          count: 'auto',
-          wrap: {
-            enabled: true,
-            maxItemsPerLine: 5,
-            lineCount: 'auto',
-            wrapDistribution: 'balanced',
-            lineSpacing: 25,
+    ],
+    config: {
+      containers: {
+        title: {
+          type: 'text',
+          bounds: {
+            left: 0,
+            top: 15,
+            width: { expr: 'SLIDE_WIDTH' },
+            height: 100,
           },
-          structure: {
-            type: 'block',
-            layout: {
-              verticalAlignment: 'center',
-              horizontalAlignment: 'center',
+          layout: {
+            horizontalAlignment: 'center',
+            verticalAlignment: 'top',
+          },
+          text: {
+            color: '{{theme.titleFontColor}}',
+            fontFamily: '{{theme.titleFontName}}',
+            fontWeight: 'bold',
+            textAlign: 'center',
+          },
+        },
+        content: {
+          type: 'block',
+          positioning: {
+            relativeTo: 'title',
+            axis: 'vertical',
+            anchor: 'end',
+            offset: 25,
+            size: 'fill',
+            margin: { left: 60, right: 60, top: 0, bottom: 60 },
+          },
+          border: {
+            width: 0,
+            color: '{{theme.themeColors[0]}}',
+            radius: '{{theme.card.borderRadius}}',
+          },
+          shadow: {
+            h: '{{theme.card.shadow.h}}',
+            v: '{{theme.card.shadow.v}}',
+            blur: '{{theme.card.shadow.blur}}',
+            color: '{{theme.card.shadow.color}}',
+          },
+          background: {
+            color: '{{theme.card.backgroundColor}}',
+          },
+          layout: {
+            distribution: 'space-around',
+            gap: 20,
+            horizontalAlignment: 'center',
+            verticalAlignment: 'top',
+            orientation: 'vertical',
+          },
+          childTemplate: {
+            count: 'auto',
+            wrap: {
+              enabled: true,
+              maxItemsPerLine: 5,
+              lineCount: 'auto',
+              wrapDistribution: 'balanced',
+              lineSpacing: 30,
             },
-            children: [
-              {
-                type: 'text',
-                label: 'item',
-                text: {
-                  color: '{{theme.fontColor}}',
-                  fontFamily: '{{theme.fontName}}',
-                  fontWeight: 'normal',
-                  textAlign: 'left',
-                },
+            structure: {
+              type: 'block',
+              layout: {
+                verticalAlignment: 'center',
+                horizontalAlignment: 'center',
               },
-            ],
+              children: [
+                {
+                  type: 'text',
+                  label: 'item',
+                  text: {
+                    color: '{{theme.card.textColor}}',
+                    fontFamily: '{{theme.fontName}}',
+                    fontWeight: 'normal',
+                    textAlign: 'center',
+                  },
+                },
+              ],
+            },
           },
         },
       },
     },
   },
-};
+  {
+    id: 'two-column-bordered-items',
+    name: 'Two Column - Each Column Border',
+    parameters: [
+      {
+        key: 'SIDE_PADDING',
+        label: 'Side Padding (px)',
+        defaultValue: 30,
+        min: 0,
+        max: 200,
+        step: 1,
+        description: 'Left/right slide padding',
+      },
+      {
+        key: 'COLUMN_SPACING',
+        label: 'Column Spacing (px)',
+        defaultValue: 60,
+        min: 0,
+        max: 200,
+        step: 1,
+        description: 'Horizontal spacing between columns',
+      },
+    ],
+    config: {
+      containers: {
+        title: {
+          type: 'text',
+          bounds: {
+            left: 0,
+            top: 15,
+            width: { expr: 'SLIDE_WIDTH' },
+            height: 100,
+          },
+          layout: {
+            horizontalAlignment: 'center',
+            verticalAlignment: 'top',
+          },
+          text: {
+            color: '{{theme.titleFontColor}}',
+            fontFamily: '{{theme.titleFontName}}',
+            fontWeight: 'bold',
+            textAlign: 'center',
+          },
+        },
+        leftColumn: {
+          type: 'block',
+          bounds: {
+            left: { expr: 'SIDE_PADDING' },
+            top: {
+              expr: 'title.top + title.height + 20',
+            },
+            width: {
+              expr: '(SLIDE_WIDTH - SIDE_PADDING * 2 - COLUMN_SPACING) / 2',
+            },
+            height: {
+              expr: 'SLIDE_HEIGHT - title.top - title.height - 55',
+            },
+          },
+          border: {
+            width: '{{theme.card.borderWidth}}',
+            color: '{{theme.themeColors[0]}}',
+            radius: '{{theme.card.borderRadius}}',
+          },
+          layout: {
+            distribution: 'equal',
+            gap: 12,
+            horizontalAlignment: 'left',
+            verticalAlignment: 'top',
+            orientation: 'vertical',
+          },
+          childTemplate: {
+            count: 'auto',
+            structure: {
+              type: 'text',
+              label: 'item',
+              text: {
+                color: '{{theme.fontColor}}',
+                fontFamily: '{{theme.fontName}}',
+                fontWeight: 'normal',
+                textAlign: 'right',
+              },
+            },
+          },
+        },
+        rightColumn: {
+          type: 'block',
+          bounds: {
+            left: {
+              expr: 'leftColumn.left + leftColumn.width + COLUMN_SPACING',
+            },
+            top: {
+              expr: 'leftColumn.top',
+            },
+            width: {
+              expr: 'leftColumn.width',
+            },
+            height: {
+              expr: 'leftColumn.height',
+            },
+          },
+          border: {
+            width: '{{theme.card.borderWidth}}',
+            color: '{{theme.themeColors[0]}}',
+            radius: '{{theme.card.borderRadius}}',
+          },
+          layout: {
+            distribution: 'equal',
+            gap: 12,
+            horizontalAlignment: 'left',
+            verticalAlignment: 'top',
+            orientation: 'vertical',
+          },
+          childTemplate: {
+            count: 'auto',
+            structure: {
+              type: 'text',
+              label: 'item',
+              text: {
+                color: '{{theme.fontColor}}',
+                fontFamily: '{{theme.fontName}}',
+                fontWeight: 'normal',
+                textAlign: 'left',
+              },
+            },
+          },
+        },
+      },
+    },
+    graphics: [
+      {
+        type: 'contentSeparator',
+        orientation: 'vertical',
+        containers: ['leftColumn', 'rightColumn'],
+        color: '{{theme.themeColors[0]}}',
+      },
+    ],
+  },
+  {
+    id: 'two-column-bordered-items-shadow',
+    name: 'Two Column - Each Column Border Shadow',
+    parameters: [
+      {
+        key: 'SIDE_PADDING',
+        label: 'Side Padding (px)',
+        defaultValue: 30,
+        min: 0,
+        max: 200,
+        step: 1,
+        description: 'Left/right slide padding',
+      },
+      {
+        key: 'COLUMN_SPACING',
+        label: 'Column Spacing (px)',
+        defaultValue: 60,
+        min: 0,
+        max: 200,
+        step: 1,
+        description: 'Horizontal spacing between columns',
+      },
+    ],
+    config: {
+      containers: {
+        title: {
+          type: 'text',
+          bounds: {
+            left: 0,
+            top: 15,
+            width: { expr: 'SLIDE_WIDTH' },
+            height: 100,
+          },
+          layout: {
+            horizontalAlignment: 'center',
+            verticalAlignment: 'top',
+          },
+          text: {
+            color: '{{theme.titleFontColor}}',
+            fontFamily: '{{theme.titleFontName}}',
+            fontWeight: 'bold',
+            textAlign: 'center',
+          },
+        },
+        leftColumn: {
+          type: 'block',
+          bounds: {
+            left: { expr: 'SIDE_PADDING' },
+            top: {
+              expr: 'title.top + title.height + 25',
+            },
+            width: {
+              expr: '(SLIDE_WIDTH - SIDE_PADDING * 2 - COLUMN_SPACING) / 2',
+            },
+            height: {
+              expr: 'SLIDE_HEIGHT - title.top - title.height - 60',
+            },
+          },
+          border: {
+            width: '{{theme.card.borderWidth}}',
+            color: '{{theme.themeColors[0]}}',
+            radius: '{{theme.card.borderRadius}}',
+          },
+          shadow: {
+            h: '{{theme.card.shadow.h}}',
+            v: '{{theme.card.shadow.v}}',
+            blur: '{{theme.card.shadow.blur}}',
+            color: '{{theme.card.shadow.color}}',
+          },
+          background: {
+            color: '{{theme.card.backgroundColor}}',
+          },
+          layout: {
+            distribution: 'equal',
+            gap: 12,
+            horizontalAlignment: 'left',
+            verticalAlignment: 'top',
+            orientation: 'vertical',
+          },
+          childTemplate: {
+            count: 'auto',
+            structure: {
+              type: 'text',
+              label: 'item',
+              text: {
+                color: '{{theme.card.textColor}}',
+                fontFamily: '{{theme.fontName}}',
+                fontWeight: 'normal',
+                textAlign: 'right',
+              },
+            },
+          },
+        },
+        rightColumn: {
+          type: 'block',
+          bounds: {
+            left: {
+              expr: 'leftColumn.left + leftColumn.width + COLUMN_SPACING',
+            },
+            top: {
+              expr: 'leftColumn.top',
+            },
+            width: {
+              expr: 'leftColumn.width',
+            },
+            height: {
+              expr: 'leftColumn.height',
+            },
+          },
+          border: {
+            width: '{{theme.card.borderWidth}}',
+            color: '{{theme.themeColors[0]}}',
+            radius: '{{theme.card.borderRadius}}',
+          },
+          shadow: {
+            h: '{{theme.card.shadow.h}}',
+            v: '{{theme.card.shadow.v}}',
+            blur: '{{theme.card.shadow.blur}}',
+            color: '{{theme.card.shadow.color}}',
+          },
+          background: {
+            color: '{{theme.card.backgroundColor}}',
+          },
+          layout: {
+            distribution: 'equal',
+            gap: 12,
+            horizontalAlignment: 'left',
+            verticalAlignment: 'top',
+            orientation: 'vertical',
+          },
+          childTemplate: {
+            count: 'auto',
+            structure: {
+              type: 'text',
+              label: 'item',
+              text: {
+                color: '{{theme.card.textColor}}',
+                fontFamily: '{{theme.fontName}}',
+                fontWeight: 'normal',
+                textAlign: 'left',
+              },
+            },
+          },
+        },
+      },
+    },
+    graphics: [
+      {
+        type: 'contentSeparator',
+        orientation: 'vertical',
+        containers: ['leftColumn', 'rightColumn'],
+        color: '{{theme.themeColors[0]}}',
+      },
+    ],
+  },
+  {
+    id: 'two-column-container-bullet',
+    name: 'Two Column - Container Bullet',
+    parameters: [
+      {
+        key: 'SIDE_PADDING',
+        label: 'Side Padding (px)',
+        defaultValue: 40,
+        min: 0,
+        max: 200,
+        step: 1,
+        description: 'Left/right content padding',
+      },
+    ],
+    config: {
+      containers: {
+        title: {
+          type: 'text',
+          bounds: {
+            left: 0,
+            top: 15,
+            width: { expr: 'SLIDE_WIDTH' },
+            height: 110,
+          },
+          layout: {
+            horizontalAlignment: 'center',
+            verticalAlignment: 'top',
+          },
+          text: {
+            color: '{{theme.titleFontColor}}',
+            fontFamily: '{{theme.titleFontName}}',
+            fontWeight: 'bold',
+            textAlign: 'center',
+          },
+        },
+        content: {
+          type: 'text',
+          combined: {
+            enabled: true,
+            pattern: '{item}',
+            wrapping: true,
+            twoColumn: true,
+          },
+          layout: {
+            verticalAlignment: 'center',
+          },
+          positioning: {
+            relativeTo: 'title',
+            axis: 'vertical',
+            anchor: 'end',
+            offset: 20,
+            size: 'fill',
+            margin: { left: 40, right: 40, top: 0, bottom: 40 },
+          },
+          border: {
+            width: '{{theme.card.borderWidth}}',
+            color: '{{theme.themeColors[0]}}',
+            radius: '{{theme.card.borderRadius}}',
+          },
+          text: {
+            color: '{{theme.fontColor}}',
+            fontFamily: '{{theme.fontName}}',
+            fontWeight: 'normal',
+            textAlign: 'left',
+            lineHeight: 1.5,
+          },
+          children: [
+            {
+              type: 'text',
+              id: 'item',
+              label: 'item',
+              text: {
+                color: '{{theme.fontColor}}',
+                fontFamily: '{{theme.fontName}}',
+                fontWeight: 'normal',
+              },
+            },
+          ],
+        },
+      },
+    },
+  },
+];

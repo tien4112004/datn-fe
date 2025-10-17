@@ -1,7 +1,13 @@
 // Helper utilities
-import type { PartialTemplateConfig, SlideViewport, TemplateConfig, TextLayoutBlockInstance } from '../types';
+import type {
+  PartialTemplateConfig,
+  SlideViewport,
+  TemplateConfig,
+  TemplateParameter,
+  TextLayoutBlockInstance,
+} from '../types';
 import type { Slide, SlideTheme } from '@/types/slides';
-import { resolveTemplateContainers, processBackground } from '../primitives';
+import { resolveTemplateContainers, processBackground, processCombinedTextContainer } from '../primitives';
 import {
   buildLayoutWithUnifiedFontSizing,
   buildCards,
@@ -10,6 +16,10 @@ import {
   buildImageElement,
 } from '../primitives/layoutProbuild';
 import { cloneDeepWith, template } from 'lodash';
+import { calculateElementBounds } from '../primitives/layoutUtils';
+import type { GraphicElement } from '../types/graphics';
+import { renderGraphics } from '../primitives/graphicRenderer';
+import type { Bounds } from '../types';
 
 /**
  * Normalized data structure for all layout types.
@@ -41,8 +51,9 @@ export type DataMapper<T = any> = (data: T) => MappedLayoutData;
  * 3. Process blocks with unified font sizing
  * 4. Process text containers (titles, subtitles)
  * 5. Process image containers with cropping
- * 6. Combine elements and sort by zIndex
- * 7. Return final Slide object
+ * 6. Render decorative graphics
+ * 7. Combine elements and sort by zIndex
+ * 8. Return final Slide object
  *
  * @param data - Original layout schema data (type-specific)
  * @param template - Resolved template with theme and viewport
@@ -58,27 +69,51 @@ export async function convertLayoutGeneric<T = any>(
 ): Promise<Slide> {
   const mappedData = mapData(data);
 
-  // Resolve all container bounds (expressions + relative positioning)
-  const resolvedContainers = resolveTemplateContainers(template.containers, {
-    width: template.viewport.width,
-    height: template.viewport.height,
-  });
+  // Resolve all container bounds (expressions + relative positioning + parameters)
+  const resolvedContainers = resolveTemplateContainers(
+    template.containers,
+    {
+      width: template.viewport.width,
+      height: template.viewport.height,
+    },
+    template.parameters
+    // TODO: Add parameterOverrides parameter here if you want user customization
+  );
 
   const allElements: Array<{ element: any; zIndex: number }> = [];
   const allCards: Array<{ element: any; zIndex: number }> = [];
+
+  // Track actual bounds of rendered elements (for graphics rendering)
+  const containerActualBounds: Record<string, Bounds> = {};
+
+  // Track child bounds for each container (for timeline graphics)
+  const childBounds: Record<string, Bounds[]> = {};
 
   // Process block containers with labeled children
   if (mappedData.blocks) {
     for (const [containerId, labelData] of Object.entries(mappedData.blocks)) {
       const container = resolvedContainers[containerId];
-      if (!container || container.type !== 'block') {
+      if (!container) {
         continue;
       }
 
       const zIndex = container.zIndex ?? 0;
 
+      // Check if this is a text container with combined enabled
+      if (container.type === 'text' && container.combined?.enabled) {
+        const { elements, cards } = processCombinedTextContainer(container, labelData, zIndex);
+        allElements.push(...elements);
+        allCards.push(...cards);
+        continue; // Skip normal block processing
+      }
+
       // Build layout with unified font sizing
       const { instance, elements } = buildLayoutWithUnifiedFontSizing(container, container.bounds, labelData);
+
+      // Extract child bounds for timeline graphics
+      if (instance.children && instance.children.length > 0) {
+        childBounds[containerId] = instance.children.map((child) => child.bounds);
+      }
 
       // Extract cards (border decorations)
       const cards = buildCards(instance);
@@ -115,6 +150,14 @@ export async function convertLayoutGeneric<T = any>(
           : buildText(textContent, instance);
 
       allElements.push(...textElements.map((element) => ({ element, zIndex })));
+
+      // Track actual bounds for title container (used by graphics)
+      if (containerId === 'title') {
+        const actualBounds = calculateElementBounds(textElements);
+        if (actualBounds) {
+          containerActualBounds.title = actualBounds;
+        }
+      }
     }
   }
 
@@ -133,8 +176,30 @@ export async function convertLayoutGeneric<T = any>(
     }
   }
 
+  // Render decorative graphics if provided
+  const graphicElements: Array<{ element: any; zIndex: number }> = [];
+  if (template.graphics && template.graphics.length > 0) {
+    // Extract just the bounds from each container for graphics context
+    const containerBounds: Record<string, any> = {};
+    for (const [id, container] of Object.entries(resolvedContainers)) {
+      containerBounds[id] = container.bounds;
+    }
+
+    const graphicsContext = {
+      theme: template.theme,
+      viewport: template.viewport,
+      containerBounds,
+      containerActualBounds, // Pass actual rendered bounds
+      childBounds, // Pass child bounds for timeline graphics
+    };
+
+    const renderedGraphics = renderGraphics(template.graphics, graphicsContext);
+    // Graphics render at zIndex -1 by default (behind all content)
+    graphicElements.push(...renderedGraphics.map((element) => ({ element, zIndex: -1 })));
+  }
+
   // Combine all elements and sort by zIndex (lower values render first/behind)
-  const combinedElements = [...allCards, ...allElements, ...imageElements];
+  const combinedElements = [...allCards, ...allElements, ...imageElements, ...graphicElements];
   combinedElements.sort((a, b) => a.zIndex - b.zIndex);
 
   const slide: Slide = {
@@ -159,12 +224,16 @@ export async function convertLayoutGeneric<T = any>(
  * @param partialTemplate - Template with {{theme.xxx}} placeholders
  * @param theme - Theme object with colors, fonts, etc.
  * @param viewport - Viewport dimensions
+ * @param graphics - Optional decorative graphics
+ * @param parameters - Optional template parameters for customization
  * @returns Fully resolved template config
  */
 export function resolveTemplate(
   partialTemplate: PartialTemplateConfig,
   theme: SlideTheme,
-  viewport: SlideViewport
+  viewport: SlideViewport,
+  graphics?: GraphicElement[],
+  parameters?: TemplateParameter[]
 ): TemplateConfig {
   // Use lodash cloneDeepWith to traverse and transform the object tree
   const resolvedContainers = cloneDeepWith(partialTemplate.containers, (value) => {
@@ -182,9 +251,27 @@ export function resolveTemplate(
     return undefined;
   });
 
+  const resolvedGraphics = graphics?.map((graphic) => {
+    return cloneDeepWith(graphic, (value) => {
+      if (typeof value === 'string' && value.includes('{{')) {
+        try {
+          const compiled = template(value, { interpolate: /\{\{(.+?)\}\}/g });
+          return compiled({ theme });
+        } catch (e) {
+          // If template compilation fails, return original string
+          return value;
+        }
+      }
+      // Return undefined to let cloneDeepWith handle other types normally
+      return undefined;
+    });
+  });
+
   return {
     containers: resolvedContainers,
     theme,
     viewport,
+    graphics: resolvedGraphics,
+    parameters,
   };
 }

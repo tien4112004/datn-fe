@@ -1,48 +1,14 @@
 import seedrandom from 'seedrandom';
 import type { Template } from '../types';
-import {
-  verticalListLayoutTemplate,
-  verticalListCompactTemplate,
-  verticalListCardsTemplate,
-  verticalListNumberedTemplate,
-  verticalListNumberedCompactTemplate,
-  verticalListNumberedCardsTemplate,
-} from './template/verticalList';
-import {
-  twoColumnWithImageLayoutTemplate,
-  twoColumnLeftBigImageTemplate,
-  twoColumnRightBigImageTemplate,
-  twoColumnRightImageTemplate,
-} from './template/twoColumnWithImage';
-import {
-  twoColumnLayoutTemplate,
-  twoColumnSplitTemplate,
-  twoColumnAsymmetricTemplate,
-} from './template/twoColumn';
-import {
-  horizontalListLayoutTemplate,
-  horizontalListGridTemplate,
-  horizontalListSingleRowTemplate,
-  horizontalListNumberedTemplate,
-} from './template/horizontalList';
-import {
-  titleLayoutTemplate,
-  transitionLayoutTemplate,
-  titleTopTemplate,
-  titleLeftAlignTemplate,
-  titleRightAlignTemplate,
-} from './template/title';
-import {
-  mainImageLayoutTemplate,
-  mainImageCenteredTemplate,
-  mainImageSplitTemplate,
-  mainImageWithTitleOverlayTemplate,
-} from './template/mainImage';
-import {
-  tableOfContentsLayoutTemplate,
-  tableOfContentsGridTemplate,
-  tableOfContentsTwoRowTemplate,
-} from './template/tableOfContents';
+import { listTemplates } from './template/list';
+import { twoColumnWithImageTemplates } from './template/twoColumnWithImage';
+import { twoColumnTemplates } from './template/twoColumn';
+import { labeledListTemplates } from './template/labeledList';
+import { titleTemplates } from './template/title';
+import { mainImageTemplates } from './template/mainImage';
+import { tableOfContentsTemplates } from './template/tableOfContents';
+import { timelineTemplates } from './template/timeline';
+import { pyramidTemplates } from './template/pyramid';
 import { SLIDE_LAYOUT_TYPE } from '../types';
 
 /**
@@ -53,50 +19,16 @@ const cycleIndexes: Record<string, number> = {};
 /**
  * Template variations for each layout type
  */
-const TEMPLATE_VARIATIONS: Record<string, Template[]> = {
-  [SLIDE_LAYOUT_TYPE.VERTICAL_LIST]: [
-    verticalListLayoutTemplate,
-    verticalListCompactTemplate,
-    verticalListCardsTemplate,
-    verticalListNumberedTemplate,
-    verticalListNumberedCompactTemplate,
-    verticalListNumberedCardsTemplate,
-  ],
-  [SLIDE_LAYOUT_TYPE.TWO_COLUMN_WITH_IMAGE]: [
-    twoColumnWithImageLayoutTemplate,
-    twoColumnLeftBigImageTemplate,
-    twoColumnRightBigImageTemplate,
-    twoColumnRightImageTemplate,
-  ],
-  [SLIDE_LAYOUT_TYPE.TWO_COLUMN]: [
-    twoColumnLayoutTemplate,
-    twoColumnSplitTemplate,
-    twoColumnAsymmetricTemplate,
-  ],
-  [SLIDE_LAYOUT_TYPE.HORIZONTAL_LIST]: [
-    horizontalListLayoutTemplate,
-    horizontalListGridTemplate,
-    horizontalListSingleRowTemplate,
-    horizontalListNumberedTemplate,
-  ],
-  [SLIDE_LAYOUT_TYPE.TITLE]: [
-    titleLayoutTemplate,
-    titleTopTemplate,
-    titleLeftAlignTemplate,
-    titleRightAlignTemplate,
-  ],
-  [SLIDE_LAYOUT_TYPE.TRANSITION]: [transitionLayoutTemplate],
-  [SLIDE_LAYOUT_TYPE.MAIN_IMAGE]: [
-    mainImageLayoutTemplate,
-    mainImageCenteredTemplate,
-    mainImageSplitTemplate,
-    mainImageWithTitleOverlayTemplate,
-  ],
-  [SLIDE_LAYOUT_TYPE.TABLE_OF_CONTENTS]: [
-    tableOfContentsLayoutTemplate,
-    tableOfContentsGridTemplate,
-    tableOfContentsTwoRowTemplate,
-  ],
+export const TEMPLATE_VARIATIONS: Record<string, Template[]> = {
+  [SLIDE_LAYOUT_TYPE.LIST]: listTemplates,
+  [SLIDE_LAYOUT_TYPE.TWO_COLUMN_WITH_IMAGE]: twoColumnWithImageTemplates,
+  [SLIDE_LAYOUT_TYPE.TWO_COLUMN]: twoColumnTemplates,
+  [SLIDE_LAYOUT_TYPE.LABELED_LIST]: labeledListTemplates,
+  [SLIDE_LAYOUT_TYPE.TITLE]: titleTemplates,
+  [SLIDE_LAYOUT_TYPE.MAIN_IMAGE]: mainImageTemplates,
+  [SLIDE_LAYOUT_TYPE.TABLE_OF_CONTENTS]: tableOfContentsTemplates,
+  [SLIDE_LAYOUT_TYPE.TIMELINE]: timelineTemplates,
+  [SLIDE_LAYOUT_TYPE.PYRAMID]: pyramidTemplates,
 };
 
 /**

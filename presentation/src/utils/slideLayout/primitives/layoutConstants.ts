@@ -16,7 +16,7 @@ export const DEFAULT_LABEL_TO_VALUE_RATIO = 1.1;
  */
 export const DEFAULT_SPACING_BETWEEN_ITEMS = 10;
 export const DEFAULT_LINE_SPACING = 0;
-export const DEFAULT_TITLE_LINE_SPACING = 10;
+export const DEFAULT_TITLE_LINE_SPACING = 0;
 
 /**
  * Default border radius multiplier for rounded rectangles

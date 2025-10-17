@@ -258,7 +258,13 @@ const updateOutline = (outlineProps: Partial<PPTElementOutline>) => {
       updateElement(el.id, props);
     }
 
-    if (el.type === 'line') updateElement(el.id, outlineProps);
+    if (el.type === 'line') {
+      // Extract only the properties valid for line elements
+      const lineProps: Record<string, unknown> = {};
+      if (outlineProps.style) lineProps.style = outlineProps.style;
+      if (outlineProps.color) lineProps.color = outlineProps.color;
+      updateElement(el.id, lineProps as Partial<PPTElement>);
+    }
   }
   outline.value = { ...outline.value, ...outlineProps };
 };

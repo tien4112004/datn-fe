@@ -44,7 +44,7 @@ export default class ImageRealApiService implements ImageApiService {
     request: ImageGenerationRequest
   ): Promise<ImageGenerationResponse> {
     const res = await api.post<ApiResponse<{ cdnUrls: string[] }>>(
-      `${this.baseUrl}/api/images/generate`,
+      `${this.baseUrl}/api/images/generate-in-presentation`,
       {
         prompt: request.prompt,
         model: request.model.name,
@@ -52,7 +52,7 @@ export default class ImageRealApiService implements ImageApiService {
       },
       {
         headers: {
-          'Idempotency-Key': `${id}:${slideId}:${elementId}:image`,
+          'Idempotency-Key': `${id}:${slideId}:${elementId}`,
         },
       }
     );

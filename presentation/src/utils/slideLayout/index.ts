@@ -49,11 +49,12 @@ import type {
   TwoColumnWithImageLayoutSchema,
   MainImageLayoutSchema,
   TitleLayoutSchema,
-  TransitionLayoutSchema,
   TwoColumnLayoutSchema,
-  VerticalListLayoutSchema,
-  HorizontalListLayoutSchema,
+  ListLayoutSchema,
+  LabeledListLayoutSchema,
   TableOfContentsLayoutSchema,
+  TimelineLayoutSchema,
+  PyramidLayoutSchema,
 } from './types';
 import { SLIDE_LAYOUT_TYPE } from './types';
 import { convertLayoutGeneric, resolveTemplate } from './converters';
@@ -106,7 +107,13 @@ export const convertToSlide = async (
 
   if (layoutType === SLIDE_LAYOUT_TYPE.TWO_COLUMN_WITH_IMAGE) {
     const selectedTemplate = selectTemplate(layoutType, seed);
-    const template = resolveTemplate(selectedTemplate.config, theme, viewport);
+    const template = resolveTemplate(
+      selectedTemplate.config,
+      theme,
+      viewport,
+      selectedTemplate.graphics,
+      selectedTemplate.parameters
+    );
     return convertLayoutGeneric(
       data as TwoColumnWithImageLayoutSchema,
       template,
@@ -119,7 +126,13 @@ export const convertToSlide = async (
     );
   } else if (layoutType === SLIDE_LAYOUT_TYPE.MAIN_IMAGE) {
     const selectedTemplate = selectTemplate(layoutType, seed);
-    const template = resolveTemplate(selectedTemplate.config, theme, viewport);
+    const template = resolveTemplate(
+      selectedTemplate.config,
+      theme,
+      viewport,
+      selectedTemplate.graphics,
+      selectedTemplate.parameters
+    );
     return convertLayoutGeneric(
       data as MainImageLayoutSchema,
       template,
@@ -132,7 +145,13 @@ export const convertToSlide = async (
     );
   } else if (layoutType === SLIDE_LAYOUT_TYPE.TITLE) {
     const selectedTemplate = selectTemplate(layoutType, seed);
-    const template = resolveTemplate(selectedTemplate.config, theme, viewport);
+    const template = resolveTemplate(
+      selectedTemplate.config,
+      theme,
+      viewport,
+      selectedTemplate.graphics,
+      selectedTemplate.parameters
+    );
     return convertLayoutGeneric(
       data as TitleLayoutSchema,
       template,
@@ -150,19 +169,50 @@ export const convertToSlide = async (
     );
   } else if (layoutType === SLIDE_LAYOUT_TYPE.TWO_COLUMN) {
     const selectedTemplate = selectTemplate(layoutType, seed);
-    const template = resolveTemplate(selectedTemplate.config, theme, viewport);
+    const template = resolveTemplate(
+      selectedTemplate.config,
+      theme,
+      viewport,
+      selectedTemplate.graphics,
+      selectedTemplate.parameters
+    );
+
+    // Check if template has separate leftColumn/rightColumn containers
+    const hasLeftRightColumns = template.containers.leftColumn && template.containers.rightColumn;
+
     return convertLayoutGeneric(
       data as TwoColumnLayoutSchema,
       template,
-      (d) => ({
-        texts: { title: d.title },
-        blocks: { content: { item: [...d.data.items1, ...d.data.items2] } },
-      }),
+      (d) => {
+        const texts = { title: d.title };
+        let blocks: Record<string, Record<string, string[]>>;
+
+        if (hasLeftRightColumns) {
+          // Map to separate columns
+          blocks = {
+            leftColumn: { item: d.data.items1 },
+            rightColumn: { item: d.data.items2 },
+          };
+        } else {
+          // Map to single content container (legacy templates)
+          blocks = {
+            content: { item: [...d.data.items1, ...d.data.items2] },
+          };
+        }
+
+        return { texts, blocks };
+      },
       slideId
     );
-  } else if (layoutType === SLIDE_LAYOUT_TYPE.VERTICAL_LIST) {
+  } else if (layoutType === SLIDE_LAYOUT_TYPE.LIST) {
     const selectedTemplate = selectTemplate(layoutType, seed);
-    const template = resolveTemplate(selectedTemplate.config, theme, viewport);
+    const template = resolveTemplate(
+      selectedTemplate.config,
+      theme,
+      viewport,
+      selectedTemplate.graphics,
+      selectedTemplate.parameters
+    );
 
     // Check if the template has numbering enabled (label/content structure)
     const contentContainer = template.containers.content;
@@ -173,7 +223,7 @@ export const convertToSlide = async (
       );
 
     return convertLayoutGeneric(
-      data as VerticalListLayoutSchema,
+      data as ListLayoutSchema,
       template,
       (d) => {
         // For numbered templates: split into label (numbers) and content (text)
@@ -194,9 +244,15 @@ export const convertToSlide = async (
       },
       slideId
     );
-  } else if (layoutType === SLIDE_LAYOUT_TYPE.HORIZONTAL_LIST) {
+  } else if (layoutType === SLIDE_LAYOUT_TYPE.LABELED_LIST) {
     const selectedTemplate = selectTemplate(layoutType, seed);
-    const template = resolveTemplate(selectedTemplate.config, theme, viewport);
+    const template = resolveTemplate(
+      selectedTemplate.config,
+      theme,
+      viewport,
+      selectedTemplate.graphics,
+      selectedTemplate.parameters
+    );
 
     // Check if the template has numbering enabled
     const contentContainer = template.containers.content;
@@ -207,7 +263,7 @@ export const convertToSlide = async (
       );
 
     return convertLayoutGeneric(
-      data as HorizontalListLayoutSchema,
+      data as LabeledListLayoutSchema,
       template,
       (d) => ({
         texts: { title: d.title },
@@ -222,28 +278,15 @@ export const convertToSlide = async (
       }),
       slideId
     );
-  } else if (layoutType === SLIDE_LAYOUT_TYPE.TRANSITION) {
-    const selectedTemplate = selectTemplate(layoutType, seed);
-    const template = resolveTemplate(selectedTemplate.config, theme, viewport);
-
-    return convertLayoutGeneric(
-      data as TransitionLayoutSchema,
-      template,
-      (d) => ({
-        texts: {
-          title: d.data.title,
-        },
-        blocks: {
-          content: {
-            subtitle: d.data.subtitle ? [d.data.subtitle] : [],
-          },
-        },
-      }),
-      slideId
-    );
   } else if (layoutType === SLIDE_LAYOUT_TYPE.TABLE_OF_CONTENTS) {
     const selectedTemplate = selectTemplate(layoutType, seed);
-    const template = resolveTemplate(selectedTemplate.config, theme, viewport);
+    const template = resolveTemplate(
+      selectedTemplate.config,
+      theme,
+      viewport,
+      selectedTemplate.graphics,
+      selectedTemplate.parameters
+    );
 
     // Check if the template has numbering enabled
     const contentContainer = template.containers.content;
@@ -262,6 +305,53 @@ export const convertToSlide = async (
           content: {
             content: d.data.items,
             label: hasNumbering ? d.data.items.map((_, index) => String(index + 1).padStart(2, '0')) : [],
+          },
+        },
+      }),
+      slideId
+    );
+  } else if (layoutType === SLIDE_LAYOUT_TYPE.TIMELINE) {
+    const selectedTemplate = selectTemplate(layoutType, seed);
+    const template = resolveTemplate(
+      selectedTemplate.config,
+      theme,
+      viewport,
+      selectedTemplate.graphics,
+      selectedTemplate.parameters
+    );
+
+    return convertLayoutGeneric(
+      data as TimelineLayoutSchema,
+      template,
+      (d) => ({
+        texts: { title: d.title },
+        blocks: {
+          content: {
+            label: d.data.items.map((item) => item.label),
+            content: d.data.items.map((item) => item.content),
+          },
+        },
+      }),
+      slideId
+    );
+  } else if (layoutType === SLIDE_LAYOUT_TYPE.PYRAMID) {
+    const selectedTemplate = selectTemplate(layoutType, seed);
+    const template = resolveTemplate(
+      selectedTemplate.config,
+      theme,
+      viewport,
+      selectedTemplate.graphics,
+      selectedTemplate.parameters
+    );
+
+    return convertLayoutGeneric(
+      data as PyramidLayoutSchema,
+      template,
+      (d) => ({
+        texts: { title: d.title },
+        blocks: {
+          content: {
+            item: d.data.items,
           },
         },
       }),

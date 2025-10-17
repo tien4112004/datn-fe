@@ -8,7 +8,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, watch } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import {
   useScreenStore,
@@ -47,9 +47,10 @@ const { slides } = storeToRefs(slidesStore);
 const { screening } = storeToRefs(useScreenStore());
 
 // Track if this is the initial load to avoid marking as dirty
-let isInitialLoad = true;
+let isInitialLoad = ref(true);
 
 onMounted(async () => {
+  isInitialLoad.value = true;
   containerStore.initialize(props);
 
   // Reset save state on mount to ensure clean state
@@ -69,8 +70,8 @@ onMounted(async () => {
 
   // After initial load is complete, allow dirty tracking
   setTimeout(() => {
-    isInitialLoad = false;
-  }, 100);
+    isInitialLoad.value = false;
+  }, 500);
 
   // Handle browser/tab close with unsaved changes
   // Note: Browsers only allow generic messages, not custom dialogs
@@ -85,17 +86,19 @@ onMounted(async () => {
   window.addEventListener('beforeunload', handleBeforeUnload);
 });
 
-// Watch for changes in slides to mark as dirty
 watch(
   slides,
   () => {
-    // Skip marking as dirty during initial load
-    if (containerStore.isRemote && !isInitialLoad) {
+    if (containerStore.isRemote) {
       saveStore.markDirty();
     }
   },
   { deep: true }
 );
+
+watch(isInitialLoad, () => {
+  saveStore.reset();
+});
 
 // When the application is unloaded, record the current indexedDB database ID in localStorage for later database cleanup
 window.addEventListener('unload', () => {

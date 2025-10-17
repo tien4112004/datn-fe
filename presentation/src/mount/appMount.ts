@@ -1,5 +1,5 @@
-import { createApp, type App } from 'vue';
-import { createPinia } from 'pinia';
+import { createApp, watch, type App } from 'vue';
+import { createPinia, storeToRefs } from 'pinia';
 import icon from '../plugins/icon';
 import directive from '../plugins/directive/index';
 import AppComponent from '../App.vue';

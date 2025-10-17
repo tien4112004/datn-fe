@@ -161,6 +161,7 @@ export const useCreateBlankPresentation = () => {
       const presentation = await presentationApiService.createPresentation({
         id: crypto.randomUUID(),
         title: 'Untitled Presentation',
+        isParsed: true,
         slides: [
           {
             id: crypto.randomUUID(),

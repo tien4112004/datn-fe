@@ -47,6 +47,7 @@ export const useUnsavedChangesBlocker = () => {
   const handleProceed = () => {
     setShowDialog(false);
     blocker.proceed?.();
+    setShowDialog(false);
   };
 
   const handleStay = () => {
@@ -54,10 +55,15 @@ export const useUnsavedChangesBlocker = () => {
     blocker.reset?.();
   };
 
+  const handleCloseDialog = () => {
+    setShowDialog(false);
+    blocker.reset?.();
+  };
+
   return {
     hasUnsavedChanges,
     showDialog,
-    setShowDialog,
+    setShowDialog: handleCloseDialog,
     handleStay,
     handleProceed,
   };

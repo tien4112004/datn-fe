@@ -26,6 +26,7 @@ export const useGeneratingBlocker = (onProceed: () => void) => {
   );
 
   const handleProceed = () => {
+    setShowDialog(false);
     onProceed();
     blocker.proceed?.();
   };

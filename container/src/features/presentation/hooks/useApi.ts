@@ -161,9 +161,10 @@ export const useCreateBlankPresentation = () => {
       const presentation = await presentationApiService.createPresentation({
         id: crypto.randomUUID(),
         title: 'Untitled Presentation',
+        isParsed: true,
         slides: [
           {
-            id: 'w9LcNwETgw',
+            id: crypto.randomUUID(),
             elements: [],
             background: {
               type: 'solid',
@@ -222,11 +223,11 @@ export const useUpdatePresentationTitle = () => {
 
       const CONFLICT_HTTP_STATUS = 409;
       if (result && typeof result === 'object' && 'code' in result) {
-        if (result.code === CONFLICT_HTTP_STATUS) {
-          throw new Error('A presentation with this name already exists');
+        if ((result as { code: number }).code === CONFLICT_HTTP_STATUS) {
+          throw new Error(t('common:table.presentation.renameDuplicatedMessage'));
         }
 
-        throw new Error(result.message || 'An error occurred');
+        throw new Error((result as { message?: string }).message || 'An error occurred');
       }
 
       return { id, name, result };
@@ -244,12 +245,35 @@ export const useUpdatePresentationTitle = () => {
         t('common:table.presentation.renameSuccess', {
           filename: data.name,
         })
-      ); // TODO: i18n
+      );
     },
-    // onError: (error: unknown) => {
-    //   console.error('Failed to update presentation title:', error);
-    //   throw error;
-    // },
+  });
+};
+
+export const useUpdatePresentation = (id: string) => {
+  const presentationApiService = usePresentationApiService();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (presentation: Presentation) => {
+      const updatedPresentation = await presentationApiService.updatePresentation(id, presentation);
+      return updatedPresentation;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [presentationApiService.getType(), 'presentations'],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: [presentationApiService.getType(), 'presentation', id],
+      });
+
+      toast.success(t('common:presentation.saveSuccess'));
+    },
+    onError: (error: Error) => {
+      console.error('Failed to save presentation:', error);
+      toast.error(t('common:presentation.saveFailed'));
+    },
   });
 };
 

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
+import { t } from 'i18next';
 import type { AiResultSlide, Presentation } from '../types';
 import { usePresentationGeneration } from '../contexts/PresentationGenerationContext';
 import { getDefaultPresentationTheme } from '../api/mock';
@@ -11,6 +12,7 @@ import {
   useGeneratePresentationImage,
   useSetParsedPresentation,
   useUpdatePresentationSlides,
+  useUpdatePresentation,
 } from './useApi';
 import type { Slide, SlideTheme, SlideViewport } from '../types/slide';
 
@@ -74,7 +76,7 @@ export const usePresentationDataProcessor = (
         }
       } catch (error) {
         console.error('Error processing AI result:', error);
-        toast.error('Failed to process presentation');
+        toast.error(t('common:presentation.processFailed'));
       } finally {
         setIsProcessing(false);
       }
@@ -133,16 +135,26 @@ export const usePresentationDataProcessor = (
 
   useEffect(() => {
     const generateImageListener = async (event: Event) => {
-      const customEvent = event as CustomEvent;
+      const customEvent = event as CustomEvent<{
+        slideId: string;
+        elementId: string;
+        prompt: string;
+      }>;
       const { slideId, elementId, prompt } = customEvent.detail;
 
       if (app) {
+        const request = getRequest();
+        if (!request?.others?.imageModel) {
+          console.error('Image model not found in request');
+          return;
+        }
+
         const promise = generateImage
           .mutateAsync({
             slideId,
             elementId,
             prompt,
-            model: getRequest()?.others.imageModel,
+            model: request.others.imageModel,
           })
           .then((response) => {
             app.updateImageElement(slideId, elementId, response.images[0].url);
@@ -158,12 +170,13 @@ export const usePresentationDataProcessor = (
       }
     };
 
-    window.addEventListener('app.image.need-generation', generateImageListener);
+    const listener = generateImageListener as unknown as EventListener;
+    window.addEventListener('app.image.need-generation', listener);
 
     return () => {
-      window.removeEventListener('app.image.need-generation', generateImageListener);
+      window.removeEventListener('app.image.need-generation', listener);
     };
-  }, [generateImage]);
+  }, [generateImage, getRequest]);
 
   return { isProcessing };
 };
@@ -206,12 +219,52 @@ export const useMessageRemote = () => {
   }, []);
 
   useEffect(() => {
-    window.addEventListener('app.message', handleMessage);
+    const listener = handleMessage as unknown as EventListener;
+    window.addEventListener('app.message', listener);
 
     return () => {
-      window.removeEventListener('app.message', handleMessage);
+      window.removeEventListener('app.message', listener);
     };
   }, [handleMessage]);
+};
+
+interface SavePresentationEventDetail {
+  presentation: Presentation;
+}
+
+export const useSavePresentationRemote = (presentationId: string) => {
+  const [isSaving, setIsSaving] = useState(false);
+  const updatePresentation = useUpdatePresentation(presentationId);
+
+  const handleSave = useCallback(
+    async (event: CustomEvent<SavePresentationEventDetail>) => {
+      try {
+        setIsSaving(true);
+        const { presentation: dataToSave } = event.detail;
+
+        const MINIMUM_DISPLAY_TIME = 500; // 500ms minimum to prevent flickering
+        const savePromise = updatePresentation.mutateAsync(dataToSave);
+        const timerPromise = new Promise((resolve) => setTimeout(resolve, MINIMUM_DISPLAY_TIME));
+        await Promise.all([savePromise, timerPromise]);
+      } catch (error) {
+        console.error('Failed to save presentation:', error);
+      } finally {
+        setIsSaving(false);
+      }
+    },
+    [updatePresentation]
+  );
+
+  useEffect(() => {
+    const listener = handleSave as unknown as EventListener;
+    window.addEventListener('app.presentation.save', listener);
+
+    return () => {
+      window.removeEventListener('app.presentation.save', listener);
+    };
+  }, [handleSave]);
+
+  return { isSaving };
 };
 
 export const useDetailPresentation = (
@@ -232,6 +285,7 @@ export const useDetailPresentation = (
   );
 
   useMessageRemote();
+  const { isSaving } = useSavePresentationRemote(validatedId);
 
-  return { app, updateApp, isProcessing, isStreaming };
+  return { app, updateApp, isProcessing, isStreaming, isSaving };
 };

@@ -71,4 +71,15 @@ export default {
     loading: 'Đang tải mô hình...',
     error: 'Lỗi khi tải mô hình',
   },
+  presentation: {
+    saveSuccess: 'Lưu bài trình bày thành công',
+    saveFailed: 'Lưu bài trình bày thất bại',
+    processFailed: 'Xử lý bài trình bày thất bại',
+    unsavedChanges: {
+      title: 'Thay đổi chưa được lưu',
+      description: 'Bạn có thay đổi chưa được lưu. Bạn có chắc muốn rời đi? Các thay đổi của bạn sẽ bị mất.',
+      stay: 'Ở lại',
+      leave: 'Rời đi',
+    },
+  },
 };

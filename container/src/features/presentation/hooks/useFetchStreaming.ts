@@ -9,7 +9,11 @@ import type {
 } from '@/features/presentation/types';
 import useStreaming from '@/hooks/useStreaming';
 
-function useFetchStreamingOutline(initialRequestData: OutlineData, options?: { manual?: boolean }) {
+function useFetchStreamingOutline(
+  initialRequestData: OutlineData,
+  onData: (data: OutlineItem[]) => void,
+  options?: { manual?: boolean }
+) {
   const presentationApiService = usePresentationApiService();
 
   return useStreaming<OutlineData, OutlineItem[]>({
@@ -18,13 +22,17 @@ function useFetchStreamingOutline(initialRequestData: OutlineData, options?: { m
       const combinedData = data.join('');
       return splitMarkdownToOutlineItems(combinedData);
     },
+    onData,
     input: initialRequestData,
     queryKey: [presentationApiService.getType(), 'presentationOutline'],
     options: { manual: options?.manual },
   });
 }
 
-function useFetchStreamingPresentation(initialRequestData: PresentationGenerationRequest) {
+function useFetchStreamingPresentation(
+  initialRequestData: PresentationGenerationRequest,
+  onData: (data: AiResultSlide[]) => void
+) {
   const presentationApiService = usePresentationApiService();
 
   return useStreaming<PresentationGenerationRequest, AiResultSlide[], PresentationGenerationStartResponse>({
@@ -36,6 +44,7 @@ function useFetchStreamingPresentation(initialRequestData: PresentationGeneratio
         theme: initialRequestData.presentation.theme,
       }));
     },
+    onData,
     input: initialRequestData,
     queryKey: [presentationApiService.getType(), 'presentationGeneration'],
     options: { manual: true },

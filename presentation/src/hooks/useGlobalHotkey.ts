@@ -1,6 +1,6 @@
 import { onMounted, onUnmounted } from 'vue';
 import { storeToRefs } from 'pinia';
-import { useMainStore, useSlidesStore, useKeyboardStore } from '@/store';
+import { useMainStore, useSlidesStore, useKeyboardStore, useContainerStore, useSaveStore } from '@/store';
 import { ElementOrderCommands } from '@/types/edit';
 import { KEYS } from '@/configs/hotkey';
 
@@ -19,6 +19,9 @@ import useScaleCanvas from './useScaleCanvas';
 export default () => {
   const mainStore = useMainStore();
   const keyboardStore = useKeyboardStore();
+  const containerStore = useContainerStore();
+  const slidesStore = useSlidesStore();
+  const saveStore = useSaveStore();
   const {
     activeElementIdList,
     disableHotkeys,
@@ -28,7 +31,7 @@ export default () => {
     thumbnailsFocus,
     showSearchPanel,
   } = storeToRefs(mainStore);
-  const { currentSlide } = storeToRefs(useSlidesStore());
+  const { slides, currentSlide } = storeToRefs(slidesStore);
   const { ctrlKeyState, shiftKeyState, spaceKeyState } = storeToRefs(keyboardStore);
 
   const {
@@ -70,6 +73,31 @@ export default () => {
   const selectAll = () => {
     if (editorAreaFocus.value) selectAllElements();
     if (thumbnailsFocus.value) selectAllSlide();
+  };
+
+  const savePresentation = () => {
+    // Only save if isRemote and has unsaved changes
+    if (!containerStore.isRemote) return;
+    if (!saveStore.hasUnsavedChanges) return;
+
+    const presentation = containerStore.presentation;
+    if (!presentation) return;
+
+    // Dispatch save event to container
+    window.dispatchEvent(
+      new CustomEvent('app.presentation.save', {
+        detail: {
+          presentation: {
+            ...presentation,
+            title: presentation.title,
+            slides: slides.value,
+          },
+        },
+      })
+    );
+
+    // Mark as saved
+    saveStore.markSaved();
   };
 
   const lock = () => {
@@ -204,6 +232,11 @@ export default () => {
       if (disableHotkeys.value) return;
       e.preventDefault();
       selectAll();
+    }
+    if (ctrlOrMetaKeyActive && key === KEYS.S) {
+      if (disableHotkeys.value) return;
+      e.preventDefault();
+      savePresentation();
     }
     if (ctrlOrMetaKeyActive && key === KEYS.L) {
       if (disableHotkeys.value) return;

@@ -53,6 +53,7 @@ export interface PresentationApiService extends Service {
   getAiResultById(id: string): Promise<SlideLayoutSchema[]>;
   generatePresentation(request: PresentationGenerationRequest): Promise<PresentationGenerationResponse>;
   updatePresentationTitle(id: string, name: string): Promise<any | null>;
+  updatePresentation(id: string, data: Presentation): Promise<Presentation>;
   getStreamedPresentation(
     request: PresentationGenerationRequest,
     signal: AbortSignal

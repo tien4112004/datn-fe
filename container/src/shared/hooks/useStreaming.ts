@@ -1,18 +1,18 @@
 import { experimental_streamedQuery as streamedQuery, useQuery, useQueryClient } from '@tanstack/react-query';
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
 
 export interface StreamingOptions<TRequest, TProcessed> {
   extractFn: (request: TRequest, signal: AbortSignal) => Promise<{ stream: AsyncIterable<string> }>;
   transformFn: (content: string[]) => TProcessed;
   input: TRequest;
   queryKey: string[];
+  onData?: (data: TProcessed) => void;
   options?: {
     manual?: boolean;
   };
 }
 
-export interface StreamingHookReturn<TRequest, TProcessed, TExtractResult> {
-  processedData: TProcessed;
+export interface StreamingHookReturn<TRequest, _, TExtractResult> {
   isStreaming: boolean;
   error: string | null;
   restartStream: (requestData: TRequest) => void;
@@ -27,6 +27,7 @@ function useStreaming<TRequest = any, TProcessed = any, TExtractResult = any>({
   transformFn,
   input,
   queryKey,
+  onData,
   options = { manual: false },
 }: StreamingOptions<TRequest, TProcessed>): StreamingHookReturn<TRequest, TProcessed, TExtractResult> {
   const [shouldStream, setShouldStream] = React.useState(!options.manual);
@@ -64,7 +65,7 @@ function useStreaming<TRequest = any, TProcessed = any, TExtractResult = any>({
   const stopStream = useCallback(() => {
     queryClient.cancelQueries({ queryKey: [...queryKey, queryCounter] });
     setShouldStream(false);
-  }, [queryClient, queryKey, queryCounter]);
+  }, [queryClient, queryKey]);
 
   const restartStream = useCallback((data: TRequest) => {
     requestData.current = data;
@@ -74,12 +75,16 @@ function useStreaming<TRequest = any, TProcessed = any, TExtractResult = any>({
 
   const clearContent = useCallback(() => {
     queryClient.setQueryData([...queryKey, queryCounter], null);
-  }, [queryClient, queryKey, queryCounter]);
+  }, [queryClient, queryKey]);
 
-  const processedData = transformFn(data || []);
+  useEffect(() => {
+    if (data && onData) {
+      const processed = transformFn(data);
+      onData(processed);
+    }
+  });
 
   return {
-    processedData,
     isStreaming,
     error: error && error.message !== 'CancelledError' ? error.message : null,
     restartStream,

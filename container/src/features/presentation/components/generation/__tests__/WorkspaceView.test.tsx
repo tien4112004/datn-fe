@@ -21,6 +21,16 @@ vi.mock('@/features/presentation/hooks/useWorkspace', () => ({
   }),
 }));
 
+vi.mock('@/features/presentation/hooks/useGeneratingBlocker', () => ({
+  useGeneratingBlocker: () => ({
+    showDialog: false,
+    setShowDialog: vi.fn(),
+    handleStay: vi.fn(),
+    handleProceed: vi.fn(),
+    isProceeding: false,
+  }),
+}));
+
 vi.mock('@/features/presentation/stores/useOutlineStore', () => {
   const mockUseOutlineStore = vi.fn((selector) => {
     const state = {

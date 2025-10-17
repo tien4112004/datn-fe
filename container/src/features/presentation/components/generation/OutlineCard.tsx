@@ -26,7 +26,7 @@ const OutlineCard = ({ id, title = 'Outline', className = '', onDelete }: Outlin
   const setEditingId = useOutlineStore((state) => state.setEditingId);
   const handleMarkdownChange = useOutlineStore((state) => state.handleMarkdownChange);
   const isEditing = editingId === id;
-  const content = useOutlineStore((state) => state.outlines.find((item) => item.id === id));
+  const markdown = useOutlineStore((state) => state.outlines.find((item) => item.id === id)?.markdownContent);
 
   // Track if we've loaded initial content to prevent re-loading
   const hasLoadedContentRef = useRef(false);
@@ -41,13 +41,13 @@ const OutlineCard = ({ id, title = 'Outline', className = '', onDelete }: Outlin
 
   // FLOW 1: Load markdown into editor blocks on mount and when markdown changes (streaming)
   useEffect(() => {
-    if (!editor || !content?.markdownContent) return;
+    if (!editor || !markdown) return;
     if (isEditing) return; // Don't reload while editing to preserve cursor
 
     const loadContent = async () => {
       try {
         // Try to parse the markdown with additional checks
-        const blocks = await editor.tryParseMarkdownToBlocks(content.markdownContent);
+        const blocks = await editor.tryParseMarkdownToBlocks(markdown);
 
         // Store parsed blocks for HTML generation
         setParsedBlocks(blocks);
@@ -63,7 +63,7 @@ const OutlineCard = ({ id, title = 'Outline', className = '', onDelete }: Outlin
     if (!hasLoadedContentRef.current || isStreaming) {
       loadContent();
     }
-  }, [content?.markdownContent, editor, isStreaming, isEditing]);
+  }, [markdown, editor, isStreaming, isEditing]);
 
   // FLOW 2: Generate HTML from parsed blocks for display when not editing
   useEffect(() => {

@@ -9,6 +9,7 @@ export default {
     presentation: 'Đang tải trình chỉnh sửa thuyết trình...',
     generatingPresentation: 'Đang tạo thuyết trình...',
     processingPresentation: 'Đang xử lý thuyết trình...',
+    savingPresentation: 'Đang lưu thuyết trình...',
   },
   actions: {
     confirm: 'Xác nhận',

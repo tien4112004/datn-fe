@@ -15,9 +15,17 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
   const formHook = usePresentationForm();
   const { getValues, trigger, setValue } = formHook;
 
+  // Stores
+  const setOutlines = useOutlineStore((state) => state.setOutlines);
+  const startStream = useOutlineStore((state) => state.startStreaming);
+  const endStream = useOutlineStore((state) => state.endStreaming);
+  const markdownContent = useOutlineStore((state) => state.markdownContent);
+  const clearOutline = useOutlineStore((state) => state.clearOutline);
+  const isStreamingStore = useOutlineStore((state) => state.isStreaming);
+  const isGeneratingOutline = useOutlineStore((state) => state.isGenerating);
+
   // Streaming API
   const {
-    processedData: outlineItems,
     isStreaming,
     error,
     stopStream: stopStreamOutline,
@@ -31,17 +39,9 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
       language: getValues().language,
       model: getValues().model,
     },
+    setOutlines,
     { manual: true }
   );
-
-  // Stores
-  const setOutlines = useOutlineStore((state) => state.setOutlines);
-  const startStream = useOutlineStore((state) => state.startStreaming);
-  const endStream = useOutlineStore((state) => state.endStreaming);
-  const markdownContent = useOutlineStore((state) => state.markdownContent);
-  const clearOutline = useOutlineStore((state) => state.clearOutline);
-  const isStreamingStore = useOutlineStore((state) => state.isStreaming);
-  const isGeneratingOutline = useOutlineStore((state) => state.isGenerating);
 
   const { isStreaming: isGenerating, startGeneration } = usePresentationGeneration();
 
@@ -134,13 +134,6 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
     }
   }, [isStreaming, startStream, endStream]);
 
-  // Update outlines when streaming produces new data
-  useEffect(() => {
-    if (outlineItems.length > 0) {
-      setOutlines([...outlineItems]);
-    }
-  }, [outlineItems, setOutlines]);
-
   return {
     isStreaming: isStreamingStore,
     stopStream,
@@ -151,6 +144,10 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
     handleGeneratePresentation,
     isGenerating,
 
-    ...formHook,
+    // Only return needed form properties
+    control: formHook.control,
+    watch: formHook.watch,
+    setValue: formHook.setValue,
+    getValues: formHook.getValues,
   };
 };

@@ -12,7 +12,6 @@ import {
   getAllDescendantInstances,
   createCard,
   createTextElement,
-  createTitleLine,
   buildInstanceWithBounds,
   getChildrenMaxBounds,
   buildChildrenFromChildTemplate,

@@ -32,12 +32,13 @@ export const TEMPLATE_VARIATIONS: Record<string, Template[]> = {
 };
 
 /**
- * Selects a random template variation for the given layout type using a seeded random generator
+ * Selects a template variation for the given layout type
  *
  * @param layoutType - The layout type to select a template for
  * @param seed - Optional seed for deterministic random selection (useful for testing). Use '1' for cycling.
+ *               If seed starts with 'template-id:', the remainder is treated as a template ID for direct selection.
  * @returns The selected template
- * @throws Error if no templates are available for the layout type
+ * @throws Error if no templates are available for the layout type or if template ID is not found
  */
 export function selectTemplate(layoutType: string, seed?: string): Template {
   const templates = TEMPLATE_VARIATIONS[layoutType];
@@ -50,6 +51,17 @@ export function selectTemplate(layoutType: string, seed?: string): Template {
   if (templates.length === 1) {
     console.log(`Only one template available for layout type "${layoutType}": ${templates[0].id}`);
     return templates[0];
+  }
+
+  // Special case: seed starts with 'template-id:' means direct selection by ID
+  if (seed && seed.startsWith('template-id:')) {
+    const templateId = seed.substring('template-id:'.length);
+    const template = templates.find((t) => t.id === templateId);
+    if (!template) {
+      throw new Error(`Template with ID "${templateId}" not found for layout type: ${layoutType}`);
+    }
+    console.log(`Directly selected template for layout type "${layoutType}": ${template.id}`);
+    return template;
   }
 
   // Special case: seed = '1' means cycle through templates

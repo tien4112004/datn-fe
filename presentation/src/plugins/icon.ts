@@ -111,6 +111,7 @@ import {
   Sigma,
   Undo2,
   Redo2,
+  SwatchBook,
 } from 'lucide-vue-next';
 
 export interface Icons {
@@ -244,6 +245,7 @@ export const icons: Icons = {
   IconSwitch: ToggleLeft,
   IconMore: MoreHorizontal,
   IconMoreApp: Grid3X3,
+  IconSwatchBook: SwatchBook,
 };
 
 export default {

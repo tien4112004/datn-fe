@@ -23,6 +23,7 @@ export default function useSlideTemplates() {
     for (const data of slideData) {
       const slide = await convertToSlide(data, viewport, theme, undefined, '1');
       slidesStore.appendNewSlide(slide);
+      slidesStore.setTheme(theme);
     }
   };
 

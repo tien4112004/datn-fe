@@ -14,7 +14,6 @@ import { createTextElement } from './elementCreators';
 export {
   createTextElement,
   createImageElement,
-  createTitleLine,
   createCard,
   createTextPPTElement,
   processBackground,

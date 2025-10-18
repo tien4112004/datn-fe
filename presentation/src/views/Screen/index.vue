@@ -33,7 +33,10 @@ onUnmounted(() => document.removeEventListener('keydown', keydownListener));
 
 <style lang="scss" scoped>
 .pptist-screen {
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
 }
 </style>

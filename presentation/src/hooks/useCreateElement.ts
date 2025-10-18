@@ -9,6 +9,8 @@ import type {
   TableCellStyle,
   PPTShapeElement,
   ChartType,
+  PPTVideoElement,
+  PPTAudioElement,
 } from '@/types/slides';
 import { type ShapePoolItem, SHAPE_PATH_FORMULAS } from '@/configs/shapes';
 import type { LinePoolItem } from '@/configs/lines';
@@ -300,8 +302,8 @@ export default () => {
    * Create video element
    * @param src Video URL
    */
-  const createVideoElement = (src: string) => {
-    createElement({
+  const createVideoElement = (src: string, ext?: string) => {
+    const newElement: PPTVideoElement = {
       type: 'video',
       id: nanoid(10),
       width: 500,
@@ -311,15 +313,17 @@ export default () => {
       top: (viewportSize.value * viewportRatio.value - 300) / 2,
       src,
       autoplay: false,
-    });
+    };
+    if (ext) newElement.ext = ext;
+    createElement(newElement);
   };
 
   /**
    * Create audio element
    * @param src Audio URL
    */
-  const createAudioElement = (src: string) => {
-    createElement({
+  const createAudioElement = (src: string, ext?: string) => {
+    const newElement: PPTAudioElement = {
       type: 'audio',
       id: nanoid(10),
       width: 50,
@@ -332,7 +336,9 @@ export default () => {
       fixedRatio: true,
       color: theme.value.themeColors[0],
       src,
-    });
+    };
+    if (ext) newElement.ext = ext;
+    createElement(newElement);
   };
 
   return {

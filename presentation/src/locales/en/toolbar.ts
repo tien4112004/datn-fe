@@ -78,6 +78,8 @@ export default {
         audio: 'Audio',
         invalidVideoUrl: 'Please enter a valid video URL first',
         invalidAudioUrl: 'Please enter a valid audio URL first',
+        uploadLocalVideo: 'Upload Local Video',
+        uploadLocalAudio: 'Upload Local Audio',
       },
     },
 

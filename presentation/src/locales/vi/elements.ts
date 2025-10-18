@@ -40,6 +40,13 @@ export default {
         confirm: 'Xác nhận',
         invalidWebLink: 'Địa chỉ liên kết không hợp lệ',
 
+        // Tính năng AI
+        aiBeautify: 'Làm đẹp',
+        aiExpand: 'Mở rộng',
+        aiSimplify: 'Đơn giản hóa',
+        aiAssistant: 'Trợ lý AI',
+        noTextContentToExecute: 'Không có nội dung văn bản để thực thi',
+
         // Phông chữ
         searchFont: 'Tìm phông chữ',
         searchFontSize: '',

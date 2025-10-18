@@ -28,18 +28,33 @@
       <div style="width: 40%">{{ $t('styling.elements.chart.backgroundFill') }}:</div>
       <Popover trigger="click" style="width: 60%">
         <template #content>
-          <ColorPicker :modelValue="fill" @update:modelValue="(value) => updateFill(value)" />
+          <ColorPicker :modelValue="fill" @update:modelValue="(value) => updateElement({ fill: value })" />
         </template>
         <ColorButton :color="fill" />
       </Popover>
     </div>
     <div class="row">
-      <div style="width: 40%">{{ $t('styling.elements.chart.textColor') }}:</div>
+      <div style="width: 40%">{{ $t('styling.elements.chart.coordinatesAndText') }}:</div>
       <Popover trigger="click" style="width: 60%">
         <template #content>
-          <ColorPicker :modelValue="textColor" @update:modelValue="(value) => updateTextColor(value)" />
+          <ColorPicker
+            :modelValue="textColor"
+            @update:modelValue="(value) => updateElement({ textColor: value })"
+          />
         </template>
         <ColorButton :color="textColor" />
+      </Popover>
+    </div>
+    <div class="row">
+      <div style="width: 40%">{{ $t('styling.elements.chart.gridColor') }}:</div>
+      <Popover trigger="click" style="width: 60%">
+        <template #content>
+          <ColorPicker
+            :modelValue="lineColor"
+            @update:modelValue="(value) => updateElement({ lineColor: value })"
+          />
+        </template>
+        <ColorButton :color="lineColor" />
       </Popover>
     </div>
 
@@ -152,6 +167,7 @@ const fill = ref<string>('var(--presentation-foreground)');
 
 const themeColors = ref<string[]>([]);
 const textColor = ref('');
+const lineColor = ref('');
 const lineSmooth = ref(false);
 const stack = ref(false);
 
@@ -172,7 +188,8 @@ watch(
     }
 
     themeColors.value = handleElement.value.themeColors;
-    textColor.value = handleElement.value.textColor || '#333333';
+    textColor.value = handleElement.value.textColor || '#333';
+    lineColor.value = handleElement.value.lineColor || '#e8ecf4';
   },
   { deep: true, immediate: true }
 );
@@ -188,11 +205,6 @@ const updateData = (payload: { data: ChartData; type: ChartType }) => {
   updateElement({ data: payload.data, chartType: payload.type });
 };
 
-//  Set fill color
-const updateFill = (value: string) => {
-  updateElement({ fill: value });
-};
-
 // Set advanced options
 const updateOptions = (optionProps: ChartOptions) => {
   const _handleElement = handleElement.value as PPTChartElement;
@@ -206,11 +218,6 @@ const setThemeColors = (colors: string[]) => {
   updateElement({ themeColors: colors });
   themesVisible.value = false;
   themeColorsSettingVisible.value = false;
-};
-
-// Set text color
-const updateTextColor = (textColor: string) => {
-  updateElement({ textColor });
 };
 
 const openDataEditor = () => (chartDataEditorVisible.value = true);

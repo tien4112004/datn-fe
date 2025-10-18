@@ -82,10 +82,17 @@ export const getElementRange = (element: PPTElement) => {
   let minX, maxX, minY, maxY;
 
   if (element.type === 'line') {
-    minX = element.left;
-    maxX = element.left + Math.max(element.start[0], element.end[0]);
-    minY = element.top;
-    maxY = element.top + Math.max(element.start[1], element.end[1]);
+    // For lines, we need to consider both start and end points
+    // start and end are relative coordinates, so we add them to left/top
+    const x1 = element.left + element.start[0];
+    const x2 = element.left + element.end[0];
+    const y1 = element.top + element.start[1];
+    const y2 = element.top + element.end[1];
+
+    minX = Math.min(x1, x2);
+    maxX = Math.max(x1, x2);
+    minY = Math.min(y1, y2);
+    maxY = Math.max(y1, y2);
   } else if ('rotate' in element && element.rotate) {
     const { left, top, width, height, rotate } = element;
     const { xRange, yRange } = getRectRotatedRange({

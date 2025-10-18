@@ -14,6 +14,7 @@ import { encrypt } from '@/utils/crypto';
 import { svg2Base64 } from '@/utils/svg2Base64';
 import message from '@/utils/message';
 import { useI18n } from 'vue-i18n';
+import { urlToBase64 } from '@/utils/image';
 
 interface ExportImageConfig {
   quality: number;
@@ -103,9 +104,31 @@ export default () => {
 
   type FormatColor = ReturnType<typeof formatColor>;
 
+  // Decode HTML entities
+  const decodeHTMLEntities = (text: string): string => {
+    return text
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'")
+      .replace(/&apos;/g, "'")
+      .replace(/&nbsp;/g, ' ')
+      .replace(/&gt;/g, '>')
+      .replace(/&lt;/g, '<')
+      .replace(/&amp;/g, '&');
+  };
+
+  // Remove quotes from CSS values (e.g., font-family)
+  const stripQuotes = (value: string): string => {
+    return value.replace(/^["']|["']$/g, '');
+  };
+
   // Format HTML for pptxgenjs
   // Core idea: Split HTML string into slices based on styles, each slice inherits the style information of its ancestor elements, and a new line is required when encountering a block-level element
-  const formatHTML = (html: string) => {
+  const formatHTML = (
+    html: string,
+    formatOptions?: {
+      paragraphSpace?: number;
+    }
+  ) => {
     const ast = toAST(html);
     let bulletFlag = false;
     let indent = 0;
@@ -124,7 +147,8 @@ export default () => {
         const styleObj = { ...baseStyleObj };
         const styleAttr = 'attributes' in item ? item.attributes.find((attr) => attr.key === 'style') : null;
         if (styleAttr && styleAttr.value) {
-          const styleArr = styleAttr.value.split(';');
+          const decodedStyleValue = decodeHTMLEntities(styleAttr.value);
+          const styleArr = decodedStyleValue.split(';');
           for (const styleItem of styleArr) {
             const [_key, _value] = styleItem.split(': ');
             const [key, value] = [trim(_key), trim(_value)];
@@ -147,7 +171,7 @@ export default () => {
           }
           if (item.tagName === 'a') {
             const attr = item.attributes.find((attr) => attr.key === 'href');
-            styleObj['href'] = attr?.value || '';
+            styleObj['href'] = attr?.value ? decodeHTMLEntities(attr.value) : '';
           }
           if (item.tagName === 'ul') {
             styleObj['list-type'] = 'ul';
@@ -169,12 +193,7 @@ export default () => {
         if ('tagName' in item && item.tagName === 'br') {
           slices.push({ text: '', options: { breakLine: true } });
         } else if ('content' in item) {
-          const text = item.content
-            .replace(/&nbsp;/g, ' ')
-            .replace(/&gt;/g, '>')
-            .replace(/&lt;/g, '<')
-            .replace(/&amp;/g, '&')
-            .replace(/\n/g, '');
+          const text = decodeHTMLEntities(item.content).replace(/\n/g, '');
           const options: pptxgen.TextPropsOptions = {};
 
           if (styleObj['font-size']) {
@@ -215,7 +234,7 @@ export default () => {
           if (styleObj['text-align']) options.align = styleObj['text-align'] as pptxgen.HAlign;
           if (styleObj['font-weight']) options.bold = styleObj['font-weight'] === 'bold';
           if (styleObj['font-style']) options.italic = styleObj['font-style'] === 'italic';
-          if (styleObj['font-family']) options.fontFace = styleObj['font-family'];
+          if (styleObj['font-family']) options.fontFace = stripQuotes(styleObj['font-family']);
           if (styleObj['href']) options.hyperlink = { url: styleObj['href'] };
 
           if (bulletFlag && styleObj['list-type'] === 'ol') {
@@ -223,14 +242,14 @@ export default () => {
               type: 'number',
               indent: (options.fontSize || defaultFontSize) * 1.25,
             };
-            options.paraSpaceBefore = 0.1;
+            options.paraSpaceBefore = formatOptions?.paragraphSpace || 0.1;
             bulletFlag = false;
           }
           if (bulletFlag && styleObj['list-type'] === 'ul') {
             options.bullet = {
               indent: (options.fontSize || defaultFontSize) * 1.25,
             };
-            options.paraSpaceBefore = 0.1;
+            options.paraSpaceBefore = formatOptions?.paragraphSpace || 0.1;
             bulletFlag = false;
           }
           if (indent) {
@@ -417,7 +436,7 @@ export default () => {
   };
 
   // Export PPTX file
-  const exportPPTX = (_slides: Slide[], masterOverwrite: boolean, ignoreMedia: boolean) => {
+  const exportPPTX = async (_slides: Slide[], masterOverwrite: boolean, ignoreMedia: boolean) => {
     exporting.value = true;
     const pptx = new pptxgen();
 
@@ -436,7 +455,7 @@ export default () => {
         typeof theme.value.backgroundColor === 'string' ? theme.value.backgroundColor : '#ffffff'
       );
       pptx.defineSlideMaster({
-        title: 'PPTIST_MASTER',
+        title: 'DEFAULT',
         background: { color: bgColor, transparency: (1 - bgAlpha) * 100 },
       });
     }
@@ -493,7 +512,9 @@ export default () => {
 
       for (const el of slide.elements) {
         if (el.type === 'text') {
-          const textProps = formatHTML(el.content);
+          const textProps = formatHTML(el.content, {
+            paragraphSpace: el.paragraphSpace,
+          });
 
           const options: pptxgen.TextPropsOptions = {
             x: el.left / ratioPx2Inch.value,
@@ -506,9 +527,11 @@ export default () => {
             valign: 'top',
             margin: 10 / ratioPx2Pt.value,
             paraSpaceBefore: 5 / ratioPx2Pt.value,
+            paraSpaceAfter: 0,
             lineSpacingMultiple: 1.5 / 1.25,
             autoFit: true,
           };
+
           if (el.rotate) options.rotate = el.rotate;
           if (el.wordSpace) options.charSpacing = el.wordSpace / ratioPx2Pt.value;
           if (el.lineHeight) options.lineSpacingMultiple = el.lineHeight / 1.25;

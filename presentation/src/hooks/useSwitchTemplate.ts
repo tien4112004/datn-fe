@@ -57,13 +57,14 @@ export default function useSwitchTemplate() {
       // Generate a seed that will directly select this specific template by ID
       const seed = `template-id:${newTemplateId}`;
 
-      // Re-convert the slide with the new template
+      // Re-convert the slide with the new template, preserving parameter overrides
       const newSlide = await convertToSlide(
         slide.layout.schema,
         viewport,
         theme,
         slide.id, // Preserve the slide ID
-        seed
+        seed,
+        slide.layout.parameterOverrides // Preserve parameter customizations
       );
 
       // Preserve properties that shouldn't change
@@ -92,6 +93,69 @@ export default function useSwitchTemplate() {
   };
 
   /**
+   * Update template parameters for a slide
+   * Re-renders the slide with the same template but different parameter values
+   * @param slideId - The ID of the slide to update
+   * @param parameterOverrides - New parameter values to apply
+   */
+  const updateTemplateParameters = async (
+    slideId: string,
+    parameterOverrides: Record<string, number>
+  ): Promise<void> => {
+    const slide = slidesStore.slides.find((s) => s.id === slideId);
+
+    if (!slide?.layout?.schema || !slide.layout.layoutType || !slide.layout.templateId) {
+      console.error('Cannot update parameters: slide missing layout metadata');
+      return;
+    }
+
+    // Get current theme and viewport
+    const theme = slidesStore.theme;
+    const viewport = {
+      width: slidesStore.viewportSize,
+      height: slidesStore.viewportSize * slidesStore.viewportRatio,
+    };
+
+    try {
+      // Generate a seed to keep the same template
+      const seed = `template-id:${slide.layout.templateId}`;
+
+      // Re-convert the slide with the updated parameters
+      const newSlide = await convertToSlide(
+        slide.layout.schema,
+        viewport,
+        theme,
+        slide.id, // Preserve the slide ID
+        seed,
+        parameterOverrides // Apply new parameter values
+      );
+
+      // Preserve properties that shouldn't change
+      newSlide.notes = slide.notes;
+      newSlide.remark = slide.remark;
+      newSlide.animations = slide.animations;
+      newSlide.turningMode = slide.turningMode;
+      newSlide.sectionTag = slide.sectionTag;
+      newSlide.type = slide.type;
+
+      // Preserve template preview mode state
+      if (newSlide.layout && slide.layout?.isTemplatePreview !== undefined) {
+        newSlide.layout.isTemplatePreview = slide.layout.isTemplatePreview;
+      }
+
+      // Update background only if the new slide doesn't override it
+      if (!newSlide.background && slide.background) {
+        newSlide.background = slide.background;
+      }
+
+      // Update the slide in the store
+      slidesStore.updateSlide(newSlide, slideId);
+    } catch (error) {
+      console.error('Error updating template parameters:', error);
+    }
+  };
+
+  /**
    * Check if a slide supports template switching
    * @param slideId - The ID of the slide
    * @returns true if the slide has layout metadata and multiple templates available
@@ -108,6 +172,7 @@ export default function useSwitchTemplate() {
   return {
     getAvailableTemplates,
     switchTemplate,
+    updateTemplateParameters,
     canSwitchTemplate,
   };
 }

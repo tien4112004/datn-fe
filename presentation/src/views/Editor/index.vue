@@ -10,20 +10,7 @@
         <div v-if="isCurrentSlideLocked" class="preview-mode-banner">
           <div class="banner-content">
             <div class="banner-icon">
-              <svg
-                class="tw-w-5 tw-h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"
-                ></path>
-              </svg>
+              <IconSwatchBook />
             </div>
             <div class="banner-text">
               <div class="banner-title">Template Preview Mode</div>
@@ -32,20 +19,7 @@
               </div>
             </div>
             <button class="banner-button" @click="confirmCurrentTemplate">
-              <svg
-                class="tw-w-4 tw-h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M5 13l4 4L19 7"
-                ></path>
-              </svg>
+              <IconCheckOne />
               Confirm & Start Editing
             </button>
           </div>

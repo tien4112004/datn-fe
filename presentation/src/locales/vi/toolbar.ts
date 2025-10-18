@@ -44,6 +44,8 @@ export default {
       onlyForAIGenerated: 'Chuyển đổi mẫu chỉ khả dụng cho các slide được tạo bởi AI.',
       active: 'Đang dùng',
       confirmButton: 'Dùng mẫu này & Bắt đầu chỉnh sửa',
+      customizeParameters: 'Tùy chỉnh bố cục',
+      resetToDefaults: 'Đặt lại mặc định',
     },
 
     // Công cụ biểu đồ

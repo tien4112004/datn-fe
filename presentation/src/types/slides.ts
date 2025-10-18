@@ -768,6 +768,8 @@ export interface SlideLayoutMetadata {
   layoutType: string;
   /** Template preview mode - true means slide is locked for editing until template is confirmed */
   isTemplatePreview?: boolean;
+  /** User-customized template parameters (e.g., { IMAGE_RATIO: 0.5, SIDE_PADDING: 40 }) */
+  parameterOverrides?: Record<string, number>;
 }
 
 /**

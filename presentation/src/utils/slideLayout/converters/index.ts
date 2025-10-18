@@ -59,6 +59,8 @@ export type DataMapper<T = any> = (data: T) => MappedLayoutData;
  * @param template - Resolved template with theme and viewport
  * @param mapData - Function that maps schema data to MappedLayoutData format
  * @param slideId - Optional slide ID (generates UUID if not provided)
+ * @param layoutMetadata - Optional layout metadata for template switching
+ * @param parameterOverrides - Optional custom parameter values to override template defaults
  * @returns Promise<Slide> - Complete slide with all elements positioned
  */
 export async function convertLayoutGeneric<T = any>(
@@ -66,7 +68,8 @@ export async function convertLayoutGeneric<T = any>(
   template: TemplateConfig,
   mapData: DataMapper<T>,
   slideId?: string,
-  layoutMetadata?: { layoutSchema: any; templateId: string; layoutType: string }
+  layoutMetadata?: { layoutSchema: any; templateId: string; layoutType: string },
+  parameterOverrides?: Record<string, number>
 ): Promise<Slide> {
   const mappedData = mapData(data);
 
@@ -77,8 +80,8 @@ export async function convertLayoutGeneric<T = any>(
       width: template.viewport.width,
       height: template.viewport.height,
     },
-    template.parameters
-    // TODO: Add parameterOverrides parameter here if you want user customization
+    template.parameters,
+    parameterOverrides
   );
 
   const allElements: Array<{ element: any; zIndex: number }> = [];
@@ -214,6 +217,8 @@ export async function convertLayoutGeneric<T = any>(
         layoutType: layoutMetadata.layoutType,
         // New AI slides start in preview mode (locked for editing until template confirmed)
         isTemplatePreview: true,
+        // Store parameter overrides if provided
+        parameterOverrides: parameterOverrides,
       },
     }),
   };

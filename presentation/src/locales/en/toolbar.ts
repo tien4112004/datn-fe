@@ -44,6 +44,8 @@ export default {
       onlyForAIGenerated: 'Template switching is only available for AI-generated slides.',
       active: 'Active',
       confirmButton: 'Use This Template & Start Editing',
+      customizeParameters: 'Customize Layout',
+      resetToDefaults: 'Reset to Defaults',
     },
 
     // Chart Tools

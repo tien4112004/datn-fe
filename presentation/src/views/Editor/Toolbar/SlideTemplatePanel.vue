@@ -12,48 +12,52 @@
     </template>
 
     <template v-else>
-      <div class="title title-panel">{{ $t('toolbar.slideTemplate.title') }}</div>
-      <div class="tw-text-xs tw-text-gray-600 tw-mb-4 tw-leading-relaxed">
+      <div class="tw-text-md tw-font-medium tw-text-foreground tw-text-center">
+        {{ $t('toolbar.slideTemplate.title') }}
+      </div>
+      <div class="tw-text-xs tw-text-muted-foreground tw-mb-4 tw-leading-relaxed">
         {{ $t('toolbar.slideTemplate.description') }}
       </div>
 
       <div v-if="isLoading" class="tw-flex tw-items-center tw-justify-center tw-py-8">
-        <div class="tw-text-sm tw-text-gray-500">Loading previews...</div>
+        <div class="tw-text-sm tw-text-muted-foreground">Loading previews...</div>
       </div>
 
-      <div
-        v-else
-        class="tw-grid tw-grid-cols-2 tw-gap-3"
-        :class="{ 'tw-mb-3': !isInPreviewMode, 'tw-pb-20': isInPreviewMode }"
-      >
+      <div v-else class="tw-grid tw-grid-cols-2 tw-gap-3 tw-mb-4">
         <div
           v-for="preview in templatePreviews"
           :key="preview.template.id"
-          class="tw-cursor-pointer tw-border-2 tw-rounded tw-overflow-hidden tw-transition-all tw-duration-200 hover:tw-border-[var(--presentation-primary)] hover:tw--translate-y-0.5 hover:tw-shadow-lg"
+          class="tw-cursor-pointer tw-border-2 tw-rounded tw-overflow-hidden tw-transition-all tw-duration-200 hover:tw-border-primary hover:tw--translate-y-0.5 hover:tw-shadow-lg"
           :class="{
-            'tw-border-[var(--presentation-primary)] tw-shadow-[0_0_0_3px_rgba(var(--presentation-primary-rgb),0.2)]':
-              preview.template.id === currentTemplateId,
-            'tw-border-[var(--presentation-border)]': preview.template.id !== currentTemplateId,
+            'tw-border-primary tw-shadow-lg': preview.template.id === currentTemplateId,
+            'tw-border-border': preview.template.id !== currentTemplateId,
           }"
           @click="handleTemplateClick(preview.template.id)"
         >
           <div class="tw-bg-gray-100 tw-aspect-video tw-relative tw-overflow-hidden">
             <ThumbnailSlide v-if="preview.slide" :slide="preview.slide" size="auto" />
           </div>
-          <div
-            class="tw-flex tw-items-center tw-justify-between tw-px-2 tw-py-1.5 tw-bg-[var(--presentation-background)]"
-          >
-            <div class="tw-text-xs tw-font-medium tw-text-[var(--presentation-foreground)]">
+          <div class="tw-flex tw-items-center tw-justify-between tw-px-2 tw-py-1.5 tw-bg-background">
+            <div class="tw-text-xs tw-font-medium tw-text-foreground">
               {{ preview.template.name }}
             </div>
             <div
               v-if="preview.template.id === currentTemplateId"
-              class="tw-text-[10px] tw-px-1.5 tw-py-0.5 tw-bg-[var(--presentation-primary)] tw-text-white tw-rounded tw-flex-shrink-0"
+              class="tw-text-xs tw-px-1.5 tw-py-0.5 tw-bg-primary tw-text-white tw-rounded tw-flex-shrink-0"
             >
               {{ $t('toolbar.slideTemplate.active') }}
             </div>
           </div>
         </div>
+      </div>
+
+      <!-- Template Parameter Editor -->
+      <div v-if="currentParameters.length > 0" class="tw-mb-4">
+        <TemplateParameterEditor
+          :parameters="currentParameters"
+          :current-values="currentParameterValues"
+          @update="handleParameterUpdate"
+        />
       </div>
 
       <!-- Confirm Template Button (only shown in preview mode) -->
@@ -62,8 +66,9 @@
         class="tw-p-3 tw-border-t tw-border-gray-200 tw-bg-white tw-z-10"
         style="width: inherit"
       >
-        <button
-          class="tw-w-full tw-py-2.5 tw-px-4 tw-bg-[var(--presentation-primary)] tw-text-white tw-rounded tw-font-medium tw-text-sm tw-transition-all hover:tw-opacity-90 tw-flex tw-items-center tw-justify-center tw-gap-2"
+        <Button
+          type="primary"
+          class="tw-w-full hover:tw-opacity-90 tw-transition-all"
           @click="confirmAndStartEditing"
         >
           <svg
@@ -76,7 +81,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
           </svg>
           {{ $t('toolbar.slideTemplate.confirmButton') }}
-        </button>
+        </Button>
       </div>
     </template>
   </div>
@@ -94,7 +99,9 @@ import type { Template } from '@/utils/slideLayout/types';
 import type { Slide } from '@/types/slides';
 import { ToolbarStates } from '@/types/toolbar';
 import ThumbnailSlide from '@/views/components/ThumbnailSlide/index.vue';
+import TemplateParameterEditor from './TemplateParameterEditor.vue';
 import message from '@/utils/message';
+import Button from '@/components/Button.vue';
 
 interface TemplatePreview {
   template: Template;
@@ -105,7 +112,8 @@ const slidesStore = useSlidesStore();
 const mainStore = useMainStore();
 const { currentSlide, theme, viewportSize, viewportRatio } = storeToRefs(slidesStore);
 
-const { getAvailableTemplates, switchTemplate, canSwitchTemplate } = useSwitchTemplate();
+const { getAvailableTemplates, switchTemplate, updateTemplateParameters, canSwitchTemplate } =
+  useSwitchTemplate();
 const { isCurrentSlideLocked, confirmCurrentTemplate } = useSlideEditLock();
 
 const templatePreviews = ref<TemplatePreview[]>([]);
@@ -119,12 +127,27 @@ const currentTemplateId = computed(() => currentSlide.value?.layout?.templateId 
 
 const isInPreviewMode = computed(() => isCurrentSlideLocked.value);
 
+const currentTemplate = computed(() => {
+  if (!currentSlide.value?.id) return null;
+  const templates = getAvailableTemplates(currentSlide.value.id);
+  return templates.find((t) => t.id === currentTemplateId.value) || null;
+});
+
+const currentParameters = computed(() => currentTemplate.value?.parameters || []);
+
+const currentParameterValues = computed(() => currentSlide.value?.layout?.parameterOverrides || {});
+
 const handleTemplateClick = async (templateId: string) => {
   if (!currentSlide.value?.id || templateId === currentTemplateId.value) {
     return;
   }
 
   await switchTemplate(currentSlide.value.id, templateId);
+};
+
+const handleParameterUpdate = async (values: Record<string, number>) => {
+  if (!currentSlide.value?.id) return;
+  await updateTemplateParameters(currentSlide.value.id, values);
 };
 
 const confirmAndStartEditing = () => {

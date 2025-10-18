@@ -22,6 +22,7 @@ const props = defineProps<{
   data: ChartData;
   themeColors: string[];
   textColor?: string;
+  lineColor?: string;
   options?: ChartOptions;
 }>();
 
@@ -51,6 +52,7 @@ const updateOption = () => {
     data: props.data,
     themeColors: themeColors.value,
     textColor: props.textColor,
+    lineColor: props.lineColor,
     lineSmooth: props.options?.lineSmooth || false,
     stack: props.options?.stack || false,
   });
@@ -70,6 +72,7 @@ watch(() => props.type, updateOption);
 watch(() => props.data, updateOption);
 watch(() => props.themeColors, updateOption);
 watch(() => props.textColor, updateOption);
+watch(() => props.lineColor, updateOption);
 </script>
 
 <style lang="scss" scoped>

@@ -133,49 +133,64 @@
       /></CheckboxButton>
     </ButtonGroup>
 
-    <ButtonGroup class="row">
+    <ButtonGroup class="row" passive>
+      <Popover trigger="click" v-model:value="AIPopoverVisible" style="width: 25%">
+        <template #content>
+          <PopoverMenuItem center @click="execAI('Beautify')">{{
+            $t('elements.text.editor.aiBeautify')
+          }}</PopoverMenuItem>
+          <PopoverMenuItem center @click="execAI('Expand')">{{
+            $t('elements.text.editor.aiExpand')
+          }}</PopoverMenuItem>
+          <PopoverMenuItem center @click="execAI('Simplify')">{{
+            $t('elements.text.editor.aiSimplify')
+          }}</PopoverMenuItem>
+        </template>
+        <CheckboxButton first style="width: 100%" v-tooltip="$t('elements.text.editor.aiAssistant')"
+          ><span :class="{ 'ai-loading': isAIWriting }">{{ isAIWriting ? '' : 'AI' }}</span></CheckboxButton
+        >
+      </Popover>
       <CheckboxButton
-        class="tw-flex-1"
-        v-tooltip="t('elements.text.editor.clearFormatting')"
+        style="flex: 1"
+        v-tooltip="$t('elements.text.editor.clearFormatting')"
         @click="emitRichTextCommand('clear')"
         ><IconFormat
       /></CheckboxButton>
       <CheckboxButton
-        class="tw-flex-1"
+        style="flex: 1"
         :checked="!!textFormatPainter"
-        v-tooltip="t('elements.text.editor.formatPainter')"
+        v-tooltip="$t('elements.text.editor.formatPainter')"
         @click="toggleTextFormatPainter()"
         @dblclick="toggleTextFormatPainter(true)"
         ><IconFormatBrush
       /></CheckboxButton>
-      <div class="tw-flex-1">
-        <Popover placement="bottom-end" trigger="click" v-model:value="linkPopoverVisible">
-          <template #content>
-            <div class="link-popover">
-              <Input v-model="link" :placeholder="t('elements.text.editor.enterHyperlink')" />
-              <div class="btns">
-                <Button
-                  size="small"
-                  :disabled="!richTextAttrs.link"
-                  @click="removeLink()"
-                  style="margin-right: 5px"
-                  >{{ t('elements.text.editor.remove') }}</Button
-                >
-                <Button size="small" type="primary" @click="updateLink(link)">{{
-                  $t('elements.text.editor.confirm')
-                }}</Button>
-              </div>
+      <Popover placement="bottom-end" trigger="click" v-model:value="linkPopoverVisible" style="width: 25%">
+        <template #content>
+          <div class="link-popover">
+            <Input v-model:value="link" :placeholder="$t('elements.text.editor.enterHyperlink')" />
+            <div class="btns">
+              <Button
+                size="small"
+                :disabled="!richTextAttrs.link"
+                @click="removeLink()"
+                style="margin-right: 5px"
+                >{{ $t('elements.text.editor.remove') }}</Button
+              >
+              <Button size="small" type="primary" @click="updateLink(link)">{{
+                $t('elements.text.editor.confirm')
+              }}</Button>
             </div>
-          </template>
-          <CheckboxButton
-            class="tw-w-full"
-            :checked="!!richTextAttrs.link"
-            v-tooltip="$t('elements.text.editor.hyperlink')"
-            @click="openLinkPopover()"
-            ><IconLinkOne
-          /></CheckboxButton>
-        </Popover>
-      </div>
+          </div>
+        </template>
+        <CheckboxButton
+          last
+          style="width: 100%"
+          :checked="!!richTextAttrs.link"
+          v-tooltip="$t('elements.text.editor.hyperlink')"
+          @click="openLinkPopover()"
+          ><IconLinkOne
+        /></CheckboxButton>
+      </Popover>
     </ButtonGroup>
     <Divider />
 
@@ -267,7 +282,7 @@
         /></Button>
         <Popover trigger="click" v-model:value="indentLeftPanelVisible">
           <template #content>
-            <PopoverMenuItem @click="emitRichTextCommand('textIndent', '-1')">{{
+            <PopoverMenuItem center @click="emitRichTextCommand('textIndent', '-1')">{{
               $t('elements.text.editor.reduceFirstLineIndent')
             }}</PopoverMenuItem>
           </template>
@@ -284,7 +299,7 @@
         /></Button>
         <Popover trigger="click" v-model:value="indentRightPanelVisible">
           <template #content>
-            <PopoverMenuItem @click="emitRichTextCommand('textIndent', '+1')">{{
+            <PopoverMenuItem center @click="emitRichTextCommand('textIndent', '+1')">{{
               $t('elements.text.editor.increaseFirstLineIndent')
             }}</PopoverMenuItem>
           </template>
@@ -298,11 +313,13 @@
 <script lang="ts" setup>
 import { ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
+import api from '@/services';
 import { useMainStore } from '@/store';
 import emitter, { EmitterEvents } from '@/utils/emitter';
 import { FONTS } from '@/configs/font';
 import useTextFormatPainter from '@/hooks/useTextFormatPainter';
 import message from '@/utils/message';
+import { htmlToText } from '@/utils/common';
 import { useI18n } from 'vue-i18n';
 
 import TextColorButton from '@/components/TextColorButton.vue';
@@ -318,7 +335,7 @@ import RadioButton from '@/components/RadioButton.vue';
 import RadioGroup from '@/components/RadioGroup.vue';
 import PopoverMenuItem from '@/components/PopoverMenuItem.vue';
 
-const { richTextAttrs, textFormatPainter } = storeToRefs(useMainStore());
+const { handleElement, handleElementId, richTextAttrs, textFormatPainter } = storeToRefs(useMainStore());
 
 const { toggleTextFormatPainter } = useTextFormatPainter();
 const { t } = useI18n();
@@ -371,8 +388,13 @@ const orderedListStyleTypeOption = ref([
 
 const link = ref('');
 const linkPopoverVisible = ref(false);
+const AIPopoverVisible = ref(false);
+const isAIWriting = ref(false);
 
 watch(richTextAttrs, () => (linkPopoverVisible.value = false));
+watch(handleElementId, () => {
+  if (isAIWriting.value) isAIWriting.value = false;
+});
 
 const openLinkPopover = () => {
   link.value = richTextAttrs.value.link;
@@ -389,11 +411,67 @@ const removeLink = () => {
   emitRichTextCommand('link');
   linkPopoverVisible.value = false;
 };
+
+const execAI = async (command: string) => {
+  AIPopoverVisible.value = false;
+
+  if (!handleElement.value) return;
+
+  let content = '';
+  if (handleElement.value.type === 'text' && handleElement.value.content) {
+    content = handleElement.value.content;
+  }
+  if (handleElement.value.type === 'shape' && handleElement.value.text && handleElement.value.text.content) {
+    content = handleElement.value.text.content;
+  }
+
+  if (!content) return message.error(t('elements.text.editor.noTextContentToExecute'));
+
+  let resultText = '';
+
+  const stream = await api.AI_Writing({
+    content: htmlToText(content),
+    command,
+  });
+
+  isAIWriting.value = true;
+
+  const reader: ReadableStreamDefaultReader = stream.body.getReader();
+  const decoder = new TextDecoder('utf-8');
+
+  const readStream = () => {
+    reader.read().then(({ done, value }) => {
+      if (!isAIWriting.value) return;
+      if (done) {
+        isAIWriting.value = false;
+        return;
+      }
+
+      const chunk = decoder.decode(value, { stream: true });
+      resultText += chunk;
+      emitRichTextCommand('replace', resultText);
+
+      readStream();
+    });
+  };
+  readStream();
+};
 </script>
 
 <style lang="scss" scoped>
 .rich-text-base {
   user-select: none;
+
+  ::v-deep(.ai-loading) {
+    width: 16px;
+    height: 16px;
+    display: inline-block;
+    margin-top: 8px;
+    border: 1px solid var(--presentation-primary);
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spinner 0.8s linear infinite;
+  }
 }
 .row {
   width: 100%;
@@ -462,5 +540,14 @@ const removeLink = () => {
 }
 .popover-btn {
   padding: 0 3px;
+}
+
+@keyframes spinner {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 </style>

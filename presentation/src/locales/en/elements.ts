@@ -40,6 +40,13 @@ export default {
         confirm: 'Confirm',
         invalidWebLink: 'Not a valid web link address',
 
+        // AI Features
+        aiBeautify: 'Beautify',
+        aiExpand: 'Expand',
+        aiSimplify: 'Simplify',
+        aiAssistant: 'AI Assistant',
+        noTextContentToExecute: 'No text content to execute',
+
         // Fonts
         searchFont: 'Search Font',
         searchFontSize: '',

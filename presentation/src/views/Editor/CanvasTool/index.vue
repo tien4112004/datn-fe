@@ -206,14 +206,14 @@
           <MediaInput
             @close="mediaInputVisible = false"
             @insertVideo="
-              (src) => {
-                createVideoElement(src);
+              ({ src, ext }) => {
+                createVideoElement(src, ext);
                 mediaInputVisible = false;
               }
             "
             @insertAudio="
-              (src) => {
-                createAudioElement(src);
+              ({ src, ext }) => {
+                createAudioElement(src, ext);
                 mediaInputVisible = false;
               }
             "

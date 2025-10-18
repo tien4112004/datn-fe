@@ -469,6 +469,8 @@ export interface ChartData {
  * themeColors: theme color
  *
  * textColor?: text color
+ *
+ * lineColor?: line color
  */
 export interface PPTChartElement extends PPTBaseElement {
   type: 'chart';
@@ -479,6 +481,7 @@ export interface PPTChartElement extends PPTBaseElement {
   outline?: PPTElementOutline;
   themeColors: string[];
   textColor?: string;
+  lineColor?: string;
 }
 
 export type TextAlign = 'left' | 'center' | 'right' | 'justify';

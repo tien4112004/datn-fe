@@ -4,18 +4,36 @@ export const mainImageTemplates: Template[] = [
   {
     id: 'main-image-default',
     name: 'Main Image - Default',
+    parameters: [
+      {
+        key: 'IMAGE_RATIO',
+        label: 'Image Ratio',
+        defaultValue: 0.5,
+        min: 0.2,
+        max: 0.7,
+        step: 0.05,
+        description: 'Proportion of slide width occupied by the main image',
+      },
+      {
+        key: 'SPACING',
+        label: 'Spacing (px)',
+        defaultValue: 20,
+        min: 0,
+        max: 100,
+        step: 5,
+        description: 'Spacing from image to content block',
+      },
+    ],
     config: {
       containers: {
         image: {
           type: 'image',
           bounds: {
             width: {
-              expr: 'SLIDE_WIDTH * 0.6',
-              max: 'SLIDE_HEIGHT * 0.5 * (3/2)',
+              expr: 'SLIDE_WIDTH * IMAGE_RATIO',
             },
             height: {
-              expr: 'SLIDE_WIDTH * 0.6 * (2/3)',
-              max: 'SLIDE_HEIGHT * 0.5',
+              expr: 'SLIDE_WIDTH * IMAGE_RATIO * (2/3)',
             },
             left: {
               expr: 'center',
@@ -33,24 +51,13 @@ export const mainImageTemplates: Template[] = [
             width: {
               expr: 'SLIDE_WIDTH * 0.8',
             },
-            height: {
-              expr: 'SLIDE_HEIGHT - image.top - image.height - 40 - 40',
-            },
+            height: 240,
             left: {
               expr: 'center',
             },
             top: {
-              expr: 'after',
-              relativeTo: 'image',
-              offset: 40,
+              expr: 'image.top + image.height + SPACING',
             },
-          },
-          layout: {
-            distribution: 'equal',
-            gap: 10,
-            horizontalAlignment: 'center',
-            verticalAlignment: 'center',
-            orientation: 'vertical',
           },
           childTemplate: {
             count: 'auto',
@@ -59,7 +66,7 @@ export const mainImageTemplates: Template[] = [
               label: 'content',
               layout: {
                 horizontalAlignment: 'center',
-                verticalAlignment: 'center',
+                verticalAlignment: 'top',
               },
               text: {
                 color: '{{theme.titleFontColor}}',
@@ -67,62 +74,9 @@ export const mainImageTemplates: Template[] = [
                 fontWeight: 'bold',
                 fontStyle: 'normal',
                 textAlign: 'center',
+                fontSizeRange: { minSize: 20, maxSize: 28 },
               },
             },
-          },
-        },
-      },
-    },
-  },
-  {
-    id: 'main-image-centered',
-    name: 'Main Image - Centered with Caption',
-    config: {
-      containers: {
-        image: {
-          type: 'image',
-          bounds: {
-            width: {
-              expr: 'SLIDE_WIDTH * 0.75',
-              max: 'SLIDE_HEIGHT * 0.65 * (16/9)',
-            },
-            height: {
-              expr: 'SLIDE_WIDTH * 0.75 * (9/16)',
-              max: 'SLIDE_HEIGHT * 0.65',
-            },
-            left: {
-              expr: 'center',
-            },
-            top: {
-              expr: 'SLIDE_HEIGHT * 0.15',
-            },
-          },
-        },
-        content: {
-          type: 'text',
-          label: 'content',
-          bounds: {
-            width: {
-              expr: 'SLIDE_WIDTH * 0.7',
-            },
-            height: 80,
-            left: {
-              expr: 'center',
-            },
-            top: {
-              expr: 'image.top + image.height + 25',
-            },
-          },
-          layout: {
-            horizontalAlignment: 'center',
-            verticalAlignment: 'center',
-          },
-          text: {
-            color: '{{theme.titleFontColor}}',
-            fontFamily: '{{theme.titleFontName}}',
-            fontWeight: 'bold',
-            fontStyle: 'normal',
-            textAlign: 'center',
           },
         },
       },
@@ -131,13 +85,24 @@ export const mainImageTemplates: Template[] = [
   {
     id: 'main-image-left',
     name: 'Main Image - Left',
+    parameters: [
+      {
+        key: 'IMAGE_RATIO',
+        label: 'Image Ratio',
+        defaultValue: 0.5,
+        min: 0.2,
+        max: 0.7,
+        step: 0.05,
+        description: 'Proportion of slide width occupied by the main image',
+      },
+    ],
     config: {
       containers: {
         image: {
           type: 'image',
           bounds: {
             width: {
-              expr: 'SLIDE_WIDTH * 0.5',
+              expr: 'SLIDE_WIDTH * IMAGE_RATIO',
             },
             height: {
               expr: 'SLIDE_HEIGHT',
@@ -151,11 +116,11 @@ export const mainImageTemplates: Template[] = [
           label: 'content',
           bounds: {
             width: {
-              expr: 'SLIDE_WIDTH * 0.5 - 60',
+              expr: 'SLIDE_WIDTH - image.width - 60',
             },
             height: 200,
             left: {
-              expr: 'SLIDE_WIDTH * 0.5 + 30',
+              expr: 'image.width + 30',
             },
             top: {
               expr: 'SLIDE_HEIGHT * 0.5 - 100',
@@ -237,6 +202,17 @@ export const mainImageTemplates: Template[] = [
   {
     id: 'main-image-top',
     name: 'Main Image - Top',
+    parameters: [
+      {
+        key: 'IMAGE_RATIO',
+        label: 'Image Ratio',
+        defaultValue: 0.5,
+        min: 0.2,
+        max: 0.7,
+        step: 0.05,
+        description: 'Proportion of slide width occupied by the main image',
+      },
+    ],
     config: {
       containers: {
         image: {
@@ -244,11 +220,9 @@ export const mainImageTemplates: Template[] = [
           bounds: {
             width: {
               expr: 'SLIDE_WIDTH',
-              max: 'SLIDE_HEIGHT * (16/9)',
             },
             height: {
-              expr: 'SLIDE_HEIGHT * 0.6',
-              max: 'SLIDE_HEIGHT',
+              expr: 'SLIDE_HEIGHT * IMAGE_RATIO',
             },
             left: 0,
             top: 0,
@@ -285,6 +259,17 @@ export const mainImageTemplates: Template[] = [
   {
     id: 'main-image-right',
     name: 'Main Image - Right',
+    parameters: [
+      {
+        key: 'IMAGE_RATIO',
+        label: 'Image Ratio',
+        defaultValue: 0.5,
+        min: 0.2,
+        max: 0.7,
+        step: 0.05,
+        description: 'Proportion of slide width occupied by the main image',
+      },
+    ],
     config: {
       containers: {
         content: {
@@ -292,7 +277,7 @@ export const mainImageTemplates: Template[] = [
           label: 'content',
           bounds: {
             width: {
-              expr: 'SLIDE_WIDTH * 0.5 - 60',
+              expr: 'SLIDE_WIDTH * (1 - IMAGE_RATIO) - 60',
             },
             height: 300,
             left: 30,
@@ -316,13 +301,13 @@ export const mainImageTemplates: Template[] = [
           type: 'image',
           bounds: {
             width: {
-              expr: 'SLIDE_WIDTH * 0.5',
+              expr: 'SLIDE_WIDTH * IMAGE_RATIO',
             },
             height: {
               expr: 'SLIDE_HEIGHT',
             },
             left: {
-              expr: 'SLIDE_WIDTH * 0.5',
+              expr: 'content.width + 60',
             },
             top: 0,
           },
@@ -333,6 +318,17 @@ export const mainImageTemplates: Template[] = [
   {
     id: 'main-image-bottom',
     name: 'Main Image - Bottom',
+    parameters: [
+      {
+        key: 'IMAGE_RATIO',
+        label: 'Image Ratio',
+        defaultValue: 0.5,
+        min: 0.2,
+        max: 0.7,
+        step: 0.05,
+        description: 'Proportion of slide width occupied by the main image',
+      },
+    ],
     config: {
       containers: {
         content: {
@@ -343,7 +339,7 @@ export const mainImageTemplates: Template[] = [
               expr: 'SLIDE_WIDTH * 0.9',
             },
             height: {
-              expr: 'SLIDE_HEIGHT * 0.35',
+              expr: 'SLIDE_HEIGHT * (1 - IMAGE_RATIO) - 50',
             },
             left: {
               expr: 'center',
@@ -369,11 +365,11 @@ export const mainImageTemplates: Template[] = [
               expr: 'SLIDE_WIDTH',
             },
             height: {
-              expr: 'SLIDE_HEIGHT * 0.6',
+              expr: 'SLIDE_HEIGHT * IMAGE_RATIO',
             },
             left: 0,
             top: {
-              expr: 'SLIDE_HEIGHT * 0.4',
+              expr: 'content.top + content.height + 20',
             },
           },
         },
@@ -383,25 +379,43 @@ export const mainImageTemplates: Template[] = [
   {
     id: 'main-image-framed',
     name: 'Main Image - Framed',
+    parameters: [
+      {
+        key: 'IMAGE_RATIO',
+        label: 'Image Ratio',
+        defaultValue: 0.65,
+        min: 0.2,
+        max: 0.7,
+        step: 0.05,
+        description: 'Proportion of slide width occupied by the main image',
+      },
+      {
+        key: 'SPACING',
+        label: 'Spacing (px)',
+        defaultValue: 20,
+        min: 0,
+        max: 100,
+        step: 5,
+        description: 'Spacing from image to content block',
+      },
+    ],
     config: {
       containers: {
         image: {
           type: 'image',
           bounds: {
             width: {
-              expr: 'SLIDE_WIDTH * 0.65',
-              max: 'SLIDE_HEIGHT * 0.55 * (3/2)',
+              expr: 'SLIDE_WIDTH * IMAGE_RATIO',
             },
             height: {
-              expr: 'SLIDE_WIDTH * 0.65 * (2/3)',
-              max: 'SLIDE_HEIGHT * 0.55',
+              expr: 'SLIDE_WIDTH * IMAGE_RATIO * (2/3)',
             },
             left: {
               expr: 'center',
             },
             top: {
               expr: 'center',
-              offset: -30,
+              offset: -20,
             },
           },
           border: {
@@ -423,17 +437,17 @@ export const mainImageTemplates: Template[] = [
             width: {
               expr: 'SLIDE_WIDTH * 0.75',
             },
-            height: 90,
+            height: 240,
             left: {
               expr: 'center',
             },
             top: {
-              expr: 'image.top + image.height + 35',
+              expr: 'image.top + image.height + SPACING',
             },
           },
           layout: {
             horizontalAlignment: 'center',
-            verticalAlignment: 'center',
+            verticalAlignment: 'top',
           },
           text: {
             color: '{{theme.titleFontColor}}',

@@ -63,12 +63,14 @@ export const useNodeManipulationStore = create<NodeManipulationState>()(
         // Update node internals for all restored nodes to ensure handles are positioned correctly
         // This must be done BEFORE setting edges so ReactFlow knows about handle positions
         if (updateNodeInternals) {
-          // Batch update all node internals (parent + restored nodes)
           const allNodeIds = [nodeId, ...storedNodes.map((node) => node.id)];
-          updateNodeInternals(allNodeIds);
+          setTimeout(() => {
+            allNodeIds.forEach((id) => {
+              updateNodeInternals(id);
+            });
+          }, 600);
         }
 
-        // Set edges after updating node internals to ensure proper edge path calculation
         setEdges(restoredEdges);
 
         pushToUndoStack();

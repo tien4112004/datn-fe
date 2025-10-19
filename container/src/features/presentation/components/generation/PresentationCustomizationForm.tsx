@@ -171,7 +171,7 @@ const CustomizationSection = ({
 
   const onThemeSelect = useCallback(
     (theme: SlideTheme) => {
-      setValue('theme', theme);
+      setValue('theme', theme, { shouldValidate: true, shouldDirty: true });
     },
     [setValue]
   );

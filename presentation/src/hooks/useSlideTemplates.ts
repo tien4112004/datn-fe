@@ -323,6 +323,7 @@ const slideTemplates: Record<string, any[]> = {
  */
 const THEMES_DATA: Record<string, SlideTheme> = {
   default: {
+    id: 'default',
     name: 'Default',
     backgroundColor: '#ffffff',
     themeColors: ['#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6'],
@@ -359,6 +360,7 @@ const THEMES_DATA: Record<string, SlideTheme> = {
   },
 
   business: {
+    id: 'business',
     backgroundColor: '#f8fafc',
     themeColors: ['#1e40af', '#0f172a', '#475569', '#64748b', '#94a3b8'],
     fontColor: '#1e293b',
@@ -396,6 +398,7 @@ const THEMES_DATA: Record<string, SlideTheme> = {
   },
 
   education: {
+    id: 'education',
     backgroundColor: {
       type: 'linear',
       colors: [
@@ -440,6 +443,7 @@ const THEMES_DATA: Record<string, SlideTheme> = {
   },
 
   creative: {
+    id: 'creative',
     backgroundColor: {
       type: 'linear',
       colors: [
@@ -484,6 +488,7 @@ const THEMES_DATA: Record<string, SlideTheme> = {
   },
 
   minimal: {
+    id: 'minimal',
     backgroundColor: '#ffffff',
     themeColors: ['#000000', '#6b7280', '#9ca3af', '#d1d5db', '#f3f4f6'],
     fontColor: '#111827',
@@ -521,6 +526,7 @@ const THEMES_DATA: Record<string, SlideTheme> = {
   },
 
   modern: {
+    id: 'modern',
     backgroundColor: '#0f172a',
     themeColors: ['#06b6d4', '#8b5cf6', '#f59e0b', '#ef4444', '#10b981'],
     fontColor: '#e2e8f0',
@@ -558,6 +564,7 @@ const THEMES_DATA: Record<string, SlideTheme> = {
   },
 
   classic: {
+    id: 'classic',
     backgroundColor: '#fefcf0',
     themeColors: ['#92400e', '#7c2d12', '#a16207', '#166534', '#1e40af'],
     fontColor: '#451a03',
@@ -595,6 +602,7 @@ const THEMES_DATA: Record<string, SlideTheme> = {
   },
 
   'ocean-professional': {
+    id: 'ocean-professional',
     backgroundColor: '#0A1929',
     themeColors: ['#D4AF37', '#1565C0', '#0277BD', '#B8860B', '#4A90E2'],
     fontColor: '#E8EAF6',
@@ -632,6 +640,7 @@ const THEMES_DATA: Record<string, SlideTheme> = {
   },
 
   'dark-emerald': {
+    id: 'dark-emerald',
     backgroundColor: '#0F1419',
     themeColors: ['#10B981', '#8B5CF6', '#6366F1', '#34D399', '#A78BFA'],
     fontColor: '#F3F4F6',
@@ -669,6 +678,7 @@ const THEMES_DATA: Record<string, SlideTheme> = {
   },
 
   'sunset-energy': {
+    id: 'sunset-energy',
     backgroundColor: '#FFF9F5',
     themeColors: ['#FF5722', '#FF6B35', '#F4A261', '#343752', '#FFB74D'],
     fontColor: '#2D3748',
@@ -706,6 +716,7 @@ const THEMES_DATA: Record<string, SlideTheme> = {
   },
 
   'tech-cyan': {
+    id: 'tech-cyan',
     backgroundColor: '#F7FAFC',
     themeColors: ['#00BCD4', '#0288D1', '#FF6F00', '#7C4DFF', '#00ACC1'],
     fontColor: '#1A202C',
@@ -743,6 +754,7 @@ const THEMES_DATA: Record<string, SlideTheme> = {
   },
 
   'sage-wellness': {
+    id: 'sage-wellness',
     backgroundColor: {
       type: 'linear',
       colors: [
@@ -787,6 +799,7 @@ const THEMES_DATA: Record<string, SlideTheme> = {
   },
 
   'vintage-retro': {
+    id: 'vintage-retro',
     backgroundColor: '#FAF3E0',
     themeColors: ['#C15937', '#951233', '#997929', '#5D1D2E', '#B08968'],
     fontColor: '#3E2723',
@@ -824,6 +837,7 @@ const THEMES_DATA: Record<string, SlideTheme> = {
   },
 
   'bold-contrast': {
+    id: 'bold-contrast',
     backgroundColor: '#FFFFFF',
     themeColors: ['#E53E3E', '#2C5282', '#F6AD55', '#38B2AC', '#9F7AEA'],
     fontColor: '#1A202C',

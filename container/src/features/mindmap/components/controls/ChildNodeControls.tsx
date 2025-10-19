@@ -9,7 +9,7 @@ import { ArrowLeftFromLine, ArrowRightFromLine, Plus, Type, Square, Image } from
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/shared/components/ui/popover';
 import type { MindMapNode, Direction, Side, MindMapTypes } from '@/features/mindmap/types';
-import { Position, type NodeProps } from '@xyflow/react';
+import { Position, type NodeProps, useUpdateNodeInternals } from '@xyflow/react';
 import { DIRECTION, SIDE, MINDMAP_TYPES } from '@/features/mindmap/types';
 import { cn } from '@/shared/lib/utils';
 import { motion } from 'motion/react';
@@ -52,13 +52,14 @@ export const ChildNodeControls = memo(
     const { hasLeftChildren, hasRightChildren } = useCoreStore(useShallow(coreStoreSelector));
     const addChildNodeStore = useNodeOperationsStore(nodeOperationsSelector);
     const { updateSubtreeLayout, layout } = useLayoutStore(useShallow(layoutStoreSelector));
+    const updateNodeInternals = useUpdateNodeInternals();
 
     const addChildNode = useCallback(
       (side: Side, type: MindMapTypes) => {
-        expand(node.id, side);
+        expand(node.id, side, updateNodeInternals);
         addChildNodeStore(node, { x: node.positionAbsoluteX, y: node.positionAbsoluteY }, side, type);
         setTimeout(() => {
-          updateSubtreeLayout(node.id, layout);
+          updateSubtreeLayout(node.id, layout, updateNodeInternals);
         }, 200);
       },
       [
@@ -66,6 +67,7 @@ export const ChildNodeControls = memo(
         addChildNodeStore,
         updateSubtreeLayout,
         layout,
+        updateNodeInternals,
         node.id,
         node.positionAbsoluteX,
         node.positionAbsoluteY,
@@ -100,7 +102,7 @@ export const ChildNodeControls = memo(
                 <Plus />
               </Button>
             </PopoverTrigger>
-            <PopoverContent side="left" className="w-48 p-2">
+            <PopoverContent side={layout === DIRECTION.VERTICAL ? 'top' : 'left'} className="w-48 p-2">
               <div className="space-y-2">
                 <Button
                   variant="ghost"
@@ -147,7 +149,7 @@ export const ChildNodeControls = memo(
           >
             <Button
               onClick={() => {
-                if (isLeftChildrenCollapsed) expand(node.id, SIDE.LEFT);
+                if (isLeftChildrenCollapsed) expand(node.id, SIDE.LEFT, updateNodeInternals);
                 else collapse(node.id, SIDE.LEFT);
               }}
               size="icon"
@@ -161,6 +163,7 @@ export const ChildNodeControls = memo(
                     : { rotate: isLeftChildrenCollapsed ? 90 : 270 }
                 }
                 transition={{ duration: 0.2, ease: 'easeInOut' }}
+                className="flex items-center justify-center"
               >
                 <ArrowLeftFromLine />
               </motion.div>
@@ -189,7 +192,7 @@ export const ChildNodeControls = memo(
           >
             <Button
               onClick={() => {
-                if (isRightChildrenCollapsed) expand(node.id, SIDE.RIGHT);
+                if (isRightChildrenCollapsed) expand(node.id, SIDE.RIGHT, updateNodeInternals);
                 else collapse(node.id, SIDE.RIGHT);
               }}
               size="icon"
@@ -203,6 +206,7 @@ export const ChildNodeControls = memo(
                     : { rotate: isRightChildrenCollapsed ? 90 : 270 }
                 }
                 transition={{ duration: 0.2, ease: 'easeInOut' }}
+                className="flex items-center justify-center"
               >
                 <ArrowRightFromLine />
               </motion.div>
@@ -218,7 +222,7 @@ export const ChildNodeControls = memo(
                 <Plus />
               </Button>
             </PopoverTrigger>
-            <PopoverContent side="right" className="w-48 p-2">
+            <PopoverContent side={layout === DIRECTION.VERTICAL ? 'bottom' : 'right'} className="w-48 p-2">
               <div className="space-y-2">
                 <Button
                   variant="ghost"

@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { useLayoutStore } from '../../stores/layout';
 import { useUndoRedoStore, useCoreStore, useNodeOperationsStore } from '../../stores';
-import { useReactFlow } from '@xyflow/react';
+import { useReactFlow, useUpdateNodeInternals } from '@xyflow/react';
 import type { Direction } from '../../types';
 
 const Toolbar = () => {
@@ -17,6 +17,7 @@ const Toolbar = () => {
 
   const onLayoutChange = useLayoutStore((state) => state.onLayoutChange);
   const { fitView } = useReactFlow();
+  const updateNodeInternals = useUpdateNodeInternals();
 
   return (
     <div className="absolute left-4 top-4 z-10 flex gap-2">
@@ -53,7 +54,7 @@ const Toolbar = () => {
         defaultValue="horizontal"
         className="rounded-md border border-gray-300 bg-white shadow-sm"
         onValueChange={(value) => {
-          onLayoutChange(value as Direction);
+          onLayoutChange(value as Direction, updateNodeInternals);
           fitView();
         }}
       >

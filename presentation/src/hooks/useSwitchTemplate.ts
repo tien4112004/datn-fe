@@ -2,6 +2,7 @@ import { useSlidesStore } from '@/store';
 import { convertToSlide } from '@/utils/slideLayout';
 import { getTemplateVariations } from '@/utils/slideLayout/converters/templateSelector';
 import type { Template } from '@/utils/slideLayout/types';
+import type { PPTImageElement } from '@/types/slides';
 
 /**
  * Hook for switching slide templates
@@ -54,12 +55,25 @@ export default function useSwitchTemplate() {
     };
 
     try {
+      // Preserve current image sources by updating the schema with current element data
+      const updatedSchema = { ...slide.layout.schema };
+      const imageElements = slide.elements.filter((el) => el.type === 'image') as PPTImageElement[];
+
+      // Update schema with current image sources based on layout type
+      if (updatedSchema.data && imageElements.length > 0) {
+        // For layouts with a single image field
+        if ('image' in updatedSchema.data && typeof updatedSchema.data.image === 'string') {
+          // Use the first image element's source
+          updatedSchema.data = { ...updatedSchema.data, image: imageElements[0].src };
+        }
+      }
+
       // Generate a seed that will directly select this specific template by ID
       const seed = `template-id:${newTemplateId}`;
 
       // Re-convert the slide with the new template, preserving parameter overrides
       const newSlide = await convertToSlide(
-        slide.layout.schema,
+        updatedSchema,
         viewport,
         theme,
         slide.id, // Preserve the slide ID
@@ -117,12 +131,25 @@ export default function useSwitchTemplate() {
     };
 
     try {
+      // Preserve current image sources by updating the schema with current element data
+      const updatedSchema = { ...slide.layout.schema };
+      const imageElements = slide.elements.filter((el) => el.type === 'image') as PPTImageElement[];
+
+      // Update schema with current image sources based on layout type
+      if (updatedSchema.data && imageElements.length > 0) {
+        // For layouts with a single image field
+        if ('image' in updatedSchema.data && typeof updatedSchema.data.image === 'string') {
+          // Use the first image element's source
+          updatedSchema.data = { ...updatedSchema.data, image: imageElements[0].src };
+        }
+      }
+
       // Generate a seed to keep the same template
       const seed = `template-id:${slide.layout.templateId}`;
 
       // Re-convert the slide with the updated parameters
       const newSlide = await convertToSlide(
-        slide.layout.schema,
+        updatedSchema,
         viewport,
         theme,
         slide.id, // Preserve the slide ID

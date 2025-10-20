@@ -96,7 +96,7 @@ import useSwitchTemplate from '@/hooks/useSwitchTemplate';
 import useSlideEditLock from '@/hooks/useSlideEditLock';
 import { convertToSlide } from '@/utils/slideLayout';
 import type { Template } from '@/utils/slideLayout/types';
-import type { Slide } from '@/types/slides';
+import type { Slide, PPTImageElement } from '@/types/slides';
 import { ToolbarStates } from '@/types/toolbar';
 import ThumbnailSlide from '@/views/components/ThumbnailSlide/index.vue';
 import TemplateParameterEditor from './TemplateParameterEditor.vue';
@@ -180,19 +180,28 @@ const generatePreviews = async () => {
       height: viewportSize.value * viewportRatio.value,
     };
 
+    // Preserve current image sources by updating the schema with current element data
+    const updatedSchema = { ...currentSlide.value.layout.schema };
+    const imageElements = currentSlide.value.elements.filter(
+      (el) => el.type === 'image'
+    ) as PPTImageElement[];
+
+    // Update schema with current image sources based on layout type
+    if (updatedSchema.data && imageElements.length > 0) {
+      // For layouts with a single image field
+      if ('image' in updatedSchema.data && typeof updatedSchema.data.image === 'string') {
+        // Use the first image element's source
+        updatedSchema.data = { ...updatedSchema.data, image: imageElements[0].src };
+      }
+    }
+
     // Generate preview for each template
     const previews = await Promise.all(
       availableTemplates.map(async (template) => {
         try {
           // Generate slide with this specific template using direct ID selection
           const seed = `template-id:${template.id}`;
-          const previewSlide = await convertToSlide(
-            currentSlide.value!.layout!.schema,
-            viewport,
-            theme.value,
-            undefined,
-            seed
-          );
+          const previewSlide = await convertToSlide(updatedSchema, viewport, theme.value, undefined, seed);
 
           return {
             template,
@@ -226,6 +235,26 @@ watch(
     await generatePreviews();
   },
   { immediate: true }
+);
+
+// Regenerate previews when images change
+watch(
+  () =>
+    (currentSlide.value?.elements.filter((el) => el.type === 'image') as PPTImageElement[]).map(
+      (el) => el.src
+    ),
+  async (newImages, oldImages) => {
+    // Only regenerate if images actually changed and we have previews
+    if (
+      newImages &&
+      oldImages &&
+      JSON.stringify(newImages) !== JSON.stringify(oldImages) &&
+      canSwitch.value
+    ) {
+      await generatePreviews();
+    }
+  },
+  { deep: true }
 );
 </script>
 

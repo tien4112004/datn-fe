@@ -194,6 +194,8 @@ export default class PresentationMockService implements PresentationApiService {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       isParsed: false,
+      theme: _request.presentation.theme,
+      viewport: _request.presentation.viewport,
     };
 
     // Add the new presentation to the mock list

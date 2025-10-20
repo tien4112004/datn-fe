@@ -77,6 +77,32 @@ export default function useSlideEditLock() {
     }
   };
 
+  /**
+   * Confirm templates for all slides
+   * Unlocks all slides that are in template preview mode
+   * @returns The number of slides that were confirmed
+   */
+  const confirmAllTemplates = (): number => {
+    let confirmedCount = 0;
+
+    slidesStore.slides.forEach((slide) => {
+      if (slide.layout?.isTemplatePreview === true) {
+        confirmTemplate(slide.id);
+        confirmedCount++;
+      }
+    });
+
+    return confirmedCount;
+  };
+
+  /**
+   * Check if any slides are in template preview mode (locked)
+   * @returns true if at least one slide is locked
+   */
+  const hasLockedSlides = computed(() => {
+    return slidesStore.slides.some((slide) => slide.layout?.isTemplatePreview === true);
+  });
+
   return {
     isSlideLocked,
     isCurrentSlideLocked,
@@ -84,5 +110,7 @@ export default function useSlideEditLock() {
     isCurrentSlideEditable,
     confirmTemplate,
     confirmCurrentTemplate,
+    confirmAllTemplates,
+    hasLockedSlides,
   };
 }

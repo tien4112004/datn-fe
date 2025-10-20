@@ -18,10 +18,28 @@
                 Choose your preferred layout. Editing will unlock after you confirm your template choice.
               </div>
             </div>
-            <button class="banner-button" @click="confirmCurrentTemplate">
-              <IconCheckOne />
-              Confirm & Start Editing
-            </button>
+            <div class="banner-buttons">
+              <button class="banner-button" @click="confirmCurrentTemplate">
+                <IconCheckOne />
+                Confirm & Start Editing
+              </button>
+              <button
+                v-if="hasLockedSlides && !showConfirmAllButton"
+                class="banner-button banner-button-secondary"
+                @click="promptConfirmAll"
+              >
+                <IconCheckOne />
+                Confirm All Slides
+              </button>
+              <button
+                v-if="showConfirmAllButton"
+                class="banner-button banner-button-confirm"
+                @click="confirmAllTemplates"
+              >
+                <IconCheckOne />
+                Click Again to Confirm All
+              </button>
+            </div>
           </div>
         </div>
 
@@ -107,13 +125,19 @@ const {
   showAIPPTDialog,
 } = storeToRefs(mainStore);
 const { currentSlide } = storeToRefs(slidesStore);
-const { isCurrentSlideLocked, confirmCurrentTemplate: confirmTemplate } = useSlideEditLock();
+const {
+  isCurrentSlideLocked,
+  hasLockedSlides,
+  confirmCurrentTemplate: confirmTemplate,
+  confirmAllTemplates: confirmAll,
+} = useSlideEditLock();
 
 const closeExportDialog = () => mainStore.setDialogForExport('');
 const closeAIPPTDialog = () => mainStore.setAIPPTDialogState(false);
 
 const remarkHeight = ref(240);
 const showRemarkDrawer = ref(false);
+const showConfirmAllButton = ref(false);
 
 // Function to open the drawer for editing
 const openRemarkDrawer = () => {
@@ -125,6 +149,25 @@ const confirmCurrentTemplate = () => {
   confirmTemplate();
   mainStore.setToolbarState(ToolbarStates.SLIDE_DESIGN);
   message.success('Template confirmed! You can now edit your slide.');
+};
+
+// Function to show confirm all button (first step)
+const promptConfirmAll = () => {
+  showConfirmAllButton.value = true;
+  // Auto-hide after 5 seconds
+  setTimeout(() => {
+    showConfirmAllButton.value = false;
+  }, 5000);
+};
+
+// Function to confirm all templates (second step)
+const confirmAllTemplates = () => {
+  const confirmedCount = confirmAll();
+  mainStore.setToolbarState(ToolbarStates.SLIDE_DESIGN);
+  showConfirmAllButton.value = false;
+  message.success(
+    `Confirmed ${confirmedCount} slide${confirmedCount > 1 ? 's' : ''}! All slides are now editable.`
+  );
 };
 
 useGlobalHotkey();
@@ -257,6 +300,12 @@ usePasteEvent();
     line-height: 1.4;
   }
 
+  .banner-buttons {
+    flex-shrink: 0;
+    display: flex;
+    gap: 8px;
+  }
+
   .banner-button {
     flex-shrink: 0;
     display: flex;
@@ -282,6 +331,40 @@ usePasteEvent();
     &:active {
       transform: translateY(0);
     }
+
+    &.banner-button-secondary {
+      background: rgba(255, 255, 255, 0.15);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.25);
+        border-color: rgba(255, 255, 255, 0.6);
+      }
+    }
+
+    &.banner-button-confirm {
+      background: #fca43f;
+      color: #92400e;
+      border: 2px solid #f59e0b;
+      animation: pulse-glow 1.5s ease-in-out infinite;
+
+      &:hover {
+        background: #fac822;
+        border-color: #d97706;
+        transform: translateY(-1px) scale(1.02);
+      }
+    }
+  }
+}
+
+@keyframes pulse-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 8px rgba(251, 191, 36, 0.6);
+  }
+  50% {
+    box-shadow: 0 0 16px rgba(251, 191, 36, 0.9);
   }
 }
 </style>

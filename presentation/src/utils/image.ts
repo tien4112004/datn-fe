@@ -74,3 +74,17 @@ export const svg2File = (svg: string): File => {
   const blob = new Blob([svg], { type: 'image/svg+xml' });
   return new File([blob], `${Date.now()}.svg`, { type: 'image/svg+xml' });
 };
+
+export async function urlToBase64(url: string) {
+  // 1. Fetch the image data
+  const response = await fetch(url);
+  const blob = await response.blob();
+
+  // 2. Read the Blob data as a Data URL
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}

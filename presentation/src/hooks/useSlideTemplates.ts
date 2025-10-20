@@ -68,7 +68,7 @@ const slideTemplates: Record<string, any[]> = {
         'Item2: Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
         'Item3: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. ',
       ],
-      image: 'https://placehold.co/600x400',
+      image: 'https://placehold.co/600x400.png',
     },
   })),
   'two-column': TEMPLATE_VARIATIONS[SLIDE_LAYOUT_TYPE.TWO_COLUMN].map((tmpl) => ({
@@ -91,7 +91,7 @@ const slideTemplates: Record<string, any[]> = {
     type: 'main_image',
     title: tmpl.name,
     data: {
-      image: 'https://placehold.co/600x400',
+      image: 'https://placehold.co/600x400.png',
       content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
     },
   })),

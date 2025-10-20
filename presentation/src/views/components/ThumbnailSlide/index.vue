@@ -4,7 +4,7 @@
     ref="thumbnail"
     :style="{
       width: size === 'auto' ? '100%' : size + 'px',
-      height: size === 'auto' ? '100%' : size * viewportRatio + 'px',
+      height: size === 'auto' ? viewportSize * viewportRatio * scale + 'px' : size * viewportRatio + 'px',
     }"
   >
     <div

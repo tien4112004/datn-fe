@@ -80,6 +80,8 @@ export default {
         audio: 'Âm thanh',
         invalidVideoUrl: 'Vui lòng nhập URL video hợp lệ trước',
         invalidAudioUrl: 'Vui lòng nhập URL âm thanh hợp lệ trước',
+        uploadLocalVideo: 'Tải lên video cục bộ',
+        uploadLocalAudio: 'Tải lên âm thanh cục bộ',
       },
     },
 

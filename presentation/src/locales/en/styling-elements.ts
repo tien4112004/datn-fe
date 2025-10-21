@@ -31,6 +31,8 @@ export default {
       stackedStyle: 'Stacked Style',
       useSmoothCurve: 'Use Smooth Curve',
       backgroundFill: 'Background Fill',
+      coordinatesAndText: 'Coordinates and Text',
+      gridColor: 'Grid Color',
       textColor: 'Text Color',
       themeColors: 'Theme Colors',
       presetChartThemes: 'Preset Chart Themes',

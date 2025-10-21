@@ -77,6 +77,7 @@
                 label: $t('ai.dialog.models.doubaoSeed'),
                 value: 'ark-doubao-seed-1.6-flash',
               },
+              { label: 'DeepSeek-v3（限）', value: 'openrouter-deepseek-v3' },
             ]"
           />
         </div>
@@ -272,8 +273,11 @@ const createPPT = async () => {
 
       const chunk = decoder.decode(value, { stream: true });
       try {
-        const slide: AIPPTSlide = JSON.parse(chunk);
-        AIPPT(templateSlides, [slide]);
+        const text = chunk.replace('```json', '').replace('```', '').trim();
+        if (text) {
+          const slide: AIPPTSlide = JSON.parse(chunk);
+          AIPPT(templateSlides, [slide]);
+        }
       } catch (err) {
         // eslint-disable-next-line
         console.error(err);

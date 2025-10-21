@@ -1,5 +1,5 @@
 import { getBackgroundStyle } from '@/hooks/useSlideBackgroundStyle';
-import { getThemes } from '@/hooks/useSlideTemplates';
+import { getSlideTemplates, getThemes } from '@/hooks/useSlideTemplates';
 import { initializeFonts } from '@/utils/font';
 import { convertToSlide } from '@/utils/slideLayout';
 
@@ -8,4 +8,5 @@ export default {
   convertToSlide,
   initializeFonts,
   getThemes,
+  getSlideTemplates,
 };

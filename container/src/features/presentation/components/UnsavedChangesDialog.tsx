@@ -21,7 +21,7 @@ export const UnsavedChangesDialog = ({ open, onOpenChange, onStay, onLeave }: Un
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="z-1000 cursor-default">
         <DialogHeader>
           <DialogTitle>{t('presentation.unsavedChanges.title')}</DialogTitle>
           <DialogDescription>{t('presentation.unsavedChanges.description')}</DialogDescription>

@@ -101,7 +101,7 @@ watch(isInitialLoad, () => {
 });
 
 // When the application is unloaded, record the current indexedDB database ID in localStorage for later database cleanup
-window.addEventListener('unload', () => {
+window.addEventListener('beforeunload', () => {
   const discardedDB = localStorage.getItem(LOCALSTORAGE_KEY_DISCARDED_DB);
   const discardedDBList: string[] = discardedDB ? JSON.parse(discardedDB) : [];
 

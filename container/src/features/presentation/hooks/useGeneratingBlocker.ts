@@ -12,9 +12,13 @@ export const useGeneratingBlocker = (onProceed: () => void) => {
   const blocker = useBlocker(
     useCallback(
       ({ currentLocation, nextLocation }: { currentLocation: any; nextLocation: any }) => {
+        // Don't block navigation to presentation detail pages (intentional navigation after generation)
+        const isNavigatingToPresentation = nextLocation.pathname.startsWith('/presentation/');
+
         const shouldBlock =
           (isOutlineGenerating || isPresentationGenerating) &&
-          currentLocation.pathname !== nextLocation.pathname;
+          currentLocation.pathname !== nextLocation.pathname &&
+          !isNavigatingToPresentation;
 
         if (shouldBlock) {
           setShowDialog(true);

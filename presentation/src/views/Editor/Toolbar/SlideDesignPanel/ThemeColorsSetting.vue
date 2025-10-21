@@ -2,7 +2,35 @@
   <div class="theme-colors-setting">
     <div class="title">{{ $t('styling.slide.design.editThemeColors') }}</div>
 
-    <div class="list">
+    <Draggable
+      class="list"
+      :modelValue="themeColors"
+      :animation="200"
+      :scroll="true"
+      :scrollSensitivity="50"
+      handle=".label"
+      @end="handleDragEnd"
+      itemKey="id"
+    >
+      <template #item="{ element, index }">
+        <div class="row">
+          <div class="label" style="width: 40%">
+            {{ $t('styling.slide.themeColors.setting.slideThemeColor') }} {{ index + 1 }}:
+          </div>
+          <Popover trigger="click" style="width: 60%">
+            <template #content>
+              <ColorPicker
+                :modelValue="element"
+                @update:modelValue="(value: string) => (themeColors[index] = value)"
+              />
+            </template>
+            <ColorButton :color="element" />
+          </Popover>
+        </div>
+      </template>
+    </Draggable>
+
+    <!-- <div class="list">
       <div class="row" v-for="(item, index) in themeColors" :key="index">
         <div class="label" style="width: 40%">
           {{ $t('styling.slide.themeColors.setting.slideThemeColor') }} {{ index + 1 }}:
@@ -17,7 +45,7 @@
           <ColorButton :color="item" />
         </Popover>
       </div>
-    </div>
+    </div> -->
 
     <Button class="btn" type="primary" @click="setThemeColors()">{{
       $t('styling.slide.design.confirm')
@@ -33,6 +61,7 @@ import Popover from '@/components/Popover.vue';
 import ColorPicker from '@/components/ColorPicker/index.vue';
 import ColorButton from '@/components/ColorButton.vue';
 import Button from '@/components/Button.vue';
+import Draggable from 'vuedraggable';
 
 const emit = defineEmits<{
   (event: 'close'): void;
@@ -60,6 +89,15 @@ const setThemeColors = () => {
   slidesStore.setTheme({ themeColors: colors });
   emit('close');
 };
+
+const handleDragEnd = (eventData: { newIndex: number; oldIndex: number }) => {
+  const { newIndex, oldIndex } = eventData;
+  if (newIndex === undefined || oldIndex === undefined || newIndex === oldIndex) return;
+
+  const item = themeColors.value[oldIndex];
+  themeColors.value.splice(oldIndex, 1);
+  themeColors.value.splice(newIndex, 0, item);
+};
 </script>
 
 <style lang="scss" scoped>
@@ -80,6 +118,7 @@ const setThemeColors = () => {
 }
 .label {
   font-size: 13px;
+  cursor: move;
 }
 .btn {
   width: 100%;

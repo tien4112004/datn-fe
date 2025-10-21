@@ -4,9 +4,11 @@
 
     <Input
       class="input"
+      ref="inputRef"
       v-if="type === 'web'"
       v-model="address"
       :placeholder="t('canvas.linkDialog.enterWebAddress')"
+      @enter="save()"
     />
 
     <Select class="input" v-if="type === 'slide'" v-model:value="slideId" :options="slideOptions" />
@@ -24,7 +26,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, ref, useTemplateRef, nextTick, onUnmounted } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useMainStore, useSlidesStore } from '@/store';
 import type { ElementLinkType, PPTElementLink } from '@/types/slides';
@@ -48,12 +50,14 @@ const emit = defineEmits<{
   (event: 'close'): void;
 }>();
 
-const { handleElement } = storeToRefs(useMainStore());
+const mainStore = useMainStore();
+const { handleElement } = storeToRefs(mainStore);
 const { slides, currentSlide } = storeToRefs(useSlidesStore());
 
 const type = ref<ElementLinkType>('web');
 const address = ref('');
 const slideId = ref('');
+const inputRef = useTemplateRef<InstanceType<typeof Input>>('inputRef');
 
 const slideOptions = computed(() => {
   return slides.value.map((item, index) => ({
@@ -79,12 +83,18 @@ const tabs: TabItem[] = [
 const { setLink } = useLink();
 
 onMounted(() => {
+  mainStore.setDisableHotkeysState(true);
+
   if (handleElement.value?.link) {
     if (handleElement.value.link.type === 'web') address.value = handleElement.value.link.target;
     else if (handleElement.value.link.type === 'slide') slideId.value = handleElement.value.link.target;
 
     type.value = handleElement.value.link.type;
   }
+});
+
+onUnmounted(() => {
+  mainStore.setDisableHotkeysState(false);
 });
 
 const save = () => {

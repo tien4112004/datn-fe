@@ -66,7 +66,7 @@ export async function initializeFonts(): Promise<void> {
 
   FONTS.forEach((font) => {
     const available = testFontRendering(font.value);
-    console.log(`${font.label}: ${available ? 'AVAILABLE' : 'FALLBACK'}`);
+    // console.log(`${font.label}: ${available ? 'AVAILABLE' : 'FALLBACK'}`);
 
     if (!available && font.value !== 'sans-serif') {
       fallbackFonts.push(font.value);
@@ -91,7 +91,7 @@ export async function initializeFonts(): Promise<void> {
 
     FONTS.forEach((font) => {
       const available = testFontRendering(font.value);
-      console.log(`${font.label}: ${available ? 'AVAILABLE' : 'STILL_FALLBACK'}`);
+      //   console.log(`${font.label}: ${available ? 'AVAILABLE' : 'STILL_FALLBACK'}`);
     });
   } catch (error) {
     console.error('Error loading some Google Fonts:', error);

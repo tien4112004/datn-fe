@@ -32,6 +32,8 @@ export default {
       stackedStyle: 'Kiểu xếp chồng',
       useSmoothCurve: 'Dùng đường cong mượt',
       backgroundFill: 'Nền biểu đồ',
+      coordinatesAndText: 'Tọa độ và chữ',
+      gridColor: 'Màu lưới',
       textColor: 'Màu chữ',
       themeColors: 'Màu chủ đề',
       presetChartThemes: 'Chủ đề biểu đồ có sẵn',

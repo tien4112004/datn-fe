@@ -385,8 +385,8 @@ importers:
         specifier: ^4.0.1
         version: 4.0.1
       pptxtojson:
-        specifier: ^1.4.0
-        version: 1.5.0
+        specifier: ^1.5.2
+        version: 1.6.0
       prosemirror-commands:
         specifier: ^1.6.0
         version: 1.7.1
@@ -8077,8 +8077,8 @@ packages:
   pptxgenjs@4.0.1:
     resolution: {integrity: sha512-TeJISr8wouAuXw4C1F/mC33xbZs/FuEG6nH9FG1Zj+nuPcGMP5YRHl6X+j3HSUnS1f3at6k75ZZXPMZlA5Lj9A==}
 
-  pptxtojson@1.5.0:
-    resolution: {integrity: sha512-1wxnWBSwrEPsSZBSbYj8uuFFXKccuyrX2R5mJRY1ipnlWHTTDcREpLoxirkHJtZTB2A85A97BdX9ZvcLBfAJDA==}
+  pptxtojson@1.6.0:
+    resolution: {integrity: sha512-yLVj5o//8LCowpWtn/jj7GAj1exa/c1D8mukaZtEEXA5IoIK7DR6E/6vOYVpEg2uXbgY9IIeoCfMwK9acOSL/w==}
 
   precinct@12.2.0:
     resolution: {integrity: sha512-NFBMuwIfaJ4SocE9YXPU/n4AcNSoFMVFjP72nvl3cx69j/ke61/hPOWFREVxLkFhhEGnA8ZuVfTqJBa+PK3b5w==}
@@ -19060,7 +19060,7 @@ snapshots:
       image-size: 1.2.1
       jszip: 3.10.1
 
-  pptxtojson@1.5.0:
+  pptxtojson@1.6.0:
     dependencies:
       jszip: 3.10.1
       tinycolor2: 1.6.0

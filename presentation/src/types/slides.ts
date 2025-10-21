@@ -758,6 +758,22 @@ export interface SectionTag {
 export type SlideType = 'cover' | 'contents' | 'transition' | 'content' | 'end';
 
 /**
+ * Layout metadata for template switching
+ */
+export interface SlideLayoutMetadata {
+  /** Original layout data for re-rendering */
+  schema: any;
+  /** Current template ID (e.g., 'two-column-default') */
+  templateId: string;
+  /** Layout type (e.g., 'two_column') */
+  layoutType: string;
+  /** Template preview mode - true means slide is locked for editing until template is confirmed */
+  isTemplatePreview?: boolean;
+  /** User-customized template parameters (e.g., { IMAGE_RATIO: 0.5, SIDE_PADDING: 40 }) */
+  parameterOverrides?: Record<string, number>;
+}
+
+/**
  * Slide page
  *
  * id: page ID
@@ -775,6 +791,8 @@ export type SlideType = 'cover' | 'contents' | 'transition' | 'content' | 'end';
  * turningMode?: turning mode
  *
  * slideType?: page type
+ *
+ * layout?: layout metadata for template switching (AI-generated slides only)
  */
 export interface Slide {
   id: string;
@@ -786,6 +804,7 @@ export interface Slide {
   turningMode?: TurningMode;
   sectionTag?: SectionTag;
   type?: SlideType;
+  layout?: SlideLayoutMetadata;
 }
 
 /**

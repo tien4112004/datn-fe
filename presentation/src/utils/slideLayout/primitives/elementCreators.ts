@@ -1,22 +1,15 @@
 import {
-  type PPTElement,
   type PPTImageElement,
   type PPTTextElement,
   type PPTShapeElement,
   type SlideBackground,
   type SlideTheme,
   ShapePathFormulasKeys,
-  type PPTLineElement,
   type ImageElementClip,
 } from '@/types/slides';
 import { getImageSize } from '../../image';
 import { SHAPE_PATH_FORMULAS } from '../../../configs/shapes';
-import type {
-  ImageLayoutBlockInstance,
-  TextLayoutBlockInstance,
-  Bounds,
-  LayoutBlockInstance,
-} from '../types';
+import type { ImageLayoutBlockInstance, TextLayoutBlockInstance, LayoutBlockInstance } from '../types';
 import { DEFAULT_RADIUS_MULTIPLIER, DEFAULT_TITLE_LINE_SPACING } from './layoutConstants';
 import { layoutItemsInBlock } from './positioning';
 import { calculateLargestOptimalFontSize, applyFontSizeToElement } from './elementMeasurement';
@@ -75,7 +68,6 @@ export function createTextElement(
     top: position.top,
     width: dimensions.width,
     height: dimensions.height,
-    shadow: container.shadow,
   } as PPTTextElement;
 }
 
@@ -398,32 +390,11 @@ export async function createImageElement(
 }
 
 /**
- * Create a title line element
- */
-export function createTitleLine(titleDimensions: Bounds, theme: SlideTheme): PPTLineElement {
-  return {
-    id: crypto.randomUUID(),
-    type: 'line',
-    style: 'solid',
-    left: titleDimensions.left,
-    top: titleDimensions.top + titleDimensions.height + DEFAULT_TITLE_LINE_SPACING,
-    start: [0, 0],
-    end: [titleDimensions.width, 0],
-    width: 2,
-    color: theme.themeColors[0],
-    points: ['', ''],
-  } as PPTLineElement;
-}
-
-/**
  * Create a card (shape) element
  */
 export function createCard(container: LayoutBlockInstance): PPTShapeElement {
   const formula = SHAPE_PATH_FORMULAS[ShapePathFormulasKeys.ROUND_RECT_CUSTOM];
-  const radiusValue =
-    container.border?.radius && typeof container.border.radius === 'number'
-      ? container.border.radius
-      : Math.min(container.bounds.width, container.bounds.height) * DEFAULT_RADIUS_MULTIPLIER;
+  const radiusValue = container.border?.radius || 0;
 
   const radiusMultiplier = radiusValue / Math.min(container.bounds.width, container.bounds.height);
 

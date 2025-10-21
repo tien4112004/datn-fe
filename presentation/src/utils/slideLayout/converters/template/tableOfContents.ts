@@ -10,7 +10,7 @@ export const tableOfContentsTemplates: Template[] = [
         label: 'Side Padding (px)',
         defaultValue: 20,
         min: 0,
-        max: 200,
+        max: 50,
         step: 1,
         description: 'Left/right slide padding',
       },

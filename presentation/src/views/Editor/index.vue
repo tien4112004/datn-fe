@@ -5,6 +5,44 @@
       <Thumbnails class="layout-content-left" />
       <div class="layout-content-center">
         <CanvasTool class="center-top" />
+
+        <!-- Template Preview Mode Banner -->
+        <div v-if="isCurrentSlideLocked" class="preview-mode-banner">
+          <div class="banner-content">
+            <div class="banner-icon">
+              <IconSwatchBook />
+            </div>
+            <div class="banner-text">
+              <div class="banner-title">Template Preview Mode</div>
+              <div class="banner-subtitle">
+                Choose your preferred layout. Editing will unlock after you confirm your template choice.
+              </div>
+            </div>
+            <div class="banner-buttons">
+              <button class="banner-button" @click="confirmCurrentTemplate">
+                <IconCheckOne />
+                Confirm & Start Editing
+              </button>
+              <button
+                v-if="hasLockedSlides && !showConfirmAllButton"
+                class="banner-button banner-button-secondary"
+                @click="promptConfirmAll"
+              >
+                <IconCheckOne />
+                Confirm All Slides
+              </button>
+              <button
+                v-if="showConfirmAllButton"
+                class="banner-button banner-button-confirm"
+                @click="confirmAllTemplates"
+              >
+                <IconCheckOne />
+                Click Again to Confirm All
+              </button>
+            </div>
+          </div>
+        </div>
+
         <Canvas class="center-body" />
         <div class="center-bottom" @click="openRemarkDrawer">
           <div class="remark-preview">
@@ -57,6 +95,9 @@ import { storeToRefs } from 'pinia';
 import { useMainStore, useSlidesStore } from '@/store';
 import useGlobalHotkey from '@/hooks/useGlobalHotkey';
 import usePasteEvent from '@/hooks/usePasteEvent';
+import useSlideEditLock from '@/hooks/useSlideEditLock';
+import message from '@/utils/message';
+import { ToolbarStates } from '@/types/toolbar';
 
 import EditorHeader from './EditorHeader/index.vue';
 import Canvas from './Canvas/index.vue';
@@ -84,15 +125,49 @@ const {
   showAIPPTDialog,
 } = storeToRefs(mainStore);
 const { currentSlide } = storeToRefs(slidesStore);
+const {
+  isCurrentSlideLocked,
+  hasLockedSlides,
+  confirmCurrentTemplate: confirmTemplate,
+  confirmAllTemplates: confirmAll,
+} = useSlideEditLock();
+
 const closeExportDialog = () => mainStore.setDialogForExport('');
 const closeAIPPTDialog = () => mainStore.setAIPPTDialogState(false);
 
 const remarkHeight = ref(240);
 const showRemarkDrawer = ref(false);
+const showConfirmAllButton = ref(false);
 
 // Function to open the drawer for editing
 const openRemarkDrawer = () => {
   showRemarkDrawer.value = true;
+};
+
+// Function to confirm template from banner
+const confirmCurrentTemplate = () => {
+  confirmTemplate();
+  mainStore.setToolbarState(ToolbarStates.SLIDE_DESIGN);
+  message.success('Template confirmed! You can now edit your slide.');
+};
+
+// Function to show confirm all button (first step)
+const promptConfirmAll = () => {
+  showConfirmAllButton.value = true;
+  // Auto-hide after 5 seconds
+  setTimeout(() => {
+    showConfirmAllButton.value = false;
+  }, 5000);
+};
+
+// Function to confirm all templates (second step)
+const confirmAllTemplates = () => {
+  const confirmedCount = confirmAll();
+  mainStore.setToolbarState(ToolbarStates.SLIDE_DESIGN);
+  showConfirmAllButton.value = false;
+  message.success(
+    `Confirmed ${confirmedCount} slide${confirmedCount > 1 ? 's' : ''}! All slides are now editable.`
+  );
 };
 
 useGlobalHotkey();
@@ -181,5 +256,115 @@ usePasteEvent();
 .layout-content-right {
   width: 320px;
   height: 100%;
+}
+
+.preview-mode-banner {
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 12px 16px;
+  color: white;
+
+  .banner-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    max-width: 100%;
+  }
+
+  .banner-icon {
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+  }
+
+  .banner-text {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .banner-title {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+
+  .banner-subtitle {
+    font-size: 12px;
+    opacity: 0.9;
+    line-height: 1.4;
+  }
+
+  .banner-buttons {
+    flex-shrink: 0;
+    display: flex;
+    gap: 8px;
+  }
+
+  .banner-button {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: white;
+    color: #667eea;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.95);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+
+    &.banner-button-secondary {
+      background: rgba(255, 255, 255, 0.15);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.25);
+        border-color: rgba(255, 255, 255, 0.6);
+      }
+    }
+
+    &.banner-button-confirm {
+      background: #fca43f;
+      color: #92400e;
+      border: 2px solid #f59e0b;
+      animation: pulse-glow 1.5s ease-in-out infinite;
+
+      &:hover {
+        background: #fac822;
+        border-color: #d97706;
+        transform: translateY(-1px) scale(1.02);
+      }
+    }
+  }
+}
+
+@keyframes pulse-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 8px rgba(251, 191, 36, 0.6);
+  }
+  50% {
+    box-shadow: 0 0 16px rgba(251, 191, 36, 0.9);
+  }
 }
 </style>

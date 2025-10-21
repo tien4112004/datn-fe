@@ -7,7 +7,10 @@
     @dblclick="($event) => handleDblClick($event)"
     v-contextmenu="contextmenus"
     v-click-outside="removeEditorAreaFocus"
+    :class="{ 'preview-mode': isCurrentSlideLocked }"
   >
+    <!-- Preview Mode Overlay -->
+    <div v-if="isCurrentSlideLocked" class="preview-overlay" @click.stop></div>
     <ElementCreateSelection
       v-if="creatingElement"
       @created="(data) => insertElementFromCreateSelection(data)"
@@ -117,6 +120,7 @@ import useScaleCanvas from '@/hooks/useScaleCanvas';
 import useScreening from '@/hooks/useScreening';
 import useSlideHandler from '@/hooks/useSlideHandler';
 import useCreateElement from '@/hooks/useCreateElement';
+import useSlideEditLock from '@/hooks/useSlideEditLock';
 
 import EditableElement from './EditableElement.vue';
 import MouseSelection from './MouseSelection.vue';
@@ -188,6 +192,7 @@ const { pasteElement } = useCopyAndPasteElement();
 const { enterScreeningFromStart } = useScreening();
 const { updateSlideIndex } = useSlideHandler();
 const { createTextElement, createShapeElement } = useCreateElement();
+const { isCurrentSlideLocked } = useSlideEditLock();
 
 // Clear focus elements when rendering components
 // This situation occurs when entering presentation mode with focused elements, and upon exiting, the original focus needs to be cleared (as the page may have switched).
@@ -199,6 +204,9 @@ onMounted(() => {
 
 // Click on the blank area of the canvas: clear focus elements, set canvas focus, clear text selection, and reset format painter state
 const handleClickBlankArea = (e: MouseEvent) => {
+  // Block all interactions in preview mode
+  if (isCurrentSlideLocked.value) return;
+
   if (activeElementIdList.value.length) mainStore.setActiveElementIdList([]);
 
   if (!spaceKeyState.value) updateMouseSelection(e);
@@ -211,6 +219,9 @@ const handleClickBlankArea = (e: MouseEvent) => {
 
 // Double-click on a blank area to insert text
 const handleDblClick = (e: MouseEvent) => {
+  // Block text creation in preview mode
+  if (isCurrentSlideLocked.value) return;
+
   if (activeElementIdList.value.length || creatingElement.value || creatingCustomShape.value) return;
   if (!viewportRef.value) return;
 
@@ -349,6 +360,10 @@ provide(injectKeySlideScale, canvasScale);
   user-select: none;
   overflow: hidden;
   position: relative;
+
+  &.preview-mode {
+    cursor: not-allowed;
+  }
 }
 .drag-mask {
   cursor: grab;
@@ -365,5 +380,20 @@ provide(injectKeySlideScale, canvasScale);
   top: 0;
   left: 0;
   transform-origin: 0 0;
+}
+
+.preview-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.02);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  pointer-events: all;
+  cursor: not-allowed;
 }
 </style>

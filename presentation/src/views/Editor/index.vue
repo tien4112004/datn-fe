@@ -270,6 +270,7 @@ usePasteEvent();
     align-items: center;
     gap: 12px;
     max-width: 100%;
+    max-height: 40px;
   }
 
   .banner-icon {

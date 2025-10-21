@@ -42,6 +42,12 @@ const viewport = {
 };
 
 export const getThemes = () => THEMES_DATA;
+export const getSlideTemplates: () => any[] = () => {
+  return Object.entries(slideTemplates)
+    .filter(([key]) => key !== 'test')
+    .map(([_, value]) => value[0])
+    .flat();
+};
 
 const slideTemplates: Record<string, any[]> = {
   'title-with-subtitle': TEMPLATE_VARIATIONS[SLIDE_LAYOUT_TYPE.TITLE].map((tmpl) => ({

@@ -58,9 +58,7 @@ export const PresentationFormProvider = ({ children }: PresentationFormProviderP
         name: '',
         provider: '',
       },
-      theme: {
-        id: 'classic',
-      },
+      theme: {},
       contentLength: '',
       imageModel: {
         name: '',

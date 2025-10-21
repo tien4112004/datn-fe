@@ -11,7 +11,7 @@ import '@/assets/styles/font.scss';
 import '@/assets/styles/scope.scss';
 import '@/assets/styles/tailwind.css';
 import i18n from '@/locales';
-import { useSlidesStore } from '@/store';
+import { useSlidesStore, useSaveStore } from '@/store';
 import { convertToSlide, updateImageSource } from '@/utils/slideLayout';
 import type { SlideLayoutSchema, SlideViewport } from '@/utils/slideLayout/types';
 import type { PPTImageElement, Slide, SlideTheme } from '@/types/slides';
@@ -23,6 +23,7 @@ export function mount(el: string | Element, props: Record<string, unknown>) {
     addSlide?: (data: SlideLayoutSchema, order?: number, theme?: SlideTheme) => Promise<Slide>;
     updateThemeAndViewport?: (theme: SlideTheme, viewport: SlideViewport) => void;
     clearSlides?: () => void;
+    parsed?: () => void;
   };
 
   const pinia = createPinia();
@@ -57,6 +58,10 @@ export function mount(el: string | Element, props: Record<string, unknown>) {
 
     updatedSlides[slideIndex] = updatedSlide;
     slidesStore.setSlides(updatedSlides);
+
+    setTimeout(() => {
+      useSaveStore().markSaved();
+    }, 20);
   };
 
   app.replaceSlides = async (dataArray, theme) => {
@@ -149,6 +154,11 @@ export function mount(el: string | Element, props: Record<string, unknown>) {
     const slidesStore = useSlidesStore();
     slidesStore.setSlides([]);
     slidesStore.updateSlideIndex(0);
+  };
+
+  app.parsed = () => {
+    const saveStore = useSaveStore();
+    saveStore.markSaved();
   };
 
   app.mount(el);

@@ -22,6 +22,7 @@ interface VueEditorApp {
   updateThemeAndViewport: (theme: SlideTheme, viewport: SlideViewport) => void;
   updateImageElement: (slideId: string, elementId: string, image: string) => void;
   clearSlides: () => void;
+  parsed: () => void;
 }
 
 interface MessageDetail {
@@ -79,6 +80,7 @@ export const usePresentationDataProcessor = (
         toast.error(t('common:presentation.processFailed'));
       } finally {
         setIsProcessing(false);
+        app?.parsed();
       }
     };
 

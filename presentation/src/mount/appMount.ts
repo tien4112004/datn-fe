@@ -2,7 +2,7 @@ import { createApp, watch, type App } from 'vue';
 import { createPinia, storeToRefs } from 'pinia';
 import icon from '../plugins/icon';
 import directive from '../plugins/directive/index';
-import AppComponent from '../App.vue';
+import AppComponent from '../views/MainApp.vue';
 import 'prosemirror-view/style/prosemirror.css';
 import 'animate.css';
 import '@/assets/styles/tailwind.css';

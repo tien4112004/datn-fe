@@ -8,6 +8,11 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/ThumbnailView.vue'),
   },
   {
+    path: '/mobile',
+    name: 'mobile',
+    component: () => import('@/views/MobileApp.vue'),
+  },
+  {
     path: '/',
     name: 'main',
     component: () => import('@/views/MainApp.vue'),

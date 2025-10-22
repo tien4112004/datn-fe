@@ -113,5 +113,12 @@ window.addEventListener('beforeunload', () => {
 </script>
 
 <style lang="scss">
-// Styles are in App.vue
+#app {
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+  overflow-y: auto;
+  margin: 0;
+  padding: 0;
+}
 </style>

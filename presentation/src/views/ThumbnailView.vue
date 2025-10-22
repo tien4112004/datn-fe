@@ -1,20 +1,5 @@
 <template>
-  <div
-    class="thumbnail-view"
-    :style="{
-      width: '100vw',
-      height: '100vh',
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: '#f5f5f5',
-    }"
-  >
-    <ThumbnailSlide v-if="currentSlide" :slide="currentSlide" :size="slideSize" :visible="true" />
-    <div v-else class="loading">
-      {{ $t('elements.media.thumbnails.loading') }}
-    </div>
-  </div>
+  <ThumbnailSlide v-if="currentSlide" :slide="currentSlide" :size="slideSize" :visible="true" />
 </template>
 
 <script lang="ts" setup>
@@ -92,20 +77,15 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
-.thumbnail-view {
-  width: 100vw;
-  height: 100vh;
+#app {
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+  overflow-y: auto;
+  margin: 0;
+  padding: 0;
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #f5f5f5;
-  overflow: hidden;
-  padding: 20px;
-  box-sizing: border-box;
-
-  .loading {
-    font-size: 16px;
-    color: #666;
-  }
 }
 </style>

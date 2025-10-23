@@ -3,41 +3,22 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted, computed } from 'vue';
-import { storeToRefs } from 'pinia';
-import { useSlidesStore } from '@/store';
+import { ref, onMounted } from 'vue';
 import ThumbnailSlide from '@/views/components/ThumbnailSlide/index.vue';
 import type { Slide } from '@/types/slides';
 
-const slidesStore = useSlidesStore();
-const { slides } = storeToRefs(slidesStore);
-
-const currentSlideIndex = ref(0);
+const currentSlide = ref<Slide | null>(null);
 const slideSize = ref<number | 'auto'>('auto');
 
-const currentSlide = computed(() => {
-  if (slides.value.length > 0 && currentSlideIndex.value < slides.value.length) {
-    return slides.value[currentSlideIndex.value];
-  }
-  return null;
-});
-
 // Function to set slide data from Flutter InAppWebView
-const setSlideData = (slideData: Slide | Slide[], slideIndex: number = 0) => {
-  if (Array.isArray(slideData)) {
-    slidesStore.setSlides(slideData);
-    currentSlideIndex.value = slideIndex;
-  } else {
-    slidesStore.setSlides([slideData]);
-    currentSlideIndex.value = 0;
-  }
+const setSlideData = (slideData: Slide) => {
+  currentSlide.value = slideData;
 };
 
-// Function to change the current slide index
-const setSlideIndex = (index: number) => {
-  if (index >= 0 && index < slides.value.length) {
-    currentSlideIndex.value = index;
-  }
+// Function to change the current slide (for backwards compatibility)
+const setSlideIndex = (_index: number) => {
+  // No-op since we only store one slide now
+  console.warn('setSlideIndex is deprecated in ThumbnailView - only single slide storage is supported');
 };
 
 // Function to set the thumbnail size
@@ -63,7 +44,7 @@ onMounted(() => {
 
     switch (type) {
       case 'setSlideData':
-        setSlideData(data.slideData, data.slideIndex || 0);
+        setSlideData(data.slideData);
         break;
       case 'setSlideIndex':
         setSlideIndex(data.index);

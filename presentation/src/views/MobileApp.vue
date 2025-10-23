@@ -1,17 +1,5 @@
 <template>
-  <div class="mobile-app">
-    <div v-if="loading" class="loading-container">
-      <div class="spinner"></div>
-      <p>Loading presentation...</p>
-    </div>
-    <div v-else-if="error" class="error-container">
-      <div class="error-icon">⚠️</div>
-      <p class="error-message">{{ error }}</p>
-    </div>
-    <template v-else-if="isInitialized">
-      <Mobile />
-    </template>
-  </div>
+  <Mobile />
 </template>
 
 <script lang="ts" setup>
@@ -48,7 +36,6 @@ const handlePresentationData = async (event: MessageEvent) => {
 
       // Initialize container store with presentation data
       containerStore.initialize({
-        titleTest: presentation.title || 'Presentation',
         isRemote: true,
         presentation: presentation as Presentation,
       });
@@ -148,65 +135,3 @@ onUnmounted(() => {
   delete (window as any).setSlideIndex;
 });
 </script>
-
-<style lang="scss" scoped>
-.mobile-app {
-  width: 100%;
-  height: 100%;
-  background-color: #1d1d1d;
-  overflow: hidden;
-}
-
-.loading-container,
-.error-container {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 20px;
-}
-
-.loading-container {
-  color: #fff;
-
-  .spinner {
-    width: 50px;
-    height: 50px;
-    border: 4px solid rgba(255, 255, 255, 0.1);
-    border-top-color: #fff;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin-bottom: 20px;
-  }
-
-  p {
-    font-size: 16px;
-    color: rgba(255, 255, 255, 0.7);
-  }
-}
-
-.error-container {
-  color: #fff;
-  text-align: center;
-
-  .error-icon {
-    font-size: 64px;
-    margin-bottom: 20px;
-  }
-
-  .error-message {
-    font-size: 16px;
-    color: rgba(255, 255, 255, 0.8);
-    max-width: 80%;
-    line-height: 1.5;
-  }
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-</style>

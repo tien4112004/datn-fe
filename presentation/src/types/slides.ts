@@ -858,8 +858,10 @@ export interface SlideTemplate {
 export interface Presentation {
   id: string;
   title: string;
-  width?: number;
-  height?: number;
+  viewport?: {
+    width: number;
+    height: number;
+  };
   theme?: SlideTheme;
   thumbnail?: Slide;
   slides?: Slide[];

@@ -10,10 +10,7 @@
       <ButtonGroup
         class="tw-flex tw-gap-[1px] tw-h-10 tw-cursor-pointer tw-rounded-md tw-text-sm tw-transition-all tw-duration-200 tw-ease-in-out"
       >
-        <Button
-          class="tw-w-32 tw-bg-secondary tw-text-secondary-foreground hover:tw-bg-primary hover:tw-text-primary-foreground tw-flex tw-flex-1 tw-items-center tw-justify-center tw-text-sm tw-font-medium tw-transition-colors tw-border-0"
-          @click="createSlide()"
-        >
+        <Button @click="createSlide()">
           <IconPlus class="tw-h-3.5 tw-w-3.5" />{{ $t('thumbnails.slides.addSlide') }}
         </Button>
         <Popover trigger="click" placement="bottom-start" v-model:value="presetLayoutPopoverVisible" center>
@@ -33,10 +30,7 @@
               "
             />
           </template>
-          <Button
-            class="tw-bg-secondary tw-text-secondary-foreground hover:tw-bg-primary hover:tw-text-primary-foreground tw-flex tw-items-center tw-justify-center tw-transition-colors tw-border-0"
-            ><IconDown class="tw-h-3.5 tw-w-3.5"
-          /></Button>
+          <Button><IconDown class="tw-h-3.5 tw-w-3.5" /></Button>
         </Popover>
       </ButtonGroup>
     </div>

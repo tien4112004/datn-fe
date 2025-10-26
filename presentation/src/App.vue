@@ -1,6 +1,6 @@
 <template>
   <template v-if="slides.length">
-    <Screen v-if="screening" />
+    <Screen v-if="screening" :isPresentingInitial="presenter" />
     <Editor v-else-if="_isPC" />
     <Mobile v-else />
   </template>
@@ -44,7 +44,7 @@ const containerStore = useContainerStore();
 const saveStore = useSaveStore();
 const { databaseId } = storeToRefs(mainStore);
 const { slides } = storeToRefs(slidesStore);
-const { screening } = storeToRefs(useScreenStore());
+const { screening, presenter } = storeToRefs(useScreenStore());
 
 // Track if this is the initial load to avoid marking as dirty
 let isInitialLoad = ref(true);

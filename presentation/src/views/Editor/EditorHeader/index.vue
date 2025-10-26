@@ -110,6 +110,16 @@
           Present
         </Button>
       </Popover>
+
+      <Popover trigger="click" center contentClass="!tw-p-0">
+        <template #content>
+          <ShareMenu @cancel="handleShareCancel" @share="handleShare" />
+        </template>
+        <Button class="menu-item" v-tooltip="'Share presentation'">
+          <IconShare class="icon" />
+          Share
+        </Button>
+      </Popover>
       <!-- <div
         class="menu-item"
         v-tooltip="$t('header.ai.aiGeneratePPT')"
@@ -170,11 +180,11 @@ import useImport from '@/hooks/useImport';
 import useSlideHandler from '@/hooks/useSlideHandler';
 import useSlideTemplates from '@/hooks/useSlideTemplates';
 import type { DialogForExportTypes } from '@/types/export';
-import message from '@/utils/message';
 
 import HotkeyDoc from './HotkeyDoc.vue';
 import SlideCreationDialog from './SlideCreationDialog.vue';
 import PresenterMenu from './PresenterMenu.vue';
+import ShareMenu from './ShareMenu.vue';
 import FileInput from '@/components/FileInput.vue';
 import FullscreenSpin from '@/components/FullscreenSpin.vue';
 import Drawer from '@/components/Drawer.vue';
@@ -183,6 +193,7 @@ import Popover from '@/components/Popover.vue';
 import PopoverMenuItem from '@/components/PopoverMenuItem.vue';
 import LanguageSwitcher from '@/components/LanguageSwitcher.vue';
 import Button from '@/components/Button.vue';
+import message from '@/utils/message';
 const mainStore = useMainStore();
 const slidesStore = useSlidesStore();
 const { title, theme } = storeToRefs(slidesStore);
@@ -274,6 +285,14 @@ const showBackButton = computed(() => {
     new URL(document.referrer).origin === window.location.origin
   );
 });
+
+const handleShareCancel = () => {
+  message.info('Share canceled');
+};
+
+const handleShare = (options: { shareWithLink: boolean; allowEdit: boolean }) => {
+  message.success('Presentation shared successfully!');
+};
 </script>
 
 <style lang="scss" scoped>

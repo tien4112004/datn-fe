@@ -116,6 +116,9 @@ import {
   PlayCircle,
   SplitSquareHorizontal,
   ExternalLink,
+  Share2,
+  Users,
+  Globe,
 } from 'lucide-vue-next';
 
 export interface Icons {
@@ -254,6 +257,9 @@ export const icons: Icons = {
   IconPresentFromCurrent: PlayCircle,
   IconPresenterView: SplitSquareHorizontal,
   IconPresentSeparated: ExternalLink,
+  IconShare: Share2,
+  IconUsers: Users,
+  IconGlobe: Globe,
 };
 
 export default {

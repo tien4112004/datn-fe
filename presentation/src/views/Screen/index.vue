@@ -12,11 +12,18 @@ import useScreening from '@/hooks/useScreening';
 
 import BaseView from './BaseView.vue';
 import PresenterView from './PresenterView.vue';
+import { useScreenStore } from '@/store';
 
-const viewMode = ref<'base' | 'presenter'>('base');
+const prop = defineProps<{
+  isPresentingInitial?: boolean;
+}>();
+
+const viewMode = ref<'base' | 'presenter'>(prop.isPresentingInitial ? 'presenter' : 'base');
+const screenStore = useScreenStore();
 
 const changeViewMode = (mode: 'base' | 'presenter') => {
   viewMode.value = mode;
+  screenStore.setPresenter(mode === 'presenter');
 };
 
 const { exitScreening } = useScreening();

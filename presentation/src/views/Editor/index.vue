@@ -77,14 +77,7 @@
     <ExportDialog />
   </Modal>
 
-  <Modal
-    :visible="showAIPPTDialog"
-    :width="840"
-    :closeOnClickMask="false"
-    :closeOnEsc="false"
-    closeButton
-    @closed="closeAIPPTDialog()"
-  >
+  <Modal :visible="showAIPPTDialog" :width="840" @closed="closeAIPPTDialog()">
     <AIPPTDialog />
   </Modal>
 </template>

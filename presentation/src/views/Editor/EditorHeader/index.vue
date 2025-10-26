@@ -290,8 +290,22 @@ const handleShareCancel = () => {
   message.info('Share canceled');
 };
 
-const handleShare = (options: { shareWithLink: boolean; allowEdit: boolean }) => {
-  message.success('Presentation shared successfully!');
+const handleShare = (options: { shareWithLink: boolean; allowEdit: boolean; users: any[] }) => {
+  const { shareWithLink, allowEdit, users } = options;
+
+  let shareMessage = 'Share settings updated: ';
+
+  if (shareWithLink) {
+    shareMessage += `Anyone with the link can ${allowEdit ? 'comment' : 'view'}`;
+  } else {
+    shareMessage += 'Restricted access';
+  }
+
+  if (users.length > 0) {
+    shareMessage += ` | ${users.length} user${users.length > 1 ? 's' : ''} added`;
+  }
+
+  message.success(shareMessage);
 };
 </script>
 

@@ -186,30 +186,30 @@ watch(slideIndex, () => {
 const contextmenus = (): ContextmenuItem[] => {
   return [
     {
-      text: t('presenterView.previousPage'),
+      text: t('presentation.controls.navigation.previousPage'),
       subText: '↑ ←',
       disable: slideIndex.value <= 0,
       handler: () => turnPrevSlide(),
     },
     {
-      text: t('presenterView.nextPage'),
+      text: t('presentation.controls.navigation.nextPage'),
       subText: '↓ →',
       disable: slideIndex.value >= slides.value.length - 1,
       handler: () => turnNextSlide(),
     },
     {
-      text: t('presenterView.firstPage'),
+      text: t('presentation.controls.navigation.firstPage'),
       disable: slideIndex.value === 0,
       handler: () => turnSlideToIndex(0),
     },
     {
-      text: t('presenterView.lastPage'),
+      text: t('presentation.controls.navigation.lastPage'),
       disable: slideIndex.value === slides.value.length - 1,
       handler: () => turnSlideToIndex(slides.value.length - 1),
     },
     { divider: true },
     {
-      text: t('presenterView.penTool'),
+      text: t('presentation.controls.ui.penTool'),
       handler: () => (writingBoardToolVisible.value = true),
     },
     {

@@ -112,6 +112,10 @@ import {
   Undo2,
   Redo2,
   SwatchBook,
+  SkipBack,
+  PlayCircle,
+  SplitSquareHorizontal,
+  ExternalLink,
 } from 'lucide-vue-next';
 
 export interface Icons {
@@ -246,6 +250,10 @@ export const icons: Icons = {
   IconMore: MoreHorizontal,
   IconMoreApp: Grid3X3,
   IconSwatchBook: SwatchBook,
+  IconPresentFromStart: SkipBack,
+  IconPresentFromCurrent: PlayCircle,
+  IconPresenterView: SplitSquareHorizontal,
+  IconPresentSeparated: ExternalLink,
 };
 
 export default {

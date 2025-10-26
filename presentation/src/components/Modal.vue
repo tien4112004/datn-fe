@@ -2,7 +2,7 @@
   <Teleport to="body">
     <Transition name="modal-fade">
       <div
-        class="tw-fixed tw-inset-0 tw-z-[5000] tw-flex tw-items-center tw-justify-center tw-border-0 tw-outline-0"
+        class="tw-fixed tw-inset-0 tw-z-[5000] tw-flex tw-items-center tw-justify-center"
         ref="modalRef"
         v-show="visible"
         tabindex="-1"
@@ -10,23 +10,24 @@
         role="dialog"
         @keyup.esc="onEsc()"
       >
-        <div class="tw-absolute tw-inset-0 tw-bg-black/40" @click="onClickMask()"></div>
+        <div class="tw-absolute tw-inset-0 tw-bg-black/50" @click="onClickMask()"></div>
         <Transition
           name="modal-zoom"
           @afterLeave="contentVisible = false"
           @before-enter="contentVisible = true"
         >
           <div
-            class="tw-relative tw-z-[5001] tw-overflow-hidden tw-rounded-[var(--presentation-radius)] tw-bg-[var(--presentation-background)] tw-p-5 tw-shadow-sm"
+            class="tw-relative tw-z-[5001] tw-overflow-hidden tw-rounded tw-bg-background tw-p-6 tw-shadow-lg tw-duration-200"
             v-show="visible"
             :style="contentStyle"
           >
             <span
-              class="tw-absolute tw-right-4 tw-top-4 tw-flex tw-h-5 tw-w-5 tw-cursor-pointer tw-items-center tw-justify-center"
+              class="ring-offset-background focus:ring-ring data-[state=open]:bg-accent data-[state=open]:text-muted-foreground tw-absolute tw-right-4 tw-top-4 tw-flex tw-h-5 tw-w-5 tw-cursor-pointer tw-items-center tw-justify-center tw-rounded-xs tw-opacity-70 tw-transition-opacity hover:tw-opacity-100 focus:tw-outline-hidden focus:tw-ring-2 focus:tw-ring-offset-2 disabled:tw-pointer-events-none"
               v-if="closeButton"
               @click="close()"
-              ><IconClose
-            /></span>
+            >
+              <IconClose class="tw-size-4" />
+            </span>
             <slot v-if="contentVisible"></slot>
           </div>
         </Transition>

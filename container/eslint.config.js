@@ -1,4 +1,4 @@
-import base from '../eslint.base.js';
+import base from '../eslint.config.js';
 import js from '@eslint/js';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';

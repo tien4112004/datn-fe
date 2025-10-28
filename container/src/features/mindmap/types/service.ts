@@ -1,5 +1,5 @@
 import type { Service } from '@/shared/api';
-import type { MindMapNode, MindMapEdge } from './index';
+import type { MindMapNode, MindMapEdge } from './mindmap';
 import type { ApiResponse } from '@/shared/types/api';
 
 export interface MindmapData {

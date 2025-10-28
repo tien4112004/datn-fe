@@ -3,7 +3,7 @@ import { Separator } from '@radix-ui/react-separator';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import ClassTable from '../components/table/ClassTable';
-import ClassGrid from '../components/grid/ClassGrid';
+import ClassGrid from '../components/table/ClassGrid';
 import CreateClassControls from '../components/controls/CreateClassControls';
 import ViewToggle, { type ViewMode } from '../components/controls/ViewToggle';
 import ClassFilters from '../components/filters/ClassFilters';
@@ -11,7 +11,7 @@ import { useClassStore } from '../stores';
 
 const ClassListPage = () => {
   const { t } = useTranslation('classes', { keyPrefix: 'list' });
-  const { t: tPage } = useTranslation('page');
+  const { t: tPage } = useTranslation('common', { keyPrefix: 'pages' });
   const [searchParams, setSearchParams] = useSearchParams();
 
   const { viewMode, setViewMode } = useClassStore();

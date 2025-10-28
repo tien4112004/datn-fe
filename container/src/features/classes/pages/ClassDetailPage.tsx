@@ -34,7 +34,7 @@ interface LoaderData {
 
 const ClassDetailPage = () => {
   const { t } = useTranslation('classes', { keyPrefix: 'detail' });
-  const { t: tPage } = useTranslation('page');
+  const { t: tPage } = useTranslation('common', { keyPrefix: 'pages' });
   const { id } = useParams<{ id: string }>();
   const loaderData = useLoaderData() as LoaderData;
 

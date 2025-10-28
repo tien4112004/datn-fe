@@ -13,6 +13,7 @@ import mindmap from './locales/en/mindmap';
 import image from './locales/en/image';
 import projects from './locales/en/projects';
 import settings from './locales/en/settings';
+import classes from './locales/en/classes';
 
 /**
  * Resources type based on English translations
@@ -27,6 +28,7 @@ export interface Resources {
   image: typeof image;
   projects: typeof projects;
   settings: typeof settings;
+  classes: typeof classes;
 }
 
 /**

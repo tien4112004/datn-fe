@@ -10,6 +10,8 @@ import { getPresentationById } from '@/features/presentation/hooks/loaders';
 import Projects from '@/features/projects';
 import Settings from '@/features/settings';
 import Image from '@/features/image';
+import Classes from '@/features/classes';
+import { getClassById } from '@/features/classes/hooks/loaders';
 
 const router = createBrowserRouter([
   {
@@ -63,6 +65,15 @@ const router = createBrowserRouter([
             Component: Presentation.PresentationOutlinePage,
           },
         ],
+      },
+      {
+        path: 'classes',
+        Component: Classes.ClassListPage,
+      },
+      {
+        path: 'classes/:id',
+        Component: Classes.ClassDetailPage,
+        loader: getClassById,
       },
       {
         path: 'settings',

@@ -1,0 +1,42 @@
+# Build and distribution
+node_modules/
+dist/
+build/
+coverage/
+
+# Development and environment
+.env*
+.vscode/
+.idea/
+.DS_Store
+.git/
+.gitignore
+
+# Test and documentation
+tests/
+test/
+__tests__/
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+README.md
+LICENSE
+doc/
+
+# CI/CD and tooling
+.github/
+.husky/
+.turbo/
+
+# Logs and temporary
+*.log
+*.tmp
+.__mf__temp/
+
+# Source maps
+*.map
+
+# OS specific
+Thumbs.db
+*.swp

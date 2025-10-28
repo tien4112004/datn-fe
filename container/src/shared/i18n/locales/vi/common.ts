@@ -19,6 +19,21 @@ export default {
     pageNotFoundDescription: 'Xin lỗi, trang bạn đang tìm kiếm không tồn tại hoặc có thể đã được di chuyển.',
     goBack: 'Quay lại',
     goHome: 'Về trang chủ',
+    classes: 'Các lớp học',
+  },
+  status: {
+    active: 'Hoạt động',
+    inactive: 'Không hoạt động',
+  },
+  actions: {
+    view: 'Xem',
+    edit: 'Chỉnh sửa',
+    delete: 'Xóa',
+    close: 'Đóng',
+  },
+  pagination: {
+    previous: 'Trước',
+    next: 'Tiếp',
   },
   table: {
     presentation: {

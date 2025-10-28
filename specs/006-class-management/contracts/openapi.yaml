@@ -1,0 +1,130 @@
+openapi: 3.0.0
+info:
+  title: Class Management API
+  version: 1.0.0
+paths:
+  /api/classes:
+    post:
+      summary: Create a new class
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClassCreate'
+      responses:
+        '201':
+          description: Class created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Class'
+        '400':
+          description: Invalid request payload
+  /api/classes/{classId}:
+    put:
+      summary: Update an existing class
+      parameters:
+        - in: path
+          name: classId
+          required: true
+          schema:
+            type: string
+          description: ID of the class to update
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClassUpdate'
+      responses:
+        '200':
+          description: Class updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Class'
+        '400':
+          description: Invalid request payload
+        '404':
+          description: Class not found
+components:
+  schemas:
+    Class:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        name:
+          type: string
+          minLength: 3
+          maxLength: 100
+        description:
+          type: string
+          maxLength: 500
+          nullable: true
+        teacherId:
+          type: string
+        studentIds:
+          type: array
+          items:
+            type: string
+        schedule:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+        - name
+        - teacherId
+    ClassCreate:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 3
+          maxLength: 100
+        description:
+          type: string
+          maxLength: 500
+          nullable: true
+        teacherId:
+          type: string
+        studentIds:
+          type: array
+          items:
+            type: string
+        schedule:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+        - name
+        - teacherId
+    ClassUpdate:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+          minLength: 3
+          maxLength: 100
+        description:
+          type: string
+          maxLength: 500
+          nullable: true
+        teacherId:
+          type: string
+        studentIds:
+          type: array
+          items:
+            type: string
+        schedule:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+        - id
+        - name
+        - teacherId

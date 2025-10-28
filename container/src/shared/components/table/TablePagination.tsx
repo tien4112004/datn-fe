@@ -16,11 +16,17 @@ import {
 
 interface TablePaginationProps {
   table: Table<any>;
+  pageSizeOptions?: number[];
 }
 
 const PAGE_SIZE_OPTIONS = [5, 10, 20, 30, 40, 50];
 
-function TablePagination({ table, className, ...props }: TablePaginationProps & React.ComponentProps<'div'>) {
+function TablePagination({
+  table,
+  className,
+  pageSizeOptions = PAGE_SIZE_OPTIONS,
+  ...props
+}: TablePaginationProps & React.ComponentProps<'div'>) {
   const { t } = useTranslation('common', { keyPrefix: 'table.pagination' });
   const { pageIndex, pageSize } = table.getState().pagination;
   const currentPage = pageIndex + 1;
@@ -42,8 +48,8 @@ function TablePagination({ table, className, ...props }: TablePaginationProps & 
       pages.push(1);
 
       // Calculate start and end for middle pages
-      let start = Math.max(2, currentPage - sidePages);
-      let end = Math.min(totalPages - 1, currentPage + sidePages);
+      const start = Math.max(2, currentPage - sidePages);
+      const end = Math.min(totalPages - 1, currentPage + sidePages);
 
       // Add ellipsis before middle pages if needed
       if (start > 2) {
@@ -92,7 +98,7 @@ function TablePagination({ table, className, ...props }: TablePaginationProps & 
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {PAGE_SIZE_OPTIONS.map((size) => (
+              {pageSizeOptions.map((size) => (
                 <SelectItem key={size} value={size.toString()}>
                   {size}
                 </SelectItem>

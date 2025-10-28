@@ -1,0 +1,6 @@
+First Name,Last Name,Email
+"John","Smith",john@example.com
+"Jane Watson ","",jane@example.com
+This is not valid CSV format with mismatched quotes
+Bob,Johnson,bob@example.com,"extra","columns","here"
+"Alice"

@@ -7,3 +7,8 @@ node_modules/
 **/.turbo/
 **/.turbo
 index.html
+build/
+coverage/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml

@@ -41,7 +41,18 @@ i18n
     // Default namespace if none specified
     defaultNS: 'common',
     // Namespaces to load by default
-    ns: ['common', 'glossary', 'errors', 'auth', 'presentation', 'image', 'projects', 'settings', 'mindmap'],
+    ns: [
+      'common',
+      'glossary',
+      'errors',
+      'presentation',
+      'image',
+      'projects',
+      'settings',
+      'mindmap',
+      'auth',
+      'classes',
+    ],
     interpolation: {
       escapeValue: false,
     },

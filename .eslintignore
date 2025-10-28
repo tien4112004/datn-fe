@@ -1,0 +1,51 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Build outputs
+dist/
+**/dist/
+build/
+**/build/
+.turbo/
+**/.turbo/
+
+# Generated files
+*.min.js
+*.min.css
+**/*.min.js
+**/*.min.css
+
+# Test files (if not linting)
+coverage/
+**/coverage/
+
+# Configuration
+.vscode/
+.idea/
+.git/
+
+# Environment
+.env*
+!.env.sample
+**/.env*
+!**/.env.sample
+
+# Node
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Temporary
+*.tmp
+*.temp
+.__mf__temp/

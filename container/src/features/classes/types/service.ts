@@ -1,4 +1,3 @@
-import type { ApiMode } from '@/shared/constants';
 import type { ApiResponse } from '@/shared/types/api';
 import type {
   Class,
@@ -13,10 +12,9 @@ import type {
 } from './class';
 import type { DailySchedule, ScheduleCollectionRequest, ClassPeriod } from './schedule';
 import type { LessonPlan, LessonPlanCollectionRequest, LearningObjective, LessonResource } from './lesson';
+import type { Service } from '@/shared/api';
 
-export interface ClassApiService {
-  getType(): ApiMode;
-
+export interface ClassApiService extends Service {
   // Class CRUD operations
   getClasses(request: ClassCollectionRequest): Promise<ApiResponse<Class[]>>;
   getClassById(id: string): Promise<Class | null>;

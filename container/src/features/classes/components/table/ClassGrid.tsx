@@ -3,33 +3,18 @@ import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { MoreHorizontal, Edit, Users, Trash2, Eye, UserCheck, MapPin } from 'lucide-react';
+import { Users, UserCheck, MapPin } from 'lucide-react';
 
 import { useClasses } from '../../hooks';
 import { useClassStore } from '../../stores';
 import { getGradeLabel } from '../../utils';
-import type { Class } from '../../types';
+import { ClassActionsMenu } from '../shared';
 
 const ClassGrid = () => {
   const { t } = useTranslation('classes', { keyPrefix: 'grid' });
   const { t: tCommon } = useTranslation('common');
 
-  const { filters } = useClassStore();
-  const { openEditModal, openEnrollmentModal } = useClassStore();
-
-  const handleEdit = (classData: Class) => {
-    openEditModal(classData);
-  };
-
-  const handleManageStudents = (classData: Class) => {
-    openEnrollmentModal(classData);
-  };
+  const { filters, openEditModal, openEnrollmentModal } = useClassStore();
 
   // Use the updated hook with pagination management
   const {
@@ -119,33 +104,15 @@ const ClassGrid = () => {
                   </div>
                 </div>
 
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="h-8 w-8 p-0">
-                      <MoreHorizontal className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem asChild>
-                      <Link to={`/classes/${classItem.id}`}>
-                        <Eye className="mr-2 h-4 w-4" />
-                        {tCommon('actions.view')}
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleEdit(classItem)}>
-                      <Edit className="mr-2 h-4 w-4" />
-                      {tCommon('actions.edit')}
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleManageStudents(classItem)}>
-                      <Users className="mr-2 h-4 w-4" />
-                      {t('actions.manageStudents')}
-                    </DropdownMenuItem>
-                    <DropdownMenuItem className="text-destructive">
-                      <Trash2 className="mr-2 h-4 w-4" />
-                      {tCommon('actions.delete')}
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                <ClassActionsMenu
+                  classData={classItem}
+                  onEdit={openEditModal}
+                  onManageStudents={openEnrollmentModal}
+                  onDelete={(classData) => {
+                    // TODO: Implement delete functionality
+                    console.log('Delete class:', classData.id);
+                  }}
+                />
               </div>
             </CardHeader>
 

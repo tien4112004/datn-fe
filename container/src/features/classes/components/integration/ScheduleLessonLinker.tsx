@@ -5,19 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import {
-  Link,
-  Unlink,
-  Calendar,
-  BookOpen,
-  Clock,
-  CheckCircle2,
-  AlertCircle,
-  User,
-  MapPin,
-  FileText,
-  Plus,
-} from 'lucide-react';
+import { Link, Unlink, Clock, CheckCircle2, AlertCircle, User, MapPin, FileText, Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/shared/lib/utils';
 import { format } from 'date-fns';

@@ -6,13 +6,11 @@ import { Badge } from '@/components/ui/badge';
 import {
   LayoutDashboard,
   Calendar,
-  Clock,
   BookOpen,
   Target,
   AlertTriangle,
   CheckCircle2,
   Play,
-  Pause,
   Settings,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -159,12 +157,12 @@ const TodaysTeachingDashboard = ({
 
   const currentLessonPlan = useMemo(() => {
     if (!stats.currentPeriod?.lessonPlanId) return undefined;
-    return todayLessonPlans.find((lp) => lp.id === stats.currentPeriod.lessonPlanId);
+    return todayLessonPlans.find((lp) => lp.id === stats.currentPeriod?.lessonPlanId);
   }, [stats.currentPeriod, todayLessonPlans]);
 
   const nextLessonPlan = useMemo(() => {
     if (!stats.nextPeriod?.lessonPlanId) return undefined;
-    return todayLessonPlans.find((lp) => lp.id === stats.nextPeriod.lessonPlanId);
+    return todayLessonPlans.find((lp) => lp.id === stats.nextPeriod?.lessonPlanId);
   }, [stats.nextPeriod, todayLessonPlans]);
 
   return (

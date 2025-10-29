@@ -30,8 +30,10 @@ export default class ClassMockApiService implements ClassApiService {
   private lessonPlans: LessonPlan[] = [];
   private objectives: LearningObjective[] = [];
   private resources: LessonResource[] = [];
+  baseUrl: string;
 
-  constructor() {
+  constructor(baseUrl: string) {
+    this.baseUrl = baseUrl;
     this._initializeMockData();
   }
 

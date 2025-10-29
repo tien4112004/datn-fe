@@ -27,5 +27,5 @@ export * from './constants/statuses';
 // UI type exports
 export * from './ui';
 
-// Legacy service types (kept for compatibility)
+// Service types
 export * from './service';

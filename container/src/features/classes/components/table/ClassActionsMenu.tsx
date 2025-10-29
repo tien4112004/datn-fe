@@ -20,7 +20,7 @@ interface ClassActionsMenuProps {
   triggerClassName?: string;
 }
 
-export const ClassActionsMenu = ({
+const ClassActionsMenu = ({
   classData,
   onEdit,
   onManageStudents,

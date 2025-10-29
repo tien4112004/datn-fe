@@ -1,18 +1,24 @@
 import type { ApiResponse } from '@/shared/types/api';
+
+import type { Service } from '@/shared/api';
 import type {
   Class,
-  Student,
-  Teacher,
   ClassCollectionRequest,
   ClassCreateRequest,
+  ClassPeriod,
   ClassUpdateRequest,
+  DailySchedule,
+  LearningObjective,
+  LessonPlan,
+  LessonPlanCollectionRequest,
+  LessonResource,
+  ScheduleCollectionRequest,
+  Student,
   StudentEnrollmentRequest,
   StudentTransferRequest,
   SubjectManagementRequest,
-} from './class';
-import type { DailySchedule, ScheduleCollectionRequest, ClassPeriod } from './schedule';
-import type { LessonPlan, LessonPlanCollectionRequest, LearningObjective, LessonResource } from './lesson';
-import type { Service } from '@/shared/api';
+  Teacher,
+} from '.';
 
 export interface ClassApiService extends Service {
   // Class CRUD operations

@@ -8,8 +8,8 @@ import DataTable from '@/components/table/DataTable';
 import { useClasses } from '../../hooks';
 import { useClassStore } from '../../stores';
 import { getGradeLabel } from '../../utils';
-import { ClassActionsMenu } from '../shared';
 import type { Class } from '../../types';
+import ClassActionsMenu from './ClassActionsMenu';
 
 const ClassTable = () => {
   const { t } = useTranslation('classes', { keyPrefix: 'table' });
@@ -132,10 +132,7 @@ const ClassTable = () => {
               classData={classItem}
               onEdit={openEditModal}
               onManageStudents={openEnrollmentModal}
-              onDelete={(classData) => {
-                // TODO: Implement delete functionality
-                console.log('Delete class:', classData.id);
-              }}
+              onDelete={() => console.log('Delete class:', classItem.id)}
             />
           );
         },

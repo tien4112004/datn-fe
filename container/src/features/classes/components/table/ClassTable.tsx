@@ -143,7 +143,7 @@ const ClassTable = () => {
         enableResizing: false,
       }),
     ],
-    [t, tCommon, columnHelper, openEditModal, openEnrollmentModal]
+    [t, tCommon]
   );
 
   // Use the updated hook with sorting, pagination, and search management

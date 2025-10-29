@@ -8,7 +8,6 @@ import type {
   ClassUpdateRequest,
   StudentEnrollmentRequest,
   StudentTransferRequest,
-  TeacherAssignmentRequest,
 } from '../types';
 import type { ApiResponse } from '@/shared/types/api';
 import type { Class } from '../types';
@@ -296,36 +295,6 @@ export function useTransferStudent() {
       queryClient.invalidateQueries({ queryKey: classKeys.capacity(variables.toClassId) });
       queryClient.invalidateQueries({ queryKey: classKeys.detail(variables.fromClassId) });
       queryClient.invalidateQueries({ queryKey: classKeys.detail(variables.toClassId) });
-      queryClient.invalidateQueries({ queryKey: classKeys.lists() });
-    },
-  });
-}
-
-// Teacher assignment mutations
-export function useAssignTeacherToClass() {
-  const queryClient = useQueryClient();
-  const classApiService = useClassApiService();
-
-  return useMutation({
-    mutationFn: (data: TeacherAssignmentRequest) => classApiService.assignTeacherToClass(data),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: classKeys.teachers(variables.classId) });
-      queryClient.invalidateQueries({ queryKey: classKeys.detail(variables.classId) });
-      queryClient.invalidateQueries({ queryKey: classKeys.lists() });
-    },
-  });
-}
-
-export function useRemoveTeacherFromClass() {
-  const queryClient = useQueryClient();
-  const classApiService = useClassApiService();
-
-  return useMutation({
-    mutationFn: ({ classId, teacherId, subject }: { classId: string; teacherId: string; subject?: string }) =>
-      classApiService.removeTeacherFromClass(classId, teacherId, subject),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: classKeys.teachers(variables.classId) });
-      queryClient.invalidateQueries({ queryKey: classKeys.detail(variables.classId) });
       queryClient.invalidateQueries({ queryKey: classKeys.lists() });
     },
   });

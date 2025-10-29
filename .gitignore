@@ -36,3 +36,6 @@ coverage
 .turbo
 .vercel
 .env*.local
+
+.github/prompts
+.specify

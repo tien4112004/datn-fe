@@ -10,10 +10,20 @@ import { getPresentationById } from '@/features/presentation/hooks/loaders';
 import Projects from '@/features/projects';
 import Settings from '@/features/settings';
 import Image from '@/features/image';
+import { LoginPage } from '@/features/auth/pages/LoginPage';
+import { ProtectedRoute } from '@/shared/components/ProtectedRoute';
 
 const router = createBrowserRouter([
   {
-    element: <NavLayout />,
+    path: '/login',
+    element: <LoginPage />,
+  },
+  {
+    element: (
+      <ProtectedRoute>
+        <NavLayout />
+      </ProtectedRoute>
+    ),
     errorElement: <NavLayoutErrorBoundary />,
     children: [
       {

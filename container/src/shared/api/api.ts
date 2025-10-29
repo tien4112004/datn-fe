@@ -2,6 +2,7 @@ import axios, { type AxiosInstance } from 'axios';
 import { CriticalError, ExpectedError } from '@/shared/types/errors';
 import { ERROR_TYPE } from '@/shared/constants';
 import { toast } from 'sonner';
+import { getAccessToken } from '@/shared/context/auth';
 
 interface StreamableAxiosInstance extends AxiosInstance {
   stream: (url: string, request: any, signal: AbortSignal) => Promise<Response>;
@@ -14,14 +15,35 @@ const api: StreamableAxiosInstance = axios.create({
   },
 }) as StreamableAxiosInstance;
 
+// Request interceptor to add authorization token
+api.interceptors.request.use(
+  (config) => {
+    const token = getAccessToken();
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
 api.stream = async function (url: string, request: any, signal: AbortSignal) {
   try {
+    const token = getAccessToken();
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      Accept: 'text/plain',
+    };
+
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+
     const response = await fetch(url, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'text/plain',
-      },
+      headers,
       body: JSON.stringify(request),
       signal,
     });
@@ -91,6 +113,22 @@ api.interceptors.response.use(
     if (axios.isAxiosError(error)) {
       const { response } = error;
       if (response) {
+        // Handle 401 Unauthorized - token expired or invalid
+        if (response.status === 401) {
+          // Clear auth data and redirect to login will be handled by the app
+          // We'll dispatch a custom event that the app can listen to
+          window.dispatchEvent(new CustomEvent('auth:unauthorized'));
+
+          return Promise.reject(
+            new ExpectedError(
+              'Session expired. Please login again.',
+              ERROR_TYPE.API_ERROR,
+              '401',
+              response.data
+            )
+          );
+        }
+
         // Handle expected errors
         if (response.status >= 400 && response.status < 500) {
           toast.error(response.data.message || 'An error occurred');

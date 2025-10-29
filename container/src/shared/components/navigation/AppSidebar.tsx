@@ -16,15 +16,17 @@ import {
   SidebarTrigger,
 } from '@/shared/components/ui/sidebar';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '@/shared/context/auth';
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { t } = useTranslation('common', { keyPrefix: 'navigation.sidebar' });
+  const { user } = useAuth();
 
   const data = {
     user: {
-      name: 'Boss',
-      email: 'luuthaiton@example.com',
-      avatar: '',
+      name: user?.name || 'User',
+      email: user?.email || 'user@example.com',
+      avatar: user?.avatar || '',
     },
     navMain: [
       {

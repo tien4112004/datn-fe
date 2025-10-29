@@ -1,3 +1,4 @@
+// Schedule and Period types
 export interface ClassPeriod {
   id: string;
   classId: string;

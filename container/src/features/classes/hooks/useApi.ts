@@ -24,6 +24,14 @@ export const classKeys = {
   teachers: (classId: string) => [...classKeys.all, 'teachers', classId] as const,
   capacity: (classId: string) => [...classKeys.all, 'capacity', classId] as const,
   availableTeachers: (subject?: string) => ['teachers', 'available', subject] as const,
+
+  // Teaching & Schedule related keys
+  schedules: (classId: string, params?: any) => [...classKeys.all, 'schedules', classId, params] as const,
+  periods: (classId: string, params?: any) => [...classKeys.all, 'periods', classId, params] as const,
+  lessonPlans: (classId: string, params?: any) =>
+    [...classKeys.all, 'lesson-plans', classId, params] as const,
+  objectives: (lessonPlanId: string) => [...classKeys.all, 'objectives', lessonPlanId] as const,
+  resources: (lessonPlanId: string) => [...classKeys.all, 'resources', lessonPlanId] as const,
 };
 
 // Return types for the hooks
@@ -156,6 +164,54 @@ export function useAvailableTeachers(subject?: string) {
   });
 }
 
+// Teaching & Schedule queries
+export function useClassSchedules(classId: string, params: any = {}) {
+  const classApiService = useClassApiService();
+  return useQuery({
+    queryKey: classKeys.schedules(classId, params),
+    queryFn: () => classApiService.getSchedules(classId, params),
+    enabled: !!classId,
+  });
+}
+
+export function useClassPeriods(classId: string, params: any = {}) {
+  const classApiService = useClassApiService();
+  return useQuery({
+    queryKey: classKeys.periods(classId, params),
+    queryFn: () => classApiService.getPeriods(classId, params),
+    enabled: !!classId,
+  });
+}
+
+export function useClassLessonPlans(classId: string, params: any = {}) {
+  const classApiService = useClassApiService();
+  return useQuery({
+    queryKey: classKeys.lessonPlans(classId, params),
+    queryFn: () => classApiService.getLessonPlans(classId, params),
+    enabled: !!classId,
+  });
+}
+
+export function useLessonObjectives(lessonPlanId: string) {
+  const classApiService = useClassApiService();
+  return useQuery({
+    queryKey: classKeys.objectives(lessonPlanId),
+    queryFn: () => classApiService.getLessonObjectives(lessonPlanId),
+    enabled: !!lessonPlanId,
+  });
+}
+
+export function useLessonResources(lessonPlanId: string) {
+  const classApiService = useClassApiService();
+  return useQuery({
+    queryKey: classKeys.resources(lessonPlanId),
+    queryFn: () => classApiService.getLessonResources(lessonPlanId),
+    enabled: !!lessonPlanId,
+  });
+}
+
+// Class mutations
+
 // Class mutations
 export function useCreateClass() {
   const queryClient = useQueryClient();
@@ -286,6 +342,146 @@ export function useAssignHomeroomTeacher() {
       queryClient.invalidateQueries({ queryKey: classKeys.teachers(updatedClass.id) });
       queryClient.invalidateQueries({ queryKey: classKeys.detail(updatedClass.id) });
       queryClient.invalidateQueries({ queryKey: classKeys.lists() });
+    },
+  });
+}
+
+// Lesson Plan mutations
+export function useUpdateLessonStatus() {
+  const queryClient = useQueryClient();
+  const classApiService = useClassApiService();
+
+  return useMutation({
+    mutationFn: ({ id, status, notes }: { id: string; status: string; notes?: string }) =>
+      classApiService.updateLessonStatus(id, status, notes),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: classKeys.lessonPlans(variables.id, {}) });
+    },
+  });
+}
+
+export function useUpdateObjective() {
+  const queryClient = useQueryClient();
+  const classApiService = useClassApiService();
+
+  return useMutation({
+    mutationFn: ({ id, updates }: { id: string; updates: any }) =>
+      classApiService.updateObjective(id, updates),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: classKeys.objectives(variables.id) });
+    },
+  });
+}
+
+export function useAddObjectiveNote() {
+  const queryClient = useQueryClient();
+  const classApiService = useClassApiService();
+
+  return useMutation({
+    mutationFn: ({ id, note }: { id: string; note: string }) => classApiService.addObjectiveNote(id, note),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: classKeys.objectives(variables.id) });
+    },
+  });
+}
+
+export function useAddResource() {
+  const queryClient = useQueryClient();
+  const classApiService = useClassApiService();
+
+  return useMutation({
+    mutationFn: (resource: any) => classApiService.addResource(resource),
+    onSuccess: (resource) => {
+      queryClient.invalidateQueries({ queryKey: classKeys.resources(resource.lessonPlanId) });
+    },
+  });
+}
+
+export function useUpdateResource() {
+  const queryClient = useQueryClient();
+  const classApiService = useClassApiService();
+
+  return useMutation({
+    mutationFn: ({ id, updates }: { id: string; updates: any }) =>
+      classApiService.updateResource(id, updates),
+    onSuccess: (resource) => {
+      queryClient.invalidateQueries({ queryKey: classKeys.resources(resource.lessonPlanId) });
+    },
+  });
+}
+
+export function useDeleteResource() {
+  const queryClient = useQueryClient();
+  const classApiService = useClassApiService();
+
+  return useMutation({
+    mutationFn: (id: string) => classApiService.deleteResource(id),
+    onSuccess: (_, lessonPlanId) => {
+      queryClient.invalidateQueries({ queryKey: classKeys.resources(lessonPlanId) });
+    },
+  });
+}
+
+export function useCreateLessonPlan() {
+  const queryClient = useQueryClient();
+  const classApiService = useClassApiService();
+
+  return useMutation({
+    mutationFn: (data: any) => classApiService.createLessonPlan(data),
+    onSuccess: (lessonPlan) => {
+      queryClient.invalidateQueries({ queryKey: classKeys.lessonPlans(lessonPlan.classId, {}) });
+    },
+  });
+}
+
+// Schedule mutations
+export function useAddPeriod() {
+  const queryClient = useQueryClient();
+  const classApiService = useClassApiService();
+
+  return useMutation({
+    mutationFn: (data: any) => classApiService.addPeriod(data),
+    onSuccess: (period) => {
+      queryClient.invalidateQueries({ queryKey: classKeys.periods(period.classId, {}) });
+      queryClient.invalidateQueries({ queryKey: classKeys.schedules(period.classId, {}) });
+    },
+  });
+}
+
+export function useUpdatePeriod() {
+  const queryClient = useQueryClient();
+  const classApiService = useClassApiService();
+
+  return useMutation({
+    mutationFn: ({ id, updates }: { id: string; updates: any }) => classApiService.updatePeriod(id, updates),
+    onSuccess: (period) => {
+      queryClient.invalidateQueries({ queryKey: classKeys.periods(period.classId, {}) });
+      queryClient.invalidateQueries({ queryKey: classKeys.schedules(period.classId, {}) });
+    },
+  });
+}
+
+export function useLinkLessonToPeriod() {
+  const queryClient = useQueryClient();
+  const classApiService = useClassApiService();
+
+  return useMutation({
+    mutationFn: ({ periodId, lessonPlanId }: { periodId: string; lessonPlanId: string }) =>
+      classApiService.linkLessonToPeriod(periodId, lessonPlanId),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: classKeys.periods(variables.periodId, {}) });
+    },
+  });
+}
+
+export function useUnlinkLessonFromPeriod() {
+  const queryClient = useQueryClient();
+  const classApiService = useClassApiService();
+
+  return useMutation({
+    mutationFn: (periodId: string) => classApiService.unlinkLessonFromPeriod(periodId),
+    onSuccess: (_, periodId) => {
+      queryClient.invalidateQueries({ queryKey: classKeys.periods(periodId, {}) });
     },
   });
 }

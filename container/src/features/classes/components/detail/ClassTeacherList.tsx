@@ -19,44 +19,34 @@ const ClassTeacherList = ({ classData }: ClassTeacherListProps) => {
         </CardHeader>
         <CardContent>
           {classData.homeroomTeacher ? (
-            <div className="flex items-center justify-between rounded border p-3">
-              <div>
-                <p className="font-medium">{classData.homeroomTeacher.fullName}</p>
-                <p className="text-muted-foreground text-sm">{classData.homeroomTeacher.teacherCode}</p>
-                <p className="text-muted-foreground text-sm">{classData.homeroomTeacher.email}</p>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between rounded border p-3">
+                <div>
+                  <p className="font-medium">{classData.homeroomTeacher.fullName}</p>
+                  <p className="text-muted-foreground text-sm">{classData.homeroomTeacher.teacherCode}</p>
+                  <p className="text-muted-foreground text-sm">{classData.homeroomTeacher.email}</p>
+                </div>
+                <Badge>{t('teachers.homeroom')}</Badge>
               </div>
-              <Badge>{t('teachers.homeroom')}</Badge>
+
+              {/* Subjects taught by homeroom teacher */}
+              <div className="rounded border p-4">
+                <h4 className="mb-3 font-semibold">Subjects</h4>
+                {classData.subjects.length === 0 ? (
+                  <p className="text-muted-foreground text-sm">No subjects assigned</p>
+                ) : (
+                  <div className="flex flex-wrap gap-2">
+                    {classData.subjects.map((subject, index) => (
+                      <Badge key={index} variant="outline">
+                        {subject}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           ) : (
             <p className="text-muted-foreground py-8 text-center">{t('teachers.noHomeroomTeacher')}</p>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Subject Teachers */}
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('teachers.subjectTeachers', { count: classData.subjectTeachers.length })}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {classData.subjectTeachers.length === 0 ? (
-            <p className="text-muted-foreground py-8 text-center">{t('teachers.noSubjectTeachers')}</p>
-          ) : (
-            <div className="space-y-2">
-              {classData.subjectTeachers.map((assignment) => (
-                <div key={assignment.id} className="flex items-center justify-between rounded border p-3">
-                  <div>
-                    <p className="font-medium">{assignment.teacher.fullName}</p>
-                    <p className="text-muted-foreground text-sm">{assignment.teacher.teacherCode}</p>
-                    <p className="text-muted-foreground text-sm">{assignment.teacher.email}</p>
-                  </div>
-                  <div className="text-right">
-                    <Badge variant="outline">{assignment.subject}</Badge>
-                    {assignment.isMainTeacher && <Badge className="ml-2">{t('teachers.main')}</Badge>}
-                  </div>
-                </div>
-              ))}
-            </div>
           )}
         </CardContent>
       </Card>

@@ -9,7 +9,14 @@ import {
   type ClassUpdateRequest,
   type StudentEnrollmentRequest,
   type StudentTransferRequest,
-  type TeacherAssignmentRequest,
+  type SubjectManagementRequest,
+  type DailySchedule,
+  type ScheduleCollectionRequest,
+  type ClassPeriod,
+  type LessonPlan,
+  type LessonPlanCollectionRequest,
+  type LearningObjective,
+  type LessonResource,
 } from '../types';
 import { api } from '@/shared/api';
 import { mapPagination, type ApiResponse, type Pagination } from '@/shared/types/api';
@@ -109,19 +116,6 @@ export default class ClassRealApiService implements ClassApiService {
     return response.data.data.map(this._mapTeacher);
   }
 
-  async assignTeacherToClass(request: TeacherAssignmentRequest): Promise<void> {
-    await api.post(`${this.baseUrl}/api/classes/${request.classId}/teachers`, {
-      teacherId: request.teacherId,
-      subject: request.subject,
-      isMainTeacher: request.isMainTeacher,
-    });
-  }
-
-  async removeTeacherFromClass(classId: string, teacherId: string, subject?: string): Promise<void> {
-    const params = subject ? { subject } : {};
-    await api.delete(`${this.baseUrl}/api/classes/${classId}/teachers/${teacherId}`, { params });
-  }
-
   async assignHomeroomTeacher(classId: string, teacherId: string): Promise<Class> {
     const response = await api.put<ApiResponse<Class>>(
       `${this.baseUrl}/api/classes/${classId}/homeroom-teacher`,
@@ -130,6 +124,23 @@ export default class ClassRealApiService implements ClassApiService {
       }
     );
     return this._mapClass(response.data.data);
+  }
+
+  async removeHomeroomTeacher(classId: string): Promise<Class> {
+    const response = await api.delete<ApiResponse<Class>>(
+      `${this.baseUrl}/api/classes/${classId}/homeroom-teacher`
+    );
+    return this._mapClass(response.data.data);
+  }
+
+  async addSubjectToClass(request: SubjectManagementRequest): Promise<void> {
+    await api.post(`${this.baseUrl}/api/classes/${request.classId}/subjects`, {
+      subject: request.subject,
+    });
+  }
+
+  async removeSubjectFromClass(request: SubjectManagementRequest): Promise<void> {
+    await api.delete(`${this.baseUrl}/api/classes/${request.classId}/subjects/${request.subject}`);
   }
 
   async getAvailableTeachers(subject?: string): Promise<Teacher[]> {
@@ -149,6 +160,143 @@ export default class ClassRealApiService implements ClassApiService {
     return response.data.data;
   }
 
+  // Schedule and Lesson Management
+  async getSchedules(
+    classId: string,
+    params: ScheduleCollectionRequest
+  ): Promise<ApiResponse<DailySchedule[]>> {
+    const response = await api.get<ApiResponse<DailySchedule[]>>(
+      `${this.baseUrl}/api/classes/${classId}/schedules`,
+      {
+        params: {
+          startDate: params.startDate,
+          endDate: params.endDate,
+          dayOfWeek: params.dayOfWeek,
+        },
+      }
+    );
+    return response.data;
+  }
+
+  async getPeriods(classId: string, params: { date?: string }): Promise<ApiResponse<ClassPeriod[]>> {
+    const response = await api.get<ApiResponse<ClassPeriod[]>>(
+      `${this.baseUrl}/api/classes/${classId}/periods`,
+      {
+        params: {
+          date: params.date,
+        },
+      }
+    );
+    return response.data;
+  }
+
+  async getLessonPlans(
+    classId: string,
+    params: LessonPlanCollectionRequest
+  ): Promise<ApiResponse<LessonPlan[]>> {
+    const response = await api.get<ApiResponse<LessonPlan[]>>(
+      `${this.baseUrl}/api/classes/${classId}/lesson-plans`,
+      {
+        params: {
+          teacherId: params.teacherId,
+          subject: params.subject,
+          date: params.date,
+          startDate: params.startDate,
+          endDate: params.endDate,
+          status: params.status,
+          page: params.page,
+          pageSize: params.pageSize,
+        },
+      }
+    );
+    return response.data;
+  }
+
+  async getLessonObjectives(lessonPlanId: string): Promise<LearningObjective[]> {
+    const response = await api.get<ApiResponse<LearningObjective[]>>(
+      `${this.baseUrl}/api/lesson-plans/${lessonPlanId}/objectives`
+    );
+    return response.data.data;
+  }
+
+  async getLessonResources(lessonPlanId: string): Promise<LessonResource[]> {
+    const response = await api.get<ApiResponse<LessonResource[]>>(
+      `${this.baseUrl}/api/lesson-plans/${lessonPlanId}/resources`
+    );
+    return response.data.data;
+  }
+
+  // Lesson Plan mutations
+  async updateLessonStatus(id: string, status: string, notes?: string): Promise<LessonPlan> {
+    const response = await api.patch<ApiResponse<LessonPlan>>(
+      `${this.baseUrl}/api/lesson-plans/${id}/status`,
+      {
+        status,
+        notes,
+      }
+    );
+    return response.data.data;
+  }
+
+  async createLessonPlan(data: any): Promise<LessonPlan> {
+    const response = await api.post<ApiResponse<LessonPlan>>(`${this.baseUrl}/api/lesson-plans`, data);
+    return response.data.data;
+  }
+
+  // Objective mutations
+  async updateObjective(id: string, updates: any): Promise<LearningObjective> {
+    const response = await api.patch<ApiResponse<LearningObjective>>(
+      `${this.baseUrl}/api/objectives/${id}`,
+      updates
+    );
+    return response.data.data;
+  }
+
+  async addObjectiveNote(id: string, note: string): Promise<LearningObjective> {
+    const response = await api.post<ApiResponse<LearningObjective>>(
+      `${this.baseUrl}/api/objectives/${id}/notes`,
+      { note }
+    );
+    return response.data.data;
+  }
+
+  // Resource mutations
+  async addResource(resource: any): Promise<LessonResource> {
+    const response = await api.post<ApiResponse<LessonResource>>(`${this.baseUrl}/api/resources`, resource);
+    return response.data.data;
+  }
+
+  async updateResource(id: string, updates: any): Promise<LessonResource> {
+    const response = await api.patch<ApiResponse<LessonResource>>(
+      `${this.baseUrl}/api/resources/${id}`,
+      updates
+    );
+    return response.data.data;
+  }
+
+  async deleteResource(id: string): Promise<void> {
+    await api.delete(`${this.baseUrl}/api/resources/${id}`);
+  }
+
+  // Schedule mutations
+  async addPeriod(data: any): Promise<ClassPeriod> {
+    const response = await api.post<ApiResponse<ClassPeriod>>(`${this.baseUrl}/api/periods`, data);
+    return response.data.data;
+  }
+
+  async updatePeriod(id: string, updates: any): Promise<ClassPeriod> {
+    const response = await api.patch<ApiResponse<ClassPeriod>>(`${this.baseUrl}/api/periods/${id}`, updates);
+    return response.data.data;
+  }
+
+  async linkLessonToPeriod(periodId: string, lessonPlanId: string): Promise<void> {
+    await api.post(`${this.baseUrl}/api/periods/${periodId}/link-lesson`, { lessonPlanId });
+  }
+
+  async unlinkLessonFromPeriod(periodId: string): Promise<void> {
+    await api.delete(`${this.baseUrl}/api/periods/${periodId}/link-lesson`);
+  }
+
   private _mapClass(data: any): Class {
     return {
       id: data.id,
@@ -160,15 +308,7 @@ export default class ClassRealApiService implements ClassApiService {
       currentEnrollment: data.currentEnrollment || 0,
       homeroomTeacherId: data.homeroomTeacherId,
       homeroomTeacher: data.homeroomTeacher ? this._mapTeacher(data.homeroomTeacher) : undefined,
-      subjectTeachers: (data.subjectTeachers || []).map((st: any) => ({
-        id: st.id,
-        classId: st.classId,
-        teacherId: st.teacherId,
-        teacher: this._mapTeacher(st.teacher),
-        subject: st.subject,
-        isMainTeacher: st.isMainTeacher || false,
-        assignedAt: st.assignedAt,
-      })),
+      subjects: data.subjects || [],
       classroom: data.classroom,
       description: data.description,
       students: (data.students || []).map(this._mapStudent),

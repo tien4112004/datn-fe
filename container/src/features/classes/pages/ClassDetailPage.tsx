@@ -23,7 +23,23 @@ import TodaysTeachingDashboard from '../components/dashboard/TodaysTeachingDashb
 import DailyScheduleView from '../components/schedule/DailyScheduleView';
 import LessonStatusTracker from '../components/lesson/LessonStatusTracker';
 import ScheduleLessonLinker from '../components/integration/ScheduleLessonLinker';
-import { useClass } from '../hooks';
+import {
+  useClass,
+  useClassSchedules,
+  useClassPeriods,
+  useClassLessonPlans,
+  useUpdateLessonStatus,
+  useUpdateObjective,
+  useAddObjectiveNote,
+  useAddResource,
+  useUpdateResource,
+  useDeleteResource,
+  useCreateLessonPlan,
+  useAddPeriod,
+  useUpdatePeriod,
+  useLinkLessonToPeriod,
+  useUnlinkLessonFromPeriod,
+} from '../hooks';
 import { useClassStore } from '../stores';
 import { getGradeLabel } from '../utils';
 import type { Class } from '../types';
@@ -41,6 +57,40 @@ const ClassDetailPage = () => {
   // Use React Query for real-time updates, fallback to loader data
   const { data: classData, isLoading } = useClass(id!);
   const currentClass = classData || loaderData.class;
+
+  // Fetch schedules, periods, and lesson plans
+  const today = new Date().toISOString().split('T')[0];
+  const { data: schedulesData } = useClassSchedules(id!, {
+    startDate: today,
+    endDate: today,
+  });
+  const { data: periodsData } = useClassPeriods(id!, { date: today });
+  const { data: lessonPlansData } = useClassLessonPlans(id!, {});
+
+  const schedules = schedulesData?.data || [];
+  const allPeriods = periodsData?.data || [];
+  const allLessonPlans = lessonPlansData?.data || [];
+
+  // Get today's specific data
+  const todaySchedule = schedules.find((s) => s.date === today) || {
+    date: today,
+    classId: id!,
+    periods: [],
+  };
+  const todayLessonPlans = allLessonPlans.filter((lp) => lp.date === today);
+
+  // Mutation hooks
+  const updateLessonStatus = useUpdateLessonStatus();
+  const updateObjective = useUpdateObjective();
+  const addObjectiveNote = useAddObjectiveNote();
+  const addResource = useAddResource();
+  const updateResource = useUpdateResource();
+  const deleteResource = useDeleteResource();
+  const createLessonPlan = useCreateLessonPlan();
+  const addPeriod = useAddPeriod();
+  const updatePeriod = useUpdatePeriod();
+  const linkLessonToPeriod = useLinkLessonToPeriod();
+  const unlinkLessonFromPeriod = useUnlinkLessonFromPeriod();
 
   const { openEditModal } = useClassStore();
 
@@ -156,11 +206,11 @@ const ClassDetailPage = () => {
 
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">{t('stats.subjectTeachers')}</CardTitle>
+                  <CardTitle className="text-sm font-medium">{t('stats.subjects')}</CardTitle>
                   <Settings className="text-muted-foreground h-4 w-4" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{currentClass.subjectTeachers.length}</div>
+                  <div className="text-2xl font-bold">{currentClass.subjects.length}</div>
                   <p className="text-muted-foreground text-xs">{t('stats.subjects')}</p>
                 </CardContent>
               </Card>
@@ -202,50 +252,40 @@ const ClassDetailPage = () => {
               <TabsContent value="teaching" className="space-y-4">
                 <TodaysTeachingDashboard
                   classData={currentClass}
-                  todaySchedule={{
-                    date: new Date().toISOString().split('T')[0],
-                    classId: currentClass.id,
-                    periods: [], // TODO: Replace with actual today's periods
-                  }}
-                  allPeriods={[]} // TODO: Replace with actual periods
-                  todayLessonPlans={[]} // TODO: Replace with actual today's lesson plans
-                  allLessonPlans={[]} // TODO: Replace with actual lesson plans
-                  objectives={[]} // TODO: Replace with actual objectives
-                  resources={[]} // TODO: Replace with actual resources
+                  todaySchedule={todaySchedule}
+                  allPeriods={allPeriods}
+                  todayLessonPlans={todayLessonPlans}
+                  allLessonPlans={allLessonPlans}
+                  objectives={[]} // TODO: Fetch objectives for all lesson plans
+                  resources={[]} // TODO: Fetch resources for all lesson plans
                   onUpdateLessonStatus={async (id, status, notes) => {
-                    // TODO: Implement lesson status update
-                    console.log('Update lesson status:', id, status, notes);
+                    await updateLessonStatus.mutateAsync({ id, status, notes });
                   }}
                   onUpdateObjective={async (id, updates) => {
-                    // TODO: Implement objective update
-                    console.log('Update objective:', id, updates);
+                    await updateObjective.mutateAsync({ id, updates });
                   }}
                   onAddObjectiveNote={async (id, note) => {
-                    // TODO: Implement add objective note
-                    console.log('Add objective note:', id, note);
+                    await addObjectiveNote.mutateAsync({ id, note });
                   }}
                   onAddResource={async (resource) => {
-                    // TODO: Implement add resource
-                    console.log('Add resource:', resource);
+                    await addResource.mutateAsync(resource);
                   }}
                   onUpdateResource={async (id, updates) => {
-                    // TODO: Implement update resource
-                    console.log('Update resource:', id, updates);
+                    await updateResource.mutateAsync({ id, updates });
                   }}
                   onDeleteResource={async (id) => {
-                    // TODO: Implement delete resource
-                    console.log('Delete resource:', id);
+                    await deleteResource.mutateAsync(id);
                   }}
                   onSubjectChange={(subject, subjectCode) => {
-                    // TODO: Implement subject change
+                    // TODO: Implement subject change filtering
                     console.log('Subject change:', subject, subjectCode);
                   }}
                   onCreateLessonPlan={(subject, subjectCode) => {
-                    // TODO: Implement create lesson plan
+                    // TODO: Open lesson plan creation modal/form
                     console.log('Create lesson plan:', subject, subjectCode);
                   }}
                   onManageSchedule={(subject) => {
-                    // TODO: Implement manage schedule
+                    // TODO: Navigate to schedule management
                     console.log('Manage schedule:', subject);
                   }}
                 />
@@ -254,14 +294,13 @@ const ClassDetailPage = () => {
               <TabsContent value="schedule" className="space-y-4">
                 <DailyScheduleView
                   classId={currentClass.id}
-                  schedules={[]} // TODO: Replace with actual schedules
-                  onAddPeriod={(date) => {
-                    // TODO: Implement add period
+                  schedules={schedules}
+                  onAddPeriod={async (date) => {
+                    // TODO: Open period creation modal/form with pre-filled date
                     console.log('Add period for date:', date);
                   }}
-                  onEditPeriod={(period) => {
-                    // TODO: Implement edit period
-                    console.log('Edit period:', period);
+                  onEditPeriod={async (period) => {
+                    await updatePeriod.mutateAsync({ id: period.id, updates: period });
                   }}
                 />
               </TabsContent>
@@ -269,28 +308,25 @@ const ClassDetailPage = () => {
               <TabsContent value="lessons" className="space-y-4">
                 <div className="space-y-6">
                   <LessonStatusTracker
-                    lessonPlans={[]} // TODO: Replace with actual lesson plans
+                    lessonPlans={allLessonPlans}
                     onUpdateStatus={async (id, status, notes) => {
-                      // TODO: Implement status update
-                      console.log('Update status:', id, status, notes);
+                      await updateLessonStatus.mutateAsync({ id, status, notes });
                     }}
                     classId={currentClass.id}
                   />
 
                   <ScheduleLessonLinker
                     classId={currentClass.id}
-                    periods={[]} // TODO: Replace with actual periods
-                    lessonPlans={[]} // TODO: Replace with actual lesson plans
+                    periods={allPeriods}
+                    lessonPlans={allLessonPlans}
                     onLinkLesson={async (periodId, lessonPlanId) => {
-                      // TODO: Implement link lesson
-                      console.log('Link lesson:', periodId, lessonPlanId);
+                      await linkLessonToPeriod.mutateAsync({ periodId, lessonPlanId });
                     }}
                     onUnlinkLesson={async (periodId) => {
-                      // TODO: Implement unlink lesson
-                      console.log('Unlink lesson:', periodId);
+                      await unlinkLessonFromPeriod.mutateAsync(periodId);
                     }}
                     onCreateLessonForPeriod={(period) => {
-                      // TODO: Implement create lesson for period
+                      // TODO: Open lesson plan creation modal with period pre-filled
                       console.log('Create lesson for period:', period);
                     }}
                   />

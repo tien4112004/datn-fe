@@ -212,10 +212,10 @@ const ClassGrid = () => {
                   </div>
                 )}
 
-                {/* Subject Teachers Count */}
+                {/* Subjects Count */}
                 <div className="text-sm">
-                  <span className="text-muted-foreground">{t('subjectTeachers')}: </span>
-                  <span className="font-medium">{classItem.subjectTeachers.length}</span>
+                  <span className="text-muted-foreground">Subjects: </span>
+                  <span className="font-medium">{classItem.subjects.length}</span>
                 </div>
               </div>
             </CardContent>

@@ -7,8 +7,8 @@ export interface Class {
   capacity: number; // maximum students (typically 30-40)
   currentEnrollment: number; // current number of students
   homeroomTeacherId?: string;
-  homeroomTeacher?: Teacher;
-  subjectTeachers: ClassSubjectTeacher[];
+  homeroomTeacher?: Teacher; // The homeroom teacher teaches all subjects
+  subjects: string[]; // List of subjects taught in this class (must be unique)
   classroom?: string; // physical location
   description?: string;
   students: Student[];
@@ -56,16 +56,6 @@ export interface Teacher {
   updatedAt: string;
 }
 
-export interface ClassSubjectTeacher {
-  id: string;
-  classId: string;
-  teacherId: string;
-  teacher: Teacher;
-  subject: string;
-  isMainTeacher: boolean;
-  assignedAt: string;
-}
-
 export interface ClassCollectionRequest {
   page?: number;
   pageSize?: number;
@@ -84,6 +74,7 @@ export interface ClassCreateRequest {
   academicYear: string;
   capacity: number;
   homeroomTeacherId?: string;
+  subjects?: string[]; // Elementary school subjects to add to class
   classroom?: string;
   description?: string;
 }
@@ -106,11 +97,9 @@ export interface StudentTransferRequest {
   reason?: string;
 }
 
-export interface TeacherAssignmentRequest {
+export interface SubjectManagementRequest {
   classId: string;
-  teacherId: string;
-  subject?: string;
-  isMainTeacher?: boolean;
+  subject: string; // Add or remove a subject from the class
 }
 
 // Vietnamese education constants
@@ -141,5 +130,56 @@ export const DEFAULT_CLASS_CAPACITY = 35;
 export const MAX_CLASS_CAPACITY = 45;
 export const MIN_CLASS_CAPACITY = 20;
 
+// Vietnamese Elementary School Subjects (Grades 1-5)
+export const ELEMENTARY_SUBJECTS = {
+  TIENG_VIET: { code: 'TV', name: 'Tiếng Việt' },
+  TOAN: { code: 'T', name: 'Toán' },
+  DAO_DUC: { code: 'DD', name: 'Đạo đức' },
+  TU_NHIEN_XA_HOI: { code: 'TNXH', name: 'Tự nhiên và Xã hội' }, // Grades 1-3
+  KHOA_HOC: { code: 'KH', name: 'Khoa học' }, // Grades 4-5
+  LICH_SU_DIA_LY: { code: 'LSDL', name: 'Lịch sử và Địa lý' }, // Grades 4-5
+  TIENG_ANH: { code: 'TA', name: 'Tiếng Anh' },
+  TIN_HOC: { code: 'TH', name: 'Tin học và Công nghệ' },
+  AM_NHAC: { code: 'AN', name: 'Âm nhạc' },
+  MY_THUAT: { code: 'MT', name: 'Mỹ thuật' },
+  GIAO_DUC_THE_CHAT: { code: 'GDTC', name: 'Giáo dục thể chất' },
+  HOAT_DONG_TRAI_NGHIEM: { code: 'HDTN', name: 'Hoạt động trải nghiệm' },
+} as const;
+
+// Get subjects by grade level (grades 1-5)
+export function getSubjectsByGrade(grade: number): Array<{ code: string; name: string }> {
+  const subjects: Array<{ code: string; name: string }> = [
+    ELEMENTARY_SUBJECTS.TIENG_VIET,
+    ELEMENTARY_SUBJECTS.TOAN,
+    ELEMENTARY_SUBJECTS.DAO_DUC,
+    ELEMENTARY_SUBJECTS.AM_NHAC,
+    ELEMENTARY_SUBJECTS.MY_THUAT,
+    ELEMENTARY_SUBJECTS.GIAO_DUC_THE_CHAT,
+  ];
+
+  if (grade >= 1 && grade <= 3) {
+    // Grades 1-3: Add Tự nhiên và Xã hội
+    subjects.push(ELEMENTARY_SUBJECTS.TU_NHIEN_XA_HOI);
+  } else if (grade >= 4 && grade <= 5) {
+    // Grades 4-5: Add Khoa học, Lịch sử và Địa lý
+    subjects.push(ELEMENTARY_SUBJECTS.KHOA_HOC);
+    subjects.push(ELEMENTARY_SUBJECTS.LICH_SU_DIA_LY);
+  }
+
+  // Optional subjects for all grades
+  if (grade >= 3) {
+    subjects.push(ELEMENTARY_SUBJECTS.TIENG_ANH);
+  }
+
+  if (grade >= 3) {
+    subjects.push(ELEMENTARY_SUBJECTS.TIN_HOC);
+  }
+
+  subjects.push(ELEMENTARY_SUBJECTS.HOAT_DONG_TRAI_NGHIEM);
+
+  return subjects;
+}
+
 export type GradeLevel = keyof typeof GRADE_LABELS;
 export type ClassTrack = (typeof CLASS_TRACKS)[number];
+export type ElementarySubject = (typeof ELEMENTARY_SUBJECTS)[keyof typeof ELEMENTARY_SUBJECTS];

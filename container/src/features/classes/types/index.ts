@@ -24,5 +24,8 @@ export * from './constants/subjects';
 export * from './constants/grades';
 export * from './constants/statuses';
 
+// UI type exports
+export * from './ui';
+
 // Legacy service types (kept for compatibility)
 export * from './service';

@@ -1,15 +1,15 @@
-import type {
-  Class,
-  Student,
-  Teacher,
-  ClassPeriod,
-  LessonPlan,
-  LearningObjective,
-  LessonResource,
+import {
+  type Class,
+  type Student,
+  type Teacher,
+  type ClassPeriod,
+  type LessonPlan,
+  type LearningObjective,
+  type LessonResource,
+  ELEMENTARY_SUBJECTS,
+  STANDARD_PERIODS,
 } from '../../types';
 import { getCurrentAcademicYear } from '../../utils';
-import { STANDARD_PERIODS } from '../../types/schedule';
-import { ELEMENTARY_SUBJECTS } from '../../types/class';
 
 export const mockTeachers: Teacher[] = [
   {

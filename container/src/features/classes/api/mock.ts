@@ -19,7 +19,7 @@ import type {
 } from '../types';
 import { API_MODE, type ApiMode } from '@/shared/constants';
 import { mapPagination, type ApiResponse } from '@/shared/types/api';
-import { mockTeachers, mockStudents, initializeMockClasses } from './data/mockData';
+import { initializeMockClasses, mockTeachers, mockStudents } from './data/mockData';
 
 export default class ClassMockApiService implements ClassApiService {
   private classes = initializeMockClasses(mockTeachers, mockStudents);

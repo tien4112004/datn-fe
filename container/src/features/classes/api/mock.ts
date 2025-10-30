@@ -8,6 +8,8 @@ import type {
   ClassUpdateRequest,
   StudentEnrollmentRequest,
   StudentTransferRequest,
+  StudentCreateRequest,
+  StudentUpdateRequest,
   SubjectManagementRequest,
   DailySchedule,
   ScheduleCollectionRequest,
@@ -401,6 +403,109 @@ export default class ClassMockApiService implements ClassApiService {
     toClass.updatedAt = new Date().toISOString();
 
     return student;
+  }
+
+  // Student CRUD operations for roster management
+  async createStudent(classId: string, data: StudentCreateRequest): Promise<Student> {
+    await this._delay();
+
+    const cls = this.classes.find((c) => c.id === classId);
+    if (!cls) {
+      throw new Error('Class not found');
+    }
+
+    // Check for duplicate student code
+    const existingStudent = this.students.find((s) => s.studentCode === data.studentCode);
+    if (existingStudent) {
+      throw new Error('Student code already exists');
+    }
+
+    // Create new student
+    const newStudent: Student = {
+      id: `student-${Date.now()}`,
+      studentCode: data.studentCode,
+      firstName: data.firstName,
+      lastName: data.lastName,
+      fullName: `${data.firstName} ${data.lastName}`,
+      dateOfBirth: data.dateOfBirth,
+      gender: data.gender,
+      email: data.email,
+      phone: data.phone,
+      address: data.address,
+      parentName: data.parentName,
+      parentPhone: data.parentPhone,
+      classId: classId,
+      enrollmentDate: data.enrollmentDate || new Date().toISOString(),
+      status: 'active',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    this.students.push(newStudent);
+
+    // Update class enrollment count
+    cls.currentEnrollment += 1;
+    cls.updatedAt = new Date().toISOString();
+
+    return newStudent;
+  }
+
+  async updateStudent(studentId: string, data: StudentUpdateRequest): Promise<Student> {
+    await this._delay();
+
+    const student = this.students.find((s) => s.id === studentId);
+    if (!student) {
+      throw new Error('Student not found');
+    }
+
+    // Check for duplicate student code if it's being changed
+    if (data.studentCode && data.studentCode !== student.studentCode) {
+      const existingStudent = this.students.find((s) => s.studentCode === data.studentCode);
+      if (existingStudent) {
+        throw new Error('Student code already exists');
+      }
+    }
+
+    // Update student fields
+    if (data.studentCode) student.studentCode = data.studentCode;
+    if (data.firstName) student.firstName = data.firstName;
+    if (data.lastName) student.lastName = data.lastName;
+    if (data.firstName || data.lastName) {
+      student.fullName = `${student.firstName} ${student.lastName}`;
+    }
+    if (data.dateOfBirth) student.dateOfBirth = data.dateOfBirth;
+    if (data.gender) student.gender = data.gender;
+    if (data.email !== undefined) student.email = data.email;
+    if (data.phone !== undefined) student.phone = data.phone;
+    if (data.address !== undefined) student.address = data.address;
+    if (data.parentName !== undefined) student.parentName = data.parentName;
+    if (data.parentPhone !== undefined) student.parentPhone = data.parentPhone;
+    if (data.status) student.status = data.status;
+
+    student.updatedAt = new Date().toISOString();
+
+    return student;
+  }
+
+  async deleteStudent(studentId: string): Promise<void> {
+    await this._delay();
+
+    const studentIndex = this.students.findIndex((s) => s.id === studentId);
+    if (studentIndex === -1) {
+      throw new Error('Student not found');
+    }
+
+    const student = this.students[studentIndex];
+
+    // Update class enrollment count
+    const cls = this.classes.find((c) => c.id === student.classId);
+    if (cls) {
+      cls.currentEnrollment = Math.max(0, cls.currentEnrollment - 1);
+      cls.updatedAt = new Date().toISOString();
+    }
+
+    // Remove student
+    this.students.splice(studentIndex, 1);
   }
 
   async getTeachersByClassId(classId: string): Promise<Teacher[]> {

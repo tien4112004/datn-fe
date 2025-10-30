@@ -17,6 +17,8 @@ import type {
   Student,
   StudentEnrollmentRequest,
   StudentTransferRequest,
+  StudentCreateRequest,
+  StudentUpdateRequest,
   SubjectManagementRequest,
   Teacher,
   CalendarEventsQueryParams,
@@ -69,6 +71,11 @@ export interface ClassApiService extends Service {
   enrollStudent(request: StudentEnrollmentRequest): Promise<Student>;
   removeStudentFromClass(classId: string, studentId: string): Promise<void>;
   transferStudent(request: StudentTransferRequest): Promise<Student>;
+
+  // Student CRUD operations (for roster management)
+  createStudent(classId: string, data: StudentCreateRequest): Promise<Student>;
+  updateStudent(studentId: string, data: StudentUpdateRequest): Promise<Student>;
+  deleteStudent(studentId: string): Promise<void>;
 
   // Teacher management
   getTeachersByClassId(classId: string): Promise<Teacher[]>;

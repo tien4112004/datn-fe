@@ -263,15 +263,13 @@ export const SeatingChartView = ({
       {/* Main Seating Chart and Unassigned Students */}
       <div className="flex flex-col gap-6 lg:flex-row">
         {/* Seating Grid */}
-        <div className="border-primary/30 bg-accent/20 flex-1 overflow-x-auto rounded-lg border-2 border-dashed p-6">
-          <SeatingChartGrid layout={localLayout || layout} students={students} />
-          <SeatingChartSidebar
-            unassignedStudents={unassignedStudents}
-            isDirty={isDirty}
-            saveSeatingChart={saveSeatingChart}
-            handleSave={handleSave}
-          />
-        </div>
+        <SeatingChartGrid layout={localLayout || layout} students={students} />
+        <SeatingChartSidebar
+          unassignedStudents={unassignedStudents}
+          isDirty={isDirty}
+          saveSeatingChart={saveSeatingChart}
+          handleSave={handleSave}
+        />
       </div>
 
       <SeatingChartOverlay activeDragInfo={activeDragInfo} />

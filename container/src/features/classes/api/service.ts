@@ -9,6 +9,8 @@ import {
   type ClassUpdateRequest,
   type StudentEnrollmentRequest,
   type StudentTransferRequest,
+  type StudentCreateRequest,
+  type StudentUpdateRequest,
   type SubjectManagementRequest,
   type DailySchedule,
   type ScheduleCollectionRequest,
@@ -127,6 +129,29 @@ export default class ClassRealApiService implements ClassApiService {
       }
     );
     return this._mapStudent(response.data.data);
+  }
+
+  // Student CRUD operations for roster management
+  async createStudent(classId: string, data: StudentCreateRequest): Promise<Student> {
+    const response = await api.post<ApiResponse<Student>>(
+      `${this.baseUrl}/api/classes/${classId}/students`,
+      data
+    );
+    return this._mapStudent(response.data.data);
+  }
+
+  async updateStudent(studentId: string, data: StudentUpdateRequest): Promise<Student> {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { id, ...updateData } = data;
+    const response = await api.put<ApiResponse<Student>>(
+      `${this.baseUrl}/api/students/${studentId}`,
+      updateData
+    );
+    return this._mapStudent(response.data.data);
+  }
+
+  async deleteStudent(studentId: string): Promise<void> {
+    await api.delete(`${this.baseUrl}/api/students/${studentId}`);
   }
 
   async getTeachersByClassId(classId: string): Promise<Teacher[]> {

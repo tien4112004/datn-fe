@@ -1,97 +1,219 @@
-import { DndContext, closestCenter, useDraggable, useDroppable, DragOverlay } from '@dnd-kit/core';
+import { DndContext, closestCenter } from '@dnd-kit/core';
 import type { Layout, Student } from '../../../types';
-import { useTranslation } from 'react-i18next';
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
-import { Users, Grid3x3, Settings2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useSaveSeatingChart } from '@/features/classes/hooks';
+import SeatingChartSidebar from './SeatingChartSidebar';
+import SeatingChartGrid from './SeatingChartGrid';
+import SeatingChartOverlay from './SeatingChartOverlay';
+import SeatingChartConfig from './SeatingChartConfig';
 
 interface SeatingChartViewProps {
+  classId: string;
   layout: Layout;
   students: Student[];
-  unassignedStudents: Student[];
-  onDragEnd: (event: any) => void;
-  onLayoutChange: (newLayout: Layout) => void;
   showLayoutConfig?: boolean;
 }
-
-const DraggableItem = ({
-  id,
-  children,
-  data,
-  disabled = false,
-}: {
-  id: string;
-  children: React.ReactNode;
-  data?: any;
-  disabled?: boolean;
-}) => {
-  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
-    id,
-    data,
-    disabled,
-  });
-
-  const style = {
-    cursor: disabled ? 'default' : isDragging ? 'grabbing' : 'grab',
-  };
-
-  return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      {...attributes}
-      {...listeners}
-      className={isDragging ? 'opacity-0' : ''}
-    >
-      {children}
-    </div>
-  );
-};
-
-const DroppableArea = ({ id, children, data }: { id: string; children: React.ReactNode; data?: any }) => {
-  const { setNodeRef, isOver } = useDroppable({
-    id,
-    data,
-  });
-
-  return (
-    <div ref={setNodeRef} className={isOver ? 'ring-primary/50 rounded-lg ring-2 ring-offset-2' : ''}>
-      {children}
-    </div>
-  );
-};
 
 export const SeatingChartView = ({
   layout,
   students,
-  unassignedStudents,
-  onDragEnd,
-  onLayoutChange,
   showLayoutConfig = false,
+  classId,
 }: SeatingChartViewProps) => {
-  const { t } = useTranslation('classes', { keyPrefix: 'detail' });
-  const [cols, setCols] = useState(layout.columns);
-  const [rows, setRows] = useState(layout.rows);
   const [activeId, setActiveId] = useState<string | null>(null);
 
-  const handleApplyLayout = () => {
-    onLayoutChange({ ...layout, columns: cols, rows: rows });
+  const [localLayout, setLocalLayout] = useState<Layout | null>(null);
+  const [unassignedStudents, setUnassignedStudents] = useState<any[]>([]);
+
+  const [isDirty, setIsDirty] = useState(false);
+  const saveSeatingChart = useSaveSeatingChart();
+
+  const handleSave = () => {
+    if (localLayout) {
+      saveSeatingChart.mutate(
+        { classId: classId, layout: localLayout },
+        {
+          onSuccess: () => {
+            setIsDirty(false);
+          },
+        }
+      );
+    }
   };
+
+  useEffect(() => {
+    if (layout) {
+      setLocalLayout(layout);
+      setUnassignedStudents(
+        students.filter((student: Student) => !layout.seats.some((seat) => seat.studentId === student.id))
+      );
+      setIsDirty(false);
+    }
+  }, [layout, students]);
 
   const handleDragStart = (event: any) => {
     setActiveId(event.active.id);
   };
 
   const handleDragEnd = (event: any) => {
-    // Pass the event to parent handler which manages the actual state
-    onDragEnd(event);
-    // Clear activeId after a brief delay to allow state update to complete
-    requestAnimationFrame(() => {
-      setActiveId(null);
+    const { active, over } = event;
+
+    if (!over) return;
+
+    const activeContainer = active.data.current?.containerId;
+    const overContainer = over.data.current?.containerId;
+
+    if (activeContainer === overContainer) {
+      if (activeContainer === 'unassigned') {
+        // Reordering within unassigned students list - keep simple drag
+        // No need to reorder in unassigned list
+        return;
+      } else if (activeContainer === 'grid') {
+        // Swapping students within the grid
+        setLocalLayout((layout) => {
+          if (!layout) return null;
+
+          const activeSeatIndex = layout.seats.findIndex((s) => s.id === active.id);
+          const overSeatIndex = layout.seats.findIndex((s) => s.id === over.id);
+
+          if (activeSeatIndex === -1 || overSeatIndex === -1) return layout;
+
+          // Create a new seats array with swapped studentIds
+          const newSeats = layout.seats.map((seat, index) => {
+            if (index === activeSeatIndex) {
+              return { ...seat, studentId: layout.seats[overSeatIndex].studentId };
+            }
+            if (index === overSeatIndex) {
+              return { ...seat, studentId: layout.seats[activeSeatIndex].studentId };
+            }
+            return seat;
+          });
+
+          return {
+            ...layout,
+            seats: newSeats,
+          };
+        });
+      }
+    } else {
+      // Dragging from unassigned to grid
+      if (activeContainer === 'unassigned' && overContainer === 'grid') {
+        const studentId = active.id;
+        const seatId = over.id;
+
+        // Find the target seat first to check if it's occupied
+        const overSeat = localLayout?.seats.find((s) => s.id === seatId);
+
+        // If the target seat has a student, swap them
+        if (overSeat && overSeat.studentId) {
+          const studentToUnassign = students.find((s: Student) => s.id === overSeat.studentId);
+
+          // Update unassigned students list: remove dragged student, add displaced student
+          setUnassignedStudents((students) => {
+            const filtered = students.filter((s) => s.id !== studentId);
+            if (studentToUnassign) {
+              return [...filtered, studentToUnassign];
+            }
+            return filtered;
+          });
+        } else {
+          // Target seat is empty, just remove the dragged student from unassigned
+          setUnassignedStudents((students) => students.filter((s) => s.id !== studentId));
+        }
+
+        // Update the layout with the new seat assignment
+        setLocalLayout((layout) => {
+          if (!layout) return null;
+
+          const newSeats = layout.seats.map((seat) => {
+            if (seat.id === seatId) {
+              return { ...seat, studentId };
+            }
+            return seat;
+          });
+
+          return { ...layout, seats: newSeats };
+        });
+      }
+      // Dragging from grid to unassigned
+      else if (activeContainer === 'grid' && overContainer === 'unassigned') {
+        const seatId = active.id;
+
+        // Find the student before updating layout
+        const activeSeat = localLayout?.seats.find((s) => s.id === seatId);
+        const studentId = activeSeat?.studentId;
+
+        // Update unassigned students first (outside of setLocalLayout)
+        if (studentId) {
+          const student = students.find((s: Student) => s.id === studentId);
+          if (student) {
+            setUnassignedStudents((students) => [...students, student]);
+          }
+        }
+
+        // Then update layout to remove student from seat
+        setLocalLayout((layout) => {
+          if (!layout) return null;
+
+          const newSeats = layout.seats.map((seat) => {
+            if (seat.id === seatId) {
+              return { ...seat, studentId: null };
+            }
+            return seat;
+          });
+
+          return { ...layout, seats: newSeats };
+        });
+      }
+    }
+
+    setIsDirty(true);
+    setActiveId(null);
+  };
+
+  const handleLayoutChange = (newLayout: Layout) => {
+    if (!localLayout) {
+      setLocalLayout(newLayout);
+      return;
+    }
+    // When layout dimensions change, regenerate seats
+    const totalSeats = newLayout.rows * newLayout.columns;
+    const currentSeats = localLayout.seats;
+
+    const newSeats = [];
+
+    // Create new seats grid
+    for (let i = 0; i < totalSeats; i++) {
+      // Try to preserve existing seat assignment if within range
+      if (i < currentSeats.length) {
+        newSeats.push(currentSeats[i]);
+      } else {
+        // Create new empty seat
+        newSeats.push({
+          id: `seat-${i}`,
+          studentId: null,
+        });
+      }
+    }
+
+    // If we're reducing seats, move students from removed seats to unassigned
+    if (totalSeats < currentSeats.length) {
+      const removedSeats = currentSeats.slice(totalSeats);
+      const studentsToUnassign = removedSeats
+        .filter((seat) => seat.studentId)
+        .map((seat) => students.find((s: Student) => s.id === seat.studentId))
+        .filter(Boolean);
+
+      if (studentsToUnassign.length > 0) {
+        setUnassignedStudents((prev) => [...prev, ...studentsToUnassign]);
+      }
+    }
+
+    setLocalLayout({
+      ...newLayout,
+      seats: newSeats,
     });
+    setIsDirty(true);
   };
 
   const handleDragCancel = () => {
@@ -136,200 +258,23 @@ export const SeatingChartView = ({
       onDragCancel={handleDragCancel}
     >
       {/* Layout Configuration Section */}
-      {showLayoutConfig && (
-        <Card className="border-primary/20 bg-primary/5 mb-10 p-4">
-          <div className="flex flex-row gap-4">
-            <div className="text-primary flex items-center justify-center gap-2">
-              <Settings2 className="h-5 w-5" />
-              <h3 className="font-semibold">{t('students.layoutConfiguration')}</h3>
-            </div>
-            <div className="flex flex-1 items-center gap-4">
-              <div className="flex flex-1 items-center gap-2">
-                <Label htmlFor="columns" className="flex items-center gap-1.5 text-sm font-medium">
-                  <Grid3x3 className="h-4 w-4" />
-                  <span className="whitespace-nowrap">{t('students.columns')}</span>
-                </Label>
-                <Input
-                  id="columns"
-                  type="number"
-                  min="1"
-                  max="20"
-                  value={cols}
-                  onChange={(e) => setCols(Number(e.target.value))}
-                  className="h-10 w-full"
-                />
-              </div>
-              <div className="flex flex-1 items-center gap-2">
-                <Label htmlFor="rows" className="flex items-center gap-1.5 text-sm font-medium">
-                  <Grid3x3 className="h-4 w-4" />
-                  <span className="whitespace-nowrap">{t('students.rows')}</span>
-                </Label>
-                <Input
-                  id="rows"
-                  type="number"
-                  min="1"
-                  max="20"
-                  value={rows}
-                  onChange={(e) => setRows(Number(e.target.value))}
-                  className="h-10 w-full"
-                />
-              </div>
-              <Button onClick={handleApplyLayout} className="h-10 min-w-[120px]" variant="default">
-                {t('students.applyLayout')}
-              </Button>
-            </div>
-          </div>
-        </Card>
-      )}
+      {showLayoutConfig && <SeatingChartConfig onLayoutChange={handleLayoutChange} />}
 
       {/* Main Seating Chart and Unassigned Students */}
       <div className="flex flex-col gap-6 lg:flex-row">
         {/* Seating Grid */}
         <div className="border-primary/30 bg-accent/20 flex-1 overflow-x-auto rounded-lg border-2 border-dashed p-6">
-          <div
-            className="grid gap-3"
-            style={{
-              gridTemplateColumns: `repeat(${layout.columns}, 1fr)`,
-              gridTemplateRows: `repeat(${layout.rows}, 1fr)`,
-              minWidth: `${layout.columns * 140}px`,
-            }}
-          >
-            {layout.seats.map((seat) => {
-              const student = students.find((s) => s.id === seat.studentId);
-              const hasStudent = !!student;
-
-              return (
-                <DroppableArea key={seat.id} id={seat.id} data={{ containerId: 'grid' }}>
-                  <DraggableItem id={seat.id} data={{ containerId: 'grid' }} disabled={!hasStudent}>
-                    <Card
-                      className={`relative h-32 transition-all duration-200 ${
-                        student
-                          ? 'border-primary/40 hover:border-primary bg-white shadow-md hover:scale-105 hover:shadow-xl'
-                          : 'hover:border-primary/40 border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100'
-                      }`}
-                    >
-                      <div className="flex h-full w-full flex-col items-center justify-center gap-1.5 p-3 text-center">
-                        {student ? (
-                          <>
-                            <div className="bg-primary/10 text-primary mb-0.5 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full">
-                              <Users className="h-5 w-5" />
-                            </div>
-                            <div className="min-w-0">
-                              <p
-                                className="overflow-hidden whitespace-nowrap text-sm font-semibold"
-                                style={{ textOverflow: 'ellipsis' }}
-                              >
-                                {student.fullName}
-                              </p>
-                              <p className="text-xs">{student.studentCode}</p>
-                            </div>
-                          </>
-                        ) : (
-                          <>
-                            <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-gray-200">
-                              <Users className="h-5 w-5 text-gray-400" />
-                            </div>
-                            <p className="text-muted-foreground text-xs">{t('students.emptySeat')}</p>
-                          </>
-                        )}
-                      </div>
-                    </Card>
-                  </DraggableItem>
-                </DroppableArea>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Unassigned Students Sidebar */}
-        <div className="w-full lg:w-80">
-          <Card className="border-orange-200 bg-amber-50 p-4">
-            <div className="mb-4 flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-orange-500 text-white">
-                <Users className="h-4 w-4" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-gray-900">{t('students.unassignedStudents')}</h3>
-                <p className="text-muted-foreground text-xs">
-                  {unassignedStudents.length} {unassignedStudents.length === 1 ? 'student' : 'students'}
-                </p>
-              </div>
-            </div>
-            <DroppableArea id="unassigned" data={{ containerId: 'unassigned' }}>
-              <div className="max-h-[600px] space-y-2 overflow-y-auto pr-2">
-                {unassignedStudents.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-white/50 p-6 text-center">
-                    <Users className="mb-2 h-8 w-8 text-gray-400" />
-                    <p className="text-muted-foreground text-sm">{t('students.allStudentsAssigned')}</p>
-                  </div>
-                ) : (
-                  unassignedStudents.map((student) => (
-                    <DraggableItem key={student.id} id={student.id} data={{ containerId: 'unassigned' }}>
-                      <Card className="h-[72px] border-orange-200 bg-white shadow-sm transition-all hover:scale-[1.02] hover:border-orange-300 hover:shadow-lg">
-                        <div className="flex h-full items-center gap-3 p-3">
-                          <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-orange-100 text-orange-600">
-                            <Users className="h-5 w-5" />
-                          </div>
-                          <div className="min-w-0 flex-1 overflow-hidden">
-                            <p className="truncate font-medium leading-tight text-gray-900">
-                              {student.fullName}
-                            </p>
-                            <p className="text-muted-foreground truncate text-xs leading-tight">
-                              {student.studentCode}
-                            </p>
-                          </div>
-                        </div>
-                      </Card>
-                    </DraggableItem>
-                  ))
-                )}
-              </div>
-            </DroppableArea>
-          </Card>
+          <SeatingChartGrid layout={localLayout || layout} students={students} />
+          <SeatingChartSidebar
+            unassignedStudents={unassignedStudents}
+            isDirty={isDirty}
+            saveSeatingChart={saveSeatingChart}
+            handleSave={handleSave}
+          />
         </div>
       </div>
 
-      {/* DragOverlay - renders the dragged item with high z-index */}
-      <DragOverlay style={{ zIndex: 9999 }} dropAnimation={null}>
-        {activeDragInfo ? (
-          activeDragInfo.source === 'unassigned' ? (
-            // Unassigned student style (orange/amber)
-            <Card className="h-[72px] border-orange-200 bg-white shadow-2xl">
-              <div className="flex h-full items-center gap-3 p-3">
-                <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-orange-100 text-orange-600">
-                  <Users className="h-5 w-5" />
-                </div>
-                <div className="min-w-0 flex-1 overflow-hidden">
-                  <p className="truncate font-medium leading-tight text-gray-900">
-                    {activeDragInfo.student.fullName}
-                  </p>
-                  <p className="text-muted-foreground truncate text-xs leading-tight">
-                    {activeDragInfo.student.studentCode}
-                  </p>
-                </div>
-              </div>
-            </Card>
-          ) : (
-            // Grid student style (primary/blue)
-            <Card className="border-primary/40 h-32 bg-white shadow-2xl">
-              <div className="flex h-full w-full flex-col items-center justify-center gap-1.5 p-3 text-center">
-                <div className="bg-primary/10 text-primary mb-0.5 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full">
-                  <Users className="h-5 w-5" />
-                </div>
-                <div className="min-w-0">
-                  <p
-                    className="overflow-hidden whitespace-nowrap text-sm font-semibold"
-                    style={{ textOverflow: 'ellipsis' }}
-                  >
-                    {activeDragInfo.student.fullName}
-                  </p>
-                  <p className="text-xs">{activeDragInfo.student.studentCode}</p>
-                </div>
-              </div>
-            </Card>
-          )
-        ) : null}
-      </DragOverlay>
+      <SeatingChartOverlay activeDragInfo={activeDragInfo} />
     </DndContext>
   );
 };

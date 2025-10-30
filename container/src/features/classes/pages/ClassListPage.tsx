@@ -6,7 +6,7 @@ import ClassTable from '../components/table/ClassTable';
 import ClassGrid from '../components/table/ClassGrid';
 import CreateClassControls from '../components/controls/CreateClassControls';
 import ViewToggle, { type ViewMode } from '../components/controls/ViewToggle';
-import ClassFilters from '../components/filters/ClassFilters';
+import ClassFilters from '../components/table/ClassFilters';
 import { useClassStore } from '../stores';
 
 const ClassListPage = () => {

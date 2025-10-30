@@ -56,6 +56,19 @@ export default {
     students: {
       title: 'Học sinh ({{count}})',
       noStudents: 'Không có học sinh nào',
+      listView: 'Chế độ danh sách',
+      seatingChartView: 'Chế độ sơ đồ chỗ ngồi',
+      saveLayout: 'Lưu sơ đồ',
+      saving: 'Đang lưu...',
+      unassignedStudents: 'Học sinh chưa có chỗ',
+      emptySeat: 'Chỗ trống',
+      loadingSeatingChart: 'Đang tải sơ đồ chỗ ngồi...',
+      errorSeatingChart: 'Lỗi khi tải sơ đồ chỗ ngồi.',
+      columns: 'Số cột',
+      rows: 'Số hàng',
+      applyLayout: 'Áp dụng',
+      layoutConfiguration: 'Cấu hình sơ đồ',
+      allStudentsAssigned: 'Đã xếp chỗ hết',
     },
     teachers: {
       homeroomTeacher: 'Giáo viên chủ nhiệm',
@@ -456,6 +469,49 @@ export default {
         linkLesson: 'Liên kết bài học',
         linking: 'Đang liên kết...',
       },
+    },
+  },
+  calendar: {
+    title: 'Lịch Lớp Học',
+    today: 'Hôm nay',
+    previousMonth: 'Tháng trước',
+    nextMonth: 'Tháng sau',
+    noEvents: 'Không có sự kiện',
+    more: 'thêm',
+    moreEvents: '{{count}} sự kiện khác',
+    moreEvents_other: '{{count}} sự kiện khác',
+
+    weekdays: {
+      sunday: 'CN',
+      monday: 'T2',
+      tuesday: 'T3',
+      wednesday: 'T4',
+      thursday: 'T5',
+      friday: 'T6',
+      saturday: 'T7',
+    },
+
+    categories: {
+      assignment: 'Bài Tập',
+      exam: 'Kiểm Tra',
+      fieldTrip: 'Dã Ngoại',
+      meeting: 'Họp',
+      holiday: 'Ngày Lễ',
+      presentation: 'Thuyết Trình',
+      other: 'Khác',
+    },
+
+    fields: {
+      date: 'Ngày',
+      time: 'Thời gian',
+      location: 'Địa điểm',
+      description: 'Mô tả',
+      category: 'Danh mục',
+    },
+
+    errors: {
+      invalidClassId: 'ID lớp học không hợp lệ',
+      loadFailed: 'Không thể tải sự kiện lịch',
     },
   },
 };

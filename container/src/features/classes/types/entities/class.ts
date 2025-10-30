@@ -7,6 +7,7 @@
  */
 
 import type { Student } from './student';
+import type { Layout } from './layout';
 
 export interface Class {
   id: string;
@@ -22,6 +23,7 @@ export interface Class {
   classroom?: string; // physical location
   description?: string;
   students: Student[];
+  layout?: Layout;
   createdAt: string;
   updatedAt: string;
   isActive: boolean;

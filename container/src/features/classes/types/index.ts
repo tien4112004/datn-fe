@@ -12,17 +12,21 @@ export * from './entities/class';
 export * from './entities/student';
 export * from './entities/schedule';
 export * from './entities/lesson';
+export * from './entities/layout';
+export * from './entities/calendarEvent';
 
 // Request type exports
 export * from './requests/classRequests';
 export * from './requests/studentRequests';
 export * from './requests/scheduleRequests';
 export * from './requests/lessonRequests';
+export * from './requests/calendarRequests';
 
 // Constants exports
 export * from './constants/subjects';
 export * from './constants/grades';
 export * from './constants/statuses';
+export * from './constants/eventCategories';
 
 // UI type exports
 export * from './ui';

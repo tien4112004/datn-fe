@@ -1,6 +1,7 @@
-import { ClassDetailPage, ClassListPage } from './pages';
+import { ClassCalendarPage, ClassDetailPage, ClassListPage } from './pages';
 
 export default {
   ClassListPage,
   ClassDetailPage,
+  ClassCalendarPage,
 };

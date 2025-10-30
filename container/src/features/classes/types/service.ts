@@ -8,6 +8,7 @@ import type {
   ClassPeriod,
   ClassUpdateRequest,
   DailySchedule,
+  Layout,
   LearningObjective,
   LessonPlan,
   LessonPlanCollectionRequest,
@@ -18,6 +19,8 @@ import type {
   StudentTransferRequest,
   SubjectManagementRequest,
   Teacher,
+  CalendarEventsQueryParams,
+  GetCalendarEventsResponse,
 } from '.';
 
 export interface ClassApiService extends Service {
@@ -28,12 +31,19 @@ export interface ClassApiService extends Service {
   updateClass(data: ClassUpdateRequest): Promise<Class>;
   deleteClass(id: string): Promise<void>;
 
+  // Seating Chart
+  getSeatingChart(classId: string): Promise<Layout | null>;
+  saveSeatingChart(classId: string, layout: Layout): Promise<Layout>;
+
   // Schedule and Lesson Management
   getSchedules(classId: string, params: ScheduleCollectionRequest): Promise<ApiResponse<DailySchedule[]>>;
   getPeriods(classId: string, params: { date?: string }): Promise<ApiResponse<ClassPeriod[]>>;
   getLessonPlans(classId: string, params: LessonPlanCollectionRequest): Promise<ApiResponse<LessonPlan[]>>;
   getLessonObjectives(lessonPlanId: string): Promise<LearningObjective[]>;
   getLessonResources(lessonPlanId: string): Promise<LessonResource[]>;
+
+  // Calendar Events
+  getCalendarEvents(classId: string, params: CalendarEventsQueryParams): Promise<GetCalendarEventsResponse>;
 
   // Lesson Plan mutations
   updateLessonStatus(id: string, status: string, notes?: string): Promise<LessonPlan>;

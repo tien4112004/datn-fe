@@ -56,6 +56,19 @@ export default {
     students: {
       title: 'Students ({{count}})',
       noStudents: 'No students enrolled',
+      listView: 'List View',
+      seatingChartView: 'Seating Chart View',
+      saveLayout: 'Save Layout',
+      saving: 'Saving...',
+      unassignedStudents: 'Unassigned Students',
+      emptySeat: 'Empty Seat',
+      loadingSeatingChart: 'Loading seating chart...',
+      errorSeatingChart: 'Failed to load seating chart.',
+      columns: 'Columns',
+      rows: 'Rows',
+      applyLayout: 'Apply Layout',
+      layoutConfiguration: 'Layout Configuration',
+      allStudentsAssigned: 'All students assigned',
     },
     teachers: {
       homeroomTeacher: 'Homeroom Teacher',
@@ -456,6 +469,49 @@ export default {
         linkLesson: 'Link Lesson',
         linking: 'Linking...',
       },
+    },
+  },
+  calendar: {
+    title: 'Class Calendar',
+    today: 'Today',
+    previousMonth: 'Previous month',
+    nextMonth: 'Next month',
+    noEvents: 'No events',
+    more: 'more',
+    moreEvents: '{{count}} more event',
+    moreEvents_other: '{{count}} more events',
+
+    weekdays: {
+      sunday: 'Sun',
+      monday: 'Mon',
+      tuesday: 'Tue',
+      wednesday: 'Wed',
+      thursday: 'Thu',
+      friday: 'Fri',
+      saturday: 'Sat',
+    },
+
+    categories: {
+      assignment: 'Assignment',
+      exam: 'Exam',
+      fieldTrip: 'Field Trip',
+      meeting: 'Meeting',
+      holiday: 'Holiday',
+      presentation: 'Presentation',
+      other: 'Other',
+    },
+
+    fields: {
+      date: 'Date',
+      time: 'Time',
+      location: 'Location',
+      description: 'Description',
+      category: 'Category',
+    },
+
+    errors: {
+      invalidClassId: 'Invalid class ID',
+      loadFailed: 'Failed to load calendar events',
     },
   },
 };

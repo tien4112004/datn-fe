@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient, type UseQueryResult } from '@tanstack/react-query';
 import type { SortingState, PaginationState, Updater } from '@tanstack/react-table';
 import { useEffect, useState } from 'react';
+import { startOfMonth, endOfMonth, format } from 'date-fns';
 import { useClassApiService } from '../api';
 import type {
   ClassCollectionRequest,
@@ -8,6 +9,7 @@ import type {
   ClassUpdateRequest,
   StudentEnrollmentRequest,
   StudentTransferRequest,
+  Layout,
 } from '../types';
 import type { ApiResponse } from '@/shared/types/api';
 import type { Class } from '../types';
@@ -23,6 +25,7 @@ export const classKeys = {
   teachers: (classId: string) => [...classKeys.all, 'teachers', classId] as const,
   capacity: (classId: string) => [...classKeys.all, 'capacity', classId] as const,
   availableTeachers: (subject?: string) => ['teachers', 'available', subject] as const,
+  seatingChart: (classId: string) => [...classKeys.all, 'seating-chart', classId] as const,
 
   // Teaching & Schedule related keys
   schedules: (classId: string, params?: any) => [...classKeys.all, 'schedules', classId, params] as const,
@@ -31,6 +34,10 @@ export const classKeys = {
     [...classKeys.all, 'lesson-plans', classId, params] as const,
   objectives: (lessonPlanId: string) => [...classKeys.all, 'objectives', lessonPlanId] as const,
   resources: (lessonPlanId: string) => [...classKeys.all, 'resources', lessonPlanId] as const,
+
+  // Calendar related keys
+  calendarEvents: (classId: string, monthKey: string) =>
+    [...classKeys.all, 'calendar-events', classId, monthKey] as const,
 };
 
 // Return types for the hooks
@@ -163,6 +170,16 @@ export function useAvailableTeachers(subject?: string) {
   });
 }
 
+export function useSeatingChart(classId: string) {
+  const classApiService = useClassApiService();
+
+  return useQuery({
+    queryKey: classKeys.seatingChart(classId),
+    queryFn: () => classApiService.getSeatingChart(classId),
+    enabled: !!classId,
+  });
+}
+
 // Teaching & Schedule queries
 export function useClassSchedules(classId: string, params: any = {}) {
   const classApiService = useClassApiService();
@@ -209,6 +226,41 @@ export function useLessonResources(lessonPlanId: string) {
   });
 }
 
+// Calendar Events
+export function useCalendarEvents(classId: string, selectedDate: Date, enabled = true) {
+  const classApiService = useClassApiService();
+
+  // Calculate date range for the selected month
+  const startDate = startOfMonth(selectedDate);
+  const endDate = endOfMonth(selectedDate);
+
+  // Format dates for API query (YYYY-MM-DD)
+  const startDateStr = format(startDate, 'yyyy-MM-dd');
+  const endDateStr = format(endDate, 'yyyy-MM-dd');
+
+  // Format month for query key (YYYY-MM)
+  const monthKey = format(selectedDate, 'yyyy-MM');
+
+  const { data, isLoading, error, isFetching, refetch } = useQuery({
+    queryKey: classKeys.calendarEvents(classId, monthKey),
+    queryFn: () =>
+      classApiService.getCalendarEvents(classId, {
+        startDate: startDateStr,
+        endDate: endDateStr,
+      }),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    enabled: !!classId && enabled,
+  });
+
+  return {
+    events: data?.events ?? [],
+    isLoading,
+    error: error as Error | null,
+    isFetching,
+    refetch,
+  };
+}
+
 // Class mutations
 
 // Class mutations
@@ -245,6 +297,19 @@ export function useDeleteClass() {
     mutationFn: (id: string) => classApiService.deleteClass(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: classKeys.lists() });
+    },
+  });
+}
+
+export function useSaveSeatingChart() {
+  const queryClient = useQueryClient();
+  const classApiService = useClassApiService();
+
+  return useMutation({
+    mutationFn: ({ classId, layout }: { classId: string; layout: Layout }) =>
+      classApiService.saveSeatingChart(classId, layout),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: classKeys.seatingChart(variables.classId) });
     },
   });
 }

@@ -68,6 +68,9 @@ importers:
       '@dnd-kit/sortable':
         specifier: ^10.0.0
         version: 10.0.0(@dnd-kit/core@6.3.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0)
+      '@dnd-kit/utilities':
+        specifier: ^3.2.2
+        version: 3.2.2(react@19.1.0)
       '@hookform/resolvers':
         specifier: ^5.1.1
         version: 5.1.1(react-hook-form@7.61.1(react@19.1.0))
@@ -14372,7 +14375,7 @@ snapshots:
       sirv: 3.0.1
       tinyglobby: 0.2.14
       tinyrainbow: 2.0.0
-      vitest: 3.2.4(@types/debug@4.1.12)(@types/node@18.19.118)(@vitest/ui@3.2.4)(jiti@2.5.1)(jsdom@26.1.0)(lightningcss@1.30.1)(sass@1.89.2)(terser@5.43.1)(yaml@2.8.0)
+      vitest: 3.2.4(@types/debug@4.1.12)(@types/node@20.19.7)(@vitest/ui@3.2.4)(jiti@2.5.1)(jsdom@26.1.0)(lightningcss@1.30.1)(sass@1.89.2)(terser@5.43.1)(yaml@2.8.0)
 
   '@vitest/utils@3.2.4':
     dependencies:
@@ -18302,7 +18305,7 @@ snapshots:
       unctx: 2.4.1
       unimport: 5.2.0
       unplugin: 2.3.5
-      unplugin-vue-router: 0.15.0(@vue/compiler-sfc@3.5.20)(typescript@5.3.3)(vue-router@4.5.1(vue@3.5.17(typescript@5.3.3)))(vue@3.5.20(typescript@5.3.3))
+      unplugin-vue-router: 0.15.0(@vue/compiler-sfc@3.5.20)(typescript@5.3.3)(vue-router@4.5.1(vue@3.5.20(typescript@5.3.3)))(vue@3.5.20(typescript@5.3.3))
       unstorage: 1.17.0(@netlify/blobs@9.1.2)(db0@0.3.2)(ioredis@5.7.0)
       untyped: 2.0.0
       vue: 3.5.20(typescript@5.3.3)
@@ -20639,7 +20642,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  unplugin-vue-router@0.15.0(@vue/compiler-sfc@3.5.20)(typescript@5.3.3)(vue-router@4.5.1(vue@3.5.17(typescript@5.3.3)))(vue@3.5.20(typescript@5.3.3)):
+  unplugin-vue-router@0.15.0(@vue/compiler-sfc@3.5.20)(typescript@5.3.3)(vue-router@4.5.1(vue@3.5.20(typescript@5.3.3)))(vue@3.5.20(typescript@5.3.3)):
     dependencies:
       '@vue-macros/common': 3.0.0-beta.16(vue@3.5.20(typescript@5.3.3))
       '@vue/compiler-sfc': 3.5.20

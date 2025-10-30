@@ -17,6 +17,9 @@ import {
   type LessonPlanCollectionRequest,
   type LearningObjective,
   type LessonResource,
+  type Layout,
+  type CalendarEventsQueryParams,
+  type GetCalendarEventsResponse,
 } from '../types';
 import { api } from '@/shared/api';
 import { mapPagination, type ApiResponse, type Pagination } from '@/shared/types/api';
@@ -76,6 +79,21 @@ export default class ClassRealApiService implements ClassApiService {
 
   async deleteClass(id: string): Promise<void> {
     await api.delete(`${this.baseUrl}/api/classes/${id}`);
+  }
+
+  async getSeatingChart(classId: string): Promise<Layout | null> {
+    const response = await api.get<ApiResponse<Layout>>(
+      `${this.baseUrl}/api/classes/${classId}/seating-chart`
+    );
+    return response.data.data;
+  }
+
+  async saveSeatingChart(classId: string, layout: Layout): Promise<Layout> {
+    const response = await api.put<ApiResponse<Layout>>(
+      `${this.baseUrl}/api/classes/${classId}/seating-chart`,
+      layout
+    );
+    return response.data.data;
   }
 
   async getStudentsByClassId(classId: string): Promise<Student[]> {
@@ -297,6 +315,23 @@ export default class ClassRealApiService implements ClassApiService {
     await api.delete(`${this.baseUrl}/api/periods/${periodId}/link-lesson`);
   }
 
+  // Calendar Events
+  async getCalendarEvents(
+    classId: string,
+    params: CalendarEventsQueryParams
+  ): Promise<GetCalendarEventsResponse> {
+    const response = await api.get<GetCalendarEventsResponse>(
+      `${this.baseUrl}/api/classes/${classId}/calendar/events`,
+      {
+        params: {
+          startDate: params.startDate,
+          endDate: params.endDate,
+        },
+      }
+    );
+    return response.data;
+  }
+
   private _mapClass(data: any): Class {
     return {
       id: data.id,
@@ -312,6 +347,7 @@ export default class ClassRealApiService implements ClassApiService {
       classroom: data.classroom,
       description: data.description,
       students: (data.students || []).map(this._mapStudent),
+      layout: data.layout, // Assuming the backend returns the layout
       createdAt: data.createdAt,
       updatedAt: data.updatedAt,
       isActive: data.isActive !== false, // default to true if not specified

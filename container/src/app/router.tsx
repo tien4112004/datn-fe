@@ -76,6 +76,10 @@ const router = createBrowserRouter([
         loader: getClassById,
       },
       {
+        path: 'classes/:id/calendar',
+        Component: Classes.ClassCalendarPage,
+      },
+      {
         path: 'settings',
         Component: Settings.SettingsPage,
       },

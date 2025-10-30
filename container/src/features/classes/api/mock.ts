@@ -16,10 +16,14 @@ import type {
   LessonPlanCollectionRequest,
   LearningObjective,
   LessonResource,
+  CalendarEventsQueryParams,
+  GetCalendarEventsResponse,
+  Layout,
 } from '../types';
 import { API_MODE, type ApiMode } from '@/shared/constants';
 import { mapPagination, type ApiResponse } from '@/shared/types/api';
 import { initializeMockClasses, mockTeachers, mockStudents } from './data/mockData';
+import { fetchClassEvents } from './calendarApi';
 
 export default class ClassMockApiService implements ClassApiService {
   private classes = initializeMockClasses(mockTeachers, mockStudents);
@@ -811,6 +815,28 @@ export default class ClassMockApiService implements ClassApiService {
 
     period.lessonPlanId = undefined;
     period.updatedAt = new Date().toISOString();
+  }
+
+  // Calendar Events
+  async getCalendarEvents(
+    classId: string,
+    params: CalendarEventsQueryParams
+  ): Promise<GetCalendarEventsResponse> {
+    // Delegate to existing calendarApi implementation
+    return fetchClassEvents(classId, params);
+  }
+
+  // Seating Chart (stub implementations)
+  async getSeatingChart(classId: string): Promise<Layout | null> {
+    await this._delay();
+
+    return this.classes.find((c) => c.id === classId)?.layout || null;
+  }
+
+  async saveSeatingChart(classId: string, layout: any): Promise<any> {
+    await this._delay();
+    // TODO: Implement seating chart save logic
+    return { classId, layout };
   }
 
   private async _delay(): Promise<void> {

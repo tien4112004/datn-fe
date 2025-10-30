@@ -1,4 +1,4 @@
-import { useParams, useLoaderData } from 'react-router-dom';
+import { useParams, useLoaderData, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   Breadcrumb,
@@ -52,6 +52,7 @@ const ClassDetailPage = () => {
   const { t } = useTranslation('classes', { keyPrefix: 'detail' });
   const { t: tPage } = useTranslation('common', { keyPrefix: 'pages' });
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const loaderData = useLoaderData() as LoaderData;
 
   // Use React Query for real-time updates, fallback to loader data
@@ -165,6 +166,10 @@ const ClassDetailPage = () => {
               </div>
 
               <div className="flex gap-2">
+                <Button onClick={() => navigate(`/classes/${id}/calendar`)} variant="outline" size="sm">
+                  <Calendar className="mr-2 h-4 w-4" />
+                  {t('actions.calendar', 'Calendar')}
+                </Button>
                 <Button onClick={handleEditClass} variant="outline" size="sm">
                   <Edit className="mr-2 h-4 w-4" />
                   {t('actions.edit')}

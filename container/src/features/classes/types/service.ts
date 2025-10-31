@@ -23,6 +23,7 @@ import type {
   Teacher,
   CalendarEventsQueryParams,
   GetCalendarEventsResponse,
+  ImportBackendResult,
 } from '.';
 
 export interface ClassApiService extends Service {
@@ -91,4 +92,7 @@ export interface ClassApiService extends Service {
   getClassCapacityInfo(
     classId: string
   ): Promise<{ capacity: number; currentEnrollment: number; available: number }>;
+
+  // CSV Import
+  submitImport(classId: string, file: File): Promise<ImportBackendResult>;
 }

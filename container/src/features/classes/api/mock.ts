@@ -944,8 +944,26 @@ export default class ClassMockApiService implements ClassApiService {
     return { classId, layout };
   }
 
-  private async _delay(): Promise<void> {
-    return new Promise((resolve) => setTimeout(resolve, 300));
+  // CSV Import - Simulates happy case and error case based on filename
+  async submitImport(_classId: string, file: File): Promise<any> {
+    await this._delay(5000);
+
+    // Simulate error case if filename contains "error"
+    if (file.name.toLowerCase().includes('error')) {
+      throw new Error('Failed to import students');
+    }
+
+    // Happy case: successful import
+    const studentsCreated = 15;
+    return {
+      success: true,
+      studentsCreated,
+      message: `Successfully imported ${studentsCreated} students`,
+    };
+  }
+
+  private async _delay(time: number = 300): Promise<void> {
+    return new Promise((resolve) => setTimeout(resolve, time));
   }
 }
 

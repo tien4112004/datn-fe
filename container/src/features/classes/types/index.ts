@@ -31,5 +31,8 @@ export * from './constants/eventCategories';
 // UI type exports
 export * from './ui';
 
+// CSV Import types
+export * from './csvImport';
+
 // Service types
 export * from './service';

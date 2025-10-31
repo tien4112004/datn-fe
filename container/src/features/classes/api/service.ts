@@ -421,4 +421,30 @@ export default class ClassRealApiService implements ClassApiService {
       updatedAt: data.updatedAt,
     };
   }
+
+  async submitImport(classId: string, file: File): Promise<any> {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const response = await api.post(`${this.baseUrl}/api/classes/${classId}/students/import`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      return {
+        success: true,
+        studentsCreated: response.data.data?.studentsCreated || 0,
+        message: response.data.message || 'Students imported successfully',
+      };
+    } catch (error) {
+      const errorData = (error as any)?.response?.data;
+      return {
+        success: false,
+        errors: errorData?.errors || [],
+        message: errorData?.message || (error instanceof Error ? error.message : 'Failed to import students'),
+      };
+    }
+  }
 }

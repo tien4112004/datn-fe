@@ -11,6 +11,7 @@ import { StudentDeleteConfirmation } from './StudentDeleteConfirmation';
 import type { StudentFormMode } from '@/features/classes/hooks/useStudentForm';
 import { useConfirmDialog } from '@/shared/hooks/useConfirmDialog';
 import { useStudentMutations } from '@/features/classes/hooks/useStudentMutations';
+import { CsvImportButton } from '../../import';
 
 interface StudentListViewProps {
   students: Student[];
@@ -155,7 +156,10 @@ export const StudentListView = ({ students, classId, isLoading = false }: Studen
         <div>
           <p className="text-muted-foreground text-sm">{t('studentCount', { count: students.length })}</p>
         </div>
-        <Button onClick={handleOpenAddDialog}>{t('addStudent')}</Button>
+        <div className="flex items-center gap-2">
+          <CsvImportButton classId={classId} />
+          <Button onClick={handleOpenAddDialog}>{t('addStudent')}</Button>
+        </div>
       </div>
 
       {/* Table */}

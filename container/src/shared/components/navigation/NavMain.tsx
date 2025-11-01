@@ -1,27 +1,14 @@
 'use client';
 
-import {
-  // ChevronRight,
-  type LucideIcon,
-} from 'lucide-react';
+import { type LucideIcon } from 'lucide-react';
 
-import {
-  Collapsible,
-  // CollapsibleContent,
-  // CollapsibleTrigger
-} from '@/shared/components/ui/collapsible';
+import { Collapsible } from '@/shared/components/ui/collapsible';
 import {
   SidebarGroup,
-  // SidebarGroupLabel,
   SidebarMenu,
-  // SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
-  // SidebarMenuSub,
-  // SidebarMenuSubButton,
-  // SidebarMenuSubItem,
 } from '@/shared/components/ui/sidebar';
-// import { useTranslation } from 'react-i18next';
 import { NavLink, type NavLinkRenderProps } from 'react-router-dom';
 
 export function NavMain({

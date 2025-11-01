@@ -11,12 +11,17 @@ import Projects from '@/features/projects';
 import Settings from '@/features/settings';
 import Image from '@/features/image';
 import { LoginPage } from '@/features/auth/pages/LoginPage';
+import { RegisterPage } from '@/features/auth/pages/RegisterPage';
 import { ProtectedRoute } from '@/shared/components/ProtectedRoute';
 
 const router = createBrowserRouter([
   {
     path: '/login',
     element: <LoginPage />,
+  },
+  {
+    path: '/register',
+    element: <RegisterPage />,
   },
   {
     element: (

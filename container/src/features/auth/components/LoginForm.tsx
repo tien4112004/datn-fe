@@ -6,16 +6,9 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/shared/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/shared/components/ui/form';
 import { useAuth } from '@/shared/context/auth';
-import { authService } from '../api/service';
+import { useAuthApiService } from '../api';
 
 // Validation schema
 const loginSchema = z.object({
@@ -29,6 +22,7 @@ export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
   const { setUser } = useAuth();
   const navigate = useNavigate();
+  const authService = useAuthApiService();
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),

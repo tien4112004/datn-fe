@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import {
   Card,
   CardHeader,
@@ -23,20 +23,24 @@ export function LoginPage() {
   }, [isAuthenticated, navigate]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-muted/30 px-4">
+    <div className="bg-muted/30 flex min-h-screen items-center justify-center px-4">
       <div className="w-full max-w-md">
         <Card>
           <CardHeader className="space-y-1 text-center">
             <CardTitle className="text-2xl">Welcome back</CardTitle>
-            <CardDescription>
-              Enter your credentials to access your account
-            </CardDescription>
+            <CardDescription>Enter your credentials to access your account</CardDescription>
           </CardHeader>
           <CardContent>
             <LoginForm />
           </CardContent>
-          <CardFooter className="flex flex-col space-y-2">
+          <CardFooter className="flex flex-col space-y-4">
             <div className="text-muted-foreground text-center text-sm">
+              Don't have an account?{' '}
+              <Link to="/register" className="text-primary font-medium underline-offset-4 hover:underline">
+                Sign up
+              </Link>
+            </div>
+            <div className="text-muted-foreground border-t pt-4 text-center text-sm">
               <p className="font-medium">Demo Accounts:</p>
               <div className="mt-2 space-y-1 text-xs">
                 <p>test@example.com / password123</p>

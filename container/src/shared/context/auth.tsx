@@ -1,11 +1,5 @@
-import {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  type ReactNode,
-} from 'react';
-import type { User, AuthContextType } from '../types/auth';
+import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import type { User, AuthContextType, SignupRequest } from '../types/auth';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -60,6 +54,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     throw new Error('Login function should be overridden by auth service');
   };
 
+  const register = async (_data: SignupRequest) => {
+    // This will be implemented by the auth service
+    // For now, this is just a placeholder
+    throw new Error('Register function should be overridden by auth service');
+  };
+
   const logout = () => {
     // Clear user state
     setUser(null);
@@ -75,6 +75,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     isAuthenticated: Boolean(user),
     isLoading,
     login,
+    register,
     logout,
     setUser,
   };

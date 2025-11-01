@@ -4,11 +4,10 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Progress } from '@/components/ui/progress';
 import {
   PlayCircle,
-  PauseCircle,
   CheckCircle2,
   XCircle,
   Clock,
@@ -226,7 +225,7 @@ const LessonStatusTracker = ({
               <p>{t('noLessons')}</p>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="grid w-full grid-cols-1 gap-4 md:grid-cols-2">
               {sortedLessons.map((lesson) => {
                 const overdue = isOverdue(lesson);
                 const nextStatuses = getNextPossibleStatus(lesson.status);
@@ -242,14 +241,14 @@ const LessonStatusTracker = ({
                       overdue && 'border-red-500 bg-red-50'
                     )}
                   >
-                    <div className="flex items-start gap-3">
+                    <div className="flex flex-col gap-3 md:flex-row md:items-start">
                       {/* Status Icon */}
-                      <div className="pt-1">{getStatusIcon(lesson.status)}</div>
+                      <div className="pt-1 md:flex-shrink-0">{getStatusIcon(lesson.status)}</div>
 
                       {/* Content */}
                       <div className="flex-1 space-y-2">
-                        <div className="flex items-start justify-between">
-                          <div>
+                        <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+                          <div className="flex-1">
                             <h4 className="font-medium">{lesson.title}</h4>
                             <p className="text-muted-foreground text-sm">
                               {lesson.subject} • {format(new Date(lesson.date), 'PPPP', { locale: vi })}
@@ -259,7 +258,7 @@ const LessonStatusTracker = ({
                             </p>
                           </div>
 
-                          <div className="flex items-center gap-2">
+                          <div className="flex flex-wrap items-center gap-2">
                             <Badge className={cn('flex items-center gap-1', getStatusColor(lesson.status))}>
                               {getStatusIcon(lesson.status)}
                               {getStatusLabel(lesson.status)}
@@ -276,16 +275,20 @@ const LessonStatusTracker = ({
                         {/* Lesson Details */}
                         <div className="text-muted-foreground grid grid-cols-1 gap-2 text-sm md:grid-cols-3">
                           <div className="flex items-center gap-2">
-                            <User className="h-4 w-4" />
-                            {lesson.teacher.fullName}
+                            <User className="h-4 w-4 flex-shrink-0" />
+                            <span className="truncate">{lesson.teacher.fullName}</span>
                           </div>
                           <div className="flex items-center gap-2">
-                            <Calendar className="h-4 w-4" />
-                            {lesson.duration} {t('minutes')}
+                            <Calendar className="h-4 w-4 flex-shrink-0" />
+                            <span>
+                              {lesson.duration} {t('minutes')}
+                            </span>
                           </div>
                           <div className="flex items-center gap-2">
-                            <FileText className="h-4 w-4" />
-                            {lesson.objectives.length} {t('objectives')}
+                            <FileText className="h-4 w-4 flex-shrink-0" />
+                            <span>
+                              {lesson.objectives.length} {t('objectives')}
+                            </span>
                           </div>
                         </div>
 
@@ -297,16 +300,16 @@ const LessonStatusTracker = ({
                         )}
 
                         {/* Actions */}
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
+                        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                          <div className="flex flex-wrap items-center gap-2">
                             {lesson.objectives.length > 0 && (
-                              <Badge variant="outline">
+                              <Badge variant="outline" className="text-xs md:text-sm">
                                 {lesson.objectives.filter((obj) => obj.isAchieved).length}/
                                 {lesson.objectives.length} {t('objectivesAchieved')}
                               </Badge>
                             )}
                             {lesson.resources.length > 0 && (
-                              <Badge variant="outline">
+                              <Badge variant="outline" className="text-xs md:text-sm">
                                 {lesson.resources.filter((res) => res.isPrepared).length}/
                                 {lesson.resources.length} {t('resourcesPrepared')}
                               </Badge>
@@ -314,7 +317,7 @@ const LessonStatusTracker = ({
                           </div>
 
                           {canEdit && (
-                            <div className="flex items-center gap-2">
+                            <div className="flex flex-wrap items-center gap-2">
                               {/* Quick Status Updates */}
                               {nextStatuses.map((status) => (
                                 <Button
@@ -322,10 +325,10 @@ const LessonStatusTracker = ({
                                   size="sm"
                                   variant="outline"
                                   onClick={() => onUpdateStatus(lesson.id, status)}
-                                  className="text-xs"
+                                  className="whitespace-nowrap text-xs"
                                 >
                                   {getStatusIcon(status)}
-                                  <span className="ml-1">{getStatusLabel(status)}</span>
+                                  <span className="ml-1 hidden sm:inline">{getStatusLabel(status)}</span>
                                 </Button>
                               ))}
 

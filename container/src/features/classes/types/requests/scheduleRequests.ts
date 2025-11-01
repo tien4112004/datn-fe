@@ -2,6 +2,7 @@
  * Schedule Request Types
  *
  * API request types for schedule and period-related operations.
+ * All schedules are now date-based (non-recurring).
  */
 
 /**
@@ -12,7 +13,7 @@ export interface ScheduleCollectionRequest {
   classId: string;
   startDate?: string;
   endDate?: string;
-  dayOfWeek?: number;
+  date?: string;
 }
 
 /**
@@ -23,11 +24,11 @@ export interface ClassPeriodCreateRequest {
   classId: string;
   subject: string;
   subjectCode: string;
-  dayOfWeek: number;
+  date: string;
   startTime: string;
   endTime: string;
   teacherId: string;
-  room?: string;
+  location?: string;
 }
 
 /**
@@ -44,7 +45,7 @@ export interface ClassPeriodUpdateRequest extends Partial<ClassPeriodCreateReque
  */
 export interface ScheduleFilterOptions {
   classId?: string;
-  dayOfWeek?: number;
+  date?: string;
   teacherId?: string;
   subject?: string;
 }

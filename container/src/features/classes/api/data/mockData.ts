@@ -2,13 +2,14 @@ import {
   type Class,
   type Student,
   type Teacher,
-  type ClassPeriod,
+  type ScheduleEvent,
   type LessonPlan,
   type LearningObjective,
   type LessonResource,
   ELEMENTARY_SUBJECTS,
   STANDARD_PERIODS,
 } from '../../types';
+import { EventCategory } from '../../types/constants/eventCategories';
 import { getCurrentAcademicYear } from '../../utils';
 
 export const mockTeachers: Teacher[] = [
@@ -1095,7 +1096,6 @@ export function initializeMockClasses(teachers: Teacher[], students: Student[]):
       grade: 1,
       track: 'A',
       academicYear: getCurrentAcademicYear(),
-      capacity: 30,
       currentEnrollment: 15,
       homeroomTeacherId: '1',
       homeroomTeacher: teachers[0],
@@ -1145,7 +1145,6 @@ export function initializeMockClasses(teachers: Teacher[], students: Student[]):
       grade: 3,
       track: 'B',
       academicYear: getCurrentAcademicYear(),
-      capacity: 35,
       currentEnrollment: 15,
       homeroomTeacherId: '2',
       homeroomTeacher: teachers[1],
@@ -1196,7 +1195,6 @@ export function initializeMockClasses(teachers: Teacher[], students: Student[]):
       grade: 5,
       track: 'C',
       academicYear: getCurrentAcademicYear(),
-      capacity: 35,
       currentEnrollment: 15,
       homeroomTeacherId: '4',
       homeroomTeacher: teachers[3],
@@ -1246,197 +1244,207 @@ export function initializeMockClasses(teachers: Teacher[], students: Student[]):
   ];
 }
 
-export const mockClassPeriods: ClassPeriod[] = [];
+export const mockClassPeriods: ScheduleEvent[] = [];
 
-export function initializeMockClassPeriods(teachers: Teacher[]): ClassPeriod[] {
-  const periods: ClassPeriod[] = [];
+/**
+ * Helper function to get dates for the current week (Monday-Friday)
+ * Returns an array of ISO date strings for the current school week
+ */
+function getCurrentWeekDates(): string[] {
+  const today = new Date();
+  const currentDay = today.getDay(); // 0 = Sunday, 1 = Monday, etc.
+
+  // Calculate the start of the week (Monday)
+  const mondayOffset = currentDay === 0 ? -6 : 1 - currentDay;
+  const monday = new Date(today);
+  monday.setDate(today.getDate() + mondayOffset);
+
+  // Generate dates for Monday through Friday
+  const weekDates: string[] = [];
+  for (let i = 0; i < 5; i++) {
+    const date = new Date(monday);
+    date.setDate(monday.getDate() + i);
+    weekDates.push(date.toISOString().split('T')[0]); // Format: YYYY-MM-DD
+  }
+
+  return weekDates;
+}
+
+export function initializeMockClassPeriods(): ScheduleEvent[] {
+  const periods: ScheduleEvent[] = [];
+  const weekDates = getCurrentWeekDates(); // [Monday, Tuesday, Wednesday, Thursday, Friday]
 
   // Class 1A - Grade 1 Schedule (11 subjects distributed throughout the week)
   const class1ASchedule = [
     // Monday
-    { day: 1, period: 1, subject: 'Tiếng Việt', subjectCode: 'TV', teacherId: '1' },
-    { day: 1, period: 2, subject: 'Toán', subjectCode: 'T', teacherId: '1' },
-    { day: 1, period: 3, subject: 'Âm nhạc', subjectCode: 'AN', teacherId: '12' },
-    { day: 1, period: 4, subject: 'Giáo dục thể chất', subjectCode: 'GDTC', teacherId: '11' },
+    { day: 1, period: 1, subject: 'Tiếng Việt', subjectCode: 'TV' },
+    { day: 1, period: 2, subject: 'Toán', subjectCode: 'T' },
+    { day: 1, period: 3, subject: 'Âm nhạc', subjectCode: 'AN' },
+    { day: 1, period: 4, subject: 'Giáo dục thể chất', subjectCode: 'GDTC' },
     // Tuesday
-    { day: 2, period: 1, subject: 'Toán', subjectCode: 'T', teacherId: '1' },
-    { day: 2, period: 2, subject: 'Tiếng Việt', subjectCode: 'TV', teacherId: '1' },
-    { day: 2, period: 3, subject: 'Đạo đức', subjectCode: 'DD', teacherId: '10' },
-    { day: 2, period: 4, subject: 'Tiếng Anh', subjectCode: 'TA', teacherId: '3' },
+    { day: 2, period: 1, subject: 'Toán', subjectCode: 'T' },
+    { day: 2, period: 2, subject: 'Tiếng Việt', subjectCode: 'TV' },
+    { day: 2, period: 3, subject: 'Đạo đức', subjectCode: 'DD' },
+    { day: 2, period: 4, subject: 'Tiếng Anh', subjectCode: 'TA' },
     // Wednesday
-    { day: 3, period: 1, subject: 'Tiếng Việt', subjectCode: 'TV', teacherId: '1' },
-    { day: 3, period: 2, subject: 'Toán', subjectCode: 'T', teacherId: '1' },
-    { day: 3, period: 3, subject: 'Tự nhiên và Xã hội', subjectCode: 'TNXH', teacherId: '6' },
-    { day: 3, period: 4, subject: 'Mỹ thuật', subjectCode: 'MT', teacherId: '12' },
+    { day: 3, period: 1, subject: 'Tiếng Việt', subjectCode: 'TV' },
+    { day: 3, period: 2, subject: 'Toán', subjectCode: 'T' },
+    { day: 3, period: 3, subject: 'Tự nhiên và Xã hội', subjectCode: 'TNXH' },
+    { day: 3, period: 4, subject: 'Mỹ thuật', subjectCode: 'MT' },
     // Thursday
-    { day: 4, period: 1, subject: 'Toán', subjectCode: 'T', teacherId: '1' },
-    { day: 4, period: 2, subject: 'Tiếng Việt', subjectCode: 'TV', teacherId: '1' },
-    { day: 4, period: 3, subject: 'Hoạt động trải nghiệm', subjectCode: 'KC', teacherId: '1' },
-    { day: 4, period: 4, subject: 'Giáo dục thể chất', subjectCode: 'GDTC', teacherId: '11' },
+    { day: 4, period: 1, subject: 'Toán', subjectCode: 'T' },
+    { day: 4, period: 2, subject: 'Tiếng Việt', subjectCode: 'TV' },
+    { day: 4, period: 3, subject: 'Hoạt động trải nghiệm', subjectCode: 'KC' },
+    { day: 4, period: 4, subject: 'Giáo dục thể chất', subjectCode: 'GDTC' },
     // Friday
-    { day: 5, period: 1, subject: 'Tiếng Việt', subjectCode: 'TV', teacherId: '1' },
-    { day: 5, period: 2, subject: 'Toán', subjectCode: 'T', teacherId: '1' },
-    { day: 5, period: 3, subject: 'Hoạt động trải nghiệm', subjectCode: 'HĐTN', teacherId: '1' },
-    { day: 5, period: 4, subject: 'Hoạt động trải nghiệm', subjectCode: 'VCVHT', teacherId: '1' },
+    { day: 5, period: 1, subject: 'Tiếng Việt', subjectCode: 'TV' },
+    { day: 5, period: 2, subject: 'Toán', subjectCode: 'T' },
+    { day: 5, period: 3, subject: 'Hoạt động trải nghiệm', subjectCode: 'HĐTN' },
+    { day: 5, period: 4, subject: 'Hoạt động trải nghiệm', subjectCode: 'VCVHT' },
   ];
 
   // Class 3B - Grade 3 Schedule (14 subjects distributed throughout the week)
   const class3BSchedule = [
     // Monday
-    { day: 1, period: 1, subject: 'Tiếng Việt', subjectCode: 'TV', teacherId: '2' },
-    { day: 1, period: 2, subject: 'Toán', subjectCode: 'T', teacherId: '2' },
-    { day: 1, period: 3, subject: 'Tiếng Anh', subjectCode: 'TA', teacherId: '3' },
-    { day: 1, period: 4, subject: 'Giáo dục thể chất', subjectCode: 'GDTC', teacherId: '11' },
-    { day: 1, period: 5, subject: 'Tin học và Công nghệ', subjectCode: 'TH', teacherId: '9' },
+    { day: 1, period: 1, subject: 'Tiếng Việt', subjectCode: 'TV' },
+    { day: 1, period: 2, subject: 'Toán', subjectCode: 'T' },
+    { day: 1, period: 3, subject: 'Tiếng Anh', subjectCode: 'TA' },
+    { day: 1, period: 4, subject: 'Giáo dục thể chất', subjectCode: 'GDTC' },
+    { day: 1, period: 5, subject: 'Tin học và Công nghệ', subjectCode: 'TH' },
     // Tuesday
-    { day: 2, period: 1, subject: 'Toán', subjectCode: 'T', teacherId: '2' },
-    { day: 2, period: 2, subject: 'Tiếng Việt', subjectCode: 'TV', teacherId: '2' },
-    { day: 2, period: 3, subject: 'Tự nhiên và Xã hội', subjectCode: 'TNXH', teacherId: '6' },
-    { day: 2, period: 4, subject: 'Âm nhạc', subjectCode: 'AN', teacherId: '12' },
-    { day: 2, period: 5, subject: 'Hoạt động trải nghiệm', subjectCode: 'KNS', teacherId: '2' },
+    { day: 2, period: 1, subject: 'Toán', subjectCode: 'T' },
+    { day: 2, period: 2, subject: 'Tiếng Việt', subjectCode: 'TV' },
+    { day: 2, period: 3, subject: 'Tự nhiên và Xã hội', subjectCode: 'TNXH' },
+    { day: 2, period: 4, subject: 'Âm nhạc', subjectCode: 'AN' },
+    { day: 2, period: 5, subject: 'Hoạt động trải nghiệm', subjectCode: 'KNS' },
     // Wednesday
-    { day: 3, period: 1, subject: 'Tiếng Việt', subjectCode: 'TV', teacherId: '2' },
-    { day: 3, period: 2, subject: 'Toán', subjectCode: 'T', teacherId: '2' },
-    { day: 3, period: 3, subject: 'Tiếng Anh', subjectCode: 'TA', teacherId: '3' },
-    { day: 3, period: 4, subject: 'Mỹ thuật', subjectCode: 'MT', teacherId: '12' },
-    { day: 3, period: 5, subject: 'Hoạt động trải nghiệm', subjectCode: 'ATGT', teacherId: '11' },
+    { day: 3, period: 1, subject: 'Tiếng Việt', subjectCode: 'TV' },
+    { day: 3, period: 2, subject: 'Toán', subjectCode: 'T' },
+    { day: 3, period: 3, subject: 'Tiếng Anh', subjectCode: 'TA' },
+    { day: 3, period: 4, subject: 'Mỹ thuật', subjectCode: 'MT' },
+    { day: 3, period: 5, subject: 'Hoạt động trải nghiệm', subjectCode: 'ATGT' },
     // Thursday
-    { day: 4, period: 1, subject: 'Toán', subjectCode: 'T', teacherId: '2' },
-    { day: 4, period: 2, subject: 'Tiếng Việt', subjectCode: 'TV', teacherId: '2' },
-    { day: 4, period: 3, subject: 'Đạo đức', subjectCode: 'DD', teacherId: '10' },
-    { day: 4, period: 4, subject: 'Giáo dục thể chất', subjectCode: 'GDTC', teacherId: '11' },
-    { day: 4, period: 5, subject: 'Hoạt động trải nghiệm', subjectCode: 'NK', teacherId: '12' },
+    { day: 4, period: 1, subject: 'Toán', subjectCode: 'T' },
+    { day: 4, period: 2, subject: 'Tiếng Việt', subjectCode: 'TV' },
+    { day: 4, period: 3, subject: 'Đạo đức', subjectCode: 'DD' },
+    { day: 4, period: 4, subject: 'Giáo dục thể chất', subjectCode: 'GDTC' },
+    { day: 4, period: 5, subject: 'Hoạt động trải nghiệm', subjectCode: 'NK' },
     // Friday
-    { day: 5, period: 1, subject: 'Tiếng Việt', subjectCode: 'TV', teacherId: '2' },
-    { day: 5, period: 2, subject: 'Toán', subjectCode: 'T', teacherId: '2' },
-    { day: 5, period: 3, subject: 'Hoạt động trải nghiệm', subjectCode: 'HĐTN', teacherId: '2' },
-    { day: 5, period: 4, subject: 'Hoạt động trải nghiệm', subjectCode: 'TV', teacherId: '2' },
+    { day: 5, period: 1, subject: 'Tiếng Việt', subjectCode: 'TV' },
+    { day: 5, period: 2, subject: 'Toán', subjectCode: 'T' },
+    { day: 5, period: 3, subject: 'Hoạt động trải nghiệm', subjectCode: 'HĐTN' },
+    { day: 5, period: 4, subject: 'Hoạt động trải nghiệm', subjectCode: 'TV' },
   ];
 
   // Class 5C - Grade 5 Schedule (18 subjects distributed throughout the week)
   const class5CSchedule = [
     // Monday
-    { day: 1, period: 1, subject: 'Toán', subjectCode: 'T', teacherId: '4' },
-    { day: 1, period: 2, subject: 'Tiếng Việt', subjectCode: 'TV', teacherId: '2' },
-    { day: 1, period: 3, subject: 'Tiếng Anh', subjectCode: 'TA', teacherId: '3' },
-    { day: 1, period: 4, subject: 'Khoa học', subjectCode: 'KH', teacherId: '5' },
-    { day: 1, period: 5, subject: 'Giáo dục thể chất', subjectCode: 'GDTC', teacherId: '11' },
-    { day: 1, period: 6, subject: 'Tin học và Công nghệ', subjectCode: 'TH', teacherId: '9' },
+    { day: 1, period: 1, subject: 'Toán', subjectCode: 'T' },
+    { day: 1, period: 2, subject: 'Tiếng Việt', subjectCode: 'TV' },
+    { day: 1, period: 3, subject: 'Tiếng Anh', subjectCode: 'TA' },
+    { day: 1, period: 4, subject: 'Khoa học', subjectCode: 'KH' },
+    { day: 1, period: 5, subject: 'Giáo dục thể chất', subjectCode: 'GDTC' },
+    { day: 1, period: 6, subject: 'Tin học và Công nghệ', subjectCode: 'TH' },
     // Tuesday
-    { day: 2, period: 1, subject: 'Tiếng Việt', subjectCode: 'TV', teacherId: '2' },
-    { day: 2, period: 2, subject: 'Toán', subjectCode: 'T', teacherId: '4' },
-    { day: 2, period: 3, subject: 'Lịch sử và Địa lý', subjectCode: 'LS-DL', teacherId: '7' },
-    { day: 2, period: 4, subject: 'Tiếng Anh', subjectCode: 'TA', teacherId: '3' },
-    { day: 2, period: 5, subject: 'Âm nhạc', subjectCode: 'AN', teacherId: '12' },
-    { day: 2, period: 6, subject: 'Hoạt động trải nghiệm', subjectCode: 'KNS', teacherId: '4' },
+    { day: 2, period: 1, subject: 'Tiếng Việt', subjectCode: 'TV' },
+    { day: 2, period: 2, subject: 'Toán', subjectCode: 'T' },
+    { day: 2, period: 3, subject: 'Lịch sử và Địa lý', subjectCode: 'LS-DL' },
+    { day: 2, period: 4, subject: 'Tiếng Anh', subjectCode: 'TA' },
+    { day: 2, period: 5, subject: 'Âm nhạc', subjectCode: 'AN' },
+    { day: 2, period: 6, subject: 'Hoạt động trải nghiệm', subjectCode: 'KNS' },
     // Wednesday
-    { day: 3, period: 1, subject: 'Toán', subjectCode: 'T', teacherId: '4' },
-    { day: 3, period: 2, subject: 'Tiếng Việt', subjectCode: 'TV', teacherId: '2' },
-    { day: 3, period: 3, subject: 'Khoa học', subjectCode: 'KH', teacherId: '5' },
-    { day: 3, period: 4, subject: 'Mỹ thuật', subjectCode: 'MT', teacherId: '12' },
-    { day: 3, period: 5, subject: 'Đạo đức', subjectCode: 'GDCD', teacherId: '10' },
-    { day: 3, period: 6, subject: 'Tiếng Anh', subjectCode: 'NN2', teacherId: '3' },
+    { day: 3, period: 1, subject: 'Toán', subjectCode: 'T' },
+    { day: 3, period: 2, subject: 'Tiếng Việt', subjectCode: 'TV' },
+    { day: 3, period: 3, subject: 'Khoa học', subjectCode: 'KH' },
+    { day: 3, period: 4, subject: 'Mỹ thuật', subjectCode: 'MT' },
+    { day: 3, period: 5, subject: 'Đạo đức', subjectCode: 'GDCD' },
+    { day: 3, period: 6, subject: 'Tiếng Anh', subjectCode: 'NN2' },
     // Thursday
-    { day: 4, period: 1, subject: 'Tiếng Việt', subjectCode: 'TV', teacherId: '2' },
-    { day: 4, period: 2, subject: 'Toán', subjectCode: 'T', teacherId: '4' },
-    { day: 4, period: 3, subject: 'Tiếng Anh', subjectCode: 'TA', teacherId: '3' },
-    { day: 4, period: 4, subject: 'Lịch sử và Địa lý', subjectCode: 'LS-DL', teacherId: '7' },
-    { day: 4, period: 5, subject: 'Giáo dục thể chất', subjectCode: 'GDTC', teacherId: '11' },
-    { day: 4, period: 6, subject: 'Hoạt động trải nghiệm', subjectCode: 'ATGT', teacherId: '11' },
+    { day: 4, period: 1, subject: 'Tiếng Việt', subjectCode: 'TV' },
+    { day: 4, period: 2, subject: 'Toán', subjectCode: 'T' },
+    { day: 4, period: 3, subject: 'Tiếng Anh', subjectCode: 'TA' },
+    { day: 4, period: 4, subject: 'Lịch sử và Địa lý', subjectCode: 'LS-DL' },
+    { day: 4, period: 5, subject: 'Giáo dục thể chất', subjectCode: 'GDTC' },
+    { day: 4, period: 6, subject: 'Hoạt động trải nghiệm', subjectCode: 'ATGT' },
     // Friday
-    { day: 5, period: 1, subject: 'Toán', subjectCode: 'T', teacherId: '4' },
-    { day: 5, period: 2, subject: 'Tiếng Việt', subjectCode: 'TV', teacherId: '2' },
-    { day: 5, period: 3, subject: 'Hoạt động trải nghiệm', subjectCode: 'HĐTN', teacherId: '4' },
-    { day: 5, period: 4, subject: 'Hoạt động trải nghiệm', subjectCode: 'NK', teacherId: '12' },
-    { day: 5, period: 5, subject: 'Hoạt động trải nghiệm', subjectCode: 'TV', teacherId: '2' },
-    { day: 5, period: 6, subject: 'Hoạt động trải nghiệm', subjectCode: 'DHNN', teacherId: '10' },
+    { day: 5, period: 1, subject: 'Toán', subjectCode: 'T' },
+    { day: 5, period: 2, subject: 'Tiếng Việt', subjectCode: 'TV' },
+    { day: 5, period: 3, subject: 'Hoạt động trải nghiệm', subjectCode: 'HĐTN' },
+    { day: 5, period: 4, subject: 'Hoạt động trải nghiệm', subjectCode: 'NK' },
+    { day: 5, period: 5, subject: 'Hoạt động trải nghiệm', subjectCode: 'TV' },
+    { day: 5, period: 6, subject: 'Hoạt động trải nghiệm', subjectCode: 'DHNN' },
   ];
 
   let periodIdCounter = 1;
 
   // Generate periods for Class 1A
   class1ASchedule.forEach((schedule) => {
-    const teacher = teachers.find((t) => t.id === schedule.teacherId);
-    if (teacher) {
-      periods.push({
-        id: `p${periodIdCounter++}`,
-        classId: '1',
-        subject: schedule.subject,
-        subjectCode: schedule.subjectCode,
-        dayOfWeek: schedule.day,
-        startTime: STANDARD_PERIODS[schedule.period - 1].startTime,
-        endTime: STANDARD_PERIODS[schedule.period - 1].endTime,
-        teacherId: teacher.id,
-        teacher: {
-          id: teacher.id,
-          fullName: teacher.fullName,
-          email: teacher.email,
-        },
-        room: `Phòng 1.${schedule.day}`,
-        isActive: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      });
-    }
+    // schedule.day: 1=Monday, 2=Tuesday, 3=Wednesday, 4=Thursday, 5=Friday
+    const dateIndex = schedule.day - 1; // Convert to 0-based index
+    periods.push({
+      id: `p${periodIdCounter++}`,
+      classId: '1',
+      name: schedule.subject,
+      subject: schedule.subject,
+      subjectCode: schedule.subjectCode,
+      date: weekDates[dateIndex],
+      startTime: STANDARD_PERIODS[schedule.period - 1].startTime,
+      endTime: STANDARD_PERIODS[schedule.period - 1].endTime,
+      category: EventCategory.OTHER,
+      location: `Phòng 1.${schedule.day}`,
+      isActive: true,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    });
   });
 
   // Generate periods for Class 3B
   class3BSchedule.forEach((schedule) => {
-    const teacher = teachers.find((t) => t.id === schedule.teacherId);
-    if (teacher) {
-      periods.push({
-        id: `p${periodIdCounter++}`,
-        classId: '2',
-        subject: schedule.subject,
-        subjectCode: schedule.subjectCode,
-        dayOfWeek: schedule.day,
-        startTime: STANDARD_PERIODS[schedule.period - 1].startTime,
-        endTime: STANDARD_PERIODS[schedule.period - 1].endTime,
-        teacherId: teacher.id,
-        teacher: {
-          id: teacher.id,
-          fullName: teacher.fullName,
-          email: teacher.email,
-        },
-        room: `Phòng 3.${schedule.day}`,
-        isActive: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      });
-    }
+    // schedule.day: 1=Monday, 2=Tuesday, 3=Wednesday, 4=Thursday, 5=Friday
+    const dateIndex = schedule.day - 1; // Convert to 0-based index
+    periods.push({
+      id: `p${periodIdCounter++}`,
+      classId: '2',
+      name: schedule.subject,
+      subject: schedule.subject,
+      subjectCode: schedule.subjectCode,
+      date: weekDates[dateIndex],
+      startTime: STANDARD_PERIODS[schedule.period - 1].startTime,
+      endTime: STANDARD_PERIODS[schedule.period - 1].endTime,
+      category: EventCategory.OTHER,
+      location: `Phòng 3.${schedule.day}`,
+      isActive: true,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    });
   });
 
   // Generate periods for Class 5C
   class5CSchedule.forEach((schedule) => {
-    const teacher = teachers.find((t) => t.id === schedule.teacherId);
-    if (teacher) {
-      periods.push({
-        id: `p${periodIdCounter++}`,
-        classId: '3',
-        subject: schedule.subject,
-        subjectCode: schedule.subjectCode,
-        dayOfWeek: schedule.day,
-        startTime: STANDARD_PERIODS[schedule.period - 1].startTime,
-        endTime: STANDARD_PERIODS[schedule.period - 1].endTime,
-        teacherId: teacher.id,
-        teacher: {
-          id: teacher.id,
-          fullName: teacher.fullName,
-          email: teacher.email,
-        },
-        room: `Phòng 5.${schedule.day}`,
-        isActive: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      });
-    }
+    // schedule.day: 1=Monday, 2=Tuesday, 3=Wednesday, 4=Thursday, 5=Friday
+    const dateIndex = schedule.day - 1; // Convert to 0-based index
+    periods.push({
+      id: `p${periodIdCounter++}`,
+      classId: '3',
+      name: schedule.subject,
+      subject: schedule.subject,
+      subjectCode: schedule.subjectCode,
+      date: weekDates[dateIndex],
+      startTime: STANDARD_PERIODS[schedule.period - 1].startTime,
+      endTime: STANDARD_PERIODS[schedule.period - 1].endTime,
+      category: EventCategory.OTHER,
+      location: `Phòng 5.${schedule.day}`,
+      isActive: true,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    });
   });
 
   return periods;
 }
 
-export function getMockSchedulesByClass(classId: string): ClassPeriod[] {
-  const allPeriods = initializeMockClassPeriods(mockTeachers);
+export function getMockSchedulesByClass(classId: string): ScheduleEvent[] {
+  const allPeriods = initializeMockClassPeriods();
   return allPeriods.filter((p) => p.classId === classId);
 }
 
@@ -1449,7 +1457,7 @@ export function initializeMockLessonPlans(teachers: Teacher[]): LessonPlan[] {
   let objectiveIdCounter = 1;
   let resourceIdCounter = 1;
 
-  const baseDate = new Date('2024-10-08');
+  const baseDate = new Date('2024-11-01');
 
   // Lesson Plans for Class 1A (Grade 1)
   const class1ALessons = [
@@ -3200,8 +3208,8 @@ export function getMockLessonPlansByClass(classId: string): LessonPlan[] {
 }
 
 // Helper function to link lesson plans to periods for integration testing
-export function getMockPeriodsWithLessonLinks(): ClassPeriod[] {
-  const periods = initializeMockClassPeriods(mockTeachers);
+export function getMockPeriodsWithLessonLinks(): ScheduleEvent[] {
+  const periods = initializeMockClassPeriods();
   const lessonPlans = initializeMockLessonPlans(mockTeachers);
 
   // Create a map of lessons by class, subject, and time for easy matching
@@ -3235,3 +3243,947 @@ export function getMockPeriodsWithLessonLinks(): ClassPeriod[] {
 
 // Mock data with integrated periods and lessons
 export const mockPeriodsWithIntegration = getMockPeriodsWithLessonLinks();
+
+/**
+ * Special calendar events data (non-recurring)
+ * These are one-time events like exams, field trips, meetings, assignments, etc.
+ * Will be merged with regular class periods to create a single unified schedule
+ *
+ * Includes events for all 3 classes: 1A (id: '1'), 3B (id: '2'), 5C (id: '3')
+ */
+const specialCalendarEvents: ScheduleEvent[] = [
+  // ========== CLASS 1A (Grade 1) ==========
+  // Week 1 - November 1-5
+  {
+    id: 'event-001',
+    classId: '1',
+    name: 'Welcome Back Assembly',
+    subject: 'Hoạt động chung',
+    subjectCode: 'HC',
+    date: '2025-11-01',
+    startTime: '08:30:00',
+    endTime: '09:30:00',
+    category: EventCategory.MEETING,
+    location: 'School Auditorium',
+    description: 'Start of November - Welcome assembly for all students',
+    isActive: true,
+    createdAt: '2025-09-25T10:00:00Z',
+    updatedAt: '2025-09-25T10:00:00Z',
+  },
+  {
+    id: 'event-002',
+    classId: '1',
+    name: 'Reading Assignment Due',
+    subject: 'Tiếng Việt',
+    subjectCode: 'TV',
+    date: '2025-11-03',
+    startTime: null,
+    endTime: null,
+    category: EventCategory.ASSIGNMENT,
+    location: null,
+    description: 'Chapter 1-3 reading comprehension questions',
+    isActive: true,
+    createdAt: '2025-09-20T10:00:00Z',
+    updatedAt: '2025-09-20T10:00:00Z',
+  },
+  {
+    id: 'event-003',
+    classId: '1',
+    name: 'PE Class - Outdoor Games',
+    subject: 'Giáo dục thể chất',
+    subjectCode: 'GDTC',
+    date: '2025-11-03',
+    startTime: '14:00:00',
+    endTime: '15:00:00',
+    category: EventCategory.OTHER,
+    location: 'Sports Field',
+    description: 'Team building activities and outdoor games',
+    isActive: true,
+    createdAt: '2025-09-25T11:00:00Z',
+    updatedAt: '2025-09-25T11:00:00Z',
+  },
+  {
+    id: 'event-004',
+    classId: '1',
+    name: 'Math Homework Check',
+    subject: 'Toán',
+    subjectCode: 'T',
+    date: '2025-11-07',
+    startTime: '09:00:00',
+    endTime: '09:30:00',
+    category: EventCategory.ASSIGNMENT,
+    location: 'Room 301',
+    description: 'Review and discussion of homework problems',
+    isActive: true,
+    createdAt: '2025-09-28T10:00:00Z',
+    updatedAt: '2025-09-28T10:00:00Z',
+  },
+  {
+    id: 'event-005',
+    classId: '1',
+    name: 'Spelling Bee Competition',
+    subject: 'Tiếng Việt',
+    subjectCode: 'TV',
+    date: '2025-11-09',
+    startTime: '10:00:00',
+    endTime: '11:30:00',
+    category: EventCategory.EXAM,
+    location: 'Room 301',
+    description: 'Monthly spelling competition for all students',
+    isActive: true,
+    createdAt: '2025-09-30T14:00:00Z',
+    updatedAt: '2025-09-30T14:00:00Z',
+  },
+  {
+    id: 'event-006',
+    classId: '1',
+    name: 'Art Project Workshop',
+    subject: 'Mỹ thuật',
+    subjectCode: 'MT',
+    date: '2025-11-10',
+    startTime: '13:00:00',
+    endTime: '15:00:00',
+    category: EventCategory.OTHER,
+    location: 'Art Room',
+    description: 'Collaborative art project - painting autumn landscapes',
+    isActive: true,
+    createdAt: '2025-11-01T09:00:00Z',
+    updatedAt: '2025-11-01T09:00:00Z',
+  },
+  {
+    id: 'event-007',
+    classId: '1',
+    name: 'History Essay Due',
+    subject: 'Lịch sử và Địa lý',
+    subjectCode: 'LS-DL',
+    date: '2025-11-13',
+    startTime: null,
+    endTime: null,
+    category: EventCategory.ASSIGNMENT,
+    location: null,
+    description: 'Submit 500-word essay on assigned historical period',
+    isActive: true,
+    createdAt: '2025-09-29T10:00:00Z',
+    updatedAt: '2025-09-29T10:00:00Z',
+  },
+  {
+    id: 'event-008',
+    classId: '1',
+    name: 'Math Quiz',
+    subject: 'Toán',
+    subjectCode: 'T',
+    date: '2025-11-15',
+    startTime: '09:00:00',
+    endTime: '10:00:00',
+    category: EventCategory.EXAM,
+    location: 'Room 301',
+    description: 'Chapter 5 algebra quiz - bring calculator',
+    isActive: true,
+    createdAt: '2025-09-20T11:00:00Z',
+    updatedAt: '2025-09-20T11:00:00Z',
+  },
+  {
+    id: 'event-009',
+    classId: '1',
+    name: 'Guest Speaker: Environmental Science',
+    subject: 'Khoa học',
+    subjectCode: 'KH',
+    date: '2025-11-16',
+    startTime: '11:00:00',
+    endTime: '12:00:00',
+    category: EventCategory.PRESENTATION,
+    location: 'Room 301',
+    description: 'Dr. Smith discusses climate change and conservation',
+    isActive: true,
+    createdAt: '2025-11-05T10:00:00Z',
+    updatedAt: '2025-11-05T10:00:00Z',
+  },
+  {
+    id: 'event-010',
+    classId: '1',
+    name: 'Science Project Presentation',
+    subject: 'Khoa học',
+    subjectCode: 'KH',
+    date: '2025-11-18',
+    startTime: '10:00:00',
+    endTime: '12:00:00',
+    category: EventCategory.PRESENTATION,
+    location: 'Room 301',
+    description: 'Students present their science fair projects',
+    isActive: true,
+    createdAt: '2025-09-10T12:00:00Z',
+    updatedAt: '2025-09-10T12:00:00Z',
+  },
+  {
+    id: 'event-011',
+    classId: '1',
+    name: 'Book Report Due',
+    subject: 'Tiếng Việt',
+    subjectCode: 'TV',
+    date: '2025-11-20',
+    startTime: null,
+    endTime: null,
+    category: EventCategory.ASSIGNMENT,
+    location: null,
+    description: 'Submit book report on assigned reading',
+    isActive: true,
+    createdAt: '2025-09-01T10:00:00Z',
+    updatedAt: '2025-09-01T10:00:00Z',
+  },
+  {
+    id: 'event-012',
+    classId: '1',
+    name: 'Mid-Term Exam',
+    subject: 'Tổng hợp',
+    subjectCode: 'TH',
+    date: '2025-11-22',
+    startTime: '08:00:00',
+    endTime: '11:00:00',
+    category: EventCategory.EXAM,
+    location: 'Room 301',
+    description: 'Comprehensive mid-term examination covering all subjects',
+    isActive: true,
+    createdAt: '2025-09-15T10:00:00Z',
+    updatedAt: '2025-09-15T10:00:00Z',
+  },
+  {
+    id: 'event-013',
+    classId: '1',
+    name: 'Mid-Term Exam (Day 2)',
+    subject: 'Tổng hợp',
+    subjectCode: 'TH',
+    date: '2025-11-23',
+    startTime: '08:00:00',
+    endTime: '11:00:00',
+    category: EventCategory.EXAM,
+    location: 'Room 301',
+    description: 'Continuation of mid-term examination',
+    isActive: true,
+    createdAt: '2025-09-15T10:00:00Z',
+    updatedAt: '2025-09-15T10:00:00Z',
+  },
+  {
+    id: 'event-014',
+    classId: '1',
+    name: 'Field Trip to Science Museum',
+    subject: 'Khoa học',
+    subjectCode: 'KH',
+    date: '2025-11-25',
+    startTime: '08:00:00',
+    endTime: '15:00:00',
+    category: EventCategory.FIELD_TRIP,
+    location: 'City Science Museum',
+    description: 'Educational trip to explore science exhibits - bring lunch',
+    isActive: true,
+    createdAt: '2025-09-15T14:30:00Z',
+    updatedAt: '2025-09-15T14:30:00Z',
+  },
+  {
+    id: 'event-015',
+    classId: '1',
+    name: 'Team Meeting - Project Planning',
+    subject: 'Hoạt động trải nghiệm',
+    subjectCode: 'HĐTN',
+    date: '2025-11-27',
+    startTime: '09:00:00',
+    endTime: '10:00:00',
+    category: EventCategory.MEETING,
+    location: 'Room 301',
+    description: 'Plan group projects for December',
+    isActive: true,
+    createdAt: '2025-11-20T10:00:00Z',
+    updatedAt: '2025-11-20T10:00:00Z',
+  },
+  {
+    id: 'event-016',
+    classId: '1',
+    name: 'Math Practice Problems Due',
+    subject: 'Toán',
+    subjectCode: 'T',
+    date: '2025-11-28',
+    startTime: null,
+    endTime: null,
+    category: EventCategory.ASSIGNMENT,
+    location: null,
+    description: 'Complete problem set 7 - pages 45-50',
+    isActive: true,
+    createdAt: '2025-11-21T10:00:00Z',
+    updatedAt: '2025-11-21T10:00:00Z',
+  },
+  {
+    id: 'event-017',
+    classId: '1',
+    name: 'Parent-Teacher Conference',
+    subject: 'Hoạt động chung',
+    subjectCode: 'HC',
+    date: '2025-11-30',
+    startTime: '14:00:00',
+    endTime: '17:00:00',
+    category: EventCategory.MEETING,
+    location: 'Room 301',
+    description: 'Quarterly parent-teacher meetings - sign up for time slots',
+    isActive: true,
+    createdAt: '2025-09-25T09:00:00Z',
+    updatedAt: '2025-09-25T09:00:00Z',
+  },
+  {
+    id: 'event-020',
+    classId: '1',
+    name: 'Library Orientation',
+    subject: 'Hoạt động trải nghiệm',
+    subjectCode: 'HĐTN',
+    date: '2025-11-02',
+    startTime: '11:00:00',
+    endTime: '12:00:00',
+    category: EventCategory.OTHER,
+    location: 'School Library',
+    description: 'Introduction to library resources and borrowing system',
+    isActive: true,
+    createdAt: '2025-09-28T10:00:00Z',
+    updatedAt: '2025-09-28T10:00:00Z',
+  },
+  {
+    id: 'event-021',
+    classId: '1',
+    name: 'Vocabulary Quiz',
+    subject: 'Tiếng Việt',
+    subjectCode: 'TV',
+    date: '2025-11-08',
+    startTime: '09:00:00',
+    endTime: '09:30:00',
+    category: EventCategory.EXAM,
+    location: 'Room 301',
+    description: 'Weekly vocabulary assessment - Units 1-3',
+    isActive: true,
+    createdAt: '2025-11-01T10:00:00Z',
+    updatedAt: '2025-11-01T10:00:00Z',
+  },
+  {
+    id: 'event-022',
+    classId: '1',
+    name: 'Fall Concert Practice',
+    subject: 'Âm nhạc',
+    subjectCode: 'AN',
+    date: '2025-11-14',
+    startTime: '15:00:00',
+    endTime: '16:30:00',
+    category: EventCategory.OTHER,
+    location: 'Music Room',
+    description: 'Rehearsal for upcoming fall concert',
+    isActive: true,
+    createdAt: '2025-11-07T10:00:00Z',
+    updatedAt: '2025-11-07T10:00:00Z',
+  },
+  {
+    id: 'event-023',
+    classId: '1',
+    name: 'Group Project Presentation',
+    subject: 'Hoạt động trải nghiệm',
+    subjectCode: 'HĐTN',
+    date: '2025-11-24',
+    startTime: '13:00:00',
+    endTime: '15:00:00',
+    category: EventCategory.PRESENTATION,
+    location: 'Room 301',
+    description: 'Final presentations for group projects',
+    isActive: true,
+    createdAt: '2025-11-10T10:00:00Z',
+    updatedAt: '2025-11-10T10:00:00Z',
+  },
+
+  // ========== CLASS 3B (Grade 3) ==========
+  {
+    id: 'event-101',
+    classId: '2',
+    name: 'Class 3B Orientation',
+    subject: 'Hoạt động chung',
+    subjectCode: 'HC',
+    date: '2025-11-01',
+    startTime: '09:00:00',
+    endTime: '10:00:00',
+    category: EventCategory.MEETING,
+    location: 'Room 302',
+    description: 'New year orientation for Grade 3 students',
+    isActive: true,
+    createdAt: '2025-09-25T10:00:00Z',
+    updatedAt: '2025-09-25T10:00:00Z',
+  },
+  {
+    id: 'event-102',
+    classId: '2',
+    name: 'English Assignment Due',
+    subject: 'Tiếng Anh',
+    subjectCode: 'TA',
+    date: '2025-11-03',
+    startTime: null,
+    endTime: null,
+    category: EventCategory.ASSIGNMENT,
+    location: null,
+    description: 'Unit 1 vocabulary and grammar exercises',
+    isActive: true,
+    createdAt: '2025-09-20T10:00:00Z',
+    updatedAt: '2025-09-20T10:00:00Z',
+  },
+  {
+    id: 'event-103',
+    classId: '2',
+    name: 'Science Lab - Experiments',
+    subject: 'Tự nhiên và Xã hội',
+    subjectCode: 'TNXH',
+    date: '2025-11-03',
+    startTime: '14:00:00',
+    endTime: '15:30:00',
+    category: EventCategory.OTHER,
+    location: 'Science Lab',
+    description: 'Hands-on science experiments about states of matter',
+    isActive: true,
+    createdAt: '2025-09-25T11:00:00Z',
+    updatedAt: '2025-09-25T11:00:00Z',
+  },
+  {
+    id: 'event-104',
+    classId: '2',
+    name: 'Math Test',
+    subject: 'Toán',
+    subjectCode: 'T',
+    date: '2025-11-07',
+    startTime: '09:00:00',
+    endTime: '10:00:00',
+    category: EventCategory.EXAM,
+    location: 'Room 302',
+    description: 'Chapter 1-2 multiplication and division',
+    isActive: true,
+    createdAt: '2025-09-28T10:00:00Z',
+    updatedAt: '2025-09-28T10:00:00Z',
+  },
+  {
+    id: 'event-105',
+    classId: '2',
+    name: 'Art Competition',
+    subject: 'Mỹ thuật',
+    subjectCode: 'MT',
+    date: '2025-11-09',
+    startTime: '10:00:00',
+    endTime: '12:00:00',
+    category: EventCategory.PRESENTATION,
+    location: 'Art Room',
+    description: 'Grade 3 art competition - painting and sculpture',
+    isActive: true,
+    createdAt: '2025-09-30T14:00:00Z',
+    updatedAt: '2025-09-30T14:00:00Z',
+  },
+  {
+    id: 'event-106',
+    classId: '2',
+    name: 'Literature Reading Circle',
+    subject: 'Tiếng Việt',
+    subjectCode: 'TV',
+    date: '2025-11-10',
+    startTime: '13:00:00',
+    endTime: '14:00:00',
+    category: EventCategory.OTHER,
+    location: 'Library',
+    description: 'Discuss assigned chapter book',
+    isActive: true,
+    createdAt: '2025-11-01T09:00:00Z',
+    updatedAt: '2025-11-01T09:00:00Z',
+  },
+  {
+    id: 'event-107',
+    classId: '2',
+    name: 'Social Studies Project Due',
+    subject: 'Tự nhiên và Xã hội',
+    subjectCode: 'TNXH',
+    date: '2025-11-13',
+    startTime: null,
+    endTime: null,
+    category: EventCategory.ASSIGNMENT,
+    location: null,
+    description: 'Community project - local history research',
+    isActive: true,
+    createdAt: '2025-09-29T10:00:00Z',
+    updatedAt: '2025-09-29T10:00:00Z',
+  },
+  {
+    id: 'event-108',
+    classId: '2',
+    name: 'English Speaking Practice',
+    subject: 'Tiếng Anh',
+    subjectCode: 'TA',
+    date: '2025-11-15',
+    startTime: '10:00:00',
+    endTime: '11:00:00',
+    category: EventCategory.EXAM,
+    location: 'Room 302',
+    description: 'Oral presentation and conversation practice',
+    isActive: true,
+    createdAt: '2025-09-20T11:00:00Z',
+    updatedAt: '2025-09-20T11:00:00Z',
+  },
+  {
+    id: 'event-109',
+    classId: '2',
+    name: 'Guest Speaker: Local Community Leader',
+    subject: 'Đạo đức',
+    subjectCode: 'DD',
+    date: '2025-11-16',
+    startTime: '11:00:00',
+    endTime: '12:00:00',
+    category: EventCategory.PRESENTATION,
+    location: 'Room 302',
+    description: 'Learn about community service and leadership',
+    isActive: true,
+    createdAt: '2025-11-05T10:00:00Z',
+    updatedAt: '2025-11-05T10:00:00Z',
+  },
+  {
+    id: 'event-110',
+    classId: '2',
+    name: 'Group Science Project Presentation',
+    subject: 'Tự nhiên và Xã hội',
+    subjectCode: 'TNXH',
+    date: '2025-11-18',
+    startTime: '10:00:00',
+    endTime: '12:00:00',
+    category: EventCategory.PRESENTATION,
+    location: 'Room 302',
+    description: 'Teams present their environmental science projects',
+    isActive: true,
+    createdAt: '2025-09-10T12:00:00Z',
+    updatedAt: '2025-09-10T12:00:00Z',
+  },
+  {
+    id: 'event-111',
+    classId: '2',
+    name: 'Math Project Due',
+    subject: 'Toán',
+    subjectCode: 'T',
+    date: '2025-11-20',
+    startTime: null,
+    endTime: null,
+    category: EventCategory.ASSIGNMENT,
+    location: null,
+    description: 'Geometry and measurement project',
+    isActive: true,
+    createdAt: '2025-09-01T10:00:00Z',
+    updatedAt: '2025-09-01T10:00:00Z',
+  },
+  {
+    id: 'event-112',
+    classId: '2',
+    name: 'Mid-Term Exam',
+    subject: 'Tổng hợp',
+    subjectCode: 'TH',
+    date: '2025-11-22',
+    startTime: '08:00:00',
+    endTime: '10:30:00',
+    category: EventCategory.EXAM,
+    location: 'Room 302',
+    description: 'Comprehensive mid-term examination',
+    isActive: true,
+    createdAt: '2025-09-15T10:00:00Z',
+    updatedAt: '2025-09-15T10:00:00Z',
+  },
+  {
+    id: 'event-113',
+    classId: '2',
+    name: 'Field Trip - Botanical Garden',
+    subject: 'Tự nhiên và Xã hội',
+    subjectCode: 'TNXH',
+    date: '2025-11-25',
+    startTime: '08:30:00',
+    endTime: '15:00:00',
+    category: EventCategory.FIELD_TRIP,
+    location: 'City Botanical Garden',
+    description: 'Study plants and ecosystems - bring water bottle',
+    isActive: true,
+    createdAt: '2025-09-15T14:30:00Z',
+    updatedAt: '2025-09-15T14:30:00Z',
+  },
+  {
+    id: 'event-114',
+    classId: '2',
+    name: 'PE Sports Day',
+    subject: 'Giáo dục thể chất',
+    subjectCode: 'GDTC',
+    date: '2025-11-27',
+    startTime: '09:00:00',
+    endTime: '11:00:00',
+    category: EventCategory.MEETING,
+    location: 'Sports Field',
+    description: 'Grade 3 sports competition',
+    isActive: true,
+    createdAt: '2025-11-20T10:00:00Z',
+    updatedAt: '2025-11-20T10:00:00Z',
+  },
+  {
+    id: 'event-115',
+    classId: '2',
+    name: 'Reading Assignment Due',
+    subject: 'Tiếng Việt',
+    subjectCode: 'TV',
+    date: '2025-11-28',
+    startTime: null,
+    endTime: null,
+    category: EventCategory.ASSIGNMENT,
+    location: null,
+    description: 'Complete chapter 5-7 and discussion questions',
+    isActive: true,
+    createdAt: '2025-11-21T10:00:00Z',
+    updatedAt: '2025-11-21T10:00:00Z',
+  },
+  {
+    id: 'event-116',
+    classId: '2',
+    name: 'Parent-Teacher Meeting',
+    subject: 'Hoạt động chung',
+    subjectCode: 'HC',
+    date: '2025-11-30',
+    startTime: '15:00:00',
+    endTime: '18:00:00',
+    category: EventCategory.MEETING,
+    location: 'Room 302',
+    description: 'Quarterly progress meeting with parents',
+    isActive: true,
+    createdAt: '2025-09-25T09:00:00Z',
+    updatedAt: '2025-09-25T09:00:00Z',
+  },
+
+  // ========== CLASS 5C (Grade 5) ==========
+  {
+    id: 'event-201',
+    classId: '3',
+    name: 'Class 5C Opening Ceremony',
+    subject: 'Hoạt động chung',
+    subjectCode: 'HC',
+    date: '2025-11-01',
+    startTime: '08:00:00',
+    endTime: '09:00:00',
+    category: EventCategory.MEETING,
+    location: 'School Hall',
+    description: 'Start of November - New academic year begins',
+    isActive: true,
+    createdAt: '2025-09-25T10:00:00Z',
+    updatedAt: '2025-09-25T10:00:00Z',
+  },
+  {
+    id: 'event-202',
+    classId: '3',
+    name: 'Advanced Math Assignment Due',
+    subject: 'Toán',
+    subjectCode: 'T',
+    date: '2025-11-03',
+    startTime: null,
+    endTime: null,
+    category: EventCategory.ASSIGNMENT,
+    location: null,
+    description: 'Pre-Algebra problem set - chapters 1-3',
+    isActive: true,
+    createdAt: '2025-09-20T10:00:00Z',
+    updatedAt: '2025-09-20T10:00:00Z',
+  },
+  {
+    id: 'event-203',
+    classId: '3',
+    name: 'Computer Lab Session',
+    subject: 'Tin học và Công nghệ',
+    subjectCode: 'TH',
+    date: '2025-11-03',
+    startTime: '14:00:00',
+    endTime: '15:30:00',
+    category: EventCategory.OTHER,
+    location: 'Computer Lab',
+    description: 'Introduction to coding and algorithms',
+    isActive: true,
+    createdAt: '2025-09-25T11:00:00Z',
+    updatedAt: '2025-09-25T11:00:00Z',
+  },
+  {
+    id: 'event-204',
+    classId: '3',
+    name: 'Science Midterm Quiz',
+    subject: 'Khoa học',
+    subjectCode: 'KH',
+    date: '2025-11-07',
+    startTime: '09:00:00',
+    endTime: '10:00:00',
+    category: EventCategory.EXAM,
+    location: 'Room 303',
+    description: 'Biology and earth science quiz',
+    isActive: true,
+    createdAt: '2025-09-28T10:00:00Z',
+    updatedAt: '2025-09-28T10:00:00Z',
+  },
+  {
+    id: 'event-205',
+    classId: '3',
+    name: 'English Literature Presentation',
+    subject: 'Tiếng Anh',
+    subjectCode: 'TA',
+    date: '2025-11-09',
+    startTime: '10:00:00',
+    endTime: '12:00:00',
+    category: EventCategory.PRESENTATION,
+    location: 'Room 303',
+    description: 'Student presentations on assigned novels',
+    isActive: true,
+    createdAt: '2025-09-30T14:00:00Z',
+    updatedAt: '2025-09-30T14:00:00Z',
+  },
+  {
+    id: 'event-206',
+    classId: '3',
+    name: 'History Documentary Viewing',
+    subject: 'Lịch sử và Địa lý',
+    subjectCode: 'LS-DL',
+    date: '2025-11-10',
+    startTime: '13:00:00',
+    endTime: '14:30:00',
+    category: EventCategory.OTHER,
+    location: 'Media Room',
+    description: 'Watch and discuss historical documentary',
+    isActive: true,
+    createdAt: '2025-11-01T09:00:00Z',
+    updatedAt: '2025-11-01T09:00:00Z',
+  },
+  {
+    id: 'event-207',
+    classId: '3',
+    name: 'History Research Project Due',
+    subject: 'Lịch sử và Địa lý',
+    subjectCode: 'LS-DL',
+    date: '2025-11-13',
+    startTime: null,
+    endTime: null,
+    category: EventCategory.ASSIGNMENT,
+    location: null,
+    description: 'Independent research paper on world history',
+    isActive: true,
+    createdAt: '2025-09-29T10:00:00Z',
+    updatedAt: '2025-09-29T10:00:00Z',
+  },
+  {
+    id: 'event-208',
+    classId: '3',
+    name: 'Math Problem Solving Competition',
+    subject: 'Toán',
+    subjectCode: 'T',
+    date: '2025-11-15',
+    startTime: '09:00:00',
+    endTime: '11:00:00',
+    category: EventCategory.EXAM,
+    location: 'Room 303',
+    description: 'Grade 5 math competition - team event',
+    isActive: true,
+    createdAt: '2025-09-20T11:00:00Z',
+    updatedAt: '2025-09-20T11:00:00Z',
+  },
+  {
+    id: 'event-209',
+    classId: '3',
+    name: 'University Professor Lecture',
+    subject: 'Khoa học',
+    subjectCode: 'KH',
+    date: '2025-11-16',
+    startTime: '11:00:00',
+    endTime: '12:30:00',
+    category: EventCategory.PRESENTATION,
+    location: 'Room 303',
+    description: 'Prof. Johnson discusses STEM careers and education',
+    isActive: true,
+    createdAt: '2025-11-05T10:00:00Z',
+    updatedAt: '2025-11-05T10:00:00Z',
+  },
+  {
+    id: 'event-210',
+    classId: '3',
+    name: 'Science Fair Project Showcase',
+    subject: 'Khoa học',
+    subjectCode: 'KH',
+    date: '2025-11-18',
+    startTime: '10:00:00',
+    endTime: '13:00:00',
+    category: EventCategory.PRESENTATION,
+    location: 'Room 303 & Hallway',
+    description: 'Advanced science fair projects - open to community',
+    isActive: true,
+    createdAt: '2025-09-10T12:00:00Z',
+    updatedAt: '2025-09-10T12:00:00Z',
+  },
+  {
+    id: 'event-211',
+    classId: '3',
+    name: 'English Essay Due',
+    subject: 'Tiếng Anh',
+    subjectCode: 'TA',
+    date: '2025-11-20',
+    startTime: null,
+    endTime: null,
+    category: EventCategory.ASSIGNMENT,
+    location: null,
+    description: 'Critical analysis essay - 1500 words minimum',
+    isActive: true,
+    createdAt: '2025-09-01T10:00:00Z',
+    updatedAt: '2025-09-01T10:00:00Z',
+  },
+  {
+    id: 'event-212',
+    classId: '3',
+    name: 'Comprehensive Final Exam',
+    subject: 'Tổng hợp',
+    subjectCode: 'TH',
+    date: '2025-11-22',
+    startTime: '08:00:00',
+    endTime: '11:30:00',
+    category: EventCategory.EXAM,
+    location: 'Room 303',
+    description: 'Final comprehensive examination - all subjects',
+    isActive: true,
+    createdAt: '2025-09-15T10:00:00Z',
+    updatedAt: '2025-09-15T10:00:00Z',
+  },
+  {
+    id: 'event-213',
+    classId: '3',
+    name: 'Final Exam Day 2',
+    subject: 'Tổng hợp',
+    subjectCode: 'TH',
+    date: '2025-11-23',
+    startTime: '08:00:00',
+    endTime: '11:00:00',
+    category: EventCategory.EXAM,
+    location: 'Room 303',
+    description: 'Continuation of final comprehensive examination',
+    isActive: true,
+    createdAt: '2025-09-15T10:00:00Z',
+    updatedAt: '2025-09-15T10:00:00Z',
+  },
+  {
+    id: 'event-214',
+    classId: '3',
+    name: 'Educational Trip - Science Museum',
+    subject: 'Khoa học',
+    subjectCode: 'KH',
+    date: '2025-11-25',
+    startTime: '08:00:00',
+    endTime: '16:00:00',
+    category: EventCategory.FIELD_TRIP,
+    location: 'Metropolitan Science Museum',
+    description: 'Advanced exhibits on technology and nature - pack lunch',
+    isActive: true,
+    createdAt: '2025-09-15T14:30:00Z',
+    updatedAt: '2025-09-15T14:30:00Z',
+  },
+  {
+    id: 'event-215',
+    classId: '3',
+    name: 'Advanced Workshop - Critical Thinking',
+    subject: 'Hoạt động trải nghiệm',
+    subjectCode: 'HĐTN',
+    date: '2025-11-27',
+    startTime: '09:00:00',
+    endTime: '11:00:00',
+    category: EventCategory.MEETING,
+    location: 'Room 303',
+    description: 'Workshop on logical reasoning and debate',
+    isActive: true,
+    createdAt: '2025-11-20T10:00:00Z',
+    updatedAt: '2025-11-20T10:00:00Z',
+  },
+  {
+    id: 'event-216',
+    classId: '3',
+    name: 'Science Lab Report Due',
+    subject: 'Khoa học',
+    subjectCode: 'KH',
+    date: '2025-11-28',
+    startTime: null,
+    endTime: null,
+    category: EventCategory.ASSIGNMENT,
+    location: null,
+    description: 'Final lab report with analysis and conclusions',
+    isActive: true,
+    createdAt: '2025-11-21T10:00:00Z',
+    updatedAt: '2025-11-21T10:00:00Z',
+  },
+  {
+    id: 'event-217',
+    classId: '3',
+    name: 'Parent-Student-Teacher Conference',
+    subject: 'Hoạt động chung',
+    subjectCode: 'HC',
+    date: '2025-11-30',
+    startTime: '16:00:00',
+    endTime: '19:00:00',
+    category: EventCategory.MEETING,
+    location: 'Room 303',
+    description: 'Year-end progress conference with family',
+    isActive: true,
+    createdAt: '2025-09-25T09:00:00Z',
+    updatedAt: '2025-09-25T09:00:00Z',
+  },
+];
+
+/**
+ * Get all schedule events (regular periods + special calendar events) for all classes
+ * This is the single source of truth for all schedule data
+ *
+ * @returns Combined array of regular class periods and special calendar events
+ */
+export function getAllScheduleEvents(): ScheduleEvent[] {
+  // Get regular class periods for current week
+  const regularPeriods = initializeMockClassPeriods();
+
+  // Combine with special calendar events
+  const allEvents = [...regularPeriods, ...specialCalendarEvents];
+
+  return allEvents;
+}
+
+/**
+ * Fetch calendar events for a specific class within a date range
+ * Uses the unified schedule data (regular periods + special events)
+ *
+ * @param classId - The class ID to fetch events for
+ * @param startDate - Start date in YYYY-MM-DD format
+ * @param endDate - End date in YYYY-MM-DD format
+ * @returns Filtered and sorted events array with total count
+ */
+export function fetchClassCalendarEvents(
+  classId: string,
+  startDate: string,
+  endDate: string
+): { events: ScheduleEvent[]; total: number } {
+  // Get all events (regular + special)
+  const allEvents = getAllScheduleEvents();
+
+  // Filter by classId and date range
+  const filtered = allEvents.filter((event) => {
+    if (!event.date) return false;
+
+    const eventDate = new Date(event.date);
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    return event.classId === classId && eventDate >= start && eventDate <= end;
+  });
+
+  // Sort by date, then by startTime
+  const sorted = filtered.sort((a, b) => {
+    const dateComparison = (a.date || '').localeCompare(b.date || '');
+    if (dateComparison !== 0) return dateComparison;
+
+    // If same date, sort by startTime (nulls last)
+    if (a.startTime && b.startTime) {
+      return a.startTime.localeCompare(b.startTime);
+    }
+    if (a.startTime) return -1;
+    if (b.startTime) return 1;
+    return 0;
+  });
+
+  return {
+    events: sorted,
+    total: sorted.length,
+  };
+}

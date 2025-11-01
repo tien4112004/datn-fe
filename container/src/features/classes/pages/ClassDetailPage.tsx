@@ -10,17 +10,15 @@ import {
 } from '@/components/ui/breadcrumb';
 import { Separator } from '@radix-ui/react-separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Edit, Users, UserCheck, Settings, LayoutDashboard, Calendar, BookOpen, Target } from 'lucide-react';
+import { Edit, Users, Settings, LayoutDashboard, Calendar, BookOpen, Target } from 'lucide-react';
 
 import ClassOverview from '../components/detail/ClassOverview';
 import ClassStudentList from '../components/detail/ClassStudentList';
-import ClassTeacherList from '../components/detail/ClassTeacherList';
 import ClassSettings from '../components/detail/ClassSettings';
 import TodaysTeachingDashboard from '../components/dashboard/TodaysTeachingDashboard';
-import DailyScheduleView from '../components/schedule/DailyScheduleView';
+import ScheduleView from '../components/schedule/ScheduleView';
 import LessonStatusTracker from '../components/lesson/LessonStatusTracker';
 import ScheduleLessonLinker from '../components/integration/ScheduleLessonLinker';
 import {
@@ -65,7 +63,9 @@ const ClassDetailPage = () => {
     startDate: today,
     endDate: today,
   });
+  console.log('Schedules Data:', schedulesData);
   const { data: periodsData } = useClassPeriods(id!, { date: today });
+  console.log('Periods Data:', periodsData);
   const { data: lessonPlansData } = useClassLessonPlans(id!, {});
 
   const schedules = schedulesData?.data || [];
@@ -76,8 +76,9 @@ const ClassDetailPage = () => {
   const todaySchedule = schedules.find((s) => s.date === today) || {
     date: today,
     classId: id!,
-    periods: [],
+    events: [],
   };
+
   const todayLessonPlans = allLessonPlans.filter((lp) => lp.date === today);
 
   // Mutation hooks
@@ -177,53 +178,9 @@ const ClassDetailPage = () => {
               </div>
             </div>
 
-            {/* Quick Stats */}
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">{t('stats.students')}</CardTitle>
-                  <Users className="text-muted-foreground h-4 w-4" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">
-                    {currentClass.currentEnrollment}/{currentClass.capacity}
-                  </div>
-                  <p className="text-muted-foreground text-xs">
-                    {currentClass.capacity - currentClass.currentEnrollment} {t('stats.available')}
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">{t('stats.homeroomTeacher')}</CardTitle>
-                  <UserCheck className="text-muted-foreground h-4 w-4" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{currentClass.homeroomTeacher ? '1' : '0'}</div>
-                  <p className="text-muted-foreground text-xs">
-                    {currentClass.homeroomTeacher
-                      ? currentClass.homeroomTeacher.fullName
-                      : t('stats.noHomeroomTeacher')}
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">{t('stats.subjects')}</CardTitle>
-                  <Settings className="text-muted-foreground h-4 w-4" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{currentClass.subjects.length}</div>
-                  <p className="text-muted-foreground text-xs">{t('stats.subjects')}</p>
-                </CardContent>
-              </Card>
-            </div>
-
             {/* Detailed Tabs */}
-            <Tabs defaultValue="teaching" className="space-y-4">
-              <TabsList className="grid w-full grid-cols-7">
+            <Tabs defaultValue="teaching" className="mx-12 space-y-4">
+              <TabsList className="grid w-full grid-cols-6">
                 <TabsTrigger value="teaching" className="flex items-center gap-1">
                   <LayoutDashboard className="h-4 w-4" />
                   {t('tabs.teaching')}
@@ -243,10 +200,6 @@ const ClassDetailPage = () => {
                 <TabsTrigger value="students" className="flex items-center gap-1">
                   <Users className="h-4 w-4" />
                   {t('tabs.students')}
-                </TabsTrigger>
-                <TabsTrigger value="teachers" className="flex items-center gap-1">
-                  <UserCheck className="h-4 w-4" />
-                  {t('tabs.teachers')}
                 </TabsTrigger>
                 <TabsTrigger value="settings" className="flex items-center gap-1">
                   <Settings className="h-4 w-4" />
@@ -297,7 +250,7 @@ const ClassDetailPage = () => {
               </TabsContent>
 
               <TabsContent value="schedule" className="space-y-4">
-                <DailyScheduleView
+                <ScheduleView
                   classId={currentClass.id}
                   schedules={schedules}
                   onAddPeriod={async (date) => {
@@ -344,10 +297,6 @@ const ClassDetailPage = () => {
 
               <TabsContent value="students" className="space-y-4">
                 <ClassStudentList classData={currentClass} />
-              </TabsContent>
-
-              <TabsContent value="teachers" className="space-y-4">
-                <ClassTeacherList classData={currentClass} />
               </TabsContent>
 
               <TabsContent value="settings" className="space-y-4">

@@ -12,8 +12,8 @@ import type {
   StudentUpdateRequest,
   SubjectManagementRequest,
   DailySchedule,
+  ScheduleEvent,
   ScheduleCollectionRequest,
-  ClassPeriod,
   LessonPlan,
   LessonPlanCollectionRequest,
   LearningObjective,
@@ -24,15 +24,21 @@ import type {
 } from '../types';
 import { API_MODE, type ApiMode } from '@/shared/constants';
 import { mapPagination, type ApiResponse } from '@/shared/types/api';
-import { initializeMockClasses, mockTeachers, mockStudents } from './data/mockData';
-import { fetchClassEvents } from './calendarApi';
+import {
+  initializeMockClasses,
+  mockTeachers,
+  mockStudents,
+  getAllScheduleEvents,
+  initializeMockLessonPlans,
+  fetchClassCalendarEvents,
+} from './data/mockData';
 
 export default class ClassMockApiService implements ClassApiService {
   private classes = initializeMockClasses(mockTeachers, mockStudents);
   private students = [...mockStudents];
   private teachers = [...mockTeachers];
   private schedules: DailySchedule[] = [];
-  private periods: ClassPeriod[] = [];
+  private periods: ScheduleEvent[] = [];
   private lessonPlans: LessonPlan[] = [];
   private objectives: LearningObjective[] = [];
   private resources: LessonResource[] = [];
@@ -48,130 +54,51 @@ export default class ClassMockApiService implements ClassApiService {
   }
 
   private _initializeMockData() {
-    // Initialize mock periods for the first class
+    // Initialize all schedule events (regular periods + special calendar events)
+    this.periods = getAllScheduleEvents();
+
+    // Initialize mock lesson plans from mockData.ts
+    const lessonPlans = initializeMockLessonPlans(this.teachers);
+    this.lessonPlans = lessonPlans;
+
+    // Extract all objectives and resources from lesson plans
+    lessonPlans.forEach((lessonPlan) => {
+      if (lessonPlan.objectives) {
+        this.objectives.push(...lessonPlan.objectives);
+      }
+      if (lessonPlan.resources) {
+        this.resources.push(...lessonPlan.resources);
+      }
+    });
+
+    // Generate daily schedules for each class
     if (this.classes.length > 0) {
-      const firstClass = this.classes[0];
-      const mathTeacher = this.teachers.find((t) => t.subjects.includes('Toán'));
-      const englishTeacher = this.teachers.find((t) => t.subjects.includes('Tiếng Anh'));
+      this.classes.forEach((classItem) => {
+        const classSchedules = this.periods.filter((p) => p.classId === classItem.id);
 
-      if (mathTeacher) {
-        // Monday Math period
-        const mathPeriod: ClassPeriod = {
-          id: 'period-1',
-          classId: firstClass.id,
-          subject: 'Toán',
-          subjectCode: 'TOAN',
-          dayOfWeek: 1, // Monday
-          startTime: '07:30',
-          endTime: '08:15',
-          teacherId: mathTeacher.id,
-          teacher: {
-            id: mathTeacher.id,
-            fullName: mathTeacher.fullName,
-            email: mathTeacher.email,
-          },
-          room: 'A101',
-          isActive: true,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        };
-        this.periods.push(mathPeriod);
+        if (classSchedules.length > 0) {
+          // Group events by their date field
+          const eventsByDate = new Map<string, typeof classSchedules>();
 
-        // Create a lesson plan for today if it's Monday
-        const today = new Date();
-        const lessonPlan: LessonPlan = {
-          id: 'lesson-1',
-          classId: firstClass.id,
-          className: firstClass.name,
-          subject: 'Toán',
-          subjectCode: 'TOAN',
-          title: 'Phương trình bậc hai',
-          description: 'Học về phương trình bậc hai và cách giải',
-          date: today.toISOString().split('T')[0],
-          periodId: mathPeriod.id,
-          startTime: '07:30',
-          endTime: '08:15',
-          duration: 45,
-          teacherId: mathTeacher.id,
-          teacher: {
-            id: mathTeacher.id,
-            fullName: mathTeacher.fullName,
-            email: mathTeacher.email,
-          },
-          objectives: [],
-          resources: [],
-          status: 'planned',
-          preparationTime: 30,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        };
-        this.lessonPlans.push(lessonPlan);
+          classSchedules.forEach((event) => {
+            if (!event.date) return; // Skip events without dates
 
-        // Add objectives
-        const objective1: LearningObjective = {
-          id: 'obj-1',
-          lessonPlanId: lessonPlan.id,
-          description: 'Hiểu công thức giải phương trình bậc hai',
-          type: 'knowledge',
-          isAchieved: false,
-          createdAt: new Date().toISOString(),
-        };
-        const objective2: LearningObjective = {
-          id: 'obj-2',
-          lessonPlanId: lessonPlan.id,
-          description: 'Áp dụng công thức vào giải bài tập',
-          type: 'skill',
-          isAchieved: false,
-          createdAt: new Date().toISOString(),
-        };
-        this.objectives.push(objective1, objective2);
+            if (!eventsByDate.has(event.date)) {
+              eventsByDate.set(event.date, []);
+            }
+            eventsByDate.get(event.date)!.push(event);
+          });
 
-        // Add resources
-        const resource1: LessonResource = {
-          id: 'res-1',
-          lessonPlanId: lessonPlan.id,
-          name: 'Slide bài giảng Phương trình bậc hai',
-          type: 'presentation',
-          url: '/resources/math-quadratic-equations.pptx',
-          description: 'Slide PowerPoint với ví dụ minh họa',
-          isRequired: true,
-          isPrepared: true,
-          createdAt: new Date().toISOString(),
-        };
-        this.resources.push(resource1);
-
-        // Create today's schedule
-        const todaySchedule: DailySchedule = {
-          date: today.toISOString().split('T')[0],
-          classId: firstClass.id,
-          periods: [mathPeriod],
-        };
-        this.schedules.push(todaySchedule);
-      }
-
-      if (englishTeacher) {
-        // Tuesday English period
-        const englishPeriod: ClassPeriod = {
-          id: 'period-2',
-          classId: firstClass.id,
-          subject: 'Tiếng Anh',
-          subjectCode: 'ANH',
-          dayOfWeek: 2, // Tuesday
-          startTime: '08:15',
-          endTime: '09:00',
-          teacherId: englishTeacher.id,
-          teacher: {
-            id: englishTeacher.id,
-            fullName: englishTeacher.fullName,
-            email: englishTeacher.email,
-          },
-          room: 'B202',
-          isActive: true,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        };
-        this.periods.push(englishPeriod);
-      }
+          // Create DailySchedule for each date
+          eventsByDate.forEach((events, dateStr) => {
+            this.schedules.push({
+              date: dateStr,
+              classId: classItem.id,
+              events: events, // Use 'events' instead of 'periods'
+            });
+          });
+        }
+      });
     }
   }
 
@@ -320,10 +247,6 @@ export default class ClassMockApiService implements ClassApiService {
       throw new Error('Class not found');
     }
 
-    if (cls.currentEnrollment >= cls.capacity) {
-      throw new Error('Class is at full capacity');
-    }
-
     const student = this.students.find((s) => s.id === request.studentId);
     if (!student) {
       throw new Error('Student not found');
@@ -378,10 +301,6 @@ export default class ClassMockApiService implements ClassApiService {
 
     if (!fromClass || !toClass) {
       throw new Error('Source or destination class not found');
-    }
-
-    if (toClass.currentEnrollment >= toClass.capacity) {
-      throw new Error('Destination class is at full capacity');
     }
 
     const student = this.students.find(
@@ -614,23 +533,6 @@ export default class ClassMockApiService implements ClassApiService {
     return availableTeachers;
   }
 
-  async getClassCapacityInfo(
-    classId: string
-  ): Promise<{ capacity: number; currentEnrollment: number; available: number }> {
-    await this._delay();
-
-    const cls = this.classes.find((c) => c.id === classId);
-    if (!cls) {
-      throw new Error('Class not found');
-    }
-
-    return {
-      capacity: cls.capacity,
-      currentEnrollment: cls.currentEnrollment,
-      available: cls.capacity - cls.currentEnrollment,
-    };
-  }
-
   // Schedule and Lesson Management
   async getSchedules(
     classId: string,
@@ -655,7 +557,7 @@ export default class ClassMockApiService implements ClassApiService {
     };
   }
 
-  async getPeriods(classId: string, params: { date?: string }): Promise<ApiResponse<ClassPeriod[]>> {
+  async getPeriods(classId: string, params: { date?: string }): Promise<ApiResponse<ScheduleEvent[]>> {
     await this._delay();
 
     let filtered = this.periods.filter((p) => p.classId === classId && p.isActive);
@@ -664,7 +566,7 @@ export default class ClassMockApiService implements ClassApiService {
       // Filter by date if provided
       const schedule = this.schedules.find((s) => s.classId === classId && s.date === params.date);
       if (schedule) {
-        filtered = filtered.filter((p) => schedule.periods.some((sp) => sp.id === p.id));
+        filtered = filtered.filter((p) => schedule.events.some((event) => event.id === p.id));
       }
     }
 
@@ -852,7 +754,7 @@ export default class ClassMockApiService implements ClassApiService {
   }
 
   // Schedule mutations
-  async addPeriod(data: any): Promise<ClassPeriod> {
+  async addPeriod(data: any): Promise<ScheduleEvent> {
     await this._delay();
 
     const teacher = this.teachers.find((t) => t.id === data.teacherId);
@@ -860,23 +762,20 @@ export default class ClassMockApiService implements ClassApiService {
       throw new Error('Teacher not found');
     }
 
-    const newPeriod: ClassPeriod = {
+    const newPeriod: ScheduleEvent = {
       id: Date.now().toString(),
       classId: data.classId,
+      name: data.subject,
       subject: data.subject,
       subjectCode: data.subjectCode,
-      dayOfWeek: data.dayOfWeek,
+      date: data.date,
       startTime: data.startTime,
       endTime: data.endTime,
-      teacherId: data.teacherId,
-      teacher: {
-        id: teacher.id,
-        fullName: teacher.fullName,
-        email: teacher.email,
-      },
-      room: data.room,
+      category: data.category || 'other',
+      location: data.location,
+      description: null,
       isActive: true,
-      lessonPlanId: data.lessonPlanId,
+      lessonPlanId: data.lessonPlanId || null,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
@@ -885,7 +784,7 @@ export default class ClassMockApiService implements ClassApiService {
     return newPeriod;
   }
 
-  async updatePeriod(id: string, updates: any): Promise<ClassPeriod> {
+  async updatePeriod(id: string, updates: any): Promise<ScheduleEvent> {
     await this._delay();
 
     const period = this.periods.find((p) => p.id === id);
@@ -927,8 +826,8 @@ export default class ClassMockApiService implements ClassApiService {
     classId: string,
     params: CalendarEventsQueryParams
   ): Promise<GetCalendarEventsResponse> {
-    // Delegate to existing calendarApi implementation
-    return fetchClassEvents(classId, params);
+    await this._delay();
+    return fetchClassCalendarEvents(classId, params.startDate, params.endDate);
   }
 
   // Seating Chart (stub implementations)

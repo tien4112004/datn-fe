@@ -4,19 +4,19 @@
  * Displays events in day cells
  */
 
-import type { CalendarEvent } from '../../types/entities/calendarEvent';
 import { CalendarEventCard } from './CalendarEventCard';
 import { groupEventsByDate, toISODateString, getMonthDays } from '../../utils/calendarHelpers';
 import { useCalendarStore } from '../../stores/calendarStore';
 import { cn } from '@/shared/lib/utils';
 import { useTranslation } from 'react-i18next';
+import type { ScheduleEvent } from '../../types';
 
 interface CalendarGridProps {
   /** Array of events to display */
-  events: CalendarEvent[];
+  events: ScheduleEvent[];
 
   /** Callback when an event is clicked */
-  onEventClick?: (event: CalendarEvent) => void;
+  onEventClick?: (event: ScheduleEvent) => void;
 }
 
 export function CalendarGrid({ events, onEventClick }: CalendarGridProps) {
@@ -71,7 +71,7 @@ export function CalendarGrid({ events, onEventClick }: CalendarGridProps) {
               <div
                 key={index}
                 className={cn(
-                  'min-h-[120px] border-b border-r border-gray-200 p-2',
+                  'min-h-[100px] border-b border-r border-gray-200 p-2',
                   index % 7 === 6 && 'border-r-0',
                   isToday && 'bg-blue-50',
                   !isCurrentMonth && 'bg-gray-50 text-gray-400'

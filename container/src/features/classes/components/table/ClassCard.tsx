@@ -69,28 +69,9 @@ const ClassCard = ({
 
           {/* Enrollment */}
           <div className="space-y-2">
-            <div className="flex items-center justify-between text-sm">
-              <span className="flex items-center gap-1">
-                <Users className="h-4 w-4" />
-                {t('enrollment')}
-              </span>
-              <span className="font-medium">
-                {classItem.currentEnrollment}/{classItem.capacity}
-              </span>
-            </div>
-            <div className="h-2 w-full rounded-full bg-gray-200">
-              <div
-                className={`h-2 rounded-full transition-all ${
-                  classItem.currentEnrollment >= classItem.capacity
-                    ? 'bg-red-500'
-                    : classItem.currentEnrollment >= classItem.capacity * 0.8
-                      ? 'bg-yellow-500'
-                      : 'bg-green-500'
-                }`}
-                style={{
-                  width: `${Math.min((classItem.currentEnrollment / classItem.capacity) * 100, 100)}%`,
-                }}
-              />
+            <div className="flex items-center gap-1 text-sm">
+              <Users className="h-4 w-4" />
+              {t('enrollment')}:<span className="font-medium">{classItem.currentEnrollment}</span>
             </div>
           </div>
 

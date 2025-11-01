@@ -2,18 +2,18 @@ import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Clock, ArrowRight, User, MapPin, BookOpen } from 'lucide-react';
+import { Clock, ArrowRight, MapPin, BookOpen } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import type { ClassPeriod } from '../../types';
+import type { ScheduleEvent } from '../../types';
 
 interface CurrentNextClassProps {
   classId: string;
-  periods: ClassPeriod[];
+  periods: ScheduleEvent[];
 }
 
 interface ClassStatus {
-  current: ClassPeriod | null;
-  next: ClassPeriod | null;
+  current: ScheduleEvent | null;
+  next: ScheduleEvent | null;
   timeUntilNext: number; // minutes
   isInSession: boolean;
 }
@@ -30,21 +30,26 @@ const CurrentNextClass = ({ classId, periods }: CurrentNextClassProps) => {
 
   const getCurrentClassStatus = (): ClassStatus => {
     const now = new Date();
-    const currentDay = now.getDay();
     const currentTimeStr = now.toTimeString().slice(0, 5); // "HH:MM"
+    const todayDateStr = now.toISOString().split('T')[0]; // "YYYY-MM-DD"
 
-    // Filter today's periods
+    // Filter today's periods by date
     const todayPeriods = periods
-      .filter((period) => period.dayOfWeek === currentDay && period.isActive)
-      .sort((a, b) => a.startTime.localeCompare(b.startTime));
+      .filter((period) => period.date === todayDateStr && period.isActive)
+      .sort((a, b) => (a.startTime || '').localeCompare(b.startTime || ''));
 
-    let current: ClassPeriod | null = null;
-    let next: ClassPeriod | null = null;
+    let current: ScheduleEvent | null = null;
+    let next: ScheduleEvent | null = null;
     let isInSession = false;
 
     // Find current period
     for (const period of todayPeriods) {
-      if (currentTimeStr >= period.startTime && currentTimeStr < period.endTime) {
+      if (
+        period.startTime &&
+        period.endTime &&
+        currentTimeStr >= period.startTime &&
+        currentTimeStr < period.endTime
+      ) {
         current = period;
         isInSession = true;
         break;
@@ -53,7 +58,7 @@ const CurrentNextClass = ({ classId, periods }: CurrentNextClassProps) => {
 
     // Find next period
     for (const period of todayPeriods) {
-      if (currentTimeStr < period.startTime) {
+      if (period.startTime && currentTimeStr < period.startTime) {
         next = period;
         break;
       }
@@ -61,7 +66,7 @@ const CurrentNextClass = ({ classId, periods }: CurrentNextClassProps) => {
 
     // Calculate time until next
     let timeUntilNext = 0;
-    if (next) {
+    if (next && next.startTime) {
       const nextStart = new Date();
       const [hours, minutes] = next.startTime.split(':').map(Number);
       nextStart.setHours(hours, minutes, 0, 0);
@@ -137,20 +142,17 @@ const CurrentNextClass = ({ classId, periods }: CurrentNextClassProps) => {
                 </div>
 
                 <div className="text-muted-foreground space-y-2 text-sm">
-                  <div className="flex items-center gap-2">
-                    <Clock className="h-4 w-4" />
-                    {formatTime(status.current.startTime)} - {formatTime(status.current.endTime)}
-                  </div>
+                  {status.current.startTime && status.current.endTime && (
+                    <div className="flex items-center gap-2">
+                      <Clock className="h-4 w-4" />
+                      {formatTime(status.current.startTime)} - {formatTime(status.current.endTime)}
+                    </div>
+                  )}
 
-                  <div className="flex items-center gap-2">
-                    <User className="h-4 w-4" />
-                    {status.current.teacher.fullName}
-                  </div>
-
-                  {status.current.room && (
+                  {status.current.location && (
                     <div className="flex items-center gap-2">
                       <MapPin className="h-4 w-4" />
-                      {t('room')} {status.current.room}
+                      {t('room')} {status.current.location}
                     </div>
                   )}
                 </div>
@@ -188,20 +190,17 @@ const CurrentNextClass = ({ classId, periods }: CurrentNextClassProps) => {
                 </div>
 
                 <div className="text-muted-foreground space-y-2 text-sm">
-                  <div className="flex items-center gap-2">
-                    <Clock className="h-4 w-4" />
-                    {formatTime(status.next.startTime)} - {formatTime(status.next.endTime)}
-                  </div>
+                  {status.next.startTime && status.next.endTime && (
+                    <div className="flex items-center gap-2">
+                      <Clock className="h-4 w-4" />
+                      {formatTime(status.next.startTime)} - {formatTime(status.next.endTime)}
+                    </div>
+                  )}
 
-                  <div className="flex items-center gap-2">
-                    <User className="h-4 w-4" />
-                    {status.next.teacher.fullName}
-                  </div>
-
-                  {status.next.room && (
+                  {status.next.location && (
                     <div className="flex items-center gap-2">
                       <MapPin className="h-4 w-4" />
-                      {t('room')} {status.next.room}
+                      {t('room')} {status.next.location}
                     </div>
                   )}
                 </div>

@@ -10,10 +10,9 @@
 // Entity exports
 export * from './entities/class';
 export * from './entities/student';
-export * from './entities/schedule';
+export * from './entities/scheduleEvent';
 export * from './entities/lesson';
 export * from './entities/layout';
-export * from './entities/calendarEvent';
 
 // Request type exports
 export * from './requests/classRequests';

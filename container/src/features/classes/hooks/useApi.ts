@@ -151,16 +151,6 @@ export function useClassTeachers(classId: string) {
   });
 }
 
-export function useClassCapacity(classId: string) {
-  const classApiService = useClassApiService();
-
-  return useQuery({
-    queryKey: classKeys.capacity(classId),
-    queryFn: () => classApiService.getClassCapacityInfo(classId),
-    enabled: !!classId,
-  });
-}
-
 export function useAvailableTeachers(subject?: string) {
   const classApiService = useClassApiService();
 

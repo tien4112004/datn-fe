@@ -29,12 +29,6 @@ const ClassOverview = ({ classData }: ClassOverviewProps) => {
               <label className="text-muted-foreground text-sm font-medium">{t('academicYear')}</label>
               <p className="text-sm">{classData.academicYear}</p>
             </div>
-            <div>
-              <label className="text-muted-foreground text-sm font-medium">{t('overview.capacity')}</label>
-              <p className="text-sm">
-                {classData.currentEnrollment}/{classData.capacity}
-              </p>
-            </div>
             {classData.classroom && (
               <div>
                 <label className="text-muted-foreground text-sm font-medium">{t('classroom')}</label>

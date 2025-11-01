@@ -5,7 +5,6 @@ import type {
   Class,
   ClassCollectionRequest,
   ClassCreateRequest,
-  ClassPeriod,
   ClassUpdateRequest,
   DailySchedule,
   Layout,
@@ -14,6 +13,7 @@ import type {
   LessonPlanCollectionRequest,
   LessonResource,
   ScheduleCollectionRequest,
+  ScheduleEvent,
   Student,
   StudentEnrollmentRequest,
   StudentTransferRequest,
@@ -23,7 +23,6 @@ import type {
   Teacher,
   CalendarEventsQueryParams,
   GetCalendarEventsResponse,
-  ImportBackendResult,
 } from '.';
 
 export interface ClassApiService extends Service {
@@ -40,7 +39,7 @@ export interface ClassApiService extends Service {
 
   // Schedule and Lesson Management
   getSchedules(classId: string, params: ScheduleCollectionRequest): Promise<ApiResponse<DailySchedule[]>>;
-  getPeriods(classId: string, params: { date?: string }): Promise<ApiResponse<ClassPeriod[]>>;
+  getPeriods(classId: string, params: { date?: string }): Promise<ApiResponse<ScheduleEvent[]>>;
   getLessonPlans(classId: string, params: LessonPlanCollectionRequest): Promise<ApiResponse<LessonPlan[]>>;
   getLessonObjectives(lessonPlanId: string): Promise<LearningObjective[]>;
   getLessonResources(lessonPlanId: string): Promise<LessonResource[]>;
@@ -62,8 +61,8 @@ export interface ClassApiService extends Service {
   deleteResource(id: string): Promise<void>;
 
   // Schedule mutations
-  addPeriod(data: any): Promise<ClassPeriod>;
-  updatePeriod(id: string, updates: any): Promise<ClassPeriod>;
+  addPeriod(data: any): Promise<ScheduleEvent>;
+  updatePeriod(id: string, updates: any): Promise<ScheduleEvent>;
   linkLessonToPeriod(periodId: string, lessonPlanId: string): Promise<void>;
   unlinkLessonFromPeriod(periodId: string): Promise<void>;
 
@@ -89,10 +88,7 @@ export interface ClassApiService extends Service {
 
   // Utility methods
   getAvailableTeachers(subject?: string): Promise<Teacher[]>;
-  getClassCapacityInfo(
-    classId: string
-  ): Promise<{ capacity: number; currentEnrollment: number; available: number }>;
 
   // CSV Import
-  submitImport(classId: string, file: File): Promise<ImportBackendResult>;
+  submitImport(classId: string, file: File): Promise<any>;
 }

@@ -5,20 +5,20 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Link, Unlink, Clock, CheckCircle2, AlertCircle, User, MapPin, FileText, Plus } from 'lucide-react';
+import { Link, Unlink, Clock, CheckCircle2, AlertCircle, MapPin, FileText, Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/shared/lib/utils';
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
-import type { ClassPeriod, LessonPlan } from '../../types';
+import type { ScheduleEvent, LessonPlan } from '../../types';
 
 interface ScheduleLessonLinkerProps {
   classId: string;
-  periods: ClassPeriod[];
+  periods: ScheduleEvent[];
   lessonPlans: LessonPlan[];
   onLinkLesson: (periodId: string, lessonPlanId: string) => Promise<void>;
   onUnlinkLesson: (periodId: string) => Promise<void>;
-  onCreateLessonForPeriod: (period: ClassPeriod) => void;
+  onCreateLessonForPeriod: (period: ScheduleEvent) => void;
   canEdit?: boolean;
 }
 
@@ -42,7 +42,7 @@ const ScheduleLessonLinker = ({
   canEdit = true,
 }: ScheduleLessonLinkerProps) => {
   const { t } = useTranslation('classes', { keyPrefix: 'integration.scheduleLesson' });
-  const [selectedPeriod, setSelectedPeriod] = useState<ClassPeriod | null>(null);
+  const [selectedPeriod, setSelectedPeriod] = useState<ScheduleEvent | null>(null);
   const [selectedLessonId, setSelectedLessonId] = useState<string>('');
   const [isLinkDialogOpen, setIsLinkDialogOpen] = useState(false);
   const [isLinking, setIsLinking] = useState(false);
@@ -71,11 +71,12 @@ const ScheduleLessonLinker = ({
 
   const sortedPeriods = useMemo(() => {
     return [...periods].sort((a, b) => {
-      // Sort by day of week first
-      const dayComparison = a.dayOfWeek - b.dayOfWeek;
-      if (dayComparison !== 0) return dayComparison;
+      // Sort by date first
+      const dateComparison = a.date.localeCompare(b.date);
+      if (dateComparison !== 0) return dateComparison;
 
-      // Then by start time
+      // Then by start time (with null safety)
+      if (!a.startTime || !b.startTime) return 0;
       return a.startTime.localeCompare(b.startTime);
     });
   }, [periods]);
@@ -98,7 +99,7 @@ const ScheduleLessonLinker = ({
     });
   }, [selectedPeriod, lessonPlans, periods]);
 
-  const getLinkedLesson = (period: ClassPeriod): LessonPlan | undefined => {
+  const getLinkedLesson = (period: ScheduleEvent): LessonPlan | undefined => {
     return lessonPlans.find((lp) => lp.id === period.lessonPlanId);
   };
 
@@ -118,7 +119,7 @@ const ScheduleLessonLinker = ({
     }
   };
 
-  const handleUnlinkLesson = async (period: ClassPeriod) => {
+  const handleUnlinkLesson = async (period: ScheduleEvent) => {
     try {
       await onUnlinkLesson(period.id);
     } catch (error) {
@@ -126,15 +127,10 @@ const ScheduleLessonLinker = ({
     }
   };
 
-  const openLinkDialog = (period: ClassPeriod) => {
+  const openLinkDialog = (period: ScheduleEvent) => {
     setSelectedPeriod(period);
     setSelectedLessonId('');
     setIsLinkDialogOpen(true);
-  };
-
-  const getDayLabel = (dayOfWeek: number) => {
-    const days = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
-    return days[dayOfWeek];
   };
 
   return (
@@ -216,7 +212,8 @@ const ScheduleLessonLinker = ({
                       <div className="mb-2 flex items-center gap-2">
                         <h4 className="font-medium">{period.subject}</h4>
                         <Badge variant="outline">
-                          {getDayLabel(period.dayOfWeek)} {period.startTime}-{period.endTime}
+                          {format(new Date(period.date), 'EEEE', { locale: vi })} {period.startTime}-
+                          {period.endTime}
                         </Badge>
                         {isLinked ? (
                           <CheckCircle2 className="h-4 w-4 text-green-600" />
@@ -225,19 +222,15 @@ const ScheduleLessonLinker = ({
                         )}
                       </div>
 
-                      <div className="text-muted-foreground mb-3 grid grid-cols-1 gap-2 text-sm md:grid-cols-3">
-                        <div className="flex items-center gap-2">
-                          <User className="h-4 w-4" />
-                          {period.teacher.fullName}
-                        </div>
+                      <div className="text-muted-foreground mb-3 grid grid-cols-1 gap-2 text-sm md:grid-cols-2">
                         <div className="flex items-center gap-2">
                           <Clock className="h-4 w-4" />
                           {period.startTime} - {period.endTime}
                         </div>
-                        {period.room && (
+                        {period.location && (
                           <div className="flex items-center gap-2">
                             <MapPin className="h-4 w-4" />
-                            {period.room}
+                            {period.location}
                           </div>
                         )}
                       </div>
@@ -357,11 +350,8 @@ const ScheduleLessonLinker = ({
                   <div>
                     {t('time')}: {selectedPeriod.startTime}-{selectedPeriod.endTime}
                   </div>
-                  <div>
-                    {t('teacher')}: {selectedPeriod.teacher.fullName}
-                  </div>
-                  <div>
-                    {t('day')}: {getDayLabel(selectedPeriod.dayOfWeek)}
+                  <div className="col-span-2">
+                    {format(new Date(selectedPeriod.date), 'EEEE, PPP', { locale: vi })}
                   </div>
                 </div>
               </div>

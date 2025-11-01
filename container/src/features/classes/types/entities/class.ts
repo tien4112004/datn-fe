@@ -15,7 +15,6 @@ export interface Class {
   grade: number; // 1-12 for Vietnamese education system
   track?: string; // A, B, C for high school tracks
   academicYear: string; // e.g., "2024-2025"
-  capacity: number; // maximum students (typically 30-40)
   currentEnrollment: number; // current number of students
   homeroomTeacherId?: string;
   homeroomTeacher?: Teacher; // The homeroom teacher teaches all subjects

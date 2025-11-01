@@ -12,14 +12,6 @@ export default {
     actions: {
       edit: 'Edit',
     },
-    stats: {
-      students: 'Students',
-      available: 'available',
-      homeroomTeacher: 'Homeroom Teacher',
-      noHomeroomTeacher: 'No homeroom teacher assigned',
-      subjectTeachers: 'Subject Teachers',
-      subjects: 'subjects',
-    },
     tabs: {
       teaching: 'Teaching',
       schedule: 'Schedule',
@@ -69,14 +61,6 @@ export default {
       applyLayout: 'Apply Layout',
       layoutConfiguration: 'Layout Configuration',
       allStudentsAssigned: 'All students assigned',
-    },
-    teachers: {
-      homeroomTeacher: 'Homeroom Teacher',
-      noHomeroomTeacher: 'No homeroom teacher assigned',
-      subjectTeachers: 'Subject Teachers ({{count}})',
-      noSubjectTeachers: 'No subject teachers assigned',
-      homeroom: 'Homeroom',
-      main: 'Main',
     },
   },
   list: {

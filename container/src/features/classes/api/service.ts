@@ -12,8 +12,6 @@ import {
   type StudentCreateRequest,
   type StudentUpdateRequest,
   type SubjectManagementRequest,
-  type DailySchedule,
-  type ScheduleCollectionRequest,
   type ClassPeriod,
   type LessonPlan,
   type LessonPlanCollectionRequest,
@@ -22,6 +20,8 @@ import {
   type Layout,
   type CalendarEventsQueryParams,
   type GetCalendarEventsResponse,
+  type DailySchedule,
+  type ScheduleCollectionRequest,
 } from '../types';
 import { api } from '@/shared/api';
 import { mapPagination, type ApiResponse, type Pagination } from '@/shared/types/api';
@@ -194,15 +194,6 @@ export default class ClassRealApiService implements ClassApiService {
     return response.data.data.map(this._mapTeacher);
   }
 
-  async getClassCapacityInfo(
-    classId: string
-  ): Promise<{ capacity: number; currentEnrollment: number; available: number }> {
-    const response = await api.get<
-      ApiResponse<{ capacity: number; currentEnrollment: number; available: number }>
-    >(`${this.baseUrl}/api/classes/${classId}/capacity`);
-    return response.data.data;
-  }
-
   // Schedule and Lesson Management
   async getSchedules(
     classId: string,
@@ -364,7 +355,6 @@ export default class ClassRealApiService implements ClassApiService {
       grade: data.grade,
       track: data.track,
       academicYear: data.academicYear,
-      capacity: data.capacity,
       currentEnrollment: data.currentEnrollment || 0,
       homeroomTeacherId: data.homeroomTeacherId,
       homeroomTeacher: data.homeroomTeacher ? this._mapTeacher(data.homeroomTeacher) : undefined,

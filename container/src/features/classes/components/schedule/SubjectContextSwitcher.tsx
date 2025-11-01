@@ -3,13 +3,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { BookOpen, User, Clock, Target, FileText, Settings } from 'lucide-react';
+import { BookOpen, Clock, Target, FileText, Settings } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import type { ClassPeriod, LessonPlan } from '../../types';
+import type { ScheduleEvent, LessonPlan } from '../../types';
 
 interface SubjectContextSwitcherProps {
   classId: string;
-  periods: ClassPeriod[];
+  periods: ScheduleEvent[];
   lessonPlans: LessonPlan[];
   currentSubject?: string;
   onSubjectChange: (subject: string, subjectCode: string) => void;
@@ -22,12 +22,8 @@ interface SubjectContext {
   subjectCode: string;
   totalPeriods: number;
   weeklyPeriods: number;
-  nextPeriod?: ClassPeriod;
+  nextPeriod?: ScheduleEvent;
   recentLessonPlan?: LessonPlan;
-  teacher: {
-    id: string;
-    fullName: string;
-  };
   upcomingDeadlines: number;
 }
 
@@ -55,10 +51,10 @@ const SubjectContextSwitcher = ({
         // Find next period for this subject
         const now = new Date();
         const nextPeriod = periods
-          .filter((p) => p.subject === period.subject && p.isActive)
+          .filter((p) => p.subject === period.subject && p.isActive && p.startTime)
           .find((p) => {
-            const periodTime = new Date();
-            const [hours, minutes] = p.startTime.split(':').map(Number);
+            const periodTime = new Date(p.date);
+            const [hours, minutes] = p.startTime!.split(':').map(Number);
             periodTime.setHours(hours, minutes, 0, 0);
             return periodTime > now;
           });
@@ -83,7 +79,6 @@ const SubjectContextSwitcher = ({
           weeklyPeriods,
           nextPeriod,
           recentLessonPlan,
-          teacher: period.teacher,
           upcomingDeadlines,
         });
       }
@@ -102,9 +97,11 @@ const SubjectContextSwitcher = ({
 
   const selectedContext = subjectContexts.find((ctx) => ctx.subject === selectedSubject);
 
-  const formatNextClass = (period: ClassPeriod) => {
+  const formatNextClass = (period: ScheduleEvent) => {
     const dayNames = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
-    return `${dayNames[period.dayOfWeek]} ${period.startTime}`;
+    const date = new Date(period.date);
+    const dayOfWeek = date.getDay(); // 0 = Sunday, 1 = Monday, etc.
+    return `${dayNames[dayOfWeek]} ${period.startTime}`;
   };
 
   return (
@@ -180,14 +177,6 @@ const SubjectContextSwitcher = ({
           <CardContent>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
               {/* Teacher Info */}
-              <div className="space-y-2">
-                <div className="text-muted-foreground flex items-center gap-2 text-sm">
-                  <User className="h-4 w-4" />
-                  {t('teacher')}
-                </div>
-                <p className="font-medium">{selectedContext.teacher.fullName}</p>
-              </div>
-
               {/* Schedule Info */}
               <div className="space-y-2">
                 <div className="text-muted-foreground flex items-center gap-2 text-sm">
@@ -287,11 +276,6 @@ const SubjectContextSwitcher = ({
                   </div>
 
                   <div className="text-muted-foreground space-y-2 text-sm">
-                    <div className="flex items-center gap-2">
-                      <User className="h-4 w-4" />
-                      {context.teacher.fullName}
-                    </div>
-
                     <div className="flex items-center gap-2">
                       <Clock className="h-4 w-4" />
                       {context.weeklyPeriods} {t('periodsPerWeek')}

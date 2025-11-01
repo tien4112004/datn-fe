@@ -26,17 +26,17 @@ import ResourceManager from '../lesson/ResourceManager';
 
 import type {
   Class,
-  ClassPeriod,
   LessonPlan,
   LearningObjective,
   LessonResource,
   DailySchedule,
+  ScheduleEvent,
 } from '../../types';
 
 interface TodaysTeachingDashboardProps {
   classData: Class;
   todaySchedule: DailySchedule;
-  allPeriods: ClassPeriod[];
+  allPeriods: ScheduleEvent[];
   todayLessonPlans: LessonPlan[];
   allLessonPlans: LessonPlan[];
   objectives: LearningObjective[];
@@ -56,8 +56,8 @@ interface TodaysTeachingDashboardProps {
 interface DashboardStats {
   totalPeriodsToday: number;
   completedPeriodsToday: number;
-  currentPeriod?: ClassPeriod;
-  nextPeriod?: ClassPeriod;
+  currentPeriod?: ScheduleEvent;
+  nextPeriod?: ScheduleEvent;
   todayLessonsPlanned: number;
   todayLessonsCompleted: number;
   objectivesAchievedToday: number;
@@ -92,18 +92,25 @@ const TodaysTeachingDashboard = ({
   const stats = useMemo((): DashboardStats => {
     const now = new Date();
     const currentTimeStr = now.toTimeString().slice(0, 5);
-    const todayPeriods = todaySchedule.periods || [];
+    const todayPeriods = todaySchedule.events || [];
 
     // Current and next periods
-    let currentPeriod: ClassPeriod | undefined;
-    let nextPeriod: ClassPeriod | undefined;
+    let currentPeriod: ScheduleEvent | undefined;
+    let nextPeriod: ScheduleEvent | undefined;
 
-    const sortedPeriods = [...todayPeriods].sort((a, b) => a.startTime.localeCompare(b.startTime));
+    const sortedPeriods = [...todayPeriods].sort((a, b) =>
+      (a.startTime || '').localeCompare(b.startTime || '')
+    );
 
     for (const period of sortedPeriods) {
-      if (currentTimeStr >= period.startTime && currentTimeStr < period.endTime) {
+      if (
+        period.startTime &&
+        period.endTime &&
+        currentTimeStr >= period.startTime &&
+        currentTimeStr < period.endTime
+      ) {
         currentPeriod = period;
-      } else if (currentTimeStr < period.startTime && !nextPeriod) {
+      } else if (period.startTime && currentTimeStr < period.startTime && !nextPeriod) {
         nextPeriod = period;
       }
     }
@@ -111,7 +118,7 @@ const TodaysTeachingDashboard = ({
     // Lesson stats
     const todayLessonsPlanned = todayLessonPlans.length;
     const todayLessonsCompleted = todayLessonPlans.filter((lp) => lp.status === 'completed').length;
-    const completedPeriodsToday = todayPeriods.filter((p) => {
+    const completedPeriodsToday = todayPeriods.filter((p: ScheduleEvent) => {
       const linkedLesson = todayLessonPlans.find((lp) => lp.id === p.lessonPlanId);
       return linkedLesson?.status === 'completed';
     }).length;
@@ -133,7 +140,7 @@ const TodaysTeachingDashboard = ({
     // Unprepared resources for upcoming lessons
     urgentTasks += todayResources.filter((res) => res.isRequired && !res.isPrepared).length;
     // Unplanned periods (periods without lesson plans)
-    urgentTasks += todayPeriods.filter((p) => !p.lessonPlanId).length;
+    urgentTasks += todayPeriods.filter((p: ScheduleEvent) => !p.lessonPlanId).length;
     // Overdue lessons
     urgentTasks += todayLessonPlans.filter((lp) => {
       const lessonEnd = new Date(`${lp.date}T${lp.endTime}`);
@@ -244,7 +251,7 @@ const TodaysTeachingDashboard = ({
         {/* Overview Tab */}
         <TabsContent value="overview" className="space-y-6">
           {/* Current/Next Class */}
-          <CurrentNextClass classId={classData.id} periods={todaySchedule.periods || []} />
+          <CurrentNextClass classId={classData.id} periods={todaySchedule.events || []} />
 
           {/* Time Management for Current Period */}
           {stats.currentPeriod && (
@@ -294,7 +301,7 @@ const TodaysTeachingDashboard = ({
 
         {/* Schedule Tab */}
         <TabsContent value="schedule" className="space-y-6">
-          <CurrentNextClass classId={classData.id} periods={todaySchedule.periods || []} />
+          <CurrentNextClass classId={classData.id} periods={todaySchedule.events || []} />
 
           {stats.currentPeriod && (
             <TimeManagement currentPeriod={stats.currentPeriod} nextPeriod={stats.nextPeriod} />

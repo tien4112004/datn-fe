@@ -12,6 +12,7 @@ const DetailPage = () => {
   const { presentation } = useLoaderData() as { presentation: Presentation | null };
   const { id } = useParams<{ id: string }>();
   const isGeneratingParam = getSearchParamAsBoolean('isGenerating', false) ?? false;
+  const isViewModeParam = getSearchParamAsBoolean('view', false) ?? false;
 
   const { app, updateApp, isProcessing, isStreaming, isSaving } = useDetailPresentation(
     presentation,
@@ -31,6 +32,7 @@ const DetailPage = () => {
           titleTest: 'random',
           isRemote: true,
           presentation,
+          mode: isViewModeParam ? 'view' : 'edit',
         }}
         className="vue-remote"
         LoadingComponent={() => <GlobalSpinner text={t('presentation')} />}

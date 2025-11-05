@@ -1,10 +1,10 @@
 <template>
-  <div class="pptist-editor">
+  <div class="pptist-editor" :class="{ 'view-mode': mode === 'view' }">
     <EditorHeader class="layout-header" />
     <div class="layout-content">
       <Thumbnails class="layout-content-left" />
       <div class="layout-content-center">
-        <CanvasTool class="center-top" />
+        <CanvasTool v-if="mode === 'edit'" class="center-top" />
 
         <!-- Template Preview Mode Banner -->
         <div v-if="isCurrentSlideLocked" class="preview-mode-banner">
@@ -43,8 +43,8 @@
           </div>
         </div>
 
-        <Canvas class="center-body" />
-        <div class="center-bottom" @click="openRemarkDrawer">
+        <Canvas class="center-body" :readonly="mode === 'view'" />
+        <div v-if="mode === 'edit'" class="center-bottom" @click="openRemarkDrawer">
           <div class="remark-preview">
             <div
               class="remark-content"
@@ -57,35 +57,44 @@
           </div>
         </div>
       </div>
-      <Toolbar class="layout-content-right" />
+      <Toolbar v-if="mode === 'edit'" class="layout-content-right" />
     </div>
   </div>
 
-  <SelectPanel v-if="showSelectPanel" />
-  <SearchPanel v-if="showSearchPanel" />
-  <NotesPanel v-if="showNotesPanel" />
-  <MarkupPanel v-if="showMarkupPanel" />
+  <template v-if="mode === 'edit'">
+    <SelectPanel v-if="showSelectPanel" />
+    <SearchPanel v-if="showSearchPanel" />
+    <NotesPanel v-if="showNotesPanel" />
+    <MarkupPanel v-if="showMarkupPanel" />
 
-  <Drawer v-model:visible="showRemarkDrawer" placement="bottom">
-    <template #title>
-      <span>Slide Remarks</span>
-    </template>
-    <Remark v-model:height="remarkHeight" :style="{ height: `${remarkHeight}px` }" />
-  </Drawer>
+    <Drawer v-model:visible="showRemarkDrawer" placement="bottom">
+      <template #title>
+        <span>Slide Remarks</span>
+      </template>
+      <Remark v-model:height="remarkHeight" :style="{ height: `${remarkHeight}px` }" />
+    </Drawer>
 
-  <Modal :visible="!!dialogForExport" :width="1000" @closed="closeExportDialog()">
-    <ExportDialog />
-  </Modal>
+    <Modal :visible="!!dialogForExport" :width="1000" @closed="closeExportDialog()">
+      <ExportDialog />
+    </Modal>
 
-  <Modal :visible="showAIPPTDialog" :width="840" @closed="closeAIPPTDialog()">
-    <AIPPTDialog />
-  </Modal>
+    <Modal
+      :visible="showAIPPTDialog"
+      :width="840"
+      :closeOnClickMask="false"
+      :closeOnEsc="false"
+      closeButton
+      @closed="closeAIPPTDialog()"
+    >
+      <AIPPTDialog />
+    </Modal>
+  </template>
 </template>
 
 <script lang="ts" setup>
 import { ref, computed } from 'vue';
 import { storeToRefs } from 'pinia';
-import { useMainStore, useSlidesStore } from '@/store';
+import { useMainStore, useSlidesStore, useContainerStore } from '@/store';
 import useGlobalHotkey from '@/hooks/useGlobalHotkey';
 import usePasteEvent from '@/hooks/usePasteEvent';
 import useSlideEditLock from '@/hooks/useSlideEditLock';
@@ -109,6 +118,8 @@ import Drawer from '@/components/Drawer.vue';
 
 const mainStore = useMainStore();
 const slidesStore = useSlidesStore();
+const containerStore = useContainerStore();
+const { mode } = storeToRefs(containerStore);
 const {
   dialogForExport,
   showSelectPanel,
@@ -349,6 +360,12 @@ usePasteEvent();
         transform: translateY(-1px) scale(1.02);
       }
     }
+  }
+}
+
+.pptist-editor.view-mode {
+  .layout-content-center {
+    width: calc(100% - 180px);
   }
 }
 

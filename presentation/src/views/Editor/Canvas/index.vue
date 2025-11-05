@@ -7,10 +7,18 @@
     @dblclick="($event) => handleDblClick($event)"
     v-contextmenu="contextmenus"
     v-click-outside="removeEditorAreaFocus"
-    :class="{ 'preview-mode': isCurrentSlideLocked, 'view-mode': mode === 'view' }"
   >
     <!-- Preview Mode Overlay -->
-    <div v-if="isCurrentSlideLocked" class="preview-overlay" @click.stop></div>
+    <div
+      v-if="isCurrentSlideLocked || mode === 'view'"
+      class="preview-overlay"
+      @click.stop.prevent
+      @mousedown.stop.prevent
+      @mouseup.stop.prevent
+      @dblclick.stop.prevent
+      @contextmenu.stop.prevent
+      @wheel.stop.prevent
+    ></div>
     <ElementCreateSelection
       v-if="creatingElement"
       @created="(data) => insertElementFromCreateSelection(data)"
@@ -364,19 +372,6 @@ provide(injectKeySlideScale, canvasScale);
   user-select: none;
   overflow: hidden;
   position: relative;
-
-  &.preview-mode {
-    cursor: not-allowed;
-  }
-
-  &.view-mode {
-    cursor: default;
-
-    .operates,
-    .mouse-selection {
-      pointer-events: none;
-    }
-  }
 }
 .drag-mask {
   cursor: grab;
@@ -405,8 +400,6 @@ provide(injectKeySlideScale, canvasScale);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 999;
-  pointer-events: all;
-  cursor: not-allowed;
+  z-index: 9999;
 }
 </style>

@@ -7,7 +7,7 @@
     @dblclick="($event) => handleDblClick($event)"
     v-contextmenu="contextmenus"
     v-click-outside="removeEditorAreaFocus"
-    :class="{ 'preview-mode': isCurrentSlideLocked }"
+    :class="{ 'preview-mode': isCurrentSlideLocked, 'view-mode': mode === 'view' }"
   >
     <!-- Preview Mode Overlay -->
     <div v-if="isCurrentSlideLocked" class="preview-overlay" @click.stop></div>
@@ -93,7 +93,7 @@
 import { nextTick, onMounted, onUnmounted, provide, ref, watch, watchEffect } from 'vue';
 import { throttle } from 'lodash';
 import { storeToRefs } from 'pinia';
-import { useMainStore, useSlidesStore, useKeyboardStore } from '@/store';
+import { useMainStore, useSlidesStore, useKeyboardStore, useContainerStore } from '@/store';
 import type { ContextmenuItem } from '@/components/Contextmenu/types';
 import type { PPTElement, PPTShapeElement } from '@/types/slides';
 import type { AlignmentLineProps, CreateCustomShapeData } from '@/types/edit';
@@ -152,6 +152,7 @@ const {
 } = storeToRefs(mainStore);
 const { currentSlide } = storeToRefs(useSlidesStore());
 const { ctrlKeyState, spaceKeyState } = storeToRefs(useKeyboardStore());
+const { mode } = storeToRefs(useContainerStore());
 
 const viewportRef = ref<HTMLElement>();
 const alignmentLines = ref<AlignmentLineProps[]>([]);
@@ -204,6 +205,7 @@ onMounted(() => {
 
 // Click on the blank area of the canvas: clear focus elements, set canvas focus, clear text selection, and reset format painter state
 const handleClickBlankArea = (e: MouseEvent) => {
+  if (mode.value === 'view') return;
   // Block all interactions in preview mode
   if (isCurrentSlideLocked.value) return;
 
@@ -219,6 +221,7 @@ const handleClickBlankArea = (e: MouseEvent) => {
 
 // Double-click on a blank area to insert text
 const handleDblClick = (e: MouseEvent) => {
+  if (mode.value === 'view') return;
   // Block text creation in preview mode
   if (isCurrentSlideLocked.value) return;
 
@@ -296,6 +299,7 @@ const insertCustomShape = (data: CreateCustomShapeData) => {
 };
 
 const contextmenus = (): ContextmenuItem[] => {
+  if (mode.value === 'view') return [];
   return [
     {
       text: t('canvas.controls.paste'),
@@ -363,6 +367,15 @@ provide(injectKeySlideScale, canvasScale);
 
   &.preview-mode {
     cursor: not-allowed;
+  }
+
+  &.view-mode {
+    cursor: default;
+
+    .operates,
+    .mouse-selection {
+      pointer-events: none;
+    }
   }
 }
 .drag-mask {

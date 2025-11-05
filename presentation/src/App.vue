@@ -35,6 +35,7 @@ const props = defineProps<{
   titleTest: string;
   isRemote: boolean;
   presentation: Presentation;
+  mode: 'view' | 'edit';
 }>();
 
 const mainStore = useMainStore();

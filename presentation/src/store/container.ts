@@ -7,6 +7,7 @@ export interface ContainerState {
   titleTest: string;
   isRemote: boolean;
   presentation?: Presentation;
+  mode: 'edit' | 'view';
 }
 
 export const useContainerStore = defineStore('container', {
@@ -14,6 +15,7 @@ export const useContainerStore = defineStore('container', {
     titleTest: '',
     isRemote: false,
     presentation: undefined,
+    mode: 'edit',
   }),
 
   getters: {
@@ -27,6 +29,7 @@ export const useContainerStore = defineStore('container', {
       this.titleTest = data?.titleTest || '';
       this.isRemote = data?.isRemote || false;
       this.presentation = data?.presentation ? markRaw(data?.presentation as Presentation) : undefined;
+      this.mode = data?.mode || 'edit';
     },
   },
 });

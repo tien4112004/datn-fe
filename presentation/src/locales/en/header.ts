@@ -21,6 +21,10 @@ export default {
       slideShow: 'Slide Show (F5)',
       fromBeginning: 'From Beginning',
       fromCurrentPage: 'From Current Page',
+      presenterView: 'Presenter View',
+      presenterViewDescription: 'Present with speaker notes and preview',
+      separatedWindow: 'Open in New Window',
+      separatedWindowDescription: 'Present in a separate window or screen',
     },
 
     // Tools
@@ -30,6 +34,25 @@ export default {
       feedback: 'Feedback',
       faq: 'FAQ',
       changeLanguage: 'Change Language',
+    },
+
+    // Share and Export
+    share: {
+      sharePresentation: 'Share presentation',
+      export: 'Export',
+      shareCanceled: 'Share canceled',
+      shareSettingsUpdated: 'Share settings updated: ',
+      anyoneWithLinkCan: 'Anyone with the link can ',
+      view: 'view',
+      comment: 'comment',
+      restrictedAccess: 'Restricted access',
+      usersAdded: ' user(s) added',
+    },
+
+    // Button Labels
+    buttons: {
+      present: 'Present',
+      share: 'Share',
     },
 
     // Edit Actions

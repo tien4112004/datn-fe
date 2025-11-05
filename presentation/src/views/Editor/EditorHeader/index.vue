@@ -107,7 +107,7 @@
         </template>
         <Button class="menu-item" v-tooltip="$t('header.presentation.slideShow')">
           <IconPpt />
-          Present
+          {{ $t('header.buttons.present') }}
         </Button>
       </Popover>
 
@@ -115,9 +115,9 @@
         <template #content>
           <ShareMenu @cancel="handleShareCancel" @share="handleShare" />
         </template>
-        <Button class="menu-item" v-tooltip="'Share presentation'">
+        <Button class="menu-item" v-tooltip="$t('header.share.sharePresentation')">
           <IconShare class="icon" />
-          Share
+          {{ $t('header.buttons.share') }}
         </Button>
       </Popover>
       <!-- <div
@@ -136,7 +136,7 @@
         @click="setDialogForExport('pptx')"
       >
         <IconDownload class="icon" />
-        Export
+        {{ $t('header.share.export') }}
       </Button>
       <!-- <a
         class="github-link"
@@ -174,6 +174,7 @@
 <script lang="ts" setup>
 import { nextTick, ref, computed } from 'vue';
 import { storeToRefs } from 'pinia';
+import { useI18n } from 'vue-i18n';
 import { useMainStore, useSlidesStore } from '@/store';
 import useScreening from '@/hooks/useScreening';
 import useImport from '@/hooks/useImport';
@@ -194,6 +195,7 @@ import PopoverMenuItem from '@/components/PopoverMenuItem.vue';
 import LanguageSwitcher from '@/components/LanguageSwitcher.vue';
 import Button from '@/components/Button.vue';
 import message from '@/utils/message';
+const { t } = useI18n();
 const mainStore = useMainStore();
 const slidesStore = useSlidesStore();
 const { title, theme } = storeToRefs(slidesStore);
@@ -287,22 +289,23 @@ const showBackButton = computed(() => {
 });
 
 const handleShareCancel = () => {
-  message.info('Share canceled');
+  message.info(t('header.share.shareCanceled'));
 };
 
 const handleShare = (options: { shareWithLink: boolean; allowEdit: boolean; users: any[] }) => {
   const { shareWithLink, allowEdit, users } = options;
 
-  let shareMessage = 'Share settings updated: ';
+  let shareMessage = t('header.share.shareSettingsUpdated');
 
   if (shareWithLink) {
-    shareMessage += `Anyone with the link can ${allowEdit ? 'comment' : 'view'}`;
+    shareMessage +=
+      t('header.share.anyoneWithLinkCan') + (allowEdit ? t('header.share.comment') : t('header.share.view'));
   } else {
-    shareMessage += 'Restricted access';
+    shareMessage += t('header.share.restrictedAccess');
   }
 
   if (users.length > 0) {
-    shareMessage += ` | ${users.length} user${users.length > 1 ? 's' : ''} added`;
+    shareMessage += ' | ' + users.length + t('header.share.usersAdded');
   }
 
   message.success(shareMessage);

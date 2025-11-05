@@ -61,9 +61,11 @@
         <IconPresenterView class="tw-text-purple-600" />
       </div>
       <div class="tw-flex-1 tw-min-w-0">
-        <h4 class="tw-text-sm tw-font-semibold tw-text-gray-800 tw-m-0 tw-mb-1">Presenter View</h4>
+        <h4 class="tw-text-sm tw-font-semibold tw-text-gray-800 tw-m-0 tw-mb-1">
+          {{ $t('header.presentation.presenterView') }}
+        </h4>
         <p class="tw-text-xs tw-text-gray-600 tw-m-0 tw-leading-tight">
-          Present with speaker notes and preview
+          {{ $t('header.presentation.presenterViewDescription') }}
         </p>
       </div>
     </div>
@@ -81,9 +83,11 @@
         <IconPresentSeparated class="tw-text-orange-600" />
       </div>
       <div class="tw-flex-1 tw-min-w-0">
-        <h4 class="tw-text-sm tw-font-semibold tw-text-gray-800 tw-m-0 tw-mb-1">Open in New Window</h4>
+        <h4 class="tw-text-sm tw-font-semibold tw-text-gray-800 tw-m-0 tw-mb-1">
+          {{ $t('header.presentation.separatedWindow') }}
+        </h4>
         <p class="tw-text-xs tw-text-gray-600 tw-m-0 tw-leading-tight">
-          Present in a separate window or screen
+          {{ $t('header.presentation.separatedWindowDescription') }}
         </p>
       </div>
     </div>

@@ -10,6 +10,7 @@ export default () => {
     document.dispatchEvent(new CustomEvent('enableFullscreen', {}));
     enterFullscreen();
     screenStore.setScreening(true);
+    screenStore.setPresenter(false);
   };
 
   const enterPresenterMode = () => {

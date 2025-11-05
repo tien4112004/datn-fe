@@ -21,6 +21,10 @@ export default {
       slideShow: 'Trình chiếu (F5)',
       fromBeginning: 'Từ đầu',
       fromCurrentPage: 'Từ trang hiện tại',
+      presenterView: 'Chế độ trình chiếu',
+      presenterViewDescription: 'Trình chiếu với ghi chú diễn giả và xem trước',
+      separatedWindow: 'Mở trong cửa sổ mới',
+      separatedWindowDescription: 'Trình chiếu trong cửa sổ hoặc màn hình riêng biệt',
     },
 
     // Công cụ
@@ -30,6 +34,25 @@ export default {
       feedback: 'Phản hồi',
       faq: 'Câu hỏi thường gặp',
       changeLanguage: 'Thay đổi ngôn ngữ',
+    },
+
+    // Chia sẻ và Xuất
+    share: {
+      sharePresentation: 'Chia sẻ bài trình chiếu',
+      export: 'Xuất',
+      shareCanceled: 'Đã hủy chia sẻ',
+      shareSettingsUpdated: 'Đã cập nhật cài đặt chia sẻ: ',
+      anyoneWithLinkCan: 'Bất kỳ ai có liên kết có thể ',
+      view: 'xem',
+      comment: 'bình luận',
+      restrictedAccess: 'Quyền truy cập hạn chế',
+      usersAdded: ' người dùng đã thêm',
+    },
+
+    // Nhãn nút
+    buttons: {
+      present: 'Trình chiếu',
+      share: 'Chia sẻ',
     },
 
     // Hành động chỉnh sửa

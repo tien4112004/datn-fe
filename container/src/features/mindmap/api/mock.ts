@@ -26,7 +26,7 @@ const mockMindmaps: MindmapData[] = [
           side: SIDE.MID,
           isCollapsed: false,
           pathType: PATH_TYPES.SMOOTHSTEP,
-          edgeColor: 'var(--primary)',
+          edgeColor: '#00FF00',
         },
         dragHandle: DRAGHANDLE.SELECTOR,
         width: 250,
@@ -138,7 +138,7 @@ const mockMindmaps: MindmapData[] = [
         sourceHandle: 'first-source-root',
         targetHandle: 'second-target-left-1',
         data: {
-          strokeColor: 'var(--primary)',
+          strokeColor: '#00FF00',
           strokeWidth: 2,
         },
       },

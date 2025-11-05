@@ -4,6 +4,7 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { useLayoutStore } from '../../stores/layout';
 import { useUndoRedoStore, useCoreStore, useNodeOperationsStore } from '../../stores';
 import { useReactFlow, useUpdateNodeInternals } from '@xyflow/react';
+import DownloadButton from '../controls/DownloadButton';
 import type { Direction } from '../../types';
 
 const Toolbar = () => {
@@ -68,6 +69,8 @@ const Toolbar = () => {
           None
         </ToggleGroupItem>
       </ToggleGroup>
+
+      <DownloadButton />
     </div>
   );
 };

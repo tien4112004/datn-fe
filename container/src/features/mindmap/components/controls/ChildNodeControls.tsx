@@ -85,9 +85,9 @@ export const ChildNodeControls = memo(
         {/* Add Child Buttons */}
         <div
           className={cn(
-            'absolute z-[1000] flex items-center justify-center gap-1 rounded-sm transition-all duration-200',
+            'absolute z-[10000] flex items-center justify-center gap-1 rounded-sm transition-all duration-200',
             layout === DIRECTION.VERTICAL
-              ? 'left-1/2 top-0 -translate-x-1/2 -translate-y-[calc(100%+24px)]'
+              ? 'left-1/2 top-0 -translate-x-1/2 -translate-y-[calc(100%+24px)] flex-col'
               : 'left-0 top-1/2 -translate-x-[calc(100%+24px)] -translate-y-1/2',
             (isMouseOver || selected) && canCreateLeft ? 'visible opacity-100' : 'invisible opacity-0'
           )}
@@ -173,9 +173,9 @@ export const ChildNodeControls = memo(
 
         <div
           className={cn(
-            'absolute z-[1000] flex items-center justify-center gap-1 rounded-sm transition-all duration-200',
+            'absolute z-[10000] flex items-center justify-center gap-1 rounded-sm transition-all duration-200',
             layout === DIRECTION.VERTICAL
-              ? 'bottom-0 left-1/2 -translate-x-1/2 translate-y-[calc(100%+24px)]'
+              ? 'bottom-0 left-1/2 -translate-x-1/2 translate-y-[calc(100%+24px)] flex-col'
               : 'right-0 top-1/2 -translate-y-1/2 translate-x-[calc(100%+24px)]',
             (isMouseOver || selected) && canCreateRight ? 'visible opacity-100' : 'invisible opacity-0'
           )}

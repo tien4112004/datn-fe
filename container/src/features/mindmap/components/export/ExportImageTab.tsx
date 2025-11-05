@@ -2,11 +2,13 @@ import { useState } from 'react';
 import { Button } from '@/shared/components/ui/button';
 import { Label } from '@/shared/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
-import { Checkbox } from '@/shared/components/ui/checkbox';
 import { useTranslation } from 'react-i18next';
-import { useReactFlow, getNodesBounds, getViewportForBounds } from '@xyflow/react';
-import { toPng, toJpeg } from 'html-to-image';
-import { generateFilename, downloadFile, getMindmapViewport } from '../../utils/exportUtils';
+import { useReactFlow, getViewportForBounds } from '@xyflow/react';
+import { generateFilename, downloadFile, getMindmapViewport, getImageData } from './utils';
+import { PreviewCard } from './PreviewCard';
+import { usePreview } from './usePreview';
+import { useLatest } from '@/hooks/useLatest';
+import { Slider } from '@/components/ui/slider';
 
 interface ExportImageTabProps {
   format: 'png' | 'jpg';
@@ -16,17 +18,48 @@ const DIMENSION_PRESETS = [
   { label: '1024x1024', value: '1024' },
   { label: '2048x2048', value: '2048' },
   { label: '4096x4096', value: '4096' },
+  { label: '8192x8192', value: '8192' },
 ];
 
 function ExportImageTab({ format }: ExportImageTabProps) {
   const { t } = useTranslation('mindmap');
-  const { getNodes } = useReactFlow();
+  const { getNodes, getNodesBounds } = useReactFlow();
 
   const [dimensions, setDimensions] = useState('2048');
   const [backgroundColor, setBackgroundColor] = useState('white');
-  const [skipFonts, setSkipFonts] = useState(true);
   const [quality, setQuality] = useState(1);
+  const [padding, setPadding] = useState(0.5);
   const [isExporting, setIsExporting] = useState(false);
+
+  const configRef = useLatest({ format, backgroundColor, quality, padding, dimensions });
+
+  const { previewDataUrl, previewLoading, previewError } = usePreview({
+    executor: async () => {
+      const { format: f, padding: p, quality: q, backgroundColor: bg, dimensions: d } = configRef.current;
+
+      const viewport = getMindmapViewport();
+      if (!viewport) {
+        throw new Error('Viewport not found');
+      }
+
+      const nodes = getNodes();
+      if (nodes.length === 0) {
+        throw new Error('No nodes to preview');
+      }
+
+      const previewSize = parseInt(d);
+      const nodesBounds = getNodesBounds(nodes);
+      const viewportTransform = getViewportForBounds(nodesBounds, previewSize, previewSize, 0.01, 100, p);
+
+      return getImageData(f, viewport, {
+        backgroundColor: bg,
+        quality: q,
+        size: previewSize,
+        viewportTransform,
+      });
+    },
+    dependencies: [format, backgroundColor, quality, padding, dimensions],
+  });
 
   const handleExport = async () => {
     setIsExporting(true);
@@ -39,26 +72,15 @@ function ExportImageTab({ format }: ExportImageTabProps) {
 
       const nodesBounds = getNodesBounds(getNodes());
       const imageSize = parseInt(dimensions);
-      const viewportTransform = getViewportForBounds(nodesBounds, imageSize, imageSize, 0.5, 2, 0.5);
+      const viewportTransform = getViewportForBounds(nodesBounds, imageSize, imageSize, 0.01, 100, padding);
 
-      const exportFunction = format === 'png' ? toPng : toJpeg;
-      const options: any = {
-        backgroundColor: backgroundColor === 'transparent' ? undefined : backgroundColor,
-        width: imageSize,
-        height: imageSize,
-        style: {
-          width: `${imageSize}px`,
-          height: `${imageSize}px`,
-          transform: `translate(${viewportTransform.x}px, ${viewportTransform.y}px) scale(${viewportTransform.zoom})`,
-        },
-        skipFonts,
-      };
+      const dataUrl = await getImageData(format, viewport, {
+        backgroundColor,
+        quality,
+        size: imageSize,
+        viewportTransform,
+      });
 
-      if (format === 'jpg') {
-        options.quality = quality;
-      }
-
-      const dataUrl = await exportFunction(viewport, options);
       const filename = generateFilename(format);
       downloadFile(dataUrl, filename);
     } catch (error) {
@@ -101,13 +123,16 @@ function ExportImageTab({ format }: ExportImageTabProps) {
           </Select>
         </div>
 
-        <div className="flex items-center space-x-2">
-          <Checkbox
-            id="skipFonts"
-            checked={skipFonts}
-            onCheckedChange={(checked) => setSkipFonts(checked as boolean)}
+        <div className="space-y-2">
+          <Label htmlFor="padding">{t('export.image.padding')}</Label>
+          <Slider
+            defaultValue={[padding]}
+            id="padding"
+            min={0}
+            max={1}
+            step={0.1}
+            onValueChange={(value) => setPadding(value[0])}
           />
-          <Label htmlFor="skipFonts">{t('export.common.skipFonts')}</Label>
         </div>
 
         {format === 'jpg' && (
@@ -115,15 +140,13 @@ function ExportImageTab({ format }: ExportImageTabProps) {
             <Label htmlFor="quality">
               {t('export.image.quality')}: {Math.round(quality * 100)}%
             </Label>
-            <input
+            <Slider
+              defaultValue={[quality]}
               id="quality"
-              type="range"
-              min="0.1"
-              max="1"
-              step="0.1"
-              value={quality}
-              onChange={(e) => setQuality(parseFloat(e.target.value))}
-              className="w-full"
+              min={0.1}
+              max={1}
+              step={0.1}
+              onValueChange={(value) => setQuality(value[0])}
             />
           </div>
         )}
@@ -137,12 +160,7 @@ function ExportImageTab({ format }: ExportImageTabProps) {
 
       {/* Right Panel - Preview/Info */}
       <div className="flex-1 border-l p-6">
-        <div className="text-muted-foreground flex h-full items-center justify-center">
-          <div className="text-center">
-            <div className="mb-2 text-lg font-medium">Preview</div>
-            <div className="text-sm">Export configuration will be applied to the mindmap viewport</div>
-          </div>
-        </div>
+        <PreviewCard dataUrl={previewDataUrl} loading={previewLoading} error={previewError} />
       </div>
     </div>
   );

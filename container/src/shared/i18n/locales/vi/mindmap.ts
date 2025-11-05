@@ -44,7 +44,6 @@ export default {
     formats: {
       png: 'Ảnh PNG',
       jpg: 'Ảnh JPG',
-      svg: 'Vector SVG',
       pdf: 'Tài liệu PDF',
     },
     common: {
@@ -61,16 +60,20 @@ export default {
       quality: 'Chất lượng',
       width: 'Chiều rộng',
       height: 'Chiều cao',
-    },
-    svg: {
-      strokeColor: 'Màu viền',
-      includeBackground: 'Bao gồm nền',
+      padding: 'Khoảng cách lề',
     },
     pdf: {
       orientation: 'Hướng',
       portrait: 'Dọc',
       landscape: 'Ngang',
       paperSize: 'Kích thước giấy',
+    },
+    preview: {
+      generating: 'Đang tạo...',
+      error: 'Lỗi',
+      adjustSettings: 'Điều chỉnh cài đặt để tạo bản xem trước',
+      generatingPreview: 'Đang tạo bản xem trước...',
+      previewError: 'Lỗi bản xem trước',
     },
   },
 };

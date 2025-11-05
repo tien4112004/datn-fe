@@ -44,7 +44,6 @@ export default {
     formats: {
       png: 'PNG Image',
       jpg: 'JPG Image',
-      svg: 'SVG Vector',
       pdf: 'PDF Document',
     },
     common: {
@@ -61,16 +60,20 @@ export default {
       quality: 'Quality',
       width: 'Width',
       height: 'Height',
-    },
-    svg: {
-      strokeColor: 'Stroke Color',
-      includeBackground: 'Include Background',
+      padding: 'Padding',
     },
     pdf: {
       orientation: 'Orientation',
       portrait: 'Portrait',
       landscape: 'Landscape',
       paperSize: 'Paper Size',
+    },
+    preview: {
+      generating: 'Generating...',
+      error: 'Error',
+      adjustSettings: 'Adjust settings to generate preview',
+      generatingPreview: 'Generating preview...',
+      previewError: 'Preview Error',
     },
   },
 };

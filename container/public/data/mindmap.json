@@ -15,7 +15,7 @@
         "pathType": "smoothstep",
         "edgeColor": "#FF0000"
       },
-      "dragHandle": ".dragHandle",
+      "dragHandle": ".drag-handle",
       "width": 300,
       "height": 100
     },
@@ -30,7 +30,7 @@
         "side": "left",
         "isCollapsed": false
       },
-      "dragHandle": ".dragHandle",
+      "dragHandle": ".drag-handle",
       "width": 150,
       "height": 60
     },
@@ -45,7 +45,7 @@
         "side": "right",
         "isCollapsed": false
       },
-      "dragHandle": ".dragHandle",
+      "dragHandle": ".drag-handle",
       "width": 150,
       "height": 60
     },
@@ -60,7 +60,7 @@
         "side": "left",
         "isCollapsed": false
       },
-      "dragHandle": ".dragHandle",
+      "dragHandle": ".drag-handle",
       "width": 120,
       "height": 50
     },
@@ -75,7 +75,7 @@
         "side": "left",
         "isCollapsed": false
       },
-      "dragHandle": ".dragHandle",
+      "dragHandle": ".drag-handle",
       "width": 120,
       "height": 50
     },
@@ -90,7 +90,7 @@
         "side": "right",
         "isCollapsed": false
       },
-      "dragHandle": ".dragHandle",
+      "dragHandle": ".drag-handle",
       "width": 120,
       "height": 50
     },
@@ -105,7 +105,7 @@
         "side": "right",
         "isCollapsed": false
       },
-      "dragHandle": ".dragHandle",
+      "dragHandle": ".drag-handle",
       "width": 120,
       "height": 50
     }

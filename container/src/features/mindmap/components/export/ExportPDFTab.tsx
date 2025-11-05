@@ -3,23 +3,50 @@ import { Button } from '@/shared/components/ui/button';
 import { Label } from '@/shared/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
 import { useTranslation } from 'react-i18next';
-import { useReactFlow, getNodesBounds, getViewportForBounds } from '@xyflow/react';
-import { toPng } from 'html-to-image';
+import { useReactFlow, getViewportForBounds } from '@xyflow/react';
 import jsPDF from 'jspdf';
 import {
   generateFilename,
   downloadFile,
   getMindmapViewport,
   getPaperSizeDimensions,
-} from '../../utils/exportUtils';
+  getImageData,
+} from './utils';
+import { PDFPreviewCard } from './PDFPreviewCard';
+import { usePreview } from './usePreview';
 
 function ExportPDFTab() {
   const { t } = useTranslation('mindmap');
-  const { getNodes } = useReactFlow();
+  const { getNodes, getNodesBounds } = useReactFlow();
 
   const [orientation, setOrientation] = useState<'portrait' | 'landscape'>('portrait');
   const [paperSize, setPaperSize] = useState<'a4' | 'letter'>('a4');
   const [isExporting, setIsExporting] = useState(false);
+
+  const { previewDataUrl, previewLoading, previewError } = usePreview({
+    executor: async () => {
+      const viewport = getMindmapViewport();
+      if (!viewport) {
+        throw new Error('Viewport not found');
+      }
+
+      const nodes = getNodes();
+      if (nodes.length === 0) {
+        throw new Error('No nodes to preview');
+      }
+
+      const previewSize = 512;
+      const nodesBounds = getNodesBounds(nodes);
+      const viewportTransform = getViewportForBounds(nodesBounds, previewSize, previewSize, 0.01, 100, 0.5);
+
+      return getImageData('png', viewport, {
+        backgroundColor: 'white',
+        size: previewSize,
+        viewportTransform,
+      });
+    },
+    dependencies: [orientation, paperSize],
+  });
 
   const handleExport = async () => {
     setIsExporting(true);
@@ -39,19 +66,13 @@ function ExportPDFTab() {
       // Calculate dimensions for image export
       const nodesBounds = getNodesBounds(nodes);
       const imageSize = 2048;
-      const viewportTransform = getViewportForBounds(nodesBounds, imageSize, imageSize, 0.5, 2, 0.5);
+      const viewportTransform = getViewportForBounds(nodesBounds, imageSize, imageSize, 0.01, 100, 0.5);
 
       // Export mindmap as PNG image
-      const dataUrl = await toPng(viewport, {
+      const dataUrl = await getImageData('png', viewport, {
         backgroundColor: 'white',
-        width: imageSize,
-        height: imageSize,
-        style: {
-          width: `${imageSize}px`,
-          height: `${imageSize}px`,
-          transform: `translate(${viewportTransform.x}px, ${viewportTransform.y}px) scale(${viewportTransform.zoom})`,
-        },
-        skipFonts: true,
+        size: imageSize,
+        viewportTransform,
       });
 
       // Create PDF
@@ -141,14 +162,13 @@ function ExportPDFTab() {
 
       {/* Right Panel - Preview/Info */}
       <div className="flex-1 border-l p-6">
-        <div className="text-muted-foreground flex h-full items-center justify-center">
-          <div className="text-center">
-            <div className="mb-2 text-lg font-medium">PDF Export</div>
-            <div className="text-sm">
-              Exports mindmap as a PDF document with selected paper size and orientation
-            </div>
-          </div>
-        </div>
+        <PDFPreviewCard
+          dataUrl={previewDataUrl}
+          loading={previewLoading}
+          error={previewError}
+          orientation={orientation}
+          paperSize={paperSize}
+        />
       </div>
     </div>
   );

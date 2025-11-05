@@ -42,7 +42,7 @@
       :animation="200"
       :scroll="true"
       :scrollSensitivity="50"
-      :disabled="editingSectionId"
+      :disabled="!!editingSectionId || mode === 'view'"
       @end="handleDragEnd"
       itemKey="id"
     >

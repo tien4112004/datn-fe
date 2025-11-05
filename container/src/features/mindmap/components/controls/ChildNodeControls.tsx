@@ -37,7 +37,6 @@ const coreStoreSelector = (state: any) => ({
 const nodeOperationsSelector = (state: any) => state.addChildNode;
 
 const layoutStoreSelector = (state: any) => ({
-  updateSubtreeLayout: state.updateSubtreeLayout,
   layout: state.layout,
 });
 
@@ -51,22 +50,18 @@ export const ChildNodeControls = memo(
     const { collapse, expand } = useNodeManipulationStore(useShallow(nodeManipulationSelector));
     const { hasLeftChildren, hasRightChildren } = useCoreStore(useShallow(coreStoreSelector));
     const addChildNodeStore = useNodeOperationsStore(nodeOperationsSelector);
-    const { updateSubtreeLayout, layout } = useLayoutStore(useShallow(layoutStoreSelector));
+    const { layout } = useLayoutStore(useShallow(layoutStoreSelector));
     const updateNodeInternals = useUpdateNodeInternals();
 
     const addChildNode = useCallback(
       (side: Side, type: MindMapTypes) => {
         expand(node.id, side, updateNodeInternals);
         addChildNodeStore(node, { x: node.positionAbsoluteX, y: node.positionAbsoluteY }, side, type);
-        setTimeout(() => {
-          updateSubtreeLayout(node.id, layout, updateNodeInternals);
-        }, 200);
+        // Auto-layout is now handled inside the addChildNode store function
       },
       [
         expand,
         addChildNodeStore,
-        updateSubtreeLayout,
-        layout,
         updateNodeInternals,
         node.id,
         node.positionAbsoluteX,

@@ -16,11 +16,13 @@ interface AnimationData {
 
 interface LayoutState {
   layout: Direction;
+  isAutoLayoutEnabled: boolean;
   isLayouting: boolean;
   isAnimating: boolean;
   animationTimer: d3.Timer | null;
   animationData: AnimationData[];
   setLayout: (direction: Direction) => void;
+  setAutoLayoutEnabled: (enabled: boolean) => void;
   setIsAnimating: (isAnimating: boolean) => void;
   stopAnimation: () => void;
   layoutAllTrees: (
@@ -41,6 +43,8 @@ interface LayoutState {
     direction: Direction,
     updateNodeInternals?: (nodeId: string) => void
   ) => void;
+  updateNodeDirection: (direction: Direction, updateNodeInternals?: (nodeId: string) => void) => void;
+  applyAutoLayout: (updateNodeInternals?: (nodeId: string) => void) => Promise<void>;
   onLayoutChange: (direction: Direction, updateNodeInternals?: (nodeId: string) => void) => void;
 }
 
@@ -50,11 +54,14 @@ export const useLayoutStore = create<LayoutState>()(
   devtools(
     (set, get) => ({
       layout: 'horizontal',
+      isAutoLayoutEnabled: false,
       isAnimating: false,
       animationTimer: null,
       animationData: [],
 
       setLayout: (direction) => set({ layout: direction }, false, 'mindmap-layout/setLayout'),
+      setAutoLayoutEnabled: (enabled) =>
+        set({ isAutoLayoutEnabled: enabled }, false, 'mindmap-layout/setAutoLayoutEnabled'),
       setIsAnimating: (isAnimating) => set({ isAnimating }, false, 'mindmap-layout/setIsAnimating'),
 
       stopAnimation: () => {
@@ -150,7 +157,7 @@ export const useLayoutStore = create<LayoutState>()(
       },
 
       updateLayout: async (direction, updateNodeInternals) => {
-        const { layout, animateNodesToPositions } = get();
+        const { layout, animateNodesToPositions, isAutoLayoutEnabled } = get();
         const nodes = useCoreStore.getState().nodes;
         const edges = useCoreStore.getState().edges;
         const setEdges = useCoreStore.getState().setEdges;
@@ -158,6 +165,16 @@ export const useLayoutStore = create<LayoutState>()(
         const layoutDirection = direction || layout;
 
         if (!nodes?.length || !edges) return;
+
+        // If auto-layout is disabled, only update node internals and return
+        if (!isAutoLayoutEnabled) {
+          if (updateNodeInternals) {
+            nodes.forEach((node) => {
+              updateNodeInternals(node.id);
+            });
+          }
+          return;
+        }
 
         set({ isLayouting: true }, false, 'mindmap-layout/updateLayout');
 
@@ -262,13 +279,72 @@ export const useLayoutStore = create<LayoutState>()(
         }
       },
 
+      updateNodeDirection: (direction, updateNodeInternals) => {
+        const nodes = useCoreStore.getState().nodes;
+
+        // Update the layout direction state
+        set({ layout: direction }, false, 'mindmap-layout/updateNodeDirection');
+
+        // Update node internals to refresh handles for all nodes
+        if (updateNodeInternals && nodes?.length) {
+          nodes.forEach((node) => {
+            updateNodeInternals(node.id);
+          });
+        }
+
+        // Note: Edges will be updated automatically when node handles change
+        // No position recalculation or animation is performed here
+      },
+
+      applyAutoLayout: async (updateNodeInternals) => {
+        const { layout, animateNodesToPositions } = get();
+        const nodes = useCoreStore.getState().nodes;
+        const edges = useCoreStore.getState().edges;
+        const setEdges = useCoreStore.getState().setEdges;
+
+        if (!nodes?.length || !edges) return;
+
+        set({ isLayouting: true }, false, 'mindmap-layout/applyAutoLayout');
+
+        try {
+          const { nodes: layoutedNodes, edges: layoutedEdges } = await d3LayoutService.layoutAllTrees(
+            nodes,
+            edges,
+            layout
+          );
+
+          setEdges([...layoutedEdges]);
+
+          // Update node internals BEFORE animation to ensure handles are positioned correctly
+          if (updateNodeInternals) {
+            layoutedNodes.forEach((node) => {
+              updateNodeInternals(node.id);
+            });
+          }
+
+          const targetPositions: Record<string, { x: number; y: number }> = {};
+          layoutedNodes.forEach((node) => {
+            targetPositions[node.id] = { x: node.position.x, y: node.position.y };
+          });
+
+          animateNodesToPositions(targetPositions, ANIMATION_DURATION);
+
+          setTimeout(() => {
+            set({ isLayouting: false }, false, 'mindmap-layout/applyAutoLayout:animationEnd');
+          }, ANIMATION_DURATION);
+        } catch (error) {
+          console.error('Auto layout application failed:', error);
+          set({ isLayouting: false }, false, 'mindmap-layout/applyAutoLayout:error');
+        }
+      },
+
       onLayoutChange: (direction, updateNodeInternals) => {
-        const { updateLayout } = get();
+        const { updateNodeDirection } = get();
         const { prepareToPushUndo, pushToUndoStack } = useUndoRedoStore.getState();
         prepareToPushUndo();
 
         set({ layout: direction }, false, 'mindmap-layout/onLayoutChange');
-        updateLayout(direction, updateNodeInternals);
+        updateNodeDirection(direction, updateNodeInternals);
         pushToUndoStack();
       },
     }),

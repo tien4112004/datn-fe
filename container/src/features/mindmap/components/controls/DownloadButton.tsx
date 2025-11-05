@@ -10,10 +10,10 @@ function downloadImage(dataUrl: string) {
   a.click();
 }
 
-const imageWidth = 1024;
-const imageHeight = 768;
+const imageWidth = 2048;
+const imageHeight = 2048;
 
-function DownloadButton() {
+function DownloadButton({ className }: { className?: string }) {
   const { getNodes } = useReactFlow();
   const onClick = () => {
     const nodesBounds = getNodesBounds(getNodes());
@@ -33,7 +33,7 @@ function DownloadButton() {
   };
 
   return (
-    <Button variant={'outline'} onClick={onClick}>
+    <Button variant={'outline'} onClick={onClick} className={className}>
       Download Image
     </Button>
   );

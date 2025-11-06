@@ -9,6 +9,7 @@ import { getPresentationById } from '@/features/presentation/hooks/loaders';
 import { getMindmapById } from '@/features/mindmap/hooks/loaders';
 import Projects from '@/features/projects';
 import Settings from '@/features/settings';
+import UserProfilePage from '@/features/user-profile/pages/UserProfilePage';
 import Image from '@/features/image';
 import { LoginPage } from '@/features/auth/pages/LoginPage';
 import { RegisterPage } from '@/features/auth/pages/RegisterPage';
@@ -118,6 +119,10 @@ const router = createBrowserRouter([
       {
         path: 'settings',
         Component: Settings.SettingsPage,
+      },
+      {
+        path: 'profile',
+        Component: UserProfilePage,
       },
       {
         path: 'error',

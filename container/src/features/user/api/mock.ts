@@ -37,7 +37,7 @@ export default class UserProfileMockApiService implements UserProfileApiService 
     return mockUserProfile;
   }
 
-  async updateCurrentUserAvatar(avatar: File): Promise<{ avatarUrl: string }> {
+  async updateCurrentUserAvatar(_avatar: File): Promise<{ avatarUrl: string }> {
     await new Promise((resolve) => setTimeout(resolve, 500));
     const newAvatarUrl = 'https://i.pravatar.cc/150?u=' + Date.now();
     mockUserProfile.avatarUrl = newAvatarUrl;

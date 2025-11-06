@@ -9,7 +9,7 @@ import { getPresentationById } from '@/features/presentation/hooks/loaders';
 import { getMindmapById } from '@/features/mindmap/hooks/loaders';
 import Projects from '@/features/projects';
 import Settings from '@/features/settings';
-import UserProfilePage from '@/features/user-profile/pages/UserProfilePage';
+import UserProfilePage from '@/features/user/components/UserProfile';
 import Image from '@/features/image';
 import { LoginPage } from '@/features/auth/pages/LoginPage';
 import { RegisterPage } from '@/features/auth/pages/RegisterPage';

@@ -19,7 +19,7 @@ export default class AuthRealApiService implements AuthApiService {
    * Login user with real API call
    */
   async login(request: LoginRequest): Promise<LoginResponse> {
-    const response = await api.post<LoginResponse>(`${this.baseUrl}/api/auth/login`, request);
+    const response = await api.post<LoginResponse>(`${this.baseUrl}/api/auth/signin`, request);
 
     const { user, accessToken, refreshToken } = response.data;
 
@@ -34,7 +34,7 @@ export default class AuthRealApiService implements AuthApiService {
    * Register new user with real API call
    */
   async register(request: SignupRequest): Promise<SignupResponse> {
-    const response = await api.post<SignupResponse>(`${this.baseUrl}/api/auth/register`, request);
+    const response = await api.post<SignupResponse>(`${this.baseUrl}/api/auth/signup`, request);
 
     const { user, accessToken, refreshToken } = response.data;
 

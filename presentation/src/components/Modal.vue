@@ -2,7 +2,7 @@
   <Teleport to="body">
     <Transition name="modal-fade">
       <div
-        class="modal"
+        class="tw-fixed tw-inset-0 tw-z-[5000] tw-flex tw-items-center tw-justify-center"
         ref="modalRef"
         v-show="visible"
         tabindex="-1"
@@ -10,14 +10,24 @@
         role="dialog"
         @keyup.esc="onEsc()"
       >
-        <div class="mask" @click="onClickMask()"></div>
+        <div class="tw-absolute tw-inset-0 tw-bg-black/50" @click="onClickMask()"></div>
         <Transition
           name="modal-zoom"
           @afterLeave="contentVisible = false"
           @before-enter="contentVisible = true"
         >
-          <div class="modal-content" v-show="visible" :style="contentStyle">
-            <span class="close-btn" v-if="closeButton" @click="close()"><IconClose /></span>
+          <div
+            class="tw-relative tw-z-[5001] tw-overflow-hidden tw-rounded tw-bg-background tw-p-6 tw-shadow-lg tw-duration-200"
+            v-show="visible"
+            :style="contentStyle"
+          >
+            <span
+              class="ring-offset-background focus:ring-ring data-[state=open]:bg-accent data-[state=open]:text-muted-foreground tw-absolute tw-right-4 tw-top-4 tw-flex tw-h-5 tw-w-5 tw-cursor-pointer tw-items-center tw-justify-center tw-rounded-xs tw-opacity-70 tw-transition-opacity hover:tw-opacity-100 focus:tw-outline-hidden focus:tw-ring-2 focus:tw-ring-offset-2 disabled:tw-pointer-events-none"
+              v-if="closeButton"
+              @click="close()"
+            >
+              <IconClose class="tw-size-4" />
+            </span>
             <slot v-if="contentVisible"></slot>
           </div>
         </Transition>
@@ -89,60 +99,18 @@ const onClickMask = () => {
 </script>
 
 <style lang="scss" scoped>
-.modal,
-.mask {
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 5000;
-}
-
-.modal {
-  position: fixed;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  outline: 0;
-  border: 0;
-}
-
-.mask {
-  position: absolute;
-  background: rgba(0, 0, 0, 0.4);
-}
-
-.modal-content {
-  z-index: 5001;
-  padding: 20px;
-  background: var(--presentation-background);
-  border-radius: var(--presentation-radius);
-  overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-  position: relative;
-}
-
-.close-btn {
-  width: 20px;
-  height: 20px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  cursor: pointer;
-}
-
 .modal-fade-enter-active {
   animation: modal-fade-enter 0.25s both ease-in;
 }
+
 .modal-fade-leave-active {
   animation: modal-fade-leave 0.25s both ease-out;
 }
+
 .modal-zoom-enter-active {
   animation: modal-zoom-enter 0.25s both cubic-bezier(0.4, 0, 0, 1.5);
 }
+
 .modal-zoom-leave-active {
   animation: modal-zoom-leave 0.25s both;
 }
@@ -152,16 +120,19 @@ const onClickMask = () => {
     opacity: 0;
   }
 }
+
 @keyframes modal-fade-leave {
   to {
     opacity: 0;
   }
 }
+
 @keyframes modal-zoom-enter {
   from {
     transform: scale3d(0.3, 0.3, 0.3);
   }
 }
+
 @keyframes modal-zoom-leave {
   to {
     transform: scale3d(0.3, 0.3, 0.3);

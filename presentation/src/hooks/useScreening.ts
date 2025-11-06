@@ -10,6 +10,14 @@ export default () => {
     document.dispatchEvent(new CustomEvent('enableFullscreen', {}));
     enterFullscreen();
     screenStore.setScreening(true);
+    screenStore.setPresenter(false);
+  };
+
+  const enterPresenterMode = () => {
+    document.dispatchEvent(new CustomEvent('enableFullscreen', {}));
+    enterFullscreen();
+    screenStore.setScreening(true);
+    screenStore.setPresenter(true);
   };
 
   // Enter presentation mode (start from first slide)
@@ -17,6 +25,15 @@ export default () => {
     document.dispatchEvent(new CustomEvent('enableFullscreen', {}));
     slidesStore.updateSlideIndex(0);
     enterScreening();
+  };
+
+  // Open presentation in a new window/tab
+  const openSeparatedPresentation = () => {
+    const currentUrl = window.location.href;
+    const screeningUrl = currentUrl.includes('?')
+      ? `${currentUrl}&screening=true`
+      : `${currentUrl}?screening=true`;
+    window.open(screeningUrl, '_blank', 'width=1920,height=1080');
   };
 
   // Exit presentation mode
@@ -30,5 +47,7 @@ export default () => {
     enterScreening,
     enterScreeningFromStart,
     exitScreening,
+    enterPresenterMode,
+    openSeparatedPresentation,
   };
 };

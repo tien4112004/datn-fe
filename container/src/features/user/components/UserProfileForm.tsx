@@ -3,7 +3,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useUserProfile, useUpdateUserProfile } from '../hooks/useApi';
 import { Input } from '@/shared/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/shared/components/ui/form';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -50,12 +49,12 @@ export const UserProfileForm = () => {
   }
 
   return (
-    <Card className="border border-gray-200 bg-white shadow-sm transition-shadow duration-300 hover:shadow-md">
-      <CardHeader className="border-b border-gray-100 pb-6">
-        <CardTitle className="text-2xl font-semibold text-gray-900">{t('profile.form.title')}</CardTitle>
+    <div className="space-y-6">
+      <div className="border-b border-gray-100 pb-6">
+        <h2 className="text-2xl font-semibold text-gray-900">{t('profile.form.title')}</h2>
         <p className="mt-2 text-sm text-gray-500">{t('profile.form.subtitle')}</p>
-      </CardHeader>
-      <CardContent className="space-y-6 p-6">
+      </div>
+      <div className="space-y-6">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -125,7 +124,7 @@ export const UserProfileForm = () => {
             </div>
           </form>
         </Form>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };

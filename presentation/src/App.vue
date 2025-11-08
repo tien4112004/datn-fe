@@ -69,28 +69,13 @@ onMounted(async () => {
   await deleteDiscardedDB();
   snapshotStore.initSnapshotDatabase();
 
-  // After initial load is complete, allow dirty tracking
-  setTimeout(() => {
-    isInitialLoad.value = false;
-  }, 500);
-
-  // Handle browser/tab close with unsaved changes
-  // Note: Browsers only allow generic messages, not custom dialogs
-  const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-    if (containerStore.isRemote && saveStore.hasUnsavedChanges) {
-      e.preventDefault();
-      e.returnValue = '';
-      return '';
-    }
-  };
-
-  window.addEventListener('beforeunload', handleBeforeUnload);
+  isInitialLoad.value = false;
 });
 
 watch(
   slides,
   () => {
-    if (containerStore.isRemote) {
+    if (containerStore.isRemote && containerStore.mode === 'edit') {
       saveStore.markDirty();
     }
   },

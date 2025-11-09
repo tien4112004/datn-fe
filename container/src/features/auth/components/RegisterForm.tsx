@@ -49,7 +49,6 @@ type RegisterFormValues = z.infer<typeof registerSchema>;
 
 export function RegisterForm() {
   const [isLoading, setIsLoading] = useState(false);
-  const { setUser } = useAuth();
   const navigate = useNavigate();
   const authService = useAuthApiService();
 
@@ -80,14 +79,11 @@ export function RegisterForm() {
         phoneNumber: data.phoneNumber || undefined,
       });
 
-      // Update auth context
-      setUser(response.user);
-
       // Show success message
-      toast.success(`Welcome, ${response.user.firstName || response.user.email}!`);
+      toast.success(`Account created successfully! Please sign in with your credentials.`);
 
-      // Redirect to home page
-      navigate('/');
+      // Redirect to login page
+      navigate('/login');
     } catch (error) {
       // Error is already handled by the API interceptor
       // But we can add additional handling here if needed

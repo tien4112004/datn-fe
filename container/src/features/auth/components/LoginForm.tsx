@@ -36,14 +36,17 @@ export function LoginForm() {
     try {
       setIsLoading(true);
 
-      // Call the auth service
-      const response = await authService.login(data);
+      // Call the auth service to login (stores tokens)
+      await authService.login(data);
+
+      // Fetch the current user data
+      const user = await authService.getCurrentUser();
 
       // Update auth context
-      setUser(response.user);
+      setUser(user);
 
       // Show success message
-      toast.success(`Welcome back, ${response.user.name || response.user.email}!`);
+      toast.success(`Welcome back, ${user.firstName || user.email}!`);
 
       // Redirect to home page
       navigate('/');

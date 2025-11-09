@@ -19,30 +19,24 @@ export default class AuthRealApiService implements AuthApiService {
    * Login user with real API call
    */
   async login(request: LoginRequest): Promise<LoginResponse> {
-    const response = await api.post<LoginResponse>(`${this.baseUrl}/api/auth/signin`, request);
+    const response = await api.post<{ data: LoginResponse }>(`${this.baseUrl}/api/auth/signin`, request);
 
-    const { user, accessToken, refreshToken } = response.data;
+    const { access_token, refresh_token } = response.data.data;
 
-    // Store tokens and user data
-    setTokens(accessToken, refreshToken);
-    setUserData(user);
+    // Store tokens
+    setTokens(access_token, refresh_token);
 
-    return response.data;
+    return response.data.data;
   }
 
   /**
    * Register new user with real API call
    */
   async register(request: SignupRequest): Promise<SignupResponse> {
-    const response = await api.post<SignupResponse>(`${this.baseUrl}/api/auth/signup`, request);
+    const response = await api.post<{ data: User }>(`${this.baseUrl}/api/auth/signup`, request);
 
-    const { user, accessToken, refreshToken } = response.data;
-
-    // Store tokens and user data
-    setTokens(accessToken, refreshToken);
-    setUserData(user);
-
-    return response.data;
+    // Signup doesn't return tokens, just user data
+    return { user: response.data.data };
   }
 
   /**
@@ -59,23 +53,24 @@ export default class AuthRealApiService implements AuthApiService {
    * Get current user from backend
    */
   async getCurrentUser(): Promise<User> {
-    const response = await api.get<User>(`${this.baseUrl}/api/auth/me`);
-    return response.data;
+    const response = await api.get<{ data: User }>(`${this.baseUrl}/api/user/me`);
+
+    // Store user data in localStorage
+    setUserData(response.data.data);
+
+    return response.data.data;
   }
 
   /**
    * Refresh access token
+   *
+   * ⚠️ NOTE: The /api/auth/refresh endpoint is NOT implemented in the backend.
+   * Token refresh would need to be handled through Keycloak's standard OAuth2 token endpoint.
+   * Currently, when tokens expire (401), the user is logged out and must sign in again.
    */
   async refreshToken(refreshToken: string): Promise<{ accessToken: string }> {
-    const response = await api.post<{ accessToken: string }>(`${this.baseUrl}/api/auth/refresh`, {
-      refreshToken,
-    });
-
-    const { accessToken } = response.data;
-
-    // Store new access token
-    localStorage.setItem('accessToken', accessToken);
-
-    return response.data;
+    // TODO: Implement token refresh through Keycloak OAuth2 token endpoint
+    // For now, this endpoint is not available
+    throw new Error('Token refresh endpoint not implemented. Please sign in again.');
   }
 }

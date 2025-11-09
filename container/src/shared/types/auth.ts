@@ -18,9 +18,10 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse {
-  user: User;
-  accessToken: string;
-  refreshToken: string;
+  access_token: string;
+  refresh_token: string;
+  token_type: string;
+  expires_in: number;
 }
 
 export interface AuthContextType {
@@ -49,6 +50,4 @@ export interface SignupRequest {
 
 export interface SignupResponse {
   user: User;
-  accessToken: string;
-  refreshToken: string;
 }

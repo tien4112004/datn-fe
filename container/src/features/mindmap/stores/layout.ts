@@ -37,12 +37,12 @@ interface LayoutState {
     targetPositions: Record<string, { x: number; y: number }>,
     duration?: number
   ) => void;
-  updateLayout: (direction?: Direction, updateNodeInternals?: (nodeId: string) => void) => void;
+  updateLayout: (direction?: Direction, updateNodeInternals?: (nodeId: string) => void) => Promise<void>;
   updateSubtreeLayout: (
     nodeId: string,
     direction: Direction,
     updateNodeInternals?: (nodeId: string) => void
-  ) => void;
+  ) => Promise<void>;
   updateNodeDirection: (direction: Direction, updateNodeInternals?: (nodeId: string) => void) => void;
   applyAutoLayout: (updateNodeInternals?: (nodeId: string) => void) => Promise<void>;
   onLayoutChange: (direction: Direction, updateNodeInternals?: (nodeId: string) => void) => void;
@@ -55,6 +55,7 @@ export const useLayoutStore = create<LayoutState>()(
     (set, get) => ({
       layout: 'horizontal',
       isAutoLayoutEnabled: false,
+      isLayouting: false,
       isAnimating: false,
       animationTimer: null,
       animationData: [],

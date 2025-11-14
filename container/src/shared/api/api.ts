@@ -143,18 +143,18 @@ api.interceptors.response.use(
           );
         }
 
-        // Handle critical errors
+        // Handle critical errors (5xx)
+        // Show toast with backend error message if available
+        const errorMessage = response.data?.message || 'A server error occurred. Please try again.';
+        toast.error(errorMessage);
+
         return Promise.reject(
-          new CriticalError(
-            'Critical API error occurred',
-            ERROR_TYPE.API_ERROR,
-            response.status.toString(),
-            response.data
-          )
+          new CriticalError(errorMessage, ERROR_TYPE.API_ERROR, response.status.toString(), response.data)
         );
       }
     }
     // Handle network or unexpected errors
+    toast.error('Network error. Please check your connection and try again.');
     return Promise.reject(new CriticalError('Network or unexpected error occurred', ERROR_TYPE.NETWORK));
   }
 );

@@ -4,9 +4,14 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { format } from 'date-fns';
+import { CalendarIcon } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/shared/components/ui/form';
+import { Popover, PopoverContent, PopoverTrigger } from '@/shared/components/ui/popover';
+import { Calendar } from '@/shared/components/ui/calendar';
+import { cn } from '@/shared/lib/utils';
 import { useAuth } from '@/shared/context/auth';
 import { useAuthApiService } from '../api';
 
@@ -27,13 +32,17 @@ const registerSchema = z
       .max(50, 'First name must be less than 50 characters'),
     lastName: z.string().min(1, 'Last name is required').max(50, 'Last name must be less than 50 characters'),
     dateOfBirth: z
-      .string()
-      .min(1, 'Date of birth is required')
+      .date({
+        required_error: 'Date of birth is required',
+        invalid_type_error: 'Please select a valid date',
+      })
       .refine((date) => {
-        const birthDate = new Date(date);
         const today = new Date();
-        const age = today.getFullYear() - birthDate.getFullYear();
-        return age >= 13 && age <= 120;
+        const age = today.getFullYear() - date.getFullYear();
+        const monthDiff = today.getMonth() - date.getMonth();
+        const adjustedAge =
+          monthDiff < 0 || (monthDiff === 0 && today.getDate() < date.getDate()) ? age - 1 : age;
+        return adjustedAge >= 13 && adjustedAge <= 120;
       }, 'You must be at least 13 years old'),
     phoneNumber: z
       .string()
@@ -60,7 +69,7 @@ export function RegisterForm() {
       confirmPassword: '',
       firstName: '',
       lastName: '',
-      dateOfBirth: '',
+      dateOfBirth: undefined,
       phoneNumber: '',
     },
   });
@@ -75,7 +84,7 @@ export function RegisterForm() {
         password: data.password,
         firstName: data.firstName,
         lastName: data.lastName,
-        dateOfBirth: data.dateOfBirth,
+        dateOfBirth: format(data.dateOfBirth, 'yyyy-MM-dd'),
         phoneNumber: data.phoneNumber || undefined,
       });
 
@@ -162,17 +171,37 @@ export function RegisterForm() {
           control={form.control}
           name="dateOfBirth"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="flex flex-col">
               <FormLabel>Date of Birth</FormLabel>
-              <FormControl>
-                <Input
-                  type="date"
-                  autoComplete="bday"
-                  disabled={isLoading}
-                  max={new Date().toISOString().split('T')[0]}
-                  {...field}
-                />
-              </FormControl>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <FormControl>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        'w-full pl-3 text-left font-normal',
+                        !field.value && 'text-muted-foreground'
+                      )}
+                      disabled={isLoading}
+                    >
+                      {field.value ? format(field.value, 'PPP') : <span>Pick a date</span>}
+                      <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                    </Button>
+                  </FormControl>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={field.value}
+                    onSelect={field.onChange}
+                    disabled={(date) => date > new Date() || date < new Date('1900-01-01')}
+                    initialFocus
+                    captionLayout="dropdown"
+                    fromYear={1900}
+                    toYear={new Date().getFullYear()}
+                  />
+                </PopoverContent>
+              </Popover>
               <FormMessage />
             </FormItem>
           )}

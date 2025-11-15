@@ -5,3 +5,4 @@ export { useImportExportStore } from './importExport';
 export { useNodeOperationsStore } from './nodeOperation';
 export { useNodeManipulationStore } from './nodeManipulation';
 export { useUndoRedoStore } from './undoredo';
+export { useMetadataStore } from './metadata';

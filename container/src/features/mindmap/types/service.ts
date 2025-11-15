@@ -1,11 +1,13 @@
 import type { Service } from '@/shared/api';
-import type { MindMapNode, MindMapEdge } from './index';
+import type { MindMapNode, MindMapEdge, MindmapMetadata } from './index';
 import type { ApiResponse } from '@/shared/types/api';
 
 export interface MindmapData {
   id: string;
   title: string;
   description?: string;
+  thumbnail?: string;
+  metadata?: MindmapMetadata;
   nodes: MindMapNode[];
   edges: MindMapEdge[];
   createdAt: string;

@@ -280,6 +280,8 @@ describe('useLayoutStore', () => {
 
       mockCoreState.nodes = mockNodes;
       mockCoreState.edges = mockEdges;
+      // Enable auto-layout for these tests
+      useLayoutStore.setState({ isAutoLayoutEnabled: true });
     });
 
     it('should perform layout update with D3 service', async () => {
@@ -319,12 +321,13 @@ describe('useLayoutStore', () => {
       });
 
       const state = useLayoutStore.getState();
-      const updatePromise = state.updateLayout('vertical' as Direction);
+      state.updateLayout('vertical' as Direction);
 
       // Should set layouting state immediately
       expect(useLayoutStore.getState().isLayouting).toBe(true);
 
-      await updatePromise;
+      // Wait for layout to complete
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       expect(d3LayoutService.layoutAllTrees).toHaveBeenCalledWith(
         mockCoreState.nodes,
@@ -345,7 +348,10 @@ describe('useLayoutStore', () => {
       });
 
       const state = useLayoutStore.getState();
-      await state.updateLayout();
+      state.updateLayout();
+
+      // Wait for async operations
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       expect(d3LayoutService.layoutAllTrees).toHaveBeenCalledWith(
         mockCoreState.nodes,
@@ -361,7 +367,10 @@ describe('useLayoutStore', () => {
       const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
       const state = useLayoutStore.getState();
-      await state.updateLayout();
+      state.updateLayout();
+
+      // Wait for error to be handled
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       expect(consoleSpy).toHaveBeenCalledWith('Layout update failed:', expect.any(Error));
       expect(useLayoutStore.getState().isLayouting).toBe(false);
@@ -374,7 +383,7 @@ describe('useLayoutStore', () => {
       mockCoreState.edges = undefined;
 
       const state = useLayoutStore.getState();
-      await state.updateLayout();
+      state.updateLayout();
 
       const { d3LayoutService } = await import('../../services/D3LayoutService');
       expect(d3LayoutService.layoutAllTrees).not.toHaveBeenCalled();
@@ -538,7 +547,7 @@ describe('useLayoutStore', () => {
   });
 
   describe('onLayoutChange', () => {
-    it('should save state to undo stack and trigger layout update', async () => {
+    it('should save state to undo stack and update layout direction', async () => {
       const mockNodes: MindMapNode[] = [
         {
           id: 'node-1',
@@ -558,12 +567,6 @@ describe('useLayoutStore', () => {
       mockCoreState.nodes = mockNodes;
       mockCoreState.edges = mockEdges;
 
-      const { d3LayoutService } = await import('../../services/D3LayoutService');
-      vi.mocked(d3LayoutService.layoutAllTrees).mockResolvedValue({
-        nodes: mockNodes,
-        edges: mockEdges,
-      });
-
       const state = useLayoutStore.getState();
       state.onLayoutChange('vertical' as Direction);
 
@@ -573,10 +576,6 @@ describe('useLayoutStore', () => {
 
       // Should update layout direction
       expect(useLayoutStore.getState().layout).toBe('vertical');
-
-      // Should trigger layout update
-      await new Promise((resolve) => setTimeout(resolve, 0)); // Wait for async
-      expect(d3LayoutService.layoutAllTrees).toHaveBeenCalled();
     });
   });
 });

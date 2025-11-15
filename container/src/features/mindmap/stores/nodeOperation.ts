@@ -7,6 +7,7 @@ import { generateId } from '@/shared/lib/utils';
 import { getRootNodeOfSubtree, getAllDescendantNodes } from '../services/utils';
 import { useCoreStore } from './core';
 import { useUndoRedoStore } from './undoredo';
+import { useLayoutStore } from './layout';
 
 interface NewNodeData {
   content: string;
@@ -67,6 +68,7 @@ export const useNodeOperationsStore = create<NodeOperationsState>()(
       ) => {
         const { nodes, setNodes, setEdges } = useCoreStore.getState();
         const { prepareToPushUndo, pushToUndoStack } = useUndoRedoStore.getState();
+        const { isAutoLayoutEnabled, updateSubtreeLayout, layout } = useLayoutStore.getState();
         prepareToPushUndo();
         // Find the root node to get the pathType
         const rootNode = getRootNodeOfSubtree(parentNode.id!, nodes);
@@ -114,6 +116,13 @@ export const useNodeOperationsStore = create<NodeOperationsState>()(
 
         setNodes((state) => [...state, newNode]);
         setEdges((state) => [...state, newEdge]);
+
+        // Only apply auto-layout if it's enabled
+        if (isAutoLayoutEnabled) {
+          setTimeout(() => {
+            updateSubtreeLayout(parentNode.id!, layout);
+          }, 200);
+        }
 
         pushToUndoStack();
       },

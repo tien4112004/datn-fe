@@ -45,12 +45,12 @@ export const useReactFlowIntegration = () => {
   }, []);
 
   const onInit = useCallback(async () => {
-    updateLayout();
+    updateLayout(undefined, updateNodeInternals);
 
     setTimeout(() => {
       fitView({ duration: 2000, padding: 0.1 });
     }, 800);
-  }, []);
+  }, [updateLayout, updateNodeInternals, fitView]);
 
   useEffect(() => {
     syncState(updateNodeInternals);

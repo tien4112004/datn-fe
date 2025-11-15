@@ -5,6 +5,7 @@ import type { ImageNode } from '../../types';
 import { BaseNodeBlock } from './BaseNode';
 import { BaseNodeContent } from '../ui/base-node';
 import type { NodeProps } from '@xyflow/react';
+import { useUpdateNodeInternals } from '@xyflow/react';
 import { useMindmapNodeCommon } from '../../hooks';
 import { Button } from '@/components/ui/button';
 import { Upload, X, Loader2, Network } from 'lucide-react';
@@ -19,6 +20,7 @@ const ImageNodeBlock = memo(
     const updateNodeData = useNodeOperationsStore((state) => state.updateNodeData);
     const updateNodeDataWithUndo = useNodeOperationsStore((state) => state.updateNodeDataWithUndo);
     const updateSubtreeLayout = useLayoutStore((state) => state.updateSubtreeLayout);
+    const updateNodeInternals = useUpdateNodeInternals();
 
     const [isEditing, setIsEditing] = useState(!data.imageUrl);
     const [isLoadingImage, setIsLoadingImage] = useState(false);
@@ -107,7 +109,7 @@ const ImageNodeBlock = memo(
     }, [id, updateNodeData]);
 
     const handleLayoutClick = () => {
-      updateSubtreeLayout(id, layout);
+      updateSubtreeLayout(id, layout, updateNodeInternals);
     };
 
     return (

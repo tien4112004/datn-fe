@@ -52,6 +52,7 @@
     "cmdk": "^1.1.1",
     "d3-hierarchy": "^3.1.2",
     "date-fns": "^4.1.0",
+    "html-to-image": "^1.11.11",
     "i18next": "^25.3.2",
     "i18next-browser-languagedetector": "^8.2.0",
     "json-diff-ts": "^4.8.2",

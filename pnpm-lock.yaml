@@ -145,6 +145,9 @@ importers:
       date-fns:
         specifier: ^4.1.0
         version: 4.1.0
+      html-to-image:
+        specifier: ^1.11.11
+        version: 1.11.13
       i18next:
         specifier: ^25.3.2
         version: 25.3.2(typescript@5.8.3)

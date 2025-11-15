@@ -69,10 +69,12 @@ export const BaseNodeBlock = memo(
     const nodeStyle = useMemo(
       () => ({
         width: width ? `${width}px` : undefined,
-        minHeight: height ? `${height}px` : undefined,
+        ...(variant === 'replacing'
+          ? { height: height ? `${height}px` : undefined }
+          : { minHeight: height ? `${height}px` : undefined }),
         ...props.style,
       }),
-      [width, height, props.style]
+      [width, height, props.style, variant]
     );
 
     return (

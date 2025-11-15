@@ -179,7 +179,7 @@ export const useClipboardStore = create<ClipboardState>()(
       // Check if it's AI generated structure
       if (isAiGeneratedNodeStructure(parsedData)) {
         const { setNodes, setEdges } = useCoreStore.getState();
-        const { updateLayout, layout } = useLayoutStore.getState();
+        const { updateLayout, layout, isAutoLayoutEnabled } = useLayoutStore.getState();
         const { mousePosition, offset } = get();
 
         const basePosition = screenToFlowPosition({
@@ -199,10 +199,12 @@ export const useClipboardStore = create<ClipboardState>()(
         ]);
         setEdges((eds: MindMapEdge[]) => [...eds, ...aiEdges]);
 
-        // Trigger layout after nodes are added
-        setTimeout(() => {
-          updateLayout(layout);
-        }, 100);
+        // Trigger layout after nodes are added only if auto-layout is enabled
+        if (isAutoLayoutEnabled) {
+          setTimeout(() => {
+            updateLayout(layout);
+          }, 100);
+        }
 
         pushToUndoStack();
         set((state) => ({ offset: state.offset + 20 }), false, 'mindmap-clip/pasteFromClipboard');

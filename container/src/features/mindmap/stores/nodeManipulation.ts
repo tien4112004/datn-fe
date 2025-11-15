@@ -10,7 +10,7 @@ import { useUndoRedoStore } from './undoredo';
 
 interface NodeManipulationState {
   collapse: (nodeId: string, side: Side) => void;
-  expand: (nodeId: string, side: Side) => void;
+  expand: (nodeId: string, side: Side, updateNodeInternals?: (nodeId: string) => void) => void;
   moveToChild: (sourceId: string, targetId: string, side?: Side) => void;
   updateSubtreeEdgePathType: (rootNodeId: string, pathType: PathType) => void;
   updateSubtreeEdgeColor: (rootNodeId: string, edgeColor: string) => void;
@@ -19,7 +19,7 @@ interface NodeManipulationState {
 export const useNodeManipulationStore = create<NodeManipulationState>()(
   devtools(
     () => ({
-      expand: (nodeId: string, side: Side) => {
+      expand: (nodeId: string, side: Side, updateNodeInternals) => {
         const { nodes, edges, setNodes, setEdges } = useCoreStore.getState();
         const parentNode = nodes.find((n) => n.id === nodeId);
         if (!parentNode || !parentNode.data.collapsedChildren) return;
@@ -59,6 +59,18 @@ export const useNodeManipulationStore = create<NodeManipulationState>()(
         });
 
         setNodes(updatedNodes);
+
+        // Update node internals for all restored nodes to ensure handles are positioned correctly
+        // This must be done BEFORE setting edges so ReactFlow knows about handle positions
+        if (updateNodeInternals) {
+          const allNodeIds = [nodeId, ...storedNodes.map((node) => node.id)];
+          setTimeout(() => {
+            allNodeIds.forEach((id) => {
+              updateNodeInternals(id);
+            });
+          }, 600);
+        }
+
         setEdges(restoredEdges);
 
         pushToUndoStack();

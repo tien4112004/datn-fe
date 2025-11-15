@@ -9,7 +9,7 @@ import { ArrowLeftFromLine, ArrowRightFromLine, Plus, Type, Square, Image } from
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/shared/components/ui/popover';
 import type { MindMapNode, Direction, Side, MindMapTypes } from '@/features/mindmap/types';
-import { Position, type NodeProps } from '@xyflow/react';
+import { Position, type NodeProps, useUpdateNodeInternals } from '@xyflow/react';
 import { DIRECTION, SIDE, MINDMAP_TYPES } from '@/features/mindmap/types';
 import { cn } from '@/shared/lib/utils';
 import { motion } from 'motion/react';
@@ -37,7 +37,6 @@ const coreStoreSelector = (state: any) => ({
 const nodeOperationsSelector = (state: any) => state.addChildNode;
 
 const layoutStoreSelector = (state: any) => ({
-  updateSubtreeLayout: state.updateSubtreeLayout,
   layout: state.layout,
 });
 
@@ -51,21 +50,19 @@ export const ChildNodeControls = memo(
     const { collapse, expand } = useNodeManipulationStore(useShallow(nodeManipulationSelector));
     const { hasLeftChildren, hasRightChildren } = useCoreStore(useShallow(coreStoreSelector));
     const addChildNodeStore = useNodeOperationsStore(nodeOperationsSelector);
-    const { updateSubtreeLayout, layout } = useLayoutStore(useShallow(layoutStoreSelector));
+    const { layout } = useLayoutStore(useShallow(layoutStoreSelector));
+    const updateNodeInternals = useUpdateNodeInternals();
 
     const addChildNode = useCallback(
       (side: Side, type: MindMapTypes) => {
-        expand(node.id, side);
+        expand(node.id, side, updateNodeInternals);
         addChildNodeStore(node, { x: node.positionAbsoluteX, y: node.positionAbsoluteY }, side, type);
-        setTimeout(() => {
-          updateSubtreeLayout(node.id, layout);
-        }, 200);
+        // Auto-layout is now handled inside the addChildNode store function
       },
       [
         expand,
         addChildNodeStore,
-        updateSubtreeLayout,
-        layout,
+        updateNodeInternals,
         node.id,
         node.positionAbsoluteX,
         node.positionAbsoluteY,
@@ -83,9 +80,9 @@ export const ChildNodeControls = memo(
         {/* Add Child Buttons */}
         <div
           className={cn(
-            'absolute z-[1000] flex items-center justify-center gap-1 rounded-sm transition-all duration-200',
+            'absolute z-[10000] flex items-center justify-center gap-1 rounded-sm transition-all duration-200',
             layout === DIRECTION.VERTICAL
-              ? 'left-1/2 top-0 -translate-x-1/2 -translate-y-[calc(100%+24px)]'
+              ? 'left-1/2 top-0 -translate-x-1/2 -translate-y-[calc(100%+24px)] flex-col'
               : 'left-0 top-1/2 -translate-x-[calc(100%+24px)] -translate-y-1/2',
             (isMouseOver || selected) && canCreateLeft ? 'visible opacity-100' : 'invisible opacity-0'
           )}
@@ -100,7 +97,7 @@ export const ChildNodeControls = memo(
                 <Plus />
               </Button>
             </PopoverTrigger>
-            <PopoverContent side="left" className="w-48 p-2">
+            <PopoverContent side={layout === DIRECTION.VERTICAL ? 'top' : 'left'} className="w-48 p-2">
               <div className="space-y-2">
                 <Button
                   variant="ghost"
@@ -147,7 +144,7 @@ export const ChildNodeControls = memo(
           >
             <Button
               onClick={() => {
-                if (isLeftChildrenCollapsed) expand(node.id, SIDE.LEFT);
+                if (isLeftChildrenCollapsed) expand(node.id, SIDE.LEFT, updateNodeInternals);
                 else collapse(node.id, SIDE.LEFT);
               }}
               size="icon"
@@ -161,6 +158,7 @@ export const ChildNodeControls = memo(
                     : { rotate: isLeftChildrenCollapsed ? 90 : 270 }
                 }
                 transition={{ duration: 0.2, ease: 'easeInOut' }}
+                className="flex items-center justify-center"
               >
                 <ArrowLeftFromLine />
               </motion.div>
@@ -170,9 +168,9 @@ export const ChildNodeControls = memo(
 
         <div
           className={cn(
-            'absolute z-[1000] flex items-center justify-center gap-1 rounded-sm transition-all duration-200',
+            'absolute z-[10000] flex items-center justify-center gap-1 rounded-sm transition-all duration-200',
             layout === DIRECTION.VERTICAL
-              ? 'bottom-0 left-1/2 -translate-x-1/2 translate-y-[calc(100%+24px)]'
+              ? 'bottom-0 left-1/2 -translate-x-1/2 translate-y-[calc(100%+24px)] flex-col'
               : 'right-0 top-1/2 -translate-y-1/2 translate-x-[calc(100%+24px)]',
             (isMouseOver || selected) && canCreateRight ? 'visible opacity-100' : 'invisible opacity-0'
           )}
@@ -189,7 +187,7 @@ export const ChildNodeControls = memo(
           >
             <Button
               onClick={() => {
-                if (isRightChildrenCollapsed) expand(node.id, SIDE.RIGHT);
+                if (isRightChildrenCollapsed) expand(node.id, SIDE.RIGHT, updateNodeInternals);
                 else collapse(node.id, SIDE.RIGHT);
               }}
               size="icon"
@@ -203,6 +201,7 @@ export const ChildNodeControls = memo(
                     : { rotate: isRightChildrenCollapsed ? 90 : 270 }
                 }
                 transition={{ duration: 0.2, ease: 'easeInOut' }}
+                className="flex items-center justify-center"
               >
                 <ArrowRightFromLine />
               </motion.div>
@@ -218,7 +217,7 @@ export const ChildNodeControls = memo(
                 <Plus />
               </Button>
             </PopoverTrigger>
-            <PopoverContent side="right" className="w-48 p-2">
+            <PopoverContent side={layout === DIRECTION.VERTICAL ? 'bottom' : 'right'} className="w-48 p-2">
               <div className="space-y-2">
                 <Button
                   variant="ghost"

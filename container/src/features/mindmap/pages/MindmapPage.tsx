@@ -3,7 +3,7 @@ import '@xyflow/react/dist/style.css';
 import { Background, BackgroundVariant, Controls, MiniMap, ControlButton } from '@xyflow/react';
 import { Move, MousePointer2 } from 'lucide-react';
 import { DevTools } from '@/features/mindmap/components/ui/devtools';
-import { Flow, LogicHandler, Instructions, Toolbar } from '@/features/mindmap/components';
+import { Flow, LogicHandler, Toolbar } from '@/features/mindmap/components';
 import { useState, useEffect } from 'react';
 import { useLoaderData } from 'react-router-dom';
 import type { MindmapData } from '@/features/mindmap/types/service';
@@ -30,7 +30,6 @@ const MindmapPage = () => {
     <ReactFlowProvider>
       <div className="h-screen w-full" style={{ backgroundColor: 'var(--background)' }}>
         <Toolbar />
-        <Instructions />
         <Flow isPanOnDrag={isPanOnDrag}>
           <Controls>
             <ControlButton
@@ -50,6 +49,7 @@ const MindmapPage = () => {
             nodeStrokeColor="var(--primary)"
             nodeColor="var(--primary)"
             nodeBorderRadius={8}
+            position="top-left"
           />
 
           <Background variant={BackgroundVariant.Dots} gap={20} size={1} />

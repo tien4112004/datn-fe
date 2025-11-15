@@ -4,6 +4,7 @@ import { SHAPES } from '../../types';
 import type { ShapeNode, Shape } from '../../types';
 import { BaseNodeBlock } from './BaseNode';
 import type { NodeProps } from '@xyflow/react';
+import { useUpdateNodeInternals } from '@xyflow/react';
 import { useMindmapNodeCommon } from '../../hooks';
 import { Button } from '@/components/ui/button';
 import { useLayoutStore, useNodeOperationsStore } from '../../stores';
@@ -18,6 +19,7 @@ const ShapeNodeBlock = memo(
     const { layout } = useMindmapNodeCommon<ShapeNode>({ node });
     const updateNodeData = useNodeOperationsStore((state) => state.updateNodeDataWithUndo);
     const updateSubtreeLayout = useLayoutStore((state) => state.updateSubtreeLayout);
+    const updateNodeInternals = useUpdateNodeInternals();
 
     const handleShapeChange = (newShape: Shape) => {
       updateNodeData(id, { shape: newShape });
@@ -42,7 +44,7 @@ const ShapeNodeBlock = memo(
     };
 
     const handleLayoutClick = () => {
-      updateSubtreeLayout(id, layout);
+      updateSubtreeLayout(id, layout, updateNodeInternals);
     };
 
     return (

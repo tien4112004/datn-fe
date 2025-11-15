@@ -351,6 +351,38 @@ export default class MindmapMockService implements MindmapApiService {
     });
   }
 
+  async updateMindmap(id: string, data: Partial<MindmapData>): Promise<MindmapData> {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        const index = mindmapStorage.findIndex((m) => m.id === id);
+        if (index !== -1) {
+          mindmapStorage[index] = {
+            ...mindmapStorage[index],
+            ...data,
+            updatedAt: new Date().toISOString(),
+          };
+          resolve({ ...mindmapStorage[index] });
+        } else {
+          reject(new Error(`Mindmap with id ${id} not found`));
+        }
+      }, 300);
+    });
+  }
+
+  async deleteMindmap(id: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        const index = mindmapStorage.findIndex((m) => m.id === id);
+        if (index !== -1) {
+          mindmapStorage.splice(index, 1);
+          resolve();
+        } else {
+          reject(new Error(`Mindmap with id ${id} not found`));
+        }
+      }, 300);
+    });
+  }
+
   async updateMindmapTitle(id: string, name: string): Promise<any | null> {
     return new Promise((resolve, reject) => {
       setTimeout(() => {

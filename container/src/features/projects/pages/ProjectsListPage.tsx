@@ -6,6 +6,7 @@ import ProjectControls from '@/features/projects/components/ProjectControls';
 import ViewToggle, { type ViewMode } from '@/features/presentation/components/others/ViewToggle';
 import CommonTabs, { type TabItem } from '@/shared/components/common/CommonTabs';
 import MindmapTable from '@/features/mindmap/components/table/MindmapTable';
+import type { ResourceType } from '@/shared/constants/resourceTypes';
 
 const ProjectListPage = () => {
   const { t } = useTranslation('projects');
@@ -77,7 +78,7 @@ const ProjectListPage = () => {
     <>
       <div className="space-y-4 px-8 py-4">
         <h1 className="text-2xl font-semibold">{t('title')}</h1>
-        <ProjectControls />
+        <ProjectControls currentResourceType={resourceType as ResourceType} />
         <CommonTabs
           value={resourceType}
           onValueChange={handleResourceChange}

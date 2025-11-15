@@ -5,7 +5,6 @@ import Demo from '@/features/demo';
 import NotFoundPage from '@/shared/pages/NotFoundPage';
 import { CriticalError } from '@/types/errors';
 import Mindmap from '@/features/mindmap';
-import { getMindmapById } from '@/features/mindmap/hooks/loaders';
 import { getPresentationById } from '@/features/presentation/hooks/loaders';
 import Projects from '@/features/projects';
 import Settings from '@/features/settings';
@@ -61,13 +60,8 @@ const router = createBrowserRouter([
         Component: Image.ImageDetailPage,
       },
       {
-        path: 'mindmap',
+        path: 'mindmap/:id',
         Component: Mindmap.MindmapPage,
-        // TODO: checkout this loader
-        loader: async () => {
-          const mindmap = await getMindmapById('1');
-          return { mindmap };
-        },
       },
       {
         path: 'presentation',

@@ -171,3 +171,61 @@ export const useCreateBlankMindmap = () => {
     },
   });
 };
+
+export const useUpdateMindmap = () => {
+  const mindmapApiService = useMindmapApiService();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, data }: { id: string; data: Partial<MindmapData> }) => {
+      const result = await mindmapApiService.updateMindmap(id, data);
+      return { id, data: result };
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({
+        queryKey: [mindmapApiService.getType(), 'mindmaps'],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: [mindmapApiService.getType(), 'mindmap', data.id],
+      });
+    },
+  });
+};
+
+export const useDeleteMindmap = () => {
+  const mindmapApiService = useMindmapApiService();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      await mindmapApiService.deleteMindmap(id);
+      return id;
+    },
+    onSuccess: (deletedId) => {
+      queryClient.invalidateQueries({
+        queryKey: [mindmapApiService.getType(), 'mindmaps'],
+      });
+
+      queryClient.removeQueries({
+        queryKey: [mindmapApiService.getType(), 'mindmap', deletedId],
+      });
+    },
+  });
+};
+
+export const useCreateTestMindmaps = () => {
+  const mindmapApiService = useMindmapApiService();
+
+  return useMutation({
+    mutationFn: async () => {
+      // Read from /public/data/mindmap.json
+      const response = await fetch('/data/mindmap.json');
+      const mindmap = await response.json();
+
+      const createdMindmap = await mindmapApiService.createMindmap(mindmap);
+
+      return createdMindmap;
+    },
+  });
+};

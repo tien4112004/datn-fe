@@ -40,6 +40,15 @@ export default class MindmapRealApiService implements MindmapApiService {
     return response.data.data;
   }
 
+  async updateMindmap(id: string, data: Partial<MindmapData>): Promise<MindmapData> {
+    const response = await api.put<ApiResponse<MindmapData>>(`${this.baseUrl}/api/mindmaps/${id}`, data);
+    return response.data.data;
+  }
+
+  async deleteMindmap(id: string): Promise<void> {
+    await api.delete(`${this.baseUrl}/api/mindmaps/${id}`);
+  }
+
   async updateMindmapTitle(id: string, name: string): Promise<any | null> {
     await api.patch(`${this.baseUrl}/api/mindmaps/${id}/title`, {
       title: name,

@@ -6,6 +6,7 @@ import NotFoundPage from '@/shared/pages/NotFoundPage';
 import { CriticalError } from '@/types/errors';
 import Mindmap from '@/features/mindmap';
 import { getPresentationById } from '@/features/presentation/hooks/loaders';
+import { getMindmapById } from '@/features/mindmap/hooks/loaders';
 import Projects from '@/features/projects';
 import Settings from '@/features/settings';
 import Image from '@/features/image';
@@ -62,6 +63,7 @@ const router = createBrowserRouter([
       {
         path: 'mindmap/:id',
         Component: Mindmap.MindmapPage,
+        loader: getMindmapById,
       },
       {
         path: 'presentation',

@@ -6,7 +6,7 @@ import { DevTools } from '@/features/mindmap/components/ui/devtools';
 import { Flow, LogicHandler, Toolbar } from '@/features/mindmap/components';
 import { useState, useEffect } from 'react';
 import { useLoaderData } from 'react-router-dom';
-import { useCoreStore } from '../stores';
+import { useCoreStore, useLayoutStore, useMetadataStore } from '../stores';
 import type { MindmapData } from '../types/service';
 
 const MindmapPage = () => {
@@ -14,14 +14,31 @@ const MindmapPage = () => {
   const { mindmap } = useLoaderData() as { mindmap: MindmapData };
   const setNodes = useCoreStore((state) => state.setNodes);
   const setEdges = useCoreStore((state) => state.setEdges);
+  const setLayout = useLayoutStore((state) => state.setLayout);
+  const setAutoLayoutEnabled = useLayoutStore((state) => state.setAutoLayoutEnabled);
+  const setMetadata = useMetadataStore((state) => state.setMetadata);
 
-  // Sync mindmap data from React Router loader to React Flow
+  // Sync mindmap data from React Router loader to stores
   useEffect(() => {
     if (mindmap) {
       setNodes(mindmap.nodes);
       setEdges(mindmap.edges);
+
+      // Sync metadata if available
+      if (mindmap.metadata) {
+        setMetadata(mindmap.metadata);
+
+        // Sync direction to layout store
+        if (mindmap.metadata.direction) {
+          setLayout(mindmap.metadata.direction);
+        }
+
+        if (mindmap.metadata.forceLayout) {
+          setAutoLayoutEnabled(mindmap.metadata.forceLayout);
+        }
+      }
     }
-  }, [mindmap, setNodes, setEdges]);
+  }, [mindmap, setNodes, setEdges, setLayout, setMetadata]);
 
   const togglePanOnDrag = () => {
     setIsPanOnDrag(!isPanOnDrag);

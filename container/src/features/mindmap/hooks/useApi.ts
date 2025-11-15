@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import type { MindmapData } from '../types/service';
 import type { ApiResponse } from '@/shared/types/api';
 import { ExpectedError } from '@/types/errors';
+import { useMetadataStore } from '../stores';
 
 // Return types for the hooks
 export interface UseMindmapsReturn extends Omit<UseQueryResult<ApiResponse<MindmapData[]>>, 'data'> {
@@ -179,6 +180,38 @@ export const useUpdateMindmap = () => {
   return useMutation({
     mutationFn: async ({ id, data }: { id: string; data: Partial<MindmapData> }) => {
       const result = await mindmapApiService.updateMindmap(id, data);
+      return { id, data: result };
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({
+        queryKey: [mindmapApiService.getType(), 'mindmaps'],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: [mindmapApiService.getType(), 'mindmap', data.id],
+      });
+    },
+  });
+};
+
+export const useUpdateMindmapWithMetadata = () => {
+  const mindmapApiService = useMindmapApiService();
+  const queryClient = useQueryClient();
+  const getMetadata = useMetadataStore((state) => state.getMetadata);
+
+  return useMutation({
+    mutationFn: async ({ id, data }: { id: string; data: Partial<MindmapData> }) => {
+      // Include metadata from store in the update payload
+      const metadata = getMetadata();
+      const updateData: Partial<MindmapData> = {
+        ...data,
+      };
+
+      if (metadata) {
+        updateData.metadata = metadata;
+      }
+
+      const result = await mindmapApiService.updateMindmap(id, updateData);
       return { id, data: result };
     },
     onSuccess: (data) => {

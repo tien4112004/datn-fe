@@ -63,14 +63,8 @@ export default class AuthRealApiService implements AuthApiService {
 
   /**
    * Refresh access token
-   *
-   * ⚠️ NOTE: The /api/auth/refresh endpoint is NOT implemented in the backend.
-   * Token refresh would need to be handled through Keycloak's standard OAuth2 token endpoint.
-   * Currently, when tokens expire (401), the user is logged out and must sign in again.
    */
-  async refreshToken(refreshToken: string): Promise<{ accessToken: string }> {
-    // TODO: Implement token refresh through Keycloak OAuth2 token endpoint
-    // For now, this endpoint is not available
+  async refreshToken(_refreshToken: string): Promise<{ accessToken: string }> {
     throw new Error('Token refresh endpoint not implemented. Please sign in again.');
   }
 }

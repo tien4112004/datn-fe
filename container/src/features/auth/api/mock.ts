@@ -118,9 +118,6 @@ export default class AuthMockService implements AuthApiService {
 
   /**
    * Mock refresh token - simulates refreshing access token
-   *
-   * ⚠️ NOTE: The /api/auth/refresh endpoint is NOT implemented in the backend.
-   * This mock implementation is kept for testing purposes only.
    */
   async refreshToken(_refreshToken: string): Promise<{ accessToken: string }> {
     // Simulate network delay

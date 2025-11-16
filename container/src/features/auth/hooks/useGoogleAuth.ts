@@ -19,6 +19,10 @@ export const useGoogleLogin = () => {
       // Get Google OAuth URL from backend
       const response = await oauthService.getGoogleAuthUrl(redirectUri);
 
+      if (!response.url) {
+        throw new Error('No authorization URL received from backend');
+      }
+
       return response.url;
     },
     onSuccess: (authUrl) => {

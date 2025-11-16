@@ -37,14 +37,17 @@ export class OAuthService {
    * @returns Promise with Google authorization URL
    */
   async getGoogleAuthUrl(redirectUri: string): Promise<GoogleAuthorizeResponse> {
-    const response = await api.get<{ data: GoogleAuthorizeResponse }>(
+    const response = await api.get<{ data?: GoogleAuthorizeResponse; message?: string }>(
       `${this.baseUrl}/api/auth/google/authorize`,
       {
         params: { redirectUri },
       }
     );
 
-    return response.data.data || response.data;
+    // Backend returns URL in 'message' field for string responses
+    const url = response.data.data?.url || response.data.message;
+
+    return { url: url || '' };
   }
 
   /**

@@ -35,6 +35,8 @@ export default {
     save: {
       save: 'Lưu',
       saving: 'Đang lưu...',
+      success: 'Lưu sơ đồ tư duy thành công',
+      error: 'Lưu sơ đồ tư duy thất bại',
     },
   },
 };

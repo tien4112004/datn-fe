@@ -84,7 +84,7 @@ const MindmapPage = () => {
 
             <Background variant={BackgroundVariant.Dots} gap={20} size={1} />
             <DevTools position="bottom-center" />
-            <LogicHandler />
+            <LogicHandler mindmapId={mindmap.id} />
           </Flow>
         </div>
       </ReactFlowProvider>

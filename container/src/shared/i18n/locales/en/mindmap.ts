@@ -35,6 +35,8 @@ export default {
     save: {
       save: 'Save',
       saving: 'Saving...',
+      success: 'Mindmap saved successfully',
+      error: 'Failed to save mindmap',
     },
   },
 };

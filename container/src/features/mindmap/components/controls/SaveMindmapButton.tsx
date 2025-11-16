@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Save } from 'lucide-react';
-import { useSaveMindmapWithThumbnail } from '../../hooks/useSaveMindmapWithThumbnail';
+import { useSaveMindmap } from '../../hooks/useSaveMindmap';
 import { useTranslation } from 'react-i18next';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 
@@ -11,7 +11,7 @@ interface SaveMindmapButtonProps {
 
 function SaveMindmapButton({ mindmapId, className }: SaveMindmapButtonProps) {
   const { t } = useTranslation(I18N_NAMESPACES.MINDMAP);
-  const { saveWithThumbnail, isLoading } = useSaveMindmapWithThumbnail();
+  const { saveWithThumbnail, isLoading } = useSaveMindmap();
 
   const handleSave = async () => {
     await saveWithThumbnail(mindmapId);

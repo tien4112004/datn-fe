@@ -12,7 +12,7 @@ import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 const imageWidth = 2048;
 const imageHeight = 2048;
 
-export const useSaveMindmapWithThumbnail = () => {
+export const useSaveMindmap = () => {
   const { t } = useTranslation(I18N_NAMESPACES.MINDMAP);
   const { getNodes } = useReactFlow();
   const { nodes, edges } = useCoreStore();
@@ -63,10 +63,10 @@ export const useSaveMindmapWithThumbnail = () => {
       const markSaved = useDirtyStore.getState().markSaved;
       markSaved();
 
-      toast.success(t('toolbar.save.success', 'Mindmap saved successfully'));
+      toast.success(t('toolbar.save.success'));
     } catch (error) {
       console.error('Failed to save mindmap with thumbnail:', error);
-      toast.error(t('toolbar.save.error', 'Failed to save mindmap'));
+      toast.error(t('toolbar.save.error'));
       throw error;
     } finally {
       setIsGeneratingThumbnail(false);

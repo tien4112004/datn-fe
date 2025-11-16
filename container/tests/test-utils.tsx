@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { MemoryRouter, RouterProvider, createMemoryRouter, type RouteObject } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ApiSwitchingProvider } from '@/shared/context/api-switching';
+import { AuthProvider } from '@/shared/context/auth';
 import { I18nextProvider } from 'react-i18next';
 import i18n from '@/shared/i18n';
 import { vi } from 'vitest';
@@ -14,6 +15,7 @@ interface ExtendedRenderOptions extends Omit<RenderOptions, 'wrapper'> {
   routes?: RouteObject[];
   queryClient?: QueryClient;
   excludeProviders?: string[];
+  includeProviders?: string[];
 }
 
 Object.defineProperty(window, 'matchMedia', {
@@ -41,6 +43,7 @@ Object.defineProperty(window, 'matchMedia', {
  * @param {RouteObject[]} [options.routes] - Custom route objects for RouterProvider (for routing tests).
  * @param {QueryClient} [options.queryClient] - Custom QueryClient instance for React Query.
  * @param {string[]} [options.excludeProviders] - Array of provider names to exclude (e.g., ['i18n', 'react-query', 'api']).
+ * @param {string[]} [options.includeProviders] - Array of provider names to include (e.g., ['auth']). Only these providers will be included.
  * @param {...RenderOptions} [options.renderOptions] - Other @testing-library/react render options.
  * @returns {ReturnType<typeof render>} The result of RTL's render() with all providers applied.
  *
@@ -62,6 +65,10 @@ Object.defineProperty(window, 'matchMedia', {
  * @example
  * // Exclude i18n and react-query providers
  * renderWithProviders(<MyComponent />, { excludeProviders: ['i18n', 'react-query'] });
+ *
+ * @example
+ * // Include auth provider only
+ * renderWithProviders(<MyComponent />, { includeProviders: ['auth'] });
  */
 const renderWithProviders = (
   ui: React.ReactElement,
@@ -77,6 +84,7 @@ const renderWithProviders = (
       },
     }),
     excludeProviders = [],
+    includeProviders = [],
     ...renderOptions
   }: ExtendedRenderOptions = {}
 ) => {
@@ -98,6 +106,11 @@ const renderWithProviders = (
     // ApiSwitchingProvider
     if (!excludeProviders.includes('api')) {
       node = <ApiSwitchingProvider>{node}</ApiSwitchingProvider>;
+    }
+
+    // AuthProvider (opt-in via includeProviders)
+    if (includeProviders.includes('auth')) {
+      node = <AuthProvider>{node}</AuthProvider>;
     }
 
     // QueryClientProvider

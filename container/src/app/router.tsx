@@ -12,6 +12,7 @@ import Settings from '@/features/settings';
 import Image from '@/features/image';
 import { LoginPage } from '@/features/auth/pages/LoginPage';
 import { RegisterPage } from '@/features/auth/pages/RegisterPage';
+import GoogleCallbackPage from '@/features/auth/pages/GoogleCallbackPage';
 import { ProtectedRoute } from '@/shared/components/ProtectedRoute';
 
 const router = createBrowserRouter([
@@ -22,6 +23,10 @@ const router = createBrowserRouter([
   {
     path: '/register',
     element: <RegisterPage />,
+  },
+  {
+    path: '/auth/google/callback',
+    element: <GoogleCallbackPage />,
   },
   {
     element: (

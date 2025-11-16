@@ -11,10 +11,12 @@ import { Checkbox } from '@/shared/components/ui/checkbox';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/shared/components/ui/form';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 import { useLogin } from '../hooks/useAuth';
+import { useGoogleLogin } from '../hooks/useGoogleAuth';
 
 export function LoginForm() {
   const { t, i18n } = useTranslation(I18N_NAMESPACES.AUTH);
   const loginMutation = useLogin();
+  const googleLoginMutation = useGoogleLogin();
 
   const loginSchema = useMemo(
     () =>
@@ -138,8 +140,8 @@ export function LoginForm() {
           type="button"
           variant="outline"
           className="w-full"
-          disabled={loginMutation.isPending}
-          onClick={() => toast.info(t('login.googleComingSoon'))}
+          disabled={loginMutation.isPending || googleLoginMutation.isPending}
+          onClick={() => googleLoginMutation.mutate()}
         >
           <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
             <path

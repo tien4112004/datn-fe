@@ -19,11 +19,7 @@ const mockMindmaps: MindmapData[] = [
       'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="120"%3E%3Crect fill="%23f0f0f0" width="200" height="120"/%3E%3Ctext x="50%25" y="50%25" text-anchor="middle" dy=".3em" fill="%23999" font-family="sans-serif"%3EArchitecture%3C/text%3E%3C/svg%3E',
     metadata: {
       direction: 'horizontal',
-      forceLayout: {
-        enabled: true,
-        strength: 0.5,
-        distance: 100,
-      },
+      forceLayout: false,
     },
     nodes: [
       {
@@ -225,9 +221,7 @@ const mockMindmaps: MindmapData[] = [
       'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="120"%3E%3Crect fill="%23e3f2fd" width="200" height="120"/%3E%3Ctext x="50%25" y="50%25" text-anchor="middle" dy=".3em" fill="%231976d2" font-family="sans-serif"%3EPlanning%3C/text%3E%3C/svg%3E',
     metadata: {
       direction: 'vertical',
-      forceLayout: {
-        enabled: false,
-      },
+      forceLayout: false,
     },
     nodes: [
       {
@@ -260,11 +254,7 @@ const mockMindmaps: MindmapData[] = [
       'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="120"%3E%3Crect fill="%23f3e5f5" width="200" height="120"/%3E%3Ctext x="50%25" y="50%25" text-anchor="middle" dy=".3em" fill="%237b1fa2" font-family="sans-serif"%3ELearning%3C/text%3E%3C/svg%3E',
     metadata: {
       direction: 'horizontal',
-      forceLayout: {
-        enabled: true,
-        strength: 0.3,
-        distance: 80,
-      },
+      forceLayout: true,
     },
     nodes: [
       {

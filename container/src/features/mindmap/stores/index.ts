@@ -6,3 +6,4 @@ export { useNodeOperationsStore } from './nodeOperation';
 export { useNodeManipulationStore } from './nodeManipulation';
 export { useUndoRedoStore } from './undoredo';
 export { useMetadataStore } from './metadata';
+export { useDirtyStore } from './dirty';

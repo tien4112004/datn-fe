@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { useReactFlow, getNodesBounds, getViewportForBounds } from '@xyflow/react';
 import { toPng } from 'html-to-image';
+import { useMetadataStore } from '../../stores/metadata';
 
 function downloadImage(dataUrl: string) {
   const a = document.createElement('a');
@@ -15,6 +16,8 @@ const imageHeight = 2048;
 
 function DownloadButton({ className }: { className?: string }) {
   const { getNodes } = useReactFlow();
+  const setThumbnail = useMetadataStore((state) => state.setThumbnail);
+
   const onClick = () => {
     const nodesBounds = getNodesBounds(getNodes());
     const viewport = getViewportForBounds(nodesBounds, imageWidth, imageHeight, 0.5, 2, 0.5);
@@ -29,7 +32,12 @@ function DownloadButton({ className }: { className?: string }) {
         transform: `translate(${viewport.x}px, ${viewport.y}px) scale(${viewport.zoom})`,
       },
       skipFonts: true,
-    }).then(downloadImage);
+    }).then((dataUrl) => {
+      // Store thumbnail in metadata store
+      setThumbnail(dataUrl);
+      // Download the image
+      downloadImage(dataUrl);
+    });
   };
 
   return (

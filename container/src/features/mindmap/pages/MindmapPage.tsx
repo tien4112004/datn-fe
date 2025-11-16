@@ -7,6 +7,9 @@ import { Flow, LogicHandler, Toolbar } from '@/features/mindmap/components';
 import { useState, useEffect } from 'react';
 import { useLoaderData } from 'react-router-dom';
 import { useCoreStore, useLayoutStore, useMetadataStore } from '../stores';
+import { useMindmapDirtyTracking } from '../hooks/useMindmapDirtyTracking';
+import { useUnsavedChangesBlocker } from '@/shared/hooks';
+import { UnsavedChangesDialog } from '@/shared/components/modals/UnsavedChangesDialog';
 import type { MindmapData } from '../types/service';
 
 const MindmapPage = () => {
@@ -17,6 +20,14 @@ const MindmapPage = () => {
   const setLayout = useLayoutStore((state) => state.setLayout);
   const setAutoLayoutEnabled = useLayoutStore((state) => state.setAutoLayoutEnabled);
   const setMetadata = useMetadataStore((state) => state.setMetadata);
+
+  // Track dirty state changes
+  useMindmapDirtyTracking();
+
+  // Handle unsaved changes blocking
+  const { showDialog, setShowDialog, handleStay, handleProceed } = useUnsavedChangesBlocker({
+    eventName: 'app.mindmap.dirty-state-changed',
+  });
 
   // Sync mindmap data from React Router loader to stores
   useEffect(() => {
@@ -45,37 +56,45 @@ const MindmapPage = () => {
   };
 
   return (
-    <ReactFlowProvider>
-      <div className="h-screen w-full" style={{ backgroundColor: 'var(--background)' }}>
-        <Toolbar />
-        <Flow isPanOnDrag={isPanOnDrag}>
-          <Controls>
-            <ControlButton
-              onClick={togglePanOnDrag}
-              title={isPanOnDrag ? 'Switch to Selection Mode' : 'Switch to Pan Mode'}
-            >
-              {isPanOnDrag ? <MousePointer2 size={16} /> : <Move size={16} />}
-            </ControlButton>
-          </Controls>
+    <>
+      <ReactFlowProvider>
+        <div className="h-screen w-full" style={{ backgroundColor: 'var(--background)' }}>
+          <Toolbar mindmapId={mindmap.id} />
+          <Flow isPanOnDrag={isPanOnDrag}>
+            <Controls>
+              <ControlButton
+                onClick={togglePanOnDrag}
+                title={isPanOnDrag ? 'Switch to Selection Mode' : 'Switch to Pan Mode'}
+              >
+                {isPanOnDrag ? <MousePointer2 size={16} /> : <Move size={16} />}
+              </ControlButton>
+            </Controls>
 
-          <MiniMap
-            className="!border-border !bg-white/90"
-            style={{
-              border: '1px solid var(--border)',
-              backgroundColor: 'var(--muted)',
-            }}
-            nodeStrokeColor="var(--primary)"
-            nodeColor="var(--primary)"
-            nodeBorderRadius={8}
-            position="top-left"
-          />
+            <MiniMap
+              className="!border-border !bg-white/90"
+              style={{
+                border: '1px solid var(--border)',
+                backgroundColor: 'var(--muted)',
+              }}
+              nodeStrokeColor="var(--primary)"
+              nodeColor="var(--primary)"
+              nodeBorderRadius={8}
+              position="top-left"
+            />
 
-          <Background variant={BackgroundVariant.Dots} gap={20} size={1} />
-          <DevTools position="bottom-center" />
-          <LogicHandler />
-        </Flow>
-      </div>
-    </ReactFlowProvider>
+            <Background variant={BackgroundVariant.Dots} gap={20} size={1} />
+            <DevTools position="bottom-center" />
+            <LogicHandler />
+          </Flow>
+        </div>
+      </ReactFlowProvider>
+      <UnsavedChangesDialog
+        open={showDialog}
+        onOpenChange={setShowDialog}
+        onStay={handleStay}
+        onLeave={handleProceed}
+      />
+    </>
   );
 };
 

@@ -5,8 +5,8 @@ import { useLoaderData, useParams } from 'react-router-dom';
 import type { Presentation } from '../types';
 import { getSearchParamAsBoolean } from '@/shared/utils/searchParams';
 import { useDetailPresentation } from '../hooks/useDetailPresentation';
-import { useUnsavedChangesBlocker } from '../hooks/useUnsavedChangesBlocker';
-import { UnsavedChangesDialog } from '../components/UnsavedChangesDialog';
+import { useUnsavedChangesBlocker } from '@/shared/hooks';
+import { UnsavedChangesDialog } from '@/shared/components/modals/UnsavedChangesDialog';
 
 const DetailPage = () => {
   const { presentation } = useLoaderData() as { presentation: Presentation | null };
@@ -20,7 +20,9 @@ const DetailPage = () => {
     isGeneratingParam
   );
 
-  const { showDialog, setShowDialog, handleStay, handleProceed } = useUnsavedChangesBlocker();
+  const { showDialog, setShowDialog, handleStay, handleProceed } = useUnsavedChangesBlocker({
+    eventName: 'app.presentation.dirty-state-changed',
+  });
 
   const { t } = useTranslation('glossary', { keyPrefix: 'loading' });
 

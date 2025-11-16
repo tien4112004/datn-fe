@@ -5,6 +5,7 @@
 import common from './common';
 import glossary from './glossary';
 import errors from './errors';
+import auth from './auth';
 
 import presentation from './presentation';
 import mindmap from './mindmap';
@@ -16,6 +17,7 @@ export default {
   common,
   glossary,
   errors,
+  auth,
 
   presentation,
   mindmap,

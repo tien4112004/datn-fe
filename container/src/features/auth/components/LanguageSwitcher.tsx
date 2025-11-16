@@ -1,0 +1,62 @@
+import { useTranslation } from 'react-i18next';
+import { Popover, PopoverTrigger, PopoverContent } from '@/shared/components/ui/popover';
+import { Button } from '@/shared/components/ui/button';
+import { Check } from 'lucide-react';
+import clsx from 'clsx';
+import { useState } from 'react';
+
+const LANGUAGES = [
+  { code: 'en', name: 'English', flag: '🇬🇧' },
+  { code: 'vi', name: 'Tiếng Việt', flag: '🇻🇳' },
+];
+
+export function LanguageSwitcher() {
+  const { i18n } = useTranslation();
+  const [open, setOpen] = useState(false);
+
+  const current = LANGUAGES.find((l) => l.code === i18n.language) ?? LANGUAGES[0];
+
+  const change = (code: string) => {
+    if (code !== i18n.language) i18n.changeLanguage(code);
+    setOpen(false);
+    window.dispatchEvent(new Event('languageChanged'));
+  };
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button variant="outline" size="sm" className="gap-2">
+          <span>{current.flag}</span>
+          <span>{current.name}</span>
+        </Button>
+      </PopoverTrigger>
+
+      <PopoverContent align="end" className="w-44 p-0">
+        <div className="grid">
+          {LANGUAGES.map((language, index) => {
+            const active = language.code === i18n.language;
+            return (
+              <Button
+                key={language.code}
+                variant="ghost"
+                className={clsx(
+                  'hover:bg-primary hover:text-primary-foreground w-full justify-start px-3 text-left',
+                  active && 'bg-accent hover:bg-secondary hover:text-secondary-foreground',
+                  index === 0 && 'rounded-bl-none rounded-br-none',
+                  index === LANGUAGES.length - 1 && 'rounded-tl-none rounded-tr-none'
+                )}
+                onClick={() => {
+                  change(language.code);
+                }}
+              >
+                <span className="text-lg leading-none">{language.flag}</span>
+                <span>{language.name}</span>
+                {active && <Check className="ml-auto h-4 w-4" />}
+              </Button>
+            );
+          })}
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+}

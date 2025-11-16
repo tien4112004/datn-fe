@@ -1,17 +1,13 @@
 import { useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-  CardFooter,
-} from '@/shared/components/ui/card';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/shared/context/auth';
 import { LoginForm } from '../components/LoginForm';
+import { LanguageSwitcher } from '../components/LanguageSwitcher';
+import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 
 export function LoginPage() {
+  const { t } = useTranslation(I18N_NAMESPACES.AUTH);
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
@@ -23,33 +19,43 @@ export function LoginPage() {
   }, [isAuthenticated, navigate]);
 
   return (
-    <div className="bg-muted/30 flex min-h-screen items-center justify-center px-4">
-      <div className="w-full max-w-md">
-        <Card>
-          <CardHeader className="space-y-1 text-center">
-            <CardTitle className="text-2xl">Welcome back</CardTitle>
-            <CardDescription>Enter your credentials to access your account</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <LoginForm />
-          </CardContent>
-          <CardFooter className="flex flex-col space-y-4">
-            <div className="text-muted-foreground text-center text-sm">
-              Don't have an account?{' '}
-              <Link to="/register" className="text-primary font-medium underline-offset-4 hover:underline">
-                Sign up
-              </Link>
-            </div>
-            <div className="text-muted-foreground border-t pt-4 text-center text-sm">
-              <p className="font-medium">Demo Accounts:</p>
-              <div className="mt-2 space-y-1 text-xs">
-                <p>test@example.com / password123</p>
-                <p>admin@example.com / admin123</p>
-                <p>demo@example.com / demo123</p>
-              </div>
-            </div>
-          </CardFooter>
-        </Card>
+    <div className="relative flex min-h-screen">
+      {/* Language Switcher - Fixed top-right */}
+      <div className="absolute right-4 top-4 z-10">
+        <LanguageSwitcher />
+      </div>
+
+      {/* Left side - Image */}
+      <div className="bg-muted relative hidden lg:block lg:w-2/3">
+        <img
+          src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80"
+          alt="Login"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+        <div className="from-background/80 via-background/50 to-background/30 absolute inset-0 bg-gradient-to-t" />
+        <div className="absolute bottom-0 left-0 right-0 p-12 text-white">
+          <h2 className="mb-4 text-4xl font-bold">{t('login.heroTitle')}</h2>
+          <p className="text-lg text-white/90">{t('login.heroSubtitle')}</p>
+        </div>
+      </div>
+
+      {/* Right side - Form */}
+      <div className="flex w-full items-center justify-center p-8 lg:w-1/3">
+        <div className="w-full max-w-md space-y-8">
+          <div className="space-y-2">
+            <h1 className="text-3xl font-bold tracking-tight">{t('login.title')}</h1>
+            <p className="text-muted-foreground">{t('login.subtitle')}</p>
+          </div>
+
+          <LoginForm />
+
+          <div className="text-muted-foreground text-center text-sm">
+            {t('login.noAccount')}{' '}
+            <Link to="/register" className="text-primary font-medium underline-offset-4 hover:underline">
+              {t('login.signUp')}
+            </Link>
+          </div>
+        </div>
       </div>
     </div>
   );

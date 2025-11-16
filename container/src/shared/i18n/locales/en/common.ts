@@ -74,15 +74,15 @@ export default {
     loading: 'Loading models...',
     error: 'Error loading models',
   },
+  unsavedChanges: {
+    title: 'Unsaved Changes',
+    description: 'You have unsaved changes. Are you sure you want to leave? Your changes will be lost.',
+    stay: 'Stay',
+    leave: 'Leave',
+  },
   presentation: {
     saveSuccess: 'Presentation saved successfully',
     saveFailed: 'Failed to save presentation',
     processFailed: 'Failed to process presentation',
-    unsavedChanges: {
-      title: 'Unsaved Changes',
-      description: 'You have unsaved changes. Are you sure you want to leave? Your changes will be lost.',
-      stay: 'Stay',
-      leave: 'Leave',
-    },
   },
 };

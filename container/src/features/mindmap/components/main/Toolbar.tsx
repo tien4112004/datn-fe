@@ -10,7 +10,7 @@ import {
 } from '@/shared/components/ui/dropdown-menu';
 import { useLayoutStore } from '../../stores/layout';
 import { useUndoRedoStore, useCoreStore, useNodeOperationsStore } from '../../stores';
-import { useReactFlow, useUpdateNodeInternals } from '@xyflow/react';
+import { useUpdateNodeInternals } from '@xyflow/react';
 import { useTranslation } from 'react-i18next';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 import DownloadButton from '../controls/DownloadButton';
@@ -33,7 +33,6 @@ const Toolbar = ({ mindmapId }: { mindmapId: string }) => {
   const setAutoLayoutEnabled = useLayoutStore((state) => state.setAutoLayoutEnabled);
   const updateNodeDirection = useLayoutStore((state) => state.updateNodeDirection);
   const applyAutoLayout = useLayoutStore((state) => state.applyAutoLayout);
-  const { fitView } = useReactFlow();
   const updateNodeInternals = useUpdateNodeInternals();
 
   const handleDirectionChange = (value: Direction) => {
@@ -47,7 +46,6 @@ const Toolbar = ({ mindmapId }: { mindmapId: string }) => {
       // When auto-layout is disabled, only update handles/controls
       updateNodeDirection(value, updateNodeInternals);
     }
-    fitView();
   };
 
   const handleAutoLayoutChange = (checked: boolean | 'indeterminate') => {

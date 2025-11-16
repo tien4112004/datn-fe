@@ -23,10 +23,10 @@ function SaveMindmapButton({ mindmapId, className }: SaveMindmapButtonProps) {
       onClick={handleSave}
       disabled={isLoading}
       className={className}
-      title={t('toolbar.tooltips.saveMindmap', 'Save Mindmap')}
+      title={t('toolbar.tooltips.saveMindmap')}
     >
       <Save size={16} />
-      {isLoading ? t('toolbar.save.saving', 'Saving...') : t('toolbar.save.save', 'Save')}
+      {isLoading ? t('toolbar.save.saving') : t('toolbar.save.save')}
     </Button>
   );
 }

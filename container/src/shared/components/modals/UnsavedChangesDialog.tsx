@@ -41,21 +41,21 @@ export const UnsavedChangesDialog = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="z-1000 cursor-default">
         <DialogHeader>
-          <DialogTitle>{title || t('presentation.unsavedChanges.title', 'Unsaved Changes')}</DialogTitle>
+          <DialogTitle>{title || t('unsavedChanges.title', 'Unsaved Changes')}</DialogTitle>
           <DialogDescription>
             {description ||
               t(
-                'presentation.unsavedChanges.description',
-                'You have unsaved changes. Do you want to save them before leaving?'
+                'unsavedChanges.description',
+                'You have unsaved changes. Are you sure you want to leave? Your changes will be lost.'
               )}
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
           <Button variant="outline" onClick={onStay}>
-            {stayLabel || t('presentation.unsavedChanges.stay', 'Stay')}
+            {stayLabel || t('unsavedChanges.stay', 'Stay')}
           </Button>
           <Button variant="destructive" onClick={onLeave}>
-            {leaveLabel || t('presentation.unsavedChanges.leave', 'Leave')}
+            {leaveLabel || t('unsavedChanges.leave', 'Leave')}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -1,6 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { toast } from 'sonner';
 import { useAuth as useAuthContext } from '@/shared/context/auth';
 import { useAuthApiService } from '../api';
 import type { LoginRequest, SignupRequest } from '@/shared/types/auth';

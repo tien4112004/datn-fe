@@ -15,16 +15,6 @@ import { cn } from '@/shared/lib/utils';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 import { useRegister } from '../hooks/useAuth';
 
-type RegisterFormValues = {
-  email: string;
-  password: string;
-  confirmPassword: string;
-  firstName: string;
-  lastName: string;
-  dateOfBirth: Date | undefined;
-  phoneNumber?: string;
-};
-
 export function RegisterForm() {
   const { t, i18n } = useTranslation(I18N_NAMESPACES.AUTH);
   const registerMutation = useRegister();
@@ -62,7 +52,8 @@ export function RegisterForm() {
               const adjustedAge =
                 monthDiff < 0 || (monthDiff === 0 && today.getDate() < date.getDate()) ? age - 1 : age;
               return adjustedAge >= 13 && adjustedAge <= 120;
-            }, t('validation.ageRequirement')),
+            }, t('validation.ageRequirement'))
+            .optional(),
           phoneNumber: z
             .string()
             .optional()
@@ -75,7 +66,10 @@ export function RegisterForm() {
     [t]
   );
 
-  const form = useForm<RegisterFormValues>({
+  type RegisterFormInput = z.input<typeof registerSchema>;
+  type RegisterFormOutput = z.output<typeof registerSchema>;
+
+  const form = useForm<RegisterFormInput, unknown, RegisterFormOutput>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
       email: '',
@@ -93,7 +87,7 @@ export function RegisterForm() {
     form.clearErrors();
   }, [i18n.language, form]);
 
-  const onSubmit = async (data: RegisterFormValues) => {
+  const onSubmit = async (data: RegisterFormOutput) => {
     if (!data.dateOfBirth) return;
 
     registerMutation.mutate(

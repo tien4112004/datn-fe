@@ -12,12 +12,6 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 import { useLogin } from '../hooks/useAuth';
 
-type LoginFormValues = {
-  email: string;
-  password: string;
-  rememberMe: boolean;
-};
-
 export function LoginForm() {
   const { t, i18n } = useTranslation(I18N_NAMESPACES.AUTH);
   const loginMutation = useLogin();
@@ -32,7 +26,10 @@ export function LoginForm() {
     [t]
   );
 
-  const form = useForm<LoginFormValues>({
+  type LoginFormInput = z.input<typeof loginSchema>;
+  type LoginFormOutput = z.output<typeof loginSchema>;
+
+  const form = useForm<LoginFormInput, unknown, LoginFormOutput>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
       email: '',
@@ -46,7 +43,7 @@ export function LoginForm() {
     form.clearErrors();
   }, [i18n.language, form]);
 
-  const onSubmit = async (data: LoginFormValues) => {
+  const onSubmit = async (data: LoginFormOutput) => {
     loginMutation.mutate(
       { email: data.email, password: data.password },
       {

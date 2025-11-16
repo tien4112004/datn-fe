@@ -5,11 +5,44 @@ interface DirtyStateChangedDetail {
   isDirty: boolean;
 }
 
-export const useUnsavedChangesBlocker = () => {
+export interface UseUnsavedChangesBlockerOptions {
+  /**
+   * Custom event name to listen for dirty state changes
+   * Default: 'app.unsaved-changes'
+   */
+  eventName?: string;
+}
+
+/**
+ * Shared hook to block navigation when there are unsaved changes
+ * Can be used by any feature that dispatches a custom event with dirty state
+ *
+ * @param options Configuration options for the blocker
+ * @returns Object with dialog state and handlers
+ *
+ * @example
+ * ```tsx
+ * // In your store/dirty state:
+ * window.dispatchEvent(
+ *   new CustomEvent('app.my-feature.dirty-state-changed', {
+ *     detail: { isDirty: true }
+ *   })
+ * );
+ *
+ * // In your component:
+ * const { showDialog, setShowDialog, handleStay, handleProceed } =
+ *   useUnsavedChangesBlocker({
+ *     eventName: 'app.my-feature.dirty-state-changed'
+ *   });
+ * ```
+ */
+export const useUnsavedChangesBlocker = (options: UseUnsavedChangesBlockerOptions = {}) => {
+  const { eventName = 'app.unsaved-changes' } = options;
+
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [showDialog, setShowDialog] = useState(false);
 
-  // Listen to dirty state changes from Vue app
+  // Listen to dirty state changes
   useEffect(() => {
     const handleDirtyStateChange = (event: Event) => {
       const customEvent = event as CustomEvent<DirtyStateChangedDetail>;
@@ -17,14 +50,14 @@ export const useUnsavedChangesBlocker = () => {
     };
 
     const listener = handleDirtyStateChange as unknown as EventListener;
-    window.addEventListener('app.presentation.dirty-state-changed', listener);
+    window.addEventListener(eventName, listener);
 
     return () => {
-      window.removeEventListener('app.presentation.dirty-state-changed', listener);
+      window.removeEventListener(eventName, listener);
       // Reset dirty state when component unmounts
       setHasUnsavedChanges(false);
     };
-  }, []);
+  }, [eventName]);
 
   // Block navigation when there are unsaved changes
   const blocker = useBlocker(
@@ -47,7 +80,6 @@ export const useUnsavedChangesBlocker = () => {
   const handleProceed = () => {
     setShowDialog(false);
     blocker.proceed?.();
-    setShowDialog(false);
   };
 
   const handleStay = () => {

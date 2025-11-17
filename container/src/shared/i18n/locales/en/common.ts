@@ -51,6 +51,7 @@ export default {
       renameDuplicatedMessage: 'A mindmap with this name already exists',
     },
     actions: 'Actions',
+    renameError: 'Failed to rename',
     pagination: {
       rowsPerPage: 'Rows per page',
       showing: 'Showing',

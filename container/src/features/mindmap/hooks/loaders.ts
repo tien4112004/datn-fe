@@ -1,12 +1,12 @@
 import { CriticalError } from '@/types/errors';
 import { getMindmapApiService } from '../api';
-import type { MindmapData } from '../types/service';
+import type { Mindmap } from '../types/service';
 
 export const getMindmapById = async ({
   params,
 }: {
   params: { id?: string };
-}): Promise<{ mindmap: MindmapData }> => {
+}): Promise<{ mindmap: Mindmap }> => {
   if (!params.id) {
     throw new CriticalError('Mindmap ID is required');
   }

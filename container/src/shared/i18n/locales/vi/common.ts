@@ -51,6 +51,7 @@ export default {
       renameDuplicatedMessage: 'Đã tồn tại bản đồ tư duy với tên này',
     },
     actions: 'Hành động',
+    renameError: 'Đổi tên thất bại',
     pagination: {
       rowsPerPage: 'Số hàng mỗi trang',
       showing: 'Hiển thị',

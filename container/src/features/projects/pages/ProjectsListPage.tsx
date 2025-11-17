@@ -35,7 +35,7 @@ const ProjectListPage = () => {
     {
       key: 'presentation',
       value: 'presentation',
-      label: t('resources.presentation', 'Presentation'),
+      label: t('resources.presentation'),
       // content: viewMode === 'list' ? <PresentationTable /> : <PresentationGrid />,
       content: (
         <>
@@ -47,29 +47,25 @@ const ProjectListPage = () => {
     {
       key: 'document',
       value: 'document',
-      label: t('resources.document', 'Document'),
+      label: t('resources.document'),
       content: <div className="text-muted-foreground py-8 text-center">Document resource coming soon...</div>,
     },
     {
       key: 'video',
       value: 'video',
-      label: t('resources.video', 'Video'),
+      label: t('resources.video'),
       content: <div className="text-muted-foreground py-8 text-center">Video resource coming soon...</div>,
     },
     {
       key: 'mindmap',
       value: 'mindmap',
-      label: t('resources.mindmap', 'Mindmap'),
-      content: (
-        <>
-          <MindmapTable />
-        </>
-      ),
+      label: t('resources.mindmap'),
+      content: <MindmapTable />,
     },
     {
       key: 'image',
       value: 'image',
-      label: t('resources.image', 'Image'),
+      label: t('resources.image'),
       content: <div className="text-muted-foreground py-8 text-center">Image resource coming soon...</div>,
     },
   ];

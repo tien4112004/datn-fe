@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import PresentationTable from '@/features/presentation/components/table/PresentationTable';
-import PresentationGrid from '@/features/presentation/components/others/PresentationGrid';
+import PresentationGrid from '@/features/presentation/components/table/PresentationGrid';
 import ProjectControls from '@/features/projects/components/ProjectControls';
 import ViewToggle, { type ViewMode } from '@/features/presentation/components/others/ViewToggle';
 import CommonTabs, { type TabItem } from '@/shared/components/common/CommonTabs';

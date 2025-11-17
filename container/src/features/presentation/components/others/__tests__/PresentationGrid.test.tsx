@@ -1,6 +1,6 @@
 import { screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import PresentationGrid from '../PresentationGrid';
+import PresentationGrid from '../../table/PresentationGrid';
 import { renderWithProviders } from '@/tests/test-utils';
 import type { Presentation } from '@/features/presentation/types/presentation';
 

@@ -2,14 +2,13 @@ import { createColumnHelper, getCoreRowModel, useReactTable } from '@tanstack/re
 import { useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Presentation } from '../../types/presentation';
-import { usePresentations, useUpdatePresentationTitle } from '../../hooks/useApi';
+import { usePresentationManager } from '../../hooks/usePresentationManager';
 import DataTable from '@/components/table/DataTable';
 import { ActionContent } from './ActionButton';
 import { SearchBar } from '../../../../shared/components/common/SearchBar';
 import { useNavigate } from 'react-router-dom';
 import ThumbnailWrapper from '../others/ThumbnailWrapper';
-import * as React from 'react';
-import { RenameFileDialog } from '@/shared/components/modals/RenameFileDialog';
+import { RenameFileDialog } from '@/components/modals/RenameFileDialog';
 
 const PresentationTable = () => {
   const { t } = useTranslation('common', { keyPrefix: 'table' });
@@ -79,11 +78,24 @@ const PresentationTable = () => {
     [t, formatDate]
   );
 
-  const { data, isLoading, sorting, setSorting, pagination, setPagination, totalItems, search, setSearch } =
-    usePresentations();
-  const [isRenameOpen, setIsRenameOpen] = React.useState(false);
-  const [selectedPresentation, setSelectedPresentation] = React.useState<Presentation | null>(null);
-  const updatePresentationTitle = useUpdatePresentationTitle();
+  const {
+    data,
+    isLoading,
+    sorting,
+    setSorting,
+    pagination,
+    setPagination,
+    totalItems,
+    search,
+    setSearch,
+    isRenameOpen,
+    setIsRenameOpen,
+    selectedPresentation,
+    handleRename,
+    handleConfirmRename,
+    isRenamePending,
+  } = usePresentationManager();
+
   const table = useReactTable({
     data: [...data],
     columns: columns,
@@ -107,7 +119,7 @@ const PresentationTable = () => {
       <SearchBar
         value={search}
         onChange={setSearch}
-        placeholder={t('presentation.searchPlaceholder', 'Search presentations...')}
+        placeholder={t('presentation.searchPlaceholder')}
         className="w-full rounded-lg border-2 border-slate-200"
       />
       <DataTable
@@ -126,8 +138,7 @@ const PresentationTable = () => {
               console.log('Delete', row.original);
             }}
             onRename={() => {
-              setSelectedPresentation(row.original);
-              setIsRenameOpen(true);
+              handleRename(row.original);
             }}
           />
         )}
@@ -138,18 +149,13 @@ const PresentationTable = () => {
         project={{
           id: selectedPresentation?.id || '',
           filename: selectedPresentation?.title || '',
-          projectType: t('presentation.presentation', 'presentation'),
+          projectType: t('presentation.presentation'),
         }}
-        renameDialogTitle={t('presentation.renamneFileDialogTitle', 'Rename Presentation')}
-        renameDuplicatedMessage={t(
-          'presentation.renameDuplicatedMessage',
-          'A presentation with this name already exists'
-        )}
-        placeholder={t('presentation.title', 'Title')}
-        isLoading={updatePresentationTitle.isPending}
-        onRename={async (id: string, newName: string) => {
-          await updatePresentationTitle.mutateAsync({ id, name: newName });
-        }}
+        renameDialogTitle={t('presentation.renameFileDialogTitle')}
+        renameDuplicatedMessage={t('presentation.renameDuplicatedMessage')}
+        placeholder={t('presentation.title')}
+        isLoading={isRenamePending}
+        onRename={handleConfirmRename}
       />
     </div>
   );

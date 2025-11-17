@@ -33,6 +33,9 @@ export default {
       renameFileDialogTitle: 'Đổi tên bài trình bày',
       renameSuccess: 'Đổi tên bài thuyết trình "{{filename}}" thành công',
       renameDuplicatedMessage: 'Đã tồn tại bài trình bày với tên này',
+      untitled: 'Bài trình bày chưa đặt tên',
+      createFirst: 'Tạo bài trình bày đầu tiên của bạn để bắt đầu',
+      presentation: 'bài trình bày',
     },
     mindmap: {
       id: 'Mã',

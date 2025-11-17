@@ -6,7 +6,7 @@
     v-contextmenu="contextmenusThumbnails"
     padding="normal"
   >
-    <div class="tw-w-full tw-flex tw-justify-center tw-items-center tw-mb-1">
+    <div class="tw-w-full tw-flex tw-justify-center tw-items-center tw-mb-1" v-if="mode === 'edit'">
       <ButtonGroup
         class="tw-flex tw-gap-[1px] tw-h-10 tw-cursor-pointer tw-rounded-md tw-text-sm tw-transition-all tw-duration-200 tw-ease-in-out"
       >
@@ -42,7 +42,7 @@
       :animation="200"
       :scroll="true"
       :scrollSensitivity="50"
-      :disabled="editingSectionId"
+      :disabled="!!editingSectionId || mode === 'view'"
       @end="handleDragEnd"
       itemKey="id"
     >
@@ -110,7 +110,7 @@
 <script lang="ts" setup>
 import { computed, nextTick, ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
-import { useMainStore, useSlidesStore, useKeyboardStore } from '@/store';
+import { useMainStore, useSlidesStore, useKeyboardStore, useContainerStore } from '@/store';
 import { fillDigit } from '@/utils/common';
 import { isElementInViewport } from '@/utils/element';
 import type { ContextmenuItem } from '@/components/Contextmenu/types';
@@ -134,6 +134,7 @@ const { t } = useI18n();
 const mainStore = useMainStore();
 const slidesStore = useSlidesStore();
 const keyboardStore = useKeyboardStore();
+const { mode } = useContainerStore();
 const { selectedSlidesIndex: _selectedSlidesIndex, thumbnailsFocus } = storeToRefs(mainStore);
 const { slides, slideIndex, currentSlide } = storeToRefs(slidesStore);
 const { ctrlKeyState, shiftKeyState } = storeToRefs(keyboardStore);

@@ -1,10 +1,9 @@
 <template>
   <template v-if="slides.length">
-    <Screen v-if="screening" />
+    <Screen v-if="screening" :isPresentingInitial="presenter" />
     <Editor v-else-if="_isPC" />
     <Mobile v-else />
   </template>
-  <!-- <FullscreenSpin :tip="$t('app.initializing')" v-else loading :mask="false" class="spin" /> -->
 </template>
 
 <script lang="ts" setup>
@@ -23,10 +22,9 @@ import { deleteDiscardedDB } from '@/utils/database';
 import { isPC } from '@/utils/common';
 import api from '@/services';
 
-import Editor from './Editor/index.vue';
-import Mobile from './Mobile/index.vue';
-import Screen from './Screen/index.vue';
-import FullscreenSpin from '@/components/FullscreenSpin.vue';
+import Editor from '../views/Editor/index.vue';
+import Mobile from '../views/Mobile/index.vue';
+import Screen from '../views/Screen/index.vue';
 import type { Presentation } from '../types/slides';
 
 const _isPC = isPC();
@@ -35,6 +33,7 @@ const props = defineProps<{
   titleTest: string;
   isRemote: boolean;
   presentation: Presentation;
+  mode: 'view' | 'edit';
 }>();
 
 const mainStore = useMainStore();
@@ -44,7 +43,7 @@ const containerStore = useContainerStore();
 const saveStore = useSaveStore();
 const { databaseId } = storeToRefs(mainStore);
 const { slides } = storeToRefs(slidesStore);
-const { screening } = storeToRefs(useScreenStore());
+const { screening, presenter } = storeToRefs(useScreenStore());
 
 // Track if this is the initial load to avoid marking as dirty
 let isInitialLoad = ref(true);
@@ -68,28 +67,13 @@ onMounted(async () => {
   await deleteDiscardedDB();
   snapshotStore.initSnapshotDatabase();
 
-  // After initial load is complete, allow dirty tracking
-  setTimeout(() => {
-    isInitialLoad.value = false;
-  }, 500);
-
-  // Handle browser/tab close with unsaved changes
-  // Note: Browsers only allow generic messages, not custom dialogs
-  const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-    if (containerStore.isRemote && saveStore.hasUnsavedChanges) {
-      e.preventDefault();
-      e.returnValue = '';
-      return '';
-    }
-  };
-
-  window.addEventListener('beforeunload', handleBeforeUnload);
+  isInitialLoad.value = false;
 });
 
 watch(
   slides,
   () => {
-    if (containerStore.isRemote) {
+    if (containerStore.isRemote && containerStore.mode === 'edit') {
       saveStore.markDirty();
     }
   },

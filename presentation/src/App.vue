@@ -20,5 +20,6 @@ const componentProps = computed(() => ({
   titleTest: props.titleTest,
   isRemote: props.isRemote,
   presentation: props.presentation,
+  mode: props.mode,
 }));
 </script>

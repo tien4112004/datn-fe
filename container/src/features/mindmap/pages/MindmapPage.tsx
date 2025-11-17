@@ -10,11 +10,11 @@ import { useCoreStore, useLayoutStore, useMetadataStore } from '../stores';
 import { useMindmapDirtyTracking } from '../hooks/useMindmapDirtyTracking';
 import { useUnsavedChangesBlocker } from '@/shared/hooks';
 import { UnsavedChangesDialog } from '@/shared/components/modals/UnsavedChangesDialog';
-import type { MindmapData } from '../types/service';
+import type { Mindmap } from '../types/service';
 
 const MindmapPage = () => {
   const [isPanOnDrag, setIsPanOnDrag] = useState(false);
-  const { mindmap } = useLoaderData() as { mindmap: MindmapData };
+  const { mindmap } = useLoaderData() as { mindmap: Mindmap };
   const setNodes = useCoreStore((state) => state.setNodes);
   const setEdges = useCoreStore((state) => state.setEdges);
   const setLayout = useLayoutStore((state) => state.setLayout);

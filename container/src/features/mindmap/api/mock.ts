@@ -1,7 +1,7 @@
 import { API_MODE, type ApiMode } from '@/shared/constants';
 import {
   type MindmapApiService,
-  type MindmapData,
+  type Mindmap,
   type MindmapCollectionRequest,
   MINDMAP_TYPES,
   PATH_TYPES,
@@ -10,7 +10,7 @@ import { DRAGHANDLE, SIDE } from '../types/constants';
 import type { ApiResponse, Pagination } from '@/shared/types/api';
 import { mapPagination } from '@/shared/types/api';
 
-const mockMindmaps: MindmapData[] = [
+const mockMindmaps: Mindmap[] = [
   {
     id: '1',
     title: 'Software Architecture',
@@ -294,7 +294,7 @@ export default class MindmapMockService implements MindmapApiService {
     return API_MODE.mock;
   }
 
-  async getMindmaps(request: MindmapCollectionRequest): Promise<ApiResponse<MindmapData[]>> {
+  async getMindmaps(request: MindmapCollectionRequest): Promise<ApiResponse<Mindmap[]>> {
     return new Promise((resolve) => {
       setTimeout(() => {
         const { page = 0, pageSize = 20, sort = 'desc', filter = '' } = request;
@@ -341,7 +341,7 @@ export default class MindmapMockService implements MindmapApiService {
     });
   }
 
-  async getMindmapById(id: string): Promise<MindmapData> {
+  async getMindmapById(id: string): Promise<Mindmap> {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         const mindmap = mindmapStorage.find((m) => m.id === id);
@@ -354,10 +354,10 @@ export default class MindmapMockService implements MindmapApiService {
     });
   }
 
-  async createMindmap(data: MindmapData): Promise<MindmapData> {
+  async createMindmap(data: Mindmap): Promise<Mindmap> {
     return new Promise((resolve) => {
       setTimeout(() => {
-        const newMindmap: MindmapData = {
+        const newMindmap: Mindmap = {
           ...data,
           id: data.id || crypto.randomUUID(),
           createdAt: new Date().toISOString(),
@@ -369,7 +369,7 @@ export default class MindmapMockService implements MindmapApiService {
     });
   }
 
-  async updateMindmap(id: string, data: Partial<MindmapData>): Promise<MindmapData> {
+  async updateMindmap(id: string, data: Partial<Mindmap>): Promise<Mindmap> {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         const index = mindmapStorage.findIndex((m) => m.id === id);

@@ -33,12 +33,16 @@ const router = createBrowserRouter([
         Component: Presentation.PresentationListPage,
       },
       {
-        path: 'image/create',
+        path: 'image/generate',
         Component: Image.CreateImagePage,
       },
       {
         path: 'image/:id',
         Component: Image.ImageDetailPage,
+      },
+      {
+        path: 'mindmap/generate',
+        Component: Mindmap.CreateMindmapPage,
       },
       {
         path: 'mindmap/:id',
@@ -55,7 +59,7 @@ const router = createBrowserRouter([
             loader: getPresentationById,
           },
           {
-            path: 'create',
+            path: 'generate',
             Component: Presentation.PresentationOutlinePage,
           },
         ],

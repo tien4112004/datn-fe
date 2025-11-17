@@ -39,7 +39,7 @@ const ResourceTypeSwitcher = ({ className }: ResourceTypeSwitcherProps) => {
             className={`group cursor-pointer rounded-md border-2 py-0 transition-all duration-200 hover:scale-[1.02] hover:shadow-lg ${
               isActive ? 'border-blue-500 bg-blue-50 shadow-md' : 'border-gray-200 hover:border-blue-300'
             }`}
-            onClick={() => navigate(`/${resource.type}/create`)}
+            onClick={() => navigate(`/${resource.type}/generate`)}
           >
             <CardContent className="flex min-w-[120px] flex-col items-center justify-center gap-1 px-4 py-2">
               <IconComponent

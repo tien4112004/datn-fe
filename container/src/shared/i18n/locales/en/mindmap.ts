@@ -12,8 +12,8 @@ export default {
       deleteSelected: 'Delete Selected',
       undo: 'Undo',
       redo: 'Redo',
-      applyLayout: 'Apply Layout',
-      logData: 'Log Data',
+      applyLayout: 'Apply Layout Manually',
+      logData: 'Log Nodes and Edges',
     },
     layout: {
       forceAutoLayout: 'Force Auto Layout',
@@ -29,6 +29,40 @@ export default {
       redo: 'Redo (Ctrl+Y)',
       applyLayout: 'Apply Layout Manually',
       logData: 'Log Nodes and Edges',
+    },
+  },
+  export: {
+    title: 'Export Mindmap',
+    formats: {
+      png: 'PNG Image',
+      jpg: 'JPG Image',
+      svg: 'SVG Vector',
+      pdf: 'PDF Document',
+    },
+    common: {
+      backgroundColor: 'Background Color',
+      white: 'White',
+      transparent: 'Transparent',
+      dimensions: 'Dimensions',
+      skipFonts: 'Skip Web Fonts',
+      export: 'Export',
+      cancel: 'Cancel',
+      exporting: 'Exporting...',
+    },
+    image: {
+      quality: 'Quality',
+      width: 'Width',
+      height: 'Height',
+    },
+    svg: {
+      strokeColor: 'Stroke Color',
+      includeBackground: 'Include Background',
+    },
+    pdf: {
+      orientation: 'Orientation',
+      portrait: 'Portrait',
+      landscape: 'Landscape',
+      paperSize: 'Paper Size',
     },
   },
 };

@@ -85,12 +85,7 @@ export function LoginForm() {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <div className="flex items-center justify-between">
-                <FormLabel>{t('login.password')}</FormLabel>
-                <Link to="/forgot-password" className="text-primary text-sm hover:underline" tabIndex={-1}>
-                  {t('login.forgotPassword')}
-                </Link>
-              </div>
+              <FormLabel>{t('login.password')}</FormLabel>
               <FormControl>
                 <PasswordInput
                   placeholder={t('login.passwordPlaceholder')}
@@ -104,24 +99,27 @@ export function LoginForm() {
           )}
         />
 
-        <FormField
-          control={form.control}
-          name="rememberMe"
-          render={({ field }) => (
-            <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-              <FormControl>
-                <Checkbox
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                  disabled={loginMutation.isPending}
-                />
-              </FormControl>
-              <div className="space-y-1 leading-none">
+        <div className="flex items-center justify-between">
+          <FormField
+            control={form.control}
+            name="rememberMe"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-center space-x-2 space-y-0">
+                <FormControl>
+                  <Checkbox
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                    disabled={loginMutation.isPending}
+                  />
+                </FormControl>
                 <FormLabel className="cursor-pointer text-sm font-normal">{t('login.rememberMe')}</FormLabel>
-              </div>
-            </FormItem>
-          )}
-        />
+              </FormItem>
+            )}
+          />
+          <Link to="/forgot-password" className="text-primary text-sm hover:underline" tabIndex={-1}>
+            {t('login.forgotPassword')}
+          </Link>
+        </div>
 
         <Button type="submit" className="w-full" disabled={loginMutation.isPending}>
           {loginMutation.isPending ? t('login.signingIn') : t('login.signInButton')}

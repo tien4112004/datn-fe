@@ -39,4 +39,38 @@ export default {
       error: 'Lưu sơ đồ tư duy thất bại',
     },
   },
+  export: {
+    title: 'Xuất Mindmap',
+    formats: {
+      png: 'Ảnh PNG',
+      jpg: 'Ảnh JPG',
+      svg: 'Vector SVG',
+      pdf: 'Tài liệu PDF',
+    },
+    common: {
+      backgroundColor: 'Màu nền',
+      white: 'Trắng',
+      transparent: 'Trong suốt',
+      dimensions: 'Kích thước',
+      skipFonts: 'Bỏ qua font web',
+      export: 'Xuất',
+      cancel: 'Hủy',
+      exporting: 'Đang xuất...',
+    },
+    image: {
+      quality: 'Chất lượng',
+      width: 'Chiều rộng',
+      height: 'Chiều cao',
+    },
+    svg: {
+      strokeColor: 'Màu viền',
+      includeBackground: 'Bao gồm nền',
+    },
+    pdf: {
+      orientation: 'Hướng',
+      portrait: 'Dọc',
+      landscape: 'Ngang',
+      paperSize: 'Kích thước giấy',
+    },
+  },
 };

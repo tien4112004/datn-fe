@@ -5,8 +5,8 @@ import Demo from '@/features/demo';
 import NotFoundPage from '@/shared/pages/NotFoundPage';
 import { CriticalError } from '@/types/errors';
 import Mindmap from '@/features/mindmap';
-import { getMindmapById } from '@/features/mindmap/hooks/loaders';
 import { getPresentationById } from '@/features/presentation/hooks/loaders';
+import { getMindmapById } from '@/features/mindmap/hooks/loaders';
 import Projects from '@/features/projects';
 import Settings from '@/features/settings';
 import Image from '@/features/image';
@@ -53,7 +53,7 @@ const router = createBrowserRouter([
         Component: Presentation.PresentationListPage,
       },
       {
-        path: 'image/create',
+        path: 'image/generate',
         Component: Image.CreateImagePage,
       },
       {
@@ -61,13 +61,13 @@ const router = createBrowserRouter([
         Component: Image.ImageDetailPage,
       },
       {
-        path: 'mindmap',
+        path: 'mindmap/generate',
+        Component: Mindmap.CreateMindmapPage,
+      },
+      {
+        path: 'mindmap/:id',
         Component: Mindmap.MindmapPage,
-        // TODO: checkout this loader
-        loader: async () => {
-          const mindmap = await getMindmapById('1');
-          return { mindmap };
-        },
+        loader: getMindmapById,
       },
       {
         path: 'presentation',
@@ -79,7 +79,7 @@ const router = createBrowserRouter([
             loader: getPresentationById,
           },
           {
-            path: 'create',
+            path: 'generate',
             Component: Presentation.PresentationOutlinePage,
           },
         ],

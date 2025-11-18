@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
+import { PasswordInput } from '@/shared/components/ui/password-input';
 import { Checkbox } from '@/shared/components/ui/checkbox';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/shared/components/ui/form';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
@@ -91,8 +92,7 @@ export function LoginForm() {
                 </Link>
               </div>
               <FormControl>
-                <Input
-                  type="password"
+                <PasswordInput
                   placeholder={t('login.passwordPlaceholder')}
                   autoComplete="current-password"
                   disabled={loginMutation.isPending}

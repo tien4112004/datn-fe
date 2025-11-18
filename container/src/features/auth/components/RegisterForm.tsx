@@ -5,13 +5,11 @@ import * as z from 'zod';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
-import { CalendarIcon } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
+import { PasswordInput } from '@/shared/components/ui/password-input';
+import { DateInput } from '@/shared/components/ui/date-input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/shared/components/ui/form';
-import { Popover, PopoverContent, PopoverTrigger } from '@/shared/components/ui/popover';
-import { Calendar } from '@/shared/components/ui/calendar';
-import { cn } from '@/shared/lib/utils';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 import { useRegister } from '../hooks/useAuth';
 
@@ -27,10 +25,10 @@ export function RegisterForm() {
           email: z.string().email(t('validation.emailInvalid')),
           password: z
             .string()
-            .min(8, t('validation.passwordMinLength', { min: 8 }))
-            .regex(/[A-Z]/, t('validation.passwordUppercase'))
-            .regex(/[a-z]/, t('validation.passwordLowercase'))
-            .regex(/[0-9]/, t('validation.passwordNumber')),
+            // .regex(/[A-Z]/, t('validation.passwordUppercase'))
+            // .regex(/[a-z]/, t('validation.passwordLowercase'))
+            // .regex(/[0-9]/, t('validation.passwordNumber'))
+            .min(6, t('validation.passwordMinLength', { min: 6 })),
           confirmPassword: z.string(),
           firstName: z
             .string()
@@ -45,19 +43,17 @@ export function RegisterForm() {
               required_error: t('validation.dateOfBirthRequired'),
               invalid_type_error: t('validation.dateOfBirthInvalid'),
             })
-            .refine((date) => {
-              const today = new Date();
-              const age = today.getFullYear() - date.getFullYear();
-              const monthDiff = today.getMonth() - date.getMonth();
-              const adjustedAge =
-                monthDiff < 0 || (monthDiff === 0 && today.getDate() < date.getDate()) ? age - 1 : age;
-              return adjustedAge >= 13 && adjustedAge <= 120;
-            }, t('validation.ageRequirement'))
+            // .refine((date) => {
+            //   const today = new Date();
+            //   const age = today.getFullYear() - date.getFullYear();
+            //   const monthDiff = today.getMonth() - date.getMonth();
+            //   const adjustedAge =
+            //     monthDiff < 0 || (monthDiff === 0 && today.getDate() < date.getDate()) ? age - 1 : age;
+            //   return adjustedAge >= 13 && adjustedAge <= 120;
+            // }, t('validation.ageRequirement'))
             .optional(),
-          phoneNumber: z
-            .string()
-            .optional()
-            .refine((val) => !val || /^\+?[1-9]\d{1,14}$/.test(val), t('validation.phoneNumberInvalid')),
+          phoneNumber: z.string().optional(),
+          // .refine((val) => !val || /^\+?[1-9]\d{1,14}$/.test(val), t('validation.phoneNumberInvalid')),
         })
         .refine((data) => data.password === data.confirmPassword, {
           message: t('validation.passwordsNoMatch'),
@@ -178,39 +174,17 @@ export function RegisterForm() {
           render={({ field }) => (
             <FormItem className="flex flex-col">
               <FormLabel>{t('register.dateOfBirth')}</FormLabel>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <FormControl>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        'w-full pl-3 text-left font-normal',
-                        !field.value && 'text-muted-foreground'
-                      )}
-                      disabled={registerMutation.isPending}
-                    >
-                      {field.value ? (
-                        format(field.value, 'PPP')
-                      ) : (
-                        <span>{t('register.dateOfBirthPlaceholder')}</span>
-                      )}
-                      <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                    </Button>
-                  </FormControl>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={field.value}
-                    onSelect={field.onChange}
-                    disabled={(date) => date > new Date() || date < new Date('1900-01-01')}
-                    initialFocus
-                    captionLayout="dropdown"
-                    fromYear={1900}
-                    toYear={new Date().getFullYear()}
-                  />
-                </PopoverContent>
-              </Popover>
+              <FormControl>
+                <DateInput
+                  value={field.value}
+                  onChange={field.onChange}
+                  disabled={registerMutation.isPending}
+                  fromYear={1900}
+                  toYear={new Date().getFullYear()}
+                  minDate={new Date('1900-01-01')}
+                  maxDate={new Date()}
+                />
+              </FormControl>
               <FormMessage />
             </FormItem>
           )}
@@ -243,8 +217,7 @@ export function RegisterForm() {
             <FormItem>
               <FormLabel>{t('register.password')}</FormLabel>
               <FormControl>
-                <Input
-                  type="password"
+                <PasswordInput
                   placeholder={t('register.passwordPlaceholder')}
                   autoComplete="new-password"
                   disabled={registerMutation.isPending}
@@ -263,8 +236,7 @@ export function RegisterForm() {
             <FormItem>
               <FormLabel>{t('register.confirmPassword')}</FormLabel>
               <FormControl>
-                <Input
-                  type="password"
+                <PasswordInput
                   placeholder={t('register.confirmPasswordPlaceholder')}
                   autoComplete="new-password"
                   disabled={registerMutation.isPending}

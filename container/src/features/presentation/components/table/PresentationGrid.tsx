@@ -3,31 +3,43 @@ import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import type { Presentation } from '@/features/presentation/types/presentation';
-import { usePresentations } from '@/features/presentation/hooks/useApi';
+import { usePresentationManager } from '@/features/presentation/hooks/usePresentationManager';
 import { Button } from '@/components/ui/button';
 import { MoreHorizontal } from 'lucide-react';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { SearchBar } from '@/shared/components/common/SearchBar';
 import ThumbnailWrapper from '@/features/presentation/components/others/ThumbnailWrapper';
 import TablePagination from '@/shared/components/table/TablePagination';
+import { ActionContent } from './ActionButton';
+import { RenameFileDialog } from '@/components/modals/RenameFileDialog';
 
 const PresentationGrid = () => {
   const { t } = useTranslation('common', { keyPrefix: 'table' });
   const navigate = useNavigate();
   const columnHelper = createColumnHelper<Presentation>();
 
+  const {
+    data,
+    isLoading,
+    sorting,
+    setSorting,
+    pagination,
+    setPagination,
+    totalItems,
+    search,
+    setSearch,
+    isRenameOpen,
+    setIsRenameOpen,
+    selectedPresentation,
+    handleRename,
+    handleConfirmRename,
+    isRenamePending,
+  } = usePresentationManager();
+
   const formatDate = useCallback((date: Date | string | undefined): string => {
     if (!date) return '';
     return new Date(date).toLocaleDateString();
   }, []);
-
-  const { data, isLoading, sorting, setSorting, pagination, setPagination, totalItems, search, setSearch } =
-    usePresentations();
 
   const columns = useMemo(
     () => [
@@ -59,9 +71,11 @@ const PresentationGrid = () => {
         onClick={() => navigate(`/presentation/${presentation.id}`)}
       >
         {presentation.thumbnail && typeof presentation.thumbnail === 'object' ? (
-          <div className="flex h-full items-center justify-center">
-            <ThumbnailWrapper slide={presentation.thumbnail} size={'auto'} visible={true} />
-          </div>
+          <ThumbnailWrapper slide={presentation.thumbnail} size={'auto'} visible={true} />
+        ) : typeof presentation.thumbnail === 'string' ? (
+          <img src={presentation.thumbnail} alt="Presentation Thumbnail" className={`w-full`} />
+        ) : presentation.slides && presentation.slides[0] ? (
+          <ThumbnailWrapper slide={presentation.slides[0]} size={'auto'} visible={true} />
         ) : (
           <img src="/images/placeholder-image.webp" alt="No Thumbnail" className={`aspect-[16/9] w-full`} />
         )}
@@ -78,32 +92,15 @@ const PresentationGrid = () => {
                 <MoreHorizontal className="h-4 w-4 text-gray-700" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem
-                onClick={(e) => {
-                  e.stopPropagation();
-                  navigate(`/presentation/${presentation.id}`);
+            <DropdownMenuContent onClick={(e) => e.stopPropagation()}>
+              <ActionContent
+                onViewDetail={() => navigate(`/presentation/${presentation.id}`)}
+                onEdit={() => console.log('Edit', presentation)}
+                onDelete={() => console.log('Delete', presentation)}
+                onRename={() => {
+                  handleRename(presentation);
                 }}
-              >
-                {t('actionButton.viewDetails', 'View Details')}
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={(e) => {
-                  e.stopPropagation();
-                  console.log('Edit', presentation);
-                }}
-              >
-                {t('actionButton.edit', 'Edit')}
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={(e) => {
-                  e.stopPropagation();
-                  console.log('Delete', presentation);
-                }}
-                className="text-red-600 focus:text-red-600"
-              >
-                {t('actionButton.delete', 'Delete')}
-              </DropdownMenuItem>
+              />
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -114,10 +111,10 @@ const PresentationGrid = () => {
           className="cursor-pointer truncate text-sm font-medium text-gray-900 transition-colors hover:text-blue-600"
           onClick={() => navigate(`/presentation/${presentation.id}`)}
         >
-          {presentation.title || t('presentation.untitled', 'Untitled Presentation')}
+          {presentation.title || t('presentation.untitled')}
         </h3>
         <p className="text-xs text-gray-500">
-          {t('presentation.lastModified', 'Last modified')}: {formatDate(presentation.updatedAt)}
+          {t('presentation.lastModified')}: {formatDate(presentation.updatedAt)}
         </p>
       </div>
     </div>
@@ -129,7 +126,7 @@ const PresentationGrid = () => {
         <SearchBar
           value={search}
           onChange={setSearch}
-          placeholder={t('presentation.searchPlaceholder', 'Search presentations...')}
+          placeholder={t('presentation.searchPlaceholder')}
           className="w-full rounded-lg border-2 border-slate-200"
         />
         <div className="grid auto-rows-fr grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-6">
@@ -150,7 +147,7 @@ const PresentationGrid = () => {
       <SearchBar
         value={search}
         onChange={setSearch}
-        placeholder={t('presentation.searchPlaceholder', 'Search presentations...')}
+        placeholder={t('presentation.searchPlaceholder')}
         className="w-full rounded-lg border-2 border-slate-200"
       />
 
@@ -167,11 +164,24 @@ const PresentationGrid = () => {
       ) : (
         <div className="flex flex-col items-center justify-center py-12 text-center">
           <div className="mb-2 text-lg text-gray-500">{t('presentation.emptyState')}</div>
-          <div className="text-sm text-gray-400">
-            {t('presentation.createFirst', 'Create your first presentation to get started')}
-          </div>
+          <div className="text-sm text-gray-400">{t('presentation.createFirst')}</div>
         </div>
       )}
+
+      <RenameFileDialog
+        isOpen={isRenameOpen}
+        onOpenChange={setIsRenameOpen}
+        project={{
+          id: selectedPresentation?.id || '',
+          filename: selectedPresentation?.title || '',
+          projectType: t('presentation.presentation'),
+        }}
+        renameDialogTitle={t('presentation.renameFileDialogTitle')}
+        renameDuplicatedMessage={t('presentation.renameDuplicatedMessage')}
+        placeholder={t('presentation.title')}
+        isLoading={isRenamePending}
+        onRename={handleConfirmRename}
+      />
     </div>
   );
 };

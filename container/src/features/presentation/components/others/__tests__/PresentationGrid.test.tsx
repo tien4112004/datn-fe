@@ -1,6 +1,6 @@
 import { screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import PresentationGrid from '../PresentationGrid';
+import PresentationGrid from '../../table/PresentationGrid';
 import { renderWithProviders } from '@/tests/test-utils';
 import type { Presentation } from '@/features/presentation/types/presentation';
 
@@ -10,7 +10,7 @@ vi.mock('../ThumbnailWrapper', () => ({
   default: () => <div data-testid="mock-thumbnail-wrapper" />,
 }));
 
-const { usePresentations } = await import('@/features/presentation/hooks/useApi');
+const { usePresentations, useUpdatePresentationTitle } = await import('@/features/presentation/hooks/useApi');
 
 vi.mock('@/features/presentation/api/service', () => ({
   presentationService: {
@@ -20,6 +20,7 @@ vi.mock('@/features/presentation/api/service', () => ({
 
 vi.mock('@/features/presentation/hooks/useApi', () => ({
   usePresentations: vi.fn(),
+  useUpdatePresentationTitle: vi.fn(),
 }));
 
 describe('PresentationGrid', () => {
@@ -59,6 +60,10 @@ describe('PresentationGrid', () => {
       totalItems: 3,
       search: '',
       setSearch: vi.fn(),
+    } as any);
+    vi.mocked(useUpdatePresentationTitle).mockReturnValue({
+      mutateAsync: vi.fn(),
+      isPending: false,
     } as any);
   });
 

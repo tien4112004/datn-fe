@@ -33,6 +33,9 @@ export default {
       renameFileDialogTitle: 'Rename Presentation',
       renameSuccess: 'Renamed to "{{filename}}" successfully',
       renameDuplicatedMessage: 'A presentation with this name already exists',
+      untitled: 'Untitled Presentation',
+      createFirst: 'Create your first presentation to get started',
+      presentation: 'presentation',
     },
     mindmap: {
       id: 'ID',

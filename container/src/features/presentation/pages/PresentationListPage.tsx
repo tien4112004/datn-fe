@@ -3,7 +3,7 @@ import { Separator } from '@radix-ui/react-separator';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import PresentationTable from '../components/table/PresentationTable';
-import PresentationGrid from '../components/others/PresentationGrid';
+import PresentationGrid from '../components/table/PresentationGrid';
 import CreatePresentationControls from '../components/others/CreatePresentationControls';
 import ViewToggle, { type ViewMode } from '../components/others/ViewToggle';
 

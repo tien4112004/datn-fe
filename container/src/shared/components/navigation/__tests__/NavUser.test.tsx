@@ -27,7 +27,7 @@ describe('NavUser', () => {
   });
 
   it('displays user name and email correctly', () => {
-    renderWithProviders(<NavUser user={mockUser} />);
+    renderWithProviders(<NavUser user={mockUser} />, { includeProviders: ['auth'] });
 
     expect(screen.getByText('John Doe')).toBeInTheDocument();
     expect(screen.getByText('john@example.com')).toBeInTheDocument();
@@ -35,7 +35,7 @@ describe('NavUser', () => {
 
   it('opens dropdown menu when user clicks the trigger button', async () => {
     const user = userEvent.setup();
-    renderWithProviders(<NavUser user={mockUser} />);
+    renderWithProviders(<NavUser user={mockUser} />, { includeProviders: ['auth'] });
 
     const triggerButton = screen.getByRole('button');
     await user.click(triggerButton);
@@ -50,7 +50,7 @@ describe('NavUser', () => {
 
   it('shows user information in dropdown header when opened', async () => {
     const user = userEvent.setup();
-    renderWithProviders(<NavUser user={mockUser} />);
+    renderWithProviders(<NavUser user={mockUser} />, { includeProviders: ['auth'] });
 
     const triggerButton = screen.getByRole('button');
     await user.click(triggerButton);
@@ -63,7 +63,7 @@ describe('NavUser', () => {
   it('uses "right" side positioning on desktop', async () => {
     mockUseSidebar.mockReturnValue({ isMobile: false });
     const user = userEvent.setup();
-    renderWithProviders(<NavUser user={mockUser} />);
+    renderWithProviders(<NavUser user={mockUser} />, { includeProviders: ['auth'] });
 
     const triggerButton = screen.getByRole('button');
     await user.click(triggerButton);
@@ -75,7 +75,7 @@ describe('NavUser', () => {
   it('uses "bottom" side positioning on mobile', async () => {
     mockUseSidebar.mockReturnValue({ isMobile: true });
     const user = userEvent.setup();
-    renderWithProviders(<NavUser user={mockUser} />);
+    renderWithProviders(<NavUser user={mockUser} />, { includeProviders: ['auth'] });
 
     const triggerButton = screen.getByRole('button');
     await user.click(triggerButton);
@@ -86,7 +86,7 @@ describe('NavUser', () => {
 
   it('renders all menu items with correct text', async () => {
     const user = userEvent.setup();
-    renderWithProviders(<NavUser user={mockUser} />);
+    renderWithProviders(<NavUser user={mockUser} />, { includeProviders: ['auth'] });
 
     const triggerButton = screen.getByRole('button');
     await user.click(triggerButton);
@@ -100,7 +100,7 @@ describe('NavUser', () => {
 
   it('handles user with all empty fields', () => {
     const emptyUser = { name: '', email: '', avatar: '' };
-    renderWithProviders(<NavUser user={emptyUser} />);
+    renderWithProviders(<NavUser user={emptyUser} />, { includeProviders: ['auth'] });
 
     expect(screen.getAllByText('No Name')).toHaveLength(1);
     expect(screen.getAllByText('No Email')).toHaveLength(1);
@@ -114,7 +114,7 @@ describe('NavUser', () => {
       avatar: mockUser.avatar,
     };
 
-    renderWithProviders(<NavUser user={userWithLongInfo} />);
+    renderWithProviders(<NavUser user={userWithLongInfo} />, { includeProviders: ['auth'] });
 
     expect(screen.getByText(userWithLongInfo.name)).toBeInTheDocument();
     expect(screen.getByText(userWithLongInfo.email)).toBeInTheDocument();
@@ -122,7 +122,7 @@ describe('NavUser', () => {
 
   it('maintains functionality when dropdown is opened and closed multiple times', async () => {
     const user = userEvent.setup();
-    renderWithProviders(<NavUser user={mockUser} />);
+    renderWithProviders(<NavUser user={mockUser} />, { includeProviders: ['auth'] });
 
     const triggerButton = screen.getByRole('button');
 

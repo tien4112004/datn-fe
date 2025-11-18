@@ -7,6 +7,7 @@ export const I18N_NAMESPACES = {
   COMMON: 'common',
   GLOSSARY: 'glossary',
   ERRORS: 'errors',
+  AUTH: 'auth',
   PRESENTATION: 'presentation',
   IMAGE: 'image',
   PROJECTS: 'projects',

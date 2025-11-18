@@ -7,6 +7,7 @@ import 'i18next';
 import common from './locales/en/common';
 import glossary from './locales/en/glossary';
 import errors from './locales/en/errors';
+import auth from './locales/en/auth';
 
 import presentation from './locales/en/presentation';
 import mindmap from './locales/en/mindmap';
@@ -21,6 +22,7 @@ export interface Resources {
   common: typeof common;
   glossary: typeof glossary;
   errors: typeof errors;
+  auth: typeof auth;
 
   presentation: typeof presentation;
   mindmap: typeof mindmap;

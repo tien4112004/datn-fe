@@ -10,6 +10,7 @@ interface StreamableAxiosInstance extends AxiosInstance {
 
 const api: StreamableAxiosInstance = axios.create({
   allowAbsoluteUrls: true,
+  withCredentials: true, // Enable sending cookies with requests
   headers: {
     'Content-Type': 'application/json',
   },
@@ -46,6 +47,7 @@ api.stream = async function (url: string, request: any, signal: AbortSignal) {
       headers,
       body: JSON.stringify(request),
       signal,
+      credentials: 'include', // Send cookies with fetch requests
     });
 
     // Handle HTTP error status codes

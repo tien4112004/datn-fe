@@ -3,9 +3,13 @@ import type { User, AuthContextType, SignupRequest } from '../types/auth';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Note: Tokens are stored as HttpOnly cookies by the backend
+// We only store user data in localStorage for quick access
+const USER_KEY = 'user';
+
+// Legacy token keys - kept for backward compatibility but not primarily used
 const TOKEN_KEY = 'accessToken';
 const REFRESH_TOKEN_KEY = 'refreshToken';
-const USER_KEY = 'user';
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -16,9 +20,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const initializeAuth = () => {
       try {
         const storedUser = localStorage.getItem(USER_KEY);
-        const storedToken = localStorage.getItem(TOKEN_KEY);
 
-        if (storedUser && storedToken) {
+        // If we have user data, assume authenticated (cookies will be sent automatically)
+        if (storedUser) {
           setUser(JSON.parse(storedUser));
         }
       } catch (error) {
@@ -64,10 +68,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Clear user state
     setUser(null);
 
-    // Clear tokens from localStorage
+    // Clear user data and legacy tokens from localStorage
+    // Note: HttpOnly cookies will be cleared by calling backend logout endpoint
+    localStorage.removeItem(USER_KEY);
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(REFRESH_TOKEN_KEY);
-    localStorage.removeItem(USER_KEY);
   };
 
   const value: AuthContextType = {

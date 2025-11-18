@@ -21,12 +21,12 @@ export default class AuthRealApiService implements AuthApiService {
   async login(request: LoginRequest): Promise<LoginResponse> {
     const response = await api.post<{ data: LoginResponse }>(`${this.baseUrl}/api/auth/signin`, request);
 
-    const { access_token, refresh_token } = response.data.data;
+    const data = response.data.data;
+    if (data.access_token && data.refresh_token) {
+      setTokens(data.access_token, data.refresh_token);
+    }
 
-    // Store tokens
-    setTokens(access_token, refresh_token);
-
-    return response.data.data;
+    return data;
   }
 
   /**

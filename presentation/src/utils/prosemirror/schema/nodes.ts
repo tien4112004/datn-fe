@@ -150,7 +150,7 @@ const paragraph: NodeSpec = {
   toDOM: (node: Node) => {
     const { align, indent, textIndent } = node.attrs;
     let style = '';
-    if (align && align !== 'left') style += `text-align: ${align};`;
+    if (align) style += `text-align: ${align};`;
     if (textIndent) style += `text-indent: ${textIndent}em;`;
 
     const attr: Attr = { style };

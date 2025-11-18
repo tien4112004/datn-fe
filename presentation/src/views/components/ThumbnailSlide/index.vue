@@ -94,9 +94,8 @@ provide(injectKeySlideScale, scale);
 <style lang="scss" scoped>
 .thumbnail-slide {
   background-color: var(--presentation-background);
-  // border-radius: 10px;
-  overflow: hidden;
   user-select: none;
+  overflow: hidden;
 }
 .elements {
   transform-origin: 0 0;

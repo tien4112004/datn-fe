@@ -24,7 +24,7 @@ function ExportPDFTab() {
   const [isExporting, setIsExporting] = useState(false);
 
   const { previewDataUrl, previewLoading, previewError } = usePreview({
-    executor: () => {
+    executor: async () => {
       const viewport = getMindmapViewport();
       if (!viewport) {
         throw new Error('Viewport not found');

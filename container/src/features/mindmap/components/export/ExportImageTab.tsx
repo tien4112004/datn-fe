@@ -7,8 +7,8 @@ import { useReactFlow, getViewportForBounds } from '@xyflow/react';
 import { generateFilename, downloadFile, getMindmapViewport, getImageData } from './utils';
 import { PreviewCard } from './PreviewCard';
 import { usePreview } from './usePreview';
-import { Input } from '@/components/ui/input';
 import { useLatest } from '@/hooks/useLatest';
+import { Slider } from '@/components/ui/slider';
 
 interface ExportImageTabProps {
   format: 'png' | 'jpg';
@@ -18,6 +18,7 @@ const DIMENSION_PRESETS = [
   { label: '1024x1024', value: '1024' },
   { label: '2048x2048', value: '2048' },
   { label: '4096x4096', value: '4096' },
+  { label: '8192x8192', value: '8192' },
 ];
 
 function ExportImageTab({ format }: ExportImageTabProps) {
@@ -33,8 +34,8 @@ function ExportImageTab({ format }: ExportImageTabProps) {
   const configRef = useLatest({ format, backgroundColor, quality, padding, dimensions });
 
   const { previewDataUrl, previewLoading, previewError } = usePreview({
-    executor: () => {
-      const { format: f, padding: p, quality: q, backgroundColor: bg } = configRef.current;
+    executor: async () => {
+      const { format: f, padding: p, quality: q, backgroundColor: bg, dimensions: d } = configRef.current;
 
       const viewport = getMindmapViewport();
       if (!viewport) {
@@ -46,7 +47,7 @@ function ExportImageTab({ format }: ExportImageTabProps) {
         throw new Error('No nodes to preview');
       }
 
-      const previewSize = 512;
+      const previewSize = parseInt(d);
       const nodesBounds = getNodesBounds(nodes);
       const viewportTransform = getViewportForBounds(nodesBounds, previewSize, previewSize, 0.5, 2, p);
 
@@ -123,15 +124,13 @@ function ExportImageTab({ format }: ExportImageTabProps) {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="padding">Padding: {padding}px</Label>
-          <Input
+          <Label htmlFor="padding">{t('export.image.padding')}</Label>
+          <Slider
+            defaultValue={[padding]}
             id="padding"
-            type="range"
-            min="0.1"
-            max="1"
-            step="0.1"
-            value={padding}
-            onChange={(e) => setPadding(parseFloat(e.target.value))}
+            max={1}
+            step={0.1}
+            onValueChange={(value) => setPadding(value[0])}
           />
         </div>
 
@@ -140,15 +139,13 @@ function ExportImageTab({ format }: ExportImageTabProps) {
             <Label htmlFor="quality">
               {t('export.image.quality')}: {Math.round(quality * 100)}%
             </Label>
-            <input
+            <Slider
+              defaultValue={[quality]}
               id="quality"
-              type="range"
-              min="0.1"
-              max="1"
-              step="0.1"
-              value={quality}
-              onChange={(e) => setQuality(parseFloat(e.target.value))}
-              className="w-full"
+              min={0.1}
+              max={1}
+              step={0.1}
+              onValueChange={(value) => setQuality(value[0])}
             />
           </div>
         )}

@@ -1,4 +1,5 @@
 import { getPaperSizeDimensions } from './utils';
+import { useTranslation } from 'react-i18next';
 
 interface PDFPreviewCardProps {
   dataUrl: string | null;
@@ -9,6 +10,7 @@ interface PDFPreviewCardProps {
 }
 
 export function PDFPreviewCard({ dataUrl, loading, error, orientation, paperSize }: PDFPreviewCardProps) {
+  const { t } = useTranslation('mindmap');
   const paperDimensions = getPaperSizeDimensions(paperSize, orientation);
   const margin = 20;
   const availableWidth = paperDimensions.width - margin * 2;
@@ -56,12 +58,12 @@ export function PDFPreviewCard({ dataUrl, loading, error, orientation, paperSize
             <div className="flex items-center justify-center">
               <div className="text-center">
                 <div className="border-muted-foreground border-t-foreground mb-2 inline-block h-6 w-6 animate-spin rounded-full border-2"></div>
-                <p className="text-muted-foreground text-xs">Generating...</p>
+                <p className="text-muted-foreground text-xs">{t('export.preview.generating')}</p>
               </div>
             </div>
           ) : error ? (
             <div className="text-center">
-              <p className="text-destructive text-xs font-medium">Error</p>
+              <p className="text-destructive text-xs font-medium">{t('export.preview.error')}</p>
               <p className="text-muted-foreground text-xs">{error}</p>
             </div>
           ) : dataUrl ? (
@@ -77,7 +79,7 @@ export function PDFPreviewCard({ dataUrl, loading, error, orientation, paperSize
               className="rounded object-contain"
             />
           ) : (
-            <p className="text-muted-foreground text-xs">Adjust settings to generate preview</p>
+            <p className="text-muted-foreground text-xs">{t('export.preview.adjustSettings')}</p>
           )}
         </div>
       </div>

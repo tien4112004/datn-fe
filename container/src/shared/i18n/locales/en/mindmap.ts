@@ -60,12 +60,20 @@ export default {
       quality: 'Quality',
       width: 'Width',
       height: 'Height',
+      padding: 'Padding',
     },
     pdf: {
       orientation: 'Orientation',
       portrait: 'Portrait',
       landscape: 'Landscape',
       paperSize: 'Paper Size',
+    },
+    preview: {
+      generating: 'Generating...',
+      error: 'Error',
+      adjustSettings: 'Adjust settings to generate preview',
+      generatingPreview: 'Generating preview...',
+      previewError: 'Preview Error',
     },
   },
 };

@@ -60,12 +60,20 @@ export default {
       quality: 'Chất lượng',
       width: 'Chiều rộng',
       height: 'Chiều cao',
+      padding: 'Khoảng cách',
     },
     pdf: {
       orientation: 'Hướng',
       portrait: 'Dọc',
       landscape: 'Ngang',
       paperSize: 'Kích thước giấy',
+    },
+    preview: {
+      generating: 'Đang tạo...',
+      error: 'Lỗi',
+      adjustSettings: 'Điều chỉnh cài đặt để tạo bản xem trước',
+      generatingPreview: 'Đang tạo bản xem trước...',
+      previewError: 'Lỗi bản xem trước',
     },
   },
 };

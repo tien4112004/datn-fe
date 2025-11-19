@@ -1,12 +1,13 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/shared/components/ui/button';
 import { Label } from '@/shared/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
-import { Checkbox } from '@/shared/components/ui/checkbox';
 import { useTranslation } from 'react-i18next';
 import { useReactFlow, getNodesBounds, getViewportForBounds } from '@xyflow/react';
 import { toPng, toJpeg } from 'html-to-image';
+import { debounce } from 'lodash';
 import { generateFilename, downloadFile, getMindmapViewport } from '../../utils/exportUtils';
+import { PreviewCard } from './PreviewCard';
 
 interface ExportImageTabProps {
   format: 'png' | 'jpg';
@@ -24,9 +25,75 @@ function ExportImageTab({ format }: ExportImageTabProps) {
 
   const [dimensions, setDimensions] = useState('2048');
   const [backgroundColor, setBackgroundColor] = useState('white');
-  const [skipFonts, setSkipFonts] = useState(true);
   const [quality, setQuality] = useState(1);
   const [isExporting, setIsExporting] = useState(false);
+
+  const [previewDataUrl, setPreviewDataUrl] = useState<string | null>(null);
+  const [previewLoading, setPreviewLoading] = useState(false);
+  const [previewError, setPreviewError] = useState<string | null>(null);
+
+  // Generate preview logic
+  const generatePreview = async () => {
+    setPreviewLoading(true);
+    setPreviewError(null);
+
+    try {
+      const viewport = getMindmapViewport();
+      if (!viewport) {
+        setPreviewError('Viewport not found');
+        setPreviewLoading(false);
+        return;
+      }
+
+      const nodes = getNodes();
+      if (nodes.length === 0) {
+        setPreviewError('No nodes to preview');
+        setPreviewLoading(false);
+        return;
+      }
+
+      const previewSize = 512;
+      const nodesBounds = getNodesBounds(nodes);
+      const viewportTransform = getViewportForBounds(nodesBounds, previewSize, previewSize, 0.5, 2, 0.5);
+
+      const exportFunction = format === 'png' ? toPng : toJpeg;
+      const options: any = {
+        backgroundColor: backgroundColor === 'transparent' ? undefined : backgroundColor,
+        width: previewSize,
+        height: previewSize,
+        style: {
+          width: `${previewSize}px`,
+          height: `${previewSize}px`,
+          transform: `translate(${viewportTransform.x}px, ${viewportTransform.y}px) scale(${viewportTransform.zoom})`,
+        },
+        skipFonts: true,
+      };
+
+      if (format === 'jpg') {
+        options.quality = quality;
+      }
+
+      const dataUrl = await exportFunction(viewport, options);
+      setPreviewDataUrl(dataUrl);
+      setPreviewLoading(false);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to generate preview';
+      setPreviewError(errorMessage);
+      setPreviewLoading(false);
+    }
+  };
+
+  // Create debounced version
+  const debouncedGeneratePreview = useRef(debounce(generatePreview, 300)).current;
+
+  // Generate preview when settings change
+  useEffect(() => {
+    debouncedGeneratePreview();
+
+    return () => {
+      debouncedGeneratePreview.cancel();
+    };
+  }, [format, dimensions, backgroundColor, quality, debouncedGeneratePreview]);
 
   const handleExport = async () => {
     setIsExporting(true);
@@ -51,7 +118,7 @@ function ExportImageTab({ format }: ExportImageTabProps) {
           height: `${imageSize}px`,
           transform: `translate(${viewportTransform.x}px, ${viewportTransform.y}px) scale(${viewportTransform.zoom})`,
         },
-        skipFonts,
+        skipFonts: true,
       };
 
       if (format === 'jpg') {
@@ -101,15 +168,6 @@ function ExportImageTab({ format }: ExportImageTabProps) {
           </Select>
         </div>
 
-        <div className="flex items-center space-x-2">
-          <Checkbox
-            id="skipFonts"
-            checked={skipFonts}
-            onCheckedChange={(checked) => setSkipFonts(checked as boolean)}
-          />
-          <Label htmlFor="skipFonts">{t('export.common.skipFonts')}</Label>
-        </div>
-
         {format === 'jpg' && (
           <div className="space-y-2">
             <Label htmlFor="quality">
@@ -137,12 +195,7 @@ function ExportImageTab({ format }: ExportImageTabProps) {
 
       {/* Right Panel - Preview/Info */}
       <div className="flex-1 border-l p-6">
-        <div className="text-muted-foreground flex h-full items-center justify-center">
-          <div className="text-center">
-            <div className="mb-2 text-lg font-medium">Preview</div>
-            <div className="text-sm">Export configuration will be applied to the mindmap viewport</div>
-          </div>
-        </div>
+        <PreviewCard dataUrl={previewDataUrl} loading={previewLoading} error={previewError} />
       </div>
     </div>
   );

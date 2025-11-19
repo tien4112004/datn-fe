@@ -44,7 +44,6 @@ export default {
     formats: {
       png: 'PNG Image',
       jpg: 'JPG Image',
-      svg: 'SVG Vector',
       pdf: 'PDF Document',
     },
     common: {
@@ -61,10 +60,6 @@ export default {
       quality: 'Quality',
       width: 'Width',
       height: 'Height',
-    },
-    svg: {
-      strokeColor: 'Stroke Color',
-      includeBackground: 'Include Background',
     },
     pdf: {
       orientation: 'Orientation',

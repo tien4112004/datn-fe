@@ -44,7 +44,6 @@ export default {
     formats: {
       png: 'Ảnh PNG',
       jpg: 'Ảnh JPG',
-      svg: 'Vector SVG',
       pdf: 'Tài liệu PDF',
     },
     common: {
@@ -61,10 +60,6 @@ export default {
       quality: 'Chất lượng',
       width: 'Chiều rộng',
       height: 'Chiều cao',
-    },
-    svg: {
-      strokeColor: 'Màu viền',
-      includeBackground: 'Bao gồm nền',
     },
     pdf: {
       orientation: 'Hướng',

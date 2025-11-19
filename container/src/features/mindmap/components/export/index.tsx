@@ -2,7 +2,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/shared/compo
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/components/ui/tabs';
 import { useTranslation } from 'react-i18next';
 import ExportImageTab from './ExportImageTab';
-import ExportSVGTab from './ExportSVGTab';
 import ExportPDFTab from './ExportPDFTab';
 
 interface ExportMindmapDialogProps {
@@ -15,16 +14,15 @@ function ExportMindmapDialog({ isOpen, onOpenChange }: ExportMindmapDialogProps)
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[80vh] max-w-4xl overflow-hidden">
+      <DialogContent className="max-h-[80vh] !max-w-4xl overflow-hidden">
         <DialogHeader>
           <DialogTitle>{t('export.title')}</DialogTitle>
         </DialogHeader>
 
         <Tabs defaultValue="png" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="png">{t('export.formats.png')}</TabsTrigger>
             <TabsTrigger value="jpg">{t('export.formats.jpg')}</TabsTrigger>
-            <TabsTrigger value="svg">{t('export.formats.svg')}</TabsTrigger>
             <TabsTrigger value="pdf">{t('export.formats.pdf')}</TabsTrigger>
           </TabsList>
 
@@ -35,10 +33,6 @@ function ExportMindmapDialog({ isOpen, onOpenChange }: ExportMindmapDialogProps)
 
             <TabsContent value="jpg" className="mt-0">
               <ExportImageTab format="jpg" />
-            </TabsContent>
-
-            <TabsContent value="svg" className="mt-0">
-              <ExportSVGTab />
             </TabsContent>
 
             <TabsContent value="pdf" className="mt-0">

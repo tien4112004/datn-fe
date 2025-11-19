@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/shared/components/ui/button';
 import { Label } from '@/shared/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
@@ -6,12 +6,14 @@ import { useTranslation } from 'react-i18next';
 import { useReactFlow, getNodesBounds, getViewportForBounds } from '@xyflow/react';
 import { toPng } from 'html-to-image';
 import jsPDF from 'jspdf';
+import { debounce } from 'lodash';
 import {
   generateFilename,
   downloadFile,
   getMindmapViewport,
   getPaperSizeDimensions,
 } from '../../utils/exportUtils';
+import { PDFPreviewCard } from './PDFPreviewCard';
 
 function ExportPDFTab() {
   const { t } = useTranslation('mindmap');
@@ -20,6 +22,68 @@ function ExportPDFTab() {
   const [orientation, setOrientation] = useState<'portrait' | 'landscape'>('portrait');
   const [paperSize, setPaperSize] = useState<'a4' | 'letter'>('a4');
   const [isExporting, setIsExporting] = useState(false);
+
+  const [previewDataUrl, setPreviewDataUrl] = useState<string | null>(null);
+  const [previewLoading, setPreviewLoading] = useState(false);
+  const [previewError, setPreviewError] = useState<string | null>(null);
+
+  // Generate preview logic for PDF
+  const generatePreview = async () => {
+    setPreviewLoading(true);
+    setPreviewError(null);
+
+    try {
+      const viewport = getMindmapViewport();
+      if (!viewport) {
+        setPreviewError('Viewport not found');
+        setPreviewLoading(false);
+        return;
+      }
+
+      const nodes = getNodes();
+      if (nodes.length === 0) {
+        setPreviewError('No nodes to preview');
+        setPreviewLoading(false);
+        return;
+      }
+
+      const previewSize = 512;
+      const nodesBounds = getNodesBounds(nodes);
+      const viewportTransform = getViewportForBounds(nodesBounds, previewSize, previewSize, 0.5, 2, 0.5);
+
+      // Generate preview PNG
+      const dataUrl = await toPng(viewport, {
+        backgroundColor: 'white',
+        width: previewSize,
+        height: previewSize,
+        style: {
+          width: `${previewSize}px`,
+          height: `${previewSize}px`,
+          transform: `translate(${viewportTransform.x}px, ${viewportTransform.y}px) scale(${viewportTransform.zoom})`,
+        },
+        skipFonts: true,
+      });
+
+      setPreviewDataUrl(dataUrl);
+      setPreviewLoading(false);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to generate preview';
+      setPreviewError(errorMessage);
+      setPreviewLoading(false);
+    }
+  };
+
+  // Create debounced version
+  const debouncedGeneratePreview = useRef(debounce(generatePreview, 300)).current;
+
+  // Generate preview when orientation or paperSize changes
+  useEffect(() => {
+    debouncedGeneratePreview();
+
+    return () => {
+      debouncedGeneratePreview.cancel();
+    };
+  }, [orientation, paperSize, debouncedGeneratePreview]);
 
   const handleExport = async () => {
     setIsExporting(true);
@@ -141,14 +205,13 @@ function ExportPDFTab() {
 
       {/* Right Panel - Preview/Info */}
       <div className="flex-1 border-l p-6">
-        <div className="text-muted-foreground flex h-full items-center justify-center">
-          <div className="text-center">
-            <div className="mb-2 text-lg font-medium">PDF Export</div>
-            <div className="text-sm">
-              Exports mindmap as a PDF document with selected paper size and orientation
-            </div>
-          </div>
-        </div>
+        <PDFPreviewCard
+          dataUrl={previewDataUrl}
+          loading={previewLoading}
+          error={previewError}
+          orientation={orientation}
+          paperSize={paperSize}
+        />
       </div>
     </div>
   );

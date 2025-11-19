@@ -1,4 +1,5 @@
-import type { ExportFormat, ExportDimensions } from '../types/export';
+import type { ExportFormat, ExportDimensions } from '../../types/export';
+import { toPng, toJpeg } from 'html-to-image';
 
 // Get mindmap viewport element
 export function getMindmapViewport(): HTMLElement | null {
@@ -59,3 +60,37 @@ export function getPaperSizeDimensions(
   const size = sizes[paperSize];
   return orientation === 'landscape' ? { width: size.height, height: size.width } : size;
 }
+
+export const getImageData = (
+  format: 'png' | 'jpg',
+  viewport: HTMLElement,
+  {
+    backgroundColor,
+    quality,
+    size,
+    viewportTransform,
+  }: {
+    backgroundColor: string;
+    quality?: number;
+    size: number;
+    viewportTransform: any;
+  }
+) => {
+  const exportFunction = format === 'png' ? toPng : toJpeg;
+  const options: any = {
+    backgroundColor: backgroundColor === 'transparent' ? undefined : backgroundColor,
+    width: size,
+    height: size,
+    style: {
+      width: `${size}px`,
+      height: `${size}px`,
+      transform: `translate(${viewportTransform.x}px, ${viewportTransform.y}px) scale(${viewportTransform.zoom})`,
+    },
+    skipFonts: true,
+  };
+
+  if (format === 'jpg') {
+    options.quality = quality;
+  }
+  return exportFunction(viewport, options);
+};

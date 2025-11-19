@@ -1,4 +1,4 @@
-import { getPaperSizeDimensions } from '../../utils/exportUtils';
+import { getPaperSizeDimensions } from './utils';
 
 interface PDFPreviewCardProps {
   dataUrl: string | null;

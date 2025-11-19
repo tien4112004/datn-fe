@@ -1,13 +1,14 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import { Button } from '@/shared/components/ui/button';
 import { Label } from '@/shared/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
 import { useTranslation } from 'react-i18next';
-import { useReactFlow, getNodesBounds, getViewportForBounds } from '@xyflow/react';
-import { toPng, toJpeg } from 'html-to-image';
-import { debounce } from 'lodash';
-import { generateFilename, downloadFile, getMindmapViewport } from '../../utils/exportUtils';
+import { useReactFlow, getViewportForBounds } from '@xyflow/react';
+import { generateFilename, downloadFile, getMindmapViewport, getImageData } from './utils';
 import { PreviewCard } from './PreviewCard';
+import { usePreview } from './usePreview';
+import { Input } from '@/components/ui/input';
+import { useLatest } from '@/hooks/useLatest';
 
 interface ExportImageTabProps {
   format: 'png' | 'jpg';
@@ -21,79 +22,43 @@ const DIMENSION_PRESETS = [
 
 function ExportImageTab({ format }: ExportImageTabProps) {
   const { t } = useTranslation('mindmap');
-  const { getNodes } = useReactFlow();
+  const { getNodes, getNodesBounds } = useReactFlow();
 
   const [dimensions, setDimensions] = useState('2048');
   const [backgroundColor, setBackgroundColor] = useState('white');
   const [quality, setQuality] = useState(1);
+  const [padding, setPadding] = useState(0.5);
   const [isExporting, setIsExporting] = useState(false);
 
-  const [previewDataUrl, setPreviewDataUrl] = useState<string | null>(null);
-  const [previewLoading, setPreviewLoading] = useState(false);
-  const [previewError, setPreviewError] = useState<string | null>(null);
+  const configRef = useLatest({ format, backgroundColor, quality, padding, dimensions });
 
-  // Generate preview logic
-  const generatePreview = async () => {
-    setPreviewLoading(true);
-    setPreviewError(null);
+  const { previewDataUrl, previewLoading, previewError } = usePreview({
+    executor: () => {
+      const { format: f, padding: p, quality: q, backgroundColor: bg } = configRef.current;
 
-    try {
       const viewport = getMindmapViewport();
       if (!viewport) {
-        setPreviewError('Viewport not found');
-        setPreviewLoading(false);
-        return;
+        throw new Error('Viewport not found');
       }
 
       const nodes = getNodes();
       if (nodes.length === 0) {
-        setPreviewError('No nodes to preview');
-        setPreviewLoading(false);
-        return;
+        throw new Error('No nodes to preview');
       }
 
       const previewSize = 512;
       const nodesBounds = getNodesBounds(nodes);
-      const viewportTransform = getViewportForBounds(nodesBounds, previewSize, previewSize, 0.5, 2, 0.5);
+      const viewportTransform = getViewportForBounds(nodesBounds, previewSize, previewSize, 0.5, 2, p);
 
-      const exportFunction = format === 'png' ? toPng : toJpeg;
-      const options: any = {
-        backgroundColor: backgroundColor === 'transparent' ? undefined : backgroundColor,
-        width: previewSize,
-        height: previewSize,
-        style: {
-          width: `${previewSize}px`,
-          height: `${previewSize}px`,
-          transform: `translate(${viewportTransform.x}px, ${viewportTransform.y}px) scale(${viewportTransform.zoom})`,
-        },
-        skipFonts: true,
-      };
-
-      if (format === 'jpg') {
-        options.quality = quality;
-      }
-
-      const dataUrl = await exportFunction(viewport, options);
-      setPreviewDataUrl(dataUrl);
-      setPreviewLoading(false);
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to generate preview';
-      setPreviewError(errorMessage);
-      setPreviewLoading(false);
-    }
-  };
-
-  // Create debounced version
-  const debouncedGeneratePreview = useRef(debounce(generatePreview, 300)).current;
-
-  // Generate preview when settings change
-  useEffect(() => {
-    debouncedGeneratePreview();
-
-    return () => {
-      debouncedGeneratePreview.cancel();
-    };
-  }, [format, dimensions, backgroundColor, quality, debouncedGeneratePreview]);
+      return getImageData(f, viewport, {
+        backgroundColor: bg,
+        quality: q,
+        size: previewSize,
+        viewportTransform,
+      });
+    },
+    dependencies: [format, backgroundColor, quality, padding, dimensions],
+  });
 
   const handleExport = async () => {
     setIsExporting(true);
@@ -106,26 +71,15 @@ function ExportImageTab({ format }: ExportImageTabProps) {
 
       const nodesBounds = getNodesBounds(getNodes());
       const imageSize = parseInt(dimensions);
-      const viewportTransform = getViewportForBounds(nodesBounds, imageSize, imageSize, 0.5, 2, 0.5);
+      const viewportTransform = getViewportForBounds(nodesBounds, imageSize, imageSize, 0.5, 2, padding);
 
-      const exportFunction = format === 'png' ? toPng : toJpeg;
-      const options: any = {
-        backgroundColor: backgroundColor === 'transparent' ? undefined : backgroundColor,
-        width: imageSize,
-        height: imageSize,
-        style: {
-          width: `${imageSize}px`,
-          height: `${imageSize}px`,
-          transform: `translate(${viewportTransform.x}px, ${viewportTransform.y}px) scale(${viewportTransform.zoom})`,
-        },
-        skipFonts: true,
-      };
+      const dataUrl = await getImageData(format, viewport, {
+        backgroundColor,
+        quality,
+        size: imageSize,
+        viewportTransform,
+      });
 
-      if (format === 'jpg') {
-        options.quality = quality;
-      }
-
-      const dataUrl = await exportFunction(viewport, options);
       const filename = generateFilename(format);
       downloadFile(dataUrl, filename);
     } catch (error) {
@@ -166,6 +120,19 @@ function ExportImageTab({ format }: ExportImageTabProps) {
               ))}
             </SelectContent>
           </Select>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="padding">Padding: {padding}px</Label>
+          <Input
+            id="padding"
+            type="range"
+            min="0.1"
+            max="1"
+            step="0.1"
+            value={padding}
+            onChange={(e) => setPadding(parseFloat(e.target.value))}
+          />
         </div>
 
         {format === 'jpg' && (

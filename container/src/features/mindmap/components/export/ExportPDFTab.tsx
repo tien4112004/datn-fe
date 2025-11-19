@@ -1,89 +1,52 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import { Button } from '@/shared/components/ui/button';
 import { Label } from '@/shared/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
 import { useTranslation } from 'react-i18next';
-import { useReactFlow, getNodesBounds, getViewportForBounds } from '@xyflow/react';
-import { toPng } from 'html-to-image';
+import { useReactFlow, getViewportForBounds } from '@xyflow/react';
 import jsPDF from 'jspdf';
-import { debounce } from 'lodash';
 import {
   generateFilename,
   downloadFile,
   getMindmapViewport,
   getPaperSizeDimensions,
-} from '../../utils/exportUtils';
+  getImageData,
+} from './utils';
 import { PDFPreviewCard } from './PDFPreviewCard';
+import { usePreview } from './usePreview';
 
 function ExportPDFTab() {
   const { t } = useTranslation('mindmap');
-  const { getNodes } = useReactFlow();
+  const { getNodes, getNodesBounds } = useReactFlow();
 
   const [orientation, setOrientation] = useState<'portrait' | 'landscape'>('portrait');
   const [paperSize, setPaperSize] = useState<'a4' | 'letter'>('a4');
   const [isExporting, setIsExporting] = useState(false);
 
-  const [previewDataUrl, setPreviewDataUrl] = useState<string | null>(null);
-  const [previewLoading, setPreviewLoading] = useState(false);
-  const [previewError, setPreviewError] = useState<string | null>(null);
-
-  // Generate preview logic for PDF
-  const generatePreview = async () => {
-    setPreviewLoading(true);
-    setPreviewError(null);
-
-    try {
+  const { previewDataUrl, previewLoading, previewError } = usePreview({
+    executor: () => {
       const viewport = getMindmapViewport();
       if (!viewport) {
-        setPreviewError('Viewport not found');
-        setPreviewLoading(false);
-        return;
+        throw new Error('Viewport not found');
       }
 
       const nodes = getNodes();
       if (nodes.length === 0) {
-        setPreviewError('No nodes to preview');
-        setPreviewLoading(false);
-        return;
+        throw new Error('No nodes to preview');
       }
 
       const previewSize = 512;
       const nodesBounds = getNodesBounds(nodes);
       const viewportTransform = getViewportForBounds(nodesBounds, previewSize, previewSize, 0.5, 2, 0.5);
 
-      // Generate preview PNG
-      const dataUrl = await toPng(viewport, {
+      return getImageData('png', viewport, {
         backgroundColor: 'white',
-        width: previewSize,
-        height: previewSize,
-        style: {
-          width: `${previewSize}px`,
-          height: `${previewSize}px`,
-          transform: `translate(${viewportTransform.x}px, ${viewportTransform.y}px) scale(${viewportTransform.zoom})`,
-        },
-        skipFonts: true,
+        size: previewSize,
+        viewportTransform,
       });
-
-      setPreviewDataUrl(dataUrl);
-      setPreviewLoading(false);
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to generate preview';
-      setPreviewError(errorMessage);
-      setPreviewLoading(false);
-    }
-  };
-
-  // Create debounced version
-  const debouncedGeneratePreview = useRef(debounce(generatePreview, 300)).current;
-
-  // Generate preview when orientation or paperSize changes
-  useEffect(() => {
-    debouncedGeneratePreview();
-
-    return () => {
-      debouncedGeneratePreview.cancel();
-    };
-  }, [orientation, paperSize, debouncedGeneratePreview]);
+    },
+    dependencies: [orientation, paperSize],
+  });
 
   const handleExport = async () => {
     setIsExporting(true);
@@ -106,16 +69,10 @@ function ExportPDFTab() {
       const viewportTransform = getViewportForBounds(nodesBounds, imageSize, imageSize, 0.5, 2, 0.5);
 
       // Export mindmap as PNG image
-      const dataUrl = await toPng(viewport, {
+      const dataUrl = await getImageData('png', viewport, {
         backgroundColor: 'white',
-        width: imageSize,
-        height: imageSize,
-        style: {
-          width: `${imageSize}px`,
-          height: `${imageSize}px`,
-          transform: `translate(${viewportTransform.x}px, ${viewportTransform.y}px) scale(${viewportTransform.zoom})`,
-        },
-        skipFonts: true,
+        size: imageSize,
+        viewportTransform,
       });
 
       // Create PDF

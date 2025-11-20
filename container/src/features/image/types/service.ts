@@ -33,9 +33,16 @@ export interface ImageData {
   updatedAt?: string;
 }
 
+export interface GetImagesParams {
+  page?: number;
+  pageSize?: number;
+  search?: string;
+}
+
 export interface ImageApiService extends Service {
   generateImage(request: ImageGenerationRequest): Promise<ImageGenerationResponse>;
   getImageById(id: string): Promise<ImageData | null>;
+  getImages(params?: GetImagesParams): Promise<ImageData[]>;
   generatePresentationImage(
     id: string,
     slideId: string,

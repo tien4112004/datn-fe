@@ -6,6 +6,7 @@ import ProjectControls from '@/features/projects/components/ProjectControls';
 import ViewToggle, { type ViewMode } from '@/features/presentation/components/others/ViewToggle';
 import CommonTabs, { type TabItem } from '@/shared/components/common/CommonTabs';
 import MindmapTable from '@/features/mindmap/components/table/MindmapTable';
+import Image from '@/features/image';
 
 const ProjectListPage = () => {
   const { t } = useTranslation('projects');
@@ -69,7 +70,7 @@ const ProjectListPage = () => {
       key: 'image',
       value: 'image',
       label: t('resources.image', 'Image'),
-      content: <div className="text-muted-foreground py-8 text-center">Image resource coming soon...</div>,
+      content: <Image.ImageGalleryPage />,
     },
   ];
 

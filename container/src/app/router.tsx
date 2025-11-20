@@ -53,6 +53,10 @@ const router = createBrowserRouter([
         Component: Presentation.PresentationListPage,
       },
       {
+        path: 'image',
+        Component: Image.ImageGalleryPage,
+      },
+      {
         path: 'image/create',
         Component: Image.CreateImagePage,
       },

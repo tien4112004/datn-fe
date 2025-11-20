@@ -4,6 +4,7 @@ import {
   type ImageGenerationRequest,
   type ImageGenerationResponse,
   type ImageData,
+  type GetImagesParams,
 } from '../types/service';
 import { api } from '@/shared/api';
 import { type ApiResponse } from '@/types/api';
@@ -34,6 +35,22 @@ export default class ImageRealApiService implements ImageApiService {
     } catch (error) {
       console.error('Failed to fetch image:', error);
       return null;
+    }
+  }
+
+  async getImages(params?: GetImagesParams): Promise<ImageData[]> {
+    try {
+      const response = await api.get<ApiResponse<ImageData[]>>(`${this.baseUrl}/api/images`, {
+        params: {
+          page: params?.page,
+          pageSize: params?.pageSize,
+          search: params?.search,
+        },
+      });
+      return response.data.data.map((img) => this._mapImageItem(img));
+    } catch (error) {
+      console.error('Failed to fetch images:', error);
+      return [];
     }
   }
 

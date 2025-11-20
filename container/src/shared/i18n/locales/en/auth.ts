@@ -32,7 +32,7 @@ export default {
     emailPlaceholder: 'name@example.com',
     dateOfBirth: 'Date of Birth',
     dateOfBirthPlaceholder: 'Pick a date',
-    phoneNumber: 'Phone Number (Optional)',
+    phoneNumber: 'Phone Number',
     phoneNumberPlaceholder: '+1234567890',
     password: 'Password',
     passwordPlaceholder: 'Create a strong password',

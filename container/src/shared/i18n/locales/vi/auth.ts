@@ -32,7 +32,7 @@ export default {
     emailPlaceholder: 'ten@example.com',
     dateOfBirth: 'Ngày sinh',
     dateOfBirthPlaceholder: 'Chọn ngày',
-    phoneNumber: 'Số điện thoại (Tùy chọn)',
+    phoneNumber: 'Số điện thoại',
     phoneNumberPlaceholder: '+84123456789',
     password: 'Mật khẩu',
     passwordPlaceholder: 'Tạo mật khẩu mạnh',

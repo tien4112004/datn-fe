@@ -22,7 +22,7 @@ export function LoginForm() {
     () =>
       z.object({
         email: z.string().email(t('validation.emailInvalid')),
-        password: z.string().min(6, t('validation.passwordMinLength', { min: 6 })),
+        password: z.string(),
         rememberMe: z.boolean().default(false),
       }),
     [t]

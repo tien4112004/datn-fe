@@ -24,12 +24,12 @@ export default class UserProfileRealApiService implements UserProfileApiService 
   }
 
   async getCurrentUserProfile(): Promise<UserProfile> {
-    const response = await api.get<ApiResponse<UserProfile>>(`/auth/user/me`);
+    const response = await api.get<ApiResponse<UserProfile>>(`${this.baseUrl}/api/user/me`);
     return response.data.data;
   }
 
   async updateCurrentUserProfile(data: UserProfileUpdateRequest): Promise<UserProfile> {
-    const response = await api.patch<ApiResponse<UserProfile>>(`/auth/user/me`, data);
+    const response = await api.patch<ApiResponse<UserProfile>>(`${this.baseUrl}/api/user/me`, data);
     return response.data.data;
   }
 
@@ -37,15 +37,19 @@ export default class UserProfileRealApiService implements UserProfileApiService 
     const formData = new FormData();
     formData.append('avatar', avatar);
 
-    const response = await api.patch<ApiResponse<{ avatarUrl: string }>>(`/auth/user/me/avatar`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
+    const response = await api.patch<ApiResponse<{ avatarUrl: string }>>(
+      `${this.baseUrl}/api/user/me/avatar`,
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }
+    );
     return response.data.data;
   }
 
   async removeCurrentUserAvatar(): Promise<void> {
-    await api.delete(`/auth/user/me/avatar`);
+    await api.delete(`${this.baseUrl}/api/user/me/avatar`);
   }
 }

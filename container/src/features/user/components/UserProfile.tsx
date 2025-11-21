@@ -33,11 +33,11 @@ const UserProfile = () => {
 
   return (
     <div className="space-y-6 py-4">
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-        <div className="lg:col-span-1">
+      <div className="flex flex-col gap-8 lg:flex-row">
+        <div className="">
           <AvatarUploader />
         </div>
-        <div className="lg:col-span-2">
+        <div className="flex-1">
           <UserProfileForm />
         </div>
       </div>

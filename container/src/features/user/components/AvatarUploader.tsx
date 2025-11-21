@@ -54,7 +54,7 @@ export const AvatarUploader = () => {
           className="hidden"
           accept="image/png, image/jpeg, image/gif"
         />
-        <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
+        <div className="flex flex-row gap-3">
           <LoadingButton
             onClick={handleUploadClick}
             loading={isUpdatingAvatar}

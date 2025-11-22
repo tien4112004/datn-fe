@@ -29,6 +29,14 @@ export default {
       redo: 'Làm lại (Ctrl+Y)',
       applyLayout: 'Áp dụng bố cục',
       logData: 'Ghi nhật ký nút và cạnh',
+      saveMindmap: 'Lưu sơ đồ tư duy với hình thu nhỏ',
+      download: 'Tải xuống dưới dạng PNG',
+    },
+    save: {
+      save: 'Lưu',
+      saving: 'Đang lưu...',
+      success: 'Lưu sơ đồ tư duy thành công',
+      error: 'Lưu sơ đồ tư duy thất bại',
     },
   },
 };

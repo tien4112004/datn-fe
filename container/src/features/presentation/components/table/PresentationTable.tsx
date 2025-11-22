@@ -1,5 +1,5 @@
 import { createColumnHelper, getCoreRowModel, useReactTable } from '@tanstack/react-table';
-import { useMemo, useCallback } from 'react';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Presentation } from '../../types/presentation';
 import { usePresentationManager } from '../../hooks/usePresentationManager';
@@ -9,16 +9,13 @@ import { SearchBar } from '../../../../shared/components/common/SearchBar';
 import { useNavigate } from 'react-router-dom';
 import ThumbnailWrapper from '../others/ThumbnailWrapper';
 import { RenameFileDialog } from '@/components/modals/RenameFileDialog';
+import { getLocaleDateFns } from '@/shared/i18n/helper';
+import { format } from 'date-fns';
 
 const PresentationTable = () => {
   const { t } = useTranslation('common', { keyPrefix: 'table' });
   const navigate = useNavigate();
   const columnHelper = createColumnHelper<Presentation>();
-
-  const formatDate = useCallback((date: Date | string | undefined): string => {
-    if (!date) return '';
-    return new Date(date).toLocaleString();
-  }, []);
 
   const columns = useMemo(
     () => [
@@ -65,17 +62,19 @@ const PresentationTable = () => {
       }),
       columnHelper.accessor('createdAt', {
         header: t('presentation.createdAt'),
-        cell: (info) => formatDate(info.getValue()),
-        size: 160,
+        cell: (info) =>
+          info.getValue() ? format(info.getValue() as Date, 'E, P', { locale: getLocaleDateFns() }) : '',
+        size: 280,
       }),
       columnHelper.accessor('updatedAt', {
         header: t('presentation.updatedAt'),
-        cell: (info) => formatDate(info.getValue()),
-        size: 160,
+        cell: (info) =>
+          info.getValue() ? format(info.getValue() as Date, 'E, P', { locale: getLocaleDateFns() }) : '',
+        size: 280,
         enableSorting: false,
       }),
     ],
-    [t, formatDate]
+    [t]
   );
 
   const {

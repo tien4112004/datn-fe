@@ -1,7 +1,7 @@
 import { API_MODE, type ApiMode } from '@/shared/constants';
 import {
   type MindmapApiService,
-  type MindmapData,
+  type Mindmap,
   type MindmapCollectionRequest,
   MINDMAP_TYPES,
   PATH_TYPES,
@@ -10,11 +10,17 @@ import { DRAGHANDLE, SIDE } from '../types/constants';
 import type { ApiResponse, Pagination } from '@/shared/types/api';
 import { mapPagination } from '@/shared/types/api';
 
-const mockMindmaps: MindmapData[] = [
+const mockMindmaps: Mindmap[] = [
   {
     id: '1',
     title: 'Software Architecture',
     description: 'A mindmap exploring different software architecture patterns',
+    thumbnail:
+      'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="120"%3E%3Crect fill="%23f0f0f0" width="200" height="120"/%3E%3Ctext x="50%25" y="50%25" text-anchor="middle" dy=".3em" fill="%23999" font-family="sans-serif"%3EArchitecture%3C/text%3E%3C/svg%3E',
+    metadata: {
+      direction: 'horizontal',
+      forceLayout: false,
+    },
     nodes: [
       {
         id: 'root',
@@ -211,6 +217,12 @@ const mockMindmaps: MindmapData[] = [
     id: '2',
     title: 'Project Planning',
     description: 'Planning phases and milestones for the new project',
+    thumbnail:
+      'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="120"%3E%3Crect fill="%23e3f2fd" width="200" height="120"/%3E%3Ctext x="50%25" y="50%25" text-anchor="middle" dy=".3em" fill="%231976d2" font-family="sans-serif"%3EPlanning%3C/text%3E%3C/svg%3E',
+    metadata: {
+      direction: 'vertical',
+      forceLayout: false,
+    },
     nodes: [
       {
         id: 'root-2',
@@ -238,6 +250,12 @@ const mockMindmaps: MindmapData[] = [
     id: '3',
     title: 'Learning Roadmap',
     description: 'Personal learning path for web development',
+    thumbnail:
+      'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="120"%3E%3Crect fill="%23f3e5f5" width="200" height="120"/%3E%3Ctext x="50%25" y="50%25" text-anchor="middle" dy=".3em" fill="%237b1fa2" font-family="sans-serif"%3ELearning%3C/text%3E%3C/svg%3E',
+    metadata: {
+      direction: 'horizontal',
+      forceLayout: true,
+    },
     nodes: [
       {
         id: 'root-3',
@@ -276,7 +294,7 @@ export default class MindmapMockService implements MindmapApiService {
     return API_MODE.mock;
   }
 
-  async getMindmaps(request: MindmapCollectionRequest): Promise<ApiResponse<MindmapData[]>> {
+  async getMindmaps(request: MindmapCollectionRequest): Promise<ApiResponse<Mindmap[]>> {
     return new Promise((resolve) => {
       setTimeout(() => {
         const { page = 0, pageSize = 20, sort = 'desc', filter = '' } = request;
@@ -323,7 +341,7 @@ export default class MindmapMockService implements MindmapApiService {
     });
   }
 
-  async getMindmapById(id: string): Promise<MindmapData> {
+  async getMindmapById(id: string): Promise<Mindmap> {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         const mindmap = mindmapStorage.find((m) => m.id === id);
@@ -336,10 +354,10 @@ export default class MindmapMockService implements MindmapApiService {
     });
   }
 
-  async createMindmap(data: MindmapData): Promise<MindmapData> {
+  async createMindmap(data: Mindmap): Promise<Mindmap> {
     return new Promise((resolve) => {
       setTimeout(() => {
-        const newMindmap: MindmapData = {
+        const newMindmap: Mindmap = {
           ...data,
           id: data.id || crypto.randomUUID(),
           createdAt: new Date().toISOString(),
@@ -347,6 +365,38 @@ export default class MindmapMockService implements MindmapApiService {
         };
         mindmapStorage.push(newMindmap);
         resolve({ ...newMindmap });
+      }, 300);
+    });
+  }
+
+  async updateMindmap(id: string, data: Partial<Mindmap>): Promise<Mindmap> {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        const index = mindmapStorage.findIndex((m) => m.id === id);
+        if (index !== -1) {
+          mindmapStorage[index] = {
+            ...mindmapStorage[index],
+            ...data,
+            updatedAt: new Date().toISOString(),
+          };
+          resolve({ ...mindmapStorage[index] });
+        } else {
+          reject(new Error(`Mindmap with id ${id} not found`));
+        }
+      }, 300);
+    });
+  }
+
+  async deleteMindmap(id: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        const index = mindmapStorage.findIndex((m) => m.id === id);
+        if (index !== -1) {
+          mindmapStorage.splice(index, 1);
+          resolve();
+        } else {
+          reject(new Error(`Mindmap with id ${id} not found`));
+        }
       }, 300);
     });
   }

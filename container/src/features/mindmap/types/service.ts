@@ -1,17 +1,6 @@
 import type { Service } from '@/shared/api';
-import type { MindMapNode, MindMapEdge } from './index';
 import type { ApiResponse } from '@/shared/types/api';
-
-export interface MindmapData {
-  id: string;
-  title: string;
-  description?: string;
-  nodes: MindMapNode[];
-  edges: MindMapEdge[];
-  createdAt: string;
-  updatedAt: string;
-  status: 'active' | 'archived' | 'draft';
-}
+import type { Mindmap } from './mindmap';
 
 export interface MindmapCollectionRequest {
   page?: number;
@@ -21,8 +10,10 @@ export interface MindmapCollectionRequest {
 }
 
 export interface MindmapApiService extends Service {
-  getMindmapById(id: string): Promise<MindmapData>;
-  getMindmaps(request: MindmapCollectionRequest): Promise<ApiResponse<MindmapData[]>>;
-  createMindmap(data: MindmapData): Promise<MindmapData>;
+  getMindmapById(id: string): Promise<Mindmap>;
+  getMindmaps(request: MindmapCollectionRequest): Promise<ApiResponse<Mindmap[]>>;
+  createMindmap(data: Mindmap): Promise<Mindmap>;
+  updateMindmap(id: string, data: Partial<Mindmap>): Promise<Mindmap>;
+  deleteMindmap(id: string): Promise<void>;
   updateMindmapTitle(id: string, name: string): Promise<any | null>;
 }

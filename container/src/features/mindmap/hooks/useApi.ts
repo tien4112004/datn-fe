@@ -2,13 +2,15 @@ import { useQuery, useMutation, useQueryClient, type UseQueryResult } from '@tan
 import type { SortingState, PaginationState, Updater } from '@tanstack/react-table';
 import { useMindmapApiService } from '../api';
 import { useEffect, useState } from 'react';
-import type { MindmapData } from '../types/service';
+import type { Mindmap } from '../types';
 import type { ApiResponse } from '@/shared/types/api';
 import { ExpectedError } from '@/types/errors';
+import { useMetadataStore } from '../stores';
+import { DRAGHANDLE } from '../types';
 
 // Return types for the hooks
-export interface UseMindmapsReturn extends Omit<UseQueryResult<ApiResponse<MindmapData[]>>, 'data'> {
-  data: MindmapData[];
+export interface UseMindmapsReturn extends Omit<UseQueryResult<ApiResponse<Mindmap[]>>, 'data'> {
+  data: Mindmap[];
   sorting: SortingState;
   setSorting: (updaterOrValue: Updater<SortingState>) => void;
   pagination: PaginationState;
@@ -28,9 +30,9 @@ export const useMindmaps = (): UseMindmapsReturn => {
   });
   const [search, setSearch] = useState<string>('');
 
-  const { data, ...query } = useQuery<ApiResponse<MindmapData[]>>({
+  const { data, ...query } = useQuery<ApiResponse<Mindmap[]>>({
     queryKey: [mindmapApiService.getType(), 'mindmaps', sorting, pagination, search],
-    queryFn: async (): Promise<ApiResponse<MindmapData[]>> => {
+    queryFn: async (): Promise<ApiResponse<Mindmap[]>> => {
       const data = await mindmapApiService.getMindmaps({
         page: pagination.pageIndex,
         pageSize: pagination.pageSize,
@@ -87,9 +89,9 @@ export const useMindmaps = (): UseMindmapsReturn => {
 export const useMindmapById = (id: string | undefined) => {
   const mindmapApiService = useMindmapApiService();
 
-  return useQuery<MindmapData>({
+  return useQuery<Mindmap>({
     queryKey: [mindmapApiService.getType(), 'mindmap', id],
-    queryFn: async (): Promise<MindmapData> => {
+    queryFn: async (): Promise<Mindmap> => {
       if (!id) {
         throw new ExpectedError('Mindmap ID is required');
       }
@@ -156,7 +158,7 @@ export const useCreateBlankMindmap = () => {
               pathType: 'smoothstep',
               edgeColor: 'var(--primary)',
             },
-            dragHandle: '.drag-handle',
+            dragHandle: DRAGHANDLE.SELECTOR,
             width: 250,
             height: 100,
           },
@@ -168,6 +170,102 @@ export const useCreateBlankMindmap = () => {
       });
 
       return { mindmap };
+    },
+  });
+};
+
+export const useUpdateMindmap = () => {
+  const mindmapApiService = useMindmapApiService();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, data }: { id: string; data: Partial<Mindmap> }) => {
+      const result = await mindmapApiService.updateMindmap(id, data);
+      return { id, data: result };
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({
+        queryKey: [mindmapApiService.getType(), 'mindmaps'],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: [mindmapApiService.getType(), 'mindmap', data.id],
+      });
+    },
+  });
+};
+
+export const useUpdateMindmapWithMetadata = () => {
+  const mindmapApiService = useMindmapApiService();
+  const queryClient = useQueryClient();
+  const getMetadata = useMetadataStore((state) => state.getMetadata);
+  const getThumbnail = useMetadataStore((state) => state.getThumbnail);
+
+  return useMutation({
+    mutationFn: async ({ id, data }: { id: string; data: Partial<Mindmap> }) => {
+      // Include metadata from store in the update payload
+      const metadata = getMetadata();
+      const updateData: Partial<Mindmap> = {
+        ...data,
+      };
+
+      if (metadata) {
+        updateData.metadata = metadata;
+      }
+
+      const thumbnail = getThumbnail();
+      if (thumbnail) {
+        updateData.thumbnail = thumbnail;
+      }
+
+      const result = await mindmapApiService.updateMindmap(id, updateData);
+      return { id, data: result };
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({
+        queryKey: [mindmapApiService.getType(), 'mindmaps'],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: [mindmapApiService.getType(), 'mindmap', data.id],
+      });
+    },
+  });
+};
+
+export const useDeleteMindmap = () => {
+  const mindmapApiService = useMindmapApiService();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      await mindmapApiService.deleteMindmap(id);
+      return id;
+    },
+    onSuccess: (deletedId) => {
+      queryClient.invalidateQueries({
+        queryKey: [mindmapApiService.getType(), 'mindmaps'],
+      });
+
+      queryClient.removeQueries({
+        queryKey: [mindmapApiService.getType(), 'mindmap', deletedId],
+      });
+    },
+  });
+};
+
+export const useCreateTestMindmaps = () => {
+  const mindmapApiService = useMindmapApiService();
+
+  return useMutation({
+    mutationFn: async () => {
+      // Read from /public/data/mindmap.json
+      const response = await fetch('/data/mindmap.json');
+      const mindmap = await response.json();
+
+      const createdMindmap = await mindmapApiService.createMindmap(mindmap);
+
+      return createdMindmap;
     },
   });
 };

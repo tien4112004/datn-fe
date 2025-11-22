@@ -1,5 +1,5 @@
 import { API_MODE, type ApiMode } from '@/shared/constants';
-import { type MindmapApiService, type MindmapData, type MindmapCollectionRequest } from '../types';
+import { type MindmapApiService, type Mindmap, type MindmapCollectionRequest } from '../types';
 import { api } from '@/shared/api';
 import { mapPagination, type ApiResponse, type Pagination } from '@/types/api';
 
@@ -14,8 +14,8 @@ export default class MindmapRealApiService implements MindmapApiService {
     return API_MODE.real;
   }
 
-  async getMindmaps(request: MindmapCollectionRequest): Promise<ApiResponse<MindmapData[]>> {
-    const response = await api.get<ApiResponse<MindmapData[]>>(`${this.baseUrl}/api/mindmaps`, {
+  async getMindmaps(request: MindmapCollectionRequest): Promise<ApiResponse<Mindmap[]>> {
+    const response = await api.get<ApiResponse<Mindmap[]>>(`${this.baseUrl}/api/mindmaps`, {
       params: {
         page: (request.page || 0) + 1,
         pageSize: request.pageSize,
@@ -30,14 +30,23 @@ export default class MindmapRealApiService implements MindmapApiService {
     };
   }
 
-  async getMindmapById(id: string): Promise<MindmapData> {
-    const response = await api.get<ApiResponse<MindmapData>>(`${this.baseUrl}/api/mindmaps/${id}`);
+  async getMindmapById(id: string): Promise<Mindmap> {
+    const response = await api.get<ApiResponse<Mindmap>>(`${this.baseUrl}/api/mindmaps/${id}`);
     return response.data.data;
   }
 
-  async createMindmap(data: MindmapData): Promise<MindmapData> {
-    const response = await api.post<ApiResponse<MindmapData>>(`${this.baseUrl}/api/mindmaps`, data);
+  async createMindmap(data: Mindmap): Promise<Mindmap> {
+    const response = await api.post<ApiResponse<Mindmap>>(`${this.baseUrl}/api/mindmaps`, data);
     return response.data.data;
+  }
+
+  async updateMindmap(id: string, data: Partial<Mindmap>): Promise<Mindmap> {
+    const response = await api.put<ApiResponse<Mindmap>>(`${this.baseUrl}/api/mindmaps/${id}`, data);
+    return response.data.data;
+  }
+
+  async deleteMindmap(id: string): Promise<void> {
+    await api.delete(`${this.baseUrl}/api/mindmaps/${id}`);
   }
 
   async updateMindmapTitle(id: string, name: string): Promise<any | null> {

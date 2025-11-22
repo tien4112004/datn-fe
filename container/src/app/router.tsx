@@ -10,15 +10,12 @@ import { getMindmapById } from '@/features/mindmap/hooks/loaders';
 import Projects from '@/features/projects';
 import Settings from '@/features/settings';
 import Image from '@/features/image';
-<<<<<<< HEAD
 import { LoginPage } from '@/features/auth/pages/LoginPage';
 import { RegisterPage } from '@/features/auth/pages/RegisterPage';
 import GoogleCallbackPage from '@/features/auth/pages/GoogleCallbackPage';
 import { ProtectedRoute } from '@/shared/components/ProtectedRoute';
-=======
 import Classes from '@/features/classes';
 import { getClassById } from '@/features/classes/shared/hooks/loaders';
->>>>>>> d195cce2 (feat: temp)
 
 const router = createBrowserRouter([
   {

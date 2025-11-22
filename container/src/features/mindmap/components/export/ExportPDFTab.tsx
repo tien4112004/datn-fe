@@ -37,7 +37,7 @@ function ExportPDFTab() {
 
       const previewSize = 512;
       const nodesBounds = getNodesBounds(nodes);
-      const viewportTransform = getViewportForBounds(nodesBounds, previewSize, previewSize, 0.5, 2, 0.5);
+      const viewportTransform = getViewportForBounds(nodesBounds, previewSize, previewSize, 0.01, 100, 0.5);
 
       return getImageData('png', viewport, {
         backgroundColor: 'white',
@@ -66,7 +66,7 @@ function ExportPDFTab() {
       // Calculate dimensions for image export
       const nodesBounds = getNodesBounds(nodes);
       const imageSize = 2048;
-      const viewportTransform = getViewportForBounds(nodesBounds, imageSize, imageSize, 0.5, 2, 0.5);
+      const viewportTransform = getViewportForBounds(nodesBounds, imageSize, imageSize, 0.01, 100, 0.5);
 
       // Export mindmap as PNG image
       const dataUrl = await getImageData('png', viewport, {

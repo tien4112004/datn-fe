@@ -60,7 +60,7 @@ export default {
       quality: 'Chất lượng',
       width: 'Chiều rộng',
       height: 'Chiều cao',
-      padding: 'Khoảng cách',
+      padding: 'Khoảng cách lề',
     },
     pdf: {
       orientation: 'Hướng',

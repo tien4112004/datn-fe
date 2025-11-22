@@ -49,7 +49,7 @@ function ExportImageTab({ format }: ExportImageTabProps) {
 
       const previewSize = parseInt(d);
       const nodesBounds = getNodesBounds(nodes);
-      const viewportTransform = getViewportForBounds(nodesBounds, previewSize, previewSize, 0.5, 2, p);
+      const viewportTransform = getViewportForBounds(nodesBounds, previewSize, previewSize, 0.01, 100, p);
 
       return getImageData(f, viewport, {
         backgroundColor: bg,
@@ -72,7 +72,7 @@ function ExportImageTab({ format }: ExportImageTabProps) {
 
       const nodesBounds = getNodesBounds(getNodes());
       const imageSize = parseInt(dimensions);
-      const viewportTransform = getViewportForBounds(nodesBounds, imageSize, imageSize, 0.5, 2, padding);
+      const viewportTransform = getViewportForBounds(nodesBounds, imageSize, imageSize, 0.01, 100, padding);
 
       const dataUrl = await getImageData(format, viewport, {
         backgroundColor,
@@ -128,6 +128,7 @@ function ExportImageTab({ format }: ExportImageTabProps) {
           <Slider
             defaultValue={[padding]}
             id="padding"
+            min={0}
             max={1}
             step={0.1}
             onValueChange={(value) => setPadding(value[0])}

@@ -1,5 +1,5 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/shared/components/ui/dialog';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/components/ui/tabs';
+import { ColoredTabsTrigger, Tabs, TabsContent, TabsList } from '@/shared/components/ui/tabs';
 import { useTranslation } from 'react-i18next';
 import ExportImageTab from './ExportImageTab';
 import ExportPDFTab from './ExportPDFTab';
@@ -21,9 +21,9 @@ function ExportMindmapDialog({ isOpen, onOpenChange }: ExportMindmapDialogProps)
 
         <Tabs defaultValue="png" className="w-full">
           <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="png">{t('export.formats.png')}</TabsTrigger>
-            <TabsTrigger value="jpg">{t('export.formats.jpg')}</TabsTrigger>
-            <TabsTrigger value="pdf">{t('export.formats.pdf')}</TabsTrigger>
+            <ColoredTabsTrigger value="png">{t('export.formats.png')}</ColoredTabsTrigger>
+            <ColoredTabsTrigger value="jpg">{t('export.formats.jpg')}</ColoredTabsTrigger>
+            <ColoredTabsTrigger value="pdf">{t('export.formats.pdf')}</ColoredTabsTrigger>
           </TabsList>
 
           <div className="mt-4 h-[400px] overflow-y-auto">

@@ -1,4 +1,4 @@
-import { Plus, Trash2, Undo, Redo, ChevronDown } from 'lucide-react';
+import { Plus, Trash2, Undo, Redo, ChevronDown, Save } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/shared/components/ui/checkbox';
 import { Label } from '@/shared/components/ui/label';
@@ -10,13 +10,16 @@ import {
 } from '@/shared/components/ui/dropdown-menu';
 import { useLayoutStore } from '../../stores/layout';
 import { useUndoRedoStore, useCoreStore, useNodeOperationsStore } from '../../stores';
-import { useReactFlow, useUpdateNodeInternals } from '@xyflow/react';
+import { useUpdateNodeInternals } from '@xyflow/react';
 import { useTranslation } from 'react-i18next';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
-import DownloadButton from '../controls/DownloadButton';
+import { useSaveMindmap } from '../../hooks/useSaveMindmap';
+import { useState } from 'react';
+import ExportMindmapDialog from '../export';
 import type { Direction } from '../../types';
+import LoadingButton from '@/components/common/LoadingButton';
 
-const Toolbar = () => {
+const Toolbar = ({ mindmapId }: { mindmapId: string }) => {
   const { t } = useTranslation(I18N_NAMESPACES.MINDMAP);
   const addNode = useNodeOperationsStore((state) => state.addNode);
   const deleteSelectedNodes = useNodeOperationsStore((state) => state.markNodeForDeletion);
@@ -32,8 +35,11 @@ const Toolbar = () => {
   const setAutoLayoutEnabled = useLayoutStore((state) => state.setAutoLayoutEnabled);
   const updateNodeDirection = useLayoutStore((state) => state.updateNodeDirection);
   const applyAutoLayout = useLayoutStore((state) => state.applyAutoLayout);
-  const { fitView } = useReactFlow();
   const updateNodeInternals = useUpdateNodeInternals();
+
+  // Save and Export states
+  const { saveWithThumbnail, isLoading: isSaving } = useSaveMindmap();
+  const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
 
   const handleDirectionChange = (value: Direction) => {
     setLayout(value);
@@ -46,7 +52,6 @@ const Toolbar = () => {
       // When auto-layout is disabled, only update handles/controls
       updateNodeDirection(value, updateNodeInternals);
     }
-    fitView();
   };
 
   const handleAutoLayoutChange = (checked: boolean | 'indeterminate') => {
@@ -202,9 +207,31 @@ const Toolbar = () => {
             <span className="sr-only">{t('toolbar.actions.logData')}</span>
             {t('toolbar.actions.logData')}
           </Button>
-          <DownloadButton className="w-full transition-colors hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500" />
+          <LoadingButton
+            variant="outline"
+            onClick={async () => await saveWithThumbnail(mindmapId)}
+            loading={isSaving}
+            loadingText={t('toolbar.save.saving')}
+            className="w-full transition-colors hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500"
+            title={t('toolbar.tooltips.saveMindmap')}
+            size="sm"
+          >
+            <Save size={16} />
+            {t('toolbar.save.save')}
+          </LoadingButton>
+          <Button
+            variant="outline"
+            onClick={() => setIsExportDialogOpen(true)}
+            className="w-full transition-colors hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500"
+            size="sm"
+          >
+            Export
+          </Button>
         </div>
       </div>
+
+      {/* Export Dialog */}
+      <ExportMindmapDialog isOpen={isExportDialogOpen} onOpenChange={setIsExportDialogOpen} />
     </div>
   );
 };

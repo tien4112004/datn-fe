@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   createColumnHelper,
   getCoreRowModel,
@@ -12,19 +12,21 @@ import { useNavigate } from 'react-router-dom';
 import DataTable from '@/components/table/DataTable';
 import { SearchBar } from '@/shared/components/common/SearchBar';
 import { useMindmaps, useUpdateMindmapTitle } from '@/features/mindmap/hooks';
-import type { MindmapData } from '@/features/mindmap/types/service';
+import type { Mindmap } from '@/features/mindmap/types/service';
 import { RenameFileDialog } from '@/shared/components/modals/RenameFileDialog';
 import { toast } from 'sonner';
 import { ActionContent } from '@/features/presentation/components';
+import { format } from 'date-fns';
+import { getLocaleDateFns } from '@/shared/i18n/helper';
 
-const columnHelper = createColumnHelper<MindmapData>();
+const columnHelper = createColumnHelper<Mindmap>();
 
-const MindmapTable: React.FC = () => {
+const MindmapTable = () => {
   const { t } = useTranslation('common', { keyPrefix: 'table' });
   const navigate = useNavigate();
 
   const [isRenameOpen, setIsRenameOpen] = useState(false);
-  const [selectedMindmap, setSelectedMindmap] = useState<MindmapData | null>(null);
+  const [selectedMindmap, setSelectedMindmap] = useState<Mindmap | null>(null);
 
   // Use the new hook
   const { data, isLoading, sorting, setSorting, pagination, setPagination, search, setSearch, totalItems } =
@@ -32,53 +34,65 @@ const MindmapTable: React.FC = () => {
 
   const updateMindmapTitleMutation = useUpdateMindmapTitle();
 
-  const formatDate = useCallback((d: string | undefined) => {
-    if (!d) return '';
-    return new Date(d).toLocaleString();
-  }, []);
-
   const columns = useMemo(
     () => [
       columnHelper.accessor('id', {
-        header: t('mindmap.id', 'ID'),
+        header: t('mindmap.id'),
         size: 90,
         cell: (info) => info.getValue(),
         enableResizing: true,
         enableSorting: false,
       }),
+      columnHelper.accessor('thumbnail', {
+        header: t('mindmap.thumbnail'),
+        size: 176,
+        cell: (info) => {
+          const thumbnail = info.getValue();
+          if (thumbnail && typeof thumbnail === 'string') {
+            return (
+              <img
+                src={thumbnail}
+                alt="Mindmap Thumbnail"
+                className="aspect-[16/9] w-[120px] rounded border object-cover"
+                onError={(e) => {
+                  // Fallback to placeholder if image fails to load
+                  const target = e.target as HTMLImageElement;
+                  target.src = '/images/placeholder-image.webp';
+                }}
+              />
+            );
+          }
+          // Fallback placeholder
+          return (
+            <img
+              src="/images/placeholder-image.webp"
+              alt="No Thumbnail"
+              className={`aspect-[16/9] w-[120px]`}
+            />
+          );
+        },
+        enableResizing: false,
+        enableSorting: false,
+      }),
       columnHelper.accessor('title', {
-        header: t('mindmap.title', 'Title'),
+        header: t('mindmap.title'),
         cell: (info) => info.getValue(),
         minSize: 200,
         meta: { isGrow: true },
         enableSorting: true,
       }),
-      // TODO: remove this
-      columnHelper.accessor('nodes', {
-        header: t('nodes', 'Nodes'),
-        cell: (info) => (info.getValue() ? (info.getValue() as any).length : 0),
-        enableSorting: false,
-        size: 100,
-      }),
-      columnHelper.accessor('edges', {
-        header: t('edges', 'Edges'),
-        cell: (info) => (info.getValue() ? (info.getValue() as any).length : 0),
-        enableSorting: false,
-        size: 100,
-      }),
-      // end TODO
       columnHelper.accessor('createdAt', {
-        header: t('mindmap.createdAt', 'Created At'),
-        cell: (info) => formatDate(info.getValue()),
-        size: 180,
+        header: t('mindmap.createdAt'),
+        cell: (info) => format(info.getValue(), 'E, P', { locale: getLocaleDateFns() }),
+        size: 280,
       }),
       columnHelper.accessor('updatedAt', {
-        header: t('mindmap.updatedAt', 'Last modified'),
-        cell: (info) => formatDate(info.getValue()),
-        size: 180,
+        header: t('mindmap.updatedAt'),
+        cell: (info) => format(info.getValue(), 'E, P', { locale: getLocaleDateFns() }),
+        size: 280,
       }),
     ],
-    [t, formatDate]
+    [t]
   );
 
   // Clone data to ensure fresh references for table
@@ -124,7 +138,7 @@ const MindmapTable: React.FC = () => {
         })
       ); // TODO: move to hook, set i18n
     } catch (error) {
-      toast.error(t('renameError', 'Failed to rename mindmap'));
+      toast.error(t('renameError'));
       console.error('Failed to rename mindmap:', error);
     }
   };
@@ -134,16 +148,14 @@ const MindmapTable: React.FC = () => {
       <SearchBar
         value={search}
         onChange={handleSearchChange}
-        placeholder={t('mindmap.searchPlaceholder', 'Search by mindmap name...')}
+        placeholder={t('mindmap.searchPlaceholder')}
         className="w-full rounded-lg border-2 border-slate-200"
       />
 
       <DataTable
         table={table}
         isLoading={isLoading}
-        emptyState={
-          <div className="text-muted-foreground">{t('mindmap.emptyState', 'No mindmaps found')}</div>
-        }
+        emptyState={<div className="text-muted-foreground">{t('mindmap.emptyState')}</div>}
         contextMenu={(row) => (
           <ActionContent
             onViewDetail={() => {
@@ -169,14 +181,11 @@ const MindmapTable: React.FC = () => {
         project={{
           id: selectedMindmap?.id || '',
           filename: selectedMindmap?.title || '',
-          projectType: t('mindmap', 'mindmap'),
+          projectType: 'mindmap',
         }}
-        renameDialogTitle={t('mindmap.renameFileDialogTitle', 'Rename Mindmap')}
-        renameDuplicatedMessage={t(
-          'mindmap.renameDuplicatedMessage',
-          'A mindmap with this name already exists'
-        )}
-        placeholder={t('mindmap.title', 'Title')}
+        renameDialogTitle={t('mindmap.renameFileDialogTitle')}
+        renameDuplicatedMessage={t('mindmap.renameDuplicatedMessage')}
+        placeholder={t('mindmap.title')}
         isLoading={updateMindmapTitleMutation.isPending}
         onRename={handleRename}
       />

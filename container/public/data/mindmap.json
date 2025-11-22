@@ -1,0 +1,190 @@
+{
+  "id": "test-mindmap-1",
+  "title": "Software Development Mindmap",
+  "description": "A comprehensive mindmap for software development concepts",
+  "nodes": [
+    {
+      "id": "root",
+      "type": "mindmapRootNode",
+      "position": { "x": 0, "y": 0 },
+      "data": {
+        "level": 0,
+        "content": "<p>Software Development</p>",
+        "side": "mid",
+        "isCollapsed": false,
+        "pathType": "smoothstep",
+        "edgeColor": "#FF0000"
+      },
+      "dragHandle": ".drag-handle",
+      "width": 300,
+      "height": 100
+    },
+    {
+      "id": "frontend",
+      "type": "mindmapTextNode",
+      "position": { "x": -400, "y": -200 },
+      "data": {
+        "level": 1,
+        "content": "<p>Frontend</p>",
+        "parentId": "root",
+        "side": "left",
+        "isCollapsed": false
+      },
+      "dragHandle": ".drag-handle",
+      "width": 150,
+      "height": 60
+    },
+    {
+      "id": "backend",
+      "type": "mindmapTextNode",
+      "position": { "x": 400, "y": -200 },
+      "data": {
+        "level": 1,
+        "content": "<p>Backend</p>",
+        "parentId": "root",
+        "side": "right",
+        "isCollapsed": false
+      },
+      "dragHandle": ".drag-handle",
+      "width": 150,
+      "height": 60
+    },
+    {
+      "id": "react",
+      "type": "mindmapTextNode",
+      "position": { "x": -600, "y": -350 },
+      "data": {
+        "level": 2,
+        "content": "<p>React</p>",
+        "parentId": "frontend",
+        "side": "left",
+        "isCollapsed": false
+      },
+      "dragHandle": ".drag-handle",
+      "width": 120,
+      "height": 50
+    },
+    {
+      "id": "vue",
+      "type": "mindmapTextNode",
+      "position": { "x": -600, "y": -50 },
+      "data": {
+        "level": 2,
+        "content": "<p>Vue.js</p>",
+        "parentId": "frontend",
+        "side": "left",
+        "isCollapsed": false
+      },
+      "dragHandle": ".drag-handle",
+      "width": 120,
+      "height": 50
+    },
+    {
+      "id": "nodejs",
+      "type": "mindmapTextNode",
+      "position": { "x": 600, "y": -350 },
+      "data": {
+        "level": 2,
+        "content": "<p>Node.js</p>",
+        "parentId": "backend",
+        "side": "right",
+        "isCollapsed": false
+      },
+      "dragHandle": ".drag-handle",
+      "width": 120,
+      "height": 50
+    },
+    {
+      "id": "python",
+      "type": "mindmapTextNode",
+      "position": { "x": 600, "y": -50 },
+      "data": {
+        "level": 2,
+        "content": "<p>Python</p>",
+        "parentId": "backend",
+        "side": "right",
+        "isCollapsed": false
+      },
+      "dragHandle": ".drag-handle",
+      "width": 120,
+      "height": 50
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-root-frontend",
+      "source": "root",
+      "target": "frontend",
+      "type": "mindmapEdge",
+      "sourceHandle": "first-source-root",
+      "targetHandle": "second-target-frontend",
+      "data": {
+        "strokeColor": "#FF0000",
+        "strokeWidth": 2
+      }
+    },
+    {
+      "id": "e-root-backend",
+      "source": "root",
+      "target": "backend",
+      "type": "mindmapEdge",
+      "sourceHandle": "second-source-root",
+      "targetHandle": "first-target-backend",
+      "data": {
+        "strokeColor": "#FF0000",
+        "strokeWidth": 2
+      }
+    },
+    {
+      "id": "e-frontend-react",
+      "source": "frontend",
+      "target": "react",
+      "type": "mindmapEdge",
+      "sourceHandle": "first-source-frontend",
+      "targetHandle": "second-target-react",
+      "data": {
+        "strokeColor": "#FF0000",
+        "strokeWidth": 2
+      }
+    },
+    {
+      "id": "e-frontend-vue",
+      "source": "frontend",
+      "target": "vue",
+      "type": "mindmapEdge",
+      "sourceHandle": "first-source-frontend",
+      "targetHandle": "second-target-vue",
+      "data": {
+        "strokeColor": "#FF0000",
+        "strokeWidth": 2
+      }
+    },
+    {
+      "id": "e-backend-nodejs",
+      "source": "backend",
+      "target": "nodejs",
+      "type": "mindmapEdge",
+      "sourceHandle": "second-source-backend",
+      "targetHandle": "first-target-nodejs",
+      "data": {
+        "strokeColor": "#FF0000",
+        "strokeWidth": 2
+      }
+    },
+    {
+      "id": "e-backend-python",
+      "source": "backend",
+      "target": "python",
+      "type": "mindmapEdge",
+      "sourceHandle": "second-source-backend",
+      "targetHandle": "first-target-python",
+      "data": {
+        "strokeColor": "#FF0000",
+        "strokeWidth": 2
+      }
+    }
+  ],
+  "createdAt": "2024-11-15T10:00:00.000Z",
+  "updatedAt": "2024-11-15T10:00:00.000Z",
+  "status": "active"
+}

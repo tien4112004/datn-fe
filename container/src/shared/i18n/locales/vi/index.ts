@@ -12,6 +12,7 @@ import mindmap from './mindmap';
 import image from './image';
 import projects from './projects';
 import settings from './settings';
+import classes from './classes';
 
 export default {
   common,
@@ -24,4 +25,5 @@ export default {
   image,
   projects,
   settings,
+  classes,
 };

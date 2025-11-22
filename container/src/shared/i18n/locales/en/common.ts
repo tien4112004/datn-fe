@@ -19,6 +19,21 @@ export default {
     pageNotFoundDescription: 'Sorry, the page you are looking for does not exist or may have been moved.',
     goBack: 'Go Back',
     goHome: 'Go Home',
+    classes: 'Classes',
+  },
+  status: {
+    active: 'Active',
+    inactive: 'Inactive',
+  },
+  actions: {
+    view: 'View',
+    edit: 'Edit',
+    delete: 'Delete',
+    close: 'Close',
+  },
+  pagination: {
+    previous: 'Previous',
+    next: 'Next',
   },
   table: {
     presentation: {

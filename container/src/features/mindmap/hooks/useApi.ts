@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient, type UseQueryResult } from '@tan
 import type { SortingState, PaginationState, Updater } from '@tanstack/react-table';
 import { useMindmapApiService } from '../api';
 import { useEffect, useState } from 'react';
-import type { Mindmap } from '../types/service';
+import type { Mindmap } from '../types';
 import type { ApiResponse } from '@/shared/types/api';
 import { ExpectedError } from '@/types/errors';
 import { useMetadataStore } from '../stores';
@@ -199,6 +199,7 @@ export const useUpdateMindmapWithMetadata = () => {
   const mindmapApiService = useMindmapApiService();
   const queryClient = useQueryClient();
   const getMetadata = useMetadataStore((state) => state.getMetadata);
+  const getThumbnail = useMetadataStore((state) => state.getThumbnail);
 
   return useMutation({
     mutationFn: async ({ id, data }: { id: string; data: Partial<Mindmap> }) => {
@@ -210,6 +211,11 @@ export const useUpdateMindmapWithMetadata = () => {
 
       if (metadata) {
         updateData.metadata = metadata;
+      }
+
+      const thumbnail = getThumbnail();
+      if (thumbnail) {
+        updateData.thumbnail = thumbnail;
       }
 
       const result = await mindmapApiService.updateMindmap(id, updateData);

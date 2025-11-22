@@ -9,6 +9,7 @@ interface MetadataState {
   setForceLayout: (forceLayout: boolean) => void;
   setMetadata: (metadata: MindmapMetadata | undefined) => void;
   getMetadata: () => MindmapMetadata | undefined;
+  getThumbnail: () => string | undefined;
   reset: () => void;
 }
 
@@ -31,19 +32,16 @@ export const useMetadataStore = create<MetadataState>()(
           if (!metadata) {
             set(
               {
-                thumbnail: undefined,
                 forceLayout: undefined,
               },
               false,
               'mindmap-metadata/reset'
             );
           } else {
-            const newThumbnail = metadata.thumbnail as string;
             const newForceLayout = metadata.forceLayout as boolean;
 
             set(
               {
-                thumbnail: newThumbnail,
                 forceLayout: newForceLayout,
               },
               false,
@@ -56,10 +54,6 @@ export const useMetadataStore = create<MetadataState>()(
           const state = get();
           const metadata: MindmapMetadata = {};
 
-          if (state.thumbnail !== undefined) {
-            metadata.thumbnail = state.thumbnail;
-          }
-
           if (state.forceLayout !== undefined) {
             metadata.forceLayout = state.forceLayout;
           }
@@ -67,10 +61,14 @@ export const useMetadataStore = create<MetadataState>()(
           return Object.keys(metadata).length > 0 ? metadata : undefined;
         },
 
+        getThumbnail: () => {
+          const state = get();
+          return state.thumbnail;
+        },
+
         reset: () => {
           set(
             {
-              thumbnail: undefined,
               forceLayout: undefined,
             },
             false,

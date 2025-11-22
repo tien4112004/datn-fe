@@ -12,7 +12,7 @@ import { useNavigate } from 'react-router-dom';
 import DataTable from '@/components/table/DataTable';
 import { SearchBar } from '@/shared/components/common/SearchBar';
 import { useMindmaps, useUpdateMindmapTitle } from '@/features/mindmap/hooks';
-import type { Mindmap } from '@/features/mindmap/types/service';
+import type { Mindmap } from '@/features/mindmap/types';
 import { RenameFileDialog } from '@/shared/components/modals/RenameFileDialog';
 import { toast } from 'sonner';
 import { ActionContent } from '@/features/presentation/components';
@@ -83,12 +83,14 @@ const MindmapTable = () => {
       }),
       columnHelper.accessor('createdAt', {
         header: t('mindmap.createdAt'),
-        cell: (info) => format(info.getValue(), 'E, P', { locale: getLocaleDateFns() }),
+        cell: (info) =>
+          info.getValue() ? format(info.getValue(), 'E, P', { locale: getLocaleDateFns() }) : '',
         size: 280,
       }),
       columnHelper.accessor('updatedAt', {
         header: t('mindmap.updatedAt'),
-        cell: (info) => format(info.getValue(), 'E, P', { locale: getLocaleDateFns() }),
+        cell: (info) =>
+          info.getValue() ? format(info.getValue(), 'E, P', { locale: getLocaleDateFns() }) : '',
         size: 280,
       }),
     ],

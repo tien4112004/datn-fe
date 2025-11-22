@@ -1,7 +1,7 @@
 import { memo, useMemo } from 'react';
 import { useMindmapActions, useShortcuts } from '../../hooks';
 import { useUndoRedoStore } from '../../stores/undoredo';
-import { useSaveMindmap } from '../../hooks/useSaveMindmap';
+import { useSaveMindmap } from '../../hooks/useSaving';
 
 interface LogicHandlerProps {
   mindmapId: string;

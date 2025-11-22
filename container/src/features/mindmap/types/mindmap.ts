@@ -97,3 +97,16 @@ export interface MindmapMetadata {
   forceLayout?: boolean;
   [key: string]: unknown;
 }
+
+export interface Mindmap {
+  id: string;
+  title: string;
+  description?: string;
+  thumbnail?: string;
+  metadata?: MindmapMetadata;
+  nodes: MindMapNode[];
+  edges: MindMapEdge[];
+  createdAt: string;
+  updatedAt: string;
+  status: 'active' | 'archived' | 'draft';
+}

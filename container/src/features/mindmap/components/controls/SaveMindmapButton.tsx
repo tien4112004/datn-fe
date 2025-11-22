@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Save } from 'lucide-react';
-import { useSaveMindmap } from '../../hooks/useSaveMindmap';
+import { useSaveMindmap } from '../../hooks/useSaving';
 import { useTranslation } from 'react-i18next';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 

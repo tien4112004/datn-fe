@@ -15,7 +15,7 @@ export default class MindmapRealApiService implements MindmapApiService {
   }
 
   async getMindmaps(request: MindmapCollectionRequest): Promise<ApiResponse<Mindmap[]>> {
-    const response = await api.get<ApiResponse<Mindmap[]>>(`${this.baseUrl}/api/mindmaps/paginated`, {
+    const response = await api.get<ApiResponse<Mindmap[]>>(`${this.baseUrl}/api/mindmaps`, {
       params: {
         page: (request.page || 0) + 1,
         pageSize: request.pageSize,

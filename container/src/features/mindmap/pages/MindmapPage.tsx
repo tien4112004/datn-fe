@@ -7,10 +7,10 @@ import { Flow, LogicHandler, Toolbar } from '@/features/mindmap/components';
 import { useState, useEffect } from 'react';
 import { useLoaderData } from 'react-router-dom';
 import { useCoreStore, useLayoutStore, useMetadataStore } from '../stores';
-import { useMindmapDirtyTracking } from '../hooks/useMindmapDirtyTracking';
+import { useMindmapDirtyTracking } from '../hooks/useDirtyTracking';
 import { useUnsavedChangesBlocker } from '@/shared/hooks';
 import { UnsavedChangesDialog } from '@/shared/components/modals/UnsavedChangesDialog';
-import type { Mindmap } from '../types/service';
+import type { Mindmap } from '../types';
 
 const MindmapPage = () => {
   const [isPanOnDrag, setIsPanOnDrag] = useState(false);

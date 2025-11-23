@@ -1,6 +1,6 @@
 import { CriticalError } from '@/types/errors';
 import { getMindmapApiService } from '../api';
-import type { Mindmap } from '../types/service';
+import type { Mindmap } from '../types';
 
 export const getMindmapById = async ({
   params,

@@ -91,8 +91,8 @@ export const ChildNodeControls = memo(
             <PopoverTrigger asChild>
               <Button
                 size="icon"
-                variant="outline"
-                className={cn('bg-accent cursor-pointer rounded-full transition-all duration-200')}
+                variant="secondary"
+                className={cn('cursor-pointer rounded-full transition-all duration-200')}
               >
                 <Plus />
               </Button>
@@ -148,8 +148,8 @@ export const ChildNodeControls = memo(
                 else collapse(node.id, SIDE.LEFT);
               }}
               size="icon"
-              variant="outline"
-              className={cn('bg-accent cursor-pointer rounded-full transition-all duration-200')}
+              variant="secondary"
+              className={cn('cursor-pointer rounded-full transition-all duration-200')}
             >
               <motion.div
                 animate={
@@ -191,8 +191,8 @@ export const ChildNodeControls = memo(
                 else collapse(node.id, SIDE.RIGHT);
               }}
               size="icon"
-              variant="outline"
-              className={cn('bg-accent cursor-pointer rounded-full transition-all duration-200')}
+              variant="secondary"
+              className={cn('cursor-pointer rounded-full transition-all duration-200')}
             >
               <motion.div
                 animate={
@@ -211,8 +211,8 @@ export const ChildNodeControls = memo(
             <PopoverTrigger asChild>
               <Button
                 size="icon"
-                variant="outline"
-                className={cn('bg-accent cursor-pointer rounded-full transition-all duration-200')}
+                variant="secondary"
+                className={cn('cursor-pointer rounded-full transition-all duration-200')}
               >
                 <Plus />
               </Button>

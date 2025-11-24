@@ -29,6 +29,14 @@ export default {
       redo: 'Redo (Ctrl+Y)',
       applyLayout: 'Apply Layout Manually',
       logData: 'Log Nodes and Edges',
+      saveMindmap: 'Save mindmap with thumbnail',
+      download: 'Download as PNG',
+    },
+    save: {
+      save: 'Save',
+      saving: 'Saving...',
+      success: 'Mindmap saved successfully',
+      error: 'Failed to save mindmap',
     },
   },
 };

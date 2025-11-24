@@ -51,6 +51,7 @@ export default {
       renameDuplicatedMessage: 'Đã tồn tại bản đồ tư duy với tên này',
     },
     actions: 'Hành động',
+    renameError: 'Đổi tên thất bại',
     pagination: {
       rowsPerPage: 'Số hàng mỗi trang',
       showing: 'Hiển thị',
@@ -74,15 +75,15 @@ export default {
     loading: 'Đang tải mô hình...',
     error: 'Lỗi khi tải mô hình',
   },
+  unsavedChanges: {
+    title: 'Thay đổi chưa được lưu',
+    description: 'Bạn có thay đổi chưa được lưu. Bạn có chắc muốn rời đi? Các thay đổi của bạn sẽ bị mất.',
+    stay: 'Ở lại',
+    leave: 'Rời đi',
+  },
   presentation: {
     saveSuccess: 'Lưu bài trình bày thành công',
     saveFailed: 'Lưu bài trình bày thất bại',
     processFailed: 'Xử lý bài trình bày thất bại',
-    unsavedChanges: {
-      title: 'Thay đổi chưa được lưu',
-      description: 'Bạn có thay đổi chưa được lưu. Bạn có chắc muốn rời đi? Các thay đổi của bạn sẽ bị mất.',
-      stay: 'Ở lại',
-      leave: 'Rời đi',
-    },
   },
 };

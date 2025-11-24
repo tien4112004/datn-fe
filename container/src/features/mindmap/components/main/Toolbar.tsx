@@ -10,13 +10,14 @@ import {
 } from '@/shared/components/ui/dropdown-menu';
 import { useLayoutStore } from '../../stores/layout';
 import { useUndoRedoStore, useCoreStore, useNodeOperationsStore } from '../../stores';
-import { useReactFlow, useUpdateNodeInternals } from '@xyflow/react';
+import { useUpdateNodeInternals } from '@xyflow/react';
 import { useTranslation } from 'react-i18next';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 import DownloadButton from '../controls/DownloadButton';
+import SaveMindmapButton from '../controls/SaveMindmapButton';
 import type { Direction } from '../../types';
 
-const Toolbar = () => {
+const Toolbar = ({ mindmapId }: { mindmapId: string }) => {
   const { t } = useTranslation(I18N_NAMESPACES.MINDMAP);
   const addNode = useNodeOperationsStore((state) => state.addNode);
   const deleteSelectedNodes = useNodeOperationsStore((state) => state.markNodeForDeletion);
@@ -32,7 +33,6 @@ const Toolbar = () => {
   const setAutoLayoutEnabled = useLayoutStore((state) => state.setAutoLayoutEnabled);
   const updateNodeDirection = useLayoutStore((state) => state.updateNodeDirection);
   const applyAutoLayout = useLayoutStore((state) => state.applyAutoLayout);
-  const { fitView } = useReactFlow();
   const updateNodeInternals = useUpdateNodeInternals();
 
   const handleDirectionChange = (value: Direction) => {
@@ -46,7 +46,6 @@ const Toolbar = () => {
       // When auto-layout is disabled, only update handles/controls
       updateNodeDirection(value, updateNodeInternals);
     }
-    fitView();
   };
 
   const handleAutoLayoutChange = (checked: boolean | 'indeterminate') => {
@@ -202,6 +201,10 @@ const Toolbar = () => {
             <span className="sr-only">{t('toolbar.actions.logData')}</span>
             {t('toolbar.actions.logData')}
           </Button>
+          <SaveMindmapButton
+            mindmapId={mindmapId}
+            className="w-full transition-colors hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500"
+          />
           <DownloadButton className="w-full transition-colors hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500" />
         </div>
       </div>

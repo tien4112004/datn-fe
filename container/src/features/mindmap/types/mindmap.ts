@@ -91,3 +91,22 @@ export interface MindmapLayoutType {
   updateLayout: (direction: Direction) => void;
   onLayoutChange: (direction: Direction) => void;
 }
+
+export interface MindmapMetadata {
+  direction?: Direction;
+  forceLayout?: boolean;
+  [key: string]: unknown;
+}
+
+export interface Mindmap {
+  id: string;
+  title: string;
+  description?: string;
+  thumbnail?: string;
+  metadata?: MindmapMetadata;
+  nodes: MindMapNode[];
+  edges: MindMapEdge[];
+  createdAt: string;
+  updatedAt: string;
+  status: 'active' | 'archived' | 'draft';
+}

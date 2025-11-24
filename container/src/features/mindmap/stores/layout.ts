@@ -288,13 +288,12 @@ export const useLayoutStore = create<LayoutState>()(
 
         // Update node internals to refresh handles for all nodes
         if (updateNodeInternals && nodes?.length) {
-          nodes.forEach((node) => {
-            updateNodeInternals(node.id);
-          });
+          setTimeout(() => {
+            nodes.forEach((node) => {
+              updateNodeInternals(node.id);
+            });
+          }, 200);
         }
-
-        // Note: Edges will be updated automatically when node handles change
-        // No position recalculation or animation is performed here
       },
 
       applyAutoLayout: async (updateNodeInternals) => {

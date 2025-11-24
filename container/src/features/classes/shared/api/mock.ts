@@ -12,11 +12,11 @@ import {
   type SchedulePeriod,
   type MinimalSchedulePeriod,
   type ScheduleCollectionRequest,
-  type LessonPlan,
-  type LessonPlanCollectionRequest,
+  type Lesson,
+  type LessonCollectionRequest,
   type Layout,
-  type LessonPlanCreateRequest,
-  type LessonPlanUpdateRequest,
+  type LessonCreateRequest,
+  type LessonUpdateRequest,
   type SchedulePeriodCreateRequest,
   type SchedulePeriodUpdateRequest,
   type ImportResult,
@@ -28,7 +28,7 @@ import { mapPagination, type ApiResponse } from '@/shared/types/api';
 import { classesTable } from './data/classes.data';
 import { studentsTable } from './data/students.data';
 import { schedulePeriodsTable } from './data/schedule-periods.data';
-import { lessonPlansTable } from './data/lesson-plans.data';
+import { lessonsTable } from './data/lesson-plans.data';
 import { seatingLayoutsTable } from './data/seating-layouts.data';
 
 export default class ClassMockApiService implements ClassApiService {
@@ -36,7 +36,7 @@ export default class ClassMockApiService implements ClassApiService {
   private students: Student[] = [];
   private schedules: DailySchedule[] = [];
   private periods: SchedulePeriod[] = [];
-  private lessonPlans: LessonPlan[] = [];
+  private lessons: Lesson[] = [];
   baseUrl: string;
 
   constructor(baseUrl: string) {
@@ -64,12 +64,12 @@ export default class ClassMockApiService implements ClassApiService {
       })),
     ];
 
-    // Initialize lesson plans with populated objectives and resources
-    this.lessonPlans = lessonPlansTable.map((lessonData) => {
+    // Initialize lessons with populated objectives and resources
+    this.lessons = lessonsTable.map((lessonData) => {
       return {
         ...lessonData,
-        objectives: lessonData.objectives || [], // Use inline objectives from lesson plan
-        resources: lessonData.resources || [], // Use inline resources from lesson plan
+        objectives: lessonData.objectives || [], // Use inline objectives from lesson
+        resources: lessonData.resources || [], // Use inline resources from lesson
         subject: lessonData.subject, // subject is already the code
       };
     });
@@ -104,28 +104,23 @@ export default class ClassMockApiService implements ClassApiService {
       });
     }
 
-    // Map lessons to their schedule periods
+    // Map lessons to their schedule periods - initialize empty lessons arrays
     this.periods.forEach((period) => {
-      if (period.lessonPlanId) {
-        const lessonPlan = this.lessonPlans.find((lp) => lp.id === period.lessonPlanId);
-        if (lessonPlan) {
-          period.lessonPlan = lessonPlan;
-        }
-      }
+      period.lessons = [];
     });
 
     // Map schedule periods to lessons
-    this.lessonPlans.forEach((lesson) => {
-      const linkedPeriods = this.periods.filter((p) => p.lessonPlanId === lesson.id);
-      lesson.linkedPeriod = toMinimalSchedulePeriod(linkedPeriods[0]);
+    this.lessons.forEach((lesson) => {
+      const linkedPeriodsList = this.periods.filter((p) => p.lessons.some((l) => l.id === lesson.id));
+      lesson.linkedPeriods = linkedPeriodsList.map((p) => toMinimalSchedulePeriod(p));
     });
   }
 
-  getLessonPlan(id: string): Promise<LessonPlan | null> {
+  getLesson(id: string): Promise<Lesson | null> {
     this._delay();
 
-    const lessonPlan = this.lessonPlans.find((lp) => lp.id === id);
-    return Promise.resolve(lessonPlan || null);
+    const lesson = this.lessons.find((lp) => lp.id === id);
+    return Promise.resolve(lesson || null);
   }
 
   async getClasses(request: ClassCollectionRequest): Promise<ApiResponse<Class[]>> {
@@ -405,14 +400,10 @@ export default class ClassMockApiService implements ClassApiService {
       filtered = filtered.filter((s) => s.date <= params.endDate!);
     }
 
-    // Populate lesson plan data for each period
+    // Populate lesson data for each period
     filtered = filtered.map((schedule) => ({
       ...schedule,
       periods: schedule.periods.map((period) => {
-        if (period.lessonPlanId) {
-          const lessonPlan = this.lessonPlans.find((lp) => lp.id === period.lessonPlanId);
-          return lessonPlan ? { ...period, lessonPlan } : period;
-        }
         return period;
       }),
     }));
@@ -446,14 +437,8 @@ export default class ClassMockApiService implements ClassApiService {
       });
     }
 
-    // Populate lesson plan data for each period
-    filtered = filtered.map((period) => {
-      if (period.lessonPlanId) {
-        const lessonPlan = this.lessonPlans.find((lp) => lp.id === period.lessonPlanId);
-        return lessonPlan ? { ...period, lessonPlan } : period;
-      }
-      return period;
-    });
+    // Periods already have lessons loaded from constructor
+    // No additional mapping needed
 
     return {
       data: filtered,
@@ -468,22 +453,14 @@ export default class ClassMockApiService implements ClassApiService {
     if (!period) {
       return null;
     }
-    if (period.lessonPlanId) {
-      const lessonPlan = this.lessonPlans.find((lp) => lp.id === period.lessonPlanId);
-      if (lessonPlan) {
-        period.lessonPlan = lessonPlan;
-      }
-    }
+    // Lessons are already loaded in the period
     return period;
   }
 
-  async getLessonPlans(
-    classId: string,
-    params: LessonPlanCollectionRequest
-  ): Promise<ApiResponse<LessonPlan[]>> {
+  async getLessons(classId: string, params: LessonCollectionRequest): Promise<ApiResponse<Lesson[]>> {
     await this._delay();
 
-    let filtered = this.lessonPlans.filter((lp) => lp.classId === classId);
+    let filtered = this.lessons.filter((lp) => lp.classId === classId);
 
     if (params.subject) {
       filtered = filtered.filter((lp) => lp.subject === params.subject);
@@ -500,25 +477,25 @@ export default class ClassMockApiService implements ClassApiService {
     };
   }
 
-  // Lesson Plan mutations
-  async updateLessonStatus(id: string, status: string, notes?: string): Promise<LessonPlan> {
+  // Lesson  mutations
+  async updateLessonStatus(id: string, status: string, notes?: string): Promise<Lesson> {
     await this._delay();
 
-    const lessonPlan = this.lessonPlans.find((lp) => lp.id === id);
-    if (!lessonPlan) {
+    const lesson = this.lessons.find((lp) => lp.id === id);
+    if (!lesson) {
       throw new Error('Lesson plan not found');
     }
 
-    lessonPlan.status = status as LessonPlan['status'];
+    lesson.status = status as Lesson['status'];
     if (notes !== undefined) {
-      lessonPlan.notes = notes;
+      lesson.notes = notes;
     }
-    lessonPlan.updatedAt = new Date().toISOString();
+    lesson.updatedAt = new Date().toISOString();
 
-    return lessonPlan;
+    return lesson;
   }
 
-  async createLessonPlan(data: LessonPlanCreateRequest): Promise<LessonPlan> {
+  async createLesson(data: LessonCreateRequest): Promise<Lesson> {
     await this._delay();
 
     const cls = this.classes.find((c) => c.id === data.classId);
@@ -542,11 +519,12 @@ export default class ClassMockApiService implements ClassApiService {
           endTime: period.endTime,
           category: period.category,
           isActive: period.isActive,
+          lessonIds: period.lessons.map((l) => l.id),
         };
       }
     }
 
-    const newLessonPlan: LessonPlan = {
+    const newLesson: Lesson = {
       id: Date.now().toString(),
       classId: data.classId,
       className: cls.name,
@@ -554,15 +532,15 @@ export default class ClassMockApiService implements ClassApiService {
       title: data.title,
       description: data.description,
       duration: 45, // Default duration, could be calculated from start/end time
-      linkedPeriod: bindedPeriod,
+      linkedPeriods: bindedPeriod ? [bindedPeriod] : [],
       objectives: data.objectives.map((obj, index) => ({
         ...obj,
-        lessonPlanId: '', // Will be set after creation
+        lessonId: '', // Will be set after creation
         id: `obj-${Date.now()}-${index}`, // Temporary ID for API operations
       })),
       resources: data.resources.map((res, index) => ({
         ...res,
-        lessonPlanId: '', // Will be set after creation
+        lessonId: '', // Will be set after creation
         id: `res-${Date.now()}-${index}`, // Temporary ID for API operations
       })),
       status: 'planned',
@@ -571,44 +549,44 @@ export default class ClassMockApiService implements ClassApiService {
       updatedAt: new Date().toISOString(),
     };
 
-    this.lessonPlans.push(newLessonPlan);
-    return newLessonPlan;
+    this.lessons.push(newLesson);
+    return newLesson;
   }
 
-  async updateLessonPlan(data: LessonPlanUpdateRequest): Promise<LessonPlan> {
+  async updateLesson(data: LessonUpdateRequest): Promise<Lesson> {
     await this._delay();
 
-    const lessonPlan = this.lessonPlans.find((lp) => lp.id === data.id);
-    if (!lessonPlan) {
+    const lesson = this.lessons.find((lp) => lp.id === data.id);
+    if (!lesson) {
       throw new Error('Lesson plan not found');
     }
 
     // Update basic fields
-    if (data.title !== undefined) lessonPlan.title = data.title;
-    if (data.description !== undefined) lessonPlan.description = data.description;
-    if (data.notes !== undefined) lessonPlan.notes = data.notes;
-    if (data.status !== undefined) lessonPlan.status = data.status;
+    if (data.title !== undefined) lesson.title = data.title;
+    if (data.description !== undefined) lesson.description = data.description;
+    if (data.notes !== undefined) lesson.notes = data.notes;
+    if (data.status !== undefined) lesson.status = data.status;
 
     // Update objectives if provided
     if (data.objectives !== undefined) {
-      lessonPlan.objectives = data.objectives.map((obj, index) => ({
+      lesson.objectives = data.objectives.map((obj, index) => ({
         ...obj,
-        lessonPlanId: lessonPlan.id,
+        lessonId: lesson.id,
         id: `obj-${Date.now()}-${index}`, // Generate new ID for each objective
       }));
     }
 
     // Update resources if provided
     if (data.resources !== undefined) {
-      lessonPlan.resources = data.resources.map((res, index) => ({
+      lesson.resources = data.resources.map((res, index) => ({
         ...res,
-        lessonPlanId: lessonPlan.id,
+        lessonId: lesson.id,
         id: `res-${Date.now()}-${index}`, // Generate new ID for each resource
       }));
     }
 
-    lessonPlan.updatedAt = new Date().toISOString();
-    return lessonPlan;
+    lesson.updatedAt = new Date().toISOString();
+    return lesson;
   }
 
   // Schedule mutations
@@ -627,7 +605,7 @@ export default class ClassMockApiService implements ClassApiService {
       location: data.location,
       description: null,
       isActive: true,
-      lessonPlanId: null, // Will be set later if linked to a lesson
+      lessons: [], // Will be populated when lessons are linked
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
@@ -653,26 +631,27 @@ export default class ClassMockApiService implements ClassApiService {
     return period;
   }
 
-  async linkLessonToSchedulePeriod(_classId: string, periodId: string, lessonPlanId: string): Promise<void> {
+  async linkLessonToSchedulePeriod(_classId: string, periodId: string, lessonId: string): Promise<void> {
     await this._delay();
 
     const period = this.periods.find((p) => p.id === periodId);
-    const lessonPlan = this.lessonPlans.find((lp) => lp.id === lessonPlanId);
+    const lesson = this.lessons.find((lp) => lp.id === lessonId);
 
     if (!period) {
       throw new Error('Period not found');
     }
-
-    if (!lessonPlan) {
+    if (!lesson) {
       throw new Error('Lesson plan not found');
     }
 
-    period.lessonPlanId = lessonPlanId;
-    period.lessonPlan = lessonPlan;
+    // Add lesson to the lessons array if not already present
+    if (!period.lessons.find((l) => l.id === lessonId)) {
+      period.lessons.push(lesson);
+    }
     period.updatedAt = new Date().toISOString();
   }
 
-  async unlinkLessonFromSchedulePeriod(_classId: string, periodId: string): Promise<void> {
+  async unlinkLessonFromSchedulePeriod(_classId: string, periodId: string, lessonId: string): Promise<void> {
     await this._delay();
 
     const period = this.periods.find((p) => p.id === periodId);
@@ -680,8 +659,8 @@ export default class ClassMockApiService implements ClassApiService {
       throw new Error('Period not found');
     }
 
-    period.lessonPlanId = undefined;
-    period.lessonPlan = undefined;
+    // Remove lesson from the lessons array
+    period.lessons = period.lessons.filter((l) => l.id !== lessonId);
     period.updatedAt = new Date().toISOString();
   }
 
@@ -727,14 +706,8 @@ export default class ClassMockApiService implements ClassApiService {
         if (dateCompare !== 0) return dateCompare;
         return (a.startTime || '').localeCompare(b.startTime || '');
       })
-      // Populate lesson plan data for each period
-      .map((period) => {
-        if (period.lessonPlanId) {
-          const lessonPlan = this.lessonPlans.find((lp) => lp.id === period.lessonPlanId);
-          return lessonPlan ? { ...period, lessonPlan } : period;
-        }
-        return period;
-      });
+      // Lessons are already loaded in each period
+      .map((period) => period);
 
     return res;
   }

@@ -27,21 +27,17 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/shared/lib/utils';
-import type { LessonResource, ResourceType, LessonPlan } from '../../../shared/types';
+import type { LessonResource, ResourceType, Lesson } from '../../../shared/types';
 
 interface ResourceManagerProps {
-  lessonPlan: LessonPlan;
+  lesson: Lesson;
   resources: LessonResource[];
   onAddResource: (
-    lessonPlanId: string,
-    resource: Omit<LessonResource, 'id' | 'lessonPlanId' | 'createdAt'>
+    lessonId: string,
+    resource: Omit<LessonResource, 'id' | 'lessonId' | 'createdAt'>
   ) => Promise<void>;
-  onUpdateResource: (
-    lessonPlanId: string,
-    resourceId: string,
-    updates: Partial<LessonResource>
-  ) => Promise<void>;
-  onDeleteResource: (lessonPlanId: string, resourceId: string) => Promise<void>;
+  onUpdateResource: (lessonId: string, resourceId: string, updates: Partial<LessonResource>) => Promise<void>;
+  onDeleteResource: (lessonId: string, resourceId: string) => Promise<void>;
   onUploadFile?: (file: File) => Promise<string>; // Returns file path/URL
   canEdit?: boolean;
 }
@@ -55,7 +51,7 @@ interface ResourceStats {
 }
 
 export const ResourceManager = ({
-  lessonPlan,
+  lesson,
   resources,
   onAddResource,
   onUpdateResource,
@@ -63,7 +59,7 @@ export const ResourceManager = ({
   onUploadFile,
   canEdit = true,
 }: ResourceManagerProps) => {
-  const { t } = useTranslation('classes', { keyPrefix: 'lessonPlan.resources' });
+  const { t } = useTranslation('classes', { keyPrefix: 'lesson.resources' });
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [newResource, setNewResource] = useState({
@@ -172,7 +168,7 @@ export const ResourceManager = ({
 
   const handleAddResource = async () => {
     try {
-      await onAddResource(lessonPlan.id, newResource);
+      await onAddResource(lesson.id, newResource);
       setNewResource({
         name: '',
         type: 'document',
@@ -190,7 +186,7 @@ export const ResourceManager = ({
 
   const handleUpdateResource = async (resourceId: string, updates: Partial<LessonResource>) => {
     try {
-      await onUpdateResource(lessonPlan.id, resourceId, updates);
+      await onUpdateResource(lesson.id, resourceId, updates);
       // TODO: Implement editing resource functionality
       console.log('Resource updated:', resourceId, updates);
     } catch (error) {
@@ -246,7 +242,7 @@ export const ResourceManager = ({
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-2">
               <FileText className="h-5 w-5" />
-              {t('title')} - {lessonPlan.title}
+              {t('title')} - {lesson.title}
             </CardTitle>
             {canEdit && (
               <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
@@ -500,7 +496,7 @@ export const ResourceManager = ({
                             <Button
                               size="sm"
                               variant="ghost"
-                              onClick={() => onDeleteResource(lessonPlan.id, resource.id)}
+                              onClick={() => onDeleteResource(lesson.id, resource.id)}
                             >
                               <Trash2 className="h-4 w-4 text-red-600" />
                             </Button>

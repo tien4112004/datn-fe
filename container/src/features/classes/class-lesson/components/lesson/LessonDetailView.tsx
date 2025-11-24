@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { LessonPlan } from '../../types';
+import type { Lesson } from '../../types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
@@ -37,21 +37,30 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { useTranslation } from 'react-i18next';
 import { getLocaleDateFns } from '@/shared/i18n/helper';
 import { formatTimeRange } from '../../../class-schedule/utils/calendarHelpers';
-import { LessonPlanCreator } from '../form/LessonPlanCreator';
-import { useUpdateLessonPlan } from '../../hooks';
+import { LessonCreator } from '../form/LessonCreator';
+import { useUpdateLesson } from '../../hooks';
 import { getSubjectByCode } from '../../../shared/types';
 
 interface LessonDetailViewProps {
-  lessonPlan: LessonPlan;
+  lesson: Lesson;
 }
 
-export const LessonDetailView = ({ lessonPlan }: LessonDetailViewProps) => {
+export const LessonDetailView = ({ lesson }: LessonDetailViewProps) => {
   const navigate = useNavigate();
   const { t } = useTranslation('classes', { keyPrefix: 'schedule.lessonDetail' });
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const updateLessonPlan = useUpdateLessonPlan();
+  const updateLesson = useUpdateLesson();
 
-  const displayPeriod = lessonPlan.linkedPeriod;
+  const formattedDate =
+    lesson.linkedPeriods.length > 0
+      ? format(new Date(lesson.linkedPeriods[0].date), 'PPPP', { locale: getLocaleDateFns() })
+      : format(new Date(lesson.createdAt), 'PPPP', { locale: getLocaleDateFns() });
+
+  const timeRange =
+    lesson.linkedPeriods.length > 0 && lesson.linkedPeriods[0].startTime && lesson.linkedPeriods[0].endTime
+      ? formatTimeRange(lesson.linkedPeriods[0].startTime, lesson.linkedPeriods[0].endTime)
+      : `${lesson.duration} minutes`;
+
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'planned':
@@ -120,15 +129,6 @@ export const LessonDetailView = ({ lessonPlan }: LessonDetailViewProps) => {
     }
   };
 
-  const formattedDate = displayPeriod
-    ? format(new Date(displayPeriod.date), 'PPPP', { locale: getLocaleDateFns() })
-    : format(new Date(lessonPlan.createdAt), 'PPPP', { locale: getLocaleDateFns() });
-
-  const timeRange =
-    displayPeriod && displayPeriod.startTime && displayPeriod.endTime
-      ? formatTimeRange(displayPeriod.startTime, displayPeriod.endTime)
-      : `${lessonPlan.duration} minutes`;
-
   return (
     <>
       <div className="space-y-6">
@@ -141,7 +141,7 @@ export const LessonDetailView = ({ lessonPlan }: LessonDetailViewProps) => {
                   <div className="bg-primary/10 rounded-lg p-2">
                     <BookOpen className="text-primary h-5 w-5" />
                   </div>
-                  {lessonPlan.title}
+                  {lesson.title}
                 </CardTitle>
                 <div className="mt-3 flex flex-col gap-2 text-sm">
                   <div className="text-muted-foreground flex items-center gap-2">
@@ -151,16 +151,18 @@ export const LessonDetailView = ({ lessonPlan }: LessonDetailViewProps) => {
                   <div className="text-muted-foreground flex items-center gap-2">
                     <Clock className="h-4 w-4" />
                     <span>
-                      {displayPeriod && displayPeriod.startTime && displayPeriod.endTime
-                        ? `${timeRange} (${lessonPlan.duration} minutes)`
-                        : `${lessonPlan.duration} minutes`}
+                      {lesson.linkedPeriods.length > 0 &&
+                      lesson.linkedPeriods[0].startTime &&
+                      lesson.linkedPeriods[0].endTime
+                        ? `${timeRange} (${lesson.duration} minutes)`
+                        : `${lesson.duration} minutes`}
                     </span>
                   </div>
                 </div>
               </div>
-              <Badge className={`h-fit border ${getStatusColor(lessonPlan.status)} font-semibold shadow-sm`}>
-                {getStatusIcon(lessonPlan.status)}
-                <span className="ml-1 capitalize">{lessonPlan.status.replace('_', ' ')}</span>
+              <Badge className={`h-fit border ${getStatusColor(lesson.status)} font-semibold shadow-sm`}>
+                {getStatusIcon(lesson.status)}
+                <span className="ml-1 capitalize">{lesson.status.replace('_', ' ')}</span>
               </Badge>
               <Button
                 variant="outline"
@@ -180,81 +182,83 @@ export const LessonDetailView = ({ lessonPlan }: LessonDetailViewProps) => {
                 <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
                   {t('class')}
                 </p>
-                <p className="mt-1 text-lg font-semibold">{lessonPlan.className}</p>
+                <p className="mt-1 text-lg font-semibold">{lesson.className}</p>
               </div>
               <div className="rounded-lg bg-white/60 p-3 backdrop-blur-sm">
                 <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
                   {t('subject')}
                 </p>
                 <p className="mt-1 text-lg font-semibold">
-                  {lessonPlan.subject
-                    ? getSubjectByCode(lessonPlan.subject)?.name || lessonPlan.subject
-                    : 'N/A'}
+                  {lesson.subject ? getSubjectByCode(lesson.subject)?.name || lesson.subject : 'N/A'}
                 </p>
               </div>
             </div>
-            {lessonPlan.description && (
+            {lesson.description && (
               <div className="mt-4 rounded-lg bg-white/60 p-3 backdrop-blur-sm">
                 <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
                   {t('description')}
                 </p>
-                <p className="mt-1 text-sm">{lessonPlan.description}</p>
+                <p className="mt-1 text-sm">{lesson.description}</p>
               </div>
             )}
           </CardContent>
         </Card>
 
-        {/* Binded Period Information */}
-        {displayPeriod && (
-          <ColoredCard colorScheme="purple">
-            <ColoredCardHeader>
-              <ColoredCardTitle>
-                <Link className="mr-2 h-5 w-5 text-purple-600" />
-                <span>{t('scheduleBinding')}</span>
-              </ColoredCardTitle>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => navigate(`/periods/${displayPeriod.id}`)}
-                className="flex-shrink-0"
-              >
-                {t('viewPeriodDetails')}
-              </Button>
-            </ColoredCardHeader>
-            <ColoredCardContent>
-              <div className="rounded-lg bg-purple-50 p-4">
-                <div className="flex items-start gap-4">
-                  <div className="flex-shrink-0 rounded-lg bg-purple-100 p-3">
-                    <Calendar className="h-6 w-6 text-purple-600" />
-                  </div>
-                  <div className="flex-1 space-y-2">
-                    <div className="flex items-center gap-2">
-                      <h4 className="font-semibold text-purple-900">{displayPeriod.name}</h4>
-                      <Badge className="border-purple-300 bg-purple-200 text-purple-800">
-                        {displayPeriod.category}
-                      </Badge>
-                    </div>
-                    <div className="grid grid-cols-1 gap-4 text-sm md:grid-cols-2">
-                      <div>
-                        <p className="font-medium text-purple-700">{t('date')}</p>
-                        <p className="text-purple-600">
-                          {format(new Date(displayPeriod.date), 'PPPP', { locale: getLocaleDateFns() })}
-                        </p>
+        {/* Binded Periods Information */}
+        {lesson.linkedPeriods.length > 0 && (
+          <div className="space-y-4">
+            {lesson.linkedPeriods.map((period) => (
+              <ColoredCard key={period.id} colorScheme="purple">
+                <ColoredCardHeader>
+                  <ColoredCardTitle>
+                    <Link className="mr-2 h-5 w-5 text-purple-600" />
+                    <span>{t('scheduleBinding')}</span>
+                  </ColoredCardTitle>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => navigate(`/periods/${period.id}`)}
+                    className="flex-shrink-0"
+                  >
+                    {t('viewPeriodDetails')}
+                  </Button>
+                </ColoredCardHeader>
+                <ColoredCardContent>
+                  <div className="rounded-lg bg-purple-50 p-4">
+                    <div className="flex items-start gap-4">
+                      <div className="flex-shrink-0 rounded-lg bg-purple-100 p-3">
+                        <Calendar className="h-6 w-6 text-purple-600" />
                       </div>
-                      <div>
-                        <p className="font-medium text-purple-700">{t('time')}</p>
-                        <p className="text-purple-600">
-                          {displayPeriod.startTime && displayPeriod.endTime
-                            ? formatTimeRange(displayPeriod.startTime, displayPeriod.endTime)
-                            : t('notSpecified')}
-                        </p>
+                      <div className="flex-1 space-y-2">
+                        <div className="flex items-center gap-2">
+                          <h4 className="font-semibold text-purple-900">{period.name}</h4>
+                          <Badge className="border-purple-300 bg-purple-200 text-purple-800">
+                            {period.category}
+                          </Badge>
+                        </div>
+                        <div className="grid grid-cols-1 gap-4 text-sm md:grid-cols-2">
+                          <div>
+                            <p className="font-medium text-purple-700">{t('date')}</p>
+                            <p className="text-purple-600">
+                              {format(new Date(period.date), 'PPPP', { locale: getLocaleDateFns() })}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="font-medium text-purple-700">{t('time')}</p>
+                            <p className="text-purple-600">
+                              {period.startTime && period.endTime
+                                ? formatTimeRange(period.startTime, period.endTime)
+                                : t('notSpecified')}
+                            </p>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </div>
-            </ColoredCardContent>
-          </ColoredCard>
+                </ColoredCardContent>
+              </ColoredCard>
+            ))}
+          </div>
         )}
 
         {/* Learning Objectives Card */}
@@ -268,16 +272,16 @@ export const LessonDetailView = ({ lessonPlan }: LessonDetailViewProps) => {
                 <div className="flex-1">
                   <ColoredCardTitle>{t('learningObjectives')}</ColoredCardTitle>
                   <p className="text-muted-foreground mt-1 text-sm">
-                    {lessonPlan.objectives.filter((obj) => obj.isAchieved).length} {t('of')}{' '}
-                    {lessonPlan.objectives.length} {t('completed')}
+                    {lesson.objectives.filter((obj) => obj.isAchieved).length} {t('of')}{' '}
+                    {lesson.objectives.length} {t('completed')}
                   </p>
                 </div>
               </div>
             </ColoredCardHeader>
             <ColoredCardContent>
-              {lessonPlan.objectives.length > 0 ? (
+              {lesson.objectives.length > 0 ? (
                 <div className="space-y-3">
-                  {lessonPlan.objectives.map((objective) => (
+                  {lesson.objectives.map((objective) => (
                     <div
                       key={objective.id}
                       className="flex gap-3 rounded-lg bg-slate-50 p-4 transition-colors hover:bg-slate-100"
@@ -319,16 +323,16 @@ export const LessonDetailView = ({ lessonPlan }: LessonDetailViewProps) => {
                 <div className="flex-1">
                   <ColoredCardTitle>{t('resources')}</ColoredCardTitle>
                   <p className="text-muted-foreground mt-1 text-sm">
-                    {lessonPlan.resources.filter((res) => res.isPrepared).length} {t('of')}{' '}
-                    {lessonPlan.resources.length} {t('prepared')}
+                    {lesson.resources.filter((res) => res.isPrepared).length} {t('of')}{' '}
+                    {lesson.resources.length} {t('prepared')}
                   </p>
                 </div>
               </div>
             </ColoredCardHeader>
             <ColoredCardContent>
-              {lessonPlan.resources.length > 0 ? (
+              {lesson.resources.length > 0 ? (
                 <div className="space-y-3">
-                  {lessonPlan.resources.map((resource) => (
+                  {lesson.resources.map((resource) => (
                     <div
                       key={resource.id}
                       className="flex gap-3 rounded-lg bg-slate-50 p-4 transition-colors hover:bg-slate-100"
@@ -378,16 +382,16 @@ export const LessonDetailView = ({ lessonPlan }: LessonDetailViewProps) => {
         </div>
 
         {/* Additional Information Card */}
-        {lessonPlan.notes && (
+        {lesson.notes && (
           <ColoredCard colorScheme="amber">
             <ColoredCardHeader>
               <ColoredCardTitle>{t('additionalInformation')}</ColoredCardTitle>
             </ColoredCardHeader>
             <ColoredCardContent>
-              {lessonPlan.notes && (
+              {lesson.notes && (
                 <div className="rounded-lg bg-amber-50 p-3">
                   <p className="text-sm font-medium text-amber-800">{t('notes')}</p>
-                  <p className="whitespace-pre-wrap text-sm text-amber-700">{lessonPlan.notes}</p>
+                  <p className="whitespace-pre-wrap text-sm text-amber-700">{lesson.notes}</p>
                 </div>
               )}
             </ColoredCardContent>
@@ -398,20 +402,20 @@ export const LessonDetailView = ({ lessonPlan }: LessonDetailViewProps) => {
       <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
         <DialogContent className="max-h-[90vh] !max-w-4xl overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>{t('editLessonPlan')}</DialogTitle>
+            <DialogTitle>{t('editLesson')}</DialogTitle>
           </DialogHeader>
-          <LessonPlanCreator
-            classId={lessonPlan.classId}
-            lessonId={lessonPlan.id}
-            existingData={lessonPlan}
+          <LessonCreator
+            classId={lesson.classId}
+            lessonId={lesson.id}
+            existingData={lesson}
             operation="update"
             onSave={() => Promise.resolve()} // Not used in update mode
-            onUpdate={async (lessonPlanData) => {
-              await updateLessonPlan.mutateAsync(lessonPlanData);
+            onUpdate={async (lessonData) => {
+              await updateLesson.mutateAsync(lessonData);
               setIsEditModalOpen(false);
             }}
             onCancel={() => setIsEditModalOpen(false)}
-            isLoading={updateLessonPlan.isPending}
+            isLoading={updateLesson.isPending}
           />
         </DialogContent>
       </Dialog>

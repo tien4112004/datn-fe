@@ -2,22 +2,22 @@ import { Badge } from '@/components/ui/badge';
 import { BookOpen, Clock, PlayCircle, CheckCircle2, XCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/shared/lib/utils';
-import type { LessonPlan, LessonStatus } from '../../types';
+import type { Lesson, LessonStatus } from '../../types';
 
-interface LessonPlanBadgeProps {
-  lessonPlan: LessonPlan;
+interface LessonBadgeProps {
+  lesson: Lesson;
   variant?: 'compact' | 'detailed';
   showObjectives?: boolean;
   className?: string;
 }
 
-export const LessonPlanBadge = ({
-  lessonPlan,
+export const LessonBadge = ({
+  lesson,
   variant = 'compact',
   showObjectives = false,
   className,
-}: LessonPlanBadgeProps) => {
-  const { t } = useTranslation('classes', { keyPrefix: 'lessonPlan' });
+}: LessonBadgeProps) => {
+  const { t } = useTranslation('classes', { keyPrefix: 'lesson' });
 
   const getStatusIcon = (status: LessonStatus) => {
     switch (status) {
@@ -69,13 +69,13 @@ export const LessonPlanBadge = ({
       <div className={cn('flex items-center gap-2', className)}>
         <BookOpen className="h-4 w-4 flex-shrink-0 text-blue-500" />
         <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-medium">{lessonPlan.title}</p>
+          <p className="truncate text-sm font-medium">{lesson.title}</p>
           <Badge
             variant="outline"
-            className={cn('flex w-fit items-center gap-1 text-xs', getStatusColor(lessonPlan.status))}
+            className={cn('flex w-fit items-center gap-1 text-xs', getStatusColor(lesson.status))}
           >
-            {getStatusIcon(lessonPlan.status)}
-            {getStatusLabel(lessonPlan.status)}
+            {getStatusIcon(lesson.status)}
+            {getStatusLabel(lesson.status)}
           </Badge>
         </div>
       </div>
@@ -87,24 +87,24 @@ export const LessonPlanBadge = ({
       <div className="flex items-start gap-2">
         <BookOpen className="mt-0.5 h-4 w-4 flex-shrink-0 text-blue-500" />
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-medium">{lessonPlan.title}</p>
+          <p className="text-sm font-medium">{lesson.title}</p>
           <div className="mt-1 flex items-center gap-2">
             <Badge
               variant="outline"
-              className={cn('flex items-center gap-1 text-xs', getStatusColor(lessonPlan.status))}
+              className={cn('flex items-center gap-1 text-xs', getStatusColor(lesson.status))}
             >
-              {getStatusIcon(lessonPlan.status)}
-              {getStatusLabel(lessonPlan.status)}
+              {getStatusIcon(lesson.status)}
+              {getStatusLabel(lesson.status)}
             </Badge>
-            {showObjectives && lessonPlan.objectives.length > 0 && (
+            {showObjectives && lesson.objectives.length > 0 && (
               <Badge variant="secondary" className="text-xs">
-                {lessonPlan.objectives.filter((obj) => obj.isAchieved).length}/{lessonPlan.objectives.length}{' '}
+                {lesson.objectives.filter((obj) => obj.isAchieved).length}/{lesson.objectives.length}{' '}
                 {t('status.objectives')}
               </Badge>
             )}
           </div>
-          {lessonPlan.description && (
-            <p className="text-muted-foreground mt-1 line-clamp-2 text-xs">{lessonPlan.description}</p>
+          {lesson.description && (
+            <p className="text-muted-foreground mt-1 line-clamp-2 text-xs">{lesson.description}</p>
           )}
         </div>
       </div>

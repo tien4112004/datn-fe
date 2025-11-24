@@ -9,13 +9,13 @@ export default {
   errors: {
     general: 'Lỗi',
     invalidAccess: 'Truy cập không hợp lệ',
-    lessonPlansRequirePeriod: 'Kế hoạch bài học phải được tạo cho một tiết học cụ thể.',
+    lessonsRequirePeriod: 'bài học phải được tạo cho một tiết học cụ thể.',
     failedToLoadPeriodDetails: 'Không thể tải chi tiết tiết học.',
-    failedToLoadLessonPlanDetails: 'Không thể tải chi tiết kế hoạch bài học.',
+    failedToLoadLessonDetails: 'Không thể tải chi tiết bài học.',
     periodNotFound: 'Không tìm thấy tiết học',
     periodNotFoundDescription: 'Không thể tìm thấy tiết học được yêu cầu.',
-    lessonPlanNotFound: 'Không tìm thấy kế hoạch bài học',
-    lessonPlanNotFoundDescription: 'Không thể tìm thấy kế hoạch bài học được yêu cầu.',
+    lessonNotFound: 'Không tìm thấy bài học',
+    lessonNotFoundDescription: 'Không thể tìm thấy bài học được yêu cầu.',
   },
 
   controls: {
@@ -249,12 +249,12 @@ export default {
         scheduled: 'Đã lên lịch',
       },
       room: 'Phòng',
-      hasLessonPlan: 'Có kế hoạch bài học',
+      hasLesson: 'Có bài học',
       stats: {
         totalPeriods: 'Tổng tiết học',
         completed: 'Hoàn thành',
         remaining: 'Còn lại',
-        withLessonPlan: 'Có kế hoạch bài học',
+        withLesson: 'Có bài học',
       },
       dialog: {
         eventDetails: 'Chi tiết sự kiện lịch biểu',
@@ -330,7 +330,7 @@ export default {
       time: 'Thời gian',
       category: 'Danh mục',
       location: 'Địa điểm',
-      noLessons: 'Không có kế hoạch bài học được gán',
+      noLessons: 'Không có bài học được gán',
       chronologicalList: 'Danh sách các tiết học theo thứ tự thời gian cho bộ môn được chọn',
     },
     subjectContext: {
@@ -338,7 +338,7 @@ export default {
       selectSubject: 'Chọn một bộ môn',
       periodsPerWeek: 'tiết/tuần',
       schedule: 'Lịch biểu',
-      lessonPlanning: 'Kế hoạch bài học',
+      lessonning: 'bài học',
       recentPlan: 'Kế hoạch gần đây',
       noRecentPlan: 'Không có kế hoạch gần đây',
       upcomingDeadlines: 'Hạn chót sắp tới',
@@ -359,8 +359,8 @@ export default {
       room: 'Phòng',
       learningObjectives: 'Mục tiêu học tập',
       viewFullDetails: 'Xem chi tiết bài học',
-      lessonPlan: 'Kế hoạch bài học',
-      noLessonPlan: 'Không có kế hoạch bài học',
+      lesson: 'bài học',
+      noLesson: 'Không có bài học',
     },
     lessonDetail: {
       title: 'Chi tiết bài học',
@@ -389,16 +389,16 @@ export default {
       completed: 'hoàn thành',
       minutes: 'phút',
       edit: 'Chỉnh sửa',
-      editLessonPlan: 'Chỉnh sửa kế hoạch bài học',
+      editLesson: 'Chỉnh sửa bài học',
     },
-    createLessonPlan: {
-      title: 'Tạo kế hoạch bài học',
+    createLesson: {
+      title: 'Tạo bài học',
       description: 'Thêm cấu trúc cho tài liệu dạy học và lên kế hoạch mục tiêu và tài nguyên bài học.',
-      createButton: 'Tạo kế hoạch bài học',
-      subtitle: 'Đang tạo kế hoạch bài học cho {{periodName}} vào {{periodDate}}',
+      createButton: 'Tạo bài học',
+      subtitle: 'Đang tạo bài học cho {{periodName}} vào {{periodDate}}',
     },
   },
-  lessonPlan: {
+  lesson: {
     creator: {
       sections: {
         basicInfo: 'Thông tin cơ bản',
@@ -585,7 +585,7 @@ export default {
       day: 'Ngày',
       selectLesson: 'Chọn bài học',
       noAvailableLessons: 'Không có bài học phù hợp cho tiết học này',
-      chooseLessonPlan: 'Chọn một bài học',
+      chooseLesson: 'Chọn một bài học',
       actions: {
         link: 'Liên kết',
         unlink: 'Hủy liên kết',
@@ -943,7 +943,7 @@ export default {
   lessonTab: {
     createLesson: 'Tạo bài học',
     createLessonModal: {
-      title: 'Tạo kế hoạch bài học mới',
+      title: 'Tạo bài học mới',
     },
   },
 

@@ -22,7 +22,7 @@ import { SubjectContextSwitcher } from './SubjectContextSwitcher';
 
 import type {
   Class,
-  LessonPlan,
+  Lesson,
   LearningObjective,
   LessonResource,
   DailySchedule,
@@ -35,27 +35,23 @@ interface TodaysTeachingDashboardProps {
   classData: Class;
   todaySchedule: DailySchedule;
   allPeriods: SchedulePeriod[];
-  todayLessonPlans: LessonPlan[];
-  allLessonPlans: LessonPlan[];
-  onUpdateLessonStatus: (lessonPlanId: string, status: any, notes?: string) => Promise<void>;
+  todayLessons: Lesson[];
+  allLessons: Lesson[];
+  onUpdateLessonStatus: (lessonId: string, status: any, notes?: string) => Promise<void>;
   onUpdateObjective: (
-    lessonPlanId: string,
+    lessonId: string,
     objectiveId: string,
     updates: Partial<LearningObjective>
   ) => Promise<void>;
-  onAddObjectiveNote: (lessonPlanId: string, objectiveId: string, note: string) => Promise<void>;
+  onAddObjectiveNote: (lessonId: string, objectiveId: string, note: string) => Promise<void>;
   onAddResource: (
-    lessonPlanId: string,
-    resource: Omit<LessonResource, 'id' | 'lessonPlanId' | 'createdAt'>
+    lessonId: string,
+    resource: Omit<LessonResource, 'id' | 'lessonId' | 'createdAt'>
   ) => Promise<void>;
-  onUpdateResource: (
-    lessonPlanId: string,
-    resourceId: string,
-    updates: Partial<LessonResource>
-  ) => Promise<void>;
-  onDeleteResource: (lessonPlanId: string, resourceId: string) => Promise<void>;
+  onUpdateResource: (lessonId: string, resourceId: string, updates: Partial<LessonResource>) => Promise<void>;
+  onDeleteResource: (lessonId: string, resourceId: string) => Promise<void>;
   onSubjectChange: (subject: string, subjectCode: string) => void;
-  onCreateLessonPlan?: (subject: string, subjectCode: string) => void;
+  onCreateLesson?: (subject: string, subjectCode: string) => void;
   onManageSchedule?: (subject: string) => void;
   currentSubject?: string;
 }
@@ -78,8 +74,8 @@ export const TodaysTeachingDashboard = ({
   classData,
   todaySchedule,
   allPeriods,
-  todayLessonPlans,
-  allLessonPlans,
+  todayLessons,
+  allLessons,
   onUpdateLessonStatus,
   onUpdateObjective,
   onAddObjectiveNote,
@@ -87,7 +83,7 @@ export const TodaysTeachingDashboard = ({
   onUpdateResource,
   onDeleteResource,
   onSubjectChange,
-  onCreateLessonPlan,
+  onCreateLesson,
   onManageSchedule,
   currentSubject,
 }: TodaysTeachingDashboardProps) => {
@@ -121,28 +117,28 @@ export const TodaysTeachingDashboard = ({
     }
 
     // Lesson stats
-    const todayLessonsPlanned = todayLessonPlans.length;
-    const todayLessonsCompleted = todayLessonPlans.filter((lp) => lp.status === 'completed').length;
+    const todayLessonsPlanned = todayLessons.length;
+    const todayLessonsCompleted = todayLessons.filter((lp) => lp.status === 'completed').length;
     const completedPeriodsToday = todayPeriods.filter((p: SchedulePeriod) => {
-      const linkedLesson = todayLessonPlans.find((lp) => lp.id === p.lessonPlanId);
-      return linkedLesson?.status === 'completed';
+      const linkedLessons = p.lessons.filter((lp) => lp.status === 'completed');
+      return linkedLessons.length > 0;
     }).length;
 
     // Objectives stats (for today's lessons)
-    const todayObjectives = todayLessonPlans.flatMap((lp) => lp.objectives || []);
+    const todayObjectives = todayLessons.flatMap((lp) => lp.objectives || []);
     const objectivesAchievedToday = todayObjectives.filter((obj) => obj.isAchieved).length;
 
     // Resources stats (for today's lessons)
-    const todayResources = todayLessonPlans.flatMap((lp) => lp.resources || []);
+    const todayResources = todayLessons.flatMap((lp) => lp.resources || []);
     const resourcesPreparedToday = todayResources.filter((res) => res.isPrepared).length;
 
     // Urgent tasks
     let urgentTasks = 0;
     // Unprepared resources for upcoming lessons
     urgentTasks += todayResources.filter((res) => res.isRequired && !res.isPrepared).length;
-    // Unplanned periods (periods without lesson plans)
-    urgentTasks += todayPeriods.filter((p: SchedulePeriod) => !p.lessonPlanId).length;
-    // Note: Overdue lessons calculation removed since date/endTime fields were removed from LessonPlan
+    // Unplanned periods (periods without lessons)
+    urgentTasks += todayPeriods.filter((p: SchedulePeriod) => p.lessons.length === 0).length;
+    // Note: Overdue lessons calculation removed since date/endTime fields were removed from Lesson
 
     return {
       totalPeriodsToday: todayPeriods.length,
@@ -157,12 +153,12 @@ export const TodaysTeachingDashboard = ({
       totalResourcesToday: todayResources.length,
       urgentTasks,
     };
-  }, [todaySchedule, todayLessonPlans]);
+  }, [todaySchedule, todayLessons]);
 
-  const currentLessonPlan = useMemo(() => {
-    if (!stats.currentPeriod?.lessonPlanId) return undefined;
-    return todayLessonPlans.find((lp) => lp.id === stats.currentPeriod?.lessonPlanId);
-  }, [stats.currentPeriod, todayLessonPlans]);
+  const currentLesson = useMemo(() => {
+    if (!stats.currentPeriod?.lessons || stats.currentPeriod.lessons.length === 0) return undefined;
+    return stats.currentPeriod.lessons[0];
+  }, [stats.currentPeriod]);
 
   return (
     <div className="space-y-6">
@@ -248,10 +244,10 @@ export const TodaysTeachingDashboard = ({
           {/* Subject Context Switching */}
           <SubjectContextSwitcher
             periods={allPeriods}
-            lessonPlans={allLessonPlans}
+            lessons={allLessons}
             currentSubject={currentSubject}
             onSubjectChange={onSubjectChange}
-            onCreateLessonPlan={onCreateLessonPlan}
+            onCreateLesson={onCreateLesson}
             onManageSchedule={onManageSchedule}
           />
 
@@ -291,25 +287,25 @@ export const TodaysTeachingDashboard = ({
 
           <SubjectContextSwitcher
             periods={allPeriods}
-            lessonPlans={allLessonPlans}
+            lessons={allLessons}
             currentSubject={currentSubject}
             onSubjectChange={onSubjectChange}
-            onCreateLessonPlan={onCreateLessonPlan}
+            onCreateLesson={onCreateLesson}
             onManageSchedule={onManageSchedule}
           />
         </TabsContent>
 
         {/* Lessons Tab */}
         <TabsContent value="lessons" className="space-y-6">
-          <LessonStatusTracker lessonPlans={todayLessonPlans} onUpdateStatus={onUpdateLessonStatus} />
+          <LessonStatusTracker lessons={todayLessons} onUpdateStatus={onUpdateLessonStatus} />
         </TabsContent>
 
         {/* Objectives Tab */}
         <TabsContent value="objectives" className="space-y-6">
-          {currentLessonPlan ? (
+          {currentLesson ? (
             <ObjectiveTracker
-              lessonPlan={currentLessonPlan}
-              objectives={currentLessonPlan.objectives || []}
+              lesson={currentLesson}
+              objectives={currentLesson.objectives || []}
               onUpdateObjective={onUpdateObjective}
               onAddNote={onAddObjectiveNote}
             />
@@ -326,14 +322,14 @@ export const TodaysTeachingDashboard = ({
           )}
 
           {/* All Today's Objectives Summary */}
-          {todayLessonPlans.length > 0 && (
+          {todayLessons.length > 0 && (
             <Card>
               <CardHeader>
                 <CardTitle>{t('todayObjectivesSummary')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {todayLessonPlans.map((lesson) => {
+                  {todayLessons.map((lesson) => {
                     const lessonObjectives = lesson.objectives || [];
                     const achievedCount = lessonObjectives.filter((obj) => obj.isAchieved).length;
 
@@ -364,10 +360,10 @@ export const TodaysTeachingDashboard = ({
 
         {/* Resources Tab */}
         <TabsContent value="resources" className="space-y-6">
-          {currentLessonPlan ? (
+          {currentLesson ? (
             <ResourceManager
-              lessonPlan={currentLessonPlan}
-              resources={currentLessonPlan.resources || []}
+              lesson={currentLesson}
+              resources={currentLesson.resources || []}
               onAddResource={onAddResource}
               onUpdateResource={onUpdateResource}
               onDeleteResource={onDeleteResource}
@@ -385,14 +381,14 @@ export const TodaysTeachingDashboard = ({
           )}
 
           {/* All Today's Resources Summary */}
-          {todayLessonPlans.length > 0 && (
+          {todayLessons.length > 0 && (
             <Card>
               <CardHeader>
                 <CardTitle>{t('todayResourcesSummary')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {todayLessonPlans.map((lesson) => {
+                  {todayLessons.map((lesson) => {
                     const lessonResources = lesson.resources || [];
                     const preparedCount = lessonResources.filter((res) => res.isPrepared).length;
                     const requiredCount = lessonResources.filter((res) => res.isRequired).length;

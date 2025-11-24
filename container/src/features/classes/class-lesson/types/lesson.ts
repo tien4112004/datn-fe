@@ -7,11 +7,11 @@
 import type { MinimalSchedulePeriod } from '../../class-schedule/types/schedule';
 
 /**
- * LessonPlan Entity
+ * Lesson Entity
  *
  * A detailed plan for teaching a specific subject during a class period.
  */
-export interface LessonPlan {
+export interface Lesson {
   id: string;
   classId: string;
   className: string;
@@ -19,7 +19,7 @@ export interface LessonPlan {
   title: string;
   description?: string;
   duration: number; // minutes
-  linkedPeriod?: MinimalSchedulePeriod;
+  linkedPeriods: MinimalSchedulePeriod[];
   objectives: LearningObjective[];
   resources: LessonResource[];
   status: LessonStatus;

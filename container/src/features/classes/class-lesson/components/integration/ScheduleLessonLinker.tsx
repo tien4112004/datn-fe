@@ -10,15 +10,15 @@ import { useTranslation } from 'react-i18next';
 import { cn } from '@/shared/lib/utils';
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
-import type { SchedulePeriod, LessonPlan } from '../../../shared/types';
+import type { SchedulePeriod, Lesson } from '../../../shared/types';
 import { getSubjectByCode } from '../../../shared/types/constants/subjects';
 
 interface ScheduleLessonLinkerProps {
   classId: string;
   periods: SchedulePeriod[];
-  lessonPlans: LessonPlan[];
-  onLinkLesson: (periodId: string, lessonPlanId: string) => Promise<void>;
-  onUnlinkLesson: (periodId: string) => Promise<void>;
+  lessons: Lesson[];
+  onLinkLesson: (periodId: string, lessonId: string) => Promise<void>;
+  onUnlinkLesson: (periodId: string, lessonId: string) => Promise<void>;
   onCreateLessonForPeriod: (period: SchedulePeriod) => void;
   canEdit?: boolean;
 }
@@ -35,7 +35,7 @@ interface LinkingStats {
 
 export const ScheduleLessonLinker = ({
   periods,
-  lessonPlans,
+  lessons,
   onLinkLesson,
   onUnlinkLesson,
   onCreateLessonForPeriod,
@@ -49,11 +49,13 @@ export const ScheduleLessonLinker = ({
 
   const stats = useMemo((): LinkingStats => {
     const totalPeriods = periods.length;
-    const linkedPeriods = periods.filter((p) => p.lessonPlanId).length;
+    const linkedPeriods = periods.filter((p) => p.lessons.length > 0).length;
     const unlinkedPeriods = totalPeriods - linkedPeriods;
 
-    const totalLessons = lessonPlans.length;
-    const linkedLessons = lessonPlans.filter((lp) => periods.some((p) => p.lessonPlanId === lp.id)).length;
+    const totalLessons = lessons.length;
+    const linkedLessons = lessons.filter((lp) =>
+      periods.some((p) => p.lessons.some((l) => l.id === lp.id))
+    ).length;
     const unlinkedLessons = totalLessons - linkedLessons;
 
     const linkingRate = totalPeriods > 0 ? Math.round((linkedPeriods / totalPeriods) * 100) : 0;
@@ -67,7 +69,7 @@ export const ScheduleLessonLinker = ({
       unlinkedLessons,
       linkingRate,
     };
-  }, [periods, lessonPlans]);
+  }, [periods, lessons]);
 
   const sortedPeriods = useMemo(() => {
     return [...periods].sort((a, b) => {
@@ -79,10 +81,10 @@ export const ScheduleLessonLinker = ({
   const availableLessons = useMemo(() => {
     if (!selectedPeriod) return [];
 
-    return lessonPlans.filter((lesson) => {
+    return lessons.filter((lesson) => {
       // Check if lesson is already linked to another period
       const isLinkedToOtherPeriod = periods.some(
-        (p) => p.lessonPlanId === lesson.id && p.id !== selectedPeriod.id
+        (p) => p.lessons.some((l) => l.id === lesson.id) && p.id !== selectedPeriod.id
       );
 
       // Check if lesson matches the period's subject
@@ -90,10 +92,10 @@ export const ScheduleLessonLinker = ({
 
       return !isLinkedToOtherPeriod && matchesSubject;
     });
-  }, [selectedPeriod, lessonPlans, periods]);
+  }, [selectedPeriod, lessons, periods]);
 
-  const getLinkedLesson = (period: SchedulePeriod): LessonPlan | undefined => {
-    return lessonPlans.find((lp) => lp.id === period.lessonPlanId);
+  const getLinkedLesson = (period: SchedulePeriod): Lesson | undefined => {
+    return period.lessons[0];
   };
 
   const handleLinkLesson = async () => {
@@ -114,7 +116,10 @@ export const ScheduleLessonLinker = ({
 
   const handleUnlinkLesson = async (period: SchedulePeriod) => {
     try {
-      await onUnlinkLesson(period.id);
+      // Unlink all lessons from this period
+      for (const lesson of period.lessons) {
+        await onUnlinkLesson(period.id, lesson.id);
+      }
     } catch (error) {
       console.error('Failed to unlink lesson:', error);
     }
@@ -300,8 +305,8 @@ export const ScheduleLessonLinker = ({
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {lessonPlans
-                .filter((lesson) => !periods.some((p) => p.lessonPlanId === lesson.id))
+              {lessons
+                .filter((lesson) => !periods.some((p) => p.lessons.some((l) => l.id === lesson.id)))
                 .map((lesson) => (
                   <div key={lesson.id} className="rounded-lg border p-3">
                     <div className="flex items-center justify-between">
@@ -361,7 +366,7 @@ export const ScheduleLessonLinker = ({
               ) : (
                 <Select value={selectedLessonId} onValueChange={setSelectedLessonId}>
                   <SelectTrigger>
-                    <SelectValue placeholder={t('chooseLessonPlan')} />
+                    <SelectValue placeholder={t('chooseLesson')} />
                   </SelectTrigger>
                   <SelectContent>
                     {availableLessons.map((lesson) => (

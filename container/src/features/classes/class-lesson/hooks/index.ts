@@ -1,2 +1,2 @@
 export * from './useApi';
-export * from './useLessonPlanOperations';
+export * from './useLessonOperations';

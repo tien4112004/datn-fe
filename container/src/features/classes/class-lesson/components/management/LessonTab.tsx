@@ -6,7 +6,7 @@ import { Plus } from 'lucide-react';
 
 import { LessonStatusTracker } from './LessonStatusTracker';
 import { ScheduleLessonLinker } from '../integration/ScheduleLessonLinker';
-import { LessonPlanCreator } from '../form/LessonPlanCreator';
+import { LessonCreator } from '../form/LessonCreator';
 import {
   useClassPeriods,
   useLinkLessonToPeriod,
@@ -14,7 +14,7 @@ import {
   type SchedulePeriod,
 } from '../../../class-schedule';
 import type { Class } from '../../../shared/types';
-import { useClassLessonPlans, useUpdateLessonStatus, useCreateLessonPlan } from '../../hooks';
+import { useClassLessons, useUpdateLessonStatus, useCreateLesson } from '../../hooks';
 
 interface LessonTabProps {
   classId: string;
@@ -27,18 +27,18 @@ export const LessonTab = ({ classId, currentClass }: LessonTabProps) => {
   // Get today's date
   const today = new Date().toISOString().split('T')[0];
 
-  // Fetch periods and lesson plans
+  // Fetch periods and lessons
   const { data: periodsData } = useClassPeriods(classId, { date: today });
-  const { data: lessonPlansData } = useClassLessonPlans(classId, {});
+  const { data: lessonsData } = useClassLessons(classId, {});
 
   const allPeriods = periodsData?.data || [];
-  const allLessonPlans = lessonPlansData?.data || [];
+  const allLessons = lessonsData?.data || [];
 
   // Mutation hooks
   const updateLessonStatus = useUpdateLessonStatus();
   const linkLessonToPeriod = useLinkLessonToPeriod();
   const unlinkLessonFromPeriod = useUnlinkLessonFromPeriod();
-  const createLessonPlan = useCreateLessonPlan();
+  const createLesson = useCreateLesson();
 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
@@ -52,7 +52,7 @@ export const LessonTab = ({ classId, currentClass }: LessonTabProps) => {
       </div>
       <div className="space-y-6">
         <LessonStatusTracker
-          lessonPlans={allLessonPlans}
+          lessons={allLessons}
           onUpdateStatus={async (id, status, notes) => {
             await updateLessonStatus.mutateAsync({ id, status, notes });
           }}
@@ -61,15 +61,15 @@ export const LessonTab = ({ classId, currentClass }: LessonTabProps) => {
         <ScheduleLessonLinker
           classId={currentClass.id}
           periods={allPeriods}
-          lessonPlans={allLessonPlans}
-          onLinkLesson={async (periodId, lessonPlanId) => {
-            await linkLessonToPeriod.mutateAsync({ classId: currentClass.id, periodId, lessonPlanId });
+          lessons={allLessons}
+          onLinkLesson={async (periodId, lessonId) => {
+            await linkLessonToPeriod.mutateAsync({ classId: currentClass.id, periodId, lessonId });
           }}
-          onUnlinkLesson={async (periodId) => {
-            await unlinkLessonFromPeriod.mutateAsync({ classId: currentClass.id, periodId });
+          onUnlinkLesson={async (periodId, lessonId) => {
+            await unlinkLessonFromPeriod.mutateAsync({ classId: currentClass.id, periodId, lessonId });
           }}
           onCreateLessonForPeriod={(period: SchedulePeriod) => {
-            // TODO: Open lesson plan creation modal with period pre-filled
+            // TODO: Open lesson creation modal with period pre-filled
             console.log('Create lesson for period:', period);
           }}
         />
@@ -80,10 +80,10 @@ export const LessonTab = ({ classId, currentClass }: LessonTabProps) => {
           <DialogHeader>
             <DialogTitle>{t('createLessonModal.title')}</DialogTitle>
           </DialogHeader>
-          <LessonPlanCreator
+          <LessonCreator
             classId={currentClass.id}
-            onSave={async (lessonPlan) => {
-              await createLessonPlan.mutateAsync(lessonPlan);
+            onSave={async (lesson) => {
+              await createLesson.mutateAsync(lesson);
               setIsCreateModalOpen(false);
             }}
             onCancel={() => setIsCreateModalOpen(false)}

@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom';
-import { useLessonPlan } from './hooks/useApi';
+import { useLesson } from './hooks/useApi';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   Breadcrumb,
@@ -16,8 +16,8 @@ import { LessonDetailView } from './components';
 export const LessonDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const { t } = useTranslation('classes');
-  const { data: lessonPlan, isLoading, isError } = useLessonPlan(id!);
-  const { data: classData } = useClass(lessonPlan?.classId || '');
+  const { data: lesson, isLoading, isError } = useLesson(id!);
+  const { data: classData } = useClass(lesson?.classId || '');
 
   if (isLoading) {
     return (
@@ -36,18 +36,18 @@ export const LessonDetailPage = () => {
       <div className="flex h-full items-center justify-center">
         <div className="text-center">
           <h2 className="text-lg font-semibold">{t('errors.general')}</h2>
-          <p className="text-muted-foreground">{t('errors.failedToLoadLessonPlanDetails')}</p>
+          <p className="text-muted-foreground">{t('errors.failedToLoadLessonDetails')}</p>
         </div>
       </div>
     );
   }
 
-  if (!lessonPlan) {
+  if (!lesson) {
     return (
       <div className="flex h-full items-center justify-center">
         <div className="text-center">
-          <h2 className="text-lg font-semibold">{t('errors.lessonPlanNotFound')}</h2>
-          <p className="text-muted-foreground">{t('errors.lessonPlanNotFoundDescription')}</p>
+          <h2 className="text-lg font-semibold">{t('errors.lessonNotFound')}</h2>
+          <p className="text-muted-foreground">{t('errors.lessonNotFoundDescription')}</p>
         </div>
       </div>
     );
@@ -56,7 +56,7 @@ export const LessonDetailPage = () => {
   return (
     <div className="p-8">
       {/* Breadcrumb Navigation */}
-      {lessonPlan && classData && (
+      {lesson && classData && (
         <Breadcrumb className="mb-6">
           <BreadcrumbList>
             <BreadcrumbItem>
@@ -64,17 +64,17 @@ export const LessonDetailPage = () => {
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbLink href={`/classes/${lessonPlan.classId}`}>{classData.name}</BreadcrumbLink>
+              <BreadcrumbLink href={`/classes/${lesson.classId}`}>{classData.name}</BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbPage>{lessonPlan.title}</BreadcrumbPage>
+              <BreadcrumbPage>{lesson.title}</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
       )}
       <div className="mx-12">
-        <LessonDetailView lessonPlan={lessonPlan} />
+        <LessonDetailView lesson={lesson} />
       </div>
     </div>
   );

@@ -10,7 +10,7 @@ import {
   ColoredCardTitle,
   ColoredCardContent,
 } from '@/components/common/ColoredCard';
-import type { LessonPlanFormData } from './LessonPlanCreator';
+import type { LessonFormData } from './LessonCreator';
 
 interface BasicInfoSectionProps {
   isPeriodProvided?: boolean;
@@ -18,11 +18,11 @@ interface BasicInfoSectionProps {
 }
 
 export const BasicInfoSection = ({ isPeriodProvided, isUpdate }: BasicInfoSectionProps) => {
-  const { t } = useTranslation('classes', { keyPrefix: 'lessonPlan.creator' });
+  const { t } = useTranslation('classes', { keyPrefix: 'lesson.creator' });
   const {
     register,
     formState: { errors },
-  } = useFormContext<LessonPlanFormData>();
+  } = useFormContext<LessonFormData>();
 
   return (
     <ColoredCard colorScheme="blue">

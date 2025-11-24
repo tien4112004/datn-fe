@@ -19,7 +19,7 @@ export interface ScheduleStats {
   total: number;
   completed: number;
   remaining: number;
-  withLessonPlan: number;
+  withLesson: number;
 }
 
 export type PeriodStatus = 'current' | 'completed' | 'upcoming' | 'scheduled';
@@ -68,7 +68,7 @@ export function useScheduleHelpers() {
         total: 0,
         completed: 0,
         remaining: 0,
-        withLessonPlan: 0,
+        withLesson: 0,
       };
     }
 
@@ -79,7 +79,7 @@ export function useScheduleHelpers() {
       completed: events.filter((e) => getPeriodStatus(e, schedule.date) === 'completed').length,
       remaining: events.filter((e) => ['current', 'upcoming'].includes(getPeriodStatus(e, schedule.date)))
         .length,
-      withLessonPlan: events.filter((e) => e.lessonPlanId).length,
+      withLesson: events.filter((e) => e.lessons.length > 0).length,
     };
   };
 
@@ -107,7 +107,7 @@ export function useScheduleHelpers() {
         total: 0,
         completed: 0,
         remaining: 0,
-        withLessonPlan: 0,
+        withLesson: 0,
       };
     }
 
@@ -123,7 +123,7 @@ export function useScheduleHelpers() {
         const status = getPeriodStatus(p, today);
         return ['current', 'upcoming'].includes(status);
       }).length,
-      withLessonPlan: periods.filter((p) => p.lessonPlanId).length,
+      withLesson: periods.filter((p) => p.lessons.length > 0).length,
     };
   };
 

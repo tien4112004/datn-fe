@@ -8,16 +8,16 @@ import type {
   ClassUpdateRequest,
   DailySchedule,
   Layout,
-  LessonPlan,
-  LessonPlanCollectionRequest,
+  Lesson,
+  LessonCollectionRequest,
   ScheduleCollectionRequest,
   SchedulePeriod,
   Student,
   StudentEnrollmentRequest,
   StudentCreateRequest,
   StudentUpdateRequest,
-  LessonPlanCreateRequest,
-  LessonPlanUpdateRequest,
+  LessonCreateRequest,
+  LessonUpdateRequest,
   SchedulePeriodCreateRequest,
   SchedulePeriodUpdateRequest,
 } from '.';
@@ -52,13 +52,13 @@ export interface ClassApiService extends Service {
   ): Promise<ApiResponse<SchedulePeriod[]>>;
   getPeriodById(id: string): Promise<SchedulePeriod | null>;
   getPeriodsBySubject(classId: string, subjectCode: string): Promise<SchedulePeriod[]>;
-  getLessonPlans(classId: string, params: LessonPlanCollectionRequest): Promise<ApiResponse<LessonPlan[]>>;
-  getLessonPlan(id: string): Promise<LessonPlan | null>;
+  getLessons(classId: string, params: LessonCollectionRequest): Promise<ApiResponse<Lesson[]>>;
+  getLesson(id: string): Promise<Lesson | null>;
 
-  // Lesson Plan mutations
-  updateLessonStatus(id: string, status: string, notes?: string): Promise<LessonPlan>;
-  createLessonPlan(data: LessonPlanCreateRequest): Promise<LessonPlan>;
-  updateLessonPlan(data: LessonPlanUpdateRequest): Promise<LessonPlan>;
+  // Lesson  mutations
+  updateLessonStatus(id: string, status: string, notes?: string): Promise<Lesson>;
+  createLesson(data: LessonCreateRequest): Promise<Lesson>;
+  updateLesson(data: LessonUpdateRequest): Promise<Lesson>;
 
   // Schedule mutations
   addSchedulePeriod(classId: string, data: SchedulePeriodCreateRequest): Promise<SchedulePeriod>;
@@ -67,8 +67,8 @@ export interface ClassApiService extends Service {
     id: string,
     updates: SchedulePeriodUpdateRequest
   ): Promise<SchedulePeriod>;
-  linkLessonToSchedulePeriod(classId: string, periodId: string, lessonPlanId: string): Promise<void>;
-  unlinkLessonFromSchedulePeriod(classId: string, periodId: string): Promise<void>;
+  linkLessonToSchedulePeriod(classId: string, periodId: string, lessonId: string): Promise<void>;
+  unlinkLessonFromSchedulePeriod(classId: string, periodId: string, lessonId: string): Promise<void>;
 
   // Student management
   getStudentsByClassId(classId: string): Promise<Student[]>;

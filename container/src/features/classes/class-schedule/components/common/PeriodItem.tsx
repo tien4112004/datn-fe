@@ -5,7 +5,7 @@ import type { SchedulePeriod } from '../../../shared/types';
 import { getLocaleDateFns } from '@/shared/i18n/helper';
 import { Clock } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { LessonPlanBadge } from '../../../class-lesson';
+import { LessonBadge } from '../../../class-lesson';
 
 interface PeriodItemProps {
   period: SchedulePeriod;
@@ -35,9 +35,11 @@ const PeriodItem = ({ period, onClick }: PeriodItemProps) => {
           </div>
 
           {/* Lesson Information */}
-          {period.lessonPlan && (
-            <div className="border-t pt-3">
-              <LessonPlanBadge lessonPlan={period.lessonPlan} variant="detailed" showObjectives />
+          {period.lessons.length > 0 && (
+            <div className="space-y-2 border-t pt-3">
+              {period.lessons.map((lesson) => (
+                <LessonBadge key={lesson.id} lesson={lesson} variant="detailed" showObjectives />
+              ))}
             </div>
           )}
 

@@ -3,14 +3,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { BookOpen } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import type { LessonPlan, LessonStatus } from '../../types';
+import type { Lesson, LessonStatus } from '../../types';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { LessonCard } from '../lesson/LessonCard';
 import { LessonStatusUpdateDialog } from '../form/LessonStatusUpdateDialog';
 
 interface LessonStatusTrackerProps {
-  lessonPlans: LessonPlan[];
-  onUpdateStatus: (lessonPlanId: string, status: LessonStatus, notes?: string) => Promise<void>;
+  lessons: Lesson[];
+  onUpdateStatus: (lessonId: string, status: LessonStatus, notes?: string) => Promise<void>;
   canEdit?: boolean;
 }
 
@@ -24,33 +24,33 @@ interface StatusStats {
 }
 
 export const LessonStatusTracker = ({
-  lessonPlans,
+  lessons,
   onUpdateStatus,
   canEdit = true,
 }: LessonStatusTrackerProps) => {
-  const { t } = useTranslation('classes', { keyPrefix: 'lessonPlan.status' });
-  const [selectedLesson, setSelectedLesson] = useState<LessonPlan | null>(null);
+  const { t } = useTranslation('classes', { keyPrefix: 'lesson.status' });
+  const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(null);
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
 
   const stats = useMemo((): StatusStats => {
-    const total = lessonPlans.length;
-    const planned = lessonPlans.filter((lp) => lp.status === 'planned').length;
-    const inProgress = lessonPlans.filter((lp) => lp.status === 'in_progress').length;
-    const completed = lessonPlans.filter((lp) => lp.status === 'completed').length;
-    const cancelled = lessonPlans.filter((lp) => lp.status === 'cancelled').length;
+    const total = lessons.length;
+    const planned = lessons.filter((lp) => lp.status === 'planned').length;
+    const inProgress = lessons.filter((lp) => lp.status === 'in_progress').length;
+    const completed = lessons.filter((lp) => lp.status === 'completed').length;
+    const cancelled = lessons.filter((lp) => lp.status === 'cancelled').length;
     const completionRate = total > 0 ? Math.round((completed / total) * 100) : 0;
 
     return { total, planned, inProgress, completed, cancelled, completionRate };
-  }, [lessonPlans]);
+  }, [lessons]);
 
   const sortedLessons = useMemo(() => {
-    return [...lessonPlans].sort((a, b) => {
+    return [...lessons].sort((a, b) => {
       // Sort by title since date/startTime fields were removed
       return a.title.localeCompare(b.title);
     });
-  }, [lessonPlans]);
+  }, [lessons]);
 
-  const openUpdateDialog = (lesson: LessonPlan) => {
+  const openUpdateDialog = (lesson: Lesson) => {
     setSelectedLesson(lesson);
     setIsUpdateDialogOpen(true);
   };

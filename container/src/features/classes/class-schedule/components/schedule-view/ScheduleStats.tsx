@@ -41,8 +41,8 @@ const ScheduleStatsDisplay = ({ stats }: ScheduleStatsProps) => {
       <Card className="border-0 bg-gradient-to-br from-purple-50 to-purple-100">
         <CardContent className="px-6 py-2">
           <div className="flex items-center justify-between">
-            <p className="text-muted-foreground text-xs font-medium">{t('stats.withLessonPlan')}</p>
-            <div className="text-3xl font-bold text-purple-600">{stats.withLessonPlan}</div>
+            <p className="text-muted-foreground text-xs font-medium">{t('stats.withLesson')}</p>
+            <div className="text-3xl font-bold text-purple-600">{stats.withLesson}</div>
           </div>
         </CardContent>
       </Card>

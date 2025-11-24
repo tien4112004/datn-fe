@@ -8,18 +8,18 @@ import { Textarea } from '@/components/ui/textarea';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Target, ChevronDown, ChevronRight, CheckCircle2, AlertCircle, Edit, Save, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import type { LearningObjective, LessonPlan, ObjectiveType } from '../../types';
+import type { LearningObjective, Lesson, ObjectiveType } from '../../types';
 import { cn } from '@/shared/lib/utils';
 
 interface ObjectiveTrackerProps {
-  lessonPlan: LessonPlan;
+  lesson: Lesson;
   objectives: LearningObjective[];
   onUpdateObjective: (
-    lessonPlanId: string,
+    lessonId: string,
     objectiveId: string,
     updates: Partial<LearningObjective>
   ) => Promise<void>;
-  onAddNote: (lessonPlanId: string, objectiveId: string, note: string) => Promise<void>;
+  onAddNote: (lessonId: string, objectiveId: string, note: string) => Promise<void>;
   canEdit?: boolean;
 }
 
@@ -31,13 +31,13 @@ interface ObjectiveProgress {
 }
 
 export const ObjectiveTracker = ({
-  lessonPlan,
+  lesson,
   objectives,
   onUpdateObjective,
   onAddNote,
   canEdit = true,
 }: ObjectiveTrackerProps) => {
-  const { t } = useTranslation('classes', { keyPrefix: 'lessonPlan.objectives' });
+  const { t } = useTranslation('classes', { keyPrefix: 'lesson.objectives' });
   const [expandedObjectives, setExpandedObjectives] = useState<Set<string>>(new Set());
   const [editingNotes, setEditingNotes] = useState<Map<string, string>>(new Map());
   const [isUpdating, setIsUpdating] = useState<Set<string>>(new Set());
@@ -69,7 +69,7 @@ export const ObjectiveTracker = ({
 
     setIsUpdating((prev) => new Set(prev).add(objectiveId));
     try {
-      await onUpdateObjective(lessonPlan.id, objectiveId, { isAchieved });
+      await onUpdateObjective(lesson.id, objectiveId, { isAchieved });
     } finally {
       setIsUpdating((prev) => {
         const newSet = new Set(prev);
@@ -101,7 +101,7 @@ export const ObjectiveTracker = ({
 
     setIsUpdating((prev) => new Set(prev).add(objectiveId));
     try {
-      await onAddNote(lessonPlan.id, objectiveId, note);
+      await onAddNote(lesson.id, objectiveId, note);
       setEditingNotes((prev) => {
         const newMap = new Map(prev);
         newMap.delete(objectiveId);
@@ -161,7 +161,7 @@ export const ObjectiveTracker = ({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Target className="h-5 w-5" />
-            {t('title')} - {lessonPlan.title}
+            {t('title')} - {lesson.title}
           </CardTitle>
         </CardHeader>
         <CardContent>

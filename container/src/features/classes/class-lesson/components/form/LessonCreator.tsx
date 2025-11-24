@@ -5,15 +5,15 @@ import { z } from 'zod';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import type {
-  LessonPlanCreateRequest,
-  LessonPlanUpdateRequest,
-  LessonPlan,
+  LessonCreateRequest,
+  LessonUpdateRequest,
+  Lesson,
   ObjectiveType,
   ResourceType,
 } from '../../types';
 import type { SchedulePeriod } from '../../../class-schedule';
 
-export interface LessonPlanFormData {
+export interface LessonFormData {
   title: string;
   description?: string;
   subject: string; // Now a string code instead of object
@@ -43,20 +43,20 @@ import { NotesSection } from './NotesSection';
 import { ObjectivesSection } from './ObjectivesSection';
 import { ResourcesSection } from './ResourcesSection';
 
-interface LessonPlanCreatorProps {
+interface LessonCreatorProps {
   classId: string;
   period?: SchedulePeriod;
   defaultSubject?: string;
   lessonId?: string;
-  existingData?: LessonPlan;
+  existingData?: Lesson;
   operation?: 'create' | 'update';
-  onSave: (lessonPlan: LessonPlanCreateRequest) => Promise<void>;
-  onUpdate?: (lessonPlan: LessonPlanUpdateRequest) => Promise<void>;
+  onSave: (lesson: LessonCreateRequest) => Promise<void>;
+  onUpdate?: (lesson: LessonUpdateRequest) => Promise<void>;
   onCancel: () => void;
   isLoading?: boolean;
 }
 
-export const LessonPlanCreator = ({
+export const LessonCreator = ({
   classId,
   period,
   defaultSubject,
@@ -67,30 +67,30 @@ export const LessonPlanCreator = ({
   onUpdate,
   onCancel,
   isLoading = false,
-}: LessonPlanCreatorProps) => {
-  const { t } = useTranslation('classes', { keyPrefix: 'lessonPlan.creator' });
+}: LessonCreatorProps) => {
+  const { t } = useTranslation('classes', { keyPrefix: 'lesson.creator' });
   const { t: tValidation } = useTranslation('classes', { keyPrefix: 'validation' });
 
   // Schema with localized validation messages
-  const lessonPlanSchema = z.object({
-    title: z.string().min(1, tValidation('lessonPlan.titleRequired')),
+  const lessonSchema = z.object({
+    title: z.string().min(1, tValidation('lesson.titleRequired')),
     description: z.string().optional(),
     subject: z.string().min(1, 'Subject is required'), // Now a string code
     notes: z.string().optional(),
     objectives: z
       .array(
         z.object({
-          description: z.string().min(1, tValidation('lessonPlan.objectiveDescriptionRequired')),
-          type: z.string().min(1, tValidation('lessonPlan.objectiveTypeRequired')),
+          description: z.string().min(1, tValidation('lesson.objectiveDescriptionRequired')),
+          type: z.string().min(1, tValidation('lesson.objectiveTypeRequired')),
           isAchieved: z.boolean(),
           notes: z.string().optional(),
         })
       )
-      .min(1, tValidation('lessonPlan.atLeastOneObjective')),
+      .min(1, tValidation('lesson.atLeastOneObjective')),
     resources: z.array(
       z.object({
-        name: z.string().min(1, tValidation('lessonPlan.resourceNameRequired')),
-        type: z.string().min(1, tValidation('lessonPlan.resourceTypeRequired')),
+        name: z.string().min(1, tValidation('lesson.resourceNameRequired')),
+        type: z.string().min(1, tValidation('lesson.resourceTypeRequired')),
         url: z.string().optional(),
         filePath: z.string().optional(),
         description: z.string().optional(),
@@ -100,8 +100,8 @@ export const LessonPlanCreator = ({
     ),
   });
 
-  const form = useForm<LessonPlanFormData>({
-    resolver: zodResolver(lessonPlanSchema),
+  const form = useForm<LessonFormData>({
+    resolver: zodResolver(lessonSchema),
     defaultValues:
       operation === 'update' && existingData
         ? {
@@ -142,7 +142,7 @@ export const LessonPlanCreator = ({
           },
   });
 
-  const handleSubmit = async (data: LessonPlanFormData) => {
+  const handleSubmit = async (data: LessonFormData) => {
     try {
       if (operation === 'update' && lessonId && onUpdate) {
         // Update operation
@@ -167,7 +167,7 @@ export const LessonPlanCreator = ({
             isPrepared: res.isPrepared,
           })),
         });
-        toast.success('Lesson plan updated successfully!');
+        toast.success('Lesson updated successfully!');
       } else {
         // Create operation
         const subject = data.subject;
@@ -196,10 +196,10 @@ export const LessonPlanCreator = ({
             isPrepared: res.isPrepared,
           })),
         });
-        toast.success('Lesson plan created successfully!');
+        toast.success('Lesson created successfully!');
       }
     } catch (error) {
-      console.error('Failed to save lesson plan:', error);
+      console.error('Failed to save lesson:', error);
     }
   };
 

@@ -6,7 +6,7 @@ import { Clock, MapPin, BookOpen, Lightbulb, FileText } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
-import { CreateLessonPlan } from './CreateLessonPlan';
+import { CreateLesson } from './CreateLesson';
 import { format } from 'date-fns';
 import { getLocaleDateFns } from '@/shared/i18n/helper';
 import { useClassStore } from '@/features/classes/shared/stores';
@@ -92,86 +92,90 @@ export const PeriodDetailView = ({ period }: PeriodDetailViewProps) => {
         </CardContent>
       </Card>
 
-      {/* Lesson Plan Card */}
-      {period.lessonPlan ? (
-        <Card className="gap-0 border pt-0 shadow-md">
-          <CardHeader className="bg-slate-50 pb-4 pt-6">
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex flex-1 items-start gap-3">
-                <div className="bg-primary/10 rounded-lg p-2">
-                  <FileText className="text-primary h-5 w-5" />
+      {/* Lessons Cards */}
+      {period.lessons.length > 0 ? (
+        <div className="space-y-4">
+          {period.lessons.map((lesson) => (
+            <Card key={lesson.id} className="gap-0 border pt-0 shadow-md">
+              <CardHeader className="bg-slate-50 pb-4 pt-6">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex flex-1 items-start gap-3">
+                    <div className="bg-primary/10 rounded-lg p-2">
+                      <FileText className="text-primary h-5 w-5" />
+                    </div>
+                    <div className="flex-1">
+                      <CardTitle className="text-xl">{lesson.title}</CardTitle>
+                      <p className="text-muted-foreground mt-2 text-sm">{lesson.description}</p>
+                    </div>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => navigate(`/lessons/${lesson.id}`)}
+                    className="flex-shrink-0"
+                  >
+                    {t('schedule.periodDetail.viewFullDetails')}
+                  </Button>
                 </div>
+              </CardHeader>
+              <Separator />
+
+              <CardContent className="flex space-x-6 pt-6">
+                {/* Objectives Section */}
                 <div className="flex-1">
-                  <CardTitle className="text-xl">{period.lessonPlan.title}</CardTitle>
-                  <p className="text-muted-foreground mt-2 text-sm">{period.lessonPlan.description}</p>
+                  <div className="mb-3 flex items-center gap-2">
+                    <Lightbulb className="h-5 w-5 text-amber-500" />
+                    <h4 className="text-base font-bold">{t('schedule.periodDetail.learningObjectives')}</h4>
+                  </div>
+                  <Separator className="mb-4" />
+                  {lesson.objectives.length > 0 ? (
+                    <ul className="space-y-2">
+                      {lesson.objectives.map((obj) => (
+                        <li
+                          key={obj.id}
+                          className="flex gap-3 rounded-lg bg-amber-50 p-3 transition-colors hover:bg-amber-100"
+                        >
+                          <span className="flex-shrink-0 rounded-full bg-amber-200 px-2 py-0.5 text-xs font-semibold text-amber-800">
+                            ✓
+                          </span>
+                          <span className="text-sm">{obj.description}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-muted-foreground text-sm italic">No objectives defined</p>
+                  )}
                 </div>
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => navigate(`/lessons/${period.lessonPlan!.id}`)}
-                className="flex-shrink-0"
-              >
-                {t('schedule.periodDetail.viewFullDetails')}
-              </Button>
-            </div>
-          </CardHeader>
-          <Separator />
 
-          <CardContent className="flex space-x-6 pt-6">
-            {/* Objectives Section */}
-            <div className="flex-1">
-              <div className="mb-3 flex items-center gap-2">
-                <Lightbulb className="h-5 w-5 text-amber-500" />
-                <h4 className="text-base font-bold">{t('schedule.periodDetail.learningObjectives')}</h4>
-              </div>
-              <Separator className="mb-4" />
-              {period.lessonPlan.objectives.length > 0 ? (
-                <ul className="space-y-2">
-                  {period.lessonPlan.objectives.map((obj) => (
-                    <li
-                      key={obj.id}
-                      className="flex gap-3 rounded-lg bg-amber-50 p-3 transition-colors hover:bg-amber-100"
-                    >
-                      <span className="flex-shrink-0 rounded-full bg-amber-200 px-2 py-0.5 text-xs font-semibold text-amber-800">
-                        ✓
-                      </span>
-                      <span className="text-sm">{obj.description}</span>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-muted-foreground text-sm italic">No objectives defined</p>
-              )}
-            </div>
-
-            {/* Resources Section */}
-            <div className="flex-1">
-              <div className="mb-3 flex items-center gap-2">
-                <FileText className="h-5 w-5 text-blue-500" />
-                <h4 className="text-base font-bold">{t('schedule.lessonDetail.resources')}</h4>
-              </div>
-              <Separator className="mb-4" />
-              {period.lessonPlan.resources.length > 0 ? (
-                <ul className="space-y-2">
-                  {period.lessonPlan.resources.map((res) => (
-                    <li
-                      key={res.id}
-                      className="flex gap-3 rounded-lg bg-blue-50 p-3 transition-colors hover:bg-blue-100"
-                    >
-                      <span className="flex-shrink-0 text-blue-500">📎</span>
-                      <span className="text-sm font-medium">{res.name}</span>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-muted-foreground text-sm italic">No resources attached</p>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+                {/* Resources Section */}
+                <div className="flex-1">
+                  <div className="mb-3 flex items-center gap-2">
+                    <FileText className="h-5 w-5 text-blue-500" />
+                    <h4 className="text-base font-bold">{t('schedule.lessonDetail.resources')}</h4>
+                  </div>
+                  <Separator className="mb-4" />
+                  {lesson.resources.length > 0 ? (
+                    <ul className="space-y-2">
+                      {lesson.resources.map((res) => (
+                        <li
+                          key={res.id}
+                          className="flex gap-3 rounded-lg bg-blue-50 p-3 transition-colors hover:bg-blue-100"
+                        >
+                          <span className="flex-shrink-0 text-blue-500">📎</span>
+                          <span className="text-sm font-medium">{res.name}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-muted-foreground text-sm italic">No resources attached</p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       ) : (
-        <CreateLessonPlan period={period} />
+        <CreateLesson period={period} />
       )}
     </div>
   );

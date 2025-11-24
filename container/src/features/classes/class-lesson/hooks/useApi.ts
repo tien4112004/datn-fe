@@ -1,39 +1,35 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useClassApiService } from '../../shared/api';
-import type {
-  LessonPlanCollectionRequest,
-  LessonPlanCreateRequest,
-  LessonPlanUpdateRequest,
-} from '../../shared/types';
+import type { LessonCollectionRequest, LessonCreateRequest, LessonUpdateRequest } from '../../shared/types';
 
-// Query keys for lesson plans
+// Query keys for lessons
 const classKeys = {
   all: ['classes'] as const,
-  lessonPlans: (classId: string, params?: LessonPlanCollectionRequest) =>
-    [...classKeys.all, 'lesson-plans', classId, params] as const,
+  lessons: (classId: string, params?: LessonCollectionRequest) =>
+    [...classKeys.all, 'lessons', classId, params] as const,
 };
 
-// Lesson plan queries
-export function useLessonPlan(id: string) {
+// Lesson queries
+export function useLesson(id: string) {
   const classApiService = useClassApiService();
 
   return useQuery({
-    queryKey: ['lessonPlan', id],
-    queryFn: () => classApiService.getLessonPlan(id),
+    queryKey: ['lesson', id],
+    queryFn: () => classApiService.getLesson(id),
     enabled: !!id,
   });
 }
 
-export function useClassLessonPlans(classId: string, params: LessonPlanCollectionRequest = {}) {
+export function useClassLessons(classId: string, params: LessonCollectionRequest = {}) {
   const classApiService = useClassApiService();
   return useQuery({
-    queryKey: classKeys.lessonPlans(classId, params),
-    queryFn: () => classApiService.getLessonPlans(classId, params),
+    queryKey: classKeys.lessons(classId, params),
+    queryFn: () => classApiService.getLessons(classId, params),
     enabled: !!classId,
   });
 }
 
-// Lesson plan mutations
+// Lesson mutations
 export function useUpdateLessonStatus() {
   const queryClient = useQueryClient();
   const classApiService = useClassApiService();
@@ -42,32 +38,32 @@ export function useUpdateLessonStatus() {
     mutationFn: ({ id, status, notes }: { id: string; status: string; notes?: string }) =>
       classApiService.updateLessonStatus(id, status, notes),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: classKeys.lessonPlans(variables.id, {}) });
+      queryClient.invalidateQueries({ queryKey: classKeys.lessons(variables.id, {}) });
     },
   });
 }
 
-export function useCreateLessonPlan() {
+export function useCreateLesson() {
   const queryClient = useQueryClient();
   const classApiService = useClassApiService();
 
   return useMutation({
-    mutationFn: (data: LessonPlanCreateRequest) => classApiService.createLessonPlan(data),
-    onSuccess: (lessonPlan) => {
-      queryClient.invalidateQueries({ queryKey: classKeys.lessonPlans(lessonPlan.classId, {}) });
+    mutationFn: (data: LessonCreateRequest) => classApiService.createLesson(data),
+    onSuccess: (lesson) => {
+      queryClient.invalidateQueries({ queryKey: classKeys.lessons(lesson.classId, {}) });
     },
   });
 }
 
-export function useUpdateLessonPlan() {
+export function useUpdateLesson() {
   const queryClient = useQueryClient();
   const classApiService = useClassApiService();
 
   return useMutation({
-    mutationFn: (data: LessonPlanUpdateRequest) => classApiService.updateLessonPlan(data),
-    onSuccess: (lessonPlan) => {
-      queryClient.invalidateQueries({ queryKey: classKeys.lessonPlans(lessonPlan.classId, {}) });
-      queryClient.invalidateQueries({ queryKey: ['lessonPlan', lessonPlan.id] });
+    mutationFn: (data: LessonUpdateRequest) => classApiService.updateLesson(data),
+    onSuccess: (lesson) => {
+      queryClient.invalidateQueries({ queryKey: classKeys.lessons(lesson.classId, {}) });
+      queryClient.invalidateQueries({ queryKey: ['lesson', lesson.id] });
     },
   });
 }

@@ -1,9 +1,9 @@
-import { type LessonPlan } from '../../types';
+import { type Lesson } from '../../types';
 
-// Complete lesson plan records with nested objectives and resources
+// Complete lesson records with nested objectives and resources
 // Teacher interface has been removed, only objectives and resources are nested
 // This is now the single entry point for all lesson data
-export const lessonPlansTable: LessonPlan[] = [
+export const lessonsTable: Lesson[] = [
   // Class 1A lessons
   {
     id: 'lesson-1',
@@ -59,6 +59,7 @@ export const lessonPlansTable: LessonPlan[] = [
     ],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
+    linkedPeriods: [],
   },
   {
     id: 'lesson-2',
@@ -114,6 +115,7 @@ export const lessonPlansTable: LessonPlan[] = [
     ],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
+    linkedPeriods: [],
   },
   {
     id: 'lesson-3',
@@ -169,6 +171,7 @@ export const lessonPlansTable: LessonPlan[] = [
     ],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
+    linkedPeriods: [],
   },
   {
     id: 'lesson-4',
@@ -224,6 +227,7 @@ export const lessonPlansTable: LessonPlan[] = [
     ],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
+    linkedPeriods: [],
   },
   // Class 1A lessons - Tuesday
   {
@@ -274,6 +278,7 @@ export const lessonPlansTable: LessonPlan[] = [
     ],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
+    linkedPeriods: [],
   },
   {
     id: 'lesson-6',
@@ -323,6 +328,7 @@ export const lessonPlansTable: LessonPlan[] = [
     ],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
+    linkedPeriods: [],
   },
   {
     id: 'lesson-7',
@@ -372,6 +378,7 @@ export const lessonPlansTable: LessonPlan[] = [
     ],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
+    linkedPeriods: [],
   },
   {
     id: 'lesson-8',
@@ -421,6 +428,7 @@ export const lessonPlansTable: LessonPlan[] = [
     ],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
+    linkedPeriods: [],
   },
 
   // Class 1A lessons - Wednesday
@@ -472,6 +480,7 @@ export const lessonPlansTable: LessonPlan[] = [
     ],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
+    linkedPeriods: [],
   },
   {
     id: 'lesson-10',
@@ -521,6 +530,7 @@ export const lessonPlansTable: LessonPlan[] = [
     ],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
+    linkedPeriods: [],
   },
   {
     id: 'lesson-11',
@@ -570,6 +580,7 @@ export const lessonPlansTable: LessonPlan[] = [
     ],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
+    linkedPeriods: [],
   },
   {
     id: 'lesson-12',
@@ -619,6 +630,7 @@ export const lessonPlansTable: LessonPlan[] = [
     ],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
+    linkedPeriods: [],
   },
 
   // Class 1A lessons - Thursday
@@ -670,6 +682,7 @@ export const lessonPlansTable: LessonPlan[] = [
     ],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
+    linkedPeriods: [],
   },
   {
     id: 'lesson-14',
@@ -719,6 +732,7 @@ export const lessonPlansTable: LessonPlan[] = [
     ],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
+    linkedPeriods: [],
   },
   {
     id: 'lesson-15',
@@ -768,6 +782,7 @@ export const lessonPlansTable: LessonPlan[] = [
     ],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
+    linkedPeriods: [],
   },
   {
     id: 'lesson-16',
@@ -817,6 +832,7 @@ export const lessonPlansTable: LessonPlan[] = [
     ],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
+    linkedPeriods: [],
   },
 
   // Class 1A lessons - Friday
@@ -868,6 +884,7 @@ export const lessonPlansTable: LessonPlan[] = [
     ],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
+    linkedPeriods: [],
   },
   {
     id: 'lesson-18',
@@ -917,6 +934,7 @@ export const lessonPlansTable: LessonPlan[] = [
     ],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
+    linkedPeriods: [],
   },
   {
     id: 'lesson-19',
@@ -966,6 +984,7 @@ export const lessonPlansTable: LessonPlan[] = [
     ],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
+    linkedPeriods: [],
   },
   {
     id: 'lesson-20',
@@ -1015,5 +1034,6 @@ export const lessonPlansTable: LessonPlan[] = [
     ],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
+    linkedPeriods: [],
   },
 ];

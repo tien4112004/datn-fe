@@ -10,13 +10,13 @@ import {
   type StudentCreateRequest,
   type StudentUpdateRequest,
   type SchedulePeriod,
-  type LessonPlan,
-  type LessonPlanCollectionRequest,
+  type Lesson,
+  type LessonCollectionRequest,
   type Layout,
   type DailySchedule,
   type ScheduleCollectionRequest,
-  type LessonPlanCreateRequest,
-  type LessonPlanUpdateRequest,
+  type LessonCreateRequest,
+  type LessonUpdateRequest,
   type SchedulePeriodCreateRequest,
   type SchedulePeriodUpdateRequest,
   type ImportResult,
@@ -190,11 +190,8 @@ export default class ClassRealApiService implements ClassApiService {
     }
   }
 
-  async getLessonPlans(
-    classId: string,
-    params: LessonPlanCollectionRequest
-  ): Promise<ApiResponse<LessonPlan[]>> {
-    const response = await api.get<ApiResponse<LessonPlan[]>>(
+  async getLessons(classId: string, params: LessonCollectionRequest): Promise<ApiResponse<Lesson[]>> {
+    const response = await api.get<ApiResponse<Lesson[]>>(
       `${this.baseUrl}/api/classes/${classId}/lesson-plans`,
       {
         params: {
@@ -208,36 +205,33 @@ export default class ClassRealApiService implements ClassApiService {
     return response.data;
   }
 
-  async getLessonPlan(id: string): Promise<LessonPlan | null> {
+  async getLesson(id: string): Promise<Lesson | null> {
     try {
-      const response = await api.get<ApiResponse<LessonPlan>>(`${this.baseUrl}/api/lesson-plans/${id}`);
+      const response = await api.get<ApiResponse<Lesson>>(`${this.baseUrl}/api/lesson-plans/${id}`);
       return response.data.data;
     } catch (error) {
-      console.error('Failed to fetch lesson plan:', error);
+      console.error('Failed to fetch lesson:', error);
       return null;
     }
   }
 
-  // Lesson Plan mutations
-  async updateLessonStatus(id: string, status: string, notes?: string): Promise<LessonPlan> {
-    const response = await api.patch<ApiResponse<LessonPlan>>(
-      `${this.baseUrl}/api/lesson-plans/${id}/status`,
-      {
-        status,
-        notes,
-      }
-    );
+  // Lesson  mutations
+  async updateLessonStatus(id: string, status: string, notes?: string): Promise<Lesson> {
+    const response = await api.patch<ApiResponse<Lesson>>(`${this.baseUrl}/api/lesson-plans/${id}/status`, {
+      status,
+      notes,
+    });
     return response.data.data;
   }
 
-  async createLessonPlan(data: LessonPlanCreateRequest): Promise<LessonPlan> {
-    const response = await api.post<ApiResponse<LessonPlan>>(`${this.baseUrl}/api/lesson-plans`, data);
+  async createLesson(data: LessonCreateRequest): Promise<Lesson> {
+    const response = await api.post<ApiResponse<Lesson>>(`${this.baseUrl}/api/lesson-plans`, data);
     return response.data.data;
   }
 
-  async updateLessonPlan(data: LessonPlanUpdateRequest): Promise<LessonPlan> {
+  async updateLesson(data: LessonUpdateRequest): Promise<Lesson> {
     const { id, ...updateData } = data;
-    const response = await api.patch<ApiResponse<LessonPlan>>(
+    const response = await api.patch<ApiResponse<Lesson>>(
       `${this.baseUrl}/api/lesson-plans/${id}`,
       updateData
     );
@@ -265,14 +259,16 @@ export default class ClassRealApiService implements ClassApiService {
     return response.data.data;
   }
 
-  async linkLessonToSchedulePeriod(classId: string, periodId: string, lessonPlanId: string): Promise<void> {
+  async linkLessonToSchedulePeriod(classId: string, periodId: string, lessonId: string): Promise<void> {
     await api.post(`${this.baseUrl}/api/classes/${classId}/periods/${periodId}/link-lesson`, {
-      lessonPlanId,
+      lessonId,
     });
   }
 
-  async unlinkLessonFromSchedulePeriod(classId: string, periodId: string): Promise<void> {
-    await api.delete(`${this.baseUrl}/api/classes/${classId}/periods/${periodId}/link-lesson`);
+  async unlinkLessonFromSchedulePeriod(classId: string, periodId: string, lessonId: string): Promise<void> {
+    await api.delete(`${this.baseUrl}/api/classes/${classId}/periods/${periodId}/link-lesson`, {
+      data: { lessonId },
+    });
   }
 
   private _mapClass(data: any): Class {

@@ -7,7 +7,7 @@
  */
 
 import type { PeriodCategory } from '../../shared/types/constants/periodCategories';
-import type { LessonPlan } from '../../class-lesson';
+import type { Lesson } from '../../class-lesson';
 
 /**
  * SchedulePeriod - Date-based class period
@@ -29,8 +29,7 @@ export interface SchedulePeriod {
   location?: string | null;
   description?: string | null;
   isActive: boolean;
-  lessonPlanId?: string | null;
-  lessonPlan?: LessonPlan | null;
+  lessons: Lesson[];
   createdAt: string;
   updatedAt: string;
 }
@@ -46,6 +45,7 @@ export const toMinimalSchedulePeriod = (period: SchedulePeriod): MinimalSchedule
     endTime: period.endTime,
     category: period.category,
     isActive: period.isActive,
+    lessonIds: period.lessons.map((lesson) => lesson.id),
   };
 };
 
@@ -59,6 +59,7 @@ export interface MinimalSchedulePeriod {
   endTime: string | null;
   category: PeriodCategory;
   isActive: boolean;
+  lessonIds: string[];
 }
 
 /**

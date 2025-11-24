@@ -12,18 +12,18 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/shared/lib/utils';
-import type { LessonPlan, LessonStatus, LearningObjective, LessonResource } from '../../types';
+import type { Lesson, LessonStatus, LearningObjective, LessonResource } from '../../types';
 import { getSubjectByCode } from '../../../shared/types';
 
 interface LessonCardProps {
-  lesson: LessonPlan;
+  lesson: Lesson;
   canEdit?: boolean;
-  onUpdateStatus: (lessonPlanId: string, status: LessonStatus) => Promise<void>;
-  onEditClick: (lesson: LessonPlan) => void;
+  onUpdateStatus: (lessonId: string, status: LessonStatus) => Promise<void>;
+  onEditClick: (lesson: Lesson) => void;
 }
 
 export const LessonCard = ({ lesson, canEdit = true, onUpdateStatus, onEditClick }: LessonCardProps) => {
-  const { t } = useTranslation('classes', { keyPrefix: 'lessonPlan.status' });
+  const { t } = useTranslation('classes', { keyPrefix: 'lesson.status' });
 
   const getStatusIcon = (status: LessonStatus) => {
     switch (status) {
@@ -85,8 +85,8 @@ export const LessonCard = ({ lesson, canEdit = true, onUpdateStatus, onEditClick
     }
   };
 
-  const isOverdue = (_lesson: LessonPlan) => {
-    // Since date/endTime fields were removed from LessonPlan, we can't determine if a lesson is overdue
+  const isOverdue = (_lesson: Lesson) => {
+    // Since date/endTime fields were removed from Lesson, we can't determine if a lesson is overdue
     return false;
   };
 

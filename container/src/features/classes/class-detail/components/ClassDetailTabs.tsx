@@ -10,9 +10,9 @@ import { ClassSettings } from './ClassSettings';
 import TodaysTeachingDashboard from '../../class-dashboard/components/TodaysTeachingDashboard';
 import {
   LessonTab,
-  useClassLessonPlans,
-  useLessonPlanOperations,
-  useUpdateLessonPlan,
+  useClassLessons,
+  useLessonOperations,
+  useUpdateLesson,
   useUpdateLessonStatus,
 } from '../../class-lesson';
 import { useScheduleHelpers } from '../../class-schedule';
@@ -45,19 +45,19 @@ export const ClassDetailTabs = ({ classId, currentClass, onEditClick }: ClassDet
     return findScheduleForDate(schedules, today, classId);
   }, [schedules, today, classId]);
 
-  // Fetch periods and lesson plans
+  // Fetch periods and lessons
   const { data: periodsData } = useClassPeriods(classId, { date: today });
-  const { data: lessonPlansData } = useClassLessonPlans(classId, {});
+  const { data: lessonsData } = useClassLessons(classId, {});
 
   const allPeriods = periodsData?.data || [];
-  const allLessonPlans = lessonPlansData?.data || [];
+  const allLessons = lessonsData?.data || [];
 
-  const todayLessonPlans = allLessonPlans.filter((lp) => lp.linkedPeriod?.date === today);
+  const todayLessons = allLessons.filter((lp) => lp.linkedPeriods.some((p) => p.date === today));
 
   // Mutation hooks
   const updateLessonStatus = useUpdateLessonStatus();
-  const updateLessonPlan = useUpdateLessonPlan();
-  const lessonPlanOperations = useLessonPlanOperations();
+  const updateLesson = useUpdateLesson();
+  const lessonOperations = useLessonOperations();
 
   const [searchParams, setSearchParams] = useSearchParams();
   const currentTab = searchParams.get('tab') || 'teaching';
@@ -107,85 +107,75 @@ export const ClassDetailTabs = ({ classId, currentClass, onEditClick }: ClassDet
             classData={currentClass}
             todaySchedule={todaySchedule}
             allPeriods={allPeriods}
-            todayLessonPlans={todayLessonPlans}
-            allLessonPlans={allLessonPlans}
+            todayLessons={todayLessons}
+            allLessons={allLessons}
             onUpdateLessonStatus={async (id, status, notes) => {
               await updateLessonStatus.mutateAsync({ id, status, notes });
             }}
-            onUpdateObjective={async (lessonPlanId, objectiveId, updates) => {
-              // Find the lesson plan
-              const lessonPlan = todayLessonPlans.find((lp) => lp.id === lessonPlanId);
-              if (!lessonPlan) return;
+            onUpdateObjective={async (lessonId, objectiveId, updates) => {
+              // Find the lesson
+              const lesson = todayLessons.find((lp) => lp.id === lessonId);
+              if (!lesson) return;
 
-              // Use lesson plan operations to update the objective
-              const updatedLessonPlan = lessonPlanOperations.updateObjectiveInLesson(
-                lessonPlan,
-                objectiveId,
-                updates
-              );
+              // Use lesson operations to update the objective
+              const updatedLesson = lessonOperations.updateObjectiveInLesson(lesson, objectiveId, updates);
 
               // Persist the changes
-              await updateLessonPlan.mutateAsync(updatedLessonPlan);
+              await updateLesson.mutateAsync(updatedLesson);
             }}
-            onAddObjectiveNote={async (lessonPlanId, objectiveId, note) => {
-              // Find the lesson plan
-              const lessonPlan = todayLessonPlans.find((lp) => lp.id === lessonPlanId);
-              if (!lessonPlan) return;
+            onAddObjectiveNote={async (lessonId, objectiveId, note) => {
+              // Find the lesson
+              const lesson = todayLessons.find((lp) => lp.id === lessonId);
+              if (!lesson) return;
 
-              // Use lesson plan operations to update the objective
-              const updatedLessonPlan = lessonPlanOperations.updateObjectiveInLesson(
-                lessonPlan,
-                objectiveId,
-                { notes: note }
-              );
+              // Use lesson operations to update the objective
+              const updatedLesson = lessonOperations.updateObjectiveInLesson(lesson, objectiveId, {
+                notes: note,
+              });
 
               // Persist the changes
-              await updateLessonPlan.mutateAsync(updatedLessonPlan);
+              await updateLesson.mutateAsync(updatedLesson);
             }}
-            onAddResource={async (lessonPlanId, resource) => {
-              // Find the lesson plan
-              const lessonPlan = todayLessonPlans.find((lp) => lp.id === lessonPlanId);
-              if (!lessonPlan) return;
+            onAddResource={async (lessonId, resource) => {
+              // Find the lesson
+              const lesson = todayLessons.find((lp) => lp.id === lessonId);
+              if (!lesson) return;
 
-              // Use lesson plan operations to add the resource
-              const updatedLessonPlan = lessonPlanOperations.addResourceToLesson(lessonPlan, resource);
+              // Use lesson operations to add the resource
+              const updatedLesson = lessonOperations.addResourceToLesson(lesson, resource);
 
               // Persist the changes
-              await updateLessonPlan.mutateAsync(updatedLessonPlan);
+              await updateLesson.mutateAsync(updatedLesson);
             }}
-            onUpdateResource={async (lessonPlanId, resourceId, updates) => {
-              // Find the lesson plan
-              const lessonPlan = todayLessonPlans.find((lp) => lp.id === lessonPlanId);
-              if (!lessonPlan) return;
+            onUpdateResource={async (lessonId, resourceId, updates) => {
+              // Find the lesson
+              const lesson = todayLessons.find((lp) => lp.id === lessonId);
+              if (!lesson) return;
 
-              // Use lesson plan operations to update the resource
-              const updatedLessonPlan = lessonPlanOperations.updateResourceInLesson(
-                lessonPlan,
-                resourceId,
-                updates
-              );
+              // Use lesson operations to update the resource
+              const updatedLesson = lessonOperations.updateResourceInLesson(lesson, resourceId, updates);
 
               // Persist the changes
-              await updateLessonPlan.mutateAsync(updatedLessonPlan);
+              await updateLesson.mutateAsync(updatedLesson);
             }}
-            onDeleteResource={async (lessonPlanId, resourceId) => {
-              // Find the lesson plan
-              const lessonPlan = todayLessonPlans.find((lp) => lp.id === lessonPlanId);
-              if (!lessonPlan) return;
+            onDeleteResource={async (lessonId, resourceId) => {
+              // Find the lesson
+              const lesson = todayLessons.find((lp) => lp.id === lessonId);
+              if (!lesson) return;
 
-              // Use lesson plan operations to remove the resource
-              const updatedLessonPlan = lessonPlanOperations.removeResourceFromLesson(lessonPlan, resourceId);
+              // Use lesson operations to remove the resource
+              const updatedLesson = lessonOperations.removeResourceFromLesson(lesson, resourceId);
 
               // Persist the changes
-              await updateLessonPlan.mutateAsync(updatedLessonPlan);
+              await updateLesson.mutateAsync(updatedLesson);
             }}
             onSubjectChange={(subject, subjectCode) => {
               // TODO: Implement subject change filtering
               console.log('Subject change:', subject, subjectCode);
             }}
-            onCreateLessonPlan={(subject, subjectCode) => {
-              // TODO: Open lesson plan creation modal/form
-              console.log('Create lesson plan:', subject, subjectCode);
+            onCreateLesson={(subject, subjectCode) => {
+              // TODO: Open lesson creation modal/form
+              console.log('Create lesson:', subject, subjectCode);
             }}
             onManageSchedule={(subject) => {
               // TODO: Navigate to schedule management

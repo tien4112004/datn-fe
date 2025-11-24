@@ -71,17 +71,11 @@ export function useLinkLessonToPeriod() {
   const classApiService = useClassApiService();
 
   return useMutation({
-    mutationFn: ({
-      classId,
-      periodId,
-      lessonPlanId,
-    }: {
-      classId: string;
-      periodId: string;
-      lessonPlanId: string;
-    }) => classApiService.linkLessonToSchedulePeriod(classId, periodId, lessonPlanId),
+    mutationFn: ({ classId, periodId, lessonId }: { classId: string; periodId: string; lessonId: string }) =>
+      classApiService.linkLessonToSchedulePeriod(classId, periodId, lessonId),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: classKeys.periods(variables.classId, {}) });
+      queryClient.invalidateQueries({ queryKey: classKeys.schedules(variables.classId, {}) });
     },
   });
 }
@@ -91,10 +85,11 @@ export function useUnlinkLessonFromPeriod() {
   const classApiService = useClassApiService();
 
   return useMutation({
-    mutationFn: ({ classId, periodId }: { classId: string; periodId: string }) =>
-      classApiService.unlinkLessonFromSchedulePeriod(classId, periodId),
+    mutationFn: ({ classId, periodId, lessonId }: { classId: string; periodId: string; lessonId: string }) =>
+      classApiService.unlinkLessonFromSchedulePeriod(classId, periodId, lessonId),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: classKeys.periods(variables.classId, {}) });
+      queryClient.invalidateQueries({ queryKey: classKeys.schedules(variables.classId, {}) });
     },
   });
 }

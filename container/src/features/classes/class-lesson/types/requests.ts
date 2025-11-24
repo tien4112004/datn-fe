@@ -1,16 +1,16 @@
 /**
- * Lesson Plan Request Types
+ * Lesson Request Types
  *
- * API request types for lesson plan-related operations.
+ * API request types for lesson-related operations.
  */
 
 import type { LearningObjective, LessonResource, LessonStatus, ObjectiveType, ResourceType } from './lesson';
 
 /**
- * LessonPlanCollectionRequest
- * Query parameters for fetching lesson plans
+ * LessonCollectionRequest
+ * Query parameters for fetching lessons
  */
-export interface LessonPlanCollectionRequest {
+export interface LessonCollectionRequest {
   classId?: string;
   subject?: string;
   status?: LessonStatus;
@@ -19,25 +19,25 @@ export interface LessonPlanCollectionRequest {
 }
 
 /**
- * LessonPlanCreateRequest
- * Payload for creating a new lesson plan
+ * LessonCreateRequest
+ * Payload for creating a new lesson
  */
-export interface LessonPlanCreateRequest {
+export interface LessonCreateRequest {
   classId: string;
   title: string;
   subject: string;
   description?: string;
   bindedPeriodId?: string;
-  objectives: Omit<LearningObjective, 'id' | 'lessonPlanId' | 'createdAt'>[];
-  resources: Omit<LessonResource, 'id' | 'lessonPlanId' | 'createdAt'>[];
+  objectives: Omit<LearningObjective, 'id' | 'lessonId' | 'createdAt'>[];
+  resources: Omit<LessonResource, 'id' | 'lessonId' | 'createdAt'>[];
   notes?: string;
 }
 
 /**
- * LessonPlanUpdateRequest
- * Payload for updating an existing lesson plan
+ * LessonUpdateRequest
+ * Payload for updating an existing lesson
  */
-export interface LessonPlanUpdateRequest extends Partial<LessonPlanCreateRequest> {
+export interface LessonUpdateRequest extends Partial<LessonCreateRequest> {
   id: string;
   status?: LessonStatus;
 }
@@ -81,6 +81,6 @@ export interface LessonFilterOptions {
 
 /**
  * LessonSortOption
- * Sorting options for lesson plans
+ * Sorting options for lessons
  */
 export type LessonSortOption = 'title-asc' | 'title-desc' | 'status-asc' | 'status-desc';

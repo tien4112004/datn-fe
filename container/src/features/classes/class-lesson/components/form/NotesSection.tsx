@@ -9,11 +9,11 @@ import {
   ColoredCardTitle,
   ColoredCardContent,
 } from '@/components/common/ColoredCard';
-import type { LessonPlanFormData } from './LessonPlanCreator';
+import type { LessonFormData } from './LessonCreator';
 
 export const NotesSection = () => {
-  const { t } = useTranslation('classes', { keyPrefix: 'lessonPlan.creator' });
-  const { register } = useFormContext<LessonPlanFormData>();
+  const { t } = useTranslation('classes', { keyPrefix: 'lesson.creator' });
+  const { register } = useFormContext<LessonFormData>();
 
   return (
     <ColoredCard colorScheme="amber">

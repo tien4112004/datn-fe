@@ -5,13 +5,13 @@ import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { PlayCircle, CheckCircle2, XCircle, Clock } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import type { LessonPlan, LessonStatus } from '../../types';
+import type { Lesson, LessonStatus } from '../../types';
 
 interface LessonStatusUpdateDialogProps {
-  selectedLesson: LessonPlan | null;
+  selectedLesson: Lesson | null;
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  onUpdateStatus: (lessonPlanId: string, status: LessonStatus, notes?: string) => Promise<void>;
+  onUpdateStatus: (lessonId: string, status: LessonStatus, notes?: string) => Promise<void>;
 }
 
 export const LessonStatusUpdateDialog = ({
@@ -20,7 +20,7 @@ export const LessonStatusUpdateDialog = ({
   onOpenChange,
   onUpdateStatus,
 }: LessonStatusUpdateDialogProps) => {
-  const { t } = useTranslation('classes', { keyPrefix: 'lessonPlan.status' });
+  const { t } = useTranslation('classes', { keyPrefix: 'lesson.status' });
   const [newStatus, setNewStatus] = useState<LessonStatus>('planned');
   const [statusNotes, setStatusNotes] = useState('');
 

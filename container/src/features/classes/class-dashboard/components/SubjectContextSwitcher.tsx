@@ -5,14 +5,14 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { BookOpen, Clock, Target, FileText, Settings } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { type SchedulePeriod, type LessonPlan, getSubjectByCode } from '../../shared/types';
+import { type SchedulePeriod, type Lesson, getSubjectByCode } from '../../shared/types';
 
 interface SubjectContextSwitcherProps {
   periods: SchedulePeriod[];
-  lessonPlans: LessonPlan[];
+  lessons: Lesson[];
   currentSubject?: string;
   onSubjectChange: (subject: string, subjectCode: string) => void;
-  onCreateLessonPlan?: (subject: string, subjectCode: string) => void;
+  onCreateLesson?: (subject: string, subjectCode: string) => void;
   onManageSchedule?: (subject: string) => void;
 }
 
@@ -22,16 +22,16 @@ interface SubjectContext {
   totalPeriods: number;
   weeklyPeriods: number;
   nextPeriod?: SchedulePeriod;
-  recentLessonPlan?: LessonPlan;
+  recentLesson?: Lesson;
   upcomingDeadlines: number;
 }
 
 export const SubjectContextSwitcher = ({
   periods,
-  lessonPlans,
+  lessons,
   currentSubject,
   onSubjectChange,
-  onCreateLessonPlan,
+  onCreateLesson,
   onManageSchedule,
 }: SubjectContextSwitcherProps) => {
   const { t } = useTranslation('classes', { keyPrefix: 'schedule.subjectContext' });
@@ -58,13 +58,13 @@ export const SubjectContextSwitcher = ({
             return periodTime > now;
           });
 
-        // Find recent lesson plan for this subject
-        const recentLessonPlan = lessonPlans
+        // Find recent lesson for this subject
+        const recentLesson = lessons
           .filter((lp) => lp.subject === period.subject)
           .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())[0];
 
-        // Count upcoming deadlines (lesson plans due soon)
-        // Note: Since date field was removed from LessonPlan, we can't calculate upcoming deadlines
+        // Count upcoming deadlines (lessons due soon)
+        // Note: Since date field was removed from Lesson, we can't calculate upcoming deadlines
         const upcomingDeadlines = 0;
 
         subjectMap.set(subjectName || period.subject, {
@@ -73,14 +73,14 @@ export const SubjectContextSwitcher = ({
           totalPeriods: periods.filter((p) => p.subject === period.subject).length,
           weeklyPeriods,
           nextPeriod,
-          recentLessonPlan,
+          recentLesson,
           upcomingDeadlines,
         });
       }
     });
 
     return Array.from(subjectMap.values()).sort((a, b) => a.subject.localeCompare(b.subject));
-  }, [periods, lessonPlans]);
+  }, [periods, lessons]);
 
   const handleSubjectSelect = (subject: string) => {
     const context = subjectContexts.find((ctx) => ctx.subject === subject);
@@ -133,11 +133,11 @@ export const SubjectContextSwitcher = ({
 
             {selectedContext && (
               <div className="flex gap-2">
-                {onCreateLessonPlan && (
+                {onCreateLesson && (
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => onCreateLessonPlan(selectedContext.subject, selectedContext.subjectCode)}
+                    onClick={() => onCreateLesson(selectedContext.subject, selectedContext.subjectCode)}
                   >
                     <FileText className="mr-2 h-4 w-4" />
                     {t('actions.createLesson')}
@@ -189,19 +189,17 @@ export const SubjectContextSwitcher = ({
                 </div>
               </div>
 
-              {/* Lesson Planning Status */}
+              {/* Lesson ning Status */}
               <div className="space-y-2">
                 <div className="text-muted-foreground flex items-center gap-2 text-sm">
                   <Target className="h-4 w-4" />
-                  {t('lessonPlanning')}
+                  {t('lessonning')}
                 </div>
                 <div>
-                  {selectedContext.recentLessonPlan ? (
+                  {selectedContext.recentLesson ? (
                     <div>
                       <p className="font-medium text-green-600">{t('recentPlan')}</p>
-                      <p className="text-muted-foreground text-sm">
-                        {selectedContext.recentLessonPlan.title}
-                      </p>
+                      <p className="text-muted-foreground text-sm">{selectedContext.recentLesson.title}</p>
                     </div>
                   ) : (
                     <p className="font-medium text-orange-600">{t('noRecentPlan')}</p>

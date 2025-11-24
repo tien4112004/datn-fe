@@ -1,6 +1,6 @@
 import { useSearchParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
-import { LessonPlanCreator } from './components';
+import { LessonCreator } from './components';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   Breadcrumb,
@@ -14,7 +14,7 @@ import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
 import { useClass } from '../shared/hooks';
-import { useCreateLessonPlan } from './hooks';
+import { useCreateLesson } from './hooks';
 import { usePeriod } from '../class-schedule';
 
 export const LessonCreatorPage = () => {
@@ -28,7 +28,7 @@ export const LessonCreatorPage = () => {
       <div className="flex h-full items-center justify-center">
         <div className="text-center">
           <h2 className="text-lg font-semibold">{t('errors.invalidAccess')}</h2>
-          <p className="text-muted-foreground">{t('errors.lessonPlansRequirePeriod')}</p>
+          <p className="text-muted-foreground">{t('errors.lessonsRequirePeriod')}</p>
           <Button onClick={() => navigate('/classes')} className="mt-4">
             {t('navigation.goToClasses')}
           </Button>
@@ -39,7 +39,7 @@ export const LessonCreatorPage = () => {
 
   const { data: period, isLoading: periodLoading, isError: periodError } = usePeriod(periodId);
   const { data: classData } = useClass(period?.classId || '');
-  const createLessonPlanMutation = useCreateLessonPlan();
+  const createLessonMutation = useCreateLesson();
 
   const handleGoBack = () => {
     if (periodId) {
@@ -49,18 +49,16 @@ export const LessonCreatorPage = () => {
     }
   };
 
-  const handleSaveLessonPlan = async (lessonPlanData: any) => {
+  const handleSaveLesson = async (lessonData: any) => {
     try {
-      await createLessonPlanMutation.mutateAsync(lessonPlanData);
-      // Navigate back to the period after successful creation
+      await createLessonMutation.mutateAsync(lessonData);
       if (periodId) {
         navigate(`/periods/${periodId}`);
       } else {
         navigate('/classes');
       }
     } catch (error) {
-      console.error('Failed to create lesson plan:', error);
-      // Error handling could be improved here
+      console.error('Failed to create lesson:', error);
     }
   };
 
@@ -78,7 +76,7 @@ export const LessonCreatorPage = () => {
       <div className="flex h-full items-center justify-center">
         <div className="text-center">
           <h2 className="text-lg font-semibold">{t('errors.general')}</h2>
-          <p className="text-muted-foreground">{t('errors.failedToLoadPeriodDetails')}</p>
+          <p className="text-muted-foreground">{t('errors.failedToLoadLessonDetails')}</p>
           <Button onClick={handleGoBack} className="mt-4">
             {t('navigation.goBack')}
           </Button>
@@ -89,7 +87,6 @@ export const LessonCreatorPage = () => {
 
   return (
     <div className="p-8">
-      {/* Breadcrumb Navigation */}
       {period && classData && (
         <Breadcrumb className="mb-6">
           <BreadcrumbList>
@@ -106,7 +103,7 @@ export const LessonCreatorPage = () => {
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbPage>Create Lesson Plan</BreadcrumbPage>
+              <BreadcrumbPage>Create Lesson</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
@@ -118,9 +115,9 @@ export const LessonCreatorPage = () => {
           {t('navigation.backToPeriod')}
         </Button>
         <div>
-          <h1 className="text-2xl font-bold">{t('schedule.createLessonPlan.title')}</h1>
+          <h1 className="text-2xl font-bold">{t('schedule.createLesson.title')}</h1>
           <p className="text-muted-foreground">
-            {t('schedule.createLessonPlan.subtitle', {
+            {t('schedule.createLesson.subtitle', {
               periodName: period.name,
               periodDate: period.date,
             })}
@@ -129,12 +126,12 @@ export const LessonCreatorPage = () => {
       </div>
 
       <div className="mx-auto max-w-4xl">
-        <LessonPlanCreator
+        <LessonCreator
           classId={period.classId}
           period={period}
-          onSave={handleSaveLessonPlan}
+          onSave={handleSaveLesson}
           onCancel={handleGoBack}
-          isLoading={createLessonPlanMutation.isPending}
+          isLoading={createLessonMutation.isPending}
         />
       </div>
     </div>

@@ -12,7 +12,7 @@ import {
   ColoredCardTitle,
   ColoredCardContent,
 } from '@/components/common/ColoredCard';
-import type { LessonPlanFormData } from './LessonPlanCreator';
+import type { LessonFormData } from './LessonCreator';
 
 export const resourceTypes = [
   { value: 'presentation', label: 'Presentation' },
@@ -24,8 +24,8 @@ export const resourceTypes = [
 ] as const;
 
 export const ResourcesSection = () => {
-  const { t } = useTranslation('classes', { keyPrefix: 'lessonPlan.creator' });
-  const { control, register, watch, setValue } = useFormContext<LessonPlanFormData>();
+  const { t } = useTranslation('classes', { keyPrefix: 'lesson.creator' });
+  const { control, register, watch, setValue } = useFormContext<LessonFormData>();
 
   const {
     fields: resourceFields,

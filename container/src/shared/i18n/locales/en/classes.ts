@@ -9,13 +9,13 @@ export default {
   errors: {
     general: 'Error',
     invalidAccess: 'Invalid Access',
-    lessonPlansRequirePeriod: 'Lesson plans must be created for a specific period.',
+    lessonsRequirePeriod: 'Lessons must be created for a specific period.',
     failedToLoadPeriodDetails: 'Failed to load period details.',
-    failedToLoadLessonPlanDetails: 'Failed to load lesson plan details.',
+    failedToLoadLessonDetails: 'Failed to load lesson details.',
     periodNotFound: 'Period not found',
     periodNotFoundDescription: 'The requested period could not be found.',
-    lessonPlanNotFound: 'Lesson plan not found',
-    lessonPlanNotFoundDescription: 'The requested lesson plan could not be found.',
+    lessonNotFound: 'Lesson not found',
+    lessonNotFoundDescription: 'The requested lesson could not be found.',
   },
 
   controls: {
@@ -66,8 +66,8 @@ export default {
     academicYearInvalid: 'Academic year must be in format YYYY-YYYY (e.g., 2024-2025)',
     classroomTooLong: 'Classroom must be 100 characters or less',
     descriptionTooLong: 'Description must be 500 characters or less',
-    // Lesson plan validation messages
-    lessonPlan: {
+    // Lesson validation messages
+    lesson: {
       titleRequired: 'Title is required',
       subjectNameRequired: 'Subject name is required',
       subjectCodeRequired: 'Subject code is required',
@@ -256,12 +256,12 @@ export default {
         scheduled: 'Scheduled',
       },
       room: 'Room',
-      hasLessonPlan: 'Has lesson plan',
+      hasLesson: 'Has lesson',
       stats: {
         totalPeriods: 'Total Periods',
         completed: 'Completed',
         remaining: 'Remaining',
-        withLessonPlan: 'With Lesson Plan',
+        withLesson: 'With Lesson',
       },
       dialog: {
         periodDetails: 'Schedule period details',
@@ -336,7 +336,7 @@ export default {
       time: 'Time',
       category: 'Category',
       location: 'Location',
-      noLessons: 'No lesson plans mapped',
+      noLessons: 'No lessons mapped',
       chronologicalList: 'Chronological list of all periods for the selected subject',
     },
     subjectContext: {
@@ -344,7 +344,7 @@ export default {
       selectSubject: 'Select a subject',
       periodsPerWeek: 'periods/week',
       schedule: 'Schedule',
-      lessonPlanning: 'Lesson Planning',
+      lessonning: 'Lesson ning',
       recentPlan: 'Recent plan',
       noRecentPlan: 'No recent plan',
       upcomingDeadlines: 'Upcoming Deadlines',
@@ -365,8 +365,8 @@ export default {
       room: 'Room',
       learningObjectives: 'Learning Objectives',
       viewFullDetails: 'View Lesson Details',
-      lessonPlan: 'Lesson Plan',
-      noLessonPlan: 'No lesson plan available',
+      lesson: 'Lesson',
+      noLesson: 'No lesson available',
     },
     lessonDetail: {
       title: 'Lesson Details',
@@ -395,16 +395,16 @@ export default {
       completed: 'completed',
       minutes: 'minutes',
       edit: 'Edit',
-      editLessonPlan: 'Edit Lesson Plan',
+      editLesson: 'Edit Lesson',
     },
-    createLessonPlan: {
-      title: 'Create Lesson Plan',
+    createLesson: {
+      title: 'Create Lesson',
       description: 'Add structure to your teaching materials and plan your lesson objectives and resources.',
-      createButton: 'Create Lesson Plan',
-      subtitle: 'Creating lesson plan for {{periodName}} on {{periodDate}}',
+      createButton: 'Create Lesson',
+      subtitle: 'Creating lesson for {{periodName}} on {{periodDate}}',
     },
   },
-  lessonPlan: {
+  lesson: {
     creator: {
       sections: {
         basicInfo: 'Basic Information',
@@ -582,16 +582,16 @@ export default {
       resources: 'resources',
       linked: 'Linked',
       unlinked: 'Unlinked',
-      noLessonLinked: 'No lesson plan linked to this period',
-      unlinkedLessons: 'Unlinked Lesson Plans',
+      noLessonLinked: 'No lesson linked to this period',
+      unlinkedLessons: 'Unlinked Lessons',
       linkLessonToPeriod: 'Link Lesson to Period',
       periodDetails: 'Period Details',
       subject: 'Subject',
       time: 'Time',
       day: 'Day',
-      selectLesson: 'Select Lesson Plan',
-      noAvailableLessons: 'No matching lesson plans available for this period',
-      chooseLessonPlan: 'Choose a lesson plan',
+      selectLesson: 'Select Lesson',
+      noAvailableLessons: 'No matching lessons available for this period',
+      chooseLesson: 'Choose a lesson',
       actions: {
         link: 'Link',
         unlink: 'Unlink',
@@ -948,7 +948,7 @@ export default {
   lessonTab: {
     createLesson: 'Create Lesson',
     createLessonModal: {
-      title: 'Create New Lesson Plan',
+      title: 'Create New Lesson',
     },
   },
 

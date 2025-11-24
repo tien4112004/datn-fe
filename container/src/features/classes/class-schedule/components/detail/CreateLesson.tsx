@@ -5,15 +5,15 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import type { SchedulePeriod } from '../../../shared/types';
 
-interface CreateLessonPlanProps {
+interface CreateLessonProps {
   period: SchedulePeriod;
 }
 
-export const CreateLessonPlan = ({ period }: CreateLessonPlanProps) => {
+export const CreateLesson = ({ period }: CreateLessonProps) => {
   const navigate = useNavigate();
-  const { t } = useTranslation('classes', { keyPrefix: 'schedule.createLessonPlan' });
+  const { t } = useTranslation('classes', { keyPrefix: 'schedule.createLesson' });
 
-  const handleCreateLessonPlan = () => {
+  const handleCreateLesson = () => {
     navigate(`/lessons/create?periodId=${period.id}`);
   };
 
@@ -25,7 +25,7 @@ export const CreateLessonPlan = ({ period }: CreateLessonPlanProps) => {
         </div>
         <h3 className="mt-4 text-lg font-semibold">{t('title')}</h3>
         <p className="text-muted-foreground mt-2 max-w-md text-center text-sm">{t('description')}</p>
-        <Button onClick={handleCreateLessonPlan} className="mt-6" size="lg">
+        <Button onClick={handleCreateLesson} className="mt-6" size="lg">
           <Plus className="mr-2 h-4 w-4" />
           {t('createButton')}
         </Button>

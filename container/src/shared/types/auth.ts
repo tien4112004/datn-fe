@@ -17,13 +17,6 @@ export interface LoginRequest {
   password: string;
 }
 
-export interface LoginResponse {
-  access_token: string;
-  refresh_token: string;
-  token_type: string;
-  expires_in: number;
-}
-
 export interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
@@ -32,11 +25,6 @@ export interface AuthContextType {
   register: (data: SignupRequest) => Promise<void>;
   logout: () => void;
   setUser: (user: User | null) => void;
-}
-
-export interface TokenData {
-  accessToken: string;
-  refreshToken: string;
 }
 
 export interface SignupRequest {

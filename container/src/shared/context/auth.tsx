@@ -3,13 +3,10 @@ import type { User, AuthContextType, SignupRequest } from '../types/auth';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Note: Tokens are stored as HttpOnly cookies by the backend
-// We only store user data in localStorage for quick access
+// Note: Authentication is now fully cookie-based (HttpOnly cookies from backend)
+// We don't store any tokens in localStorage
+// User data is kept in memory only and refreshed on page load via /me endpoint
 const USER_KEY = 'user';
-
-// Legacy token keys - kept for backward compatibility but not primarily used
-const TOKEN_KEY = 'accessToken';
-const REFRESH_TOKEN_KEY = 'refreshToken';
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -29,8 +26,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         console.error('Failed to initialize auth:', error);
         // Clear corrupted data
         localStorage.removeItem(USER_KEY);
-        localStorage.removeItem(TOKEN_KEY);
-        localStorage.removeItem(REFRESH_TOKEN_KEY);
       } finally {
         setIsLoading(false);
       }
@@ -39,7 +34,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     initializeAuth();
   }, []);
 
-  // Listen for unauthorized events from API
+  // Listen for unauthorized events from API (401 responses)
   useEffect(() => {
     const handleUnauthorized = () => {
       logout();
@@ -68,11 +63,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Clear user state
     setUser(null);
 
-    // Clear user data and legacy tokens from localStorage
+    // Clear user data from localStorage
     // Note: HttpOnly cookies will be cleared by calling backend logout endpoint
     localStorage.removeItem(USER_KEY);
-    localStorage.removeItem(TOKEN_KEY);
-    localStorage.removeItem(REFRESH_TOKEN_KEY);
   };
 
   const value: AuthContextType = {
@@ -96,21 +89,12 @@ export function useAuth() {
   return context;
 }
 
-// Helper functions for token management
-export const getAccessToken = () => localStorage.getItem(TOKEN_KEY);
-export const getRefreshToken = () => localStorage.getItem(REFRESH_TOKEN_KEY);
-
-export const setTokens = (accessToken: string, refreshToken: string) => {
-  localStorage.setItem(TOKEN_KEY, accessToken);
-  localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
-};
-
+// Helper function to store user data in localStorage
 export const setUserData = (user: User) => {
   localStorage.setItem(USER_KEY, JSON.stringify(user));
 };
 
+// Helper function to clear all auth data
 export const clearAuthData = () => {
-  localStorage.removeItem(TOKEN_KEY);
-  localStorage.removeItem(REFRESH_TOKEN_KEY);
   localStorage.removeItem(USER_KEY);
 };

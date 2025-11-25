@@ -1,19 +1,26 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/shared/context/auth';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { useAuthApiService } from '../api';
+import { getAuthApiService } from '../api';
 
 export default function GoogleCallbackPage() {
   const navigate = useNavigate();
   const { setUser } = useAuth();
-  const authService = useAuthApiService();
   const [isLoading, setIsLoading] = useState(true);
+  const hasHandledCallback = useRef(false);
 
   useEffect(() => {
+    // Prevent multiple calls if effect runs multiple times
+    if (hasHandledCallback.current) {
+      return;
+    }
+    hasHandledCallback.current = true;
+
     const handleCallback = async () => {
       try {
+        const authService = getAuthApiService();
         const user = await authService.getCurrentUser();
         setUser(user);
         toast.success('Successfully signed in with Google');
@@ -30,7 +37,7 @@ export default function GoogleCallbackPage() {
     };
 
     handleCallback();
-  }, [navigate, setUser, authService]);
+  }, [navigate, setUser]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">

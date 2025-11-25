@@ -53,8 +53,10 @@ export function RegisterForm() {
             //   return adjustedAge >= 13 && adjustedAge <= 120;
             // }, t('validation.ageRequirement'))
             .optional(),
-          phoneNumber: z.string().optional(),
-          // .refine((val) => !val || /^\+?[1-9]\d{1,14}$/.test(val), t('validation.phoneNumberInvalid')),
+          phoneNumber: z
+            .string()
+            .optional()
+            .refine((val) => !val || /^\+?[1-9]\d{1,14}$/.test(val), t('validation.phoneNumberInvalid')),
         })
         .refine((data) => data.password === data.confirmPassword, {
           message: t('validation.passwordsNoMatch'),

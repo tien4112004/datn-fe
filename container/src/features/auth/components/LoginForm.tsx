@@ -52,6 +52,9 @@ export function LoginForm() {
         onSuccess: (user) => {
           toast.success(t('login.welcomeBack', { name: user.firstName || user.email }));
         },
+        onError: () => {
+          toast.error(t('login.loginFailed'));
+        },
       }
     );
   };

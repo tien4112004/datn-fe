@@ -18,6 +18,7 @@ export default {
     signUp: 'Đăng ký',
     welcomeBack: 'Chào mừng trở lại, {{name}}!',
     googleComingSoon: 'Đăng nhập bằng Google sắp ra mắt!',
+    loginFailed: 'Đăng nhập thất bại. Vui lòng kiểm tra thông tin đăng nhập và thử lại.',
   },
   register: {
     title: 'Tạo tài khoản',

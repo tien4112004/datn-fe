@@ -18,6 +18,7 @@ export default {
     signUp: 'Sign up',
     welcomeBack: 'Welcome back, {{name}}!',
     googleComingSoon: 'Google sign-in coming soon!',
+    loginFailed: 'Sign in failed. Please check your credentials and try again.',
   },
   register: {
     title: 'Create an account',

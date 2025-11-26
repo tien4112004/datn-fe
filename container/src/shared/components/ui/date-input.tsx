@@ -34,10 +34,9 @@ const DateInput = React.forwardRef<HTMLInputElement, DateInputProps>(
     const [inputValue, setInputValue] = React.useState('');
     const [isOpen, setIsOpen] = React.useState(false);
 
-    // Update input value when value prop changes
     React.useEffect(() => {
       if (value) {
-        setInputValue(format(value, 'MM/dd/yyyy'));
+        setInputValue(format(value, 'dd/MM/yyyy'));
       } else {
         setInputValue('');
       }
@@ -47,8 +46,7 @@ const DateInput = React.forwardRef<HTMLInputElement, DateInputProps>(
       const inputVal = e.target.value;
       setInputValue(inputVal);
 
-      // Try to parse the input as a date (MM/dd/yyyy format)
-      const parsedDate = parse(inputVal, 'MM/dd/yyyy', new Date());
+      const parsedDate = parse(inputVal, 'dd/MM/yyyy', new Date());
       if (isValid(parsedDate) && parsedDate >= minDate && parsedDate <= maxDate) {
         onChange?.(parsedDate);
       } else if (inputVal === '') {
@@ -61,7 +59,7 @@ const DateInput = React.forwardRef<HTMLInputElement, DateInputProps>(
         <div className="relative">
           <Input
             type="text"
-            placeholder="MM/DD/YYYY"
+            placeholder="DD/MM/YYYY"
             value={inputValue}
             onChange={handleInputChange}
             disabled={disabled}
@@ -86,7 +84,7 @@ const DateInput = React.forwardRef<HTMLInputElement, DateInputProps>(
             onSelect={(date) => {
               onChange?.(date);
               if (date) {
-                setInputValue(format(date, 'MM/dd/yyyy'));
+                setInputValue(format(date, 'dd/MM/yyyy'));
               }
               setIsOpen(false);
             }}

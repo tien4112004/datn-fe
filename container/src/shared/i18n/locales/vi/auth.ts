@@ -65,5 +65,6 @@ export default {
     dateOfBirthInvalid: 'Vui lòng chọn ngày hợp lệ',
     ageRequirement: 'Bạn phải ít nhất 13 tuổi',
     phoneNumberInvalid: 'Vui lòng nhập số điện thoại hợp lệ',
+    nameAlphabetOnly: 'Tên chỉ được chứa ký tự chữ cái',
   },
 };

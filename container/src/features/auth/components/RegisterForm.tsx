@@ -24,39 +24,29 @@ export function RegisterForm() {
       z
         .object({
           email: z.string().email(t('validation.emailInvalid')),
-          password: z
-            .string()
-            // .regex(/[A-Z]/, t('validation.passwordUppercase'))
-            // .regex(/[a-z]/, t('validation.passwordLowercase'))
-            // .regex(/[0-9]/, t('validation.passwordNumber'))
-            .min(6, t('validation.passwordMinLength', { min: 6 })),
+          password: z.string().min(6, t('validation.passwordMinLength', { min: 6 })),
           confirmPassword: z.string(),
           firstName: z
             .string()
             .min(1, t('validation.firstNameRequired'))
-            .max(50, t('validation.firstNameMaxLength', { max: 50 })),
+            .max(50, t('validation.firstNameMaxLength', { max: 50 }))
+            .regex(/^[a-zA-Z\s]+$/, t('validation.nameAlphabetOnly')),
           lastName: z
             .string()
             .min(1, t('validation.lastNameRequired'))
-            .max(50, t('validation.lastNameMaxLength', { max: 50 })),
-          dateOfBirth: z
-            .date({
-              required_error: t('validation.dateOfBirthRequired'),
-              invalid_type_error: t('validation.dateOfBirthInvalid'),
-            })
-            // .refine((date) => {
-            //   const today = new Date();
-            //   const age = today.getFullYear() - date.getFullYear();
-            //   const monthDiff = today.getMonth() - date.getMonth();
-            //   const adjustedAge =
-            //     monthDiff < 0 || (monthDiff === 0 && today.getDate() < date.getDate()) ? age - 1 : age;
-            //   return adjustedAge >= 13 && adjustedAge <= 120;
-            // }, t('validation.ageRequirement'))
-            .optional(),
+            .max(50, t('validation.lastNameMaxLength', { max: 50 }))
+            .regex(/^[a-zA-Z\s]+$/, t('validation.nameAlphabetOnly')),
+          dateOfBirth: z.date({
+            required_error: t('validation.dateOfBirthRequired'),
+            invalid_type_error: t('validation.dateOfBirthInvalid'),
+          }),
           phoneNumber: z
             .string()
             .optional()
-            .refine((val) => !val || /^\+?[1-9]\d{1,14}$/.test(val), t('validation.phoneNumberInvalid')),
+            .refine(
+              (val) => !val || /^(\+[1-9]\d{7,14}|0\d{7,14})$/.test(val),
+              t('validation.phoneNumberInvalid')
+            ),
         })
         .refine((data) => data.password === data.confirmPassword, {
           message: t('validation.passwordsNoMatch'),
@@ -81,14 +71,11 @@ export function RegisterForm() {
     },
   });
 
-  // Update validation schema when language changes
   useEffect(() => {
     form.clearErrors();
   }, [i18n.language, form]);
 
   const onSubmit = async (data: RegisterFormOutput) => {
-    if (!data.dateOfBirth) return;
-
     registerMutation.mutate(
       {
         email: data.email,
@@ -182,7 +169,9 @@ export function RegisterForm() {
           name="dateOfBirth"
           render={({ field }) => (
             <FormItem className="flex flex-col">
-              <FormLabel>{t('register.dateOfBirth')}</FormLabel>
+              <FormLabel>
+                {t('register.dateOfBirth')} <span className="text-destructive">*</span>
+              </FormLabel>
               <FormControl>
                 <DateInput
                   value={field.value}

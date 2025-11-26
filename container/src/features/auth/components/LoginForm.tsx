@@ -40,7 +40,6 @@ export function LoginForm() {
     },
   });
 
-  // Update validation schema when language changes
   useEffect(() => {
     form.clearErrors();
   }, [i18n.language, form]);

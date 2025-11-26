@@ -65,5 +65,6 @@ export default {
     dateOfBirthInvalid: 'Please select a valid date',
     ageRequirement: 'You must be at least 13 years old',
     phoneNumberInvalid: 'Please enter a valid phone number',
+    nameAlphabetOnly: 'Name must contain only alphabetic characters',
   },
 };

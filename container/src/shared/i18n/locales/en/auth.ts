@@ -19,6 +19,8 @@ export default {
     welcomeBack: 'Welcome back, {{name}}!',
     googleComingSoon: 'Google sign-in coming soon!',
     loginFailed: 'Sign in failed. Please check your credentials and try again.',
+    googleSignInSuccess: 'Successfully signed in with Google',
+    googleSignInFailed: 'Failed to complete sign in. Please try again.',
   },
   register: {
     title: 'Create an account',

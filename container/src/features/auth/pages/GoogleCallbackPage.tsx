@@ -1,11 +1,14 @@
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/shared/context/auth';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 import { getAuthApiService } from '../api';
 
 export default function GoogleCallbackPage() {
+  const { t } = useTranslation(I18N_NAMESPACES.AUTH);
   const navigate = useNavigate();
   const { setUser } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
@@ -23,11 +26,11 @@ export default function GoogleCallbackPage() {
         const authService = getAuthApiService();
         const user = await authService.getCurrentUser();
         setUser(user);
-        toast.success('Successfully signed in with Google');
+        toast.success(t('login.googleSignInSuccess'));
         navigate('/', { replace: true });
       } catch (error) {
         console.error('OAuth callback error:', error);
-        toast.error('Failed to complete sign in. Please try again.');
+        toast.error(t('login.googleSignInFailed'));
         setTimeout(() => {
           navigate('/login', { replace: true });
         }, 2000);
@@ -37,7 +40,7 @@ export default function GoogleCallbackPage() {
     };
 
     handleCallback();
-  }, [navigate, setUser]);
+  }, [navigate, setUser, t]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">

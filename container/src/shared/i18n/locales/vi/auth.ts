@@ -19,6 +19,8 @@ export default {
     welcomeBack: 'Chào mừng trở lại, {{name}}!',
     googleComingSoon: 'Đăng nhập bằng Google sắp ra mắt!',
     loginFailed: 'Đăng nhập thất bại. Vui lòng kiểm tra thông tin đăng nhập và thử lại.',
+    googleSignInSuccess: 'Đăng nhập bằng Google thành công',
+    googleSignInFailed: 'Không thể hoàn tất đăng nhập. Vui lòng thử lại.',
   },
   register: {
     title: 'Tạo tài khoản',

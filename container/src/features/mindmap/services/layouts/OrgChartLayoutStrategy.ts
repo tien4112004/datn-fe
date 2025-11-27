@@ -254,7 +254,10 @@ export class OrgChartLayoutStrategy extends BaseLayoutStrategy {
       }
     });
 
-    return { nodes: layoutedNodes, edges };
+    // Update edge handles for this layout
+    const updatedEdges = this.updateEdgeHandles(edges, layoutedNodes);
+
+    return { nodes: layoutedNodes, edges: updatedEdges };
   }
 
   getEdgeHandles(_parentNode: MindMapNode, _childNode: MindMapNode): EdgeHandleInfo {

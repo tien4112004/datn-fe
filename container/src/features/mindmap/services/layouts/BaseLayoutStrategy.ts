@@ -97,6 +97,38 @@ export abstract class BaseLayoutStrategy implements LayoutStrategy {
   }
 
   /**
+   * Updates edge handles based on the layout strategy.
+   * This method should be called after node positions are calculated.
+   *
+   * @param edges - The edges to update
+   * @param layoutedNodes - The nodes with updated positions
+   * @returns Updated edges with proper sourceHandle and targetHandle
+   */
+  protected updateEdgeHandles(edges: MindMapEdge[], layoutedNodes: MindMapNode[]): MindMapEdge[] {
+    const nodeMap = new Map<string, MindMapNode>();
+    for (const node of layoutedNodes) {
+      nodeMap.set(node.id, node);
+    }
+
+    return edges.map((edge) => {
+      const sourceNode = nodeMap.get(edge.source);
+      const targetNode = nodeMap.get(edge.target);
+
+      if (!sourceNode || !targetNode) {
+        return edge;
+      }
+
+      const handles = this.getEdgeHandles(sourceNode, targetNode);
+
+      return {
+        ...edge,
+        sourceHandle: `${handles.sourceHandle}-source-${sourceNode.id}`,
+        targetHandle: `${handles.targetHandle}-target-${targetNode.id}`,
+      };
+    });
+  }
+
+  /**
    * Default implementation of order inference using the SiblingOrderService.
    */
   inferOrderFromPositions(

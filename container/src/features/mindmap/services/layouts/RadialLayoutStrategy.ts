@@ -254,7 +254,10 @@ export class RadialLayoutStrategy extends BaseLayoutStrategy {
       };
     });
 
-    return { nodes: layoutedNodes, edges };
+    // Update edge handles for this layout
+    const updatedEdges = this.updateEdgeHandles(edges, layoutedNodes);
+
+    return { nodes: layoutedNodes, edges: updatedEdges };
   }
 
   getEdgeHandles(parentNode: MindMapNode, childNode: MindMapNode): EdgeHandleInfo {

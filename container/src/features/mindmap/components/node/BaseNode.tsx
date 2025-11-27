@@ -26,7 +26,7 @@ export const BaseNodeBlock = memo(
     const dragTargetNodeId = useClipboardStore(useShallow(clipboardSelector));
     const isDragTarget = dragTargetNodeId === id;
 
-    const { layout, isLayouting, onNodeDelete } = useMindmapNodeCommon<MindMapNode>({
+    const { layout, layoutType, isLayouting, onNodeDelete } = useMindmapNodeCommon<MindMapNode>({
       node,
     });
 
@@ -88,7 +88,7 @@ export const BaseNodeBlock = memo(
           {...props}
         >
           {children}
-          <NodeHandlers layout={layout} id={id} side={data.side} />
+          <NodeHandlers layout={layout} layoutType={layoutType} id={id} side={data.side} />
           <Helper node={node} dragging={dragging} selected={selected} />
         </motion.div>
       </AnimatePresence>

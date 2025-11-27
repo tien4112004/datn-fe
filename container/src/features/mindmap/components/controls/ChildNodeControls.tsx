@@ -12,12 +12,12 @@ import type { LayoutState } from '@/features/mindmap/stores/layout';
 import type { ClipboardState } from '@/features/mindmap/stores/clipboard';
 import { ArrowLeftFromLine, ArrowRightFromLine, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import type { MindMapNode, Direction, Side, MindMapTypes } from '@/features/mindmap/types';
+import type { MindMapNode, Direction, Side, MindMapTypes, LayoutType } from '@/features/mindmap/types';
 import { Position, type NodeProps, useUpdateNodeInternals } from '@xyflow/react';
-import { DIRECTION, SIDE, MINDMAP_TYPES } from '@/features/mindmap/types';
+import { DIRECTION, SIDE, MINDMAP_TYPES, LAYOUT_TYPE } from '@/features/mindmap/types';
 import { cn } from '@/shared/lib/utils';
 import { motion } from 'motion/react';
-import { memo, useCallback, useEffect, useState } from 'react';
+import { memo, useCallback, useEffect } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { BaseHandle } from '../ui/base-handle';
 import { isEqual } from 'lodash';
@@ -42,6 +42,7 @@ const nodeOperationsSelector = (state: NodeOperationsState) => state.addChildNod
 
 const layoutStoreSelector = (state: LayoutState) => ({
   layout: state.layout,
+  layoutType: state.layoutType,
 });
 
 const mouseOverSelector = (state: ClipboardState) => state.mouseOverNodeId;
@@ -287,55 +288,206 @@ export const ChildNodeControls = memo(
   }
 );
 
-export const NodeHandlers = memo(({ layout, side, id }: { layout: Direction; side: Side; id: string }) => {
-  const [currentLayout, setCurrentLayout] = useState(layout);
-  const updateNodeInternals = useUpdateNodeInternals();
+export const NodeHandlers = memo(
+  ({
+    layout,
+    layoutType,
+    side,
+    id,
+  }: {
+    layout: Direction;
+    layoutType: LayoutType;
+    side: Side;
+    id: string;
+  }) => {
+    const updateNodeInternals = useUpdateNodeInternals();
 
-  if (currentLayout !== layout && layout !== DIRECTION.NONE) {
-    setCurrentLayout(layout);
-  }
+    useEffect(() => {
+      const timerId = setTimeout(() => {
+        updateNodeInternals(id);
+      }, 0);
 
-  useEffect(() => {
-    const timerId = setTimeout(() => {
-      updateNodeInternals(id);
-    }, 0);
+      const timerId2 = setTimeout(() => {
+        updateNodeInternals(id);
+      }, 500);
 
-    const timerId2 = setTimeout(() => {
-      updateNodeInternals(id);
-    }, 500);
+      return () => {
+        clearTimeout(timerId);
+        clearTimeout(timerId2);
+      };
+    }, [layout, layoutType, id, updateNodeInternals]);
 
-    return () => {
-      clearTimeout(timerId);
-      clearTimeout(timerId2);
+    /**
+     * Determine which handles should be visible based on layout type and node side.
+     * Returns visibility settings for each handle position.
+     */
+    const getHandleVisibility = () => {
+      // For legacy layouts (horizontal/vertical balanced), use the old logic
+      if (layoutType === LAYOUT_TYPE.HORIZONTAL_BALANCED || layoutType === LAYOUT_TYPE.NONE) {
+        return {
+          leftSource: side === SIDE.LEFT || side === SIDE.MID,
+          rightSource: side === SIDE.RIGHT || side === SIDE.MID,
+          topSource: false,
+          bottomSource: false,
+          leftTarget: true, // Always available but hidden
+          rightTarget: true,
+          topTarget: false,
+          bottomTarget: false,
+        };
+      }
+
+      if (layoutType === LAYOUT_TYPE.VERTICAL_BALANCED) {
+        return {
+          leftSource: false,
+          rightSource: false,
+          topSource: side === SIDE.LEFT || side === SIDE.MID, // "left" means "top" in vertical
+          bottomSource: side === SIDE.RIGHT || side === SIDE.MID, // "right" means "bottom" in vertical
+          leftTarget: false,
+          rightTarget: false,
+          topTarget: true,
+          bottomTarget: true,
+        };
+      }
+
+      if (layoutType === LAYOUT_TYPE.RIGHT_ONLY) {
+        return {
+          leftSource: false,
+          rightSource: true, // All nodes can have children to the right
+          topSource: false,
+          bottomSource: false,
+          leftTarget: true, // Children receive from left
+          rightTarget: false,
+          topTarget: false,
+          bottomTarget: false,
+        };
+      }
+
+      if (layoutType === LAYOUT_TYPE.ORG_CHART) {
+        return {
+          leftSource: false,
+          rightSource: false,
+          topSource: false,
+          bottomSource: true, // Parents connect from bottom
+          leftTarget: false,
+          rightTarget: false,
+          topTarget: true, // Children receive from top
+          bottomTarget: false,
+        };
+      }
+
+      if (layoutType === LAYOUT_TYPE.RADIAL) {
+        // Radial layout needs all handles available
+        return {
+          leftSource: true,
+          rightSource: true,
+          topSource: true,
+          bottomSource: true,
+          leftTarget: true,
+          rightTarget: true,
+          topTarget: true,
+          bottomTarget: true,
+        };
+      }
+
+      // Default fallback
+      return {
+        leftSource: true,
+        rightSource: true,
+        topSource: false,
+        bottomSource: false,
+        leftTarget: true,
+        rightTarget: true,
+        topTarget: false,
+        bottomTarget: false,
+      };
     };
-  }, [currentLayout, id, updateNodeInternals]);
 
-  return (
-    <>
-      <BaseHandle
-        type="source"
-        position={currentLayout === DIRECTION.VERTICAL ? Position.Top : Position.Left}
-        style={side === SIDE.LEFT || side === SIDE.MID ? {} : { visibility: 'hidden' }}
-        id={`first-source-${id}`}
-      />
-      <BaseHandle
-        type="source"
-        position={currentLayout === DIRECTION.VERTICAL ? Position.Bottom : Position.Right}
-        style={side === SIDE.RIGHT || side === SIDE.MID ? {} : { visibility: 'hidden' }}
-        id={`second-source-${id}`}
-      />
-      <BaseHandle
-        type="target"
-        position={currentLayout === DIRECTION.VERTICAL ? Position.Top : Position.Left}
-        style={{ visibility: 'hidden' }}
-        id={`first-target-${id}`}
-      />
-      <BaseHandle
-        type="target"
-        position={currentLayout === DIRECTION.VERTICAL ? Position.Bottom : Position.Right}
-        style={{ visibility: 'hidden' }}
-        id={`second-target-${id}`}
-      />
-    </>
-  );
-});
+    const visibility = getHandleVisibility();
+
+    return (
+      <>
+        {/* Left handles */}
+        <BaseHandle
+          type="source"
+          position={Position.Left}
+          style={visibility.leftSource ? {} : { visibility: 'hidden' }}
+          id={`left-source-${id}`}
+        />
+        <BaseHandle
+          type="target"
+          position={Position.Left}
+          style={{ visibility: 'hidden' }}
+          id={`left-target-${id}`}
+        />
+
+        {/* Right handles */}
+        <BaseHandle
+          type="source"
+          position={Position.Right}
+          style={visibility.rightSource ? {} : { visibility: 'hidden' }}
+          id={`right-source-${id}`}
+        />
+        <BaseHandle
+          type="target"
+          position={Position.Right}
+          style={{ visibility: 'hidden' }}
+          id={`right-target-${id}`}
+        />
+
+        {/* Top handles */}
+        <BaseHandle
+          type="source"
+          position={Position.Top}
+          style={visibility.topSource ? {} : { visibility: 'hidden' }}
+          id={`top-source-${id}`}
+        />
+        <BaseHandle
+          type="target"
+          position={Position.Top}
+          style={{ visibility: 'hidden' }}
+          id={`top-target-${id}`}
+        />
+
+        {/* Bottom handles */}
+        <BaseHandle
+          type="source"
+          position={Position.Bottom}
+          style={visibility.bottomSource ? {} : { visibility: 'hidden' }}
+          id={`bottom-source-${id}`}
+        />
+        <BaseHandle
+          type="target"
+          position={Position.Bottom}
+          style={{ visibility: 'hidden' }}
+          id={`bottom-target-${id}`}
+        />
+
+        {/* Legacy handles for backward compatibility */}
+        <BaseHandle
+          type="source"
+          position={layout === DIRECTION.VERTICAL ? Position.Top : Position.Left}
+          style={side === SIDE.LEFT || side === SIDE.MID ? {} : { visibility: 'hidden' }}
+          id={`first-source-${id}`}
+        />
+        <BaseHandle
+          type="source"
+          position={layout === DIRECTION.VERTICAL ? Position.Bottom : Position.Right}
+          style={side === SIDE.RIGHT || side === SIDE.MID ? {} : { visibility: 'hidden' }}
+          id={`second-source-${id}`}
+        />
+        <BaseHandle
+          type="target"
+          position={layout === DIRECTION.VERTICAL ? Position.Top : Position.Left}
+          style={{ visibility: 'hidden' }}
+          id={`first-target-${id}`}
+        />
+        <BaseHandle
+          type="target"
+          position={layout === DIRECTION.VERTICAL ? Position.Bottom : Position.Right}
+          style={{ visibility: 'hidden' }}
+          id={`second-target-${id}`}
+        />
+      </>
+    );
+  }
+);

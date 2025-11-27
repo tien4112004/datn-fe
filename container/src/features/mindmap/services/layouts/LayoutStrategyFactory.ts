@@ -1,6 +1,6 @@
 import type { LayoutStrategy, LayoutType, LayoutResult, LayoutOptions } from '../../types';
 import type { MindMapNode, MindMapEdge } from '../../types';
-import { LAYOUT_TYPE, DIRECTION } from '../../types';
+import { LAYOUT_TYPE, DIRECTION, MINDMAP_TYPES } from '../../types';
 import { rightOnlyLayoutStrategy } from './RightOnlyLayoutStrategy';
 import { orgChartLayoutStrategy } from './OrgChartLayoutStrategy';
 import { radialLayoutStrategy } from './RadialLayoutStrategy';
@@ -136,7 +136,6 @@ class LayoutStrategyFactory {
     }
 
     // For new layout types, find root nodes and layout each tree
-    const { MINDMAP_TYPES } = await import('../../types');
     const rootNodes = nodes.filter((node) => node.type === MINDMAP_TYPES.ROOT_NODE);
 
     if (rootNodes.length === 0) {

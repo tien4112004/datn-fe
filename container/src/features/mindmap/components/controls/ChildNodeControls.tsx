@@ -5,15 +5,19 @@ import {
   useNodeManipulationStore,
   useNodeOperationsStore,
 } from '@/features/mindmap/stores';
-import { ArrowLeftFromLine, ArrowRightFromLine, Plus, Type, Square, Image } from 'lucide-react';
+import type { NodeManipulationState } from '@/features/mindmap/stores/nodeManipulation';
+import type { CoreState } from '@/features/mindmap/stores/core';
+import type { NodeOperationsState } from '@/features/mindmap/stores/nodeOperation';
+import type { LayoutState } from '@/features/mindmap/stores/layout';
+import type { ClipboardState } from '@/features/mindmap/stores/clipboard';
+import { ArrowLeftFromLine, ArrowRightFromLine, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Popover, PopoverContent, PopoverTrigger } from '@/shared/components/ui/popover';
 import type { MindMapNode, Direction, Side, MindMapTypes } from '@/features/mindmap/types';
 import { Position, type NodeProps, useUpdateNodeInternals } from '@xyflow/react';
 import { DIRECTION, SIDE, MINDMAP_TYPES } from '@/features/mindmap/types';
 import { cn } from '@/shared/lib/utils';
 import { motion } from 'motion/react';
-import { memo, useCallback, useState } from 'react';
+import { memo, useCallback, useEffect, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { BaseHandle } from '../ui/base-handle';
 import { isEqual } from 'lodash';
@@ -24,23 +28,23 @@ interface ChildNodeControlsProps {
 }
 
 // Selectors for better memoization
-const nodeManipulationSelector = (state: any) => ({
+const nodeManipulationSelector = (state: NodeManipulationState) => ({
   collapse: state.collapse,
   expand: state.expand,
 });
 
-const coreStoreSelector = (state: any) => ({
+const coreStoreSelector = (state: CoreState) => ({
   hasLeftChildren: state.hasLeftChildren,
   hasRightChildren: state.hasRightChildren,
 });
 
-const nodeOperationsSelector = (state: any) => state.addChildNode;
+const nodeOperationsSelector = (state: NodeOperationsState) => state.addChildNode;
 
-const layoutStoreSelector = (state: any) => ({
+const layoutStoreSelector = (state: LayoutState) => ({
   layout: state.layout,
 });
 
-const mouseOverSelector = (state: any) => state.mouseOverNodeId;
+const mouseOverSelector = (state: ClipboardState) => state.mouseOverNodeId;
 
 export const ChildNodeControls = memo(
   ({ node, selected }: ChildNodeControlsProps) => {
@@ -51,22 +55,14 @@ export const ChildNodeControls = memo(
     const { hasLeftChildren, hasRightChildren } = useCoreStore(useShallow(coreStoreSelector));
     const addChildNodeStore = useNodeOperationsStore(nodeOperationsSelector);
     const { layout } = useLayoutStore(useShallow(layoutStoreSelector));
-    const updateNodeInternals = useUpdateNodeInternals();
 
     const addChildNode = useCallback(
       (side: Side, type: MindMapTypes) => {
-        expand(node.id, side, updateNodeInternals);
-        addChildNodeStore(node, { x: node.positionAbsoluteX, y: node.positionAbsoluteY }, side, type);
+        expand(node.id, side);
+        addChildNodeStore(node, { x: node.positionAbsoluteX, y: node.positionAbsoluteY + 200 }, side, type);
         // Auto-layout is now handled inside the addChildNode store function
       },
-      [
-        expand,
-        addChildNodeStore,
-        updateNodeInternals,
-        node.id,
-        node.positionAbsoluteX,
-        node.positionAbsoluteY,
-      ]
+      [expand, addChildNodeStore, node.id, node.positionAbsoluteX, node.positionAbsoluteY]
     );
 
     const mouseOverNodeId = useClipboardStore(useShallow(mouseOverSelector));
@@ -87,7 +83,17 @@ export const ChildNodeControls = memo(
             (isMouseOver || selected) && canCreateLeft ? 'visible opacity-100' : 'invisible opacity-0'
           )}
         >
-          <Popover>
+          <Button
+            size="icon"
+            variant="secondary"
+            className={cn('cursor-pointer rounded-full transition-all duration-200')}
+            onClick={() => {
+              addChildNode(SIDE.LEFT, MINDMAP_TYPES.TEXT_NODE);
+            }}
+          >
+            <Plus />
+          </Button>
+          {/* <Popover>
             <PopoverTrigger asChild>
               <Button
                 size="icon"
@@ -131,7 +137,7 @@ export const ChildNodeControls = memo(
                 </Button>
               </div>
             </PopoverContent>
-          </Popover>
+          </Popover> */}
           <motion.div
             whileTap={{ scale: 0.95 }}
             whileHover={{ scale: 1.05 }}
@@ -144,7 +150,7 @@ export const ChildNodeControls = memo(
           >
             <Button
               onClick={() => {
-                if (isLeftChildrenCollapsed) expand(node.id, SIDE.LEFT, updateNodeInternals);
+                if (isLeftChildrenCollapsed) expand(node.id, SIDE.LEFT);
                 else collapse(node.id, SIDE.LEFT);
               }}
               size="icon"
@@ -187,7 +193,7 @@ export const ChildNodeControls = memo(
           >
             <Button
               onClick={() => {
-                if (isRightChildrenCollapsed) expand(node.id, SIDE.RIGHT, updateNodeInternals);
+                if (isRightChildrenCollapsed) expand(node.id, SIDE.RIGHT);
                 else collapse(node.id, SIDE.RIGHT);
               }}
               size="icon"
@@ -207,7 +213,17 @@ export const ChildNodeControls = memo(
               </motion.div>
             </Button>
           </motion.div>
-          <Popover>
+          <Button
+            size="icon"
+            variant="secondary"
+            className={cn('cursor-pointer rounded-full transition-all duration-200')}
+            onClick={() => {
+              addChildNode(SIDE.RIGHT, MINDMAP_TYPES.TEXT_NODE);
+            }}
+          >
+            <Plus />
+          </Button>
+          {/* <Popover>
             <PopoverTrigger asChild>
               <Button
                 size="icon"
@@ -251,7 +267,7 @@ export const ChildNodeControls = memo(
                 </Button>
               </div>
             </PopoverContent>
-          </Popover>
+          </Popover> */}
         </div>
       </>
     );
@@ -273,10 +289,26 @@ export const ChildNodeControls = memo(
 
 export const NodeHandlers = memo(({ layout, side, id }: { layout: Direction; side: Side; id: string }) => {
   const [currentLayout, setCurrentLayout] = useState(layout);
+  const updateNodeInternals = useUpdateNodeInternals();
 
   if (currentLayout !== layout && layout !== DIRECTION.NONE) {
     setCurrentLayout(layout);
   }
+
+  useEffect(() => {
+    const timerId = setTimeout(() => {
+      updateNodeInternals(id);
+    }, 0);
+
+    const timerId2 = setTimeout(() => {
+      updateNodeInternals(id);
+    }, 500);
+
+    return () => {
+      clearTimeout(timerId);
+      clearTimeout(timerId2);
+    };
+  }, [currentLayout, id, updateNodeInternals]);
 
   return (
     <>

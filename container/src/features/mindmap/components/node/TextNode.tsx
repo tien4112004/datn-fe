@@ -8,7 +8,6 @@ import { BaseNodeBlock } from './BaseNode';
 import { BaseNodeContent } from '../ui/base-node';
 import { useMindmapNodeCommon } from '../../hooks';
 import type { NodeProps } from '@xyflow/react';
-import { useUpdateNodeInternals } from '@xyflow/react';
 import RichTextEditor from '@/components/rte/RichTextEditor';
 import { useNodeOperationsStore } from '../../stores';
 import { useLayoutStore } from '../../stores/layout';
@@ -26,7 +25,6 @@ const TextNodeBlock = memo(
 
     const updateNodeData = useNodeOperationsStore((state) => state.updateNodeDataWithUndo);
     const updateSubtreeLayout = useLayoutStore((state) => state.updateSubtreeLayout);
-    const updateNodeInternals = useUpdateNodeInternals();
 
     const [isEditing, setIsEditing] = useState(false);
 
@@ -61,7 +59,7 @@ const TextNodeBlock = memo(
     }, []);
 
     const handleLayoutClick = () => {
-      updateSubtreeLayout(node.id, layout, updateNodeInternals);
+      updateSubtreeLayout(node.id, layout);
     };
 
     return (

@@ -8,7 +8,7 @@ import { useNodeOperationsStore } from './nodeOperation';
 import { useLayoutStore } from './layout';
 import { isAiGeneratedNodeStructure, convertAiDataToMindMapNodes } from '../services/utils';
 
-interface ClipboardState {
+export interface ClipboardState {
   cloningNodes: MindMapNode[];
   cloningEdges: MindMapEdge[];
 

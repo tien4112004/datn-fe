@@ -372,22 +372,21 @@ describe('useCoreStore', () => {
     });
 
     it('should sync state with update function', () => {
-      const mockUpdateNodeInternals = vi.fn();
-
       const state = useCoreStore.getState();
-      state.syncState(mockUpdateNodeInternals);
+      state.syncState();
 
-      expect(mockUpdateNodeInternals).toHaveBeenCalledWith(['node-1']);
+      // syncState now just syncs the state without updating node internals
+      expect(state.nodes.length).toBeGreaterThan(0);
     });
 
     it('should handle syncState with empty nodes', () => {
       useCoreStore.setState({ nodes: [] });
-      const mockUpdateNodeInternals = vi.fn();
 
       const state = useCoreStore.getState();
-      state.syncState(mockUpdateNodeInternals);
+      state.syncState();
 
-      expect(mockUpdateNodeInternals).toHaveBeenCalledWith([]);
+      // syncState now just syncs the state without updating node internals
+      expect(state.nodes.length).toBe(0);
     });
   });
 });

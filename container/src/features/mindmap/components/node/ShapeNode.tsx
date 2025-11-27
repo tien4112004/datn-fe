@@ -4,7 +4,6 @@ import { SHAPES } from '../../types';
 import type { ShapeNode, Shape } from '../../types';
 import { BaseNodeBlock } from './BaseNode';
 import type { NodeProps } from '@xyflow/react';
-import { useUpdateNodeInternals } from '@xyflow/react';
 import { useMindmapNodeCommon } from '../../hooks';
 import { Button } from '@/components/ui/button';
 import { useLayoutStore, useNodeOperationsStore } from '../../stores';
@@ -12,14 +11,23 @@ import { Network } from 'lucide-react';
 import ColorPickerControl from '../controls/ColorPickerControl';
 import { BaseNodeControl } from '../controls/BaseNodeControl';
 
+/**
+ * @deprecated ShapeNode is deprecated and will be removed in a future version.
+ * Please use TextNode or other alternative node types instead.
+ */
 const ShapeNodeBlock = memo(
   ({ ...node }: NodeProps<ShapeNode>) => {
     const { id, data, selected, width, height } = node;
 
+    // Deprecation warning
+    console.warn(
+      '[Mindmap] ShapeNode is deprecated and will be removed in a future version. ' +
+        'Please use TextNode or other alternative node types instead.'
+    );
+
     const { layout } = useMindmapNodeCommon<ShapeNode>({ node });
     const updateNodeData = useNodeOperationsStore((state) => state.updateNodeDataWithUndo);
     const updateSubtreeLayout = useLayoutStore((state) => state.updateSubtreeLayout);
-    const updateNodeInternals = useUpdateNodeInternals();
 
     const handleShapeChange = (newShape: Shape) => {
       updateNodeData(id, { shape: newShape });
@@ -44,7 +52,7 @@ const ShapeNodeBlock = memo(
     };
 
     const handleLayoutClick = () => {
-      updateSubtreeLayout(id, layout, updateNodeInternals);
+      updateSubtreeLayout(id, layout);
     };
 
     return (

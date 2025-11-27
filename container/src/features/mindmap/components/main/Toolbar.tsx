@@ -10,7 +10,6 @@ import {
 } from '@/shared/components/ui/dropdown-menu';
 import { useLayoutStore } from '../../stores/layout';
 import { useUndoRedoStore, useCoreStore, useNodeOperationsStore } from '../../stores';
-import { useUpdateNodeInternals } from '@xyflow/react';
 import { useTranslation } from 'react-i18next';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 import { useSaveMindmap } from '../../hooks/useSaveMindmap';
@@ -35,7 +34,6 @@ const Toolbar = ({ mindmapId }: { mindmapId: string }) => {
   const setAutoLayoutEnabled = useLayoutStore((state) => state.setAutoLayoutEnabled);
   const updateNodeDirection = useLayoutStore((state) => state.updateNodeDirection);
   const applyAutoLayout = useLayoutStore((state) => state.applyAutoLayout);
-  const updateNodeInternals = useUpdateNodeInternals();
 
   // Save and Export states
   const { saveWithThumbnail, isLoading: isSaving } = useSaveMindmap();
@@ -47,10 +45,10 @@ const Toolbar = ({ mindmapId }: { mindmapId: string }) => {
     if (isAutoLayoutEnabled) {
       // When auto-layout is enabled, direction changes should also reposition nodes
       const { updateLayout } = useLayoutStore.getState();
-      updateLayout(value, updateNodeInternals);
+      updateLayout(value);
     } else {
       // When auto-layout is disabled, only update handles/controls
-      updateNodeDirection(value, updateNodeInternals);
+      updateNodeDirection(value);
     }
   };
 
@@ -59,7 +57,7 @@ const Toolbar = ({ mindmapId }: { mindmapId: string }) => {
       setAutoLayoutEnabled(checked);
       // If auto-layout is enabled, apply layout immediately
       if (checked) {
-        applyAutoLayout(updateNodeInternals);
+        applyAutoLayout();
       }
     }
   };
@@ -182,7 +180,7 @@ const Toolbar = ({ mindmapId }: { mindmapId: string }) => {
         {/* Manual Layout Button */}
         <Button
           variant="outline"
-          onClick={() => applyAutoLayout(updateNodeInternals)}
+          onClick={() => applyAutoLayout()}
           size="sm"
           title={t('toolbar.tooltips.applyLayout')}
           className="w-full transition-colors hover:bg-gray-100"

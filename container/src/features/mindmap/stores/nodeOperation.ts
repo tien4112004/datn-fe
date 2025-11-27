@@ -14,7 +14,7 @@ interface NewNodeData {
   position: XYPosition;
 }
 
-interface NodeOperationsState {
+export interface NodeOperationsState {
   nodesToBeDeleted: Set<string>;
   addNode: (data?: NewNodeData) => void;
   addChildNode: (

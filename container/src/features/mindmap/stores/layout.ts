@@ -14,7 +14,7 @@ interface AnimationData {
   deltaY: number;
 }
 
-interface LayoutState {
+export interface LayoutState {
   layout: Direction;
   isAutoLayoutEnabled: boolean;
   isLayouting: boolean;
@@ -37,15 +37,11 @@ interface LayoutState {
     targetPositions: Record<string, { x: number; y: number }>,
     duration?: number
   ) => void;
-  updateLayout: (direction?: Direction, updateNodeInternals?: (nodeId: string) => void) => Promise<void>;
-  updateSubtreeLayout: (
-    nodeId: string,
-    direction: Direction,
-    updateNodeInternals?: (nodeId: string) => void
-  ) => Promise<void>;
-  updateNodeDirection: (direction: Direction, updateNodeInternals?: (nodeId: string) => void) => void;
-  applyAutoLayout: (updateNodeInternals?: (nodeId: string) => void) => Promise<void>;
-  onLayoutChange: (direction: Direction, updateNodeInternals?: (nodeId: string) => void) => void;
+  updateLayout: (direction?: Direction) => Promise<void>;
+  updateSubtreeLayout: (nodeId: string, direction: Direction) => Promise<void>;
+  updateNodeDirection: (direction: Direction) => void;
+  applyAutoLayout: () => Promise<void>;
+  onLayoutChange: (direction: Direction) => void;
 }
 
 const ANIMATION_DURATION = 800;
@@ -157,8 +153,8 @@ export const useLayoutStore = create<LayoutState>()(
         set({ animationTimer: timer }, false, 'mindmap-layout/animateNodesToPositions:timer');
       },
 
-      updateLayout: async (direction, updateNodeInternals) => {
-        const { layout, animateNodesToPositions, isAutoLayoutEnabled } = get();
+      updateLayout: async (direction) => {
+        const { layout, animateNodesToPositions } = get();
         const nodes = useCoreStore.getState().nodes;
         const edges = useCoreStore.getState().edges;
         const setEdges = useCoreStore.getState().setEdges;
@@ -166,16 +162,6 @@ export const useLayoutStore = create<LayoutState>()(
         const layoutDirection = direction || layout;
 
         if (!nodes?.length || !edges) return;
-
-        // If auto-layout is disabled, only update node internals and return
-        if (!isAutoLayoutEnabled) {
-          if (updateNodeInternals) {
-            nodes.forEach((node) => {
-              updateNodeInternals(node.id);
-            });
-          }
-          return;
-        }
 
         set({ isLayouting: true }, false, 'mindmap-layout/updateLayout');
 
@@ -187,13 +173,6 @@ export const useLayoutStore = create<LayoutState>()(
           );
 
           setEdges([...layoutedEdges]);
-
-          // Update node internals BEFORE animation to ensure handles are positioned correctly
-          if (updateNodeInternals) {
-            layoutedNodes.forEach((node) => {
-              updateNodeInternals(node.id);
-            });
-          }
 
           const targetPositions: Record<string, { x: number; y: number }> = {};
           layoutedNodes.forEach((node) => {
@@ -211,7 +190,7 @@ export const useLayoutStore = create<LayoutState>()(
         }
       },
 
-      updateSubtreeLayout: async (nodeId: string, direction: Direction, updateNodeInternals) => {
+      updateSubtreeLayout: async (nodeId: string, direction: Direction) => {
         const { animateNodesToPositions } = get();
         const nodes = useCoreStore.getState().nodes;
         const edges = useCoreStore.getState().edges;
@@ -253,13 +232,6 @@ export const useLayoutStore = create<LayoutState>()(
             return updatedEdges;
           });
 
-          // Update node internals BEFORE animation to ensure handles are positioned correctly
-          if (updateNodeInternals) {
-            layoutedNodes.forEach((node) => {
-              updateNodeInternals(node.id);
-            });
-          }
-
           const targetPositions: Record<string, { x: number; y: number }> = {};
           layoutedNodes.forEach((node) => {
             targetPositions[node.id] = { x: node.position.x, y: node.position.y };
@@ -280,23 +252,12 @@ export const useLayoutStore = create<LayoutState>()(
         }
       },
 
-      updateNodeDirection: (direction, updateNodeInternals) => {
-        const nodes = useCoreStore.getState().nodes;
-
+      updateNodeDirection: (direction: Direction) => {
         // Update the layout direction state
         set({ layout: direction }, false, 'mindmap-layout/updateNodeDirection');
-
-        // Update node internals to refresh handles for all nodes
-        if (updateNodeInternals && nodes?.length) {
-          setTimeout(() => {
-            nodes.forEach((node) => {
-              updateNodeInternals(node.id);
-            });
-          }, 200);
-        }
       },
 
-      applyAutoLayout: async (updateNodeInternals) => {
+      applyAutoLayout: async () => {
         const { layout, animateNodesToPositions } = get();
         const nodes = useCoreStore.getState().nodes;
         const edges = useCoreStore.getState().edges;
@@ -315,13 +276,6 @@ export const useLayoutStore = create<LayoutState>()(
 
           setEdges([...layoutedEdges]);
 
-          // Update node internals BEFORE animation to ensure handles are positioned correctly
-          if (updateNodeInternals) {
-            layoutedNodes.forEach((node) => {
-              updateNodeInternals(node.id);
-            });
-          }
-
           const targetPositions: Record<string, { x: number; y: number }> = {};
           layoutedNodes.forEach((node) => {
             targetPositions[node.id] = { x: node.position.x, y: node.position.y };
@@ -338,13 +292,13 @@ export const useLayoutStore = create<LayoutState>()(
         }
       },
 
-      onLayoutChange: (direction, updateNodeInternals) => {
+      onLayoutChange: (direction: Direction) => {
         const { updateNodeDirection } = get();
         const { prepareToPushUndo, pushToUndoStack } = useUndoRedoStore.getState();
         prepareToPushUndo();
 
         set({ layout: direction }, false, 'mindmap-layout/onLayoutChange');
-        updateNodeDirection(direction, updateNodeInternals);
+        updateNodeDirection(direction);
         pushToUndoStack();
       },
     }),

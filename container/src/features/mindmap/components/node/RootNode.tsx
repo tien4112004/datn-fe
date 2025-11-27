@@ -7,7 +7,6 @@ import { useMindmapNodeCommon } from '../../hooks/useNodeCommon';
 import { BaseNodeBlock } from './BaseNode';
 import { BaseNodeContent } from '../ui/base-node';
 import type { NodeProps } from '@xyflow/react';
-import { useUpdateNodeInternals } from '@xyflow/react';
 import { useNodeManipulationStore, useNodeOperationsStore, useLayoutStore } from '../../stores';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/shared/components/ui/popover';
@@ -30,7 +29,6 @@ const RootNodeBlock = memo(
     const updateSubtreeEdgePathType = useNodeManipulationStore((state) => state.updateSubtreeEdgePathType);
     const updateSubtreeEdgeColor = useNodeManipulationStore((state) => state.updateSubtreeEdgeColor);
     const isLayouting = useLayoutStore((state) => state.isLayouting);
-    const updateNodeInternals = useUpdateNodeInternals();
 
     const [hex, setHex] = useState<string>(data.edgeColor as string);
 
@@ -49,7 +47,7 @@ const RootNodeBlock = memo(
     }, []);
 
     const handleLayoutClick = () => {
-      updateSubtreeLayout(node.id, layout, updateNodeInternals);
+      updateSubtreeLayout(node.id, layout);
     };
 
     const handlePathTypeChange = useCallback(

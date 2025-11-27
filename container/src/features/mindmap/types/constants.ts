@@ -25,7 +25,9 @@ export const MINDMAP_TYPES = {
   TEXT_NODE: 'mindmapTextNode',
   ROOT_NODE: 'mindmapRootNode',
   EDGE: 'mindmapEdge',
+  /** @deprecated SHAPE_NODE is deprecated and will be removed in a future version. */
   SHAPE_NODE: 'mindmapShapeNode',
+  /** @deprecated IMAGE_NODE is deprecated and will be removed in a future version. */
   IMAGE_NODE: 'mindmapImageNode',
 } as const;
 

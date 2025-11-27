@@ -9,10 +9,16 @@ import TextNodeBlock from '../node/TextNode';
 import ImageNodeBlock from '../node/ImageNode';
 import { useCoreStore } from '../../stores';
 
+/**
+ * @deprecated ShapeNodeBlock and ImageNodeBlock are deprecated and will be removed in a future version.
+ * Consider using TextNode or other alternative node types instead.
+ */
 const nodeTypes = {
   mindmapTextNode: TextNodeBlock,
   mindmapRootNode: RootNodeBlock,
+  /** @deprecated - Use TextNode or other alternatives instead */
   mindmapShapeNode: ShapeNodeBlock,
+  /** @deprecated - Use TextNode or other alternatives instead */
   mindmapImageNode: ImageNodeBlock,
 };
 

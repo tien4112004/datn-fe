@@ -44,14 +44,26 @@ export interface RootNodeData extends BaseNodeData {
 
 export interface RootNode extends BaseNode<RootNodeData, typeof MINDMAP_TYPES.ROOT_NODE> {}
 
+/**
+ * @deprecated ShapeNode is deprecated and will be removed in a future version.
+ * Please use TextNode or other alternative node types instead.
+ */
 interface ShapeNodeData extends BaseNodeData {
   shape?: 'rectangle' | 'circle' | 'ellipse';
   width?: number;
   height?: number;
 }
 
+/**
+ * @deprecated ShapeNode is deprecated and will be removed in a future version.
+ * Please use TextNode or other alternative node types instead.
+ */
 export interface ShapeNode extends BaseNode<ShapeNodeData, typeof MINDMAP_TYPES.SHAPE_NODE> {}
 
+/**
+ * @deprecated ImageNode is deprecated and will be removed in a future version.
+ * Please use TextNode or other alternative node types instead.
+ */
 interface ImageNodeData extends BaseNodeData {
   imageUrl?: string;
   imageFile?: File;
@@ -61,6 +73,10 @@ interface ImageNodeData extends BaseNodeData {
   height?: number;
 }
 
+/**
+ * @deprecated ImageNode is deprecated and will be removed in a future version.
+ * Please use TextNode or other alternative node types instead.
+ */
 export interface ImageNode extends BaseNode<ImageNodeData, typeof MINDMAP_TYPES.IMAGE_NODE> {}
 
 export type MindMapEdge = Edge<{

@@ -5,22 +5,30 @@ import type { ImageNode } from '../../types';
 import { BaseNodeBlock } from './BaseNode';
 import { BaseNodeContent } from '../ui/base-node';
 import type { NodeProps } from '@xyflow/react';
-import { useUpdateNodeInternals } from '@xyflow/react';
 import { useMindmapNodeCommon } from '../../hooks';
 import { Button } from '@/components/ui/button';
 import { Upload, X, Loader2, Network } from 'lucide-react';
 import { useNodeOperationsStore, useLayoutStore } from '../../stores';
 import { BaseNodeControl } from '../controls/BaseNodeControl';
 
+/**
+ * @deprecated ImageNode is deprecated and will be removed in a future version.
+ * Please use TextNode or other alternative node types instead.
+ */
 const ImageNodeBlock = memo(
   ({ ...node }: NodeProps<ImageNode>) => {
     const { id, data, selected, width, height } = node;
+
+    // Deprecation warning
+    console.warn(
+      '[Mindmap] ImageNode is deprecated and will be removed in a future version. ' +
+        'Please use TextNode or other alternative node types instead.'
+    );
 
     const { layout } = useMindmapNodeCommon<ImageNode>({ node });
     const updateNodeData = useNodeOperationsStore((state) => state.updateNodeData);
     const updateNodeDataWithUndo = useNodeOperationsStore((state) => state.updateNodeDataWithUndo);
     const updateSubtreeLayout = useLayoutStore((state) => state.updateSubtreeLayout);
-    const updateNodeInternals = useUpdateNodeInternals();
 
     const [isEditing, setIsEditing] = useState(!data.imageUrl);
     const [isLoadingImage, setIsLoadingImage] = useState(false);
@@ -109,7 +117,7 @@ const ImageNodeBlock = memo(
     }, [id, updateNodeData]);
 
     const handleLayoutClick = () => {
-      updateSubtreeLayout(id, layout, updateNodeInternals);
+      updateSubtreeLayout(id, layout);
     };
 
     return (

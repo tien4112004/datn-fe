@@ -1,10 +1,5 @@
 import { useCallback, useEffect } from 'react';
-import {
-  useUpdateNodeInternals,
-  useReactFlow,
-  type FinalConnectionState,
-  useNodesInitialized,
-} from '@xyflow/react';
+import { useReactFlow, type FinalConnectionState, useNodesInitialized } from '@xyflow/react';
 import { useLayoutStore } from '../stores/layout';
 import type { MindMapNode } from '../types';
 import { useClipboardStore, useCoreStore, useNodeManipulationStore, useNodeOperationsStore } from '../stores';
@@ -23,7 +18,6 @@ export const useReactFlowIntegration = () => {
   const setDragTarget = useClipboardStore((state) => state.setDragTarget);
   const setMouseOverNodeId = useClipboardStore((state) => state.setMouseOverNodeId);
 
-  const updateNodeInternals = useUpdateNodeInternals();
   const nodesInitialized = useNodesInitialized();
   const { getIntersectingNodes, fitView, screenToFlowPosition } = useReactFlow();
 
@@ -45,15 +39,15 @@ export const useReactFlowIntegration = () => {
   }, []);
 
   const onInit = useCallback(async () => {
-    updateLayout(undefined, updateNodeInternals);
+    updateLayout();
 
     setTimeout(() => {
       fitView({ duration: 2000, padding: 0.1 });
     }, 800);
-  }, [updateLayout, updateNodeInternals, fitView]);
+  }, [updateLayout, fitView]);
 
   useEffect(() => {
-    syncState(updateNodeInternals);
+    syncState();
   }, [nodesInitialized]);
 
   const determineSideFromPosition = useCallback((draggedNode: MindMapNode, targetNode: any) => {
@@ -152,7 +146,6 @@ export const useReactFlowIntegration = () => {
     onNodeDragStop,
     onPaneMouseMove,
     onPaneClick,
-    updateNodeInternals,
     onInit,
     onConnectEnd,
     onNodeMouseEnter,

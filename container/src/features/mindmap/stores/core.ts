@@ -7,7 +7,7 @@ import { MINDMAP_TYPES, PATH_TYPES } from '../types';
 import { SIDE } from '../types/constants';
 import { getRootNodeOfSubtree } from '../services/utils';
 
-interface CoreState {
+export interface CoreState {
   nodes: MindMapNode[];
   edges: MindMapEdge[];
   selectedNodeIds: Set<string>;
@@ -22,7 +22,7 @@ interface CoreState {
   hasLeftChildren: (nodeId: string) => boolean;
   hasRightChildren: (nodeId: string) => boolean;
   logData: () => void;
-  syncState: (updateNodeInternals: any) => void;
+  syncState: () => void;
   selectAllNodesAndEdges: () => void;
   deselectAllNodesAndEdges: () => void;
   updateSelectedNodeIds: () => void;
@@ -149,9 +149,9 @@ export const useCoreStore = create<CoreState>()(
           console.log('Edges:', edges);
         },
 
-        syncState: (updateNodeInternals: any) => {
-          const { nodes } = get();
-          updateNodeInternals(nodes.map((node) => node.id));
+        syncState: () => {
+          // Sync state is now called without updateNodeInternals
+          // This is a placeholder for any future sync operations
         },
 
         selectAllNodesAndEdges: () => {

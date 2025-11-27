@@ -65,234 +65,209 @@ const OPPOSITE_SIDE: Record<Side, Side> = {
   [SIDE.MID]: SIDE.MID,
 };
 
+// ============================================================================
+// Pure Functions
+// ============================================================================
+
 /**
- * Service for handling layout transitions.
- * Ensures consistent state when switching between different layout types.
+ * Gets the layout side configuration for a given layout type.
  */
-class LayoutTransitionService {
-  /**
-   * Gets the layout side configuration for a given layout type.
-   */
-  getLayoutConfig(layoutType: LayoutType): LayoutSideConfig {
-    return LAYOUT_SIDE_CONFIGS[layoutType] || LAYOUT_SIDE_CONFIGS[LAYOUT_TYPE.HORIZONTAL_BALANCED];
+export const getLayoutConfig = (layoutType: LayoutType): LayoutSideConfig =>
+  LAYOUT_SIDE_CONFIGS[layoutType] || LAYOUT_SIDE_CONFIGS[LAYOUT_TYPE.HORIZONTAL_BALANCED];
+
+/**
+ * Gets the opposite side for edge target handles.
+ */
+export const getOppositeSide = (side: Side): Side => OPPOSITE_SIDE[side];
+
+/**
+ * Checks if a side is valid for a given layout type.
+ */
+export const isValidSide = (side: Side, layoutType: LayoutType): boolean => {
+  const config = getLayoutConfig(layoutType);
+  return config.validSides.includes(side);
+};
+
+/**
+ * Recursively propagates the subtree direction to all descendants.
+ */
+const propagateSubtreeDirection = (
+  nodeId: string,
+  side: Side,
+  childrenByParent: Map<string, MindMapNode[]>,
+  subtreeDirection: Map<string, Side>
+): void => {
+  const children = childrenByParent.get(nodeId) || [];
+  for (const child of children) {
+    subtreeDirection.set(child.id, side);
+    propagateSubtreeDirection(child.id, side, childrenByParent, subtreeDirection);
   }
+};
 
-  /**
-   * Gets the opposite side for edge target handles.
-   */
-  getOppositeSide(side: Side): Side {
-    return OPPOSITE_SIDE[side];
-  }
+/**
+ * Assigns sides to nodes based on the target layout type.
+ * For balanced layouts, distributes root's direct children evenly,
+ * then propagates the subtree direction to all descendants.
+ * For single-direction layouts, assigns all to the same side.
+ */
+export const assignSides = (nodes: MindMapNode[], layoutType: LayoutType): MindMapNode[] => {
+  const config = getLayoutConfig(layoutType);
 
-  /**
-   * Checks if a side is valid for a given layout type.
-   */
-  isValidSide(side: Side, layoutType: LayoutType): boolean {
-    const config = this.getLayoutConfig(layoutType);
-    return config.validSides.includes(side);
-  }
+  // Build node lookup and children map
+  const nodeMap = new Map<string, MindMapNode>();
+  const childrenByParent = new Map<string, MindMapNode[]>();
+  const rootNodes: MindMapNode[] = [];
 
-  /**
-   * Prepares nodes and edges for a layout transition.
-   * This is the main entry point for layout transitions.
-   *
-   * @param nodes - Current nodes
-   * @param edges - Current edges
-   * @param fromLayout - Source layout type
-   * @param toLayout - Target layout type
-   * @returns Prepared nodes and edges for the target layout
-   */
-  prepareTransition(
-    nodes: MindMapNode[],
-    edges: MindMapEdge[],
-    _fromLayout: LayoutType,
-    toLayout: LayoutType
-  ): { nodes: MindMapNode[]; edges: MindMapEdge[] } {
-    // Step 1: Assign sides based on target layout
-    const nodesWithSides = this.assignSides(nodes, toLayout);
-
-    // Step 2: Update edge handles based on new side assignments
-    const updatedEdges = this.updateEdgeHandles(edges, nodesWithSides, toLayout);
-
-    return { nodes: nodesWithSides, edges: updatedEdges };
-  }
-
-  /**
-   * Assigns sides to nodes based on the target layout type.
-   * For balanced layouts, distributes root's direct children evenly,
-   * then propagates the subtree direction to all descendants.
-   * For single-direction layouts, assigns all to the same side.
-   */
-  assignSides(nodes: MindMapNode[], layoutType: LayoutType): MindMapNode[] {
-    const config = this.getLayoutConfig(layoutType);
-
-    // Build node lookup and children map
-    const nodeMap = new Map<string, MindMapNode>();
-    const childrenByParent = new Map<string, MindMapNode[]>();
-    const rootNodes: MindMapNode[] = [];
-
-    for (const node of nodes) {
-      nodeMap.set(node.id, node);
-      if (node.type === MINDMAP_TYPES.ROOT_NODE) {
-        rootNodes.push(node);
-      } else if (node.data.parentId) {
-        const children = childrenByParent.get(node.data.parentId) || [];
-        children.push(node);
-        childrenByParent.set(node.data.parentId, children);
-      }
+  for (const node of nodes) {
+    nodeMap.set(node.id, node);
+    if (node.type === MINDMAP_TYPES.ROOT_NODE) {
+      rootNodes.push(node);
+    } else if (node.data.parentId) {
+      const children = childrenByParent.get(node.data.parentId) || [];
+      children.push(node);
+      childrenByParent.set(node.data.parentId, children);
     }
+  }
 
-    // For balanced layouts, we need to propagate subtree direction
-    // Step 1: Assign sides to root's direct children (balanced distribution)
-    // Step 2: Propagate those sides to all descendants in each subtree
-    if (config.balanced && config.validSides.length >= 2) {
-      // Map to store the subtree direction for each node
-      const subtreeDirection = new Map<string, Side>();
+  // For balanced layouts, we need to propagate subtree direction
+  if (config.balanced && config.validSides.length >= 2) {
+    const subtreeDirection = new Map<string, Side>();
 
-      // Process each root node
-      for (const root of rootNodes) {
-        subtreeDirection.set(root.id, SIDE.MID);
+    for (const root of rootNodes) {
+      subtreeDirection.set(root.id, SIDE.MID);
 
-        // Get direct children of root
-        const directChildren = childrenByParent.get(root.id) || [];
+      const directChildren = childrenByParent.get(root.id) || [];
+      const sortedChildren = [...directChildren].sort((a, b) => {
+        const orderA = a.data.siblingOrder ?? 0;
+        const orderB = b.data.siblingOrder ?? 0;
+        return orderA - orderB;
+      });
 
-        // Assign sides to direct children (balanced)
-        const sortedChildren = [...directChildren].sort((a, b) => {
-          const orderA = a.data.siblingOrder ?? 0;
-          const orderB = b.data.siblingOrder ?? 0;
-          return orderA - orderB;
-        });
-
-        sortedChildren.forEach((child, index) => {
-          // Alternate between valid sides for direct children of root
-          const sideIndex = index % config.validSides.length;
-          const side = config.validSides[sideIndex];
-          subtreeDirection.set(child.id, side);
-
-          // Recursively propagate this side to all descendants
-          this.propagateSubtreeDirection(child.id, side, childrenByParent, subtreeDirection);
-        });
-      }
-
-      // Apply the subtree directions to nodes
-      return nodes.map((node) => {
-        if (node.type === MINDMAP_TYPES.ROOT_NODE) {
-          return { ...node, data: { ...node.data, side: SIDE.MID } };
-        }
-
-        const side = subtreeDirection.get(node.id) ?? config.defaultSide;
-        return { ...node, data: { ...node.data, side } };
+      sortedChildren.forEach((child, index) => {
+        const sideIndex = index % config.validSides.length;
+        const side = config.validSides[sideIndex];
+        subtreeDirection.set(child.id, side);
+        propagateSubtreeDirection(child.id, side, childrenByParent, subtreeDirection);
       });
     }
 
-    // For single-direction layouts, assign all to the same side
     return nodes.map((node) => {
       if (node.type === MINDMAP_TYPES.ROOT_NODE) {
         return { ...node, data: { ...node.data, side: SIDE.MID } };
       }
-      return { ...node, data: { ...node.data, side: config.defaultSide } };
+      const side = subtreeDirection.get(node.id) ?? config.defaultSide;
+      return { ...node, data: { ...node.data, side } };
     });
   }
 
-  /**
-   * Recursively propagates the subtree direction to all descendants.
-   * All nodes in a subtree should have the same side as their root ancestor.
-   */
-  private propagateSubtreeDirection(
-    nodeId: string,
-    side: Side,
-    childrenByParent: Map<string, MindMapNode[]>,
-    subtreeDirection: Map<string, Side>
-  ): void {
-    const children = childrenByParent.get(nodeId) || [];
-    for (const child of children) {
-      subtreeDirection.set(child.id, side);
-      this.propagateSubtreeDirection(child.id, side, childrenByParent, subtreeDirection);
+  // For single-direction layouts, assign all to the same side
+  return nodes.map((node) => {
+    if (node.type === MINDMAP_TYPES.ROOT_NODE) {
+      return { ...node, data: { ...node.data, side: SIDE.MID } };
     }
-  }
-
-  /**
-   * Updates edge handles based on node side assignments.
-   * Uses the standardized format: {side}-source-{id} and {side}-target-{id}
-   */
-  updateEdgeHandles(edges: MindMapEdge[], nodes: MindMapNode[], _layoutType: LayoutType): MindMapEdge[] {
-    const nodeMap = new Map<string, MindMapNode>();
-    for (const node of nodes) {
-      nodeMap.set(node.id, node);
-    }
-
-    return edges.map((edge) => {
-      const sourceNode = nodeMap.get(edge.source);
-      const targetNode = nodeMap.get(edge.target);
-
-      if (!sourceNode || !targetNode) {
-        return edge;
-      }
-
-      // Get the child's side (which determines handle positions)
-      const childSide = targetNode.data.side;
-
-      // Source handle: the side where the child is relative to parent
-      // Target handle: the opposite side (where parent is relative to child)
-      const sourceHandle = `${childSide}-source-${sourceNode.id}`;
-      const targetHandle = `${this.getOppositeSide(childSide)}-target-${targetNode.id}`;
-
-      return {
-        ...edge,
-        sourceHandle,
-        targetHandle,
-      };
-    });
-  }
-
-  /**
-   * Gets the default child side for a given layout type.
-   * Used when creating new child nodes.
-   */
-  getDefaultChildSide(layoutType: LayoutType): Side {
-    return this.getLayoutConfig(layoutType).defaultSide;
-  }
-
-  /**
-   * Calculates the next side for a new child in a balanced layout.
-   * Considers existing children to maintain balance.
-   */
-  getNextChildSide(existingChildren: MindMapNode[], layoutType: LayoutType): Side {
-    const config = this.getLayoutConfig(layoutType);
-
-    if (!config.balanced || config.validSides.length < 2) {
-      return config.defaultSide;
-    }
-
-    // Count children on each valid side
-    const sideCounts: Record<string, number> = {};
-    for (const side of config.validSides) {
-      sideCounts[side] = 0;
-    }
-
-    for (const child of existingChildren) {
-      const side = child.data.side;
-      if (side in sideCounts) {
-        sideCounts[side]++;
-      }
-    }
-
-    // Return the side with fewer children
-    let minCount = Infinity;
-    let minSide = config.defaultSide;
-
-    for (const side of config.validSides) {
-      if (sideCounts[side] < minCount) {
-        minCount = sideCounts[side];
-        minSide = side;
-      }
-    }
-
-    return minSide;
-  }
-}
+    return { ...node, data: { ...node.data, side: config.defaultSide } };
+  });
+};
 
 /**
- * Singleton instance
+ * Updates edge handles based on node side assignments.
+ * Uses the standardized format: {side}-source-{id} and {side}-target-{id}
  */
-export const layoutTransitionService = new LayoutTransitionService();
+export const updateEdgeHandles = (
+  edges: MindMapEdge[],
+  nodes: MindMapNode[],
+  _layoutType: LayoutType
+): MindMapEdge[] => {
+  const nodeMap = new Map<string, MindMapNode>();
+  for (const node of nodes) {
+    nodeMap.set(node.id, node);
+  }
+
+  return edges.map((edge) => {
+    const sourceNode = nodeMap.get(edge.source);
+    const targetNode = nodeMap.get(edge.target);
+
+    if (!sourceNode || !targetNode) {
+      return edge;
+    }
+
+    const childSide = targetNode.data.side;
+    const sourceHandle = `${childSide}-source-${sourceNode.id}`;
+    const targetHandle = `${getOppositeSide(childSide)}-target-${targetNode.id}`;
+
+    return { ...edge, sourceHandle, targetHandle };
+  });
+};
+
+/**
+ * Prepares nodes and edges for a layout transition.
+ */
+export const prepareTransition = (
+  nodes: MindMapNode[],
+  edges: MindMapEdge[],
+  _fromLayout: LayoutType,
+  toLayout: LayoutType
+): { nodes: MindMapNode[]; edges: MindMapEdge[] } => {
+  const nodesWithSides = assignSides(nodes, toLayout);
+  const updatedEdges = updateEdgeHandles(edges, nodesWithSides, toLayout);
+  return { nodes: nodesWithSides, edges: updatedEdges };
+};
+
+/**
+ * Gets the default child side for a given layout type.
+ */
+export const getDefaultChildSide = (layoutType: LayoutType): Side => getLayoutConfig(layoutType).defaultSide;
+
+/**
+ * Calculates the next side for a new child in a balanced layout.
+ */
+export const getNextChildSide = (existingChildren: MindMapNode[], layoutType: LayoutType): Side => {
+  const config = getLayoutConfig(layoutType);
+
+  if (!config.balanced || config.validSides.length < 2) {
+    return config.defaultSide;
+  }
+
+  const sideCounts: Record<string, number> = {};
+  for (const side of config.validSides) {
+    sideCounts[side] = 0;
+  }
+
+  for (const child of existingChildren) {
+    const side = child.data.side;
+    if (side in sideCounts) {
+      sideCounts[side]++;
+    }
+  }
+
+  let minCount = Infinity;
+  let minSide = config.defaultSide;
+
+  for (const side of config.validSides) {
+    if (sideCounts[side] < minCount) {
+      minCount = sideCounts[side];
+      minSide = side;
+    }
+  }
+
+  return minSide;
+};
+
+// ============================================================================
+// Backwards Compatibility - Service Object
+// ============================================================================
+
+/**
+ * Service object for backwards compatibility.
+ * Wraps the pure functions in an object interface.
+ */
+export const layoutTransitionService = {
+  getLayoutConfig,
+  getOppositeSide,
+  isValidSide,
+  assignSides,
+  updateEdgeHandles,
+  prepareTransition,
+  getDefaultChildSide,
+  getNextChildSide,
+};

@@ -1,13 +1,19 @@
-// Export base class first
-export * from './BaseLayoutStrategy';
+// Export layout utility functions and types
+export {
+  type HierarchyNode,
+  type D3HierarchyNode,
+  type HorizontalLayoutConfig,
+  sortBySiblingOrder,
+  groupByParent,
+  buildSubtree,
+  preprocessHierarchy,
+  calculateHorizontalLayout,
+} from './horizontalLayoutUtils';
 
-// Export individual strategies
-export * from './RightOnlyLayoutStrategy';
-export * from './LeftOnlyLayoutStrategy';
-export * from './BottomOnlyLayoutStrategy';
-export * from './TopOnlyLayoutStrategy';
-export * from './HorizontalBalancedLayoutStrategy';
-export * from './VerticalBalancedLayoutStrategy';
+export { type VerticalLayoutConfig, calculateVerticalLayout } from './verticalLayoutUtils';
+
+// Export all layout strategies (directional + balanced)
+export * from './directionalLayoutStrategies';
 
 // Export transition service
 export * from './LayoutTransitionService';

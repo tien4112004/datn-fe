@@ -1,12 +1,14 @@
 import type { LayoutStrategy, LayoutType, LayoutResult, LayoutOptions } from '../../types';
 import type { MindMapNode, MindMapEdge } from '../../types';
 import { LAYOUT_TYPE, DIRECTION, MINDMAP_TYPES } from '../../types';
-import { rightOnlyLayoutStrategy } from './RightOnlyLayoutStrategy';
-import { leftOnlyLayoutStrategy } from './LeftOnlyLayoutStrategy';
-import { bottomOnlyLayoutStrategy } from './BottomOnlyLayoutStrategy';
-import { topOnlyLayoutStrategy } from './TopOnlyLayoutStrategy';
-import { horizontalBalancedLayoutStrategy } from './HorizontalBalancedLayoutStrategy';
-import { verticalBalancedLayoutStrategy } from './VerticalBalancedLayoutStrategy';
+import {
+  rightOnlyLayoutStrategy,
+  leftOnlyLayoutStrategy,
+  bottomOnlyLayoutStrategy,
+  topOnlyLayoutStrategy,
+  horizontalBalancedLayoutStrategy,
+  verticalBalancedLayoutStrategy,
+} from './directionalLayoutStrategies';
 import { d3LayoutService } from '../D3LayoutService';
 
 /**

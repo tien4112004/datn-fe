@@ -5,3 +5,4 @@ export * from './useSaveMindmap';
 export * from './useShortcut';
 export * from './useActions';
 export * from './useReactFlowIntegration';
+export * from './useNodeSelection';

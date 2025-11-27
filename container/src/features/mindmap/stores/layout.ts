@@ -1,9 +1,11 @@
 import { create } from 'zustand';
 import * as d3 from 'd3';
-import type { MindMapEdge, MindMapNode, Direction } from '../types';
+import type { MindMapEdge, MindMapNode, Direction, LayoutType, LayoutOptions } from '../types';
+import { LAYOUT_TYPE } from '../types';
 import { useCoreStore } from './core';
 import { devtools } from 'zustand/middleware';
 import { d3LayoutService } from '../services/D3LayoutService';
+import { layoutStrategyFactory } from '../services/layouts/LayoutStrategyFactory';
 import { useUndoRedoStore } from './undoredo';
 
 interface AnimationData {
@@ -14,14 +16,38 @@ interface AnimationData {
   deltaY: number;
 }
 
+/**
+ * Default layout options for spacing
+ */
+const DEFAULT_LAYOUT_OPTIONS: LayoutOptions = {
+  horizontalSpacing: 200,
+  verticalSpacing: 80,
+  baseRadius: 200,
+  radiusIncrement: 150,
+};
+
 export interface LayoutState {
+  /**
+   * @deprecated Use layoutType instead. This is kept for backward compatibility.
+   */
   layout: Direction;
+  /**
+   * The current layout type used for node arrangement.
+   */
+  layoutType: LayoutType;
   isAutoLayoutEnabled: boolean;
   isLayouting: boolean;
   isAnimating: boolean;
   animationTimer: d3.Timer | null;
   animationData: AnimationData[];
+  /**
+   * @deprecated Use setLayoutType instead.
+   */
   setLayout: (direction: Direction) => void;
+  /**
+   * Sets the layout type and updates the legacy direction for compatibility.
+   */
+  setLayoutType: (layoutType: LayoutType) => void;
   setAutoLayoutEnabled: (enabled: boolean) => void;
   setIsAnimating: (isAnimating: boolean) => void;
   stopAnimation: () => void;
@@ -33,15 +59,34 @@ export interface LayoutState {
     nodes: MindMapNode[];
     edges: MindMapEdge[];
   }>;
+  /**
+   * Layout all trees using the new layout type system.
+   */
+  layoutAllTreesWithType: (
+    nodes: MindMapNode[],
+    edges: MindMapEdge[],
+    layoutType: LayoutType
+  ) => Promise<{
+    nodes: MindMapNode[];
+    edges: MindMapEdge[];
+  }>;
   animateNodesToPositions: (
     targetPositions: Record<string, { x: number; y: number }>,
     duration?: number
   ) => void;
   updateLayout: (direction?: Direction) => Promise<void>;
+  /**
+   * Updates layout using the new layout type system.
+   */
+  updateLayoutWithType: (layoutType?: LayoutType) => Promise<void>;
   updateSubtreeLayout: (nodeId: string, direction: Direction) => Promise<void>;
   updateNodeDirection: (direction: Direction) => void;
   applyAutoLayout: () => Promise<void>;
   onLayoutChange: (direction: Direction) => void;
+  /**
+   * Handles layout type change with undo/redo support.
+   */
+  onLayoutTypeChange: (layoutType: LayoutType) => void;
 }
 
 const ANIMATION_DURATION = 800;
@@ -50,13 +95,25 @@ export const useLayoutStore = create<LayoutState>()(
   devtools(
     (set, get) => ({
       layout: 'horizontal',
+      layoutType: LAYOUT_TYPE.HORIZONTAL_BALANCED,
       isAutoLayoutEnabled: false,
       isLayouting: false,
       isAnimating: false,
       animationTimer: null,
       animationData: [],
 
-      setLayout: (direction) => set({ layout: direction }, false, 'mindmap-layout/setLayout'),
+      setLayout: (direction) => {
+        // Convert direction to layout type for consistency
+        const layoutType = layoutStrategyFactory.fromDirection(direction);
+        set({ layout: direction, layoutType }, false, 'mindmap-layout/setLayout');
+      },
+
+      setLayoutType: (layoutType) => {
+        // Also update legacy direction for backward compatibility
+        const direction = layoutStrategyFactory.toDirection(layoutType) as Direction;
+        set({ layoutType, layout: direction }, false, 'mindmap-layout/setLayoutType');
+      },
+
       setAutoLayoutEnabled: (enabled) =>
         set({ isAutoLayoutEnabled: enabled }, false, 'mindmap-layout/setAutoLayoutEnabled'),
       setIsAnimating: (isAnimating) => set({ isAnimating }, false, 'mindmap-layout/setIsAnimating'),
@@ -299,6 +356,72 @@ export const useLayoutStore = create<LayoutState>()(
 
         set({ layout: direction }, false, 'mindmap-layout/onLayoutChange');
         updateNodeDirection(direction);
+        pushToUndoStack();
+      },
+
+      // ===== New Layout Type Methods =====
+
+      layoutAllTreesWithType: async (nodes, edges, layoutType) => {
+        // Use strategy factory to layout with new layout types
+        const result = await layoutStrategyFactory.layoutAllTrees(
+          layoutType,
+          nodes,
+          edges,
+          DEFAULT_LAYOUT_OPTIONS
+        );
+        return result;
+      },
+
+      updateLayoutWithType: async (layoutType) => {
+        const { layoutType: currentLayoutType, animateNodesToPositions } = get();
+        const nodes = useCoreStore.getState().nodes;
+        const edges = useCoreStore.getState().edges;
+        const setEdges = useCoreStore.getState().setEdges;
+        const setNodes = useCoreStore.getState().setNodes;
+
+        const targetLayoutType = layoutType || currentLayoutType;
+
+        if (!nodes?.length || !edges) return;
+
+        set({ isLayouting: true }, false, 'mindmap-layout/updateLayoutWithType');
+
+        try {
+          const { nodes: layoutedNodes, edges: layoutedEdges } = await layoutStrategyFactory.layoutAllTrees(
+            targetLayoutType,
+            nodes,
+            edges,
+            DEFAULT_LAYOUT_OPTIONS
+          );
+
+          // Update edges with new handles if needed
+          setEdges([...layoutedEdges]);
+
+          // Update node data (side assignments may have changed)
+          setNodes(layoutedNodes);
+
+          const targetPositions: Record<string, { x: number; y: number }> = {};
+          layoutedNodes.forEach((node) => {
+            targetPositions[node.id] = { x: node.position.x, y: node.position.y };
+          });
+
+          animateNodesToPositions(targetPositions, ANIMATION_DURATION);
+
+          setTimeout(() => {
+            set({ isLayouting: false }, false, 'mindmap-layout/updateLayoutWithType:animationEnd');
+          }, ANIMATION_DURATION);
+        } catch (error) {
+          console.error('Layout update with type failed:', error);
+          set({ isLayouting: false }, false, 'mindmap-layout/updateLayoutWithType:error');
+        }
+      },
+
+      onLayoutTypeChange: (layoutType: LayoutType) => {
+        const { setLayoutType, updateLayoutWithType } = get();
+        const { prepareToPushUndo, pushToUndoStack } = useUndoRedoStore.getState();
+        prepareToPushUndo();
+
+        setLayoutType(layoutType);
+        updateLayoutWithType(layoutType);
         pushToUndoStack();
       },
     }),

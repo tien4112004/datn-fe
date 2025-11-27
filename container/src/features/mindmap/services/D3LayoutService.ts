@@ -345,10 +345,26 @@ class D3LayoutService {
   }
 
   /**
-   * Recursively builds a hierarchy structure for D3 from a flat node structure
+   * Sorts an array of nodes by their siblingOrder property.
+   * Nodes without siblingOrder are placed at the end, maintaining their relative array order.
+   *
+   * @param nodes - Array of nodes to sort
+   * @returns Sorted array of nodes
+   */
+  private sortBySiblingOrder(nodes: MindMapNode[]): MindMapNode[] {
+    return [...nodes].sort((a, b) => {
+      const orderA = a.data.siblingOrder ?? Number.MAX_SAFE_INTEGER;
+      const orderB = b.data.siblingOrder ?? Number.MAX_SAFE_INTEGER;
+      return orderA - orderB;
+    });
+  }
+
+  /**
+   * Recursively builds a hierarchy structure for D3 from a flat node structure.
+   * Children are sorted by siblingOrder to ensure consistent layout order.
    *
    * @param startNode - The root node to build the subtree from
-   * @param childrenMap - Map of parent IDs to their child nodes
+   * @param childrenMap - Map of parent IDs to their child nodes (pre-sorted by siblingOrder)
    * @returns Hierarchy structure suitable for D3 tree layout
    */
   buildSubtree(startNode: MindMapNode, childrenMap: Map<string, MindMapNode[]>): HierarchyNode {
@@ -360,7 +376,8 @@ class D3LayoutService {
   }
 
   /**
-   * Creates a D3 hierarchy for nodes on a specific side of the root
+   * Creates a D3 hierarchy for nodes on a specific side of the root.
+   * Children are sorted by siblingOrder to ensure consistent layout order.
    *
    * This method filters nodes by side (left/right) and level, then builds
    * a D3 hierarchy structure that can be used with D3's tree layout algorithm.
@@ -368,7 +385,7 @@ class D3LayoutService {
    * @param side - Which side (LEFT or RIGHT) to create hierarchy for
    * @param nodes - All available nodes
    * @param rootNode - The root node of the mindmap
-   * @param childrenMap - Map of parent IDs to their child nodes
+   * @param childrenMap - Map of parent IDs to their child nodes (pre-sorted by siblingOrder)
    * @returns D3 hierarchy object ready for layout calculation
    */
   createHierarchy(
@@ -378,9 +395,12 @@ class D3LayoutService {
     childrenMap: Map<string, MindMapNode[]>
   ): D3HierarchyNode {
     const level1Nodes = nodes.filter((node) => node.data.level === 1 && node.data.side === side);
+    // Sort level 1 nodes by siblingOrder for consistent layout
+    const sortedLevel1Nodes = this.sortBySiblingOrder(level1Nodes);
+
     const tree = {
       originalNode: rootNode,
-      children: level1Nodes.map((node) => this.buildSubtree(node, childrenMap)),
+      children: sortedLevel1Nodes.map((node) => this.buildSubtree(node, childrenMap)),
     };
 
     const hierarchy = d3.hierarchy<HierarchyNode>(tree) as D3HierarchyNode;
@@ -521,6 +541,11 @@ class D3LayoutService {
         }
         childrenMap.get(node.data.parentId)!.push(node);
       }
+    }
+
+    // Sort children by siblingOrder for each parent
+    for (const [parentId, children] of childrenMap) {
+      childrenMap.set(parentId, this.sortBySiblingOrder(children));
     }
 
     // Create hierarchies for left and right sides

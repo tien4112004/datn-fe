@@ -1,12 +1,16 @@
 import type { Node, Edge } from '@xyflow/react';
-import type { MINDMAP_TYPES, PATH_TYPES, DIRECTION, SHAPES, SIDE, POSITION } from './constants';
+import type { MINDMAP_TYPES, PATH_TYPES, DIRECTION, SHAPES, SIDE, POSITION, LAYOUT_TYPE } from './constants';
 
 export type MindMapTypes = (typeof MINDMAP_TYPES)[keyof typeof MINDMAP_TYPES];
 export type PathType = (typeof PATH_TYPES)[keyof typeof PATH_TYPES];
 export type Shape = (typeof SHAPES)[keyof typeof SHAPES];
 export type Side = (typeof SIDE)[keyof typeof SIDE];
+/**
+ * @deprecated Use LayoutType instead. Direction will be removed in a future version.
+ */
 export type Direction = (typeof DIRECTION)[keyof typeof DIRECTION];
 export type Position = (typeof POSITION)[keyof typeof POSITION];
+export type LayoutType = (typeof LAYOUT_TYPE)[keyof typeof LAYOUT_TYPE];
 
 export interface BaseNodeData extends Record<string, unknown> {
   level: number;
@@ -15,6 +19,12 @@ export interface BaseNodeData extends Record<string, unknown> {
   parentId?: string;
   metadata?: Record<string, any>;
   side: Side;
+  /**
+   * Determines the order of this node among its siblings.
+   * Lower values appear earlier in the layout (top for horizontal, left for vertical).
+   * When undefined, nodes are ordered by their array index.
+   */
+  siblingOrder?: number;
   collapsedChildren?: {
     leftNodes: BaseNode[];
     leftEdges: MindMapEdge[];
@@ -104,12 +114,21 @@ export interface MindmapActionsType {
 }
 
 export interface MindmapLayoutType {
-  updateLayout: (direction: Direction) => void;
-  onLayoutChange: (direction: Direction) => void;
+  updateLayout: (layoutType: LayoutType) => void;
+  onLayoutChange: (layoutType: LayoutType) => void;
+  /**
+   * @deprecated Use updateLayout with LayoutType instead
+   */
+  updateLayoutLegacy?: (direction: Direction) => void;
 }
 
 export interface MindmapMetadata {
+  /**
+   * @deprecated Use layoutType instead. direction will be removed in a future version.
+   */
   direction?: Direction;
+  /** The layout type used for arranging nodes */
+  layoutType?: LayoutType;
   forceLayout?: boolean;
   [key: string]: unknown;
 }

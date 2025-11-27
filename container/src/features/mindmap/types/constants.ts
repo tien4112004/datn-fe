@@ -3,9 +3,31 @@ export const DRAGHANDLE = {
   SELECTOR: '.dragHandle',
 };
 
+/**
+ * @deprecated Use LAYOUT_TYPE instead. DIRECTION will be removed in a future version.
+ */
 export const DIRECTION = {
   HORIZONTAL: 'horizontal',
   VERTICAL: 'vertical',
+  NONE: '',
+} as const;
+
+/**
+ * Layout types for mindmap node arrangement.
+ * These define how nodes are positioned relative to their parent.
+ */
+export const LAYOUT_TYPE = {
+  /** Children extend left and right from parent (balanced horizontal tree) */
+  HORIZONTAL_BALANCED: 'horizontal-balanced',
+  /** Children extend up and down from parent (balanced vertical tree) */
+  VERTICAL_BALANCED: 'vertical-balanced',
+  /** All children extend to the right of parent (classic tree view) */
+  RIGHT_ONLY: 'right-only',
+  /** Children positioned below parent, centered horizontally (org chart) */
+  ORG_CHART: 'org-chart',
+  /** Children positioned in a circle around parent */
+  RADIAL: 'radial',
+  /** No automatic layout */
   NONE: '',
 } as const;
 

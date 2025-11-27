@@ -18,9 +18,21 @@ export default {
     layout: {
       forceAutoLayout: 'Force Auto Layout',
       direction: 'Direction',
+      layoutType: 'Layout Type',
       horizontal: 'Horizontal',
       vertical: 'Vertical',
       none: 'None',
+      // New layout types
+      horizontalBalanced: 'Horizontal Balanced',
+      horizontalBalancedDesc: 'Children extend left and right from parent',
+      verticalBalanced: 'Vertical Balanced',
+      verticalBalancedDesc: 'Children extend up and down from parent',
+      rightOnly: 'Right Only',
+      rightOnlyDesc: 'All children extend to the right',
+      orgChart: 'Org Chart',
+      orgChartDesc: 'Children positioned below parent, centered',
+      radial: 'Radial',
+      radialDesc: 'Children positioned in a circle around parent',
     },
     tooltips: {
       addNode: 'Add new node',

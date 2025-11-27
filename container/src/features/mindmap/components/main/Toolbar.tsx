@@ -15,7 +15,8 @@ import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 import { useSaveMindmap } from '../../hooks/useSaveMindmap';
 import { useState } from 'react';
 import ExportMindmapDialog from '../export';
-import type { Direction } from '../../types';
+import type { LayoutType } from '../../types';
+import { LAYOUT_TYPE } from '../../types';
 import LoadingButton from '@/components/common/LoadingButton';
 
 const Toolbar = ({ mindmapId }: { mindmapId: string }) => {
@@ -28,27 +29,83 @@ const Toolbar = ({ mindmapId }: { mindmapId: string }) => {
   const canUndo = useUndoRedoStore((state) => !state.undoStack.isEmpty());
   const canRedo = useUndoRedoStore((state) => !state.redoStack.isEmpty());
 
-  const layout = useLayoutStore((state) => state.layout);
-  const setLayout = useLayoutStore((state) => state.setLayout);
+  const layoutType = useLayoutStore((state) => state.layoutType);
+  const setLayoutType = useLayoutStore((state) => state.setLayoutType);
   const isAutoLayoutEnabled = useLayoutStore((state) => state.isAutoLayoutEnabled);
   const setAutoLayoutEnabled = useLayoutStore((state) => state.setAutoLayoutEnabled);
-  const updateNodeDirection = useLayoutStore((state) => state.updateNodeDirection);
-  const applyAutoLayout = useLayoutStore((state) => state.applyAutoLayout);
+  const updateLayoutWithType = useLayoutStore((state) => state.updateLayoutWithType);
 
   // Save and Export states
   const { saveWithThumbnail, isLoading: isSaving } = useSaveMindmap();
   const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
 
-  const handleDirectionChange = (value: Direction) => {
-    setLayout(value);
+  /**
+   * Layout type display names and descriptions
+   */
+  const LAYOUT_OPTIONS: Array<{
+    type: LayoutType;
+    labelKey: string;
+    descriptionKey: string;
+  }> = [
+    {
+      type: LAYOUT_TYPE.HORIZONTAL_BALANCED,
+      labelKey: 'toolbar.layout.horizontalBalanced',
+      descriptionKey: 'toolbar.layout.horizontalBalancedDesc',
+    },
+    {
+      type: LAYOUT_TYPE.VERTICAL_BALANCED,
+      labelKey: 'toolbar.layout.verticalBalanced',
+      descriptionKey: 'toolbar.layout.verticalBalancedDesc',
+    },
+    {
+      type: LAYOUT_TYPE.RIGHT_ONLY,
+      labelKey: 'toolbar.layout.rightOnly',
+      descriptionKey: 'toolbar.layout.rightOnlyDesc',
+    },
+    {
+      type: LAYOUT_TYPE.ORG_CHART,
+      labelKey: 'toolbar.layout.orgChart',
+      descriptionKey: 'toolbar.layout.orgChartDesc',
+    },
+    {
+      type: LAYOUT_TYPE.RADIAL,
+      labelKey: 'toolbar.layout.radial',
+      descriptionKey: 'toolbar.layout.radialDesc',
+    },
+  ];
+
+  const getLayoutLabel = (type: LayoutType): string => {
+    const option = LAYOUT_OPTIONS.find((opt) => opt.type === type);
+    if (option) {
+      // Try to get translated label, fallback to key-based label
+      const translated = t(option.labelKey, { defaultValue: '' });
+      if (translated && translated !== option.labelKey) {
+        return translated;
+      }
+    }
+    // Fallback labels if translation not found
+    switch (type) {
+      case LAYOUT_TYPE.HORIZONTAL_BALANCED:
+        return 'Horizontal Balanced';
+      case LAYOUT_TYPE.VERTICAL_BALANCED:
+        return 'Vertical Balanced';
+      case LAYOUT_TYPE.RIGHT_ONLY:
+        return 'Right Only';
+      case LAYOUT_TYPE.ORG_CHART:
+        return 'Org Chart';
+      case LAYOUT_TYPE.RADIAL:
+        return 'Radial';
+      default:
+        return 'None';
+    }
+  };
+
+  const handleLayoutTypeChange = (type: LayoutType) => {
+    setLayoutType(type);
 
     if (isAutoLayoutEnabled) {
-      // When auto-layout is enabled, direction changes should also reposition nodes
-      const { updateLayout } = useLayoutStore.getState();
-      updateLayout(value);
-    } else {
-      // When auto-layout is disabled, only update handles/controls
-      updateNodeDirection(value);
+      // When auto-layout is enabled, layout type changes should also reposition nodes
+      updateLayoutWithType(type);
     }
   };
 
@@ -57,7 +114,7 @@ const Toolbar = ({ mindmapId }: { mindmapId: string }) => {
       setAutoLayoutEnabled(checked);
       // If auto-layout is enabled, apply layout immediately
       if (checked) {
-        applyAutoLayout();
+        updateLayoutWithType();
       }
     }
   };
@@ -150,9 +207,9 @@ const Toolbar = ({ mindmapId }: { mindmapId: string }) => {
           </Label>
         </div>
 
-        {/* Direction Dropdown */}
+        {/* Layout Type Dropdown */}
         <div className="space-y-1">
-          <Label className="text-xs font-medium text-gray-600">{t('toolbar.layout.direction')}</Label>
+          <Label className="text-xs font-medium text-gray-600">{t('toolbar.layout.layoutType')}</Label>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
@@ -160,19 +217,22 @@ const Toolbar = ({ mindmapId }: { mindmapId: string }) => {
                 size="sm"
                 className="w-full justify-between focus:outline-none focus:ring-2 focus:ring-gray-500"
               >
-                {layout === 'horizontal' && t('toolbar.layout.horizontal')}
-                {layout === 'vertical' && t('toolbar.layout.vertical')}
-                {layout === '' && t('toolbar.layout.none')}
+                {getLayoutLabel(layoutType)}
                 <ChevronDown size={16} />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-56">
-              <DropdownMenuItem onClick={() => handleDirectionChange('horizontal')}>
-                {t('toolbar.layout.horizontal')}
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleDirectionChange('vertical')}>
-                {t('toolbar.layout.vertical')}
-              </DropdownMenuItem>
+              {LAYOUT_OPTIONS.map((option) => (
+                <DropdownMenuItem
+                  key={option.type}
+                  onClick={() => handleLayoutTypeChange(option.type)}
+                  className={layoutType === option.type ? 'bg-gray-100' : ''}
+                >
+                  <div className="flex flex-col">
+                    <span className="font-medium">{getLayoutLabel(option.type)}</span>
+                  </div>
+                </DropdownMenuItem>
+              ))}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -180,7 +240,7 @@ const Toolbar = ({ mindmapId }: { mindmapId: string }) => {
         {/* Manual Layout Button */}
         <Button
           variant="outline"
-          onClick={() => applyAutoLayout()}
+          onClick={() => updateLayoutWithType()}
           size="sm"
           title={t('toolbar.tooltips.applyLayout')}
           className="w-full transition-colors hover:bg-gray-100"

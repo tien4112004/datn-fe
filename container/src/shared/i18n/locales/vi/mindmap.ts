@@ -18,9 +18,21 @@ export default {
     layout: {
       forceAutoLayout: 'Bật bố cục tự động',
       direction: 'Hướng',
+      layoutType: 'Loại bố cục',
       horizontal: 'Ngang',
       vertical: 'Dọc',
       none: 'Không',
+      // New layout types
+      horizontalBalanced: 'Cân bằng ngang',
+      horizontalBalancedDesc: 'Nút con mở rộng sang trái và phải',
+      verticalBalanced: 'Cân bằng dọc',
+      verticalBalancedDesc: 'Nút con mở rộng lên và xuống',
+      rightOnly: 'Chỉ bên phải',
+      rightOnlyDesc: 'Tất cả nút con mở rộng sang phải',
+      orgChart: 'Sơ đồ tổ chức',
+      orgChartDesc: 'Nút con bên dưới, căn giữa',
+      radial: 'Hình tròn',
+      radialDesc: 'Nút con xung quanh nút cha',
     },
     tooltips: {
       addNode: 'Thêm nút mới',

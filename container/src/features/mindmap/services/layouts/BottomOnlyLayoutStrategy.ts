@@ -20,7 +20,7 @@ type D3HierarchyNode = d3.HierarchyNode<HierarchyNode> & {
 };
 
 /**
- * Org Chart Layout Strategy
+ * Bottom Only Layout Strategy
  *
  * Children are positioned below their parent, centered horizontally.
  * This creates a traditional organizational chart layout flowing top-to-bottom.
@@ -29,10 +29,10 @@ type D3HierarchyNode = d3.HierarchyNode<HierarchyNode> & {
  * - Children stack horizontally below parent, centered
  * - Sibling order determined by X position (left to right)
  * - Uses bottom handle for source, top handle for target
- * - All nodes assigned to 'right' side (meaning 'below' in this context)
+ * - All nodes assigned to BOTTOM side
  */
-export class OrgChartLayoutStrategy extends BaseLayoutStrategy {
-  readonly type: LayoutType = LAYOUT_TYPE.ORG_CHART;
+export class BottomOnlyLayoutStrategy extends BaseLayoutStrategy {
+  readonly type: LayoutType = LAYOUT_TYPE.BOTTOM_ONLY;
 
   /**
    * Calculates the total width required for a subtree including all its children.
@@ -247,8 +247,8 @@ export class OrgChartLayoutStrategy extends BaseLayoutStrategy {
           position: { x: node.x, y: node.y },
           data: {
             ...originalNode.data,
-            // Use 'right' side for all non-root nodes (meaning 'below' in org chart)
-            side: originalNode.type === MINDMAP_TYPES.ROOT_NODE ? SIDE.MID : SIDE.RIGHT,
+            // Use BOTTOM side for all non-root nodes
+            side: originalNode.type === MINDMAP_TYPES.ROOT_NODE ? SIDE.MID : SIDE.BOTTOM,
           },
         });
       }
@@ -261,7 +261,7 @@ export class OrgChartLayoutStrategy extends BaseLayoutStrategy {
   }
 
   getEdgeHandles(_parentNode: MindMapNode, _childNode: MindMapNode): EdgeHandleInfo {
-    // For org chart: parent's bottom handle to child's top handle
+    // For bottom only: parent's bottom handle to child's top handle
     return {
       sourceHandle: 'bottom',
       targetHandle: 'top',
@@ -269,12 +269,12 @@ export class OrgChartLayoutStrategy extends BaseLayoutStrategy {
   }
 
   getDefaultChildSide(_parentNode: MindMapNode, _existingChildren: MindMapNode[]): Side {
-    // All children go below (represented as 'right' side)
-    return SIDE.RIGHT;
+    // All children go below
+    return SIDE.BOTTOM;
   }
 }
 
 /**
  * Singleton instance
  */
-export const orgChartLayoutStrategy = new OrgChartLayoutStrategy();
+export const bottomOnlyLayoutStrategy = new BottomOnlyLayoutStrategy();

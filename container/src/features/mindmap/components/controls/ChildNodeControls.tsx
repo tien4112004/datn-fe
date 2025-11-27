@@ -20,7 +20,6 @@ import { motion } from 'motion/react';
 import { memo, useCallback, useEffect } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { BaseHandle } from '../ui/base-handle';
-import { isEqual } from 'lodash';
 
 interface ChildNodeControlsProps {
   node: NodeProps<MindMapNode>;
@@ -47,40 +46,117 @@ const layoutStoreSelector = (state: LayoutState) => ({
 
 const mouseOverSelector = (state: ClipboardState) => state.mouseOverNodeId;
 
-export const ChildNodeControls = memo(
-  ({ node, selected }: ChildNodeControlsProps) => {
-    const canCreateLeft = node.data.side === SIDE.LEFT || node.data.side === SIDE.MID;
-    const canCreateRight = node.data.side === SIDE.RIGHT || node.data.side === SIDE.MID;
+export const ChildNodeControls = ({ node, selected }: ChildNodeControlsProps) => {
+  const { collapse, expand } = useNodeManipulationStore(useShallow(nodeManipulationSelector));
+  const { hasLeftChildren, hasRightChildren } = useCoreStore(useShallow(coreStoreSelector));
+  const addChildNodeStore = useNodeOperationsStore(nodeOperationsSelector);
+  const { layoutType } = useLayoutStore(useShallow(layoutStoreSelector));
 
-    const { collapse, expand } = useNodeManipulationStore(useShallow(nodeManipulationSelector));
-    const { hasLeftChildren, hasRightChildren } = useCoreStore(useShallow(coreStoreSelector));
-    const addChildNodeStore = useNodeOperationsStore(nodeOperationsSelector);
-    const { layout } = useLayoutStore(useShallow(layoutStoreSelector));
+  const isRootNode = node.type === MINDMAP_TYPES.ROOT_NODE;
 
-    const addChildNode = useCallback(
-      (side: Side, type: MindMapTypes) => {
-        expand(node.id, side);
-        addChildNodeStore(node, { x: node.positionAbsoluteX, y: node.positionAbsoluteY + 200 }, side, type);
-        // Auto-layout is now handled inside the addChildNode store function
-      },
-      [expand, addChildNodeStore, node.id, node.positionAbsoluteX, node.positionAbsoluteY]
-    );
+  // Determine if we can create children on each side based on layout type and node side
+  const getCanCreateSides = () => {
+    const side = node.data.side;
+    const isMid = side === SIDE.MID;
 
-    const mouseOverNodeId = useClipboardStore(useShallow(mouseOverSelector));
-    const isMouseOver = mouseOverNodeId === node.id;
+    switch (layoutType) {
+      case LAYOUT_TYPE.HORIZONTAL_BALANCED:
+      case LAYOUT_TYPE.NONE:
+        return {
+          canCreateLeft: side === SIDE.LEFT || isMid || isRootNode,
+          canCreateRight: side === SIDE.RIGHT || isMid || isRootNode,
+          canCreateTop: false,
+          canCreateBottom: false,
+        };
 
-    const isLeftChildrenCollapsed = (node.data.collapsedChildren?.leftNodes || []).length > 0;
-    const isRightChildrenCollapsed = (node.data.collapsedChildren?.rightNodes || []).length > 0;
+      case LAYOUT_TYPE.VERTICAL_BALANCED:
+        return {
+          canCreateLeft: false,
+          canCreateRight: false,
+          canCreateTop: side === SIDE.TOP || isMid || isRootNode,
+          canCreateBottom: side === SIDE.BOTTOM || isMid || isRootNode,
+        };
 
-    return (
-      <>
-        {/* Add Child Buttons */}
+      case LAYOUT_TYPE.RIGHT_ONLY:
+        return {
+          canCreateLeft: false,
+          canCreateRight: true,
+          canCreateTop: false,
+          canCreateBottom: false,
+        };
+
+      case LAYOUT_TYPE.LEFT_ONLY:
+        return {
+          canCreateLeft: true,
+          canCreateRight: false,
+          canCreateTop: false,
+          canCreateBottom: false,
+        };
+
+      case LAYOUT_TYPE.BOTTOM_ONLY:
+        return {
+          canCreateLeft: false,
+          canCreateRight: false,
+          canCreateTop: false,
+          canCreateBottom: true,
+        };
+
+      case LAYOUT_TYPE.TOP_ONLY:
+        return {
+          canCreateLeft: false,
+          canCreateRight: false,
+          canCreateTop: true,
+          canCreateBottom: false,
+        };
+
+      default:
+        return {
+          canCreateLeft: side === SIDE.LEFT || isMid || isRootNode,
+          canCreateRight: side === SIDE.RIGHT || isMid || isRootNode,
+          canCreateTop: false,
+          canCreateBottom: false,
+        };
+    }
+  };
+
+  const { canCreateLeft, canCreateRight, canCreateTop, canCreateBottom } = getCanCreateSides();
+
+  const addChildNode = useCallback(
+    (side: Side, type: MindMapTypes) => {
+      expand(node.id, side);
+      addChildNodeStore(node, { x: node.positionAbsoluteX, y: node.positionAbsoluteY + 200 }, side, type);
+      // Auto-layout is now handled inside the addChildNode store function
+    },
+    [expand, addChildNodeStore, node.id, node.positionAbsoluteX, node.positionAbsoluteY]
+  );
+
+  const mouseOverNodeId = useClipboardStore(useShallow(mouseOverSelector));
+  const isMouseOver = mouseOverNodeId === node.id;
+
+  const isLeftChildrenCollapsed = (node.data.collapsedChildren?.leftNodes || []).length > 0;
+  const isRightChildrenCollapsed = (node.data.collapsedChildren?.rightNodes || []).length > 0;
+
+  // Determine if we're in a vertical-flow layout (TOP_ONLY, BOTTOM_ONLY, VERTICAL_BALANCED)
+  const isVerticalFlow =
+    layoutType === LAYOUT_TYPE.VERTICAL_BALANCED ||
+    layoutType === LAYOUT_TYPE.TOP_ONLY ||
+    layoutType === LAYOUT_TYPE.BOTTOM_ONLY;
+
+  // Determine if we're in a horizontal-flow layout (LEFT_ONLY, RIGHT_ONLY, HORIZONTAL_BALANCED)
+  const isHorizontalFlow =
+    layoutType === LAYOUT_TYPE.HORIZONTAL_BALANCED ||
+    layoutType === LAYOUT_TYPE.LEFT_ONLY ||
+    layoutType === LAYOUT_TYPE.RIGHT_ONLY ||
+    layoutType === LAYOUT_TYPE.NONE;
+
+  return (
+    <>
+      {/* Left side button (for horizontal layouts) */}
+      {isHorizontalFlow && (
         <div
           className={cn(
             'absolute z-[10000] flex items-center justify-center gap-1 rounded-sm transition-all duration-200',
-            layout === DIRECTION.VERTICAL
-              ? 'left-1/2 top-0 -translate-x-1/2 -translate-y-[calc(100%+24px)] flex-col'
-              : 'left-0 top-1/2 -translate-x-[calc(100%+24px)] -translate-y-1/2',
+            'left-0 top-1/2 -translate-x-[calc(100%+24px)] -translate-y-1/2',
             (isMouseOver || selected) && canCreateLeft ? 'visible opacity-100' : 'invisible opacity-0'
           )}
         >
@@ -94,51 +170,6 @@ export const ChildNodeControls = memo(
           >
             <Plus />
           </Button>
-          {/* <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                size="icon"
-                variant="secondary"
-                className={cn('cursor-pointer rounded-full transition-all duration-200')}
-              >
-                <Plus />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent side={layout === DIRECTION.VERTICAL ? 'top' : 'left'} className="w-48 p-2">
-              <div className="space-y-2">
-                <Button
-                  variant="ghost"
-                  className="w-full justify-start gap-2"
-                  onClick={() => {
-                    addChildNode(SIDE.LEFT, MINDMAP_TYPES.TEXT_NODE);
-                  }}
-                >
-                  <Type className="h-4 w-4" />
-                  Text Node
-                </Button>
-                <Button
-                  variant="ghost"
-                  className="w-full justify-start gap-2"
-                  onClick={() => {
-                    addChildNode(SIDE.LEFT, MINDMAP_TYPES.SHAPE_NODE);
-                  }}
-                >
-                  <Square className="h-4 w-4" />
-                  Shape Node
-                </Button>
-                <Button
-                  variant="ghost"
-                  className="w-full justify-start gap-2"
-                  onClick={() => {
-                    addChildNode(SIDE.LEFT, MINDMAP_TYPES.IMAGE_NODE);
-                  }}
-                >
-                  <Image className="h-4 w-4" />
-                  Image Node
-                </Button>
-              </div>
-            </PopoverContent>
-          </Popover> */}
           <motion.div
             whileTap={{ scale: 0.95 }}
             whileHover={{ scale: 1.05 }}
@@ -159,11 +190,7 @@ export const ChildNodeControls = memo(
               className={cn('cursor-pointer rounded-full transition-all duration-200')}
             >
               <motion.div
-                animate={
-                  layout === DIRECTION.HORIZONTAL
-                    ? { rotate: isLeftChildrenCollapsed ? 0 : 180 }
-                    : { rotate: isLeftChildrenCollapsed ? 90 : 270 }
-                }
+                animate={{ rotate: isLeftChildrenCollapsed ? 0 : 180 }}
                 transition={{ duration: 0.2, ease: 'easeInOut' }}
                 className="flex items-center justify-center"
               >
@@ -172,13 +199,14 @@ export const ChildNodeControls = memo(
             </Button>
           </motion.div>
         </div>
+      )}
 
+      {/* Right side button (for horizontal layouts) */}
+      {isHorizontalFlow && (
         <div
           className={cn(
             'absolute z-[10000] flex items-center justify-center gap-1 rounded-sm transition-all duration-200',
-            layout === DIRECTION.VERTICAL
-              ? 'bottom-0 left-1/2 -translate-x-1/2 translate-y-[calc(100%+24px)] flex-col'
-              : 'right-0 top-1/2 -translate-y-1/2 translate-x-[calc(100%+24px)]',
+            'right-0 top-1/2 -translate-y-1/2 translate-x-[calc(100%+24px)]',
             (isMouseOver || selected) && canCreateRight ? 'visible opacity-100' : 'invisible opacity-0'
           )}
         >
@@ -202,11 +230,7 @@ export const ChildNodeControls = memo(
               className={cn('cursor-pointer rounded-full transition-all duration-200')}
             >
               <motion.div
-                animate={
-                  layout === DIRECTION.HORIZONTAL
-                    ? { rotate: isRightChildrenCollapsed ? 0 : 180 }
-                    : { rotate: isRightChildrenCollapsed ? 90 : 270 }
-                }
+                animate={{ rotate: isRightChildrenCollapsed ? 0 : 180 }}
                 transition={{ duration: 0.2, ease: 'easeInOut' }}
                 className="flex items-center justify-center"
               >
@@ -224,69 +248,111 @@ export const ChildNodeControls = memo(
           >
             <Plus />
           </Button>
-          {/* <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                size="icon"
-                variant="secondary"
-                className={cn('cursor-pointer rounded-full transition-all duration-200')}
-              >
-                <Plus />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent side={layout === DIRECTION.VERTICAL ? 'bottom' : 'right'} className="w-48 p-2">
-              <div className="space-y-2">
-                <Button
-                  variant="ghost"
-                  className="w-full justify-start gap-2"
-                  onClick={() => {
-                    addChildNode(SIDE.RIGHT, MINDMAP_TYPES.TEXT_NODE);
-                  }}
-                >
-                  <Type className="h-4 w-4" />
-                  Text Node
-                </Button>
-                <Button
-                  variant="ghost"
-                  className="w-full justify-start gap-2"
-                  onClick={() => {
-                    addChildNode(SIDE.RIGHT, MINDMAP_TYPES.SHAPE_NODE);
-                  }}
-                >
-                  <Square className="h-4 w-4" />
-                  Shape Node
-                </Button>
-                <Button
-                  variant="ghost"
-                  className="w-full justify-start gap-2"
-                  onClick={() => {
-                    addChildNode(SIDE.RIGHT, MINDMAP_TYPES.IMAGE_NODE);
-                  }}
-                >
-                  <Image className="h-4 w-4" />
-                  Image Node
-                </Button>
-              </div>
-            </PopoverContent>
-          </Popover> */}
         </div>
-      </>
-    );
-  },
-  (prevProps, nextProps) => {
-    // Only re-render if these specific properties change
-    const prevData = prevProps.node.data;
-    const nextData = nextProps.node.data;
+      )}
 
-    return (
-      prevProps.node.id === nextProps.node.id &&
-      prevProps.selected === nextProps.selected &&
-      prevData.side === nextData.side &&
-      isEqual(prevData.collapsedChildren?.leftNodes, nextData.collapsedChildren?.leftNodes) &&
-      isEqual(prevData.collapsedChildren?.rightNodes, nextData.collapsedChildren?.rightNodes)
-    );
-  }
-);
+      {/* Top side button (for vertical layouts) */}
+      {isVerticalFlow && (
+        <div
+          className={cn(
+            'absolute z-[10000] flex flex-col items-center justify-center gap-1 rounded-sm transition-all duration-200',
+            'left-1/2 top-0 -translate-x-1/2 -translate-y-[calc(100%+24px)]',
+            (isMouseOver || selected) && canCreateTop ? 'visible opacity-100' : 'invisible opacity-0'
+          )}
+        >
+          <Button
+            size="icon"
+            variant="secondary"
+            className={cn('cursor-pointer rounded-full transition-all duration-200')}
+            onClick={() => {
+              addChildNode(SIDE.TOP, MINDMAP_TYPES.TEXT_NODE);
+            }}
+          >
+            <Plus />
+          </Button>
+          <motion.div
+            whileTap={{ scale: 0.95 }}
+            whileHover={{ scale: 1.05 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+            className={cn(
+              hasLeftChildren(node.id) || isLeftChildrenCollapsed
+                ? 'visible opacity-100'
+                : 'invisible opacity-0'
+            )}
+          >
+            <Button
+              onClick={() => {
+                if (isLeftChildrenCollapsed) expand(node.id, SIDE.LEFT);
+                else collapse(node.id, SIDE.LEFT);
+              }}
+              size="icon"
+              variant="secondary"
+              className={cn('cursor-pointer rounded-full transition-all duration-200')}
+            >
+              <motion.div
+                animate={{ rotate: isLeftChildrenCollapsed ? 90 : 270 }}
+                transition={{ duration: 0.2, ease: 'easeInOut' }}
+                className="flex items-center justify-center"
+              >
+                <ArrowLeftFromLine />
+              </motion.div>
+            </Button>
+          </motion.div>
+        </div>
+      )}
+
+      {/* Bottom side button (for vertical layouts) */}
+      {isVerticalFlow && (
+        <div
+          className={cn(
+            'absolute z-[10000] flex flex-col items-center justify-center gap-1 rounded-sm transition-all duration-200',
+            'bottom-0 left-1/2 -translate-x-1/2 translate-y-[calc(100%+24px)]',
+            (isMouseOver || selected) && canCreateBottom ? 'visible opacity-100' : 'invisible opacity-0'
+          )}
+        >
+          <motion.div
+            whileTap={{ scale: 0.95 }}
+            whileHover={{ scale: 1.05 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+            className={cn(
+              hasRightChildren(node.id) || isRightChildrenCollapsed
+                ? 'visible opacity-100'
+                : 'invisible opacity-0'
+            )}
+          >
+            <Button
+              onClick={() => {
+                if (isRightChildrenCollapsed) expand(node.id, SIDE.RIGHT);
+                else collapse(node.id, SIDE.RIGHT);
+              }}
+              size="icon"
+              variant="secondary"
+              className={cn('cursor-pointer rounded-full transition-all duration-200')}
+            >
+              <motion.div
+                animate={{ rotate: isRightChildrenCollapsed ? 90 : 270 }}
+                transition={{ duration: 0.2, ease: 'easeInOut' }}
+                className="flex items-center justify-center"
+              >
+                <ArrowRightFromLine />
+              </motion.div>
+            </Button>
+          </motion.div>
+          <Button
+            size="icon"
+            variant="secondary"
+            className={cn('cursor-pointer rounded-full transition-all duration-200')}
+            onClick={() => {
+              addChildNode(SIDE.BOTTOM, MINDMAP_TYPES.TEXT_NODE);
+            }}
+          >
+            <Plus />
+          </Button>
+        </div>
+      )}
+    </>
+  );
+};
 
 export const NodeHandlers = memo(
   ({
@@ -319,87 +385,103 @@ export const NodeHandlers = memo(
 
     /**
      * Determine which handles should be visible based on layout type and node side.
-     * Returns visibility settings for each handle position.
+     * The new system uses the node's side directly to determine handle visibility.
+     * Each layout type specifies which sides are valid, and handles are shown accordingly.
      */
     const getHandleVisibility = () => {
-      // For legacy layouts (horizontal/vertical balanced), use the old logic
-      if (layoutType === LAYOUT_TYPE.HORIZONTAL_BALANCED || layoutType === LAYOUT_TYPE.NONE) {
-        return {
-          leftSource: side === SIDE.LEFT || side === SIDE.MID,
-          rightSource: side === SIDE.RIGHT || side === SIDE.MID,
-          topSource: false,
-          bottomSource: false,
-          leftTarget: true, // Always available but hidden
-          rightTarget: true,
-          topTarget: false,
-          bottomTarget: false,
-        };
-      }
+      const isMid = side === SIDE.MID;
 
-      if (layoutType === LAYOUT_TYPE.VERTICAL_BALANCED) {
-        return {
-          leftSource: false,
-          rightSource: false,
-          topSource: side === SIDE.LEFT || side === SIDE.MID, // "left" means "top" in vertical
-          bottomSource: side === SIDE.RIGHT || side === SIDE.MID, // "right" means "bottom" in vertical
-          leftTarget: false,
-          rightTarget: false,
-          topTarget: true,
-          bottomTarget: true,
-        };
-      }
+      // For each layout type, determine valid source handles based on the node's side
+      switch (layoutType) {
+        case LAYOUT_TYPE.HORIZONTAL_BALANCED:
+        case LAYOUT_TYPE.NONE:
+          return {
+            // Source handles: node can have children on its side or both if MID
+            leftSource: side === SIDE.LEFT || isMid,
+            rightSource: side === SIDE.RIGHT || isMid,
+            topSource: false,
+            bottomSource: false,
+            // Target handles: always available for incoming edges
+            leftTarget: true,
+            rightTarget: true,
+            topTarget: false,
+            bottomTarget: false,
+          };
 
-      if (layoutType === LAYOUT_TYPE.RIGHT_ONLY) {
-        return {
-          leftSource: false,
-          rightSource: true, // All nodes can have children to the right
-          topSource: false,
-          bottomSource: false,
-          leftTarget: true, // Children receive from left
-          rightTarget: false,
-          topTarget: false,
-          bottomTarget: false,
-        };
-      }
+        case LAYOUT_TYPE.VERTICAL_BALANCED:
+          return {
+            leftSource: false,
+            rightSource: false,
+            // Source handles: node can have children on its side (TOP/BOTTOM)
+            topSource: side === SIDE.TOP || isMid,
+            bottomSource: side === SIDE.BOTTOM || isMid,
+            leftTarget: false,
+            rightTarget: false,
+            topTarget: true,
+            bottomTarget: true,
+          };
 
-      if (layoutType === LAYOUT_TYPE.ORG_CHART) {
-        return {
-          leftSource: false,
-          rightSource: false,
-          topSource: false,
-          bottomSource: true, // Parents connect from bottom
-          leftTarget: false,
-          rightTarget: false,
-          topTarget: true, // Children receive from top
-          bottomTarget: false,
-        };
-      }
+        case LAYOUT_TYPE.RIGHT_ONLY:
+          return {
+            leftSource: false,
+            rightSource: true, // All nodes can have children to the right
+            topSource: false,
+            bottomSource: false,
+            leftTarget: true, // All non-root nodes receive edges from left
+            rightTarget: false,
+            topTarget: false,
+            bottomTarget: false,
+          };
 
-      if (layoutType === LAYOUT_TYPE.RADIAL) {
-        // Radial layout needs all handles available
-        return {
-          leftSource: true,
-          rightSource: true,
-          topSource: true,
-          bottomSource: true,
-          leftTarget: true,
-          rightTarget: true,
-          topTarget: true,
-          bottomTarget: true,
-        };
-      }
+        case LAYOUT_TYPE.LEFT_ONLY:
+          return {
+            leftSource: true, // All nodes can have children to the left
+            rightSource: false,
+            topSource: false,
+            bottomSource: false,
+            leftTarget: false,
+            rightTarget: true, // All non-root nodes receive edges from right
+            topTarget: false,
+            bottomTarget: false,
+          };
 
-      // Default fallback
-      return {
-        leftSource: true,
-        rightSource: true,
-        topSource: false,
-        bottomSource: false,
-        leftTarget: true,
-        rightTarget: true,
-        topTarget: false,
-        bottomTarget: false,
-      };
+        case LAYOUT_TYPE.BOTTOM_ONLY:
+          return {
+            leftSource: false,
+            rightSource: false,
+            topSource: false,
+            bottomSource: true, // All nodes can have children below
+            leftTarget: false,
+            rightTarget: false,
+            topTarget: true, // All non-root nodes receive edges from top
+            bottomTarget: false,
+          };
+
+        case LAYOUT_TYPE.TOP_ONLY:
+          return {
+            leftSource: false,
+            rightSource: false,
+            topSource: true, // All nodes can have children above
+            bottomSource: false,
+            leftTarget: false,
+            rightTarget: false,
+            topTarget: false,
+            bottomTarget: true, // All non-root nodes receive edges from bottom
+          };
+
+        default:
+          // Default: horizontal-like behavior
+          return {
+            leftSource: side === SIDE.LEFT || isMid,
+            rightSource: side === SIDE.RIGHT || isMid,
+            topSource: false,
+            bottomSource: false,
+            leftTarget: true,
+            rightTarget: true,
+            topTarget: false,
+            bottomTarget: false,
+          };
+      }
     };
 
     const visibility = getHandleVisibility();

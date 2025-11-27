@@ -23,10 +23,12 @@ export const LAYOUT_TYPE = {
   VERTICAL_BALANCED: 'vertical-balanced',
   /** All children extend to the right of parent (classic tree view) */
   RIGHT_ONLY: 'right-only',
-  /** Children positioned below parent, centered horizontally (org chart) */
-  ORG_CHART: 'org-chart',
-  /** Children positioned in a circle around parent */
-  RADIAL: 'radial',
+  /** All children extend to the left of parent (classic tree view mirrored) */
+  LEFT_ONLY: 'left-only',
+  /** Children positioned below parent, centered horizontally */
+  BOTTOM_ONLY: 'bottom-only',
+  /** Children positioned above parent, centered horizontally */
+  TOP_ONLY: 'top-only',
   /** No automatic layout */
   NONE: '',
 } as const;
@@ -34,6 +36,8 @@ export const LAYOUT_TYPE = {
 export const SIDE = {
   LEFT: 'left',
   RIGHT: 'right',
+  TOP: 'top',
+  BOTTOM: 'bottom',
   MID: 'mid',
 } as const;
 

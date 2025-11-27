@@ -63,14 +63,19 @@ const Toolbar = ({ mindmapId }: { mindmapId: string }) => {
       descriptionKey: 'toolbar.layout.rightOnlyDesc',
     },
     {
-      type: LAYOUT_TYPE.ORG_CHART,
-      labelKey: 'toolbar.layout.orgChart',
-      descriptionKey: 'toolbar.layout.orgChartDesc',
+      type: LAYOUT_TYPE.LEFT_ONLY,
+      labelKey: 'toolbar.layout.leftOnly',
+      descriptionKey: 'toolbar.layout.leftOnlyDesc',
     },
     {
-      type: LAYOUT_TYPE.RADIAL,
-      labelKey: 'toolbar.layout.radial',
-      descriptionKey: 'toolbar.layout.radialDesc',
+      type: LAYOUT_TYPE.BOTTOM_ONLY,
+      labelKey: 'toolbar.layout.bottomOnly',
+      descriptionKey: 'toolbar.layout.bottomOnlyDesc',
+    },
+    {
+      type: LAYOUT_TYPE.TOP_ONLY,
+      labelKey: 'toolbar.layout.topOnly',
+      descriptionKey: 'toolbar.layout.topOnlyDesc',
     },
   ];
 
@@ -91,10 +96,12 @@ const Toolbar = ({ mindmapId }: { mindmapId: string }) => {
         return 'Vertical Balanced';
       case LAYOUT_TYPE.RIGHT_ONLY:
         return 'Right Only';
-      case LAYOUT_TYPE.ORG_CHART:
-        return 'Org Chart';
-      case LAYOUT_TYPE.RADIAL:
-        return 'Radial';
+      case LAYOUT_TYPE.LEFT_ONLY:
+        return 'Left Only';
+      case LAYOUT_TYPE.BOTTOM_ONLY:
+        return 'Bottom Only';
+      case LAYOUT_TYPE.TOP_ONLY:
+        return 'Top Only';
       default:
         return 'None';
     }

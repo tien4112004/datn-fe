@@ -163,23 +163,32 @@ export const LAYOUT_CONFIGS: Record<LayoutType, LayoutConfig> = {
     defaultSide: 'right',
     isRadial: false,
   },
-  [LAYOUT_TYPE.ORG_CHART]: {
+  [LAYOUT_TYPE.LEFT_ONLY]: {
+    sourceHandles: ['left'],
+    targetHandles: ['right'],
+    orderAxis: 'y',
+    orderDirection: 'ascending',
+    allowedSides: ['left'],
+    defaultSide: 'left',
+    isRadial: false,
+  },
+  [LAYOUT_TYPE.BOTTOM_ONLY]: {
     sourceHandles: ['bottom'],
     targetHandles: ['top'],
     orderAxis: 'x',
     orderDirection: 'ascending',
-    allowedSides: ['right'], // We use 'right' to mean 'below' in org chart
-    defaultSide: 'right',
+    allowedSides: ['bottom'],
+    defaultSide: 'bottom',
     isRadial: false,
   },
-  [LAYOUT_TYPE.RADIAL]: {
-    sourceHandles: ['top', 'bottom', 'left', 'right'],
-    targetHandles: ['top', 'bottom', 'left', 'right'],
-    orderAxis: 'angle',
-    orderDirection: 'ascending', // Clockwise from top
-    allowedSides: ['left', 'right', 'mid'],
-    defaultSide: 'right',
-    isRadial: true,
+  [LAYOUT_TYPE.TOP_ONLY]: {
+    sourceHandles: ['top'],
+    targetHandles: ['bottom'],
+    orderAxis: 'x',
+    orderDirection: 'ascending',
+    allowedSides: ['top'],
+    defaultSide: 'top',
+    isRadial: false,
   },
   [LAYOUT_TYPE.NONE]: {
     sourceHandles: ['left', 'right'],
@@ -208,7 +217,8 @@ export const LAYOUT_TYPE_TO_DIRECTION: Record<LayoutType, string> = {
   [LAYOUT_TYPE.HORIZONTAL_BALANCED]: 'horizontal',
   [LAYOUT_TYPE.VERTICAL_BALANCED]: 'vertical',
   [LAYOUT_TYPE.RIGHT_ONLY]: 'horizontal', // Fallback
-  [LAYOUT_TYPE.ORG_CHART]: 'vertical', // Fallback
-  [LAYOUT_TYPE.RADIAL]: 'horizontal', // Fallback
+  [LAYOUT_TYPE.LEFT_ONLY]: 'horizontal', // Fallback
+  [LAYOUT_TYPE.BOTTOM_ONLY]: 'vertical', // Fallback
+  [LAYOUT_TYPE.TOP_ONLY]: 'vertical', // Fallback
   [LAYOUT_TYPE.NONE]: '',
 };

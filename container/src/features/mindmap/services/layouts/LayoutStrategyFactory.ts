@@ -2,8 +2,11 @@ import type { LayoutStrategy, LayoutType, LayoutResult, LayoutOptions } from '..
 import type { MindMapNode, MindMapEdge } from '../../types';
 import { LAYOUT_TYPE, DIRECTION, MINDMAP_TYPES } from '../../types';
 import { rightOnlyLayoutStrategy } from './RightOnlyLayoutStrategy';
-import { orgChartLayoutStrategy } from './OrgChartLayoutStrategy';
-import { radialLayoutStrategy } from './RadialLayoutStrategy';
+import { leftOnlyLayoutStrategy } from './LeftOnlyLayoutStrategy';
+import { bottomOnlyLayoutStrategy } from './BottomOnlyLayoutStrategy';
+import { topOnlyLayoutStrategy } from './TopOnlyLayoutStrategy';
+import { horizontalBalancedLayoutStrategy } from './HorizontalBalancedLayoutStrategy';
+import { verticalBalancedLayoutStrategy } from './VerticalBalancedLayoutStrategy';
 import { d3LayoutService } from '../D3LayoutService';
 
 /**
@@ -18,8 +21,11 @@ class LayoutStrategyFactory {
 
     // Register all layout strategies
     this.register(rightOnlyLayoutStrategy);
-    this.register(orgChartLayoutStrategy);
-    this.register(radialLayoutStrategy);
+    this.register(leftOnlyLayoutStrategy);
+    this.register(bottomOnlyLayoutStrategy);
+    this.register(topOnlyLayoutStrategy);
+    this.register(horizontalBalancedLayoutStrategy);
+    this.register(verticalBalancedLayoutStrategy);
   }
 
   /**
@@ -54,13 +60,10 @@ class LayoutStrategyFactory {
 
   /**
    * Checks if a layout type uses legacy direction-based layout.
+   * Now only NONE layout is considered legacy since we have dedicated strategies for all others.
    */
   isLegacyLayout(type: LayoutType): boolean {
-    return (
-      type === LAYOUT_TYPE.HORIZONTAL_BALANCED ||
-      type === LAYOUT_TYPE.VERTICAL_BALANCED ||
-      type === LAYOUT_TYPE.NONE
-    );
+    return type === LAYOUT_TYPE.NONE;
   }
 
   /**

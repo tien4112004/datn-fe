@@ -1,10 +1,10 @@
 import { API_MODE, type ApiMode } from '@/shared/constants';
 import type { AuthApiService } from '../types';
-import type { LoginRequest, LoginResponse, SignupRequest, SignupResponse, User } from '@/shared/types/auth';
+import type { LoginRequest, SignupRequest, SignupResponse, User } from '@/shared/types/auth';
 import { ExpectedError } from '@/shared/types/errors';
 import { ERROR_TYPE } from '@/shared/constants';
-import { generateMockTokens, createMockUser } from './mock-data';
-import { setTokens, setUserData, clearAuthData } from '@/shared/context/auth';
+import { createMockUser } from './mock-data';
+import { setUserData, clearAuthData } from '@/shared/context/auth';
 
 export default class AuthMockService implements AuthApiService {
   baseUrl: string;
@@ -20,8 +20,9 @@ export default class AuthMockService implements AuthApiService {
   /**
    * Mock login - simulates API call to backend
    * Always succeeds with any credentials (no validation)
+   * Authentication is simulated via localStorage (in real app, backend sets HttpOnly cookies)
    */
-  async login(request: LoginRequest): Promise<LoginResponse> {
+  async login(request: LoginRequest): Promise<void> {
     // Simulate network delay
     await new Promise((resolve) => setTimeout(resolve, 500));
 
@@ -33,20 +34,8 @@ export default class AuthMockService implements AuthApiService {
       avatar: 'https://github.com/shadcn.png',
     };
 
-    // Generate mock tokens
-    const { accessToken, refreshToken } = generateMockTokens();
-
-    // Store tokens and user data (user data is stored for getCurrentUser to work)
-    setTokens(accessToken, refreshToken);
+    // Store user data (simulates backend setting cookies + returning user)
     setUserData(mockUser);
-
-    // Return tokens only (matching new API spec)
-    return {
-      access_token: accessToken,
-      refresh_token: refreshToken,
-      token_type: 'Bearer',
-      expires_in: 3600,
-    };
   }
 
   /**
@@ -114,21 +103,5 @@ export default class AuthMockService implements AuthApiService {
     }
 
     return JSON.parse(userJson);
-  }
-
-  /**
-   * Mock refresh token - simulates refreshing access token
-   */
-  async refreshToken(_refreshToken: string): Promise<{ accessToken: string }> {
-    // Simulate network delay
-    await new Promise((resolve) => setTimeout(resolve, 300));
-
-    // Generate new mock access token
-    const { accessToken } = generateMockTokens();
-
-    // Store new access token
-    localStorage.setItem('accessToken', accessToken);
-
-    return { accessToken };
   }
 }

@@ -1,8 +1,8 @@
 import { API_MODE, type ApiMode } from '@/shared/constants';
 import type { AuthApiService } from '../types';
-import type { LoginRequest, LoginResponse, SignupRequest, SignupResponse, User } from '@/shared/types/auth';
+import type { LoginRequest, SignupRequest, SignupResponse, User } from '@/shared/types/auth';
 import { api } from '@/shared/api';
-import { setTokens, setUserData, clearAuthData } from '@/shared/context/auth';
+import { setUserData, clearAuthData } from '@/shared/context/auth';
 
 export default class AuthRealApiService implements AuthApiService {
   baseUrl: string;
@@ -17,16 +17,12 @@ export default class AuthRealApiService implements AuthApiService {
 
   /**
    * Login user with real API call
+   * Authentication tokens are set as HttpOnly cookies by the backend
    */
-  async login(request: LoginRequest): Promise<LoginResponse> {
-    const response = await api.post<{ data: LoginResponse }>(`${this.baseUrl}/api/auth/signin`, request);
-
-    const { access_token, refresh_token } = response.data.data;
-
-    // Store tokens
-    setTokens(access_token, refresh_token);
-
-    return response.data.data;
+  async login(request: LoginRequest): Promise<void> {
+    await api.post(`${this.baseUrl}/api/auth/signin`, request);
+    // Backend sets HttpOnly cookies automatically
+    // No need to handle tokens on frontend
   }
 
   /**
@@ -55,16 +51,9 @@ export default class AuthRealApiService implements AuthApiService {
   async getCurrentUser(): Promise<User> {
     const response = await api.get<{ data: User }>(`${this.baseUrl}/api/user/me`);
 
-    // Store user data in localStorage
+    // Store user data in localStorage for persistence across page reloads
     setUserData(response.data.data);
 
     return response.data.data;
-  }
-
-  /**
-   * Refresh access token
-   */
-  async refreshToken(_refreshToken: string): Promise<{ accessToken: string }> {
-    throw new Error('Token refresh endpoint not implemented. Please sign in again.');
   }
 }

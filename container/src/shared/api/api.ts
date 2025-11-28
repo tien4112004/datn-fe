@@ -2,7 +2,6 @@ import axios, { type AxiosInstance } from 'axios';
 import { CriticalError, ExpectedError } from '@/shared/types/errors';
 import { ERROR_TYPE } from '@/shared/constants';
 import { toast } from 'sonner';
-import { getAccessToken } from '@/shared/context/auth';
 
 interface StreamableAxiosInstance extends AxiosInstance {
   stream: (url: string, request: any, signal: AbortSignal) => Promise<Response>;
@@ -10,46 +9,43 @@ interface StreamableAxiosInstance extends AxiosInstance {
 
 const api: StreamableAxiosInstance = axios.create({
   allowAbsoluteUrls: true,
+  withCredentials: true, // Enable sending cookies with requests (HttpOnly cookies contain auth tokens)
   headers: {
     'Content-Type': 'application/json',
   },
 }) as StreamableAxiosInstance;
 
-// Request interceptor to add authorization token
-api.interceptors.request.use(
-  (config) => {
-    const token = getAccessToken();
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
-
 api.stream = async function (url: string, request: any, signal: AbortSignal) {
   try {
-    const token = getAccessToken();
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       Accept: 'text/plain',
     };
-
-    if (token) {
-      headers.Authorization = `Bearer ${token}`;
-    }
 
     const response = await fetch(url, {
       method: 'POST',
       headers,
       body: JSON.stringify(request),
       signal,
+      credentials: 'include', // Send HttpOnly cookies with fetch requests
     });
 
     // Handle HTTP error status codes
     if (!response.ok) {
+      // Handle 401 Unauthorized - dispatch event to clear auth
+      if (response.status === 401) {
+        window.dispatchEvent(new CustomEvent('auth:unauthorized'));
+
+        const error = new ExpectedError('Session expired. Please login again.', ERROR_TYPE.API_ERROR, '401', {
+          status: response.status,
+          statusText: response.statusText,
+          url: response.url,
+        });
+
+        console.error(error);
+        throw error;
+      }
+
       // Handle expected errors (4xx status codes)
       if (response.status >= 400 && response.status < 500) {
         let errorMessage = 'An error occurred';

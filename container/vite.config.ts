@@ -51,6 +51,14 @@ export default defineConfig(({ mode }) => {
         '@ui': path.resolve(__dirname, './src/shared/components/ui'),
       },
     },
+    optimizeDeps: {
+      esbuildOptions: {
+        target: 'esnext',
+        supported: {
+          'top-level-await': true,
+        },
+      },
+    },
     preview: {
       allowedHosts: ['*'],
     },

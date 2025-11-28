@@ -18,6 +18,15 @@ export default {
     signUp: 'Đăng ký',
     welcomeBack: 'Chào mừng trở lại, {{name}}!',
     googleComingSoon: 'Đăng nhập bằng Google sắp ra mắt!',
+    loginFailed: 'Đăng nhập thất bại. Vui lòng kiểm tra thông tin đăng nhập và thử lại.',
+    googleSignInSuccess: 'Đăng nhập bằng Google thành công',
+    googleSignInFailed: 'Không thể hoàn tất đăng nhập. Vui lòng thử lại.',
+  },
+  googleCallback: {
+    completingSignIn: 'Đang hoàn tất đăng nhập...',
+    redirecting: 'Đang chuyển hướng...',
+    pleaseWait: 'Vui lòng đợi trong khi chúng tôi thiết lập tài khoản của bạn',
+    redirectShortly: 'Bạn sẽ được chuyển hướng trong giây lát',
   },
   register: {
     title: 'Tạo tài khoản',
@@ -32,7 +41,7 @@ export default {
     emailPlaceholder: 'ten@example.com',
     dateOfBirth: 'Ngày sinh',
     dateOfBirthPlaceholder: 'Chọn ngày',
-    phoneNumber: 'Số điện thoại (Tùy chọn)',
+    phoneNumber: 'Số điện thoại',
     phoneNumberPlaceholder: '+84123456789',
     password: 'Mật khẩu',
     passwordPlaceholder: 'Tạo mật khẩu mạnh',
@@ -62,5 +71,6 @@ export default {
     dateOfBirthInvalid: 'Vui lòng chọn ngày hợp lệ',
     ageRequirement: 'Bạn phải ít nhất 13 tuổi',
     phoneNumberInvalid: 'Vui lòng nhập số điện thoại hợp lệ',
+    nameAlphabetOnly: 'Tên chỉ được chứa ký tự chữ cái',
   },
 };

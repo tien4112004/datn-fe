@@ -9,7 +9,8 @@ import {
   horizontalBalancedLayoutStrategy,
   verticalBalancedLayoutStrategy,
 } from './directionalLayoutStrategies';
-import { d3LayoutService } from '../D3LayoutService';
+import { updateSiblingOrdersFromPositions } from './SiblingOrderService';
+import { getSubtreeNodes } from './treeUtils';
 
 /**
  * Factory for managing layout strategies.
@@ -98,7 +99,9 @@ class LayoutStrategyFactory {
 
   /**
    * Performs layout calculation using the appropriate strategy.
-   * Falls back to legacy D3LayoutService for horizontal/vertical layouts.
+   *
+   * IMPORTANT: Updates sibling orders from current positions BEFORE layout
+   * to preserve relative positions of nodes.
    */
   async calculateLayout(
     layoutType: LayoutType,
@@ -107,26 +110,29 @@ class LayoutStrategyFactory {
     edges: MindMapEdge[],
     options: LayoutOptions
   ): Promise<LayoutResult> {
-    // Use legacy service for horizontal/vertical balanced layouts
-    if (this.isLegacyLayout(layoutType)) {
-      const direction = this.toDirection(layoutType);
-      return d3LayoutService.layoutSubtree(rootNode, descendants, edges, direction as any);
-    }
+    // Step 1: Update sibling orders from current positions to preserve relative layout
+    const allNodes = [rootNode, ...descendants];
+    const nodesWithUpdatedOrder = updateSiblingOrdersFromPositions(allNodes, layoutType);
+    const updatedRoot = nodesWithUpdatedOrder.find((n) => n.id === rootNode.id) || rootNode;
+    const updatedDescendants = nodesWithUpdatedOrder.filter((n) => n.id !== rootNode.id);
 
-    // Use dedicated strategy for new layout types
+    // Use dedicated strategy for layout types
     const strategy = this.getStrategy(layoutType);
     if (strategy) {
-      return strategy.calculateLayout(rootNode, descendants, edges, options);
+      return strategy.calculateLayout(updatedRoot, updatedDescendants, edges, options);
     }
 
-    // Fallback: return nodes unchanged
+    // Fallback: return nodes unchanged for NONE layout type
     console.warn(`No strategy found for layout type: ${layoutType}`);
-    return { nodes: [rootNode, ...descendants], edges };
+    return { nodes: [updatedRoot, ...updatedDescendants], edges };
   }
 
   /**
    * Performs layout for all trees in a mindmap.
    * This is the main entry point for full mindmap layout.
+   *
+   * IMPORTANT: Updates sibling orders from current positions BEFORE layout
+   * to preserve relative positions of nodes.
    */
   async layoutAllTrees(
     layoutType: LayoutType,
@@ -134,27 +140,29 @@ class LayoutStrategyFactory {
     edges: MindMapEdge[],
     options: LayoutOptions
   ): Promise<LayoutResult> {
-    // Use legacy service for horizontal/vertical balanced layouts
+    // Step 1: Update sibling orders from current positions to preserve relative layout
+    const nodesWithUpdatedOrder = updateSiblingOrdersFromPositions(nodes, layoutType);
+
+    // For NONE layout type, just return nodes as-is
     if (this.isLegacyLayout(layoutType)) {
-      const direction = this.toDirection(layoutType);
-      return d3LayoutService.layoutAllTrees(nodes, edges, direction as any);
+      return { nodes: nodesWithUpdatedOrder, edges };
     }
 
-    // For new layout types, find root nodes and layout each tree
-    const rootNodes = nodes.filter((node) => node.type === MINDMAP_TYPES.ROOT_NODE);
+    // Find root nodes and layout each tree
+    const rootNodes = nodesWithUpdatedOrder.filter((node) => node.type === MINDMAP_TYPES.ROOT_NODE);
 
     if (rootNodes.length === 0) {
       console.warn('No root nodes found');
-      return { nodes, edges };
+      return { nodes: nodesWithUpdatedOrder, edges };
     }
 
     let allLayoutedNodes: MindMapNode[] = [];
     let allLayoutedEdges: MindMapEdge[] = [];
 
     for (const rootNode of rootNodes) {
-      const descendantNodes = d3LayoutService
-        .getSubtreeNodes(rootNode.id, nodes)
-        .filter((node) => node.id !== rootNode.id);
+      const descendantNodes = getSubtreeNodes(rootNode.id, nodesWithUpdatedOrder).filter(
+        (node) => node.id !== rootNode.id
+      );
 
       const treeNodeIds = new Set([rootNode.id, ...descendantNodes.map((n) => n.id)]);
       const treeEdges = edges.filter((edge) => treeNodeIds.has(edge.source) && treeNodeIds.has(edge.target));
@@ -173,7 +181,7 @@ class LayoutStrategyFactory {
 
     // Handle orphaned nodes and edges
     const processedNodeIds = new Set(allLayoutedNodes.map((n) => n.id));
-    const orphanedNodes = nodes.filter((node) => !processedNodeIds.has(node.id));
+    const orphanedNodes = nodesWithUpdatedOrder.filter((node) => !processedNodeIds.has(node.id));
     allLayoutedNodes.push(...orphanedNodes);
 
     const processedEdgeIds = new Set(allLayoutedEdges.map((e) => e.id));

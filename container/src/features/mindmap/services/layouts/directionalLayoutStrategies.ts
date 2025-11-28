@@ -11,12 +11,19 @@ import type {
   MindMapEdge,
   Side,
 } from '../../types';
-import { LAYOUT_CONFIGS, LAYOUT_TYPE, SIDE, DIRECTION } from '../../types';
+import { LAYOUT_CONFIGS, LAYOUT_TYPE, SIDE } from '../../types';
 import { siblingOrderService } from './SiblingOrderService';
-import { d3LayoutService } from '../D3LayoutService';
 import { layoutTransitionService } from './LayoutTransitionService';
-import { calculateHorizontalLayout, type HorizontalLayoutConfig } from './horizontalLayoutUtils';
-import { calculateVerticalLayout, type VerticalLayoutConfig } from './verticalLayoutUtils';
+import {
+  calculateHorizontalLayout,
+  calculateBalancedHorizontalLayout,
+  type HorizontalLayoutConfig,
+} from './horizontalLayoutUtils';
+import {
+  calculateVerticalLayout,
+  calculateBalancedVerticalLayout,
+  type VerticalLayoutConfig,
+} from './verticalLayoutUtils';
 
 // ============================================================================
 // Layout Configurations
@@ -205,7 +212,7 @@ export const horizontalBalancedLayoutStrategy: LayoutStrategy = {
     rootNode: MindMapNode,
     descendants: MindMapNode[],
     edges: MindMapEdge[],
-    _options: LayoutOptions
+    options: LayoutOptions
   ): Promise<LayoutResult> => {
     const allNodes = [rootNode, ...descendants];
 
@@ -215,18 +222,23 @@ export const horizontalBalancedLayoutStrategy: LayoutStrategy = {
 
     // Assign sides to nodes using the transition service
     const nodesWithSides = layoutTransitionService.assignSides(allNodes, LAYOUT_TYPE.HORIZONTAL_BALANCED);
+    const rootWithSides = nodesWithSides.find((n) => n.id === rootNode.id) || rootNode;
+    const descendantsWithSides = nodesWithSides.filter((n) => n.id !== rootNode.id);
 
-    // Use D3LayoutService for positioning
-    const { nodes: layoutedNodes, edges: layoutedEdges } = await d3LayoutService.layoutSubtree(
-      nodesWithSides.find((n) => n.id === rootNode.id) || rootNode,
-      nodesWithSides.filter((n) => n.id !== rootNode.id),
+    // Use balanced horizontal layout function
+    const { nodes: layoutedNodes } = calculateBalancedHorizontalLayout(
+      rootWithSides,
+      descendantsWithSides,
       edges,
-      DIRECTION.HORIZONTAL
+      {
+        horizontalSpacing: options.horizontalSpacing ?? 200,
+        verticalSpacing: options.verticalSpacing ?? 80,
+      }
     );
 
     // Update edge handles
     const updatedEdges = updateEdgeHandles(
-      layoutedEdges,
+      edges,
       layoutedNodes,
       horizontalBalancedLayoutStrategy.getEdgeHandles
     );
@@ -277,7 +289,7 @@ export const verticalBalancedLayoutStrategy: LayoutStrategy = {
     rootNode: MindMapNode,
     descendants: MindMapNode[],
     edges: MindMapEdge[],
-    _options: LayoutOptions
+    options: LayoutOptions
   ): Promise<LayoutResult> => {
     const allNodes = [rootNode, ...descendants];
 
@@ -287,47 +299,28 @@ export const verticalBalancedLayoutStrategy: LayoutStrategy = {
 
     // Assign sides (TOP/BOTTOM) to nodes
     const nodesWithSides = layoutTransitionService.assignSides(allNodes, LAYOUT_TYPE.VERTICAL_BALANCED);
+    const rootWithSides = nodesWithSides.find((n) => n.id === rootNode.id) || rootNode;
+    const descendantsWithSides = nodesWithSides.filter((n) => n.id !== rootNode.id);
 
-    // Convert TOP/BOTTOM to LEFT/RIGHT for D3LayoutService compatibility
-    const convertSideForD3 = (side: Side): Side => {
-      if (side === SIDE.TOP) return SIDE.LEFT;
-      if (side === SIDE.BOTTOM) return SIDE.RIGHT;
-      return side;
-    };
-
-    const convertSideFromD3 = (side: Side): Side => {
-      if (side === SIDE.LEFT) return SIDE.TOP;
-      if (side === SIDE.RIGHT) return SIDE.BOTTOM;
-      return side;
-    };
-
-    const nodesForD3 = nodesWithSides.map((node) => ({
-      ...node,
-      data: { ...node.data, side: convertSideForD3(node.data.side) },
-    }));
-
-    // Use D3LayoutService for positioning
-    const { nodes: layoutedNodes } = await d3LayoutService.layoutSubtree(
-      nodesForD3.find((n) => n.id === rootNode.id) || rootNode,
-      nodesForD3.filter((n) => n.id !== rootNode.id),
+    // Use balanced vertical layout function
+    const { nodes: layoutedNodes } = calculateBalancedVerticalLayout(
+      rootWithSides,
+      descendantsWithSides,
       edges,
-      DIRECTION.VERTICAL
+      {
+        horizontalSpacing: options.horizontalSpacing ?? 200,
+        verticalSpacing: options.verticalSpacing ?? 80,
+      }
     );
-
-    // Convert sides back to TOP/BOTTOM
-    const nodesWithCorrectSides = layoutedNodes.map((node) => ({
-      ...node,
-      data: { ...node.data, side: convertSideFromD3(node.data.side) },
-    }));
 
     // Update edge handles
     const updatedEdges = updateEdgeHandles(
       edges,
-      nodesWithCorrectSides,
+      layoutedNodes,
       verticalBalancedLayoutStrategy.getEdgeHandles
     );
 
-    return { nodes: nodesWithCorrectSides, edges: updatedEdges };
+    return { nodes: layoutedNodes, edges: updatedEdges };
   },
 
   inferOrderFromPositions: (

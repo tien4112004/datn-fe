@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import type { Mindmap } from '../types';
 import type { ApiResponse } from '@/shared/types/api';
 import { ExpectedError } from '@/types/errors';
-import { useMetadataStore } from '../stores';
+import { useMetadataStore, useLayoutStore } from '../stores';
 import { DRAGHANDLE } from '../types';
 
 // Return types for the hooks
@@ -200,18 +200,23 @@ export const useUpdateMindmapWithMetadata = () => {
   const queryClient = useQueryClient();
   const getMetadata = useMetadataStore((state) => state.getMetadata);
   const getThumbnail = useMetadataStore((state) => state.getThumbnail);
+  const layoutType = useLayoutStore((state) => state.layoutType);
+  const isAutoLayoutEnabled = useLayoutStore((state) => state.isAutoLayoutEnabled);
 
   return useMutation({
     mutationFn: async ({ id, data }: { id: string; data: Partial<Mindmap> }) => {
       // Include metadata from store in the update payload
-      const metadata = getMetadata();
+      const metadata = getMetadata() || {};
       const updateData: Partial<Mindmap> = {
         ...data,
       };
 
-      if (metadata) {
-        updateData.metadata = metadata;
-      }
+      // Include layoutType and auto layout state in metadata
+      updateData.metadata = {
+        ...metadata,
+        layoutType,
+        forceLayout: isAutoLayoutEnabled,
+      };
 
       const thumbnail = getThumbnail();
       if (thumbnail) {

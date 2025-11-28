@@ -1,6 +1,6 @@
 import type { MindMapNode, MindMapEdge, Side } from '../../types';
 import type { LayoutResult, LayoutOptions, EdgeHandleInfo } from '../../types';
-import { MINDMAP_TYPES } from '../../types';
+import { MINDMAP_TYPES, SIDE } from '../../types';
 import * as d3 from 'd3';
 
 // ============================================================================
@@ -310,4 +310,134 @@ export const calculateHorizontalLayout = async (
   const updatedEdges = updateEdgeHandles(edges, layoutedNodes, getHandles);
 
   return { nodes: layoutedNodes, edges: updatedEdges };
+};
+
+// ============================================================================
+// Balanced Horizontal Layout
+// ============================================================================
+
+/**
+ * Builds a hierarchy for nodes on a specific side of the root.
+ */
+const buildSideHierarchy = (rootNode: MindMapNode, descendants: MindMapNode[], side: Side): HierarchyNode => {
+  // Filter level 1 nodes for this side
+  const level1Nodes = descendants.filter((n) => n.data.level === 1 && n.data.side === side);
+
+  // Build children map (sorted by siblingOrder)
+  const childrenMap = groupByParent(descendants);
+
+  // Build children for root on this side
+  const children = sortBySiblingOrder(level1Nodes).map((child) => buildSubtree(child, childrenMap));
+
+  return {
+    originalNode: rootNode,
+    children,
+  };
+};
+
+/**
+ * Processes a side hierarchy and positions nodes.
+ */
+const processBalancedSideHierarchy = (
+  tree: HierarchyNode,
+  side: Side,
+  rootNode: MindMapNode,
+  rootX: number,
+  rootY: number,
+  horizontalSpacing: number,
+  verticalSpacing: number
+): MindMapNode[] => {
+  if (!tree.children || tree.children.length === 0) {
+    return [];
+  }
+
+  const hierarchy = d3.hierarchy<HierarchyNode>(tree) as D3HierarchyNode;
+  preprocessHierarchy(hierarchy);
+
+  // Calculate subtree heights
+  hierarchy.eachAfter((node: D3HierarchyNode) => {
+    node.subtreeHeight = calculateSubtreeHeight(node, verticalSpacing);
+  });
+
+  const xDirection = side === SIDE.LEFT ? -1 : 1;
+
+  // Position all nodes
+  positionHorizontalHierarchy(
+    hierarchy,
+    rootX,
+    rootY,
+    rootNode,
+    horizontalSpacing,
+    verticalSpacing,
+    xDirection
+  );
+
+  // Adjust spacing
+  adjustVerticalSpacing(hierarchy, verticalSpacing);
+
+  // Collect positioned nodes (excluding root, will be added separately)
+  const layoutedNodes: MindMapNode[] = [];
+
+  hierarchy.each((node: D3HierarchyNode) => {
+    const originalNode = node.data.originalNode;
+    if (originalNode && originalNode.id !== rootNode.id) {
+      layoutedNodes.push({
+        ...originalNode,
+        position: { x: node.x, y: node.y },
+      });
+    }
+  });
+
+  return layoutedNodes;
+};
+
+/**
+ * Calculates a balanced horizontal layout with nodes on both LEFT and RIGHT sides.
+ */
+export const calculateBalancedHorizontalLayout = (
+  rootNode: MindMapNode,
+  descendants: MindMapNode[],
+  edges: MindMapEdge[],
+  options: { horizontalSpacing: number; verticalSpacing: number }
+): LayoutResult => {
+  const { horizontalSpacing, verticalSpacing } = options;
+  const rootX = rootNode.position?.x ?? 0;
+  const rootY = rootNode.position?.y ?? 0;
+
+  // Build and process left side
+  const leftTree = buildSideHierarchy(rootNode, descendants, SIDE.LEFT);
+  const leftNodes = processBalancedSideHierarchy(
+    leftTree,
+    SIDE.LEFT,
+    rootNode,
+    rootX,
+    rootY,
+    horizontalSpacing,
+    verticalSpacing
+  );
+
+  // Build and process right side
+  const rightTree = buildSideHierarchy(rootNode, descendants, SIDE.RIGHT);
+  const rightNodes = processBalancedSideHierarchy(
+    rightTree,
+    SIDE.RIGHT,
+    rootNode,
+    rootX,
+    rootY,
+    horizontalSpacing,
+    verticalSpacing
+  );
+
+  // Combine results: root + left + right
+  const layoutedNodes: MindMapNode[] = [
+    {
+      ...rootNode,
+      position: { x: rootX, y: rootY },
+      data: { ...rootNode.data, side: 'mid' as Side },
+    },
+    ...leftNodes,
+    ...rightNodes,
+  ];
+
+  return { nodes: layoutedNodes, edges };
 };

@@ -18,6 +18,7 @@ const MindmapPage = () => {
   const setNodes = useCoreStore((state) => state.setNodes);
   const setEdges = useCoreStore((state) => state.setEdges);
   const setLayout = useLayoutStore((state) => state.setLayout);
+  const setLayoutType = useLayoutStore((state) => state.setLayoutType);
   const setAutoLayoutEnabled = useLayoutStore((state) => state.setAutoLayoutEnabled);
   const setMetadata = useMetadataStore((state) => state.setMetadata);
 
@@ -39,8 +40,11 @@ const MindmapPage = () => {
       if (mindmap.metadata) {
         setMetadata(mindmap.metadata);
 
-        // Sync direction to layout store
-        if (mindmap.metadata.direction) {
+        // Sync layout type to layout store (prefer layoutType over legacy direction)
+        if (mindmap.metadata.layoutType) {
+          setLayoutType(mindmap.metadata.layoutType);
+        } else if (mindmap.metadata.direction) {
+          // Fallback to legacy direction for backward compatibility
           setLayout(mindmap.metadata.direction);
         }
 
@@ -49,7 +53,7 @@ const MindmapPage = () => {
         }
       }
     }
-  }, [mindmap, setNodes, setEdges, setLayout, setMetadata]);
+  }, [mindmap, setNodes, setEdges, setLayout, setLayoutType, setMetadata, setAutoLayoutEnabled]);
 
   const togglePanOnDrag = () => {
     setIsPanOnDrag(!isPanOnDrag);

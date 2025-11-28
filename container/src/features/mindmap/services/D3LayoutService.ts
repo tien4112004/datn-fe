@@ -1,3 +1,19 @@
+/**
+ * @deprecated This service is deprecated and will be removed in a future version.
+ *
+ * Use the new functional layout utilities from './layouts' instead:
+ * - `calculateHorizontalLayout` / `calculateBalancedHorizontalLayout` from './layouts/horizontalLayoutUtils'
+ * - `calculateVerticalLayout` / `calculateBalancedVerticalLayout` from './layouts/verticalLayoutUtils'
+ * - `getSubtreeNodes` / `findRootNodes` from './layouts/treeUtils'
+ * - `layoutStrategyFactory` from './layouts/LayoutStrategyFactory'
+ *
+ * The new functional approach provides:
+ * - Pure functions instead of class methods
+ * - Better tree-shaking and code splitting
+ * - Easier testing and composition
+ * - Consistent with modern JavaScript best practices
+ */
+
 import type { Direction, Side, MindMapEdge, MindMapNode } from '../types';
 import { MINDMAP_TYPES, DIRECTION, SIDE } from '../types';
 import * as d3 from 'd3';
@@ -17,6 +33,9 @@ type D3HierarchyNode = d3.HierarchyNode<HierarchyNode> & {
   parent?: D3HierarchyNode | null;
 };
 
+/**
+ * @deprecated Use the functional layout utilities from './layouts' instead.
+ */
 class D3LayoutService {
   /**
    * Calculates the total height required for a subtree including all its children

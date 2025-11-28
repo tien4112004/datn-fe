@@ -14,6 +14,8 @@ export const useReactFlowIntegration = () => {
   const addChildNode = useNodeOperationsStore((state) => state.addChildNode);
 
   const updateLayout = useLayoutStore((state) => state.updateLayout);
+  const isAutoLayoutEnabled = useLayoutStore((state) => state.isAutoLayoutEnabled);
+  const applyAutoLayout = useLayoutStore((state) => state.applyAutoLayout);
   const setMousePosition = useClipboardStore((state) => state.setMousePosition);
   const setDragTarget = useClipboardStore((state) => state.setDragTarget);
   const setMouseOverNodeId = useClipboardStore((state) => state.setMouseOverNodeId);
@@ -89,18 +91,33 @@ export const useReactFlowIntegration = () => {
 
       setDragTarget(null);
 
-      if (intersections.length === 0) return;
+      // If there's an intersection, move node to be a child of the target
+      if (intersections.length > 0) {
+        const targetNodeId = intersections[0];
+        if (targetNodeId !== node.id) {
+          const targetNode = getNode(targetNodeId);
+          if (targetNode) {
+            const side = determineSideFromPosition(node, targetNode);
+            moveToChild(node.id, targetNodeId, side);
+            return; // moveToChild will handle layout if needed
+          }
+        }
+      }
 
-      const targetNodeId = intersections[0];
-      if (targetNodeId === node.id) return;
-
-      const targetNode = getNode(targetNodeId);
-      if (!targetNode) return;
-
-      const side = determineSideFromPosition(node, targetNode);
-      moveToChild(node.id, targetNodeId, side);
+      // If auto layout is enabled, apply layout after dropping node
+      if (isAutoLayoutEnabled) {
+        applyAutoLayout();
+      }
     },
-    [getIntersectingNodes, getNode, moveToChild, determineSideFromPosition, setDragTarget]
+    [
+      getIntersectingNodes,
+      getNode,
+      moveToChild,
+      determineSideFromPosition,
+      setDragTarget,
+      isAutoLayoutEnabled,
+      applyAutoLayout,
+    ]
   );
 
   const onConnectEnd = useCallback(

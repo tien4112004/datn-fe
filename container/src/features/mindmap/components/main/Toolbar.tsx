@@ -29,10 +29,14 @@ const Toolbar = ({ mindmapId }: { mindmapId: string }) => {
   const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<string>('general');
 
-  // Auto-switch to general tab when selection is cleared
+  // Auto-switch to general tab when selection is cleared or to selection tab when selection exists
   useEffect(() => {
     if (!hasSelection && activeTab === 'selection') {
       setActiveTab('general');
+    }
+
+    if (hasSelection && activeTab === 'general') {
+      setActiveTab('selection');
     }
   }, [hasSelection, activeTab]);
 

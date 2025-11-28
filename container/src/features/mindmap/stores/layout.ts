@@ -4,8 +4,8 @@ import type { MindMapEdge, MindMapNode, Direction, LayoutType, LayoutOptions } f
 import { LAYOUT_TYPE } from '../types';
 import { useCoreStore } from './core';
 import { devtools } from 'zustand/middleware';
-import { d3LayoutService } from '../services/D3LayoutService';
 import { layoutStrategyFactory } from '../services/layouts/LayoutStrategyFactory';
+import { getSubtreeNodes } from '../services/layouts/treeUtils';
 import { useUndoRedoStore } from './undoredo';
 
 interface AnimationData {
@@ -223,10 +223,13 @@ export const useLayoutStore = create<LayoutState>()(
         set({ isLayouting: true }, false, 'mindmap-layout/updateLayout');
 
         try {
-          const { nodes: layoutedNodes, edges: layoutedEdges } = await d3LayoutService.layoutAllTrees(
+          // Convert legacy direction to layoutType
+          const layoutType = layoutStrategyFactory.fromDirection(layoutDirection);
+          const { nodes: layoutedNodes, edges: layoutedEdges } = await layoutStrategyFactory.layoutAllTrees(
+            layoutType,
             nodes,
             edges,
-            layoutDirection
+            DEFAULT_LAYOUT_OPTIONS
           );
 
           setEdges([...layoutedEdges]);
@@ -265,20 +268,21 @@ export const useLayoutStore = create<LayoutState>()(
             return;
           }
 
-          const descendantNodes = d3LayoutService
-            .getSubtreeNodes(nodeId, nodes)
-            .filter((node) => node.id !== nodeId);
+          const descendantNodes = getSubtreeNodes(nodeId, nodes).filter((node) => node.id !== nodeId);
 
           const subtreeNodeIds = new Set([nodeId, ...descendantNodes.map((n) => n.id)]);
           const subtreeEdges = edges.filter(
             (edge) => subtreeNodeIds.has(edge.source) && subtreeNodeIds.has(edge.target)
           );
 
-          const { nodes: layoutedNodes, edges: layoutedEdges } = await d3LayoutService.layoutSubtree(
+          // Convert legacy direction to layoutType
+          const layoutType = layoutStrategyFactory.fromDirection(direction);
+          const { nodes: layoutedNodes, edges: layoutedEdges } = await layoutStrategyFactory.calculateLayout(
+            layoutType,
             rootNode,
             descendantNodes,
             subtreeEdges,
-            direction
+            DEFAULT_LAYOUT_OPTIONS
           );
 
           setEdges((prevEdges) => {
@@ -315,7 +319,7 @@ export const useLayoutStore = create<LayoutState>()(
       },
 
       applyAutoLayout: async () => {
-        const { layout, animateNodesToPositions } = get();
+        const { layoutType, animateNodesToPositions } = get();
         const nodes = useCoreStore.getState().nodes;
         const edges = useCoreStore.getState().edges;
         const setEdges = useCoreStore.getState().setEdges;
@@ -325,10 +329,11 @@ export const useLayoutStore = create<LayoutState>()(
         set({ isLayouting: true }, false, 'mindmap-layout/applyAutoLayout');
 
         try {
-          const { nodes: layoutedNodes, edges: layoutedEdges } = await d3LayoutService.layoutAllTrees(
+          const { nodes: layoutedNodes, edges: layoutedEdges } = await layoutStrategyFactory.layoutAllTrees(
+            layoutType,
             nodes,
             edges,
-            layout
+            DEFAULT_LAYOUT_OPTIONS
           );
 
           setEdges([...layoutedEdges]);

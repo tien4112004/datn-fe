@@ -50,11 +50,11 @@ export default function GoogleCallbackPage() {
         </div>
 
         <h1 className="mb-3 text-2xl font-semibold text-gray-800">
-          {isLoading ? 'Completing sign in...' : 'Redirecting...'}
+          {isLoading ? t('googleCallback.completingSignIn') : t('googleCallback.redirecting')}
         </h1>
 
         <p className="text-gray-600">
-          {isLoading ? 'Please wait while we set up your account' : 'You will be redirected shortly'}
+          {isLoading ? t('googleCallback.pleaseWait') : t('googleCallback.redirectShortly')}
         </p>
       </div>
     </div>

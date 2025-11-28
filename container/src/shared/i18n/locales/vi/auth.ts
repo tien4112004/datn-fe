@@ -22,6 +22,12 @@ export default {
     googleSignInSuccess: 'Đăng nhập bằng Google thành công',
     googleSignInFailed: 'Không thể hoàn tất đăng nhập. Vui lòng thử lại.',
   },
+  googleCallback: {
+    completingSignIn: 'Đang hoàn tất đăng nhập...',
+    redirecting: 'Đang chuyển hướng...',
+    pleaseWait: 'Vui lòng đợi trong khi chúng tôi thiết lập tài khoản của bạn',
+    redirectShortly: 'Bạn sẽ được chuyển hướng trong giây lát',
+  },
   register: {
     title: 'Tạo tài khoản',
     subtitle: 'Nhập thông tin của bạn để bắt đầu',

@@ -22,6 +22,12 @@ export default {
     googleSignInSuccess: 'Successfully signed in with Google',
     googleSignInFailed: 'Failed to complete sign in. Please try again.',
   },
+  googleCallback: {
+    completingSignIn: 'Completing sign in...',
+    redirecting: 'Redirecting...',
+    pleaseWait: 'Please wait while we set up your account',
+    redirectShortly: 'You will be redirected shortly',
+  },
   register: {
     title: 'Create an account',
     subtitle: 'Enter your information to get started',

@@ -47,18 +47,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  const login = async (_email: string, _password: string) => {
-    // This will be implemented by the auth service
-    // For now, this is just a placeholder
-    throw new Error('Login function should be overridden by auth service');
-  };
-
-  const register = async (_data: SignupRequest) => {
-    // This will be implemented by the auth service
-    // For now, this is just a placeholder
-    throw new Error('Register function should be overridden by auth service');
-  };
-
   const logout = () => {
     // Clear user state
     setUser(null);
@@ -72,8 +60,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     user,
     isAuthenticated: Boolean(user),
     isLoading,
-    login,
-    register,
     logout,
     setUser,
   };

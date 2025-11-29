@@ -13,6 +13,8 @@ export default {
     },
     actions: {
       addNode: 'Thêm nút',
+      addTree: 'Thêm cây',
+      generateTree: 'Tạo cây AI',
       deleteSelected: 'Xóa nút đã chọn',
       undo: 'Hoàn tác',
       redo: 'Làm lại',
@@ -64,6 +66,8 @@ export default {
     },
     tooltips: {
       addNode: 'Thêm nút mới',
+      addTree: 'Thêm cây mới (nút gốc)',
+      generateTree: 'Tạo sơ đồ tư duy bằng AI',
       deleteSelected: 'Xóa các nút đã chọn',
       undo: 'Hoàn tác (Ctrl+Z)',
       redo: 'Làm lại (Ctrl+Y)',
@@ -77,6 +81,33 @@ export default {
       saving: 'Đang lưu...',
       success: 'Lưu sơ đồ tư duy thành công',
       error: 'Lưu sơ đồ tư duy thất bại',
+    },
+  },
+  generate: {
+    title: 'Tạo Sơ đồ tư duy với AI',
+    prompt: {
+      title: 'Mô tả',
+      label: 'Mô tả sơ đồ tư duy của bạn',
+      placeholder:
+        'Ví dụ: Tạo sơ đồ tư duy về các phương pháp quản lý dự án tốt nhất, bao gồm các giai đoạn lập kế hoạch, thực hiện và giám sát...',
+      hint: 'Hãy cụ thể về các chủ đề và cấu trúc bạn muốn tạo.',
+    },
+    options: {
+      title: 'Tùy chọn',
+      maxDepth: 'Độ sâu tối đa',
+      maxDepthHint: 'Sơ đồ tư duy sẽ có bao nhiêu cấp độ (1-5)',
+      maxChildren: 'Số nút con tối đa',
+      maxChildrenHint: 'Số lượng nút con tối đa cho mỗi nút cha (2-10)',
+      includeDescriptions: 'Thêm mô tả',
+      includeDescriptionsHint: 'Thêm mô tả chi tiết cho mỗi nút',
+    },
+    preview: {
+      title: 'Xem trước',
+      selectLayout: 'Chọn bố cục',
+    },
+    actions: {
+      cancel: 'Hủy',
+      generate: 'Tạo',
     },
   },
   export: {

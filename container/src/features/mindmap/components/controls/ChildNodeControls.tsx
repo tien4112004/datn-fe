@@ -345,7 +345,7 @@ export const NodeHandlers = memo(
 
       const timerId2 = setTimeout(() => {
         updateNodeInternals(id);
-      }, 500);
+      }, 1000);
 
       return () => {
         clearTimeout(timerId);

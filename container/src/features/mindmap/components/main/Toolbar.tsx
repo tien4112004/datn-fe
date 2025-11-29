@@ -1,4 +1,4 @@
-import { Plus, Undo, Redo, Save } from 'lucide-react';
+import { GitBranchPlus, Undo, Redo, Save, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/shared/components/ui/tabs';
 import { useUndoRedoStore, useCoreStore, useNodeOperationsStore } from '../../stores';
@@ -8,6 +8,7 @@ import { useSaveMindmap } from '../../hooks/useSaveMindmap';
 import { useNodeSelection } from '../../hooks/useNodeSelection';
 import { useState, useEffect } from 'react';
 import ExportMindmapDialog from '../export';
+import { GenerateTreeDialog } from '../generate';
 import NodeSelectionTab from './NodeSelectionTab';
 import LoadingButton from '@/components/common/LoadingButton';
 import { cn } from '@/shared/lib/utils';
@@ -27,6 +28,7 @@ const Toolbar = ({ mindmapId }: { mindmapId: string }) => {
   // Save and Export states
   const { saveWithThumbnail, isLoading: isSaving } = useSaveMindmap();
   const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
+  const [isGenerateDialogOpen, setIsGenerateDialogOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<string>('general');
 
   // Auto-switch to general tab when selection is cleared or to selection tab when selection exists
@@ -73,13 +75,23 @@ const Toolbar = ({ mindmapId }: { mindmapId: string }) => {
                 onClick={() => {
                   addNode();
                 }}
-                title={t('toolbar.tooltips.addNode')}
+                title={t('toolbar.tooltips.addTree')}
                 variant="default"
                 size="sm"
                 className="w-full transition-colors hover:bg-blue-600 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <Plus size={16} />
-                {t('toolbar.actions.addNode')}
+                <GitBranchPlus size={16} />
+                {t('toolbar.actions.addTree')}
+              </Button>
+              <Button
+                onClick={() => setIsGenerateDialogOpen(true)}
+                title={t('toolbar.tooltips.generateTree')}
+                variant="outline"
+                size="sm"
+                className="w-full gap-2 transition-colors hover:border-purple-400 hover:bg-purple-50 hover:text-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              >
+                <Sparkles size={16} />
+                {t('toolbar.actions.generateTree')}
               </Button>
             </div>
           </div>
@@ -163,6 +175,9 @@ const Toolbar = ({ mindmapId }: { mindmapId: string }) => {
 
       {/* Export Dialog */}
       <ExportMindmapDialog isOpen={isExportDialogOpen} onOpenChange={setIsExportDialogOpen} />
+
+      {/* Generate Tree Dialog */}
+      <GenerateTreeDialog isOpen={isGenerateDialogOpen} onOpenChange={setIsGenerateDialogOpen} />
     </div>
   );
 };

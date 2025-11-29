@@ -83,7 +83,7 @@ const RootNodeBlock = memo(
     }, [editor, data.content, shouldUseRichEditor]);
 
     return (
-      <BaseNodeBlock node={node} className="border-primary">
+      <BaseNodeBlock node={node} variant="root">
         <BaseNodeContent className="flex min-h-full flex-row items-start gap-2 p-0">
           <div className={cn('flex-shrink-0 p-2 pr-0', DRAGHANDLE.CLASS)}>
             <GripVertical

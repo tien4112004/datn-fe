@@ -13,6 +13,8 @@ export default {
     },
     actions: {
       addNode: 'Add Node',
+      addTree: 'Add Tree',
+      generateTree: 'Generate Tree',
       deleteSelected: 'Delete Selected',
       undo: 'Undo',
       redo: 'Redo',
@@ -64,6 +66,8 @@ export default {
     },
     tooltips: {
       addNode: 'Add new node',
+      addTree: 'Add new tree (root node)',
+      generateTree: 'Generate a mindmap tree with AI',
       deleteSelected: 'Delete selected nodes',
       undo: 'Undo (Ctrl+Z)',
       redo: 'Redo (Ctrl+Y)',
@@ -77,6 +81,33 @@ export default {
       saving: 'Saving...',
       success: 'Mindmap saved successfully',
       error: 'Failed to save mindmap',
+    },
+  },
+  generate: {
+    title: 'Generate Mindmap with AI',
+    prompt: {
+      title: 'Prompt',
+      label: 'Describe your mindmap',
+      placeholder:
+        'E.g., Create a mindmap about project management best practices, including planning, execution, and monitoring phases...',
+      hint: 'Be specific about the topics and structure you want to generate.',
+    },
+    options: {
+      title: 'Options',
+      maxDepth: 'Maximum Depth',
+      maxDepthHint: 'How many levels deep the mindmap should go (1-5)',
+      maxChildren: 'Max Children per Node',
+      maxChildrenHint: 'Maximum number of child nodes for each parent (2-10)',
+      includeDescriptions: 'Include Descriptions',
+      includeDescriptionsHint: 'Add detailed descriptions to each node',
+    },
+    preview: {
+      title: 'Preview',
+      selectLayout: 'Select layout',
+    },
+    actions: {
+      cancel: 'Cancel',
+      generate: 'Generate',
     },
   },
   export: {

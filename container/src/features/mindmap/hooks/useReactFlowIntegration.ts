@@ -4,7 +4,7 @@ import { useLayoutStore } from '../stores/layout';
 import type { MindMapNode } from '../types';
 import { useClipboardStore, useCoreStore, useNodeManipulationStore, useNodeOperationsStore } from '../stores';
 import { MINDMAP_TYPES, SIDE } from '../types';
-import { getSideFromPosition } from '../services/utils';
+import { getSideFromPosition, getTreeForceLayout } from '../services/utils';
 
 export const useReactFlowIntegration = () => {
   const syncState = useCoreStore((state) => state.syncState);
@@ -12,13 +12,16 @@ export const useReactFlowIntegration = () => {
   const moveToChild = useNodeManipulationStore((state) => state.moveToChild);
   const getNode = useCoreStore((state) => state.getNode);
   const addChildNode = useNodeOperationsStore((state) => state.addChildNode);
+  const nodes = useCoreStore((state) => state.nodes);
 
   const updateLayout = useLayoutStore((state) => state.updateLayout);
-  const isAutoLayoutEnabled = useLayoutStore((state) => state.isAutoLayoutEnabled);
   const applyAutoLayout = useLayoutStore((state) => state.applyAutoLayout);
   const setMousePosition = useClipboardStore((state) => state.setMousePosition);
   const setDragTarget = useClipboardStore((state) => state.setDragTarget);
   const setMouseOverNodeId = useClipboardStore((state) => state.setMouseOverNodeId);
+
+  // Get auto layout enabled from root node
+  const isAutoLayoutEnabled = getTreeForceLayout(nodes);
 
   const nodesInitialized = useNodesInitialized();
   const { getIntersectingNodes, fitView, screenToFlowPosition } = useReactFlow();

@@ -1,12 +1,18 @@
 import { create } from 'zustand';
-import type { MindMapNode, MindMapEdge } from '../types';
+import type { MindMapNode, MindMapEdge, Direction } from '../types';
 import { generateId } from '@/shared/lib/utils';
 import { devtools } from 'zustand/middleware';
 import { useCoreStore } from './core';
 import { useUndoRedoStore } from './undoredo';
 import { useNodeOperationsStore } from './nodeOperation';
 import { useLayoutStore } from './layout';
-import { isAiGeneratedNodeStructure, convertAiDataToMindMapNodes } from '../services/utils';
+import {
+  isAiGeneratedNodeStructure,
+  convertAiDataToMindMapNodes,
+  getTreeLayoutType,
+  getTreeForceLayout,
+} from '../services/utils';
+import { toDirection } from '../services/layouts/layoutStrategy';
 
 export interface ClipboardState {
   cloningNodes: MindMapNode[];
@@ -178,9 +184,14 @@ export const useClipboardStore = create<ClipboardState>()(
 
       // Check if it's AI generated structure
       if (isAiGeneratedNodeStructure(parsedData)) {
-        const { setNodes, setEdges } = useCoreStore.getState();
-        const { updateLayout, layout, isAutoLayoutEnabled } = useLayoutStore.getState();
+        const { setNodes, setEdges, nodes } = useCoreStore.getState();
+        const { updateLayout } = useLayoutStore.getState();
         const { mousePosition, offset } = get();
+
+        // Get layout info from root node
+        const layoutType = getTreeLayoutType(nodes);
+        const layout = toDirection(layoutType) as Direction;
+        const isAutoLayoutEnabled = getTreeForceLayout(nodes);
 
         const basePosition = screenToFlowPosition({
           x: mousePosition.x,

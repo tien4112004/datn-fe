@@ -23,26 +23,32 @@ interface NewNodeData {
 const DEFAULT_HORIZONTAL_SPACING = 200;
 const DEFAULT_VERTICAL_SPACING = 80;
 const DEFAULT_NODE_HEIGHT = 50;
-const DEFAULT_NODE_WIDTH = 150;
+const DEFAULT_NODE_WIDTH = 180;
 
 /**
  * Calculates the position for a new child node after the last sibling.
  * - For horizontal layouts: Position is offset in x-direction from parent, y after last sibling
  * - For vertical layouts: Position is offset in y-direction from parent, x after last sibling
+ *
+ * Alignment rules:
+ * - Right children: aligned by left edge (grow rightward)
+ * - Left children: aligned by right edge (grow leftward)
+ * - Bottom children: aligned by top edge (grow downward)
+ * - Top children: aligned by bottom edge (grow upward)
  */
 const calculatePositionAfterLastSibling = (
   parentNode: MindMapNode,
   siblings: MindMapNode[],
   side: Side | 'mid',
   layoutType: LayoutType,
-  fallbackPosition: XYPosition
+  _fallbackPosition: XYPosition
 ): XYPosition => {
   const parentX = parentNode.position?.x ?? 0;
   const parentY = parentNode.position?.y ?? 0;
 
   // If no siblings, return a position relative to parent based on layout type
   if (siblings.length === 0) {
-    return getInitialChildPosition(parentX, parentY, side, layoutType, fallbackPosition);
+    return getInitialChildPosition(parentX, parentY, side, layoutType, parentNode);
   }
 
   // Determine if this is a vertical or horizontal flow layout
@@ -86,16 +92,29 @@ const calculatePositionAfterLastSibling = (
     const lastSiblingBottom =
       (lastSibling.position?.y ?? 0) + (lastSibling.measured?.height ?? DEFAULT_NODE_HEIGHT);
 
-    // Calculate x offset based on side (LEFT vs RIGHT)
-    let xOffset: number;
+    // Get reference X position from the first sibling for proper alignment
+    // For left side: align right edges at (parentX - spacing)
+    // For right side: align left edges at (parentX + parentWidth + spacing)
+    let newNodeX: number;
     if (side === SIDE.LEFT) {
-      xOffset = -DEFAULT_HORIZONTAL_SPACING - DEFAULT_NODE_WIDTH;
+      // Left children: right edge should be at (parentX - spacing)
+      // So x position = parentX - spacing - newNodeWidth
+      // Since we don't know the new node's width yet, use DEFAULT_NODE_WIDTH
+      newNodeX = parentX - DEFAULT_HORIZONTAL_SPACING - DEFAULT_NODE_WIDTH;
     } else {
-      xOffset = DEFAULT_HORIZONTAL_SPACING + (parentNode.measured?.width ?? DEFAULT_NODE_WIDTH);
+      // Right children: align left edges - use the first sibling's x position
+      const leftmostSibling = siblings.reduce((leftmost, sibling) => {
+        const siblingX = sibling.position?.x ?? 0;
+        const leftmostX = leftmost.position?.x ?? 0;
+        return siblingX < leftmostX ? sibling : leftmost;
+      }, siblings[0]);
+      newNodeX =
+        leftmostSibling.position?.x ??
+        parentX + (parentNode.measured?.width ?? DEFAULT_NODE_WIDTH) + DEFAULT_HORIZONTAL_SPACING;
     }
 
     return {
-      x: parentX + xOffset,
+      x: newNodeX,
       y: lastSiblingBottom + DEFAULT_VERTICAL_SPACING,
     };
   }
@@ -103,35 +122,49 @@ const calculatePositionAfterLastSibling = (
 
 /**
  * Gets the initial position for the first child node based on layout type.
+ *
+ * Alignment rules for horizontal layouts:
+ * - Right children: left edge of child aligns with (parent right edge + spacing)
+ * - Left children: right edge of child aligns with (parent left edge - spacing)
+ *   So we position at: parentX - spacing - nodeWidth
+ *
+ * Alignment rules for vertical layouts:
+ * - Bottom children: top edge of child aligns with (parent bottom edge + spacing)
+ * - Top children: bottom edge of child aligns with (parent top edge - spacing)
  */
 const getInitialChildPosition = (
   parentX: number,
   parentY: number,
   side: Side | 'mid',
   layoutType: LayoutType,
-  fallbackPosition: XYPosition
+  parentNode?: MindMapNode
 ): XYPosition => {
   const isVerticalFlow =
     layoutType === LAYOUT_TYPE.VERTICAL_BALANCED ||
     layoutType === LAYOUT_TYPE.TOP_ONLY ||
     layoutType === LAYOUT_TYPE.BOTTOM_ONLY;
 
+  const parentWidth = parentNode?.measured?.width ?? DEFAULT_NODE_WIDTH;
+  const parentHeight = parentNode?.measured?.height ?? DEFAULT_NODE_HEIGHT;
+
   if (isVerticalFlow) {
     // Vertical layouts: offset in y-direction
     const yOffset =
       side === SIDE.TOP
         ? -DEFAULT_VERTICAL_SPACING - DEFAULT_NODE_HEIGHT
-        : DEFAULT_VERTICAL_SPACING + DEFAULT_NODE_HEIGHT;
+        : DEFAULT_VERTICAL_SPACING + parentHeight;
     return {
       x: parentX,
       y: parentY + yOffset,
     };
   } else {
     // Horizontal layouts: offset in x-direction
+    // For right side: position at parent's right edge + spacing (left edge alignment)
+    // For left side: position at parent's left edge - spacing - node width (right edge alignment)
     const xOffset =
       side === SIDE.LEFT
         ? -DEFAULT_HORIZONTAL_SPACING - DEFAULT_NODE_WIDTH
-        : DEFAULT_HORIZONTAL_SPACING + DEFAULT_NODE_WIDTH;
+        : DEFAULT_HORIZONTAL_SPACING + parentWidth;
     return {
       x: parentX + xOffset,
       y: parentY,
@@ -215,12 +248,6 @@ export const useNodeOperationsStore = create<NodeOperationsState>()(
           ? allChildren.filter((child) => child.data?.side === side)
           : allChildren;
 
-        // Calculate the next sibling order (append at end of siblings on same side)
-        const maxSiblingOrder = siblingsOnSameSide.reduce(
-          (max, child) => Math.max(max, child.data?.siblingOrder ?? 0),
-          -1
-        );
-
         // Calculate position after the last sibling
         const newPosition = calculatePositionAfterLastSibling(
           parentNode as MindMapNode,
@@ -250,6 +277,10 @@ export const useNodeOperationsStore = create<NodeOperationsState>()(
               height: 180,
               alt: 'Image',
             }),
+          },
+          measured: {
+            width: DEFAULT_NODE_WIDTH,
+            height: DEFAULT_NODE_HEIGHT,
           },
           dragHandle: DRAGHANDLE.SELECTOR,
           position: newPosition,

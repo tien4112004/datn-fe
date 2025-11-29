@@ -14,7 +14,7 @@ import { ChildNodeControls, NodeHandlers } from '../controls/ChildNodeControls';
 export interface BaseNodeBlockProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
   children: ReactNode;
   node: NodeProps<MindMapNode>;
-  variant?: 'card' | 'replacing';
+  variant?: 'card' | 'replacing' | 'root';
 }
 
 const clipboardSelector = (state: any) => state.dragTargetNodeId;
@@ -40,6 +40,13 @@ export const BaseNodeBlock = memo(
 
     const cardStyles = cn(
       'base-node-card',
+      isLayouting && 'layouting',
+      isDragTarget && 'drag-target',
+      className
+    );
+
+    const rootStyles = cn(
+      'root-node-card',
       isLayouting && 'layouting',
       isDragTarget && 'drag-target',
       className
@@ -77,6 +84,18 @@ export const BaseNodeBlock = memo(
       [width, height, props.style, variant]
     );
 
+    // Determine which styles to use based on variant
+    const variantStyles = useMemo(() => {
+      switch (variant) {
+        case 'root':
+          return rootStyles;
+        case 'card':
+          return cardStyles;
+        default:
+          return baseStyles;
+      }
+    }, [variant, rootStyles, cardStyles, baseStyles]);
+
     return (
       <AnimatePresence>
         <motion.div
@@ -84,7 +103,7 @@ export const BaseNodeBlock = memo(
           style={nodeStyle}
           {...animationConfig}
           onAnimationComplete={handleAnimationComplete}
-          className={cn(variant === 'card' ? cardStyles : baseStyles, className)}
+          className={cn(variantStyles, className)}
           {...props}
         >
           {children}

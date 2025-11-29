@@ -17,25 +17,18 @@ export {
   calculateBalancedVerticalLayout,
 } from './verticalLayoutUtils';
 
-// Export tree utilities (replacement for D3LayoutService tree methods)
-export { getSubtreeNodes, findRootNodes, buildChildrenMap } from './treeUtils';
-
 // Export sibling order utilities
 export {
   inferOrderFromPositions,
   inferOrderForAllNodes,
-  detectReorderFromDrag,
-  getNextSiblingOrder,
-  normalizeSiblingOrders,
   updateSiblingOrdersFromPositions,
-  siblingOrderService,
-} from './SiblingOrderService';
+} from './siblingOrder';
 
 // Export all layout strategies (directional + balanced)
 export * from './directionalLayoutStrategies';
 
 // Export transition service
-export * from './LayoutTransitionService';
+export * from './layoutTransition';
 
 // Export factory last (depends on strategies)
-export * from './LayoutStrategyFactory';
+export * from './layoutStrategy';

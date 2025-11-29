@@ -62,8 +62,7 @@ const MindmapPage = () => {
   return (
     <>
       <ReactFlowProvider>
-        <div className="h-screen w-full" style={{ backgroundColor: 'var(--background)' }}>
-          <Toolbar mindmapId={mindmap.id} />
+        <div className="flex h-screen w-full" style={{ backgroundColor: 'var(--background)' }}>
           <Flow isPanOnDrag={isPanOnDrag}>
             <Controls>
               <ControlButton
@@ -90,6 +89,7 @@ const MindmapPage = () => {
             <DevTools position="bottom-center" />
             <LogicHandler mindmapId={mindmap.id} />
           </Flow>
+          <Toolbar mindmapId={mindmap.id} />
         </div>
       </ReactFlowProvider>
       <UnsavedChangesDialog

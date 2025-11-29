@@ -1,8 +1,8 @@
 import { create } from 'zustand';
 import type { XYPosition } from '@xyflow/react';
 import { devtools } from 'zustand/middleware';
-import type { MindMapNode, MindMapEdge, MindMapTypes, PathType, Side } from '../types';
-import { MINDMAP_TYPES, PATH_TYPES, DRAGHANDLE, SIDE } from '../types';
+import type { MindMapNode, MindMapEdge, MindMapTypes, PathType, Side, LayoutType } from '../types';
+import { MINDMAP_TYPES, PATH_TYPES, DRAGHANDLE, SIDE, LAYOUT_TYPE } from '../types';
 import { generateId } from '@/shared/lib/utils';
 import { getRootNodeOfSubtree, getAllDescendantNodes } from '../services/utils';
 import { useCoreStore } from './core';
@@ -13,6 +13,126 @@ interface NewNodeData {
   content: string;
   position: XYPosition;
 }
+
+// Default spacing constants
+const DEFAULT_HORIZONTAL_SPACING = 200;
+const DEFAULT_VERTICAL_SPACING = 80;
+const DEFAULT_NODE_HEIGHT = 50;
+const DEFAULT_NODE_WIDTH = 150;
+
+/**
+ * Calculates the position for a new child node after the last sibling.
+ * - For horizontal layouts: Position is offset in x-direction from parent, y after last sibling
+ * - For vertical layouts: Position is offset in y-direction from parent, x after last sibling
+ */
+const calculatePositionAfterLastSibling = (
+  parentNode: MindMapNode,
+  siblings: MindMapNode[],
+  side: Side | 'mid',
+  layoutType: LayoutType,
+  fallbackPosition: XYPosition
+): XYPosition => {
+  const parentX = parentNode.position?.x ?? 0;
+  const parentY = parentNode.position?.y ?? 0;
+
+  // If no siblings, return a position relative to parent based on layout type
+  if (siblings.length === 0) {
+    return getInitialChildPosition(parentX, parentY, side, layoutType, fallbackPosition);
+  }
+
+  // Determine if this is a vertical or horizontal flow layout
+  const isVerticalFlow =
+    layoutType === LAYOUT_TYPE.VERTICAL_BALANCED ||
+    layoutType === LAYOUT_TYPE.TOP_ONLY ||
+    layoutType === LAYOUT_TYPE.BOTTOM_ONLY;
+
+  if (isVerticalFlow) {
+    // For vertical layouts, find the rightmost sibling and position after it
+    const lastSibling = siblings.reduce((rightmost, sibling) => {
+      const siblingRight = (sibling.position?.x ?? 0) + (sibling.measured?.width ?? DEFAULT_NODE_WIDTH);
+      const rightmostRight = (rightmost.position?.x ?? 0) + (rightmost.measured?.width ?? DEFAULT_NODE_WIDTH);
+      return siblingRight > rightmostRight ? sibling : rightmost;
+    }, siblings[0]);
+
+    const lastSiblingRight =
+      (lastSibling.position?.x ?? 0) + (lastSibling.measured?.width ?? DEFAULT_NODE_WIDTH);
+
+    // Calculate y offset based on side (TOP vs BOTTOM)
+    let yOffset: number;
+    if (side === SIDE.TOP) {
+      yOffset = -DEFAULT_VERTICAL_SPACING - DEFAULT_NODE_HEIGHT;
+    } else {
+      yOffset = DEFAULT_VERTICAL_SPACING + (parentNode.measured?.height ?? DEFAULT_NODE_HEIGHT);
+    }
+
+    return {
+      x: lastSiblingRight + DEFAULT_VERTICAL_SPACING,
+      y: parentY + yOffset,
+    };
+  } else {
+    // For horizontal layouts, find the bottommost sibling and position after it
+    const lastSibling = siblings.reduce((bottommost, sibling) => {
+      const siblingBottom = (sibling.position?.y ?? 0) + (sibling.measured?.height ?? DEFAULT_NODE_HEIGHT);
+      const bottommostBottom =
+        (bottommost.position?.y ?? 0) + (bottommost.measured?.height ?? DEFAULT_NODE_HEIGHT);
+      return siblingBottom > bottommostBottom ? sibling : bottommost;
+    }, siblings[0]);
+
+    const lastSiblingBottom =
+      (lastSibling.position?.y ?? 0) + (lastSibling.measured?.height ?? DEFAULT_NODE_HEIGHT);
+
+    // Calculate x offset based on side (LEFT vs RIGHT)
+    let xOffset: number;
+    if (side === SIDE.LEFT) {
+      xOffset = -DEFAULT_HORIZONTAL_SPACING - DEFAULT_NODE_WIDTH;
+    } else {
+      xOffset = DEFAULT_HORIZONTAL_SPACING + (parentNode.measured?.width ?? DEFAULT_NODE_WIDTH);
+    }
+
+    return {
+      x: parentX + xOffset,
+      y: lastSiblingBottom + DEFAULT_VERTICAL_SPACING,
+    };
+  }
+};
+
+/**
+ * Gets the initial position for the first child node based on layout type.
+ */
+const getInitialChildPosition = (
+  parentX: number,
+  parentY: number,
+  side: Side | 'mid',
+  layoutType: LayoutType,
+  fallbackPosition: XYPosition
+): XYPosition => {
+  const isVerticalFlow =
+    layoutType === LAYOUT_TYPE.VERTICAL_BALANCED ||
+    layoutType === LAYOUT_TYPE.TOP_ONLY ||
+    layoutType === LAYOUT_TYPE.BOTTOM_ONLY;
+
+  if (isVerticalFlow) {
+    // Vertical layouts: offset in y-direction
+    const yOffset =
+      side === SIDE.TOP
+        ? -DEFAULT_VERTICAL_SPACING - DEFAULT_NODE_HEIGHT
+        : DEFAULT_VERTICAL_SPACING + DEFAULT_NODE_HEIGHT;
+    return {
+      x: parentX,
+      y: parentY + yOffset,
+    };
+  } else {
+    // Horizontal layouts: offset in x-direction
+    const xOffset =
+      side === SIDE.LEFT
+        ? -DEFAULT_HORIZONTAL_SPACING - DEFAULT_NODE_WIDTH
+        : DEFAULT_HORIZONTAL_SPACING + DEFAULT_NODE_WIDTH;
+    return {
+      x: parentX + xOffset,
+      y: parentY,
+    };
+  }
+};
 
 export interface NodeOperationsState {
   nodesToBeDeleted: Set<string>;
@@ -66,13 +186,43 @@ export const useNodeOperationsStore = create<NodeOperationsState>()(
         side: Side | 'mid',
         nodeType: MindMapTypes = MINDMAP_TYPES.TEXT_NODE
       ) => {
-        const { nodes, setNodes, setEdges } = useCoreStore.getState();
+        const { nodes, setNodes, setEdges, edges } = useCoreStore.getState();
         const { prepareToPushUndo, pushToUndoStack } = useUndoRedoStore.getState();
-        const { isAutoLayoutEnabled, updateSubtreeLayout, layout } = useLayoutStore.getState();
+        const { isAutoLayoutEnabled, applyAutoLayout } = useLayoutStore.getState();
+        const { layoutType } = useLayoutStore.getState();
         prepareToPushUndo();
         // Find the root node to get the pathType
         const rootNode = getRootNodeOfSubtree(parentNode.id!, nodes);
         const pathType = (rootNode?.data?.pathType || PATH_TYPES.SMOOTHSTEP) as PathType;
+
+        // Find existing children of this parent
+        const allChildren = edges
+          .filter((edge) => edge.source === parentNode.id)
+          .map((edge) => nodes.find((n) => n.id === edge.target))
+          .filter((n): n is MindMapNode => n !== undefined);
+
+        // For balanced layouts, filter children by side to calculate sibling order
+        const isBalancedLayout =
+          layoutType === LAYOUT_TYPE.HORIZONTAL_BALANCED || layoutType === LAYOUT_TYPE.VERTICAL_BALANCED;
+
+        const siblingsOnSameSide = isBalancedLayout
+          ? allChildren.filter((child) => child.data?.side === side)
+          : allChildren;
+
+        // Calculate the next sibling order (append at end of siblings on same side)
+        const maxSiblingOrder = siblingsOnSameSide.reduce(
+          (max, child) => Math.max(max, child.data?.siblingOrder ?? 0),
+          -1
+        );
+
+        // Calculate position after the last sibling
+        const newPosition = calculatePositionAfterLastSibling(
+          parentNode as MindMapNode,
+          siblingsOnSameSide,
+          side,
+          layoutType,
+          position
+        );
 
         const id = generateId();
         const newNode: MindMapNode = {
@@ -96,7 +246,7 @@ export const useNodeOperationsStore = create<NodeOperationsState>()(
             }),
           },
           dragHandle: DRAGHANDLE.SELECTOR,
-          position,
+          position: newPosition,
         };
 
         const newEdge = {
@@ -120,7 +270,7 @@ export const useNodeOperationsStore = create<NodeOperationsState>()(
         // Only apply auto-layout if it's enabled
         if (isAutoLayoutEnabled) {
           setTimeout(() => {
-            updateSubtreeLayout(parentNode.id!, layout);
+            applyAutoLayout();
           }, 200);
         }
 

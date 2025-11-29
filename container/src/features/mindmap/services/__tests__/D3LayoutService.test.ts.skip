@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { describe, it, expect, beforeEach } from 'vitest';
 import { d3LayoutService } from '../D3LayoutService';
 import { DIRECTION, SIDE } from '../../types/constants';

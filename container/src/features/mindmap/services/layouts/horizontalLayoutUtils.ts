@@ -79,6 +79,67 @@ export const preprocessHierarchy = (hierarchy: D3HierarchyNode): void => {
   });
 };
 
+/**
+ * Assigns side and siblingOrder to nodes based on their final positions.
+ * For horizontal layouts:
+ * - side: LEFT if x < rootX, RIGHT otherwise
+ * - siblingOrder: based on Y position within each parent group (top to bottom)
+ */
+export const assignSideAndOrderFromPositions = (nodes: MindMapNode[], rootX: number): MindMapNode[] => {
+  // Build a map for quick position lookup
+  const nodeMap = new Map<string, MindMapNode>();
+  for (const node of nodes) {
+    nodeMap.set(node.id, node);
+  }
+
+  // Group nodes by parentId
+  const childrenByParent = new Map<string, MindMapNode[]>();
+  for (const node of nodes) {
+    if (node.type === MINDMAP_TYPES.ROOT_NODE) continue;
+    const parentId = node.data.parentId;
+    if (!parentId) continue;
+
+    if (!childrenByParent.has(parentId)) {
+      childrenByParent.set(parentId, []);
+    }
+    childrenByParent.get(parentId)!.push(node);
+  }
+
+  // For each parent group, sort by Y position and assign siblingOrder
+  const orderMap = new Map<string, number>();
+  for (const [_parentId, children] of childrenByParent) {
+    // Sort by Y position (top to bottom)
+    const sorted = [...children].sort((a, b) => {
+      const yA = a.position?.y ?? 0;
+      const yB = b.position?.y ?? 0;
+      return yA - yB;
+    });
+
+    sorted.forEach((child, index) => {
+      orderMap.set(child.id, index);
+    });
+  }
+
+  // Apply side and siblingOrder to all nodes
+  return nodes.map((node) => {
+    if (node.type === MINDMAP_TYPES.ROOT_NODE) {
+      return {
+        ...node,
+        data: { ...node.data, side: SIDE.MID as Side },
+      };
+    }
+
+    const nodeX = node.position?.x ?? 0;
+    const side = nodeX < rootX ? SIDE.LEFT : SIDE.RIGHT;
+    const siblingOrder = orderMap.get(node.id) ?? node.data.siblingOrder ?? 0;
+
+    return {
+      ...node,
+      data: { ...node.data, side, siblingOrder },
+    };
+  });
+};
+
 // ============================================================================
 // Horizontal Layout Functions
 // ============================================================================
@@ -317,17 +378,15 @@ export const calculateHorizontalLayout = async (
 // ============================================================================
 
 /**
- * Builds a hierarchy for nodes on a specific side of the root.
+ * Builds a hierarchy for a subset of level 1 nodes (used for balanced layout).
+ * This version takes specific level1 nodes instead of filtering by side.
  */
-const buildSideHierarchy = (rootNode: MindMapNode, descendants: MindMapNode[], side: Side): HierarchyNode => {
-  // Filter level 1 nodes for this side
-  const level1Nodes = descendants.filter((n) => n.data.level === 1 && n.data.side === side);
-
-  // Build children map (sorted by siblingOrder)
-  const childrenMap = groupByParent(descendants);
-
-  // Build children for root on this side
-  const children = sortBySiblingOrder(level1Nodes).map((child) => buildSubtree(child, childrenMap));
+const buildSideHierarchyFromNodes = (
+  rootNode: MindMapNode,
+  level1Nodes: MindMapNode[],
+  childrenMap: Map<string, MindMapNode[]>
+): HierarchyNode => {
+  const children = level1Nodes.map((child) => buildSubtree(child, childrenMap));
 
   return {
     originalNode: rootNode,
@@ -336,7 +395,7 @@ const buildSideHierarchy = (rootNode: MindMapNode, descendants: MindMapNode[], s
 };
 
 /**
- * Processes a side hierarchy and positions nodes.
+ * Processes a side hierarchy and positions nodes, assigning side based on final position.
  */
 const processBalancedSideHierarchy = (
   tree: HierarchyNode,
@@ -375,7 +434,7 @@ const processBalancedSideHierarchy = (
   // Adjust spacing
   adjustVerticalSpacing(hierarchy, verticalSpacing);
 
-  // Collect positioned nodes (excluding root, will be added separately)
+  // Collect positioned nodes (side and siblingOrder will be assigned later)
   const layoutedNodes: MindMapNode[] = [];
 
   hierarchy.each((node: D3HierarchyNode) => {
@@ -393,6 +452,8 @@ const processBalancedSideHierarchy = (
 
 /**
  * Calculates a balanced horizontal layout with nodes on both LEFT and RIGHT sides.
+ * Splits level 1 children incrementally: first half to LEFT, second half to RIGHT.
+ * Side is assigned AFTER layout based on final positions.
  */
 export const calculateBalancedHorizontalLayout = (
   rootNode: MindMapNode,
@@ -404,8 +465,20 @@ export const calculateBalancedHorizontalLayout = (
   const rootX = rootNode.position?.x ?? 0;
   const rootY = rootNode.position?.y ?? 0;
 
+  // Build children map (sorted by siblingOrder)
+  const childrenMap = groupByParent(descendants);
+
+  // Get level 1 nodes (direct children of root) sorted by sibling order
+  const level1Nodes = sortBySiblingOrder(descendants.filter((n) => n.data.level === 1));
+
+  // Split level 1 nodes incrementally: first half to LEFT, second half to RIGHT
+  const totalLevel1 = level1Nodes.length;
+  const halfPoint = Math.ceil(totalLevel1 / 2);
+  const leftLevel1Nodes = level1Nodes.slice(0, halfPoint);
+  const rightLevel1Nodes = level1Nodes.slice(halfPoint);
+
   // Build and process left side
-  const leftTree = buildSideHierarchy(rootNode, descendants, SIDE.LEFT);
+  const leftTree = buildSideHierarchyFromNodes(rootNode, leftLevel1Nodes, childrenMap);
   const leftNodes = processBalancedSideHierarchy(
     leftTree,
     SIDE.LEFT,
@@ -417,7 +490,7 @@ export const calculateBalancedHorizontalLayout = (
   );
 
   // Build and process right side
-  const rightTree = buildSideHierarchy(rootNode, descendants, SIDE.RIGHT);
+  const rightTree = buildSideHierarchyFromNodes(rootNode, rightLevel1Nodes, childrenMap);
   const rightNodes = processBalancedSideHierarchy(
     rightTree,
     SIDE.RIGHT,
@@ -428,16 +501,18 @@ export const calculateBalancedHorizontalLayout = (
     verticalSpacing
   );
 
-  // Combine results: root + left + right
-  const layoutedNodes: MindMapNode[] = [
+  // Combine positioned nodes (root + left + right)
+  const positionedNodes: MindMapNode[] = [
     {
       ...rootNode,
       position: { x: rootX, y: rootY },
-      data: { ...rootNode.data, side: 'mid' as Side },
     },
     ...leftNodes,
     ...rightNodes,
   ];
+
+  // Derive side and siblingOrder from final positions
+  const layoutedNodes = assignSideAndOrderFromPositions(positionedNodes, rootX);
 
   return { nodes: layoutedNodes, edges };
 };

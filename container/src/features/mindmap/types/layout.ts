@@ -190,15 +190,6 @@ export const LAYOUT_CONFIGS: Record<LayoutType, LayoutConfig> = {
     defaultSide: 'top',
     isRadial: false,
   },
-  [LAYOUT_TYPE.NONE]: {
-    sourceHandles: ['left', 'right'],
-    targetHandles: ['left', 'right'],
-    orderAxis: 'y',
-    orderDirection: 'ascending',
-    allowedSides: ['left', 'right', 'mid'],
-    defaultSide: 'right',
-    isRadial: false,
-  },
 };
 
 /**
@@ -207,7 +198,6 @@ export const LAYOUT_CONFIGS: Record<LayoutType, LayoutConfig> = {
 export const DIRECTION_TO_LAYOUT_TYPE: Record<string, LayoutType> = {
   horizontal: LAYOUT_TYPE.HORIZONTAL_BALANCED,
   vertical: LAYOUT_TYPE.VERTICAL_BALANCED,
-  '': LAYOUT_TYPE.NONE,
 };
 
 /**
@@ -220,5 +210,4 @@ export const LAYOUT_TYPE_TO_DIRECTION: Record<LayoutType, string> = {
   [LAYOUT_TYPE.LEFT_ONLY]: 'horizontal', // Fallback
   [LAYOUT_TYPE.BOTTOM_ONLY]: 'vertical', // Fallback
   [LAYOUT_TYPE.TOP_ONLY]: 'vertical', // Fallback
-  [LAYOUT_TYPE.NONE]: '',
 };

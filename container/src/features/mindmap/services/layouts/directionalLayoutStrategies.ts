@@ -12,8 +12,8 @@ import type {
   Side,
 } from '../../types';
 import { LAYOUT_CONFIGS, LAYOUT_TYPE, SIDE } from '../../types';
-import { siblingOrderService } from './SiblingOrderService';
-import { layoutTransitionService } from './LayoutTransitionService';
+import { inferOrderFromPositions } from './siblingOrder';
+import { getNextChildSide } from './layoutTransition';
 import {
   calculateHorizontalLayout,
   calculateBalancedHorizontalLayout,
@@ -93,7 +93,7 @@ export const createHorizontalLayoutStrategy = (type: LayoutType): LayoutStrategy
       siblings: NodePositionInfo[],
       parentPosition?: { x: number; y: number }
     ): SiblingOrderMap => {
-      return siblingOrderService.inferOrderFromPositions(siblings, type, parentPosition);
+      return inferOrderFromPositions(siblings, type, parentPosition);
     },
 
     getEdgeHandles: (_parentNode: MindMapNode, _childNode: MindMapNode): EdgeHandleInfo => ({
@@ -137,7 +137,7 @@ export const createVerticalLayoutStrategy = (type: LayoutType): LayoutStrategy =
       siblings: NodePositionInfo[],
       parentPosition?: { x: number; y: number }
     ): SiblingOrderMap => {
-      return siblingOrderService.inferOrderFromPositions(siblings, type, parentPosition);
+      return inferOrderFromPositions(siblings, type, parentPosition);
     },
 
     getEdgeHandles: (_parentNode: MindMapNode, _childNode: MindMapNode): EdgeHandleInfo => ({
@@ -152,7 +152,7 @@ export const createVerticalLayoutStrategy = (type: LayoutType): LayoutStrategy =
 };
 
 // ============================================================================
-// Pre-created Strategy Instances (for backwards compatibility)
+// Pre-created Strategy Instances
 // ============================================================================
 
 export const rightOnlyLayoutStrategy = createHorizontalLayoutStrategy(LAYOUT_TYPE.RIGHT_ONLY);
@@ -220,21 +220,12 @@ export const horizontalBalancedLayoutStrategy: LayoutStrategy = {
       return { nodes: allNodes, edges };
     }
 
-    // Assign sides to nodes using the transition service
-    const nodesWithSides = layoutTransitionService.assignSides(allNodes, LAYOUT_TYPE.HORIZONTAL_BALANCED);
-    const rootWithSides = nodesWithSides.find((n) => n.id === rootNode.id) || rootNode;
-    const descendantsWithSides = nodesWithSides.filter((n) => n.id !== rootNode.id);
-
-    // Use balanced horizontal layout function
-    const { nodes: layoutedNodes } = calculateBalancedHorizontalLayout(
-      rootWithSides,
-      descendantsWithSides,
-      edges,
-      {
-        horizontalSpacing: options.horizontalSpacing ?? 200,
-        verticalSpacing: options.verticalSpacing ?? 80,
-      }
-    );
+    // Layout calculates positions and assigns sides based on final positions
+    // No pre-assignment of sides needed - the layout function handles it
+    const { nodes: layoutedNodes } = calculateBalancedHorizontalLayout(rootNode, descendants, edges, {
+      horizontalSpacing: options.horizontalSpacing ?? 200,
+      verticalSpacing: options.verticalSpacing ?? 80,
+    });
 
     // Update edge handles
     const updatedEdges = updateEdgeHandles(
@@ -250,11 +241,7 @@ export const horizontalBalancedLayoutStrategy: LayoutStrategy = {
     siblings: NodePositionInfo[],
     parentPosition?: { x: number; y: number }
   ): SiblingOrderMap => {
-    return siblingOrderService.inferOrderFromPositions(
-      siblings,
-      LAYOUT_TYPE.HORIZONTAL_BALANCED,
-      parentPosition
-    );
+    return inferOrderFromPositions(siblings, LAYOUT_TYPE.HORIZONTAL_BALANCED, parentPosition);
   },
 
   getEdgeHandles: (_parentNode: MindMapNode, childNode: MindMapNode): EdgeHandleInfo => {
@@ -268,7 +255,7 @@ export const horizontalBalancedLayoutStrategy: LayoutStrategy = {
   },
 
   getDefaultChildSide: (_parentNode: MindMapNode, existingChildren: MindMapNode[]): Side => {
-    return layoutTransitionService.getNextChildSide(existingChildren, LAYOUT_TYPE.HORIZONTAL_BALANCED);
+    return getNextChildSide(existingChildren, LAYOUT_TYPE.HORIZONTAL_BALANCED);
   },
 };
 
@@ -297,21 +284,12 @@ export const verticalBalancedLayoutStrategy: LayoutStrategy = {
       return { nodes: allNodes, edges };
     }
 
-    // Assign sides (TOP/BOTTOM) to nodes
-    const nodesWithSides = layoutTransitionService.assignSides(allNodes, LAYOUT_TYPE.VERTICAL_BALANCED);
-    const rootWithSides = nodesWithSides.find((n) => n.id === rootNode.id) || rootNode;
-    const descendantsWithSides = nodesWithSides.filter((n) => n.id !== rootNode.id);
-
-    // Use balanced vertical layout function
-    const { nodes: layoutedNodes } = calculateBalancedVerticalLayout(
-      rootWithSides,
-      descendantsWithSides,
-      edges,
-      {
-        horizontalSpacing: options.horizontalSpacing ?? 200,
-        verticalSpacing: options.verticalSpacing ?? 80,
-      }
-    );
+    // Layout calculates positions and assigns sides based on final positions
+    // No pre-assignment of sides needed - the layout function handles it
+    const { nodes: layoutedNodes } = calculateBalancedVerticalLayout(rootNode, descendants, edges, {
+      horizontalSpacing: options.horizontalSpacing ?? 200,
+      verticalSpacing: options.verticalSpacing ?? 80,
+    });
 
     // Update edge handles
     const updatedEdges = updateEdgeHandles(
@@ -327,11 +305,7 @@ export const verticalBalancedLayoutStrategy: LayoutStrategy = {
     siblings: NodePositionInfo[],
     parentPosition?: { x: number; y: number }
   ): SiblingOrderMap => {
-    return siblingOrderService.inferOrderFromPositions(
-      siblings,
-      LAYOUT_TYPE.VERTICAL_BALANCED,
-      parentPosition
-    );
+    return inferOrderFromPositions(siblings, LAYOUT_TYPE.VERTICAL_BALANCED, parentPosition);
   },
 
   getEdgeHandles: (_parentNode: MindMapNode, childNode: MindMapNode): EdgeHandleInfo => {
@@ -345,6 +319,6 @@ export const verticalBalancedLayoutStrategy: LayoutStrategy = {
   },
 
   getDefaultChildSide: (_parentNode: MindMapNode, existingChildren: MindMapNode[]): Side => {
-    return layoutTransitionService.getNextChildSide(existingChildren, LAYOUT_TYPE.VERTICAL_BALANCED);
+    return getNextChildSide(existingChildren, LAYOUT_TYPE.VERTICAL_BALANCED);
   },
 };

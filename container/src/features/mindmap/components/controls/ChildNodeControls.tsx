@@ -10,7 +10,7 @@ import type { CoreState } from '@/features/mindmap/stores/core';
 import type { NodeOperationsState } from '@/features/mindmap/stores/nodeOperation';
 import type { LayoutState } from '@/features/mindmap/stores/layout';
 import type { ClipboardState } from '@/features/mindmap/stores/clipboard';
-import { ArrowLeftFromLine, ArrowRightFromLine, Plus } from 'lucide-react';
+import { Minus, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { MindMapNode, Direction, Side, MindMapTypes, LayoutType } from '@/features/mindmap/types';
 import { Position, type NodeProps, useUpdateNodeInternals } from '@xyflow/react';
@@ -61,7 +61,6 @@ export const ChildNodeControls = ({ node, selected }: ChildNodeControlsProps) =>
 
     switch (layoutType) {
       case LAYOUT_TYPE.HORIZONTAL_BALANCED:
-      case LAYOUT_TYPE.NONE:
         return {
           canCreateLeft: side === SIDE.LEFT || isMid || isRootNode,
           canCreateRight: side === SIDE.RIGHT || isMid || isRootNode,
@@ -146,8 +145,7 @@ export const ChildNodeControls = ({ node, selected }: ChildNodeControlsProps) =>
   const isHorizontalFlow =
     layoutType === LAYOUT_TYPE.HORIZONTAL_BALANCED ||
     layoutType === LAYOUT_TYPE.LEFT_ONLY ||
-    layoutType === LAYOUT_TYPE.RIGHT_ONLY ||
-    layoutType === LAYOUT_TYPE.NONE;
+    layoutType === LAYOUT_TYPE.RIGHT_ONLY;
 
   return (
     <>
@@ -161,7 +159,6 @@ export const ChildNodeControls = ({ node, selected }: ChildNodeControlsProps) =>
           )}
         >
           <Button
-            size="icon"
             variant="secondary"
             className={cn('cursor-pointer rounded-full transition-all duration-200')}
             onClick={() => {
@@ -185,17 +182,10 @@ export const ChildNodeControls = ({ node, selected }: ChildNodeControlsProps) =>
                 if (isLeftChildrenCollapsed) expand(node.id, SIDE.LEFT);
                 else collapse(node.id, SIDE.LEFT);
               }}
-              size="icon"
               variant="secondary"
               className={cn('cursor-pointer rounded-full transition-all duration-200')}
             >
-              <motion.div
-                animate={{ rotate: isLeftChildrenCollapsed ? 0 : 180 }}
-                transition={{ duration: 0.2, ease: 'easeInOut' }}
-                className="flex items-center justify-center"
-              >
-                <ArrowLeftFromLine />
-              </motion.div>
+              <Minus />
             </Button>
           </motion.div>
         </div>
@@ -225,21 +215,13 @@ export const ChildNodeControls = ({ node, selected }: ChildNodeControlsProps) =>
                 if (isRightChildrenCollapsed) expand(node.id, SIDE.RIGHT);
                 else collapse(node.id, SIDE.RIGHT);
               }}
-              size="icon"
               variant="secondary"
               className={cn('cursor-pointer rounded-full transition-all duration-200')}
             >
-              <motion.div
-                animate={{ rotate: isRightChildrenCollapsed ? 0 : 180 }}
-                transition={{ duration: 0.2, ease: 'easeInOut' }}
-                className="flex items-center justify-center"
-              >
-                <ArrowRightFromLine />
-              </motion.div>
+              <Minus />
             </Button>
           </motion.div>
           <Button
-            size="icon"
             variant="secondary"
             className={cn('cursor-pointer rounded-full transition-all duration-200')}
             onClick={() => {
@@ -261,7 +243,6 @@ export const ChildNodeControls = ({ node, selected }: ChildNodeControlsProps) =>
           )}
         >
           <Button
-            size="icon"
             variant="secondary"
             className={cn('cursor-pointer rounded-full transition-all duration-200')}
             onClick={() => {
@@ -285,17 +266,10 @@ export const ChildNodeControls = ({ node, selected }: ChildNodeControlsProps) =>
                 if (isLeftChildrenCollapsed) expand(node.id, SIDE.LEFT);
                 else collapse(node.id, SIDE.LEFT);
               }}
-              size="icon"
               variant="secondary"
               className={cn('cursor-pointer rounded-full transition-all duration-200')}
             >
-              <motion.div
-                animate={{ rotate: isLeftChildrenCollapsed ? 90 : 270 }}
-                transition={{ duration: 0.2, ease: 'easeInOut' }}
-                className="flex items-center justify-center"
-              >
-                <ArrowLeftFromLine />
-              </motion.div>
+              <Minus />
             </Button>
           </motion.div>
         </div>
@@ -325,21 +299,13 @@ export const ChildNodeControls = ({ node, selected }: ChildNodeControlsProps) =>
                 if (isRightChildrenCollapsed) expand(node.id, SIDE.RIGHT);
                 else collapse(node.id, SIDE.RIGHT);
               }}
-              size="icon"
               variant="secondary"
               className={cn('cursor-pointer rounded-full transition-all duration-200')}
             >
-              <motion.div
-                animate={{ rotate: isRightChildrenCollapsed ? 90 : 270 }}
-                transition={{ duration: 0.2, ease: 'easeInOut' }}
-                className="flex items-center justify-center"
-              >
-                <ArrowRightFromLine />
-              </motion.div>
+              <Minus />
             </Button>
           </motion.div>
           <Button
-            size="icon"
             variant="secondary"
             className={cn('cursor-pointer rounded-full transition-all duration-200')}
             onClick={() => {
@@ -394,7 +360,6 @@ export const NodeHandlers = memo(
       // For each layout type, determine valid source handles based on the node's side
       switch (layoutType) {
         case LAYOUT_TYPE.HORIZONTAL_BALANCED:
-        case LAYOUT_TYPE.NONE:
           return {
             // Source handles: node can have children on its side or both if MID
             leftSource: side === SIDE.LEFT || isMid,

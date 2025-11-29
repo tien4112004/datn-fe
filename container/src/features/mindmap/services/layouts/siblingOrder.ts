@@ -171,99 +171,42 @@ export const inferOrderFromPositions = (
 };
 
 /**
- * Groups nodes by their parent and side, then infers order for each group.
+ * Groups nodes by their parent (and side for non-balanced layouts), then infers order for each group.
+ *
+ * For balanced layouts (HORIZONTAL_BALANCED, VERTICAL_BALANCED):
+ * - Groups only by parent, so all children share a continuous order sequence
+ * - Left/top side comes first, then right/bottom side
+ *
+ * For directional layouts:
+ * - Groups by parent AND side (though typically all nodes are on one side)
  */
 export const inferOrderForAllNodes = (
   nodes: NodePositionInfo[],
   layoutType: LayoutType,
   parentPositions: Map<string, { x: number; y: number }>
 ): SiblingOrderMap => {
-  // Group nodes by parent and side
+  // Group nodes by parent
   const groups = new Map<string, NodePositionInfo[]>();
 
   for (const node of nodes) {
     if (!node.parentId) continue;
 
-    const groupKey = `${node.parentId}-${node.side}`;
-    if (!groups.has(groupKey)) {
-      groups.set(groupKey, []);
+    if (!groups.has(node.parentId)) {
+      groups.set(node.parentId, []);
     }
-    groups.get(groupKey)!.push(node);
+    groups.get(node.parentId)!.push(node);
   }
 
   // Infer order for each group
   const allOrders: SiblingOrderMap = {};
 
-  for (const [groupKey, siblings] of groups) {
-    const parentId = groupKey.split('-')[0];
+  for (const [parentId, siblings] of groups) {
     const parentPosition = parentPositions.get(parentId);
-
     const groupOrders = inferOrderFromPositions(siblings, layoutType, parentPosition);
     Object.assign(allOrders, groupOrders);
   }
 
   return allOrders;
-};
-
-/**
- * Detects if a node has been dragged to a position that suggests reordering.
- * Returns true if the node's position relative to its siblings has changed.
- */
-export const detectReorderFromDrag = (
-  nodeId: string,
-  newPosition: { x: number; y: number },
-  siblings: NodePositionInfo[],
-  layoutType: LayoutType,
-  parentPosition?: { x: number; y: number }
-): { shouldReorder: boolean; newOrders: SiblingOrderMap } => {
-  // Find the current node in siblings and update its position
-  const updatedSiblings = siblings.map((s) =>
-    s.id === nodeId ? { ...s, x: newPosition.x, y: newPosition.y } : s
-  );
-
-  // Get new orders based on updated positions
-  const newOrders = inferOrderFromPositions(updatedSiblings, layoutType, parentPosition);
-
-  // Check if the order for the dragged node changed
-  const originalNode = siblings.find((s) => s.id === nodeId);
-  const originalOrders = inferOrderFromPositions(siblings, layoutType, parentPosition);
-
-  const shouldReorder = originalNode ? originalOrders[nodeId] !== newOrders[nodeId] : false;
-
-  return { shouldReorder, newOrders };
-};
-
-/**
- * Gets the next available sibling order for a new child node.
- */
-export const getNextSiblingOrder = (existingSiblings: Array<{ siblingOrder?: number }>): number => {
-  if (existingSiblings.length === 0) {
-    return 0;
-  }
-
-  const maxOrder = Math.max(...existingSiblings.map((s) => s.siblingOrder ?? -1));
-  return maxOrder + 1;
-};
-
-/**
- * Normalizes sibling order values to be sequential (0, 1, 2, ...).
- * Useful after deletions that may leave gaps in the order sequence.
- */
-export const normalizeSiblingOrders = (
-  siblings: Array<{ id: string; siblingOrder?: number }>
-): SiblingOrderMap => {
-  const sorted = [...siblings].sort((a, b) => {
-    const orderA = a.siblingOrder ?? Number.MAX_SAFE_INTEGER;
-    const orderB = b.siblingOrder ?? Number.MAX_SAFE_INTEGER;
-    return orderA - orderB;
-  });
-
-  const orderMap: SiblingOrderMap = {};
-  sorted.forEach((sibling, index) => {
-    orderMap[sibling.id] = index;
-  });
-
-  return orderMap;
 };
 
 /**
@@ -301,7 +244,7 @@ export const updateSiblingOrdersFromPositions = (
   const orderMap = inferOrderForAllNodes(positionInfos, layoutType, parentPositions);
 
   // Apply orders to nodes
-  return nodes.map((node) => {
+  const res = nodes.map((node) => {
     const newOrder = orderMap[node.id];
     if (newOrder !== undefined) {
       return {
@@ -314,21 +257,6 @@ export const updateSiblingOrdersFromPositions = (
     }
     return node;
   });
-};
 
-// ============================================================================
-// Backwards Compatibility - Service Object
-// ============================================================================
-
-/**
- * Service object for backwards compatibility.
- * Wraps the pure functions in an object interface.
- */
-export const siblingOrderService = {
-  inferOrderFromPositions,
-  inferOrderForAllNodes,
-  detectReorderFromDrag,
-  getNextSiblingOrder,
-  normalizeSiblingOrders,
-  updateSiblingOrdersFromPositions,
+  return res;
 };

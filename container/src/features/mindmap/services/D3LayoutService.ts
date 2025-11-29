@@ -4,8 +4,8 @@
  * Use the new functional layout utilities from './layouts' instead:
  * - `calculateHorizontalLayout` / `calculateBalancedHorizontalLayout` from './layouts/horizontalLayoutUtils'
  * - `calculateVerticalLayout` / `calculateBalancedVerticalLayout` from './layouts/verticalLayoutUtils'
- * - `getSubtreeNodes` / `findRootNodes` from './layouts/treeUtils'
- * - `layoutStrategyFactory` from './layouts/LayoutStrategyFactory'
+ * - `getAllDescendantNodes` from './utils'
+ * - `layoutSingleTree`, `calculateLayout` from './layouts/LayoutStrategyFactory'
  *
  * The new functional approach provides:
  * - Pure functions instead of class methods
@@ -15,7 +15,7 @@
  */
 
 import type { Direction, Side, MindMapEdge, MindMapNode } from '../types';
-import { MINDMAP_TYPES, DIRECTION, SIDE } from '../types';
+import { DIRECTION, SIDE } from '../types';
 import * as d3 from 'd3';
 
 interface HierarchyNode {
@@ -600,86 +600,6 @@ class D3LayoutService {
 
     return { nodes: layoutedNodes, edges: descendantEdges };
   }
-
-  /**
-   * Layouts multiple independent trees in a mindmap
-   *
-   * This method is the main entry point for laying out complex mindmaps that may
-   * contain multiple independent tree structures. It automatically discovers all
-   * root nodes (nodes with type MINDMAP_TYPES.ROOT_NODE) and layouts each tree
-   * separately using the layoutSubtree method.
-   *
-   * Features:
-   * - Automatically discovers multiple root nodes
-   * - Layouts each tree independently using layoutSubtree
-   * - Handles orphaned nodes and edges not part of any tree
-   * - Combines results from all trees into a single output
-   * - Maintains consistent spacing and positioning across all trees
-   *
-   * Process:
-   * 1. Find all nodes with ROOT_NODE type
-   * 2. For each root, collect its descendant nodes and edges
-   * 3. Layout each tree using layoutSubtree
-   * 4. Combine all results and include orphaned elements
-   *
-   * @param nodes - Array of all nodes in the mindmap
-   * @param edges - Array of all edges in the mindmap
-   * @param direction - Layout direction (HORIZONTAL, VERTICAL, or NONE)
-   * @returns Promise resolving to object containing all positioned nodes and edges
-   *
-   * @example
-   * ```typescript
-   * const result = await layoutAllTrees(
-   *   allNodes,
-   *   allEdges,
-   *   DIRECTION.HORIZONTAL
-   * );
-   * ```
-   */
-  async layoutAllTrees(nodes: MindMapNode[], edges: MindMapEdge[], direction: Direction) {
-    if (direction === DIRECTION.NONE) return { nodes, edges };
-
-    const rootNodes = nodes.filter((node) => node.type === MINDMAP_TYPES.ROOT_NODE);
-
-    if (rootNodes.length === 0) {
-      console.warn('No root nodes found');
-      return { nodes, edges };
-    }
-
-    let allLayoutedNodes: MindMapNode[] = [];
-    let allLayoutedEdges: MindMapEdge[] = [];
-
-    // Layout each tree separately
-    for (const rootNode of rootNodes) {
-      const descendantNodes = this.getSubtreeNodes(rootNode.id, nodes).filter(
-        (node) => node.id !== rootNode.id
-      );
-
-      const treeNodeIds = new Set([rootNode.id, ...descendantNodes.map((n) => n.id)]);
-      const treeEdges = edges.filter((edge) => treeNodeIds.has(edge.source) && treeNodeIds.has(edge.target));
-
-      const { nodes: layoutedTreeNodes, edges: layoutedTreeEdges } = await this.layoutSubtree(
-        rootNode,
-        descendantNodes,
-        treeEdges,
-        direction
-      );
-
-      allLayoutedNodes.push(...layoutedTreeNodes);
-      allLayoutedEdges.push(...layoutedTreeEdges);
-    }
-
-    // Handle orphaned nodes and edges
-    const processedNodeIds = new Set(allLayoutedNodes.map((n) => n.id));
-    const orphanedNodes = nodes.filter((node) => !processedNodeIds.has(node.id));
-    allLayoutedNodes.push(...orphanedNodes);
-
-    const processedEdgeIds = new Set(allLayoutedEdges.map((e) => e.id));
-    const orphanedEdges = edges.filter((edge) => !processedEdgeIds.has(edge.id));
-    allLayoutedEdges.push(...orphanedEdges);
-
-    return { nodes: allLayoutedNodes, edges: allLayoutedEdges };
-  }
 }
 
 /**
@@ -692,9 +612,6 @@ class D3LayoutService {
  * @example
  * ```typescript
  * import { d3LayoutService } from './D3LayoutService';
- *
- * // Layout all trees in a mindmap
- * const result = await d3LayoutService.layoutAllTrees(nodes, edges, direction);
  *
  * // Layout a specific subtree
  * const subtreeResult = await d3LayoutService.layoutSubtree(

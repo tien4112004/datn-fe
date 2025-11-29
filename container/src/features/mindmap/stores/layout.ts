@@ -1,11 +1,16 @@
 import { create } from 'zustand';
 import * as d3 from 'd3';
 import type { MindMapEdge, MindMapNode, Direction, LayoutType, LayoutOptions } from '../types';
-import { LAYOUT_TYPE } from '../types';
+import { LAYOUT_TYPE, MINDMAP_TYPES } from '../types';
 import { useCoreStore } from './core';
 import { devtools } from 'zustand/middleware';
-import { layoutStrategyFactory } from '../services/layouts/LayoutStrategyFactory';
-import { getSubtreeNodes } from '../services/layouts/treeUtils';
+import {
+  fromDirection,
+  toDirection,
+  layoutSingleTree,
+  calculateLayout,
+} from '../services/layouts/layoutStrategy';
+import { getAllDescendantNodes } from '../services/utils';
 import { useUndoRedoStore } from './undoredo';
 
 interface AnimationData {
@@ -51,18 +56,10 @@ export interface LayoutState {
   setAutoLayoutEnabled: (enabled: boolean) => void;
   setIsAnimating: (isAnimating: boolean) => void;
   stopAnimation: () => void;
-  layoutAllTrees: (
-    nodes: MindMapNode[],
-    edges: MindMapEdge[],
-    direction: Direction
-  ) => Promise<{
-    nodes: MindMapNode[];
-    edges: MindMapEdge[];
-  }>;
   /**
-   * Layout all trees using the new layout type system.
+   * Layout a single tree using the new layout type system.
    */
-  layoutAllTreesWithType: (
+  layoutWithType: (
     nodes: MindMapNode[],
     edges: MindMapEdge[],
     layoutType: LayoutType
@@ -104,13 +101,13 @@ export const useLayoutStore = create<LayoutState>()(
 
       setLayout: (direction) => {
         // Convert direction to layout type for consistency
-        const layoutType = layoutStrategyFactory.fromDirection(direction);
+        const layoutType = fromDirection(direction);
         set({ layout: direction, layoutType }, false, 'mindmap-layout/setLayout');
       },
 
       setLayoutType: (layoutType) => {
         // Also update legacy direction for backward compatibility
-        const direction = layoutStrategyFactory.toDirection(layoutType) as Direction;
+        const direction = toDirection(layoutType) as Direction;
         set({ layoutType, layout: direction }, false, 'mindmap-layout/setLayoutType');
       },
 
@@ -220,12 +217,21 @@ export const useLayoutStore = create<LayoutState>()(
 
         if (!nodes?.length || !edges) return;
 
+        // Ensure single-root tree before performing a global update
+        const rootNodes = nodes.filter((n) => n.type === MINDMAP_TYPES.ROOT_NODE);
+        if (rootNodes.length !== 1) {
+          console.warn(
+            `updateLayout requires a single root node. Found ${rootNodes.length}. Skipping layout.`
+          );
+          return;
+        }
+
         set({ isLayouting: true }, false, 'mindmap-layout/updateLayout');
 
         try {
           // Convert legacy direction to layoutType
-          const layoutType = layoutStrategyFactory.fromDirection(layoutDirection);
-          const { nodes: layoutedNodes, edges: layoutedEdges } = await layoutStrategyFactory.layoutAllTrees(
+          const layoutType = fromDirection(layoutDirection);
+          const { nodes: layoutedNodes, edges: layoutedEdges } = await layoutSingleTree(
             layoutType,
             nodes,
             edges,
@@ -268,7 +274,7 @@ export const useLayoutStore = create<LayoutState>()(
             return;
           }
 
-          const descendantNodes = getSubtreeNodes(nodeId, nodes).filter((node) => node.id !== nodeId);
+          const descendantNodes = getAllDescendantNodes(nodeId, nodes);
 
           const subtreeNodeIds = new Set([nodeId, ...descendantNodes.map((n) => n.id)]);
           const subtreeEdges = edges.filter(
@@ -276,8 +282,8 @@ export const useLayoutStore = create<LayoutState>()(
           );
 
           // Convert legacy direction to layoutType
-          const layoutType = layoutStrategyFactory.fromDirection(direction);
-          const { nodes: layoutedNodes, edges: layoutedEdges } = await layoutStrategyFactory.calculateLayout(
+          const layoutType = fromDirection(direction);
+          const { nodes: layoutedNodes, edges: layoutedEdges } = await calculateLayout(
             layoutType,
             rootNode,
             descendantNodes,
@@ -326,10 +332,19 @@ export const useLayoutStore = create<LayoutState>()(
 
         if (!nodes?.length || !edges) return;
 
+        // Ensure single-root tree before performing auto layout
+        const rootNodes = nodes.filter((n) => n.type === MINDMAP_TYPES.ROOT_NODE);
+        if (rootNodes.length !== 1) {
+          console.warn(
+            `applyAutoLayout requires a single root node. Found ${rootNodes.length}. Skipping layout.`
+          );
+          return;
+        }
+
         set({ isLayouting: true }, false, 'mindmap-layout/applyAutoLayout');
 
         try {
-          const { nodes: layoutedNodes, edges: layoutedEdges } = await layoutStrategyFactory.layoutAllTrees(
+          const { nodes: layoutedNodes, edges: layoutedEdges } = await layoutSingleTree(
             layoutType,
             nodes,
             edges,
@@ -366,14 +381,20 @@ export const useLayoutStore = create<LayoutState>()(
 
       // ===== New Layout Type Methods =====
 
-      layoutAllTreesWithType: async (nodes, edges, layoutType) => {
-        // Use strategy factory to layout with new layout types
-        const result = await layoutStrategyFactory.layoutAllTrees(
-          layoutType,
-          nodes,
-          edges,
-          DEFAULT_LAYOUT_OPTIONS
-        );
+      layoutWithType: async (nodes, edges, layoutType) => {
+        // Only layout when there is exactly one root node in the provided nodes.
+        if (!nodes?.length || !edges) return { nodes, edges };
+
+        const rootNodes = nodes.filter((n) => n.type === MINDMAP_TYPES.ROOT_NODE);
+        if (rootNodes.length !== 1) {
+          console.warn(
+            `layoutWithType requires a single root node. Found ${rootNodes.length}. Skipping layout.`
+          );
+          return { nodes, edges };
+        }
+
+        // Use strategy factory to layout the single tree
+        const result = await layoutSingleTree(layoutType, nodes, edges, DEFAULT_LAYOUT_OPTIONS);
         return result;
       },
 
@@ -391,7 +412,7 @@ export const useLayoutStore = create<LayoutState>()(
         set({ isLayouting: true }, false, 'mindmap-layout/updateLayoutWithType');
 
         try {
-          const { nodes: layoutedNodes, edges: layoutedEdges } = await layoutStrategyFactory.layoutAllTrees(
+          const { nodes: layoutedNodes, edges: layoutedEdges } = await layoutSingleTree(
             targetLayoutType,
             nodes,
             edges,

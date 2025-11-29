@@ -22,6 +22,61 @@ export interface VerticalLayoutConfig {
   yDirection: 1 | -1;
 }
 
+/**
+ * Assigns side and siblingOrder to nodes based on their final positions.
+ * For vertical layouts:
+ * - side: TOP if y < rootY, BOTTOM otherwise
+ * - siblingOrder: based on X position within each parent group (left to right)
+ */
+const assignSideAndOrderFromPositionsVertical = (nodes: MindMapNode[], rootY: number): MindMapNode[] => {
+  // Group nodes by parentId
+  const childrenByParent = new Map<string, MindMapNode[]>();
+  for (const node of nodes) {
+    if (node.type === MINDMAP_TYPES.ROOT_NODE) continue;
+    const parentId = node.data.parentId;
+    if (!parentId) continue;
+
+    if (!childrenByParent.has(parentId)) {
+      childrenByParent.set(parentId, []);
+    }
+    childrenByParent.get(parentId)!.push(node);
+  }
+
+  // For each parent group, sort by X position and assign siblingOrder
+  const orderMap = new Map<string, number>();
+  for (const [_parentId, children] of childrenByParent) {
+    // Sort by X position (left to right)
+    const sorted = [...children].sort((a, b) => {
+      const xA = a.position?.x ?? 0;
+      const xB = b.position?.x ?? 0;
+      return xA - xB;
+    });
+
+    sorted.forEach((child, index) => {
+      orderMap.set(child.id, index);
+    });
+  }
+
+  // Apply side and siblingOrder to all nodes
+  return nodes.map((node) => {
+    if (node.type === MINDMAP_TYPES.ROOT_NODE) {
+      return {
+        ...node,
+        data: { ...node.data, side: SIDE.MID as Side },
+      };
+    }
+
+    const nodeY = node.position?.y ?? 0;
+    const side = nodeY < rootY ? SIDE.TOP : SIDE.BOTTOM;
+    const siblingOrder = orderMap.get(node.id) ?? node.data.siblingOrder ?? 0;
+
+    return {
+      ...node,
+      data: { ...node.data, side, siblingOrder },
+    };
+  });
+};
+
 // ============================================================================
 // Vertical Layout Functions
 // ============================================================================
@@ -281,21 +336,15 @@ export const calculateVerticalLayout = async (
 // ============================================================================
 
 /**
- * Builds a hierarchy for nodes on a specific side of the root (TOP or BOTTOM).
+ * Builds a hierarchy for a subset of level 1 nodes (used for balanced layout).
+ * This version takes specific level1 nodes instead of filtering by side.
  */
-const buildVerticalSideHierarchy = (
+const buildVerticalSideHierarchyFromNodes = (
   rootNode: MindMapNode,
-  descendants: MindMapNode[],
-  side: Side
+  level1Nodes: MindMapNode[],
+  childrenMap: Map<string, MindMapNode[]>
 ): HierarchyNode => {
-  // Filter level 1 nodes for this side
-  const level1Nodes = descendants.filter((n) => n.data.level === 1 && n.data.side === side);
-
-  // Build children map (sorted by siblingOrder)
-  const childrenMap = groupByParent(descendants);
-
-  // Build children for root on this side
-  const children = sortBySiblingOrder(level1Nodes).map((child) => buildSubtree(child, childrenMap));
+  const children = level1Nodes.map((child) => buildSubtree(child, childrenMap));
 
   return {
     originalNode: rootNode,
@@ -305,6 +354,7 @@ const buildVerticalSideHierarchy = (
 
 /**
  * Processes a side hierarchy and positions nodes for vertical layout.
+ * Assigns side based on final position relative to root.
  */
 const processBalancedVerticalSideHierarchy = (
   tree: HierarchyNode,
@@ -343,7 +393,7 @@ const processBalancedVerticalSideHierarchy = (
   // Adjust spacing
   adjustHorizontalSpacing(hierarchy, horizontalSpacing);
 
-  // Collect positioned nodes (excluding root, will be added separately)
+  // Collect positioned nodes (side and siblingOrder will be assigned later)
   const layoutedNodes: MindMapNode[] = [];
 
   hierarchy.each((node: D3HierarchyNode) => {
@@ -361,6 +411,8 @@ const processBalancedVerticalSideHierarchy = (
 
 /**
  * Calculates a balanced vertical layout with nodes on both TOP and BOTTOM sides.
+ * Splits level 1 children incrementally: first half to TOP, second half to BOTTOM.
+ * Side is assigned AFTER layout based on final positions.
  */
 export const calculateBalancedVerticalLayout = (
   rootNode: MindMapNode,
@@ -372,8 +424,20 @@ export const calculateBalancedVerticalLayout = (
   const rootX = rootNode.position?.x ?? 0;
   const rootY = rootNode.position?.y ?? 0;
 
+  // Build children map (sorted by siblingOrder)
+  const childrenMap = groupByParent(descendants);
+
+  // Get level 1 nodes (direct children of root) sorted by sibling order
+  const level1Nodes = sortBySiblingOrder(descendants.filter((n) => n.data.level === 1));
+
+  // Split level 1 nodes incrementally: first half to TOP, second half to BOTTOM
+  const totalLevel1 = level1Nodes.length;
+  const halfPoint = Math.ceil(totalLevel1 / 2);
+  const topLevel1Nodes = level1Nodes.slice(0, halfPoint);
+  const bottomLevel1Nodes = level1Nodes.slice(halfPoint);
+
   // Build and process top side
-  const topTree = buildVerticalSideHierarchy(rootNode, descendants, SIDE.TOP);
+  const topTree = buildVerticalSideHierarchyFromNodes(rootNode, topLevel1Nodes, childrenMap);
   const topNodes = processBalancedVerticalSideHierarchy(
     topTree,
     SIDE.TOP,
@@ -385,7 +449,7 @@ export const calculateBalancedVerticalLayout = (
   );
 
   // Build and process bottom side
-  const bottomTree = buildVerticalSideHierarchy(rootNode, descendants, SIDE.BOTTOM);
+  const bottomTree = buildVerticalSideHierarchyFromNodes(rootNode, bottomLevel1Nodes, childrenMap);
   const bottomNodes = processBalancedVerticalSideHierarchy(
     bottomTree,
     SIDE.BOTTOM,
@@ -396,16 +460,18 @@ export const calculateBalancedVerticalLayout = (
     verticalSpacing
   );
 
-  // Combine results: root + top + bottom
-  const layoutedNodes: MindMapNode[] = [
+  // Combine positioned nodes (root + top + bottom)
+  const positionedNodes: MindMapNode[] = [
     {
       ...rootNode,
       position: { x: rootX, y: rootY },
-      data: { ...rootNode.data, side: 'mid' as Side },
     },
     ...topNodes,
     ...bottomNodes,
   ];
+
+  // Derive side and siblingOrder from final positions
+  const layoutedNodes = assignSideAndOrderFromPositionsVertical(positionedNodes, rootY);
 
   return { nodes: layoutedNodes, edges };
 };

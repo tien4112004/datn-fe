@@ -29,8 +29,6 @@ export const LAYOUT_TYPE = {
   BOTTOM_ONLY: 'bottom-only',
   /** Children positioned above parent, centered horizontally */
   TOP_ONLY: 'top-only',
-  /** No automatic layout */
-  NONE: '',
 } as const;
 
 export const SIDE = {

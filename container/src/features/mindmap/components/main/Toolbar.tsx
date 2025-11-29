@@ -41,7 +41,7 @@ const Toolbar = ({ mindmapId }: { mindmapId: string }) => {
   }, [hasSelection, activeTab]);
 
   return (
-    <div className="absolute bottom-0 right-0 top-0 z-10 flex w-64 flex-col gap-2 overflow-y-auto border-l border-gray-200 bg-gradient-to-b from-white to-slate-50/95 p-4 shadow-lg backdrop-blur-md">
+    <div className="flex w-64 flex-col gap-2 overflow-y-auto border-l border-gray-200 bg-gradient-to-b from-white to-slate-50/95 p-4 shadow-lg backdrop-blur-md">
       {/* Header */}
       <div className="flex items-center justify-between">
         <h2 className="text-base font-bold text-gray-800">{t('toolbar.title')}</h2>

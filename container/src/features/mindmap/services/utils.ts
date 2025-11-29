@@ -1,6 +1,6 @@
 import { Position } from '@xyflow/react';
-import type { MindMapNode, Side, MindMapEdge, AiGeneratedNode } from '../types';
-import { MINDMAP_TYPES, SIDE, PATH_TYPES, DRAGHANDLE } from '../types';
+import type { MindMapNode, Side, MindMapEdge, AiGeneratedNode, LayoutType, RootNode } from '../types';
+import { MINDMAP_TYPES, SIDE, PATH_TYPES, DRAGHANDLE, LAYOUT_TYPE } from '../types';
 import { generateId } from '@/shared/lib/utils';
 
 export const getAllDescendantNodes = (parentId: string, nodes: MindMapNode[]): MindMapNode[] => {
@@ -148,4 +148,117 @@ export const convertAiDataToMindMapNodes = (
   }
 
   return { nodes, edges };
+};
+
+// ===== Root Node Layout Helpers =====
+
+/**
+ * Default layout type when none is specified on root node
+ */
+export const DEFAULT_LAYOUT_TYPE: LayoutType = LAYOUT_TYPE.HORIZONTAL_BALANCED;
+
+/**
+ * Find the root node from a list of nodes
+ * Returns the first root node found, or null if none exists
+ */
+export const findRootNode = (nodes: MindMapNode[]): RootNode | null => {
+  return (nodes.find((n) => n.type === MINDMAP_TYPES.ROOT_NODE) as RootNode) || null;
+};
+
+/**
+ * Find all root nodes from a list of nodes
+ * Used for multi-tree support
+ */
+export const findAllRootNodes = (nodes: MindMapNode[]): RootNode[] => {
+  return nodes.filter((n) => n.type === MINDMAP_TYPES.ROOT_NODE) as RootNode[];
+};
+
+/**
+ * Get the layout type for a tree from its root node
+ * Falls back to default layout type if not set
+ */
+export const getTreeLayoutType = (nodes: MindMapNode[]): LayoutType => {
+  const rootNode = findRootNode(nodes);
+  return rootNode?.data?.layoutType ?? DEFAULT_LAYOUT_TYPE;
+};
+
+/**
+ * Get the layout type for a specific root node
+ * Falls back to default layout type if not set
+ */
+export const getRootLayoutType = (rootNode: RootNode | null): LayoutType => {
+  return rootNode?.data?.layoutType ?? DEFAULT_LAYOUT_TYPE;
+};
+
+/**
+ * Check if force layout (auto-layout) is enabled for a tree
+ */
+export const getTreeForceLayout = (nodes: MindMapNode[]): boolean => {
+  const rootNode = findRootNode(nodes);
+  return rootNode?.data?.forceLayout ?? false;
+};
+
+/**
+ * Check if force layout (auto-layout) is enabled for a specific root node
+ */
+export const getRootForceLayout = (rootNode: RootNode | null): boolean => {
+  return rootNode?.data?.forceLayout ?? false;
+};
+
+/**
+ * Update the layout type on a root node, returning updated nodes array
+ */
+export const setTreeLayoutType = (nodes: MindMapNode[], layoutType: LayoutType): MindMapNode[] => {
+  return nodes.map((node) => {
+    if (node.type === MINDMAP_TYPES.ROOT_NODE) {
+      return {
+        ...node,
+        data: {
+          ...node.data,
+          layoutType,
+        },
+      };
+    }
+    return node;
+  });
+};
+
+/**
+ * Update the force layout setting on a root node, returning updated nodes array
+ */
+export const setTreeForceLayout = (nodes: MindMapNode[], forceLayout: boolean): MindMapNode[] => {
+  return nodes.map((node) => {
+    if (node.type === MINDMAP_TYPES.ROOT_NODE) {
+      return {
+        ...node,
+        data: {
+          ...node.data,
+          forceLayout,
+        },
+      };
+    }
+    return node;
+  });
+};
+
+/**
+ * Update layout data on a specific root node by ID, returning updated nodes array
+ */
+export const updateRootNodeLayoutData = (
+  nodes: MindMapNode[],
+  rootNodeId: string,
+  layoutData: { layoutType?: LayoutType; forceLayout?: boolean }
+): MindMapNode[] => {
+  return nodes.map((node) => {
+    if (node.id === rootNodeId && node.type === MINDMAP_TYPES.ROOT_NODE) {
+      return {
+        ...node,
+        data: {
+          ...node.data,
+          ...layoutData,
+        },
+      };
+    }
+    return node;
+  });
 };

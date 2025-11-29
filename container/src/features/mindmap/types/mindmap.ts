@@ -50,6 +50,10 @@ export interface RootNodeData extends BaseNodeData {
   content: string;
   pathType?: PathType;
   edgeColor?: string;
+  /** The layout type used for arranging nodes in this tree */
+  layoutType?: LayoutType;
+  /** Whether to force auto-layout on changes for this tree */
+  forceLayout?: boolean;
 }
 
 export interface RootNode extends BaseNode<RootNodeData, typeof MINDMAP_TYPES.ROOT_NODE> {}

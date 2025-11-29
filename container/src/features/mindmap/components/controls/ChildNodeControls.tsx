@@ -17,9 +17,10 @@ import { Position, type NodeProps, useUpdateNodeInternals } from '@xyflow/react'
 import { DIRECTION, SIDE, MINDMAP_TYPES, LAYOUT_TYPE } from '@/features/mindmap/types';
 import { cn } from '@/shared/lib/utils';
 import { motion } from 'motion/react';
-import { memo, useCallback, useEffect } from 'react';
+import { memo, useCallback, useEffect, useMemo } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { BaseHandle } from '../ui/base-handle';
+import { getTreeLayoutType } from '@/features/mindmap/services/utils';
 
 interface ChildNodeControlsProps {
   node: NodeProps<MindMapNode>;
@@ -35,22 +36,25 @@ const nodeManipulationSelector = (state: NodeManipulationState) => ({
 const coreStoreSelector = (state: CoreState) => ({
   hasLeftChildren: state.hasLeftChildren,
   hasRightChildren: state.hasRightChildren,
+  nodes: state.nodes,
 });
 
 const nodeOperationsSelector = (state: NodeOperationsState) => state.addChildNode;
 
 const layoutStoreSelector = (state: LayoutState) => ({
-  layout: state.layout,
-  layoutType: state.layoutType,
+  isLayouting: state.isLayouting,
 });
 
 const mouseOverSelector = (state: ClipboardState) => state.mouseOverNodeId;
 
 export const ChildNodeControls = ({ node, selected }: ChildNodeControlsProps) => {
   const { collapse, expand } = useNodeManipulationStore(useShallow(nodeManipulationSelector));
-  const { hasLeftChildren, hasRightChildren } = useCoreStore(useShallow(coreStoreSelector));
+  const { hasLeftChildren, hasRightChildren, nodes } = useCoreStore(useShallow(coreStoreSelector));
   const addChildNodeStore = useNodeOperationsStore(nodeOperationsSelector);
-  const { layoutType } = useLayoutStore(useShallow(layoutStoreSelector));
+  useLayoutStore(useShallow(layoutStoreSelector));
+
+  // Get layout type from root node
+  const layoutType = useMemo(() => getTreeLayoutType(nodes), [nodes]);
 
   const isRootNode = node.type === MINDMAP_TYPES.ROOT_NODE;
 

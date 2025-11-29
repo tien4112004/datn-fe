@@ -16,7 +16,7 @@ import ColorPickerControl from '../controls/ColorPickerControl';
 import { useCallback, useMemo } from 'react';
 import { SIDE, MINDMAP_TYPES, LAYOUT_TYPE } from '../../types';
 import type { LayoutType } from '../../types';
-import { getAllDescendantNodes } from '../../services/utils';
+import { getAllDescendantNodes, getTreeLayoutType, getTreeForceLayout } from '../../services/utils';
 
 interface NodeSelectionTabProps {
   className?: string;
@@ -42,11 +42,12 @@ const NodeSelectionTab = ({ className }: NodeSelectionTabProps) => {
   const addChildNode = useNodeOperationsStore((state) => state.addChildNode);
   const updateSubtreeLayout = useLayoutStore((state) => state.updateSubtreeLayout);
   const updateLayoutWithType = useLayoutStore((state) => state.updateLayoutWithType);
-  const layout = useLayoutStore((state) => state.layout);
-  const layoutType = useLayoutStore((state) => state.layoutType);
   const setLayoutType = useLayoutStore((state) => state.setLayoutType);
-  const isAutoLayoutEnabled = useLayoutStore((state) => state.isAutoLayoutEnabled);
   const setAutoLayoutEnabled = useLayoutStore((state) => state.setAutoLayoutEnabled);
+
+  // Get layout data from root node
+  const layoutType = useMemo(() => getTreeLayoutType(nodes), [nodes]);
+  const isAutoLayoutEnabled = useMemo(() => getTreeForceLayout(nodes), [nodes]);
 
   // Get the background color of the first selected node (for single selection styling)
   const currentColor = (firstSelectedNode?.data?.backgroundColor as string) || '#ffffff';
@@ -170,6 +171,9 @@ const NodeSelectionTab = ({ className }: NodeSelectionTabProps) => {
       }))
     );
   }, [firstSelectedNode, nodes, setNodes]);
+
+  // Get legacy direction from layout type for subtree layout
+  const layout = useLayoutStore((state) => state.getLayout)();
 
   // Layout subtree for the selected node
   const handleLayoutSubtree = useCallback(() => {

@@ -6,21 +6,54 @@ import { DevTools } from '@/features/mindmap/components/ui/devtools';
 import { Flow, LogicHandler, Toolbar, MindmapTitleInput } from '@/features/mindmap/components';
 import { useState, useEffect } from 'react';
 import { useLoaderData } from 'react-router-dom';
-import { useCoreStore, useLayoutStore, useMetadataStore } from '../stores';
+import { useCoreStore } from '../stores';
 import { useMindmapDirtyTracking } from '../hooks/useDirtyTracking';
 import { useUnsavedChangesBlocker } from '@/shared/hooks';
 import { UnsavedChangesDialog } from '@/shared/components/modals/UnsavedChangesDialog';
-import type { Mindmap } from '../types';
+import type { Mindmap, MindMapNode } from '../types';
+import { MINDMAP_TYPES } from '../types';
+
+/**
+ * Migrate layout data from mindmap metadata to root nodes.
+ * This ensures backward compatibility with mindmaps that stored layout data globally.
+ */
+const migrateLayoutDataToRootNodes = (
+  nodes: MindMapNode[],
+  metadata?: Mindmap['metadata']
+): MindMapNode[] => {
+  if (!metadata) return nodes;
+
+  const { layoutType, forceLayout } = metadata;
+
+  // If no layout data in metadata, return nodes as-is
+  if (!layoutType && forceLayout === undefined) return nodes;
+
+  // Apply layout data to all root nodes that don't have it set
+  return nodes.map((node) => {
+    if (node.type !== MINDMAP_TYPES.ROOT_NODE) return node;
+
+    const rootNode = node;
+    const needsLayoutType = layoutType && !rootNode.data.layoutType;
+    const needsForceLayout = forceLayout !== undefined && rootNode.data.forceLayout === undefined;
+
+    if (!needsLayoutType && !needsForceLayout) return node;
+
+    return {
+      ...rootNode,
+      data: {
+        ...rootNode.data,
+        ...(needsLayoutType && { layoutType }),
+        ...(needsForceLayout && { forceLayout }),
+      },
+    };
+  });
+};
 
 const MindmapPage = () => {
   const [isPanOnDrag, setIsPanOnDrag] = useState(false);
   const { mindmap } = useLoaderData() as { mindmap: Mindmap };
   const setNodes = useCoreStore((state) => state.setNodes);
   const setEdges = useCoreStore((state) => state.setEdges);
-  const setLayout = useLayoutStore((state) => state.setLayout);
-  const setLayoutType = useLayoutStore((state) => state.setLayoutType);
-  const setAutoLayoutEnabled = useLayoutStore((state) => state.setAutoLayoutEnabled);
-  const setMetadata = useMetadataStore((state) => state.setMetadata);
 
   // Track dirty state changes
   useMindmapDirtyTracking();
@@ -33,23 +66,13 @@ const MindmapPage = () => {
   // Sync mindmap data from React Router loader to stores
   useEffect(() => {
     if (mindmap) {
-      setNodes(mindmap.nodes);
+      // Migrate layout data from metadata to root nodes for backward compatibility
+      const migratedNodes = migrateLayoutDataToRootNodes(mindmap.nodes, mindmap.metadata);
+
+      setNodes(migratedNodes);
       setEdges(mindmap.edges);
-
-      // Sync metadata if available
-      if (mindmap.metadata) {
-        setMetadata(mindmap.metadata);
-
-        if (mindmap.metadata.layoutType) {
-          setLayoutType(mindmap.metadata.layoutType);
-        }
-
-        if (mindmap.metadata.forceLayout) {
-          setAutoLayoutEnabled(mindmap.metadata.forceLayout);
-        }
-      }
     }
-  }, [mindmap, setNodes, setEdges, setLayout, setLayoutType, setMetadata, setAutoLayoutEnabled]);
+  }, [mindmap, setNodes, setEdges]);
 
   const togglePanOnDrag = () => {
     setIsPanOnDrag(!isPanOnDrag);

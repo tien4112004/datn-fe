@@ -5,8 +5,10 @@ import { useEffect, useState } from 'react';
 import type { Mindmap } from '../types';
 import type { ApiResponse } from '@/shared/types/api';
 import { ExpectedError } from '@/types/errors';
-import { useMetadataStore, useLayoutStore } from '../stores';
+import { useMetadataStore } from '../stores';
+import { useCoreStore } from '../stores/core';
 import { DRAGHANDLE } from '../types';
+import { getTreeLayoutType, getTreeForceLayout } from '../services/utils';
 
 // Return types for the hooks
 export interface UseMindmapsReturn extends Omit<UseQueryResult<ApiResponse<Mindmap[]>>, 'data'> {
@@ -198,24 +200,24 @@ export const useUpdateMindmap = () => {
 export const useUpdateMindmapWithMetadata = () => {
   const mindmapApiService = useMindmapApiService();
   const queryClient = useQueryClient();
-  const getMetadata = useMetadataStore((state) => state.getMetadata);
   const getThumbnail = useMetadataStore((state) => state.getThumbnail);
-  const layoutType = useLayoutStore((state) => state.layoutType);
-  const isAutoLayoutEnabled = useLayoutStore((state) => state.isAutoLayoutEnabled);
+  const nodes = useCoreStore((state) => state.nodes);
 
   return useMutation({
     mutationFn: async ({ id, data }: { id: string; data: Partial<Mindmap> }) => {
-      // Include metadata from store in the update payload
-      const metadata = getMetadata() || {};
+      // Get layout data from root node
+      const layoutType = getTreeLayoutType(nodes);
+      const forceLayout = getTreeForceLayout(nodes);
+
       const updateData: Partial<Mindmap> = {
         ...data,
       };
 
-      // Include layoutType and auto layout state in metadata
+      // Include layoutType and auto layout state in metadata for backward compatibility
+      // The actual data is stored in root node, but we also save to metadata for older clients
       updateData.metadata = {
-        ...metadata,
         layoutType,
-        forceLayout: isAutoLayoutEnabled,
+        forceLayout,
       };
 
       const thumbnail = getThumbnail();

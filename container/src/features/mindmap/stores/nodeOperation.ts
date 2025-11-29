@@ -4,7 +4,12 @@ import { devtools } from 'zustand/middleware';
 import type { MindMapNode, MindMapEdge, MindMapTypes, PathType, Side, LayoutType } from '../types';
 import { MINDMAP_TYPES, PATH_TYPES, DRAGHANDLE, SIDE, LAYOUT_TYPE } from '../types';
 import { generateId } from '@/shared/lib/utils';
-import { getRootNodeOfSubtree, getAllDescendantNodes } from '../services/utils';
+import {
+  getRootNodeOfSubtree,
+  getAllDescendantNodes,
+  getTreeLayoutType,
+  getTreeForceLayout,
+} from '../services/utils';
 import { useCoreStore } from './core';
 import { useUndoRedoStore } from './undoredo';
 import { useLayoutStore } from './layout';
@@ -188,8 +193,9 @@ export const useNodeOperationsStore = create<NodeOperationsState>()(
       ) => {
         const { nodes, setNodes, setEdges, edges } = useCoreStore.getState();
         const { prepareToPushUndo, pushToUndoStack } = useUndoRedoStore.getState();
-        const { isAutoLayoutEnabled, applyAutoLayout } = useLayoutStore.getState();
-        const { layoutType } = useLayoutStore.getState();
+        const { applyAutoLayout } = useLayoutStore.getState();
+        const isAutoLayoutEnabled = getTreeForceLayout(nodes);
+        const layoutType = getTreeLayoutType(nodes);
         prepareToPushUndo();
         // Find the root node to get the pathType
         const rootNode = getRootNodeOfSubtree(parentNode.id!, nodes);

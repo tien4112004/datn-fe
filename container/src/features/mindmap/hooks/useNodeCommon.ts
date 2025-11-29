@@ -3,8 +3,11 @@ import { useEffect, useMemo } from 'react';
 import { useUpdateNodeInternals, type NodeProps } from '@xyflow/react';
 import { useShallow } from 'zustand/react/shallow';
 import { useLayoutStore } from '../stores/layout';
+import { useCoreStore } from '../stores/core';
 import { type Direction, type Side, type BaseNode, type LayoutType } from '../types';
 import { useNodeManipulationStore, useNodeOperationsStore } from '../stores';
+import { getTreeLayoutType } from '../services/utils';
+import { toDirection } from '../services/layouts/layoutStrategy';
 
 export interface UseNodeCommonProps<T extends BaseNode = BaseNode> {
   node: NodeProps<T>;
@@ -21,8 +24,6 @@ export interface UseNodeCommonReturn {
 
 // Optimized selectors to prevent unnecessary re-renders
 const layoutSelector = (state: any) => ({
-  layout: state.layout,
-  layoutType: state.layoutType,
   isLayouting: state.isLayouting,
 });
 
@@ -37,9 +38,14 @@ const nodeManipulationSelector = (state: any) => ({
 export const useMindmapNodeCommon = <T extends BaseNode = BaseNode>({
   node,
 }: UseNodeCommonProps<T>): UseNodeCommonReturn => {
-  const { layout, layoutType, isLayouting } = useLayoutStore(useShallow(layoutSelector));
+  const { isLayouting } = useLayoutStore(useShallow(layoutSelector));
   const { onNodeDelete } = useNodeOperationsStore(useShallow(nodeOperationsSelector));
   const { moveToChild } = useNodeManipulationStore(useShallow(nodeManipulationSelector));
+
+  // Get layout data from nodes (stored in root node)
+  const nodes = useCoreStore((state) => state.nodes);
+  const layoutType = getTreeLayoutType(nodes);
+  const layout = toDirection(layoutType) as Direction;
 
   const updateNodeInternals = useUpdateNodeInternals();
 

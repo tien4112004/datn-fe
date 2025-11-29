@@ -3,7 +3,7 @@ import '@xyflow/react/dist/style.css';
 import { Background, BackgroundVariant, Controls, MiniMap, ControlButton } from '@xyflow/react';
 import { Move, MousePointer2 } from 'lucide-react';
 import { DevTools } from '@/features/mindmap/components/ui/devtools';
-import { Flow, LogicHandler, Toolbar } from '@/features/mindmap/components';
+import { Flow, LogicHandler, Toolbar, MindmapTitleInput } from '@/features/mindmap/components';
 import { useState, useEffect } from 'react';
 import { useLoaderData } from 'react-router-dom';
 import { useCoreStore, useLayoutStore, useMetadataStore } from '../stores';
@@ -40,12 +40,8 @@ const MindmapPage = () => {
       if (mindmap.metadata) {
         setMetadata(mindmap.metadata);
 
-        // Sync layout type to layout store (prefer layoutType over legacy direction)
         if (mindmap.metadata.layoutType) {
           setLayoutType(mindmap.metadata.layoutType);
-        } else if (mindmap.metadata.direction) {
-          // Fallback to legacy direction for backward compatibility
-          setLayout(mindmap.metadata.direction);
         }
 
         if (mindmap.metadata.forceLayout) {
@@ -74,7 +70,7 @@ const MindmapPage = () => {
             </Controls>
 
             <MiniMap
-              className="!border-border !bg-white/90"
+              className="!border-border !mb-4 !mr-4 !bg-white/90"
               style={{
                 border: '1px solid var(--border)',
                 backgroundColor: 'var(--muted)',
@@ -82,8 +78,10 @@ const MindmapPage = () => {
               nodeStrokeColor="var(--primary)"
               nodeColor="var(--primary)"
               nodeBorderRadius={8}
-              position="top-left"
+              position="bottom-right"
             />
+
+            <MindmapTitleInput mindmapId={mindmap.id} initialTitle={mindmap.title} />
 
             <Background variant={BackgroundVariant.Dots} gap={20} size={1} />
             <DevTools position="bottom-center" />

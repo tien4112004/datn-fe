@@ -14,6 +14,8 @@ import { LoginPage } from '@/features/auth/pages/LoginPage';
 import { RegisterPage } from '@/features/auth/pages/RegisterPage';
 import GoogleCallbackPage from '@/features/auth/pages/GoogleCallbackPage';
 import { ProtectedRoute } from '@/shared/components/ProtectedRoute';
+import Classes from '@/features/classes';
+import { getClassById } from '@/features/classes/shared/hooks/loaders';
 
 const router = createBrowserRouter([
   {
@@ -83,6 +85,31 @@ const router = createBrowserRouter([
             Component: Presentation.PresentationOutlinePage,
           },
         ],
+      },
+      {
+        path: 'classes',
+        Component: Classes.ClassListPage,
+      },
+      {
+        path: 'classes/:id',
+        Component: Classes.ClassDetailPage,
+        loader: getClassById,
+        shouldRevalidate: ({ currentUrl, nextUrl }) => {
+          // Only revalidate if the path params (id) changed, not search params (tab)
+          return currentUrl.pathname !== nextUrl.pathname;
+        },
+      },
+      {
+        path: 'periods/:id',
+        Component: Classes.PeriodDetailPage,
+      },
+      {
+        path: 'lessons/:id',
+        Component: Classes.LessonDetailPage,
+      },
+      {
+        path: 'lessons/create',
+        Component: Classes.LessonCreatorPage,
       },
       {
         path: 'settings',

@@ -32,8 +32,11 @@ coverage
 .pnpm-store
 
 .__mf__temp/
-.env
 .turbo
 .vercel
-.env*.local
 
+# Universal ignores
+build/
+Thumbs.db
+*.tmp
+.env*

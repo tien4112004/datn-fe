@@ -12,17 +12,14 @@ import {
 import { Button } from '@/shared/components/ui/button';
 
 interface SmallScreenDialogProps {
-  /** Minimum viewport width in pixels (default: 768) */
   minWidth?: number;
-  /** Minimum viewport height in pixels (default: 600) */
   minHeight?: number;
 }
 
 /**
  * SmallScreenDialog component
  * Shows a dismissible warning dialog when the viewport is too small.
- * Used in editor pages (Mindmap Editor, Presentation Editor) to notify users
- * that the experience is better on larger screens.
+ * Used in editor pages to notify users that the experience is better on larger screens.
  */
 export const SmallScreenDialog = ({ minWidth = 768, minHeight = 600 }: SmallScreenDialogProps) => {
   const [open, setOpen] = useState(false);
@@ -75,5 +72,3 @@ export const SmallScreenDialog = ({ minWidth = 768, minHeight = 600 }: SmallScre
     </Dialog>
   );
 };
-
-export default SmallScreenDialog;

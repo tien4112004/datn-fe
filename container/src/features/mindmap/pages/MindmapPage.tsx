@@ -10,6 +10,7 @@ import { useCoreStore } from '../stores';
 import { useMindmapDirtyTracking } from '../hooks/useDirtyTracking';
 import { useUnsavedChangesBlocker } from '@/shared/hooks';
 import { UnsavedChangesDialog } from '@/shared/components/modals/UnsavedChangesDialog';
+import { SmallScreenDialog } from '@/shared/components/modals/SmallScreenDialog';
 import type { Mindmap, MindMapNode } from '../types';
 import { MINDMAP_TYPES } from '../types';
 
@@ -119,6 +120,7 @@ const MindmapPage = () => {
         onStay={handleStay}
         onLeave={handleProceed}
       />
+      <SmallScreenDialog />
     </>
   );
 };

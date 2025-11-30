@@ -141,8 +141,8 @@ const mockMindmaps: Mindmap[] = [
         source: 'root',
         target: 'left-1',
         type: MINDMAP_TYPES.EDGE,
-        sourceHandle: 'first-source-root',
-        targetHandle: 'second-target-left-1',
+        sourceHandle: 'left-source-root',
+        targetHandle: 'left-target-left-1',
         data: {
           strokeColor: '#00FF00',
           strokeWidth: 2,

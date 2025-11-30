@@ -42,6 +42,14 @@ export default {
       selectDescendants: 'Chọn nút con ({{count}})',
       layoutSubtree: 'Sắp xếp cây con',
       layoutTree: 'Sắp xếp toàn bộ cây',
+      edgeStyle: 'Kiểu đường nối',
+      edgeType: 'Loại đường',
+      edgeColor: 'Màu đường',
+      edgeTypes: {
+        smoothStep: 'Đường mềm',
+        bezier: 'Đường cong',
+        straight: 'Đường thẳng',
+      },
     },
     layout: {
       forceAutoLayout: 'Bật bố cục tự động',

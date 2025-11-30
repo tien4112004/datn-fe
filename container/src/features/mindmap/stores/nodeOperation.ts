@@ -9,6 +9,7 @@ import {
   getAllDescendantNodes,
   getTreeLayoutType,
   getTreeForceLayout,
+  getOppositeSide,
 } from '../services/utils';
 import { useCoreStore } from './core';
 import { useUndoRedoStore } from './undoredo';
@@ -291,9 +292,8 @@ export const useNodeOperationsStore = create<NodeOperationsState>()(
           source: parentNode.id!,
           target: newNode.id,
           type: MINDMAP_TYPES.EDGE,
-          sourceHandle:
-            side === SIDE.LEFT ? `first-source-${parentNode.id}` : `second-source-${parentNode.id}`,
-          targetHandle: side === SIDE.LEFT ? `second-target-${newNode.id}` : `first-target-${newNode.id}`,
+          sourceHandle: `${side}-source-${parentNode.id}`,
+          targetHandle: `${getOppositeSide(side)}-target-${newNode.id}`,
           data: {
             strokeColor: (rootNode?.data.edgeColor as string) || 'var(--primary)',
             strokeWidth: 2,

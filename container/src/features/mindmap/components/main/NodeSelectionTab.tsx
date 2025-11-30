@@ -11,12 +11,13 @@ import {
 import { useTranslation } from 'react-i18next';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 import { useNodeSelection } from '../../hooks/useNodeSelection';
-import { useNodeOperationsStore, useCoreStore, useLayoutStore } from '../../stores';
+import { useNodeOperationsStore, useCoreStore, useLayoutStore, useNodeManipulationStore } from '../../stores';
 import ColorPickerControl from '../controls/ColorPickerControl';
 import { useCallback, useMemo } from 'react';
-import { SIDE, MINDMAP_TYPES, LAYOUT_TYPE } from '../../types';
-import type { LayoutType } from '../../types';
+import { SIDE, MINDMAP_TYPES, LAYOUT_TYPE, PATH_TYPES } from '../../types';
+import type { LayoutType, PathType } from '../../types';
 import { getAllDescendantNodes, getTreeLayoutType, getTreeForceLayout } from '../../services/utils';
+import { BezierIcon, SmoothStepIcon, StraightIcon } from '../ui/icon';
 
 interface NodeSelectionTabProps {
   className?: string;
@@ -44,6 +45,8 @@ const NodeSelectionTab = ({ className }: NodeSelectionTabProps) => {
   const updateLayout = useLayoutStore((state) => state.updateLayout);
   const setLayoutType = useLayoutStore((state) => state.setLayoutType);
   const setAutoLayoutEnabled = useLayoutStore((state) => state.setAutoLayoutEnabled);
+  const updateSubtreeEdgePathType = useNodeManipulationStore((state) => state.updateSubtreeEdgePathType);
+  const updateSubtreeEdgeColor = useNodeManipulationStore((state) => state.updateSubtreeEdgeColor);
 
   // Get layout data from root node
   const layoutType = useMemo(() => getTreeLayoutType(nodes), [nodes]);
@@ -56,6 +59,18 @@ const NodeSelectionTab = ({ className }: NodeSelectionTabProps) => {
   const isRootNode = useMemo(() => {
     return firstSelectedNode?.type === MINDMAP_TYPES.ROOT_NODE;
   }, [firstSelectedNode]);
+
+  // Get the edge color for root node
+  const currentEdgeColor = useMemo(() => {
+    if (!isRootNode || !firstSelectedNode) return 'var(--primary)';
+    return (firstSelectedNode?.data?.edgeColor as string) || 'var(--primary)';
+  }, [isRootNode, firstSelectedNode]);
+
+  // Get the current path type for root node
+  const currentPathType = useMemo(() => {
+    if (!isRootNode || !firstSelectedNode) return PATH_TYPES.SMOOTHSTEP;
+    return (firstSelectedNode?.data?.pathType as PathType) || PATH_TYPES.SMOOTHSTEP;
+  }, [isRootNode, firstSelectedNode]);
 
   // Get descendant count for single selection
   const descendantCount = useMemo(() => {
@@ -138,6 +153,22 @@ const NodeSelectionTab = ({ className }: NodeSelectionTabProps) => {
       });
     },
     [selectedNodes, updateNodeData]
+  );
+
+  const handleEdgePathTypeChange = useCallback(
+    (pathType: PathType) => {
+      if (!firstSelectedNode || !isRootNode) return;
+      updateSubtreeEdgePathType(firstSelectedNode.id, pathType);
+    },
+    [firstSelectedNode, isRootNode, updateSubtreeEdgePathType]
+  );
+
+  const handleEdgeColorChange = useCallback(
+    (color: string) => {
+      if (!firstSelectedNode || !isRootNode) return;
+      updateSubtreeEdgeColor(firstSelectedNode.id, color);
+    },
+    [firstSelectedNode, isRootNode, updateSubtreeEdgeColor]
   );
 
   const handleAddChild = useCallback(() => {
@@ -328,6 +359,65 @@ const NodeSelectionTab = ({ className }: NodeSelectionTabProps) => {
           >
             {t('toolbar.actions.applyLayout')}
           </Button>
+
+          {/* Edge Style Section */}
+          <div className="mt-3 border-t border-gray-200 pt-3">
+            <Label className="mb-2 block text-xs font-medium text-gray-600">
+              {t('toolbar.selection.edgeStyle')}
+            </Label>
+
+            {/* Edge Path Type */}
+            <div className="space-y-1">
+              <Label className="text-xs text-gray-500">{t('toolbar.selection.edgeType')}</Label>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm" className="w-full justify-between">
+                    <div className="flex items-center gap-2">
+                      {currentPathType === PATH_TYPES.SMOOTHSTEP && <SmoothStepIcon />}
+                      {currentPathType === PATH_TYPES.BEZIER && <BezierIcon />}
+                      {currentPathType === PATH_TYPES.STRAIGHT && <StraightIcon />}
+                      <span>
+                        {currentPathType === PATH_TYPES.SMOOTHSTEP &&
+                          t('toolbar.selection.edgeTypes.smoothStep')}
+                        {currentPathType === PATH_TYPES.BEZIER && t('toolbar.selection.edgeTypes.bezier')}
+                        {currentPathType === PATH_TYPES.STRAIGHT && t('toolbar.selection.edgeTypes.straight')}
+                      </span>
+                    </div>
+                    <ChevronDown size={16} />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-48">
+                  <DropdownMenuItem
+                    onClick={() => handleEdgePathTypeChange(PATH_TYPES.SMOOTHSTEP)}
+                    className={currentPathType === PATH_TYPES.SMOOTHSTEP ? 'bg-gray-100' : ''}
+                  >
+                    <SmoothStepIcon />
+                    <span className="ml-2">{t('toolbar.selection.edgeTypes.smoothStep')}</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => handleEdgePathTypeChange(PATH_TYPES.BEZIER)}
+                    className={currentPathType === PATH_TYPES.BEZIER ? 'bg-gray-100' : ''}
+                  >
+                    <BezierIcon />
+                    <span className="ml-2">{t('toolbar.selection.edgeTypes.bezier')}</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => handleEdgePathTypeChange(PATH_TYPES.STRAIGHT)}
+                    className={currentPathType === PATH_TYPES.STRAIGHT ? 'bg-gray-100' : ''}
+                  >
+                    <StraightIcon />
+                    <span className="ml-2">{t('toolbar.selection.edgeTypes.straight')}</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+
+            {/* Edge Color */}
+            <div className="mt-2 flex items-center justify-between">
+              <Label className="text-xs text-gray-500">{t('toolbar.selection.edgeColor')}</Label>
+              <ColorPickerControl hex={currentEdgeColor} setHex={handleEdgeColorChange} hasPicker />
+            </div>
+          </div>
         </div>
       )}
 

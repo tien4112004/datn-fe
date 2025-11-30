@@ -42,6 +42,14 @@ export default {
       selectDescendants: 'Select Descendants ({{count}})',
       layoutSubtree: 'Layout Subtree',
       layoutTree: 'Layout Entire Tree',
+      edgeStyle: 'Edge Style',
+      edgeType: 'Edge Type',
+      edgeColor: 'Edge Color',
+      edgeTypes: {
+        smoothStep: 'Smooth Step',
+        bezier: 'Bezier',
+        straight: 'Straight',
+      },
     },
     layout: {
       forceAutoLayout: 'Force Auto Layout',

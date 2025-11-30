@@ -58,6 +58,25 @@ export const getOppositePosition = (position: Position): Position => {
   }
 };
 
+/**
+ * Gets the opposite side for target handle connection.
+ * When a child is on the 'right' side of parent, the edge enters from the 'left' side of the child.
+ */
+export const getOppositeSide = (side: Side | 'mid'): Side => {
+  switch (side) {
+    case SIDE.LEFT:
+      return SIDE.RIGHT;
+    case SIDE.RIGHT:
+      return SIDE.LEFT;
+    case SIDE.TOP:
+      return SIDE.BOTTOM;
+    case SIDE.BOTTOM:
+      return SIDE.TOP;
+    default:
+      return SIDE.LEFT; // Default for 'mid'
+  }
+};
+
 export const isAiGeneratedNodeStructure = (data: any): data is AiGeneratedNode[] => {
   // Handle single object format (new AI response) by wrapping in array
   const normalizedData = Array.isArray(data) ? data : [data];
@@ -178,8 +197,8 @@ export const convertAiDataToMindMapNodes = (
         source: parentId,
         target: nodeId,
         type: MINDMAP_TYPES.EDGE,
-        sourceHandle: side === SIDE.LEFT ? `first-source-${parentId}` : `second-source-${parentId}`,
-        targetHandle: side === SIDE.LEFT ? `second-target-${nodeId}` : `first-target-${nodeId}`,
+        sourceHandle: `${side}-source-${parentId}`,
+        targetHandle: `${getOppositeSide(side)}-target-${nodeId}`,
         data: {
           strokeColor: '#0044FF',
           strokeWidth: 2,

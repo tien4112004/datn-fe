@@ -17,7 +17,7 @@
 
   /* Root Node Styling - Distinguished from Text Nodes */
   .root-node-card {
-    @apply border-primary from-primary/5 to-primary/10 text-card-foreground hover:ring-primary/50 relative rounded-lg border-2 bg-gradient-to-br shadow-lg transition-all hover:ring-2;
+    @apply border-primary text-card-foreground hover:ring-primary/50 relative rounded-lg border-2 bg-white shadow-lg transition-all hover:ring-2;
   }
 
   .root-node-card.layouting {

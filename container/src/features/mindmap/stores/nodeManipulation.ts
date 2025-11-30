@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 import type { MindMapEdge, PathType, Side } from '../types';
 import { MINDMAP_TYPES, PATH_TYPES, SIDE } from '../types';
 import { generateId } from '@/shared/lib/utils';
-import { getAllDescendantNodes, getRootNodeOfSubtree } from '../services/utils';
+import { getAllDescendantNodes, getRootNodeOfSubtree, getOppositeSide } from '../services/utils';
 import { useCoreStore } from './core';
 import { useUndoRedoStore } from './undoredo';
 
@@ -150,6 +150,7 @@ export const useNodeManipulationStore = create<NodeManipulationState>()(
           return;
         }
 
+        const isSourceRoot = sourceNode.data?.level === 0;
         const isTargetRoot = targetNode.data?.level === 0;
         const newSourceLevel = (targetNode.data?.level ?? 0) + 1;
         const oldSourceLevel = sourceNode.data?.level ?? 0;
@@ -159,8 +160,12 @@ export const useNodeManipulationStore = create<NodeManipulationState>()(
 
         const updatedNodes = nodes.map((node) => {
           if (node.id === sourceId) {
+            // If source is a root node, convert it to a text node
+            const newType = isSourceRoot ? MINDMAP_TYPES.TEXT_NODE : node.type;
+
             return {
               ...node,
+              type: newType,
               data: {
                 ...node.data,
                 parentId: targetId,
@@ -184,11 +189,11 @@ export const useNodeManipulationStore = create<NodeManipulationState>()(
           return node;
         });
 
-        const getHandles = (side: string, nodeId: string, isSource: boolean) => {
+        const getHandles = (side: Side, nodeId: string, isSource: boolean) => {
           const handleType = isSource ? 'source' : 'target';
-          const position =
-            side === SIDE.LEFT ? (isSource ? 'first' : 'second') : isSource ? 'second' : 'first';
-          return `${position}-${handleType}-${nodeId}`;
+          // For target handles, use the opposite side since edge enters from opposite direction
+          const handleSide = isSource ? side : getOppositeSide(side);
+          return `${handleSide}-${handleType}-${nodeId}`;
         };
 
         let isEdgeEstablished = false;
@@ -203,7 +208,8 @@ export const useNodeManipulationStore = create<NodeManipulationState>()(
             };
           }
 
-          if (newSide !== oldSide && descendantNodes.some((descendant) => descendant.id === edge.target)) {
+          const isDescendantEdge = descendantNodes.some((descendant) => descendant.id === edge.target);
+          if (isDescendantEdge && (isSourceRoot || newSide !== oldSide)) {
             return {
               ...edge,
               sourceHandle: getHandles(newSide!, edge.source, true),

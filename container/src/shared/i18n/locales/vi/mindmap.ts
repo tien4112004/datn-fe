@@ -150,4 +150,8 @@ export default {
   editor: {
     fontSize: 'Cỡ chữ',
   },
+  title: {
+    updateSuccess: 'Cập nhật tiêu đề thành công',
+    updateError: 'Không thể cập nhật tiêu đề',
+  },
 };

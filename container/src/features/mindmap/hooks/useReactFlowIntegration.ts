@@ -4,7 +4,7 @@ import { useLayoutStore } from '../stores/layout';
 import type { MindMapNode } from '../types';
 import { useClipboardStore, useCoreStore, useNodeManipulationStore, useNodeOperationsStore } from '../stores';
 import { MINDMAP_TYPES, SIDE } from '../types';
-import { getSideFromPosition, getTreeForceLayout } from '../services/utils';
+import { getSideFromPosition, getTreeForceLayout, getRootNodeOfSubtree } from '../services/utils';
 
 export const useReactFlowIntegration = () => {
   const syncState = useCoreStore((state) => state.syncState);
@@ -109,7 +109,10 @@ export const useReactFlowIntegration = () => {
 
       // If auto layout is enabled, apply layout after dropping node
       if (isAutoLayoutEnabled) {
-        applyAutoLayout();
+        const rootNode = getRootNodeOfSubtree(node.id, nodes);
+        if (rootNode) {
+          applyAutoLayout(rootNode.id);
+        }
       }
     },
     [
@@ -120,6 +123,7 @@ export const useReactFlowIntegration = () => {
       setDragTarget,
       isAutoLayoutEnabled,
       applyAutoLayout,
+      nodes,
     ]
   );
 

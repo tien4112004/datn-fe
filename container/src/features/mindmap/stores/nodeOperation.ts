@@ -305,9 +305,9 @@ export const useNodeOperationsStore = create<NodeOperationsState>()(
         setEdges((state) => [...state, newEdge]);
 
         // Only apply auto-layout if it's enabled
-        if (isAutoLayoutEnabled) {
+        if (isAutoLayoutEnabled && rootNode) {
           setTimeout(() => {
-            applyAutoLayout();
+            applyAutoLayout(rootNode.id);
           }, 200);
         }
 

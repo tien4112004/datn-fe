@@ -14,9 +14,25 @@
  * - Consistent with modern JavaScript best practices
  */
 
-import type { Direction, Side, MindMapEdge, MindMapNode } from '../types';
-import { DIRECTION, SIDE } from '../types';
+import type { Side, MindMapEdge, MindMapNode } from '../types';
+import { SIDE } from '../types';
 import * as d3 from 'd3';
+
+/**
+ * @deprecated Direction type is deprecated. Use LayoutType instead.
+ * This is only kept for backward compatibility with this deprecated service.
+ */
+type Direction = 'horizontal' | 'vertical' | 'none';
+
+/**
+ * @deprecated DIRECTION constant is deprecated. Use LAYOUT_TYPE instead.
+ * This is only kept for backward compatibility with this deprecated service.
+ */
+const DIRECTION = {
+  HORIZONTAL: 'horizontal',
+  VERTICAL: 'vertical',
+  NONE: 'none',
+} as const;
 
 interface HierarchyNode {
   originalNode: MindMapNode;

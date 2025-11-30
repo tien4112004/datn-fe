@@ -191,23 +191,3 @@ export const LAYOUT_CONFIGS: Record<LayoutType, LayoutConfig> = {
     isRadial: false,
   },
 };
-
-/**
- * Maps old Direction values to new LayoutType values for migration
- */
-export const DIRECTION_TO_LAYOUT_TYPE: Record<string, LayoutType> = {
-  horizontal: LAYOUT_TYPE.HORIZONTAL_BALANCED,
-  vertical: LAYOUT_TYPE.VERTICAL_BALANCED,
-};
-
-/**
- * Maps new LayoutType values to old Direction values for backwards compatibility
- */
-export const LAYOUT_TYPE_TO_DIRECTION: Record<LayoutType, string> = {
-  [LAYOUT_TYPE.HORIZONTAL_BALANCED]: 'horizontal',
-  [LAYOUT_TYPE.VERTICAL_BALANCED]: 'vertical',
-  [LAYOUT_TYPE.RIGHT_ONLY]: 'horizontal', // Fallback
-  [LAYOUT_TYPE.LEFT_ONLY]: 'horizontal', // Fallback
-  [LAYOUT_TYPE.BOTTOM_ONLY]: 'vertical', // Fallback
-  [LAYOUT_TYPE.TOP_ONLY]: 'vertical', // Fallback
-};

@@ -12,9 +12,9 @@ import type { LayoutState } from '@/features/mindmap/stores/layout';
 import type { ClipboardState } from '@/features/mindmap/stores/clipboard';
 import { Minus, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import type { MindMapNode, Direction, Side, MindMapTypes, LayoutType } from '@/features/mindmap/types';
+import type { MindMapNode, Side, MindMapTypes, LayoutType } from '@/features/mindmap/types';
 import { Position, type NodeProps, useUpdateNodeInternals } from '@xyflow/react';
-import { DIRECTION, SIDE, MINDMAP_TYPES, LAYOUT_TYPE } from '@/features/mindmap/types';
+import { SIDE, MINDMAP_TYPES, LAYOUT_TYPE } from '@/features/mindmap/types';
 import { cn } from '@/shared/lib/utils';
 import { motion } from 'motion/react';
 import { memo, useCallback, useEffect, useMemo } from 'react';
@@ -325,20 +325,12 @@ export const ChildNodeControls = ({ node, selected }: ChildNodeControlsProps) =>
 };
 
 export const NodeHandlers = memo(
-  ({
-    layout,
-    layoutType,
-    side,
-    id,
-  }: {
-    layout: Direction;
-    layoutType: LayoutType;
-    side: Side;
-    id: string;
-  }) => {
+  ({ layoutType, side, id }: { layoutType: LayoutType; side: Side; id: string }) => {
     const updateNodeInternals = useUpdateNodeInternals();
 
     useEffect(() => {
+      updateNodeInternals(id);
+
       const timerId = setTimeout(() => {
         updateNodeInternals(id);
       }, 0);
@@ -351,7 +343,7 @@ export const NodeHandlers = memo(
         clearTimeout(timerId);
         clearTimeout(timerId2);
       };
-    }, [layout, layoutType, id, updateNodeInternals]);
+    }, [layoutType, id, updateNodeInternals]);
 
     /**
      * Determine which handles should be visible based on layout type and node side.
@@ -511,32 +503,6 @@ export const NodeHandlers = memo(
           position={Position.Bottom}
           style={{ visibility: 'hidden' }}
           id={`bottom-target-${id}`}
-        />
-
-        {/* Legacy handles for backward compatibility */}
-        <BaseHandle
-          type="source"
-          position={layout === DIRECTION.VERTICAL ? Position.Top : Position.Left}
-          style={side === SIDE.LEFT || side === SIDE.MID ? {} : { visibility: 'hidden' }}
-          id={`first-source-${id}`}
-        />
-        <BaseHandle
-          type="source"
-          position={layout === DIRECTION.VERTICAL ? Position.Bottom : Position.Right}
-          style={side === SIDE.RIGHT || side === SIDE.MID ? {} : { visibility: 'hidden' }}
-          id={`second-source-${id}`}
-        />
-        <BaseHandle
-          type="target"
-          position={layout === DIRECTION.VERTICAL ? Position.Top : Position.Left}
-          style={{ visibility: 'hidden' }}
-          id={`first-target-${id}`}
-        />
-        <BaseHandle
-          type="target"
-          position={layout === DIRECTION.VERTICAL ? Position.Bottom : Position.Right}
-          style={{ visibility: 'hidden' }}
-          id={`second-target-${id}`}
         />
       </>
     );

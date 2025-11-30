@@ -7,9 +7,14 @@ import { DRAGHANDLE } from '@/features/mindmap/types';
 import { useShallow } from 'zustand/react/shallow';
 import { isEqual } from 'lodash';
 
-import { useMindmapNodeCommon } from '@/features/mindmap/hooks';
-import { useClipboardStore, useCoreStore } from '@/features/mindmap/stores';
+import {
+  useClipboardStore,
+  useCoreStore,
+  useLayoutStore,
+  useNodeOperationsStore,
+} from '@/features/mindmap/stores';
 import { ChildNodeControls, NodeHandlers } from '../controls/ChildNodeControls';
+import { getTreeLayoutType } from '@/features/mindmap/services/utils';
 
 export interface BaseNodeBlockProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
   children: ReactNode;
@@ -26,15 +31,16 @@ export const BaseNodeBlock = memo(
     const dragTargetNodeId = useClipboardStore(useShallow(clipboardSelector));
     const isDragTarget = dragTargetNodeId === id;
 
-    const { layout, layoutType, isLayouting, onNodeDelete } = useMindmapNodeCommon<MindMapNode>({
-      node,
-    });
+    const nodes = useCoreStore((state) => state.nodes);
+    const isLayouting = useLayoutStore((state) => state.isLayouting);
+    const onNodeDelete = useNodeOperationsStore((state) => state.finalizeNodeDeletion);
+    const layoutType = useMemo(() => getTreeLayoutType(nodes), [nodes]);
 
     const handleAnimationComplete = useCallback(() => {
       if (data.isDeleting && onNodeDelete) {
-        onNodeDelete(id);
+        onNodeDelete();
       }
-    }, [data.isDeleting, onNodeDelete, id]);
+    }, [data.isDeleting, onNodeDelete]);
 
     const baseStyles = cn(isDragTarget && 'drag-target', DRAGHANDLE.CLASS);
 
@@ -107,7 +113,7 @@ export const BaseNodeBlock = memo(
           {...props}
         >
           {children}
-          <NodeHandlers layout={layout} layoutType={layoutType} id={id} side={data.side} />
+          <NodeHandlers layoutType={layoutType} id={id} side={data.side} />
           <Helper node={node} dragging={dragging} selected={selected} />
         </motion.div>
       </AnimatePresence>

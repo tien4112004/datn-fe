@@ -41,7 +41,7 @@ const NodeSelectionTab = ({ className }: NodeSelectionTabProps) => {
   const updateNodeData = useNodeOperationsStore((state) => state.updateNodeData);
   const addChildNode = useNodeOperationsStore((state) => state.addChildNode);
   const updateSubtreeLayout = useLayoutStore((state) => state.updateSubtreeLayout);
-  const updateLayoutWithType = useLayoutStore((state) => state.updateLayoutWithType);
+  const updateLayout = useLayoutStore((state) => state.updateLayout);
   const setLayoutType = useLayoutStore((state) => state.setLayoutType);
   const setAutoLayoutEnabled = useLayoutStore((state) => state.setAutoLayoutEnabled);
 
@@ -112,10 +112,10 @@ const NodeSelectionTab = ({ className }: NodeSelectionTabProps) => {
     (type: LayoutType) => {
       setLayoutType(type);
       if (isAutoLayoutEnabled) {
-        updateLayoutWithType(type);
+        updateLayout(type);
       }
     },
-    [setLayoutType, isAutoLayoutEnabled, updateLayoutWithType]
+    [setLayoutType, isAutoLayoutEnabled, updateLayout]
   );
 
   const handleAutoLayoutChange = useCallback(
@@ -123,11 +123,11 @@ const NodeSelectionTab = ({ className }: NodeSelectionTabProps) => {
       if (typeof checked === 'boolean') {
         setAutoLayoutEnabled(checked);
         if (checked) {
-          updateLayoutWithType();
+          updateLayout();
         }
       }
     },
-    [setAutoLayoutEnabled, updateLayoutWithType]
+    [setAutoLayoutEnabled, updateLayout]
   );
 
   const handleColorChange = useCallback(
@@ -172,14 +172,11 @@ const NodeSelectionTab = ({ className }: NodeSelectionTabProps) => {
     );
   }, [firstSelectedNode, nodes, setNodes]);
 
-  // Get legacy direction from layout type for subtree layout
-  const layout = useLayoutStore((state) => state.getLayout)();
-
   // Layout subtree for the selected node
   const handleLayoutSubtree = useCallback(() => {
     if (!firstSelectedNode) return;
-    updateSubtreeLayout(firstSelectedNode.id, layout);
-  }, [firstSelectedNode, updateSubtreeLayout, layout]);
+    updateSubtreeLayout(firstSelectedNode.id, layoutType);
+  }, [firstSelectedNode, updateSubtreeLayout, layoutType]);
 
   // No selection state
   if (!hasSelection) {
@@ -324,7 +321,7 @@ const NodeSelectionTab = ({ className }: NodeSelectionTabProps) => {
           {/* Manual Layout Button */}
           <Button
             variant="outline"
-            onClick={() => updateLayoutWithType()}
+            onClick={() => updateLayout()}
             size="sm"
             title={t('toolbar.tooltips.applyLayout')}
             className="w-full transition-colors hover:bg-gray-100"

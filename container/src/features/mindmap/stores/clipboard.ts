@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import type { MindMapNode, MindMapEdge } from '../types';
+import { MINDMAP_TYPES } from '../types';
 import { generateId } from '@/shared/lib/utils';
 import { devtools } from 'zustand/middleware';
 import { useCoreStore } from './core';
@@ -213,9 +214,13 @@ export const useClipboardStore = create<ClipboardState>()(
         setEdges((eds: MindMapEdge[]) => [...eds, ...aiEdges]);
 
         // Trigger layout after nodes are added only if auto-layout is enabled
-        setTimeout(() => {
-          applyAutoLayout();
-        }, 200);
+        // Find the root node of the pasted tree (first node is always the root)
+        const pastedRootNode = aiNodes.find((n) => n.type === MINDMAP_TYPES.ROOT_NODE);
+        if (pastedRootNode) {
+          setTimeout(() => {
+            applyAutoLayout(pastedRootNode.id);
+          }, 200);
+        }
 
         pushToUndoStack();
         set((state) => ({ offset: state.offset + 20 }), false, 'mindmap-clip/pasteFromClipboard');

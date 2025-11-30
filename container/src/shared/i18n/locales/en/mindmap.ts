@@ -150,4 +150,8 @@ export default {
   editor: {
     fontSize: 'Font Size',
   },
+  title: {
+    updateSuccess: 'Title updated successfully',
+    updateError: 'Failed to update title',
+  },
 };

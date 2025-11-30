@@ -1,6 +1,6 @@
 import type { LayoutStrategy, LayoutType, LayoutResult, LayoutOptions } from '../../types';
 import type { MindMapNode, MindMapEdge } from '../../types';
-import { LAYOUT_TYPE, DIRECTION, MINDMAP_TYPES } from '../../types';
+import { LAYOUT_TYPE, MINDMAP_TYPES } from '../../types';
 import {
   rightOnlyLayoutStrategy,
   leftOnlyLayoutStrategy,
@@ -25,23 +25,6 @@ const strategies: Record<LayoutType, LayoutStrategy> = {
 };
 
 /**
- * Direction mapping for backwards compatibility.
- */
-const layoutToDirection: Record<LayoutType, string> = {
-  [LAYOUT_TYPE.HORIZONTAL_BALANCED]: DIRECTION.HORIZONTAL,
-  [LAYOUT_TYPE.VERTICAL_BALANCED]: DIRECTION.VERTICAL,
-  [LAYOUT_TYPE.RIGHT_ONLY]: DIRECTION.HORIZONTAL,
-  [LAYOUT_TYPE.LEFT_ONLY]: DIRECTION.HORIZONTAL,
-  [LAYOUT_TYPE.BOTTOM_ONLY]: DIRECTION.VERTICAL,
-  [LAYOUT_TYPE.TOP_ONLY]: DIRECTION.VERTICAL,
-};
-
-const directionToLayout: Record<string, LayoutType> = {
-  [DIRECTION.HORIZONTAL]: LAYOUT_TYPE.HORIZONTAL_BALANCED,
-  [DIRECTION.VERTICAL]: LAYOUT_TYPE.VERTICAL_BALANCED,
-};
-
-/**
  * Gets a layout strategy by type.
  * Returns undefined for types that use the legacy D3LayoutService.
  */
@@ -57,18 +40,6 @@ export const hasStrategy = (type: LayoutType): boolean => strategies[type] !== u
  * Gets all registered layout types.
  */
 export const getRegisteredTypes = (): LayoutType[] => Object.keys(strategies) as LayoutType[];
-
-/**
- * Converts a layout type to legacy direction for backwards compatibility.
- */
-export const toDirection = (type: LayoutType): string => layoutToDirection[type];
-
-/**
- * Converts a legacy direction to layout type.
- * Defaults to HORIZONTAL_BALANCED if direction is not recognized.
- */
-export const fromDirection = (direction: string): LayoutType =>
-  directionToLayout[direction] ?? LAYOUT_TYPE.HORIZONTAL_BALANCED;
 
 /**
  * Performs layout calculation using the appropriate strategy.

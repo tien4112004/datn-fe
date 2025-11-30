@@ -1,16 +1,16 @@
 import { GripVertical, Network, Workflow } from 'lucide-react';
-import { useState, memo, useCallback } from 'react';
+import { useState, memo, useCallback, useMemo } from 'react';
 import { cn } from '@/shared/lib/utils';
 import type { RootNode, PathType } from '../../types';
-import { PATH_TYPES, DIRECTION, DRAGHANDLE } from '../../types';
-import { useMindmapNodeCommon } from '../../hooks/useNodeCommon';
+import { PATH_TYPES, DRAGHANDLE } from '../../types';
 import { BaseNodeBlock } from './BaseNode';
 import { BaseNodeContent } from '../ui/base-node';
 import type { NodeProps } from '@xyflow/react';
-import { useNodeManipulationStore, useNodeOperationsStore, useLayoutStore } from '../../stores';
+import { useCoreStore, useNodeManipulationStore, useNodeOperationsStore, useLayoutStore } from '../../stores';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/shared/components/ui/popover';
 import { BezierIcon, SmoothStepIcon, StraightIcon } from '../ui/icon';
+import { getTreeLayoutType } from '../../services/utils';
 
 import ColorPickerControl from '../controls/ColorPickerControl';
 import { BaseNodeControl } from '../controls/BaseNodeControl';
@@ -19,9 +19,9 @@ import { NodeRichTextContent } from '../ui/node-rich-text-content';
 const RootNodeBlock = memo(
   ({ ...node }: NodeProps<RootNode>) => {
     const { data, selected: isSelected, dragging } = node;
-    const { layout } = useMindmapNodeCommon<RootNode>({
-      node,
-    });
+
+    const nodes = useCoreStore((state) => state.nodes);
+    const layoutType = useMemo(() => getTreeLayoutType(nodes), [nodes]);
 
     const updateNodeData = useNodeOperationsStore((state) => state.updateNodeDataWithUndo);
     const updateSubtreeLayout = useLayoutStore((state) => state.updateSubtreeLayout);
@@ -39,7 +39,7 @@ const RootNodeBlock = memo(
     );
 
     const handleLayoutClick = () => {
-      updateSubtreeLayout(node.id, layout);
+      updateSubtreeLayout(node.id, layoutType);
     };
 
     const handlePathTypeChange = useCallback(
@@ -60,13 +60,7 @@ const RootNodeBlock = memo(
       <BaseNodeBlock node={node} variant="root">
         <BaseNodeContent className="flex min-h-full flex-row items-start gap-2 p-0">
           <div className={cn('flex-shrink-0 p-2 pr-0', DRAGHANDLE.CLASS)}>
-            <GripVertical
-              className={cn(
-                'h-6 w-5',
-                isSelected ? 'opacity-100' : 'opacity-50',
-                layout === DIRECTION.NONE ? 'cursor-move' : 'cursor-default'
-              )}
-            />
+            <GripVertical className={cn('h-6 w-5', isSelected ? 'opacity-100' : 'opacity-50')} />
           </div>
           <NodeRichTextContent
             content={data.content}
@@ -77,7 +71,7 @@ const RootNodeBlock = memo(
           />
         </BaseNodeContent>
 
-        <BaseNodeControl layout={layout} selected={isSelected} dragging={dragging}>
+        <BaseNodeControl layoutType={layoutType} selected={isSelected} dragging={dragging}>
           <Button
             variant="ghost"
             size="sm"

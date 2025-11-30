@@ -1,26 +1,26 @@
 import { GripVertical } from 'lucide-react';
-import { useCallback, memo } from 'react';
+import { useCallback, memo, useMemo } from 'react';
 import { cn } from '@/shared/lib/utils';
-import { DIRECTION, DRAGHANDLE } from '@/features/mindmap/types/constants';
+import { DRAGHANDLE } from '@/features/mindmap/types/constants';
 import type { TextNode } from '@/features/mindmap/types';
 import { BaseNodeBlock } from './BaseNode';
 import { BaseNodeContent } from '../ui/base-node';
-import { useMindmapNodeCommon } from '../../hooks';
 import type { NodeProps } from '@xyflow/react';
-import { useNodeOperationsStore } from '../../stores';
+import { useCoreStore, useNodeOperationsStore } from '../../stores';
 import { useLayoutStore } from '../../stores/layout';
 import { Button } from '@/components/ui/button';
 import { Network } from 'lucide-react';
 import { BaseNodeControl } from '../controls/BaseNodeControl';
 import { NodeRichTextContent } from '../ui/node-rich-text-content';
+import { getTreeLayoutType } from '../../services/utils';
 
 const TextNodeBlock = memo(
   ({ ...node }: NodeProps<TextNode>) => {
     const { data, selected: isSelected, dragging } = node;
 
-    const { layout, isLayouting } = useMindmapNodeCommon<TextNode>({
-      node,
-    });
+    const nodes = useCoreStore((state) => state.nodes);
+    const isLayouting = useLayoutStore((state) => state.isLayouting);
+    const layoutType = useMemo(() => getTreeLayoutType(nodes), [nodes]);
 
     const updateNodeData = useNodeOperationsStore((state) => state.updateNodeDataWithUndo);
     const updateSubtreeLayout = useLayoutStore((state) => state.updateSubtreeLayout);
@@ -33,20 +33,14 @@ const TextNodeBlock = memo(
     );
 
     const handleLayoutClick = () => {
-      updateSubtreeLayout(node.id, layout);
+      updateSubtreeLayout(node.id, layoutType);
     };
 
     return (
       <BaseNodeBlock node={node} variant="card">
         <BaseNodeContent className="flex min-h-full flex-row items-start gap-2 p-0">
           <div className={cn('flex-shrink-0 p-2 pr-0', DRAGHANDLE.CLASS)}>
-            <GripVertical
-              className={cn(
-                'h-6 w-5',
-                isSelected ? 'opacity-100' : 'opacity-50',
-                layout === DIRECTION.NONE ? 'cursor-move' : 'cursor-default'
-              )}
-            />
+            <GripVertical className={cn('h-6 w-5', isSelected ? 'opacity-100' : 'opacity-50')} />
           </div>
           <NodeRichTextContent
             content={data.content}
@@ -57,7 +51,7 @@ const TextNodeBlock = memo(
           />
         </BaseNodeContent>
 
-        <BaseNodeControl layout={layout} selected={isSelected} dragging={dragging}>
+        <BaseNodeControl layoutType={layoutType} selected={isSelected} dragging={dragging}>
           <Button
             variant="ghost"
             size="sm"

@@ -1,15 +1,10 @@
 import { create } from 'zustand';
 import * as d3 from 'd3';
-import type { MindMapEdge, MindMapNode, Direction, LayoutType, LayoutOptions } from '../types';
+import type { MindMapEdge, MindMapNode, LayoutType, LayoutOptions } from '../types';
 import { MINDMAP_TYPES } from '../types';
 import { useCoreStore } from './core';
 import { devtools } from 'zustand/middleware';
-import {
-  fromDirection,
-  toDirection,
-  layoutSingleTree,
-  calculateLayout,
-} from '../services/layouts/layoutStrategy';
+import { layoutSingleTree, calculateLayout } from '../services/layouts/layoutStrategy';
 import {
   getAllDescendantNodes,
   getTreeLayoutType,
@@ -38,43 +33,18 @@ const DEFAULT_LAYOUT_OPTIONS: LayoutOptions = {
 };
 
 export interface LayoutState {
-  // ===== Animation/UI State (kept in store) =====
   isLayouting: boolean;
   isAnimating: boolean;
   animationTimer: d3.Timer | null;
   animationData: AnimationData[];
 
-  // ===== Getters for layout data from root node =====
-  /**
-   * Get the current layout type from the root node.
-   * Returns the default layout type if no root node or no layout type set.
-   */
   getLayoutType: () => LayoutType;
-  /**
-   * Get the current layout direction (legacy) from the root node.
-   * @deprecated Use getLayoutType instead.
-   */
-  getLayout: () => Direction;
-  /**
-   * Check if auto-layout is enabled (from root node's forceLayout).
-   */
   isAutoLayoutEnabled: () => boolean;
 
-  // ===== Setters for layout data on root node =====
-  /**
-   * @deprecated Use setLayoutType instead.
-   */
-  setLayout: (direction: Direction) => void;
-  /**
-   * Sets the layout type on the root node.
-   */
   setLayoutType: (layoutType: LayoutType) => void;
-  /**
-   * Enable or disable auto-layout (forceLayout on root node).
-   */
   setAutoLayoutEnabled: (enabled: boolean) => void;
 
-  // ===== Animation control =====
+  // Animation control
   setIsAnimating: (isAnimating: boolean) => void;
   stopAnimation: () => void;
   animateNodesToPositions: (
@@ -82,10 +52,6 @@ export interface LayoutState {
     duration?: number
   ) => void;
 
-  // ===== Layout operations =====
-  /**
-   * Layout a single tree using the new layout type system.
-   */
   layoutWithType: (
     nodes: MindMapNode[],
     edges: MindMapEdge[],
@@ -94,28 +60,10 @@ export interface LayoutState {
     nodes: MindMapNode[];
     edges: MindMapEdge[];
   }>;
-  /**
-   * @deprecated Use updateLayoutWithType instead.
-   */
-  updateLayout: (direction?: Direction) => Promise<void>;
-  /**
-   * Updates layout using the new layout type system.
-   */
-  updateLayoutWithType: (layoutType?: LayoutType) => Promise<void>;
-  updateSubtreeLayout: (nodeId: string, direction: Direction) => Promise<void>;
-  /**
-   * @deprecated Use setLayoutType instead.
-   */
-  updateNodeDirection: (direction: Direction) => void;
-  applyAutoLayout: () => Promise<void>;
-  /**
-   * @deprecated Use onLayoutTypeChange instead.
-   */
-  onLayoutChange: (direction: Direction) => void;
-  /**
-   * Handles layout type change with undo/redo support.
-   */
-  onLayoutTypeChange: (layoutType: LayoutType) => void;
+  updateLayout: (layoutType?: LayoutType) => Promise<void>;
+  updateSubtreeLayout: (nodeId: string, layoutType?: LayoutType) => Promise<void>;
+  applyAutoLayout: (rootNodeId: string) => Promise<void>;
+  onLayoutChange: (layoutType: LayoutType) => void;
 }
 
 const ANIMATION_DURATION = 800;
@@ -129,26 +77,14 @@ export const useLayoutStore = create<LayoutState>()(
       animationTimer: null,
       animationData: [],
 
-      // ===== Getters for layout data from root node =====
       getLayoutType: () => {
         const nodes = useCoreStore.getState().nodes;
         return getTreeLayoutType(nodes);
       },
 
-      getLayout: () => {
-        const layoutType = get().getLayoutType();
-        return toDirection(layoutType) as Direction;
-      },
-
       isAutoLayoutEnabled: () => {
         const nodes = useCoreStore.getState().nodes;
         return getTreeForceLayout(nodes);
-      },
-
-      // ===== Setters for layout data on root node =====
-      setLayout: (direction) => {
-        const layoutType = fromDirection(direction);
-        get().setLayoutType(layoutType);
       },
 
       setLayoutType: (layoutType) => {
@@ -255,13 +191,14 @@ export const useLayoutStore = create<LayoutState>()(
         set({ animationTimer: timer }, false, 'mindmap-layout/animateNodesToPositions:timer');
       },
 
-      updateLayout: async (direction) => {
-        const { getLayout, animateNodesToPositions } = get();
+      updateLayout: async (layoutType) => {
+        const { getLayoutType, animateNodesToPositions } = get();
         const nodes = useCoreStore.getState().nodes;
         const edges = useCoreStore.getState().edges;
         const setEdges = useCoreStore.getState().setEdges;
+        const setNodes = useCoreStore.getState().setNodes;
 
-        const layoutDirection = direction || getLayout();
+        const targetLayoutType = layoutType || getLayoutType();
 
         if (!nodes?.length || !edges) return;
 
@@ -277,16 +214,15 @@ export const useLayoutStore = create<LayoutState>()(
         set({ isLayouting: true }, false, 'mindmap-layout/updateLayout');
 
         try {
-          // Convert legacy direction to layoutType
-          const layoutType = fromDirection(layoutDirection);
           const { nodes: layoutedNodes, edges: layoutedEdges } = await layoutSingleTree(
-            layoutType,
+            targetLayoutType,
             nodes,
             edges,
             DEFAULT_LAYOUT_OPTIONS
           );
 
           setEdges([...layoutedEdges]);
+          setNodes(layoutedNodes);
 
           const targetPositions: Record<string, { x: number; y: number }> = {};
           layoutedNodes.forEach((node) => {
@@ -304,8 +240,8 @@ export const useLayoutStore = create<LayoutState>()(
         }
       },
 
-      updateSubtreeLayout: async (nodeId: string, direction: Direction) => {
-        const { animateNodesToPositions } = get();
+      updateSubtreeLayout: async (nodeId: string, layoutType?: LayoutType) => {
+        const { animateNodesToPositions, getLayoutType } = get();
         const nodes = useCoreStore.getState().nodes;
         const edges = useCoreStore.getState().edges;
         const setEdges = useCoreStore.getState().setEdges;
@@ -329,10 +265,9 @@ export const useLayoutStore = create<LayoutState>()(
             (edge) => subtreeNodeIds.has(edge.source) && subtreeNodeIds.has(edge.target)
           );
 
-          // Convert legacy direction to layoutType
-          const layoutType = fromDirection(direction);
+          const targetLayoutType = layoutType || getLayoutType();
           const { nodes: layoutedNodes, edges: layoutedEdges } = await calculateLayout(
-            layoutType,
+            targetLayoutType,
             rootNode,
             descendantNodes,
             subtreeEdges,
@@ -367,47 +302,64 @@ export const useLayoutStore = create<LayoutState>()(
         }
       },
 
-      updateNodeDirection: (direction: Direction) => {
-        // Update the layout direction on root node
-        get().setLayout(direction);
-      },
-
-      applyAutoLayout: async () => {
-        const { getLayoutType, animateNodesToPositions } = get();
+      applyAutoLayout: async (rootNodeId: string) => {
+        const { animateNodesToPositions } = get();
         const nodes = useCoreStore.getState().nodes;
         const edges = useCoreStore.getState().edges;
         const setEdges = useCoreStore.getState().setEdges;
 
         if (!nodes?.length || !edges) return;
 
-        // Ensure single-root tree before performing auto layout
-        const rootNodes = nodes.filter((n) => n.type === MINDMAP_TYPES.ROOT_NODE);
-        if (rootNodes.length !== 1) {
-          console.warn(
-            `applyAutoLayout requires a single root node. Found ${rootNodes.length}. Skipping layout.`
-          );
+        // Find the root node by ID
+        const rootNode = nodes.find((n) => n.id === rootNodeId);
+        if (!rootNode) {
+          console.warn(`applyAutoLayout: Root node with id "${rootNodeId}" not found. Skipping layout.`);
           return;
         }
 
         set({ isLayouting: true }, false, 'mindmap-layout/applyAutoLayout');
 
         try {
-          const layoutType = getLayoutType();
-          const { nodes: layoutedNodes, edges: layoutedEdges } = await layoutSingleTree(
+          // Get all descendant nodes for this root
+          const descendantNodes = getAllDescendantNodes(rootNodeId, nodes);
+          const subtreeNodes = [rootNode, ...descendantNodes];
+          const subtreeNodeIds = new Set(subtreeNodes.map((n) => n.id));
+          const subtreeEdges = edges.filter(
+            (edge) => subtreeNodeIds.has(edge.source) && subtreeNodeIds.has(edge.target)
+          );
+
+          const layoutType = getTreeLayoutType(subtreeNodes);
+          const { nodes: layoutedNodes, edges: layoutedEdges } = await calculateLayout(
             layoutType,
-            nodes,
-            edges,
+            rootNode,
+            descendantNodes,
+            subtreeEdges,
             DEFAULT_LAYOUT_OPTIONS
           );
 
-          setEdges([...layoutedEdges]);
+          // Update only the edges that belong to this subtree
+          setEdges((prevEdges) => {
+            const updatedEdges = prevEdges.map((edge) => {
+              const layoutedEdge = layoutedEdges.find((e) => e.id === edge.id);
+              return layoutedEdge ? { ...edge, ...layoutedEdge } : edge;
+            });
+            return updatedEdges;
+          });
 
           const targetPositions: Record<string, { x: number; y: number }> = {};
           layoutedNodes.forEach((node) => {
             targetPositions[node.id] = { x: node.position.x, y: node.position.y };
           });
 
-          animateNodesToPositions(targetPositions, ANIMATION_DURATION);
+          if (Object.keys(targetPositions).length > 0) {
+            animateNodesToPositions(targetPositions, ANIMATION_DURATION);
+
+            setTimeout(() => {
+              set({ isLayouting: false }, false, 'mindmap-layout/applyAutoLayout:animationEnd');
+            }, ANIMATION_DURATION);
+          } else {
+            set({ isLayouting: false }, false, 'mindmap-layout/applyAutoLayout:noChanges');
+          }
 
           setTimeout(() => {
             set({ isLayouting: false }, false, 'mindmap-layout/applyAutoLayout:animationEnd');
@@ -418,16 +370,15 @@ export const useLayoutStore = create<LayoutState>()(
         }
       },
 
-      onLayoutChange: (direction: Direction) => {
-        const { setLayout } = get();
+      onLayoutChange: (layoutType: LayoutType) => {
+        const { setLayoutType, updateLayout } = get();
         const { prepareToPushUndo, pushToUndoStack } = useUndoRedoStore.getState();
         prepareToPushUndo();
 
-        setLayout(direction);
+        setLayoutType(layoutType);
+        updateLayout(layoutType);
         pushToUndoStack();
       },
-
-      // ===== New Layout Type Methods =====
 
       layoutWithType: async (nodes, edges, layoutType) => {
         // Only layout when there is exactly one root node in the provided nodes.
@@ -445,67 +396,12 @@ export const useLayoutStore = create<LayoutState>()(
         const result = await layoutSingleTree(layoutType, nodes, edges, DEFAULT_LAYOUT_OPTIONS);
         return result;
       },
-
-      updateLayoutWithType: async (layoutType) => {
-        const { getLayoutType, animateNodesToPositions } = get();
-        const nodes = useCoreStore.getState().nodes;
-        const edges = useCoreStore.getState().edges;
-        const setEdges = useCoreStore.getState().setEdges;
-        const setNodes = useCoreStore.getState().setNodes;
-
-        const targetLayoutType = layoutType || getLayoutType();
-
-        if (!nodes?.length || !edges) return;
-
-        set({ isLayouting: true }, false, 'mindmap-layout/updateLayoutWithType');
-
-        try {
-          const { nodes: layoutedNodes, edges: layoutedEdges } = await layoutSingleTree(
-            targetLayoutType,
-            nodes,
-            edges,
-            DEFAULT_LAYOUT_OPTIONS
-          );
-
-          // Update edges with new handles if needed
-          setEdges([...layoutedEdges]);
-
-          // Update node data (side assignments may have changed)
-          setNodes(layoutedNodes);
-
-          const targetPositions: Record<string, { x: number; y: number }> = {};
-          layoutedNodes.forEach((node) => {
-            targetPositions[node.id] = { x: node.position.x, y: node.position.y };
-          });
-
-          animateNodesToPositions(targetPositions, ANIMATION_DURATION);
-
-          setTimeout(() => {
-            set({ isLayouting: false }, false, 'mindmap-layout/updateLayoutWithType:animationEnd');
-          }, ANIMATION_DURATION);
-        } catch (error) {
-          console.error('Layout update with type failed:', error);
-          set({ isLayouting: false }, false, 'mindmap-layout/updateLayoutWithType:error');
-        }
-      },
-
-      onLayoutTypeChange: (layoutType: LayoutType) => {
-        const { setLayoutType, updateLayoutWithType } = get();
-        const { prepareToPushUndo, pushToUndoStack } = useUndoRedoStore.getState();
-        prepareToPushUndo();
-
-        setLayoutType(layoutType);
-        updateLayoutWithType(layoutType);
-        pushToUndoStack();
-      },
     }),
     { name: 'LayoutStore' }
   )
 );
 
 // ===== Backward Compatibility Exports =====
-// These are kept for backward compatibility with code that expects state properties
-// The actual data now lives in the root node
 
 /**
  * @deprecated Access layout data through getLayoutType() method instead.
@@ -513,14 +409,6 @@ export const useLayoutStore = create<LayoutState>()(
  */
 export const selectLayoutType = () => {
   return useLayoutStore.getState().getLayoutType();
-};
-
-/**
- * @deprecated Access layout data through getLayout() method instead.
- * This selector is kept for backward compatibility.
- */
-export const selectLayout = () => {
-  return useLayoutStore.getState().getLayout();
 };
 
 /**

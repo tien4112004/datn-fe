@@ -56,10 +56,10 @@ const MindmapTitleInput = ({ mindmapId, initialTitle }: MindmapTitleInputProps) 
       });
       setOriginalTitle(trimmedTitle);
       setIsEditing(false);
-      toast.success(t('title.updateSuccess', 'Title updated successfully'));
+      toast.success(t('title.updateSuccess'));
     } catch (error) {
       console.error('Failed to update title:', error);
-      toast.error(error instanceof Error ? error.message : t('title.updateError', 'Failed to update title'));
+      toast.error(error instanceof Error ? error.message : t('title.updateError'));
       setTitle(originalTitle);
       setIsEditing(false);
     }
@@ -109,7 +109,6 @@ const MindmapTitleInput = ({ mindmapId, initialTitle }: MindmapTitleInputProps) 
               onKeyDown={handleKeyDown}
               onBlur={handleBlur}
               className="h-7 w-48 border-0 bg-transparent px-1 text-sm font-medium shadow-none focus-visible:ring-0"
-              placeholder={t('title.placeholder', 'Enter mindmap title')}
               disabled={updateMindmapTitle.isPending}
             />
             <div className="flex items-center gap-1">
@@ -119,7 +118,6 @@ const MindmapTitleInput = ({ mindmapId, initialTitle }: MindmapTitleInputProps) 
                 className="h-6 w-6 text-green-600 hover:bg-green-50 hover:text-green-700"
                 onClick={handleSave}
                 disabled={updateMindmapTitle.isPending}
-                title={t('title.save', 'Save')}
               >
                 <Check size={14} />
               </Button>
@@ -129,7 +127,6 @@ const MindmapTitleInput = ({ mindmapId, initialTitle }: MindmapTitleInputProps) 
                 className="h-6 w-6 text-gray-500 hover:bg-gray-100 hover:text-gray-700"
                 onClick={handleCancel}
                 disabled={updateMindmapTitle.isPending}
-                title={t('title.cancel', 'Cancel')}
               >
                 <X size={14} />
               </Button>
@@ -143,7 +140,6 @@ const MindmapTitleInput = ({ mindmapId, initialTitle }: MindmapTitleInputProps) 
               size="icon"
               className="h-6 w-6 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
               onClick={() => setIsEditing(true)}
-              title={t('title.edit', 'Edit title')}
             >
               <Pencil size={14} />
             </Button>

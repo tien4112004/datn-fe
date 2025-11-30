@@ -1,15 +1,15 @@
-import { memo } from 'react';
+import { memo, useMemo } from 'react';
 import { cn } from '@/shared/lib/utils';
 import { SHAPES } from '../../types';
 import type { ShapeNode, Shape } from '../../types';
 import { BaseNodeBlock } from './BaseNode';
 import type { NodeProps } from '@xyflow/react';
-import { useMindmapNodeCommon } from '../../hooks';
 import { Button } from '@/components/ui/button';
-import { useLayoutStore, useNodeOperationsStore } from '../../stores';
+import { useCoreStore, useLayoutStore, useNodeOperationsStore } from '../../stores';
 import { Network } from 'lucide-react';
 import ColorPickerControl from '../controls/ColorPickerControl';
 import { BaseNodeControl } from '../controls/BaseNodeControl';
+import { getTreeLayoutType } from '../../services/utils';
 
 /**
  * @deprecated ShapeNode is deprecated and will be removed in a future version.
@@ -25,7 +25,8 @@ const ShapeNodeBlock = memo(
         'Please use TextNode or other alternative node types instead.'
     );
 
-    const { layout } = useMindmapNodeCommon<ShapeNode>({ node });
+    const nodes = useCoreStore((state) => state.nodes);
+    const layoutType = useMemo(() => getTreeLayoutType(nodes), [nodes]);
     const updateNodeData = useNodeOperationsStore((state) => state.updateNodeDataWithUndo);
     const updateSubtreeLayout = useLayoutStore((state) => state.updateSubtreeLayout);
 
@@ -52,7 +53,7 @@ const ShapeNodeBlock = memo(
     };
 
     const handleLayoutClick = () => {
-      updateSubtreeLayout(id, layout);
+      updateSubtreeLayout(id, layoutType);
     };
 
     return (
@@ -99,7 +100,7 @@ const ShapeNodeBlock = memo(
           )}
         </svg>
 
-        <BaseNodeControl layout={layout} selected={selected} dragging={node.dragging}>
+        <BaseNodeControl layoutType={layoutType} selected={selected} dragging={node.dragging}>
           <Button
             variant="ghost"
             size="sm"

@@ -1,23 +1,22 @@
 import { GripVertical } from 'lucide-react';
-import { useState, useEffect, useCallback, memo } from 'react';
+import { useCallback, memo } from 'react';
 import { cn } from '@/shared/lib/utils';
-import { useRichTextEditor } from '@/shared/components/rte/useRichTextEditor';
 import { DIRECTION, DRAGHANDLE } from '@/features/mindmap/types/constants';
 import type { TextNode } from '@/features/mindmap/types';
 import { BaseNodeBlock } from './BaseNode';
 import { BaseNodeContent } from '../ui/base-node';
 import { useMindmapNodeCommon } from '../../hooks';
 import type { NodeProps } from '@xyflow/react';
-import RichTextEditor from '@/components/rte/RichTextEditor';
 import { useNodeOperationsStore } from '../../stores';
 import { useLayoutStore } from '../../stores/layout';
 import { Button } from '@/components/ui/button';
 import { Network } from 'lucide-react';
 import { BaseNodeControl } from '../controls/BaseNodeControl';
+import { NodeRichTextContent } from '../ui/node-rich-text-content';
 
 const TextNodeBlock = memo(
   ({ ...node }: NodeProps<TextNode>) => {
-    const { data, selected: isSelected, width, dragging } = node;
+    const { data, selected: isSelected, dragging } = node;
 
     const { layout, isLayouting } = useMindmapNodeCommon<TextNode>({
       node,
@@ -26,37 +25,12 @@ const TextNodeBlock = memo(
     const updateNodeData = useNodeOperationsStore((state) => state.updateNodeDataWithUndo);
     const updateSubtreeLayout = useLayoutStore((state) => state.updateSubtreeLayout);
 
-    const [isEditing, setIsEditing] = useState(false);
-
-    // Only create heavy rich text editor when not dragging/layouting for better performance
-    const shouldUseRichEditor = !dragging && !isLayouting && isEditing;
-
-    const editor = useRichTextEditor({
-      trailingBlock: false,
-      placeholders: { default: '', heading: '', emptyBlock: '' },
-    });
-
-    useEffect(() => {
-      if (!shouldUseRichEditor) return;
-
-      async function loadInitialHTML() {
-        const blocks = await editor.tryParseHTMLToBlocks(data.content);
-        editor.replaceBlocks(editor.document, blocks);
-      }
-      loadInitialHTML();
-    }, [editor, data.content, shouldUseRichEditor]);
-
-    const handleEditSubmit = useCallback(async () => {
-      setIsEditing(false);
-      const htmlContent = await editor.blocksToFullHTML(editor.document);
-      updateNodeData(node.id, { content: htmlContent });
-    }, [editor, node.id, updateNodeData]);
-
-    const handleKeyPress = useCallback((e: React.KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        setIsEditing(false);
-      }
-    }, []);
+    const handleContentChange = useCallback(
+      (content: string) => {
+        updateNodeData(node.id, { content });
+      },
+      [node.id, updateNodeData]
+    );
 
     const handleLayoutClick = () => {
       updateSubtreeLayout(node.id, layout);
@@ -74,31 +48,13 @@ const TextNodeBlock = memo(
               )}
             />
           </div>
-          <div
-            className="min-h-full flex-1 cursor-text p-2 pl-0"
-            style={{
-              width: width ? `${width - 40}px` : undefined,
-              minWidth: '60px',
-            }}
-            onKeyDown={handleKeyPress}
-          >
-            {shouldUseRichEditor ? (
-              <RichTextEditor
-                editor={editor}
-                sideMenu={false}
-                slashMenu={false}
-                className="m-0 min-h-[24px] w-full border-none p-0"
-                onBlur={handleEditSubmit}
-              />
-            ) : (
-              // Lightweight HTML display during drag operations
-              <div
-                className="m-0 min-h-[24px] w-full cursor-text p-0"
-                dangerouslySetInnerHTML={{ __html: data.content }}
-                onClick={() => setIsEditing(true)}
-              />
-            )}
-          </div>
+          <NodeRichTextContent
+            content={data.content}
+            isDragging={dragging}
+            isLayouting={isLayouting}
+            onContentChange={handleContentChange}
+            minimalToolbar={true}
+          />
         </BaseNodeContent>
 
         <BaseNodeControl layout={layout} selected={isSelected} dragging={dragging}>

@@ -147,4 +147,7 @@ export default {
       previewError: 'Preview Error',
     },
   },
+  editor: {
+    fontSize: 'Font Size',
+  },
 };

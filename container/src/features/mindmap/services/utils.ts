@@ -59,51 +59,112 @@ export const getOppositePosition = (position: Position): Position => {
 };
 
 export const isAiGeneratedNodeStructure = (data: any): data is AiGeneratedNode[] => {
-  if (!Array.isArray(data)) return false;
+  // Handle single object format (new AI response) by wrapping in array
+  const normalizedData = Array.isArray(data) ? data : [data];
 
   // Empty root array is not valid, but empty children arrays are valid
-  if (data.length === 0) return false;
+  if (normalizedData.length === 0) return false;
 
-  return data.every((item: any) => {
-    return (
-      typeof item === 'object' &&
-      item !== null &&
-      typeof item.data === 'string' &&
-      (item.children === undefined ||
-        (Array.isArray(item.children) &&
-          (item.children.length === 0 || isAiGeneratedNodeStructure(item.children))))
-    );
-  });
+  const isValidNode = (item: any): boolean => {
+    if (typeof item !== 'object' || item === null) return false;
+
+    // Support both 'data' (old format) and 'content' (new format)
+    const hasContent = typeof item.data === 'string' || typeof item.content === 'string';
+    if (!hasContent) return false;
+
+    // Check children if present
+    if (item.children !== undefined) {
+      if (!Array.isArray(item.children)) return false;
+      if (item.children.length > 0 && !item.children.every(isValidNode)) return false;
+    }
+
+    return true;
+  };
+
+  return normalizedData.every(isValidNode);
+};
+
+// ===== Root Node Layout Helpers =====
+
+/**
+ * Default layout type when none is specified on root node
+ */
+export const DEFAULT_LAYOUT_TYPE: LayoutType = LAYOUT_TYPE.HORIZONTAL_BALANCED;
+
+/**
+ * Normalize AI data to always be an array format
+ * Handles both single object (new format) and array (old format)
+ */
+export const normalizeAiData = (data: AiGeneratedNode | AiGeneratedNode[]): AiGeneratedNode[] => {
+  return Array.isArray(data) ? data : [data];
+};
+
+/**
+ * Get content from AI node (supports both 'data' and 'content' properties)
+ */
+const getNodeContent = (aiNode: AiGeneratedNode): string => {
+  return aiNode.content ?? aiNode.data ?? '';
+};
+
+/**
+ * Get the appropriate side for a child node based on layout type and child index
+ */
+const getChildSide = (layoutType: LayoutType, childIndex: number, isRootChild: boolean): Side => {
+  if (!isRootChild) {
+    // Non-root children inherit side from parent (handled by caller)
+    return SIDE.RIGHT; // Default fallback
+  }
+
+  switch (layoutType) {
+    case LAYOUT_TYPE.HORIZONTAL_BALANCED:
+      // Alternate left/right for balanced horizontal layout
+      return childIndex % 2 === 0 ? SIDE.LEFT : SIDE.RIGHT;
+    case LAYOUT_TYPE.VERTICAL_BALANCED:
+      // Alternate left/right for balanced vertical layout (top/bottom positioning)
+      return childIndex % 2 === 0 ? SIDE.LEFT : SIDE.RIGHT;
+    case LAYOUT_TYPE.RIGHT_ONLY:
+      return SIDE.RIGHT;
+    case LAYOUT_TYPE.LEFT_ONLY:
+      return SIDE.LEFT;
+    case LAYOUT_TYPE.BOTTOM_ONLY:
+      return SIDE.RIGHT; // Use RIGHT for bottom (maps to bottom handle)
+    case LAYOUT_TYPE.TOP_ONLY:
+      return SIDE.LEFT; // Use LEFT for top (maps to top handle)
+    default:
+      return SIDE.RIGHT;
+  }
 };
 
 export const convertAiDataToMindMapNodes = (
-  aiData: AiGeneratedNode[],
-  basePosition: { x: number; y: number }
+  aiData: AiGeneratedNode | AiGeneratedNode[],
+  basePosition: { x: number; y: number },
+  layoutType: LayoutType = DEFAULT_LAYOUT_TYPE
 ): { nodes: MindMapNode[]; edges: MindMapEdge[] } => {
   const nodes: MindMapNode[] = [];
   const edges: MindMapEdge[] = [];
 
-  const processNode = (
-    aiNode: AiGeneratedNode,
-    parentId: string | null,
-    side: Side,
-    level: number,
-    rootPosition?: { x: number; y: number }
-  ): void => {
+  // Normalize to array format
+  const normalizedData = normalizeAiData(aiData);
+
+  const processNode = (aiNode: AiGeneratedNode, parentId: string | null, side: Side, level: number): void => {
     const nodeId = generateId();
     const isRoot = parentId === null;
+    const content = getNodeContent(aiNode);
 
     const mindMapNode: MindMapNode = {
       id: nodeId,
       type: isRoot ? MINDMAP_TYPES.ROOT_NODE : MINDMAP_TYPES.TEXT_NODE,
-      position: isRoot ? rootPosition || basePosition : { x: 0, y: 0 }, // Layout system will handle child positioning
+      position: isRoot ? basePosition : { x: 0, y: 0 },
       data: {
         level,
-        content: `<p>${aiNode.data}</p>`,
+        content: `<p>${content}</p>`,
         side: isRoot ? SIDE.MID : side,
         parentId: parentId || undefined,
         pathType: PATH_TYPES.SMOOTHSTEP,
-        ...(isRoot && { edgeColor: 'var(--primary)' }),
+        ...(isRoot && {
+          edgeColor: '#0044FF',
+          layoutType,
+        }),
       },
       ...(isRoot ? {} : { dragHandle: DRAGHANDLE.SELECTOR }),
     };
@@ -120,7 +181,7 @@ export const convertAiDataToMindMapNodes = (
         sourceHandle: side === SIDE.LEFT ? `first-source-${parentId}` : `second-source-${parentId}`,
         targetHandle: side === SIDE.LEFT ? `second-target-${nodeId}` : `first-target-${nodeId}`,
         data: {
-          strokeColor: 'var(--primary)',
+          strokeColor: '#0044FF',
           strokeWidth: 2,
           pathType: PATH_TYPES.SMOOTHSTEP,
         },
@@ -131,31 +192,21 @@ export const convertAiDataToMindMapNodes = (
     // Process children
     if (aiNode.children && aiNode.children.length > 0) {
       aiNode.children.forEach((child, index) => {
-        const childSide = isRoot ? (index % 2 === 0 ? SIDE.LEFT : SIDE.RIGHT) : side;
+        const childSide = isRoot ? getChildSide(layoutType, index, true) : side;
         processNode(child, nodeId, childSide, level + 1);
       });
     }
   };
 
   // Process root nodes
-  if (aiData.length > 0) {
-    aiData.forEach((rootNode, index) => {
-      // Only set position for the first root node, let layout handle multiple roots
-      const rootPosition =
-        index === 0 ? basePosition : { x: basePosition.x, y: basePosition.y + index * 200 };
-      processNode(rootNode, null, SIDE.MID, 0, rootPosition);
+  if (normalizedData.length > 0) {
+    normalizedData.forEach((rootNode) => {
+      processNode(rootNode, null, SIDE.MID, 0);
     });
   }
 
   return { nodes, edges };
 };
-
-// ===== Root Node Layout Helpers =====
-
-/**
- * Default layout type when none is specified on root node
- */
-export const DEFAULT_LAYOUT_TYPE: LayoutType = LAYOUT_TYPE.HORIZONTAL_BALANCED;
 
 /**
  * Find the root node from a list of nodes

@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { MindMapNode, MindMapEdge, Direction } from '../types';
+import type { MindMapNode, MindMapEdge } from '../types';
 import { generateId } from '@/shared/lib/utils';
 import { devtools } from 'zustand/middleware';
 import { useCoreStore } from './core';
@@ -10,9 +10,8 @@ import {
   isAiGeneratedNodeStructure,
   convertAiDataToMindMapNodes,
   getTreeLayoutType,
-  getTreeForceLayout,
+  DEFAULT_LAYOUT_TYPE,
 } from '../services/utils';
-import { toDirection } from '../services/layouts/layoutStrategy';
 
 export interface ClipboardState {
   cloningNodes: MindMapNode[];
@@ -185,23 +184,26 @@ export const useClipboardStore = create<ClipboardState>()(
       // Check if it's AI generated structure
       if (isAiGeneratedNodeStructure(parsedData)) {
         const { setNodes, setEdges, nodes } = useCoreStore.getState();
-        const { updateLayout } = useLayoutStore.getState();
+        const { applyAutoLayout } = useLayoutStore.getState();
         const { mousePosition, offset } = get();
 
-        // Get layout info from root node
-        const layoutType = getTreeLayoutType(nodes);
-        const layout = toDirection(layoutType) as Direction;
-        const isAutoLayoutEnabled = getTreeForceLayout(nodes);
+        // Get layout info from existing root node, or use default for new trees
+        const hasExistingNodes = nodes.length > 0;
+        const layoutType = hasExistingNodes ? getTreeLayoutType(nodes) : DEFAULT_LAYOUT_TYPE;
 
         const basePosition = screenToFlowPosition({
           x: mousePosition.x,
           y: mousePosition.y,
         });
 
-        const { nodes: aiNodes, edges: aiEdges } = convertAiDataToMindMapNodes(parsedData, {
-          x: basePosition.x + offset,
-          y: basePosition.y + offset,
-        });
+        const { nodes: aiNodes, edges: aiEdges } = convertAiDataToMindMapNodes(
+          parsedData,
+          {
+            x: basePosition.x + offset,
+            y: basePosition.y + offset,
+          },
+          layoutType
+        );
 
         // Deselect existing nodes and add new AI nodes as selected
         setNodes((nds: MindMapNode[]) => [
@@ -211,11 +213,9 @@ export const useClipboardStore = create<ClipboardState>()(
         setEdges((eds: MindMapEdge[]) => [...eds, ...aiEdges]);
 
         // Trigger layout after nodes are added only if auto-layout is enabled
-        if (isAutoLayoutEnabled) {
-          setTimeout(() => {
-            updateLayout(layout);
-          }, 100);
-        }
+        setTimeout(() => {
+          applyAutoLayout();
+        }, 200);
 
         pushToUndoStack();
         set((state) => ({ offset: state.offset + 20 }), false, 'mindmap-clip/pasteFromClipboard');

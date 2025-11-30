@@ -105,7 +105,10 @@ export type NodeData = TextNodeData | RootNodeData | ShapeNodeData | ImageNodeDa
 export type MindMapNode = TextNode | RootNode | ShapeNode | ImageNode | BaseNode;
 
 export type AiGeneratedNode = {
-  data: string;
+  /** @deprecated Use `content` instead */
+  data?: string;
+  /** New AI response format uses `content` */
+  content?: string;
   children?: AiGeneratedNode[];
 };
 

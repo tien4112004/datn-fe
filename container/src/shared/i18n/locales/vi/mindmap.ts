@@ -147,4 +147,7 @@ export default {
       previewError: 'Lỗi bản xem trước',
     },
   },
+  editor: {
+    fontSize: 'Cỡ chữ',
+  },
 };

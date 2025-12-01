@@ -18,6 +18,15 @@ export default {
     signUp: 'Sign up',
     welcomeBack: 'Welcome back, {{name}}!',
     googleComingSoon: 'Google sign-in coming soon!',
+    loginFailed: 'Sign in failed. Please check your credentials and try again.',
+    googleSignInSuccess: 'Successfully signed in with Google',
+    googleSignInFailed: 'Failed to complete sign in. Please try again.',
+  },
+  googleCallback: {
+    completingSignIn: 'Completing sign in...',
+    redirecting: 'Redirecting...',
+    pleaseWait: 'Please wait while we set up your account',
+    redirectShortly: 'You will be redirected shortly',
   },
   register: {
     title: 'Create an account',
@@ -32,7 +41,7 @@ export default {
     emailPlaceholder: 'name@example.com',
     dateOfBirth: 'Date of Birth',
     dateOfBirthPlaceholder: 'Pick a date',
-    phoneNumber: 'Phone Number (Optional)',
+    phoneNumber: 'Phone Number',
     phoneNumberPlaceholder: '+1234567890',
     password: 'Password',
     passwordPlaceholder: 'Create a strong password',
@@ -62,5 +71,6 @@ export default {
     dateOfBirthInvalid: 'Please select a valid date',
     ageRequirement: 'You must be at least 13 years old',
     phoneNumberInvalid: 'Please enter a valid phone number',
+    nameAlphabetOnly: 'Name must contain only alphabetic characters',
   },
 };

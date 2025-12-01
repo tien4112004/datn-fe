@@ -14,7 +14,7 @@ import {
 } from '@/shared/components/ui/dropdown-menu';
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@/shared/components/ui/sidebar';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { useAuth } from '@/shared/context/auth';
+import { useLogout } from '@/features/auth/hooks/useAuth';
 import { toast } from 'sonner';
 
 export function NavUser({
@@ -27,18 +27,20 @@ export function NavUser({
   };
 }) {
   const { isMobile } = useSidebar();
-  const { logout } = useAuth();
   const navigate = useNavigate();
+  const { mutate: logout } = useLogout();
 
   const handleLogout = async () => {
-    try {
-      logout();
-      toast.success('Logged out successfully');
-      navigate('/login');
-    } catch (error) {
-      console.error('Logout failed:', error);
-      toast.error('Failed to logout');
-    }
+    logout(undefined, {
+      onSuccess: () => {
+        toast.success('Logged out successfully');
+        navigate('/login');
+      },
+      onError: (error) => {
+        console.error('Logout failed:', error);
+        toast.error('Failed to logout');
+      },
+    });
   };
 
   return (

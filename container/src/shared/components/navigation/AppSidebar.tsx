@@ -1,8 +1,6 @@
 import * as React from 'react';
 import { Bell, BookOpen, CalendarDays, Command, File, FolderClosed, Home, Users } from 'lucide-react';
-
 import { NavMain } from '@/shared/components/navigation/NavMain';
-// import { NavSubjects } from '@/shared/components/navigation/NavSubjects';
 import { NavSecondary } from '@/shared/components/navigation/NavSecondary';
 import { NavUser } from '@/shared/components/navigation/NavUser';
 import {
@@ -11,7 +9,6 @@ import {
   SidebarFooter,
   SidebarHeader,
   SidebarMenu,
-  // SidebarMenuButton,
   SidebarMenuItem,
   SidebarTrigger,
 } from '@/shared/components/ui/sidebar';
@@ -24,7 +21,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   const data = {
     user: {
-      name: user?.name || 'User',
+      name: user?.name || user?.firstName + ' ' + user?.lastName || 'User',
       email: user?.email || 'user@example.com',
       avatar: user?.avatar || '',
     },
@@ -67,20 +64,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         icon: Bell,
       },
     ],
-    // subjects: [
-    //   {
-    //     name: t('subjects.math'),
-    //     url: '#',
-    //   },
-    //   {
-    //     name: t('subjects.vietnamese'),
-    //     url: '#',
-    //   },
-    //   {
-    //     name: t('subjects.english'),
-    //     url: '#',
-    //   },
-    // ],
   };
 
   return (
@@ -88,17 +71,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            {/* <SidebarMenuButton size="lg" asChild>
-              <div>
-                <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                  <Command className="size-4" />
-                </div>
-                <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=lg-icon]:hidden">
-                  <span className="truncate font-medium">PrimaryToolbox</span>
-                  <span className="truncate text-xs">{t('slogan')}</span>
-                </div>
-              </div>
-            </SidebarMenuButton> */}
             <div className="outline-hidden ring-sidebar-ring group-data-[collapsible=lg-icon]:h-14! my-auto flex h-12 w-full flex-row items-center justify-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm transition-[width,height,padding] group-data-[collapsible=lg-icon]:flex-col group-data-[collapsible=lg-icon]:text-xs [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0">
               <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
                 <Command className="size-4" />
@@ -117,7 +89,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
-        {/* <NavSubjects subjects={data.subjects} /> */}
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>

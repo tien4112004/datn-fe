@@ -1,5 +1,5 @@
 import { api } from '@/shared/api';
-import { setTokens, setUserData } from '@/shared/context/auth';
+import { setUserData } from '@/shared/context/auth';
 import type { User } from '@/shared/types/auth';
 
 export interface GoogleAuthorizeRequest {
@@ -16,13 +16,12 @@ export interface ExchangeTokenRequest {
 }
 
 export interface ExchangeTokenResponse {
-  access_token: string;
-  refresh_token: string;
   user?: User;
 }
 
 /**
  * OAuth Service for Google authentication
+ * Authentication tokens are managed via HttpOnly cookies by the backend
  */
 export class OAuthService {
   baseUrl: string;
@@ -51,10 +50,10 @@ export class OAuthService {
   }
 
   /**
-   * Exchange authorization code for access and refresh tokens
+   * Exchange authorization code for authentication
    * @param code - Authorization code from Google OAuth callback
    * @param redirectUri - Same redirect URI used in authorization request
-   * @returns Promise with tokens and optional user data
+   * @returns Promise with optional user data
    */
   async exchangeCode(code: string, redirectUri: string): Promise<ExchangeTokenResponse> {
     const response = await api.post<{ data: ExchangeTokenResponse }>(`${this.baseUrl}/api/auth/exchange`, {
@@ -64,11 +63,7 @@ export class OAuthService {
 
     const data = response.data.data || response.data;
 
-    // Store tokens
-    if (data.access_token && data.refresh_token) {
-      setTokens(data.access_token, data.refresh_token);
-    }
-
+    // Backend sets HttpOnly cookies automatically
     // Store user data if provided
     if (data.user) {
       setUserData(data.user);
@@ -79,10 +74,10 @@ export class OAuthService {
 
   /**
    * Complete OAuth login flow
-   * Exchanges code, stores tokens, and fetches user profile
+   * Exchanges code and fetches user profile
    */
   async completeOAuthLogin(code: string, redirectUri: string): Promise<User> {
-    // Exchange code for tokens
+    // Exchange code for authentication (backend sets cookies)
     const tokenResponse = await this.exchangeCode(code, redirectUri);
 
     // If user data is included in the exchange response, return it

@@ -1,10 +1,11 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
-import type { User, AuthContextType, SignupRequest } from '../types/auth';
+import type { User, AuthContextType } from '../types/auth';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const TOKEN_KEY = 'accessToken';
-const REFRESH_TOKEN_KEY = 'refreshToken';
+// Note: Authentication is now fully cookie-based (HttpOnly cookies from backend)
+// We don't store any tokens in localStorage
+// User data is kept in memory only and refreshed on page load via /me endpoint
 const USER_KEY = 'user';
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -16,17 +17,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const initializeAuth = () => {
       try {
         const storedUser = localStorage.getItem(USER_KEY);
-        const storedToken = localStorage.getItem(TOKEN_KEY);
 
-        if (storedUser && storedToken) {
+        // If we have user data, assume authenticated (cookies will be sent automatically)
+        if (storedUser) {
           setUser(JSON.parse(storedUser));
         }
       } catch (error) {
         console.error('Failed to initialize auth:', error);
         // Clear corrupted data
         localStorage.removeItem(USER_KEY);
-        localStorage.removeItem(TOKEN_KEY);
-        localStorage.removeItem(REFRESH_TOKEN_KEY);
       } finally {
         setIsLoading(false);
       }
@@ -35,7 +34,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     initializeAuth();
   }, []);
 
-  // Listen for unauthorized events from API
+  // Listen for unauthorized events from API (401 responses)
   useEffect(() => {
     const handleUnauthorized = () => {
       logout();
@@ -48,25 +47,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  const login = async (_email: string, _password: string) => {
-    // This will be implemented by the auth service
-    // For now, this is just a placeholder
-    throw new Error('Login function should be overridden by auth service');
-  };
-
-  const register = async (_data: SignupRequest) => {
-    // This will be implemented by the auth service
-    // For now, this is just a placeholder
-    throw new Error('Register function should be overridden by auth service');
-  };
-
   const logout = () => {
     // Clear user state
     setUser(null);
 
-    // Clear tokens from localStorage
-    localStorage.removeItem(TOKEN_KEY);
-    localStorage.removeItem(REFRESH_TOKEN_KEY);
+    // Clear user data from localStorage
+    // Note: HttpOnly cookies will be cleared by calling backend logout endpoint
     localStorage.removeItem(USER_KEY);
   };
 
@@ -74,8 +60,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     user,
     isAuthenticated: Boolean(user),
     isLoading,
-    login,
-    register,
     logout,
     setUser,
   };
@@ -91,21 +75,12 @@ export function useAuth() {
   return context;
 }
 
-// Helper functions for token management
-export const getAccessToken = () => localStorage.getItem(TOKEN_KEY);
-export const getRefreshToken = () => localStorage.getItem(REFRESH_TOKEN_KEY);
-
-export const setTokens = (accessToken: string, refreshToken: string) => {
-  localStorage.setItem(TOKEN_KEY, accessToken);
-  localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
-};
-
+// Helper function to store user data in localStorage
 export const setUserData = (user: User) => {
   localStorage.setItem(USER_KEY, JSON.stringify(user));
 };
 
+// Helper function to clear all auth data
 export const clearAuthData = () => {
-  localStorage.removeItem(TOKEN_KEY);
-  localStorage.removeItem(REFRESH_TOKEN_KEY);
   localStorage.removeItem(USER_KEY);
 };

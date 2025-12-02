@@ -226,7 +226,7 @@ const NodeSelectionTab = ({ className }: NodeSelectionTabProps) => {
 
   return (
     <div className={className}>
-      {/* Selection Info */}
+      {/* 1. Selection Info */}
       <div className="mb-4 rounded-md bg-blue-50 px-3 py-2">
         <p className="text-sm font-medium text-blue-700">
           {t('toolbar.selection.selectedCount', { count: selectedCount })}
@@ -250,53 +250,155 @@ const NodeSelectionTab = ({ className }: NodeSelectionTabProps) => {
         )}
       </div>
 
-      {/* Single Selection Actions */}
-      {isSingleSelection && (
+      {/* 2. Actions Section */}
+      <div className="space-y-2">
+        <h3 className="mb-2 border-b border-gray-200 pb-1 text-xs font-semibold uppercase tracking-wider text-gray-700">
+          {t('toolbar.selection.actions')}
+        </h3>
+
         <div className="space-y-2">
-          <h3 className="mb-2 border-b border-gray-200 pb-1 text-xs font-semibold uppercase tracking-wider text-gray-700">
-            {t('toolbar.selection.nodeActions')}
-          </h3>
-
-          <div className="space-y-2">
-            {/* Add Child Node */}
-            <Button
-              onClick={handleAddChild}
-              variant="outline"
-              size="sm"
-              className="w-full justify-start transition-colors hover:bg-gray-100"
-            >
-              <Plus size={16} />
-              {t('toolbar.selection.addChild')}
-            </Button>
-
-            {/* Select All Descendants */}
-            {descendantCount > 0 && (
+          {/* Single Selection Actions */}
+          {isSingleSelection && (
+            <>
+              {/* Add Child Node */}
               <Button
-                onClick={handleSelectDescendants}
+                onClick={handleAddChild}
                 variant="outline"
                 size="sm"
                 className="w-full justify-start transition-colors hover:bg-gray-100"
               >
-                <MousePointerClick size={16} />
-                {t('toolbar.selection.selectDescendants', { count: descendantCount })}
+                <Plus size={16} />
+                {t('toolbar.selection.addChild')}
               </Button>
-            )}
 
-            {/* Layout Subtree - always show for any node */}
-            <Button
-              onClick={handleLayoutSubtree}
-              variant="outline"
-              size="sm"
-              className="w-full justify-start transition-colors hover:bg-gray-100"
-            >
-              <GitBranch size={16} />
-              {t('toolbar.selection.layoutSubtree')}
-            </Button>
-          </div>
+              {/* Select All Descendants */}
+              {descendantCount > 0 && (
+                <Button
+                  onClick={handleSelectDescendants}
+                  variant="outline"
+                  size="sm"
+                  className="w-full justify-start transition-colors hover:bg-gray-100"
+                >
+                  <MousePointerClick size={16} />
+                  {t('toolbar.selection.selectDescendants', { count: descendantCount })}
+                </Button>
+              )}
+
+              {/* Layout Subtree - always show for any node */}
+              <Button
+                onClick={handleLayoutSubtree}
+                variant="outline"
+                size="sm"
+                className="w-full justify-start transition-colors hover:bg-gray-100"
+              >
+                <GitBranch size={16} />
+                {t('toolbar.selection.layoutSubtree')}
+              </Button>
+            </>
+          )}
+
+          {/* Copy */}
+          <Button
+            onClick={copyToClipboard}
+            variant="outline"
+            size="sm"
+            className="w-full justify-start transition-colors hover:bg-gray-100"
+          >
+            <Copy size={16} />
+            {t('toolbar.selection.copy')}
+          </Button>
+
+          {/* Delete */}
+          <Button
+            onClick={deleteSelected}
+            variant="destructive"
+            size="sm"
+            className="w-full justify-start transition-colors"
+          >
+            <Trash2 size={16} />
+            {t('toolbar.selection.delete')}
+          </Button>
         </div>
-      )}
+      </div>
 
-      {/* Root Node Layout Options */}
+      {/* 3. Styling Section (Background and Edge) */}
+      <div className="mt-4 space-y-3">
+        <h3 className="mb-2 border-b border-gray-200 pb-1 text-xs font-semibold uppercase tracking-wider text-gray-700">
+          {t('toolbar.selection.styling')}
+        </h3>
+
+        {/* Background Color */}
+        <div className="flex items-center justify-between">
+          <Label className="text-sm text-gray-600">{t('toolbar.selection.backgroundColor')}</Label>
+          <ColorPickerControl hex={currentColor} setHex={handleColorChange} hasPicker />
+        </div>
+
+        {/* Edge Style Section - only for root nodes */}
+        {isRootNode && (
+          <>
+            <div className="border-t border-gray-200 pt-3">
+              <Label className="mb-2 block text-xs font-medium text-gray-600">
+                {t('toolbar.selection.edgeStyle')}
+              </Label>
+
+              {/* Edge Path Type */}
+              <div className="space-y-1">
+                <Label className="text-xs text-gray-500">{t('toolbar.selection.edgeType')}</Label>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm" className="w-full justify-between">
+                      <div className="flex items-center gap-2">
+                        {currentPathType === PATH_TYPES.SMOOTHSTEP && <SmoothStepIcon />}
+                        {currentPathType === PATH_TYPES.BEZIER && <BezierIcon />}
+                        {currentPathType === PATH_TYPES.STRAIGHT && <StraightIcon />}
+                        <span>
+                          {currentPathType === PATH_TYPES.SMOOTHSTEP &&
+                            t('toolbar.selection.edgeTypes.smoothStep')}
+                          {currentPathType === PATH_TYPES.BEZIER && t('toolbar.selection.edgeTypes.bezier')}
+                          {currentPathType === PATH_TYPES.STRAIGHT &&
+                            t('toolbar.selection.edgeTypes.straight')}
+                        </span>
+                      </div>
+                      <ChevronDown size={16} />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="w-48">
+                    <DropdownMenuItem
+                      onClick={() => handleEdgePathTypeChange(PATH_TYPES.SMOOTHSTEP)}
+                      className={currentPathType === PATH_TYPES.SMOOTHSTEP ? 'bg-gray-100' : ''}
+                    >
+                      <SmoothStepIcon />
+                      <span className="ml-2">{t('toolbar.selection.edgeTypes.smoothStep')}</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => handleEdgePathTypeChange(PATH_TYPES.BEZIER)}
+                      className={currentPathType === PATH_TYPES.BEZIER ? 'bg-gray-100' : ''}
+                    >
+                      <BezierIcon />
+                      <span className="ml-2">{t('toolbar.selection.edgeTypes.bezier')}</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => handleEdgePathTypeChange(PATH_TYPES.STRAIGHT)}
+                      className={currentPathType === PATH_TYPES.STRAIGHT ? 'bg-gray-100' : ''}
+                    >
+                      <StraightIcon />
+                      <span className="ml-2">{t('toolbar.selection.edgeTypes.straight')}</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+
+              {/* Edge Color */}
+              <div className="mt-2 flex items-center justify-between">
+                <Label className="text-xs text-gray-500">{t('toolbar.selection.edgeColor')}</Label>
+                <ColorPickerControl hex={currentEdgeColor} setHex={handleEdgeColorChange} hasPicker />
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* 4. Layout Section - only for root nodes */}
       {isSingleSelection && isRootNode && (
         <div className="mt-4 space-y-3">
           <h3 className="mb-2 border-b border-gray-200 pb-1 text-xs font-semibold uppercase tracking-wider text-gray-700">
@@ -359,115 +461,10 @@ const NodeSelectionTab = ({ className }: NodeSelectionTabProps) => {
           >
             {t('toolbar.actions.applyLayout')}
           </Button>
-
-          {/* Edge Style Section */}
-          <div className="mt-3 border-t border-gray-200 pt-3">
-            <Label className="mb-2 block text-xs font-medium text-gray-600">
-              {t('toolbar.selection.edgeStyle')}
-            </Label>
-
-            {/* Edge Path Type */}
-            <div className="space-y-1">
-              <Label className="text-xs text-gray-500">{t('toolbar.selection.edgeType')}</Label>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm" className="w-full justify-between">
-                    <div className="flex items-center gap-2">
-                      {currentPathType === PATH_TYPES.SMOOTHSTEP && <SmoothStepIcon />}
-                      {currentPathType === PATH_TYPES.BEZIER && <BezierIcon />}
-                      {currentPathType === PATH_TYPES.STRAIGHT && <StraightIcon />}
-                      <span>
-                        {currentPathType === PATH_TYPES.SMOOTHSTEP &&
-                          t('toolbar.selection.edgeTypes.smoothStep')}
-                        {currentPathType === PATH_TYPES.BEZIER && t('toolbar.selection.edgeTypes.bezier')}
-                        {currentPathType === PATH_TYPES.STRAIGHT && t('toolbar.selection.edgeTypes.straight')}
-                      </span>
-                    </div>
-                    <ChevronDown size={16} />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="w-48">
-                  <DropdownMenuItem
-                    onClick={() => handleEdgePathTypeChange(PATH_TYPES.SMOOTHSTEP)}
-                    className={currentPathType === PATH_TYPES.SMOOTHSTEP ? 'bg-gray-100' : ''}
-                  >
-                    <SmoothStepIcon />
-                    <span className="ml-2">{t('toolbar.selection.edgeTypes.smoothStep')}</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => handleEdgePathTypeChange(PATH_TYPES.BEZIER)}
-                    className={currentPathType === PATH_TYPES.BEZIER ? 'bg-gray-100' : ''}
-                  >
-                    <BezierIcon />
-                    <span className="ml-2">{t('toolbar.selection.edgeTypes.bezier')}</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => handleEdgePathTypeChange(PATH_TYPES.STRAIGHT)}
-                    className={currentPathType === PATH_TYPES.STRAIGHT ? 'bg-gray-100' : ''}
-                  >
-                    <StraightIcon />
-                    <span className="ml-2">{t('toolbar.selection.edgeTypes.straight')}</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-
-            {/* Edge Color */}
-            <div className="mt-2 flex items-center justify-between">
-              <Label className="text-xs text-gray-500">{t('toolbar.selection.edgeColor')}</Label>
-              <ColorPickerControl hex={currentEdgeColor} setHex={handleEdgeColorChange} hasPicker />
-            </div>
-          </div>
         </div>
       )}
 
-      {/* Common Actions Section */}
-      <div className={isSingleSelection ? 'mt-4 space-y-2' : 'space-y-2'}>
-        <h3 className="mb-2 border-b border-gray-200 pb-1 text-xs font-semibold uppercase tracking-wider text-gray-700">
-          {t('toolbar.selection.actions')}
-        </h3>
-
-        <div className="space-y-2">
-          {/* Copy */}
-          <Button
-            onClick={copyToClipboard}
-            variant="outline"
-            size="sm"
-            className="w-full justify-start transition-colors hover:bg-gray-100"
-          >
-            <Copy size={16} />
-            {t('toolbar.selection.copy')}
-          </Button>
-
-          {/* Delete */}
-          <Button
-            onClick={deleteSelected}
-            variant="destructive"
-            size="sm"
-            className="w-full justify-start transition-colors"
-          >
-            <Trash2 size={16} />
-            {t('toolbar.selection.delete')}
-          </Button>
-        </div>
-      </div>
-
-      {/* Styling Section */}
-      <div className="mt-4 space-y-2">
-        <h3 className="mb-2 border-b border-gray-200 pb-1 text-xs font-semibold uppercase tracking-wider text-gray-700">
-          {t('toolbar.selection.styling')}
-        </h3>
-
-        <div className="space-y-3">
-          {/* Background Color */}
-          <div className="flex items-center justify-between">
-            <Label className="text-sm text-gray-600">{t('toolbar.selection.backgroundColor')}</Label>
-            <ColorPickerControl hex={currentColor} setHex={handleColorChange} hasPicker />
-          </div>
-        </div>
-      </div>
-
-      {/* Quick Actions */}
+      {/* 5. Unselect Button */}
       <div className="mt-4">
         <Button
           onClick={deselectAll}

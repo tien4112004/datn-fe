@@ -1,6 +1,7 @@
 export const DRAGHANDLE = {
   CLASS: 'dragHandle',
   SELECTOR: '.dragHandle',
+  NODRAG_CLASS: 'nodrag',
 };
 
 /**

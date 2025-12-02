@@ -1,6 +1,5 @@
-import { GripVertical, Network, Workflow } from 'lucide-react';
+import { Network, Workflow } from 'lucide-react';
 import { useState, memo, useCallback, useMemo } from 'react';
-import { cn } from '@/shared/lib/utils';
 import type { RootNode, PathType } from '../../types';
 import { PATH_TYPES, DRAGHANDLE } from '../../types';
 import { BaseNodeBlock } from './BaseNode';
@@ -57,11 +56,22 @@ const RootNodeBlock = memo(
     );
 
     return (
-      <BaseNodeBlock node={node} variant="root">
-        <BaseNodeContent className="flex min-h-full flex-row items-start gap-2 p-0">
-          <div className={cn('flex-shrink-0 p-2 pr-0', DRAGHANDLE.CLASS)}>
+      <BaseNodeBlock
+        node={node}
+        variant="root"
+        className={DRAGHANDLE.CLASS}
+        style={{ backgroundColor: data.backgroundColor as string }}
+      >
+        <BaseNodeContent className="flex min-h-full flex-row items-start gap-2 px-2">
+          {/* <div className={cn('flex-shrink-0 p-2 pr-0', DRAGHANDLE.CLASS)}>
             <GripVertical className={cn('h-6 w-5', isSelected ? 'opacity-100' : 'opacity-50')} />
-          </div>
+          </div> */}
+          <style>{`
+			.bn-container[data-color-scheme] {
+			--bn-colors-editor-background: ${data.backgroundColor} !important;
+			}
+		`}</style>
+
           <NodeRichTextContent
             content={data.content}
             isDragging={dragging}
@@ -71,7 +81,7 @@ const RootNodeBlock = memo(
           />
         </BaseNodeContent>
 
-        <BaseNodeControl layoutType={layoutType} selected={isSelected} dragging={dragging}>
+        <BaseNodeControl layoutType={layoutType} selected={isSelected} dragging={dragging} className="hidden">
           <Button
             variant="ghost"
             size="sm"

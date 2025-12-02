@@ -90,6 +90,9 @@ export default {
       success: 'Mindmap saved successfully',
       error: 'Failed to save mindmap',
     },
+    export: {
+      export: 'Export',
+    },
   },
   generate: {
     title: 'Generate Mindmap with AI',

@@ -1,4 +1,4 @@
-import { GitBranchPlus, Undo, Redo, Save, Sparkles } from 'lucide-react';
+import { GitBranchPlus, Undo, Redo, Save, Sparkles, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/shared/components/ui/tabs';
 import { useUndoRedoStore, useCoreStore, useNodeOperationsStore } from '../../stores';
@@ -161,7 +161,8 @@ const Toolbar = ({ mindmapId }: { mindmapId: string }) => {
                 className="w-full transition-colors hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500"
                 size="sm"
               >
-                Export
+                <Download size={16} />
+                {t('toolbar.export.export')}
               </Button>
             </div>
           </div>

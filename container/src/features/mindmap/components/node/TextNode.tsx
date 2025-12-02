@@ -1,6 +1,4 @@
-import { GripVertical } from 'lucide-react';
 import { useCallback, memo, useMemo } from 'react';
-import { cn } from '@/shared/lib/utils';
 import { DRAGHANDLE } from '@/features/mindmap/types/constants';
 import type { TextNode } from '@/features/mindmap/types';
 import { BaseNodeBlock } from './BaseNode';
@@ -37,11 +35,11 @@ const TextNodeBlock = memo(
     };
 
     return (
-      <BaseNodeBlock node={node} variant="card">
-        <BaseNodeContent className="flex min-h-full flex-row items-start gap-2 p-0">
-          <div className={cn('flex-shrink-0 p-2 pr-0', DRAGHANDLE.CLASS)}>
+      <BaseNodeBlock node={node} variant="card" className={DRAGHANDLE.CLASS}>
+        <BaseNodeContent className="flex min-h-full flex-row items-start gap-2 px-4">
+          {/* <div className={cn('flex-shrink-0 p-2 pr-0', DRAGHANDLE.CLASS)}>
             <GripVertical className={cn('h-6 w-5', isSelected ? 'opacity-100' : 'opacity-50')} />
-          </div>
+          </div> */}
           <NodeRichTextContent
             content={data.content}
             isDragging={dragging}

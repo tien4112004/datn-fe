@@ -90,6 +90,9 @@ export default {
       success: 'Lưu sơ đồ tư duy thành công',
       error: 'Lưu sơ đồ tư duy thất bại',
     },
+    export: {
+      export: 'Xuất',
+    },
   },
   generate: {
     title: 'Tạo Sơ đồ tư duy với AI',

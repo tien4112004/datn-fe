@@ -1,6 +1,8 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useRichTextEditor } from '@/shared/components/rte/useRichTextEditor';
 import RichTextEditor from '@/components/rte/RichTextEditor';
+import { cn } from '@/shared/lib/utils';
+import { DRAGHANDLE } from '../../types';
 
 interface NodeRichTextContentProps {
   content: string;
@@ -81,7 +83,10 @@ export const NodeRichTextContent = ({
           sideMenu={false}
           slashMenu={false}
           minimalToolbar={minimalToolbar}
-          className={`background-transparent m-0 min-h-[24px] w-full border-none ${editorClassName}`}
+          className={cn(
+            `m-0 min-h-[24px] w-full rounded-none border-none ${editorClassName}`,
+            DRAGHANDLE.NODRAG_CLASS
+          )}
         />
       ) : (
         // Lightweight HTML display during drag operations

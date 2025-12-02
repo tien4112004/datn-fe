@@ -10,7 +10,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useMemo, useState } from 'react';
 import AdvancedOptions from '@/features/mindmap/components/AdvancedOptions';
 import type { CreateMindmapFormData } from '@/features/mindmap/types';
-import useGenerateMindmap from '../hooks/useGenerateMindmap';
+import { useGenerateMindmap } from '../hooks/useApi';
 import useFormPersist from 'react-hook-form-persist';
 import { getLocalStorageData } from '@/shared/lib/utils';
 

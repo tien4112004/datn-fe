@@ -1,26 +1,35 @@
-import { memo, useState, useCallback, useRef } from 'react';
+import { memo, useState, useCallback, useRef, useMemo } from 'react';
 import { cn } from '@/shared/lib/utils';
 import { DRAGHANDLE } from '../../types/constants';
 import type { ImageNode } from '../../types';
 import { BaseNodeBlock } from './BaseNode';
 import { BaseNodeContent } from '../ui/base-node';
 import type { NodeProps } from '@xyflow/react';
-import { useUpdateNodeInternals } from '@xyflow/react';
-import { useMindmapNodeCommon } from '../../hooks';
 import { Button } from '@/components/ui/button';
 import { Upload, X, Loader2, Network } from 'lucide-react';
-import { useNodeOperationsStore, useLayoutStore } from '../../stores';
+import { useCoreStore, useNodeOperationsStore, useLayoutStore } from '../../stores';
 import { BaseNodeControl } from '../controls/BaseNodeControl';
+import { getTreeLayoutType } from '../../services/utils';
 
+/**
+ * @deprecated ImageNode is deprecated and will be removed in a future version.
+ * Please use TextNode or other alternative node types instead.
+ */
 const ImageNodeBlock = memo(
   ({ ...node }: NodeProps<ImageNode>) => {
     const { id, data, selected, width, height } = node;
 
-    const { layout } = useMindmapNodeCommon<ImageNode>({ node });
+    // Deprecation warning
+    console.warn(
+      '[Mindmap] ImageNode is deprecated and will be removed in a future version. ' +
+        'Please use TextNode or other alternative node types instead.'
+    );
+
+    const nodes = useCoreStore((state) => state.nodes);
+    const layoutType = useMemo(() => getTreeLayoutType(nodes), [nodes]);
     const updateNodeData = useNodeOperationsStore((state) => state.updateNodeData);
     const updateNodeDataWithUndo = useNodeOperationsStore((state) => state.updateNodeDataWithUndo);
     const updateSubtreeLayout = useLayoutStore((state) => state.updateSubtreeLayout);
-    const updateNodeInternals = useUpdateNodeInternals();
 
     const [isEditing, setIsEditing] = useState(!data.imageUrl);
     const [isLoadingImage, setIsLoadingImage] = useState(false);
@@ -109,7 +118,7 @@ const ImageNodeBlock = memo(
     }, [id, updateNodeData]);
 
     const handleLayoutClick = () => {
-      updateSubtreeLayout(id, layout, updateNodeInternals);
+      updateSubtreeLayout(id, layoutType);
     };
 
     return (
@@ -131,7 +140,12 @@ const ImageNodeBlock = memo(
               draggable={false}
             />
 
-            <BaseNodeControl layout={layout} selected={selected} spacing="lg" dragging={node.dragging}>
+            <BaseNodeControl
+              layoutType={layoutType}
+              selected={selected}
+              spacing="lg"
+              dragging={node.dragging}
+            >
               <Button
                 variant="ghost"
                 size="sm"

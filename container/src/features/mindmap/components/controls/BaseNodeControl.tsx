@@ -1,12 +1,12 @@
 import { memo, useMemo, type ReactNode } from 'react';
 import { cn } from '@/shared/lib/utils';
-import { DIRECTION } from '../../types';
-import type { Direction } from '../../types';
+import { LAYOUT_TYPE } from '../../types';
+import type { LayoutType } from '../../types';
 import { useShallow } from 'zustand/react/shallow';
 import { useCoreStore } from '../../stores';
 
-interface BaseNodeControlProps {
-  layout: Direction;
+export interface BaseNodeControlProps {
+  layoutType: LayoutType;
   children: ReactNode;
   spacing?: 'sm' | 'lg';
   padding?: boolean;
@@ -18,9 +18,20 @@ interface BaseNodeControlProps {
 // Optimized selector for BaseNodeControl
 const selectedNodeCountSelector = (state: any) => state.selectedNodeIds.size;
 
+/**
+ * Check if layout is vertical (controls should be on the side)
+ */
+const isVerticalLayout = (layoutType: LayoutType): boolean => {
+  return (
+    layoutType === LAYOUT_TYPE.VERTICAL_BALANCED ||
+    layoutType === LAYOUT_TYPE.TOP_ONLY ||
+    layoutType === LAYOUT_TYPE.BOTTOM_ONLY
+  );
+};
+
 export const BaseNodeControl = memo(
   ({
-    layout,
+    layoutType,
     children,
     spacing = 'lg',
     padding = false,
@@ -35,7 +46,7 @@ export const BaseNodeControl = memo(
     const controlClassName = useMemo(
       () =>
         cn(
-          layout === DIRECTION.VERTICAL
+          isVerticalLayout(layoutType)
             ? `right-0 top-1/2 -translate-y-1/2 translate-x-[calc(100%+${offset})] flex-col`
             : `left-1/2 top-0 -translate-x-1/2 -translate-y-[calc(100%+${offset})] flex-row`,
           'bg-muted absolute z-[1000] flex items-center justify-center gap-1 rounded-sm transition-all duration-200',
@@ -43,7 +54,7 @@ export const BaseNodeControl = memo(
           selected ? 'visible opacity-100' : 'invisible opacity-0',
           className
         ),
-      [layout, offset, padding, selected, className]
+      [layoutType, offset, padding, selected, className]
     );
 
     // Early return for multiple selections
@@ -55,7 +66,7 @@ export const BaseNodeControl = memo(
   },
   (prevProps, nextProps) => {
     return (
-      prevProps.layout === nextProps.layout &&
+      prevProps.layoutType === nextProps.layoutType &&
       prevProps.spacing === nextProps.spacing &&
       prevProps.padding === nextProps.padding &&
       prevProps.className === nextProps.className &&

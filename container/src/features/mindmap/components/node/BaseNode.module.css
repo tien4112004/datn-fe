@@ -14,4 +14,20 @@
   .react-flow__node.selected .base-node-card {
     @apply shadow-lg ring-2 ring-blue-500;
   }
+
+  .root-node-card {
+    @apply border-primary from-primary/5 to-primary/10 text-card-foreground hover:ring-primary/50 relative rounded-lg border-2 bg-gradient-to-br shadow-lg transition-all hover:ring-2;
+  }
+
+  .root-node-card.layouting {
+    @apply shadow-xl ring-2 ring-blue-300;
+  }
+
+  .root-node-card.drag-target {
+    @apply bg-green-50 ring-2 ring-green-400;
+  }
+
+  .react-flow__node.selected .root-node-card {
+    @apply ring-primary shadow-xl ring-2;
+  }
 }

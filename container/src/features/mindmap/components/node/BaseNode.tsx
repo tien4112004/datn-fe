@@ -7,14 +7,19 @@ import { DRAGHANDLE } from '@/features/mindmap/types';
 import { useShallow } from 'zustand/react/shallow';
 import { isEqual } from 'lodash';
 
-import { useMindmapNodeCommon } from '@/features/mindmap/hooks';
-import { useClipboardStore, useCoreStore } from '@/features/mindmap/stores';
+import {
+  useClipboardStore,
+  useCoreStore,
+  useLayoutStore,
+  useNodeOperationsStore,
+} from '@/features/mindmap/stores';
 import { ChildNodeControls, NodeHandlers } from '../controls/ChildNodeControls';
+import { getTreeLayoutType } from '@/features/mindmap/services/utils';
 
 export interface BaseNodeBlockProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
   children: ReactNode;
   node: NodeProps<MindMapNode>;
-  variant?: 'card' | 'replacing';
+  variant?: 'card' | 'replacing' | 'root';
 }
 
 const clipboardSelector = (state: any) => state.dragTargetNodeId;
@@ -26,20 +31,28 @@ export const BaseNodeBlock = memo(
     const dragTargetNodeId = useClipboardStore(useShallow(clipboardSelector));
     const isDragTarget = dragTargetNodeId === id;
 
-    const { layout, isLayouting, onNodeDelete } = useMindmapNodeCommon<MindMapNode>({
-      node,
-    });
+    const nodes = useCoreStore((state) => state.nodes);
+    const isLayouting = useLayoutStore((state) => state.isLayouting);
+    const onNodeDelete = useNodeOperationsStore((state) => state.finalizeNodeDeletion);
+    const layoutType = useMemo(() => getTreeLayoutType(nodes), [nodes]);
 
     const handleAnimationComplete = useCallback(() => {
       if (data.isDeleting && onNodeDelete) {
-        onNodeDelete(id);
+        onNodeDelete();
       }
-    }, [data.isDeleting, onNodeDelete, id]);
+    }, [data.isDeleting, onNodeDelete]);
 
     const baseStyles = cn(isDragTarget && 'drag-target', DRAGHANDLE.CLASS);
 
     const cardStyles = cn(
       'base-node-card',
+      isLayouting && 'layouting',
+      isDragTarget && 'drag-target',
+      className
+    );
+
+    const rootStyles = cn(
+      'root-node-card',
       isLayouting && 'layouting',
       isDragTarget && 'drag-target',
       className
@@ -77,6 +90,18 @@ export const BaseNodeBlock = memo(
       [width, height, props.style, variant]
     );
 
+    // Determine which styles to use based on variant
+    const variantStyles = useMemo(() => {
+      switch (variant) {
+        case 'root':
+          return rootStyles;
+        case 'card':
+          return cardStyles;
+        default:
+          return baseStyles;
+      }
+    }, [variant, rootStyles, cardStyles, baseStyles]);
+
     return (
       <AnimatePresence>
         <motion.div
@@ -84,11 +109,11 @@ export const BaseNodeBlock = memo(
           style={nodeStyle}
           {...animationConfig}
           onAnimationComplete={handleAnimationComplete}
-          className={cn(variant === 'card' ? cardStyles : baseStyles, className)}
+          className={cn(variantStyles, className)}
           {...props}
         >
           {children}
-          <NodeHandlers layout={layout} id={id} side={data.side} />
+          <NodeHandlers layoutType={layoutType} id={id} side={data.side} />
           <Helper node={node} dragging={dragging} selected={selected} />
         </motion.div>
       </AnimatePresence>
@@ -102,6 +127,8 @@ export const BaseNodeBlock = memo(
       prevProps.node.id === nextProps.node.id &&
       prevProps.node.selected === nextProps.node.selected &&
       prevProps.node.dragging === nextProps.node.dragging &&
+      prevProps.node.width === nextProps.node.width &&
+      prevProps.node.height === nextProps.node.height &&
       prevProps.className === nextProps.className &&
       prevProps.variant === nextProps.variant &&
       prevProps.children === nextProps.children &&

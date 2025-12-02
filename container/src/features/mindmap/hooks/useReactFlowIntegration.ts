@@ -1,15 +1,10 @@
 import { useCallback, useEffect } from 'react';
-import {
-  useUpdateNodeInternals,
-  useReactFlow,
-  type FinalConnectionState,
-  useNodesInitialized,
-} from '@xyflow/react';
+import { useReactFlow, type FinalConnectionState, useNodesInitialized } from '@xyflow/react';
 import { useLayoutStore } from '../stores/layout';
 import type { MindMapNode } from '../types';
 import { useClipboardStore, useCoreStore, useNodeManipulationStore, useNodeOperationsStore } from '../stores';
 import { MINDMAP_TYPES, SIDE } from '../types';
-import { getSideFromPosition } from '../services/utils';
+import { getSideFromPosition, getTreeForceLayout, getRootNodeOfSubtree } from '../services/utils';
 
 export const useReactFlowIntegration = () => {
   const syncState = useCoreStore((state) => state.syncState);
@@ -17,13 +12,17 @@ export const useReactFlowIntegration = () => {
   const moveToChild = useNodeManipulationStore((state) => state.moveToChild);
   const getNode = useCoreStore((state) => state.getNode);
   const addChildNode = useNodeOperationsStore((state) => state.addChildNode);
+  const nodes = useCoreStore((state) => state.nodes);
 
   const updateLayout = useLayoutStore((state) => state.updateLayout);
+  const applyAutoLayout = useLayoutStore((state) => state.applyAutoLayout);
   const setMousePosition = useClipboardStore((state) => state.setMousePosition);
   const setDragTarget = useClipboardStore((state) => state.setDragTarget);
   const setMouseOverNodeId = useClipboardStore((state) => state.setMouseOverNodeId);
 
-  const updateNodeInternals = useUpdateNodeInternals();
+  // Get auto layout enabled from root node
+  const isAutoLayoutEnabled = getTreeForceLayout(nodes);
+
   const nodesInitialized = useNodesInitialized();
   const { getIntersectingNodes, fitView, screenToFlowPosition } = useReactFlow();
 
@@ -45,15 +44,15 @@ export const useReactFlowIntegration = () => {
   }, []);
 
   const onInit = useCallback(async () => {
-    updateLayout(undefined, updateNodeInternals);
+    updateLayout();
 
     setTimeout(() => {
       fitView({ duration: 2000, padding: 0.1 });
     }, 800);
-  }, [updateLayout, updateNodeInternals, fitView]);
+  }, [updateLayout, fitView]);
 
   useEffect(() => {
-    syncState(updateNodeInternals);
+    syncState();
   }, [nodesInitialized]);
 
   const determineSideFromPosition = useCallback((draggedNode: MindMapNode, targetNode: any) => {
@@ -95,18 +94,37 @@ export const useReactFlowIntegration = () => {
 
       setDragTarget(null);
 
-      if (intersections.length === 0) return;
+      // If there's an intersection, move node to be a child of the target
+      if (intersections.length > 0) {
+        const targetNodeId = intersections[0];
+        if (targetNodeId !== node.id) {
+          const targetNode = getNode(targetNodeId);
+          if (targetNode) {
+            const side = determineSideFromPosition(node, targetNode);
+            moveToChild(node.id, targetNodeId, side);
+            return; // moveToChild will handle layout if needed
+          }
+        }
+      }
 
-      const targetNodeId = intersections[0];
-      if (targetNodeId === node.id) return;
-
-      const targetNode = getNode(targetNodeId);
-      if (!targetNode) return;
-
-      const side = determineSideFromPosition(node, targetNode);
-      moveToChild(node.id, targetNodeId, side);
+      // If auto layout is enabled, apply layout after dropping node
+      if (isAutoLayoutEnabled) {
+        const rootNode = getRootNodeOfSubtree(node.id, nodes);
+        if (rootNode) {
+          applyAutoLayout(rootNode.id);
+        }
+      }
     },
-    [getIntersectingNodes, getNode, moveToChild, determineSideFromPosition, setDragTarget]
+    [
+      getIntersectingNodes,
+      getNode,
+      moveToChild,
+      determineSideFromPosition,
+      setDragTarget,
+      isAutoLayoutEnabled,
+      applyAutoLayout,
+      nodes,
+    ]
   );
 
   const onConnectEnd = useCallback(
@@ -152,7 +170,6 @@ export const useReactFlowIntegration = () => {
     onNodeDragStop,
     onPaneMouseMove,
     onPaneClick,
-    updateNodeInternals,
     onInit,
     onConnectEnd,
     onNodeMouseEnter,

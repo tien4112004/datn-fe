@@ -1,6 +1,38 @@
-import type { Direction, Side, MindMapEdge, MindMapNode } from '../types';
-import { MINDMAP_TYPES, DIRECTION, SIDE } from '../types';
+/**
+ * @deprecated This service is deprecated and will be removed in a future version.
+ *
+ * Use the new functional layout utilities from './layouts' instead:
+ * - `calculateHorizontalLayout` / `calculateBalancedHorizontalLayout` from './layouts/horizontalLayoutUtils'
+ * - `calculateVerticalLayout` / `calculateBalancedVerticalLayout` from './layouts/verticalLayoutUtils'
+ * - `getAllDescendantNodes` from './utils'
+ * - `layoutSingleTree`, `calculateLayout` from './layouts/LayoutStrategyFactory'
+ *
+ * The new functional approach provides:
+ * - Pure functions instead of class methods
+ * - Better tree-shaking and code splitting
+ * - Easier testing and composition
+ * - Consistent with modern JavaScript best practices
+ */
+
+import type { Side, MindMapEdge, MindMapNode } from '../types';
+import { SIDE } from '../types';
 import * as d3 from 'd3';
+
+/**
+ * @deprecated Direction type is deprecated. Use LayoutType instead.
+ * This is only kept for backward compatibility with this deprecated service.
+ */
+type Direction = 'horizontal' | 'vertical' | 'none';
+
+/**
+ * @deprecated DIRECTION constant is deprecated. Use LAYOUT_TYPE instead.
+ * This is only kept for backward compatibility with this deprecated service.
+ */
+const DIRECTION = {
+  HORIZONTAL: 'horizontal',
+  VERTICAL: 'vertical',
+  NONE: 'none',
+} as const;
 
 interface HierarchyNode {
   originalNode: MindMapNode;
@@ -17,6 +49,9 @@ type D3HierarchyNode = d3.HierarchyNode<HierarchyNode> & {
   parent?: D3HierarchyNode | null;
 };
 
+/**
+ * @deprecated Use the functional layout utilities from './layouts' instead.
+ */
 class D3LayoutService {
   /**
    * Calculates the total height required for a subtree including all its children
@@ -345,10 +380,26 @@ class D3LayoutService {
   }
 
   /**
-   * Recursively builds a hierarchy structure for D3 from a flat node structure
+   * Sorts an array of nodes by their siblingOrder property.
+   * Nodes without siblingOrder are placed at the end, maintaining their relative array order.
+   *
+   * @param nodes - Array of nodes to sort
+   * @returns Sorted array of nodes
+   */
+  private sortBySiblingOrder(nodes: MindMapNode[]): MindMapNode[] {
+    return [...nodes].sort((a, b) => {
+      const orderA = a.data.siblingOrder ?? Number.MAX_SAFE_INTEGER;
+      const orderB = b.data.siblingOrder ?? Number.MAX_SAFE_INTEGER;
+      return orderA - orderB;
+    });
+  }
+
+  /**
+   * Recursively builds a hierarchy structure for D3 from a flat node structure.
+   * Children are sorted by siblingOrder to ensure consistent layout order.
    *
    * @param startNode - The root node to build the subtree from
-   * @param childrenMap - Map of parent IDs to their child nodes
+   * @param childrenMap - Map of parent IDs to their child nodes (pre-sorted by siblingOrder)
    * @returns Hierarchy structure suitable for D3 tree layout
    */
   buildSubtree(startNode: MindMapNode, childrenMap: Map<string, MindMapNode[]>): HierarchyNode {
@@ -360,7 +411,8 @@ class D3LayoutService {
   }
 
   /**
-   * Creates a D3 hierarchy for nodes on a specific side of the root
+   * Creates a D3 hierarchy for nodes on a specific side of the root.
+   * Children are sorted by siblingOrder to ensure consistent layout order.
    *
    * This method filters nodes by side (left/right) and level, then builds
    * a D3 hierarchy structure that can be used with D3's tree layout algorithm.
@@ -368,7 +420,7 @@ class D3LayoutService {
    * @param side - Which side (LEFT or RIGHT) to create hierarchy for
    * @param nodes - All available nodes
    * @param rootNode - The root node of the mindmap
-   * @param childrenMap - Map of parent IDs to their child nodes
+   * @param childrenMap - Map of parent IDs to their child nodes (pre-sorted by siblingOrder)
    * @returns D3 hierarchy object ready for layout calculation
    */
   createHierarchy(
@@ -378,9 +430,12 @@ class D3LayoutService {
     childrenMap: Map<string, MindMapNode[]>
   ): D3HierarchyNode {
     const level1Nodes = nodes.filter((node) => node.data.level === 1 && node.data.side === side);
+    // Sort level 1 nodes by siblingOrder for consistent layout
+    const sortedLevel1Nodes = this.sortBySiblingOrder(level1Nodes);
+
     const tree = {
       originalNode: rootNode,
-      children: level1Nodes.map((node) => this.buildSubtree(node, childrenMap)),
+      children: sortedLevel1Nodes.map((node) => this.buildSubtree(node, childrenMap)),
     };
 
     const hierarchy = d3.hierarchy<HierarchyNode>(tree) as D3HierarchyNode;
@@ -523,6 +578,11 @@ class D3LayoutService {
       }
     }
 
+    // Sort children by siblingOrder for each parent
+    for (const [parentId, children] of childrenMap) {
+      childrenMap.set(parentId, this.sortBySiblingOrder(children));
+    }
+
     // Create hierarchies for left and right sides
     const leftHierarchy = this.createHierarchy(SIDE.LEFT, allSubtreeNodes, rootNode, childrenMap);
     const rightHierarchy = this.createHierarchy(SIDE.RIGHT, allSubtreeNodes, rootNode, childrenMap);
@@ -556,86 +616,6 @@ class D3LayoutService {
 
     return { nodes: layoutedNodes, edges: descendantEdges };
   }
-
-  /**
-   * Layouts multiple independent trees in a mindmap
-   *
-   * This method is the main entry point for laying out complex mindmaps that may
-   * contain multiple independent tree structures. It automatically discovers all
-   * root nodes (nodes with type MINDMAP_TYPES.ROOT_NODE) and layouts each tree
-   * separately using the layoutSubtree method.
-   *
-   * Features:
-   * - Automatically discovers multiple root nodes
-   * - Layouts each tree independently using layoutSubtree
-   * - Handles orphaned nodes and edges not part of any tree
-   * - Combines results from all trees into a single output
-   * - Maintains consistent spacing and positioning across all trees
-   *
-   * Process:
-   * 1. Find all nodes with ROOT_NODE type
-   * 2. For each root, collect its descendant nodes and edges
-   * 3. Layout each tree using layoutSubtree
-   * 4. Combine all results and include orphaned elements
-   *
-   * @param nodes - Array of all nodes in the mindmap
-   * @param edges - Array of all edges in the mindmap
-   * @param direction - Layout direction (HORIZONTAL, VERTICAL, or NONE)
-   * @returns Promise resolving to object containing all positioned nodes and edges
-   *
-   * @example
-   * ```typescript
-   * const result = await layoutAllTrees(
-   *   allNodes,
-   *   allEdges,
-   *   DIRECTION.HORIZONTAL
-   * );
-   * ```
-   */
-  async layoutAllTrees(nodes: MindMapNode[], edges: MindMapEdge[], direction: Direction) {
-    if (direction === DIRECTION.NONE) return { nodes, edges };
-
-    const rootNodes = nodes.filter((node) => node.type === MINDMAP_TYPES.ROOT_NODE);
-
-    if (rootNodes.length === 0) {
-      console.warn('No root nodes found');
-      return { nodes, edges };
-    }
-
-    let allLayoutedNodes: MindMapNode[] = [];
-    let allLayoutedEdges: MindMapEdge[] = [];
-
-    // Layout each tree separately
-    for (const rootNode of rootNodes) {
-      const descendantNodes = this.getSubtreeNodes(rootNode.id, nodes).filter(
-        (node) => node.id !== rootNode.id
-      );
-
-      const treeNodeIds = new Set([rootNode.id, ...descendantNodes.map((n) => n.id)]);
-      const treeEdges = edges.filter((edge) => treeNodeIds.has(edge.source) && treeNodeIds.has(edge.target));
-
-      const { nodes: layoutedTreeNodes, edges: layoutedTreeEdges } = await this.layoutSubtree(
-        rootNode,
-        descendantNodes,
-        treeEdges,
-        direction
-      );
-
-      allLayoutedNodes.push(...layoutedTreeNodes);
-      allLayoutedEdges.push(...layoutedTreeEdges);
-    }
-
-    // Handle orphaned nodes and edges
-    const processedNodeIds = new Set(allLayoutedNodes.map((n) => n.id));
-    const orphanedNodes = nodes.filter((node) => !processedNodeIds.has(node.id));
-    allLayoutedNodes.push(...orphanedNodes);
-
-    const processedEdgeIds = new Set(allLayoutedEdges.map((e) => e.id));
-    const orphanedEdges = edges.filter((edge) => !processedEdgeIds.has(edge.id));
-    allLayoutedEdges.push(...orphanedEdges);
-
-    return { nodes: allLayoutedNodes, edges: allLayoutedEdges };
-  }
 }
 
 /**
@@ -648,9 +628,6 @@ class D3LayoutService {
  * @example
  * ```typescript
  * import { d3LayoutService } from './D3LayoutService';
- *
- * // Layout all trees in a mindmap
- * const result = await d3LayoutService.layoutAllTrees(nodes, edges, direction);
  *
  * // Layout a specific subtree
  * const subtreeResult = await d3LayoutService.layoutSubtree(

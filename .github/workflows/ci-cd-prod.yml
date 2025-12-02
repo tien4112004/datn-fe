@@ -108,8 +108,8 @@ jobs:
       - name: Deploy to Production
         run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
 
-  deploy_container:
-    name: Deploy Container to Production
+  deploy_app:
+    name: Deploy App to Production
     runs-on: ubuntu-latest
     needs: ci
     env:

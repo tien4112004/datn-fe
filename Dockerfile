@@ -11,15 +11,14 @@ COPY pnpm-lock.yaml ./
 RUN --mount=type=cache,target=/pnpm/store \
     pnpm fetch --frozen-lockfile
 COPY package.json ./
-RUN --mount=type=cache,target=/pnpm/store \
-    pnpm install --frozen-lockfile 
+RUN --mount=type=cache,target=/pnpm/store CI=true pnpm install --frozen-lockfile
 
 COPY . .
 
 RUN pnpm build
 
-# Production stage for container
-FROM node:20-alpine AS container-production
+# Production stage for app
+FROM node:20-alpine AS app-production
 
 WORKDIR /app
 
@@ -27,9 +26,9 @@ COPY --from=builder /app/container/dist ./dist
 
 RUN npm install -g serve
 
-EXPOSE 3000
+EXPOSE 5173
 
-CMD ["serve", "-s", "dist", "-l", "3000"]
+CMD ["serve", "-s", "dist", "-l", "5173"]
 
 # Production stage for presentation
 FROM node:20-alpine AS presentation-production
@@ -40,6 +39,19 @@ COPY --from=builder /app/presentation/dist ./dist
 
 RUN npm install -g serve
 
-EXPOSE 3001
+EXPOSE 5174
 
-CMD ["serve", "-s", "dist", "-l", "3001"]
+CMD ["serve", "-s", "dist", "-l", "5174"]
+
+# Production stage for admin
+FROM node:20-alpine AS admin-production
+
+WORKDIR /app
+
+COPY --from=builder /app/admin/dist ./dist
+
+RUN npm install -g serve
+
+EXPOSE 5175
+
+CMD ["serve", "-s", "dist", "-l", "5175"]

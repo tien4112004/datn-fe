@@ -1,3 +1,4 @@
 packages:
   - 'container'
   - 'presentation'
+  - 'admin'

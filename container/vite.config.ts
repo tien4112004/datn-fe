@@ -8,6 +8,13 @@ import path from 'path';
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
+
+  // Use a placeholder URL for build time - actual URL is loaded at runtime
+  const presentationUrl =
+    env.NODE_ENV === 'production'
+      ? 'https://presentation.huy-devops.site' // replace with actual production URL
+      : process.env.VITE_PRESENTATION_URL || env.VITE_PRESENTATION_URL || 'http://localhost:5174'; // fallback for local development
+
   return {
     plugins: [
       react(),
@@ -18,7 +25,7 @@ export default defineConfig(({ mode }) => {
           vueRemote: {
             type: 'module',
             name: 'vueRemote',
-            entry: `${process.env.PRESENTATION_URL || env.PRESENTATION_URL}/remoteEntry.js`,
+            entry: `${presentationUrl}/remoteEntry.js`,
             entryGlobalName: 'vueRemote',
             shareScope: 'default',
           },

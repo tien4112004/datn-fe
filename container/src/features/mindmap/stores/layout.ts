@@ -222,7 +222,6 @@ export const useLayoutStore = create<LayoutState>()(
           );
 
           setEdges([...layoutedEdges]);
-          setNodes(layoutedNodes);
 
           const targetPositions: Record<string, { x: number; y: number }> = {};
           layoutedNodes.forEach((node) => {
@@ -233,6 +232,7 @@ export const useLayoutStore = create<LayoutState>()(
 
           setTimeout(() => {
             set({ isLayouting: false }, false, 'mindmap-layout/updateLayout:animationEnd');
+            setNodes(layoutedNodes);
           }, ANIMATION_DURATION);
         } catch (error) {
           console.error('Layout update failed:', error);
@@ -245,6 +245,7 @@ export const useLayoutStore = create<LayoutState>()(
         const nodes = useCoreStore.getState().nodes;
         const edges = useCoreStore.getState().edges;
         const setEdges = useCoreStore.getState().setEdges;
+        const setNodes = useCoreStore.getState().setNodes;
 
         if (!nodes?.length || !edges) return;
 
@@ -292,6 +293,7 @@ export const useLayoutStore = create<LayoutState>()(
 
             setTimeout(() => {
               set({ isLayouting: false }, false, 'mindmap-layout/updateSubtreeLayout:animationEnd');
+              setNodes(layoutedNodes);
             }, ANIMATION_DURATION);
           } else {
             set({ isLayouting: false }, false, 'mindmap-layout/updateSubtreeLayout:noChanges');
@@ -307,6 +309,7 @@ export const useLayoutStore = create<LayoutState>()(
         const nodes = useCoreStore.getState().nodes;
         const edges = useCoreStore.getState().edges;
         const setEdges = useCoreStore.getState().setEdges;
+        const setNodes = useCoreStore.getState().setNodes;
 
         if (!nodes?.length || !edges) return;
 
@@ -356,14 +359,11 @@ export const useLayoutStore = create<LayoutState>()(
 
             setTimeout(() => {
               set({ isLayouting: false }, false, 'mindmap-layout/applyAutoLayout:animationEnd');
+              setNodes(layoutedNodes);
             }, ANIMATION_DURATION);
           } else {
             set({ isLayouting: false }, false, 'mindmap-layout/applyAutoLayout:noChanges');
           }
-
-          setTimeout(() => {
-            set({ isLayouting: false }, false, 'mindmap-layout/applyAutoLayout:animationEnd');
-          }, ANIMATION_DURATION);
         } catch (error) {
           console.error('Auto layout application failed:', error);
           set({ isLayouting: false }, false, 'mindmap-layout/applyAutoLayout:error');

@@ -183,6 +183,7 @@ export const convertAiDataToMindMapNodes = (
         ...(isRoot && {
           edgeColor: '#0044FF',
           layoutType,
+          forceLayout: true,
         }),
       },
       ...(isRoot ? {} : { dragHandle: DRAGHANDLE.SELECTOR }),

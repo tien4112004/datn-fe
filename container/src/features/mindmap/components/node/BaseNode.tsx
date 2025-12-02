@@ -127,6 +127,8 @@ export const BaseNodeBlock = memo(
       prevProps.node.id === nextProps.node.id &&
       prevProps.node.selected === nextProps.node.selected &&
       prevProps.node.dragging === nextProps.node.dragging &&
+      prevProps.node.width === nextProps.node.width &&
+      prevProps.node.height === nextProps.node.height &&
       prevProps.className === nextProps.className &&
       prevProps.variant === nextProps.variant &&
       prevProps.children === nextProps.children &&

@@ -17,7 +17,7 @@ import { NodeRichTextContent } from '../ui/node-rich-text-content';
 
 const RootNodeBlock = memo(
   ({ ...node }: NodeProps<RootNode>) => {
-    const { data, selected: isSelected, dragging } = node;
+    const { data, selected: isSelected, dragging, width, height } = node;
 
     const nodes = useCoreStore((state) => state.nodes);
     const layoutType = useMemo(() => getTreeLayoutType(nodes), [nodes]);
@@ -78,6 +78,12 @@ const RootNodeBlock = memo(
             isLayouting={isLayouting}
             onContentChange={handleContentChange}
             minimalToolbar={true}
+            style={{
+              width: width ? `${width - 40}px` : undefined,
+              height: height ? `${height - 16}px` : undefined,
+              minWidth: 'fit-content',
+              minHeight: 'fit-content',
+            }}
           />
         </BaseNodeContent>
 

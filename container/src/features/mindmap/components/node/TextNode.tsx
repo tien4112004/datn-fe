@@ -14,7 +14,7 @@ import { getTreeLayoutType } from '../../services/utils';
 
 const TextNodeBlock = memo(
   ({ ...node }: NodeProps<TextNode>) => {
-    const { data, selected: isSelected, dragging } = node;
+    const { data, selected: isSelected, dragging, width, height } = node;
 
     const nodes = useCoreStore((state) => state.nodes);
     const isLayouting = useLayoutStore((state) => state.isLayouting);
@@ -46,10 +46,16 @@ const TextNodeBlock = memo(
             isLayouting={isLayouting}
             onContentChange={handleContentChange}
             minimalToolbar={true}
+            style={{
+              width: width ? `${width - 40}px` : undefined,
+              height: height ? `${height - 16}px` : undefined,
+              minWidth: 'fit-content',
+              minHeight: 'fit-content',
+            }}
           />
         </BaseNodeContent>
 
-        <BaseNodeControl layoutType={layoutType} selected={isSelected} dragging={dragging}>
+        <BaseNodeControl layoutType={layoutType} selected={isSelected} dragging={dragging} className="hidden">
           <Button
             variant="ghost"
             size="sm"

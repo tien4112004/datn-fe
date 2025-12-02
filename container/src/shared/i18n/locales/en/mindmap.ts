@@ -1,4 +1,40 @@
 export default {
+  create: {
+    title: 'Create AI Mindmap',
+    subtitle: 'Generate structured mindmaps with AI',
+    promptTitle: 'Describe the topic for your mindmap',
+    promptPlaceholder: 'Enter your mindmap topic...',
+    generateMindmap: 'Generate Mindmap',
+    generating: 'Generating...',
+    advancedOptions: 'Advanced Options',
+    language: {
+      label: 'Language',
+      placeholder: 'Select language',
+      english: 'English',
+      vietnamese: 'Tiếng Việt',
+    },
+    model: {
+      label: 'Model',
+      placeholder: 'Select a model',
+    },
+    maxDepth: {
+      label: 'Max Depth',
+      description: 'Maximum depth of mindmap branches (1-5)',
+    },
+    maxBranches: {
+      label: 'Max Branches',
+      description: 'Maximum branches per node (1-10)',
+    },
+    examples: {
+      title: 'Example Mindmap Topics',
+      prompt1: 'Machine Learning Fundamentals',
+      prompt2: 'Project Management Best Practices',
+      prompt3: 'Web Development Technologies',
+      prompt4: 'Business Strategy Framework',
+      prompt5: 'Learning a New Language',
+      prompt6: 'Healthy Lifestyle Habits',
+    },
+  },
   toolbar: {
     title: 'Tools',
     sections: {

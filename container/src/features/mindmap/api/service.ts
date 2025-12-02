@@ -56,4 +56,9 @@ export default class MindmapRealApiService implements MindmapApiService {
     // API returns 204 No Content
     return null;
   }
+
+  async generateMindmap(request: import('../types/service').MindmapGenerateRequest): Promise<Mindmap> {
+    const response = await api.post<ApiResponse<Mindmap>>(`${this.baseUrl}/api/mindmaps/generate`, request);
+    return response.data.data;
+  }
 }

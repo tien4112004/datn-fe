@@ -1,4 +1,11 @@
-import { useQuery, useMutation, type UseQueryResult } from '@tanstack/react-query';
+import {
+  useQuery,
+  useInfiniteQuery,
+  useMutation,
+  type UseQueryResult,
+  type UseInfiniteQueryResult,
+  type InfiniteData,
+} from '@tanstack/react-query';
 import { useImageApiService } from '../api';
 import type { ImageGenerationRequest, ImageData } from '../types/service';
 
@@ -37,6 +44,43 @@ export const useImageById = (id: string | undefined): UseImageByIdReturn => {
 
   return {
     image,
+    ...query,
+  };
+};
+
+const PAGE_SIZE = 20;
+
+export interface UseImagesReturn
+  extends Omit<UseInfiniteQueryResult<InfiniteData<ImageData[], unknown>, Error>, 'data'> {
+  images: ImageData[];
+}
+
+export const useImages = (search?: string): UseImagesReturn => {
+  const imageApiService = useImageApiService();
+
+  const { data, ...query } = useInfiniteQuery({
+    queryKey: [imageApiService.getType(), 'images', search],
+    queryFn: async ({ pageParam = 1 }): Promise<ImageData[]> => {
+      const images = await imageApiService.getImages({
+        page: pageParam,
+        pageSize: PAGE_SIZE,
+        search,
+      });
+      return images;
+    },
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, allPages) => {
+      if (lastPage.length < PAGE_SIZE) return undefined;
+      return allPages.length + 1;
+    },
+    staleTime: 30000,
+    gcTime: 300000,
+  });
+
+  const images = data?.pages.flatMap((page) => page) || [];
+
+  return {
+    images,
     ...query,
   };
 };

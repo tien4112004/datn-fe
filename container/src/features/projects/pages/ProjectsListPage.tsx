@@ -7,6 +7,7 @@ import ViewToggle, { type ViewMode } from '@/features/presentation/components/ot
 import CommonTabs, { type TabItem } from '@/shared/components/common/CommonTabs';
 import MindmapTable from '@/features/mindmap/components/table/MindmapTable';
 import type { ResourceType } from '@/shared/constants/resourceTypes';
+import Image from '@/features/image';
 
 const ProjectListPage = () => {
   const { t } = useTranslation('projects');
@@ -65,8 +66,8 @@ const ProjectListPage = () => {
     {
       key: 'image',
       value: 'image',
-      label: t('resources.image'),
-      content: <div className="text-muted-foreground py-8 text-center">Image resource coming soon...</div>,
+      label: t('resources.image', 'Image'),
+      content: <Image.ImageGalleryPage />,
     },
   ];
 

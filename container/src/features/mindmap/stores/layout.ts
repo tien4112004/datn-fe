@@ -128,20 +128,25 @@ export const useLayoutStore = create<LayoutState>()(
         }
 
         // Store initial positions and calculate deltas
+        // Only include nodes that have target positions (nodes in the current layout operation)
         const animationData: AnimationData[] = [];
         nodes.forEach((node) => {
           const target = targetPositions[node.id];
 
+          // Skip nodes that don't have a target position (from other trees)
           if (!target) return;
 
           animationData.push({
             id: node.id,
             startPos: { ...node.position },
-            targetPos: target || node.position,
+            targetPos: target,
             deltaX: target.x - (node.position.x ?? 0),
             deltaY: target.y - (node.position.y ?? 0),
           });
         });
+
+        // If no nodes to animate, skip
+        if (animationData.length === 0) return;
 
         set(
           {
@@ -152,6 +157,9 @@ export const useLayoutStore = create<LayoutState>()(
           'mindmap-layout/animateNodesToPositions:start'
         );
 
+        // Create a set of node IDs being animated for quick lookup
+        const animatingNodeIds = new Set(animationData.map((d) => d.id));
+
         const timer = d3.timer((elapsed) => {
           const progress = Math.min(elapsed / duration, 1);
 
@@ -160,6 +168,9 @@ export const useLayoutStore = create<LayoutState>()(
 
           setNodes((currentNodes: MindMapNode[]) =>
             currentNodes.map((node) => {
+              // Only animate nodes that are part of this layout operation
+              if (!animatingNodeIds.has(node.id)) return node;
+
               const animData = animationData.find((d) => d.id === node.id);
               if (!animData) return node;
 
@@ -221,7 +232,7 @@ export const useLayoutStore = create<LayoutState>()(
             DEFAULT_LAYOUT_OPTIONS
           );
 
-          setEdges([...layoutedEdges]);
+          setEdges((state) => state.map((edge) => layoutedEdges.find((e) => e.id === edge.id) ?? edge));
 
           const targetPositions: Record<string, { x: number; y: number }> = {};
           layoutedNodes.forEach((node) => {
@@ -232,7 +243,7 @@ export const useLayoutStore = create<LayoutState>()(
 
           setTimeout(() => {
             set({ isLayouting: false }, false, 'mindmap-layout/updateLayout:animationEnd');
-            setNodes(layoutedNodes);
+            setNodes((state) => state.map((node) => layoutedNodes.find((n) => n.id === node.id) ?? node));
           }, ANIMATION_DURATION);
         } catch (error) {
           console.error('Layout update failed:', error);
@@ -275,13 +286,7 @@ export const useLayoutStore = create<LayoutState>()(
             DEFAULT_LAYOUT_OPTIONS
           );
 
-          setEdges((prevEdges) => {
-            const updatedEdges = prevEdges.map((edge) => {
-              const layoutedEdge = layoutedEdges.find((e) => e.id === edge.id);
-              return layoutedEdge ? { ...edge, ...layoutedEdge } : edge;
-            });
-            return updatedEdges;
-          });
+          setEdges((state) => state.map((edge) => layoutedEdges.find((e) => e.id === edge.id) ?? edge));
 
           const targetPositions: Record<string, { x: number; y: number }> = {};
           layoutedNodes.forEach((node) => {
@@ -293,7 +298,7 @@ export const useLayoutStore = create<LayoutState>()(
 
             setTimeout(() => {
               set({ isLayouting: false }, false, 'mindmap-layout/updateSubtreeLayout:animationEnd');
-              setNodes(layoutedNodes);
+              setNodes((state) => state.map((node) => layoutedNodes.find((n) => n.id === node.id) ?? node));
             }, ANIMATION_DURATION);
           } else {
             set({ isLayouting: false }, false, 'mindmap-layout/updateSubtreeLayout:noChanges');
@@ -340,14 +345,7 @@ export const useLayoutStore = create<LayoutState>()(
             DEFAULT_LAYOUT_OPTIONS
           );
 
-          // Update only the edges that belong to this subtree
-          setEdges((prevEdges) => {
-            const updatedEdges = prevEdges.map((edge) => {
-              const layoutedEdge = layoutedEdges.find((e) => e.id === edge.id);
-              return layoutedEdge ? { ...edge, ...layoutedEdge } : edge;
-            });
-            return updatedEdges;
-          });
+          setEdges((state) => state.map((edge) => layoutedEdges.find((e) => e.id === edge.id) ?? edge));
 
           const targetPositions: Record<string, { x: number; y: number }> = {};
           layoutedNodes.forEach((node) => {
@@ -359,7 +357,7 @@ export const useLayoutStore = create<LayoutState>()(
 
             setTimeout(() => {
               set({ isLayouting: false }, false, 'mindmap-layout/applyAutoLayout:animationEnd');
-              setNodes(layoutedNodes);
+              setNodes((state) => state.map((node) => layoutedNodes.find((n) => n.id === node.id) ?? node));
             }, ANIMATION_DURATION);
           } else {
             set({ isLayouting: false }, false, 'mindmap-layout/applyAutoLayout:noChanges');

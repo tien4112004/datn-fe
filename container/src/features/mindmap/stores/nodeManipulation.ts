@@ -233,7 +233,7 @@ export const useNodeManipulationStore = create<NodeManipulationState>()(
             sourceHandle: getHandles(newSide!, targetId, true),
             targetHandle: getHandles(newSide!, sourceId, false),
             data: {
-              strokeColor: 'var(--primary)',
+              strokeColor: '#0044FF',
               strokeWidth: 2,
               pathType,
             },

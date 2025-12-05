@@ -19,8 +19,8 @@ jobs:
       contents: read
     outputs:
       presentation_changed: ${{ steps.filter.outputs.presentation }}
-      container_changed: ${{ steps.filter.outputs.container }}
-      something_changed: ${{ steps.filter.outputs.presentation == 'true' || steps.filter.outputs.container == 'true' }}
+      app_changed: ${{ steps.filter.outputs.app }}
+      something_changed: ${{ steps.filter.outputs.presentation == 'true' || steps.filter.outputs.app == 'true' }}
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v2
@@ -29,7 +29,7 @@ jobs:
           filters: |
             presentation:
               - 'presentation/**'
-            container:
+            app:
               - 'container/**'
 
   ci:
@@ -143,14 +143,14 @@ jobs:
           PREVIEW_URL=$(echo "$DEPLOY_OUTPUT" | grep -oE "https://[a-zA-Z0-9.-]+\.vercel\.app" | tail -n 1)
           echo "preview_url=$PREVIEW_URL" >> "$GITHUB_OUTPUT"
 
-  deploy_container:
-    name: Deploy Container Preview
+  deploy_app:
+    name: Deploy App Preview
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
       contents: read
     needs: [ci, path_filter, deploy_presentation]
-    if: always() && needs.path_filter.outputs.container_changed == 'true' && (needs.deploy_presentation.result == 'success' || needs.deploy_presentation.result == 'skipped')
+    if: always() && needs.path_filter.outputs.app_changed == 'true' && (needs.deploy_presentation.result == 'success' || needs.deploy_presentation.result == 'skipped')
     env:
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_CONTAINER_ID }}

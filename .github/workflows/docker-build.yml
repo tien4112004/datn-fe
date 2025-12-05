@@ -1,0 +1,180 @@
+# .github/workflows/docker-build.yml
+name: Docker Build
+
+on:
+    # Trigger on workflow_dispatch for manual builds
+    workflow_dispatch:
+    # Trigger only after Production CI/CD workflow completes successfully on main
+    workflow_run:
+        workflows: ["Production CI/CD"]
+        types: [completed]
+        branches:
+            - main
+
+env:
+    REGISTRY: ghcr.io
+    IMAGE_NAME: ${{ github.repository }}
+    JENKINS_URL: https://jenkins.huy-devops.site
+    JENKINS_JOB_NAME: aiprimary-frontend
+
+jobs:
+    build:
+        name: Dockerize and Push Images
+        runs-on: ubuntu-latest
+        if: |
+            (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main') ||
+            (github.event_name == 'workflow_dispatch')
+
+        permissions:
+            contents: read
+            packages: write
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Set up Docker Buildx
+              uses: docker/setup-buildx-action@v3
+
+            - name: Log in to Container Registry
+              uses: docker/login-action@v3
+              with:
+                  registry: ${{ env.REGISTRY }}
+                  username: ${{ github.actor }}
+                  password: ${{ secrets.GITHUB_TOKEN }}
+
+            # Build and push App application
+            - name: Extract metadata for App
+              id: meta-app
+              uses: docker/metadata-action@v5
+              with:
+                  images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+                  tags: |
+                      type=raw,value=app-latest
+                      type=raw,value=app-${{ github.sha }}
+                  flavor: |
+                      latest=false
+
+            - name: Build and push App image
+              uses: docker/build-push-action@v5
+              with:
+                  context: .
+                  file: ./Dockerfile
+                  target: app-production
+                  push: true
+                  tags: ${{ steps.meta-app.outputs.tags }}
+                  labels: ${{ steps.meta-app.outputs.labels }}
+                  cache-from: type=gha,scope=app
+                  cache-to: type=gha,mode=max,scope=app
+                  platforms: linux/amd64,linux/arm64
+
+            # Build and push Presentation application
+            - name: Extract metadata for Presentation
+              id: meta-presentation
+              uses: docker/metadata-action@v5
+              with:
+                  images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+                  tags: |
+                      type=raw,value=presentation-latest
+                      type=raw,value=presentation-${{ github.sha }}
+                  flavor: |
+                      latest=false
+
+            - name: Build and push Presentation image
+              uses: docker/build-push-action@v5
+              with:
+                  context: .
+                  file: ./Dockerfile
+                  target: presentation-production
+                  push: true
+                  tags: ${{ steps.meta-presentation.outputs.tags }}
+                  labels: ${{ steps.meta-presentation.outputs.labels }}
+                  cache-from: type=gha,scope=presentation
+                  cache-to: type=gha,mode=max,scope=presentation
+                  platforms: linux/amd64,linux/arm64
+
+            # Build and push Admin application
+            - name: Extract metadata for Admin
+              id: meta-admin
+              uses: docker/metadata-action@v5
+              with:
+                  images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+                  tags: |
+                      type=raw,value=admin-latest
+                      type=raw,value=admin-${{ github.sha }}
+                  flavor: |
+                      latest=false
+
+            - name: Build and push Admin image
+              uses: docker/build-push-action@v5
+              with:
+                  context: .
+                  file: ./Dockerfile
+                  target: admin-production
+                  push: true
+                  tags: ${{ steps.meta-admin.outputs.tags }}
+                  labels: ${{ steps.meta-admin.outputs.labels }}
+                  cache-from: type=gha,scope=admin
+                  cache-to: type=gha,mode=max,scope=admin
+                  platforms: linux/amd64,linux/arm64
+
+            - name: Trigger Jenkins deployment
+              if: success()
+              env:
+                  JENKINS_URL: ${{ env.JENKINS_URL }}
+                  JENKINS_USER: ${{ secrets.JENKINS_USER }}
+                  JENKINS_API_TOKEN: ${{ secrets.JENKINS_API_TOKEN }}
+                  JENKINS_JOB: ${{ env.JENKINS_JOB_NAME }}
+              run: |
+                  echo "Triggering Jenkins job for deployment..."
+                  echo "Branch: ${{ github.ref_name }}"
+                  echo "Event: ${{ github.event_name }}"
+
+                  if [ -z "${JENKINS_URL}" ] || [ -z "${JENKINS_USER}" ] || [ -z "${JENKINS_API_TOKEN}" ] || [ -z "${JENKINS_JOB}" ]; then
+                    echo "One or more Jenkins secrets are missing (JENKINS_URL/JENKINS_USER/JENKINS_API_TOKEN/JENKINS_JOB_NAME). Skipping Jenkins trigger.";
+                    exit 1;
+                  fi
+
+                  BRANCH_NAME="main"
+                  ENCODED_BRANCH=$(echo "$BRANCH_NAME" | sed 's/\//%2F/g')
+
+                  echo "Triggering Jenkins job for branch: ${BRANCH_NAME}"
+                  echo "Encoded branch: ${ENCODED_BRANCH}"
+
+                  TRIGGER_URL="${JENKINS_URL}/job/${JENKINS_JOB}/job/${ENCODED_BRANCH}/build"
+
+                  echo "Trigger URL: ${TRIGGER_URL}"
+
+                  # Try to get CSRF crumb (if enabled)
+                  echo "Attempting to fetch CSRF crumb..."
+                  CRUMB=$(curl -s -u "${JENKINS_USER}:${JENKINS_API_TOKEN}" \
+                    "${JENKINS_URL}/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,%22:%22,//crumb)" 2>/dev/null || echo "")
+
+                  if [ -n "$CRUMB" ] && [[ "$CRUMB" != *"{"* ]]; then
+                    echo "CSRF crumb obtained: ${CRUMB}"
+                    CRUMB_FIELD=$(echo "$CRUMB" | cut -d':' -f1)
+                    CRUMB_VALUE=$(echo "$CRUMB" | cut -d':' -f2-)
+                    
+                    # Trigger with CSRF crumb
+                    HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
+                      -u "${JENKINS_USER}:${JENKINS_API_TOKEN}" \
+                      -H "${CRUMB_FIELD}: ${CRUMB_VALUE}" \
+                      -X POST "${TRIGGER_URL}")
+                  else
+                    echo "CSRF crumb not available or not required, triggering without it..."
+                    
+                    # Trigger without CSRF crumb
+                    HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
+                      -u "${JENKINS_USER}:${JENKINS_API_TOKEN}" \
+                      -X POST "${TRIGGER_URL}")
+                  fi
+
+                  echo "HTTP response code: ${HTTP_CODE}"
+
+                  # Check if trigger was successful (201 = created, 200 = ok)
+                  if [ "$HTTP_CODE" = "201" ] || [ "$HTTP_CODE" = "200" ]; then
+                    echo "✓ Jenkins job triggered successfully"
+                  else
+                    echo "✗ Failed to trigger Jenkins job (HTTP ${HTTP_CODE})"
+                    exit 1
+                  fi

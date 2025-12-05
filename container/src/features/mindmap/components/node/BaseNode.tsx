@@ -149,7 +149,7 @@ const Helper = memo(
 
     return (
       <>
-        <NodeResizer isVisible={selected} minWidth={100} minHeight={30} />
+        <NodeResizer isVisible={selected} minWidth={100} minHeight={60} />
         <ChildNodeControls node={node} selected={selected} />
       </>
     );

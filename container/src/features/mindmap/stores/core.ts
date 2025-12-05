@@ -69,7 +69,7 @@ export const useCoreStore = create<CoreState>()(
             ...connection,
             type: MINDMAP_TYPES.EDGE,
             data: {
-              strokeColor: 'var(--primary)',
+              strokeColor: '#0044FF',
               strokeWidth: 2,
               pathType,
             },

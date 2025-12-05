@@ -94,14 +94,26 @@ export const useReactFlowIntegration = () => {
 
       setDragTarget(null);
 
-      // If there's an intersection, move node to be a child of the target
+      // If there's an intersection, move node(s) to be a child of the target
       if (intersections.length > 0) {
         const targetNodeId = intersections[0];
         if (targetNodeId !== node.id) {
           const targetNode = getNode(targetNodeId);
           if (targetNode) {
             const side = determineSideFromPosition(node, targetNode);
-            moveToChild(node.id, targetNodeId, side);
+
+            // Get all selected node IDs and move them to the target
+            const selectedNodeIds = Array.from(useCoreStore.getState().selectedNodeIds);
+
+            // If no nodes are selected, just move the dragged node
+            if (selectedNodeIds.length === 0) {
+              moveToChild(node.id, targetNodeId, side);
+            } else {
+              // Move all selected nodes to the target
+              selectedNodeIds.forEach((nodeId) => {
+                moveToChild(nodeId, targetNodeId, side);
+              });
+            }
             return; // moveToChild will handle layout if needed
           }
         }

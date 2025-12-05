@@ -1,4 +1,40 @@
 export default {
+  create: {
+    title: 'Tạo Sơ Đồ Tư Duy AI',
+    subtitle: 'Tạo sơ đồ tư duy có cấu trúc với AI',
+    promptTitle: 'Mô tả chủ đề cho sơ đồ tư duy',
+    promptPlaceholder: 'Nhập chủ đề sơ đồ tư duy...',
+    generateMindmap: 'Tạo Sơ Đồ Tư Duy',
+    generating: 'Đang tạo...',
+    advancedOptions: 'Tùy Chọn Nâng Cao',
+    language: {
+      label: 'Ngôn ngữ',
+      placeholder: 'Chọn ngôn ngữ',
+      english: 'English',
+      vietnamese: 'Tiếng Việt',
+    },
+    model: {
+      label: 'Mô hình',
+      placeholder: 'Chọn mô hình',
+    },
+    maxDepth: {
+      label: 'Độ sâu tối đa',
+      description: 'Độ sâu tối đa của các nhánh (1-5)',
+    },
+    maxBranches: {
+      label: 'Số nhánh tối đa',
+      description: 'Số nhánh tối đa mỗi nút (1-10)',
+    },
+    examples: {
+      title: 'Ví Dụ Chủ Đề Sơ Đồ Tư Duy',
+      prompt1: 'Nền tảng Machine Learning',
+      prompt2: 'Phương pháp quản lý dự án tốt nhất',
+      prompt3: 'Công nghệ phát triển web',
+      prompt4: 'Khung chiến lược kinh doanh',
+      prompt5: 'Học một ngôn ngữ mới',
+      prompt6: 'Thói quen sống lành mạnh',
+    },
+  },
   toolbar: {
     title: 'Công cụ',
     sections: {

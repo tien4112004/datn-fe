@@ -35,11 +35,22 @@ const TextNodeBlock = memo(
     };
 
     return (
-      <BaseNodeBlock node={node} variant="card" className={DRAGHANDLE.CLASS}>
+      <BaseNodeBlock
+        node={node}
+        variant="card"
+        className={DRAGHANDLE.CLASS}
+        style={{ backgroundColor: data.backgroundColor as string }}
+      >
         <BaseNodeContent className="flex min-h-full flex-row items-start gap-2 px-4">
           {/* <div className={cn('flex-shrink-0 p-2 pr-0', DRAGHANDLE.CLASS)}>
             <GripVertical className={cn('h-6 w-5', isSelected ? 'opacity-100' : 'opacity-50')} />
           </div> */}
+          <style>{`
+            .bn-container[data-color-scheme] {
+              --bn-colors-editor-background: ${data.backgroundColor} !important;
+            }
+          `}</style>
+
           <NodeRichTextContent
             content={data.content}
             isDragging={dragging}

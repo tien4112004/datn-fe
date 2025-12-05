@@ -276,3 +276,19 @@ export const useCreateTestMindmaps = () => {
     },
   });
 };
+
+export const useGenerateMindmap = () => {
+  const mindmapApiService = useMindmapApiService();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (request: import('../types/service').MindmapGenerateRequest) => {
+      return await mindmapApiService.generateMindmap(request);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [mindmapApiService.getType(), 'mindmaps'],
+      });
+    },
+  });
+};

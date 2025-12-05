@@ -212,6 +212,10 @@ export const useNodeOperationsStore = create<NodeOperationsState>()(
             isCollapsed: false,
             pathType: PATH_TYPES.SMOOTHSTEP,
           },
+          style: {
+            width: 'fit-content',
+            height: 'fit-content',
+          },
         };
 
         setNodes((state) => [...state, newNode]);
@@ -231,13 +235,21 @@ export const useNodeOperationsStore = create<NodeOperationsState>()(
         const isAutoLayoutEnabled = getTreeForceLayout(nodes);
         const layoutType = getTreeLayoutType(nodes);
         prepareToPushUndo();
+
+        // Get the full parent node from the store to ensure we have position and measured data
+        const fullParentNode = nodes.find((n) => n.id === parentNode.id);
+        if (!fullParentNode) {
+          console.error('Parent node not found');
+          return;
+        }
+
         // Find the root node to get the pathType
-        const rootNode = getRootNodeOfSubtree(parentNode.id!, nodes);
+        const rootNode = getRootNodeOfSubtree(fullParentNode.id, nodes);
         const pathType = (rootNode?.data?.pathType || PATH_TYPES.SMOOTHSTEP) as PathType;
 
         // Find existing children of this parent
         const allChildren = edges
-          .filter((edge) => edge.source === parentNode.id)
+          .filter((edge) => edge.source === fullParentNode.id)
           .map((edge) => nodes.find((n) => n.id === edge.target))
           .filter((n): n is MindMapNode => n !== undefined);
 
@@ -249,9 +261,9 @@ export const useNodeOperationsStore = create<NodeOperationsState>()(
           ? allChildren.filter((child) => child.data?.side === side)
           : allChildren;
 
-        // Calculate position after the last sibling
+        // Calculate position after the last sibling using full parent node data
         const newPosition = calculatePositionAfterLastSibling(
-          parentNode as MindMapNode,
+          fullParentNode,
           siblingsOnSameSide,
           side,
           layoutType,
@@ -263,9 +275,9 @@ export const useNodeOperationsStore = create<NodeOperationsState>()(
           id,
           type: nodeType,
           data: {
-            level: parentNode.data?.level ? parentNode.data.level + 1 : 1,
-            content: `<p>${id}</p>`,
-            parentId: parentNode.id,
+            level: fullParentNode.data?.level ? fullParentNode.data.level + 1 : 1,
+            content: `<p> New node ${allChildren.length + 1}</p>`,
+            parentId: fullParentNode.id,
             side: side,
             isCollapsed: false,
             ...(nodeType === MINDMAP_TYPES.SHAPE_NODE && {
@@ -289,13 +301,13 @@ export const useNodeOperationsStore = create<NodeOperationsState>()(
 
         const newEdge = {
           id: generateId(),
-          source: parentNode.id!,
+          source: fullParentNode.id,
           target: newNode.id,
           type: MINDMAP_TYPES.EDGE,
-          sourceHandle: `${side}-source-${parentNode.id}`,
+          sourceHandle: `${side}-source-${fullParentNode.id}`,
           targetHandle: `${getOppositeSide(side)}-target-${newNode.id}`,
           data: {
-            strokeColor: (rootNode?.data.edgeColor as string) || 'var(--primary)',
+            strokeColor: (rootNode?.data.edgeColor as string) || '#0044FF',
             strokeWidth: 2,
             pathType,
           },

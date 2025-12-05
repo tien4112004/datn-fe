@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import type { MindMapNode, MindMapEdge } from '../types';
-import { MINDMAP_TYPES } from '../types';
+import { MINDMAP_TYPES, PATH_TYPES, SIDE } from '../types';
 import { generateId } from '@/shared/lib/utils';
 import { devtools } from 'zustand/middleware';
 import { useCoreStore } from './core';
@@ -12,6 +12,8 @@ import {
   convertAiDataToMindMapNodes,
   getTreeLayoutType,
   DEFAULT_LAYOUT_TYPE,
+  getAllDescendantNodes,
+  getRootNodeOfSubtree,
 } from '../services/utils';
 
 export interface ClipboardState {
@@ -153,8 +155,52 @@ export const useClipboardStore = create<ClipboardState>()(
       const nodes = useCoreStore.getState().nodes;
       const edges = useCoreStore.getState().edges;
       const selectedNodes = nodes.filter((node) => node.selected);
-      const selectedEdges = edges.filter((edge) => edge.selected);
-      navigator.clipboard.writeText(JSON.stringify({ nodes: selectedNodes, edges: selectedEdges }));
+
+      if (selectedNodes.length === 0) return;
+
+      // Collect all nodes to copy: selected nodes + all their descendants
+      const allNodesToCopy = new Set<string>();
+      selectedNodes.forEach((node) => {
+        allNodesToCopy.add(node.id);
+        const descendants = getAllDescendantNodes(node.id, nodes);
+        descendants.forEach((d) => allNodesToCopy.add(d.id));
+      });
+
+      const nodesToCopy = nodes.filter((n) => allNodesToCopy.has(n.id));
+
+      // Calculate edges that connect only nodes within the copied set
+      // This avoids copying edges that link to nodes outside the selection
+      const edgesToCopy = edges.filter(
+        (edge) => allNodesToCopy.has(edge.source) && allNodesToCopy.has(edge.target)
+      );
+
+      // Find root nodes in the selection (nodes whose parents are not in the selection)
+      const copyRootNodes = nodesToCopy.filter(
+        (node) => !node.data.parentId || !allNodesToCopy.has(node.data.parentId)
+      );
+
+      // Get tree context from the original root for each copy root
+      const treeContextMap: Record<string, any> = {};
+      copyRootNodes.forEach((copyRoot) => {
+        const originalRoot = getRootNodeOfSubtree(copyRoot.id, nodes);
+        if (originalRoot) {
+          treeContextMap[copyRoot.id] = {
+            pathType: originalRoot.data?.pathType ?? PATH_TYPES.SMOOTHSTEP,
+            layoutType: originalRoot.data?.layoutType ?? DEFAULT_LAYOUT_TYPE,
+            edgeColor: originalRoot.data?.edgeColor ?? '#0044FF',
+            forceLayout: originalRoot.data?.forceLayout ?? false,
+          };
+        }
+      });
+
+      navigator.clipboard.writeText(
+        JSON.stringify({
+          nodes: nodesToCopy,
+          edges: edgesToCopy,
+          treeContext: treeContextMap,
+          copyRootIds: copyRootNodes.map((n) => n.id),
+        })
+      );
     },
 
     pasteFromClipboard: async (screenToFlowPosition: any) => {
@@ -229,11 +275,12 @@ export const useClipboardStore = create<ClipboardState>()(
 
       // Check if it's standard mindmap JSON format
       if (parsedData.nodes && parsedData.edges) {
-        const { nodes: clipboardNodes, edges: clipboardEdges } = parsedData;
+        const { nodes: clipboardNodes, edges: clipboardEdges, treeContext, copyRootIds } = parsedData;
         const { setNodes, setEdges } = useCoreStore.getState();
+        const { applyAutoLayout } = useLayoutStore.getState();
 
         const { mousePosition, offset } = get();
-        const rootPosition = clipboardNodes[0].position || { x: 0, y: 0 };
+        const rootPosition = clipboardNodes[0]?.position || { x: 0, y: 0 };
 
         // Create a map to track old IDs to new IDs
         const freshNodesMap = new Map<string, string>();
@@ -242,31 +289,83 @@ export const useClipboardStore = create<ClipboardState>()(
           freshNodesMap.set(node.id, newId);
         });
 
-        // Generate fresh nodes with new IDs to avoid duplicates
-        const freshNodes = clipboardNodes.map((node: any) => ({
-          ...node,
-          id: freshNodesMap.get(node.id) || generateId(),
-          data: {
-            ...node.data,
-            parentId: freshNodesMap.get(node.data.parentId as string) || undefined,
-          },
-          parentId: freshNodesMap.get(node.parentId as string) || undefined,
-          selected: false,
-        }));
+        // Determine which nodes are "copy roots" - nodes that should become root nodes
+        const copyRootIdSet = new Set<string>(copyRootIds || []);
 
-        const freshEdges = clipboardEdges.map((edge: any) => {
-          const newSourceId = freshNodesMap.get(edge.source);
-          const newTargetId = freshNodesMap.get(edge.target);
+        // Generate fresh nodes with new IDs to avoid duplicates
+        const freshNodes = clipboardNodes.map((node: any) => {
+          const newId = freshNodesMap.get(node.id) || generateId();
+          const isCopyRoot = copyRootIdSet.has(node.id);
+          const context = treeContext?.[node.id];
+
+          // If this node is a copy root and was not originally a root node, convert it
+          const shouldConvertToRoot = isCopyRoot && node.type !== MINDMAP_TYPES.ROOT_NODE;
+
+          if (shouldConvertToRoot) {
+            return {
+              ...node,
+              id: newId,
+              type: MINDMAP_TYPES.ROOT_NODE,
+              dragHandle: undefined, // Root nodes don't have drag handles
+              data: {
+                ...node.data,
+                parentId: undefined, // Root nodes have no parent
+                level: 0,
+                side: SIDE.MID,
+                // Apply tree context from the original tree
+                pathType: context?.pathType ?? node.data.pathType ?? PATH_TYPES.SMOOTHSTEP,
+                layoutType: context?.layoutType ?? DEFAULT_LAYOUT_TYPE,
+                edgeColor: context?.edgeColor ?? '#0044FF',
+                forceLayout: context?.forceLayout ?? false,
+              },
+              selected: false,
+            };
+          }
+
+          // For non-copy-roots, update parentId to new IDs
+          const newParentId = freshNodesMap.get(node.data.parentId as string);
+          const originalLevel = node.data.level ?? 0;
+
+          // Calculate level adjustment for descendants of converted roots
+          let levelAdjustment = 0;
+          if (node.data.parentId && copyRootIdSet.has(node.data.parentId)) {
+            // Direct child of a copy root - recalculate level
+            const copyRootOriginalLevel =
+              clipboardNodes.find((n: any) => n.id === node.data.parentId)?.data?.level ?? 0;
+            levelAdjustment = -copyRootOriginalLevel;
+          }
 
           return {
-            ...edge,
-            id: generateId(),
-            source: newSourceId ? newSourceId : edge.source,
-            target: newTargetId ? newTargetId : edge.target,
-            sourceHandle: edge.sourceHandle?.replace(edge.source, newSourceId || edge.source),
-            targetHandle: edge.targetHandle?.replace(edge.target, newTargetId || edge.target),
+            ...node,
+            id: newId,
+            data: {
+              ...node.data,
+              parentId: newParentId || undefined,
+              level: originalLevel + levelAdjustment,
+            },
+            selected: false,
           };
         });
+
+        // Generate fresh edges - only those that connect nodes within the pasted set
+        const freshEdges = clipboardEdges
+          .map((edge: any) => {
+            const newSourceId = freshNodesMap.get(edge.source);
+            const newTargetId = freshNodesMap.get(edge.target);
+
+            // Skip edges that don't have both ends in the fresh nodes
+            if (!newSourceId || !newTargetId) return null;
+
+            return {
+              ...edge,
+              id: generateId(),
+              source: newSourceId,
+              target: newTargetId,
+              sourceHandle: edge.sourceHandle?.replace(edge.source, newSourceId),
+              targetHandle: edge.targetHandle?.replace(edge.target, newTargetId),
+            };
+          })
+          .filter(Boolean) as MindMapEdge[];
 
         setNodes((nds: MindMapNode[]) => [
           ...nds.map((node) => ({ ...node, selected: false })),
@@ -287,6 +386,16 @@ export const useClipboardStore = create<ClipboardState>()(
           }),
         ]);
         setEdges((eds: MindMapEdge[]) => [...eds, ...freshEdges]);
+
+        // Apply auto layout to newly pasted root nodes if force layout is enabled
+        const pastedRootNodes = freshNodes.filter((n: any) => n.type === MINDMAP_TYPES.ROOT_NODE);
+        pastedRootNodes.forEach((rootNode: any) => {
+          if (rootNode.data?.forceLayout) {
+            setTimeout(() => {
+              applyAutoLayout(rootNode.id);
+            }, 200);
+          }
+        });
 
         pushToUndoStack();
         set((state) => ({ offset: state.offset + 20 }), false, 'mindmap-clip/pasteFromClipboard');

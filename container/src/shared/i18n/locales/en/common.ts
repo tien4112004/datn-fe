@@ -96,6 +96,12 @@ export default {
     stay: 'Stay',
     leave: 'Leave',
   },
+  smallScreen: {
+    title: 'Larger Screen Recommended',
+    description:
+      'This editor is optimized for larger screens. For the best experience, please use a device with a larger display or resize your browser window.',
+    understand: 'I Understand',
+  },
   presentation: {
     saveSuccess: 'Presentation saved successfully',
     saveFailed: 'Failed to save presentation',

@@ -7,6 +7,7 @@ import { getSearchParamAsBoolean } from '@/shared/utils/searchParams';
 import { useDetailPresentation } from '../hooks/useDetailPresentation';
 import { useUnsavedChangesBlocker } from '@/shared/hooks';
 import { UnsavedChangesDialog } from '@/shared/components/modals/UnsavedChangesDialog';
+import { SmallScreenDialog } from '@/shared/components/modals/SmallScreenDialog';
 
 const DetailPage = () => {
   const { presentation } = useLoaderData() as { presentation: Presentation | null };
@@ -49,6 +50,7 @@ const DetailPage = () => {
         onStay={handleStay}
         onLeave={handleProceed}
       />
+      <SmallScreenDialog />
     </>
   );
 };

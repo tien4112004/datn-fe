@@ -96,6 +96,12 @@ export default {
     stay: 'Ở lại',
     leave: 'Rời đi',
   },
+  smallScreen: {
+    title: 'Nên sử dụng màn hình lớn hơn',
+    description:
+      'Trình soạn thảo này được tối ưu hóa cho màn hình lớn hơn. Để có trải nghiệm tốt nhất, vui lòng sử dụng thiết bị có màn hình lớn hơn hoặc phóng to cửa sổ trình duyệt.',
+    understand: 'Tôi hiểu',
+  },
   presentation: {
     saveSuccess: 'Lưu bài trình bày thành công',
     saveFailed: 'Lưu bài trình bày thất bại',

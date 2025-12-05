@@ -6,6 +6,7 @@ import GeneralSettings from '../components/GeneralSettings';
 import AppearanceSettings from '../components/AppearanceSettings';
 import DevToolsSettings from '../components/DevToolsSettings';
 import LanguageSettings from '../components/LanguageSettings';
+import UserProfilePage from '@/features/user/components/UserProfile';
 
 function SettingsPage() {
   const { t } = useTranslation('settings');
@@ -22,6 +23,12 @@ function SettingsPage() {
   };
 
   const tabItems: TabItem[] = [
+    {
+      key: 'profile',
+      value: 'profile',
+      label: t('tabs.profile'),
+      content: <UserProfilePage />,
+    },
     {
       key: 'general',
       value: 'general',

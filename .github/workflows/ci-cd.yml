@@ -30,7 +30,7 @@ jobs:
             presentation:
               - 'presentation/**'
             app:
-              - 'container/**'
+              - 'app/**'
 
   ci:
     name: Build and Test
@@ -215,7 +215,7 @@ jobs:
           echo "$PRESENTATION_URL" | vercel env add PRESENTATION_URL preview ${{ github.head_ref }} --token=${{ secrets.VERCEL_TOKEN }}
 
           # Generate vercel.json with the correct destination
-          cat <<EOF > container/vercel.json
+          cat <<EOF > app/vercel.json
           {
             "rewrites": [
                 {
@@ -230,7 +230,7 @@ jobs:
           }
           EOF
           echo "Generated vercel.json:"
-          cat container/vercel.json
+          cat app/vercel.json
 
           # Build with the environment variable
           PRESENTATION_URL="$PRESENTATION_URL" vercel build --token=${{ secrets.VERCEL_TOKEN }}

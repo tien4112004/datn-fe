@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import type { Presentation, OutlineItem, PresentationGenerationRequest } from '../types';
 import type { ApiResponse } from '@/shared/types/api';
 import { ExpectedError } from '@/types/errors';
-import type { Slide } from '../types/slide';
+import type { Slide, SlideTemplate, SlideTheme } from '../types/slide';
 import { toast } from 'sonner';
 import { t } from 'i18next';
 
@@ -350,4 +350,35 @@ export const useGeneratePresentationImage = (id: string) => {
       });
     },
   });
+};
+
+export const useSlideThemes = () => {
+  const apiService = usePresentationApiService();
+
+  const { data: themes, ...query } = useQuery<SlideTheme[]>({
+    queryKey: [apiService.getType(), 'slideThemes'],
+    queryFn: async () => apiService.getSlideThemes(),
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+  });
+
+  return {
+    themes: themes || [],
+    defaultTheme: themes?.find((t) => t.id === 'default') || themes?.[0],
+    ...query,
+  };
+};
+
+export const useSlideTemplates = () => {
+  const apiService = usePresentationApiService();
+
+  const { data: templates, ...query } = useQuery<SlideTemplate[]>({
+    queryKey: [apiService.getType(), 'slideTemplates'],
+    queryFn: async () => apiService.getSlideTemplates(),
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+  });
+
+  return {
+    templates: templates || [],
+    ...query,
+  };
 };

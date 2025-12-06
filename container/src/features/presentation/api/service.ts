@@ -65,16 +65,14 @@ export default class PresentationRealApiService implements PresentationApiServic
     return api.patch<ApiResponse<Presentation>>(`${this.baseUrl}/api/presentations/${id}/parse`);
   }
 
-  getSlideThemes(): Promise<SlideTheme[]> {
-    return api
-      .get<ApiResponse<SlideTheme[]>>(`${this.baseUrl}/api/slide-themes`)
-      .then((res) => res.data.data);
+  async getSlideThemes(): Promise<SlideTheme[]> {
+    const res = await api.get<ApiResponse<SlideTheme[]>>(`${this.baseUrl}/api/slide-themes`);
+    return res.data.data;
   }
 
-  getSlideTemplates(): Promise<SlideTemplate[]> {
-    return api
-      .get<ApiResponse<SlideTemplate[]>>(`${this.baseUrl}/api/slide-templates`)
-      .then((res) => res.data.data);
+  async getSlideTemplates(): Promise<SlideTemplate[]> {
+    const res = await api.get<ApiResponse<SlideTemplate[]>>(`${this.baseUrl}/api/slide-templates`);
+    return res.data.data;
   }
 
   upsertPresentationSlide(id: string, slide: Slide): Promise<any> {

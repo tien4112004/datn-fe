@@ -19,6 +19,7 @@ export const getTheme = (themeId: string): SlideTheme => {
 /**
  * Get the default presentation theme
  * @returns The default theme configuration
+ * @deprecated Use useSlideThemes hook instead for React components
  */
 export const getDefaultPresentationTheme = (): SlideTheme => {
   return THEMES_DATA.default;
@@ -27,6 +28,7 @@ export const getDefaultPresentationTheme = (): SlideTheme => {
 /**
  * Get all available presentation themes
  * @returns Array of all theme objects
+ * @deprecated Use useSlideThemes hook instead for React components
  */
 export const getPresentationThemes = (): SlideTheme[] => {
   return Object.values(THEMES_DATA).filter((theme) => theme.id !== 'default');

@@ -1,6 +1,22 @@
 /**
  * Presentation feature translations
- * Includes create outline, workspace, customization, and list views
+ * Includes create outline, workspace, cus    theme: {
+      title: 'Chủ đề',
+      description: 'Sử dụng một trong những chủ đề phổ biến dưới đây hoặc xem thêm',
+      viewMore: 'Xem thêm',
+      business: 'Kinh doanh',
+      education: 'Giáo dục',
+      creative: 'Sáng tạo',
+      minimal: 'Tối giản',
+      modern: 'Hiện đại',
+      classic: 'Cổ điển',
+      gallery: {
+        title: 'Tất cả chủ đề có sẵn',
+        description: 'Chọn từ bộ sưu tập chủ đề hoàn chỉnh của chúng tôi',
+        close: 'Đóng',
+        loadMore: 'Tải thêm',
+      },
+    }, and list views
  */
 export default {
   createOutline: {

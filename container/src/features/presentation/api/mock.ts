@@ -10,8 +10,9 @@ import {
   type SlideLayoutSchema,
 } from '../types';
 import type { ApiResponse } from '@/types/api';
-import type { Slide, SlideTheme } from '../types/slide';
+import type { Slide, SlideTheme, SlideTemplate } from '../types/slide';
 import { moduleMethodMap } from '../components/remote/module';
+import { THEMES_DATA } from '../utils/themes';
 
 /**
  * Default theme configuration for generated presentations
@@ -388,6 +389,22 @@ export default class PresentationMockService implements PresentationApiService {
       }, 500);
     });
   }
+
+  getSlideThemes(): Promise<SlideTheme[]> {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(Object.values(THEMES_DATA).filter((theme): theme is SlideTheme => theme.id !== 'default'));
+      }, 300);
+    });
+  }
+
+  getSlideTemplates(): Promise<SlideTemplate[]> {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(mockSlideTemplates);
+      }, 300);
+    });
+  }
 }
 
 const mockSlideData: SlideLayoutSchema[] = [];
@@ -445,5 +462,23 @@ const mockOutlineItems: OutlineItem[] = [
     id: '3',
     markdownContent: `# Backend Technologies\r\n
       Exploring server-side technologies including Node.js, Python, and database management systems.`,
+  },
+];
+
+const mockSlideTemplates: SlideTemplate[] = [
+  {
+    id: 'title-slide',
+    name: 'Title Slide',
+    cover: '/templates/title-slide.png',
+  },
+  {
+    id: 'content-slide',
+    name: 'Content Slide',
+    cover: '/templates/content-slide.png',
+  },
+  {
+    id: 'two-column-slide',
+    name: 'Two Column Slide',
+    cover: '/templates/two-column-slide.png',
   },
 ];

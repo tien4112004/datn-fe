@@ -14,10 +14,11 @@ import { useTranslation } from 'react-i18next';
 import { ModelSelect } from '@/components/common/ModelSelect';
 import { MODEL_TYPES, useModels } from '@/features/model';
 import type { UnifiedFormData } from '../../contexts/PresentationFormContext';
-import { useCallback } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import useOutlineStore from '../../stores/useOutlineStore';
-import { getPresentationThemes } from '../../utils';
+import { useSlideThemes } from '../../hooks';
 import { ThemePreviewCard } from './ThemePreviewCard';
+import ThemeGalleryDialog from './ThemeGalleryDialog';
 import type { SlideTheme } from '../../types/slide';
 import { cn } from '@/shared/lib/utils';
 
@@ -35,19 +36,23 @@ interface ContentSectionProps {
 
 const ThemeSection = ({ selectedTheme, onThemeSelect, disabled = false }: ThemeSectionProps) => {
   const { t } = useTranslation('presentation', { keyPrefix: 'customization' });
-  const mockThemes = getPresentationThemes();
+  const { themes, isLoading } = useSlideThemes();
+  const [galleryOpen, setGalleryOpen] = useState(false);
+  const [displayedThemes, setDisplayedThemes] = useState<SlideTheme[]>([]);
 
-  // Old theme selection with icons - commented out for preservation
-  /*
-  const themes = [
-    { name: 'business', icon: <Briefcase className="h-5 w-5" /> },
-    { name: 'education', icon: <GraduationCap className="h-5 w-5" /> },
-    { name: 'creative', icon: <Sparkles className="h-5 w-5" /> },
-    { name: 'minimal', icon: <Square className="h-5 w-5" /> },
-    { name: 'modern', icon: <Monitor className="h-5 w-5" /> },
-    { name: 'classic', icon: <BookText className="h-5 w-5" /> },
-  ];
-  */
+  useEffect(() => {
+    if (themes.length > 0) {
+      setDisplayedThemes(themes.slice(0, 6));
+    }
+  }, [themes]);
+
+  const handleThemeSelectFromGallery = useCallback(
+    (theme: SlideTheme) => {
+      setDisplayedThemes((prev) => [theme, ...prev.filter((t) => t.id !== theme.id)].slice(0, 6));
+      onThemeSelect(theme);
+    },
+    [onThemeSelect]
+  );
 
   return (
     <>
@@ -55,28 +60,47 @@ const ThemeSection = ({ selectedTheme, onThemeSelect, disabled = false }: ThemeS
         <CardTitle>{t('theme.title')}</CardTitle>
         <CardDescription>{t('theme.description')}</CardDescription>
         <CardAction>
-          <Button variant="ghost" size="sm" className="shadow-none" type="button" disabled={disabled}>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="shadow-none"
+            type="button"
+            disabled={disabled || isLoading}
+            onClick={() => setGalleryOpen(true)}
+          >
             <Palette className="h-4 w-4" />
             {t('theme.viewMore')}
           </Button>
         </CardAction>
       </CardHeader>
       <CardContent className="flex flex-col gap-2">
-        <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
-          {mockThemes.map((theme) => (
-            <div
-              key={theme.id}
-              className={cn(
-                'transition-all',
-                disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer hover:scale-105',
-                selectedTheme.id === theme.id && 'rounded-lg ring-2 ring-blue-500'
-              )}
-              onClick={() => !disabled && onThemeSelect(theme)}
-            >
-              <ThemePreviewCard theme={theme} title={theme.name} isSelected={selectedTheme.id === theme.id} />
-            </div>
-          ))}
-        </div>
+        {isLoading ? (
+          <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
+            {Array.from({ length: 6 }).map((_, index) => (
+              <div key={index} className="bg-muted h-24 animate-pulse rounded-lg" />
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
+            {displayedThemes.map((theme) => (
+              <div
+                key={theme.id}
+                className={cn(
+                  'transition-all',
+                  disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer hover:scale-105',
+                  selectedTheme.id === theme.id && 'rounded-lg ring-2 ring-blue-500'
+                )}
+                onClick={() => !disabled && onThemeSelect(theme)}
+              >
+                <ThemePreviewCard
+                  theme={theme}
+                  title={theme.name}
+                  isSelected={selectedTheme.id === theme.id}
+                />
+              </div>
+            ))}
+          </div>
+        )}
 
         {/*
         <div className="grid grid-cols-3 grid-rows-2 gap-4">
@@ -93,6 +117,15 @@ const ThemeSection = ({ selectedTheme, onThemeSelect, disabled = false }: ThemeS
         </div>
         */}
       </CardContent>
+
+      <ThemeGalleryDialog
+        open={galleryOpen}
+        onOpenChange={setGalleryOpen}
+        themes={themes}
+        isLoading={isLoading}
+        selectedThemeId={selectedTheme.id}
+        onThemeSelect={handleThemeSelectFromGallery}
+      />
     </>
   );
 };

@@ -2,7 +2,7 @@ import type { Service } from '@/shared/api';
 import type { OutlineItem, OutlineData } from './outline';
 import type { Presentation, PresentationCollectionRequest, SlideLayoutSchema } from './presentation';
 import type { ApiResponse } from '@/types/api';
-import type { Slide, SlideTheme, SlideViewport } from './slide';
+import type { Slide, SlideTheme, SlideTemplate, SlideViewport } from './slide';
 
 export interface PresentationGenerationRequest {
   outline: string;
@@ -60,4 +60,6 @@ export interface PresentationApiService extends Service {
   ): Promise<{ stream: AsyncIterable<string> } & PresentationGenerationStartResponse>;
   upsertPresentationSlide(id: string, slide: Slide): Promise<Presentation>;
   setPresentationAsParsed(id: string): Promise<Presentation>;
+  getSlideThemes(): Promise<SlideTheme[]>;
+  getSlideTemplates(): Promise<SlideTemplate[]>;
 }

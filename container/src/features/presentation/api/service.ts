@@ -13,7 +13,7 @@ import {
 import { splitMarkdownToOutlineItems } from '../utils';
 import { api } from '@/shared/api';
 import { mapPagination, type ApiResponse, type Pagination } from '@/types/api';
-import type { Slide } from '../types/slide';
+import type { Slide, SlideTheme, SlideTemplate } from '../types/slide';
 // import api from '@/shared/api';
 
 const mockOutlineOutput = `\`\`\`markdown
@@ -63,6 +63,18 @@ export default class PresentationRealApiService implements PresentationApiServic
 
   setPresentationAsParsed(id: string): Promise<any> {
     return api.patch<ApiResponse<Presentation>>(`${this.baseUrl}/api/presentations/${id}/parse`);
+  }
+
+  getSlideThemes(): Promise<SlideTheme[]> {
+    return api
+      .get<ApiResponse<SlideTheme[]>>(`${this.baseUrl}/api/slide-themes`)
+      .then((res) => res.data.data);
+  }
+
+  getSlideTemplates(): Promise<SlideTemplate[]> {
+    return api
+      .get<ApiResponse<SlideTemplate[]>>(`${this.baseUrl}/api/slide-templates`)
+      .then((res) => res.data.data);
   }
 
   upsertPresentationSlide(id: string, slide: Slide): Promise<any> {

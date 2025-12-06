@@ -91,6 +91,12 @@ export default {
       minimal: 'Minimal',
       modern: 'Modern',
       classic: 'Classic',
+      gallery: {
+        title: 'All Available Themes',
+        description: 'Choose from our complete collection of themes',
+        close: 'Close',
+        loadMore: 'Load More',
+      },
     },
     content: {
       title: 'Content',

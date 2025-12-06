@@ -1,100 +1,26 @@
 import { createBrowserRouter } from 'react-router-dom';
-import { lazy, Suspense } from 'react';
 import NavLayout, { NavLayoutErrorBoundary } from '../shared/layouts/SidebarLayout';
 import { CriticalError } from '@aiprimary/api';
 import { ProtectedRoute } from '@/shared/components/ProtectedRoute';
-import GlobalSpinner from '@/components/common/GlobalSpinner';
-
-// Lazy load auth pages
-const LoginPage = lazy(() =>
-  import('@/features/auth/pages/LoginPage').then((m) => ({ default: m.LoginPage }))
-);
-const RegisterPage = lazy(() =>
-  import('@/features/auth/pages/RegisterPage').then((m) => ({ default: m.RegisterPage }))
-);
-const GoogleCallbackPage = lazy(() => import('@/features/auth/pages/GoogleCallbackPage'));
-
-// Lazy load feature pages
-const CardDemoPage = lazy(() => import('@/features/demo').then((m) => ({ default: m.default.CardDemoPage })));
-// const ThumbnailDemoPage = lazy(() =>
-//   import('@/features/presentation').then((m) => ({ default: m.default.ThumbnailDemoPage }))
-// );
-const ProjectListPage = lazy(() =>
-  import('@/features/projects').then((m) => ({ default: m.default.ProjectListPage }))
-);
-// const PresentationListPage = lazy(() =>
-//   import('@/features/presentation').then((m) => ({ default: m.default.PresentationListPage }))
-// );
-const ImageGalleryPage = lazy(() =>
-  import('@/features/image').then((m) => ({ default: m.default.ImageGalleryPage }))
-);
-const CreateImagePage = lazy(() =>
-  import('@/features/image').then((m) => ({ default: m.default.CreateImagePage }))
-);
-const ImageDetailPage = lazy(() =>
-  import('@/features/image').then((m) => ({ default: m.default.ImageDetailPage }))
-);
-const CreateMindmapPage = lazy(() =>
-  import('@/features/mindmap').then((m) => ({ default: m.default.CreateMindmapPage }))
-);
-const MindmapPage = lazy(() =>
-  import('@/features/mindmap').then((m) => ({ default: m.default.MindmapPage }))
-);
-const PresentationDetailPage = lazy(() =>
-  import('@/features/presentation').then((m) => ({ default: m.default.DetailPage }))
-);
-const PresentationOutlinePage = lazy(() =>
-  import('@/features/presentation').then((m) => ({ default: m.default.PresentationOutlinePage }))
-);
-const ClassListPage = lazy(() =>
-  import('@/features/classes').then((m) => ({ default: m.default.ClassListPage }))
-);
-const ClassDetailPage = lazy(() =>
-  import('@/features/classes').then((m) => ({ default: m.default.ClassDetailPage }))
-);
-const PeriodDetailPage = lazy(() =>
-  import('@/features/classes').then((m) => ({ default: m.default.PeriodDetailPage }))
-);
-const LessonDetailPage = lazy(() =>
-  import('@/features/classes').then((m) => ({ default: m.default.LessonDetailPage }))
-);
-const LessonCreatorPage = lazy(() =>
-  import('@/features/classes').then((m) => ({ default: m.default.LessonCreatorPage }))
-);
-const SettingsPage = lazy(() =>
-  import('@/features/settings').then((m) => ({ default: m.default.SettingsPage }))
-);
-const UserProfilePage = lazy(() => import('@/features/user/components/UserProfile'));
-const NotFoundPage = lazy(() => import('@/shared/pages/NotFoundPage'));
-
-const LazyWrapper = ({ children }: { children: React.ReactNode }) => (
-  <Suspense fallback={<GlobalSpinner text="Loading..." />}>{children}</Suspense>
-);
 
 const router = createBrowserRouter([
   {
     path: '/login',
-    element: (
-      <LazyWrapper>
-        <LoginPage />
-      </LazyWrapper>
-    ),
+    lazy: async () => ({
+      Component: (await import('@/features/auth/pages/LoginPage')).LoginPage,
+    }),
   },
   {
     path: '/register',
-    element: (
-      <LazyWrapper>
-        <RegisterPage />
-      </LazyWrapper>
-    ),
+    lazy: async () => ({
+      Component: (await import('@/features/auth/pages/RegisterPage')).RegisterPage,
+    }),
   },
   {
     path: '/auth/google/callback',
-    element: (
-      <LazyWrapper>
-        <GoogleCallbackPage />
-      </LazyWrapper>
-    ),
+    lazy: async () => ({
+      Component: (await import('@/features/auth/pages/GoogleCallbackPage')).default,
+    }),
   },
   {
     element: (
@@ -106,162 +32,105 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: (
-          <LazyWrapper>
-            <CardDemoPage />
-          </LazyWrapper>
-        ),
+        lazy: async () => ({
+          Component: (await import('@/features/demo')).default.CardDemoPage,
+        }),
       },
-      // {
-      //   path: 'presentation/thumbnail',
-      //   element: (
-      //     <LazyWrapper>
-      //       <ThumbnailDemoPage />
-      //     </LazyWrapper>
-      //   ),
-      // },
       {
         path: 'projects',
-        element: (
-          <LazyWrapper>
-            <ProjectListPage />
-          </LazyWrapper>
-        ),
+        lazy: async () => ({
+          Component: (await import('@/features/projects')).default.ProjectListPage,
+        }),
       },
-      // {
-      //   path: 'presentation',
-      //   element: (
-      //     <LazyWrapper>
-      //       <PresentationListPage />
-      //     </LazyWrapper>
-      //   ),
-      // },
       {
         path: 'image',
-        element: (
-          <LazyWrapper>
-            <ImageGalleryPage />
-          </LazyWrapper>
-        ),
+        lazy: async () => ({
+          Component: (await import('@/features/image')).default.ImageGalleryPage,
+        }),
       },
       {
         path: 'image/generate',
-        element: (
-          <LazyWrapper>
-            <CreateImagePage />
-          </LazyWrapper>
-        ),
+        lazy: async () => ({
+          Component: (await import('@/features/image')).default.CreateImagePage,
+        }),
       },
       {
         path: 'image/:id',
-        element: (
-          <LazyWrapper>
-            <ImageDetailPage />
-          </LazyWrapper>
-        ),
+        lazy: async () => ({
+          Component: (await import('@/features/image')).default.ImageDetailPage,
+        }),
       },
       {
         path: 'mindmap/generate',
-        element: (
-          <LazyWrapper>
-            <CreateMindmapPage />
-          </LazyWrapper>
-        ),
+        lazy: async () => ({
+          Component: (await import('@/features/mindmap')).default.CreateMindmapPage,
+        }),
       },
       {
         path: 'mindmap/:id',
-        element: (
-          <LazyWrapper>
-            <MindmapPage />
-          </LazyWrapper>
-        ),
-        async lazy() {
-          const loader = await import('@/features/mindmap/hooks/loaders');
-          return { loader: loader.getMindmapById };
-        },
+        lazy: async () => ({
+          Component: (await import('@/features/mindmap')).default.MindmapPage,
+          loader: (await import('@/features/mindmap/hooks/loaders')).getMindmapById,
+        }),
       },
       {
         path: 'presentation/:id',
-        element: (
-          <LazyWrapper>
-            <PresentationDetailPage />
-          </LazyWrapper>
-        ),
-        async lazy() {
-          const loader = await import('@/features/presentation/hooks/loaders');
-          return { loader: loader.getPresentationById };
-        },
+        lazy: async () => ({
+          Component: (await import('@/features/presentation')).default.DetailPage,
+          loader: (await import('@/features/presentation/hooks/loaders')).getPresentationById,
+        }),
       },
       {
         path: 'presentation/generate',
-        element: (
-          <LazyWrapper>
-            <PresentationOutlinePage />
-          </LazyWrapper>
-        ),
+        lazy: async () => ({
+          Component: (await import('@/features/presentation')).default.PresentationOutlinePage,
+        }),
       },
       {
         path: 'classes',
-        element: (
-          <LazyWrapper>
-            <ClassListPage />
-          </LazyWrapper>
-        ),
+        lazy: async () => ({
+          Component: (await import('@/features/classes')).default.ClassListPage,
+        }),
       },
       {
         path: 'classes/:id',
-        element: (
-          <LazyWrapper>
-            <ClassDetailPage />
-          </LazyWrapper>
-        ),
-        async lazy() {
-          const loader = await import('@/features/classes/shared/hooks/loaders');
-          return { loader: loader.getClassById };
-        },
+        lazy: async () => ({
+          Component: (await import('@/features/classes')).default.ClassDetailPage,
+          loader: (await import('@/features/classes/shared/hooks/loaders')).getClassById,
+        }),
         shouldRevalidate: ({ currentUrl, nextUrl }) => {
           return currentUrl.pathname !== nextUrl.pathname;
         },
       },
       {
         path: 'periods/:id',
-        element: (
-          <LazyWrapper>
-            <PeriodDetailPage />
-          </LazyWrapper>
-        ),
+        lazy: async () => ({
+          Component: (await import('@/features/classes')).default.PeriodDetailPage,
+        }),
       },
       {
         path: 'lessons/:id',
-        element: (
-          <LazyWrapper>
-            <LessonDetailPage />
-          </LazyWrapper>
-        ),
+        lazy: async () => ({
+          Component: (await import('@/features/classes')).default.LessonDetailPage,
+        }),
       },
       {
         path: 'lessons/create',
-        element: (
-          <LazyWrapper>
-            <LessonCreatorPage />
-          </LazyWrapper>
-        ),
+        lazy: async () => ({
+          Component: (await import('@/features/classes')).default.LessonCreatorPage,
+        }),
       },
       {
         path: 'settings',
-        element: (
-          <LazyWrapper>
-            <SettingsPage />
-          </LazyWrapper>
-        ),
+        lazy: async () => ({
+          Component: (await import('@/features/settings')).default.SettingsPage,
+        }),
       },
       {
         path: 'profile',
-        element: (
-          <LazyWrapper>
-            <UserProfilePage />
-          </LazyWrapper>
-        ),
+        lazy: async () => ({
+          Component: (await import('@/features/user/components/UserProfile')).default,
+        }),
       },
       {
         path: 'error',
@@ -271,11 +140,9 @@ const router = createBrowserRouter([
       },
       {
         path: '*',
-        element: (
-          <LazyWrapper>
-            <NotFoundPage />
-          </LazyWrapper>
-        ),
+        lazy: async () => ({
+          Component: (await import('@/shared/pages/NotFoundPage')).default,
+        }),
       },
     ],
   },

@@ -1,6 +1,15 @@
 pipeline {
     agent any
 
+    // Build parameters
+    parameters {
+        string(
+            name: 'BRANCH',
+            defaultValue: 'main',
+            description: 'Git branch to build and deploy'
+        )
+    }
+
     // Environment variables
     environment {
         GITHUB_REPO = 'tien4112004/datn-fe'
@@ -14,6 +23,7 @@ pipeline {
         CONTAINER_NAME_PRESENTATION = 'frontend-presentation-aiprimary'
         CONTAINER_NAME_ADMIN = 'frontend-admin-aiprimary'
         DOCKER_BUILDKIT = '1'  // Enable BuildKit for better caching
+        BUILD_BRANCH = "${params.BRANCH ?: env.GIT_BRANCH ?: 'main'}"
     }
 
     options {
@@ -30,7 +40,8 @@ pipeline {
                     echo "Image: ${IMAGE_NAME}"
                     echo "Deploy Directory: ${DEPLOY_DIR}"
                     echo "Environment File: ${ENV_FILE}"
-                    echo "Branch: ${env.BRANCH_NAME}"
+                    echo "Build Branch: ${BUILD_BRANCH}"
+                    echo "Git Branch: ${env.GIT_BRANCH}"
                     echo "Commit: ${env.GIT_COMMIT}"
                 }
             }
@@ -317,7 +328,9 @@ pipeline {
 
         stage('Cleanup Old Images') {
             when {
-                branch 'main'
+                expression {
+                    return env.BUILD_BRANCH == 'main' || env.BUILD_BRANCH == 'origin/main'
+                }
             }
             steps {
                 script {

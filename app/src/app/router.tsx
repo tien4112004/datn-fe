@@ -17,6 +17,7 @@ import GoogleCallbackPage from '@/features/auth/pages/GoogleCallbackPage';
 import { ProtectedRoute } from '@/shared/components/ProtectedRoute';
 import Classes from '@/features/classes';
 import { getClassById } from '@/features/classes/shared/hooks/loaders';
+import { FeedPage } from '@/features/classes/class-feed';
 
 const router = createBrowserRouter([
   {
@@ -103,6 +104,10 @@ const router = createBrowserRouter([
           // Only revalidate if the path params (id) changed, not search params (tab)
           return currentUrl.pathname !== nextUrl.pathname;
         },
+      },
+      {
+        path: 'classes/:id/feed',
+        Component: () => <FeedPage classId="class1" />,
       },
       {
         path: 'periods/:id',

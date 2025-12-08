@@ -7,7 +7,7 @@ import { ChevronDown, ChevronUp } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 import { MODEL_TYPES, useModels } from '@/features/model';
-import { ModelSelect } from '@/shared/components/common/ModelSelect';
+import { ModelSelect } from '@/features/model/components/ModelSelect';
 import { IMAGE_DIMENSION_OPTIONS, ART_STYLE_OPTIONS } from '@/features/image/types';
 import type { CreateImageFormData } from '@/features/image/types';
 import type { Control, UseFormRegister } from 'react-hook-form';

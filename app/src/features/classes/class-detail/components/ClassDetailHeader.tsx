@@ -39,7 +39,7 @@ export const ClassDetailHeader = ({ currentClass }: ClassDetailHeaderProps) => {
 
       <div className="space-y-6 px-8 py-6">
         {/* Class Header */}
-        <div className="rounded-lg border bg-gradient-to-br from-white to-slate-50 p-6 shadow-sm">
+        <div className="rounded-lg bg-gradient-to-br from-white to-slate-50 p-6">
           <div className="flex items-start justify-between gap-6">
             <div className="flex-1 space-y-3">
               {/* Title and Status */}
@@ -64,11 +64,11 @@ export const ClassDetailHeader = ({ currentClass }: ClassDetailHeaderProps) => {
                     {t('academicYear')}: <span className="font-medium">{currentClass.academicYear}</span>
                   </span>
                 </div>
-                {currentClass.classroom && (
+                {currentClass.class && (
                   <div className="flex items-center gap-1.5">
                     <span className="inline-block h-1 w-1 rounded-full bg-slate-300"></span>
                     <span className="text-sm text-slate-600">
-                      {t('classroom')}: <span className="font-medium">{currentClass.classroom}</span>
+                      {t('class')}: <span className="font-medium">{currentClass.class}</span>
                     </span>
                   </div>
                 )}

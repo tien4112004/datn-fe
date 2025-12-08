@@ -32,6 +32,7 @@ export default class AuthMockService implements AuthApiService {
       email: request.email,
       name: request.email.split('@')[0], // Use email prefix as name
       avatar: 'https://github.com/shadcn.png',
+      role: 'student' as const,
     };
 
     // Store user data (simulates backend setting cookies + returning user)

@@ -278,7 +278,7 @@ export default class ClassRealApiService implements ClassApiService {
       grade: data.grade,
       academicYear: data.academicYear,
       currentEnrollment: data.currentEnrollment || 0,
-      classroom: data.classroom,
+      class: data.class,
       description: data.description,
       students: (data.students || []).map(this._mapStudent),
       layout: data.layout, // Assuming the backend returns the layout

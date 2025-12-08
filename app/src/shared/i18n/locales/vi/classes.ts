@@ -1070,14 +1070,12 @@ export default {
       },
       labels: {
         postType: 'Loại Bài Đăng',
-        title: 'Tiêu Đề',
         content: 'Nội Dung',
         attachments: 'Tập Tin Đính Kèm',
         linkLessons: 'Liên Kết Bài Học',
         linkResources: 'Liên Kết Tài Nguyên',
       },
       placeholders: {
-        title: 'Nhập tiêu đề thông báo',
         content: 'Viết nội dung bài đăng của bạn ở đây...',
         comment: 'Viết bình luận...',
       },
@@ -1094,6 +1092,10 @@ export default {
       loading: 'Đang tải bài viết...',
       loadMore: 'Tải thêm bài viết',
       loadingMore: 'Đang tải...',
+      delete: {
+        title: 'Xóa Bài Viết',
+        description: 'Bạn có chắc chắn muốn xóa bài viết này? Hành động này không thể hoàn tác.',
+      },
     },
     post: {
       badges: {

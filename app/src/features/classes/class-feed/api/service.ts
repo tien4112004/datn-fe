@@ -46,7 +46,6 @@ export default class ClassFeedRealApiService implements ClassFeedApiService {
     const formData = new FormData();
     formData.append('classId', request.classId);
     formData.append('type', request.type);
-    if (request.title) formData.append('title', request.title);
     formData.append('content', request.content);
 
     if (request.attachments) {

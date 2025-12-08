@@ -1075,14 +1075,12 @@ export default {
       },
       labels: {
         postType: 'Post Type',
-        title: 'Title',
         content: 'Content',
         attachments: 'Attachments',
         linkLessons: 'Link Lessons',
         linkResources: 'Link Resources',
       },
       placeholders: {
-        title: 'Enter announcement title',
         content: 'Write your post content here...',
         comment: 'Write a comment...',
       },
@@ -1099,6 +1097,10 @@ export default {
       loading: 'Loading posts...',
       loadMore: 'Load More Posts',
       loadingMore: 'Loading...',
+      delete: {
+        title: 'Delete Post',
+        description: 'Are you sure you want to delete this post? This action cannot be undone.',
+      },
     },
     post: {
       badges: {

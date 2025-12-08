@@ -1,7 +1,6 @@
 // Class Feed Post
 export interface Post {
   id: string;
-  title: string;
   classId: string;
   authorId: string;
   authorName: string;

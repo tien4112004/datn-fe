@@ -138,8 +138,8 @@ export const PostList = ({
         onConfirm={handleConfirmDelete}
         onCancel={cancel}
         isDeleting={deletePost.isPending}
-        title="Delete Post"
-        description="Are you sure you want to delete this post? This action cannot be undone."
+        title={t('feed.list.delete.title')}
+        description={t('feed.list.delete.description')}
       />
     </div>
   );

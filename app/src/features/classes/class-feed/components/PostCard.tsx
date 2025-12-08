@@ -54,8 +54,9 @@ export const PostCard = ({ post, onEdit, onDelete, onPin, onComment, className =
 
       {/* Content */}
       <div className="mb-3">
-        {post.title && <h3 className="mb-2 text-lg font-semibold text-gray-900">{post.title}</h3>}
-        <ReactMarkdown>{post.content}</ReactMarkdown>
+        <article className="prose prose-sm prose-hr:my-4 !w-full !max-w-full">
+          <ReactMarkdown>{post.content}</ReactMarkdown>
+        </article>
       </div>
 
       {/* Attachments */}

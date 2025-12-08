@@ -23,9 +23,9 @@ export const ResourceListCommand = ({
   const [resourceSearchOpen, setResourceSearchOpen] = useState(false);
   const [linkedResources, setLinkedResources] = useState<Array<LessonResource>>([]);
 
-  const handleResourceSelect = (resource: LessonResource) => {
-    setLinkedResources((prev) => [...prev, resource]);
-    onResourcesSelect([...linkedResources, resource]);
+  const handleResourceSelect = (resources: LessonResource[]) => {
+    setLinkedResources(resources);
+    onResourcesSelect(resources);
   };
 
   // TODO: Replace with actual linked resources state management
@@ -39,7 +39,7 @@ export const ResourceListCommand = ({
 
   const addResource = (resourceId: string, resourceName: string) => {
     if (!linkedResources.find((r) => r.id === resourceId)) {
-      handleResourceSelect({ id: resourceId, name: resourceName } as any);
+      handleResourceSelect([...linkedResources, { id: resourceId, name: resourceName } as any]);
     }
   };
 
@@ -108,6 +108,7 @@ export const ResourceListCommand = ({
               <span>{resource.name}</span>
               <Button
                 type="button"
+                variant={'ghost'}
                 onClick={() => removeResource(resource.id)}
                 className="hover:text-green-900"
               >

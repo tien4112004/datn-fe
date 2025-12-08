@@ -19,9 +19,32 @@ const mockPosts: Post[] = [
     authorName: 'Dr. Sarah Johnson',
     authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=teacher1',
     type: 'announcement',
-    title: 'Welcome to Advanced Mathematics 2025!',
-    content:
-      "Hello everyone! Welcome to our Advanced Mathematics class for the 2025 academic year. I'm excited to embark on this mathematical journey with you all.\n\n📅 **Important Dates:**\n- First quiz: December 15th\n- Mid-term exam: January 20th\n- Final project due: February 28th\n\n📚 **What to expect:**\n- Weekly problem sets\n- Group discussions\n- Real-world applications\n- Guest lectures from industry professionals\n\nPlease introduce yourselves in the comments below and share one thing you're most excited to learn this semester!",
+    content: `
+# 👋 Welcome to Advanced Mathematics 2025!
+
+I'm excited to embark on this mathematical journey with you all.
+
+---
+
+## 📅 Important Dates
+
+* **First quiz:** December 15th
+* **Mid-term exam:** January 20th
+* **Final project due:** February 28th
+
+---
+
+## 📚 What to Expect
+
+* Weekly problem sets
+* Group discussions
+* Real-world applications
+* Guest lectures from industry professionals
+
+---
+
+**Please introduce yourselves in the comments below and share one thing you're most excited to learn this semester!**
+	  `,
     attachments: [
       {
         id: 'att1',
@@ -39,7 +62,6 @@ const mockPosts: Post[] = [
   },
   {
     id: '2',
-    title: 'Introduction from Alex Chen',
     classId: '1',
     authorId: 'student1',
     authorName: 'Alex Chen',
@@ -55,7 +77,6 @@ const mockPosts: Post[] = [
   },
   {
     id: '3',
-    title: 'Introduction from Maria Rodriguez',
     classId: '1',
     authorId: 'student2',
     authorName: 'Maria Rodriguez',
@@ -76,7 +97,6 @@ const mockPosts: Post[] = [
     authorName: 'Dr. Sarah Johnson',
     authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=teacher1',
     type: 'announcement',
-    title: 'Study Groups Formation',
     content:
       "📢 **Study Groups Announcement**\n\nI've noticed some of you are interested in forming study groups. This is a great idea! Here's how we'll organize:\n\n🎯 **Objectives:**\n- Peer learning and support\n- Practice problem-solving together\n- Share different approaches to problems\n\n📋 **Guidelines:**\n- Groups of 3-4 students\n- Meet 1-2 times per week\n- Rotate who leads the discussion\n- Focus on understanding concepts, not just getting answers\n\nIf you're interested in joining a study group, please reply to this post with:\n1. Your availability (days/times)\n2. Preferred meeting format (in-person/virtual)\n3. Any specific topics you'd like to focus on\n\nI'll help coordinate the groups based on your responses!",
     attachments: [],
@@ -373,11 +393,7 @@ export default class ClassFeedMockApiService implements ClassFeedApiService {
       // 'all' means no filtering
       if (filter.search) {
         const searchLower = filter.search.toLowerCase();
-        filteredPosts = filteredPosts.filter(
-          (post) =>
-            post.content.toLowerCase().includes(searchLower) ||
-            post.title?.toLowerCase().includes(searchLower)
-        );
+        filteredPosts = filteredPosts.filter((post) => post.content.toLowerCase().includes(searchLower));
       }
       if (filter.startDate) {
         filteredPosts = filteredPosts.filter((post) => post.createdAt >= filter.startDate!);
@@ -418,7 +434,6 @@ export default class ClassFeedMockApiService implements ClassFeedApiService {
       authorName: 'Current User',
       authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=current-user',
       type: request.type,
-      title: request.title,
       content: request.content,
       attachments:
         request.attachments?.map((file) => ({

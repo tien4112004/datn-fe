@@ -23,9 +23,9 @@ export const LessonListCommand = ({
   const [lessonSearchOpen, setLessonSearchOpen] = useState(false);
   const [linkedLessons, setLinkedLessons] = useState<Array<Lesson>>([]);
 
-  const handleLessonSelect = (lesson: Lesson) => {
-    setLinkedLessons((prev) => [...prev, lesson]);
-    onLessonsSelect([...linkedLessons, lesson]);
+  const handleLessonSelect = (lessons: Lesson[]) => {
+    setLinkedLessons(lessons);
+    onLessonsSelect(lessons);
   };
 
   // TODO: Replace with actual linked lessons state management
@@ -39,7 +39,7 @@ export const LessonListCommand = ({
 
   const addLesson = (lessonId: string, lessonTitle: string) => {
     if (!linkedLessons.find((l) => l.id === lessonId)) {
-      handleLessonSelect({ id: lessonId, title: lessonTitle } as any);
+      handleLessonSelect([...linkedLessons, { id: lessonId, title: lessonTitle } as any]);
     }
   };
 
@@ -109,6 +109,7 @@ export const LessonListCommand = ({
               <Button
                 type="button"
                 size="icon"
+                variant={'ghost'}
                 onClick={() => removeLesson(lesson.id)}
                 className="hover:text-blue-900"
               >

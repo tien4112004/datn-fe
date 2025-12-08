@@ -4,7 +4,6 @@ import type { Post } from './post';
 export interface PostCreateRequest {
   classId: string;
   type: 'post' | 'announcement';
-  title: string;
   content: string;
   attachments?: File[];
   linkedLessonIds?: string[];

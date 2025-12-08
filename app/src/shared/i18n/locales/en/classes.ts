@@ -36,14 +36,14 @@ export default {
     name: 'Class Name',
     grade: 'Grade',
     academicYear: 'Academic Year',
-    classroom: 'Classroom',
+    class: 'Class',
     description: 'Description',
 
     // Placeholders
     namePlaceholder: 'e.g., Class 10A',
     gradePlaceholder: '10',
     academicYearPlaceholder: '2024-2025',
-    classroomPlaceholder: 'e.g., Room 301',
+    classPlaceholder: 'e.g., Room 301',
     descriptionPlaceholder: 'Add a brief description about this class...',
 
     // Form states
@@ -64,7 +64,7 @@ export default {
     gradeInvalid: 'Grade must be between 1 and 12',
     academicYearRequired: 'Academic year is required',
     academicYearInvalid: 'Academic year must be in format YYYY-YYYY (e.g., 2024-2025)',
-    classroomTooLong: 'Classroom must be 100 characters or less',
+    classTooLong: 'Class must be 100 characters or less',
     descriptionTooLong: 'Description must be 500 characters or less',
     // Lesson validation messages
     lesson: {
@@ -99,7 +99,7 @@ export default {
     notFoundDescription: 'The class you are looking for does not exist.',
     loading: 'Loading...',
     academicYear: 'Academic Year',
-    classroom: 'Classroom',
+    class: 'Class',
     status: {
       active: 'Active',
       inactive: 'Inactive',
@@ -108,6 +108,7 @@ export default {
       edit: 'Edit',
     },
     tabs: {
+      feed: 'Feed',
       teaching: 'Teaching',
       schedule: 'Schedule',
       lessons: 'Lessons',
@@ -177,7 +178,7 @@ export default {
       grade: 'Grade',
       academicYear: 'Academic Year',
       enrollment: 'Enrollment',
-      classroom: 'Classroom',
+      class: 'Class',
       status: 'Status',
     },
     actions: {
@@ -188,7 +189,7 @@ export default {
   grid: {
     academicYear: 'Academic Year',
     enrollment: 'Enrollment',
-    classroom: 'Classroom',
+    class: 'Class',
     actions: {
       manageStudents: 'Manage Students',
     },
@@ -1030,6 +1031,91 @@ export default {
         saturdayFull: 'Saturday',
         sundayFull: 'Sunday',
       },
+    },
+  },
+
+  feed: {
+    header: {
+      title: '{{className}} Feed',
+      subtitle: 'Stay updated with class announcements and discussions',
+      filters: {
+        all: 'All posts',
+        announcements: 'Announcements',
+        posts: 'Posts',
+      },
+    },
+    creator: {
+      actions: {
+        createPost: 'Create Post',
+        attachFiles: 'Attach Files',
+        posting: 'Posting...',
+        post: 'Post',
+        cancel: 'Cancel',
+        postComment: 'Post Comment',
+      },
+      dialog: {
+        title: 'Create New Post',
+        description: 'Share an announcement or post with your class.',
+      },
+      labels: {
+        postType: 'Post Type',
+        title: 'Title',
+        content: 'Content',
+        attachments: 'Attachments',
+      },
+      placeholders: {
+        title: 'Enter announcement title',
+        content: 'Write your post content here...',
+        comment: 'Write a comment...',
+      },
+      postType: {
+        post: 'Post',
+        announcement: 'Announcement',
+      },
+    },
+    list: {
+      empty: {
+        title: 'No posts yet',
+        description: 'Be the first to share something with your class!',
+      },
+      loading: 'Loading posts...',
+      loadMore: 'Load More Posts',
+      loadingMore: 'Loading...',
+    },
+    post: {
+      badges: {
+        pinned: '📌 Pinned',
+        announcement: '📢 Announcement',
+      },
+      actions: {
+        edit: 'Edit post',
+        pin: 'Pin post',
+        unpin: 'Unpin post',
+        delete: 'Delete post',
+        comment: 'comments',
+      },
+      confirm: {
+        deletePost: 'Are you sure you want to delete this post?',
+      },
+    },
+    comments: {
+      loading: 'Loading comments...',
+      empty: 'No comments yet',
+    },
+    errors: {
+      loadFailed: 'Failed to load posts',
+      createFailed: 'Failed to create post',
+      updateFailed: 'Failed to update post',
+      deleteFailed: 'Failed to delete post',
+      commentFailed: 'Failed to add comment',
+      pinFailed: 'Failed to {{action}} post',
+      tryAgain: 'Try again',
+    },
+    time: {
+      justNow: 'Just now',
+      minutesAgo: '{{count}}m ago',
+      hoursAgo: '{{count}}h ago',
+      daysAgo: '{{count}}d ago',
     },
   },
 };

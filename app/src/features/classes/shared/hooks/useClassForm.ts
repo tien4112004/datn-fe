@@ -6,7 +6,7 @@ import { z } from 'zod';
  * Used by React Hook Form with zodResolver for class management
  *
  * Validates required fields (name, grade, academicYear)
- * and optional fields (classroom, description)
+ * and optional fields (class, description)
  */
 export const classSchema = z
   .object({
@@ -26,9 +26,9 @@ export const classSchema = z
       .regex(/^\d{4}-\d{4}$/, { message: 'classes.form.validation.academicYearInvalid' }),
 
     // Optional fields
-    classroom: z
+    class: z
       .string()
-      .max(100, { message: 'classes.form.validation.classroomTooLong' })
+      .max(100, { message: 'classes.form.validation.classTooLong' })
       .optional()
       .or(z.literal('')),
 
@@ -69,7 +69,7 @@ export const useClassForm = ({ initialData, onSubmit }: UseClassFormProps) => {
       name: '',
       grade: 1,
       academicYear: '',
-      classroom: undefined,
+      class: undefined,
       description: undefined,
       studentIds: undefined,
       schedule: undefined,

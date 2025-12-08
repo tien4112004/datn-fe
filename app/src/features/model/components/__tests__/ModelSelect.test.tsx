@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { ModelSelect } from '../ModelSelect';
+import { ModelSelect } from '../../../../features/model/components/ModelSelect';
 import { type Model } from '@/features/model/types/model';
 
 // Mock react-i18next

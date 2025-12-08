@@ -8,6 +8,7 @@ export interface User {
   avatarUrl?: string;
   dateOfBirth?: string;
   phoneNumber?: string;
+  role: 'student' | 'teacher' | 'admin';
   createdAt?: string;
   updatedAt?: string;
 }

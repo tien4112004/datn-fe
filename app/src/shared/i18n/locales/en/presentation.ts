@@ -58,7 +58,7 @@ export default {
       prompt1: 'Create a presentation about the life cycle of a butterfly.',
       prompt2: 'Design a presentation explaining basic addition and subtraction.',
       prompt3: 'Outline a presentation on healthy eating habits.',
-      prompt4: 'Create a presentation about the importance of kindness and sharing in the classroom.',
+      prompt4: 'Create a presentation about the importance of kindness and sharing in the class.',
       prompt5: 'Design a presentation introducing the water cycle.',
       prompt6: 'Outline a presentation on community helpers and their roles.',
     },

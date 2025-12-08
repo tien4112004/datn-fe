@@ -13,7 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/shared/components/ui/select';
-import { ModelSelect } from '@/components/common/ModelSelect';
+import { ModelSelect } from '@/features/model/components/ModelSelect';
 import { LANGUAGE_OPTIONS, SLIDE_COUNT_OPTIONS } from '@/features/presentation/types';
 import { MODEL_TYPES, useModels } from '@/features/model';
 import { useWorkspace } from '@/features/presentation/hooks/useWorkspace';

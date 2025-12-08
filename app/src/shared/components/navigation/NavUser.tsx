@@ -2,7 +2,6 @@
 
 import { BadgeCheck, ChevronsUpDown, CreditCard, LogOut, Settings, Sparkles } from 'lucide-react';
 
-import { Avatar, AvatarFallback, AvatarImage } from '@/shared/components/ui/avatar';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,6 +17,7 @@ import { useLogout } from '@/features/auth/hooks/useAuth';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
+import { UserAvatar } from '../common/UserAvatar';
 
 export function NavUser({
   user,
@@ -55,13 +55,7 @@ export function NavUser({
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <Avatar className="h-8 w-8 rounded-lg">
-                {user.avatar ? (
-                  <AvatarImage src={user.avatar} alt={user.name || 'User Avatar'} />
-                ) : (
-                  <AvatarFallback className="rounded-lg">CN</AvatarFallback>
-                )}
-              </Avatar>
+              <UserAvatar className="h-8 w-8 rounded-lg" src={user.avatar} name={user.name} />
               <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=lg-icon]:hidden">
                 <span className="truncate font-medium">{user.name || 'No Name'}</span>
                 <span className="truncate text-xs">{user.email || 'No Email'}</span>
@@ -77,13 +71,7 @@ export function NavUser({
           >
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                <Avatar className="h-8 w-8 rounded-lg">
-                  {user.avatar ? (
-                    <AvatarImage src={user.avatar} alt={user.name || 'User Avatar'} />
-                  ) : (
-                    <AvatarFallback className="rounded-lg">CN</AvatarFallback>
-                  )}
-                </Avatar>
+                <UserAvatar className="h-10 w-10 rounded-lg" src={user.avatar} name={user.name} />
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-medium">{user.name || 'No Name'}</span>
                   <span className="truncate text-xs">{user.email || 'No Email'}</span>

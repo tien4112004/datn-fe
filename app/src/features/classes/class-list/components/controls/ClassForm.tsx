@@ -103,23 +103,23 @@ export const ClassForm = ({ initialData, onSubmit, isEditMode = false }: ClassFo
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="classroom" className="text-sm font-medium">
+            <Label htmlFor="class" className="text-sm font-medium">
               <MapPin className="mr-1 inline h-3.5 w-3.5" />
-              {t('classroom')}
+              {t('class')}
             </Label>
             <Input
               type="text"
-              name="classroom"
-              id="classroom"
-              value={formData.classroom || ''}
+              name="class"
+              id="class"
+              value={formData.class || ''}
               onChange={handleChange}
               disabled={isLoading}
-              placeholder={t('classroomPlaceholder')}
-              className={getFieldError('classroom') ? 'border-destructive' : ''}
+              placeholder={t('classPlaceholder')}
+              className={getFieldError('class') ? 'border-destructive' : ''}
             />
-            {getFieldError('classroom') && (
+            {getFieldError('class') && (
               <p className="text-destructive text-sm font-medium">
-                {getErrorMessage(getFieldError('classroom'))}
+                {getErrorMessage(getFieldError('class'))}
               </p>
             )}
           </div>
@@ -201,23 +201,23 @@ export const ClassForm = ({ initialData, onSubmit, isEditMode = false }: ClassFo
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="classroom" className="text-sm font-medium">
+            <Label htmlFor="class" className="text-sm font-medium">
               <MapPin className="mr-1 inline h-3.5 w-3.5" />
-              {t('classroom')}
+              {t('class')}
             </Label>
             <Input
               type="text"
-              name="classroom"
-              id="classroom"
-              value={formData.classroom || ''}
+              name="class"
+              id="class"
+              value={formData.class || ''}
               onChange={handleChange}
               disabled={isLoading}
-              placeholder={t('classroomPlaceholder')}
-              className={getFieldError('classroom') ? 'border-destructive' : ''}
+              placeholder={t('classPlaceholder')}
+              className={getFieldError('class') ? 'border-destructive' : ''}
             />
-            {getFieldError('classroom') && (
+            {getFieldError('class') && (
               <p className="text-destructive text-sm font-medium">
-                {getErrorMessage(getFieldError('classroom'))}
+                {getErrorMessage(getFieldError('class'))}
               </p>
             )}
           </div>

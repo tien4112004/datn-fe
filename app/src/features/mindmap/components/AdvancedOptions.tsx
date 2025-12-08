@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { Controller } from 'react-hook-form';
 
 import { MODEL_TYPES, useModels } from '@/features/model';
-import { ModelSelect } from '@/shared/components/common/ModelSelect';
+import { ModelSelect } from '@/features/model/components/ModelSelect';
 import { LANGUAGE_OPTIONS, MAX_DEPTH_OPTIONS, MAX_BRANCHES_OPTIONS } from '@/features/mindmap/types/form';
 import type { CreateMindmapFormData } from '@/features/mindmap/types/form';
 import type { Control } from 'react-hook-form';

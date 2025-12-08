@@ -608,6 +608,22 @@ export default {
         linking: 'Đang liên kết...',
       },
     },
+    lessonSelection: {
+      selectLessons: 'Chọn bài học...',
+      searchLessons: 'Tìm kiếm bài học...',
+      noLessonsFound: 'Không tìm thấy bài học nào.',
+      availableLessons: 'Bài học có sẵn',
+      lessonsSelected: '{{count}} bài học được chọn',
+      lessonsSelected_other: '{{count}} bài học được chọn',
+    },
+    resourceSelection: {
+      selectResources: 'Chọn tài nguyên...',
+      searchResources: 'Tìm kiếm tài nguyên...',
+      noResourcesFound: 'Không tìm thấy tài nguyên nào.',
+      availableResources: 'Tài nguyên có sẵn',
+      resourcesSelected: '{{count}} tài nguyên được chọn',
+      resourcesSelected_other: '{{count}} tài nguyên được chọn',
+    },
   },
   calendar: {
     title: 'Lịch Lớp Học',
@@ -1057,6 +1073,8 @@ export default {
         title: 'Tiêu Đề',
         content: 'Nội Dung',
         attachments: 'Tập Tin Đính Kèm',
+        linkLessons: 'Liên Kết Bài Học',
+        linkResources: 'Liên Kết Tài Nguyên',
       },
       placeholders: {
         title: 'Nhập tiêu đề thông báo',

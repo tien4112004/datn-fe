@@ -7,6 +7,8 @@ export interface PostCreateRequest {
   title: string;
   content: string;
   attachments?: File[];
+  linkedLessonIds?: string[];
+  linkedResourceIds?: string[];
 }
 
 export interface PostUpdateRequest {

@@ -614,6 +614,22 @@ export default {
         linking: 'Linking...',
       },
     },
+    lessonSelection: {
+      selectLessons: 'Select lessons...',
+      searchLessons: 'Search lessons...',
+      noLessonsFound: 'No lessons found.',
+      availableLessons: 'Available Lessons',
+      lessonsSelected: '{{count}} lesson selected',
+      lessonsSelected_other: '{{count}} lessons selected',
+    },
+    resourceSelection: {
+      selectResources: 'Select resources...',
+      searchResources: 'Search resources...',
+      noResourcesFound: 'No resources found.',
+      availableResources: 'Available Resources',
+      resourcesSelected: '{{count}} resource selected',
+      resourcesSelected_other: '{{count}} resources selected',
+    },
   },
   calendar: {
     title: 'Class Calendar',
@@ -1062,6 +1078,8 @@ export default {
         title: 'Title',
         content: 'Content',
         attachments: 'Attachments',
+        linkLessons: 'Link Lessons',
+        linkResources: 'Link Resources',
       },
       placeholders: {
         title: 'Enter announcement title',

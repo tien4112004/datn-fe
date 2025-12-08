@@ -3,7 +3,6 @@ import { useCreatePost } from '../hooks/useApi';
 import type { PostCreateRequest } from '../types';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/shared/components/ui/button';
-import { Input } from '@/shared/components/ui/input';
 import RichTextEditor from '@/shared/components/rte/RichTextEditor';
 import { useRichTextEditor } from '@/shared/components/rte/useRichTextEditor';
 import { RadioGroup, RadioGroupItem } from '@/shared/components/ui/radio-group';
@@ -33,7 +32,6 @@ export const PostCreator = ({ classId, onPostCreated, className = '' }: PostCrea
   const editor = useRichTextEditor();
   const [open, setOpen] = useState(false);
   const [type, setType] = useState<'post' | 'announcement'>('post');
-  const [title, setTitle] = useState('');
   const [attachments, setAttachments] = useState<File[]>([]);
   const [linkedLessons, setLinkedLessons] = useState<Array<Lesson>>([]);
   const [linkedResources, setLinkedResources] = useState<Array<LessonResource>>([]);
@@ -44,13 +42,12 @@ export const PostCreator = ({ classId, onPostCreated, className = '' }: PostCrea
     if (!editor || editor.document.length === 0) return;
 
     try {
-      const contentHtml = await editor.blocksToFullHTML(editor.document);
+      const contentMd = await editor.blocksToMarkdownLossy(editor.document);
 
       const request: PostCreateRequest = {
         classId,
         type,
-        title: type === 'announcement' ? title : '',
-        content: contentHtml,
+        content: contentMd,
         attachments: attachments.length > 0 ? attachments : undefined,
         linkedLessonIds: linkedLessons.length > 0 ? linkedLessons.map((l) => l.id) : undefined,
         linkedResourceIds: linkedResources.length > 0 ? linkedResources.map((r) => r.id) : undefined,
@@ -59,7 +56,6 @@ export const PostCreator = ({ classId, onPostCreated, className = '' }: PostCrea
       await createPost.mutateAsync(request);
 
       // Reset form
-      setTitle('');
       editor.replaceBlocks(editor.document, []);
       setAttachments([]);
       setLinkedLessons([]);
@@ -113,18 +109,6 @@ export const PostCreator = ({ classId, onPostCreated, className = '' }: PostCrea
                 <Label htmlFor="announcement">{t('feed.creator.postType.announcement')}</Label>
               </div>
             </RadioGroup>
-          </div>
-
-          <div className="mb-4">
-            <Label htmlFor="title">{t('feed.creator.labels.title')}</Label>
-            <Input
-              id="title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder={t('feed.creator.placeholders.title')}
-              maxLength={100}
-              className="border-border mt-1 shadow-none"
-            />
           </div>
 
           {/* Content */}

@@ -36,10 +36,10 @@ export const ClassOverview = ({ classData, onEditClick }: ClassOverviewProps) =>
               <label className="text-muted-foreground text-sm font-medium">{t('academicYear')}</label>
               <p className="text-sm">{classData.academicYear}</p>
             </div>
-            {classData.classroom && (
+            {classData.class && (
               <div>
-                <label className="text-muted-foreground text-sm font-medium">{t('classroom')}</label>
-                <p className="text-sm">{classData.classroom}</p>
+                <label className="text-muted-foreground text-sm font-medium">{t('class')}</label>
+                <p className="text-sm">{classData.class}</p>
               </div>
             )}
             <div>

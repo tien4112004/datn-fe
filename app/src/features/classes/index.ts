@@ -4,6 +4,8 @@ import { PeriodDetailPage } from './class-schedule/PeriodDetailPage';
 import { LessonDetailPage } from './class-lesson/LessonDetailPage';
 import { LessonCreatorPage } from './class-lesson/LessonCreatorPage';
 
+export { FeedPage } from './class-feed';
+
 export default {
   ClassListPage,
   ClassDetailPage,

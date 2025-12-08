@@ -70,14 +70,14 @@ export const ClassCard = ({
             </div>
           </div>
 
-          {/* Classroom */}
-          {classItem.classroom && (
+          {/* Class */}
+          {classItem.class && (
             <div className="text-sm">
               <div className="text-muted-foreground mb-1 flex items-center gap-1">
                 <MapPin className="h-4 w-4" />
-                {t('classroom')}
+                {t('class')}
               </div>
-              <span className="font-medium">{classItem.classroom}</span>
+              <span className="font-medium">{classItem.class}</span>
             </div>
           )}
         </div>

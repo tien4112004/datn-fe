@@ -16,6 +16,8 @@ import viTranslation from './locales/vi';
  * - projects: Project management page
  * - settings: Settings page
  * - mindmaps: Mindmap creation and management
+ * - auth: Authentication and user management
+ * - classes: Class management and details
  *
  * Usage:
  * const { t } = useTranslation('namespace');

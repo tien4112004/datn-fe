@@ -14,7 +14,7 @@ export interface Class {
   academicYear: string; // e.g., "2024-2025"
   currentEnrollment: number; // current number of students
   teacherId: string; // homeroom teacher
-  classroom?: string; // physical location
+  class?: string; // physical location
   description?: string;
   students: Student[];
   layout?: Layout;
@@ -26,7 +26,7 @@ export interface Class {
 /**
  * Layout Entity
  *
- * Represents the seating arrangement of a classroom.
+ * Represents the seating arrangement of a class.
  */
 
 export interface Layout {
@@ -39,7 +39,7 @@ export interface Layout {
 /**
  * Seat Entity
  *
- * Represents a single seat in the classroom layout.
+ * Represents a single seat in the class layout.
  */
 export interface Seat {
   id: string;

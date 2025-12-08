@@ -33,9 +33,6 @@ export interface Resources {
   classes: typeof classes;
 }
 
-/**
- * Extend i18next types for autocomplete support
- */
 declare module 'i18next' {
   interface CustomTypeOptions {
     defaultNS: 'common';

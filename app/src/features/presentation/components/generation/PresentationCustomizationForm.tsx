@@ -10,7 +10,7 @@ import {
 import { Button } from '@/shared/components/ui/button';
 import { Palette, Sparkles, AlignLeft, AlignCenter, AlignJustify } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { ModelSelect } from '@/components/common/ModelSelect';
+import { ModelSelect } from '@/features/model/components/ModelSelect';
 import { MODEL_TYPES, useModels } from '@/features/model';
 import type { UnifiedFormData } from '../../contexts/PresentationFormContext';
 import type { ArtStyle } from '@aiprimary/core';

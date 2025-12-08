@@ -26,7 +26,7 @@ export interface ClassCreateRequest {
   name: string;
   grade: number;
   academicYear: string;
-  classroom?: string;
+  class?: string;
   description?: string;
 }
 

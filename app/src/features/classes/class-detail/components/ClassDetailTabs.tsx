@@ -1,23 +1,15 @@
-import { useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { LayoutDashboard, Calendar, BookOpen, Target, Users, Settings } from 'lucide-react';
+import { MessageSquare, Calendar, BookOpen, Target, Users, Settings } from 'lucide-react';
 
 import { ClassOverview } from './ClassOverview';
 import { ClassStudentView } from '../../class-student';
 import { ClassSettings } from './ClassSettings';
-import TodaysTeachingDashboard from '../../class-dashboard/components/TodaysTeachingDashboard';
-import {
-  LessonTab,
-  useClassLessons,
-  useLessonOperations,
-  useUpdateLesson,
-  useUpdateLessonStatus,
-} from '../../class-lesson';
-import { useScheduleHelpers } from '../../class-schedule';
+import { FeedPage } from '@/features/classes/class-feed/components';
+import { LessonTab } from '../../class-lesson';
 import type { Class } from '../../shared/types';
-import { ScheduleTab, useClassSchedules, useClassPeriods } from '../../class-schedule';
+import { ScheduleTab } from '../../class-schedule';
 import type { ClassTabs } from '../../shared';
 
 interface ClassDetailTabsProps {
@@ -29,38 +21,8 @@ interface ClassDetailTabsProps {
 export const ClassDetailTabs = ({ classId, currentClass, onEditClick }: ClassDetailTabsProps) => {
   const { t } = useTranslation('classes', { keyPrefix: 'detail' });
 
-  // Get today's date
-  const today = new Date().toISOString().split('T')[0];
-
-  // ============= MANAGER: Call the Fetcher =============
-  // Get raw schedules from the API (fetch just today's schedule)
-  const { data: schedulesData } = useClassSchedules(classId, { startDate: today, endDate: today });
-  const schedules = schedulesData?.data || [];
-
-  // ============= MANAGER: Use the Toolbox =============
-  // Get today's schedule from the raw list
-  const { findScheduleForDate } = useScheduleHelpers();
-
-  const todaySchedule = useMemo(() => {
-    return findScheduleForDate(schedules, today, classId);
-  }, [schedules, today, classId]);
-
-  // Fetch periods and lessons
-  const { data: periodsData } = useClassPeriods(classId, { date: today });
-  const { data: lessonsData } = useClassLessons(classId, {});
-
-  const allPeriods = periodsData?.data || [];
-  const allLessons = lessonsData?.data || [];
-
-  const todayLessons = allLessons.filter((lp) => lp.linkedPeriods.some((p) => p.date === today));
-
-  // Mutation hooks
-  const updateLessonStatus = useUpdateLessonStatus();
-  const updateLesson = useUpdateLesson();
-  const lessonOperations = useLessonOperations();
-
   const [searchParams, setSearchParams] = useSearchParams();
-  const currentTab = searchParams.get('tab') || 'teaching';
+  const currentTab = searchParams.get('tab') || 'feed';
 
   const handleTabChange = (tab: ClassTabs) => {
     setSearchParams({ tab }, { replace: true });
@@ -70,15 +32,15 @@ export const ClassDetailTabs = ({ classId, currentClass, onEditClick }: ClassDet
     <div className="space-y-6 px-8">
       {/* Detailed Tabs */}
       <Tabs
-        defaultValue="teaching"
+        defaultValue="feed"
         className="mx-12 space-y-4"
         value={currentTab}
         onValueChange={(value) => handleTabChange(value as ClassTabs)}
       >
         <TabsList className="grid w-full grid-cols-6">
-          <TabsTrigger value="teaching" className="flex cursor-pointer items-center gap-1">
-            <LayoutDashboard className="h-4 w-4" />
-            {t('tabs.teaching')}
+          <TabsTrigger value="feed" className="flex cursor-pointer items-center gap-1">
+            <MessageSquare className="h-4 w-4" />
+            {t('tabs.feed')}
           </TabsTrigger>
           <TabsTrigger value="schedule" className="flex cursor-pointer items-center gap-1">
             <Calendar className="h-4 w-4" />
@@ -102,86 +64,8 @@ export const ClassDetailTabs = ({ classId, currentClass, onEditClick }: ClassDet
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="teaching" className="space-y-4">
-          <TodaysTeachingDashboard
-            classData={currentClass}
-            todaySchedule={todaySchedule}
-            allPeriods={allPeriods}
-            todayLessons={todayLessons}
-            allLessons={allLessons}
-            onUpdateLessonStatus={async (id, status, notes) => {
-              await updateLessonStatus.mutateAsync({ id, status, notes });
-            }}
-            onUpdateObjective={async (lessonId, objectiveId, updates) => {
-              // Find the lesson
-              const lesson = todayLessons.find((lp) => lp.id === lessonId);
-              if (!lesson) return;
-
-              // Use lesson operations to update the objective
-              const updatedLesson = lessonOperations.updateObjectiveInLesson(lesson, objectiveId, updates);
-
-              // Persist the changes
-              await updateLesson.mutateAsync(updatedLesson);
-            }}
-            onAddObjectiveNote={async (lessonId, objectiveId, note) => {
-              // Find the lesson
-              const lesson = todayLessons.find((lp) => lp.id === lessonId);
-              if (!lesson) return;
-
-              // Use lesson operations to update the objective
-              const updatedLesson = lessonOperations.updateObjectiveInLesson(lesson, objectiveId, {
-                notes: note,
-              });
-
-              // Persist the changes
-              await updateLesson.mutateAsync(updatedLesson);
-            }}
-            onAddResource={async (lessonId, resource) => {
-              // Find the lesson
-              const lesson = todayLessons.find((lp) => lp.id === lessonId);
-              if (!lesson) return;
-
-              // Use lesson operations to add the resource
-              const updatedLesson = lessonOperations.addResourceToLesson(lesson, resource);
-
-              // Persist the changes
-              await updateLesson.mutateAsync(updatedLesson);
-            }}
-            onUpdateResource={async (lessonId, resourceId, updates) => {
-              // Find the lesson
-              const lesson = todayLessons.find((lp) => lp.id === lessonId);
-              if (!lesson) return;
-
-              // Use lesson operations to update the resource
-              const updatedLesson = lessonOperations.updateResourceInLesson(lesson, resourceId, updates);
-
-              // Persist the changes
-              await updateLesson.mutateAsync(updatedLesson);
-            }}
-            onDeleteResource={async (lessonId, resourceId) => {
-              // Find the lesson
-              const lesson = todayLessons.find((lp) => lp.id === lessonId);
-              if (!lesson) return;
-
-              // Use lesson operations to remove the resource
-              const updatedLesson = lessonOperations.removeResourceFromLesson(lesson, resourceId);
-
-              // Persist the changes
-              await updateLesson.mutateAsync(updatedLesson);
-            }}
-            onSubjectChange={(subject, subjectCode) => {
-              // TODO: Implement subject change filtering
-              console.log('Subject change:', subject, subjectCode);
-            }}
-            onCreateLesson={(subject, subjectCode) => {
-              // TODO: Open lesson creation modal/form
-              console.log('Create lesson:', subject, subjectCode);
-            }}
-            onManageSchedule={(subject) => {
-              // TODO: Navigate to schedule management
-              console.log('Manage schedule:', subject);
-            }}
-          />
+        <TabsContent value="feed" className="space-y-4">
+          <FeedPage classId={classId} />
         </TabsContent>
 
         <TabsContent value="schedule" className="space-y-4">

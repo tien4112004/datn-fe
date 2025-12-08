@@ -36,14 +36,14 @@ export default {
     name: 'Tên lớp',
     grade: 'Khối',
     academicYear: 'Năm học',
-    classroom: 'Phòng học',
+    class: 'Phòng học',
     description: 'Mô tả',
 
     // Placeholders
     namePlaceholder: 'ví dụ: Lớp 10A',
     gradePlaceholder: '10',
     academicYearPlaceholder: '2024-2025',
-    classroomPlaceholder: 'ví dụ: Phòng 301',
+    classPlaceholder: 'ví dụ: Phòng 301',
     descriptionPlaceholder: 'Thêm mô tả ngắn gọn về lớp học này...',
 
     // Form states
@@ -64,7 +64,7 @@ export default {
     gradeInvalid: 'Khối phải từ 1 đến 12',
     academicYearRequired: 'Năm học là bắt buộc',
     academicYearInvalid: 'Năm học phải có định dạng YYYY-YYYY (ví dụ: 2024-2025)',
-    classroomTooLong: 'Phòng học không được vượt quá 100 ký tự',
+    classTooLong: 'Phòng học không được vượt quá 100 ký tự',
     descriptionTooLong: 'Mô tả không được vượt quá 500 ký tự',
   },
 
@@ -88,7 +88,7 @@ export default {
     notFoundDescription: 'Lớp học bạn tìm kiếm không tồn tại.',
     loading: 'Đang tải...',
     academicYear: 'Năm học',
-    classroom: 'Phòng học',
+    class: 'Phòng học',
     status: {
       active: 'Hoạt động',
       inactive: 'Không hoạt động',
@@ -101,6 +101,7 @@ export default {
       available: 'còn lại',
     },
     tabs: {
+      feed: 'Bảng tin',
       teaching: 'Giảng dạy',
       schedule: 'Lịch biểu',
       lessons: 'Bài học',
@@ -170,7 +171,7 @@ export default {
       grade: 'Khối',
       academicYear: 'Năm học',
       enrollment: 'Danh sách',
-      classroom: 'Phòng học',
+      class: 'Phòng học',
       status: 'Trạng thái',
     },
     actions: {
@@ -181,7 +182,7 @@ export default {
   grid: {
     academicYear: 'Năm học',
     enrollment: 'Danh sách',
-    classroom: 'Phòng học',
+    class: 'Phòng học',
     actions: {
       manageStudents: 'Quản lý học sinh',
     },
@@ -1025,6 +1026,91 @@ export default {
         saturdayFull: 'Thứ Bảy',
         sundayFull: 'Chủ Nhật',
       },
+    },
+  },
+
+  feed: {
+    header: {
+      title: 'Bảng tin {{className}}',
+      subtitle: 'Cập nhật thông báo và thảo luận của lớp',
+      filters: {
+        all: 'Tất cả bài viết',
+        announcements: 'Thông báo',
+        posts: 'Bài viết',
+      },
+    },
+    creator: {
+      actions: {
+        createPost: 'Tạo Bài Đăng',
+        attachFiles: 'Đính Kèm Tập Tin',
+        posting: 'Đang Đăng...',
+        post: 'Đăng',
+        cancel: 'Hủy',
+        postComment: 'Đăng bình luận',
+      },
+      dialog: {
+        title: 'Tạo Bài Đăng Mới',
+        description: 'Chia sẻ thông báo hoặc bài đăng với lớp học của bạn.',
+      },
+      labels: {
+        postType: 'Loại Bài Đăng',
+        title: 'Tiêu Đề',
+        content: 'Nội Dung',
+        attachments: 'Tập Tin Đính Kèm',
+      },
+      placeholders: {
+        title: 'Nhập tiêu đề thông báo',
+        content: 'Viết nội dung bài đăng của bạn ở đây...',
+        comment: 'Viết bình luận...',
+      },
+      postType: {
+        post: 'Bài Đăng',
+        announcement: 'Thông Báo',
+      },
+    },
+    list: {
+      empty: {
+        title: 'Chưa có bài viết nào',
+        description: 'Hãy là người đầu tiên chia sẻ điều gì đó với lớp!',
+      },
+      loading: 'Đang tải bài viết...',
+      loadMore: 'Tải thêm bài viết',
+      loadingMore: 'Đang tải...',
+    },
+    post: {
+      badges: {
+        pinned: '📌 Đã ghim',
+        announcement: '📢 Thông báo',
+      },
+      actions: {
+        edit: 'Chỉnh sửa bài viết',
+        pin: 'Ghim bài viết',
+        unpin: 'Bỏ ghim bài viết',
+        delete: 'Xóa bài viết',
+        comment: 'bình luận',
+      },
+      confirm: {
+        delete: 'Bạn có chắc chắn muốn xóa bài viết này?',
+      },
+    },
+    comments: {
+      loading: 'Đang tải bình luận...',
+      empty: 'Chưa có bình luận nào',
+    },
+    errors: {
+      loadFailed: 'Không thể tải bài viết',
+      createFailed: 'Không thể tạo bài viết',
+      updateFailed: 'Không thể cập nhật bài viết',
+      deleteFailed: 'Không thể xóa bài viết',
+      commentFailed: 'Không thể thêm bình luận',
+      pinFailed: 'Không thể {{action}} bài viết',
+      tryAgain: 'Thử lại',
+    },
+    time: {
+      justNow: 'Vừa xong',
+      minutesAgo: '{{count}} phút trước',
+      hoursAgo: '{{count}} giờ trước',
+      daysAgo: '{{count}} ngày trước',
     },
   },
 };

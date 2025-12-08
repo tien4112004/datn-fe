@@ -16,7 +16,7 @@ import {
 import ExamplePrompts from '@/features/projects/components/ExamplePrompts';
 import { SLIDE_COUNT_OPTIONS, LANGUAGE_OPTIONS } from '@/features/presentation/types';
 import { MODEL_TYPES, useModels } from '@/features/model';
-import { ModelSelect } from '@/components/common/ModelSelect';
+import { ModelSelect } from '@/features/model/components/ModelSelect';
 import { usePresentationForm } from '@/features/presentation/contexts/PresentationFormContext';
 import ResourceTypeSwitcher from '@/features/projects/components/ResourceTypeSwitcher';
 

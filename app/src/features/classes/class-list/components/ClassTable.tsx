@@ -63,8 +63,8 @@ export const ClassTable = () => {
         },
         size: 160,
       }),
-      columnHelper.accessor('classroom', {
-        header: t('columns.classroom'),
+      columnHelper.accessor('class', {
+        header: t('columns.class'),
         cell: (info) => info.getValue() || <span className="text-muted-foreground">-</span>,
         size: 100,
       }),

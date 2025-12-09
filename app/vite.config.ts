@@ -13,7 +13,7 @@ export default defineConfig(({ mode }) => {
   const presentationUrl =
     env.NODE_ENV === 'production'
       ? 'https://presentation.huy-devops.site' // replace with actual production URL
-      : process.env.VITE_PRESENTATION_URL || env.VITE_PRESENTATION_URL || 'http://localhost:5174'; // fallback for local development
+      : process.env.PRESENTATION_URL || env.PRESENTATION_URL || 'http://localhost:5174'; // fallback for local development
 
   return {
     plugins: [

@@ -76,10 +76,6 @@ onMounted(async () => {
     slidesStore.setSlides(slides);
   }
 
-  if (props.isGenerating) {
-    // Trigger Generation Streaming
-  }
-
   await deleteDiscardedDB();
   snapshotStore.initSnapshotDatabase();
 

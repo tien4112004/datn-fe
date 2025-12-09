@@ -16,7 +16,6 @@ export const imageApi = {
   async generateImage(
     presentationId: string,
     slideId: string,
-    elementId: string,
     params: {
       prompt: string;
       model: {
@@ -26,11 +25,16 @@ export const imageApi = {
     }
   ): Promise<{ images: Array<{ url: string }> }> {
     const response = await api.post<ApiResponse<{ images: Array<{ url: string }> }>>(
-      `${BASE_URL}/presentations/${presentationId}/slides/${slideId}/elements/${elementId}/generate-image`,
+      `${BASE_URL}/api/images/generate-in-presentation`,
       {
         prompt: params.prompt,
         model: params.model.name,
         provider: params.model.provider.toLowerCase(),
+      },
+      {
+        headers: {
+          'Idempotency-Key': `${presentationId}:${slideId}:image`,
+        },
       }
     );
     return response.data.data;

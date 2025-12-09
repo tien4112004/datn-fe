@@ -1,7 +1,7 @@
 import { ref, watch, onUnmounted, type Ref } from 'vue';
 import { convertToSlide, updateImageSource } from '@/utils/slideLayout';
 import type { SlideLayoutSchema, SlideViewport } from '@/utils/slideLayout/types';
-import type { PPTImageElement, Slide, SlideTheme } from '@/types/slides';
+import type { PPTImageElement, SlideTheme } from '@/types/slides';
 import { useSlidesStore } from '@/store';
 import { useGenerationStore, type AiResultSlide } from '@/store/generation';
 import { useAiResultById, useUpdateSlides, useSetParsed } from './usePresentationMutations';
@@ -123,7 +123,6 @@ export function usePresentationProcessor(
     try {
       const response: any = await generateImage({
         slideId,
-        elementId: imageElement.id,
         prompt,
         model: request.others.imageModel,
       });

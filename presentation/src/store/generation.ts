@@ -1,8 +1,5 @@
 import { defineStore } from 'pinia';
-import {
-  mockPresentationApi as presentationApi,
-  type PresentationGenerationRequest,
-} from '../services/presentationApi';
+import { presentationApi, type PresentationGenerationRequest } from '../services/presentationApi';
 
 export interface AiResultSlide {
   result: Record<string, any>;

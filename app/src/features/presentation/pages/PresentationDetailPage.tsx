@@ -1,5 +1,5 @@
 import VueRemoteWrapper from '@/features/presentation/components/remote/VueRemoteWrapper';
-import GlobalSpinner, { Spinner } from '@/shared/components/common/GlobalSpinner';
+import GlobalSpinner from '@/shared/components/common/GlobalSpinner';
 import { useTranslation } from 'react-i18next';
 import { useLoaderData, useParams } from 'react-router-dom';
 import type { Presentation } from '../types';
@@ -8,6 +8,7 @@ import { useDetailPresentation } from '../hooks/useDetailPresentation';
 import { useUnsavedChangesBlocker } from '@/shared/hooks';
 import { UnsavedChangesDialog } from '@/shared/components/modals/UnsavedChangesDialog';
 import { SmallScreenDialog } from '@/shared/components/modals/SmallScreenDialog';
+import usePresentationStore from '../stores/usePresentationStore';
 
 const DetailPage = () => {
   const { presentation } = useLoaderData() as { presentation: Presentation | null };
@@ -15,12 +16,11 @@ const DetailPage = () => {
   const isGeneratingParam = getSearchParamAsBoolean('isGenerating', false) ?? false;
   const isViewModeParam = getSearchParamAsBoolean('view', false) ?? false;
 
-  const { app, updateApp, isProcessing, isStreaming, isSaving } = useDetailPresentation(
-    presentation,
-    id,
-    isGeneratingParam
-  );
+  // Validate and initialize - all processing logic is now in Vue
+  const { updateApp, isStreaming, isSaving } = useDetailPresentation(presentation, id, isGeneratingParam);
+  const { request } = usePresentationStore();
 
+  // Listen for dirty state changes from Vue
   const { showDialog, setShowDialog, handleStay, handleProceed } = useUnsavedChangesBlocker({
     eventName: 'app.presentation.dirty-state-changed',
   });
@@ -29,20 +29,34 @@ const DetailPage = () => {
 
   return (
     <>
-      <VueRemoteWrapper
-        modulePath="editor"
-        mountProps={{
-          titleTest: 'random',
-          isRemote: true,
-          presentation,
-          mode: isViewModeParam ? 'view' : 'edit',
-        }}
-        className="vue-remote"
-        LoadingComponent={() => <GlobalSpinner text={t('presentation')} />}
-        onMountSuccess={updateApp}
-      />
-      {isStreaming && app && <Spinner text={t('generatingPresentation')} />}
-      {!isStreaming && isProcessing && <Spinner text={t('processingPresentation')} />}
+      {!isGeneratingParam ? (
+        <VueRemoteWrapper
+          modulePath="editor"
+          mountProps={{
+            presentation,
+            isRemote: true,
+            mode: isViewModeParam ? 'view' : 'edit',
+          }}
+          className="vue-remote"
+          LoadingComponent={() => <GlobalSpinner text={t('presentation')} />}
+          onMountSuccess={updateApp}
+        />
+      ) : (
+        <VueRemoteWrapper
+          modulePath="editor"
+          mountProps={{
+            presentation,
+            isRemote: true,
+            mode: isViewModeParam ? 'view' : 'edit',
+            generationRequest: request,
+            isGenerating: true,
+          }}
+          className="vue-remote"
+          LoadingComponent={() => <GlobalSpinner text={t('presentation')} />}
+          onMountSuccess={updateApp}
+        />
+      )}
+      {isStreaming && <GlobalSpinner text={t('generatingPresentation')} />}
       {isSaving && <GlobalSpinner text={t('savingPresentation') || 'Saving presentation...'} />}
       <UnsavedChangesDialog
         open={showDialog}

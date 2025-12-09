@@ -2,7 +2,8 @@ import { createApp, watch, type App } from 'vue';
 import { createPinia, storeToRefs } from 'pinia';
 import icon from '../plugins/icon';
 import directive from '../plugins/directive/index';
-import AppComponent from '../views/MainApp.vue';
+import queryClientPlugin from '../plugins/queryClient';
+import AppComponent from '../views/RemoteApp.vue';
 import 'prosemirror-view/style/prosemirror.css';
 import 'animate.css';
 import '@/assets/styles/tailwind.css';
@@ -28,6 +29,7 @@ export function mount(el: string | Element, props: Record<string, unknown>) {
 
   const pinia = createPinia();
   app.use(pinia);
+  app.use(queryClientPlugin);
   app.use(i18n);
   icon.install(app);
   directive.install(app);

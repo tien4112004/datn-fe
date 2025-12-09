@@ -4,7 +4,9 @@ import { toast } from 'sonner';
 import useFetchStreamingOutline from '@/features/presentation/hooks/useFetchStreaming';
 import useOutlineStore from '@/features/presentation/stores/useOutlineStore';
 import { usePresentationForm } from '@/features/presentation/contexts/PresentationFormContext';
-import { usePresentationGeneration } from '../contexts/PresentationGenerationContext';
+import { useDraftPresentation } from './useApi';
+import type { PresentationGenerationRequest } from '../types';
+import usePresentationStore from '../stores/usePresentationStore';
 
 interface UseWorkspaceProps {}
 
@@ -23,6 +25,7 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
   const clearOutline = useOutlineStore((state) => state.clearOutline);
   const isStreamingStore = useOutlineStore((state) => state.isStreaming);
   const isGeneratingOutline = useOutlineStore((state) => state.isGenerating);
+  const draftPresentation = useDraftPresentation();
 
   // Streaming API
   const {
@@ -43,7 +46,7 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
     { manual: true }
   );
 
-  const { isStreaming: isGenerating, startGeneration } = usePresentationGeneration();
+  const { setRequest } = usePresentationStore();
 
   useEffect(() => {
     if (isGeneratingOutline) fetch();
@@ -85,7 +88,7 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
     const outline = markdownContent();
     const data = getValues();
 
-    const generationRequest = {
+    const generationRequest: PresentationGenerationRequest = {
       outline,
       model: data.model,
       slideCount: data.slideCount,
@@ -101,19 +104,18 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
         imageModel: data.imageModel,
       },
     };
+    try {
+      const result = await draftPresentation.mutateAsync(generationRequest);
+      setRequest(generationRequest);
+      clearOutline();
+      setValue('topic', '');
 
-    const result = await startGeneration(generationRequest);
-    if (result.error) {
+      // Navigate to the detail page
+      navigate(`/presentation/${result.id}?isGenerating=true`, { replace: true });
+    } catch {
       toast.error('Error generating presentation. Please try again.');
-      return;
     }
-
-    clearOutline();
-    setValue('topic', '');
-
-    // Navigate to the detail page
-    navigate(`/presentation/${result.presentationId}?isGenerating=true`, { replace: true });
-  }, [trigger, markdownContent, getValues, startGeneration, navigate]);
+  }, [trigger, markdownContent, getValues, navigate]);
 
   const stopStream = useCallback(() => {
     stopStreamOutline();
@@ -142,7 +144,6 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
     // Form handlers
     handleRegenerateOutline,
     handleGeneratePresentation,
-    isGenerating,
 
     // Only return needed form properties
     control: formHook.control,

@@ -3,7 +3,12 @@ import type { SortingState, PaginationState, Updater } from '@tanstack/react-tab
 import { usePresentationApiService } from '../api';
 import { useImageApiService } from '@/features/image/api';
 import { useEffect, useState } from 'react';
-import type { Presentation, OutlineItem, PresentationGenerationRequest } from '../types';
+import type {
+  Presentation,
+  OutlineItem,
+  PresentationGenerationRequest,
+  PresentationGenerateDraftRequest,
+} from '../types';
 import type { ApiResponse } from '@aiprimary/api';
 import { ExpectedError } from '@aiprimary/api';
 import type { Slide, SlideTemplate, SlideTheme } from '../types/slide';
@@ -381,4 +386,15 @@ export const useSlideTemplates = () => {
     templates: templates || [],
     ...query,
   };
+};
+
+export const useDraftPresentation = () => {
+  const presentationApiService = usePresentationApiService();
+
+  return useMutation({
+    mutationFn: async (request: PresentationGenerateDraftRequest) => {
+      const draftPresentation = await presentationApiService.draftPresentation(request);
+      return draftPresentation;
+    },
+  });
 };

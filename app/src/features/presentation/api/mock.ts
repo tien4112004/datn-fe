@@ -6,6 +6,7 @@ import {
   type Presentation,
   type PresentationCollectionRequest,
   type PresentationGenerationRequest,
+  type PresentationGenerateDraftRequest,
   type PresentationGenerationResponse,
   type SlideLayoutSchema,
 } from '../types';
@@ -404,6 +405,27 @@ export default class PresentationMockService implements PresentationApiService {
         resolve(mockSlideTemplates);
       }, 300);
     });
+  }
+
+  async draftPresentation(request: PresentationGenerateDraftRequest): Promise<Presentation> {
+    // Simulate API delay
+    await new Promise((resolve) => setTimeout(resolve, 200));
+
+    const draftPresentation: Presentation = {
+      id: crypto.randomUUID(),
+      title: 'Draft Presentation',
+      slides: [],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      isParsed: false,
+      theme: request.presentation.theme,
+      viewport: request.presentation.viewport,
+    };
+
+    // Add the draft presentation to the mock list
+    mockPresentationItems = [draftPresentation, ...mockPresentationItems];
+
+    return draftPresentation;
   }
 }
 

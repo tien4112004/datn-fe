@@ -1,7 +1,12 @@
 import { create } from 'zustand';
-import type { AiResultSlide, PresentationGenerationResponse } from '@/features/presentation/types';
+import type {
+  AiResultSlide,
+  PresentationGenerationRequest,
+  PresentationGenerationResponse,
+} from '@/features/presentation/types';
 
 interface PresentationStore {
+  request: PresentationGenerationRequest | null;
   generatedPresentation: PresentationGenerationResponse | null;
   streamedData: AiResultSlide[];
   isGenerating: boolean;
@@ -10,9 +15,11 @@ interface PresentationStore {
   setIsGenerating: (isGenerating: boolean) => void;
   clearGeneratedPresentation: () => void;
   clearStreamedData: () => void;
+  setRequest: (request: PresentationGenerationRequest) => void;
 }
 
 const usePresentationStore = create<PresentationStore>((set) => ({
+  request: null,
   generatedPresentation: null,
   streamedData: [],
   isGenerating: false,
@@ -35,6 +42,10 @@ const usePresentationStore = create<PresentationStore>((set) => ({
 
   clearStreamedData: () => {
     set({ streamedData: [] });
+  },
+
+  setRequest: (request) => {
+    set({ request });
   },
 }));
 

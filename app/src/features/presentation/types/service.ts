@@ -12,6 +12,7 @@ export interface PresentationGenerationRequest {
   };
   slideCount: number;
   language: string;
+  /** @deprecated */
   presentation: {
     theme: SlideTheme;
     viewport: SlideViewport;
@@ -24,6 +25,13 @@ export interface PresentationGenerationRequest {
       name: string;
       provider: string;
     };
+  };
+}
+
+export interface PresentationGenerateDraftRequest {
+  presentation: {
+    theme: SlideTheme;
+    viewport: SlideViewport;
   };
 }
 
@@ -58,6 +66,7 @@ export interface PresentationApiService extends Service {
     request: PresentationGenerationRequest,
     signal: AbortSignal
   ): Promise<{ stream: AsyncIterable<string> } & PresentationGenerationStartResponse>;
+  draftPresentation(request: PresentationGenerateDraftRequest): Promise<Presentation>;
   upsertPresentationSlide(id: string, slide: Slide): Promise<Presentation>;
   setPresentationAsParsed(id: string): Promise<Presentation>;
   getSlideThemes(): Promise<SlideTheme[]>;

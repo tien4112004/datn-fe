@@ -77,19 +77,13 @@ const router = createBrowserRouter([
         loader: getMindmapById,
       },
       {
-        path: 'presentation',
-        element: <Presentation.Layout />,
-        children: [
-          {
-            path: ':id',
-            Component: Presentation.DetailPage,
-            loader: getPresentationById,
-          },
-          {
-            path: 'generate',
-            Component: Presentation.PresentationOutlinePage,
-          },
-        ],
+        path: 'presentation/:id',
+        Component: Presentation.DetailPage,
+        loader: getPresentationById,
+      },
+      {
+        path: 'presentation/generate',
+        Component: Presentation.PresentationOutlinePage,
       },
       {
         path: 'classes',

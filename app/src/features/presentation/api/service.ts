@@ -9,6 +9,7 @@ import {
   type PresentationGenerationResponse,
   type SlideLayoutSchema,
   type PresentationGenerationStartResponse,
+  type PresentationGenerateDraftRequest,
 } from '../types';
 import { splitMarkdownToOutlineItems } from '../utils';
 import { api } from '@aiprimary/api';
@@ -60,10 +61,6 @@ export default class PresentationRealApiService implements PresentationApiServic
     this.baseUrl = baseUrl;
   }
 
-  setPresentationAsParsed(id: string): Promise<any> {
-    return api.patch<ApiResponse<Presentation>>(`${this.baseUrl}/api/presentations/${id}/parse`);
-  }
-
   async getSlideThemes(): Promise<SlideTheme[]> {
     const res = await api.get<ApiResponse<SlideTheme[]>>(`${this.baseUrl}/api/slide-themes`);
     return res.data.data;
@@ -91,6 +88,18 @@ export default class PresentationRealApiService implements PresentationApiServic
         },
       }
     );
+  }
+
+  setPresentationAsParsed(id: string): Promise<any> {
+    return api.patch<ApiResponse<Presentation>>(`${this.baseUrl}/api/presentations/${id}/parse`);
+  }
+
+  async draftPresentation(request: PresentationGenerateDraftRequest): Promise<Presentation> {
+    var response = await api.post<ApiResponse<Presentation>>(
+      `${this.baseUrl}/api/presentations/draft`,
+      request
+    );
+    return response.data.data;
   }
 
   async getStreamedPresentation(

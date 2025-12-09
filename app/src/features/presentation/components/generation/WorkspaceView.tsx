@@ -39,7 +39,6 @@ const WorkspaceView = ({ onWorkspaceEmpty }: WorkspaceViewProps) => {
     clearContent,
     handleRegenerateOutline,
     handleGeneratePresentation,
-    isGenerating,
     isStreaming,
     control,
     watch,
@@ -48,10 +47,10 @@ const WorkspaceView = ({ onWorkspaceEmpty }: WorkspaceViewProps) => {
   } = useWorkspace({});
 
   useEffect(() => {
-    if (isEmpty() && getValues().topic.trim() === '' && !isGenerating) {
+    if (isEmpty() && getValues().topic.trim() === '' && !isStreaming) {
       onWorkspaceEmpty();
     }
-  }, [isEmpty, isGenerating, onWorkspaceEmpty]);
+  }, [isEmpty, isStreaming, onWorkspaceEmpty]);
 
   const { showDialog, setShowDialog, handleStay, handleProceed } = useGeneratingBlocker(stopStream);
 
@@ -78,7 +77,7 @@ const WorkspaceView = ({ onWorkspaceEmpty }: WorkspaceViewProps) => {
               watch={watch}
               setValue={setValue}
               onGeneratePresentation={handleGeneratePresentation}
-              isGenerating={isGenerating}
+              isGenerating={isStreaming}
             />
           </form>
         </div>

@@ -1,8 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { getBackendUrl } from '@/shared/utils/backend-url';
-import { getApiMode } from '@/context/api-switching';
-import { API_MODE } from '@/shared/constants';
+import { getApiMode, API_MODE } from '@aiprimary/api';
 import { setUserData, useAuth } from '@/shared/context/auth';
 
 export const useGoogleLogin = () => {

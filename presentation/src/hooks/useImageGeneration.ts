@@ -1,11 +1,12 @@
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
-import { imageApi } from '@/services/imageApi';
+import { getImageApi } from '@/services/imageApi';
 
 /**
  * Generate an image for a slide element
  */
 export function useGenerateImage(presentationId: string) {
   const queryClient = useQueryClient();
+  const imageApi = getImageApi();
 
   return useMutation({
     mutationFn: async ({

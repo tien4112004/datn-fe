@@ -1,4 +1,4 @@
-import { API_MODE, type ApiMode } from '@/shared/constants';
+import { API_MODE, type ApiMode } from '@aiprimary/api';
 import { type MindmapApiService, type Mindmap, type MindmapCollectionRequest } from '../types';
 import { api } from '@aiprimary/api';
 import { mapPagination, type ApiResponse, type Pagination } from '@aiprimary/api';

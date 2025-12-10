@@ -1,5 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
-import { presentationApi, type Slide, type Presentation } from '@/services/presentationApi';
+import { getPresentationApi, type Slide, type Presentation } from '@/services/presentationApi';
+
+const presentationApi = getPresentationApi();
 
 /**
  * Fetch AI result for a presentation (used for parsing unparsed presentations)

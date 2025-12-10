@@ -2,7 +2,7 @@ import { SidebarMenuItem } from '@/shared/components/ui/sidebar';
 import { Switch } from '@ui/switch';
 import { Label } from '@ui/label';
 import { useApiSwitching } from '@/shared/context/api-switching';
-import { API_MODE } from '@/shared/constants';
+import { API_MODE } from '@aiprimary/api';
 
 /**
  * @deprecated Use the settings to switch API modes instead for cleaner UI.

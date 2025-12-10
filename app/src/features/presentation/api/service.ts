@@ -1,4 +1,4 @@
-import { API_MODE, type ApiMode } from '@/shared/constants';
+import { API_MODE, type ApiMode } from '@aiprimary/api';
 import {
   type PresentationApiService,
   type OutlineItem,
@@ -95,10 +95,7 @@ export default class PresentationRealApiService implements PresentationApiServic
   }
 
   async draftPresentation(request: PresentationGenerateDraftRequest): Promise<Presentation> {
-    var response = await api.post<ApiResponse<Presentation>>(
-      `${this.baseUrl}/api/presentations/draft`,
-      request
-    );
+    var response = await api.post<ApiResponse<Presentation>>(`${this.baseUrl}/api/presentations`, request);
     return response.data.data;
   }
 

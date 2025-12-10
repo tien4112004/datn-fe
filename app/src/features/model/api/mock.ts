@@ -1,4 +1,4 @@
-import { API_MODE, type ApiMode } from '@/shared/constants';
+import { API_MODE, type ApiMode } from '@aiprimary/api';
 import type { ModelApiService, Model, ModelPatchData, ModelType } from '../types';
 
 export default class ModelMockService implements ModelApiService {

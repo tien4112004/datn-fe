@@ -1,4 +1,4 @@
-import { API_MODE, type ApiMode } from '@/shared/constants';
+import { API_MODE, type ApiMode } from '@aiprimary/api';
 import {
   type OutlineItem,
   type OutlineData,
@@ -413,7 +413,7 @@ export default class PresentationMockService implements PresentationApiService {
 
     const draftPresentation: Presentation = {
       id: crypto.randomUUID(),
-      title: 'Draft Presentation',
+      title: 'AI Generated Presentation',
       slides: [],
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),

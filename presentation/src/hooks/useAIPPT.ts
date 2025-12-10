@@ -9,7 +9,7 @@ import type {
   Slide,
   TextType,
 } from '@/types/slides';
-import type { AIPPTSlide } from '@/types/AIPPT';
+import type { AIPPTSlide } from '@aiprimary/core';
 import { useSlidesStore } from '@/store';
 import useAddSlidesOrElements from './useAddSlidesOrElements';
 import useSlideHandler from './useSlideHandler';

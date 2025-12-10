@@ -4,7 +4,11 @@ import { useTranslation } from 'react-i18next';
 import { useLoaderData, useParams } from 'react-router-dom';
 import type { Presentation } from '../types';
 import { getSearchParamAsBoolean } from '@/shared/utils/searchParams';
-import { useDetailPresentation } from '../hooks/useDetailPresentation';
+import {
+  usePresentationValidation,
+  useMessageRemote,
+  useSavePresentationRemote,
+} from '../hooks/useDetailPresentation';
 import { useUnsavedChangesBlocker } from '@/shared/hooks';
 import { UnsavedChangesDialog } from '@/shared/components/modals/UnsavedChangesDialog';
 import { SmallScreenDialog } from '@/shared/components/modals/SmallScreenDialog';
@@ -17,7 +21,9 @@ const DetailPage = () => {
   const isViewModeParam = getSearchParamAsBoolean('view', false) ?? false;
 
   // Validate and initialize - all processing logic is now in Vue
-  const { updateApp, isStreaming, isSaving } = useDetailPresentation(presentation, id, isGeneratingParam);
+  usePresentationValidation(id, presentation, isGeneratingParam);
+  useMessageRemote();
+  const { isSaving } = useSavePresentationRemote(id!);
   const { request } = usePresentationStore();
 
   // Listen for dirty state changes from Vue
@@ -29,34 +35,17 @@ const DetailPage = () => {
 
   return (
     <>
-      {!isGeneratingParam ? (
-        <VueRemoteWrapper
-          modulePath="editor"
-          mountProps={{
-            presentation,
-            isRemote: true,
-            mode: isViewModeParam ? 'view' : 'edit',
-          }}
-          className="vue-remote"
-          LoadingComponent={() => <GlobalSpinner text={t('presentation')} />}
-          onMountSuccess={updateApp}
-        />
-      ) : (
-        <VueRemoteWrapper
-          modulePath="editor"
-          mountProps={{
-            presentation,
-            isRemote: true,
-            mode: isViewModeParam ? 'view' : 'edit',
-            generationRequest: request,
-            isGenerating: true,
-          }}
-          className="vue-remote"
-          LoadingComponent={() => <GlobalSpinner text={t('presentation')} />}
-          onMountSuccess={updateApp}
-        />
-      )}
-      {isStreaming && <GlobalSpinner text={t('generatingPresentation')} />}
+      <VueRemoteWrapper
+        modulePath="editor"
+        mountProps={{
+          presentation,
+          isRemote: true,
+          mode: isViewModeParam ? 'view' : 'edit',
+          ...(isGeneratingParam && { generationRequest: request, isGenerating: true }),
+        }}
+        className="vue-remote"
+        LoadingComponent={() => <GlobalSpinner text={t('presentation')} />}
+      />
       {isSaving && <GlobalSpinner text={t('savingPresentation') || 'Saving presentation...'} />}
       <UnsavedChangesDialog
         open={showDialog}

@@ -45,6 +45,8 @@ export interface PresentationGenerationStartResponse {
   error?: unknown;
 }
 
+export type CreatePresentationRequest = Omit<Presentation, 'id' | 'createdAt' | 'updatedAt'>;
+
 export interface PresentationApiService extends Service {
   /**
    * @deprecated
@@ -56,7 +58,7 @@ export interface PresentationApiService extends Service {
   getOutlineItems(): Promise<OutlineItem[]>;
   getStreamedOutline(request: OutlineData, signal: AbortSignal): Promise<{ stream: AsyncIterable<string> }>;
   getPresentations(request: PresentationCollectionRequest): Promise<ApiResponse<Presentation[]>>;
-  createPresentation(data: Presentation): Promise<Presentation>;
+  createPresentation(data: CreatePresentationRequest): Promise<Presentation>;
   getPresentationById(id: string): Promise<Presentation | null>;
   getAiResultById(id: string): Promise<SlideLayoutSchema[]>;
   generatePresentation(request: PresentationGenerationRequest): Promise<PresentationGenerationResponse>;

@@ -22,7 +22,7 @@ import {
   type ImportResult,
   toMinimalSchedulePeriod,
 } from '../types';
-import { API_MODE, type ApiMode } from '@/shared/constants';
+import { API_MODE, type ApiMode } from '@aiprimary/api';
 import { mapPagination, type ApiResponse } from '@aiprimary/api';
 
 import { classesTable } from './data/classes.data';

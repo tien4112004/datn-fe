@@ -5,7 +5,7 @@ import { Button } from '@/shared/components/ui/button';
 import { Switch } from '@/shared/components/ui/switch';
 import { toast } from 'sonner';
 import { useApiSwitching } from '@/context/api-switching';
-import { API_MODE } from '@/shared/constants';
+import { API_MODE } from '@aiprimary/api';
 import BackendUrlForm from './BackendUrlForm';
 import AIModelsTable from './AIModelsTable';
 

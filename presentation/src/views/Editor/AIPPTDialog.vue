@@ -143,7 +143,7 @@ import { ref, onMounted } from 'vue';
 import { storeToRefs } from 'pinia';
 import api from '@/services';
 import useAIPPT from '@/hooks/useAIPPT';
-import type { AIPPTSlide } from '@/types/AIPPT';
+import type { AIPPTSlide } from '@aiprimary/core';
 import type { Slide, SlideTheme } from '@/types/slides';
 import message from '@/utils/message';
 import { useMainStore, useSlidesStore } from '@/store';

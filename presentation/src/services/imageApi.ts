@@ -1,69 +1,25 @@
-import { api } from '@aiprimary/api';
-import type { ApiResponse } from '@aiprimary/api';
+import { getApiServiceFactory } from '@aiprimary/api';
+import { ImageApiService } from './image';
+import { MockImageApiService } from './image-mock';
+import type { GeneratedImage, ImageGenerationParams, ImageGenerationResponse } from './image-types';
+
+// Re-export types
+export type { GeneratedImage, ImageGenerationParams, ImageGenerationResponse };
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 
-export interface GeneratedImage {
-  url: string;
-  [key: string]: any;
+export interface IImageApi {
+  generateImage(
+    presentationId: string,
+    slideId: string,
+    params: ImageGenerationParams
+  ): Promise<ImageGenerationResponse>;
 }
 
-export const imageApi = {
-  /**
-   * Generate an image for a slide element
-   * Called when a slide with image placeholder is added during generation
-   */
-  async generateImage(
-    presentationId: string,
-    slideId: string,
-    params: {
-      prompt: string;
-      model: {
-        name: string;
-        provider: string;
-      };
-    }
-  ): Promise<{ images: Array<{ url: string }> }> {
-    const response = await api.post<ApiResponse<{ images: Array<{ url: string }> }>>(
-      `${BASE_URL}/api/images/generate-in-presentation`,
-      {
-        prompt: params.prompt,
-        model: params.model.name,
-        provider: params.model.provider.toLowerCase(),
-      },
-      {
-        headers: {
-          'Idempotency-Key': `${presentationId}:${slideId}:image`,
-        },
-      }
-    );
-    return response.data.data;
-  },
-};
-
-export const mockImageApi = {
-  async generateImage(
-    presentationId: string,
-    slideId: string,
-    elementId: string,
-    params: {
-      prompt: string;
-      model: {
-        name: string;
-        provider: string;
-      };
-    }
-  ): Promise<{ images: Array<{ url: string }> }> {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({
-          images: [
-            {
-              url: 'https://picsum.photos/800/600?random=' + Math.floor(Math.random() * 1000),
-            },
-          ],
-        });
-      }, 2000); // Simulate 2 seconds delay
-    });
-  },
+/**
+ * Get an image API service instance based on current API mode
+ * Used with traditional JavaScript (non-reactive)
+ */
+export const getImageApi = (): IImageApi => {
+  return getApiServiceFactory<any>(MockImageApiService, ImageApiService, BASE_URL);
 };

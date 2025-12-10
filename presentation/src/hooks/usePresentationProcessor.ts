@@ -4,6 +4,7 @@ import type { SlideLayoutSchema, SlideViewport } from '@/utils/slideLayout/types
 import type { PPTImageElement, SlideTheme } from '@/types/slides';
 import { useSlidesStore } from '@/store';
 import { useGenerationStore, type AiResultSlide } from '@/store/generation';
+import { useSaveStore } from '@/store/save';
 import { useAiResultById, useUpdateSlides, useSetParsed } from './usePresentationMutations';
 import { useGenerateImage } from './useImageGeneration';
 import type { PresentationGenerationRequest } from '@/types/generation';
@@ -34,6 +35,7 @@ export function usePresentationProcessor(
   // Stores
   const generationStore = useGenerationStore();
   const slidesStore = useSlidesStore();
+  const saveStore = useSaveStore();
 
   const viewport: SlideViewport = {
     width: slidesStore.viewportSize,
@@ -55,7 +57,7 @@ export function usePresentationProcessor(
       const theme = presentation?.theme || slidesStore.theme;
 
       const slides = await Promise.all(
-        aiResult.map((slideData, i) =>
+        aiResult.map((slideData: any, i: number) =>
           convertToSlide(slideData as SlideLayoutSchema, viewport, theme, (i + 1).toString())
         )
       );
@@ -65,6 +67,7 @@ export function usePresentationProcessor(
 
       await updateSlides(slides);
       await setParsed();
+      saveStore.markSaved();
     } catch (error) {
       console.error('Error processing AI result:', error);
       dispatchMessage('error', 'Failed to process presentation');
@@ -178,6 +181,7 @@ export function usePresentationProcessor(
           // Single upsert at the end
           await updateSlides(slidesStore.slides);
           await setParsed();
+          saveStore.markSaved();
 
           processedStreamDataRef.value = [];
           generationStore.clearStreamedData();

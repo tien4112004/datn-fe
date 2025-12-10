@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { createApiServiceFactory, type Service } from '@/shared/api/base-service';
-import { API_MODE, type ApiMode } from '@/shared/constants';
+import { API_MODE, type ApiMode } from '@aiprimary/api';
 
 // Mock the useApiSwitching hook
 vi.mock('@/context/api-switching', () => ({

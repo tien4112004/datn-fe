@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { presentationApi, type PresentationGenerationRequest } from '../services/presentationApi';
+import { getPresentationApi, type PresentationGenerationRequest } from '../services/presentationApi';
 
 export interface AiResultSlide {
   result: Record<string, any>;
@@ -48,6 +48,7 @@ export const useGenerationStore = defineStore('generation', {
       this.error = null;
       this.request = request;
       this.abortController = new AbortController();
+      const presentationApi = getPresentationApi();
 
       try {
         const response = await presentationApi.streamPresentation(request, this.abortController.signal);

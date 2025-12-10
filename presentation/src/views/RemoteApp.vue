@@ -54,6 +54,14 @@ const { screening, presenter } = storeToRefs(useScreenStore());
 let isInitialLoad = ref(true);
 
 onMounted(async () => {
+  if (props.presentation.theme) {
+    slidesStore.setTheme(props.presentation.theme);
+  }
+
+  if (props.presentation.viewport) {
+    slidesStore.setViewportSize(props.presentation.viewport.width);
+  }
+
   const { isProcessing } = usePresentationProcessor(
     (containerStore.presentation || null) as any,
     props.presentation.id,

@@ -1,5 +1,5 @@
-import { getApiMode, useApiSwitching } from '@/context/api-switching';
-import { API_MODE, type ApiMode } from '@/shared/constants';
+import { getApiMode, API_MODE, type ApiMode } from '@aiprimary/api';
+import { useApiSwitching } from '@/shared/context/api-switching';
 
 export interface Service {
   baseUrl: string;

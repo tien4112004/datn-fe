@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, type ReactNode } from 'react';
-import { API_MODE, type ApiMode } from '@/shared/constants';
+import { getApiMode, setApiMode, type ApiMode } from '@aiprimary/api';
 
 interface ApiSwitchingContextType {
   apiMode: ApiMode;
@@ -7,8 +7,6 @@ interface ApiSwitchingContextType {
 }
 
 const ApiSwitchingContext = createContext<ApiSwitchingContextType | undefined>(undefined);
-
-const LOCAL_STORAGE_KEY = 'apiMode';
 
 export const useApiSwitching = () => {
   const context = useContext(ApiSwitchingContext);
@@ -18,17 +16,12 @@ export const useApiSwitching = () => {
   return context;
 };
 
-export const getApiMode = (): ApiMode => {
-  const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
-  return stored === API_MODE.mock || stored === API_MODE.real ? stored : API_MODE.mock;
-};
-
 export const ApiSwitchingProvider = ({ children }: { children: ReactNode }) => {
-  const [apiMode, setApiMode] = useState<ApiMode>(getApiMode());
+  const [apiMode, setApiModeState] = useState<ApiMode>(getApiMode());
 
   const handleSetApiMode = (mode: ApiMode) => {
+    setApiModeState(mode);
     setApiMode(mode);
-    localStorage.setItem(LOCAL_STORAGE_KEY, mode);
   };
 
   return (

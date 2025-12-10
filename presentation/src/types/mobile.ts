@@ -1,1 +1,1 @@
-export type Mode = 'preview' | 'player' | 'editor';
+export type { Mode } from '@aiprimary/core';

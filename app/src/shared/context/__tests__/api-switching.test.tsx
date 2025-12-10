@@ -1,7 +1,7 @@
 import { render, screen, act } from '@testing-library/react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { ApiSwitchingProvider, useApiSwitching } from '@/shared/context/api-switching';
-import { API_MODE } from '@/shared/constants';
+import { API_MODE } from '@aiprimary/api';
 
 // Mock localStorage
 const localStorageMock = {

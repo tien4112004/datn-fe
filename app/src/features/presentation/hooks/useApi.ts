@@ -164,7 +164,6 @@ export const useCreateBlankPresentation = () => {
   return useMutation({
     mutationFn: async () => {
       const presentation = await presentationApiService.createPresentation({
-        id: crypto.randomUUID(),
         title: 'Untitled Presentation',
         isParsed: true,
         slides: [
@@ -393,7 +392,12 @@ export const useDraftPresentation = () => {
 
   return useMutation({
     mutationFn: async (request: PresentationGenerateDraftRequest) => {
-      const draftPresentation = await presentationApiService.draftPresentation(request);
+      const draftPresentation = await presentationApiService.createPresentation({
+        title: 'AI Generated Presentation',
+        isParsed: true,
+        slides: [],
+        ...request,
+      });
       return draftPresentation;
     },
   });

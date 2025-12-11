@@ -2,272 +2,272 @@
 name: CI/CD
 
 on:
-  pull_request:
-    branches:
-      - main
+    pull_request:
+        branches:
+            - main
 
 env:
-  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
-  TURBO_TEAM: "datn-fe"
-  PRODUCTION_PRESENTATION_URL: "https://datn-fe-presentation.vercel.app"
+    TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+    TURBO_TEAM: "datn-fe"
+    PRODUCTION_PRESENTATION_URL: "https://datn-fe-presentation.vercel.app"
 jobs:
-  path_filter:
-    name: Check for path changes
-    runs-on: ubuntu-latest
-    permissions:
-      pull-requests: read
-      contents: read
-    outputs:
-      presentation_changed: ${{ steps.filter.outputs.presentation }}
-      app_changed: ${{ steps.filter.outputs.app }}
-      something_changed: ${{ steps.filter.outputs.presentation == 'true' || steps.filter.outputs.app == 'true' }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dorny/paths-filter@v2
-        id: filter
-        with:
-          filters: |
-            presentation:
-              - 'presentation/**'
-            app:
-              - 'container/**'
+    path_filter:
+        name: Check for path changes
+        runs-on: ubuntu-latest
+        permissions:
+            pull-requests: read
+            contents: read
+        outputs:
+            presentation_changed: ${{ steps.filter.outputs.presentation }}
+            app_changed: ${{ steps.filter.outputs.app }}
+            something_changed: ${{ steps.filter.outputs.presentation == 'true' || steps.filter.outputs.app == 'true' }}
+        steps:
+            - uses: actions/checkout@v4
+            - uses: dorny/paths-filter@v2
+              id: filter
+              with:
+                  filters: |
+                      presentation:
+                        - 'presentation/**'
+                      app:
+                        - 'app/**'
 
-  ci:
-    name: Build and Test
-    timeout-minutes: 15
-    runs-on: ubuntu-latest
-    needs: path_filter
-    if: needs.path_filter.outputs.something_changed == 'true'
-    steps:
-      - name: Check out code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 2
+    ci:
+        name: Build and Test
+        timeout-minutes: 15
+        runs-on: ubuntu-latest
+        needs: path_filter
+        if: needs.path_filter.outputs.something_changed == 'true'
+        steps:
+            - name: Check out code
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 2
 
-      - name: Cache turbo build setup
-        uses: actions/cache@v4
-        with:
-          path: .turbo
-          key: ${{ runner.os }}-turbo-${{ hashFiles('**/package.json', '**/pnpm-lock.yaml') }}-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-turbo-${{ hashFiles('**/package.json', '**/pnpm-lock.yaml') }}-
-            ${{ runner.os }}-turbo-
+            - name: Cache turbo build setup
+              uses: actions/cache@v4
+              with:
+                  path: .turbo
+                  key: ${{ runner.os }}-turbo-${{ hashFiles('**/package.json', '**/pnpm-lock.yaml') }}-${{ github.sha }}
+                  restore-keys: |
+                      ${{ runner.os }}-turbo-${{ hashFiles('**/package.json', '**/pnpm-lock.yaml') }}-
+                      ${{ runner.os }}-turbo-
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10.18.1
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v4
+              with:
+                  version: 10.18.1
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          registry-url: https://registry.npmjs.org
-          cache: pnpm
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 22
+                  registry-url: https://registry.npmjs.org
+                  cache: pnpm
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
 
-      - name: Build
-        run: pnpm build
+            - name: Build
+              run: pnpm build
 
-      - name: Test
-        run: pnpm test
+            - name: Test
+              run: pnpm test
 
-  deploy_presentation:
-    name: Deploy Presentation Preview
-    runs-on: ubuntu-latest
-    permissions:
-      pull-requests: write
-      contents: read
-    needs: [ci, path_filter]
-    outputs:
-      preview_url: ${{ steps.deploy_vercel.outputs.preview_url }}
-    if: needs.path_filter.outputs.presentation_changed == 'true'
-    env:
-      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PRESENTATION_ID }}
-    steps:
-      - uses: actions/checkout@v4
+    deploy_presentation:
+        name: Deploy Presentation Preview
+        runs-on: ubuntu-latest
+        permissions:
+            pull-requests: write
+            contents: read
+        needs: [ci, path_filter]
+        outputs:
+            preview_url: ${{ steps.deploy_vercel.outputs.preview_url }}
+        if: needs.path_filter.outputs.presentation_changed == 'true'
+        env:
+            VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+            VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PRESENTATION_ID }}
+        steps:
+            - uses: actions/checkout@v4
 
-      - name: Cache turbo build setup
-        uses: actions/cache@v4
-        with:
-          path: .turbo
-          key: ${{ runner.os }}-turbo-${{ hashFiles('**/package.json', '**/pnpm-lock.yaml') }}-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-turbo-${{ hashFiles('**/package.json', '**/pnpm-lock.yaml') }}-
-            ${{ runner.os }}-turbo-
+            - name: Cache turbo build setup
+              uses: actions/cache@v4
+              with:
+                  path: .turbo
+                  key: ${{ runner.os }}-turbo-${{ hashFiles('**/package.json', '**/pnpm-lock.yaml') }}-${{ github.sha }}
+                  restore-keys: |
+                      ${{ runner.os }}-turbo-${{ hashFiles('**/package.json', '**/pnpm-lock.yaml') }}-
+                      ${{ runner.os }}-turbo-
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10.18.1
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v4
+              with:
+                  version: 10.18.1
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          registry-url: https://registry.npmjs.org
-          cache: pnpm
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 22
+                  registry-url: https://registry.npmjs.org
+                  cache: pnpm
 
-      - name: Get npm global path
-        run: |
-          echo "NPM_GLOBAL_DIR=$(npm config get prefix)" >> $GITHUB_ENV
+            - name: Get npm global path
+              run: |
+                  echo "NPM_GLOBAL_DIR=$(npm config get prefix)" >> $GITHUB_ENV
 
-      - name: Cache global npm packages
-        uses: actions/cache@v4
-        id: npm-global-cache
-        with:
-          path: ${{ env.NPM_GLOBAL_DIR }}
-          key: ${{ runner.os }}-npm-global-${{ hashFiles('package.json') }}
-          restore-keys: |
-            ${{ runner.os }}-npm-global-
+            - name: Cache global npm packages
+              uses: actions/cache@v4
+              id: npm-global-cache
+              with:
+                  path: ${{ env.NPM_GLOBAL_DIR }}
+                  key: ${{ runner.os }}-npm-global-${{ hashFiles('package.json') }}
+                  restore-keys: |
+                      ${{ runner.os }}-npm-global-
 
-      - name: Install Vercel CLI
-        if: ${{ steps.npm-global-cache.outputs.cache-hit != 'true' }}
-        run: npm install --global vercel@latest
+            - name: Install Vercel CLI
+              if: ${{ steps.npm-global-cache.outputs.cache-hit != 'true' }}
+              run: npm install --global vercel@latest
 
-      - name: Pull Vercel Environment Information
-        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+            - name: Pull Vercel Environment Information
+              run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
 
-      - name: Build and Deploy Project
-        id: deploy_vercel
-        run: |
-          # Build the project (no VITE_BASE_URL needed - uses dynamic detection)
-          vercel build --token=${{ secrets.VERCEL_TOKEN }}
+            - name: Build and Deploy Project
+              id: deploy_vercel
+              run: |
+                  # Build the project (no VITE_BASE_URL needed - uses dynamic detection)
+                  vercel build --token=${{ secrets.VERCEL_TOKEN }}
 
-          # Deploy to get the preview URL
-          DEPLOY_OUTPUT=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})
-          echo "$DEPLOY_OUTPUT"
-          PREVIEW_URL=$(echo "$DEPLOY_OUTPUT" | grep -oE "https://[a-zA-Z0-9.-]+\.vercel\.app" | tail -n 1)
-          echo "preview_url=$PREVIEW_URL" >> "$GITHUB_OUTPUT"
+                  # Deploy to get the preview URL
+                  DEPLOY_OUTPUT=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})
+                  echo "$DEPLOY_OUTPUT"
+                  PREVIEW_URL=$(echo "$DEPLOY_OUTPUT" | grep -oE "https://[a-zA-Z0-9.-]+\.vercel\.app" | tail -n 1)
+                  echo "preview_url=$PREVIEW_URL" >> "$GITHUB_OUTPUT"
 
-  deploy_app:
-    name: Deploy App Preview
-    runs-on: ubuntu-latest
-    permissions:
-      pull-requests: write
-      contents: read
-    needs: [ci, path_filter, deploy_presentation]
-    if: always() && needs.path_filter.outputs.app_changed == 'true' && (needs.deploy_presentation.result == 'success' || needs.deploy_presentation.result == 'skipped')
-    env:
-      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_CONTAINER_ID }}
-    steps:
-      - uses: actions/checkout@v4
+    deploy_app:
+        name: Deploy App Preview
+        runs-on: ubuntu-latest
+        permissions:
+            pull-requests: write
+            contents: read
+        needs: [ci, path_filter, deploy_presentation]
+        if: always() && needs.path_filter.outputs.app_changed == 'true' && (needs.deploy_presentation.result == 'success' || needs.deploy_presentation.result == 'skipped')
+        env:
+            VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+            VERCEL_PROJECT_ID: ${{ secrets.VERCEL_CONTAINER_ID }}
+        steps:
+            - uses: actions/checkout@v4
 
-      - name: Cache turbo build setup
-        uses: actions/cache@v4
-        with:
-          path: .turbo
-          key: ${{ runner.os }}-turbo-${{ hashFiles('**/package.json', '**/pnpm-lock.yaml') }}-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-turbo-${{ hashFiles('**/package.json', '**/pnpm-lock.yaml') }}-
-            ${{ runner.os }}-turbo-
+            - name: Cache turbo build setup
+              uses: actions/cache@v4
+              with:
+                  path: .turbo
+                  key: ${{ runner.os }}-turbo-${{ hashFiles('**/package.json', '**/pnpm-lock.yaml') }}-${{ github.sha }}
+                  restore-keys: |
+                      ${{ runner.os }}-turbo-${{ hashFiles('**/package.json', '**/pnpm-lock.yaml') }}-
+                      ${{ runner.os }}-turbo-
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10.18.1
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v4
+              with:
+                  version: 10.18.1
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          registry-url: https://registry.npmjs.org
-          cache: pnpm
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 22
+                  registry-url: https://registry.npmjs.org
+                  cache: pnpm
 
-      - name: Get npm global path
-        run: |
-          echo "NPM_GLOBAL_DIR=$(npm config get prefix)" >> $GITHUB_ENV
+            - name: Get npm global path
+              run: |
+                  echo "NPM_GLOBAL_DIR=$(npm config get prefix)" >> $GITHUB_ENV
 
-      - name: Cache global npm packages
-        uses: actions/cache@v4
-        id: npm-global-cache
-        with:
-          path: ${{ env.NPM_GLOBAL_DIR }}
-          key: ${{ runner.os }}-npm-global-${{ hashFiles('package.json') }}
-          restore-keys: |
-            ${{ runner.os }}-npm-global-
+            - name: Cache global npm packages
+              uses: actions/cache@v4
+              id: npm-global-cache
+              with:
+                  path: ${{ env.NPM_GLOBAL_DIR }}
+                  key: ${{ runner.os }}-npm-global-${{ hashFiles('package.json') }}
+                  restore-keys: |
+                      ${{ runner.os }}-npm-global-
 
-      - name: Install Vercel CLI
-        if: ${{ steps.npm-global-cache.outputs.cache-hit != 'true' }}
-        run: npm install --global vercel@latest
+            - name: Install Vercel CLI
+              if: ${{ steps.npm-global-cache.outputs.cache-hit != 'true' }}
+              run: npm install --global vercel@latest
 
-      - name: Pull Vercel Environment Information
-        run: vercel pull --yes --environment=preview --git-branch=${{ github.head_ref }} --token=${{ secrets.VERCEL_TOKEN }}
+            - name: Pull Vercel Environment Information
+              run: vercel pull --yes --environment=preview --git-branch=${{ github.head_ref }} --token=${{ secrets.VERCEL_TOKEN }}
 
-      - name: Set Environment Variables and Build
-        id: deploy_vercel
-        run: |
-          # Determine PRESENTATION_URL with fallback
-          if [ "${{ needs.deploy_presentation.result }}" = "success" ] && [ -n "${{ needs.deploy_presentation.outputs.preview_url }}" ]; then
-            PRESENTATION_URL="${{ needs.deploy_presentation.outputs.preview_url }}"
-          else
-            PRESENTATION_URL="${{ env.PRODUCTION_PRESENTATION_URL }}"
-          fi
+            - name: Set Environment Variables and Build
+              id: deploy_vercel
+              run: |
+                  # Determine PRESENTATION_URL with fallback
+                  if [ "${{ needs.deploy_presentation.result }}" = "success" ] && [ -n "${{ needs.deploy_presentation.outputs.preview_url }}" ]; then
+                    PRESENTATION_URL="${{ needs.deploy_presentation.outputs.preview_url }}"
+                  else
+                    PRESENTATION_URL="${{ env.PRODUCTION_PRESENTATION_URL }}"
+                  fi
 
-          echo "Using PRESENTATION_URL: $PRESENTATION_URL"
+                  echo "Using PRESENTATION_URL: $PRESENTATION_URL"
 
-          # Set environment variable for this branch
-          vercel env rm PRESENTATION_URL preview ${{ github.head_ref }} --yes --token=${{ secrets.VERCEL_TOKEN }} || true
-          echo "$PRESENTATION_URL" | vercel env add PRESENTATION_URL preview ${{ github.head_ref }} --token=${{ secrets.VERCEL_TOKEN }}
+                  # Set environment variable for this branch
+                  vercel env rm PRESENTATION_URL preview ${{ github.head_ref }} --yes --token=${{ secrets.VERCEL_TOKEN }} || true
+                  echo "$PRESENTATION_URL" | vercel env add PRESENTATION_URL preview ${{ github.head_ref }} --token=${{ secrets.VERCEL_TOKEN }}
 
-          # Generate vercel.json with the correct destination
-          cat <<EOF > container/vercel.json
-          {
-            "rewrites": [
-                {
-                    "source": "/vue-remote",
-                    "destination": "$PRESENTATION_URL"
-                },
-                {
-                    "source": "/((?!api/).*)",
-                    "destination": "/"
-                }
-            ]
-          }
-          EOF
-          echo "Generated vercel.json:"
-          cat container/vercel.json
+                  # Generate vercel.json with the correct destination
+                  cat <<EOF > app/vercel.json
+                  {
+                    "rewrites": [
+                        {
+                            "source": "/vue-remote",
+                            "destination": "$PRESENTATION_URL"
+                        },
+                        {
+                            "source": "/((?!api/).*)",
+                            "destination": "/"
+                        }
+                    ]
+                  }
+                  EOF
+                  echo "Generated vercel.json:"
+                  cat app/vercel.json
 
-          # Build with the environment variable
-          PRESENTATION_URL="$PRESENTATION_URL" vercel build --token=${{ secrets.VERCEL_TOKEN }}
+                  # Build with the environment variable
+                  PRESENTATION_URL="$PRESENTATION_URL" vercel build --token=${{ secrets.VERCEL_TOKEN }}
 
-          # Deploy the project
-          DEPLOY_OUTPUT=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }} --env PRESENTATION_URL="$PRESENTATION_URL")
-          echo "$DEPLOY_OUTPUT"
-          PREVIEW_URL=$(echo "$DEPLOY_OUTPUT" | grep -oE "https://[a-zA-Z0-9.-]+\.vercel\.app" | tail -n 1)
-          echo "preview_url=$PREVIEW_URL" >> "$GITHUB_OUTPUT"
+                  # Deploy the project
+                  DEPLOY_OUTPUT=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }} --env PRESENTATION_URL="$PRESENTATION_URL")
+                  echo "$DEPLOY_OUTPUT"
+                  PREVIEW_URL=$(echo "$DEPLOY_OUTPUT" | grep -oE "https://[a-zA-Z0-9.-]+\.vercel\.app" | tail -n 1)
+                  echo "preview_url=$PREVIEW_URL" >> "$GITHUB_OUTPUT"
 
-      - name: Delete Previous Comments
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const comments = await github.rest.issues.listComments({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo
-            });
-            for (const comment of comments.data) {
-              if (comment.body.includes('Vercel') && comment.user.login === 'github-actions[bot]') {
-                await github.rest.issues.deleteComment({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  comment_id: comment.id
-                });
-              }
-            }
+            - name: Delete Previous Comments
+              uses: actions/github-script@v6
+              with:
+                  script: |
+                      const comments = await github.rest.issues.listComments({
+                        issue_number: context.issue.number,
+                        owner: context.repo.owner,
+                        repo: context.repo.repo
+                      });
+                      for (const comment of comments.data) {
+                        if (comment.body.includes('Vercel') && comment.user.login === 'github-actions[bot]') {
+                          await github.rest.issues.deleteComment({
+                            owner: context.repo.owner,
+                            repo: context.repo.repo,
+                            comment_id: comment.id
+                          });
+                        }
+                      }
 
-      - name: Add PR Comment
-        if: steps.deploy_vercel.outputs.preview_url != ''
-        uses: actions/github-script@v6
-        with:
-          script: |
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: `Vercel Preview: ${{ steps.deploy_vercel.outputs.preview_url }}`
-            })
+            - name: Add PR Comment
+              if: steps.deploy_vercel.outputs.preview_url != ''
+              uses: actions/github-script@v6
+              with:
+                  script: |
+                      github.rest.issues.createComment({
+                        issue_number: context.issue.number,
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        body: `Vercel Preview: ${{ steps.deploy_vercel.outputs.preview_url }}`
+                      })

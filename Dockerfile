@@ -22,7 +22,7 @@ FROM node:20-alpine AS app-production
 
 WORKDIR /app
 
-COPY --from=builder /app/container/dist ./dist
+COPY --from=builder /app/app/dist ./dist
 
 RUN npm install -g serve
 

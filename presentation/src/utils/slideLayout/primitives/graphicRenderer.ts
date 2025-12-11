@@ -1,5 +1,5 @@
 import {
-  ShapePathFormulasKeys,
+  SHAPE_PATH_FORMULAS_KEYS,
   type PPTLineElement,
   type PPTShapeElement,
   type SlideTheme,
@@ -538,7 +538,7 @@ function renderTrapezoidPyramid(
 
     shapes.push({
       type: 'shape',
-      pathFormula: ShapePathFormulasKeys.TRAPEZOID,
+      pathFormula: SHAPE_PATH_FORMULAS_KEYS.TRAPEZOID,
       id: nanoid(10),
       left,
       top,
@@ -548,7 +548,7 @@ function renderTrapezoidPyramid(
       fixedRatio: false,
       fill,
       keypoints: [keypoint],
-      path: SHAPE_PATH_FORMULAS[ShapePathFormulasKeys.TRAPEZOID].formula(width, height, [keypoint]),
+      path: SHAPE_PATH_FORMULAS[SHAPE_PATH_FORMULAS_KEYS.TRAPEZOID].formula(width, height, [keypoint]),
       viewBox: [width, height],
     } satisfies PPTShapeElement);
   });

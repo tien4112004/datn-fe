@@ -1,0 +1,10 @@
+{
+  "name": "@aiprimary/core",
+  "exports": {
+    ".": "./src/index.ts",
+    "./*": "./src/*"
+  },
+  "devDependencies": {
+    "typescript": "latest"
+  }
+}

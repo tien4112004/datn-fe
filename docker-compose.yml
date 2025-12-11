@@ -7,7 +7,7 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
-      - /app/container/node_modules
+      - /app/app/node_modules
       - /app/presentation/node_modules
     ports:
       - "5173:5173" # Container dev port

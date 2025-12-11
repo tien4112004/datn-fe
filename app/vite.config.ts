@@ -30,6 +30,7 @@ export default defineConfig(({ mode }) => {
             shareScope: 'default',
           },
         },
+        dts: false,
         exposes: {},
         filename: 'remoteEntry.js',
         shared: {

@@ -4,7 +4,7 @@ import {
   type PPTShapeElement,
   type SlideBackground,
   type SlideTheme,
-  ShapePathFormulasKeys,
+  SHAPE_PATH_FORMULAS_KEYS,
   type ImageElementClip,
 } from '@/types/slides';
 import { getImageSize } from '../../image';
@@ -393,7 +393,7 @@ export async function createImageElement(
  * Create a card (shape) element
  */
 export function createCard(container: LayoutBlockInstance): PPTShapeElement {
-  const formula = SHAPE_PATH_FORMULAS[ShapePathFormulasKeys.ROUND_RECT_CUSTOM];
+  const formula = SHAPE_PATH_FORMULAS[SHAPE_PATH_FORMULAS_KEYS.ROUND_RECT_CUSTOM];
   const radiusValue = container.border?.radius || 0;
 
   const radiusMultiplier = radiusValue / Math.min(container.bounds.width, container.bounds.height);
@@ -418,7 +418,7 @@ export function createCard(container: LayoutBlockInstance): PPTShapeElement {
   return {
     id: crypto.randomUUID(),
     type: 'shape',
-    pathFormula: ShapePathFormulasKeys.ROUND_RECT_CUSTOM,
+    pathFormula: SHAPE_PATH_FORMULAS_KEYS.ROUND_RECT_CUSTOM,
     left: container.bounds.left,
     top: container.bounds.top,
     width: container.bounds.width,

@@ -221,6 +221,9 @@ importers:
       '@aiprimary/api':
         specifier: workspace:*
         version: link:../packages/api
+      '@aiprimary/core':
+        specifier: workspace:*
+        version: link:../packages/core
       '@blocknote/core':
         specifier: ^0.35.0
         version: 0.35.0(@types/hast@3.0.4)
@@ -559,6 +562,9 @@ importers:
       '@aiprimary/api':
         specifier: workspace:*
         version: link:../packages/api
+      '@aiprimary/core':
+        specifier: workspace:*
+        version: link:../packages/core
       '@tanstack/vue-query':
         specifier: ^5.28.0
         version: 5.92.1(vue@3.5.17(typescript@5.3.3))

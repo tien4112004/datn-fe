@@ -18,7 +18,7 @@
 
 <script lang="ts" setup>
 import { computed } from 'vue';
-import { ElementTypes, type PPTElement } from '@/types/slides';
+import { ELEMENT_TYPES, type PPTElement } from '@/types/slides';
 import type { ContextmenuItem } from '@/components/Contextmenu/types';
 import { useI18n } from 'vue-i18n';
 
@@ -54,15 +54,15 @@ const { t } = useI18n();
 
 const currentElementComponent = computed<unknown>(() => {
   const elementTypeMap = {
-    [ElementTypes.IMAGE]: ImageElement,
-    [ElementTypes.TEXT]: TextElement,
-    [ElementTypes.SHAPE]: ShapeElement,
-    [ElementTypes.LINE]: LineElement,
-    [ElementTypes.CHART]: ChartElement,
-    [ElementTypes.TABLE]: TableElement,
-    [ElementTypes.LATEX]: LatexElement,
-    [ElementTypes.VIDEO]: VideoElement,
-    [ElementTypes.AUDIO]: AudioElement,
+    [ELEMENT_TYPES.IMAGE]: ImageElement,
+    [ELEMENT_TYPES.TEXT]: TextElement,
+    [ELEMENT_TYPES.SHAPE]: ShapeElement,
+    [ELEMENT_TYPES.LINE]: LineElement,
+    [ELEMENT_TYPES.CHART]: ChartElement,
+    [ELEMENT_TYPES.TABLE]: TableElement,
+    [ELEMENT_TYPES.LATEX]: LatexElement,
+    [ELEMENT_TYPES.VIDEO]: VideoElement,
+    [ELEMENT_TYPES.AUDIO]: AudioElement,
   };
   return elementTypeMap[props.elementInfo.type] || null;
 });

@@ -12,7 +12,7 @@
 
 <script lang="ts" setup>
 import { computed } from 'vue';
-import { ElementTypes, type PPTElement } from '@/types/slides';
+import { ELEMENT_TYPES, type PPTElement } from '@/types/slides';
 
 import BaseImageElement from '@/views/components/element/ImageElement/BaseImageElement.vue';
 import BaseTextElement from '@/views/components/element/TextElement/BaseTextElement.vue';
@@ -31,24 +31,24 @@ const props = defineProps<{
 
 const currentElementComponent = computed<unknown>(() => {
   const elementTypeMap = {
-    [ElementTypes.IMAGE]: BaseImageElement,
-    [ElementTypes.IMAGE.toUpperCase()]: BaseImageElement,
-    [ElementTypes.TEXT]: BaseTextElement,
-    [ElementTypes.TEXT.toUpperCase()]: BaseTextElement,
-    [ElementTypes.SHAPE]: BaseShapeElement,
-    [ElementTypes.SHAPE.toUpperCase()]: BaseShapeElement,
-    [ElementTypes.LINE]: BaseLineElement,
-    [ElementTypes.LINE.toUpperCase()]: BaseLineElement,
-    [ElementTypes.CHART]: BaseChartElement,
-    [ElementTypes.CHART.toUpperCase()]: BaseChartElement,
-    [ElementTypes.TABLE]: BaseTableElement,
-    [ElementTypes.TABLE.toUpperCase()]: BaseTableElement,
-    [ElementTypes.LATEX]: BaseLatexElement,
-    [ElementTypes.LATEX.toUpperCase()]: BaseLatexElement,
-    [ElementTypes.VIDEO]: BaseVideoElement,
-    [ElementTypes.VIDEO.toUpperCase()]: BaseVideoElement,
-    [ElementTypes.AUDIO]: BaseAudioElement,
-    [ElementTypes.AUDIO.toUpperCase()]: BaseAudioElement,
+    [ELEMENT_TYPES.IMAGE]: BaseImageElement,
+    [ELEMENT_TYPES.IMAGE.toUpperCase()]: BaseImageElement,
+    [ELEMENT_TYPES.TEXT]: BaseTextElement,
+    [ELEMENT_TYPES.TEXT.toUpperCase()]: BaseTextElement,
+    [ELEMENT_TYPES.SHAPE]: BaseShapeElement,
+    [ELEMENT_TYPES.SHAPE.toUpperCase()]: BaseShapeElement,
+    [ELEMENT_TYPES.LINE]: BaseLineElement,
+    [ELEMENT_TYPES.LINE.toUpperCase()]: BaseLineElement,
+    [ELEMENT_TYPES.CHART]: BaseChartElement,
+    [ELEMENT_TYPES.CHART.toUpperCase()]: BaseChartElement,
+    [ELEMENT_TYPES.TABLE]: BaseTableElement,
+    [ELEMENT_TYPES.TABLE.toUpperCase()]: BaseTableElement,
+    [ELEMENT_TYPES.LATEX]: BaseLatexElement,
+    [ELEMENT_TYPES.LATEX.toUpperCase()]: BaseLatexElement,
+    [ELEMENT_TYPES.VIDEO]: BaseVideoElement,
+    [ELEMENT_TYPES.VIDEO.toUpperCase()]: BaseVideoElement,
+    [ELEMENT_TYPES.AUDIO]: BaseAudioElement,
+    [ELEMENT_TYPES.AUDIO.toUpperCase()]: BaseAudioElement,
   };
   return elementTypeMap[props.elementInfo.type] || null;
 });

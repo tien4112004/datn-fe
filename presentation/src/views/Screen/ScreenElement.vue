@@ -20,7 +20,7 @@
 import { computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useSlidesStore } from '@/store';
-import { ElementTypes, type PPTElement } from '@/types/slides';
+import { ELEMENT_TYPES, type PPTElement } from '@/types/slides';
 
 import BaseImageElement from '@/views/components/element/ImageElement/BaseImageElement.vue';
 import BaseTextElement from '@/views/components/element/TextElement/BaseTextElement.vue';
@@ -42,15 +42,15 @@ const props = defineProps<{
 
 const currentElementComponent = computed<unknown>(() => {
   const elementTypeMap = {
-    [ElementTypes.IMAGE]: BaseImageElement,
-    [ElementTypes.TEXT]: BaseTextElement,
-    [ElementTypes.SHAPE]: BaseShapeElement,
-    [ElementTypes.LINE]: BaseLineElement,
-    [ElementTypes.CHART]: BaseChartElement,
-    [ElementTypes.TABLE]: BaseTableElement,
-    [ElementTypes.LATEX]: BaseLatexElement,
-    [ElementTypes.VIDEO]: ScreenVideoElement,
-    [ElementTypes.AUDIO]: ScreenAudioElement,
+    [ELEMENT_TYPES.IMAGE]: BaseImageElement,
+    [ELEMENT_TYPES.TEXT]: BaseTextElement,
+    [ELEMENT_TYPES.SHAPE]: BaseShapeElement,
+    [ELEMENT_TYPES.LINE]: BaseLineElement,
+    [ELEMENT_TYPES.CHART]: BaseChartElement,
+    [ELEMENT_TYPES.TABLE]: BaseTableElement,
+    [ELEMENT_TYPES.LATEX]: BaseLatexElement,
+    [ELEMENT_TYPES.VIDEO]: ScreenVideoElement,
+    [ELEMENT_TYPES.AUDIO]: ScreenAudioElement,
   };
   return elementTypeMap[props.elementInfo.type] || null;
 });

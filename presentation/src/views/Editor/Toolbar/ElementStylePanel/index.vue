@@ -8,7 +8,7 @@
 import { computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useMainStore } from '@/store';
-import { ElementTypes } from '@/types/slides';
+import { ELEMENT_TYPES } from '@/types/slides';
 
 import TextStylePanel from './TextStylePanel.vue';
 import ImageStylePanel from './ImageStylePanel.vue';
@@ -21,15 +21,15 @@ import VideoStylePanel from './VideoStylePanel.vue';
 import AudioStylePanel from './AudioStylePanel.vue';
 
 const panelMap = {
-  [ElementTypes.TEXT]: TextStylePanel,
-  [ElementTypes.IMAGE]: ImageStylePanel,
-  [ElementTypes.SHAPE]: ShapeStylePanel,
-  [ElementTypes.LINE]: LineStylePanel,
-  [ElementTypes.CHART]: ChartStylePanel,
-  [ElementTypes.TABLE]: TableStylePanel,
-  [ElementTypes.LATEX]: LatexStylePanel,
-  [ElementTypes.VIDEO]: VideoStylePanel,
-  [ElementTypes.AUDIO]: AudioStylePanel,
+  [ELEMENT_TYPES.TEXT]: TextStylePanel,
+  [ELEMENT_TYPES.IMAGE]: ImageStylePanel,
+  [ELEMENT_TYPES.SHAPE]: ShapeStylePanel,
+  [ELEMENT_TYPES.LINE]: LineStylePanel,
+  [ELEMENT_TYPES.CHART]: ChartStylePanel,
+  [ELEMENT_TYPES.TABLE]: TableStylePanel,
+  [ELEMENT_TYPES.LATEX]: LatexStylePanel,
+  [ELEMENT_TYPES.VIDEO]: VideoStylePanel,
+  [ELEMENT_TYPES.AUDIO]: AudioStylePanel,
 };
 
 const { handleElement } = storeToRefs(useMainStore());

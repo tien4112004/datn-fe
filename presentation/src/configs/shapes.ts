@@ -2,7 +2,7 @@
 
 // Non-professional designers can use this application to draw basic shapes: https://github.com/pipipi-pikachu/svgPathCreator
 
-import { ShapePathFormulasKeys } from '@/types/slides';
+import { SHAPE_PATH_FORMULAS_KEYS, type ShapePathFormulasKeys } from '@/types/slides';
 import { computed, type ComputedRef } from 'vue';
 import { useI18n } from 'vue-i18n';
 
@@ -34,7 +34,7 @@ export interface ShapePathFormula {
 export const SHAPE_PATH_FORMULAS: {
   [key: string]: ShapePathFormula;
 } = {
-  [ShapePathFormulasKeys.ROUND_RECT]: {
+  [SHAPE_PATH_FORMULAS_KEYS.ROUND_RECT]: {
     editable: true,
     defaultValue: [0.125],
     range: [[0, 0.5]],
@@ -49,7 +49,7 @@ export const SHAPE_PATH_FORMULAS: {
       } L 0 ${radius} Q 0 0 ${radius} 0 Z`;
     },
   },
-  [ShapePathFormulasKeys.ROUND_RECT_CUSTOM]: {
+  [SHAPE_PATH_FORMULAS_KEYS.ROUND_RECT_CUSTOM]: {
     editable: false,
     defaultValue: [0.125, 0.125, 0.125, 0.125],
     range: [
@@ -112,7 +112,7 @@ export const SHAPE_PATH_FORMULAS: {
       return path;
     },
   },
-  [ShapePathFormulasKeys.CUT_RECT_DIAGONAL]: {
+  [SHAPE_PATH_FORMULAS_KEYS.CUT_RECT_DIAGONAL]: {
     editable: true,
     defaultValue: [0.2],
     range: [[0, 0.9]],
@@ -125,7 +125,7 @@ export const SHAPE_PATH_FORMULAS: {
       } 0 L ${width} ${radius} L ${width} ${height} L ${radius} ${height} Z`;
     },
   },
-  [ShapePathFormulasKeys.CUT_RECT_SINGLE]: {
+  [SHAPE_PATH_FORMULAS_KEYS.CUT_RECT_SINGLE]: {
     editable: true,
     defaultValue: [0.2],
     range: [[0, 0.9]],
@@ -136,7 +136,7 @@ export const SHAPE_PATH_FORMULAS: {
       return `M 0 ${height} L 0 0 L ${width - radius} 0 L ${width} ${radius} L ${width} ${height} Z`;
     },
   },
-  [ShapePathFormulasKeys.CUT_RECT_SAMESIDE]: {
+  [SHAPE_PATH_FORMULAS_KEYS.CUT_RECT_SAMESIDE]: {
     editable: true,
     defaultValue: [0.2],
     range: [[0, 0.5]],
@@ -149,7 +149,7 @@ export const SHAPE_PATH_FORMULAS: {
       } 0 L ${width} ${radius} L ${width} ${height} L 0 ${height} Z`;
     },
   },
-  [ShapePathFormulasKeys.ROUND_RECT_DIAGONAL]: {
+  [SHAPE_PATH_FORMULAS_KEYS.ROUND_RECT_DIAGONAL]: {
     editable: true,
     defaultValue: [0.125],
     range: [[0, 1]],
@@ -162,7 +162,7 @@ export const SHAPE_PATH_FORMULAS: {
       } ${height} L 0 ${height} L 0 ${radius} Q 0 0 ${radius} 0 Z`;
     },
   },
-  [ShapePathFormulasKeys.ROUND_RECT_SINGLE]: {
+  [SHAPE_PATH_FORMULAS_KEYS.ROUND_RECT_SINGLE]: {
     editable: true,
     defaultValue: [0.125],
     range: [[0, 1]],
@@ -175,7 +175,7 @@ export const SHAPE_PATH_FORMULAS: {
       } 0 Q ${width} 0 ${width} ${radius} L ${width} ${height} L 0 ${height} L 0 0 Z`;
     },
   },
-  [ShapePathFormulasKeys.ROUND_RECT_SAMESIDE]: {
+  [SHAPE_PATH_FORMULAS_KEYS.ROUND_RECT_SAMESIDE]: {
     editable: true,
     defaultValue: [0.125],
     range: [[0, 0.5]],
@@ -188,7 +188,7 @@ export const SHAPE_PATH_FORMULAS: {
       } 0 Q ${width} 0 ${width} ${radius} L ${width} ${height} L 0 ${height} Z`;
     },
   },
-  [ShapePathFormulasKeys.CUT_ROUND_RECT]: {
+  [SHAPE_PATH_FORMULAS_KEYS.CUT_ROUND_RECT]: {
     editable: true,
     defaultValue: [0.125],
     range: [[0, 0.5]],
@@ -201,7 +201,7 @@ export const SHAPE_PATH_FORMULAS: {
       } 0 L ${width} ${radius} L ${width} ${height} L 0 ${height} L 0 ${radius} Q 0 0 ${radius} 0 Z`;
     },
   },
-  [ShapePathFormulasKeys.MESSAGE]: {
+  [SHAPE_PATH_FORMULAS_KEYS.MESSAGE]: {
     editable: true,
     range: [
       [0, 0.8],
@@ -219,7 +219,7 @@ export const SHAPE_PATH_FORMULAS: {
       } L ${point} ${height} L ${point} ${height - arrowheight} L 0 ${height - arrowheight} Z`;
     },
   },
-  [ShapePathFormulasKeys.ROUND_MESSAGE]: {
+  [SHAPE_PATH_FORMULAS_KEYS.ROUND_MESSAGE]: {
     formula: (width, height) => {
       const radius = Math.min(width, height) * 0.125;
       const arrowWidth = Math.min(width, height) * 0.2;
@@ -235,7 +235,7 @@ export const SHAPE_PATH_FORMULAS: {
       } Q 0 ${height - arrowheight} 0 ${height - radius - arrowheight} L 0 ${radius} Z`;
     },
   },
-  [ShapePathFormulasKeys.L]: {
+  [SHAPE_PATH_FORMULAS_KEYS.L]: {
     editable: true,
     defaultValue: [0.25],
     range: [[0.1, 0.9]],
@@ -248,7 +248,7 @@ export const SHAPE_PATH_FORMULAS: {
       } L ${lineWidth} 0 Z`;
     },
   },
-  [ShapePathFormulasKeys.RING_RECT]: {
+  [SHAPE_PATH_FORMULAS_KEYS.RING_RECT]: {
     editable: true,
     defaultValue: [0.25],
     range: [[0.1, 0.45]],
@@ -261,7 +261,7 @@ export const SHAPE_PATH_FORMULAS: {
       } L ${width - lineWidth} ${height - lineWidth} L ${width - lineWidth} ${lineWidth} Z`;
     },
   },
-  [ShapePathFormulasKeys.PLUS]: {
+  [SHAPE_PATH_FORMULAS_KEYS.PLUS]: {
     editable: true,
     defaultValue: [0.25],
     range: [[0.1, 0.9]],
@@ -280,7 +280,7 @@ export const SHAPE_PATH_FORMULAS: {
       } L ${width / 2 + lineWidth / 2} ${height / 2 - lineWidth / 2} L ${width / 2 + lineWidth / 2} 0 Z`;
     },
   },
-  [ShapePathFormulasKeys.TRIANGLE]: {
+  [SHAPE_PATH_FORMULAS_KEYS.TRIANGLE]: {
     editable: true,
     defaultValue: [0.5],
     range: [[0, 1]],
@@ -291,7 +291,7 @@ export const SHAPE_PATH_FORMULAS: {
       return `M ${vertex} 0 L 0 ${height} L ${width} ${height} Z`;
     },
   },
-  [ShapePathFormulasKeys.PARALLELOGRAM_LEFT]: {
+  [SHAPE_PATH_FORMULAS_KEYS.PARALLELOGRAM_LEFT]: {
     editable: true,
     defaultValue: [0.25],
     range: [[0, 0.9]],
@@ -302,7 +302,7 @@ export const SHAPE_PATH_FORMULAS: {
       return `M ${point} 0 L ${width} 0 L ${width - point} ${height} L 0 ${height} Z`;
     },
   },
-  [ShapePathFormulasKeys.PARALLELOGRAM_RIGHT]: {
+  [SHAPE_PATH_FORMULAS_KEYS.PARALLELOGRAM_RIGHT]: {
     editable: true,
     defaultValue: [0.25],
     range: [[0, 0.9]],
@@ -313,7 +313,7 @@ export const SHAPE_PATH_FORMULAS: {
       return `M 0 0 L ${width - point} 0 L ${width} ${height} L ${point} ${height} Z`;
     },
   },
-  [ShapePathFormulasKeys.TRAPEZOID]: {
+  [SHAPE_PATH_FORMULAS_KEYS.TRAPEZOID]: {
     editable: true,
     defaultValue: [0.25],
     range: [[0, 0.5]],
@@ -324,7 +324,7 @@ export const SHAPE_PATH_FORMULAS: {
       return `M ${point} 0 L ${width - point} 0 L ${width} ${height} L 0 ${height} Z`;
     },
   },
-  [ShapePathFormulasKeys.BULLET]: {
+  [SHAPE_PATH_FORMULAS_KEYS.BULLET]: {
     editable: true,
     defaultValue: [0.2],
     range: [[0, 1]],
@@ -335,7 +335,7 @@ export const SHAPE_PATH_FORMULAS: {
       return `M ${width / 2} 0 L 0 ${point} L 0 ${height} L ${width} ${height} L ${width} ${point} Z`;
     },
   },
-  [ShapePathFormulasKeys.INDICATOR]: {
+  [SHAPE_PATH_FORMULAS_KEYS.INDICATOR]: {
     editable: true,
     defaultValue: [0.2],
     range: [[0, 0.9]],
@@ -365,55 +365,55 @@ export const getShapeList = (): ComputedRef<ShapeListItem[]> => {
         {
           viewBox: [200, 200],
           path: 'M 50 0 L 150 0 Q 200 0 200 50 L 200 150 Q 200 200 150 200 L 50 200 Q 0 200 0 150 L 0 50 Q 0 0 50 0 Z',
-          pathFormula: ShapePathFormulasKeys.ROUND_RECT,
+          pathFormula: SHAPE_PATH_FORMULAS_KEYS.ROUND_RECT,
           pptxShapeType: 'roundRect',
         },
         {
           viewBox: [200, 200],
           path: 'M 25 0 L 150 0 Q 200 0 200 50 L 200 175 Q 200 200 175 200 L 25 200 Q 0 200 0 175 L 0 25 Q 0 0 25 0 Z',
-          pathFormula: ShapePathFormulasKeys.ROUND_RECT_CUSTOM,
+          pathFormula: SHAPE_PATH_FORMULAS_KEYS.ROUND_RECT_CUSTOM,
           pptxShapeType: 'roundRect',
         },
         {
           viewBox: [200, 200],
           path: 'M 0 200 L 0 0 L 150 0 L 200 50 L 200 200 Z',
-          pathFormula: ShapePathFormulasKeys.CUT_RECT_SINGLE,
+          pathFormula: SHAPE_PATH_FORMULAS_KEYS.CUT_RECT_SINGLE,
           pptxShapeType: 'snip1Rect',
         },
         {
           viewBox: [200, 200],
           path: 'M 0 50 L 50 0 L 150 0 L 200 50 L 200 200 L 0 200 Z',
-          pathFormula: ShapePathFormulasKeys.CUT_RECT_SAMESIDE,
+          pathFormula: SHAPE_PATH_FORMULAS_KEYS.CUT_RECT_SAMESIDE,
           pptxShapeType: 'snip2SameRect',
         },
         {
           viewBox: [200, 200],
           path: 'M 0 150 L 0 0 L 150 0 L 200 50 L 200 200 L 50 200 Z',
-          pathFormula: ShapePathFormulasKeys.CUT_RECT_DIAGONAL,
+          pathFormula: SHAPE_PATH_FORMULAS_KEYS.CUT_RECT_DIAGONAL,
           pptxShapeType: 'snip2DiagRect',
         },
         {
           viewBox: [200, 200],
           path: 'M 50 0 L 150 0 L 200 50 L 200 200 L 0 200 L 0 50 Q 0 0 50 0 Z',
-          pathFormula: ShapePathFormulasKeys.CUT_ROUND_RECT,
+          pathFormula: SHAPE_PATH_FORMULAS_KEYS.CUT_ROUND_RECT,
           pptxShapeType: 'snipRoundRect',
         },
         {
           viewBox: [200, 200],
           path: 'M 0 0 L 150 0 Q 200 0 200 50 L 200 200 L 0 200 L 0 0 Z',
-          pathFormula: ShapePathFormulasKeys.ROUND_RECT_SINGLE,
+          pathFormula: SHAPE_PATH_FORMULAS_KEYS.ROUND_RECT_SINGLE,
           pptxShapeType: 'round1Rect',
         },
         {
           viewBox: [200, 200],
           path: 'M 0 50 Q 0 0 50 0 L 150 0 Q 200 0 200 50 L 200 200 L 0 200 Z',
-          pathFormula: ShapePathFormulasKeys.ROUND_RECT_SAMESIDE,
+          pathFormula: SHAPE_PATH_FORMULAS_KEYS.ROUND_RECT_SAMESIDE,
           pptxShapeType: 'round2SameRect',
         },
         {
           viewBox: [200, 200],
           path: 'M 50 0 L 200 0 L 200 150 Q 200 200 150 200 L 0 200 L 0 50 Q 0 0 50 0 Z',
-          pathFormula: ShapePathFormulasKeys.ROUND_RECT_DIAGONAL,
+          pathFormula: SHAPE_PATH_FORMULAS_KEYS.ROUND_RECT_DIAGONAL,
           pptxShapeType: 'round2DiagRect',
         },
       ],
@@ -430,7 +430,7 @@ export const getShapeList = (): ComputedRef<ShapeListItem[]> => {
         {
           viewBox: [200, 200],
           path: 'M 100 0 L 0 200 L 200 200 L 100 0 Z',
-          pathFormula: ShapePathFormulasKeys.TRIANGLE,
+          pathFormula: SHAPE_PATH_FORMULAS_KEYS.TRIANGLE,
           pptxShapeType: 'triangle',
         },
         {
@@ -444,18 +444,18 @@ export const getShapeList = (): ComputedRef<ShapeListItem[]> => {
         {
           viewBox: [200, 200],
           path: 'M 50 0 L 200 0 L 150 200 L 0 200 L 50 0 Z',
-          pathFormula: ShapePathFormulasKeys.PARALLELOGRAM_LEFT,
+          pathFormula: SHAPE_PATH_FORMULAS_KEYS.PARALLELOGRAM_LEFT,
           pptxShapeType: 'parallelogram',
         },
         {
           viewBox: [200, 200],
           path: 'M 0 0 L 150 0 L 200 200 L 50 200 L 0 0 Z',
-          pathFormula: ShapePathFormulasKeys.PARALLELOGRAM_RIGHT,
+          pathFormula: SHAPE_PATH_FORMULAS_KEYS.PARALLELOGRAM_RIGHT,
         },
         {
           viewBox: [200, 200],
           path: 'M 50 0 L 150 0 L 200 200 L 0 200 L 50 0 Z',
-          pathFormula: ShapePathFormulasKeys.TRAPEZOID,
+          pathFormula: SHAPE_PATH_FORMULAS_KEYS.TRAPEZOID,
           pptxShapeType: 'trapezoid',
         },
         {
@@ -466,12 +466,12 @@ export const getShapeList = (): ComputedRef<ShapeListItem[]> => {
         {
           viewBox: [200, 200],
           path: 'M 100 0 L 0 50 L 0 200 L 200 200 L 200 50 L 100 0 Z',
-          pathFormula: ShapePathFormulasKeys.BULLET,
+          pathFormula: SHAPE_PATH_FORMULAS_KEYS.BULLET,
         },
         {
           viewBox: [200, 200],
           path: 'M 200 100 L 150 0 L 0 0 L 50 100 L 0 200 L 150 200 L 200 100 Z',
-          pathFormula: ShapePathFormulasKeys.INDICATOR,
+          pathFormula: SHAPE_PATH_FORMULAS_KEYS.INDICATOR,
         },
         {
           viewBox: [200, 200],
@@ -578,13 +578,13 @@ export const getShapeList = (): ComputedRef<ShapeListItem[]> => {
         {
           viewBox: [200, 200],
           path: 'M 0 0 L 0 200 L 200 200 L 200 140 L 60 140 L 60 0 L 0 0 Z',
-          pathFormula: ShapePathFormulasKeys.L,
+          pathFormula: SHAPE_PATH_FORMULAS_KEYS.L,
           pptxShapeType: 'corner',
         },
         {
           viewBox: [200, 200],
           path: 'M0 0 L200 0 L200 200 L0 200 L0 0 Z M50 50 L50 150 L150 150 L150 50 Z',
-          pathFormula: ShapePathFormulasKeys.RING_RECT,
+          pathFormula: SHAPE_PATH_FORMULAS_KEYS.RING_RECT,
           pptxShapeType: 'frame',
         },
         {
@@ -595,7 +595,7 @@ export const getShapeList = (): ComputedRef<ShapeListItem[]> => {
         {
           viewBox: [200, 200],
           path: 'M 70 0 L 70 70 L 0 70 L 0 130 L 70 130 L 70 200 L 130 200 L 130 130 L 200 130 L 200 70 L 130 70 L 130 0 L 70 0 Z',
-          pathFormula: ShapePathFormulasKeys.PLUS,
+          pathFormula: SHAPE_PATH_FORMULAS_KEYS.PLUS,
           pptxShapeType: 'mathPlus',
         },
         {
@@ -626,13 +626,13 @@ export const getShapeList = (): ComputedRef<ShapeListItem[]> => {
         {
           viewBox: [200, 200],
           path: 'M 0 0 L 200 0 L 200 160 L 100 160 L 60 200 L 60 160 L 0 160 Z',
-          pathFormula: ShapePathFormulasKeys.MESSAGE,
+          pathFormula: SHAPE_PATH_FORMULAS_KEYS.MESSAGE,
           pptxShapeType: 'wedgeRectCallout',
         },
         {
           viewBox: [200, 200],
           path: 'M 0 40 Q 0 0 40 0 L 160 0 Q 200 0 200 40 L 200 120 Q 200 160 160 160 L 100 160 L 60 200 L 60 160 L 40 160 Q 0 160 0 120 L 0 40 Z',
-          pathFormula: ShapePathFormulasKeys.ROUND_MESSAGE,
+          pathFormula: SHAPE_PATH_FORMULAS_KEYS.ROUND_MESSAGE,
           pptxShapeType: 'wedgeRoundRectCallout',
         },
         {

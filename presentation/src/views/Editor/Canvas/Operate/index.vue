@@ -41,7 +41,7 @@ import { computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useMainStore, useSlidesStore } from '@/store';
 import {
-  ElementTypes,
+  ELEMENT_TYPES,
   type PPTElement,
   type PPTLineElement,
   type PPTVideoElement,
@@ -84,15 +84,15 @@ const { formatedAnimations } = storeToRefs(useSlidesStore());
 
 const currentOperateComponent = computed<unknown>(() => {
   const elementTypeMap = {
-    [ElementTypes.IMAGE]: ImageElementOperate,
-    [ElementTypes.TEXT]: TextElementOperate,
-    [ElementTypes.SHAPE]: ShapeElementOperate,
-    [ElementTypes.LINE]: LineElementOperate,
-    [ElementTypes.TABLE]: TableElementOperate,
-    [ElementTypes.CHART]: CommonElementOperate,
-    [ElementTypes.LATEX]: CommonElementOperate,
-    [ElementTypes.VIDEO]: CommonElementOperate,
-    [ElementTypes.AUDIO]: CommonElementOperate,
+    [ELEMENT_TYPES.IMAGE]: ImageElementOperate,
+    [ELEMENT_TYPES.TEXT]: TextElementOperate,
+    [ELEMENT_TYPES.SHAPE]: ShapeElementOperate,
+    [ELEMENT_TYPES.LINE]: LineElementOperate,
+    [ELEMENT_TYPES.TABLE]: TableElementOperate,
+    [ELEMENT_TYPES.CHART]: CommonElementOperate,
+    [ELEMENT_TYPES.LATEX]: CommonElementOperate,
+    [ELEMENT_TYPES.VIDEO]: CommonElementOperate,
+    [ELEMENT_TYPES.AUDIO]: CommonElementOperate,
   };
   return elementTypeMap[props.elementInfo.type] || null;
 });

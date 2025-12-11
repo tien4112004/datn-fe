@@ -378,8 +378,7 @@ export default class PresentationMockService implements PresentationApiService {
         if (index !== -1) {
           const updatedPresentation = {
             ...mockPresentationItems[index],
-            title: data.title,
-            slides: data.slides,
+            ...data,
             updatedAt: new Date().toISOString(),
           };
           mockPresentationItems[index] = updatedPresentation;

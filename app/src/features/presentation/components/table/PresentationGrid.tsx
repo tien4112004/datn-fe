@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { MoreHorizontal } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { SearchBar } from '@/shared/components/common/SearchBar';
-import ThumbnailWrapper from '@/features/presentation/components/others/ThumbnailWrapper';
+import { ThumbnailWrapperV2 } from '@/features/presentation/components/others/ThumbnailWrapper';
 import TablePagination from '@/shared/components/table/TablePagination';
 import { ActionContent } from './ActionButton';
 import { RenameFileDialog } from '@/components/modals/RenameFileDialog';
@@ -70,15 +70,7 @@ const PresentationGrid = () => {
         className="relative aspect-video w-full overflow-hidden rounded-lg bg-gray-100 transition-shadow duration-200 hover:shadow-md"
         onClick={() => navigate(`/presentation/${presentation.id}`)}
       >
-        {presentation.thumbnail && typeof presentation.thumbnail === 'object' ? (
-          <ThumbnailWrapper slide={presentation.thumbnail} size={'auto'} visible={true} />
-        ) : typeof presentation.thumbnail === 'string' ? (
-          <img src={presentation.thumbnail} alt="Presentation Thumbnail" className={`w-full`} />
-        ) : presentation.slides && presentation.slides[0] ? (
-          <ThumbnailWrapper slide={presentation.slides[0]} size={'auto'} visible={true} />
-        ) : (
-          <img src="/images/placeholder-image.webp" alt="No Thumbnail" className={`aspect-[16/9] w-full`} />
-        )}
+        <ThumbnailWrapperV2 presentation={presentation} size={'auto'} visible={true} />
 
         <div className="absolute right-2 top-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
           <DropdownMenu>

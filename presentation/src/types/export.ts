@@ -1,1 +1,1 @@
-export type { DialogForExportTypes } from '@aiprimary/core';
+export type DialogForExportTypes = 'image' | 'pdf' | 'json' | 'pptx' | 'pptist' | '';

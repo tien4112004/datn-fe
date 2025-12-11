@@ -18,6 +18,7 @@
   "author": "pipipi_pikachu@163.com",
   "dependencies": {
     "@aiprimary/api": "workspace:*",
+    "@aiprimary/core": "workspace:*",
     "@tanstack/vue-query": "^5.28.0",
     "@tanstack/vue-table": "^8.21.3",
     "@unovis/ts": "^1.6.0",

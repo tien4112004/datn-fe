@@ -200,7 +200,6 @@ const EXAMPLE_TEMPLATES: Record<string, Record<string, unknown>> = {
 function getDefaultTemplate(): Partial<SlideTemplate> {
   return {
     name: '',
-    layout: 'list',
     config: EXAMPLE_TEMPLATES.list,
     graphics: [],
     parameters: [],
@@ -215,6 +214,7 @@ export function TemplateFormDialog({
   isPending = false,
 }: TemplateFormDialogProps) {
   const [formData, setFormData] = useState<Partial<SlideTemplate>>(getDefaultTemplate());
+  const [selectedLayout, setSelectedLayout] = useState('list');
   const [configJson, setConfigJson] = useState('');
   const [graphicsJson, setGraphicsJson] = useState('');
   const [jsonError, setJsonError] = useState<string | null>(null);
@@ -226,11 +226,13 @@ export function TemplateFormDialog({
         ...template,
         parameters: template.parameters || [],
       });
+      setSelectedLayout('list'); // Default layout for existing templates
       setConfigJson(JSON.stringify(template.config, null, 2));
       setGraphicsJson(JSON.stringify(template.graphics || [], null, 2));
     } else {
       const defaultTemplate = getDefaultTemplate();
       setFormData(defaultTemplate);
+      setSelectedLayout('list');
       setConfigJson(JSON.stringify(defaultTemplate.config, null, 2));
       setGraphicsJson('[]');
     }
@@ -239,7 +241,7 @@ export function TemplateFormDialog({
   }, [template, open]);
 
   const handleLayoutChange = (layout: string) => {
-    setFormData({ ...formData, layout });
+    setSelectedLayout(layout);
     // Load example template for the selected layout
     const exampleConfig = EXAMPLE_TEMPLATES[layout] || EXAMPLE_TEMPLATES.list;
     setConfigJson(JSON.stringify(exampleConfig, null, 2));
@@ -295,7 +297,7 @@ export function TemplateFormDialog({
   };
 
   const removeParameter = (index: number) => {
-    const params = (formData.parameters || []).filter((_, i) => i !== index);
+    const params = (formData.parameters || []).filter((_: any, i: number) => i !== index);
     setFormData({ ...formData, parameters: params });
   };
 
@@ -306,12 +308,13 @@ export function TemplateFormDialog({
     if (!validateJson(graphicsJson, 'graphics')) return;
 
     const submitData: SlideTemplate = {
-      ...formData,
+      id: formData.id || `template-${Date.now()}`,
       name: formData.name || '',
-      layout: formData.layout || 'list',
       config: JSON.parse(configJson),
       graphics: JSON.parse(graphicsJson),
       parameters: formData.parameters,
+      createdAt: formData.createdAt,
+      updatedAt: formData.updatedAt,
     };
 
     onSubmit(submitData);
@@ -360,7 +363,7 @@ export function TemplateFormDialog({
             </div>
             <div className="space-y-2">
               <Label htmlFor="layout">Layout Type</Label>
-              <Select value={formData.layout || 'list'} onValueChange={handleLayoutChange}>
+              <Select value={selectedLayout} onValueChange={handleLayoutChange}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select layout" />
                 </SelectTrigger>
@@ -460,7 +463,7 @@ export function TemplateFormDialog({
             </div>
             {(formData.parameters?.length || 0) > 0 && (
               <div className="space-y-2 rounded-lg border p-4">
-                {formData.parameters?.map((param, index) => (
+                {formData.parameters?.map((param: any, index: number) => (
                   <div key={index} className="grid grid-cols-6 items-end gap-2">
                     <div className="col-span-2">
                       <Label className="text-xs">Key</Label>

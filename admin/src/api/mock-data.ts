@@ -122,7 +122,6 @@ export const MOCK_SLIDE_TEMPLATES: SlideTemplate[] = [
   {
     id: 'template-1',
     name: 'Title Slide',
-    layout: 'title',
     config: {
       containers: {
         title: { x: 100, y: 200, width: 800, height: 100 },
@@ -139,7 +138,6 @@ export const MOCK_SLIDE_TEMPLATES: SlideTemplate[] = [
   {
     id: 'template-2',
     name: 'Content with Image',
-    layout: 'content-image',
     config: {
       containers: {
         title: { x: 50, y: 30, width: 900, height: 60 },
@@ -157,7 +155,6 @@ export const MOCK_SLIDE_TEMPLATES: SlideTemplate[] = [
   {
     id: 'template-3',
     name: 'Two Column',
-    layout: 'two-column',
     config: {
       containers: {
         title: { x: 50, y: 30, width: 900, height: 60 },
@@ -172,7 +169,6 @@ export const MOCK_SLIDE_TEMPLATES: SlideTemplate[] = [
   {
     id: 'template-4',
     name: 'Quote Slide',
-    layout: 'quote',
     config: {
       containers: {
         quote: { x: 100, y: 150, width: 800, height: 200 },

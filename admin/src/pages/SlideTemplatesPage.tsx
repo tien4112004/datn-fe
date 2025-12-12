@@ -85,10 +85,6 @@ export function SlideTemplatesPage() {
         header: 'Name',
         cell: (info) => <span className="font-medium">{info.getValue()}</span>,
       }),
-      columnHelper.accessor('layout', {
-        header: 'Layout',
-        cell: (info) => <span className="bg-muted rounded px-2 py-1 text-sm">{info.getValue()}</span>,
-      }),
       columnHelper.accessor('config', {
         header: 'Config',
         cell: (info) => {

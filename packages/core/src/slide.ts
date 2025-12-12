@@ -854,9 +854,18 @@ export interface SlideTheme {
 }
 
 export interface SlideTemplate {
-  name: string;
+  /** Unique template id */
   id: string;
-  cover: string;
+  /** Human-friendly template name */
+  name: string;
+  /** Optional cover image (used by app mocks/preview) */
+  cover?: string;
+  /** Partial template config (theme/viewport resolved in runtime) - keep permissive here */
+  config?: any;
+  /** Optional decorative graphics */
+  graphics?: any;
+  /** Template parameters for user customization */
+  parameters?: any;
 }
 
 export interface SlideViewport {

@@ -1,3 +1,5 @@
+import type { SlideTheme as CoreSlideTheme, SlideTemplate as CoreSlideTemplate } from '@aiprimary/core';
+
 export type GradientType = 'linear' | 'radial';
 export type GradientColor = {
   pos: number;
@@ -24,42 +26,16 @@ export interface PPTElementOutline {
   color?: string;
 }
 
-export interface SlideTheme {
-  backgroundColor: string | Gradient;
-  themeColors: string[];
-  fontColor: string;
-  fontName: string;
-  outline: PPTElementOutline;
-  shadow: PPTElementShadow;
-  titleFontName?: string;
-  titleFontColor?: string;
-  labelFontColor?: string;
-  labelFontName?: string;
-
-  // Extended properties
-  id?: string;
-  name?: string;
-  accentImageShape?: 'default' | 'big' | 'mixed';
-  card?: {
-    enabled: boolean;
-    borderRadius: number;
-    borderWidth: number;
-    fill: 'none' | 'full' | 'semi';
-    shadow: PPTElementShadow;
-    backgroundColor: string;
-    textColor: string;
-  };
+// Extended SlideTheme for admin functionality
+export interface SlideTheme extends CoreSlideTheme {
+  // Additional admin fields
   createdAt?: string;
   updatedAt?: string;
 }
 
-export interface SlideTemplate {
-  id?: string;
-  name: string;
-  layout: string;
-  config: Record<string, unknown>; // PartialTemplateConfig - template container definitions
-  graphics?: Record<string, unknown>[]; // Optional decorative graphics
-  parameters?: TemplateParameter[]; // Customizable parameters
+// Extended SlideTemplate for admin functionality
+export interface SlideTemplate extends CoreSlideTemplate {
+  // Additional admin fields
   createdAt?: string;
   updatedAt?: string;
 }

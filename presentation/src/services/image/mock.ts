@@ -1,12 +1,10 @@
-import type { ImageGenerationParams, ImageGenerationResponse } from './image-types';
+import type { ImageGenerationParams, ImageGenerationResponse } from './types';
 import type { ApiService } from '@aiprimary/api';
-
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 
 export class MockImageApiService implements ApiService {
   baseUrl: string;
 
-  constructor(baseUrl: string = BASE_URL) {
+  constructor(baseUrl = '') {
     this.baseUrl = baseUrl;
   }
 

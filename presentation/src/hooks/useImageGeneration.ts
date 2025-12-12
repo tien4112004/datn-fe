@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
-import { getImageApi } from '@/services/imageApi';
+import { getImageApi } from '@/services/image/api';
 
 /**
  * Generate an image for a slide element

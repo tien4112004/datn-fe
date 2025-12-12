@@ -1,14 +1,11 @@
-import type { Slide } from '@/types/slides';
+import type { Presentation, Slide } from '@aiprimary/core';
 import type { SlideLayoutSchema } from '@/utils/slideLayout/types/schemas';
 import { getSlideTemplates } from '@/hooks/useSlideTemplates';
-import type {
-  Presentation,
-  PresentationGenerationRequest,
-  PresentationGenerationStartResponse,
-} from './types';
+import type { PresentationGenerationRequest, PresentationGenerationStartResponse } from './types';
 import type { ApiService } from '@aiprimary/api';
+import { getBackendUrl } from '@aiprimary/api';
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
+const BASE_URL = getBackendUrl();
 
 const getDefaultPresentationTheme = () => ({
   backgroundColor: '#ffffff',

@@ -1,9 +1,10 @@
 import { api } from '@aiprimary/api';
 import type { ApiResponse } from '@aiprimary/api';
-import type { ImageGenerationParams, ImageGenerationResponse } from './image-types';
+import type { ImageGenerationParams, ImageGenerationResponse } from './types';
 import type { ApiService } from '@aiprimary/api';
+import { getBackendUrl } from '@aiprimary/api';
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
+const BASE_URL = getBackendUrl();
 
 export class ImageApiService implements ApiService {
   baseUrl: string;

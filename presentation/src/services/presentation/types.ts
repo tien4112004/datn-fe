@@ -1,20 +1,4 @@
-import type { Slide, SlideTheme } from '@/types/slides';
-import type { SlideLayoutSchema } from '@/utils/slideLayout/types/schemas';
-
-export type { Slide, SlideTheme, SlideLayoutSchema };
-
-export interface Presentation {
-  id: string;
-  title: string;
-  theme: SlideTheme;
-  viewport: {
-    width: number;
-    height: number;
-  };
-  slides: Slide[];
-  isParsed?: boolean;
-  [key: string]: any;
-}
+import type { SlideTheme } from '@/types/slides';
 
 export interface PresentationGenerationRequest {
   outline: string;

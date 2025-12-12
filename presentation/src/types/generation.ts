@@ -1,2 +1,3 @@
-// Re-export the correct types from presentationApi
-export type { PresentationGenerationRequest, SlideTheme } from '../services/presentationApi';
+// Re-export the correct types from presentation services
+export type { PresentationGenerationRequest } from '../services/presentation/types';
+export type { SlideTheme } from '@/types/slides';

@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
-import { getPresentationApi, type PresentationGenerationRequest } from '../services/presentationApi';
+import { getPresentationApi } from '../services/presentation/api';
+import type { PresentationGenerationRequest } from '../services/presentation/types';
 
 export interface AiResultSlide {
   result: Record<string, any>;

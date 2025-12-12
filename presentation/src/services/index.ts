@@ -1,7 +1,8 @@
 import axios from './config';
+import { getBackendUrl } from '@aiprimary/api';
 
 // export const SERVER_URL = 'http://localhost:5000'
-export const SERVER_URL = import.meta.env.MODE === 'development' ? '/api' : 'https://server.pptist.cn';
+export const SERVER_URL = getBackendUrl();
 export const ASSET_URL = 'https://asset.pptist.cn';
 
 interface AIPPTOutlinePayload {

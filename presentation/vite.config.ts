@@ -26,12 +26,16 @@ export default defineConfig(({ mode }) => {
       vue(),
       federation({
         name: 'vueRemote',
-        manifest: true,
         filename: 'remoteEntry.js',
         exposes: {
           './Editor': './src/mount/appMount.ts',
           './ThumbnailSlide': './src/mount/thumbnailMount.ts',
           './method': './src/mount/methodMount.ts',
+        },
+        shared: {
+          vue: {
+            singleton: true,
+          },
         },
       }),
       Icons({ compiler: 'vue3' }),

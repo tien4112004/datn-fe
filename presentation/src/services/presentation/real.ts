@@ -1,15 +1,11 @@
 import { api } from '@aiprimary/api';
-import type { Slide, SlideTheme } from '@/types/slides';
 import type { ApiResponse } from '@aiprimary/api';
-import type { SlideLayoutSchema } from '@/utils/slideLayout/types/schemas';
-import type {
-  Presentation,
-  PresentationGenerationRequest,
-  PresentationGenerationStartResponse,
-} from './types';
+import type { PresentationGenerationRequest, PresentationGenerationStartResponse } from './types';
 import type { ApiService } from '@aiprimary/api';
+import { getBackendUrl } from '@aiprimary/api';
+import type { Presentation, Slide, SlideLayoutSchema } from '@aiprimary/core';
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
+const BASE_URL = getBackendUrl();
 
 export class PresentationApiService implements ApiService {
   baseUrl: string;

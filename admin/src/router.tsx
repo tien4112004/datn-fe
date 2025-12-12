@@ -9,6 +9,7 @@ import { SlideTemplatesPage } from '@/pages/SlideTemplatesPage';
 import { ModelConfigPage } from '@/pages/ModelConfigPage';
 import { FAQPostsPage } from '@/pages/FAQPostsPage';
 import { BooksPage } from '@/pages/BooksPage';
+import SettingsPage from '@/features/settings/pages/SettingsPage';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 
 export const router = createBrowserRouter([
@@ -59,6 +60,10 @@ export const router = createBrowserRouter([
       {
         path: 'books',
         element: <BooksPage />,
+      },
+      {
+        path: 'settings',
+        element: <SettingsPage />,
       },
     ],
   },

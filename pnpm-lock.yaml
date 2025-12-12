@@ -49,6 +49,9 @@ importers:
 
   admin:
     dependencies:
+      '@aiprimary/api':
+        specifier: workspace:*
+        version: link:../packages/api
       '@codemirror/lang-json':
         specifier: ^6.0.2
         version: 6.0.2

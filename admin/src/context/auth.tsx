@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import type { User, AuthContextType } from '@/types/auth';
-import { authApi, type ApiMode } from '@/api/auth';
+import { authApi } from '@/api/auth';
+import { getApiMode } from '@aiprimary/api';
 import { toast } from 'sonner';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -8,17 +9,6 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 const TOKEN_KEY = 'accessToken';
 const REFRESH_TOKEN_KEY = 'refreshToken';
 const USER_KEY = 'admin_user';
-const API_MODE_KEY = 'admin_api_mode';
-
-// Get API mode from localStorage or environment
-const getApiMode = (): ApiMode => {
-  const stored = localStorage.getItem(API_MODE_KEY);
-  if (stored === 'mock' || stored === 'real') {
-    return stored;
-  }
-  // Default to env variable or 'real'
-  return (import.meta.env.VITE_API_MODE as ApiMode) || 'mock';
-};
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -68,17 +58,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = async (email: string, password: string) => {
-    const apiMode = getApiMode();
-
     try {
-      const response = await authApi.login({ email, password }, apiMode);
+      const response = await authApi.login({ email, password });
 
       // Store tokens
       localStorage.setItem(TOKEN_KEY, response.access_token);
       localStorage.setItem(REFRESH_TOKEN_KEY, response.refresh_token);
 
       // Get user profile
-      const userProfile = await authApi.getProfile(apiMode);
+      const userProfile = await authApi.getProfile(getApiMode());
 
       // Check if user is admin
       if (userProfile.role !== 'ADMIN' && userProfile.role !== 'admin') {

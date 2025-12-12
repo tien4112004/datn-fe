@@ -11,7 +11,7 @@ import type {
   Book,
   BookType,
 } from '@/types/api';
-import type { ApiMode } from './auth';
+import { getApiMode } from '@aiprimary/api';
 import {
   MOCK_USERS,
   MOCK_SLIDE_THEMES,
@@ -23,15 +23,6 @@ import {
   paginate,
   generateId,
 } from './mock-data';
-
-// Get API mode from localStorage or environment
-const getApiMode = (): ApiMode => {
-  const stored = localStorage.getItem('admin_api_mode');
-  if (stored === 'mock' || stored === 'real') {
-    return stored;
-  }
-  return (import.meta.env.VITE_API_MODE as ApiMode) || 'mock';
-};
 
 // In-memory storage for mock mutations
 let mockUsers = [...MOCK_USERS];

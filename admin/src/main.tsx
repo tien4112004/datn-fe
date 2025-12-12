@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { RouterProvider } from 'react-router-dom';
 import { Toaster } from '@/components/ui/sonner';
 import { AuthProvider } from '@/context/auth';
+import { ApiSwitchingProvider } from '@/context/api-switching';
 import { router } from './router';
 import './index.css';
 
@@ -19,10 +20,12 @@ const queryClient = new QueryClient({
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <RouterProvider router={router} />
-        <Toaster position="top-right" richColors />
-      </AuthProvider>
+      <ApiSwitchingProvider>
+        <AuthProvider>
+          <RouterProvider router={router} />
+          <Toaster position="top-right" richColors />
+        </AuthProvider>
+      </ApiSwitchingProvider>
     </QueryClientProvider>
   </StrictMode>
 );

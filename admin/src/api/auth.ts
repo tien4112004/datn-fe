@@ -1,7 +1,6 @@
 import api from './client';
 import type { LoginRequest, LoginResponse, User } from '@/types/auth';
-
-export type ApiMode = 'mock' | 'real';
+import { getApiMode, type ApiMode } from '@aiprimary/api';
 
 const MOCK_ADMIN_USER: User = {
   id: 'admin-mock-id',
@@ -12,7 +11,9 @@ const MOCK_ADMIN_USER: User = {
 };
 
 export const authApi = {
-  login: async (data: LoginRequest, apiMode: ApiMode = 'real'): Promise<LoginResponse> => {
+  login: async (data: LoginRequest): Promise<LoginResponse> => {
+    const apiMode = getApiMode();
+
     if (apiMode === 'mock') {
       // Simulate network delay
       await new Promise((resolve) => setTimeout(resolve, 500));

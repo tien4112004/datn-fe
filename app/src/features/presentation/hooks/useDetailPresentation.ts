@@ -1,14 +1,29 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useRef } from 'react';
 import { toast } from 'sonner';
 import type { Presentation } from '../types';
 import { CriticalError } from '@aiprimary/api';
 import { ERROR_TYPE } from '@/shared/constants';
 import { useUpdatePresentation } from './useApi';
 
+export interface VueEditorApp {
+  generateThumbnail?: () => Promise<string | undefined>;
+}
+
 interface MessageDetail {
   type: 'success' | 'error' | 'warning' | 'info' | string;
   message: string;
 }
+
+// Hook to manage Vue app instance reference
+export const useVueApp = () => {
+  const app = useRef<VueEditorApp | null>(null);
+
+  const updateApp = useCallback((newInstance: VueEditorApp) => {
+    app.current = newInstance;
+  }, []);
+
+  return { app, updateApp };
+};
 
 export const usePresentationValidation = (
   id: string | undefined,
@@ -61,7 +76,7 @@ interface SavePresentationEventDetail {
   presentation: Presentation;
 }
 
-export const useSavePresentationRemote = (presentationId: string) => {
+export const useSavePresentationRemote = (presentationId: string, vueApp?: VueEditorApp) => {
   const [isSaving, setIsSaving] = useState(false);
   const updatePresentation = useUpdatePresentation(presentationId);
 
@@ -71,17 +86,25 @@ export const useSavePresentationRemote = (presentationId: string) => {
         setIsSaving(true);
         const { presentation: dataToSave } = event.detail;
 
-        const MINIMUM_DISPLAY_TIME = 500; // 500ms minimum to prevent flickering
-        const savePromise = updatePresentation.mutateAsync(dataToSave);
-        const timerPromise = new Promise((resolve) => setTimeout(resolve, MINIMUM_DISPLAY_TIME));
-        await Promise.all([savePromise, timerPromise]);
+        // Generate thumbnail using Vue app instance if available
+        const thumbnail = await vueApp?.generateThumbnail?.();
+        console.log(thumbnail);
+
+        // Include thumbnail in the presentation data (thumbnail will be undefined if generation failed)
+        const presentationWithThumbnail = {
+          ...dataToSave,
+          ...(thumbnail ? { thumbnail } : { thumbnail: dataToSave.thumbnail }),
+        };
+
+        // Save presentation with thumbnail
+        await updatePresentation.mutateAsync(presentationWithThumbnail);
       } catch (error) {
         console.error('Failed to save presentation:', error);
       } finally {
         setIsSaving(false);
       }
     },
-    [updatePresentation]
+    [updatePresentation, vueApp]
   );
 
   useEffect(() => {

@@ -9,7 +9,6 @@ import { computed } from 'vue';
 import type { Presentation } from './types/slides';
 
 const props = defineProps<{
-  titleTest: string;
   isRemote: boolean;
   presentation: Presentation;
   mode: 'view' | 'edit';
@@ -17,7 +16,6 @@ const props = defineProps<{
 
 // Pass props to routed components
 const componentProps = computed(() => ({
-  titleTest: props.titleTest,
   isRemote: props.isRemote,
   presentation: props.presentation,
   mode: props.mode,

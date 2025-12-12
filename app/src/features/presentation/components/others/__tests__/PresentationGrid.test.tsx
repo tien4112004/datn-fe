@@ -8,6 +8,26 @@ import type { Presentation } from '@/features/presentation/types/presentation';
 vi.mock('../ThumbnailWrapper', () => ({
   __esModule: true,
   default: () => <div data-testid="mock-thumbnail-wrapper" />,
+  ThumbnailWrapperV2: ({ presentation }: { presentation: any }) => {
+    // If presentation has a thumbnail as an object (Slide), render ThumbnailWrapper
+    if (presentation.thumbnail && typeof presentation.thumbnail === 'object') {
+      return <div data-testid="mock-thumbnail-wrapper" />;
+    }
+    // If presentation has a thumbnail as a string, render img tag
+    if (typeof presentation.thumbnail === 'string') {
+      return (
+        <img
+          src={presentation.thumbnail}
+          alt="Presentation Thumbnail"
+          data-testid="mock-thumbnail-wrapper-v2"
+        />
+      );
+    }
+    // Fallback to placeholder image
+    return (
+      <img src="/images/placeholder-image.webp" alt="No Thumbnail" data-testid="mock-thumbnail-wrapper-v2" />
+    );
+  },
 }));
 
 const { usePresentations, useUpdatePresentationTitle } = await import('@/features/presentation/hooks/useApi');

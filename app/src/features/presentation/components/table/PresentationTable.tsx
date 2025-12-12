@@ -7,7 +7,7 @@ import DataTable from '@/components/table/DataTable';
 import { ActionContent } from './ActionButton';
 import { SearchBar } from '../../../../shared/components/common/SearchBar';
 import { useNavigate } from 'react-router-dom';
-import ThumbnailWrapper from '../others/ThumbnailWrapper';
+import { ThumbnailWrapperV2 } from '../others/ThumbnailWrapper';
 import { RenameFileDialog } from '@/components/modals/RenameFileDialog';
 import { getLocaleDateFns } from '@/shared/i18n/helper';
 import { format } from 'date-fns';
@@ -30,22 +30,7 @@ const PresentationTable = () => {
         header: t('presentation.thumbnail'),
         cell: (info) => {
           const presentation = info.row.original;
-
-          if (presentation.thumbnail && typeof presentation.thumbnail === 'object') {
-            return <ThumbnailWrapper slide={presentation.thumbnail} size={160} visible={true} />;
-          } else if (typeof presentation.thumbnail === 'string') {
-            return <img src={presentation.thumbnail} alt="Presentation Thumbnail" className={`w-[160px]`} />;
-          } else if (presentation.slides && presentation.slides[0]) {
-            return <ThumbnailWrapper slide={presentation.slides[0]} size={160} visible={true} />;
-          } else {
-            return (
-              <img
-                src="/images/placeholder-image.webp"
-                alt="No Thumbnail"
-                className={`aspect-[16/9] w-[160px]`}
-              />
-            );
-          }
+          return <ThumbnailWrapperV2 presentation={presentation} size={160} visible={true} />;
         },
         size: 176,
         enableResizing: false,
@@ -128,7 +113,7 @@ const PresentationTable = () => {
         contextMenu={(row) => (
           <ActionContent
             onViewDetail={() => {
-              navigate(`/presentation/${row.original.id}`);
+              navigate(`/presentation/${row.original.id}`, { replace: false });
             }}
             onEdit={() => {
               console.log('Edit', row.original);

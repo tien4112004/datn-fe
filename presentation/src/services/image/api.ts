@@ -1,6 +1,6 @@
 import { getApiServiceFactory } from '@aiprimary/api';
-import { ImageApiService } from './image';
-import { MockImageApiService } from './image-mock';
+import { ImageApiService } from './real';
+import { MockImageApiService } from './mock';
 import type { GeneratedImage, ImageGenerationParams, ImageGenerationResponse } from './types';
 import { getBackendUrl } from '@aiprimary/api';
 

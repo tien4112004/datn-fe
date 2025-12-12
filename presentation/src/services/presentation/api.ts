@@ -1,17 +1,11 @@
 import { getApiServiceFactory } from '@aiprimary/api';
 import { PresentationApiService } from './presentation';
 import { MockPresentationApiService } from './presentation-mock';
-import type {
-  Presentation,
-  PresentationGenerationRequest,
-  PresentationGenerationStartResponse,
-} from './types';
+import type { PresentationGenerationRequest, PresentationGenerationStartResponse } from './types';
+import { getBackendUrl } from '@aiprimary/api';
+import type { Presentation } from '@aiprimary/core';
 
-// Re-export types
-export type { Presentation, PresentationGenerationRequest, PresentationGenerationStartResponse };
-export type { Slide, SlideTheme, SlideLayoutSchema } from './types';
-
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
+const BASE_URL = getBackendUrl();
 
 export interface IPresentationApi {
   getAiResultById(id: string): Promise<any[]>;

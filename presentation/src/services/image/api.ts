@@ -1,12 +1,13 @@
 import { getApiServiceFactory } from '@aiprimary/api';
 import { ImageApiService } from './image';
 import { MockImageApiService } from './image-mock';
-import type { GeneratedImage, ImageGenerationParams, ImageGenerationResponse } from './image-types';
+import type { GeneratedImage, ImageGenerationParams, ImageGenerationResponse } from './types';
+import { getBackendUrl } from '@aiprimary/api';
 
 // Re-export types
 export type { GeneratedImage, ImageGenerationParams, ImageGenerationResponse };
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
+const BASE_URL = getBackendUrl();
 
 export interface IImageApi {
   generateImage(

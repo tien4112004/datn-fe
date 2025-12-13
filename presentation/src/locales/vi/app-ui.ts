@@ -8,6 +8,10 @@ export default {
     initializing: 'Đang khởi tạo dữ liệu, vui lòng chờ...',
   },
 
+  loading: {
+    generatingPresentation: 'Đang tạo bài thuyết trình, vui lòng chờ...',
+  },
+
   // ===============================
   // GIAO DIỆN NGƯỜI DÙNG
   // ===============================

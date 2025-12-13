@@ -28,8 +28,7 @@ const OutlineCard = ({ id, title = 'Outline', className = '', onDelete }: Outlin
   const isEditing = editingId === id;
   const markdown = useOutlineStore((state) => state.outlines.find((item) => item.id === id)?.markdownContent);
 
-  // Track if we've loaded initial content to prevent re-loading
-  const hasLoadedContentRef = useRef(false);
+  const loadedMarkdownRef = useRef<string | null>(null);
 
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: `outline-card-${id.toString()}`,
@@ -44,6 +43,10 @@ const OutlineCard = ({ id, title = 'Outline', className = '', onDelete }: Outlin
     if (!editor || !markdown) return;
     if (isEditing) return; // Don't reload while editing to preserve cursor
 
+    if (!isStreaming && loadedMarkdownRef.current === markdown) {
+      return;
+    }
+
     const loadContent = async () => {
       try {
         // Try to parse the markdown with additional checks
@@ -53,16 +56,13 @@ const OutlineCard = ({ id, title = 'Outline', className = '', onDelete }: Outlin
         setParsedBlocks(blocks);
 
         editor.replaceBlocks(editor.document, blocks);
-        hasLoadedContentRef.current = true;
+        loadedMarkdownRef.current = markdown;
       } catch (error) {
         console.error('Failed to load markdown to editor:', error);
       }
     };
 
-    // Load content initially or when streaming updates markdown
-    if (!hasLoadedContentRef.current || isStreaming) {
-      loadContent();
-    }
+    loadContent();
   }, [markdown, editor, isStreaming, isEditing]);
 
   // FLOW 2: Generate HTML from parsed blocks for display when not editing

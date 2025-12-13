@@ -46,7 +46,10 @@ export function usePresentationProcessor(
   if (presentation && !presentation.isParsed && !isGenerating) {
     processFullAiResult();
   } else if (!isGenerating && generationRequest) {
-    generationStore.startStreaming(generationRequest);
+    generationStore.startStreaming({
+      ...generationRequest,
+      presentationId: presentationId,
+    });
   }
 
   // 2. Process non-streaming result
@@ -185,11 +188,19 @@ export function usePresentationProcessor(
 
           processedStreamDataRef.value = [];
           generationStore.clearStreamedData();
-          dispatchMessage('success', 'Presentation generated successfully');
         } catch (error) {
           console.error('Error finalizing presentation:', error);
           dispatchMessage('error', 'Failed to finalize presentation');
         }
+      }
+    }
+  );
+
+  watch(
+    () => generationStore.error,
+    async (error, previous) => {
+      if (error && error !== previous) {
+        dispatchMessage('error', error);
       }
     }
   );

@@ -8,6 +8,10 @@ export default {
     initializing: 'Initializing data, please wait...',
   },
 
+  loading: {
+    generatingPresentation: 'Generating presentation, please wait...',
+  },
+
   // ===============================
   // USER INTERFACE
   // ===============================

@@ -141,7 +141,8 @@ export class MockPresentationApiService implements ApiService {
       stream: AsyncIterable<string>;
     } & PresentationGenerationStartResponse
   > {
-    const presentationId = crypto.randomUUID();
+    console.log('Mock streamPresentation called with request:', request);
+    const presentationId = request.presentationId || `pres_${Math.random().toString(36).substr(2, 9)}`;
     const newPresentation: Presentation = {
       id: presentationId,
       title: `Streamed Presentation`,
@@ -164,8 +165,6 @@ export class MockPresentationApiService implements ApiService {
         }
       },
     };
-
-    return { presentationId, error: new Error('Streaming not supported'), stream };
 
     return { presentationId, stream };
   }

@@ -46,7 +46,10 @@ export function usePresentationProcessor(
   if (presentation && !presentation.isParsed && !isGenerating) {
     processFullAiResult();
   } else if (!isGenerating && generationRequest) {
-    generationStore.startStreaming(generationRequest);
+    generationStore.startStreaming({
+      ...generationRequest,
+      presentationId: presentationId,
+    });
   }
 
   // 2. Process non-streaming result

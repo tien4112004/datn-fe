@@ -1,7 +1,7 @@
 import type { SlideTheme } from '@/types/slides';
 
 export interface PresentationGenerationRequest {
-  presentationId?: string;
+  presentationId: string;
   outline: string;
   model: {
     name: string;

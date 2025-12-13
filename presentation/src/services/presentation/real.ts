@@ -24,7 +24,7 @@ export class PresentationApiService implements ApiService {
    */
   async getAiResultById(id: string): Promise<SlideLayoutSchema[]> {
     const response = await api.get<ApiResponse<SlideLayoutSchema[]>>(
-      `${this.baseUrl}/presentations/${id}/ai-result`
+      `${this.baseUrl}/api/presentations/${id}/ai-result`
     );
     return response.data.data;
   }
@@ -35,7 +35,7 @@ export class PresentationApiService implements ApiService {
    */
   async upsertSlide(presentationId: string, slide: Slide): Promise<Presentation> {
     const response = await api.put<ApiResponse<Presentation>>(
-      `${this.baseUrl}/presentations/${presentationId}/slides`,
+      `${this.baseUrl}/api/presentations/${presentationId}/slides`,
       {
         slides: [
           {
@@ -57,7 +57,9 @@ export class PresentationApiService implements ApiService {
    * Mark presentation as parsed (generation complete)
    */
   async setParsed(id: string): Promise<Presentation> {
-    const response = await api.patch<ApiResponse<Presentation>>(`${this.baseUrl}/presentations/${id}/parse`);
+    const response = await api.patch<ApiResponse<Presentation>>(
+      `${this.baseUrl}/api/presentations/${id}/parse`
+    );
     return response.data.data;
   }
 
@@ -75,7 +77,7 @@ export class PresentationApiService implements ApiService {
   > {
     try {
       const response = await api.stream(
-        `${this.baseUrl}/presentations/generate`,
+        `${this.baseUrl}/api/presentations/generate`,
         {
           ...request,
         },
@@ -113,7 +115,7 @@ export class PresentationApiService implements ApiService {
    * Get presentation by ID
    */
   async getPresentation(id: string): Promise<Presentation> {
-    const response = await api.get<ApiResponse<Presentation>>(`${this.baseUrl}/presentations/${id}`);
+    const response = await api.get<ApiResponse<Presentation>>(`${this.baseUrl}/api/presentations/${id}`);
     return response.data.data;
   }
 
@@ -121,7 +123,10 @@ export class PresentationApiService implements ApiService {
    * Update presentation data
    */
   async updatePresentation(id: string, data: Presentation): Promise<Presentation> {
-    const response = await api.put<ApiResponse<Presentation>>(`${this.baseUrl}/presentations/${id}`, data);
+    const response = await api.put<ApiResponse<Presentation>>(
+      `${this.baseUrl}/api/presentations/${id}`,
+      data
+    );
     return response.data.data;
   }
 }

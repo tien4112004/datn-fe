@@ -9,6 +9,7 @@ import {
   MindmapTitleInput,
   MindmapControls,
 } from '@/features/mindmap/components';
+import { TreePanel } from '@/features/mindmap/components/tree-panel';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { useLoaderData, useNavigate, useSearchParams } from 'react-router-dom';
@@ -132,6 +133,7 @@ const MindmapPage = () => {
       <ReactFlowProvider>
         <PresenterProvider isPresenterMode={isPresenterMode}>
           <div className="flex h-screen w-full" style={{ backgroundColor: 'var(--background)' }}>
+            <TreePanel />
             <Flow isPanOnDrag={isPanOnDrag} isPresenterMode={isPresenterMode}>
               {/* Controls - always visible on desktop, toggleable on mobile */}
               {isDesktop ? (

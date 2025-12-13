@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { addEdge, applyNodeChanges, applyEdgeChanges } from '@xyflow/react';
 import type { Connection } from '@xyflow/react';
-import { devtools, persist } from 'zustand/middleware';
+import { devtools, persist, createJSONStorage } from 'zustand/middleware';
 import type { MindMapNode, MindMapEdge } from '../types';
 import { MINDMAP_TYPES, PATH_TYPES } from '../types';
 import { SIDE } from '../types/constants';
@@ -170,6 +170,50 @@ export const useCoreStore = create<CoreState>()(
       }),
       {
         name: 'CoreStore',
+        storage: createJSONStorage(() => localStorage, {
+          reviver: (_key, value: unknown) => {
+            // Revive Set from array during deserialization
+            if (
+              value &&
+              typeof value === 'object' &&
+              'state' in value &&
+              typeof value.state === 'object' &&
+              value.state &&
+              'selectedNodeIds' in value.state
+            ) {
+              const state = value.state as { selectedNodeIds: string[] };
+              return {
+                ...value,
+                state: {
+                  ...state,
+                  selectedNodeIds: new Set(state.selectedNodeIds || []),
+                },
+              };
+            }
+            return value;
+          },
+          replacer: (_key, value: unknown) => {
+            // Replace Set with array during serialization
+            if (
+              value &&
+              typeof value === 'object' &&
+              'state' in value &&
+              typeof value.state === 'object' &&
+              value.state &&
+              'selectedNodeIds' in value.state
+            ) {
+              const state = value.state as { selectedNodeIds: Set<string> };
+              return {
+                ...value,
+                state: {
+                  ...state,
+                  selectedNodeIds: Array.from(state.selectedNodeIds),
+                },
+              };
+            }
+            return value;
+          },
+        }),
       }
     ),
     { name: 'CoreStore' }

@@ -78,8 +78,6 @@ export class PresentationApiService implements ApiService {
         `${this.baseUrl}/presentations/generate`,
         {
           ...request,
-          model: request.model.name,
-          provider: request.model.provider.toLowerCase(),
         },
         signal
       );

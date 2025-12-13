@@ -165,6 +165,8 @@ export class MockPresentationApiService implements ApiService {
       },
     };
 
+    return { presentationId, error: new Error('Streaming not supported'), stream };
+
     return { presentationId, stream };
   }
 

@@ -194,6 +194,15 @@ export function usePresentationProcessor(
     }
   );
 
+  watch(
+    () => generationStore.error,
+    async (error, previous) => {
+      if (error && error !== previous) {
+        dispatchMessage('error', error);
+      }
+    }
+  );
+
   onUnmounted(() => generationStore.stopStreaming());
 
   function dispatchMessage(type: string, message: string) {

@@ -141,7 +141,6 @@ export class MockPresentationApiService implements ApiService {
       stream: AsyncIterable<string>;
     } & PresentationGenerationStartResponse
   > {
-    console.log('Mock streamPresentation called with request:', request);
     const presentationId = request.presentationId || `pres_${Math.random().toString(36).substr(2, 9)}`;
     const newPresentation: Presentation = {
       id: presentationId,

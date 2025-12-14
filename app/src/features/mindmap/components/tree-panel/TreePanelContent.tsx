@@ -16,7 +16,7 @@ export const TreePanelContent = () => {
   }
 
   return (
-    <div className="flex-1 space-y-4 overflow-y-auto p-4">
+    <div className="flex-1 space-y-4 overflow-auto p-4">
       {rootNodes.map((rootNode) => (
         <TreeView key={rootNode.id} rootNode={rootNode} />
       ))}

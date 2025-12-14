@@ -12,11 +12,11 @@ export const TreePanel = () => {
         'flex flex-col border-r border-gray-200',
         'bg-gradient-to-b from-white to-slate-50/95',
         'shadow-lg transition-all duration-300',
-        isOpen ? 'w-64' : 'w-0 overflow-hidden'
+        isOpen ? 'w-80 min-w-80 max-w-[600px]' : 'w-10 min-w-10'
       )}
     >
       <TreePanelHeader />
-      <TreePanelContent />
+      {isOpen && <TreePanelContent />}
     </div>
   );
 };

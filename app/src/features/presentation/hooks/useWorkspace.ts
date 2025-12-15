@@ -5,7 +5,7 @@ import useFetchStreamingOutline from '@/features/presentation/hooks/useFetchStre
 import useOutlineStore from '@/features/presentation/stores/useOutlineStore';
 import { usePresentationForm } from '@/features/presentation/contexts/PresentationFormContext';
 import { useDraftPresentation } from './useApi';
-import type { PresentationGenerationRequest } from '../types';
+import type { PresentationGenerateDraftRequest } from '../types';
 import usePresentationStore from '../stores/usePresentationStore';
 
 interface UseWorkspaceProps {}
@@ -88,25 +88,27 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
     const outline = markdownContent();
     const data = getValues();
 
-    const generationRequest: PresentationGenerationRequest = {
-      outline,
-      model: data.model,
-      slideCount: data.slideCount,
-      language: data.language,
-
+    const generationRequest: PresentationGenerateDraftRequest = {
       presentation: {
         theme: data.theme,
         viewport: { width: 1000, height: 562.5 },
       },
-
-      others: {
-        contentLength: data.contentLength,
-        imageModel: data.imageModel,
-      },
     };
     try {
       const result = await draftPresentation.mutateAsync(generationRequest);
-      setRequest(generationRequest);
+      setRequest({
+        ...generationRequest,
+
+        outline,
+        model: data.model,
+        slideCount: data.slideCount,
+        language: data.language,
+
+        others: {
+          contentLength: data.contentLength,
+          imageModel: data.imageModel,
+        },
+      });
       clearOutline();
       setValue('topic', '');
 

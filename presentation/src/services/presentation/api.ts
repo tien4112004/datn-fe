@@ -1,5 +1,5 @@
 import { getApiServiceFactory } from '@aiprimary/api';
-import { PresentationApiService } from './real';
+import { PresentationApiService } from './service';
 import { MockPresentationApiService } from './mock';
 import type { PresentationGenerationRequest, PresentationGenerationStartResponse } from './types';
 import { getBackendUrl } from '@aiprimary/api';

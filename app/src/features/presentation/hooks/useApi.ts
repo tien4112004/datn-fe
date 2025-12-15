@@ -396,7 +396,7 @@ export const useDraftPresentation = () => {
         title: 'AI Generated Presentation',
         isParsed: true,
         slides: [],
-        ...request,
+        ...request.presentation,
       });
       return draftPresentation;
     },

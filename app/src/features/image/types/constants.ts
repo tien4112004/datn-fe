@@ -9,6 +9,7 @@ export const IMAGE_DIMENSION_OPTIONS = [
 ];
 
 export const ART_STYLE_OPTIONS = [
+  { value: '', labelKey: 'none' },
   { value: 'photorealistic', labelKey: 'photorealistic' },
   { value: 'digital-art', labelKey: 'digitalArt' },
   { value: 'oil-painting', labelKey: 'oilPainting' },
@@ -19,7 +20,9 @@ export const ART_STYLE_OPTIONS = [
   { value: 'abstract', labelKey: 'abstract' },
   { value: 'surreal', labelKey: 'surreal' },
   { value: 'minimalist', labelKey: 'minimalist' },
-];
+] as const;
+
+export type ArtStyle = (typeof ART_STYLE_OPTIONS)[number]['value'];
 
 export const THEME_OPTIONS = [
   { value: 'nature', labelKey: 'nature' },

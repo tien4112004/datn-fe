@@ -3,6 +3,7 @@ import type { OutlineItem, OutlineData } from './outline';
 import type { Presentation, PresentationCollectionRequest, SlideLayoutSchema } from './presentation';
 import type { ApiResponse } from '@aiprimary/api';
 import type { Slide, SlideTheme, SlideTemplate, SlideViewport } from './slide';
+import type { ArtStyle } from '@/features/image/types';
 
 export interface PresentationGenerationRequest {
   outline: string;
@@ -21,6 +22,7 @@ export interface PresentationGenerationRequest {
   // This field is not used in the backend
   others: {
     contentLength: string;
+    artStyle: ArtStyle;
     imageModel: {
       name: string;
       provider: string;

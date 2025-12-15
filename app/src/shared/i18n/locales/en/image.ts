@@ -41,6 +41,9 @@ export default {
     artStyle: {
       label: 'Art Style',
       placeholder: 'Which art style?',
+      title: 'Art Style',
+      description: 'Choose the visual style for your images',
+      none: 'None',
       photorealistic: 'Photorealistic',
       digitalArt: 'Digital Art',
       oilPainting: 'Oil Painting',

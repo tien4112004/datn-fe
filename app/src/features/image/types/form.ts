@@ -1,3 +1,5 @@
+import type { ArtStyle } from './constants';
+
 export interface CreateImageFormData {
   topic: string;
   model: {
@@ -5,6 +7,6 @@ export interface CreateImageFormData {
     provider: string;
   };
   imageDimension: string;
-  artStyle: string;
+  artStyle: ArtStyle;
   negativePrompt: string;
 }

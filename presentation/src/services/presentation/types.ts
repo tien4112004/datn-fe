@@ -1,5 +1,18 @@
 import type { SlideTheme } from '@/types/slides';
 
+export type ArtStyle =
+  | ''
+  | 'photorealistic'
+  | 'digital-art'
+  | 'oil-painting'
+  | 'watercolor'
+  | 'anime'
+  | 'cartoon'
+  | 'sketch'
+  | 'abstract'
+  | 'surreal'
+  | 'minimalist';
+
 export interface PresentationGenerationRequest {
   presentationId: string;
   outline: string;
@@ -18,6 +31,7 @@ export interface PresentationGenerationRequest {
   };
   others: {
     contentLength: string;
+    artStyle: ArtStyle;
     imageModel: {
       name: string;
       provider: string;

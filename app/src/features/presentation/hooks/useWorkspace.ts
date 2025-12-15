@@ -78,6 +78,7 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
     const isValid = await trigger([
       'theme',
       'contentLength',
+      'artStyle',
       'imageModel',
       'model',
       'slideCount',
@@ -105,6 +106,7 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
         language: data.language,
 
         others: {
+          artStyle: data.artStyle,
           contentLength: data.contentLength,
           imageModel: data.imageModel,
         },

@@ -11,6 +11,7 @@ import {
 import useFormPersist from 'react-hook-form-persist';
 import { moduleMap } from '../components/remote/module';
 import type { SlideTheme } from '../types/slide';
+import type { ArtStyle } from '@/features/image/types';
 
 export type UnifiedFormData = {
   // Outline fields
@@ -24,6 +25,7 @@ export type UnifiedFormData = {
   // Customization fields
   theme: SlideTheme;
   contentLength: string;
+  artStyle: ArtStyle;
   imageModel: {
     name: string;
     provider: string;
@@ -60,6 +62,7 @@ export const PresentationFormProvider = ({ children }: PresentationFormProviderP
       },
       theme: {},
       contentLength: '',
+      artStyle: '',
       imageModel: {
         name: '',
         provider: '',

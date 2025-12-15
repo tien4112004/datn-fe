@@ -111,6 +111,21 @@ export default {
     imageModels: {
       title: 'Image Models',
     },
+    artStyle: {
+      title: 'Art Style',
+      none: 'None',
+      description: 'Choose the visual style for your presentation images',
+      photorealistic: 'Photorealistic',
+      digitalArt: 'Digital Art',
+      oilPainting: 'Oil Painting',
+      watercolor: 'Watercolor',
+      anime: 'Anime',
+      cartoon: 'Cartoon',
+      sketch: 'Sketch',
+      abstract: 'Abstract',
+      surreal: 'Surreal',
+      minimalist: 'Minimalist',
+    },
   },
   list: {
     title: 'Presentation List',

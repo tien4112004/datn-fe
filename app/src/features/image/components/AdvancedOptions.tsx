@@ -1,5 +1,4 @@
 import { AnimatePresence, motion } from 'motion/react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { AutosizeTextarea } from '@/components/ui/autosize-textarea';
 import { CardTitle } from '@/shared/components/ui/card';
@@ -8,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 
 import { MODEL_TYPES, useModels } from '@/features/model';
 import { ModelSelect } from '@/shared/components/common/ModelSelect';
-import { IMAGE_DIMENSION_OPTIONS, ART_STYLE_OPTIONS } from '@/features/image/types';
+import { IMAGE_DIMENSION_OPTIONS } from '@/features/image/types';
 import type { CreateImageFormData } from '@/features/image/types';
 import type { Control, UseFormRegister } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
@@ -52,50 +51,24 @@ const AdvancedOptions = ({ register, control, isOpen, onToggle }: AdvancedOption
             style={{ overflow: 'hidden' }}
           >
             <div className="mt-4 space-y-4 px-1">
-              {/* 1x2 Grid for Model and Art Style */}
-              <div className="grid grid-cols-2 gap-4">
-                {/* Image Models */}
-                <div className="space-y-2">
-                  <Label>{t('model.label')}</Label>
-                  <Controller
-                    name="model"
-                    control={control}
-                    render={({ field }) => (
-                      <ModelSelect
-                        models={models}
-                        value={field.value}
-                        onValueChange={field.onChange}
-                        placeholder={t('model.placeholder')}
-                        label={t('model.label')}
-                        isLoading={isLoading}
-                        isError={isError}
-                      />
-                    )}
-                  />
-                </div>
-
-                {/* Art Styles */}
-                <div className="space-y-2">
-                  <Label>{t('artStyle.label')}</Label>
-                  <Controller
-                    name="artStyle"
-                    control={control}
-                    render={({ field }) => (
-                      <Select value={field.value} onValueChange={field.onChange} defaultValue="">
-                        <SelectTrigger>
-                          <SelectValue placeholder={t('artStyle.placeholder')} />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {ART_STYLE_OPTIONS.map((opt) => (
-                            <SelectItem key={opt.value} value={opt.value}>
-                              {t(`artStyle.${opt.labelKey}` as never)}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    )}
-                  />
-                </div>
+              {/* Image Models */}
+              <div className="space-y-2">
+                <Label>{t('model.label')}</Label>
+                <Controller
+                  name="model"
+                  control={control}
+                  render={({ field }) => (
+                    <ModelSelect
+                      models={models}
+                      value={field.value}
+                      onValueChange={field.onChange}
+                      placeholder={t('model.placeholder')}
+                      label={t('model.label')}
+                      isLoading={isLoading}
+                      isError={isError}
+                    />
+                  )}
+                />
               </div>
 
               {/* Image Dimensions - Full Width Visual Options */}

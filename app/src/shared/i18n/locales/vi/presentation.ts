@@ -121,6 +121,21 @@ export default {
     imageModels: {
       title: 'Mô hình hình ảnh',
     },
+    artStyle: {
+      title: 'Phong cách nghệ thuật',
+      description: 'Chọn phong cách hình ảnh cho bài trình bày của bạn',
+      none: 'Không',
+      photorealistic: 'Ảnh thực tế',
+      digitalArt: 'Nghệ thuật kỹ thuật số',
+      oilPainting: 'Tranh sơn dầu',
+      watercolor: 'Tranh màu nước',
+      anime: 'Anime',
+      cartoon: 'Hoạt hình',
+      sketch: 'Phác thảo',
+      abstract: 'Trừu tượng',
+      surreal: 'Siêu thực',
+      minimalist: 'Tối giản',
+    },
   },
   list: {
     title: 'Danh sách bài trình bày',

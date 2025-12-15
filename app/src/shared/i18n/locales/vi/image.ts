@@ -41,6 +41,9 @@ export default {
     artStyle: {
       label: 'Phong cách nghệ thuật',
       placeholder: 'Phong cách nghệ thuật nào?',
+      title: 'Phong cách nghệ thuật',
+      description: 'Chọn phong cách hình ảnh cho hình ảnh của bạn',
+      none: 'Không có',
       photorealistic: 'Chụp thực tế',
       digitalArt: 'Nghệ thuật số',
       oilPainting: 'Sơn dầu',

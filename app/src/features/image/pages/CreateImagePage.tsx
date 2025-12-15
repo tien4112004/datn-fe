@@ -1,5 +1,5 @@
 import { AutosizeTextarea } from '@/components/ui/autosize-textarea';
-import { Card, CardContent, CardTitle, CardHeader, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardTitle } from '@/components/ui/card';
 import ExamplePrompts from '@/features/projects/components/ExamplePrompts';
 import ResourceTypeSwitcher from '@/features/projects/components/ResourceTypeSwitcher';
 import { Sparkles } from 'lucide-react';
@@ -12,116 +12,9 @@ import AdvancedOptions from '@/features/image/components/AdvancedOptions';
 import type { CreateImageFormData } from '@/features/image/types';
 import { useGenerateImage } from '../hooks';
 import useFormPersist from 'react-hook-form-persist';
-import { getLocalStorageData, cn } from '@/shared/lib/utils';
-import type { ArtStyle } from '@/features/image/types';
+import { getLocalStorageData } from '@/shared/lib/utils';
 
 const IMAGE_FORM_PERSIST = 'create-image-form';
-
-interface ArtStyleSectionProps {
-  selectedStyle: ArtStyle;
-  onStyleSelect: (style: ArtStyle) => void;
-}
-
-const ArtStyleSection = ({ selectedStyle, onStyleSelect }: ArtStyleSectionProps) => {
-  const { t } = useTranslation('image', { keyPrefix: 'create.artStyle' });
-
-  const artStyleOptions: Array<{ key: ArtStyle; label: string; preview: string }> = [
-    {
-      key: '',
-      label: t('none'),
-      preview: 'https://placehold.co/600x400/FFFFFF/31343C?text=None',
-    },
-    {
-      key: 'photorealistic',
-      label: t('photorealistic'),
-      preview: 'https://placehold.co/600x400/667eea/ffffff?text=Photorealistic',
-    },
-    {
-      key: 'digital-art',
-      label: t('digitalArt'),
-      preview: 'https://placehold.co/600x400/f093fb/ffffff?text=Digital+Art',
-    },
-    {
-      key: 'oil-painting',
-      label: t('oilPainting'),
-      preview: 'https://placehold.co/600x400/4facfe/ffffff?text=Oil+Painting',
-    },
-    {
-      key: 'watercolor',
-      label: t('watercolor'),
-      preview: 'https://placehold.co/600x400/43e97b/ffffff?text=Watercolor',
-    },
-    {
-      key: 'anime',
-      label: t('anime'),
-      preview: 'https://placehold.co/600x400/fa709a/ffffff?text=Anime',
-    },
-    {
-      key: 'cartoon',
-      label: t('cartoon'),
-      preview: 'https://placehold.co/600x400/30cfd0/ffffff?text=Cartoon',
-    },
-    {
-      key: 'sketch',
-      label: t('sketch'),
-      preview: 'https://placehold.co/600x400/a8edea/ffffff?text=Sketch',
-    },
-    {
-      key: 'abstract',
-      label: t('abstract'),
-      preview: 'https://placehold.co/600x400/ff9a9e/ffffff?text=Abstract',
-    },
-    {
-      key: 'surreal',
-      label: t('surreal'),
-      preview: 'https://placehold.co/600x400/ffecd2/ffffff?text=Surreal',
-    },
-    {
-      key: 'minimalist',
-      label: t('minimalist'),
-      preview: 'https://placehold.co/600x400/EEEEEE/31343C?text=Minimalist',
-    },
-  ];
-
-  return (
-    <>
-      <CardHeader>
-        <CardTitle>{t('title')}</CardTitle>
-        <CardDescription>{t('description')}</CardDescription>
-      </CardHeader>
-      <CardContent className="flex flex-col gap-2">
-        <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
-          {artStyleOptions.map((style) => (
-            <div
-              key={style.key}
-              className={cn(
-                'group relative cursor-pointer overflow-hidden rounded-lg border-2 transition-all hover:scale-105',
-                selectedStyle === style.key ? 'border-primary shadow-md' : 'border-border'
-              )}
-              onClick={() => onStyleSelect(style.key)}
-            >
-              {/* Preview gradient/image */}
-              <div
-                className="h-24 w-full bg-cover bg-center"
-                style={{
-                  background:
-                    style.preview && String(style.preview).startsWith('http')
-                      ? `url(${style.preview}) center/cover no-repeat`
-                      : (style.preview as string),
-                }}
-              />
-
-              {/* Label section */}
-              <div className="bg-card flex items-center justify-center p-2">
-                <span className="text-xs font-medium">{style.label}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </CardContent>
-    </>
-  );
-};
 
 const CreateImagePage = () => {
   const { t } = useTranslation('image');
@@ -217,7 +110,7 @@ const CreateImagePage = () => {
   };
 
   return (
-    <div className="lg:w-4xl flex min-h-[calc(100vh-1rem)] flex-col items-center justify-center gap-4 self-center sm:w-full">
+    <div className="lg:w-4xl flex min-h-[calc(100vh-1rem)] flex-col items-center justify-center gap-4 self-center py-12 sm:w-full">
       <h1 className="text-3xl font-bold leading-10 text-neutral-900">{t('create.title')}</h1>
       <ResourceTypeSwitcher />
       <h2 className="text-xl font-bold leading-10 text-sky-500/80">{t('create.subtitle')}</h2>
@@ -260,14 +153,6 @@ const CreateImagePage = () => {
               onToggle={toggleAdvancedOptions}
             />
           </CardContent>
-        </Card>
-
-        {/* Art Style Section */}
-        <Card className="mt-4 w-full">
-          <ArtStyleSection
-            selectedStyle={watch('artStyle')}
-            onStyleSelect={(style) => setValue('artStyle', style)}
-          />
         </Card>
 
         {error && <div className="mt-2 rounded-md bg-red-50 p-3 text-sm text-red-600">{error}</div>}

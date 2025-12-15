@@ -53,6 +53,12 @@ const useResourceHooks = (resourceType: ResourceType) => {
         }),
       createTest: () => createTestMindmaps.mutate(),
     };
+  } else if (resourceType === 'image') {
+    return {
+      generate: () => navigate('/image/generate'),
+      createBlank: null,
+      createTest: null,
+    };
   }
 
   return null;
@@ -63,11 +69,15 @@ const CreatePresentationControls = ({ currentResourceType }: ProjectControlsProp
   const hooks = useResourceHooks(currentResourceType);
 
   const handleCreateBlank = () => {
-    hooks?.createBlank();
+    if (hooks?.createBlank) {
+      hooks.createBlank();
+    }
   };
 
   const handleCreateTest = () => {
-    hooks?.createTest();
+    if (hooks?.createTest) {
+      hooks.createTest();
+    }
   };
 
   const handleGenerate = () => {

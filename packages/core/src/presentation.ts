@@ -1,5 +1,10 @@
 import type { Slide, SlideTheme } from '@aiprimary/core';
 
+export interface ModelConfig {
+  name: string;
+  provider: string;
+}
+
 export interface Presentation {
   id: string;
   title: string;

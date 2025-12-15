@@ -191,11 +191,6 @@ const ArtSection = ({ selectedStyle, onStyleSelect, disabled = false }: ArtSecti
       label: t('artStyle.surreal'),
       preview: 'https://placehold.co/600x400/ffecd2/ffffff?text=Surreal',
     },
-    {
-      key: 'minimalist',
-      label: t('artStyle.minimalist'),
-      preview: 'https://placehold.co/600x400/EEEEEE/31343C?text=Minimalist',
-    },
   ];
 
   return (

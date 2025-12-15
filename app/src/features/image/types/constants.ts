@@ -19,20 +19,6 @@ export const ART_STYLE_OPTIONS = [
   { value: 'sketch', labelKey: 'sketch' },
   { value: 'abstract', labelKey: 'abstract' },
   { value: 'surreal', labelKey: 'surreal' },
-  { value: 'minimalist', labelKey: 'minimalist' },
 ] as const;
 
 export type ArtStyle = (typeof ART_STYLE_OPTIONS)[number]['value'];
-
-export const THEME_OPTIONS = [
-  { value: 'nature', labelKey: 'nature' },
-  { value: 'urban', labelKey: 'urban' },
-  { value: 'fantasy', labelKey: 'fantasy' },
-  { value: 'sci-fi', labelKey: 'sciFi' },
-  { value: 'vintage', labelKey: 'vintage' },
-  { value: 'modern', labelKey: 'modern' },
-  { value: 'dark', labelKey: 'dark' },
-  { value: 'bright', labelKey: 'bright' },
-  { value: 'pastel', labelKey: 'pastel' },
-  { value: 'monochrome', labelKey: 'monochrome' },
-];

@@ -212,8 +212,17 @@ export default class PresentationMockService implements PresentationApiService {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       isParsed: false,
-      theme: _request.presentation.theme,
-      viewport: _request.presentation.viewport,
+      theme: _request.presentation?.theme || {
+        backgroundColor: '#ffffff',
+        themeColors: [],
+        fontColor: '#000000',
+        fontName: 'Arial',
+        titleFontName: 'Arial',
+        titleFontColor: '#000000',
+        outline: {} as any,
+        shadow: {} as any,
+      },
+      viewport: _request.presentation?.viewport || { width: 1024, height: 768 },
     };
 
     // Add the new presentation to the mock list

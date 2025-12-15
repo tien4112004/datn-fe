@@ -119,7 +119,7 @@ export function usePresentationProcessor(
   // 4. Extracted Image Logic
   async function handleImageGeneration(slideId: string, imageElement: PPTImageElement, prompt?: string) {
     const request = generationStore.request;
-    if (!prompt || !request?.others?.imageModel) return;
+    if (!prompt || !request?.generationOptions?.imageModel) return;
 
     // Set loading state
     const loadingUrl =
@@ -130,7 +130,7 @@ export function usePresentationProcessor(
       const response: any = await generateImage({
         slideId,
         prompt,
-        model: request.others.imageModel,
+        model: request.generationOptions.imageModel,
       });
 
       const imageUrl = response.images[0]?.url;

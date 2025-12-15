@@ -1,40 +1,36 @@
 import type { Service } from '@/shared/api';
 import type { OutlineItem, OutlineData } from './outline';
-import type { Presentation, PresentationCollectionRequest, SlideLayoutSchema } from './presentation';
+import type {
+  Presentation,
+  PresentationCollectionRequest,
+  SlideLayoutSchema,
+  ModelConfig,
+} from './presentation';
 import type { ApiResponse } from '@aiprimary/api';
 import type { Slide, SlideTheme, SlideTemplate, SlideViewport } from './slide';
 import type { ArtStyle } from '@/features/image/types';
 
+interface PresentationConfig {
+  theme: SlideTheme;
+  viewport: SlideViewport;
+}
+
+interface ImageOptions {
+  artStyle: ArtStyle;
+  imageModel: ModelConfig;
+}
+
 export interface PresentationGenerationRequest {
   outline: string;
-  model: {
-    name: string;
-    provider: string;
-  };
+  model: ModelConfig;
   slideCount: number;
   language: string;
-  /** @deprecated */
-  presentation: {
-    theme: SlideTheme;
-    viewport: SlideViewport;
-  };
-
-  // This field is not used in the backend
-  others: {
-    contentLength: string;
-    artStyle: ArtStyle;
-    imageModel: {
-      name: string;
-      provider: string;
-    };
-  };
+  presentation?: PresentationConfig;
+  generationOptions?: ImageOptions;
 }
 
 export interface PresentationGenerateDraftRequest {
-  presentation: {
-    theme: SlideTheme;
-    viewport: SlideViewport;
-  };
+  presentation: PresentationConfig;
 }
 
 export interface PresentationGenerationResponse {

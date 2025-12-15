@@ -110,7 +110,7 @@ const CreateMindmapPage = () => {
   };
 
   return (
-    <div className="lg:w-4xl flex min-h-[calc(100vh-1rem)] flex-col items-center justify-center gap-4 self-center sm:w-full">
+    <div className="lg:w-4xl flex min-h-[calc(100vh-1rem)] flex-col items-center justify-center gap-4 self-center py-12 sm:w-full">
       <h1 className="text-3xl font-bold leading-10 text-neutral-900">{t('create.title')}</h1>
       <ResourceTypeSwitcher />
       <h2 className="text-xl font-bold leading-10 text-sky-500/80">{t('create.subtitle')}</h2>

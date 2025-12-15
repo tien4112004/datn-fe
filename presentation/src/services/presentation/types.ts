@@ -1,4 +1,4 @@
-import type { SlideTheme } from '@/types/slides';
+import type { SlideTheme, ModelConfig } from '@aiprimary/core';
 
 export type ArtStyle =
   | ''
@@ -13,30 +13,27 @@ export type ArtStyle =
   | 'surreal'
   | 'minimalist';
 
+interface PresentationConfig {
+  theme: SlideTheme;
+  viewport: {
+    width: number;
+    height: number;
+  };
+}
+
+interface ImageOptions {
+  artStyle: ArtStyle;
+  imageModel: ModelConfig;
+}
+
 export interface PresentationGenerationRequest {
   presentationId: string;
   outline: string;
-  model: {
-    name: string;
-    provider: string;
-  };
+  model: ModelConfig;
   slideCount: number;
   language: string;
-  presentation: {
-    theme: SlideTheme;
-    viewport: {
-      width: number;
-      height: number;
-    };
-  };
-  others: {
-    contentLength: string;
-    artStyle: ArtStyle;
-    imageModel: {
-      name: string;
-      provider: string;
-    };
-  };
+  presentation: PresentationConfig;
+  generationOptions?: ImageOptions;
 }
 
 export interface PresentationGenerationStartResponse {

@@ -105,9 +105,8 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
         slideCount: data.slideCount,
         language: data.language,
 
-        others: {
+        generationOptions: {
           artStyle: data.artStyle,
-          contentLength: data.contentLength,
           imageModel: data.imageModel,
         },
       });

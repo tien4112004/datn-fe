@@ -7,6 +7,7 @@ import { UserDetailPage } from '@/pages/UserDetailPage';
 import { SlideThemesPage } from '@/pages/SlideThemesPage';
 import { ThemeFormPage } from '@/pages/ThemeFormPage';
 import { SlideTemplatesPage } from '@/pages/SlideTemplatesPage';
+import { TemplateFormPage } from '@/pages/TemplateFormPage';
 import { ArtStylesPage } from '@/pages/ArtStylesPage';
 import { ModelConfigPage } from '@/pages/ModelConfigPage';
 import { FAQPostsPage } from '@/pages/FAQPostsPage';
@@ -57,6 +58,14 @@ export const router = createBrowserRouter([
       {
         path: 'slide-templates',
         element: <SlideTemplatesPage />,
+      },
+      {
+        path: 'slide-templates/new',
+        element: <TemplateFormPage />,
+      },
+      {
+        path: 'slide-templates/:id',
+        element: <TemplateFormPage />,
       },
       {
         path: 'art-styles',

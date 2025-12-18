@@ -52,7 +52,7 @@ export const adminApi = {
       const { data, pagination } = paginate(mockUsers, params?.page, params?.pageSize);
       return { success: true, data, pagination };
     }
-    const response = await api.get<ApiResponse<User[]>>('/admin/users', { params });
+    const response = await api.get<ApiResponse<User[]>>('/api/users', { params });
     return response.data;
   },
 
@@ -63,7 +63,7 @@ export const adminApi = {
       if (!user) throw new Error('User not found');
       return { success: true, data: user };
     }
-    const response = await api.get<ApiResponse<User>>(`/admin/users/${id}`);
+    const response = await api.get<ApiResponse<User>>(`/api/users/${id}`);
     return response.data;
   },
 
@@ -74,7 +74,7 @@ export const adminApi = {
       const { data, pagination } = paginate(mockSlideThemes, params?.page, params?.pageSize);
       return { success: true, data, pagination };
     }
-    const response = await api.get<ApiResponse<SlideTheme[]>>('/admin/slide/theme', { params });
+    const response = await api.get<ApiResponse<SlideTheme[]>>('/api/slide-themes', { params });
     return response.data;
   },
 
@@ -90,7 +90,7 @@ export const adminApi = {
       mockSlideThemes.unshift(newTheme);
       return { success: true, data: newTheme };
     }
-    const response = await api.post<ApiResponse<SlideTheme>>('/admin/slide/theme', data);
+    const response = await api.post<ApiResponse<SlideTheme>>('/api/slide-themes', data);
     return response.data;
   },
 
@@ -103,7 +103,7 @@ export const adminApi = {
       mockSlideThemes[index] = updated;
       return { success: true, data: updated };
     }
-    const response = await api.put<ApiResponse<SlideTheme>>(`/admin/slide/theme/${id}`, data);
+    const response = await api.put<ApiResponse<SlideTheme>>(`/api/slide-themes/${id}`, data);
     return response.data;
   },
 
@@ -114,7 +114,7 @@ export const adminApi = {
       const { data, pagination } = paginate(mockSlideTemplates, params?.page, params?.pageSize);
       return { success: true, data, pagination };
     }
-    const response = await api.get<ApiResponse<SlideTemplate[]>>('/admin/slide/layout', { params });
+    const response = await api.get<ApiResponse<SlideTemplate[]>>('/api/slide-templates', { params });
     return response.data;
   },
 
@@ -130,7 +130,7 @@ export const adminApi = {
       mockSlideTemplates.unshift(newTemplate);
       return { success: true, data: newTemplate };
     }
-    const response = await api.post<ApiResponse<SlideTemplate>>('/admin/slide/layout', data);
+    const response = await api.post<ApiResponse<SlideTemplate>>('/api/slide-templates', data);
     return response.data;
   },
 
@@ -143,7 +143,7 @@ export const adminApi = {
       mockSlideTemplates[index] = updated;
       return { success: true, data: updated };
     }
-    const response = await api.put<ApiResponse<SlideTemplate>>(`/admin/slide/layout/${id}`, data);
+    const response = await api.put<ApiResponse<SlideTemplate>>(`/api/slide-templates/${id}`, data);
     return response.data;
   },
 
@@ -233,7 +233,7 @@ export const adminApi = {
       const { data, pagination } = paginate(mockFAQPosts, params?.page, params?.pageSize);
       return { success: true, data, pagination };
     }
-    const response = await api.get<ApiResponse<FAQPost[]>>('/admin/faq', { params });
+    const response = await api.get<ApiResponse<FAQPost[]>>('/api/faq', { params });
     return response.data;
   },
 
@@ -249,7 +249,7 @@ export const adminApi = {
       mockFAQPosts.unshift(newPost);
       return { success: true, data: newPost };
     }
-    const response = await api.post<ApiResponse<FAQPost>>('/admin/faq', data);
+    const response = await api.post<ApiResponse<FAQPost>>('/api/faq', data);
     return response.data;
   },
 
@@ -262,7 +262,7 @@ export const adminApi = {
       mockFAQPosts[index] = updated;
       return { success: true, data: updated };
     }
-    const response = await api.put<ApiResponse<FAQPost>>(`/admin/faq/${id}`, data);
+    const response = await api.put<ApiResponse<FAQPost>>(`/api/faq/${id}`, data);
     return response.data;
   },
 
@@ -274,7 +274,7 @@ export const adminApi = {
       mockFAQPosts.splice(index, 1);
       return { success: true, data: undefined };
     }
-    const response = await api.delete<ApiResponse<void>>(`/admin/faq/${id}`);
+    const response = await api.delete<ApiResponse<void>>(`/api/faq/${id}`);
     return response.data;
   },
 
@@ -289,7 +289,7 @@ export const adminApi = {
       const { data, pagination } = paginate(filtered, params?.page, params?.pageSize);
       return { success: true, data, pagination };
     }
-    const response = await api.get<ApiResponse<Book[]>>('/admin/books', { params });
+    const response = await api.get<ApiResponse<Book[]>>('/api/books', { params });
     return response.data;
   },
 
@@ -300,7 +300,7 @@ export const adminApi = {
       if (!book) throw new Error('Book not found');
       return { success: true, data: book };
     }
-    const response = await api.get<ApiResponse<Book>>(`/admin/books/${id}`);
+    const response = await api.get<ApiResponse<Book>>(`/api/books/${id}`);
     return response.data;
   },
 
@@ -324,7 +324,7 @@ export const adminApi = {
       mockBooks.unshift(newBook);
       return { success: true, data: newBook };
     }
-    const response = await api.post<ApiResponse<Book>>('/admin/books', data, {
+    const response = await api.post<ApiResponse<Book>>('/api/books', data, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
     return response.data;
@@ -351,7 +351,7 @@ export const adminApi = {
       mockBooks[index] = updated;
       return { success: true, data: updated };
     }
-    const response = await api.put<ApiResponse<Book>>(`/admin/books/${id}`, data, {
+    const response = await api.put<ApiResponse<Book>>(`/api/books/${id}`, data, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
     return response.data;
@@ -365,7 +365,7 @@ export const adminApi = {
       mockBooks.splice(index, 1);
       return { success: true, data: undefined };
     }
-    const response = await api.delete<ApiResponse<void>>(`/admin/books/${id}`);
+    const response = await api.delete<ApiResponse<void>>(`/api/books/${id}`);
     return response.data;
   },
 };

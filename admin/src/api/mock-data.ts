@@ -121,67 +121,567 @@ export const MOCK_SLIDE_THEMES: SlideTheme[] = [
 export const MOCK_SLIDE_TEMPLATES: SlideTemplate[] = [
   {
     id: 'template-1',
-    name: 'Title Slide',
+    name: 'Title - Default',
     layout: 'title',
     config: {
       containers: {
-        title: { x: 100, y: 200, width: 800, height: 100 },
-        subtitle: { x: 100, y: 320, width: 800, height: 60 },
+        title: {
+          type: 'text',
+          bounds: {
+            left: 30,
+            top: 'calc(SLIDE_HEIGHT * 0.28)',
+            width: 'calc(SLIDE_WIDTH - 60)',
+            height: 120,
+          },
+          layout: {
+            horizontalAlignment: 'center',
+            verticalAlignment: 'center',
+          },
+          text: {
+            color: '{{theme.titleFontColor}}',
+            fontFamily: '{{theme.titleFontName}}',
+            fontWeight: 'bold',
+            textAlign: 'center',
+          },
+        },
+        content: {
+          type: 'block',
+          positioning: {
+            relativeTo: 'title',
+            axis: 'vertical',
+            anchor: 'end',
+            offset: 0,
+            size: 120,
+          },
+          childTemplate: {
+            count: 'auto',
+            structure: {
+              type: 'text',
+              text: {
+                color: '{{theme.fontColor}}',
+                fontFamily: '{{theme.fontName}}',
+                textAlign: 'center',
+              },
+            },
+          },
+        },
       },
     },
-    parameters: [
-      { key: 'titleSize', label: 'Title Size', defaultValue: 48, min: 24, max: 72, step: 2 },
-      { key: 'subtitleSize', label: 'Subtitle Size', defaultValue: 24, min: 14, max: 36, step: 2 },
-    ],
+    parameters: [],
     createdAt: '2024-01-20T10:00:00Z',
     updatedAt: '2024-05-15T12:30:00Z',
   },
   {
     id: 'template-2',
-    name: 'Content with Image',
-    layout: 'content-image',
+    name: 'List - Bordered Items Grid',
+    layout: 'list',
     config: {
       containers: {
-        title: { x: 50, y: 30, width: 900, height: 60 },
-        content: { x: 50, y: 110, width: 450, height: 400 },
-        image: { x: 520, y: 110, width: 430, height: 400 },
+        title: {
+          type: 'text',
+          bounds: {
+            left: 'SIDE_PADDING',
+            top: 15,
+            width: 'calc(SLIDE_WIDTH - SIDE_PADDING * 2)',
+            height: 120,
+          },
+          text: {
+            color: '{{theme.titleFontColor}}',
+            fontFamily: '{{theme.titleFontName}}',
+            fontWeight: 'bold',
+            textAlign: 'center',
+          },
+        },
+        content: {
+          type: 'block',
+          id: 'content',
+          positioning: {
+            relativeTo: 'title',
+            axis: 'vertical',
+            anchor: 'end',
+            offset: 20,
+            size: 'fill',
+          },
+          childTemplate: {
+            count: 'auto',
+            structure: {
+              type: 'text',
+              text: {
+                color: '{{theme.fontColor}}',
+                fontFamily: '{{theme.fontName}}',
+              },
+            },
+          },
+        },
       },
     },
     parameters: [
-      { key: 'contentPadding', label: 'Content Padding', defaultValue: 20, min: 10, max: 40, step: 5 },
-      { key: 'imageRadius', label: 'Image Border Radius', defaultValue: 8, min: 0, max: 24, step: 4 },
+      {
+        key: 'SIDE_PADDING',
+        label: 'Side Padding (px)',
+        defaultValue: 20,
+        min: 0,
+        max: 50,
+        step: 1,
+      },
     ],
     createdAt: '2024-02-10T14:00:00Z',
     updatedAt: '2024-06-20T09:15:00Z',
   },
   {
     id: 'template-3',
-    name: 'Two Column',
-    layout: 'two-column',
+    name: 'Labeled List - Numbered',
+    layout: 'labeledList',
     config: {
       containers: {
-        title: { x: 50, y: 30, width: 900, height: 60 },
-        leftColumn: { x: 50, y: 110, width: 430, height: 400 },
-        rightColumn: { x: 520, y: 110, width: 430, height: 400 },
+        title: {
+          type: 'text',
+          bounds: {
+            left: 30,
+            top: 15,
+            width: 'calc(SLIDE_WIDTH - 60)',
+            height: 80,
+          },
+          text: {
+            color: '{{theme.titleFontColor}}',
+            fontFamily: '{{theme.titleFontName}}',
+            fontWeight: 'bold',
+            textAlign: 'center',
+          },
+        },
+        content: {
+          type: 'block',
+          positioning: {
+            relativeTo: 'title',
+            axis: 'vertical',
+            anchor: 'end',
+            offset: 20,
+            size: 'fill',
+          },
+          childTemplate: {
+            count: 'auto',
+            structure: {
+              type: 'text',
+              text: {
+                color: '{{theme.fontColor}}',
+                fontFamily: '{{theme.fontName}}',
+              },
+            },
+          },
+        },
       },
     },
-    parameters: [{ key: 'columnGap', label: 'Column Gap', defaultValue: 40, min: 20, max: 80, step: 10 }],
+    parameters: [
+      {
+        key: 'ITEM_SPACING',
+        label: 'Item Spacing (px)',
+        defaultValue: 15,
+        min: 5,
+        max: 30,
+        step: 1,
+      },
+    ],
     createdAt: '2024-03-05T16:30:00Z',
     updatedAt: '2024-07-25T11:00:00Z',
   },
   {
     id: 'template-4',
-    name: 'Quote Slide',
-    layout: 'quote',
+    name: 'Two Column - Equal Split',
+    layout: 'twoColumn',
     config: {
       containers: {
-        quote: { x: 100, y: 150, width: 800, height: 200 },
-        author: { x: 100, y: 380, width: 800, height: 40 },
+        title: {
+          type: 'text',
+          bounds: {
+            left: 30,
+            top: 15,
+            width: 'calc(SLIDE_WIDTH - 60)',
+            height: 80,
+          },
+          text: {
+            color: '{{theme.titleFontColor}}',
+            fontFamily: '{{theme.titleFontName}}',
+            fontWeight: 'bold',
+            textAlign: 'center',
+          },
+        },
+        leftColumn: {
+          type: 'block',
+          positioning: {
+            relativeTo: 'title',
+            axis: 'vertical',
+            anchor: 'end',
+            offset: 20,
+            size: 'fill',
+          },
+          layout: {
+            horizontalAlignment: 'left',
+          },
+          childTemplate: {
+            count: 'auto',
+            structure: {
+              type: 'text',
+              text: {
+                color: '{{theme.fontColor}}',
+                fontFamily: '{{theme.fontName}}',
+              },
+            },
+          },
+        },
+        rightColumn: {
+          type: 'block',
+          positioning: {
+            relativeTo: 'title',
+            axis: 'vertical',
+            anchor: 'end',
+            offset: 20,
+            size: 'fill',
+          },
+          layout: {
+            horizontalAlignment: 'right',
+          },
+          childTemplate: {
+            count: 'auto',
+            structure: {
+              type: 'text',
+              text: {
+                color: '{{theme.fontColor}}',
+                fontFamily: '{{theme.fontName}}',
+              },
+            },
+          },
+        },
       },
     },
-    parameters: [{ key: 'quoteSize', label: 'Quote Font Size', defaultValue: 32, min: 20, max: 48, step: 2 }],
+    parameters: [
+      {
+        key: 'COLUMN_GAP',
+        label: 'Column Gap (px)',
+        defaultValue: 40,
+        min: 20,
+        max: 80,
+        step: 5,
+      },
+    ],
     createdAt: '2024-04-15T10:45:00Z',
     updatedAt: '2024-08-30T14:20:00Z',
+  },
+  {
+    id: 'template-5',
+    name: 'Two Column with Image',
+    layout: 'twoColumnWithImage',
+    config: {
+      containers: {
+        title: {
+          type: 'text',
+          bounds: {
+            left: 30,
+            top: 15,
+            width: 'calc(SLIDE_WIDTH - 60)',
+            height: 80,
+          },
+          text: {
+            color: '{{theme.titleFontColor}}',
+            fontFamily: '{{theme.titleFontName}}',
+            fontWeight: 'bold',
+            textAlign: 'center',
+          },
+        },
+        content: {
+          type: 'block',
+          bounds: {
+            left: 30,
+            top: 110,
+            width: 'calc(SLIDE_WIDTH * 0.5 - 50)',
+            height: 'calc(SLIDE_HEIGHT - 130)',
+          },
+          childTemplate: {
+            count: 'auto',
+            structure: {
+              type: 'text',
+              text: {
+                color: '{{theme.fontColor}}',
+                fontFamily: '{{theme.fontName}}',
+              },
+            },
+          },
+        },
+        image: {
+          type: 'image',
+          bounds: {
+            left: 'calc(SLIDE_WIDTH * 0.5 + 20)',
+            top: 110,
+            width: 'calc(SLIDE_WIDTH * 0.5 - 50)',
+            height: 'calc(SLIDE_HEIGHT - 130)',
+          },
+        },
+      },
+    },
+    parameters: [
+      {
+        key: 'IMAGE_RADIUS',
+        label: 'Image Border Radius (px)',
+        defaultValue: 8,
+        min: 0,
+        max: 24,
+        step: 2,
+      },
+    ],
+    createdAt: '2024-05-10T13:20:00Z',
+    updatedAt: '2024-09-05T10:15:00Z',
+  },
+  {
+    id: 'template-6',
+    name: 'Main Image - Featured',
+    layout: 'mainImage',
+    config: {
+      containers: {
+        title: {
+          type: 'text',
+          bounds: {
+            left: 30,
+            top: 15,
+            width: 'calc(SLIDE_WIDTH - 60)',
+            height: 60,
+          },
+          text: {
+            color: '{{theme.titleFontColor}}',
+            fontFamily: '{{theme.titleFontName}}',
+            fontWeight: 'bold',
+            textAlign: 'center',
+          },
+        },
+        image: {
+          type: 'image',
+          bounds: {
+            left: 30,
+            top: 90,
+            width: 'calc(SLIDE_WIDTH - 60)',
+            height: 'calc(SLIDE_HEIGHT - 180)',
+          },
+        },
+        caption: {
+          type: 'text',
+          bounds: {
+            left: 30,
+            top: 'calc(SLIDE_HEIGHT - 70)',
+            width: 'calc(SLIDE_WIDTH - 60)',
+            height: 60,
+          },
+          text: {
+            color: '{{theme.fontColor}}',
+            fontFamily: '{{theme.fontName}}',
+            textAlign: 'center',
+            fontSize: 14,
+          },
+        },
+      },
+    },
+    parameters: [],
+    createdAt: '2024-06-15T11:00:00Z',
+    updatedAt: '2024-09-20T15:45:00Z',
+  },
+  {
+    id: 'template-7',
+    name: 'Table of Contents',
+    layout: 'tableOfContents',
+    config: {
+      containers: {
+        title: {
+          type: 'text',
+          bounds: {
+            left: 30,
+            top: 15,
+            width: 'calc(SLIDE_WIDTH - 60)',
+            height: 80,
+          },
+          text: {
+            color: '{{theme.titleFontColor}}',
+            fontFamily: '{{theme.titleFontName}}',
+            fontWeight: 'bold',
+            textAlign: 'center',
+            fontSize: 36,
+          },
+        },
+        content: {
+          type: 'block',
+          positioning: {
+            relativeTo: 'title',
+            axis: 'vertical',
+            anchor: 'end',
+            offset: 30,
+            size: 'fill',
+          },
+          childTemplate: {
+            count: 'auto',
+            structure: {
+              type: 'text',
+              text: {
+                color: '{{theme.fontColor}}',
+                fontFamily: '{{theme.fontName}}',
+                fontSize: 18,
+              },
+            },
+          },
+        },
+      },
+    },
+    parameters: [
+      {
+        key: 'LINE_HEIGHT',
+        label: 'Line Height (px)',
+        defaultValue: 40,
+        min: 25,
+        max: 60,
+        step: 5,
+      },
+    ],
+    createdAt: '2024-07-20T09:30:00Z',
+    updatedAt: '2024-10-01T16:00:00Z',
+  },
+  {
+    id: 'template-8',
+    name: 'Timeline - Horizontal',
+    layout: 'timeline',
+    config: {
+      containers: {
+        title: {
+          type: 'text',
+          bounds: {
+            left: 30,
+            top: 15,
+            width: 'calc(SLIDE_WIDTH - 60)',
+            height: 60,
+          },
+          text: {
+            color: '{{theme.titleFontColor}}',
+            fontFamily: '{{theme.titleFontName}}',
+            fontWeight: 'bold',
+            textAlign: 'center',
+          },
+        },
+        timeline: {
+          type: 'block',
+          bounds: {
+            left: 30,
+            top: 90,
+            width: 'calc(SLIDE_WIDTH - 60)',
+            height: 'calc(SLIDE_HEIGHT - 130)',
+          },
+          layout: {
+            horizontalAlignment: 'space-between',
+          },
+          childTemplate: {
+            count: 'auto',
+            structure: {
+              type: 'block',
+              layout: {
+                verticalAlignment: 'top',
+              },
+              children: [
+                {
+                  label: 'label',
+                  type: 'text',
+                  text: {
+                    color: '{{theme.themeColors[0]}}',
+                    fontFamily: '{{theme.fontName}}',
+                    fontWeight: 'bold',
+                    fontSize: 16,
+                  },
+                },
+                {
+                  label: 'content',
+                  type: 'text',
+                  text: {
+                    color: '{{theme.fontColor}}',
+                    fontFamily: '{{theme.fontName}}',
+                    fontSize: 14,
+                  },
+                },
+              ],
+            },
+          },
+        },
+      },
+    },
+    parameters: [],
+    createdAt: '2024-08-10T14:15:00Z',
+    updatedAt: '2024-10-15T11:30:00Z',
+  },
+  {
+    id: 'template-9',
+    name: 'Pyramid - Hierarchy',
+    layout: 'pyramid',
+    config: {
+      containers: {
+        title: {
+          type: 'text',
+          bounds: {
+            left: 30,
+            top: 15,
+            width: 'calc(SLIDE_WIDTH - 60)',
+            height: 60,
+          },
+          text: {
+            color: '{{theme.titleFontColor}}',
+            fontFamily: '{{theme.titleFontName}}',
+            fontWeight: 'bold',
+            textAlign: 'center',
+          },
+        },
+        content: {
+          type: 'block',
+          positioning: {
+            relativeTo: 'title',
+            axis: 'vertical',
+            anchor: 'end',
+            offset: 30,
+            size: 'fill',
+          },
+          layout: {
+            horizontalAlignment: 'center',
+            verticalAlignment: 'space-around',
+          },
+          childTemplate: {
+            count: 'auto',
+            structure: {
+              type: 'block',
+              bounds: {
+                height: 80,
+              },
+              layout: {
+                horizontalAlignment: 'center',
+                verticalAlignment: 'center',
+              },
+              children: [
+                {
+                  label: 'content',
+                  type: 'text',
+                  text: {
+                    color: '#FFFFFF',
+                    fontFamily: '{{theme.fontName}}',
+                    fontWeight: 'bold',
+                    textAlign: 'center',
+                  },
+                },
+              ],
+            },
+          },
+        },
+      },
+    },
+    parameters: [
+      {
+        key: 'LEVEL_HEIGHT',
+        label: 'Level Height (px)',
+        defaultValue: 80,
+        min: 40,
+        max: 120,
+        step: 10,
+      },
+    ],
+    createdAt: '2024-09-05T10:00:00Z',
+    updatedAt: '2024-10-20T13:45:00Z',
   },
 ];
 

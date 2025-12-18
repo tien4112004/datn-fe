@@ -64,6 +64,27 @@ export interface SlideTemplate {
   updatedAt?: string;
 }
 
+export interface ArtStyle {
+  id?: string;
+  name: string;
+  labelKey: string;
+  visual?: string; // CDN URL in responses
+  modifiers?: string;
+  isEnabled?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+// Request type for creating/updating art styles - visual accepts base64 data URI
+export interface ArtStyleRequest {
+  id?: string;
+  name: string;
+  labelKey: string;
+  visual?: string; // base64 data URI (e.g., "data:image/png;base64,...")
+  modifiers?: string;
+  isEnabled?: boolean;
+}
+
 export interface TemplateParameter {
   key: string;
   label: string;

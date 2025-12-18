@@ -5,6 +5,7 @@ import type {
   PaginationParams,
   SlideTheme,
   SlideTemplate,
+  ArtStyle,
   Model,
   ModelPatchData,
   FAQPost,
@@ -16,6 +17,7 @@ import {
   MOCK_USERS,
   MOCK_SLIDE_THEMES,
   MOCK_SLIDE_TEMPLATES,
+  MOCK_ART_STYLES,
   MOCK_MODELS,
   MOCK_FAQ_POSTS,
   MOCK_BOOKS,
@@ -37,6 +39,7 @@ const getApiMode = (): ApiMode => {
 let mockUsers = [...MOCK_USERS];
 let mockSlideThemes = [...MOCK_SLIDE_THEMES];
 let mockSlideTemplates = [...MOCK_SLIDE_TEMPLATES];
+let mockArtStyles = [...MOCK_ART_STYLES];
 let mockModels = [...MOCK_MODELS];
 let mockFAQPosts = [...MOCK_FAQ_POSTS];
 let mockBooks = [...MOCK_BOOKS];
@@ -141,6 +144,46 @@ export const adminApi = {
       return { success: true, data: updated };
     }
     const response = await api.put<ApiResponse<SlideTemplate>>(`/admin/slide/layout/${id}`, data);
+    return response.data;
+  },
+
+  // Art Styles
+  getArtStyles: async (params?: PaginationParams): Promise<ApiResponse<ArtStyle[]>> => {
+    if (getApiMode() === 'mock') {
+      await delay();
+      const { data, pagination } = paginate(mockArtStyles, params?.page, params?.pageSize);
+      return { success: true, data, pagination };
+    }
+    const response = await api.get<ApiResponse<ArtStyle[]>>('/api/art-styles', { params });
+    return response.data;
+  },
+
+  createArtStyle: async (data: ArtStyle): Promise<ApiResponse<ArtStyle>> => {
+    if (getApiMode() === 'mock') {
+      await delay(500);
+      const newStyle: ArtStyle = {
+        ...data,
+        id: data.id || generateId('art-style'),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+      mockArtStyles.unshift(newStyle);
+      return { success: true, data: newStyle };
+    }
+    const response = await api.post<ApiResponse<ArtStyle>>('/api/art-styles', data);
+    return response.data;
+  },
+
+  updateArtStyle: async (id: string, data: ArtStyle): Promise<ApiResponse<ArtStyle>> => {
+    if (getApiMode() === 'mock') {
+      await delay(500);
+      const index = mockArtStyles.findIndex((s) => s.id === id);
+      if (index === -1) throw new Error('Art style not found');
+      const updated: ArtStyle = { ...data, id, updatedAt: new Date().toISOString() };
+      mockArtStyles[index] = updated;
+      return { success: true, data: updated };
+    }
+    const response = await api.put<ApiResponse<ArtStyle>>(`/api/art-styles/${id}`, data);
     return response.data;
   },
 

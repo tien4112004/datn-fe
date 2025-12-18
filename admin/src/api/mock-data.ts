@@ -1,5 +1,5 @@
 import type { User } from '@/types/auth';
-import type { SlideTheme, SlideTemplate, Model, FAQPost, Book, Pagination } from '@/types/api';
+import type { SlideTheme, SlideTemplate, ArtStyle, Model, FAQPost, Book, Pagination } from '@/types/api';
 
 // ============= USERS MOCK DATA =============
 export const MOCK_USERS: User[] = [
@@ -182,6 +182,119 @@ export const MOCK_SLIDE_TEMPLATES: SlideTemplate[] = [
     parameters: [{ key: 'quoteSize', label: 'Quote Font Size', defaultValue: 32, min: 20, max: 48, step: 2 }],
     createdAt: '2024-04-15T10:45:00Z',
     updatedAt: '2024-08-30T14:20:00Z',
+  },
+];
+
+// ============= ART STYLES MOCK DATA =============
+// Mock CDN URL base - simulates R2 storage URLs
+const MOCK_CDN_BASE = 'https://cdn.example.com/artStyles';
+
+export const MOCK_ART_STYLES: ArtStyle[] = [
+  {
+    id: 'photorealistic',
+    name: 'Photorealistic',
+    labelKey: 'photorealistic',
+    visual: `${MOCK_CDN_BASE}/photorealistic.jpg`,
+    modifiers: 'ultra realistic, highly detailed, 8k resolution, sharp focus, professional photography',
+    isEnabled: true,
+    createdAt: '2024-01-10T10:00:00Z',
+    updatedAt: '2024-06-15T14:30:00Z',
+  },
+  {
+    id: 'digital-art',
+    name: 'Digital Art',
+    labelKey: 'digitalArt',
+    visual: `${MOCK_CDN_BASE}/digital-art.jpg`,
+    modifiers: 'digital painting, vibrant colors, detailed, artstation trending',
+    isEnabled: true,
+    createdAt: '2024-01-10T10:00:00Z',
+    updatedAt: '2024-06-15T14:30:00Z',
+  },
+  {
+    id: 'oil-painting',
+    name: 'Oil Painting',
+    labelKey: 'oilPainting',
+    visual: `${MOCK_CDN_BASE}/oil-painting.jpg`,
+    modifiers: 'oil on canvas, brush strokes visible, classical technique, rich colors',
+    isEnabled: true,
+    createdAt: '2024-01-10T10:00:00Z',
+    updatedAt: '2024-06-15T14:30:00Z',
+  },
+  {
+    id: 'watercolor',
+    name: 'Watercolor',
+    labelKey: 'watercolor',
+    visual: `${MOCK_CDN_BASE}/watercolor.jpg`,
+    modifiers: 'watercolor painting, soft edges, flowing colors, paper texture',
+    isEnabled: true,
+    createdAt: '2024-01-10T10:00:00Z',
+    updatedAt: '2024-06-15T14:30:00Z',
+  },
+  {
+    id: 'anime',
+    name: 'Anime',
+
+    labelKey: 'anime',
+    visual: `${MOCK_CDN_BASE}/anime.jpg`,
+    modifiers: 'anime style, manga, cel shading, vibrant colors, detailed eyes',
+    isEnabled: true,
+    createdAt: '2024-01-10T10:00:00Z',
+    updatedAt: '2024-06-15T14:30:00Z',
+  },
+  {
+    id: 'cartoon',
+    name: 'Cartoon',
+
+    labelKey: 'cartoon',
+    visual: `${MOCK_CDN_BASE}/cartoon.jpg`,
+    modifiers: 'cartoon style, bold outlines, flat colors, exaggerated features',
+    isEnabled: true,
+    createdAt: '2024-01-10T10:00:00Z',
+    updatedAt: '2024-06-15T14:30:00Z',
+  },
+  {
+    id: 'sketch',
+    name: 'Sketch',
+
+    labelKey: 'sketch',
+    visual: `${MOCK_CDN_BASE}/sketch.jpg`,
+    modifiers: 'pencil sketch, hand drawn, line art, rough strokes, hatching',
+    isEnabled: true,
+    createdAt: '2024-01-10T10:00:00Z',
+    updatedAt: '2024-06-15T14:30:00Z',
+  },
+  {
+    id: 'abstract',
+    name: 'Abstract',
+
+    labelKey: 'abstract',
+    visual: `${MOCK_CDN_BASE}/abstract.jpg`,
+    modifiers: 'abstract art, geometric shapes, bold colors, non-representational',
+    isEnabled: true,
+    createdAt: '2024-01-10T10:00:00Z',
+    updatedAt: '2024-06-15T14:30:00Z',
+  },
+  {
+    id: 'surreal',
+    name: 'Surreal',
+
+    labelKey: 'surreal',
+    visual: `${MOCK_CDN_BASE}/surreal.jpg`,
+    modifiers: 'surrealism, dreamlike, Salvador Dali inspired, impossible scenes',
+    isEnabled: true,
+    createdAt: '2024-01-10T10:00:00Z',
+    updatedAt: '2024-06-15T14:30:00Z',
+  },
+  {
+    id: 'minimalist',
+    name: 'Minimalist',
+
+    labelKey: 'minimalist',
+    visual: `${MOCK_CDN_BASE}/minimalist.jpg`,
+    modifiers: 'minimalist design, simple shapes, limited color palette, clean lines',
+    isEnabled: true,
+    createdAt: '2024-01-10T10:00:00Z',
+    updatedAt: '2024-06-15T14:30:00Z',
   },
 ];
 

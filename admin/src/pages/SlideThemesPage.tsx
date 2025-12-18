@@ -1,13 +1,14 @@
 import { useMemo, useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { createColumnHelper, getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import { adminApi } from '@/api/admin';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { DataTable, TablePagination } from '@/components/table';
-import { ThemeFormDialog, ThemePreviewCard } from '@/components/theme';
+import { ThemePreviewCard } from '@/components/theme';
+import { useNavigate } from 'react-router-dom';
 import { Plus, Edit } from 'lucide-react';
-import { toast } from 'sonner';
+
 import type { SlideTheme, Gradient } from '@/types/api';
 
 const columnHelper = createColumnHelper<SlideTheme>();
@@ -19,39 +20,13 @@ function getBackgroundColor(bg: string | Gradient): string {
 }
 
 export function SlideThemesPage() {
-  const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [editingTheme, setEditingTheme] = useState<SlideTheme | null>(null);
+  const navigate = useNavigate();
   const pageSize = 10;
 
   const { data, isLoading } = useQuery({
     queryKey: ['slideThemes', page, pageSize],
     queryFn: () => adminApi.getSlideThemes({ page, pageSize }),
-  });
-
-  const createMutation = useMutation({
-    mutationFn: (data: SlideTheme) => adminApi.createSlideTheme(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['slideThemes'] });
-      toast.success('Theme created successfully');
-      handleCloseDialog();
-    },
-    onError: () => {
-      toast.error('Failed to create theme');
-    },
-  });
-
-  const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: SlideTheme }) => adminApi.updateSlideTheme(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['slideThemes'] });
-      toast.success('Theme updated successfully');
-      handleCloseDialog();
-    },
-    onError: () => {
-      toast.error('Failed to update theme');
-    },
   });
 
   const themes = data?.data || [];
@@ -63,7 +38,7 @@ export function SlideThemesPage() {
         id: 'preview',
         header: 'Preview',
         cell: (info) => (
-          <div className="w-24">
+          <div className="w-60">
             <ThemePreviewCard theme={info.row.original} title={info.row.original.name || 'Theme'} />
           </div>
         ),
@@ -161,27 +136,12 @@ export function SlideThemesPage() {
     },
   });
 
-  const handleCloseDialog = () => {
-    setDialogOpen(false);
-    setEditingTheme(null);
-  };
-
   const handleEdit = (theme: SlideTheme) => {
-    setEditingTheme(theme);
-    setDialogOpen(true);
+    navigate(`/slide-themes/${theme.id}`);
   };
 
   const handleCreate = () => {
-    setEditingTheme(null);
-    setDialogOpen(true);
-  };
-
-  const handleSubmit = (themeData: SlideTheme) => {
-    if (editingTheme?.id) {
-      updateMutation.mutate({ id: editingTheme.id, data: themeData });
-    } else {
-      createMutation.mutate(themeData);
-    }
+    navigate('/slide-themes/new');
   };
 
   return (
@@ -196,14 +156,6 @@ export function SlideThemesPage() {
           New Theme
         </Button>
       </div>
-
-      <ThemeFormDialog
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
-        theme={editingTheme}
-        onSubmit={handleSubmit}
-        isPending={createMutation.isPending || updateMutation.isPending}
-      />
 
       <Card>
         <CardHeader>

@@ -11,6 +11,7 @@ import { IMAGE_DIMENSION_OPTIONS, ART_STYLE_OPTIONS } from '@/features/image/typ
 import type { CreateImageFormData } from '@/features/image/types';
 import type { Control, UseFormRegister } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface AdvancedOptionsProps {
   register: UseFormRegister<CreateImageFormData>;
@@ -51,24 +52,50 @@ const AdvancedOptions = ({ register, control, isOpen, onToggle }: AdvancedOption
             style={{ overflow: 'hidden' }}
           >
             <div className="mt-4 space-y-4 px-1">
-              {/* Image Models */}
-              <div className="space-y-2">
-                <Label>{t('model.label')}</Label>
-                <Controller
-                  name="model"
-                  control={control}
-                  render={({ field }) => (
-                    <ModelSelect
-                      models={models}
-                      value={field.value}
-                      onValueChange={field.onChange}
-                      placeholder={t('model.placeholder')}
-                      label={t('model.label')}
-                      isLoading={isLoading}
-                      isError={isError}
-                    />
-                  )}
-                />
+              {/* 1x2 Grid for Model and Art Style */}
+              <div className="grid grid-cols-2 gap-4">
+                {/* Image Models */}
+                <div className="space-y-2">
+                  <Label>{t('model.label')}</Label>
+                  <Controller
+                    name="model"
+                    control={control}
+                    render={({ field }) => (
+                      <ModelSelect
+                        models={models}
+                        value={field.value}
+                        onValueChange={field.onChange}
+                        placeholder={t('model.placeholder')}
+                        label={t('model.label')}
+                        isLoading={isLoading}
+                        isError={isError}
+                      />
+                    )}
+                  />
+                </div>
+
+                {/* Art Styles */}
+                <div className="space-y-2">
+                  <Label>{t('artStyle.label')}</Label>
+                  <Controller
+                    name="artStyle"
+                    control={control}
+                    render={({ field }) => (
+                      <Select value={field.value} onValueChange={field.onChange} defaultValue="">
+                        <SelectTrigger>
+                          <SelectValue placeholder={t('artStyle.placeholder')} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {ART_STYLE_OPTIONS.map((opt) => (
+                            <SelectItem key={opt.id} value={opt.id}>
+                              {t(`artStyle.${opt.labelKey}` as never)}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                </div>
               </div>
 
               {/* Image Dimensions - Full Width Visual Options */}

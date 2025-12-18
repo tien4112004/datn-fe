@@ -15,6 +15,9 @@
     "test:run": "vitest run",
     "format": "prettier --write \"**/*.{js,ts,vue,json,css,tsx}\""
   },
+  "exports": {
+    ".": "./src/index.ts"
+  },
   "author": "pipipi_pikachu@163.com",
   "dependencies": {
     "@aiprimary/api": "workspace:*",

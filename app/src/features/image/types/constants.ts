@@ -9,16 +9,16 @@ export const IMAGE_DIMENSION_OPTIONS = [
 ];
 
 export const ART_STYLE_OPTIONS = [
-  { value: '', labelKey: 'none' },
-  { value: 'photorealistic', labelKey: 'photorealistic' },
-  { value: 'digital-art', labelKey: 'digitalArt' },
-  { value: 'oil-painting', labelKey: 'oilPainting' },
-  { value: 'watercolor', labelKey: 'watercolor' },
-  { value: 'anime', labelKey: 'anime' },
-  { value: 'cartoon', labelKey: 'cartoon' },
-  { value: 'sketch', labelKey: 'sketch' },
-  { value: 'abstract', labelKey: 'abstract' },
-  { value: 'surreal', labelKey: 'surreal' },
+  { id: '', value: '', labelKey: 'none', visual: 'string' },
+  { id: '', value: 'photorealistic', labelKey: 'photorealistic', visual: 'string' },
+  { id: '', value: 'digital-art', labelKey: 'digitalArt', visual: 'string' },
+  { id: '', value: 'oil-painting', labelKey: 'oilPainting', visual: 'string' },
+  { id: '', value: 'watercolor', labelKey: 'watercolor', visual: 'string' },
+  { id: '', value: 'anime', labelKey: 'anime', visual: 'string' },
+  { id: '', value: 'cartoon', labelKey: 'cartoon', visual: 'string' },
+  { id: '', value: 'sketch', labelKey: 'sketch', visual: 'string' },
+  { id: '', value: 'abstract', labelKey: 'abstract', visual: 'string' },
+  { id: '', value: 'surreal', labelKey: 'surreal', visual: 'string' },
 ] as const;
 
 export type ArtStyle = (typeof ART_STYLE_OPTIONS)[number]['value'];

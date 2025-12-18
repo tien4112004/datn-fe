@@ -1,7 +1,6 @@
 import { useMemo, useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
 import { createColumnHelper, getCoreRowModel, useReactTable } from '@tanstack/react-table';
-import { adminApi } from '@/api/admin';
+import { useSlideThemes } from '@/hooks';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { DataTable, TablePagination } from '@/components/table';
@@ -24,10 +23,7 @@ export function SlideThemesPage() {
   const navigate = useNavigate();
   const pageSize = 10;
 
-  const { data, isLoading } = useQuery({
-    queryKey: ['slideThemes', page, pageSize],
-    queryFn: () => adminApi.getSlideThemes({ page, pageSize }),
-  });
+  const { data, isLoading } = useSlideThemes({ page, pageSize });
 
   const themes = data?.data || [];
   const pagination = data?.pagination;

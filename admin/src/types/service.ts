@@ -1,0 +1,73 @@
+import type { ApiMode } from '@aiprimary/api';
+import type { User, LoginRequest, LoginResponse } from './auth';
+import type {
+  ApiResponse,
+  PaginationParams,
+  SlideTheme,
+  SlideTemplate,
+  ArtStyle,
+  Model,
+  ModelPatchData,
+  FAQPost,
+  Book,
+  BookType,
+} from './api';
+
+/**
+ * Base service interface that all API services must extend
+ */
+export interface Service {
+  baseUrl: string;
+  getType(): ApiMode;
+}
+
+/**
+ * Authentication API Service Interface
+ */
+export interface AuthApiService extends Service {
+  login(data: LoginRequest): Promise<LoginResponse>;
+  logout(): Promise<void>;
+  getProfile(): Promise<User>;
+  refreshToken(refreshToken: string): Promise<LoginResponse>;
+}
+
+/**
+ * Admin API Service Interface
+ */
+export interface AdminApiService extends Service {
+  // Users
+  getUsers(params?: PaginationParams): Promise<ApiResponse<User[]>>;
+  getUserById(id: string): Promise<ApiResponse<User>>;
+
+  // Slide Themes
+  getSlideThemes(params?: PaginationParams): Promise<ApiResponse<SlideTheme[]>>;
+  createSlideTheme(data: SlideTheme): Promise<ApiResponse<SlideTheme>>;
+  updateSlideTheme(id: string, data: SlideTheme): Promise<ApiResponse<SlideTheme>>;
+
+  // Slide Templates
+  getSlideTemplates(params?: PaginationParams): Promise<ApiResponse<SlideTemplate[]>>;
+  createSlideTemplate(data: SlideTemplate): Promise<ApiResponse<SlideTemplate>>;
+  updateSlideTemplate(id: string, data: SlideTemplate): Promise<ApiResponse<SlideTemplate>>;
+
+  // Art Styles
+  getArtStyles(params?: PaginationParams): Promise<ApiResponse<ArtStyle[]>>;
+  createArtStyle(data: ArtStyle): Promise<ApiResponse<ArtStyle>>;
+  updateArtStyle(id: string, data: ArtStyle): Promise<ApiResponse<ArtStyle>>;
+
+  // AI Models
+  getModels(type?: string | null): Promise<ApiResponse<Model[]>>;
+  patchModel(id: string, data: ModelPatchData): Promise<ApiResponse<Model>>;
+
+  // FAQ Posts
+  getFAQPosts(params?: PaginationParams): Promise<ApiResponse<FAQPost[]>>;
+  createFAQPost(data: FAQPost): Promise<ApiResponse<FAQPost>>;
+  updateFAQPost(id: string, data: FAQPost): Promise<ApiResponse<FAQPost>>;
+  deleteFAQPost(id: string): Promise<ApiResponse<void>>;
+
+  // Books
+  getBooks(params?: PaginationParams & { type?: BookType }): Promise<ApiResponse<Book[]>>;
+  getBookById(id: string): Promise<ApiResponse<Book>>;
+  createBook(data: FormData): Promise<ApiResponse<Book>>;
+  updateBook(id: string, data: FormData): Promise<ApiResponse<Book>>;
+  deleteBook(id: string): Promise<ApiResponse<void>>;
+}

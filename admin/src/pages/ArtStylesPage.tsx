@@ -1,52 +1,33 @@
-import { useMemo, useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useEffect, useMemo, useState } from 'react';
+import { useArtStyles, useCreateArtStyle, useUpdateArtStyle } from '@/hooks';
 import { createColumnHelper, getCoreRowModel, useReactTable } from '@tanstack/react-table';
-import { adminApi } from '@/api/admin';
+
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { DataTable, TablePagination } from '@/components/table';
 import { ArtStyleFormDialog } from '@/components/art-style/ArtStyleFormDialog';
 import { Plus, Edit, Image } from 'lucide-react';
-import { toast } from 'sonner';
 import type { ArtStyle } from '@/types/api';
 
 const columnHelper = createColumnHelper<ArtStyle>();
 
 export function ArtStylesPage() {
-  const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingStyle, setEditingStyle] = useState<ArtStyle | null>(null);
   const pageSize = 10;
 
-  const { data, isLoading } = useQuery({
-    queryKey: ['artStyles', page, pageSize],
-    queryFn: () => adminApi.getArtStyles({ page, pageSize }),
-  });
+  const { data, isLoading } = useArtStyles({ page, pageSize });
 
-  const createMutation = useMutation({
-    mutationFn: (data: ArtStyle) => adminApi.createArtStyle(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['artStyles'] });
-      toast.success('Art style created successfully');
-      handleCloseDialog();
-    },
-    onError: () => {
-      toast.error('Failed to create art style');
-    },
-  });
+  const createMutation = useCreateArtStyle();
+  const updateMutation = useUpdateArtStyle();
 
-  const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: ArtStyle }) => adminApi.updateArtStyle(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['artStyles'] });
-      toast.success('Art style updated successfully');
+  // Handle dialog close after successful mutation
+  useEffect(() => {
+    if (createMutation.isSuccess || updateMutation.isSuccess) {
       handleCloseDialog();
-    },
-    onError: () => {
-      toast.error('Failed to update art style');
-    },
-  });
+    }
+  }, [createMutation.isSuccess, updateMutation.isSuccess]);
 
   const styles = data?.data || [];
   const pagination = data?.pagination;

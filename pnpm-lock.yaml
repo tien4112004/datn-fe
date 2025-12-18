@@ -49,6 +49,9 @@ importers:
 
   admin:
     dependencies:
+      '@aiprimary/api':
+        specifier: workspace:*
+        version: link:../packages/api
       '@aiprimary/core':
         specifier: workspace:*
         version: link:../packages/core

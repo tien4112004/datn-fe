@@ -12,6 +12,7 @@
     "format": "prettier --write \"**/*.{js,ts,json,css,tsx}\""
   },
   "dependencies": {
+    "@aiprimary/api": "workspace:*",
     "@aiprimary/core": "workspace:*",
     "@codemirror/lang-json": "^6.0.2",
     "@hookform/resolvers": "^5.2.2",

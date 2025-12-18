@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useModels, usePatchModel } from '@/hooks';
 import { createColumnHelper, getCoreRowModel, useReactTable } from '@tanstack/react-table';
-import { adminApi } from '@/api/admin';
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -28,23 +28,9 @@ const getModelsForMediaType = (mediaType: string, models: Model[]) => {
 };
 
 export function ModelConfigPage() {
-  const queryClient = useQueryClient();
+  const { data, isLoading, isError } = useModels();
 
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ['models'],
-    queryFn: () => adminApi.getModels(null),
-  });
-
-  const patchMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: { enabled?: boolean; default?: boolean } }) =>
-      adminApi.patchModel(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['models'] });
-    },
-    onError: () => {
-      toast.error('Failed to update model');
-    },
-  });
+  const patchMutation = usePatchModel();
 
   const models = data?.data || [];
 
@@ -199,7 +185,7 @@ export function ModelConfigPage() {
             {Object.values(MODEL_TYPES).map((mediaType) => {
               const availableModels = getModelsForMediaType(mediaType, models);
               const currentDefault = getDefaultModelForMediaType(mediaType, models);
-              const defaultModel = models.find((m) => m.id === currentDefault);
+              const defaultModel = models.find((m: Model) => m.id === currentDefault);
 
               return (
                 <div key={mediaType} className="space-y-2">

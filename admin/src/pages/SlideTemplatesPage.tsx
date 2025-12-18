@@ -1,13 +1,13 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useSlideTemplates } from '@/hooks';
 import {
   createColumnHelper,
   getCoreRowModel,
   getPaginationRowModel,
   useReactTable,
 } from '@tanstack/react-table';
-import { adminApi } from '@/api/admin';
+
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Plus, Edit, FileJson } from 'lucide-react';
@@ -21,10 +21,7 @@ export function SlideTemplatesPage() {
   const [page, setPage] = useState(1);
   const pageSize = 10;
 
-  const { data, isLoading } = useQuery({
-    queryKey: ['slideTemplates', page, pageSize],
-    queryFn: () => adminApi.getSlideTemplates({ page, pageSize }),
-  });
+  const { data, isLoading } = useSlideTemplates({ page, pageSize });
 
   const templates = data?.data || [];
   const pagination = data?.pagination;

@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { adminApi } from '@/api/admin';
+import { useSlideTemplates, useCreateSlideTemplate, useUpdateSlideTemplate } from '@/hooks';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -129,7 +128,6 @@ function generateSampleTemplateData(layout: string): Record<string, unknown> {
 export function TemplateFormPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
 
   const [formData, setFormData] = useState<Partial<SlideTemplate>>(getDefaultTemplate());
   const [editMode, setEditMode] = useState<'form' | 'json'>('form');
@@ -138,19 +136,12 @@ export function TemplateFormPage() {
   // Which part the JSON editor is currently editing: whole template, config object, or graphics array
   const [jsonTarget, setJsonTarget] = useState<'template' | 'config' | 'graphics'>('template');
 
-  const { data, isLoading } = useQuery<SlideTemplate | null>({
-    queryKey: ['slideTemplate', id],
-    queryFn: async () => {
-      if (!id) return null;
-      const resp = await adminApi.getSlideTemplates({ page: 1, pageSize: 1000 });
-      return (resp.data || []).find((t) => t.id === id) || null;
-    },
-    enabled: !!id,
-  });
+  const { data: templatesData, isLoading } = useSlideTemplates(id ? { page: 1, pageSize: 1000 } : undefined);
+  const template = id ? templatesData?.data?.find((t) => t.id === id) || null : null;
 
   useEffect(() => {
-    if (data) {
-      const sanitized: Partial<SlideTemplate> = { ...data };
+    if (template) {
+      const sanitized: Partial<SlideTemplate> = { ...template };
       delete (sanitized as any).created;
       delete (sanitized as any).updated;
       delete (sanitized as any).createdAt;
@@ -162,27 +153,17 @@ export function TemplateFormPage() {
       setFormData(d);
       setJsonText(JSON.stringify(d, null, 2));
     }
-  }, [data, id]);
+  }, [template, id]);
 
-  const createMutation = useMutation({
-    mutationFn: (data: SlideTemplate) => adminApi.createSlideTemplate(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['slideTemplates'] });
-      toast.success('Template created successfully');
-      navigate('/slide-templates');
-    },
-    onError: () => toast.error('Failed to create template'),
-  });
+  const createMutation = useCreateSlideTemplate();
+  const updateMutation = useUpdateSlideTemplate();
 
-  const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: SlideTemplate }) => adminApi.updateSlideTemplate(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['slideTemplates'] });
-      toast.success('Template updated successfully');
+  // Handle navigation after successful mutation
+  useEffect(() => {
+    if (createMutation.isSuccess || updateMutation.isSuccess) {
       navigate('/slide-templates');
-    },
-    onError: () => toast.error('Failed to update template'),
-  });
+    }
+  }, [createMutation.isSuccess, updateMutation.isSuccess, navigate]);
 
   const handleLayoutChange = (layout: string) => {
     setFormData({ ...formData, layout });

@@ -91,7 +91,8 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
 
     const generationRequest: PresentationGenerateDraftRequest = {
       presentation: {
-        theme: data.theme,
+        // Ensure we supply a valid theme (fall back to an empty object cast if not set)
+        theme: (data.theme as any) || ({} as any),
         viewport: { width: 1000, height: 562.5 },
       },
     };
@@ -106,8 +107,9 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
         language: data.language,
 
         generationOptions: {
-          artStyle: data.artStyle,
-          imageModel: data.imageModel,
+          // Default artStyle to empty string (allowed option) if not set
+          artStyle: data.artStyle ?? '',
+          imageModel: data.imageModel ?? { name: '', provider: '' },
         },
       });
       clearOutline();

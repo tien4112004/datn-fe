@@ -1,5 +1,4 @@
-import { Controller } from 'react-hook-form';
-import type { Control } from 'react-hook-form';
+import { Controller, type Control } from 'react-hook-form';
 import {
   Card,
   CardAction,

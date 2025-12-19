@@ -15,6 +15,8 @@ import { UnsavedChangesDialog } from '@/shared/components/modals/UnsavedChangesD
 import { SmallScreenDialog } from '@/shared/components/modals/SmallScreenDialog';
 import usePresentationStore from '../stores/usePresentationStore';
 import { useState } from 'react';
+import { CriticalError } from '@aiprimary/api';
+import { ERROR_TYPE } from '@/shared/constants';
 
 const DetailPage = () => {
   const { presentation } = useLoaderData() as { presentation: Presentation | null };
@@ -28,6 +30,11 @@ const DetailPage = () => {
   useMessageRemote();
   const { isSaving } = useSavePresentationRemote(id!, vueApp);
   const { request } = usePresentationStore();
+
+  // Additional runtime safety check
+  if (!presentation && !isGeneratingParam) {
+    throw new CriticalError('Presentation data is unavailable', ERROR_TYPE.RESOURCE_NOT_FOUND);
+  }
 
   // Listen for dirty state changes from Vue
   const { showDialog, setShowDialog, handleStay, handleProceed } = useUnsavedChangesBlocker({

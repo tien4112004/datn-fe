@@ -74,7 +74,6 @@ const OutlineCreationView = ({ onCreateOutline }: OutlineCreationViewProps) => {
                 <Controller
                   name="topic"
                   control={control}
-                  rules={{ required: true }}
                   render={({ field }) => (
                     <AutosizeTextarea
                       className="w-full"

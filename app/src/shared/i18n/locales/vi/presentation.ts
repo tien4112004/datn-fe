@@ -146,4 +146,14 @@ export default {
       placeholder: 'Nhập tên mới cho bài trình bày',
     },
   },
+  validation: {
+    topicRequired: 'Chủ đề là bắt buộc',
+    slideCountRequired: 'Số slide là bắt buộc',
+    languageRequired: 'Ngôn ngữ là bắt buộc',
+    modelRequired: 'Mô hình là bắt buộc',
+    providerRequired: 'Nhà cung cấp là bắt buộc',
+    themeRequired: 'Chủ đề là bắt buộc',
+    artStyleRequired: 'Phong cách nghệ thuật là bắt buộc',
+    imageModelRequired: 'Mô hình hình ảnh là bắt buộc',
+  },
 };

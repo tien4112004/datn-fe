@@ -136,4 +136,14 @@ export default {
       placeholder: 'Enter new name for the presentation',
     },
   },
+  validation: {
+    topicRequired: 'Topic is required',
+    slideCountRequired: 'Slide count is required',
+    languageRequired: 'Language is required',
+    modelRequired: 'Model is required',
+    providerRequired: 'Provider is required',
+    themeRequired: 'Theme is required',
+    artStyleRequired: 'Art style is required',
+    imageModelRequired: 'Image model is required',
+  },
 };

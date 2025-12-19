@@ -9,6 +9,7 @@ import {
   type PresentationGenerateDraftRequest,
   type PresentationGenerationResponse,
   type SlideLayoutSchema,
+  type GetSlideThemesParams,
 } from '../types';
 import type { ApiResponse } from '@aiprimary/api';
 import type { Slide, SlideTheme, SlideTemplate } from '../types/slide';
@@ -399,10 +400,21 @@ export default class PresentationMockService implements PresentationApiService {
     });
   }
 
-  getSlideThemes(): Promise<SlideTheme[]> {
+  getSlideThemes(params?: GetSlideThemesParams): Promise<SlideTheme[]> {
     return new Promise((resolve) => {
       setTimeout(() => {
-        resolve(Object.values(THEMES_DATA).filter((theme): theme is SlideTheme => theme.id !== 'default'));
+        const allThemes = Object.values(THEMES_DATA).filter(
+          (theme): theme is SlideTheme => theme.id !== 'default'
+        );
+
+        // Simulate pagination
+        if (params?.page && params?.pageSize) {
+          const startIndex = (params.page - 1) * params.pageSize;
+          const endIndex = startIndex + params.pageSize;
+          resolve(allThemes.slice(startIndex, endIndex));
+        } else {
+          resolve(allThemes);
+        }
       }, 300);
     });
   }

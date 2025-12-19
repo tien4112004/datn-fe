@@ -5,6 +5,8 @@ import {
   type ImageGenerationResponse,
   type ImageData,
   type GetImagesParams,
+  type ArtStyleApiResponse,
+  type GetArtStylesParams,
 } from '../types/service';
 import { api } from '@aiprimary/api';
 import { type ApiResponse } from '@aiprimary/api';
@@ -94,5 +96,23 @@ export default class ImageRealApiService implements ImageApiService {
     return {
       images: data.images.map((img: any) => this._mapImageItem(img)),
     };
+  }
+
+  async getArtStyles(params?: GetArtStylesParams): Promise<ArtStyleApiResponse[]> {
+    try {
+      const response = await api.get<ApiResponse<ArtStyleApiResponse[]>>(`${this.baseUrl}/api/art-styles`, {
+        params: {
+          page: params?.page || 1,
+          pageSize: params?.pageSize || 50,
+        },
+      });
+
+      // Filter only enabled styles (if isEnabled field exists, otherwise return all)
+      const styles = response.data.data;
+      return styles.filter((style) => style.isEnabled !== false);
+    } catch (error) {
+      console.error('Failed to fetch art styles:', error);
+      return [];
+    }
   }
 }

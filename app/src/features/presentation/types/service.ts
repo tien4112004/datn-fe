@@ -45,6 +45,11 @@ export interface PresentationGenerationStartResponse {
 
 export type CreatePresentationRequest = Omit<Presentation, 'id' | 'createdAt' | 'updatedAt'>;
 
+export interface GetSlideThemesParams {
+  page?: number;
+  pageSize?: number;
+}
+
 export interface PresentationApiService extends Service {
   /**
    * @deprecated
@@ -69,6 +74,6 @@ export interface PresentationApiService extends Service {
   draftPresentation(request: PresentationGenerateDraftRequest): Promise<Presentation>;
   upsertPresentationSlide(id: string, slide: Slide): Promise<Presentation>;
   setPresentationAsParsed(id: string): Promise<Presentation>;
-  getSlideThemes(): Promise<SlideTheme[]>;
+  getSlideThemes(params?: GetSlideThemesParams): Promise<SlideTheme[]>;
   getSlideTemplates(): Promise<SlideTemplate[]>;
 }

@@ -84,4 +84,8 @@ export default {
       prompt6: 'A steampunk-inspired robot in a Victorian setting',
     },
   },
+  errors: {
+    artStylesLoadFailed: 'Failed to load art styles',
+    usingFallbackStyles: 'Using default styles instead',
+  },
 };

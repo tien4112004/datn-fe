@@ -1,4 +1,10 @@
-import { useQuery, useMutation, useQueryClient, type UseQueryResult } from '@tanstack/react-query';
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  useInfiniteQuery,
+  type UseQueryResult,
+} from '@tanstack/react-query';
 import type { SortingState, PaginationState, Updater } from '@tanstack/react-table';
 import { usePresentationApiService } from '../api';
 import { useImageApiService } from '@/features/image/api';
@@ -368,6 +374,39 @@ export const useSlideThemes = () => {
   return {
     themes: themes || [],
     defaultTheme: themes?.find((t) => t.id === 'default') || themes?.[0],
+    ...query,
+  };
+};
+
+const PAGE_SIZE = 12;
+
+export const useInfiniteSlideThemes = () => {
+  const apiService = usePresentationApiService();
+
+  const { data, ...query } = useInfiniteQuery({
+    queryKey: [apiService.getType(), 'slideThemes', 'infinite'],
+    queryFn: async ({ pageParam = 1 }): Promise<SlideTheme[]> => {
+      const themes = await apiService.getSlideThemes({
+        page: pageParam as number,
+        pageSize: PAGE_SIZE,
+      });
+      return themes;
+    },
+    initialPageParam: 1,
+    getNextPageParam: (lastPage: SlideTheme[], allPages: SlideTheme[][]) => {
+      // If the last page has fewer items than the page size, we've reached the end
+      if (lastPage.length < PAGE_SIZE) return undefined;
+      return allPages.length + 1;
+    },
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+    gcTime: 10 * 60 * 1000, // Keep in cache for 10 minutes
+  });
+
+  const themes = data?.pages.flatMap((page: SlideTheme[]) => page) || [];
+
+  return {
+    themes,
+    defaultTheme: themes.find((t: SlideTheme) => t.id === 'default') || themes[0],
     ...query,
   };
 };

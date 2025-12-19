@@ -84,4 +84,8 @@ export default {
       prompt6: 'Robot phong cách steampunk trong khung cảnh thời Victorian',
     },
   },
+  errors: {
+    artStylesLoadFailed: 'Không thể tải phong cách nghệ thuật',
+    usingFallbackStyles: 'Sử dụng phong cách mặc định thay thế',
+  },
 };

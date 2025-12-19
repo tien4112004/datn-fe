@@ -3,7 +3,6 @@
     <Screen v-if="screening" :isPresentingInitial="presenter" />
     <Editor v-else-if="_isPC" />
     <Mobile v-else />
-    <Spinner />
   </template>
   <div v-else-if="error" class="error-container">
     <div class="error-message">
@@ -31,7 +30,6 @@ import { isPC } from '@/utils/common';
 import Editor from '../views/Editor/index.vue';
 import Mobile from '../views/Mobile/index.vue';
 import Screen from '../views/Screen/index.vue';
-import Spinner from '@/components/Spinner.vue';
 import type { Presentation } from '../types/slides';
 import type { PresentationGenerationRequest } from '../types/generation';
 import { usePresentationProcessor } from '@/hooks/usePresentationProcessor';

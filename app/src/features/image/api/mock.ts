@@ -5,6 +5,8 @@ import {
   type ImageGenerationResponse,
   type ImageData,
   type GetImagesParams,
+  type ArtStyleApiResponse,
+  type GetArtStylesParams,
 } from '../types/service';
 
 /**
@@ -191,6 +193,128 @@ export default class ImageMockService implements ImageApiService {
         };
         resolve(response);
       }, 10000);
+    });
+  }
+
+  async getArtStyles(_params?: GetArtStylesParams): Promise<ArtStyleApiResponse[]> {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const mockArtStyles: ArtStyleApiResponse[] = [
+          {
+            id: '',
+            name: 'None',
+            labelKey: 'none',
+            visual: 'https://placehold.co/600x400/FFFFFF/31343C?text=None',
+            modifiers: null,
+            isEnabled: true,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            data: null,
+          },
+          {
+            id: 'photorealistic',
+            name: 'Photorealistic',
+            labelKey: 'photorealistic',
+            visual: 'https://placehold.co/600x400/667eea/ffffff?text=Photorealistic',
+            modifiers: 'photorealistic, highly detailed, realistic photography',
+            isEnabled: true,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            data: null,
+          },
+          {
+            id: 'digital-art',
+            name: 'Digital Art',
+            labelKey: 'digitalArt',
+            visual: 'https://placehold.co/600x400/f093fb/ffffff?text=Digital+Art',
+            modifiers: 'digital art, digital painting, concept art',
+            isEnabled: true,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            data: null,
+          },
+          {
+            id: 'oil-painting',
+            name: 'Oil Painting',
+            labelKey: 'oilPainting',
+            visual: 'https://placehold.co/600x400/4facfe/ffffff?text=Oil+Painting',
+            modifiers: 'oil painting, traditional art, painterly style',
+            isEnabled: true,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            data: null,
+          },
+          {
+            id: 'watercolor',
+            name: 'Watercolor',
+            labelKey: 'watercolor',
+            visual: 'https://placehold.co/600x400/00f2fe/ffffff?text=Watercolor',
+            modifiers: 'watercolor, aquarelle, soft washes',
+            isEnabled: true,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            data: null,
+          },
+          {
+            id: 'anime',
+            name: 'Anime',
+            labelKey: 'anime',
+            visual: 'https://placehold.co/600x400/43e97b/ffffff?text=Anime',
+            modifiers: 'anime style, manga, japanese animation',
+            isEnabled: true,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            data: null,
+          },
+          {
+            id: 'cartoon',
+            name: 'Cartoon',
+            labelKey: 'cartoon',
+            visual: 'https://placehold.co/600x400/fa709a/ffffff?text=Cartoon',
+            modifiers: 'cartoon style, cel shaded, vibrant colors',
+            isEnabled: true,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            data: null,
+          },
+          {
+            id: 'sketch',
+            name: 'Sketch',
+            labelKey: 'sketch',
+            visual: 'https://placehold.co/600x400/fee140/ffffff?text=Sketch',
+            modifiers: 'pencil sketch, hand drawn, line art',
+            isEnabled: true,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            data: null,
+          },
+          {
+            id: 'abstract',
+            name: 'Abstract',
+            labelKey: 'abstract',
+            visual: 'https://placehold.co/600x400/30cfd0/ffffff?text=Abstract',
+            modifiers: 'abstract art, non-representational, geometric',
+            isEnabled: true,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            data: null,
+          },
+          {
+            id: 'surreal',
+            name: 'Surreal',
+            labelKey: 'surreal',
+            visual: 'https://placehold.co/600x400/ffecd2/ffffff?text=Surreal',
+            modifiers: 'surrealism, dreamlike, fantastical',
+            isEnabled: true,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            data: null,
+          },
+        ];
+
+        // Filter only enabled styles
+        resolve(mockArtStyles.filter((s) => s.isEnabled));
+      }, 500);
     });
   }
 }

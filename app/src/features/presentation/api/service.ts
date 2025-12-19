@@ -10,6 +10,7 @@ import {
   type SlideLayoutSchema,
   type PresentationGenerationStartResponse,
   type PresentationGenerateDraftRequest,
+  type GetSlideThemesParams,
 } from '../types';
 import { splitMarkdownToOutlineItems } from '../utils';
 import { api } from '@aiprimary/api';
@@ -61,8 +62,13 @@ export default class PresentationRealApiService implements PresentationApiServic
     this.baseUrl = baseUrl;
   }
 
-  async getSlideThemes(): Promise<SlideTheme[]> {
-    const res = await api.get<ApiResponse<SlideTheme[]>>(`${this.baseUrl}/api/slide-themes`);
+  async getSlideThemes(params?: GetSlideThemesParams): Promise<SlideTheme[]> {
+    const res = await api.get<ApiResponse<SlideTheme[]>>(`${this.baseUrl}/api/slide-themes`, {
+      params: {
+        page: params?.page,
+        pageSize: params?.pageSize,
+      },
+    });
     return res.data.data;
   }
 

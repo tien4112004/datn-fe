@@ -17,6 +17,7 @@ import type { ArtStyle } from '@/features/image/types';
 import { useCallback, useState, useEffect } from 'react';
 import useOutlineStore from '../../stores/useOutlineStore';
 import { useSlideThemes } from '../../hooks';
+import { useArtStyles } from '@/features/image/hooks';
 import { ThemePreviewCard } from './ThemePreviewCard';
 import ThemeGalleryDialog from './ThemeGalleryDialog';
 import type { SlideTheme } from '../../types/slide';
@@ -75,13 +76,13 @@ const ThemeSection = ({ selectedTheme, onThemeSelect, disabled = false }: ThemeS
       </CardHeader>
       <CardContent className="flex flex-col gap-2">
         {isLoading ? (
-          <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
+          <div className="grid grid-cols-3 gap-4">
             {Array.from({ length: 6 }).map((_, index) => (
               <div key={index} className="bg-muted h-24 animate-pulse rounded-lg" />
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
+          <div className="grid grid-cols-3 gap-4">
             {displayedThemes.map((theme) => (
               <div
                 key={theme.id}
@@ -121,8 +122,6 @@ const ThemeSection = ({ selectedTheme, onThemeSelect, disabled = false }: ThemeS
       <ThemeGalleryDialog
         open={galleryOpen}
         onOpenChange={setGalleryOpen}
-        themes={themes}
-        isLoading={isLoading}
         selectedThemeId={selectedTheme.id}
         onThemeSelect={handleThemeSelectFromGallery}
       />
@@ -138,59 +137,7 @@ interface ArtSectionProps {
 
 const ArtSection = ({ selectedStyle, onStyleSelect, disabled = false }: ArtSectionProps) => {
   const { t } = useTranslation('presentation', { keyPrefix: 'customization' });
-
-  const artStyleOptions: Array<{ key: ArtStyle; label: string; preview: string }> = [
-    {
-      key: '',
-      label: t('artStyle.none'),
-      preview: 'https://placehold.co/600x400/FFFFFF/31343C?text=None',
-    },
-    {
-      key: 'photorealistic',
-      label: t('artStyle.photorealistic'),
-      preview: 'https://placehold.co/600x400/667eea/ffffff?text=Photorealistic',
-    },
-    {
-      key: 'digital-art',
-      label: t('artStyle.digitalArt'),
-      preview: 'https://placehold.co/600x400/f093fb/ffffff?text=Digital+Art',
-    },
-    {
-      key: 'oil-painting',
-      label: t('artStyle.oilPainting'),
-      preview: 'https://placehold.co/600x400/4facfe/ffffff?text=Oil+Painting',
-    },
-    {
-      key: 'watercolor',
-      label: t('artStyle.watercolor'),
-      preview: 'https://placehold.co/600x400/43e97b/ffffff?text=Watercolor',
-    },
-    {
-      key: 'anime',
-      label: t('artStyle.anime'),
-      preview: 'https://placehold.co/600x400/fa709a/ffffff?text=Anime',
-    },
-    {
-      key: 'cartoon',
-      label: t('artStyle.cartoon'),
-      preview: 'https://placehold.co/600x400/30cfd0/ffffff?text=Cartoon',
-    },
-    {
-      key: 'sketch',
-      label: t('artStyle.sketch'),
-      preview: 'https://placehold.co/600x400/a8edea/ffffff?text=Sketch',
-    },
-    {
-      key: 'abstract',
-      label: t('artStyle.abstract'),
-      preview: 'https://placehold.co/600x400/ff9a9e/ffffff?text=Abstract',
-    },
-    {
-      key: 'surreal',
-      label: t('artStyle.surreal'),
-      preview: 'https://placehold.co/600x400/ffecd2/ffffff?text=Surreal',
-    },
-  ];
+  const { artStyles, isLoading } = useArtStyles();
 
   return (
     <>
@@ -199,37 +146,40 @@ const ArtSection = ({ selectedStyle, onStyleSelect, disabled = false }: ArtSecti
         <CardDescription>{t('artStyle.description')}</CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-2">
-        <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
-          {artStyleOptions.map((style) => (
-            <div
-              key={style.key}
-              className={cn(
-                'group relative overflow-hidden rounded-lg border-2 transition-all',
-                disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer hover:scale-105',
-                selectedStyle === style.key ? 'border-primary shadow-md' : 'border-border'
-              )}
-              onClick={() => !disabled && onStyleSelect(style.key)}
-            >
-              {/* Preview gradient/image */}
+        {isLoading ? (
+          <div className="grid grid-cols-3 gap-3 lg:grid-cols-5">
+            {Array.from({ length: 5 }).map((_, idx) => (
+              <div key={idx} className="bg-muted h-32 animate-pulse rounded-lg" />
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-3 gap-3 lg:grid-cols-5">
+            {artStyles.map((style) => (
               <div
-                className="h-24 w-full bg-cover bg-center"
-                style={{
-                  background:
-                    style.preview && String(style.preview).startsWith('http')
-                      ? `url(${style.preview}) center/cover no-repeat`
-                      : (style.preview as string),
-                }}
-              />
+                key={style.id}
+                className={cn(
+                  'group relative overflow-hidden rounded-lg border-2 transition-all',
+                  disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer hover:scale-105',
+                  selectedStyle === style.value ? 'border-primary shadow-md' : 'border-border'
+                )}
+                onClick={() => !disabled && onStyleSelect(style.value)}
+              >
+                {/* Preview gradient/image */}
+                <div
+                  className="h-24 w-full bg-cover bg-center"
+                  style={{
+                    background: `url(${style.visual}) center/cover no-repeat`,
+                  }}
+                />
 
-              {/* icon removed */}
-
-              {/* Label section */}
-              <div className="bg-card flex items-center justify-center p-2">
-                <span className="text-xs font-medium">{style.label}</span>
+                {/* Label section */}
+                <div className="bg-card flex items-center justify-center p-2">
+                  <span className="text-xs font-medium">{t(`artStyle.${style.labelKey}` as never)}</span>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </CardContent>
     </>
   );

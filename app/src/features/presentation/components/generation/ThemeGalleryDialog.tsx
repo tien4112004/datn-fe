@@ -11,13 +11,12 @@ import { useTranslation } from 'react-i18next';
 import { ThemePreviewCard } from './ThemePreviewCard';
 import type { SlideTheme } from '../../types/slide';
 import { cn } from '@/shared/lib/utils';
-import { useState } from 'react';
+import { useRef, useEffect } from 'react';
+import { useInfiniteSlideThemes } from '../../hooks';
 
 interface ThemeGalleryDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  themes: SlideTheme[];
-  isLoading?: boolean;
   selectedThemeId?: string;
   onThemeSelect: (theme: SlideTheme) => void;
 }
@@ -25,26 +24,44 @@ interface ThemeGalleryDialogProps {
 const ThemeGalleryDialog = ({
   open,
   onOpenChange,
-  themes,
-  isLoading = false,
   selectedThemeId,
   onThemeSelect,
 }: ThemeGalleryDialogProps) => {
   const { t } = useTranslation('presentation', { keyPrefix: 'customization' });
-  const [displayedCount, setDisplayedCount] = useState(12);
+  const { themes, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage } = useInfiniteSlideThemes();
+
+  // Reference to the sentinel element for intersection observer
+  const sentinelRef = useRef<HTMLDivElement>(null);
 
   const handleThemeSelect = (theme: SlideTheme) => {
     onThemeSelect(theme);
     onOpenChange(false);
   };
 
-  const handleLoadMore = () => {
-    setDisplayedCount((prev) => prev + 12);
-  };
+  // Intersection Observer for infinite scrolling
+  useEffect(() => {
+    if (!sentinelRef.current || !open) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const first = entries[0];
+        if (first.isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(sentinelRef.current);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage, open]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl">
+      <DialogContent className="!max-w-3xl">
         <DialogHeader>
           <DialogTitle>{t('theme.gallery.title')}</DialogTitle>
           <DialogDescription>{t('theme.gallery.description')}</DialogDescription>
@@ -58,34 +75,40 @@ const ThemeGalleryDialog = ({
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-              {themes.slice(0, displayedCount).map((theme) => (
-                <div
-                  key={theme.id}
-                  className={cn(
-                    'cursor-pointer transition-all hover:scale-105',
-                    selectedThemeId === theme.id && 'rounded-lg ring-2 ring-blue-500'
-                  )}
-                  onClick={() => handleThemeSelect(theme)}
-                >
-                  <ThemePreviewCard
-                    theme={theme}
-                    title={theme.name}
-                    isSelected={selectedThemeId === theme.id}
-                  />
+            <>
+              <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+                {themes.map((theme: SlideTheme) => (
+                  <div
+                    key={theme.id}
+                    className={cn(
+                      'cursor-pointer transition-all hover:scale-105',
+                      selectedThemeId === theme.id && 'rounded-lg ring-2 ring-blue-500'
+                    )}
+                    onClick={() => handleThemeSelect(theme)}
+                  >
+                    <ThemePreviewCard
+                      theme={theme}
+                      title={theme.name}
+                      isSelected={selectedThemeId === theme.id}
+                    />
+                  </div>
+                ))}
+              </div>
+
+              {/* Sentinel element for infinite scrolling */}
+              {hasNextPage && <div ref={sentinelRef} className="h-10" />}
+
+              {/* Loading indicator for next page */}
+              {isFetchingNextPage && (
+                <div className="grid grid-cols-2 gap-4 pt-4 md:grid-cols-3 lg:grid-cols-4">
+                  {Array.from({ length: 4 }).map((_, index) => (
+                    <div key={index} className="bg-muted h-24 animate-pulse rounded-lg" />
+                  ))}
                 </div>
-              ))}
-            </div>
+              )}
+            </>
           )}
         </ScrollArea>
-
-        {displayedCount < themes.length && (
-          <div className="flex justify-center py-4">
-            <Button variant="outline" onClick={handleLoadMore}>
-              {t('theme.gallery.loadMore')}
-            </Button>
-          </div>
-        )}
 
         <div className="flex justify-end">
           <Button variant="outline" onClick={() => onOpenChange(false)}>

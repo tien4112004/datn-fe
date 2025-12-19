@@ -7,7 +7,8 @@ import { useTranslation } from 'react-i18next';
 
 import { MODEL_TYPES, useModels } from '@/features/model';
 import { ModelSelect } from '@/shared/components/common/ModelSelect';
-import { IMAGE_DIMENSION_OPTIONS, ART_STYLE_OPTIONS } from '@/features/image/types';
+import { IMAGE_DIMENSION_OPTIONS } from '@/features/image/types';
+import { useArtStyles } from '@/features/image/hooks';
 import type { CreateImageFormData } from '@/features/image/types';
 import type { Control, UseFormRegister } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
@@ -23,6 +24,7 @@ interface AdvancedOptionsProps {
 const AdvancedOptions = ({ register, control, isOpen, onToggle }: AdvancedOptionsProps) => {
   const { t } = useTranslation('image', { keyPrefix: 'create' });
   const { models, isLoading, isError } = useModels(MODEL_TYPES.IMAGE);
+  const { artStyles, isLoading: isLoadingStyles } = useArtStyles();
 
   const toggleOptions = () => {
     onToggle(!isOpen);
@@ -86,9 +88,9 @@ const AdvancedOptions = ({ register, control, isOpen, onToggle }: AdvancedOption
                           <SelectValue placeholder={t('artStyle.placeholder')} />
                         </SelectTrigger>
                         <SelectContent>
-                          {ART_STYLE_OPTIONS.map((opt) => (
-                            <SelectItem key={opt.id} value={opt.id}>
-                              {t(`artStyle.${opt.labelKey}` as never)}
+                          {artStyles.map((style) => (
+                            <SelectItem key={style.id} value={style.value}>
+                              {t(`artStyle.${style.labelKey}` as never)}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -159,59 +161,44 @@ const AdvancedOptions = ({ register, control, isOpen, onToggle }: AdvancedOption
                   name="artStyle"
                   control={control}
                   render={({ field }) => (
-                    <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
-                      {ART_STYLE_OPTIONS.map((style) => {
-                        const preview = (() => {
-                          switch (style.value) {
-                            case 'photorealistic':
-                              return 'https://placehold.co/600x400/667eea/ffffff?text=Photorealistic';
-                            case 'digital-art':
-                              return 'https://placehold.co/600x400/f093fb/ffffff?text=Digital+Art';
-                            case 'oil-painting':
-                              return 'https://placehold.co/600x400/4facfe/ffffff?text=Oil+Painting';
-                            case 'watercolor':
-                              return 'https://placehold.co/600x400/43e97b/ffffff?text=Watercolor';
-                            case 'anime':
-                              return 'https://placehold.co/600x400/fa709a/ffffff?text=Anime';
-                            case 'cartoon':
-                              return 'https://placehold.co/600x400/30cfd0/ffffff?text=Cartoon';
-                            case 'sketch':
-                              return 'https://placehold.co/600x400/a8edea/ffffff?text=Sketch';
-                            case 'abstract':
-                              return 'https://placehold.co/600x400/ff9a9e/ffffff?text=Abstract';
-                            case 'surreal':
-                              return 'https://placehold.co/600x400/ffecd2/ffffff?text=Surreal';
-                            default:
-                              return 'https://placehold.co/600x400/FFFFFF/31343C?text=None';
-                          }
-                        })();
+                    <>
+                      {isLoadingStyles ? (
+                        <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
+                          {Array.from({ length: 5 }).map((_, idx) => (
+                            <div key={idx} className="bg-muted h-32 animate-pulse rounded-lg" />
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
+                          {artStyles.map((style) => {
+                            const isSelected = field.value === style.value;
 
-                        const isSelected = field.value === style.value;
+                            return (
+                              <div
+                                key={style.id}
+                                className={`group relative cursor-pointer overflow-hidden rounded-lg border-2 transition-all hover:scale-105 ${
+                                  isSelected ? 'border-primary shadow-md' : 'border-border'
+                                }`}
+                                onClick={() => field.onChange(style.value)}
+                              >
+                                <div
+                                  className="h-24 w-full bg-cover bg-center"
+                                  style={{
+                                    background: `url(${style.visual}) center/cover no-repeat`,
+                                  }}
+                                />
 
-                        return (
-                          <div
-                            key={style.value}
-                            className={`group relative cursor-pointer overflow-hidden rounded-lg border-2 transition-all hover:scale-105 ${
-                              isSelected ? 'border-primary shadow-md' : 'border-border'
-                            }`}
-                            onClick={() => field.onChange(style.value)}
-                          >
-                            <div
-                              className="h-24 w-full bg-cover bg-center"
-                              style={{
-                                background: `url(${preview}) center/cover no-repeat`,
-                              }}
-                            />
-
-                            <div className="bg-card flex items-center justify-center p-2">
-                              <span className="text-xs font-medium">
-                                {t(`artStyle.${style.labelKey}` as never)}
-                              </span>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
+                                <div className="bg-card flex items-center justify-center p-2">
+                                  <span className="text-xs font-medium">
+                                    {t(`artStyle.${style.labelKey}` as never)}
+                                  </span>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </>
                   )}
                 />
               </div>

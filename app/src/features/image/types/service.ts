@@ -39,6 +39,24 @@ export interface GetImagesParams {
   search?: string;
 }
 
+// API Response Types for Art Styles
+export interface ArtStyleApiResponse {
+  id: string;
+  name: string;
+  labelKey: string;
+  visual: string | null;
+  modifiers: string | null;
+  isEnabled: boolean;
+  createdAt: string;
+  updatedAt: string;
+  data: object | null;
+}
+
+export interface GetArtStylesParams {
+  page?: number;
+  pageSize?: number;
+}
+
 export interface ImageApiService extends Service {
   generateImage(request: ImageGenerationRequest): Promise<ImageGenerationResponse>;
   getImageById(id: string): Promise<ImageData | null>;
@@ -49,4 +67,5 @@ export interface ImageApiService extends Service {
     elementId: string,
     request: ImageGenerationRequest
   ): Promise<ImageGenerationResponse>;
+  getArtStyles(params?: GetArtStylesParams): Promise<ArtStyleApiResponse[]>;
 }

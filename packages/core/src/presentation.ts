@@ -5,7 +5,7 @@ export interface Presentation {
   title: string;
   viewport?: { width: number; height: number };
   theme?: SlideTheme;
-  thumbnail?: Slide;
+  thumbnail?: Slide | string;
   slides?: Slide[];
   isParsed?: boolean;
   createdAt?: Date | string;

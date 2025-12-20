@@ -4,6 +4,7 @@ import { Background, BackgroundVariant, Controls, MiniMap, ControlButton } from 
 import { Move, MousePointer2 } from 'lucide-react';
 import { DevTools } from '@/features/mindmap/components/ui/devtools';
 import { Flow, LogicHandler, Toolbar, MindmapTitleInput } from '@/features/mindmap/components';
+import { TreePanel } from '@/features/mindmap/components/tree-panel';
 import { useState, useEffect } from 'react';
 import { useLoaderData } from 'react-router-dom';
 import { useCoreStore } from '../stores';
@@ -83,6 +84,7 @@ const MindmapPage = () => {
     <>
       <ReactFlowProvider>
         <div className="flex h-screen w-full" style={{ backgroundColor: 'var(--background)' }}>
+          <TreePanel />
           <Flow isPanOnDrag={isPanOnDrag}>
             <Controls>
               <ControlButton

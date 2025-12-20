@@ -1,7 +1,16 @@
 import { ReactFlowProvider } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { Background, BackgroundVariant, Controls, MiniMap, ControlButton } from '@xyflow/react';
-import { Move, MousePointer2, Maximize2, Minimize2, PanelRight, PanelRightOpen } from 'lucide-react';
+import {
+  Move,
+  MousePointer2,
+  Maximize2,
+  Minimize2,
+  PanelRight,
+  PanelRightOpen,
+  Eye,
+  Edit,
+} from 'lucide-react';
 import { DevTools } from '@/features/mindmap/components/ui/devtools';
 import { Flow, LogicHandler, Toolbar, MindmapTitleInput } from '@/features/mindmap/components';
 import { useState, useEffect } from 'react';
@@ -9,8 +18,10 @@ import { useLoaderData } from 'react-router-dom';
 import { useCoreStore } from '../stores';
 import { useMindmapDirtyTracking } from '../hooks/useDirtyTracking';
 import { useFullscreen } from '../hooks/useFullscreen';
+import { useReadOnlyMode } from '../hooks/useReadOnlyMode';
 import { useUnsavedChangesBlocker } from '@/shared/hooks';
 import { useSidebar } from '@/shared/components/ui/sidebar';
+import { ReadOnlyProvider } from '../contexts/ReadOnlyContext';
 import { UnsavedChangesDialog } from '@/shared/components/modals/UnsavedChangesDialog';
 import { SmallScreenDialog } from '@/shared/components/modals/SmallScreenDialog';
 import type { Mindmap, MindMapNode } from '../types';
@@ -66,6 +77,9 @@ const MindmapPage = () => {
   const { isFullscreen, toggleFullscreen: toggleFullscreenMode } = useFullscreen();
   const { setFullscreen } = useSidebar();
 
+  // Read-only mode functionality
+  const { isReadOnly, toggleReadOnly } = useReadOnlyMode();
+
   // Handle unsaved changes blocking
   const { showDialog, setShowDialog, handleStay, handleProceed } = useUnsavedChangesBlocker({
     eventName: 'app.mindmap.dirty-state-changed',
@@ -94,59 +108,67 @@ const MindmapPage = () => {
   return (
     <>
       <ReactFlowProvider>
-        <div className="flex h-screen w-full" style={{ backgroundColor: 'var(--background)' }}>
-          <Flow isPanOnDrag={isPanOnDrag}>
-            <Controls>
-              {!isFullscreen && (
+        <ReadOnlyProvider isReadOnly={isReadOnly}>
+          <div className="flex h-screen w-full" style={{ backgroundColor: 'var(--background)' }}>
+            <Flow isPanOnDrag={isPanOnDrag} isReadOnly={isReadOnly}>
+              <Controls>
+                {!isReadOnly && (
+                  <ControlButton
+                    onClick={togglePanOnDrag}
+                    title={isPanOnDrag ? 'Switch to Selection Mode' : 'Switch to Pan Mode'}
+                  >
+                    {isPanOnDrag ? <MousePointer2 size={16} /> : <Move size={16} />}
+                  </ControlButton>
+                )}
                 <ControlButton
-                  onClick={togglePanOnDrag}
-                  title={isPanOnDrag ? 'Switch to Selection Mode' : 'Switch to Pan Mode'}
+                  onClick={toggleFullscreenMode}
+                  title={isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}
                 >
-                  {isPanOnDrag ? <MousePointer2 size={16} /> : <Move size={16} />}
+                  {isFullscreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
                 </ControlButton>
-              )}
-              <ControlButton
-                onClick={toggleFullscreenMode}
-                title={isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}
-              >
-                {isFullscreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
-              </ControlButton>
-            </Controls>
-
-            {!isFullscreen && (
-              <div className="absolute right-4 top-4 z-10 flex gap-2">
-                <button
-                  onClick={() => setIsToolbarVisible(!isToolbarVisible)}
-                  title={isToolbarVisible ? 'Hide Toolbar' : 'Show Toolbar'}
-                  className="rounded-md border border-gray-200 bg-white p-2 shadow-md transition-colors hover:bg-gray-50"
+                <ControlButton
+                  onClick={toggleReadOnly}
+                  title={isReadOnly ? 'Disable Read-Only Mode' : 'Enable Read-Only Mode'}
                 >
-                  {isToolbarVisible ? <PanelRightOpen size={18} /> : <PanelRight size={18} />}
-                </button>
-              </div>
-            )}
+                  {isReadOnly ? <Edit size={16} /> : <Eye size={16} />}
+                </ControlButton>
+              </Controls>
 
-            {!isFullscreen && (
-              <MiniMap
-                className="!border-border !mb-4 !mr-4 !bg-white/90"
-                style={{
-                  border: '1px solid var(--border)',
-                  backgroundColor: 'var(--muted)',
-                }}
-                nodeStrokeColor="var(--primary)"
-                nodeColor="var(--primary)"
-                nodeBorderRadius={8}
-                position="bottom-right"
-              />
-            )}
+              {!isReadOnly && (
+                <div className="absolute right-4 top-4 z-10 flex gap-2">
+                  <button
+                    onClick={() => setIsToolbarVisible(!isToolbarVisible)}
+                    title={isToolbarVisible ? 'Hide Toolbar' : 'Show Toolbar'}
+                    className="rounded-md border border-gray-200 bg-white p-2 shadow-md transition-colors hover:bg-gray-50"
+                  >
+                    {isToolbarVisible ? <PanelRightOpen size={18} /> : <PanelRight size={18} />}
+                  </button>
+                </div>
+              )}
 
-            {!isFullscreen && <MindmapTitleInput mindmapId={mindmap.id} initialTitle={mindmap.title} />}
+              {!isReadOnly && (
+                <MiniMap
+                  className="!border-border !mb-4 !mr-4 !bg-white/90"
+                  style={{
+                    border: '1px solid var(--border)',
+                    backgroundColor: 'var(--muted)',
+                  }}
+                  nodeStrokeColor="var(--primary)"
+                  nodeColor="var(--primary)"
+                  nodeBorderRadius={8}
+                  position="bottom-right"
+                />
+              )}
 
-            <Background variant={BackgroundVariant.Dots} gap={20} size={1} />
-            {!isFullscreen && <DevTools position="bottom-center" />}
-            <LogicHandler mindmapId={mindmap.id} />
-          </Flow>
-          {!isFullscreen && isToolbarVisible && <Toolbar mindmapId={mindmap.id} />}
-        </div>
+              {!isReadOnly && <MindmapTitleInput mindmapId={mindmap.id} initialTitle={mindmap.title} />}
+
+              <Background variant={BackgroundVariant.Dots} gap={20} size={1} />
+              {!isReadOnly && <DevTools position="bottom-center" />}
+              <LogicHandler mindmapId={mindmap.id} isReadOnly={isReadOnly} />
+            </Flow>
+            {!isReadOnly && isToolbarVisible && <Toolbar mindmapId={mindmap.id} />}
+          </div>
+        </ReadOnlyProvider>
       </ReactFlowProvider>
       <UnsavedChangesDialog
         open={showDialog}

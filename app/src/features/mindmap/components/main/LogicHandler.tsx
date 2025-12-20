@@ -5,9 +5,10 @@ import { useSaveMindmap } from '../../hooks/useSaving';
 
 interface LogicHandlerProps {
   mindmapId: string;
+  isReadOnly?: boolean;
 }
 
-const LogicHandler = memo(({ mindmapId }: LogicHandlerProps) => {
+const LogicHandler = memo(({ mindmapId, isReadOnly = false }: LogicHandlerProps) => {
   const { selectAllHandler, copyHandler, pasteHandler, deleteHandler, deselectAllHandler } =
     useMindmapActions();
 
@@ -20,11 +21,12 @@ const LogicHandler = memo(({ mindmapId }: LogicHandlerProps) => {
     await saveWithThumbnail(mindmapId);
   };
 
-  const shortcuts = useMemo(
+  const allShortcuts = useMemo(
     () => [
       {
         shortcutKey: 'Ctrl+A',
         onKeyPressed: selectAllHandler,
+        disabled: isReadOnly,
         shouldExecute: () => {
           const activeElement = document.activeElement as HTMLElement;
 
@@ -38,6 +40,7 @@ const LogicHandler = memo(({ mindmapId }: LogicHandlerProps) => {
       {
         shortcutKey: 'Ctrl+C',
         onKeyPressed: copyHandler,
+        disabled: isReadOnly,
         shouldExecute: () => {
           const activeElement = document.activeElement as HTMLElement;
           return (
@@ -50,30 +53,37 @@ const LogicHandler = memo(({ mindmapId }: LogicHandlerProps) => {
       {
         shortcutKey: 'Ctrl+V',
         onKeyPressed: pasteHandler,
+        disabled: isReadOnly,
       },
       {
         shortcutKey: 'Delete',
         onKeyPressed: deleteHandler,
+        disabled: isReadOnly,
       },
       {
         shortcutKey: 'Escape',
         onKeyPressed: deselectAllHandler,
+        disabled: false,
       },
       {
         shortcutKey: 'Ctrl+Z',
         onKeyPressed: undo,
+        disabled: isReadOnly,
       },
       {
         shortcutKey: 'Ctrl+Y',
         onKeyPressed: redo,
+        disabled: isReadOnly,
       },
       {
         shortcutKey: 'Ctrl+Shift+Z',
         onKeyPressed: redo,
+        disabled: isReadOnly,
       },
       {
         shortcutKey: 'Ctrl+S',
         onKeyPressed: handleSave,
+        disabled: false,
         shouldExecute: () => {
           const activeElement = document.activeElement as HTMLElement;
           return (
@@ -84,8 +94,20 @@ const LogicHandler = memo(({ mindmapId }: LogicHandlerProps) => {
         },
       },
     ],
-    [selectAllHandler, copyHandler, pasteHandler, deleteHandler, deselectAllHandler, undo, redo, handleSave]
+    [
+      selectAllHandler,
+      copyHandler,
+      pasteHandler,
+      deleteHandler,
+      deselectAllHandler,
+      undo,
+      redo,
+      handleSave,
+      isReadOnly,
+    ]
   );
+
+  const shortcuts = useMemo(() => allShortcuts.filter((shortcut) => !shortcut.disabled), [allShortcuts]);
 
   useShortcuts(shortcuts);
 

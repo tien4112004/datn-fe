@@ -21,6 +21,7 @@ import { memo, useCallback, useEffect, useMemo } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { BaseHandle } from '../ui/base-handle';
 import { getTreeLayoutType } from '@/features/mindmap/services/utils';
+import { useReadOnlyContext } from '../../contexts/ReadOnlyContext';
 
 interface ChildNodeControlsProps {
   node: NodeProps<MindMapNode>;
@@ -48,6 +49,7 @@ const layoutStoreSelector = (state: LayoutState) => ({
 const mouseOverSelector = (state: ClipboardState) => state.mouseOverNodeId;
 
 export const ChildNodeControls = ({ node, selected }: ChildNodeControlsProps) => {
+  const { isReadOnly } = useReadOnlyContext();
   const { collapse, expand } = useNodeManipulationStore(useShallow(nodeManipulationSelector));
   const { hasLeftChildren, hasRightChildren, nodes } = useCoreStore(useShallow(coreStoreSelector));
   const addChildNodeStore = useNodeOperationsStore(nodeOperationsSelector);
@@ -159,18 +161,23 @@ export const ChildNodeControls = ({ node, selected }: ChildNodeControlsProps) =>
           className={cn(
             'absolute z-[10000] flex items-center justify-center gap-1 rounded-sm transition-all duration-200',
             'left-0 top-1/2 -translate-x-[calc(100%+24px)] -translate-y-1/2',
-            (isMouseOver || selected) && canCreateLeft ? 'visible opacity-100' : 'invisible opacity-0'
+            (isMouseOver || selected) &&
+              (canCreateLeft || hasLeftChildren(node.id) || isLeftChildrenCollapsed)
+              ? 'visible opacity-100'
+              : 'invisible opacity-0'
           )}
         >
-          <Button
-            variant="secondary"
-            className={cn('cursor-pointer rounded-full transition-all duration-200')}
-            onClick={() => {
-              addChildNode(SIDE.LEFT, MINDMAP_TYPES.TEXT_NODE);
-            }}
-          >
-            <Plus />
-          </Button>
+          {!isReadOnly && (
+            <Button
+              variant="secondary"
+              className={cn('cursor-pointer rounded-full transition-all duration-200')}
+              onClick={() => {
+                addChildNode(SIDE.LEFT, MINDMAP_TYPES.TEXT_NODE);
+              }}
+            >
+              <Plus />
+            </Button>
+          )}
           <motion.div
             whileTap={{ scale: 0.95 }}
             whileHover={{ scale: 1.05 }}
@@ -201,7 +208,10 @@ export const ChildNodeControls = ({ node, selected }: ChildNodeControlsProps) =>
           className={cn(
             'absolute z-[10000] flex items-center justify-center gap-1 rounded-sm transition-all duration-200',
             'right-0 top-1/2 -translate-y-1/2 translate-x-[calc(100%+24px)]',
-            (isMouseOver || selected) && canCreateRight ? 'visible opacity-100' : 'invisible opacity-0'
+            (isMouseOver || selected) &&
+              (canCreateRight || hasRightChildren(node.id) || isRightChildrenCollapsed)
+              ? 'visible opacity-100'
+              : 'invisible opacity-0'
           )}
         >
           <motion.div
@@ -225,15 +235,17 @@ export const ChildNodeControls = ({ node, selected }: ChildNodeControlsProps) =>
               <Minus />
             </Button>
           </motion.div>
-          <Button
-            variant="secondary"
-            className={cn('cursor-pointer rounded-full transition-all duration-200')}
-            onClick={() => {
-              addChildNode(SIDE.RIGHT, MINDMAP_TYPES.TEXT_NODE);
-            }}
-          >
-            <Plus />
-          </Button>
+          {!isReadOnly && (
+            <Button
+              variant="secondary"
+              className={cn('cursor-pointer rounded-full transition-all duration-200')}
+              onClick={() => {
+                addChildNode(SIDE.RIGHT, MINDMAP_TYPES.TEXT_NODE);
+              }}
+            >
+              <Plus />
+            </Button>
+          )}
         </div>
       )}
 
@@ -243,18 +255,22 @@ export const ChildNodeControls = ({ node, selected }: ChildNodeControlsProps) =>
           className={cn(
             'absolute z-[10000] flex flex-col items-center justify-center gap-1 rounded-sm transition-all duration-200',
             'left-1/2 top-0 -translate-x-1/2 -translate-y-[calc(100%+24px)]',
-            (isMouseOver || selected) && canCreateTop ? 'visible opacity-100' : 'invisible opacity-0'
+            (isMouseOver || selected) && (canCreateTop || hasLeftChildren(node.id) || isLeftChildrenCollapsed)
+              ? 'visible opacity-100'
+              : 'invisible opacity-0'
           )}
         >
-          <Button
-            variant="secondary"
-            className={cn('cursor-pointer rounded-full transition-all duration-200')}
-            onClick={() => {
-              addChildNode(SIDE.TOP, MINDMAP_TYPES.TEXT_NODE);
-            }}
-          >
-            <Plus />
-          </Button>
+          {!isReadOnly && (
+            <Button
+              variant="secondary"
+              className={cn('cursor-pointer rounded-full transition-all duration-200')}
+              onClick={() => {
+                addChildNode(SIDE.TOP, MINDMAP_TYPES.TEXT_NODE);
+              }}
+            >
+              <Plus />
+            </Button>
+          )}
           <motion.div
             whileTap={{ scale: 0.95 }}
             whileHover={{ scale: 1.05 }}
@@ -285,7 +301,10 @@ export const ChildNodeControls = ({ node, selected }: ChildNodeControlsProps) =>
           className={cn(
             'absolute z-[10000] flex flex-col items-center justify-center gap-1 rounded-sm transition-all duration-200',
             'bottom-0 left-1/2 -translate-x-1/2 translate-y-[calc(100%+24px)]',
-            (isMouseOver || selected) && canCreateBottom ? 'visible opacity-100' : 'invisible opacity-0'
+            (isMouseOver || selected) &&
+              (canCreateBottom || hasRightChildren(node.id) || isRightChildrenCollapsed)
+              ? 'visible opacity-100'
+              : 'invisible opacity-0'
           )}
         >
           <motion.div
@@ -309,15 +328,17 @@ export const ChildNodeControls = ({ node, selected }: ChildNodeControlsProps) =>
               <Minus />
             </Button>
           </motion.div>
-          <Button
-            variant="secondary"
-            className={cn('cursor-pointer rounded-full transition-all duration-200')}
-            onClick={() => {
-              addChildNode(SIDE.BOTTOM, MINDMAP_TYPES.TEXT_NODE);
-            }}
-          >
-            <Plus />
-          </Button>
+          {!isReadOnly && (
+            <Button
+              variant="secondary"
+              className={cn('cursor-pointer rounded-full transition-all duration-200')}
+              onClick={() => {
+                addChildNode(SIDE.BOTTOM, MINDMAP_TYPES.TEXT_NODE);
+              }}
+            >
+              <Plus />
+            </Button>
+          )}
         </div>
       )}
     </>

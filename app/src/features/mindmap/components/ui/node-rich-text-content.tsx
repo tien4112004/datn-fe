@@ -13,6 +13,7 @@ interface NodeRichTextContentProps {
   editorClassName?: string;
   minimalToolbar?: boolean;
   style?: React.CSSProperties;
+  isReadOnly?: boolean;
 }
 
 export const NodeRichTextContent = ({
@@ -24,6 +25,7 @@ export const NodeRichTextContent = ({
   editorClassName = '',
   minimalToolbar = false,
   style,
+  isReadOnly = false,
 }: NodeRichTextContentProps) => {
   const [isEditing, setIsEditing] = useState(false);
 
@@ -75,7 +77,7 @@ export const NodeRichTextContent = ({
 
   return (
     <div
-      className={`min-h-full flex-1 cursor-text p-2 pl-0 ${className}`}
+      className={cn('min-h-full flex-1 p-2 pl-0', !isReadOnly && 'cursor-text', className)}
       onKeyDown={handleKeyPress}
       onBlur={shouldUseRichEditor ? handleEditorBlur : undefined}
       style={style}
@@ -100,9 +102,9 @@ export const NodeRichTextContent = ({
             fontFamily: 'inherit',
             paddingInline: '1px',
           }}
-          className="break-word m-0 mr-1 min-h-[24px] w-full cursor-text"
+          className={cn('break-word m-0 mr-1 min-h-[24px] w-full', !isReadOnly && 'cursor-text')}
           dangerouslySetInnerHTML={{ __html: content }}
-          onClick={() => setIsEditing(true)}
+          onClick={() => !isReadOnly && setIsEditing(true)}
         />
       )}
     </div>

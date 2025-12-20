@@ -1,35 +1,101 @@
 import { createBrowserRouter } from 'react-router-dom';
+import { lazy, Suspense } from 'react';
 import NavLayout, { NavLayoutErrorBoundary } from '../shared/layouts/SidebarLayout';
-import Presentation from '@/features/presentation';
-import Demo from '@/features/demo';
-import NotFoundPage from '@/shared/pages/NotFoundPage';
 import { CriticalError } from '@aiprimary/api';
-import Mindmap from '@/features/mindmap';
-import { getPresentationById } from '@/features/presentation/hooks/loaders';
-import { getMindmapById } from '@/features/mindmap/hooks/loaders';
-import Projects from '@/features/projects';
-import Settings from '@/features/settings';
-import UserProfilePage from '@/features/user/components/UserProfile';
-import Image from '@/features/image';
-import { LoginPage } from '@/features/auth/pages/LoginPage';
-import { RegisterPage } from '@/features/auth/pages/RegisterPage';
-import GoogleCallbackPage from '@/features/auth/pages/GoogleCallbackPage';
 import { ProtectedRoute } from '@/shared/components/ProtectedRoute';
-import Classes from '@/features/classes';
-import { getClassById } from '@/features/classes/shared/hooks/loaders';
+
+// Lazy load auth pages
+const LoginPage = lazy(() =>
+  import('@/features/auth/pages/LoginPage').then((m) => ({ default: m.LoginPage }))
+);
+const RegisterPage = lazy(() =>
+  import('@/features/auth/pages/RegisterPage').then((m) => ({ default: m.RegisterPage }))
+);
+const GoogleCallbackPage = lazy(() => import('@/features/auth/pages/GoogleCallbackPage'));
+
+// Lazy load feature pages
+const CardDemoPage = lazy(() => import('@/features/demo').then((m) => ({ default: m.default.CardDemoPage })));
+const ThumbnailDemoPage = lazy(() =>
+  import('@/features/presentation').then((m) => ({ default: m.default.ThumbnailDemoPage }))
+);
+const ProjectListPage = lazy(() =>
+  import('@/features/projects').then((m) => ({ default: m.default.ProjectListPage }))
+);
+const PresentationListPage = lazy(() =>
+  import('@/features/presentation').then((m) => ({ default: m.default.PresentationListPage }))
+);
+const ImageGalleryPage = lazy(() =>
+  import('@/features/image').then((m) => ({ default: m.default.ImageGalleryPage }))
+);
+const CreateImagePage = lazy(() =>
+  import('@/features/image').then((m) => ({ default: m.default.CreateImagePage }))
+);
+const ImageDetailPage = lazy(() =>
+  import('@/features/image').then((m) => ({ default: m.default.ImageDetailPage }))
+);
+const CreateMindmapPage = lazy(() =>
+  import('@/features/mindmap').then((m) => ({ default: m.default.CreateMindmapPage }))
+);
+const MindmapPage = lazy(() =>
+  import('@/features/mindmap').then((m) => ({ default: m.default.MindmapPage }))
+);
+const PresentationDetailPage = lazy(() =>
+  import('@/features/presentation').then((m) => ({ default: m.default.DetailPage }))
+);
+const PresentationOutlinePage = lazy(() =>
+  import('@/features/presentation').then((m) => ({ default: m.default.PresentationOutlinePage }))
+);
+const ClassListPage = lazy(() =>
+  import('@/features/classes').then((m) => ({ default: m.default.ClassListPage }))
+);
+const ClassDetailPage = lazy(() =>
+  import('@/features/classes').then((m) => ({ default: m.default.ClassDetailPage }))
+);
+const PeriodDetailPage = lazy(() =>
+  import('@/features/classes').then((m) => ({ default: m.default.PeriodDetailPage }))
+);
+const LessonDetailPage = lazy(() =>
+  import('@/features/classes').then((m) => ({ default: m.default.LessonDetailPage }))
+);
+const LessonCreatorPage = lazy(() =>
+  import('@/features/classes').then((m) => ({ default: m.default.LessonCreatorPage }))
+);
+const SettingsPage = lazy(() =>
+  import('@/features/settings').then((m) => ({ default: m.default.SettingsPage }))
+);
+const UserProfilePage = lazy(() => import('@/features/user/components/UserProfile'));
+const NotFoundPage = lazy(() => import('@/shared/pages/NotFoundPage'));
+
+const LazyWrapper = ({ children }: { children: React.ReactNode }) => (
+  <Suspense fallback={<div className="flex h-screen items-center justify-center">Loading...</div>}>
+    {children}
+  </Suspense>
+);
 
 const router = createBrowserRouter([
   {
     path: '/login',
-    element: <LoginPage />,
+    element: (
+      <LazyWrapper>
+        <LoginPage />
+      </LazyWrapper>
+    ),
   },
   {
     path: '/register',
-    element: <RegisterPage />,
+    element: (
+      <LazyWrapper>
+        <RegisterPage />
+      </LazyWrapper>
+    ),
   },
   {
     path: '/auth/google/callback',
-    element: <GoogleCallbackPage />,
+    element: (
+      <LazyWrapper>
+        <GoogleCallbackPage />
+      </LazyWrapper>
+    ),
   },
   {
     element: (
@@ -41,82 +107,162 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        Component: Demo.CardDemoPage,
+        element: (
+          <LazyWrapper>
+            <CardDemoPage />
+          </LazyWrapper>
+        ),
       },
       {
         path: 'presentation/thumbnail',
-        Component: Presentation.ThumbnailDemoPage,
+        element: (
+          <LazyWrapper>
+            <ThumbnailDemoPage />
+          </LazyWrapper>
+        ),
       },
       {
         path: 'projects',
-        Component: Projects.ProjectListPage,
+        element: (
+          <LazyWrapper>
+            <ProjectListPage />
+          </LazyWrapper>
+        ),
       },
       {
         path: 'presentation',
-        Component: Presentation.PresentationListPage,
+        element: (
+          <LazyWrapper>
+            <PresentationListPage />
+          </LazyWrapper>
+        ),
       },
       {
         path: 'image',
-        Component: Image.ImageGalleryPage,
+        element: (
+          <LazyWrapper>
+            <ImageGalleryPage />
+          </LazyWrapper>
+        ),
       },
       {
         path: 'image/generate',
-        Component: Image.CreateImagePage,
+        element: (
+          <LazyWrapper>
+            <CreateImagePage />
+          </LazyWrapper>
+        ),
       },
       {
         path: 'image/:id',
-        Component: Image.ImageDetailPage,
+        element: (
+          <LazyWrapper>
+            <ImageDetailPage />
+          </LazyWrapper>
+        ),
       },
       {
         path: 'mindmap/generate',
-        Component: Mindmap.CreateMindmapPage,
+        element: (
+          <LazyWrapper>
+            <CreateMindmapPage />
+          </LazyWrapper>
+        ),
       },
       {
         path: 'mindmap/:id',
-        Component: Mindmap.MindmapPage,
-        loader: getMindmapById,
+        element: (
+          <LazyWrapper>
+            <MindmapPage />
+          </LazyWrapper>
+        ),
+        async lazy() {
+          const loader = await import('@/features/mindmap/hooks/loaders');
+          return { loader: loader.getMindmapById };
+        },
       },
       {
         path: 'presentation/:id',
-        Component: Presentation.DetailPage,
-        loader: getPresentationById,
+        element: (
+          <LazyWrapper>
+            <PresentationDetailPage />
+          </LazyWrapper>
+        ),
+        async lazy() {
+          const loader = await import('@/features/presentation/hooks/loaders');
+          return { loader: loader.getPresentationById };
+        },
       },
       {
         path: 'presentation/generate',
-        Component: Presentation.PresentationOutlinePage,
+        element: (
+          <LazyWrapper>
+            <PresentationOutlinePage />
+          </LazyWrapper>
+        ),
       },
       {
         path: 'classes',
-        Component: Classes.ClassListPage,
+        element: (
+          <LazyWrapper>
+            <ClassListPage />
+          </LazyWrapper>
+        ),
       },
       {
         path: 'classes/:id',
-        Component: Classes.ClassDetailPage,
-        loader: getClassById,
+        element: (
+          <LazyWrapper>
+            <ClassDetailPage />
+          </LazyWrapper>
+        ),
+        async lazy() {
+          const loader = await import('@/features/classes/shared/hooks/loaders');
+          return { loader: loader.getClassById };
+        },
         shouldRevalidate: ({ currentUrl, nextUrl }) => {
-          // Only revalidate if the path params (id) changed, not search params (tab)
           return currentUrl.pathname !== nextUrl.pathname;
         },
       },
       {
         path: 'periods/:id',
-        Component: Classes.PeriodDetailPage,
+        element: (
+          <LazyWrapper>
+            <PeriodDetailPage />
+          </LazyWrapper>
+        ),
       },
       {
         path: 'lessons/:id',
-        Component: Classes.LessonDetailPage,
+        element: (
+          <LazyWrapper>
+            <LessonDetailPage />
+          </LazyWrapper>
+        ),
       },
       {
         path: 'lessons/create',
-        Component: Classes.LessonCreatorPage,
+        element: (
+          <LazyWrapper>
+            <LessonCreatorPage />
+          </LazyWrapper>
+        ),
       },
       {
         path: 'settings',
-        Component: Settings.SettingsPage,
+        element: (
+          <LazyWrapper>
+            <SettingsPage />
+          </LazyWrapper>
+        ),
       },
       {
         path: 'profile',
-        Component: UserProfilePage,
+        element: (
+          <LazyWrapper>
+            <UserProfilePage />
+          </LazyWrapper>
+        ),
       },
       {
         path: 'error',
@@ -126,7 +272,11 @@ const router = createBrowserRouter([
       },
       {
         path: '*',
-        Component: NotFoundPage,
+        element: (
+          <LazyWrapper>
+            <NotFoundPage />
+          </LazyWrapper>
+        ),
       },
     ],
   },

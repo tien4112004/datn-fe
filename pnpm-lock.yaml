@@ -55,6 +55,9 @@ importers:
       '@aiprimary/core':
         specifier: workspace:*
         version: link:../packages/core
+      '@aiprimary/frontend-data':
+        specifier: workspace:*
+        version: link:../packages/frontend-data
       '@codemirror/lang-json':
         specifier: ^6.0.2
         version: 6.0.2
@@ -569,6 +572,16 @@ importers:
         specifier: latest
         version: 5.9.3
 
+  packages/frontend-data:
+    dependencies:
+      '@aiprimary/core':
+        specifier: workspace:*
+        version: link:../core
+    devDependencies:
+      typescript:
+        specifier: latest
+        version: 5.9.3
+
   presentation:
     dependencies:
       '@aiprimary/api':
@@ -577,6 +590,9 @@ importers:
       '@aiprimary/core':
         specifier: workspace:*
         version: link:../packages/core
+      '@aiprimary/frontend-data':
+        specifier: workspace:*
+        version: link:../packages/frontend-data
       '@tanstack/vue-query':
         specifier: ^5.28.0
         version: 5.92.1(vue@3.5.17(typescript@5.3.3))

@@ -1,4 +1,10 @@
-import type { Bounds, Size, LayoutBlockInstance, DistributionType, WrapConfig } from '../types';
+import type {
+  Bounds,
+  Size,
+  LayoutBlockInstance,
+  DistributionType,
+  WrapConfig,
+} from '@aiprimary/core/templates';
 import { DEFAULT_SPACING_BETWEEN_ITEMS } from './layoutConstants';
 
 /**

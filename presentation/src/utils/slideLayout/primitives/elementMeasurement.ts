@@ -1,4 +1,9 @@
-import type { LayoutBlockInstance, Size, TextLayoutBlockInstance, FontSizeRange } from '../types';
+import type {
+  LayoutBlockInstance,
+  Size,
+  TextLayoutBlockInstance,
+  FontSizeRange,
+} from '@aiprimary/core/templates';
 
 /**
  * Font Size Calculation Result

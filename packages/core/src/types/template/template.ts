@@ -1,14 +1,29 @@
-import type { SlideTheme } from '@/types/slides';
-import type { Bounds, SlideViewport } from './base';
+import type { SlideViewport, SlideTheme } from '../../slide';
 import type { BoundsExpression } from './expressions';
+import type { GraphicElement } from './graphics';
 import type {
-  RelativePositioning,
-  TextLayoutBlockConfig,
   ImageLayoutBlockConfig,
   NonTextLayoutBlockConfig,
+  RelativePositioning,
   SlideLayoutBlockInstance,
+  TextLayoutBlockConfig,
 } from './layout';
-import type { GraphicElement } from './graphics';
+
+// ============================================================================
+// Base Types
+// ============================================================================
+
+export interface Position {
+  left: number;
+  top: number;
+}
+
+export interface Size {
+  width: number;
+  height: number;
+}
+
+export interface Bounds extends Position, Size {}
 
 // ============================================================================
 // Template Container Types (Config with Bounds or Relative Positioning)

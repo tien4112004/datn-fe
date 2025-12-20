@@ -858,11 +858,14 @@ export interface SlideTheme {
 }
 
 export interface SlideTemplate {
+  id: string;
   name: string;
-  id?: string;
+  layout: string;         // Template layout type (e.g., 'list', 'title', 'twoColumn')
+  config: {               // Layout configuration
+    containers: Record<string, any>;
+    [key: string]: any;
+  };
   cover?: string;
-  layout?: string;        // Template layout type (e.g., 'list', 'title', 'twoColumn')
-  config?: Record<string, any>;  // Layout configuration
   graphics?: any[];       // Graphics elements
   parameters?: Array<{    // Template parameters
     key: string;

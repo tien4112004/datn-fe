@@ -1,4 +1,4 @@
-import type { Gradient } from './slide';
+import type { Gradient } from '../../slide';
 
 export interface FontSizeRange {
   minSize: number;

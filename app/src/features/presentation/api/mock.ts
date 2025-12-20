@@ -511,16 +511,22 @@ const mockSlideTemplates: SlideTemplate[] = [
   {
     id: 'title-slide',
     name: 'Title Slide',
+    layout: 'title',
+    config: { containers: {} },
     cover: '/templates/title-slide.png',
   },
   {
     id: 'content-slide',
     name: 'Content Slide',
+    layout: 'list',
+    config: { containers: {} },
     cover: '/templates/content-slide.png',
   },
   {
     id: 'two-column-slide',
     name: 'Two Column Slide',
+    layout: 'two_column',
+    config: { containers: {} },
     cover: '/templates/two-column-slide.png',
   },
 ];

@@ -65,21 +65,29 @@ export const useSlidesStore = defineStore('slides', {
       {
         name: 'Red Universal',
         id: 'template_1',
+        layout: 'title',
+        config: { containers: {} },
         cover: 'https://asset.pptist.cn/img/template_1.jpg',
       },
       {
         name: 'Blue Universal',
         id: 'template_2',
+        layout: 'title',
+        config: { containers: {} },
         cover: 'https://asset.pptist.cn/img/template_2.jpg',
       },
       {
         name: 'Purple Universal',
         id: 'template_3',
+        layout: 'title',
+        config: { containers: {} },
         cover: 'https://asset.pptist.cn/img/template_3.jpg',
       },
       {
         name: 'Morandi Color Scheme',
         id: 'template_4',
+        layout: 'title',
+        config: { containers: {} },
         cover: 'https://asset.pptist.cn/img/template_4.jpg',
       },
     ], // Templates

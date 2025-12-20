@@ -6,7 +6,7 @@ import type {
   Bounds,
   LayoutBlockInstance,
   LayoutBlockConfig,
-} from '../types';
+} from '@aiprimary/core/templates';
 import {
   createImageElement,
   getAllDescendantInstances,

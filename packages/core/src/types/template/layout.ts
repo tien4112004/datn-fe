@@ -1,4 +1,3 @@
-import type { Bounds } from './base';
 import type {
   BackgroundConfig,
   BorderConfig,
@@ -8,6 +7,7 @@ import type {
   TextStyleConfig,
   WrapConfig,
 } from './styling';
+import type { Bounds } from './template';
 
 /**
  * Distribution strategies for laying out children within a container

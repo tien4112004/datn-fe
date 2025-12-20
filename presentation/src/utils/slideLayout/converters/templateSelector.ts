@@ -1,15 +1,17 @@
 import seedrandom from 'seedrandom';
-import type { Template } from '../types';
-import { SLIDE_LAYOUT_TYPE } from '../types';
-import { labeledListTemplates } from './template/labeledList';
-import { listTemplates } from './template/list';
-import { mainImageTemplates } from './template/mainImage';
-import { pyramidTemplates } from './template/pyramid';
-import { tableOfContentsTemplates } from './template/tableOfContents';
-import { timelineTemplates } from './template/timeline';
-import { titleTemplates } from './template/title';
-import { twoColumnTemplates } from './template/twoColumn';
-import { twoColumnWithImageTemplates } from './template/twoColumnWithImage';
+import type { Template } from '@aiprimary/core/templates';
+import { SLIDE_LAYOUT_TYPE } from '@aiprimary/core/templates';
+import {
+  labeledListTemplates,
+  listTemplates,
+  mainImageTemplates,
+  pyramidTemplates,
+  tableOfContentsTemplates,
+  timelineTemplates,
+  titleTemplates,
+  twoColumnTemplates,
+  twoColumnWithImageTemplates,
+} from '@aiprimary/frontend-data';
 
 /**
  * Tracks the current index for cycling through templates when seed = '1'

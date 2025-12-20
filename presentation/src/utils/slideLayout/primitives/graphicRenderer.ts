@@ -14,8 +14,8 @@ import type {
   WrappingTimeline,
   ZigZagTimeline,
   TrapezoidPyramid,
-} from '../types/graphics';
-import type { Bounds } from '../types';
+  Bounds,
+} from '@aiprimary/core/templates';
 import { nanoid } from 'nanoid';
 import { DEFAULT_TITLE_LINE_SPACING } from '.';
 import { SHAPE_PATH_FORMULAS } from '@/configs/shapes';

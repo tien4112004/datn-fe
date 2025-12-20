@@ -2,7 +2,9 @@
   "name": "@aiprimary/core",
   "exports": {
     ".": "./src/index.ts",
-    "./*": "./src/*"
+    "./*": "./src/*",
+    "./templates": "./src/types/template/index.ts",
+    "./templates/*": "./src/types/template/*"
   },
   "devDependencies": {
     "typescript": "latest"

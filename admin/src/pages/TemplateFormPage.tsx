@@ -31,7 +31,7 @@ function getDefaultTemplate(): Partial<SlideTemplate> {
   return {
     name: '',
     layout: 'list',
-    config: {},
+    config: { containers: {} },
     graphics: [],
     parameters: [],
   };
@@ -110,7 +110,11 @@ export function TemplateFormPage() {
 
       if (jsonTarget === 'config') {
         const cfg = removeMeta(parsed);
-        setFormData({ ...formData, config: cfg as Record<string, unknown> });
+        if (!cfg || typeof cfg !== 'object' || !('containers' in cfg)) {
+          setJsonError('Config JSON must include a "containers" property');
+          return;
+        }
+        setFormData({ ...formData, config: cfg as { containers: Record<string, any>; [key: string]: any } });
       } else if (jsonTarget === 'graphics') {
         // Allow either an array or an object with `graphics` property
         if (Array.isArray(parsed)) setFormData({ ...formData, graphics: parsed as any[] });

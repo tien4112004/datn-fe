@@ -1,5 +1,5 @@
 import type { PPTElement } from '@/types/slides';
-import type { Bounds, LayoutBlockInstance, TextStyleConfig } from '../types';
+import type { Bounds, LayoutBlockInstance, TextStyleConfig } from '@aiprimary/core/templates';
 
 export function getAllDescendantInstances(instance: LayoutBlockInstance): LayoutBlockInstance[] {
   const result: LayoutBlockInstance[] = [];

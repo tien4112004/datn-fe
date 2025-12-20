@@ -1,4 +1,4 @@
-import type { TextLayoutBlockInstance, TextStyleConfig } from '../types';
+import type { TextLayoutBlockInstance, TextStyleConfig } from '@aiprimary/core/templates';
 import { buildCombinedList, buildCards } from './layoutProbuild';
 import { extractLabelStyles, collectDescendantTextsByLabel } from './layoutUtils';
 

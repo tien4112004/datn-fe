@@ -21,3 +21,8 @@ export const LAYOUT_TYPES = [
  * Layout type union from the available layouts
  */
 export type LayoutType = (typeof LAYOUT_TYPES)[number];
+
+/**
+ * Re-export SLIDE_LAYOUT_TYPE from core (single source of truth)
+ */
+export { SLIDE_LAYOUT_TYPE } from '@aiprimary/core/templates';

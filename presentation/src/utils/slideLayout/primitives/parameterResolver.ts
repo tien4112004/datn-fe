@@ -1,5 +1,4 @@
-import type { TemplateParameter } from '../types/template';
-import type { ExpressionConstants } from '../types/expressions';
+import type { TemplateParameter, ExpressionConstants } from '@aiprimary/core/templates';
 
 /**
  * Resolves template parameters by merging defaults with user overrides

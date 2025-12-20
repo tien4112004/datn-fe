@@ -9,13 +9,16 @@ import {
 } from '@/types/slides';
 import { getImageSize } from '../../image';
 import { SHAPE_PATH_FORMULAS } from '../../../configs/shapes';
-import type { ImageLayoutBlockInstance, TextLayoutBlockInstance, LayoutBlockInstance } from '../types';
-import { DEFAULT_RADIUS_MULTIPLIER, DEFAULT_TITLE_LINE_SPACING } from './layoutConstants';
+import type {
+  ImageLayoutBlockInstance,
+  TextLayoutBlockInstance,
+  LayoutBlockInstance,
+} from '@aiprimary/core/templates';
 import { layoutItemsInBlock } from './positioning';
 import { calculateLargestOptimalFontSize, applyFontSizeToElement } from './elementMeasurement';
-import type { FontSizeRange } from '../types';
+import type { FontSizeRange } from '@aiprimary/core/templates';
 import { measureElement } from './elementMeasurement';
-import type { TextStyleConfig } from '../types';
+import type { TextStyleConfig } from '@aiprimary/core/templates';
 
 /**
  * Creates a PPT text element with automatically optimized font size.

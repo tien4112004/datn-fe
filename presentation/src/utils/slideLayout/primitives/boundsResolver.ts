@@ -1,12 +1,12 @@
 import { resolveTemplateBounds } from './expressionResolver';
 import type {
-  SlideViewport,
   Bounds,
   RelativePositioning,
   BoundsExpression,
   TemplateParameter,
-} from '../types';
+} from '@aiprimary/core/templates';
 import { mergeParametersIntoConstants } from './parameterResolver';
+import type { SlideViewport } from '@aiprimary/core';
 
 /**
  * Resolve all container positions and return containers with absolute bounds

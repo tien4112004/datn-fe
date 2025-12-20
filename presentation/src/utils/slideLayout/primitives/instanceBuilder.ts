@@ -6,7 +6,7 @@ import {
   fromBorderConfigToInstance,
   fromShadowConfigToInstance,
   type SlideLayoutBlockInstance,
-} from '../types';
+} from '@aiprimary/core/templates';
 import { DEFAULT_WRAP_CONFIG } from './layoutConstants';
 import { calculateWrapLayout, getChildrenMaxBounds } from './positioning';
 

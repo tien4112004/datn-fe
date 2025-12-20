@@ -1,0 +1,37 @@
+{
+  "name": "@aiprimary/frontend-data",
+  "version": "1.0.0",
+  "description": "Shared frontend data package containing templates, themes, and reusable components",
+  "main": "src/index.ts",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./templates": "./src/templates/index.ts",
+    "./templates/slide": "./src/templates/slide/index.ts",
+    "./templates/slide/converters": "./src/templates/slide/converters/index.ts",
+    "./types": "./src/types/index.ts",
+    "./graphics": "./src/graphics/index.ts",
+    "./themes": "./src/themes/index.ts",
+    "./utils": "./src/utils/index.ts",
+    "./*": "./src/*"
+  },
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src --ext .ts,.tsx",
+    "format": "prettier --write src/**/*.{ts,tsx}"
+  },
+  "keywords": [
+    "frontend",
+    "data",
+    "templates",
+    "themes",
+    "reusable",
+    "monorepo"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "latest"
+  }
+}

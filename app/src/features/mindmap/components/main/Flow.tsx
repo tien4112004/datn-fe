@@ -59,7 +59,7 @@ const Flow = memo(
       onNodeMouseEnter,
       onNodeMouseLeave,
       onSelectionChange,
-    } = useReactFlowIntegration(isReadOnly);
+    } = useReactFlowIntegration();
 
     return (
       <ReactFlow

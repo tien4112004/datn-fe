@@ -6,7 +6,7 @@ import { useClipboardStore, useCoreStore, useNodeManipulationStore, useNodeOpera
 import { MINDMAP_TYPES, SIDE } from '../types';
 import { getSideFromPosition, getTreeForceLayout, getRootNodeOfSubtree } from '../services/utils';
 
-export const useReactFlowIntegration = (isReadOnly: boolean = false) => {
+export const useReactFlowIntegration = () => {
   const hasInitializedRef = useRef(false);
   const syncState = useCoreStore((state) => state.syncState);
   const updateSelectedNodeIds = useCoreStore((state) => state.updateSelectedNodeIds);

@@ -1,7 +1,8 @@
-import type { Template } from '../../../types/template';
+import type { SlideTemplate } from '@aiprimary/core';
 
-export const tableOfContentsTemplates: Template[] = [
+export const tableOfContentsTemplates: SlideTemplate[] = [
   {
+    layout: 'table_of_contents',
     id: 'table-of-contents-default',
     name: 'Table of Contents - Default',
     parameters: [
@@ -114,6 +115,7 @@ export const tableOfContentsTemplates: Template[] = [
     },
   },
   {
+    layout: 'table_of_contents',
     id: 'table-of-contents-grid',
     name: 'Table of Contents - Grid',
     config: {
@@ -224,6 +226,7 @@ export const tableOfContentsTemplates: Template[] = [
     },
   },
   {
+    layout: 'table_of_contents',
     id: 'table-of-contents-two-column',
     name: 'Table of Contents - Two Column',
     config: {
@@ -326,6 +329,7 @@ export const tableOfContentsTemplates: Template[] = [
     },
   },
   {
+    layout: 'table_of_contents',
     id: 'table-of-contents-container-border',
     name: 'Table of Contents - Container Border',
     config: {
@@ -422,6 +426,7 @@ export const tableOfContentsTemplates: Template[] = [
     },
   },
   {
+    layout: 'table_of_contents',
     id: 'table-of-contents-container-border-shadow',
     name: 'Table of Contents - Container Border Shadow',
     config: {
@@ -532,6 +537,7 @@ export const tableOfContentsTemplates: Template[] = [
     },
   },
   {
+    layout: 'table_of_contents',
     id: 'table-of-contents-container-bullet',
     name: 'Table of Contents - Container Bullet',
     config: {

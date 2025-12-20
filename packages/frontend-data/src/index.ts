@@ -16,6 +16,3 @@ export * from './graphics';
 
 // Export themes
 export * from './themes';
-
-// Export utilities
-export * from './utils';

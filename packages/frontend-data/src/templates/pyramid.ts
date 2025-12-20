@@ -1,6 +1,7 @@
-import type { Template } from '../../../types/template';
+import type { SlideTemplate } from '@aiprimary/core';
 
-const trapezoidPyramidTemplate: Template = {
+const trapezoidPyramidTemplate: SlideTemplate = {
+  layout: 'pyramid',
   id: 'pyramid-triangle',
   name: 'Pyramid - Triangle',
   parameters: [
@@ -91,7 +92,8 @@ const trapezoidPyramidTemplate: Template = {
   ],
 };
 
-const invertedTrapezoidPyramidTemplate: Template = {
+const invertedTrapezoidPyramidTemplate: SlideTemplate = {
+  layout: 'pyramid',
   id: 'pyramid-inverted-triangle',
   name: 'Pyramid - Inverted Triangle',
   parameters: [
@@ -184,7 +186,8 @@ const invertedTrapezoidPyramidTemplate: Template = {
   ],
 };
 
-const trapezoidPyramidFillTemplate: Template = {
+const trapezoidPyramidFillTemplate: SlideTemplate = {
+  layout: 'pyramid',
   id: 'pyramid-fill',
   name: 'Pyramid - Fill',
   parameters: [
@@ -276,7 +279,8 @@ const trapezoidPyramidFillTemplate: Template = {
   ],
 };
 
-const invertedTrapezoidPyramidFillTemplate: Template = {
+const invertedTrapezoidPyramidFillTemplate: SlideTemplate = {
+  layout: 'pyramid',
   id: 'pyramid-fill-inverted',
   name: 'Pyramid - Fill Inverted',
   parameters: [
@@ -370,7 +374,7 @@ const invertedTrapezoidPyramidFillTemplate: Template = {
   ],
 };
 
-export const pyramidTemplates: Template[] = [
+export const pyramidTemplates: SlideTemplate[] = [
   trapezoidPyramidTemplate,
   invertedTrapezoidPyramidTemplate,
   trapezoidPyramidFillTemplate,

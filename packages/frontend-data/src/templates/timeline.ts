@@ -1,6 +1,7 @@
-import type { Template } from '../../../types/template';
+import type { SlideTemplate } from '@aiprimary/core';
 
-const straightTimelineTemplate: Template = {
+const straightTimelineTemplate: SlideTemplate = {
+  layout: 'timeline',
   id: 'timeline-straight',
   name: 'Timeline - Straight',
   parameters: [
@@ -118,7 +119,8 @@ const straightTimelineTemplate: Template = {
  * Alternating timeline with zigzag layout - items alternate between two rows
  * with vertical branches connecting to a central horizontal line
  */
-const alternatingTimelineTemplate: Template = {
+const alternatingTimelineTemplate: SlideTemplate = {
+  layout: 'timeline',
   id: 'timeline-alternating',
   name: 'Timeline - Alternating',
   parameters: [
@@ -233,7 +235,8 @@ const alternatingTimelineTemplate: Template = {
  * Diagonal arrows connecting items in zigzag layout
  * Creates a dynamic visual flow with alternating diagonal connections
  */
-const zigZagTimelineTemplate: Template = {
+const zigZagTimelineTemplate: SlideTemplate = {
+  layout: 'timeline',
   id: 'timeline-zigzag',
   name: 'Timeline - ZigZag',
   parameters: [
@@ -341,7 +344,7 @@ const zigZagTimelineTemplate: Template = {
 };
 
 // Export all templates
-export const timelineTemplates: Template[] = [
+export const timelineTemplates: SlideTemplate[] = [
   straightTimelineTemplate,
   alternatingTimelineTemplate,
   zigZagTimelineTemplate,

@@ -1,7 +1,8 @@
-import type { Template } from '../../../types/template';
+import type { SlideTemplate } from '@aiprimary/core';
 
-export const titleTemplates: Template[] = [
+export const titleTemplates: SlideTemplate[] = [
   {
+    layout: 'title',
     id: 'title-default',
     name: 'Title - Default',
     config: {
@@ -73,6 +74,7 @@ export const titleTemplates: Template[] = [
     ],
   },
   {
+    layout: 'title',
     id: 'title-top',
     name: 'Title - Top',
     config: {
@@ -156,6 +158,7 @@ export const titleTemplates: Template[] = [
     ],
   },
   {
+    layout: 'title',
     id: 'title-left-align',
     name: 'Title - Left Aligned',
     config: {
@@ -248,6 +251,7 @@ export const titleTemplates: Template[] = [
     ],
   },
   {
+    layout: 'title',
     id: 'title-right-align',
     name: 'Title - Right Aligned',
     config: {

@@ -1,9 +1,10 @@
-import type { Template } from '../../../types/template';
+import type { SlideTemplate } from '@aiprimary/core';
 
-export const listTemplates: Template[] = [
+export const labeledListTemplates: SlideTemplate[] = [
   {
-    id: 'list-default',
-    name: 'List - Bordered Items Grid',
+    layout: 'labeled_list',
+    id: 'labeled-list-default',
+    name: 'Labeled List - Default',
     parameters: [
       {
         key: 'SIDE_PADDING',
@@ -36,7 +37,6 @@ export const listTemplates: Template[] = [
             fontFamily: '{{theme.titleFontName}}',
             fontWeight: 'bold',
             fontStyle: 'normal',
-            textAlign: 'center',
           },
         },
         content: {
@@ -48,27 +48,27 @@ export const listTemplates: Template[] = [
             anchor: 'end',
             offset: 20,
             size: 'fill',
-            margin: { left: 0, right: 0, top: 0, bottom: 40 },
+            margin: { left: 30, right: 30, top: 0, bottom: 40 },
           },
           layout: {
-            distribution: 'space-between',
-            gap: 20,
-            verticalAlignment: 'top',
-            orientation: 'vertical',
+            distribution: 'space-around',
+            gap: 25,
+            horizontalAlignment: 'center',
+            verticalAlignment: 'center',
+            orientation: 'horizontal',
           },
           childTemplate: {
             count: 'auto',
             wrap: {
               enabled: true,
               maxItemsPerLine: 4,
-              lineCount: 'auto',
+              lineCount: 2,
               wrapDistribution: 'balanced',
-              lineSpacing: 20,
-              syncSize: true,
+              lineSpacing: 15,
+              alternating: { start: 20, end: 20 },
             },
             structure: {
-              type: 'text',
-              label: 'item',
+              type: 'block',
               layout: {
                 distribution: 'equal',
                 gap: 10,
@@ -81,14 +81,32 @@ export const listTemplates: Template[] = [
                 color: '{{theme.themeColors[0]}}',
                 radius: '{{theme.card.borderRadius}}',
               },
-              text: {
-                color: '{{theme.fontColor}}',
-                fontFamily: '{{theme.fontName}}',
-                fontWeight: 'normal',
-                fontStyle: 'normal',
-                textAlign: 'left',
-                fontSizeRange: { minSize: 15, maxSize: 22 },
-              },
+              children: [
+                {
+                  type: 'text',
+                  label: 'label',
+                  text: {
+                    color: '{{theme.labelFontColor}}',
+                    fontFamily: '{{theme.labelFontName}}',
+                    fontWeight: 'bold',
+                    textAlign: 'center',
+                  },
+                },
+                {
+                  type: 'text',
+                  label: 'content',
+                  layout: {
+                    horizontalAlignment: 'center',
+                    verticalAlignment: 'center',
+                  },
+                  text: {
+                    color: '{{theme.fontColor}}',
+                    fontFamily: '{{theme.fontName}}',
+                    fontWeight: 'normal',
+                    textAlign: 'center',
+                  },
+                },
+              ],
             },
           },
         },
@@ -96,8 +114,9 @@ export const listTemplates: Template[] = [
     },
   },
   {
-    id: 'list-compact',
-    name: 'List - Simple Grid',
+    layout: 'labeled_list',
+    id: 'labeled-list-grid',
+    name: 'Labeled List - Grid',
     parameters: [
       {
         key: 'SIDE_PADDING',
@@ -136,41 +155,77 @@ export const listTemplates: Template[] = [
             relativeTo: 'title',
             axis: 'vertical',
             anchor: 'end',
-            offset: 15,
+            offset: 20,
             size: 'fill',
-            margin: { left: 0, right: 0, top: 0, bottom: 40 },
+            margin: { left: 40, right: 40, top: 0, bottom: 40 },
           },
           layout: {
-            distribution: 'equal',
-            gap: 15,
-            verticalAlignment: 'top',
-            orientation: 'vertical',
+            distribution: 'space-around',
+            gap: 20,
+            horizontalAlignment: 'center',
+            verticalAlignment: 'center',
+            orientation: 'horizontal',
           },
           childTemplate: {
             count: 'auto',
             wrap: {
               enabled: true,
-              maxItemsPerLine: 5,
-              lineCount: 'auto',
+              maxItemsPerLine: 3,
+              lineCount: 2,
               wrapDistribution: 'balanced',
-              lineSpacing: 16,
+              lineSpacing: 20,
               syncSize: true,
             },
             structure: {
-              type: 'text',
-              label: 'item',
+              type: 'block',
+              layout: {
+                distribution: 'equal',
+                gap: 10,
+                horizontalAlignment: 'center',
+                verticalAlignment: 'center',
+                orientation: 'vertical',
+              },
               border: {
-                width: 1,
+                width: '{{theme.card.borderWidth}}',
                 color: '{{theme.themeColors[0]}}',
                 radius: '{{theme.card.borderRadius}}',
               },
-              text: {
-                color: '{{theme.fontColor}}',
-                fontFamily: '{{theme.fontName}}',
-                fontWeight: 'normal',
-                textAlign: 'left',
-                fontSizeRange: { minSize: 15, maxSize: 22 },
+              shadow: {
+                h: '{{theme.card.shadow.h}}',
+                v: '{{theme.card.shadow.v}}',
+                blur: '{{theme.card.shadow.blur}}',
+                color: '{{theme.card.shadow.color}}',
               },
+              children: [
+                {
+                  type: 'text',
+                  label: 'label',
+                  layout: {
+                    horizontalAlignment: 'center',
+                    verticalAlignment: 'center',
+                  },
+                  text: {
+                    color: '{{theme.labelFontColor}}',
+                    fontFamily: '{{theme.labelFontName}}',
+                    fontWeight: 'bold',
+                    textAlign: 'center',
+                  },
+                },
+                {
+                  type: 'text',
+                  label: 'content',
+                  layout: {
+                    horizontalAlignment: 'center',
+                    verticalAlignment: 'center',
+                  },
+                  text: {
+                    color: '{{theme.fontColor}}',
+                    fontFamily: '{{theme.fontName}}',
+                    fontWeight: 'normal',
+                    textAlign: 'center',
+                  },
+                },
+              ],
             },
           },
         },
@@ -178,8 +233,9 @@ export const listTemplates: Template[] = [
     },
   },
   {
-    id: 'list-cards',
-    name: 'List - Staggered Shadowed Cards',
+    layout: 'labeled_list',
+    id: 'labeled-list-single-row',
+    name: 'Labeled List - Single Row',
     parameters: [
       {
         key: 'SIDE_PADDING',
@@ -197,9 +253,9 @@ export const listTemplates: Template[] = [
           type: 'text',
           bounds: {
             left: { expr: 'SIDE_PADDING' },
-            top: 10,
+            top: 15,
             width: { expr: 'SLIDE_WIDTH - SIDE_PADDING * 2' },
-            height: 90,
+            height: 100,
           },
           layout: {
             horizontalAlignment: 'center',
@@ -209,57 +265,72 @@ export const listTemplates: Template[] = [
             color: '{{theme.titleFontColor}}',
             fontFamily: '{{theme.titleFontName}}',
             fontWeight: 'bold',
-            textAlign: 'center',
+            fontStyle: 'normal',
           },
         },
         content: {
           type: 'block',
+          id: 'content',
           positioning: {
             relativeTo: 'title',
             axis: 'vertical',
             anchor: 'end',
             offset: 25,
             size: 'fill',
-            margin: { left: 0, right: 0, top: 0, bottom: 50 },
+            margin: { left: 60, right: 60, top: 0, bottom: 40 },
           },
           layout: {
-            distribution: 'equal',
+            distribution: 'space-around',
             gap: 20,
-            verticalAlignment: 'top',
-            orientation: 'vertical',
+            horizontalAlignment: 'center',
+            verticalAlignment: 'center',
+            orientation: 'horizontal',
           },
           childTemplate: {
             count: 'auto',
             wrap: {
-              enabled: true,
-              maxItemsPerLine: 5,
-              lineCount: 2,
-              wrapDistribution: 'top-heavy',
-              lineSpacing: 20,
-              syncSize: true,
-              alternating: { start: 15, end: -15 },
+              enabled: false,
             },
             structure: {
-              type: 'text',
-              label: 'item',
+              type: 'block',
+              layout: {
+                distribution: 'equal',
+                gap: 10,
+                horizontalAlignment: 'center',
+                verticalAlignment: 'center',
+                orientation: 'vertical',
+              },
               border: {
                 width: '{{theme.card.borderWidth}}',
                 color: '{{theme.themeColors[0]}}',
                 radius: '{{theme.card.borderRadius}}',
               },
-              shadow: {
-                h: '{{theme.card.shadow.h}}',
-                v: '{{theme.card.shadow.v}}',
-                blur: '{{theme.card.shadow.blur}}',
-                color: '{{theme.card.shadow.color}}',
-              },
-              text: {
-                color: '{{theme.fontColor}}',
-                fontFamily: '{{theme.fontName}}',
-                fontWeight: 'normal',
-                textAlign: 'center',
-                fontSizeRange: { minSize: 15, maxSize: 22 },
-              },
+              children: [
+                {
+                  type: 'text',
+                  label: 'label',
+                  text: {
+                    color: '{{theme.labelFontColor}}',
+                    fontFamily: '{{theme.labelFontName}}',
+                    fontWeight: 'bold',
+                    textAlign: 'center',
+                  },
+                },
+                {
+                  type: 'text',
+                  label: 'content',
+                  layout: {
+                    horizontalAlignment: 'center',
+                    verticalAlignment: 'center',
+                  },
+                  text: {
+                    color: '{{theme.fontColor}}',
+                    fontFamily: '{{theme.fontName}}',
+                    fontWeight: 'normal',
+                    textAlign: 'center',
+                  },
+                },
+              ],
             },
           },
         },
@@ -267,8 +338,128 @@ export const listTemplates: Template[] = [
     },
   },
   {
-    id: 'list-numbered',
-    name: 'List - Numbered Grid with Bordered Content',
+    layout: 'labeled_list',
+    id: 'labeled-list-container-border',
+    name: 'Labeled List - Container Border',
+    parameters: [
+      {
+        key: 'SIDE_PADDING',
+        label: 'Side Padding (px)',
+        defaultValue: 30,
+        min: 0,
+        max: 50,
+        step: 1,
+        description: 'Left/right slide padding',
+      },
+    ],
+    config: {
+      containers: {
+        title: {
+          type: 'text',
+          bounds: {
+            left: { expr: 'SIDE_PADDING' },
+            top: 15,
+            width: {
+              expr: 'SLIDE_WIDTH - SIDE_PADDING * 2',
+            },
+            height: 100,
+          },
+          layout: {
+            horizontalAlignment: 'center',
+            verticalAlignment: 'top',
+          },
+          text: {
+            color: '{{theme.titleFontColor}}',
+            fontFamily: '{{theme.titleFontName}}',
+            fontWeight: 'bold',
+            fontStyle: 'normal',
+            textAlign: 'center',
+          },
+        },
+        content: {
+          type: 'block',
+          id: 'content',
+          positioning: {
+            relativeTo: 'title',
+            axis: 'vertical',
+            anchor: 'end',
+            offset: 20,
+            size: 'fill',
+            margin: { left: 40, right: 40, top: 0, bottom: 40 },
+          },
+          border: {
+            width: '{{theme.card.borderWidth}}',
+            color: '{{theme.themeColors[0]}}',
+            radius: '{{theme.card.borderRadius}}',
+          },
+          layout: {
+            distribution: 'space-around',
+            gap: 20,
+            horizontalAlignment: 'center',
+            verticalAlignment: 'center',
+            orientation: 'horizontal',
+          },
+          childTemplate: {
+            count: 'auto',
+            wrap: {
+              enabled: true,
+              maxItemsPerLine: 5,
+              lineCount: 2,
+              wrapDistribution: 'balanced',
+              lineSpacing: 15,
+              alternating: { start: 20, end: 20 },
+            },
+            structure: {
+              type: 'block',
+              layout: {
+                distribution: 'equal',
+                gap: 10,
+                horizontalAlignment: 'center',
+                verticalAlignment: 'center',
+                orientation: 'vertical',
+              },
+              children: [
+                {
+                  type: 'text',
+                  label: 'label',
+                  layout: {
+                    horizontalAlignment: 'center',
+                    verticalAlignment: 'center',
+                  },
+                  text: {
+                    color: '{{theme.labelFontColor}}',
+                    fontFamily: '{{theme.labelFontName}}',
+                    fontWeight: 'bold',
+                    fontStyle: 'normal',
+                    textAlign: 'center',
+                  },
+                },
+                {
+                  type: 'text',
+                  label: 'content',
+                  layout: {
+                    horizontalAlignment: 'center',
+                    verticalAlignment: 'center',
+                  },
+                  text: {
+                    color: '{{theme.fontColor}}',
+                    fontFamily: '{{theme.fontName}}',
+                    fontWeight: 'normal',
+                    fontStyle: 'normal',
+                    textAlign: 'center',
+                  },
+                },
+              ],
+            },
+          },
+        },
+      },
+    },
+  },
+  {
+    layout: 'labeled_list',
+    id: 'labeled-list-vertical-numbered',
+    name: 'Labeled List - Vertical Numbered',
     parameters: [
       {
         key: 'SIDE_PADDING',
@@ -307,12 +498,12 @@ export const listTemplates: Template[] = [
             relativeTo: 'title',
             axis: 'vertical',
             anchor: 'end',
-            offset: 15,
+            offset: 20,
             size: 'fill',
-            margin: { left: 0, right: 0, top: 0, bottom: 40 },
+            margin: { left: 40, right: 40, top: 0, bottom: 40 },
           },
           layout: {
-            distribution: 'space-between',
+            distribution: 'equal',
             gap: 15,
             verticalAlignment: 'top',
             orientation: 'vertical',
@@ -320,18 +511,13 @@ export const listTemplates: Template[] = [
           childTemplate: {
             count: 'auto',
             wrap: {
-              enabled: true,
-              maxItemsPerLine: 4,
-              lineCount: 'auto',
-              wrapDistribution: 'balanced',
-              lineSpacing: 16,
-              syncSize: true,
+              enabled: false,
             },
             structure: {
               type: 'block',
               label: 'item',
               layout: {
-                distribution: '1/5',
+                distribution: '1/3',
                 gap: 15,
                 horizontalAlignment: 'left',
                 verticalAlignment: 'center',
@@ -342,7 +528,6 @@ export const listTemplates: Template[] = [
                   type: 'text',
                   id: 'label',
                   label: 'label',
-                  numbering: true,
                   text: {
                     color: '{{theme.labelFontColor}}',
                     fontFamily: '{{theme.labelFontName}}',
@@ -376,15 +561,16 @@ export const listTemplates: Template[] = [
     },
   },
   {
-    id: 'list-numbered-compact',
-    name: 'List - Simple Numbered Grid',
+    layout: 'labeled_list',
+    id: 'labeled-list-vertical-simple',
+    name: 'Labeled List - Vertical Simple',
     parameters: [
       {
         key: 'SIDE_PADDING',
         label: 'Side Padding (px)',
-        defaultValue: 40,
+        defaultValue: 20,
         min: 0,
-        max: 50,
+        max: 200,
         step: 1,
         description: 'Left/right slide padding',
       },
@@ -418,7 +604,7 @@ export const listTemplates: Template[] = [
             anchor: 'end',
             offset: 15,
             size: 'fill',
-            margin: { left: 0, right: 0, top: 0, bottom: 40 },
+            margin: { left: 100, right: 100, top: 0, bottom: 40 },
           },
           layout: {
             distribution: 'space-between',
@@ -430,19 +616,14 @@ export const listTemplates: Template[] = [
           childTemplate: {
             count: 'auto',
             wrap: {
-              enabled: true,
-              maxItemsPerLine: 5,
-              lineCount: 'auto',
-              wrapDistribution: 'balanced',
-              lineSpacing: 16,
-              syncSize: false,
+              enabled: false,
             },
             structure: {
               type: 'block',
               label: 'item',
               layout: {
-                distribution: '1/5',
-                gap: 8,
+                distribution: '1/3',
+                gap: 12,
                 horizontalAlignment: 'left',
                 verticalAlignment: 'center',
                 orientation: 'horizontal',
@@ -452,7 +633,6 @@ export const listTemplates: Template[] = [
                   type: 'text',
                   id: 'label',
                   label: 'label',
-                  numbering: true,
                   layout: {
                     horizontalAlignment: 'center',
                     verticalAlignment: 'center',
@@ -489,142 +669,16 @@ export const listTemplates: Template[] = [
     },
   },
   {
-    id: 'list-numbered-cards',
-    name: 'List - Staggered Numbered Shadowed Cards',
-    parameters: [
-      {
-        key: 'SIDE_PADDING',
-        label: 'Side Padding (px)',
-        defaultValue: 40,
-        min: 0,
-        max: 50,
-        step: 1,
-        description: 'Left/right slide padding',
-      },
-    ],
-    config: {
-      containers: {
-        title: {
-          type: 'text',
-          bounds: {
-            left: { expr: 'SIDE_PADDING' },
-            top: 15,
-            width: { expr: 'SLIDE_WIDTH - SIDE_PADDING * 2' },
-            height: 100,
-          },
-          layout: {
-            horizontalAlignment: 'center',
-            verticalAlignment: 'top',
-          },
-          text: {
-            color: '{{theme.titleFontColor}}',
-            fontFamily: '{{theme.titleFontName}}',
-            fontWeight: 'bold',
-            textAlign: 'center',
-          },
-        },
-        content: {
-          type: 'block',
-          positioning: {
-            relativeTo: 'title',
-            axis: 'vertical',
-            anchor: 'end',
-            offset: 25,
-            size: 'fill',
-            margin: { left: 0, right: 0, top: 0, bottom: 50 },
-          },
-          layout: {
-            distribution: 'equal',
-            gap: 18,
-            verticalAlignment: 'top',
-            orientation: 'vertical',
-          },
-          childTemplate: {
-            count: 'auto',
-            wrap: {
-              enabled: true,
-              maxItemsPerLine: 4,
-              lineCount: 2,
-              wrapDistribution: 'top-heavy',
-              lineSpacing: 20,
-              syncSize: true,
-              alternating: { start: 15, end: -15 },
-            },
-            structure: {
-              type: 'block',
-              label: 'item',
-              layout: {
-                distribution: '1/5',
-                gap: 10,
-                horizontalAlignment: 'left',
-                verticalAlignment: 'center',
-                orientation: 'horizontal',
-              },
-              border: {
-                width: '{{theme.card.borderWidth}}',
-                color: '{{theme.themeColors[0]}}',
-                radius: '{{theme.card.borderRadius}}',
-              },
-              shadow: {
-                h: '{{theme.card.shadow.h}}',
-                v: '{{theme.card.shadow.v}}',
-                blur: '{{theme.card.shadow.blur}}',
-                color: '{{theme.card.shadow.color}}',
-              },
-              background: {
-                color: '{{theme.card.backgroundColor}}',
-              },
-              children: [
-                {
-                  type: 'text',
-                  id: 'label',
-                  label: 'label',
-                  numbering: true,
-                  layout: {
-                    horizontalAlignment: 'center',
-                    verticalAlignment: 'center',
-                  },
-                  text: {
-                    color: '{{theme.card.textColor}}',
-                    fontFamily: '{{theme.labelFontName}}',
-                    fontWeight: 'bold',
-                    textAlign: 'center',
-                    fontSizeRange: { minSize: 16, maxSize: 24 },
-                  },
-                },
-                {
-                  type: 'text',
-                  id: 'content',
-                  label: 'content',
-                  layout: {
-                    horizontalAlignment: 'left',
-                    verticalAlignment: 'center',
-                  },
-                  text: {
-                    color: '{{theme.card.textColor}}',
-                    fontFamily: '{{theme.fontName}}',
-                    fontWeight: 'normal',
-                    textAlign: 'left',
-                    fontSizeRange: { minSize: 15, maxSize: 22 },
-                  },
-                },
-              ],
-            },
-          },
-        },
-      },
-    },
-  },
-  {
-    id: 'list-container-border',
-    name: 'List - Framed Grid',
+    layout: 'labeled_list',
+    id: 'labeled-list-vertical-container-border',
+    name: 'Labeled List - Vertical Container Border',
     parameters: [
       {
         key: 'SIDE_PADDING',
         label: 'Side Padding (px)',
         defaultValue: 20,
         min: 0,
-        max: 50,
+        max: 200,
         step: 1,
         description: 'Left/right slide padding',
       },
@@ -658,7 +712,7 @@ export const listTemplates: Template[] = [
             anchor: 'end',
             offset: 20,
             size: 'fill',
-            margin: { left: 0, right: 0, top: 0, bottom: 50 },
+            margin: { left: 40, right: 40, top: 0, bottom: 40 },
           },
           border: {
             width: '{{theme.card.borderWidth}}',
@@ -674,106 +728,16 @@ export const listTemplates: Template[] = [
           childTemplate: {
             count: 'auto',
             wrap: {
-              enabled: true,
-              maxItemsPerLine: 5,
-              lineCount: 'auto',
-              wrapDistribution: 'balanced',
-              lineSpacing: 16,
-              syncSize: true,
+              enabled: false,
             },
             structure: {
-              type: 'text',
-              label: 'item',
-              text: {
-                color: '{{theme.fontColor}}',
-                fontFamily: '{{theme.fontName}}',
-                fontWeight: 'normal',
-                textAlign: 'center',
-                fontSizeRange: { minSize: 15, maxSize: 22 },
-              },
-            },
-          },
-        },
-      },
-    },
-  },
-  {
-    id: 'list-container-border-numbered',
-    name: 'List - Framed Numbered Grid',
-    parameters: [
-      {
-        key: 'SIDE_PADDING',
-        label: 'Side Padding (px)',
-        defaultValue: 20,
-        min: 0,
-        max: 50,
-        step: 1,
-        description: 'Left/right slide padding',
-      },
-    ],
-    config: {
-      containers: {
-        title: {
-          id: 'title',
-          type: 'text',
-          bounds: {
-            left: { expr: 'SIDE_PADDING' },
-            top: 15,
-            width: { expr: 'SLIDE_WIDTH - SIDE_PADDING * 2' },
-            height: 100,
-          },
-          layout: {
-            horizontalAlignment: 'center',
-            verticalAlignment: 'top',
-          },
-          text: {
-            color: '{{theme.titleFontColor}}',
-            fontFamily: '{{theme.titleFontName}}',
-            fontWeight: 'bold',
-            textAlign: 'center',
-          },
-        },
-        content: {
-          id: 'content',
-          type: 'block',
-          positioning: {
-            relativeTo: 'title',
-            axis: 'vertical',
-            anchor: 'end',
-            offset: 20,
-            size: 'fill',
-            margin: { left: 0, right: 0, top: 0, bottom: 50 },
-          },
-          border: {
-            width: '{{theme.card.borderWidth}}',
-            color: '{{theme.themeColors[0]}}',
-            radius: '{{theme.card.borderRadius}}',
-          },
-          layout: {
-            distribution: 'equal',
-            gap: 10,
-            verticalAlignment: 'top',
-            orientation: 'vertical',
-          },
-          childTemplate: {
-            count: 'auto',
-            wrap: {
-              enabled: true,
-              maxItemsPerLine: 4,
-              lineCount: 'auto',
-              wrapDistribution: 'balanced',
-              lineSpacing: 16,
-              syncSize: true,
-            },
-            structure: {
-              id: 'item',
               type: 'block',
               label: 'item',
               layout: {
-                distribution: '1/5',
-                gap: 12,
+                distribution: '1/3',
+                gap: 15,
                 horizontalAlignment: 'left',
-                verticalAlignment: 'top',
+                verticalAlignment: 'center',
                 orientation: 'horizontal',
               },
               children: [
@@ -781,27 +745,18 @@ export const listTemplates: Template[] = [
                   type: 'text',
                   id: 'label',
                   label: 'label',
-                  numbering: true,
-                  layout: {
-                    horizontalAlignment: 'center',
-                    verticalAlignment: 'center',
-                  },
                   text: {
-                    color: '{{theme.themeColors[0]}}',
+                    color: '{{theme.labelFontColor}}',
                     fontFamily: '{{theme.labelFontName}}',
                     fontWeight: 'bold',
                     textAlign: 'right',
-                    fontSizeRange: { minSize: 14, maxSize: 20 },
+                    fontSizeRange: { minSize: 16, maxSize: 24 },
                   },
                 },
                 {
                   type: 'text',
                   id: 'content',
                   label: 'content',
-                  layout: {
-                    horizontalAlignment: 'left',
-                    verticalAlignment: 'center',
-                  },
                   text: {
                     color: '{{theme.fontColor}}',
                     fontFamily: '{{theme.fontName}}',
@@ -818,15 +773,16 @@ export const listTemplates: Template[] = [
     },
   },
   {
-    id: 'list-container-bullet',
-    name: 'List - Container Bullet',
+    layout: 'labeled_list',
+    id: 'labeled-list-vertical-container-bullet',
+    name: 'Labeled List - Vertical Container Bullet',
     parameters: [
       {
         key: 'SIDE_PADDING',
         label: 'Side Padding (px)',
         defaultValue: 20,
         min: 0,
-        max: 50,
+        max: 200,
         step: 1,
         description: 'Left/right slide padding',
       },
@@ -856,8 +812,7 @@ export const listTemplates: Template[] = [
           type: 'text',
           combined: {
             enabled: true,
-            pattern: '{item}',
-            wrapping: true,
+            pattern: '{label}: {content}',
           },
           layout: {
             verticalAlignment: 'center',
@@ -868,7 +823,7 @@ export const listTemplates: Template[] = [
             anchor: 'end',
             offset: 20,
             size: 'fill',
-            margin: { left: 0, right: 0, top: 0, bottom: 40 },
+            margin: { left: 40, right: 40, top: 0, bottom: 40 },
           },
           border: {
             width: '{{theme.card.borderWidth}}',
@@ -876,18 +831,27 @@ export const listTemplates: Template[] = [
             radius: '{{theme.card.borderRadius}}',
           },
           text: {
-            color: '{{theme.fontColor}}',
+            color: '{{theme.labelFontColor}}',
             fontFamily: '{{theme.fontName}}',
             fontWeight: 'normal',
             textAlign: 'left',
             lineHeight: 1.5,
-            fontSizeRange: { minSize: 15, maxSize: 22 },
           },
           children: [
             {
               type: 'text',
-              id: 'item',
-              label: 'item',
+              id: 'label',
+              label: 'label',
+              text: {
+                color: '{{theme.labelFontColor}}',
+                fontFamily: '{{theme.labelFontName}}',
+                fontWeight: 'bold',
+              },
+            },
+            {
+              type: 'text',
+              id: 'content',
+              label: 'content',
               text: {
                 color: '{{theme.fontColor}}',
                 fontFamily: '{{theme.fontName}}',

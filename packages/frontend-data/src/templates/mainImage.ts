@@ -1,7 +1,8 @@
-import type { Template } from '../../../types/template';
+import type { SlideTemplate } from '@aiprimary/core';
 
-export const mainImageTemplates: Template[] = [
+export const mainImageTemplates: SlideTemplate[] = [
   {
+    layout: 'main_image',
     id: 'main-image-default',
     name: 'Main Image - Default',
     parameters: [
@@ -83,6 +84,7 @@ export const mainImageTemplates: Template[] = [
     },
   },
   {
+    layout: 'main_image',
     id: 'main-image-left',
     name: 'Main Image - Left',
     parameters: [
@@ -142,6 +144,7 @@ export const mainImageTemplates: Template[] = [
     },
   },
   {
+    layout: 'main_image',
     id: 'main-image-title-overlay',
     name: 'Main Image - Title Overlay',
     config: {
@@ -200,6 +203,7 @@ export const mainImageTemplates: Template[] = [
     },
   },
   {
+    layout: 'main_image',
     id: 'main-image-top',
     name: 'Main Image - Top',
     parameters: [
@@ -257,6 +261,7 @@ export const mainImageTemplates: Template[] = [
     },
   },
   {
+    layout: 'main_image',
     id: 'main-image-right',
     name: 'Main Image - Right',
     parameters: [
@@ -316,6 +321,7 @@ export const mainImageTemplates: Template[] = [
     },
   },
   {
+    layout: 'main_image',
     id: 'main-image-bottom',
     name: 'Main Image - Bottom',
     parameters: [
@@ -377,6 +383,7 @@ export const mainImageTemplates: Template[] = [
     },
   },
   {
+    layout: 'main_image',
     id: 'main-image-framed',
     name: 'Main Image - Framed',
     parameters: [

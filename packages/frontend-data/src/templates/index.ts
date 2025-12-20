@@ -1,6 +1,12 @@
-/**
- * Template exports
- */
-
-// Export slide templates
-export * from './slide';
+export * from './constants';
+export * from './sampleData';
+export * from './mainImage';
+export * from './tableOfContents';
+export * from './timeline';
+export * from './title';
+export * from './twoColumn';
+export * from './twoColumnWithImage';
+export * from './list';
+export * from './labeledList';
+export * from './pyramid';
+export * from './utils';

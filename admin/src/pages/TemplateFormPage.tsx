@@ -2,11 +2,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ThemeSelector, ParameterControls, TemplatePreview } from '@/components/template';
 import { useCreateSlideTemplate, useSlideTemplates, useSlideThemes, useUpdateSlideTemplate } from '@/hooks';
-import VueRemoteWrapper from '@/remote/VueRemoteWrapper';
 import { moduleMethodMap } from '@/remote/module';
 import type { TemplateParameter } from '@/types/api';
 import type { Slide, SlideTemplate } from '@aiprimary/core';
+import { generateSampleTemplateData, type LayoutType } from '@aiprimary/frontend-data';
 import { json } from '@codemirror/lang-json';
 import CodeMirror from '@uiw/react-codemirror';
 import { FileJson, Plus, Trash2 } from 'lucide-react';
@@ -17,11 +18,11 @@ import { toast } from 'sonner';
 const AVAILABLE_LAYOUTS = [
   'title',
   'list',
-  'labeledList',
-  'twoColumn',
-  'twoColumnWithImage',
-  'mainImage',
-  'tableOfContents',
+  'labeled_list',
+  'two_column',
+  'two_column_with_image',
+  'main_image',
+  'table_of_contents',
   'timeline',
   'pyramid',
 ] as const;
@@ -36,94 +37,6 @@ function getDefaultTemplate(): Partial<SlideTemplate> {
   };
 }
 
-// Generate sample template data based on layout type for preview
-function generateSampleTemplateData(layout: string): Record<string, unknown> {
-  const layoutConfigs: Record<string, Record<string, unknown>> = {
-    title: {
-      type: 'title',
-      data: {
-        title: 'Presentation Title',
-        subtitle: 'Subtitle or topic description',
-      },
-    },
-    list: {
-      type: 'list',
-      title: 'List Slide',
-      data: {
-        items: [
-          'First item in the list',
-          'Second item in the list',
-          'Third item in the list',
-          'Fourth item in the list',
-        ],
-      },
-    },
-    labeledList: {
-      type: 'labeled_list',
-      title: 'Labeled List',
-      data: {
-        items: [
-          { label: 'Item 1', content: 'Description for item 1' },
-          { label: 'Item 2', content: 'Description for item 2' },
-          { label: 'Item 3', content: 'Description for item 3' },
-        ],
-      },
-    },
-    twoColumn: {
-      type: 'two_column',
-      title: 'Two Column Layout',
-      data: {
-        items1: ['Left Point 1', 'Left Point 2', 'Left Point 3'],
-        items2: ['Right Point A', 'Right Point B', 'Right Point C'],
-      },
-    },
-    twoColumnWithImage: {
-      type: 'two_column_with_image',
-      title: 'Two Column with Image',
-      data: {
-        items: ['Feature 1', 'Feature 2', 'Feature 3'],
-        image: 'https://via.placeholder.com/300',
-      },
-    },
-    mainImage: {
-      type: 'main_image',
-      data: {
-        title: 'Image Focus Slide',
-        image: 'https://via.placeholder.com/800x400',
-        content: 'Image caption or description',
-      },
-    },
-    tableOfContents: {
-      type: 'table_of_contents',
-      title: 'Table of Contents',
-      data: {
-        items: ['Introduction', 'Main Concepts', 'Implementation', 'Results and Discussion', 'Conclusion'],
-      },
-    },
-    timeline: {
-      type: 'timeline',
-      title: 'Timeline',
-      data: {
-        items: [
-          { label: '2020', content: 'Project Started' },
-          { label: '2021', content: 'Major Milestone' },
-          { label: '2022', content: 'Launch Phase' },
-          { label: '2023', content: 'Growth Phase' },
-        ],
-      },
-    },
-    pyramid: {
-      type: 'pyramid',
-      title: 'Pyramid Structure',
-      data: {
-        items: ['Strategy', 'Execution', 'Foundation'],
-      },
-    },
-  };
-
-  return layoutConfigs[layout] || layoutConfigs.title;
-}
-
 export function TemplateFormPage() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -136,18 +49,13 @@ export function TemplateFormPage() {
   const [jsonTarget, setJsonTarget] = useState<'template' | 'config' | 'graphics'>('template');
 
   const { data: templatesData, isLoading } = useSlideTemplates(id ? { page: 1, pageSize: 1000 } : undefined);
-  const { data: themesData } = useSlideThemes({ page: 1, pageSize: 1 });
+  const { data: themesData } = useSlideThemes({ page: 1, pageSize: 100 });
   const template = id ? templatesData?.data?.find((t) => t.id === id) || null : null;
 
   useEffect(() => {
     if (template) {
-      const sanitized: Partial<SlideTemplate> = { ...template };
-      delete (sanitized as any).created;
-      delete (sanitized as any).updated;
-      delete (sanitized as any).createdAt;
-      delete (sanitized as any).updatedAt;
-      setFormData(sanitized);
-      setJsonText(JSON.stringify(sanitized, null, 2));
+      setFormData(template);
+      setJsonText(JSON.stringify(template, null, 2));
     } else if (!id) {
       const d = getDefaultTemplate();
       setFormData(d);
@@ -194,10 +102,9 @@ export function TemplateFormPage() {
       // sanitize any server metadata if present
       const removeMeta = (obj: any) => {
         if (!obj || typeof obj !== 'object') return obj;
+        // Remove legacy 'created'/'updated' fields only; API sanitizes timestamps
         delete obj.created;
         delete obj.updated;
-        delete obj.createdAt;
-        delete obj.updatedAt;
         return obj;
       };
 
@@ -252,10 +159,9 @@ export function TemplateFormPage() {
     e?.preventDefault();
     // sanitize
     const toSubmit: Partial<SlideTemplate> = { ...formData };
+    // Legacy 'created'/'updated' will be stripped by the API service sanitizer
     delete (toSubmit as any).created;
     delete (toSubmit as any).updated;
-    delete (toSubmit as any).createdAt;
-    delete (toSubmit as any).updatedAt;
 
     // ensure config/graphics are valid JSON if strings
     try {
@@ -271,27 +177,18 @@ export function TemplateFormPage() {
     else createMutation.mutate(payload);
   };
 
+  const [selectedThemeId, setSelectedThemeId] = useState<string | null>(null);
+  const [parameterOverrides, setParameterOverrides] = useState<Record<string, number>>({});
   const [previewSlide, setPreviewSlide] = useState<Slide | null>(null);
   const [previewLoading, setPreviewLoading] = useState(false);
   const [previewError, setPreviewError] = useState<Error | null>(null);
+  const [previewKey, setPreviewKey] = useState(0);
 
   // Generate preview slide using convertToSlide from the presentation module when available.
   // Prefer using the actual mock templates (getSlideTemplates) for correct layout schemas.
   // Falls back to a simple text-based slide if conversion fails.
   useEffect(() => {
     let mounted = true;
-
-    const layoutToType: Record<string, string> = {
-      title: 'title',
-      list: 'list',
-      labeledList: 'labeled_list',
-      twoColumn: 'two_column',
-      twoColumnWithImage: 'two_column_with_image',
-      mainImage: 'main_image',
-      tableOfContents: 'table_of_contents',
-      timeline: 'timeline',
-      pyramid: 'pyramid',
-    };
 
     const makePreview = async () => {
       setPreviewLoading(true);
@@ -300,26 +197,21 @@ export function TemplateFormPage() {
         const methodModule = await moduleMethodMap.method();
         const { convertToSlide } = methodModule.default;
 
-        const desiredType = layoutToType[formData.layout || 'title'] || 'title';
+        const layoutType = (formData.layout || 'title') as LayoutType;
+        let schema: any = generateSampleTemplateData(layoutType);
 
-        // Always generate a schema based on the currently selected layout form field
-        let schema: any = generateSampleTemplateData(formData.layout || 'title');
+        schema.type = layoutType;
 
-        // Force the schema type to match the selected layout to ensure correct conversion
-        schema.type = desiredType;
-
-        // Normalize data shapes for specific layouts
         const normalizeSchemaData = (s: any) => {
           if (!s || !s.data) return s;
-          if (desiredType === 'timeline' && s.data.items && Array.isArray(s.data.items)) {
-            // Ensure timeline items have { label, content } shape
+          if (layoutType === 'timeline' && s.data.items && Array.isArray(s.data.items)) {
             s.data.items = (s.data.items as any[]).map((it: any) => {
               if (typeof it === 'string') return { label: 'Event', content: it };
               if (it.year && it.description) return { label: String(it.year), content: it.description };
               return it;
             });
           }
-          if (desiredType === 'title' && (!s.data.title || typeof s.data.title !== 'string')) {
+          if (layoutType === 'title' && (!s.data.title || typeof s.data.title !== 'string')) {
             s.data.title = String(s.data.title || formData.name || 'Preview Title');
           }
           return s;
@@ -327,30 +219,46 @@ export function TemplateFormPage() {
 
         schema = normalizeSchemaData(schema);
 
-        const themeForPreview = themesData?.data?.[0] || {
-          id: 'fallback',
-          name: 'Fallback Theme',
-          backgroundColor: '#ffffff',
-          themeColors: ['#2563eb', '#64748b', '#0ea5e9'],
-          fontColor: '#1e293b',
-          fontName: 'Arial',
-          titleFontName: 'Arial',
-          titleFontColor: '#1e293b',
-          outline: { style: 'solid', width: 0, color: '#000000' },
-          shadow: { h: 0, v: 0, blur: 0, color: 'transparent' },
+        const availableThemes = themesData?.data || [];
+        const themeForPreview = availableThemes.find((t) => t.id === selectedThemeId) ||
+          availableThemes[0] || {
+            id: 'fallback',
+            name: 'Fallback Theme',
+            backgroundColor: '#ffffff',
+            themeColors: ['#2563eb', '#64748b', '#0ea5e9'],
+            fontColor: '#1e293b',
+            fontName: 'Arial',
+            titleFontName: 'Arial',
+            titleFontColor: '#1e293b',
+            outline: { style: 'solid', width: 0, color: '#000000' },
+            shadow: { h: 0, v: 0, blur: 0, color: 'transparent' },
+          };
+
+        const templateForPreview = {
+          id: formData.id || 'preview-template',
+          name: formData.name || 'Preview Template',
+          layout: formData.layout || 'list',
+          config: formData.config,
+          graphics: formData.graphics,
+          parameters: formData.parameters,
         };
+
         const slide = await convertToSlide(
           schema as any,
           { width: 1000, height: 562.5 },
           themeForPreview as any,
-          'preview-template-slide'
+          'preview-template-slide',
+          undefined,
+          parameterOverrides,
+          templateForPreview
         );
         if (!mounted) return;
         setPreviewSlide(slide as Slide);
+        setPreviewKey((k) => k + 1);
       } catch (err) {
         // fallback: simple textual slide
         if (!mounted) return;
-        const sampleData = generateSampleTemplateData(formData.layout || 'title');
+        const sampleData = generateSampleTemplateData((formData.layout || 'title') as LayoutType);
         const fallbackSlide: Slide = {
           id: 'preview-template-slide',
           elements: [
@@ -373,6 +281,7 @@ export function TemplateFormPage() {
           } as any,
         };
         setPreviewSlide(fallbackSlide);
+        setPreviewKey((k) => k + 1);
         setPreviewError(err as Error);
       } finally {
         if (mounted) setPreviewLoading(false);
@@ -383,7 +292,16 @@ export function TemplateFormPage() {
     return () => {
       mounted = false;
     };
-  }, [formData.layout, formData.config, formData.graphics, formData.name]);
+  }, [
+    formData.layout,
+    formData.name,
+    selectedThemeId,
+    parameterOverrides,
+    JSON.stringify(formData.config),
+    JSON.stringify(formData.graphics),
+    JSON.stringify(formData.parameters),
+    JSON.stringify(themesData?.data?.find((t) => t.id === selectedThemeId)),
+  ]);
 
   return (
     <div className="space-y-6">
@@ -612,44 +530,45 @@ export function TemplateFormPage() {
         <div className="space-y-4">
           <Label>Preview</Label>
           <div className="bg-muted/30 space-y-4 rounded-lg border p-4">
+            <ThemeSelector
+              themes={themesData?.data || []}
+              selectedThemeId={selectedThemeId}
+              onThemeChange={setSelectedThemeId}
+            />
+
             <div>
               <div className="text-muted-foreground text-sm">Layout Type</div>
               <div className="text-base font-medium">{formData.layout || 'title'}</div>
             </div>
 
-            {/* VueRemoteWrapper Slide Preview */}
-            {previewLoading && (
-              <div className="text-muted-foreground flex items-center justify-center p-4 text-sm">
-                Generating slide preview…
+            <div>
+              <div className="text-muted-foreground text-sm">Config Status</div>
+              <div className="font-mono text-xs">
+                {formData.config ? (
+                  <>
+                    Containers: {Object.keys((formData.config as any)?.containers || {}).length}
+                    {Object.keys((formData.config as any)?.containers || {}).length > 0 && (
+                      <> ({Object.keys((formData.config as any).containers).join(', ')})</>
+                    )}
+                  </>
+                ) : (
+                  <span className="text-red-600">No config</span>
+                )}
               </div>
-            )}
+            </div>
 
-            {previewError && (
-              <div className="flex items-center justify-center p-2 text-sm text-red-600">
-                Preview generation failed: {previewError.message}
-              </div>
-            )}
+            <ParameterControls
+              parameters={formData.parameters || []}
+              overrides={parameterOverrides}
+              onOverrideChange={setParameterOverrides}
+            />
 
-            {previewSlide && (
-              <div className="rounded-md border bg-white p-2" style={{ aspectRatio: '16/9', width: '100%' }}>
-                <VueRemoteWrapper
-                  modulePath="thumbnail"
-                  mountProps={{ slide: previewSlide, size: 'auto', visible: true }}
-                  className="h-full w-full"
-                  LoadingComponent={() => (
-                    <div className="text-muted-foreground flex items-center justify-center p-4 text-sm">
-                      Rendering preview...
-                    </div>
-                  )}
-                  ErrorComponent={({ error }: { error: Error }) => (
-                    <div className="flex items-center justify-center p-4 text-sm text-red-600">
-                      Preview error: {error.message}
-                    </div>
-                  )}
-                  onMountError={(err) => console.error('Template preview mount error', err)}
-                />
-              </div>
-            )}
+            <TemplatePreview
+              slide={previewSlide}
+              loading={previewLoading}
+              error={previewError}
+              previewKey={previewKey}
+            />
           </div>
 
           <div className="flex items-center justify-end gap-3">

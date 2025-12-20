@@ -31,6 +31,9 @@
   ],
   "author": "",
   "license": "ISC",
+  "dependencies": {
+    "@aiprimary/core": "workspace:*"
+  },
   "devDependencies": {
     "typescript": "latest"
   }

@@ -1,7 +1,8 @@
-import type { Template } from '../../../types/template';
+import type { SlideTemplate } from '@aiprimary/core';
 
-export const twoColumnTemplates: Template[] = [
+export const twoColumnTemplates: SlideTemplate[] = [
   {
+    layout: 'two_column',
     id: 'two-column-compact',
     name: 'Two Column - Compact',
     parameters: [
@@ -92,6 +93,7 @@ export const twoColumnTemplates: Template[] = [
     },
   },
   {
+    layout: 'two_column',
     id: 'two-column-container-border',
     name: 'Two Column - Container Border',
     parameters: [
@@ -183,6 +185,7 @@ export const twoColumnTemplates: Template[] = [
     },
   },
   {
+    layout: 'two_column',
     id: 'two-column-container-border-shadow',
     name: 'Two Column - Container Border Shadow',
     parameters: [
@@ -282,6 +285,7 @@ export const twoColumnTemplates: Template[] = [
     },
   },
   {
+    layout: 'two_column',
     id: 'two-column-bordered-items',
     name: 'Two Column - Each Column Border',
     parameters: [
@@ -419,6 +423,7 @@ export const twoColumnTemplates: Template[] = [
     ],
   },
   {
+    layout: 'two_column',
     id: 'two-column-bordered-items-shadow',
     name: 'Two Column - Each Column Border Shadow',
     parameters: [
@@ -574,6 +579,7 @@ export const twoColumnTemplates: Template[] = [
     ],
   },
   {
+    layout: 'two_column',
     id: 'two-column-container-bullet',
     name: 'Two Column - Container Bullet',
     parameters: [

@@ -1,7 +1,8 @@
-import type { Template } from '../../../types/template';
+import type { SlideTemplate } from '@aiprimary/core';
 
-export const twoColumnWithImageTemplates: Template[] = [
+export const twoColumnWithImageTemplates: SlideTemplate[] = [
   {
+    layout: 'two_column_with_image',
     id: 'two-column-with-image',
     name: 'Two Column with Image',
     parameters: [
@@ -118,6 +119,7 @@ export const twoColumnWithImageTemplates: Template[] = [
     },
   },
   {
+    layout: 'two_column_with_image',
     id: 'two-column-left-big-image',
     name: 'Two Column - Left Big Image',
     parameters: [
@@ -229,6 +231,7 @@ export const twoColumnWithImageTemplates: Template[] = [
     },
   },
   {
+    layout: 'two_column_with_image',
     id: 'two-column-right-big-image',
     name: 'Two Column - Right Big Image',
     parameters: [
@@ -338,6 +341,7 @@ export const twoColumnWithImageTemplates: Template[] = [
     },
   },
   {
+    layout: 'two_column_with_image',
     id: 'two-column-right-image',
     name: 'Two Column - Right Image',
     parameters: [
@@ -449,6 +453,7 @@ export const twoColumnWithImageTemplates: Template[] = [
     },
   },
   {
+    layout: 'two_column_with_image',
     id: 'two-column-with-image-container-border',
     name: 'Two Column with Image - Container Border',
     parameters: [
@@ -567,6 +572,7 @@ export const twoColumnWithImageTemplates: Template[] = [
     },
   },
   {
+    layout: 'two_column_with_image',
     id: 'two-column-left-big-image-container-border',
     name: 'Two Column - Left Big Image Container Border',
     parameters: [
@@ -678,6 +684,7 @@ export const twoColumnWithImageTemplates: Template[] = [
     },
   },
   {
+    layout: 'two_column_with_image',
     id: 'two-column-right-big-image-container-border',
     name: 'Two Column - Right Big Image Container Border',
     parameters: [
@@ -791,6 +798,7 @@ export const twoColumnWithImageTemplates: Template[] = [
     },
   },
   {
+    layout: 'two_column_with_image',
     id: 'two-column-with-image-container-bullet',
     name: 'Two Column with Image - Container Bullet',
     parameters: [

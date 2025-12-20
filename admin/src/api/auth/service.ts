@@ -14,17 +14,17 @@ export default class AuthRealApiService implements AuthApiService {
   }
 
   async login(data: LoginRequest): Promise<LoginResponse> {
-    const response = await api.post<LoginResponse>(`${this.baseUrl}/auth/login`, data);
+    const response = await api.post<LoginResponse>(`${this.baseUrl}/api/auth/signin`, data);
     return response.data;
   }
 
   async logout(): Promise<void> {
-    await api.post(`${this.baseUrl}/auth/logout`);
+    await api.post(`${this.baseUrl}/api/auth/logout`);
   }
 
   async getProfile(): Promise<User> {
-    const response = await api.get<{ data: User }>(`${this.baseUrl}/auth/profile`);
-    return response.data.data;
+    const response = await api.get<{ data: User }>(`${this.baseUrl}/api/user/me`);
+    return { ...response.data.data, role: 'admin' };
   }
 
   async refreshToken(refreshToken: string): Promise<LoginResponse> {

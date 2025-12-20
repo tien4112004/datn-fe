@@ -7,7 +7,8 @@ import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { DataTable } from '@/components/table';
-import { MODEL_TYPES, type Model, type ModelType } from '@/types/api';
+import type { Model, ModelType } from '@aiprimary/core';
+import { MODEL_TYPES } from '@aiprimary/core';
 
 const columnHelper = createColumnHelper<Model>();
 

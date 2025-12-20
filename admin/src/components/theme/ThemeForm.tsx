@@ -1,13 +1,13 @@
-import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { NumberInput } from '@/components/ui/number-input';
-import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { NumberInput } from '@/components/ui/number-input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import ThemeFormSide from './ThemeFormSide';
-import type { SlideTheme, PPTElementShadow, PPTElementOutline } from '@/types/api';
+import type { PPTElementOutline, PPTElementShadow, SlideTheme } from '@aiprimary/core';
 import { Plus, Trash2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import ThemeFormSide from './ThemeFormSide';
 
 export const DEFAULT_SHADOW: PPTElementShadow = {
   h: 0,

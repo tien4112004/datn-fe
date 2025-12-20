@@ -1,19 +1,18 @@
-import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { useSlideTemplates, useCreateSlideTemplate, useUpdateSlideTemplate } from '@/hooks';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { toast } from 'sonner';
-import CodeMirror from '@uiw/react-codemirror';
-import { json } from '@codemirror/lang-json';
-import { FileJson, Plus, Trash2 } from 'lucide-react';
+import { useCreateSlideTemplate, useSlideTemplates, useSlideThemes, useUpdateSlideTemplate } from '@/hooks';
 import VueRemoteWrapper from '@/remote/VueRemoteWrapper';
 import { moduleMethodMap } from '@/remote/module';
-import { MOCK_SLIDE_THEMES } from '@/api/mock-data';
-import type { SlideTemplate, TemplateParameter } from '@/types/api';
-import type { Slide } from '@aiprimary/core';
+import type { TemplateParameter } from '@/types/api';
+import type { Slide, SlideTemplate } from '@aiprimary/core';
+import { json } from '@codemirror/lang-json';
+import CodeMirror from '@uiw/react-codemirror';
+import { FileJson, Plus, Trash2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { toast } from 'sonner';
 
 const AVAILABLE_LAYOUTS = [
   'title',
@@ -137,6 +136,7 @@ export function TemplateFormPage() {
   const [jsonTarget, setJsonTarget] = useState<'template' | 'config' | 'graphics'>('template');
 
   const { data: templatesData, isLoading } = useSlideTemplates(id ? { page: 1, pageSize: 1000 } : undefined);
+  const { data: themesData } = useSlideThemes({ page: 1, pageSize: 1 });
   const template = id ? templatesData?.data?.find((t) => t.id === id) || null : null;
 
   useEffect(() => {
@@ -327,8 +327,18 @@ export function TemplateFormPage() {
 
         schema = normalizeSchemaData(schema);
 
-        const themeForPreview =
-          MOCK_SLIDE_THEMES && MOCK_SLIDE_THEMES.length ? MOCK_SLIDE_THEMES[0] : ({} as any);
+        const themeForPreview = themesData?.data?.[0] || {
+          id: 'fallback',
+          name: 'Fallback Theme',
+          backgroundColor: '#ffffff',
+          themeColors: ['#2563eb', '#64748b', '#0ea5e9'],
+          fontColor: '#1e293b',
+          fontName: 'Arial',
+          titleFontName: 'Arial',
+          titleFontColor: '#1e293b',
+          outline: { style: 'solid', width: 0, color: '#000000' },
+          shadow: { h: 0, v: 0, blur: 0, color: 'transparent' },
+        };
         const slide = await convertToSlide(
           schema as any,
           { width: 1000, height: 562.5 },

@@ -1,4 +1,4 @@
-import type { SlideTheme, Gradient } from '@/types/api';
+import type { Gradient, SlideTheme } from '@aiprimary/core';
 
 interface ThemePreviewCardProps {
   theme: SlideTheme;

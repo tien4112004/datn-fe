@@ -1,14 +1,14 @@
-import { useMemo, useState } from 'react';
-import { createColumnHelper, getCoreRowModel, useReactTable } from '@tanstack/react-table';
-import { useSlideThemes } from '@/hooks';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { DataTable, TablePagination } from '@/components/table';
 import { ThemePreviewCard } from '@/components/theme';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useSlideThemes } from '@/hooks';
+import { createColumnHelper, getCoreRowModel, useReactTable } from '@tanstack/react-table';
+import { Edit, Plus } from 'lucide-react';
+import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Edit } from 'lucide-react';
 
-import type { SlideTheme, Gradient } from '@/types/api';
+import type { Gradient, SlideTheme } from '@aiprimary/core';
 
 const columnHelper = createColumnHelper<SlideTheme>();
 

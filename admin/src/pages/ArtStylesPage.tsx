@@ -1,13 +1,13 @@
-import { useEffect, useMemo, useState } from 'react';
 import { useArtStyles, useCreateArtStyle, useUpdateArtStyle } from '@/hooks';
 import { createColumnHelper, getCoreRowModel, useReactTable } from '@tanstack/react-table';
+import { useEffect, useMemo, useState } from 'react';
 
+import { ArtStyleFormDialog } from '@/components/art-style/ArtStyleFormDialog';
+import { DataTable, TablePagination } from '@/components/table';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { DataTable, TablePagination } from '@/components/table';
-import { ArtStyleFormDialog } from '@/components/art-style/ArtStyleFormDialog';
-import { Plus, Edit, Image } from 'lucide-react';
-import type { ArtStyle } from '@/types/api';
+import type { ArtStyle } from '@aiprimary/core';
+import { Edit, Image, Plus } from 'lucide-react';
 
 const columnHelper = createColumnHelper<ArtStyle>();
 
@@ -58,21 +58,6 @@ export function ArtStylesPage() {
       columnHelper.accessor('labelKey', {
         header: 'Label Key',
         cell: (info) => <code className="bg-muted rounded px-2 py-1 text-sm">{info.getValue()}</code>,
-      }),
-      columnHelper.accessor('isEnabled', {
-        header: 'Status',
-        cell: (info) => {
-          const isEnabled = info.getValue();
-          return (
-            <span
-              className={`inline-flex rounded-full px-2 py-1 text-xs font-medium ${
-                isEnabled ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-              }`}
-            >
-              {isEnabled ? 'Enabled' : 'Disabled'}
-            </span>
-          );
-        },
       }),
       columnHelper.display({
         id: 'actions',

@@ -1,5 +1,3 @@
-import { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useSlideTemplates } from '@/hooks';
 import {
   createColumnHelper,
@@ -7,12 +5,14 @@ import {
   getPaginationRowModel,
   useReactTable,
 } from '@tanstack/react-table';
+import { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
+import { DataTable, TablePagination } from '@/components/table';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Plus, Edit, FileJson } from 'lucide-react';
-import { DataTable, TablePagination } from '@/components/table';
-import type { SlideTemplate } from '@/types/api';
+import type { SlideTemplate } from '@aiprimary/core';
+import { Edit, FileJson, Plus } from 'lucide-react';
 
 const columnHelper = createColumnHelper<SlideTemplate>();
 

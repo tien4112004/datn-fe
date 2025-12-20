@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -11,10 +10,12 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import type { SlideTemplate, TemplateParameter } from '@/types/api';
-import { AlertCircle, FileJson, Plus, Trash2 } from 'lucide-react';
-import CodeMirror from '@uiw/react-codemirror';
+import type { TemplateParameter } from '@/types/api';
+import type { SlideTemplate } from '@aiprimary/core';
 import { json } from '@codemirror/lang-json';
+import CodeMirror from '@uiw/react-codemirror';
+import { AlertCircle, FileJson, Plus, Trash2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 interface TemplateFormDialogProps {
   open: boolean;

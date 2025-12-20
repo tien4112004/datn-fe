@@ -1,7 +1,7 @@
-import { useNavigate, useParams } from 'react-router-dom';
-import { useSlideThemes, useCreateSlideTheme, useUpdateSlideTheme } from '@/hooks';
 import ThemeForm from '@/components/theme/ThemeForm';
-import type { SlideTheme } from '@/types/api';
+import { useCreateSlideTheme, useSlideThemes, useUpdateSlideTheme } from '@/hooks';
+import type { SlideTheme } from '@aiprimary/core';
+import { useNavigate, useParams } from 'react-router-dom';
 
 export function ThemeFormPage() {
   const { id } = useParams();

@@ -1,17 +1,14 @@
 import type { AuthApiService } from '@/types/service';
-import AuthMockService from './mock';
 import AuthRealApiService from './service';
-import { getApiServiceFactory, getBackendUrl } from '../base-service';
+import { getBackendUrl } from '@aiprimary/api';
 
 /**
- * Get auth API service instance (for use in React components)
- * Automatically switches between mock and real based on localStorage setting
+ * Get auth API service instance
+ * Returns the real API service implementation
  */
 export const getAuthApiService = (): AuthApiService => {
   const backendUrl = getBackendUrl();
-
-  return getApiServiceFactory<AuthApiService>(AuthMockService, AuthRealApiService, backendUrl);
+  return new AuthRealApiService(backendUrl);
 };
 
-// Export services for convenience
-export { AuthMockService, AuthRealApiService };
+export { AuthRealApiService };

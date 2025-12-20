@@ -1,17 +1,14 @@
 import type { AdminApiService } from '@/types/service';
-import AdminMockService from './mock';
 import AdminRealApiService from './service';
-import { getApiServiceFactory, getBackendUrl } from '../base-service';
+import { getBackendUrl } from '@aiprimary/api';
 
 /**
- * Get admin API service instance (for use in React components)
- * Automatically switches between mock and real based on localStorage setting
+ * Get admin API service instance
+ * Returns the real API service implementation
  */
 export const getAdminApiService = (): AdminApiService => {
   const backendUrl = getBackendUrl();
-
-  return getApiServiceFactory<AdminApiService>(AdminMockService, AdminRealApiService, backendUrl);
+  return new AdminRealApiService(backendUrl);
 };
 
-// Export service for convenience
-export { AdminMockService, AdminRealApiService };
+export { AdminRealApiService };

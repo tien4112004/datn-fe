@@ -1,4 +1,3 @@
-import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -10,10 +9,11 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
-import type { ArtStyle, ArtStyleRequest } from '@/types/api';
+import type { ArtStyleRequest } from '@/types/api';
+import type { ArtStyle } from '@aiprimary/core';
 import { Image, Upload, X } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 
 interface ArtStyleFormDialogProps {
   open: boolean;
@@ -33,7 +33,6 @@ function getDefaultFormData(): ArtStyleRequest & { visualPreview?: string } {
     labelKey: '',
     visual: undefined,
     modifiers: '',
-    isEnabled: true,
     visualPreview: undefined,
   };
 }
@@ -66,9 +65,8 @@ export function ArtStyleFormDialog({
         id: artStyle.id,
         name: artStyle.name,
         labelKey: artStyle.labelKey,
-        visual: undefined, // Don't send existing CDN URL back
+        visual: undefined, // Reset visual to undefined; use visualPreview for display
         modifiers: artStyle.modifiers,
-        isEnabled: artStyle.isEnabled,
         visualPreview: artStyle.visual, // Show existing image in preview
       });
     } else {
@@ -221,21 +219,6 @@ export function ArtStyleFormDialog({
                   Style modifiers appended to prompts for this art style
                 </p>
               </div>
-
-              {/* Enabled */}
-              <div className="flex items-center justify-between rounded-lg border p-4">
-                <div className="space-y-0.5">
-                  <Label htmlFor="isEnabled">Enabled</Label>
-                  <p className="text-muted-foreground text-xs">
-                    Whether this art style is available for selection
-                  </p>
-                </div>
-                <Switch
-                  id="isEnabled"
-                  checked={formData.isEnabled ?? true}
-                  onCheckedChange={(checked) => setFormData({ ...formData, isEnabled: checked })}
-                />
-              </div>
             </div>
 
             {/* Right column - Preview */}
@@ -295,16 +278,6 @@ export function ArtStyleFormDialog({
                     <p className="bg-muted break-words rounded px-2 py-1 text-xs">
                       {formData.modifiers || '-'}
                     </p>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Status:</span>
-                    <span
-                      className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${
-                        formData.isEnabled ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                      }`}
-                    >
-                      {formData.isEnabled ? 'Enabled' : 'Disabled'}
-                    </span>
                   </div>
                 </div>
               </div>

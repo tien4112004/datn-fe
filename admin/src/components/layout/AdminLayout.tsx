@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
+import { getBackendUrl } from '@aiprimary/api';
 
 const navItems = [
   { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
@@ -112,42 +113,10 @@ export function AdminLayout() {
           <h1 className="text-lg font-semibold">Admin Panel</h1>
         </header>
 
-        {/* Page content */}
-        <div className="bg-background flex hidden items-center justify-end gap-4 border-b px-6 py-3 lg:flex">
-          <div className="flex items-center gap-3 text-sm">
-            <div className="flex items-center gap-2">
-              <label htmlFor="api-mode" className="text-muted-foreground">
-                API Mode
-              </label>
-              <select
-                id="api-mode"
-                defaultValue={
-                  (localStorage.getItem('admin_api_mode') as 'mock' | 'real') ||
-                  (import.meta.env.VITE_API_MODE as any) ||
-                  'mock'
-                }
-                onChange={(e) => {
-                  const val = e.target.value as 'mock' | 'real';
-                  localStorage.setItem('admin_api_mode', val);
-                  // Also set global apiMode key used by @aiprimary/api
-                  localStorage.setItem('apiMode', val);
-                  // Notify other parts of the app
-                  window.dispatchEvent(new CustomEvent('api:mode-changed', { detail: val }));
-                  // Reload so in-memory services pick up the change
-                  // eslint-disable-next-line no-alert
-                  window.alert(`API mode set to ${val}. The app will reload to apply the change.`);
-                  window.location.reload();
-                }}
-                className="rounded border px-2 py-1"
-              >
-                <option value="mock">Mock</option>
-                <option value="real">Real</option>
-              </select>
-            </div>
-
-            <div className="text-muted-foreground text-xs">
-              Backend: <span className="font-mono">{import.meta.env.VITE_API_URL}</span>
-            </div>
+        {/* Backend URL Display */}
+        <div className="bg-background flex items-center justify-end gap-4 border-b px-6 py-3">
+          <div className="text-muted-foreground text-sm">
+            Backend: <span className="font-mono">{import.meta.env.VITE_API_URL || getBackendUrl()}</span>
           </div>
         </div>
 

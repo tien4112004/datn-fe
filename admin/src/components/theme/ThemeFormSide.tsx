@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import type { SlideTheme } from '@aiprimary/core';
+import { useEffect, useState } from 'react';
 import { ThemePreviewCard } from './ThemePreviewCard';
 import ThemeThumbnailPreview from './ThemeThumbnailPreview';
-import type { SlideTheme } from '@/types/api';
 
 interface ThemeFormSideProps {
   formData: Partial<SlideTheme>;

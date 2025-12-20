@@ -1,8 +1,7 @@
-import { useEffect, useState } from 'react';
 import VueRemoteWrapper from '@/remote/VueRemoteWrapper';
 import { moduleMethodMap } from '@/remote/module';
-import type { SlideTheme } from '@/types/api';
-import type { Slide } from '@aiprimary/core';
+import type { Slide, SlideTheme } from '@aiprimary/core';
+import { useEffect, useState } from 'react';
 
 interface ThemeThumbnailPreviewProps {
   theme: SlideTheme;

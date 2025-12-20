@@ -1,17 +1,11 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getAdminApiService } from '@/api/admin';
 import { getAuthApiService } from '@/api/auth';
-import { toast } from 'sonner';
-import type {
-  PaginationParams,
-  SlideTheme,
-  SlideTemplate,
-  ArtStyle,
-  ModelPatchData,
-  FAQPost,
-  BookType,
-} from '@/types/api';
+import type { BookType, FAQPost, PaginationParams } from '@/types/api';
+import type { ModelPatchData } from '@aiprimary/core';
 import type { LoginRequest } from '@/types/auth';
+import type { ArtStyle, SlideTemplate, SlideTheme } from '@aiprimary/core';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 
 /**
  * Query key factory for admin API

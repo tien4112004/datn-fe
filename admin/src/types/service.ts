@@ -1,17 +1,7 @@
 import type { ApiMode } from '@aiprimary/api';
 import type { User, LoginRequest, LoginResponse } from './auth';
-import type {
-  ApiResponse,
-  PaginationParams,
-  SlideTheme,
-  SlideTemplate,
-  ArtStyle,
-  Model,
-  ModelPatchData,
-  FAQPost,
-  Book,
-  BookType,
-} from './api';
+import type { ApiResponse, PaginationParams, FAQPost, Book, BookType } from './api';
+import type { SlideTheme, SlideTemplate, ArtStyle, Model, ModelPatchData } from '@aiprimary/core';
 
 /**
  * Base service interface that all API services must extend

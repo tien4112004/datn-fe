@@ -1,6 +1,6 @@
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import type { SlideTheme } from '@aiprimary/core';
 import ThemeForm from './ThemeForm';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import type { SlideTheme } from '@/types/api';
 
 interface ThemeFormDialogProps {
   open: boolean;

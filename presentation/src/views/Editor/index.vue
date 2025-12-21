@@ -1,10 +1,24 @@
 <template>
-  <div class="pptist-editor" :class="{ 'view-mode': mode === 'view' }">
+  <div
+    class="pptist-editor"
+    :class="{ 'view-mode': mode === 'view', 'show-left': showLeftOnMobile, 'show-right': showRightOnMobile }"
+  >
     <EditorHeader class="layout-header" />
     <div class="layout-content">
       <Thumbnails class="layout-content-left" />
       <div class="layout-content-center">
-        <CanvasTool v-if="mode === 'edit'" class="center-top" />
+        <div class="center-top center-top-wrapper">
+          <CanvasTool v-if="mode === 'edit'" />
+
+          <div class="mobile-panel-toggle" v-if="mode === 'edit'">
+            <button class="mobile-toggle-btn" @click="toggleLeftPanel" aria-label="Toggle Thumbnails">
+              ☰
+            </button>
+            <button class="mobile-toggle-btn" @click="toggleRightPanel" aria-label="Toggle Toolbar">
+              ⚙
+            </button>
+          </div>
+        </div>
 
         <!-- Template Preview Mode Banner -->
         <div v-if="isCurrentSlideLocked" class="preview-mode-banner">
@@ -143,6 +157,24 @@ const remarkHeight = ref(240);
 const showRemarkDrawer = ref(false);
 const showConfirmAllButton = ref(false);
 
+// Mobile panel toggle state
+const showLeftOnMobile = ref(false);
+const showRightOnMobile = ref(false);
+
+const toggleLeftPanel = () => {
+  showLeftOnMobile.value = !showLeftOnMobile.value;
+  if (showLeftOnMobile.value) {
+    showRightOnMobile.value = false;
+  }
+};
+
+const toggleRightPanel = () => {
+  showRightOnMobile.value = !showRightOnMobile.value;
+  if (showRightOnMobile.value) {
+    showLeftOnMobile.value = false;
+  }
+};
+
 // Function to open the drawer for editing
 const openRemarkDrawer = () => {
   showRemarkDrawer.value = true;
@@ -262,110 +294,117 @@ usePasteEvent();
   height: 100%;
 }
 
-.preview-mode-banner {
-  flex-shrink: 0;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-  padding: 12px 16px;
-  color: white;
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+  .layout-content-right {
+    width: 260px;
+  }
+  .layout-content-center {
+    width: calc(100% - 180px - 260px);
+  }
+}
 
-  .banner-content {
+@media (max-width: 900px) {
+  .layout-content-left,
+  .layout-content-right {
+    display: none;
+  }
+
+  .layout-content-center {
+    width: 100%;
+  }
+
+  /* Mobile panel toggles */
+  .center-top-wrapper {
     display: flex;
     align-items: center;
-    gap: 12px;
-    max-width: 100%;
-    max-height: 40px;
+    justify-content: space-between;
+    padding: 0 8px;
   }
 
-  .banner-icon {
-    flex-shrink: 0;
-    width: 36px;
-    height: 36px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 8px;
-  }
-
-  .banner-text {
-    flex: 1;
-    min-width: 0;
-  }
-
-  .banner-title {
-    font-size: 14px;
-    font-weight: 600;
-    margin-bottom: 2px;
-  }
-
-  .banner-subtitle {
-    font-size: 12px;
-    opacity: 0.9;
-    line-height: 1.4;
-  }
-
-  .banner-buttons {
-    flex-shrink: 0;
+  .mobile-panel-toggle {
     display: flex;
     gap: 8px;
   }
 
-  .banner-button {
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 8px 16px;
-    background: white;
-    color: #667eea;
-    border: none;
+  .mobile-toggle-btn {
+    background: transparent;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    padding: 6px 8px;
     border-radius: 6px;
-    font-size: 13px;
-    font-weight: 600;
+    font-size: 16px;
     cursor: pointer;
-    transition: all 0.2s;
-    white-space: nowrap;
+  }
 
-    &:hover {
-      background: rgba(255, 255, 255, 0.95);
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    }
+  /* When toggled, show as overlays */
+  .pptist-editor.show-left .layout-content-left,
+  .pptist-editor.show-right .layout-content-right {
+    display: block;
+    position: absolute;
+    top: 40px;
+    bottom: 0;
+    z-index: 30;
+    background: var(--presentation-background);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  }
 
-    &:active {
-      transform: translateY(0);
-    }
+  .pptist-editor.show-left .layout-content-left {
+    left: 0;
+    width: 240px;
+  }
 
-    &.banner-button-secondary {
-      background: rgba(255, 255, 255, 0.15);
-      color: white;
-      border: 1px solid rgba(255, 255, 255, 0.4);
+  .pptist-editor.show-right .layout-content-right {
+    right: 0;
+    width: 320px;
+  }
 
-      &:hover {
-        background: rgba(255, 255, 255, 0.25);
-        border-color: rgba(255, 255, 255, 0.6);
-      }
-    }
+  /* Banner responsive wrap */
+  .preview-mode-banner .banner-content {
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+  }
 
-    &.banner-button-confirm {
-      background: #fca43f;
-      color: #92400e;
-      border: 2px solid #f59e0b;
-      animation: pulse-glow 1.5s ease-in-out infinite;
+  .preview-mode-banner .banner-buttons {
+    width: 100%;
+    justify-content: flex-end;
+  }
 
-      &:hover {
-        background: #fac822;
-        border-color: #d97706;
-        transform: translateY(-1px) scale(1.02);
-      }
-    }
+  .preview-mode-banner .banner-button {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+
+  .preview-mode-banner .banner-title {
+    font-size: 13px;
+  }
+
+  .preview-mode-banner .banner-subtitle {
+    display: none;
+  }
+
+  /* Hide remark preview on small screens */
+  .center-bottom {
+    display: none;
   }
 }
 
+/* Larger view mode adjustments */
 .pptist-editor.view-mode {
   .layout-content-center {
     width: calc(100% - 180px);
+  }
+}
+
+@media (max-width: 420px) {
+  .mobile-toggle-btn {
+    padding: 6px;
+    font-size: 14px;
+  }
+
+  .preview-mode-banner .banner-icon {
+    width: 28px;
+    height: 28px;
   }
 }
 

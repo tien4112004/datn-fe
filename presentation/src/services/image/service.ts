@@ -27,15 +27,19 @@ export class ImageApiService implements ApiService {
     params: ImageGenerationParams
   ): Promise<ImageGenerationResponse> {
     const response = await api.post<ApiResponse<ImageGenerationResponse>>(
-      `${this.baseUrl}/api/images/generate-in-presentation`,
+      `${this.baseUrl}/api/image/generate-in-presentation/mock`,
       {
         prompt: params.prompt,
         model: params.model.name,
         provider: params.model.provider.toLowerCase(),
+        themeStyle: params.themeStyle,
+        themeDescription: params.themeDescription,
+        artStyle: params.artStyle,
+        artDescription: params.artDescription,
       },
       {
         headers: {
-          'Idempotency-Key': `${presentationId}:${slideId}:image`,
+          'Idempotency-Key': `${presentationId}:${slideId}`,
         },
       }
     );

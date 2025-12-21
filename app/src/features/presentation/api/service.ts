@@ -313,13 +313,13 @@ export default class PresentationRealApiService implements PresentationApiServic
 
   _mapPresentationItem(data: any): Presentation {
     return {
-      id: data.id,
-      title: data.title,
-      thumbnail: data.thumbnail,
-      slides: data.slides,
-      createdAt: data.createdAt,
-      updatedAt: data.updatedAt,
-      isParsed: data.parsed || false,
+      id: data?.id,
+      title: data?.title,
+      thumbnail: data?.thumbnail,
+      slides: data?.slides,
+      theme: data?.theme,
+      viewport: data?.viewport,
+      isParsed: data?.parsed || false,
     };
   }
 }

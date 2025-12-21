@@ -321,7 +321,7 @@ export function createListElements(
       defaultFontName: container.text.fontFamily || 'Arial',
       defaultColor: container.text.color || '#000000',
       left: position.left + 10, // Padding left
-      top: position.top - 12.5,
+      top: position.top - paragraphSpace,
       width: container.bounds.width - 20,
       height: container.bounds.height,
       paragraphSpace,

@@ -50,7 +50,7 @@ export class PresentationApiService implements ApiService {
         },
       }
     );
-    return response.data.data;
+    return this._mapPresentationItem(response.data.data);
   }
 
   /**
@@ -60,7 +60,7 @@ export class PresentationApiService implements ApiService {
     const response = await api.patch<ApiResponse<Presentation>>(
       `${this.baseUrl}/api/presentations/${id}/parse`
     );
-    return response.data.data;
+    return this._mapPresentationItem(response.data.data);
   }
 
   /**
@@ -118,7 +118,7 @@ export class PresentationApiService implements ApiService {
    */
   async getPresentation(id: string): Promise<Presentation> {
     const response = await api.get<ApiResponse<Presentation>>(`${this.baseUrl}/api/presentations/${id}`);
-    return response.data.data;
+    return this._mapPresentationItem(response.data.data);
   }
 
   /**
@@ -129,6 +129,18 @@ export class PresentationApiService implements ApiService {
       `${this.baseUrl}/api/presentations/${id}`,
       data
     );
-    return response.data.data;
+    return this._mapPresentationItem(response.data.data);
+  }
+
+  _mapPresentationItem(data: any): Presentation {
+    return {
+      id: data.id,
+      title: data.title,
+      thumbnail: data.thumbnail,
+      theme: data.theme,
+      viewport: data.viewport,
+      slides: data.slides,
+      isParsed: data.parsed || false,
+    };
   }
 }

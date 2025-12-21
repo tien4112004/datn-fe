@@ -11,7 +11,7 @@
     "lint": "turbo run lint",
     "format": "turbo run format",
     "format:root": "prettier --write \"**/*.{js,ts,vue,json,css,tsx}\"",
-    "typecheck": "turbo run typecheck",
+    "type-check": "turbo run type-check",
     "test": "turbo run test",
     "test:run": "turbo run test:run",
     "prepare": "husky install"

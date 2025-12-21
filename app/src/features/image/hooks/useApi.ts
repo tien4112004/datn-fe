@@ -107,6 +107,7 @@ const adaptArtStyle = (apiStyle: ArtStyleApiResponse): ArtStyleOption => ({
   value: apiStyle.id as ArtStyle,
   labelKey: apiStyle.labelKey,
   visual: apiStyle.visual || 'https://placehold.co/600x400/FFFFFF/31343C?text=None',
+  modifiers: apiStyle.modifiers || undefined,
 });
 
 /**

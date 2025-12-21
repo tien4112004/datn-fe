@@ -23,6 +23,7 @@ interface PresentationConfig {
 
 interface ImageOptions {
   artStyle: ArtStyle;
+  artStyleModifiers?: string;
   imageModel: ModelConfig;
 }
 

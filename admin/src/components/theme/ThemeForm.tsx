@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { NumberInput } from '@/components/ui/number-input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 import type { PPTElementOutline, PPTElementShadow, SlideTheme } from '@aiprimary/core';
 import { Plus, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -28,6 +29,7 @@ const MAX_THEME_COLORS = 5;
 export function getDefaultTheme(): Partial<SlideTheme> {
   return {
     name: '',
+    modifiers: null,
     backgroundColor: '#ffffff',
     themeColors: [...DEFAULT_THEME_COLORS],
     fontColor: '#1f2937',
@@ -295,6 +297,23 @@ export function ThemeForm({ initialTheme, onSubmit, onCancel, isPending = false 
                     ))}
                   </div>
                 </div>
+              </div>
+
+              {/* Modifiers */}
+              <div className="space-y-2">
+                <Label htmlFor="modifiers" className="text-sm font-semibold">
+                  Modifiers
+                </Label>
+                <Textarea
+                  id="modifiers"
+                  value={formData.modifiers || ''}
+                  onChange={(e) => setFormData({ ...formData, modifiers: e.target.value })}
+                  placeholder="e.g., clean, modern, professional design"
+                  rows={3}
+                />
+                <p className="text-muted-foreground text-xs">
+                  Style modifiers appended to image generation prompts for this theme
+                </p>
               </div>
 
               {/* Outline & Shadow */}

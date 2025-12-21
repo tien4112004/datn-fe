@@ -13,7 +13,7 @@ import { z } from 'zod';
 import useFormPersist from 'react-hook-form-persist';
 import { moduleMap } from '../components/remote/module';
 import type { SlideTheme } from '../types/slide';
-import type { ArtStyle } from '@/features/image/types';
+import type { ArtStyleOption } from '@/features/image/types';
 
 export type UnifiedFormData = {
   // Outline fields
@@ -27,7 +27,7 @@ export type UnifiedFormData = {
   // Customization fields (optional)
   theme?: SlideTheme;
   contentLength?: string;
-  artStyle?: ArtStyle;
+  artStyle?: ArtStyleOption;
   imageModel?: {
     name: string;
     provider: string;
@@ -70,18 +70,24 @@ export const PresentationFormProvider = ({ children }: PresentationFormProviderP
         theme: z.any().optional(),
         contentLength: z.string().optional(),
         artStyle: z
-          .enum([
-            '',
-            'photorealistic',
-            'digital-art',
-            'oil-painting',
-            'watercolor',
-            'anime',
-            'cartoon',
-            'sketch',
-            'abstract',
-            'surreal',
-          ])
+          .object({
+            id: z.string(),
+            value: z.enum([
+              '',
+              'photorealistic',
+              'digital-art',
+              'oil-painting',
+              'watercolor',
+              'anime',
+              'cartoon',
+              'sketch',
+              'abstract',
+              'surreal',
+            ]),
+            labelKey: z.string(),
+            visual: z.string(),
+            modifiers: z.string().optional(),
+          })
           .optional(),
         imageModel: z
           .object({
@@ -105,7 +111,7 @@ export const PresentationFormProvider = ({ children }: PresentationFormProviderP
       },
       theme: undefined,
       contentLength: '',
-      artStyle: '',
+      artStyle: undefined,
       imageModel: {
         name: '',
         provider: '',

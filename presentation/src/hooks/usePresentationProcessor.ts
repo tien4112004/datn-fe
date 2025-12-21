@@ -148,10 +148,17 @@ export function usePresentationProcessor(
     await updateSlideImageInStore(slideId, imageElement.id, loadingUrl);
 
     try {
+      // Get current theme info
+      const currentTheme = presentation?.theme || slidesStore.theme;
+
       const response: any = await generateImage({
         slideId,
         prompt,
         model: request.generationOptions.imageModel,
+        themeStyle: currentTheme.id,
+        themeDescription: currentTheme.modifiers || undefined,
+        artStyle: request.generationOptions.artStyle || undefined,
+        artDescription: request.generationOptions.artStyleModifiers,
       });
 
       const imageUrl = response.images[0]?.url;

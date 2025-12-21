@@ -13,7 +13,7 @@ import { useTranslation } from 'react-i18next';
 import { ModelSelect } from '@/components/common/ModelSelect';
 import { MODEL_TYPES, useModels } from '@/features/model';
 import type { UnifiedFormData } from '../../contexts/PresentationFormContext';
-import type { ArtStyle } from '@/features/image/types';
+import type { ArtStyleOption } from '@/features/image/types';
 import { useCallback, useState, useEffect } from 'react';
 import useOutlineStore from '../../stores/useOutlineStore';
 import { useSlideThemes } from '../../hooks';
@@ -130,8 +130,8 @@ const ThemeSection = ({ selectedTheme, onThemeSelect, disabled = false }: ThemeS
 };
 
 interface ArtSectionProps {
-  selectedStyle: ArtStyle;
-  onStyleSelect: (style: ArtStyle) => void;
+  selectedStyle: ArtStyleOption | undefined;
+  onStyleSelect: (style: ArtStyleOption) => void;
   disabled?: boolean;
 }
 
@@ -160,9 +160,9 @@ const ArtSection = ({ selectedStyle, onStyleSelect, disabled = false }: ArtSecti
                 className={cn(
                   'group relative overflow-hidden rounded-lg border-2 transition-all',
                   disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer hover:scale-105',
-                  selectedStyle === style.value ? 'border-primary shadow-md' : 'border-border'
+                  selectedStyle?.value === style.value ? 'border-primary shadow-md' : 'border-border'
                 )}
-                onClick={() => !disabled && onStyleSelect(style.value)}
+                onClick={() => !disabled && onStyleSelect(style)}
               >
                 {/* Preview gradient/image */}
                 <div
@@ -265,7 +265,7 @@ const CustomizationSection = ({
   );
 
   const onArtStyleSelect = useCallback(
-    (style: string) => {
+    (style: ArtStyleOption) => {
       setValue('artStyle', style, { shouldValidate: true, shouldDirty: true });
     },
     [setValue]

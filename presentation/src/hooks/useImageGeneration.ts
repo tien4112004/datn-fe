@@ -13,6 +13,10 @@ export function useGenerateImage(presentationId: string) {
       slideId,
       prompt,
       model,
+      themeStyle,
+      themeDescription,
+      artStyle,
+      artDescription,
     }: {
       slideId: string;
       prompt: string;
@@ -20,10 +24,18 @@ export function useGenerateImage(presentationId: string) {
         name: string;
         provider: string;
       };
+      themeStyle?: string;
+      themeDescription?: string;
+      artStyle?: string;
+      artDescription?: string;
     }) => {
       const result = await imageApi.generateImage(presentationId, slideId, {
         prompt,
         model,
+        themeStyle,
+        themeDescription,
+        artStyle,
+        artDescription,
       });
       return result;
     },

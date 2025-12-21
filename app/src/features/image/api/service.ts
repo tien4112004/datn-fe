@@ -68,6 +68,10 @@ export default class ImageRealApiService implements ImageApiService {
         prompt: request.prompt,
         model: request.model.name,
         provider: request.model.provider.toLowerCase(),
+        themeStyle: request.themeStyle,
+        themeDescription: request.themeDescription,
+        artStyle: request.artStyle,
+        artDescription: request.artDescription,
       },
       {
         headers: {

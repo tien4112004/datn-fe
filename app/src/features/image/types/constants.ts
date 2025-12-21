@@ -74,4 +74,5 @@ export interface ArtStyleOption {
   value: ArtStyle;
   labelKey: string;
   visual: string;
+  modifiers?: string;
 }

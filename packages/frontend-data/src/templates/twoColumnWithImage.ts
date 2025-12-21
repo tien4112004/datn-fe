@@ -750,7 +750,7 @@ export const twoColumnWithImageTemplates: SlideTemplate[] = [
             wrapping: false,
           },
           layout: {
-            verticalAlignment: 'center',
+            verticalAlignment: 'top',
           },
           positioning: {
             relativeTo: 'title',

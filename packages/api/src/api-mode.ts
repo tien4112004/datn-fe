@@ -22,7 +22,7 @@ export function getApiMode(): ApiMode {
     return API_MODE.mock;
   }
   const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
-  return stored === API_MODE.mock || stored === API_MODE.real ? (stored as ApiMode) : API_MODE.mock;
+  return stored === API_MODE.mock || stored === API_MODE.real ? (stored as ApiMode) : API_MODE.real;
 }
 
 /**

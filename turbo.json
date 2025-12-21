@@ -8,6 +8,7 @@
     "test:run": { "outputs": [] },
 
     "dev": { "cache": true, "persistent": true },
+    "preview": { "dependsOn": ["^build"], "persistent": true },
 
     "build": {
       "dependsOn": ["^build"],

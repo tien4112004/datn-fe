@@ -8,7 +8,6 @@ import path from 'path';
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
   return {
-    base: './',
     plugins: [
       react(),
       tailwindcss(),
@@ -36,30 +35,7 @@ export default defineConfig(({ mode }) => {
     build: {
       chunkSizeWarningLimit: 1000,
       rollupOptions: {
-        output: {
-          // manualChunks: {
-          //   'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-          //   'ui-vendor': [
-          //     '@radix-ui/react-dialog',
-          //     '@radix-ui/react-dropdown-menu',
-          //     '@radix-ui/react-select',
-          //     '@radix-ui/react-popover',
-          //     '@radix-ui/react-tabs',
-          //     '@radix-ui/react-tooltip',
-          //     '@radix-ui/react-alert-dialog',
-          //     '@radix-ui/react-label',
-          //     '@radix-ui/react-switch',
-          //     '@radix-ui/react-checkbox',
-          //     '@radix-ui/react-slot',
-          //     '@radix-ui/react-separator',
-          //     '@radix-ui/react-scroll-area',
-          //     '@radix-ui/react-avatar',
-          //   ],
-          //   'query-vendor': ['@tanstack/react-query', '@tanstack/react-table'],
-          //   'form-vendor': ['react-hook-form', '@hookform/resolvers', 'zod'],
-          //   'editor-vendor': ['@uiw/react-codemirror', '@codemirror/lang-json'],
-          // },
-        },
+        treeshake: false,
       },
     },
     server: {
@@ -82,7 +58,7 @@ export default defineConfig(({ mode }) => {
       },
     },
     define: {
-      'import.meta.env.VITE_API_URL': JSON.stringify(env.VITE_API_URL || 'http://localhost:8081'),
+      'import.meta.env.VITE_API_URL': JSON.stringify(env.VITE_API_URL),
     },
   };
 });

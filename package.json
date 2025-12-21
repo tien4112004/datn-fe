@@ -14,7 +14,8 @@
     "type-check": "turbo run type-check",
     "test": "turbo run test",
     "test:run": "turbo run test:run",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "preview": "turbo run preview"
   },
   "keywords": [],
   "author": "",

@@ -251,10 +251,9 @@ export function TemplateFormPage() {
           schema as any,
           { width: 1000, height: 562.5 },
           themeForPreview as any,
+          templateForPreview as any,
           'preview-template-slide',
-          undefined,
-          parameterOverrides,
-          templateForPreview
+          parameterOverrides
         );
         if (!mounted) return;
         setPreviewSlide(slide as Slide);

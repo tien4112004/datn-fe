@@ -23,7 +23,7 @@ const ThemeThumbnailPreview = ({ theme, size = 240 }: ThemeThumbnailPreviewProps
       setSlides([]);
       try {
         const methodModule = await moduleMethodMap.method();
-        const { convertToSlide, getSlideTemplates } = methodModule.default;
+        const { convertToSlide, getSlideTemplates, selectRandomTemplate } = methodModule.default;
 
         const templates = getSlideTemplates() || [];
         const effectiveTemplates = templates.length
@@ -31,9 +31,10 @@ const ThemeThumbnailPreview = ({ theme, size = 240 }: ThemeThumbnailPreviewProps
           : [{ type: 'title', data: { title: 'Preview' } }];
 
         const results = await Promise.allSettled(
-          effectiveTemplates.map((tpl: any, i: number) =>
-            convertToSlide(tpl, DEFAULT_VIEWPORT, theme, undefined, String(i))
-          )
+          effectiveTemplates.map(async (tpl: any, i: number) => {
+            const template = await selectRandomTemplate(tpl.type, String(i));
+            return convertToSlide(tpl, DEFAULT_VIEWPORT, theme, template, undefined);
+          })
         );
 
         if (!mounted) return;

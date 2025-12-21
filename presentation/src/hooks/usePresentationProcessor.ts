@@ -1,5 +1,5 @@
 import { ref, watch, onUnmounted, type Ref } from 'vue';
-import { convertToSlide, updateImageSource } from '@/utils/slideLayout';
+import { convertToSlide, updateImageSource, selectRandomTemplate } from '@/utils/slideLayout';
 import type { SlideLayoutSchema, SlideViewport } from '@/utils/slideLayout/types';
 import type { PPTImageElement, SlideTheme } from '@/types/slides';
 import { useSlidesStore } from '@/store';
@@ -60,9 +60,16 @@ export function usePresentationProcessor(
       const theme = presentation?.theme || slidesStore.theme;
 
       const slides = await Promise.all(
-        aiResult.map((slideData: any, i: number) =>
-          convertToSlide(slideData as SlideLayoutSchema, viewport, theme, (i + 1).toString())
-        )
+        aiResult.map(async (slideData: any, i: number) => {
+          const template = await selectRandomTemplate(slideData.type);
+          return convertToSlide(
+            slideData as SlideLayoutSchema,
+            viewport,
+            theme,
+            template,
+            (i + 1).toString()
+          );
+        })
       );
 
       slidesStore.setSlides(slides);
@@ -88,10 +95,12 @@ export function usePresentationProcessor(
 
     for (const streamedSlide of newData) {
       try {
+        const template = await selectRandomTemplate(streamedSlide.result.type);
         const slide = await convertToSlide(
           streamedSlide.result as SlideLayoutSchema,
           viewport,
           streamedSlide.theme || slidesStore.theme,
+          template,
           streamedSlide.order?.toString()
         );
 

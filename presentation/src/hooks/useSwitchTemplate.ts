@@ -1,5 +1,5 @@
 import { useSlidesStore } from '@/store';
-import { convertToSlide } from '@/utils/slideLayout';
+import { convertToSlide, selectTemplateById } from '@/utils/slideLayout';
 import { getTemplateVariations } from '@/utils/slideLayout/converters/templateSelector';
 import type { Template } from '@/utils/slideLayout/types';
 import type { PPTImageElement } from '@/types/slides';
@@ -68,16 +68,16 @@ export default function useSwitchTemplate() {
         }
       }
 
-      // Generate a seed that will directly select this specific template by ID
-      const seed = `template-id:${newTemplateId}`;
+      // Select the specific template by ID
+      const template = await selectTemplateById(slide.layout.layoutType, newTemplateId);
 
       // Re-convert the slide with the new template, preserving parameter overrides
       const newSlide = await convertToSlide(
         updatedSchema,
         viewport,
         theme,
+        template,
         slide.id, // Preserve the slide ID
-        seed,
         slide.layout.parameterOverrides // Preserve parameter customizations
       );
 
@@ -144,16 +144,16 @@ export default function useSwitchTemplate() {
         }
       }
 
-      // Generate a seed to keep the same template
-      const seed = `template-id:${slide.layout.templateId}`;
+      // Select the same template by ID to keep the current template
+      const template = await selectTemplateById(slide.layout.layoutType, slide.layout.templateId);
 
       // Re-convert the slide with the updated parameters
       const newSlide = await convertToSlide(
         updatedSchema,
         viewport,
         theme,
+        template,
         slide.id, // Preserve the slide ID
-        seed,
         parameterOverrides // Apply new parameter values
       );
 

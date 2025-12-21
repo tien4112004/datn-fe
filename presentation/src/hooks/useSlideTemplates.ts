@@ -1,6 +1,6 @@
 import { useSlidesStore } from '@/store';
 import type { SlideTheme } from '@/types/slides';
-import { convertToSlide } from '@/utils/slideLayout';
+import { convertToSlide, selectNextTemplate } from '@/utils/slideLayout';
 import { TEMPLATE_VARIATIONS } from '@/utils/slideLayout/converters/templateSelector';
 import { SLIDE_LAYOUT_TYPE } from '@/utils/slideLayout/types';
 
@@ -21,7 +21,8 @@ export default function useSlideTemplates() {
     }
 
     for (const data of slideData) {
-      const slide = await convertToSlide(data, viewport, theme, undefined, '1');
+      const template = await selectNextTemplate(data.type);
+      const slide = await convertToSlide(data, viewport, theme, template, undefined);
       slidesStore.appendNewSlide(slide);
       slidesStore.setTheme(theme);
     }

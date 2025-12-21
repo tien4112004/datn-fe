@@ -44,6 +44,13 @@ export interface PresentationGenerationStartResponse {
 }
 
 export type CreatePresentationRequest = Omit<Presentation, 'id' | 'createdAt' | 'updatedAt'>;
+export interface UpdatePresentationRequest {
+  title?: string;
+  slides?: Slide[];
+  theme?: SlideTheme;
+  viewport?: SlideViewport;
+  thumbnail?: string;
+}
 
 export interface GetSlideThemesParams {
   page?: number;
@@ -66,7 +73,7 @@ export interface PresentationApiService extends Service {
   getAiResultById(id: string): Promise<SlideLayoutSchema[]>;
   generatePresentation(request: PresentationGenerationRequest): Promise<PresentationGenerationResponse>;
   updatePresentationTitle(id: string, name: string): Promise<any | null>;
-  updatePresentation(id: string, data: Presentation): Promise<Presentation>;
+  updatePresentation(id: string, data: UpdatePresentationRequest): Promise<Presentation>;
   getStreamedPresentation(
     request: PresentationGenerationRequest,
     signal: AbortSignal

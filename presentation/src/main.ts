@@ -4,6 +4,7 @@ import App from './App.vue';
 import router from '@/router';
 import i18n from '@/locales';
 import { initializeFonts } from '@/utils/font';
+import { templateRegistry } from '@/utils/slideLayout/converters/templateRegistry';
 
 import 'prosemirror-view/style/prosemirror.css';
 import 'animate.css';
@@ -25,3 +26,6 @@ app.mount('#app');
 
 // Initialize Google Fonts for fallback fonts
 initializeFonts();
+
+// Prefetch all slide templates from API on app initialization
+templateRegistry.prefetchAll();

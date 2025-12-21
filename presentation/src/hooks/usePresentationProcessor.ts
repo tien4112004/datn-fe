@@ -2,7 +2,7 @@ import { ref, watch, onUnmounted, type Ref } from 'vue';
 import { convertToSlide, updateImageSource, selectRandomTemplate } from '@/utils/slideLayout';
 import type { SlideLayoutSchema, SlideViewport } from '@/utils/slideLayout/types';
 import type { PPTImageElement, SlideTheme } from '@/types/slides';
-import { useSlidesStore } from '@/store';
+import { useSlidesStore, useContainerStore } from '@/store';
 import { useGenerationStore, type AiResultSlide } from '@/store/generation';
 import { useSaveStore } from '@/store/save';
 import { useAiResultById, useUpdateSlides, useSetParsed } from './usePresentationMutations';
@@ -42,6 +42,17 @@ export function usePresentationProcessor(
     height: slidesStore.viewportSize * slidesStore.viewportRatio,
   };
 
+  // 0. Set theme and viewport from presentation if available
+  if (presentation) {
+    if (presentation.theme) {
+      slidesStore.setTheme(presentation.theme);
+    }
+    if (presentation.viewport) {
+      slidesStore.setViewportSize(presentation.viewport.width);
+      slidesStore.setViewportRatio(presentation.viewport.height / presentation.viewport.width);
+    }
+  }
+
   // 1. Initial Logic
   if (presentation && !presentation.isParsed && !isGenerating) {
     processFullAiResult();
@@ -77,6 +88,7 @@ export function usePresentationProcessor(
 
       await updateSlides(slides);
       await setParsed();
+      dispatchSavePresentationEvent();
       saveStore.markSaved();
     } catch (error) {
       console.error('Error processing AI result:', error);
@@ -169,6 +181,29 @@ export function usePresentationProcessor(
     slidesStore.setSlides(newSlides);
   }
 
+  // Dispatch save event to container when presentation is parsed remotely
+  const containerStore = useContainerStore();
+
+  function dispatchSavePresentationEvent() {
+    // Only dispatch if running in a remote container and there are unsaved changes
+    if (!containerStore.isRemote) return;
+    if (!saveStore.hasUnsavedChanges) return;
+    if (!presentation) return;
+
+    window.dispatchEvent(
+      new CustomEvent('app.presentation.save', {
+        detail: {
+          presentation: {
+            title: presentation.title,
+            slides: slidesStore.slides,
+            theme: slidesStore.theme,
+            viewport,
+          },
+        },
+      })
+    );
+  }
+
   // 5. Watchers
   watch(
     () => generationStore.streamedData,
@@ -193,6 +228,7 @@ export function usePresentationProcessor(
           // Single upsert at the end
           await updateSlides(slidesStore.slides);
           await setParsed();
+          dispatchSavePresentationEvent();
           saveStore.markSaved();
 
           processedStreamDataRef.value = [];

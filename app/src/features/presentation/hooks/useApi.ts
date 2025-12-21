@@ -14,6 +14,7 @@ import type {
   OutlineItem,
   PresentationGenerationRequest,
   PresentationGenerateDraftRequest,
+  UpdatePresentationRequest,
 } from '../types';
 import type { ApiResponse } from '@aiprimary/api';
 import { ExpectedError } from '@aiprimary/api';
@@ -265,7 +266,7 @@ export const useUpdatePresentation = (id: string) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (presentation: Presentation) => {
+    mutationFn: async (presentation: UpdatePresentationRequest) => {
       const updatedPresentation = await presentationApiService.updatePresentation(id, presentation);
       return updatedPresentation;
     },

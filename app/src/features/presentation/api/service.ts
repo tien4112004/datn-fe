@@ -11,6 +11,7 @@ import {
   type PresentationGenerationStartResponse,
   type PresentationGenerateDraftRequest,
   type GetSlideThemesParams,
+  type UpdatePresentationRequest,
 } from '../types';
 import { splitMarkdownToOutlineItems } from '../utils';
 import { api } from '@aiprimary/api';
@@ -300,10 +301,13 @@ export default class PresentationRealApiService implements PresentationApiServic
     return null;
   }
 
-  async updatePresentation(id: string, data: Presentation): Promise<any> {
+  async updatePresentation(id: string, data: UpdatePresentationRequest): Promise<any> {
     await api.put<ApiResponse<Presentation>>(`${this.baseUrl}/api/presentations/${id}`, {
-      title: data.title,
       slides: data.slides,
+      title: data.title,
+      theme: data.theme,
+      viewport: data.viewport,
+      thumbnail: data.thumbnail,
     });
   }
 

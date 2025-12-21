@@ -88,9 +88,13 @@ export default () => {
       new CustomEvent('app.presentation.save', {
         detail: {
           presentation: {
-            ...presentation,
             title: presentation.title,
             slides: slides.value,
+            theme: slidesStore.theme,
+            viewport: {
+              width: slidesStore.viewportSize,
+              height: slidesStore.viewportSize * slidesStore.viewportRatio,
+            },
           },
         },
       })

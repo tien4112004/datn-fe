@@ -10,6 +10,7 @@ import {
   type PresentationGenerationResponse,
   type SlideLayoutSchema,
   type GetSlideThemesParams,
+  type UpdatePresentationRequest,
 } from '../types';
 import type { ApiResponse } from '@aiprimary/api';
 import type { Slide, SlideTheme, SlideTemplate } from '../types/slide';
@@ -381,7 +382,7 @@ export default class PresentationMockService implements PresentationApiService {
     });
   }
 
-  async updatePresentation(id: string, data: Presentation): Promise<Presentation> {
+  async updatePresentation(id: string, data: UpdatePresentationRequest): Promise<Presentation> {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         const index = mockPresentationItems.findIndex((item) => item.id === id);

@@ -106,12 +106,11 @@ export const useSavePresentationRemote = (presentationId: string, vueApp?: VueEd
 
         // Generate thumbnail using Vue app instance if available
         const thumbnail = await vueApp?.generateThumbnail?.();
-        console.log(thumbnail);
 
         // Include thumbnail in the presentation data (thumbnail will be undefined if generation failed)
         const presentationWithThumbnail = {
           ...dataToSave,
-          ...(thumbnail ? { thumbnail } : { thumbnail: dataToSave.thumbnail }),
+          ...(thumbnail ? { thumbnail } : { thumbnail: dataToSave.thumbnail as string }),
         };
 
         // Save presentation with thumbnail

@@ -12,7 +12,7 @@ import { TEMPLATE_VARIATIONS } from './templateSelector';
  */
 class TemplateRegistry {
   private cache: Map<string, Template[]> = new Map();
-  private fetchPromises: Map<string, Promise<Template[]>> = new Map();
+  private initPromise: Promise<void> | null = null;
   private initialized = false;
 
   /**
@@ -25,47 +25,23 @@ class TemplateRegistry {
       return this.getFrontendDataTemplates(layoutType);
     }
 
-    // Check cache first
+    // Ensure templates are initialized
+    if (!this.initialized && !this.initPromise) {
+      await this.prefetchAll();
+    } else if (this.initPromise) {
+      await this.initPromise;
+    }
+
+    // Check cache
     if (this.cache.has(layoutType)) {
       return this.cache.get(layoutType)!;
     }
 
-    // Check if we're already fetching this layout type
-    if (this.fetchPromises.has(layoutType)) {
-      return this.fetchPromises.get(layoutType)!;
-    }
-
-    // Fetch from API
-    const fetchPromise = this.fetchTemplatesFromApi(layoutType);
-    this.fetchPromises.set(layoutType, fetchPromise);
-
-    try {
-      const templates = await fetchPromise;
-      this.cache.set(layoutType, templates);
-      return templates;
-    } catch (error) {
-      console.error(
-        `Failed to fetch templates for ${layoutType} from API, falling back to frontend-data:`,
-        error
-      );
-      // Fall back to frontend-data on error
-      const fallbackTemplates = this.getFrontendDataTemplates(layoutType);
-      this.cache.set(layoutType, fallbackTemplates);
-      return fallbackTemplates;
-    } finally {
-      this.fetchPromises.delete(layoutType);
-    }
-  }
-
-  /**
-   * Fetch templates from API for a specific layout type
-   */
-  private async fetchTemplatesFromApi(layoutType: string): Promise<Template[]> {
-    const templateApi = getTemplateApi();
-    const apiTemplates = await templateApi.getSlideTemplatesByLayout(layoutType);
-
-    // Convert API SlideTemplate[] to Template[]
-    return apiTemplates.map((apiTemplate) => this.convertApiTemplateToTemplate(apiTemplate));
+    // If not in cache after initialization, fall back to frontend-data
+    console.warn(
+      `No templates found for layout type "${layoutType}" in API response, falling back to frontend-data`
+    );
+    return this.getFrontendDataTemplates(layoutType);
   }
 
   /**
@@ -95,15 +71,30 @@ class TemplateRegistry {
   }
 
   /**
-   * Prefetch all templates from API (optional optimization)
+   * Prefetch all templates from API on app initialization
    */
   async prefetchAll(): Promise<void> {
-    if (isMockMode() || this.initialized) {
+    // In mock mode, skip API fetching
+    if (isMockMode()) {
       return;
     }
 
-    this.initialized = true;
+    // If already initialized, return immediately
+    if (this.initialized) {
+      return;
+    }
 
+    // If already initializing, wait for that promise
+    if (this.initPromise) {
+      return this.initPromise;
+    }
+
+    // Create and store the initialization promise
+    this.initPromise = this.doInitialize();
+    await this.initPromise;
+  }
+
+  private async doInitialize(): Promise<void> {
     try {
       const templateApi = getTemplateApi();
       const allTemplates = await templateApi.getSlideTemplates();
@@ -125,9 +116,18 @@ class TemplateRegistry {
       for (const [layout, templates] of grouped.entries()) {
         this.cache.set(layout, templates);
       }
+
+      this.initialized = true;
+      console.log(
+        `✓ Loaded ${allTemplates.length} templates from API, grouped into ${grouped.size} layout types`
+      );
     } catch (error) {
       console.error('Failed to prefetch templates from API:', error);
-      // Don't throw - we'll fall back to lazy loading or frontend-data
+      // Mark as initialized even on error to prevent retry loops
+      // Will fall back to frontend-data when getTemplates is called
+      this.initialized = true;
+    } finally {
+      this.initPromise = null;
     }
   }
 
@@ -136,7 +136,7 @@ class TemplateRegistry {
    */
   clearCache(): void {
     this.cache.clear();
-    this.fetchPromises.clear();
+    this.initPromise = null;
     this.initialized = false;
   }
 

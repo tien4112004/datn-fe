@@ -181,9 +181,6 @@ export const mainImageTemplates: SlideTemplate[] = [
             horizontalAlignment: 'center',
             verticalAlignment: 'center',
           },
-          background: {
-            color: 'rgba(0, 0, 0, 0.6)',
-          },
           border: {
             width: 0,
             radius: '{{theme.card.borderRadius}}',

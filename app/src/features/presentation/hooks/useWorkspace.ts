@@ -108,7 +108,7 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
 
         generationOptions: {
           // Default artStyle to empty string (allowed option) if not set
-          artStyle: data.artStyle?.value ?? '',
+          artStyle: data.artStyle?.id ?? '',
           artStyleModifiers: data.artStyle?.modifiers,
           imageModel: data.imageModel ?? { name: '', provider: '' },
         },

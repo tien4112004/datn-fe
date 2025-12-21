@@ -1,4 +1,12 @@
-import type { ApiResponse, Book, BookType, FAQPost, Pagination, PaginationParams } from '@/types/api';
+import type {
+  ApiResponse,
+  ArtStyleRequest,
+  Book,
+  BookType,
+  FAQPost,
+  Pagination,
+  PaginationParams,
+} from '@/types/api';
 import type { Model, ModelPatchData } from '@aiprimary/core';
 import type { User } from '@/types/auth';
 import type { AdminApiService } from '@/types/service';
@@ -266,12 +274,12 @@ export default class AdminRealApiService implements AdminApiService {
     return response.data;
   }
 
-  async createArtStyle(data: ArtStyle): Promise<ApiResponse<ArtStyle>> {
+  async createArtStyle(data: ArtStyleRequest): Promise<ApiResponse<ArtStyle>> {
     const response = await api.post<ApiResponse<ArtStyle>>(`${this.baseUrl}/api/art-styles`, data);
     return response.data;
   }
 
-  async updateArtStyle(id: string, data: ArtStyle): Promise<ApiResponse<ArtStyle>> {
+  async updateArtStyle(id: string, data: ArtStyleRequest): Promise<ApiResponse<ArtStyle>> {
     const response = await api.put<ApiResponse<ArtStyle>>(`${this.baseUrl}/api/art-styles/${id}`, data);
     return response.data;
   }

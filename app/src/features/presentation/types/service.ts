@@ -8,7 +8,6 @@ import type {
 } from './presentation';
 import type { ApiResponse } from '@aiprimary/api';
 import type { Slide, SlideTheme, SlideTemplate, SlideViewport } from './slide';
-import type { ArtStyle } from '@/features/image/types';
 
 interface PresentationConfig {
   theme: SlideTheme;
@@ -16,7 +15,7 @@ interface PresentationConfig {
 }
 
 interface ImageOptions {
-  artStyle: ArtStyle;
+  artStyle: string;
   artStyleModifiers?: string;
   imageModel: ModelConfig;
 }

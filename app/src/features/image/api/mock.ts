@@ -5,9 +5,9 @@ import {
   type ImageGenerationResponse,
   type ImageData,
   type GetImagesParams,
-  type ArtStyleApiResponse,
   type GetArtStylesParams,
 } from '../types/service';
+import type { ArtStyle } from '@aiprimary/core';
 
 /**
  * Generate mock image data
@@ -121,9 +121,9 @@ export default class ImageMockService implements ImageApiService {
           id: crypto.randomUUID(),
           url: `https://picsum.photos/800/600?random=${Date.now()}`,
           prompt: request.prompt,
-          style: request.style || 'realistic',
+          style: request.artStyle || 'realistic',
           size: request.size || '800x600',
-          quality: request.quality || 'high',
+          quality: 'high',
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         };
@@ -196,20 +196,18 @@ export default class ImageMockService implements ImageApiService {
     });
   }
 
-  async getArtStyles(_params?: GetArtStylesParams): Promise<ArtStyleApiResponse[]> {
+  async getArtStyles(_params?: GetArtStylesParams): Promise<ArtStyle[]> {
     return new Promise((resolve) => {
       setTimeout(() => {
-        const mockArtStyles: ArtStyleApiResponse[] = [
+        const mockArtStyles: ArtStyle[] = [
           {
             id: '',
             name: 'None',
             labelKey: 'none',
             visual: 'https://placehold.co/600x400/FFFFFF/31343C?text=None',
-            modifiers: null,
-            isEnabled: true,
+            modifiers: undefined,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
-            data: null,
           },
           {
             id: 'photorealistic',
@@ -217,10 +215,8 @@ export default class ImageMockService implements ImageApiService {
             labelKey: 'photorealistic',
             visual: 'https://placehold.co/600x400/667eea/ffffff?text=Photorealistic',
             modifiers: 'photorealistic, highly detailed, realistic photography',
-            isEnabled: true,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
-            data: null,
           },
           {
             id: 'digital-art',
@@ -228,10 +224,8 @@ export default class ImageMockService implements ImageApiService {
             labelKey: 'digitalArt',
             visual: 'https://placehold.co/600x400/f093fb/ffffff?text=Digital+Art',
             modifiers: 'digital art, digital painting, concept art',
-            isEnabled: true,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
-            data: null,
           },
           {
             id: 'oil-painting',
@@ -239,10 +233,8 @@ export default class ImageMockService implements ImageApiService {
             labelKey: 'oilPainting',
             visual: 'https://placehold.co/600x400/4facfe/ffffff?text=Oil+Painting',
             modifiers: 'oil painting, traditional art, painterly style',
-            isEnabled: true,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
-            data: null,
           },
           {
             id: 'watercolor',
@@ -250,10 +242,8 @@ export default class ImageMockService implements ImageApiService {
             labelKey: 'watercolor',
             visual: 'https://placehold.co/600x400/00f2fe/ffffff?text=Watercolor',
             modifiers: 'watercolor, aquarelle, soft washes',
-            isEnabled: true,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
-            data: null,
           },
           {
             id: 'anime',
@@ -261,10 +251,8 @@ export default class ImageMockService implements ImageApiService {
             labelKey: 'anime',
             visual: 'https://placehold.co/600x400/43e97b/ffffff?text=Anime',
             modifiers: 'anime style, manga, japanese animation',
-            isEnabled: true,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
-            data: null,
           },
           {
             id: 'cartoon',
@@ -272,10 +260,8 @@ export default class ImageMockService implements ImageApiService {
             labelKey: 'cartoon',
             visual: 'https://placehold.co/600x400/fa709a/ffffff?text=Cartoon',
             modifiers: 'cartoon style, cel shaded, vibrant colors',
-            isEnabled: true,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
-            data: null,
           },
           {
             id: 'sketch',
@@ -283,10 +269,8 @@ export default class ImageMockService implements ImageApiService {
             labelKey: 'sketch',
             visual: 'https://placehold.co/600x400/fee140/ffffff?text=Sketch',
             modifiers: 'pencil sketch, hand drawn, line art',
-            isEnabled: true,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
-            data: null,
           },
           {
             id: 'abstract',
@@ -294,10 +278,8 @@ export default class ImageMockService implements ImageApiService {
             labelKey: 'abstract',
             visual: 'https://placehold.co/600x400/30cfd0/ffffff?text=Abstract',
             modifiers: 'abstract art, non-representational, geometric',
-            isEnabled: true,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
-            data: null,
           },
           {
             id: 'surreal',
@@ -305,15 +287,13 @@ export default class ImageMockService implements ImageApiService {
             labelKey: 'surreal',
             visual: 'https://placehold.co/600x400/ffecd2/ffffff?text=Surreal',
             modifiers: 'surrealism, dreamlike, fantastical',
-            isEnabled: true,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
-            data: null,
           },
         ];
 
-        // Filter only enabled styles
-        resolve(mockArtStyles.filter((s) => s.isEnabled));
+        // Return all art styles
+        resolve(mockArtStyles);
       }, 500);
     });
   }

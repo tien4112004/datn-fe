@@ -1,9 +1,9 @@
 import { getAdminApiService } from '@/api/admin';
 import { getAuthApiService } from '@/api/auth';
-import type { BookType, FAQPost, PaginationParams } from '@/types/api';
+import type { ArtStyleRequest, BookType, FAQPost, PaginationParams } from '@/types/api';
 import type { ModelPatchData } from '@aiprimary/core';
 import type { LoginRequest } from '@/types/auth';
-import type { ArtStyle, SlideTemplate, SlideTheme } from '@aiprimary/core';
+import type { SlideTemplate, SlideTheme } from '@aiprimary/core';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
@@ -278,7 +278,7 @@ export function useCreateArtStyle() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: ArtStyle) => getAdminApiService().createArtStyle(data),
+    mutationFn: (data: ArtStyleRequest) => getAdminApiService().createArtStyle(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: adminKeys.artStyles.all });
       toast.success('Art style created successfully');
@@ -295,7 +295,7 @@ export function useUpdateArtStyle() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: ArtStyle }) =>
+    mutationFn: ({ id, data }: { id: string; data: ArtStyleRequest }) =>
       getAdminApiService().updateArtStyle(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: adminKeys.artStyles.all });

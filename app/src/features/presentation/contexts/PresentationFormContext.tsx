@@ -71,7 +71,7 @@ export const PresentationFormProvider = ({ children }: PresentationFormProviderP
         contentLength: z.string().optional(),
         artStyle: z
           .object({
-            id: z.string().optional(),
+            id: z.string(),
             name: z.string(),
             labelKey: z.string(),
             visual: z.string().optional(),

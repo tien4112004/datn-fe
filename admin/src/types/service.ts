@@ -1,6 +1,6 @@
 import type { ApiMode } from '@aiprimary/api';
 import type { User, LoginRequest, LoginResponse } from './auth';
-import type { ApiResponse, PaginationParams, FAQPost, Book, BookType } from './api';
+import type { ApiResponse, PaginationParams, FAQPost, Book, BookType, ArtStyleRequest } from './api';
 import type { SlideTheme, SlideTemplate, ArtStyle, Model, ModelPatchData } from '@aiprimary/core';
 
 /**
@@ -41,8 +41,8 @@ export interface AdminApiService extends Service {
 
   // Art Styles
   getArtStyles(params?: PaginationParams): Promise<ApiResponse<ArtStyle[]>>;
-  createArtStyle(data: ArtStyle): Promise<ApiResponse<ArtStyle>>;
-  updateArtStyle(id: string, data: ArtStyle): Promise<ApiResponse<ArtStyle>>;
+  createArtStyle(data: ArtStyleRequest): Promise<ApiResponse<ArtStyle>>;
+  updateArtStyle(id: string, data: ArtStyleRequest): Promise<ApiResponse<ArtStyle>>;
 
   // AI Models
   getModels(type?: string | null): Promise<ApiResponse<Model[]>>;

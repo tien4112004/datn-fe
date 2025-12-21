@@ -47,6 +47,25 @@ pipeline {
             }
         }
 
+        stage('Checkout') {
+            steps {
+                script {
+                    echo "========== Checking out branch: ${BUILD_BRANCH} =========="
+                    
+                    sh '''
+                        git fetch origin
+                        git checkout ${BUILD_BRANCH} || git checkout origin/${BUILD_BRANCH}
+                        git pull origin ${BUILD_BRANCH} || true
+                        
+                        echo "Current branch:"
+                        git branch --show-current
+                        echo "Latest commit:"
+                        git log -1 --oneline
+                    '''
+                }
+            }
+        }
+
         stage('Validate Environment') {
             steps {
                 script {

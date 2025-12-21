@@ -12,7 +12,6 @@ import { useArtStyles } from '@/features/image/hooks';
 import type { CreateImageFormData } from '@/features/image/types';
 import type { Control, UseFormRegister } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface AdvancedOptionsProps {
   register: UseFormRegister<CreateImageFormData>;
@@ -72,29 +71,6 @@ const AdvancedOptions = ({ register, control, isOpen, onToggle }: AdvancedOption
                         isLoading={isLoading}
                         isError={isError}
                       />
-                    )}
-                  />
-                </div>
-
-                {/* Art Styles */}
-                <div className="space-y-2">
-                  <Label>{t('artStyle.label')}</Label>
-                  <Controller
-                    name="artStyle"
-                    control={control}
-                    render={({ field }) => (
-                      <Select value={field.value} onValueChange={field.onChange} defaultValue="">
-                        <SelectTrigger>
-                          <SelectValue placeholder={t('artStyle.placeholder')} />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {artStyles.map((style) => (
-                            <SelectItem key={style.id} value={style.id}>
-                              {t(`artStyle.${style.labelKey}` as never)}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
                     )}
                   />
                 </div>

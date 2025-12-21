@@ -84,7 +84,7 @@ const CreateImagePage = () => {
   const transformToApiRequest = (formData: CreateImageFormData): ImageGenerationRequest => {
     return {
       prompt: formData.topic,
-      style: formData.artStyle,
+      artStyle: formData.artStyle,
       size: formData.imageDimension,
       model: formData.model,
     };

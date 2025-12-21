@@ -3,9 +3,7 @@ import type { ArtStyle } from '@aiprimary/core';
 
 export interface ImageGenerationRequest {
   prompt: string;
-  style?: string;
   size?: string;
-  quality?: string;
 
   model: {
     name: string;

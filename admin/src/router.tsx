@@ -2,6 +2,7 @@ import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { lazy, Suspense } from 'react';
 import { AdminLayout } from '@/components/layout/AdminLayout';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
+import GlobalSpinner from '@/components/common/GlobalSpinner';
 
 const LoginPage = lazy(() => import('@/pages/LoginPage').then((m) => ({ default: m.LoginPage })));
 const DashboardPage = lazy(() => import('@/pages/DashboardPage').then((m) => ({ default: m.DashboardPage })));
@@ -27,9 +28,7 @@ const FAQPostsPage = lazy(() => import('@/pages/FAQPostsPage').then((m) => ({ de
 const BooksPage = lazy(() => import('@/pages/BooksPage').then((m) => ({ default: m.BooksPage })));
 
 const LazyWrapper = ({ children }: { children: React.ReactNode }) => (
-  <Suspense fallback={<div className="flex h-screen items-center justify-center">Loading...</div>}>
-    {children}
-  </Suspense>
+  <Suspense fallback={<GlobalSpinner text="Loading..." />}>{children}</Suspense>
 );
 
 export const router = createBrowserRouter([

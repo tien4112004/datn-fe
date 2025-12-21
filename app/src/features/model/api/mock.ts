@@ -128,4 +128,13 @@ const mockImageModels: Model[] = [
     provider: 'Midjourney',
     type: 'IMAGE',
   },
+  {
+    id: 'mock',
+    name: 'mock',
+    displayName: 'Mock Image',
+    enabled: true,
+    default: false,
+    provider: 'Mock',
+    type: 'IMAGE',
+  },
 ];

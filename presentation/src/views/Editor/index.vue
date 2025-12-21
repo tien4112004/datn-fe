@@ -1,24 +1,10 @@
 <template>
-  <div
-    class="pptist-editor"
-    :class="{ 'view-mode': mode === 'view', 'show-left': showLeftOnMobile, 'show-right': showRightOnMobile }"
-  >
+  <div class="pptist-editor" :class="{ 'view-mode': mode === 'view' }">
     <EditorHeader class="layout-header" />
     <div class="layout-content">
-      <Thumbnails class="layout-content-left" />
+      <Thumbnails class="layout-content-left layout-thumbnails" />
       <div class="layout-content-center">
-        <div class="center-top center-top-wrapper">
-          <CanvasTool v-if="mode === 'edit'" />
-
-          <div class="mobile-panel-toggle" v-if="mode === 'edit'">
-            <button class="mobile-toggle-btn" @click="toggleLeftPanel" aria-label="Toggle Thumbnails">
-              ☰
-            </button>
-            <button class="mobile-toggle-btn" @click="toggleRightPanel" aria-label="Toggle Toolbar">
-              ⚙
-            </button>
-          </div>
-        </div>
+        <CanvasTool v-if="mode === 'edit'" class="center-top" />
 
         <!-- Template Preview Mode Banner -->
         <div v-if="isCurrentSlideLocked" class="preview-mode-banner">
@@ -157,24 +143,6 @@ const remarkHeight = ref(240);
 const showRemarkDrawer = ref(false);
 const showConfirmAllButton = ref(false);
 
-// Mobile panel toggle state
-const showLeftOnMobile = ref(false);
-const showRightOnMobile = ref(false);
-
-const toggleLeftPanel = () => {
-  showLeftOnMobile.value = !showLeftOnMobile.value;
-  if (showLeftOnMobile.value) {
-    showRightOnMobile.value = false;
-  }
-};
-
-const toggleRightPanel = () => {
-  showRightOnMobile.value = !showRightOnMobile.value;
-  if (showRightOnMobile.value) {
-    showLeftOnMobile.value = false;
-  }
-};
-
 // Function to open the drawer for editing
 const openRemarkDrawer = () => {
   showRemarkDrawer.value = true;
@@ -220,14 +188,17 @@ usePasteEvent();
 .layout-content {
   height: calc(100% - 40px);
   display: flex;
+  position: relative;
 }
 .layout-content-left {
-  width: 180px;
+  width: var(--thumbnails-width, 180px);
   height: 100%;
   flex-shrink: 0;
+  z-index: 1;
 }
 .layout-content-center {
-  width: calc(100% - 180px - 320px);
+  flex: 1;
+  min-width: 0;
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -290,122 +261,250 @@ usePasteEvent();
   }
 }
 .layout-content-right {
-  width: 320px;
+  width: var(--toolbar-width, 320px);
+  flex-shrink: 0;
   height: 100%;
 }
 
-/* Responsive adjustments */
-@media (max-width: 1200px) {
-  .layout-content-right {
-    width: 260px;
-  }
-  .layout-content-center {
-    width: calc(100% - 180px - 260px);
-  }
-}
+.preview-mode-banner {
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 12px 16px;
+  color: white;
 
-@media (max-width: 900px) {
-  .layout-content-left,
-  .layout-content-right {
-    display: none;
-  }
-
-  .layout-content-center {
-    width: 100%;
-  }
-
-  /* Mobile panel toggles */
-  .center-top-wrapper {
+  .banner-content {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 0 8px;
-  }
-
-  .mobile-panel-toggle {
-    display: flex;
-    gap: 8px;
-  }
-
-  .mobile-toggle-btn {
-    background: transparent;
-    border: 1px solid rgba(0, 0, 0, 0.08);
-    padding: 6px 8px;
-    border-radius: 6px;
-    font-size: 16px;
-    cursor: pointer;
-  }
-
-  /* When toggled, show as overlays */
-  .pptist-editor.show-left .layout-content-left,
-  .pptist-editor.show-right .layout-content-right {
-    display: block;
-    position: absolute;
-    top: 40px;
-    bottom: 0;
-    z-index: 30;
-    background: var(--presentation-background);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-  }
-
-  .pptist-editor.show-left .layout-content-left {
-    left: 0;
-    width: 240px;
-  }
-
-  .pptist-editor.show-right .layout-content-right {
-    right: 0;
-    width: 320px;
-  }
-
-  /* Banner responsive wrap */
-  .preview-mode-banner .banner-content {
+    gap: 12px;
+    max-width: 100%;
+    min-height: 40px;
     flex-wrap: wrap;
-    gap: 8px;
+  }
+
+  .banner-icon {
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    display: flex;
     align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
   }
 
-  .preview-mode-banner .banner-buttons {
-    width: 100%;
-    justify-content: flex-end;
+  .banner-text {
+    flex: 1;
+    min-width: 200px;
   }
 
-  .preview-mode-banner .banner-button {
-    padding: 8px 12px;
+  .banner-title {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+
+  .banner-subtitle {
     font-size: 12px;
+    opacity: 0.9;
+    line-height: 1.4;
   }
 
-  .preview-mode-banner .banner-title {
+  .banner-buttons {
+    flex-shrink: 0;
+    display: flex;
+    gap: 8px;
+  }
+
+  .banner-button {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    background: white;
+    color: #667eea;
+    border: none;
+    border-radius: 6px;
     font-size: 13px;
-  }
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
 
-  .preview-mode-banner .banner-subtitle {
-    display: none;
-  }
+    &:hover {
+      background: rgba(255, 255, 255, 0.95);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
 
-  /* Hide remark preview on small screens */
-  .center-bottom {
-    display: none;
+    &:active {
+      transform: translateY(0);
+    }
+
+    &.banner-button-secondary {
+      background: rgba(255, 255, 255, 0.15);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.25);
+        border-color: rgba(255, 255, 255, 0.6);
+      }
+    }
+
+    &.banner-button-confirm {
+      background: #fca43f;
+      color: #92400e;
+      border: 2px solid #f59e0b;
+      animation: pulse-glow 1.5s ease-in-out infinite;
+
+      &:hover {
+        background: #fac822;
+        border-color: #d97706;
+        transform: translateY(-1px) scale(1.02);
+      }
+    }
   }
 }
 
-/* Larger view mode adjustments */
 .pptist-editor.view-mode {
   .layout-content-center {
-    width: calc(100% - 180px);
+    flex: 1;
+    min-width: 0;
+  }
+
+  @media (max-width: 1200px) {
+    .layout-content-center {
+      height: calc(100% - 100px) !important;
+    }
+
+    .layout-content-right {
+      height: calc(100% - 100px) !important;
+    }
   }
 }
 
-@media (max-width: 420px) {
-  .mobile-toggle-btn {
-    padding: 6px;
-    font-size: 14px;
+// Responsive styles for smaller PC screens
+@media (max-width: 1366px) {
+  .preview-mode-banner {
+    padding: 10px 12px;
+
+    .banner-icon {
+      width: 32px;
+      height: 32px;
+    }
+
+    .banner-title {
+      font-size: 13px;
+    }
+
+    .banner-subtitle {
+      font-size: 11px;
+    }
+
+    .banner-button {
+      padding: 6px 10px;
+      font-size: 12px;
+      gap: 4px;
+    }
+  }
+}
+
+@media (max-width: 1200px) {
+  .preview-mode-banner {
+    padding: 8px 10px;
+
+    .banner-content {
+      gap: 8px;
+      flex-wrap: wrap;
+      min-height: auto;
+    }
+
+    .banner-icon {
+      width: 28px;
+      height: 28px;
+      order: 1;
+    }
+
+    .banner-text {
+      min-width: 150px;
+      flex-basis: 100%;
+      order: 2;
+      margin-top: 4px;
+    }
+
+    .banner-title {
+      font-size: 12px;
+      margin-bottom: 1px;
+    }
+
+    .banner-subtitle {
+      font-size: 10px;
+    }
+
+    .banner-button {
+      padding: 5px 8px;
+      font-size: 11px;
+    }
+
+    .banner-buttons {
+      order: 3;
+      margin-top: 4px;
+      flex-wrap: wrap;
+    }
   }
 
-  .preview-mode-banner .banner-icon {
-    width: 28px;
-    height: 28px;
+  .layout-content-center {
+    .center-bottom {
+      height: 40px;
+
+      .remark-preview {
+        padding: 6px 10px;
+
+        .remark-content {
+          font-size: 12px;
+        }
+
+        .remark-hint {
+          font-size: 10px;
+        }
+      }
+    }
   }
+
+  // Reposition thumbnails to bottom with horizontal layout
+  .layout-content {
+    flex-wrap: wrap;
+  }
+
+  .layout-thumbnails {
+    order: 3;
+    flex-basis: 100%;
+    width: 100% !important;
+    height: 100px !important;
+    border-top: 1px solid var(--presentation-border);
+    border-left: none;
+    z-index: 10; // Above drawer backdrop but below drawer
+  }
+
+  .layout-content-center {
+    order: 1;
+    flex: 1 1 0;
+    min-width: 0;
+    height: calc(100% - 100px) !important;
+  }
+
+  .layout-content-right {
+    order: 2;
+    flex-shrink: 0;
+    height: calc(100% - 100px) !important;
+  }
+}
+
+// Ensure drawer appears above thumbnails
+:deep(.drawer-wrapper) {
+  z-index: 100 !important;
 }
 
 @keyframes pulse-glow {

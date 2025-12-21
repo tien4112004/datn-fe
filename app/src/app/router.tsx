@@ -3,6 +3,7 @@ import { lazy, Suspense } from 'react';
 import NavLayout, { NavLayoutErrorBoundary } from '../shared/layouts/SidebarLayout';
 import { CriticalError } from '@aiprimary/api';
 import { ProtectedRoute } from '@/shared/components/ProtectedRoute';
+import GlobalSpinner from '@/components/common/GlobalSpinner';
 
 // Lazy load auth pages
 const LoginPage = lazy(() =>
@@ -67,9 +68,7 @@ const UserProfilePage = lazy(() => import('@/features/user/components/UserProfil
 const NotFoundPage = lazy(() => import('@/shared/pages/NotFoundPage'));
 
 const LazyWrapper = ({ children }: { children: React.ReactNode }) => (
-  <Suspense fallback={<div className="flex h-screen items-center justify-center">Loading...</div>}>
-    {children}
-  </Suspense>
+  <Suspense fallback={<GlobalSpinner text="Loading..." />}>{children}</Suspense>
 );
 
 const router = createBrowserRouter([

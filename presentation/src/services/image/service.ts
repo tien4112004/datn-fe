@@ -26,8 +26,13 @@ export class ImageApiService implements ApiService {
     slideId: string,
     params: ImageGenerationParams
   ): Promise<ImageGenerationResponse> {
+    const isMock = params.model.name === 'mock';
+    const endpoint = isMock
+      ? `${this.baseUrl}/api/image/generate-in-presentation/mock`
+      : `${this.baseUrl}/api/image/generate-in-presentation`;
+
     const response = await api.post<ApiResponse<ImageGenerationResponse>>(
-      `${this.baseUrl}/api/image/generate-in-presentation/mock`,
+      endpoint,
       {
         prompt: params.prompt,
         model: params.model.name,

@@ -89,7 +89,7 @@ const AdvancedOptions = ({ register, control, isOpen, onToggle }: AdvancedOption
                         </SelectTrigger>
                         <SelectContent>
                           {artStyles.map((style) => (
-                            <SelectItem key={style.id} value={style.value}>
+                            <SelectItem key={style.id} value={style.id}>
                               {t(`artStyle.${style.labelKey}` as never)}
                             </SelectItem>
                           ))}
@@ -171,15 +171,16 @@ const AdvancedOptions = ({ register, control, isOpen, onToggle }: AdvancedOption
                       ) : (
                         <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
                           {artStyles.map((style) => {
-                            const isSelected = field.value === style.value;
+                            const styleValue = style.id || style.name;
+                            const isSelected = field.value === styleValue;
 
                             return (
                               <div
-                                key={style.id}
+                                key={styleValue}
                                 className={`group relative cursor-pointer overflow-hidden rounded-lg border-2 transition-all hover:scale-105 ${
                                   isSelected ? 'border-primary shadow-md' : 'border-border'
                                 }`}
-                                onClick={() => field.onChange(style.value)}
+                                onClick={() => field.onChange(styleValue)}
                               >
                                 <div
                                   className="h-24 w-full bg-cover bg-center"

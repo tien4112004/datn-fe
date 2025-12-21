@@ -568,4 +568,102 @@ const contextmenusThumbnailItem = (): ContextmenuItem[] => {
     display: none;
   }
 }
+
+// Responsive: Horizontal layout for small screens
+@media (max-width: 1200px) {
+  .thumbnails {
+    :deep(.card-content) {
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+    }
+  }
+
+  .tw-w-full {
+    width: auto !important;
+    flex-shrink: 0;
+  }
+
+  .thumbnail-list {
+    flex-direction: row;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 0.5rem;
+    gap: 0.75rem;
+    flex: 1;
+    min-width: 0;
+    scrollbar-width: thin;
+    scrollbar-color: var(--presentation-border) transparent;
+
+    &::-webkit-scrollbar {
+      height: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: var(--presentation-border);
+      border-radius: 3px;
+
+      &:hover {
+        background: color-mix(in srgb, var(--presentation-border) 120%, black);
+      }
+    }
+  }
+
+  .thumbnail-container {
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+  }
+
+  .thumbnail-item {
+    flex-shrink: 0;
+  }
+
+  .section-title {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    height: auto;
+    width: 20px;
+    padding: 8px 4px;
+    white-space: nowrap;
+
+    .text::before {
+      transform: rotate(-90deg);
+      margin-right: 0;
+      margin-bottom: 5px;
+    }
+
+    input {
+      writing-mode: vertical-rl;
+      height: 100px;
+    }
+  }
+
+  .page-number {
+    height: auto;
+    width: 80px;
+    flex-shrink: 0;
+    border-top: none;
+    border-left: 1px solid var(--presentation-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 8px;
+    text-align: center;
+    line-height: 1.2;
+    font-size: 0.75rem;
+  }
+
+  .label {
+    position: absolute;
+    top: 2px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.75rem;
+  }
+}
 </style>

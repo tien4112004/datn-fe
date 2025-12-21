@@ -320,6 +320,8 @@ export default class PresentationRealApiService implements PresentationApiServic
       theme: data?.theme,
       viewport: data?.viewport,
       isParsed: data?.parsed || false,
+      createdAt: data?.createdAt,
+      updatedAt: data?.updatedAt,
     };
   }
 }

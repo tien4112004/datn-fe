@@ -13,7 +13,7 @@ import { useTranslation } from 'react-i18next';
 import { ModelSelect } from '@/components/common/ModelSelect';
 import { MODEL_TYPES, useModels } from '@/features/model';
 import type { UnifiedFormData } from '../../contexts/PresentationFormContext';
-import type { ArtStyleOption } from '@/features/image/types';
+import type { ArtStyle } from '@aiprimary/core';
 import { useCallback, useState, useEffect } from 'react';
 import useOutlineStore from '../../stores/useOutlineStore';
 import { useSlideThemes } from '../../hooks';
@@ -130,8 +130,8 @@ const ThemeSection = ({ selectedTheme, onThemeSelect, disabled = false }: ThemeS
 };
 
 interface ArtSectionProps {
-  selectedStyle: ArtStyleOption | undefined;
-  onStyleSelect: (style: ArtStyleOption) => void;
+  selectedStyle: ArtStyle | undefined;
+  onStyleSelect: (style: ArtStyle) => void;
   disabled?: boolean;
 }
 
@@ -154,30 +154,35 @@ const ArtSection = ({ selectedStyle, onStyleSelect, disabled = false }: ArtSecti
           </div>
         ) : (
           <div className="grid grid-cols-3 gap-3 lg:grid-cols-5">
-            {artStyles.map((style) => (
-              <div
-                key={style.id}
-                className={cn(
-                  'group relative overflow-hidden rounded-lg border-2 transition-all',
-                  disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer hover:scale-105',
-                  selectedStyle?.value === style.value ? 'border-primary shadow-md' : 'border-border'
-                )}
-                onClick={() => !disabled && onStyleSelect(style)}
-              >
-                {/* Preview gradient/image */}
-                <div
-                  className="h-24 w-full bg-cover bg-center"
-                  style={{
-                    background: `url(${style.visual}) center/cover no-repeat`,
-                  }}
-                />
+            {artStyles.map((style) => {
+              const styleValue = style.id || style.name;
+              const selectedValue = selectedStyle?.id || selectedStyle?.name;
 
-                {/* Label section */}
-                <div className="bg-card flex items-center justify-center p-2">
-                  <span className="text-xs font-medium">{t(`artStyle.${style.labelKey}` as never)}</span>
+              return (
+                <div
+                  key={styleValue}
+                  className={cn(
+                    'group relative overflow-hidden rounded-lg border-2 transition-all',
+                    disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer hover:scale-105',
+                    selectedValue === styleValue ? 'border-primary shadow-md' : 'border-border'
+                  )}
+                  onClick={() => !disabled && onStyleSelect(style)}
+                >
+                  {/* Preview gradient/image */}
+                  <div
+                    className="h-24 w-full bg-cover bg-center"
+                    style={{
+                      background: `url(${style.visual}) center/cover no-repeat`,
+                    }}
+                  />
+
+                  {/* Label section */}
+                  <div className="bg-card flex items-center justify-center p-2">
+                    <span className="text-xs font-medium">{t(`artStyle.${style.labelKey}` as never)}</span>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </CardContent>
@@ -265,7 +270,7 @@ const CustomizationSection = ({
   );
 
   const onArtStyleSelect = useCallback(
-    (style: ArtStyleOption) => {
+    (style: ArtStyle) => {
       setValue('artStyle', style, { shouldValidate: true, shouldDirty: true });
     },
     [setValue]

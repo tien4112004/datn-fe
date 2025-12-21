@@ -48,6 +48,7 @@ export const MODEL_PROVIDERS_LOGO: Record<string, string> = {
   OpenAI: '/images/providers/openai.png',
   Deepseek: '/images/providers/deepseek.png',
   Google: '/images/providers/google.png',
+  LocalAI: '/images/providers/localai.png',
 };
 
 export const PRESENTATION_VIEW_STATE = {

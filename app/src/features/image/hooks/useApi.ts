@@ -7,12 +7,12 @@ import {
   type InfiniteData,
 } from '@tanstack/react-query';
 import { useImageApiService } from '../api';
-import type { ImageGenerationRequest, ImageData, ArtStyleApiResponse } from '../types/service';
-import type { ArtStyleOption, ArtStyle } from '../types/constants';
+import type { ImageGenerationRequest, ImageData } from '../types/service';
 import { ART_STYLE_OPTIONS } from '../types/constants';
 import { useMemo, useEffect } from 'react';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
+import type { ArtStyle } from '@aiprimary/core';
 
 // Return types for the hooks
 export interface UseImageByIdReturn extends Omit<UseQueryResult<ImageData | null>, 'data'> {
@@ -92,34 +92,18 @@ export const useImages = (search?: string): UseImagesReturn => {
 
 // Art Styles Hook
 export interface UseArtStylesReturn {
-  artStyles: ArtStyleOption[];
-  defaultStyle: ArtStyleOption | undefined;
+  artStyles: ArtStyle[];
+  defaultStyle: ArtStyle | undefined;
   isLoading: boolean;
   isError: boolean;
   error: Error | null;
 }
 
 /**
- * Adapter function to transform API response to component-friendly format
- */
-const adaptArtStyle = (apiStyle: ArtStyleApiResponse): ArtStyleOption => ({
-  id: apiStyle.id,
-  value: apiStyle.id as ArtStyle,
-  labelKey: apiStyle.labelKey,
-  visual: apiStyle.visual || 'https://placehold.co/600x400/FFFFFF/31343C?text=None',
-  modifiers: apiStyle.modifiers || undefined,
-});
-
-/**
  * Fallback art styles from constants
  */
-const getFallbackArtStyles = (): ArtStyleOption[] => {
-  return ART_STYLE_OPTIONS.map((opt) => ({
-    id: opt.value,
-    value: opt.value,
-    labelKey: opt.labelKey,
-    visual: opt.visual,
-  }));
+const getFallbackArtStyles = (): ArtStyle[] => {
+  return ART_STYLE_OPTIONS;
 };
 
 /**
@@ -134,7 +118,7 @@ export const useArtStyles = (): UseArtStylesReturn => {
     isLoading,
     isError,
     error,
-  } = useQuery<ArtStyleApiResponse[]>({
+  } = useQuery<ArtStyle[]>({
     queryKey: [imageApiService.getType(), 'artStyles'],
     queryFn: async () => {
       const styles = await imageApiService.getArtStyles({ pageSize: 50 });
@@ -154,16 +138,16 @@ export const useArtStyles = (): UseArtStylesReturn => {
     }
   }, [isError, error, t]);
 
-  // Transform API data or use fallback
+  // Use API data or fallback
   const artStyles = useMemo(() => {
     if (apiArtStyles && apiArtStyles.length > 0) {
-      return apiArtStyles.map(adaptArtStyle);
+      return apiArtStyles;
     }
     return getFallbackArtStyles();
   }, [apiArtStyles]);
 
   const defaultStyle = useMemo(
-    () => artStyles.find((style) => style.value === '') || artStyles[0],
+    () => artStyles.find((style) => style.name === '') || artStyles[0],
     [artStyles]
   );
 

@@ -9,7 +9,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useMemo, useState } from 'react';
 import AdvancedOptions from '@/features/image/components/AdvancedOptions';
-import type { CreateImageFormData } from '@/features/image/types';
+import type { CreateImageFormData, ImageGenerationRequest } from '@/features/image/types';
 import { useGenerateImage } from '../hooks';
 import useFormPersist from 'react-hook-form-persist';
 import { getLocalStorageData } from '@/shared/lib/utils';
@@ -81,7 +81,7 @@ const CreateImagePage = () => {
   };
 
   // Transform form data to API request format
-  const transformToApiRequest = (formData: CreateImageFormData) => {
+  const transformToApiRequest = (formData: CreateImageFormData): ImageGenerationRequest => {
     return {
       prompt: formData.topic,
       style: formData.artStyle,

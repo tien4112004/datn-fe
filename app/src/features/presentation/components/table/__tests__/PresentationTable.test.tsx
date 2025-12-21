@@ -71,7 +71,7 @@ describe('PresentationTable', () => {
   it('displays table headers correctly', () => {
     renderWithProviders(<PresentationTable />);
 
-    expect(screen.queryByRole('columnheader', { name: /id/i })).not.toBeInTheDocument();
+    expect(screen.getByRole('columnheader', { name: /id/i })).not.toBeInTheDocument();
     expect(screen.getByRole('columnheader', { name: /title/i })).toBeInTheDocument();
     expect(screen.getByRole('columnheader', { name: /created/i })).toBeInTheDocument();
     expect(screen.getByRole('columnheader', { name: /updated/i })).toBeInTheDocument();

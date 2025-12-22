@@ -46,7 +46,7 @@ export class PresentationApiService implements ApiService {
       },
       {
         headers: {
-          'Idempotency-Key': `${presentationId}:${slide.id}:update`,
+          'Idempotency-Key': `${presentationId}:${slide.id}`,
         },
       }
     );
@@ -54,13 +54,31 @@ export class PresentationApiService implements ApiService {
   }
 
   /**
+   * Upsert multiple slides in a single request
+   */
+  async upsertSlides(presentationId: string, slides: Slide[]): Promise<any> {
+    const payload = {
+      slides: slides.map((s) => ({ ...s, slideId: s.id })),
+    };
+
+    await api.put<ApiResponse<Presentation>>(
+      `${this.baseUrl}/api/presentations/${presentationId}/slides`,
+      payload,
+      {
+        headers: {
+          'Idempotency-Key': `${presentationId}:${slides[0].id}`,
+        },
+      }
+    );
+
+    return;
+  }
+
+  /**
    * Mark presentation as parsed (generation complete)
    */
-  async setParsed(id: string): Promise<Presentation> {
-    const response = await api.patch<ApiResponse<Presentation>>(
-      `${this.baseUrl}/api/presentations/${id}/parse`
-    );
-    return this._mapPresentationItem(response.data.data);
+  async setParsed(id: string): Promise<any> {
+    return await api.patch<ApiResponse<Presentation>>(`${this.baseUrl}/api/presentations/${id}/parse`);
   }
 
   /**

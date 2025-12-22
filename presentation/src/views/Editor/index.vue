@@ -92,7 +92,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed } from 'vue';
+import { ref, computed, inject } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useMainStore, useSlidesStore, useContainerStore } from '@/store';
 import useGlobalHotkey from '@/hooks/useGlobalHotkey';
@@ -174,7 +174,10 @@ const confirmAllTemplates = () => {
   );
 };
 
-useGlobalHotkey();
+// Inject save function provided by RemoteApp (undefined if not in remote context)
+const savePresentationFn = inject<(() => Promise<void>) | undefined>('savePresentationFn', undefined);
+
+useGlobalHotkey(savePresentationFn);
 usePasteEvent();
 </script>
 

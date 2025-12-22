@@ -24,7 +24,7 @@ import type { SlideTheme } from '../../types/slide';
 import { cn } from '@/shared/lib/utils';
 
 interface ThemeSectionProps {
-  selectedTheme: SlideTheme;
+  selectedTheme?: SlideTheme;
   onThemeSelect: (theme: SlideTheme) => void;
   disabled?: boolean;
 }
@@ -89,14 +89,14 @@ const ThemeSection = ({ selectedTheme, onThemeSelect, disabled = false }: ThemeS
                 className={cn(
                   'transition-all',
                   disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer hover:scale-105',
-                  selectedTheme.id === theme.id && 'rounded-lg ring-2 ring-blue-500'
+                  selectedTheme?.id === theme.id && 'rounded-lg ring-2 ring-blue-500'
                 )}
                 onClick={() => !disabled && onThemeSelect(theme)}
               >
                 <ThemePreviewCard
                   theme={theme}
                   title={theme.name}
-                  isSelected={selectedTheme.id === theme.id}
+                  isSelected={selectedTheme?.id === theme.id}
                 />
               </div>
             ))}
@@ -122,7 +122,7 @@ const ThemeSection = ({ selectedTheme, onThemeSelect, disabled = false }: ThemeS
       <ThemeGalleryDialog
         open={galleryOpen}
         onOpenChange={setGalleryOpen}
-        selectedThemeId={selectedTheme.id}
+        selectedThemeId={selectedTheme?.id}
         onThemeSelect={handleThemeSelectFromGallery}
       />
     </>
@@ -130,7 +130,7 @@ const ThemeSection = ({ selectedTheme, onThemeSelect, disabled = false }: ThemeS
 };
 
 interface ArtSectionProps {
-  selectedStyle: ArtStyle | undefined;
+  selectedStyle?: ArtStyle;
   onStyleSelect: (style: ArtStyle) => void;
   disabled?: boolean;
 }

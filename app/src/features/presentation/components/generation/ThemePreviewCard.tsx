@@ -1,6 +1,4 @@
-import { useEffect, useState } from 'react';
-import type { SlideTheme } from '../../types/slide';
-import { moduleMethodMap } from '../remote/module';
+import type { Gradient, SlideTheme } from '../../types/slide';
 
 interface ThemePreviewCardProps {
   theme: SlideTheme;
@@ -11,6 +9,21 @@ interface ThemePreviewCardProps {
   height?: number;
 }
 
+function getBackgroundStyle(background: string | Gradient): React.CSSProperties {
+  if (typeof background === 'string') {
+    return { backgroundColor: background };
+  }
+
+  // Handle gradient
+  const { type, colors, rotate } = background;
+  const colorStops = colors.map((c) => `${c.color} ${c.pos}%`).join(', ');
+
+  if (type === 'radial') {
+    return { background: `radial-gradient(circle, ${colorStops})` };
+  }
+  return { background: `linear-gradient(${rotate}deg, ${colorStops})` };
+}
+
 export const ThemePreviewCard = ({
   theme,
   isSelected = false,
@@ -19,20 +32,7 @@ export const ThemePreviewCard = ({
   width,
   height,
 }: ThemePreviewCardProps) => {
-  const [getBackgroundStyle, setGetBackgroundStyle] = useState<
-    ((background: string | any) => React.CSSProperties) | null
-  >(null);
-
-  useEffect(() => {
-    // Get the background style function from the method module
-    moduleMethodMap['method']().then((mod) => {
-      setGetBackgroundStyle(() => (mod.default as any).getBackgroundStyle);
-    });
-  }, []);
-
-  const backgroundStyle = getBackgroundStyle
-    ? getBackgroundStyle(theme.backgroundColor)
-    : { backgroundColor: '#fff' };
+  const backgroundStyle = getBackgroundStyle(theme.backgroundColor);
 
   return (
     <div

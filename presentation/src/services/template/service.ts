@@ -16,13 +16,15 @@ export class TemplateApiService implements ITemplateApi {
   }
 
   async getSlideTemplates(): Promise<SlideTemplate[]> {
-    const res = await api.get<ApiResponse<SlideTemplate[]>>(`${this.baseUrl}/api/slide-templates`);
+    const res = await api.get<ApiResponse<SlideTemplate[]>>(`${this.baseUrl}/api/slide-templates`, {
+      params: { pageSize: 1000 },
+    });
     return res.data.data;
   }
 
   async getSlideTemplatesByLayout(layoutType: string): Promise<SlideTemplate[]> {
     const res = await api.get<ApiResponse<SlideTemplate[]>>(`${this.baseUrl}/api/slide-templates`, {
-      params: { layout: layoutType },
+      params: { layout: layoutType, pageSize: 1000 },
     });
     return res.data.data;
   }

@@ -24,13 +24,8 @@ export function useUpdateSlides(presentationId: string) {
 
   return useMutation({
     mutationFn: async (slides: Slide[]) => {
-      let updatedPresentation: Presentation;
-
-      for (const slide of slides) {
-        updatedPresentation = await presentationApi.upsertSlide(presentationId, slide);
-      }
-
-      return updatedPresentation!;
+      const updatedPresentation = await presentationApi.upsertSlides(presentationId, slides);
+      return updatedPresentation;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -49,6 +44,31 @@ export function useSetParsed(presentationId: string) {
   return useMutation({
     mutationFn: async () => {
       const updatedPresentation = await presentationApi.setParsed(presentationId);
+      return updatedPresentation;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['presentation', presentationId],
+      });
+    },
+  });
+}
+
+/**
+ * Update full presentation (title, slides, theme, viewport, thumbnail)
+ */
+export function useUpdatePresentation(presentationId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (data: {
+      title?: string;
+      slides?: Slide[];
+      theme?: any;
+      viewport?: any;
+      thumbnail?: string;
+    }) => {
+      const updatedPresentation = await presentationApi.updatePresentation(presentationId, data);
       return updatedPresentation;
     },
     onSuccess: () => {

@@ -8,7 +8,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref, watch, computed } from 'vue';
+import { onMounted, ref, watch, computed, provide, getCurrentInstance } from 'vue';
 import { storeToRefs } from 'pinia';
 import {
   useScreenStore,
@@ -31,6 +31,7 @@ import type { Presentation } from '../types/slides';
 import type { PresentationGenerationRequest } from '../types/generation';
 import { usePresentationProcessor } from '@/hooks/usePresentationProcessor';
 import { useGenerationStore } from '@/store/generation';
+import { useSavePresentation } from '@/hooks/useSavePresentation';
 
 const _isPC = isPC();
 
@@ -70,10 +71,21 @@ onMounted(async () => {
     slidesStore.setViewportSize(props.presentation.viewport.width);
   }
 
+  // Get pinia instance
+  const instance = getCurrentInstance();
+  const pinia = instance?.appContext.config.globalProperties.$pinia;
+
+  // Create save hook and provide to child components
+  if (pinia) {
+    const { savePresentation: saveFn } = useSavePresentation(props.presentation.id, pinia);
+    provide('savePresentationFn', saveFn);
+  }
+
   const processorResult = usePresentationProcessor(
     (containerStore.presentation || null) as any,
     props.presentation.id,
     generationStore.isStreaming,
+    pinia!,
     props.generationRequest
   );
   isProcessing = processorResult.isProcessing;

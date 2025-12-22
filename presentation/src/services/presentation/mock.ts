@@ -112,6 +112,40 @@ export class MockPresentationApiService implements ApiService {
   }
 
   /**
+   * Upsert multiple slides in a single request (mock implementation)
+   */
+  async upsertSlides(presentationId: string, slides: Slide[]): Promise<Presentation> {
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    const presentationIndex = mockPresentationItems.findIndex((item) => item.id === presentationId);
+    if (presentationIndex === -1) {
+      throw new Error(`Presentation with id ${presentationId} not found`);
+    }
+
+    const presentation = mockPresentationItems[presentationIndex];
+    const existingSlides = [...(presentation.slides || [])];
+
+    // Upsert each slide in the incoming list
+    for (const slide of slides) {
+      const idx = existingSlides.findIndex((s) => s.id === slide.id);
+      if (idx === -1) {
+        existingSlides.push(slide);
+      } else {
+        existingSlides[idx] = slide;
+      }
+    }
+
+    const updatedPresentation = {
+      ...presentation,
+      slides: existingSlides,
+      updatedAt: new Date().toISOString(),
+      isParsed: true,
+    };
+
+    mockPresentationItems[presentationIndex] = updatedPresentation;
+    return updatedPresentation;
+  }
+
+  /**
    * Mark presentation as parsed
    */
   async setParsed(id: string): Promise<Presentation> {
@@ -183,7 +217,7 @@ export class MockPresentationApiService implements ApiService {
   /**
    * Update presentation data
    */
-  async updatePresentation(id: string, data: Presentation): Promise<Presentation> {
+  async updatePresentation(id: string, data: Partial<Presentation>): Promise<Presentation> {
     await new Promise((resolve) => setTimeout(resolve, 500));
     const index = mockPresentationItems.findIndex((item) => item.id === id);
     if (index === -1) {

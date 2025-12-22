@@ -192,18 +192,6 @@
       </Popover>
     </div>
     <div class="row">
-      <div style="width: 40%">{{ $t('styling.slide.design.theme.backgroundColor') }}</div>
-      <Popover trigger="click" style="width: 60%">
-        <template #content>
-          <ColorPicker
-            :modelValue="typeof theme.backgroundColor === 'string' ? theme.backgroundColor : '#ffffff'"
-            @update:modelValue="(value) => updateTheme({ backgroundColor: value })"
-          />
-        </template>
-        <ColorButton :color="themeBackgroundColor" />
-      </Popover>
-    </div>
-    <div class="row">
       <div style="width: 40%">{{ $t('styling.slide.design.theme.themeColor') }}</div>
       <ColorListButton
         style="width: 60%"
@@ -421,6 +409,7 @@ const background = computed(() => {
       value: 'var(--presentation-background)',
     } as SlideBackground;
   }
+
   return currentSlide.value.background;
 });
 

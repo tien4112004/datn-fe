@@ -13,7 +13,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, onUnmounted, ref } from 'vue';
+import { onMounted, onUnmounted, ref, provide, getCurrentInstance } from 'vue';
 import { storeToRefs } from 'pinia';
 import {
   useScreenStore,
@@ -34,6 +34,7 @@ import type { Presentation } from '../types/slides';
 import type { PresentationGenerationRequest } from '../types/generation';
 import { usePresentationProcessor } from '@/hooks/usePresentationProcessor';
 import { useGenerationStore } from '@/store/generation';
+import { useSavePresentation } from '@/hooks/useSavePresentation';
 
 const _isPC = isPC();
 
@@ -94,11 +95,22 @@ const handlePresentationData = async (event: MessageEvent) => {
       await deleteDiscardedDB();
       await snapshotStore.initSnapshotDatabase();
 
+      // Get pinia instance
+      const instance = getCurrentInstance();
+      const pinia = instance?.appContext.config.globalProperties.$pinia;
+
+      // Create save hook and provide to child components
+      if (pinia) {
+        const { savePresentation: saveFn } = useSavePresentation(presentation.id, pinia);
+        provide('savePresentationFn', saveFn);
+      }
+
       // Initialize presentation processor for streaming
       processorInstance = usePresentationProcessor(
         (containerStore.presentation as any) || null,
         presentation.id,
         generationStore.isStreaming,
+        pinia!,
         generationRequest as PresentationGenerationRequest
       );
 

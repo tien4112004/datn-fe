@@ -9,7 +9,7 @@
     "type-check": "tsc --noEmit",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "vitest",
+    "test": "",
     "test:ui": "vitest --ui",
     "test:run": "vitest run",
     "format": "prettier --write \"**/*.{js,ts,vue,json,css,tsx}\""

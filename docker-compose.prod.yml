@@ -1,5 +1,13 @@
 services:
   datn-fe-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: app-production
+      args:
+        - VITE_API_URL=${VITE_API_URL}
+        - PRESENTATION_URL=${PRESENTATION_URL}
+        - NODE_ENV=production
     image: ghcr.io/tien4112004/datn-fe:app-latest
     container_name: frontend-app-aiprimary
     restart: unless-stopped
@@ -9,15 +17,18 @@ services:
           memory: 512M
     ports:
       - '5173:5173'
-    environment:
-      - NODE_ENV=production
-      - PORT=5173
-      - PRESENTATION_URL=${PRESENTATION_URL}
-      - VITE_API_URL=${VITE_API_URL}
     networks:
       - network-aiprimary
 
   datn-fe-presentation:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: presentation-production
+      args:
+        - VITE_API_URL=${VITE_API_URL}
+        - PRESENTATION_URL=${PRESENTATION_URL}
+        - NODE_ENV=production
     image: ghcr.io/tien4112004/datn-fe:presentation-latest
     container_name: frontend-presentation-aiprimary
     restart: unless-stopped
@@ -27,14 +38,18 @@ services:
           memory: 512M
     ports:
       - '5174:5174'
-    environment:
-      - NODE_ENV=production
-      - PORT=5174
-      - VITE_API_URL=${VITE_API_URL}
     networks:
       - network-aiprimary
 
   datn-fe-admin:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: admin-production
+      args:
+        - VITE_API_URL=${VITE_API_URL}
+        - PRESENTATION_URL=${PRESENTATION_URL}
+        - NODE_ENV=production
     image: ghcr.io/tien4112004/datn-fe:admin-latest
     container_name: frontend-admin-aiprimary
     restart: unless-stopped
@@ -44,11 +59,6 @@ services:
           memory: 512M
     ports:
       - '5175:5175'
-    environment:
-      - NODE_ENV=production
-      - PORT=5175
-      - VITE_API_URL=${VITE_API_URL}
-      - PRESENTATION_URL=${PRESENTATION_URL}
     networks:
       - network-aiprimary
 

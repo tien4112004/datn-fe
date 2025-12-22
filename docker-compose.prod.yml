@@ -55,3 +55,4 @@ services:
 networks:
   network-aiprimary:
     name: network-aiprimary
+    external: true

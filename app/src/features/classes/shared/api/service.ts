@@ -291,18 +291,8 @@ export default class ClassRealApiService implements ClassApiService {
 
   private _mapStudent(data: any): Student {
     return {
-      id: data.id,
-      fullName: data.fullName,
-      dateOfBirth: data.dateOfBirth,
-      gender: data.gender,
-      address: data.address,
-      parentName: data.parentName,
-      parentPhone: data.parentPhone,
-      classId: data.classId,
-      enrollmentDate: data.enrollmentDate,
+      ...data,
       status: data.status || 'active',
-      createdAt: data.createdAt,
-      updatedAt: data.updatedAt,
     };
   }
 

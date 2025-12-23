@@ -16,18 +16,23 @@ export const studentFormSchema = z.object({
     .min(1, { message: 'roster.validation.fullNameRequired' })
     .max(200, { message: 'roster.validation.fullNameTooLong' }),
 
+  parentName: z
+    .string({ message: 'roster.validation.parentNameRequired' })
+    .min(1, { message: 'roster.validation.parentNameRequired' })
+    .max(100, { message: 'roster.validation.parentNameTooLong' }),
+
+  parentPhone: z
+    .string({ message: 'roster.validation.parentPhoneRequired' })
+    .min(1, { message: 'roster.validation.parentPhoneRequired' })
+    .max(20, { message: 'roster.validation.parentPhoneTooLong' }),
+
   // Optional fields
   address: z.string().max(500, { message: 'roster.validation.addressTooLong' }).optional().or(z.literal('')),
 
-  parentName: z
+  parentContactEmail: z
     .string()
-    .max(100, { message: 'roster.validation.parentNameTooLong' })
-    .optional()
-    .or(z.literal('')),
-
-  parentPhone: z
-    .string()
-    .max(20, { message: 'roster.validation.parentPhoneTooLong' })
+    .email({ message: 'roster.validation.emailInvalid' })
+    .max(100, { message: 'roster.validation.emailTooLong' })
     .optional()
     .or(z.literal('')),
 
@@ -84,8 +89,9 @@ export function useStudentForm({ mode = 'create', initialData }: UseStudentFormO
       ? {
           fullName: initialData.fullName,
           address: initialData.address || '',
-          parentName: initialData.parentName || '',
-          parentPhone: initialData.parentPhone || '',
+          parentName: initialData.parentName,
+          parentPhone: initialData.parentPhone,
+          parentContactEmail: initialData.parentContactEmail || '',
           dateOfBirth: initialData.dateOfBirth || '',
           gender: initialData.gender,
         }
@@ -94,6 +100,7 @@ export function useStudentForm({ mode = 'create', initialData }: UseStudentFormO
           address: '',
           parentName: '',
           parentPhone: '',
+          parentContactEmail: '',
           dateOfBirth: '',
         };
 

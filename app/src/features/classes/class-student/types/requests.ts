@@ -24,21 +24,31 @@ export interface StudentCollectionRequest {
  */
 export interface StudentCreateRequest {
   fullName: string;
-  dateOfBirth: string;
-  gender: 'male' | 'female' | 'other';
+  dateOfBirth?: string;
+  gender?: 'male' | 'female' | 'other';
   address?: string;
-  parentName?: string;
-  parentPhone?: string;
+  parentName: string; // Required
+  parentPhone: string; // Required
+  parentContactEmail?: string;
   classId: string;
   enrollmentDate?: string;
+  status?: string;
 }
 
 /**
  * StudentUpdateRequest
  * Payload for updating an existing student
  */
-export interface StudentUpdateRequest extends Partial<StudentCreateRequest> {
+export interface StudentUpdateRequest {
   id: string;
+  fullName?: string;
+  dateOfBirth?: string;
+  gender?: 'male' | 'female' | 'other';
+  address?: string;
+  parentName?: string;
+  parentPhone?: string;
+  parentContactEmail?: string;
+  enrollmentDate?: string;
   status?: 'active' | 'transferred' | 'graduated' | 'dropped';
 }
 

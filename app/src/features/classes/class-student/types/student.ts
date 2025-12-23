@@ -7,17 +7,23 @@
 
 export interface Student {
   id: string;
+  userId?: string; // Reference to user profile (optional)
   fullName: string;
-  dateOfBirth: string;
-  gender: StudentGender;
+  dateOfBirth?: string;
+  gender?: StudentGender;
   address?: string;
-  parentName?: string;
-  parentPhone?: string;
+  parentName: string;
+  parentPhone: string;
+  parentContactEmail?: string;
   classId: string;
   enrollmentDate: string;
   status: StudentStatus;
-  createdAt: string;
-  updatedAt: string;
+  createdAt?: string;
+  updatedAt?: string;
+  // Credentials (only present after creation)
+  username?: string;
+  password?: string;
+  email?: string;
 }
 
 export type StudentStatus = 'active' | 'transferred' | 'graduated' | 'dropped';

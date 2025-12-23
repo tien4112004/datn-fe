@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Dialog,
@@ -14,6 +14,7 @@ import { Label } from '@ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@ui/select';
 import { useStudentForm, type StudentFormData, type StudentFormMode, useStudentMutations } from '../../hooks';
 import type { Student } from '../../types';
+import { CredentialsDisplay } from '../common';
 
 export interface StudentFormDialogProps {
   open: boolean;
@@ -67,6 +68,9 @@ export function StudentFormDialog({
   const { t: tValidation } = useTranslation('classes', { keyPrefix: 'validation' });
   const { createStudent, isCreating, updateStudent, isUpdating } = useStudentMutations(classId);
 
+  // Track created student with credentials
+  const [createdStudent, setCreatedStudent] = useState<Student | null>(null);
+
   const form = useStudentForm({
     mode,
     initialData,
@@ -84,10 +88,11 @@ export function StudentFormDialog({
   // Determine loading state based on mode
   const isSubmitting = mode === 'create' ? isCreating : isUpdating;
 
-  // Reset form when dialog closes
+  // Reset form and credentials when dialog closes
   useEffect(() => {
     if (!open) {
       reset();
+      setCreatedStudent(null);
     }
   }, [open, reset]);
 
@@ -96,8 +101,9 @@ export function StudentFormDialog({
     if (mode === 'edit' && initialData && open) {
       setValue('fullName', initialData.fullName);
       setValue('address', initialData.address || '');
-      setValue('parentName', initialData.parentName || '');
-      setValue('parentPhone', initialData.parentPhone || '');
+      setValue('parentName', initialData.parentName);
+      setValue('parentPhone', initialData.parentPhone);
+      setValue('parentContactEmail', initialData.parentContactEmail || '');
       setValue('dateOfBirth', initialData.dateOfBirth || '');
       setValue('gender', initialData.gender);
     }
@@ -106,10 +112,15 @@ export function StudentFormDialog({
   const onSubmit = handleSubmit((data: StudentFormData) => {
     if (mode === 'create') {
       createStudent.mutate(data, {
-        onSuccess: () => {
+        onSuccess: (student) => {
           reset();
-          onOpenChange(false);
-          onSuccess?.();
+          // If credentials are present, show them instead of closing
+          if (student.username && student.password && student.email) {
+            setCreatedStudent(student);
+          } else {
+            onOpenChange(false);
+            onSuccess?.();
+          }
         },
       });
     } else if (mode === 'edit' && initialData) {
@@ -129,6 +140,12 @@ export function StudentFormDialog({
     }
   });
 
+  const handleCloseCredentials = () => {
+    setCreatedStudent(null);
+    onOpenChange(false);
+    onSuccess?.();
+  };
+
   const genderValue = watch('gender');
 
   const getErrorMessage = (error: any) => {
@@ -142,6 +159,33 @@ export function StudentFormDialog({
     }
     return translated || '';
   };
+
+  // Show credentials if student was just created with credentials
+  if (createdStudent?.username && createdStudent?.password && createdStudent?.email) {
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{t('credentialsTitle', 'Student Created Successfully')}</DialogTitle>
+            <DialogDescription>
+              {t('credentialsDescription', 'Save these credentials - they will not be shown again')}
+            </DialogDescription>
+          </DialogHeader>
+
+          <CredentialsDisplay
+            username={createdStudent.username}
+            password={createdStudent.password}
+            email={createdStudent.email}
+            studentName={createdStudent.fullName}
+          />
+
+          <DialogFooter>
+            <Button onClick={handleCloseCredentials}>{t('closeCredentials', 'Done')}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    );
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -161,10 +205,40 @@ export function StudentFormDialog({
             {/* Full Name */}
             <div className="space-y-2">
               <Label htmlFor="fullName">
-                Full Name <span className="text-red-500">*</span>
+                {t('form.fullName')} <span className="text-red-500">*</span>
               </Label>
-              <Input id="fullName" {...register('fullName')} placeholder="Enter full name" />
+              <Input id="fullName" {...register('fullName')} placeholder={t('form.fullNamePlaceholder')} />
               {errors.fullName && <p className="text-sm text-red-500">{getErrorMessage(errors.fullName)}</p>}
+            </div>
+
+            {/* Parent/Guardian Name */}
+            <div className="space-y-2">
+              <Label htmlFor="parentName">
+                {t('form.parentName')} <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                id="parentName"
+                {...register('parentName')}
+                placeholder={t('form.parentNamePlaceholder')}
+              />
+              {errors.parentName && (
+                <p className="text-sm text-red-500">{getErrorMessage(errors.parentName)}</p>
+              )}
+            </div>
+
+            {/* Parent/Guardian Phone */}
+            <div className="space-y-2">
+              <Label htmlFor="parentPhone">
+                {t('form.parentPhone')} <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                id="parentPhone"
+                {...register('parentPhone')}
+                placeholder={t('form.parentPhonePlaceholder')}
+              />
+              {errors.parentPhone && (
+                <p className="text-sm text-red-500">{getErrorMessage(errors.parentPhone)}</p>
+              )}
             </div>
           </div>
 
@@ -207,29 +281,17 @@ export function StudentFormDialog({
               {errors.address && <p className="text-sm text-red-500">{getErrorMessage(errors.address)}</p>}
             </div>
 
-            {/* Parent/Guardian Name */}
+            {/* Parent Contact Email */}
             <div className="space-y-2">
-              <Label htmlFor="parentName">{t('form.parentName')}</Label>
+              <Label htmlFor="parentContactEmail">{t('form.parentContactEmail', 'Parent Email')}</Label>
               <Input
-                id="parentName"
-                {...register('parentName')}
-                placeholder={t('form.parentNamePlaceholder')}
+                id="parentContactEmail"
+                type="email"
+                {...register('parentContactEmail')}
+                placeholder={t('form.parentContactEmailPlaceholder', 'parent@example.com')}
               />
-              {errors.parentName && (
-                <p className="text-sm text-red-500">{getErrorMessage(errors.parentName)}</p>
-              )}
-            </div>
-
-            {/* Parent/Guardian Phone */}
-            <div className="space-y-2">
-              <Label htmlFor="parentPhone">{t('form.parentPhone')}</Label>
-              <Input
-                id="parentPhone"
-                {...register('parentPhone')}
-                placeholder={t('form.parentPhonePlaceholder')}
-              />
-              {errors.parentPhone && (
-                <p className="text-sm text-red-500">{getErrorMessage(errors.parentPhone)}</p>
+              {errors.parentContactEmail && (
+                <p className="text-sm text-red-500">{getErrorMessage(errors.parentContactEmail)}</p>
               )}
             </div>
           </div>

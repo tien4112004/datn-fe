@@ -68,6 +68,45 @@ export const StudentListView = ({ students, classId, isLoading = false }: Studen
       cell: ({ row }) => <div className="font-medium">{row.getValue('fullName')}</div>,
     },
     {
+      accessorKey: 'dateOfBirth',
+      header: t('table.dateOfBirth', 'Date of Birth'),
+      cell: ({ row }) => {
+        const dob = row.getValue('dateOfBirth') as string;
+        if (!dob) return <span className="text-muted-foreground">-</span>;
+        return <div className="text-sm">{new Date(dob).toLocaleDateString()}</div>;
+      },
+    },
+    {
+      accessorKey: 'gender',
+      header: t('table.gender', 'Gender'),
+      cell: ({ row }) => {
+        const gender = row.getValue('gender') as string;
+        if (!gender) return <span className="text-muted-foreground">-</span>;
+        const genderLabels = {
+          male: t('table.genderMale', 'Male'),
+          female: t('table.genderFemale', 'Female'),
+          other: t('table.genderOther', 'Other'),
+        };
+        return <div className="text-sm">{genderLabels[gender as keyof typeof genderLabels] || gender}</div>;
+      },
+    },
+    {
+      accessorKey: 'parentName',
+      header: t('table.parentName', 'Parent Name'),
+      cell: ({ row }) => {
+        const parentName = row.getValue('parentName') as string;
+        return <div className="text-sm">{parentName || '-'}</div>;
+      },
+    },
+    {
+      accessorKey: 'parentPhone',
+      header: t('table.parentPhone', 'Parent Phone'),
+      cell: ({ row }) => {
+        const parentPhone = row.getValue('parentPhone') as string;
+        return <div className="font-mono text-sm">{parentPhone || '-'}</div>;
+      },
+    },
+    {
       accessorKey: 'status',
       header: t('table.status'),
       cell: ({ row }) => {

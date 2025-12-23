@@ -93,13 +93,14 @@ export function useStudentMutations(classId: string) {
     mutationFn: async (data: StudentFormData): Promise<Student> => {
       const request: StudentCreateRequest = {
         fullName: data.fullName,
-        dateOfBirth: data.dateOfBirth || new Date().toISOString(),
-        gender: data.gender || 'other',
+        dateOfBirth: data.dateOfBirth,
+        gender: data.gender,
         address: data.address,
         parentName: data.parentName,
         parentPhone: data.parentPhone,
+        parentContactEmail: data.parentContactEmail,
         classId: classId,
-        enrollmentDate: new Date().toISOString(),
+        enrollmentDate: new Date().toISOString().split('T')[0], // YYYY-MM-DD format
       };
 
       return await classApiService.createStudent(classId, request);
@@ -140,6 +141,7 @@ export function useStudentMutations(classId: string) {
         address: data.address,
         parentName: data.parentName,
         parentPhone: data.parentPhone,
+        parentContactEmail: data.parentContactEmail,
       };
 
       return await classApiService.updateStudent(studentId, request);

@@ -1,83 +1,30 @@
-import { useMemo, useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useSlideTemplates } from '@/hooks';
 import {
   createColumnHelper,
   getCoreRowModel,
   getPaginationRowModel,
   useReactTable,
 } from '@tanstack/react-table';
-import { adminApi } from '@/api/admin';
+import { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+import { DataTable, TablePagination } from '@/components/table';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Plus, Edit, FileJson } from 'lucide-react';
-import { toast } from 'sonner';
-import { DataTable, TablePagination } from '@/components/table';
-import { TemplateFormDialog } from '@/components/template';
-import type { SlideTemplate } from '@/types/api';
+import type { SlideTemplate } from '@aiprimary/core';
+import { Edit, FileJson, Plus } from 'lucide-react';
 
 const columnHelper = createColumnHelper<SlideTemplate>();
 
 export function SlideTemplatesPage() {
-  const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const [page, setPage] = useState(1);
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [editingTemplate, setEditingTemplate] = useState<SlideTemplate | null>(null);
   const pageSize = 10;
 
-  const { data, isLoading } = useQuery({
-    queryKey: ['slideTemplates', page, pageSize],
-    queryFn: () => adminApi.getSlideTemplates({ page, pageSize }),
-  });
-
-  const createMutation = useMutation({
-    mutationFn: (data: SlideTemplate) => adminApi.createSlideTemplate(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['slideTemplates'] });
-      toast.success('Template created successfully');
-      handleCloseDialog();
-    },
-    onError: () => {
-      toast.error('Failed to create template');
-    },
-  });
-
-  const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: SlideTemplate }) => adminApi.updateSlideTemplate(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['slideTemplates'] });
-      toast.success('Template updated successfully');
-      handleCloseDialog();
-    },
-    onError: () => {
-      toast.error('Failed to update template');
-    },
-  });
+  const { data, isLoading } = useSlideTemplates({ page, pageSize });
 
   const templates = data?.data || [];
   const pagination = data?.pagination;
-
-  const handleCloseDialog = () => {
-    setDialogOpen(false);
-    setEditingTemplate(null);
-  };
-
-  const handleEdit = (template: SlideTemplate) => {
-    setEditingTemplate(template);
-    setDialogOpen(true);
-  };
-
-  const handleCreate = () => {
-    setEditingTemplate(null);
-    setDialogOpen(true);
-  };
-
-  const handleSubmit = (templateData: SlideTemplate) => {
-    if (editingTemplate?.id) {
-      updateMutation.mutate({ id: editingTemplate.id, data: templateData });
-    } else {
-      createMutation.mutate(templateData);
-    }
-  };
 
   const columns = useMemo(
     () => [
@@ -118,7 +65,11 @@ export function SlideTemplatesPage() {
         header: 'Actions',
         meta: { align: 'right' as const },
         cell: ({ row }) => (
-          <Button variant="outline" size="sm" onClick={() => handleEdit(row.original)}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => (window.location.href = `/slide-templates/${row.original.id}`)}
+          >
             <Edit className="h-4 w-4" />
           </Button>
         ),
@@ -155,19 +106,11 @@ export function SlideTemplatesPage() {
           <h1 className="text-3xl font-bold tracking-tight">Slide Templates</h1>
           <p className="text-muted-foreground">Manage slide layouts and templates with JSON configuration</p>
         </div>
-        <Button onClick={handleCreate}>
+        <Button onClick={() => navigate('/slide-templates/new')}>
           <Plus className="mr-2 h-4 w-4" />
           New Template
         </Button>
       </div>
-
-      <TemplateFormDialog
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
-        template={editingTemplate}
-        onSubmit={handleSubmit}
-        isPending={createMutation.isPending || updateMutation.isPending}
-      />
 
       <Card>
         <CardHeader>

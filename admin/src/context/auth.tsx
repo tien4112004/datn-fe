@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import type { User, AuthContextType } from '@/types/auth';
-import { authApi, type ApiMode } from '@/api/auth';
+import { useLogin as useLoginMutation, useProfile, useLogout as useLogoutMutation } from '@/hooks';
 import { toast } from 'sonner';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -8,21 +8,17 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 const TOKEN_KEY = 'accessToken';
 const REFRESH_TOKEN_KEY = 'refreshToken';
 const USER_KEY = 'admin_user';
-const API_MODE_KEY = 'admin_api_mode';
-
-// Get API mode from localStorage or environment
-const getApiMode = (): ApiMode => {
-  const stored = localStorage.getItem(API_MODE_KEY);
-  if (stored === 'mock' || stored === 'real') {
-    return stored;
-  }
-  // Default to env variable or 'real'
-  return (import.meta.env.VITE_API_MODE as ApiMode) || 'mock';
-};
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isInitializing, setIsInitializing] = useState(true);
+
+  // Use the profile query hook to get user data when tokens exist
+  const hasToken = Boolean(localStorage.getItem(TOKEN_KEY));
+  const { data: profileData, isLoading: isLoadingProfile } = useProfile(hasToken);
+
+  const loginMutation = useLoginMutation();
+  const logoutMutation = useLogoutMutation();
 
   // Initialize auth state from localStorage on mount
   useEffect(() => {
@@ -38,21 +34,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             setUser(parsedUser);
           } else {
             // Clear non-admin user data
-            logout();
+            clearAuthData();
           }
         }
       } catch (error) {
         console.error('Failed to initialize auth:', error);
-        localStorage.removeItem(USER_KEY);
-        localStorage.removeItem(TOKEN_KEY);
-        localStorage.removeItem(REFRESH_TOKEN_KEY);
+        clearAuthData();
       } finally {
-        setIsLoading(false);
+        setIsInitializing(false);
       }
     };
 
     initializeAuth();
   }, []);
+
+  // Update user when profile data changes
+  useEffect(() => {
+    if (profileData) {
+      // Verify admin role
+      if (profileData.role === 'ADMIN' || profileData.role === 'admin') {
+        setUser(profileData);
+        localStorage.setItem(USER_KEY, JSON.stringify(profileData));
+      } else {
+        clearAuthData();
+        toast.error('Access denied. Admin privileges required.');
+      }
+    }
+  }, [profileData]);
 
   // Listen for unauthorized events from API
   useEffect(() => {
@@ -67,46 +75,39 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
+  const clearAuthData = () => {
+    setUser(null);
+    localStorage.removeItem(USER_KEY);
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(REFRESH_TOKEN_KEY);
+  };
+
   const login = async (email: string, password: string) => {
-    const apiMode = getApiMode();
-
     try {
-      const response = await authApi.login({ email, password }, apiMode);
+      // Use the login mutation
+      await loginMutation.mutateAsync({ email, password });
 
-      // Store tokens
-      localStorage.setItem(TOKEN_KEY, response.access_token);
-      localStorage.setItem(REFRESH_TOKEN_KEY, response.refresh_token);
+      // Tokens are stored by the mutation hook
+      // Profile will be fetched automatically via useProfile hook
 
-      // Get user profile
-      const userProfile = await authApi.getProfile(apiMode);
-
-      // Check if user is admin
-      if (userProfile.role !== 'ADMIN' && userProfile.role !== 'admin') {
-        logout();
-        throw new Error('Access denied. Admin privileges required.');
-      }
-
-      localStorage.setItem(USER_KEY, JSON.stringify(userProfile));
-      setUser(userProfile);
       toast.success('Login successful');
     } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : 'Login failed';
-      toast.error(message);
+      // Error toast is already shown by the mutation hook
       throw error;
     }
   };
 
   const logout = () => {
+    // Use the logout mutation
+    logoutMutation.mutate();
+    // Data clearing is handled by the mutation hook
     setUser(null);
-    localStorage.removeItem(TOKEN_KEY);
-    localStorage.removeItem(REFRESH_TOKEN_KEY);
-    localStorage.removeItem(USER_KEY);
   };
 
   const value: AuthContextType = {
     user,
     isAuthenticated: Boolean(user),
-    isLoading,
+    isLoading: isInitializing || isLoadingProfile || loginMutation.isPending,
     login,
     logout,
     setUser,

@@ -5,9 +5,11 @@ import {
   type ImageGenerationResponse,
   type ImageData,
   type GetImagesParams,
+  type GetArtStylesParams,
 } from '../types/service';
 import { api } from '@aiprimary/api';
 import { type ApiResponse } from '@aiprimary/api';
+import type { ArtStyle } from '@aiprimary/core';
 
 export default class ImageRealApiService implements ImageApiService {
   baseUrl: string;
@@ -21,10 +23,12 @@ export default class ImageRealApiService implements ImageApiService {
   }
 
   async generateImage(request: ImageGenerationRequest): Promise<ImageGenerationResponse> {
-    const response = await api.post<ApiResponse<ImageGenerationResponse>>(
-      `${this.baseUrl}/api/images/generate`,
-      request
-    );
+    const isMock = request.model.name === 'mock';
+    const endpoint = isMock
+      ? `${this.baseUrl}/api/images/generate/mock`
+      : `${this.baseUrl}/api/images/generate`;
+
+    const response = await api.post<ApiResponse<ImageGenerationResponse>>(endpoint, request);
     return this._mapImageResponse(response.data.data);
   }
 
@@ -60,12 +64,21 @@ export default class ImageRealApiService implements ImageApiService {
     elementId: string,
     request: ImageGenerationRequest
   ): Promise<ImageGenerationResponse> {
+    const isMock = request.model.name === 'mock';
+    const endpoint = isMock
+      ? `${this.baseUrl}/api/images/generate-in-presentation/mock`
+      : `${this.baseUrl}/api/images/generate-in-presentation`;
+
     const res = await api.post<ApiResponse<{ cdnUrls: string[] }>>(
-      `${this.baseUrl}/api/images/generate-in-presentation`,
+      endpoint,
       {
         prompt: request.prompt,
         model: request.model.name,
         provider: request.model.provider.toLowerCase(),
+        themeStyle: request.themeStyle,
+        themeDescription: request.themeDescription,
+        artStyle: request.artStyle,
+        artDescription: request.artDescription,
       },
       {
         headers: {
@@ -94,5 +107,33 @@ export default class ImageRealApiService implements ImageApiService {
     return {
       images: data.images.map((img: any) => this._mapImageItem(img)),
     };
+  }
+
+  async getArtStyles(params?: GetArtStylesParams): Promise<ArtStyle[]> {
+    try {
+      const response = await api.get<ApiResponse<any[]>>(`${this.baseUrl}/api/art-styles`, {
+        params: {
+          page: params?.page || 1,
+          pageSize: params?.pageSize || 50,
+        },
+      });
+
+      // Filter only enabled styles and map to ArtStyle interface
+      const styles = response.data.data;
+      return styles
+        .filter((style) => style.isEnabled !== false)
+        .map((style) => ({
+          id: style.id,
+          name: style.name,
+          labelKey: style.labelKey,
+          visual: style.visual || undefined,
+          modifiers: style.modifiers || undefined,
+          createdAt: style.createdAt,
+          updatedAt: style.updatedAt,
+        }));
+    } catch (error) {
+      console.error('Failed to fetch art styles:', error);
+      return [];
+    }
   }
 }

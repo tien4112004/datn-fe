@@ -54,7 +54,7 @@ const OutlineCreationView = ({ onCreateOutline }: OutlineCreationViewProps) => {
   };
 
   return (
-    <div className="lg:w-4xl flex min-h-[calc(100vh-1rem)] flex-col items-center justify-center gap-4 self-center sm:w-full">
+    <div className="lg:w-4xl flex min-h-[calc(100vh-1rem)] flex-col items-center justify-center gap-4 self-center py-12 sm:w-full">
       <h1 className="text-3xl font-bold leading-10 text-neutral-900">{t('title')}</h1>
       <ResourceTypeSwitcher />
       <h2 className="text-xl font-bold leading-10 text-sky-500/80">{t('subtitle')}</h2>
@@ -74,7 +74,6 @@ const OutlineCreationView = ({ onCreateOutline }: OutlineCreationViewProps) => {
                 <Controller
                   name="topic"
                   control={control}
-                  rules={{ required: true }}
                   render={({ field }) => (
                     <AutosizeTextarea
                       className="w-full"

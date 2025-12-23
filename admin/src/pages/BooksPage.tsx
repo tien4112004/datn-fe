@@ -1,17 +1,16 @@
-import { useMemo, useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useEffect, useMemo, useState } from 'react';
+import { useBooks, useCreateBook, useUpdateBook, useDeleteBook } from '@/hooks';
 import {
   createColumnHelper,
   getCoreRowModel,
   getPaginationRowModel,
   useReactTable,
 } from '@tanstack/react-table';
-import { adminApi } from '@/api/admin';
+
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Plus, Edit, Trash2, FileText, ExternalLink, BookOpen, GraduationCap } from 'lucide-react';
-import { toast } from 'sonner';
 import { DataTable, TablePagination } from '@/components/table';
 import { BookFormDialog } from '@/components/book';
 import type { Book, BookType } from '@/types/api';
@@ -19,7 +18,6 @@ import type { Book, BookType } from '@/types/api';
 const columnHelper = createColumnHelper<Book>();
 
 export function BooksPage() {
-  const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
   const [typeFilter, setTypeFilter] = useState<BookType | 'ALL'>('ALL');
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -27,52 +25,29 @@ export function BooksPage() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const pageSize = 10;
 
-  const { data, isLoading } = useQuery({
-    queryKey: ['books', page, pageSize, typeFilter],
-    queryFn: () =>
-      adminApi.getBooks({
-        page,
-        pageSize,
-        ...(typeFilter !== 'ALL' && { type: typeFilter }),
-      }),
+  const { data, isLoading } = useBooks({
+    page,
+    pageSize,
+    ...(typeFilter !== 'ALL' && { type: typeFilter }),
   });
 
-  const createMutation = useMutation({
-    mutationFn: (formData: FormData) => adminApi.createBook(formData),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['books'] });
-      toast.success('Book created successfully');
+  const createMutation = useCreateBook();
+  const updateMutation = useUpdateBook();
+  const deleteMutation = useDeleteBook();
+
+  // Handle dialog close after successful mutation
+  useEffect(() => {
+    if (createMutation.isSuccess || updateMutation.isSuccess) {
       handleCloseDialog();
-    },
-    onError: () => {
-      toast.error('Failed to create book');
-    },
-  });
+    }
+  }, [createMutation.isSuccess, updateMutation.isSuccess]);
 
-  const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: FormData }) => adminApi.updateBook(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['books'] });
-      toast.success('Book updated successfully');
-      handleCloseDialog();
-    },
-    onError: () => {
-      toast.error('Failed to update book');
-    },
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: (id: string) => adminApi.deleteBook(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['books'] });
-      toast.success('Book deleted successfully');
+  // Handle delete state reset
+  useEffect(() => {
+    if (deleteMutation.isSuccess || deleteMutation.isError) {
       setDeletingId(null);
-    },
-    onError: () => {
-      toast.error('Failed to delete book');
-      setDeletingId(null);
-    },
-  });
+    }
+  }, [deleteMutation.isSuccess, deleteMutation.isError]);
 
   const books = data?.data || [];
   const pagination = data?.pagination;

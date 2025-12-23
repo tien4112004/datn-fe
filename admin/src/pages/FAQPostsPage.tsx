@@ -1,12 +1,12 @@
-import { useMemo, useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useEffect, useMemo, useState } from 'react';
+import { useFAQPosts, useCreateFAQPost, useUpdateFAQPost, useDeleteFAQPost } from '@/hooks';
 import {
   createColumnHelper,
   getCoreRowModel,
   getPaginationRowModel,
   useReactTable,
 } from '@tanstack/react-table';
-import { adminApi } from '@/api/admin';
+
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -45,7 +45,6 @@ const defaultFormData: FAQFormData = {
 };
 
 export function FAQPostsPage() {
-  const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -54,47 +53,26 @@ export function FAQPostsPage() {
   const [formData, setFormData] = useState<FAQFormData>(defaultFormData);
   const pageSize = 10;
 
-  const { data, isLoading } = useQuery({
-    queryKey: ['faqPosts', page, pageSize],
-    queryFn: () => adminApi.getFAQPosts({ page, pageSize }),
-  });
+  const { data, isLoading } = useFAQPosts({ page, pageSize });
 
-  const createMutation = useMutation({
-    mutationFn: (data: FAQPost) => adminApi.createFAQPost(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['faqPosts'] });
-      toast.success('FAQ post created successfully');
+  const createMutation = useCreateFAQPost();
+  const updateMutation = useUpdateFAQPost();
+  const deleteMutation = useDeleteFAQPost();
+
+  // Handle dialog close after successful mutation
+  useEffect(() => {
+    if (createMutation.isSuccess || updateMutation.isSuccess) {
       handleCloseDialog();
-    },
-    onError: () => {
-      toast.error('Failed to create FAQ post');
-    },
-  });
+    }
+  }, [createMutation.isSuccess, updateMutation.isSuccess]);
 
-  const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: FAQPost }) => adminApi.updateFAQPost(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['faqPosts'] });
-      toast.success('FAQ post updated successfully');
-      handleCloseDialog();
-    },
-    onError: () => {
-      toast.error('Failed to update FAQ post');
-    },
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: (id: string) => adminApi.deleteFAQPost(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['faqPosts'] });
-      toast.success('FAQ post deleted successfully');
+  // Handle delete dialog close and state reset
+  useEffect(() => {
+    if (deleteMutation.isSuccess) {
       setDeleteDialogOpen(false);
       setDeletingPost(null);
-    },
-    onError: () => {
-      toast.error('Failed to delete FAQ post');
-    },
-  });
+    }
+  }, [deleteMutation.isSuccess]);
 
   const posts = data?.data || [];
   const pagination = data?.pagination;

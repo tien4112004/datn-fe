@@ -41,6 +41,7 @@ export default defineConfig(({ mode }) => {
       }),
     ],
     build: {
+      chunkSizeWarningLimit: 1000,
       rollupOptions: {
         treeshake: false,
       },
@@ -68,6 +69,9 @@ export default defineConfig(({ mode }) => {
     },
     preview: {
       allowedHosts: ['*'],
+    },
+    define: {
+      'import.meta.env.VITE_API_URL': JSON.stringify(env.VITE_API_URL),
     },
   };
 });

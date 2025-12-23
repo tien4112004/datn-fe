@@ -38,11 +38,17 @@ function useFetchStreamingPresentation(
   return useStreaming<PresentationGenerationRequest, AiResultSlide[], PresentationGenerationStartResponse>({
     extractFn: presentationApiService.getStreamedPresentation.bind(presentationApiService),
     transformFn: (slides) => {
-      return slides.map((slide, index) => ({
-        result: JSON.parse(slide),
-        order: index,
-        theme: initialRequestData.presentation.theme,
-      }));
+      return slides.map((slide, index) => {
+        const theme = initialRequestData.presentation?.theme;
+        if (!theme) {
+          throw new Error('Presentation theme is required');
+        }
+        return {
+          result: JSON.parse(slide),
+          order: index,
+          theme,
+        };
+      });
     },
     onData,
     input: initialRequestData,

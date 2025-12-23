@@ -4,10 +4,11 @@
     <Editor v-else-if="_isPC" />
     <Mobile v-else />
   </template>
+  <FullscreenSpin :loading="isLoading" tip="Generating presentation..." />
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref, watch } from 'vue';
+import { onMounted, ref, watch, computed, provide, getCurrentInstance } from 'vue';
 import { storeToRefs } from 'pinia';
 import {
   useScreenStore,
@@ -25,10 +26,12 @@ import api from '@/services';
 import Editor from '../views/Editor/index.vue';
 import Mobile from '../views/Mobile/index.vue';
 import Screen from '../views/Screen/index.vue';
+import FullscreenSpin from '@/components/FullscreenSpin.vue';
 import type { Presentation } from '../types/slides';
 import type { PresentationGenerationRequest } from '../types/generation';
 import { usePresentationProcessor } from '@/hooks/usePresentationProcessor';
 import { useGenerationStore } from '@/store/generation';
+import { useSavePresentation } from '@/hooks/useSavePresentation';
 
 const _isPC = isPC();
 
@@ -52,6 +55,12 @@ const { screening, presenter } = storeToRefs(useScreenStore());
 
 // Track if this is the initial load to avoid marking as dirty
 let isInitialLoad = ref(true);
+let isProcessing = ref(false);
+
+// Computed loading state that combines processing and streaming states
+const isLoading = computed(() => {
+  return isProcessing.value || generationStore.isStreaming;
+});
 
 onMounted(async () => {
   if (props.presentation.theme) {
@@ -62,12 +71,24 @@ onMounted(async () => {
     slidesStore.setViewportSize(props.presentation.viewport.width);
   }
 
-  const { isProcessing } = usePresentationProcessor(
+  // Get pinia instance
+  const instance = getCurrentInstance();
+  const pinia = instance?.appContext.config.globalProperties.$pinia;
+
+  // Create save hook and provide to child components
+  if (pinia) {
+    const { savePresentation: saveFn } = useSavePresentation(props.presentation.id, pinia);
+    provide('savePresentationFn', saveFn);
+  }
+
+  const processorResult = usePresentationProcessor(
     (containerStore.presentation || null) as any,
     props.presentation.id,
     generationStore.isStreaming,
+    pinia!,
     props.generationRequest
   );
+  isProcessing = processorResult.isProcessing;
 
   isInitialLoad.value = true;
   containerStore.initialize(props);

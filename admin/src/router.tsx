@@ -1,20 +1,44 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
+import { lazy, Suspense } from 'react';
 import { AdminLayout } from '@/components/layout/AdminLayout';
-import { LoginPage } from '@/pages/LoginPage';
-import { DashboardPage } from '@/pages/DashboardPage';
-import { UsersPage } from '@/pages/UsersPage';
-import { UserDetailPage } from '@/pages/UserDetailPage';
-import { SlideThemesPage } from '@/pages/SlideThemesPage';
-import { SlideTemplatesPage } from '@/pages/SlideTemplatesPage';
-import { ModelConfigPage } from '@/pages/ModelConfigPage';
-import { FAQPostsPage } from '@/pages/FAQPostsPage';
-import { BooksPage } from '@/pages/BooksPage';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
+import GlobalSpinner from '@/components/common/GlobalSpinner';
+
+const LoginPage = lazy(() => import('@/pages/LoginPage').then((m) => ({ default: m.LoginPage })));
+const DashboardPage = lazy(() => import('@/pages/DashboardPage').then((m) => ({ default: m.DashboardPage })));
+const UsersPage = lazy(() => import('@/pages/UsersPage').then((m) => ({ default: m.UsersPage })));
+const UserDetailPage = lazy(() =>
+  import('@/pages/UserDetailPage').then((m) => ({ default: m.UserDetailPage }))
+);
+const SlideThemesPage = lazy(() =>
+  import('@/pages/SlideThemesPage').then((m) => ({ default: m.SlideThemesPage }))
+);
+const ThemeFormPage = lazy(() => import('@/pages/ThemeFormPage').then((m) => ({ default: m.ThemeFormPage })));
+const SlideTemplatesPage = lazy(() =>
+  import('@/pages/SlideTemplatesPage').then((m) => ({ default: m.SlideTemplatesPage }))
+);
+const TemplateFormPage = lazy(() =>
+  import('@/pages/TemplateFormPage').then((m) => ({ default: m.TemplateFormPage }))
+);
+const ArtStylesPage = lazy(() => import('@/pages/ArtStylesPage').then((m) => ({ default: m.ArtStylesPage })));
+const ModelConfigPage = lazy(() =>
+  import('@/pages/ModelConfigPage').then((m) => ({ default: m.ModelConfigPage }))
+);
+const FAQPostsPage = lazy(() => import('@/pages/FAQPostsPage').then((m) => ({ default: m.FAQPostsPage })));
+const BooksPage = lazy(() => import('@/pages/BooksPage').then((m) => ({ default: m.BooksPage })));
+
+const LazyWrapper = ({ children }: { children: React.ReactNode }) => (
+  <Suspense fallback={<GlobalSpinner text="Loading..." />}>{children}</Suspense>
+);
 
 export const router = createBrowserRouter([
   {
     path: '/login',
-    element: <LoginPage />,
+    element: (
+      <LazyWrapper>
+        <LoginPage />
+      </LazyWrapper>
+    ),
   },
   {
     path: '/',
@@ -30,35 +54,107 @@ export const router = createBrowserRouter([
       },
       {
         path: 'dashboard',
-        element: <DashboardPage />,
+        element: (
+          <LazyWrapper>
+            <DashboardPage />
+          </LazyWrapper>
+        ),
       },
       {
         path: 'users',
-        element: <UsersPage />,
+        element: (
+          <LazyWrapper>
+            <UsersPage />
+          </LazyWrapper>
+        ),
       },
       {
         path: 'users/:id',
-        element: <UserDetailPage />,
+        element: (
+          <LazyWrapper>
+            <UserDetailPage />
+          </LazyWrapper>
+        ),
       },
       {
         path: 'slide-themes',
-        element: <SlideThemesPage />,
+        element: (
+          <LazyWrapper>
+            <SlideThemesPage />
+          </LazyWrapper>
+        ),
+      },
+      {
+        path: 'slide-themes/new',
+        element: (
+          <LazyWrapper>
+            <ThemeFormPage />
+          </LazyWrapper>
+        ),
+      },
+      {
+        path: 'slide-themes/:id',
+        element: (
+          <LazyWrapper>
+            <ThemeFormPage />
+          </LazyWrapper>
+        ),
       },
       {
         path: 'slide-templates',
-        element: <SlideTemplatesPage />,
+        element: (
+          <LazyWrapper>
+            <SlideTemplatesPage />
+          </LazyWrapper>
+        ),
+      },
+      {
+        path: 'slide-templates/new',
+        element: (
+          <LazyWrapper>
+            <TemplateFormPage />
+          </LazyWrapper>
+        ),
+      },
+      {
+        path: 'slide-templates/:id',
+        element: (
+          <LazyWrapper>
+            <TemplateFormPage />
+          </LazyWrapper>
+        ),
+      },
+      {
+        path: 'art-styles',
+        element: (
+          <LazyWrapper>
+            <ArtStylesPage />
+          </LazyWrapper>
+        ),
       },
       {
         path: 'model-config',
-        element: <ModelConfigPage />,
+        element: (
+          <LazyWrapper>
+            <ModelConfigPage />
+          </LazyWrapper>
+        ),
       },
       {
         path: 'faq-posts',
-        element: <FAQPostsPage />,
+        element: (
+          <LazyWrapper>
+            <FAQPostsPage />
+          </LazyWrapper>
+        ),
       },
       {
         path: 'books',
-        element: <BooksPage />,
+        element: (
+          <LazyWrapper>
+            <BooksPage />
+          </LazyWrapper>
+        ),
       },
     ],
   },

@@ -16,7 +16,7 @@ import useHistorySnapshot from './useHistorySnapshot';
 import useScreening from './useScreening';
 import useScaleCanvas from './useScaleCanvas';
 
-export default () => {
+export default (saveFn?: () => Promise<void>) => {
   const mainStore = useMainStore();
   const keyboardStore = useKeyboardStore();
   const containerStore = useContainerStore();
@@ -75,29 +75,17 @@ export default () => {
     if (thumbnailsFocus.value) selectAllSlide();
   };
 
-  const savePresentation = () => {
+  const savePresentation = async () => {
     // Only save if isRemote and has unsaved changes
     if (!containerStore.isRemote) return;
     if (!saveStore.hasUnsavedChanges) return;
+    if (!saveFn) return;
 
-    const presentation = containerStore.presentation;
-    if (!presentation) return;
-
-    // Dispatch save event to container
-    window.dispatchEvent(
-      new CustomEvent('app.presentation.save', {
-        detail: {
-          presentation: {
-            ...presentation,
-            title: presentation.title,
-            slides: slides.value,
-          },
-        },
-      })
-    );
-
-    // Mark as saved
-    saveStore.markSaved();
+    try {
+      await saveFn();
+    } catch (error) {
+      console.error('Failed to save presentation:', error);
+    }
   };
 
   const lock = () => {

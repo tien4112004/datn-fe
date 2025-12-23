@@ -1,38 +1,36 @@
 import type { Service } from '@/shared/api';
 import type { OutlineItem, OutlineData } from './outline';
-import type { Presentation, PresentationCollectionRequest, SlideLayoutSchema } from './presentation';
+import type {
+  Presentation,
+  PresentationCollectionRequest,
+  SlideLayoutSchema,
+  ModelConfig,
+} from './presentation';
 import type { ApiResponse } from '@aiprimary/api';
 import type { Slide, SlideTheme, SlideTemplate, SlideViewport } from './slide';
 
+interface PresentationConfig {
+  theme: SlideTheme;
+  viewport: SlideViewport;
+}
+
+interface ImageOptions {
+  artStyle: string;
+  artStyleModifiers?: string;
+  imageModel: ModelConfig;
+}
+
 export interface PresentationGenerationRequest {
   outline: string;
-  model: {
-    name: string;
-    provider: string;
-  };
+  model: ModelConfig;
   slideCount: number;
   language: string;
-  /** @deprecated */
-  presentation: {
-    theme: SlideTheme;
-    viewport: SlideViewport;
-  };
-
-  // This field is not used in the backend
-  others: {
-    contentLength: string;
-    imageModel: {
-      name: string;
-      provider: string;
-    };
-  };
+  presentation?: PresentationConfig;
+  generationOptions?: ImageOptions;
 }
 
 export interface PresentationGenerateDraftRequest {
-  presentation: {
-    theme: SlideTheme;
-    viewport: SlideViewport;
-  };
+  presentation: PresentationConfig;
 }
 
 export interface PresentationGenerationResponse {
@@ -46,6 +44,18 @@ export interface PresentationGenerationStartResponse {
 }
 
 export type CreatePresentationRequest = Omit<Presentation, 'id' | 'createdAt' | 'updatedAt'>;
+export interface UpdatePresentationRequest {
+  title?: string;
+  slides?: Slide[];
+  theme?: SlideTheme;
+  viewport?: SlideViewport;
+  thumbnail?: string;
+}
+
+export interface GetSlideThemesParams {
+  page?: number;
+  pageSize?: number;
+}
 
 export interface PresentationApiService extends Service {
   /**
@@ -63,7 +73,7 @@ export interface PresentationApiService extends Service {
   getAiResultById(id: string): Promise<SlideLayoutSchema[]>;
   generatePresentation(request: PresentationGenerationRequest): Promise<PresentationGenerationResponse>;
   updatePresentationTitle(id: string, name: string): Promise<any | null>;
-  updatePresentation(id: string, data: Presentation): Promise<Presentation>;
+  updatePresentation(id: string, data: UpdatePresentationRequest): Promise<Presentation>;
   getStreamedPresentation(
     request: PresentationGenerationRequest,
     signal: AbortSignal
@@ -71,6 +81,6 @@ export interface PresentationApiService extends Service {
   draftPresentation(request: PresentationGenerateDraftRequest): Promise<Presentation>;
   upsertPresentationSlide(id: string, slide: Slide): Promise<Presentation>;
   setPresentationAsParsed(id: string): Promise<Presentation>;
-  getSlideThemes(): Promise<SlideTheme[]>;
+  getSlideThemes(params?: GetSlideThemesParams): Promise<SlideTheme[]>;
   getSlideTemplates(): Promise<SlideTemplate[]>;
 }

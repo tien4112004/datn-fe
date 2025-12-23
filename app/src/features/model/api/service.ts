@@ -19,7 +19,22 @@ export default class ModelRealApiService implements ModelApiService {
     const response = await api.get<ApiResponse<Model[]>>(`${baseUrl}/api/models`, {
       params: { modelType: type },
     });
-    return response.data.data.map(this._mapModelOption);
+    const models = response.data.data.map(this._mapModelOption);
+
+    // Append Mock Image option for IMAGE type
+    if (type === 'IMAGE' || type === null) {
+      models.push({
+        id: 'mock',
+        name: 'mock',
+        displayName: 'Mock Image',
+        enabled: true,
+        default: false,
+        provider: 'LocalAI',
+        type: 'IMAGE',
+      });
+    }
+
+    return models;
   }
 
   async getDefaultModel(type: ModelType): Promise<Model> {

@@ -9,6 +9,8 @@ import {
   type PresentationGenerateDraftRequest,
   type PresentationGenerationResponse,
   type SlideLayoutSchema,
+  type GetSlideThemesParams,
+  type UpdatePresentationRequest,
 } from '../types';
 import type { ApiResponse } from '@aiprimary/api';
 import type { Slide, SlideTheme, SlideTemplate } from '../types/slide';
@@ -212,8 +214,17 @@ export default class PresentationMockService implements PresentationApiService {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       isParsed: false,
-      theme: _request.presentation.theme,
-      viewport: _request.presentation.viewport,
+      theme: _request.presentation?.theme || {
+        backgroundColor: '#ffffff',
+        themeColors: [],
+        fontColor: '#000000',
+        fontName: 'Arial',
+        titleFontName: 'Arial',
+        titleFontColor: '#000000',
+        outline: {} as any,
+        shadow: {} as any,
+      },
+      viewport: _request.presentation?.viewport || { width: 1024, height: 768 },
     };
 
     // Add the new presentation to the mock list
@@ -371,7 +382,7 @@ export default class PresentationMockService implements PresentationApiService {
     });
   }
 
-  async updatePresentation(id: string, data: Presentation): Promise<Presentation> {
+  async updatePresentation(id: string, data: UpdatePresentationRequest): Promise<Presentation> {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         const index = mockPresentationItems.findIndex((item) => item.id === id);
@@ -390,10 +401,21 @@ export default class PresentationMockService implements PresentationApiService {
     });
   }
 
-  getSlideThemes(): Promise<SlideTheme[]> {
+  getSlideThemes(params?: GetSlideThemesParams): Promise<SlideTheme[]> {
     return new Promise((resolve) => {
       setTimeout(() => {
-        resolve(Object.values(THEMES_DATA).filter((theme): theme is SlideTheme => theme.id !== 'default'));
+        const allThemes = Object.values(THEMES_DATA).filter(
+          (theme): theme is SlideTheme => theme.id !== 'default'
+        );
+
+        // Simulate pagination
+        if (params?.page && params?.pageSize) {
+          const startIndex = (params.page - 1) * params.pageSize;
+          const endIndex = startIndex + params.pageSize;
+          resolve(allThemes.slice(startIndex, endIndex));
+        } else {
+          resolve(allThemes);
+        }
       }, 300);
     });
   }
@@ -490,16 +512,22 @@ const mockSlideTemplates: SlideTemplate[] = [
   {
     id: 'title-slide',
     name: 'Title Slide',
+    layout: 'title',
+    config: { containers: {} },
     cover: '/templates/title-slide.png',
   },
   {
     id: 'content-slide',
     name: 'Content Slide',
+    layout: 'list',
+    config: { containers: {} },
     cover: '/templates/content-slide.png',
   },
   {
     id: 'two-column-slide',
     name: 'Two Column Slide',
+    layout: 'two_column',
+    config: { containers: {} },
     cover: '/templates/two-column-slide.png',
   },
 ];

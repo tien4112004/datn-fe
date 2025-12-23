@@ -15,10 +15,14 @@
     "test:run": "vitest run",
     "format": "prettier --write \"**/*.{js,ts,vue,json,css,tsx}\""
   },
+  "exports": {
+    ".": "./src/index.ts"
+  },
   "author": "pipipi_pikachu@163.com",
   "dependencies": {
     "@aiprimary/api": "workspace:*",
     "@aiprimary/core": "workspace:*",
+    "@aiprimary/frontend-data": "workspace:*",
     "@tanstack/vue-query": "^5.28.0",
     "@tanstack/vue-table": "^8.21.3",
     "@unovis/ts": "^1.6.0",

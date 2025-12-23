@@ -1,5 +1,4 @@
-import { Controller } from 'react-hook-form';
-import type { Control } from 'react-hook-form';
+import { Controller, type Control } from 'react-hook-form';
 import {
   Card,
   CardAction,
@@ -14,16 +13,18 @@ import { useTranslation } from 'react-i18next';
 import { ModelSelect } from '@/components/common/ModelSelect';
 import { MODEL_TYPES, useModels } from '@/features/model';
 import type { UnifiedFormData } from '../../contexts/PresentationFormContext';
+import type { ArtStyle } from '@aiprimary/core';
 import { useCallback, useState, useEffect } from 'react';
 import useOutlineStore from '../../stores/useOutlineStore';
 import { useSlideThemes } from '../../hooks';
+import { useArtStyles } from '@/features/image/hooks';
 import { ThemePreviewCard } from './ThemePreviewCard';
 import ThemeGalleryDialog from './ThemeGalleryDialog';
 import type { SlideTheme } from '../../types/slide';
 import { cn } from '@/shared/lib/utils';
 
 interface ThemeSectionProps {
-  selectedTheme: SlideTheme;
+  selectedTheme?: SlideTheme;
   onThemeSelect: (theme: SlideTheme) => void;
   disabled?: boolean;
 }
@@ -75,27 +76,27 @@ const ThemeSection = ({ selectedTheme, onThemeSelect, disabled = false }: ThemeS
       </CardHeader>
       <CardContent className="flex flex-col gap-2">
         {isLoading ? (
-          <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
+          <div className="grid grid-cols-3 gap-4">
             {Array.from({ length: 6 }).map((_, index) => (
               <div key={index} className="bg-muted h-24 animate-pulse rounded-lg" />
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
+          <div className="grid grid-cols-3 gap-4">
             {displayedThemes.map((theme) => (
               <div
                 key={theme.id}
                 className={cn(
                   'transition-all',
                   disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer hover:scale-105',
-                  selectedTheme.id === theme.id && 'rounded-lg ring-2 ring-blue-500'
+                  selectedTheme?.id === theme.id && 'rounded-lg ring-2 ring-blue-500'
                 )}
                 onClick={() => !disabled && onThemeSelect(theme)}
               >
                 <ThemePreviewCard
                   theme={theme}
                   title={theme.name}
-                  isSelected={selectedTheme.id === theme.id}
+                  isSelected={selectedTheme?.id === theme.id}
                 />
               </div>
             ))}
@@ -121,11 +122,70 @@ const ThemeSection = ({ selectedTheme, onThemeSelect, disabled = false }: ThemeS
       <ThemeGalleryDialog
         open={galleryOpen}
         onOpenChange={setGalleryOpen}
-        themes={themes}
-        isLoading={isLoading}
-        selectedThemeId={selectedTheme.id}
+        selectedThemeId={selectedTheme?.id}
         onThemeSelect={handleThemeSelectFromGallery}
       />
+    </>
+  );
+};
+
+interface ArtSectionProps {
+  selectedStyle?: ArtStyle;
+  onStyleSelect: (style: ArtStyle) => void;
+  disabled?: boolean;
+}
+
+const ArtSection = ({ selectedStyle, onStyleSelect, disabled = false }: ArtSectionProps) => {
+  const { t } = useTranslation('presentation', { keyPrefix: 'customization' });
+  const { artStyles, isLoading } = useArtStyles();
+
+  return (
+    <>
+      <CardHeader>
+        <CardTitle>{t('artStyle.title')}</CardTitle>
+        <CardDescription>{t('artStyle.description')}</CardDescription>
+      </CardHeader>
+      <CardContent className="flex flex-col gap-2">
+        {isLoading ? (
+          <div className="grid grid-cols-3 gap-3 lg:grid-cols-5">
+            {Array.from({ length: 5 }).map((_, idx) => (
+              <div key={idx} className="bg-muted h-32 animate-pulse rounded-lg" />
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-3 gap-3 lg:grid-cols-5">
+            {artStyles.map((style) => {
+              const styleValue = style.id || style.name;
+              const selectedValue = selectedStyle?.id || selectedStyle?.name;
+
+              return (
+                <div
+                  key={styleValue}
+                  className={cn(
+                    'group relative overflow-hidden rounded-lg border-2 transition-all',
+                    disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer hover:scale-105',
+                    selectedValue === styleValue ? 'border-primary shadow-md' : 'border-border'
+                  )}
+                  onClick={() => !disabled && onStyleSelect(style)}
+                >
+                  {/* Preview gradient/image */}
+                  <div
+                    className="h-24 w-full bg-cover bg-center"
+                    style={{
+                      background: `url(${style.visual}) center/cover no-repeat`,
+                    }}
+                  />
+
+                  {/* Label section */}
+                  <div className="bg-card flex items-center justify-center p-2">
+                    <span className="text-xs font-medium">{t(`artStyle.${style.labelKey}` as never)}</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </CardContent>
     </>
   );
 };
@@ -209,6 +269,13 @@ const CustomizationSection = ({
     [setValue]
   );
 
+  const onArtStyleSelect = useCallback(
+    (style: ArtStyle) => {
+      setValue('artStyle', style, { shouldValidate: true, shouldDirty: true });
+    },
+    [setValue]
+  );
+
   //   const onContentLengthSelect = useCallback(
   //     (length: string) => {
   //       setValue('contentLength', length);
@@ -223,11 +290,13 @@ const CustomizationSection = ({
       </div>
       <Card className="w-full max-w-3xl">
         <ThemeSection selectedTheme={watch('theme')} onThemeSelect={onThemeSelect} disabled={disabled} />
+        <ArtSection selectedStyle={watch('artStyle')} onStyleSelect={onArtStyleSelect} disabled={disabled} />
         {/* <ContentSection
           selectedContentLength={watch('contentLength')}
           onContentLengthSelect={onContentLengthSelect}
           disabled={disabled}
         /> */}
+
         <CardContent className="flex flex-row items-center gap-2">
           <CardTitle>{t('customization.imageModels.title')}</CardTitle>
           <Controller
@@ -261,4 +330,4 @@ const CustomizationSection = ({
 };
 
 export default CustomizationSection;
-export { ContentSection, ThemeSection };
+export { ContentSection, ThemeSection, ArtSection };

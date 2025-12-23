@@ -77,22 +77,6 @@ export interface PyramidLayoutSchema {
   };
 }
 
-export const SLIDE_LAYOUT_TYPE = {
-  TWO_COLUMN_WITH_IMAGE: 'two_column_with_image',
-  MAIN_IMAGE: 'main_image',
-  TITLE: 'title',
-  TWO_COLUMN: 'two_column',
-  LIST: 'list',
-  LABELED_LIST: 'labeled_list',
-  TABLE_OF_CONTENTS: 'table_of_contents',
-  TIMELINE: 'timeline',
-  PYRAMID: 'pyramid',
-} as const;
-
-export { SLIDE_LAYOUT_TYPE as default };
-
-export type SlideLayoutTypeKey = (typeof SLIDE_LAYOUT_TYPE)[keyof typeof SLIDE_LAYOUT_TYPE];
-
 export type SlideLayoutSchema =
   | TwoColumnWithImageLayoutSchema
   | MainImageLayoutSchema

@@ -1,8 +1,7 @@
 import { useMemo, useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { createColumnHelper, getCoreRowModel, useReactTable } from '@tanstack/react-table';
-import { adminApi } from '@/api/admin';
+import { useUsers } from '@/hooks';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -19,12 +18,9 @@ export function UsersPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const pageSize = 10;
 
-  const { data, isLoading, error } = useQuery({
-    queryKey: ['users', page, pageSize],
-    queryFn: () => adminApi.getUsers({ page, pageSize }),
-  });
+  const { data, isLoading, error } = useUsers({ page, pageSize });
 
-  const users = data?.data || [];
+  const users: User[] = (data?.data as User[]) || [];
   const pagination = data?.pagination;
 
   const filteredUsers = useMemo(

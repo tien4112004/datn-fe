@@ -41,8 +41,8 @@
  * ```
  */
 
-import { selectTemplate } from './converters/templateSelector';
 import type { PPTImageElement, Slide, SlideTheme } from '@/types/slides';
+import type { Template } from '@aiprimary/core/templates';
 import type {
   SlideViewport,
   SlideLayoutSchema,
@@ -66,10 +66,9 @@ import { getImageSize } from '../image';
  * This is the primary public API for the slide layout engine.
  *
  * Process:
- * 1. Select template based on layout type and optional seed
- * 2. Resolve template with theme and viewport (replace {{theme.xxx}} placeholders)
- * 3. Map input data to template containers (texts, blocks, images)
- * 4. Convert to final Slide object with all PPT elements
+ * 1. Resolve template with theme and viewport (replace {{theme.xxx}} placeholders)
+ * 2. Map input data to template containers (texts, blocks, images)
+ * 3. Convert to final Slide object with all PPT elements
  *
  * Supported layout types:
  * - TWO_COLUMN_WITH_IMAGE: Two-column content with side image
@@ -81,44 +80,51 @@ import { getImageSize } from '../image';
  * - TRANSITION: Section transition slide
  * - TABLE_OF_CONTENTS: Auto-numbered contents page
  *
+ * Template Selection: Template must be selected by the caller using helper functions:
+ * - selectRandomTemplate(layoutType, seed?) - Random selection with optional seed
+ * - selectTemplateById(layoutType, templateId) - Select specific template by ID
+ * - selectFirstTemplate(layoutType) - Get first available template
+ * - selectNextTemplate(layoutType) - Cycle through templates
+ *
  * @param data - Layout schema with type and content data
  * @param viewport - Slide dimensions (typically 1000x562.5 for 16:9)
  * @param theme - Visual theme (colors, fonts, backgrounds)
+ * @param template - Template to use for rendering the slide
  * @param slideId - Optional custom slide ID
- * @param seed - Optional seed for deterministic template selection (useful for testing)
  * @param parameterOverrides - Optional custom parameter values to override template defaults
  * @returns Promise resolving to a complete Slide object
  * @throws Error if layout type is not supported
  *
  * @example
+ * const template = selectRandomTemplate('list');
  * const slide = await convertToSlide(
  *   { type: 'VERTICAL_LIST', title: 'Features', data: { items: ['Fast', 'Easy', 'Powerful'] }},
  *   { width: 1000, height: 562.5 },
- *   theme
+ *   theme,
+ *   template
  * );
  */
 export const convertToSlide = async (
   data: SlideLayoutSchema,
   viewport: SlideViewport,
   theme: SlideTheme,
+  template: Template,
   slideId?: string,
-  seed?: string,
   parameterOverrides?: Record<string, number>
 ): Promise<Slide> => {
   const layoutType = data.type;
 
   if (layoutType === SLIDE_LAYOUT_TYPE.TWO_COLUMN_WITH_IMAGE) {
-    const selectedTemplate = selectTemplate(layoutType, seed);
-    const template = resolveTemplate(
-      selectedTemplate.config,
+    const resolvedTemplate = resolveTemplate(
+      template.config,
       theme,
       viewport,
-      selectedTemplate.graphics,
-      selectedTemplate.parameters
+      template.graphics,
+      template.parameters
     );
     return convertLayoutGeneric(
       data as TwoColumnWithImageLayoutSchema,
-      template,
+      resolvedTemplate,
       (d) => ({
         texts: { title: d.title },
         blocks: { content: { item: d.data.items } },
@@ -127,23 +133,22 @@ export const convertToSlide = async (
       slideId,
       {
         layoutSchema: data,
-        templateId: selectedTemplate.id,
+        templateId: template.id,
         layoutType: layoutType,
       },
       parameterOverrides
     );
   } else if (layoutType === SLIDE_LAYOUT_TYPE.MAIN_IMAGE) {
-    const selectedTemplate = selectTemplate(layoutType, seed);
-    const template = resolveTemplate(
-      selectedTemplate.config,
+    const resolvedTemplate = resolveTemplate(
+      template.config,
       theme,
       viewport,
-      selectedTemplate.graphics,
-      selectedTemplate.parameters
+      template.graphics,
+      template.parameters
     );
     return convertLayoutGeneric(
       data as MainImageLayoutSchema,
-      template,
+      resolvedTemplate,
       (d) => ({
         texts: { content: d.data.content },
         blocks: { content: { content: [d.data.content] } },
@@ -152,23 +157,22 @@ export const convertToSlide = async (
       slideId,
       {
         layoutSchema: data,
-        templateId: selectedTemplate.id,
+        templateId: template.id,
         layoutType: layoutType,
       },
       parameterOverrides
     );
   } else if (layoutType === SLIDE_LAYOUT_TYPE.TITLE) {
-    const selectedTemplate = selectTemplate(layoutType, seed);
-    const template = resolveTemplate(
-      selectedTemplate.config,
+    const resolvedTemplate = resolveTemplate(
+      template.config,
       theme,
       viewport,
-      selectedTemplate.graphics,
-      selectedTemplate.parameters
+      template.graphics,
+      template.parameters
     );
     return convertLayoutGeneric(
       data as TitleLayoutSchema,
-      template,
+      resolvedTemplate,
       (d) => ({
         texts: {
           title: d.data.title,
@@ -182,27 +186,27 @@ export const convertToSlide = async (
       slideId,
       {
         layoutSchema: data,
-        templateId: selectedTemplate.id,
+        templateId: template.id,
         layoutType: layoutType,
       },
       parameterOverrides
     );
   } else if (layoutType === SLIDE_LAYOUT_TYPE.TWO_COLUMN) {
-    const selectedTemplate = selectTemplate(layoutType, seed);
-    const template = resolveTemplate(
-      selectedTemplate.config,
+    const resolvedTemplate = resolveTemplate(
+      template.config,
       theme,
       viewport,
-      selectedTemplate.graphics,
-      selectedTemplate.parameters
+      template.graphics,
+      template.parameters
     );
 
     // Check if template has separate leftColumn/rightColumn containers
-    const hasLeftRightColumns = template.containers.leftColumn && template.containers.rightColumn;
+    const hasLeftRightColumns =
+      resolvedTemplate.containers.leftColumn && resolvedTemplate.containers.rightColumn;
 
     return convertLayoutGeneric(
       data as TwoColumnLayoutSchema,
-      template,
+      resolvedTemplate,
       (d) => {
         const texts = { title: d.title };
         let blocks: Record<string, Record<string, string[]>>;
@@ -225,23 +229,22 @@ export const convertToSlide = async (
       slideId,
       {
         layoutSchema: data,
-        templateId: selectedTemplate.id,
+        templateId: template.id,
         layoutType: layoutType,
       },
       parameterOverrides
     );
   } else if (layoutType === SLIDE_LAYOUT_TYPE.LIST) {
-    const selectedTemplate = selectTemplate(layoutType, seed);
-    const template = resolveTemplate(
-      selectedTemplate.config,
+    const resolvedTemplate = resolveTemplate(
+      template.config,
       theme,
       viewport,
-      selectedTemplate.graphics,
-      selectedTemplate.parameters
+      template.graphics,
+      template.parameters
     );
 
     // Check if the template has numbering enabled (label/content structure)
-    const contentContainer = template.containers.content;
+    const contentContainer = resolvedTemplate.containers.content;
     const hasNumbering =
       contentContainer?.type === 'block' &&
       contentContainer.childTemplate?.structure?.children?.some(
@@ -250,7 +253,7 @@ export const convertToSlide = async (
 
     return convertLayoutGeneric(
       data as ListLayoutSchema,
-      template,
+      resolvedTemplate,
       (d) => {
         // For numbered templates: split into label (numbers) and content (text)
         // For non-numbered templates: single 'item' field
@@ -271,23 +274,22 @@ export const convertToSlide = async (
       slideId,
       {
         layoutSchema: data,
-        templateId: selectedTemplate.id,
+        templateId: template.id,
         layoutType: layoutType,
       },
       parameterOverrides
     );
   } else if (layoutType === SLIDE_LAYOUT_TYPE.LABELED_LIST) {
-    const selectedTemplate = selectTemplate(layoutType, seed);
-    const template = resolveTemplate(
-      selectedTemplate.config,
+    const resolvedTemplate = resolveTemplate(
+      template.config,
       theme,
       viewport,
-      selectedTemplate.graphics,
-      selectedTemplate.parameters
+      template.graphics,
+      template.parameters
     );
 
     // Check if the template has numbering enabled
-    const contentContainer = template.containers.content;
+    const contentContainer = resolvedTemplate.containers.content;
     const hasNumbering =
       contentContainer?.type === 'block' &&
       contentContainer.childTemplate?.structure?.children?.some(
@@ -296,7 +298,7 @@ export const convertToSlide = async (
 
     return convertLayoutGeneric(
       data as LabeledListLayoutSchema,
-      template,
+      resolvedTemplate,
       (d) => ({
         texts: { title: d.title },
         blocks: {
@@ -311,23 +313,22 @@ export const convertToSlide = async (
       slideId,
       {
         layoutSchema: data,
-        templateId: selectedTemplate.id,
+        templateId: template.id,
         layoutType: layoutType,
       },
       parameterOverrides
     );
   } else if (layoutType === SLIDE_LAYOUT_TYPE.TABLE_OF_CONTENTS) {
-    const selectedTemplate = selectTemplate(layoutType, seed);
-    const template = resolveTemplate(
-      selectedTemplate.config,
+    const resolvedTemplate = resolveTemplate(
+      template.config,
       theme,
       viewport,
-      selectedTemplate.graphics,
-      selectedTemplate.parameters
+      template.graphics,
+      template.parameters
     );
 
     // Check if the template has numbering enabled
-    const contentContainer = template.containers.content;
+    const contentContainer = resolvedTemplate.containers.content;
     const hasNumbering =
       contentContainer?.type === 'block' &&
       contentContainer.childTemplate?.structure?.children?.some(
@@ -336,7 +337,7 @@ export const convertToSlide = async (
 
     return convertLayoutGeneric(
       data as TableOfContentsLayoutSchema,
-      template,
+      resolvedTemplate,
       (d) => ({
         texts: { title: 'Contents' },
         blocks: {
@@ -349,24 +350,23 @@ export const convertToSlide = async (
       slideId,
       {
         layoutSchema: data,
-        templateId: selectedTemplate.id,
+        templateId: template.id,
         layoutType: layoutType,
       },
       parameterOverrides
     );
   } else if (layoutType === SLIDE_LAYOUT_TYPE.TIMELINE) {
-    const selectedTemplate = selectTemplate(layoutType, seed);
-    const template = resolveTemplate(
-      selectedTemplate.config,
+    const resolvedTemplate = resolveTemplate(
+      template.config,
       theme,
       viewport,
-      selectedTemplate.graphics,
-      selectedTemplate.parameters
+      template.graphics,
+      template.parameters
     );
 
     return convertLayoutGeneric(
       data as TimelineLayoutSchema,
-      template,
+      resolvedTemplate,
       (d) => ({
         texts: { title: d.title },
         blocks: {
@@ -379,24 +379,23 @@ export const convertToSlide = async (
       slideId,
       {
         layoutSchema: data,
-        templateId: selectedTemplate.id,
+        templateId: template.id,
         layoutType: layoutType,
       },
       parameterOverrides
     );
   } else if (layoutType === SLIDE_LAYOUT_TYPE.PYRAMID) {
-    const selectedTemplate = selectTemplate(layoutType, seed);
-    const template = resolveTemplate(
-      selectedTemplate.config,
+    const resolvedTemplate = resolveTemplate(
+      template.config,
       theme,
       viewport,
-      selectedTemplate.graphics,
-      selectedTemplate.parameters
+      template.graphics,
+      template.parameters
     );
 
     return convertLayoutGeneric(
       data as PyramidLayoutSchema,
-      template,
+      resolvedTemplate,
       (d) => ({
         texts: { title: d.title },
         blocks: {
@@ -408,7 +407,7 @@ export const convertToSlide = async (
       slideId,
       {
         layoutSchema: data,
-        templateId: selectedTemplate.id,
+        templateId: template.id,
         layoutType: layoutType,
       },
       parameterOverrides
@@ -455,3 +454,17 @@ export const updateImageSource = async (
     clip: finalClip,
   } as PPTImageElement;
 };
+
+// Export template selection helper functions
+export {
+  selectRandomTemplate,
+  selectTemplateById,
+  selectFirstTemplate,
+  selectNextTemplate,
+} from './converters/templateSelectionHelpers';
+
+// Export template registry for advanced usage
+export { templateRegistry } from './converters/templateRegistry';
+
+// Re-export existing template utilities (for fallback/mock mode)
+export { selectTemplate, getTemplateVariations, TEMPLATE_VARIATIONS } from './converters/templateSelector';

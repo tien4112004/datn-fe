@@ -3,7 +3,6 @@ import { toast } from 'sonner';
 import type { Presentation } from '../types';
 import { CriticalError } from '@aiprimary/api';
 import { ERROR_TYPE } from '@/shared/constants';
-import { useUpdatePresentation } from './useApi';
 
 export interface VueEditorApp {
   generateThumbnail?: () => Promise<string | undefined>;
@@ -36,6 +35,24 @@ export const usePresentationValidation = (
 
   if (!presentation && !isGeneratingParam) {
     throw new CriticalError(`Presentation with ID ${id} not found`, ERROR_TYPE.RESOURCE_NOT_FOUND);
+  }
+
+  // Additional validation when presentation exists
+  if (presentation) {
+    // Validate required fields
+    if (!presentation.id) {
+      throw new CriticalError('Presentation data is invalid: missing ID', ERROR_TYPE.RESOURCE_NOT_FOUND);
+    }
+
+    if (presentation.title === undefined || presentation.title === null) {
+      throw new CriticalError('Presentation data is invalid: missing title', ERROR_TYPE.RESOURCE_NOT_FOUND);
+    }
+
+    // Warn about empty presentations (don't throw, just log)
+    if (presentation.slides && presentation.slides.length === 0) {
+      console.warn(`Presentation ${id} has no slides`);
+      // Don't throw - empty presentations are valid (user might be building it)
+    }
   }
 
   return id;
@@ -72,49 +89,25 @@ export const useMessageRemote = () => {
   }, [handleMessage]);
 };
 
-interface SavePresentationEventDetail {
-  presentation: Presentation;
-}
-
-export const useSavePresentationRemote = (presentationId: string, vueApp?: VueEditorApp) => {
+/**
+ * Simplified hook to listen for saving state events from Vue
+ * Used only for showing GlobalSpinner, all save logic is handled in Vue
+ */
+export const useSavingIndicator = () => {
   const [isSaving, setIsSaving] = useState(false);
-  const updatePresentation = useUpdatePresentation(presentationId);
 
-  const handleSave = useCallback(
-    async (event: CustomEvent<SavePresentationEventDetail>) => {
-      try {
-        setIsSaving(true);
-        const { presentation: dataToSave } = event.detail;
-
-        // Generate thumbnail using Vue app instance if available
-        const thumbnail = await vueApp?.generateThumbnail?.();
-        console.log(thumbnail);
-
-        // Include thumbnail in the presentation data (thumbnail will be undefined if generation failed)
-        const presentationWithThumbnail = {
-          ...dataToSave,
-          ...(thumbnail ? { thumbnail } : { thumbnail: dataToSave.thumbnail }),
-        };
-
-        // Save presentation with thumbnail
-        await updatePresentation.mutateAsync(presentationWithThumbnail);
-      } catch (error) {
-        console.error('Failed to save presentation:', error);
-      } finally {
-        setIsSaving(false);
-      }
-    },
-    [updatePresentation, vueApp]
-  );
+  const handleSavingStateChange = useCallback((event: CustomEvent<{ isSaving: boolean }>) => {
+    setIsSaving(event.detail.isSaving);
+  }, []);
 
   useEffect(() => {
-    const listener = handleSave as unknown as EventListener;
-    window.addEventListener('app.presentation.save', listener);
+    const listener = handleSavingStateChange as unknown as EventListener;
+    window.addEventListener('app.presentation.saving', listener);
 
     return () => {
-      window.removeEventListener('app.presentation.save', listener);
+      window.removeEventListener('app.presentation.saving', listener);
     };
-  }, [handleSave]);
+  }, [handleSavingStateChange]);
 
   return { isSaving };
 };

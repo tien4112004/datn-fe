@@ -9,6 +9,10 @@ export interface ImageGenerationParams {
     name: string;
     provider: string;
   };
+  themeStyle?: string;
+  themeDescription?: string;
+  artStyle?: string;
+  artDescription?: string;
 }
 
 export interface ImageGenerationResponse {

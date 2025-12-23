@@ -111,6 +111,21 @@ export default {
     imageModels: {
       title: 'Image Models',
     },
+    artStyle: {
+      title: 'Art Style',
+      none: 'None',
+      description: 'Choose the visual style for your presentation images',
+      photorealistic: 'Photorealistic',
+      digitalArt: 'Digital Art',
+      oilPainting: 'Oil Painting',
+      watercolor: 'Watercolor',
+      anime: 'Anime',
+      cartoon: 'Cartoon',
+      sketch: 'Sketch',
+      abstract: 'Abstract',
+      surreal: 'Surreal',
+      minimalist: 'Minimalist',
+    },
   },
   list: {
     title: 'Presentation List',
@@ -120,5 +135,15 @@ export default {
       title: 'Rename Presentation',
       placeholder: 'Enter new name for the presentation',
     },
+  },
+  validation: {
+    topicRequired: 'Topic is required',
+    slideCountRequired: 'Slide count is required',
+    languageRequired: 'Language is required',
+    modelRequired: 'Model is required',
+    providerRequired: 'Provider is required',
+    themeRequired: 'Theme is required',
+    artStyleRequired: 'Art style is required',
+    imageModelRequired: 'Image model is required',
   },
 };

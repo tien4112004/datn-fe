@@ -1,5 +1,5 @@
 import { getApiServiceFactory } from '@aiprimary/api';
-import { PresentationApiService } from './real';
+import { PresentationApiService } from './service';
 import { MockPresentationApiService } from './mock';
 import type { PresentationGenerationRequest, PresentationGenerationStartResponse } from './types';
 import { getBackendUrl } from '@aiprimary/api';
@@ -10,13 +10,15 @@ const BASE_URL = getBackendUrl();
 export interface IPresentationApi {
   getAiResultById(id: string): Promise<any[]>;
   upsertSlide(presentationId: string, slide: any): Promise<Presentation>;
+  // Upsert multiple slides in a single request
+  upsertSlides(presentationId: string, slides: any[]): Promise<Presentation>;
   setParsed(id: string): Promise<Presentation>;
   streamPresentation(
     request: PresentationGenerationRequest,
     signal: AbortSignal
   ): Promise<{ stream: AsyncIterable<string> } & PresentationGenerationStartResponse>;
   getPresentation(id: string): Promise<Presentation>;
-  updatePresentation(id: string, data: Presentation): Promise<Presentation>;
+  updatePresentation(id: string, data: Partial<Presentation>): Promise<Presentation>;
 }
 
 /**

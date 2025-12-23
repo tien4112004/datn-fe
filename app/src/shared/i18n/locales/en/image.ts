@@ -41,6 +41,9 @@ export default {
     artStyle: {
       label: 'Art Style',
       placeholder: 'Which art style?',
+      title: 'Art Style',
+      description: 'Choose the visual style for your images',
+      none: 'None',
       photorealistic: 'Photorealistic',
       digitalArt: 'Digital Art',
       oilPainting: 'Oil Painting',
@@ -80,5 +83,9 @@ export default {
       prompt5: 'A serene mountain lake with reflection of snow-capped peaks',
       prompt6: 'A steampunk-inspired robot in a Victorian setting',
     },
+  },
+  errors: {
+    artStylesLoadFailed: 'Failed to load art styles',
+    usingFallbackStyles: 'Using default styles instead',
   },
 };

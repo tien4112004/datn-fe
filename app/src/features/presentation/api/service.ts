@@ -10,6 +10,8 @@ import {
   type SlideLayoutSchema,
   type PresentationGenerationStartResponse,
   type PresentationGenerateDraftRequest,
+  type GetSlideThemesParams,
+  type UpdatePresentationRequest,
 } from '../types';
 import { splitMarkdownToOutlineItems } from '../utils';
 import { api } from '@aiprimary/api';
@@ -61,8 +63,13 @@ export default class PresentationRealApiService implements PresentationApiServic
     this.baseUrl = baseUrl;
   }
 
-  async getSlideThemes(): Promise<SlideTheme[]> {
-    const res = await api.get<ApiResponse<SlideTheme[]>>(`${this.baseUrl}/api/slide-themes`);
+  async getSlideThemes(params?: GetSlideThemesParams): Promise<SlideTheme[]> {
+    const res = await api.get<ApiResponse<SlideTheme[]>>(`${this.baseUrl}/api/slide-themes`, {
+      params: {
+        page: params?.page,
+        pageSize: params?.pageSize,
+      },
+    });
     return res.data.data;
   }
 
@@ -294,22 +301,27 @@ export default class PresentationRealApiService implements PresentationApiServic
     return null;
   }
 
-  async updatePresentation(id: string, data: Presentation): Promise<any> {
+  async updatePresentation(id: string, data: UpdatePresentationRequest): Promise<any> {
     await api.put<ApiResponse<Presentation>>(`${this.baseUrl}/api/presentations/${id}`, {
-      title: data.title,
       slides: data.slides,
+      title: data.title,
+      theme: data.theme,
+      viewport: data.viewport,
+      thumbnail: data.thumbnail,
     });
   }
 
   _mapPresentationItem(data: any): Presentation {
     return {
-      id: data.id,
-      title: data.title,
-      thumbnail: data.thumbnail,
-      slides: data.slides,
-      createdAt: data.createdAt,
-      updatedAt: data.updatedAt,
-      isParsed: data.parsed || false,
+      id: data?.id,
+      title: data?.title,
+      thumbnail: data?.thumbnail,
+      slides: data?.slides,
+      theme: data?.theme,
+      viewport: data?.viewport,
+      isParsed: data?.parsed || false,
+      createdAt: data?.createdAt,
+      updatedAt: data?.updatedAt,
     };
   }
 }

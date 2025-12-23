@@ -828,6 +828,7 @@ export interface Slide {
 export interface SlideTheme {
   id?: string;
   name?: string;
+  modifiers?: string | null;
   backgroundColor: string | Gradient;
   themeColors: string[];
   fontColor: string;
@@ -851,12 +852,32 @@ export interface SlideTheme {
     textColor: string;
     shadow: PPTElementShadow;
   };
+
+  createdAt?: string;     // ISO date string
+  updatedAt?: string;     // ISO date string
 }
 
 export interface SlideTemplate {
-  name: string;
   id: string;
-  cover: string;
+  name: string;
+  layout: string;         // Template layout type (e.g., 'list', 'title', 'twoColumn')
+  config: {               // Layout configuration
+    containers: Record<string, any>;
+    [key: string]: any;
+  };
+  cover?: string;
+  graphics?: any[];       // Graphics elements
+  parameters?: Array<{    // Template parameters
+    key: string;
+    label: string;
+    defaultValue: number;
+    min?: number;
+    max?: number;
+    step?: number;
+    description?: string;
+  }>;
+  createdAt?: string;     // ISO date string
+  updatedAt?: string;     // ISO date string
 }
 
 export interface SlideViewport {

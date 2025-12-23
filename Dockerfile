@@ -7,6 +7,17 @@ COPY . /app
 WORKDIR /app
 
 FROM base AS builder
+
+# Build-time environment variable injection
+ARG VITE_API_URL
+ARG PRESENTATION_URL
+ARG NODE_ENV=production
+
+# Set as environment variables for the build process
+ENV VITE_API_URL=$VITE_API_URL
+ENV PRESENTATION_URL=$PRESENTATION_URL
+ENV NODE_ENV=$NODE_ENV
+
 COPY pnpm-lock.yaml ./
 RUN --mount=type=cache,target=/pnpm/store \
     pnpm fetch --frozen-lockfile

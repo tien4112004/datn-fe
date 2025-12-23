@@ -1,5 +1,4 @@
 import { AnimatePresence, motion } from 'motion/react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { AutosizeTextarea } from '@/components/ui/autosize-textarea';
 import { CardTitle } from '@/shared/components/ui/card';
@@ -8,7 +7,8 @@ import { useTranslation } from 'react-i18next';
 
 import { MODEL_TYPES, useModels } from '@/features/model';
 import { ModelSelect } from '@/shared/components/common/ModelSelect';
-import { IMAGE_DIMENSION_OPTIONS, ART_STYLE_OPTIONS } from '@/features/image/types';
+import { IMAGE_DIMENSION_OPTIONS } from '@/features/image/types';
+import { useArtStyles } from '@/features/image/hooks';
 import type { CreateImageFormData } from '@/features/image/types';
 import type { Control, UseFormRegister } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
@@ -23,6 +23,7 @@ interface AdvancedOptionsProps {
 const AdvancedOptions = ({ register, control, isOpen, onToggle }: AdvancedOptionsProps) => {
   const { t } = useTranslation('image', { keyPrefix: 'create' });
   const { models, isLoading, isError } = useModels(MODEL_TYPES.IMAGE);
+  const { artStyles, isLoading: isLoadingStyles } = useArtStyles();
 
   const toggleOptions = () => {
     onToggle(!isOpen);
@@ -70,29 +71,6 @@ const AdvancedOptions = ({ register, control, isOpen, onToggle }: AdvancedOption
                         isLoading={isLoading}
                         isError={isError}
                       />
-                    )}
-                  />
-                </div>
-
-                {/* Art Styles */}
-                <div className="space-y-2">
-                  <Label>{t('artStyle.label')}</Label>
-                  <Controller
-                    name="artStyle"
-                    control={control}
-                    render={({ field }) => (
-                      <Select value={field.value} onValueChange={field.onChange} defaultValue="">
-                        <SelectTrigger>
-                          <SelectValue placeholder={t('artStyle.placeholder')} />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {ART_STYLE_OPTIONS.map((opt) => (
-                            <SelectItem key={opt.value} value={opt.value}>
-                              {t(`artStyle.${opt.labelKey}` as never)}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
                     )}
                   />
                 </div>
@@ -148,6 +126,56 @@ const AdvancedOptions = ({ register, control, isOpen, onToggle }: AdvancedOption
                         );
                       })}
                     </div>
+                  )}
+                />
+              </div>
+
+              {/* Art Style */}
+              <div className="space-y-2">
+                <Label>{t('artStyle.title')}</Label>
+                <Controller
+                  name="artStyle"
+                  control={control}
+                  render={({ field }) => (
+                    <>
+                      {isLoadingStyles ? (
+                        <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
+                          {Array.from({ length: 5 }).map((_, idx) => (
+                            <div key={idx} className="bg-muted h-32 animate-pulse rounded-lg" />
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
+                          {artStyles.map((style) => {
+                            const styleValue = style.id || style.name;
+                            const isSelected = field.value === styleValue;
+
+                            return (
+                              <div
+                                key={styleValue}
+                                className={`group relative cursor-pointer overflow-hidden rounded-lg border-2 transition-all hover:scale-105 ${
+                                  isSelected ? 'border-primary shadow-md' : 'border-border'
+                                }`}
+                                onClick={() => field.onChange(styleValue)}
+                              >
+                                <div
+                                  className="h-24 w-full bg-cover bg-center"
+                                  style={{
+                                    background: `url(${style.visual}) center/cover no-repeat`,
+                                  }}
+                                />
+
+                                <div className="bg-card flex items-center justify-center p-2">
+                                  <span className="text-xs font-medium">
+                                    {t(`artStyle.${style.labelKey}` as never)}
+                                  </span>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </>
                   )}
                 />
               </div>

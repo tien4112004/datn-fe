@@ -5,7 +5,7 @@ import useFetchStreamingOutline from '@/features/presentation/hooks/useFetchStre
 import useOutlineStore from '@/features/presentation/stores/useOutlineStore';
 import { usePresentationForm } from '@/features/presentation/contexts/PresentationFormContext';
 import { useDraftPresentation } from './useApi';
-import type { PresentationGenerationRequest } from '../types';
+import type { PresentationGenerateDraftRequest } from '../types';
 import usePresentationStore from '../stores/usePresentationStore';
 
 interface UseWorkspaceProps {}
@@ -78,6 +78,7 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
     const isValid = await trigger([
       'theme',
       'contentLength',
+      'artStyle',
       'imageModel',
       'model',
       'slideCount',
@@ -88,25 +89,30 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
     const outline = markdownContent();
     const data = getValues();
 
-    const generationRequest: PresentationGenerationRequest = {
-      outline,
-      model: data.model,
-      slideCount: data.slideCount,
-      language: data.language,
-
+    const generationRequest: PresentationGenerateDraftRequest = {
       presentation: {
-        theme: data.theme,
+        // Ensure we supply a valid theme (fall back to an empty object cast if not set)
+        theme: (data.theme as any) || ({} as any),
         viewport: { width: 1000, height: 562.5 },
-      },
-
-      others: {
-        contentLength: data.contentLength,
-        imageModel: data.imageModel,
       },
     };
     try {
       const result = await draftPresentation.mutateAsync(generationRequest);
-      setRequest(generationRequest);
+      setRequest({
+        ...generationRequest,
+
+        outline,
+        model: data.model,
+        slideCount: data.slideCount,
+        language: data.language,
+
+        generationOptions: {
+          // Default artStyle to empty string (allowed option) if not set
+          artStyle: data.artStyle?.id ?? '',
+          artStyleModifiers: data.artStyle?.modifiers,
+          imageModel: data.imageModel ?? { name: '', provider: '' },
+        },
+      });
       clearOutline();
       setValue('topic', '');
 

@@ -6,7 +6,7 @@ import type {
   ExpressionContext,
   ResolvedBounds,
   ExpressionConstants,
-} from '../types';
+} from '@aiprimary/core/templates';
 import { DEFAULT_VIEWPORT } from './layoutConstants';
 
 /**

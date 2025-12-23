@@ -41,6 +41,9 @@ export default {
     artStyle: {
       label: 'Phong cách nghệ thuật',
       placeholder: 'Phong cách nghệ thuật nào?',
+      title: 'Phong cách nghệ thuật',
+      description: 'Chọn phong cách hình ảnh cho hình ảnh của bạn',
+      none: 'Không có',
       photorealistic: 'Chụp thực tế',
       digitalArt: 'Nghệ thuật số',
       oilPainting: 'Sơn dầu',
@@ -80,5 +83,9 @@ export default {
       prompt5: 'Hồ núi thanh bình với phản chiếu của đỉnh núi phủ tuyết',
       prompt6: 'Robot phong cách steampunk trong khung cảnh thời Victorian',
     },
+  },
+  errors: {
+    artStylesLoadFailed: 'Không thể tải phong cách nghệ thuật',
+    usingFallbackStyles: 'Sử dụng phong cách mặc định thay thế',
   },
 };

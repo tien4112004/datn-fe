@@ -15,14 +15,14 @@ const LOCAL_STORAGE_KEY = 'apiMode';
 
 /**
  * Get the current API mode from localStorage
- * Defaults to 'mock' if not set or invalid value
+ * Defaults to 'real' if not set or invalid value
  */
 export function getApiMode(): ApiMode {
   if (typeof window === 'undefined') {
-    return API_MODE.mock;
+    return API_MODE.real;
   }
   const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
-  return stored === API_MODE.mock || stored === API_MODE.real ? (stored as ApiMode) : API_MODE.mock;
+  return stored === API_MODE.mock || stored === API_MODE.real ? (stored as ApiMode) : API_MODE.real;
 }
 
 /**

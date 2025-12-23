@@ -199,9 +199,14 @@ const generatePreviews = async () => {
     const previews = await Promise.all(
       availableTemplates.map(async (template) => {
         try {
-          // Generate slide with this specific template using direct ID selection
-          const seed = `template-id:${template.id}`;
-          const previewSlide = await convertToSlide(updatedSchema, viewport, theme.value, undefined, seed);
+          // Generate slide with this specific template
+          const previewSlide = await convertToSlide(
+            updatedSchema,
+            viewport,
+            theme.value,
+            template,
+            undefined
+          );
 
           return {
             template,

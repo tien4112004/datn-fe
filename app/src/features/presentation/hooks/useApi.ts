@@ -1,4 +1,10 @@
-import { useQuery, useMutation, useQueryClient, type UseQueryResult } from '@tanstack/react-query';
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  useInfiniteQuery,
+  type UseQueryResult,
+} from '@tanstack/react-query';
 import type { SortingState, PaginationState, Updater } from '@tanstack/react-table';
 import { usePresentationApiService } from '../api';
 import { useImageApiService } from '@/features/image/api';
@@ -8,6 +14,7 @@ import type {
   OutlineItem,
   PresentationGenerationRequest,
   PresentationGenerateDraftRequest,
+  UpdatePresentationRequest,
 } from '../types';
 import type { ApiResponse } from '@aiprimary/api';
 import { ExpectedError } from '@aiprimary/api';
@@ -259,7 +266,7 @@ export const useUpdatePresentation = (id: string) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (presentation: Presentation) => {
+    mutationFn: async (presentation: UpdatePresentationRequest) => {
       const updatedPresentation = await presentationApiService.updatePresentation(id, presentation);
       return updatedPresentation;
     },
@@ -372,6 +379,39 @@ export const useSlideThemes = () => {
   };
 };
 
+const PAGE_SIZE = 12;
+
+export const useInfiniteSlideThemes = () => {
+  const apiService = usePresentationApiService();
+
+  const { data, ...query } = useInfiniteQuery({
+    queryKey: [apiService.getType(), 'slideThemes', 'infinite'],
+    queryFn: async ({ pageParam = 1 }): Promise<SlideTheme[]> => {
+      const themes = await apiService.getSlideThemes({
+        page: pageParam as number,
+        pageSize: PAGE_SIZE,
+      });
+      return themes;
+    },
+    initialPageParam: 1,
+    getNextPageParam: (lastPage: SlideTheme[], allPages: SlideTheme[][]) => {
+      // If the last page has fewer items than the page size, we've reached the end
+      if (lastPage.length < PAGE_SIZE) return undefined;
+      return allPages.length + 1;
+    },
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+    gcTime: 10 * 60 * 1000, // Keep in cache for 10 minutes
+  });
+
+  const themes = data?.pages.flatMap((page: SlideTheme[]) => page) || [];
+
+  return {
+    themes,
+    defaultTheme: themes.find((t: SlideTheme) => t.id === 'default') || themes[0],
+    ...query,
+  };
+};
+
 export const useSlideTemplates = () => {
   const apiService = usePresentationApiService();
 
@@ -394,9 +434,9 @@ export const useDraftPresentation = () => {
     mutationFn: async (request: PresentationGenerateDraftRequest) => {
       const draftPresentation = await presentationApiService.createPresentation({
         title: 'AI Generated Presentation',
-        isParsed: true,
+        isParsed: false,
         slides: [],
-        ...request,
+        ...request.presentation,
       });
       return draftPresentation;
     },

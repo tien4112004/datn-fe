@@ -5,7 +5,9 @@ import {
   type ImageGenerationResponse,
   type ImageData,
   type GetImagesParams,
+  type GetArtStylesParams,
 } from '../types/service';
+import type { ArtStyle } from '@aiprimary/core';
 
 /**
  * Generate mock image data
@@ -119,9 +121,9 @@ export default class ImageMockService implements ImageApiService {
           id: crypto.randomUUID(),
           url: `https://picsum.photos/800/600?random=${Date.now()}`,
           prompt: request.prompt,
-          style: request.style || 'realistic',
+          style: request.artStyle || 'realistic',
           size: request.size || '800x600',
-          quality: request.quality || 'high',
+          quality: 'high',
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         };
@@ -191,6 +193,108 @@ export default class ImageMockService implements ImageApiService {
         };
         resolve(response);
       }, 10000);
+    });
+  }
+
+  async getArtStyles(_params?: GetArtStylesParams): Promise<ArtStyle[]> {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const mockArtStyles: ArtStyle[] = [
+          {
+            id: '',
+            name: 'None',
+            labelKey: 'none',
+            visual: 'https://placehold.co/600x400/FFFFFF/31343C?text=None',
+            modifiers: undefined,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          },
+          {
+            id: 'photorealistic',
+            name: 'Photorealistic',
+            labelKey: 'photorealistic',
+            visual: 'https://placehold.co/600x400/667eea/ffffff?text=Photorealistic',
+            modifiers: 'photorealistic, highly detailed, realistic photography',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          },
+          {
+            id: 'digital-art',
+            name: 'Digital Art',
+            labelKey: 'digitalArt',
+            visual: 'https://placehold.co/600x400/f093fb/ffffff?text=Digital+Art',
+            modifiers: 'digital art, digital painting, concept art',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          },
+          {
+            id: 'oil-painting',
+            name: 'Oil Painting',
+            labelKey: 'oilPainting',
+            visual: 'https://placehold.co/600x400/4facfe/ffffff?text=Oil+Painting',
+            modifiers: 'oil painting, traditional art, painterly style',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          },
+          {
+            id: 'watercolor',
+            name: 'Watercolor',
+            labelKey: 'watercolor',
+            visual: 'https://placehold.co/600x400/00f2fe/ffffff?text=Watercolor',
+            modifiers: 'watercolor, aquarelle, soft washes',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          },
+          {
+            id: 'anime',
+            name: 'Anime',
+            labelKey: 'anime',
+            visual: 'https://placehold.co/600x400/43e97b/ffffff?text=Anime',
+            modifiers: 'anime style, manga, japanese animation',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          },
+          {
+            id: 'cartoon',
+            name: 'Cartoon',
+            labelKey: 'cartoon',
+            visual: 'https://placehold.co/600x400/fa709a/ffffff?text=Cartoon',
+            modifiers: 'cartoon style, cel shaded, vibrant colors',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          },
+          {
+            id: 'sketch',
+            name: 'Sketch',
+            labelKey: 'sketch',
+            visual: 'https://placehold.co/600x400/fee140/ffffff?text=Sketch',
+            modifiers: 'pencil sketch, hand drawn, line art',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          },
+          {
+            id: 'abstract',
+            name: 'Abstract',
+            labelKey: 'abstract',
+            visual: 'https://placehold.co/600x400/30cfd0/ffffff?text=Abstract',
+            modifiers: 'abstract art, non-representational, geometric',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          },
+          {
+            id: 'surreal',
+            name: 'Surreal',
+            labelKey: 'surreal',
+            visual: 'https://placehold.co/600x400/ffecd2/ffffff?text=Surreal',
+            modifiers: 'surrealism, dreamlike, fantastical',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          },
+        ];
+
+        // Return all art styles
+        resolve(mockArtStyles);
+      }, 500);
     });
   }
 }

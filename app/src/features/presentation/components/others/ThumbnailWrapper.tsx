@@ -67,7 +67,7 @@ const ThumbnailWrapperV2 = ({ presentation, size, visible = true }: ThumbnailWra
     <img
       src="/images/placeholder-image.webp"
       alt="No Thumbnail"
-      className={size === 'auto' ? 'aspect-[16/9] w-full' : `aspect-[16/9] w-[${size}px]`}
+      style={size !== 'auto' ? { width: `${size}px` } : { width: '100%' }}
     />
   );
 };

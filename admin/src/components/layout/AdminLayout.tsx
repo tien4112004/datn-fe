@@ -7,6 +7,7 @@ import {
   Users,
   Palette,
   LayoutTemplate,
+  Brush,
   Settings,
   LogOut,
   Menu,
@@ -16,12 +17,14 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
+import { getBackendUrl } from '@aiprimary/api';
 
 const navItems = [
   { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/users', icon: Users, label: 'Users' },
   { to: '/slide-themes', icon: Palette, label: 'Slide Themes' },
   { to: '/slide-templates', icon: LayoutTemplate, label: 'Slide Templates' },
+  { to: '/art-styles', icon: Brush, label: 'Art Styles' },
   { to: '/books', icon: BookOpen, label: 'Books' },
   { to: '/model-config', icon: Settings, label: 'Model Config' },
   { to: '/faq-posts', icon: HelpCircle, label: 'FAQ Posts' },
@@ -110,7 +113,13 @@ export function AdminLayout() {
           <h1 className="text-lg font-semibold">Admin Panel</h1>
         </header>
 
-        {/* Page content */}
+        {/* Backend URL Display */}
+        <div className="bg-background flex items-center justify-end gap-4 border-b px-6 py-3">
+          <div className="text-muted-foreground text-sm">
+            Backend: <span className="font-mono">{import.meta.env.VITE_API_URL || getBackendUrl()}</span>
+          </div>
+        </div>
+
         <main className="flex-1 overflow-auto p-6">
           <Outlet />
         </main>

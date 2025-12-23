@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { adminApi } from '@/api/admin';
+import { getAdminApiService } from '@/api/admin';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
@@ -13,7 +13,7 @@ export function UserDetailPage() {
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['user', id],
-    queryFn: () => adminApi.getUserById(id!),
+    queryFn: () => getAdminApiService().getUserById(id!),
     enabled: !!id,
   });
 

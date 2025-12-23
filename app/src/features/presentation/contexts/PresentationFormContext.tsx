@@ -8,9 +8,12 @@ import {
   type UseFormTrigger,
   type UseFormGetValues,
 } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import useFormPersist from 'react-hook-form-persist';
 import { moduleMap } from '../components/remote/module';
 import type { SlideTheme } from '../types/slide';
+import type { ArtStyle } from '@aiprimary/core';
 
 export type UnifiedFormData = {
   // Outline fields
@@ -21,10 +24,11 @@ export type UnifiedFormData = {
     name: string;
     provider: string;
   };
-  // Customization fields
-  theme: SlideTheme;
-  contentLength: string;
-  imageModel: {
+  // Customization fields (optional)
+  theme?: SlideTheme;
+  contentLength?: string;
+  artStyle?: ArtStyle;
+  imageModel?: {
     name: string;
     provider: string;
   };
@@ -49,7 +53,45 @@ const PRESENTATION_FORM_KEY = 'presentation-unified-form';
 export const PresentationFormProvider = ({ children }: PresentationFormProviderProps) => {
   const persistedData = useMemo(() => getLocalStorageData(PRESENTATION_FORM_KEY), []);
 
+  // Zod validation schema for presentation form
+  const presentationFormSchema = useMemo(
+    () =>
+      z.object({
+        // Outline fields - required
+        topic: z.string().min(1),
+        slideCount: z.number().min(1),
+        language: z.string().min(1),
+        model: z.object({
+          name: z.string().min(1),
+          provider: z.string().min(1),
+        }),
+
+        // Customization fields - optional
+        theme: z.any().optional(),
+        contentLength: z.string().optional(),
+        artStyle: z
+          .object({
+            id: z.string(),
+            name: z.string(),
+            labelKey: z.string(),
+            visual: z.string().optional(),
+            modifiers: z.string().optional(),
+            createdAt: z.string().optional(),
+            updatedAt: z.string().optional(),
+          })
+          .optional(),
+        imageModel: z
+          .object({
+            name: z.string().min(1),
+            provider: z.string().min(1),
+          })
+          .optional(),
+      }),
+    []
+  );
+
   const form = useForm<UnifiedFormData>({
+    resolver: zodResolver(presentationFormSchema),
     defaultValues: {
       topic: '',
       slideCount: 10,
@@ -58,8 +100,9 @@ export const PresentationFormProvider = ({ children }: PresentationFormProviderP
         name: '',
         provider: '',
       },
-      theme: {},
+      theme: undefined,
       contentLength: '',
+      artStyle: undefined,
       imageModel: {
         name: '',
         provider: '',

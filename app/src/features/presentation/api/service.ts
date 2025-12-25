@@ -311,6 +311,10 @@ export default class PresentationRealApiService implements PresentationApiServic
     });
   }
 
+  async deletePresentation(id: string): Promise<void> {
+    await api.delete(`${this.baseUrl}/api/presentations/${id}`);
+  }
+
   _mapPresentationItem(data: any): Presentation {
     return {
       id: data?.id,

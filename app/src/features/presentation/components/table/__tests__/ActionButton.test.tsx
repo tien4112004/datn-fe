@@ -5,7 +5,7 @@ import { renderWithProviders } from '@/tests/test-utils';
 
 describe('ActionButton', () => {
   const mockOnViewDetail = vi.fn();
-  const mockOnEdit = vi.fn();
+  const mockOnRename = vi.fn();
   const mockOnDelete = vi.fn();
 
   beforeEach(() => {
@@ -14,7 +14,7 @@ describe('ActionButton', () => {
 
   describe('ActionButton popover behavior', () => {
     it('displays ellipsis icon initially', () => {
-      renderWithProviders(<ActionButton onEdit={mockOnEdit} onDelete={mockOnDelete} />);
+      renderWithProviders(<ActionButton onRename={mockOnRename} onDelete={mockOnDelete} />);
 
       // Check that the trigger icon is visible (it's an SVG with specific class)
       const ellipsisIcon = document.querySelector('.lucide-ellipsis-vertical');
@@ -23,7 +23,7 @@ describe('ActionButton', () => {
 
     it('opens popover menu when clicked', async () => {
       renderWithProviders(
-        <ActionButton onViewDetail={mockOnViewDetail} onEdit={mockOnEdit} onDelete={mockOnDelete} />
+        <ActionButton onViewDetail={mockOnViewDetail} onRename={mockOnRename} onDelete={mockOnDelete} />
       );
 
       // Click the ellipsis icon to open popover
@@ -32,28 +32,28 @@ describe('ActionButton', () => {
 
       await waitFor(() => {
         expect(screen.getByRole('button', { name: /view details/i })).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: /edit/i })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /rename/i })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: /delete/i })).toBeInTheDocument();
       });
     });
 
-    it('calls edit callback when edit option is selected', async () => {
-      renderWithProviders(<ActionButton onEdit={mockOnEdit} onDelete={mockOnDelete} />);
+    it('calls rename callback when rename option is selected', async () => {
+      renderWithProviders(<ActionButton onRename={mockOnRename} onDelete={mockOnDelete} />);
 
-      // Open popover and click edit
+      // Open popover and click rename
       const triggerButton = document.querySelector('.lucide-ellipsis-vertical');
       fireEvent.click(triggerButton!);
 
       await waitFor(async () => {
-        const editButton = screen.getByRole('button', { name: /edit/i });
-        fireEvent.click(editButton);
+        const renameButton = screen.getByRole('button', { name: /rename/i });
+        fireEvent.click(renameButton);
       });
 
-      expect(mockOnEdit).toHaveBeenCalledTimes(1);
+      expect(mockOnRename).toHaveBeenCalledTimes(1);
     });
 
     it('calls delete callback when delete option is selected', async () => {
-      renderWithProviders(<ActionButton onEdit={mockOnEdit} onDelete={mockOnDelete} />);
+      renderWithProviders(<ActionButton onRename={mockOnRename} onDelete={mockOnDelete} />);
 
       // Open popover and click delete
       const triggerButton = document.querySelector('.lucide-ellipsis-vertical');
@@ -74,11 +74,11 @@ describe('ActionButton', () => {
       fireEvent.click(triggerButton!);
 
       await waitFor(() => {
-        const editButton = screen.getByRole('button', { name: /edit/i });
+        const renameButton = screen.getByRole('button', { name: /rename/i });
         const deleteButton = screen.getByRole('button', { name: /delete/i });
 
         // Should not throw errors when callbacks are undefined
-        expect(() => fireEvent.click(editButton)).not.toThrow();
+        expect(() => fireEvent.click(renameButton)).not.toThrow();
         expect(() => fireEvent.click(deleteButton)).not.toThrow();
       });
     });
@@ -87,15 +87,15 @@ describe('ActionButton', () => {
   describe('ActionContent standalone behavior', () => {
     it('renders all action buttons with icons and text', () => {
       renderWithProviders(
-        <ActionContent onViewDetail={mockOnViewDetail} onEdit={mockOnEdit} onDelete={mockOnDelete} />
+        <ActionContent onViewDetail={mockOnViewDetail} onRename={mockOnRename} onDelete={mockOnDelete} />
       );
 
       const viewDetailButton = screen.getByRole('button', { name: /view details/i });
-      const editButton = screen.getByRole('button', { name: /edit/i });
+      const renameButton = screen.getByRole('button', { name: /rename/i });
       const deleteButton = screen.getByRole('button', { name: /delete/i });
 
       expect(viewDetailButton).toBeInTheDocument();
-      expect(editButton).toBeInTheDocument();
+      expect(renameButton).toBeInTheDocument();
       expect(deleteButton).toBeInTheDocument();
 
       // Check that icons are present (they render as SVG elements)
@@ -105,18 +105,18 @@ describe('ActionButton', () => {
 
     it('displays internationalized text correctly', () => {
       renderWithProviders(
-        <ActionContent onViewDetail={mockOnViewDetail} onEdit={mockOnEdit} onDelete={mockOnDelete} />
+        <ActionContent onViewDetail={mockOnViewDetail} onRename={mockOnRename} onDelete={mockOnDelete} />
       );
 
       // Should show translated text (exact text depends on i18n setup)
       expect(screen.getByText(/view details/i)).toBeInTheDocument();
-      expect(screen.getByText(/edit/i)).toBeInTheDocument();
+      expect(screen.getByText(/rename/i)).toBeInTheDocument();
       expect(screen.getByText(/delete/i)).toBeInTheDocument();
     });
 
     it('handles view detail action when used standalone', () => {
       renderWithProviders(
-        <ActionContent onViewDetail={mockOnViewDetail} onEdit={mockOnEdit} onDelete={mockOnDelete} />
+        <ActionContent onViewDetail={mockOnViewDetail} onRename={mockOnRename} onDelete={mockOnDelete} />
       );
 
       const viewDetailButton = screen.getByRole('button', { name: /view details/i });
@@ -125,20 +125,20 @@ describe('ActionButton', () => {
       expect(mockOnViewDetail).toHaveBeenCalledTimes(1);
     });
 
-    it('handles edit action when used standalone', () => {
+    it('handles rename action when used standalone', () => {
       renderWithProviders(
-        <ActionContent onViewDetail={mockOnViewDetail} onEdit={mockOnEdit} onDelete={mockOnDelete} />
+        <ActionContent onViewDetail={mockOnViewDetail} onRename={mockOnRename} onDelete={mockOnDelete} />
       );
 
-      const editButton = screen.getByRole('button', { name: /edit/i });
-      fireEvent.click(editButton);
+      const renameButton = screen.getByRole('button', { name: /rename/i });
+      fireEvent.click(renameButton);
 
-      expect(mockOnEdit).toHaveBeenCalledTimes(1);
+      expect(mockOnRename).toHaveBeenCalledTimes(1);
     });
 
     it('handles delete action when used standalone', () => {
       renderWithProviders(
-        <ActionContent onViewDetail={mockOnViewDetail} onEdit={mockOnEdit} onDelete={mockOnDelete} />
+        <ActionContent onViewDetail={mockOnViewDetail} onRename={mockOnRename} onDelete={mockOnDelete} />
       );
 
       const deleteButton = screen.getByRole('button', { name: /delete/i });
@@ -159,13 +159,13 @@ describe('ActionButton', () => {
       };
 
       const handleViewDetail = vi.fn();
-      const handleEdit = vi.fn();
+      const handleRename = vi.fn();
       const handleDelete = vi.fn();
 
       renderWithProviders(
         <ActionContent
           onViewDetail={() => handleViewDetail(mockPresentationData)}
-          onEdit={() => handleEdit(mockPresentationData)}
+          onRename={() => handleRename(mockPresentationData)}
           onDelete={() => handleDelete(mockPresentationData)}
         />
       );
@@ -176,11 +176,11 @@ describe('ActionButton', () => {
 
       expect(handleViewDetail).toHaveBeenCalledWith(mockPresentationData);
 
-      // Test edit flow
-      const editButton = screen.getByRole('button', { name: /edit/i });
-      fireEvent.click(editButton);
+      // Test rename flow
+      const renameButton = screen.getByRole('button', { name: /rename/i });
+      fireEvent.click(renameButton);
 
-      expect(handleEdit).toHaveBeenCalledWith(mockPresentationData);
+      expect(handleRename).toHaveBeenCalledWith(mockPresentationData);
 
       // Test delete flow
       const deleteButton = screen.getByRole('button', { name: /delete/i });
@@ -191,7 +191,7 @@ describe('ActionButton', () => {
 
     it('shows appropriate hover states', () => {
       renderWithProviders(
-        <ActionButton onViewDetail={mockOnViewDetail} onEdit={mockOnEdit} onDelete={mockOnDelete} />
+        <ActionButton onViewDetail={mockOnViewDetail} onRename={mockOnRename} onDelete={mockOnDelete} />
       );
 
       const triggerIcon = document.querySelector('.lucide-ellipsis-vertical');

@@ -74,6 +74,7 @@ export interface PresentationApiService extends Service {
   generatePresentation(request: PresentationGenerationRequest): Promise<PresentationGenerationResponse>;
   updatePresentationTitle(id: string, name: string): Promise<any | null>;
   updatePresentation(id: string, data: UpdatePresentationRequest): Promise<Presentation>;
+  deletePresentation(id: string): Promise<void>;
   getStreamedPresentation(
     request: PresentationGenerationRequest,
     signal: AbortSignal

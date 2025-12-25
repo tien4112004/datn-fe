@@ -11,9 +11,10 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import DataTable from '@/components/table/DataTable';
 import { SearchBar } from '@/shared/components/common/SearchBar';
-import { useMindmaps, useUpdateMindmapTitle } from '@/features/mindmap/hooks';
+import { useMindmaps, useUpdateMindmapTitle, useDeleteMindmap } from '@/features/mindmap/hooks';
 import type { Mindmap } from '@/features/mindmap/types';
 import { RenameFileDialog } from '@/shared/components/modals/RenameFileDialog';
+import { DeleteConfirmationDialog } from '@/shared/components/modals/DeleteConfirmationDialog';
 import { toast } from 'sonner';
 import { ActionContent } from '@/features/presentation/components';
 import { format } from 'date-fns';
@@ -26,6 +27,7 @@ const MindmapTable = () => {
   const navigate = useNavigate();
 
   const [isRenameOpen, setIsRenameOpen] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [selectedMindmap, setSelectedMindmap] = useState<Mindmap | null>(null);
 
   // Use the new hook
@@ -33,16 +35,10 @@ const MindmapTable = () => {
     useMindmaps();
 
   const updateMindmapTitleMutation = useUpdateMindmapTitle();
+  const deleteMindmapMutation = useDeleteMindmap();
 
   const columns = useMemo(
     () => [
-      columnHelper.accessor('id', {
-        header: t('mindmap.id'),
-        size: 90,
-        cell: (info) => info.getValue(),
-        enableResizing: true,
-        enableSorting: false,
-      }),
       columnHelper.accessor('thumbnail', {
         header: t('mindmap.thumbnail'),
         size: 176,
@@ -145,6 +141,30 @@ const MindmapTable = () => {
     }
   };
 
+  const handleDelete = (mindmap: Mindmap) => {
+    setSelectedMindmap(mindmap);
+    setIsDeleteOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!selectedMindmap) return;
+
+    try {
+      await deleteMindmapMutation.mutateAsync(selectedMindmap.id);
+      toast.success(t('mindmap.deleteSuccess', { name: selectedMindmap.title }));
+      setIsDeleteOpen(false);
+      setSelectedMindmap(null);
+    } catch (error) {
+      toast.error(t('mindmap.deleteError'));
+      console.error('Failed to delete mindmap:', error);
+    }
+  };
+
+  const handleCancelDelete = () => {
+    setIsDeleteOpen(false);
+    setSelectedMindmap(null);
+  };
+
   return (
     <div className="w-full space-y-4">
       <SearchBar
@@ -163,11 +183,8 @@ const MindmapTable = () => {
             onViewDetail={() => {
               navigate(`/mindmap/${row.original.id}`);
             }}
-            onEdit={() => {
-              console.log('Edit', row.original);
-            }}
             onDelete={() => {
-              console.log('Delete', row.original);
+              handleDelete(row.original);
             }}
             onRename={() => {
               setSelectedMindmap(row.original);
@@ -190,6 +207,15 @@ const MindmapTable = () => {
         placeholder={t('mindmap.title')}
         isLoading={updateMindmapTitleMutation.isPending}
         onRename={handleRename}
+      />
+      <DeleteConfirmationDialog
+        open={isDeleteOpen}
+        onOpenChange={setIsDeleteOpen}
+        itemName={selectedMindmap?.title || ''}
+        itemType="mindmap"
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+        isDeleting={deleteMindmapMutation.isPending}
       />
     </div>
   );

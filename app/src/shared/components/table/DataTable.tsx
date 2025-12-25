@@ -33,8 +33,8 @@ function DataTable<TData>({
   const headers = table.getFlatHeaders();
 
   useLayoutEffect(() => {
-    if (tableContainerRef.current) {
-      const initialColumnSizing = calculateTableSizing(headers, tableContainerRef.current?.clientWidth);
+    if (tableContainerRef.current && tableContainerRef.current.clientWidth > 0) {
+      const initialColumnSizing = calculateTableSizing(headers, tableContainerRef.current.clientWidth);
       table.setColumnSizing(initialColumnSizing);
     }
   }, [headers, windowDimensions.width, table]);
@@ -65,6 +65,8 @@ function DataTable<TData>({
                     sortable={header.column.getCanSort()}
                     style={{
                       width: header.column.getSize(),
+                      maxWidth: header.column.getSize(),
+                      minWidth: header.column.getSize(),
                     }}
                   >
                     {header.isPlaceholder
@@ -95,6 +97,7 @@ function DataTable<TData>({
                   style={{
                     width: cell.column.getSize(),
                     maxWidth: cell.column.getSize(),
+                    minWidth: cell.column.getSize(),
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                     whiteSpace: 'nowrap',

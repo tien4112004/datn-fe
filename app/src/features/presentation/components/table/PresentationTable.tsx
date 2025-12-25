@@ -21,12 +21,15 @@ const PresentationTable = () => {
   const columns = useMemo(
     () => [
       columnHelper.display({
+        id: 'thumbnail',
         header: t('presentation.thumbnail'),
         cell: (info) => {
           const presentation = info.row.original;
           return <ThumbnailWrapperV2 presentation={presentation} size={'auto'} visible={true} />;
         },
-        size: 160,
+        size: 180,
+        minSize: 180,
+        maxSize: 180,
         enableResizing: false,
         enableSorting: false,
       }),
@@ -43,17 +46,27 @@ const PresentationTable = () => {
         header: t('presentation.createdAt'),
         cell: (info) =>
           info.getValue() ? format(info.getValue() as Date, 'E, P', { locale: getLocaleDateFns() }) : '',
-        size: 280,
+        size: 200,
       }),
       columnHelper.accessor('updatedAt', {
         header: t('presentation.updatedAt'),
         cell: (info) =>
           info.getValue() ? format(info.getValue() as Date, 'E, P', { locale: getLocaleDateFns() }) : '',
-        size: 280,
+        size: 200,
         enableSorting: false,
       }),
     ],
     [t]
+  );
+
+  const initialColumnSizing = useMemo(
+    () => ({
+      thumbnail: 180,
+      title: 400,
+      createdAt: 200,
+      updatedAt: 200,
+    }),
+    []
   );
 
   const {
@@ -89,6 +102,13 @@ const PresentationTable = () => {
     enableColumnResizing: true,
     columnResizeMode: 'onChange',
     columnResizeDirection: 'ltr',
+    defaultColumn: {
+      minSize: 40,
+      maxSize: Number.MAX_SAFE_INTEGER,
+    },
+    initialState: {
+      columnSizing: initialColumnSizing,
+    },
     state: {
       sorting,
       pagination,

@@ -9,11 +9,16 @@ import path from 'path';
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
 
-  // Use a placeholder URL for build time - actual URL is loaded at runtime
+  // Configure URLs with production fallbacks
+  const apiUrl =
+    env.NODE_ENV === 'production'
+      ? 'https://api.huy-devops.site'
+      : env.VITE_API_URL || 'http://localhost:3000';
+
   const presentationUrl =
     env.NODE_ENV === 'production'
-      ? 'https://presentation.huy-devops.site' // replace with actual production URL
-      : process.env.PRESENTATION_URL || env.PRESENTATION_URL || 'http://localhost:5174'; // fallback for local development
+      ? 'https://presentation.huy-devops.site'
+      : env.VITE_PRESENTATION_URL || 'http://localhost:5174';
 
   return {
     plugins: [
@@ -71,7 +76,7 @@ export default defineConfig(({ mode }) => {
       allowedHosts: ['*'],
     },
     define: {
-      'import.meta.env.VITE_API_URL': JSON.stringify(env.VITE_API_URL),
+      'import.meta.env.VITE_API_URL': JSON.stringify(apiUrl),
     },
   };
 });

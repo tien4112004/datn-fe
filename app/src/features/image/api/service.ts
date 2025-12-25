@@ -23,9 +23,9 @@ export default class ImageRealApiService implements ImageApiService {
   }
 
   async generateImage(request: ImageGenerationRequest): Promise<ImageGenerationResponse> {
-    const isMock = request.model.name === 'mock';
+    const isMock = request.model === 'mock';
     const endpoint = isMock
-      ? `${this.baseUrl}/api/images/generate/mock`
+      ? `${this.baseUrl}/api/image/generate/mock`
       : `${this.baseUrl}/api/images/generate`;
 
     const response = await api.post<ApiResponse<ImageGenerationResponse>>(endpoint, request);
@@ -64,17 +64,17 @@ export default class ImageRealApiService implements ImageApiService {
     elementId: string,
     request: ImageGenerationRequest
   ): Promise<ImageGenerationResponse> {
-    const isMock = request.model.name === 'mock';
+    const isMock = request.model === 'mock';
     const endpoint = isMock
-      ? `${this.baseUrl}/api/images/generate-in-presentation/mock`
+      ? `${this.baseUrl}/api/image/generate-in-presentation/mock`
       : `${this.baseUrl}/api/images/generate-in-presentation`;
 
     const res = await api.post<ApiResponse<{ cdnUrls: string[] }>>(
       endpoint,
       {
         prompt: request.prompt,
-        model: request.model.name,
-        provider: request.model.provider.toLowerCase(),
+        model: request.model,
+        provider: request.provider.toLowerCase(),
         themeStyle: request.themeStyle,
         themeDescription: request.themeDescription,
         artStyle: request.artStyle,

@@ -362,6 +362,26 @@ pipeline {
                         # Remove unused volumes
                         docker volume prune -f || true
                         
+                        # Remove old images for this repository except 'latest' and current commit tags
+                        echo "Removing old images for ${IMAGE_NAME} (keeping latest and current commit)..."
+                        COMMIT_SHA=$(git rev-parse --short HEAD) || true
+                        docker images ${IMAGE_NAME} --format '{{.Repository}}:{{.Tag}} {{.ID}}' | while read -r line; do
+                            IMG_TAG=$(echo "$line" | awk '{print $1}' | sed "s|${IMAGE_NAME}:||")
+                            IMG_ID=$(echo "$line" | awk '{print $2}')
+                            if [ -z "$IMG_TAG" ]; then
+                                continue
+                            fi
+                            case "$IMG_TAG" in
+                                app-latest|presentation-latest|admin-latest|app-${COMMIT_SHA}|presentation-${COMMIT_SHA}|admin-${COMMIT_SHA})
+                                    echo "Keeping ${IMAGE_NAME}:$IMG_TAG"
+                                    ;;
+                                *)
+                                    echo "Removing ${IMAGE_NAME}:$IMG_TAG (ID: $IMG_ID)"
+                                    docker rmi -f ${IMAGE_NAME}:$IMG_TAG || true
+                                    ;;
+                            esac
+                        done || true
+                        
                         # Show disk usage
                         docker system df
                     '''

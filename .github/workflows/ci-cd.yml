@@ -201,18 +201,18 @@ jobs:
             - name: Set Environment Variables and Build
               id: deploy_vercel
               run: |
-                  # Determine PRESENTATION_URL with fallback
+                  # Determine VITE_PRESENTATION_URL with fallback
                   if [ "${{ needs.deploy_presentation.result }}" = "success" ] && [ -n "${{ needs.deploy_presentation.outputs.preview_url }}" ]; then
-                    PRESENTATION_URL="${{ needs.deploy_presentation.outputs.preview_url }}"
+                    VITE_PRESENTATION_URL="${{ needs.deploy_presentation.outputs.preview_url }}"
                   else
-                    PRESENTATION_URL="${{ env.PRODUCTION_PRESENTATION_URL }}"
+                    VITE_PRESENTATION_URL="${{ env.PRODUCTION_PRESENTATION_URL }}"
                   fi
 
-                  echo "Using PRESENTATION_URL: $PRESENTATION_URL"
+                  echo "Using VITE_PRESENTATION_URL: $VITE_PRESENTATION_URL"
 
                   # Set environment variable for this branch
-                  vercel env rm PRESENTATION_URL preview ${{ github.head_ref }} --yes --token=${{ secrets.VERCEL_TOKEN }} || true
-                  echo "$PRESENTATION_URL" | vercel env add PRESENTATION_URL preview ${{ github.head_ref }} --token=${{ secrets.VERCEL_TOKEN }}
+                  vercel env rm VITE_PRESENTATION_URL preview ${{ github.head_ref }} --yes --token=${{ secrets.VERCEL_TOKEN }} || true
+                  echo "$VITE_PRESENTATION_URL" | vercel env add VITE_PRESENTATION_URL preview ${{ github.head_ref }} --token=${{ secrets.VERCEL_TOKEN }}
 
                   # Generate vercel.json with the correct destination
                   cat <<EOF > app/vercel.json
@@ -220,7 +220,7 @@ jobs:
                     "rewrites": [
                         {
                             "source": "/vue-remote",
-                            "destination": "$PRESENTATION_URL"
+                            "destination": "$VITE_PRESENTATION_URL"
                         },
                         {
                             "source": "/((?!api/).*)",
@@ -233,10 +233,10 @@ jobs:
                   cat app/vercel.json
 
                   # Build with the environment variable
-                  PRESENTATION_URL="$PRESENTATION_URL" vercel build --token=${{ secrets.VERCEL_TOKEN }}
+                  VITE_PRESENTATION_URL="$VITE_PRESENTATION_URL" vercel build --token=${{ secrets.VERCEL_TOKEN }}
 
                   # Deploy the project
-                  DEPLOY_OUTPUT=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }} --env PRESENTATION_URL="$PRESENTATION_URL")
+                  DEPLOY_OUTPUT=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }} --env VITE_PRESENTATION_URL="$VITE_PRESENTATION_URL")
                   echo "$DEPLOY_OUTPUT"
                   PREVIEW_URL=$(echo "$DEPLOY_OUTPUT" | grep -oE "https://[a-zA-Z0-9.-]+\.vercel\.app" | tail -n 1)
                   echo "preview_url=$PREVIEW_URL" >> "$GITHUB_OUTPUT"

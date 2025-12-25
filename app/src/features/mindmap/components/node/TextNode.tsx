@@ -11,12 +11,12 @@ import { Network } from 'lucide-react';
 import { BaseNodeControl } from '../controls/BaseNodeControl';
 import { NodeRichTextContent } from '../ui/node-rich-text-content';
 import { getTreeLayoutType } from '../../services/utils';
-import { useReadOnlyContext } from '../../contexts/ReadOnlyContext';
+import { usePresenterContext } from '../../contexts/ReadOnlyContext';
 
 const TextNodeBlock = memo(
   ({ ...node }: NodeProps<TextNode>) => {
     const { data, selected: isSelected, dragging, width, height } = node;
-    const { isReadOnly } = useReadOnlyContext();
+    const { isPresenterMode } = usePresenterContext();
 
     const nodes = useCoreStore((state) => state.nodes);
     const isLayouting = useLayoutStore((state) => state.isLayouting);
@@ -59,7 +59,7 @@ const TextNodeBlock = memo(
             isLayouting={isLayouting}
             onContentChange={handleContentChange}
             minimalToolbar={true}
-            isReadOnly={isReadOnly}
+            isPresenterMode={isPresenterMode}
             style={{
               width: width ? `${width - 40}px` : undefined,
               height: height ? `${height - 16}px` : undefined,
@@ -69,7 +69,7 @@ const TextNodeBlock = memo(
           />
         </BaseNodeContent>
 
-        {!isReadOnly && (
+        {!isPresenterMode && (
           <BaseNodeControl
             layoutType={layoutType}
             selected={isSelected}

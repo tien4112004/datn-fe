@@ -21,7 +21,7 @@ import { memo, useCallback, useEffect, useMemo } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { BaseHandle } from '../ui/base-handle';
 import { getTreeLayoutType } from '@/features/mindmap/services/utils';
-import { useReadOnlyContext } from '../../contexts/ReadOnlyContext';
+import { usePresenterContext } from '../../contexts/ReadOnlyContext';
 
 interface ChildNodeControlsProps {
   node: NodeProps<MindMapNode>;
@@ -49,7 +49,7 @@ const layoutStoreSelector = (state: LayoutState) => ({
 const mouseOverSelector = (state: ClipboardState) => state.mouseOverNodeId;
 
 export const ChildNodeControls = ({ node, selected }: ChildNodeControlsProps) => {
-  const { isReadOnly } = useReadOnlyContext();
+  const { isPresenterMode } = usePresenterContext();
   const { collapse, expand } = useNodeManipulationStore(useShallow(nodeManipulationSelector));
   const { hasLeftChildren, hasRightChildren, nodes } = useCoreStore(useShallow(coreStoreSelector));
   const addChildNodeStore = useNodeOperationsStore(nodeOperationsSelector);
@@ -167,7 +167,7 @@ export const ChildNodeControls = ({ node, selected }: ChildNodeControlsProps) =>
               : 'invisible opacity-0'
           )}
         >
-          {!isReadOnly && (
+          {!isPresenterMode && (
             <Button
               variant="secondary"
               className={cn('cursor-pointer rounded-full transition-all duration-200')}
@@ -237,7 +237,7 @@ export const ChildNodeControls = ({ node, selected }: ChildNodeControlsProps) =>
               <Minus />
             </Button>
           </motion.div>
-          {!isReadOnly && (
+          {!isPresenterMode && (
             <Button
               variant="secondary"
               className={cn('cursor-pointer rounded-full transition-all duration-200')}
@@ -262,7 +262,7 @@ export const ChildNodeControls = ({ node, selected }: ChildNodeControlsProps) =>
               : 'invisible opacity-0'
           )}
         >
-          {!isReadOnly && (
+          {!isPresenterMode && (
             <Button
               variant="secondary"
               className={cn('cursor-pointer rounded-full transition-all duration-200')}
@@ -332,7 +332,7 @@ export const ChildNodeControls = ({ node, selected }: ChildNodeControlsProps) =>
               <Minus />
             </Button>
           </motion.div>
-          {!isReadOnly && (
+          {!isPresenterMode && (
             <Button
               variant="secondary"
               className={cn('cursor-pointer rounded-full transition-all duration-200')}

@@ -5,20 +5,20 @@ import { useResponsiveBreakpoint } from '@/shared/hooks';
 
 interface MindmapControlsProps {
   isPanOnDrag: boolean;
-  isReadOnly: boolean;
+  isPresenterMode: boolean;
   isFullscreen: boolean;
   onTogglePanOnDrag: () => void;
   onToggleFullscreen: () => void;
-  onToggleReadOnly: () => void;
+  onTogglePresenterMode: () => void;
 }
 
 const MindmapControls = ({
   isPanOnDrag,
-  isReadOnly,
+  isPresenterMode,
   isFullscreen,
   onTogglePanOnDrag,
   onToggleFullscreen,
-  onToggleReadOnly,
+  onTogglePresenterMode,
 }: MindmapControlsProps) => {
   const { zoomIn, zoomOut, fitView } = useReactFlow();
   const { isMobile } = useResponsiveBreakpoint();
@@ -28,7 +28,7 @@ const MindmapControls = ({
 
   return (
     <CustomControls>
-      {!isReadOnly && (
+      {!isPresenterMode && (
         <CustomControlButton
           onClick={onTogglePanOnDrag}
           title={isPanOnDrag ? 'Switch to Selection Mode' : 'Switch to Pan Mode'}
@@ -52,10 +52,10 @@ const MindmapControls = ({
         {isFullscreen ? <Minimize2 size={iconSize} /> : <Maximize2 size={iconSize} />}
       </CustomControlButton>
       <CustomControlButton
-        onClick={onToggleReadOnly}
-        title={isReadOnly ? 'Disable Read-Only Mode' : 'Enable Read-Only Mode'}
+        onClick={onTogglePresenterMode}
+        title={isPresenterMode ? 'Disable Presenter Mode' : 'Enable Presenter Mode'}
       >
-        {isReadOnly ? <Edit size={iconSize} /> : <Eye size={iconSize} />}
+        {isPresenterMode ? <Edit size={iconSize} /> : <Eye size={iconSize} />}
       </CustomControlButton>
     </CustomControls>
   );

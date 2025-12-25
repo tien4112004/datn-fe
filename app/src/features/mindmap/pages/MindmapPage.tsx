@@ -12,13 +12,13 @@ import {
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { useLoaderData, useNavigate } from 'react-router-dom';
-import { useCoreStore, useReadOnlyStore } from '../stores';
+import { useCoreStore, usePresenterModeStore } from '../stores';
 import { useMindmapDirtyTracking } from '../hooks/useDirtyTracking';
 import { useFullscreen } from '../hooks/useFullscreen';
-import { useReadOnlyMode } from '../hooks/useReadOnlyMode';
+import { usePresenterMode } from '../hooks/usePresenterMode';
 import { useUnsavedChangesBlocker, useResponsiveBreakpoint } from '@/shared/hooks';
 import { useSidebar } from '@/shared/components/ui/sidebar';
-import { ReadOnlyProvider } from '../contexts/ReadOnlyContext';
+import { PresenterProvider } from '../contexts/ReadOnlyContext';
 import { UnsavedChangesDialog } from '@/shared/components/modals/UnsavedChangesDialog';
 import { SmallScreenDialog } from '@/shared/components/modals/SmallScreenDialog';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/shared/components/ui/sheet';
@@ -69,9 +69,7 @@ const MindmapPage = () => {
   const navigate = useNavigate();
 
   const [isPanOnDrag, setIsPanOnDrag] = useState(false);
-  // Toolbar should be closed by default on mobile, open on desktop
   const [isToolbarVisible, setIsToolbarVisible] = useState(isDesktop);
-  // Controls should be collapsed by default on mobile for cleaner UX
   const [isControlsExpanded, setIsControlsExpanded] = useState(false);
 
   // Track dirty state changes
@@ -81,9 +79,9 @@ const MindmapPage = () => {
   const { isFullscreen, toggleFullscreen: toggleFullscreenMode } = useFullscreen();
   const { setFullscreen } = useSidebar();
 
-  // Read-only mode functionality
-  const { isReadOnly, toggleReadOnly } = useReadOnlyMode();
-  const setReadOnlyStore = useReadOnlyStore((state) => state.setReadOnly);
+  // Presenter mode functionality
+  const { isPresenterMode, togglePresenterMode } = usePresenterMode();
+  const setPresenterModeStore = usePresenterModeStore((state) => state.setPresenterMode);
 
   // Handle unsaved changes blocking
   const { showDialog, setShowDialog, handleStay, handleProceed } = useUnsavedChangesBlocker({
@@ -95,10 +93,10 @@ const MindmapPage = () => {
     setFullscreen(isFullscreen);
   }, [isFullscreen, setFullscreen]);
 
-  // Sync read-only state to store for use in zustand stores
+  // Sync presenter mode state to store for use in zustand stores
   useEffect(() => {
-    setReadOnlyStore(isReadOnly);
-  }, [isReadOnly, setReadOnlyStore]);
+    setPresenterModeStore(isPresenterMode);
+  }, [isPresenterMode, setPresenterModeStore]);
 
   // Sync mindmap data from React Router loader to stores
   useEffect(() => {
@@ -118,35 +116,46 @@ const MindmapPage = () => {
   return (
     <>
       <ReactFlowProvider>
-        <ReadOnlyProvider isReadOnly={isReadOnly}>
+        <PresenterProvider isPresenterMode={isPresenterMode}>
           <div className="flex h-screen w-full" style={{ backgroundColor: 'var(--background)' }}>
-            <Flow isPanOnDrag={isPanOnDrag} isReadOnly={isReadOnly}>
-              {/* Controls wrapper - always visible on desktop, toggleable on mobile */}
-              <div className="fixed bottom-4 left-4 z-10 flex flex-col items-start">
-                {/* Controls container with animation - expands upward */}
-                <div
-                  className={`origin-bottom transition-all duration-300 ease-in-out ${
-                    isDesktop
-                      ? 'scale-y-100 opacity-100'
-                      : isControlsExpanded
+            <Flow isPanOnDrag={isPanOnDrag} isPresenterMode={isPresenterMode}>
+              {/* Controls - always visible on desktop, toggleable on mobile */}
+              {isDesktop ? (
+                // Desktop: Always visible controls
+                <div className="fixed bottom-4 left-4 z-10">
+                  <MindmapControls
+                    isPanOnDrag={isPanOnDrag}
+                    isPresenterMode={isPresenterMode}
+                    isFullscreen={isFullscreen}
+                    onTogglePanOnDrag={togglePanOnDrag}
+                    onToggleFullscreen={toggleFullscreenMode}
+                    onTogglePresenterMode={togglePresenterMode}
+                  />
+                </div>
+              ) : (
+                // Mobile: Expandable controls with toggle button
+                <div className="fixed bottom-4 left-4 z-10 flex flex-col items-start">
+                  {/* Controls container with animation - expands upward */}
+                  <div
+                    className={`origin-bottom transition-all duration-300 ease-in-out ${
+                      isControlsExpanded
                         ? 'scale-y-100 opacity-100'
                         : 'pointer-events-none scale-y-0 opacity-0'
-                  }`}
-                >
-                  <div className="mb-2">
-                    <MindmapControls
-                      isPanOnDrag={isPanOnDrag}
-                      isReadOnly={isReadOnly}
-                      isFullscreen={isFullscreen}
-                      onTogglePanOnDrag={togglePanOnDrag}
-                      onToggleFullscreen={toggleFullscreenMode}
-                      onToggleReadOnly={toggleReadOnly}
-                    />
+                    }`}
+                  >
+                    <div className="mb-2">
+                      <MindmapControls
+                        isPanOnDrag={isPanOnDrag}
+                        isPresenterMode={isPresenterMode}
+                        isFullscreen={isFullscreen}
+                        onTogglePanOnDrag={togglePanOnDrag}
+                        onToggleFullscreen={toggleFullscreenMode}
+                        onTogglePresenterMode={togglePresenterMode}
+                      />
+                    </div>
                   </div>
-                </div>
 
-                {/* Mobile controls toggle button - always at the bottom */}
-                {!isDesktop && (
+                  {/* Toggle button - always at the bottom */}
                   <Button
                     onClick={() => setIsControlsExpanded(!isControlsExpanded)}
                     variant="outline"
@@ -156,10 +165,10 @@ const MindmapPage = () => {
                   >
                     {isControlsExpanded ? <X size={18} /> : <Sliders size={18} />}
                   </Button>
-                )}
-              </div>
+                </div>
+              )}
 
-              {!isReadOnly && (
+              {!isPresenterMode && (
                 <div className="fixed right-4 top-4 z-10 flex gap-2">
                   <Button
                     onClick={() => setIsToolbarVisible(!isToolbarVisible)}
@@ -173,7 +182,7 @@ const MindmapPage = () => {
                 </div>
               )}
 
-              {!isReadOnly && (
+              {!isPresenterMode && (
                 <MiniMap
                   className="!border-border !mb-4 !mr-4 hidden !bg-white/90 lg:block"
                   style={{
@@ -203,13 +212,13 @@ const MindmapPage = () => {
                 mindmapId={mindmap.id}
                 initialTitle={mindmap.title}
                 hasBackButton={isDesktop}
-                isReadOnly={isReadOnly}
+                isPresenterMode={isPresenterMode}
               />
 
               <Background variant={BackgroundVariant.Dots} gap={20} size={1} />
-              <LogicHandler mindmapId={mindmap.id} isReadOnly={isReadOnly} />
+              <LogicHandler mindmapId={mindmap.id} isPresenterMode={isPresenterMode} />
             </Flow>
-            {!isReadOnly &&
+            {!isPresenterMode &&
               isToolbarVisible &&
               (isDesktop ? (
                 <Toolbar mindmapId={mindmap.id} />
@@ -226,7 +235,7 @@ const MindmapPage = () => {
                 </Sheet>
               ))}
           </div>
-        </ReadOnlyProvider>
+        </PresenterProvider>
       </ReactFlowProvider>
       <UnsavedChangesDialog
         open={showDialog}

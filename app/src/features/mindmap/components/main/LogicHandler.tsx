@@ -5,10 +5,10 @@ import { useSaveMindmap } from '../../hooks/useSaving';
 
 interface LogicHandlerProps {
   mindmapId: string;
-  isReadOnly?: boolean;
+  isPresenterMode?: boolean;
 }
 
-const LogicHandler = memo(({ mindmapId, isReadOnly = false }: LogicHandlerProps) => {
+const LogicHandler = memo(({ mindmapId, isPresenterMode = false }: LogicHandlerProps) => {
   const { selectAllHandler, copyHandler, pasteHandler, deleteHandler, deselectAllHandler } =
     useMindmapActions();
 
@@ -26,7 +26,7 @@ const LogicHandler = memo(({ mindmapId, isReadOnly = false }: LogicHandlerProps)
       {
         shortcutKey: 'Ctrl+A',
         onKeyPressed: selectAllHandler,
-        disabled: isReadOnly,
+        disabled: isPresenterMode,
         shouldExecute: () => {
           const activeElement = document.activeElement as HTMLElement;
 
@@ -40,7 +40,7 @@ const LogicHandler = memo(({ mindmapId, isReadOnly = false }: LogicHandlerProps)
       {
         shortcutKey: 'Ctrl+C',
         onKeyPressed: copyHandler,
-        disabled: isReadOnly,
+        disabled: isPresenterMode,
         shouldExecute: () => {
           const activeElement = document.activeElement as HTMLElement;
           return (
@@ -53,12 +53,12 @@ const LogicHandler = memo(({ mindmapId, isReadOnly = false }: LogicHandlerProps)
       {
         shortcutKey: 'Ctrl+V',
         onKeyPressed: pasteHandler,
-        disabled: isReadOnly,
+        disabled: isPresenterMode,
       },
       {
         shortcutKey: 'Delete',
         onKeyPressed: deleteHandler,
-        disabled: isReadOnly,
+        disabled: isPresenterMode,
       },
       {
         shortcutKey: 'Escape',
@@ -68,22 +68,22 @@ const LogicHandler = memo(({ mindmapId, isReadOnly = false }: LogicHandlerProps)
       {
         shortcutKey: 'Ctrl+Z',
         onKeyPressed: undo,
-        disabled: isReadOnly,
+        disabled: isPresenterMode,
       },
       {
         shortcutKey: 'Ctrl+Y',
         onKeyPressed: redo,
-        disabled: isReadOnly,
+        disabled: isPresenterMode,
       },
       {
         shortcutKey: 'Ctrl+Shift+Z',
         onKeyPressed: redo,
-        disabled: isReadOnly,
+        disabled: isPresenterMode,
       },
       {
         shortcutKey: 'Ctrl+S',
         onKeyPressed: handleSave,
-        disabled: isReadOnly, // Disable save in read-only mode
+        disabled: isPresenterMode, // Disable save in presenter mode
         shouldExecute: () => {
           const activeElement = document.activeElement as HTMLElement;
           return (
@@ -103,7 +103,7 @@ const LogicHandler = memo(({ mindmapId, isReadOnly = false }: LogicHandlerProps)
       undo,
       redo,
       handleSave,
-      isReadOnly,
+      isPresenterMode,
     ]
   );
 

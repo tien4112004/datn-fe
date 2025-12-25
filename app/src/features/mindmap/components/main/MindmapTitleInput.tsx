@@ -12,14 +12,14 @@ interface MindmapTitleInputProps {
   mindmapId: string;
   initialTitle: string;
   hasBackButton?: boolean;
-  isReadOnly?: boolean;
+  isPresenterMode?: boolean;
 }
 
 const MindmapTitleInput = ({
   mindmapId,
   initialTitle,
   hasBackButton = false,
-  isReadOnly = false,
+  isPresenterMode = false,
 }: MindmapTitleInputProps) => {
   const { t } = useTranslation(I18N_NAMESPACES.MINDMAP);
   const [title, setTitle] = useState(initialTitle);
@@ -43,8 +43,8 @@ const MindmapTitleInput = ({
   }, [isEditing]);
 
   const handleSave = useCallback(async () => {
-    // Prevent save in read-only mode
-    if (isReadOnly) {
+    // Prevent save in presenter mode
+    if (isPresenterMode) {
       setIsEditing(false);
       return;
     }
@@ -76,7 +76,7 @@ const MindmapTitleInput = ({
       setTitle(originalTitle);
       setIsEditing(false);
     }
-  }, [title, originalTitle, mindmapId, updateMindmapTitle, t, isReadOnly]);
+  }, [title, originalTitle, mindmapId, updateMindmapTitle, t, isPresenterMode]);
 
   const handleCancel = useCallback(() => {
     setTitle(originalTitle);
@@ -154,7 +154,7 @@ const MindmapTitleInput = ({
         ) : (
           <>
             <span className="max-w-32 truncate text-sm font-medium text-gray-800 sm:max-w-48">{title}</span>
-            {!isReadOnly && (
+            {!isPresenterMode && (
               <Button
                 variant="ghost"
                 size="icon"

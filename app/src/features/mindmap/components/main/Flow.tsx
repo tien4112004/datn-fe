@@ -38,11 +38,11 @@ const Flow = memo(
   ({
     children,
     isPanOnDrag,
-    isReadOnly = false,
+    isPresenterMode = false,
   }: {
     children: ReactNode;
     isPanOnDrag: boolean;
-    isReadOnly?: boolean;
+    isPresenterMode?: boolean;
   }) => {
     const { nodes, edges, onNodesChange, onEdgesChange, onConnect } = useCoreStore(
       useShallow(handlersSelector)
@@ -87,8 +87,8 @@ const Flow = memo(
         selectionOnDrag={!isPanOnDrag}
         selectNodesOnDrag={false}
         selectionKeyCode={isPanOnDrag ? 'Shift' : null}
-        nodesDraggable={!isReadOnly}
-        nodesConnectable={!isReadOnly}
+        nodesDraggable={!isPresenterMode}
+        nodesConnectable={!isPresenterMode}
         fitViewOnInit={false}
       >
         {children}

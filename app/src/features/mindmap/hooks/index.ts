@@ -6,4 +6,4 @@ export * from './useActions';
 export * from './useReactFlowIntegration';
 export * from './useNodeSelection';
 export * from './useFullscreen';
-export * from './useReadOnlyMode';
+export * from './usePresenterMode';

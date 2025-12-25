@@ -401,6 +401,20 @@ export default class PresentationMockService implements PresentationApiService {
     });
   }
 
+  async deletePresentation(id: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        const index = mockPresentationItems.findIndex((item) => item.id === id);
+        if (index !== -1) {
+          mockPresentationItems.splice(index, 1);
+          resolve();
+        } else {
+          reject(new Error('Presentation not found'));
+        }
+      }, 500);
+    });
+  }
+
   getSlideThemes(params?: GetSlideThemesParams): Promise<SlideTheme[]> {
     return new Promise((resolve) => {
       setTimeout(() => {

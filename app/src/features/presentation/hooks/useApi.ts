@@ -442,3 +442,24 @@ export const useDraftPresentation = () => {
     },
   });
 };
+
+export const useDeletePresentation = () => {
+  const presentationApiService = usePresentationApiService();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      await presentationApiService.deletePresentation(id);
+      return id;
+    },
+    onSuccess: (deletedId) => {
+      queryClient.invalidateQueries({
+        queryKey: [presentationApiService.getType(), 'presentations'],
+      });
+
+      queryClient.removeQueries({
+        queryKey: [presentationApiService.getType(), 'presentation', deletedId],
+      });
+    },
+  });
+};

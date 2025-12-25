@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label';
 import { NumberInput } from '@/components/ui/number-input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import type { PPTElementOutline, PPTElementShadow, SlideTheme } from '@aiprimary/core';
+import type { Gradient, PPTElementOutline, PPTElementShadow, SlideTheme } from '@aiprimary/core';
 import { Plus, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import ThemeFormSide from './ThemeFormSide';
@@ -160,26 +160,205 @@ export function ThemeForm({ initialTheme, onSubmit, onCancel, isPending = false 
                 </div>
 
                 {/* Background Color */}
-                <div className="space-y-2">
-                  <Label htmlFor="backgroundColor" className="text-sm font-semibold">
-                    Background Color
-                  </Label>
-                  <div className="flex gap-2">
-                    <Input
-                      id="backgroundColor"
-                      type="color"
-                      value={
-                        typeof formData.backgroundColor === 'string' ? formData.backgroundColor : '#ffffff'
-                      }
-                      onChange={(e) => setFormData({ ...formData, backgroundColor: e.target.value })}
-                      className="h-9 w-16 p-1"
-                    />
-                    <Input
-                      value={typeof formData.backgroundColor === 'string' ? formData.backgroundColor : ''}
-                      onChange={(e) => setFormData({ ...formData, backgroundColor: e.target.value })}
-                      placeholder="#ffffff"
-                    />
+                <div className="bg-muted/30 space-y-3 rounded-lg p-4">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-sm font-semibold">Background</Label>
+                    <Select
+                      value={typeof formData.backgroundColor === 'string' ? 'solid' : 'gradient'}
+                      onValueChange={(value) => {
+                        if (value === 'solid') {
+                          const currentBg = formData.backgroundColor;
+                          const color =
+                            typeof currentBg === 'string'
+                              ? currentBg
+                              : currentBg?.colors?.[0]?.color || '#ffffff';
+                          setFormData({ ...formData, backgroundColor: color });
+                        } else {
+                          const currentColor =
+                            typeof formData.backgroundColor === 'string'
+                              ? formData.backgroundColor
+                              : '#ffffff';
+                          setFormData({
+                            ...formData,
+                            backgroundColor: {
+                              type: 'linear',
+                              colors: [
+                                { pos: 0, color: currentColor },
+                                { pos: 100, color: '#000000' },
+                              ],
+                              rotate: 0,
+                            } as Gradient,
+                          });
+                        }
+                      }}
+                    >
+                      <SelectTrigger className="w-32">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="solid">Solid</SelectItem>
+                        <SelectItem value="gradient">Gradient</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
+
+                  {typeof formData.backgroundColor === 'string' ? (
+                    <div className="flex gap-2">
+                      <Input
+                        id="backgroundColor"
+                        type="color"
+                        value={formData.backgroundColor}
+                        onChange={(e) => setFormData({ ...formData, backgroundColor: e.target.value })}
+                        className="h-9 w-16 p-1"
+                      />
+                      <Input
+                        value={formData.backgroundColor}
+                        onChange={(e) => setFormData({ ...formData, backgroundColor: e.target.value })}
+                        placeholder="#ffffff"
+                      />
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="space-y-2">
+                          <Label className="text-xs font-medium">Type</Label>
+                          <Select
+                            value={(formData.backgroundColor as Gradient).type}
+                            onValueChange={(value: 'linear' | 'radial') =>
+                              setFormData({
+                                ...formData,
+                                backgroundColor: {
+                                  ...(formData.backgroundColor as Gradient),
+                                  type: value,
+                                },
+                              })
+                            }
+                          >
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="linear">Linear</SelectItem>
+                              <SelectItem value="radial">Radial</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        {(formData.backgroundColor as Gradient).type === 'linear' && (
+                          <div className="space-y-2">
+                            <Label className="text-xs font-medium">Angle</Label>
+                            <NumberInput
+                              value={(formData.backgroundColor as Gradient).rotate}
+                              onValueChange={(v: number | undefined) =>
+                                setFormData({
+                                  ...formData,
+                                  backgroundColor: {
+                                    ...(formData.backgroundColor as Gradient),
+                                    rotate: v ?? 0,
+                                  },
+                                })
+                              }
+                              min={0}
+                              max={360}
+                              decimalScale={0}
+                            />
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <Label className="text-xs font-medium">Gradient Colors</Label>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              const gradient = formData.backgroundColor as Gradient;
+                              const colors = [...gradient.colors];
+                              const lastPos = colors[colors.length - 1]?.pos || 0;
+                              colors.push({ pos: Math.min(100, lastPos + 25), color: '#6366F1' });
+                              setFormData({
+                                ...formData,
+                                backgroundColor: { ...gradient, colors },
+                              });
+                            }}
+                          >
+                            <Plus className="mr-1 h-3 w-3" />
+                            Add
+                          </Button>
+                        </div>
+                        <div className="space-y-2">
+                          {((formData.backgroundColor as Gradient).colors || []).map((colorStop, index) => (
+                            <div key={index} className="bg-muted flex items-center gap-2 rounded-md p-2">
+                              <Input
+                                type="color"
+                                value={colorStop.color}
+                                onChange={(e) => {
+                                  const gradient = formData.backgroundColor as Gradient;
+                                  const colors = [...gradient.colors];
+                                  colors[index] = { ...colors[index], color: e.target.value };
+                                  setFormData({
+                                    ...formData,
+                                    backgroundColor: { ...gradient, colors },
+                                  });
+                                }}
+                                className="h-8 w-12 p-1"
+                              />
+                              <Input
+                                value={colorStop.color}
+                                onChange={(e) => {
+                                  const gradient = formData.backgroundColor as Gradient;
+                                  const colors = [...gradient.colors];
+                                  colors[index] = { ...colors[index], color: e.target.value };
+                                  setFormData({
+                                    ...formData,
+                                    backgroundColor: { ...gradient, colors },
+                                  });
+                                }}
+                                placeholder="#000000"
+                                className="flex-1"
+                              />
+                              <NumberInput
+                                value={colorStop.pos}
+                                onValueChange={(v: number | undefined) => {
+                                  const gradient = formData.backgroundColor as Gradient;
+                                  const colors = [...gradient.colors];
+                                  colors[index] = { ...colors[index], pos: v ?? 0 };
+                                  setFormData({
+                                    ...formData,
+                                    backgroundColor: { ...gradient, colors },
+                                  });
+                                }}
+                                min={0}
+                                max={100}
+                                className="w-20"
+                                decimalScale={0}
+                              />
+                              <span className="text-muted-foreground text-xs">%</span>
+                              {((formData.backgroundColor as Gradient).colors?.length || 0) > 2 && (
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-7 w-7 p-0"
+                                  onClick={() => {
+                                    const gradient = formData.backgroundColor as Gradient;
+                                    const colors = gradient.colors.filter((_, i) => i !== index);
+                                    setFormData({
+                                      ...formData,
+                                      backgroundColor: { ...gradient, colors },
+                                    });
+                                  }}
+                                >
+                                  <Trash2 className="h-3 w-3" />
+                                </Button>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Font Settings */}

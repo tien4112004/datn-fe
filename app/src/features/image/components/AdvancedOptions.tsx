@@ -139,13 +139,13 @@ const AdvancedOptions = ({ register, control, isOpen, onToggle }: AdvancedOption
                   render={({ field }) => (
                     <>
                       {isLoadingStyles ? (
-                        <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
+                        <div className="grid grid-cols-3 gap-3 lg:grid-cols-5">
                           {Array.from({ length: 5 }).map((_, idx) => (
                             <div key={idx} className="bg-muted h-32 animate-pulse rounded-lg" />
                           ))}
                         </div>
                       ) : (
-                        <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
+                        <div className="grid grid-cols-3 gap-3 lg:grid-cols-5">
                           {artStyles.map((style) => {
                             const styleValue = style.id || style.name;
                             const isSelected = field.value === styleValue;
@@ -159,7 +159,7 @@ const AdvancedOptions = ({ register, control, isOpen, onToggle }: AdvancedOption
                                 onClick={() => field.onChange(styleValue)}
                               >
                                 <div
-                                  className="h-24 w-full bg-cover bg-center"
+                                  className="h-36 w-full bg-cover bg-center"
                                   style={{
                                     background: `url(${style.visual}) center/cover no-repeat`,
                                   }}

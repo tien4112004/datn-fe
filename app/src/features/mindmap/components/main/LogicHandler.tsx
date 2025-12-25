@@ -83,7 +83,7 @@ const LogicHandler = memo(({ mindmapId, isReadOnly = false }: LogicHandlerProps)
       {
         shortcutKey: 'Ctrl+S',
         onKeyPressed: handleSave,
-        disabled: false,
+        disabled: isReadOnly, // Disable save in read-only mode
         shouldExecute: () => {
           const activeElement = document.activeElement as HTMLElement;
           return (

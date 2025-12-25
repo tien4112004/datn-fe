@@ -5,6 +5,7 @@ import { useUpdateMindmapWithMetadata } from './useApi';
 import { useCoreStore } from '../stores/core';
 import { useMetadataStore } from '../stores/metadata';
 import { useDirtyStore } from '../stores/dirty';
+import { useReadOnlyStore } from '../stores/readOnly';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
@@ -45,6 +46,14 @@ export const useSaveMindmap = () => {
   };
 
   const saveWithThumbnail = async (mindmapId: string) => {
+    // Prevent save in read-only/view mode
+    const isReadOnly = useReadOnlyStore.getState().isReadOnly;
+    if (isReadOnly) {
+      console.log('saveWithThumbnail: Skipping save in read-only mode');
+      toast.info('Cannot save in view mode');
+      return;
+    }
+
     try {
       setIsGeneratingThumbnail(true);
       // Generate thumbnail first

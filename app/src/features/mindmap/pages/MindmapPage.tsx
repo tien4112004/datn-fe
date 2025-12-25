@@ -1,29 +1,27 @@
 import { ReactFlowProvider } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import { Background, BackgroundVariant, Controls, MiniMap, ControlButton } from '@xyflow/react';
+import { Background, BackgroundVariant, MiniMap } from '@xyflow/react';
+import { PanelRight, PanelRightOpen, ArrowLeft, Sliders, X } from 'lucide-react';
 import {
-  Move,
-  MousePointer2,
-  Maximize2,
-  Minimize2,
-  PanelRight,
-  PanelRightOpen,
-  Eye,
-  Edit,
-} from 'lucide-react';
-import { DevTools } from '@/features/mindmap/components/ui/devtools';
-import { Flow, LogicHandler, Toolbar, MindmapTitleInput } from '@/features/mindmap/components';
+  Flow,
+  LogicHandler,
+  Toolbar,
+  MindmapTitleInput,
+  MindmapControls,
+} from '@/features/mindmap/components';
 import { useState, useEffect } from 'react';
-import { useLoaderData } from 'react-router-dom';
-import { useCoreStore } from '../stores';
+import { Button } from '@/components/ui/button';
+import { useLoaderData, useNavigate } from 'react-router-dom';
+import { useCoreStore, useReadOnlyStore } from '../stores';
 import { useMindmapDirtyTracking } from '../hooks/useDirtyTracking';
 import { useFullscreen } from '../hooks/useFullscreen';
 import { useReadOnlyMode } from '../hooks/useReadOnlyMode';
-import { useUnsavedChangesBlocker } from '@/shared/hooks';
+import { useUnsavedChangesBlocker, useResponsiveBreakpoint } from '@/shared/hooks';
 import { useSidebar } from '@/shared/components/ui/sidebar';
 import { ReadOnlyProvider } from '../contexts/ReadOnlyContext';
 import { UnsavedChangesDialog } from '@/shared/components/modals/UnsavedChangesDialog';
 import { SmallScreenDialog } from '@/shared/components/modals/SmallScreenDialog';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/shared/components/ui/sheet';
 import type { Mindmap, MindMapNode } from '../types';
 import { MINDMAP_TYPES } from '../types';
 
@@ -64,11 +62,17 @@ const migrateLayoutDataToRootNodes = (
 };
 
 const MindmapPage = () => {
-  const [isPanOnDrag, setIsPanOnDrag] = useState(false);
-  const [isToolbarVisible, setIsToolbarVisible] = useState(true);
   const { mindmap } = useLoaderData() as { mindmap: Mindmap };
   const setNodes = useCoreStore((state) => state.setNodes);
   const setEdges = useCoreStore((state) => state.setEdges);
+  const { isDesktop } = useResponsiveBreakpoint();
+  const navigate = useNavigate();
+
+  const [isPanOnDrag, setIsPanOnDrag] = useState(false);
+  // Toolbar should be closed by default on mobile, open on desktop
+  const [isToolbarVisible, setIsToolbarVisible] = useState(isDesktop);
+  // Controls should be collapsed by default on mobile for cleaner UX
+  const [isControlsExpanded, setIsControlsExpanded] = useState(false);
 
   // Track dirty state changes
   useMindmapDirtyTracking();
@@ -79,6 +83,7 @@ const MindmapPage = () => {
 
   // Read-only mode functionality
   const { isReadOnly, toggleReadOnly } = useReadOnlyMode();
+  const setReadOnlyStore = useReadOnlyStore((state) => state.setReadOnly);
 
   // Handle unsaved changes blocking
   const { showDialog, setShowDialog, handleStay, handleProceed } = useUnsavedChangesBlocker({
@@ -89,6 +94,11 @@ const MindmapPage = () => {
   useEffect(() => {
     setFullscreen(isFullscreen);
   }, [isFullscreen, setFullscreen]);
+
+  // Sync read-only state to store for use in zustand stores
+  useEffect(() => {
+    setReadOnlyStore(isReadOnly);
+  }, [isReadOnly, setReadOnlyStore]);
 
   // Sync mindmap data from React Router loader to stores
   useEffect(() => {
@@ -111,44 +121,61 @@ const MindmapPage = () => {
         <ReadOnlyProvider isReadOnly={isReadOnly}>
           <div className="flex h-screen w-full" style={{ backgroundColor: 'var(--background)' }}>
             <Flow isPanOnDrag={isPanOnDrag} isReadOnly={isReadOnly}>
-              <Controls>
-                {!isReadOnly && (
-                  <ControlButton
-                    onClick={togglePanOnDrag}
-                    title={isPanOnDrag ? 'Switch to Selection Mode' : 'Switch to Pan Mode'}
+              {/* Controls wrapper - always visible on desktop, toggleable on mobile */}
+              <div className="fixed bottom-4 left-4 z-10 flex flex-col items-start">
+                {/* Controls container with animation - expands upward */}
+                <div
+                  className={`origin-bottom transition-all duration-300 ease-in-out ${
+                    isDesktop
+                      ? 'scale-y-100 opacity-100'
+                      : isControlsExpanded
+                        ? 'scale-y-100 opacity-100'
+                        : 'pointer-events-none scale-y-0 opacity-0'
+                  }`}
+                >
+                  <div className="mb-2">
+                    <MindmapControls
+                      isPanOnDrag={isPanOnDrag}
+                      isReadOnly={isReadOnly}
+                      isFullscreen={isFullscreen}
+                      onTogglePanOnDrag={togglePanOnDrag}
+                      onToggleFullscreen={toggleFullscreenMode}
+                      onToggleReadOnly={toggleReadOnly}
+                    />
+                  </div>
+                </div>
+
+                {/* Mobile controls toggle button - always at the bottom */}
+                {!isDesktop && (
+                  <Button
+                    onClick={() => setIsControlsExpanded(!isControlsExpanded)}
+                    variant="outline"
+                    size="icon"
+                    className="touch-manipulation shadow-md"
+                    title={isControlsExpanded ? 'Hide Controls' : 'Show Controls'}
                   >
-                    {isPanOnDrag ? <MousePointer2 size={16} /> : <Move size={16} />}
-                  </ControlButton>
+                    {isControlsExpanded ? <X size={18} /> : <Sliders size={18} />}
+                  </Button>
                 )}
-                <ControlButton
-                  onClick={toggleFullscreenMode}
-                  title={isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}
-                >
-                  {isFullscreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
-                </ControlButton>
-                <ControlButton
-                  onClick={toggleReadOnly}
-                  title={isReadOnly ? 'Disable Read-Only Mode' : 'Enable Read-Only Mode'}
-                >
-                  {isReadOnly ? <Edit size={16} /> : <Eye size={16} />}
-                </ControlButton>
-              </Controls>
+              </div>
 
               {!isReadOnly && (
-                <div className="absolute right-4 top-4 z-10 flex gap-2">
-                  <button
+                <div className="fixed right-4 top-4 z-10 flex gap-2">
+                  <Button
                     onClick={() => setIsToolbarVisible(!isToolbarVisible)}
                     title={isToolbarVisible ? 'Hide Toolbar' : 'Show Toolbar'}
-                    className="rounded-md border border-gray-200 bg-white p-2 shadow-md transition-colors hover:bg-gray-50"
+                    variant="outline"
+                    size="icon"
+                    className="touch-manipulation shadow-md"
                   >
                     {isToolbarVisible ? <PanelRightOpen size={18} /> : <PanelRight size={18} />}
-                  </button>
+                  </Button>
                 </div>
               )}
 
               {!isReadOnly && (
                 <MiniMap
-                  className="!border-border !mb-4 !mr-4 !bg-white/90"
+                  className="!border-border !mb-4 !mr-4 hidden !bg-white/90 lg:block"
                   style={{
                     border: '1px solid var(--border)',
                     backgroundColor: 'var(--muted)',
@@ -160,13 +187,44 @@ const MindmapPage = () => {
                 />
               )}
 
-              {!isReadOnly && <MindmapTitleInput mindmapId={mindmap.id} initialTitle={mindmap.title} />}
+              {/* Back button for desktop */}
+              {isDesktop && (
+                <Button
+                  onClick={() => navigate(-1)}
+                  variant="outline"
+                  size="icon"
+                  className="fixed left-4 top-4 z-10 shadow-md"
+                  title="Go back"
+                >
+                  <ArrowLeft size={18} />
+                </Button>
+              )}
+              <MindmapTitleInput
+                mindmapId={mindmap.id}
+                initialTitle={mindmap.title}
+                hasBackButton={isDesktop}
+                isReadOnly={isReadOnly}
+              />
 
               <Background variant={BackgroundVariant.Dots} gap={20} size={1} />
-              {!isReadOnly && <DevTools position="bottom-center" />}
               <LogicHandler mindmapId={mindmap.id} isReadOnly={isReadOnly} />
             </Flow>
-            {!isReadOnly && isToolbarVisible && <Toolbar mindmapId={mindmap.id} />}
+            {!isReadOnly &&
+              isToolbarVisible &&
+              (isDesktop ? (
+                <Toolbar mindmapId={mindmap.id} />
+              ) : (
+                <Sheet open={isToolbarVisible} onOpenChange={setIsToolbarVisible}>
+                  <SheetContent side="bottom" className="h-[85vh] rounded-t-2xl p-0 sm:h-[80vh]">
+                    <SheetHeader className="border-b px-4 pb-2 pt-4">
+                      <SheetTitle>Toolbar</SheetTitle>
+                    </SheetHeader>
+                    <div className="h-[calc(100%-60px)] overflow-y-auto">
+                      <Toolbar mindmapId={mindmap.id} isMobileSheet={true} />
+                    </div>
+                  </SheetContent>
+                </Sheet>
+              ))}
           </div>
         </ReadOnlyProvider>
       </ReactFlowProvider>

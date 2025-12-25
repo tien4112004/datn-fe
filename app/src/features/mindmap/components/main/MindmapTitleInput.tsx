@@ -11,9 +11,16 @@ import { cn } from '@/shared/lib/utils';
 interface MindmapTitleInputProps {
   mindmapId: string;
   initialTitle: string;
+  hasBackButton?: boolean;
+  isReadOnly?: boolean;
 }
 
-const MindmapTitleInput = ({ mindmapId, initialTitle }: MindmapTitleInputProps) => {
+const MindmapTitleInput = ({
+  mindmapId,
+  initialTitle,
+  hasBackButton = false,
+  isReadOnly = false,
+}: MindmapTitleInputProps) => {
   const { t } = useTranslation(I18N_NAMESPACES.MINDMAP);
   const [title, setTitle] = useState(initialTitle);
   const [isEditing, setIsEditing] = useState(false);
@@ -36,6 +43,12 @@ const MindmapTitleInput = ({ mindmapId, initialTitle }: MindmapTitleInputProps) 
   }, [isEditing]);
 
   const handleSave = useCallback(async () => {
+    // Prevent save in read-only mode
+    if (isReadOnly) {
+      setIsEditing(false);
+      return;
+    }
+
     const trimmedTitle = title.trim();
 
     if (!trimmedTitle) {
@@ -63,7 +76,7 @@ const MindmapTitleInput = ({ mindmapId, initialTitle }: MindmapTitleInputProps) 
       setTitle(originalTitle);
       setIsEditing(false);
     }
-  }, [title, originalTitle, mindmapId, updateMindmapTitle, t]);
+  }, [title, originalTitle, mindmapId, updateMindmapTitle, t, isReadOnly]);
 
   const handleCancel = useCallback(() => {
     setTitle(originalTitle);
@@ -93,10 +106,16 @@ const MindmapTitleInput = ({ mindmapId, initialTitle }: MindmapTitleInputProps) 
   }, [isEditing, handleSave]);
 
   return (
-    <div className="absolute left-4 top-4 z-10 flex items-center gap-2">
+    <div
+      className={cn(
+        'fixed top-4 z-10 flex max-w-[calc(100vw-8rem)] items-center gap-2 sm:max-w-none',
+        hasBackButton ? 'left-20' : 'left-4'
+      )}
+    >
       <div
         className={cn(
-          'flex items-center gap-2 rounded-lg border bg-white/95 px-3 py-2 shadow-md backdrop-blur-sm transition-all',
+          'flex items-center gap-2 rounded-lg border bg-white/95 shadow-md backdrop-blur-sm transition-all',
+          'px-2 py-1.5 sm:px-3 sm:py-2',
           isEditing ? 'border-primary ring-primary/20 ring-2' : 'border-gray-200 hover:border-gray-300'
         )}
       >
@@ -108,7 +127,7 @@ const MindmapTitleInput = ({ mindmapId, initialTitle }: MindmapTitleInputProps) 
               onChange={(e) => setTitle(e.target.value)}
               onKeyDown={handleKeyDown}
               onBlur={handleBlur}
-              className="h-7 w-48 border-0 bg-transparent px-1 text-sm font-medium shadow-none focus-visible:ring-0"
+              className="h-7 w-32 border-0 bg-transparent px-1 text-sm font-medium shadow-none focus-visible:ring-0 sm:w-48"
               disabled={updateMindmapTitle.isPending}
             />
             <div className="flex items-center gap-1">
@@ -134,15 +153,17 @@ const MindmapTitleInput = ({ mindmapId, initialTitle }: MindmapTitleInputProps) 
           </>
         ) : (
           <>
-            <span className="max-w-48 truncate text-sm font-medium text-gray-800">{title}</span>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-6 w-6 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
-              onClick={() => setIsEditing(true)}
-            >
-              <Pencil size={14} />
-            </Button>
+            <span className="max-w-32 truncate text-sm font-medium text-gray-800 sm:max-w-48">{title}</span>
+            {!isReadOnly && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+                onClick={() => setIsEditing(true)}
+              >
+                <Pencil size={14} />
+              </Button>
+            )}
           </>
         )}
       </div>

@@ -178,6 +178,7 @@ export const ChildNodeControls = ({ node, selected }: ChildNodeControlsProps) =>
               <Plus />
             </Button>
           )}
+          {/* Collapse/expand button - visible in View Mode */}
           <motion.div
             whileTap={{ scale: 0.95 }}
             whileHover={{ scale: 1.05 }}
@@ -214,6 +215,7 @@ export const ChildNodeControls = ({ node, selected }: ChildNodeControlsProps) =>
               : 'invisible opacity-0'
           )}
         >
+          {/* Collapse/expand button - visible in View Mode */}
           <motion.div
             whileTap={{ scale: 0.95 }}
             whileHover={{ scale: 1.05 }}
@@ -271,6 +273,7 @@ export const ChildNodeControls = ({ node, selected }: ChildNodeControlsProps) =>
               <Plus />
             </Button>
           )}
+          {/* Collapse/expand button - visible in View Mode */}
           <motion.div
             whileTap={{ scale: 0.95 }}
             whileHover={{ scale: 1.05 }}
@@ -307,6 +310,7 @@ export const ChildNodeControls = ({ node, selected }: ChildNodeControlsProps) =>
               : 'invisible opacity-0'
           )}
         >
+          {/* Collapse/expand button - visible in View Mode */}
           <motion.div
             whileTap={{ scale: 0.95 }}
             whileHover={{ scale: 1.05 }}

@@ -310,6 +310,14 @@ export const useLayoutStore = create<LayoutState>()(
       },
 
       applyAutoLayout: async (rootNodeId: string) => {
+        // Skip auto-layout in read-only/view mode to preserve node positions
+        const { useReadOnlyStore } = await import('./readOnly');
+        const isReadOnly = useReadOnlyStore.getState().isReadOnly;
+        if (isReadOnly) {
+          console.log('applyAutoLayout: Skipping layout in read-only mode to preserve positions');
+          return;
+        }
+
         const { animateNodesToPositions } = get();
         const nodes = useCoreStore.getState().nodes;
         const edges = useCoreStore.getState().edges;

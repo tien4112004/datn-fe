@@ -1,35 +1,49 @@
 <template>
   <div class="editor-header">
-    <div class="tw-flex tw-items-center">
-      <Button
-        class="tw-border-0 tw-bg-transparent hover:tw-bg-gray-100"
-        @click="goBack"
-        v-if="showBackButton"
-      >
-        <IconLeft class="!tw-w-4 !tw-h-4" />
-      </Button>
-
-      <div class="title">
-        <Input
-          class="title-input"
-          ref="titleInputRef"
-          v-model:value="titleValue"
-          @blur="handleUpdateTitle()"
-          v-if="editingTitle"
-        />
-        <div
-          class="title-text tw-flex tw-items-center tw-gap-2"
-          @click="startEditTitle()"
-          :title="title"
-          v-else
-        >
-          <IconEdit />
-          {{ title }}
-        </div>
-      </div>
+    <!-- Breadcrumb Section -->
+    <div class="tw-flex tw-items-center tw-gap-2 tw-max-w-md tw-flex-shrink">
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem class="tw-hidden md:tw-block tw-pl-4">
+            <BreadcrumbLink @click="navigateToList" class="tw-cursor-pointer">
+              {{ $t('header.breadcrumb.presentations') }}
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator class="tw-hidden md:tw-block" />
+          <BreadcrumbItem>
+            <!-- Edit Mode -->
+            <div v-if="editingTitle" class="tw-flex tw-items-center tw-gap-2">
+              <Input
+                ref="titleInputRef"
+                v-model:value="titleValue"
+                @blur="handleUpdateTitle"
+                @keydown="handleKeyDown"
+                class="tw-w-32 sm:tw-w-48 tw-h-7 tw-px-2 tw-text-sm tw-font-medium tw-border-primary"
+              />
+              <Button size="small" @click="handleUpdateTitle">
+                <IconCheck class="tw-w-4 tw-h-4" />
+              </Button>
+              <Button size="small" @click="handleCancelEdit">
+                <IconClose class="tw-w-4 tw-h-4" />
+              </Button>
+            </div>
+            <!-- Display Mode -->
+            <div v-else class="tw-flex tw-items-center tw-gap-2">
+              <BreadcrumbPage class="tw-max-w-32 sm:tw-max-w-48 tw-truncate">{{ title }}</BreadcrumbPage>
+              <Button
+                size="small"
+                class="tw-p-1 tw-bg-transparent hover:tw-bg-gray-100"
+                @click="startEditTitle"
+              >
+                <IconEdit class="tw-w-3 tw-h-3" />
+              </Button>
+            </div>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
     </div>
 
-    <div class="tw-flex tw-items-center tw-gap-2">
+    <div class="tw-flex tw-items-center tw-gap-2 tw-flex-shrink-0">
       <Popover trigger="click" placement="bottom-end" v-model:value="mainMenuVisible">
         <template #content>
           <PopoverMenuItem
@@ -194,6 +208,13 @@ import Popover from '@/components/Popover.vue';
 import PopoverMenuItem from '@/components/PopoverMenuItem.vue';
 import LanguageSwitcher from '@/components/LanguageSwitcher.vue';
 import Button from '@/components/Button.vue';
+import Breadcrumb from '@/components/ui/breadcrumb/Breadcrumb.vue';
+import BreadcrumbList from '@/components/ui/breadcrumb/BreadcrumbList.vue';
+import BreadcrumbItem from '@/components/ui/breadcrumb/BreadcrumbItem.vue';
+import BreadcrumbLink from '@/components/ui/breadcrumb/BreadcrumbLink.vue';
+import BreadcrumbPage from '@/components/ui/breadcrumb/BreadcrumbPage.vue';
+import BreadcrumbSeparator from '@/components/ui/breadcrumb/BreadcrumbSeparator.vue';
+import { Check as IconCheck, X as IconClose } from 'lucide-vue-next';
 import message from '@/utils/message';
 const { t } = useI18n();
 const mainStore = useMainStore();
@@ -225,8 +246,48 @@ const startEditTitle = () => {
 };
 
 const handleUpdateTitle = () => {
-  slidesStore.setTitle(titleValue.value);
+  const trimmedTitle = titleValue.value.trim();
+
+  if (!trimmedTitle) {
+    titleValue.value = title.value;
+    editingTitle.value = false;
+    return;
+  }
+
+  if (trimmedTitle === title.value) {
+    editingTitle.value = false;
+    return;
+  }
+
+  try {
+    slidesStore.setTitle(trimmedTitle);
+    editingTitle.value = false;
+    message.success(t('header.title.updateSuccess'));
+  } catch (error) {
+    console.error('Failed to update title:', error);
+    message.error(t('header.title.updateError'));
+    titleValue.value = title.value;
+    editingTitle.value = false;
+  }
+};
+
+const handleCancelEdit = () => {
+  titleValue.value = title.value;
   editingTitle.value = false;
+};
+
+const handleKeyDown = (e: KeyboardEvent) => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    handleUpdateTitle();
+  } else if (e.key === 'Escape') {
+    e.preventDefault();
+    handleCancelEdit();
+  }
+};
+
+const navigateToList = () => {
+  window.location.href = '/projects?type=presentation';
 };
 
 const goLink = (url: string) => {
@@ -273,20 +334,6 @@ const handlePresentationMode = (
       break;
   }
 };
-
-const goBack = () => {
-  window.history.back();
-};
-
-const showBackButton = computed(() => {
-  return (
-    typeof window !== 'undefined' &&
-    window.location.pathname !== '/' &&
-    window.history.length > 1 &&
-    document.referrer !== '' &&
-    new URL(document.referrer).origin === window.location.origin
-  );
-});
 
 const handleShareCancel = () => {
   message.info(t('header.share.shareCanceled'));

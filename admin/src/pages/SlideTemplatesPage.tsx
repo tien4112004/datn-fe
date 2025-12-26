@@ -1,4 +1,4 @@
-import { useSlideTemplates } from '@/hooks';
+import { useSlideTemplates, useUpdateSlideTemplate } from '@/hooks';
 import {
   createColumnHelper,
   getCoreRowModel,
@@ -12,7 +12,9 @@ import { DataTable, TablePagination } from '@/components/table';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import type { SlideTemplate } from '@aiprimary/core';
-import { Edit, FileJson, Plus } from 'lucide-react';
+import { Edit, FileJson, Plus, RefreshCw } from 'lucide-react';
+import * as frontendDataTemplates from '@aiprimary/frontend-data';
+import { toast } from 'sonner';
 
 const columnHelper = createColumnHelper<SlideTemplate>();
 
@@ -20,11 +22,89 @@ export function SlideTemplatesPage() {
   const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const pageSize = 10;
+  const [isSyncing, setIsSyncing] = useState(false);
 
-  const { data, isLoading } = useSlideTemplates({ page, pageSize });
+  const { data, isLoading, refetch } = useSlideTemplates({ page, pageSize });
+  const updateTemplate = useUpdateSlideTemplate();
 
   const templates = data?.data || [];
   const pagination = data?.pagination;
+
+  // Collect all templates from frontend-data
+  const getAllFrontendTemplates = (): SlideTemplate[] => {
+    const allTemplates: SlideTemplate[] = [];
+
+    // Extract template arrays from frontend-data exports
+    if (frontendDataTemplates.listTemplates) allTemplates.push(...frontendDataTemplates.listTemplates);
+    if (frontendDataTemplates.labeledListTemplates)
+      allTemplates.push(...frontendDataTemplates.labeledListTemplates);
+    if (frontendDataTemplates.titleTemplates) allTemplates.push(...frontendDataTemplates.titleTemplates);
+    if (frontendDataTemplates.twoColumnTemplates)
+      allTemplates.push(...frontendDataTemplates.twoColumnTemplates);
+    if (frontendDataTemplates.twoColumnWithImageTemplates)
+      allTemplates.push(...frontendDataTemplates.twoColumnWithImageTemplates);
+    if (frontendDataTemplates.mainImageTemplates)
+      allTemplates.push(...frontendDataTemplates.mainImageTemplates);
+    if (frontendDataTemplates.tableOfContentsTemplates)
+      allTemplates.push(...frontendDataTemplates.tableOfContentsTemplates);
+    if (frontendDataTemplates.timelineTemplates)
+      allTemplates.push(...frontendDataTemplates.timelineTemplates);
+    if (frontendDataTemplates.pyramidTemplates) allTemplates.push(...frontendDataTemplates.pyramidTemplates);
+
+    return allTemplates;
+  };
+
+  const handleSync = async () => {
+    setIsSyncing(true);
+
+    try {
+      const frontendTemplates = getAllFrontendTemplates();
+
+      if (frontendTemplates.length === 0) {
+        toast.error('No templates found in frontend-data');
+        return;
+      }
+
+      toast.info(`Starting sync of ${frontendTemplates.length} templates...`);
+
+      let synced = 0;
+      let failed = 0;
+
+      for (const template of frontendTemplates) {
+        try {
+          // Use template.id as the ID for PUT request
+          if (template.id) {
+            await updateTemplate.mutateAsync({
+              id: template.id,
+              data: template,
+            });
+            synced++;
+          } else {
+            console.warn('Template without ID:', template.name);
+            failed++;
+          }
+        } catch (error) {
+          console.error(`Failed to sync template ${template.name}:`, error);
+          failed++;
+        }
+      }
+
+      if (failed === 0) {
+        toast.success(`Successfully synced ${synced} templates!`);
+      } else {
+        toast.warning(`Synced ${synced} templates, ${failed} failed`);
+      }
+
+      // Refresh the list
+      refetch();
+    } catch (error) {
+      toast.error('Sync failed', {
+        description: error instanceof Error ? error.message : 'An error occurred',
+      });
+    } finally {
+      setIsSyncing(false);
+    }
+  };
 
   const columns = useMemo(
     () => [
@@ -106,10 +186,16 @@ export function SlideTemplatesPage() {
           <h1 className="text-3xl font-bold tracking-tight">Slide Templates</h1>
           <p className="text-muted-foreground">Manage slide layouts and templates with JSON configuration</p>
         </div>
-        <Button onClick={() => navigate('/slide-templates/new')}>
-          <Plus className="mr-2 h-4 w-4" />
-          New Template
-        </Button>
+        <div className="flex gap-2">
+          <Button onClick={handleSync} disabled={isSyncing} variant="outline">
+            <RefreshCw className={`mr-2 h-4 w-4 ${isSyncing ? 'animate-spin' : ''}`} />
+            {isSyncing ? 'Syncing...' : 'Sync from frontend-data'}
+          </Button>
+          <Button onClick={() => navigate('/slide-templates/new')}>
+            <Plus className="mr-2 h-4 w-4" />
+            New Template
+          </Button>
+        </div>
       </div>
 
       <Card>

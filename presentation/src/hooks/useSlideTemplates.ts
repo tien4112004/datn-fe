@@ -82,12 +82,6 @@ const generateSlideTemplates = (): Record<string, any[]> => {
         ...sampleData,
         title: tmpl.name,
       }));
-
-      // Special case: Add title variants for backward compatibility with UI
-      if (layoutType === 'title') {
-        templates['title-with-subtitle'] = templates[hyphenatedKey];
-        templates['title-no-subtitle'] = templates[hyphenatedKey];
-      }
     }
   });
 

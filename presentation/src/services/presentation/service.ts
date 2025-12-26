@@ -142,12 +142,8 @@ export class PresentationApiService implements ApiService {
   /**
    * Update presentation data
    */
-  async updatePresentation(id: string, data: Presentation): Promise<Presentation> {
-    const response = await api.put<ApiResponse<Presentation>>(
-      `${this.baseUrl}/api/presentations/${id}`,
-      data
-    );
-    return this._mapPresentationItem(response.data.data);
+  async updatePresentation(id: string, data: Presentation): Promise<any> {
+    await api.put<ApiResponse<Presentation>>(`${this.baseUrl}/api/presentations/${id}`, data);
   }
 
   _mapPresentationItem(data: any): Presentation {

@@ -1,5 +1,5 @@
 import type { Service } from '@/shared/api';
-import type { OutlineItem, OutlineData } from './outline';
+import type { OutlineData } from './outline';
 import type {
   Presentation,
   PresentationCollectionRequest,
@@ -58,30 +58,14 @@ export interface GetSlideThemesParams {
 }
 
 export interface PresentationApiService extends Service {
-  /**
-   * @deprecated
-   */
-  getPresentationItems(): Promise<Presentation[]>;
-  /**
-   * @deprecated
-   */
-  getOutlineItems(): Promise<OutlineItem[]>;
   getStreamedOutline(request: OutlineData, signal: AbortSignal): Promise<{ stream: AsyncIterable<string> }>;
   getPresentations(request: PresentationCollectionRequest): Promise<ApiResponse<Presentation[]>>;
   createPresentation(data: CreatePresentationRequest): Promise<Presentation>;
   getPresentationById(id: string): Promise<Presentation | null>;
   getAiResultById(id: string): Promise<SlideLayoutSchema[]>;
-  generatePresentation(request: PresentationGenerationRequest): Promise<PresentationGenerationResponse>;
   updatePresentationTitle(id: string, name: string): Promise<any | null>;
   updatePresentation(id: string, data: UpdatePresentationRequest): Promise<Presentation>;
   deletePresentation(id: string): Promise<void>;
-  getStreamedPresentation(
-    request: PresentationGenerationRequest,
-    signal: AbortSignal
-  ): Promise<{ stream: AsyncIterable<string> } & PresentationGenerationStartResponse>;
-  draftPresentation(request: PresentationGenerateDraftRequest): Promise<Presentation>;
-  upsertPresentationSlide(id: string, slide: Slide): Promise<Presentation>;
-  setPresentationAsParsed(id: string): Promise<Presentation>;
   getSlideThemes(params?: GetSlideThemesParams): Promise<SlideTheme[]>;
   getSlideTemplates(): Promise<SlideTemplate[]>;
 }

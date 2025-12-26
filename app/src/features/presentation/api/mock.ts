@@ -1,19 +1,15 @@
 import { API_MODE, type ApiMode } from '@aiprimary/api';
 import {
-  type OutlineItem,
   type OutlineData,
   type PresentationApiService,
   type Presentation,
   type PresentationCollectionRequest,
-  type PresentationGenerationRequest,
-  type PresentationGenerateDraftRequest,
-  type PresentationGenerationResponse,
   type SlideLayoutSchema,
   type GetSlideThemesParams,
   type UpdatePresentationRequest,
 } from '../types';
 import type { ApiResponse } from '@aiprimary/api';
-import type { Slide, SlideTheme, SlideTemplate } from '../types/slide';
+import type { SlideTheme, SlideTemplate } from '../types/slide';
 import { moduleMethodMap } from '../components/remote/module';
 import { THEMES_DATA } from '../utils/themes';
 
@@ -108,64 +104,6 @@ export default class PresentationMockService implements PresentationApiService {
     this.baseUrl = baseUrl;
   }
 
-  async setPresentationAsParsed(id: string): Promise<Presentation> {
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 100));
-
-    const presentationIndex = mockPresentationItems.findIndex((item) => item.id === id);
-
-    if (presentationIndex === -1) {
-      throw new Error(`Presentation with id ${id} not found`);
-    }
-
-    const presentation = mockPresentationItems[presentationIndex];
-
-    const updatedPresentation = {
-      ...presentation,
-      isParsed: true,
-      updatedAt: new Date().toISOString(),
-    };
-
-    // Update the mock data
-    mockPresentationItems[presentationIndex] = updatedPresentation;
-
-    return updatedPresentation;
-  }
-
-  async upsertPresentationSlide(id: string, slide: Slide): Promise<Presentation> {
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 100));
-
-    const presentationIndex = mockPresentationItems.findIndex((item) => item.id === id);
-
-    if (presentationIndex === -1) {
-      throw new Error(`Presentation with id ${id} not found`);
-    }
-
-    const presentation = mockPresentationItems[presentationIndex];
-    const slides = [...(presentation.slides || [])];
-
-    // Upsert
-    const slideIndex = slides.findIndex((s) => s.id === slide.id);
-    if (slideIndex === -1) {
-      slides.push(slide);
-    } else {
-      slides[slideIndex] = slide;
-    }
-
-    const updatedPresentation = {
-      ...presentation,
-      slides: slides,
-      updatedAt: new Date().toISOString(),
-      isParsed: true,
-    };
-
-    // Update the mock data
-    mockPresentationItems[presentationIndex] = updatedPresentation;
-
-    return updatedPresentation;
-  }
-
   async getAiResultById(id: string): Promise<SlideLayoutSchema[]> {
     // Simulate API delay
     await new Promise((resolve) => setTimeout(resolve, 500));
@@ -199,78 +137,8 @@ export default class PresentationMockService implements PresentationApiService {
     return { stream };
   }
 
-  async getStreamedPresentation(
-    _request: PresentationGenerationRequest,
-    signal: AbortSignal
-  ): Promise<{ presentationId: string; stream: AsyncIterable<string> }> {
-    const presentationId = crypto.randomUUID();
-    const mockSlides = getMockSlideData();
-
-    // Create and append new presentation to the mock list
-    const newPresentation: Presentation = {
-      id: presentationId,
-      title: `Streamed Presentation`,
-      slides: [],
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      isParsed: false,
-      theme: _request.presentation?.theme || {
-        backgroundColor: '#ffffff',
-        themeColors: [],
-        fontColor: '#000000',
-        fontName: 'Arial',
-        titleFontName: 'Arial',
-        titleFontColor: '#000000',
-        outline: {} as any,
-        shadow: {} as any,
-      },
-      viewport: _request.presentation?.viewport || { width: 1024, height: 768 },
-    };
-
-    // Add the new presentation to the mock list
-    mockPresentationItems = [{ ...newPresentation }, ...mockPresentationItems];
-
-    const stream = {
-      async *[Symbol.asyncIterator]() {
-        // Stream each slide as a separate JSON block
-        for (const slide of mockSlides) {
-          if (signal.aborted) {
-            return;
-          }
-
-          const jsonBlock = `${JSON.stringify({ ...slide }, null, 2)}`;
-          yield jsonBlock;
-          await new Promise((resolve) => setTimeout(resolve, 500));
-        }
-      },
-    };
-
-    return {
-      presentationId,
-      stream,
-    };
-  }
-
   getType(): ApiMode {
     return API_MODE.mock;
-  }
-
-  /**
-   * @deprecated
-   */
-  async getPresentationItems(): Promise<Presentation[]> {
-    return new Promise((resolve) => {
-      setTimeout(() => resolve([...mockPresentationItems]), 500);
-    });
-  }
-
-  /**
-   * @deprecated
-   */
-  async getOutlineItems(): Promise<OutlineItem[]> {
-    return new Promise((resolve) => {
-      setTimeout(() => resolve([...mockOutlineItems]), 500);
-    });
   }
 
   async createPresentation(data: Presentation): Promise<Presentation> {
@@ -312,41 +180,6 @@ export default class PresentationMockService implements PresentationApiService {
           },
         });
       }, 500);
-    });
-  }
-
-  async generatePresentation(_: PresentationGenerationRequest): Promise<PresentationGenerationResponse> {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const mockSlides = getMockSlideData();
-        const presentation = {
-          id: crypto.randomUUID(),
-          title: `Generated Presentation`,
-          slides: [
-            {
-              id: crypto.randomUUID(),
-              elements: [],
-              background: {
-                type: 'solid' as const,
-                color: '#ffffff',
-              },
-            },
-          ],
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-          isParsed: false,
-        };
-
-        // Add the new presentation to the mock list
-        mockPresentationItems = [{ ...presentation }, ...mockPresentationItems];
-
-        const responses: PresentationGenerationResponse = {
-          aiResult: mockSlides,
-          presentation: presentation,
-        };
-
-        resolve(responses);
-      }, 1000);
     });
   }
 
@@ -441,27 +274,6 @@ export default class PresentationMockService implements PresentationApiService {
       }, 300);
     });
   }
-
-  async draftPresentation(request: PresentationGenerateDraftRequest): Promise<Presentation> {
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 200));
-
-    const draftPresentation: Presentation = {
-      id: crypto.randomUUID(),
-      title: 'AI Generated Presentation',
-      slides: [],
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      isParsed: false,
-      theme: request.presentation.theme,
-      viewport: request.presentation.viewport,
-    };
-
-    // Add the draft presentation to the mock list
-    mockPresentationItems = [draftPresentation, ...mockPresentationItems];
-
-    return draftPresentation;
-  }
 }
 
 const mockSlideData: SlideLayoutSchema[] = [];
@@ -503,24 +315,6 @@ From your smartphone to your favorite streaming service, AI is everywhere workin
 
 _AI is like having a super-smart friend who never sleeps and always wants to help!_
 \`\`\``;
-
-const mockOutlineItems: OutlineItem[] = [
-  {
-    id: '1',
-    markdownContent: `# Introduction to Web Development\r\n
-      This slide covers the basics of web development including HTML, CSS, and JavaScript fundamentals.`,
-  },
-  {
-    id: '2',
-    markdownContent: `# Frontend Frameworks\r\n
-      Overview of popular frontend frameworks like React, Vue, and Angular with their key features and use cases.`,
-  },
-  {
-    id: '3',
-    markdownContent: `# Backend Technologies\r\n
-      Exploring server-side technologies including Node.js, Python, and database management systems.`,
-  },
-];
 
 const mockSlideTemplates: SlideTemplate[] = [
   {

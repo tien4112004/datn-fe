@@ -9,24 +9,14 @@ import type { SortingState, PaginationState, Updater } from '@tanstack/react-tab
 import { usePresentationApiService } from '../api';
 import { useImageApiService } from '@/features/image/api';
 import { useEffect, useState } from 'react';
-import type {
-  Presentation,
-  OutlineItem,
-  PresentationGenerationRequest,
-  PresentationGenerateDraftRequest,
-  UpdatePresentationRequest,
-} from '../types';
+import type { Presentation, PresentationGenerateDraftRequest, UpdatePresentationRequest } from '../types';
 import type { ApiResponse } from '@aiprimary/api';
 import { ExpectedError } from '@aiprimary/api';
-import type { Slide, SlideTemplate, SlideTheme } from '../types/slide';
+import type { SlideTemplate, SlideTheme } from '../types/slide';
 import { toast } from 'sonner';
 import { t } from 'i18next';
 
 // Return types for the hooks
-export interface UsePresentationOutlinesReturn extends Omit<UseQueryResult<OutlineItem[]>, 'data'> {
-  outlineItems: OutlineItem[];
-}
-
 export interface UsePresentationsReturn extends Omit<UseQueryResult<ApiResponse<Presentation[]>>, 'data'> {
   data: Presentation[];
   sorting: SortingState;
@@ -37,26 +27,6 @@ export interface UsePresentationsReturn extends Omit<UseQueryResult<ApiResponse<
   setSearch: (search: string) => void;
   totalItems: number;
 }
-
-/**
- * @deprecated
- */
-export const usePresentationOutlines = (): UsePresentationOutlinesReturn => {
-  const presentationApiService = usePresentationApiService();
-  const { data: outlineItems = [], ...query } = useQuery<OutlineItem[]>({
-    queryKey: [presentationApiService.getType(), 'outlineItems'],
-    queryFn: async (): Promise<OutlineItem[]> => {
-      const data = await presentationApiService.getOutlineItems();
-      console.log('Fetch data', data);
-      return data;
-    },
-  });
-
-  return {
-    outlineItems,
-    ...query,
-  };
-};
 
 export const usePresentations = (): UsePresentationsReturn => {
   const presentationApiService = usePresentationApiService();
@@ -196,23 +166,6 @@ export const useCreateBlankPresentation = () => {
   });
 };
 
-export const useGeneratePresentation = () => {
-  const presentationApiService = usePresentationApiService();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (request: PresentationGenerationRequest) => {
-      const generatedSlides = await presentationApiService.generatePresentation(request);
-      return generatedSlides;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: [presentationApiService.getType(), 'presentations'],
-      });
-    },
-  });
-};
-
 export const useAiResultById = (id: string) => {
   const presentationApiService = usePresentationApiService();
 
@@ -284,46 +237,6 @@ export const useUpdatePresentation = (id: string) => {
     onError: (error: Error) => {
       console.error('Failed to save presentation:', error);
       toast.error(t('common:presentation.saveFailed'));
-    },
-  });
-};
-
-export const useUpdatePresentationSlides = (id: string) => {
-  const presentationApiService = usePresentationApiService();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (slides: Slide[]) => {
-      // Use multiple single slide updates for batch operations
-      let updatedPresentation: Presentation;
-
-      for (const slide of slides) {
-        updatedPresentation = await presentationApiService.upsertPresentationSlide(id, slide);
-      }
-
-      return updatedPresentation!;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: [presentationApiService.getType(), 'presentation', id],
-      });
-    },
-  });
-};
-
-export const useSetParsedPresentation = (id: string) => {
-  const presentationApiService = usePresentationApiService();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async () => {
-      const updatedPresentation = await presentationApiService.setPresentationAsParsed(id);
-      return updatedPresentation;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: [presentationApiService.getType(), 'presentation', id],
-      });
     },
   });
 };

@@ -1,66 +1,25 @@
-import { API_MODE, type ApiMode } from '@aiprimary/api';
 import {
   type PresentationApiService,
-  type OutlineItem,
   type Presentation,
-  type OutlineData,
-  type PresentationCollectionRequest,
-  type PresentationGenerationRequest,
-  type PresentationGenerationResponse,
   type SlideLayoutSchema,
-  type PresentationGenerationStartResponse,
   type PresentationGenerateDraftRequest,
   type GetSlideThemesParams,
   type UpdatePresentationRequest,
+  type OutlineData,
 } from '../types';
-import { splitMarkdownToOutlineItems } from '../utils';
-import { api } from '@aiprimary/api';
+import { api, API_MODE, type ApiMode } from '@aiprimary/api';
 import { mapPagination, type ApiResponse, type Pagination } from '@aiprimary/api';
-import type { Slide, SlideTheme, SlideTemplate } from '../types/slide';
-
-const mockOutlineOutput = `\`\`\`markdown
-### The Amazing World of Artificial Intelligence!
-
-Did you know computers can now think and learn just like humans? Let's discover how AI is changing our world!
-
-**What makes AI so special?**
-
-- **AI systems are smart programs** that can learn from experience
-- They are like **digital brains** that solve problems for us
-- This incredible technology helps us in ways we never imagined
-
-_AI doesn't get tired or forget - it keeps learning 24/7!_
-
-### How Does AI Actually Learn?
-
-The secret ingredient is massive amounts of **data**! AI systems feed on information to become smarter.
-
-**Data: The Brain Food of AI**
-
-- **Machine Learning** is like teaching a computer to recognize patterns
-- AI systems use **algorithms** to process and understand information
-- Without quality data, AI cannot make good decisions
-
-> Just like we learn from our mistakes, AI gets better with every example!
-
-### AI in Our Daily Lives
-
-From your smartphone to your favorite streaming service, AI is everywhere working behind the scenes.
-
-**Where Can You Find AI Today?**
-
-- **Voice assistants** like Siri and Alexa understand what you say
-- **Recommendation systems** suggest movies and music you might like
-- **Navigation apps** find the fastest route to your destination
-
-_AI is like having a super-smart friend who never sleeps and always wants to help!_
-\`\`\``;
+import type { SlideTheme, SlideTemplate, PresentationCollectionRequest } from '../types/slide';
 
 export default class PresentationRealApiService implements PresentationApiService {
   baseUrl: string;
 
   constructor(baseUrl: string = '') {
     this.baseUrl = baseUrl;
+  }
+
+  getType(): ApiMode {
+    return API_MODE.real;
   }
 
   async getSlideThemes(params?: GetSlideThemesParams): Promise<SlideTheme[]> {
@@ -78,80 +37,9 @@ export default class PresentationRealApiService implements PresentationApiServic
     return res.data.data;
   }
 
-  upsertPresentationSlide(id: string, slide: Slide): Promise<any> {
-    return api.put<ApiResponse<Presentation>>(
-      `${this.baseUrl}/api/presentations/${id}/slides`,
-      {
-        slides: [
-          {
-            ...slide,
-            slideId: slide.id,
-          },
-        ],
-      },
-      {
-        headers: {
-          'Idempotency-Key': `${id}:${slide.id}:update`,
-        },
-      }
-    );
-  }
-
-  setPresentationAsParsed(id: string): Promise<any> {
-    return api.patch<ApiResponse<Presentation>>(`${this.baseUrl}/api/presentations/${id}/parse`);
-  }
-
   async draftPresentation(request: PresentationGenerateDraftRequest): Promise<Presentation> {
     var response = await api.post<ApiResponse<Presentation>>(`${this.baseUrl}/api/presentations`, request);
     return response.data.data;
-  }
-
-  async getStreamedPresentation(
-    request: PresentationGenerationRequest,
-    signal: AbortSignal
-  ): Promise<
-    {
-      stream: AsyncIterable<string>;
-    } & PresentationGenerationStartResponse
-  > {
-    const baseUrl = this.baseUrl;
-
-    try {
-      const response = await api.stream(
-        `${baseUrl}/api/presentations/generate`,
-        {
-          ...request,
-          model: request.model.name,
-          provider: request.model.provider.toLowerCase(),
-        },
-        signal
-      );
-
-      const presentationId = response.headers.get('X-Presentation') || '';
-
-      const stream: AsyncIterable<string> = {
-        async *[Symbol.asyncIterator]() {
-          const reader = response.body?.getReader();
-          if (!reader) throw new Error('No reader available');
-
-          try {
-            while (true) {
-              const { done, value } = await reader.read();
-              if (done) break;
-
-              const text = new TextDecoder().decode(value);
-              yield text;
-            }
-          } finally {
-            reader.releaseLock();
-          }
-        },
-      };
-
-      return { presentationId, stream };
-    } catch (error) {
-      return { presentationId: '', error, stream: (async function* () {})() };
-    }
   }
 
   async getStreamedOutline(
@@ -192,26 +80,6 @@ export default class PresentationRealApiService implements PresentationApiServic
     return { stream };
   }
 
-  getType(): ApiMode {
-    return API_MODE.real;
-  }
-
-  /**
-   * @deprecated
-   */
-  async getPresentationItems(): Promise<Presentation[]> {
-    const response = await api.get<ApiResponse<Presentation[]>>(`${this.baseUrl}/api/presentations/all`);
-    return response.data.data.map(this._mapPresentationItem);
-  }
-
-  /**
-   * @deprecated
-   */
-  async getOutlineItems(): Promise<OutlineItem[]> {
-    await new Promise((resolve) => setTimeout(resolve, 50));
-    return splitMarkdownToOutlineItems(mockOutlineOutput);
-  }
-
   async getPresentations(request: PresentationCollectionRequest): Promise<ApiResponse<Presentation[]>> {
     const response = await api.get<ApiResponse<Presentation[]>>(`${this.baseUrl}/api/presentations`, {
       params: {
@@ -250,29 +118,6 @@ export default class PresentationRealApiService implements PresentationApiServic
     }
 
     return parsedAiResult;
-  }
-
-  async generatePresentation(
-    request: PresentationGenerationRequest
-  ): Promise<PresentationGenerationResponse> {
-    const response = await api.post<ApiResponse<PresentationGenerationResponse>>(
-      `${this.baseUrl}/api/presentations/generate/batch`,
-      request
-    );
-
-    const rawData = response.data.data;
-
-    // Parse the aiResult which contains JSON wrapped in ```json code blocks
-    let parsedAiResult = rawData.aiResult;
-    if (typeof rawData.aiResult === 'string') {
-      const jsonBlocks = this._parseJsonBlocks(rawData.aiResult);
-      parsedAiResult = jsonBlocks[0]?.slides || jsonBlocks;
-    }
-
-    return {
-      aiResult: parsedAiResult,
-      presentation: rawData.presentation,
-    };
   }
 
   private _parseJsonBlocks(input: string): any[] {

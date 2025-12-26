@@ -3,7 +3,6 @@ import type { Pinia } from 'pinia';
 import { useSaveStore, useContainerStore, useSlidesStore } from '@/store';
 import { generateThumbnail } from '@/utils/thumbnail';
 import { getPresentationApi } from '@/services/presentation/api';
-import { uploadThumbnail } from '@/services/presentation/thumbnail';
 import type { Slide, SlideTheme, SlideViewport } from '@/types/slides';
 
 /**
@@ -40,29 +39,7 @@ export function useSavePresentation(presentationId: string, pinia: Pinia) {
 
       if (!thumbnailToUse) {
         // Generate thumbnail from first slide (base64)
-        const thumbnailBase64 = await generateThumbnail(pinia);
-
-        // Upload thumbnail to R2 and get URL (with fallback to base64)
-        let thumbnailUrl = thumbnailBase64; // Default fallback
-        if (thumbnailBase64) {
-          try {
-            thumbnailUrl = await uploadThumbnail('presentation', presentationId, thumbnailBase64);
-            console.log('Thumbnail uploaded successfully, URL:', thumbnailUrl);
-          } catch (error) {
-            console.error('Failed to upload thumbnail, falling back to base64:', error);
-            // Keep using thumbnailBase64 as fallback
-          }
-        }
-        thumbnailToUse = thumbnailUrl;
-      } else if (thumbnailToUse && thumbnailToUse.startsWith('data:image')) {
-        // If provided thumbnail is base64, upload it
-        try {
-          thumbnailToUse = await uploadThumbnail('presentation', presentationId, thumbnailToUse);
-          console.log('Provided thumbnail uploaded successfully, URL:', thumbnailToUse);
-        } catch (error) {
-          console.error('Failed to upload provided thumbnail, using as-is:', error);
-          // Keep the base64 as fallback
-        }
+        thumbnailToUse = await generateThumbnail(pinia);
       }
 
       // Get data from store or use overrides
@@ -71,13 +48,13 @@ export function useSavePresentation(presentationId: string, pinia: Pinia) {
         height: slidesStore.viewportSize * slidesStore.viewportRatio,
       };
 
-      // Prepare presentation data with slides and thumbnail URL
+      // Prepare presentation data with slides and thumbnail
       const presentationData = {
         title: overrides?.title ?? slidesStore.title,
         slides: overrides?.slides ?? slidesStore.slides,
         theme: overrides?.theme ?? slidesStore.theme,
         viewport,
-        thumbnail: thumbnailToUse, // Now a URL instead of base64 (unless upload failed)
+        thumbnail: thumbnailToUse, // Backend will convert base64 to URL
       };
 
       // Call API to update presentation with all data

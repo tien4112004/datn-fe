@@ -1,6 +1,6 @@
 import { api } from '@aiprimary/api';
 import type { ApiResponse } from '@aiprimary/api';
-import type { ImageGenerationParams, ImageGenerationResponse } from './types';
+import type { ImageGenerationParams, ImageGenerationResponse, SingleImageResponse } from './types';
 import type { ApiService } from '@aiprimary/api';
 import { getBackendUrl } from '@aiprimary/api';
 
@@ -25,13 +25,13 @@ export class ImageApiService implements ApiService {
     presentationId: string,
     slideId: string,
     params: ImageGenerationParams
-  ): Promise<ImageGenerationResponse> {
+  ): Promise<SingleImageResponse> {
     const isMock = params.model.name === 'mock';
     const endpoint = isMock
       ? `${this.baseUrl}/api/image/generate-in-presentation/mock`
       : `${this.baseUrl}/api/image/generate-in-presentation`;
 
-    const response = await api.post<ApiResponse<ImageGenerationResponse>>(
+    const response = await api.post<ApiResponse<any>>(
       endpoint,
       {
         prompt: params.prompt,
@@ -48,6 +48,8 @@ export class ImageApiService implements ApiService {
         },
       }
     );
-    return response.data.data;
+    return {
+      imageUrl: response.data.data.images[0].cdnUrl,
+    };
   }
 }

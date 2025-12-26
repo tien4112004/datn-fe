@@ -112,7 +112,7 @@ import { useI18n } from 'vue-i18n';
 
 import useViewportSize from './hooks/useViewportSize';
 import useMouseSelection from './hooks/useMouseSelection';
-import useDropImageOrText from './hooks/useDropImageOrText';
+import useDrop from './hooks/useDrop';
 import useRotateElement from './hooks/useRotateElement';
 import useScaleElement from './hooks/useScaleElement';
 import useSelectAndMoveElement from './hooks/useSelectElement';
@@ -183,7 +183,7 @@ watchEffect(setLocalElementList);
 const canvasRef = ref<HTMLElement>();
 const { dragViewport, viewportStyles } = useViewportSize(canvasRef);
 
-useDropImageOrText(canvasRef);
+useDrop(canvasRef);
 
 const { mouseSelection, mouseSelectionVisible, mouseSelectionQuadrant, updateMouseSelection } =
   useMouseSelection(elementList, viewportRef);

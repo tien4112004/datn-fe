@@ -26,6 +26,12 @@ import type {
 } from '@/types/slides';
 import { useI18n } from 'vue-i18n';
 
+const shapeVAlignMap: { [key: string]: ShapeTextAlign } = {
+  mid: 'middle',
+  down: 'bottom',
+  up: 'top',
+};
+
 const convertFontSizePtToPx = (html: string, ratio: number) => {
   return html.replace(/font-size:\s*([\d.]+)pt/g, (match, p1) => {
     return `font-size: ${(parseFloat(p1) * ratio).toFixed(1)}px`;
@@ -45,7 +51,7 @@ export default () => {
   const { t } = useI18n();
 
   // Import PPTist file
-  const importSpecificFile = (files: FileList, cover = false) => {
+  const importSpecificFile = (files: FileList | File[], cover = false) => {
     const file = files[0];
 
     const reader = new FileReader();
@@ -218,7 +224,10 @@ export default () => {
   };
 
   // Import PPTX file
-  const importPPTXFile = (files: FileList, options?: { cover?: boolean; fixedViewport?: boolean }) => {
+  const importPPTXFile = (
+    files: FileList | File[],
+    options?: { cover?: boolean; fixedViewport?: boolean }
+  ) => {
     const defaultOptions = {
       cover: false,
       fixedViewport: false,
@@ -281,7 +290,7 @@ export default () => {
         } else {
           background = {
             type: 'solid',
-            color: value || '#fff',
+            color: typeof value === 'string' ? value || '#fff' : '#fff',
           };
         }
 
@@ -307,35 +316,65 @@ export default () => {
             el.top = el.top * ratio;
 
             if (el.type === 'text') {
-              const textEl: PPTTextElement = {
-                type: 'text',
-                id: nanoid(10),
-                width: el.width,
-                height: el.height,
-                left: el.left,
-                top: el.top,
-                rotate: el.rotate,
-                defaultFontName: theme.value.fontName,
-                defaultColor: theme.value.fontColor,
-                content: convertFontSizePtToPx(el.content, ratio),
-                lineHeight: 1,
-                outline: {
-                  color: el.borderColor,
-                  width: +(el.borderWidth * ratio).toFixed(2),
-                  style: el.borderType,
-                },
-                fill: el.fill.type === 'color' ? el.fill.value : '',
-                vertical: el.isVertical,
-              };
-              if (el.shadow) {
-                textEl.shadow = {
-                  h: el.shadow.h * ratio,
-                  v: el.shadow.v * ratio,
-                  blur: el.shadow.blur * ratio,
-                  color: el.shadow.color,
+              if (el.autoFit && el.autoFit.type === 'text') {
+                const fontScale = (ratio * (el.autoFit.fontScale || 100)) / 100;
+                const shapeEl: PPTShapeElement = {
+                  type: 'shape',
+                  id: nanoid(10),
+                  width: el.width,
+                  height: el.height,
+                  left: el.left,
+                  top: el.top,
+                  rotate: el.rotate,
+                  viewBox: [200, 200],
+                  path: 'M 0 0 L 200 0 L 200 200 L 0 200 Z',
+                  fill: el.fill.type === 'color' ? el.fill.value : '',
+                  fixedRatio: false,
+                  outline: {
+                    color: el.borderColor,
+                    width: +(el.borderWidth * ratio).toFixed(2),
+                    style: el.borderType,
+                  },
+                  text: {
+                    content: convertFontSizePtToPx(el.content, fontScale),
+                    defaultFontName: theme.value.fontName,
+                    defaultColor: theme.value.fontColor,
+                    align: shapeVAlignMap[el.vAlign] || 'middle',
+                    lineHeight: 1,
+                  },
                 };
+                slide.elements.push(shapeEl);
+              } else {
+                const textEl: PPTTextElement = {
+                  type: 'text',
+                  id: nanoid(10),
+                  width: el.width,
+                  height: el.height,
+                  left: el.left,
+                  top: el.top,
+                  rotate: el.rotate,
+                  defaultFontName: theme.value.fontName,
+                  defaultColor: theme.value.fontColor,
+                  content: convertFontSizePtToPx(el.content, ratio),
+                  lineHeight: 1,
+                  outline: {
+                    color: el.borderColor,
+                    width: +(el.borderWidth * ratio).toFixed(2),
+                    style: el.borderType,
+                  },
+                  fill: el.fill.type === 'color' ? el.fill.value : '',
+                  vertical: el.isVertical,
+                };
+                if (el.shadow) {
+                  textEl.shadow = {
+                    h: el.shadow.h * ratio,
+                    v: el.shadow.v * ratio,
+                    blur: el.shadow.blur * ratio,
+                    color: el.shadow.color,
+                  };
+                }
+                slide.elements.push(textEl);
               }
-              slide.elements.push(textEl);
             } else if (el.type === 'image') {
               const element: PPTImageElement = {
                 type: 'image',
@@ -433,12 +472,6 @@ export default () => {
               } else {
                 const shape = shapeList.find((item) => item.pptxShapeType === el.shapType);
 
-                const vAlignMap: { [key: string]: ShapeTextAlign } = {
-                  mid: 'middle',
-                  down: 'bottom',
-                  up: 'top',
-                };
-
                 const gradient: Gradient | undefined =
                   el.fill?.type === 'gradient'
                     ? {
@@ -479,7 +512,7 @@ export default () => {
                     content: convertFontSizePtToPx(el.content, ratio),
                     defaultFontName: theme.value.fontName,
                     defaultColor: theme.value.fontColor,
-                    align: vAlignMap[el.vAlign] || 'middle',
+                    align: shapeVAlignMap[el.vAlign] || 'middle',
                   },
                   flipH: el.isFlipH,
                   flipV: el.isFlipV,

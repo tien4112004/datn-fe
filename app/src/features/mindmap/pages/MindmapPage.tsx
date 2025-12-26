@@ -1,18 +1,18 @@
 import { ReactFlowProvider } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { Background, BackgroundVariant, MiniMap } from '@xyflow/react';
-import { PanelRight, PanelRightOpen, ArrowLeft, Sliders, X } from 'lucide-react';
+import { PanelRight, PanelRightOpen, Sliders, X } from 'lucide-react';
 import {
   Flow,
   LogicHandler,
   Toolbar,
-  MindmapTitleInput,
+  MindmapBreadcrumbHeader,
   MindmapControls,
 } from '@/features/mindmap/components';
 import { TreePanel } from '@/features/mindmap/components/tree-panel';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { useLoaderData, useNavigate, useSearchParams } from 'react-router-dom';
+import { useLoaderData, useSearchParams } from 'react-router-dom';
 import { useCoreStore, usePresenterModeStore, useViewModeStore } from '../stores';
 import { useMindmapDirtyTracking } from '../hooks/useDirtyTracking';
 import { useFullscreen } from '../hooks/useFullscreen';
@@ -69,7 +69,6 @@ const MindmapPage = () => {
   const setEdges = useCoreStore((state) => state.setEdges);
   const { isDesktop } = useResponsiveBreakpoint();
   const isMobile = useIsMobile();
-  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
   const [isPanOnDrag, setIsPanOnDrag] = useState(false);
@@ -135,6 +134,13 @@ const MindmapPage = () => {
           <div className="flex h-screen w-full" style={{ backgroundColor: 'var(--background)' }}>
             <TreePanel />
             <Flow isPanOnDrag={isPanOnDrag} isPresenterMode={isPresenterMode}>
+              {/* Breadcrumb Header */}
+              <MindmapBreadcrumbHeader
+                mindmapId={mindmap.id}
+                initialTitle={mindmap.title}
+                isPresenterMode={isPresenterMode}
+                isViewMode={isViewMode}
+              />
               {/* Controls - always visible on desktop, toggleable on mobile */}
               {isDesktop ? (
                 // Desktop: Always visible controls
@@ -211,26 +217,6 @@ const MindmapPage = () => {
                   position="bottom-right"
                 />
               )}
-
-              {/* Back button for desktop */}
-              {isDesktop && (
-                <Button
-                  onClick={() => navigate(-1)}
-                  variant="outline"
-                  size="icon"
-                  className={`left-4 top-4 z-10 h-10 w-10 shadow-md ${isMobile ? 'fixed' : 'absolute'}`}
-                  title="Go back"
-                >
-                  <ArrowLeft size={18} />
-                </Button>
-              )}
-              <MindmapTitleInput
-                mindmapId={mindmap.id}
-                initialTitle={mindmap.title}
-                hasBackButton={isDesktop}
-                isPresenterMode={isPresenterMode}
-                isViewMode={isViewMode}
-              />
 
               <Background variant={BackgroundVariant.Dots} gap={20} size={1} />
               <LogicHandler

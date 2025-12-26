@@ -70,7 +70,7 @@ export const tableOfContentsTemplates: SlideTemplate[] = [
               type: 'block',
               label: 'item',
               layout: {
-                distribution: '1/5',
+                distribution: 'maxLabel/fill',
                 gap: 10,
                 horizontalAlignment: 'left',
                 verticalAlignment: 'center',
@@ -386,7 +386,7 @@ export const tableOfContentsTemplates: SlideTemplate[] = [
               type: 'block',
               label: 'item',
               layout: {
-                distribution: '1/5',
+                distribution: 'maxLabel/fill',
                 gap: 10,
                 horizontalAlignment: 'left',
                 verticalAlignment: 'center',

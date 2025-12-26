@@ -179,3 +179,74 @@ export function updateElementFontSize(element: HTMLElement, newFontSize: number)
 export function updateElementLineHeight(element: HTMLElement, newLineHeight: number): void {
   element.style.lineHeight = `${newLineHeight}`;
 }
+
+/**
+ * Measures the width required to render text at a specific font size.
+ * Used for calculating maximum label width in content-aware layouts.
+ *
+ * @param text - Text content to measure
+ * @param fontSize - Font size in pixels
+ * @param fontFamily - Font family (defaults to Arial)
+ * @param fontWeight - Font weight (defaults to normal)
+ * @returns Width in pixels required to render the text
+ */
+export function measureTextWidth(
+  text: string,
+  fontSize: number,
+  fontFamily: string = 'Arial',
+  fontWeight: string = 'normal'
+): number {
+  // Create a temporary canvas for text measurement
+  const canvas = document.createElement('canvas');
+  const context = canvas.getContext('2d');
+
+  if (!context) {
+    // Fallback: rough estimation
+    return text.length * fontSize * 0.6;
+  }
+
+  // Set font properties
+  context.font = `${fontWeight} ${fontSize}px ${fontFamily}`;
+
+  // Measure text
+  const metrics = context.measureText(text);
+
+  return metrics.width;
+}
+
+/**
+ * Calculates the maximum width needed for a group of label texts.
+ * Measures all labels at the maximum font size to determine the upper bound.
+ *
+ * @param texts - Array of label text strings
+ * @param fontSizeRange - Font size constraints (uses maxSize for measurement)
+ * @param fontFamily - Font family to use
+ * @param fontWeight - Font weight to use
+ * @param padding - Additional padding to add (default: 30px for 15px each side)
+ * @returns Maximum width required in pixels
+ */
+export function calculateMaxLabelWidth(
+  texts: string[],
+  fontSizeRange: FontSizeRange = { minSize: 18, maxSize: 24 },
+  fontFamily: string = 'Arial',
+  fontWeight: string = 'normal',
+  padding: number = 30
+): number {
+  if (texts.length === 0) return 0;
+
+  // Measure all texts at max font size
+  let maxWidth = 0;
+
+  for (const text of texts) {
+    const width = measureTextWidth(text, fontSizeRange.maxSize, fontFamily, fontWeight);
+    maxWidth = Math.max(maxWidth, width);
+  }
+
+  // Add safety margin to account for canvas measurement discrepancies
+  // Canvas measureText() is slightly smaller than actual rendered width
+  // Add 5% extra + 5px to prevent text wrapping
+  const safetyMargin = maxWidth * 0.05 + 5;
+
+  // Add padding and safety margin
+  return maxWidth + safetyMargin + padding;
+}

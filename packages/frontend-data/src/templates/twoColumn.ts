@@ -139,10 +139,9 @@ export const twoColumnTemplates: SlideTemplate[] = [
             margin: { left: 50, right: 50, top: 0, bottom: 50 },
           },
           border: {
-            width: 1,
+            width: '{{theme.card.borderWidth}}',
             color: '{{theme.themeColors[0]}}',
-            radius: 20,
-            directions: ['top', 'right', 'bottom'],
+            radius: '{{theme.card.borderRadius}}',
           },
           layout: {
             distribution: 'space-between',

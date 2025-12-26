@@ -53,9 +53,20 @@ pipeline {
                     echo "========== Checking out branch: ${BUILD_BRANCH} =========="
                     
                     sh '''
-                        git fetch origin
-                        git checkout ${BUILD_BRANCH} || git checkout origin/${BUILD_BRANCH}
-                        git pull origin ${BUILD_BRANCH} || true
+                        # Fetch all branches and tags
+                        git fetch origin --prune
+                        
+                        # Normalize branch name (remove origin/ prefix if present)
+                        BRANCH_NAME="${BUILD_BRANCH#origin/}"
+                        
+                        # Checkout or create local branch tracking remote
+                        git checkout -B "${BRANCH_NAME}" "origin/${BRANCH_NAME}" || {
+                            echo "ERROR: Failed to checkout branch ${BRANCH_NAME}"
+                            exit 1
+                        }
+                        
+                        # Reset to match remote exactly (handles divergent branches)
+                        git reset --hard "origin/${BRANCH_NAME}"
                         
                         echo "Current branch:"
                         git branch --show-current

@@ -9,7 +9,6 @@ import { usePresenterModeStore, useViewModeStore } from '../stores';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
-import { uploadThumbnail } from '../api/thumbnail';
 
 const imageWidth = 2048;
 const imageHeight = 2048;
@@ -59,28 +58,13 @@ export const useSaveMindmap = () => {
 
     try {
       setIsGeneratingThumbnail(true);
-
-      // Generate thumbnail as base64
-      const thumbnailBase64 = await generateThumbnail();
-
-      // Upload thumbnail to R2 and get URL (with fallback to base64)
-      let thumbnailUrl = thumbnailBase64; // Default fallback
-      if (thumbnailBase64) {
-        try {
-          thumbnailUrl = await uploadThumbnail('mindmap', mindmapId, thumbnailBase64);
-          console.log('Thumbnail uploaded successfully, URL:', thumbnailUrl);
-          // Update metadata store with URL instead of base64
-          setThumbnail(thumbnailUrl);
-        } catch (error) {
-          console.error('Failed to upload thumbnail, falling back to base64:', error);
-          // Keep using thumbnailBase64 as fallback
-        }
-      }
+      // Generate thumbnail first
+      await generateThumbnail();
 
       // Get current viewport
       const viewport = getViewport();
 
-      // Then save mindmap with metadata (including thumbnail URL and viewport)
+      // Then save mindmap with metadata (including thumbnail and viewport)
       await updateMindmap.mutateAsync({
         id: mindmapId,
         data: {

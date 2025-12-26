@@ -102,10 +102,6 @@ const PresentationTable = () => {
     enableColumnResizing: true,
     columnResizeMode: 'onChange',
     columnResizeDirection: 'ltr',
-    defaultColumn: {
-      minSize: 40,
-      maxSize: Number.MAX_SAFE_INTEGER,
-    },
     initialState: {
       columnSizing: initialColumnSizing,
     },

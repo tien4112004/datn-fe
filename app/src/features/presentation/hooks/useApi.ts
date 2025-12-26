@@ -350,7 +350,8 @@ export const useGeneratePresentationImage = (id: string) => {
     }) => {
       const imageUrl = await imageApiService.generatePresentationImage(id, slideId, elementId, {
         prompt,
-        model,
+        model: model.name,
+        provider: model.provider,
       });
       return imageUrl;
     },

@@ -99,6 +99,17 @@ class TemplateRegistry {
       const templateApi = getTemplateApi();
       const allTemplates = await templateApi.getSlideTemplates();
 
+      // Validate that allTemplates is an array
+      if (!Array.isArray(allTemplates)) {
+        console.warn(
+          'API returned non-array templates data, falling back to frontend-data. Received:',
+          typeof allTemplates,
+          allTemplates
+        );
+        this.initialized = true;
+        return;
+      }
+
       // Group by layout type
       const grouped = new Map<string, Template[]>();
 

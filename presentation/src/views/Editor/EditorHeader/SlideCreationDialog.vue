@@ -75,7 +75,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed } from 'vue';
+import { ref, watch } from 'vue';
 import Modal from '@/components/Modal.vue';
 import Button from '@/components/Button.vue';
 
@@ -90,14 +90,22 @@ const emit = defineEmits<{
 }>();
 
 const selectedTheme = ref<string>('default');
-const selectedLayout = ref<string>('title-with-subtitle');
+const selectedLayout = ref<string>('title');
+
+// Reset selections when dialog opens
+watch(
+  () => props.visible,
+  (newVisible) => {
+    if (newVisible) {
+      selectedTheme.value = 'default';
+      selectedLayout.value = 'title';
+    }
+  }
+);
 
 const layouts = {
-  'title-with-subtitle': {
-    name: 'Title with Subtitle',
-  },
-  'title-no-subtitle': {
-    name: 'Title Only',
+  title: {
+    name: 'Title',
   },
   'two-column-with-image': {
     name: 'Two Column + Image',
@@ -122,9 +130,6 @@ const layouts = {
   },
   pyramid: {
     name: 'Pyramid',
-  },
-  test: {
-    name: 'Test Layout',
   },
 };
 

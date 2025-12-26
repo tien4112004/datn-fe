@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useRef } from 'react';
-import { useReactFlow, type FinalConnectionState, useNodesInitialized } from '@xyflow/react';
+import { useCallback, useRef } from 'react';
+import { useReactFlow, type FinalConnectionState } from '@xyflow/react';
 import { useLayoutStore } from '../stores/layout';
 import type { MindMapNode } from '../types';
 import { useClipboardStore, useCoreStore, useNodeManipulationStore, useNodeOperationsStore } from '../stores';
@@ -8,7 +8,6 @@ import { getSideFromPosition, getTreeForceLayout, getRootNodeOfSubtree } from '.
 
 export const useReactFlowIntegration = () => {
   const hasInitializedRef = useRef(false);
-  const syncState = useCoreStore((state) => state.syncState);
   const updateSelectedNodeIds = useCoreStore((state) => state.updateSelectedNodeIds);
   const moveToChild = useNodeManipulationStore((state) => state.moveToChild);
   const getNode = useCoreStore((state) => state.getNode);
@@ -24,7 +23,6 @@ export const useReactFlowIntegration = () => {
   // Get auto layout enabled from root node
   const isAutoLayoutEnabled = getTreeForceLayout(nodes);
 
-  const nodesInitialized = useNodesInitialized();
   const { getIntersectingNodes, fitView, screenToFlowPosition } = useReactFlow();
 
   const onPaneMouseMove = useCallback((event: any) => {
@@ -56,10 +54,6 @@ export const useReactFlowIntegration = () => {
       }, 800);
     }
   }, [updateLayout, fitView]);
-
-  useEffect(() => {
-    syncState();
-  }, [nodesInitialized]);
 
   const determineSideFromPosition = useCallback((draggedNode: MindMapNode, targetNode: any) => {
     const targetCenterX = targetNode.position.x + (targetNode.measured?.width ?? 0) / 2;

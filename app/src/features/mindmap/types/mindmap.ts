@@ -139,4 +139,5 @@ export interface Mindmap {
   createdAt: string;
   updatedAt: string;
   status: 'active' | 'archived' | 'draft';
+  permission?: 'edit' | 'comment' | 'read'; // Permission level from server
 }

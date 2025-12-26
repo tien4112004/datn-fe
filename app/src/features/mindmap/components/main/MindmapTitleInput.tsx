@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { Check, Pencil, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/shared/lib/utils';
+import { useIsMobile } from '@/shared/hooks/use-mobile';
 
 interface MindmapTitleInputProps {
   mindmapId: string;
@@ -22,6 +23,7 @@ const MindmapTitleInput = ({
   isPresenterMode = false,
 }: MindmapTitleInputProps) => {
   const { t } = useTranslation(I18N_NAMESPACES.MINDMAP);
+  const isMobile = useIsMobile();
   const [title, setTitle] = useState(initialTitle);
   const [isEditing, setIsEditing] = useState(false);
   const [originalTitle, setOriginalTitle] = useState(initialTitle);
@@ -108,8 +110,9 @@ const MindmapTitleInput = ({
   return (
     <div
       className={cn(
-        'fixed top-4 z-10 flex max-w-[calc(100vw-8rem)] items-center gap-2 sm:max-w-none',
-        hasBackButton ? 'left-20' : 'left-4'
+        'top-4 z-10 flex max-w-[calc(100vw-8rem)] items-center gap-2 sm:max-w-none',
+        isMobile ? 'fixed' : 'absolute',
+        hasBackButton ? 'left-18' : 'left-4'
       )}
     >
       <div

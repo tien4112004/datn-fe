@@ -12,12 +12,13 @@ import {
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { useLoaderData, useNavigate } from 'react-router-dom';
-import { useCoreStore, usePresenterModeStore } from '../stores';
+import { useCoreStore, usePresenterModeStore, useViewModeStore } from '../stores';
 import { useMindmapDirtyTracking } from '../hooks/useDirtyTracking';
 import { useFullscreen } from '../hooks/useFullscreen';
 import { usePresenterMode } from '../hooks/usePresenterMode';
 import { useUnsavedChangesBlocker, useResponsiveBreakpoint } from '@/shared/hooks';
 import { useSidebar } from '@/shared/components/ui/sidebar';
+import { useIsMobile } from '@/shared/hooks/use-mobile';
 import { PresenterProvider } from '../contexts/ReadOnlyContext';
 import { UnsavedChangesDialog } from '@/shared/components/modals/UnsavedChangesDialog';
 import { SmallScreenDialog } from '@/shared/components/modals/SmallScreenDialog';
@@ -66,6 +67,7 @@ const MindmapPage = () => {
   const setNodes = useCoreStore((state) => state.setNodes);
   const setEdges = useCoreStore((state) => state.setEdges);
   const { isDesktop } = useResponsiveBreakpoint();
+  const isMobile = useIsMobile();
   const navigate = useNavigate();
 
   const [isPanOnDrag, setIsPanOnDrag] = useState(false);
@@ -79,9 +81,12 @@ const MindmapPage = () => {
   const { isFullscreen, toggleFullscreen: toggleFullscreenMode } = useFullscreen();
   const { setFullscreen } = useSidebar();
 
-  // Presenter mode functionality
+  // Presenter mode functionality (user can toggle)
   const { isPresenterMode, togglePresenterMode } = usePresenterMode();
   const setPresenterModeStore = usePresenterModeStore((state) => state.setPresenterMode);
+
+  // View mode functionality (server-driven, cannot toggle)
+  const setViewMode = useViewModeStore((state) => state.setViewMode);
 
   // Handle unsaved changes blocking
   const { showDialog, setShowDialog, handleStay, handleProceed } = useUnsavedChangesBlocker({
@@ -97,6 +102,13 @@ const MindmapPage = () => {
   useEffect(() => {
     setPresenterModeStore(isPresenterMode);
   }, [isPresenterMode, setPresenterModeStore]);
+
+  // Set View Mode based on mindmap permissions from server
+  // 'read' and 'comment' permissions are view-only, 'edit' allows full editing
+  useEffect(() => {
+    const isViewOnly = mindmap?.permission === 'read' || mindmap?.permission === 'comment';
+    setViewMode(isViewOnly);
+  }, [mindmap?.permission, setViewMode]);
 
   // Sync mindmap data from React Router loader to stores
   useEffect(() => {
@@ -122,7 +134,7 @@ const MindmapPage = () => {
               {/* Controls - always visible on desktop, toggleable on mobile */}
               {isDesktop ? (
                 // Desktop: Always visible controls
-                <div className="fixed bottom-4 left-4 z-10">
+                <div className={`bottom-4 left-4 z-10 ${isMobile ? 'fixed' : 'absolute'}`}>
                   <MindmapControls
                     isPanOnDrag={isPanOnDrag}
                     isPresenterMode={isPresenterMode}
@@ -169,7 +181,7 @@ const MindmapPage = () => {
               )}
 
               {!isPresenterMode && (
-                <div className="fixed right-4 top-4 z-10 flex gap-2">
+                <div className={`right-4 top-4 z-10 flex gap-2 ${isMobile ? 'fixed' : 'absolute'}`}>
                   <Button
                     onClick={() => setIsToolbarVisible(!isToolbarVisible)}
                     title={isToolbarVisible ? 'Hide Toolbar' : 'Show Toolbar'}
@@ -202,7 +214,7 @@ const MindmapPage = () => {
                   onClick={() => navigate(-1)}
                   variant="outline"
                   size="icon"
-                  className="fixed left-4 top-4 z-10 shadow-md"
+                  className={`left-4 top-4 z-10 h-10 w-10 shadow-md ${isMobile ? 'fixed' : 'absolute'}`}
                   title="Go back"
                 >
                   <ArrowLeft size={18} />

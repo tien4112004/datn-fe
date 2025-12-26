@@ -1,11 +1,10 @@
 import { GitBranchPlus, Undo, Redo, Save, Sparkles, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/shared/components/ui/tabs';
-import { useUndoRedoStore, useCoreStore, useNodeOperationsStore } from '../../stores';
+import { useUndoRedoStore, useNodeOperationsStore } from '../../stores';
 import { useTranslation } from 'react-i18next';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
-import { useSaveMindmap } from '../../hooks/useSaveMindmap';
-import { useNodeSelection } from '../../hooks/useNodeSelection';
+import { useSaveMindmap, useNodeSelection } from '../../hooks';
 import { useState, useEffect } from 'react';
 import ExportMindmapDialog from '../export';
 import { GenerateTreeDialog } from '../generate';
@@ -16,7 +15,6 @@ import { cn } from '@/shared/lib/utils';
 const Toolbar = ({ mindmapId, isMobileSheet = false }: { mindmapId: string; isMobileSheet?: boolean }) => {
   const { t } = useTranslation(I18N_NAMESPACES.MINDMAP);
   const addNode = useNodeOperationsStore((state) => state.addNode);
-  const logData = useCoreStore((state) => state.logData);
   const undo = useUndoRedoStore((state) => state.undo);
   const redo = useUndoRedoStore((state) => state.redo);
   const canUndo = useUndoRedoStore((state) => !state.undoStack.isEmpty());
@@ -164,19 +162,6 @@ const Toolbar = ({ mindmapId, isMobileSheet = false }: { mindmapId: string; isMo
               {t('toolbar.sections.utilities')}
             </h3>
             <div className="space-y-2">
-              <Button
-                variant="outline"
-                onClick={logData}
-                size="sm"
-                title={t('toolbar.tooltips.logData')}
-                className={cn(
-                  'w-full transition-colors hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500',
-                  isMobileSheet && 'h-11 min-h-[44px] text-base'
-                )}
-              >
-                <span className="sr-only">{t('toolbar.actions.logData')}</span>
-                {t('toolbar.actions.logData')}
-              </Button>
               <LoadingButton
                 variant="outline"
                 onClick={async () => await saveWithThumbnail(mindmapId)}

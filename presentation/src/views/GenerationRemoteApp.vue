@@ -3,10 +3,6 @@
     <Screen v-if="screening" :isPresentingInitial="presenter" />
     <Editor v-else-if="_isPC" />
     <Mobile v-else />
-<<<<<<< HEAD
-=======
-    <Spinner />
->>>>>>> 3e30d66c (feat: for flutter)
   </template>
   <div v-else-if="error" class="error-container">
     <div class="error-message">
@@ -17,11 +13,7 @@
 </template>
 
 <script lang="ts" setup>
-<<<<<<< HEAD
 import { onMounted, onUnmounted, ref, provide, getCurrentInstance } from 'vue';
-=======
-import { onMounted, onUnmounted, ref } from 'vue';
->>>>>>> 3e30d66c (feat: for flutter)
 import { storeToRefs } from 'pinia';
 import {
   useScreenStore,
@@ -38,18 +30,11 @@ import { isPC } from '@/utils/common';
 import Editor from '../views/Editor/index.vue';
 import Mobile from '../views/Mobile/index.vue';
 import Screen from '../views/Screen/index.vue';
-<<<<<<< HEAD
-=======
-import Spinner from '@/components/Spinner.vue';
->>>>>>> 3e30d66c (feat: for flutter)
 import type { Presentation } from '../types/slides';
 import type { PresentationGenerationRequest } from '../types/generation';
 import { usePresentationProcessor } from '@/hooks/usePresentationProcessor';
 import { useGenerationStore } from '@/store/generation';
-<<<<<<< HEAD
 import { useSavePresentation } from '@/hooks/useSavePresentation';
-=======
->>>>>>> 3e30d66c (feat: for flutter)
 
 const _isPC = isPC();
 
@@ -110,7 +95,6 @@ const handlePresentationData = async (event: MessageEvent) => {
       await deleteDiscardedDB();
       await snapshotStore.initSnapshotDatabase();
 
-<<<<<<< HEAD
       // Get pinia instance
       const instance = getCurrentInstance();
       const pinia = instance?.appContext.config.globalProperties.$pinia;
@@ -121,17 +105,12 @@ const handlePresentationData = async (event: MessageEvent) => {
         provide('savePresentationFn', saveFn);
       }
 
-=======
->>>>>>> 3e30d66c (feat: for flutter)
       // Initialize presentation processor for streaming
       processorInstance = usePresentationProcessor(
         (containerStore.presentation as any) || null,
         presentation.id,
         generationStore.isStreaming,
-<<<<<<< HEAD
         pinia!,
-=======
->>>>>>> 3e30d66c (feat: for flutter)
         generationRequest as PresentationGenerationRequest
       );
 

@@ -8,3 +8,4 @@ export { useUndoRedoStore } from './undoredo';
 export { useMetadataStore } from './metadata';
 export { useDirtyStore } from './dirty';
 export { usePresenterModeStore, useReadOnlyStore } from './readOnly';
+export { useViewModeStore } from './viewMode';

@@ -1,21 +1,32 @@
-import { memo, useMemo } from 'react';
+import { memo, useMemo, useEffect } from 'react';
+import { useReactFlow } from '@xyflow/react';
 import { useMindmapActions, useShortcuts } from '../../hooks';
 import { useUndoRedoStore } from '../../stores/undoredo';
 import { useSaveMindmap } from '../../hooks/useSaving';
+import type { MindmapMetadata } from '../../types';
 
 interface LogicHandlerProps {
   mindmapId: string;
   isPresenterMode?: boolean;
+  metadata?: MindmapMetadata;
 }
 
-const LogicHandler = memo(({ mindmapId, isPresenterMode = false }: LogicHandlerProps) => {
+const LogicHandler = memo(({ mindmapId, isPresenterMode = false, metadata }: LogicHandlerProps) => {
   const { selectAllHandler, copyHandler, pasteHandler, deleteHandler, deselectAllHandler } =
     useMindmapActions();
+  const { setViewport } = useReactFlow();
 
   const undo = useUndoRedoStore((state) => state.undo);
   const redo = useUndoRedoStore((state) => state.redo);
 
   const { saveWithThumbnail } = useSaveMindmap();
+
+  // Restore viewport from metadata on mount
+  useEffect(() => {
+    if (metadata?.viewport) {
+      setViewport(metadata.viewport, { duration: 0 });
+    }
+  }, [metadata, setViewport]);
 
   const handleSave = async () => {
     await saveWithThumbnail(mindmapId);

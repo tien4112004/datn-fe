@@ -11,7 +11,7 @@ import {
 } from '@/features/mindmap/components';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { useLoaderData, useNavigate } from 'react-router-dom';
+import { useLoaderData, useNavigate, useSearchParams } from 'react-router-dom';
 import { useCoreStore, usePresenterModeStore, useViewModeStore } from '../stores';
 import { useMindmapDirtyTracking } from '../hooks/useDirtyTracking';
 import { useFullscreen } from '../hooks/useFullscreen';
@@ -69,6 +69,7 @@ const MindmapPage = () => {
   const { isDesktop } = useResponsiveBreakpoint();
   const isMobile = useIsMobile();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const [isPanOnDrag, setIsPanOnDrag] = useState(false);
   const [isToolbarVisible, setIsToolbarVisible] = useState(isDesktop);
@@ -85,7 +86,8 @@ const MindmapPage = () => {
   const { isPresenterMode, togglePresenterMode } = usePresenterMode();
   const setPresenterModeStore = usePresenterModeStore((state) => state.setPresenterMode);
 
-  // View mode functionality (server-driven, cannot toggle)
+  // View mode functionality (URL-driven, cannot toggle)
+  const isViewMode = useViewModeStore((state) => state.isViewMode);
   const setViewMode = useViewModeStore((state) => state.setViewMode);
 
   // Handle unsaved changes blocking
@@ -103,12 +105,12 @@ const MindmapPage = () => {
     setPresenterModeStore(isPresenterMode);
   }, [isPresenterMode, setPresenterModeStore]);
 
-  // Set View Mode based on mindmap permissions from server
-  // 'read' and 'comment' permissions are view-only, 'edit' allows full editing
+  // Set View Mode based on URL search params
+  // When ?view is present in the URL, enable view-only mode
   useEffect(() => {
-    const isViewOnly = mindmap?.permission === 'read' || mindmap?.permission === 'comment';
-    setViewMode(isViewOnly);
-  }, [mindmap?.permission, setViewMode]);
+    const isViewMode = searchParams.has('view');
+    setViewMode(isViewMode);
+  }, [searchParams, setViewMode]);
 
   // Sync mindmap data from React Router loader to stores
   useEffect(() => {
@@ -180,7 +182,7 @@ const MindmapPage = () => {
                 </div>
               )}
 
-              {!isPresenterMode && (
+              {!isPresenterMode && !isViewMode && (
                 <div className={`right-4 top-4 z-10 flex gap-2 ${isMobile ? 'fixed' : 'absolute'}`}>
                   <Button
                     onClick={() => setIsToolbarVisible(!isToolbarVisible)}
@@ -225,12 +227,18 @@ const MindmapPage = () => {
                 initialTitle={mindmap.title}
                 hasBackButton={isDesktop}
                 isPresenterMode={isPresenterMode}
+                isViewMode={isViewMode}
               />
 
               <Background variant={BackgroundVariant.Dots} gap={20} size={1} />
-              <LogicHandler mindmapId={mindmap.id} isPresenterMode={isPresenterMode} />
+              <LogicHandler
+                mindmapId={mindmap.id}
+                isPresenterMode={isPresenterMode}
+                metadata={mindmap.metadata}
+              />
             </Flow>
             {!isPresenterMode &&
+              !isViewMode &&
               isToolbarVisible &&
               (isDesktop ? (
                 <Toolbar mindmapId={mindmap.id} />

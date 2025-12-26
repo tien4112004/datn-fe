@@ -14,6 +14,7 @@ interface MindmapTitleInputProps {
   initialTitle: string;
   hasBackButton?: boolean;
   isPresenterMode?: boolean;
+  isViewMode?: boolean;
 }
 
 const MindmapTitleInput = ({
@@ -21,6 +22,7 @@ const MindmapTitleInput = ({
   initialTitle,
   hasBackButton = false,
   isPresenterMode = false,
+  isViewMode = false,
 }: MindmapTitleInputProps) => {
   const { t } = useTranslation(I18N_NAMESPACES.MINDMAP);
   const isMobile = useIsMobile();
@@ -45,8 +47,8 @@ const MindmapTitleInput = ({
   }, [isEditing]);
 
   const handleSave = useCallback(async () => {
-    // Prevent save in presenter mode
-    if (isPresenterMode) {
+    // Prevent save in presenter mode or view mode
+    if (isPresenterMode || isViewMode) {
       setIsEditing(false);
       return;
     }
@@ -78,7 +80,7 @@ const MindmapTitleInput = ({
       setTitle(originalTitle);
       setIsEditing(false);
     }
-  }, [title, originalTitle, mindmapId, updateMindmapTitle, t, isPresenterMode]);
+  }, [title, originalTitle, mindmapId, updateMindmapTitle, t, isPresenterMode, isViewMode]);
 
   const handleCancel = useCallback(() => {
     setTitle(originalTitle);
@@ -157,7 +159,7 @@ const MindmapTitleInput = ({
         ) : (
           <>
             <span className="max-w-32 truncate text-sm font-medium text-gray-800 sm:max-w-48">{title}</span>
-            {!isPresenterMode && (
+            {!isPresenterMode && !isViewMode && (
               <Button
                 variant="ghost"
                 size="icon"

@@ -125,6 +125,12 @@ export interface MindmapMetadata {
   /** The layout type used for arranging nodes */
   layoutType?: LayoutType;
   forceLayout?: boolean;
+  /** Saved viewport state (zoom and position) */
+  viewport?: {
+    x: number;
+    y: number;
+    zoom: number;
+  };
   [key: string]: unknown;
 }
 
@@ -139,5 +145,4 @@ export interface Mindmap {
   createdAt: string;
   updatedAt: string;
   status: 'active' | 'archived' | 'draft';
-  permission?: 'edit' | 'comment' | 'read'; // Permission level from server
 }

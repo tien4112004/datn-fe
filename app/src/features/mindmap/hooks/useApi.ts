@@ -204,7 +204,15 @@ export const useUpdateMindmapWithMetadata = () => {
   const nodes = useCoreStore((state) => state.nodes);
 
   return useMutation({
-    mutationFn: async ({ id, data }: { id: string; data: Partial<Mindmap> }) => {
+    mutationFn: async ({
+      id,
+      data,
+      viewport,
+    }: {
+      id: string;
+      data: Partial<Mindmap>;
+      viewport?: { x: number; y: number; zoom: number };
+    }) => {
       // Get layout data from root node
       const layoutType = getTreeLayoutType(nodes);
       const forceLayout = getTreeForceLayout(nodes);
@@ -213,11 +221,12 @@ export const useUpdateMindmapWithMetadata = () => {
         ...data,
       };
 
-      // Include layoutType and auto layout state in metadata for backward compatibility
-      // The actual data is stored in root node, but we also save to metadata for older clients
+      // Include layoutType, auto layout state, and viewport in metadata
+      // The layout data is stored in root node, but we also save to metadata for backward compatibility
       updateData.metadata = {
         layoutType,
         forceLayout,
+        ...(viewport && { viewport }),
       };
 
       const thumbnail = getThumbnail();

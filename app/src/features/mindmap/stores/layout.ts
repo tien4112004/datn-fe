@@ -310,6 +310,17 @@ export const useLayoutStore = create<LayoutState>()(
       },
 
       applyAutoLayout: async (rootNodeId: string) => {
+        // Skip auto-layout in presenter/view mode to preserve node positions
+        const { usePresenterModeStore } = await import('./readOnly');
+        const { useViewModeStore } = await import('./viewMode');
+        const isPresenterMode = usePresenterModeStore.getState().isPresenterMode;
+        const isViewMode = useViewModeStore.getState().isViewMode;
+
+        if (isPresenterMode || isViewMode) {
+          console.log('applyAutoLayout: Skipping layout in presenter/view mode to preserve positions');
+          return;
+        }
+
         const { animateNodesToPositions } = get();
         const nodes = useCoreStore.getState().nodes;
         const edges = useCoreStore.getState().edges;

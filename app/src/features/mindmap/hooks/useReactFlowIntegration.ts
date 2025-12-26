@@ -1,5 +1,5 @@
-import { useCallback, useEffect } from 'react';
-import { useReactFlow, type FinalConnectionState, useNodesInitialized } from '@xyflow/react';
+import { useCallback, useRef } from 'react';
+import { useReactFlow, type FinalConnectionState } from '@xyflow/react';
 import { useLayoutStore } from '../stores/layout';
 import type { MindMapNode } from '../types';
 import { useClipboardStore, useCoreStore, useNodeManipulationStore, useNodeOperationsStore } from '../stores';
@@ -7,7 +7,7 @@ import { MINDMAP_TYPES, SIDE } from '../types';
 import { getSideFromPosition, getTreeForceLayout, getRootNodeOfSubtree } from '../services/utils';
 
 export const useReactFlowIntegration = () => {
-  const syncState = useCoreStore((state) => state.syncState);
+  const hasInitializedRef = useRef(false);
   const updateSelectedNodeIds = useCoreStore((state) => state.updateSelectedNodeIds);
   const moveToChild = useNodeManipulationStore((state) => state.moveToChild);
   const getNode = useCoreStore((state) => state.getNode);
@@ -23,7 +23,6 @@ export const useReactFlowIntegration = () => {
   // Get auto layout enabled from root node
   const isAutoLayoutEnabled = getTreeForceLayout(nodes);
 
-  const nodesInitialized = useNodesInitialized();
   const { getIntersectingNodes, fitView, screenToFlowPosition } = useReactFlow();
 
   const onPaneMouseMove = useCallback((event: any) => {
@@ -46,14 +45,15 @@ export const useReactFlowIntegration = () => {
   const onInit = useCallback(async () => {
     updateLayout();
 
-    setTimeout(() => {
-      fitView({ duration: 2000, padding: 0.1 });
-    }, 800);
+    // Only fit view on the very first initialization to prevent
+    // unwanted zooming during collapse/expand operations
+    if (!hasInitializedRef.current) {
+      hasInitializedRef.current = true;
+      setTimeout(() => {
+        fitView({ duration: 2000, padding: 0.1 });
+      }, 800);
+    }
   }, [updateLayout, fitView]);
-
-  useEffect(() => {
-    syncState();
-  }, [nodesInitialized]);
 
   const determineSideFromPosition = useCallback((draggedNode: MindMapNode, targetNode: any) => {
     const targetCenterX = targetNode.position.x + (targetNode.measured?.width ?? 0) / 2;

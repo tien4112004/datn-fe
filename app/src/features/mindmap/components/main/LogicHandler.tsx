@@ -1,30 +1,43 @@
-import { memo, useMemo } from 'react';
+import { memo, useMemo, useEffect } from 'react';
+import { useReactFlow } from '@xyflow/react';
 import { useMindmapActions, useShortcuts } from '../../hooks';
 import { useUndoRedoStore } from '../../stores/undoredo';
 import { useSaveMindmap } from '../../hooks/useSaving';
+import type { MindmapMetadata } from '../../types';
 
 interface LogicHandlerProps {
   mindmapId: string;
+  isPresenterMode?: boolean;
+  metadata?: MindmapMetadata;
 }
 
-const LogicHandler = memo(({ mindmapId }: LogicHandlerProps) => {
+const LogicHandler = memo(({ mindmapId, isPresenterMode = false, metadata }: LogicHandlerProps) => {
   const { selectAllHandler, copyHandler, pasteHandler, deleteHandler, deselectAllHandler } =
     useMindmapActions();
+  const { setViewport } = useReactFlow();
 
   const undo = useUndoRedoStore((state) => state.undo);
   const redo = useUndoRedoStore((state) => state.redo);
 
   const { saveWithThumbnail } = useSaveMindmap();
 
+  // Restore viewport from metadata on mount
+  useEffect(() => {
+    if (metadata?.viewport) {
+      setViewport(metadata.viewport, { duration: 0 });
+    }
+  }, [metadata, setViewport]);
+
   const handleSave = async () => {
     await saveWithThumbnail(mindmapId);
   };
 
-  const shortcuts = useMemo(
+  const allShortcuts = useMemo(
     () => [
       {
         shortcutKey: 'Ctrl+A',
         onKeyPressed: selectAllHandler,
+        disabled: isPresenterMode,
         shouldExecute: () => {
           const activeElement = document.activeElement as HTMLElement;
 
@@ -38,6 +51,7 @@ const LogicHandler = memo(({ mindmapId }: LogicHandlerProps) => {
       {
         shortcutKey: 'Ctrl+C',
         onKeyPressed: copyHandler,
+        disabled: isPresenterMode,
         shouldExecute: () => {
           const activeElement = document.activeElement as HTMLElement;
           return (
@@ -50,30 +64,37 @@ const LogicHandler = memo(({ mindmapId }: LogicHandlerProps) => {
       {
         shortcutKey: 'Ctrl+V',
         onKeyPressed: pasteHandler,
+        disabled: isPresenterMode,
       },
       {
         shortcutKey: 'Delete',
         onKeyPressed: deleteHandler,
+        disabled: isPresenterMode,
       },
       {
         shortcutKey: 'Escape',
         onKeyPressed: deselectAllHandler,
+        disabled: false,
       },
       {
         shortcutKey: 'Ctrl+Z',
         onKeyPressed: undo,
+        disabled: isPresenterMode,
       },
       {
         shortcutKey: 'Ctrl+Y',
         onKeyPressed: redo,
+        disabled: isPresenterMode,
       },
       {
         shortcutKey: 'Ctrl+Shift+Z',
         onKeyPressed: redo,
+        disabled: isPresenterMode,
       },
       {
         shortcutKey: 'Ctrl+S',
         onKeyPressed: handleSave,
+        disabled: isPresenterMode, // Disable save in presenter mode
         shouldExecute: () => {
           const activeElement = document.activeElement as HTMLElement;
           return (
@@ -84,8 +105,20 @@ const LogicHandler = memo(({ mindmapId }: LogicHandlerProps) => {
         },
       },
     ],
-    [selectAllHandler, copyHandler, pasteHandler, deleteHandler, deselectAllHandler, undo, redo, handleSave]
+    [
+      selectAllHandler,
+      copyHandler,
+      pasteHandler,
+      deleteHandler,
+      deselectAllHandler,
+      undo,
+      redo,
+      handleSave,
+      isPresenterMode,
+    ]
   );
+
+  const shortcuts = useMemo(() => allShortcuts.filter((shortcut) => !shortcut.disabled), [allShortcuts]);
 
   useShortcuts(shortcuts);
 

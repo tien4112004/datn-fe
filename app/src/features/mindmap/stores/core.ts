@@ -21,8 +21,6 @@ export interface CoreState {
   setEdges: (updater: MindMapEdge[] | ((edges: MindMapEdge[]) => MindMapEdge[])) => void;
   hasLeftChildren: (nodeId: string) => boolean;
   hasRightChildren: (nodeId: string) => boolean;
-  logData: () => void;
-  syncState: () => void;
   selectAllNodesAndEdges: () => void;
   deselectAllNodesAndEdges: () => void;
   updateSelectedNodeIds: () => void;
@@ -141,17 +139,6 @@ export const useCoreStore = create<CoreState>()(
         hasRightChildren: (nodeId: string) => {
           const { nodes } = get();
           return nodes.some((node) => node.data.parentId === nodeId && node.data.side === SIDE.RIGHT);
-        },
-
-        logData: () => {
-          const { nodes, edges } = get();
-          console.log('Nodes:', nodes);
-          console.log('Edges:', edges);
-        },
-
-        syncState: () => {
-          // Sync state is now called without updateNodeInternals
-          // This is a placeholder for any future sync operations
         },
 
         selectAllNodesAndEdges: () => {

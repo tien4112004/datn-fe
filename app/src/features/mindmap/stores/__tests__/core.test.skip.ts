@@ -358,35 +358,5 @@ describe('useCoreStore', () => {
 
       useCoreStore.setState({ nodes: mockNodes, edges: mockEdges });
     });
-
-    it('should log data without throwing errors', () => {
-      const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
-
-      const state = useCoreStore.getState();
-      expect(() => state.logData()).not.toThrow();
-
-      expect(consoleSpy).toHaveBeenCalledWith('Nodes:', expect.any(Array));
-      expect(consoleSpy).toHaveBeenCalledWith('Edges:', expect.any(Array));
-
-      consoleSpy.mockRestore();
-    });
-
-    it('should sync state with update function', () => {
-      const state = useCoreStore.getState();
-      state.syncState();
-
-      // syncState now just syncs the state without updating node internals
-      expect(state.nodes.length).toBeGreaterThan(0);
-    });
-
-    it('should handle syncState with empty nodes', () => {
-      useCoreStore.setState({ nodes: [] });
-
-      const state = useCoreStore.getState();
-      state.syncState();
-
-      // syncState now just syncs the state without updating node internals
-      expect(state.nodes.length).toBe(0);
-    });
   });
 });

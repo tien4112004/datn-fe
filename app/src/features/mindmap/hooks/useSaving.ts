@@ -5,6 +5,7 @@ import { useUpdateMindmapWithMetadata } from './useApi';
 import { useCoreStore } from '../stores/core';
 import { useMetadataStore } from '../stores/metadata';
 import { useDirtyStore } from '../stores/dirty';
+import { usePresenterModeStore, useViewModeStore } from '../stores';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
@@ -14,7 +15,7 @@ const imageHeight = 2048;
 
 export const useSaveMindmap = () => {
   const { t } = useTranslation(I18N_NAMESPACES.MINDMAP);
-  const { getNodes } = useReactFlow();
+  const { getNodes, getViewport } = useReactFlow();
   const { nodes, edges } = useCoreStore();
   const setThumbnail = useMetadataStore((state) => state.setThumbnail);
   const updateMindmap = useUpdateMindmapWithMetadata();
@@ -45,18 +46,32 @@ export const useSaveMindmap = () => {
   };
 
   const saveWithThumbnail = async (mindmapId: string) => {
+    // Prevent save in presenter mode or view mode
+    const isPresenterMode = usePresenterModeStore.getState().isPresenterMode;
+    const isViewMode = useViewModeStore.getState().isViewMode;
+
+    if (isPresenterMode || isViewMode) {
+      console.log('saveWithThumbnail: Skipping save in presenter/view mode');
+      toast.info(isViewMode ? 'Cannot save in view mode' : 'Cannot save while in presenter mode');
+      return;
+    }
+
     try {
       setIsGeneratingThumbnail(true);
       // Generate thumbnail first
       await generateThumbnail();
 
-      // Then save mindmap with metadata (including thumbnail)
+      // Get current viewport
+      const viewport = getViewport();
+
+      // Then save mindmap with metadata (including thumbnail and viewport)
       await updateMindmap.mutateAsync({
         id: mindmapId,
         data: {
           nodes,
           edges,
         },
+        viewport,
       });
 
       // Mark as saved after successful save

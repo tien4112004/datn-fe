@@ -1,11 +1,10 @@
 import { GitBranchPlus, Undo, Redo, Save, Sparkles, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/shared/components/ui/tabs';
-import { useUndoRedoStore, useCoreStore, useNodeOperationsStore } from '../../stores';
+import { useUndoRedoStore, useNodeOperationsStore } from '../../stores';
 import { useTranslation } from 'react-i18next';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
-import { useSaveMindmap } from '../../hooks/useSaveMindmap';
-import { useNodeSelection } from '../../hooks/useNodeSelection';
+import { useSaveMindmap, useNodeSelection } from '../../hooks';
 import { useState, useEffect } from 'react';
 import ExportMindmapDialog from '../export';
 import { GenerateTreeDialog } from '../generate';
@@ -13,10 +12,9 @@ import NodeSelectionTab from './NodeSelectionTab';
 import LoadingButton from '@/components/common/LoadingButton';
 import { cn } from '@/shared/lib/utils';
 
-const Toolbar = ({ mindmapId }: { mindmapId: string }) => {
+const Toolbar = ({ mindmapId, isMobileSheet = false }: { mindmapId: string; isMobileSheet?: boolean }) => {
   const { t } = useTranslation(I18N_NAMESPACES.MINDMAP);
   const addNode = useNodeOperationsStore((state) => state.addNode);
-  const logData = useCoreStore((state) => state.logData);
   const undo = useUndoRedoStore((state) => state.undo);
   const redo = useUndoRedoStore((state) => state.redo);
   const canUndo = useUndoRedoStore((state) => !state.undoStack.isEmpty());
@@ -43,20 +41,39 @@ const Toolbar = ({ mindmapId }: { mindmapId: string }) => {
   }, [hasSelection, activeTab]);
 
   return (
-    <div className="flex w-64 flex-col gap-2 overflow-y-auto border-l border-gray-200 bg-gradient-to-b from-white to-slate-50/95 p-4 shadow-lg backdrop-blur-md">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <h2 className="text-base font-bold text-gray-800">{t('toolbar.title')}</h2>
-      </div>
+    <div
+      className={cn(
+        'flex flex-col gap-2 p-4',
+        isMobileSheet
+          ? 'w-full bg-transparent'
+          : 'w-64 overflow-y-auto border-l border-gray-200 bg-gradient-to-b from-white to-slate-50/95 shadow-lg backdrop-blur-md'
+      )}
+    >
+      {/* Header - Hide on mobile (shown in SheetHeader instead) */}
+      {!isMobileSheet && (
+        <div className="flex items-center justify-between">
+          <h2 className="text-base font-bold text-gray-800">{t('toolbar.title')}</h2>
+        </div>
+      )}
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="flex flex-1 flex-col">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="general">{t('toolbar.tabs.general')}</TabsTrigger>
-          <TabsTrigger value="selection" className={cn(hasSelection && 'relative')}>
+        <TabsList className={cn('grid w-full grid-cols-2', isMobileSheet && 'h-12')}>
+          <TabsTrigger value="general" className={cn(isMobileSheet && 'text-base')}>
+            {t('toolbar.tabs.general')}
+          </TabsTrigger>
+          <TabsTrigger
+            value="selection"
+            className={cn(hasSelection && 'relative', isMobileSheet && 'text-base')}
+          >
             {t('toolbar.tabs.selection')}
             {hasSelection && (
-              <span className="ml-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-blue-500 text-xs text-white">
+              <span
+                className={cn(
+                  'ml-1 inline-flex items-center justify-center rounded-full bg-blue-500 text-white',
+                  isMobileSheet ? 'h-6 w-6 text-sm' : 'h-5 w-5 text-xs'
+                )}
+              >
                 {selectedCount}
               </span>
             )}
@@ -78,9 +95,12 @@ const Toolbar = ({ mindmapId }: { mindmapId: string }) => {
                 title={t('toolbar.tooltips.addTree')}
                 variant="default"
                 size="sm"
-                className="w-full transition-colors hover:bg-blue-600 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className={cn(
+                  'w-full transition-colors hover:bg-blue-600 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-500',
+                  isMobileSheet && 'h-11 min-h-[44px] text-base'
+                )}
               >
-                <GitBranchPlus size={16} />
+                <GitBranchPlus size={isMobileSheet ? 20 : 16} />
                 {t('toolbar.actions.addTree')}
               </Button>
               <Button
@@ -88,9 +108,12 @@ const Toolbar = ({ mindmapId }: { mindmapId: string }) => {
                 title={t('toolbar.tooltips.generateTree')}
                 variant="outline"
                 size="sm"
-                className="w-full gap-2 transition-colors hover:border-purple-400 hover:bg-purple-50 hover:text-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className={cn(
+                  'w-full gap-2 transition-colors hover:border-purple-400 hover:bg-purple-50 hover:text-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500',
+                  isMobileSheet && 'h-11 min-h-[44px] text-base'
+                )}
               >
-                <Sparkles size={16} />
+                <Sparkles size={isMobileSheet ? 20 : 16} />
                 {t('toolbar.actions.generateTree')}
               </Button>
             </div>
@@ -108,9 +131,12 @@ const Toolbar = ({ mindmapId }: { mindmapId: string }) => {
                 disabled={!canUndo}
                 title={t('toolbar.tooltips.undo')}
                 size="sm"
-                className="w-full transition-colors hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500 disabled:opacity-50"
+                className={cn(
+                  'w-full transition-colors hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500 disabled:opacity-50',
+                  isMobileSheet && 'h-11 min-h-[44px] text-base'
+                )}
               >
-                <Undo size={16} />
+                <Undo size={isMobileSheet ? 20 : 16} />
                 {t('toolbar.actions.undo')}
               </Button>
               <Button
@@ -119,9 +145,12 @@ const Toolbar = ({ mindmapId }: { mindmapId: string }) => {
                 disabled={!canRedo}
                 title={t('toolbar.tooltips.redo')}
                 size="sm"
-                className="w-full transition-colors hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500 disabled:opacity-50"
+                className={cn(
+                  'w-full transition-colors hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500 disabled:opacity-50',
+                  isMobileSheet && 'h-11 min-h-[44px] text-base'
+                )}
               >
-                <Redo size={16} />
+                <Redo size={isMobileSheet ? 20 : 16} />
                 {t('toolbar.actions.redo')}
               </Button>
             </div>
@@ -133,35 +162,31 @@ const Toolbar = ({ mindmapId }: { mindmapId: string }) => {
               {t('toolbar.sections.utilities')}
             </h3>
             <div className="space-y-2">
-              <Button
-                variant="outline"
-                onClick={logData}
-                size="sm"
-                title={t('toolbar.tooltips.logData')}
-                className="w-full transition-colors hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500"
-              >
-                <span className="sr-only">{t('toolbar.actions.logData')}</span>
-                {t('toolbar.actions.logData')}
-              </Button>
               <LoadingButton
                 variant="outline"
                 onClick={async () => await saveWithThumbnail(mindmapId)}
                 loading={isSaving}
                 loadingText={t('toolbar.save.saving')}
-                className="w-full transition-colors hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                className={cn(
+                  'w-full transition-colors hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500',
+                  isMobileSheet && 'h-11 min-h-[44px] text-base'
+                )}
                 title={t('toolbar.tooltips.saveMindmap')}
                 size="sm"
               >
-                <Save size={16} />
+                <Save size={isMobileSheet ? 20 : 16} />
                 {t('toolbar.save.save')}
               </LoadingButton>
               <Button
                 variant="outline"
                 onClick={() => setIsExportDialogOpen(true)}
-                className="w-full transition-colors hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                className={cn(
+                  'w-full transition-colors hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500',
+                  isMobileSheet && 'h-11 min-h-[44px] text-base'
+                )}
                 size="sm"
               >
-                <Download size={16} />
+                <Download size={isMobileSheet ? 20 : 16} />
                 {t('toolbar.export.export')}
               </Button>
             </div>

@@ -1,16 +1,28 @@
 import { ReactFlowProvider } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import { Background, BackgroundVariant, Controls, MiniMap, ControlButton } from '@xyflow/react';
-import { Move, MousePointer2 } from 'lucide-react';
-import { DevTools } from '@/features/mindmap/components/ui/devtools';
-import { Flow, LogicHandler, Toolbar, MindmapTitleInput } from '@/features/mindmap/components';
+import { Background, BackgroundVariant, MiniMap } from '@xyflow/react';
+import { PanelRight, PanelRightOpen, ArrowLeft, Sliders, X } from 'lucide-react';
+import {
+  Flow,
+  LogicHandler,
+  Toolbar,
+  MindmapTitleInput,
+  MindmapControls,
+} from '@/features/mindmap/components';
 import { useState, useEffect } from 'react';
-import { useLoaderData } from 'react-router-dom';
-import { useCoreStore } from '../stores';
+import { Button } from '@/components/ui/button';
+import { useLoaderData, useNavigate, useSearchParams } from 'react-router-dom';
+import { useCoreStore, usePresenterModeStore, useViewModeStore } from '../stores';
 import { useMindmapDirtyTracking } from '../hooks/useDirtyTracking';
-import { useUnsavedChangesBlocker } from '@/shared/hooks';
+import { useFullscreen } from '../hooks/useFullscreen';
+import { usePresenterMode } from '../hooks/usePresenterMode';
+import { useUnsavedChangesBlocker, useResponsiveBreakpoint } from '@/shared/hooks';
+import { useSidebar } from '@/shared/components/ui/sidebar';
+import { useIsMobile } from '@/shared/hooks/use-mobile';
+import { PresenterProvider } from '../contexts/ReadOnlyContext';
 import { UnsavedChangesDialog } from '@/shared/components/modals/UnsavedChangesDialog';
 import { SmallScreenDialog } from '@/shared/components/modals/SmallScreenDialog';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/shared/components/ui/sheet';
 import type { Mindmap, MindMapNode } from '../types';
 import { MINDMAP_TYPES } from '../types';
 
@@ -51,18 +63,54 @@ const migrateLayoutDataToRootNodes = (
 };
 
 const MindmapPage = () => {
-  const [isPanOnDrag, setIsPanOnDrag] = useState(false);
   const { mindmap } = useLoaderData() as { mindmap: Mindmap };
   const setNodes = useCoreStore((state) => state.setNodes);
   const setEdges = useCoreStore((state) => state.setEdges);
+  const { isDesktop } = useResponsiveBreakpoint();
+  const isMobile = useIsMobile();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  const [isPanOnDrag, setIsPanOnDrag] = useState(false);
+  const [isToolbarVisible, setIsToolbarVisible] = useState(isDesktop);
+  const [isControlsExpanded, setIsControlsExpanded] = useState(false);
 
   // Track dirty state changes
   useMindmapDirtyTracking();
+
+  // Fullscreen functionality
+  const { isFullscreen, toggleFullscreen: toggleFullscreenMode } = useFullscreen();
+  const { setFullscreen } = useSidebar();
+
+  // Presenter mode functionality (user can toggle)
+  const { isPresenterMode, togglePresenterMode } = usePresenterMode();
+  const setPresenterModeStore = usePresenterModeStore((state) => state.setPresenterMode);
+
+  // View mode functionality (URL-driven, cannot toggle)
+  const isViewMode = useViewModeStore((state) => state.isViewMode);
+  const setViewMode = useViewModeStore((state) => state.setViewMode);
 
   // Handle unsaved changes blocking
   const { showDialog, setShowDialog, handleStay, handleProceed } = useUnsavedChangesBlocker({
     eventName: 'app.mindmap.dirty-state-changed',
   });
+
+  // Sync fullscreen state with sidebar
+  useEffect(() => {
+    setFullscreen(isFullscreen);
+  }, [isFullscreen, setFullscreen]);
+
+  // Sync presenter mode state to store for use in zustand stores
+  useEffect(() => {
+    setPresenterModeStore(isPresenterMode);
+  }, [isPresenterMode, setPresenterModeStore]);
+
+  // Set View Mode based on URL search params
+  // When ?view is present in the URL, enable view-only mode
+  useEffect(() => {
+    const isViewMode = searchParams.has('view');
+    setViewMode(isViewMode);
+  }, [searchParams, setViewMode]);
 
   // Sync mindmap data from React Router loader to stores
   useEffect(() => {
@@ -82,37 +130,132 @@ const MindmapPage = () => {
   return (
     <>
       <ReactFlowProvider>
-        <div className="flex h-screen w-full" style={{ backgroundColor: 'var(--background)' }}>
-          <Flow isPanOnDrag={isPanOnDrag}>
-            <Controls>
-              <ControlButton
-                onClick={togglePanOnDrag}
-                title={isPanOnDrag ? 'Switch to Selection Mode' : 'Switch to Pan Mode'}
-              >
-                {isPanOnDrag ? <MousePointer2 size={16} /> : <Move size={16} />}
-              </ControlButton>
-            </Controls>
+        <PresenterProvider isPresenterMode={isPresenterMode}>
+          <div className="flex h-screen w-full" style={{ backgroundColor: 'var(--background)' }}>
+            <Flow isPanOnDrag={isPanOnDrag} isPresenterMode={isPresenterMode}>
+              {/* Controls - always visible on desktop, toggleable on mobile */}
+              {isDesktop ? (
+                // Desktop: Always visible controls
+                <div className={`bottom-4 left-4 z-10 ${isMobile ? 'fixed' : 'absolute'}`}>
+                  <MindmapControls
+                    isPanOnDrag={isPanOnDrag}
+                    isPresenterMode={isPresenterMode}
+                    isFullscreen={isFullscreen}
+                    onTogglePanOnDrag={togglePanOnDrag}
+                    onToggleFullscreen={toggleFullscreenMode}
+                    onTogglePresenterMode={togglePresenterMode}
+                  />
+                </div>
+              ) : (
+                // Mobile: Expandable controls with toggle button
+                <div className="fixed bottom-4 left-4 z-10 flex flex-col items-start">
+                  {/* Controls container with animation - expands upward */}
+                  <div
+                    className={`origin-bottom transition-all duration-300 ease-in-out ${
+                      isControlsExpanded
+                        ? 'scale-y-100 opacity-100'
+                        : 'pointer-events-none scale-y-0 opacity-0'
+                    }`}
+                  >
+                    <div className="mb-2">
+                      <MindmapControls
+                        isPanOnDrag={isPanOnDrag}
+                        isPresenterMode={isPresenterMode}
+                        isFullscreen={isFullscreen}
+                        onTogglePanOnDrag={togglePanOnDrag}
+                        onToggleFullscreen={toggleFullscreenMode}
+                        onTogglePresenterMode={togglePresenterMode}
+                      />
+                    </div>
+                  </div>
 
-            <MiniMap
-              className="!border-border !mb-4 !mr-4 !bg-white/90"
-              style={{
-                border: '1px solid var(--border)',
-                backgroundColor: 'var(--muted)',
-              }}
-              nodeStrokeColor="var(--primary)"
-              nodeColor="var(--primary)"
-              nodeBorderRadius={8}
-              position="bottom-right"
-            />
+                  {/* Toggle button - always at the bottom */}
+                  <Button
+                    onClick={() => setIsControlsExpanded(!isControlsExpanded)}
+                    variant="outline"
+                    size="icon"
+                    className="touch-manipulation shadow-md"
+                    title={isControlsExpanded ? 'Hide Controls' : 'Show Controls'}
+                  >
+                    {isControlsExpanded ? <X size={18} /> : <Sliders size={18} />}
+                  </Button>
+                </div>
+              )}
 
-            <MindmapTitleInput mindmapId={mindmap.id} initialTitle={mindmap.title} />
+              {!isPresenterMode && !isViewMode && (
+                <div className={`right-4 top-4 z-10 flex gap-2 ${isMobile ? 'fixed' : 'absolute'}`}>
+                  <Button
+                    onClick={() => setIsToolbarVisible(!isToolbarVisible)}
+                    title={isToolbarVisible ? 'Hide Toolbar' : 'Show Toolbar'}
+                    variant="outline"
+                    size="icon"
+                    className="touch-manipulation shadow-md"
+                  >
+                    {isToolbarVisible ? <PanelRightOpen size={18} /> : <PanelRight size={18} />}
+                  </Button>
+                </div>
+              )}
 
-            <Background variant={BackgroundVariant.Dots} gap={20} size={1} />
-            <DevTools position="bottom-center" />
-            <LogicHandler mindmapId={mindmap.id} />
-          </Flow>
-          <Toolbar mindmapId={mindmap.id} />
-        </div>
+              {!isPresenterMode && (
+                <MiniMap
+                  className="!border-border !mb-4 !mr-4 hidden !bg-white/90 lg:block"
+                  style={{
+                    border: '1px solid var(--border)',
+                    backgroundColor: 'var(--muted)',
+                  }}
+                  nodeStrokeColor="var(--primary)"
+                  nodeColor="var(--primary)"
+                  nodeBorderRadius={8}
+                  position="bottom-right"
+                />
+              )}
+
+              {/* Back button for desktop */}
+              {isDesktop && (
+                <Button
+                  onClick={() => navigate(-1)}
+                  variant="outline"
+                  size="icon"
+                  className={`left-4 top-4 z-10 h-10 w-10 shadow-md ${isMobile ? 'fixed' : 'absolute'}`}
+                  title="Go back"
+                >
+                  <ArrowLeft size={18} />
+                </Button>
+              )}
+              <MindmapTitleInput
+                mindmapId={mindmap.id}
+                initialTitle={mindmap.title}
+                hasBackButton={isDesktop}
+                isPresenterMode={isPresenterMode}
+                isViewMode={isViewMode}
+              />
+
+              <Background variant={BackgroundVariant.Dots} gap={20} size={1} />
+              <LogicHandler
+                mindmapId={mindmap.id}
+                isPresenterMode={isPresenterMode}
+                metadata={mindmap.metadata}
+              />
+            </Flow>
+            {!isPresenterMode &&
+              !isViewMode &&
+              isToolbarVisible &&
+              (isDesktop ? (
+                <Toolbar mindmapId={mindmap.id} />
+              ) : (
+                <Sheet open={isToolbarVisible} onOpenChange={setIsToolbarVisible}>
+                  <SheetContent side="bottom" className="h-[85vh] rounded-t-2xl p-0 sm:h-[80vh]">
+                    <SheetHeader className="border-b px-4 pb-2 pt-4">
+                      <SheetTitle>Toolbar</SheetTitle>
+                    </SheetHeader>
+                    <div className="h-[calc(100%-60px)] overflow-y-auto">
+                      <Toolbar mindmapId={mindmap.id} isMobileSheet={true} />
+                    </div>
+                  </SheetContent>
+                </Sheet>
+              ))}
+          </div>
+        </PresenterProvider>
       </ReactFlowProvider>
       <UnsavedChangesDialog
         open={showDialog}

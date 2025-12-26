@@ -34,54 +34,67 @@ const handlersSelector = (state: any) => ({
   onConnect: state.onConnect,
 });
 
-const Flow = memo(({ children, isPanOnDrag }: { children: ReactNode; isPanOnDrag: boolean }) => {
-  const { nodes, edges, onNodesChange, onEdgesChange, onConnect } = useCoreStore(
-    useShallow(handlersSelector)
-  );
+const Flow = memo(
+  ({
+    children,
+    isPanOnDrag,
+    isPresenterMode = false,
+  }: {
+    children: ReactNode;
+    isPanOnDrag: boolean;
+    isPresenterMode?: boolean;
+  }) => {
+    const { nodes, edges, onNodesChange, onEdgesChange, onConnect } = useCoreStore(
+      useShallow(handlersSelector)
+    );
 
-  const {
-    onNodeDragStart,
-    onNodeDrag,
-    onNodeDragStop,
-    onPaneMouseMove,
-    onPaneClick,
-    onInit,
-    onConnectEnd,
-    onNodeMouseEnter,
-    onNodeMouseLeave,
-    onSelectionChange,
-  } = useReactFlowIntegration();
+    const {
+      onNodeDragStart,
+      onNodeDrag,
+      onNodeDragStop,
+      onPaneMouseMove,
+      onPaneClick,
+      onInit,
+      onConnectEnd,
+      onNodeMouseEnter,
+      onNodeMouseLeave,
+      onSelectionChange,
+    } = useReactFlowIntegration();
 
-  return (
-    <ReactFlow
-      nodes={nodes}
-      edges={edges}
-      onNodesChange={onNodesChange}
-      onEdgesChange={onEdgesChange}
-      onConnect={onConnect}
-      nodeTypes={nodeTypes}
-      edgeTypes={edgeTypes}
-      proOptions={{ hideAttribution: true }}
-      onPaneMouseMove={onPaneMouseMove}
-      onPaneClick={onPaneClick}
-      onNodeDragStart={onNodeDragStart}
-      onNodeDrag={onNodeDrag}
-      onNodeDragStop={onNodeDragStop}
-      onInit={onInit}
-      onConnectEnd={onConnectEnd}
-      onNodeMouseEnter={onNodeMouseEnter}
-      onNodeMouseLeave={onNodeMouseLeave}
-      onSelectionChange={onSelectionChange}
-      connectionLineComponent={ConnectionLine}
-      panOnDrag={isPanOnDrag}
-      panActivationKeyCode={!isPanOnDrag ? 'Shift' : null}
-      selectionOnDrag={!isPanOnDrag}
-      selectNodesOnDrag={false}
-      selectionKeyCode={isPanOnDrag ? 'Shift' : null}
-    >
-      {children}
-    </ReactFlow>
-  );
-});
+    return (
+      <ReactFlow
+        nodes={nodes}
+        edges={edges}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
+        onConnect={onConnect}
+        nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
+        proOptions={{ hideAttribution: true }}
+        onPaneMouseMove={onPaneMouseMove}
+        onPaneClick={onPaneClick}
+        onNodeDragStart={onNodeDragStart}
+        onNodeDrag={onNodeDrag}
+        onNodeDragStop={onNodeDragStop}
+        onInit={onInit}
+        onConnectEnd={onConnectEnd}
+        onNodeMouseEnter={onNodeMouseEnter}
+        onNodeMouseLeave={onNodeMouseLeave}
+        onSelectionChange={onSelectionChange}
+        connectionLineComponent={ConnectionLine}
+        panOnDrag={isPanOnDrag}
+        panActivationKeyCode={!isPanOnDrag ? 'Shift' : null}
+        selectionOnDrag={!isPanOnDrag}
+        selectNodesOnDrag={false}
+        selectionKeyCode={isPanOnDrag ? 'Shift' : null}
+        nodesDraggable={!isPresenterMode}
+        nodesConnectable={!isPresenterMode}
+        fitViewOnInit={false}
+      >
+        {children}
+      </ReactFlow>
+    );
+  }
+);
 
 export default Flow;

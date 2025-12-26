@@ -14,10 +14,12 @@ import { getTreeLayoutType } from '../../services/utils';
 import ColorPickerControl from '../controls/ColorPickerControl';
 import { BaseNodeControl } from '../controls/BaseNodeControl';
 import { NodeRichTextContent } from '../ui/node-rich-text-content';
+import { usePresenterContext } from '../../contexts/ReadOnlyContext';
 
 const RootNodeBlock = memo(
   ({ ...node }: NodeProps<RootNode>) => {
     const { data, selected: isSelected, dragging, width, height } = node;
+    const { isPresenterMode } = usePresenterContext();
 
     const nodes = useCoreStore((state) => state.nodes);
     const layoutType = useMemo(() => getTreeLayoutType(nodes), [nodes]);
@@ -78,6 +80,7 @@ const RootNodeBlock = memo(
             isLayouting={isLayouting}
             onContentChange={handleContentChange}
             minimalToolbar={true}
+            isPresenterMode={isPresenterMode}
             style={{
               width: width ? `${width - 40}px` : undefined,
               height: height ? `${height - 16}px` : undefined,
@@ -87,61 +90,68 @@ const RootNodeBlock = memo(
           />
         </BaseNodeContent>
 
-        <BaseNodeControl layoutType={layoutType} selected={isSelected} dragging={dragging} className="hidden">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleLayoutClick}
-            className="h-6 w-6 p-1"
-            title="Update Subtree Layout"
+        {!isPresenterMode && (
+          <BaseNodeControl
+            layoutType={layoutType}
+            selected={isSelected}
+            dragging={dragging}
+            className="hidden"
           >
-            <Network className="h-3 w-3" />
-          </Button>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="ghost" size="sm" className="h-6 w-6 p-1" title="Change Edge Path Type">
-                <Workflow className="h-3 w-3" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent side="top" className="w-48 p-2">
-              <div className="space-y-2">
-                <Button
-                  variant="ghost"
-                  className="w-full justify-start text-xs"
-                  onClick={() => handlePathTypeChange(PATH_TYPES.SMOOTHSTEP)}
-                >
-                  <SmoothStepIcon />
-                  Smooth Step
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleLayoutClick}
+              className="h-6 w-6 p-1"
+              title="Update Subtree Layout"
+            >
+              <Network className="h-3 w-3" />
+            </Button>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="ghost" size="sm" className="h-6 w-6 p-1" title="Change Edge Path Type">
+                  <Workflow className="h-3 w-3" />
                 </Button>
-                <Button
-                  variant="ghost"
-                  className="w-full justify-start text-xs"
-                  onClick={() => handlePathTypeChange(PATH_TYPES.BEZIER)}
-                >
-                  <BezierIcon />
-                  Bezier
-                </Button>
-                <Button
-                  variant="ghost"
-                  className="w-full justify-start text-xs"
-                  onClick={() => handlePathTypeChange(PATH_TYPES.STRAIGHT)}
-                >
-                  <StraightIcon />
-                  Straight
-                </Button>
-              </div>
-            </PopoverContent>
-          </Popover>
+              </PopoverTrigger>
+              <PopoverContent side="top" className="w-48 p-2">
+                <div className="space-y-2">
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start text-xs"
+                    onClick={() => handlePathTypeChange(PATH_TYPES.SMOOTHSTEP)}
+                  >
+                    <SmoothStepIcon />
+                    Smooth Step
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start text-xs"
+                    onClick={() => handlePathTypeChange(PATH_TYPES.BEZIER)}
+                  >
+                    <BezierIcon />
+                    Bezier
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start text-xs"
+                    onClick={() => handlePathTypeChange(PATH_TYPES.STRAIGHT)}
+                  >
+                    <StraightIcon />
+                    Straight
+                  </Button>
+                </div>
+              </PopoverContent>
+            </Popover>
 
-          <ColorPickerControl
-            hex={hex}
-            setHex={(color: string) => {
-              handleEdgeColorChange(color);
-              setHex(color);
-            }}
-            hasPicker={false}
-          />
-        </BaseNodeControl>
+            <ColorPickerControl
+              hex={hex}
+              setHex={(color: string) => {
+                handleEdgeColorChange(color);
+                setHex(color);
+              }}
+              hasPicker={false}
+            />
+          </BaseNodeControl>
+        )}
       </BaseNodeBlock>
     );
   },

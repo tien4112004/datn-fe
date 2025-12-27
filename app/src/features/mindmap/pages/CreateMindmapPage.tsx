@@ -10,7 +10,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useMemo, useState } from 'react';
 import AdvancedOptions from '@/features/mindmap/components/AdvancedOptions';
 import type { CreateMindmapFormData } from '@/features/mindmap/types';
-import { useGenerateMindmap } from '../hooks/useApi';
+import { useGenerateMindmapFlow } from '../hooks/useGenerateMindmapFlow';
 import useFormPersist from 'react-hook-form-persist';
 import { getLocalStorageData } from '@/shared/lib/utils';
 
@@ -20,9 +20,8 @@ const CreateMindmapPage = () => {
   const { t } = useTranslation('mindmap');
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
-  const generate = useGenerateMindmap();
+  const { generateMindmap, isGenerating: isFlowGenerating } = useGenerateMindmapFlow();
 
-  const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const persistedData = useMemo(() => getLocalStorageData(MINDMAP_FORM_PERSIST), []);
 
@@ -91,21 +90,22 @@ const CreateMindmapPage = () => {
   };
 
   const onSubmit = async (data: CreateMindmapFormData) => {
-    setIsGenerating(true);
     setError(null);
 
     try {
       const apiRequest = transformToApiRequest(data);
-      const response = await generate.mutateAsync(apiRequest);
 
-      // Navigate to the mindmap details page with the generated mindmap ID
-      navigate(`/mindmap/${response.id}`);
+      const mindmap = await generateMindmap(apiRequest, {
+        layoutType: 'horizontal-balanced',
+        basePosition: { x: 0, y: 0 },
+      });
+
+      // Navigate to the mindmap details page
+      navigate(`/mindmap/${mindmap.id}`);
       setValue('topic', '');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to generate mindmap');
       console.error('Mindmap generation failed:', err);
-    } finally {
-      setIsGenerating(false);
     }
   };
 
@@ -152,9 +152,9 @@ const CreateMindmapPage = () => {
 
         {error && <div className="mt-2 rounded-md bg-red-50 p-3 text-sm text-red-600">{error}</div>}
 
-        <Button type="submit" className="mt-4 w-full" disabled={isGenerating}>
+        <Button type="submit" className="mt-4 w-full" disabled={isFlowGenerating}>
           <Sparkles className="mr-2 h-4 w-4" />
-          {isGenerating ? t('create.generating') : t('create.generateMindmap')}
+          {isFlowGenerating ? t('create.generating') : t('create.generateMindmap')}
         </Button>
       </form>
     </div>

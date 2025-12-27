@@ -175,14 +175,6 @@
                 ><IconUpload class="icon" /> {{ $t('toolbar.tools.uploadImage') }}</PopoverMenuItem
               >
             </FileInput>
-            <PopoverMenuItem
-              center
-              @click="
-                openImageLibPanel();
-                imageMenuVisible = false;
-              "
-              ><IconPicture class="icon" /> {{ $t('toolbar.tools.onlineLibrary') }}</PopoverMenuItem
-            >
           </template>
           <div class="handler-item">
             <IconDown class="arrow" />
@@ -325,6 +317,7 @@
 import { ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useMainStore, useSnapshotStore } from '@/store';
+import { ToolbarStates } from '@/types/toolbar';
 import { getImageDataURL } from '@/utils/image';
 import type { ShapePoolItem } from '@/configs/shapes';
 import type { LinePoolItem } from '@/configs/lines';
@@ -442,7 +435,8 @@ const toggleNotesPanel = () => {
 
 // Open image library panel
 const openImageLibPanel = () => {
-  mainStore.setImageLibPanelState(true);
+  mainStore.setToolbarState(ToolbarStates.IMAGE_LIBRARY);
+  mainStore.setSidebarExpanded(true);
 };
 </script>
 

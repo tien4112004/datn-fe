@@ -2,59 +2,62 @@
   <div class="pptist-editor" :class="{ 'view-mode': mode === 'view' }">
     <EditorHeader class="layout-header" />
     <div class="layout-content">
-      <Thumbnails class="layout-content-left layout-thumbnails" />
-      <div class="layout-content-center">
-        <CanvasTool v-if="mode === 'edit'" class="center-top" />
-
-        <!-- Template Preview Mode Banner -->
-        <div v-if="isCurrentSlideLocked" class="preview-mode-banner">
-          <div class="banner-content">
-            <div class="banner-icon">
-              <IconSwatchBook />
-            </div>
-            <div class="banner-text">
-              <div class="banner-title">{{ t('editor.templatePreview.title') }}</div>
-              <div class="banner-subtitle">
-                {{ t('editor.templatePreview.subtitle') }}
+      <div class="layout-content-main">
+        <CanvasTool v-if="mode === 'edit'" class="canvas-tool" />
+        <div class="layout-content-columns">
+          <Thumbnails class="layout-content-left layout-thumbnails" />
+          <div class="layout-content-center">
+            <!-- Template Preview Mode Banner -->
+            <div v-if="isCurrentSlideLocked" class="preview-mode-banner">
+              <div class="banner-content">
+                <div class="banner-icon">
+                  <IconSwatchBook />
+                </div>
+                <div class="banner-text">
+                  <div class="banner-title">{{ t('editor.templatePreview.title') }}</div>
+                  <div class="banner-subtitle">
+                    {{ t('editor.templatePreview.subtitle') }}
+                  </div>
+                </div>
+                <div class="banner-buttons">
+                  <button class="banner-button" @click="confirmCurrentTemplate">
+                    <IconCheckOne />
+                    {{ t('editor.templatePreview.confirmCurrent') }}
+                  </button>
+                  <button
+                    v-if="hasLockedSlides && !showConfirmAllButton"
+                    class="banner-button banner-button-secondary"
+                    @click="promptConfirmAll"
+                  >
+                    <IconCheckOne />
+                    {{ t('editor.templatePreview.confirmAll') }}
+                  </button>
+                  <button
+                    v-if="showConfirmAllButton"
+                    class="banner-button banner-button-confirm"
+                    @click="confirmAllTemplates"
+                  >
+                    <IconCheckOne />
+                    {{ t('editor.templatePreview.confirmAllWarning') }}
+                  </button>
+                </div>
               </div>
             </div>
-            <div class="banner-buttons">
-              <button class="banner-button" @click="confirmCurrentTemplate">
-                <IconCheckOne />
-                {{ t('editor.templatePreview.confirmCurrent') }}
-              </button>
-              <button
-                v-if="hasLockedSlides && !showConfirmAllButton"
-                class="banner-button banner-button-secondary"
-                @click="promptConfirmAll"
-              >
-                <IconCheckOne />
-                {{ t('editor.templatePreview.confirmAll') }}
-              </button>
-              <button
-                v-if="showConfirmAllButton"
-                class="banner-button banner-button-confirm"
-                @click="confirmAllTemplates"
-              >
-                <IconCheckOne />
-                {{ t('editor.templatePreview.confirmAllWarning') }}
-              </button>
-            </div>
-          </div>
-        </div>
 
-        <Canvas class="center-body" :readonly="mode === 'view'" />
-        <div v-if="mode === 'edit'" class="center-bottom" @click="openRemarkDrawer">
-          <div class="remark-preview">
-            <div
-              class="remark-content"
-              :class="{ empty: !currentSlide?.remark }"
-              v-html="currentSlide?.remark || ''"
-            ></div>
-            <div class="remark-hint">
-              <span>{{
-                currentSlide?.remark ? t('editor.remarks.clickToEdit') : t('editor.remarks.clickToAdd')
-              }}</span>
+            <Canvas class="center-body" :readonly="mode === 'view'" />
+            <div v-if="mode === 'edit'" class="center-bottom" @click="openRemarkDrawer">
+              <div class="remark-preview">
+                <div
+                  class="remark-content"
+                  :class="{ empty: !currentSlide?.remark }"
+                  v-html="currentSlide?.remark || ''"
+                ></div>
+                <div class="remark-hint">
+                  <span>{{
+                    currentSlide?.remark ? t('editor.remarks.clickToEdit') : t('editor.remarks.clickToAdd')
+                  }}</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -72,7 +75,6 @@
     <NotesPanel v-if="showNotesPanel" />
     <SymbolPanel v-if="showSymbolPanel" />
     <MarkupPanel v-if="showMarkupPanel" />
-    <ImageLibPanel v-if="showImageLibPanel" />
 
     <Drawer v-model:visible="showRemarkDrawer" placement="bottom">
       <template #title>
@@ -122,7 +124,6 @@ import SearchPanel from './SearchPanel.vue';
 import NotesPanel from './NotesPanel.vue';
 import SymbolPanel from './Toolbar/SymbolPanel.vue';
 import MarkupPanel from './MarkupPanel.vue';
-import ImageLibPanel from './ImageLibPanel.vue';
 import AIPPTDialog from './AIPPTDialog.vue';
 import Modal from '@/components/Modal.vue';
 import Drawer from '@/components/Drawer.vue';
@@ -140,7 +141,6 @@ const {
   showNotesPanel,
   showSymbolPanel,
   showMarkupPanel,
-  showImageLibPanel,
   showAIPPTDialog,
 } = storeToRefs(mainStore);
 const { currentSlide } = storeToRefs(slidesStore);
@@ -217,11 +217,27 @@ onMounted(() => {
 }
 .layout-header {
   height: 40px;
+  flex-shrink: 0;
 }
 .layout-content {
   height: calc(100% - 40px);
   display: flex;
   position: relative;
+}
+.layout-content-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.canvas-tool {
+  height: 40px;
+  flex-shrink: 0;
+}
+.layout-content-columns {
+  flex: 1;
+  display: flex;
+  min-height: 0;
 }
 .layout-content-left {
   width: var(--thumbnails-width, 180px);
@@ -236,10 +252,6 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
 
-  .center-top {
-    height: 40px;
-    flex-shrink: 0;
-  }
   .center-body {
     flex: 1;
     min-height: 0;
@@ -527,6 +539,17 @@ onMounted(() => {
     flex-wrap: wrap;
   }
 
+  .layout-content-main {
+    order: 1;
+    flex: 1 1 0;
+    min-width: 0;
+    height: calc(100% - 100px) !important;
+  }
+
+  .layout-content-columns {
+    flex-direction: column;
+  }
+
   .layout-thumbnails {
     order: 3;
     flex-basis: 100%;
@@ -538,10 +561,7 @@ onMounted(() => {
   }
 
   .layout-content-center {
-    order: 1;
-    flex: 1 1 0;
-    min-width: 0;
-    height: calc(100% - 100px) !important;
+    flex: 1;
   }
 
   .layout-content-right {

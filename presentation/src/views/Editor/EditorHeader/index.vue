@@ -84,16 +84,6 @@
           >
             <PopoverMenuItem>{{ $t('header.file.importPptist') }}</PopoverMenuItem>
           </FileInput>
-          <PopoverMenuItem @click="setDialogForExport('pptx')">{{
-            $t('header.file.exportFile')
-          }}</PopoverMenuItem>
-          <PopoverMenuItem
-            @click="
-              resetSlides();
-              mainMenuVisible = false;
-            "
-            >{{ $t('header.file.resetSlides') }}</PopoverMenuItem
-          >
           <PopoverMenuItem
             @click="
               openMarkupPanel();
@@ -288,11 +278,6 @@ const handleKeyDown = (e: KeyboardEvent) => {
 
 const navigateToList = () => {
   window.location.href = '/projects?type=presentation';
-};
-
-const goLink = (url: string) => {
-  window.open(url);
-  mainMenuVisible.value = false;
 };
 
 const setDialogForExport = (type: DialogForExportTypes) => {

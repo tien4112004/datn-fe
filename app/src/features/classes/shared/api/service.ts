@@ -40,7 +40,7 @@ export default class ClassRealApiService implements ClassApiService {
       params: {
         page: (request.page || 0) + 1,
         pageSize: request.pageSize,
-        sort: request.sort,
+        // sort: request.sort,
         search: request.search,
         grade: request.grade,
         academicYear: request.academicYear,

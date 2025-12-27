@@ -16,6 +16,7 @@ import presentation from './presentation';
 import content from './content';
 import files from './files';
 import system from './system';
+import templateParameters from './template-parameters';
 
 // Combine all locale modules
 export default {
@@ -38,4 +39,5 @@ export default {
   ...content,
   ...files,
   ...system,
+  template: templateParameters,
 };

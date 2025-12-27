@@ -134,11 +134,7 @@
       >
         <span class="text ai">AI</span>
       </div> -->
-      <Button
-        class="handler-item"
-        v-tooltip="$t('header.file.exportFile')"
-        @click="setDialogForExport('pptx')"
-      >
+      <Button class="menu-item" v-tooltip="$t('header.file.exportFile')" @click="setDialogForExport('pptx')">
         <IconDownload class="icon" />
         {{ $t('header.share.export') }}
       </Button>

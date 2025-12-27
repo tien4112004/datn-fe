@@ -31,6 +31,7 @@ import SlideTemplatePanel from './SlideTemplatePanel.vue';
 import MultiPositionPanel from './MultiPositionPanel.vue';
 import MultiStylePanel from './MultiStylePanel.vue';
 import SymbolPanel from './SymbolPanel.vue';
+import ImageLibPanel from '../ImageLibPanel.vue';
 import Card from '@/components/Card.vue';
 
 const mainStore = useMainStore();
@@ -51,6 +52,7 @@ const currentPanelTitle = computed(() => {
     [ToolbarStates.MULTI_STYLE]: t('toolbar.categories.styleMulti'),
     [ToolbarStates.MULTI_POSITION]: t('toolbar.categories.positionMulti'),
     [ToolbarStates.SYMBOL]: t('toolbar.categories.symbol'),
+    [ToolbarStates.IMAGE_LIBRARY]: t('toolbar.categories.imageLibrary'),
   };
   return titleMap[toolbarState.value] || '';
 });
@@ -66,6 +68,7 @@ const currentPanelComponent = computed(() => {
     [ToolbarStates.MULTI_STYLE]: MultiStylePanel,
     [ToolbarStates.MULTI_POSITION]: MultiPositionPanel,
     [ToolbarStates.SYMBOL]: SymbolPanel,
+    [ToolbarStates.IMAGE_LIBRARY]: ImageLibPanel,
   };
   return panelMap[toolbarState.value] || null;
 });

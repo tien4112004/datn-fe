@@ -1,80 +1,63 @@
 <template>
-  <MoveablePanel
-    class="image-lib-panel"
-    :width="360"
-    :height="580"
-    :left="-270"
-    :top="90"
-    :contentStyle="{
-      overflow: 'hidden',
-      display: 'flex',
-      flexDirection: 'column',
-    }"
-    :title="t('panels.imageLibrary.title')"
-    @close="close()"
-  >
-    <div class="container">
-      <div class="tools">
-        <Input
-          class="input"
-          v-model:value="searchWord"
-          :placeholder="t('panels.imageLibrary.searchPlaceholder')"
-          @enter="search()"
-        >
-          <template #prefix>
-            <Popover class="more-icon" trigger="click" v-model:value="orientationVisible">
-              <template #content>
-                <PopoverMenuItem
-                  center
-                  v-for="item in orientationOptions"
-                  :key="item.key"
-                  @click="
-                    setOrientation(item.key);
-                    orientationVisible = false;
-                  "
-                  >{{ item.label }}</PopoverMenuItem
-                >
-              </template>
-              <div class="search-orientation">{{ orientationMap[orientation] }} <IconDown :size="14" /></div>
-            </Popover>
-          </template>
-          <template #suffix>
-            <div class="search-btn" @click="search()"><IconSearch /></div>
-          </template>
-        </Input>
-      </div>
-
-      <div class="imgs-wrap">
-        <div v-if="loading" class="loading-state">
-          <div class="spinner"></div>
-          <div class="loading-text">{{ t('panels.imageLibrary.loading') }}</div>
-        </div>
-        <ImageWaterfallViewer v-else :list="imgs" :columnSpacing="5" :columnWidth="160">
-          <template v-slot:default="props">
-            <div class="img-item">
-              <img :src="props.src" />
-              <div class="mask">
-                <Button type="primary" size="small" @click="createImageElement(props.src)">{{
-                  t('panels.imageLibrary.insert')
-                }}</Button>
-              </div>
-            </div>
-          </template>
-        </ImageWaterfallViewer>
-      </div>
+  <div class="image-lib-panel">
+    <div class="tools">
+      <Input
+        class="input"
+        v-model:value="searchWord"
+        :placeholder="t('panels.imageLibrary.searchPlaceholder')"
+        @enter="search()"
+      >
+        <template #prefix>
+          <Popover class="more-icon" trigger="click" v-model:value="orientationVisible">
+            <template #content>
+              <PopoverMenuItem
+                center
+                v-for="item in orientationOptions"
+                :key="item.key"
+                @click="
+                  setOrientation(item.key);
+                  orientationVisible = false;
+                "
+                >{{ item.label }}</PopoverMenuItem
+              >
+            </template>
+            <div class="search-orientation">{{ orientationMap[orientation] }} <IconDown :size="14" /></div>
+          </Popover>
+        </template>
+        <template #suffix>
+          <div class="search-btn" @click="search()"><IconSearch /></div>
+        </template>
+      </Input>
     </div>
-  </MoveablePanel>
+
+    <div class="imgs-wrap">
+      <div v-if="loading" class="loading-state">
+        <div class="spinner"></div>
+        <div class="loading-text">{{ t('panels.imageLibrary.loading') }}</div>
+      </div>
+      <ImageWaterfallViewer v-else :list="imgs" :columnSpacing="5" :columnWidth="160">
+        <template v-slot:default="props">
+          <div class="img-item">
+            <img :src="props.src" />
+            <div class="mask">
+              <Button type="primary" size="small" @click="createImageElement(props.src)">{{
+                t('panels.imageLibrary.insert')
+              }}</Button>
+            </div>
+          </div>
+        </template>
+      </ImageWaterfallViewer>
+    </div>
+  </div>
 </template>
 
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import api from '@/services';
-import { useMainStore } from '@/store/main';
 import useCreateElement from '@/hooks/useCreateElement';
 import message from '@/utils/message';
 import Button from '@/components/Button.vue';
-import MoveablePanel from '@/components/MoveablePanel.vue';
 import ImageWaterfallViewer from '@/components/ImageWaterfallViewer.vue';
 import Input from '@/components/Input.vue';
 import Popover from '@/components/Popover.vue';
@@ -90,8 +73,6 @@ interface ImageItem {
 }
 
 type Orientation = 'landscape' | 'portrait' | 'square' | 'all';
-
-const mainStore = useMainStore();
 
 const { createImageElement } = useCreateElement();
 
@@ -123,10 +104,6 @@ const initOrientationOptions = () => {
     portrait: t('panels.imageLibrary.orientations.portrait'),
     square: t('panels.imageLibrary.orientations.square'),
   };
-};
-
-const close = () => {
-  mainStore.setImageLibPanelState(false);
 };
 
 onMounted(() => {
@@ -165,12 +142,7 @@ const setOrientation = (value: Orientation) => {
   height: 100%;
   display: flex;
   flex-direction: column;
-}
-.container {
-  flex: 1;
   overflow: hidden;
-  display: flex;
-  flex-direction: column;
 }
 .tools {
   flex-shrink: 0;

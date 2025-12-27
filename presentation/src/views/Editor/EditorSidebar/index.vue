@@ -38,6 +38,7 @@ import {
   Zap,
   Group,
   AlignCenterHorizontal,
+  Image,
 } from 'lucide-vue-next';
 
 interface TabConfig {
@@ -117,6 +118,12 @@ const slideTabs = computed<TabConfig[]>(() => {
       icon: Zap,
       label: t('toolbar.categories.animation'),
       tooltip: t('toolbar.categories.animation'),
+    },
+    {
+      key: ToolbarStates.IMAGE_LIBRARY,
+      icon: Image,
+      label: t('toolbar.categories.imageLibrary'),
+      tooltip: t('toolbar.categories.imageLibrary'),
     },
   ];
 

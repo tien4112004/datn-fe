@@ -395,7 +395,6 @@ import { FONTS } from '@/configs/font';
 import useHistorySnapshot from '@/hooks/useHistorySnapshot';
 import useSlideTheme from '@/hooks/useSlideTheme';
 import { getPresentationApi } from '@/services/presentation/api';
-import { adaptSlideThemeToPreset } from '@/utils/themeAdapter';
 import { getImageDataURL } from '@/utils/image';
 import { useI18n } from 'vue-i18n';
 
@@ -461,7 +460,13 @@ const fetchThemes = async () => {
   try {
     const api = getPresentationApi();
     const slideThemes = await api.getSlideThemes();
-    presetThemes.value = slideThemes.map(adaptSlideThemeToPreset);
+    presetThemes.value = slideThemes.map((theme) => ({
+      background: typeof theme.backgroundColor === 'string' ? theme.backgroundColor : '#ffffff',
+      fontColor: theme.fontColor,
+      borderColor: theme.outline?.color || '#525252',
+      fontname: theme.fontName,
+      colors: theme.themeColors,
+    }));
   } catch (error) {
     console.error('Failed to fetch themes:', error);
     themesError.value = 'Failed to load themes';

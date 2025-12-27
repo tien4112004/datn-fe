@@ -11,6 +11,12 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
   const port = env.PORT ? parseInt(env.PORT, 10) : 5174;
 
+  // Configure URLs with production fallbacks
+  const apiUrl =
+    env.NODE_ENV === 'production'
+      ? 'https://api.huy-devops.site'
+      : env.VITE_API_URL || 'http://localhost:3000';
+
   // Dynamic base URL: use relative path for production, absolute for development
   const getBaseUrl = () => {
     if (mode === 'development') {
@@ -87,6 +93,9 @@ export default defineConfig(({ mode }) => {
     build: {
       target: 'esnext',
       minify: false,
+    },
+    define: {
+      'import.meta.env.VITE_API_URL': JSON.stringify(apiUrl),
     },
   };
 });

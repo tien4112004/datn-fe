@@ -3,7 +3,7 @@ import type { ApiResponse } from '@aiprimary/api';
 import type { PresentationGenerationRequest, PresentationGenerationStartResponse } from './types';
 import type { ApiService } from '@aiprimary/api';
 import { getBackendUrl } from '@aiprimary/api';
-import type { Presentation, Slide, SlideLayoutSchema } from '@aiprimary/core';
+import type { Presentation, Slide, SlideLayoutSchema, SlideTheme } from '@aiprimary/core';
 
 const BASE_URL = getBackendUrl();
 
@@ -142,8 +142,18 @@ export class PresentationApiService implements ApiService {
   /**
    * Update presentation data
    */
-  async updatePresentation(id: string, data: Presentation): Promise<any> {
-    await api.put<ApiResponse<Presentation>>(`${this.baseUrl}/api/presentations/${id}`, data);
+  async updatePresentation(id: string, data: Presentation | FormData): Promise<any> {
+    const config = data instanceof FormData ? { headers: { 'Content-Type': 'multipart/form-data' } } : {};
+
+    await api.put<ApiResponse<Presentation>>(`${this.baseUrl}/api/presentations/${id}`, data, config);
+  }
+
+  /**
+   * Get slide themes from the backend
+   */
+  async getSlideThemes(): Promise<SlideTheme[]> {
+    const response = await api.get<ApiResponse<SlideTheme[]>>(`${this.baseUrl}/api/slide-themes`);
+    return response.data.data;
   }
 
   _mapPresentationItem(data: any): Presentation {

@@ -6,6 +6,21 @@ import { getPresentationApi } from '@/services/presentation/api';
 import type { Slide, SlideTheme, SlideViewport } from '@/types/slides';
 
 /**
+ * Convert data URL (base64) to Blob for multipart upload
+ */
+function dataURLtoBlob(dataURL: string): Blob {
+  const arr = dataURL.split(',');
+  const mime = arr[0].match(/:(.*?);/)?.[1] || 'image/png';
+  const bstr = atob(arr[1]);
+  let n = bstr.length;
+  const u8arr = new Uint8Array(n);
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n);
+  }
+  return new Blob([u8arr], { type: mime });
+}
+
+/**
  * Vue composable for saving presentations
  * Handles thumbnail generation, API calls, and state management
  */
@@ -48,17 +63,27 @@ export function useSavePresentation(presentationId: string, pinia: Pinia) {
         height: slidesStore.viewportSize * slidesStore.viewportRatio,
       };
 
-      // Prepare presentation data with slides and thumbnail
-      const presentationData = {
+      // Convert base64 thumbnail to Blob
+      const thumbnailBlob = thumbnailToUse ? dataURLtoBlob(thumbnailToUse) : null;
+
+      // Build data object with all non-file fields
+      const data = {
         title: overrides?.title ?? slidesStore.title,
         slides: overrides?.slides ?? slidesStore.slides,
-        theme: overrides?.theme ?? slidesStore.theme,
-        viewport,
-        thumbnail: thumbnailToUse, // Backend will convert base64 to URL
+        isParsed: false,
+        metadata: {},
       };
 
-      // Call API to update presentation with all data
-      await presentationApi.updatePresentation(presentationId, presentationData);
+      // Create FormData for multipart upload
+      const formData = new FormData();
+      formData.append('data', new Blob([JSON.stringify(data)], { type: 'application/json' }));
+
+      if (thumbnailBlob) {
+        formData.append('file', thumbnailBlob, 'thumbnail.png');
+      }
+
+      // Call API to update presentation with FormData
+      await presentationApi.updatePresentation(presentationId, formData);
 
       // Mark as saved in store
       saveStore.markSaved();

@@ -119,19 +119,39 @@ const { isCurrentSlideLocked, confirmCurrentTemplate } = useSlideEditLock();
 const templatePreviews = ref<TemplatePreview[]>([]);
 const isLoading = ref(false);
 
-const canSwitch = computed(() => {
-  return currentSlide.value?.id ? canSwitchTemplate(currentSlide.value.id) : false;
-});
+const canSwitch = ref(false);
+const currentTemplate = ref<Template | null>(null);
 
 const currentTemplateId = computed(() => currentSlide.value?.layout?.templateId || '');
 
 const isInPreviewMode = computed(() => isCurrentSlideLocked.value);
 
-const currentTemplate = computed(() => {
-  if (!currentSlide.value?.id) return null;
-  const templates = getAvailableTemplates(currentSlide.value.id);
-  return templates.find((t) => t.id === currentTemplateId.value) || null;
-});
+// Update canSwitch when currentSlide changes
+watch(
+  currentSlide,
+  async (slide) => {
+    if (slide?.id) {
+      canSwitch.value = await canSwitchTemplate(slide.id);
+    } else {
+      canSwitch.value = false;
+    }
+  },
+  { immediate: true }
+);
+
+// Update currentTemplate when currentSlide or currentTemplateId changes
+watch(
+  [currentSlide, currentTemplateId],
+  async ([slide, templateId]) => {
+    if (!slide?.id) {
+      currentTemplate.value = null;
+      return;
+    }
+    const templates = await getAvailableTemplates(slide.id);
+    currentTemplate.value = templates.find((t) => t.id === templateId) || null;
+  },
+  { immediate: true }
+);
 
 const currentParameters = computed(() => currentTemplate.value?.parameters || []);
 
@@ -174,7 +194,7 @@ const generatePreviews = async () => {
   templatePreviews.value = [];
 
   try {
-    const availableTemplates = getAvailableTemplates(currentSlide.value.id);
+    const availableTemplates = await getAvailableTemplates(currentSlide.value.id);
     const viewport = {
       width: viewportSize.value,
       height: viewportSize.value * viewportRatio.value,

@@ -7,7 +7,6 @@ import type { ApiResponse } from '@aiprimary/api';
 import { ExpectedError } from '@aiprimary/api';
 import { useMetadataStore } from '../stores';
 import { useCoreStore } from '../stores/core';
-import { DRAGHANDLE } from '../types';
 import { getTreeLayoutType, getTreeForceLayout } from '../services/utils';
 
 /**
@@ -162,24 +161,7 @@ export const useCreateBlankMindmap = () => {
         id: crypto.randomUUID(),
         title: 'Untitled Mindmap',
         description: '',
-        nodes: [
-          {
-            id: 'root',
-            type: 'mindmapRootNode',
-            position: { x: 0, y: 0 },
-            data: {
-              level: 0,
-              content: '<p>Central Topic</p>',
-              side: 'mid',
-              isCollapsed: false,
-              pathType: 'smoothstep',
-              edgeColor: 'var(--primary)',
-            },
-            dragHandle: DRAGHANDLE.SELECTOR,
-            width: 250,
-            height: 100,
-          },
-        ],
+        nodes: [],
         edges: [],
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),

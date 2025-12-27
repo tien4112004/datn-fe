@@ -1,6 +1,6 @@
 import type { Service } from '@/shared/api';
 import type { ApiResponse } from '@aiprimary/api';
-import type { Mindmap } from './mindmap';
+import type { Mindmap, AiGeneratedNode } from './mindmap';
 
 export interface MindmapCollectionRequest {
   page?: number;
@@ -16,7 +16,7 @@ export interface MindmapApiService extends Service {
   updateMindmap(id: string, data: Partial<Mindmap> | FormData): Promise<Mindmap>;
   deleteMindmap(id: string): Promise<void>;
   updateMindmapTitle(id: string, name: string): Promise<any | null>;
-  generateMindmap(request: MindmapGenerateRequest): Promise<Mindmap>;
+  generateMindmap(request: MindmapGenerateRequest): Promise<AiGeneratedNode>;
 }
 
 /**

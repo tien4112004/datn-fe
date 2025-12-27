@@ -9,6 +9,7 @@ import { SearchBar } from '../../../../shared/components/common/SearchBar';
 import { useNavigate } from 'react-router-dom';
 import { ThumbnailWrapperV2 } from '../others/ThumbnailWrapper';
 import { RenameFileDialog } from '@/components/modals/RenameFileDialog';
+import { DeleteConfirmationDialog } from '@/shared/components/modals/DeleteConfirmationDialog';
 import { getLocaleDateFns } from '@/shared/i18n/helper';
 import { format } from 'date-fns';
 
@@ -19,20 +20,16 @@ const PresentationTable = () => {
 
   const columns = useMemo(
     () => [
-      columnHelper.accessor('id', {
-        header: t('presentation.id'),
-        cell: (info) => info.getValue(),
-        size: 90,
-        enableResizing: false,
-        enableSorting: false,
-      }),
       columnHelper.display({
+        id: 'thumbnail',
         header: t('presentation.thumbnail'),
         cell: (info) => {
           const presentation = info.row.original;
-          return <ThumbnailWrapperV2 presentation={presentation} size={160} visible={true} />;
+          return <ThumbnailWrapperV2 presentation={presentation} size={'auto'} visible={true} />;
         },
-        size: 176,
+        size: 180,
+        minSize: 180,
+        maxSize: 180,
         enableResizing: false,
         enableSorting: false,
       }),
@@ -49,17 +46,27 @@ const PresentationTable = () => {
         header: t('presentation.createdAt'),
         cell: (info) =>
           info.getValue() ? format(info.getValue() as Date, 'E, P', { locale: getLocaleDateFns() }) : '',
-        size: 280,
+        size: 200,
       }),
       columnHelper.accessor('updatedAt', {
         header: t('presentation.updatedAt'),
         cell: (info) =>
           info.getValue() ? format(info.getValue() as Date, 'E, P', { locale: getLocaleDateFns() }) : '',
-        size: 280,
+        size: 200,
         enableSorting: false,
       }),
     ],
     [t]
+  );
+
+  const initialColumnSizing = useMemo(
+    () => ({
+      thumbnail: 180,
+      title: 400,
+      createdAt: 200,
+      updatedAt: 200,
+    }),
+    []
   );
 
   const {
@@ -78,6 +85,12 @@ const PresentationTable = () => {
     handleRename,
     handleConfirmRename,
     isRenamePending,
+    isDeleteOpen,
+    setIsDeleteOpen,
+    handleDelete,
+    handleConfirmDelete,
+    handleCancelDelete,
+    isDeletePending,
   } = usePresentationManager();
 
   const table = useReactTable({
@@ -89,6 +102,9 @@ const PresentationTable = () => {
     enableColumnResizing: true,
     columnResizeMode: 'onChange',
     columnResizeDirection: 'ltr',
+    initialState: {
+      columnSizing: initialColumnSizing,
+    },
     state: {
       sorting,
       pagination,
@@ -115,11 +131,8 @@ const PresentationTable = () => {
             onViewDetail={() => {
               navigate(`/presentation/${row.original.id}`, { replace: false });
             }}
-            onEdit={() => {
-              console.log('Edit', row.original);
-            }}
             onDelete={() => {
-              console.log('Delete', row.original);
+              handleDelete(row.original);
             }}
             onRename={() => {
               handleRename(row.original);
@@ -140,6 +153,15 @@ const PresentationTable = () => {
         placeholder={t('presentation.title')}
         isLoading={isRenamePending}
         onRename={handleConfirmRename}
+      />
+      <DeleteConfirmationDialog
+        open={isDeleteOpen}
+        onOpenChange={setIsDeleteOpen}
+        itemName={selectedPresentation?.title || ''}
+        itemType="presentation"
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+        isDeleting={isDeletePending}
       />
     </div>
   );

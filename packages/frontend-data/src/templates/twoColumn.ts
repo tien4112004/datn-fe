@@ -139,10 +139,9 @@ export const twoColumnTemplates: SlideTemplate[] = [
             margin: { left: 50, right: 50, top: 0, bottom: 50 },
           },
           border: {
-            width: 1,
+            width: '{{theme.card.borderWidth}}',
             color: '{{theme.themeColors[0]}}',
-            radius: 20,
-            directions: ['top', 'right', 'bottom'],
+            radius: '{{theme.card.borderRadius}}',
           },
           layout: {
             distribution: 'space-between',
@@ -213,9 +212,9 @@ export const twoColumnTemplates: SlideTemplate[] = [
         title: {
           type: 'text',
           bounds: {
-            left: 0,
+            left: { expr: 'SIDE_PADDING' },
             top: 15,
-            width: { expr: 'SLIDE_WIDTH' },
+            width: { expr: 'SLIDE_WIDTH - SIDE_PADDING * 2' },
             height: 100,
           },
           layout: {
@@ -342,9 +341,9 @@ export const twoColumnTemplates: SlideTemplate[] = [
         title: {
           type: 'text',
           bounds: {
-            left: 0,
+            left: { expr: 'SIDE_PADDING' },
             top: 15,
-            width: { expr: 'SLIDE_WIDTH' },
+            width: { expr: 'SLIDE_WIDTH - SIDE_PADDING * 2' },
             height: 110,
           },
           layout: {

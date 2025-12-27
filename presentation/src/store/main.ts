@@ -35,8 +35,10 @@ export interface MainState {
   showSelectPanel: boolean;
   showSearchPanel: boolean;
   showNotesPanel: boolean;
+  showSymbolPanel: boolean;
   showMarkupPanel: boolean;
   showAIPPTDialog: boolean;
+  sidebarExpanded: boolean;
 }
 
 const nanoid = customAlphabet('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz');
@@ -71,8 +73,10 @@ export const useMainStore = defineStore('main', {
     showSelectPanel: false, // Open selection panel
     showSearchPanel: false, // Open find and replace panel
     showNotesPanel: false, // Open annotation panel
+    showSymbolPanel: false, // Open symbol panel
     showMarkupPanel: false, // Open type annotation panel
     showAIPPTDialog: false, // Open AIPPT creation window
+    sidebarExpanded: false, // Sidebar panel expansion state
   }),
 
   getters: {
@@ -199,12 +203,26 @@ export const useMainStore = defineStore('main', {
       this.showNotesPanel = show;
     },
 
+    setSymbolPanelState(show: boolean) {
+      this.showSymbolPanel = show;
+    },
+
     setMarkupPanelState(show: boolean) {
       this.showMarkupPanel = show;
     },
 
     setAIPPTDialogState(show: boolean) {
       this.showAIPPTDialog = show;
+    },
+
+    setSidebarExpanded(expanded: boolean) {
+      this.sidebarExpanded = expanded;
+      // Save to localStorage for persistence
+      try {
+        localStorage.setItem('pptist-sidebar-expanded', JSON.stringify(expanded));
+      } catch (e) {
+        console.warn('Failed to save sidebar state:', e);
+      }
     },
   },
 });

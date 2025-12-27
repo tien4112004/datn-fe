@@ -293,6 +293,12 @@
     </div>
 
     <div class="row">
+      <Button style="flex: 1" @click="applyFontToAllSlides(theme.fontName)">{{
+        $t('styling.slide.design.applyFontToAll')
+      }}</Button>
+    </div>
+
+    <div class="row">
       <Button style="flex: 1" @click="themeStylesExtractVisible = true">
         {{ $t('styling.slide.design.extractThemeFromSlide') }}
       </Button>
@@ -301,10 +307,28 @@
     <Divider />
 
     <div class="title title-panel">{{ $t('styling.slide.design.presetThemes') }}</div>
-    <div class="theme-list">
+
+    <!-- Loading State -->
+    <div v-if="themesLoading" class="themes-loading">
+      {{ $t('styling.slide.design.loadingThemes') || 'Loading themes...' }}
+    </div>
+
+    <!-- Error State -->
+    <div v-else-if="themesError" class="themes-error">
+      <div class="error-message">{{ themesError }}</div>
+      <Button size="small" @click="fetchThemes">{{ $t('styling.slide.design.retry') || 'Retry' }}</Button>
+    </div>
+
+    <!-- Empty State -->
+    <div v-else-if="presetThemes.length === 0" class="themes-empty">
+      {{ $t('styling.slide.design.noThemes') || 'No themes available' }}
+    </div>
+
+    <!-- Themes List -->
+    <div v-else class="theme-list">
       <div
         class="theme-item"
-        v-for="(item, index) in PRESET_THEMES"
+        v-for="(item, index) in presetThemes"
         :key="index"
         :style="{
           backgroundColor: item.background,
@@ -353,7 +377,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref, watch } from 'vue';
+import { computed, ref, watch, onMounted } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useSlidesStore } from '@/store';
 import type {
@@ -366,10 +390,11 @@ import type {
   SlideBackgroundImageSize,
   LineStyleType,
 } from '@/types/slides';
-import { PRESET_THEMES } from '@/configs/theme';
+import type { PresetTheme } from '@/configs/theme';
 import { FONTS } from '@/configs/font';
 import useHistorySnapshot from '@/hooks/useHistorySnapshot';
 import useSlideTheme from '@/hooks/useSlideTheme';
+import { getPresentationApi } from '@/services/presentation/api';
 import { getImageDataURL } from '@/utils/image';
 import { useI18n } from 'vue-i18n';
 
@@ -402,6 +427,11 @@ const pageNumberSettingVisible = ref(false);
 const currentGradientIndex = ref(0);
 const lineStyleOptions = ref<LineStyleType[]>(['solid', 'dashed', 'dotted']);
 
+// Themes from API
+const presetThemes = ref<PresetTheme[]>([]);
+const themesLoading = ref(false);
+const themesError = ref<string | null>(null);
+
 const background = computed(() => {
   if (!currentSlide.value.background) {
     return {
@@ -414,12 +444,40 @@ const background = computed(() => {
 });
 
 const { addHistorySnapshot } = useHistorySnapshot();
-const { applyPresetTheme, applyThemeToAllSlides } = useSlideTheme();
+const { applyPresetTheme, applyThemeToAllSlides, applyFontToAllSlides } = useSlideTheme();
 const { createTextElement } = useCreateElement();
 const { t } = useI18n();
 
 watch(slideIndex, () => {
   currentGradientIndex.value = 0;
+});
+
+// Fetch themes from API
+const fetchThemes = async () => {
+  themesLoading.value = true;
+  themesError.value = null;
+
+  try {
+    const api = getPresentationApi();
+    const slideThemes = await api.getSlideThemes();
+    presetThemes.value = slideThemes.map((theme) => ({
+      background: typeof theme.backgroundColor === 'string' ? theme.backgroundColor : '#ffffff',
+      fontColor: theme.fontColor,
+      borderColor: theme.outline?.color || '#525252',
+      fontname: theme.fontName,
+      colors: theme.themeColors,
+    }));
+  } catch (error) {
+    console.error('Failed to fetch themes:', error);
+    themesError.value = 'Failed to load themes';
+    presetThemes.value = [];
+  } finally {
+    themesLoading.value = false;
+  }
+};
+
+onMounted(() => {
+  fetchThemes();
 });
 
 // Set background mode: solid color, image, gradient
@@ -601,6 +659,20 @@ const themeBackgroundColor = computed(() => {
   color: #888;
   font-size: 0.75rem;
   text-align: center;
+}
+
+.themes-loading,
+.themes-error,
+.themes-empty {
+  padding: 20px;
+  text-align: center;
+  color: var(--presentation-foreground);
+  font-size: 0.875rem;
+}
+
+.error-message {
+  margin-bottom: 10px;
+  color: var(--presentation-danger, #ff4444);
 }
 
 .theme-list {

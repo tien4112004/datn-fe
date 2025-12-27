@@ -1,12 +1,6 @@
 import splitMarkdownToOutlineItems from '@/features/presentation/utils/splitMarkdownToOutlineItems';
 import { usePresentationApiService } from '@/features/presentation/api';
-import type {
-  OutlineItem,
-  OutlineData,
-  PresentationGenerationRequest,
-  AiResultSlide,
-  PresentationGenerationStartResponse,
-} from '@/features/presentation/types';
+import type { OutlineItem, OutlineData } from '@/features/presentation/types';
 import useStreaming from '@/hooks/useStreaming';
 
 function useFetchStreamingOutline(
@@ -29,33 +23,4 @@ function useFetchStreamingOutline(
   });
 }
 
-function useFetchStreamingPresentation(
-  initialRequestData: PresentationGenerationRequest,
-  onData: (data: AiResultSlide[]) => void
-) {
-  const presentationApiService = usePresentationApiService();
-
-  return useStreaming<PresentationGenerationRequest, AiResultSlide[], PresentationGenerationStartResponse>({
-    extractFn: presentationApiService.getStreamedPresentation.bind(presentationApiService),
-    transformFn: (slides) => {
-      return slides.map((slide, index) => {
-        const theme = initialRequestData.presentation?.theme;
-        if (!theme) {
-          throw new Error('Presentation theme is required');
-        }
-        return {
-          result: JSON.parse(slide),
-          order: index,
-          theme,
-        };
-      });
-    },
-    onData,
-    input: initialRequestData,
-    queryKey: [presentationApiService.getType(), 'presentationGeneration'],
-    options: { manual: true },
-  });
-}
-
-export { useFetchStreamingPresentation };
 export default useFetchStreamingOutline;

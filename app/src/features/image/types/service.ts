@@ -4,12 +4,8 @@ import type { ArtStyle } from '@aiprimary/core';
 export interface ImageGenerationRequest {
   prompt: string;
   size?: string;
-
-  model: {
-    name: string;
-    provider: string;
-  };
-
+  model: string;
+  provider: string;
   themeStyle?: string;
   themeDescription?: string;
   artStyle?: string;

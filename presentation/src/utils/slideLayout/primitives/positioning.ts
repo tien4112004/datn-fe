@@ -212,10 +212,58 @@ function calculateChildrenBounds(
   let spacing = gap;
   let offset = 0;
 
-  // Ratio distribution (e.g., '30/70', '1/8')
+  // Pixel-based distribution (e.g., '120px/fill', 'calc(150)/fill', 'maxLabel/fill')
   if (distribution.includes('/')) {
     const parts = distribution.split('/');
-    if (parts.length === childCount && parts.every((p) => !isNaN(Number(p)))) {
+
+    // Check for pixel-based or special distribution
+    if (parts.length === 2) {
+      const firstPart = parts[0].trim();
+      const secondPart = parts[1].trim();
+
+      // Handle 'maxLabel/fill' - placeholder for now, actual calculation done in layoutProbuild
+      if (firstPart === 'maxLabel' && secondPart === 'fill') {
+        // This is a marker - will be replaced with actual measurement in two-pass layout
+        // For now, use a reasonable default (25% for label, 75% for content)
+        const labelWidth = bounds[axis.primary] * 0.25;
+        const contentWidth = bounds[axis.primary] - labelWidth - gap;
+        sizes = [labelWidth, contentWidth];
+        spacing = gap;
+        offset = 0;
+      }
+      // Handle pixel-based (e.g., '120px/fill' or 'calc(150)/fill')
+      else if ((firstPart.includes('px') || firstPart.includes('calc')) && secondPart === 'fill') {
+        // Extract pixel value
+        const pxMatch = firstPart.match(/(\d+(?:\.\d+)?)/);
+        if (pxMatch) {
+          const fixedWidth = parseFloat(pxMatch[1]);
+          const remainingWidth = bounds[axis.primary] - fixedWidth - gap;
+          sizes = [fixedWidth, Math.max(0, remainingWidth)];
+          spacing = gap;
+          offset = 0;
+        } else {
+          // Fallback to equal distribution
+          sizes = Array(childCount).fill(baseItemSize);
+          spacing = gap;
+          offset = 0;
+        }
+      }
+      // Handle ratio distribution (e.g., '1/5', '30/70')
+      else if (parts.length === childCount && parts.every((p) => !isNaN(Number(p)))) {
+        const ratios = parts.map(Number);
+        const totalRatio = ratios.reduce((sum, r) => sum + r, 0);
+        sizes = ratios.map((r) => (bounds[axis.primary] * r) / totalRatio);
+        spacing = 0; // Ratio distribution doesn't use gap
+        offset = 0;
+      } else {
+        // Fallback to equal distribution
+        sizes = Array(childCount).fill(baseItemSize);
+        spacing = gap;
+        offset = 0;
+      }
+    }
+    // Original ratio distribution logic (e.g., '1/3/2')
+    else if (parts.length === childCount && parts.every((p) => !isNaN(Number(p)))) {
       const ratios = parts.map(Number);
       const totalRatio = ratios.reduce((sum, r) => sum + r, 0);
       sizes = ratios.map((r) => (bounds[axis.primary] * r) / totalRatio);
@@ -329,10 +377,48 @@ function calculateLayout(
   let spacing = gap;
   let offset = 0;
 
-  // Ratio distribution (e.g., '1/8')
+  // Pixel-based or special distribution (e.g., '120px/fill', 'maxLabel/fill', '1/8')
   if (distribution.includes('/')) {
     const parts = distribution.split('/');
-    if (parts.length === itemDimensions.length && parts.every((p) => !isNaN(Number(p)))) {
+
+    // Check for pixel-based or special distribution (2 parts)
+    if (parts.length === 2) {
+      const firstPart = parts[0].trim();
+      const secondPart = parts[1].trim();
+
+      // Handle 'maxLabel/fill' - should have been replaced by now, but fallback just in case
+      if (firstPart === 'maxLabel' && secondPart === 'fill') {
+        const labelWidth = bounds[axis.primary] * 0.25;
+        const contentWidth = bounds[axis.primary] - labelWidth - gap;
+        sizes = [labelWidth, contentWidth];
+        spacing = gap;
+        offset = 0;
+      }
+      // Handle pixel-based (e.g., '120px/fill' or 'calc(150)/fill')
+      else if ((firstPart.includes('px') || firstPart.includes('calc')) && secondPart === 'fill') {
+        const pxMatch = firstPart.match(/(\d+(?:\.\d+)?)/);
+        if (pxMatch) {
+          const fixedWidth = parseFloat(pxMatch[1]);
+          const remainingWidth = bounds[axis.primary] - fixedWidth - gap;
+          sizes = [fixedWidth, Math.max(0, remainingWidth)];
+          spacing = gap;
+          offset = 0;
+        }
+      }
+      // Handle ratio distribution (e.g., '1/5', '30/70')
+      else if (parts.length === itemDimensions.length && parts.every((p) => !isNaN(Number(p)))) {
+        const ratios = parts.map(Number);
+        const totalRatio = ratios.reduce((sum, r) => sum + r, 0);
+        const totalSpacing = gap * (itemDimensions.length - 1);
+        const availableForItems = bounds[axis.primary] - totalSpacing;
+
+        sizes = ratios.map((ratio) => (availableForItems * ratio) / totalRatio);
+        spacing = gap;
+        offset = 0;
+      }
+    }
+    // Original ratio distribution logic (e.g., '1/3/2')
+    else if (parts.length === itemDimensions.length && parts.every((p) => !isNaN(Number(p)))) {
       const ratios = parts.map(Number);
       const totalRatio = ratios.reduce((sum, r) => sum + r, 0);
       const totalSpacing = gap * (itemDimensions.length - 1);

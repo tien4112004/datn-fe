@@ -1,5 +1,10 @@
 import { API_MODE, type ApiMode } from '@aiprimary/api';
-import { type MindmapApiService, type Mindmap, type MindmapCollectionRequest } from '../types';
+import {
+  type MindmapApiService,
+  type Mindmap,
+  type MindmapCollectionRequest,
+  type AiGeneratedNode,
+} from '../types';
 import { api } from '@aiprimary/api';
 import { mapPagination, type ApiResponse, type Pagination } from '@aiprimary/api';
 
@@ -40,8 +45,10 @@ export default class MindmapRealApiService implements MindmapApiService {
     return response.data.data;
   }
 
-  async updateMindmap(id: string, data: Partial<Mindmap>): Promise<Mindmap> {
-    const response = await api.put<ApiResponse<Mindmap>>(`${this.baseUrl}/api/mindmaps/${id}`, data);
+  async updateMindmap(id: string, data: Partial<Mindmap> | FormData): Promise<Mindmap> {
+    const config = data instanceof FormData ? { headers: { 'Content-Type': 'multipart/form-data' } } : {};
+
+    const response = await api.put<ApiResponse<Mindmap>>(`${this.baseUrl}/api/mindmaps/${id}`, data, config);
     return response.data.data;
   }
 
@@ -57,8 +64,13 @@ export default class MindmapRealApiService implements MindmapApiService {
     return null;
   }
 
-  async generateMindmap(request: import('../types/service').MindmapGenerateRequest): Promise<Mindmap> {
-    const response = await api.post<ApiResponse<Mindmap>>(`${this.baseUrl}/api/mindmaps/generate`, request);
+  async generateMindmap(
+    request: import('../types/service').MindmapGenerateRequest
+  ): Promise<AiGeneratedNode> {
+    const response = await api.post<ApiResponse<AiGeneratedNode>>(
+      `${this.baseUrl}/api/mindmaps/generate`,
+      request
+    );
     return response.data.data;
   }
 }

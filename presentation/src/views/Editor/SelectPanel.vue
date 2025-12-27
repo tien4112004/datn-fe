@@ -25,7 +25,7 @@
         <IconUp class="icon-btn" @click="orderElement(handleElement!, ElementOrderCommands.DOWN)" />
       </div>
     </div>
-    <div class="element-list">
+    <div class="element-list" v-if="elements.length">
       <template v-for="item in elements" :key="item.id">
         <div class="group-els" v-if="item.type === 'group'">
           <div class="group-title">{{ $t('panels.select.groupTitle') }}</div>
@@ -92,6 +92,7 @@
         </div>
       </template>
     </div>
+    <div class="empty" v-if="!elements.length">{{ $t('panels.select.emptyState') }}</div>
   </MoveablePanel>
 </template>
 
@@ -210,6 +211,15 @@ const close = () => {
       color: var(--presentation-primary);
     }
   }
+}
+.empty {
+  width: 100%;
+  height: 100%;
+  color: #999;
+  font-style: italic;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .element-list {
   height: calc(100% - 32px);

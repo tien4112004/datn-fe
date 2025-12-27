@@ -86,7 +86,8 @@ const CreateImagePage = () => {
       prompt: formData.topic,
       artStyle: formData.artStyle,
       size: formData.imageDimension,
-      model: formData.model,
+      model: formData.model.name,
+      provider: formData.model.provider,
     };
   };
 

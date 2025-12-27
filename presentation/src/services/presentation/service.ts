@@ -3,7 +3,7 @@ import type { ApiResponse } from '@aiprimary/api';
 import type { PresentationGenerationRequest, PresentationGenerationStartResponse } from './types';
 import type { ApiService } from '@aiprimary/api';
 import { getBackendUrl } from '@aiprimary/api';
-import type { Presentation, Slide, SlideLayoutSchema } from '@aiprimary/core';
+import type { Presentation, Slide, SlideLayoutSchema, SlideTheme } from '@aiprimary/core';
 
 const BASE_URL = getBackendUrl();
 
@@ -23,10 +23,22 @@ export class PresentationApiService implements ApiService {
    * Used during parsing phase to retrieve generated slide layouts
    */
   async getAiResultById(id: string): Promise<SlideLayoutSchema[]> {
-    const response = await api.get<ApiResponse<SlideLayoutSchema[]>>(
+    const response = await api.get<ApiResponse<string | SlideLayoutSchema[]>>(
       `${this.baseUrl}/api/presentations/${id}/ai-result`
     );
-    return response.data.data;
+
+    const data = response.data.data;
+
+    // If data is a string (newline-separated JSON), parse it
+    if (typeof data === 'string') {
+      return data
+        .split('\n')
+        .filter((line) => line.trim().length > 0)
+        .map((line) => JSON.parse(line));
+    }
+
+    // If already an array, return as-is
+    return data;
   }
 
   /**
@@ -142,12 +154,18 @@ export class PresentationApiService implements ApiService {
   /**
    * Update presentation data
    */
-  async updatePresentation(id: string, data: Presentation): Promise<Presentation> {
-    const response = await api.put<ApiResponse<Presentation>>(
-      `${this.baseUrl}/api/presentations/${id}`,
-      data
-    );
-    return this._mapPresentationItem(response.data.data);
+  async updatePresentation(id: string, data: Presentation | FormData): Promise<any> {
+    const config = data instanceof FormData ? { headers: { 'Content-Type': 'multipart/form-data' } } : {};
+
+    await api.put<ApiResponse<Presentation>>(`${this.baseUrl}/api/presentations/${id}`, data, config);
+  }
+
+  /**
+   * Get slide themes from the backend
+   */
+  async getSlideThemes(): Promise<SlideTheme[]> {
+    const response = await api.get<ApiResponse<SlideTheme[]>>(`${this.baseUrl}/api/slide-themes`);
+    return response.data.data;
   }
 
   _mapPresentationItem(data: any): Presentation {
@@ -158,7 +176,7 @@ export class PresentationApiService implements ApiService {
       theme: data.theme,
       viewport: data.viewport,
       slides: data.slides,
-      isParsed: data.parsed || false,
+      isParsed: data.parsed || data.isParsed || false,
     };
   }
 }

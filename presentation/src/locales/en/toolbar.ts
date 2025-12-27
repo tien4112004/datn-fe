@@ -7,8 +7,11 @@ export default {
       horizontalTextBox: 'Horizontal Text Box',
       verticalTextBox: 'Vertical Text Box',
       insertShape: 'Insert Shape',
+      presetShapes: 'Preset Shapes',
       freehandDrawing: 'Freehand Drawing',
       insertImage: 'Insert Image',
+      uploadImage: 'Upload Image',
+      onlineLibrary: 'Online Library',
       insertLine: 'Insert Line',
       insertChart: 'Insert Chart',
       insertTable: 'Insert Table',
@@ -34,6 +37,7 @@ export default {
       transition: 'Transition',
       styleMulti: 'Style (Multi-select)',
       positionMulti: 'Position (Multi-select)',
+      imageLibrary: 'Image Library',
     },
 
     // Slide Template Panel

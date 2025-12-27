@@ -55,6 +55,17 @@ export default {
       share: 'Share',
     },
 
+    // Breadcrumb Navigation
+    breadcrumb: {
+      presentations: 'Presentations',
+    },
+
+    // Title Editing
+    title: {
+      updateSuccess: 'Title updated successfully',
+      updateError: 'Failed to update title',
+    },
+
     // Edit Actions
     edit: {
       undo: 'Undo',

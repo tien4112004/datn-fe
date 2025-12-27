@@ -7,6 +7,7 @@ export default {
       showAll: 'Show All',
       hideAll: 'Hide All',
       groupTitle: 'Group',
+      emptyState: 'No content on this page',
     },
 
     // Search & Replace
@@ -43,12 +44,16 @@ export default {
       currentImageType: 'Current Image Type:',
       placeholder: 'Select image, text, or shape with text to mark type',
       unmarkedType: 'Unmarked Type',
-      pageTypes: {
-        coverPage: 'Cover Page',
+      layoutTypes: {
+        title: 'Title',
+        list: 'List',
+        labeledList: 'Labeled List',
+        twoColumn: 'Two Column',
+        twoColumnWithImage: 'Two Column with Image',
+        mainImage: 'Main Image',
         tableOfContents: 'Table of Contents',
-        transitionPage: 'Transition Page',
-        contentPage: 'Content Page',
-        endPage: 'End Page',
+        timeline: 'Timeline',
+        pyramid: 'Pyramid',
       },
       textTypes: {
         title: 'Title',
@@ -67,6 +72,22 @@ export default {
         itemIllustration: 'Item Illustration',
         backgroundImage: 'Background Image',
       },
+    },
+
+    // Image Library Panel
+    imageLibrary: {
+      title: 'Image Library (from pexels.com)',
+      searchPlaceholder: 'Search images',
+      loading: 'Loading...',
+      insert: 'Insert',
+      orientations: {
+        all: 'All',
+        landscape: 'Landscape',
+        portrait: 'Portrait',
+        square: 'Square',
+      },
+      defaultSearch: 'landscape',
+      errorNoQuery: 'Please enter search keywords',
     },
   },
 };

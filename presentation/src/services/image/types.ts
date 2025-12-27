@@ -18,3 +18,7 @@ export interface ImageGenerationParams {
 export interface ImageGenerationResponse {
   images: Array<{ url: string }>;
 }
+
+export interface SingleImageResponse {
+  imageUrl: string;
+}

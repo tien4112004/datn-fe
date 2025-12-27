@@ -1,6 +1,14 @@
 import type { ApiMode } from '@aiprimary/api';
 import type { User, LoginRequest, LoginResponse } from './auth';
-import type { ApiResponse, PaginationParams, FAQPost, Book, BookType, ArtStyleRequest } from './api';
+import type {
+  ApiResponse,
+  PaginationParams,
+  SlideTemplateParams,
+  FAQPost,
+  Book,
+  BookType,
+  ArtStyleRequest,
+} from './api';
 import type { SlideTheme, SlideTemplate, ArtStyle, Model, ModelPatchData } from '@aiprimary/core';
 
 /**
@@ -35,7 +43,7 @@ export interface AdminApiService extends Service {
   updateSlideTheme(id: string, data: SlideTheme): Promise<ApiResponse<SlideTheme>>;
 
   // Slide Templates
-  getSlideTemplates(params?: PaginationParams): Promise<ApiResponse<SlideTemplate[]>>;
+  getSlideTemplates(params?: SlideTemplateParams): Promise<ApiResponse<SlideTemplate[]>>;
   createSlideTemplate(data: SlideTemplate): Promise<ApiResponse<SlideTemplate>>;
   updateSlideTemplate(id: string, data: SlideTemplate): Promise<ApiResponse<SlideTemplate>>;
 

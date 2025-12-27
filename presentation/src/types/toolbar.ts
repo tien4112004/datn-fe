@@ -8,4 +8,5 @@ export const enum ToolbarStates {
   SLIDE_TEMPLATE = 'slideTemplate',
   MULTI_STYLE = 'multiStyle',
   MULTI_POSITION = 'multiPosition',
+  IMAGE_LIBRARY = 'imageLibrary',
 }

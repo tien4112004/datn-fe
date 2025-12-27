@@ -86,6 +86,7 @@ export default class PresentationRealApiService implements PresentationApiServic
         page: (request.page || 0) + 1,
         pageSize: request.pageSize,
         sort: request.sort,
+        filter: request.filter,
       },
     });
 

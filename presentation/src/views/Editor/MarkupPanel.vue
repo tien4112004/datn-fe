@@ -14,7 +14,7 @@
         <Select
           style="width: 60%"
           :value="slideType"
-          @update:value="(value) => updateSlide(value as SlideType | '')"
+          @update:value="(value) => updateSlide(value as LayoutType | '')"
           :options="slideTypeOptions"
         />
       </div>
@@ -51,7 +51,8 @@
 import { computed, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useMainStore, useSlidesStore } from '@/store';
-import type { ImageType, SlideType, TextType } from '@/types/slides';
+import type { ImageType, TextType } from '@/types/slides';
+import type { LayoutType } from '@aiprimary/frontend-data';
 
 import MoveablePanel from '@/components/MoveablePanel.vue';
 import Select from '@/components/Select.vue';
@@ -64,13 +65,17 @@ const mainStore = useMainStore();
 const { currentSlide } = storeToRefs(slidesStore);
 const { handleElement, handleElementId } = storeToRefs(mainStore);
 
-const slideTypeOptions = ref<{ label: string; value: SlideType | '' }[]>([
+const slideTypeOptions = ref<{ label: string; value: LayoutType | '' }[]>([
   { label: t('panels.markup.unmarkedType'), value: '' },
-  { label: t('panels.markup.pageTypes.coverPage'), value: 'cover' },
-  { label: t('panels.markup.pageTypes.tableOfContents'), value: 'contents' },
-  { label: t('panels.markup.pageTypes.transitionPage'), value: 'transition' },
-  { label: t('panels.markup.pageTypes.contentPage'), value: 'content' },
-  { label: t('panels.markup.pageTypes.endPage'), value: 'end' },
+  { label: t('panels.markup.layoutTypes.title'), value: 'title' },
+  { label: t('panels.markup.layoutTypes.list'), value: 'list' },
+  { label: t('panels.markup.layoutTypes.labeledList'), value: 'labeled_list' },
+  { label: t('panels.markup.layoutTypes.twoColumn'), value: 'two_column' },
+  { label: t('panels.markup.layoutTypes.twoColumnWithImage'), value: 'two_column_with_image' },
+  { label: t('panels.markup.layoutTypes.mainImage'), value: 'main_image' },
+  { label: t('panels.markup.layoutTypes.tableOfContents'), value: 'table_of_contents' },
+  { label: t('panels.markup.layoutTypes.timeline'), value: 'timeline' },
+  { label: t('panels.markup.layoutTypes.pyramid'), value: 'pyramid' },
 ]);
 
 const textTypeOptions = ref<{ label: string; value: TextType | '' }[]>([
@@ -108,7 +113,7 @@ const imageType = computed(() => {
   return '';
 });
 
-const updateSlide = (type: SlideType | '') => {
+const updateSlide = (type: LayoutType | '') => {
   if (type) slidesStore.updateSlide({ type });
   else {
     slidesStore.removeSlideProps({

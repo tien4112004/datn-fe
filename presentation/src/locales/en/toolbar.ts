@@ -37,6 +37,7 @@ export default {
       transition: 'Transition',
       styleMulti: 'Style (Multi-select)',
       positionMulti: 'Position (Multi-select)',
+      imageLibrary: 'Image Library',
     },
 
     // Slide Template Panel

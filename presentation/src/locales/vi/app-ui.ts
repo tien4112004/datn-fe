@@ -13,6 +13,26 @@ export default {
   },
 
   // ===============================
+  // TRÌNH CHỈNH SỬA
+  // ===============================
+  editor: {
+    templatePreview: {
+      title: 'Chế độ xem trước mẫu',
+      subtitle: 'Chọn bố cục mà bạn thích. Bạn có thể chỉnh sửa sau khi xác nhận mẫu.',
+      confirmCurrent: 'Xác nhận & Bắt đầu chỉnh sửa',
+      confirmAll: 'Xác nhận tất cả slide',
+      confirmAllWarning: 'Nhấn lại để xác nhận tất cả',
+      successSingle: 'Đã xác nhận mẫu! Bạn có thể chỉnh sửa slide của mình.',
+      successMultiple: 'Đã xác nhận {count} slide! Tất cả slide đã có thể chỉnh sửa.',
+    },
+    remarks: {
+      title: 'Ghi chú slide',
+      clickToEdit: 'Nhấn để chỉnh sửa ghi chú',
+      clickToAdd: 'Nhấn để thêm ghi chú',
+    },
+  },
+
+  // ===============================
   // GIAO DIỆN NGƯỜI DÙNG
   // ===============================
   ui: {

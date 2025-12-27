@@ -1,6 +1,6 @@
 import { getAdminApiService } from '@/api/admin';
 import { getAuthApiService } from '@/api/auth';
-import type { ArtStyleRequest, BookType, FAQPost, PaginationParams } from '@/types/api';
+import type { ArtStyleRequest, BookType, FAQPost, PaginationParams, SlideTemplateParams } from '@/types/api';
 import type { ModelPatchData } from '@aiprimary/core';
 import type { LoginRequest } from '@/types/auth';
 import type { SlideTemplate, SlideTheme } from '@aiprimary/core';
@@ -219,7 +219,7 @@ export function useUpdateSlideTheme() {
 
 // ============= SLIDE TEMPLATES =============
 
-export function useSlideTemplates(params?: PaginationParams) {
+export function useSlideTemplates(params?: SlideTemplateParams) {
   return useQuery({
     queryKey: adminKeys.templates.list(params),
     queryFn: () => getAdminApiService().getSlideTemplates(params),

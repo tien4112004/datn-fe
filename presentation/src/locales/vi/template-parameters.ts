@@ -24,9 +24,21 @@ export default {
       label: 'Độ lớn hình ảnh',
       description: 'Điều khiển độ lớn hình ảnh so với vùng chứa',
     },
+    IMAGE_WIDTH: {
+      label: 'Chiều rộng hình ảnh',
+      description: 'Điều khiển chiều rộng của hình ảnh',
+    },
     TIMELINE_SPACING: {
       label: 'Khoảng cách timeline',
       description: 'Khoảng cách ngang giữa các điểm trên timeline',
+    },
+    COLUMN_SPACING: {
+      label: 'Khoảng cách cột',
+      description: 'Khoảng cách ngang giữa các cột',
+    },
+    SPACING: {
+      label: 'Khoảng cách',
+      description: 'Khoảng cách giữa các phần tử',
     },
   },
 };

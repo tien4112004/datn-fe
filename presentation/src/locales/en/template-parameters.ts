@@ -1,33 +1,44 @@
 export default {
   param: {
-    // Common parameters used across templates
     SIDE_PADDING: {
       label: 'Side Padding',
-      description: 'Adjust left and right padding of the slide',
+      description: 'Adjust the left and right spacing of the slide',
     },
     TOP_PADDING: {
       label: 'Top Padding',
-      description: 'Adjust top padding of the content',
+      description: 'Adjust the spacing above the content',
     },
     BOTTOM_PADDING: {
       label: 'Bottom Padding',
-      description: 'Adjust bottom padding of the content',
+      description: 'Adjust the spacing below the content',
     },
     TITLE_SPACING: {
       label: 'Title Spacing',
-      description: 'Space between title and content area',
+      description: 'Distance between the title and content area',
     },
     CONTENT_SPACING: {
       label: 'Content Spacing',
-      description: 'Spacing between content items',
+      description: 'Distance between content items',
     },
     IMAGE_RATIO: {
+      label: 'Image Size',
+      description: 'Control the image size relative to the container',
+    },
+    IMAGE_WIDTH: {
       label: 'Image Width',
-      description: 'Control the width of the image relative to container',
+      description: 'Control the width of the image',
     },
     TIMELINE_SPACING: {
       label: 'Timeline Spacing',
-      description: 'Horizontal spacing between timeline points',
+      description: 'Horizontal distance between timeline points',
+    },
+    COLUMN_SPACING: {
+      label: 'Column Spacing',
+      description: 'Horizontal spacing between columns',
+    },
+    SPACING: {
+      label: 'Spacing',
+      description: 'Spacing between elements',
     },
   },
 };

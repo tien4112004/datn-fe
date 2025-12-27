@@ -50,6 +50,10 @@ export interface PaginationParams {
   pageSize?: number;
 }
 
+export interface SlideTemplateParams extends PaginationParams {
+  layout?: string;
+}
+
 export interface Pagination {
   currentPage: number;
   pageSize: number;

@@ -60,8 +60,8 @@
         </div>
       </div>
       <div v-if="mode === 'edit'" class="layout-content-right">
-        <EditorSidebar class="editor-sidebar" />
         <Toolbar class="toolbar-panel" />
+        <EditorSidebar class="editor-sidebar" />
       </div>
     </div>
   </div>
@@ -295,6 +295,7 @@ onMounted(() => {
 }
 .layout-content-right {
   display: flex;
+  flex-direction: row;
   flex-shrink: 0;
   height: 100%;
   transition: width 0.2s ease-in-out;

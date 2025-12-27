@@ -149,12 +149,16 @@
               ><IconWritingFluently class="icon" /> {{ $t('toolbar.tools.freehandDrawing') }}</PopoverMenuItem
             >
           </template>
-          <IconDown class="arrow" />
+          <div class="handler-item">
+            <IconDown class="arrow" />
+          </div>
         </Popover>
       </div>
-      <div class="handler-item group-btn" v-tooltip="$t('toolbar.tools.insertImage')">
+      <div class="group-btn" v-tooltip="$t('toolbar.tools.insertImage')">
         <FileInput style="height: 100%" @change="(files) => insertImageElement(files)">
-          <IconPicture class="icon" />
+          <div class="handler-item">
+            <IconPicture class="icon" />
+          </div>
         </FileInput>
 
         <Popover trigger="click" v-model:value="imageMenuVisible" style="height: 100%" :offset="10">
@@ -180,7 +184,9 @@
               ><IconPicture class="icon" /> {{ $t('toolbar.tools.onlineLibrary') }}</PopoverMenuItem
             >
           </template>
-          <IconDown class="arrow" />
+          <div class="handler-item">
+            <IconDown class="arrow" />
+          </div>
         </Popover>
       </div>
       <Popover trigger="click" v-model:value="linePoolVisible" :offset="10">
@@ -433,9 +439,6 @@ const toggleSraechPanel = () => {
 const toggleNotesPanel = () => {
   mainStore.setNotesPanelState(!showNotesPanel.value);
 };
-const toggleSymbolPanel = () => {
-  mainStore.setSymbolPanelState(!showSymbolPanel.value);
-};
 
 // Open image library panel
 const openImageLibPanel = () => {
@@ -463,11 +466,11 @@ const openImageLibPanel = () => {
   display: flex;
   align-items: center;
   flex: 0 0 auto;
-  gap: 4px;
+  gap: 2px;
 }
 .left-handler {
   min-width: 0;
-  gap: 4px;
+  gap: 2px;
 }
 .more-icon {
   display: none;
@@ -476,14 +479,14 @@ const openImageLibPanel = () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 2px;
 
   .group-btn {
     display: flex;
     width: auto;
     margin-right: 0;
     flex-shrink: 0;
-    padding: 0 8px;
+    padding: 0 4px;
     border-radius: var(--presentation-radius);
 
     .handler-item {
@@ -524,7 +527,7 @@ const openImageLibPanel = () => {
   border-radius: var(--presentation-radius);
   overflow: hidden;
   cursor: pointer;
-  padding: 0 8px;
+  padding: 0;
 
   &.disable {
     opacity: 0.5;
@@ -556,7 +559,7 @@ const openImageLibPanel = () => {
   }
 }
 
-@media screen and (width <= 1200px) {
+@media screen and (width <= 1500px) {
   .right-handler .text {
     display: none;
   }
@@ -572,7 +575,7 @@ const openImageLibPanel = () => {
   }
 }
 
-@media screen and (width <= 1100px) {
+@media screen and (width <= 1400px) {
   .canvas-tool {
     :deep(.card-content) {
       padding-inline: 2px;
@@ -580,7 +583,7 @@ const openImageLibPanel = () => {
   }
 }
 
-@media screen and (width <= 1050px) {
+@media screen and (width <= 1300px) {
   .left-handler,
   .right-handler {
     display: none;

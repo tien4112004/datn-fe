@@ -35,9 +35,7 @@
                   >{{ item.label }}</PopoverMenuItem
                 >
               </template>
-              <div class="search-orientation">
-                {{ orientationMap.value[orientation.value] }} <IconDown :size="14" />
-              </div>
+              <div class="search-orientation">{{ orientationMap[orientation] }} <IconDown :size="14" /></div>
             </Popover>
           </template>
           <template #suffix>
@@ -191,7 +189,7 @@ const setOrientation = (value: Orientation) => {
   cursor: pointer;
 
   &:hover {
-    color: $themeColor;
+    color: var(--presentation-primary);
   }
 }
 .imgs-wrap {
@@ -200,7 +198,7 @@ const setOrientation = (value: Orientation) => {
   overflow-y: auto;
 }
 .img-item {
-  border-radius: $borderRadius;
+  border-radius: 4px;
   overflow: hidden;
   position: relative;
 

@@ -22,3 +22,8 @@ export const SLIDE_LAYOUT_TYPE = {
   TIMELINE: 'timeline',
   PYRAMID: 'pyramid',
 } as const;
+
+/**
+ * Layout type union - single source of truth for layout types
+ */
+export type LayoutType = (typeof SLIDE_LAYOUT_TYPE)[keyof typeof SLIDE_LAYOUT_TYPE];

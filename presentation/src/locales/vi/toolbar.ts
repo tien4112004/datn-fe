@@ -37,6 +37,7 @@ export default {
       transition: 'Chuyển trang',
       styleMulti: 'Kiểu dáng (Chọn nhiều)',
       positionMulti: 'Vị trí (Chọn nhiều)',
+      imageLibrary: 'Thư viện ảnh',
     },
 
     // Bảng chọn mẫu slide

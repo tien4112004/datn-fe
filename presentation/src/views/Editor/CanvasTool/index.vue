@@ -133,24 +133,56 @@
             <PopoverMenuItem
               center
               @click="
+                shapeMenuVisible = false;
+                shapePoolVisible = true;
+              "
+              ><IconGraphicDesign class="icon" /> {{ $t('toolbar.tools.presetShapes') }}</PopoverMenuItem
+            >
+            <PopoverMenuItem
+              center
+              @click="
                 () => {
                   drawCustomShape();
                   shapeMenuVisible = false;
                 }
               "
-              >{{ $t('toolbar.tools.freehandDrawing') }}</PopoverMenuItem
+              ><IconWritingFluently class="icon" /> {{ $t('toolbar.tools.freehandDrawing') }}</PopoverMenuItem
             >
           </template>
-          <div class="handler-item">
-            <IconDown class="arrow" />
-          </div>
+          <IconDown class="arrow" />
         </Popover>
       </div>
-      <FileInput @change="(files) => insertImageElement(files)">
-        <div class="handler-item" v-tooltip="$t('toolbar.tools.insertImage')">
-          <IconPicture />
-        </div>
-      </FileInput>
+      <div class="handler-item group-btn" v-tooltip="$t('toolbar.tools.insertImage')">
+        <FileInput style="height: 100%" @change="(files) => insertImageElement(files)">
+          <IconPicture class="icon" />
+        </FileInput>
+
+        <Popover trigger="click" v-model:value="imageMenuVisible" style="height: 100%" :offset="10">
+          <template #content>
+            <FileInput
+              @change="
+                (files) => {
+                  insertImageElement(files);
+                  imageMenuVisible = false;
+                }
+              "
+            >
+              <PopoverMenuItem center
+                ><IconUpload class="icon" /> {{ $t('toolbar.tools.uploadImage') }}</PopoverMenuItem
+              >
+            </FileInput>
+            <PopoverMenuItem
+              center
+              @click="
+                openImageLibPanel();
+                imageMenuVisible = false;
+              "
+              ><IconPicture class="icon" /> {{ $t('toolbar.tools.onlineLibrary') }}</PopoverMenuItem
+            >
+          </template>
+          <IconDown class="arrow" />
+        </Popover>
+      </div>
       <Popover trigger="click" v-model:value="linePoolVisible" :offset="10">
         <template #content>
           <LinePool @select="(line) => drawLine(line)" />
@@ -308,8 +340,14 @@ import PopoverMenuItem from '@/components/PopoverMenuItem.vue';
 import Card from '@/components/Card.vue';
 
 const mainStore = useMainStore();
-const { creatingElement, creatingCustomShape, showSelectPanel, showSearchPanel, showNotesPanel } =
-  storeToRefs(mainStore);
+const {
+  creatingElement,
+  creatingCustomShape,
+  showSelectPanel,
+  showSearchPanel,
+  showNotesPanel,
+  showSymbolPanel,
+} = storeToRefs(mainStore);
 const { canUndo, canRedo } = storeToRefs(useSnapshotStore());
 
 const { redo, undo } = useHistorySnapshot();
@@ -347,6 +385,7 @@ const mediaInputVisible = ref(false);
 const latexEditorVisible = ref(false);
 const textTypeSelectVisible = ref(false);
 const shapeMenuVisible = ref(false);
+const imageMenuVisible = ref(false);
 const moreVisible = ref(false);
 
 // Insert text
@@ -393,6 +432,14 @@ const toggleSraechPanel = () => {
 // Open annotation panel
 const toggleNotesPanel = () => {
   mainStore.setNotesPanelState(!showNotesPanel.value);
+};
+const toggleSymbolPanel = () => {
+  mainStore.setSymbolPanelState(!showSymbolPanel.value);
+};
+
+// Open image library panel
+const openImageLibPanel = () => {
+  mainStore.setImageLibPanelState(true);
 };
 </script>
 

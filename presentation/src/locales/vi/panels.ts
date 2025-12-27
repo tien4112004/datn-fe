@@ -7,6 +7,7 @@ export default {
       showAll: 'Hiện tất cả',
       hideAll: 'Ẩn tất cả',
       groupTitle: 'Nhóm',
+      emptyState: 'Trang này không có nội dung',
     },
 
     // Tìm kiếm & Thay thế
@@ -43,12 +44,16 @@ export default {
       currentImageType: 'Loại hình ảnh hiện tại:',
       placeholder: 'Chọn hình ảnh, văn bản, hoặc hình có chứa văn bản để gắn loại',
       unmarkedType: 'Chưa gắn loại',
-      pageTypes: {
-        coverPage: 'Trang bìa',
+      layoutTypes: {
+        title: 'Tiêu đề',
+        list: 'Danh sách',
+        labeledList: 'Danh sách có nhãn',
+        twoColumn: 'Hai cột',
+        twoColumnWithImage: 'Hai cột có hình ảnh',
+        mainImage: 'Hình ảnh chính',
         tableOfContents: 'Mục lục',
-        transitionPage: 'Trang chuyển tiếp',
-        contentPage: 'Trang nội dung',
-        endPage: 'Trang kết thúc',
+        timeline: 'Dòng thời gian',
+        pyramid: 'Kim tự tháp',
       },
       textTypes: {
         title: 'Tiêu đề',
@@ -67,6 +72,22 @@ export default {
         itemIllustration: 'Minh họa cho mục',
         backgroundImage: 'Hình nền',
       },
+    },
+
+    // Bảng thư viện hình ảnh
+    imageLibrary: {
+      title: 'Thư viện hình ảnh (từ pexels.com)',
+      searchPlaceholder: 'Tìm kiếm hình ảnh',
+      loading: 'Đang tải...',
+      insert: 'Chèn',
+      orientations: {
+        all: 'Tất cả',
+        landscape: 'Ngang',
+        portrait: 'Dọc',
+        square: 'Vuông',
+      },
+      defaultSearch: 'phong cảnh',
+      errorNoQuery: 'Vui lòng nhập từ khóa tìm kiếm',
     },
   },
 };

@@ -1,5 +1,9 @@
 <template>
-  <div class="mask" @contextmenu.prevent="removeContextmenu()" @mousedown.left="removeContextmenu()"></div>
+  <div
+    class="contextmenu-mask"
+    @contextmenu.prevent="removeContextmenu()"
+    @mousedown.left="removeContextmenu()"
+  ></div>
 
   <div
     class="contextmenu"
@@ -57,7 +61,7 @@ const handleClickMenuItem = (item: ContextmenuItem) => {
 </script>
 
 <style lang="scss">
-.mask {
+.contextmenu-mask {
   position: fixed;
   left: 0;
   top: 0;

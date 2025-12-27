@@ -16,6 +16,7 @@ import type { SlideTemplate } from '@aiprimary/core';
 import { Edit, FileJson, Plus, RefreshCw } from 'lucide-react';
 import * as frontendDataTemplates from '@aiprimary/frontend-data';
 import { toast } from 'sonner';
+import { getAvailableLayouts } from '@/utils/defaultTemplates';
 
 const columnHelper = createColumnHelper<SlideTemplate>();
 
@@ -25,9 +26,14 @@ export function SlideTemplatesPage() {
   const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [layoutFilter, setLayoutFilter] = useState<string | 'ALL'>('ALL');
   const [isSyncing, setIsSyncing] = useState(false);
 
-  const { data, isLoading, refetch } = useSlideTemplates({ page, pageSize });
+  const { data, isLoading, refetch } = useSlideTemplates({
+    page,
+    pageSize,
+    ...(layoutFilter !== 'ALL' && { layout: layoutFilter }),
+  });
   const updateTemplate = useUpdateSlideTemplate();
 
   const templates = data?.data || [];
@@ -210,26 +216,50 @@ export function SlideTemplatesPage() {
                 {pagination ? `${pagination.totalItems} total templates` : 'Loading...'}
               </CardDescription>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="text-muted-foreground text-sm">Items per page:</span>
-              <Select
-                value={pageSize.toString()}
-                onValueChange={(value) => {
-                  setPageSize(Number(value));
-                  setPage(1); // Reset to first page when changing page size
-                }}
-              >
-                <SelectTrigger className="w-[100px]">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {PAGE_SIZE_OPTIONS.map((size) => (
-                    <SelectItem key={size} value={size.toString()}>
-                      {size}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <span className="text-muted-foreground text-sm">Layout:</span>
+                <Select
+                  value={layoutFilter}
+                  onValueChange={(value: string) => {
+                    setLayoutFilter(value);
+                    setPage(1); // Reset to first page when filter changes
+                  }}
+                >
+                  <SelectTrigger className="w-[200px]">
+                    <SelectValue placeholder="Filter by layout" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="ALL">All Layouts</SelectItem>
+                    {getAvailableLayouts().map((layout) => (
+                      <SelectItem key={layout} value={layout}>
+                        {layout.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-muted-foreground text-sm">Items per page:</span>
+                <Select
+                  value={pageSize.toString()}
+                  onValueChange={(value) => {
+                    setPageSize(Number(value));
+                    setPage(1); // Reset to first page when changing page size
+                  }}
+                >
+                  <SelectTrigger className="w-[100px]">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {PAGE_SIZE_OPTIONS.map((size) => (
+                      <SelectItem key={size} value={size.toString()}>
+                        {size}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </div>
         </CardHeader>

@@ -6,6 +6,7 @@ import type {
   FAQPost,
   Pagination,
   PaginationParams,
+  SlideTemplateParams,
 } from '@/types/api';
 import type { Model, ModelPatchData } from '@aiprimary/core';
 import type { User } from '@/types/auth';
@@ -246,7 +247,7 @@ export default class AdminRealApiService implements AdminApiService {
   }
 
   // Slide Templates
-  async getSlideTemplates(params?: PaginationParams): Promise<ApiResponse<SlideTemplate[]>> {
+  async getSlideTemplates(params?: SlideTemplateParams): Promise<ApiResponse<SlideTemplate[]>> {
     const response = await api.get<ApiResponse<SlideTemplate[]>>(`${this.baseUrl}/api/slide-templates`, {
       params,
     });

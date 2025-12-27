@@ -13,15 +13,15 @@
               <IconSwatchBook />
             </div>
             <div class="banner-text">
-              <div class="banner-title">Template Preview Mode</div>
+              <div class="banner-title">{{ t('editor.templatePreview.title') }}</div>
               <div class="banner-subtitle">
-                Choose your preferred layout. Editing will unlock after you confirm your template choice.
+                {{ t('editor.templatePreview.subtitle') }}
               </div>
             </div>
             <div class="banner-buttons">
               <button class="banner-button" @click="confirmCurrentTemplate">
                 <IconCheckOne />
-                Confirm & Start Editing
+                {{ t('editor.templatePreview.confirmCurrent') }}
               </button>
               <button
                 v-if="hasLockedSlides && !showConfirmAllButton"
@@ -29,7 +29,7 @@
                 @click="promptConfirmAll"
               >
                 <IconCheckOne />
-                Confirm All Slides
+                {{ t('editor.templatePreview.confirmAll') }}
               </button>
               <button
                 v-if="showConfirmAllButton"
@@ -37,7 +37,7 @@
                 @click="confirmAllTemplates"
               >
                 <IconCheckOne />
-                Click Again to Confirm All
+                {{ t('editor.templatePreview.confirmAllWarning') }}
               </button>
             </div>
           </div>
@@ -52,12 +52,17 @@
               v-html="currentSlide?.remark || ''"
             ></div>
             <div class="remark-hint">
-              <span>{{ currentSlide?.remark ? 'Click to edit notes' : 'Click to add notes' }}</span>
+              <span>{{
+                currentSlide?.remark ? t('editor.remarks.clickToEdit') : t('editor.remarks.clickToAdd')
+              }}</span>
             </div>
           </div>
         </div>
       </div>
-      <Toolbar v-if="mode === 'edit'" class="layout-content-right" />
+      <div v-if="mode === 'edit'" class="layout-content-right">
+        <EditorSidebar class="editor-sidebar" />
+        <Toolbar class="toolbar-panel" />
+      </div>
     </div>
   </div>
 
@@ -65,11 +70,13 @@
     <SelectPanel v-if="showSelectPanel" />
     <SearchPanel v-if="showSearchPanel" />
     <NotesPanel v-if="showNotesPanel" />
+    <SymbolPanel v-if="showSymbolPanel" />
     <MarkupPanel v-if="showMarkupPanel" />
+    <ImageLibPanel v-if="showImageLibPanel" />
 
     <Drawer v-model:visible="showRemarkDrawer" placement="bottom">
       <template #title>
-        <span>Slide Remarks</span>
+        <span>{{ t('editor.remarks.title') }}</span>
       </template>
       <Remark v-model:height="remarkHeight" :style="{ height: `${remarkHeight}px` }" />
     </Drawer>
@@ -92,7 +99,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, inject } from 'vue';
+import { ref, computed, inject, onMounted } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useMainStore, useSlidesStore, useContainerStore } from '@/store';
 import useGlobalHotkey from '@/hooks/useGlobalHotkey';
@@ -100,8 +107,10 @@ import usePasteEvent from '@/hooks/usePasteEvent';
 import useSlideEditLock from '@/hooks/useSlideEditLock';
 import message from '@/utils/message';
 import { ToolbarStates } from '@/types/toolbar';
+import { useI18n } from 'vue-i18n';
 
 import EditorHeader from './EditorHeader/index.vue';
+import EditorSidebar from './EditorSidebar/index.vue';
 import Canvas from './Canvas/index.vue';
 import CanvasTool from './CanvasTool/index.vue';
 import Thumbnails from './Thumbnails/index.vue';
@@ -111,10 +120,14 @@ import ExportDialog from './ExportDialog/index.vue';
 import SelectPanel from './SelectPanel.vue';
 import SearchPanel from './SearchPanel.vue';
 import NotesPanel from './NotesPanel.vue';
+import SymbolPanel from './Toolbar/SymbolPanel.vue';
 import MarkupPanel from './MarkupPanel.vue';
+import ImageLibPanel from './ImageLibPanel.vue';
 import AIPPTDialog from './AIPPTDialog.vue';
 import Modal from '@/components/Modal.vue';
 import Drawer from '@/components/Drawer.vue';
+
+const { t } = useI18n();
 
 const mainStore = useMainStore();
 const slidesStore = useSlidesStore();
@@ -125,7 +138,9 @@ const {
   showSelectPanel,
   showSearchPanel,
   showNotesPanel,
+  showSymbolPanel,
   showMarkupPanel,
+  showImageLibPanel,
   showAIPPTDialog,
 } = storeToRefs(mainStore);
 const { currentSlide } = storeToRefs(slidesStore);
@@ -152,7 +167,7 @@ const openRemarkDrawer = () => {
 const confirmCurrentTemplate = () => {
   confirmTemplate();
   mainStore.setToolbarState(ToolbarStates.SLIDE_DESIGN);
-  message.success('Template confirmed! You can now edit your slide.');
+  message.success(t('editor.templatePreview.successSingle'));
 };
 
 // Function to show confirm all button (first step)
@@ -170,7 +185,10 @@ const confirmAllTemplates = () => {
   mainStore.setToolbarState(ToolbarStates.SLIDE_DESIGN);
   showConfirmAllButton.value = false;
   message.success(
-    `Confirmed ${confirmedCount} slide${confirmedCount > 1 ? 's' : ''}! All slides are now editable.`
+    t('editor.templatePreview.successMultiple', {
+      count: confirmedCount,
+      plural: confirmedCount > 1 ? 's' : '',
+    })
   );
 };
 
@@ -179,6 +197,18 @@ const savePresentationFn = inject<(() => Promise<void>) | undefined>('savePresen
 
 useGlobalHotkey(savePresentationFn);
 usePasteEvent();
+
+// Restore sidebar state from localStorage
+onMounted(() => {
+  try {
+    const saved = localStorage.getItem('pptist-sidebar-expanded');
+    if (saved !== null) {
+      mainStore.setSidebarExpanded(JSON.parse(saved));
+    }
+  } catch (e) {
+    console.warn('Failed to restore sidebar state:', e);
+  }
+});
 </script>
 
 <style lang="scss" scoped>
@@ -264,9 +294,19 @@ usePasteEvent();
   }
 }
 .layout-content-right {
-  width: var(--toolbar-width, 320px);
+  display: flex;
   flex-shrink: 0;
   height: 100%;
+  transition: width 0.2s ease-in-out;
+}
+
+.editor-sidebar {
+  flex-shrink: 0;
+}
+
+.toolbar-panel {
+  flex-shrink: 0;
+  width: var(--toolbar-width, 320px);
 }
 
 .preview-mode-banner {
@@ -372,6 +412,10 @@ usePasteEvent();
 }
 
 .pptist-editor.view-mode {
+  .layout-content {
+    height: calc(100% - 40px); // No tab bar in view mode
+  }
+
   .layout-content-center {
     flex: 1;
     min-width: 0;
@@ -427,14 +471,14 @@ usePasteEvent();
     .banner-icon {
       width: 28px;
       height: 28px;
+      flex-shrink: 0;
       order: 1;
     }
 
     .banner-text {
-      min-width: 150px;
-      flex-basis: 100%;
+      flex: 1;
+      min-width: 0;
       order: 2;
-      margin-top: 4px;
     }
 
     .banner-title {
@@ -453,6 +497,7 @@ usePasteEvent();
 
     .banner-buttons {
       order: 3;
+      flex-basis: 100%;
       margin-top: 4px;
       flex-wrap: wrap;
     }

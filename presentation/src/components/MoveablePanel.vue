@@ -15,12 +15,12 @@
         <div class="close-btn" @click="emit('close')"><IconClose /></div>
       </div>
 
-      <div class="content">
+      <div class="content" :style="contentStyle">
         <slot></slot>
       </div>
     </template>
 
-    <div v-else class="content" @mousedown="($event) => startMove($event)">
+    <div v-else class="content" :style="contentStyle" @mousedown="($event) => startMove($event)">
       <slot></slot>
     </div>
 
@@ -44,6 +44,7 @@ const props = withDefaults(
     title?: string;
     moveable?: boolean;
     resizeable?: boolean;
+    contentStyle?: Record<string, any>;
   }>(),
   {
     minWidth: 20,
@@ -200,6 +201,7 @@ const startResize = (e: MouseEvent) => {
   display: flex;
   align-items: center;
   border-bottom: 1px solid #f0f0f0;
+  user-select: none;
   cursor: move;
 }
 .title {

@@ -48,12 +48,6 @@ export const usePresentationValidation = (
     if (presentation.title === undefined || presentation.title === null) {
       throw new CriticalError('Presentation data is invalid: missing title', ERROR_TYPE.RESOURCE_NOT_FOUND);
     }
-
-    // Warn about empty presentations (don't throw, just log)
-    if (presentation.slides && presentation.slides.length === 0) {
-      console.warn(`Presentation ${id} has no slides`);
-      // Don't throw - empty presentations are valid (user might be building it)
-    }
   }
 
   return id;

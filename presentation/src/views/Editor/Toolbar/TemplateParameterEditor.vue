@@ -10,7 +10,7 @@
       <div v-for="param in parameters" :key="param.key" class="parameter-control">
         <div class="tw-flex tw-items-center tw-justify-between tw-mb-2">
           <label class="tw-text-xs tw-font-medium tw-text-muted-foreground">
-            {{ param.label }}
+            {{ getParameterLabel(param) }}
           </label>
           <span class="tw-text-xs tw-text-muted-foreground tw-font-mono">
             {{ formatValue(param, localValues[param.key]) }}
@@ -25,8 +25,8 @@
           @update:value="(value) => handleParameterChange(param.key, value as any)"
         />
 
-        <p v-if="param.description" class="tw-text-xs tw-text-gray-400 tw-mt-1 tw-leading-tight">
-          {{ param.description }}
+        <p v-if="getParameterDescription(param)" class="tw-text-xs tw-text-gray-400 tw-mt-1 tw-leading-tight">
+          {{ getParameterDescription(param) }}
         </p>
       </div>
     </div>
@@ -47,6 +47,7 @@ import type { TemplateParameter } from '@/utils/slideLayout/types';
 import { debounce } from 'lodash';
 import Slider from '@/components/Slider.vue';
 import Button from '@/components/Button.vue';
+import { useParameterLocalization } from '@/composables/useParameterLocalization';
 
 interface Props {
   parameters?: TemplateParameter[];
@@ -59,6 +60,9 @@ interface Emits {
 
 const props = defineProps<Props>();
 const emit = defineEmits<Emits>();
+
+// Initialize localization composable
+const { getParameterLabel, getParameterDescription, formatValue } = useParameterLocalization();
 
 const localValues = ref<Record<string, number>>({});
 
@@ -83,29 +87,6 @@ const initializeValues = () => {
     values[param.key] = props.currentValues?.[param.key] ?? param.defaultValue;
   }
   localValues.value = values;
-};
-
-/**
- * IMPORTANT: Update this function when adding new parameter types!
- *
- * Format parameter value for display
- */
-const formatValue = (param: TemplateParameter, value: number): string => {
-  // Check if the label suggests this is a ratio (percentage)
-  if (param.label.toLowerCase().includes('ratio')) {
-    return `${(value * 100).toFixed(0)}%`;
-  }
-
-  // Check if the label suggests pixels
-  if (
-    param.label.toLowerCase().includes('px') ||
-    param.label.toLowerCase().includes('padding') ||
-    param.label.toLowerCase().includes('spacing')
-  ) {
-    return `${value}px`;
-  }
-
-  return value.toString();
 };
 
 /**

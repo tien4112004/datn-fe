@@ -5,7 +5,7 @@ import { ThemeSelector, ParameterControls, TemplatePreview } from '@/components/
 import { useCreateSlideTemplate, useSlideTemplates, useSlideThemes, useUpdateSlideTemplate } from '@/hooks';
 import { moduleMethodMap } from '@/remote/module';
 import type { Slide, SlideTemplate } from '@aiprimary/core';
-import { generateSampleTemplateData, type LayoutType } from '@aiprimary/frontend-data';
+import { generateSampleTemplateData, type LayoutType, type TestScenario } from '@aiprimary/frontend-data';
 import { json } from '@codemirror/lang-json';
 import CodeMirror from '@uiw/react-codemirror';
 import { useEffect, useState } from 'react';
@@ -162,6 +162,7 @@ export function TemplateFormPage() {
   const [previewLoading, setPreviewLoading] = useState(false);
   const [previewError, setPreviewError] = useState<Error | null>(null);
   const [previewKey, setPreviewKey] = useState(0);
+  const [testScenario, setTestScenario] = useState<TestScenario>('normal');
 
   // Track when JSON changes to indicate unapplied changes
   useEffect(() => {
@@ -183,7 +184,7 @@ export function TemplateFormPage() {
       const { convertToSlide } = methodModule.default;
 
       const layoutType = (dataToUse.layout || 'title') as LayoutType;
-      let schema: any = generateSampleTemplateData(layoutType);
+      let schema: any = generateSampleTemplateData(layoutType, testScenario);
       schema.type = layoutType;
 
       const normalizeSchemaData = (s: any) => {
@@ -239,7 +240,10 @@ export function TemplateFormPage() {
       setPreviewKey((k) => k + 1);
     } catch (err) {
       // fallback: simple textual slide
-      const sampleData = generateSampleTemplateData((dataToUse.layout || 'title') as LayoutType);
+      const sampleData = generateSampleTemplateData(
+        (dataToUse.layout || 'title') as LayoutType,
+        testScenario
+      );
       const fallbackSlide: Slide = {
         id: 'preview-template-slide',
         elements: [
@@ -269,7 +273,7 @@ export function TemplateFormPage() {
     }
   };
 
-  // Regenerate preview when theme or parameters change
+  // Regenerate preview when theme, parameters, or test scenario change
   useEffect(() => {
     if (formData.layout) {
       makePreview();
@@ -277,6 +281,7 @@ export function TemplateFormPage() {
   }, [
     selectedThemeId,
     parameterOverrides,
+    testScenario,
     JSON.stringify(themesData?.data?.find((t) => t.id === selectedThemeId)),
   ]);
 
@@ -400,6 +405,27 @@ export function TemplateFormPage() {
               selectedThemeId={selectedThemeId}
               onThemeChange={setSelectedThemeId}
             />
+
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Test Data Scenario</Label>
+              <Select value={testScenario} onValueChange={(value) => setTestScenario(value as TestScenario)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="normal">Normal Text</SelectItem>
+                  <SelectItem value="short">Short Text</SelectItem>
+                  <SelectItem value="long">Long Text</SelectItem>
+                  <SelectItem value="edge">Edge Cases</SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-muted-foreground text-xs">
+                {testScenario === 'normal' && 'Standard content with moderate length'}
+                {testScenario === 'short' && 'Minimal text - 1-2 words per field'}
+                {testScenario === 'long' && 'Extensive paragraphs and long labels'}
+                {testScenario === 'edge' && 'Empty values, special chars, emojis, very long words'}
+              </p>
+            </div>
 
             <div>
               <div className="text-muted-foreground text-sm">Layout Type</div>

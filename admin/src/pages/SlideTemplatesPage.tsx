@@ -11,6 +11,7 @@ import { useNavigate } from 'react-router-dom';
 import { DataTable, TablePagination } from '@/components/table';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import type { SlideTemplate } from '@aiprimary/core';
 import { Edit, FileJson, Plus, RefreshCw } from 'lucide-react';
 import * as frontendDataTemplates from '@aiprimary/frontend-data';
@@ -18,10 +19,12 @@ import { toast } from 'sonner';
 
 const columnHelper = createColumnHelper<SlideTemplate>();
 
+const PAGE_SIZE_OPTIONS = [5, 10, 20, 50, 100] as const;
+
 export function SlideTemplatesPage() {
   const navigate = useNavigate();
   const [page, setPage] = useState(1);
-  const pageSize = 10;
+  const [pageSize, setPageSize] = useState(10);
   const [isSyncing, setIsSyncing] = useState(false);
 
   const { data, isLoading, refetch } = useSlideTemplates({ page, pageSize });
@@ -200,10 +203,35 @@ export function SlideTemplatesPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>All Templates</CardTitle>
-          <CardDescription>
-            {pagination ? `${pagination.totalItems} total templates` : 'Loading...'}
-          </CardDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>All Templates</CardTitle>
+              <CardDescription>
+                {pagination ? `${pagination.totalItems} total templates` : 'Loading...'}
+              </CardDescription>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-muted-foreground text-sm">Items per page:</span>
+              <Select
+                value={pageSize.toString()}
+                onValueChange={(value) => {
+                  setPageSize(Number(value));
+                  setPage(1); // Reset to first page when changing page size
+                }}
+              >
+                <SelectTrigger className="w-[100px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {PAGE_SIZE_OPTIONS.map((size) => (
+                    <SelectItem key={size} value={size.toString()}>
+                      {size}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
           <DataTable

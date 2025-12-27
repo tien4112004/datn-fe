@@ -23,10 +23,22 @@ export class PresentationApiService implements ApiService {
    * Used during parsing phase to retrieve generated slide layouts
    */
   async getAiResultById(id: string): Promise<SlideLayoutSchema[]> {
-    const response = await api.get<ApiResponse<SlideLayoutSchema[]>>(
+    const response = await api.get<ApiResponse<string | SlideLayoutSchema[]>>(
       `${this.baseUrl}/api/presentations/${id}/ai-result`
     );
-    return response.data.data;
+
+    const data = response.data.data;
+
+    // If data is a string (newline-separated JSON), parse it
+    if (typeof data === 'string') {
+      return data
+        .split('\n')
+        .filter((line) => line.trim().length > 0)
+        .map((line) => JSON.parse(line));
+    }
+
+    // If already an array, return as-is
+    return data;
   }
 
   /**
@@ -164,7 +176,7 @@ export class PresentationApiService implements ApiService {
       theme: data.theme,
       viewport: data.viewport,
       slides: data.slides,
-      isParsed: data.parsed || false,
+      isParsed: data.parsed || data.isParsed || false,
     };
   }
 }

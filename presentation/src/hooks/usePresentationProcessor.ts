@@ -43,14 +43,12 @@ export function usePresentationProcessor(
 
   // API Mutations
   const { mutateAsync: getAiResult } = useAiResultById(presentationId);
-  const { mutateAsync: updateSlides } = useUpdateSlides(presentationId);
   const { mutateAsync: setParsed } = useSetParsed(presentationId);
   const { mutateAsync: generateImage } = useGenerateImage(presentationId);
 
   // Stores
   const generationStore = useGenerationStore();
   const slidesStore = useSlidesStore();
-  const saveStore = useSaveStore();
 
   // Save hook
   const { savePresentation: savePresentationFn } = useSavePresentation(presentationId, pinia);
@@ -73,6 +71,7 @@ export function usePresentationProcessor(
 
   // 1. Initial Logic
   if (presentation && !presentation.isParsed && !isGenerating) {
+    console.log('[PresentationProcessor] Processing unparsed presentation...', presentation);
     processFullAiResult();
   } else if (!isGenerating && generationRequest) {
     generationStore.startStreaming({
@@ -156,29 +155,16 @@ export function usePresentationProcessor(
         // Get the actual slide ID from the store after insertion
         const addedSlideIndex = updatedSlides.length - 1;
         const actualSlideId = slidesStore.slides[addedSlideIndex]?.id;
-        console.debug(
-          '[ImageFlow] Slide added to store at index:',
-          addedSlideIndex,
-          'actual ID:',
-          actualSlideId
-        );
 
         // Handle Image Generation - USE ACTUAL SLIDE ID FROM STORE
         const imageElement = slide.elements.find((el) => el.type === 'image') as PPTImageElement;
         if (imageElement && actualSlideId) {
           const prompt = (streamedSlide.result as any).data?.image;
-          console.debug(
-            '[ImageFlow] Found image element for slide:',
-            actualSlideId,
-            'element:',
-            imageElement.id
-          );
           const promise = handleImageGeneration(actualSlideId, imageElement, prompt);
 
           // Track promise
           pendingImageGenerations.value.add(promise);
           promise.finally(() => {
-            console.debug('[ImageFlow] Image generation promise completed for slide:', actualSlideId);
             pendingImageGenerations.value.delete(promise);
           });
         }
@@ -195,21 +181,13 @@ export function usePresentationProcessor(
     prompt?: string
   ): Promise<{ success: boolean; error?: Error }> {
     const request = generationStore.request;
-    console.debug(
-      '[ImageFlow] handleImageGeneration called for slide:',
-      slideId,
-      'element:',
-      imageElement.id
-    );
 
     if (!prompt) {
-      console.warn('[ImageFlow] No prompt provided for slide:', slideId);
       await updateSlideImageInStoreWithError(slideId, imageElement.id);
       return { success: false, error: new Error('No prompt provided') };
     }
 
     if (!request?.generationOptions?.imageModel) {
-      console.warn('[ImageFlow] No image model configured for slide:', slideId);
       await updateSlideImageInStoreWithError(slideId, imageElement.id);
       return { success: false, error: new Error('No image model configured') };
     }
@@ -217,15 +195,13 @@ export function usePresentationProcessor(
     // Set loading state
     const loadingUrl =
       'https://upload.wikimedia.org/wikipedia/commons/a/ad/YouTube_loading_symbol_3_%28transparent%29.gif';
-    console.debug('[ImageFlow] Setting loading state for slide:', slideId);
     await updateSlideImageInStore(slideId, imageElement.id, loadingUrl);
 
     try {
       // Get current theme info
       const currentTheme = presentation?.theme || slidesStore.theme;
 
-      console.debug('[ImageFlow] Calling generateImage API for slide:', slideId);
-      const response: any = await generateImage({
+      const response = await generateImage({
         slideId,
         prompt,
         model: request.generationOptions.imageModel,
@@ -235,18 +211,17 @@ export function usePresentationProcessor(
         artDescription: request.generationOptions.artStyleModifiers,
       });
 
-      const imageUrl = response.images[0]?.url;
+      const imageUrl = response.imageUrl;
       if (imageUrl) {
-        console.info('[ImageFlow] Image generated for slide:', slideId);
         await updateSlideImageInStore(slideId, imageElement.id, imageUrl);
         return { success: true };
       } else {
-        console.error('[ImageFlow] No image URL in response for slide:', slideId, response);
+        console.error('No image URL in response for slide:', slideId);
         await updateSlideImageInStoreWithError(slideId, imageElement.id);
         return { success: false, error: new Error('No image URL in response') };
       }
     } catch (error) {
-      console.error('[ImageFlow] Image generation failed for slide:', slideId, error);
+      console.error('Image generation failed for slide:', slideId, error);
       await updateSlideImageInStoreWithError(slideId, imageElement.id);
       return { success: false, error: error as Error };
     }
@@ -254,52 +229,42 @@ export function usePresentationProcessor(
 
   // Helper to update store specific image
   async function updateSlideImageInStore(slideId: string, elementId: string, url: string) {
-    console.debug('[ImageFlow] updateSlideImageInStore called:', { slideId, elementId });
-
     const slideIndex = slidesStore.slides.findIndex((s) => s.id === slideId);
-    console.debug('[ImageFlow] Slide index found:', slideIndex);
 
     if (slideIndex === -1) {
-      console.error('[ImageFlow] Slide not found in store:', slideId);
+      console.error('Slide not found in store:', slideId);
       return;
     }
 
     const slide = { ...slidesStore.slides[slideIndex] };
-    console.debug('[ImageFlow] Slide elements count:', slide.elements.length);
-
     const elementIndex = slide.elements.findIndex((el) => el.id === elementId);
-    console.debug('[ImageFlow] Element index found:', elementIndex);
 
     if (elementIndex === -1) {
-      console.error('[ImageFlow] Element not found in slide:', elementId);
+      console.error('Element not found in slide:', elementId);
       return;
     }
 
-    console.debug('[ImageFlow] Updating image source for element:', elementId);
     const updatedElement = await updateImageSource(slide.elements[elementIndex] as PPTImageElement, url);
     slide.elements = [...slide.elements];
     slide.elements[elementIndex] = updatedElement;
 
     const newSlides = [...slidesStore.slides];
     newSlides[slideIndex] = slide;
-    console.info('[ImageFlow] Updated slide image in store:', slideId, elementId);
     slidesStore.setSlides(newSlides);
   }
 
   // Helper to update slide with error placeholder
   async function updateSlideImageInStoreWithError(slideId: string, elementId: string) {
-    console.warn('[ImageFlow] Setting error placeholder for element:', elementId);
-
     const slideIndex = slidesStore.slides.findIndex((s) => s.id === slideId);
     if (slideIndex === -1) {
-      console.error('[ImageFlow] Slide not found for error update:', slideId);
+      console.error('Slide not found for error update:', slideId);
       return;
     }
 
     const slide = { ...slidesStore.slides[slideIndex] };
     const elementIndex = slide.elements.findIndex((el) => el.id === elementId);
     if (elementIndex === -1) {
-      console.error('[ImageFlow] Element not found for error update:', elementId);
+      console.error('Element not found for error update:', elementId);
       return;
     }
 
@@ -317,7 +282,6 @@ export function usePresentationProcessor(
     const newSlides = [...slidesStore.slides];
     newSlides[slideIndex] = slide;
 
-    console.warn('[ImageFlow] Set error placeholder for slide:', slideId, 'element:', elementId);
     slidesStore.setSlides(newSlides);
   }
 
@@ -342,55 +306,18 @@ export function usePresentationProcessor(
     async (isStreaming, wasStreaming) => {
       if (wasStreaming && !isStreaming) {
         try {
-          console.info('[ImageFlow] Streaming stopped; beginning finalization.');
-
           // STEP 1: Wait for all slide processing to complete
           if (pendingSlideProcessing.value.size > 0) {
-            console.info(
-              '[ImageFlow] Waiting for',
-              pendingSlideProcessing.value.size,
-              'slide processing operations to complete...'
-            );
             await Promise.all(Array.from(pendingSlideProcessing.value));
-            console.info('[ImageFlow] All slides processed');
-          } else {
-            console.info('[ImageFlow] No pending slide processing');
           }
 
           // STEP 2: Wait for all image generations to complete (including all retries)
           if (pendingImageGenerations.value.size > 0) {
-            console.info(
-              '[ImageFlow] Waiting for',
-              pendingImageGenerations.value.size,
-              'pending image generations...'
-            );
-
-            // Create array of promises at this moment
             const promisesToWait = Array.from(pendingImageGenerations.value);
-            console.info('[ImageFlow] Tracking', promisesToWait.length, 'promises to completion');
-
-            const results = await Promise.allSettled(promisesToWait);
-
-            // Log results
-            const successful = results.filter((r) => r.status === 'fulfilled').length;
-            const failed = results.filter((r) => r.status === 'rejected').length;
-            console.info(
-              '[ImageFlow] Image generation complete:',
-              successful,
-              'successful,',
-              failed,
-              'failed'
-            );
-
-            if (failed > 0) {
-              console.warn('[ImageFlow] Some images failed to generate but continuing with finalization');
-            }
-          } else {
-            console.info('[ImageFlow] No pending image generations');
+            await Promise.allSettled(promisesToWait);
           }
 
           // STEP 3: Run finalization logic (ONLY after ALL slides processed and ALL images complete)
-          console.info('[ImageFlow] Starting finalization: savePresentation → setParsed');
 
           // Dispatch generating event BEFORE saving
           dispatchGeneratingEvent(true);
@@ -413,8 +340,6 @@ export function usePresentationProcessor(
             });
 
             await setParsed();
-
-            console.log('[ImageFlow] ✅ Finalization complete');
           } finally {
             // Always clear generating state
             dispatchGeneratingEvent(false);

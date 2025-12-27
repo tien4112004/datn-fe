@@ -212,9 +212,9 @@ export const twoColumnTemplates: SlideTemplate[] = [
         title: {
           type: 'text',
           bounds: {
-            left: 0,
+            left: { expr: 'SIDE_PADDING' },
             top: 15,
-            width: { expr: 'SLIDE_WIDTH' },
+            width: { expr: 'SLIDE_WIDTH - SIDE_PADDING * 2' },
             height: 100,
           },
           layout: {
@@ -341,9 +341,9 @@ export const twoColumnTemplates: SlideTemplate[] = [
         title: {
           type: 'text',
           bounds: {
-            left: 0,
+            left: { expr: 'SIDE_PADDING' },
             top: 15,
-            width: { expr: 'SLIDE_WIDTH' },
+            width: { expr: 'SLIDE_WIDTH - SIDE_PADDING * 2' },
             height: 110,
           },
           layout: {

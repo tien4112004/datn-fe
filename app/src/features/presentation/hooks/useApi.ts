@@ -346,8 +346,9 @@ export const useDraftPresentation = () => {
 
   return useMutation({
     mutationFn: async (request: PresentationGenerateDraftRequest) => {
+      const title = request.topic || 'AI Generated Presentation';
       const draftPresentation = await presentationApiService.createPresentation({
-        title: 'AI Generated Presentation',
+        title,
         isParsed: false,
         slides: [],
         ...request.presentation,

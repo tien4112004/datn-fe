@@ -95,6 +95,7 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
         theme: (data.theme as any) || ({} as any),
         viewport: { width: 1000, height: 562.5 },
       },
+      topic: data.topic,
     };
     try {
       const result = await draftPresentation.mutateAsync(generationRequest);
@@ -105,6 +106,7 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
         model: data.model,
         slideCount: data.slideCount,
         language: data.language,
+        topic: data.topic,
 
         generationOptions: {
           // Default artStyle to empty string (allowed option) if not set

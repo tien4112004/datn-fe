@@ -63,7 +63,9 @@
         </div>
       </div>
       <div v-if="mode === 'edit'" class="layout-content-right">
-        <Toolbar class="toolbar-panel" />
+        <Transition name="panel-slide">
+          <Toolbar v-if="sidebarExpanded" class="toolbar-panel" />
+        </Transition>
         <EditorSidebar class="editor-sidebar" />
       </div>
     </div>
@@ -141,7 +143,9 @@ const {
   showNotesPanel,
   showSymbolPanel,
   showMarkupPanel,
+  showImageLibPanel,
   showAIPPTDialog,
+  sidebarExpanded,
 } = storeToRefs(mainStore);
 const { currentSlide } = storeToRefs(slidesStore);
 const {
@@ -584,5 +588,27 @@ onMounted(() => {
   50% {
     box-shadow: 0 0 16px rgba(251, 191, 36, 0.9);
   }
+}
+
+// Panel slide animation
+.panel-slide-enter-active,
+.panel-slide-leave-active {
+  transition: all 0.25s ease-out;
+}
+
+.panel-slide-enter-from {
+  transform: translateX(-100%);
+  opacity: 0;
+}
+
+.panel-slide-leave-to {
+  transform: translateX(-100%);
+  opacity: 0;
+}
+
+.panel-slide-enter-to,
+.panel-slide-leave-from {
+  transform: translateX(0);
+  opacity: 1;
 }
 </style>

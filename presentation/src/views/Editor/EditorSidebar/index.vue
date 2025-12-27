@@ -1,7 +1,7 @@
 <template>
   <div class="editor-sidebar">
     <div class="sidebar-tabs">
-      <button
+      <Button
         v-for="tab in visibleTabs"
         :key="tab.key"
         class="sidebar-tab"
@@ -14,7 +14,7 @@
       >
         <component :is="tab.icon" class="tab-icon" />
         <span class="tab-label">{{ tab.label }}</span>
-      </button>
+      </Button>
     </div>
   </div>
 </template>
@@ -26,6 +26,7 @@ import { useMainStore, useSlidesStore } from '@/store';
 import { ToolbarStates } from '@/types/toolbar';
 import { useI18n } from 'vue-i18n';
 import useSlideEditLock from '@/hooks/useSlideEditLock';
+import Button from '@/components/Button.vue';
 
 // Import icons from lucide-vue-next
 import {
@@ -203,8 +204,6 @@ watch(
 .editor-sidebar {
   width: 90px;
   height: 100%;
-  background-color: var(--presentation-background);
-  border-left: 1px solid var(--presentation-border);
   display: flex;
   flex-direction: column;
   flex-shrink: 0;

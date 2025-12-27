@@ -27,10 +27,12 @@ export interface PresentationGenerationRequest {
   language: string;
   presentation?: PresentationConfig;
   generationOptions?: ImageOptions;
+  topic?: string;
 }
 
 export interface PresentationGenerateDraftRequest {
   presentation: PresentationConfig;
+  topic?: string;
 }
 
 export interface PresentationGenerationResponse {

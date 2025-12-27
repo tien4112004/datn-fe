@@ -13,7 +13,7 @@ export interface MindmapApiService extends Service {
   getMindmapById(id: string): Promise<Mindmap>;
   getMindmaps(request: MindmapCollectionRequest): Promise<ApiResponse<Mindmap[]>>;
   createMindmap(data: Mindmap): Promise<Mindmap>;
-  updateMindmap(id: string, data: Partial<Mindmap>): Promise<Mindmap>;
+  updateMindmap(id: string, data: Partial<Mindmap> | FormData): Promise<Mindmap>;
   deleteMindmap(id: string): Promise<void>;
   updateMindmapTitle(id: string, name: string): Promise<any | null>;
   generateMindmap(request: MindmapGenerateRequest): Promise<Mindmap>;

@@ -3,6 +3,7 @@ import { toast } from 'sonner';
 import type { Presentation } from '../types';
 import { CriticalError } from '@aiprimary/api';
 import { ERROR_TYPE } from '@/shared/constants';
+import usePresentationStore from '../stores/usePresentationStore';
 
 export interface VueEditorApp {
   generateThumbnail?: () => Promise<string | undefined>;
@@ -110,4 +111,28 @@ export const useSavingIndicator = () => {
   }, [handleSavingStateChange]);
 
   return { isSaving };
+};
+
+/**
+ * Hook to listen for generating state events from Vue and update the Zustand store
+ * This syncs the Vue generating state with the React store
+ */
+export const useGeneratingStoreSync = () => {
+  const setIsGenerating = usePresentationStore((state) => state.setIsGenerating);
+
+  const handleGeneratingStateChange = useCallback(
+    (event: CustomEvent<{ isGenerating: boolean }>) => {
+      setIsGenerating(event.detail.isGenerating);
+    },
+    [setIsGenerating]
+  );
+
+  useEffect(() => {
+    const listener = handleGeneratingStateChange as unknown as EventListener;
+    window.addEventListener('app.presentation.generating', listener);
+
+    return () => {
+      window.removeEventListener('app.presentation.generating', listener);
+    };
+  }, [handleGeneratingStateChange]);
 };

@@ -3,7 +3,7 @@ import { PresentationApiService } from './service';
 import { MockPresentationApiService } from './mock';
 import type { PresentationGenerationRequest, PresentationGenerationStartResponse } from './types';
 import { getBackendUrl } from '@aiprimary/api';
-import type { Presentation } from '@aiprimary/core';
+import type { Presentation, SlideTheme } from '@aiprimary/core';
 
 const BASE_URL = getBackendUrl();
 
@@ -18,7 +18,8 @@ export interface IPresentationApi {
     signal: AbortSignal
   ): Promise<{ stream: AsyncIterable<string> } & PresentationGenerationStartResponse>;
   getPresentation(id: string): Promise<Presentation>;
-  updatePresentation(id: string, data: Partial<Presentation>): Promise<Presentation>;
+  updatePresentation(id: string, data: Partial<Presentation> | FormData): Promise<Presentation>;
+  getSlideThemes(): Promise<SlideTheme[]>;
 }
 
 /**

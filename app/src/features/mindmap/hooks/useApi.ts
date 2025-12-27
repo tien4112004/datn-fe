@@ -10,6 +10,21 @@ import { useCoreStore } from '../stores/core';
 import { DRAGHANDLE } from '../types';
 import { getTreeLayoutType, getTreeForceLayout } from '../services/utils';
 
+/**
+ * Convert data URL (base64) to Blob for multipart upload
+ */
+function dataURLtoBlob(dataURL: string): Blob {
+  const arr = dataURL.split(',');
+  const mime = arr[0].match(/:(.*?);/)?.[1] || 'image/png';
+  const bstr = atob(arr[1]);
+  let n = bstr.length;
+  const u8arr = new Uint8Array(n);
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n);
+  }
+  return new Blob([u8arr], { type: mime });
+}
+
 // Return types for the hooks
 export interface UseMindmapsReturn extends Omit<UseQueryResult<ApiResponse<Mindmap[]>>, 'data'> {
   data: Mindmap[];
@@ -229,12 +244,18 @@ export const useUpdateMindmapWithMetadata = () => {
         ...(viewport && { viewport }),
       };
 
+      // Create FormData for multipart upload
+      const formData = new FormData();
+      formData.append('data', new Blob([JSON.stringify(updateData)], { type: 'application/json' }));
+
+      // Convert thumbnail to Blob
       const thumbnail = getThumbnail();
       if (thumbnail) {
-        updateData.thumbnail = thumbnail;
+        const blob = dataURLtoBlob(thumbnail);
+        formData.append('file', blob, 'thumbnail.png');
       }
 
-      const result = await mindmapApiService.updateMindmap(id, updateData);
+      const result = await mindmapApiService.updateMindmap(id, formData);
       return { id, data: result };
     },
     onSuccess: (data) => {

@@ -146,14 +146,10 @@ export default class PresentationRealApiService implements PresentationApiServic
     return null;
   }
 
-  async updatePresentation(id: string, data: UpdatePresentationRequest): Promise<any> {
-    await api.put<ApiResponse<Presentation>>(`${this.baseUrl}/api/presentations/${id}`, {
-      slides: data.slides,
-      title: data.title,
-      theme: data.theme,
-      viewport: data.viewport,
-      thumbnail: data.thumbnail,
-    });
+  async updatePresentation(id: string, data: UpdatePresentationRequest | FormData): Promise<any> {
+    const config = data instanceof FormData ? { headers: { 'Content-Type': 'multipart/form-data' } } : {};
+
+    await api.put<ApiResponse<Presentation>>(`${this.baseUrl}/api/presentations/${id}`, data, config);
   }
 
   async deletePresentation(id: string): Promise<void> {

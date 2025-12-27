@@ -6,6 +6,7 @@ export default {
       confirm: 'Confirm',
       editThemeColors: 'Edit Theme Colors',
       applyThemeToAll: 'Apply Theme to All',
+      applyFontToAll: 'Apply Font to All',
       extractThemeFromSlide: 'Extract Theme from Slide',
       presetThemes: 'Preset Themes',
       textAa: 'Text Aa',
@@ -15,6 +16,8 @@ export default {
       eyedropperEscHint: 'Press ESC to close eyedropper',
       shapeCreateHint:
         'Click to draw any shape, close the shape to complete drawing, press ESC key or right-click to cancel, press ENTER key to finish early',
+      noThemes: 'No themes available',
+      loadingThemes: 'Loading themes...',
 
       // Background
       background: {

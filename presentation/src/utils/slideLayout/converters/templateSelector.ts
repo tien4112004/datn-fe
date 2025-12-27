@@ -95,10 +95,23 @@ export function selectTemplate(layoutType: string, seed?: string): Template {
 }
 
 /**
- * Gets all available template variations for a given layout type
+ * Gets all available template variations for a given layout type (async version)
+ * Fetches from API (with cache) or falls back to frontend-data
  *
  * @param layoutType - The layout type
- * @returns Array of available templates
+ * @returns Promise resolving to array of available templates
+ */
+export async function getTemplateVariationsAsync(layoutType: string): Promise<Template[]> {
+  const { templateRegistry } = await import('./templateRegistry');
+  return await templateRegistry.getTemplates(layoutType);
+}
+
+/**
+ * Gets all available template variations for a given layout type (legacy sync version)
+ *
+ * @deprecated Use getTemplateVariationsAsync instead for API-first behavior
+ * @param layoutType - The layout type
+ * @returns Array of available templates from frontend-data only
  */
 export function getTemplateVariations(layoutType: string): Template[] {
   return TEMPLATE_VARIATIONS[layoutType] || [];

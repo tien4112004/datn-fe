@@ -467,4 +467,9 @@ export {
 export { templateRegistry } from './converters/templateRegistry';
 
 // Re-export existing template utilities (for fallback/mock mode)
-export { selectTemplate, getTemplateVariations, TEMPLATE_VARIATIONS } from './converters/templateSelector';
+export {
+  selectTemplate,
+  getTemplateVariations,
+  getTemplateVariationsAsync,
+  TEMPLATE_VARIATIONS,
+} from './converters/templateSelector';

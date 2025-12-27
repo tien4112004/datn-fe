@@ -105,17 +105,23 @@ export function usePresentationProcessor(
       slidesStore.updateSlideIndex(slides.length - 1);
 
       // Save presentation with full data (slides, metadata, thumbnail)
-      if (presentation) {
-        await savePresentationFn({
-          title: presentation.title,
-          slides: slidesStore.slides,
-          theme: slidesStore.theme,
-          viewport,
-          thumbnail: presentation.thumbnail,
-        });
-      }
+      dispatchGeneratingEvent(true);
 
-      await setParsed();
+      try {
+        if (presentation) {
+          await savePresentationFn({
+            title: presentation.title,
+            slides: slidesStore.slides,
+            theme: slidesStore.theme,
+            viewport,
+            thumbnail: presentation.thumbnail,
+          });
+        }
+
+        await setParsed();
+      } finally {
+        dispatchGeneratingEvent(false);
+      }
     } catch (error) {
       console.error('Error processing AI result:', error);
       dispatchMessage('error', 'Failed to process presentation');
@@ -386,25 +392,33 @@ export function usePresentationProcessor(
           // STEP 3: Run finalization logic (ONLY after ALL slides processed and ALL images complete)
           console.info('[ImageFlow] Starting finalization: savePresentation → setParsed');
 
-          // Extract title from outline markdown (first ## heading)
-          const title =
-            presentation?.title ||
-            (generationRequest?.outline
-              ? extractTitleFromOutline(generationRequest.outline)
-              : 'Untitled Presentation');
+          // Dispatch generating event BEFORE saving
+          dispatchGeneratingEvent(true);
 
-          // Save presentation with all data (slides, metadata, thumbnail)
-          await savePresentationFn({
-            title,
-            slides: slidesStore.slides,
-            theme: slidesStore.theme,
-            viewport,
-            thumbnail: presentation?.thumbnail,
-          });
+          try {
+            // Extract title from outline markdown (first ## heading)
+            const title =
+              presentation?.title ||
+              (generationRequest?.outline
+                ? extractTitleFromOutline(generationRequest.outline)
+                : 'Untitled Presentation');
 
-          await setParsed();
+            // Save presentation with all data (slides, metadata, thumbnail)
+            await savePresentationFn({
+              title,
+              slides: slidesStore.slides,
+              theme: slidesStore.theme,
+              viewport,
+              thumbnail: presentation?.thumbnail,
+            });
 
-          console.log('[ImageFlow] ✅ Finalization complete');
+            await setParsed();
+
+            console.log('[ImageFlow] ✅ Finalization complete');
+          } finally {
+            // Always clear generating state
+            dispatchGeneratingEvent(false);
+          }
 
           processedStreamDataRef.value = [];
           generationStore.clearStreamedData();
@@ -429,6 +443,14 @@ export function usePresentationProcessor(
 
   function dispatchMessage(type: string, message: string) {
     window.dispatchEvent(new CustomEvent('app.message', { detail: { type, message } }));
+  }
+
+  function dispatchGeneratingEvent(isGenerating: boolean) {
+    window.dispatchEvent(
+      new CustomEvent('app.presentation.generating', {
+        detail: { isGenerating },
+      })
+    );
   }
 
   return { isProcessing };

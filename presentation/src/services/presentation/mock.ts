@@ -1,4 +1,4 @@
-import type { Presentation, Slide } from '@aiprimary/core';
+import type { Presentation, Slide, SlideTheme } from '@aiprimary/core';
 import type { SlideLayoutSchema } from '@/utils/slideLayout/types/schemas';
 import { getSlideTemplates } from '@/hooks/useSlideTemplates';
 import type { PresentationGenerationRequest, PresentationGenerationStartResponse } from './types';
@@ -6,6 +6,38 @@ import type { ApiService } from '@aiprimary/api';
 import { getBackendUrl } from '@aiprimary/api';
 
 const BASE_URL = getBackendUrl();
+
+// Mock preset themes for testing
+const MOCK_PRESET_THEMES = [
+  {
+    background: '#ffffff',
+    fontColor: '#333333',
+    borderColor: '#41719c',
+    fontname: 'sans-serif',
+    colors: ['#5b9bd5', '#ed7d31', '#a5a5a5', '#ffc000', '#4472c4', '#70ad47'],
+  },
+  {
+    background: '#17444e',
+    fontColor: '#ffffff',
+    borderColor: '#800c0b',
+    fontname: 'sans-serif',
+    colors: ['#b01513', '#ea6312', '#e6b729', '#6bab90', '#55839a', '#9e5d9d'],
+  },
+  {
+    background: '#36234d',
+    fontColor: '#ffffff',
+    borderColor: '#830949',
+    fontname: 'sans-serif',
+    colors: ['#b31166', '#e33d6f', '#e45f3c', '#e9943a', '#9b6bf2', '#d63cd0'],
+  },
+  {
+    background: '#333333',
+    fontColor: '#ffffff',
+    borderColor: '#7c91a8',
+    fontname: 'sans-serif',
+    colors: ['#bdc8df', '#003fa9', '#f5ba00', '#ff7567', '#7676d9', '#923ffc'],
+  },
+];
 
 const getDefaultPresentationTheme = () => ({
   backgroundColor: '#ffffff',
@@ -230,5 +262,34 @@ export class MockPresentationApiService implements ApiService {
     };
     mockPresentationItems[index] = updatedPresentation;
     return updatedPresentation;
+  }
+
+  /**
+   * Get slide themes (mock implementation)
+   * Converts MOCK_PRESET_THEMES to SlideTheme format
+   */
+  async getSlideThemes(): Promise<SlideTheme[]> {
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    return MOCK_PRESET_THEMES.map((preset, index) => ({
+      id: `theme-${index + 1}`,
+      name: `Theme ${index + 1}`,
+      backgroundColor: preset.background,
+      themeColors: preset.colors,
+      fontColor: preset.fontColor,
+      fontName: preset.fontname,
+      titleFontColor: preset.fontColor,
+      titleFontName: preset.fontname,
+      outline: {
+        width: 2,
+        style: 'solid' as const,
+        color: preset.borderColor,
+      },
+      shadow: {
+        h: 3,
+        v: 3,
+        blur: 2,
+        color: '#808080',
+      },
+    }));
   }
 }

@@ -342,6 +342,7 @@ export interface ShapeText {
   defaultFontName: string;
   defaultColor: string;
   align: ShapeTextAlign;
+  lineHeight?: number;
   type?: TextType;
 }
 

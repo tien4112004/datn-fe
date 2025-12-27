@@ -6,6 +6,7 @@ export default {
       confirm: 'Xác nhận',
       editThemeColors: 'Chỉnh sửa màu chủ đề',
       applyThemeToAll: 'Áp dụng chủ đề cho tất cả',
+      applyFontToAll: 'Áp dụng phông chữ cho tất cả',
       extractThemeFromSlide: 'Trích xuất chủ đề từ slide',
       presetThemes: 'Chủ đề có sẵn',
       textAa: 'Văn bản Aa',
@@ -16,6 +17,8 @@ export default {
       eyedropperEscHint: 'Nhấn ESC để đóng công cụ chọn màu',
       shapeCreateHint:
         'Nhấn để vẽ hình bất kỳ, đóng hình để hoàn tất, nhấn ESC hoặc chuột phải để hủy, nhấn ENTER để kết thúc sớm',
+      noThemes: 'Không có chủ đề nào',
+      loadingThemes: 'Đang tải chủ đề...',
 
       // Nền
       background: {

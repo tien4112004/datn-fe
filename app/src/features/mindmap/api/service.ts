@@ -40,8 +40,10 @@ export default class MindmapRealApiService implements MindmapApiService {
     return response.data.data;
   }
 
-  async updateMindmap(id: string, data: Partial<Mindmap>): Promise<Mindmap> {
-    const response = await api.put<ApiResponse<Mindmap>>(`${this.baseUrl}/api/mindmaps/${id}`, data);
+  async updateMindmap(id: string, data: Partial<Mindmap> | FormData): Promise<Mindmap> {
+    const config = data instanceof FormData ? { headers: { 'Content-Type': 'multipart/form-data' } } : {};
+
+    const response = await api.put<ApiResponse<Mindmap>>(`${this.baseUrl}/api/mindmaps/${id}`, data, config);
     return response.data.data;
   }
 

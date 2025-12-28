@@ -140,7 +140,7 @@ export const twoColumnTemplates: SlideTemplate[] = [
           },
           border: {
             width: '{{theme.card.borderWidth}}',
-            color: '{{theme.themeColors[0]}}',
+            color: '{{theme.outline.color}}',
             radius: '{{theme.card.borderRadius}}',
           },
           layout: {
@@ -244,7 +244,7 @@ export const twoColumnTemplates: SlideTemplate[] = [
           },
           border: {
             width: '{{theme.card.borderWidth}}',
-            color: '{{theme.themeColors[0]}}',
+            color: '{{theme.outline.color}}',
             radius: '{{theme.card.borderRadius}}',
           },
           layout: {
@@ -286,7 +286,7 @@ export const twoColumnTemplates: SlideTemplate[] = [
           },
           border: {
             width: '{{theme.card.borderWidth}}',
-            color: '{{theme.themeColors[0]}}',
+            color: '{{theme.outline.color}}',
             radius: '{{theme.card.borderRadius}}',
           },
           layout: {
@@ -378,7 +378,7 @@ export const twoColumnTemplates: SlideTemplate[] = [
           },
           border: {
             width: '{{theme.card.borderWidth}}',
-            color: '{{theme.themeColors[0]}}',
+            color: '{{theme.outline.color}}',
             radius: '{{theme.card.borderRadius}}',
           },
           text: {

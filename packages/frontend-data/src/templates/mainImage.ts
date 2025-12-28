@@ -424,7 +424,7 @@ export const mainImageTemplates: SlideTemplate[] = [
           },
           border: {
             width: '{{theme.card.borderWidth}}',
-            color: '{{theme.themeColors[0]}}',
+            color: '{{theme.outline.color}}',
             radius: '{{theme.card.borderRadius}}',
           },
           shadow: {

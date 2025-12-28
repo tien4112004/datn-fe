@@ -18,6 +18,8 @@ export default {
         'Click to draw any shape, close the shape to complete drawing, press ESC key or right-click to cancel, press ENTER key to finish early',
       noThemes: 'No themes available',
       loadingThemes: 'Loading themes...',
+      loadingMoreThemes: 'Loading more themes...',
+      noMoreThemes: 'No more themes',
 
       // Background
       background: {
@@ -51,6 +53,8 @@ export default {
         fontColor: 'Font Color:',
         titleFont: 'Title Font:',
         titleFontColor: 'Title Font Color:',
+        labelFont: 'Label Font:',
+        labelFontColor: 'Label Font Color:',
         backgroundColor: 'Background Color:',
         themeColor: 'Theme Color:',
         searchFont: 'Search Font',

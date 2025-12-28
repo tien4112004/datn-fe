@@ -19,6 +19,8 @@ export default {
         'Nhấn để vẽ hình bất kỳ, đóng hình để hoàn tất, nhấn ESC hoặc chuột phải để hủy, nhấn ENTER để kết thúc sớm',
       noThemes: 'Không có chủ đề nào',
       loadingThemes: 'Đang tải chủ đề...',
+      loadingMoreThemes: 'Đang tải thêm chủ đề...',
+      noMoreThemes: 'Không còn chủ đề nào',
 
       // Nền
       background: {
@@ -52,6 +54,8 @@ export default {
         fontColor: 'Màu chữ:',
         titleFont: 'Phông chữ tiêu đề:',
         titleFontColor: 'Màu chữ tiêu đề:',
+        labelFont: 'Phông chữ nhãn:',
+        labelFontColor: 'Màu chữ nhãn:',
         backgroundColor: 'Màu nền:',
         themeColor: 'Màu chủ đề:',
         searchFont: 'Tìm phông chữ',

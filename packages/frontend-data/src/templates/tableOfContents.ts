@@ -78,7 +78,7 @@ export const tableOfContentsTemplates: SlideTemplate[] = [
               },
               border: {
                 width: '{{theme.card.borderWidth}}',
-                color: '{{theme.themeColors[0]}}',
+                color: '{{theme.outline.color}}',
                 radius: '{{theme.card.borderRadius}}',
               },
               children: [
@@ -181,7 +181,7 @@ export const tableOfContentsTemplates: SlideTemplate[] = [
               },
               border: {
                 width: '{{theme.card.borderWidth}}',
-                color: '{{theme.themeColors[0]}}',
+                color: '{{theme.outline.color}}',
                 radius: '{{theme.card.borderRadius}}',
               },
               children: [
@@ -195,7 +195,7 @@ export const tableOfContentsTemplates: SlideTemplate[] = [
                     verticalAlignment: 'center',
                   },
                   text: {
-                    color: '{{theme.themeColors[0]}}',
+                    color: '{{theme.outline.color}}',
                     fontFamily: '{{theme.labelFontName}}',
                     fontWeight: 'bold',
                     textAlign: 'center',
@@ -291,7 +291,7 @@ export const tableOfContentsTemplates: SlideTemplate[] = [
               },
               border: {
                 width: '{{theme.card.borderWidth}}',
-                color: '{{theme.themeColors[0]}}',
+                color: '{{theme.outline.color}}',
                 radius: '{{theme.card.borderRadius}}',
               },
               children: [
@@ -471,7 +471,7 @@ export const tableOfContentsTemplates: SlideTemplate[] = [
           },
           border: {
             width: '{{theme.card.borderWidth}}',
-            color: '{{theme.themeColors[0]}}',
+            color: '{{theme.outline.color}}',
             radius: '{{theme.card.borderRadius}}',
           },
           text: {

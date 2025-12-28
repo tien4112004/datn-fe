@@ -90,6 +90,7 @@
 <script lang="ts" setup>
 import { ref, computed, watch } from 'vue';
 import { storeToRefs } from 'pinia';
+import { useI18n } from 'vue-i18n';
 import { useSlidesStore } from '@/store';
 import { useMainStore } from '@/store';
 import useSwitchTemplate from '@/hooks/useSwitchTemplate';
@@ -107,6 +108,8 @@ interface TemplatePreview {
   template: Template;
   slide: Slide | null;
 }
+
+const { t } = useI18n();
 
 const slidesStore = useSlidesStore();
 const mainStore = useMainStore();

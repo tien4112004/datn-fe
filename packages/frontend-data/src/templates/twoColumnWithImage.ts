@@ -103,7 +103,7 @@ export const twoColumnWithImageTemplates: SlideTemplate[] = [
               label: 'item',
               border: {
                 width: '{{theme.card.borderWidth}}',
-                color: '{{theme.themeColors[0]}}',
+                color: '{{theme.outline.color}}',
                 radius: '{{theme.card.borderRadius}}',
               },
               text: {
@@ -214,7 +214,7 @@ export const twoColumnWithImageTemplates: SlideTemplate[] = [
               },
               border: {
                 width: '{{theme.card.borderWidth}}',
-                color: '{{theme.themeColors[0]}}',
+                color: '{{theme.outline.color}}',
                 radius: '{{theme.card.borderRadius}}',
               },
               text: {
@@ -324,7 +324,7 @@ export const twoColumnWithImageTemplates: SlideTemplate[] = [
               label: 'item',
               border: {
                 width: '{{theme.card.borderWidth}}',
-                color: '{{theme.themeColors[0]}}',
+                color: '{{theme.outline.color}}',
                 radius: '{{theme.card.borderRadius}}',
               },
               text: {
@@ -421,7 +421,7 @@ export const twoColumnWithImageTemplates: SlideTemplate[] = [
               label: 'item',
               border: {
                 width: '{{theme.card.borderWidth}}',
-                color: '{{theme.themeColors[0]}}',
+                color: '{{theme.outline.color}}',
                 radius: '{{theme.card.borderRadius}}',
               },
               text: {
@@ -555,7 +555,7 @@ export const twoColumnWithImageTemplates: SlideTemplate[] = [
               label: 'item',
               border: {
                 width: '{{theme.card.borderWidth}}',
-                color: '{{theme.themeColors[0]}}',
+                color: '{{theme.outline.color}}',
                 radius: '{{theme.card.borderRadius}}',
               },
               text: {
@@ -667,7 +667,7 @@ export const twoColumnWithImageTemplates: SlideTemplate[] = [
               },
               border: {
                 width: '{{theme.card.borderWidth}}',
-                color: '{{theme.themeColors[0]}}',
+                color: '{{theme.outline.color}}',
                 radius: '{{theme.card.borderRadius}}',
               },
               text: {
@@ -762,7 +762,7 @@ export const twoColumnWithImageTemplates: SlideTemplate[] = [
           },
           border: {
             width: '{{theme.card.borderWidth}}',
-            color: '{{theme.themeColors[0]}}',
+            color: '{{theme.outline.color}}',
             radius: '{{theme.card.borderRadius}}',
           },
           text: {

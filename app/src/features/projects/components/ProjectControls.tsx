@@ -17,7 +17,7 @@ const isSupportedResourceType = (type: ResourceType): type is 'presentation' | '
 };
 
 // Resource-specific hook configuration
-const useResourceHooks = (resourceType: ResourceType, t: (key: string, params?: any) => string) => {
+const useResourceHooks = (resourceType: ResourceType, t: ReturnType<typeof useTranslation>['t']) => {
   const navigate = useNavigate();
 
   const createTestPresentations = useCreateTestPresentations();

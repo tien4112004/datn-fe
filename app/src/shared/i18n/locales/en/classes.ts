@@ -660,10 +660,10 @@ export default {
   },
   roster: {
     title: 'Class Roster',
-    addStudent: 'Add Student',
+    addStudentButton: 'Add Student',
     addFirstStudent: 'Add First Student',
     editStudent: 'Edit Student',
-    deleteStudent: 'Remove Student',
+    deleteStudentButton: 'Remove Student',
     noStudents: 'No students in this class yet',
     loadingRoster: 'Loading roster...',
     studentCount: '{{count}} student',
@@ -737,17 +737,6 @@ export default {
       cancel: 'Cancel',
     },
 
-    messages: {
-      addSuccess: 'Student added successfully',
-      addError: 'Failed to add student',
-      updateSuccess: 'Student updated successfully',
-      updateError: 'Failed to update student',
-      deleteSuccess: 'Student removed successfully',
-      deleteError: 'Failed to remove student',
-      networkError: 'Network error. Please check your connection and try again.',
-      validationError: 'Please fix the errors in the form before submitting.',
-      duplicateError: 'A student with this ID already exists in the class.',
-    },
     addStudent: {
       success: 'Student added successfully',
       error: 'Failed to add student',

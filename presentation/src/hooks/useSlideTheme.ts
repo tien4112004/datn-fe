@@ -316,14 +316,25 @@ export default () => {
         if (el.text) {
           el.text.defaultColor = theme.fontColor;
           el.text.defaultFontName = theme.fontname;
-          if (el.text.content) el.text.content = el.text.content.replace(/font-family: .+?;/g, '');
+          if (el.text.content) {
+            el.text.content = el.text.content.replace(/color: .+?;/g, '').replace(/font-family: .+?;/g, '');
+          }
         }
       }
       if (el.type === 'text') {
         if (el.fill) el.fill = getColor(el.fill);
         el.defaultColor = theme.fontColor;
         el.defaultFontName = theme.fontname;
-        if (el.content) el.content = el.content.replace(/font-family: .+?;/g, '');
+
+        // Handle label text types
+        if (el.textType === 'itemTitle' || el.textType === 'itemNumber' || el.textType === 'partNumber') {
+          el.defaultColor = theme.fontColor;
+          el.defaultFontName = theme.fontname;
+        }
+
+        if (el.content) {
+          el.content = el.content.replace(/color: .+?;/g, '').replace(/font-family: .+?;/g, '');
+        }
       }
       if (el.type === 'image' && el.colorMask) {
         el.colorMask = getColor(el.colorMask);
@@ -389,6 +400,8 @@ export default () => {
       shadow,
       titleFontColor,
       titleFontName,
+      labelFontColor,
+      labelFontName,
     } = theme.value;
 
     for (const slide of newSlides) {
@@ -411,7 +424,9 @@ export default () => {
           if (el.text) {
             el.text.defaultColor = fontColor;
             el.text.defaultFontName = fontName;
-            if (el.text.content) el.text.content = el.text.content.replace(/font-family: .+?;/g, '');
+            if (el.text.content) {
+              el.text.content = el.text.content.replace(/color: .+?;/g, '').replace(/font-family: .+?;/g, '');
+            }
           }
           if (el.gradient) delete el.gradient;
         } else if (el.type === 'line') el.color = themeColors[0];
@@ -427,8 +442,15 @@ export default () => {
             el.defaultColor = titleFontColor;
             el.defaultFontName = titleFontName;
           }
+
+          // Handle label text types
+          if (el.textType === 'itemTitle' || el.textType === 'itemNumber' || el.textType === 'partNumber') {
+            el.defaultColor = labelFontColor || fontColor;
+            el.defaultFontName = labelFontName || fontName;
+          }
+
           if (el.content) {
-            el.content = el.content.replace(/font-family: .+?;/g, '');
+            el.content = el.content.replace(/color: .+?;/g, '').replace(/font-family: .+?;/g, '');
           }
         } else if (el.type === 'table') {
           if (el.theme) el.theme.color = themeColors[0];

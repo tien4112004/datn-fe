@@ -191,11 +191,44 @@ export class PresentationApiService implements ApiService {
   }
 
   /**
-   * Get slide themes from the backend
+   * Get slide themes from the backend with pagination support
    */
-  async getSlideThemes(): Promise<SlideTheme[]> {
-    const response = await api.get<ApiResponse<SlideTheme[]>>(`${this.baseUrl}/api/slide-themes`);
-    return response.data.data;
+  async getSlideThemes(params?: { page?: number; limit?: number }): Promise<{
+    data: SlideTheme[];
+    total: number;
+    page: number;
+    limit: number;
+    hasMore: boolean;
+  }> {
+    const page = params?.page ?? 0;
+    const limit = params?.limit ?? 10;
+
+    const response = await api.get<ApiResponse<any>>(
+      `${this.baseUrl}/api/slide-themes?page=${page}&limit=${limit}`
+    );
+
+    const responseData = response.data.data;
+
+    // Handle both paginated and non-paginated responses for backward compatibility
+    if (Array.isArray(responseData)) {
+      // Old API response format (no pagination)
+      return {
+        data: responseData,
+        total: responseData.length,
+        page: 0,
+        limit: responseData.length,
+        hasMore: false,
+      };
+    }
+
+    // New paginated API response
+    return {
+      data: responseData.data || responseData.content || [],
+      total: responseData.total || responseData.totalElements || 0,
+      page: responseData.page ?? page,
+      limit: responseData.limit ?? responseData.size ?? limit,
+      hasMore: responseData.hasMore ?? (responseData.page + 1) * responseData.limit < responseData.total,
+    };
   }
 
   _mapPresentationItem(data: any): Presentation {

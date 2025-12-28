@@ -281,12 +281,22 @@ export class MockPresentationApiService implements ApiService {
   }
 
   /**
-   * Get slide themes (mock implementation)
+   * Get slide themes (mock implementation with pagination support)
    * Converts MOCK_PRESET_THEMES to SlideTheme format
    */
-  async getSlideThemes(): Promise<SlideTheme[]> {
+  async getSlideThemes(params?: { page?: number; limit?: number }): Promise<{
+    data: SlideTheme[];
+    total: number;
+    page: number;
+    limit: number;
+    hasMore: boolean;
+  }> {
     await new Promise((resolve) => setTimeout(resolve, 300));
-    return MOCK_PRESET_THEMES.map((preset, index) => ({
+
+    const page = params?.page ?? 0;
+    const limit = params?.limit ?? 10;
+
+    const allThemes = MOCK_PRESET_THEMES.map((preset, index) => ({
       id: `theme-${index + 1}`,
       name: `Theme ${index + 1}`,
       backgroundColor: preset.background,
@@ -307,5 +317,17 @@ export class MockPresentationApiService implements ApiService {
         color: '#808080',
       },
     }));
+
+    const start = page * limit;
+    const end = start + limit;
+    const paginatedThemes = allThemes.slice(start, end);
+
+    return {
+      data: paginatedThemes,
+      total: allThemes.length,
+      page,
+      limit,
+      hasMore: end < allThemes.length,
+    };
   }
 }

@@ -79,7 +79,7 @@ export const listTemplates: SlideTemplate[] = [
               },
               border: {
                 width: '{{theme.card.borderWidth}}',
-                color: '{{theme.themeColors[0]}}',
+                color: '{{theme.outline.color}}',
                 radius: '{{theme.card.borderRadius}}',
               },
               text: {
@@ -163,7 +163,7 @@ export const listTemplates: SlideTemplate[] = [
               label: 'item',
               border: {
                 width: '{{theme.card.borderWidth}}',
-                color: '{{theme.themeColors[0]}}',
+                color: '{{theme.outline.color}}',
                 radius: '{{theme.card.borderRadius}}',
               },
               text: {
@@ -271,7 +271,7 @@ export const listTemplates: SlideTemplate[] = [
                   label: 'content',
                   border: {
                     width: '{{theme.card.borderWidth}}',
-                    color: '{{theme.themeColors[0]}}',
+                    color: '{{theme.outline.color}}',
                     radius: '{{theme.card.borderRadius}}',
                   },
                   text: {
@@ -373,7 +373,7 @@ export const listTemplates: SlideTemplate[] = [
                     verticalAlignment: 'center',
                   },
                   text: {
-                    color: '{{theme.themeColors[0]}}',
+                    color: '{{theme.outline.color}}',
                     fontFamily: '{{theme.labelFontName}}',
                     fontWeight: 'bold',
                     textAlign: 'right',
@@ -478,7 +478,7 @@ export const listTemplates: SlideTemplate[] = [
               },
               border: {
                 width: '{{theme.card.borderWidth}}',
-                color: '{{theme.themeColors[0]}}',
+                color: '{{theme.outline.color}}',
                 radius: '{{theme.card.borderRadius}}',
               },
               shadow: {
@@ -581,7 +581,7 @@ export const listTemplates: SlideTemplate[] = [
           },
           border: {
             width: '{{theme.card.borderWidth}}',
-            color: '{{theme.themeColors[0]}}',
+            color: '{{theme.outline.color}}',
             radius: '{{theme.card.borderRadius}}',
           },
           layout: {
@@ -622,7 +622,7 @@ export const listTemplates: SlideTemplate[] = [
                     verticalAlignment: 'center',
                   },
                   text: {
-                    color: '{{theme.themeColors[0]}}',
+                    color: '{{theme.outline.color}}',
                     fontFamily: '{{theme.labelFontName}}',
                     fontWeight: 'bold',
                     textAlign: 'right',
@@ -708,7 +708,7 @@ export const listTemplates: SlideTemplate[] = [
           },
           border: {
             width: '{{theme.card.borderWidth}}',
-            color: '{{theme.themeColors[0]}}',
+            color: '{{theme.outline.color}}',
             radius: '{{theme.card.borderRadius}}',
           },
           text: {

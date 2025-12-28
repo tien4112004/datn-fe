@@ -78,7 +78,7 @@ export const labeledListTemplates: SlideTemplate[] = [
               },
               border: {
                 width: '{{theme.card.borderWidth}}',
-                color: '{{theme.themeColors[0]}}',
+                color: '{{theme.outline.color}}',
                 radius: '{{theme.card.borderRadius}}',
               },
               children: [
@@ -187,7 +187,7 @@ export const labeledListTemplates: SlideTemplate[] = [
               },
               border: {
                 width: '{{theme.card.borderWidth}}',
-                color: '{{theme.themeColors[0]}}',
+                color: '{{theme.outline.color}}',
                 radius: '{{theme.card.borderRadius}}',
               },
               shadow: {
@@ -302,7 +302,7 @@ export const labeledListTemplates: SlideTemplate[] = [
               },
               border: {
                 width: '{{theme.card.borderWidth}}',
-                color: '{{theme.themeColors[0]}}',
+                color: '{{theme.outline.color}}',
                 radius: '{{theme.card.borderRadius}}',
               },
               children: [
@@ -423,7 +423,7 @@ export const labeledListTemplates: SlideTemplate[] = [
                   label: 'content',
                   border: {
                     width: '{{theme.card.borderWidth}}',
-                    color: '{{theme.themeColors[0]}}',
+                    color: '{{theme.outline.color}}',
                     radius: '{{theme.card.borderRadius}}',
                   },
                   text: {
@@ -519,7 +519,7 @@ export const labeledListTemplates: SlideTemplate[] = [
                     verticalAlignment: 'center',
                   },
                   text: {
-                    color: '{{theme.themeColors[0]}}',
+                    color: '{{theme.outline.color}}',
                     fontFamily: '{{theme.labelFontName}}',
                     fontWeight: 'bold',
                     textAlign: 'right',
@@ -604,7 +604,7 @@ export const labeledListTemplates: SlideTemplate[] = [
           },
           border: {
             width: '{{theme.card.borderWidth}}',
-            color: '{{theme.themeColors[0]}}',
+            color: '{{theme.outline.color}}',
             radius: '{{theme.card.borderRadius}}',
           },
           text: {

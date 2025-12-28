@@ -84,7 +84,7 @@ const straightTimelineTemplate: SlideTemplate = {
                 text: {
                   fontSizeRange: { minSize: 16, maxSize: 20 },
                   fontWeight: 'bold',
-                  color: '{{theme.themeColors[0]}}',
+                  color: '{{theme.outline.color}}',
                   fontFamily: '{{theme.labelFontName}}',
                   textAlign: 'center',
                 },
@@ -209,7 +209,7 @@ const alternatingTimelineTemplate: SlideTemplate = {
                 text: {
                   fontSizeRange: { minSize: 14, maxSize: 18 },
                   fontWeight: 'bold',
-                  color: '{{theme.themeColors[0]}}',
+                  color: '{{theme.outline.color}}',
                   fontFamily: '{{theme.labelFontName}}',
                   textAlign: 'center',
                 },

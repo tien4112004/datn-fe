@@ -92,8 +92,8 @@ export function usePresentationProcessor(
       // Restore generation options to store if available
       if (generationOptions) {
         // Validate that required fields exist
-        if (!generationOptions.imageModel?.name) {
-          console.error('[processFullAiResult] Invalid generation options - missing imageModel');
+        if (!generationOptions.model?.name) {
+          console.error('[processFullAiResult] Invalid generation options - missing model');
         } else {
           // Reconstruct the request object with the generation options
           const reconstructedRequest = {
@@ -239,7 +239,7 @@ export function usePresentationProcessor(
       return { success: false, error: new Error('No prompt provided') };
     }
 
-    if (!request?.generationOptions?.imageModel) {
+    if (!request?.generationOptions?.model) {
       await updateSlideImageInStoreWithError(slideId, imageElement.id);
       return { success: false, error: new Error('No image model configured') };
     }
@@ -256,11 +256,11 @@ export function usePresentationProcessor(
       const response = await generateImage({
         slideId,
         prompt,
-        model: request.generationOptions.imageModel,
+        model: request.generationOptions.model,
         themeStyle: currentTheme.id,
         themeDescription: currentTheme.modifiers || undefined,
         artStyle: request.generationOptions.artStyle || undefined,
-        artDescription: request.generationOptions.artStyleModifiers,
+        artDescription: request.generationOptions.artDescription,
       });
 
       const imageUrl = response.imageUrl;

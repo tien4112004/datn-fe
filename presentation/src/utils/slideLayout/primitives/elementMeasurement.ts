@@ -66,7 +66,7 @@ export function measureElement(element: HTMLElement, container: LayoutBlockInsta
 
   // Measure (getBoundingClientRect already includes the padding)
   const size = {
-    width: clonedElement.getBoundingClientRect().width + 20,
+    width: clonedElement.getBoundingClientRect().width + 24,
     height: clonedElement.getBoundingClientRect().height + 20,
   };
 

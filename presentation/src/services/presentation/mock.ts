@@ -1,11 +1,8 @@
 import type { Presentation, Slide, SlideTheme } from '@aiprimary/core';
 import type { SlideLayoutSchema } from '@/utils/slideLayout/types/schemas';
 import { getSlideTemplates } from '@/hooks/useSlideTemplates';
-import type {
-  PresentationGenerationRequest,
-  PresentationGenerationStartResponse,
-  ImageOptions,
-} from './types';
+import type { PresentationGenerationRequest, PresentationGenerationStartResponse } from './types';
+import type { ImageGenerationParams } from '../image/types';
 import type { ApiService } from '@aiprimary/api';
 import { getBackendUrl } from '@aiprimary/api';
 
@@ -113,7 +110,7 @@ export class MockPresentationApiService implements ApiService {
    */
   async getAiResultById(id: string): Promise<{
     slides: SlideLayoutSchema[];
-    generationOptions?: ImageOptions;
+    generationOptions?: Omit<ImageGenerationParams, 'prompt' | 'slideId'>;
   }> {
     await new Promise((resolve) => setTimeout(resolve, 500));
     if (id === 'ai123') {
@@ -121,11 +118,13 @@ export class MockPresentationApiService implements ApiService {
         slides: mockSlideData,
         generationOptions: {
           artStyle: 'digital-art',
-          artStyleModifiers: 'vibrant colors, modern',
-          imageModel: {
+          artDescription: 'vibrant colors, modern',
+          model: {
             name: 'dall-e-3',
             provider: 'openai',
           },
+          themeStyle: 'modern',
+          themeDescription: 'clean and professional',
         },
       };
     } else {

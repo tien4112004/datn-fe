@@ -1,10 +1,7 @@
 import { api } from '@aiprimary/api';
 import type { ApiResponse } from '@aiprimary/api';
-import type {
-  PresentationGenerationRequest,
-  PresentationGenerationStartResponse,
-  ImageOptions,
-} from './types';
+import type { PresentationGenerationRequest, PresentationGenerationStartResponse } from './types';
+import type { ImageGenerationParams } from '../image/types';
 import type { ApiService } from '@aiprimary/api';
 import { getBackendUrl } from '@aiprimary/api';
 import type { Presentation, Slide, SlideLayoutSchema, SlideTheme } from '@aiprimary/core';
@@ -28,7 +25,7 @@ export class PresentationApiService implements ApiService {
    */
   async getAiResultById(id: string): Promise<{
     slides: SlideLayoutSchema[];
-    generationOptions?: ImageOptions;
+    generationOptions?: Omit<ImageGenerationParams, 'prompt' | 'slideId'>;
   }> {
     const response = await api.get<ApiResponse<any>>(`${this.baseUrl}/api/presentations/${id}/ai-result`);
 
@@ -49,7 +46,7 @@ export class PresentationApiService implements ApiService {
     }
 
     // Parse generation options if available
-    let generationOptions: ImageOptions | undefined;
+    let generationOptions: Omit<ImageGenerationParams, 'prompt' | 'slideId'> | undefined;
     if (rawData.generationOptions) {
       try {
         generationOptions = JSON.parse(rawData.generationOptions);

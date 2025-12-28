@@ -22,6 +22,10 @@ export default {
     googleSignInSuccess: 'Successfully signed in with Google',
     googleSignInFailed: 'Failed to complete sign in. Please try again.',
   },
+  logout: {
+    success: 'Logged out successfully',
+    error: 'Failed to logout',
+  },
   googleCallback: {
     completingSignIn: 'Completing sign in...',
     redirecting: 'Redirecting...',

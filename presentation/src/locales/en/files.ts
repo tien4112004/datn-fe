@@ -58,6 +58,7 @@ export default {
     import: {
       xAxis: 'X',
       yAxis: 'Y',
+      cannotReadFile: 'Unable to read or parse the file',
     },
   },
 };

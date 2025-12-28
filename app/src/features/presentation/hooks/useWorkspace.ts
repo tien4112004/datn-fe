@@ -7,11 +7,14 @@ import { usePresentationForm } from '@/features/presentation/contexts/Presentati
 import { useDraftPresentation } from './useApi';
 import type { PresentationGenerateDraftRequest } from '../types';
 import usePresentationStore from '../stores/usePresentationStore';
+import { useTranslation } from 'react-i18next';
+import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 
 interface UseWorkspaceProps {}
 
 export const useWorkspace = ({}: UseWorkspaceProps) => {
   const navigate = useNavigate();
+  const { t } = useTranslation(I18N_NAMESPACES.PRESENTATION);
 
   // Form context
   const formHook = usePresentationForm();
@@ -55,9 +58,9 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
   // Handle streaming errors
   useEffect(() => {
     if (error) {
-      toast.error('Error generating outline. Please try again.');
+      toast.error(t('generation.outlineError'));
     }
-  }, [error]);
+  }, [error, t]);
 
   // Form handlers
   const handleRegenerateOutline = useCallback(async () => {
@@ -121,9 +124,9 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
       // Navigate to the detail page
       navigate(`/presentation/${result.id}?isGenerating=true`, { replace: true });
     } catch {
-      toast.error('Error generating presentation. Please try again.');
+      toast.error(t('generation.presentationError'));
     }
-  }, [trigger, markdownContent, getValues, navigate]);
+  }, [trigger, markdownContent, getValues, navigate, t]);
 
   const stopStream = useCallback(() => {
     stopStreamOutline();

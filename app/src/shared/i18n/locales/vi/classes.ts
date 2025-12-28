@@ -71,6 +71,16 @@ export default {
   modals: {
     addTitle: 'Thêm lớp học mới',
     editTitle: 'Cập nhật lớp học',
+    addClass: {
+      loading: 'Đang thêm lớp...',
+      success: 'Lớp "{{name}}" đã được thêm thành công',
+      error: 'Thêm lớp thất bại',
+    },
+    updateClass: {
+      loading: 'Đang cập nhật lớp...',
+      success: 'Lớp "{{name}}" đã được cập nhật thành công',
+      error: 'Cập nhật lớp thất bại',
+    },
   },
 
   detail: {
@@ -400,6 +410,8 @@ export default {
   },
   lesson: {
     creator: {
+      createSuccess: 'Tạo bài giảng thành công!',
+      updateSuccess: 'Cập nhật bài giảng thành công!',
       sections: {
         basicInfo: 'Thông tin cơ bản',
         objectives: 'Mục tiêu học tập',
@@ -729,6 +741,21 @@ export default {
       networkError: 'Lỗi kết nối mạng. Vui lòng kiểm tra kết nối và thử lại.',
       validationError: 'Vui lòng sửa các lỗi trong biểu mẫu trước khi gửi.',
       duplicateError: 'Học sinh với mã này đã tồn tại trong lớp.',
+    },
+    addStudent: {
+      success: 'Thêm học sinh thành công',
+      error: 'Thêm học sinh thất bại',
+      errorDescription: 'Lỗi: {{error}}',
+    },
+    updateStudent: {
+      success: 'Cập nhật học sinh thành công',
+      error: 'Cập nhật học sinh thất bại',
+      errorDescription: 'Lỗi: {{error}}',
+    },
+    deleteStudent: {
+      success: 'Xóa học sinh khỏi danh sách thành công',
+      error: 'Xóa học sinh thất bại',
+      errorDescription: 'Lỗi: {{error}}',
     },
   },
 

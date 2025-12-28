@@ -14,4 +14,8 @@ export default {
     mindmap: 'Mindmap',
     image: 'Image',
   },
+  creation: {
+    createPresentationError: 'Failed to create blank presentation: {{error}}',
+    createMindmapError: 'Failed to create blank mindmap: {{error}}',
+  },
 };

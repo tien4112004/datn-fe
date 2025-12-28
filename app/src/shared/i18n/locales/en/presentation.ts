@@ -146,4 +146,8 @@ export default {
     artStyleRequired: 'Art style is required',
     imageModelRequired: 'Image model is required',
   },
+  generation: {
+    outlineError: 'Error generating outline. Please try again.',
+    presentationError: 'Error generating presentation. Please try again.',
+  },
 };

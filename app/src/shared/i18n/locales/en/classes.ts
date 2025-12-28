@@ -82,6 +82,16 @@ export default {
   modals: {
     addTitle: 'Add New Class',
     editTitle: 'Update Class',
+    addClass: {
+      loading: 'Adding class...',
+      success: 'Class "{{name}}" added successfully',
+      error: 'Failed to add class',
+    },
+    updateClass: {
+      loading: 'Updating class...',
+      success: 'Class "{{name}}" updated successfully',
+      error: 'Failed to update class',
+    },
   },
 
   detail: {
@@ -406,6 +416,8 @@ export default {
   },
   lesson: {
     creator: {
+      createSuccess: 'Lesson created successfully!',
+      updateSuccess: 'Lesson updated successfully!',
       sections: {
         basicInfo: 'Basic Information',
         objectives: 'Learning Objectives',
@@ -735,6 +747,21 @@ export default {
       networkError: 'Network error. Please check your connection and try again.',
       validationError: 'Please fix the errors in the form before submitting.',
       duplicateError: 'A student with this ID already exists in the class.',
+    },
+    addStudent: {
+      success: 'Student added successfully',
+      error: 'Failed to add student',
+      errorDescription: 'Error: {{error}}',
+    },
+    updateStudent: {
+      success: 'Student updated successfully',
+      error: 'Failed to update student',
+      errorDescription: 'Error: {{error}}',
+    },
+    deleteStudent: {
+      success: 'Student removed from roster successfully',
+      error: 'Failed to delete student',
+      errorDescription: 'Error: {{error}}',
     },
   },
 

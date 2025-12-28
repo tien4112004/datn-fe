@@ -51,6 +51,7 @@ export default {
       confirmButton: 'Use This Template & Start Editing',
       customizeParameters: 'Customize Layout',
       resetToDefaults: 'Reset to Defaults',
+      confirmSuccess: 'Template confirmed! You can now edit your slide.',
     },
 
     // Chart Tools

@@ -96,6 +96,7 @@ export default {
         noImages: 'No images uploaded yet',
         noSearchResults: 'No images found',
       },
+      failedToLoad: 'Failed to load images',
     },
 
     // AI Modification Panel

@@ -156,4 +156,8 @@ export default {
     artStyleRequired: 'Phong cách nghệ thuật là bắt buộc',
     imageModelRequired: 'Mô hình hình ảnh là bắt buộc',
   },
+  generation: {
+    outlineError: 'Lỗi khi tạo dàn ý. Vui lòng thử lại.',
+    presentationError: 'Lỗi khi tạo bản trình bày. Vui lòng thử lại.',
+  },
 };

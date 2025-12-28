@@ -14,4 +14,8 @@ export default {
     mindmap: 'Sơ đồ tư duy',
     image: 'Hình ảnh',
   },
+  creation: {
+    createPresentationError: 'Tạo bản trình bày trống thất bại: {{error}}',
+    createMindmapError: 'Tạo sơ đồ tư duy trống thất bại: {{error}}',
+  },
 };

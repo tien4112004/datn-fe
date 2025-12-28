@@ -201,4 +201,11 @@ export default {
     updateSuccess: 'Title updated successfully',
     updateError: 'Failed to update title',
   },
+  errors: {
+    cannotMoveToDescendant: 'Cannot move a node to one of its descendants',
+  },
+  saving: {
+    cannotSaveInViewMode: 'Cannot save in view mode',
+    cannotSaveInPresenterMode: 'Cannot save while in presenter mode',
+  },
 };

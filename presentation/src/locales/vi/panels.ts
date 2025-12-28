@@ -96,6 +96,7 @@ export default {
         noImages: 'Chưa có ảnh nào được tải lên',
         noSearchResults: 'Không tìm thấy ảnh',
       },
+      failedToLoad: 'Tải hình ảnh thất bại',
     },
 
     // Bảng AI Sửa đổi

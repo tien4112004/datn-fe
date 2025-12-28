@@ -146,14 +146,23 @@ export class PresentationApiService implements ApiService {
           try {
             while (true) {
               const { done, value } = await reader.read();
-              if (done) break;
+              if (done) {
+                // Stream completed successfully - cancel to properly close the HTTP/2 stream
+                await reader.cancel();
+                break;
+              }
 
               const text = new TextDecoder().decode(value);
               yield text;
             }
           } catch (error) {
             // Cancel the reader on error to properly close the stream
-            await reader.cancel();
+            try {
+              await reader.cancel();
+            } catch (cancelError) {
+              // Ignore cancel errors
+              console.warn('Failed to cancel reader:', cancelError);
+            }
             throw error;
           } finally {
             reader.releaseLock();

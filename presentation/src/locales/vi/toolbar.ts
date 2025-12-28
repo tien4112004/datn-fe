@@ -51,6 +51,7 @@ export default {
       confirmButton: 'Dùng mẫu này & Bắt đầu chỉnh sửa',
       customizeParameters: 'Tùy chỉnh bố cục',
       resetToDefaults: 'Đặt lại mặc định',
+      confirmSuccess: 'Xác nhận mẫu! Bạn có thể chỉnh sửa slide của mình.',
     },
 
     // Công cụ biểu đồ

@@ -226,7 +226,7 @@ const loadMyImages = async (page: number = 1) => {
     totalPages.value = pagination.totalPages;
   } catch (error) {
     console.error('Failed to load images:', error);
-    message.error('Failed to load images');
+    message.error(t('panels.imageLibrary.failedToLoad'));
   } finally {
     myImagesLoading.value = false;
     loadingMore.value = false;

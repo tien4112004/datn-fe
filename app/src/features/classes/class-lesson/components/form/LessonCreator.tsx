@@ -167,7 +167,7 @@ export const LessonCreator = ({
             isPrepared: res.isPrepared,
           })),
         });
-        toast.success('Lesson updated successfully!');
+        toast.success(t('updateSuccess'));
       } else {
         // Create operation
         const subject = data.subject;
@@ -196,7 +196,7 @@ export const LessonCreator = ({
             isPrepared: res.isPrepared,
           })),
         });
-        toast.success('Lesson created successfully!');
+        toast.success(t('createSuccess'));
       }
     } catch (error) {
       console.error('Failed to save lesson:', error);

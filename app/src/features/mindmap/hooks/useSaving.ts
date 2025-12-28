@@ -59,7 +59,7 @@ export const useSaveMindmap = () => {
 
     if (isPresenterMode || isViewMode) {
       console.log('saveWithThumbnail: Skipping save in presenter/view mode');
-      toast.info(isViewMode ? 'Cannot save in view mode' : 'Cannot save while in presenter mode');
+      toast.info(t(isViewMode ? 'saving.cannotSaveInViewMode' : 'saving.cannotSaveInPresenterMode'));
       useSavingStore.getState().setIsSaving(false);
       return;
     }

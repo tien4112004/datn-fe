@@ -58,6 +58,7 @@ export default {
     import: {
       xAxis: 'Trục X',
       yAxis: 'Trục Y',
+      cannotReadFile: 'Không thể đọc hoặc phân tích tệp',
     },
   },
 };

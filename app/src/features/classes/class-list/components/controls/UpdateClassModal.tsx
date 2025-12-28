@@ -18,17 +18,17 @@ export const UpdateClassModal = ({ isOpen, onClose, initialData }: UpdateClassMo
   const { closeEditModal } = useClassStore();
 
   const handleSubmit = async (data: ClassSchema) => {
-    const toastId = toast.loading('Updating class...');
+    const toastId = toast.loading(t('updateClass.loading'));
 
     try {
       await updateClassMutation.mutateAsync({ ...data, id: initialData.id });
-      toast.success(`Class "${data.name}" updated successfully.`, {
+      toast.success(t('updateClass.success', { name: data.name }), {
         id: toastId,
       });
       closeEditModal();
     } catch (error) {
       console.error('Failed to update class', error);
-      toast.error('Failed to update class.', {
+      toast.error(t('updateClass.error'), {
         id: toastId,
       });
     }

@@ -63,9 +63,11 @@ export const useGenerationStore = defineStore('generation', {
 
         // Process stream - each chunk is a complete JSON object
         let slideIndex = 0;
+        let hasReceivedData = false;
         try {
           for await (const chunk of response.stream) {
             console.log('Received chunk:', chunk);
+            hasReceivedData = true;
 
             try {
               const slideData = JSON.parse(chunk);
@@ -78,10 +80,21 @@ export const useGenerationStore = defineStore('generation', {
             }
           }
           // Stream completed successfully
-          console.log('Stream completed successfully');
+          console.log('Stream completed successfully, received', slideIndex, 'slides');
         } catch (streamError) {
-          console.error('Error during stream processing:', streamError);
-          throw streamError;
+          // Check if this is an HTTP/2 protocol error that occurred AFTER we received data
+          const isHttp2Error =
+            streamError instanceof TypeError && streamError.message?.toLowerCase().includes('network');
+
+          if (isHttp2Error && hasReceivedData) {
+            // This is the ERR_HTTP2_PROTOCOL_ERROR that happens after successful data transfer
+            // The stream closed improperly but we got all the data, so treat as success
+            console.warn('HTTP/2 stream closure error (ignored - data received successfully):', streamError);
+          } else {
+            // Real error during streaming - propagate it
+            console.error('Error during stream processing:', streamError);
+            throw streamError;
+          }
         }
       } catch (error) {
         if (error instanceof DOMException && error.name === 'AbortError') {

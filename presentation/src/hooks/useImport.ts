@@ -67,7 +67,7 @@ export default () => {
           addHistorySnapshot();
         } else addSlidesFromData(slides);
       } catch {
-        message.error('无法正确读取 / 解析该文件');
+        message.error(t('files.import.cannotReadFile'));
       }
     });
     reader.readAsText(file);
@@ -251,7 +251,7 @@ export default () => {
         json = await parse(e.target!.result as ArrayBuffer);
       } catch {
         exporting.value = false;
-        message.error('无法正确读取 / 解析该文件');
+        message.error(t('files.import.cannotReadFile'));
         return;
       }
 

@@ -179,7 +179,7 @@ const confirmAndStartEditing = () => {
   mainStore.setToolbarState(ToolbarStates.SLIDE_DESIGN);
 
   // Show success message
-  message.success('Template confirmed! You can now edit your slide.');
+  message.success(t('toolbar.slideTemplate.confirmSuccess'));
 };
 
 /**

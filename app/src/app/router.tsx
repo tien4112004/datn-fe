@@ -4,6 +4,7 @@ import NavLayout, { NavLayoutErrorBoundary } from '../shared/layouts/SidebarLayo
 import { CriticalError } from '@aiprimary/api';
 import { ProtectedRoute } from '@/shared/components/ProtectedRoute';
 import GlobalSpinner from '@/components/common/GlobalSpinner';
+import { AssignmentDemoPage } from '@/features/assignment';
 
 // Lazy load auth pages
 const LoginPage = lazy(() =>
@@ -72,6 +73,10 @@ const LazyWrapper = ({ children }: { children: React.ReactNode }) => (
 );
 
 const router = createBrowserRouter([
+  {
+    path: 'assignment-demo',
+    element: <AssignmentDemoPage />,
+  },
   {
     path: '/login',
     element: (

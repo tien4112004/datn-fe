@@ -7,8 +7,9 @@
 
     <Divider />
 
-    <!-- Category Tabs -->
+    <!-- Category Tabs - Only show if there are available tabs -->
     <Tabs
+      v-if="categoryTabs.length > 0"
       :value="activeCategory"
       @update:value="(val: string | number) => (activeCategory = String(val))"
       :tabs="categoryTabs"
@@ -64,7 +65,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import Tabs from '@/components/Tabs.vue';
 import Button from '@/components/Button.vue';
 import Divider from '@/components/Divider.vue';
@@ -94,19 +95,43 @@ const {
   setPreviewData,
 } = useAIModificationState();
 
-// Active category tab
-const activeCategory = ref<string>('text');
-
-// Category tabs configuration
-const categoryTabs = [
+// Define all possible category tabs
+const allCategoryTabs = [
   { key: 'text', label: 'Text' },
-  { key: 'design', label: 'Design' },
   { key: 'generate', label: 'Generate' },
 ];
 
-// Filter actions by active category
+// Compute tabs that have available actions
+const categoryTabs = computed(() => {
+  return allCategoryTabs.filter((tab) => {
+    const actionsInCategory = getActionsByCategory(tab.key, availableActions.value);
+    return actionsInCategory.length > 0;
+  });
+});
+
+// Active category tab - default to first available category
+const activeCategory = ref<string>(categoryTabs.value[0]?.key || 'text');
+
+// Update active category if it becomes unavailable
 const filteredActions = computed(() => {
-  return getActionsByCategory(activeCategory.value, availableActions.value);
+  const actions = getActionsByCategory(activeCategory.value, availableActions.value);
+
+  // If no actions in current category, switch to first available
+  if (actions.length === 0 && categoryTabs.value.length > 0) {
+    activeCategory.value = categoryTabs.value[0].key;
+    return getActionsByCategory(categoryTabs.value[0].key, availableActions.value);
+  }
+
+  return actions;
+});
+
+// Watch for changes in available tabs and update active category if needed
+watch(categoryTabs, (newTabs) => {
+  const isCurrentCategoryAvailable = newTabs.some((tab) => tab.key === activeCategory.value);
+
+  if (!isCurrentCategoryAvailable && newTabs.length > 0) {
+    activeCategory.value = newTabs[0].key;
+  }
 });
 
 // Handle action selection
@@ -192,7 +217,7 @@ async function handleApply() {
 .category-tabs {
   :deep(.tabs-list) {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
     gap: 0.25rem;
   }
 

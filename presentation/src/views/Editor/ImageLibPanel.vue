@@ -96,7 +96,7 @@
 <script lang="ts" setup>
 import { onMounted, ref, computed, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import api from '@/services';
+import { getImageApi } from '@/services/image/api';
 import useCreateElement from '@/hooks/useCreateElement';
 import message from '@/utils/message';
 import Button from '@/components/Button.vue';
@@ -107,6 +107,7 @@ import PopoverMenuItem from '@/components/PopoverMenuItem.vue';
 import Tabs from '@/components/Tabs.vue';
 
 const { t } = useI18n();
+const imageApi = getImageApi();
 
 // Common types
 interface PexelsImageItem {
@@ -174,13 +175,13 @@ const searchPexels = (q?: string) => {
   if (!query) return message.error(t('panels.imageLibrary.errorNoQuery'));
   pexelsLoading.value = true;
 
-  api
+  imageApi
     .searchImage({
       query,
       per_page: 50,
       orientation: orientation.value,
     })
-    .then((ret) => {
+    .then((ret: any) => {
       pexelsImages.value = ret.data;
       pexelsLoading.value = false;
     })
@@ -203,7 +204,7 @@ const loadMyImages = async (page: number = 1) => {
   }
 
   try {
-    const response = await api.getMyImages(page, 20);
+    const response = await imageApi.getMyImages(page, 20);
     const { data, pagination } = response.data;
 
     // Transform MediaResponseDto to match ImageWaterfallViewer interface

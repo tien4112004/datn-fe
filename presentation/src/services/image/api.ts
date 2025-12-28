@@ -1,11 +1,11 @@
 import { getApiServiceFactory } from '@aiprimary/api';
 import { ImageApiService } from './service';
 import { MockImageApiService } from './mock';
-import type { GeneratedImage, ImageGenerationParams, SingleImageResponse } from './types';
+import type { GeneratedImage, ImageGenerationParams, SingleImageResponse, ImageSearchPayload } from './types';
 import { getBackendUrl } from '@aiprimary/api';
 
 // Re-export types
-export type { GeneratedImage, ImageGenerationParams, SingleImageResponse };
+export type { GeneratedImage, ImageGenerationParams, SingleImageResponse, ImageSearchPayload };
 
 const BASE_URL = getBackendUrl();
 
@@ -15,6 +15,8 @@ export interface IImageApi {
     slideId: string,
     params: ImageGenerationParams
   ): Promise<SingleImageResponse>;
+  searchImage(body: ImageSearchPayload): Promise<any>;
+  getMyImages(page?: number, size?: number): Promise<any>;
 }
 
 /**

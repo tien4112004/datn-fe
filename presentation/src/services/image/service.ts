@@ -1,6 +1,11 @@
 import { api } from '@aiprimary/api';
 import type { ApiResponse } from '@aiprimary/api';
-import type { ImageGenerationParams, ImageGenerationResponse, SingleImageResponse } from './types';
+import type {
+  ImageGenerationParams,
+  ImageGenerationResponse,
+  SingleImageResponse,
+  ImageSearchPayload,
+} from './types';
 import type { ApiService } from '@aiprimary/api';
 import { getBackendUrl } from '@aiprimary/api';
 
@@ -51,5 +56,29 @@ export class ImageApiService implements ApiService {
     return {
       imageUrl: response.data.data.images[0].cdnUrl,
     };
+  }
+
+  async searchImage(body: ImageSearchPayload): Promise<any> {
+    try {
+      const response = await api.post(`${this.baseUrl}/api/images/search-pexels`, body);
+      return response.data;
+    } catch (error: any) {
+      // Handle rate limit from Pexels API
+      if (error.response?.status === 502) {
+        throw new Error('Image search service is temporarily unavailable. Please try again later.');
+      }
+      throw error;
+    }
+  }
+
+  async getMyImages(page: number = 1, size: number = 20): Promise<any> {
+    try {
+      const response = await api.get(`${this.baseUrl}/api/images`, {
+        params: { page, size },
+      });
+      return response.data;
+    } catch (error: any) {
+      throw error;
+    }
   }
 }

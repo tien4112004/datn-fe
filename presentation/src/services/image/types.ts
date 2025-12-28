@@ -22,3 +22,14 @@ export interface ImageGenerationResponse {
 export interface SingleImageResponse {
   imageUrl: string;
 }
+
+export interface ImageSearchPayload {
+  query: string;
+  orientation?: 'landscape' | 'portrait' | 'square' | 'all';
+  locale?: 'zh' | 'en';
+  order?: 'popular' | 'latest';
+  size?: 'large' | 'medium' | 'small';
+  image_type?: 'all' | 'photo' | 'illustration' | 'vector';
+  page?: number;
+  per_page?: number;
+}

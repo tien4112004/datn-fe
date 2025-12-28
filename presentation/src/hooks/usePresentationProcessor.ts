@@ -78,7 +78,6 @@ export function usePresentationProcessor(
     });
   } else if (presentation && !presentation.isParsed && !generationRequest) {
     // Old unparsed presentation without generation request - fetch AI result
-    console.log('[PresentationProcessor] Processing unparsed presentation...', presentation);
     processFullAiResult();
   }
 
@@ -138,9 +137,6 @@ export function usePresentationProcessor(
       // Generate images for slides that have image elements
       const imageGenerationPromises: Promise<any>[] = [];
 
-      console.log('[processFullAiResult] Processing images for', slides.length, 'slides');
-      console.log('[processFullAiResult] AI Result:', aiResultSlides);
-
       slides.forEach((slide, index) => {
         const slideData = aiResultSlides[index];
         const imageElement = slide.elements.find((el) => el.type === 'image') as PPTImageElement;
@@ -148,27 +144,15 @@ export function usePresentationProcessor(
         // Type guard: check if data has image property
         const imagePrompt = slideData.data && 'image' in slideData.data ? slideData.data.image : undefined;
 
-        console.log(`[processFullAiResult] Slide ${index}:`, {
-          slideId: slide.id,
-          hasImageElement: !!imageElement,
-          imagePrompt,
-          slideData: slideData,
-        });
-
         if (imageElement && imagePrompt) {
-          console.log(`[processFullAiResult] Starting image generation for slide ${slide.id}`);
           const promise = handleImageGeneration(slide.id, imageElement, imagePrompt);
           imageGenerationPromises.push(promise);
         }
       });
 
-      console.log(`[processFullAiResult] Total image generations started: ${imageGenerationPromises.length}`);
-
       // Wait for all image generations to complete
       if (imageGenerationPromises.length > 0) {
-        console.log('[processFullAiResult] Waiting for image generations to complete...');
         await Promise.allSettled(imageGenerationPromises);
-        console.log('[processFullAiResult] All image generations completed');
       }
 
       // Save presentation with full data (slides, metadata, thumbnail)
@@ -333,7 +317,6 @@ export function usePresentationProcessor(
     let imageData = url;
     if (!url.startsWith('data:')) {
       try {
-        console.log(`[updateSlideImageInStore] Converting image to base64 for slide ${slideId}`);
         imageData = await urlToBase64(url);
       } catch (error) {
         console.error('Failed to convert image to base64, using URL fallback:', error);

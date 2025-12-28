@@ -7,10 +7,11 @@ import type { Slide, SlideTheme, SlideViewport } from '@/types/slides';
 
 /**
  * Convert data URL (base64) to Blob for multipart upload
+ * Supports both PNG and JPEG formats
  */
 function dataURLtoBlob(dataURL: string): Blob {
   const arr = dataURL.split(',');
-  const mime = arr[0].match(/:(.*?);/)?.[1] || 'image/png';
+  const mime = arr[0].match(/:(.*?);/)?.[1] || 'image/jpeg';
   const bstr = atob(arr[1]);
   let n = bstr.length;
   const u8arr = new Uint8Array(n);
@@ -74,6 +75,9 @@ export function useSavePresentation(presentationId: string, pinia: Pinia) {
         slides: overrides?.slides ?? slidesStore.slides,
         isParsed: false,
         metadata: {},
+        // Include thumbnail URL if we're not uploading a new file (i.e., it's already an R2 URL)
+        // This prevents the backend from setting thumbnail to null when no file is uploaded
+        ...(thumbnailBlob ? {} : { thumbnail: thumbnailToUse }),
       };
 
       // Create FormData for multipart upload

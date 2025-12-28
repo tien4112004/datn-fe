@@ -13,7 +13,7 @@ export type ArtStyle =
   | 'surreal'
   | 'minimalist';
 
-interface PresentationConfig {
+export interface PresentationConfig {
   theme: SlideTheme;
   viewport: {
     width: number;
@@ -21,7 +21,7 @@ interface PresentationConfig {
   };
 }
 
-interface ImageOptions {
+export interface ImageOptions {
   artStyle: ArtStyle;
   artStyleModifiers?: string;
   imageModel: ModelConfig;

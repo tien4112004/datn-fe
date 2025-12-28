@@ -1,6 +1,6 @@
 <template>
   <div class="parameter-control">
-    <label class="parameter-label">{{ t(parameter.name) }}</label>
+    <label class="parameter-label">{{ parameter.name }}</label>
 
     <!-- Select Dropdown -->
     <Select
@@ -19,7 +19,7 @@
         :class="{ active: modelValue === option.value }"
         @click="emit('update:modelValue', option.value)"
       >
-        {{ t(option.label) }}
+        {{ option.label }}
       </div>
     </div>
 
@@ -68,14 +68,13 @@
     />
 
     <p v-if="parameter.description" class="parameter-description">
-      {{ t(parameter.description) }}
+      {{ parameter.description }}
     </p>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { defineProps, defineEmits, computed } from 'vue';
-import { useI18n } from 'vue-i18n';
 import type { AIParameter } from '@/types/aiModification';
 import Select from '@/components/Select.vue';
 import Input from '@/components/Input.vue';
@@ -91,13 +90,11 @@ const emit = defineEmits<{
   'update:modelValue': [value: string | number];
 }>();
 
-const { t } = useI18n();
-
 // Convert parameter options to Select component format
 const selectOptions = computed(() => {
   return (
     props.parameter.options?.map((opt) => ({
-      label: t(opt.label),
+      label: opt.label,
       value: String(opt.value),
     })) || []
   );

@@ -24,7 +24,7 @@ function extractTitleFromOutline(outline: string): string {
 interface Presentation {
   id: string;
   title: string;
-  theme: SlideTheme;
+  theme?: SlideTheme;
   isParsed?: boolean;
   [key: string]: any;
 }
@@ -70,25 +70,57 @@ export function usePresentationProcessor(
   }
 
   // 1. Initial Logic
-  if (presentation && !presentation.isParsed && !isGenerating) {
-    console.log('[PresentationProcessor] Processing unparsed presentation...', presentation);
-    processFullAiResult();
-  } else if (!isGenerating && generationRequest) {
+  if (generationRequest && !generationStore.isStreaming) {
+    // New presentation with generation request - start streaming
     generationStore.startStreaming({
       ...generationRequest,
       presentationId: presentationId,
     });
+  } else if (presentation && !presentation.isParsed && !generationRequest) {
+    // Old unparsed presentation without generation request - fetch AI result
+    console.log('[PresentationProcessor] Processing unparsed presentation...', presentation);
+    processFullAiResult();
   }
 
   // 2. Process non-streaming result
   async function processFullAiResult() {
     try {
       isProcessing.value = true;
-      const aiResult = await getAiResult();
+
+      // Get both slides and generation options from AI result
+      const { slides: aiResultSlides, generationOptions } = await getAiResult();
+
+      // Restore generation options to store if available
+      if (generationOptions) {
+        // Validate that required fields exist
+        if (!generationOptions.imageModel?.name) {
+          console.error('[processFullAiResult] Invalid generation options - missing imageModel');
+        } else {
+          // Reconstruct the request object with the generation options
+          const reconstructedRequest = {
+            presentationId: presentationId,
+            outline: '', // Not needed for image generation
+            model: { name: '', provider: '' }, // Not needed for image generation
+            slideCount: aiResultSlides.length,
+            language: '',
+            presentation: {
+              theme: presentation?.theme || slidesStore.theme,
+              viewport: viewport,
+            },
+            generationOptions: generationOptions,
+          };
+          generationStore.setRequest(reconstructedRequest);
+        }
+      } else {
+        console.warn(
+          '[processFullAiResult] No generation options available - images will show error placeholders'
+        );
+      }
+
       const theme = presentation?.theme || slidesStore.theme;
 
       const slides = await Promise.all(
-        aiResult.map(async (slideData: any, i: number) => {
+        aiResultSlides.map(async (slideData: any, i: number) => {
           const template = await selectRandomTemplate(slideData.type);
           return convertToSlide(
             slideData as SlideLayoutSchema,
@@ -107,22 +139,25 @@ export function usePresentationProcessor(
       const imageGenerationPromises: Promise<any>[] = [];
 
       console.log('[processFullAiResult] Processing images for', slides.length, 'slides');
-      console.log('[processFullAiResult] AI Result:', aiResult);
+      console.log('[processFullAiResult] AI Result:', aiResultSlides);
 
       slides.forEach((slide, index) => {
-        const slideData = aiResult[index];
+        const slideData = aiResultSlides[index];
         const imageElement = slide.elements.find((el) => el.type === 'image') as PPTImageElement;
+
+        // Type guard: check if data has image property
+        const imagePrompt = slideData.data && 'image' in slideData.data ? slideData.data.image : undefined;
 
         console.log(`[processFullAiResult] Slide ${index}:`, {
           slideId: slide.id,
           hasImageElement: !!imageElement,
-          imagePrompt: slideData.data?.image,
+          imagePrompt,
           slideData: slideData,
         });
 
-        if (imageElement && slideData.data?.image) {
+        if (imageElement && imagePrompt) {
           console.log(`[processFullAiResult] Starting image generation for slide ${slide.id}`);
-          const promise = handleImageGeneration(slide.id, imageElement, slideData.data.image);
+          const promise = handleImageGeneration(slide.id, imageElement, imagePrompt);
           imageGenerationPromises.push(promise);
         }
       });
@@ -215,22 +250,12 @@ export function usePresentationProcessor(
   ): Promise<{ success: boolean; error?: Error }> {
     const request = generationStore.request;
 
-    console.log('[handleImageGeneration] Called for slide:', slideId, {
-      prompt,
-      hasRequest: !!request,
-      hasGenerationOptions: !!request?.generationOptions,
-      hasImageModel: !!request?.generationOptions?.imageModel,
-      request: request,
-    });
-
     if (!prompt) {
-      console.log('[handleImageGeneration] No prompt provided, setting error image');
       await updateSlideImageInStoreWithError(slideId, imageElement.id);
       return { success: false, error: new Error('No prompt provided') };
     }
 
     if (!request?.generationOptions?.imageModel) {
-      console.log('[handleImageGeneration] No image model configured, setting error image');
       await updateSlideImageInStoreWithError(slideId, imageElement.id);
       return { success: false, error: new Error('No image model configured') };
     }
@@ -270,6 +295,23 @@ export function usePresentationProcessor(
     }
   }
 
+  // Helper to convert URL to base64
+  async function urlToBase64(url: string): Promise<string> {
+    try {
+      const response = await fetch(url);
+      const blob = await response.blob();
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    } catch (error) {
+      console.error('Failed to convert URL to base64:', error);
+      throw error;
+    }
+  }
+
   // Helper to update store specific image
   async function updateSlideImageInStore(slideId: string, elementId: string, url: string) {
     const slideIndex = slidesStore.slides.findIndex((s) => s.id === slideId);
@@ -287,7 +329,22 @@ export function usePresentationProcessor(
       return;
     }
 
-    const updatedElement = await updateImageSource(slide.elements[elementIndex] as PPTImageElement, url);
+    // Convert URL to base64 for portability
+    let imageData = url;
+    if (!url.startsWith('data:')) {
+      try {
+        console.log(`[updateSlideImageInStore] Converting image to base64 for slide ${slideId}`);
+        imageData = await urlToBase64(url);
+      } catch (error) {
+        console.error('Failed to convert image to base64, using URL fallback:', error);
+        // Fall back to URL if conversion fails
+      }
+    }
+
+    const updatedElement = await updateImageSource(
+      slide.elements[elementIndex] as PPTImageElement,
+      imageData
+    );
     slide.elements = [...slide.elements];
     slide.elements[elementIndex] = updatedElement;
 

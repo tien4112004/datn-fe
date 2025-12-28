@@ -1,6 +1,10 @@
 import { api } from '@aiprimary/api';
 import type { ApiResponse } from '@aiprimary/api';
-import type { PresentationGenerationRequest, PresentationGenerationStartResponse } from './types';
+import type {
+  PresentationGenerationRequest,
+  PresentationGenerationStartResponse,
+  ImageOptions,
+} from './types';
 import type { ApiService } from '@aiprimary/api';
 import { getBackendUrl } from '@aiprimary/api';
 import type { Presentation, Slide, SlideLayoutSchema, SlideTheme } from '@aiprimary/core';
@@ -22,7 +26,10 @@ export class PresentationApiService implements ApiService {
    * Get AI result for a presentation by ID
    * Used during parsing phase to retrieve generated slide layouts
    */
-  async getAiResultById(id: string): Promise<SlideLayoutSchema[]> {
+  async getAiResultById(id: string): Promise<{
+    slides: SlideLayoutSchema[];
+    generationOptions?: ImageOptions;
+  }> {
     const response = await api.get<ApiResponse<any>>(`${this.baseUrl}/api/presentations/${id}/ai-result`);
 
     const rawData = response.data.data;
@@ -30,16 +37,28 @@ export class PresentationApiService implements ApiService {
     // Extract the result field from the response
     const data = rawData.result || rawData;
 
-    // If data is a string (newline-separated JSON), parse it
+    // Parse slides
+    let slides: SlideLayoutSchema[];
     if (typeof data === 'string') {
-      return data
+      slides = data
         .split('\n')
         .filter((line) => line.trim().length > 0)
         .map((line) => JSON.parse(line));
+    } else {
+      slides = data;
     }
 
-    // If already an array, return as-is
-    return data;
+    // Parse generation options if available
+    let generationOptions: ImageOptions | undefined;
+    if (rawData.generationOptions) {
+      try {
+        generationOptions = JSON.parse(rawData.generationOptions);
+      } catch (error) {
+        console.error('[getAiResultById] Failed to parse generation options:', error);
+      }
+    }
+
+    return { slides, generationOptions };
   }
 
   /**

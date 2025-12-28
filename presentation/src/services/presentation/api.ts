@@ -1,14 +1,21 @@
 import { getApiServiceFactory } from '@aiprimary/api';
 import { PresentationApiService } from './service';
 import { MockPresentationApiService } from './mock';
-import type { PresentationGenerationRequest, PresentationGenerationStartResponse } from './types';
+import type {
+  PresentationGenerationRequest,
+  PresentationGenerationStartResponse,
+  ImageOptions,
+} from './types';
 import { getBackendUrl } from '@aiprimary/api';
-import type { Presentation, SlideTheme } from '@aiprimary/core';
+import type { Presentation, SlideTheme, SlideLayoutSchema } from '@aiprimary/core';
 
 const BASE_URL = getBackendUrl();
 
 export interface IPresentationApi {
-  getAiResultById(id: string): Promise<any[]>;
+  getAiResultById(id: string): Promise<{
+    slides: SlideLayoutSchema[];
+    generationOptions?: ImageOptions;
+  }>;
   upsertSlide(presentationId: string, slide: any): Promise<Presentation>;
   // Upsert multiple slides in a single request
   upsertSlides(presentationId: string, slides: any[]): Promise<Presentation>;

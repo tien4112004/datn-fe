@@ -3,15 +3,13 @@
     <!-- Loading State -->
     <div v-if="isLoading" class="preview-state loading">
       <div class="spinner"></div>
-      <p class="state-message">{{ t('panels.aiModification.states.processing') }}</p>
+      <p class="state-message">Processing...</p>
     </div>
 
     <!-- Error State -->
     <div v-else-if="error" class="preview-state error">
       <p class="state-message error-message">{{ error }}</p>
-      <Button variant="outline" size="small" @click="$emit('retry')">
-        {{ t('panels.aiModification.errors.retry') }}
-      </Button>
+      <Button variant="outline" size="small" @click="$emit('retry')"> Retry </Button>
     </div>
 
     <!-- Preview Content -->
@@ -24,14 +22,13 @@
 
     <!-- Empty State -->
     <div v-else class="preview-state empty">
-      <p class="state-message">{{ t('panels.aiModification.states.selectAction') }}</p>
+      <p class="state-message">Select an action to get started</p>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { defineProps, defineEmits } from 'vue';
-import { useI18n } from 'vue-i18n';
 import Button from '@/components/Button.vue';
 
 interface Props {
@@ -44,8 +41,6 @@ defineProps<Props>();
 defineEmits<{
   retry: [];
 }>();
-
-const { t } = useI18n();
 </script>
 
 <style lang="scss" scoped>

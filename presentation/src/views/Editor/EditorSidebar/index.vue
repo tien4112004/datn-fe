@@ -212,15 +212,20 @@ watch(
   { immediate: true }
 );
 
-// When panel is opened and slide is in preview (locked), always show template panel
+// When transitioning to a locked slide, show template panel initially
 watch(
-  [sidebarExpanded, isCurrentSlideLocked, () => currentSlide.value?.layout],
-  ([expanded, locked, hasLayout]) => {
-    if (expanded && locked && hasLayout) {
+  [isCurrentSlideLocked, () => currentSlide.value?.id],
+  ([locked, slideId], [prevLocked, prevSlideId]) => {
+    // Only set template panel when:
+    // 1. Transitioning to a locked slide (locked became true)
+    // 2. OR moving to a different locked slide
+    const isTransitionToLocked = locked && (!prevLocked || slideId !== prevSlideId);
+
+    if (isTransitionToLocked && currentSlide.value?.layout) {
       mainStore.setToolbarState(ToolbarStates.SLIDE_TEMPLATE);
+      mainStore.setSidebarExpanded(true);
     }
-  },
-  { immediate: true }
+  }
 );
 </script>
 

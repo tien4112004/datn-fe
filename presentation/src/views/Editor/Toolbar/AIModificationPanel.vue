@@ -29,7 +29,7 @@
       </div>
     </div>
     <div v-else class="empty-state">
-      <p>{{ t('panels.aiModification.states.noActions') }}</p>
+      <p>No actions available for current selection</p>
     </div>
 
     <!-- Parameters Section -->
@@ -57,19 +57,14 @@
 
     <!-- Action Buttons -->
     <div v-if="selectedAction" class="action-buttons">
-      <Button variant="outline" size="small" @click="handleCancel" :disabled="isProcessing">
-        {{ t('panels.aiModification.buttons.cancel') }}
-      </Button>
-      <Button variant="primary" size="small" @click="handleApply" :disabled="isProcessing">
-        {{ t('panels.aiModification.buttons.apply') }}
-      </Button>
+      <Button variant="outline" size="small" @click="handleCancel" :disabled="isProcessing"> Cancel </Button>
+      <Button variant="primary" size="small" @click="handleApply" :disabled="isProcessing"> Apply </Button>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { ref, computed } from 'vue';
-import { useI18n } from 'vue-i18n';
 import Tabs from '@/components/Tabs.vue';
 import Button from '@/components/Button.vue';
 import Divider from '@/components/Divider.vue';
@@ -81,8 +76,6 @@ import { useAIModificationState } from './AIModificationPanel/useAIModificationS
 import { getActionsByCategory } from './AIModificationPanel/actions';
 import { aiModificationService } from '@/services/ai/modifications';
 import type { AIAction } from '@/types/aiModification';
-
-const { t } = useI18n();
 
 // State management
 const {
@@ -106,9 +99,9 @@ const activeCategory = ref<string>('text');
 
 // Category tabs configuration
 const categoryTabs = [
-  { key: 'text', label: t('panels.aiModification.categories.text') },
-  { key: 'design', label: t('panels.aiModification.categories.design') },
-  { key: 'generate', label: t('panels.aiModification.categories.generate') },
+  { key: 'text', label: 'Text' },
+  { key: 'design', label: 'Design' },
+  { key: 'generate', label: 'Generate' },
 ];
 
 // Filter actions by active category
@@ -136,7 +129,7 @@ async function handleApply() {
     .map((param) => param.name);
 
   if (missingParams.length > 0) {
-    setError(t('panels.aiModification.errors.processingFailed'));
+    setError('Required parameters are missing');
     return;
   }
 
@@ -173,10 +166,10 @@ async function handleApply() {
           'AI processing completed successfully!'
       );
     } else {
-      setError(response.error || t('panels.aiModification.errors.processingFailed'));
+      setError(response.error || 'AI processing failed');
     }
   } catch (err) {
-    setError(t('panels.aiModification.errors.processingFailed'));
+    setError('AI processing failed');
     console.error('AI modification error:', err);
   }
 }

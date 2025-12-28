@@ -7,7 +7,6 @@
 
 <script lang="ts" setup>
 import { computed } from 'vue';
-import { useI18n } from 'vue-i18n';
 import { FileText, Square, Layers, Plus } from 'lucide-vue-next';
 import type { CurrentContext } from '@/types/aiModification';
 
@@ -16,7 +15,6 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-const { t } = useI18n();
 
 const contextIcon = computed(() => {
   switch (props.context.type) {
@@ -36,13 +34,13 @@ const contextIcon = computed(() => {
 const contextText = computed(() => {
   switch (props.context.type) {
     case 'slide':
-      return t('panels.aiModification.context.slide');
+      return 'Current Slide';
     case 'element':
-      return t('panels.aiModification.context.element');
+      return 'Selected Element';
     case 'elements':
-      return t('panels.aiModification.context.elements', { count: props.context.count || 0 });
+      return `${props.context.count || 0} Elements`;
     case 'generate':
-      return t('panels.aiModification.context.generate');
+      return 'Generate New';
     default:
       return '';
   }

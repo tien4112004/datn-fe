@@ -1,10 +1,25 @@
-import { ref, computed } from 'vue';
+import { ref, computed, type Ref, type ComputedRef } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useMainStore, useSlidesStore } from '@/store';
 import type { AIAction, AIModificationState, CurrentContext, AIContextType } from '@/types/aiModification';
 import { getActionsForContext } from './actions';
 
-export function useAIModificationState() {
+export function useAIModificationState(): {
+  selectedAction: Ref<AIAction | null>;
+  parameterValues: Ref<Record<string, string | number>>;
+  isProcessing: Ref<boolean>;
+  previewData: Ref<unknown>;
+  error: Ref<string | null>;
+  currentContext: ComputedRef<CurrentContext>;
+  availableActions: ComputedRef<AIAction[]>;
+  state: ComputedRef<AIModificationState>;
+  selectAction: (action: AIAction) => void;
+  updateParameter: (parameterId: string, value: string | number) => void;
+  reset: () => void;
+  setProcessing: (processing: boolean) => void;
+  setError: (errorMessage: string) => void;
+  setPreviewData: (data: unknown) => void;
+} {
   const mainStore = useMainStore();
   const slidesStore = useSlidesStore();
   const { activeElementIdList, handleElement } = storeToRefs(mainStore);
@@ -101,14 +116,16 @@ export function useAIModificationState() {
     isProcessing.value = false;
   }
 
-  // Create the state object
-  const state: AIModificationState = {
-    selectedAction: selectedAction.value,
-    parameterValues: parameterValues.value,
-    isProcessing: isProcessing.value,
-    previewData: previewData.value,
-    error: error.value,
-  };
+  // Create the state object as computed
+  const state = computed(
+    (): AIModificationState => ({
+      selectedAction: selectedAction.value,
+      parameterValues: parameterValues.value,
+      isProcessing: isProcessing.value,
+      previewData: previewData.value,
+      error: error.value,
+    })
+  );
 
   return {
     // State

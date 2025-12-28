@@ -1,21 +1,14 @@
 <template>
-  <div
-    class="action-card"
-    :class="{ active: isActive }"
-    @click="$emit('click')"
-    :title="t(action.description)"
-  >
+  <div class="action-card" :class="{ active: isActive }" @click="$emit('click')" :title="action.description">
     <component :is="action.icon" class="action-icon" />
     <div class="action-content">
-      <div class="action-name">{{ t(action.name) }}</div>
-      <div class="action-description">{{ t(action.description) }}</div>
+      <div class="action-name">{{ action.name }}</div>
+      <div class="action-description">{{ action.description }}</div>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { defineProps, defineEmits } from 'vue';
-import { useI18n } from 'vue-i18n';
 import type { AIAction } from '@/types/aiModification';
 
 interface Props {
@@ -27,8 +20,6 @@ defineProps<Props>();
 defineEmits<{
   click: [];
 }>();
-
-const { t } = useI18n();
 </script>
 
 <style lang="scss" scoped>
@@ -80,7 +71,6 @@ const { t } = useI18n();
   color: var(--presentation-muted-foreground);
   line-height: 1.4;
   display: -webkit-box;
-  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }

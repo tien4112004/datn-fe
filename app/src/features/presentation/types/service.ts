@@ -9,12 +9,12 @@ import type {
 import type { ApiResponse } from '@aiprimary/api';
 import type { Slide, SlideTheme, SlideTemplate, SlideViewport } from './slide';
 
-interface PresentationConfig {
+export interface PresentationConfig {
   theme: SlideTheme;
   viewport: SlideViewport;
 }
 
-interface ImageOptions {
+export interface ImageOptions {
   artStyle: string;
   artStyleModifiers?: string;
   imageModel: ModelConfig;
@@ -64,7 +64,10 @@ export interface PresentationApiService extends Service {
   getPresentations(request: PresentationCollectionRequest): Promise<ApiResponse<Presentation[]>>;
   createPresentation(data: CreatePresentationRequest): Promise<Presentation>;
   getPresentationById(id: string): Promise<Presentation | null>;
-  getAiResultById(id: string): Promise<SlideLayoutSchema[]>;
+  getAiResultById(id: string): Promise<{
+    slides: SlideLayoutSchema[];
+    generationOptions?: ImageOptions;
+  }>;
   updatePresentationTitle(id: string, name: string): Promise<any | null>;
   updatePresentation(id: string, data: UpdatePresentationRequest): Promise<Presentation>;
   deletePresentation(id: string): Promise<void>;

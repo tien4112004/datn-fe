@@ -104,14 +104,24 @@ export default class PresentationMockService implements PresentationApiService {
     this.baseUrl = baseUrl;
   }
 
-  async getAiResultById(id: string): Promise<SlideLayoutSchema[]> {
+  async getAiResultById(id: string): Promise<{
+    slides: SlideLayoutSchema[];
+    generationOptions?: ImageOptions;
+  }> {
     // Simulate API delay
     await new Promise((resolve) => setTimeout(resolve, 500));
 
     if (id === 'ai123') {
-      return getMockSlideData();
+      return {
+        slides: getMockSlideData(),
+        generationOptions: {
+          artStyle: 'digital-art',
+          artStyleModifiers: 'vibrant colors, modern',
+          imageModel: { name: 'dall-e-3', provider: 'openai' },
+        },
+      };
     } else {
-      return [];
+      return { slides: [] };
     }
   }
 

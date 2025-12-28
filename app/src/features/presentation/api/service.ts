@@ -6,6 +6,7 @@ import {
   type GetSlideThemesParams,
   type UpdatePresentationRequest,
   type OutlineData,
+  type ImageOptions,
 } from '../types';
 import { api, API_MODE, type ApiMode } from '@aiprimary/api';
 import { mapPagination, type ApiResponse, type Pagination } from '@aiprimary/api';
@@ -107,37 +108,44 @@ export default class PresentationRealApiService implements PresentationApiServic
     return this._mapPresentationItem(response.data.data);
   }
 
-  async getAiResultById(id: string): Promise<SlideLayoutSchema[]> {
+  async getAiResultById(id: string): Promise<{
+    slides: SlideLayoutSchema[];
+    generationOptions?: ImageOptions;
+  }> {
     const response = await api.get<ApiResponse<any>>(`${this.baseUrl}/api/presentations/${id}/ai-result`);
 
-    console.log('Full API Response:', response.data);
     const rawData = response.data.data;
-    console.log('rawData:', rawData);
-    console.log('rawData.result type:', typeof rawData.result);
 
-    let parsedAiResult = rawData.result;
-
+    // Parse slides
+    let slides: SlideLayoutSchema[];
     if (typeof rawData.result === 'string') {
       // Try parsing as newline-separated JSON first
       try {
-        parsedAiResult = rawData.result
+        slides = rawData.result
           .split('\n')
           .filter((line: string) => line.trim().length > 0)
           .map((line: string) => JSON.parse(line));
-        console.log('Parsed AI result (newline-separated):', parsedAiResult);
       } catch (error) {
         console.error('Error parsing newline-separated JSON:', error);
         // Fallback to parsing ```json blocks
         const jsonBlocks = this._parseJsonBlocks(rawData.result);
-        parsedAiResult = jsonBlocks[0]?.slides || jsonBlocks;
-        console.log('Parsed AI result (json blocks):', parsedAiResult);
+        slides = jsonBlocks[0]?.slides || jsonBlocks;
+      }
+    } else {
+      slides = rawData.result;
+    }
+
+    // Parse generation options if available
+    let generationOptions: ImageOptions | undefined;
+    if (rawData.generationOptions) {
+      try {
+        generationOptions = JSON.parse(rawData.generationOptions);
+      } catch (error) {
+        console.error('Failed to parse generation options:', error);
       }
     }
 
-    console.log('Final parsedAiResult:', parsedAiResult);
-    console.log('Is array?', Array.isArray(parsedAiResult));
-
-    return parsedAiResult;
+    return { slides, generationOptions };
   }
 
   private _parseJsonBlocks(input: string): any[] {

@@ -72,6 +72,10 @@ export default class PresentationRealApiService implements PresentationApiServic
             const text = new TextDecoder().decode(value);
             yield text;
           }
+        } catch (error) {
+          // Cancel the reader on error to properly close the stream
+          await reader.cancel();
+          throw error;
         } finally {
           reader.releaseLock();
         }

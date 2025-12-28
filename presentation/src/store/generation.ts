@@ -63,18 +63,25 @@ export const useGenerationStore = defineStore('generation', {
 
         // Process stream - each chunk is a complete JSON object
         let slideIndex = 0;
-        for await (const chunk of response.stream) {
-          console.log('Received chunk:', chunk);
+        try {
+          for await (const chunk of response.stream) {
+            console.log('Received chunk:', chunk);
 
-          try {
-            const slideData = JSON.parse(chunk);
-            this.addStreamedSlide(slideData, slideIndex);
-            console.log('Added streamed slide:', slideData);
-            slideIndex++;
-          } catch (error) {
-            console.error('Failed to parse chunk:', chunk, error);
-            // Continue processing other chunks even if one fails
+            try {
+              const slideData = JSON.parse(chunk);
+              this.addStreamedSlide(slideData, slideIndex);
+              console.log('Added streamed slide:', slideData);
+              slideIndex++;
+            } catch (error) {
+              console.error('Failed to parse chunk:', chunk, error);
+              // Continue processing other chunks even if one fails
+            }
           }
+          // Stream completed successfully
+          console.log('Stream completed successfully');
+        } catch (streamError) {
+          console.error('Error during stream processing:', streamError);
+          throw streamError;
         }
       } catch (error) {
         if (error instanceof DOMException && error.name === 'AbortError') {

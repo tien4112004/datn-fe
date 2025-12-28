@@ -34,7 +34,7 @@ export class ImageApiService implements ApiService {
     const isMock = params.model.name === 'mock';
     const endpoint = isMock
       ? `${this.baseUrl}/api/image/generate-in-presentation/mock`
-      : `${this.baseUrl}/api/image/generate-in-presentation`;
+      : `${this.baseUrl}/api/images/generate-in-presentation`;
 
     const response = await api.post<ApiResponse<any>>(
       endpoint,

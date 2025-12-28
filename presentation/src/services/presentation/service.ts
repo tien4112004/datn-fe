@@ -23,11 +23,12 @@ export class PresentationApiService implements ApiService {
    * Used during parsing phase to retrieve generated slide layouts
    */
   async getAiResultById(id: string): Promise<SlideLayoutSchema[]> {
-    const response = await api.get<ApiResponse<string | SlideLayoutSchema[]>>(
-      `${this.baseUrl}/api/presentations/${id}/ai-result`
-    );
+    const response = await api.get<ApiResponse<any>>(`${this.baseUrl}/api/presentations/${id}/ai-result`);
 
-    const data = response.data.data;
+    const rawData = response.data.data;
+
+    // Extract the result field from the response
+    const data = rawData.result || rawData;
 
     // If data is a string (newline-separated JSON), parse it
     if (typeof data === 'string') {

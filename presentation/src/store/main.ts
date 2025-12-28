@@ -37,6 +37,7 @@ export interface MainState {
   showNotesPanel: boolean;
   showSymbolPanel: boolean;
   showMarkupPanel: boolean;
+  showImageLibPanel: boolean;
   showAIPPTDialog: boolean;
   sidebarExpanded: boolean;
 }
@@ -75,6 +76,7 @@ export const useMainStore = defineStore('main', {
     showNotesPanel: false, // Open annotation panel
     showSymbolPanel: false, // Open symbol panel
     showMarkupPanel: false, // Open type annotation panel
+    showImageLibPanel: false, // Open image library panel
     showAIPPTDialog: false, // Open AIPPT creation window
     sidebarExpanded: false, // Sidebar panel expansion state
   }),
@@ -209,6 +211,10 @@ export const useMainStore = defineStore('main', {
 
     setMarkupPanelState(show: boolean) {
       this.showMarkupPanel = show;
+    },
+
+    setImageLibPanelState(show: boolean) {
+      this.showImageLibPanel = show;
     },
 
     setAIPPTDialogState(show: boolean) {

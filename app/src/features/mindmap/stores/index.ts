@@ -10,3 +10,4 @@ export { useDirtyStore } from './dirty';
 export { useTreePanelStore } from './treePanel';
 export { usePresenterModeStore, useReadOnlyStore } from './readOnly';
 export { useViewModeStore } from './viewMode';
+export { useSavingStore } from './saving';

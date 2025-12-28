@@ -82,7 +82,7 @@ onMounted(async () => {
   }
 
   const processorResult = usePresentationProcessor(
-    (containerStore.presentation || null) as any,
+    props.presentation,
     props.presentation.id,
     generationStore.isStreaming,
     pinia!,

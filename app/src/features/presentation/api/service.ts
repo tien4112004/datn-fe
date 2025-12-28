@@ -110,13 +110,32 @@ export default class PresentationRealApiService implements PresentationApiServic
   async getAiResultById(id: string): Promise<SlideLayoutSchema[]> {
     const response = await api.get<ApiResponse<any>>(`${this.baseUrl}/api/presentations/${id}/ai-result`);
 
+    console.log('Full API Response:', response.data);
     const rawData = response.data.data;
+    console.log('rawData:', rawData);
+    console.log('rawData.result type:', typeof rawData.result);
+
     let parsedAiResult = rawData.result;
 
     if (typeof rawData.result === 'string') {
-      const jsonBlocks = this._parseJsonBlocks(rawData.result);
-      parsedAiResult = jsonBlocks[0]?.slides || jsonBlocks;
+      // Try parsing as newline-separated JSON first
+      try {
+        parsedAiResult = rawData.result
+          .split('\n')
+          .filter((line: string) => line.trim().length > 0)
+          .map((line: string) => JSON.parse(line));
+        console.log('Parsed AI result (newline-separated):', parsedAiResult);
+      } catch (error) {
+        console.error('Error parsing newline-separated JSON:', error);
+        // Fallback to parsing ```json blocks
+        const jsonBlocks = this._parseJsonBlocks(rawData.result);
+        parsedAiResult = jsonBlocks[0]?.slides || jsonBlocks;
+        console.log('Parsed AI result (json blocks):', parsedAiResult);
+      }
     }
+
+    console.log('Final parsedAiResult:', parsedAiResult);
+    console.log('Is array?', Array.isArray(parsedAiResult));
 
     return parsedAiResult;
   }

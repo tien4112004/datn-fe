@@ -437,16 +437,6 @@ onMounted(() => {
     flex: 1;
     min-width: 0;
   }
-
-  @media (max-width: 1200px) {
-    .layout-content-center {
-      height: calc(100% - 100px) !important;
-    }
-
-    .layout-content-right {
-      height: calc(100% - 100px) !important;
-    }
-  }
 }
 
 // Responsive styles for smaller PC screens
@@ -540,23 +530,23 @@ onMounted(() => {
 
   // Reposition thumbnails to bottom with horizontal layout
   .layout-content {
-    flex-wrap: wrap;
+    // Keep horizontal layout but constrain widths
   }
 
   .layout-content-main {
-    order: 1;
-    flex: 1 1 0;
+    flex: 1;
     min-width: 0;
-    height: calc(100% - 100px) !important;
+    min-height: 0;
   }
 
   .layout-content-columns {
     flex-direction: column;
+    height: 100%;
   }
 
   .layout-thumbnails {
-    order: 3;
-    flex-basis: 100%;
+    order: 2;
+    flex-shrink: 0;
     width: 100% !important;
     height: 100px !important;
     border-top: 1px solid var(--presentation-border);
@@ -565,13 +555,16 @@ onMounted(() => {
   }
 
   .layout-content-center {
+    order: 1;
     flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
   }
 
   .layout-content-right {
-    order: 2;
     flex-shrink: 0;
-    height: calc(100% - 100px) !important;
+    max-width: 410px;
   }
 }
 
@@ -597,12 +590,12 @@ onMounted(() => {
 }
 
 .panel-slide-enter-from {
-  transform: translateX(-100%);
+  transform: translateX(100%);
   opacity: 0;
 }
 
 .panel-slide-leave-to {
-  transform: translateX(-100%);
+  transform: translateX(100%);
   opacity: 0;
 }
 

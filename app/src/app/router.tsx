@@ -16,15 +16,15 @@ const GoogleCallbackPage = lazy(() => import('@/features/auth/pages/GoogleCallba
 
 // Lazy load feature pages
 const CardDemoPage = lazy(() => import('@/features/demo').then((m) => ({ default: m.default.CardDemoPage })));
-const ThumbnailDemoPage = lazy(() =>
-  import('@/features/presentation').then((m) => ({ default: m.default.ThumbnailDemoPage }))
-);
+// const ThumbnailDemoPage = lazy(() =>
+//   import('@/features/presentation').then((m) => ({ default: m.default.ThumbnailDemoPage }))
+// );
 const ProjectListPage = lazy(() =>
   import('@/features/projects').then((m) => ({ default: m.default.ProjectListPage }))
 );
-const PresentationListPage = lazy(() =>
-  import('@/features/presentation').then((m) => ({ default: m.default.PresentationListPage }))
-);
+// const PresentationListPage = lazy(() =>
+//   import('@/features/presentation').then((m) => ({ default: m.default.PresentationListPage }))
+// );
 const ImageGalleryPage = lazy(() =>
   import('@/features/image').then((m) => ({ default: m.default.ImageGalleryPage }))
 );
@@ -112,14 +112,14 @@ const router = createBrowserRouter([
           </LazyWrapper>
         ),
       },
-      {
-        path: 'presentation/thumbnail',
-        element: (
-          <LazyWrapper>
-            <ThumbnailDemoPage />
-          </LazyWrapper>
-        ),
-      },
+      // {
+      //   path: 'presentation/thumbnail',
+      //   element: (
+      //     <LazyWrapper>
+      //       <ThumbnailDemoPage />
+      //     </LazyWrapper>
+      //   ),
+      // },
       {
         path: 'projects',
         element: (
@@ -128,14 +128,14 @@ const router = createBrowserRouter([
           </LazyWrapper>
         ),
       },
-      {
-        path: 'presentation',
-        element: (
-          <LazyWrapper>
-            <PresentationListPage />
-          </LazyWrapper>
-        ),
-      },
+      // {
+      //   path: 'presentation',
+      //   element: (
+      //     <LazyWrapper>
+      //       <PresentationListPage />
+      //     </LazyWrapper>
+      //   ),
+      // },
       {
         path: 'image',
         element: (

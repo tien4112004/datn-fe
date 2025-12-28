@@ -40,6 +40,7 @@ import {
   Group,
   AlignCenterHorizontal,
   Image,
+  Sparkles,
 } from 'lucide-vue-next';
 
 interface TabConfig {
@@ -84,6 +85,12 @@ const elementTabs = computed<TabConfig[]>(() => {
       label: t('toolbar.categories.animation'),
       tooltip: t('toolbar.categories.animation'),
     },
+    {
+      key: ToolbarStates.AI_MODIFICATION,
+      icon: Sparkles,
+      label: 'AI',
+      tooltip: t('toolbar.categories.aiModification'),
+    },
   ];
 
   // Insert Symbol tab for text elements
@@ -125,6 +132,12 @@ const slideTabs = computed<TabConfig[]>(() => {
       icon: Image,
       label: t('toolbar.categories.imageLibrary'),
       tooltip: t('toolbar.categories.imageLibrary'),
+    },
+    {
+      key: ToolbarStates.AI_MODIFICATION,
+      icon: Sparkles,
+      label: 'AI',
+      tooltip: t('toolbar.categories.aiModification'),
     },
   ];
 
@@ -194,6 +207,17 @@ watch(
     const currentTabKeys: ToolbarStates[] = visibleTabs.value.map((tab) => tab.key);
     if (!currentTabKeys.includes(toolbarState.value)) {
       mainStore.setToolbarState(currentTabKeys[0]);
+    }
+  },
+  { immediate: true }
+);
+
+// When panel is opened and slide is in preview (locked), always show template panel
+watch(
+  [sidebarExpanded, isCurrentSlideLocked, () => currentSlide.value?.layout],
+  ([expanded, locked, hasLayout]) => {
+    if (expanded && locked && hasLayout) {
+      mainStore.setToolbarState(ToolbarStates.SLIDE_TEMPLATE);
     }
   },
   { immediate: true }

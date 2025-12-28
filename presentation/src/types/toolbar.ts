@@ -9,4 +9,5 @@ export const enum ToolbarStates {
   MULTI_STYLE = 'multiStyle',
   MULTI_POSITION = 'multiPosition',
   IMAGE_LIBRARY = 'imageLibrary',
+  AI_MODIFICATION = 'aiModification',
 }

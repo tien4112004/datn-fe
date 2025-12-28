@@ -38,6 +38,7 @@ export default {
       styleMulti: 'Style (Multi-select)',
       positionMulti: 'Position (Multi-select)',
       imageLibrary: 'Image Library',
+      aiModification: 'AI Modification',
     },
 
     // Slide Template Panel

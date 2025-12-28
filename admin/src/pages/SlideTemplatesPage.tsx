@@ -64,16 +64,26 @@ export function SlideTemplatesPage() {
   };
 
   const handleSync = async () => {
+    const frontendTemplates = getAllFrontendTemplates();
+
+    if (frontendTemplates.length === 0) {
+      toast.error('No templates found in frontend-data');
+      return;
+    }
+
+    // Show confirmation dialog
+    const confirmed = window.confirm(
+      `Are you sure you want to sync ${frontendTemplates.length} templates from frontend-data?\n\n` +
+        `This will update all existing templates with matching IDs. This action cannot be undone.`
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
     setIsSyncing(true);
 
     try {
-      const frontendTemplates = getAllFrontendTemplates();
-
-      if (frontendTemplates.length === 0) {
-        toast.error('No templates found in frontend-data');
-        return;
-      }
-
       toast.info(`Starting sync of ${frontendTemplates.length} templates...`);
 
       let synced = 0;

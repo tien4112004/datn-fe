@@ -52,7 +52,8 @@ export function useSavePresentation(presentationId: string, pinia: Pinia) {
       // Use provided thumbnail or generate a new one
       let thumbnailToUse = overrides?.thumbnail;
 
-      if (!thumbnailToUse) {
+      // Only generate thumbnail if not provided or if it's not a valid data URL
+      if (!thumbnailToUse || !thumbnailToUse.startsWith('data:')) {
         // Generate thumbnail from first slide (base64)
         thumbnailToUse = await generateThumbnail(pinia);
       }
@@ -63,8 +64,9 @@ export function useSavePresentation(presentationId: string, pinia: Pinia) {
         height: slidesStore.viewportSize * slidesStore.viewportRatio,
       };
 
-      // Convert base64 thumbnail to Blob
-      const thumbnailBlob = thumbnailToUse ? dataURLtoBlob(thumbnailToUse) : null;
+      // Convert base64 thumbnail to Blob (only if it's a data URL)
+      const thumbnailBlob =
+        thumbnailToUse && thumbnailToUse.startsWith('data:') ? dataURLtoBlob(thumbnailToUse) : null;
 
       // Build data object with all non-file fields
       const data = {

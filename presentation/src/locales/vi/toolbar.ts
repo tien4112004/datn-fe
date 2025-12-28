@@ -38,6 +38,7 @@ export default {
       styleMulti: 'Kiểu dáng (Chọn nhiều)',
       positionMulti: 'Vị trí (Chọn nhiều)',
       imageLibrary: 'Thư viện ảnh',
+      aiModification: 'AI Sửa đổi',
     },
 
     // Bảng chọn mẫu slide

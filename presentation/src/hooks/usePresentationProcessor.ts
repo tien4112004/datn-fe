@@ -103,6 +103,39 @@ export function usePresentationProcessor(
       slidesStore.setSlides(slides);
       slidesStore.updateSlideIndex(slides.length - 1);
 
+      // Generate images for slides that have image elements
+      const imageGenerationPromises: Promise<any>[] = [];
+
+      console.log('[processFullAiResult] Processing images for', slides.length, 'slides');
+      console.log('[processFullAiResult] AI Result:', aiResult);
+
+      slides.forEach((slide, index) => {
+        const slideData = aiResult[index];
+        const imageElement = slide.elements.find((el) => el.type === 'image') as PPTImageElement;
+
+        console.log(`[processFullAiResult] Slide ${index}:`, {
+          slideId: slide.id,
+          hasImageElement: !!imageElement,
+          imagePrompt: slideData.data?.image,
+          slideData: slideData,
+        });
+
+        if (imageElement && slideData.data?.image) {
+          console.log(`[processFullAiResult] Starting image generation for slide ${slide.id}`);
+          const promise = handleImageGeneration(slide.id, imageElement, slideData.data.image);
+          imageGenerationPromises.push(promise);
+        }
+      });
+
+      console.log(`[processFullAiResult] Total image generations started: ${imageGenerationPromises.length}`);
+
+      // Wait for all image generations to complete
+      if (imageGenerationPromises.length > 0) {
+        console.log('[processFullAiResult] Waiting for image generations to complete...');
+        await Promise.allSettled(imageGenerationPromises);
+        console.log('[processFullAiResult] All image generations completed');
+      }
+
       // Save presentation with full data (slides, metadata, thumbnail)
       dispatchGeneratingEvent(true);
 
@@ -182,12 +215,22 @@ export function usePresentationProcessor(
   ): Promise<{ success: boolean; error?: Error }> {
     const request = generationStore.request;
 
+    console.log('[handleImageGeneration] Called for slide:', slideId, {
+      prompt,
+      hasRequest: !!request,
+      hasGenerationOptions: !!request?.generationOptions,
+      hasImageModel: !!request?.generationOptions?.imageModel,
+      request: request,
+    });
+
     if (!prompt) {
+      console.log('[handleImageGeneration] No prompt provided, setting error image');
       await updateSlideImageInStoreWithError(slideId, imageElement.id);
       return { success: false, error: new Error('No prompt provided') };
     }
 
     if (!request?.generationOptions?.imageModel) {
+      console.log('[handleImageGeneration] No image model configured, setting error image');
       await updateSlideImageInStoreWithError(slideId, imageElement.id);
       return { success: false, error: new Error('No image model configured') };
     }

@@ -1,5 +1,5 @@
-import { api, getBackendUrl } from '@aiprimary/api';
 import { getBaseUrl } from '@/utils/base-url';
+import { api, getBackendUrl } from '@aiprimary/api';
 
 // export const SERVER_URL = 'http://localhost:5000'
 export const SERVER_URL = getBackendUrl();
@@ -46,8 +46,27 @@ export default {
   },
 
   async searchImage(body: ImageSearchPayload): Promise<any> {
-    const response = await api.post(`${SERVER_URL}/tools/img_search`, body);
-    return response.data;
+    try {
+      const response = await api.post(`${SERVER_URL}/images/search-pexels`, body);
+      return response.data;
+    } catch (error: any) {
+      // Handle rate limit from Pexels API
+      if (error.response?.status === 502) {
+        throw new Error('Image search service is temporarily unavailable. Please try again later.');
+      }
+      throw error;
+    }
+  },
+
+  async getMyImages(page: number = 1, size: number = 20): Promise<any> {
+    try {
+      const response = await api.get(`${SERVER_URL}/images`, {
+        params: { page, size },
+      });
+      return response.data;
+    } catch (error: any) {
+      throw error;
+    }
   },
 
   AIPPT_Outline({ content, language, model }: AIPPTOutlinePayload): Promise<any> {

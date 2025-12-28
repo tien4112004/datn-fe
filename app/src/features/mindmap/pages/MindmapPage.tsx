@@ -24,6 +24,8 @@ import { PresenterProvider } from '../contexts/ReadOnlyContext';
 import { UnsavedChangesDialog } from '@/shared/components/modals/UnsavedChangesDialog';
 import { SmallScreenDialog } from '@/shared/components/modals/SmallScreenDialog';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/shared/components/ui/sheet';
+import GlobalSpinner from '@/shared/components/common/GlobalSpinner';
+import { useSavingStore } from '../stores/saving';
 import type { Mindmap, MindMapNode } from '../types';
 import { MINDMAP_TYPES } from '../types';
 
@@ -77,6 +79,9 @@ const MindmapPage = () => {
 
   // Track dirty state changes
   useMindmapDirtyTracking();
+
+  // Track saving state
+  const isSaving = useSavingStore((state) => state.isSaving);
 
   // Fullscreen functionality
   const { isFullscreen, toggleFullscreen: toggleFullscreenMode } = useFullscreen();
@@ -252,6 +257,7 @@ const MindmapPage = () => {
         onLeave={handleProceed}
       />
       <SmallScreenDialog />
+      {isSaving && <GlobalSpinner text="Saving mindmap..." />}
     </>
   );
 };

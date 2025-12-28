@@ -11,6 +11,14 @@ import type {
   ArtStyleRequest,
 } from './api';
 import type { SlideTheme, SlideTemplate, ArtStyle, Model, ModelPatchData } from '@aiprimary/core';
+import type {
+  QuestionBankItem,
+  QuestionBankParams,
+  QuestionBankFilters,
+  CreateQuestionPayload,
+  UpdateQuestionPayload,
+  ImportResult,
+} from './question-bank';
 
 /**
  * Base service interface that all API services must extend
@@ -70,4 +78,15 @@ export interface AdminApiService extends Service {
   createBook(data: FormData): Promise<ApiResponse<Book>>;
   updateBook(id: string, data: FormData): Promise<ApiResponse<Book>>;
   deleteBook(id: string): Promise<ApiResponse<void>>;
+
+  // Question Bank
+  getQuestionBank(params?: QuestionBankParams): Promise<ApiResponse<QuestionBankItem[]>>;
+  getQuestionById(id: string): Promise<ApiResponse<QuestionBankItem>>;
+  createQuestion(payload: CreateQuestionPayload): Promise<ApiResponse<QuestionBankItem>>;
+  updateQuestion(id: string, payload: UpdateQuestionPayload): Promise<ApiResponse<QuestionBankItem>>;
+  deleteQuestion(id: string): Promise<ApiResponse<void>>;
+  bulkDeleteQuestions(ids: string[]): Promise<ApiResponse<{ deletedCount: number }>>;
+  duplicateQuestion(id: string): Promise<ApiResponse<QuestionBankItem>>;
+  exportQuestions(filters?: QuestionBankFilters): Promise<Blob>;
+  importQuestions(file: File): Promise<ApiResponse<ImportResult>>;
 }

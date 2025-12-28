@@ -14,6 +14,42 @@ import type { User } from '@/types/auth';
 import type { AdminApiService } from '@/types/service';
 import { API_MODE, type ApiMode, api } from '@aiprimary/api';
 import type { ArtStyle, SlideTemplate, SlideTheme } from '@aiprimary/core';
+import type {
+  QuestionBankItem,
+  QuestionBankParams,
+  QuestionBankFilters,
+  CreateQuestionPayload,
+  UpdateQuestionPayload,
+  ImportResult,
+} from '@/types/question-bank';
+import { QUESTION_TYPE, DIFFICULTY, BANK_TYPE } from '@/types/question-bank';
+import { parseQuestionBankCSV, exportQuestionsToCSV } from '@/utils/csvParser';
+
+// ============= HELPER FUNCTIONS =============
+const delay = (ms: number = 300) => new Promise((resolve) => setTimeout(resolve, ms));
+const generateId = (prefix: string = 'id') =>
+  `${prefix}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+const paginate = <T>(
+  items: T[],
+  page: number = 1,
+  pageSize: number = 10
+): { data: T[]; pagination: Pagination } => {
+  const totalItems = items.length;
+  const totalPages = Math.ceil(totalItems / pageSize);
+  const startIndex = (page - 1) * pageSize;
+  const endIndex = startIndex + pageSize;
+  const paginatedItems = items.slice(startIndex, endIndex);
+
+  return {
+    data: paginatedItems,
+    pagination: {
+      currentPage: page,
+      pageSize,
+      totalPages,
+      totalItems,
+    },
+  };
+};
 
 // ============= MOCK DATA FOR UNIMPLEMENTED APIs =============
 // These mock implementations will be replaced when backend APIs are ready
@@ -181,31 +217,110 @@ let MOCK_BOOKS: Book[] = [
   },
 ];
 
-// Helper functions
-const delay = (ms: number = 300) => new Promise((resolve) => setTimeout(resolve, ms));
-const generateId = (prefix: string = 'id') =>
-  `${prefix}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-const paginate = <T>(
-  items: T[],
-  page: number = 1,
-  pageSize: number = 10
-): { data: T[]; pagination: Pagination } => {
-  const totalItems = items.length;
-  const totalPages = Math.ceil(totalItems / pageSize);
-  const startIndex = (page - 1) * pageSize;
-  const endIndex = startIndex + pageSize;
-  const paginatedItems = items.slice(startIndex, endIndex);
-
-  return {
-    data: paginatedItems,
-    pagination: {
-      currentPage: page,
-      pageSize,
-      totalPages,
-      totalItems,
-    },
-  };
-};
+// Mock data for Question Bank (Application-wide questions)
+let MOCK_QUESTION_BANK: QuestionBankItem[] = [
+  // Multiple Choice Questions
+  {
+    id: generateId('q'),
+    type: QUESTION_TYPE.MULTIPLE_CHOICE,
+    difficulty: DIFFICULTY.EASY,
+    title: '5 + 3 bằng bao nhiêu?',
+    explanation: '5 + 3 = 8',
+    points: 5,
+    subjectCode: 'T',
+    bankType: BANK_TYPE.APPLICATION,
+    createdAt: '2024-01-15T10:00:00Z',
+    updatedAt: '2024-01-15T10:00:00Z',
+    createdBy: 'admin',
+    options: [
+      { id: generateId('opt'), text: '6', isCorrect: false },
+      { id: generateId('opt'), text: '7', isCorrect: false },
+      { id: generateId('opt'), text: '8', isCorrect: true },
+      { id: generateId('opt'), text: '9', isCorrect: false },
+    ],
+  },
+  {
+    id: generateId('q'),
+    type: QUESTION_TYPE.MULTIPLE_CHOICE,
+    difficulty: DIFFICULTY.MEDIUM,
+    title: 'What color is the sky?',
+    explanation: 'The sky appears blue due to the scattering of sunlight by the atmosphere.',
+    points: 10,
+    subjectCode: 'TA',
+    bankType: BANK_TYPE.APPLICATION,
+    createdAt: '2024-02-10T09:00:00Z',
+    updatedAt: '2024-02-10T09:00:00Z',
+    createdBy: 'admin',
+    options: [
+      { id: generateId('opt'), text: 'Red', isCorrect: false },
+      { id: generateId('opt'), text: 'Blue', isCorrect: true },
+      { id: generateId('opt'), text: 'Green', isCorrect: false },
+      { id: generateId('opt'), text: 'Yellow', isCorrect: false },
+    ],
+  },
+  // Matching Questions
+  {
+    id: generateId('q'),
+    type: QUESTION_TYPE.MATCHING,
+    difficulty: DIFFICULTY.EASY,
+    title: 'Nối số với chữ số tương ứng',
+    explanation: 'Ghép các số với cách viết bằng chữ.',
+    points: 10,
+    subjectCode: 'T',
+    bankType: BANK_TYPE.APPLICATION,
+    createdAt: '2024-03-05T14:00:00Z',
+    updatedAt: '2024-03-05T14:00:00Z',
+    createdBy: 'admin',
+    pairs: [
+      { id: generateId('pair'), left: '10', right: 'Mười' },
+      { id: generateId('pair'), left: '20', right: 'Hai mươi' },
+      { id: generateId('pair'), left: '30', right: 'Ba mươi' },
+    ],
+  },
+  // Open-ended Questions
+  {
+    id: generateId('q'),
+    type: QUESTION_TYPE.OPEN_ENDED,
+    difficulty: DIFFICULTY.MEDIUM,
+    title: 'Em hãy viết một đoạn văn ngắn (5-7 câu) về gia đình của em.',
+    explanation:
+      'Học sinh nên mô tả các thành viên trong gia đình, công việc và những điều đặc biệt về gia đình.',
+    expectedAnswer:
+      'Gia đình em có bốn người: bố, mẹ, em và em trai. Bố em là kỹ sư, còn mẹ em là giáo viên. Em học lớp 5, em trai học lớp 2. Gia đình em rất yêu thương nhau. Cuối tuần, cả nhà thường đi chơi công viên. Em rất yêu gia đình của mình.',
+    maxLength: 500,
+    points: 15,
+    subjectCode: 'TV',
+    bankType: BANK_TYPE.APPLICATION,
+    createdAt: '2024-04-12T16:30:00Z',
+    updatedAt: '2024-04-12T16:30:00Z',
+    createdBy: 'admin',
+  },
+  // Fill in Blank Questions
+  {
+    id: generateId('q'),
+    type: QUESTION_TYPE.FILL_IN_BLANK,
+    difficulty: DIFFICULTY.EASY,
+    title: 'Điền vào chỗ trống',
+    explanation: 'Thủ đô của Việt Nam là Hà Nội.',
+    points: 5,
+    subjectCode: 'TV',
+    bankType: BANK_TYPE.APPLICATION,
+    createdAt: '2024-05-20T10:00:00Z',
+    updatedAt: '2024-05-20T10:00:00Z',
+    createdBy: 'admin',
+    segments: [
+      { id: generateId('seg'), type: 'text', content: 'Thủ đô của Việt Nam là ' },
+      {
+        id: generateId('seg'),
+        type: 'blank',
+        content: 'Hà Nội',
+        acceptableAnswers: ['Hà Nội', 'Ha Noi'],
+      },
+      { id: generateId('seg'), type: 'text', content: '.' },
+    ],
+    caseSensitive: false,
+  },
+];
 
 export default class AdminRealApiService implements AdminApiService {
   baseUrl: string;
@@ -431,5 +546,193 @@ export default class AdminRealApiService implements AdminApiService {
     if (index === -1) throw new Error('Book not found');
     MOCK_BOOKS.splice(index, 1);
     return { success: true, data: undefined };
+  }
+
+  // Question Bank (MOCK - Backend not implemented yet)
+  async getQuestionBank(params?: QuestionBankParams): Promise<ApiResponse<QuestionBankItem[]>> {
+    await delay();
+    let questions = MOCK_QUESTION_BANK;
+
+    // Apply filters
+    if (params?.searchText) {
+      const search = params.searchText.toLowerCase();
+      questions = questions.filter(
+        (q) => q.title.toLowerCase().includes(search) || q.explanation?.toLowerCase().includes(search)
+      );
+    }
+
+    if (params?.questionType) {
+      questions = questions.filter((q) => q.type === params.questionType);
+    }
+
+    if (params?.difficulty) {
+      questions = questions.filter((q) => q.difficulty === params.difficulty);
+    }
+
+    if (params?.subjectCode) {
+      questions = questions.filter((q) => q.subjectCode === params.subjectCode);
+    }
+
+    const { data, pagination } = paginate(questions, params?.page, params?.pageSize);
+    return { success: true, data, pagination };
+  }
+
+  async getQuestionById(id: string): Promise<ApiResponse<QuestionBankItem>> {
+    await delay();
+    const question = MOCK_QUESTION_BANK.find((q) => q.id === id);
+    if (!question) throw new Error('Question not found');
+    return { success: true, data: question };
+  }
+
+  async createQuestion(payload: CreateQuestionPayload): Promise<ApiResponse<QuestionBankItem>> {
+    await delay(500);
+    const newQuestion: QuestionBankItem = {
+      ...payload.question,
+      id: generateId('q'),
+      bankType: BANK_TYPE.APPLICATION, // Always application type for admin
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      createdBy: 'admin', // TODO: Get from auth context
+    } as QuestionBankItem;
+    MOCK_QUESTION_BANK.unshift(newQuestion);
+    return { success: true, data: newQuestion };
+  }
+
+  async updateQuestion(id: string, payload: UpdateQuestionPayload): Promise<ApiResponse<QuestionBankItem>> {
+    await delay(500);
+    const index = MOCK_QUESTION_BANK.findIndex((q) => q.id === id);
+    if (index === -1) throw new Error('Question not found');
+
+    const updated: QuestionBankItem = {
+      ...MOCK_QUESTION_BANK[index],
+      ...payload.question,
+      id, // Preserve original ID
+      updatedAt: new Date().toISOString(),
+    } as QuestionBankItem;
+
+    MOCK_QUESTION_BANK[index] = updated;
+    return { success: true, data: updated };
+  }
+
+  async deleteQuestion(id: string): Promise<ApiResponse<void>> {
+    await delay(500);
+    const index = MOCK_QUESTION_BANK.findIndex((q) => q.id === id);
+    if (index === -1) throw new Error('Question not found');
+    MOCK_QUESTION_BANK.splice(index, 1);
+    return { success: true, data: undefined };
+  }
+
+  async bulkDeleteQuestions(ids: string[]): Promise<ApiResponse<{ deletedCount: number }>> {
+    await delay(500);
+    let deletedCount = 0;
+
+    ids.forEach((id) => {
+      const index = MOCK_QUESTION_BANK.findIndex((q) => q.id === id);
+      if (index !== -1) {
+        MOCK_QUESTION_BANK.splice(index, 1);
+        deletedCount++;
+      }
+    });
+
+    return { success: true, data: { deletedCount } };
+  }
+
+  async duplicateQuestion(id: string): Promise<ApiResponse<QuestionBankItem>> {
+    await delay(500);
+    const original = MOCK_QUESTION_BANK.find((q) => q.id === id);
+    if (!original) throw new Error('Question not found');
+
+    const duplicated: QuestionBankItem = {
+      ...original,
+      id: generateId('q'),
+      title: `${original.title} (Copy)`,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    MOCK_QUESTION_BANK.unshift(duplicated);
+    return { success: true, data: duplicated };
+  }
+
+  async exportQuestions(filters?: QuestionBankFilters): Promise<Blob> {
+    await delay(800);
+    let questions = MOCK_QUESTION_BANK;
+
+    // Apply filters
+    if (filters?.searchText) {
+      const search = filters.searchText.toLowerCase();
+      questions = questions.filter(
+        (q) => q.title.toLowerCase().includes(search) || q.explanation?.toLowerCase().includes(search)
+      );
+    }
+
+    if (filters?.questionType) {
+      questions = questions.filter((q) => q.type === filters.questionType);
+    }
+
+    if (filters?.difficulty) {
+      questions = questions.filter((q) => q.difficulty === filters.difficulty);
+    }
+
+    if (filters?.subjectCode) {
+      questions = questions.filter((q) => q.subjectCode === filters.subjectCode);
+    }
+
+    // Convert to CSV format
+    const csvContent = exportQuestionsToCSV(questions);
+    return new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  }
+
+  async importQuestions(file: File): Promise<ApiResponse<ImportResult>> {
+    await delay(1000);
+
+    try {
+      const text = await file.text();
+
+      // Parse CSV
+      const questions = parseQuestionBankCSV(text);
+
+      let success = 0;
+      let failed = 0;
+      const errors: Array<{ row: number; error: string }> = [];
+
+      questions.forEach((q, index) => {
+        try {
+          // Validate required fields
+          if (!q.type || !q.difficulty || !q.title || !q.subjectCode) {
+            throw new Error('Missing required fields');
+          }
+
+          const newQuestion: QuestionBankItem = {
+            ...q,
+            id: generateId('q'),
+            bankType: BANK_TYPE.APPLICATION,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            createdBy: 'admin',
+          };
+
+          MOCK_QUESTION_BANK.unshift(newQuestion);
+          success++;
+        } catch (error) {
+          failed++;
+          errors.push({
+            row: index + 2, // +2 for header + 0-indexed
+            error: error instanceof Error ? error.message : 'Unknown error',
+          });
+        }
+      });
+
+      return { success: true, data: { success, failed, errors } };
+    } catch (error) {
+      return {
+        success: false,
+        data: {
+          success: 0,
+          failed: 1,
+          errors: [{ row: 0, error: error instanceof Error ? error.message : 'Invalid CSV format' }],
+        },
+      };
+    }
   }
 }

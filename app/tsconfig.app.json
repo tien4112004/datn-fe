@@ -26,6 +26,7 @@
     /* Path mapping */
     "baseUrl": ".",
     "paths": {
+      "@aiprimary/core": ["../packages/core/src"],
       "@/utils/*": ["./src/shared/lib/utils/*"],
       "@/hooks/*": ["./src/shared/hooks/*"],
       "@/types/*": ["./src/shared/types/*"],

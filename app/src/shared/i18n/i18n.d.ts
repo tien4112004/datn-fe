@@ -15,9 +15,12 @@ import image from './locales/en/image';
 import projects from './locales/en/projects';
 import settings from './locales/en/settings';
 import classes from './locales/en/classes';
+import assignment from './locales/en/assignment';
+import examMatrix from './locales/en/examMatrix';
 
 /**
  * Resources type based on English translations
+ * Updated with examMatrix namespace
  */
 export interface Resources {
   common: typeof common;
@@ -31,6 +34,8 @@ export interface Resources {
   projects: typeof projects;
   settings: typeof settings;
   classes: typeof classes;
+  assignment: typeof assignment;
+  examMatrix: typeof examMatrix;
 }
 
 declare module 'i18next' {

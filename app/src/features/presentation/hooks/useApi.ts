@@ -141,7 +141,7 @@ export const useCreateBlankPresentation = () => {
   return useMutation({
     mutationFn: async () => {
       const presentation = await presentationApiService.createPresentation({
-        title: 'Untitled Presentation',
+        title: t('presentation:list.untitledPresentation'),
         isParsed: true,
         slides: [
           {

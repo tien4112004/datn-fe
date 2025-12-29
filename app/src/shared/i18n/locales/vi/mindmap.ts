@@ -208,4 +208,7 @@ export default {
     cannotSaveInViewMode: 'Không thể lưu ở chế độ xem',
     cannotSaveInPresenterMode: 'Không thể lưu khi đang ở chế độ trình chiếu',
   },
+  list: {
+    untitledMindmap: 'Sơ đồ tư duy chưa đặt tên',
+  },
 };

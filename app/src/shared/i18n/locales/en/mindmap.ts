@@ -208,4 +208,7 @@ export default {
     cannotSaveInViewMode: 'Cannot save in view mode',
     cannotSaveInPresenterMode: 'Cannot save while in presenter mode',
   },
+  list: {
+    untitledMindmap: 'Untitled Mindmap',
+  },
 };

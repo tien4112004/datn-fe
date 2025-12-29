@@ -141,6 +141,7 @@ export default {
     title: 'Danh sách bài trình bày',
     generateNewPresentation: 'Tạo bài trình bày mới',
     createBlankPresentation: 'Tạo bài trình bày trống',
+    untitledPresentation: 'Bài trình bày chưa đặt tên',
     filenameDialog: {
       title: 'Đổi tên bài trình bày',
       placeholder: 'Nhập tên mới cho bài trình bày',

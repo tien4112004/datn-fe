@@ -8,6 +8,7 @@ import { ExpectedError } from '@aiprimary/api';
 import { useMetadataStore } from '../stores';
 import { useCoreStore } from '../stores/core';
 import { getTreeLayoutType, getTreeForceLayout } from '../services/utils';
+import { t } from 'i18next';
 
 /**
  * Convert data URL (base64) to Blob for multipart upload
@@ -159,7 +160,7 @@ export const useCreateBlankMindmap = () => {
     mutationFn: async () => {
       const mindmap = await mindmapApiService.createMindmap({
         id: crypto.randomUUID(),
-        title: 'Untitled Mindmap',
+        title: t('mindmap:list.untitledMindmap'),
         description: '',
         nodes: [],
         edges: [],

@@ -195,7 +195,7 @@
       <div style="width: 40%">{{ $t('styling.slide.design.theme.labelFont') }}</div>
       <Select
         style="width: 60%"
-        :value="theme.labelFontName"
+        :value="theme.labelFontName || ''"
         search
         :searchLabel="$t('styling.slide.design.theme.searchFont')"
         @update:value="(value) => updateTheme({ labelFontName: value as string })"

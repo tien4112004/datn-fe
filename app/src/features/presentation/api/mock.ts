@@ -7,6 +7,7 @@ import {
   type SlideLayoutSchema,
   type GetSlideThemesParams,
   type UpdatePresentationRequest,
+  type ImageOptions,
 } from '../types';
 import type { ApiResponse } from '@aiprimary/api';
 import type { SlideTheme, SlideTemplate } from '../types/slide';

@@ -17,7 +17,7 @@ const isSupportedResourceType = (type: ResourceType): type is 'presentation' | '
 };
 
 // Resource-specific hook configuration
-const useResourceHooks = (resourceType: ResourceType, t: ReturnType<typeof useTranslation>['t']) => {
+const useResourceHooks = (resourceType: ResourceType) => {
   const navigate = useNavigate();
 
   const createTestPresentations = useCreateTestPresentations();
@@ -33,8 +33,8 @@ const useResourceHooks = (resourceType: ResourceType, t: ReturnType<typeof useTr
           onSuccess: (data) => {
             navigate(`/presentation/${data.presentation.id}`);
           },
-          onError: (error) => {
-            toast.error(t('creation.createPresentationError', { error: error.message }));
+          onError: (error: any) => {
+            toast.error(`Failed to create presentation: ${error?.message || 'Unknown error'}`);
           },
         }),
       createTest: () => createTestPresentations.mutate(),
@@ -47,8 +47,8 @@ const useResourceHooks = (resourceType: ResourceType, t: ReturnType<typeof useTr
           onSuccess: (data) => {
             navigate(`/mindmap/${data.mindmap.id}`);
           },
-          onError: (error) => {
-            toast.error(t('creation.createMindmapError', { error: error.message }));
+          onError: (error: any) => {
+            toast.error(`Failed to create mindmap: ${error?.message || 'Unknown error'}`);
           },
         }),
       createTest: () => createTestMindmaps.mutate(),
@@ -66,7 +66,7 @@ const useResourceHooks = (resourceType: ResourceType, t: ReturnType<typeof useTr
 
 const CreatePresentationControls = ({ currentResourceType }: ProjectControlsProps) => {
   const { t } = useTranslation('projects');
-  const hooks = useResourceHooks(currentResourceType, t);
+  const hooks = useResourceHooks(currentResourceType);
 
   const handleCreateBlank = () => {
     if (hooks?.createBlank) {

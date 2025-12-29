@@ -40,7 +40,12 @@ export function useParameterLocalization() {
    * Format parameter value for display
    * Extracts unit from label (e.g., "Side Padding (px)" → "20px")
    */
-  const formatValue = (param: TemplateParameter, value: number): string => {
+  const formatValue = (param: TemplateParameter, value: number | boolean): string => {
+    // Handle boolean values
+    if (typeof value === 'boolean') {
+      return value ? 'Yes' : 'No';
+    }
+
     const label = getParameterLabel(param);
 
     // Try to extract unit from label

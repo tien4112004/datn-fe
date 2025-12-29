@@ -113,26 +113,27 @@ export const usePresentationById = (id: string | undefined) => {
   });
 };
 
-export const useCreateTestPresentations = () => {
-  const presentationApiService = usePresentationApiService();
-
-  return useMutation({
-    mutationFn: async () => {
-      // Read from /public/data/{presentation.json|presentation-2.json}
-      const responses = await Promise.all([
-        fetch('/data/presentation.json'),
-        fetch('/data/presentation2.json'),
-      ]);
-      const presentations = await Promise.all(responses.map((res) => res.json()));
-
-      const createdPresentations = await Promise.all(
-        presentations.map((presentation: any) => presentationApiService.createPresentation(presentation))
-      );
-
-      return createdPresentations;
-    },
-  });
-};
+// Removed: Test presentation creation hook (not needed for production)
+// export const useCreateTestPresentations = () => {
+//   const presentationApiService = usePresentationApiService();
+//
+//   return useMutation({
+//     mutationFn: async () => {
+//       // Read from /public/data/{presentation.json|presentation-2.json}
+//       const responses = await Promise.all([
+//         fetch('/data/presentation.json'),
+//         fetch('/data/presentation2.json'),
+//       ]);
+//       const presentations = await Promise.all(responses.map((res) => res.json()));
+//
+//       const createdPresentations = await Promise.all(
+//         presentations.map((presentation: any) => presentationApiService.createPresentation(presentation))
+//       );
+//
+//       return createdPresentations;
+//     },
+//   });
+// };
 
 export const useCreateBlankPresentation = () => {
   const presentationApiService = usePresentationApiService();
@@ -300,18 +301,18 @@ export const useInfiniteSlideThemes = () => {
 
   const { data, ...query } = useInfiniteQuery({
     queryKey: [apiService.getType(), 'slideThemes', 'infinite'],
-    queryFn: async ({ pageParam = 1 }): Promise<SlideTheme[]> => {
+    queryFn: async ({ pageParam = 0 }): Promise<SlideTheme[]> => {
       const themes = await apiService.getSlideThemes({
         page: pageParam as number,
         pageSize: PAGE_SIZE,
       });
       return themes;
     },
-    initialPageParam: 1,
+    initialPageParam: 0,
     getNextPageParam: (lastPage: SlideTheme[], allPages: SlideTheme[][]) => {
       // If the last page has fewer items than the page size, we've reached the end
       if (lastPage.length < PAGE_SIZE) return undefined;
-      return allPages.length + 1;
+      return allPages.length;
     },
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
     gcTime: 10 * 60 * 1000, // Keep in cache for 10 minutes

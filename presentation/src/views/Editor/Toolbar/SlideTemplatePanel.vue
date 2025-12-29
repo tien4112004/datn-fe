@@ -168,7 +168,7 @@ const handleTemplateClick = async (templateId: string) => {
   await switchTemplate(currentSlide.value.id, templateId);
 };
 
-const handleParameterUpdate = async (values: Record<string, number>) => {
+const handleParameterUpdate = async (values: Record<string, number | boolean>) => {
   if (!currentSlide.value?.id) return;
   await updateTemplateParameters(currentSlide.value.id, values);
 };

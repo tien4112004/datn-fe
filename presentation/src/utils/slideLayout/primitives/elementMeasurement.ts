@@ -47,7 +47,7 @@ export function measureElement(element: HTMLElement, container: LayoutBlockInsta
   clonedElement.style.paddingInline = '15px'; // Add padding to match actual rendering
 
   // Apply constraints from container
-  if (container.bounds?.width && container.label !== 'label' && container.label !== 'title') {
+  if (container.bounds?.width && container.label !== 'title') {
     clonedElement.style.maxWidth = `${container.bounds.width}px`;
     clonedElement.style.whiteSpace = 'normal';
     clonedElement.style.overflowWrap = 'break-word';

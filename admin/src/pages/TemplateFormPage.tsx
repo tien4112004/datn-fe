@@ -157,7 +157,7 @@ export function TemplateFormPage() {
   };
 
   const [selectedThemeId, setSelectedThemeId] = useState<string | null>(null);
-  const [parameterOverrides, setParameterOverrides] = useState<Record<string, number>>({});
+  const [parameterOverrides, setParameterOverrides] = useState<Record<string, number | boolean>>({});
   const [previewSlide, setPreviewSlide] = useState<Slide | null>(null);
   const [previewLoading, setPreviewLoading] = useState(false);
   const [previewError, setPreviewError] = useState<Error | null>(null);

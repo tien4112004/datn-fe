@@ -175,11 +175,12 @@
 import { nextTick, ref, computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useI18n } from 'vue-i18n';
-import { useMainStore, useSlidesStore } from '@/store';
+import { useMainStore, useSlidesStore, useContainerStore } from '@/store';
 import useScreening from '@/hooks/useScreening';
 import useImport from '@/hooks/useImport';
 import useSlideHandler from '@/hooks/useSlideHandler';
 import useSlideTemplates from '@/hooks/useSlideTemplates';
+import { getPresentationApi } from '@/services/presentation/api';
 import type { DialogForExportTypes } from '@/types/export';
 
 import HotkeyDoc from './HotkeyDoc.vue';
@@ -205,12 +206,17 @@ import message from '@/utils/message';
 const { t } = useI18n();
 const mainStore = useMainStore();
 const slidesStore = useSlidesStore();
+const containerStore = useContainerStore();
 const { title, theme } = storeToRefs(slidesStore);
+const { presentation } = storeToRefs(containerStore);
 const { enterScreening, enterScreeningFromStart, enterPresenterMode, openSeparatedPresentation } =
   useScreening();
 const { importSpecificFile, importPPTXFile, exporting } = useImport();
 const { resetSlides } = useSlideHandler();
 const { createSlide, getThemes } = useSlideTemplates();
+
+// Get presentation ID from container store
+const presentationId = computed(() => presentation.value?.id || '');
 
 const mainMenuVisible = ref(false);
 const hotkeyDrawerVisible = ref(false);
@@ -231,7 +237,7 @@ const startEditTitle = () => {
   nextTick(() => titleInputRef.value?.focus());
 };
 
-const handleUpdateTitle = () => {
+const handleUpdateTitle = async () => {
   const trimmedTitle = titleValue.value.trim();
 
   if (!trimmedTitle) {
@@ -245,15 +251,28 @@ const handleUpdateTitle = () => {
     return;
   }
 
+  if (!presentationId.value) {
+    console.error('No presentation ID available');
+    message.error(t('header.title.updateError'));
+    return;
+  }
+
   try {
+    // Update in store first (optimistic update)
+    const previousTitle = title.value;
     slidesStore.setTitle(trimmedTitle);
     editingTitle.value = false;
+
+    // Call API to persist the change
+    const presentationApi = getPresentationApi();
+    await presentationApi.updatePresentation(presentationId.value, { title: trimmedTitle });
     message.success(t('header.title.updateSuccess'));
   } catch (error) {
     console.error('Failed to update title:', error);
     message.error(t('header.title.updateError'));
+    // Revert the title on error
     titleValue.value = title.value;
-    editingTitle.value = false;
+    slidesStore.setTitle(title.value);
   }
 };
 

@@ -110,7 +110,7 @@ export const convertToSlide = async (
   theme: SlideTheme,
   template: Template,
   slideId?: string,
-  parameterOverrides?: Record<string, number>
+  parameterOverrides?: Record<string, number | boolean>
 ): Promise<Slide> => {
   const layoutType = data.type;
 

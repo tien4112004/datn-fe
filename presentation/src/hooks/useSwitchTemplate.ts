@@ -114,7 +114,7 @@ export default function useSwitchTemplate() {
    */
   const updateTemplateParameters = async (
     slideId: string,
-    parameterOverrides: Record<string, number>
+    parameterOverrides: Record<string, number | boolean>
   ): Promise<void> => {
     const slide = slidesStore.slides.find((s) => s.id === slideId);
 

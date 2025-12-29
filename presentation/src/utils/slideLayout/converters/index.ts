@@ -69,7 +69,7 @@ export async function convertLayoutGeneric<T = any>(
   mapData: DataMapper<T>,
   slideId?: string,
   layoutMetadata?: { layoutSchema: any; templateId: string; layoutType: string },
-  parameterOverrides?: Record<string, number>
+  parameterOverrides?: Record<string, number | boolean>
 ): Promise<Slide> {
   const mappedData = mapData(data);
 

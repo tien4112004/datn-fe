@@ -122,8 +122,8 @@ export async function generateThumbnail(pinia: Pinia): Promise<string | undefine
       backgroundColor: 'white',
       skipFonts: true,
       pixelRatio: 1,
-      width: 600,
-      height: 600 * slidesStore.viewportRatio,
+      width: 800,
+      height: 800 * slidesStore.viewportRatio,
       cacheBust: true,
       fetchRequestInit: {
         cache: 'no-cache',
@@ -134,7 +134,7 @@ export async function generateThumbnail(pinia: Pinia): Promise<string | undefine
     thumbnailApp.unmount();
     document.body.removeChild(container);
 
-    // Compress to JPEG format to reduce file size (target max 800KB)
+    // Compress to JPEG format to reduce file size (target max 600KB)
     const compressedDataUrl = await compressImage(dataUrl, 0.7, 600);
 
     return compressedDataUrl;

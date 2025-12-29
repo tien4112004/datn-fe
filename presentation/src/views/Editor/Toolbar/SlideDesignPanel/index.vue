@@ -508,7 +508,7 @@ const fetchThemes = async () => {
       colors: theme.themeColors,
     }));
     hasMoreThemes.value = result.hasMore;
-    currentPage.value = result.page;
+    // Keep currentPage at 0, don't rely on backend response
   } catch (error) {
     console.error('Failed to fetch themes:', error);
     themesError.value = 'Failed to load themes';
@@ -540,7 +540,8 @@ const loadMoreThemes = async () => {
 
     presetThemes.value.push(...newThemes);
     hasMoreThemes.value = result.hasMore;
-    currentPage.value = result.page;
+    // Increment currentPage after successful fetch
+    currentPage.value = nextPage;
   } catch (error) {
     console.error('Failed to load more themes:', error);
   } finally {

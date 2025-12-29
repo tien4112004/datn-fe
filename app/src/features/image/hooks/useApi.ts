@@ -55,8 +55,10 @@ export const useImageById = (id: string | undefined): UseImageByIdReturn => {
 
 const PAGE_SIZE = 20;
 
-export interface UseImagesReturn
-  extends Omit<UseInfiniteQueryResult<InfiniteData<ImageData[], unknown>, Error>, 'data'> {
+export interface UseImagesReturn extends Omit<
+  UseInfiniteQueryResult<InfiniteData<ImageData[], unknown>, Error>,
+  'data'
+> {
   images: ImageData[];
 }
 

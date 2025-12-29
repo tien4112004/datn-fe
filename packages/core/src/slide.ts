@@ -1,4 +1,4 @@
-import type { LayoutType } from './types/template';
+import type { LayoutType, TemplateParameter } from './types/template';
 
 export const SHAPE_PATH_FORMULAS_KEYS = {
   ROUND_RECT: 'roundRect',
@@ -780,8 +780,8 @@ export interface SlideLayoutMetadata {
   layoutType: string;
   /** Template preview mode - true means slide is locked for editing until template is confirmed */
   isTemplatePreview?: boolean;
-  /** User-customized template parameters (e.g., { IMAGE_RATIO: 0.5, SIDE_PADDING: 40 }) */
-  parameterOverrides?: Record<string, number>;
+  /** User-customized template parameters (e.g., { IMAGE_RATIO: 0.5, SIDE_PADDING: 40, ENABLE_WRAP: true }) */
+  parameterOverrides?: Record<string, number | boolean>;
 }
 
 /**
@@ -872,16 +872,7 @@ export interface SlideTemplate {
   };
   cover?: string;
   graphics?: any[]; // Graphics elements
-  parameters?: Array<{
-    // Template parameters
-    key: string;
-    label: string;
-    defaultValue: number;
-    min?: number;
-    max?: number;
-    step?: number;
-    description?: string;
-  }>;
+  parameters?: TemplateParameter[]; // Template parameters (supports number and boolean types)
   createdAt?: string; // ISO date string
   updatedAt?: string; // ISO date string
 }

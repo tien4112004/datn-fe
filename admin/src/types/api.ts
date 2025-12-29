@@ -7,13 +7,24 @@ export interface ArtStyleRequest {
   modifiers?: string;
 }
 
-export interface TemplateParameter {
+export type TemplateParameter = NumberParameter | BooleanParameter;
+
+export interface NumberParameter {
+  type?: 'number';
   key: string;
   label: string;
   defaultValue: number;
   min?: number;
   max?: number;
   step?: number;
+  description?: string;
+}
+
+export interface BooleanParameter {
+  type: 'boolean';
+  key: string;
+  label: string;
+  defaultValue: boolean;
   description?: string;
 }
 

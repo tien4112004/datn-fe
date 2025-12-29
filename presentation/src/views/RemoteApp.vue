@@ -63,6 +63,10 @@ const isLoading = computed(() => {
 });
 
 onMounted(async () => {
+  if (props.presentation.title) {
+    slidesStore.setTitle(props.presentation.title);
+  }
+
   if (props.presentation.theme) {
     slidesStore.setTheme(props.presentation.theme);
   }

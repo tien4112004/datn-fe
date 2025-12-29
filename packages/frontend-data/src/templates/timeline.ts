@@ -176,16 +176,16 @@ const alternatingTimelineTemplate: SlideTemplate = {
           wrap: {
             enabled: true,
             zigzag: true,
-            lineSpacing: 120,
+            lineSpacing: 70,
             reverseOddRowChildren: true,
           },
           structure: {
             type: 'block',
             layout: {
               orientation: 'vertical',
-              gap: 20,
               horizontalAlignment: 'center',
               verticalAlignment: 'bottom',
+              gap: 10,
             },
             children: [
               {
@@ -224,7 +224,7 @@ const alternatingTimelineTemplate: SlideTemplate = {
     {
       type: 'alternatingTimeline',
       containerId: 'content',
-      thickness: 4,
+      thickness: 2,
       branchLength: 40,
     },
   ],

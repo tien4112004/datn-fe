@@ -15,7 +15,7 @@ export function resolveTemplateContainers<T extends Record<string, any>>(
   containers: T,
   viewport: SlideViewport,
   parameters?: TemplateParameter[],
-  parameterOverrides?: Record<string, number>
+  parameterOverrides?: Record<string, number | boolean>
 ): Record<keyof T, T[keyof T] & { bounds: Bounds }> {
   // Resolve all bounds (expressions + relative positioning)
   const resolvedBounds = resolveContainerPositions(containers, viewport, parameters, parameterOverrides);
@@ -120,7 +120,7 @@ export function resolveContainerPositions(
   containers: Record<string, { bounds?: Bounds | BoundsExpression; positioning?: RelativePositioning }>,
   viewport: SlideViewport,
   parameters?: TemplateParameter[],
-  parameterOverrides?: Record<string, number>
+  parameterOverrides?: Record<string, number | boolean>
 ): Record<string, Bounds> {
   // STEP 1: Resolve expression-based bounds first
   // Merge template parameters into constants for expression evaluation

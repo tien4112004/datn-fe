@@ -274,21 +274,22 @@ export const useDeleteMindmap = () => {
   });
 };
 
-export const useCreateTestMindmaps = () => {
-  const mindmapApiService = useMindmapApiService();
-
-  return useMutation({
-    mutationFn: async () => {
-      // Read from /public/data/mindmap.json
-      const response = await fetch('/data/mindmap.json');
-      const mindmap = await response.json();
-
-      const createdMindmap = await mindmapApiService.createMindmap(mindmap);
-
-      return createdMindmap;
-    },
-  });
-};
+// Removed: Test mindmap creation hook (not needed for production)
+// export const useCreateTestMindmaps = () => {
+//   const mindmapApiService = useMindmapApiService();
+//
+//   return useMutation({
+//     mutationFn: async () => {
+//       // Read from /public/data/mindmap.json
+//       const response = await fetch('/data/mindmap.json');
+//       const mindmap = await response.json();
+//
+//       const createdMindmap = await mindmapApiService.createMindmap(mindmap);
+//
+//       return createdMindmap;
+//     },
+//   });
+// };
 
 export const useGenerateMindmap = () => {
   const mindmapApiService = useMindmapApiService();

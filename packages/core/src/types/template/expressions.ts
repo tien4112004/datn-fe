@@ -48,7 +48,7 @@ export interface BoundsExpression {
 export interface ExpressionConstants {
   SLIDE_WIDTH: number;
   SLIDE_HEIGHT: number;
-  [key: string]: number;
+  [key: string]: number | boolean; // Support both number and boolean parameters
 }
 
 // Resolved bounds after expression evaluation

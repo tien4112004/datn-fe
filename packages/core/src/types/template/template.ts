@@ -87,14 +87,32 @@ export interface TemplateInstance {
 
 /**
  * Template parameter definition for user customization
+ * Supports both number and boolean types
  */
-export interface TemplateParameter {
+export type TemplateParameter = NumberParameter | BooleanParameter;
+
+/**
+ * Numeric parameter with min/max/step controls
+ */
+export interface NumberParameter {
+  type?: 'number'; // Type discriminator (optional for backward compatibility)
   key: string; // Variable name used in expressions (e.g., "IMAGE_RATIO")
   label: string; // User-friendly name for UI
   defaultValue: number; // Default value if not overridden
   min?: number; // Minimum allowed value
   max?: number; // Maximum allowed value
   step?: number; // Step increment for UI controls
+  description?: string; // Help text for users
+}
+
+/**
+ * Boolean parameter with checkbox/toggle control
+ */
+export interface BooleanParameter {
+  type: 'boolean'; // Type discriminator (required)
+  key: string; // Variable name used in expressions (e.g., "SHOW_ICONS")
+  label: string; // User-friendly name for UI
+  defaultValue: boolean; // Default value if not overridden
   description?: string; // Help text for users
 }
 

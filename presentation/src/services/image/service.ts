@@ -31,28 +31,31 @@ export class ImageApiService implements ApiService {
     slideId: string,
     params: ImageGenerationParams
   ): Promise<SingleImageResponse> {
-    const isMock = params.model.name === 'mock';
+    const isMock = params.imageModel.name === 'mock';
     const endpoint = isMock
       ? `${this.baseUrl}/api/image/generate-in-presentation/mock`
       : `${this.baseUrl}/api/images/generate-in-presentation`;
 
-    const response = await api.post<ApiResponse<any>>(
-      endpoint,
-      {
-        prompt: params.prompt,
-        model: params.model.name,
-        provider: params.model.provider.toLowerCase(),
-        themeStyle: params.themeStyle,
-        themeDescription: params.themeDescription,
-        artStyle: params.artStyle,
-        artDescription: params.artDescription,
-      },
-      {
-        headers: {
-          'Idempotency-Key': `${presentationId}:${slideId}`,
+    const [response] = await Promise.all([
+      api.post<ApiResponse<any>>(
+        endpoint,
+        {
+          prompt: params.prompt,
+          model: params.imageModel.name,
+          provider: params.imageModel.provider.toLowerCase(),
+          themeStyle: params.themeStyle,
+          themeDescription: params.themeDescription,
+          artStyle: params.artStyle,
+          artDescription: params.artStyleModifiers,
         },
-      }
-    );
+        {
+          headers: {
+            'Idempotency-Key': `${presentationId}:${slideId}`,
+          },
+        }
+      ),
+      Promise.resolve(isMock ? null : new Promise((resolve) => setTimeout(resolve, 2000))),
+    ]);
     return {
       imageUrl: response.data.data.images[0].cdnUrl,
     };

@@ -5,14 +5,14 @@ export interface GeneratedImage {
 
 export interface ImageGenerationParams {
   prompt: string;
-  model: {
+  imageModel: {
     name: string;
     provider: string;
   };
   themeStyle?: string;
   themeDescription?: string;
   artStyle?: string;
-  artDescription?: string;
+  artStyleModifiers?: string;
 }
 
 export interface ImageGenerationResponse {

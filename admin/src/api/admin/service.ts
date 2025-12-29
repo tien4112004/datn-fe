@@ -231,7 +231,11 @@ export default class AdminRealApiService implements AdminApiService {
   // Slide Themes
   async getSlideThemes(params?: PaginationParams): Promise<ApiResponse<SlideTheme[]>> {
     const response = await api.get<ApiResponse<SlideTheme[]>>(`${this.baseUrl}/api/slide-themes`, {
-      params,
+      params: {
+        ...params,
+        page: params?.page && params.page >= 1 ? params.page : 1,
+        limit: params?.pageSize,
+      },
     });
     return response.data;
   }

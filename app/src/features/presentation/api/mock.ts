@@ -1,16 +1,19 @@
 import { API_MODE, type ApiMode } from '@aiprimary/api';
 import {
-  type OutlineData,
   type PresentationApiService,
-  type Presentation,
-  type PresentationCollectionRequest,
-  type SlideLayoutSchema,
   type GetSlideThemesParams,
   type UpdatePresentationRequest,
   type ImageOptions,
+  type OutlineData,
 } from '../types';
 import type { ApiResponse } from '@aiprimary/api';
-import type { SlideTheme, SlideTemplate } from '../types/slide';
+import type {
+  Presentation,
+  PresentationCollectionRequest,
+  SlideLayoutSchema,
+  SlideTheme,
+  SlideTemplate,
+} from '@aiprimary/core';
 import { moduleMethodMap } from '../components/remote/module';
 import { THEMES_DATA } from '../utils/themes';
 

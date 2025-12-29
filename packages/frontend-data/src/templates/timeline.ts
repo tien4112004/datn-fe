@@ -82,9 +82,9 @@ const straightTimelineTemplate: SlideTemplate = {
                 type: 'text',
                 label: 'label',
                 text: {
-                  fontSizeRange: { minSize: 16, maxSize: 20 },
+                  fontSizeRange: { minSize: 16, maxSize: 28 },
                   fontWeight: 'bold',
-                  color: '{{theme.outline.color}}',
+                  color: '{{theme.labelFontColor}}',
                   fontFamily: '{{theme.labelFontName}}',
                   textAlign: 'center',
                 },
@@ -93,7 +93,7 @@ const straightTimelineTemplate: SlideTemplate = {
                 type: 'text',
                 label: 'content',
                 text: {
-                  fontSizeRange: { minSize: 12, maxSize: 16 },
+                  fontSizeRange: { minSize: 12, maxSize: 24 },
                   color: '{{theme.fontColor}}',
                   fontFamily: '{{theme.fontName}}',
                   textAlign: 'center',
@@ -109,7 +109,7 @@ const straightTimelineTemplate: SlideTemplate = {
     {
       type: 'wrappingTimeline',
       containerId: 'content',
-      thickness: 3,
+      thickness: 8,
     },
   ],
 };
@@ -161,7 +161,7 @@ const alternatingTimelineTemplate: SlideTemplate = {
           relativeTo: 'title',
           axis: 'vertical',
           anchor: 'end',
-          offset: 10,
+          offset: 0,
           size: 'fill',
           margin: { left: 20, right: 20, bottom: 20 },
         },
@@ -183,7 +183,7 @@ const alternatingTimelineTemplate: SlideTemplate = {
             type: 'block',
             layout: {
               orientation: 'vertical',
-              gap: 10,
+              gap: 20,
               horizontalAlignment: 'center',
               verticalAlignment: 'bottom',
             },
@@ -192,7 +192,7 @@ const alternatingTimelineTemplate: SlideTemplate = {
                 type: 'text',
                 label: 'content',
                 text: {
-                  fontSizeRange: { minSize: 11, maxSize: 15 },
+                  fontSizeRange: { minSize: 16, maxSize: 24 },
                   color: '{{theme.fontColor}}',
                   fontFamily: '{{theme.fontName}}',
                   textAlign: 'center',
@@ -207,9 +207,9 @@ const alternatingTimelineTemplate: SlideTemplate = {
                   radius: '{{theme.card.borderRadius}}',
                 },
                 text: {
-                  fontSizeRange: { minSize: 14, maxSize: 18 },
+                  fontSizeRange: { minSize: 18, maxSize: 28 },
                   fontWeight: 'bold',
-                  color: '{{theme.outline.color}}',
+                  color: '{{theme.labelFontColor}}',
                   fontFamily: '{{theme.labelFontName}}',
                   textAlign: 'center',
                 },
@@ -224,7 +224,7 @@ const alternatingTimelineTemplate: SlideTemplate = {
     {
       type: 'alternatingTimeline',
       containerId: 'content',
-      thickness: 3,
+      thickness: 4,
       branchLength: 40,
     },
   ],
@@ -298,8 +298,9 @@ const zigZagTimelineTemplate: SlideTemplate = {
             type: 'block',
             layout: {
               orientation: 'vertical',
-              gap: 10,
               horizontalAlignment: 'center',
+              verticalAlignment: 'center',
+              gap: -10,
             },
             border: {
               color: '{{theme.borderColor}}',
@@ -311,9 +312,9 @@ const zigZagTimelineTemplate: SlideTemplate = {
                 type: 'text',
                 label: 'label',
                 text: {
-                  fontSizeRange: { minSize: 14, maxSize: 18 },
+                  fontSizeRange: { minSize: 18, maxSize: 28 },
                   fontWeight: 'bold',
-                  color: '{{theme.themeColors[1]}}',
+                  color: '{{theme.labelFontColor}}',
                   fontFamily: '{{theme.labelFontName}}',
                   textAlign: 'center',
                 },
@@ -322,7 +323,7 @@ const zigZagTimelineTemplate: SlideTemplate = {
                 type: 'text',
                 label: 'content',
                 text: {
-                  fontSizeRange: { minSize: 12, maxSize: 16 },
+                  fontSizeRange: { minSize: 16, maxSize: 24 },
                   color: '{{theme.fontColor}}',
                   fontFamily: '{{theme.fontName}}',
                   textAlign: 'center',
@@ -338,7 +339,7 @@ const zigZagTimelineTemplate: SlideTemplate = {
     {
       type: 'zigzagTimeline',
       containerId: 'content',
-      thickness: 3,
+      thickness: 8,
     },
   ],
 };

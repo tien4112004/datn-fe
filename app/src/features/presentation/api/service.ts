@@ -1,16 +1,19 @@
 import {
   type PresentationApiService,
-  type Presentation,
-  type SlideLayoutSchema,
-  type PresentationGenerateDraftRequest,
   type GetSlideThemesParams,
   type UpdatePresentationRequest,
-  type OutlineData,
   type ImageOptions,
+  type OutlineData,
 } from '../types';
 import { api, API_MODE, type ApiMode } from '@aiprimary/api';
 import { mapPagination, type ApiResponse, type Pagination } from '@aiprimary/api';
-import type { SlideTheme, SlideTemplate, PresentationCollectionRequest } from '../types/slide';
+import type {
+  Presentation,
+  SlideLayoutSchema,
+  PresentationCollectionRequest,
+  SlideTheme,
+  SlideTemplate,
+} from '@aiprimary/core';
 
 export default class PresentationRealApiService implements PresentationApiService {
   baseUrl: string;
@@ -26,8 +29,8 @@ export default class PresentationRealApiService implements PresentationApiServic
   async getSlideThemes(params?: GetSlideThemesParams): Promise<SlideTheme[]> {
     const res = await api.get<ApiResponse<SlideTheme[]>>(`${this.baseUrl}/api/slide-themes`, {
       params: {
-        page: params?.page,
-        pageSize: params?.pageSize,
+        page: (params?.page || 0) + 1,
+        limit: params?.pageSize,
       },
     });
     return res.data.data;
@@ -36,11 +39,6 @@ export default class PresentationRealApiService implements PresentationApiServic
   async getSlideTemplates(): Promise<SlideTemplate[]> {
     const res = await api.get<ApiResponse<SlideTemplate[]>>(`${this.baseUrl}/api/slide-templates`);
     return res.data.data;
-  }
-
-  async draftPresentation(request: PresentationGenerateDraftRequest): Promise<Presentation> {
-    var response = await api.post<ApiResponse<Presentation>>(`${this.baseUrl}/api/presentations`, request);
-    return response.data.data;
   }
 
   async getStreamedOutline(

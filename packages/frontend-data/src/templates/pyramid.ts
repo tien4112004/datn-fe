@@ -71,7 +71,7 @@ const trapezoidPyramidTemplate: SlideTemplate = {
                 type: 'text',
                 label: 'item',
                 text: {
-                  fontSizeRange: { minSize: 14, maxSize: 18 },
+                  fontSizeRange: { minSize: 14, maxSize: 24 },
                   fontWeight: 'bold',
                   color: '#fff',
                   fontFamily: '{{theme.fontName}}',
@@ -164,7 +164,7 @@ const invertedTrapezoidPyramidTemplate: SlideTemplate = {
                 type: 'text',
                 label: 'item',
                 text: {
-                  fontSizeRange: { minSize: 14, maxSize: 18 },
+                  fontSizeRange: { minSize: 14, maxSize: 24 },
                   fontWeight: 'bold',
                   color: '#fff',
                   fontFamily: '{{theme.fontName}}',
@@ -257,7 +257,7 @@ const trapezoidPyramidFillTemplate: SlideTemplate = {
                 type: 'text',
                 label: 'item',
                 text: {
-                  fontSizeRange: { minSize: 14, maxSize: 18 },
+                  fontSizeRange: { minSize: 14, maxSize: 24 },
                   fontWeight: 'bold',
                   color: '#fff',
                   fontFamily: '{{theme.fontName}}',
@@ -351,7 +351,7 @@ const invertedTrapezoidPyramidFillTemplate: SlideTemplate = {
                 type: 'text',
                 label: 'item',
                 text: {
-                  fontSizeRange: { minSize: 14, maxSize: 18 },
+                  fontSizeRange: { minSize: 14, maxSize: 24 },
                   fontWeight: 'bold',
                   color: '#fff',
                   fontFamily: '{{theme.fontName}}',

@@ -7,13 +7,15 @@ import { getBackendUrl } from '@/shared/utils/backend-url';
 export const useClassApiService = (): ClassApiService => {
   const backendUrl = getBackendUrl();
 
-  return createApiServiceFactory<ClassApiService>(ClassMockApiService, ClassRealApiService, backendUrl);
+  // Force mock service for Classes module
+  return new ClassMockApiService();
 };
 
 export const getClassApiService = (): ClassApiService => {
   const backendUrl = getBackendUrl();
 
-  return getApiServiceFactory<ClassApiService>(ClassMockApiService, ClassRealApiService, backendUrl);
+  // Force mock service for Classes module
+  return new ClassMockApiService();
 };
 
 // Deprecated: Use useClassApiService() hook instead

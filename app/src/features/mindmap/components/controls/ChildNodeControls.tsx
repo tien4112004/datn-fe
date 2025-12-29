@@ -368,7 +368,7 @@ export const NodeHandlers = memo(
         clearTimeout(timerId);
         clearTimeout(timerId2);
       };
-    }, [layoutType, id, updateNodeInternals]);
+    }, [layoutType, id, side, updateNodeInternals]);
 
     /**
      * Determine which handles should be visible based on layout type and node side.

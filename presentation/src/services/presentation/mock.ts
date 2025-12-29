@@ -118,8 +118,8 @@ export class MockPresentationApiService implements ApiService {
         slides: mockSlideData,
         generationOptions: {
           artStyle: 'digital-art',
-          artDescription: 'vibrant colors, modern',
-          model: {
+          artStyleModifiers: 'vibrant colors, modern',
+          imageModel: {
             name: 'dall-e-3',
             provider: 'openai',
           },

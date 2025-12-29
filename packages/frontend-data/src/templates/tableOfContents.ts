@@ -92,7 +92,7 @@ export const tableOfContentsTemplates: SlideTemplate[] = [
                     fontFamily: '{{theme.labelFontName}}',
                     fontWeight: 'bold',
                     textAlign: 'center',
-                    fontSizeRange: { minSize: 16, maxSize: 24 },
+                    fontSizeRange: { minSize: 16, maxSize: 28 },
                   },
                 },
                 {
@@ -199,7 +199,7 @@ export const tableOfContentsTemplates: SlideTemplate[] = [
                     fontFamily: '{{theme.labelFontName}}',
                     fontWeight: 'bold',
                     textAlign: 'center',
-                    fontSizeRange: { minSize: 16, maxSize: 24 },
+                    fontSizeRange: { minSize: 16, maxSize: 28 },
                   },
                 },
                 {
@@ -305,7 +305,7 @@ export const tableOfContentsTemplates: SlideTemplate[] = [
                     fontFamily: '{{theme.labelFontName}}',
                     fontWeight: 'bold',
                     textAlign: 'center',
-                    fontSizeRange: { minSize: 18, maxSize: 26 },
+                    fontSizeRange: { minSize: 18, maxSize: 28 },
                   },
                 },
                 {
@@ -318,7 +318,7 @@ export const tableOfContentsTemplates: SlideTemplate[] = [
                     fontWeight: 'normal',
                     fontStyle: 'normal',
                     textAlign: 'center',
-                    fontSizeRange: { minSize: 18, maxSize: 24 },
+                    fontSizeRange: { minSize: 18, maxSize: 26 },
                   },
                 },
               ],
@@ -403,7 +403,7 @@ export const tableOfContentsTemplates: SlideTemplate[] = [
                     fontFamily: '{{theme.labelFontName}}',
                     fontWeight: 'bold',
                     textAlign: 'center',
-                    fontSizeRange: { minSize: 16, maxSize: 24 },
+                    fontSizeRange: { minSize: 16, maxSize: 28 },
                   },
                 },
                 {

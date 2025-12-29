@@ -4,7 +4,7 @@
     <Editor v-else-if="_isPC" />
     <Mobile v-else />
   </template>
-  <FullscreenSpin :loading="isLoading" tip="Generating presentation..." />
+  <FullscreenSpin :loading="isLoading" :tip="$t('loading.generatingPresentation')" />
 </template>
 
 <script lang="ts" setup>

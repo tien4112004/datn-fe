@@ -443,8 +443,9 @@ function _calculateFontSizeForLabel(
     return createHtmlElement(item, 16, instances[0].text || {});
   });
 
-  // Determine font size range based on label type
-  const fontSizeRange = label === 'label' ? FONT_SIZE_RANGE_LABEL : FONT_SIZE_RANGE_CONTENT;
+  // Determine font size range from text config or use default based on label type
+  const fontSizeRange =
+    instances[0].text?.fontSizeRange || (label === 'label' ? FONT_SIZE_RANGE_LABEL : FONT_SIZE_RANGE_CONTENT);
 
   // Calculate unified font size for this group
   return calculateUnifiedFontSizeForLabels(elements, instances, fontSizeRange);

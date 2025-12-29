@@ -92,7 +92,7 @@ export function usePresentationProcessor(
       // Restore generation options to store if available
       if (generationOptions) {
         // Validate that required fields exist
-        if (!generationOptions.model?.name) {
+        if (!generationOptions.imageModel?.name) {
           console.error('[processFullAiResult] Invalid generation options - missing model');
         } else {
           // Reconstruct the request object with the generation options
@@ -239,7 +239,7 @@ export function usePresentationProcessor(
       return { success: false, error: new Error('No prompt provided') };
     }
 
-    if (!request?.generationOptions?.model) {
+    if (!request?.generationOptions?.imageModel) {
       await updateSlideImageInStoreWithError(slideId, imageElement.id);
       return { success: false, error: new Error('No image model configured') };
     }
@@ -256,11 +256,11 @@ export function usePresentationProcessor(
       const response = await generateImage({
         slideId,
         prompt,
-        model: request.generationOptions.model,
+        model: request.generationOptions.imageModel,
         themeStyle: currentTheme.id,
         themeDescription: currentTheme.modifiers || undefined,
         artStyle: request.generationOptions.artStyle || undefined,
-        artDescription: request.generationOptions.artDescription,
+        artStyleModifiers: request.generationOptions.artStyleModifiers,
       });
 
       const imageUrl = response.imageUrl;
@@ -354,16 +354,9 @@ export function usePresentationProcessor(
     // Update element with error placeholder and error flag
     const element = slide.elements[elementIndex] as PPTImageElement;
 
-    // Convert error icon URL to base64 for portability
-    let errorIconSrc = 'https://www.freeiconspng.com/uploads/error-icon-32.png';
-    try {
-      errorIconSrc = await urlToBase64(errorIconSrc);
-    } catch (error) {
-      console.error('Failed to convert error icon to base64, using fallback SVG:', error);
-      // Fallback to inline SVG if URL conversion fails
-      errorIconSrc =
-        'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48Y2lyY2xlIGN4PSIxNiIgY3k9IjE2IiByPSIxNSIgZmlsbD0iI2RjMzU0NSIvPjxsaW5lIHgxPSIxMCIgeTE9IjEwIiB4Mj0iMjIiIHkyPSIyMiIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48bGluZSB4MT0iMjIiIHkxPSIxMCIgeDI9IjEwIiB5Mj0iMjIiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMyIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PC9zdmc+';
-    }
+    // Use inline SVG error icon (no external fetch needed, avoids CORS issues)
+    const errorIconSrc =
+      'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48Y2lyY2xlIGN4PSIxNiIgY3k9IjE2IiByPSIxNSIgZmlsbD0iI2RjMzU0NSIvPjxsaW5lIHgxPSIxMCIgeTE9IjEwIiB4Mj0iMjIiIHkyPSIyMiIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48bGluZSB4MT0iMjIiIHkxPSIxMCIgeDI9IjEwIiB5Mj0iMjIiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMyIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PC9zdmc+';
 
     const updatedElement = {
       ...element,

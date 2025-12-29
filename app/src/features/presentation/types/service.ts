@@ -1,13 +1,16 @@
 import type { Service } from '@/shared/api';
+import type { ApiResponse } from '@aiprimary/api';
 import type { OutlineData } from './outline';
 import type {
   Presentation,
   PresentationCollectionRequest,
   SlideLayoutSchema,
   ModelConfig,
-} from './presentation';
-import type { ApiResponse } from '@aiprimary/api';
-import type { Slide, SlideTheme, SlideTemplate, SlideViewport } from './slide';
+  SlideTheme,
+  SlideTemplate,
+  Slide,
+  SlideViewport,
+} from '@aiprimary/core';
 
 export interface PresentationConfig {
   theme: SlideTheme;

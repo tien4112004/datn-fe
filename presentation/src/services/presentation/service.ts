@@ -200,7 +200,7 @@ export class PresentationApiService implements ApiService {
     limit: number;
     hasMore: boolean;
   }> {
-    const page = params?.page ?? 0;
+    const page = (params?.page ?? 0) + 1;
     const limit = params?.limit ?? 10;
 
     const response = await api.get<ApiResponse<any>>(
@@ -222,12 +222,16 @@ export class PresentationApiService implements ApiService {
     }
 
     // New paginated API response
+    const backendPage = responseData.page ?? page;
+    const backendLimit = responseData.limit ?? responseData.size ?? limit;
+    const total = responseData.total || responseData.totalElements || 0;
+
     return {
       data: responseData.data || responseData.content || [],
-      total: responseData.total || responseData.totalElements || 0,
-      page: responseData.page ?? page,
-      limit: responseData.limit ?? responseData.size ?? limit,
-      hasMore: responseData.hasMore ?? (responseData.page + 1) * responseData.limit < responseData.total,
+      total,
+      page: backendPage - 1, // Convert from 1-based (backend) to 0-based (frontend)
+      limit: backendLimit,
+      hasMore: responseData.hasMore ?? backendPage * backendLimit < total,
     };
   }
 

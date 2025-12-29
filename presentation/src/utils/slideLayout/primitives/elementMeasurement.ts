@@ -66,7 +66,7 @@ export function measureElement(element: HTMLElement, container: LayoutBlockInsta
 
   // Measure (getBoundingClientRect already includes the padding)
   const size = {
-    width: clonedElement.getBoundingClientRect().width + 24,
+    width: clonedElement.getBoundingClientRect().width + 25,
     height: clonedElement.getBoundingClientRect().height + 20,
   };
 
@@ -227,7 +227,7 @@ export function measureTextWidth(
  */
 export function calculateMaxLabelWidth(
   texts: string[],
-  fontSizeRange: FontSizeRange = { minSize: 18, maxSize: 24 },
+  fontSizeRange: FontSizeRange = { minSize: 18, maxSize: 28 },
   fontFamily: string = 'Arial',
   fontWeight: string = 'normal',
   padding: number = 30

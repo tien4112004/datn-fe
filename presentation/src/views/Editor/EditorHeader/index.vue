@@ -216,7 +216,7 @@ const { resetSlides } = useSlideHandler();
 const { createSlide, getThemes } = useSlideTemplates();
 
 // Get presentation ID from container store
-const presentationId = computed(() => presentation.value?.id || '');
+const presentationId = computed(() => presentation?.value?.id || '');
 
 const mainMenuVisible = ref(false);
 const hotkeyDrawerVisible = ref(false);

@@ -6,6 +6,7 @@ import { useCoreStore } from '../stores/core';
 import { useMetadataStore } from '../stores/metadata';
 import { useDirtyStore } from '../stores/dirty';
 import { usePresenterModeStore, useViewModeStore } from '../stores';
+import { useSavingStore } from '../stores/saving';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
@@ -46,13 +47,20 @@ export const useSaveMindmap = () => {
   };
 
   const saveWithThumbnail = async (mindmapId: string) => {
+    // Set saving state immediately
+    useSavingStore.getState().setIsSaving(true);
+
+    // Yield to the event loop to allow React to render the spinner before CPU-intensive work
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
     // Prevent save in presenter mode or view mode
     const isPresenterMode = usePresenterModeStore.getState().isPresenterMode;
     const isViewMode = useViewModeStore.getState().isViewMode;
 
     if (isPresenterMode || isViewMode) {
       console.log('saveWithThumbnail: Skipping save in presenter/view mode');
-      toast.info(isViewMode ? 'Cannot save in view mode' : 'Cannot save while in presenter mode');
+      toast.info(t(isViewMode ? 'saving.cannotSaveInViewMode' : 'saving.cannotSaveInPresenterMode'));
+      useSavingStore.getState().setIsSaving(false);
       return;
     }
 
@@ -85,6 +93,7 @@ export const useSaveMindmap = () => {
       throw error;
     } finally {
       setIsGeneratingThumbnail(false);
+      useSavingStore.getState().setIsSaving(false);
     }
   };
 

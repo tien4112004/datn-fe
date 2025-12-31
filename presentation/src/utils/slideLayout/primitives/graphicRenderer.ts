@@ -250,6 +250,7 @@ function renderAlternatingTimeline(
 
   const color = graphic.color || theme.themeColors[0];
   const thickness = graphic.thickness || 3;
+  const branchLength = graphic.branchLength || 40;
   const lines: PPTLineElement[] = [];
 
   // Calculate central line Y position (between the two rows)
@@ -285,11 +286,9 @@ function renderAlternatingTimeline(
     let branchEndY: number;
 
     if (isTopRow) {
-      // Top row: branch extends downward from item bottom to central line
-      branchStartY = bounds.top + bounds.height;
+      branchStartY = bounds.top + bounds.height - thickness;
       branchEndY = centralLineY;
     } else {
-      // Bottom row: branch extends upward from central line to item top
       branchStartY = centralLineY;
       branchEndY = bounds.top;
     }
@@ -452,6 +451,9 @@ function renderZigzagTimeline(graphic: ZigZagTimeline, context: GraphicsRenderCo
   const thickness = graphic.thickness || 3;
   const lines: PPTLineElement[] = [];
 
+  // Fixed gap between arrows and items (independent of thickness)
+  const arrowGap = 4;
+
   // Create diagonal arrow between each consecutive pair
   for (let i = 0; i < itemBounds.length - 1; i++) {
     const current = itemBounds[i];
@@ -462,11 +464,13 @@ function renderZigzagTimeline(graphic: ZigZagTimeline, context: GraphicsRenderCo
 
     // Start from 3/4 position (midpoint between center and right edge) of current item
     const startX = current.left + (current.width * 3) / 4;
-    const startY = isEven ? current.top + current.height + thickness : current.top - thickness;
+    const startY = isEven
+      ? current.top + current.height - arrowGap + thickness
+      : current.top + arrowGap - thickness;
 
     // End at 1/4 position (midpoint between left edge and center) of next item
     const endX = next.left + next.width / 4;
-    const endY = isEven ? next.top - thickness : next.top + next.height + thickness;
+    const endY = isEven ? next.top - arrowGap - thickness : next.top + next.height + arrowGap + thickness;
 
     // Create diagonal line
     lines.push({

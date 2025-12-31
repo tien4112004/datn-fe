@@ -90,6 +90,7 @@
 <script lang="ts" setup>
 import { ref, computed, watch } from 'vue';
 import { storeToRefs } from 'pinia';
+import { useI18n } from 'vue-i18n';
 import { useSlidesStore } from '@/store';
 import { useMainStore } from '@/store';
 import useSwitchTemplate from '@/hooks/useSwitchTemplate';
@@ -108,6 +109,8 @@ interface TemplatePreview {
   slide: Slide | null;
 }
 
+const { t } = useI18n();
+
 const slidesStore = useSlidesStore();
 const mainStore = useMainStore();
 const { currentSlide, theme, viewportSize, viewportRatio } = storeToRefs(slidesStore);
@@ -119,19 +122,39 @@ const { isCurrentSlideLocked, confirmCurrentTemplate } = useSlideEditLock();
 const templatePreviews = ref<TemplatePreview[]>([]);
 const isLoading = ref(false);
 
-const canSwitch = computed(() => {
-  return currentSlide.value?.id ? canSwitchTemplate(currentSlide.value.id) : false;
-});
+const canSwitch = ref(false);
+const currentTemplate = ref<Template | null>(null);
 
 const currentTemplateId = computed(() => currentSlide.value?.layout?.templateId || '');
 
 const isInPreviewMode = computed(() => isCurrentSlideLocked.value);
 
-const currentTemplate = computed(() => {
-  if (!currentSlide.value?.id) return null;
-  const templates = getAvailableTemplates(currentSlide.value.id);
-  return templates.find((t) => t.id === currentTemplateId.value) || null;
-});
+// Update canSwitch when currentSlide changes
+watch(
+  currentSlide,
+  async (slide) => {
+    if (slide?.id) {
+      canSwitch.value = await canSwitchTemplate(slide.id);
+    } else {
+      canSwitch.value = false;
+    }
+  },
+  { immediate: true }
+);
+
+// Update currentTemplate when currentSlide or currentTemplateId changes
+watch(
+  [currentSlide, currentTemplateId],
+  async ([slide, templateId]) => {
+    if (!slide?.id) {
+      currentTemplate.value = null;
+      return;
+    }
+    const templates = await getAvailableTemplates(slide.id);
+    currentTemplate.value = templates.find((t) => t.id === templateId) || null;
+  },
+  { immediate: true }
+);
 
 const currentParameters = computed(() => currentTemplate.value?.parameters || []);
 
@@ -145,7 +168,7 @@ const handleTemplateClick = async (templateId: string) => {
   await switchTemplate(currentSlide.value.id, templateId);
 };
 
-const handleParameterUpdate = async (values: Record<string, number>) => {
+const handleParameterUpdate = async (values: Record<string, number | boolean>) => {
   if (!currentSlide.value?.id) return;
   await updateTemplateParameters(currentSlide.value.id, values);
 };
@@ -159,7 +182,7 @@ const confirmAndStartEditing = () => {
   mainStore.setToolbarState(ToolbarStates.SLIDE_DESIGN);
 
   // Show success message
-  message.success('Template confirmed! You can now edit your slide.');
+  message.success(t('toolbar.slideTemplate.confirmSuccess'));
 };
 
 /**
@@ -174,7 +197,7 @@ const generatePreviews = async () => {
   templatePreviews.value = [];
 
   try {
-    const availableTemplates = getAvailableTemplates(currentSlide.value.id);
+    const availableTemplates = await getAvailableTemplates(currentSlide.value.id);
     const viewport = {
       width: viewportSize.value,
       height: viewportSize.value * viewportRatio.value,

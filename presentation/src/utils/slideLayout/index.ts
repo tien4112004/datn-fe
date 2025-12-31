@@ -110,7 +110,7 @@ export const convertToSlide = async (
   theme: SlideTheme,
   template: Template,
   slideId?: string,
-  parameterOverrides?: Record<string, number>
+  parameterOverrides?: Record<string, number | boolean>
 ): Promise<Slide> => {
   const layoutType = data.type;
 
@@ -467,4 +467,9 @@ export {
 export { templateRegistry } from './converters/templateRegistry';
 
 // Re-export existing template utilities (for fallback/mock mode)
-export { selectTemplate, getTemplateVariations, TEMPLATE_VARIATIONS } from './converters/templateSelector';
+export {
+  selectTemplate,
+  getTemplateVariations,
+  getTemplateVariationsAsync,
+  TEMPLATE_VARIATIONS,
+} from './converters/templateSelector';

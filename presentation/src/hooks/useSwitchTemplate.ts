@@ -1,6 +1,6 @@
 import { useSlidesStore } from '@/store';
 import { convertToSlide, selectTemplateById } from '@/utils/slideLayout';
-import { getTemplateVariations } from '@/utils/slideLayout/converters/templateSelector';
+import { getTemplateVariationsAsync } from '@/utils/slideLayout/converters/templateSelector';
 import type { Template } from '@/utils/slideLayout/types';
 import type { PPTImageElement } from '@/types/slides';
 
@@ -14,14 +14,14 @@ export default function useSwitchTemplate() {
   /**
    * Get available template variations for a slide
    * @param slideId - The ID of the slide
-   * @returns Array of template variations, or empty array if slide has no layout metadata
+   * @returns Promise resolving to array of template variations, or empty array if slide has no layout metadata
    */
-  const getAvailableTemplates = (slideId: string): Template[] => {
+  const getAvailableTemplates = async (slideId: string): Promise<Template[]> => {
     const slide = slidesStore.slides.find((s) => s.id === slideId);
     if (!slide?.layout?.layoutType) {
       return [];
     }
-    return getTemplateVariations(slide.layout.layoutType);
+    return await getTemplateVariationsAsync(slide.layout.layoutType);
   };
 
   /**
@@ -39,7 +39,7 @@ export default function useSwitchTemplate() {
     }
 
     // Find the new template
-    const availableTemplates = getTemplateVariations(slide.layout.layoutType);
+    const availableTemplates = await getTemplateVariationsAsync(slide.layout.layoutType);
     const newTemplate = availableTemplates.find((t) => t.id === newTemplateId);
 
     if (!newTemplate) {
@@ -114,7 +114,7 @@ export default function useSwitchTemplate() {
    */
   const updateTemplateParameters = async (
     slideId: string,
-    parameterOverrides: Record<string, number>
+    parameterOverrides: Record<string, number | boolean>
   ): Promise<void> => {
     const slide = slidesStore.slides.find((s) => s.id === slideId);
 
@@ -185,14 +185,14 @@ export default function useSwitchTemplate() {
   /**
    * Check if a slide supports template switching
    * @param slideId - The ID of the slide
-   * @returns true if the slide has layout metadata and multiple templates available
+   * @returns Promise resolving to true if the slide has layout metadata and multiple templates available
    */
-  const canSwitchTemplate = (slideId: string): boolean => {
+  const canSwitchTemplate = async (slideId: string): Promise<boolean> => {
     const slide = slidesStore.slides.find((s) => s.id === slideId);
     if (!slide?.layout?.layoutType) {
       return false;
     }
-    const templates = getTemplateVariations(slide.layout.layoutType);
+    const templates = await getTemplateVariationsAsync(slide.layout.layoutType);
     return templates.length > 1;
   };
 

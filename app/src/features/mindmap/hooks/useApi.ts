@@ -7,8 +7,23 @@ import type { ApiResponse } from '@aiprimary/api';
 import { ExpectedError } from '@aiprimary/api';
 import { useMetadataStore } from '../stores';
 import { useCoreStore } from '../stores/core';
-import { DRAGHANDLE } from '../types';
 import { getTreeLayoutType, getTreeForceLayout } from '../services/utils';
+import { t } from 'i18next';
+
+/**
+ * Convert data URL (base64) to Blob for multipart upload
+ */
+function dataURLtoBlob(dataURL: string): Blob {
+  const arr = dataURL.split(',');
+  const mime = arr[0].match(/:(.*?);/)?.[1] || 'image/png';
+  const bstr = atob(arr[1]);
+  let n = bstr.length;
+  const u8arr = new Uint8Array(n);
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n);
+  }
+  return new Blob([u8arr], { type: mime });
+}
 
 // Return types for the hooks
 export interface UseMindmapsReturn extends Omit<UseQueryResult<ApiResponse<Mindmap[]>>, 'data'> {
@@ -145,26 +160,9 @@ export const useCreateBlankMindmap = () => {
     mutationFn: async () => {
       const mindmap = await mindmapApiService.createMindmap({
         id: crypto.randomUUID(),
-        title: 'Untitled Mindmap',
+        title: t('mindmap:list.untitledMindmap'),
         description: '',
-        nodes: [
-          {
-            id: 'root',
-            type: 'mindmapRootNode',
-            position: { x: 0, y: 0 },
-            data: {
-              level: 0,
-              content: '<p>Central Topic</p>',
-              side: 'mid',
-              isCollapsed: false,
-              pathType: 'smoothstep',
-              edgeColor: 'var(--primary)',
-            },
-            dragHandle: DRAGHANDLE.SELECTOR,
-            width: 250,
-            height: 100,
-          },
-        ],
+        nodes: [],
         edges: [],
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -229,12 +227,18 @@ export const useUpdateMindmapWithMetadata = () => {
         ...(viewport && { viewport }),
       };
 
+      // Create FormData for multipart upload
+      const formData = new FormData();
+      formData.append('data', new Blob([JSON.stringify(updateData)], { type: 'application/json' }));
+
+      // Convert thumbnail to Blob
       const thumbnail = getThumbnail();
       if (thumbnail) {
-        updateData.thumbnail = thumbnail;
+        const blob = dataURLtoBlob(thumbnail);
+        formData.append('file', blob, 'thumbnail.png');
       }
 
-      const result = await mindmapApiService.updateMindmap(id, updateData);
+      const result = await mindmapApiService.updateMindmap(id, formData);
       return { id, data: result };
     },
     onSuccess: (data) => {
@@ -270,21 +274,22 @@ export const useDeleteMindmap = () => {
   });
 };
 
-export const useCreateTestMindmaps = () => {
-  const mindmapApiService = useMindmapApiService();
-
-  return useMutation({
-    mutationFn: async () => {
-      // Read from /public/data/mindmap.json
-      const response = await fetch('/data/mindmap.json');
-      const mindmap = await response.json();
-
-      const createdMindmap = await mindmapApiService.createMindmap(mindmap);
-
-      return createdMindmap;
-    },
-  });
-};
+// Removed: Test mindmap creation hook (not needed for production)
+// export const useCreateTestMindmaps = () => {
+//   const mindmapApiService = useMindmapApiService();
+//
+//   return useMutation({
+//     mutationFn: async () => {
+//       // Read from /public/data/mindmap.json
+//       const response = await fetch('/data/mindmap.json');
+//       const mindmap = await response.json();
+//
+//       const createdMindmap = await mindmapApiService.createMindmap(mindmap);
+//
+//       return createdMindmap;
+//     },
+//   });
+// };
 
 export const useGenerateMindmap = () => {
   const mindmapApiService = useMindmapApiService();

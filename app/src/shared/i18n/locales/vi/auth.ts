@@ -22,6 +22,10 @@ export default {
     googleSignInSuccess: 'Đăng nhập bằng Google thành công',
     googleSignInFailed: 'Không thể hoàn tất đăng nhập. Vui lòng thử lại.',
   },
+  logout: {
+    success: 'Đăng xuất thành công',
+    error: 'Đăng xuất thất bại',
+  },
   googleCallback: {
     completingSignIn: 'Đang hoàn tất đăng nhập...',
     redirecting: 'Đang chuyển hướng...',

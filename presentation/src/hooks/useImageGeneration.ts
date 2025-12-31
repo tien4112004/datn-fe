@@ -16,7 +16,7 @@ export function useGenerateImage(presentationId: string) {
       themeStyle,
       themeDescription,
       artStyle,
-      artDescription,
+      artStyleModifiers,
     }: {
       slideId: string;
       prompt: string;
@@ -27,16 +27,16 @@ export function useGenerateImage(presentationId: string) {
       themeStyle?: string;
       themeDescription?: string;
       artStyle?: string;
-      artDescription?: string;
+      artStyleModifiers?: string;
     }) => {
       console.log('[ImageGen] Starting image generation for slide:', slideId);
       const result = await imageApi.generateImage(presentationId, slideId, {
         prompt,
-        model,
+        imageModel: model,
         themeStyle,
         themeDescription,
         artStyle,
-        artDescription,
+        artStyleModifiers,
       });
       console.log('[ImageGen] Image generation completed for slide:', slideId, result);
       return result;

@@ -26,7 +26,7 @@ import {
   FONT_SIZE_RANGE_CONTENT,
   FONT_SIZE_RANGE_TITLE,
 } from './layoutConstants';
-import { measureElement } from './elementMeasurement';
+import { measureElement, calculateMaxLabelWidth } from './elementMeasurement';
 
 export async function buildImageElement(
   src: string,
@@ -107,17 +107,99 @@ export function buildCombinedList(contents: string[], config: TemplateContainerC
 }
 
 /**
+ * Checks if a config uses maxLabel distribution type.
+ * Recursively checks the config and its childTemplate.
+ */
+function _usesMaxLabelDistribution(config: LayoutBlockConfig): boolean {
+  if (config.layout?.distribution === 'maxLabel/fill') {
+    return true;
+  }
+
+  if (config.childTemplate?.structure?.layout?.distribution === 'maxLabel/fill') {
+    return true;
+  }
+
+  return false;
+}
+
+/**
+ * Calculates the maximum label width from data.
+ * Uses the first pass of two-pass layout algorithm.
+ *
+ * @param data - Label data to measure
+ * @param containerWidth - Container width for capping
+ * @returns Calculated label width in pixels
+ */
+function _calculateMaxLabelWidthFromData(data: Record<string, string[]>, containerWidth: number): number {
+  // Find label data
+  const labelData = data['label'];
+  if (!labelData || labelData.length === 0) {
+    // Fallback: use 25% of container width
+    return containerWidth * 0.25;
+  }
+
+  // Measure all labels at max font size
+  const maxWidth = calculateMaxLabelWidth(labelData, FONT_SIZE_RANGE_LABEL);
+
+  // Cap at reasonable percentage (35% max)
+  const maxAllowed = containerWidth * 0.35;
+  const minAllowed = 60; // Minimum 60px for very short labels
+
+  return Math.max(minAllowed, Math.min(maxWidth, maxAllowed));
+}
+
+/**
+ * Applies calculated label width to config by replacing maxLabel/fill distribution.
+ * Creates a modified copy of the config with pixel-based distribution.
+ *
+ * @param config - Original config
+ * @param labelWidth - Calculated label width
+ * @returns Modified config with pixel distribution
+ */
+function _applyLabelWidthToConfig(config: LayoutBlockConfig, labelWidth: number): LayoutBlockConfig {
+  const modifiedConfig = { ...config };
+
+  // Update main layout distribution
+  if (config.layout?.distribution === 'maxLabel/fill') {
+    modifiedConfig.layout = {
+      ...config.layout,
+      distribution: `${labelWidth}px/fill`,
+    };
+  }
+
+  // Update childTemplate distribution
+  if (config.childTemplate?.structure?.layout?.distribution === 'maxLabel/fill') {
+    modifiedConfig.childTemplate = {
+      ...config.childTemplate,
+      structure: {
+        ...config.childTemplate.structure,
+        layout: {
+          ...config.childTemplate.structure.layout,
+          distribution: `${labelWidth}px/fill`,
+        },
+      },
+    };
+  }
+
+  return modifiedConfig;
+}
+
+/**
  * Builds layout with unified font sizing across all labeled elements.
  * This is the main function for creating content-heavy layouts (lists, tables, etc.)
  *
- * Algorithm (single-pass optimization):
- * 1. Normalize data structure (flat vs nested)
- * 2. Build layout tree with bounds
- * 3. Collect elements by label
- * 4. Calculate unified font size per label (smallest size that fits all instances)
- * 5. Create HTML elements with calculated sizes
- * 6. Measure and position elements
- * 7. Convert to PPT elements
+ * Algorithm (two-pass optimization for maxLabel distribution):
+ * 1. Detect if using maxLabel/fill distribution
+ * 2. If yes:
+ *    a. PASS 1: Measure all labels to find max width
+ *    b. Replace maxLabel/fill with calculated pixel width
+ * 3. Normalize data structure (flat vs nested)
+ * 4. Build layout tree with bounds
+ * 5. Collect elements by label
+ * 6. Calculate unified font size per label (smallest size that fits all instances)
+ * 7. Create HTML elements with calculated sizes
+ * 8. Measure and position elements
+ * 9. Convert to PPT elements
  *
  * Key concept: Elements with the same label share a unified font size to ensure
  * visual consistency (e.g., all "content" items have the same font size)
@@ -140,6 +222,14 @@ export function buildCombinedList(contents: string[], config: TemplateContainerC
  *   column1: ['Item 1', 'Item 2'],
  *   column2: ['Item A', 'Item B']
  * })
+ *
+ * @example
+ * // Content-aware label sizing
+ * buildLayoutWithUnifiedFontSizing(config, bounds, {
+ *   label: ['Q:', 'A:', 'Note:'],
+ *   content: ['...', '...', '...']
+ * })
+ * // Labels will be sized to fit longest label ('Note:'), ensuring alignment
  */
 export function buildLayoutWithUnifiedFontSizing(
   config: LayoutBlockConfig,
@@ -150,15 +240,22 @@ export function buildLayoutWithUnifiedFontSizing(
   elements: Record<string, PPTElement[]>;
   fontSizes: Record<string, number>;
 } {
+  // PASS 1: Calculate max label width if using maxLabel distribution
+  let finalConfig = config;
+  if (_usesMaxLabelDistribution(config)) {
+    const labelWidth = _calculateMaxLabelWidthFromData(data, bounds.width);
+    finalConfig = _applyLabelWidthToConfig(config, labelWidth);
+  }
+
   // Step 1: Process and normalize data
   const {
     dataMap,
     processedData,
     instance: prebuiltInstance,
-  } = _normalizeDataStructure(data, config, bounds);
+  } = _normalizeDataStructure(data, finalConfig, bounds);
 
   // Step 2: Build layout tree (skip if already built for nested structures)
-  const instance = prebuiltInstance || buildInstanceWithBounds(config, bounds, processedData);
+  const instance = prebuiltInstance || buildInstanceWithBounds(finalConfig, bounds, processedData);
 
   // Step 3: Collect label groups
   const labelGroups = new Map<string, TextLayoutBlockInstance[]>();
@@ -346,8 +443,9 @@ function _calculateFontSizeForLabel(
     return createHtmlElement(item, 16, instances[0].text || {});
   });
 
-  // Determine font size range based on label type
-  const fontSizeRange = label === 'label' ? FONT_SIZE_RANGE_LABEL : FONT_SIZE_RANGE_CONTENT;
+  // Determine font size range from text config or use default based on label type
+  const fontSizeRange =
+    instances[0].text?.fontSizeRange || (label === 'label' ? FONT_SIZE_RANGE_LABEL : FONT_SIZE_RANGE_CONTENT);
 
   // Calculate unified font size for this group
   return calculateUnifiedFontSizeForLabels(elements, instances, fontSizeRange);

@@ -4,7 +4,7 @@
     <Editor v-else-if="_isPC" />
     <Mobile v-else />
   </template>
-  <FullscreenSpin :loading="isLoading" tip="Generating presentation..." />
+  <FullscreenSpin :loading="isLoading" :tip="$t('loading.generatingPresentation')" />
 </template>
 
 <script lang="ts" setup>
@@ -63,6 +63,10 @@ const isLoading = computed(() => {
 });
 
 onMounted(async () => {
+  if (props.presentation.title) {
+    slidesStore.setTitle(props.presentation.title);
+  }
+
   if (props.presentation.theme) {
     slidesStore.setTheme(props.presentation.theme);
   }
@@ -82,7 +86,7 @@ onMounted(async () => {
   }
 
   const processorResult = usePresentationProcessor(
-    (containerStore.presentation || null) as any,
+    props.presentation,
     props.presentation.id,
     generationStore.isStreaming,
     pinia!,

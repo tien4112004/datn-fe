@@ -141,6 +141,7 @@ export default {
     title: 'Danh sách bài trình bày',
     generateNewPresentation: 'Tạo bài trình bày mới',
     createBlankPresentation: 'Tạo bài trình bày trống',
+    untitledPresentation: 'Bài trình bày chưa đặt tên',
     filenameDialog: {
       title: 'Đổi tên bài trình bày',
       placeholder: 'Nhập tên mới cho bài trình bày',
@@ -155,5 +156,9 @@ export default {
     themeRequired: 'Chủ đề là bắt buộc',
     artStyleRequired: 'Phong cách nghệ thuật là bắt buộc',
     imageModelRequired: 'Mô hình hình ảnh là bắt buộc',
+  },
+  generation: {
+    outlineError: 'Lỗi khi tạo dàn ý. Vui lòng thử lại.',
+    presentationError: 'Lỗi khi tạo bản trình bày. Vui lòng thử lại.',
   },
 };

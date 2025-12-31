@@ -16,6 +16,8 @@ import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@/s
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useLogout } from '@/features/auth/hooks/useAuth';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
+import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 
 export function NavUser({
   user,
@@ -29,16 +31,17 @@ export function NavUser({
   const { isMobile } = useSidebar();
   const navigate = useNavigate();
   const { mutate: logout } = useLogout();
+  const { t } = useTranslation(I18N_NAMESPACES.AUTH);
 
   const handleLogout = async () => {
     logout(undefined, {
       onSuccess: () => {
-        toast.success('Logged out successfully');
+        toast.success(t('logout.success'));
         navigate('/login');
       },
       onError: (error) => {
         console.error('Logout failed:', error);
-        toast.error('Failed to logout');
+        toast.error(t('logout.error'));
       },
     });
   };

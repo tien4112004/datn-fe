@@ -7,13 +7,24 @@ export interface ArtStyleRequest {
   modifiers?: string;
 }
 
-export interface TemplateParameter {
+export type TemplateParameter = NumberParameter | BooleanParameter;
+
+export interface NumberParameter {
+  type?: 'number';
   key: string;
   label: string;
   defaultValue: number;
   min?: number;
   max?: number;
   step?: number;
+  description?: string;
+}
+
+export interface BooleanParameter {
+  type: 'boolean';
+  key: string;
+  label: string;
+  defaultValue: boolean;
   description?: string;
 }
 
@@ -48,6 +59,10 @@ export interface Book {
 export interface PaginationParams {
   page?: number;
   pageSize?: number;
+}
+
+export interface SlideTemplateParams extends PaginationParams {
+  layout?: string;
 }
 
 export interface Pagination {

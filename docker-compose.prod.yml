@@ -6,7 +6,7 @@ services:
       target: app-production
       args:
         - VITE_API_URL=${VITE_API_URL}
-        - PRESENTATION_URL=${PRESENTATION_URL}
+        - VITE_PRESENTATION_URL=${VITE_PRESENTATION_URL}
         - NODE_ENV=production
     image: ghcr.io/tien4112004/datn-fe:app-latest
     container_name: frontend-app-aiprimary
@@ -27,7 +27,7 @@ services:
       target: presentation-production
       args:
         - VITE_API_URL=${VITE_API_URL}
-        - PRESENTATION_URL=${PRESENTATION_URL}
+        - VITE_PRESENTATION_URL=${VITE_PRESENTATION_URL}
         - NODE_ENV=production
     image: ghcr.io/tien4112004/datn-fe:presentation-latest
     container_name: frontend-presentation-aiprimary
@@ -48,7 +48,7 @@ services:
       target: admin-production
       args:
         - VITE_API_URL=${VITE_API_URL}
-        - PRESENTATION_URL=${PRESENTATION_URL}
+        - VITE_PRESENTATION_URL=${VITE_PRESENTATION_URL}
         - NODE_ENV=production
     image: ghcr.io/tien4112004/datn-fe:admin-latest
     container_name: frontend-admin-aiprimary

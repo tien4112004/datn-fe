@@ -79,7 +79,7 @@ export const listTemplates: SlideTemplate[] = [
               },
               border: {
                 width: '{{theme.card.borderWidth}}',
-                color: '{{theme.themeColors[0]}}',
+                color: '{{theme.outline.color}}',
                 radius: '{{theme.card.borderRadius}}',
               },
               text: {
@@ -88,90 +88,7 @@ export const listTemplates: SlideTemplate[] = [
                 fontWeight: 'normal',
                 fontStyle: 'normal',
                 textAlign: 'left',
-                fontSizeRange: { minSize: 15, maxSize: 22 },
-              },
-            },
-          },
-        },
-      },
-    },
-  },
-  {
-    layout: 'list',
-    id: 'list-compact',
-    name: 'List - Simple Grid',
-    parameters: [
-      {
-        key: 'SIDE_PADDING',
-        label: 'Side Padding (px)',
-        defaultValue: 40,
-        min: 0,
-        max: 50,
-        step: 1,
-        description: 'Left/right slide padding',
-      },
-    ],
-    config: {
-      containers: {
-        title: {
-          type: 'text',
-          bounds: {
-            left: { expr: 'SIDE_PADDING' },
-            top: 15,
-            width: { expr: 'SLIDE_WIDTH - SIDE_PADDING * 2' },
-            height: 100,
-          },
-          layout: {
-            horizontalAlignment: 'center',
-            verticalAlignment: 'top',
-          },
-          text: {
-            color: '{{theme.titleFontColor}}',
-            fontFamily: '{{theme.titleFontName}}',
-            fontWeight: 'bold',
-            textAlign: 'center',
-          },
-        },
-        content: {
-          type: 'block',
-          positioning: {
-            relativeTo: 'title',
-            axis: 'vertical',
-            anchor: 'end',
-            offset: 15,
-            size: 'fill',
-            margin: { left: 0, right: 0, top: 0, bottom: 40 },
-          },
-          layout: {
-            distribution: 'equal',
-            gap: 15,
-            verticalAlignment: 'top',
-            orientation: 'vertical',
-          },
-          childTemplate: {
-            count: 'auto',
-            wrap: {
-              enabled: true,
-              maxItemsPerLine: 5,
-              lineCount: 'auto',
-              wrapDistribution: 'balanced',
-              lineSpacing: 16,
-              syncSize: true,
-            },
-            structure: {
-              type: 'text',
-              label: 'item',
-              border: {
-                width: 1,
-                color: '{{theme.themeColors[0]}}',
-                radius: '{{theme.card.borderRadius}}',
-              },
-              text: {
-                color: '{{theme.fontColor}}',
-                fontFamily: '{{theme.fontName}}',
-                fontWeight: 'normal',
-                textAlign: 'left',
-                fontSizeRange: { minSize: 15, maxSize: 22 },
+                fontSizeRange: { minSize: 15, maxSize: 24 },
               },
             },
           },
@@ -245,8 +162,8 @@ export const listTemplates: SlideTemplate[] = [
               type: 'block',
               label: 'item',
               layout: {
-                distribution: '1/5',
-                gap: 15,
+                distribution: 'maxLabel/fill',
+                gap: 8,
                 horizontalAlignment: 'left',
                 verticalAlignment: 'center',
                 orientation: 'horizontal',
@@ -262,7 +179,7 @@ export const listTemplates: SlideTemplate[] = [
                     fontFamily: '{{theme.labelFontName}}',
                     fontWeight: 'bold',
                     textAlign: 'right',
-                    fontSizeRange: { minSize: 16, maxSize: 24 },
+                    fontSizeRange: { minSize: 16, maxSize: 28 },
                   },
                 },
                 {
@@ -271,7 +188,7 @@ export const listTemplates: SlideTemplate[] = [
                   label: 'content',
                   border: {
                     width: '{{theme.card.borderWidth}}',
-                    color: '{{theme.themeColors[0]}}',
+                    color: '{{theme.outline.color}}',
                     radius: '{{theme.card.borderRadius}}',
                   },
                   text: {
@@ -279,7 +196,7 @@ export const listTemplates: SlideTemplate[] = [
                     fontFamily: '{{theme.fontName}}',
                     fontWeight: 'normal',
                     textAlign: 'left',
-                    fontSizeRange: { minSize: 15, maxSize: 22 },
+                    fontSizeRange: { minSize: 15, maxSize: 24 },
                   },
                 },
               ],
@@ -356,7 +273,7 @@ export const listTemplates: SlideTemplate[] = [
               type: 'block',
               label: 'item',
               layout: {
-                distribution: '1/5',
+                distribution: 'maxLabel/fill',
                 gap: 8,
                 horizontalAlignment: 'left',
                 verticalAlignment: 'center',
@@ -373,11 +290,11 @@ export const listTemplates: SlideTemplate[] = [
                     verticalAlignment: 'center',
                   },
                   text: {
-                    color: '{{theme.themeColors[0]}}',
+                    color: '{{theme.labelFontColor}}',
                     fontFamily: '{{theme.labelFontName}}',
                     fontWeight: 'bold',
                     textAlign: 'right',
-                    fontSizeRange: { minSize: 14, maxSize: 20 },
+                    fontSizeRange: { minSize: 14, maxSize: 28 },
                   },
                 },
                 {
@@ -393,7 +310,7 @@ export const listTemplates: SlideTemplate[] = [
                     fontFamily: '{{theme.fontName}}',
                     fontWeight: 'normal',
                     textAlign: 'left',
-                    fontSizeRange: { minSize: 15, maxSize: 22 },
+                    fontSizeRange: { minSize: 15, maxSize: 24 },
                   },
                 },
               ],
@@ -470,7 +387,7 @@ export const listTemplates: SlideTemplate[] = [
               type: 'block',
               label: 'item',
               layout: {
-                distribution: '1/5',
+                distribution: 'maxLabel/fill',
                 gap: 10,
                 horizontalAlignment: 'left',
                 verticalAlignment: 'center',
@@ -478,7 +395,7 @@ export const listTemplates: SlideTemplate[] = [
               },
               border: {
                 width: '{{theme.card.borderWidth}}',
-                color: '{{theme.themeColors[0]}}',
+                color: '{{theme.outline.color}}',
                 radius: '{{theme.card.borderRadius}}',
               },
               shadow: {
@@ -505,7 +422,7 @@ export const listTemplates: SlideTemplate[] = [
                     fontFamily: '{{theme.labelFontName}}',
                     fontWeight: 'bold',
                     textAlign: 'center',
-                    fontSizeRange: { minSize: 16, maxSize: 24 },
+                    fontSizeRange: { minSize: 16, maxSize: 28 },
                   },
                 },
                 {
@@ -521,93 +438,10 @@ export const listTemplates: SlideTemplate[] = [
                     fontFamily: '{{theme.fontName}}',
                     fontWeight: 'normal',
                     textAlign: 'left',
-                    fontSizeRange: { minSize: 15, maxSize: 22 },
+                    fontSizeRange: { minSize: 15, maxSize: 24 },
                   },
                 },
               ],
-            },
-          },
-        },
-      },
-    },
-  },
-  {
-    layout: 'list',
-    id: 'list-container-border',
-    name: 'List - Framed Grid',
-    parameters: [
-      {
-        key: 'SIDE_PADDING',
-        label: 'Side Padding (px)',
-        defaultValue: 20,
-        min: 0,
-        max: 50,
-        step: 1,
-        description: 'Left/right slide padding',
-      },
-    ],
-    config: {
-      containers: {
-        title: {
-          type: 'text',
-          bounds: {
-            left: { expr: 'SIDE_PADDING' },
-            top: 15,
-            width: { expr: 'SLIDE_WIDTH - SIDE_PADDING * 2' },
-            height: 110,
-          },
-          layout: {
-            horizontalAlignment: 'center',
-            verticalAlignment: 'top',
-          },
-          text: {
-            color: '{{theme.titleFontColor}}',
-            fontFamily: '{{theme.titleFontName}}',
-            fontWeight: 'bold',
-            textAlign: 'center',
-          },
-        },
-        content: {
-          type: 'block',
-          positioning: {
-            relativeTo: 'title',
-            axis: 'vertical',
-            anchor: 'end',
-            offset: 20,
-            size: 'fill',
-            margin: { left: 0, right: 0, top: 0, bottom: 50 },
-          },
-          border: {
-            width: '{{theme.card.borderWidth}}',
-            color: '{{theme.themeColors[0]}}',
-            radius: '{{theme.card.borderRadius}}',
-          },
-          layout: {
-            distribution: 'equal',
-            gap: 15,
-            verticalAlignment: 'top',
-            orientation: 'vertical',
-          },
-          childTemplate: {
-            count: 'auto',
-            wrap: {
-              enabled: true,
-              maxItemsPerLine: 5,
-              lineCount: 'auto',
-              wrapDistribution: 'balanced',
-              lineSpacing: 16,
-              syncSize: true,
-            },
-            structure: {
-              type: 'text',
-              label: 'item',
-              text: {
-                color: '{{theme.fontColor}}',
-                fontFamily: '{{theme.fontName}}',
-                fontWeight: 'normal',
-                textAlign: 'center',
-                fontSizeRange: { minSize: 15, maxSize: 22 },
-              },
             },
           },
         },
@@ -664,7 +498,7 @@ export const listTemplates: SlideTemplate[] = [
           },
           border: {
             width: '{{theme.card.borderWidth}}',
-            color: '{{theme.themeColors[0]}}',
+            color: '{{theme.outline.color}}',
             radius: '{{theme.card.borderRadius}}',
           },
           layout: {
@@ -688,10 +522,10 @@ export const listTemplates: SlideTemplate[] = [
               type: 'block',
               label: 'item',
               layout: {
-                distribution: '1/5',
-                gap: 12,
+                distribution: 'maxLabel/fill',
+                gap: 8,
                 horizontalAlignment: 'left',
-                verticalAlignment: 'top',
+                verticalAlignment: 'center',
                 orientation: 'horizontal',
               },
               children: [
@@ -705,11 +539,11 @@ export const listTemplates: SlideTemplate[] = [
                     verticalAlignment: 'center',
                   },
                   text: {
-                    color: '{{theme.themeColors[0]}}',
+                    color: '{{theme.labelFontColor}}',
                     fontFamily: '{{theme.labelFontName}}',
                     fontWeight: 'bold',
                     textAlign: 'right',
-                    fontSizeRange: { minSize: 14, maxSize: 20 },
+                    fontSizeRange: { minSize: 14, maxSize: 28 },
                   },
                 },
                 {
@@ -725,7 +559,7 @@ export const listTemplates: SlideTemplate[] = [
                     fontFamily: '{{theme.fontName}}',
                     fontWeight: 'normal',
                     textAlign: 'left',
-                    fontSizeRange: { minSize: 15, maxSize: 22 },
+                    fontSizeRange: { minSize: 15, maxSize: 24 },
                   },
                 },
               ],
@@ -791,7 +625,7 @@ export const listTemplates: SlideTemplate[] = [
           },
           border: {
             width: '{{theme.card.borderWidth}}',
-            color: '{{theme.themeColors[0]}}',
+            color: '{{theme.outline.color}}',
             radius: '{{theme.card.borderRadius}}',
           },
           text: {
@@ -800,7 +634,7 @@ export const listTemplates: SlideTemplate[] = [
             fontWeight: 'normal',
             textAlign: 'left',
             lineHeight: 1.5,
-            fontSizeRange: { minSize: 15, maxSize: 22 },
+            fontSizeRange: { minSize: 15, maxSize: 24 },
           },
           children: [
             {

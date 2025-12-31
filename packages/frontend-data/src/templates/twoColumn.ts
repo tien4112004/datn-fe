@@ -139,10 +139,9 @@ export const twoColumnTemplates: SlideTemplate[] = [
             margin: { left: 50, right: 50, top: 0, bottom: 50 },
           },
           border: {
-            width: 1,
-            color: '{{theme.themeColors[0]}}',
-            radius: 20,
-            directions: ['top', 'right', 'bottom'],
+            width: '{{theme.card.borderWidth}}',
+            color: '{{theme.outline.color}}',
+            radius: '{{theme.card.borderRadius}}',
           },
           layout: {
             distribution: 'space-between',
@@ -175,6 +174,7 @@ export const twoColumnTemplates: SlideTemplate[] = [
                     fontFamily: '{{theme.fontName}}',
                     fontWeight: 'normal',
                     textAlign: 'center',
+                    fontSizeRange: { minSize: 15, maxSize: 24 },
                   },
                 },
               ],
@@ -213,9 +213,9 @@ export const twoColumnTemplates: SlideTemplate[] = [
         title: {
           type: 'text',
           bounds: {
-            left: 0,
+            left: { expr: 'SIDE_PADDING' },
             top: 15,
-            width: { expr: 'SLIDE_WIDTH' },
+            width: { expr: 'SLIDE_WIDTH - SIDE_PADDING * 2' },
             height: 100,
           },
           layout: {
@@ -245,7 +245,7 @@ export const twoColumnTemplates: SlideTemplate[] = [
           },
           border: {
             width: '{{theme.card.borderWidth}}',
-            color: '{{theme.themeColors[0]}}',
+            color: '{{theme.outline.color}}',
             radius: '{{theme.card.borderRadius}}',
           },
           layout: {
@@ -265,6 +265,7 @@ export const twoColumnTemplates: SlideTemplate[] = [
                 fontFamily: '{{theme.fontName}}',
                 fontWeight: 'normal',
                 textAlign: 'right',
+                fontSizeRange: { minSize: 15, maxSize: 24 },
               },
             },
           },
@@ -287,7 +288,7 @@ export const twoColumnTemplates: SlideTemplate[] = [
           },
           border: {
             width: '{{theme.card.borderWidth}}',
-            color: '{{theme.themeColors[0]}}',
+            color: '{{theme.outline.color}}',
             radius: '{{theme.card.borderRadius}}',
           },
           layout: {
@@ -307,6 +308,7 @@ export const twoColumnTemplates: SlideTemplate[] = [
                 fontFamily: '{{theme.fontName}}',
                 fontWeight: 'normal',
                 textAlign: 'left',
+                fontSizeRange: { minSize: 15, maxSize: 24 },
               },
             },
           },
@@ -342,9 +344,9 @@ export const twoColumnTemplates: SlideTemplate[] = [
         title: {
           type: 'text',
           bounds: {
-            left: 0,
+            left: { expr: 'SIDE_PADDING' },
             top: 15,
-            width: { expr: 'SLIDE_WIDTH' },
+            width: { expr: 'SLIDE_WIDTH - SIDE_PADDING * 2' },
             height: 110,
           },
           layout: {
@@ -379,7 +381,7 @@ export const twoColumnTemplates: SlideTemplate[] = [
           },
           border: {
             width: '{{theme.card.borderWidth}}',
-            color: '{{theme.themeColors[0]}}',
+            color: '{{theme.outline.color}}',
             radius: '{{theme.card.borderRadius}}',
           },
           text: {

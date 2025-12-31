@@ -7,3 +7,5 @@
 
 // Export all templates
 export * from './templates';
+// Export all themes
+export * from './themes';

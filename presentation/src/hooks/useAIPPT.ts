@@ -392,11 +392,11 @@ export default () => {
       } else AISlides.push(template);
     }
 
-    const coverTemplates = templateSlides.filter((slide) => slide.type === 'cover');
-    const contentsTemplates = templateSlides.filter((slide) => slide.type === 'contents');
-    const transitionTemplates = templateSlides.filter((slide) => slide.type === 'transition');
-    const contentTemplates = templateSlides.filter((slide) => slide.type === 'content');
-    const endTemplates = templateSlides.filter((slide) => slide.type === 'end');
+    const coverTemplates = templateSlides.filter((slide) => slide.type === ('cover' as any));
+    const contentsTemplates = templateSlides.filter((slide) => slide.type === ('contents' as any));
+    const transitionTemplates = templateSlides.filter((slide) => slide.type === ('transition' as any));
+    const contentTemplates = templateSlides.filter((slide) => slide.type === ('content' as any));
+    const endTemplates = templateSlides.filter((slide) => slide.type === ('end' as any));
 
     if (!transitionTemplate.value) {
       const _transitionTemplate = transitionTemplates[Math.floor(Math.random() * transitionTemplates.length)];

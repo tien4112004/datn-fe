@@ -119,6 +119,8 @@ import {
   Share2,
   Users,
   Globe,
+  PenLine,
+  Upload,
 } from 'lucide-vue-next';
 
 export interface Icons {
@@ -260,6 +262,8 @@ export const icons: Icons = {
   IconShare: Share2,
   IconUsers: Users,
   IconGlobe: Globe,
+  IconWritingFluently: PenLine,
+  IconUpload: Upload,
 };
 
 export default {

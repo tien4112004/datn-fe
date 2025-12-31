@@ -9,24 +9,14 @@ import type { SortingState, PaginationState, Updater } from '@tanstack/react-tab
 import { usePresentationApiService } from '../api';
 import { useImageApiService } from '@/features/image/api';
 import { useEffect, useState } from 'react';
-import type {
-  Presentation,
-  OutlineItem,
-  PresentationGenerationRequest,
-  PresentationGenerateDraftRequest,
-  UpdatePresentationRequest,
-} from '../types';
+import type { Presentation, PresentationGenerateDraftRequest, UpdatePresentationRequest } from '../types';
 import type { ApiResponse } from '@aiprimary/api';
 import { ExpectedError } from '@aiprimary/api';
-import type { Slide, SlideTemplate, SlideTheme } from '../types/slide';
+import type { SlideTemplate, SlideTheme } from '../types/slide';
 import { toast } from 'sonner';
 import { t } from 'i18next';
 
 // Return types for the hooks
-export interface UsePresentationOutlinesReturn extends Omit<UseQueryResult<OutlineItem[]>, 'data'> {
-  outlineItems: OutlineItem[];
-}
-
 export interface UsePresentationsReturn extends Omit<UseQueryResult<ApiResponse<Presentation[]>>, 'data'> {
   data: Presentation[];
   sorting: SortingState;
@@ -37,26 +27,6 @@ export interface UsePresentationsReturn extends Omit<UseQueryResult<ApiResponse<
   setSearch: (search: string) => void;
   totalItems: number;
 }
-
-/**
- * @deprecated
- */
-export const usePresentationOutlines = (): UsePresentationOutlinesReturn => {
-  const presentationApiService = usePresentationApiService();
-  const { data: outlineItems = [], ...query } = useQuery<OutlineItem[]>({
-    queryKey: [presentationApiService.getType(), 'outlineItems'],
-    queryFn: async (): Promise<OutlineItem[]> => {
-      const data = await presentationApiService.getOutlineItems();
-      console.log('Fetch data', data);
-      return data;
-    },
-  });
-
-  return {
-    outlineItems,
-    ...query,
-  };
-};
 
 export const usePresentations = (): UsePresentationsReturn => {
   const presentationApiService = usePresentationApiService();
@@ -143,26 +113,27 @@ export const usePresentationById = (id: string | undefined) => {
   });
 };
 
-export const useCreateTestPresentations = () => {
-  const presentationApiService = usePresentationApiService();
-
-  return useMutation({
-    mutationFn: async () => {
-      // Read from /public/data/{presentation.json|presentation-2.json}
-      const responses = await Promise.all([
-        fetch('/data/presentation.json'),
-        fetch('/data/presentation2.json'),
-      ]);
-      const presentations = await Promise.all(responses.map((res) => res.json()));
-
-      const createdPresentations = await Promise.all(
-        presentations.map((presentation: any) => presentationApiService.createPresentation(presentation))
-      );
-
-      return createdPresentations;
-    },
-  });
-};
+// Removed: Test presentation creation hook (not needed for production)
+// export const useCreateTestPresentations = () => {
+//   const presentationApiService = usePresentationApiService();
+//
+//   return useMutation({
+//     mutationFn: async () => {
+//       // Read from /public/data/{presentation.json|presentation-2.json}
+//       const responses = await Promise.all([
+//         fetch('/data/presentation.json'),
+//         fetch('/data/presentation2.json'),
+//       ]);
+//       const presentations = await Promise.all(responses.map((res) => res.json()));
+//
+//       const createdPresentations = await Promise.all(
+//         presentations.map((presentation: any) => presentationApiService.createPresentation(presentation))
+//       );
+//
+//       return createdPresentations;
+//     },
+//   });
+// };
 
 export const useCreateBlankPresentation = () => {
   const presentationApiService = usePresentationApiService();
@@ -171,7 +142,7 @@ export const useCreateBlankPresentation = () => {
   return useMutation({
     mutationFn: async () => {
       const presentation = await presentationApiService.createPresentation({
-        title: 'Untitled Presentation',
+        title: t('presentation:list.untitledPresentation'),
         isParsed: true,
         slides: [
           {
@@ -189,23 +160,6 @@ export const useCreateBlankPresentation = () => {
     },
     onSuccess: () => {
       // Invalidate and refetch
-      queryClient.invalidateQueries({
-        queryKey: [presentationApiService.getType(), 'presentations'],
-      });
-    },
-  });
-};
-
-export const useGeneratePresentation = () => {
-  const presentationApiService = usePresentationApiService();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (request: PresentationGenerationRequest) => {
-      const generatedSlides = await presentationApiService.generatePresentation(request);
-      return generatedSlides;
-    },
-    onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [presentationApiService.getType(), 'presentations'],
       });
@@ -288,46 +242,6 @@ export const useUpdatePresentation = (id: string) => {
   });
 };
 
-export const useUpdatePresentationSlides = (id: string) => {
-  const presentationApiService = usePresentationApiService();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (slides: Slide[]) => {
-      // Use multiple single slide updates for batch operations
-      let updatedPresentation: Presentation;
-
-      for (const slide of slides) {
-        updatedPresentation = await presentationApiService.upsertPresentationSlide(id, slide);
-      }
-
-      return updatedPresentation!;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: [presentationApiService.getType(), 'presentation', id],
-      });
-    },
-  });
-};
-
-export const useSetParsedPresentation = (id: string) => {
-  const presentationApiService = usePresentationApiService();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async () => {
-      const updatedPresentation = await presentationApiService.setPresentationAsParsed(id);
-      return updatedPresentation;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: [presentationApiService.getType(), 'presentation', id],
-      });
-    },
-  });
-};
-
 export const useGeneratePresentationImage = (id: string) => {
   const imageApiService = useImageApiService();
   const presentationApiService = usePresentationApiService();
@@ -350,7 +264,8 @@ export const useGeneratePresentationImage = (id: string) => {
     }) => {
       const imageUrl = await imageApiService.generatePresentationImage(id, slideId, elementId, {
         prompt,
-        model,
+        model: model.name,
+        provider: model.provider,
       });
       return imageUrl;
     },
@@ -386,18 +301,18 @@ export const useInfiniteSlideThemes = () => {
 
   const { data, ...query } = useInfiniteQuery({
     queryKey: [apiService.getType(), 'slideThemes', 'infinite'],
-    queryFn: async ({ pageParam = 1 }): Promise<SlideTheme[]> => {
+    queryFn: async ({ pageParam = 0 }): Promise<SlideTheme[]> => {
       const themes = await apiService.getSlideThemes({
         page: pageParam as number,
         pageSize: PAGE_SIZE,
       });
       return themes;
     },
-    initialPageParam: 1,
+    initialPageParam: 0,
     getNextPageParam: (lastPage: SlideTheme[], allPages: SlideTheme[][]) => {
       // If the last page has fewer items than the page size, we've reached the end
       if (lastPage.length < PAGE_SIZE) return undefined;
-      return allPages.length + 1;
+      return allPages.length;
     },
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
     gcTime: 10 * 60 * 1000, // Keep in cache for 10 minutes
@@ -432,13 +347,35 @@ export const useDraftPresentation = () => {
 
   return useMutation({
     mutationFn: async (request: PresentationGenerateDraftRequest) => {
+      const title = request.topic || 'AI Generated Presentation';
       const draftPresentation = await presentationApiService.createPresentation({
-        title: 'AI Generated Presentation',
+        title,
         isParsed: false,
         slides: [],
         ...request.presentation,
       });
       return draftPresentation;
+    },
+  });
+};
+
+export const useDeletePresentation = () => {
+  const presentationApiService = usePresentationApiService();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      await presentationApiService.deletePresentation(id);
+      return id;
+    },
+    onSuccess: (deletedId) => {
+      queryClient.invalidateQueries({
+        queryKey: [presentationApiService.getType(), 'presentations'],
+      });
+
+      queryClient.removeQueries({
+        queryKey: [presentationApiService.getType(), 'presentation', deletedId],
+      });
     },
   });
 };

@@ -147,7 +147,7 @@ export function StudentFormDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{mode === 'create' ? t('addStudent') : t('editStudent')}</DialogTitle>
+          <DialogTitle>{mode === 'create' ? t('addStudentButton') : t('editStudent')}</DialogTitle>
           <DialogDescription>
             {mode === 'create' ? t('form.createDescription') : t('form.editDescription')}
           </DialogDescription>

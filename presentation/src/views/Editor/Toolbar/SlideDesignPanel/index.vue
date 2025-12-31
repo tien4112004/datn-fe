@@ -192,6 +192,29 @@
       </Popover>
     </div>
     <div class="row">
+      <div style="width: 40%">{{ $t('styling.slide.design.theme.labelFont') }}</div>
+      <Select
+        style="width: 60%"
+        :value="theme.labelFontName || ''"
+        search
+        :searchLabel="$t('styling.slide.design.theme.searchFont')"
+        @update:value="(value) => updateTheme({ labelFontName: value as string })"
+        :options="FONTS"
+      />
+    </div>
+    <div class="row">
+      <div style="width: 40%">{{ $t('styling.slide.design.theme.labelFontColor') }}</div>
+      <Popover trigger="click" style="width: 60%">
+        <template #content>
+          <ColorPicker
+            :modelValue="theme.labelFontColor"
+            @update:modelValue="(value) => updateTheme({ labelFontColor: value })"
+          />
+        </template>
+        <ColorButton :color="theme.labelFontColor || theme.fontColor" />
+      </Popover>
+    </div>
+    <div class="row">
       <div style="width: 40%">{{ $t('styling.slide.design.theme.themeColor') }}</div>
       <ColorListButton
         style="width: 60%"
@@ -293,6 +316,12 @@
     </div>
 
     <div class="row">
+      <Button style="flex: 1" @click="applyFontToAllSlides(theme.fontName)">{{
+        $t('styling.slide.design.applyFontToAll')
+      }}</Button>
+    </div>
+
+    <div class="row">
       <Button style="flex: 1" @click="themeStylesExtractVisible = true">
         {{ $t('styling.slide.design.extractThemeFromSlide') }}
       </Button>
@@ -301,10 +330,28 @@
     <Divider />
 
     <div class="title title-panel">{{ $t('styling.slide.design.presetThemes') }}</div>
-    <div class="theme-list">
+
+    <!-- Loading State -->
+    <div v-if="themesLoading" class="themes-loading">
+      {{ $t('styling.slide.design.loadingThemes') || 'Loading themes...' }}
+    </div>
+
+    <!-- Error State -->
+    <div v-else-if="themesError" class="themes-error">
+      <div class="error-message">{{ themesError }}</div>
+      <Button size="small" @click="fetchThemes">{{ $t('styling.slide.design.retry') || 'Retry' }}</Button>
+    </div>
+
+    <!-- Empty State -->
+    <div v-else-if="presetThemes.length === 0" class="themes-empty">
+      {{ $t('styling.slide.design.noThemes') || 'No themes available' }}
+    </div>
+
+    <!-- Themes List -->
+    <div v-else class="theme-list" ref="themeListRef" @scroll="handleThemeListScroll">
       <div
         class="theme-item"
-        v-for="(item, index) in PRESET_THEMES"
+        v-for="(item, index) in presetThemes"
         :key="index"
         :style="{
           backgroundColor: item.background,
@@ -336,6 +383,16 @@
           </div>
         </div>
       </div>
+
+      <!-- Loading More Indicator -->
+      <div v-if="themesLoadingMore" class="themes-loading-more">
+        {{ $t('styling.slide.design.loadingMoreThemes') || 'Loading more themes...' }}
+      </div>
+
+      <!-- No More Themes Indicator -->
+      <div v-else-if="!hasMoreThemes && presetThemes.length > 0" class="themes-end">
+        {{ $t('styling.slide.design.noMoreThemes') || 'No more themes' }}
+      </div>
     </div>
   </div>
 
@@ -353,7 +410,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref, watch } from 'vue';
+import { computed, ref, watch, onMounted } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useSlidesStore } from '@/store';
 import type {
@@ -366,10 +423,11 @@ import type {
   SlideBackgroundImageSize,
   LineStyleType,
 } from '@/types/slides';
-import { PRESET_THEMES } from '@/configs/theme';
+import type { PresetTheme } from '@/configs/theme';
 import { FONTS } from '@/configs/font';
 import useHistorySnapshot from '@/hooks/useHistorySnapshot';
 import useSlideTheme from '@/hooks/useSlideTheme';
+import { getPresentationApi } from '@/services/presentation/api';
 import { getImageDataURL } from '@/utils/image';
 import { useI18n } from 'vue-i18n';
 
@@ -402,6 +460,16 @@ const pageNumberSettingVisible = ref(false);
 const currentGradientIndex = ref(0);
 const lineStyleOptions = ref<LineStyleType[]>(['solid', 'dashed', 'dotted']);
 
+// Themes from API with infinite scroll support
+const presetThemes = ref<PresetTheme[]>([]);
+const themesLoading = ref(false);
+const themesLoadingMore = ref(false);
+const themesError = ref<string | null>(null);
+const currentPage = ref(0);
+const hasMoreThemes = ref(true);
+const themesLimit = ref(10);
+const themeListRef = ref<HTMLElement | null>(null);
+
 const background = computed(() => {
   if (!currentSlide.value.background) {
     return {
@@ -414,12 +482,88 @@ const background = computed(() => {
 });
 
 const { addHistorySnapshot } = useHistorySnapshot();
-const { applyPresetTheme, applyThemeToAllSlides } = useSlideTheme();
+const { applyPresetTheme, applyThemeToAllSlides, applyFontToAllSlides } = useSlideTheme();
 const { createTextElement } = useCreateElement();
 const { t } = useI18n();
 
 watch(slideIndex, () => {
   currentGradientIndex.value = 0;
+});
+
+// Fetch initial themes from API
+const fetchThemes = async () => {
+  themesLoading.value = true;
+  themesError.value = null;
+  currentPage.value = 0;
+  presetThemes.value = [];
+
+  try {
+    const api = getPresentationApi();
+    const result = await api.getSlideThemes({ page: 0, limit: themesLimit.value });
+    presetThemes.value = result.data.map((theme) => ({
+      background: typeof theme.backgroundColor === 'string' ? theme.backgroundColor : '#ffffff',
+      fontColor: theme.fontColor,
+      borderColor: theme.outline?.color || '#525252',
+      fontname: theme.fontName,
+      colors: theme.themeColors,
+    }));
+    hasMoreThemes.value = result.hasMore;
+    // Keep currentPage at 0, don't rely on backend response
+  } catch (error) {
+    console.error('Failed to fetch themes:', error);
+    themesError.value = 'Failed to load themes';
+    presetThemes.value = [];
+    hasMoreThemes.value = false;
+  } finally {
+    themesLoading.value = false;
+  }
+};
+
+// Load more themes for infinite scroll
+const loadMoreThemes = async () => {
+  if (!hasMoreThemes.value || themesLoadingMore.value) return;
+
+  themesLoadingMore.value = true;
+
+  try {
+    const api = getPresentationApi();
+    const nextPage = currentPage.value + 1;
+    const result = await api.getSlideThemes({ page: nextPage, limit: themesLimit.value });
+
+    const newThemes = result.data.map((theme) => ({
+      background: typeof theme.backgroundColor === 'string' ? theme.backgroundColor : '#ffffff',
+      fontColor: theme.fontColor,
+      borderColor: theme.outline?.color || '#525252',
+      fontname: theme.fontName,
+      colors: theme.themeColors,
+    }));
+
+    presetThemes.value.push(...newThemes);
+    hasMoreThemes.value = result.hasMore;
+    // Increment currentPage after successful fetch
+    currentPage.value = nextPage;
+  } catch (error) {
+    console.error('Failed to load more themes:', error);
+  } finally {
+    themesLoadingMore.value = false;
+  }
+};
+
+// Handle scroll event for infinite loading
+const handleThemeListScroll = (event: Event) => {
+  const target = event.target as HTMLElement;
+  const scrollTop = target.scrollTop;
+  const scrollHeight = target.scrollHeight;
+  const clientHeight = target.clientHeight;
+
+  // Load more when user scrolls to 80% of the list
+  if (scrollTop + clientHeight >= scrollHeight * 0.8) {
+    loadMoreThemes();
+  }
+};
+
+onMounted(() => {
+  fetchThemes();
 });
 
 // Set background mode: solid color, image, gradient
@@ -603,8 +747,59 @@ const themeBackgroundColor = computed(() => {
   text-align: center;
 }
 
+.themes-loading,
+.themes-error,
+.themes-empty,
+.themes-loading-more,
+.themes-end {
+  padding: 20px;
+  text-align: center;
+  color: var(--presentation-foreground);
+  font-size: 0.875rem;
+}
+
+.themes-loading-more {
+  padding: 10px;
+  font-size: 0.8rem;
+  color: var(--presentation-foreground-muted);
+}
+
+.themes-end {
+  padding: 10px;
+  font-size: 0.8rem;
+  color: var(--presentation-foreground-muted);
+  opacity: 0.7;
+}
+
+.error-message {
+  margin-bottom: 10px;
+  color: var(--presentation-danger, #ff4444);
+}
+
 .theme-list {
   @include flex-grid-layout();
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 5px;
+
+  /* Custom scrollbar styles */
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: var(--presentation-background);
+    border-radius: 3px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--presentation-border);
+    border-radius: 3px;
+
+    &:hover {
+      background: var(--presentation-foreground-muted);
+    }
+  }
 }
 .theme-item {
   @include flex-grid-layout-children(2, 48%);

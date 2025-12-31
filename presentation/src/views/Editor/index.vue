@@ -2,62 +2,72 @@
   <div class="pptist-editor" :class="{ 'view-mode': mode === 'view' }">
     <EditorHeader class="layout-header" />
     <div class="layout-content">
-      <Thumbnails class="layout-content-left layout-thumbnails" />
-      <div class="layout-content-center">
-        <CanvasTool v-if="mode === 'edit'" class="center-top" />
-
-        <!-- Template Preview Mode Banner -->
-        <div v-if="isCurrentSlideLocked" class="preview-mode-banner">
-          <div class="banner-content">
-            <div class="banner-icon">
-              <IconSwatchBook />
-            </div>
-            <div class="banner-text">
-              <div class="banner-title">Template Preview Mode</div>
-              <div class="banner-subtitle">
-                Choose your preferred layout. Editing will unlock after you confirm your template choice.
+      <div class="layout-content-main">
+        <CanvasTool v-if="mode === 'edit'" class="canvas-tool" />
+        <div class="layout-content-columns">
+          <Thumbnails class="layout-content-left layout-thumbnails" />
+          <div class="layout-content-center">
+            <!-- Template Preview Mode Banner -->
+            <div v-if="isCurrentSlideLocked" class="preview-mode-banner">
+              <div class="banner-content">
+                <div class="banner-icon">
+                  <IconSwatchBook />
+                </div>
+                <div class="banner-text">
+                  <div class="banner-title">{{ t('editor.templatePreview.title') }}</div>
+                  <div class="banner-subtitle">
+                    {{ t('editor.templatePreview.subtitle') }}
+                  </div>
+                </div>
+                <div class="banner-buttons">
+                  <button class="banner-button" @click="confirmCurrentTemplate">
+                    <IconCheckOne />
+                    {{ t('editor.templatePreview.confirmCurrent') }}
+                  </button>
+                  <button
+                    v-if="hasLockedSlides && !showConfirmAllButton"
+                    class="banner-button banner-button-secondary"
+                    @click="promptConfirmAll"
+                  >
+                    <IconCheckOne />
+                    {{ t('editor.templatePreview.confirmAll') }}
+                  </button>
+                  <button
+                    v-if="showConfirmAllButton"
+                    class="banner-button banner-button-confirm"
+                    @click="confirmAllTemplates"
+                  >
+                    <IconCheckOne />
+                    {{ t('editor.templatePreview.confirmAllWarning') }}
+                  </button>
+                </div>
               </div>
             </div>
-            <div class="banner-buttons">
-              <button class="banner-button" @click="confirmCurrentTemplate">
-                <IconCheckOne />
-                Confirm & Start Editing
-              </button>
-              <button
-                v-if="hasLockedSlides && !showConfirmAllButton"
-                class="banner-button banner-button-secondary"
-                @click="promptConfirmAll"
-              >
-                <IconCheckOne />
-                Confirm All Slides
-              </button>
-              <button
-                v-if="showConfirmAllButton"
-                class="banner-button banner-button-confirm"
-                @click="confirmAllTemplates"
-              >
-                <IconCheckOne />
-                Click Again to Confirm All
-              </button>
-            </div>
-          </div>
-        </div>
 
-        <Canvas class="center-body" :readonly="mode === 'view'" />
-        <div v-if="mode === 'edit'" class="center-bottom" @click="openRemarkDrawer">
-          <div class="remark-preview">
-            <div
-              class="remark-content"
-              :class="{ empty: !currentSlide?.remark }"
-              v-html="currentSlide?.remark || ''"
-            ></div>
-            <div class="remark-hint">
-              <span>{{ currentSlide?.remark ? 'Click to edit notes' : 'Click to add notes' }}</span>
+            <Canvas class="center-body" :readonly="mode === 'view'" />
+            <div v-if="mode === 'edit'" class="center-bottom" @click="openRemarkDrawer">
+              <div class="remark-preview">
+                <div
+                  class="remark-content"
+                  :class="{ empty: !currentSlide?.remark }"
+                  v-html="currentSlide?.remark || ''"
+                ></div>
+                <div class="remark-hint">
+                  <span>{{
+                    currentSlide?.remark ? t('editor.remarks.clickToEdit') : t('editor.remarks.clickToAdd')
+                  }}</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
-      <Toolbar v-if="mode === 'edit'" class="layout-content-right" />
+      <div v-if="mode === 'edit'" class="layout-content-right">
+        <Transition name="panel-slide">
+          <Toolbar v-if="sidebarExpanded" class="toolbar-panel" />
+        </Transition>
+        <EditorSidebar class="editor-sidebar" />
+      </div>
     </div>
   </div>
 
@@ -65,11 +75,12 @@
     <SelectPanel v-if="showSelectPanel" />
     <SearchPanel v-if="showSearchPanel" />
     <NotesPanel v-if="showNotesPanel" />
+    <SymbolPanel v-if="showSymbolPanel" />
     <MarkupPanel v-if="showMarkupPanel" />
 
     <Drawer v-model:visible="showRemarkDrawer" placement="bottom">
       <template #title>
-        <span>Slide Remarks</span>
+        <span>{{ t('editor.remarks.title') }}</span>
       </template>
       <Remark v-model:height="remarkHeight" :style="{ height: `${remarkHeight}px` }" />
     </Drawer>
@@ -92,7 +103,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, inject } from 'vue';
+import { ref, computed, inject, onMounted } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useMainStore, useSlidesStore, useContainerStore } from '@/store';
 import useGlobalHotkey from '@/hooks/useGlobalHotkey';
@@ -100,8 +111,10 @@ import usePasteEvent from '@/hooks/usePasteEvent';
 import useSlideEditLock from '@/hooks/useSlideEditLock';
 import message from '@/utils/message';
 import { ToolbarStates } from '@/types/toolbar';
+import { useI18n } from 'vue-i18n';
 
 import EditorHeader from './EditorHeader/index.vue';
+import EditorSidebar from './EditorSidebar/index.vue';
 import Canvas from './Canvas/index.vue';
 import CanvasTool from './CanvasTool/index.vue';
 import Thumbnails from './Thumbnails/index.vue';
@@ -111,10 +124,13 @@ import ExportDialog from './ExportDialog/index.vue';
 import SelectPanel from './SelectPanel.vue';
 import SearchPanel from './SearchPanel.vue';
 import NotesPanel from './NotesPanel.vue';
+import SymbolPanel from './Toolbar/SymbolPanel.vue';
 import MarkupPanel from './MarkupPanel.vue';
 import AIPPTDialog from './AIPPTDialog.vue';
 import Modal from '@/components/Modal.vue';
 import Drawer from '@/components/Drawer.vue';
+
+const { t } = useI18n();
 
 const mainStore = useMainStore();
 const slidesStore = useSlidesStore();
@@ -125,8 +141,11 @@ const {
   showSelectPanel,
   showSearchPanel,
   showNotesPanel,
+  showSymbolPanel,
   showMarkupPanel,
+  showImageLibPanel,
   showAIPPTDialog,
+  sidebarExpanded,
 } = storeToRefs(mainStore);
 const { currentSlide } = storeToRefs(slidesStore);
 const {
@@ -152,7 +171,7 @@ const openRemarkDrawer = () => {
 const confirmCurrentTemplate = () => {
   confirmTemplate();
   mainStore.setToolbarState(ToolbarStates.SLIDE_DESIGN);
-  message.success('Template confirmed! You can now edit your slide.');
+  message.success(t('editor.templatePreview.successSingle'));
 };
 
 // Function to show confirm all button (first step)
@@ -170,7 +189,10 @@ const confirmAllTemplates = () => {
   mainStore.setToolbarState(ToolbarStates.SLIDE_DESIGN);
   showConfirmAllButton.value = false;
   message.success(
-    `Confirmed ${confirmedCount} slide${confirmedCount > 1 ? 's' : ''}! All slides are now editable.`
+    t('editor.templatePreview.successMultiple', {
+      count: confirmedCount,
+      plural: confirmedCount > 1 ? 's' : '',
+    })
   );
 };
 
@@ -179,6 +201,18 @@ const savePresentationFn = inject<(() => Promise<void>) | undefined>('savePresen
 
 useGlobalHotkey(savePresentationFn);
 usePasteEvent();
+
+// Restore sidebar state from localStorage
+onMounted(() => {
+  try {
+    const saved = localStorage.getItem('pptist-sidebar-expanded');
+    if (saved !== null) {
+      mainStore.setSidebarExpanded(JSON.parse(saved));
+    }
+  } catch (e) {
+    console.warn('Failed to restore sidebar state:', e);
+  }
+});
 </script>
 
 <style lang="scss" scoped>
@@ -187,11 +221,27 @@ usePasteEvent();
 }
 .layout-header {
   height: 40px;
+  flex-shrink: 0;
 }
 .layout-content {
   height: calc(100% - 40px);
   display: flex;
   position: relative;
+}
+.layout-content-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.canvas-tool {
+  height: 40px;
+  flex-shrink: 0;
+}
+.layout-content-columns {
+  flex: 1;
+  display: flex;
+  min-height: 0;
 }
 .layout-content-left {
   width: var(--thumbnails-width, 180px);
@@ -206,10 +256,6 @@ usePasteEvent();
   display: flex;
   flex-direction: column;
 
-  .center-top {
-    height: 40px;
-    flex-shrink: 0;
-  }
   .center-body {
     flex: 1;
     min-height: 0;
@@ -264,9 +310,20 @@ usePasteEvent();
   }
 }
 .layout-content-right {
-  width: var(--toolbar-width, 320px);
+  display: flex;
+  flex-direction: row;
   flex-shrink: 0;
   height: 100%;
+  transition: width 0.2s ease-in-out;
+}
+
+.editor-sidebar {
+  flex-shrink: 0;
+}
+
+.toolbar-panel {
+  flex-shrink: 0;
+  width: var(--toolbar-width, 320px);
 }
 
 .preview-mode-banner {
@@ -372,19 +429,13 @@ usePasteEvent();
 }
 
 .pptist-editor.view-mode {
+  .layout-content {
+    height: calc(100% - 40px); // No tab bar in view mode
+  }
+
   .layout-content-center {
     flex: 1;
     min-width: 0;
-  }
-
-  @media (max-width: 1200px) {
-    .layout-content-center {
-      height: calc(100% - 100px) !important;
-    }
-
-    .layout-content-right {
-      height: calc(100% - 100px) !important;
-    }
   }
 }
 
@@ -427,14 +478,14 @@ usePasteEvent();
     .banner-icon {
       width: 28px;
       height: 28px;
+      flex-shrink: 0;
       order: 1;
     }
 
     .banner-text {
-      min-width: 150px;
-      flex-basis: 100%;
+      flex: 1;
+      min-width: 0;
       order: 2;
-      margin-top: 4px;
     }
 
     .banner-title {
@@ -453,6 +504,7 @@ usePasteEvent();
 
     .banner-buttons {
       order: 3;
+      flex-basis: 100%;
       margin-top: 4px;
       flex-wrap: wrap;
     }
@@ -478,12 +530,23 @@ usePasteEvent();
 
   // Reposition thumbnails to bottom with horizontal layout
   .layout-content {
-    flex-wrap: wrap;
+    // Keep horizontal layout but constrain widths
+  }
+
+  .layout-content-main {
+    flex: 1;
+    min-width: 0;
+    min-height: 0;
+  }
+
+  .layout-content-columns {
+    flex-direction: column;
+    height: 100%;
   }
 
   .layout-thumbnails {
-    order: 3;
-    flex-basis: 100%;
+    order: 2;
+    flex-shrink: 0;
     width: 100% !important;
     height: 100px !important;
     border-top: 1px solid var(--presentation-border);
@@ -493,15 +556,15 @@ usePasteEvent();
 
   .layout-content-center {
     order: 1;
-    flex: 1 1 0;
-    min-width: 0;
-    height: calc(100% - 100px) !important;
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
   }
 
   .layout-content-right {
-    order: 2;
     flex-shrink: 0;
-    height: calc(100% - 100px) !important;
+    max-width: 410px;
   }
 }
 
@@ -518,5 +581,27 @@ usePasteEvent();
   50% {
     box-shadow: 0 0 16px rgba(251, 191, 36, 0.9);
   }
+}
+
+// Panel slide animation
+.panel-slide-enter-active,
+.panel-slide-leave-active {
+  transition: all 0.25s ease-out;
+}
+
+.panel-slide-enter-from {
+  transform: translateX(100%);
+  opacity: 0;
+}
+
+.panel-slide-leave-to {
+  transform: translateX(100%);
+  opacity: 0;
+}
+
+.panel-slide-enter-to,
+.panel-slide-leave-from {
+  transform: translateX(0);
+  opacity: 1;
 }
 </style>

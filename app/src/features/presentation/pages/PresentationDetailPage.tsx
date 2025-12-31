@@ -8,6 +8,7 @@ import {
   usePresentationValidation,
   useMessageRemote,
   useSavingIndicator,
+  useGeneratingStoreSync,
 } from '../hooks/useDetailPresentation';
 import { useUnsavedChangesBlocker } from '@/shared/hooks';
 import { UnsavedChangesDialog } from '@/shared/components/modals/UnsavedChangesDialog';
@@ -26,6 +27,8 @@ const DetailPage = () => {
   usePresentationValidation(id, presentation, isGeneratingParam);
   useMessageRemote();
   const { isSaving } = useSavingIndicator();
+  useGeneratingStoreSync(); // Sync Vue events to store
+  const isGenerating = usePresentationStore((state) => state.isGenerating); // Read from store
   const { request } = usePresentationStore();
 
   // Additional runtime safety check
@@ -53,7 +56,8 @@ const DetailPage = () => {
         className="vue-remote"
         LoadingComponent={() => <GlobalSpinner text={t('presentation')} />}
       />
-      {isSaving && <GlobalSpinner text={t('savingPresentation')} />}
+      {isGenerating && <GlobalSpinner text={t('generatingPresentation')} />}
+      {!isGenerating && isSaving && <GlobalSpinner text={t('savingPresentation')} />}
       <UnsavedChangesDialog
         open={showDialog}
         onOpenChange={setShowDialog}

@@ -55,6 +55,17 @@ export default {
       share: 'Chia sẻ',
     },
 
+    // Điều hướng breadcrumb
+    breadcrumb: {
+      presentations: 'Bài trình chiếu',
+    },
+
+    // Chỉnh sửa tiêu đề
+    title: {
+      updateSuccess: 'Đã cập nhật tiêu đề thành công',
+      updateError: 'Không thể cập nhật tiêu đề',
+    },
+
     // Hành động chỉnh sửa
     edit: {
       undo: 'Hoàn tác',

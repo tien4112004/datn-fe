@@ -24,7 +24,7 @@ function extractTitleFromOutline(outline: string): string {
 interface Presentation {
   id: string;
   title: string;
-  theme: SlideTheme;
+  theme?: SlideTheme;
   isParsed?: boolean;
   [key: string]: any;
 }
@@ -43,14 +43,12 @@ export function usePresentationProcessor(
 
   // API Mutations
   const { mutateAsync: getAiResult } = useAiResultById(presentationId);
-  const { mutateAsync: updateSlides } = useUpdateSlides(presentationId);
   const { mutateAsync: setParsed } = useSetParsed(presentationId);
   const { mutateAsync: generateImage } = useGenerateImage(presentationId);
 
   // Stores
   const generationStore = useGenerationStore();
   const slidesStore = useSlidesStore();
-  const saveStore = useSaveStore();
 
   // Save hook
   const { savePresentation: savePresentationFn } = useSavePresentation(presentationId, pinia);
@@ -72,24 +70,56 @@ export function usePresentationProcessor(
   }
 
   // 1. Initial Logic
-  if (presentation && !presentation.isParsed && !isGenerating) {
-    processFullAiResult();
-  } else if (!isGenerating && generationRequest) {
+  if (generationRequest && !generationStore.isStreaming) {
+    // New presentation with generation request - start streaming
     generationStore.startStreaming({
       ...generationRequest,
       presentationId: presentationId,
     });
+  } else if (presentation && !presentation.isParsed && !generationRequest) {
+    // Old unparsed presentation without generation request - fetch AI result
+    processFullAiResult();
   }
 
   // 2. Process non-streaming result
   async function processFullAiResult() {
     try {
       isProcessing.value = true;
-      const aiResult = await getAiResult();
+
+      // Get both slides and generation options from AI result
+      const { slides: aiResultSlides, generationOptions } = await getAiResult();
+
+      // Restore generation options to store if available
+      if (generationOptions) {
+        // Validate that required fields exist
+        if (!generationOptions.imageModel?.name) {
+          console.error('[processFullAiResult] Invalid generation options - missing model');
+        } else {
+          // Reconstruct the request object with the generation options
+          const reconstructedRequest = {
+            presentationId: presentationId,
+            outline: '', // Not needed for image generation
+            model: { name: '', provider: '' }, // Not needed for image generation
+            slideCount: aiResultSlides.length,
+            language: '',
+            presentation: {
+              theme: presentation?.theme || slidesStore.theme,
+              viewport: viewport,
+            },
+            generationOptions: generationOptions,
+          };
+          generationStore.setRequest(reconstructedRequest);
+        }
+      } else {
+        console.warn(
+          '[processFullAiResult] No generation options available - images will show error placeholders'
+        );
+      }
+
       const theme = presentation?.theme || slidesStore.theme;
 
       const slides = await Promise.all(
-        aiResult.map(async (slideData: any, i: number) => {
+        aiResultSlides.map(async (slideData: any, i: number) => {
           const template = await selectRandomTemplate(slideData.type);
           return convertToSlide(
             slideData as SlideLayoutSchema,
@@ -104,18 +134,45 @@ export function usePresentationProcessor(
       slidesStore.setSlides(slides);
       slidesStore.updateSlideIndex(slides.length - 1);
 
-      // Save presentation with full data (slides, metadata, thumbnail)
-      if (presentation) {
-        await savePresentationFn({
-          title: presentation.title,
-          slides: slidesStore.slides,
-          theme: slidesStore.theme,
-          viewport,
-          thumbnail: presentation.thumbnail,
-        });
+      // Generate images for slides that have image elements
+      const imageGenerationPromises: Promise<any>[] = [];
+
+      slides.forEach((slide, index) => {
+        const slideData = aiResultSlides[index];
+        const imageElement = slide.elements.find((el) => el.type === 'image') as PPTImageElement;
+
+        // Type guard: check if data has image property
+        const imagePrompt = slideData.data && 'image' in slideData.data ? slideData.data.image : undefined;
+
+        if (imageElement && imagePrompt) {
+          const promise = handleImageGeneration(slide.id, imageElement, imagePrompt);
+          imageGenerationPromises.push(promise);
+        }
+      });
+
+      // Wait for all image generations to complete
+      if (imageGenerationPromises.length > 0) {
+        await Promise.allSettled(imageGenerationPromises);
       }
 
-      await setParsed();
+      // Save presentation with full data (slides, metadata, thumbnail)
+      dispatchGeneratingEvent(true);
+
+      try {
+        if (presentation) {
+          await savePresentationFn({
+            title: presentation.title,
+            slides: slidesStore.slides,
+            theme: slidesStore.theme,
+            viewport,
+            thumbnail: presentation.thumbnail,
+          });
+        }
+
+        await setParsed();
+      } finally {
+        dispatchGeneratingEvent(false);
+      }
     } catch (error) {
       console.error('Error processing AI result:', error);
       dispatchMessage('error', 'Failed to process presentation');
@@ -150,29 +207,16 @@ export function usePresentationProcessor(
         // Get the actual slide ID from the store after insertion
         const addedSlideIndex = updatedSlides.length - 1;
         const actualSlideId = slidesStore.slides[addedSlideIndex]?.id;
-        console.debug(
-          '[ImageFlow] Slide added to store at index:',
-          addedSlideIndex,
-          'actual ID:',
-          actualSlideId
-        );
 
         // Handle Image Generation - USE ACTUAL SLIDE ID FROM STORE
         const imageElement = slide.elements.find((el) => el.type === 'image') as PPTImageElement;
         if (imageElement && actualSlideId) {
           const prompt = (streamedSlide.result as any).data?.image;
-          console.debug(
-            '[ImageFlow] Found image element for slide:',
-            actualSlideId,
-            'element:',
-            imageElement.id
-          );
           const promise = handleImageGeneration(actualSlideId, imageElement, prompt);
 
           // Track promise
           pendingImageGenerations.value.add(promise);
           promise.finally(() => {
-            console.debug('[ImageFlow] Image generation promise completed for slide:', actualSlideId);
             pendingImageGenerations.value.delete(promise);
           });
         }
@@ -189,21 +233,13 @@ export function usePresentationProcessor(
     prompt?: string
   ): Promise<{ success: boolean; error?: Error }> {
     const request = generationStore.request;
-    console.debug(
-      '[ImageFlow] handleImageGeneration called for slide:',
-      slideId,
-      'element:',
-      imageElement.id
-    );
 
     if (!prompt) {
-      console.warn('[ImageFlow] No prompt provided for slide:', slideId);
       await updateSlideImageInStoreWithError(slideId, imageElement.id);
       return { success: false, error: new Error('No prompt provided') };
     }
 
     if (!request?.generationOptions?.imageModel) {
-      console.warn('[ImageFlow] No image model configured for slide:', slideId);
       await updateSlideImageInStoreWithError(slideId, imageElement.id);
       return { success: false, error: new Error('No image model configured') };
     }
@@ -211,97 +247,120 @@ export function usePresentationProcessor(
     // Set loading state
     const loadingUrl =
       'https://upload.wikimedia.org/wikipedia/commons/a/ad/YouTube_loading_symbol_3_%28transparent%29.gif';
-    console.debug('[ImageFlow] Setting loading state for slide:', slideId);
     await updateSlideImageInStore(slideId, imageElement.id, loadingUrl);
 
     try {
       // Get current theme info
       const currentTheme = presentation?.theme || slidesStore.theme;
 
-      console.debug('[ImageFlow] Calling generateImage API for slide:', slideId);
-      const response: any = await generateImage({
+      const response = await generateImage({
         slideId,
         prompt,
         model: request.generationOptions.imageModel,
         themeStyle: currentTheme.id,
         themeDescription: currentTheme.modifiers || undefined,
         artStyle: request.generationOptions.artStyle || undefined,
-        artDescription: request.generationOptions.artStyleModifiers,
+        artStyleModifiers: request.generationOptions.artStyleModifiers,
       });
 
-      const imageUrl = response.images[0]?.url;
+      const imageUrl = response.imageUrl;
       if (imageUrl) {
-        console.info('[ImageFlow] Image generated for slide:', slideId);
         await updateSlideImageInStore(slideId, imageElement.id, imageUrl);
         return { success: true };
       } else {
-        console.error('[ImageFlow] No image URL in response for slide:', slideId, response);
+        console.error('No image URL in response for slide:', slideId);
         await updateSlideImageInStoreWithError(slideId, imageElement.id);
         return { success: false, error: new Error('No image URL in response') };
       }
     } catch (error) {
-      console.error('[ImageFlow] Image generation failed for slide:', slideId, error);
+      console.error('Image generation failed for slide:', slideId, error);
       await updateSlideImageInStoreWithError(slideId, imageElement.id);
       return { success: false, error: error as Error };
     }
   }
 
+  // Helper to convert URL to base64
+  async function urlToBase64(url: string): Promise<string> {
+    try {
+      const response = await fetch(url);
+      const blob = await response.blob();
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    } catch (error) {
+      console.error('Failed to convert URL to base64:', error);
+      throw error;
+    }
+  }
+
   // Helper to update store specific image
   async function updateSlideImageInStore(slideId: string, elementId: string, url: string) {
-    console.debug('[ImageFlow] updateSlideImageInStore called:', { slideId, elementId });
-
     const slideIndex = slidesStore.slides.findIndex((s) => s.id === slideId);
-    console.debug('[ImageFlow] Slide index found:', slideIndex);
 
     if (slideIndex === -1) {
-      console.error('[ImageFlow] Slide not found in store:', slideId);
+      console.error('Slide not found in store:', slideId);
       return;
     }
 
     const slide = { ...slidesStore.slides[slideIndex] };
-    console.debug('[ImageFlow] Slide elements count:', slide.elements.length);
-
     const elementIndex = slide.elements.findIndex((el) => el.id === elementId);
-    console.debug('[ImageFlow] Element index found:', elementIndex);
 
     if (elementIndex === -1) {
-      console.error('[ImageFlow] Element not found in slide:', elementId);
+      console.error('Element not found in slide:', elementId);
       return;
     }
 
-    console.debug('[ImageFlow] Updating image source for element:', elementId);
-    const updatedElement = await updateImageSource(slide.elements[elementIndex] as PPTImageElement, url);
+    // Convert URL to base64 for portability
+    let imageData = url;
+    if (!url.startsWith('data:')) {
+      try {
+        imageData = await urlToBase64(url);
+      } catch (error) {
+        console.error('Failed to convert image to base64, using URL fallback:', error);
+        // Fall back to URL if conversion fails
+      }
+    }
+
+    const updatedElement = await updateImageSource(
+      slide.elements[elementIndex] as PPTImageElement,
+      imageData
+    );
     slide.elements = [...slide.elements];
     slide.elements[elementIndex] = updatedElement;
 
     const newSlides = [...slidesStore.slides];
     newSlides[slideIndex] = slide;
-    console.info('[ImageFlow] Updated slide image in store:', slideId, elementId);
     slidesStore.setSlides(newSlides);
   }
 
   // Helper to update slide with error placeholder
   async function updateSlideImageInStoreWithError(slideId: string, elementId: string) {
-    console.warn('[ImageFlow] Setting error placeholder for element:', elementId);
-
     const slideIndex = slidesStore.slides.findIndex((s) => s.id === slideId);
     if (slideIndex === -1) {
-      console.error('[ImageFlow] Slide not found for error update:', slideId);
+      console.error('Slide not found for error update:', slideId);
       return;
     }
 
     const slide = { ...slidesStore.slides[slideIndex] };
     const elementIndex = slide.elements.findIndex((el) => el.id === elementId);
     if (elementIndex === -1) {
-      console.error('[ImageFlow] Element not found for error update:', elementId);
+      console.error('Element not found for error update:', elementId);
       return;
     }
 
     // Update element with error placeholder and error flag
     const element = slide.elements[elementIndex] as PPTImageElement;
+
+    // Use inline SVG error icon (no external fetch needed, avoids CORS issues)
+    const errorIconSrc =
+      'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48Y2lyY2xlIGN4PSIxNiIgY3k9IjE2IiByPSIxNSIgZmlsbD0iI2RjMzU0NSIvPjxsaW5lIHgxPSIxMCIgeTE9IjEwIiB4Mj0iMjIiIHkyPSIyMiIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48bGluZSB4MT0iMjIiIHkxPSIxMCIgeDI9IjEwIiB5Mj0iMjIiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMyIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PC9zdmc+';
+
     const updatedElement = {
       ...element,
-      src: 'https://www.freeiconspng.com/uploads/error-icon-32.png', // Placeholder URL as specified
+      src: errorIconSrc,
       hasError: true, // Error flag
     } as any;
 
@@ -311,7 +370,6 @@ export function usePresentationProcessor(
     const newSlides = [...slidesStore.slides];
     newSlides[slideIndex] = slide;
 
-    console.warn('[ImageFlow] Set error placeholder for slide:', slideId, 'element:', elementId);
     slidesStore.setSlides(newSlides);
   }
 
@@ -336,75 +394,44 @@ export function usePresentationProcessor(
     async (isStreaming, wasStreaming) => {
       if (wasStreaming && !isStreaming) {
         try {
-          console.info('[ImageFlow] Streaming stopped; beginning finalization.');
-
           // STEP 1: Wait for all slide processing to complete
           if (pendingSlideProcessing.value.size > 0) {
-            console.info(
-              '[ImageFlow] Waiting for',
-              pendingSlideProcessing.value.size,
-              'slide processing operations to complete...'
-            );
             await Promise.all(Array.from(pendingSlideProcessing.value));
-            console.info('[ImageFlow] All slides processed');
-          } else {
-            console.info('[ImageFlow] No pending slide processing');
           }
 
           // STEP 2: Wait for all image generations to complete (including all retries)
           if (pendingImageGenerations.value.size > 0) {
-            console.info(
-              '[ImageFlow] Waiting for',
-              pendingImageGenerations.value.size,
-              'pending image generations...'
-            );
-
-            // Create array of promises at this moment
             const promisesToWait = Array.from(pendingImageGenerations.value);
-            console.info('[ImageFlow] Tracking', promisesToWait.length, 'promises to completion');
-
-            const results = await Promise.allSettled(promisesToWait);
-
-            // Log results
-            const successful = results.filter((r) => r.status === 'fulfilled').length;
-            const failed = results.filter((r) => r.status === 'rejected').length;
-            console.info(
-              '[ImageFlow] Image generation complete:',
-              successful,
-              'successful,',
-              failed,
-              'failed'
-            );
-
-            if (failed > 0) {
-              console.warn('[ImageFlow] Some images failed to generate but continuing with finalization');
-            }
-          } else {
-            console.info('[ImageFlow] No pending image generations');
+            await Promise.allSettled(promisesToWait);
           }
 
           // STEP 3: Run finalization logic (ONLY after ALL slides processed and ALL images complete)
-          console.info('[ImageFlow] Starting finalization: savePresentation → setParsed');
 
-          // Extract title from outline markdown (first ## heading)
-          const title =
-            presentation?.title ||
-            (generationRequest?.outline
-              ? extractTitleFromOutline(generationRequest.outline)
-              : 'Untitled Presentation');
+          // Dispatch generating event BEFORE saving
+          dispatchGeneratingEvent(true);
 
-          // Save presentation with all data (slides, metadata, thumbnail)
-          await savePresentationFn({
-            title,
-            slides: slidesStore.slides,
-            theme: slidesStore.theme,
-            viewport,
-            thumbnail: presentation?.thumbnail,
-          });
+          try {
+            // Extract title from outline markdown (first ## heading)
+            const title =
+              presentation?.title ||
+              (generationRequest?.outline
+                ? extractTitleFromOutline(generationRequest.outline)
+                : 'Untitled Presentation');
 
-          await setParsed();
+            // Save presentation with all data (slides, metadata, thumbnail)
+            await savePresentationFn({
+              title,
+              slides: slidesStore.slides,
+              theme: slidesStore.theme,
+              viewport,
+              thumbnail: presentation?.thumbnail,
+            });
 
-          console.log('[ImageFlow] ✅ Finalization complete');
+            await setParsed();
+          } finally {
+            // Always clear generating state
+            dispatchGeneratingEvent(false);
+          }
 
           processedStreamDataRef.value = [];
           generationStore.clearStreamedData();
@@ -429,6 +456,14 @@ export function usePresentationProcessor(
 
   function dispatchMessage(type: string, message: string) {
     window.dispatchEvent(new CustomEvent('app.message', { detail: { type, message } }));
+  }
+
+  function dispatchGeneratingEvent(isGenerating: boolean) {
+    window.dispatchEvent(
+      new CustomEvent('app.presentation.generating', {
+        detail: { isGenerating },
+      })
+    );
   }
 
   return { isProcessing };

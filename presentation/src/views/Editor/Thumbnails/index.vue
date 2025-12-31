@@ -11,7 +11,9 @@
         class="tw-flex tw-gap-[1px] tw-h-10 tw-cursor-pointer tw-rounded-md tw-text-sm tw-transition-all tw-duration-200 tw-ease-in-out"
       >
         <Button @click="createSlide()">
-          <IconPlus class="tw-h-3.5 tw-w-3.5" />{{ $t('thumbnails.slides.addSlide') }}
+          <IconPlus class="tw-h-3.5 tw-w-3.5" /><span class="button-text">{{
+            $t('thumbnails.slides.addSlide')
+          }}</span>
         </Button>
         <Popover trigger="click" placement="bottom-start" v-model:value="presetLayoutPopoverVisible" center>
           <template #content>
@@ -582,6 +584,26 @@ const contextmenusThumbnailItem = (): ContextmenuItem[] => {
   .tw-w-full {
     width: auto !important;
     flex-shrink: 0;
+
+    :deep(.button-group) {
+      gap: 0 !important;
+      height: 2rem;
+    }
+
+    :deep(button) {
+      padding: 0.5rem;
+      font-size: 0.75rem;
+      gap: 0;
+
+      svg {
+        width: 1rem;
+        height: 1rem;
+      }
+
+      .button-text {
+        display: none;
+      }
+    }
   }
 
   .thumbnail-list {

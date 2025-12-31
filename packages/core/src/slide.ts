@@ -1,3 +1,5 @@
+import type { LayoutType, TemplateParameter } from './types/template';
+
 export const SHAPE_PATH_FORMULAS_KEYS = {
   ROUND_RECT: 'roundRect',
   ROUND_RECT_CUSTOM: 'roundRectCustom',
@@ -342,6 +344,7 @@ export interface ShapeText {
   defaultFontName: string;
   defaultColor: string;
   align: ShapeTextAlign;
+  lineHeight?: number;
   type?: TextType;
 }
 
@@ -762,7 +765,8 @@ export interface SectionTag {
   title?: string;
 }
 
-export type SlideType = 'cover' | 'contents' | 'transition' | 'content' | 'end';
+// Re-export LayoutType for convenience
+export type { LayoutType } from './types/template';
 
 /**
  * Layout metadata for template switching
@@ -776,8 +780,8 @@ export interface SlideLayoutMetadata {
   layoutType: string;
   /** Template preview mode - true means slide is locked for editing until template is confirmed */
   isTemplatePreview?: boolean;
-  /** User-customized template parameters (e.g., { IMAGE_RATIO: 0.5, SIDE_PADDING: 40 }) */
-  parameterOverrides?: Record<string, number>;
+  /** User-customized template parameters (e.g., { IMAGE_RATIO: 0.5, SIDE_PADDING: 40, ENABLE_WRAP: true }) */
+  parameterOverrides?: Record<string, number | boolean>;
 }
 
 /**
@@ -797,7 +801,7 @@ export interface SlideLayoutMetadata {
  *
  * turningMode?: turning mode
  *
- * slideType?: page type
+ * type?: layout type (from templates - single source of truth)
  *
  * layout?: layout metadata for template switching (AI-generated slides only)
  */
@@ -810,7 +814,7 @@ export interface Slide {
   animations?: PPTAnimation[];
   turningMode?: TurningMode;
   sectionTag?: SectionTag;
-  type?: SlideType;
+  type?: LayoutType;
   layout?: SlideLayoutMetadata;
 }
 
@@ -853,31 +857,24 @@ export interface SlideTheme {
     shadow: PPTElementShadow;
   };
 
-  createdAt?: string;     // ISO date string
-  updatedAt?: string;     // ISO date string
+  createdAt?: string; // ISO date string
+  updatedAt?: string; // ISO date string
 }
 
 export interface SlideTemplate {
   id: string;
   name: string;
-  layout: string;         // Template layout type (e.g., 'list', 'title', 'twoColumn')
-  config: {               // Layout configuration
+  layout: string; // Template layout type (e.g., 'list', 'title', 'twoColumn')
+  config: {
+    // Layout configuration
     containers: Record<string, any>;
     [key: string]: any;
   };
   cover?: string;
-  graphics?: any[];       // Graphics elements
-  parameters?: Array<{    // Template parameters
-    key: string;
-    label: string;
-    defaultValue: number;
-    min?: number;
-    max?: number;
-    step?: number;
-    description?: string;
-  }>;
-  createdAt?: string;     // ISO date string
-  updatedAt?: string;     // ISO date string
+  graphics?: any[]; // Graphics elements
+  parameters?: TemplateParameter[]; // Template parameters (supports number and boolean types)
+  createdAt?: string; // ISO date string
+  updatedAt?: string; // ISO date string
 }
 
 export interface SlideViewport {

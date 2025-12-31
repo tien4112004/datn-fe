@@ -7,8 +7,11 @@ export default {
       horizontalTextBox: 'Hộp văn bản ngang',
       verticalTextBox: 'Hộp văn bản dọc',
       insertShape: 'Chèn hình dạng',
+      presetShapes: 'Hình dạng có sẵn',
       freehandDrawing: 'Vẽ tự do',
       insertImage: 'Chèn hình ảnh',
+      uploadImage: 'Tải lên hình ảnh',
+      onlineLibrary: 'Thư viện trực tuyến',
       insertLine: 'Chèn đường thẳng',
       insertChart: 'Chèn biểu đồ',
       insertTable: 'Chèn bảng',
@@ -34,6 +37,8 @@ export default {
       transition: 'Chuyển trang',
       styleMulti: 'Kiểu dáng (Chọn nhiều)',
       positionMulti: 'Vị trí (Chọn nhiều)',
+      imageLibrary: 'Thư viện ảnh',
+      aiModification: 'AI Sửa đổi',
     },
 
     // Bảng chọn mẫu slide
@@ -46,6 +51,7 @@ export default {
       confirmButton: 'Dùng mẫu này & Bắt đầu chỉnh sửa',
       customizeParameters: 'Tùy chỉnh bố cục',
       resetToDefaults: 'Đặt lại mặc định',
+      confirmSuccess: 'Xác nhận mẫu! Bạn có thể chỉnh sửa slide của mình.',
     },
 
     // Công cụ biểu đồ

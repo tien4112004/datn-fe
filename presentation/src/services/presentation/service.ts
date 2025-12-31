@@ -1,9 +1,10 @@
 import { api } from '@aiprimary/api';
 import type { ApiResponse } from '@aiprimary/api';
 import type { PresentationGenerationRequest, PresentationGenerationStartResponse } from './types';
+import type { ImageGenerationParams } from '../image/types';
 import type { ApiService } from '@aiprimary/api';
 import { getBackendUrl } from '@aiprimary/api';
-import type { Presentation, Slide, SlideLayoutSchema } from '@aiprimary/core';
+import type { Presentation, Slide, SlideLayoutSchema, SlideTheme } from '@aiprimary/core';
 
 const BASE_URL = getBackendUrl();
 
@@ -22,11 +23,39 @@ export class PresentationApiService implements ApiService {
    * Get AI result for a presentation by ID
    * Used during parsing phase to retrieve generated slide layouts
    */
-  async getAiResultById(id: string): Promise<SlideLayoutSchema[]> {
-    const response = await api.get<ApiResponse<SlideLayoutSchema[]>>(
-      `${this.baseUrl}/api/presentations/${id}/ai-result`
-    );
-    return response.data.data;
+  async getAiResultById(id: string): Promise<{
+    slides: SlideLayoutSchema[];
+    generationOptions?: Omit<ImageGenerationParams, 'prompt' | 'slideId'>;
+  }> {
+    const response = await api.get<ApiResponse<any>>(`${this.baseUrl}/api/presentations/${id}/ai-result`);
+
+    const rawData = response.data.data;
+
+    // Extract the result field from the response
+    const data = rawData.result || rawData;
+
+    // Parse slides
+    let slides: SlideLayoutSchema[];
+    if (typeof data === 'string') {
+      slides = data
+        .split('\n')
+        .filter((line) => line.trim().length > 0)
+        .map((line) => JSON.parse(line));
+    } else {
+      slides = data;
+    }
+
+    // Parse generation options if available
+    let generationOptions: Omit<ImageGenerationParams, 'prompt' | 'slideId'> | undefined;
+    if (rawData.generationOptions) {
+      try {
+        generationOptions = JSON.parse(rawData.generationOptions);
+      } catch (error) {
+        console.error('[getAiResultById] Failed to parse generation options:', error);
+      }
+    }
+
+    return { slides, generationOptions };
   }
 
   /**
@@ -114,11 +143,24 @@ export class PresentationApiService implements ApiService {
           try {
             while (true) {
               const { done, value } = await reader.read();
-              if (done) break;
+              if (done) {
+                // Stream completed successfully - cancel to properly close the HTTP/2 stream
+                await reader.cancel();
+                break;
+              }
 
               const text = new TextDecoder().decode(value);
               yield text;
             }
+          } catch (error) {
+            // Cancel the reader on error to properly close the stream
+            try {
+              await reader.cancel();
+            } catch (cancelError) {
+              // Ignore cancel errors
+              console.warn('Failed to cancel reader:', cancelError);
+            }
+            throw error;
           } finally {
             reader.releaseLock();
           }
@@ -142,12 +184,55 @@ export class PresentationApiService implements ApiService {
   /**
    * Update presentation data
    */
-  async updatePresentation(id: string, data: Presentation): Promise<Presentation> {
-    const response = await api.put<ApiResponse<Presentation>>(
-      `${this.baseUrl}/api/presentations/${id}`,
-      data
+  async updatePresentation(id: string, data: Presentation | FormData): Promise<any> {
+    const config = data instanceof FormData ? { headers: { 'Content-Type': 'multipart/form-data' } } : {};
+
+    await api.put<ApiResponse<Presentation>>(`${this.baseUrl}/api/presentations/${id}`, data, config);
+  }
+
+  /**
+   * Get slide themes from the backend with pagination support
+   */
+  async getSlideThemes(params?: { page?: number; limit?: number }): Promise<{
+    data: SlideTheme[];
+    total: number;
+    page: number;
+    limit: number;
+    hasMore: boolean;
+  }> {
+    const page = (params?.page ?? 0) + 1;
+    const limit = params?.limit ?? 10;
+
+    const response = await api.get<ApiResponse<any>>(
+      `${this.baseUrl}/api/slide-themes?page=${page}&limit=${limit}`
     );
-    return this._mapPresentationItem(response.data.data);
+
+    const responseData = response.data.data;
+
+    // Handle both paginated and non-paginated responses for backward compatibility
+    if (Array.isArray(responseData)) {
+      // Old API response format (no pagination)
+      return {
+        data: responseData,
+        total: responseData.length,
+        page: 0,
+        limit: responseData.length,
+        hasMore: false,
+      };
+    }
+
+    // New paginated API response
+    const backendPage = responseData.page ?? page;
+    const backendLimit = responseData.limit ?? responseData.size ?? limit;
+    const total = responseData.total || responseData.totalElements || 0;
+
+    return {
+      data: responseData.data || responseData.content || [],
+      total,
+      page: backendPage - 1, // Convert from 1-based (backend) to 0-based (frontend)
+      limit: backendLimit,
+      hasMore: responseData.hasMore ?? backendPage * backendLimit < total,
+    };
   }
 
   _mapPresentationItem(data: any): Presentation {
@@ -158,7 +243,7 @@ export class PresentationApiService implements ApiService {
       theme: data.theme,
       viewport: data.viewport,
       slides: data.slides,
-      isParsed: data.parsed || false,
+      isParsed: data.parsed || data.isParsed || false,
     };
   }
 }

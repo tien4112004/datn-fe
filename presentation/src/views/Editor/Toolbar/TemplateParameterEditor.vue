@@ -8,26 +8,53 @@
 
     <div class="tw-space-y-4">
       <div v-for="param in parameters" :key="param.key" class="parameter-control">
-        <div class="tw-flex tw-items-center tw-justify-between tw-mb-2">
-          <label class="tw-text-xs tw-font-medium tw-text-muted-foreground">
-            {{ param.label }}
-          </label>
-          <span class="tw-text-xs tw-text-muted-foreground tw-font-mono">
-            {{ formatValue(param, localValues[param.key]) }}
-          </span>
+        <!-- Boolean Parameter -->
+        <div v-if="param.type === 'boolean'" class="tw-flex tw-items-center tw-justify-between">
+          <div class="tw-flex-1">
+            <label class="tw-text-xs tw-font-medium tw-text-muted-foreground">
+              {{ getParameterLabel(param) }}
+            </label>
+            <p
+              v-if="getParameterDescription(param)"
+              class="tw-text-xs tw-text-gray-400 tw-mt-1 tw-leading-tight"
+            >
+              {{ getParameterDescription(param) }}
+            </p>
+          </div>
+          <input
+            type="checkbox"
+            :checked="Boolean(localValues[param.key])"
+            @change="(e) => handleParameterChange(param.key, (e.target as HTMLInputElement).checked)"
+            class="tw-w-4 tw-h-4 tw-rounded tw-border-gray-300 tw-text-blue-600 focus:tw-ring-blue-500"
+          />
         </div>
 
-        <Slider
-          :value="localValues[param.key]"
-          :min="param.min ?? 0"
-          :max="param.max ?? 100"
-          :step="param.step ?? 1"
-          @update:value="(value) => handleParameterChange(param.key, value as any)"
-        />
+        <!-- Number Parameter -->
+        <div v-else>
+          <div class="tw-flex tw-items-center tw-justify-between tw-mb-2">
+            <label class="tw-text-xs tw-font-medium tw-text-muted-foreground">
+              {{ getParameterLabel(param) }}
+            </label>
+            <span class="tw-text-xs tw-text-muted-foreground tw-font-mono">
+              {{ formatValue(param, localValues[param.key]) }}
+            </span>
+          </div>
 
-        <p v-if="param.description" class="tw-text-xs tw-text-gray-400 tw-mt-1 tw-leading-tight">
-          {{ param.description }}
-        </p>
+          <Slider
+            :value="Number(localValues[param.key])"
+            :min="param.min ?? 0"
+            :max="param.max ?? 100"
+            :step="param.step ?? 1"
+            @update:value="(value) => handleParameterChange(param.key, value as any)"
+          />
+
+          <p
+            v-if="getParameterDescription(param)"
+            class="tw-text-xs tw-text-gray-400 tw-mt-1 tw-leading-tight"
+          >
+            {{ getParameterDescription(param) }}
+          </p>
+        </div>
       </div>
     </div>
 
@@ -47,20 +74,24 @@ import type { TemplateParameter } from '@/utils/slideLayout/types';
 import { debounce } from 'lodash';
 import Slider from '@/components/Slider.vue';
 import Button from '@/components/Button.vue';
+import { useParameterLocalization } from '@/composables/useParameterLocalization';
 
 interface Props {
   parameters?: TemplateParameter[];
-  currentValues?: Record<string, number>;
+  currentValues?: Record<string, number | boolean>;
 }
 
 interface Emits {
-  (e: 'update', values: Record<string, number>): void;
+  (e: 'update', values: Record<string, number | boolean>): void;
 }
 
 const props = defineProps<Props>();
 const emit = defineEmits<Emits>();
 
-const localValues = ref<Record<string, number>>({});
+// Initialize localization composable
+const { getParameterLabel, getParameterDescription, formatValue } = useParameterLocalization();
+
+const localValues = ref<Record<string, number | boolean>>({});
 
 const hasParameters = computed(() => props.parameters && props.parameters.length > 0);
 
@@ -78,7 +109,7 @@ const hasChanges = computed(() => {
 const initializeValues = () => {
   if (!props.parameters) return;
 
-  const values: Record<string, number> = {};
+  const values: Record<string, number | boolean> = {};
   for (const param of props.parameters) {
     values[param.key] = props.currentValues?.[param.key] ?? param.defaultValue;
   }
@@ -86,39 +117,16 @@ const initializeValues = () => {
 };
 
 /**
- * IMPORTANT: Update this function when adding new parameter types!
- *
- * Format parameter value for display
- */
-const formatValue = (param: TemplateParameter, value: number): string => {
-  // Check if the label suggests this is a ratio (percentage)
-  if (param.label.toLowerCase().includes('ratio')) {
-    return `${(value * 100).toFixed(0)}%`;
-  }
-
-  // Check if the label suggests pixels
-  if (
-    param.label.toLowerCase().includes('px') ||
-    param.label.toLowerCase().includes('padding') ||
-    param.label.toLowerCase().includes('spacing')
-  ) {
-    return `${value}px`;
-  }
-
-  return value.toString();
-};
-
-/**
  * Debounced parameter update to avoid excessive re-renders
  */
-const debouncedUpdate = debounce((values: Record<string, number>) => {
+const debouncedUpdate = debounce((values: Record<string, number | boolean>) => {
   emit('update', values);
 }, 100);
 
 /**
  * Handle parameter value change
  */
-const handleParameterChange = (key: string, value: number) => {
+const handleParameterChange = (key: string, value: number | boolean) => {
   localValues.value = {
     ...localValues.value,
     [key]: value,
@@ -133,7 +141,7 @@ const handleParameterChange = (key: string, value: number) => {
 const resetToDefaults = () => {
   if (!props.parameters) return;
 
-  const defaults: Record<string, number> = {};
+  const defaults: Record<string, number | boolean> = {};
   for (const param of props.parameters) {
     defaults[param.key] = param.defaultValue;
   }

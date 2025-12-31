@@ -15,8 +15,17 @@ import type { Bounds } from './template';
  * - 'space-between': Items at edges, equal space between
  * - 'space-around': Equal space around each item
  * - Ratio (e.g., '30/70', '1/2/1'): Proportional sizing
+ * - 'maxLabel/fill': Content-aware label sizing (measures all labels, uses max width)
+ * - Pixel-based (e.g., '120px/fill', 'calc(150)/fill'): Fixed pixel width for first child, remaining for second
  */
-export type DistributionType = 'equal' | 'space-between' | 'space-around' | `${number}/${number}`;
+export type DistributionType =
+  | 'equal'
+  | 'space-between'
+  | 'space-around'
+  | 'maxLabel/fill'
+  | `${number}/${number}`
+  | `${number}px/fill`
+  | `calc(${number})/fill`;
 export type HorizontalAlignment = 'left' | 'center' | 'right';
 export type VerticalAlignment = 'top' | 'center' | 'bottom';
 export type Orientation = 'horizontal' | 'vertical';

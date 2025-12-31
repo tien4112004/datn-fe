@@ -7,6 +7,8 @@ import { generateId } from '@/shared/lib/utils';
 import { getAllDescendantNodes, getRootNodeOfSubtree, getOppositeSide } from '../services/utils';
 import { useCoreStore } from './core';
 import { useUndoRedoStore } from './undoredo';
+import i18next from 'i18next';
+import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 
 export interface NodeManipulationState {
   collapse: (nodeId: string, side: Side) => void;
@@ -146,7 +148,7 @@ export const useNodeManipulationStore = create<NodeManipulationState>()(
         const descendantNodes = getAllDescendantNodes(sourceId, nodes);
 
         if (descendantNodes.some((node) => node.id === targetId)) {
-          toast.error('Cannot move a node to one of its descendants.');
+          toast.error(i18next.t('errors.cannotMoveToDescendant', { ns: I18N_NAMESPACES.MINDMAP }));
           return;
         }
 

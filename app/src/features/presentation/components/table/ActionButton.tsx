@@ -5,19 +5,18 @@ import { Button } from '@/components/ui/button';
 
 type ActionButtonProps = {
   onViewDetail?: () => void;
-  onEdit?: () => void;
   onDelete?: () => void;
   onRename?: () => void;
 };
 
-const ActionButton = ({ onViewDetail, onEdit, onDelete, onRename }: ActionButtonProps) => {
+const ActionButton = ({ onViewDetail, onDelete, onRename }: ActionButtonProps) => {
   return (
     <Popover>
       <PopoverTrigger asChild>
         <EllipsisVerticalIcon className="h-5 w-5 cursor-pointer text-gray-500 hover:text-gray-700" />
       </PopoverTrigger>
       <PopoverContent className="w-48">
-        <ActionContent onEdit={onEdit} onDelete={onDelete} onViewDetail={onViewDetail} onRename={onRename} />
+        <ActionContent onDelete={onDelete} onViewDetail={onViewDetail} onRename={onRename} />
       </PopoverContent>
     </Popover>
   );
@@ -25,7 +24,7 @@ const ActionButton = ({ onViewDetail, onEdit, onDelete, onRename }: ActionButton
 
 export default ActionButton;
 
-export const ActionContent = ({ onViewDetail, onEdit, onDelete, onRename }: ActionButtonProps) => {
+export const ActionContent = ({ onViewDetail, onDelete, onRename }: ActionButtonProps) => {
   const { t } = useTranslation('glossary');
 
   return (
@@ -33,10 +32,6 @@ export const ActionContent = ({ onViewDetail, onEdit, onDelete, onRename }: Acti
       <Button onClick={onViewDetail} className="justify-start" variant={'ghost'}>
         <Eye className="mr-2 h-4 w-4" />
         {t('actions.viewDetails')}
-      </Button>
-      <Button onClick={onEdit} className="justify-start" variant={'ghost'}>
-        <Edit className="mr-2 h-4 w-4" />
-        {t('actions.edit')}
       </Button>
       <Button
         onClick={onDelete}

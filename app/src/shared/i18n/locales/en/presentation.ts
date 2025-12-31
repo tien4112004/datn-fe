@@ -131,6 +131,7 @@ export default {
     title: 'Presentation List',
     generateNewPresentation: 'Generate New Presentation',
     createBlankPresentation: 'Create Blank Presentation',
+    untitledPresentation: 'Untitled Presentation',
     filenameDialog: {
       title: 'Rename Presentation',
       placeholder: 'Enter new name for the presentation',
@@ -145,5 +146,9 @@ export default {
     themeRequired: 'Theme is required',
     artStyleRequired: 'Art style is required',
     imageModelRequired: 'Image model is required',
+  },
+  generation: {
+    outlineError: 'Error generating outline. Please try again.',
+    presentationError: 'Error generating presentation. Please try again.',
   },
 };

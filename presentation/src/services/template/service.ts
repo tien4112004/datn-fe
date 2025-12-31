@@ -16,16 +16,35 @@ export class TemplateApiService implements ITemplateApi {
   }
 
   async getSlideTemplates(): Promise<SlideTemplate[]> {
-    const res = await api.get<ApiResponse<SlideTemplate[]>>(`${this.baseUrl}/api/slide-templates`, {
-      params: { pageSize: 1000 },
-    });
-    return res.data.data;
+    try {
+      const res = await api.get<ApiResponse<SlideTemplate[]>>(`${this.baseUrl}/api/slide-templates`, {
+        params: { pageSize: 1000 },
+      });
+
+      // Check if response has expected structure
+      if (!res?.data?.data) {
+        console.warn('API response missing data.data property:', res);
+        return [];
+      }
+
+      return res.data.data;
+    } catch (error) {
+      console.warn('Failed to fetch slide templates from API, will use frontend-data fallback:', error);
+      return [];
+    }
   }
 
   async getSlideTemplatesByLayout(layoutType: string): Promise<SlideTemplate[]> {
-    const res = await api.get<ApiResponse<SlideTemplate[]>>(`${this.baseUrl}/api/slide-templates`, {
-      params: { layout: layoutType, pageSize: 1000 },
-    });
-    return res.data.data;
+    try {
+      // API doesn't support layout filtering, so fetch all and filter client-side
+      const allTemplates = await this.getSlideTemplates();
+      return allTemplates.filter((template) => template.layout === layoutType);
+    } catch (error) {
+      console.warn(
+        `Failed to fetch slide templates for layout "${layoutType}" from API, will use frontend-data fallback:`,
+        error
+      );
+      return [];
+    }
   }
 }

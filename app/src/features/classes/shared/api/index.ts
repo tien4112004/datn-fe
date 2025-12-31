@@ -1,19 +1,20 @@
 import type { ClassApiService } from '../types';
 import ClassMockApiService from './mock';
 import ClassRealApiService from './service';
-import { createApiServiceFactory, getApiServiceFactory } from '@/shared/api';
 import { getBackendUrl } from '@/shared/utils/backend-url';
 
 export const useClassApiService = (): ClassApiService => {
   const backendUrl = getBackendUrl();
 
-  return createApiServiceFactory<ClassApiService>(ClassMockApiService, ClassRealApiService, backendUrl);
+  // Force mock service for Classes module
+  return new ClassMockApiService(backendUrl);
 };
 
 export const getClassApiService = (): ClassApiService => {
   const backendUrl = getBackendUrl();
 
-  return getApiServiceFactory<ClassApiService>(ClassMockApiService, ClassRealApiService, backendUrl);
+  // Force mock service for Classes module
+  return new ClassMockApiService(backendUrl);
 };
 
 // Deprecated: Use useClassApiService() hook instead

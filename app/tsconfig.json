@@ -1,7 +1,6 @@
 {
   "extends": "./tsconfig.app.json",
   "compilerOptions": {
-    "baseUrl": ".",
     "paths": {
       "@/components/*": ["./src/shared/components/*"],
       "@/utils/*": ["./src/shared/lib/utils/*"],

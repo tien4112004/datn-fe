@@ -69,6 +69,20 @@ export function SlideThemesPage() {
         header: 'Font',
         cell: (info) => info.getValue() || '-',
       }),
+      columnHelper.accessor('modifiers', {
+        header: 'Modifiers',
+        cell: (info) => {
+          const modifiers = info.getValue();
+          if (!modifiers || modifiers.trim() === '') {
+            return <span className="text-destructive font-medium">Not set - Update required</span>;
+          }
+          return (
+            <span className="text-muted-foreground text-sm" title={modifiers}>
+              {modifiers.length > 30 ? `${modifiers.substring(0, 30)}...` : modifiers}
+            </span>
+          );
+        },
+      }),
       columnHelper.accessor('themeColors', {
         header: 'Theme Colors',
         cell: (info) => {

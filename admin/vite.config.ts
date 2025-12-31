@@ -7,6 +7,18 @@ import path from 'path';
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
+
+  // Configure URLs with production fallbacks
+  const apiUrl =
+    env.NODE_ENV === 'production'
+      ? 'https://api.huy-devops.site'
+      : env.VITE_API_URL || 'http://localhost:3000';
+
+  const presentationUrl =
+    env.NODE_ENV === 'production'
+      ? 'https://presentation.huy-devops.site'
+      : env.VITE_PRESENTATION_URL || 'http://localhost:5174';
+
   return {
     plugins: [
       react(),
@@ -17,7 +29,7 @@ export default defineConfig(({ mode }) => {
           vueRemote: {
             type: 'module',
             name: 'vueRemote',
-            entry: `${process.env.PRESENTATION_URL || env.PRESENTATION_URL}/remoteEntry.js`,
+            entry: `${presentationUrl}/remoteEntry.js`,
             entryGlobalName: 'vueRemote',
             shareScope: 'default',
           },
@@ -58,7 +70,7 @@ export default defineConfig(({ mode }) => {
       },
     },
     define: {
-      'import.meta.env.VITE_API_URL': JSON.stringify(env.VITE_API_URL),
+      'import.meta.env.VITE_API_URL': JSON.stringify(apiUrl),
     },
   };
 });

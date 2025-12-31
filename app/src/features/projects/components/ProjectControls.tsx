@@ -1,8 +1,8 @@
 import { Sparkles, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { useCreateTestPresentations, useCreateBlankPresentation } from '@/features/presentation/hooks';
-import { useCreateBlankMindmap, useCreateTestMindmaps } from '@/features/mindmap/hooks';
+import { useCreateBlankPresentation } from '@/features/presentation/hooks';
+import { useCreateBlankMindmap } from '@/features/mindmap/hooks';
 import { toast } from 'sonner';
 import type { ResourceType } from '@/shared/constants/resourceTypes';
 import { useTranslation } from 'react-i18next';
@@ -20,9 +20,7 @@ const isSupportedResourceType = (type: ResourceType): type is 'presentation' | '
 const useResourceHooks = (resourceType: ResourceType) => {
   const navigate = useNavigate();
 
-  const createTestPresentations = useCreateTestPresentations();
   const createBlankPresentation = useCreateBlankPresentation();
-  const createTestMindmaps = useCreateTestMindmaps();
   const createBlankMindmap = useCreateBlankMindmap();
 
   if (resourceType === 'presentation') {
@@ -33,11 +31,10 @@ const useResourceHooks = (resourceType: ResourceType) => {
           onSuccess: (data) => {
             navigate(`/presentation/${data.presentation.id}`);
           },
-          onError: (error) => {
-            toast.error(`Failed to create blank presentation: ${error.message}`);
+          onError: (error: any) => {
+            toast.error(`Failed to create presentation: ${error?.message || 'Unknown error'}`);
           },
         }),
-      createTest: () => createTestPresentations.mutate(),
     };
   } else if (resourceType === 'mindmap') {
     return {
@@ -47,17 +44,15 @@ const useResourceHooks = (resourceType: ResourceType) => {
           onSuccess: (data) => {
             navigate(`/mindmap/${data.mindmap.id}`);
           },
-          onError: (error) => {
-            toast.error(`Failed to create blank mindmap: ${error.message}`);
+          onError: (error: any) => {
+            toast.error(`Failed to create mindmap: ${error?.message || 'Unknown error'}`);
           },
         }),
-      createTest: () => createTestMindmaps.mutate(),
     };
   } else if (resourceType === 'image') {
     return {
       generate: () => navigate('/image/generate'),
       createBlank: null,
-      createTest: null,
     };
   }
 
@@ -71,12 +66,6 @@ const CreatePresentationControls = ({ currentResourceType }: ProjectControlsProp
   const handleCreateBlank = () => {
     if (hooks?.createBlank) {
       hooks.createBlank();
-    }
-  };
-
-  const handleCreateTest = () => {
-    if (hooks?.createTest) {
-      hooks.createTest();
     }
   };
 
@@ -98,25 +87,14 @@ const CreatePresentationControls = ({ currentResourceType }: ProjectControlsProp
       </Button>
 
       {showCreationButtons && (
-        <>
-          <Button
-            variant="secondary"
-            className="text-primary-foreground dark:text-foreground flex h-28 flex-col bg-gradient-to-r from-green-500 to-teal-500 shadow hover:to-green-500"
-            onClick={handleCreateBlank}
-          >
-            <Plus className="!size-6" />
-            <p className="text-lg font-semibold">{t('controls.createBlank')}</p>
-          </Button>
-
-          <Button
-            variant="secondary"
-            className="text-primary-foreground dark:text-foreground flex h-28 flex-col bg-gradient-to-r from-purple-500 to-pink-500 shadow hover:to-purple-500"
-            onClick={handleCreateTest}
-          >
-            <p className="text-lg font-semibold">Create Test</p>
-            <span className="text-xs opacity-75">(For development only)</span>
-          </Button>
-        </>
+        <Button
+          variant="secondary"
+          className="text-primary-foreground dark:text-foreground flex h-28 flex-col bg-gradient-to-r from-green-500 to-teal-500 shadow hover:to-green-500"
+          onClick={handleCreateBlank}
+        >
+          <Plus className="!size-6" />
+          <p className="text-lg font-semibold">{t('controls.createBlank')}</p>
+        </Button>
       )}
     </div>
   );

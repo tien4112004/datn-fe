@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Bell, BookOpen, CalendarDays, Command, File, FolderClosed, Home, Users } from 'lucide-react';
+import { Bell, Command, File, Home, Users } from 'lucide-react';
 import { NavMain } from '@/shared/components/navigation/NavMain';
 import { NavSecondary } from '@/shared/components/navigation/NavSecondary';
 import { NavUser } from '@/shared/components/navigation/NavUser';
@@ -37,24 +37,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         icon: File,
       },
       {
-        title: t('files'),
-        url: '/files',
-        icon: FolderClosed,
-      },
-      {
         title: t('classes'),
         url: '/classes',
         icon: Users,
-      },
-      {
-        title: t('subjects'),
-        url: '/subjects',
-        icon: BookOpen,
-      },
-      {
-        title: t('schedules'),
-        url: '/schedules',
-        icon: CalendarDays,
       },
     ],
     navSecondary: [

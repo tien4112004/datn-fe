@@ -1,24 +1,14 @@
 import { onMounted, onUnmounted } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useMainStore } from '@/store';
-import { getImageDataURL } from '@/utils/image';
 import usePasteTextClipboardData from './usePasteTextClipboardData';
-import useCreateElement from './useCreateElement';
+import usePasteDataTransfer from './usePasteDataTransfer';
 
 export default () => {
   const { editorAreaFocus, thumbnailsFocus, disableHotkeys } = storeToRefs(useMainStore());
 
   const { pasteTextClipboardData } = usePasteTextClipboardData();
-  const { createImageElement } = useCreateElement();
-
-  // Paste image into slide elements
-  /**
-   * Paste image file
-   * @param imageFile File object of the image
-   */
-  const pasteImageFile = (imageFile: File) => {
-    getImageDataURL(imageFile).then((dataURL) => createImageElement(dataURL));
-  };
+  const { pasteDataTransfer } = usePasteDataTransfer();
 
   /**
    * Paste event listener
@@ -30,26 +20,16 @@ export default () => {
 
     if (!e.clipboardData) return;
 
-    const clipboardDataItems = e.clipboardData.items;
-    const clipboardDataFirstItem = clipboardDataItems[0];
+    const { isFile, dataTransferFirstItem } = pasteDataTransfer(e.clipboardData);
+    if (isFile) return;
 
-    if (!clipboardDataFirstItem) return;
-
-    // If there is an image in the clipboard, try to read the image first
-    let isImage = false;
-    for (const item of clipboardDataItems) {
-      if (item.kind === 'file' && item.type.indexOf('image') !== -1) {
-        const imageFile = item.getAsFile();
-        if (imageFile) pasteImageFile(imageFile);
-        isImage = true;
-      }
-    }
-
-    if (isImage) return;
-
-    // If there is no image in the clipboard, but there is text content, try to parse the text content
-    if (clipboardDataFirstItem.kind === 'string' && clipboardDataFirstItem.type === 'text/plain') {
-      clipboardDataFirstItem.getAsString((text) => pasteTextClipboardData(text));
+    // If there is no valid file in the clipboard, but there is text content, try to parse the text content
+    if (
+      dataTransferFirstItem &&
+      dataTransferFirstItem.kind === 'string' &&
+      dataTransferFirstItem.type === 'text/plain'
+    ) {
+      dataTransferFirstItem.getAsString((text) => pasteTextClipboardData(text));
     }
   };
 

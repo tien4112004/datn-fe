@@ -1,5 +1,5 @@
-import axios from './config';
-import { getBackendUrl } from '@aiprimary/api';
+import { getBaseUrl } from '@/utils/base-url';
+import { api, getBackendUrl } from '@aiprimary/api';
 
 // export const SERVER_URL = 'http://localhost:5000'
 export const SERVER_URL = getBackendUrl();
@@ -23,15 +23,15 @@ interface AIWritingPayload {
   command: string;
 }
 
-import { getBaseUrl } from '@/utils/base-url';
-
 export default {
-  getMockData(filename: string): Promise<any> {
-    return axios.get(`${getBaseUrl()}/mocks/${filename}.json`);
+  async getMockData(filename: string): Promise<any> {
+    const response = await api.get(`${getBaseUrl()}/mocks/${filename}.json`);
+    return response.data;
   },
 
-  getFileData(filename: string): Promise<any> {
-    return axios.get(`${getBaseUrl()}/mocks/${filename}.json`);
+  async getFileData(filename: string): Promise<any> {
+    const response = await api.get(`${getBaseUrl()}/mocks/${filename}.json`);
+    return response.data;
   },
 
   AIPPT_Outline({ content, language, model }: AIPPTOutlinePayload): Promise<any> {

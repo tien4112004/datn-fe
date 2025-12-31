@@ -1,6 +1,11 @@
 import { api } from '@aiprimary/api';
 import type { ApiResponse } from '@aiprimary/api';
-import type { ImageGenerationParams, ImageGenerationResponse } from './types';
+import type {
+  ImageGenerationParams,
+  ImageGenerationResponse,
+  SingleImageResponse,
+  ImageSearchPayload,
+} from './types';
 import type { ApiService } from '@aiprimary/api';
 import { getBackendUrl } from '@aiprimary/api';
 
@@ -25,29 +30,58 @@ export class ImageApiService implements ApiService {
     presentationId: string,
     slideId: string,
     params: ImageGenerationParams
-  ): Promise<ImageGenerationResponse> {
-    const isMock = params.model.name === 'mock';
+  ): Promise<SingleImageResponse> {
+    const isMock = params.imageModel.name === 'mock';
     const endpoint = isMock
       ? `${this.baseUrl}/api/image/generate-in-presentation/mock`
-      : `${this.baseUrl}/api/image/generate-in-presentation`;
+      : `${this.baseUrl}/api/images/generate-in-presentation`;
 
-    const response = await api.post<ApiResponse<ImageGenerationResponse>>(
-      endpoint,
-      {
-        prompt: params.prompt,
-        model: params.model.name,
-        provider: params.model.provider.toLowerCase(),
-        themeStyle: params.themeStyle,
-        themeDescription: params.themeDescription,
-        artStyle: params.artStyle,
-        artDescription: params.artDescription,
-      },
-      {
-        headers: {
-          'Idempotency-Key': `${presentationId}:${slideId}`,
+    const [response] = await Promise.all([
+      api.post<ApiResponse<any>>(
+        endpoint,
+        {
+          prompt: params.prompt,
+          model: params.imageModel.name,
+          provider: params.imageModel.provider.toLowerCase(),
+          themeStyle: params.themeStyle,
+          themeDescription: params.themeDescription,
+          artStyle: params.artStyle,
+          artDescription: params.artStyleModifiers,
         },
+        {
+          headers: {
+            'Idempotency-Key': `${presentationId}:${slideId}`,
+          },
+        }
+      ),
+      Promise.resolve(isMock ? null : new Promise((resolve) => setTimeout(resolve, 2000))),
+    ]);
+    return {
+      imageUrl: response.data.data.images[0].cdnUrl,
+    };
+  }
+
+  async searchImage(body: ImageSearchPayload): Promise<any> {
+    try {
+      const response = await api.post(`${this.baseUrl}/api/images/search-pexels`, body);
+      return response.data;
+    } catch (error: any) {
+      // Handle rate limit from Pexels API
+      if (error.response?.status === 502) {
+        throw new Error('Image search service is temporarily unavailable. Please try again later.');
       }
-    );
-    return response.data.data;
+      throw error;
+    }
+  }
+
+  async getMyImages(page: number = 1, size: number = 20): Promise<any> {
+    try {
+      const response = await api.get(`${this.baseUrl}/api/images`, {
+        params: { page, size },
+      });
+      return response.data;
+    } catch (error: any) {
+      throw error;
+    }
   }
 }

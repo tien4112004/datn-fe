@@ -6,6 +6,7 @@ export default {
       confirm: 'Confirm',
       editThemeColors: 'Edit Theme Colors',
       applyThemeToAll: 'Apply Theme to All',
+      applyFontToAll: 'Apply Font to All',
       extractThemeFromSlide: 'Extract Theme from Slide',
       presetThemes: 'Preset Themes',
       textAa: 'Text Aa',
@@ -15,6 +16,10 @@ export default {
       eyedropperEscHint: 'Press ESC to close eyedropper',
       shapeCreateHint:
         'Click to draw any shape, close the shape to complete drawing, press ESC key or right-click to cancel, press ENTER key to finish early',
+      noThemes: 'No themes available',
+      loadingThemes: 'Loading themes...',
+      loadingMoreThemes: 'Loading more themes...',
+      noMoreThemes: 'No more themes',
 
       // Background
       background: {
@@ -48,6 +53,8 @@ export default {
         fontColor: 'Font Color:',
         titleFont: 'Title Font:',
         titleFontColor: 'Title Font Color:',
+        labelFont: 'Label Font:',
+        labelFontColor: 'Label Font Color:',
         backgroundColor: 'Background Color:',
         themeColor: 'Theme Color:',
         searchFont: 'Search Font',

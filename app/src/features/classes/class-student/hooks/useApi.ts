@@ -5,6 +5,8 @@ import type { StudentEnrollmentRequest, Layout } from '@/features/classes/shared
 import type { Student } from '../types/student';
 import type { StudentFormData } from './useStudentForm';
 import type { StudentCreateRequest, StudentUpdateRequest } from '../types/requests';
+import { useTranslation } from 'react-i18next';
+import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 
 // Query keys for students
 const classKeys = {
@@ -85,6 +87,7 @@ export function useRemoveStudentFromClass() {
  */
 export function useStudentMutations(classId: string) {
   const queryClient = useQueryClient();
+  const { t } = useTranslation(I18N_NAMESPACES.CLASSES);
 
   /**
    * Mutation for creating a new student
@@ -106,18 +109,17 @@ export function useStudentMutations(classId: string) {
     },
 
     onError: (error) => {
-      toast.error('Failed to add student', {
-        description:
-          error instanceof Error
-            ? error.message
-            : 'Network error. Please check your connection and try again.',
+      toast.error(t('roster.addStudent.error'), {
+        description: t('roster.addStudent.errorDescription', {
+          error: error instanceof Error ? error.message : 'Network error',
+        }),
       });
     },
 
     onSuccess: () => {
       // Invalidate and refetch to get fresh server data
       queryClient.invalidateQueries({ queryKey: ['classes', classId, 'students'] });
-      toast.success('Student added successfully');
+      toast.success(t('roster.addStudent.success'));
     },
   });
 
@@ -146,18 +148,17 @@ export function useStudentMutations(classId: string) {
     },
 
     onError: (error) => {
-      toast.error('Failed to update student', {
-        description:
-          error instanceof Error
-            ? error.message
-            : 'Network error. Please check your connection and try again.',
+      toast.error(t('roster.updateStudent.error'), {
+        description: t('roster.updateStudent.errorDescription', {
+          error: error instanceof Error ? error.message : 'Network error',
+        }),
       });
     },
 
     onSuccess: () => {
       // Invalidate and refetch to get fresh server data
       queryClient.invalidateQueries({ queryKey: ['classes', classId, 'students'] });
-      toast.success('Student updated successfully');
+      toast.success(t('roster.updateStudent.success'));
     },
   });
 
@@ -170,18 +171,17 @@ export function useStudentMutations(classId: string) {
     },
 
     onError: (error) => {
-      toast.error('Failed to delete student', {
-        description:
-          error instanceof Error
-            ? error.message
-            : 'Network error. Please check your connection and try again.',
+      toast.error(t('roster.deleteStudent.error'), {
+        description: t('roster.deleteStudent.errorDescription', {
+          error: error instanceof Error ? error.message : 'Network error',
+        }),
       });
     },
 
     onSuccess: () => {
       // Invalidate and refetch to get fresh server data
       queryClient.invalidateQueries({ queryKey: ['classes', classId, 'students'] });
-      toast.success('Student removed from roster successfully');
+      toast.success(t('roster.deleteStudent.success'));
     },
   });
 

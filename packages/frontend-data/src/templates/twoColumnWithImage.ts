@@ -103,7 +103,7 @@ export const twoColumnWithImageTemplates: SlideTemplate[] = [
               label: 'item',
               border: {
                 width: '{{theme.card.borderWidth}}',
-                color: '{{theme.themeColors[0]}}',
+                color: '{{theme.outline.color}}',
                 radius: '{{theme.card.borderRadius}}',
               },
               text: {
@@ -111,6 +111,7 @@ export const twoColumnWithImageTemplates: SlideTemplate[] = [
                 fontFamily: '{{theme.fontName}}',
                 fontWeight: 'normal',
                 fontStyle: 'normal',
+                fontSizeRange: { minSize: 15, maxSize: 24 },
               },
             },
           },
@@ -214,7 +215,7 @@ export const twoColumnWithImageTemplates: SlideTemplate[] = [
               },
               border: {
                 width: '{{theme.card.borderWidth}}',
-                color: '{{theme.themeColors[0]}}',
+                color: '{{theme.outline.color}}',
                 radius: '{{theme.card.borderRadius}}',
               },
               text: {
@@ -223,6 +224,7 @@ export const twoColumnWithImageTemplates: SlideTemplate[] = [
                 fontWeight: 'normal',
                 fontStyle: 'normal',
                 textAlign: 'left',
+                fontSizeRange: { minSize: 15, maxSize: 24 },
               },
             },
           },
@@ -324,7 +326,7 @@ export const twoColumnWithImageTemplates: SlideTemplate[] = [
               label: 'item',
               border: {
                 width: '{{theme.card.borderWidth}}',
-                color: '{{theme.themeColors[0]}}',
+                color: '{{theme.outline.color}}',
                 radius: '{{theme.card.borderRadius}}',
               },
               text: {
@@ -333,6 +335,7 @@ export const twoColumnWithImageTemplates: SlideTemplate[] = [
                 fontWeight: 'normal',
                 fontStyle: 'normal',
                 textAlign: 'left',
+                fontSizeRange: { minSize: 15, maxSize: 24 },
               },
             },
           },
@@ -421,7 +424,7 @@ export const twoColumnWithImageTemplates: SlideTemplate[] = [
               label: 'item',
               border: {
                 width: '{{theme.card.borderWidth}}',
-                color: '{{theme.themeColors[0]}}',
+                color: '{{theme.outline.color}}',
                 radius: '{{theme.card.borderRadius}}',
               },
               text: {
@@ -430,6 +433,7 @@ export const twoColumnWithImageTemplates: SlideTemplate[] = [
                 fontWeight: 'normal',
                 fontStyle: 'normal',
                 textAlign: 'left',
+                fontSizeRange: { minSize: 15, maxSize: 24 },
               },
             },
           },
@@ -541,11 +545,6 @@ export const twoColumnWithImageTemplates: SlideTemplate[] = [
               expr: 'SLIDE_HEIGHT - image.top - 50',
             },
           },
-          border: {
-            width: '{{theme.card.borderWidth}}',
-            color: '{{theme.themeColors[0]}}',
-            radius: '{{theme.card.borderRadius}}',
-          },
           layout: {
             distribution: 'space-between',
             gap: 15,
@@ -558,12 +557,18 @@ export const twoColumnWithImageTemplates: SlideTemplate[] = [
             structure: {
               type: 'text',
               label: 'item',
+              border: {
+                width: '{{theme.card.borderWidth}}',
+                color: '{{theme.outline.color}}',
+                radius: '{{theme.card.borderRadius}}',
+              },
               text: {
                 color: '{{theme.fontColor}}',
                 fontFamily: '{{theme.fontName}}',
                 fontWeight: 'normal',
                 fontStyle: 'normal',
                 textAlign: 'left',
+                fontSizeRange: { minSize: 15, maxSize: 24 },
               },
             },
           },
@@ -649,11 +654,6 @@ export const twoColumnWithImageTemplates: SlideTemplate[] = [
             size: 'fill',
             margin: { left: 0, right: 0, top: 0, bottom: 40 },
           },
-          border: {
-            width: '{{theme.card.borderWidth}}',
-            color: '{{theme.themeColors[0]}}',
-            radius: '{{theme.card.borderRadius}}',
-          },
           layout: {
             distribution: 'space-between',
             gap: 15,
@@ -670,12 +670,18 @@ export const twoColumnWithImageTemplates: SlideTemplate[] = [
                 horizontalAlignment: 'left',
                 verticalAlignment: 'center',
               },
+              border: {
+                width: '{{theme.card.borderWidth}}',
+                color: '{{theme.outline.color}}',
+                radius: '{{theme.card.borderRadius}}',
+              },
               text: {
                 color: '{{theme.fontColor}}',
                 fontFamily: '{{theme.fontName}}',
                 fontWeight: 'normal',
                 fontStyle: 'normal',
                 textAlign: 'left',
+                fontSizeRange: { minSize: 15, maxSize: 24 },
               },
             },
           },
@@ -762,7 +768,7 @@ export const twoColumnWithImageTemplates: SlideTemplate[] = [
           },
           border: {
             width: '{{theme.card.borderWidth}}',
-            color: '{{theme.themeColors[0]}}',
+            color: '{{theme.outline.color}}',
             radius: '{{theme.card.borderRadius}}',
           },
           text: {

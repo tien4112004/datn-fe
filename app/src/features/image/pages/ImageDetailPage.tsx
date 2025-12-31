@@ -5,6 +5,14 @@ import { Button } from '@/shared/components/ui/button';
 import { Avatar, AvatarImage, AvatarFallback } from '@/shared/components/ui/avatar';
 import { Separator } from '@/shared/components/ui/separator';
 import { Textarea } from '@/shared/components/ui/textarea';
+import {
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@/shared/components/ui/breadcrumb';
 
 interface Comment {
   id: string;
@@ -41,6 +49,13 @@ const mockComments: Comment[] = [
     likes: 5,
   },
 ];
+
+// Helper function to truncate prompt text for breadcrumb
+const truncatePrompt = (text: string | undefined, maxLength: number): string => {
+  if (!text) return 'Image';
+  if (text.length <= maxLength) return text;
+  return text.slice(0, maxLength) + '...';
+};
 
 const CommentSection = () => {
   return (
@@ -155,6 +170,19 @@ const ImageDetailPage = () => {
   return (
     <div className="bg-background min-h-screen">
       <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-12">
+        {/* Breadcrumb Navigation */}
+        <Breadcrumb className="mb-6">
+          <BreadcrumbList>
+            <BreadcrumbItem className="hidden md:block">
+              <BreadcrumbLink href="/image">Images</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator className="hidden md:block" />
+            <BreadcrumbItem>
+              <BreadcrumbPage>{truncatePrompt(image.prompt, 50)}</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+
         {/* Main Image Display */}
         <div className="mb-8 flex justify-center">
           <img

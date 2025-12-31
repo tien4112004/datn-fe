@@ -13,6 +13,26 @@ export default {
   },
 
   // ===============================
+  // EDITOR
+  // ===============================
+  editor: {
+    templatePreview: {
+      title: 'Template Preview Mode',
+      subtitle: 'Choose your preferred layout. Editing will unlock after you confirm your template choice.',
+      confirmCurrent: 'Confirm & Start Editing',
+      confirmAll: 'Confirm All Slides',
+      confirmAllWarning: 'Click Again to Confirm All',
+      successSingle: 'Template confirmed! You can now edit your slide.',
+      successMultiple: 'Confirmed {count} slide{plural}! All slides are now editable.',
+    },
+    remarks: {
+      title: 'Slide Remarks',
+      clickToEdit: 'Click to edit notes',
+      clickToAdd: 'Click to add notes',
+    },
+  },
+
+  // ===============================
   // USER INTERFACE
   // ===============================
   ui: {

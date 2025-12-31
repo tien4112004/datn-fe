@@ -7,8 +7,11 @@ export default {
       horizontalTextBox: 'Horizontal Text Box',
       verticalTextBox: 'Vertical Text Box',
       insertShape: 'Insert Shape',
+      presetShapes: 'Preset Shapes',
       freehandDrawing: 'Freehand Drawing',
       insertImage: 'Insert Image',
+      uploadImage: 'Upload Image',
+      onlineLibrary: 'Online Library',
       insertLine: 'Insert Line',
       insertChart: 'Insert Chart',
       insertTable: 'Insert Table',
@@ -34,6 +37,8 @@ export default {
       transition: 'Transition',
       styleMulti: 'Style (Multi-select)',
       positionMulti: 'Position (Multi-select)',
+      imageLibrary: 'Image Library',
+      aiModification: 'AI Modification',
     },
 
     // Slide Template Panel
@@ -46,6 +51,7 @@ export default {
       confirmButton: 'Use This Template & Start Editing',
       customizeParameters: 'Customize Layout',
       resetToDefaults: 'Reset to Defaults',
+      confirmSuccess: 'Template confirmed! You can now edit your slide.',
     },
 
     // Chart Tools

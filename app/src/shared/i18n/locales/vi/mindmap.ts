@@ -201,4 +201,14 @@ export default {
     updateSuccess: 'Cập nhật tiêu đề thành công',
     updateError: 'Không thể cập nhật tiêu đề',
   },
+  errors: {
+    cannotMoveToDescendant: 'Không thể di chuyển nút đến các nút con của nó',
+  },
+  saving: {
+    cannotSaveInViewMode: 'Không thể lưu ở chế độ xem',
+    cannotSaveInPresenterMode: 'Không thể lưu khi đang ở chế độ trình chiếu',
+  },
+  list: {
+    untitledMindmap: 'Sơ đồ tư duy chưa đặt tên',
+  },
 };

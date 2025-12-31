@@ -133,12 +133,20 @@
             <PopoverMenuItem
               center
               @click="
+                shapeMenuVisible = false;
+                shapePoolVisible = true;
+              "
+              ><IconGraphicDesign class="icon" /> {{ $t('toolbar.tools.presetShapes') }}</PopoverMenuItem
+            >
+            <PopoverMenuItem
+              center
+              @click="
                 () => {
                   drawCustomShape();
                   shapeMenuVisible = false;
                 }
               "
-              >{{ $t('toolbar.tools.freehandDrawing') }}</PopoverMenuItem
+              ><IconWritingFluently class="icon" /> {{ $t('toolbar.tools.freehandDrawing') }}</PopoverMenuItem
             >
           </template>
           <div class="handler-item">
@@ -146,11 +154,33 @@
           </div>
         </Popover>
       </div>
-      <FileInput @change="(files) => insertImageElement(files)">
-        <div class="handler-item" v-tooltip="$t('toolbar.tools.insertImage')">
-          <IconPicture />
-        </div>
-      </FileInput>
+      <div class="group-btn" v-tooltip="$t('toolbar.tools.insertImage')">
+        <FileInput style="height: 100%" @change="(files) => insertImageElement(files)">
+          <div class="handler-item">
+            <IconPicture class="icon" />
+          </div>
+        </FileInput>
+
+        <Popover trigger="click" v-model:value="imageMenuVisible" style="height: 100%" :offset="10">
+          <template #content>
+            <FileInput
+              @change="
+                (files) => {
+                  insertImageElement(files);
+                  imageMenuVisible = false;
+                }
+              "
+            >
+              <PopoverMenuItem center
+                ><IconUpload class="icon" /> {{ $t('toolbar.tools.uploadImage') }}</PopoverMenuItem
+              >
+            </FileInput>
+          </template>
+          <div class="handler-item">
+            <IconDown class="arrow" />
+          </div>
+        </Popover>
+      </div>
       <Popover trigger="click" v-model:value="linePoolVisible" :offset="10">
         <template #content>
           <LinePool @select="(line) => drawLine(line)" />
@@ -287,6 +317,7 @@
 import { ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useMainStore, useSnapshotStore } from '@/store';
+import { ToolbarStates } from '@/types/toolbar';
 import { getImageDataURL } from '@/utils/image';
 import type { ShapePoolItem } from '@/configs/shapes';
 import type { LinePoolItem } from '@/configs/lines';
@@ -308,8 +339,14 @@ import PopoverMenuItem from '@/components/PopoverMenuItem.vue';
 import Card from '@/components/Card.vue';
 
 const mainStore = useMainStore();
-const { creatingElement, creatingCustomShape, showSelectPanel, showSearchPanel, showNotesPanel } =
-  storeToRefs(mainStore);
+const {
+  creatingElement,
+  creatingCustomShape,
+  showSelectPanel,
+  showSearchPanel,
+  showNotesPanel,
+  showSymbolPanel,
+} = storeToRefs(mainStore);
 const { canUndo, canRedo } = storeToRefs(useSnapshotStore());
 
 const { redo, undo } = useHistorySnapshot();
@@ -347,6 +384,7 @@ const mediaInputVisible = ref(false);
 const latexEditorVisible = ref(false);
 const textTypeSelectVisible = ref(false);
 const shapeMenuVisible = ref(false);
+const imageMenuVisible = ref(false);
 const moreVisible = ref(false);
 
 // Insert text
@@ -394,6 +432,12 @@ const toggleSraechPanel = () => {
 const toggleNotesPanel = () => {
   mainStore.setNotesPanelState(!showNotesPanel.value);
 };
+
+// Open image library panel
+const openImageLibPanel = () => {
+  mainStore.setToolbarState(ToolbarStates.IMAGE_LIBRARY);
+  mainStore.setSidebarExpanded(true);
+};
 </script>
 
 <style lang="scss" scoped>
@@ -416,11 +460,11 @@ const toggleNotesPanel = () => {
   display: flex;
   align-items: center;
   flex: 0 0 auto;
-  gap: 4px;
+  gap: 2px;
 }
 .left-handler {
   min-width: 0;
-  gap: 4px;
+  gap: 2px;
 }
 .more-icon {
   display: none;
@@ -429,14 +473,14 @@ const toggleNotesPanel = () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 2px;
 
   .group-btn {
     display: flex;
     width: auto;
     margin-right: 0;
     flex-shrink: 0;
-    padding: 0 8px;
+    padding: 0 4px;
     border-radius: var(--presentation-radius);
 
     .handler-item {
@@ -477,7 +521,7 @@ const toggleNotesPanel = () => {
   border-radius: var(--presentation-radius);
   overflow: hidden;
   cursor: pointer;
-  padding: 0 8px;
+  padding: 0;
 
   &.disable {
     opacity: 0.5;
@@ -509,7 +553,7 @@ const toggleNotesPanel = () => {
   }
 }
 
-@media screen and (width <= 1200px) {
+@media screen and (width <= 1500px) {
   .right-handler .text {
     display: none;
   }
@@ -525,7 +569,7 @@ const toggleNotesPanel = () => {
   }
 }
 
-@media screen and (width <= 1100px) {
+@media screen and (width <= 1400px) {
   .canvas-tool {
     :deep(.card-content) {
       padding-inline: 2px;
@@ -533,7 +577,7 @@ const toggleNotesPanel = () => {
   }
 }
 
-@media screen and (width <= 1050px) {
+@media screen and (width <= 1300px) {
   .left-handler,
   .right-handler {
     display: none;

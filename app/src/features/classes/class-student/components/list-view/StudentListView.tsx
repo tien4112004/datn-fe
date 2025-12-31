@@ -147,7 +147,7 @@ export const StudentListView = ({ students, classId, isLoading = false }: Studen
         </div>
         <div className="flex items-center gap-2">
           <CsvImportButton classId={classId} />
-          <Button onClick={handleOpenAddDialog}>{t('addStudent')}</Button>
+          <Button onClick={handleOpenAddDialog}>{t('addStudentButton')}</Button>
         </div>
       </div>
 

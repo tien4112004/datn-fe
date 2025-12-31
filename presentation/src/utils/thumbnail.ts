@@ -8,9 +8,62 @@ import directive from '../plugins/directive/index';
 import i18n from '@/locales';
 
 /**
+ * Compress image data URL to JPEG format with quality control
+ * @param dataUrl - Source image data URL (PNG or JPEG)
+ * @param quality - JPEG quality (0-1), default 0.7
+ * @param maxSizeKB - Maximum file size in KB, will reduce quality if exceeded
+ * @returns Promise resolving to compressed JPEG data URL
+ */
+async function compressImage(
+  dataUrl: string,
+  quality: number = 0.7,
+  maxSizeKB: number = 800
+): Promise<string> {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width;
+      canvas.height = img.height;
+
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        resolve(dataUrl);
+        return;
+      }
+
+      ctx.fillStyle = 'white';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0);
+
+      let currentQuality = quality;
+      let compressedDataUrl = canvas.toDataURL('image/jpeg', currentQuality);
+
+      // Reduce quality if file size exceeds limit
+      while (currentQuality > 0.1 && getDataUrlSizeKB(compressedDataUrl) > maxSizeKB) {
+        currentQuality -= 0.1;
+        compressedDataUrl = canvas.toDataURL('image/jpeg', currentQuality);
+      }
+
+      resolve(compressedDataUrl);
+    };
+    img.src = dataUrl;
+  });
+}
+
+/**
+ * Calculate data URL size in KB
+ */
+function getDataUrlSizeKB(dataUrl: string): number {
+  const base64 = dataUrl.split(',')[1];
+  const bytes = (base64.length * 3) / 4;
+  return bytes / 1024;
+}
+
+/**
  * Generates a thumbnail image from the first slide of the presentation
  * @param pinia - Pinia instance to access the slides store
- * @returns Promise resolving to base64 PNG data URL, or undefined if generation fails
+ * @returns Promise resolving to base64 JPEG data URL, or undefined if generation fails
  */
 export async function generateThumbnail(pinia: Pinia): Promise<string | undefined> {
   try {
@@ -64,20 +117,27 @@ export async function generateThumbnail(pinia: Pinia): Promise<string | undefine
       return undefined;
     }
 
-    // Capture the thumbnail as PNG
+    // Capture the thumbnail as PNG with reduced pixel ratio
     const dataUrl = await toPng(thumbnailElement as HTMLElement, {
       backgroundColor: 'white',
       skipFonts: true,
-      pixelRatio: 2,
+      pixelRatio: 1,
       width: 800,
       height: 800 * slidesStore.viewportRatio,
+      cacheBust: true,
+      fetchRequestInit: {
+        cache: 'no-cache',
+      },
     });
 
     // Cleanup
     thumbnailApp.unmount();
     document.body.removeChild(container);
 
-    return dataUrl;
+    // Compress to JPEG format to reduce file size (target max 600KB)
+    const compressedDataUrl = await compressImage(dataUrl, 0.7, 600);
+
+    return compressedDataUrl;
   } catch (error) {
     console.warn('Failed to generate thumbnail:', error);
     return undefined;

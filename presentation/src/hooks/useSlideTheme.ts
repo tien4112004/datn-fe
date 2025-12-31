@@ -316,15 +316,25 @@ export default () => {
         if (el.text) {
           el.text.defaultColor = theme.fontColor;
           el.text.defaultFontName = theme.fontname;
-          if (el.text.content)
+          if (el.text.content) {
             el.text.content = el.text.content.replace(/color: .+?;/g, '').replace(/font-family: .+?;/g, '');
+          }
         }
       }
       if (el.type === 'text') {
         if (el.fill) el.fill = getColor(el.fill);
         el.defaultColor = theme.fontColor;
         el.defaultFontName = theme.fontname;
-        if (el.content) el.content = el.content.replace(/color: .+?;/g, '').replace(/font-family: .+?;/g, '');
+
+        // Handle label text types
+        if (el.textType === 'itemTitle' || el.textType === 'itemNumber' || el.textType === 'partNumber') {
+          el.defaultColor = theme.fontColor;
+          el.defaultFontName = theme.fontname;
+        }
+
+        if (el.content) {
+          el.content = el.content.replace(/color: .+?;/g, '').replace(/font-family: .+?;/g, '');
+        }
       }
       if (el.type === 'image' && el.colorMask) {
         el.colorMask = getColor(el.colorMask);
@@ -390,6 +400,8 @@ export default () => {
       shadow,
       titleFontColor,
       titleFontName,
+      labelFontColor,
+      labelFontName,
     } = theme.value;
 
     for (const slide of newSlides) {
@@ -412,8 +424,9 @@ export default () => {
           if (el.text) {
             el.text.defaultColor = fontColor;
             el.text.defaultFontName = fontName;
-            if (el.text.content)
+            if (el.text.content) {
               el.text.content = el.text.content.replace(/color: .+?;/g, '').replace(/font-family: .+?;/g, '');
+            }
           }
           if (el.gradient) delete el.gradient;
         } else if (el.type === 'line') el.color = themeColors[0];
@@ -429,6 +442,13 @@ export default () => {
             el.defaultColor = titleFontColor;
             el.defaultFontName = titleFontName;
           }
+
+          // Handle label text types
+          if (el.textType === 'itemTitle' || el.textType === 'itemNumber' || el.textType === 'partNumber') {
+            el.defaultColor = labelFontColor || fontColor;
+            el.defaultFontName = labelFontName || fontName;
+          }
+
           if (el.content) {
             el.content = el.content.replace(/color: .+?;/g, '').replace(/font-family: .+?;/g, '');
           }
@@ -453,9 +473,43 @@ export default () => {
     addHistorySnapshot();
   };
 
+  // Unify font
+  const applyFontToAllSlides = (fontname: string) => {
+    const newSlides: Slide[] = JSON.parse(JSON.stringify(slides.value));
+
+    for (const slide of newSlides) {
+      for (const el of slide.elements) {
+        if (el.type === 'shape') {
+          if (el.text) {
+            el.text.defaultFontName = fontname;
+            if (el.text.content)
+              el.text.content = el.text.content.replace(/color: .+?;/g, '').replace(/font-family: .+?;/g, '');
+          }
+        }
+        if (el.type === 'text') {
+          el.defaultFontName = fontname;
+          if (el.content)
+            el.content = el.content.replace(/color: .+?;/g, '').replace(/font-family: .+?;/g, '');
+        }
+        if (el.type === 'table') {
+          for (const rowCells of el.data) {
+            for (const cell of rowCells) {
+              if (cell.style) {
+                cell.style.fontname = fontname;
+              }
+            }
+          }
+        }
+      }
+    }
+    slidesStore.setSlides(newSlides);
+    addHistorySnapshot();
+  };
+
   return {
     getSlidesThemeStyles,
     applyPresetTheme,
     applyThemeToAllSlides,
+    applyFontToAllSlides,
   };
 };

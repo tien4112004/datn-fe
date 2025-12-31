@@ -34,6 +34,6 @@ export const DEFAULT_WRAP_CONFIG = {
 /**
  * Font size ranges for different label types
  */
-export const FONT_SIZE_RANGE_LABEL = { minSize: 18, maxSize: 24 };
-export const FONT_SIZE_RANGE_CONTENT = { minSize: 16, maxSize: 22 };
+export const FONT_SIZE_RANGE_LABEL = { minSize: 18, maxSize: 28 };
+export const FONT_SIZE_RANGE_CONTENT = { minSize: 16, maxSize: 26 };
 export const FONT_SIZE_RANGE_TITLE = { minSize: 28, maxSize: 48 };

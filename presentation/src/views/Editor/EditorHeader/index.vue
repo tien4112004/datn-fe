@@ -1,35 +1,49 @@
 <template>
   <div class="editor-header">
-    <div class="tw-flex tw-items-center">
-      <Button
-        class="tw-border-0 tw-bg-transparent hover:tw-bg-gray-100"
-        @click="goBack"
-        v-if="showBackButton"
-      >
-        <IconLeft class="!tw-w-4 !tw-h-4" />
-      </Button>
-
-      <div class="title">
-        <Input
-          class="title-input"
-          ref="titleInputRef"
-          v-model:value="titleValue"
-          @blur="handleUpdateTitle()"
-          v-if="editingTitle"
-        />
-        <div
-          class="title-text tw-flex tw-items-center tw-gap-2"
-          @click="startEditTitle()"
-          :title="title"
-          v-else
-        >
-          <IconEdit />
-          {{ title }}
-        </div>
-      </div>
+    <!-- Breadcrumb Section -->
+    <div class="tw-flex tw-items-center tw-gap-2 tw-max-w-md tw-flex-shrink">
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem class="tw-hidden md:tw-block tw-pl-4">
+            <BreadcrumbLink @click="navigateToList" class="tw-cursor-pointer">
+              {{ $t('header.breadcrumb.presentations') }}
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator class="tw-hidden md:tw-block" />
+          <BreadcrumbItem>
+            <!-- Edit Mode -->
+            <div v-if="editingTitle" class="tw-flex tw-items-center tw-gap-2">
+              <Input
+                ref="titleInputRef"
+                v-model:value="titleValue"
+                @blur="handleUpdateTitle"
+                @keydown="handleKeyDown"
+                class="tw-w-32 sm:tw-w-48 tw-h-7 tw-px-2 tw-text-sm tw-font-medium tw-border-primary"
+              />
+              <Button size="small" @click="handleUpdateTitle">
+                <IconCheck class="tw-w-4 tw-h-4" />
+              </Button>
+              <Button size="small" @click="handleCancelEdit">
+                <IconClose class="tw-w-4 tw-h-4" />
+              </Button>
+            </div>
+            <!-- Display Mode -->
+            <div v-else class="tw-flex tw-items-center tw-gap-2">
+              <BreadcrumbPage class="tw-max-w-32 sm:tw-max-w-48 tw-truncate">{{ title }}</BreadcrumbPage>
+              <Button
+                size="small"
+                class="tw-p-1 tw-bg-transparent hover:tw-bg-gray-100"
+                @click="startEditTitle"
+              >
+                <IconEdit class="tw-w-3 tw-h-3" />
+              </Button>
+            </div>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
     </div>
 
-    <div class="tw-flex tw-items-center tw-gap-2">
+    <div class="tw-flex tw-items-center tw-gap-2 tw-flex-shrink-0">
       <Popover trigger="click" placement="bottom-end" v-model:value="mainMenuVisible">
         <template #content>
           <PopoverMenuItem
@@ -70,16 +84,6 @@
           >
             <PopoverMenuItem>{{ $t('header.file.importPptist') }}</PopoverMenuItem>
           </FileInput>
-          <PopoverMenuItem @click="setDialogForExport('pptx')">{{
-            $t('header.file.exportFile')
-          }}</PopoverMenuItem>
-          <PopoverMenuItem
-            @click="
-              resetSlides();
-              mainMenuVisible = false;
-            "
-            >{{ $t('header.file.resetSlides') }}</PopoverMenuItem
-          >
           <PopoverMenuItem
             @click="
               openMarkupPanel();
@@ -130,11 +134,7 @@
       >
         <span class="text ai">AI</span>
       </div> -->
-      <Button
-        class="handler-item"
-        v-tooltip="$t('header.file.exportFile')"
-        @click="setDialogForExport('pptx')"
-      >
+      <Button class="menu-item" v-tooltip="$t('header.file.exportFile')" @click="setDialogForExport('pptx')">
         <IconDownload class="icon" />
         {{ $t('header.share.export') }}
       </Button>
@@ -175,11 +175,12 @@
 import { nextTick, ref, computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useI18n } from 'vue-i18n';
-import { useMainStore, useSlidesStore } from '@/store';
+import { useMainStore, useSlidesStore, useContainerStore } from '@/store';
 import useScreening from '@/hooks/useScreening';
 import useImport from '@/hooks/useImport';
 import useSlideHandler from '@/hooks/useSlideHandler';
 import useSlideTemplates from '@/hooks/useSlideTemplates';
+import { getPresentationApi } from '@/services/presentation/api';
 import type { DialogForExportTypes } from '@/types/export';
 
 import HotkeyDoc from './HotkeyDoc.vue';
@@ -194,16 +195,28 @@ import Popover from '@/components/Popover.vue';
 import PopoverMenuItem from '@/components/PopoverMenuItem.vue';
 import LanguageSwitcher from '@/components/LanguageSwitcher.vue';
 import Button from '@/components/Button.vue';
+import Breadcrumb from '@/components/ui/breadcrumb/Breadcrumb.vue';
+import BreadcrumbList from '@/components/ui/breadcrumb/BreadcrumbList.vue';
+import BreadcrumbItem from '@/components/ui/breadcrumb/BreadcrumbItem.vue';
+import BreadcrumbLink from '@/components/ui/breadcrumb/BreadcrumbLink.vue';
+import BreadcrumbPage from '@/components/ui/breadcrumb/BreadcrumbPage.vue';
+import BreadcrumbSeparator from '@/components/ui/breadcrumb/BreadcrumbSeparator.vue';
+import { Check as IconCheck, X as IconClose } from 'lucide-vue-next';
 import message from '@/utils/message';
 const { t } = useI18n();
 const mainStore = useMainStore();
 const slidesStore = useSlidesStore();
+const containerStore = useContainerStore();
 const { title, theme } = storeToRefs(slidesStore);
+const { presentation } = storeToRefs(containerStore);
 const { enterScreening, enterScreeningFromStart, enterPresenterMode, openSeparatedPresentation } =
   useScreening();
 const { importSpecificFile, importPPTXFile, exporting } = useImport();
 const { resetSlides } = useSlideHandler();
 const { createSlide, getThemes } = useSlideTemplates();
+
+// Get presentation ID from container store
+const presentationId = computed(() => presentation?.value?.id || '');
 
 const mainMenuVisible = ref(false);
 const hotkeyDrawerVisible = ref(false);
@@ -224,14 +237,62 @@ const startEditTitle = () => {
   nextTick(() => titleInputRef.value?.focus());
 };
 
-const handleUpdateTitle = () => {
-  slidesStore.setTitle(titleValue.value);
+const handleUpdateTitle = async () => {
+  const trimmedTitle = titleValue.value.trim();
+
+  if (!trimmedTitle) {
+    titleValue.value = title.value;
+    editingTitle.value = false;
+    return;
+  }
+
+  if (trimmedTitle === title.value) {
+    editingTitle.value = false;
+    return;
+  }
+
+  if (!presentationId.value) {
+    console.error('No presentation ID available');
+    message.error(t('header.title.updateError'));
+    return;
+  }
+
+  try {
+    // Update in store first (optimistic update)
+    const previousTitle = title.value;
+    slidesStore.setTitle(trimmedTitle);
+    editingTitle.value = false;
+
+    // Call API to persist the change
+    const presentationApi = getPresentationApi();
+    await presentationApi.updatePresentation(presentationId.value, { title: trimmedTitle });
+    message.success(t('header.title.updateSuccess'));
+  } catch (error) {
+    console.error('Failed to update title:', error);
+    message.error(t('header.title.updateError'));
+    // Revert the title on error
+    titleValue.value = title.value;
+    slidesStore.setTitle(title.value);
+  }
+};
+
+const handleCancelEdit = () => {
+  titleValue.value = title.value;
   editingTitle.value = false;
 };
 
-const goLink = (url: string) => {
-  window.open(url);
-  mainMenuVisible.value = false;
+const handleKeyDown = (e: KeyboardEvent) => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    handleUpdateTitle();
+  } else if (e.key === 'Escape') {
+    e.preventDefault();
+    handleCancelEdit();
+  }
+};
+
+const navigateToList = () => {
+  window.location.href = '/projects?type=presentation';
 };
 
 const setDialogForExport = (type: DialogForExportTypes) => {
@@ -273,20 +334,6 @@ const handlePresentationMode = (
       break;
   }
 };
-
-const goBack = () => {
-  window.history.back();
-};
-
-const showBackButton = computed(() => {
-  return (
-    typeof window !== 'undefined' &&
-    window.location.pathname !== '/' &&
-    window.history.length > 1 &&
-    document.referrer !== '' &&
-    new URL(document.referrer).origin === window.location.origin
-  );
-});
 
 const handleShareCancel = () => {
   message.info(t('header.share.shareCanceled'));

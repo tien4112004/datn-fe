@@ -182,4 +182,4 @@ jobs:
         run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
 
       - name: Deploy to Production
-        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }} --env PRESENTATION_URL=https://datn-fe-presentation.vercel.app
+        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }} --env VITE_PRESENTATION_URL=https://datn-fe-presentation.vercel.app

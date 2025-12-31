@@ -12,6 +12,7 @@ import { ThumbnailWrapperV2 } from '@/features/presentation/components/others/Th
 import TablePagination from '@/shared/components/table/TablePagination';
 import { ActionContent } from './ActionButton';
 import { RenameFileDialog } from '@/components/modals/RenameFileDialog';
+import { DeleteConfirmationDialog } from '@/shared/components/modals/DeleteConfirmationDialog';
 
 const PresentationGrid = () => {
   const { t } = useTranslation('common', { keyPrefix: 'table' });
@@ -34,6 +35,12 @@ const PresentationGrid = () => {
     handleRename,
     handleConfirmRename,
     isRenamePending,
+    isDeleteOpen,
+    setIsDeleteOpen,
+    handleDelete,
+    handleConfirmDelete,
+    handleCancelDelete,
+    isDeletePending,
   } = usePresentationManager();
 
   const formatDate = useCallback((date: Date | string | undefined): string => {
@@ -87,11 +94,8 @@ const PresentationGrid = () => {
             <DropdownMenuContent onClick={(e) => e.stopPropagation()}>
               <ActionContent
                 onViewDetail={() => navigate(`/presentation/${presentation.id}`)}
-                onEdit={() => console.log('Edit', presentation)}
-                onDelete={() => console.log('Delete', presentation)}
-                onRename={() => {
-                  handleRename(presentation);
-                }}
+                onDelete={() => handleDelete(presentation)}
+                onRename={() => handleRename(presentation)}
               />
             </DropdownMenuContent>
           </DropdownMenu>
@@ -173,6 +177,15 @@ const PresentationGrid = () => {
         placeholder={t('presentation.title')}
         isLoading={isRenamePending}
         onRename={handleConfirmRename}
+      />
+      <DeleteConfirmationDialog
+        open={isDeleteOpen}
+        onOpenChange={setIsDeleteOpen}
+        itemName={selectedPresentation?.title || ''}
+        itemType="presentation"
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+        isDeleting={isDeletePending}
       />
     </div>
   );

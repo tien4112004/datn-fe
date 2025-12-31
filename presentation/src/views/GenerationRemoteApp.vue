@@ -71,6 +71,11 @@ const handlePresentationData = async (event: MessageEvent) => {
         throw new Error('Invalid generation request data');
       }
 
+      // Set title if provided
+      if (presentation.title) {
+        slidesStore.setTitle(presentation.title);
+      }
+
       // Set theme if provided
       if (presentation.theme) {
         slidesStore.setTheme(presentation.theme);

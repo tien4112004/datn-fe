@@ -17,17 +17,17 @@ export const AddClassModal = ({ isOpen, onClose }: AddClassModalProps) => {
   const { closeCreateModal } = useClassStore();
 
   const handleSubmit = async (data: ClassSchema) => {
-    const toastId = toast.loading('Adding class...');
+    const toastId = toast.loading(t('addClass.loading'));
 
     try {
       await createClassMutation.mutateAsync(data);
-      toast.success(`Class "${data.name}" added successfully.`, {
+      toast.success(t('addClass.success', { name: data.name }), {
         id: toastId,
       });
       closeCreateModal();
     } catch (error) {
       console.error('Failed to add class', error);
-      toast.error('Failed to add class.', {
+      toast.error(t('addClass.error'), {
         id: toastId,
       });
     }

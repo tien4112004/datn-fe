@@ -22,7 +22,7 @@ export const ClassStudentView = ({ classData }: ClassStudentListProps) => {
     <div className="space-y-6">
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>{t('students.title', { count: classData.students.length })}</CardTitle>
+          <CardTitle>{t('students.title', { count: classData.students?.length || 0 })}</CardTitle>
           <div className="flex gap-2">
             {viewMode === 'seating-chart' && (
               <>
@@ -47,7 +47,11 @@ export const ClassStudentView = ({ classData }: ClassStudentListProps) => {
         </CardHeader>
         <CardContent>
           {viewMode === 'list' && (
-            <StudentListView students={classData.students} classId={classData.id} isLoading={isLoading} />
+            <StudentListView
+              students={classData.students || []}
+              classId={classData.id}
+              isLoading={isLoading}
+            />
           )}
           {viewMode === 'seating-chart' && (
             <>
@@ -64,7 +68,7 @@ export const ClassStudentView = ({ classData }: ClassStudentListProps) => {
               {initialLayout && (
                 <SeatingChartView
                   layout={initialLayout}
-                  students={classData.students}
+                  students={classData.students || []}
                   showLayoutConfig={showLayoutConfig}
                   classId={classData.id}
                 />

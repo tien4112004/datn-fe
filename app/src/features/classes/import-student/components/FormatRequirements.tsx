@@ -5,7 +5,7 @@
  * Provides users with clear guidance on data format and acceptable values.
  */
 
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, X, Check, Lightbulb } from 'lucide-react';
 import { useState } from 'react';
 
 interface FormatRequirementsProps {
@@ -74,21 +74,30 @@ export function FormatRequirements({ className = '' }: FormatRequirementsProps) 
             </h4>
             <div className="space-y-2">
               <div className="rounded border border-blue-100 bg-white p-2">
-                <p className="mb-1 text-xs font-medium text-red-700">❌ First Name</p>
+                <p className="mb-1 flex items-center gap-1.5 text-xs font-medium text-red-700">
+                  <X className="h-3.5 w-3.5" />
+                  First Name
+                </p>
                 <p className="text-xs text-blue-700">
                   Student's first name. Cannot be empty. Accepts spaces and special characters (e.g.,
                   "Mary-Jane", "José").
                 </p>
               </div>
               <div className="rounded border border-blue-100 bg-white p-2">
-                <p className="mb-1 text-xs font-medium text-red-700">❌ Last Name</p>
+                <p className="mb-1 flex items-center gap-1.5 text-xs font-medium text-red-700">
+                  <X className="h-3.5 w-3.5" />
+                  Last Name
+                </p>
                 <p className="text-xs text-blue-700">
                   Student's last name. Cannot be empty. Accepts spaces and special characters (e.g.,
                   "O'Brien", "von Neumann").
                 </p>
               </div>
               <div className="rounded border border-blue-100 bg-white p-2">
-                <p className="mb-1 text-xs font-medium text-red-700">❌ Email</p>
+                <p className="mb-1 flex items-center gap-1.5 text-xs font-medium text-red-700">
+                  <X className="h-3.5 w-3.5" />
+                  Email
+                </p>
                 <p className="text-xs text-blue-700">
                   Student's email address. Must be unique in the class. Format: name@domain.com
                 </p>
@@ -103,32 +112,47 @@ export function FormatRequirements({ className = '' }: FormatRequirementsProps) 
             </h4>
             <div className="space-y-2">
               <div className="rounded border border-blue-100 bg-white p-2">
-                <p className="mb-1 text-xs font-medium text-green-700">✓ Date of Birth</p>
+                <p className="mb-1 flex items-center gap-1.5 text-xs font-medium text-green-700">
+                  <Check className="h-3.5 w-3.5" />
+                  Date of Birth
+                </p>
                 <p className="text-xs text-blue-700">
                   Format: YYYY-MM-DD (e.g., 2008-03-15). Supports: dob, birthdate, birth_date
                 </p>
               </div>
               <div className="rounded border border-blue-100 bg-white p-2">
-                <p className="mb-1 text-xs font-medium text-green-700">✓ Phone Number</p>
+                <p className="mb-1 flex items-center gap-1.5 text-xs font-medium text-green-700">
+                  <Check className="h-3.5 w-3.5" />
+                  Phone Number
+                </p>
                 <p className="text-xs text-blue-700">
                   Student's phone number. Any format accepted (e.g., 555-0101, +1-555-0101). Supports: phone,
                   mobile, cell
                 </p>
               </div>
               <div className="rounded border border-blue-100 bg-white p-2">
-                <p className="mb-1 text-xs font-medium text-green-700">✓ Parent/Guardian Name</p>
+                <p className="mb-1 flex items-center gap-1.5 text-xs font-medium text-green-700">
+                  <Check className="h-3.5 w-3.5" />
+                  Parent/Guardian Name
+                </p>
                 <p className="text-xs text-blue-700">
                   Name of parent or guardian. Supports: parent_name, guardian_name, parent/guardian name
                 </p>
               </div>
               <div className="rounded border border-blue-100 bg-white p-2">
-                <p className="mb-1 text-xs font-medium text-green-700">✓ Parent/Guardian Email</p>
+                <p className="mb-1 flex items-center gap-1.5 text-xs font-medium text-green-700">
+                  <Check className="h-3.5 w-3.5" />
+                  Parent/Guardian Email
+                </p>
                 <p className="text-xs text-blue-700">
                   Email address of parent or guardian. Format: name@domain.com
                 </p>
               </div>
               <div className="rounded border border-blue-100 bg-white p-2">
-                <p className="mb-1 text-xs font-medium text-green-700">✓ Additional Notes</p>
+                <p className="mb-1 flex items-center gap-1.5 text-xs font-medium text-green-700">
+                  <Check className="h-3.5 w-3.5" />
+                  Additional Notes
+                </p>
                 <p className="text-xs text-blue-700">
                   Any additional information about the student. Supports: notes, comments, remarks
                 </p>
@@ -170,7 +194,10 @@ Michael,Williams,michael@example.com,2008-11-08,555-0103`}
 
           {/* Tips */}
           <div className="rounded border border-yellow-200 bg-yellow-50 p-3">
-            <p className="mb-2 text-xs font-semibold text-yellow-900">💡 Tips for successful import:</p>
+            <p className="mb-2 flex items-center gap-1.5 text-xs font-semibold text-yellow-900">
+              <Lightbulb className="h-4 w-4" />
+              Tips for successful import:
+            </p>
             <ul className="list-inside list-disc space-y-1 text-xs text-yellow-800">
               <li>Ensure all emails are unique within your class</li>
               <li>Use consistent date format (YYYY-MM-DD) for dates</li>

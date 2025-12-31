@@ -9,6 +9,8 @@ import type {
   FeedFilter,
 } from '../types';
 import { API_MODE, type ApiMode } from '@/shared/constants';
+import { api } from '@aiprimary/api';
+import type { ApiResponse } from '@aiprimary/api';
 
 export default class ClassFeedRealApiService implements ClassFeedApiService {
   baseUrl: string;
@@ -22,49 +24,43 @@ export default class ClassFeedRealApiService implements ClassFeedApiService {
   }
 
   async getPosts(classId: string, filter?: FeedFilter, page = 1, pageSize = 20): Promise<PostListResponse> {
-    const params = new URLSearchParams({
-      page: page.toString(),
-      pageSize: pageSize.toString(),
-    });
+    const response = await api.get<ApiResponse<PostListResponse>>(
+      `${this.baseUrl}/api/classes/${classId}/posts`,
+      {
+        params: {
+          page: page.toString(),
+          size: pageSize.toString(),
+          type: filter?.type !== 'all' ? filter?.type : undefined,
+          search: filter?.search || undefined,
+        },
+      }
+    );
 
-    if (filter) {
-      if (filter.type !== 'all') params.append('type', filter.type);
-      if (filter.search) params.append('search', filter.search);
-      if (filter.startDate) params.append('startDate', filter.startDate.toISOString());
-      if (filter.endDate) params.append('endDate', filter.endDate.toISOString());
-    }
-
-    const response = await fetch(`${this.baseUrl}/${classId}/feed?${params}`);
-    if (!response.ok) {
-      throw new Error(`Failed to fetch posts: ${response.statusText}`);
-    }
-
-    return response.json();
+    return response.data.data;
   }
 
   async createPost(request: PostCreateRequest): Promise<Post> {
     const formData = new FormData();
-    formData.append('classId', request.classId);
     formData.append('type', request.type);
     formData.append('content', request.content);
 
     if (request.attachments) {
-      request.attachments.forEach((file, index) => {
-        formData.append(`attachments[${index}]`, file);
+      request.attachments.forEach((file) => {
+        formData.append('attachments', file);
       });
     }
 
-    const response = await fetch(`${this.baseUrl}/${request.classId}/feed`, {
-      method: 'POST',
-      body: formData,
-    });
+    const response = await api.post<ApiResponse<Post>>(
+      `${this.baseUrl}/api/classes/${request.classId}/posts`,
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }
+    );
 
-    if (!response.ok) {
-      throw new Error(`Failed to create post: ${response.statusText}`);
-    }
-
-    const result = await response.json();
-    return result.data;
+    return response.data.data;
   }
 
   async updatePost(request: PostUpdateRequest): Promise<Post> {
@@ -72,102 +68,54 @@ export default class ClassFeedRealApiService implements ClassFeedApiService {
     formData.append('content', request.content);
 
     if (request.attachments) {
-      request.attachments.forEach((file, index) => {
-        formData.append(`attachments[${index}]`, file);
+      request.attachments.forEach((file) => {
+        formData.append('attachments', file);
       });
     }
 
-    const response = await fetch(`${this.baseUrl}/feed/${request.id}`, {
-      method: 'PUT',
-      body: formData,
+    const response = await api.put<ApiResponse<Post>>(`${this.baseUrl}/api/posts/${request.id}`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
     });
 
-    if (!response.ok) {
-      throw new Error(`Failed to update post: ${response.statusText}`);
-    }
-
-    const result = await response.json();
-    return result.data;
+    return response.data.data;
   }
 
   async deletePost(postId: string): Promise<void> {
-    const response = await fetch(`${this.baseUrl}/feed/${postId}`, {
-      method: 'DELETE',
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to delete post: ${response.statusText}`);
-    }
+    await api.delete(`${this.baseUrl}/api/posts/${postId}`);
   }
 
   async pinPost(postId: string, pinned: boolean): Promise<Post> {
-    const response = await fetch(`${this.baseUrl}/feed/${postId}/pin`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ pinned }),
-    });
+    const response = await api.post<ApiResponse<Post>>(`${this.baseUrl}/api/posts/${postId}/pin`, { pinned });
 
-    if (!response.ok) {
-      throw new Error(`Failed to ${pinned ? 'pin' : 'unpin'} post: ${response.statusText}`);
-    }
-
-    const result = await response.json();
-    return result.data;
+    return response.data.data;
   }
 
   async getComments(postId: string): Promise<Comment[]> {
-    const response = await fetch(`${this.baseUrl}/feed/${postId}/comments`);
-    if (!response.ok) {
-      throw new Error(`Failed to fetch comments: ${response.statusText}`);
-    }
+    const response = await api.get<ApiResponse<Comment[]>>(`${this.baseUrl}/api/posts/${postId}/comments`);
 
-    const result = await response.json();
-    return result.data || result;
+    return response.data.data;
   }
 
   async createComment(request: CommentCreateRequest): Promise<Comment> {
-    const response = await fetch(`${this.baseUrl}/feed/${request.postId}/comments`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ content: request.content }),
-    });
+    const response = await api.post<ApiResponse<Comment>>(
+      `${this.baseUrl}/api/posts/${request.postId}/comments`,
+      { content: request.content }
+    );
 
-    if (!response.ok) {
-      throw new Error(`Failed to create comment: ${response.statusText}`);
-    }
-
-    const result = await response.json();
-    return result.data;
+    return response.data.data;
   }
 
   async updateComment(commentId: string, content: string): Promise<Comment> {
-    const response = await fetch(`${this.baseUrl}/feed/comments/${commentId}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ content }),
+    const response = await api.put<ApiResponse<Comment>>(`${this.baseUrl}/api/comments/${commentId}`, {
+      content,
     });
 
-    if (!response.ok) {
-      throw new Error(`Failed to update comment: ${response.statusText}`);
-    }
-
-    const result = await response.json();
-    return result.data;
+    return response.data.data;
   }
 
   async deleteComment(commentId: string): Promise<void> {
-    const response = await fetch(`${this.baseUrl}/feed/comments/${commentId}`, {
-      method: 'DELETE',
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to delete comment: ${response.statusText}`);
-    }
+    await api.delete(`${this.baseUrl}/api/comments/${commentId}`);
   }
 }

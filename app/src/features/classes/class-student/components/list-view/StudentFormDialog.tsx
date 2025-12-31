@@ -94,7 +94,7 @@ export function StudentFormDialog({
   // Pre-fill form data in edit mode
   useEffect(() => {
     if (mode === 'edit' && initialData && open) {
-      setValue('fullName', initialData.fullName);
+      setValue('fullName', initialData.fullName || '');
       setValue('address', initialData.address || '');
       setValue('parentName', initialData.parentName || '');
       setValue('parentPhone', initialData.parentPhone || '');

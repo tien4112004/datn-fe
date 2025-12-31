@@ -22,11 +22,13 @@ export const ClassForm = ({ initialData, onSubmit, isEditMode = false }: ClassFo
   const [isLoading, setIsLoading] = useState(false);
   const [generalError, setGeneralError] = useState<string | null>(null);
 
+  // Only re-validate when formData changes and we already have errors
   useEffect(() => {
     if (Object.keys(errors).length > 0) {
       validateForm();
     }
-  }, [formData, errors, validateForm]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formData]);
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -155,7 +157,7 @@ export const ClassForm = ({ initialData, onSubmit, isEditMode = false }: ClassFo
         </div>
         <Separator />
 
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="grade" className="text-sm font-medium">
               {t('grade')} <span className="text-destructive">*</span>
@@ -196,28 +198,6 @@ export const ClassForm = ({ initialData, onSubmit, isEditMode = false }: ClassFo
             {getFieldError('academicYear') && (
               <p className="text-destructive text-sm font-medium">
                 {getErrorMessage(getFieldError('academicYear'))}
-              </p>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="class" className="text-sm font-medium">
-              <MapPin className="mr-1 inline h-3.5 w-3.5" />
-              {t('class')}
-            </Label>
-            <Input
-              type="text"
-              name="class"
-              id="class"
-              value={formData.class || ''}
-              onChange={handleChange}
-              disabled={isLoading}
-              placeholder={t('classPlaceholder')}
-              className={getFieldError('class') ? 'border-destructive' : ''}
-            />
-            {getFieldError('class') && (
-              <p className="text-destructive text-sm font-medium">
-                {getErrorMessage(getFieldError('class'))}
               </p>
             )}
           </div>

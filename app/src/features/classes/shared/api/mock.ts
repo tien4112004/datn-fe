@@ -20,6 +20,7 @@ import {
   type SchedulePeriodCreateRequest,
   type SchedulePeriodUpdateRequest,
   type ImportResult,
+  type ObjectiveType,
   toMinimalSchedulePeriod,
 } from '../types';
 import { API_MODE, type ApiMode } from '@aiprimary/api';
@@ -201,12 +202,14 @@ export default class ClassMockApiService implements ClassApiService {
     const newClass: Class = {
       id: Date.now().toString(),
       ...data,
+      ownerId: '1',
       teacherId: '1',
       currentEnrollment: 0,
       students: [],
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       isActive: true,
+      name: data.name,
     };
 
     this.classes.push(newClass);
@@ -240,7 +243,7 @@ export default class ClassMockApiService implements ClassApiService {
     }
 
     // Check if class has students
-    if (this.classes[index].currentEnrollment > 0) {
+    if ((this.classes[index].currentEnrollment || 0) > 0) {
       throw new Error('Cannot delete class with enrolled students');
     }
 
@@ -276,7 +279,7 @@ export default class ClassMockApiService implements ClassApiService {
     student.updatedAt = new Date().toISOString();
 
     // Update class enrollment count
-    cls.currentEnrollment += 1;
+    cls.currentEnrollment = (cls.currentEnrollment || 0) + 1;
     cls.updatedAt = new Date().toISOString();
 
     return student;
@@ -296,7 +299,9 @@ export default class ClassMockApiService implements ClassApiService {
     }
 
     // Update class enrollment count
-    cls.currentEnrollment = Math.max(0, cls.currentEnrollment - 1);
+    if (cls.currentEnrollment !== undefined) {
+      cls.currentEnrollment = Math.max(0, cls.currentEnrollment - 1);
+    }
     cls.updatedAt = new Date().toISOString();
 
     // Remove student from students array (in real system, might just update status)
@@ -318,14 +323,14 @@ export default class ClassMockApiService implements ClassApiService {
     // Create new student
     const newStudent: Student = {
       id: `student-${Date.now()}`,
-      fullName: data.fullName,
-      dateOfBirth: data.dateOfBirth,
-      gender: data.gender,
+      userId: `user-${Date.now()}`,
+      firstName: data.firstName,
+      lastName: data.lastName,
       address: data.address,
-      parentName: data.parentName,
-      parentPhone: data.parentPhone,
-      classId: classId,
-      enrollmentDate: data.enrollmentDate || new Date().toISOString(),
+      parentContactEmail: data.parentContactEmail,
+      phoneNumber: data.phoneNumber,
+      avatarUrl: data.avatarUrl,
+      enrollmentDate: new Date().toISOString(),
       status: 'active',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
@@ -334,7 +339,7 @@ export default class ClassMockApiService implements ClassApiService {
     this.students.push(newStudent);
 
     // Update class enrollment count
-    cls.currentEnrollment += 1;
+    cls.currentEnrollment = (cls.currentEnrollment || 0) + 1;
     cls.updatedAt = new Date().toISOString();
 
     return newStudent;
@@ -349,12 +354,12 @@ export default class ClassMockApiService implements ClassApiService {
     }
 
     // Update student fields
-    if (data.fullName !== undefined) student.fullName = data.fullName;
-    if (data.dateOfBirth !== undefined) student.dateOfBirth = data.dateOfBirth;
-    if (data.gender !== undefined) student.gender = data.gender;
+    if (data.firstName !== undefined) student.firstName = data.firstName;
+    if (data.lastName !== undefined) student.lastName = data.lastName;
+    if (data.phoneNumber !== undefined) student.phoneNumber = data.phoneNumber;
     if (data.address !== undefined) student.address = data.address;
-    if (data.parentName !== undefined) student.parentName = data.parentName;
-    if (data.parentPhone !== undefined) student.parentPhone = data.parentPhone;
+    if (data.parentContactEmail !== undefined) student.parentContactEmail = data.parentContactEmail;
+    if (data.avatarUrl !== undefined) student.avatarUrl = data.avatarUrl;
     if (data.status !== undefined) student.status = data.status;
 
     student.updatedAt = new Date().toISOString();
@@ -374,7 +379,7 @@ export default class ClassMockApiService implements ClassApiService {
 
     // Update class enrollment count
     const cls = this.classes.find((c) => c.id === student.classId);
-    if (cls) {
+    if (cls && cls.currentEnrollment !== undefined) {
       cls.currentEnrollment = Math.max(0, cls.currentEnrollment - 1);
       cls.updatedAt = new Date().toISOString();
     }
@@ -504,49 +509,45 @@ export default class ClassMockApiService implements ClassApiService {
       throw new Error('Class not found');
     }
 
-    // Look up the binded period if provided
-    let bindedPeriod: MinimalSchedulePeriod | undefined;
-    if (data.bindedPeriodId) {
-      const period = this.periods.find((p) => p.id === data.bindedPeriodId);
-      if (period) {
-        bindedPeriod = {
-          id: period.id,
-          classId: period.classId,
-          name: period.name,
-          subject: period.subject, // This is now a string code
-          date: period.date,
-          startTime: period.startTime,
-          endTime: period.endTime,
-          category: period.category,
-          isActive: period.isActive,
-          lessonIds: period.lessons.map((l) => l.id),
-        };
-      }
-    }
-
     const newLesson: Lesson = {
       id: Date.now().toString(),
       classId: data.classId,
+      authorId: '1', // Default author ID for mock API
       className: cls.name,
-      subject: '', // Subject not specified in request
+      subject: data.subject || null,
       title: data.title,
-      description: data.description,
+      content: data.content,
+      type: data.type || 'lecture',
       duration: 45, // Default duration, could be calculated from start/end time
-      linkedPeriods: bindedPeriod ? [bindedPeriod] : [],
-      objectives: data.objectives.map((obj, index) => ({
-        ...obj,
-        lessonId: '', // Will be set after creation
-        id: `obj-${Date.now()}-${index}`, // Temporary ID for API operations
-      })),
-      resources: data.resources.map((res, index) => ({
-        ...res,
-        lessonId: '', // Will be set after creation
-        id: `res-${Date.now()}-${index}`, // Temporary ID for API operations
-      })),
-      status: 'planned',
-      notes: data.notes,
+      linkedPeriods: [],
+      learningObjectives:
+        data.learningObjectives?.map((obj, index) => ({
+          id: `obj-${Date.now()}-${index}`,
+          lessonId: Date.now().toString(),
+          description: obj.description,
+          type: (obj.type as ObjectiveType) || 'knowledge',
+          isAchieved: obj.isAchieved || false,
+          notes: obj.notes || undefined,
+        })) || null,
+      lessonPlan: data.lessonPlan || null,
+      maxPoints: data.maxPoints || null,
+      dueDate: data.dueDate || null,
+      status: 'draft',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
+      // Legacy fields for compatibility
+      description: data.content,
+      objectives:
+        data.learningObjectives?.map((obj, index) => ({
+          id: `obj-${Date.now()}-${index}`,
+          lessonId: Date.now().toString(),
+          description: obj.description,
+          type: (obj.type as ObjectiveType) || 'knowledge',
+          isAchieved: obj.isAchieved || false,
+          notes: obj.notes || undefined,
+        })) || [],
+      resources: [],
+      notes: data.lessonPlan || undefined,
     };
 
     this.lessons.push(newLesson);
@@ -563,26 +564,33 @@ export default class ClassMockApiService implements ClassApiService {
 
     // Update basic fields
     if (data.title !== undefined) lesson.title = data.title;
-    if (data.description !== undefined) lesson.description = data.description;
-    if (data.notes !== undefined) lesson.notes = data.notes;
-    if (data.status !== undefined) lesson.status = data.status;
-
-    // Update objectives if provided
-    if (data.objectives !== undefined) {
-      lesson.objectives = data.objectives.map((obj, index) => ({
-        ...obj,
-        lessonId: lesson.id,
-        id: `obj-${Date.now()}-${index}`, // Generate new ID for each objective
-      }));
+    if (data.content !== undefined) {
+      lesson.content = data.content;
+      lesson.description = data.content; // Keep legacy field in sync
     }
+    if (data.subject !== undefined) lesson.subject = data.subject;
+    if (data.type !== undefined) lesson.type = data.type;
+    if (data.status !== undefined) lesson.status = data.status;
+    if (data.lessonPlan !== undefined) {
+      lesson.lessonPlan = data.lessonPlan;
+      lesson.notes = data.lessonPlan; // Keep legacy field in sync
+    }
+    if (data.maxPoints !== undefined) lesson.maxPoints = data.maxPoints;
+    if (data.dueDate !== undefined) lesson.dueDate = data.dueDate;
 
-    // Update resources if provided
-    if (data.resources !== undefined) {
-      lesson.resources = data.resources.map((res, index) => ({
-        ...res,
-        lessonId: lesson.id,
-        id: `res-${Date.now()}-${index}`, // Generate new ID for each resource
-      }));
+    // Update learning objectives if provided
+    if (data.learningObjectives !== undefined) {
+      lesson.learningObjectives =
+        data.learningObjectives?.map((obj, index) => ({
+          id: `obj-${Date.now()}-${index}`,
+          lessonId: lesson.id,
+          description: obj.description,
+          type: (obj.type as ObjectiveType) || 'knowledge',
+          isAchieved: obj.isAchieved || false,
+          notes: obj.notes || undefined,
+        })) || null;
+      // Keep legacy field in sync
+      lesson.objectives = lesson.learningObjectives || [];
     }
 
     lesson.updatedAt = new Date().toISOString();

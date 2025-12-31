@@ -20,8 +20,23 @@ export const AddClassModal = ({ isOpen, onClose }: AddClassModalProps) => {
     const toastId = toast.loading(t('addClass.loading'));
 
     try {
-      await createClassMutation.mutateAsync(data);
-      toast.success(t('addClass.success', { name: data.name }), {
+      // Backend expects settings as a JSON string, not an object
+      // Store grade, academicYear, and class in settings for backward compatibility
+      const settings: Record<string, any> = {};
+
+      if (data.grade) settings.grade = data.grade;
+      if (data.academicYear) settings.academicYear = data.academicYear;
+      if (data.class) settings.class = data.class;
+
+      const createRequest = {
+        name: data.name,
+        description: data.description || null,
+        // Stringify settings object to JSON string as backend expects String type
+        settings: Object.keys(settings).length > 0 ? JSON.stringify(settings) : null,
+      };
+
+      await createClassMutation.mutateAsync(createRequest);
+      toast.success(`Class "${data.name}" added successfully.`, {
         id: toastId,
       });
       closeCreateModal();

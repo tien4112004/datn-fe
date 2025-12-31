@@ -10,22 +10,33 @@ import type { MinimalSchedulePeriod } from '../../class-schedule/types/schedule'
  * Lesson Entity
  *
  * A detailed plan for teaching a specific subject during a class period.
+ * Matches backend Lesson schema
  */
 export interface Lesson {
+  // Backend fields
   id: string;
   classId: string;
-  className: string;
-  subject?: string; // Subject code
+  authorId: string; // ID of the teacher/author
   title: string;
-  description?: string;
-  duration: number; // minutes
-  linkedPeriods: MinimalSchedulePeriod[];
-  objectives: LearningObjective[];
-  resources: LessonResource[];
+  subject?: string | null; // Subject code
+  content: string; // Lesson content or instructions
+  type?: 'assignment' | 'material' | 'lecture' | 'quiz';
   status: LessonStatus;
-  notes?: string;
-  createdAt: string;
-  updatedAt: string;
+  learningObjectives?: LearningObjective[] | null;
+  lessonPlan?: string | null; // Private teacher notes/plan
+  maxPoints?: number | null; // For assignments
+  dueDate?: string | null; // For assignments
+  createdAt?: string;
+  updatedAt?: string;
+
+  // Legacy/compatibility fields
+  className?: string;
+  description?: string; // Use content instead
+  duration?: number; // minutes
+  linkedPeriods?: MinimalSchedulePeriod[];
+  objectives?: LearningObjective[]; // Alias for learningObjectives
+  resources?: LessonResource[];
+  notes?: string; // Use lessonPlan instead
 }
 
 /**
@@ -57,7 +68,15 @@ export interface LessonResource {
   isPrepared: boolean;
 }
 
-export type LessonStatus = 'planned' | 'in_progress' | 'completed' | 'cancelled';
+export type LessonStatus =
+  | 'draft'
+  | 'published'
+  | 'archived'
+  // Legacy statuses for backwards compatibility
+  | 'planned'
+  | 'in_progress'
+  | 'completed'
+  | 'cancelled';
 
 export type ObjectiveType =
   | 'knowledge' // Kiến thức

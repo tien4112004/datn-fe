@@ -20,13 +20,13 @@ const mockPosts: Post[] = [
     authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=teacher1',
     type: 'announcement',
     content: `
-# 👋 Welcome to Advanced Mathematics 2025!
+# Welcome to Advanced Mathematics 2025!
 
 I'm excited to embark on this mathematical journey with you all.
 
 ---
 
-## 📅 Important Dates
+## Important Dates
 
 * **First quiz:** December 15th
 * **Mid-term exam:** January 20th
@@ -34,7 +34,7 @@ I'm excited to embark on this mathematical journey with you all.
 
 ---
 
-## 📚 What to Expect
+## What to Expect
 
 * Weekly problem sets
 * Group discussions
@@ -98,12 +98,53 @@ I'm excited to embark on this mathematical journey with you all.
     authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=teacher1',
     type: 'announcement',
     content:
-      "📢 **Study Groups Announcement**\n\nI've noticed some of you are interested in forming study groups. This is a great idea! Here's how we'll organize:\n\n🎯 **Objectives:**\n- Peer learning and support\n- Practice problem-solving together\n- Share different approaches to problems\n\n📋 **Guidelines:**\n- Groups of 3-4 students\n- Meet 1-2 times per week\n- Rotate who leads the discussion\n- Focus on understanding concepts, not just getting answers\n\nIf you're interested in joining a study group, please reply to this post with:\n1. Your availability (days/times)\n2. Preferred meeting format (in-person/virtual)\n3. Any specific topics you'd like to focus on\n\nI'll help coordinate the groups based on your responses!",
+      "**Study Groups Announcement**\n\nI've noticed some of you are interested in forming study groups. This is a great idea! Here's how we'll organize:\n\n**Objectives:**\n- Peer learning and support\n- Practice problem-solving together\n- Share different approaches to problems\n\n**Guidelines:**\n- Groups of 3-4 students\n- Meet 1-2 times per week\n- Rotate who leads the discussion\n- Focus on understanding concepts, not just getting answers\n\nIf you're interested in joining a study group, please reply to this post with:\n1. Your availability (days/times)\n2. Preferred meeting format (in-person/virtual)\n3. Any specific topics you'd like to focus on\n\nI'll help coordinate the groups based on your responses!",
     attachments: [],
     isPinned: true,
     commentCount: 12,
     createdAt: new Date('2025-12-02T09:00:00Z'),
     updatedAt: new Date('2025-12-02T09:00:00Z'),
+  },
+  {
+    id: '5',
+    classId: '1',
+    authorId: 'teacher1',
+    authorName: 'Dr. Sarah Johnson',
+    authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=teacher1',
+    type: 'assignment',
+    content:
+      '# Problem Set 1: Linear Transformations\n\n## Instructions\n\nComplete the following problems and submit your solutions by the deadline. Show all your work and explain your reasoning.\n\n### Problems\n\n1. **Matrix Representation** (20 points)\n   - Find the matrix representation of the linear transformation T: R³ → R² defined by T(x, y, z) = (2x - y, x + 3z)\n   - Verify your answer with at least two test vectors\n\n2. **Kernel and Range** (25 points)\n   - For the transformation in problem 1, find:\n     - The kernel (null space) of T\n     - The range (column space) of T\n     - The rank and nullity, and verify the rank-nullity theorem\n\n3. **Composition** (25 points)\n   - Let S: R² → R³ be defined by S(x, y) = (x + y, 2x, y)\n   - Find the matrix representation of the composition T ∘ S\n   - What is the dimension of the range of T ∘ S?\n\n4. **Eigenvalues and Eigenvectors** (30 points)\n   - Find all eigenvalues and eigenvectors for the matrix:\n     ```\n     A = [3  -1]\n         [2   0]\n     ```\n   - Determine if A is diagonalizable. If so, find matrices P and D such that A = PDP⁻¹\n\n### Submission Guidelines\n\n- Submit your work as a PDF file\n- Type your solutions using LaTeX or write them clearly and scan/photograph them\n- Include your name and student ID on the first page\n- Late submissions will receive a 10% penalty per day\n\n**Good luck! Feel free to ask questions in the comments below.**',
+    attachments: [
+      {
+        id: 'att2',
+        fileName: 'problem-set-1-template.pdf',
+        fileType: 'application/pdf',
+        fileSize: 125000,
+        url: 'https://example.com/problem-set-1.pdf',
+        uploadedAt: new Date('2025-12-03T10:00:00Z'),
+      },
+    ],
+    deadline: new Date('2025-12-15T23:59:00Z'),
+    isPinned: false,
+    commentCount: 7,
+    createdAt: new Date('2025-12-03T10:00:00Z'),
+    updatedAt: new Date('2025-12-03T10:00:00Z'),
+  },
+  {
+    id: '6',
+    classId: '1',
+    authorId: 'teacher1',
+    authorName: 'Dr. Sarah Johnson',
+    authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=teacher1',
+    type: 'assignment',
+    content:
+      "# Reading Assignment: Chapter 4 - Vector Spaces\n\n## Overview\n\nFor our next class, please read **Chapter 4** of our textbook covering vector spaces and subspaces.\n\n## Key Topics to Focus On\n\n1. **Definition of Vector Spaces** (Section 4.1)\n   - Understand the 10 axioms that define a vector space\n   - Review examples and non-examples\n\n2. **Subspaces** (Section 4.2)\n   - Subspace test (3 conditions)\n   - Common subspaces: zero subspace, spans, null space, column space\n\n3. **Linear Independence** (Section 4.3)\n   - Definition and geometric interpretation\n   - Testing for linear independence\n\n## Discussion Questions\n\nBe prepared to discuss these questions in class:\n\n1. Why is the set of all 2×2 matrices a vector space?\n2. Can you give an example of a subset of R³ that is NOT a subspace? Why not?\n3. What's the relationship between linear independence and spanning sets?\n\n## Optional Practice\n\n- Work through the examples in sections 4.1-4.3\n- Try the odd-numbered exercises (solutions in the back)\n\n*This reading is essential preparation for our class discussion. Come with questions!*",
+    attachments: [],
+    deadline: new Date('2025-12-10T08:00:00Z'),
+    isPinned: false,
+    commentCount: 3,
+    createdAt: new Date('2025-12-04T14:00:00Z'),
+    updatedAt: new Date('2025-12-04T14:00:00Z'),
   },
 ];
 
@@ -389,6 +430,8 @@ export default class ClassFeedMockApiService implements ClassFeedApiService {
         filteredPosts = filteredPosts.filter((post) => post.type === 'post');
       } else if (filter.type === 'announcements') {
         filteredPosts = filteredPosts.filter((post) => post.type === 'announcement');
+      } else if (filter.type === 'assignments') {
+        filteredPosts = filteredPosts.filter((post) => post.type === 'assignment');
       }
       // 'all' means no filtering
       if (filter.search) {
@@ -435,6 +478,7 @@ export default class ClassFeedMockApiService implements ClassFeedApiService {
       authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=current-user',
       type: request.type,
       content: request.content,
+      deadline: request.deadline,
       attachments:
         request.attachments?.map((file) => ({
           id: Date.now().toString() + Math.random(),

@@ -1,4 +1,4 @@
-export { FeedTab as FeedPage } from './FeedTab';
+export { FeedTab } from './FeedTab';
 export { PostCreator } from './PostCreator';
 export { PostList } from './PostList';
 export { LoadMore } from './LoadMore';

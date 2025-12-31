@@ -142,7 +142,7 @@ export const LessonCard = ({ lesson, canEdit = true, onUpdateStatus, onEditClick
             <div className="flex items-center gap-2">
               <FileText className="h-4 w-4 flex-shrink-0" />
               <span>
-                {lesson.objectives.length} {t('objectives')}
+                {(lesson.objectives || []).length} {t('objectives')}
               </span>
             </div>
           </div>
@@ -157,16 +157,16 @@ export const LessonCard = ({ lesson, canEdit = true, onUpdateStatus, onEditClick
           {/* Actions */}
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <div className="flex flex-wrap items-center gap-2">
-              {lesson.objectives.length > 0 && (
+              {(lesson.objectives || []).length > 0 && (
                 <Badge variant="outline" className="text-xs md:text-sm">
-                  {lesson.objectives.filter((obj: LearningObjective) => obj.isAchieved).length}/
-                  {lesson.objectives.length} {t('objectivesAchieved')}
+                  {(lesson.objectives || []).filter((obj: LearningObjective) => obj.isAchieved).length}/
+                  {(lesson.objectives || []).length} {t('objectivesAchieved')}
                 </Badge>
               )}
-              {lesson.resources.length > 0 && (
+              {(lesson.resources || []).length > 0 && (
                 <Badge variant="outline" className="text-xs md:text-sm">
-                  {lesson.resources.filter((res: LessonResource) => res.isPrepared).length}/
-                  {lesson.resources.length} {t('resourcesPrepared')}
+                  {(lesson.resources || []).filter((res: LessonResource) => res.isPrepared).length}/
+                  {(lesson.resources || []).length} {t('resourcesPrepared')}
                 </Badge>
               )}
             </div>

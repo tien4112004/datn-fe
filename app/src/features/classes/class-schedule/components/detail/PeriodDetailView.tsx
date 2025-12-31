@@ -128,9 +128,9 @@ export const PeriodDetailView = ({ period }: PeriodDetailViewProps) => {
                     <h4 className="text-base font-bold">{t('schedule.periodDetail.learningObjectives')}</h4>
                   </div>
                   <Separator className="mb-4" />
-                  {lesson.objectives.length > 0 ? (
+                  {(lesson.objectives || lesson.learningObjectives || []).length > 0 ? (
                     <ul className="space-y-2">
-                      {lesson.objectives.map((obj) => (
+                      {(lesson.objectives || lesson.learningObjectives || []).map((obj) => (
                         <li
                           key={obj.id}
                           className="flex gap-3 rounded-lg bg-amber-50 p-3 transition-colors hover:bg-amber-100"
@@ -154,9 +154,9 @@ export const PeriodDetailView = ({ period }: PeriodDetailViewProps) => {
                     <h4 className="text-base font-bold">{t('schedule.lessonDetail.resources')}</h4>
                   </div>
                   <Separator className="mb-4" />
-                  {lesson.resources.length > 0 ? (
+                  {(lesson.resources || []).length > 0 ? (
                     <ul className="space-y-2">
-                      {lesson.resources.map((res) => (
+                      {(lesson.resources || []).map((res) => (
                         <li
                           key={res.id}
                           className="flex gap-3 rounded-lg bg-blue-50 p-3 transition-colors hover:bg-blue-100"

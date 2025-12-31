@@ -178,7 +178,7 @@ export function useSubjects(classId: string) {
       if (!cls) {
         return [];
       }
-      const subjects = getSubjectsByGrade(cls.grade);
+      const subjects = getSubjectsByGrade(cls.grade || cls.settings?.grade || 1);
       return subjects.map((subject) => subject.code);
     },
     enabled: !!classId,

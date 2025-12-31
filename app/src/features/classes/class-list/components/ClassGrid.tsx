@@ -1,5 +1,4 @@
 import { useTranslation } from 'react-i18next';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
 
 import { useClasses } from '../../shared/hooks';
 import { useClassStore } from '../../shared/stores';
@@ -10,7 +9,10 @@ import { getCoreRowModel, useReactTable } from '@tanstack/react-table';
 export const ClassGrid = () => {
   const { t } = useTranslation('classes', { keyPrefix: 'grid' });
 
-  const { filters, openEditModal, openEnrollmentModal } = useClassStore();
+  // Use selectors to prevent unnecessary re-renders
+  const filters = useClassStore((state) => state.filters);
+  const openEditModal = useClassStore((state) => state.openEditModal);
+  const openEnrollmentModal = useClassStore((state) => state.openEnrollmentModal);
 
   const {
     data: classes,
@@ -27,7 +29,7 @@ export const ClassGrid = () => {
   });
 
   const table = useReactTable({
-    data: [...classes],
+    data: classes,
     columns: [],
     getCoreRowModel: getCoreRowModel(),
     manualPagination: true,
@@ -46,20 +48,23 @@ export const ClassGrid = () => {
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="divide-y">
         {Array.from({ length: 6 }).map((_, i) => (
-          <Card key={i} className="animate-pulse">
-            <CardHeader>
-              <div className="h-4 w-1/2 rounded bg-gray-200"></div>
-              <div className="h-3 w-3/4 rounded bg-gray-200"></div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <div className="h-3 rounded bg-gray-200"></div>
-                <div className="h-3 w-2/3 rounded bg-gray-200"></div>
+          <div key={i} className="animate-pulse py-6">
+            <div className="space-y-3">
+              {/* Title and badges skeleton */}
+              <div className="flex items-center gap-3">
+                <div className="h-6 w-48 rounded bg-gray-200"></div>
+                <div className="h-5 w-16 rounded-full bg-gray-200"></div>
               </div>
-            </CardContent>
-          </Card>
+              {/* Metadata skeleton */}
+              <div className="flex gap-4">
+                <div className="h-4 w-24 rounded bg-gray-200"></div>
+                <div className="h-4 w-28 rounded bg-gray-200"></div>
+                <div className="h-4 w-20 rounded bg-gray-200"></div>
+              </div>
+            </div>
+          </div>
         ))}
       </div>
     );
@@ -67,31 +72,27 @@ export const ClassGrid = () => {
 
   if (error) {
     return (
-      <Card>
-        <CardContent className="p-8">
-          <div className="text-destructive text-center">
-            <p>{t('error')}</p>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="border-destructive bg-destructive/10 border-l-4 p-6">
+        <div className="text-destructive">
+          <p>{t('error')}</p>
+        </div>
+      </div>
     );
   }
 
   if (classes.length === 0) {
     return (
-      <Card>
-        <CardContent className="p-8">
-          <div className="text-muted-foreground text-center">
-            <p>{t('noClasses')}</p>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="py-12 text-center">
+        <div className="text-muted-foreground">
+          <p>{t('noClasses')}</p>
+        </div>
+      </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="divide-y">
         {classes.map((classItem) => (
           <ClassCard
             key={classItem.id}

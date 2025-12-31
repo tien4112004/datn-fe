@@ -39,49 +39,36 @@ export const ClassDetailHeader = ({ currentClass }: ClassDetailHeaderProps) => {
 
       <div className="space-y-6 px-8 py-6">
         {/* Class Header */}
-        <div className="rounded-lg bg-gradient-to-br from-white to-slate-50 p-6">
-          <div className="flex items-start justify-between gap-6">
-            <div className="flex-1 space-y-3">
-              {/* Title and Status */}
-              <div className="flex flex-wrap items-center gap-3">
-                <h1 className="text-4xl font-bold tracking-tight">{currentClass.name}</h1>
-                <Badge variant={currentClass.isActive ? 'default' : 'secondary'} className="px-3 py-1">
-                  {currentClass.isActive ? t('status.active') : t('status.inactive')}
-                </Badge>
-              </div>
-
-              {/* Metadata */}
-              <div className="flex flex-wrap items-center gap-4 pt-2">
-                <div className="flex items-center gap-1.5">
-                  <span className="inline-block h-1 w-1 rounded-full bg-slate-300"></span>
-                  <span className="text-sm font-medium text-slate-700">
-                    {getGradeLabel(currentClass.grade)}
-                  </span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <span className="inline-block h-1 w-1 rounded-full bg-slate-300"></span>
-                  <span className="text-sm text-slate-600">
-                    {t('academicYear')}: <span className="font-medium">{currentClass.academicYear}</span>
-                  </span>
-                </div>
-                {currentClass.class && (
-                  <div className="flex items-center gap-1.5">
-                    <span className="inline-block h-1 w-1 rounded-full bg-slate-300"></span>
-                    <span className="text-sm text-slate-600">
-                      {t('class')}: <span className="font-medium">{currentClass.class}</span>
-                    </span>
-                  </div>
-                )}
-              </div>
-
-              {/* Description */}
-              {currentClass.description && (
-                <p className="max-w-2xl pt-2 text-sm leading-relaxed text-slate-600">
-                  {currentClass.description}
-                </p>
-              )}
-            </div>
+        <div className="space-y-4">
+          {/* Title and Status */}
+          <div className="flex flex-wrap items-center gap-3">
+            <h1 className="text-3xl font-bold tracking-tight">{currentClass.name}</h1>
+            <Badge variant={currentClass.isActive ? 'default' : 'secondary'}>
+              {currentClass.isActive ? t('status.active') : t('status.inactive')}
+            </Badge>
           </div>
+
+          {/* Metadata */}
+          <div className="text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
+            <span className="font-medium">
+              {getGradeLabel(currentClass.grade || currentClass.settings?.grade || 1)}
+            </span>
+            <span className="bg-muted-foreground/30 inline-block h-1 w-1 rounded-full"></span>
+            <span>{currentClass.academicYear}</span>
+            {currentClass.class && (
+              <>
+                <span className="bg-muted-foreground/30 inline-block h-1 w-1 rounded-full"></span>
+                <span>{currentClass.class}</span>
+              </>
+            )}
+          </div>
+
+          {/* Description */}
+          {currentClass.description && (
+            <p className="text-muted-foreground max-w-3xl text-sm leading-relaxed">
+              {currentClass.description}
+            </p>
+          )}
         </div>
       </div>
     </>

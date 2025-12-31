@@ -61,7 +61,7 @@ export const SubjectContextSwitcher = ({
         // Find recent lesson for this subject
         const recentLesson = lessons
           .filter((lp) => lp.subject === period.subject)
-          .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())[0];
+          .sort((a, b) => new Date(b.updatedAt || 0).getTime() - new Date(a.updatedAt || 0).getTime())[0];
 
         // Count upcoming deadlines (lessons due soon)
         // Note: Since date field was removed from Lesson, we can't calculate upcoming deadlines

@@ -5,9 +5,10 @@ export interface Post {
   authorId: string;
   authorName: string;
   authorAvatar?: string;
-  type: 'announcement' | 'post'; // Simple types only
+  type: 'announcement' | 'post' | 'assignment';
   content: string;
   attachments?: Attachment[];
+  deadline?: Date; // Only for assignments
   isPinned: boolean;
   commentCount: number;
   createdAt: Date;

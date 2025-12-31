@@ -3,21 +3,35 @@
  *
  * This file is kept separate from class.ts even though Student is referenced there,
  * to allow independent evolution and clearer domain boundaries.
+ *
+ * Matches backend StudentResponse schema
  */
 
 export interface Student {
   id: string;
-  fullName: string;
-  dateOfBirth: string;
-  gender: StudentGender;
-  address?: string;
-  parentName?: string;
-  parentPhone?: string;
-  classId: string;
-  enrollmentDate: string;
-  status: StudentStatus;
-  createdAt: string;
-  updatedAt: string;
+  userId: string; // Associated user/profile ID
+  enrollmentDate?: string | null;
+  address?: string | null;
+  parentContactEmail?: string | null;
+  status?: StudentStatus | null;
+  createdAt?: string | null;
+  updatedAt?: string | null;
+
+  // User profile fields
+  username?: string | null; // Generated username/email (only set during create/import)
+  password?: string | null; // Temporary password (only set during create/import)
+  firstName?: string | null; // From user profile
+  lastName?: string | null; // From user profile
+  avatarUrl?: string | null; // From user profile
+  phoneNumber?: string | null; // From user profile
+
+  // Legacy/computed fields for compatibility
+  fullName?: string; // Computed from firstName + lastName (deprecated)
+  dateOfBirth?: string; // (deprecated)
+  gender?: StudentGender; // (deprecated)
+  parentName?: string; // (deprecated - use parentContactEmail)
+  parentPhone?: string; // (deprecated - use phoneNumber)
+  classId?: string; // Context-dependent (deprecated)
 }
 
 export type StudentStatus = 'active' | 'transferred' | 'graduated' | 'dropped';

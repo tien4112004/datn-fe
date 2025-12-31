@@ -19,6 +19,7 @@ export const classesTable: Omit<Class, 'students' | 'subjects' | 'layout'>[] = [
     updatedAt: '2024-09-23T00:00:00Z',
     isActive: true,
     teacherId: '1',
+    ownerId: '1',
   },
   {
     id: '2',
@@ -32,6 +33,7 @@ export const classesTable: Omit<Class, 'students' | 'subjects' | 'layout'>[] = [
     updatedAt: '2024-09-23T00:00:00Z',
     isActive: true,
     teacherId: '1',
+    ownerId: '1',
   },
   {
     id: '3',
@@ -46,5 +48,6 @@ export const classesTable: Omit<Class, 'students' | 'subjects' | 'layout'>[] = [
     updatedAt: '2024-09-23T00:00:00Z',
     isActive: true,
     teacherId: '1',
+    ownerId: '1',
   },
 ];

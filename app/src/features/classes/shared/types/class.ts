@@ -9,18 +9,23 @@ import type { Student } from '../../class-student/types/student';
 
 export interface Class {
   id: string;
+  ownerId: string; // ID of the teacher/owner who created the class
   name: string; // e.g., "10A1", "11B2"
-  grade: number; // 1-12 for Vietnamese education system
-  academicYear: string; // e.g., "2024-2025"
-  currentEnrollment: number; // current number of students
-  teacherId: string; // homeroom teacher
-  class?: string; // physical location
-  description?: string;
-  students: Student[];
-  layout?: Layout;
+  description?: string | null;
+  joinCode?: string | null; // Unique join code for students to enroll
+  settings?: Record<string, any> | null; // Class-specific settings
+  isActive: boolean;
   createdAt: string;
   updatedAt: string;
-  isActive: boolean;
+
+  // Legacy/computed fields for compatibility with existing frontend code
+  grade?: number; // 1-12 for Vietnamese education system (deprecated)
+  academicYear?: string; // e.g., "2024-2025" (deprecated)
+  currentEnrollment?: number; // current number of students (deprecated)
+  teacherId?: string; // alias for ownerId (deprecated)
+  class?: string; // physical location (deprecated)
+  students?: Student[]; // populated from separate endpoint
+  layout?: Layout; // populated from separate endpoint
 }
 
 /**

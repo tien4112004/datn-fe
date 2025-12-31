@@ -11,7 +11,7 @@ import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
 import { Alert, AlertDescription } from '@/shared/components/ui/alert';
 import { useImportQuestions } from '@/features/assignment/hooks/useQuestionBankApi';
-import { downloadCSVTemplate } from '../utils/csvTemplateGenerator';
+import { downloadCSVTemplate } from '@/features/assignment/utils/csvTemplateGenerator';
 import { Upload, FileSpreadsheet, AlertCircle, CheckCircle, Download } from 'lucide-react';
 
 interface QuestionBankImportDialogProps {

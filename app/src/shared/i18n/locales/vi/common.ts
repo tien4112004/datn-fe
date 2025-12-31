@@ -24,6 +24,9 @@ export default {
     goBack: 'Quay lại',
     goHome: 'Về trang chủ',
     classes: 'Các lớp học',
+    examMatrices: 'Ma Trận Đề Thi',
+    createMatrix: 'Tạo Ma Trận',
+    editMatrix: 'Chỉnh Sửa Ma Trận',
   },
   status: {
     active: 'Hoạt động',

@@ -12,8 +12,10 @@ import {
   useDeleteAssignment,
   usePublishAssignment,
 } from '@/features/assignment/hooks/useAssignmentApi';
-import { AssignmentMetadataForm } from './components/AssignmentMetadataForm';
-import { QuestionCollectionSection } from './components/QuestionCollectionSection';
+import {
+  AssignmentMetadataForm,
+  QuestionCollectionSection,
+} from '@/features/assignment/components/assignment-editor';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 import {
   validateAssignmentMetadata,

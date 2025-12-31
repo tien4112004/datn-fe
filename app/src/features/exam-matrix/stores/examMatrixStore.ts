@@ -14,7 +14,6 @@ interface ExamMatrixStore {
   filters: ExamMatrixFilters;
 
   // UI state (not persisted)
-  isBuilderOpen: boolean;
   activeCellId: string | null; // Currently focused cell in generator
 
   // Actions - Matrix
@@ -37,8 +36,6 @@ interface ExamMatrixStore {
   clearAllSelections: () => void;
 
   // Actions - UI
-  openBuilder: (matrix?: ExamMatrix) => void;
-  closeBuilder: () => void;
   setActiveCell: (cellId: string | null) => void;
 
   // Actions - Filters
@@ -60,7 +57,6 @@ const initialState = {
     page: 1,
     limit: 10,
   },
-  isBuilderOpen: false,
   activeCellId: null,
 };
 
@@ -200,20 +196,6 @@ const useExamMatrixStore = create<ExamMatrixStore>()(
         clearAllSelections: () => set({ questionSelections: {} }),
 
         // UI actions
-        openBuilder: (matrix) =>
-          set({
-            currentMatrix: matrix || null,
-            isBuilderOpen: true,
-            questionSelections: {}, // Clear selections when opening builder
-          }),
-
-        closeBuilder: () =>
-          set({
-            isBuilderOpen: false,
-            currentMatrix: null,
-            questionSelections: {},
-          }),
-
         setActiveCell: (cellId) => set({ activeCellId: cellId }),
 
         // Filter actions

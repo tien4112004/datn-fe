@@ -31,7 +31,7 @@ import {
   QuestionBankImportDialog,
   CopyToPersonalDialog,
   QuestionContentPreview,
-} from './components';
+} from '@/features/assignment/components/question-bank';
 
 export function TeacherQuestionBankPage() {
   const { t } = useTranslation(I18N_NAMESPACES.ASSIGNMENT, { keyPrefix: 'teacherQuestionBank' });

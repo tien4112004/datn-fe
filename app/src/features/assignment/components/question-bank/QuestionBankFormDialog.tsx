@@ -32,7 +32,7 @@ import { generateId } from '@/shared/lib/utils';
 import { toast } from 'sonner';
 import { Alert, AlertDescription, AlertTitle } from '@/shared/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
-import { validateQuestion } from '../utils/validateQuestion';
+import { validateQuestion } from '@/features/assignment/utils/validateQuestion';
 
 interface QuestionBankFormDialogProps {
   open: boolean;
@@ -143,7 +143,7 @@ export function QuestionBankFormDialog({ open, onClose, mode, question }: Questi
 
     // Show warnings but allow submission
     if (validation.warnings.length > 0) {
-      validation.warnings.forEach((warning) => {
+      validation.warnings.forEach((warning: string) => {
         toast.warning(warning);
       });
     }

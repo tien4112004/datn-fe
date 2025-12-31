@@ -5,9 +5,12 @@ import { CriticalError } from '@aiprimary/api';
 import { ProtectedRoute } from '@/shared/components/ProtectedRoute';
 import GlobalSpinner from '@/components/common/GlobalSpinner';
 
-// Lazy load exam matrix page
+// Lazy load exam matrix pages
 const ExamMatrixPage = lazy(() =>
   import('@/features/exam-matrix').then((m) => ({ default: m.ExamMatrixPage }))
+);
+const MatrixBuilderPage = lazy(() =>
+  import('@/features/exam-matrix/pages/MatrixBuilderPage').then((m) => ({ default: m.MatrixBuilderPage }))
 );
 
 // Lazy load teacher question bank page
@@ -285,6 +288,22 @@ const router = createBrowserRouter([
         element: (
           <LazyWrapper>
             <ExamMatrixPage />
+          </LazyWrapper>
+        ),
+      },
+      {
+        path: 'exam-matrix/builder',
+        element: (
+          <LazyWrapper>
+            <MatrixBuilderPage />
+          </LazyWrapper>
+        ),
+      },
+      {
+        path: 'exam-matrix/builder/:id',
+        element: (
+          <LazyWrapper>
+            <MatrixBuilderPage />
           </LazyWrapper>
         ),
       },

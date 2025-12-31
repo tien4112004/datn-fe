@@ -10,6 +10,13 @@ import {
   useExportMatrices,
   useImportMatrices,
 } from '@/features/exam-matrix/hooks/useExamMatrixApi';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbList,
+  BreadcrumbPage,
+} from '@/shared/components/ui/breadcrumb';
+import { Separator } from '@/shared/components/ui/separator';
 import type { ExamMatrix } from '@/features/exam-matrix/types';
 import type { ExamDraft } from '@/features/assignment/types/examDraft';
 import { toast } from 'sonner';
@@ -18,21 +25,20 @@ import {
   MatrixToolbar,
   MatrixFilters,
   MatrixDeleteDialog,
-  MatrixBuilderDialog,
   ExamGeneratorDialog,
 } from '../components';
 
 export const ExamMatrixPage = () => {
   const { t } = useTranslation(I18N_NAMESPACES.EXAM_MATRIX);
+  const { t: tCommon } = useTranslation('common', { keyPrefix: 'pages' });
   const navigate = useNavigate();
 
   // Store state
-  const { filters, isBuilderOpen, closeBuilder } = useExamMatrixStore();
+  const { filters } = useExamMatrixStore();
 
   // Local state
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [editingMatrix, setEditingMatrix] = useState<ExamMatrix | null>(null);
   const [generatorOpen, setGeneratorOpen] = useState(false);
   const [generatorMatrix, setGeneratorMatrix] = useState<ExamMatrix | null>(null);
 
@@ -45,18 +51,11 @@ export const ExamMatrixPage = () => {
 
   // Handlers
   const handleCreateNew = () => {
-    setEditingMatrix(null);
-    useExamMatrixStore.getState().openBuilder();
+    navigate('/exam-matrix/builder');
   };
 
   const handleRowClick = (matrix: ExamMatrix) => {
-    setEditingMatrix(matrix);
-    useExamMatrixStore.getState().openBuilder(matrix);
-  };
-
-  const handleBuilderClose = () => {
-    setEditingMatrix(null);
-    closeBuilder();
+    navigate(`/exam-matrix/builder/${matrix.id}`);
   };
 
   const handleDeleteSelected = () => {
@@ -149,54 +148,65 @@ export const ExamMatrixPage = () => {
   };
 
   return (
-    <div className="flex flex-col gap-6 px-8 py-4">
-      {/* Header */}
-      <div>
-        <h1 className="scroll-m-20 text-balance text-4xl font-bold tracking-tight">{t('title')}</h1>
-        <p className="text-muted-foreground text-sm">{t('subtitle')}</p>
+    <div className="flex h-full flex-col">
+      {/* Breadcrumb Header */}
+      <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
+        <Separator orientation="vertical" className="mr-2 h-4" />
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem className="hidden md:block">
+              <BreadcrumbPage>{tCommon('examMatrices')}</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+      </header>
+
+      <div className="flex flex-1 flex-col gap-6 overflow-auto px-8 py-4">
+        {/* Header */}
+        <div>
+          <h1 className="scroll-m-20 text-balance text-4xl font-bold tracking-tight">{t('title')}</h1>
+          <p className="text-muted-foreground text-sm">{t('subtitle')}</p>
+        </div>
+
+        {/* Filters */}
+        <MatrixFilters />
+
+        {/* Toolbar */}
+        <MatrixToolbar
+          selectedCount={selectedIds.length}
+          onCreateNew={handleCreateNew}
+          onDeleteSelected={handleDeleteSelected}
+          onDuplicateSelected={handleDuplicateSelected}
+          onGenerateExam={handleGenerateExam}
+          onExport={handleExport}
+          onImport={handleImport}
+        />
+
+        {/* Table */}
+        <MatrixTable
+          matrices={data?.matrices || []}
+          isLoading={isLoading}
+          selectedIds={selectedIds}
+          onSelectionChange={setSelectedIds}
+          onRowClick={handleRowClick}
+        />
+
+        {/* Exam Generator Dialog */}
+        <ExamGeneratorDialog
+          open={generatorOpen}
+          matrix={generatorMatrix}
+          onClose={() => setGeneratorOpen(false)}
+          onComplete={handleGeneratorComplete}
+        />
+
+        {/* Delete Confirmation Dialog */}
+        <MatrixDeleteDialog
+          open={deleteDialogOpen}
+          matrixCount={selectedIds.length}
+          onClose={() => setDeleteDialogOpen(false)}
+          onConfirm={handleDeleteConfirm}
+        />
       </div>
-
-      {/* Filters */}
-      <MatrixFilters />
-
-      {/* Toolbar */}
-      <MatrixToolbar
-        selectedCount={selectedIds.length}
-        onCreateNew={handleCreateNew}
-        onDeleteSelected={handleDeleteSelected}
-        onDuplicateSelected={handleDuplicateSelected}
-        onGenerateExam={handleGenerateExam}
-        onExport={handleExport}
-        onImport={handleImport}
-      />
-
-      {/* Table */}
-      <MatrixTable
-        matrices={data?.matrices || []}
-        isLoading={isLoading}
-        selectedIds={selectedIds}
-        onSelectionChange={setSelectedIds}
-        onRowClick={handleRowClick}
-      />
-
-      {/* Matrix Builder Dialog */}
-      <MatrixBuilderDialog open={isBuilderOpen} matrix={editingMatrix} onClose={handleBuilderClose} />
-
-      {/* Exam Generator Dialog */}
-      <ExamGeneratorDialog
-        open={generatorOpen}
-        matrix={generatorMatrix}
-        onClose={() => setGeneratorOpen(false)}
-        onComplete={handleGeneratorComplete}
-      />
-
-      {/* Delete Confirmation Dialog */}
-      <MatrixDeleteDialog
-        open={deleteDialogOpen}
-        matrixCount={selectedIds.length}
-        onClose={() => setDeleteDialogOpen(false)}
-        onConfirm={handleDeleteConfirm}
-      />
     </div>
   );
 };

@@ -6,9 +6,11 @@ import { Label } from '@/shared/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/shared/components/ui/radio-group';
 import { Input } from '@/shared/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
-import { Plus, Trash2, ImagePlus, X } from 'lucide-react';
+import { Switch } from '@/shared/components/ui/switch';
+import { Plus, Trash2, ImagePlus, X, Shuffle } from 'lucide-react';
 import { generateId } from '@/shared/lib/utils';
 import { DIFFICULTY_LABELS, type Difficulty } from '../../types';
+import { useTranslation } from 'react-i18next';
 
 interface MultipleChoiceEditingProps {
   question: MultipleChoiceQuestion;
@@ -16,6 +18,8 @@ interface MultipleChoiceEditingProps {
 }
 
 export const MultipleChoiceEditing = ({ question, onChange }: MultipleChoiceEditingProps) => {
+  const { t } = useTranslation('assignment', { keyPrefix: 'editing.shuffle' });
+
   const updateQuestion = (updates: Partial<MultipleChoiceQuestion>) => {
     onChange({ ...question, ...updates });
   };
@@ -92,6 +96,21 @@ export const MultipleChoiceEditing = ({ question, onChange }: MultipleChoiceEdit
               onChange={(e) => updateQuestion({ points: parseInt(e.target.value) || 0 })}
             />
           </div>
+        </div>
+
+        {/* Shuffle Options */}
+        <div className="flex items-center justify-between rounded-lg border p-4">
+          <div className="space-y-0.5">
+            <div className="flex items-center gap-2">
+              <Shuffle className="h-4 w-4" />
+              <Label className="text-base font-medium">{t('shuffleOptions')}</Label>
+            </div>
+            <div className="text-muted-foreground text-sm">{t('shuffleOptionsDescription')}</div>
+          </div>
+          <Switch
+            checked={question.shuffleOptions || false}
+            onCheckedChange={(shuffleOptions) => updateQuestion({ shuffleOptions })}
+          />
         </div>
 
         {/* Question Title */}

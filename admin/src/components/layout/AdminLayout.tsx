@@ -14,6 +14,7 @@ import {
   X,
   HelpCircle,
   BookOpen,
+  Library,
 } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
@@ -26,6 +27,7 @@ const navItems = [
   { to: '/slide-templates', icon: LayoutTemplate, label: 'Slide Templates' },
   { to: '/art-styles', icon: Brush, label: 'Art Styles' },
   { to: '/books', icon: BookOpen, label: 'Books' },
+  { to: '/question-bank', icon: Library, label: 'Question Bank' },
   { to: '/model-config', icon: Settings, label: 'Model Config' },
   { to: '/faq-posts', icon: HelpCircle, label: 'FAQ Posts' },
 ];

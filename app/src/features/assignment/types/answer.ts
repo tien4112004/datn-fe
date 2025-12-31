@@ -67,4 +67,5 @@ export interface Assignment {
   createdAt: string;
   updatedAt: string;
   status: 'draft' | 'published' | 'archived';
+  shuffleQuestions?: boolean; // Shuffle question order for each student (default: false)
 }

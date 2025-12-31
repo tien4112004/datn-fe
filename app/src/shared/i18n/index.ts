@@ -52,6 +52,9 @@ i18n
       'mindmap',
       'auth',
       'classes',
+      'assignment',
+      'admin',
+      'examMatrix',
     ],
     interpolation: {
       escapeValue: false,

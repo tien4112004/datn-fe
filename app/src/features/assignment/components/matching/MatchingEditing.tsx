@@ -5,9 +5,11 @@ import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
 import { Label } from '@/shared/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
-import { Plus, Trash2, ImagePlus, X } from 'lucide-react';
+import { Switch } from '@/shared/components/ui/switch';
+import { Plus, Trash2, ImagePlus, X, Shuffle } from 'lucide-react';
 import { generateId } from '@/shared/lib/utils';
 import { DIFFICULTY_LABELS } from '../../types';
+import { useTranslation } from 'react-i18next';
 
 interface MatchingEditingProps {
   question: MatchingQuestion;
@@ -15,6 +17,8 @@ interface MatchingEditingProps {
 }
 
 export const MatchingEditing = ({ question, onChange }: MatchingEditingProps) => {
+  const { t } = useTranslation('assignment', { keyPrefix: 'editing.shuffle' });
+
   const updateQuestion = (updates: Partial<MatchingQuestion>) => {
     onChange({ ...question, ...updates });
   };
@@ -80,6 +84,21 @@ export const MatchingEditing = ({ question, onChange }: MatchingEditingProps) =>
               onChange={(e) => updateQuestion({ points: parseInt(e.target.value) || 0 })}
             />
           </div>
+        </div>
+
+        {/* Shuffle Pairs */}
+        <div className="flex items-center justify-between rounded-lg border p-4">
+          <div className="space-y-0.5">
+            <div className="flex items-center gap-2">
+              <Shuffle className="h-4 w-4" />
+              <Label className="text-base font-medium">{t('shufflePairs')}</Label>
+            </div>
+            <div className="text-muted-foreground text-sm">{t('shufflePairsDescription')}</div>
+          </div>
+          <Switch
+            checked={question.shufflePairs || false}
+            onCheckedChange={(shufflePairs) => updateQuestion({ shufflePairs })}
+          />
         </div>
 
         {/* Question Title */}

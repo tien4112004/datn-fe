@@ -83,8 +83,33 @@ export const validateQuestion = (question: Question): { valid: boolean; errors?:
 };
 
 export const duplicateQuestion = (question: Question): Question => {
-  return {
-    ...JSON.parse(JSON.stringify(question)),
-    id: generateId(),
-  };
+  // Deep copy the question
+  const duplicate: Question = JSON.parse(JSON.stringify(question));
+
+  // Generate new top-level ID
+  duplicate.id = generateId();
+
+  // Update nested IDs based on question type
+  if ('options' in duplicate && duplicate.options) {
+    duplicate.options = duplicate.options.map((opt) => ({
+      ...opt,
+      id: generateId(),
+    }));
+  }
+
+  if ('pairs' in duplicate && duplicate.pairs) {
+    duplicate.pairs = duplicate.pairs.map((pair) => ({
+      ...pair,
+      id: generateId(),
+    }));
+  }
+
+  if ('segments' in duplicate && duplicate.segments) {
+    duplicate.segments = duplicate.segments.map((seg) => ({
+      ...seg,
+      id: generateId(),
+    }));
+  }
+
+  return duplicate;
 };

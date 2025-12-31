@@ -4,7 +4,23 @@ import NavLayout, { NavLayoutErrorBoundary } from '../shared/layouts/SidebarLayo
 import { CriticalError } from '@aiprimary/api';
 import { ProtectedRoute } from '@/shared/components/ProtectedRoute';
 import GlobalSpinner from '@/components/common/GlobalSpinner';
-import { AssignmentDemoPage } from '@/features/assignment';
+
+// Lazy load exam matrix page
+const ExamMatrixPage = lazy(() =>
+  import('@/features/exam-matrix').then((m) => ({ default: m.ExamMatrixPage }))
+);
+
+// Lazy load teacher question bank page
+const TeacherQuestionBankPage = lazy(() =>
+  import('@/features/assignment/pages/teacher-question-bank').then((m) => ({
+    default: m.TeacherQuestionBankPage,
+  }))
+);
+
+// Lazy load assignment editor page
+const AssignmentEditorPage = lazy(() =>
+  import('@/features/assignment/pages/assignment-editor').then((m) => ({ default: m.AssignmentEditorPage }))
+);
 
 // Lazy load auth pages
 const LoginPage = lazy(() =>
@@ -73,10 +89,6 @@ const LazyWrapper = ({ children }: { children: React.ReactNode }) => (
 );
 
 const router = createBrowserRouter([
-  {
-    path: 'assignment-demo',
-    element: <AssignmentDemoPage />,
-  },
   {
     path: '/login',
     element: (
@@ -265,6 +277,38 @@ const router = createBrowserRouter([
         element: (
           <LazyWrapper>
             <UserProfilePage />
+          </LazyWrapper>
+        ),
+      },
+      {
+        path: 'exam-matrix',
+        element: (
+          <LazyWrapper>
+            <ExamMatrixPage />
+          </LazyWrapper>
+        ),
+      },
+      {
+        path: 'question-bank',
+        element: (
+          <LazyWrapper>
+            <TeacherQuestionBankPage />
+          </LazyWrapper>
+        ),
+      },
+      {
+        path: 'assignments/create',
+        element: (
+          <LazyWrapper>
+            <AssignmentEditorPage />
+          </LazyWrapper>
+        ),
+      },
+      {
+        path: 'assignments/edit/:id',
+        element: (
+          <LazyWrapper>
+            <AssignmentEditorPage />
           </LazyWrapper>
         ),
       },

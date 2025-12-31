@@ -1,2 +1,11 @@
 export * from './useViewMode';
-export * from './useApi';
+export * from './useQuestionBankApi';
+export {
+  useAssignmentList,
+  useAssignment,
+  useCreateAssignment,
+  useUpdateAssignment,
+  useDeleteAssignment,
+  usePublishAssignment,
+  useArchiveAssignment,
+} from './useAssignmentApi';

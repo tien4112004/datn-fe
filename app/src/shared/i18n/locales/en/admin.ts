@@ -1,0 +1,46 @@
+export default {
+  questionBank: {
+    title: 'Question Bank Management',
+    subtitle: 'Manage questions for assignments',
+    columns: {
+      type: 'Type',
+      title: 'Title',
+      difficulty: 'Difficulty',
+      subject: 'Subject',
+      points: 'Points',
+      createdAt: 'Created',
+    },
+    toolbar: {
+      createNew: 'Create New Question',
+      delete: 'Delete',
+      duplicate: 'Duplicate',
+      export: 'Export',
+      import: 'Import',
+    },
+    dialog: {
+      createTitle: 'Create New Question',
+      editTitle: 'Edit Question',
+      subject: 'Subject',
+      questionType: 'Question Type',
+      cancel: 'Cancel',
+      save: 'Save Changes',
+      create: 'Create Question',
+    },
+    deleteDialog: {
+      title: 'Delete Questions',
+      description: 'Are you sure you want to delete {{count}} question(s)? This action cannot be undone.',
+      cancel: 'Cancel',
+      confirm: 'Delete',
+    },
+    emptyState: 'No questions in the bank. Create your first question to get started.',
+    messages: {
+      created: 'Question created successfully',
+      updated: 'Question updated successfully',
+      deleted: 'Questions deleted successfully',
+      duplicated: 'Question duplicated successfully',
+      exported: 'Questions exported successfully',
+      imported: '{{success}} questions imported successfully, {{failed}} failed',
+      error: 'An error occurred. Please try again.',
+    },
+  },
+};

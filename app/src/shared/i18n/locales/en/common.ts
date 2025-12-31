@@ -8,8 +8,12 @@ export default {
       files: 'Files',
       classes: 'Classes',
       subjects: 'Subjects',
+      examMatrix: 'Exam Matrix',
       schedules: 'Schedules',
       home: 'Home',
+      admin: 'Administration',
+      questionBank: 'Question Bank',
+      assignments: 'Assignments',
     },
   },
   pages: {

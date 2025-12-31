@@ -17,6 +17,3 @@ export * from './components/multiple-choice';
 export * from './components/matching';
 export * from './components/open-ended';
 export * from './components/fill-in-blank';
-
-// Pages
-export { default as AssignmentDemoPage } from './pages/AssignmentDemoPage';

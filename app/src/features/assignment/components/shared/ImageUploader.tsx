@@ -5,6 +5,7 @@ import { Label } from '@/shared/components/ui/label';
 import { uploadImage, isValidImageUrl } from '../../utils';
 import { Upload, X } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
+import { useTranslation } from 'react-i18next';
 
 interface ImageUploaderProps {
   value?: string;
@@ -17,13 +18,16 @@ interface ImageUploaderProps {
 export const ImageUploader = ({
   value,
   onChange,
-  label = 'Image',
+  label,
   className,
   disabled = false,
 }: ImageUploaderProps) => {
+  const { t } = useTranslation('assignment', { keyPrefix: 'shared.imageUploader' });
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<string>('');
+
+  const defaultLabel = t('label');
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -36,7 +40,7 @@ export const ImageUploader = ({
       const dataUrl = await uploadImage(file);
       onChange(dataUrl);
     } catch (err: any) {
-      setError(err.message || 'Failed to upload image');
+      setError(err.message || t('uploadError'));
     } finally {
       setIsUploading(false);
     }
@@ -51,7 +55,7 @@ export const ImageUploader = ({
 
   return (
     <div className={cn('space-y-2', className)}>
-      {label && <Label>{label}</Label>}
+      {(label || defaultLabel) && <Label>{label || defaultLabel}</Label>}
 
       <div className="flex items-center gap-2">
         <Input
@@ -71,7 +75,7 @@ export const ImageUploader = ({
           disabled={disabled || isUploading}
         >
           <Upload className="mr-2 h-4 w-4" />
-          {isUploading ? 'Uploading...' : 'Upload Image'}
+          {isUploading ? t('uploading') : t('uploadButton')}
         </Button>
 
         {value && isValidImageUrl(value) && (
@@ -85,7 +89,7 @@ export const ImageUploader = ({
 
       {value && isValidImageUrl(value) && (
         <div className="relative mt-2 inline-block max-w-xs">
-          <img src={value} alt="Preview" className="rounded-md border" style={{ maxHeight: '200px' }} />
+          <img src={value} alt={t('preview')} className="rounded-md border" style={{ maxHeight: '200px' }} />
         </div>
       )}
     </div>

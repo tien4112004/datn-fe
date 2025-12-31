@@ -111,6 +111,7 @@ export default {
     },
     overview: {
       basicInfo: 'Thông tin cơ bản',
+      subtitle: 'Xem và quản lý chi tiết lớp học',
       className: 'Tên lớp',
       grade: 'Khối',
       capacity: 'Sức chứa',
@@ -173,6 +174,7 @@ export default {
       enrollment: 'Danh sách',
       class: 'Phòng học',
       status: 'Trạng thái',
+      createdAt: 'Ngày tạo',
     },
     actions: {
       manageStudents: 'Quản lý học sinh',
@@ -679,6 +681,9 @@ export default {
     loadingRoster: 'Đang tải danh sách...',
     studentCount: '{{count}} học sinh',
     studentCount_other: '{{count}} học sinh',
+    searchPlaceholder: 'Tìm kiếm học sinh...',
+    filterByStatus: 'Lọc theo trạng thái',
+    allStatuses: 'Tất cả trạng thái',
 
     form: {
       // Dialog descriptions
@@ -1050,9 +1055,10 @@ export default {
       title: 'Bảng tin {{className}}',
       subtitle: 'Cập nhật thông báo và thảo luận của lớp',
       filters: {
-        all: 'Tất cả bài viết',
+        all: 'Tất cả',
         announcements: 'Thông báo',
         posts: 'Bài viết',
+        assignments: 'Bài tập',
       },
     },
     creator: {
@@ -1074,6 +1080,7 @@ export default {
         attachments: 'Tập Tin Đính Kèm',
         linkLessons: 'Liên Kết Bài Học',
         linkResources: 'Liên Kết Tài Nguyên',
+        deadline: 'Hạn chót',
       },
       placeholders: {
         content: 'Viết nội dung bài đăng của bạn ở đây...',
@@ -1082,6 +1089,7 @@ export default {
       postType: {
         post: 'Bài Đăng',
         announcement: 'Thông Báo',
+        assignment: 'Bài Tập',
       },
     },
     list: {
@@ -1099,8 +1107,10 @@ export default {
     },
     post: {
       badges: {
-        pinned: '📌 Đã ghim',
-        announcement: '📢 Thông báo',
+        pinned: 'Đã ghim',
+        announcement: 'Thông báo',
+        assignment: 'Bài tập',
+        dueDate: 'Hạn',
       },
       actions: {
         edit: 'Chỉnh sửa bài viết',
@@ -1108,6 +1118,7 @@ export default {
         unpin: 'Bỏ ghim bài viết',
         delete: 'Xóa bài viết',
         comment: 'bình luận',
+        comments: 'bình luận',
       },
       confirm: {
         delete: 'Bạn có chắc chắn muốn xóa bài viết này?',

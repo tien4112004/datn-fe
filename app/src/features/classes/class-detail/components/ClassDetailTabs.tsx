@@ -1,15 +1,16 @@
 import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { MessageSquare, Calendar, BookOpen, Target, Users, Settings } from 'lucide-react';
+import { Target, Users, Settings, MessageSquare, BookOpen, GraduationCap, Calendar } from 'lucide-react';
+import { cn } from '@/shared/lib/utils';
+import { Badge } from '@/components/ui/badge';
+import { getGradeLabel } from '../../shared/utils/grades';
 
 import { ClassOverview } from './ClassOverview';
 import { ClassStudentView } from '../../class-student';
 import { ClassSettings } from './ClassSettings';
-import { FeedPage } from '@/features/classes/class-feed/components';
+import { FeedTab } from '../../class-feed/components';
 import { LessonTab } from '../../class-lesson';
 import type { Class } from '../../shared/types';
-import { ScheduleTab } from '../../class-schedule';
 import type { ClassTabs } from '../../shared';
 
 interface ClassDetailTabsProps {
@@ -18,76 +19,121 @@ interface ClassDetailTabsProps {
   onEditClick: (classData: Class) => void;
 }
 
+const tabs = [
+  { value: 'overview', icon: Target, labelKey: 'tabs.overview' },
+  { value: 'feed', icon: MessageSquare, labelKey: 'tabs.feed' },
+  { value: 'students', icon: Users, labelKey: 'tabs.students' },
+  { value: 'lessons', icon: BookOpen, labelKey: 'tabs.lessons' },
+  { value: 'settings', icon: Settings, labelKey: 'tabs.settings' },
+] as const;
+
 export const ClassDetailTabs = ({ classId, currentClass, onEditClick }: ClassDetailTabsProps) => {
   const { t } = useTranslation('classes', { keyPrefix: 'detail' });
 
   const [searchParams, setSearchParams] = useSearchParams();
-  const currentTab = searchParams.get('tab') || 'feed';
+  const currentTab = (searchParams.get('tab') || 'overview') as ClassTabs;
 
   const handleTabChange = (tab: ClassTabs) => {
     setSearchParams({ tab }, { replace: true });
   };
 
   return (
-    <div className="space-y-6 px-8">
-      {/* Detailed Tabs */}
-      <Tabs
-        defaultValue="feed"
-        className="mx-12 space-y-4"
-        value={currentTab}
-        onValueChange={(value) => handleTabChange(value as ClassTabs)}
-      >
-        <TabsList className="grid w-full grid-cols-6">
-          <TabsTrigger value="feed" className="flex cursor-pointer items-center gap-1">
-            <MessageSquare className="h-4 w-4" />
-            {t('tabs.feed')}
-          </TabsTrigger>
-          <TabsTrigger value="schedule" className="flex cursor-pointer items-center gap-1">
-            <Calendar className="h-4 w-4" />
-            {t('tabs.schedule')}
-          </TabsTrigger>
-          <TabsTrigger value="lessons" className="flex cursor-pointer items-center gap-1">
-            <BookOpen className="h-4 w-4" />
-            {t('tabs.lessons')}
-          </TabsTrigger>
-          <TabsTrigger value="overview" className="flex cursor-pointer items-center gap-1">
-            <Target className="h-4 w-4" />
-            {t('tabs.overview')}
-          </TabsTrigger>
-          <TabsTrigger value="students" className="flex cursor-pointer items-center gap-1">
-            <Users className="h-4 w-4" />
-            {t('tabs.students')}
-          </TabsTrigger>
-          <TabsTrigger value="settings" className="flex cursor-pointer items-center gap-1">
-            <Settings className="h-4 w-4" />
-            {t('tabs.settings')}
-          </TabsTrigger>
-        </TabsList>
+    <div className="flex h-[calc(100vh-4rem)]">
+      {/* Vertical Sidebar with Class Info */}
+      <aside className="bg-muted/10 w-80 overflow-y-auto border-r">
+        {/* Class Information Section */}
+        <div className="space-y-4 border-b p-6">
+          {/* Title and Status */}
+          <div className="space-y-2">
+            <h1 className="text-2xl font-bold tracking-tight">{currentClass.name}</h1>
+            <Badge variant={currentClass.isActive ? 'default' : 'secondary'}>
+              {currentClass.isActive ? t('status.active') : t('status.inactive')}
+            </Badge>
+          </div>
 
-        <TabsContent value="feed" className="space-y-4">
-          <FeedPage classId={classId} />
-        </TabsContent>
+          {/* Metadata */}
+          <div className="text-muted-foreground space-y-2 text-sm">
+            {currentClass.grade && (
+              <div className="flex items-center gap-2">
+                <GraduationCap className="h-4 w-4" />
+                <span>{getGradeLabel(currentClass.grade || currentClass.settings?.grade || 1)}</span>
+              </div>
+            )}
 
-        <TabsContent value="schedule" className="space-y-4">
-          <ScheduleTab classId={currentClass.id} />
-        </TabsContent>
+            {currentClass.academicYear && (
+              <div className="flex items-center gap-2">
+                <Calendar className="h-4 w-4" />
+                <span>{currentClass.academicYear}</span>
+              </div>
+            )}
 
-        <TabsContent value="lessons" className="space-y-4">
-          <LessonTab classId={classId} currentClass={currentClass} />
-        </TabsContent>
+            {currentClass.class && (
+              <div className="flex items-center gap-2">
+                <span className="font-medium">Room:</span>
+                <span>{currentClass.class}</span>
+              </div>
+            )}
+          </div>
 
-        <TabsContent value="overview" className="space-y-4">
-          <ClassOverview classData={currentClass} onEditClick={onEditClick} />
-        </TabsContent>
+          {/* Description */}
+          {currentClass.description && (
+            <p className="text-muted-foreground text-sm leading-relaxed">{currentClass.description}</p>
+          )}
+        </div>
 
-        <TabsContent value="students" className="space-y-4">
-          <ClassStudentView classData={currentClass} />
-        </TabsContent>
+        {/* Navigation Tabs */}
+        <nav className="flex flex-col gap-1 p-4">
+          {tabs.map((tab) => {
+            const Icon = tab.icon;
+            const isActive = currentTab === tab.value;
 
-        <TabsContent value="settings" className="space-y-4">
-          <ClassSettings classData={currentClass} />
-        </TabsContent>
-      </Tabs>
+            return (
+              <button
+                key={tab.value}
+                onClick={() => handleTabChange(tab.value as ClassTabs)}
+                className={cn(
+                  'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
+                  isActive
+                    ? 'bg-primary text-primary-foreground'
+                    : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                )}
+              >
+                <Icon className="h-4 w-4" />
+                <span>{t(tab.labelKey)}</span>
+              </button>
+            );
+          })}
+        </nav>
+      </aside>
+
+      {/* Content Area - Scrollable */}
+      <main className="flex-1 overflow-y-auto">
+        {currentTab === 'overview' && (
+          <div className="p-6">
+            <ClassOverview classData={currentClass} onEditClick={onEditClick} />
+          </div>
+        )}
+
+        {currentTab === 'feed' && <FeedTab classId={classId} />}
+
+        {currentTab === 'students' && (
+          <div className="p-6">
+            <ClassStudentView classData={currentClass} />
+          </div>
+        )}
+
+        {currentTab === 'lessons' && (
+          <div className="p-6">
+            <LessonTab classId={classId} currentClass={currentClass} />
+          </div>
+        )}
+
+        {currentTab === 'settings' && (
+          <div className="p-6">
+            <ClassSettings classData={currentClass} />
+          </div>
+        )}
+      </main>
     </div>
   );
 };

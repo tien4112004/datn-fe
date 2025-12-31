@@ -16,25 +16,20 @@ export const ClassTable = () => {
   const { t: tCommon } = useTranslation('common');
   const columnHelper = createColumnHelper<Class>();
 
-  const { filters, openEditModal, openEnrollmentModal } = useClassStore();
+  // Use selectors to prevent unnecessary re-renders
+  const filters = useClassStore((state) => state.filters);
+  const openEditModal = useClassStore((state) => state.openEditModal);
+  const openEnrollmentModal = useClassStore((state) => state.openEnrollmentModal);
 
   const columns = useMemo(
     () => [
       columnHelper.accessor('name', {
         header: t('columns.name'),
         cell: (info) => {
-          const classItem = info.row.original;
           return (
-            <div>
-              <Link to={`/classes/${classItem.id}`} className="font-medium hover:underline">
-                {info.getValue()}
-              </Link>
-              {classItem.description && (
-                <p className="text-muted-foreground max-w-[200px] truncate text-sm">
-                  {classItem.description}
-                </p>
-              )}
-            </div>
+            <Link to={`/classes/${info.row.original.id}`} className="font-medium hover:underline">
+              {info.getValue()}
+            </Link>
           );
         },
         minSize: 200,
@@ -42,31 +37,6 @@ export const ClassTable = () => {
           isGrow: true,
         },
         enableSorting: true,
-      }),
-      columnHelper.accessor('grade', {
-        header: t('columns.grade'),
-        cell: (info) => {
-          return <span>{getGradeLabel(info.getValue())}</span>;
-        },
-        size: 120,
-      }),
-      columnHelper.accessor('academicYear', {
-        header: t('columns.academicYear'),
-        cell: (info) => info.getValue(),
-        size: 120,
-      }),
-      columnHelper.display({
-        header: t('columns.enrollment'),
-        cell: (info) => {
-          const classItem = info.row.original;
-          return <span className="font-medium">{classItem.currentEnrollment}</span>;
-        },
-        size: 160,
-      }),
-      columnHelper.accessor('class', {
-        header: t('columns.class'),
-        cell: (info) => info.getValue() || <span className="text-muted-foreground">-</span>,
-        size: 100,
       }),
       columnHelper.display({
         header: t('columns.status'),
@@ -78,7 +48,15 @@ export const ClassTable = () => {
             </Badge>
           );
         },
-        size: 100,
+        size: 120,
+      }),
+      columnHelper.accessor('createdAt', {
+        header: t('columns.createdAt'),
+        cell: (info) => {
+          const date = new Date(info.getValue());
+          return <span>{date.toLocaleDateString()}</span>;
+        },
+        size: 150,
       }),
       columnHelper.display({
         id: 'actions',
@@ -98,6 +76,7 @@ export const ClassTable = () => {
         enableResizing: false,
       }),
     ],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [t, tCommon]
   );
 
@@ -113,7 +92,7 @@ export const ClassTable = () => {
   } = useClasses(filters);
 
   const table = useReactTable({
-    data: [...classes],
+    data: classes,
     columns: columns,
     getCoreRowModel: getCoreRowModel(),
     manualPagination: true,

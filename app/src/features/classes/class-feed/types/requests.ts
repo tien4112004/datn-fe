@@ -3,8 +3,9 @@ import type { Post } from './post';
 // Request types
 export interface PostCreateRequest {
   classId: string;
-  type: 'post' | 'announcement';
+  type: 'post' | 'announcement' | 'assignment';
   content: string;
+  deadline?: Date; // Only for assignments
   attachments?: File[];
   linkedLessonIds?: string[];
   linkedResourceIds?: string[];
@@ -40,7 +41,7 @@ export interface PostListResponse {
 
 // Feed Filter
 export interface FeedFilter {
-  type: 'all' | 'posts' | 'announcements';
+  type: 'all' | 'posts' | 'announcements' | 'assignments';
   search?: string;
   startDate?: Date;
   endDate?: Date;

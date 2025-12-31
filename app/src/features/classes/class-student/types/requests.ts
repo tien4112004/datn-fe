@@ -21,25 +21,32 @@ export interface StudentCollectionRequest {
 /**
  * StudentCreateRequest
  * Payload for creating a new student
+ * Matches backend schema exactly
  */
 export interface StudentCreateRequest {
-  fullName: string;
-  dateOfBirth: string;
-  gender: 'male' | 'female' | 'other';
-  address?: string;
-  parentName?: string;
-  parentPhone?: string;
-  classId: string;
-  enrollmentDate?: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneNumber?: string | null;
+  avatarUrl?: string | null;
+  address?: string | null;
+  parentContactEmail?: string | null;
 }
 
 /**
  * StudentUpdateRequest
  * Payload for updating an existing student
+ * Matches backend schema exactly
  */
-export interface StudentUpdateRequest extends Partial<StudentCreateRequest> {
+export interface StudentUpdateRequest {
   id: string;
-  status?: 'active' | 'transferred' | 'graduated' | 'dropped';
+  firstName?: string | null;
+  lastName?: string | null;
+  phoneNumber?: string | null;
+  address?: string | null;
+  parentContactEmail?: string | null;
+  avatarUrl?: string | null;
+  status?: 'active' | 'transferred' | 'graduated' | 'dropped' | null;
 }
 
 /**

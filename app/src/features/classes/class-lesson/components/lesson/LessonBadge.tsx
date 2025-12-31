@@ -96,10 +96,10 @@ export const LessonBadge = ({
               {getStatusIcon(lesson.status)}
               {getStatusLabel(lesson.status)}
             </Badge>
-            {showObjectives && lesson.objectives.length > 0 && (
+            {showObjectives && (lesson.objectives || []).length > 0 && (
               <Badge variant="secondary" className="text-xs">
-                {lesson.objectives.filter((obj) => obj.isAchieved).length}/{lesson.objectives.length}{' '}
-                {t('status.objectives')}
+                {(lesson.objectives || []).filter((obj) => obj.isAchieved).length}/
+                {(lesson.objectives || []).length} {t('status.objectives')}
               </Badge>
             )}
           </div>

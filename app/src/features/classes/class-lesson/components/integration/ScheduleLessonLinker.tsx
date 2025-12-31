@@ -240,8 +240,8 @@ export const ScheduleLessonLinker = ({
                             <div>
                               <h5 className="font-medium text-green-700">{linkedLesson.title}</h5>
                               <p className="text-muted-foreground text-sm">
-                                {linkedLesson.objectives.length} {t('objectives')} •
-                                {linkedLesson.resources.length} {t('resources')}
+                                {(linkedLesson.objectives || []).length} {t('objectives')} •
+                                {(linkedLesson.resources || []).length} {t('resources')}
                               </p>
                               {linkedLesson.description && (
                                 <p className="text-muted-foreground mt-1 text-sm">

@@ -4,13 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
-import type {
-  LessonCreateRequest,
-  LessonUpdateRequest,
-  Lesson,
-  ObjectiveType,
-  ResourceType,
-} from '../../types';
+import type { LessonCreateRequest, LessonUpdateRequest, Lesson, ObjectiveType } from '../../types';
 import type { SchedulePeriod } from '../../../class-schedule';
 
 export interface LessonFormData {
@@ -106,16 +100,16 @@ export const LessonCreator = ({
       operation === 'update' && existingData
         ? {
             title: existingData.title,
-            description: existingData.description || '',
+            description: existingData.content || '', // Backend uses 'content' field
             subject: existingData.subject || '', // Now a string code
             notes: existingData.notes || '',
-            objectives: existingData.objectives.map((obj) => ({
+            objectives: (existingData.learningObjectives || existingData.objectives || []).map((obj) => ({
               description: obj.description,
-              type: obj.type,
-              isAchieved: obj.isAchieved,
+              type: obj.type || 'knowledge',
+              isAchieved: obj.isAchieved || false,
               notes: obj.notes || '',
             })),
-            resources: existingData.resources.map((res) => ({
+            resources: (existingData.resources || []).map((res) => ({
               name: res.name,
               type: res.type,
               url: res.url || '',
@@ -149,51 +143,28 @@ export const LessonCreator = ({
         await onUpdate({
           id: lessonId,
           title: data.title,
-          description: data.description,
-          notes: data.notes,
-          objectives: data.objectives.map((obj) => ({
+          content: data.description || '', // Map form 'description' to API 'content'
+          subject: data.subject,
+          learningObjectives: data.objectives.map((obj) => ({
             description: obj.description,
             type: obj.type as ObjectiveType,
             isAchieved: obj.isAchieved,
-            notes: obj.notes,
-          })),
-          resources: data.resources.map((res) => ({
-            name: res.name,
-            type: res.type as ResourceType,
-            url: res.url,
-            filePath: res.filePath,
-            description: res.description,
-            isRequired: res.isRequired,
-            isPrepared: res.isPrepared,
+            notes: obj.notes || null,
           })),
         });
         toast.success(t('updateSuccess'));
       } else {
         // Create operation
-        const subject = data.subject;
-        const bindedPeriodId = period?.id;
-
         await onSave({
           classId,
-          subject: subject,
+          subject: data.subject,
           title: data.title,
-          description: data.description,
-          notes: data.notes,
-          bindedPeriodId,
-          objectives: data.objectives.map((obj) => ({
+          content: data.description || '', // Map form 'description' to API 'content'
+          learningObjectives: data.objectives.map((obj) => ({
             description: obj.description,
             type: obj.type as ObjectiveType,
             isAchieved: obj.isAchieved,
-            notes: obj.notes,
-          })),
-          resources: data.resources.map((res) => ({
-            name: res.name,
-            type: res.type as ResourceType,
-            url: res.url,
-            filePath: res.filePath,
-            description: res.description,
-            isRequired: res.isRequired,
-            isPrepared: res.isPrepared,
+            notes: obj.notes || null,
           })),
         });
         toast.success(t('createSuccess'));

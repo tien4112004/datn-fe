@@ -16,7 +16,12 @@ export const ClassListPage = () => {
   const { t: tPage } = useTranslation('common', { keyPrefix: 'pages' });
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const { viewMode, setViewMode, openCreateModal, closeCreateModal, isCreateModalOpen } = useClassStore();
+  // Use selectors to prevent unnecessary re-renders
+  const viewMode = useClassStore((state) => state.viewMode);
+  const setViewMode = useClassStore((state) => state.setViewMode);
+  const openCreateModal = useClassStore((state) => state.openCreateModal);
+  const closeCreateModal = useClassStore((state) => state.closeCreateModal);
+  const isCreateModalOpen = useClassStore((state) => state.isCreateModalOpen);
 
   const currentViewMode = (searchParams.get('view') as ViewMode) || viewMode;
 
@@ -42,11 +47,12 @@ export const ClassListPage = () => {
         </Breadcrumb>
       </header>
 
-      <div className="space-y-4 px-8 py-4">
-        <div className="flex items-center justify-between">
+      <div className="space-y-6 px-8 py-6">
+        {/* Page Header */}
+        <div className="flex items-start justify-between gap-4">
           <div className="space-y-1">
-            <h2 className="text-lg font-medium">{t('welcome')}</h2>
-            <p className="text-muted-foreground">{t('description')}</p>
+            <h1 className="text-2xl font-semibold tracking-tight">{t('title')}</h1>
+            <p className="text-muted-foreground text-sm">{t('description')}</p>
           </div>
           <Button onClick={openCreateModal} className="gap-2">
             <Plus className="h-4 w-4" />
@@ -55,13 +61,15 @@ export const ClassListPage = () => {
           <AddClassModal isOpen={isCreateModalOpen} onClose={closeCreateModal} />
         </div>
 
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-semibold">{t('title')}</h1>
+        {/* Controls */}
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex-1">
+            <ClassFilters />
+          </div>
           <ViewToggle value={currentViewMode} onValueChange={handleViewModeChange} />
         </div>
 
-        <ClassFilters />
-
+        {/* Content */}
         {currentViewMode === 'list' ? <ClassTable /> : <ClassGrid />}
       </div>
     </>

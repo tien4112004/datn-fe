@@ -118,6 +118,7 @@ export default {
     },
     overview: {
       basicInfo: 'Basic Information',
+      subtitle: 'View and manage class details',
       className: 'Class Name',
       grade: 'Grade',
       capacity: 'Capacity',
@@ -180,6 +181,7 @@ export default {
       enrollment: 'Enrollment',
       class: 'Class',
       status: 'Status',
+      createdAt: 'Created At',
     },
     actions: {
       manageStudents: 'Manage Students',
@@ -685,6 +687,9 @@ export default {
     loadingRoster: 'Loading roster...',
     studentCount: '{{count}} student',
     studentCount_other: '{{count}} students',
+    searchPlaceholder: 'Search students...',
+    filterByStatus: 'Filter by status',
+    allStatuses: 'All statuses',
 
     form: {
       // Dialog descriptions
@@ -1055,9 +1060,10 @@ export default {
       title: '{{className}} Feed',
       subtitle: 'Stay updated with class announcements and discussions',
       filters: {
-        all: 'All posts',
+        all: 'All',
         announcements: 'Announcements',
         posts: 'Posts',
+        assignments: 'Assignments',
       },
     },
     creator: {
@@ -1079,6 +1085,7 @@ export default {
         attachments: 'Attachments',
         linkLessons: 'Link Lessons',
         linkResources: 'Link Resources',
+        deadline: 'Deadline',
       },
       placeholders: {
         content: 'Write your post content here...',
@@ -1087,6 +1094,7 @@ export default {
       postType: {
         post: 'Post',
         announcement: 'Announcement',
+        assignment: 'Assignment',
       },
     },
     list: {
@@ -1104,15 +1112,18 @@ export default {
     },
     post: {
       badges: {
-        pinned: '📌 Pinned',
-        announcement: '📢 Announcement',
+        pinned: 'Pinned',
+        announcement: 'Announcement',
+        assignment: 'Assignment',
+        dueDate: 'Due',
       },
       actions: {
         edit: 'Edit post',
         pin: 'Pin post',
         unpin: 'Unpin post',
         delete: 'Delete post',
-        comment: 'comments',
+        comment: 'comment',
+        comments: 'comments',
       },
       confirm: {
         deletePost: 'Are you sure you want to delete this post?',

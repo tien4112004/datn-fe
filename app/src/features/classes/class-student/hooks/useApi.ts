@@ -94,15 +94,19 @@ export function useStudentMutations(classId: string) {
    */
   const createStudent = useMutation({
     mutationFn: async (data: StudentFormData): Promise<Student> => {
+      // Split fullName into firstName and lastName
+      const nameParts = data.fullName.trim().split(/\s+/);
+      const firstName = nameParts[0] || '';
+      const lastName = nameParts.slice(1).join(' ') || firstName;
+
       const request: StudentCreateRequest = {
-        fullName: data.fullName,
-        dateOfBirth: data.dateOfBirth || new Date().toISOString(),
-        gender: data.gender || 'other',
-        address: data.address,
-        parentName: data.parentName,
-        parentPhone: data.parentPhone,
-        classId: classId,
-        enrollmentDate: new Date().toISOString(),
+        firstName,
+        lastName,
+        email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}@student.temp`.replace(/\s+/g, ''),
+        phoneNumber: data.parentPhone || null,
+        address: data.address || null,
+        parentContactEmail: null,
+        avatarUrl: null,
       };
 
       return await classApiService.createStudent(classId, request);
@@ -134,14 +138,19 @@ export function useStudentMutations(classId: string) {
       studentId: string;
       data: StudentFormData;
     }): Promise<Student> => {
+      // Split fullName into firstName and lastName
+      const nameParts = data.fullName.trim().split(/\s+/);
+      const firstName = nameParts[0] || '';
+      const lastName = nameParts.slice(1).join(' ') || firstName;
+
       const request: StudentUpdateRequest = {
         id: studentId,
-        fullName: data.fullName,
-        dateOfBirth: data.dateOfBirth,
-        gender: data.gender,
-        address: data.address,
-        parentName: data.parentName,
-        parentPhone: data.parentPhone,
+        firstName,
+        lastName,
+        phoneNumber: data.parentPhone || null,
+        address: data.address || null,
+        parentContactEmail: null,
+        avatarUrl: null,
       };
 
       return await classApiService.updateStudent(studentId, request);

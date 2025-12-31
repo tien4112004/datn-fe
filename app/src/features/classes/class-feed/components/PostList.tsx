@@ -83,9 +83,9 @@ export const PostList = ({
   }
 
   return (
-    <div className={`space-y-6 ${className}`}>
+    <div className={className}>
       {posts.map((post) => (
-        <div key={post.id} className="space-y-4">
+        <div key={post.id}>
           <PostCard
             post={post}
             onPin={(pinned) => handlePinPost(post.id, pinned)}
@@ -96,12 +96,12 @@ export const PostList = ({
           <AnimatePresence>
             {expandedComments.has(post.id) && (
               <motion.div
-                key="comment-thread" // Key is essential for AnimatePresence
-                initial={{ opacity: 0, height: 0 }} // Start invisible and closed
-                animate={{ opacity: 1, height: 'auto' }} // Animate to fully visible and auto height
-                exit={{ opacity: 0, height: 0 }} // Animate out to invisible and closed
-                transition={{ duration: 0.3 }} // Smooth transition
-                className="ml-12"
+                key="comment-thread"
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3 }}
+                className="bg-muted/20 border-b px-6 py-4"
               >
                 <CommentThread postId={post.id} />
               </motion.div>

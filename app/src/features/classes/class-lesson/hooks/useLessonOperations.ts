@@ -19,7 +19,7 @@ export const useLessonOperations = () => {
 
       return {
         ...lesson,
-        objectives: [...lesson.objectives, newObjective],
+        objectives: [...(lesson.objectives || []), newObjective],
         updatedAt: new Date().toISOString(),
       };
     },
@@ -32,7 +32,7 @@ export const useLessonOperations = () => {
   const removeObjectiveFromLesson = useCallback((lesson: Lesson, objectiveId: string): Lesson => {
     return {
       ...lesson,
-      objectives: lesson.objectives.filter((obj) => obj.id !== objectiveId),
+      objectives: (lesson.objectives || []).filter((obj) => obj.id !== objectiveId),
       updatedAt: new Date().toISOString(),
     };
   }, []);
@@ -44,7 +44,9 @@ export const useLessonOperations = () => {
     (lesson: Lesson, objectiveId: string, updates: Partial<LearningObjective>): Lesson => {
       return {
         ...lesson,
-        objectives: lesson.objectives.map((obj) => (obj.id === objectiveId ? { ...obj, ...updates } : obj)),
+        objectives: (lesson.objectives || []).map((obj) =>
+          obj.id === objectiveId ? { ...obj, ...updates } : obj
+        ),
         updatedAt: new Date().toISOString(),
       };
     },
@@ -62,7 +64,7 @@ export const useLessonOperations = () => {
 
     return {
       ...lesson,
-      resources: [...lesson.resources, newResource],
+      resources: [...(lesson.resources || []), newResource],
       updatedAt: new Date().toISOString(),
     };
   }, []);
@@ -73,7 +75,7 @@ export const useLessonOperations = () => {
   const removeResourceFromLesson = useCallback((lesson: Lesson, resourceId: string): Lesson => {
     return {
       ...lesson,
-      resources: lesson.resources.filter((res) => res.id !== resourceId),
+      resources: (lesson.resources || []).filter((res) => res.id !== resourceId),
       updatedAt: new Date().toISOString(),
     };
   }, []);
@@ -85,7 +87,9 @@ export const useLessonOperations = () => {
     (lesson: Lesson, resourceId: string, updates: Partial<LessonResource>): Lesson => {
       return {
         ...lesson,
-        resources: lesson.resources.map((res) => (res.id === resourceId ? { ...res, ...updates } : res)),
+        resources: (lesson.resources || []).map((res) =>
+          res.id === resourceId ? { ...res, ...updates } : res
+        ),
         updatedAt: new Date().toISOString(),
       };
     },
@@ -119,7 +123,7 @@ export const useLessonOperations = () => {
    */
   const findObjectiveInLesson = useCallback(
     (lesson: Lesson, objectiveId: string): LearningObjective | undefined => {
-      return lesson.objectives.find((obj) => obj.id === objectiveId);
+      return (lesson.objectives || []).find((obj) => obj.id === objectiveId);
     },
     []
   );
@@ -129,7 +133,7 @@ export const useLessonOperations = () => {
    */
   const findResourceInLesson = useCallback(
     (lesson: Lesson, resourceId: string): LessonResource | undefined => {
-      return lesson.resources.find((res) => res.id === resourceId);
+      return (lesson.resources || []).find((res) => res.id === resourceId);
     },
     []
   );

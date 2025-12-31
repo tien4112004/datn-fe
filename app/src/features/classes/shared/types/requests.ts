@@ -11,31 +11,34 @@
 export interface ClassCollectionRequest {
   page?: number;
   pageSize?: number;
-  sort?: string;
+  sort?: 'asc' | 'desc'; // Backend only accepts direction, not field:direction
   search?: string;
-  grade?: number;
-  academicYear?: string;
   isActive?: boolean;
 }
 
 /**
  * ClassCreateRequest
  * Payload for creating a new class
+ * Matches backend schema exactly
+ * Note: settings is a JSON string, not an object
  */
 export interface ClassCreateRequest {
   name: string;
-  grade: number;
-  academicYear: string;
-  class?: string;
-  description?: string;
+  description?: string | null;
+  settings?: string | null; // JSON string, not object
 }
 
 /**
  * ClassUpdateRequest
  * Payload for updating an existing class
+ * Matches backend schema exactly
+ * Note: settings is a JSON string, not an object
  */
-export interface ClassUpdateRequest extends Partial<ClassCreateRequest> {
+export interface ClassUpdateRequest {
   id: string;
+  name?: string | null;
+  description?: string | null;
+  settings?: string | null; // JSON string, not object
   isActive?: boolean;
 }
 

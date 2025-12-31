@@ -33,7 +33,8 @@ export function useClasses(initialParams: ClassCollectionRequest = {}): UseClass
   const classApiService = useClassApiService();
 
   const [sorting, setSorting] = useState<SortingState>([
-    { id: initialParams.sort?.split(':')[0] || 'name', desc: initialParams.sort?.split(':')[1] === 'desc' },
+    // Backend only returns 'asc' or 'desc', default to sort by name
+    { id: 'name', desc: initialParams.sort === 'desc' },
   ]);
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: initialParams.page || 0,
@@ -45,7 +46,8 @@ export function useClasses(initialParams: ClassCollectionRequest = {}): UseClass
   const queryParams: ClassCollectionRequest = {
     page: pagination.pageIndex,
     pageSize: pagination.pageSize,
-    sort: sorting.length > 0 ? `${sorting[0].id}:${sorting[0].desc ? 'desc' : 'asc'}` : undefined,
+    // Backend only accepts 'asc' or 'desc' (not field:direction format)
+    sort: sorting.length > 0 ? (sorting[0].desc ? 'desc' : 'asc') : undefined,
     search: search.trim() || undefined,
     ...initialParams, // Include other filters (grade, academicYear, isActive)
   };
@@ -59,11 +61,20 @@ export function useClasses(initialParams: ClassCollectionRequest = {}): UseClass
 
   useEffect(() => {
     if (data && data.pagination) {
-      setPagination((prev) => ({
-        ...prev,
-        pageIndex: data.pagination?.currentPage ?? 0,
-        pageSize: data.pagination?.pageSize ?? 10,
-      }));
+      const newPageIndex = data.pagination?.currentPage ?? 0;
+      const newPageSize = data.pagination?.pageSize ?? 10;
+
+      setPagination((prev) => {
+        // Only update if values actually changed
+        if (prev.pageIndex !== newPageIndex || prev.pageSize !== newPageSize) {
+          return {
+            ...prev,
+            pageIndex: newPageIndex,
+            pageSize: newPageSize,
+          };
+        }
+        return prev;
+      });
     }
   }, [data?.pagination]);
 

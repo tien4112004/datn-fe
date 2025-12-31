@@ -1,5 +1,5 @@
 // Main exports
-export { FeedPage } from './components';
+export { FeedTab } from './components';
 
 // Re-export components for external use
 export * from './components';

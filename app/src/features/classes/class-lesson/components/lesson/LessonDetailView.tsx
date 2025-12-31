@@ -52,13 +52,17 @@ export const LessonDetailView = ({ lesson }: LessonDetailViewProps) => {
   const updateLesson = useUpdateLesson();
 
   const formattedDate =
-    lesson.linkedPeriods.length > 0
-      ? format(new Date(lesson.linkedPeriods[0].date), 'PPPP', { locale: getLocaleDateFns() })
-      : format(new Date(lesson.createdAt), 'PPPP', { locale: getLocaleDateFns() });
+    (lesson.linkedPeriods || []).length > 0
+      ? format(new Date((lesson.linkedPeriods || [])[0].date || new Date()), 'PPPP', {
+          locale: getLocaleDateFns(),
+        })
+      : format(new Date(lesson.createdAt || new Date()), 'PPPP', { locale: getLocaleDateFns() });
 
   const timeRange =
-    lesson.linkedPeriods.length > 0 && lesson.linkedPeriods[0].startTime && lesson.linkedPeriods[0].endTime
-      ? formatTimeRange(lesson.linkedPeriods[0].startTime, lesson.linkedPeriods[0].endTime)
+    (lesson.linkedPeriods || []).length > 0 &&
+    (lesson.linkedPeriods || [])[0].startTime &&
+    (lesson.linkedPeriods || [])[0].endTime
+      ? formatTimeRange((lesson.linkedPeriods || [])[0].startTime!, (lesson.linkedPeriods || [])[0].endTime!)
       : `${lesson.duration} minutes`;
 
   const getStatusIcon = (status: string) => {
@@ -151,9 +155,9 @@ export const LessonDetailView = ({ lesson }: LessonDetailViewProps) => {
                   <div className="text-muted-foreground flex items-center gap-2">
                     <Clock className="h-4 w-4" />
                     <span>
-                      {lesson.linkedPeriods.length > 0 &&
-                      lesson.linkedPeriods[0].startTime &&
-                      lesson.linkedPeriods[0].endTime
+                      {(lesson.linkedPeriods || []).length > 0 &&
+                      (lesson.linkedPeriods || [])[0].startTime &&
+                      (lesson.linkedPeriods || [])[0].endTime
                         ? `${timeRange} (${lesson.duration} minutes)`
                         : `${lesson.duration} minutes`}
                     </span>
@@ -205,9 +209,9 @@ export const LessonDetailView = ({ lesson }: LessonDetailViewProps) => {
         </Card>
 
         {/* Binded Periods Information */}
-        {lesson.linkedPeriods.length > 0 && (
+        {(lesson.linkedPeriods || []).length > 0 && (
           <div className="space-y-4">
-            {lesson.linkedPeriods.map((period) => (
+            {(lesson.linkedPeriods || []).map((period) => (
               <ColoredCard key={period.id} colorScheme="purple">
                 <ColoredCardHeader>
                   <ColoredCardTitle>
@@ -240,7 +244,9 @@ export const LessonDetailView = ({ lesson }: LessonDetailViewProps) => {
                           <div>
                             <p className="font-medium text-purple-700">{t('date')}</p>
                             <p className="text-purple-600">
-                              {format(new Date(period.date), 'PPPP', { locale: getLocaleDateFns() })}
+                              {format(new Date(period.date || new Date()), 'PPPP', {
+                                locale: getLocaleDateFns(),
+                              })}
                             </p>
                           </div>
                           <div>
@@ -272,16 +278,16 @@ export const LessonDetailView = ({ lesson }: LessonDetailViewProps) => {
                 <div className="flex-1">
                   <ColoredCardTitle>{t('learningObjectives')}</ColoredCardTitle>
                   <p className="text-muted-foreground mt-1 text-sm">
-                    {lesson.objectives.filter((obj) => obj.isAchieved).length} {t('of')}{' '}
-                    {lesson.objectives.length} {t('completed')}
+                    {(lesson.objectives || []).filter((obj) => obj.isAchieved).length} {t('of')}{' '}
+                    {(lesson.objectives || []).length} {t('completed')}
                   </p>
                 </div>
               </div>
             </ColoredCardHeader>
             <ColoredCardContent>
-              {lesson.objectives.length > 0 ? (
+              {(lesson.objectives || []).length > 0 ? (
                 <div className="space-y-3">
-                  {lesson.objectives.map((objective) => (
+                  {(lesson.objectives || []).map((objective) => (
                     <div
                       key={objective.id}
                       className="flex gap-3 rounded-lg bg-slate-50 p-4 transition-colors hover:bg-slate-100"
@@ -323,16 +329,16 @@ export const LessonDetailView = ({ lesson }: LessonDetailViewProps) => {
                 <div className="flex-1">
                   <ColoredCardTitle>{t('resources')}</ColoredCardTitle>
                   <p className="text-muted-foreground mt-1 text-sm">
-                    {lesson.resources.filter((res) => res.isPrepared).length} {t('of')}{' '}
-                    {lesson.resources.length} {t('prepared')}
+                    {(lesson.resources || []).filter((res) => res.isPrepared).length} {t('of')}{' '}
+                    {(lesson.resources || []).length} {t('prepared')}
                   </p>
                 </div>
               </div>
             </ColoredCardHeader>
             <ColoredCardContent>
-              {lesson.resources.length > 0 ? (
+              {(lesson.resources || []).length > 0 ? (
                 <div className="space-y-3">
-                  {lesson.resources.map((resource) => (
+                  {(lesson.resources || []).map((resource) => (
                     <div
                       key={resource.id}
                       className="flex gap-3 rounded-lg bg-slate-50 p-4 transition-colors hover:bg-slate-100"

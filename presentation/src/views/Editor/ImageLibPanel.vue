@@ -205,10 +205,13 @@ const loadMyImages = async (page: number = 1) => {
 
   try {
     const response = await imageApi.getMyImages(page, 20);
-    const { data, pagination } = response.data;
+
+    // Response is already the API response object {success, code, timestamp, data, pagination}
+    const apiData = response.data || [];
+    const apiPagination = response.pagination;
 
     // Transform MediaResponseDto to match ImageWaterfallViewer interface
-    const transformedData = data.map((item: MyImageItem) => ({
+    const transformedData = apiData.map((item: MyImageItem) => ({
       id: item.id,
       width: 300,
       height: 200,
@@ -222,8 +225,10 @@ const loadMyImages = async (page: number = 1) => {
       myImages.value = [...myImages.value, ...transformedData];
     }
 
-    currentPage.value = pagination.currentPage + 1;
-    totalPages.value = pagination.totalPages;
+    if (apiPagination) {
+      currentPage.value = apiPagination.currentPage + 1;
+      totalPages.value = apiPagination.totalPages;
+    }
   } catch (error) {
     console.error('Failed to load images:', error);
     message.error(t('panels.imageLibrary.failedToLoad'));

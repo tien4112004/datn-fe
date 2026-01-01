@@ -18,6 +18,20 @@ import type {
 } from '@/features/exam-matrix/types';
 import { generateId } from '@/shared/lib/utils';
 
+// Deterministic IDs for mock matrices (so URLs are stable)
+const MOCK_MATRIX_IDS = [
+  'eijkrw07o', // ID from the user's URL
+  'abc123def',
+  'xyz789ghi',
+  'mno456pqr',
+  'stu012vwx',
+  'jkl345mno',
+  'pqr678stu',
+  'vwx901yza',
+  'bcd234efg',
+  'hij567klm',
+];
+
 // Create sample matrix - now with empty topics for freestyle creation
 const createSampleMatrix = (id: string, index: number): ExamMatrix => {
   const subjects: SubjectCode[] = ['T', 'TV', 'TA'];
@@ -50,7 +64,8 @@ export default class ExamMatrixMockApiService implements ExamMatrixApiService {
   constructor() {
     // Initialize with empty topic library - users will create their own topics
     this.topics = [];
-    this.matrices = Array.from({ length: 10 }, (_, i) => createSampleMatrix(generateId(), i));
+    // Use deterministic IDs so URLs are stable across page refreshes
+    this.matrices = MOCK_MATRIX_IDS.map((id, i) => createSampleMatrix(id, i));
   }
 
   async getMatrices(filters?: ExamMatrixFilters): Promise<ExamMatrixResponse> {

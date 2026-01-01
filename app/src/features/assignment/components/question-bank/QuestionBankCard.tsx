@@ -6,7 +6,7 @@ import { Lock } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 import type { Question, QuestionBankItem } from '../../types';
-import { QUESTION_TYPE, BANK_TYPE } from '../../types';
+import { BANK_TYPE } from '../../types';
 import { QuestionTypeIcon } from '../shared/QuestionTypeIcon';
 import { DifficultyBadge } from '../shared/DifficultyBadge';
 
@@ -16,50 +16,8 @@ interface QuestionBankCardProps {
   onToggleSelection: (question: Question) => void;
 }
 
-const getQuestionPreview = (question: Question): string => {
-  const maxLength = 100;
-
-  switch (question.type) {
-    case QUESTION_TYPE.MULTIPLE_CHOICE:
-      if ('options' in question && question.options.length > 0) {
-        const firstTwo = question.options.slice(0, 2).map((opt) => opt.text);
-        return firstTwo.join(', ') + (question.options.length > 2 ? '...' : '');
-      }
-      return '';
-
-    case QUESTION_TYPE.MATCHING:
-      if ('pairs' in question) {
-        return `${question.pairs.length} pairs to match`;
-      }
-      return '';
-
-    case QUESTION_TYPE.OPEN_ENDED:
-      if ('expectedAnswer' in question && question.expectedAnswer) {
-        return (
-          question.expectedAnswer.substring(0, maxLength) +
-          (question.expectedAnswer.length > maxLength ? '...' : '')
-        );
-      }
-      return 'Open-ended response required';
-
-    case QUESTION_TYPE.FILL_IN_BLANK:
-      if ('segments' in question && question.segments.length > 0) {
-        const preview = question.segments
-          .slice(0, 3)
-          .map((seg) => (seg.type === 'text' ? seg.content : '[___]'))
-          .join('');
-        return preview.substring(0, maxLength) + (preview.length > maxLength ? '...' : '');
-      }
-      return '';
-
-    default:
-      return '';
-  }
-};
-
 export const QuestionBankCard = ({ question, isSelected, onToggleSelection }: QuestionBankCardProps) => {
   const { t } = useTranslation(I18N_NAMESPACES.ASSIGNMENT);
-  const preview = getQuestionPreview(question);
   const isApplicationQuestion = question.bankType === BANK_TYPE.APPLICATION;
 
   const getSubjectName = (subjectCode: 'T' | 'TV' | 'TA'): string => {
@@ -78,9 +36,22 @@ export const QuestionBankCard = ({ question, isSelected, onToggleSelection }: Qu
   return (
     <Card
       className={cn(
-        'cursor-pointer transition-all hover:shadow-md',
-        isSelected && 'border-primary border-2',
-        isApplicationQuestion && 'bg-accent/10'
+        'cursor-pointer rounded-2xl border-2',
+        'transition-all',
+        'duration-200',
+        isSelected && [
+          'border-primary from-primary/10 bg-gradient-to-br to-transparent',
+          'shadow-lg',
+          'scale-[1.02]',
+          'ring-primary/20 ring-2',
+        ],
+        !isSelected && [
+          'border-border',
+          'shadow-sm',
+          'hover:scale-[1.01] hover:shadow-md',
+          'active:scale-[0.99]',
+        ],
+        isApplicationQuestion && !isSelected && 'bg-accent/10'
       )}
       onClick={() => onToggleSelection(question)}
     >
@@ -118,12 +89,6 @@ export const QuestionBankCard = ({ question, isSelected, onToggleSelection }: Qu
             <QuestionTypeIcon type={question.type} className="h-3.5 w-3.5" />
             <DifficultyBadge difficulty={question.difficulty} className="text-xs" />
           </div>
-
-          {/* Divider */}
-          {preview && <div className="border-t" />}
-
-          {/* Preview */}
-          {preview && <div className="text-muted-foreground line-clamp-2 text-xs">{preview}</div>}
 
           {/* Footer: Points */}
           <div className="flex items-center justify-between text-xs">

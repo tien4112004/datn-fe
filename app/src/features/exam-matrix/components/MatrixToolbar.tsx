@@ -36,45 +36,68 @@ export const MatrixToolbar = ({
   };
 
   return (
-    <div className="flex items-center justify-between">
-      <div className="flex gap-2">
-        <Button onClick={onCreateNew} className="gap-2">
-          <Plus className="h-4 w-4" />
+    <div className="flex items-center justify-between gap-4">
+      <div className="flex gap-3">
+        <Button
+          onClick={onCreateNew}
+          className="group gap-2 shadow-sm transition-all duration-200 hover:shadow-md"
+        >
+          <Plus className="h-4 w-4 transition-transform group-hover:rotate-90" />
           {t('toolbar.createNew')}
         </Button>
 
         {selectedCount > 0 && (
-          <>
-            <Button variant="destructive" onClick={onDeleteSelected} className="gap-2">
+          <div className="animate-in fade-in flex gap-3">
+            <Button
+              variant="destructive"
+              onClick={onDeleteSelected}
+              className="gap-2 shadow-sm transition-all duration-200 hover:shadow-md"
+            >
               <Trash2 className="h-4 w-4" />
               {t('toolbar.delete')} ({selectedCount})
             </Button>
 
             {selectedCount === 1 && (
               <>
-                <Button variant="outline" onClick={onDuplicateSelected} className="gap-2">
+                <Button
+                  variant="outline"
+                  onClick={onDuplicateSelected}
+                  className="gap-2 shadow-sm transition-all duration-200 hover:shadow-md"
+                >
                   <Copy className="h-4 w-4" />
                   {t('toolbar.duplicate')}
                 </Button>
 
-                <Button variant="default" onClick={onGenerateExam} className="gap-2">
-                  <Sparkles className="h-4 w-4" />
+                <Button
+                  variant="default"
+                  onClick={onGenerateExam}
+                  className="group gap-2 shadow-sm transition-all duration-200 hover:shadow-md"
+                >
+                  <Sparkles className="h-4 w-4 transition-transform group-hover:rotate-12" />
                   {t('toolbar.generateExam')}
                 </Button>
               </>
             )}
-          </>
+          </div>
         )}
       </div>
 
-      <div className="flex gap-2">
-        <Button variant="outline" onClick={onExport} className="gap-2">
-          <Download className="h-4 w-4" />
+      <div className="flex gap-3">
+        <Button
+          variant="outline"
+          onClick={onExport}
+          className="group gap-2 shadow-sm transition-all duration-200 hover:shadow-md"
+        >
+          <Download className="h-4 w-4 transition-transform group-hover:translate-y-0.5" />
           {t('toolbar.export')}
         </Button>
 
-        <Button variant="outline" onClick={handleImportClick} className="gap-2">
-          <Upload className="h-4 w-4" />
+        <Button
+          variant="outline"
+          onClick={handleImportClick}
+          className="group gap-2 shadow-sm transition-all duration-200 hover:shadow-md"
+        >
+          <Upload className="h-4 w-4 transition-transform group-hover:-translate-y-0.5" />
           {t('toolbar.import')}
         </Button>
       </div>

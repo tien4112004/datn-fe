@@ -227,8 +227,85 @@ export default {
   },
 
   difficulty: {
-    easy: 'Nhận biết',
-    medium: 'Thông hiểu',
-    hard: 'Vận dụng',
+    easy: 'Dễ',
+    medium: 'Trung bình',
+    hard: 'Khó',
+    nhan_biet: 'Nhận biết',
+    thong_hieu: 'Thông hiểu',
+    van_dung: 'Vận dụng',
+    van_dung_cao: 'Vận dụng cao',
+  },
+
+  table: {
+    total: 'Tổng',
+    edit: 'Sửa',
+    duplicate: 'Sao chép',
+    delete: 'Xóa',
+  },
+
+  status: {
+    fulfilled: 'Đã đủ',
+    partial: 'Một phần',
+    empty: 'Trống',
+    perfectMatch: 'Khớp hoàn hảo!',
+    withinTolerance: 'Trong phạm vi cho phép',
+    offBy: 'Chênh lệch',
+  },
+
+  labels: {
+    filteringFor: 'Đang lọc cho:',
+    questions: 'Câu hỏi',
+    points: 'Điểm',
+    totalCells: 'Tổng số ô',
+    totalQuestions: 'Tổng số câu hỏi',
+    totalPoints: 'Tổng điểm',
+    pointsProgress: 'Tiến độ điểm',
+    ptsFromTarget: 'điểm so với mục tiêu',
+  },
+
+  loading: {
+    saving: 'Đang lưu...',
+    loading: 'Đang tải...',
+    loadingQuestions: 'Đang tải câu hỏi...',
+  },
+
+  emptyStates: {
+    noQuestions: 'Không tìm thấy câu hỏi',
+    matrixNotFound: 'Không tìm thấy ma trận',
+    addTopicsFirst: 'Thêm chủ đề trước để xác định lưới ma trận',
+    createFirstMatrix: 'Tạo ma trận đề thi đầu tiên để bắt đầu',
+  },
+
+  buttons: {
+    backToList: 'Quay lại danh sách ma trận',
+    done: 'Xong',
+  },
+
+  breadcrumbs: {
+    examMatrix: 'Ma trận đề thi',
+    editMatrix: 'Sửa ma trận',
+    createMatrix: 'Tạo ma trận',
+  },
+
+  toasts: {
+    unassigned: 'Đã hủy gán khỏi {{name}}',
+    cellFull: 'Ô đã đủ (cần {{count}} câu hỏi)',
+    assigned: 'Đã gán cho {{name}}',
+    cellsNotFulfilled: '{{count}} ô chưa được đáp ứng đầy đủ',
+    selectOneMatrix: 'Vui lòng chọn chính xác một ma trận',
+    matrixNotFound: 'Không tìm thấy ma trận',
+    examGenerated: 'Đề thi đã được tạo: {{name}}',
+  },
+
+  confirmations: {
+    deleteMatrix: 'Bạn có chắc chắn muốn xóa ma trận này?',
+  },
+
+  search: {
+    placeholder: 'Tìm kiếm câu hỏi...',
+  },
+
+  fallbacks: {
+    untitledQuestion: 'Câu hỏi không có tiêu đề',
   },
 };

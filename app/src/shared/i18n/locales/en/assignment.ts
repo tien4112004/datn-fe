@@ -146,6 +146,101 @@ export default {
       shuffleQuestions: 'Shuffle Questions',
       shuffleQuestionsDescription: 'Randomize the order of questions for each student',
     },
+    multipleChoice: {
+      title: 'Edit Multiple Choice Question',
+      alerts: {
+        minOptions: 'Must have at least 2 options',
+      },
+      labels: {
+        question: 'Question',
+        questionImage: 'Question Image (optional)',
+        options: 'Options',
+        explanation: 'Explanation (shown after assessment)',
+      },
+      placeholders: {
+        question: 'Enter your question here...',
+        option: 'Enter option text...',
+        explanation: 'Explain the correct answer...',
+      },
+      buttons: {
+        addOption: 'Add Option',
+        removeImage: 'Remove image',
+        addImage: 'Add image',
+      },
+    },
+    matching: {
+      title: 'Edit Matching Question',
+      alerts: {
+        minPairs: 'Must have at least 2 pairs',
+      },
+      labels: {
+        question: 'Question',
+        questionImage: 'Question Image (optional)',
+        matchingPairs: 'Matching Pairs',
+        left: 'Left',
+        right: 'Right',
+        explanation: 'Explanation (shown after assessment)',
+      },
+      placeholders: {
+        question: 'Enter your matching question instructions...',
+        leftItem: 'Left item...',
+        rightItem: 'Right item...',
+        explanation: 'Explain the correct matches...',
+      },
+      buttons: {
+        addPair: 'Add Pair',
+        addImage: 'Add image',
+        removeImage: 'Remove image',
+      },
+      pair: 'Pair {{number}}',
+    },
+    openEnded: {
+      title: 'Edit Open-ended Question',
+      labels: {
+        question: 'Question',
+        questionImage: 'Question Image (optional)',
+        maxLength: 'Max Answer Length',
+        expectedAnswer: 'Expected Answer (optional)',
+        explanation: 'Explanation (shown after assessment)',
+      },
+      placeholders: {
+        question: 'Enter your question here...',
+        expectedAnswer: 'Enter a sample/expected answer for reference...',
+        explanation: 'Explain what makes a good answer...',
+      },
+      maxLengthInfo: '{{length}} chars (0 = unlimited)',
+    },
+    fillInBlank: {
+      title: 'Edit Fill In Blank Question',
+      alerts: {
+        minSegments: 'Must have at least 1 segment',
+      },
+      labels: {
+        title: 'Title (optional)',
+        caseSensitive: 'Case sensitive',
+        titleImage: 'Title Image (optional)',
+        questionSegments: 'Question Segments',
+        alternativeAnswers: 'Alternative answers',
+        preview: 'Preview:',
+        explanation: 'Explanation (shown after assessment)',
+      },
+      placeholders: {
+        title: 'Enter a title or instructions...',
+        text: 'Enter text...',
+        correctAnswer: 'Correct answer...',
+        alternative: 'Alternative...',
+        explanation: 'Explain the correct answers...',
+      },
+      buttons: {
+        addText: 'Add Text',
+        addBlank: 'Add Blank',
+        add: 'Add',
+      },
+      segmentTypes: {
+        text: 'Text',
+        blank: 'Blank',
+      },
+    },
   },
   assignmentEditor: {
     title: 'Assignment Editor',
@@ -286,5 +381,103 @@ export default {
       previous: 'Previous',
       next: 'Next',
     },
+  },
+
+  dialogs: {
+    copyToPersonal: {
+      title: 'Copy to Personal Bank',
+      description: 'This will create a copy of this question in your personal bank.',
+      questionToCopy: 'Question to copy:',
+      message:
+        'The copied question will be added to your personal bank and can be edited or deleted as needed.',
+      cancel: 'Cancel',
+      copying: 'Copying...',
+      copyQuestion: 'Copy Question',
+    },
+    importQuestions: {
+      title: 'Import Questions from CSV',
+      description: 'Upload a CSV file containing questions to import into your personal question bank.',
+      downloadTemplate: 'Download CSV Template',
+      uploadPlaceholder: 'Click to upload or drag and drop',
+      fileTypeInfo: 'CSV files only',
+      successMessage: 'Successfully imported {{count}} question(s)',
+      errorMessage: 'Import completed with errors: {{success}} succeeded, {{failed}} failed',
+      errorDetails: 'Error Details:',
+      moreErrors: '... and {{count}} more errors',
+      formatRequirements: 'CSV Format Requirements:',
+      requirement1: 'First row must contain headers: type, title, difficulty, subject, points, content',
+      requirement2: 'type must be one of: multipleChoice, matching, openEnded, fillInBlank',
+      requirement3: 'difficulty must be one of: nhanBiet, thongHieu, vanDung, vanDungCao',
+      requirement4: 'subject must be one of: toan, tiengViet, tiengAnh',
+      requirement5: 'content must be valid JSON for the question type',
+      close: 'Close',
+      cancel: 'Cancel',
+      importing: 'Importing...',
+      importQuestions: 'Import Questions',
+    },
+    questionForm: {
+      titleCreate: 'Create New Question',
+      titleEdit: 'Edit Question',
+      metadataSection: 'Question Metadata',
+      contentSection: 'Question Content',
+      validationErrors: 'Validation Errors',
+      labels: {
+        questionType: 'Question Type',
+        subject: 'Subject',
+        difficulty: 'Difficulty',
+        points: 'Points',
+      },
+      questionTypes: {
+        multipleChoice: 'Multiple Choice',
+        matching: 'Matching',
+        openEnded: 'Open-ended',
+        fillInBlank: 'Fill In Blank',
+      },
+      subjects: {
+        math: 'Math',
+        vietnamese: 'Vietnamese',
+        english: 'English',
+      },
+      difficulties: {
+        nhanBiet: 'Nhận biết',
+        thongHieu: 'Thông hiểu',
+        vanDung: 'Vận dụng',
+        vanDungCao: 'Vận dụng cao',
+      },
+      buttons: {
+        cancel: 'Cancel',
+        create: 'Create Question',
+        save: 'Save Changes',
+      },
+      errors: {
+        missingData: 'Question data is missing',
+        validationFailed: 'Please fix validation errors before saving',
+      },
+    },
+    unsavedChanges: {
+      title: 'Unsaved Changes',
+      description: 'You have unsaved changes. Are you sure you want to leave?',
+      stay: 'Stay',
+      leave: 'Leave',
+    },
+    deleteAssignment: {
+      title: 'Delete Assignment?',
+      description: 'This action cannot be undone. This will permanently delete the assignment.',
+      cancel: 'Cancel',
+      delete: 'Delete',
+    },
+  },
+
+  preview: {
+    optionsCorrect: 'options • Correct:',
+    placeholderContent: 'Has placeholder or empty content',
+    pairs: 'pairs',
+    blanks: 'blank(s)',
+    freeResponse: 'Free response ({{limit}})',
+    noExpectedAnswer: 'No expected answer provided',
+  },
+
+  common: {
+    unsavedChanges: 'Unsaved changes',
   },
 };

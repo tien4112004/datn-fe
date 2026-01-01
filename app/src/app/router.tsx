@@ -15,14 +15,23 @@ const MatrixBuilderPage = lazy(() =>
 
 // Lazy load teacher question bank page
 const TeacherQuestionBankPage = lazy(() =>
-  import('@/features/assignment/pages/teacher-question-bank').then((m) => ({
+  import('@/features/assignment/pages/TeacherQuestionBankPage').then((m) => ({
     default: m.TeacherQuestionBankPage,
+  }))
+);
+
+// Lazy load question bank editor page
+const QuestionBankEditorPage = lazy(() =>
+  import('@/features/assignment/pages/QuestionBankEditorPage').then((m) => ({
+    default: m.QuestionBankEditorPage,
   }))
 );
 
 // Lazy load assignment editor page
 const AssignmentEditorPage = lazy(() =>
-  import('@/features/assignment/pages/assignment-editor').then((m) => ({ default: m.AssignmentEditorPage }))
+  import('@/features/assignment/pages/AssignmentEditorPage').then((m) => ({
+    default: m.AssignmentEditorPage,
+  }))
 );
 
 // Lazy load auth pages
@@ -312,6 +321,22 @@ const router = createBrowserRouter([
         element: (
           <LazyWrapper>
             <TeacherQuestionBankPage />
+          </LazyWrapper>
+        ),
+      },
+      {
+        path: 'question-bank/create',
+        element: (
+          <LazyWrapper>
+            <QuestionBankEditorPage />
+          </LazyWrapper>
+        ),
+      },
+      {
+        path: 'question-bank/edit/:id',
+        element: (
+          <LazyWrapper>
+            <QuestionBankEditorPage />
           </LazyWrapper>
         ),
       },

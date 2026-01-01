@@ -78,7 +78,7 @@ export const MatrixCellEditor = ({
       nhan_biet: t('difficulty.easy'),
       thong_hieu: t('difficulty.medium'),
       van_dung: t('difficulty.hard'),
-      van_dung_cao: 'Super Hard',
+      van_dung_cao: t('difficulty.van_dung_cao'),
     };
     return labels[diff];
   };

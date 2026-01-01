@@ -70,7 +70,7 @@ export const QuestionBankDialog = ({ open, onOpenChange, onAddQuestions }: Quest
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="flex max-h-[80vh] !max-w-6xl flex-col">
+      <DialogContent className="flex max-h-[80vh] !max-w-6xl flex-col overflow-hidden rounded-3xl border-2 shadow-2xl">
         {/* Header */}
         <DialogHeader>
           <DialogTitle>{t('questionBank.title')}</DialogTitle>
@@ -89,7 +89,7 @@ export const QuestionBankDialog = ({ open, onOpenChange, onAddQuestions }: Quest
         </Tabs>
 
         {/* Filters */}
-        <div className="py-2">
+        <div className="gap-3 py-2">
           <QuestionBankFilters />
         </div>
 

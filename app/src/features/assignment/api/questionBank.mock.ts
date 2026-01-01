@@ -72,8 +72,33 @@ export default class QuestionBankMockApiService implements QuestionBankApiServic
 
   constructor(baseUrl: string = '') {
     this.baseUrl = baseUrl;
-    // Initialize with 20 mock questions
-    this.questions = Array.from({ length: 20 }, (_, i) => createMockQuestion(generateId(), i));
+    // Initialize with predefined questions with specific IDs for testing
+    const predefinedQuestions: QuestionBankItem[] = [
+      // Predefined question with specific ID for testing
+      {
+        id: 'zzuhg9bpd',
+        type: QUESTION_TYPE.MULTIPLE_CHOICE,
+        difficulty: DIFFICULTY.MEDIUM,
+        title: 'What is the capital of France?',
+        points: 10,
+        subjectCode: 'TA',
+        bankType: 'personal',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        options: [
+          { id: generateId(), text: 'Paris', isCorrect: true },
+          { id: generateId(), text: 'London', isCorrect: false },
+          { id: generateId(), text: 'Berlin', isCorrect: false },
+          { id: generateId(), text: 'Madrid', isCorrect: false },
+        ],
+      } as QuestionBankItem,
+    ];
+
+    // Initialize with predefined questions and 19 random ones
+    this.questions = [
+      ...predefinedQuestions,
+      ...Array.from({ length: 19 }, (_, i) => createMockQuestion(generateId(), i)),
+    ];
   }
 
   async getQuestions(filters?: QuestionBankFilters): Promise<QuestionBankResponse> {

@@ -56,11 +56,6 @@ export const TopicManagementDialog = ({ open, onClose }: TopicManagementDialogPr
       return;
     }
 
-    if (!newTopicDescription.trim()) {
-      toast.error(t('topic.validation.descriptionRequired'));
-      return;
-    }
-
     // Check for duplicate in current matrix
     const duplicate = currentMatrix.topics.find(
       (t) => t.name.trim().toLowerCase() === newTopicName.trim().toLowerCase()
@@ -74,7 +69,7 @@ export const TopicManagementDialog = ({ open, onClose }: TopicManagementDialogPr
     const newTopic: Topic = {
       id: generateId(),
       name: newTopicName.trim(),
-      description: newTopicDescription.trim(),
+      description: newTopicDescription.trim() || undefined,
       subjectCode: currentMatrix.subjectCode,
     };
 

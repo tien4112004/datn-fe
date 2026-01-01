@@ -7,7 +7,7 @@
  * - Matching pairs
  */
 
-import type { Question, MultipleChoiceQuestion, MatchingQuestion } from '../types/question';
+import type { Question, MultipleChoiceQuestion, MatchingQuestion } from '@aiprimary/core';
 
 /**
  * Fisher-Yates shuffle algorithm

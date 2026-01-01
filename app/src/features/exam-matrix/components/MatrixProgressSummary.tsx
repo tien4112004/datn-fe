@@ -1,7 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 import type { MatrixCell } from '@/features/exam-matrix/types';
-import { Progress } from '@/shared/components/ui/progress';
 import { Badge } from '@/shared/components/ui/badge';
 import { CheckCircle, AlertCircle, XCircle } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
@@ -60,9 +59,9 @@ export const MatrixProgressSummary = ({
   const isPartiallyComplete = fulfilledCells > 0 || partialCells > 0;
 
   const getStatusColor = () => {
-    if (isValid) return 'text-green-600';
-    if (isPartiallyComplete) return 'text-yellow-600';
-    return 'text-red-600';
+    if (isValid) return 'text-green-600 dark:text-green-400';
+    if (isPartiallyComplete) return 'text-yellow-600 dark:text-yellow-400';
+    return 'text-red-600 dark:text-red-400';
   };
 
   const getStatusIcon = () => {
@@ -78,10 +77,10 @@ export const MatrixProgressSummary = ({
   };
 
   return (
-    <div className="bg-muted/20 space-y-4 rounded-lg border p-4">
-      <div className="flex items-center gap-2">
+    <div className="space-y-4">
+      <div className={cn('flex items-center gap-2', !isValid && 'animate-pulse')}>
         {getStatusIcon()}
-        <h3 className="text-lg font-semibold">{t('progress.title')}</h3>
+        <h3 className="text-base font-semibold">{t('progress.title')}</h3>
       </div>
 
       {/* Overall Status */}
@@ -95,17 +94,22 @@ export const MatrixProgressSummary = ({
             {t('progress.cellsCompleted', { completed: fulfilledCells, total: totalActiveCells })}
           </span>
         </div>
-        <Progress value={cellsProgress} className="h-2" />
+        <div className="bg-muted relative h-2 overflow-hidden rounded-full">
+          <div
+            className="from-primary to-primary/80 h-full rounded-full bg-gradient-to-r shadow-sm transition-all duration-500 ease-out"
+            style={{ width: `${cellsProgress}%` }}
+          />
+        </div>
 
         <div className="flex gap-2 text-xs">
-          <Badge variant="outline" className="text-green-600">
-            {fulfilledCells} Fulfilled
+          <Badge variant="outline" className="text-green-600 shadow-sm dark:text-green-400">
+            {fulfilledCells} {t('cellStatus.fulfilled')}
           </Badge>
-          <Badge variant="outline" className="text-yellow-600">
-            {partialCells} Partial
+          <Badge variant="outline" className="text-yellow-600 shadow-sm dark:text-yellow-400">
+            {partialCells} {t('cellStatus.partial')}
           </Badge>
-          <Badge variant="outline" className="text-muted-foreground">
-            {emptyCells} Empty
+          <Badge variant="outline" className="text-muted-foreground shadow-sm">
+            {emptyCells} {t('cellStatus.empty')}
           </Badge>
         </div>
       </div>
@@ -113,7 +117,7 @@ export const MatrixProgressSummary = ({
       {/* Points Progress */}
       <div className="space-y-2">
         <div className="flex items-center justify-between text-sm">
-          <span className="text-muted-foreground">Points Progress</span>
+          <span className="text-muted-foreground">{t('labels.pointsProgress')}</span>
           <span className="font-medium">
             {t('progress.pointsProgress', {
               current: totalCurrentPoints.toFixed(1),
@@ -121,21 +125,33 @@ export const MatrixProgressSummary = ({
             })}
           </span>
         </div>
-        <Progress value={Math.min(pointsProgress, 100)} className="h-2" />
+        <div className="bg-muted relative h-2 overflow-hidden rounded-full">
+          <div
+            className={cn(
+              'h-full rounded-full shadow-sm transition-all duration-500 ease-out',
+              pointsDifference > 0
+                ? 'bg-gradient-to-r from-yellow-500 to-yellow-400'
+                : pointsDifference < 0
+                  ? 'bg-gradient-to-r from-red-500 to-red-400'
+                  : 'bg-gradient-to-r from-green-500 to-green-400'
+            )}
+            style={{ width: `${Math.min(pointsProgress, 100)}%` }}
+          />
+        </div>
 
         {pointsDifference !== 0 && (
           <div
             className={cn(
               'text-xs',
               Math.abs(pointsDifference) < 0.01
-                ? 'text-green-600'
+                ? 'text-green-600 dark:text-green-400'
                 : pointsDifference > 0
-                  ? 'text-yellow-600'
-                  : 'text-red-600'
+                  ? 'text-yellow-600 dark:text-yellow-400'
+                  : 'text-red-600 dark:text-red-400'
             )}
           >
             {pointsDifference > 0 ? '+' : ''}
-            {pointsDifference.toFixed(1)} pts from target
+            {pointsDifference.toFixed(1)} {t('labels.ptsFromTarget')}
           </div>
         )}
       </div>

@@ -229,5 +229,82 @@ export default {
     easy: 'Easy',
     medium: 'Medium',
     hard: 'Hard',
+    nhan_biet: 'Knowledge',
+    thong_hieu: 'Comprehension',
+    van_dung: 'Application',
+    van_dung_cao: 'Advanced Application',
+  },
+
+  table: {
+    total: 'Total',
+    edit: 'Edit',
+    duplicate: 'Duplicate',
+    delete: 'Delete',
+  },
+
+  status: {
+    fulfilled: 'Fulfilled',
+    partial: 'Partial',
+    empty: 'Empty',
+    perfectMatch: 'Perfect Match!',
+    withinTolerance: 'Within Tolerance',
+    offBy: 'Off by',
+  },
+
+  labels: {
+    filteringFor: 'Filtering for:',
+    questions: 'Questions',
+    points: 'Points',
+    totalCells: 'Total Cells',
+    totalQuestions: 'Total Questions',
+    totalPoints: 'Total Points',
+    pointsProgress: 'Points Progress',
+    ptsFromTarget: 'pts from target',
+  },
+
+  loading: {
+    saving: 'Saving...',
+    loading: 'Loading...',
+    loadingQuestions: 'Loading questions...',
+  },
+
+  emptyStates: {
+    noQuestions: 'No questions found',
+    matrixNotFound: 'Matrix not found',
+    addTopicsFirst: 'Add topics first to define the matrix grid',
+    createFirstMatrix: 'Create your first exam matrix to get started',
+  },
+
+  buttons: {
+    backToList: 'Back to Matrix List',
+    done: 'Done',
+  },
+
+  breadcrumbs: {
+    examMatrix: 'Exam Matrix',
+    editMatrix: 'Edit Matrix',
+    createMatrix: 'Create Matrix',
+  },
+
+  toasts: {
+    unassigned: 'Unassigned from {{name}}',
+    cellFull: 'Cell is full ({{count}} questions required)',
+    assigned: 'Assigned to {{name}}',
+    cellsNotFulfilled: '{{count}} cells are not fully fulfilled',
+    selectOneMatrix: 'Please select exactly one matrix',
+    matrixNotFound: 'Matrix not found',
+    examGenerated: 'Exam generated: {{name}}',
+  },
+
+  confirmations: {
+    deleteMatrix: 'Are you sure you want to delete this matrix?',
+  },
+
+  search: {
+    placeholder: 'Search questions...',
+  },
+
+  fallbacks: {
+    untitledQuestion: 'Untitled Question',
   },
 };

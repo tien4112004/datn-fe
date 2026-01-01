@@ -38,7 +38,7 @@ export const MatrixGridEditor = ({ open, onClose }: MatrixGridEditorProps) => {
       nhan_biet: t('difficulty.easy'),
       thong_hieu: t('difficulty.medium'),
       van_dung: t('difficulty.hard'),
-      van_dung_cao: 'Super Hard',
+      van_dung_cao: t('difficulty.van_dung_cao'),
     };
     return labels[difficulty];
   };
@@ -103,9 +103,7 @@ export const MatrixGridEditor = ({ open, onClose }: MatrixGridEditorProps) => {
               <div className="flex h-full items-center justify-center">
                 <div className="text-center">
                   <p className="text-muted-foreground">{t('builder.topics.noTopics')}</p>
-                  <p className="text-muted-foreground mt-1 text-sm">
-                    Add topics first to define the matrix grid
-                  </p>
+                  <p className="text-muted-foreground mt-1 text-sm">{t('emptyStates.addTopicsFirst')}</p>
                 </div>
               </div>
             ) : (
@@ -113,15 +111,15 @@ export const MatrixGridEditor = ({ open, onClose }: MatrixGridEditorProps) => {
                 {/* Summary Stats */}
                 <div className="grid grid-cols-3 gap-4">
                   <div className="rounded-lg border p-3">
-                    <div className="text-muted-foreground text-sm">Total Cells</div>
+                    <div className="text-muted-foreground text-sm">{t('labels.totalCells')}</div>
                     <div className="text-2xl font-bold">{totalCells}</div>
                   </div>
                   <div className="rounded-lg border p-3">
-                    <div className="text-muted-foreground text-sm">Total Questions</div>
+                    <div className="text-muted-foreground text-sm">{t('labels.totalQuestions')}</div>
                     <div className="text-2xl font-bold">{totalQuestions}</div>
                   </div>
                   <div className="rounded-lg border p-3">
-                    <div className="text-muted-foreground text-sm">Total Points</div>
+                    <div className="text-muted-foreground text-sm">{t('labels.totalPoints')}</div>
                     <div className="text-2xl font-bold">{totalPoints.toFixed(1)}</div>
                   </div>
                 </div>
@@ -189,7 +187,7 @@ export const MatrixGridEditor = ({ open, onClose }: MatrixGridEditorProps) => {
           </div>
 
           <div className="flex justify-end gap-2 border-t pt-4">
-            <Button onClick={onClose}>Done</Button>
+            <Button onClick={onClose}>{t('buttons.done')}</Button>
           </div>
         </DialogContent>
       </Dialog>

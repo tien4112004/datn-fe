@@ -24,7 +24,7 @@ export function QuestionContentPreview({ question }: QuestionContentPreviewProps
               {opts.length} options • Correct: {correctLetter}
             </span>
             {(hasPlaceholder || hasEmptyOptions) && (
-              <AlertCircle className="h-3.5 w-3.5 text-amber-600" title="Has placeholder or empty content" />
+              <AlertCircle className="h-3.5 w-3.5 text-yellow-500" title="Has placeholder or empty content" />
             )}
           </div>
         );
@@ -41,7 +41,7 @@ export function QuestionContentPreview({ question }: QuestionContentPreviewProps
           <div className="flex items-center gap-2">
             <span className="text-muted-foreground text-sm">{pairs.length} pairs</span>
             {(hasPlaceholder || hasEmpty) && (
-              <AlertCircle className="h-3.5 w-3.5 text-amber-600" title="Has placeholder or empty content" />
+              <AlertCircle className="h-3.5 w-3.5 text-yellow-500" title="Has placeholder or empty content" />
             )}
           </div>
         );
@@ -57,7 +57,7 @@ export function QuestionContentPreview({ question }: QuestionContentPreviewProps
           <div className="flex items-center gap-2">
             <span className="text-muted-foreground text-sm">{blankCount} blank(s)</span>
             {(hasPlaceholder || hasEmptyBlanks) && (
-              <AlertCircle className="h-3.5 w-3.5 text-amber-600" title="Has placeholder or empty content" />
+              <AlertCircle className="h-3.5 w-3.5 text-yellow-500" title="Has placeholder or empty content" />
             )}
           </div>
         );
@@ -71,7 +71,7 @@ export function QuestionContentPreview({ question }: QuestionContentPreviewProps
           <div className="flex items-center gap-2">
             <span className="text-muted-foreground text-sm">Free response ({limit})</span>
             {hasNoAnswer && (
-              <AlertCircle className="h-3.5 w-3.5 text-amber-600" title="No expected answer provided" />
+              <AlertCircle className="h-3.5 w-3.5 text-yellow-500" title="No expected answer provided" />
             )}
           </div>
         );

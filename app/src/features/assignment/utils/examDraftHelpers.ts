@@ -1,4 +1,4 @@
-import type { ExamDraft } from '../types/examDraft';
+import type { ExamDraft } from '@aiprimary/core';
 
 /**
  * Validates an exam draft to ensure it meets requirements

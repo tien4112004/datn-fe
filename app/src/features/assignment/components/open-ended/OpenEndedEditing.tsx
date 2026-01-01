@@ -1,10 +1,9 @@
-import type { OpenEndedQuestion, Difficulty } from '../../types';
+import type { OpenEndedQuestion } from '../../types';
 import { MarkdownEditor, ImageUploader, DifficultyBadge } from '../shared';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
 import { Input } from '@/shared/components/ui/input';
 import { Label } from '@/shared/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
-import { DIFFICULTY_LABELS } from '../../types';
+import { useTranslation } from 'react-i18next';
 
 interface OpenEndedEditingProps {
   question: OpenEndedQuestion;
@@ -12,6 +11,8 @@ interface OpenEndedEditingProps {
 }
 
 export const OpenEndedEditing = ({ question, onChange }: OpenEndedEditingProps) => {
+  const { t } = useTranslation('assignment', { keyPrefix: 'editing.openEnded' });
+
   const updateQuestion = (updates: Partial<OpenEndedQuestion>) => {
     onChange({ ...question, ...updates });
   };
@@ -20,55 +21,24 @@ export const OpenEndedEditing = ({ question, onChange }: OpenEndedEditingProps) 
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle className="text-lg">Edit Open-ended Question</CardTitle>
+          <CardTitle className="text-lg">{t('title')}</CardTitle>
           <DifficultyBadge difficulty={question.difficulty} />
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
-        {/* Difficulty & Points */}
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label>Difficulty</Label>
-            <Select
-              value={question.difficulty}
-              onValueChange={(value) => updateQuestion({ difficulty: value as Difficulty })}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {Object.entries(DIFFICULTY_LABELS).map(([value, label]) => (
-                  <SelectItem key={value} value={value}>
-                    {label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-2">
-            <Label>Points</Label>
-            <Input
-              type="number"
-              min="0"
-              value={question.points || 0}
-              onChange={(e) => updateQuestion({ points: parseInt(e.target.value) || 0 })}
-            />
-          </div>
-        </div>
-
         {/* Question */}
         <div className="space-y-2">
-          <Label>Question</Label>
+          <Label>{t('labels.question')}</Label>
           <MarkdownEditor
             value={question.title}
             onChange={(title) => updateQuestion({ title })}
-            placeholder="Enter your question here..."
+            placeholder={t('placeholders.question')}
           />
         </div>
 
         {/* Question Image */}
         <ImageUploader
-          label="Question Image (optional)"
+          label={t('labels.questionImage')}
           value={question.titleImageUrl}
           onChange={(titleImageUrl) => updateQuestion({ titleImageUrl })}
         />
@@ -76,9 +46,9 @@ export const OpenEndedEditing = ({ question, onChange }: OpenEndedEditingProps) 
         {/* Max Length */}
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <Label className="text-sm">Max Answer Length</Label>
+            <Label className="text-sm">{t('labels.maxLength')}</Label>
             <span className="text-muted-foreground text-xs">
-              {question.maxLength || 500} chars (0 = unlimited)
+              {t('maxLengthInfo', { length: question.maxLength || 500 })}
             </span>
           </div>
           <Input
@@ -93,22 +63,22 @@ export const OpenEndedEditing = ({ question, onChange }: OpenEndedEditingProps) 
 
         {/* Expected Answer */}
         <div className="space-y-2">
-          <Label className="text-sm">Expected Answer (optional)</Label>
+          <Label className="text-sm">{t('labels.expectedAnswer')}</Label>
           <MarkdownEditor
             value={question.expectedAnswer || ''}
             onChange={(expectedAnswer) => updateQuestion({ expectedAnswer })}
-            placeholder="Enter a sample/expected answer for reference..."
+            placeholder={t('placeholders.expectedAnswer')}
             minHeight={80}
           />
         </div>
 
         {/* Explanation */}
         <div className="space-y-2">
-          <Label className="text-sm">Explanation (shown after assessment)</Label>
+          <Label className="text-sm">{t('labels.explanation')}</Label>
           <MarkdownEditor
             value={question.explanation || ''}
             onChange={(explanation) => updateQuestion({ explanation })}
-            placeholder="Explain what makes a good answer..."
+            placeholder={t('placeholders.explanation')}
             minHeight={80}
           />
         </div>

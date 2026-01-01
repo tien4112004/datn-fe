@@ -10,14 +10,13 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/shared/components/ui/breadcrumb';
-import { Separator } from '@/shared/components/ui/separator';
 import { useTranslation } from 'react-i18next';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 import useExamMatrixStore from '@/features/exam-matrix/stores/examMatrixStore';
 import {
   useCreateMatrix,
   useUpdateMatrix,
-  useExamMatrixList,
+  useExamMatrix,
 } from '@/features/exam-matrix/hooks/useExamMatrixApi';
 import { toast } from 'sonner';
 import { generateId } from '@/shared/lib/utils';
@@ -25,12 +24,12 @@ import { MatrixConfigForm } from '../components/MatrixConfigForm';
 import { TopicManagementDialog } from '../components/TopicManagementDialog';
 import { MatrixGridEditor } from '../components/MatrixGridEditor';
 import { MatrixPreviewTable } from '../components/MatrixPreviewTable';
+import { Save } from 'lucide-react';
 
 export function MatrixBuilderPage() {
   const { id } = useParams<{ id?: string }>();
   const navigate = useNavigate();
   const { t } = useTranslation(I18N_NAMESPACES.EXAM_MATRIX);
-  const { t: tCommon } = useTranslation('common', { keyPrefix: 'pages' });
   const { currentMatrix, setCurrentMatrix } = useExamMatrixStore();
   const [activeTab, setActiveTab] = useState<'configuration' | 'preview'>('configuration');
   const [topicManagerOpen, setTopicManagerOpen] = useState(false);
@@ -38,9 +37,8 @@ export function MatrixBuilderPage() {
 
   const isEditMode = !!id;
 
-  // Load existing matrices to find the one being edited
-  const { data: matrices } = useExamMatrixList({});
-  const existingMatrix = isEditMode ? matrices?.matrices.find((m) => m.id === id) : null;
+  // Load existing matrix if in edit mode
+  const { data: existingMatrix, isLoading: isLoadingMatrix, error: matrixError } = useExamMatrix(id || '');
 
   const createMutation = useCreateMatrix();
   const updateMutation = useUpdateMatrix();
@@ -125,40 +123,101 @@ export function MatrixBuilderPage() {
     navigate('/exam-matrix');
   };
 
+  // Show loading state while fetching matrix in edit mode
+  if (isEditMode && isLoadingMatrix) {
+    return (
+      <div className="flex h-full items-center justify-center">
+        <div className="text-muted-foreground">{t('loading.loading')}</div>
+      </div>
+    );
+  }
+
+  // Show error state if matrix not found
+  if (isEditMode && matrixError) {
+    return (
+      <div className="flex h-full flex-col items-center justify-center gap-4">
+        <div className="text-destructive">{t('emptyStates.matrixNotFound')}</div>
+        <Button variant="outline" onClick={() => navigate('/exam-matrix')}>
+          {t('buttons.backToList')}
+        </Button>
+      </div>
+    );
+  }
+
+  // If no current matrix, return null
   if (!currentMatrix) {
     return null;
   }
 
   return (
     <div className="flex h-full flex-col">
-      {/* Breadcrumb Header */}
-      <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
-        <Separator orientation="vertical" className="mr-2 h-4" />
-        <Breadcrumb>
-          <BreadcrumbList>
-            <BreadcrumbItem className="hidden md:block">
-              <BreadcrumbLink href="/exam-matrix">{tCommon('examMatrices')}</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator className="hidden md:block" />
-            <BreadcrumbItem>
-              <BreadcrumbPage>{isEditMode ? tCommon('editMatrix') : tCommon('createMatrix')}</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
-      </header>
+      <div className="flex flex-1 flex-col overflow-hidden">
+        <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col space-y-6 overflow-hidden px-8 py-12">
+          {/* Breadcrumb Navigation */}
+          <Breadcrumb className="mb-6">
+            <BreadcrumbList>
+              <BreadcrumbItem className="hidden md:block">
+                <BreadcrumbLink href="/exam-matrix">{t('breadcrumbs.examMatrix')}</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator className="hidden md:block" />
+              <BreadcrumbItem>
+                <BreadcrumbPage>
+                  {isEditMode ? t('breadcrumbs.editMatrix') : t('breadcrumbs.createMatrix')}
+                </BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
 
-      {/* Page Content */}
-      <div className="flex flex-1 flex-col overflow-hidden px-8 py-6">
-        <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col overflow-hidden">
+          {/* Header */}
+          <div className="mb-8 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div>
+                <h1 className="scroll-m-20 text-3xl font-semibold tracking-tight">
+                  {isEditMode ? t('builder.editTitle') : t('builder.createTitle')}
+                </h1>
+              </div>
+            </div>
+          </div>
+
           <Tabs
             value={activeTab}
             onValueChange={(v) => setActiveTab(v as typeof activeTab)}
             className="flex flex-1 flex-col overflow-hidden"
           >
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="configuration">{t('builder.tabs.configuration')}</TabsTrigger>
-              <TabsTrigger value="preview">{t('builder.tabs.preview')}</TabsTrigger>
-            </TabsList>
+            <div className="flex w-full justify-between p-1">
+              <TabsList className="p-1">
+                <div className="grid grid-cols-2">
+                  <TabsTrigger
+                    value="configuration"
+                    className="data-[state=active]:bg-card data-[state=active]:shadow-sm"
+                  >
+                    {t('builder.tabs.configuration')}
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="preview"
+                    className="data-[state=active]:bg-card data-[state=active]:shadow-sm"
+                  >
+                    {t('builder.tabs.preview')}
+                  </TabsTrigger>
+                </div>
+              </TabsList>
+
+              <div className="flex items-center gap-2">
+                <Button variant="outline" onClick={handleCancel}>
+                  {t('builder.actions.cancel')}
+                </Button>
+                <Button
+                  onClick={handleSave}
+                  disabled={createMutation.isPending || updateMutation.isPending}
+                  className="gap-2"
+                >
+                  <Save className="h-4 w-4" />
+                  {createMutation.isPending || updateMutation.isPending
+                    ? t('loading.saving')
+                    : t('builder.actions.save')}
+                </Button>
+              </div>
+            </div>
 
             <TabsContent value="configuration" className="mt-4 flex-1 space-y-6 overflow-auto">
               <MatrixConfigForm
@@ -171,16 +230,6 @@ export function MatrixBuilderPage() {
               <MatrixPreviewTable />
             </TabsContent>
           </Tabs>
-
-          {/* Action Buttons */}
-          <div className="flex justify-end gap-2 border-t pt-4">
-            <Button variant="outline" onClick={handleCancel}>
-              {t('builder.actions.cancel')}
-            </Button>
-            <Button onClick={handleSave} disabled={createMutation.isPending || updateMutation.isPending}>
-              {createMutation.isPending || updateMutation.isPending ? 'Saving...' : t('builder.actions.save')}
-            </Button>
-          </div>
         </div>
       </div>
 

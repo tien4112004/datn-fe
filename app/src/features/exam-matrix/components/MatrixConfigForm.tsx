@@ -151,7 +151,7 @@ export const MatrixConfigForm = ({ onOpenTopicManager, onOpenGridEditor }: Matri
 
         {currentMatrix.topics.length === 0 && (
           <div className="rounded-lg border border-dashed p-4 text-center">
-            <p className="text-muted-foreground text-sm">Add topics first to define the matrix grid</p>
+            <p className="text-muted-foreground text-sm">{t('emptyStates.addTopicsFirst')}</p>
           </div>
         )}
       </div>

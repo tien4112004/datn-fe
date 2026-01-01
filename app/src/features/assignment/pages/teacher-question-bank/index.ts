@@ -1,1 +1,0 @@
-export { TeacherQuestionBankPage } from './TeacherQuestionBankPage';

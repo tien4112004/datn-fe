@@ -36,7 +36,7 @@ export const MatrixCellStatusCard = ({
       nhan_biet: t('difficulty.easy'),
       thong_hieu: t('difficulty.medium'),
       van_dung: t('difficulty.hard'),
-      van_dung_cao: 'Super Hard',
+      van_dung_cao: t('difficulty.van_dung_cao'),
     };
     return labels[difficulty];
   };
@@ -57,18 +57,26 @@ export const MatrixCellStatusCard = ({
     return t('cellStatus.empty');
   };
 
-  const getStatusColor = () => {
-    if (isFulfilled) return 'border-green-500 bg-green-50';
-    if (isPartial) return 'border-yellow-500 bg-yellow-50';
-    return 'border-muted-foreground/20 bg-muted/20';
-  };
-
   return (
     <button
       onClick={onClick}
       className={cn(
-        'w-full rounded-lg border-2 p-3 text-left transition-all hover:shadow-md',
-        isActive ? 'border-primary bg-primary/10 shadow-md' : getStatusColor()
+        'w-full cursor-pointer rounded-2xl border-2 p-4 text-left',
+        'transition-all duration-200',
+        isActive && [
+          'border-primary from-primary/10 bg-gradient-to-br to-transparent',
+          'shadow-lg',
+          'scale-[1.02]',
+          'ring-primary/20 ring-2',
+        ],
+        !isActive && [
+          'border-border bg-card',
+          'shadow-sm',
+          'hover:shadow-md',
+          'hover:border-primary/30',
+          'hover:scale-[1.01]',
+          'active:scale-[0.99]',
+        ]
       )}
     >
       <div className="space-y-2">
@@ -86,11 +94,15 @@ export const MatrixCellStatusCard = ({
         {/* Progress */}
         <div className="space-y-1">
           <div className="flex items-center justify-between text-xs">
-            <span className="text-muted-foreground">Questions</span>
+            <span className="text-muted-foreground">{t('labels.questions')}</span>
             <span
               className={cn(
                 'font-medium',
-                isFulfilled ? 'text-green-600' : isPartial ? 'text-yellow-600' : ''
+                isFulfilled
+                  ? 'text-green-600 dark:text-green-400'
+                  : isPartial
+                    ? 'text-yellow-600 dark:text-yellow-400'
+                    : ''
               )}
             >
               {t('cellStatus.questionsSelected', { selected, required })}
@@ -98,11 +110,15 @@ export const MatrixCellStatusCard = ({
           </div>
 
           <div className="flex items-center justify-between text-xs">
-            <span className="text-muted-foreground">Points</span>
+            <span className="text-muted-foreground">{t('labels.points')}</span>
             <span
               className={cn(
                 'font-medium',
-                isFulfilled ? 'text-green-600' : isPartial ? 'text-yellow-600' : ''
+                isFulfilled
+                  ? 'text-green-600 dark:text-green-400'
+                  : isPartial
+                    ? 'text-yellow-600 dark:text-yellow-400'
+                    : ''
               )}
             >
               {t('cellStatus.pointsSelected', {
@@ -113,11 +129,17 @@ export const MatrixCellStatusCard = ({
           </div>
 
           {/* Progress Bar */}
-          <div className="bg-muted relative h-1.5 overflow-hidden rounded-full">
+          <div className="bg-muted relative h-2 overflow-hidden rounded-full">
             <div
               className={cn(
-                'absolute inset-y-0 left-0 transition-all',
-                isFulfilled ? 'bg-green-500' : isPartial ? 'bg-yellow-500' : 'bg-muted-foreground/20'
+                'h-full rounded-full',
+                'transition-all duration-500 ease-out',
+                'shadow-sm',
+                isFulfilled
+                  ? 'bg-gradient-to-r from-green-500 to-green-400'
+                  : isPartial
+                    ? 'bg-gradient-to-r from-yellow-500 to-yellow-400'
+                    : 'from-primary to-primary/80 bg-gradient-to-r'
               )}
               style={{ width: `${Math.min((selected / required) * 100, 100)}%` }}
             />
@@ -128,7 +150,11 @@ export const MatrixCellStatusCard = ({
         <div className="text-xs font-medium">
           <span
             className={cn(
-              isFulfilled ? 'text-green-600' : isPartial ? 'text-yellow-600' : 'text-muted-foreground'
+              isFulfilled
+                ? 'text-green-600 dark:text-green-400'
+                : isPartial
+                  ? 'text-yellow-600 dark:text-yellow-400'
+                  : 'text-muted-foreground'
             )}
           >
             {getStatusLabel()}

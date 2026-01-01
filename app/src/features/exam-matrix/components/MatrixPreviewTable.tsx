@@ -24,7 +24,7 @@ export const MatrixPreviewTable = () => {
       nhan_biet: t('difficulty.easy'),
       thong_hieu: t('difficulty.medium'),
       van_dung: t('difficulty.hard'),
-      van_dung_cao: 'Super Hard',
+      van_dung_cao: t('difficulty.van_dung_cao'),
     };
     return labels[difficulty];
   };
@@ -80,13 +80,13 @@ export const MatrixPreviewTable = () => {
               {isPointsMatch ? (
                 <>
                   <CheckCircle className="h-5 w-5 text-green-500" />
-                  <span className="text-sm font-medium text-green-600">Perfect Match!</span>
+                  <span className="text-sm font-medium text-green-600">{t('status.perfectMatch')}</span>
                 </>
               ) : isWithinTolerance ? (
                 <>
                   <CheckCircle className="h-5 w-5 text-yellow-500" />
                   <span className="text-sm font-medium text-yellow-600">
-                    Within Tolerance ({pointsDifference > 0 ? '+' : ''}
+                    {t('status.withinTolerance')} ({pointsDifference > 0 ? '+' : ''}
                     {pointsDifference.toFixed(1)})
                   </span>
                 </>
@@ -94,7 +94,7 @@ export const MatrixPreviewTable = () => {
                 <>
                   <AlertCircle className="h-5 w-5 text-red-500" />
                   <span className="text-sm font-medium text-red-600">
-                    Off by {Math.abs(pointsDifference).toFixed(1)} pts
+                    {t('status.offBy')} {Math.abs(pointsDifference).toFixed(1)} pts
                   </span>
                 </>
               )}
@@ -116,7 +116,7 @@ export const MatrixPreviewTable = () => {
                   {getDifficultyLabel(difficulty)}
                 </th>
               ))}
-              <th className="min-w-[100px] p-3 text-center font-medium">Total</th>
+              <th className="min-w-[100px] p-3 text-center font-medium">{t('table.total')}</th>
             </tr>
           </thead>
           <tbody>
@@ -168,7 +168,7 @@ export const MatrixPreviewTable = () => {
 
             {/* Totals Row */}
             <tr className="bg-muted font-semibold">
-              <td className="bg-muted sticky left-0 p-3">Total</td>
+              <td className="bg-muted sticky left-0 p-3">{t('table.total')}</td>
               {difficultyLevels.map((difficulty) => {
                 const difficultyCells = currentMatrix.cells.filter((c) => c.difficulty === difficulty);
                 const difficultyQuestions = difficultyCells.reduce(

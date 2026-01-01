@@ -35,7 +35,7 @@ export const QuestionBankFilters = () => {
   };
 
   return (
-    <div className="flex flex-col gap-2 sm:flex-row">
+    <div className="flex flex-col gap-3 sm:flex-row">
       {/* Search Bar */}
       <div className="flex-1">
         <SearchBar

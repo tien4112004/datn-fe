@@ -1,18 +1,25 @@
 import { useState, useEffect } from 'react';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from '@/shared/components/ui/dialog';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
 import { Label } from '@/shared/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
-import { useCreateQuestion, useUpdateQuestion } from '@/features/assignment/hooks/useQuestionBankApi';
+import { Alert, AlertDescription, AlertTitle } from '@/shared/components/ui/alert';
+import { Separator } from '@/shared/components/ui/separator';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@/shared/components/ui/breadcrumb';
+import {
+  useCreateQuestion,
+  useUpdateQuestion,
+  useQuestionBankItem,
+} from '@/features/assignment/hooks/useQuestionBankApi';
 import type {
-  QuestionBankItem,
   CreateQuestionRequest,
   QuestionType,
   Difficulty,
@@ -30,16 +37,8 @@ import { FillInBlankEditing } from '@/features/assignment/components/fill-in-bla
 import { OpenEndedEditing } from '@/features/assignment/components/open-ended/OpenEndedEditing';
 import { generateId } from '@/shared/lib/utils';
 import { toast } from 'sonner';
-import { Alert, AlertDescription, AlertTitle } from '@/shared/components/ui/alert';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, Save, Settings, FileText } from 'lucide-react';
 import { validateQuestion } from '@/features/assignment/utils/validateQuestion';
-
-interface QuestionBankFormDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  mode: 'create' | 'edit';
-  question?: QuestionBankItem | null;
-}
 
 // Helper function to create default question based on type
 function createDefaultQuestion(type: QuestionType): Question {
@@ -95,39 +94,31 @@ function createDefaultQuestion(type: QuestionType): Question {
   }
 }
 
-export function QuestionBankFormDialog({ open, onOpenChange, mode, question }: QuestionBankFormDialogProps) {
-  const createMutation = useCreateQuestion();
-  const updateMutation = useUpdateQuestion();
+export function QuestionBankEditorPage() {
+  const { id } = useParams<{ id?: string }>();
+  const navigate = useNavigate();
 
-  // Form state - full question object instead of metadata only
+  const isEditMode = !!id;
+
+  // Form state
   const [questionData, setQuestionData] = useState<Question | null>(null);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
-  // Initialize form with question data when editing or opening
+  // Fetch existing question if editing
+  const { data: existingQuestion, isLoading } = useQuestionBankItem(id || '');
+
+  // Mutations
+  const createMutation = useCreateQuestion();
+  const updateMutation = useUpdateQuestion();
+
+  // Initialize form data
   useEffect(() => {
-    if (mode === 'edit' && question && open) {
-      // Edit mode: use full existing question
-      setQuestionData(question as Question);
-      setValidationErrors([]);
-    } else if (mode === 'create' && open) {
-      // Create mode: initialize with default question of initial type
+    if (isEditMode && existingQuestion) {
+      setQuestionData(existingQuestion as Question);
+    } else if (!isEditMode) {
       setQuestionData(createDefaultQuestion(QUESTION_TYPE.MULTIPLE_CHOICE));
-      setValidationErrors([]);
     }
-  }, [mode, question, open]);
-
-  // Clean up state after dialog closes (with delay for animation)
-  useEffect(() => {
-    if (!open) {
-      // Delay cleanup to allow Radix UI Dialog's close animation to complete
-      const timeoutId = setTimeout(() => {
-        setQuestionData(null);
-        setValidationErrors([]);
-      }, 300); // Match dialog animation duration
-
-      return () => clearTimeout(timeoutId);
-    }
-  }, [open]);
+  }, [isEditMode, existingQuestion]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -141,7 +132,6 @@ export function QuestionBankFormDialog({ open, onOpenChange, mode, question }: Q
     const validation = validateQuestion(questionData);
 
     if (!validation.isValid) {
-      // Show errors - block submission
       setValidationErrors(validation.errors);
       toast.error('Please fix validation errors before saving');
       return;
@@ -158,39 +148,39 @@ export function QuestionBankFormDialog({ open, onOpenChange, mode, question }: Q
     }
 
     try {
-      if (mode === 'create') {
-        // Create with full question content
-        const payload: CreateQuestionRequest = {
-          question: {
-            ...questionData,
-            bankType: BANK_TYPE.PERSONAL, // Ensure it's personal
-          } as any,
-        };
-
-        await createMutation.mutateAsync(payload);
-        toast.success('Question created successfully');
-      } else if (mode === 'edit' && question) {
-        // Update with full question content
+      if (isEditMode && id) {
         await updateMutation.mutateAsync({
-          id: question.id,
+          id,
           data: {
             question: questionData as any,
           },
         });
         toast.success('Question updated successfully');
+      } else {
+        const payload: CreateQuestionRequest = {
+          question: {
+            ...questionData,
+            bankType: BANK_TYPE.PERSONAL,
+          } as any,
+        };
+        await createMutation.mutateAsync(payload);
+        toast.success('Question created successfully');
       }
 
-      onOpenChange(false);
+      navigate('/question-bank');
     } catch (error) {
-      toast.error(`Failed to ${mode} question`);
+      toast.error(`Failed to ${isEditMode ? 'update' : 'create'} question`);
     }
+  };
+
+  const handleCancel = () => {
+    navigate('/question-bank');
   };
 
   // Handle question type change (create mode only)
   const handleTypeChange = (newType: QuestionType) => {
-    if (mode === 'create' && questionData) {
+    if (!isEditMode && questionData) {
       const newQuestion = createDefaultQuestion(newType);
-      // Preserve metadata from current question
       setQuestionData({
         ...newQuestion,
         difficulty: questionData.difficulty,
@@ -200,21 +190,74 @@ export function QuestionBankFormDialog({ open, onOpenChange, mode, question }: Q
     }
   };
 
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] !max-w-6xl overflow-y-auto rounded-3xl border-2 shadow-2xl">
-        <DialogHeader>
-          <DialogTitle>{mode === 'create' ? 'Create New Question' : 'Edit Question'}</DialogTitle>
-        </DialogHeader>
+  if (isEditMode && isLoading) {
+    return (
+      <div className="flex h-full items-center justify-center">
+        <div className="text-muted-foreground">Loading question...</div>
+      </div>
+    );
+  }
 
-        {questionData && (
-          <form onSubmit={handleSubmit} className="gap-6 space-y-6">
+  if (!questionData) {
+    return null;
+  }
+
+  return (
+    <div className="flex h-full flex-col">
+      <div className="flex flex-1 flex-col overflow-auto">
+        <div className="mx-auto w-full max-w-7xl space-y-6 px-8 py-12">
+          {/* Breadcrumb Navigation */}
+          <Breadcrumb className="mb-6">
+            <BreadcrumbList>
+              <BreadcrumbItem className="hidden md:block">
+                <BreadcrumbLink href="/question-bank">Question Bank</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator className="hidden md:block" />
+              <BreadcrumbItem>
+                <BreadcrumbPage>{isEditMode ? 'Edit Question' : 'Create Question'}</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+
+          {/* Header */}
+          <div className="mb-8 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <h1 className="scroll-m-20 text-3xl font-semibold tracking-tight">
+                {isEditMode ? 'Edit Question' : 'Create New Question'}
+              </h1>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Button variant="outline" onClick={handleCancel}>
+                Cancel
+              </Button>
+              <Button
+                onClick={handleSubmit}
+                disabled={createMutation.isPending || updateMutation.isPending}
+                className="gap-2"
+              >
+                <Save className="h-4 w-4" />
+                {createMutation.isPending || updateMutation.isPending
+                  ? 'Saving...'
+                  : isEditMode
+                    ? 'Save Changes'
+                    : 'Create Question'}
+              </Button>
+            </div>
+          </div>
+
+          {/* Form Content */}
+          <form onSubmit={handleSubmit} className="space-y-6">
             {/* Metadata Section */}
-            <div className="bg-muted/10 space-y-4 rounded-2xl border p-6 shadow-sm">
-              <h3 className="scroll-m-20 text-xl font-semibold tracking-tight">Question Metadata</h3>
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <Settings className="text-primary h-5 w-5" />
+                <h3 className="text-lg font-semibold">Question Metadata</h3>
+              </div>
+              <Separator />
 
               {/* Question Type - Only for create mode */}
-              {mode === 'create' && (
+              {!isEditMode && (
                 <div className="space-y-2">
                   <Label>Question Type</Label>
                   <Select value={questionData.type} onValueChange={handleTypeChange}>
@@ -304,9 +347,13 @@ export function QuestionBankFormDialog({ open, onOpenChange, mode, question }: Q
               </Alert>
             )}
 
-            {/* Question Content Editor - Type Specific */}
-            <div className="mt-6 space-y-4 rounded-2xl border p-6 shadow-sm">
-              <h3 className="scroll-m-20 text-xl font-semibold tracking-tight">Question Content</h3>
+            {/* Question Content Section */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <FileText className="text-primary h-5 w-5" />
+                <h3 className="text-lg font-semibold">Question Content</h3>
+              </div>
+              <Separator />
 
               {questionData.type === QUESTION_TYPE.MULTIPLE_CHOICE && (
                 <MultipleChoiceEditing
@@ -336,18 +383,9 @@ export function QuestionBankFormDialog({ open, onOpenChange, mode, question }: Q
                 />
               )}
             </div>
-
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-                Cancel
-              </Button>
-              <Button type="submit" disabled={createMutation.isPending || updateMutation.isPending}>
-                {mode === 'create' ? 'Create Question' : 'Save Changes'}
-              </Button>
-            </DialogFooter>
           </form>
-        )}
-      </DialogContent>
-    </Dialog>
+        </div>
+      </div>
+    </div>
   );
 }

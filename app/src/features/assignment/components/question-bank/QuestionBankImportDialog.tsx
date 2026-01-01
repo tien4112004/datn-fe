@@ -61,7 +61,7 @@ export function QuestionBankImportDialog({ open, onClose }: QuestionBankImportDi
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-2xl rounded-3xl border-2 shadow-xl">
         <DialogHeader>
           <DialogTitle>Import Questions from CSV</DialogTitle>
           <DialogDescription>
@@ -117,9 +117,9 @@ export function QuestionBankImportDialog({ open, onClose }: QuestionBankImportDi
           {importResult && (
             <div className="space-y-2">
               {importResult.failed === 0 ? (
-                <Alert className="border-green-200 bg-green-50">
-                  <CheckCircle className="h-4 w-4 text-green-600" />
-                  <AlertDescription className="text-green-800">
+                <Alert className="border border-green-500 bg-green-50 dark:bg-green-950">
+                  <CheckCircle className="h-4 w-4 text-green-500" />
+                  <AlertDescription className="text-green-600 dark:text-green-400">
                     Successfully imported {importResult.success} question(s)
                   </AlertDescription>
                 </Alert>

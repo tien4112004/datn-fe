@@ -1,6 +1,4 @@
-import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbPage } from '@/components/ui/breadcrumb';
 import { Button } from '@/components/ui/button';
-import { Separator } from '@radix-ui/react-separator';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import { Plus } from 'lucide-react';
@@ -13,7 +11,6 @@ import { ClassTable } from './components/ClassTable';
 
 export const ClassListPage = () => {
   const { t } = useTranslation('classes', { keyPrefix: 'list' });
-  const { t: tPage } = useTranslation('common', { keyPrefix: 'pages' });
   const [searchParams, setSearchParams] = useSearchParams();
 
   const { viewMode, setViewMode, openCreateModal, closeCreateModal, isCreateModalOpen } = useClassStore();
@@ -30,40 +27,30 @@ export const ClassListPage = () => {
   };
 
   return (
-    <>
-      <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
-        <Separator orientation="vertical" className="mr-2 data-[orientation=vertical]:h-4" />
-        <Breadcrumb>
-          <BreadcrumbList>
-            <BreadcrumbItem className="hidden md:block">
-              <BreadcrumbPage>{tPage('classes')}</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
-      </header>
-
-      <div className="space-y-4 px-8 py-4">
-        <div className="flex items-center justify-between">
-          <div className="space-y-1">
-            <h2 className="text-lg font-medium">{t('welcome')}</h2>
-            <p className="text-muted-foreground">{t('description')}</p>
+    <div className="flex h-full flex-col">
+      <div className="flex flex-1 flex-col overflow-auto">
+        <div className="mx-auto w-full max-w-7xl space-y-6 px-8 py-12">
+          <div className="flex items-center justify-between">
+            <div className="space-y-1">
+              <h1 className="scroll-m-20 text-3xl font-semibold tracking-tight">{t('title')}</h1>
+              <p className="text-muted-foreground text-sm">{t('description')}</p>
+            </div>
+            <Button onClick={openCreateModal} className="gap-2">
+              <Plus className="h-4 w-4" />
+              {t('createClass')}
+            </Button>
+            <AddClassModal isOpen={isCreateModalOpen} onClose={closeCreateModal} />
           </div>
-          <Button onClick={openCreateModal} className="gap-2">
-            <Plus className="h-4 w-4" />
-            {t('createClass')}
-          </Button>
-          <AddClassModal isOpen={isCreateModalOpen} onClose={closeCreateModal} />
+
+          <div className="flex items-center justify-end">
+            <ViewToggle value={currentViewMode} onValueChange={handleViewModeChange} />
+          </div>
+
+          <ClassFilters />
+
+          {currentViewMode === 'list' ? <ClassTable /> : <ClassGrid />}
         </div>
-
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-semibold">{t('title')}</h1>
-          <ViewToggle value={currentViewMode} onValueChange={handleViewModeChange} />
-        </div>
-
-        <ClassFilters />
-
-        {currentViewMode === 'list' ? <ClassTable /> : <ClassGrid />}
       </div>
-    </>
+    </div>
   );
 };

@@ -4,12 +4,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui
 import { Button } from '@/shared/components/ui/button';
 import { Label } from '@/shared/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/shared/components/ui/radio-group';
-import { Input } from '@/shared/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
 import { Switch } from '@/shared/components/ui/switch';
 import { Plus, Trash2, ImagePlus, X, Shuffle } from 'lucide-react';
 import { generateId } from '@/shared/lib/utils';
-import { DIFFICULTY_LABELS, type Difficulty } from '../../types';
 import { useTranslation } from 'react-i18next';
 
 interface MultipleChoiceEditingProps {
@@ -18,7 +15,7 @@ interface MultipleChoiceEditingProps {
 }
 
 export const MultipleChoiceEditing = ({ question, onChange }: MultipleChoiceEditingProps) => {
-  const { t } = useTranslation('assignment', { keyPrefix: 'editing.shuffle' });
+  const { t } = useTranslation('assignment', { keyPrefix: 'editing.multipleChoice' });
 
   const updateQuestion = (updates: Partial<MultipleChoiceQuestion>) => {
     onChange({ ...question, ...updates });
@@ -35,7 +32,7 @@ export const MultipleChoiceEditing = ({ question, onChange }: MultipleChoiceEdit
 
   const removeOption = (optionId: string) => {
     if (question.options.length <= 2) {
-      alert('Must have at least 2 options');
+      alert(t('alerts.minOptions'));
       return;
     }
     updateQuestion({ options: question.options.filter((o) => o.id !== optionId) });
@@ -62,50 +59,26 @@ export const MultipleChoiceEditing = ({ question, onChange }: MultipleChoiceEdit
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle className="text-lg">Edit Multiple Choice Question</CardTitle>
+          <CardTitle className="text-lg">{t('title')}</CardTitle>
           <DifficultyBadge difficulty={question.difficulty} />
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
-        {/* Difficulty & Points */}
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label>Difficulty</Label>
-            <Select
-              value={question.difficulty}
-              onValueChange={(value) => updateQuestion({ difficulty: value as Difficulty })}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {Object.entries(DIFFICULTY_LABELS).map(([value, label]) => (
-                  <SelectItem key={value} value={value}>
-                    {label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-2">
-            <Label>Points</Label>
-            <Input
-              type="number"
-              min="0"
-              value={question.points || 0}
-              onChange={(e) => updateQuestion({ points: parseInt(e.target.value) || 0 })}
-            />
-          </div>
-        </div>
-
         {/* Shuffle Options */}
         <div className="flex items-center justify-between rounded-lg border p-4">
           <div className="space-y-0.5">
             <div className="flex items-center gap-2">
               <Shuffle className="h-4 w-4" />
-              <Label className="text-base font-medium">{t('shuffleOptions')}</Label>
+              <Label className="text-base font-medium">
+                {t('shuffle.shuffleOptions', { ns: 'assignment', defaultValue: 'Shuffle Options' })}
+              </Label>
             </div>
-            <div className="text-muted-foreground text-sm">{t('shuffleOptionsDescription')}</div>
+            <div className="text-muted-foreground text-sm">
+              {t('shuffle.shuffleOptionsDescription', {
+                ns: 'assignment',
+                defaultValue: 'Randomize the order of options for each student',
+              })}
+            </div>
           </div>
           <Switch
             checked={question.shuffleOptions || false}
@@ -115,17 +88,17 @@ export const MultipleChoiceEditing = ({ question, onChange }: MultipleChoiceEdit
 
         {/* Question Title */}
         <div className="space-y-2">
-          <Label>Question</Label>
+          <Label>{t('labels.question')}</Label>
           <MarkdownEditor
             value={question.title}
             onChange={(title) => updateQuestion({ title })}
-            placeholder="Enter your question here..."
+            placeholder={t('placeholders.question')}
           />
         </div>
 
         {/* Question Image */}
         <ImageUploader
-          label="Question Image (optional)"
+          label={t('labels.questionImage')}
           value={question.titleImageUrl}
           onChange={(titleImageUrl) => updateQuestion({ titleImageUrl })}
         />
@@ -133,7 +106,7 @@ export const MultipleChoiceEditing = ({ question, onChange }: MultipleChoiceEdit
         {/* Options */}
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <Label>Options</Label>
+            <Label>{t('labels.options')}</Label>
             <Button
               type="button"
               variant="outline"
@@ -142,7 +115,7 @@ export const MultipleChoiceEditing = ({ question, onChange }: MultipleChoiceEdit
               disabled={question.options.length >= 6}
             >
               <Plus className="mr-2 h-4 w-4" />
-              Add Option
+              {t('buttons.addOption')}
             </Button>
           </div>
 
@@ -158,7 +131,7 @@ export const MultipleChoiceEditing = ({ question, onChange }: MultipleChoiceEdit
                     <MarkdownEditor
                       value={option.text}
                       onChange={(text) => updateOption(option.id, { text })}
-                      placeholder="Enter option text..."
+                      placeholder={t('placeholders.option')}
                       minHeight={50}
                       className="flex-1"
                     />
@@ -168,7 +141,7 @@ export const MultipleChoiceEditing = ({ question, onChange }: MultipleChoiceEdit
                         variant="ghost"
                         size="sm"
                         onClick={() => updateOption(option.id, { imageUrl: undefined })}
-                        title="Remove image"
+                        title={t('buttons.removeImage')}
                       >
                         <X className="h-4 w-4" />
                       </Button>
@@ -178,7 +151,7 @@ export const MultipleChoiceEditing = ({ question, onChange }: MultipleChoiceEdit
                         variant="ghost"
                         size="sm"
                         onClick={() => updateOption(option.id, { imageUrl: '' })}
-                        title="Add image"
+                        title={t('buttons.addImage')}
                       >
                         <ImagePlus className="h-4 w-4" />
                       </Button>
@@ -209,11 +182,11 @@ export const MultipleChoiceEditing = ({ question, onChange }: MultipleChoiceEdit
 
         {/* Explanation */}
         <div className="space-y-2">
-          <Label>Explanation (shown after assessment)</Label>
+          <Label>{t('labels.explanation')}</Label>
           <MarkdownEditor
             value={question.explanation || ''}
             onChange={(explanation) => updateQuestion({ explanation })}
-            placeholder="Explain the correct answer..."
+            placeholder={t('placeholders.explanation')}
           />
         </div>
       </CardContent>

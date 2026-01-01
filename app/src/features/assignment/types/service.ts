@@ -1,7 +1,6 @@
 import type { Service } from '@/shared/api';
 import type { ApiResponse } from '@aiprimary/api';
-import type { Assignment, Submission } from './answer';
-import type { Question } from './question';
+import type { Assignment, Submission, Question } from '@aiprimary/core';
 
 export interface AssignmentCollectionRequest {
   page?: number;

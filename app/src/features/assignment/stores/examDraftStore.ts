@@ -2,9 +2,8 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { devtools } from 'zustand/middleware';
 import { generateId } from '@/shared/lib/utils';
-import type { ExamDraft } from '../types/examDraft';
+import type { ExamDraft, Question } from '@aiprimary/core';
 import type { ExamMatrix } from '@/features/exam-matrix/types';
-import type { Question } from '../types';
 
 interface ExamDraftStore {
   // State

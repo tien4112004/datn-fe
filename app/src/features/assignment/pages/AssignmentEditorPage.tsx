@@ -39,6 +39,9 @@ export function AssignmentEditorPage() {
   const { t } = useTranslation(I18N_NAMESPACES.ASSIGNMENT, {
     keyPrefix: 'assignmentEditor',
   });
+  const { t: tDialogs } = useTranslation(I18N_NAMESPACES.ASSIGNMENT, {
+    keyPrefix: 'dialogs',
+  });
 
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showUnsavedDialog, setShowUnsavedDialog] = useState(false);
@@ -200,99 +203,101 @@ export function AssignmentEditorPage() {
   };
 
   return (
-    <div className="mx-auto flex max-w-7xl flex-col gap-6 px-8 py-4">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={handleCancel} disabled={isLoading}>
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <div>
-            <h1 className="scroll-m-20 text-balance text-4xl font-bold tracking-tight">
-              {isEditMode ? t('editAssignment') : t('createNew')}
-            </h1>
-            {hasUnsavedChanges && <p className="mt-1 text-sm text-amber-600">Unsaved changes</p>}
+    <div className="flex h-full flex-col">
+      <div className="flex flex-1 flex-col overflow-auto">
+        <div className="mx-auto w-full max-w-7xl space-y-6 px-8 py-12">
+          {/* Header */}
+          <div className="mb-8 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Button variant="ghost" size="icon" onClick={handleCancel} disabled={isLoading}>
+                <ArrowLeft className="h-5 w-5" />
+              </Button>
+              <div className="space-y-0.5">
+                <h1 className="scroll-m-20 text-2xl font-semibold tracking-tight">
+                  {isEditMode ? t('editAssignment') : t('createNew')}
+                </h1>
+                {hasUnsavedChanges && (
+                  <p className="text-sm text-yellow-600 dark:text-yellow-400">Unsaved changes</p>
+                )}
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              {isEditMode && (
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => setShowDeleteDialog(true)}
+                  disabled={isLoading}
+                  className="gap-2"
+                >
+                  <Trash2 className="h-4 w-4" />
+                  {t('actions.delete')}
+                </Button>
+              )}
+
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleSaveDraft}
+                disabled={isLoading}
+                className="gap-2"
+              >
+                <Save className="h-4 w-4" />
+                {t('actions.saveDraft')}
+              </Button>
+
+              <Button size="sm" onClick={handlePublish} disabled={isLoading} className="gap-2">
+                <Send className="h-4 w-4" />
+                {t('actions.publish')}
+              </Button>
+            </div>
           </div>
-        </div>
 
-        <div className="flex items-center gap-2">
-          {isEditMode && (
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={() => setShowDeleteDialog(true)}
-              disabled={isLoading}
-              className="gap-2"
-            >
-              <Trash2 className="h-4 w-4" />
-              {t('actions.delete')}
-            </Button>
-          )}
+          {/* Content */}
+          <div className="grid space-y-6">
+            <AssignmentMetadataForm />
+            <QuestionCollectionSection />
+          </div>
 
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleSaveDraft}
-            disabled={isLoading}
-            className="gap-2"
-          >
-            <Save className="h-4 w-4" />
-            {t('actions.saveDraft')}
-          </Button>
+          {/* Delete Confirmation Dialog */}
+          <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>{tDialogs('deleteAssignment.title')}</AlertDialogTitle>
+                <AlertDialogDescription>{tDialogs('deleteAssignment.description')}</AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>{tDialogs('deleteAssignment.cancel')}</AlertDialogCancel>
+                <AlertDialogAction onClick={handleDelete} className="bg-destructive">
+                  {tDialogs('deleteAssignment.delete')}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
 
-          <Button size="sm" onClick={handlePublish} disabled={isLoading} className="gap-2">
-            <Send className="h-4 w-4" />
-            {t('actions.publish')}
-          </Button>
+          {/* Unsaved Changes Dialog */}
+          <AlertDialog open={showUnsavedDialog} onOpenChange={setShowUnsavedDialog}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>{tDialogs('unsavedChanges.title')}</AlertDialogTitle>
+                <AlertDialogDescription>{tDialogs('unsavedChanges.description')}</AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>{tDialogs('unsavedChanges.stay')}</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={() => {
+                    resetEditor();
+                    navigate('/assignments');
+                  }}
+                >
+                  {tDialogs('unsavedChanges.leave')}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       </div>
-
-      {/* Content */}
-      <div className="grid gap-6">
-        <AssignmentMetadataForm />
-        <QuestionCollectionSection />
-      </div>
-
-      {/* Delete Confirmation Dialog */}
-      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete Assignment?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the assignment.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-destructive">
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      {/* Unsaved Changes Dialog */}
-      <AlertDialog open={showUnsavedDialog} onOpenChange={setShowUnsavedDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Unsaved Changes</AlertDialogTitle>
-            <AlertDialogDescription>
-              You have unsaved changes. Are you sure you want to leave?
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Stay</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => {
-                resetEditor();
-                navigate('/assignments');
-              }}
-            >
-              Leave
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </div>
   );
 }

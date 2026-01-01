@@ -1,74 +1,79 @@
 import type { QuestionType, Difficulty, SubjectCode, BankType } from './constants';
-import type { Question } from './question';
 
-// Re-export types for convenience
-export type { SubjectCode, BankType };
-
-/**
- * QuestionBankItem combines Question with additional metadata for the bank
- * Uses intersection type to include all type-specific fields
- */
-export type QuestionBankItem = Question & {
-  subjectCode: SubjectCode;
-  bankType: BankType; // Personal (teacher's own) or Application (school-wide)
-  createdAt?: string;
-  updatedAt?: string;
-  createdBy?: string; // User ID of creator
-};
+// Re-export core type
+export type { QuestionBankItem } from '@aiprimary/core';
 
 /**
  * Filters for querying the question bank
+ * UI/API-specific type for filtering question bank lists
  */
 export interface QuestionBankFilters {
-  searchText?: string; // Search in title and content
-  questionType?: QuestionType; // Filter by question type
-  difficulty?: Difficulty; // Filter by difficulty level
-  subjectCode?: SubjectCode; // Filter by subject
-  bankType?: BankType; // Filter by personal or application bank
-  page?: number; // Pagination: page number (1-indexed)
-  limit?: number; // Pagination: items per page
+  /** Search in title and content */
+  searchText?: string;
+  /** Filter by question type */
+  questionType?: QuestionType;
+  /** Filter by difficulty level */
+  difficulty?: Difficulty;
+  /** Filter by subject */
+  subjectCode?: SubjectCode;
+  /** Filter by personal or application bank */
+  bankType?: BankType;
+  /** Pagination: page number (1-indexed) */
+  page?: number;
+  /** Pagination: items per page */
+  limit?: number;
 }
 
 /**
  * Response structure for question bank API
+ * UI/API-specific type for paginated responses
  */
 export interface QuestionBankResponse {
-  questions: QuestionBankItem[];
-  total: number; // Total matching questions
-  page: number; // Current page
-  limit: number; // Items per page
+  questions: import('@aiprimary/core').QuestionBankItem[];
+  /** Total matching questions */
+  total: number;
+  /** Current page */
+  page: number;
+  /** Items per page */
+  limit: number;
 }
 
 /**
  * Request types for question bank operations
+ * UI/API-specific types for creating/updating questions
  */
 export interface CreateQuestionRequest {
-  question: Omit<QuestionBankItem, 'id' | 'createdAt' | 'updatedAt'>;
+  question: Omit<import('@aiprimary/core').QuestionBankItem, 'id' | 'createdAt' | 'updatedAt'>;
 }
 
 export interface UpdateQuestionRequest {
-  question: Partial<QuestionBankItem>;
+  question: Partial<import('@aiprimary/core').QuestionBankItem>;
 }
 
 /**
  * API service interface for question bank operations
+ * UI/API-specific interface defining the service contract
  */
 export interface QuestionBankApiService {
   // Query operations
   getQuestions(filters: QuestionBankFilters): Promise<QuestionBankResponse>;
-  getQuestionById(id: string): Promise<QuestionBankItem>;
+  getQuestionById(id: string): Promise<import('@aiprimary/core').QuestionBankItem>;
 
   // CRUD operations
   createQuestion(
-    question: Omit<QuestionBankItem, 'id' | 'createdAt' | 'updatedAt'>
-  ): Promise<QuestionBankItem>;
-  updateQuestion(id: string, question: Partial<QuestionBankItem>): Promise<QuestionBankItem>;
+    question: Omit<import('@aiprimary/core').QuestionBankItem, 'id' | 'createdAt' | 'updatedAt'>
+  ): Promise<import('@aiprimary/core').QuestionBankItem>;
+  updateQuestion(
+    id: string,
+    question: Partial<import('@aiprimary/core').QuestionBankItem>
+  ): Promise<import('@aiprimary/core').QuestionBankItem>;
   deleteQuestion(id: string): Promise<void>;
   bulkDeleteQuestions(ids: string[]): Promise<void>;
 
   // Utility operations
-  duplicateQuestion(id: string): Promise<QuestionBankItem>;
-  copyToPersonal(id: string): Promise<QuestionBankItem>; // Copy from application bank to personal
+  duplicateQuestion(id: string): Promise<import('@aiprimary/core').QuestionBankItem>;
+  /** Copy from application bank to personal */
+  copyToPersonal(id: string): Promise<import('@aiprimary/core').QuestionBankItem>;
 
   // Import/Export
   exportQuestions(filters?: QuestionBankFilters): Promise<Blob>;

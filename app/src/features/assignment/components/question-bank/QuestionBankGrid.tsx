@@ -5,6 +5,7 @@ import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 import { questionBankData } from '../../api/data/questionBank.data';
 import useQuestionBankStore from '../../stores/questionBankStore';
 import { QuestionBankCard } from './QuestionBankCard';
+import { getStaggerDelay } from '../../constants/animations';
 
 export const QuestionBankGrid = () => {
   const { t } = useTranslation(I18N_NAMESPACES.ASSIGNMENT);
@@ -53,14 +54,15 @@ export const QuestionBankGrid = () => {
   }
 
   return (
-    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-      {filteredQuestions.map((question) => (
-        <QuestionBankCard
-          key={question.id}
-          question={question}
-          isSelected={isQuestionSelected(question.id)}
-          onToggleSelection={toggleQuestionSelection}
-        />
+    <div className="animate-in fade-in grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+      {filteredQuestions.map((question, index) => (
+        <div key={question.id} className={getStaggerDelay(index)}>
+          <QuestionBankCard
+            question={question}
+            isSelected={isQuestionSelected(question.id)}
+            onToggleSelection={toggleQuestionSelection}
+          />
+        </div>
       ))}
     </div>
   );

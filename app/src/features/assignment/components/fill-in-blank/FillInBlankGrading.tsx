@@ -16,15 +16,15 @@ interface FillInBlankGradingProps {
 
 export const FillInBlankGrading = ({ question, answer, onGradeChange }: FillInBlankGradingProps) => {
   // Calculate score: each correct blank gets equal points
-  const blankSegments = question.segments.filter((s) => s.type === 'blank');
+  const blankSegments = question.data.segments.filter((s) => s.type === 'blank');
   const pointsPerBlank = question.points ? question.points / blankSegments.length : 0;
 
   const isBlankCorrect = (segmentId: string, studentAnswer: string): boolean => {
-    const segment = question.segments.find((s) => s.id === segmentId);
+    const segment = question.data.segments.find((s) => s.id === segmentId);
     if (!segment || segment.type !== 'blank') return false;
 
     const correctAnswer = segment.content;
-    const caseSensitive = question.caseSensitive || false;
+    const caseSensitive = question.data.caseSensitive || false;
 
     // Check main answer
     const mainMatch = caseSensitive
@@ -98,7 +98,7 @@ export const FillInBlankGrading = ({ question, answer, onGradeChange }: FillInBl
         <div className="space-y-2">
           <Label className="text-sm font-semibold">Student Answer:</Label>
           <div className="bg-muted/50 rounded-md p-4 text-sm leading-relaxed">
-            {question.segments.map((segment) => {
+            {question.data.segments.map((segment) => {
               if (segment.type === 'text') {
                 return (
                   <span key={segment.id} className="font-mono">
@@ -186,7 +186,7 @@ export const FillInBlankGrading = ({ question, answer, onGradeChange }: FillInBl
         </div>
 
         {/* Case Sensitivity Info */}
-        {question.caseSensitive && (
+        {question.data.caseSensitive && (
           <div className="rounded-md border border-amber-200 bg-amber-50 p-2 text-xs text-amber-800 dark:border-amber-800 dark:bg-amber-900/20 dark:text-amber-200">
             ⚠️ This question is case-sensitive
           </div>

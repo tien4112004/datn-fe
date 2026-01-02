@@ -12,7 +12,7 @@ interface FillInBlankDoingProps {
 }
 
 export const FillInBlankDoing = ({ question, answer, onAnswerChange }: FillInBlankDoingProps) => {
-  const blankSegments = question.segments.filter((s) => s.type === 'blank');
+  const blankSegments = question.data.segments.filter((s) => s.type === 'blank');
   const [blanks, setBlanks] = useState<Record<string, string>>(() => {
     const initial: Record<string, string> = {};
     answer?.blanks.forEach((b) => {
@@ -64,7 +64,7 @@ export const FillInBlankDoing = ({ question, answer, onAnswerChange }: FillInBla
 
         {/* Question with input blanks */}
         <div className="bg-muted/50 rounded-md p-4 text-sm leading-relaxed">
-          {question.segments.map((segment) => (
+          {question.data.segments.map((segment) => (
             <span key={segment.id}>
               {segment.type === 'text' ? (
                 <span className="font-mono">{segment.content}</span>
@@ -83,7 +83,7 @@ export const FillInBlankDoing = ({ question, answer, onAnswerChange }: FillInBla
 
         {/* Info */}
         <div className="text-muted-foreground space-y-1 text-sm">
-          {question.caseSensitive && (
+          {question.data.caseSensitive && (
             <p className="text-amber-600 dark:text-amber-400">⚠️ Answers are case-sensitive</p>
           )}
           {question.points && <p>Points: {question.points}</p>}

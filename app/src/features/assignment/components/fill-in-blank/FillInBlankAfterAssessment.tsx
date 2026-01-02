@@ -10,7 +10,7 @@ interface FillInBlankAfterAssessmentProps {
 }
 
 export const FillInBlankAfterAssessment = ({ question, answer }: FillInBlankAfterAssessmentProps) => {
-  const blankSegments = question.segments.filter((s) => s.type === 'blank');
+  const blankSegments = question.data.segments.filter((s) => s.type === 'blank');
   const answerMap = new Map(answer?.blanks.map((b) => [b.segmentId, b.value]) || []);
 
   // Check correctness
@@ -20,7 +20,7 @@ export const FillInBlankAfterAssessment = ({ question, answer }: FillInBlankAfte
     const acceptableAnswers = segment.acceptableAnswers || [];
     const allAcceptableAnswers = [correctAnswer, ...acceptableAnswers];
 
-    const isCorrect = question.caseSensitive
+    const isCorrect = question.data.caseSensitive
       ? allAcceptableAnswers.includes(studentAnswer)
       : allAcceptableAnswers.some((a) => a.toLowerCase() === studentAnswer.toLowerCase());
 
@@ -63,7 +63,7 @@ export const FillInBlankAfterAssessment = ({ question, answer }: FillInBlankAfte
 
         {/* Question with results */}
         <div className="bg-muted/50 rounded-md p-4 text-sm leading-relaxed">
-          {question.segments.map((segment) => {
+          {question.data.segments.map((segment) => {
             if (segment.type === 'text') {
               return (
                 <span key={segment.id} className="font-mono">
@@ -98,7 +98,7 @@ export const FillInBlankAfterAssessment = ({ question, answer }: FillInBlankAfte
           <h4 className="font-semibold">Correct Answers:</h4>
           <div className="rounded-md border border-green-200 bg-green-50 p-4 dark:border-green-800 dark:bg-green-900/20">
             <div className="font-mono text-sm leading-relaxed">
-              {question.segments.map((segment) => (
+              {question.data.segments.map((segment) => (
                 <span key={segment.id}>
                   {segment.type === 'text' ? (
                     segment.content

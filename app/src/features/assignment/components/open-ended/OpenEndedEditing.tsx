@@ -48,15 +48,17 @@ export const OpenEndedEditing = ({ question, onChange }: OpenEndedEditingProps) 
           <div className="flex items-center justify-between">
             <Label className="text-sm">{t('labels.maxLength')}</Label>
             <span className="text-muted-foreground text-xs">
-              {t('maxLengthInfo', { length: question.maxLength || 500 })}
+              {t('maxLengthInfo', { length: question.data.maxLength || 500 })}
             </span>
           </div>
           <Input
             type="number"
             min="0"
             max="5000"
-            value={question.maxLength || 500}
-            onChange={(e) => updateQuestion({ maxLength: parseInt(e.target.value) || 500 })}
+            value={question.data.maxLength || 500}
+            onChange={(e) =>
+              updateQuestion({ data: { ...question.data, maxLength: parseInt(e.target.value) || 500 } })
+            }
             className="h-8"
           />
         </div>
@@ -65,8 +67,8 @@ export const OpenEndedEditing = ({ question, onChange }: OpenEndedEditingProps) 
         <div className="space-y-2">
           <Label className="text-sm">{t('labels.expectedAnswer')}</Label>
           <MarkdownEditor
-            value={question.expectedAnswer || ''}
-            onChange={(expectedAnswer) => updateQuestion({ expectedAnswer })}
+            value={question.data.expectedAnswer || ''}
+            onChange={(expectedAnswer) => updateQuestion({ data: { ...question.data, expectedAnswer } })}
             placeholder={t('placeholders.expectedAnswer')}
             minHeight={80}
           />

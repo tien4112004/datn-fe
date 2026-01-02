@@ -12,14 +12,8 @@ import type { Question } from './question';
  * Uses intersection type to include all type-specific fields from Question
  */
 export type QuestionBankItem = Question & {
-  /** Subject classification (required for bank organization) */
-  subjectCode: SubjectCode;
-  /** Personal (teacher's own) or Application (school-wide) */
-  bankType: BankType;
-  /** ISO timestamp of creation */
-  createdAt?: string;
-  /** ISO timestamp of last update */
-  updatedAt?: string;
-  /** User ID of the question creator */
-  createdBy?: string;
+  subjectCode: SubjectCode; // Subject classification (required for bank organization)
+  bankType: BankType; // Personal (teacher's own) or Application (school-wide)
+  createdAt?: string; // ISO timestamp of creation
+  updatedAt?: string; // ISO timestamp of last update
 };

@@ -181,7 +181,7 @@ export const MatchingDoing = ({ question, answer, onAnswerChange }: MatchingDoin
   };
 
   const matchedLeftIds = new Set(Array.from(matches.values()));
-  const activePair = activeId ? question.pairs.find((p) => p.id === activeId) : null;
+  const activePair = activeId ? question.data.pairs.find((p) => p.id === activeId) : null;
 
   return (
     <Card>
@@ -212,7 +212,7 @@ export const MatchingDoing = ({ question, answer, onAnswerChange }: MatchingDoin
             {/* Left Column - Draggable Items */}
             <div className="space-y-2">
               <h4 className="text-sm font-semibold">Column A (Drag from here)</h4>
-              {question.pairs.map((pair, index) => (
+              {question.data.pairs.map((pair, index) => (
                 <DraggableItem
                   key={pair.id}
                   id={pair.id}
@@ -227,17 +227,17 @@ export const MatchingDoing = ({ question, answer, onAnswerChange }: MatchingDoin
             {/* Right Column - Drop Zones */}
             <div className="space-y-2">
               <h4 className="text-sm font-semibold">Column B (Drop here)</h4>
-              {question.pairs.map((pair, index) => {
+              {question.data.pairs.map((pair, index) => {
                 const matchedLeftId = matches.get(pair.id);
                 const matchedPair = matchedLeftId
-                  ? question.pairs.find((p) => p.id === matchedLeftId)
+                  ? question.data.pairs.find((p) => p.id === matchedLeftId)
                   : undefined;
                 const matchedItem = matchedPair
                   ? {
                       id: matchedPair.id,
                       content: matchedPair.left,
                       imageUrl: matchedPair.leftImageUrl,
-                      itemIndex: question.pairs.findIndex((p) => p.id === matchedPair.id),
+                      itemIndex: question.data.pairs.findIndex((p) => p.id === matchedPair.id),
                     }
                   : undefined;
 
@@ -260,7 +260,7 @@ export const MatchingDoing = ({ question, answer, onAnswerChange }: MatchingDoin
             {activeId && activePair && (
               <div className="flex items-start gap-3 rounded-md border bg-blue-50 p-3 opacity-90 shadow-lg dark:bg-blue-900/20">
                 <div className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-600 text-sm font-medium text-white">
-                  {question.pairs.findIndex((p) => p.id === activeId) + 1}
+                  {question.data.pairs.findIndex((p) => p.id === activeId) + 1}
                 </div>
                 <div className="flex-1">
                   <MarkdownPreview content={activePair.left} />

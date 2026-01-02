@@ -18,10 +18,12 @@ export const createEmptyQuestion = (
         title: '',
         explanation: '',
         points: 10,
-        options: [
-          { id: generateId(), text: '', isCorrect: true },
-          { id: generateId(), text: '', isCorrect: false },
-        ],
+        data: {
+          options: [
+            { id: generateId(), text: '', isCorrect: true },
+            { id: generateId(), text: '', isCorrect: false },
+          ],
+        },
       };
 
     case QUESTION_TYPE.MATCHING:
@@ -32,10 +34,12 @@ export const createEmptyQuestion = (
         title: '',
         explanation: '',
         points: 10,
-        pairs: [
-          { id: generateId(), left: '', right: '' },
-          { id: generateId(), left: '', right: '' },
-        ],
+        data: {
+          pairs: [
+            { id: generateId(), left: '', right: '' },
+            { id: generateId(), left: '', right: '' },
+          ],
+        },
       };
 
     case QUESTION_TYPE.OPEN_ENDED:
@@ -45,9 +49,11 @@ export const createEmptyQuestion = (
         difficulty,
         title: '',
         explanation: '',
-        expectedAnswer: '',
-        maxLength: 500,
         points: 10,
+        data: {
+          expectedAnswer: '',
+          maxLength: 500,
+        },
       };
 
     case QUESTION_TYPE.FILL_IN_BLANK:
@@ -58,11 +64,13 @@ export const createEmptyQuestion = (
         title: '',
         explanation: '',
         points: 10,
-        segments: [
-          { id: generateId(), type: 'text', content: '' },
-          { id: generateId(), type: 'blank', content: '' },
-        ],
-        caseSensitive: false,
+        data: {
+          segments: [
+            { id: generateId(), type: 'text', content: '' },
+            { id: generateId(), type: 'blank', content: '' },
+          ],
+          caseSensitive: false,
+        },
       };
 
     default:
@@ -90,22 +98,22 @@ export const duplicateQuestion = (question: Question): Question => {
   duplicate.id = generateId();
 
   // Update nested IDs based on question type
-  if ('options' in duplicate && duplicate.options) {
-    duplicate.options = duplicate.options.map((opt) => ({
+  if (duplicate.type === QUESTION_TYPE.MULTIPLE_CHOICE && duplicate.data.options) {
+    duplicate.data.options = duplicate.data.options.map((opt) => ({
       ...opt,
       id: generateId(),
     }));
   }
 
-  if ('pairs' in duplicate && duplicate.pairs) {
-    duplicate.pairs = duplicate.pairs.map((pair) => ({
+  if (duplicate.type === QUESTION_TYPE.MATCHING && duplicate.data.pairs) {
+    duplicate.data.pairs = duplicate.data.pairs.map((pair) => ({
       ...pair,
       id: generateId(),
     }));
   }
 
-  if ('segments' in duplicate && duplicate.segments) {
-    duplicate.segments = duplicate.segments.map((seg) => ({
+  if (duplicate.type === QUESTION_TYPE.FILL_IN_BLANK && duplicate.data.segments) {
+    duplicate.data.segments = duplicate.data.segments.map((seg) => ({
       ...seg,
       id: generateId(),
     }));

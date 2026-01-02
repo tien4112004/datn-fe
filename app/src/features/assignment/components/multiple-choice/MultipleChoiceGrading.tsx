@@ -15,7 +15,9 @@ interface MultipleChoiceGradingProps {
 }
 
 export const MultipleChoiceGrading = ({ question, answer, onGradeChange }: MultipleChoiceGradingProps) => {
-  const selectedOption = answer ? question.options.find((o) => o.id === answer.selectedOptionId) : undefined;
+  const selectedOption = answer
+    ? question.data.options.find((o) => o.id === answer.selectedOptionId)
+    : undefined;
   const isCorrect = selectedOption?.isCorrect || false;
   const autoScore = isCorrect ? question.points || 0 : 0;
 
@@ -55,7 +57,7 @@ export const MultipleChoiceGrading = ({ question, answer, onGradeChange }: Multi
         {/* Options with student selection */}
         <div className="space-y-2">
           <Label className="text-sm font-semibold">Student Answer:</Label>
-          {question.options.map((option, index) => {
+          {question.data.options.map((option, index) => {
             const isSelected = answer ? option.id === answer.selectedOptionId : false;
             const isCorrectOption = option.isCorrect;
 

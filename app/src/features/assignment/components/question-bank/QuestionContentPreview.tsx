@@ -10,7 +10,7 @@ export function QuestionContentPreview({ question }: QuestionContentPreviewProps
   const renderPreview = () => {
     switch (question.type) {
       case QUESTION_TYPE.MULTIPLE_CHOICE: {
-        const opts = question.options || [];
+        const opts = question.data.options || [];
         const correctIndex = opts.findIndex((o) => o.isCorrect);
         const correctLetter = correctIndex >= 0 ? String.fromCharCode(65 + correctIndex) : '?';
 
@@ -31,7 +31,7 @@ export function QuestionContentPreview({ question }: QuestionContentPreviewProps
       }
 
       case QUESTION_TYPE.MATCHING: {
-        const pairs = question.pairs || [];
+        const pairs = question.data.pairs || [];
         const hasPlaceholder = pairs.some(
           (p) => /^(Left|Right) \d+$/.test(p.left) || /^(Left|Right) \d+$/.test(p.right)
         );
@@ -48,7 +48,7 @@ export function QuestionContentPreview({ question }: QuestionContentPreviewProps
       }
 
       case QUESTION_TYPE.FILL_IN_BLANK: {
-        const segments = question.segments || [];
+        const segments = question.data.segments || [];
         const blankCount = segments.filter((s) => s.type === 'blank').length;
         const hasPlaceholder = segments.some((s) => s.type === 'text' && /^Fill in the /.test(s.content));
         const hasEmptyBlanks = segments.some((s) => s.type === 'blank' && !s.content?.trim());
@@ -64,8 +64,8 @@ export function QuestionContentPreview({ question }: QuestionContentPreviewProps
       }
 
       case QUESTION_TYPE.OPEN_ENDED: {
-        const limit = question.maxLength ? `${question.maxLength} chars` : 'unlimited';
-        const hasNoAnswer = !question.expectedAnswer?.trim();
+        const limit = question.data.maxLength ? `${question.data.maxLength} chars` : 'unlimited';
+        const hasNoAnswer = !question.data.expectedAnswer?.trim();
 
         return (
           <div className="flex items-center gap-2">

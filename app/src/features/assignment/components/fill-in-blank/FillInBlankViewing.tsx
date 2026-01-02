@@ -28,7 +28,7 @@ export const FillInBlankViewing = ({ question }: FillInBlankViewingProps) => {
 
         {/* Question with blanks */}
         <div className="bg-muted/50 rounded-md p-4 font-mono text-sm">
-          {question.segments.map((segment) => (
+          {question.data.segments.map((segment) => (
             <span key={segment.id}>
               {segment.type === 'text' ? (
                 segment.content
@@ -43,7 +43,7 @@ export const FillInBlankViewing = ({ question }: FillInBlankViewingProps) => {
 
         {/* Info */}
         <div className="text-muted-foreground space-y-1 text-sm">
-          {question.caseSensitive && <p>Note: Answers are case-sensitive</p>}
+          {question.data.caseSensitive && <p>Note: Answers are case-sensitive</p>}
           {question.points && <p>Points: {question.points}</p>}
         </div>
       </CardContent>

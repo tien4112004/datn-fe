@@ -14,22 +14,13 @@ import type { SubjectCode } from './constants';
  * 4. Optionally convert to Assignment for student distribution
  */
 export interface ExamDraft {
-  /** Unique identifier for this exam draft */
-  id: string;
-  /** Auto-generated name from matrix name + date */
-  name: string;
-  /** Reference to the source exam matrix */
-  matrixId: string;
-  /** Cached matrix name for display */
-  matrixName: string;
-  /** Subject of the exam */
-  subjectCode: SubjectCode;
-  /** Target total points for the exam */
-  targetPoints: number;
-  /** Full question objects selected for this exam */
-  questions: Question[];
-  /** Mapping of questionId → cellId (which matrix cell each question fulfills) */
-  questionSelections: Record<string, string>;
-  /** ISO timestamp of creation */
-  createdAt: string;
+  id: string; // Unique identifier for this exam draft
+  name: string; // Auto-generated name from matrix name + date
+  matrixId: string; // Reference to the source exam matrix
+  matrixName: string; // Cached matrix name for display
+  subjectCode: SubjectCode; // Subject of the exam
+  targetPoints: number; // Target total points for the exam
+  questions: Question[]; // Full question objects selected for this exam
+  questionSelections: Record<string, string>; // Mapping of questionId → cellId (which matrix cell each question fulfills)
+  createdAt: string; // ISO timestamp of creation
 }

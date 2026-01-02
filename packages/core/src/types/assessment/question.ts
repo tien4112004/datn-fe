@@ -1,90 +1,95 @@
-import {
-  QUESTION_TYPE,
-  type Difficulty,
-  type QuestionType,
-  type SubjectCode,
-  type BankType,
-} from './constants';
+import { QUESTION_TYPE, type Difficulty, type QuestionType } from './constants';
+
+/**
+ * Multiple Choice Question Data
+ */
+export interface MultipleChoiceOption {
+  id: string; // Unique identifier for this option
+  text: string; // Option text (Markdown-enabled)
+  imageUrl?: string; // Optional image URL for this option
+  isCorrect: boolean; // In editing mode, marks the correct answer
+}
+
+export interface MultipleChoiceData {
+  options: MultipleChoiceOption[]; // Array of answer options (typically 2-4 options)
+  shuffleOptions?: boolean; // Shuffle options for each student (default: false)
+}
+
+/**
+ * Matching Question Data
+ */
+export interface MatchingPair {
+  id: string; // Unique identifier for this pair
+  left: string; // Left item text (Markdown-enabled)
+  leftImageUrl?: string; // Optional image URL for left item
+  right: string; // Right item text (Markdown-enabled)
+  rightImageUrl?: string; // Optional image URL for right item
+}
+
+export interface MatchingData {
+  pairs: MatchingPair[]; // Array of matching pairs
+  shufflePairs?: boolean; // Shuffle pairs for each student (default: false)
+}
+
+/**
+ * Open-ended Question Data
+ */
+export interface OpenEndedData {
+  expectedAnswer?: string; // Optional reference answer for grading guidance (Markdown-enabled)
+  maxLength?: number; // Character limit for student response
+}
+
+/**
+ * Fill In Blank Question Data
+ */
+export interface BlankSegment {
+  id: string; // Unique identifier for this segment
+  type: 'text' | 'blank'; // Type of segment: 'text' for static text, 'blank' for fillable field
+  content: string; // For 'text' type: the text to display; for 'blank': the correct answer
+  acceptableAnswers?: string[]; // Alternative correct answers for a blank segment
+}
+
+export interface FillInBlankData {
+  segments: BlankSegment[]; // Array of segments alternating between text and blanks
+  caseSensitive?: boolean; // Whether blank answers should be case-sensitive
+}
+
+/**
+ * Union type for all question data types
+ */
+export type QuestionData = MultipleChoiceData | MatchingData | OpenEndedData | FillInBlankData;
 
 /**
  * Base interface for all questions
  * Contains common properties shared across all question types
  */
 export interface BaseQuestion {
-  /** Unique identifier for the question */
-  id: string;
-  /** Type of the question (multiple choice, matching, etc.) */
-  type: QuestionType;
-  /** Difficulty level based on Vietnamese education system */
-  difficulty: Difficulty;
-  /** Question text (Markdown-enabled) */
-  title: string;
-  /** Optional image URL for the question */
-  titleImageUrl?: string;
-  /** Explanation shown in After Assessment mode (Markdown-enabled) */
-  explanation?: string;
-  /** Points allocated for this question */
-  points?: number;
-
-  // Question bank metadata (optional for backward compatibility)
-  /** Subject classification */
-  subjectCode?: SubjectCode;
-  /** Personal or application-wide bank */
-  bankType?: BankType;
-  /** ISO timestamp of creation */
-  createdAt?: string;
-  /** ISO timestamp of last update */
-  updatedAt?: string;
-  /** User ID of the question creator */
-  createdBy?: string;
+  id: string; // Unique identifier for the question
+  type: QuestionType; // Type of the question (multiple choice, matching, etc.)
+  difficulty: Difficulty; // Difficulty level based on Vietnamese education system
+  title: string; // Question text (Markdown-enabled)
+  titleImageUrl?: string; // Optional image URL for the question
+  explanation?: string; // Explanation shown in After Assessment mode (Markdown-enabled)
+  points?: number; // Points allocated for this question
+  data: QuestionData; // Question-type-specific data (options, pairs, segments, etc.)
 }
 
 /**
  * Multiple Choice Question
  * Student selects one correct answer from multiple options
  */
-export interface MultipleChoiceOption {
-  /** Unique identifier for this option */
-  id: string;
-  /** Option text (Markdown-enabled) */
-  text: string;
-  /** Optional image URL for this option */
-  imageUrl?: string;
-  /** In editing mode, marks the correct answer */
-  isCorrect: boolean;
-}
-
 export interface MultipleChoiceQuestion extends BaseQuestion {
   type: typeof QUESTION_TYPE.MULTIPLE_CHOICE;
-  /** Array of answer options (typically 2-4 options) */
-  options: MultipleChoiceOption[];
-  /** Shuffle options for each student (default: false) */
-  shuffleOptions?: boolean;
+  data: MultipleChoiceData;
 }
 
 /**
  * Matching Question
  * Student matches pairs of related items (left to right)
  */
-export interface MatchingPair {
-  /** Unique identifier for this pair */
-  id: string;
-  /** Left item text (Markdown-enabled) */
-  left: string;
-  /** Optional image URL for left item */
-  leftImageUrl?: string;
-  /** Right item text (Markdown-enabled) */
-  right: string;
-  /** Optional image URL for right item */
-  rightImageUrl?: string;
-}
-
 export interface MatchingQuestion extends BaseQuestion {
   type: typeof QUESTION_TYPE.MATCHING;
-  /** Array of matching pairs */
-  pairs: MatchingPair[];
-  /** Shuffle pairs for each student (default: false) */
-  shufflePairs?: boolean;
+  data: MatchingData;
 }
 
 /**
@@ -93,33 +98,16 @@ export interface MatchingQuestion extends BaseQuestion {
  */
 export interface OpenEndedQuestion extends BaseQuestion {
   type: typeof QUESTION_TYPE.OPEN_ENDED;
-  /** Optional reference answer for grading guidance (Markdown-enabled) */
-  expectedAnswer?: string;
-  /** Character limit for student response */
-  maxLength?: number;
+  data: OpenEndedData;
 }
 
 /**
  * Fill In Blank Question
  * Student fills in missing words/phrases in a text
  */
-export interface BlankSegment {
-  /** Unique identifier for this segment */
-  id: string;
-  /** Type of segment: 'text' for static text, 'blank' for fillable field */
-  type: 'text' | 'blank';
-  /** For 'text' type: the text to display; for 'blank': the correct answer */
-  content: string;
-  /** Alternative correct answers for a blank segment */
-  acceptableAnswers?: string[];
-}
-
 export interface FillInBlankQuestion extends BaseQuestion {
   type: typeof QUESTION_TYPE.FILL_IN_BLANK;
-  /** Array of segments alternating between text and blanks */
-  segments: BlankSegment[];
-  /** Whether blank answers should be case-sensitive */
-  caseSensitive?: boolean;
+  data: FillInBlankData;
 }
 
 /**
@@ -132,16 +120,12 @@ export type Question = MultipleChoiceQuestion | MatchingQuestion | OpenEndedQues
  * Type guards for runtime type checking
  */
 
-/** Check if a question is Multiple Choice */
-export const isMultipleChoice = (q: Question): q is MultipleChoiceQuestion =>
+export const isMultipleChoice = (q: Question): q is MultipleChoiceQuestion => // Check if a question is Multiple Choice
   q.type === QUESTION_TYPE.MULTIPLE_CHOICE;
 
-/** Check if a question is Matching */
-export const isMatching = (q: Question): q is MatchingQuestion => q.type === QUESTION_TYPE.MATCHING;
+export const isMatching = (q: Question): q is MatchingQuestion => q.type === QUESTION_TYPE.MATCHING; // Check if a question is Matching
 
-/** Check if a question is Open-ended */
-export const isOpenEnded = (q: Question): q is OpenEndedQuestion => q.type === QUESTION_TYPE.OPEN_ENDED;
+export const isOpenEnded = (q: Question): q is OpenEndedQuestion => q.type === QUESTION_TYPE.OPEN_ENDED; // Check if a question is Open-ended
 
-/** Check if a question is Fill In Blank */
-export const isFillInBlank = (q: Question): q is FillInBlankQuestion =>
+export const isFillInBlank = (q: Question): q is FillInBlankQuestion => // Check if a question is Fill In Blank
   q.type === QUESTION_TYPE.FILL_IN_BLANK;

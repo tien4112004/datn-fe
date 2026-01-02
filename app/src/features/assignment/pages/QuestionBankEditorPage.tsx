@@ -25,6 +25,7 @@ import type {
   Difficulty,
   SubjectCode,
   Question,
+  QuestionBankItem,
   MultipleChoiceQuestion,
   MatchingQuestion,
   FillInBlankQuestion,
@@ -41,7 +42,7 @@ import { AlertCircle, Save, Settings, FileText } from 'lucide-react';
 import { validateQuestion } from '@/features/assignment/utils/validateQuestion';
 
 // Helper function to create default question based on type
-function createDefaultQuestion(type: QuestionType): Question {
+function createDefaultQuestion(type: QuestionType): QuestionBankItem {
   const baseQuestion = {
     id: generateId(),
     type,
@@ -57,40 +58,48 @@ function createDefaultQuestion(type: QuestionType): Question {
     case QUESTION_TYPE.MULTIPLE_CHOICE:
       return {
         ...baseQuestion,
-        options: [
-          { id: generateId(), text: '', isCorrect: false },
-          { id: generateId(), text: '', isCorrect: false },
-        ],
-      } as MultipleChoiceQuestion;
+        data: {
+          options: [
+            { id: generateId(), text: '', isCorrect: false },
+            { id: generateId(), text: '', isCorrect: false },
+          ],
+        },
+      } as QuestionBankItem;
 
     case QUESTION_TYPE.MATCHING:
       return {
         ...baseQuestion,
-        pairs: [
-          { id: generateId(), left: '', right: '' },
-          { id: generateId(), left: '', right: '' },
-        ],
-      } as MatchingQuestion;
+        data: {
+          pairs: [
+            { id: generateId(), left: '', right: '' },
+            { id: generateId(), left: '', right: '' },
+          ],
+        },
+      } as QuestionBankItem;
 
     case QUESTION_TYPE.FILL_IN_BLANK:
       return {
         ...baseQuestion,
-        segments: [
-          { id: generateId(), type: 'text', content: '' },
-          { id: generateId(), type: 'blank', content: '' },
-        ],
-        caseSensitive: false,
-      } as FillInBlankQuestion;
+        data: {
+          segments: [
+            { id: generateId(), type: 'text', content: '' },
+            { id: generateId(), type: 'blank', content: '' },
+          ],
+          caseSensitive: false,
+        },
+      } as QuestionBankItem;
 
     case QUESTION_TYPE.OPEN_ENDED:
       return {
         ...baseQuestion,
-        expectedAnswer: '',
-        maxLength: 500,
-      } as OpenEndedQuestion;
+        data: {
+          expectedAnswer: '',
+          maxLength: 500,
+        },
+      } as QuestionBankItem;
 
     default:
-      return baseQuestion as Question;
+      return baseQuestion as QuestionBankItem;
   }
 }
 
@@ -101,7 +110,7 @@ export function QuestionBankEditorPage() {
   const isEditMode = !!id;
 
   // Form state
-  const [questionData, setQuestionData] = useState<Question | null>(null);
+  const [questionData, setQuestionData] = useState<QuestionBankItem | null>(null);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
   // Fetch existing question if editing
@@ -114,7 +123,7 @@ export function QuestionBankEditorPage() {
   // Initialize form data
   useEffect(() => {
     if (isEditMode && existingQuestion) {
-      setQuestionData(existingQuestion as Question);
+      setQuestionData(existingQuestion);
     } else if (!isEditMode) {
       setQuestionData(createDefaultQuestion(QUESTION_TYPE.MULTIPLE_CHOICE));
     }
@@ -128,8 +137,8 @@ export function QuestionBankEditorPage() {
       return;
     }
 
-    // Validate question content
-    const validation = validateQuestion(questionData);
+    // Validate question content (cast to Question for validation)
+    const validation = validateQuestion(questionData as Question);
 
     if (!validation.isValid) {
       setValidationErrors(validation.errors);
@@ -357,29 +366,29 @@ export function QuestionBankEditorPage() {
 
               {questionData.type === QUESTION_TYPE.MULTIPLE_CHOICE && (
                 <MultipleChoiceEditing
-                  question={questionData as MultipleChoiceQuestion}
-                  onChange={(updated) => setQuestionData(updated)}
+                  question={questionData as Question as MultipleChoiceQuestion}
+                  onChange={(updated) => setQuestionData({ ...questionData, ...updated })}
                 />
               )}
 
               {questionData.type === QUESTION_TYPE.MATCHING && (
                 <MatchingEditing
-                  question={questionData as MatchingQuestion}
-                  onChange={(updated) => setQuestionData(updated)}
+                  question={questionData as Question as MatchingQuestion}
+                  onChange={(updated) => setQuestionData({ ...questionData, ...updated })}
                 />
               )}
 
               {questionData.type === QUESTION_TYPE.FILL_IN_BLANK && (
                 <FillInBlankEditing
-                  question={questionData as FillInBlankQuestion}
-                  onChange={(updated) => setQuestionData(updated)}
+                  question={questionData as Question as FillInBlankQuestion}
+                  onChange={(updated) => setQuestionData({ ...questionData, ...updated })}
                 />
               )}
 
               {questionData.type === QUESTION_TYPE.OPEN_ENDED && (
                 <OpenEndedEditing
-                  question={questionData as OpenEndedQuestion}
-                  onChange={(updated) => setQuestionData(updated)}
+                  question={questionData as Question as OpenEndedQuestion}
+                  onChange={(updated) => setQuestionData({ ...questionData, ...updated })}
                 />
               )}
             </div>

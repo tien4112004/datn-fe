@@ -29,7 +29,7 @@ export const MatchingViewing = ({ question }: MatchingViewingProps) => {
           {/* Left Column */}
           <div className="space-y-2">
             <h4 className="text-sm font-semibold">Column A</h4>
-            {question.pairs.map((pair, index) => (
+            {question.data.pairs.map((pair, index) => (
               <div
                 key={`left-${pair.id}`}
                 className="flex items-start gap-3 rounded-md border bg-blue-50 p-3 dark:bg-blue-900/20"
@@ -54,7 +54,7 @@ export const MatchingViewing = ({ question }: MatchingViewingProps) => {
           {/* Right Column */}
           <div className="space-y-2">
             <h4 className="text-sm font-semibold">Column B</h4>
-            {question.pairs.map((pair, index) => (
+            {question.data.pairs.map((pair, index) => (
               <div
                 key={`right-${pair.id}`}
                 className="flex items-start gap-3 rounded-md border bg-green-50 p-3 dark:bg-green-900/20"

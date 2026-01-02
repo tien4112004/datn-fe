@@ -25,8 +25,10 @@ export const OpenEndedViewing = ({ question }: OpenEndedViewingProps) => {
         </div>
 
         {/* Character Limit */}
-        {question.maxLength && (
-          <p className="text-muted-foreground text-sm">Maximum length: {question.maxLength} characters</p>
+        {question.data.maxLength && (
+          <p className="text-muted-foreground text-sm">
+            Maximum length: {question.data.maxLength} characters
+          </p>
         )}
 
         {/* Points */}

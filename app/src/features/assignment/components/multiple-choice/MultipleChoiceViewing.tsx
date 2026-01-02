@@ -27,7 +27,7 @@ export const MultipleChoiceViewing = ({ question }: MultipleChoiceViewingProps) 
 
         {/* Options */}
         <div className="space-y-2">
-          {question.options.map((option, index) => (
+          {question.data.options.map((option, index) => (
             <div key={option.id} className="flex items-start gap-3 rounded-md border p-3">
               <div className="bg-muted flex h-6 w-6 items-center justify-center rounded-full text-sm font-medium">
                 {String.fromCharCode(65 + index)}

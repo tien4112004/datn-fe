@@ -51,13 +51,16 @@ export function shuffleMultipleChoiceOptions(
   question: MultipleChoiceQuestion,
   seed?: string
 ): MultipleChoiceQuestion {
-  if (!question.shuffleOptions) {
+  if (!question.data.shuffleOptions) {
     return question;
   }
 
   return {
     ...question,
-    options: shuffleArray(question.options, seed),
+    data: {
+      ...question.data,
+      options: shuffleArray(question.data.options, seed),
+    },
   };
 }
 
@@ -65,12 +68,12 @@ export function shuffleMultipleChoiceOptions(
  * Shuffle matching pairs (both left and right sides independently)
  */
 export function shuffleMatchingPairs(question: MatchingQuestion, seed?: string): MatchingQuestion {
-  if (!question.shufflePairs) {
+  if (!question.data.shufflePairs) {
     return question;
   }
 
   // Create shuffled pairs with shuffled rights
-  const shuffledPairs = question.pairs.map((pair) => ({ ...pair }));
+  const shuffledPairs = question.data.pairs.map((pair) => ({ ...pair }));
   const rights = shuffledPairs.map((p) => ({ right: p.right, rightImageUrl: p.rightImageUrl }));
   const shuffledRights = shuffleArray(rights, seed);
 
@@ -81,7 +84,10 @@ export function shuffleMatchingPairs(question: MatchingQuestion, seed?: string):
 
   return {
     ...question,
-    pairs: shuffleArray(shuffledPairs, seed ? seed + '_left' : undefined),
+    data: {
+      ...question.data,
+      pairs: shuffleArray(shuffledPairs, seed ? seed + '_left' : undefined),
+    },
   };
 }
 

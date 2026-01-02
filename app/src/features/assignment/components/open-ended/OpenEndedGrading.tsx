@@ -60,17 +60,17 @@ export const OpenEndedGrading = ({ question, answer, onGradeChange }: OpenEndedG
           </div>
           <p className="text-muted-foreground text-xs">
             Character count: {answer?.text?.length || 0}
-            {question.maxLength && ` / ${question.maxLength}`}
+            {question.data.maxLength && ` / ${question.data.maxLength}`}
           </p>
         </div>
 
         {/* Expected Answer (Reference) */}
-        {question.expectedAnswer && (
+        {question.data.expectedAnswer && (
           <div className="space-y-2">
             <Label className="text-sm font-semibold">Expected Answer (Reference):</Label>
             <div className="bg-muted/50 rounded-md border p-4">
               <div className="prose prose-sm dark:prose-invert max-w-none">
-                <MarkdownPreview content={question.expectedAnswer} />
+                <MarkdownPreview content={question.data.expectedAnswer} />
               </div>
             </div>
           </div>

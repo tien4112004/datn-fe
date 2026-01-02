@@ -42,11 +42,11 @@ export const OpenEndedAfterAssessment = ({ question, answer }: OpenEndedAfterAss
         </div>
 
         {/* Expected Answer (if provided) */}
-        {question.expectedAnswer && (
+        {question.data.expectedAnswer && (
           <div className="space-y-2">
             <h4 className="font-semibold">Expected Answer:</h4>
             <div className="rounded-md border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
-              <MarkdownPreview content={question.expectedAnswer} />
+              <MarkdownPreview content={question.data.expectedAnswer} />
             </div>
           </div>
         )}

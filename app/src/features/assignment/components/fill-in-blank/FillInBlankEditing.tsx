@@ -28,7 +28,7 @@ export const FillInBlankEditing = ({ question, onChange }: FillInBlankEditingPro
       type: 'text',
       content: '',
     };
-    updateQuestion({ segments: [...question.segments, newSegment] });
+    updateQuestion({ data: { ...question.data, segments: [...question.data.segments, newSegment] } });
   };
 
   const addBlankSegment = () => {
@@ -38,25 +38,30 @@ export const FillInBlankEditing = ({ question, onChange }: FillInBlankEditingPro
       content: '',
       acceptableAnswers: [],
     };
-    updateQuestion({ segments: [...question.segments, newSegment] });
+    updateQuestion({ data: { ...question.data, segments: [...question.data.segments, newSegment] } });
   };
 
   const removeSegment = (segmentId: string) => {
-    if (question.segments.length <= 1) {
+    if (question.data.segments.length <= 1) {
       alert(t('alerts.minSegments'));
       return;
     }
-    updateQuestion({ segments: question.segments.filter((s) => s.id !== segmentId) });
+    updateQuestion({
+      data: { ...question.data, segments: question.data.segments.filter((s) => s.id !== segmentId) },
+    });
   };
 
   const updateSegment = (segmentId: string, updates: Partial<BlankSegment>) => {
     updateQuestion({
-      segments: question.segments.map((s) => (s.id === segmentId ? { ...s, ...updates } : s)),
+      data: {
+        ...question.data,
+        segments: question.data.segments.map((s) => (s.id === segmentId ? { ...s, ...updates } : s)),
+      },
     });
   };
 
   const addAcceptableAnswer = (segmentId: string) => {
-    const segment = question.segments.find((s) => s.id === segmentId);
+    const segment = question.data.segments.find((s) => s.id === segmentId);
     if (!segment || segment.type !== 'blank') return;
 
     updateSegment(segmentId, {
@@ -65,7 +70,7 @@ export const FillInBlankEditing = ({ question, onChange }: FillInBlankEditingPro
   };
 
   const updateAcceptableAnswer = (segmentId: string, index: number, value: string) => {
-    const segment = question.segments.find((s) => s.id === segmentId);
+    const segment = question.data.segments.find((s) => s.id === segmentId);
     if (!segment || segment.type !== 'blank') return;
 
     const updated = [...(segment.acceptableAnswers || [])];
@@ -74,7 +79,7 @@ export const FillInBlankEditing = ({ question, onChange }: FillInBlankEditingPro
   };
 
   const removeAcceptableAnswer = (segmentId: string, index: number) => {
-    const segment = question.segments.find((s) => s.id === segmentId);
+    const segment = question.data.segments.find((s) => s.id === segmentId);
     if (!segment || segment.type !== 'blank') return;
 
     const updated = [...(segment.acceptableAnswers || [])];
@@ -101,8 +106,10 @@ export const FillInBlankEditing = ({ question, onChange }: FillInBlankEditingPro
               </Label>
               <Switch
                 id="case-sensitive"
-                checked={question.caseSensitive || false}
-                onCheckedChange={(caseSensitive) => updateQuestion({ caseSensitive })}
+                checked={question.data.caseSensitive || false}
+                onCheckedChange={(caseSensitive) =>
+                  updateQuestion({ data: { ...question.data, caseSensitive } })
+                }
               />
             </div>
           </div>
@@ -138,7 +145,7 @@ export const FillInBlankEditing = ({ question, onChange }: FillInBlankEditingPro
           </div>
 
           <div className="space-y-2">
-            {question.segments.map((segment, index) => (
+            {question.data.segments.map((segment, index) => (
               <div key={segment.id} className="space-y-2 rounded-md border p-2">
                 <div className="flex items-center gap-2">
                   <Badge variant={segment.type === 'text' ? 'secondary' : 'default'} className="text-xs">
@@ -210,7 +217,7 @@ export const FillInBlankEditing = ({ question, onChange }: FillInBlankEditingPro
           <div className="bg-muted/50 rounded-md p-4">
             <p className="mb-2 text-sm font-medium">{t('labels.preview')}</p>
             <div className="font-mono text-sm">
-              {question.segments.map((segment) => (
+              {question.data.segments.map((segment) => (
                 <span key={segment.id}>
                   {segment.type === 'text' ? (
                     segment.content

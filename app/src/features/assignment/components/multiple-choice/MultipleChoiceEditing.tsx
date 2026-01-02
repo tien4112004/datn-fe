@@ -27,33 +27,41 @@ export const MultipleChoiceEditing = ({ question, onChange }: MultipleChoiceEdit
       text: '',
       isCorrect: false,
     };
-    updateQuestion({ options: [...question.options, newOption] });
+    updateQuestion({ data: { ...question.data, options: [...question.data.options, newOption] } });
   };
 
   const removeOption = (optionId: string) => {
-    if (question.options.length <= 2) {
+    if (question.data.options.length <= 2) {
       alert(t('alerts.minOptions'));
       return;
     }
-    updateQuestion({ options: question.options.filter((o) => o.id !== optionId) });
+    updateQuestion({
+      data: { ...question.data, options: question.data.options.filter((o) => o.id !== optionId) },
+    });
   };
 
   const updateOption = (optionId: string, updates: Partial<MultipleChoiceOption>) => {
     updateQuestion({
-      options: question.options.map((o) => (o.id === optionId ? { ...o, ...updates } : o)),
+      data: {
+        ...question.data,
+        options: question.data.options.map((o) => (o.id === optionId ? { ...o, ...updates } : o)),
+      },
     });
   };
 
   const markAsCorrect = (optionId: string) => {
     updateQuestion({
-      options: question.options.map((o) => ({
-        ...o,
-        isCorrect: o.id === optionId,
-      })),
+      data: {
+        ...question.data,
+        options: question.data.options.map((o) => ({
+          ...o,
+          isCorrect: o.id === optionId,
+        })),
+      },
     });
   };
 
-  const correctOptionId = question.options.find((o) => o.isCorrect)?.id || '';
+  const correctOptionId = question.data.options.find((o) => o.isCorrect)?.id || '';
 
   return (
     <Card>
@@ -81,8 +89,10 @@ export const MultipleChoiceEditing = ({ question, onChange }: MultipleChoiceEdit
             </div>
           </div>
           <Switch
-            checked={question.shuffleOptions || false}
-            onCheckedChange={(shuffleOptions) => updateQuestion({ shuffleOptions })}
+            checked={question.data.shuffleOptions || false}
+            onCheckedChange={(shuffleOptions) =>
+              updateQuestion({ data: { ...question.data, shuffleOptions } })
+            }
           />
         </div>
 
@@ -112,7 +122,7 @@ export const MultipleChoiceEditing = ({ question, onChange }: MultipleChoiceEdit
               variant="outline"
               size="sm"
               onClick={addOption}
-              disabled={question.options.length >= 6}
+              disabled={question.data.options.length >= 6}
             >
               <Plus className="mr-2 h-4 w-4" />
               {t('buttons.addOption')}
@@ -121,7 +131,7 @@ export const MultipleChoiceEditing = ({ question, onChange }: MultipleChoiceEdit
 
           <RadioGroup value={correctOptionId} onValueChange={markAsCorrect}>
             <div className="space-y-2">
-              {question.options.map((option, index) => (
+              {question.data.options.map((option, index) => (
                 <div key={option.id} className="space-y-2 rounded-md border p-3">
                   <div className="flex items-center gap-2">
                     <RadioGroupItem value={option.id} id={`correct-${option.id}`} />
@@ -161,7 +171,7 @@ export const MultipleChoiceEditing = ({ question, onChange }: MultipleChoiceEdit
                       variant="ghost"
                       size="sm"
                       onClick={() => removeOption(option.id)}
-                      disabled={question.options.length <= 2}
+                      disabled={question.data.options.length <= 2}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>

@@ -10,7 +10,9 @@ interface MultipleChoiceAfterAssessmentProps {
 }
 
 export const MultipleChoiceAfterAssessment = ({ question, answer }: MultipleChoiceAfterAssessmentProps) => {
-  const selectedOption = answer ? question.options.find((o) => o.id === answer.selectedOptionId) : undefined;
+  const selectedOption = answer
+    ? question.data.options.find((o) => o.id === answer.selectedOptionId)
+    : undefined;
   const isCorrect = selectedOption?.isCorrect || false;
 
   return (
@@ -39,7 +41,7 @@ export const MultipleChoiceAfterAssessment = ({ question, answer }: MultipleChoi
 
         {/* Options with feedback */}
         <div className="space-y-2">
-          {question.options.map((option, index) => {
+          {question.data.options.map((option, index) => {
             const isSelected = answer ? option.id === answer.selectedOptionId : false;
             const isCorrectOption = option.isCorrect;
 

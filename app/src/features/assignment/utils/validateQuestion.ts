@@ -28,7 +28,7 @@ export function validateQuestion(question: Question | null): ValidationResult {
   // Type-specific validations
   switch (question.type) {
     case QUESTION_TYPE.MULTIPLE_CHOICE: {
-      const opts = question.options || [];
+      const opts = question.data.options || [];
 
       if (opts.length < 2) {
         errors.push('Multiple choice requires at least 2 options');
@@ -56,7 +56,7 @@ export function validateQuestion(question: Question | null): ValidationResult {
     }
 
     case QUESTION_TYPE.MATCHING: {
-      const pairs = question.pairs || [];
+      const pairs = question.data.pairs || [];
 
       if (pairs.length < 2) {
         errors.push('Matching requires at least 2 pairs');
@@ -85,7 +85,7 @@ export function validateQuestion(question: Question | null): ValidationResult {
     }
 
     case QUESTION_TYPE.FILL_IN_BLANK: {
-      const segments = question.segments || [];
+      const segments = question.data.segments || [];
       const blanks = segments.filter((s) => s.type === 'blank');
 
       if (blanks.length === 0) {
@@ -110,11 +110,11 @@ export function validateQuestion(question: Question | null): ValidationResult {
 
     case QUESTION_TYPE.OPEN_ENDED: {
       // More lenient for open-ended questions
-      if (!question.expectedAnswer?.trim()) {
+      if (!question.data.expectedAnswer?.trim()) {
         warnings.push('Consider adding an expected answer for grading reference');
       }
 
-      if (question.maxLength && question.maxLength < 10) {
+      if (question.data.maxLength && question.data.maxLength < 10) {
         warnings.push('Maximum length seems very short (less than 10 characters)');
       }
 

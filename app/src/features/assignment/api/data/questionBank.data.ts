@@ -24,12 +24,14 @@ export const questionBankData: QuestionBankItem[] = [
     subjectCode: 'T',
     bankType: BANK_TYPE.APPLICATION,
     createdAt: new Date().toISOString(),
-    options: [
-      { id: generateId(), text: '6', isCorrect: false },
-      { id: generateId(), text: '7', isCorrect: false },
-      { id: generateId(), text: '8', isCorrect: true },
-      { id: generateId(), text: '9', isCorrect: false },
-    ],
+    data: {
+      options: [
+        { id: generateId(), text: '6', isCorrect: false },
+        { id: generateId(), text: '7', isCorrect: false },
+        { id: generateId(), text: '8', isCorrect: true },
+        { id: generateId(), text: '9', isCorrect: false },
+      ],
+    },
   },
   {
     id: generateId(),
@@ -41,12 +43,14 @@ export const questionBankData: QuestionBankItem[] = [
     subjectCode: 'TV',
     bankType: BANK_TYPE.APPLICATION,
     createdAt: new Date().toISOString(),
-    options: [
-      { id: generateId(), text: 'hok', isCorrect: false },
-      { id: generateId(), text: 'học', isCorrect: true },
-      { id: generateId(), text: 'hóc', isCorrect: false },
-      { id: generateId(), text: 'hộc', isCorrect: false },
-    ],
+    data: {
+      options: [
+        { id: generateId(), text: 'hok', isCorrect: false },
+        { id: generateId(), text: 'học', isCorrect: true },
+        { id: generateId(), text: 'hóc', isCorrect: false },
+        { id: generateId(), text: 'hộc', isCorrect: false },
+      ],
+    },
   },
   {
     id: generateId(),
@@ -58,12 +62,14 @@ export const questionBankData: QuestionBankItem[] = [
     subjectCode: 'TA',
     bankType: BANK_TYPE.APPLICATION,
     createdAt: new Date().toISOString(),
-    options: [
-      { id: generateId(), text: 'Red', isCorrect: false },
-      { id: generateId(), text: 'Blue', isCorrect: true },
-      { id: generateId(), text: 'Green', isCorrect: false },
-      { id: generateId(), text: 'Yellow', isCorrect: false },
-    ],
+    data: {
+      options: [
+        { id: generateId(), text: 'Red', isCorrect: false },
+        { id: generateId(), text: 'Blue', isCorrect: true },
+        { id: generateId(), text: 'Green', isCorrect: false },
+        { id: generateId(), text: 'Yellow', isCorrect: false },
+      ],
+    },
   },
   {
     id: generateId(),
@@ -75,12 +81,14 @@ export const questionBankData: QuestionBankItem[] = [
     subjectCode: 'T',
     bankType: BANK_TYPE.APPLICATION,
     createdAt: new Date().toISOString(),
-    options: [
-      { id: generateId(), text: '32', isCorrect: false },
-      { id: generateId(), text: '34', isCorrect: false },
-      { id: generateId(), text: '36', isCorrect: true },
-      { id: generateId(), text: '38', isCorrect: false },
-    ],
+    data: {
+      options: [
+        { id: generateId(), text: '32', isCorrect: false },
+        { id: generateId(), text: '34', isCorrect: false },
+        { id: generateId(), text: '36', isCorrect: true },
+        { id: generateId(), text: '38', isCorrect: false },
+      ],
+    },
   },
   {
     id: generateId(),
@@ -92,12 +100,14 @@ export const questionBankData: QuestionBankItem[] = [
     subjectCode: 'TA',
     bankType: BANK_TYPE.APPLICATION,
     createdAt: new Date().toISOString(),
-    options: [
-      { id: generateId(), text: 'She go to school every day', isCorrect: false },
-      { id: generateId(), text: 'She goes to school every day', isCorrect: true },
-      { id: generateId(), text: 'She going to school every day', isCorrect: false },
-      { id: generateId(), text: 'She gone to school every day', isCorrect: false },
-    ],
+    data: {
+      options: [
+        { id: generateId(), text: 'She go to school every day', isCorrect: false },
+        { id: generateId(), text: 'She goes to school every day', isCorrect: true },
+        { id: generateId(), text: 'She going to school every day', isCorrect: false },
+        { id: generateId(), text: 'She gone to school every day', isCorrect: false },
+      ],
+    },
   },
 
   // ============================================
@@ -113,11 +123,13 @@ export const questionBankData: QuestionBankItem[] = [
     subjectCode: 'T',
     bankType: BANK_TYPE.APPLICATION,
     createdAt: new Date().toISOString(),
-    pairs: [
-      { id: generateId(), left: '10', right: 'Mười' },
-      { id: generateId(), left: '20', right: 'Hai mươi' },
-      { id: generateId(), left: '30', right: 'Ba mươi' },
-    ],
+    data: {
+      pairs: [
+        { id: generateId(), left: '10', right: 'Mười' },
+        { id: generateId(), left: '20', right: 'Hai mươi' },
+        { id: generateId(), left: '30', right: 'Ba mươi' },
+      ],
+    },
   },
   {
     id: generateId(),
@@ -129,12 +141,14 @@ export const questionBankData: QuestionBankItem[] = [
     subjectCode: 'TA',
     bankType: BANK_TYPE.APPLICATION,
     createdAt: new Date().toISOString(),
-    pairs: [
-      { id: generateId(), left: 'Book', right: 'Sách' },
-      { id: generateId(), left: 'Pen', right: 'Bút' },
-      { id: generateId(), left: 'Table', right: 'Bàn' },
-      { id: generateId(), left: 'Chair', right: 'Ghế' },
-    ],
+    data: {
+      pairs: [
+        { id: generateId(), left: 'Book', right: 'Sách' },
+        { id: generateId(), left: 'Pen', right: 'Bút' },
+        { id: generateId(), left: 'Table', right: 'Bàn' },
+        { id: generateId(), left: 'Chair', right: 'Ghế' },
+      ],
+    },
   },
   {
     id: generateId(),
@@ -146,12 +160,14 @@ export const questionBankData: QuestionBankItem[] = [
     subjectCode: 'TV',
     bankType: BANK_TYPE.APPLICATION,
     createdAt: new Date().toISOString(),
-    pairs: [
-      { id: generateId(), left: 'Danh từ', right: 'Cái bàn' },
-      { id: generateId(), left: 'Động từ', right: 'Chạy' },
-      { id: generateId(), left: 'Tính từ', right: 'Đẹp' },
-      { id: generateId(), left: 'Trạng từ', right: 'Nhanh' },
-    ],
+    data: {
+      pairs: [
+        { id: generateId(), left: 'Danh từ', right: 'Cái bàn' },
+        { id: generateId(), left: 'Động từ', right: 'Chạy' },
+        { id: generateId(), left: 'Tính từ', right: 'Đẹp' },
+        { id: generateId(), left: 'Trạng từ', right: 'Nhanh' },
+      ],
+    },
   },
   {
     id: generateId(),
@@ -163,13 +179,15 @@ export const questionBankData: QuestionBankItem[] = [
     subjectCode: 'T',
     bankType: BANK_TYPE.APPLICATION,
     createdAt: new Date().toISOString(),
-    pairs: [
-      { id: generateId(), left: '15 + 8', right: '23' },
-      { id: generateId(), left: '24 - 9', right: '15' },
-      { id: generateId(), left: '6 × 7', right: '42' },
-      { id: generateId(), left: '48 ÷ 6', right: '8' },
-      { id: generateId(), left: '100 - 35', right: '65' },
-    ],
+    data: {
+      pairs: [
+        { id: generateId(), left: '15 + 8', right: '23' },
+        { id: generateId(), left: '24 - 9', right: '15' },
+        { id: generateId(), left: '6 × 7', right: '42' },
+        { id: generateId(), left: '48 ÷ 6', right: '8' },
+        { id: generateId(), left: '100 - 35', right: '65' },
+      ],
+    },
   },
 
   // ============================================
@@ -182,13 +200,15 @@ export const questionBankData: QuestionBankItem[] = [
     title: 'Em hãy viết một đoạn văn ngắn (5-7 câu) về gia đình của em.',
     explanation:
       'Học sinh nên mô tả các thành viên trong gia đình, công việc và những điều đặc biệt về gia đình.',
-    expectedAnswer:
-      'Gia đình em có bốn người: bố, mẹ, em và em trai. Bố em là kỹ sư, còn mẹ em là giáo viên. Em học lớp 5, em trai học lớp 2. Gia đình em rất yêu thương nhau. Cuối tuần, cả nhà thường đi chơi công viên. Em rất yêu gia đình của mình.',
-    maxLength: 500,
     points: 15,
     subjectCode: 'TV',
     bankType: BANK_TYPE.APPLICATION,
     createdAt: new Date().toISOString(),
+    data: {
+      expectedAnswer:
+        'Gia đình em có bốn người: bố, mẹ, em và em trai. Bố em là kỹ sư, còn mẹ em là giáo viên. Em học lớp 5, em trai học lớp 2. Gia đình em rất yêu thương nhau. Cuối tuần, cả nhà thường đi chơi công viên. Em rất yêu gia đình của mình.',
+      maxLength: 500,
+    },
   },
   {
     id: generateId(),
@@ -197,13 +217,15 @@ export const questionBankData: QuestionBankItem[] = [
     title: 'Write a short paragraph (5-7 sentences) about your favorite animal.',
     explanation:
       'Students should describe the animal, its characteristics, habitat, and explain why they like it.',
-    expectedAnswer:
-      'My favorite animal is the dolphin. Dolphins are intelligent marine mammals that live in oceans. They are gray in color and can swim very fast. Dolphins are friendly and often play with each other. They communicate using clicks and whistles. I like dolphins because they are smart and beautiful. I hope to see dolphins in real life someday.',
-    maxLength: 800,
     points: 20,
     subjectCode: 'TA',
     bankType: BANK_TYPE.APPLICATION,
     createdAt: new Date().toISOString(),
+    data: {
+      expectedAnswer:
+        'My favorite animal is the dolphin. Dolphins are intelligent marine mammals that live in oceans. They are gray in color and can swim very fast. Dolphins are friendly and often play with each other. They communicate using clicks and whistles. I like dolphins because they are smart and beautiful. I hope to see dolphins in real life someday.',
+      maxLength: 800,
+    },
   },
   {
     id: generateId(),
@@ -212,13 +234,15 @@ export const questionBankData: QuestionBankItem[] = [
     title:
       'Giải thích cách giải bài toán: "Một cửa hàng có 156 quả cam. Người ta đã bán đi 3/4 số cam. Hỏi còn lại bao nhiêu quả cam?"',
     explanation: 'Học sinh cần trình bày đầy đủ các bước giải và giải thích lý do.',
-    expectedAnswer:
-      'Bước 1: Tính số cam đã bán. Số cam đã bán = 156 × 3/4 = 117 quả. Bước 2: Tính số cam còn lại. Số cam còn lại = 156 - 117 = 39 quả. Vậy cửa hàng còn lại 39 quả cam. Giải thích: Ta dùng phép nhân để tính 3/4 của 156, sau đó dùng phép trừ để tìm số còn lại.',
-    maxLength: 1000,
     points: 25,
     subjectCode: 'T',
     bankType: BANK_TYPE.APPLICATION,
     createdAt: new Date().toISOString(),
+    data: {
+      expectedAnswer:
+        'Bước 1: Tính số cam đã bán. Số cam đã bán = 156 × 3/4 = 117 quả. Bước 2: Tính số cam còn lại. Số cam còn lại = 156 - 117 = 39 quả. Vậy cửa hàng còn lại 39 quả cam. Giải thích: Ta dùng phép nhân để tính 3/4 của 156, sau đó dùng phép trừ để tìm số còn lại.',
+      maxLength: 1000,
+    },
   },
 
   // ============================================
@@ -234,17 +258,19 @@ export const questionBankData: QuestionBankItem[] = [
     subjectCode: 'TV',
     bankType: BANK_TYPE.APPLICATION,
     createdAt: new Date().toISOString(),
-    segments: [
-      { id: generateId(), type: 'text', content: 'Thủ đô của Việt Nam là ' },
-      {
-        id: generateId(),
-        type: 'blank',
-        content: 'Hà Nội',
-        acceptableAnswers: ['Hà Nội', 'Ha Noi'],
-      },
-      { id: generateId(), type: 'text', content: '.' },
-    ],
-    caseSensitive: false,
+    data: {
+      segments: [
+        { id: generateId(), type: 'text', content: 'Thủ đô của Việt Nam là ' },
+        {
+          id: generateId(),
+          type: 'blank',
+          content: 'Hà Nội',
+          acceptableAnswers: ['Hà Nội', 'Ha Noi'],
+        },
+        { id: generateId(), type: 'text', content: '.' },
+      ],
+      caseSensitive: false,
+    },
   },
   {
     id: generateId(),
@@ -256,17 +282,19 @@ export const questionBankData: QuestionBankItem[] = [
     subjectCode: 'TA',
     bankType: BANK_TYPE.APPLICATION,
     createdAt: new Date().toISOString(),
-    segments: [
-      { id: generateId(), type: 'text', content: 'The grass is ' },
-      {
-        id: generateId(),
-        type: 'blank',
-        content: 'green',
-        acceptableAnswers: ['green'],
-      },
-      { id: generateId(), type: 'text', content: '.' },
-    ],
-    caseSensitive: false,
+    data: {
+      segments: [
+        { id: generateId(), type: 'text', content: 'The grass is ' },
+        {
+          id: generateId(),
+          type: 'blank',
+          content: 'green',
+          acceptableAnswers: ['green'],
+        },
+        { id: generateId(), type: 'text', content: '.' },
+      ],
+      caseSensitive: false,
+    },
   },
   {
     id: generateId(),
@@ -278,17 +306,19 @@ export const questionBankData: QuestionBankItem[] = [
     subjectCode: 'T',
     bankType: BANK_TYPE.APPLICATION,
     createdAt: new Date().toISOString(),
-    segments: [
-      { id: generateId(), type: 'text', content: '5 + 7 = ' },
-      {
-        id: generateId(),
-        type: 'blank',
-        content: '12',
-        acceptableAnswers: ['12', 'mười hai'],
-      },
-      { id: generateId(), type: 'text', content: '' },
-    ],
-    caseSensitive: false,
+    data: {
+      segments: [
+        { id: generateId(), type: 'text', content: '5 + 7 = ' },
+        {
+          id: generateId(),
+          type: 'blank',
+          content: '12',
+          acceptableAnswers: ['12', 'mười hai'],
+        },
+        { id: generateId(), type: 'text', content: '' },
+      ],
+      caseSensitive: false,
+    },
   },
   {
     id: generateId(),
@@ -300,16 +330,18 @@ export const questionBankData: QuestionBankItem[] = [
     subjectCode: 'TA',
     bankType: BANK_TYPE.APPLICATION,
     createdAt: new Date().toISOString(),
-    segments: [
-      { id: generateId(), type: 'text', content: 'I ' },
-      {
-        id: generateId(),
-        type: 'blank',
-        content: 'am',
-        acceptableAnswers: ['am'],
-      },
-      { id: generateId(), type: 'text', content: ' a student.' },
-    ],
-    caseSensitive: true,
+    data: {
+      segments: [
+        { id: generateId(), type: 'text', content: 'I ' },
+        {
+          id: generateId(),
+          type: 'blank',
+          content: 'am',
+          acceptableAnswers: ['am'],
+        },
+        { id: generateId(), type: 'text', content: ' a student.' },
+      ],
+      caseSensitive: true,
+    },
   },
 ];

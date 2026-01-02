@@ -50,7 +50,7 @@ export const MultipleChoiceDoing = ({ question, answer, onAnswerChange }: Multip
         {/* Options */}
         <RadioGroup value={selectedId} onValueChange={handleSelect}>
           <div className="space-y-2">
-            {question.options.map((option, index) => (
+            {question.data.options.map((option, index) => (
               <div
                 key={option.id}
                 className={cn(

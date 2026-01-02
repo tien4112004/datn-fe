@@ -13,11 +13,11 @@ export const MatchingAfterAssessment = ({ question, answer }: MatchingAfterAsses
   const answerMap = new Map(answer?.matches.map((m) => [m.rightId, m.leftId]) || []);
 
   // Check correctness for each pair
-  const results = question.pairs.map((pair) => {
+  const results = question.data.pairs.map((pair) => {
     const studentMatchedLeftId = answerMap.get(pair.id);
     const isCorrect = studentMatchedLeftId === pair.id;
     const studentMatchedPair = studentMatchedLeftId
-      ? question.pairs.find((p) => p.id === studentMatchedLeftId)
+      ? question.data.pairs.find((p) => p.id === studentMatchedLeftId)
       : undefined;
 
     return {
@@ -85,7 +85,7 @@ export const MatchingAfterAssessment = ({ question, answer }: MatchingAfterAsses
                       <div className="min-w-[200px] flex-1 rounded bg-blue-100 px-3 py-1 dark:bg-blue-900/30">
                         <div className="flex items-center gap-2">
                           <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-blue-600 text-xs font-medium text-white">
-                            {question.pairs.findIndex((p) => p.id === result.studentMatchedPair?.id) + 1}
+                            {question.data.pairs.findIndex((p) => p.id === result.studentMatchedPair?.id) + 1}
                           </span>
                           <MarkdownPreview content={result.studentMatchedPair.left} />
                         </div>
@@ -115,7 +115,7 @@ export const MatchingAfterAssessment = ({ question, answer }: MatchingAfterAsses
                       <strong>Correct match:</strong>
                       <div className="mt-1 inline-block rounded bg-white px-2 py-1 dark:bg-gray-900">
                         <span className="mr-2 inline-flex h-5 w-5 items-center justify-center rounded-full bg-blue-600 text-xs font-medium text-white">
-                          {question.pairs.findIndex((p) => p.id === result.correctPair.id) + 1}
+                          {question.data.pairs.findIndex((p) => p.id === result.correctPair.id) + 1}
                         </span>
                         <MarkdownPreview content={result.correctPair.left} />
                       </div>

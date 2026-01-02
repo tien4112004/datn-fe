@@ -13,8 +13,7 @@ import type { Question } from './question';
 export interface MultipleChoiceAnswer {
   questionId: string;
   type: typeof QUESTION_TYPE.MULTIPLE_CHOICE;
-  /** ID of the selected option */
-  selectedOptionId: string;
+  selectedOptionId: string; // ID of the selected option
 }
 
 /**
@@ -24,8 +23,7 @@ export interface MultipleChoiceAnswer {
 export interface MatchingAnswer {
   questionId: string;
   type: typeof QUESTION_TYPE.MATCHING;
-  /** Array of matched pairs (leftId → rightId) */
-  matches: Array<{
+  matches: Array<{ // Array of matched pairs (leftId → rightId)
     leftId: string;
     rightId: string;
   }>;
@@ -38,8 +36,7 @@ export interface MatchingAnswer {
 export interface OpenEndedAnswer {
   questionId: string;
   type: typeof QUESTION_TYPE.OPEN_ENDED;
-  /** Student's text response */
-  text: string;
+  text: string; // Student's text response
 }
 
 /**
@@ -49,8 +46,7 @@ export interface OpenEndedAnswer {
 export interface FillInBlankAnswer {
   questionId: string;
   type: typeof QUESTION_TYPE.FILL_IN_BLANK;
-  /** Array of blank answers (segmentId → value) */
-  blanks: Array<{
+  blanks: Array<{ // Array of blank answers (segmentId → value)
     segmentId: string;
     value: string;
   }>;
@@ -66,12 +62,9 @@ export type Answer = MultipleChoiceAnswer | MatchingAnswer | OpenEndedAnswer | F
  * Provided by the teacher during grading
  */
 export interface Grade {
-  /** ID of the question being graded */
-  questionId: string;
-  /** Points awarded (0 to question's max points) */
-  points: number;
-  /** Optional feedback from teacher */
-  feedback?: string;
+  questionId: string; // ID of the question being graded
+  points: number; // Points awarded (0 to question's max points)
+  feedback?: string; // Optional feedback from teacher
 }
 
 /**
@@ -79,28 +72,17 @@ export interface Grade {
  * Represents a student's complete submission for an assignment
  */
 export interface Submission {
-  /** Unique identifier for this submission */
-  id: string;
-  /** Reference to the assignment */
-  assignmentId: string;
-  /** Reference to the student */
-  studentId: string;
-  /** Student's answers to all questions */
-  answers: Answer[];
-  /** ISO timestamp when submitted */
-  submittedAt: string;
-  /** Total score (sum of all question grades) */
-  score?: number;
-  /** Maximum possible score */
-  maxScore?: number;
-  /** Current status of the submission */
-  status: 'in_progress' | 'submitted' | 'graded';
-  /** Teacher's grades for each question (available after grading) */
-  grades?: Grade[];
-  /** ISO timestamp when grading was completed */
-  gradedAt?: string;
-  /** User ID of teacher who graded */
-  gradedBy?: string;
+  id: string; // Unique identifier for this submission
+  assignmentId: string; // Reference to the assignment
+  studentId: string; // Reference to the student
+  answers: Answer[]; // Student's answers to all questions
+  submittedAt: string; // ISO timestamp when submitted
+  score?: number; // Total score (sum of all question grades)
+  maxScore?: number; // Maximum possible score
+  status: 'in_progress' | 'submitted' | 'graded'; // Current status of the submission
+  grades?: Grade[]; // Teacher's grades for each question (available after grading)
+  gradedAt?: string; // ISO timestamp when grading was completed
+  gradedBy?: string; // User ID of teacher who graded
 }
 
 /**
@@ -108,26 +90,15 @@ export interface Submission {
  * Represents a complete assignment with questions and metadata
  */
 export interface Assignment {
-  /** Unique identifier for this assignment */
-  id: string;
-  /** Reference to the class this assignment belongs to */
-  classId: string;
-  /** Assignment title */
-  title: string;
-  /** Optional description (Markdown-enabled) */
-  description?: string;
-  /** Array of questions included in this assignment */
-  questions: Question[];
-  /** Optional due date (ISO timestamp) */
-  dueDate?: string;
-  /** Total points possible (sum of all question points) */
-  totalPoints?: number;
-  /** ISO timestamp of creation */
-  createdAt: string;
-  /** ISO timestamp of last update */
-  updatedAt: string;
-  /** Current status of the assignment */
-  status: 'draft' | 'published' | 'archived';
-  /** Shuffle question order for each student (default: false) */
-  shuffleQuestions?: boolean;
+  id: string; // Unique identifier for this assignment
+  classId: string; // Reference to the class this assignment belongs to
+  title: string; // Assignment title
+  description?: string; // Optional description (Markdown-enabled)
+  questions: Question[]; // Array of questions included in this assignment
+  dueDate?: string; // Optional due date (ISO timestamp)
+  totalPoints?: number; // Total points possible (sum of all question points)
+  createdAt: string; // ISO timestamp of creation
+  updatedAt: string; // ISO timestamp of last update
+  status: 'draft' | 'published' | 'archived'; // Current status of the assignment
+  shuffleQuestions?: boolean; // Shuffle question order for each student (default: false)
 }

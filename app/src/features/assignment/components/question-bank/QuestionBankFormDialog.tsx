@@ -42,7 +42,7 @@ interface QuestionBankFormDialogProps {
 }
 
 // Helper function to create default question based on type
-function createDefaultQuestion(type: QuestionType): Question {
+function createDefaultQuestion(type: QuestionType): QuestionBankItem {
   const baseQuestion = {
     id: generateId(),
     type,
@@ -58,40 +58,48 @@ function createDefaultQuestion(type: QuestionType): Question {
     case QUESTION_TYPE.MULTIPLE_CHOICE:
       return {
         ...baseQuestion,
-        options: [
-          { id: generateId(), text: '', isCorrect: false },
-          { id: generateId(), text: '', isCorrect: false },
-        ],
-      } as MultipleChoiceQuestion;
+        data: {
+          options: [
+            { id: generateId(), text: '', isCorrect: false },
+            { id: generateId(), text: '', isCorrect: false },
+          ],
+        },
+      } as QuestionBankItem;
 
     case QUESTION_TYPE.MATCHING:
       return {
         ...baseQuestion,
-        pairs: [
-          { id: generateId(), left: '', right: '' },
-          { id: generateId(), left: '', right: '' },
-        ],
-      } as MatchingQuestion;
+        data: {
+          pairs: [
+            { id: generateId(), left: '', right: '' },
+            { id: generateId(), left: '', right: '' },
+          ],
+        },
+      } as QuestionBankItem;
 
     case QUESTION_TYPE.FILL_IN_BLANK:
       return {
         ...baseQuestion,
-        segments: [
-          { id: generateId(), type: 'text', content: '' },
-          { id: generateId(), type: 'blank', content: '' },
-        ],
-        caseSensitive: false,
-      } as FillInBlankQuestion;
+        data: {
+          segments: [
+            { id: generateId(), type: 'text', content: '' },
+            { id: generateId(), type: 'blank', content: '' },
+          ],
+          caseSensitive: false,
+        },
+      } as QuestionBankItem;
 
     case QUESTION_TYPE.OPEN_ENDED:
       return {
         ...baseQuestion,
-        expectedAnswer: '',
-        maxLength: 500,
-      } as OpenEndedQuestion;
+        data: {
+          expectedAnswer: '',
+          maxLength: 500,
+        },
+      } as QuestionBankItem;
 
     default:
-      return baseQuestion as Question;
+      return baseQuestion as QuestionBankItem;
   }
 }
 
@@ -100,14 +108,14 @@ export function QuestionBankFormDialog({ open, onOpenChange, mode, question }: Q
   const updateMutation = useUpdateQuestion();
 
   // Form state - full question object instead of metadata only
-  const [questionData, setQuestionData] = useState<Question | null>(null);
+  const [questionData, setQuestionData] = useState<QuestionBankItem | null>(null);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
   // Initialize form with question data when editing or opening
   useEffect(() => {
     if (mode === 'edit' && question && open) {
       // Edit mode: use full existing question
-      setQuestionData(question as Question);
+      setQuestionData(question);
       setValidationErrors([]);
     } else if (mode === 'create' && open) {
       // Create mode: initialize with default question of initial type
@@ -137,8 +145,8 @@ export function QuestionBankFormDialog({ open, onOpenChange, mode, question }: Q
       return;
     }
 
-    // Validate question content
-    const validation = validateQuestion(questionData);
+    // Validate question content (cast to Question for validation)
+    const validation = validateQuestion(questionData as Question);
 
     if (!validation.isValid) {
       // Show errors - block submission
@@ -310,29 +318,29 @@ export function QuestionBankFormDialog({ open, onOpenChange, mode, question }: Q
 
               {questionData.type === QUESTION_TYPE.MULTIPLE_CHOICE && (
                 <MultipleChoiceEditing
-                  question={questionData as MultipleChoiceQuestion}
-                  onChange={(updated) => setQuestionData(updated)}
+                  question={questionData as Question as MultipleChoiceQuestion}
+                  onChange={(updated) => setQuestionData({ ...questionData, ...updated })}
                 />
               )}
 
               {questionData.type === QUESTION_TYPE.MATCHING && (
                 <MatchingEditing
-                  question={questionData as MatchingQuestion}
-                  onChange={(updated) => setQuestionData(updated)}
+                  question={questionData as Question as MatchingQuestion}
+                  onChange={(updated) => setQuestionData({ ...questionData, ...updated })}
                 />
               )}
 
               {questionData.type === QUESTION_TYPE.FILL_IN_BLANK && (
                 <FillInBlankEditing
-                  question={questionData as FillInBlankQuestion}
-                  onChange={(updated) => setQuestionData(updated)}
+                  question={questionData as Question as FillInBlankQuestion}
+                  onChange={(updated) => setQuestionData({ ...questionData, ...updated })}
                 />
               )}
 
               {questionData.type === QUESTION_TYPE.OPEN_ENDED && (
                 <OpenEndedEditing
-                  question={questionData as OpenEndedQuestion}
-                  onChange={(updated) => setQuestionData(updated)}
+                  question={questionData as Question as OpenEndedQuestion}
+                  onChange={(updated) => setQuestionData({ ...questionData, ...updated })}
                 />
               )}
             </div>

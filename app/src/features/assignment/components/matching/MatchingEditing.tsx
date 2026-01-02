@@ -26,20 +26,23 @@ export const MatchingEditing = ({ question, onChange }: MatchingEditingProps) =>
       left: '',
       right: '',
     };
-    updateQuestion({ pairs: [...question.pairs, newPair] });
+    updateQuestion({ data: { ...question.data, pairs: [...question.data.pairs, newPair] } });
   };
 
   const removePair = (pairId: string) => {
-    if (question.pairs.length <= 2) {
+    if (question.data.pairs.length <= 2) {
       alert(t('alerts.minPairs'));
       return;
     }
-    updateQuestion({ pairs: question.pairs.filter((p) => p.id !== pairId) });
+    updateQuestion({ data: { ...question.data, pairs: question.data.pairs.filter((p) => p.id !== pairId) } });
   };
 
   const updatePair = (pairId: string, updates: Partial<MatchingPair>) => {
     updateQuestion({
-      pairs: question.pairs.map((p) => (p.id === pairId ? { ...p, ...updates } : p)),
+      data: {
+        ...question.data,
+        pairs: question.data.pairs.map((p) => (p.id === pairId ? { ...p, ...updates } : p)),
+      },
     });
   };
 
@@ -69,8 +72,8 @@ export const MatchingEditing = ({ question, onChange }: MatchingEditingProps) =>
             </div>
           </div>
           <Switch
-            checked={question.shufflePairs || false}
-            onCheckedChange={(shufflePairs) => updateQuestion({ shufflePairs })}
+            checked={question.data.shufflePairs || false}
+            onCheckedChange={(shufflePairs) => updateQuestion({ data: { ...question.data, shufflePairs } })}
           />
         </div>
 
@@ -100,7 +103,7 @@ export const MatchingEditing = ({ question, onChange }: MatchingEditingProps) =>
               variant="outline"
               size="sm"
               onClick={addPair}
-              disabled={question.pairs.length >= 8}
+              disabled={question.data.pairs.length >= 8}
             >
               <Plus className="mr-2 h-4 w-4" />
               {t('buttons.addPair')}
@@ -108,7 +111,7 @@ export const MatchingEditing = ({ question, onChange }: MatchingEditingProps) =>
           </div>
 
           <div className="space-y-2">
-            {question.pairs.map((pair, index) => (
+            {question.data.pairs.map((pair, index) => (
               <div key={pair.id} className="space-y-2 rounded-md border p-3">
                 <div className="mb-2 flex items-center justify-between">
                   <h4 className="text-sm font-semibold">{t('pair', { number: index + 1 })}</h4>
@@ -117,7 +120,7 @@ export const MatchingEditing = ({ question, onChange }: MatchingEditingProps) =>
                     variant="ghost"
                     size="sm"
                     onClick={() => removePair(pair.id)}
-                    disabled={question.pairs.length <= 2}
+                    disabled={question.data.pairs.length <= 2}
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>

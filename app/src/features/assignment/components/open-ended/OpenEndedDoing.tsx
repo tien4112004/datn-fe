@@ -22,7 +22,7 @@ export const OpenEndedDoing = ({ question, answer, onAnswerChange }: OpenEndedDo
     const value = e.target.value;
 
     // Check max length
-    if (question.maxLength && value.length > question.maxLength) {
+    if (question.data.maxLength && value.length > question.data.maxLength) {
       return;
     }
 
@@ -34,7 +34,7 @@ export const OpenEndedDoing = ({ question, answer, onAnswerChange }: OpenEndedDo
     });
   };
 
-  const remainingChars = question.maxLength ? question.maxLength - text.length : null;
+  const remainingChars = question.data.maxLength ? question.data.maxLength - text.length : null;
 
   return (
     <Card>

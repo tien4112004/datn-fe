@@ -1,3 +1,4 @@
+import type { QuestionBankItem } from '@aiprimary/core';
 import type { QuestionType, Difficulty, SubjectCode, BankType } from './constants';
 
 // Re-export core type
@@ -29,7 +30,7 @@ export interface QuestionBankFilters {
  * UI/API-specific type for paginated responses
  */
 export interface QuestionBankResponse {
-  questions: import('@aiprimary/core').QuestionBankItem[];
+  questions: QuestionBankItem[];
   /** Total matching questions */
   total: number;
   /** Current page */
@@ -43,11 +44,11 @@ export interface QuestionBankResponse {
  * UI/API-specific types for creating/updating questions
  */
 export interface CreateQuestionRequest {
-  question: Omit<import('@aiprimary/core').QuestionBankItem, 'id' | 'createdAt' | 'updatedAt'>;
+  question: Omit<QuestionBankItem, 'id' | 'createdAt' | 'updatedAt'>;
 }
 
 export interface UpdateQuestionRequest {
-  question: Partial<import('@aiprimary/core').QuestionBankItem>;
+  question: Partial<QuestionBankItem>;
 }
 
 /**
@@ -57,23 +58,20 @@ export interface UpdateQuestionRequest {
 export interface QuestionBankApiService {
   // Query operations
   getQuestions(filters: QuestionBankFilters): Promise<QuestionBankResponse>;
-  getQuestionById(id: string): Promise<import('@aiprimary/core').QuestionBankItem>;
+  getQuestionById(id: string): Promise<QuestionBankItem>;
 
   // CRUD operations
   createQuestion(
-    question: Omit<import('@aiprimary/core').QuestionBankItem, 'id' | 'createdAt' | 'updatedAt'>
-  ): Promise<import('@aiprimary/core').QuestionBankItem>;
-  updateQuestion(
-    id: string,
-    question: Partial<import('@aiprimary/core').QuestionBankItem>
-  ): Promise<import('@aiprimary/core').QuestionBankItem>;
+    question: Omit<QuestionBankItem, 'id' | 'createdAt' | 'updatedAt'>
+  ): Promise<QuestionBankItem>;
+  updateQuestion(id: string, question: Partial<QuestionBankItem>): Promise<QuestionBankItem>;
   deleteQuestion(id: string): Promise<void>;
   bulkDeleteQuestions(ids: string[]): Promise<void>;
 
   // Utility operations
-  duplicateQuestion(id: string): Promise<import('@aiprimary/core').QuestionBankItem>;
+  duplicateQuestion(id: string): Promise<QuestionBankItem>;
   /** Copy from application bank to personal */
-  copyToPersonal(id: string): Promise<import('@aiprimary/core').QuestionBankItem>;
+  copyToPersonal(id: string): Promise<QuestionBankItem>;
 
   // Import/Export
   exportQuestions(filters?: QuestionBankFilters): Promise<Blob>;

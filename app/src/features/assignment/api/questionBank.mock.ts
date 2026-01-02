@@ -29,7 +29,7 @@ const createMockQuestion = (id: string, index: number): QuestionBankItem => {
     return {
       ...baseQuestion,
       type: QUESTION_TYPE.MULTIPLE_CHOICE,
-      options,
+      data: { options },
     } as QuestionBankItem;
   } else if (typeIndex === 1) {
     // Matching
@@ -40,15 +40,17 @@ const createMockQuestion = (id: string, index: number): QuestionBankItem => {
     return {
       ...baseQuestion,
       type: QUESTION_TYPE.MATCHING,
-      pairs,
+      data: { pairs },
     } as QuestionBankItem;
   } else if (typeIndex === 2) {
     // Open Ended
     return {
       ...baseQuestion,
       type: QUESTION_TYPE.OPEN_ENDED,
-      maxLength: 500,
-      expectedAnswer: 'Sample expected answer',
+      data: {
+        maxLength: 500,
+        expectedAnswer: 'Sample expected answer',
+      },
     } as QuestionBankItem;
   } else {
     // Fill In Blank
@@ -60,8 +62,10 @@ const createMockQuestion = (id: string, index: number): QuestionBankItem => {
     return {
       ...baseQuestion,
       type: QUESTION_TYPE.FILL_IN_BLANK,
-      segments,
-      caseSensitive: false,
+      data: {
+        segments,
+        caseSensitive: false,
+      },
     } as QuestionBankItem;
   }
 };
@@ -85,12 +89,14 @@ export default class QuestionBankMockApiService implements QuestionBankApiServic
         bankType: 'personal',
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
-        options: [
-          { id: generateId(), text: 'Paris', isCorrect: true },
-          { id: generateId(), text: 'London', isCorrect: false },
-          { id: generateId(), text: 'Berlin', isCorrect: false },
-          { id: generateId(), text: 'Madrid', isCorrect: false },
-        ],
+        data: {
+          options: [
+            { id: generateId(), text: 'Paris', isCorrect: true },
+            { id: generateId(), text: 'London', isCorrect: false },
+            { id: generateId(), text: 'Berlin', isCorrect: false },
+            { id: generateId(), text: 'Madrid', isCorrect: false },
+          ],
+        },
       } as QuestionBankItem,
     ];
 

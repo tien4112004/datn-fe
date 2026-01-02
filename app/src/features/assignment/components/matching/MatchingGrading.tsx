@@ -16,13 +16,13 @@ interface MatchingGradingProps {
 
 export const MatchingGrading = ({ question, answer, onGradeChange }: MatchingGradingProps) => {
   // Calculate score: each correct match gets equal points
-  const pointsPerPair = question.points ? question.points / question.pairs.length : 0;
+  const pointsPerPair = question.points ? question.points / question.data.pairs.length : 0;
   let correctMatches = 0;
 
   answer?.matches.forEach((match) => {
     // In the correct answer, leftId and rightId should belong to the same pair
-    const leftPair = question.pairs.find((p) => p.id === match.leftId);
-    const rightPair = question.pairs.find((p) => p.id === match.rightId);
+    const leftPair = question.data.pairs.find((p) => p.id === match.leftId);
+    const rightPair = question.data.pairs.find((p) => p.id === match.rightId);
 
     // Check if they're from the same pair (correct match)
     if (leftPair && rightPair && leftPair.id === rightPair.id) {
@@ -50,8 +50,8 @@ export const MatchingGrading = ({ question, answer, onGradeChange }: MatchingGra
 
   const isMatchCorrect = (leftId: string, rightId: string) => {
     // A match is correct if both IDs belong to the same pair
-    const leftPair = question.pairs.find((p) => p.id === leftId);
-    const rightPair = question.pairs.find((p) => p.id === rightId);
+    const leftPair = question.data.pairs.find((p) => p.id === leftId);
+    const rightPair = question.data.pairs.find((p) => p.id === rightId);
     return leftPair && rightPair && leftPair.id === rightPair.id;
   };
 
@@ -78,8 +78,8 @@ export const MatchingGrading = ({ question, answer, onGradeChange }: MatchingGra
           <div className="space-y-2">
             {answer?.matches.map((match) => {
               const isCorrect = isMatchCorrect(match.leftId, match.rightId);
-              const leftPair = question.pairs.find((p) => p.id === match.leftId);
-              const rightPair = question.pairs.find((p) => p.id === match.rightId);
+              const leftPair = question.data.pairs.find((p) => p.id === match.leftId);
+              const rightPair = question.data.pairs.find((p) => p.id === match.rightId);
 
               if (!leftPair || !rightPair) return null;
 
@@ -127,7 +127,7 @@ export const MatchingGrading = ({ question, answer, onGradeChange }: MatchingGra
         <div className="bg-muted/50 space-y-2 rounded-md p-3">
           <Label className="text-sm font-semibold">Correct Pairs:</Label>
           <div className="space-y-1.5">
-            {question.pairs.map((pair) => (
+            {question.data.pairs.map((pair) => (
               <div key={pair.id} className="flex items-center gap-2 text-sm">
                 <MarkdownPreview content={pair.left} />
                 <ArrowRight className="text-muted-foreground h-3 w-3" />
@@ -142,7 +142,7 @@ export const MatchingGrading = ({ question, answer, onGradeChange }: MatchingGra
           <p>
             <span className="font-semibold">Auto-calculated Score: </span>
             <span className="text-blue-600">
-              {correctMatches}/{question.pairs.length} correct matches - {autoScore.toFixed(1)} points
+              {correctMatches}/{question.data.pairs.length} correct matches - {autoScore.toFixed(1)} points
             </span>
           </p>
         </div>

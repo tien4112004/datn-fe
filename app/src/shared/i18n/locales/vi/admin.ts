@@ -1,0 +1,46 @@
+export default {
+  questionBank: {
+    title: 'Quản Lý Kho Câu Hỏi',
+    subtitle: 'Quản lý câu hỏi cho bài tập',
+    columns: {
+      type: 'Loại',
+      title: 'Tiêu Đề',
+      difficulty: 'Độ Khó',
+      subject: 'Môn Học',
+      points: 'Điểm',
+      createdAt: 'Ngày Tạo',
+    },
+    toolbar: {
+      createNew: 'Tạo Câu Hỏi Mới',
+      delete: 'Xóa',
+      duplicate: 'Nhân Bản',
+      export: 'Xuất',
+      import: 'Nhập',
+    },
+    dialog: {
+      createTitle: 'Tạo Câu Hỏi Mới',
+      editTitle: 'Chỉnh Sửa Câu Hỏi',
+      subject: 'Môn Học',
+      questionType: 'Loại Câu Hỏi',
+      cancel: 'Hủy',
+      save: 'Lưu Thay Đổi',
+      create: 'Tạo Câu Hỏi',
+    },
+    deleteDialog: {
+      title: 'Xóa Câu Hỏi',
+      description: 'Bạn có chắc chắn muốn xóa {{count}} câu hỏi? Hành động này không thể hoàn tác.',
+      cancel: 'Hủy',
+      confirm: 'Xóa',
+    },
+    emptyState: 'Chưa có câu hỏi trong kho. Tạo câu hỏi đầu tiên để bắt đầu.',
+    messages: {
+      created: 'Đã tạo câu hỏi thành công',
+      updated: 'Đã cập nhật câu hỏi thành công',
+      deleted: 'Đã xóa câu hỏi thành công',
+      duplicated: 'Đã nhân bản câu hỏi thành công',
+      exported: 'Đã xuất câu hỏi thành công',
+      imported: 'Đã nhập {{success}} câu hỏi thành công, {{failed}} thất bại',
+      error: 'Đã xảy ra lỗi. Vui lòng thử lại.',
+    },
+  },
+};

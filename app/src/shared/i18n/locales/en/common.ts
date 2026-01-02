@@ -8,8 +8,12 @@ export default {
       files: 'Files',
       classes: 'Classes',
       subjects: 'Subjects',
+      examMatrix: 'Exam Matrix',
       schedules: 'Schedules',
       home: 'Home',
+      admin: 'Administration',
+      questionBank: 'Question Bank',
+      assignments: 'Assignments',
     },
   },
   pages: {
@@ -20,6 +24,9 @@ export default {
     goBack: 'Go Back',
     goHome: 'Go Home',
     classes: 'Classes',
+    examMatrices: 'Exam Matrices',
+    createMatrix: 'Create Matrix',
+    editMatrix: 'Edit Matrix',
   },
   status: {
     active: 'Active',

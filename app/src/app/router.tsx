@@ -5,6 +5,35 @@ import { CriticalError } from '@aiprimary/api';
 import { ProtectedRoute } from '@/shared/components/ProtectedRoute';
 import GlobalSpinner from '@/components/common/GlobalSpinner';
 
+// Lazy load exam matrix pages
+const ExamMatrixPage = lazy(() =>
+  import('@/features/exam-matrix').then((m) => ({ default: m.ExamMatrixPage }))
+);
+const MatrixBuilderPage = lazy(() =>
+  import('@/features/exam-matrix/pages/MatrixBuilderPage').then((m) => ({ default: m.MatrixBuilderPage }))
+);
+
+// Lazy load teacher question bank page
+const TeacherQuestionBankPage = lazy(() =>
+  import('@/features/assignment/pages/TeacherQuestionBankPage').then((m) => ({
+    default: m.TeacherQuestionBankPage,
+  }))
+);
+
+// Lazy load question bank editor page
+const QuestionBankEditorPage = lazy(() =>
+  import('@/features/assignment/pages/QuestionBankEditorPage').then((m) => ({
+    default: m.QuestionBankEditorPage,
+  }))
+);
+
+// Lazy load assignment editor page
+const AssignmentEditorPage = lazy(() =>
+  import('@/features/assignment/pages/AssignmentEditorPage').then((m) => ({
+    default: m.AssignmentEditorPage,
+  }))
+);
+
 // Lazy load auth pages
 const LoginPage = lazy(() =>
   import('@/features/auth/pages/LoginPage').then((m) => ({ default: m.LoginPage }))
@@ -260,6 +289,70 @@ const router = createBrowserRouter([
         element: (
           <LazyWrapper>
             <UserProfilePage />
+          </LazyWrapper>
+        ),
+      },
+      {
+        path: 'exam-matrix',
+        element: (
+          <LazyWrapper>
+            <ExamMatrixPage />
+          </LazyWrapper>
+        ),
+      },
+      {
+        path: 'exam-matrix/builder',
+        element: (
+          <LazyWrapper>
+            <MatrixBuilderPage />
+          </LazyWrapper>
+        ),
+      },
+      {
+        path: 'exam-matrix/builder/:id',
+        element: (
+          <LazyWrapper>
+            <MatrixBuilderPage />
+          </LazyWrapper>
+        ),
+      },
+      {
+        path: 'question-bank',
+        element: (
+          <LazyWrapper>
+            <TeacherQuestionBankPage />
+          </LazyWrapper>
+        ),
+      },
+      {
+        path: 'question-bank/create',
+        element: (
+          <LazyWrapper>
+            <QuestionBankEditorPage />
+          </LazyWrapper>
+        ),
+      },
+      {
+        path: 'question-bank/edit/:id',
+        element: (
+          <LazyWrapper>
+            <QuestionBankEditorPage />
+          </LazyWrapper>
+        ),
+      },
+      {
+        path: 'assignments/create',
+        element: (
+          <LazyWrapper>
+            <AssignmentEditorPage />
+          </LazyWrapper>
+        ),
+      },
+      {
+        path: 'assignments/edit/:id',
+        element: (
+          <LazyWrapper>
+            <AssignmentEditorPage />
           </LazyWrapper>
         ),
       },

@@ -4,7 +4,9 @@
     ".": "./src/index.ts",
     "./*": "./src/*",
     "./templates": "./src/types/template/index.ts",
-    "./templates/*": "./src/types/template/*"
+    "./templates/*": "./src/types/template/*",
+    "./assessment": "./src/types/assessment/index.ts",
+    "./assessment/*": "./src/types/assessment/*"
   },
   "devDependencies": {
     "typescript": "latest"

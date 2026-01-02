@@ -134,6 +134,9 @@ export function usePresentationProcessor(
       slidesStore.setSlides(slides);
       slidesStore.updateSlideIndex(slides.length - 1);
 
+      // Dispatch generating event to cover image generation and saving
+      dispatchGeneratingEvent(true);
+
       // Generate images for slides that have image elements
       const imageGenerationPromises: Promise<any>[] = [];
 
@@ -156,7 +159,6 @@ export function usePresentationProcessor(
       }
 
       // Save presentation with full data (slides, metadata, thumbnail)
-      dispatchGeneratingEvent(true);
 
       try {
         if (presentation) {
@@ -393,6 +395,9 @@ export function usePresentationProcessor(
     () => generationStore.isStreaming,
     async (isStreaming, wasStreaming) => {
       if (wasStreaming && !isStreaming) {
+        // Dispatch generating event at the start to cover image generation and saving
+        dispatchGeneratingEvent(true);
+
         try {
           // STEP 1: Wait for all slide processing to complete
           if (pendingSlideProcessing.value.size > 0) {
@@ -406,9 +411,6 @@ export function usePresentationProcessor(
           }
 
           // STEP 3: Run finalization logic (ONLY after ALL slides processed and ALL images complete)
-
-          // Dispatch generating event BEFORE saving
-          dispatchGeneratingEvent(true);
 
           try {
             // Extract title from outline markdown (first ## heading)

@@ -1,4 +1,5 @@
 import type { Gradient } from '../../slide';
+import type { ExpressionValue } from './expressions';
 
 export interface FontSizeRange {
   minSize: number;
@@ -68,12 +69,12 @@ export interface BackgroundConfig {
 }
 
 export interface WrapConfig {
-  enabled: boolean;
-  maxItemsPerLine?: number;
+  enabled: boolean | string; // boolean or expression string (e.g., 'ENABLE_WRAP')
+  maxItemsPerLine?: number | ExpressionValue;
   lineCount?: number | 'auto';
-  lineSpacing?: number;
+  lineSpacing?: number | ExpressionValue;
   wrapDistribution?: 'balanced' | 'top-heavy' | 'bottom-heavy';
-  alternating?: { start: number; end: number }; // Shrink alternating lines by these pixel offsets (supports negative values)
+  alternating?: { start: number | ExpressionValue; end: number | ExpressionValue }; // Shrink alternating lines by these pixel offsets (supports negative values)
   syncSize?: boolean; // Use uniform size based on the fullest line
   snake?: boolean; // Reverse item order in odd rows for snake/zigzag pattern (e.g., 1->2->3->4, 8<-7<-6<-5)
   zigzag?: boolean; // Stagger items across two rows alternately (e.g., 1  3  5 / 2  4  6)
@@ -81,8 +82,8 @@ export interface WrapConfig {
   pyramid?: {
     enabled: boolean; // Enable pyramid layout (1 item per level, progressive width)
     widthRatio?: number; // Width ratio between top and bottom (default: 0.5 = top is 50% of bottom)
-    minWidth?: number; // Minimum width for top item (default: calculated from ratio)
-    maxWidth?: number; // Maximum width for bottom item (default: container width)
+    minWidth?: number | ExpressionValue; // Minimum width for top item (default: calculated from ratio)
+    maxWidth?: number | ExpressionValue; // Maximum width for bottom item (default: container width)
     inverted?: boolean; // Invert pyramid (wide top, narrow bottom)
   };
 }

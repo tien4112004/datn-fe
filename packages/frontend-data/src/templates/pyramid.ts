@@ -15,71 +15,69 @@ const trapezoidPyramidTemplate: SlideTemplate = {
       description: 'Left/right slide padding',
     },
   ],
-  config: {
-    containers: {
-      title: {
-        type: 'text',
-        bounds: {
-          left: { expr: 'SIDE_PADDING' },
-          top: 15,
-          width: { expr: 'SLIDE_WIDTH - SIDE_PADDING * 2' },
-          height: 120,
-        },
-        layout: {
-          horizontalAlignment: 'center',
-          verticalAlignment: 'top',
-        },
-        text: {
-          color: '{{theme.titleFontColor}}',
-          fontFamily: '{{theme.titleFontName}}',
-          fontWeight: 'bold',
-          fontStyle: 'normal',
-        },
+  containers: {
+    title: {
+      type: 'text',
+      bounds: {
+        left: { expr: 'SIDE_PADDING' },
+        top: 15,
+        width: { expr: 'SLIDE_WIDTH - SIDE_PADDING * 2' },
+        height: 120,
       },
-      content: {
-        type: 'block',
-        positioning: {
-          relativeTo: 'title',
-          axis: 'vertical',
-          anchor: 'end',
-          offset: 10,
-          size: 'fill',
-          margin: { left: 30, right: 30, bottom: 30 },
-        },
-        layout: {
-          orientation: 'horizontal',
-          distribution: 'equal',
-          gap: 10,
-          verticalAlignment: 'center',
-        },
-        childTemplate: {
-          count: 'auto',
-          wrap: {
+      layout: {
+        horizontalAlignment: 'center',
+        verticalAlignment: 'top',
+      },
+      text: {
+        color: '{{theme.titleFontColor}}',
+        fontFamily: '{{theme.titleFontName}}',
+        fontWeight: 'bold',
+        fontStyle: 'normal',
+      },
+    },
+    content: {
+      type: 'block',
+      positioning: {
+        relativeTo: 'title',
+        axis: 'vertical',
+        anchor: 'end',
+        offset: 10,
+        size: 'fill',
+        margin: { left: 30, right: 30, bottom: 30 },
+      },
+      layout: {
+        orientation: 'horizontal',
+        distribution: 'equal',
+        gap: 10,
+        verticalAlignment: 'center',
+      },
+      childTemplate: {
+        count: 'auto',
+        wrap: {
+          enabled: true,
+          pyramid: {
             enabled: true,
-            pyramid: {
-              enabled: true,
-              widthRatio: 0.4,
-            },
+            widthRatio: 0.4,
           },
-          structure: {
-            type: 'block',
-            layout: {
-              verticalAlignment: 'center',
-            },
-            children: [
-              {
-                type: 'text',
-                label: 'item',
-                text: {
-                  fontSizeRange: { minSize: 14, maxSize: 24 },
-                  fontWeight: 'bold',
-                  color: '#fff',
-                  fontFamily: '{{theme.fontName}}',
-                  textAlign: 'center',
-                },
+        },
+        structure: {
+          type: 'block',
+          layout: {
+            verticalAlignment: 'center',
+          },
+          children: [
+            {
+              type: 'text',
+              label: 'item',
+              text: {
+                fontSizeRange: { minSize: 14, maxSize: 24 },
+                fontWeight: 'bold',
+                color: '#fff',
+                fontFamily: '{{theme.fontName}}',
+                textAlign: 'center',
               },
-            ],
-          },
+            },
+          ],
         },
       },
     },
@@ -107,72 +105,70 @@ const invertedTrapezoidPyramidTemplate: SlideTemplate = {
       description: 'Left/right slide padding',
     },
   ],
-  config: {
-    containers: {
-      title: {
-        type: 'text',
-        bounds: {
-          left: { expr: 'SIDE_PADDING' },
-          top: 15,
-          width: { expr: 'SLIDE_WIDTH - SIDE_PADDING * 2' },
-          height: 120,
-        },
-        layout: {
-          horizontalAlignment: 'center',
-          verticalAlignment: 'top',
-        },
-        text: {
-          color: '{{theme.titleFontColor}}',
-          fontFamily: '{{theme.titleFontName}}',
-          fontWeight: 'bold',
-          fontStyle: 'normal',
-        },
+  containers: {
+    title: {
+      type: 'text',
+      bounds: {
+        left: { expr: 'SIDE_PADDING' },
+        top: 15,
+        width: { expr: 'SLIDE_WIDTH - SIDE_PADDING * 2' },
+        height: 120,
       },
-      content: {
-        type: 'block',
-        positioning: {
-          relativeTo: 'title',
-          axis: 'vertical',
-          anchor: 'end',
-          offset: 10,
-          size: 'fill',
-          margin: { left: 30, right: 30, bottom: 30 },
-        },
-        layout: {
-          orientation: 'horizontal',
-          distribution: 'equal',
-          gap: 10,
-          verticalAlignment: 'center',
-        },
-        childTemplate: {
-          count: 'auto',
-          wrap: {
+      layout: {
+        horizontalAlignment: 'center',
+        verticalAlignment: 'top',
+      },
+      text: {
+        color: '{{theme.titleFontColor}}',
+        fontFamily: '{{theme.titleFontName}}',
+        fontWeight: 'bold',
+        fontStyle: 'normal',
+      },
+    },
+    content: {
+      type: 'block',
+      positioning: {
+        relativeTo: 'title',
+        axis: 'vertical',
+        anchor: 'end',
+        offset: 10,
+        size: 'fill',
+        margin: { left: 30, right: 30, bottom: 30 },
+      },
+      layout: {
+        orientation: 'horizontal',
+        distribution: 'equal',
+        gap: 10,
+        verticalAlignment: 'center',
+      },
+      childTemplate: {
+        count: 'auto',
+        wrap: {
+          enabled: true,
+          pyramid: {
             enabled: true,
-            pyramid: {
-              enabled: true,
-              widthRatio: 0.4,
-              inverted: true,
-            },
+            widthRatio: 0.4,
+            inverted: true,
           },
-          structure: {
-            type: 'block',
-            layout: {
-              verticalAlignment: 'center',
-            },
-            children: [
-              {
-                type: 'text',
-                label: 'item',
-                text: {
-                  fontSizeRange: { minSize: 14, maxSize: 24 },
-                  fontWeight: 'bold',
-                  color: '#fff',
-                  fontFamily: '{{theme.fontName}}',
-                  textAlign: 'center',
-                },
+        },
+        structure: {
+          type: 'block',
+          layout: {
+            verticalAlignment: 'center',
+          },
+          children: [
+            {
+              type: 'text',
+              label: 'item',
+              text: {
+                fontSizeRange: { minSize: 14, maxSize: 24 },
+                fontWeight: 'bold',
+                color: '#fff',
+                fontFamily: '{{theme.fontName}}',
+                textAlign: 'center',
               },
-            ],
-          },
+            },
+          ],
         },
       },
     },
@@ -201,71 +197,69 @@ const trapezoidPyramidFillTemplate: SlideTemplate = {
       description: 'Left/right slide padding',
     },
   ],
-  config: {
-    containers: {
-      title: {
-        type: 'text',
-        bounds: {
-          left: { expr: 'SIDE_PADDING' },
-          top: 15,
-          width: { expr: 'SLIDE_WIDTH - SIDE_PADDING * 2' },
-          height: 120,
-        },
-        layout: {
-          horizontalAlignment: 'center',
-          verticalAlignment: 'top',
-        },
-        text: {
-          color: '{{theme.titleFontColor}}',
-          fontFamily: '{{theme.titleFontName}}',
-          fontWeight: 'bold',
-          fontStyle: 'normal',
-        },
+  containers: {
+    title: {
+      type: 'text',
+      bounds: {
+        left: { expr: 'SIDE_PADDING' },
+        top: 15,
+        width: { expr: 'SLIDE_WIDTH - SIDE_PADDING * 2' },
+        height: 120,
       },
-      content: {
-        type: 'block',
-        positioning: {
-          relativeTo: 'title',
-          axis: 'vertical',
-          anchor: 'end',
-          offset: 10,
-          size: 'fill',
-          margin: { left: 30, right: 30, bottom: 30 },
-        },
-        layout: {
-          orientation: 'horizontal',
-          distribution: 'equal',
-          gap: 10,
-          verticalAlignment: 'center',
-        },
-        childTemplate: {
-          count: 'auto',
-          wrap: {
+      layout: {
+        horizontalAlignment: 'center',
+        verticalAlignment: 'top',
+      },
+      text: {
+        color: '{{theme.titleFontColor}}',
+        fontFamily: '{{theme.titleFontName}}',
+        fontWeight: 'bold',
+        fontStyle: 'normal',
+      },
+    },
+    content: {
+      type: 'block',
+      positioning: {
+        relativeTo: 'title',
+        axis: 'vertical',
+        anchor: 'end',
+        offset: 10,
+        size: 'fill',
+        margin: { left: 30, right: 30, bottom: 30 },
+      },
+      layout: {
+        orientation: 'horizontal',
+        distribution: 'equal',
+        gap: 10,
+        verticalAlignment: 'center',
+      },
+      childTemplate: {
+        count: 'auto',
+        wrap: {
+          enabled: true,
+          pyramid: {
             enabled: true,
-            pyramid: {
-              enabled: true,
-              widthRatio: 0.4,
-            },
+            widthRatio: 0.4,
           },
-          structure: {
-            type: 'block',
-            layout: {
-              verticalAlignment: 'center',
-            },
-            children: [
-              {
-                type: 'text',
-                label: 'item',
-                text: {
-                  fontSizeRange: { minSize: 14, maxSize: 24 },
-                  fontWeight: 'bold',
-                  color: '#fff',
-                  fontFamily: '{{theme.fontName}}',
-                  textAlign: 'center',
-                },
+        },
+        structure: {
+          type: 'block',
+          layout: {
+            verticalAlignment: 'center',
+          },
+          children: [
+            {
+              type: 'text',
+              label: 'item',
+              text: {
+                fontSizeRange: { minSize: 14, maxSize: 24 },
+                fontWeight: 'bold',
+                color: '#fff',
+                fontFamily: '{{theme.fontName}}',
+                textAlign: 'center',
               },
-            ],
-          },
+            },
+          ],
         },
       },
     },
@@ -294,72 +288,70 @@ const invertedTrapezoidPyramidFillTemplate: SlideTemplate = {
       description: 'Left/right slide padding',
     },
   ],
-  config: {
-    containers: {
-      title: {
-        type: 'text',
-        bounds: {
-          left: { expr: 'SIDE_PADDING' },
-          top: 15,
-          width: { expr: 'SLIDE_WIDTH - SIDE_PADDING * 2' },
-          height: 120,
-        },
-        layout: {
-          horizontalAlignment: 'center',
-          verticalAlignment: 'top',
-        },
-        text: {
-          color: '{{theme.titleFontColor}}',
-          fontFamily: '{{theme.titleFontName}}',
-          fontWeight: 'bold',
-          fontStyle: 'normal',
-        },
+  containers: {
+    title: {
+      type: 'text',
+      bounds: {
+        left: { expr: 'SIDE_PADDING' },
+        top: 15,
+        width: { expr: 'SLIDE_WIDTH - SIDE_PADDING * 2' },
+        height: 120,
       },
-      content: {
-        type: 'block',
-        positioning: {
-          relativeTo: 'title',
-          axis: 'vertical',
-          anchor: 'end',
-          offset: 10,
-          size: 'fill',
-          margin: { left: 30, right: 30, bottom: 30 },
-        },
-        layout: {
-          orientation: 'horizontal',
-          distribution: 'equal',
-          gap: 10,
-          verticalAlignment: 'center',
-        },
-        childTemplate: {
-          count: 'auto',
-          wrap: {
+      layout: {
+        horizontalAlignment: 'center',
+        verticalAlignment: 'top',
+      },
+      text: {
+        color: '{{theme.titleFontColor}}',
+        fontFamily: '{{theme.titleFontName}}',
+        fontWeight: 'bold',
+        fontStyle: 'normal',
+      },
+    },
+    content: {
+      type: 'block',
+      positioning: {
+        relativeTo: 'title',
+        axis: 'vertical',
+        anchor: 'end',
+        offset: 10,
+        size: 'fill',
+        margin: { left: 30, right: 30, bottom: 30 },
+      },
+      layout: {
+        orientation: 'horizontal',
+        distribution: 'equal',
+        gap: 10,
+        verticalAlignment: 'center',
+      },
+      childTemplate: {
+        count: 'auto',
+        wrap: {
+          enabled: true,
+          pyramid: {
             enabled: true,
-            pyramid: {
-              enabled: true,
-              widthRatio: 0.4,
-              inverted: true,
-            },
+            widthRatio: 0.4,
+            inverted: true,
           },
-          structure: {
-            type: 'block',
-            layout: {
-              verticalAlignment: 'center',
-            },
-            children: [
-              {
-                type: 'text',
-                label: 'item',
-                text: {
-                  fontSizeRange: { minSize: 14, maxSize: 24 },
-                  fontWeight: 'bold',
-                  color: '#fff',
-                  fontFamily: '{{theme.fontName}}',
-                  textAlign: 'center',
-                },
+        },
+        structure: {
+          type: 'block',
+          layout: {
+            verticalAlignment: 'center',
+          },
+          children: [
+            {
+              type: 'text',
+              label: 'item',
+              text: {
+                fontSizeRange: { minSize: 14, maxSize: 24 },
+                fontWeight: 'bold',
+                color: '#fff',
+                fontFamily: '{{theme.fontName}}',
+                textAlign: 'center',
               },
-            ],
-          },
+            },
+          ],
         },
       },
     },

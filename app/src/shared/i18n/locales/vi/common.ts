@@ -68,6 +68,8 @@ export default {
       renameFileDialogTitle: 'Đổi tên bản đồ tư duy',
       renameSuccess: 'Đổi tên bản đồ tư duy "{{filename}}" thành công',
       renameDuplicatedMessage: 'Đã tồn tại bản đồ tư duy với tên này',
+      untitled: 'Bản đồ tư duy chưa đặt tên',
+      createFirst: 'Tạo bản đồ tư duy đầu tiên của bạn để bắt đầu',
       deleteTitle: 'Xóa bản đồ tư duy',
       deleteMessage: 'Bạn có chắc chắn muốn xóa "{{name}}"? Hành động này không thể hoàn tác.',
       deleteSuccess: 'Đã xóa bản đồ tư duy "{{name}}" thành công',

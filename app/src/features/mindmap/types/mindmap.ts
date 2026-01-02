@@ -144,5 +144,4 @@ export interface Mindmap {
   edges: MindMapEdge[];
   createdAt: string;
   updatedAt: string;
-  status: 'active' | 'archived' | 'draft';
 }

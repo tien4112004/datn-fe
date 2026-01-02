@@ -2,17 +2,15 @@ import { create } from 'zustand';
 import { devtools, persist, createJSONStorage } from 'zustand/middleware';
 
 interface TreePanelState {
-  isOpen: boolean;
   collapsedNodes: Set<string>;
-  toggle: () => void;
-  setOpen: (open: boolean) => void;
+  hoveredNodeId: string | null;
   toggleNodeCollapse: (nodeId: string) => void;
   expandAll: () => void;
   collapseAll: (nodeIds: string[]) => void;
+  setHoveredNodeId: (nodeId: string | null) => void;
 }
 
 interface PersistedState {
-  isOpen: boolean;
   collapsedNodes: string[];
 }
 
@@ -20,11 +18,8 @@ export const useTreePanelStore = create<TreePanelState>()(
   devtools(
     persist(
       (set) => ({
-        isOpen: true,
         collapsedNodes: new Set(),
-
-        toggle: () => set((state) => ({ isOpen: !state.isOpen })),
-        setOpen: (open) => set({ isOpen: open }),
+        hoveredNodeId: null,
 
         toggleNodeCollapse: (nodeId) =>
           set((state) => {
@@ -39,6 +34,7 @@ export const useTreePanelStore = create<TreePanelState>()(
 
         expandAll: () => set({ collapsedNodes: new Set() }),
         collapseAll: (nodeIds) => set({ collapsedNodes: new Set(nodeIds) }),
+        setHoveredNodeId: (nodeId) => set({ hoveredNodeId: nodeId }),
       }),
       {
         name: 'TreePanelStore',

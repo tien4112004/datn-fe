@@ -205,7 +205,9 @@ const positionHorizontalHierarchy = (
         if (siblings.length === 1) {
           node.y = node.parent.y + node.parent.height / 2 - node.height / 2;
         } else {
-          node.y = node.parent.y + node.parent.height / 2 - totalLayoutHeight / 2 + cumulativeOffset;
+          // Center siblings around parent's TOP EDGE (not center) to match D3LayoutService
+          // This creates more vertical space between cousin subtrees and prevents overlaps
+          node.y = node.parent.y - totalLayoutHeight / 2 + cumulativeOffset;
         }
       }
     }
@@ -261,6 +263,59 @@ const adjustVerticalSpacing = (node: D3HierarchyNode, verticalSpacing: number): 
   }
 
   children.forEach((child) => adjustVerticalSpacing(child, verticalSpacing));
+};
+
+/**
+ * Resolves cousin node overlaps through iterative collision detection.
+ * This is a secondary safety measure that ensures no overlaps remain after
+ * the primary positioning and spacing adjustments.
+ *
+ * Processes tree top-down, detecting and resolving overlaps between subtrees
+ * of different siblings (cousin nodes). Runs multiple iterations until all
+ * collisions are resolved or max iterations reached.
+ *
+ * @param hierarchy - The D3 hierarchy to check for collisions
+ * @param verticalSpacing - Minimum vertical spacing required between subtrees
+ */
+const resolveCousinCollisions = (hierarchy: D3HierarchyNode, verticalSpacing: number): void => {
+  const maxIterations = 3; // Prevent infinite loops
+
+  for (let iteration = 0; iteration < maxIterations; iteration++) {
+    let hasCollisions = false;
+
+    // Process each node level by level (top-down)
+    hierarchy.each((node: D3HierarchyNode) => {
+      if (!node.children || node.children.length <= 1) return;
+
+      const children = node.children;
+
+      // Check each pair of adjacent siblings for subtree overlaps
+      for (let i = 0; i < children.length - 1; i++) {
+        const child1 = children[i];
+        const child2 = children[i + 1];
+
+        // Get subtree bounds
+        const bottom1 = getSubtreeBottomY(child1);
+        const top2 = getSubtreeTopY(child2);
+
+        // Calculate actual spacing
+        const actualSpacing = top2 - bottom1;
+
+        // If overlapping or too close, push apart
+        if (actualSpacing < verticalSpacing) {
+          const overlap = verticalSpacing - actualSpacing;
+          hasCollisions = true;
+
+          // Push subtrees apart (move both equally)
+          adjustSubtreePositionY(child1, -overlap / 2);
+          adjustSubtreePositionY(child2, overlap / 2);
+        }
+      }
+    });
+
+    // If no collisions detected, we're done
+    if (!hasCollisions) break;
+  }
 };
 
 const updateEdgeHandles = (
@@ -344,6 +399,9 @@ export const calculateHorizontalLayout = async (
 
   // Adjust spacing
   adjustVerticalSpacing(hierarchy, verticalSpacing);
+
+  // Resolve any remaining cousin collisions (secondary safety measure)
+  resolveCousinCollisions(hierarchy, verticalSpacing);
 
   // Collect positioned nodes with correct side assignment
   const layoutedNodes: MindMapNode[] = [];
@@ -433,6 +491,9 @@ const processBalancedSideHierarchy = (
 
   // Adjust spacing
   adjustVerticalSpacing(hierarchy, verticalSpacing);
+
+  // Resolve any remaining cousin collisions (secondary safety measure)
+  resolveCousinCollisions(hierarchy, verticalSpacing);
 
   // Collect positioned nodes (side and siblingOrder will be assigned later)
   const layoutedNodes: MindMapNode[] = [];

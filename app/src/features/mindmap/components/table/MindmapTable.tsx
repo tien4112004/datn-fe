@@ -8,7 +8,7 @@ import {
   type Updater,
 } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import DataTable from '@/components/table/DataTable';
 import { SearchBar } from '@/shared/components/common/SearchBar';
 import { useMindmaps, useUpdateMindmapTitle, useDeleteMindmap } from '@/features/mindmap/hooks';
@@ -19,16 +19,28 @@ import { toast } from 'sonner';
 import { ActionContent } from '@/features/presentation/components';
 import { format } from 'date-fns';
 import { getLocaleDateFns } from '@/shared/i18n/helper';
+import ViewToggle, { type ViewMode } from '@/features/presentation/components/others/ViewToggle';
 
 const columnHelper = createColumnHelper<Mindmap>();
 
 const MindmapTable = () => {
   const { t } = useTranslation('common', { keyPrefix: 'table' });
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const [isRenameOpen, setIsRenameOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [selectedMindmap, setSelectedMindmap] = useState<Mindmap | null>(null);
+
+  const viewMode = (searchParams.get('view') as ViewMode) || 'list';
+
+  const setViewMode = (mode: ViewMode) => {
+    setSearchParams((prev) => {
+      const newParams = new URLSearchParams(prev);
+      newParams.set('view', mode);
+      return newParams;
+    });
+  };
 
   // Use the new hook
   const { data, isLoading, sorting, setSorting, pagination, setPagination, search, setSearch, totalItems } =
@@ -167,12 +179,15 @@ const MindmapTable = () => {
 
   return (
     <div className="w-full space-y-4">
-      <SearchBar
-        value={search}
-        onChange={handleSearchChange}
-        placeholder={t('mindmap.searchPlaceholder')}
-        className="w-full rounded-lg border-2 border-slate-200"
-      />
+      <div className="flex items-center justify-between gap-4">
+        <SearchBar
+          value={search}
+          onChange={handleSearchChange}
+          placeholder={t('mindmap.searchPlaceholder')}
+          className="flex-1 rounded-lg border-2 border-slate-200"
+        />
+        <ViewToggle value={viewMode} onValueChange={setViewMode} />
+      </div>
 
       <DataTable
         table={table}

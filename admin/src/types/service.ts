@@ -46,6 +46,7 @@ export interface AdminApiService extends Service {
   getSlideTemplates(params?: SlideTemplateParams): Promise<ApiResponse<SlideTemplate[]>>;
   createSlideTemplate(data: SlideTemplate): Promise<ApiResponse<SlideTemplate>>;
   updateSlideTemplate(id: string, data: SlideTemplate): Promise<ApiResponse<SlideTemplate>>;
+  deleteSlideTemplate(id: string): Promise<ApiResponse<void>>;
 
   // Art Styles
   getArtStyles(params?: PaginationParams): Promise<ApiResponse<ArtStyle[]>>;

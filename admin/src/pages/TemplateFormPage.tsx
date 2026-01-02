@@ -113,8 +113,8 @@ export function TemplateFormPage() {
         return;
       }
 
-      if (!parsed.config || typeof parsed.config !== 'object' || !parsed.config.containers) {
-        toast.error('Template must have a config object with containers');
+      if (!parsed.containers || typeof parsed.containers !== 'object') {
+        toast.error('Template must have a containers object');
         return;
       }
 
@@ -223,7 +223,7 @@ export function TemplateFormPage() {
         id: dataToUse.id || 'preview-template',
         name: dataToUse.name || 'Preview Template',
         layout: dataToUse.layout || 'list',
-        config: dataToUse.config,
+        containers: dataToUse.containers,
         graphics: dataToUse.graphics,
         parameters: dataToUse.parameters,
       };
@@ -440,15 +440,15 @@ export function TemplateFormPage() {
             <div>
               <div className="text-muted-foreground text-sm">Config Status</div>
               <div className="font-mono text-xs">
-                {formData.config ? (
+                {formData.containers ? (
                   <>
-                    Containers: {Object.keys((formData.config as any)?.containers || {}).length}
-                    {Object.keys((formData.config as any)?.containers || {}).length > 0 && (
-                      <> ({Object.keys((formData.config as any).containers).join(', ')})</>
+                    Containers: {Object.keys((formData.containers as any) || {}).length}
+                    {Object.keys((formData.containers as any) || {}).length > 0 && (
+                      <> ({Object.keys(formData.containers as any).join(', ')})</>
                     )}
                   </>
                 ) : (
-                  <span className="text-red-600">No config</span>
+                  <span className="text-red-600">No containers</span>
                 )}
               </div>
             </div>

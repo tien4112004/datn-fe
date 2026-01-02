@@ -128,18 +128,8 @@ export const useUpdateMindmapTitle = () => {
 
   return useMutation({
     mutationFn: async ({ id, name }: { id: string; name: string }) => {
-      const result = await mindmapApiService.updateMindmapTitle(id, name);
-
-      const CONFLICT_HTTP_STATUS = 409;
-      if (result && typeof result === 'object' && 'code' in result) {
-        if (result.code === CONFLICT_HTTP_STATUS) {
-          throw new Error('A mindmap with this name already exists');
-        }
-
-        throw new Error(result.message || 'An error occurred');
-      }
-
-      return { id, name, result };
+      await mindmapApiService.updateMindmapTitle(id, name);
+      return { id, name };
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({
@@ -159,14 +149,10 @@ export const useCreateBlankMindmap = () => {
   return useMutation({
     mutationFn: async () => {
       const mindmap = await mindmapApiService.createMindmap({
-        id: crypto.randomUUID(),
         title: t('mindmap:list.untitledMindmap'),
         description: '',
         nodes: [],
         edges: [],
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        status: 'draft',
       });
 
       return { mindmap };

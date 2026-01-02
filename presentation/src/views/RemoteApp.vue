@@ -21,7 +21,6 @@ import {
 import { LOCALSTORAGE_KEY_DISCARDED_DB } from '@/configs/storage';
 import { deleteDiscardedDB } from '@/utils/database';
 import { isPC } from '@/utils/common';
-import api from '@/services';
 
 import Editor from '../views/Editor/index.vue';
 import Mobile from '../views/Mobile/index.vue';
@@ -98,16 +97,10 @@ onMounted(async () => {
   containerStore.initialize(props);
 
   // Reset save state on mount to ensure clean state
-  if (containerStore.isRemote) {
-    saveStore.reset();
-  }
+  saveStore.reset();
 
-  if (containerStore.isRemote) {
-    slidesStore.setSlides(containerStore.presentation?.slides || []);
-  } else {
-    const slides = await api.getFileData('slides');
-    slidesStore.setSlides(slides);
-  }
+  // RemoteApp always receives slides from the parent app via props
+  slidesStore.setSlides(containerStore.presentation?.slides || []);
 
   await deleteDiscardedDB();
   snapshotStore.initSnapshotDatabase();
@@ -118,7 +111,7 @@ onMounted(async () => {
 watch(
   slides,
   () => {
-    if (containerStore.isRemote && containerStore.mode === 'edit') {
+    if (containerStore.mode === 'edit') {
       saveStore.markDirty();
     }
   },

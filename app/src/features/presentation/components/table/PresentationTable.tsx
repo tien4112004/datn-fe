@@ -6,17 +6,29 @@ import { usePresentationManager } from '../../hooks/usePresentationManager';
 import DataTable from '@/components/table/DataTable';
 import { ActionContent } from './ActionButton';
 import { SearchBar } from '../../../../shared/components/common/SearchBar';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ThumbnailWrapperV2 } from '../others/ThumbnailWrapper';
 import { RenameFileDialog } from '@/components/modals/RenameFileDialog';
 import { DeleteConfirmationDialog } from '@/shared/components/modals/DeleteConfirmationDialog';
 import { getLocaleDateFns } from '@/shared/i18n/helper';
 import { format } from 'date-fns';
+import ViewToggle, { type ViewMode } from '@/features/presentation/components/others/ViewToggle';
 
 const PresentationTable = () => {
   const { t } = useTranslation('common', { keyPrefix: 'table' });
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const columnHelper = createColumnHelper<Presentation>();
+
+  const viewMode = (searchParams.get('view') as ViewMode) || 'list';
+
+  const setViewMode = (mode: ViewMode) => {
+    setSearchParams((prev) => {
+      const newParams = new URLSearchParams(prev);
+      newParams.set('view', mode);
+      return newParams;
+    });
+  };
 
   const columns = useMemo(
     () => [
@@ -116,12 +128,15 @@ const PresentationTable = () => {
 
   return (
     <div className="w-full space-y-4">
-      <SearchBar
-        value={search}
-        onChange={setSearch}
-        placeholder={t('presentation.searchPlaceholder')}
-        className="w-full rounded-lg border-2 border-slate-200"
-      />
+      <div className="flex items-center justify-between gap-4">
+        <SearchBar
+          value={search}
+          onChange={setSearch}
+          placeholder={t('presentation.searchPlaceholder')}
+          className="flex-1 rounded-lg border-2 border-slate-200"
+        />
+        <ViewToggle value={viewMode} onValueChange={setViewMode} />
+      </div>
       <DataTable
         table={table}
         isLoading={isLoading}

@@ -15,92 +15,90 @@ const straightTimelineTemplate: SlideTemplate = {
       description: 'Left/right slide padding',
     },
   ],
-  config: {
-    containers: {
-      title: {
-        type: 'text',
-        bounds: {
-          left: { expr: 'SIDE_PADDING' },
-          top: 15,
-          width: { expr: 'SLIDE_WIDTH - SIDE_PADDING * 2' },
-          height: 120,
-        },
-        layout: {
-          horizontalAlignment: 'center',
-          verticalAlignment: 'top',
-        },
-        text: {
-          color: '{{theme.titleFontColor}}',
-          fontFamily: '{{theme.titleFontName}}',
-          fontWeight: 'bold',
-          fontStyle: 'normal',
-          textAlign: 'center',
-        },
+  containers: {
+    title: {
+      type: 'text',
+      bounds: {
+        left: { expr: 'SIDE_PADDING' },
+        top: 15,
+        width: { expr: 'SLIDE_WIDTH - SIDE_PADDING * 2' },
+        height: 120,
       },
-      content: {
-        type: 'block',
-        positioning: {
-          relativeTo: 'title',
-          axis: 'vertical',
-          anchor: 'end',
-          offset: 0,
-          size: 'fill',
-          margin: { left: 50, right: 50, bottom: 40 },
+      layout: {
+        horizontalAlignment: 'center',
+        verticalAlignment: 'top',
+      },
+      text: {
+        color: '{{theme.titleFontColor}}',
+        fontFamily: '{{theme.titleFontName}}',
+        fontWeight: 'bold',
+        fontStyle: 'normal',
+        textAlign: 'center',
+      },
+    },
+    content: {
+      type: 'block',
+      positioning: {
+        relativeTo: 'title',
+        axis: 'vertical',
+        anchor: 'end',
+        offset: 0,
+        size: 'fill',
+        margin: { left: 50, right: 50, bottom: 40 },
+      },
+      layout: {
+        orientation: 'horizontal',
+        distribution: 'equal',
+        gap: 80,
+        verticalAlignment: 'top',
+      },
+      childTemplate: {
+        count: 'auto',
+        wrap: {
+          enabled: true,
+          maxItemsPerLine: 4,
+          lineCount: 2,
+          wrapDistribution: 'balanced',
+          lineSpacing: 40,
+          syncSize: true,
+          snake: true,
         },
-        layout: {
-          orientation: 'horizontal',
-          distribution: 'equal',
-          gap: 80,
-          verticalAlignment: 'top',
-        },
-        childTemplate: {
-          count: 'auto',
-          wrap: {
-            enabled: true,
-            maxItemsPerLine: 4,
-            lineCount: 2,
-            wrapDistribution: 'balanced',
-            lineSpacing: 40,
-            syncSize: true,
-            snake: true,
+        structure: {
+          type: 'block',
+          layout: {
+            orientation: 'vertical',
+            gap: -10,
+            horizontalAlignment: 'center',
+            verticalAlignment: 'center',
           },
-          structure: {
-            type: 'block',
-            layout: {
-              orientation: 'vertical',
-              gap: -10,
-              horizontalAlignment: 'center',
-              verticalAlignment: 'center',
-            },
-            border: {
-              color: '{{theme.borderColor}}',
-              width: '{{theme.card.borderWidth}}',
-              radius: '{{theme.card.borderRadius}}',
-            },
-            children: [
-              {
-                type: 'text',
-                label: 'label',
-                text: {
-                  fontSizeRange: { minSize: 16, maxSize: 28 },
-                  fontWeight: 'bold',
-                  color: '{{theme.labelFontColor}}',
-                  fontFamily: '{{theme.labelFontName}}',
-                  textAlign: 'center',
-                },
-              },
-              {
-                type: 'text',
-                label: 'content',
-                text: {
-                  fontSizeRange: { minSize: 12, maxSize: 24 },
-                  color: '{{theme.fontColor}}',
-                  fontFamily: '{{theme.fontName}}',
-                  textAlign: 'center',
-                },
-              },
-            ],
+          border: {
+            color: '{{theme.borderColor}}',
+            width: '{{theme.card.borderWidth}}',
+            radius: '{{theme.card.borderRadius}}',
           },
+          children: [
+            {
+              type: 'text',
+              label: 'label',
+              text: {
+                fontSizeRange: { minSize: 16, maxSize: 28 },
+                fontWeight: 'bold',
+                color: '{{theme.labelFontColor}}',
+                fontFamily: '{{theme.labelFontName}}',
+                textAlign: 'center',
+              },
+            },
+            {
+              type: 'text',
+              label: 'content',
+              text: {
+                fontSizeRange: { minSize: 12, maxSize: 24 },
+                color: '{{theme.fontColor}}',
+                fontFamily: '{{theme.fontName}}',
+                textAlign: 'center',
+              },
+            },
+          ],
         },
       },
     },
@@ -134,88 +132,86 @@ const alternatingTimelineTemplate: SlideTemplate = {
       description: 'Left/right slide padding',
     },
   ],
-  config: {
-    containers: {
-      title: {
-        type: 'text',
-        bounds: {
-          left: { expr: 'SIDE_PADDING' },
-          top: 15,
-          width: { expr: 'SLIDE_WIDTH - SIDE_PADDING * 2' },
-          height: 120,
-        },
-        layout: {
-          horizontalAlignment: 'center',
-          verticalAlignment: 'top',
-        },
-        text: {
-          color: '{{theme.titleFontColor}}',
-          fontFamily: '{{theme.titleFontName}}',
-          fontWeight: 'bold',
-          fontStyle: 'normal',
-        },
+  containers: {
+    title: {
+      type: 'text',
+      bounds: {
+        left: { expr: 'SIDE_PADDING' },
+        top: 15,
+        width: { expr: 'SLIDE_WIDTH - SIDE_PADDING * 2' },
+        height: 120,
       },
-      content: {
-        type: 'block',
-        positioning: {
-          relativeTo: 'title',
-          axis: 'vertical',
-          anchor: 'end',
-          offset: 0,
-          size: 'fill',
-          margin: { left: 20, right: 20, bottom: 20 },
+      layout: {
+        horizontalAlignment: 'center',
+        verticalAlignment: 'top',
+      },
+      text: {
+        color: '{{theme.titleFontColor}}',
+        fontFamily: '{{theme.titleFontName}}',
+        fontWeight: 'bold',
+        fontStyle: 'normal',
+      },
+    },
+    content: {
+      type: 'block',
+      positioning: {
+        relativeTo: 'title',
+        axis: 'vertical',
+        anchor: 'end',
+        offset: 0,
+        size: 'fill',
+        margin: { left: 20, right: 20, bottom: 20 },
+      },
+      layout: {
+        orientation: 'horizontal',
+        distribution: 'equal',
+        gap: 60,
+        verticalAlignment: 'center',
+      },
+      childTemplate: {
+        count: 'auto',
+        wrap: {
+          enabled: true,
+          zigzag: true,
+          lineSpacing: 70,
+          reverseOddRowChildren: true,
         },
-        layout: {
-          orientation: 'horizontal',
-          distribution: 'equal',
-          gap: 60,
-          verticalAlignment: 'center',
-        },
-        childTemplate: {
-          count: 'auto',
-          wrap: {
-            enabled: true,
-            zigzag: true,
-            lineSpacing: 70,
-            reverseOddRowChildren: true,
+        structure: {
+          type: 'block',
+          layout: {
+            orientation: 'vertical',
+            horizontalAlignment: 'center',
+            verticalAlignment: 'bottom',
+            gap: 10,
           },
-          structure: {
-            type: 'block',
-            layout: {
-              orientation: 'vertical',
-              horizontalAlignment: 'center',
-              verticalAlignment: 'bottom',
-              gap: 10,
+          children: [
+            {
+              type: 'text',
+              label: 'content',
+              text: {
+                fontSizeRange: { minSize: 16, maxSize: 24 },
+                color: '{{theme.fontColor}}',
+                fontFamily: '{{theme.fontName}}',
+                textAlign: 'center',
+              },
             },
-            children: [
-              {
-                type: 'text',
-                label: 'content',
-                text: {
-                  fontSizeRange: { minSize: 16, maxSize: 24 },
-                  color: '{{theme.fontColor}}',
-                  fontFamily: '{{theme.fontName}}',
-                  textAlign: 'center',
-                },
+            {
+              type: 'text',
+              label: 'label',
+              border: {
+                color: '{{theme.borderColor}}',
+                width: '{{theme.card.borderWidth}}',
+                radius: '{{theme.card.borderRadius}}',
               },
-              {
-                type: 'text',
-                label: 'label',
-                border: {
-                  color: '{{theme.borderColor}}',
-                  width: '{{theme.card.borderWidth}}',
-                  radius: '{{theme.card.borderRadius}}',
-                },
-                text: {
-                  fontSizeRange: { minSize: 18, maxSize: 28 },
-                  fontWeight: 'bold',
-                  color: '{{theme.labelFontColor}}',
-                  fontFamily: '{{theme.labelFontName}}',
-                  textAlign: 'center',
-                },
+              text: {
+                fontSizeRange: { minSize: 18, maxSize: 28 },
+                fontWeight: 'bold',
+                color: '{{theme.labelFontColor}}',
+                fontFamily: '{{theme.labelFontName}}',
+                textAlign: 'center',
               },
-            ],
-          },
+            },
+          ],
         },
       },
     },
@@ -224,8 +220,7 @@ const alternatingTimelineTemplate: SlideTemplate = {
     {
       type: 'alternatingTimeline',
       containerId: 'content',
-      thickness: 2,
-      branchLength: 40,
+      thickness: 3,
     },
   ],
 };
@@ -250,87 +245,85 @@ const zigZagTimelineTemplate: SlideTemplate = {
       description: 'Left/right slide padding',
     },
   ],
-  config: {
-    containers: {
-      title: {
-        type: 'text',
-        bounds: {
-          left: { expr: 'SIDE_PADDING' },
-          top: 15,
-          width: { expr: 'SLIDE_WIDTH - SIDE_PADDING * 2' },
-          height: 120,
-        },
-        layout: {
-          horizontalAlignment: 'center',
-          verticalAlignment: 'top',
-        },
-        text: {
-          color: '{{theme.titleFontColor}}',
-          fontFamily: '{{theme.titleFontName}}',
-          fontWeight: 'bold',
-          fontStyle: 'normal',
-        },
+  containers: {
+    title: {
+      type: 'text',
+      bounds: {
+        left: { expr: 'SIDE_PADDING' },
+        top: 15,
+        width: { expr: 'SLIDE_WIDTH - SIDE_PADDING * 2' },
+        height: 120,
       },
-      content: {
-        type: 'block',
-        positioning: {
-          relativeTo: 'title',
-          axis: 'vertical',
-          anchor: 'end',
-          offset: 10,
-          size: 'fill',
-          margin: { left: 30, right: 30, bottom: 30 },
+      layout: {
+        horizontalAlignment: 'center',
+        verticalAlignment: 'top',
+      },
+      text: {
+        color: '{{theme.titleFontColor}}',
+        fontFamily: '{{theme.titleFontName}}',
+        fontWeight: 'bold',
+        fontStyle: 'normal',
+      },
+    },
+    content: {
+      type: 'block',
+      positioning: {
+        relativeTo: 'title',
+        axis: 'vertical',
+        anchor: 'end',
+        offset: 10,
+        size: 'fill',
+        margin: { left: 30, right: 30, bottom: 30 },
+      },
+      layout: {
+        orientation: 'horizontal',
+        distribution: 'equal',
+        gap: 60,
+        verticalAlignment: 'center',
+      },
+      childTemplate: {
+        count: 'auto',
+        wrap: {
+          enabled: true,
+          zigzag: true,
+          lineSpacing: 120,
         },
-        layout: {
-          orientation: 'horizontal',
-          distribution: 'equal',
-          gap: 60,
-          verticalAlignment: 'center',
-        },
-        childTemplate: {
-          count: 'auto',
-          wrap: {
-            enabled: true,
-            zigzag: true,
-            lineSpacing: 120,
+        structure: {
+          type: 'block',
+          layout: {
+            orientation: 'vertical',
+            horizontalAlignment: 'center',
+            verticalAlignment: 'center',
+            gap: -10,
           },
-          structure: {
-            type: 'block',
-            layout: {
-              orientation: 'vertical',
-              horizontalAlignment: 'center',
-              verticalAlignment: 'center',
-              gap: -10,
-            },
-            border: {
-              color: '{{theme.borderColor}}',
-              width: '{{theme.card.borderWidth}}',
-              radius: '{{theme.card.borderRadius}}',
-            },
-            children: [
-              {
-                type: 'text',
-                label: 'label',
-                text: {
-                  fontSizeRange: { minSize: 18, maxSize: 28 },
-                  fontWeight: 'bold',
-                  color: '{{theme.labelFontColor}}',
-                  fontFamily: '{{theme.labelFontName}}',
-                  textAlign: 'center',
-                },
-              },
-              {
-                type: 'text',
-                label: 'content',
-                text: {
-                  fontSizeRange: { minSize: 16, maxSize: 24 },
-                  color: '{{theme.fontColor}}',
-                  fontFamily: '{{theme.fontName}}',
-                  textAlign: 'center',
-                },
-              },
-            ],
+          border: {
+            color: '{{theme.borderColor}}',
+            width: '{{theme.card.borderWidth}}',
+            radius: '{{theme.card.borderRadius}}',
           },
+          children: [
+            {
+              type: 'text',
+              label: 'label',
+              text: {
+                fontSizeRange: { minSize: 18, maxSize: 28 },
+                fontWeight: 'bold',
+                color: '{{theme.labelFontColor}}',
+                fontFamily: '{{theme.labelFontName}}',
+                textAlign: 'center',
+              },
+            },
+            {
+              type: 'text',
+              label: 'content',
+              text: {
+                fontSizeRange: { minSize: 16, maxSize: 24 },
+                color: '{{theme.fontColor}}',
+                fontFamily: '{{theme.fontName}}',
+                textAlign: 'center',
+              },
+            },
+          ],
         },
       },
     },

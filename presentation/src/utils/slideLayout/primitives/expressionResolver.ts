@@ -6,13 +6,14 @@ import type {
   ExpressionContext,
   ResolvedBounds,
   ExpressionConstants,
+  WrapConfig,
 } from '@aiprimary/core/templates';
 import { DEFAULT_VIEWPORT } from './layoutConstants';
 
 /**
  * Evaluates an arithmetic expression string with context
  */
-function evaluateArithmetic(expr: string, context: ExpressionContext): number {
+export function evaluateArithmetic(expr: string, context: ExpressionContext): number {
   // Replace constants
   let evaluatedExpr = expr;
   for (const [key, value] of Object.entries(context.constants)) {
@@ -328,4 +329,74 @@ export function resolveTemplateBounds(
   }
 
   return resolvedContainers;
+}
+
+/**
+ * Resolves expression values in WrapConfig to actual numbers
+ */
+export function resolveWrapConfigExpressions(
+  wrapConfig: WrapConfig | undefined,
+  constants: ExpressionConstants
+): WrapConfig | undefined {
+  if (!wrapConfig || !wrapConfig.enabled) return wrapConfig;
+
+  const context: ExpressionContext = {
+    constants,
+    containers: {},
+    currentContainer: undefined,
+  };
+
+  const resolved: WrapConfig = { ...wrapConfig };
+
+  // Helper to resolve a single numeric field
+  const resolveNumeric = (value: number | ExpressionValue | undefined): number | undefined => {
+    if (value === undefined) return undefined;
+    if (typeof value === 'number') return value;
+
+    try {
+      // Expression is a string (e.g., 'MAX_ITEMS_PER_LINE' or 'SLIDE_WIDTH * 0.5')
+      return evaluateArithmetic(String(value), context);
+    } catch (error) {
+      console.warn(`Failed to evaluate expression in wrapConfig:`, error);
+      return undefined;
+    }
+  };
+
+  // Helper to resolve boolean field (simple constant lookup)
+  const resolveBoolean = (value: boolean | string): boolean => {
+    if (typeof value === 'boolean') return value;
+
+    try {
+      // For boolean expressions, do a direct constant lookup
+      const constantValue = context.constants[value];
+      return constantValue === true;
+    } catch (error) {
+      console.warn(`Failed to evaluate boolean expression in wrapConfig:`, error);
+      return true; // Default to enabled
+    }
+  };
+
+  // Resolve boolean field
+  resolved.enabled = resolveBoolean(wrapConfig.enabled);
+
+  // Resolve all numeric expression fields
+  resolved.maxItemsPerLine = resolveNumeric(wrapConfig.maxItemsPerLine);
+  resolved.lineSpacing = resolveNumeric(wrapConfig.lineSpacing);
+
+  if (wrapConfig.alternating) {
+    resolved.alternating = {
+      start: resolveNumeric(wrapConfig.alternating.start) ?? 0,
+      end: resolveNumeric(wrapConfig.alternating.end) ?? 0,
+    };
+  }
+
+  if (wrapConfig.pyramid) {
+    resolved.pyramid = {
+      ...wrapConfig.pyramid,
+      minWidth: resolveNumeric(wrapConfig.pyramid.minWidth),
+      maxWidth: resolveNumeric(wrapConfig.pyramid.maxWidth),
+    };
+  }
+
+  return resolved;
 }

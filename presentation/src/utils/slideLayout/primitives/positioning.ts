@@ -528,9 +528,10 @@ function calculatePyramidLayout(
   const levelHeight = (containerBounds[axis.secondary] - totalGap) / itemCount;
 
   // Calculate width range
-  const maxWidth = pyramidConfig.maxWidth || containerBounds[axis.primary];
+  // Note: maxWidth/minWidth are resolved to numbers before this function is called
+  const maxWidth = (pyramidConfig.maxWidth as number | undefined) || containerBounds[axis.primary];
   const widthRatio = pyramidConfig.widthRatio || 0.5; // Default: top is 50% of bottom
-  const minWidth = pyramidConfig.minWidth || maxWidth * widthRatio;
+  const minWidth = (pyramidConfig.minWidth as number | undefined) || maxWidth * widthRatio;
 
   // Calculate width increment per level
   // If inverted, swap min and max widths so pyramid is upside down
@@ -592,7 +593,8 @@ function calculateZigzagLayout(
 
   const axis = getAxisMapping(orientation);
   const itemBounds: Bounds[] = [];
-  const lineSpacing = wrapConfig.lineSpacing || 0;
+  // Note: lineSpacing is resolved to number before this function is called
+  const lineSpacing = (wrapConfig.lineSpacing as number | undefined) || 0;
 
   // Force 2 rows for zigzag
   const lineCount = 2;
@@ -697,10 +699,17 @@ function calculateWrapLayoutInternal(
   }
 
   // Wrap case: multi-line/column layout
-  const maxPerLine = wrapConfig.maxItemsPerLine || itemCount;
-  const distributions = distributeItems(itemCount, maxPerLine, wrapConfig.wrapDistribution || 'balanced');
+  // Note: maxItemsPerLine and lineSpacing are resolved to numbers before this function is called
+  const maxPerLine = (wrapConfig.maxItemsPerLine as number | undefined) || itemCount;
+  // Ensure maxPerLine is a valid positive number
+  const validMaxPerLine = !isNaN(maxPerLine) && maxPerLine > 0 ? Math.floor(maxPerLine) : itemCount;
+  const distributions = distributeItems(
+    itemCount,
+    validMaxPerLine,
+    wrapConfig.wrapDistribution || 'balanced'
+  );
   const lineCount = distributions.length;
-  const lineSpacing = wrapConfig.lineSpacing || 0;
+  const lineSpacing = (wrapConfig.lineSpacing as number | undefined) || 0;
 
   const axis = getAxisMapping(orientation);
   const itemBounds: Bounds[] = [];
@@ -716,9 +725,11 @@ function calculateWrapLayoutInternal(
     let lineStartOffset = 0;
 
     if (isAlternatingLine && wrapConfig.alternating) {
-      effectiveContainerSize =
-        containerBounds[axis.primary] - wrapConfig.alternating.start - wrapConfig.alternating.end;
-      lineStartOffset = wrapConfig.alternating.start;
+      // Note: alternating.start and alternating.end are resolved to numbers before this function is called
+      const altStart = wrapConfig.alternating.start as number;
+      const altEnd = wrapConfig.alternating.end as number;
+      effectiveContainerSize = containerBounds[axis.primary] - altStart - altEnd;
+      lineStartOffset = altStart;
     }
 
     // Calculate item primary size
@@ -827,7 +838,8 @@ function distributeItems(
 ): number[] {
   if (itemCount <= 0) return [];
   if (maxPerLine <= 0) {
-    console.warn('maxPerLine should be greater than 0');
+    console.warn('maxPerLine should be greater than 0, defaulting to all items in one line');
+    return [itemCount];
   }
   if (itemCount <= maxPerLine) return [itemCount];
 

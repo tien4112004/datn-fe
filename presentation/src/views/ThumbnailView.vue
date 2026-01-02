@@ -3,6 +3,15 @@
 </template>
 
 <script lang="ts" setup>
+/**
+ * @deprecated ThumbnailView is deprecated as of switching to image-based thumbnails.
+ * This component is kept for backwards compatibility with older Flutter WebView implementations.
+ *
+ * Migration: Use the ThumbnailSlide component directly or generate thumbnails as images.
+ *
+ * This view will be removed in a future version.
+ */
+
 import { ref, onMounted } from 'vue';
 import ThumbnailSlide from '@/views/components/ThumbnailSlide/index.vue';
 import type { Slide } from '@/types/slides';
@@ -28,6 +37,11 @@ const setSize = (size: number | 'auto') => {
 
 // Expose functions to window object for Flutter InAppWebView communication
 onMounted(() => {
+  // Deprecation warning
+  console.warn(
+    '[DEPRECATED] ThumbnailView is deprecated. Please migrate to image-based thumbnails or use ThumbnailSlide component directly. This view will be removed in a future version.'
+  );
+
   // Make functions available to Flutter InAppWebView
   (window as any).setSlideData = setSlideData;
   (window as any).setSlideIndex = setSlideIndex;

@@ -3,9 +3,9 @@ import { useSearchParams } from 'react-router-dom';
 import PresentationTable from '@/features/presentation/components/table/PresentationTable';
 import PresentationGrid from '@/features/presentation/components/table/PresentationGrid';
 import ProjectControls from '@/features/projects/components/ProjectControls';
-import ViewToggle, { type ViewMode } from '@/features/presentation/components/others/ViewToggle';
 import CommonTabs, { type TabItem } from '@/shared/components/common/CommonTabs';
 import MindmapTable from '@/features/mindmap/components/table/MindmapTable';
+import MindmapGrid from '@/features/mindmap/components/table/MindmapGrid';
 import type { ResourceType } from '@/shared/constants/resourceTypes';
 import Image from '@/features/image';
 
@@ -13,16 +13,8 @@ const ProjectListPage = () => {
   const { t } = useTranslation('projects');
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const viewMode = (searchParams.get('view') as ViewMode) || 'list';
+  const viewMode = searchParams.get('view') || 'list';
   const resourceType = searchParams.get('resource') || 'presentation';
-
-  const setViewMode = (mode: ViewMode) => {
-    setSearchParams((prev) => {
-      const newParams = new URLSearchParams(prev);
-      newParams.set('view', mode);
-      return newParams;
-    });
-  };
 
   const handleResourceChange = (value: string) => {
     setSearchParams((prev) => {
@@ -37,13 +29,7 @@ const ProjectListPage = () => {
       key: 'presentation',
       value: 'presentation',
       label: t('resources.presentation'),
-      // content: viewMode === 'list' ? <PresentationTable /> : <PresentationGrid />,
-      content: (
-        <>
-          <ViewToggle value={viewMode} onValueChange={setViewMode} />
-          {viewMode === 'list' ? <PresentationTable /> : <PresentationGrid />}
-        </>
-      ),
+      content: viewMode === 'grid' ? <PresentationGrid /> : <PresentationTable />,
     },
     {
       key: 'document',
@@ -61,7 +47,7 @@ const ProjectListPage = () => {
       key: 'mindmap',
       value: 'mindmap',
       label: t('resources.mindmap'),
-      content: <MindmapTable />,
+      content: viewMode === 'grid' ? <MindmapGrid /> : <MindmapTable />,
     },
     {
       key: 'image',

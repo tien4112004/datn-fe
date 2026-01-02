@@ -1,7 +1,7 @@
 import VueRemoteWrapper from '@/features/presentation/components/remote/VueRemoteWrapper';
 import GlobalSpinner from '@/shared/components/common/GlobalSpinner';
 import { useTranslation } from 'react-i18next';
-import { useLoaderData, useParams } from 'react-router-dom';
+import { useLoaderData, useParams, useNavigate, useLocation } from 'react-router-dom';
 import type { Presentation } from '../types';
 import { getSearchParamAsBoolean } from '@/shared/utils/searchParams';
 import {
@@ -16,12 +16,16 @@ import { SmallScreenDialog } from '@/shared/components/modals/SmallScreenDialog'
 import usePresentationStore from '../stores/usePresentationStore';
 import { CriticalError } from '@aiprimary/api';
 import { ERROR_TYPE } from '@/shared/constants';
+import { useEffect, useRef } from 'react';
 
 const DetailPage = () => {
   const { presentation } = useLoaderData() as { presentation: Presentation | null };
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const location = useLocation();
   const isGeneratingParam = getSearchParamAsBoolean('isGenerating', false) ?? false;
   const isViewModeParam = getSearchParamAsBoolean('view', false) ?? false;
+  const previousIsGenerating = useRef<boolean>(false);
 
   // Validate and initialize - all processing logic is now in Vue
   usePresentationValidation(id, presentation, isGeneratingParam);
@@ -30,6 +34,19 @@ const DetailPage = () => {
   useGeneratingStoreSync(); // Sync Vue events to store
   const isGenerating = usePresentationStore((state) => state.isGenerating); // Read from store
   const { request } = usePresentationStore();
+
+  // Remove isGenerating=true param from URL when generation completes
+  useEffect(() => {
+    if (previousIsGenerating.current && !isGenerating && isGeneratingParam) {
+      // Generation just completed, remove the isGenerating param from URL
+      const searchParams = new URLSearchParams(location.search);
+      searchParams.delete('isGenerating');
+      const newSearch = searchParams.toString();
+      const newPath = `${location.pathname}${newSearch ? `?${newSearch}` : ''}`;
+      navigate(newPath, { replace: true });
+    }
+    previousIsGenerating.current = isGenerating;
+  }, [isGenerating, isGeneratingParam, location.pathname, location.search, navigate]);
 
   // Additional runtime safety check
   if (!presentation && !isGeneratingParam) {
@@ -56,7 +73,7 @@ const DetailPage = () => {
         className="vue-remote"
         LoadingComponent={() => <GlobalSpinner text={t('presentation')} />}
       />
-      {isGenerating && <GlobalSpinner text={t('generatingPresentation')} />}
+      {isGenerating && <GlobalSpinner text={t('generatingPresentation')} lightBlur />}
       {!isGenerating && isSaving && <GlobalSpinner text={t('savingPresentation')} />}
       <UnsavedChangesDialog
         open={showDialog}

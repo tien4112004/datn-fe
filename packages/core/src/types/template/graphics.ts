@@ -61,7 +61,7 @@ export interface AlternatingTimeline {
   color?: string;
   thickness?: number;
   centralLineY?: number; // Y position of central line (auto-calculated if not provided)
-  branchLength?: number; // Length of vertical branches (defaults to 40)
+  branchLength?: number; // Length of branch lines connecting items to central line (defaults to 40)
 }
 
 /**

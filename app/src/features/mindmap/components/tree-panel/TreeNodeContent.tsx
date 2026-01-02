@@ -4,9 +4,10 @@ import type { MindMapNode } from '../../types';
 
 interface TreeNodeContentProps {
   node: MindMapNode;
+  onSelect?: () => void;
 }
 
-export const TreeNodeContent = ({ node }: TreeNodeContentProps) => {
+export const TreeNodeContent = ({ node, onSelect }: TreeNodeContentProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [content, setContent] = useState(node.data.content as string);
   const contentEditableRef = useRef<HTMLDivElement>(null);
@@ -40,11 +41,14 @@ export const TreeNodeContent = ({ node }: TreeNodeContentProps) => {
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
       if (e.key === 'Escape') {
+        e.stopPropagation();
         setContent(node.data.content as string);
         setIsEditing(false);
       }
       if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
+        e.stopPropagation();
+        setIsEditing(false);
         handleBlur();
       }
     },
@@ -60,7 +64,7 @@ export const TreeNodeContent = ({ node }: TreeNodeContentProps) => {
         onBlur={handleBlur}
         onInput={(e) => setContent(e.currentTarget.innerHTML)}
         onKeyDown={handleKeyDown}
-        className="min-w-0 flex-1 px-1 text-sm outline-none"
+        className="min-w-0 flex-1 px-1.5 text-sm outline-none"
       />
     );
   }
@@ -69,11 +73,12 @@ export const TreeNodeContent = ({ node }: TreeNodeContentProps) => {
     <div
       onClick={(e) => {
         e.stopPropagation();
-        setIsEditing(true);
+        onSelect?.(); // Select node first
+        setIsEditing(true); // Then enter edit mode
       }}
       dangerouslySetInnerHTML={{ __html: node.data.content as string }}
-      className="min-w-0 flex-1 cursor-text truncate px-1 text-sm"
-      title="Click to edit"
+      className="min-w-0 flex-1 cursor-text break-words px-1.5 text-sm leading-tight"
+      title={`${node.data.content as string} (Click to edit)`}
     />
   );
 };

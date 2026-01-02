@@ -271,6 +271,11 @@ export default class AdminRealApiService implements AdminApiService {
     return response.data;
   }
 
+  async deleteSlideTemplate(id: string): Promise<ApiResponse<void>> {
+    const response = await api.delete<ApiResponse<void>>(`${this.baseUrl}/api/slide-templates/${id}`);
+    return response.data;
+  }
+
   // Art Styles
   async getArtStyles(params?: PaginationParams): Promise<ApiResponse<ArtStyle[]>> {
     const response = await api.get<ApiResponse<ArtStyle[]>>(`${this.baseUrl}/api/art-styles`, {

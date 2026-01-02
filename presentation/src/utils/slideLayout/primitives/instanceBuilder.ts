@@ -6,9 +6,11 @@ import {
   fromBorderConfigToInstance,
   fromShadowConfigToInstance,
   type SlideLayoutBlockInstance,
+  type ExpressionConstants,
 } from '@aiprimary/core/templates';
 import { DEFAULT_WRAP_CONFIG } from './layoutConstants';
 import { calculateWrapLayout, getChildrenMaxBounds } from './positioning';
+import { resolveWrapConfigExpressions } from './expressionResolver';
 
 /**
  * Expands a childTemplate into N child instances with calculated bounds.
@@ -28,7 +30,8 @@ import { calculateWrapLayout, getChildrenMaxBounds } from './positioning';
 export function buildChildrenFromChildTemplate(
   templateContainer: LayoutBlockConfig,
   parentBounds: Bounds,
-  data: any[]
+  data: any[],
+  constants?: ExpressionConstants
 ): SlideLayoutBlockInstance[] {
   if (!templateContainer.childTemplate) return [];
 
@@ -42,7 +45,10 @@ export function buildChildrenFromChildTemplate(
   }
 
   // Calculate bounds using wrap layout
-  const wrapConfig = childTemplate.wrap;
+  // Evaluate wrapConfig expressions if constants are available
+  const wrapConfig = constants
+    ? resolveWrapConfigExpressions(childTemplate.wrap, constants)
+    : childTemplate.wrap;
 
   const wrapLayout = calculateWrapLayout(parentBounds, {
     itemCount: count,
@@ -64,7 +70,8 @@ export function buildChildrenFromChildTemplate(
       childTemplate.structure,
       wrapLayout.itemBounds[i],
       itemData ? [itemData] : undefined, // Wrap in array for nested templates
-      shouldReverseChildren
+      shouldReverseChildren,
+      constants
     );
     children.push(instance);
   }
@@ -91,7 +98,8 @@ export function buildInstanceWithBounds(
   config: SlideLayoutBlockConfig,
   bounds: Bounds,
   data?: any[],
-  reverseChildren?: boolean
+  reverseChildren?: boolean,
+  constants?: ExpressionConstants
 ): SlideLayoutBlockInstance {
   // Create base instance with assigned bounds
   const instance: SlideLayoutBlockInstance = {
@@ -134,14 +142,14 @@ export function buildInstanceWithBounds(
 
     // Pass same data to all static children
     instance.children = childrenToProcess.map((childConfig, index) =>
-      buildInstanceWithBounds(childConfig, boundsToUse[index], data)
+      buildInstanceWithBounds(childConfig, boundsToUse[index], data, false, constants)
     );
 
     // Store flag for later repositioning
     instance.childrenReversed = reverseChildren;
   } else if (config.childTemplate) {
     // Dynamic children from template - expand with data mapping
-    instance.children = buildChildrenFromChildTemplate(config, bounds, data || []);
+    instance.children = buildChildrenFromChildTemplate(config, bounds, data || [], constants);
   }
 
   return instance;

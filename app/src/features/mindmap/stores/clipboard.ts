@@ -243,7 +243,7 @@ export const useClipboardStore = create<ClipboardState>()(
           y: mousePosition.y,
         });
 
-        const { nodes: aiNodes, edges: aiEdges } = convertAiDataToMindMapNodes(
+        const { nodes: aiNodes, edges: aiEdges } = await convertAiDataToMindMapNodes(
           parsedData,
           {
             x: basePosition.x + offset,

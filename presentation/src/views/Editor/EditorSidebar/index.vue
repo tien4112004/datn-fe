@@ -64,6 +64,15 @@ const {
 const { currentSlide } = storeToRefs(slidesStore);
 const { isCurrentSlideLocked } = useSlideEditLock();
 
+// Helper to filter tabs based on slide lock state
+const filterTabsByLockState = (tabs: TabConfig[], isLocked: boolean): TabConfig[] => {
+  if (!isLocked) return tabs;
+
+  const hiddenTabsWhenLocked = [ToolbarStates.EL_ANIMATION, ToolbarStates.IMAGE_LIBRARY];
+
+  return tabs.filter((tab) => !hiddenTabsWhenLocked.includes(tab.key));
+};
+
 // Tab configuration for element editing
 const elementTabs = computed<TabConfig[]>(() => {
   const tabs: TabConfig[] = [
@@ -103,7 +112,7 @@ const elementTabs = computed<TabConfig[]>(() => {
     });
   }
 
-  return tabs;
+  return filterTabsByLockState(tabs, isCurrentSlideLocked.value);
 });
 
 // Tab configuration for slide editing
@@ -151,7 +160,7 @@ const slideTabs = computed<TabConfig[]>(() => {
     });
   }
 
-  return tabs;
+  return filterTabsByLockState(tabs, isCurrentSlideLocked.value);
 });
 
 // Tab configuration for multi-select

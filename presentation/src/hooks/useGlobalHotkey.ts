@@ -188,6 +188,12 @@ export default (saveFn?: () => Promise<void>) => {
       resetCanvas();
       return;
     }
+    if (ctrlOrMetaKeyActive && key === KEYS.S) {
+      if (disableHotkeys.value) return;
+      e.preventDefault();
+      savePresentation();
+      return;
+    }
 
     if (!editorAreaFocus.value && !thumbnailsFocus.value) return;
 
@@ -220,11 +226,6 @@ export default (saveFn?: () => Promise<void>) => {
       if (disableHotkeys.value) return;
       e.preventDefault();
       selectAll();
-    }
-    if (ctrlOrMetaKeyActive && key === KEYS.S) {
-      if (disableHotkeys.value) return;
-      e.preventDefault();
-      savePresentation();
     }
     if (ctrlOrMetaKeyActive && key === KEYS.L) {
       if (disableHotkeys.value) return;

@@ -75,10 +75,10 @@ export default class ClassRealApiService implements ClassApiService {
   }
 
   async getSeatingChart(classId: string): Promise<Layout | null> {
-    const response = await api.get<ApiResponse<Layout>>(
+    const response = await api.get<ApiResponse<Layout | null>>(
       `${this.baseUrl}/api/classes/${classId}/seating-chart`
     );
-    return response.data.data;
+    return response.data.data ?? null;
   }
 
   async saveSeatingChart(classId: string, layout: Layout): Promise<Layout> {

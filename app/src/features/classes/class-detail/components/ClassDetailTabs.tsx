@@ -1,11 +1,11 @@
 import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Target, Users, Settings, MessageSquare, BookOpen, GraduationCap, Calendar } from 'lucide-react';
+import { Users, Settings, MessageSquare, BookOpen, GraduationCap, Calendar, Edit } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { getGradeLabel } from '../../shared/utils/grades';
 
-import { ClassOverview } from './ClassOverview';
 import { ClassStudentView } from '../../class-student';
 import { ClassSettings } from './ClassSettings';
 import { FeedTab } from '../../class-feed/components';
@@ -20,7 +20,6 @@ interface ClassDetailTabsProps {
 }
 
 const tabs = [
-  { value: 'overview', icon: Target, labelKey: 'tabs.overview' },
   { value: 'feed', icon: MessageSquare, labelKey: 'tabs.feed' },
   { value: 'students', icon: Users, labelKey: 'tabs.students' },
   { value: 'lessons', icon: BookOpen, labelKey: 'tabs.lessons' },
@@ -31,7 +30,7 @@ export const ClassDetailTabs = ({ classId, currentClass, onEditClick }: ClassDet
   const { t } = useTranslation('classes', { keyPrefix: 'detail' });
 
   const [searchParams, setSearchParams] = useSearchParams();
-  const currentTab = (searchParams.get('tab') || 'overview') as ClassTabs;
+  const currentTab = (searchParams.get('tab') || 'feed') as ClassTabs;
 
   const handleTabChange = (tab: ClassTabs) => {
     setSearchParams({ tab }, { replace: true });
@@ -44,11 +43,19 @@ export const ClassDetailTabs = ({ classId, currentClass, onEditClick }: ClassDet
         {/* Class Information Section */}
         <div className="space-y-4 border-b p-6">
           {/* Title and Status */}
-          <div className="space-y-2">
-            <h1 className="text-2xl font-bold tracking-tight">{currentClass.name}</h1>
-            <Badge variant={currentClass.isActive ? 'default' : 'secondary'}>
-              {currentClass.isActive ? t('status.active') : t('status.inactive')}
-            </Badge>
+          <div className="flex justify-between gap-4">
+            <div className="space-y-2">
+              <h1 className="text-2xl font-bold tracking-tight">{currentClass.name}</h1>
+              <Badge variant={currentClass.isActive ? 'default' : 'secondary'}>
+                {currentClass.isActive ? t('status.active') : t('status.inactive')}
+              </Badge>
+            </div>
+
+            {/* Edit Button */}
+            <Button onClick={() => onEditClick(currentClass)} variant="outline" size="sm">
+              <Edit className="mr-2 h-4 w-4" />
+              {t('actions.edit')}
+            </Button>
           </div>
 
           {/* Metadata */}
@@ -79,6 +86,14 @@ export const ClassDetailTabs = ({ classId, currentClass, onEditClick }: ClassDet
           {currentClass.description && (
             <p className="text-muted-foreground text-sm leading-relaxed">{currentClass.description}</p>
           )}
+
+          {/* Grade and academic year */}
+          {currentClass.settings?.grade && currentClass.settings?.academicYear && (
+            <div className="flex gap-2">
+              <Badge>{getGradeLabel(currentClass.settings.grade)}</Badge>
+              <Badge>{currentClass.settings.academicYear}</Badge>
+            </div>
+          )}
         </div>
 
         {/* Navigation Tabs */}
@@ -108,12 +123,6 @@ export const ClassDetailTabs = ({ classId, currentClass, onEditClick }: ClassDet
 
       {/* Content Area - Scrollable */}
       <main className="flex-1 overflow-y-auto">
-        {currentTab === 'overview' && (
-          <div className="p-6">
-            <ClassOverview classData={currentClass} onEditClick={onEditClick} />
-          </div>
-        )}
-
         {currentTab === 'feed' && <FeedTab classId={classId} />}
 
         {currentTab === 'students' && (

@@ -110,6 +110,10 @@ export default {
       settings: 'Cài đặt',
     },
     overview: {
+      welcome: 'Chào mừng',
+      welcomeSubtitle: 'Tổng quan về {{className}}',
+      about: 'Về lớp học này',
+      quickStatsPlaceholder: 'Thống kê nhanh và hoạt động gần đây sẽ được hiển thị ở đây.',
       basicInfo: 'Thông tin cơ bản',
       subtitle: 'Xem và quản lý chi tiết lớp học',
       className: 'Tên lớp',

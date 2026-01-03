@@ -160,13 +160,13 @@ export const ClassForm = ({ initialData, onSubmit, isEditMode = false }: ClassFo
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="grade" className="text-sm font-medium">
-              {t('grade')} <span className="text-destructive">*</span>
+              {t('grade')}
             </Label>
             <Input
               type="number"
               name="grade"
               id="grade"
-              value={formData.grade}
+              value={formData.grade || ''}
               onChange={handleChange}
               disabled={isLoading}
               placeholder={t('gradePlaceholder')}
@@ -183,13 +183,13 @@ export const ClassForm = ({ initialData, onSubmit, isEditMode = false }: ClassFo
 
           <div className="space-y-2">
             <Label htmlFor="academicYear" className="text-sm font-medium">
-              {t('academicYear')} <span className="text-destructive">*</span>
+              {t('academicYear')}
             </Label>
             <Input
               type="text"
               name="academicYear"
               id="academicYear"
-              value={formData.academicYear}
+              value={formData.academicYear || ''}
               onChange={handleChange}
               disabled={isLoading}
               placeholder={t('academicYearPlaceholder')}

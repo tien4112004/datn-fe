@@ -3,13 +3,13 @@ export interface Post {
   id: string;
   classId: string;
   authorId: string;
-  authorName: string;
-  authorAvatar?: string;
-  type: 'announcement' | 'post' | 'assignment';
+  type: 'announcement' | 'general' | 'schedule_event';
   content: string;
-  attachments?: Attachment[];
-  deadline?: Date; // Only for assignments
+  attachments?: string[]; // Array of URLs from backend
+  linkedResourceIds?: string[];
+  linkedLessonId?: string;
   isPinned: boolean;
+  allowComments?: boolean;
   commentCount: number;
   createdAt: Date;
   updatedAt: Date;
@@ -19,20 +19,8 @@ export interface Post {
 export interface Comment {
   id: string;
   postId: string;
-  authorId: string;
-  authorName: string;
-  authorAvatar?: string;
+  userId: string;
   content: string;
   createdAt: Date;
   updatedAt: Date;
-}
-
-// File Attachment
-export interface Attachment {
-  id: string;
-  fileName: string;
-  fileType: string; // MIME type
-  fileSize: number;
-  url: string;
-  uploadedAt: Date;
 }

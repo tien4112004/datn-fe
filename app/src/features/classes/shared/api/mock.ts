@@ -10,7 +10,6 @@ import {
   type StudentUpdateRequest,
   type DailySchedule,
   type SchedulePeriod,
-  type MinimalSchedulePeriod,
   type ScheduleCollectionRequest,
   type Lesson,
   type LessonCollectionRequest,
@@ -138,11 +137,11 @@ export default class ClassMockApiService implements ClassApiService {
     }
 
     if (request.grade !== undefined) {
-      filteredClasses = filteredClasses.filter((cls) => cls.grade === request.grade);
+      filteredClasses = filteredClasses.filter((cls) => cls.settings?.grade === request.grade);
     }
 
     if (request.academicYear) {
-      filteredClasses = filteredClasses.filter((cls) => cls.academicYear === request.academicYear);
+      filteredClasses = filteredClasses.filter((cls) => cls.settings?.academicYear === request.academicYear);
     }
 
     if (request.isActive !== undefined) {
@@ -199,17 +198,29 @@ export default class ClassMockApiService implements ClassApiService {
   async createClass(data: ClassCreateRequest): Promise<Class> {
     await this._delay();
 
+    // Parse settings from JSON string if needed
+    let parsedSettings = null;
+    if (data.settings && typeof data.settings === 'string') {
+      try {
+        parsedSettings = JSON.parse(data.settings);
+      } catch (error) {
+        console.error('Failed to parse settings:', error);
+      }
+    } else if (data.settings) {
+      parsedSettings = data.settings;
+    }
+
     const newClass: Class = {
       id: Date.now().toString(),
       ...data,
       ownerId: '1',
       teacherId: '1',
-      currentEnrollment: 0,
       students: [],
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       isActive: true,
       name: data.name,
+      settings: parsedSettings,
     };
 
     this.classes.push(newClass);
@@ -224,9 +235,14 @@ export default class ClassMockApiService implements ClassApiService {
       throw new Error('Class not found');
     }
 
-    const updatedClass = {
+    const updatedClass: Class = {
       ...this.classes[index],
-      ...data,
+      ...(data.name !== undefined && data.name !== null && { name: data.name }),
+      ...(data.description !== undefined && { description: data.description }),
+      ...(data.settings !== undefined && {
+        settings: typeof data.settings === 'string' ? JSON.parse(data.settings) : data.settings,
+      }),
+      ...(data.isActive !== undefined && { isActive: data.isActive }),
       updatedAt: new Date().toISOString(),
     };
 
@@ -243,7 +259,7 @@ export default class ClassMockApiService implements ClassApiService {
     }
 
     // Check if class has students
-    if ((this.classes[index].currentEnrollment || 0) > 0) {
+    if (this.students.filter((s) => s.classId === id).length > 0) {
       throw new Error('Cannot delete class with enrolled students');
     }
 
@@ -253,6 +269,12 @@ export default class ClassMockApiService implements ClassApiService {
   async getStudentsByClassId(classId: string): Promise<Student[]> {
     await this._delay();
     return this.students.filter((student) => student.classId === classId);
+  }
+
+  async getStudentById(studentId: string): Promise<Student | null> {
+    await this._delay();
+    const student = this.students.find((s) => s.id === studentId);
+    return student || null;
   }
 
   async enrollStudent(request: StudentEnrollmentRequest): Promise<Student> {
@@ -275,11 +297,9 @@ export default class ClassMockApiService implements ClassApiService {
     // Update student
     student.classId = request.classId;
     student.enrollmentDate = request.enrollmentDate || new Date().toISOString().split('T')[0];
-    student.status = 'active';
     student.updatedAt = new Date().toISOString();
 
-    // Update class enrollment count
-    cls.currentEnrollment = (cls.currentEnrollment || 0) + 1;
+    // Update class timestamp
     cls.updatedAt = new Date().toISOString();
 
     return student;
@@ -298,10 +318,7 @@ export default class ClassMockApiService implements ClassApiService {
       throw new Error('Student not found in this class');
     }
 
-    // Update class enrollment count
-    if (cls.currentEnrollment !== undefined) {
-      cls.currentEnrollment = Math.max(0, cls.currentEnrollment - 1);
-    }
+    // Update class timestamp
     cls.updatedAt = new Date().toISOString();
 
     // Remove student from students array (in real system, might just update status)
@@ -331,15 +348,13 @@ export default class ClassMockApiService implements ClassApiService {
       phoneNumber: data.phoneNumber,
       avatarUrl: data.avatarUrl,
       enrollmentDate: new Date().toISOString(),
-      status: 'active',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
 
     this.students.push(newStudent);
 
-    // Update class enrollment count
-    cls.currentEnrollment = (cls.currentEnrollment || 0) + 1;
+    // Update class timestamp
     cls.updatedAt = new Date().toISOString();
 
     return newStudent;
@@ -377,10 +392,9 @@ export default class ClassMockApiService implements ClassApiService {
 
     const student = this.students[studentIndex];
 
-    // Update class enrollment count
+    // Update class timestamp
     const cls = this.classes.find((c) => c.id === student.classId);
-    if (cls && cls.currentEnrollment !== undefined) {
-      cls.currentEnrollment = Math.max(0, cls.currentEnrollment - 1);
+    if (cls) {
       cls.updatedAt = new Date().toISOString();
     }
 
@@ -573,7 +587,7 @@ export default class ClassMockApiService implements ClassApiService {
     if (data.status !== undefined) lesson.status = data.status;
     if (data.lessonPlan !== undefined) {
       lesson.lessonPlan = data.lessonPlan;
-      lesson.notes = data.lessonPlan; // Keep legacy field in sync
+      lesson.notes = data.lessonPlan ?? undefined; // Keep legacy field in sync
     }
     if (data.maxPoints !== undefined) lesson.maxPoints = data.maxPoints;
     if (data.dueDate !== undefined) lesson.dueDate = data.dueDate;
@@ -595,6 +609,17 @@ export default class ClassMockApiService implements ClassApiService {
 
     lesson.updatedAt = new Date().toISOString();
     return lesson;
+  }
+
+  async deleteLesson(id: string): Promise<void> {
+    await this._delay();
+
+    const lessonIndex = this.lessons.findIndex((lp) => lp.id === id);
+    if (lessonIndex === -1) {
+      throw new Error('Lesson not found');
+    }
+
+    this.lessons.splice(lessonIndex, 1);
   }
 
   // Schedule mutations

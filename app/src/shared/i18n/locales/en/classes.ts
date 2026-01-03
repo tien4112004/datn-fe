@@ -687,7 +687,6 @@ export default {
     loadingRoster: 'Loading roster...',
     studentCount: '{{count}} student',
     studentCount_other: '{{count}} students',
-    searchPlaceholder: 'Search students...',
     filterByStatus: 'Filter by status',
     allStatuses: 'All statuses',
 
@@ -875,6 +874,8 @@ export default {
       rowNumber: 'Row number',
       fullName: 'Full Name',
       dateOfBirth: 'Date of Birth',
+      gender: 'Gender',
+      address: 'Address',
       phone: 'Phone',
       parentGuardian: 'Parent/Guardian',
       missing: 'Missing',
@@ -1062,6 +1063,8 @@ export default {
       filters: {
         all: 'All',
         announcements: 'Announcements',
+        general: 'General',
+        schedule_event: 'Schedule Events',
         posts: 'Posts',
         assignments: 'Assignments',
       },
@@ -1094,6 +1097,8 @@ export default {
       postType: {
         post: 'Post',
         announcement: 'Announcement',
+        general: 'General',
+        schedule_event: 'Schedule Event',
         assignment: 'Assignment',
       },
     },
@@ -1114,6 +1119,7 @@ export default {
       badges: {
         pinned: 'Pinned',
         announcement: 'Announcement',
+        schedule_event: 'Schedule Event',
         assignment: 'Assignment',
         dueDate: 'Due',
       },

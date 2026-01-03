@@ -13,7 +13,6 @@ export interface Student {
   enrollmentDate?: string | null;
   address?: string | null;
   parentContactEmail?: string | null;
-  status?: StudentStatus | null;
   createdAt?: string | null;
   updatedAt?: string | null;
 
@@ -34,5 +33,4 @@ export interface Student {
   classId?: string; // Context-dependent (deprecated)
 }
 
-export type StudentStatus = 'active' | 'transferred' | 'graduated' | 'dropped';
 export type StudentGender = 'male' | 'female' | 'other';

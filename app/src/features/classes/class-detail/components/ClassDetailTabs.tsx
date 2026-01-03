@@ -53,24 +53,24 @@ export const ClassDetailTabs = ({ classId, currentClass, onEditClick }: ClassDet
 
           {/* Metadata */}
           <div className="text-muted-foreground space-y-2 text-sm">
-            {currentClass.grade && (
+            {currentClass.settings?.grade && (
               <div className="flex items-center gap-2">
                 <GraduationCap className="h-4 w-4" />
-                <span>{getGradeLabel(currentClass.grade || currentClass.settings?.grade || 1)}</span>
+                <span>{getGradeLabel(currentClass.settings.grade)}</span>
               </div>
             )}
 
-            {currentClass.academicYear && (
+            {currentClass.settings?.academicYear && (
               <div className="flex items-center gap-2">
                 <Calendar className="h-4 w-4" />
-                <span>{currentClass.academicYear}</span>
+                <span>{currentClass.settings.academicYear}</span>
               </div>
             )}
 
-            {currentClass.class && (
+            {currentClass.settings?.class && (
               <div className="flex items-center gap-2">
                 <span className="font-medium">Room:</span>
-                <span>{currentClass.class}</span>
+                <span>{currentClass.settings.class}</span>
               </div>
             )}
           </div>

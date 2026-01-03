@@ -1,12 +1,9 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { type ColumnDef, flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import { Button } from '@ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@ui/table';
-import { Badge } from '@ui/badge';
-import { Input } from '@ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@ui/select';
-import { Pencil, Trash2, Search, X } from 'lucide-react';
+import { Pencil, Trash2 } from 'lucide-react';
 import type { Student } from '../../types';
 import { StudentFormDialog } from './StudentFormDialog';
 import { StudentDeleteConfirmation } from './StudentDeleteConfirmation';
@@ -25,31 +22,12 @@ export const StudentListView = ({ students, classId, isLoading = false }: Studen
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [editingStudent, setEditingStudent] = useState<Student | null>(null);
   const [dialogMode, setDialogMode] = useState<StudentFormMode>('create');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
 
   // Delete confirmation dialog state
   const deleteConfirmation = useConfirmDialog<Student>();
 
   // Get mutations
   const { deleteStudent, isDeleting } = useStudentMutations(classId);
-
-  // Filter and search students
-  const filteredStudents = useMemo(() => {
-    return students.filter((student) => {
-      const matchesSearch =
-        !searchQuery || (student.fullName?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false);
-      const matchesStatus = statusFilter === 'all' || student.status === statusFilter;
-      return matchesSearch && matchesStatus;
-    });
-  }, [students, searchQuery, statusFilter]);
-
-  const handleClearFilters = () => {
-    setSearchQuery('');
-    setStatusFilter('all');
-  };
-
-  const hasActiveFilters = searchQuery !== '' || statusFilter !== 'all';
 
   const handleEdit = (student: Student) => {
     setEditingStudent(student);
@@ -89,29 +67,43 @@ export const StudentListView = ({ students, classId, isLoading = false }: Studen
       cell: ({ row }) => <div className="font-medium">{row.getValue('fullName')}</div>,
     },
     {
-      accessorKey: 'status',
-      header: t('table.status'),
+      accessorKey: 'dateOfBirth',
+      header: t('form.dateOfBirth'),
       cell: ({ row }) => {
-        const status = row.getValue('status') as string;
-        const statusColors = {
-          active: 'bg-green-100 text-green-800',
-          transferred: 'bg-blue-100 text-blue-800',
-          graduated: 'bg-purple-100 text-purple-800',
-          dropped: 'bg-gray-100 text-gray-800',
-        };
-
-        const statusLabels = {
-          active: t('table.statusActive'),
-          transferred: t('table.statusTransferred'),
-          graduated: t('table.statusGraduated'),
-          dropped: t('table.statusDropped'),
-        };
-
-        return (
-          <Badge className={statusColors[status as keyof typeof statusColors] || ''}>
-            {statusLabels[status as keyof typeof statusLabels] || status}
-          </Badge>
-        );
+        const dateOfBirth = row.getValue('dateOfBirth') as string | null | undefined;
+        return <div className="text-sm">{dateOfBirth || '-'}</div>;
+      },
+    },
+    {
+      accessorKey: 'gender',
+      header: t('form.gender'),
+      cell: ({ row }) => {
+        const gender = row.getValue('gender') as string | null | undefined;
+        return <div className="text-sm capitalize">{gender || '-'}</div>;
+      },
+    },
+    {
+      accessorKey: 'parentName',
+      header: 'Parent Name',
+      cell: ({ row }) => {
+        const parentName = row.getValue('parentName') as string | null | undefined;
+        return <div className="text-sm">{parentName || '-'}</div>;
+      },
+    },
+    {
+      accessorKey: 'parentPhone',
+      header: 'Parent Phone',
+      cell: ({ row }) => {
+        const parentPhone = row.getValue('parentPhone') as string | null | undefined;
+        return <div className="text-sm">{parentPhone || '-'}</div>;
+      },
+    },
+    {
+      accessorKey: 'parentContactEmail',
+      header: 'Parent Email',
+      cell: ({ row }) => {
+        const email = row.getValue('parentContactEmail') as string | null | undefined;
+        return <div className="max-w-xs truncate text-sm">{email || '-'}</div>;
       },
     },
     {
@@ -146,7 +138,7 @@ export const StudentListView = ({ students, classId, isLoading = false }: Studen
   ];
 
   const table = useReactTable({
-    data: filteredStudents,
+    data: students,
     columns,
     getCoreRowModel: getCoreRowModel(),
   });
@@ -164,10 +156,7 @@ export const StudentListView = ({ students, classId, isLoading = false }: Studen
       {/* Header with Add button */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="text-muted-foreground text-sm">
-            {t('studentCount', { count: students.length })}
-            {hasActiveFilters && <span className="ml-2">({filteredStudents.length} filtered)</span>}
-          </p>
+          <p className="text-muted-foreground text-sm">{t('studentCount', { count: students.length })}</p>
         </div>
         <div className="flex items-center gap-2">
           <CsvImportButton classId={classId} />
@@ -175,49 +164,11 @@ export const StudentListView = ({ students, classId, isLoading = false }: Studen
         </div>
       </div>
 
-      {/* Search and Filter */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-        <div className="relative flex-1">
-          <Search className="text-muted-foreground absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" />
-          <Input
-            placeholder={t('searchPlaceholder') || 'Search students...'}
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9"
-          />
-        </div>
-        <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-full sm:w-[180px]">
-            <SelectValue placeholder={t('filterByStatus') || 'Filter by status'} />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">{t('allStatuses') || 'All statuses'}</SelectItem>
-            <SelectItem value="active">{t('table.statusActive')}</SelectItem>
-            <SelectItem value="transferred">{t('table.statusTransferred')}</SelectItem>
-            <SelectItem value="graduated">{t('table.statusGraduated')}</SelectItem>
-            <SelectItem value="dropped">{t('table.statusDropped')}</SelectItem>
-          </SelectContent>
-        </Select>
-        {hasActiveFilters && (
-          <Button variant="ghost" size="sm" onClick={handleClearFilters} className="gap-1.5">
-            <X className="h-4 w-4" />
-            Clear
-          </Button>
-        )}
-      </div>
-
       {/* Table */}
       {students.length === 0 ? (
         <div className="flex h-64 flex-col items-center justify-center rounded-lg border">
           <p className="text-muted-foreground mb-4">{t('noStudents')}</p>
           <Button onClick={handleOpenAddDialog}>{t('addFirstStudent')}</Button>
-        </div>
-      ) : filteredStudents.length === 0 ? (
-        <div className="flex h-64 flex-col items-center justify-center rounded-lg border">
-          <p className="text-muted-foreground mb-4">No students match your filters</p>
-          <Button variant="outline" size="sm" onClick={handleClearFilters}>
-            Clear filters
-          </Button>
         </div>
       ) : (
         <div className="rounded-md border">

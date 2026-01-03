@@ -94,19 +94,16 @@ export function useStudentMutations(classId: string) {
    */
   const createStudent = useMutation({
     mutationFn: async (data: StudentFormData): Promise<Student> => {
-      // Split fullName into firstName and lastName
-      const nameParts = data.fullName.trim().split(/\s+/);
-      const firstName = nameParts[0] || '';
-      const lastName = nameParts.slice(1).join(' ') || firstName;
-
       const request: StudentCreateRequest = {
-        firstName,
-        lastName,
-        email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}@student.temp`.replace(/\s+/g, ''),
-        phoneNumber: data.parentPhone || null,
-        address: data.address || null,
-        parentContactEmail: null,
-        avatarUrl: null,
+        fullName: data.fullName,
+        dateOfBirth: data.dateOfBirth || undefined,
+        gender: data.gender || undefined,
+        address: data.address || undefined,
+        parentName: data.parentName || '',
+        parentPhone: data.parentPhone || '',
+        parentContactEmail: undefined,
+        classId: classId,
+        enrollmentDate: undefined,
       };
 
       return await classApiService.createStudent(classId, request);

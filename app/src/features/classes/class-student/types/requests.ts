@@ -11,7 +11,6 @@
 export interface StudentCollectionRequest {
   classId?: string;
   grade?: number;
-  status?: string;
   search?: string;
   page?: number;
   pageSize?: number;
@@ -24,13 +23,15 @@ export interface StudentCollectionRequest {
  * Matches backend schema exactly
  */
 export interface StudentCreateRequest {
-  firstName: string;
-  lastName: string;
-  email: string;
-  phoneNumber?: string | null;
-  avatarUrl?: string | null;
-  address?: string | null;
-  parentContactEmail?: string | null;
+  fullName: string;
+  dateOfBirth?: string;
+  gender?: string;
+  address?: string;
+  parentName: string;
+  parentPhone: string;
+  parentContactEmail?: string;
+  classId: string;
+  enrollmentDate?: string;
 }
 
 /**
@@ -46,7 +47,6 @@ export interface StudentUpdateRequest {
   address?: string | null;
   parentContactEmail?: string | null;
   avatarUrl?: string | null;
-  status?: 'active' | 'transferred' | 'graduated' | 'dropped' | null;
 }
 
 /**
@@ -55,7 +55,6 @@ export interface StudentUpdateRequest {
  */
 export interface StudentFilterOptions {
   classId?: string;
-  status?: string;
   search?: string;
   grade?: number;
 }

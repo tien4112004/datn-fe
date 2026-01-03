@@ -50,15 +50,15 @@ export const ClassDetailHeader = ({ currentClass }: ClassDetailHeaderProps) => {
 
           {/* Metadata */}
           <div className="text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
-            <span className="font-medium">
-              {getGradeLabel(currentClass.grade || currentClass.settings?.grade || 1)}
-            </span>
+            {currentClass.settings?.grade && (
+              <span className="font-medium">{getGradeLabel(currentClass.settings.grade)}</span>
+            )}
             <span className="bg-muted-foreground/30 inline-block h-1 w-1 rounded-full"></span>
-            <span>{currentClass.academicYear}</span>
-            {currentClass.class && (
+            {currentClass.settings?.academicYear && <span>{currentClass.settings.academicYear}</span>}
+            {currentClass.settings?.class && (
               <>
                 <span className="bg-muted-foreground/30 inline-block h-1 w-1 rounded-full"></span>
-                <span>{currentClass.class}</span>
+                <span>{currentClass.settings.class}</span>
               </>
             )}
           </div>

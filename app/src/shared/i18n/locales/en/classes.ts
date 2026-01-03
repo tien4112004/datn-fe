@@ -117,6 +117,10 @@ export default {
       settings: 'Settings',
     },
     overview: {
+      welcome: 'Welcome',
+      welcomeSubtitle: 'Overview of {{className}}',
+      about: 'About This Class',
+      quickStatsPlaceholder: 'Quick stats and recent activity will be displayed here.',
       basicInfo: 'Basic Information',
       subtitle: 'View and manage class details',
       className: 'Class Name',

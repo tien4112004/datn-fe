@@ -6,8 +6,10 @@ import { cn } from '@/shared/lib/utils';
 import { Button } from './button';
 import { ScrollArea } from './scroll-area';
 
-export interface TimeInputProps
-  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'value' | 'onChange'> {
+export interface TimeInputProps extends Omit<
+  React.InputHTMLAttributes<HTMLInputElement>,
+  'value' | 'onChange'
+> {
   value?: string;
   onChange?: (time: string) => void;
 }

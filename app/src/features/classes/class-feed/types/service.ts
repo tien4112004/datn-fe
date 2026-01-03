@@ -19,6 +19,5 @@ export interface ClassFeedApiService extends Service {
   // Comments
   getComments(postId: string): Promise<Comment[]>;
   createComment(request: CommentCreateRequest): Promise<Comment>;
-  updateComment(commentId: string, content: string): Promise<Comment>;
   deleteComment(commentId: string): Promise<void>;
 }

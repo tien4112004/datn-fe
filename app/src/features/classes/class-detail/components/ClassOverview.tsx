@@ -39,18 +39,18 @@ export const ClassOverview = ({ classData, onEditClick }: ClassOverviewProps) =>
 
           <div className="space-y-2">
             <label className="text-muted-foreground text-sm font-medium">{t('overview.grade')}</label>
-            <p className="text-sm">{getGradeLabel(classData.grade || classData.settings?.grade || 1)}</p>
+            <p className="text-sm">{getGradeLabel(classData.settings?.grade || 1)}</p>
           </div>
 
           <div className="space-y-2">
             <label className="text-muted-foreground text-sm font-medium">{t('academicYear')}</label>
-            <p className="text-sm">{classData.academicYear}</p>
+            <p className="text-sm">{classData.settings?.academicYear || 'N/A'}</p>
           </div>
 
-          {classData.class && (
+          {classData.settings?.class && (
             <div className="space-y-2">
               <label className="text-muted-foreground text-sm font-medium">{t('class')}</label>
-              <p className="text-sm">{classData.class}</p>
+              <p className="text-sm">{classData.settings.class}</p>
             </div>
           )}
 

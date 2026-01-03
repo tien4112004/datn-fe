@@ -8,7 +8,7 @@ import type {
   PostListResponse,
   FeedFilter,
 } from '../types';
-import { API_MODE, type ApiMode } from '@/shared/constants';
+import { API_MODE, type ApiMode } from '@aiprimary/api';
 import { api } from '@aiprimary/api';
 import type { ApiResponse } from '@aiprimary/api';
 
@@ -21,6 +21,22 @@ export default class ClassFeedRealApiService implements ClassFeedApiService {
 
   getType(): ApiMode {
     return API_MODE.real;
+  }
+
+  private _mapPost(data: any): Post {
+    return {
+      ...data,
+      createdAt: new Date(data.createdAt),
+      updatedAt: new Date(data.updatedAt),
+    };
+  }
+
+  private _mapComment(data: any): Comment {
+    return {
+      ...data,
+      createdAt: new Date(data.createdAt),
+      updatedAt: new Date(data.updatedAt),
+    };
   }
 
   async getPosts(classId: string, filter?: FeedFilter, page = 1, pageSize = 20): Promise<PostListResponse> {
@@ -36,66 +52,64 @@ export default class ClassFeedRealApiService implements ClassFeedApiService {
       }
     );
 
-    return response.data.data;
+    return {
+      ...response.data.data,
+      data: response.data.data.data.map((post) => this._mapPost(post)),
+    };
   }
 
   async createPost(request: PostCreateRequest): Promise<Post> {
-    const formData = new FormData();
-    formData.append('type', request.type);
-    formData.append('content', request.content);
-
-    if (request.attachments) {
-      request.attachments.forEach((file) => {
-        formData.append('attachments', file);
-      });
-    }
+    // Backend expects JSON, not FormData
+    // If files need to be uploaded, handle separately via media endpoint
+    const payload = {
+      content: request.content,
+      type: request.type,
+      attachments: request.attachments || [],
+      linkedResourceIds: request.linkedResourceIds,
+      linkedLessonId: request.linkedLessonId,
+      allowComments: request.allowComments,
+    };
 
     const response = await api.post<ApiResponse<Post>>(
       `${this.baseUrl}/api/classes/${request.classId}/posts`,
-      formData,
-      {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      }
+      payload
     );
 
-    return response.data.data;
+    return this._mapPost(response.data.data);
   }
 
   async updatePost(request: PostUpdateRequest): Promise<Post> {
-    const formData = new FormData();
-    formData.append('content', request.content);
+    // Backend expects JSON, not FormData
+    const payload = {
+      content: request.content,
+      type: request.type,
+      attachments: request.attachments || [],
+      linkedResourceIds: request.linkedResourceIds,
+      linkedLessonId: request.linkedLessonId,
+      isPinned: request.isPinned,
+      allowComments: request.allowComments,
+    };
 
-    if (request.attachments) {
-      request.attachments.forEach((file) => {
-        formData.append('attachments', file);
-      });
-    }
+    const response = await api.put<ApiResponse<Post>>(`${this.baseUrl}/api/posts/${request.id}`, payload);
 
-    const response = await api.put<ApiResponse<Post>>(`${this.baseUrl}/api/posts/${request.id}`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
-
-    return response.data.data;
+    return this._mapPost(response.data.data);
   }
 
   async deletePost(postId: string): Promise<void> {
     await api.delete(`${this.baseUrl}/api/posts/${postId}`);
   }
 
-  async pinPost(postId: string, pinned: boolean): Promise<Post> {
-    const response = await api.post<ApiResponse<Post>>(`${this.baseUrl}/api/posts/${postId}/pin`, { pinned });
+  async pinPost(postId: string, _pinned: boolean): Promise<Post> {
+    // Backend pin endpoint doesn't require body, just POST to pin/unpin
+    const response = await api.post<ApiResponse<Post>>(`${this.baseUrl}/api/posts/${postId}/pin`);
 
-    return response.data.data;
+    return this._mapPost(response.data.data);
   }
 
   async getComments(postId: string): Promise<Comment[]> {
     const response = await api.get<ApiResponse<Comment[]>>(`${this.baseUrl}/api/posts/${postId}/comments`);
 
-    return response.data.data;
+    return response.data.data.map((comment) => this._mapComment(comment));
   }
 
   async createComment(request: CommentCreateRequest): Promise<Comment> {
@@ -104,15 +118,7 @@ export default class ClassFeedRealApiService implements ClassFeedApiService {
       { content: request.content }
     );
 
-    return response.data.data;
-  }
-
-  async updateComment(commentId: string, content: string): Promise<Comment> {
-    const response = await api.put<ApiResponse<Comment>>(`${this.baseUrl}/api/comments/${commentId}`, {
-      content,
-    });
-
-    return response.data.data;
+    return this._mapComment(response.data.data);
   }
 
   async deleteComment(commentId: string): Promise<void> {

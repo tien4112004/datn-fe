@@ -9,7 +9,6 @@ export {
   useDeletePost,
   usePinPost,
   useCreateComment,
-  useUpdateComment,
   useDeleteComment,
   usePostMutations,
 } from './useApi';

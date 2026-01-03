@@ -13,7 +13,12 @@ export interface Class {
   name: string; // e.g., "10A1", "11B2"
   description?: string | null;
   joinCode?: string | null; // Unique join code for students to enroll
-  settings?: Record<string, any> | null; // Class-specific settings
+  settings?: {
+    grade?: number;
+    academicYear?: string;
+    class?: string;
+    [key: string]: any;
+  } | null; // Class-specific settings
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
@@ -21,7 +26,6 @@ export interface Class {
   // Legacy/computed fields for compatibility with existing frontend code
   grade?: number; // 1-12 for Vietnamese education system (deprecated)
   academicYear?: string; // e.g., "2024-2025" (deprecated)
-  currentEnrollment?: number; // current number of students (deprecated)
   teacherId?: string; // alias for ownerId (deprecated)
   class?: string; // physical location (deprecated)
   students?: Student[]; // populated from separate endpoint

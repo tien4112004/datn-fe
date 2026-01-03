@@ -7,8 +7,6 @@ import RichTextEditor from '@/shared/components/rte/RichTextEditor';
 import { useRichTextEditor } from '@/shared/components/rte/useRichTextEditor';
 import { RadioGroup, RadioGroupItem } from '@/shared/components/ui/radio-group';
 import { Label } from '@/shared/components/ui/label';
-import { Input } from '@/shared/components/ui/input';
-import { DateInput } from '@/shared/components/ui/date-input';
 import {
   Dialog,
   DialogContent,
@@ -32,9 +30,7 @@ export const PostCreator = ({ classId, onPostCreated, className = '' }: PostCrea
   const createPost = useCreatePost();
   const editor = useRichTextEditor();
   const [open, setOpen] = useState(false);
-  const [type, setType] = useState<'post' | 'announcement' | 'assignment'>('post');
-  const [deadlineDate, setDeadlineDate] = useState<Date | undefined>(undefined);
-  const [deadlineTime, setDeadlineTime] = useState<string>('23:59');
+  const [type, setType] = useState<'general' | 'announcement' | 'schedule_event'>('general');
   const [attachments, setAttachments] = useState<File[]>([]);
   const [linkedLessons, setLinkedLessons] = useState<Array<Lesson>>([]);
   const [linkedResources, setLinkedResources] = useState<Array<LessonResource>>([]);
@@ -47,21 +43,12 @@ export const PostCreator = ({ classId, onPostCreated, className = '' }: PostCrea
     try {
       const contentMd = await editor.blocksToMarkdownLossy(editor.document);
 
-      // Combine date and time for deadline
-      let deadline: Date | undefined;
-      if (type === 'assignment' && deadlineDate && deadlineTime) {
-        const [hours, minutes] = deadlineTime.split(':');
-        deadline = new Date(deadlineDate);
-        deadline.setHours(parseInt(hours), parseInt(minutes), 0, 0);
-      }
-
       const request: PostCreateRequest = {
         classId,
         type,
         content: contentMd,
-        deadline,
         attachments: attachments.length > 0 ? attachments : undefined,
-        linkedLessonIds: linkedLessons.length > 0 ? linkedLessons.map((l) => l.id) : undefined,
+        linkedLessonId: linkedLessons.length > 0 ? linkedLessons[0].id : undefined,
         linkedResourceIds: linkedResources.length > 0 ? linkedResources.map((r) => r.id) : undefined,
       };
 
@@ -72,9 +59,7 @@ export const PostCreator = ({ classId, onPostCreated, className = '' }: PostCrea
       setAttachments([]);
       setLinkedLessons([]);
       setLinkedResources([]);
-      setDeadlineDate(undefined);
-      setDeadlineTime('23:59');
-      setType('post');
+      setType('general');
       setOpen(false);
 
       onPostCreated?.();
@@ -113,13 +98,13 @@ export const PostCreator = ({ classId, onPostCreated, className = '' }: PostCrea
             <Label className="text-sm font-medium">{t('feed.creator.labels.postType')}</Label>
             <RadioGroup
               value={type}
-              onValueChange={(value) => setType(value as 'post' | 'announcement' | 'assignment')}
+              onValueChange={(value) => setType(value as 'general' | 'announcement' | 'schedule_event')}
               className="flex gap-6"
             >
               <div className="flex items-center gap-2">
-                <RadioGroupItem value="post" id="post" />
-                <Label htmlFor="post" className="cursor-pointer font-normal">
-                  {t('feed.creator.postType.post')}
+                <RadioGroupItem value="general" id="general" />
+                <Label htmlFor="general" className="cursor-pointer font-normal">
+                  {t('feed.creator.postType.general')}
                 </Label>
               </div>
               <div className="flex items-center gap-2">
@@ -129,34 +114,13 @@ export const PostCreator = ({ classId, onPostCreated, className = '' }: PostCrea
                 </Label>
               </div>
               <div className="flex items-center gap-2">
-                <RadioGroupItem value="assignment" id="assignment" />
-                <Label htmlFor="assignment" className="cursor-pointer font-normal">
-                  {t('feed.creator.postType.assignment')}
+                <RadioGroupItem value="schedule_event" id="schedule_event" />
+                <Label htmlFor="schedule_event" className="cursor-pointer font-normal">
+                  {t('feed.creator.postType.schedule_event')}
                 </Label>
               </div>
             </RadioGroup>
           </div>
-
-          {/* Deadline for assignments */}
-          {type === 'assignment' && (
-            <div className="grid gap-4 md:grid-cols-2">
-              <div className="space-y-2">
-                <Label className="text-sm font-medium">{t('feed.creator.labels.deadline')} Date</Label>
-                <DateInput value={deadlineDate} onChange={setDeadlineDate} minDate={new Date()} />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="deadline-time" className="text-sm font-medium">
-                  Time
-                </Label>
-                <Input
-                  type="time"
-                  id="deadline-time"
-                  value={deadlineTime}
-                  onChange={(e) => setDeadlineTime(e.target.value)}
-                />
-              </div>
-            </div>
-          )}
 
           <Separator />
 

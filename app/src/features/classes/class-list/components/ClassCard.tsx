@@ -1,4 +1,4 @@
-import { Calendar, GraduationCap, Users } from 'lucide-react';
+import { Calendar, GraduationCap } from 'lucide-react';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Class } from '../../shared/types';
@@ -40,26 +40,17 @@ export const ClassCard = memo(
 
             {/* Metadata */}
             <div className="text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
-              {classItem.grade && (
+              {classItem.settings?.grade && (
                 <div className="flex items-center gap-1.5">
                   <GraduationCap className="h-4 w-4" />
-                  <span>{getGradeLabel(classItem.grade)}</span>
+                  <span>{getGradeLabel(classItem.settings.grade)}</span>
                 </div>
               )}
 
-              {classItem.academicYear && (
+              {classItem.settings?.academicYear && (
                 <div className="flex items-center gap-1.5">
                   <Calendar className="h-4 w-4" />
-                  <span>{classItem.academicYear}</span>
-                </div>
-              )}
-
-              {classItem.currentEnrollment !== undefined && (
-                <div className="flex items-center gap-1.5">
-                  <Users className="h-4 w-4" />
-                  <span>
-                    {classItem.currentEnrollment} {classItem.currentEnrollment === 1 ? 'student' : 'students'}
-                  </span>
+                  <span>{classItem.settings.academicYear}</span>
                 </div>
               )}
             </div>

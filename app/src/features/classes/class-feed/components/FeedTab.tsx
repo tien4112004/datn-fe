@@ -20,9 +20,9 @@ export const FeedTab = ({ classId }: FeedPageProps) => {
 
   const filterOptions = [
     { value: 'all' as const, label: t('feed.header.filters.all') },
-    { value: 'announcements' as const, label: t('feed.header.filters.announcements') },
-    { value: 'posts' as const, label: t('feed.header.filters.posts') },
-    { value: 'assignments' as const, label: t('feed.header.filters.assignments') },
+    { value: 'announcement' as const, label: t('feed.header.filters.announcements') },
+    { value: 'general' as const, label: t('feed.header.filters.general') },
+    { value: 'schedule_event' as const, label: t('feed.header.filters.schedule_event') },
   ];
 
   return (

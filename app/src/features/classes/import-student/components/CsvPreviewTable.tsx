@@ -88,6 +88,12 @@ export function CsvPreviewTable({ data, totalRows, className = '' }: CsvPreviewT
                   {t('csvImport.preview.dateOfBirth')}
                 </th>
                 <th className="px-3 py-2 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                  {t('csvImport.preview.gender')}
+                </th>
+                <th className="px-3 py-2 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                  {t('csvImport.preview.address')}
+                </th>
+                <th className="px-3 py-2 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                   {t('csvImport.preview.phone')}
                 </th>
                 <th className="px-3 py-2 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
@@ -113,6 +119,8 @@ export function CsvPreviewTable({ data, totalRows, className = '' }: CsvPreviewT
                     </span>
                   </td>
                   <td className="whitespace-nowrap px-3 py-2 text-gray-600">{row.dateOfBirth || '-'}</td>
+                  <td className="whitespace-nowrap px-3 py-2 text-gray-600">{row.gender || '-'}</td>
+                  <td className="whitespace-nowrap px-3 py-2 text-gray-600">{row.address || '-'}</td>
                   <td className="whitespace-nowrap px-3 py-2 text-gray-600">{row.phoneNumber || '-'}</td>
                   <td className="px-3 py-2 text-gray-600">
                     <div className="max-w-xs truncate">

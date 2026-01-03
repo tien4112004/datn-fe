@@ -4,10 +4,10 @@ import { PostActions } from './PostActions';
 import type { Post } from '../types';
 import ReactMarkdown from 'react-markdown';
 import { UserAvatar } from '@/components/common/UserAvatar';
-import { MessageCircleMore, Pin, Megaphone, ClipboardList, Calendar, Clock } from 'lucide-react';
+import { MessageCircleMore, Pin, Megaphone, CalendarDays, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { formatDistanceToNow, format, isPast } from 'date-fns';
+import { formatDistanceToNow } from 'date-fns';
 import { getLocaleDateFns } from '@/shared/i18n/helper';
 
 interface PostCardProps {
@@ -26,13 +26,13 @@ export const PostCard = ({ post, onEdit, onDelete, onPin, onComment, className =
     <article className={`hover:bg-muted/30 border-b px-6 py-4 transition-colors ${className}`}>
       {/* Header */}
       <div className="mb-3 flex items-start gap-3">
-        <UserAvatar src={post.authorAvatar} name={post.authorName} size="md" />
+        <UserAvatar name={`User ${post.authorId.slice(0, 8)}`} size="md" />
 
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2">
-                <p className="font-semibold">{post.authorName}</p>
+                <p className="font-semibold">User {post.authorId.slice(0, 8)}</p>
 
                 {/* Type Badge */}
                 {post.type === 'announcement' && (
@@ -42,10 +42,10 @@ export const PostCard = ({ post, onEdit, onDelete, onPin, onComment, className =
                   </Badge>
                 )}
 
-                {post.type === 'assignment' && (
-                  <Badge variant="default" className="gap-1 bg-orange-500 text-xs hover:bg-orange-600">
-                    <ClipboardList className="h-3 w-3" />
-                    {t('feed.post.badges.assignment')}
+                {post.type === 'schedule_event' && (
+                  <Badge variant="default" className="gap-1 bg-blue-500 text-xs hover:bg-blue-600">
+                    <CalendarDays className="h-3 w-3" />
+                    {t('feed.post.badges.schedule_event')}
                   </Badge>
                 )}
 
@@ -65,17 +65,6 @@ export const PostCard = ({ post, onEdit, onDelete, onPin, onComment, className =
 
             <PostActions post={post} onEdit={onEdit} onDelete={onDelete} onPin={onPin} />
           </div>
-
-          {/* Assignment Deadline */}
-          {post.type === 'assignment' && post.deadline && (
-            <div className="mt-2">
-              <Badge variant={isPast(post.deadline) ? 'destructive' : 'outline'} className="gap-1.5 text-xs">
-                <Calendar className="h-3 w-3" />
-                <span className="font-medium">{t('feed.post.badges.dueDate')}:</span>
-                <span>{format(post.deadline, 'PPp', { locale: getLocaleDateFns() })}</span>
-              </Badge>
-            </div>
-          )}
         </div>
       </div>
 
@@ -89,8 +78,8 @@ export const PostCard = ({ post, onEdit, onDelete, onPin, onComment, className =
       {/* Attachments */}
       {post.attachments && post.attachments.length > 0 && (
         <div className="mb-3 ml-[52px] space-y-2">
-          {post.attachments.map((attachment) => (
-            <AttachmentPreview key={attachment.id} attachment={attachment} />
+          {post.attachments.map((url, index) => (
+            <AttachmentPreview key={`${post.id}-attachment-${index}`} url={url} />
           ))}
         </div>
       )}

@@ -6,19 +6,13 @@ import {
   type ClassCollectionRequest,
   type ClassCreateRequest,
   type ClassUpdateRequest,
-  type StudentEnrollmentRequest,
   type StudentCreateRequest,
   type StudentUpdateRequest,
-  type SchedulePeriod,
   type Lesson,
   type LessonCollectionRequest,
   type Layout,
-  type DailySchedule,
-  type ScheduleCollectionRequest,
   type LessonCreateRequest,
   type LessonUpdateRequest,
-  type SchedulePeriodCreateRequest,
-  type SchedulePeriodUpdateRequest,
   type ImportResult,
 } from '../types';
 import { api } from '@aiprimary/api';
@@ -190,6 +184,20 @@ export default class ClassRealApiService implements ClassApiService {
       parsedSettings = data.settings;
     }
 
+    // Ensure settings exist, create if needed
+    const finalSettings = parsedSettings || {};
+
+    // Migrate top-level fields to settings if they exist (backward compatibility)
+    if (data.grade !== undefined) {
+      finalSettings.grade = data.grade;
+    }
+    if (data.academicYear !== undefined) {
+      finalSettings.academicYear = data.academicYear;
+    }
+    if (data.class !== undefined) {
+      finalSettings.class = data.class;
+    }
+
     return {
       // Backend fields
       id: data.id,
@@ -197,17 +205,13 @@ export default class ClassRealApiService implements ClassApiService {
       name: data.name,
       description: data.description ?? null,
       joinCode: data.joinCode ?? null,
-      settings: parsedSettings,
+      settings: Object.keys(finalSettings).length > 0 ? finalSettings : null,
       isActive: data.isActive ?? true,
       createdAt: data.createdAt,
       updatedAt: data.updatedAt,
 
-      // Legacy/compatibility fields - extract from settings if available
+      // Legacy/compatibility fields
       teacherId: data.ownerId, // Map ownerId to teacherId for backwards compatibility
-      grade: data.grade ?? parsedSettings?.grade ?? undefined,
-      academicYear: data.academicYear ?? parsedSettings?.academicYear ?? undefined,
-      currentEnrollment: data.currentEnrollment ?? data.studentCount ?? 0,
-      class: data.class ?? parsedSettings?.class ?? undefined,
       students: (data.students || []).map((item) => this._mapStudent(item)),
       layout: data.layout ?? undefined,
     };

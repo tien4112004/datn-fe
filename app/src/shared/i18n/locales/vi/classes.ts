@@ -681,7 +681,6 @@ export default {
     loadingRoster: 'Đang tải danh sách...',
     studentCount: '{{count}} học sinh',
     studentCount_other: '{{count}} học sinh',
-    searchPlaceholder: 'Tìm kiếm học sinh...',
     filterByStatus: 'Lọc theo trạng thái',
     allStatuses: 'Tất cả trạng thái',
 
@@ -869,6 +868,8 @@ export default {
       rowNumber: 'Số hàng',
       fullName: 'Họ và tên',
       dateOfBirth: 'Ngày sinh',
+      gender: 'Giới tính',
+      address: 'Địa chỉ',
       phone: 'Điện thoại',
       parentGuardian: 'Phụ huynh/Người giám hộ',
       missing: 'Thiếu',
@@ -1057,6 +1058,8 @@ export default {
       filters: {
         all: 'Tất cả',
         announcements: 'Thông báo',
+        general: 'Chung',
+        schedule_event: 'Sự kiện lịch trình',
         posts: 'Bài viết',
         assignments: 'Bài tập',
       },
@@ -1089,6 +1092,8 @@ export default {
       postType: {
         post: 'Bài Đăng',
         announcement: 'Thông Báo',
+        general: 'Chung',
+        schedule_event: 'Sự kiện lịch trình',
         assignment: 'Bài Tập',
       },
     },
@@ -1109,6 +1114,7 @@ export default {
       badges: {
         pinned: 'Đã ghim',
         announcement: 'Thông báo',
+        schedule_event: 'Sự kiện lịch trình',
         assignment: 'Bài tập',
         dueDate: 'Hạn',
       },

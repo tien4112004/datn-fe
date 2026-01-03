@@ -2,7 +2,7 @@ import { createBrowserRouter } from 'react-router-dom';
 import NavLayout, { NavLayoutErrorBoundary } from '../shared/layouts/SidebarLayout';
 import { CriticalError } from '@aiprimary/api';
 import { ProtectedRoute } from '@/shared/components/ProtectedRoute';
-import { FeedPage } from '@/features/classes/class-feed';
+import { FeedTab } from '@/features/classes/class-feed';
 
 const router = createBrowserRouter([
   {
@@ -105,7 +105,7 @@ const router = createBrowserRouter([
       },
       {
         path: 'classes/:id/feed',
-        Component: () => <FeedPage classId="class1" />,
+        Component: () => <FeedTab classId="class1" />,
       },
       {
         path: 'periods/:id',

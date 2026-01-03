@@ -52,9 +52,9 @@ export const UpdateClassModal = ({ isOpen, onClose, initialData }: UpdateClassMo
   // Transform Class data to ClassSchema format for the form
   const formInitialData: ClassSchema = {
     name: initialData.name,
-    grade: initialData.grade || initialData.settings?.grade || 1,
-    academicYear: initialData.academicYear || initialData.settings?.academicYear || '',
-    class: initialData.class || initialData.settings?.class,
+    grade: initialData.settings?.grade || 1,
+    academicYear: initialData.settings?.academicYear || '',
+    class: initialData.settings?.class,
     description: initialData.description !== null ? initialData.description : undefined,
   };
 

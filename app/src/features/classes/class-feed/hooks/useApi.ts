@@ -261,35 +261,6 @@ export function useCreateComment() {
 }
 
 /**
- * Hook for updating an existing comment
- */
-export function useUpdateComment() {
-  const queryClient = useQueryClient();
-  const classFeedApi = useClassFeedApiService();
-
-  return useMutation({
-    mutationFn: ({ commentId, content }: { commentId: string; content: string }) =>
-      classFeedApi.updateComment(commentId, content),
-    onSuccess: (updatedComment: Comment) => {
-      // Update the comment in all comments queries
-      queryClient.setQueriesData({ queryKey: feedQueryKeys.comments }, (oldComments: Comment[] = []) =>
-        oldComments.map((comment) => (comment.id === updatedComment.id ? updatedComment : comment))
-      );
-
-      toast.success('Comment updated successfully');
-    },
-    onError: (error) => {
-      toast.error('Failed to update comment', {
-        description:
-          error instanceof Error
-            ? error.message
-            : 'Network error. Please check your connection and try again.',
-      });
-    },
-  });
-}
-
-/**
  * Hook for deleting a comment
  */
 export function useDeleteComment() {

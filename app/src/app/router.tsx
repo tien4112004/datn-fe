@@ -24,6 +24,13 @@ const router = createBrowserRouter([
     }),
   },
   {
+    path: '/mindmap/embed/:id',
+    lazy: async () => ({
+      Component: (await import('@/features/mindmap')).default.MindmapEmbedPage,
+      loader: (await import('@/features/mindmap/hooks/embedLoaders')).getPublicMindmapById,
+    }),
+  },
+  {
     element: (
       <ProtectedRoute>
         <NavLayout />

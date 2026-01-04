@@ -21,6 +21,11 @@ export default defineConfig(({ mode }) => {
       : env.VITE_PRESENTATION_URL || 'http://localhost:5174';
 
   return {
+    server: {
+      allowedHosts: ['nitro15.tail5769d8.ts.net'],
+      host: '100.66.47.29',
+      port: 80,
+    },
     plugins: [
       react(),
       tailwindcss(),

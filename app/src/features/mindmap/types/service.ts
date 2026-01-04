@@ -11,7 +11,6 @@ export interface MindmapCollectionRequest {
 
 export interface MindmapApiService extends Service {
   getMindmapById(id: string): Promise<Mindmap>;
-  getPublicMindmapById(id: string): Promise<Mindmap>;
   getMindmaps(request: MindmapCollectionRequest): Promise<ApiResponse<Mindmap[]>>;
   createMindmap(data: Mindmap): Promise<Mindmap>;
   updateMindmap(id: string, data: Partial<Mindmap> | FormData): Promise<Mindmap>;

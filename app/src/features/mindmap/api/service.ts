@@ -40,11 +40,6 @@ export default class MindmapRealApiService implements MindmapApiService {
     return response.data.data;
   }
 
-  async getPublicMindmapById(id: string): Promise<Mindmap> {
-    const response = await api.get<ApiResponse<Mindmap>>(`${this.baseUrl}/api/mindmaps/${id}`);
-    return response.data.data;
-  }
-
   async createMindmap(data: Mindmap): Promise<Mindmap> {
     const response = await api.post<ApiResponse<Mindmap>>(`${this.baseUrl}/api/mindmaps`, data);
     return response.data.data;

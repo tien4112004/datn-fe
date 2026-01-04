@@ -10,6 +10,7 @@
 export interface Student {
   id: string;
   userId: string; // Associated user/profile ID
+  status?: string | null; // Student enrollment status (e.g., 'active', 'inactive')
   enrollmentDate?: string | null;
   address?: string | null;
   parentContactEmail?: string | null;

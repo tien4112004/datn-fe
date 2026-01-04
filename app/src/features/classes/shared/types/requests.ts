@@ -14,6 +14,8 @@ export interface ClassCollectionRequest {
   sort?: 'asc' | 'desc'; // Backend only accepts direction, not field:direction
   search?: string;
   isActive?: boolean;
+  grade?: number;
+  academicYear?: string;
 }
 
 /**

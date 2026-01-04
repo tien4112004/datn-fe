@@ -6,6 +6,7 @@ import type {
   ScheduleCollectionRequest,
   SchedulePeriodCreateRequest,
   SchedulePeriodUpdateRequest,
+  SchedulePeriod,
 } from '../../shared/types';
 
 // Query keys for schedules
@@ -35,7 +36,7 @@ export function useAddPeriod() {
   const queryClient = useQueryClient();
   const classApiService = useClassApiService();
 
-  return useMutation({
+  return useMutation<SchedulePeriod, Error, { classId: string; data: SchedulePeriodCreateRequest }>({
     mutationFn: ({ classId, data }: { classId: string; data: SchedulePeriodCreateRequest }) =>
       classApiService.addSchedulePeriod(classId, data),
     onSuccess: (period) => {
@@ -49,7 +50,11 @@ export function useUpdatePeriod() {
   const queryClient = useQueryClient();
   const classApiService = useClassApiService();
 
-  return useMutation({
+  return useMutation<
+    SchedulePeriod,
+    Error,
+    { classId: string; id: string; updates: SchedulePeriodUpdateRequest }
+  >({
     mutationFn: ({
       classId,
       id,

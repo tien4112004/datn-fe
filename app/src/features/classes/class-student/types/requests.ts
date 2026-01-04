@@ -24,9 +24,13 @@ export interface StudentCollectionRequest {
  */
 export interface StudentCreateRequest {
   fullName: string;
+  firstName?: string;
+  lastName?: string;
   dateOfBirth?: string;
   gender?: string;
   address?: string;
+  phoneNumber?: string;
+  avatarUrl?: string;
   parentName: string;
   parentPhone: string;
   parentContactEmail?: string;
@@ -47,6 +51,7 @@ export interface StudentUpdateRequest {
   address?: string | null;
   parentContactEmail?: string | null;
   avatarUrl?: string | null;
+  status?: string | null;
 }
 
 /**

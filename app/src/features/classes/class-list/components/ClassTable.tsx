@@ -7,7 +7,6 @@ import { Badge } from '@/components/ui/badge';
 import DataTable from '@/components/table/DataTable';
 import { useClasses } from '../../shared/hooks';
 import { useClassStore } from '../../shared/stores';
-import { getGradeLabel } from '../../shared/utils/grades';
 import type { Class } from '../../shared/types';
 import { ClassActionsMenu } from './ClassActionsMenu';
 

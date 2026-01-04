@@ -461,7 +461,7 @@ export default class ClassFeedMockApiService implements ClassFeedApiService {
     mockPosts.splice(postIndex, 1);
   }
 
-  async pinPost(postId: string, pinned: boolean): Promise<Post> {
+  async pinPost(postId: string, _pinned: boolean): Promise<Post> {
     const postIndex = mockPosts.findIndex((p) => p.id === postId);
     if (postIndex === -1) {
       throw new Error('Post not found');

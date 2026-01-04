@@ -14,6 +14,7 @@ export interface LessonCollectionRequest {
   classId?: string;
   subject?: string;
   status?: LessonStatus;
+  search?: string;
   page?: number;
   pageSize?: number;
 }

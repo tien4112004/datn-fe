@@ -12,8 +12,14 @@ import type {
   Student,
   StudentCreateRequest,
   StudentUpdateRequest,
+  StudentEnrollmentRequest,
   LessonCreateRequest,
   LessonUpdateRequest,
+  ScheduleCollectionRequest,
+  SchedulePeriodCreateRequest,
+  SchedulePeriodUpdateRequest,
+  SchedulePeriod,
+  DailySchedule,
 } from '.';
 
 /**
@@ -43,7 +49,25 @@ export interface ClassApiService extends Service {
   getLesson(id: string): Promise<Lesson | null>;
   createLesson(data: LessonCreateRequest): Promise<Lesson>;
   updateLesson(data: LessonUpdateRequest): Promise<Lesson>;
+  updateLessonStatus(id: string, status: string, notes?: string): Promise<Lesson>;
   deleteLesson(id: string): Promise<void>;
+
+  // Schedule Management
+  getSchedules(classId: string, params: ScheduleCollectionRequest): Promise<ApiResponse<DailySchedule[]>>;
+  getSchedulePeriods(
+    classId: string,
+    params: { date?: string; startDate?: string; endDate?: string }
+  ): Promise<ApiResponse<SchedulePeriod[]>>;
+  getPeriodById(id: string): Promise<SchedulePeriod | null>;
+  getPeriodsBySubject(classId: string, subjectCode: string): Promise<SchedulePeriod[]>;
+  addSchedulePeriod(classId: string, data: SchedulePeriodCreateRequest): Promise<SchedulePeriod>;
+  updateSchedulePeriod(
+    classId: string,
+    id: string,
+    updates: SchedulePeriodUpdateRequest
+  ): Promise<SchedulePeriod>;
+  linkLessonToSchedulePeriod(classId: string, periodId: string, lessonId: string): Promise<void>;
+  unlinkLessonFromSchedulePeriod(classId: string, periodId: string, lessonId: string): Promise<void>;
 
   // Student Management
   getStudentsByClassId(classId: string, page?: number, size?: number): Promise<Student[]>;
@@ -51,6 +75,8 @@ export interface ClassApiService extends Service {
   createStudent(classId: string, data: StudentCreateRequest): Promise<Student>;
   getStudentById(studentId: string): Promise<Student | null>;
   updateStudent(studentId: string, data: StudentUpdateRequest): Promise<Student>;
+  enrollStudent(data: StudentEnrollmentRequest): Promise<Student>;
+  deleteStudent(studentId: string): Promise<void>;
 
   // CSV Import
   submitImport(classId: string, file: File): Promise<ImportResult>;

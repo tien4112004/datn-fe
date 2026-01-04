@@ -1,4 +1,4 @@
-import { FileDown, FileText, FileSpreadsheet, Presentation, Archive, Paperclip } from 'lucide-react';
+import { Archive, FileDown, FileSpreadsheet, FileText, Paperclip, Presentation } from 'lucide-react';
 
 interface AttachmentPreviewProps {
   url: string;

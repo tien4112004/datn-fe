@@ -1,16 +1,16 @@
-import type { ClassFeedApiService } from '../types';
-import type {
-  Post,
-  Comment,
-  PostCreateRequest,
-  PostUpdateRequest,
-  CommentCreateRequest,
-  PostListResponse,
-  FeedFilter,
-} from '../types';
-import { API_MODE, type ApiMode } from '@aiprimary/api';
-import { api } from '@aiprimary/api';
+import { API_MODE, type ApiMode } from '@/shared/constants';
 import type { ApiResponse } from '@aiprimary/api';
+import { api } from '@aiprimary/api';
+import type {
+  ClassFeedApiService,
+  Comment,
+  CommentCreateRequest,
+  FeedFilter,
+  Post,
+  PostCreateRequest,
+  PostListResponse,
+  PostUpdateRequest,
+} from '../types';
 
 export default class ClassFeedRealApiService implements ClassFeedApiService {
   baseUrl: string;
@@ -21,22 +21,6 @@ export default class ClassFeedRealApiService implements ClassFeedApiService {
 
   getType(): ApiMode {
     return API_MODE.real;
-  }
-
-  private _mapPost(data: any): Post {
-    return {
-      ...data,
-      createdAt: new Date(data.createdAt),
-      updatedAt: new Date(data.updatedAt),
-    };
-  }
-
-  private _mapComment(data: any): Comment {
-    return {
-      ...data,
-      createdAt: new Date(data.createdAt),
-      updatedAt: new Date(data.updatedAt),
-    };
   }
 
   async getPosts(classId: string, filter?: FeedFilter, page = 1, pageSize = 20): Promise<PostListResponse> {
@@ -52,10 +36,7 @@ export default class ClassFeedRealApiService implements ClassFeedApiService {
       }
     );
 
-    return {
-      ...response.data.data,
-      data: response.data.data.data.map((post) => this._mapPost(post)),
-    };
+    return response.data.data;
   }
 
   async createPost(request: PostCreateRequest): Promise<Post> {
@@ -75,7 +56,7 @@ export default class ClassFeedRealApiService implements ClassFeedApiService {
       payload
     );
 
-    return this._mapPost(response.data.data);
+    return response.data.data;
   }
 
   async updatePost(request: PostUpdateRequest): Promise<Post> {
@@ -92,24 +73,24 @@ export default class ClassFeedRealApiService implements ClassFeedApiService {
 
     const response = await api.put<ApiResponse<Post>>(`${this.baseUrl}/api/posts/${request.id}`, payload);
 
-    return this._mapPost(response.data.data);
+    return response.data.data;
   }
 
   async deletePost(postId: string): Promise<void> {
     await api.delete(`${this.baseUrl}/api/posts/${postId}`);
   }
 
-  async pinPost(postId: string, _pinned: boolean): Promise<Post> {
+  async pinPost(postId: string, pinned: boolean): Promise<Post> {
     // Backend pin endpoint doesn't require body, just POST to pin/unpin
     const response = await api.post<ApiResponse<Post>>(`${this.baseUrl}/api/posts/${postId}/pin`);
 
-    return this._mapPost(response.data.data);
+    return response.data.data;
   }
 
   async getComments(postId: string): Promise<Comment[]> {
     const response = await api.get<ApiResponse<Comment[]>>(`${this.baseUrl}/api/posts/${postId}/comments`);
 
-    return response.data.data.map((comment) => this._mapComment(comment));
+    return response.data.data;
   }
 
   async createComment(request: CommentCreateRequest): Promise<Comment> {
@@ -118,7 +99,7 @@ export default class ClassFeedRealApiService implements ClassFeedApiService {
       { content: request.content }
     );
 
-    return this._mapComment(response.data.data);
+    return response.data.data;
   }
 
   async deleteComment(commentId: string): Promise<void> {

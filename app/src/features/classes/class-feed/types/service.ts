@@ -1,11 +1,11 @@
 import type { Service } from '@/shared/api/base-service';
-import type { Post, Comment } from './index';
+import type { Comment, Post } from './index';
 import type {
-  PostCreateRequest,
-  PostUpdateRequest,
   CommentCreateRequest,
-  PostListResponse,
   FeedFilter,
+  PostCreateRequest,
+  PostListResponse,
+  PostUpdateRequest,
 } from './requests';
 
 export interface ClassFeedApiService extends Service {

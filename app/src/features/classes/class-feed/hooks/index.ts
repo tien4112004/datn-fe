@@ -2,13 +2,13 @@ export { usePostPermissions } from './usePostPermissions';
 
 // Individual API hooks
 export {
-  usePosts,
   useComments,
+  useCreateComment,
   useCreatePost,
-  useUpdatePost,
+  useDeleteComment,
   useDeletePost,
   usePinPost,
-  useCreateComment,
-  useDeleteComment,
   usePostMutations,
+  usePosts,
+  useUpdatePost,
 } from './useApi';

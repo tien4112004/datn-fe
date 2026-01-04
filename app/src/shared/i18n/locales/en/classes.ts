@@ -1093,6 +1093,7 @@ export default {
         linkLessons: 'Link Lessons',
         linkResources: 'Link Resources',
         deadline: 'Deadline',
+        allowComments: 'Allow Comments',
       },
       placeholders: {
         content: 'Write your post content here...',

@@ -7,6 +7,7 @@ import RichTextEditor from '@/shared/components/rte/RichTextEditor';
 import { useRichTextEditor } from '@/shared/components/rte/useRichTextEditor';
 import { RadioGroup, RadioGroupItem } from '@/shared/components/ui/radio-group';
 import { Label } from '@/shared/components/ui/label';
+import { Checkbox } from '@/shared/components/ui/checkbox';
 import {
   Dialog,
   DialogContent,
@@ -34,6 +35,7 @@ export const PostCreator = ({ classId, onPostCreated, className = '' }: PostCrea
   const [attachments, setAttachments] = useState<File[]>([]);
   const [linkedLessons, setLinkedLessons] = useState<Array<Lesson>>([]);
   const [linkedResources, setLinkedResources] = useState<Array<LessonResource>>([]);
+  const [allowComments, setAllowComments] = useState(true);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,6 +52,7 @@ export const PostCreator = ({ classId, onPostCreated, className = '' }: PostCrea
         attachments: attachments.length > 0 ? attachments : undefined,
         linkedLessonId: linkedLessons.length > 0 ? linkedLessons[0].id : undefined,
         linkedResourceIds: linkedResources.length > 0 ? linkedResources.map((r) => r.id) : undefined,
+        allowComments,
       };
 
       await createPost.mutateAsync(request);
@@ -60,6 +63,7 @@ export const PostCreator = ({ classId, onPostCreated, className = '' }: PostCrea
       setLinkedLessons([]);
       setLinkedResources([]);
       setType('general');
+      setAllowComments(true);
       setOpen(false);
 
       onPostCreated?.();
@@ -215,6 +219,21 @@ export const PostCreator = ({ classId, onPostCreated, className = '' }: PostCrea
                 {linkedResources.length} resource{linkedResources.length > 1 ? 's' : ''} selected
               </p>
             )}
+          </div>
+
+          {/* Allow Comments */}
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="allowComments"
+              checked={allowComments}
+              onCheckedChange={(checked) => setAllowComments(checked === true)}
+            />
+            <Label
+              htmlFor="allowComments"
+              className="cursor-pointer text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              {t('feed.creator.labels.allowComments')}
+            </Label>
           </div>
 
           {/* Error Message */}

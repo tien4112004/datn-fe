@@ -1,14 +1,14 @@
+import { UserAvatar } from '@/components/common/UserAvatar';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { getLocaleDateFns } from '@/shared/i18n/helper';
+import { formatDistanceToNow } from 'date-fns';
+import { CalendarDays, Clock, Megaphone, MessageCircleMore, Pin } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import ReactMarkdown from 'react-markdown';
+import type { Post } from '../types';
 import { AttachmentPreview } from './AttachmentPreview';
 import { PostActions } from './PostActions';
-import type { Post } from '../types';
-import ReactMarkdown from 'react-markdown';
-import { UserAvatar } from '@/components/common/UserAvatar';
-import { MessageCircleMore, Pin, Megaphone, CalendarDays, Clock } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { formatDistanceToNow } from 'date-fns';
-import { getLocaleDateFns } from '@/shared/i18n/helper';
 
 interface PostCardProps {
   post: Post;
@@ -26,7 +26,7 @@ export const PostCard = ({ post, onEdit, onDelete, onPin, onComment, className =
     <article className={`hover:bg-muted/30 border-b px-6 py-4 transition-colors ${className}`}>
       {/* Header */}
       <div className="mb-3 flex items-start gap-3">
-        <UserAvatar name={`User ${post.authorId.slice(0, 8)}`} size="md" />
+        <UserAvatar userId={post.authorId} size="md" />
 
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-2">

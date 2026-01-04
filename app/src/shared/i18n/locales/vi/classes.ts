@@ -1088,6 +1088,7 @@ export default {
         linkLessons: 'Liên Kết Bài Học',
         linkResources: 'Liên Kết Tài Nguyên',
         deadline: 'Hạn chót',
+        allowComments: 'Cho Phép Bình Luận',
       },
       placeholders: {
         content: 'Viết nội dung bài đăng của bạn ở đây...',

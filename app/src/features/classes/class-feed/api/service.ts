@@ -1,4 +1,4 @@
-import { API_MODE, type ApiMode } from '@/shared/constants';
+import { API_MODE, type ApiMode } from '@aiprimary/api';
 import type { ApiResponse } from '@aiprimary/api';
 import { api } from '@aiprimary/api';
 import type {

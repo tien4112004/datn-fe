@@ -1,25 +1,31 @@
 import { createColumnHelper, getCoreRowModel, useReactTable } from '@tanstack/react-table';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import type { Presentation } from '@/features/presentation/types/presentation';
-import { usePresentationManager } from '@/features/presentation/hooks/usePresentationManager';
+import type { Mindmap } from '@/features/mindmap/types';
+import { useMindmaps, useUpdateMindmapTitle, useDeleteMindmap } from '@/features/mindmap/hooks';
 import { Button } from '@/components/ui/button';
 import { MoreHorizontal } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { SearchBar } from '@/shared/components/common/SearchBar';
-import { ThumbnailWrapperV2 } from '@/features/presentation/components/others/ThumbnailWrapper';
 import TablePagination from '@/shared/components/table/TablePagination';
-import { ActionContent } from './ActionButton';
+import { ActionContent } from '@/features/presentation/components';
 import { RenameFileDialog } from '@/components/modals/RenameFileDialog';
 import { DeleteConfirmationDialog } from '@/shared/components/modals/DeleteConfirmationDialog';
+import { toast } from 'sonner';
+import { format } from 'date-fns';
+import { getLocaleDateFns } from '@/shared/i18n/helper';
 import ViewToggle, { type ViewMode } from '@/features/presentation/components/others/ViewToggle';
 
-const PresentationGrid = () => {
+const MindmapGrid = () => {
   const { t } = useTranslation('common', { keyPrefix: 'table' });
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const columnHelper = createColumnHelper<Presentation>();
+  const columnHelper = createColumnHelper<Mindmap>();
+
+  const [isRenameOpen, setIsRenameOpen] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [selectedMindmap, setSelectedMindmap] = useState<Mindmap | null>(null);
 
   const viewMode = (searchParams.get('view') as ViewMode) || 'grid';
 
@@ -31,35 +37,19 @@ const PresentationGrid = () => {
     });
   };
 
-  const {
-    data,
-    isLoading,
-    sorting,
-    setSorting,
-    pagination,
-    setPagination,
-    totalItems,
-    search,
-    setSearch,
-    isRenameOpen,
-    setIsRenameOpen,
-    selectedPresentation,
-    handleRename,
-    handleConfirmRename,
-    isRenamePending,
-    isDeleteOpen,
-    setIsDeleteOpen,
-    handleDelete,
-    handleConfirmDelete,
-    handleCancelDelete,
-    isDeletePending,
-  } = usePresentationManager();
+  // Use the same hook as MindmapTable
+  const { data, isLoading, sorting, setSorting, pagination, setPagination, search, setSearch, totalItems } =
+    useMindmaps();
+
+  const updateMindmapTitleMutation = useUpdateMindmapTitle();
+  const deleteMindmapMutation = useDeleteMindmap();
 
   const formatDate = useCallback((date: Date | string | undefined): string => {
     if (!date) return '';
-    return new Date(date).toLocaleDateString();
+    return format(new Date(date), 'E, P', { locale: getLocaleDateFns() });
   }, []);
 
+  // Create dummy columns for table instance (required for pagination)
   const columns = useMemo(
     () => [
       columnHelper.accessor('id', { header: 'ID' }),
@@ -68,6 +58,7 @@ const PresentationGrid = () => {
     [columnHelper]
   );
 
+  // Create table instance for pagination component
   const table = useReactTable({
     data: data || [],
     columns: columns,
@@ -83,14 +74,73 @@ const PresentationGrid = () => {
     onPaginationChange: setPagination,
   });
 
-  const PresentationCard = ({ presentation }: { presentation: Presentation }) => (
+  const handleSearchChange = (newSearch: string) => {
+    setSearch(newSearch);
+  };
+
+  const handleRename = async (id: string, newName: string) => {
+    try {
+      await updateMindmapTitleMutation.mutateAsync({ id, name: newName });
+      setSelectedMindmap((prev) => (prev ? { ...prev, title: newName } : prev));
+      toast.success(
+        t('mindmap.renameSuccess', {
+          filename: newName,
+        })
+      );
+    } catch (error) {
+      toast.error(t('renameError'));
+      console.error('Failed to rename mindmap:', error);
+    }
+  };
+
+  const handleDelete = (mindmap: Mindmap) => {
+    setSelectedMindmap(mindmap);
+    setIsDeleteOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!selectedMindmap) return;
+
+    try {
+      await deleteMindmapMutation.mutateAsync(selectedMindmap.id);
+      toast.success(t('mindmap.deleteSuccess', { name: selectedMindmap.title }));
+      setIsDeleteOpen(false);
+      setSelectedMindmap(null);
+    } catch (error) {
+      toast.error(t('mindmap.deleteError'));
+      console.error('Failed to delete mindmap:', error);
+    }
+  };
+
+  const handleCancelDelete = () => {
+    setIsDeleteOpen(false);
+    setSelectedMindmap(null);
+  };
+
+  const handleOpenRename = (mindmap: Mindmap) => {
+    setSelectedMindmap(mindmap);
+    setIsRenameOpen(true);
+  };
+
+  // Inline card component
+  const MindmapCard = ({ mindmap }: { mindmap: Mindmap }) => (
     <div className="group w-full cursor-pointer">
       <div
         className="relative aspect-video w-full overflow-hidden rounded-lg bg-gray-100 transition-shadow duration-200 hover:shadow-md"
-        onClick={() => navigate(`/presentation/${presentation.id}`)}
+        onClick={() => navigate(`/mindmap/${mindmap.id}`)}
       >
-        <ThumbnailWrapperV2 presentation={presentation} size={'auto'} visible={true} />
+        {/* Thumbnail Image */}
+        <img
+          src={mindmap.thumbnail || '/images/placeholder-image.webp'}
+          alt={mindmap.title || 'Mindmap Thumbnail'}
+          className="aspect-video w-full rounded-lg object-cover"
+          onError={(e) => {
+            const target = e.target as HTMLImageElement;
+            target.src = '/images/placeholder-image.webp';
+          }}
+        />
 
+        {/* Action Menu (appears on hover) */}
         <div className="absolute right-2 top-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -105,29 +155,31 @@ const PresentationGrid = () => {
             </DropdownMenuTrigger>
             <DropdownMenuContent onClick={(e) => e.stopPropagation()}>
               <ActionContent
-                onViewDetail={() => navigate(`/presentation/${presentation.id}`)}
-                onDelete={() => handleDelete(presentation)}
-                onRename={() => handleRename(presentation)}
+                onViewDetail={() => navigate(`/mindmap/${mindmap.id}`)}
+                onDelete={() => handleDelete(mindmap)}
+                onRename={() => handleOpenRename(mindmap)}
               />
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
       </div>
 
+      {/* Card Footer */}
       <div className="mt-3 space-y-1">
         <h3
           className="cursor-pointer truncate text-sm font-medium text-gray-900 transition-colors hover:text-blue-600"
-          onClick={() => navigate(`/presentation/${presentation.id}`)}
+          onClick={() => navigate(`/mindmap/${mindmap.id}`)}
         >
-          {presentation.title || t('presentation.untitled')}
+          {mindmap.title || t('mindmap.untitled')}
         </h3>
         <p className="text-xs text-gray-500">
-          {t('presentation.lastModified')}: {formatDate(presentation.updatedAt)}
+          {t('mindmap.lastModified')}: {formatDate(mindmap.updatedAt)}
         </p>
       </div>
     </div>
   );
 
+  // Loading skeleton
   if (isLoading) {
     return (
       <div className="w-full space-y-4">
@@ -135,12 +187,12 @@ const PresentationGrid = () => {
           <SearchBar
             value={search}
             onChange={setSearch}
-            placeholder={t('presentation.searchPlaceholder')}
+            placeholder={t('mindmap.searchPlaceholder')}
             className="flex-1 rounded-lg border-2 border-slate-200"
           />
           <ViewToggle value={viewMode} onValueChange={setViewMode} />
         </div>
-        <div className="grid auto-rows-fr grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-6">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
           {Array.from({ length: 10 }).map((_, index) => (
             <div key={index} className="w-full animate-pulse">
               <div className="mb-3 aspect-video w-full rounded-lg bg-gray-200" />
@@ -158,8 +210,8 @@ const PresentationGrid = () => {
       <div className="flex items-center justify-between gap-4">
         <SearchBar
           value={search}
-          onChange={setSearch}
-          placeholder={t('presentation.searchPlaceholder')}
+          onChange={handleSearchChange}
+          placeholder={t('mindmap.searchPlaceholder')}
           className="flex-1 rounded-lg border-2 border-slate-200"
         />
         <ViewToggle value={viewMode} onValueChange={setViewMode} />
@@ -168,8 +220,8 @@ const PresentationGrid = () => {
       {data && data.length > 0 ? (
         <>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-            {data.map((presentation) => (
-              <PresentationCard key={presentation.id} presentation={presentation} />
+            {data.map((mindmap) => (
+              <MindmapCard key={mindmap.id} mindmap={mindmap} />
             ))}
           </div>
 
@@ -177,8 +229,8 @@ const PresentationGrid = () => {
         </>
       ) : (
         <div className="flex flex-col items-center justify-center py-12 text-center">
-          <div className="mb-2 text-lg text-gray-500">{t('presentation.emptyState')}</div>
-          <div className="text-sm text-gray-400">{t('presentation.createFirst')}</div>
+          <div className="mb-2 text-lg text-gray-500">{t('mindmap.emptyState')}</div>
+          <div className="text-sm text-gray-400">{t('mindmap.createFirst')}</div>
         </div>
       )}
 
@@ -186,27 +238,27 @@ const PresentationGrid = () => {
         isOpen={isRenameOpen}
         onOpenChange={setIsRenameOpen}
         project={{
-          id: selectedPresentation?.id || '',
-          filename: selectedPresentation?.title || '',
-          projectType: t('presentation.presentation'),
+          id: selectedMindmap?.id || '',
+          filename: selectedMindmap?.title || '',
+          projectType: 'mindmap',
         }}
-        renameDialogTitle={t('presentation.renameFileDialogTitle')}
-        renameDuplicatedMessage={t('presentation.renameDuplicatedMessage')}
-        placeholder={t('presentation.title')}
-        isLoading={isRenamePending}
-        onRename={handleConfirmRename}
+        renameDialogTitle={t('mindmap.renameFileDialogTitle')}
+        renameDuplicatedMessage={t('mindmap.renameDuplicatedMessage')}
+        placeholder={t('mindmap.title')}
+        isLoading={updateMindmapTitleMutation.isPending}
+        onRename={handleRename}
       />
       <DeleteConfirmationDialog
         open={isDeleteOpen}
         onOpenChange={setIsDeleteOpen}
-        itemName={selectedPresentation?.title || ''}
-        itemType="presentation"
+        itemName={selectedMindmap?.title || ''}
+        itemType="mindmap"
         onConfirm={handleConfirmDelete}
         onCancel={handleCancelDelete}
-        isDeleting={isDeletePending}
+        isDeleting={deleteMindmapMutation.isPending}
       />
     </div>
   );
 };
 
-export default PresentationGrid;
+export default MindmapGrid;

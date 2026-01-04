@@ -25,58 +25,56 @@ export const mainImageTemplates: SlideTemplate[] = [
         description: 'Spacing from image to content block',
       },
     ],
-    config: {
-      containers: {
-        image: {
-          type: 'image',
-          bounds: {
-            width: {
-              expr: 'SLIDE_WIDTH * IMAGE_RATIO',
-            },
-            height: {
-              expr: 'SLIDE_WIDTH * IMAGE_RATIO * (2/3)',
-            },
-            left: {
-              expr: 'center',
-              offset: 0,
-            },
-            top: {
-              expr: 'center',
-              offset: -20,
-            },
+    containers: {
+      image: {
+        type: 'image',
+        bounds: {
+          width: {
+            expr: 'SLIDE_WIDTH * IMAGE_RATIO',
+          },
+          height: {
+            expr: 'SLIDE_WIDTH * IMAGE_RATIO * (2/3)',
+          },
+          left: {
+            expr: 'center',
+            offset: 0,
+          },
+          top: {
+            expr: 'center',
+            offset: -20,
           },
         },
-        content: {
-          type: 'block',
-          bounds: {
-            width: {
-              expr: 'SLIDE_WIDTH * 0.8',
-            },
-            height: 240,
-            left: {
-              expr: 'center',
-            },
-            top: {
-              expr: 'image.top + image.height + SPACING',
-            },
+      },
+      content: {
+        type: 'block',
+        bounds: {
+          width: {
+            expr: 'SLIDE_WIDTH * 0.8',
           },
-          childTemplate: {
-            count: 'auto',
-            structure: {
-              type: 'text',
-              label: 'content',
-              layout: {
-                horizontalAlignment: 'center',
-                verticalAlignment: 'top',
-              },
-              text: {
-                color: '{{theme.titleFontColor}}',
-                fontFamily: '{{theme.titleFontName}}',
-                fontWeight: 'bold',
-                fontStyle: 'normal',
-                textAlign: 'center',
-                fontSizeRange: { minSize: 20, maxSize: 28 },
-              },
+          height: 240,
+          left: {
+            expr: 'center',
+          },
+          top: {
+            expr: 'image.top + image.height + SPACING',
+          },
+        },
+        childTemplate: {
+          count: 'auto',
+          structure: {
+            type: 'text',
+            label: 'content',
+            layout: {
+              horizontalAlignment: 'center',
+              verticalAlignment: 'top',
+            },
+            text: {
+              color: '{{theme.titleFontColor}}',
+              fontFamily: '{{theme.titleFontName}}',
+              fontWeight: 'bold',
+              fontStyle: 'normal',
+              textAlign: 'center',
+              fontSizeRange: { minSize: 20, maxSize: 28 },
             },
           },
         },
@@ -98,47 +96,45 @@ export const mainImageTemplates: SlideTemplate[] = [
         description: 'Proportion of slide width occupied by the main image',
       },
     ],
-    config: {
-      containers: {
-        image: {
-          type: 'image',
-          bounds: {
-            width: {
-              expr: 'SLIDE_WIDTH * IMAGE_RATIO',
-            },
-            height: {
-              expr: 'SLIDE_HEIGHT',
-            },
-            left: 0,
-            top: 0,
+    containers: {
+      image: {
+        type: 'image',
+        bounds: {
+          width: {
+            expr: 'SLIDE_WIDTH * IMAGE_RATIO',
+          },
+          height: {
+            expr: 'SLIDE_HEIGHT',
+          },
+          left: 0,
+          top: 0,
+        },
+      },
+      content: {
+        type: 'text',
+        label: 'content',
+        bounds: {
+          width: {
+            expr: 'SLIDE_WIDTH - image.width - 60',
+          },
+          height: 200,
+          left: {
+            expr: 'image.width + 30',
+          },
+          top: {
+            expr: 'SLIDE_HEIGHT * 0.5 - 100',
           },
         },
-        content: {
-          type: 'text',
-          label: 'content',
-          bounds: {
-            width: {
-              expr: 'SLIDE_WIDTH - image.width - 60',
-            },
-            height: 200,
-            left: {
-              expr: 'image.width + 30',
-            },
-            top: {
-              expr: 'SLIDE_HEIGHT * 0.5 - 100',
-            },
-          },
-          layout: {
-            horizontalAlignment: 'center',
-            verticalAlignment: 'center',
-          },
-          text: {
-            color: '{{theme.titleFontColor}}',
-            fontFamily: '{{theme.titleFontName}}',
-            fontWeight: 'bold',
-            fontStyle: 'normal',
-            textAlign: 'center',
-          },
+        layout: {
+          horizontalAlignment: 'center',
+          verticalAlignment: 'center',
+        },
+        text: {
+          color: '{{theme.titleFontColor}}',
+          fontFamily: '{{theme.titleFontName}}',
+          fontWeight: 'bold',
+          fontStyle: 'normal',
+          textAlign: 'center',
         },
       },
     },
@@ -147,55 +143,53 @@ export const mainImageTemplates: SlideTemplate[] = [
     layout: 'main_image',
     id: 'main-image-title-overlay',
     name: 'Main Image - Title Overlay',
-    config: {
-      containers: {
-        image: {
-          type: 'image',
-          bounds: {
-            width: {
-              expr: 'SLIDE_WIDTH',
-            },
-            height: {
-              expr: 'SLIDE_HEIGHT',
-            },
-            left: 0,
-            top: 0,
+    containers: {
+      image: {
+        type: 'image',
+        bounds: {
+          width: {
+            expr: 'SLIDE_WIDTH',
+          },
+          height: {
+            expr: 'SLIDE_HEIGHT',
+          },
+          left: 0,
+          top: 0,
+        },
+      },
+      content: {
+        type: 'text',
+        label: 'content',
+        bounds: {
+          width: {
+            expr: 'SLIDE_WIDTH * 0.9',
+          },
+          height: 160,
+          left: {
+            expr: 'center',
+          },
+          top: {
+            expr: 'SLIDE_HEIGHT * 0.8 - 80',
           },
         },
-        content: {
-          type: 'text',
-          label: 'content',
-          bounds: {
-            width: {
-              expr: 'SLIDE_WIDTH * 0.9',
-            },
-            height: 160,
-            left: {
-              expr: 'center',
-            },
-            top: {
-              expr: 'SLIDE_HEIGHT * 0.8 - 80',
-            },
-          },
-          layout: {
-            horizontalAlignment: 'center',
-            verticalAlignment: 'center',
-          },
-          border: {
-            width: 0,
-            radius: '{{theme.card.borderRadius}}',
-            color: 'transparent',
-          },
-          text: {
-            color: '{{theme.titleFontColor}}',
-            fontFamily: '{{theme.titleFontName}}',
-            fontWeight: 'bold',
-            fontStyle: 'normal',
-            textAlign: 'center',
-            fontSizeRange: { minSize: 24, maxSize: 32 },
-          },
-          zIndex: 1,
+        layout: {
+          horizontalAlignment: 'center',
+          verticalAlignment: 'center',
         },
+        border: {
+          width: 0,
+          radius: '{{theme.card.borderRadius}}',
+          color: 'transparent',
+        },
+        text: {
+          color: '{{theme.titleFontColor}}',
+          fontFamily: '{{theme.titleFontName}}',
+          fontWeight: 'bold',
+          fontStyle: 'normal',
+          textAlign: 'center',
+          fontSizeRange: { minSize: 24, maxSize: 32 },
+        },
+        zIndex: 1,
       },
     },
   },
@@ -214,45 +208,43 @@ export const mainImageTemplates: SlideTemplate[] = [
         description: 'Proportion of slide width occupied by the main image',
       },
     ],
-    config: {
-      containers: {
-        image: {
-          type: 'image',
-          bounds: {
-            width: {
-              expr: 'SLIDE_WIDTH',
-            },
-            height: {
-              expr: 'SLIDE_HEIGHT * IMAGE_RATIO',
-            },
-            left: 0,
-            top: 0,
+    containers: {
+      image: {
+        type: 'image',
+        bounds: {
+          width: {
+            expr: 'SLIDE_WIDTH',
+          },
+          height: {
+            expr: 'SLIDE_HEIGHT * IMAGE_RATIO',
+          },
+          left: 0,
+          top: 0,
+        },
+      },
+      content: {
+        type: 'text',
+        label: 'content',
+        bounds: {
+          width: {
+            expr: 'SLIDE_WIDTH * 0.9',
+          },
+          height: {
+            expr: 'SLIDE_HEIGHT - image.height',
+          },
+          left: {
+            expr: 'center',
+          },
+          top: {
+            expr: 'image.top + image.height + 20',
           },
         },
-        content: {
-          type: 'text',
-          label: 'content',
-          bounds: {
-            width: {
-              expr: 'SLIDE_WIDTH * 0.9',
-            },
-            height: {
-              expr: 'SLIDE_HEIGHT - image.height',
-            },
-            left: {
-              expr: 'center',
-            },
-            top: {
-              expr: 'image.top + image.height + 20',
-            },
-          },
-          text: {
-            color: '{{theme.titleFontColor}}',
-            fontFamily: '{{theme.titleFontName}}',
-            fontWeight: 'bold',
-            fontStyle: 'normal',
-            textAlign: 'center',
-          },
+        text: {
+          color: '{{theme.titleFontColor}}',
+          fontFamily: '{{theme.titleFontName}}',
+          fontWeight: 'bold',
+          fontStyle: 'normal',
+          textAlign: 'center',
         },
       },
     },
@@ -272,47 +264,45 @@ export const mainImageTemplates: SlideTemplate[] = [
         description: 'Proportion of slide width occupied by the main image',
       },
     ],
-    config: {
-      containers: {
-        content: {
-          type: 'text',
-          label: 'content',
-          bounds: {
-            width: {
-              expr: 'SLIDE_WIDTH * (1 - IMAGE_RATIO) - 60',
-            },
-            height: 300,
-            left: 30,
-            top: {
-              expr: 'SLIDE_HEIGHT * 0.5 - 100',
-            },
+    containers: {
+      content: {
+        type: 'text',
+        label: 'content',
+        bounds: {
+          width: {
+            expr: 'SLIDE_WIDTH * (1 - IMAGE_RATIO) - 60',
           },
-          layout: {
-            horizontalAlignment: 'center',
-            verticalAlignment: 'center',
-          },
-          text: {
-            color: '{{theme.titleFontColor}}',
-            fontFamily: '{{theme.titleFontName}}',
-            fontWeight: 'bold',
-            fontStyle: 'normal',
-            textAlign: 'center',
+          height: 300,
+          left: 30,
+          top: {
+            expr: 'SLIDE_HEIGHT * 0.5 - 100',
           },
         },
-        image: {
-          type: 'image',
-          bounds: {
-            width: {
-              expr: 'SLIDE_WIDTH * IMAGE_RATIO',
-            },
-            height: {
-              expr: 'SLIDE_HEIGHT',
-            },
-            left: {
-              expr: 'content.width + 60',
-            },
-            top: 0,
+        layout: {
+          horizontalAlignment: 'center',
+          verticalAlignment: 'center',
+        },
+        text: {
+          color: '{{theme.titleFontColor}}',
+          fontFamily: '{{theme.titleFontName}}',
+          fontWeight: 'bold',
+          fontStyle: 'normal',
+          textAlign: 'center',
+        },
+      },
+      image: {
+        type: 'image',
+        bounds: {
+          width: {
+            expr: 'SLIDE_WIDTH * IMAGE_RATIO',
           },
+          height: {
+            expr: 'SLIDE_HEIGHT',
+          },
+          left: {
+            expr: 'content.width + 60',
+          },
+          top: 0,
         },
       },
     },
@@ -332,48 +322,46 @@ export const mainImageTemplates: SlideTemplate[] = [
         description: 'Proportion of slide width occupied by the main image',
       },
     ],
-    config: {
-      containers: {
-        content: {
-          type: 'text',
-          label: 'content',
-          bounds: {
-            width: {
-              expr: 'SLIDE_WIDTH * 0.9',
-            },
-            height: {
-              expr: 'SLIDE_HEIGHT * (1 - IMAGE_RATIO) - 50',
-            },
-            left: {
-              expr: 'center',
-            },
-            top: 30,
+    containers: {
+      content: {
+        type: 'text',
+        label: 'content',
+        bounds: {
+          width: {
+            expr: 'SLIDE_WIDTH * 0.9',
           },
-          layout: {
-            horizontalAlignment: 'center',
-            verticalAlignment: 'center',
+          height: {
+            expr: 'SLIDE_HEIGHT * (1 - IMAGE_RATIO) - 50',
           },
-          text: {
-            color: '{{theme.titleFontColor}}',
-            fontFamily: '{{theme.titleFontName}}',
-            fontWeight: 'bold',
-            fontStyle: 'normal',
-            textAlign: 'center',
+          left: {
+            expr: 'center',
           },
+          top: 30,
         },
-        image: {
-          type: 'image',
-          bounds: {
-            width: {
-              expr: 'SLIDE_WIDTH',
-            },
-            height: {
-              expr: 'SLIDE_HEIGHT * IMAGE_RATIO',
-            },
-            left: 0,
-            top: {
-              expr: 'content.top + content.height + 20',
-            },
+        layout: {
+          horizontalAlignment: 'center',
+          verticalAlignment: 'center',
+        },
+        text: {
+          color: '{{theme.titleFontColor}}',
+          fontFamily: '{{theme.titleFontName}}',
+          fontWeight: 'bold',
+          fontStyle: 'normal',
+          textAlign: 'center',
+        },
+      },
+      image: {
+        type: 'image',
+        bounds: {
+          width: {
+            expr: 'SLIDE_WIDTH',
+          },
+          height: {
+            expr: 'SLIDE_HEIGHT * IMAGE_RATIO',
+          },
+          left: 0,
+          top: {
+            expr: 'content.top + content.height + 20',
           },
         },
       },
@@ -403,63 +391,61 @@ export const mainImageTemplates: SlideTemplate[] = [
         description: 'Spacing from image to content block',
       },
     ],
-    config: {
-      containers: {
-        image: {
-          type: 'image',
-          bounds: {
-            width: {
-              expr: 'SLIDE_WIDTH * IMAGE_RATIO',
-            },
-            height: {
-              expr: 'SLIDE_WIDTH * IMAGE_RATIO * (2/3)',
-            },
-            left: {
-              expr: 'center',
-            },
-            top: {
-              expr: 'center',
-              offset: -20,
-            },
+    containers: {
+      image: {
+        type: 'image',
+        bounds: {
+          width: {
+            expr: 'SLIDE_WIDTH * IMAGE_RATIO',
           },
-          border: {
-            width: '{{theme.card.borderWidth}}',
-            color: '{{theme.outline.color}}',
-            radius: '{{theme.card.borderRadius}}',
+          height: {
+            expr: 'SLIDE_WIDTH * IMAGE_RATIO * (2/3)',
           },
-          shadow: {
-            h: '{{theme.card.shadow.h}}',
-            v: '{{theme.card.shadow.v}}',
-            blur: '{{theme.card.shadow.blur}}',
-            color: '{{theme.card.shadow.color}}',
+          left: {
+            expr: 'center',
+          },
+          top: {
+            expr: 'center',
+            offset: -20,
           },
         },
-        content: {
-          type: 'text',
-          label: 'content',
-          bounds: {
-            width: {
-              expr: 'SLIDE_WIDTH * 0.75',
-            },
-            height: 240,
-            left: {
-              expr: 'center',
-            },
-            top: {
-              expr: 'image.top + image.height + SPACING',
-            },
+        border: {
+          width: '{{theme.card.borderWidth}}',
+          color: '{{theme.outline.color}}',
+          radius: '{{theme.card.borderRadius}}',
+        },
+        shadow: {
+          h: '{{theme.card.shadow.h}}',
+          v: '{{theme.card.shadow.v}}',
+          blur: '{{theme.card.shadow.blur}}',
+          color: '{{theme.card.shadow.color}}',
+        },
+      },
+      content: {
+        type: 'text',
+        label: 'content',
+        bounds: {
+          width: {
+            expr: 'SLIDE_WIDTH * 0.75',
           },
-          layout: {
-            horizontalAlignment: 'center',
-            verticalAlignment: 'top',
+          height: 240,
+          left: {
+            expr: 'center',
           },
-          text: {
-            color: '{{theme.titleFontColor}}',
-            fontFamily: '{{theme.titleFontName}}',
-            fontWeight: 'bold',
-            fontStyle: 'normal',
-            textAlign: 'center',
+          top: {
+            expr: 'image.top + image.height + SPACING',
           },
+        },
+        layout: {
+          horizontalAlignment: 'center',
+          verticalAlignment: 'top',
+        },
+        text: {
+          color: '{{theme.titleFontColor}}',
+          fontFamily: '{{theme.titleFontName}}',
+          fontWeight: 'bold',
+          fontStyle: 'normal',
+          textAlign: 'center',
         },
       },
     },

@@ -13,7 +13,7 @@ export const TreeView = ({ rootNode }: TreeViewProps) => {
   const tree = useMemo(() => buildTreeFromFlat(rootNode, nodes), [rootNode, nodes]);
 
   return (
-    <div className="w-max min-w-full rounded border border-gray-200 bg-white p-2">
+    <div className="max-w-full overflow-x-hidden rounded border border-gray-200 bg-white p-1">
       <TreeNodeItem treeNode={tree} depth={0} />
     </div>
   );

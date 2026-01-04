@@ -1,11 +1,14 @@
 interface SpinnerProps {
   text?: string;
+  lightBlur?: boolean;
 }
 
 // Spinner that overlays the entire screen
-const GlobalSpinner = ({ text }: SpinnerProps) => {
+const GlobalSpinner = ({ text, lightBlur = false }: SpinnerProps) => {
+  const blurClass = lightBlur ? 'bg-white/30 backdrop-blur-[1px]' : 'bg-white/50 backdrop-blur-sm';
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/50 backdrop-blur-sm">
+    <div className={`fixed inset-0 z-[100] flex items-center justify-center ${blurClass}`}>
       <div className="flex h-[200px] flex-col items-center justify-center">
         <div className="border-3 h-9 w-9 animate-spin rounded-full border-blue-600 border-t-transparent" />
         <div className="mt-5 font-medium text-blue-600">{text || 'Loading data...'}</div>

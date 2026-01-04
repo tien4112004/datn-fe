@@ -88,17 +88,6 @@
     <Modal :visible="!!dialogForExport" :width="1000" @closed="closeExportDialog()">
       <ExportDialog />
     </Modal>
-
-    <Modal
-      :visible="showAIPPTDialog"
-      :width="840"
-      :closeOnClickMask="false"
-      :closeOnEsc="false"
-      closeButton
-      @closed="closeAIPPTDialog()"
-    >
-      <AIPPTDialog />
-    </Modal>
   </template>
 </template>
 
@@ -126,7 +115,6 @@ import SearchPanel from './SearchPanel.vue';
 import NotesPanel from './NotesPanel.vue';
 import SymbolPanel from './Toolbar/SymbolPanel.vue';
 import MarkupPanel from './MarkupPanel.vue';
-import AIPPTDialog from './AIPPTDialog.vue';
 import Modal from '@/components/Modal.vue';
 import Drawer from '@/components/Drawer.vue';
 
@@ -144,7 +132,6 @@ const {
   showSymbolPanel,
   showMarkupPanel,
   showImageLibPanel,
-  showAIPPTDialog,
   sidebarExpanded,
 } = storeToRefs(mainStore);
 const { currentSlide } = storeToRefs(slidesStore);
@@ -156,7 +143,6 @@ const {
 } = useSlideEditLock();
 
 const closeExportDialog = () => mainStore.setDialogForExport('');
-const closeAIPPTDialog = () => mainStore.setAIPPTDialogState(false);
 
 const remarkHeight = ref(240);
 const showRemarkDrawer = ref(false);

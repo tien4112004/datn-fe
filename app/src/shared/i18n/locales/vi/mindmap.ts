@@ -46,6 +46,7 @@ export default {
     tabs: {
       general: 'Chung',
       selection: 'Lựa chọn',
+      tree: 'Cây',
     },
     actions: {
       addNode: 'Thêm nút',

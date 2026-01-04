@@ -1,6 +1,16 @@
 import type { Service } from '@/shared/api';
 import type { ApiResponse } from '@aiprimary/api';
-import type { Mindmap, AiGeneratedNode } from './mindmap';
+import type { Mindmap, AiGeneratedNode, MindMapNode, MindMapEdge, MindmapMetadata } from './mindmap';
+
+export interface MindmapApiService extends Service {
+  getMindmapById(id: string): Promise<MindmapResponse>;
+  getMindmaps(request: MindmapCollectionRequest): Promise<ApiResponse<MindmapResponse[]>>;
+  createMindmap(data: MindmapCreateInput): Promise<MindmapResponse>;
+  updateMindmap(id: string, data: MindmapUpdateInput): Promise<MindmapResponse>;
+  deleteMindmap(id: string): Promise<void>;
+  updateMindmapTitle(id: string, name: string): Promise<MindmapTitleUpdateResponse>;
+  generateMindmap(request: MindmapGenerateRequest): Promise<AiGeneratedNode>;
+}
 
 export interface MindmapCollectionRequest {
   page?: number;
@@ -9,15 +19,43 @@ export interface MindmapCollectionRequest {
   filter?: string;
 }
 
-export interface MindmapApiService extends Service {
-  getMindmapById(id: string): Promise<Mindmap>;
-  getMindmaps(request: MindmapCollectionRequest): Promise<ApiResponse<Mindmap[]>>;
-  createMindmap(data: Mindmap): Promise<Mindmap>;
-  updateMindmap(id: string, data: Partial<Mindmap> | FormData): Promise<Mindmap>;
-  deleteMindmap(id: string): Promise<void>;
-  updateMindmapTitle(id: string, name: string): Promise<any | null>;
-  generateMindmap(request: MindmapGenerateRequest): Promise<AiGeneratedNode>;
+/**
+ * Full mindmap object returned from the server (GET operations)
+ */
+export type MindmapResponse = Mindmap;
+
+/**
+ * Input data for creating a new mindmap
+ * Omits server-generated fields (id, createdAt, updatedAt)
+ */
+export interface MindmapCreateInput {
+  title: string;
+  description?: string;
+  thumbnail?: string;
+  metadata?: MindmapMetadata;
+  nodes: MindMapNode[];
+  edges: MindMapEdge[];
 }
+
+/**
+ * Input data for updating an existing mindmap
+ * Can be a partial Mindmap object or FormData (for file uploads like thumbnails)
+ */
+export type MindmapUpdateInput =
+  | Partial<{
+      title: string;
+      description: string;
+      thumbnail: string;
+      metadata: MindmapMetadata;
+      nodes: MindMapNode[];
+      edges: MindMapEdge[];
+    }>
+  | FormData;
+
+/**
+ * Response from updateMindmapTitle - API returns 204 No Content
+ */
+export type MindmapTitleUpdateResponse = null;
 
 /**
  * Request body for generating a mindmap using AI.

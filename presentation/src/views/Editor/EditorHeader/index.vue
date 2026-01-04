@@ -48,14 +48,6 @@
         <template #content>
           <PopoverMenuItem
             @click="
-              openAIPPTDialog();
-              mainMenuVisible = false;
-            "
-            >{{ $t('header.ai.aiGeneratePPT') }}</PopoverMenuItem
-          >
-          <div class="menu-divider"></div>
-          <PopoverMenuItem
-            @click="
               slideCreationDialogVisible = true;
               mainMenuVisible = false;
             "
@@ -302,10 +294,6 @@ const setDialogForExport = (type: DialogForExportTypes) => {
 
 const openMarkupPanel = () => {
   mainStore.setMarkupPanelState(true);
-};
-
-const openAIPPTDialog = () => {
-  mainStore.setAIPPTDialogState(true);
 };
 
 const handleCreateSlide = async (slideType: string, themeName: string) => {

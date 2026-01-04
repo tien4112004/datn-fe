@@ -51,7 +51,7 @@ class TemplateRegistry {
     return {
       id: apiTemplate.id,
       name: apiTemplate.name,
-      config: apiTemplate.config as any,
+      containers: apiTemplate.containers,
       graphics: apiTemplate.graphics,
       parameters: apiTemplate.parameters,
     };

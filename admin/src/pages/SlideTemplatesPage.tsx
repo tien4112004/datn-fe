@@ -1,4 +1,9 @@
-import { useSlideTemplates, useUpdateSlideTemplate } from '@/hooks';
+import {
+  useSlideTemplates,
+  useUpdateSlideTemplate,
+  useCreateSlideTemplate,
+  useDeleteSlideTemplate,
+} from '@/hooks';
 import {
   createColumnHelper,
   getCoreRowModel,
@@ -13,7 +18,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import type { SlideTemplate } from '@aiprimary/core';
-import { Edit, FileJson, Plus, RefreshCw } from 'lucide-react';
+import { Edit, FileJson, Plus, RefreshCw, Trash2 } from 'lucide-react';
 import * as frontendDataTemplates from '@aiprimary/frontend-data';
 import { toast } from 'sonner';
 import { getAvailableLayouts } from '@/utils/defaultTemplates';
@@ -35,9 +40,28 @@ export function SlideTemplatesPage() {
     ...(layoutFilter !== 'ALL' && { layout: layoutFilter }),
   });
   const updateTemplate = useUpdateSlideTemplate();
+  const createTemplate = useCreateSlideTemplate();
+  const deleteTemplate = useDeleteSlideTemplate();
 
   const templates = data?.data || [];
   const pagination = data?.pagination;
+
+  const handleDelete = async (template: SlideTemplate) => {
+    if (!template.id) return;
+
+    const confirmed = window.confirm(
+      `Are you sure you want to delete template "${template.name}"?\n\nThis action cannot be undone.`
+    );
+
+    if (!confirmed) return;
+
+    try {
+      await deleteTemplate.mutateAsync(template.id);
+      refetch();
+    } catch (error) {
+      console.error('Failed to delete template:', error);
+    }
+  };
 
   // Collect all templates from frontend-data
   const getAllFrontendTemplates = (): SlideTemplate[] => {
@@ -87,20 +111,33 @@ export function SlideTemplatesPage() {
       toast.info(`Starting sync of ${frontendTemplates.length} templates...`);
 
       let synced = 0;
+      let created = 0;
       let failed = 0;
 
       for (const template of frontendTemplates) {
         try {
-          // Use template.id as the ID for PUT request
-          if (template.id) {
+          if (!template.id) {
+            console.warn('Template without ID:', template.name);
+            failed++;
+            continue;
+          }
+
+          // Try to update first, create if it doesn't exist (upsert)
+          try {
             await updateTemplate.mutateAsync({
               id: template.id,
               data: template,
             });
             synced++;
-          } else {
-            console.warn('Template without ID:', template.name);
-            failed++;
+          } catch (updateError) {
+            // If update fails (likely 404), try to create
+            try {
+              await createTemplate.mutateAsync(template);
+              created++;
+            } catch (createError) {
+              console.error(`Failed to create template ${template.name}:`, createError);
+              failed++;
+            }
           }
         } catch (error) {
           console.error(`Failed to sync template ${template.name}:`, error);
@@ -109,9 +146,13 @@ export function SlideTemplatesPage() {
       }
 
       if (failed === 0) {
-        toast.success(`Successfully synced ${synced} templates!`);
+        const message =
+          created > 0
+            ? `Successfully synced ${synced} templates and created ${created} new templates!`
+            : `Successfully synced ${synced} templates!`;
+        toast.success(message);
       } else {
-        toast.warning(`Synced ${synced} templates, ${failed} failed`);
+        toast.warning(`Synced ${synced} templates, created ${created}, ${failed} failed`);
       }
 
       // Refresh the list
@@ -135,11 +176,11 @@ export function SlideTemplatesPage() {
         header: 'Layout',
         cell: (info) => <span className="bg-muted rounded px-2 py-1 text-sm">{info.getValue()}</span>,
       }),
-      columnHelper.accessor('config', {
+      columnHelper.accessor('containers', {
         header: 'Config',
         cell: (info) => {
-          const config = info.getValue();
-          const containerCount = config?.containers ? Object.keys(config.containers as object).length : 0;
+          const containers = info.getValue();
+          const containerCount = containers ? Object.keys(containers as object).length : 0;
           return (
             <div className="text-muted-foreground flex items-center gap-1">
               <FileJson className="h-4 w-4" />
@@ -164,17 +205,27 @@ export function SlideTemplatesPage() {
         header: 'Actions',
         meta: { align: 'right' as const },
         cell: ({ row }) => (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => (window.location.href = `/slide-templates/${row.original.id}`)}
-          >
-            <Edit className="h-4 w-4" />
-          </Button>
+          <div className="flex items-center justify-end gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => (window.location.href = `/slide-templates/${row.original.id}`)}
+            >
+              <Edit className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleDelete(row.original)}
+              className="text-destructive hover:bg-destructive hover:text-destructive-foreground"
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
         ),
       }),
     ],
-    []
+    [handleDelete]
   );
 
   const table = useReactTable({

@@ -3,7 +3,9 @@ import type {
   Size,
   TextLayoutBlockInstance,
   FontSizeRange,
+  TextStyleConfig,
 } from '@aiprimary/core/templates';
+import { createHtmlElement } from './elementCreators';
 
 /**
  * Font Size Calculation Result
@@ -249,4 +251,65 @@ export function calculateMaxLabelWidth(
 
   // Add padding and safety margin
   return maxWidth + safetyMargin + padding;
+}
+
+/**
+ * Calculates the maximum label height from an array of label texts.
+ * Measures actual DOM height considering text wrapping within width constraint.
+ *
+ * @param texts - Array of label text strings to measure
+ * @param containerWidth - Available width for labels (determines wrapping)
+ * @param fontSizeRange - Font size range for labels (default: 18-28px)
+ * @param fontFamily - Font family (default: Arial)
+ * @param fontWeight - Font weight (default: bold for labels)
+ * @param padding - Vertical padding to add (default: 20px)
+ * @param lineHeight - Line height multiplier (default: 1.4)
+ * @returns Maximum height needed for labels in pixels
+ */
+export function calculateMaxLabelHeight(
+  texts: string[],
+  containerWidth: number,
+  fontSizeRange: FontSizeRange = { minSize: 18, maxSize: 28 },
+  fontFamily: string = 'Arial',
+  fontWeight: number | 'normal' | 'bold' | 'bolder' | 'lighter' = 'bold',
+  padding: number = 20,
+  lineHeight: number = 1.4
+): number {
+  if (texts.length === 0) return 0;
+
+  let maxHeight = 0;
+
+  // Create text style config for labels
+  const config: TextStyleConfig = {
+    fontFamily,
+    fontWeight,
+    lineHeight,
+  };
+
+  // Measure each label text at max font size
+  for (const text of texts) {
+    // Create HTML element with max font size
+    const element = createHtmlElement(text, fontSizeRange.maxSize, config);
+
+    // Create mock container with width constraint for wrapping
+    const mockContainer: TextLayoutBlockInstance = {
+      type: 'text',
+      bounds: {
+        left: 0,
+        top: 0,
+        width: containerWidth,
+        height: 1000, // Large enough to not constrain height
+      },
+      label: 'label',
+      layout: {},
+      text: config,
+    };
+
+    // Measure height with wrapping
+    const size = measureElement(element, mockContainer);
+    maxHeight = Math.max(maxHeight, size.height);
+  }
+
+  // Add padding (top and bottom)
+  return maxHeight + padding;
 }

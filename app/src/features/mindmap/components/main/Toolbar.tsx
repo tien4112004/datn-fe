@@ -11,6 +11,7 @@ import { GenerateTreeDialog } from '../generate';
 import NodeSelectionTab from './NodeSelectionTab';
 import LoadingButton from '@/components/common/LoadingButton';
 import { cn } from '@/shared/lib/utils';
+import { TreePanelContent } from '../tree-panel';
 
 const Toolbar = ({ mindmapId, isMobileSheet = false }: { mindmapId: string; isMobileSheet?: boolean }) => {
   const { t } = useTranslation(I18N_NAMESPACES.MINDMAP);
@@ -46,7 +47,7 @@ const Toolbar = ({ mindmapId, isMobileSheet = false }: { mindmapId: string; isMo
         'flex flex-col gap-2 p-4',
         isMobileSheet
           ? 'w-full bg-transparent'
-          : 'w-64 overflow-y-auto border-l border-gray-200 bg-gradient-to-b from-white to-slate-50/95 shadow-lg backdrop-blur-md'
+          : 'w-[400px] overflow-x-hidden border-l border-gray-200 bg-gradient-to-b from-white to-slate-50/95 shadow-lg backdrop-blur-md'
       )}
     >
       {/* Header - Hide on mobile (shown in SheetHeader instead) */}
@@ -58,7 +59,7 @@ const Toolbar = ({ mindmapId, isMobileSheet = false }: { mindmapId: string; isMo
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="flex flex-1 flex-col">
-        <TabsList className={cn('grid w-full grid-cols-2', isMobileSheet && 'h-12')}>
+        <TabsList className={cn('grid w-full grid-cols-3', isMobileSheet && 'h-12')}>
           <TabsTrigger value="general" className={cn(isMobileSheet && 'text-base')}>
             {t('toolbar.tabs.general')}
           </TabsTrigger>
@@ -77,6 +78,9 @@ const Toolbar = ({ mindmapId, isMobileSheet = false }: { mindmapId: string; isMo
                 {selectedCount}
               </span>
             )}
+          </TabsTrigger>
+          <TabsTrigger value="tree" className={cn(isMobileSheet && 'text-base')}>
+            {t('toolbar.tabs.tree')}
           </TabsTrigger>
         </TabsList>
 
@@ -196,6 +200,11 @@ const Toolbar = ({ mindmapId, isMobileSheet = false }: { mindmapId: string; isMo
         {/* Selection Tab Content */}
         <TabsContent value="selection" className="mt-4 flex-1">
           <NodeSelectionTab />
+        </TabsContent>
+
+        {/* Tree Tab Content */}
+        <TabsContent value="tree" className="mt-4 flex-1 overflow-hidden">
+          <TreePanelContent />
         </TabsContent>
       </Tabs>
 

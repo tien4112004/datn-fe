@@ -7,15 +7,13 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref, watch } from 'vue';
+import { onMounted } from 'vue';
 import { storeToRefs } from 'pinia';
 import {
   useScreenStore,
   useMainStore,
   useSnapshotStore,
   useSlidesStore,
-  useContainerStore,
-  useSaveStore,
 } from '@/store';
 import { LOCALSTORAGE_KEY_DISCARDED_DB } from '@/configs/storage';
 import { deleteDiscardedDB } from '@/utils/database';
@@ -25,63 +23,24 @@ import api from '@/services';
 import Editor from '../views/Editor/index.vue';
 import Mobile from '../views/Mobile/index.vue';
 import Screen from '../views/Screen/index.vue';
-import type { Presentation } from '../types/slides';
 
 const _isPC = isPC();
 
-const props = defineProps<{
-  titleTest: string;
-  isRemote: boolean;
-  presentation: Presentation;
-  mode: 'view' | 'edit';
-}>();
-
+// MainApp is a standalone development/testing app - no props needed
 const mainStore = useMainStore();
 const slidesStore = useSlidesStore();
 const snapshotStore = useSnapshotStore();
-const containerStore = useContainerStore();
-const saveStore = useSaveStore();
 const { databaseId } = storeToRefs(mainStore);
 const { slides } = storeToRefs(slidesStore);
 const { screening, presenter } = storeToRefs(useScreenStore());
 
-// Track if this is the initial load to avoid marking as dirty
-let isInitialLoad = ref(true);
-
 onMounted(async () => {
-  isInitialLoad.value = true;
-  containerStore.initialize(props);
-
-  // Reset save state on mount to ensure clean state
-  if (containerStore.isRemote) {
-    saveStore.reset();
-  }
-
-  if (containerStore.isRemote) {
-    slidesStore.setSlides(containerStore.presentation?.slides || []);
-  } else {
-    const slides = await api.getFileData('slides');
-    slidesStore.setSlides(slides);
-  }
+  // MainApp always loads mock data for development/testing
+  const slides = await api.getFileData('slides');
+  slidesStore.setSlides(slides);
 
   await deleteDiscardedDB();
   snapshotStore.initSnapshotDatabase();
-
-  isInitialLoad.value = false;
-});
-
-watch(
-  slides,
-  () => {
-    if (containerStore.isRemote && containerStore.mode === 'edit') {
-      saveStore.markDirty();
-    }
-  },
-  { deep: true }
-);
-
-watch(isInitialLoad, () => {
-  saveStore.reset();
 });
 
 // When the application is unloaded, record the current indexedDB database ID in localStorage for later database cleanup

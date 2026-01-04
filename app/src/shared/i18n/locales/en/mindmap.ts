@@ -46,6 +46,7 @@ export default {
     tabs: {
       general: 'General',
       selection: 'Selection',
+      tree: 'Tree',
     },
     actions: {
       addNode: 'Add Node',

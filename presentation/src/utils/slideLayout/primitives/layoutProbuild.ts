@@ -6,6 +6,9 @@ import type {
   Bounds,
   LayoutBlockInstance,
   LayoutBlockConfig,
+  TemplateParameter,
+  SlideViewport,
+  ExpressionConstants,
 } from '@aiprimary/core/templates';
 import {
   createImageElement,
@@ -17,6 +20,7 @@ import {
   buildChildrenFromChildTemplate,
   calculateUnifiedFontSizeForLabels,
   layoutItemsInBlock,
+  mergeParametersIntoConstants,
 } from '.';
 import { createHtmlElement, createTextPPTElement, createListElements } from './elementCreators';
 import {
@@ -26,7 +30,7 @@ import {
   FONT_SIZE_RANGE_CONTENT,
   FONT_SIZE_RANGE_TITLE,
 } from './layoutConstants';
-import { measureElement, calculateMaxLabelWidth } from './elementMeasurement';
+import { measureElement, calculateMaxLabelWidth, calculateMaxLabelHeight } from './elementMeasurement';
 
 export async function buildImageElement(
   src: string,
@@ -109,61 +113,82 @@ export function buildCombinedList(contents: string[], config: TemplateContainerC
 /**
  * Checks if a config uses maxLabel distribution type.
  * Recursively checks the config and its childTemplate.
+ * Returns the orientation if found, or null if not using maxLabel.
  */
-function _usesMaxLabelDistribution(config: LayoutBlockConfig): boolean {
+function _getMaxLabelDistributionOrientation(config: LayoutBlockConfig): 'horizontal' | 'vertical' | null {
   if (config.layout?.distribution === 'maxLabel/fill') {
-    return true;
+    return config.layout.orientation || 'horizontal';
   }
 
   if (config.childTemplate?.structure?.layout?.distribution === 'maxLabel/fill') {
-    return true;
+    return config.childTemplate.structure.layout.orientation || 'horizontal';
   }
 
-  return false;
+  return null;
 }
 
 /**
- * Calculates the maximum label width from data.
+ * Calculates the maximum label size (width or height) from data.
  * Uses the first pass of two-pass layout algorithm.
  *
  * @param data - Label data to measure
- * @param containerWidth - Container width for capping
- * @returns Calculated label width in pixels
+ * @param containerBounds - Container dimensions (both width and height)
+ * @param orientation - Layout orientation ('horizontal' or 'vertical')
+ * @returns Calculated label size in pixels
  */
-function _calculateMaxLabelWidthFromData(data: Record<string, string[]>, containerWidth: number): number {
+function _calculateMaxLabelSizeFromData(
+  data: Record<string, string[]>,
+  containerBounds: { width: number; height: number },
+  orientation: 'horizontal' | 'vertical'
+): number {
   // Find label data
   const labelData = data['label'];
   if (!labelData || labelData.length === 0) {
-    // Fallback: use 25% of container width
-    return containerWidth * 0.25;
+    // Fallback: use 25% of primary axis
+    return orientation === 'horizontal' ? containerBounds.width * 0.25 : containerBounds.height * 0.25;
   }
 
-  // Measure all labels at max font size
-  const maxWidth = calculateMaxLabelWidth(labelData, FONT_SIZE_RANGE_LABEL);
+  if (orientation === 'horizontal') {
+    // Measure all labels at max font size to find max width
+    const maxWidth = calculateMaxLabelWidth(labelData, FONT_SIZE_RANGE_LABEL);
 
-  // Cap at reasonable percentage (35% max)
-  const maxAllowed = containerWidth * 0.35;
-  const minAllowed = 60; // Minimum 60px for very short labels
+    // Cap at reasonable percentage (35% max)
+    const maxAllowed = containerBounds.width * 0.35;
+    const minAllowed = 60; // Minimum 60px for very short labels
 
-  return Math.max(minAllowed, Math.min(maxWidth, maxAllowed));
+    return Math.max(minAllowed, Math.min(maxWidth, maxAllowed));
+  } else {
+    // Measure all labels to find max height (considering wrapping within width)
+    const maxHeight = calculateMaxLabelHeight(
+      labelData,
+      containerBounds.width, // Pass width for wrapping calculation
+      FONT_SIZE_RANGE_LABEL
+    );
+
+    // Cap at reasonable percentage (20% max for vertical)
+    const maxAllowed = containerBounds.height * 0.2;
+    const minAllowed = 40; // Minimum 40px for very compact labels
+
+    return Math.max(minAllowed, Math.min(maxHeight, maxAllowed));
+  }
 }
 
 /**
- * Applies calculated label width to config by replacing maxLabel/fill distribution.
+ * Applies calculated label size to config by replacing maxLabel/fill distribution.
  * Creates a modified copy of the config with pixel-based distribution.
  *
  * @param config - Original config
- * @param labelWidth - Calculated label width
+ * @param labelSize - Calculated label size (width or height)
  * @returns Modified config with pixel distribution
  */
-function _applyLabelWidthToConfig(config: LayoutBlockConfig, labelWidth: number): LayoutBlockConfig {
+function _applyLabelSizeToConfig(config: LayoutBlockConfig, labelSize: number): LayoutBlockConfig {
   const modifiedConfig = { ...config };
 
   // Update main layout distribution
   if (config.layout?.distribution === 'maxLabel/fill') {
     modifiedConfig.layout = {
       ...config.layout,
-      distribution: `${labelWidth}px/fill`,
+      distribution: `${labelSize}px/fill`,
     };
   }
 
@@ -175,7 +200,7 @@ function _applyLabelWidthToConfig(config: LayoutBlockConfig, labelWidth: number)
         ...config.childTemplate.structure,
         layout: {
           ...config.childTemplate.structure.layout,
-          distribution: `${labelWidth}px/fill`,
+          distribution: `${labelSize}px/fill`,
         },
       },
     };
@@ -189,10 +214,10 @@ function _applyLabelWidthToConfig(config: LayoutBlockConfig, labelWidth: number)
  * This is the main function for creating content-heavy layouts (lists, tables, etc.)
  *
  * Algorithm (two-pass optimization for maxLabel distribution):
- * 1. Detect if using maxLabel/fill distribution
+ * 1. Detect if using maxLabel/fill distribution and its orientation
  * 2. If yes:
- *    a. PASS 1: Measure all labels to find max width
- *    b. Replace maxLabel/fill with calculated pixel width
+ *    a. PASS 1: Calculate label size (width for horizontal, height for vertical)
+ *    b. Replace maxLabel/fill with calculated pixel size
  * 3. Normalize data structure (flat vs nested)
  * 4. Build layout tree with bounds
  * 5. Collect elements by label
@@ -234,17 +259,36 @@ function _applyLabelWidthToConfig(config: LayoutBlockConfig, labelWidth: number)
 export function buildLayoutWithUnifiedFontSizing(
   config: LayoutBlockConfig,
   bounds: Bounds,
-  data: Record<string, string[]>
+  data: Record<string, string[]>,
+  viewport?: SlideViewport,
+  parameters?: TemplateParameter[],
+  parameterOverrides?: Record<string, number | boolean>
 ): {
   instance: LayoutBlockInstance;
   elements: Record<string, PPTElement[]>;
   fontSizes: Record<string, number>;
 } {
-  // PASS 1: Calculate max label width if using maxLabel distribution
+  // Build constants for expression evaluation
+  let constants: ExpressionConstants | undefined;
+  if (viewport && parameters) {
+    const baseConstants = {
+      SLIDE_WIDTH: viewport.width,
+      SLIDE_HEIGHT: viewport.height,
+    };
+    constants = mergeParametersIntoConstants(baseConstants, parameters, parameterOverrides);
+  }
+
+  // PASS 1: Calculate max label size if using maxLabel distribution
   let finalConfig = config;
-  if (_usesMaxLabelDistribution(config)) {
-    const labelWidth = _calculateMaxLabelWidthFromData(data, bounds.width);
-    finalConfig = _applyLabelWidthToConfig(config, labelWidth);
+  const orientation = _getMaxLabelDistributionOrientation(config);
+  if (orientation) {
+    // Pass both width and height for proper measurement
+    const labelSize = _calculateMaxLabelSizeFromData(
+      data,
+      { width: bounds.width, height: bounds.height },
+      orientation
+    );
+    finalConfig = _applyLabelSizeToConfig(config, labelSize);
   }
 
   // Step 1: Process and normalize data
@@ -255,7 +299,8 @@ export function buildLayoutWithUnifiedFontSizing(
   } = _normalizeDataStructure(data, finalConfig, bounds);
 
   // Step 2: Build layout tree (skip if already built for nested structures)
-  const instance = prebuiltInstance || buildInstanceWithBounds(finalConfig, bounds, processedData);
+  const instance =
+    prebuiltInstance || buildInstanceWithBounds(finalConfig, bounds, processedData, false, constants);
 
   // Step 3: Collect label groups
   const labelGroups = new Map<string, TextLayoutBlockInstance[]>();

@@ -64,8 +64,6 @@ export type TemplateContainerConfig =
  */
 export interface TemplateConfig {
   containers: Record<string, TemplateContainerConfig>;
-  theme: SlideTheme;
-  viewport: SlideViewport;
   graphics?: GraphicElement[];
   parameters?: TemplateParameter[]; // Template parameters for user customization
 }
@@ -119,10 +117,7 @@ export interface BooleanParameter {
 /**
  * Template wrapper with metadata
  */
-export interface Template {
+export interface Template extends PartialTemplateConfig {
   id: string;
   name: string;
-  config: PartialTemplateConfig;
-  graphics?: GraphicElement[]; // Optional decorative graphics
-  parameters?: TemplateParameter[]; // Customizable parameters
 }

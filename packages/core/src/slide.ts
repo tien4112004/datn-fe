@@ -1,4 +1,4 @@
-import type { LayoutType, TemplateParameter } from './types/template';
+import type { LayoutType, TemplateConfig } from './types/template';
 
 export const SHAPE_PATH_FORMULAS_KEYS = {
   ROUND_RECT: 'roundRect',
@@ -861,18 +861,11 @@ export interface SlideTheme {
   updatedAt?: string; // ISO date string
 }
 
-export interface SlideTemplate {
+export interface SlideTemplate extends TemplateConfig {
   id: string;
   name: string;
   layout: string; // Template layout type (e.g., 'list', 'title', 'twoColumn')
-  config: {
-    // Layout configuration
-    containers: Record<string, any>;
-    [key: string]: any;
-  };
   cover?: string;
-  graphics?: any[]; // Graphics elements
-  parameters?: TemplateParameter[]; // Template parameters (supports number and boolean types)
   createdAt?: string; // ISO date string
   updatedAt?: string; // ISO date string
 }

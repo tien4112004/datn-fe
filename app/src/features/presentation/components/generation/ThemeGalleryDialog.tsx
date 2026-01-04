@@ -11,7 +11,6 @@ import { useTranslation } from 'react-i18next';
 import { ThemePreviewCard } from './ThemePreviewCard';
 import type { SlideTheme } from '../../types/slide';
 import { cn } from '@/shared/lib/utils';
-import { useRef, useEffect } from 'react';
 import { useInfiniteSlideThemes } from '../../hooks';
 
 interface ThemeGalleryDialogProps {
@@ -30,34 +29,10 @@ const ThemeGalleryDialog = ({
   const { t } = useTranslation('presentation', { keyPrefix: 'customization' });
   const { themes, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage } = useInfiniteSlideThemes();
 
-  // Reference to the sentinel element for intersection observer
-  const sentinelRef = useRef<HTMLDivElement>(null);
-
   const handleThemeSelect = (theme: SlideTheme) => {
     onThemeSelect(theme);
     onOpenChange(false);
   };
-
-  // Intersection Observer for infinite scrolling
-  useEffect(() => {
-    if (!sentinelRef.current || !open) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const first = entries[0];
-        if (first.isIntersecting && hasNextPage && !isFetchingNextPage) {
-          fetchNextPage();
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    observer.observe(sentinelRef.current);
-
-    return () => {
-      observer.disconnect();
-    };
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage, open]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -95,15 +70,21 @@ const ThemeGalleryDialog = ({
                 ))}
               </div>
 
-              {/* Sentinel element for infinite scrolling */}
-              {hasNextPage && <div ref={sentinelRef} className="h-10" />}
-
               {/* Loading indicator for next page */}
               {isFetchingNextPage && (
                 <div className="grid grid-cols-2 gap-4 pt-4 md:grid-cols-3 lg:grid-cols-4">
-                  {Array.from({ length: 4 }).map((_, index) => (
+                  {Array.from({ length: 8 }).map((_, index) => (
                     <div key={index} className="bg-muted h-24 animate-pulse rounded-lg" />
                   ))}
+                </div>
+              )}
+
+              {/* Load More button */}
+              {hasNextPage && !isFetchingNextPage && (
+                <div className="flex justify-center pt-6">
+                  <Button variant="outline" onClick={() => fetchNextPage()}>
+                    {t('theme.gallery.loadMore')}
+                  </Button>
                 </div>
               )}
             </>

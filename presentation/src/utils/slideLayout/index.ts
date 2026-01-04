@@ -116,7 +116,7 @@ export const convertToSlide = async (
 
   if (layoutType === SLIDE_LAYOUT_TYPE.TWO_COLUMN_WITH_IMAGE) {
     const resolvedTemplate = resolveTemplate(
-      template.config,
+      template,
       theme,
       viewport,
       template.graphics,
@@ -140,7 +140,7 @@ export const convertToSlide = async (
     );
   } else if (layoutType === SLIDE_LAYOUT_TYPE.MAIN_IMAGE) {
     const resolvedTemplate = resolveTemplate(
-      template.config,
+      template,
       theme,
       viewport,
       template.graphics,
@@ -164,7 +164,7 @@ export const convertToSlide = async (
     );
   } else if (layoutType === SLIDE_LAYOUT_TYPE.TITLE) {
     const resolvedTemplate = resolveTemplate(
-      template.config,
+      template,
       theme,
       viewport,
       template.graphics,
@@ -193,7 +193,7 @@ export const convertToSlide = async (
     );
   } else if (layoutType === SLIDE_LAYOUT_TYPE.TWO_COLUMN) {
     const resolvedTemplate = resolveTemplate(
-      template.config,
+      template,
       theme,
       viewport,
       template.graphics,
@@ -236,7 +236,7 @@ export const convertToSlide = async (
     );
   } else if (layoutType === SLIDE_LAYOUT_TYPE.LIST) {
     const resolvedTemplate = resolveTemplate(
-      template.config,
+      template,
       theme,
       viewport,
       template.graphics,
@@ -281,7 +281,7 @@ export const convertToSlide = async (
     );
   } else if (layoutType === SLIDE_LAYOUT_TYPE.LABELED_LIST) {
     const resolvedTemplate = resolveTemplate(
-      template.config,
+      template,
       theme,
       viewport,
       template.graphics,
@@ -320,7 +320,7 @@ export const convertToSlide = async (
     );
   } else if (layoutType === SLIDE_LAYOUT_TYPE.TABLE_OF_CONTENTS) {
     const resolvedTemplate = resolveTemplate(
-      template.config,
+      template,
       theme,
       viewport,
       template.graphics,
@@ -357,7 +357,7 @@ export const convertToSlide = async (
     );
   } else if (layoutType === SLIDE_LAYOUT_TYPE.TIMELINE) {
     const resolvedTemplate = resolveTemplate(
-      template.config,
+      template,
       theme,
       viewport,
       template.graphics,
@@ -386,7 +386,7 @@ export const convertToSlide = async (
     );
   } else if (layoutType === SLIDE_LAYOUT_TYPE.PYRAMID) {
     const resolvedTemplate = resolveTemplate(
-      template.config,
+      template,
       theme,
       viewport,
       template.graphics,

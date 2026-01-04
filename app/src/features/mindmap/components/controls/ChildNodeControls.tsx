@@ -353,7 +353,17 @@ export const NodeHandlers = memo(
   ({ layoutType, side, id }: { layoutType: LayoutType; side: Side; id: string }) => {
     const updateNodeInternals = useUpdateNodeInternals();
 
+    // Get node to access measured dimensions
+    const node = useCoreStore((state) => state.nodes.find((n) => n.id === id));
+    const nodeWidth = node?.measured?.width;
+    const nodeHeight = node?.measured?.height;
+
     useEffect(() => {
+      // Only update if node has dimensions
+      if (!nodeWidth || !nodeHeight) {
+        return;
+      }
+
       updateNodeInternals(id);
 
       const timerId = setTimeout(() => {
@@ -364,11 +374,16 @@ export const NodeHandlers = memo(
         updateNodeInternals(id);
       }, 1000);
 
+      const timerId3 = setTimeout(() => {
+        updateNodeInternals(id);
+      }, 2000);
+
       return () => {
         clearTimeout(timerId);
         clearTimeout(timerId2);
+        clearTimeout(timerId3);
       };
-    }, [layoutType, id, side, updateNodeInternals]);
+    }, [layoutType, id, side, updateNodeInternals, nodeWidth, nodeHeight]);
 
     /**
      * Determine which handles should be visible based on layout type and node side.

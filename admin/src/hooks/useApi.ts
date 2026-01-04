@@ -263,6 +263,23 @@ export function useUpdateSlideTemplate() {
   });
 }
 
+export function useDeleteSlideTemplate() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => getAdminApiService().deleteSlideTemplate(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: adminKeys.templates.all });
+      toast.success('Template deleted successfully');
+    },
+    onError: (error) => {
+      toast.error('Failed to delete template', {
+        description: error instanceof Error ? error.message : 'An error occurred',
+      });
+    },
+  });
+}
+
 // ============= ART STYLES =============
 
 export function useArtStyles(params?: PaginationParams) {

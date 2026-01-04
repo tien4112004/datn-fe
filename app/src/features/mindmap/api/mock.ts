@@ -2,7 +2,11 @@ import { API_MODE, type ApiMode } from '@aiprimary/api';
 import {
   type MindmapApiService,
   type Mindmap,
+  type MindmapResponse,
+  type MindmapCreateInput,
+  type MindmapUpdateInput,
   type MindmapCollectionRequest,
+  type MindmapTitleUpdateResponse,
   type AiGeneratedNode,
   MINDMAP_TYPES,
   PATH_TYPES,
@@ -11,7 +15,7 @@ import { DRAGHANDLE, SIDE } from '../types/constants';
 import type { ApiResponse, Pagination } from '@aiprimary/api';
 import { mapPagination } from '@aiprimary/api';
 
-const mockMindmaps: Mindmap[] = [
+const mockMindmaps: MindmapResponse[] = [
   {
     id: '1',
     title: 'Software Architecture',
@@ -212,7 +216,6 @@ const mockMindmaps: Mindmap[] = [
     ],
     createdAt: new Date('2024-01-15T10:30:00Z').toISOString(),
     updatedAt: new Date('2024-03-20T14:22:00Z').toISOString(),
-    status: 'active',
   },
   {
     id: '2',
@@ -245,7 +248,6 @@ const mockMindmaps: Mindmap[] = [
     edges: [],
     createdAt: new Date('2024-02-10T09:15:00Z').toISOString(),
     updatedAt: new Date('2024-03-18T11:45:00Z').toISOString(),
-    status: 'active',
   },
   {
     id: '3',
@@ -278,7 +280,6 @@ const mockMindmaps: Mindmap[] = [
     edges: [],
     createdAt: new Date('2024-01-05T08:00:00Z').toISOString(),
     updatedAt: new Date('2024-03-15T16:30:00Z').toISOString(),
-    status: 'draft',
   },
 ];
 
@@ -342,7 +343,7 @@ export default class MindmapMockService implements MindmapApiService {
     });
   }
 
-  async getMindmapById(id: string): Promise<Mindmap> {
+  async getMindmapById(id: string): Promise<MindmapResponse> {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         const mindmap = mindmapStorage.find((m) => m.id === id);
@@ -355,12 +356,12 @@ export default class MindmapMockService implements MindmapApiService {
     });
   }
 
-  async createMindmap(data: Mindmap): Promise<Mindmap> {
+  async createMindmap(data: MindmapCreateInput): Promise<MindmapResponse> {
     return new Promise((resolve) => {
       setTimeout(() => {
-        const newMindmap: Mindmap = {
+        const newMindmap: MindmapResponse = {
           ...data,
-          id: data.id || crypto.randomUUID(),
+          id: crypto.randomUUID(),
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         };
@@ -370,14 +371,17 @@ export default class MindmapMockService implements MindmapApiService {
     });
   }
 
-  async updateMindmap(id: string, data: Partial<Mindmap>): Promise<Mindmap> {
+  async updateMindmap(id: string, data: MindmapUpdateInput): Promise<MindmapResponse> {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         const index = mindmapStorage.findIndex((m) => m.id === id);
         if (index !== -1) {
+          // Handle FormData case (though not typical in mock)
+          const updateData = data instanceof FormData ? Object.fromEntries(data.entries()) : data;
+
           mindmapStorage[index] = {
             ...mindmapStorage[index],
-            ...data,
+            ...updateData,
             updatedAt: new Date().toISOString(),
           };
           resolve({ ...mindmapStorage[index] });
@@ -402,7 +406,7 @@ export default class MindmapMockService implements MindmapApiService {
     });
   }
 
-  async updateMindmapTitle(id: string, name: string): Promise<any | null> {
+  async updateMindmapTitle(id: string, name: string): Promise<MindmapTitleUpdateResponse> {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         const index = mindmapStorage.findIndex((m) => m.id === id);

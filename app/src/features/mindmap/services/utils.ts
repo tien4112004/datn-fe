@@ -2,6 +2,7 @@ import { Position } from '@xyflow/react';
 import type { MindMapNode, Side, MindMapEdge, AiGeneratedNode, LayoutType, RootNode } from '../types';
 import { MINDMAP_TYPES, SIDE, PATH_TYPES, DRAGHANDLE, LAYOUT_TYPE } from '../types';
 import { generateId } from '@/shared/lib/utils';
+import { layoutSingleTree } from './layouts/layoutStrategy';
 
 export const getAllDescendantNodes = (parentId: string, nodes: MindMapNode[]): MindMapNode[] => {
   return nodes.reduce((acc: MindMapNode[], node: MindMapNode) => {
@@ -154,11 +155,11 @@ const getChildSide = (layoutType: LayoutType, childIndex: number, isRootChild: b
   }
 };
 
-export const convertAiDataToMindMapNodes = (
+export const convertAiDataToMindMapNodes = async (
   aiData: AiGeneratedNode | AiGeneratedNode[],
   basePosition: { x: number; y: number },
   layoutType: LayoutType = DEFAULT_LAYOUT_TYPE
-): { nodes: MindMapNode[]; edges: MindMapEdge[] } => {
+): Promise<{ nodes: MindMapNode[]; edges: MindMapEdge[] }> => {
   const nodes: MindMapNode[] = [];
   const edges: MindMapEdge[] = [];
 
@@ -225,7 +226,13 @@ export const convertAiDataToMindMapNodes = (
     });
   }
 
-  return { nodes, edges };
+  // Apply layout to the generated nodes
+  const layoutResult = await layoutSingleTree(layoutType, nodes, edges, {
+    horizontalSpacing: 200,
+    verticalSpacing: 100,
+  });
+
+  return layoutResult;
 };
 
 /**

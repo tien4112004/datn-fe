@@ -68,6 +68,8 @@ export default {
       renameFileDialogTitle: 'Rename Mindmap',
       renameSuccess: 'Renamed to "{{filename}}" successfully',
       renameDuplicatedMessage: 'A mindmap with this name already exists',
+      untitled: 'Untitled Mindmap',
+      createFirst: 'Create your first mindmap to get started',
       deleteTitle: 'Delete Mindmap',
       deleteMessage: 'Are you sure you want to delete "{{name}}"? This action cannot be undone.',
       deleteSuccess: 'Mindmap "{{name}}" deleted successfully',

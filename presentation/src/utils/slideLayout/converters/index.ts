@@ -5,8 +5,11 @@ import type {
   TemplateConfig,
   TemplateParameter,
   TextLayoutBlockInstance,
+  TemplateContainerConfig,
 } from '../types';
-import type { Slide, SlideTheme } from '@/types/slides';
+import type { GraphicElement } from '../types/graphics';
+import type { Slide, SlideTheme, TurningMode } from '@/types/slides';
+import { SLIDE_LAYOUT_TYPE } from '@aiprimary/core/templates';
 import { resolveTemplateContainers, processBackground, processCombinedTextContainer } from '../primitives';
 import {
   buildLayoutWithUnifiedFontSizing,
@@ -17,9 +20,20 @@ import {
 } from '../primitives/layoutProbuild';
 import { cloneDeepWith, template } from 'lodash';
 import { calculateElementBounds } from '../primitives/layoutUtils';
-import type { GraphicElement } from '../types/graphics';
 import { renderGraphics } from '../primitives/graphicRenderer';
 import type { Bounds } from '../types';
+
+/**
+ * Resolved template configuration with theme and viewport
+ * This is the intermediate form after theme resolution but before bounds resolution
+ */
+export interface ResolvedTemplateConfig {
+  containers: Record<string, TemplateContainerConfig>;
+  theme: SlideTheme;
+  viewport: SlideViewport;
+  graphics?: GraphicElement[];
+  parameters?: TemplateParameter[];
+}
 
 /**
  * Normalized data structure for all layout types.
@@ -40,6 +54,27 @@ export interface MappedLayoutData {
  * Data mapper function type - converts layout schema to MappedLayoutData
  */
 export type DataMapper<T = any> = (data: T) => MappedLayoutData;
+
+/**
+ * Get appropriate slide transition mode based on layout type
+ */
+function getTurningModeForLayout(layoutType?: string): TurningMode {
+  if (!layoutType) return 'fade'; // Default
+
+  const transitionMap: Record<string, TurningMode> = {
+    [SLIDE_LAYOUT_TYPE.TITLE]: 'fade',
+    [SLIDE_LAYOUT_TYPE.LIST]: 'slideX',
+    [SLIDE_LAYOUT_TYPE.LABELED_LIST]: 'slideY',
+    [SLIDE_LAYOUT_TYPE.TWO_COLUMN]: 'slideX',
+    [SLIDE_LAYOUT_TYPE.TWO_COLUMN_WITH_IMAGE]: 'fade',
+    [SLIDE_LAYOUT_TYPE.MAIN_IMAGE]: 'scale',
+    [SLIDE_LAYOUT_TYPE.TABLE_OF_CONTENTS]: 'slideY',
+    [SLIDE_LAYOUT_TYPE.TIMELINE]: 'slideX',
+    [SLIDE_LAYOUT_TYPE.PYRAMID]: 'scaleY',
+  };
+
+  return transitionMap[layoutType] || 'fade';
+}
 
 /**
  * Generic layout converter - core conversion pipeline used by all layout types.
@@ -65,7 +100,7 @@ export type DataMapper<T = any> = (data: T) => MappedLayoutData;
  */
 export async function convertLayoutGeneric<T = any>(
   data: T,
-  template: TemplateConfig,
+  template: ResolvedTemplateConfig,
   mapData: DataMapper<T>,
   slideId?: string,
   layoutMetadata?: { layoutSchema: any; templateId: string; layoutType: string },
@@ -112,7 +147,14 @@ export async function convertLayoutGeneric<T = any>(
       }
 
       // Build layout with unified font sizing
-      const { instance, elements } = buildLayoutWithUnifiedFontSizing(container, container.bounds, labelData);
+      const { instance, elements } = buildLayoutWithUnifiedFontSizing(
+        container,
+        container.bounds,
+        labelData,
+        template.viewport,
+        template.parameters,
+        parameterOverrides
+      );
 
       // Extract child bounds for timeline graphics
       if (instance.children && instance.children.length > 0) {
@@ -210,6 +252,7 @@ export async function convertLayoutGeneric<T = any>(
     id: slideId ?? crypto.randomUUID(),
     elements: combinedElements.map((item) => item.element),
     background: processBackground(template.theme),
+    turningMode: getTurningModeForLayout(layoutMetadata?.layoutType),
     ...(layoutMetadata && {
       layout: {
         schema: layoutMetadata.layoutSchema,
@@ -249,7 +292,7 @@ export function resolveTemplate(
   viewport: SlideViewport,
   graphics?: GraphicElement[],
   parameters?: TemplateParameter[]
-): TemplateConfig {
+): ResolvedTemplateConfig {
   // Use lodash cloneDeepWith to traverse and transform the object tree
   const resolvedContainers = cloneDeepWith(partialTemplate.containers, (value) => {
     // Only process string values that contain template syntax

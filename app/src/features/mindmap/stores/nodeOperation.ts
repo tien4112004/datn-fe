@@ -186,6 +186,7 @@ export interface NodeOperationsState {
   updateNodeDataWithUndo: (nodeId: string, updates: Partial<MindMapNode['data']>) => void;
   markNodeForDeletion: () => void;
   finalizeNodeDeletion: () => void;
+  deleteNodesInstant: () => void;
 }
 
 export const useNodeOperationsStore = create<NodeOperationsState>()(
@@ -379,10 +380,26 @@ export const useNodeOperationsStore = create<NodeOperationsState>()(
       },
 
       finalizeNodeDeletion: () => {
-        const { setNodes, setEdges } = useCoreStore.getState();
+        const { nodes, setNodes, setEdges } = useCoreStore.getState();
+        const { applyAutoLayout } = useLayoutStore.getState();
 
         const nodeIdsToDelete = get().nodesToBeDeleted;
         if (nodeIdsToDelete.size === 0) return;
+
+        // Find affected root nodes before deletion
+        const affectedRootNodes = new Set<string>();
+        nodeIdsToDelete.forEach((nodeId) => {
+          const node = nodes.find((n) => n.id === nodeId);
+          if (node) {
+            const rootNode = getRootNodeOfSubtree(nodeId, nodes);
+            if (rootNode) {
+              affectedRootNodes.add(rootNode.id);
+            }
+          }
+        });
+
+        // Check if auto-layout is enabled
+        const isAutoLayoutEnabled = getTreeForceLayout(nodes);
 
         setNodes((state) => state.filter((node) => !nodeIdsToDelete.has(node.id)));
         setEdges((state) =>
@@ -390,6 +407,67 @@ export const useNodeOperationsStore = create<NodeOperationsState>()(
         );
 
         set({ nodesToBeDeleted: new Set() });
+
+        // Trigger auto-layout for affected trees if enabled
+        if (isAutoLayoutEnabled) {
+          setTimeout(() => {
+            affectedRootNodes.forEach((rootId) => {
+              const stillExists = useCoreStore.getState().nodes.find((n) => n.id === rootId);
+              if (stillExists) {
+                applyAutoLayout(rootId);
+              }
+            });
+          }, 200);
+        }
+      },
+
+      deleteNodesInstant: () => {
+        const { nodes, setNodes, setEdges } = useCoreStore.getState();
+        const { prepareToPushUndo, pushToUndoStack } = useUndoRedoStore.getState();
+        const { applyAutoLayout } = useLayoutStore.getState();
+        prepareToPushUndo();
+
+        const selectedNodeIds = nodes.filter((node) => node.selected).map((node) => node.id);
+
+        // Collect all nodes to delete (including descendants)
+        const allNodesToDelete = new Set<string>();
+        const affectedRootNodes = new Set<string>();
+
+        selectedNodeIds.forEach((nodeId) => {
+          const descendantNodes = getAllDescendantNodes(nodeId, nodes);
+          allNodesToDelete.add(nodeId);
+          descendantNodes.forEach((descendant) => allNodesToDelete.add(descendant.id));
+
+          // Track affected root node for auto-layout
+          const rootNode = getRootNodeOfSubtree(nodeId, nodes);
+          if (rootNode) {
+            affectedRootNodes.add(rootNode.id);
+          }
+        });
+
+        // Check if auto-layout is enabled
+        const isAutoLayoutEnabled = getTreeForceLayout(nodes);
+
+        // Immediately delete without animation
+        setNodes((state) => state.filter((node) => !allNodesToDelete.has(node.id)));
+        setEdges((state) =>
+          state.filter((edge) => !allNodesToDelete.has(edge.source) && !allNodesToDelete.has(edge.target))
+        );
+
+        set({ nodesToBeDeleted: new Set() });
+        pushToUndoStack();
+
+        // Trigger auto-layout if enabled (Issue #4 fix)
+        if (isAutoLayoutEnabled) {
+          setTimeout(() => {
+            affectedRootNodes.forEach((rootId) => {
+              const stillExists = useCoreStore.getState().nodes.find((n) => n.id === rootId);
+              if (stillExists) {
+                applyAutoLayout(rootId);
+              }
+            });
+          }, 200);
+        }
       },
     }),
     { name: 'NodeOperationsStore' }

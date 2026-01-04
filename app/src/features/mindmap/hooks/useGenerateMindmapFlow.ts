@@ -30,22 +30,18 @@ export const useGenerateMindmapFlow = () => {
       // Step 1: Generate AI nodes
       const aiResponse = await generate.mutateAsync(request);
 
-      // Step 2: Convert AI response to mindmap nodes/edges
+      // Step 2: Convert AI response to mindmap nodes/edges with layout applied
       const layoutType = options?.layoutType ?? DEFAULT_LAYOUT_TYPE;
       const basePosition = options?.basePosition ?? { x: 0, y: 0 };
 
-      const { nodes, edges } = convertAiDataToMindMapNodes(aiResponse, basePosition, layoutType);
+      const { nodes, edges } = await convertAiDataToMindMapNodes(aiResponse, basePosition, layoutType);
 
       // Step 3: Create mindmap with title and generated content
       const mindmap = await mindmapApiService.createMindmap({
-        id: crypto.randomUUID(),
         title: request.topic,
         description: '',
         nodes,
         edges,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        status: 'draft',
       });
 
       setIsGenerating(false);

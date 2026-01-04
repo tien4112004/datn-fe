@@ -3,10 +3,10 @@ import { getMindmapApiService } from '../api';
 import type { Mindmap } from '../types';
 
 /**
- * Public loader for mindmap embed pages.
- * Does not require authentication - fetches from public API endpoint.
+ * Loader for mindmap embed pages.
+ * Uses the standard mindmap API endpoint.
  *
- * Used by: /mindmap/embed/:id route (public route for Flutter WebView)
+ * Used by: /mindmap/embed/:id route (public route for webview embedding)
  */
 export const getPublicMindmapById = async ({
   params,
@@ -18,7 +18,7 @@ export const getPublicMindmapById = async ({
   }
 
   const mindmapApiService = getMindmapApiService();
-  const mindmap = await mindmapApiService.getPublicMindmapById(params.id);
+  const mindmap = await mindmapApiService.getMindmapById(params.id);
 
   if (!mindmap) {
     throw new CriticalError('Mindmap not found');

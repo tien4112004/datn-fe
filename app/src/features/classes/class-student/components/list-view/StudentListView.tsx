@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import { type ColumnDef, flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import { Button } from '@ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@ui/table';
-import { Badge } from '@ui/badge';
 import { Pencil, Trash2 } from 'lucide-react';
 import type { Student } from '../../types';
 import { StudentFormDialog } from './StudentFormDialog';
@@ -68,29 +67,43 @@ export const StudentListView = ({ students, classId, isLoading = false }: Studen
       cell: ({ row }) => <div className="font-medium">{row.getValue('fullName')}</div>,
     },
     {
-      accessorKey: 'status',
-      header: t('table.status'),
+      accessorKey: 'dateOfBirth',
+      header: t('form.dateOfBirth'),
       cell: ({ row }) => {
-        const status = row.getValue('status') as string;
-        const statusColors = {
-          active: 'bg-green-100 text-green-800',
-          transferred: 'bg-blue-100 text-blue-800',
-          graduated: 'bg-purple-100 text-purple-800',
-          dropped: 'bg-gray-100 text-gray-800',
-        };
-
-        const statusLabels = {
-          active: t('table.statusActive'),
-          transferred: t('table.statusTransferred'),
-          graduated: t('table.statusGraduated'),
-          dropped: t('table.statusDropped'),
-        };
-
-        return (
-          <Badge className={statusColors[status as keyof typeof statusColors] || ''}>
-            {statusLabels[status as keyof typeof statusLabels] || status}
-          </Badge>
-        );
+        const dateOfBirth = row.getValue('dateOfBirth') as string | null | undefined;
+        return <div className="text-sm">{dateOfBirth || '-'}</div>;
+      },
+    },
+    {
+      accessorKey: 'gender',
+      header: t('form.gender'),
+      cell: ({ row }) => {
+        const gender = row.getValue('gender') as string | null | undefined;
+        return <div className="text-sm capitalize">{gender || '-'}</div>;
+      },
+    },
+    {
+      accessorKey: 'parentName',
+      header: t('table.parentName'),
+      cell: ({ row }) => {
+        const parentName = row.getValue('parentName') as string | null | undefined;
+        return <div className="text-sm">{parentName || '-'}</div>;
+      },
+    },
+    {
+      accessorKey: 'parentPhone',
+      header: t('table.parentPhone'),
+      cell: ({ row }) => {
+        const parentPhone = row.getValue('parentPhone') as string | null | undefined;
+        return <div className="text-sm">{parentPhone || '-'}</div>;
+      },
+    },
+    {
+      accessorKey: 'parentContactEmail',
+      header: t('table.parentEmail'),
+      cell: ({ row }) => {
+        const email = row.getValue('parentContactEmail') as string | null | undefined;
+        return <div className="max-w-xs truncate text-sm">{email || '-'}</div>;
       },
     },
     {
@@ -141,7 +154,7 @@ export const StudentListView = ({ students, classId, isLoading = false }: Studen
   return (
     <div className="space-y-4">
       {/* Header with Add button */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-muted-foreground text-sm">{t('studentCount', { count: students.length })}</p>
         </div>

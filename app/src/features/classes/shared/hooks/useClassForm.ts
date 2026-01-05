@@ -5,8 +5,8 @@ import { z } from 'zod';
  * Class form validation schema
  * Used by React Hook Form with zodResolver for class management
  *
- * Validates required fields (name, grade, academicYear)
- * and optional fields (classroom, description)
+ * Validates required fields (name)
+ * and optional fields (grade, academicYear, class, description)
  */
 export const classSchema = z
   .object({
@@ -16,19 +16,23 @@ export const classSchema = z
       .min(3, { message: 'classes.form.validation.nameTooShort' })
       .max(100, { message: 'classes.form.validation.nameTooLong' }),
 
+    // Optional fields
     grade: z.coerce
       .number({ message: 'classes.form.validation.gradeRequired' })
       .min(1, { message: 'classes.form.validation.gradeInvalid' })
-      .max(12, { message: 'classes.form.validation.gradeInvalid' }),
+      .max(12, { message: 'classes.form.validation.gradeInvalid' })
+      .optional()
+      .or(z.literal('')),
 
     academicYear: z
-      .string({ message: 'classes.form.validation.academicYearRequired' })
-      .regex(/^\d{4}-\d{4}$/, { message: 'classes.form.validation.academicYearInvalid' }),
-
-    // Optional fields
-    classroom: z
       .string()
-      .max(100, { message: 'classes.form.validation.classroomTooLong' })
+      .regex(/^\d{4}-\d{4}$/, { message: 'classes.form.validation.academicYearInvalid' })
+      .optional()
+      .or(z.literal('')),
+
+    class: z
+      .string()
+      .max(100, { message: 'classes.form.validation.classTooLong' })
       .optional()
       .or(z.literal('')),
 
@@ -43,6 +47,8 @@ export const classSchema = z
   })
   .refine(
     (data) => {
+      // Only validate academicYear format if it's provided
+      if (!data.academicYear || data.academicYear === '') return true;
       const [startYear, endYear] = data.academicYear.split('-').map(Number);
       return endYear === startYear + 1;
     },
@@ -67,9 +73,9 @@ export const useClassForm = ({ initialData, onSubmit }: UseClassFormProps) => {
   const [formData, setFormData] = useState<ClassSchema>(
     initialData || {
       name: '',
-      grade: 1,
+      grade: undefined,
       academicYear: '',
-      classroom: undefined,
+      class: undefined,
       description: undefined,
       studentIds: undefined,
       schedule: undefined,

@@ -19,17 +19,16 @@ export const studentFormSchema = z.object({
   // Optional fields
   address: z.string().max(500, { message: 'roster.validation.addressTooLong' }).optional().or(z.literal('')),
 
+  // Required parent information
   parentName: z
-    .string()
-    .max(100, { message: 'roster.validation.parentNameTooLong' })
-    .optional()
-    .or(z.literal('')),
+    .string({ message: 'roster.validation.parentNameRequired' })
+    .min(1, { message: 'roster.validation.parentNameRequired' })
+    .max(100, { message: 'roster.validation.parentNameTooLong' }),
 
   parentPhone: z
-    .string()
-    .max(20, { message: 'roster.validation.parentPhoneTooLong' })
-    .optional()
-    .or(z.literal('')),
+    .string({ message: 'roster.validation.parentPhoneRequired' })
+    .min(1, { message: 'roster.validation.parentPhoneRequired' })
+    .max(20, { message: 'roster.validation.parentPhoneTooLong' }),
 
   dateOfBirth: z
     .string()

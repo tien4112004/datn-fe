@@ -36,14 +36,14 @@ export default {
     name: 'Class Name',
     grade: 'Grade',
     academicYear: 'Academic Year',
-    classroom: 'Classroom',
+    class: 'Class',
     description: 'Description',
 
     // Placeholders
     namePlaceholder: 'e.g., Class 10A',
     gradePlaceholder: '10',
     academicYearPlaceholder: '2024-2025',
-    classroomPlaceholder: 'e.g., Room 301',
+    classPlaceholder: 'e.g., Room 301',
     descriptionPlaceholder: 'Add a brief description about this class...',
 
     // Form states
@@ -64,7 +64,7 @@ export default {
     gradeInvalid: 'Grade must be between 1 and 12',
     academicYearRequired: 'Academic year is required',
     academicYearInvalid: 'Academic year must be in format YYYY-YYYY (e.g., 2024-2025)',
-    classroomTooLong: 'Classroom must be 100 characters or less',
+    classTooLong: 'Class must be 100 characters or less',
     descriptionTooLong: 'Description must be 500 characters or less',
     // Lesson validation messages
     lesson: {
@@ -99,7 +99,7 @@ export default {
     notFoundDescription: 'The class you are looking for does not exist.',
     loading: 'Loading...',
     academicYear: 'Academic Year',
-    classroom: 'Classroom',
+    class: 'Class',
     status: {
       active: 'Active',
       inactive: 'Inactive',
@@ -108,6 +108,7 @@ export default {
       edit: 'Edit',
     },
     tabs: {
+      feed: 'Feed',
       teaching: 'Teaching',
       schedule: 'Schedule',
       lessons: 'Lessons',
@@ -116,7 +117,12 @@ export default {
       settings: 'Settings',
     },
     overview: {
+      welcome: 'Welcome',
+      welcomeSubtitle: 'Overview of {{className}}',
+      about: 'About This Class',
+      quickStatsPlaceholder: 'Quick stats and recent activity will be displayed here.',
       basicInfo: 'Basic Information',
+      subtitle: 'View and manage class details',
       className: 'Class Name',
       grade: 'Grade',
       capacity: 'Capacity',
@@ -177,8 +183,9 @@ export default {
       grade: 'Grade',
       academicYear: 'Academic Year',
       enrollment: 'Enrollment',
-      classroom: 'Classroom',
+      class: 'Class',
       status: 'Status',
+      createdAt: 'Created At',
     },
     actions: {
       manageStudents: 'Manage Students',
@@ -188,7 +195,7 @@ export default {
   grid: {
     academicYear: 'Academic Year',
     enrollment: 'Enrollment',
-    classroom: 'Classroom',
+    class: 'Class',
     actions: {
       manageStudents: 'Manage Students',
     },
@@ -613,6 +620,28 @@ export default {
         linking: 'Linking...',
       },
     },
+    lessonSelection: {
+      selectLessons: 'Select lessons...',
+      searchLessons: 'Search lessons...',
+      noLessonsFound: 'No lessons found.',
+      availableLessons: 'Available Lessons',
+      lessonsSelected: '{{count}} lesson selected',
+      lessonsSelected_other: '{{count}} lessons selected',
+    },
+    resourceSelection: {
+      selectResources: 'Select resources...',
+      searchResources: 'Search resources...',
+      noResourcesFound: 'No resources found.',
+      availableResources: 'Available Resources',
+      resourcesSelected: '{{count}} resource selected',
+      resourcesSelected_other: '{{count}} resources selected',
+    },
+    assignmentSelection: {
+      selectAssignment: 'Select assignment...',
+      searchAssignments: 'Search assignments...',
+      noAssignmentsFound: 'No assignments found.',
+      availableAssignments: 'Available Assignments',
+    },
   },
   calendar: {
     title: 'Class Calendar',
@@ -668,6 +697,8 @@ export default {
     loadingRoster: 'Loading roster...',
     studentCount: '{{count}} student',
     studentCount_other: '{{count}} students',
+    filterByStatus: 'Filter by status',
+    allStatuses: 'All statuses',
 
     form: {
       // Dialog descriptions
@@ -718,6 +749,11 @@ export default {
 
     table: {
       fullName: 'Full Name',
+      dateOfBirth: 'Date of Birth',
+      gender: 'Gender',
+      parentName: 'Parent Name',
+      parentPhone: 'Parent Phone',
+      parentEmail: 'Parent Email',
       status: 'Status',
       actions: 'Actions',
       edit: 'Edit',
@@ -853,6 +889,8 @@ export default {
       rowNumber: 'Row number',
       fullName: 'Full Name',
       dateOfBirth: 'Date of Birth',
+      gender: 'Gender',
+      address: 'Address',
       phone: 'Phone',
       parentGuardian: 'Parent/Guardian',
       missing: 'Missing',
@@ -1030,6 +1068,115 @@ export default {
         saturdayFull: 'Saturday',
         sundayFull: 'Sunday',
       },
+    },
+  },
+
+  feed: {
+    header: {
+      title: '{{className}} Feed',
+      subtitle: 'Stay updated with class announcements and discussions',
+      filters: {
+        all: 'All',
+        announcements: 'Announcements',
+        general: 'General',
+        schedule_event: 'Schedule Events',
+        posts: 'Posts',
+        assignments: 'Assignments',
+      },
+    },
+    creator: {
+      actions: {
+        createPost: 'Create Post',
+        createAssignment: 'Create Assignment',
+        attachFiles: 'Attach Files',
+        posting: 'Posting...',
+        post: 'Post',
+        cancel: 'Cancel',
+        postComment: 'Post Comment',
+      },
+      dialog: {
+        title: 'Create New Post',
+        description: 'Share an announcement or post with your class.',
+      },
+      labels: {
+        postType: 'Post Type',
+        content: 'Content',
+        attachments: 'Attachments',
+        linkLessons: 'Link Lessons',
+        linkResources: 'Link Resources',
+        selectAssignment: 'Select Assignment',
+        deadline: 'Deadline',
+        allowComments: 'Allow Comments',
+      },
+      placeholders: {
+        content: 'Write your post content here...',
+        comment: 'Write a comment...',
+      },
+      postType: {
+        post: 'Post',
+        assignment: 'Assignment',
+      },
+    },
+    list: {
+      empty: {
+        all: {
+          title: 'No posts yet',
+          description: 'Be the first to share something with your class!',
+        },
+        post: {
+          title: 'No posts yet',
+          description: 'Create your first post to share updates with your class!',
+        },
+        assignment: {
+          title: 'No assignments yet',
+          description: 'Create your first assignment to get started!',
+        },
+      },
+      loading: 'Loading posts...',
+      loadMore: 'Load More Posts',
+      loadingMore: 'Loading...',
+      delete: {
+        title: 'Delete Post',
+        description: 'Are you sure you want to delete this post? This action cannot be undone.',
+      },
+    },
+    post: {
+      badges: {
+        pinned: 'Pinned',
+        post: 'Post',
+        assignment: 'Assignment',
+        dueDate: 'Due',
+      },
+      actions: {
+        edit: 'Edit post',
+        pin: 'Pin post',
+        unpin: 'Unpin post',
+        delete: 'Delete post',
+        comment: 'comment',
+        comments: 'comments',
+      },
+      confirm: {
+        deletePost: 'Are you sure you want to delete this post?',
+      },
+    },
+    comments: {
+      loading: 'Loading comments...',
+      empty: 'No comments yet',
+    },
+    errors: {
+      loadFailed: 'Failed to load posts',
+      createFailed: 'Failed to create post',
+      updateFailed: 'Failed to update post',
+      deleteFailed: 'Failed to delete post',
+      commentFailed: 'Failed to add comment',
+      pinFailed: 'Failed to {{action}} post',
+      tryAgain: 'Try again',
+    },
+    time: {
+      justNow: 'Just now',
+      minutesAgo: '{{count}}m ago',
+      hoursAgo: '{{count}}h ago',
+      daysAgo: '{{count}}d ago',
     },
   },
 };

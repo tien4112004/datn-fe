@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
@@ -6,7 +6,8 @@ import { Button } from '@/components/ui/button';
 import { StudentListView } from './list-view/StudentListView';
 import { SeatingChartView } from './seating-chart/SeatingChartView';
 import type { Class } from '../../shared/types';
-import { useSeatingChart } from '../hooks';
+import { useSeatingChart, useClassStudents } from '../hooks';
+import { createDefaultLayout } from '../utils';
 
 interface ClassStudentListProps {
   classData: Class;
@@ -16,13 +17,32 @@ export const ClassStudentView = ({ classData }: ClassStudentListProps) => {
   const { t } = useTranslation('classes', { keyPrefix: 'detail' });
   const [viewMode, setViewMode] = useState('list');
   const [showLayoutConfig, setShowLayoutConfig] = useState(false);
-  const { data: initialLayout, isLoading, isError } = useSeatingChart(classData.id);
+
+  // Fetch students from /classes/:id/students endpoint
+  const { data: students = [], isLoading: isLoadingStudents } = useClassStudents(classData.id);
+  const { data: initialLayout, isLoading: isLoadingLayout, isError } = useSeatingChart(classData.id);
+
+  // Auto-initialize layout if none exists
+  const effectiveLayout = useMemo(() => {
+    // If layout exists, use it
+    if (initialLayout) return initialLayout;
+
+    // If still loading, don't create default yet
+    if (isLoadingLayout) return null;
+
+    // If error occurred (network/server issue), don't auto-initialize
+    if (isError) return null;
+
+    // If no layout exists (initialLayout === null) and not loading/error,
+    // create default layout based on student count
+    return createDefaultLayout(students.length);
+  }, [initialLayout, isLoadingLayout, isError, students.length]);
 
   return (
     <div className="space-y-6">
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>{t('students.title', { count: classData.students.length })}</CardTitle>
+          <CardTitle>{t('students.title', { count: students.length })}</CardTitle>
           <div className="flex gap-2">
             {viewMode === 'seating-chart' && (
               <>
@@ -47,11 +67,11 @@ export const ClassStudentView = ({ classData }: ClassStudentListProps) => {
         </CardHeader>
         <CardContent>
           {viewMode === 'list' && (
-            <StudentListView students={classData.students} classId={classData.id} isLoading={isLoading} />
+            <StudentListView students={students} classId={classData.id} isLoading={isLoadingStudents} />
           )}
           {viewMode === 'seating-chart' && (
             <>
-              {isLoading && (
+              {isLoadingLayout && (
                 <div className="py-8 text-center">
                   <p className="text-muted-foreground">{t('students.loadingSeatingChart')}</p>
                 </div>
@@ -61,10 +81,10 @@ export const ClassStudentView = ({ classData }: ClassStudentListProps) => {
                   <p className="text-destructive">{t('students.errorSeatingChart')}</p>
                 </div>
               )}
-              {initialLayout && (
+              {!isLoadingLayout && !isError && effectiveLayout && (
                 <SeatingChartView
-                  layout={initialLayout}
-                  students={classData.students}
+                  layout={effectiveLayout}
+                  students={students}
                   showLayoutConfig={showLayoutConfig}
                   classId={classData.id}
                 />

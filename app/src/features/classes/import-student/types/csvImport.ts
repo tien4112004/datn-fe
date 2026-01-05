@@ -17,6 +17,8 @@ export interface CsvStudentRow {
 
   // Optional fields (may be absent in CSV)
   dateOfBirth?: string; // Format: YYYY-MM-DD or MM/DD/YYYY or DD/MM/YYYY
+  gender?: string; // Gender (male/female/other)
+  address?: string; // Home address
   phoneNumber?: string; // Free-form text, any international format
   parentGuardianName?: string;
   parentGuardianEmail?: string;

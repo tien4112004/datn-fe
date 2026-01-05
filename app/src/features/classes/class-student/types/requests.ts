@@ -11,7 +11,6 @@
 export interface StudentCollectionRequest {
   classId?: string;
   grade?: number;
-  status?: string;
   search?: string;
   page?: number;
   pageSize?: number;
@@ -21,14 +20,20 @@ export interface StudentCollectionRequest {
 /**
  * StudentCreateRequest
  * Payload for creating a new student
+ * Matches backend schema exactly
  */
 export interface StudentCreateRequest {
   fullName: string;
-  dateOfBirth: string;
-  gender: 'male' | 'female' | 'other';
+  firstName?: string;
+  lastName?: string;
+  dateOfBirth?: string;
+  gender?: string;
   address?: string;
-  parentName?: string;
-  parentPhone?: string;
+  phoneNumber?: string;
+  avatarUrl?: string;
+  parentName: string;
+  parentPhone: string;
+  parentContactEmail?: string;
   classId: string;
   enrollmentDate?: string;
 }
@@ -36,10 +41,17 @@ export interface StudentCreateRequest {
 /**
  * StudentUpdateRequest
  * Payload for updating an existing student
+ * Matches backend schema exactly
  */
-export interface StudentUpdateRequest extends Partial<StudentCreateRequest> {
+export interface StudentUpdateRequest {
   id: string;
-  status?: 'active' | 'transferred' | 'graduated' | 'dropped';
+  firstName?: string | null;
+  lastName?: string | null;
+  phoneNumber?: string | null;
+  address?: string | null;
+  parentContactEmail?: string | null;
+  avatarUrl?: string | null;
+  status?: string | null;
 }
 
 /**
@@ -48,7 +60,6 @@ export interface StudentUpdateRequest extends Partial<StudentCreateRequest> {
  */
 export interface StudentFilterOptions {
   classId?: string;
-  status?: string;
   search?: string;
   grade?: number;
 }

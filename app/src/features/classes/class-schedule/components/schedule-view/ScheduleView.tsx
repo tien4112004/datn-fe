@@ -12,6 +12,7 @@ import useScheduleStore from '../../stores/scheduleStore';
 import { useClassSchedules } from '../../hooks/useApi';
 import { useScheduleHelpers } from '../../hooks/useScheduleHelpers';
 import { useMemo } from 'react';
+import type { DailySchedule } from '../../types';
 
 type ScheduleViewProps = {
   classId: string;
@@ -45,7 +46,7 @@ const ScheduleView = ({ classId, onAddPeriod }: ScheduleViewProps) => {
 
   // Extract all periods from the month's schedules for the calendar
   const periods = useMemo(() => {
-    return schedules.flatMap((schedule) => schedule.periods);
+    return schedules.flatMap((schedule: DailySchedule) => schedule.periods);
   }, [schedules]);
 
   return (

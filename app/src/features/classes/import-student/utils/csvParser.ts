@@ -40,13 +40,16 @@ const HEADER_NORMALIZATION_MAP: Record<string, keyof CsvStudentRow> = {
   birthdate: 'dateOfBirth',
   'birth date': 'dateOfBirth',
 
-  // Phone Number variations
+  // Phone Number variations (maps to parentPhone for backend compatibility)
   phonenumber: 'phoneNumber',
   phone_number: 'phoneNumber',
   'phone number': 'phoneNumber',
   phone: 'phoneNumber',
   mobile: 'phoneNumber',
   cell: 'phoneNumber',
+  parentphone: 'phoneNumber',
+  parent_phone: 'phoneNumber',
+  'parent phone': 'phoneNumber',
 
   // Parent/Guardian Name variations
   parentguardianname: 'parentGuardianName',
@@ -57,6 +60,7 @@ const HEADER_NORMALIZATION_MAP: Record<string, keyof CsvStudentRow> = {
   guardianname: 'parentGuardianName',
   'guardian name': 'parentGuardianName',
   'parent/guardian name': 'parentGuardianName',
+  'parent/guardian': 'parentGuardianName',
 
   // Parent/Guardian Email variations
   parentguardianemail: 'parentGuardianEmail',
@@ -67,6 +71,19 @@ const HEADER_NORMALIZATION_MAP: Record<string, keyof CsvStudentRow> = {
   guardianemail: 'parentGuardianEmail',
   'guardian email': 'parentGuardianEmail',
   'parent/guardian email': 'parentGuardianEmail',
+  parentcontactemail: 'parentGuardianEmail',
+  parent_contact_email: 'parentGuardianEmail',
+  'parent contact email': 'parentGuardianEmail',
+
+  // Gender variations
+  gender: 'gender',
+  sex: 'gender',
+
+  // Address variations
+  address: 'address',
+  homeaddress: 'address',
+  home_address: 'address',
+  'home address': 'address',
 
   // Additional Notes variations
   additionalnotes: 'additionalNotes',
@@ -263,6 +280,8 @@ export async function parseCsvFile(file: File): Promise<CsvParseResult> {
           return {
             fullName: row.fullName || '',
             dateOfBirth: row.dateOfBirth,
+            gender: row.gender,
+            address: row.address,
             phoneNumber: row.phoneNumber,
             parentGuardianName: row.parentGuardianName,
             parentGuardianEmail: row.parentGuardianEmail,

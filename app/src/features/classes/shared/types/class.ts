@@ -9,24 +9,33 @@ import type { Student } from '../../class-student/types/student';
 
 export interface Class {
   id: string;
+  ownerId: string; // ID of the teacher/owner who created the class
   name: string; // e.g., "10A1", "11B2"
-  grade: number; // 1-12 for Vietnamese education system
-  academicYear: string; // e.g., "2024-2025"
-  currentEnrollment: number; // current number of students
-  teacherId: string; // homeroom teacher
-  classroom?: string; // physical location
-  description?: string;
-  students: Student[];
-  layout?: Layout;
+  description?: string | null;
+  joinCode?: string | null; // Unique join code for students to enroll
+  settings?: {
+    grade?: number;
+    academicYear?: string;
+    class?: string;
+    [key: string]: any;
+  } | null; // Class-specific settings
+  isActive: boolean;
   createdAt: string;
   updatedAt: string;
-  isActive: boolean;
+
+  // Legacy/computed fields for compatibility with existing frontend code
+  grade?: number; // 1-12 for Vietnamese education system (deprecated)
+  academicYear?: string; // e.g., "2024-2025" (deprecated)
+  teacherId?: string; // alias for ownerId (deprecated)
+  class?: string; // physical location (deprecated)
+  students?: Student[]; // populated from separate endpoint
+  layout?: Layout; // populated from separate endpoint
 }
 
 /**
  * Layout Entity
  *
- * Represents the seating arrangement of a classroom.
+ * Represents the seating arrangement of a class.
  */
 
 export interface Layout {
@@ -39,7 +48,7 @@ export interface Layout {
 /**
  * Seat Entity
  *
- * Represents a single seat in the classroom layout.
+ * Represents a single seat in the class layout.
  */
 export interface Seat {
   id: string;

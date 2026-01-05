@@ -6,20 +6,20 @@ import type {
   ClassCollectionRequest,
   ClassCreateRequest,
   ClassUpdateRequest,
-  DailySchedule,
   Layout,
   Lesson,
   LessonCollectionRequest,
-  ScheduleCollectionRequest,
-  SchedulePeriod,
   Student,
-  StudentEnrollmentRequest,
   StudentCreateRequest,
   StudentUpdateRequest,
+  StudentEnrollmentRequest,
   LessonCreateRequest,
   LessonUpdateRequest,
+  ScheduleCollectionRequest,
   SchedulePeriodCreateRequest,
   SchedulePeriodUpdateRequest,
+  SchedulePeriod,
+  DailySchedule,
 } from '.';
 
 /**
@@ -44,7 +44,15 @@ export interface ClassApiService extends Service {
   getSeatingChart(classId: string): Promise<Layout | null>;
   saveSeatingChart(classId: string, layout: Layout): Promise<Layout>;
 
-  // Schedule and Lesson Management
+  // Lesson Management
+  getLessons(classId: string, params: LessonCollectionRequest): Promise<ApiResponse<Lesson[]>>;
+  getLesson(id: string): Promise<Lesson | null>;
+  createLesson(data: LessonCreateRequest): Promise<Lesson>;
+  updateLesson(data: LessonUpdateRequest): Promise<Lesson>;
+  updateLessonStatus(id: string, status: string, notes?: string): Promise<Lesson>;
+  deleteLesson(id: string): Promise<void>;
+
+  // Schedule Management
   getSchedules(classId: string, params: ScheduleCollectionRequest): Promise<ApiResponse<DailySchedule[]>>;
   getSchedulePeriods(
     classId: string,
@@ -52,15 +60,6 @@ export interface ClassApiService extends Service {
   ): Promise<ApiResponse<SchedulePeriod[]>>;
   getPeriodById(id: string): Promise<SchedulePeriod | null>;
   getPeriodsBySubject(classId: string, subjectCode: string): Promise<SchedulePeriod[]>;
-  getLessons(classId: string, params: LessonCollectionRequest): Promise<ApiResponse<Lesson[]>>;
-  getLesson(id: string): Promise<Lesson | null>;
-
-  // Lesson  mutations
-  updateLessonStatus(id: string, status: string, notes?: string): Promise<Lesson>;
-  createLesson(data: LessonCreateRequest): Promise<Lesson>;
-  updateLesson(data: LessonUpdateRequest): Promise<Lesson>;
-
-  // Schedule mutations
   addSchedulePeriod(classId: string, data: SchedulePeriodCreateRequest): Promise<SchedulePeriod>;
   updateSchedulePeriod(
     classId: string,
@@ -70,14 +69,13 @@ export interface ClassApiService extends Service {
   linkLessonToSchedulePeriod(classId: string, periodId: string, lessonId: string): Promise<void>;
   unlinkLessonFromSchedulePeriod(classId: string, periodId: string, lessonId: string): Promise<void>;
 
-  // Student management
-  getStudentsByClassId(classId: string): Promise<Student[]>;
-  enrollStudent(request: StudentEnrollmentRequest): Promise<Student>;
+  // Student Management
+  getStudentsByClassId(classId: string, page?: number, size?: number): Promise<Student[]>;
   removeStudentFromClass(classId: string, studentId: string): Promise<void>;
-
-  // Student CRUD operations
   createStudent(classId: string, data: StudentCreateRequest): Promise<Student>;
+  getStudentById(studentId: string): Promise<Student | null>;
   updateStudent(studentId: string, data: StudentUpdateRequest): Promise<Student>;
+  enrollStudent(data: StudentEnrollmentRequest): Promise<Student>;
   deleteStudent(studentId: string): Promise<void>;
 
   // CSV Import

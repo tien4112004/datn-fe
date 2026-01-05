@@ -22,11 +22,13 @@ export const ClassForm = ({ initialData, onSubmit, isEditMode = false }: ClassFo
   const [isLoading, setIsLoading] = useState(false);
   const [generalError, setGeneralError] = useState<string | null>(null);
 
+  // Only re-validate when formData changes and we already have errors
   useEffect(() => {
     if (Object.keys(errors).length > 0) {
       validateForm();
     }
-  }, [formData, errors, validateForm]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formData]);
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -103,23 +105,23 @@ export const ClassForm = ({ initialData, onSubmit, isEditMode = false }: ClassFo
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="classroom" className="text-sm font-medium">
+            <Label htmlFor="class" className="text-sm font-medium">
               <MapPin className="mr-1 inline h-3.5 w-3.5" />
-              {t('classroom')}
+              {t('class')}
             </Label>
             <Input
               type="text"
-              name="classroom"
-              id="classroom"
-              value={formData.classroom || ''}
+              name="class"
+              id="class"
+              value={formData.class || ''}
               onChange={handleChange}
               disabled={isLoading}
-              placeholder={t('classroomPlaceholder')}
-              className={getFieldError('classroom') ? 'border-destructive' : ''}
+              placeholder={t('classPlaceholder')}
+              className={getFieldError('class') ? 'border-destructive' : ''}
             />
-            {getFieldError('classroom') && (
+            {getFieldError('class') && (
               <p className="text-destructive text-sm font-medium">
-                {getErrorMessage(getFieldError('classroom'))}
+                {getErrorMessage(getFieldError('class'))}
               </p>
             )}
           </div>
@@ -155,16 +157,16 @@ export const ClassForm = ({ initialData, onSubmit, isEditMode = false }: ClassFo
         </div>
         <Separator />
 
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="grade" className="text-sm font-medium">
-              {t('grade')} <span className="text-destructive">*</span>
+              {t('grade')}
             </Label>
             <Input
               type="number"
               name="grade"
               id="grade"
-              value={formData.grade}
+              value={formData.grade || ''}
               onChange={handleChange}
               disabled={isLoading}
               placeholder={t('gradePlaceholder')}
@@ -181,13 +183,13 @@ export const ClassForm = ({ initialData, onSubmit, isEditMode = false }: ClassFo
 
           <div className="space-y-2">
             <Label htmlFor="academicYear" className="text-sm font-medium">
-              {t('academicYear')} <span className="text-destructive">*</span>
+              {t('academicYear')}
             </Label>
             <Input
               type="text"
               name="academicYear"
               id="academicYear"
-              value={formData.academicYear}
+              value={formData.academicYear || ''}
               onChange={handleChange}
               disabled={isLoading}
               placeholder={t('academicYearPlaceholder')}
@@ -196,28 +198,6 @@ export const ClassForm = ({ initialData, onSubmit, isEditMode = false }: ClassFo
             {getFieldError('academicYear') && (
               <p className="text-destructive text-sm font-medium">
                 {getErrorMessage(getFieldError('academicYear'))}
-              </p>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="classroom" className="text-sm font-medium">
-              <MapPin className="mr-1 inline h-3.5 w-3.5" />
-              {t('classroom')}
-            </Label>
-            <Input
-              type="text"
-              name="classroom"
-              id="classroom"
-              value={formData.classroom || ''}
-              onChange={handleChange}
-              disabled={isLoading}
-              placeholder={t('classroomPlaceholder')}
-              className={getFieldError('classroom') ? 'border-destructive' : ''}
-            />
-            {getFieldError('classroom') && (
-              <p className="text-destructive text-sm font-medium">
-                {getErrorMessage(getFieldError('classroom'))}
               </p>
             )}
           </div>

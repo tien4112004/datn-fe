@@ -58,7 +58,7 @@ interface ClassStore {
 }
 
 const initialState = {
-  currentTab: 'teaching' as ClassTabs,
+  currentTab: 'overview' as ClassTabs,
   selectedClass: null,
   selectedStudents: [],
   filters: {},

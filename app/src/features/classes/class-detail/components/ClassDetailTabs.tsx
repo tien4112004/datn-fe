@@ -1,23 +1,16 @@
-import { useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { LayoutDashboard, Calendar, BookOpen, Target, Users, Settings } from 'lucide-react';
+import { Users, Settings, MessageSquare, BookOpen, GraduationCap, Calendar, Edit } from 'lucide-react';
+import { cn } from '@/shared/lib/utils';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { getGradeLabel } from '../../shared/utils/grades';
 
-import { ClassOverview } from './ClassOverview';
 import { ClassStudentView } from '../../class-student';
 import { ClassSettings } from './ClassSettings';
-import TodaysTeachingDashboard from '../../class-dashboard/components/TodaysTeachingDashboard';
-import {
-  LessonTab,
-  useClassLessons,
-  useLessonOperations,
-  useUpdateLesson,
-  useUpdateLessonStatus,
-} from '../../class-lesson';
-import { useScheduleHelpers } from '../../class-schedule';
+import { FeedTab } from '../../class-feed/components';
+import { LessonTab } from '../../class-lesson';
 import type { Class } from '../../shared/types';
-import { ScheduleTab, useClassSchedules, useClassPeriods } from '../../class-schedule';
 import type { ClassTabs } from '../../shared';
 
 interface ClassDetailTabsProps {
@@ -26,184 +19,172 @@ interface ClassDetailTabsProps {
   onEditClick: (classData: Class) => void;
 }
 
+const tabs = [
+  { value: 'feed', icon: MessageSquare, labelKey: 'tabs.feed' },
+  { value: 'students', icon: Users, labelKey: 'tabs.students' },
+  { value: 'lessons', icon: BookOpen, labelKey: 'tabs.lessons' },
+  { value: 'settings', icon: Settings, labelKey: 'tabs.settings' },
+] as const;
+
 export const ClassDetailTabs = ({ classId, currentClass, onEditClick }: ClassDetailTabsProps) => {
   const { t } = useTranslation('classes', { keyPrefix: 'detail' });
 
-  // Get today's date
-  const today = new Date().toISOString().split('T')[0];
-
-  // ============= MANAGER: Call the Fetcher =============
-  // Get raw schedules from the API (fetch just today's schedule)
-  const { data: schedulesData } = useClassSchedules(classId, { startDate: today, endDate: today });
-  const schedules = schedulesData?.data || [];
-
-  // ============= MANAGER: Use the Toolbox =============
-  // Get today's schedule from the raw list
-  const { findScheduleForDate } = useScheduleHelpers();
-
-  const todaySchedule = useMemo(() => {
-    return findScheduleForDate(schedules, today, classId);
-  }, [schedules, today, classId]);
-
-  // Fetch periods and lessons
-  const { data: periodsData } = useClassPeriods(classId, { date: today });
-  const { data: lessonsData } = useClassLessons(classId, {});
-
-  const allPeriods = periodsData?.data || [];
-  const allLessons = lessonsData?.data || [];
-
-  const todayLessons = allLessons.filter((lp) => lp.linkedPeriods.some((p) => p.date === today));
-
-  // Mutation hooks
-  const updateLessonStatus = useUpdateLessonStatus();
-  const updateLesson = useUpdateLesson();
-  const lessonOperations = useLessonOperations();
-
   const [searchParams, setSearchParams] = useSearchParams();
-  const currentTab = searchParams.get('tab') || 'teaching';
+  const currentTab = (searchParams.get('tab') || 'feed') as ClassTabs;
 
   const handleTabChange = (tab: ClassTabs) => {
     setSearchParams({ tab }, { replace: true });
   };
 
   return (
-    <div className="space-y-6 px-8">
-      {/* Detailed Tabs */}
-      <Tabs
-        defaultValue="teaching"
-        className="mx-12 space-y-4"
-        value={currentTab}
-        onValueChange={(value) => handleTabChange(value as ClassTabs)}
-      >
-        <TabsList className="grid w-full grid-cols-6">
-          <TabsTrigger value="teaching" className="flex cursor-pointer items-center gap-1">
-            <LayoutDashboard className="h-4 w-4" />
-            {t('tabs.teaching')}
-          </TabsTrigger>
-          <TabsTrigger value="schedule" className="flex cursor-pointer items-center gap-1">
-            <Calendar className="h-4 w-4" />
-            {t('tabs.schedule')}
-          </TabsTrigger>
-          <TabsTrigger value="lessons" className="flex cursor-pointer items-center gap-1">
-            <BookOpen className="h-4 w-4" />
-            {t('tabs.lessons')}
-          </TabsTrigger>
-          <TabsTrigger value="overview" className="flex cursor-pointer items-center gap-1">
-            <Target className="h-4 w-4" />
-            {t('tabs.overview')}
-          </TabsTrigger>
-          <TabsTrigger value="students" className="flex cursor-pointer items-center gap-1">
-            <Users className="h-4 w-4" />
-            {t('tabs.students')}
-          </TabsTrigger>
-          <TabsTrigger value="settings" className="flex cursor-pointer items-center gap-1">
-            <Settings className="h-4 w-4" />
-            {t('tabs.settings')}
-          </TabsTrigger>
-        </TabsList>
+    <div className="flex h-full flex-col md:h-[calc(100vh-4rem)] md:flex-row">
+      {/* Mobile Horizontal Tabs - Hidden on Desktop */}
+      <div className="bg-background border-b md:hidden">
+        {/* Compact Class Info */}
+        <div className="border-b px-4 py-3">
+          <h1 className="truncate text-lg font-semibold">{currentClass.name}</h1>
+          <div className="mt-1 flex items-center gap-2">
+            <Badge variant={currentClass.isActive ? 'default' : 'secondary'} className="text-xs">
+              {currentClass.isActive ? t('status.active') : t('status.inactive')}
+            </Badge>
+            {currentClass.settings?.grade && (
+              <span className="text-muted-foreground text-xs">
+                {getGradeLabel(currentClass.settings.grade)}
+              </span>
+            )}
+          </div>
+        </div>
 
-        <TabsContent value="teaching" className="space-y-4">
-          <TodaysTeachingDashboard
-            classData={currentClass}
-            todaySchedule={todaySchedule}
-            allPeriods={allPeriods}
-            todayLessons={todayLessons}
-            allLessons={allLessons}
-            onUpdateLessonStatus={async (id, status, notes) => {
-              await updateLessonStatus.mutateAsync({ id, status, notes });
-            }}
-            onUpdateObjective={async (lessonId, objectiveId, updates) => {
-              // Find the lesson
-              const lesson = todayLessons.find((lp) => lp.id === lessonId);
-              if (!lesson) return;
+        {/* Horizontal Scrollable Tabs */}
+        <nav className="overflow-x-auto">
+          <div className="flex min-w-max gap-1 p-2">
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+              const isActive = currentTab === tab.value;
 
-              // Use lesson operations to update the objective
-              const updatedLesson = lessonOperations.updateObjectiveInLesson(lesson, objectiveId, updates);
+              return (
+                <button
+                  key={tab.value}
+                  onClick={() => handleTabChange(tab.value as ClassTabs)}
+                  className={cn(
+                    'flex items-center gap-2 whitespace-nowrap rounded-lg px-4 py-2 text-sm font-medium transition-colors',
+                    isActive ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-muted'
+                  )}
+                >
+                  <Icon className="h-4 w-4 shrink-0" />
+                  <span>{t(tab.labelKey)}</span>
+                </button>
+              );
+            })}
+          </div>
+        </nav>
+      </div>
 
-              // Persist the changes
-              await updateLesson.mutateAsync(updatedLesson);
-            }}
-            onAddObjectiveNote={async (lessonId, objectiveId, note) => {
-              // Find the lesson
-              const lesson = todayLessons.find((lp) => lp.id === lessonId);
-              if (!lesson) return;
+      {/* Vertical Sidebar with Class Info */}
+      <aside className="bg-muted/10 hidden overflow-y-auto border-r md:block md:w-64 lg:w-80">
+        {/* Class Information Section */}
+        <div className="space-y-4 border-b p-6">
+          {/* Title and Status */}
+          <div className="flex justify-between gap-4">
+            <div className="space-y-2">
+              <h1 className="text-2xl font-bold tracking-tight">{currentClass.name}</h1>
+              <Badge variant={currentClass.isActive ? 'default' : 'secondary'}>
+                {currentClass.isActive ? t('status.active') : t('status.inactive')}
+              </Badge>
+            </div>
 
-              // Use lesson operations to update the objective
-              const updatedLesson = lessonOperations.updateObjectiveInLesson(lesson, objectiveId, {
-                notes: note,
-              });
+            {/* Edit Button */}
+            <Button onClick={() => onEditClick(currentClass)} variant="outline" size="sm">
+              <Edit className="mr-2 h-4 w-4" />
+              {t('actions.edit')}
+            </Button>
+          </div>
 
-              // Persist the changes
-              await updateLesson.mutateAsync(updatedLesson);
-            }}
-            onAddResource={async (lessonId, resource) => {
-              // Find the lesson
-              const lesson = todayLessons.find((lp) => lp.id === lessonId);
-              if (!lesson) return;
+          {/* Metadata */}
+          <div className="text-muted-foreground space-y-2 text-sm">
+            {currentClass.settings?.grade && (
+              <div className="flex items-center gap-2">
+                <GraduationCap className="h-4 w-4" />
+                <span>{getGradeLabel(currentClass.settings.grade)}</span>
+              </div>
+            )}
 
-              // Use lesson operations to add the resource
-              const updatedLesson = lessonOperations.addResourceToLesson(lesson, resource);
+            {currentClass.settings?.academicYear && (
+              <div className="flex items-center gap-2">
+                <Calendar className="h-4 w-4" />
+                <span>{currentClass.settings.academicYear}</span>
+              </div>
+            )}
 
-              // Persist the changes
-              await updateLesson.mutateAsync(updatedLesson);
-            }}
-            onUpdateResource={async (lessonId, resourceId, updates) => {
-              // Find the lesson
-              const lesson = todayLessons.find((lp) => lp.id === lessonId);
-              if (!lesson) return;
+            {currentClass.settings?.class && (
+              <div className="flex items-center gap-2">
+                <span className="font-medium">Room:</span>
+                <span>{currentClass.settings.class}</span>
+              </div>
+            )}
+          </div>
 
-              // Use lesson operations to update the resource
-              const updatedLesson = lessonOperations.updateResourceInLesson(lesson, resourceId, updates);
+          {/* Description */}
+          {currentClass.description && (
+            <p className="text-muted-foreground text-sm leading-relaxed">{currentClass.description}</p>
+          )}
 
-              // Persist the changes
-              await updateLesson.mutateAsync(updatedLesson);
-            }}
-            onDeleteResource={async (lessonId, resourceId) => {
-              // Find the lesson
-              const lesson = todayLessons.find((lp) => lp.id === lessonId);
-              if (!lesson) return;
+          {/* Grade and academic year */}
+          {currentClass.settings?.grade && currentClass.settings?.academicYear && (
+            <div className="flex gap-2">
+              <Badge>{getGradeLabel(currentClass.settings.grade)}</Badge>
+              <Badge>{currentClass.settings.academicYear}</Badge>
+            </div>
+          )}
+        </div>
 
-              // Use lesson operations to remove the resource
-              const updatedLesson = lessonOperations.removeResourceFromLesson(lesson, resourceId);
+        {/* Navigation Tabs */}
+        <nav className="flex flex-col gap-1 p-4">
+          {tabs.map((tab) => {
+            const Icon = tab.icon;
+            const isActive = currentTab === tab.value;
 
-              // Persist the changes
-              await updateLesson.mutateAsync(updatedLesson);
-            }}
-            onSubjectChange={(subject, subjectCode) => {
-              // TODO: Implement subject change filtering
-              console.log('Subject change:', subject, subjectCode);
-            }}
-            onCreateLesson={(subject, subjectCode) => {
-              // TODO: Open lesson creation modal/form
-              console.log('Create lesson:', subject, subjectCode);
-            }}
-            onManageSchedule={(subject) => {
-              // TODO: Navigate to schedule management
-              console.log('Manage schedule:', subject);
-            }}
-          />
-        </TabsContent>
+            return (
+              <button
+                key={tab.value}
+                onClick={() => handleTabChange(tab.value as ClassTabs)}
+                className={cn(
+                  'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
+                  isActive
+                    ? 'bg-primary text-primary-foreground'
+                    : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                )}
+              >
+                <Icon className="h-4 w-4" />
+                <span>{t(tab.labelKey)}</span>
+              </button>
+            );
+          })}
+        </nav>
+      </aside>
 
-        <TabsContent value="schedule" className="space-y-4">
-          <ScheduleTab classId={currentClass.id} />
-        </TabsContent>
+      {/* Content Area - Scrollable */}
+      <main className="flex-1 overflow-y-auto">
+        {currentTab === 'feed' && <FeedTab classId={classId} />}
 
-        <TabsContent value="lessons" className="space-y-4">
-          <LessonTab classId={classId} currentClass={currentClass} />
-        </TabsContent>
+        {currentTab === 'students' && (
+          <div className="p-6">
+            <ClassStudentView classData={currentClass} />
+          </div>
+        )}
 
-        <TabsContent value="overview" className="space-y-4">
-          <ClassOverview classData={currentClass} onEditClick={onEditClick} />
-        </TabsContent>
+        {currentTab === 'lessons' && (
+          <div className="p-6">
+            <LessonTab classId={classId} currentClass={currentClass} />
+          </div>
+        )}
 
-        <TabsContent value="students" className="space-y-4">
-          <ClassStudentView classData={currentClass} />
-        </TabsContent>
-
-        <TabsContent value="settings" className="space-y-4">
-          <ClassSettings classData={currentClass} />
-        </TabsContent>
-      </Tabs>
+        {currentTab === 'settings' && (
+          <div className="p-6">
+            <ClassSettings classData={currentClass} />
+          </div>
+        )}
+      </main>
     </div>
   );
 };

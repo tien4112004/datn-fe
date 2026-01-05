@@ -21,8 +21,23 @@ export const UpdateClassModal = ({ isOpen, onClose, initialData }: UpdateClassMo
     const toastId = toast.loading(t('updateClass.loading'));
 
     try {
-      await updateClassMutation.mutateAsync({ ...data, id: initialData.id });
-      toast.success(t('updateClass.success', { name: data.name }), {
+      // Backend expects settings as a JSON string, not an object
+      const settings: Record<string, any> = {};
+
+      if (data.grade) settings.grade = data.grade;
+      if (data.academicYear) settings.academicYear = data.academicYear;
+      if (data.class) settings.class = data.class;
+
+      const updateRequest = {
+        id: initialData.id,
+        name: data.name,
+        description: data.description || null,
+        // Stringify settings object to JSON string as backend expects String type
+        settings: Object.keys(settings).length > 0 ? JSON.stringify(settings) : null,
+      };
+
+      await updateClassMutation.mutateAsync(updateRequest);
+      toast.success(`Class "${data.name}" updated successfully.`, {
         id: toastId,
       });
       closeEditModal();
@@ -34,6 +49,15 @@ export const UpdateClassModal = ({ isOpen, onClose, initialData }: UpdateClassMo
     }
   };
 
+  // Transform Class data to ClassSchema format for the form
+  const formInitialData: ClassSchema = {
+    name: initialData.name,
+    grade: initialData.settings?.grade || 1,
+    academicYear: initialData.settings?.academicYear || '',
+    class: initialData.settings?.class,
+    description: initialData.description !== null ? initialData.description : undefined,
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="!max-w-3xl">
@@ -41,7 +65,7 @@ export const UpdateClassModal = ({ isOpen, onClose, initialData }: UpdateClassMo
           <DialogTitle>{t('editTitle')}</DialogTitle>
         </DialogHeader>
         <div className="py-4">
-          <ClassForm initialData={initialData} onSubmit={handleSubmit} isEditMode={true} />
+          <ClassForm initialData={formInitialData} onSubmit={handleSubmit} isEditMode={true} />
         </div>
       </DialogContent>
     </Dialog>

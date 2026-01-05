@@ -12,6 +12,7 @@ export const MOCK_USERS: MockUser[] = [
     password: 'password123',
     name: 'Test User',
     avatar: 'https://github.com/shadcn.png',
+    role: 'student',
   },
   {
     id: 'user-002',
@@ -19,6 +20,7 @@ export const MOCK_USERS: MockUser[] = [
     password: 'admin123',
     name: 'Admin User',
     avatar: 'https://github.com/shadcn.png',
+    role: 'admin',
   },
   {
     id: 'user-003',
@@ -26,6 +28,7 @@ export const MOCK_USERS: MockUser[] = [
     password: 'demo123',
     name: 'Demo User',
     avatar: 'https://github.com/shadcn.png',
+    role: 'teacher',
   },
 ];
 
@@ -58,7 +61,8 @@ export function createMockUser(
   firstName: string,
   lastName: string,
   dateOfBirth: string,
-  phoneNumber?: string
+  phoneNumber?: string,
+  role: 'student' | 'teacher' | 'admin' = 'student'
 ): MockUser {
   // Check if user already exists
   const existingUser = findUserByEmail(email);
@@ -77,6 +81,7 @@ export function createMockUser(
     dateOfBirth,
     phoneNumber,
     avatar: 'https://github.com/shadcn.png',
+    role,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };

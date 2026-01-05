@@ -4,7 +4,7 @@
  * API request types for lesson-related operations.
  */
 
-import type { LearningObjective, LessonResource, LessonStatus, ObjectiveType, ResourceType } from './lesson';
+import type { LessonStatus, ObjectiveType, ResourceType } from './lesson';
 
 /**
  * LessonCollectionRequest
@@ -14,6 +14,7 @@ export interface LessonCollectionRequest {
   classId?: string;
   subject?: string;
   status?: LessonStatus;
+  search?: string;
   page?: number;
   pageSize?: number;
 }
@@ -21,25 +22,46 @@ export interface LessonCollectionRequest {
 /**
  * LessonCreateRequest
  * Payload for creating a new lesson
+ * Matches backend schema exactly
  */
 export interface LessonCreateRequest {
   classId: string;
   title: string;
-  subject: string;
-  description?: string;
-  bindedPeriodId?: string;
-  objectives: Omit<LearningObjective, 'id' | 'lessonId' | 'createdAt'>[];
-  resources: Omit<LessonResource, 'id' | 'lessonId' | 'createdAt'>[];
-  notes?: string;
+  content: string; // Lesson content or instructions
+  subject?: string | null;
+  type?: 'assignment' | 'material' | 'lecture' | 'quiz';
+  learningObjectives?: Array<{
+    description: string;
+    type?: string;
+    isAchieved?: boolean;
+    notes?: string | null;
+  }> | null;
+  lessonPlan?: string | null; // Private teacher notes
+  maxPoints?: number | null; // For assignments
+  dueDate?: string | null; // For assignments
 }
 
 /**
  * LessonUpdateRequest
  * Payload for updating an existing lesson
+ * Matches backend schema exactly
  */
-export interface LessonUpdateRequest extends Partial<LessonCreateRequest> {
+export interface LessonUpdateRequest {
   id: string;
+  title?: string;
+  content?: string;
+  subject?: string | null;
+  type?: 'assignment' | 'material' | 'lecture' | 'quiz';
   status?: LessonStatus;
+  learningObjectives?: Array<{
+    description: string;
+    type?: string;
+    isAchieved?: boolean;
+    notes?: string | null;
+  }> | null;
+  lessonPlan?: string | null;
+  maxPoints?: number | null;
+  dueDate?: string | null;
 }
 
 /**

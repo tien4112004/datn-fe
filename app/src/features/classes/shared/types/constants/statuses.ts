@@ -1,16 +1,8 @@
 /**
  * Status Constants
  *
- * Status enums and configuration for classes, students, and lessons.
+ * Status enums and configuration for classes and lessons.
  */
-
-// Student status options
-export const STUDENT_STATUS = {
-  active: { code: 'active', name: 'Đang học', nameEn: 'Active', color: 'green' },
-  transferred: { code: 'transferred', name: 'Chuyển trường', nameEn: 'Transferred', color: 'blue' },
-  graduated: { code: 'graduated', name: 'Đã tốt nghiệp', nameEn: 'Graduated', color: 'purple' },
-  dropped: { code: 'dropped', name: 'Đã nghỉ học', nameEn: 'Dropped', color: 'red' },
-} as const;
 
 // Lesson plan status options
 export const LESSON_STATUS = {
@@ -51,7 +43,6 @@ export const RESOURCE_TYPES = {
   other: { code: 'other', name: 'Khác', nameEn: 'Other', icon: 'more-horizontal' },
 } as const;
 
-export type StudentStatusCode = keyof typeof STUDENT_STATUS;
 export type LessonStatusCode = keyof typeof LESSON_STATUS;
 export type ObjectiveTypeCode = keyof typeof OBJECTIVE_TYPES;
 export type ResourceTypeCode = keyof typeof RESOURCE_TYPES;

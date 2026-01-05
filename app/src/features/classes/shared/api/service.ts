@@ -6,20 +6,20 @@ import {
   type ClassCollectionRequest,
   type ClassCreateRequest,
   type ClassUpdateRequest,
-  type StudentEnrollmentRequest,
   type StudentCreateRequest,
   type StudentUpdateRequest,
-  type SchedulePeriod,
+  type StudentEnrollmentRequest,
   type Lesson,
   type LessonCollectionRequest,
   type Layout,
-  type DailySchedule,
-  type ScheduleCollectionRequest,
   type LessonCreateRequest,
   type LessonUpdateRequest,
+  type ImportResult,
+  type ScheduleCollectionRequest,
   type SchedulePeriodCreateRequest,
   type SchedulePeriodUpdateRequest,
-  type ImportResult,
+  type SchedulePeriod,
+  type DailySchedule,
 } from '../types';
 import { api } from '@aiprimary/api';
 import { mapPagination, type ApiResponse, type Pagination } from '@aiprimary/api';
@@ -42,15 +42,15 @@ export default class ClassRealApiService implements ClassApiService {
         pageSize: request.pageSize,
         // sort: request.sort,
         search: request.search,
-        grade: request.grade,
-        academicYear: request.academicYear,
         isActive: request.isActive,
       },
     });
 
+    const mappedData = response.data.data.map((item) => this._mapClass(item));
+
     return {
       ...response.data,
-      data: response.data.data.map(this._mapClass),
+      data: mappedData,
       pagination: mapPagination(response.data.pagination as Pagination),
     };
   }
@@ -81,10 +81,10 @@ export default class ClassRealApiService implements ClassApiService {
   }
 
   async getSeatingChart(classId: string): Promise<Layout | null> {
-    const response = await api.get<ApiResponse<Layout>>(
+    const response = await api.get<ApiResponse<Layout | null>>(
       `${this.baseUrl}/api/classes/${classId}/seating-chart`
     );
-    return response.data.data;
+    return response.data.data ?? null;
   }
 
   async saveSeatingChart(classId: string, layout: Layout): Promise<Layout> {
@@ -95,20 +95,14 @@ export default class ClassRealApiService implements ClassApiService {
     return response.data.data;
   }
 
-  async getStudentsByClassId(classId: string): Promise<Student[]> {
-    const response = await api.get<ApiResponse<Student[]>>(`${this.baseUrl}/api/classes/${classId}/students`);
-    return response.data.data.map(this._mapStudent);
-  }
-
-  async enrollStudent(request: StudentEnrollmentRequest): Promise<Student> {
-    const response = await api.post<ApiResponse<Student>>(
-      `${this.baseUrl}/api/classes/${request.classId}/students`,
+  async getStudentsByClassId(classId: string, page = 1, size = 10): Promise<Student[]> {
+    const response = await api.get<ApiResponse<Student[]>>(
+      `${this.baseUrl}/api/classes/${classId}/students`,
       {
-        studentId: request.studentId,
-        enrollmentDate: request.enrollmentDate,
+        params: { page, size },
       }
     );
-    return this._mapStudent(response.data.data);
+    return response.data.data.map((item) => this._mapStudent(item));
   }
 
   async removeStudentFromClass(classId: string, studentId: string): Promise<void> {
@@ -124,6 +118,16 @@ export default class ClassRealApiService implements ClassApiService {
     return this._mapStudent(response.data.data);
   }
 
+  async getStudentById(studentId: string): Promise<Student | null> {
+    try {
+      const response = await api.get<ApiResponse<Student>>(`${this.baseUrl}/api/students/${studentId}`);
+      return this._mapStudent(response.data.data);
+    } catch (error) {
+      console.error('Failed to fetch student:', error);
+      return null;
+    }
+  }
+
   async updateStudent(studentId: string, data: StudentUpdateRequest): Promise<Student> {
     const { id, ...updateData } = data;
     const response = await api.put<ApiResponse<Student>>(
@@ -133,23 +137,74 @@ export default class ClassRealApiService implements ClassApiService {
     return this._mapStudent(response.data.data);
   }
 
+  async enrollStudent(data: StudentEnrollmentRequest): Promise<Student> {
+    const response = await api.post<ApiResponse<Student>>(
+      `${this.baseUrl}/api/classes/${data.classId}/students/enroll`,
+      data
+    );
+    return this._mapStudent(response.data.data);
+  }
+
   async deleteStudent(studentId: string): Promise<void> {
     await api.delete(`${this.baseUrl}/api/students/${studentId}`);
   }
 
-  // Schedule and Lesson Management
+  // Lesson Management
+
+  async getLessons(classId: string, params: LessonCollectionRequest): Promise<ApiResponse<Lesson[]>> {
+    const response = await api.get<ApiResponse<Lesson[]>>(`${this.baseUrl}/api/classes/${classId}/lessons`, {
+      params: {
+        page: params.page || 1,
+        size: params.pageSize || 20,
+        search: params.search || undefined,
+      },
+    });
+    return response.data;
+  }
+
+  async getLesson(id: string): Promise<Lesson | null> {
+    try {
+      const response = await api.get<ApiResponse<Lesson>>(`${this.baseUrl}/api/lessons/${id}`);
+      return response.data.data;
+    } catch (error) {
+      console.error('Failed to fetch lesson:', error);
+      return null;
+    }
+  }
+
+  // Lesson mutations
+  async createLesson(data: LessonCreateRequest): Promise<Lesson> {
+    const response = await api.post<ApiResponse<Lesson>>(`${this.baseUrl}/api/lessons`, data);
+    return response.data.data;
+  }
+
+  async updateLesson(data: LessonUpdateRequest): Promise<Lesson> {
+    const { id, ...updateData } = data;
+    const response = await api.put<ApiResponse<Lesson>>(`${this.baseUrl}/api/lessons/${id}`, updateData);
+    return response.data.data;
+  }
+
+  async deleteLesson(id: string): Promise<void> {
+    await api.delete(`${this.baseUrl}/api/lessons/${id}`);
+  }
+
+  async updateLessonStatus(id: string, status: string, notes?: string): Promise<Lesson> {
+    const response = await api.patch<ApiResponse<Lesson>>(`${this.baseUrl}/api/lessons/${id}/status`, {
+      status,
+      notes,
+    });
+    return response.data.data;
+  }
+
+  // Schedule Management
+
   async getSchedules(
     classId: string,
     params: ScheduleCollectionRequest
   ): Promise<ApiResponse<DailySchedule[]>> {
     const response = await api.get<ApiResponse<DailySchedule[]>>(
       `${this.baseUrl}/api/classes/${classId}/schedules`,
-      {
-        params: {
-          startDate: params.startDate,
-          endDate: params.endDate,
-        },
-      }
+      { params }
     );
     return response.data;
   }
@@ -160,24 +215,9 @@ export default class ClassRealApiService implements ClassApiService {
   ): Promise<ApiResponse<SchedulePeriod[]>> {
     const response = await api.get<ApiResponse<SchedulePeriod[]>>(
       `${this.baseUrl}/api/classes/${classId}/periods`,
-      {
-        params: {
-          date: params.date,
-          startDate: params.startDate,
-          endDate: params.endDate,
-        },
-      }
+      { params }
     );
     return response.data;
-  }
-
-  async getPeriodsBySubject(classId: string, subjectCode: string): Promise<SchedulePeriod[]> {
-    const response = await api.get(`${this.baseUrl}/api/classes/${classId}/periods`, {
-      params: {
-        subject: subjectCode,
-      },
-    });
-    return response.data.data || [];
   }
 
   async getPeriodById(id: string): Promise<SchedulePeriod | null> {
@@ -190,55 +230,16 @@ export default class ClassRealApiService implements ClassApiService {
     }
   }
 
-  async getLessons(classId: string, params: LessonCollectionRequest): Promise<ApiResponse<Lesson[]>> {
-    const response = await api.get<ApiResponse<Lesson[]>>(
-      `${this.baseUrl}/api/classes/${classId}/lesson-plans`,
+  async getPeriodsBySubject(classId: string, subjectCode: string): Promise<SchedulePeriod[]> {
+    const response = await api.get<ApiResponse<SchedulePeriod[]>>(
+      `${this.baseUrl}/api/classes/${classId}/periods`,
       {
-        params: {
-          subject: params.subject,
-          status: params.status,
-          page: params.page,
-          pageSize: params.pageSize,
-        },
+        params: { subject: subjectCode },
       }
     );
-    return response.data;
-  }
-
-  async getLesson(id: string): Promise<Lesson | null> {
-    try {
-      const response = await api.get<ApiResponse<Lesson>>(`${this.baseUrl}/api/lesson-plans/${id}`);
-      return response.data.data;
-    } catch (error) {
-      console.error('Failed to fetch lesson:', error);
-      return null;
-    }
-  }
-
-  // Lesson  mutations
-  async updateLessonStatus(id: string, status: string, notes?: string): Promise<Lesson> {
-    const response = await api.patch<ApiResponse<Lesson>>(`${this.baseUrl}/api/lesson-plans/${id}/status`, {
-      status,
-      notes,
-    });
     return response.data.data;
   }
 
-  async createLesson(data: LessonCreateRequest): Promise<Lesson> {
-    const response = await api.post<ApiResponse<Lesson>>(`${this.baseUrl}/api/lesson-plans`, data);
-    return response.data.data;
-  }
-
-  async updateLesson(data: LessonUpdateRequest): Promise<Lesson> {
-    const { id, ...updateData } = data;
-    const response = await api.patch<ApiResponse<Lesson>>(
-      `${this.baseUrl}/api/lesson-plans/${id}`,
-      updateData
-    );
-    return response.data.data;
-  }
-
-  // Schedule mutations
   async addSchedulePeriod(classId: string, data: SchedulePeriodCreateRequest): Promise<SchedulePeriod> {
     const response = await api.post<ApiResponse<SchedulePeriod>>(
       `${this.baseUrl}/api/classes/${classId}/periods`,
@@ -252,57 +253,96 @@ export default class ClassRealApiService implements ClassApiService {
     id: string,
     updates: SchedulePeriodUpdateRequest
   ): Promise<SchedulePeriod> {
-    const response = await api.patch<ApiResponse<SchedulePeriod>>(
+    const { id: _id, ...updateData } = updates;
+    const response = await api.put<ApiResponse<SchedulePeriod>>(
       `${this.baseUrl}/api/classes/${classId}/periods/${id}`,
-      updates
+      updateData
     );
     return response.data.data;
   }
 
   async linkLessonToSchedulePeriod(classId: string, periodId: string, lessonId: string): Promise<void> {
-    await api.post(`${this.baseUrl}/api/classes/${classId}/periods/${periodId}/link-lesson`, {
-      lessonId,
-    });
+    await api.post(`${this.baseUrl}/api/classes/${classId}/periods/${periodId}/lessons`, { lessonId });
   }
 
   async unlinkLessonFromSchedulePeriod(classId: string, periodId: string, lessonId: string): Promise<void> {
-    await api.delete(`${this.baseUrl}/api/classes/${classId}/periods/${periodId}/link-lesson`, {
-      data: { lessonId },
-    });
+    await api.delete(`${this.baseUrl}/api/classes/${classId}/periods/${periodId}/lessons/${lessonId}`);
   }
 
   private _mapClass(data: any): Class {
+    // Parse settings from JSON string to object
+    let parsedSettings: Record<string, any> | null = null;
+    if (data.settings && typeof data.settings === 'string') {
+      try {
+        parsedSettings = JSON.parse(data.settings);
+      } catch (error) {
+        console.error('Failed to parse settings JSON:', error);
+        parsedSettings = null;
+      }
+    } else if (data.settings && typeof data.settings === 'object') {
+      parsedSettings = data.settings;
+    }
+
+    // Ensure settings exist, create if needed
+    const finalSettings = parsedSettings || {};
+
+    // Migrate top-level fields to settings if they exist (backward compatibility)
+    if (data.grade !== undefined) {
+      finalSettings.grade = data.grade;
+    }
+    if (data.academicYear !== undefined) {
+      finalSettings.academicYear = data.academicYear;
+    }
+    if (data.class !== undefined) {
+      finalSettings.class = data.class;
+    }
+
     return {
+      // Backend fields
       id: data.id,
+      ownerId: data.ownerId,
       name: data.name,
-      grade: data.grade,
-      academicYear: data.academicYear,
-      currentEnrollment: data.currentEnrollment || 0,
-      classroom: data.classroom,
-      description: data.description,
-      students: (data.students || []).map(this._mapStudent),
-      layout: data.layout, // Assuming the backend returns the layout
+      description: data.description ?? null,
+      joinCode: data.joinCode ?? null,
+      settings: Object.keys(finalSettings).length > 0 ? finalSettings : null,
+      isActive: data.isActive ?? true,
       createdAt: data.createdAt,
       updatedAt: data.updatedAt,
-      isActive: data.isActive !== false, // default to true if not specified
-      teacherId: data.teacherId,
+
+      // Legacy/compatibility fields
+      teacherId: data.ownerId, // Map ownerId to teacherId for backwards compatibility
+      students: (data.students || []).map((item: any) => this._mapStudent(item)),
+      layout: data.layout ?? undefined,
     };
   }
 
   private _mapStudent(data: any): Student {
     return {
+      // Backend fields
       id: data.id,
-      fullName: data.fullName,
-      dateOfBirth: data.dateOfBirth,
-      gender: data.gender,
-      address: data.address,
-      parentName: data.parentName,
-      parentPhone: data.parentPhone,
-      classId: data.classId,
+      userId: data.userId,
       enrollmentDate: data.enrollmentDate,
-      status: data.status || 'active',
+      address: data.address,
+      parentContactEmail: data.parentContactEmail,
+      status: data.status,
       createdAt: data.createdAt,
       updatedAt: data.updatedAt,
+
+      // User profile fields
+      username: data.username,
+      password: data.password,
+      firstName: data.firstName,
+      lastName: data.lastName,
+      avatarUrl: data.avatarUrl,
+      phoneNumber: data.phoneNumber,
+
+      // Legacy/compatibility fields
+      fullName: data.firstName && data.lastName ? `${data.firstName} ${data.lastName}` : data.fullName,
+      dateOfBirth: data.dateOfBirth,
+      gender: data.gender,
+      parentName: data.parentName,
+      parentPhone: data.phoneNumber || data.parentPhone,
+      classId: data.classId,
     };
   }
 

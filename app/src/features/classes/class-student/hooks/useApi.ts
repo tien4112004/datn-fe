@@ -96,13 +96,14 @@ export function useStudentMutations(classId: string) {
     mutationFn: async (data: StudentFormData): Promise<Student> => {
       const request: StudentCreateRequest = {
         fullName: data.fullName,
-        dateOfBirth: data.dateOfBirth || new Date().toISOString(),
-        gender: data.gender || 'other',
-        address: data.address,
-        parentName: data.parentName,
-        parentPhone: data.parentPhone,
+        dateOfBirth: data.dateOfBirth || undefined,
+        gender: data.gender || undefined,
+        address: data.address || undefined,
+        parentName: data.parentName || '',
+        parentPhone: data.parentPhone || '',
+        parentContactEmail: undefined,
         classId: classId,
-        enrollmentDate: new Date().toISOString(),
+        enrollmentDate: undefined,
       };
 
       return await classApiService.createStudent(classId, request);
@@ -134,14 +135,19 @@ export function useStudentMutations(classId: string) {
       studentId: string;
       data: StudentFormData;
     }): Promise<Student> => {
+      // Split fullName into firstName and lastName
+      const nameParts = data.fullName.trim().split(/\s+/);
+      const firstName = nameParts[0] || '';
+      const lastName = nameParts.slice(1).join(' ') || firstName;
+
       const request: StudentUpdateRequest = {
         id: studentId,
-        fullName: data.fullName,
-        dateOfBirth: data.dateOfBirth,
-        gender: data.gender,
-        address: data.address,
-        parentName: data.parentName,
-        parentPhone: data.parentPhone,
+        firstName,
+        lastName,
+        phoneNumber: data.parentPhone || null,
+        address: data.address || null,
+        parentContactEmail: null,
+        avatarUrl: null,
       };
 
       return await classApiService.updateStudent(studentId, request);

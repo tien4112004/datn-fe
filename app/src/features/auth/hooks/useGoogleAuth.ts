@@ -22,6 +22,7 @@ export const useGoogleLogin = () => {
           lastName: 'User',
           name: 'Google User',
           avatar: 'https://lh3.googleusercontent.com/a/default-user',
+          role: 'student' as const,
         };
 
         // Update both localStorage and React context state

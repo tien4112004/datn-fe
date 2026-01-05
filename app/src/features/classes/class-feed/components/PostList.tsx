@@ -74,9 +74,14 @@ export const PostList = ({
           : 'feed.list.empty.all';
 
     return (
-      <div className={`py-12 text-center ${className}`}>
+      <div className={`px-4 py-8 text-center md:py-12 ${className}`}>
         <div className="mb-4 text-gray-400">
-          <svg className="mx-auto h-16 w-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg
+            className="mx-auto h-12 w-12 md:h-16 md:w-16"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -111,7 +116,7 @@ export const PostList = ({
                 exit={{ opacity: 0, scaleY: 0 }}
                 transition={{ duration: 0.2, ease: 'easeInOut' }}
                 style={{ transformOrigin: 'top' }}
-                className="bg-muted/20 border-b px-6 py-4 pl-14"
+                className="bg-muted/20 border-b px-3 py-3 pl-9 md:px-6 md:py-4 md:pl-14"
               >
                 <CommentThread postId={post.id} />
               </motion.div>

@@ -44,9 +44,9 @@ export const CommentThread = ({ postId, className = '' }: CommentThreadProps) =>
     <div className={`space-y-4 ${className}`}>
       {/* Comments List */}
       {comments.length > 0 && (
-        <div className="space-y-3">
+        <div className="space-y-2 md:space-y-3">
           {comments.map((comment) => (
-            <div key={comment.id} className="flex space-x-3">
+            <div key={comment.id} className="flex space-x-2 md:space-x-3">
               <UserAvatar
                 name={
                   comment.user
@@ -57,7 +57,7 @@ export const CommentThread = ({ postId, className = '' }: CommentThreadProps) =>
                 size="sm"
               />
               <div className="flex-1">
-                <div className="rounded-lg bg-gray-100 px-3 py-2">
+                <div className="rounded-lg bg-gray-100 px-2.5 py-1.5 md:px-3 md:py-2">
                   <div className="mb-1 flex items-center space-x-2">
                     <span className="text-sm font-medium">
                       {comment.user
@@ -95,7 +95,7 @@ export const CommentThread = ({ postId, className = '' }: CommentThreadProps) =>
       )}
 
       {/* Add Comment Form */}
-      <form onSubmit={handleSubmit} className="flex space-x-3">
+      <form onSubmit={handleSubmit} className="flex space-x-2 md:space-x-3">
         <UserAvatar
           name={user ? `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email : 'User'}
           src={user?.avatarUrl || user?.avatar}

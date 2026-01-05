@@ -49,7 +49,7 @@ export const AttachmentPreview = ({ url, className = '' }: AttachmentPreviewProp
   if (isImage) {
     return (
       <div className={`overflow-hidden rounded-lg border ${className}`}>
-        <img src={url} alt={fileName} className="h-48 w-full object-cover" />
+        <img src={url} alt={fileName} className="h-32 w-full object-cover sm:h-40 md:h-48" />
         <div className="bg-muted p-2">
           <p className="truncate text-sm font-medium">{fileName}</p>
         </div>
@@ -71,7 +71,7 @@ export const AttachmentPreview = ({ url, className = '' }: AttachmentPreviewProp
   };
 
   return (
-    <div className={`bg-muted/50 flex items-center gap-3 rounded-lg border p-3 ${className}`}>
+    <div className={`bg-muted/50 flex items-center gap-2 rounded-lg border p-2 md:gap-3 md:p-3 ${className}`}>
       {getFileIcon(fileType)}
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-medium">{fileName}</p>

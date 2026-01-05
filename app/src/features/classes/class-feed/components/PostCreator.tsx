@@ -111,7 +111,7 @@ export const PostCreator = ({
           {buttonText}
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto">
+      <DialogContent className="max-h-[85vh] max-w-3xl overflow-y-auto px-4 md:max-h-[90vh] md:px-6">
         <DialogHeader>
           <DialogTitle>{t('feed.creator.dialog.title')}</DialogTitle>
         </DialogHeader>
@@ -150,7 +150,7 @@ export const PostCreator = ({
                 editor={editor}
                 minimalToolbar={true}
                 sideMenu={false}
-                className="min-h-[200px] p-3"
+                className="min-h-[150px] p-2 md:min-h-[200px] md:p-3"
               />
             </div>
           </div>
@@ -170,7 +170,7 @@ export const PostCreator = ({
           ) : (
             <>
               {/* Attachments, Lessons, Resources - Only for Post type */}
-              <div className="grid gap-4 md:grid-cols-2">
+              <div className="grid gap-3 md:grid-cols-2 md:gap-4">
                 {/* Attachments */}
                 <div className="space-y-2">
                   <Label className="text-sm font-medium">{t('feed.creator.labels.attachments')}</Label>

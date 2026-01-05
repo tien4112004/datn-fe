@@ -37,9 +37,51 @@ export const ClassDetailTabs = ({ classId, currentClass, onEditClick }: ClassDet
   };
 
   return (
-    <div className="flex h-[calc(100vh-4rem)]">
+    <div className="flex h-full flex-col md:h-[calc(100vh-4rem)] md:flex-row">
+      {/* Mobile Horizontal Tabs - Hidden on Desktop */}
+      <div className="bg-background border-b md:hidden">
+        {/* Compact Class Info */}
+        <div className="border-b px-4 py-3">
+          <h1 className="truncate text-lg font-semibold">{currentClass.name}</h1>
+          <div className="mt-1 flex items-center gap-2">
+            <Badge variant={currentClass.isActive ? 'default' : 'secondary'} className="text-xs">
+              {currentClass.isActive ? t('status.active') : t('status.inactive')}
+            </Badge>
+            {currentClass.settings?.grade && (
+              <span className="text-muted-foreground text-xs">
+                {getGradeLabel(currentClass.settings.grade)}
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Horizontal Scrollable Tabs */}
+        <nav className="overflow-x-auto">
+          <div className="flex min-w-max gap-1 p-2">
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+              const isActive = currentTab === tab.value;
+
+              return (
+                <button
+                  key={tab.value}
+                  onClick={() => handleTabChange(tab.value as ClassTabs)}
+                  className={cn(
+                    'flex items-center gap-2 whitespace-nowrap rounded-lg px-4 py-2 text-sm font-medium transition-colors',
+                    isActive ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-muted'
+                  )}
+                >
+                  <Icon className="h-4 w-4 shrink-0" />
+                  <span>{t(tab.labelKey)}</span>
+                </button>
+              );
+            })}
+          </div>
+        </nav>
+      </div>
+
       {/* Vertical Sidebar with Class Info */}
-      <aside className="bg-muted/10 w-80 overflow-y-auto border-r">
+      <aside className="bg-muted/10 hidden overflow-y-auto border-r md:block md:w-64 lg:w-80">
         {/* Class Information Section */}
         <div className="space-y-4 border-b p-6">
           {/* Title and Status */}

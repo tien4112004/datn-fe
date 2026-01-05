@@ -24,9 +24,23 @@ export const PostCard = ({ post, onEdit, onDelete, onPin, onComment, className =
   const { t } = useTranslation('classes');
 
   return (
-    <article className={`hover:bg-muted/30 border-b px-6 py-4 transition-colors ${className}`}>
+    <article
+      className={`hover:bg-muted/30 border-b px-3 py-3 transition-colors md:px-6 md:py-4 ${className}`}
+    >
       {/* Header */}
-      <div className="mb-3 flex items-start gap-3">
+      <div className="mb-2 flex items-start gap-2 md:mb-3 md:gap-3">
+        {/* Small avatar on mobile */}
+        <UserAvatar
+          name={
+            post.author
+              ? `${post.author.firstName} ${post.author.lastName}`
+              : `User ${post.authorId.slice(0, 8)}`
+          }
+          src={post.author?.avatarUrl || undefined}
+          size="sm"
+          className="md:hidden"
+        />
+        {/* Medium avatar on desktop */}
         <UserAvatar
           name={
             post.author
@@ -35,12 +49,13 @@ export const PostCard = ({ post, onEdit, onDelete, onPin, onComment, className =
           }
           src={post.author?.avatarUrl || undefined}
           size="md"
+          className="hidden md:block"
         />
 
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0 flex-1">
-              <div className="flex flex-wrap items-center gap-2">
+              <div className="flex flex-wrap items-center gap-1.5 md:gap-2">
                 <p className="font-semibold">
                   {post.author
                     ? `${post.author.firstName} ${post.author.lastName}`
@@ -49,21 +64,24 @@ export const PostCard = ({ post, onEdit, onDelete, onPin, onComment, className =
 
                 {/* Type Badge */}
                 {post.type === 'Post' && (
-                  <Badge variant="secondary" className="gap-1 text-xs">
+                  <Badge variant="secondary" className="gap-1 text-[10px] md:text-xs">
                     <FileText className="h-3 w-3" />
                     {t('feed.post.badges.post')}
                   </Badge>
                 )}
 
                 {post.type === 'Assignment' && (
-                  <Badge variant="default" className="gap-1 bg-purple-600 text-xs hover:bg-purple-700">
+                  <Badge
+                    variant="default"
+                    className="gap-1 bg-purple-600 text-[10px] hover:bg-purple-700 md:text-xs"
+                  >
                     <ClipboardList className="h-3 w-3" />
                     {t('feed.post.badges.assignment')}
                   </Badge>
                 )}
 
                 {post.isPinned && (
-                  <Badge variant="secondary" className="gap-1 text-xs">
+                  <Badge variant="secondary" className="gap-1 text-[10px] md:text-xs">
                     <Pin className="h-3 w-3" />
                     {t('feed.post.badges.pinned')}
                   </Badge>
@@ -85,7 +103,7 @@ export const PostCard = ({ post, onEdit, onDelete, onPin, onComment, className =
       </div>
 
       {/* Content */}
-      <div className="mb-3 ml-[52px]">
+      <div className="mb-2 ml-9 md:mb-3 md:ml-[52px]">
         <article className="prose prose-sm !max-w-none">
           <ReactMarkdown>{post.content}</ReactMarkdown>
         </article>
@@ -93,7 +111,7 @@ export const PostCard = ({ post, onEdit, onDelete, onPin, onComment, className =
 
       {/* Attachments */}
       {post.attachments && post.attachments.length > 0 && (
-        <div className="mb-3 ml-[52px] space-y-2">
+        <div className="mb-2 ml-9 space-y-1.5 md:mb-3 md:ml-[52px] md:space-y-2">
           {post.attachments.map((url, index) => (
             <AttachmentPreview key={`${post.id}-attachment-${index}`} url={url} />
           ))}
@@ -101,7 +119,7 @@ export const PostCard = ({ post, onEdit, onDelete, onPin, onComment, className =
       )}
 
       {/* Footer */}
-      <div className="ml-[52px] flex items-center pt-2">
+      <div className="ml-9 flex items-center pt-1.5 md:ml-[52px] md:pt-2">
         <Button
           onClick={onComment}
           variant="ghost"

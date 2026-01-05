@@ -44,11 +44,23 @@ export const CommentThread = ({ postId, className = '' }: CommentThreadProps) =>
         <div className="space-y-3">
           {comments.map((comment) => (
             <div key={comment.id} className="flex space-x-3">
-              <UserAvatar name={`User ${comment.userId.slice(0, 8)}`} size="sm" />
+              <UserAvatar
+                name={
+                  comment.user
+                    ? `${comment.user.firstName} ${comment.user.lastName}`
+                    : `User ${comment.userId.slice(0, 8)}`
+                }
+                src={comment.user?.avatarUrl || undefined}
+                size="sm"
+              />
               <div className="flex-1">
                 <div className="rounded-lg bg-gray-100 px-3 py-2">
                   <div className="mb-1 flex items-center space-x-2">
-                    <span className="text-sm font-medium">User {comment.userId.slice(0, 8)}</span>
+                    <span className="text-sm font-medium">
+                      {comment.user
+                        ? `${comment.user.firstName} ${comment.user.lastName}`
+                        : `User ${comment.userId.slice(0, 8)}`}
+                    </span>
                     <span className="text-xs text-gray-500">
                       {formatDistanceToNow(comment.createdAt, {
                         addSuffix: true,

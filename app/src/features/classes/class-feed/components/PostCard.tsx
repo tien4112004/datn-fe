@@ -26,13 +26,25 @@ export const PostCard = ({ post, onEdit, onDelete, onPin, onComment, className =
     <article className={`hover:bg-muted/30 border-b px-6 py-4 transition-colors ${className}`}>
       {/* Header */}
       <div className="mb-3 flex items-start gap-3">
-        <UserAvatar name={`User ${post.authorId.slice(0, 8)}`} size="md" />
+        <UserAvatar
+          name={
+            post.author
+              ? `${post.author.firstName} ${post.author.lastName}`
+              : `User ${post.authorId.slice(0, 8)}`
+          }
+          src={post.author?.avatarUrl || undefined}
+          size="md"
+        />
 
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2">
-                <p className="font-semibold">User {post.authorId.slice(0, 8)}</p>
+                <p className="font-semibold">
+                  {post.author
+                    ? `${post.author.firstName} ${post.author.lastName}`
+                    : `User ${post.authorId.slice(0, 8)}`}
+                </p>
 
                 {/* Type Badge */}
                 {post.type === 'announcement' && (

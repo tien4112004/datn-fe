@@ -13,7 +13,7 @@ export interface Post {
   classId: string;
   authorId: string;
   author?: UserMinimalInfo; // User info from backend
-  type: 'announcement' | 'general' | 'schedule_event';
+  type: 'Post' | 'Assignment';
   content: string;
   attachments?: string[]; // Array of URLs from backend
   linkedResourceIds?: string[];

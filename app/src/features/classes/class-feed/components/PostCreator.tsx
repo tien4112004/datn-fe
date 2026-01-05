@@ -16,25 +16,37 @@ import {
   DialogTrigger,
 } from '@/shared/components/ui/dialog';
 import { Paperclip, Plus, X } from 'lucide-react';
-import { LessonListCommand, ResourceListCommand } from '../../class-lesson/components';
+import { LessonListCommand, ResourceListCommand, AssignmentListCommand } from '../../class-lesson/components';
 import type { Lesson, LessonResource } from '../../class-lesson';
 import { Separator } from '@/shared/components/ui/separator';
+
+interface Assignment {
+  id: string;
+  title: string;
+}
 
 interface PostCreatorProps {
   classId: string;
   onPostCreated?: () => void;
   className?: string;
+  initialType?: 'Post' | 'Assignment';
 }
 
-export const PostCreator = ({ classId, onPostCreated, className = '' }: PostCreatorProps) => {
+export const PostCreator = ({
+  classId,
+  onPostCreated,
+  className = '',
+  initialType = 'Post',
+}: PostCreatorProps) => {
   const { t } = useTranslation('classes');
   const createPost = useCreatePost();
   const editor = useRichTextEditor();
   const [open, setOpen] = useState(false);
-  const [type, setType] = useState<'general' | 'announcement' | 'schedule_event'>('general');
+  const [type, setType] = useState<'Post' | 'Assignment'>(initialType);
   const [attachments, setAttachments] = useState<File[]>([]);
   const [linkedLessons, setLinkedLessons] = useState<Array<Lesson>>([]);
   const [linkedResources, setLinkedResources] = useState<Array<LessonResource>>([]);
+  const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null);
   const [allowComments, setAllowComments] = useState(true);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -49,9 +61,11 @@ export const PostCreator = ({ classId, onPostCreated, className = '' }: PostCrea
         classId,
         type,
         content: contentMd,
-        attachments: attachments.length > 0 ? attachments : undefined,
-        linkedLessonId: linkedLessons.length > 0 ? linkedLessons[0].id : undefined,
-        linkedResourceIds: linkedResources.length > 0 ? linkedResources.map((r) => r.id) : undefined,
+        attachments: type === 'Post' && attachments.length > 0 ? attachments : undefined,
+        linkedLessonId: type === 'Post' && linkedLessons.length > 0 ? linkedLessons[0].id : undefined,
+        linkedResourceIds:
+          type === 'Post' && linkedResources.length > 0 ? linkedResources.map((r) => r.id) : undefined,
+        assignmentId: type === 'Assignment' && selectedAssignment ? selectedAssignment.id : undefined,
         allowComments,
       };
 
@@ -62,7 +76,8 @@ export const PostCreator = ({ classId, onPostCreated, className = '' }: PostCrea
       setAttachments([]);
       setLinkedLessons([]);
       setLinkedResources([]);
-      setType('general');
+      setSelectedAssignment(null);
+      setType(initialType);
       setAllowComments(true);
       setOpen(false);
 
@@ -83,12 +98,17 @@ export const PostCreator = ({ classId, onPostCreated, className = '' }: PostCrea
 
   const canSubmit = editor && editor.document.length > 0 && !createPost.isPending;
 
+  const buttonText =
+    initialType === 'Assignment'
+      ? t('feed.creator.actions.createAssignment')
+      : t('feed.creator.actions.createPost');
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button className={className}>
           <Plus className="mr-2 h-4 w-4" />
-          {t('feed.creator.actions.createPost')}
+          {buttonText}
         </Button>
       </DialogTrigger>
       <DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto">
@@ -102,25 +122,19 @@ export const PostCreator = ({ classId, onPostCreated, className = '' }: PostCrea
             <Label className="text-sm font-medium">{t('feed.creator.labels.postType')}</Label>
             <RadioGroup
               value={type}
-              onValueChange={(value) => setType(value as 'general' | 'announcement' | 'schedule_event')}
+              onValueChange={(value) => setType(value as 'Post' | 'Assignment')}
               className="flex gap-6"
             >
               <div className="flex items-center gap-2">
-                <RadioGroupItem value="general" id="general" />
-                <Label htmlFor="general" className="cursor-pointer font-normal">
-                  {t('feed.creator.postType.general')}
+                <RadioGroupItem value="Post" id="post" />
+                <Label htmlFor="post" className="cursor-pointer font-normal">
+                  {t('feed.creator.postType.post')}
                 </Label>
               </div>
               <div className="flex items-center gap-2">
-                <RadioGroupItem value="announcement" id="announcement" />
-                <Label htmlFor="announcement" className="cursor-pointer font-normal">
-                  {t('feed.creator.postType.announcement')}
-                </Label>
-              </div>
-              <div className="flex items-center gap-2">
-                <RadioGroupItem value="schedule_event" id="schedule_event" />
-                <Label htmlFor="schedule_event" className="cursor-pointer font-normal">
-                  {t('feed.creator.postType.schedule_event')}
+                <RadioGroupItem value="Assignment" id="assignment" />
+                <Label htmlFor="assignment" className="cursor-pointer font-normal">
+                  {t('feed.creator.postType.assignment')}
                 </Label>
               </div>
             </RadioGroup>
@@ -143,83 +157,97 @@ export const PostCreator = ({ classId, onPostCreated, className = '' }: PostCrea
 
           <Separator />
 
-          {/* Attachments, Lessons, Resources */}
-          <div className="grid gap-4 md:grid-cols-2">
-            {/* Attachments */}
+          {/* Conditional Fields based on Post Type */}
+          {type === 'Assignment' ? (
+            /* Assignment Selector */
             <div className="space-y-2">
-              <Label className="text-sm font-medium">{t('feed.creator.labels.attachments')}</Label>
-              <div>
-                <input
-                  type="file"
-                  multiple
-                  onChange={handleFileChange}
-                  className="hidden"
-                  id="file-upload"
-                  accept="image/*,.pdf,.doc,.docx,.txt"
-                />
-                <label htmlFor="file-upload">
-                  <Button type="button" variant="outline" size="sm" className="w-full" asChild>
-                    <span className="cursor-pointer">
-                      <Paperclip className="mr-2 h-4 w-4" />
-                      {t('feed.creator.actions.attachFiles')}
-                    </span>
-                  </Button>
-                </label>
-
-                {attachments.length > 0 && (
-                  <div className="mt-2 space-y-1">
-                    {attachments.map((file, index) => (
-                      <div
-                        key={index}
-                        className="bg-muted/30 flex items-center justify-between rounded border px-2 py-1.5 text-sm"
-                      >
-                        <span className="truncate">{file.name}</span>
-                        <Button
-                          type="button"
-                          onClick={() => removeAttachment(index)}
-                          variant="ghost"
-                          size="sm"
-                          className="h-auto p-1"
-                        >
-                          <X className="h-3 w-3" />
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Link Lessons */}
-            <div className="space-y-2">
-              <Label className="text-sm font-medium">{t('feed.creator.labels.linkLessons')}</Label>
-              <LessonListCommand
-                onLessonsSelect={function (lessons: Array<Lesson>): void {
-                  setLinkedLessons(lessons);
-                }}
-              />
-              {linkedLessons.length > 0 && (
-                <p className="text-muted-foreground text-xs">
-                  {linkedLessons.length} lesson{linkedLessons.length > 1 ? 's' : ''} selected
-                </p>
+              <Label className="text-sm font-medium">{t('feed.creator.labels.selectAssignment')}</Label>
+              <AssignmentListCommand onAssignmentSelect={(assignment) => setSelectedAssignment(assignment)} />
+              {selectedAssignment && (
+                <p className="text-muted-foreground text-xs">Selected: {selectedAssignment.title}</p>
               )}
             </div>
-          </div>
+          ) : (
+            <>
+              {/* Attachments, Lessons, Resources - Only for Post type */}
+              <div className="grid gap-4 md:grid-cols-2">
+                {/* Attachments */}
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">{t('feed.creator.labels.attachments')}</Label>
+                  <div>
+                    <input
+                      type="file"
+                      multiple
+                      onChange={handleFileChange}
+                      className="hidden"
+                      id="file-upload"
+                      accept="image/*,.pdf,.doc,.docx,.txt"
+                    />
+                    <label htmlFor="file-upload">
+                      <Button type="button" variant="outline" size="sm" className="w-full" asChild>
+                        <span className="cursor-pointer">
+                          <Paperclip className="mr-2 h-4 w-4" />
+                          {t('feed.creator.actions.attachFiles')}
+                        </span>
+                      </Button>
+                    </label>
 
-          {/* Link Resources */}
-          <div className="space-y-2">
-            <Label className="text-sm font-medium">{t('feed.creator.labels.linkResources')}</Label>
-            <ResourceListCommand
-              onResourcesSelect={function (resources: Array<LessonResource>): void {
-                setLinkedResources(resources);
-              }}
-            />
-            {linkedResources.length > 0 && (
-              <p className="text-muted-foreground text-xs">
-                {linkedResources.length} resource{linkedResources.length > 1 ? 's' : ''} selected
-              </p>
-            )}
-          </div>
+                    {attachments.length > 0 && (
+                      <div className="mt-2 space-y-1">
+                        {attachments.map((file, index) => (
+                          <div
+                            key={index}
+                            className="bg-muted/30 flex items-center justify-between rounded border px-2 py-1.5 text-sm"
+                          >
+                            <span className="truncate">{file.name}</span>
+                            <Button
+                              type="button"
+                              onClick={() => removeAttachment(index)}
+                              variant="ghost"
+                              size="sm"
+                              className="h-auto p-1"
+                            >
+                              <X className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Link Lessons */}
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">{t('feed.creator.labels.linkLessons')}</Label>
+                  <LessonListCommand
+                    onLessonsSelect={function (lessons: Array<Lesson>): void {
+                      setLinkedLessons(lessons);
+                    }}
+                  />
+                  {linkedLessons.length > 0 && (
+                    <p className="text-muted-foreground text-xs">
+                      {linkedLessons.length} lesson{linkedLessons.length > 1 ? 's' : ''} selected
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {/* Link Resources */}
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">{t('feed.creator.labels.linkResources')}</Label>
+                <ResourceListCommand
+                  onResourcesSelect={function (resources: Array<LessonResource>): void {
+                    setLinkedResources(resources);
+                  }}
+                />
+                {linkedResources.length > 0 && (
+                  <p className="text-muted-foreground text-xs">
+                    {linkedResources.length} resource{linkedResources.length > 1 ? 's' : ''} selected
+                  </p>
+                )}
+              </div>
+            </>
+          )}
 
           {/* Allow Comments */}
           <div className="flex items-center space-x-2">

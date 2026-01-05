@@ -80,9 +80,10 @@ export default class ClassFeedRealApiService implements ClassFeedApiService {
     await api.delete(`${this.baseUrl}/api/posts/${postId}`);
   }
 
-  async pinPost(postId: string, _pinned: boolean): Promise<Post> {
-    // Backend pin endpoint doesn't require body, just POST to pin/unpin
-    const response = await api.post<ApiResponse<Post>>(`${this.baseUrl}/api/posts/${postId}/pin`);
+  async pinPost(postId: string, pinned: boolean): Promise<Post> {
+    const response = await api.post<ApiResponse<Post>>(`${this.baseUrl}/api/posts/${postId}/pin`, {
+      pinned,
+    });
 
     return response.data.data;
   }

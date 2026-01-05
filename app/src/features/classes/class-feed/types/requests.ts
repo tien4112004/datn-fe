@@ -3,21 +3,23 @@ import type { Post } from './post';
 // Request types
 export interface PostCreateRequest {
   classId: string;
-  type: 'general' | 'announcement' | 'schedule_event';
+  type: 'Post' | 'Assignment';
   content: string;
   attachments?: File[];
   linkedResourceIds?: string[];
   linkedLessonId?: string; // Note: singular, not plural
+  assignmentId?: string; // For Assignment type posts
   allowComments?: boolean;
 }
 
 export interface PostUpdateRequest {
   id: string;
   content?: string;
-  type?: 'general' | 'announcement' | 'schedule_event';
+  type?: 'Post' | 'Assignment';
   attachments?: File[];
   linkedResourceIds?: string[];
   linkedLessonId?: string;
+  assignmentId?: string; // For Assignment type posts
   isPinned?: boolean;
   allowComments?: boolean;
 }
@@ -46,7 +48,7 @@ export interface PostListResponse {
 
 // Feed Filter
 export interface FeedFilter {
-  type: 'all' | 'general' | 'announcement' | 'schedule_event';
+  type: 'all' | 'Post' | 'Assignment';
   search?: string;
   startDate?: Date;
   endDate?: Date;

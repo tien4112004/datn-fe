@@ -16,7 +16,7 @@ const mockPosts: Post[] = [
     id: '1',
     classId: '1',
     authorId: 'teacher1',
-    type: 'announcement',
+    type: 'Post',
     content: `
 # Welcome to Advanced Mathematics 2025!
 
@@ -56,7 +56,7 @@ I'm excited to embark on this mathematical journey with you all.
     id: '2',
     classId: '1',
     authorId: 'student1',
-    type: 'general',
+    type: 'Post',
     content:
       "Hi everyone! I'm Alex, a sophomore majoring in Computer Science. I'm really excited about this class because I want to improve my mathematical foundations for my CS courses. Looking forward to working with all of you!\n\nWhat got you interested in advanced mathematics? 🤔",
     attachments: [],
@@ -72,7 +72,7 @@ I'm excited to embark on this mathematical journey with you all.
     id: '3',
     classId: '1',
     authorId: 'student2',
-    type: 'general',
+    type: 'Post',
     content:
       "Hello! I'm Maria, a junior Physics major. I'm taking this class to strengthen my math skills for quantum mechanics. I love how mathematics reveals the underlying patterns in nature.\n\nHas anyone taken quantum physics before? I'd love to hear your experiences!",
     attachments: [],
@@ -88,7 +88,7 @@ I'm excited to embark on this mathematical journey with you all.
     id: '4',
     classId: '1',
     authorId: 'teacher1',
-    type: 'announcement',
+    type: 'Post',
     content:
       "**Study Groups Announcement**\n\nI've noticed some of you are interested in forming study groups. This is a great idea! Here's how we'll organize:\n\n**Objectives:**\n- Peer learning and support\n- Practice problem-solving together\n- Share different approaches to problems\n\n**Guidelines:**\n- Groups of 3-4 students\n- Meet 1-2 times per week\n- Rotate who leads the discussion\n- Focus on understanding concepts, not just getting answers\n\nIf you're interested in joining a study group, please reply to this post with:\n1. Your availability (days/times)\n2. Preferred meeting format (in-person/virtual)\n3. Any specific topics you'd like to focus on\n\nI'll help coordinate the groups based on your responses!",
     attachments: [],
@@ -104,7 +104,7 @@ I'm excited to embark on this mathematical journey with you all.
     id: '5',
     classId: '1',
     authorId: 'teacher1',
-    type: 'schedule_event',
+    type: 'Assignment',
     content:
       '# Problem Set 1: Linear Transformations\n\n## Instructions\n\nComplete the following problems and submit your solutions by the deadline. Show all your work and explain your reasoning.\n\n### Problems\n\n1. **Matrix Representation** (20 points)\n   - Find the matrix representation of the linear transformation T: R³ → R² defined by T(x, y, z) = (2x - y, x + 3z)\n   - Verify your answer with at least two test vectors\n\n2. **Kernel and Range** (25 points)\n   - For the transformation in problem 1, find:\n     - The kernel (null space) of T\n     - The range (column space) of T\n     - The rank and nullity, and verify the rank-nullity theorem\n\n3. **Composition** (25 points)\n   - Let S: R² → R³ be defined by S(x, y) = (x + y, 2x, y)\n   - Find the matrix representation of the composition T ∘ S\n   - What is the dimension of the range of T ∘ S?\n\n4. **Eigenvalues and Eigenvectors** (30 points)\n   - Find all eigenvalues and eigenvectors for the matrix:\n     ```\n     A = [3  -1]\n         [2   0]\n     ```\n   - Determine if A is diagonalizable. If so, find matrices P and D such that A = PDP⁻¹\n\n### Submission Guidelines\n\n- Submit your work as a PDF file\n- Type your solutions using LaTeX or write them clearly and scan/photograph them\n- Include your name and student ID on the first page\n- Late submissions will receive a 10% penalty per day\n\n**Good luck! Feel free to ask questions in the comments below.**',
     attachments: ['https://example.com/problem-set-1.pdf'],
@@ -120,7 +120,7 @@ I'm excited to embark on this mathematical journey with you all.
     id: '6',
     classId: '1',
     authorId: 'teacher1',
-    type: 'schedule_event',
+    type: 'Assignment',
     content:
       "# Reading Assignment: Chapter 4 - Vector Spaces\n\n## Overview\n\nFor our next class, please read **Chapter 4** of our textbook covering vector spaces and subspaces.\n\n## Key Topics to Focus On\n\n1. **Definition of Vector Spaces** (Section 4.1)\n   - Understand the 10 axioms that define a vector space\n   - Review examples and non-examples\n\n2. **Subspaces** (Section 4.2)\n   - Subspace test (3 conditions)\n   - Common subspaces: zero subspace, spans, null space, column space\n\n3. **Linear Independence** (Section 4.3)\n   - Definition and geometric interpretation\n   - Testing for linear independence\n\n## Discussion Questions\n\nBe prepared to discuss these questions in class:\n\n1. Why is the set of all 2×2 matrices a vector space?\n2. Can you give an example of a subset of R³ that is NOT a subspace? Why not?\n3. What's the relationship between linear independence and spanning sets?\n\n## Optional Practice\n\n- Work through the examples in sections 4.1-4.3\n- Try the odd-numbered exercises (solutions in the back)\n\n*This reading is essential preparation for our class discussion. Come with questions!*",
     attachments: [],
@@ -366,12 +366,10 @@ export default class ClassFeedMockApiService implements ClassFeedApiService {
     let filteredPosts = mockPosts.filter((post) => post.classId === classId);
 
     if (filter) {
-      if (filter.type === 'general') {
-        filteredPosts = filteredPosts.filter((post) => post.type === 'general');
-      } else if (filter.type === 'announcement') {
-        filteredPosts = filteredPosts.filter((post) => post.type === 'announcement');
-      } else if (filter.type === 'schedule_event') {
-        filteredPosts = filteredPosts.filter((post) => post.type === 'schedule_event');
+      if (filter.type === 'Post') {
+        filteredPosts = filteredPosts.filter((post) => post.type === 'Post');
+      } else if (filter.type === 'Assignment') {
+        filteredPosts = filteredPosts.filter((post) => post.type === 'Assignment');
       }
       // 'all' means no filtering
       if (filter.search) {

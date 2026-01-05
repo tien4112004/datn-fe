@@ -5,6 +5,8 @@ import { UserAvatar } from '@/components/common/UserAvatar';
 import { Button } from '@/components/ui/button';
 import { formatDistanceToNow } from 'date-fns';
 import { getLocaleDateFns } from '@/shared/i18n/helper';
+import { parseDateSafe } from '@/shared/utils/date';
+import { useAuth } from '@/shared/context/auth';
 
 interface CommentThreadProps {
   postId: string;
@@ -13,6 +15,7 @@ interface CommentThreadProps {
 
 export const CommentThread = ({ postId, className = '' }: CommentThreadProps) => {
   const { t } = useTranslation('classes');
+  const { user } = useAuth();
   const { comments, loading, error } = useComments(postId);
   const createComment = useCreateComment();
 
@@ -62,7 +65,7 @@ export const CommentThread = ({ postId, className = '' }: CommentThreadProps) =>
                         : `User ${comment.userId.slice(0, 8)}`}
                     </span>
                     <span className="text-xs text-gray-500">
-                      {formatDistanceToNow(comment.createdAt, {
+                      {formatDistanceToNow(parseDateSafe(comment.createdAt), {
                         addSuffix: true,
                         locale: getLocaleDateFns(),
                       })}
@@ -93,7 +96,11 @@ export const CommentThread = ({ postId, className = '' }: CommentThreadProps) =>
 
       {/* Add Comment Form */}
       <form onSubmit={handleSubmit} className="flex space-x-3">
-        <UserAvatar name="Current User" size="sm" />
+        <UserAvatar
+          name={user ? `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email : 'User'}
+          src={user?.avatarUrl || user?.avatar}
+          size="sm"
+        />
         <div className="flex-1">
           <textarea
             value={newComment}

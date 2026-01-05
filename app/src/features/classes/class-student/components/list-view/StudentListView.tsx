@@ -84,7 +84,7 @@ export const StudentListView = ({ students, classId, isLoading = false }: Studen
     },
     {
       accessorKey: 'parentName',
-      header: 'Parent Name',
+      header: t('table.parentName'),
       cell: ({ row }) => {
         const parentName = row.getValue('parentName') as string | null | undefined;
         return <div className="text-sm">{parentName || '-'}</div>;
@@ -92,7 +92,7 @@ export const StudentListView = ({ students, classId, isLoading = false }: Studen
     },
     {
       accessorKey: 'parentPhone',
-      header: 'Parent Phone',
+      header: t('table.parentPhone'),
       cell: ({ row }) => {
         const parentPhone = row.getValue('parentPhone') as string | null | undefined;
         return <div className="text-sm">{parentPhone || '-'}</div>;
@@ -100,7 +100,7 @@ export const StudentListView = ({ students, classId, isLoading = false }: Studen
     },
     {
       accessorKey: 'parentContactEmail',
-      header: 'Parent Email',
+      header: t('table.parentEmail'),
       cell: ({ row }) => {
         const email = row.getValue('parentContactEmail') as string | null | undefined;
         return <div className="max-w-xs truncate text-sm">{email || '-'}</div>;

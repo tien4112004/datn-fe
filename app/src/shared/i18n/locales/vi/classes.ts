@@ -630,6 +630,12 @@ export default {
       resourcesSelected: '{{count}} tài nguyên được chọn',
       resourcesSelected_other: '{{count}} tài nguyên được chọn',
     },
+    assignmentSelection: {
+      selectAssignment: 'Chọn bài tập...',
+      searchAssignments: 'Tìm kiếm bài tập...',
+      noAssignmentsFound: 'Không tìm thấy bài tập nào.',
+      availableAssignments: 'Bài tập có sẵn',
+    },
   },
   calendar: {
     title: 'Lịch Lớp Học',
@@ -1071,6 +1077,7 @@ export default {
     creator: {
       actions: {
         createPost: 'Tạo Bài Đăng',
+        createAssignment: 'Tạo Bài Tập',
         attachFiles: 'Đính Kèm Tập Tin',
         posting: 'Đang Đăng...',
         post: 'Đăng',
@@ -1087,6 +1094,7 @@ export default {
         attachments: 'Tập Tin Đính Kèm',
         linkLessons: 'Liên Kết Bài Học',
         linkResources: 'Liên Kết Tài Nguyên',
+        selectAssignment: 'Chọn Bài Tập',
         deadline: 'Hạn chót',
         allowComments: 'Cho Phép Bình Luận',
       },
@@ -1096,16 +1104,23 @@ export default {
       },
       postType: {
         post: 'Bài Đăng',
-        announcement: 'Thông Báo',
-        general: 'Chung',
-        schedule_event: 'Sự kiện lịch trình',
         assignment: 'Bài Tập',
       },
     },
     list: {
       empty: {
-        title: 'Chưa có bài viết nào',
-        description: 'Hãy là người đầu tiên chia sẻ điều gì đó với lớp!',
+        all: {
+          title: 'Chưa có bài viết nào',
+          description: 'Hãy là người đầu tiên chia sẻ điều gì đó với lớp!',
+        },
+        post: {
+          title: 'Chưa có bài viết nào',
+          description: 'Tạo bài đăng đầu tiên để chia sẻ cập nhật với lớp học của bạn!',
+        },
+        assignment: {
+          title: 'Chưa có bài tập nào',
+          description: 'Tạo bài tập đầu tiên để bắt đầu!',
+        },
       },
       loading: 'Đang tải bài viết...',
       loadMore: 'Tải thêm bài viết',
@@ -1118,8 +1133,7 @@ export default {
     post: {
       badges: {
         pinned: 'Đã ghim',
-        announcement: 'Thông báo',
-        schedule_event: 'Sự kiện lịch trình',
+        post: 'Bài Đăng',
         assignment: 'Bài tập',
         dueDate: 'Hạn',
       },
@@ -1153,6 +1167,49 @@ export default {
       minutesAgo: '{{count}} phút trước',
       hoursAgo: '{{count}} giờ trước',
       daysAgo: '{{count}} ngày trước',
+    },
+  },
+
+  roster: {
+    loadingRoster: 'Đang tải danh sách học sinh...',
+    studentCount: 'Tổng số học sinh: {{count}}',
+    noStudents: 'Chưa có học sinh nào trong lớp này',
+    addStudentButton: 'Thêm Học Sinh',
+    addFirstStudent: 'Thêm Học Sinh Đầu Tiên',
+    table: {
+      fullName: 'Họ Tên',
+      dateOfBirth: 'Ngày Sinh',
+      gender: 'Giới Tính',
+      parentName: 'Tên Phụ Huynh',
+      parentPhone: 'Điện Thoại Phụ Huynh',
+      parentEmail: 'Email Phụ Huynh',
+      actions: 'Hành Động',
+      edit: 'Sửa {{studentName}}',
+      delete: 'Xóa {{studentName}}',
+    },
+    addStudent: {
+      error: 'Không thể thêm học sinh',
+    },
+    confirmation: {
+      deleteTitle: 'Xóa Học Sinh',
+      deleteMessage: 'Bạn có chắc chắn muốn xóa {{studentName}}? Hành động này không thể hoàn tác.',
+      cancel: 'Hủy',
+      delete: 'Xóa',
+    },
+    validation: {
+      fullNameRequired: 'Tên đầy đủ là bắt buộc',
+      fullNameTooLong: 'Tên đầy đủ không được vượt quá 200 ký tự',
+      parentNameRequired: 'Tên phụ huynh là bắt buộc',
+      parentNameTooLong: 'Tên phụ huynh không được vượt quá 100 ký tự',
+      parentPhoneRequired: 'Điện thoại phụ huynh là bắt buộc',
+      parentPhoneTooLong: 'Điện thoại phụ huynh không được vượt quá 20 ký tự',
+      dateOfBirthInvalid: 'Ngày sinh phải là một ngày hợp lệ',
+      genderInvalid: 'Giới tính phải là một lựa chọn hợp lệ',
+      addressTooLong: 'Địa chỉ không được vượt quá 500 ký tự',
+    },
+    form: {
+      dateOfBirth: 'Ngày Sinh',
+      gender: 'Giới Tính',
     },
   },
 };

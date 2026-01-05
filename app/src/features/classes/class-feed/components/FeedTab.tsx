@@ -20,9 +20,8 @@ export const FeedTab = ({ classId }: FeedPageProps) => {
 
   const filterOptions = [
     { value: 'all' as const, label: t('feed.header.filters.all') },
-    { value: 'announcement' as const, label: t('feed.header.filters.announcements') },
-    { value: 'general' as const, label: t('feed.header.filters.general') },
-    { value: 'schedule_event' as const, label: t('feed.header.filters.schedule_event') },
+    { value: 'Post' as const, label: t('feed.header.filters.posts') },
+    { value: 'Assignment' as const, label: t('feed.header.filters.assignments') },
   ];
 
   return (
@@ -50,7 +49,11 @@ export const FeedTab = ({ classId }: FeedPageProps) => {
           </nav>
 
           {/* Create Post Button */}
-          <PostCreator classId={classId} onPostCreated={refresh} />
+          <PostCreator
+            classId={classId}
+            onPostCreated={refresh}
+            initialType={filter.type === 'Assignment' ? 'Assignment' : 'Post'}
+          />
         </div>
       </div>
 
@@ -67,7 +70,13 @@ export const FeedTab = ({ classId }: FeedPageProps) => {
         )}
 
         {/* Posts List */}
-        <PostList posts={posts} onLoadMore={loadMore} hasMore={hasMore} loading={loading} />
+        <PostList
+          posts={posts}
+          onLoadMore={loadMore}
+          hasMore={hasMore}
+          loading={loading}
+          filterType={filter.type}
+        />
       </div>
     </div>
   );

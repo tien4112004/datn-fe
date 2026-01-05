@@ -14,6 +14,7 @@ interface PostListProps {
   hasMore?: boolean;
   loading?: boolean;
   className?: string;
+  filterType?: 'all' | 'Post' | 'Assignment';
 }
 
 export const PostList = ({
@@ -22,6 +23,7 @@ export const PostList = ({
   hasMore = false,
   loading = false,
   className = '',
+  filterType = 'all',
 }: PostListProps) => {
   const { t } = useTranslation('classes');
   const pinPost = usePinPost();
@@ -64,6 +66,13 @@ export const PostList = ({
   };
 
   if (posts.length === 0 && !loading) {
+    const emptyStateKey =
+      filterType === 'Assignment'
+        ? 'feed.list.empty.assignment'
+        : filterType === 'Post'
+          ? 'feed.list.empty.post'
+          : 'feed.list.empty.all';
+
     return (
       <div className={`py-12 text-center ${className}`}>
         <div className="mb-4 text-gray-400">
@@ -76,8 +85,8 @@ export const PostList = ({
             />
           </svg>
         </div>
-        <h3 className="mb-2 text-lg font-medium text-gray-900">{t('feed.list.empty.title')}</h3>
-        <p className="text-gray-500">{t('feed.list.empty.description')}</p>
+        <h3 className="mb-2 text-lg font-medium text-gray-900">{t(`${emptyStateKey}.title`)}</h3>
+        <p className="text-gray-500">{t(`${emptyStateKey}.description`)}</p>
       </div>
     );
   }
@@ -97,11 +106,12 @@ export const PostList = ({
             {expandedComments.has(post.id) && (
               <motion.div
                 key="comment-thread"
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.3 }}
-                className="bg-muted/20 border-b px-6 py-4"
+                initial={{ opacity: 0, scaleY: 0 }}
+                animate={{ opacity: 1, scaleY: 1 }}
+                exit={{ opacity: 0, scaleY: 0 }}
+                transition={{ duration: 0.2, ease: 'easeInOut' }}
+                style={{ transformOrigin: 'top' }}
+                className="bg-muted/20 border-b px-6 py-4 pl-14"
               >
                 <CommentThread postId={post.id} />
               </motion.div>

@@ -3,12 +3,13 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { getLocaleDateFns } from '@/shared/i18n/helper';
 import { formatDistanceToNow } from 'date-fns';
-import { CalendarDays, Clock, Megaphone, MessageCircleMore, Pin } from 'lucide-react';
+import { Clock, FileText, ClipboardList, MessageCircleMore, Pin } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import ReactMarkdown from 'react-markdown';
 import type { Post } from '../types';
 import { AttachmentPreview } from './AttachmentPreview';
 import { PostActions } from './PostActions';
+import { parseDateSafe } from '@/shared/utils/date';
 
 interface PostCardProps {
   post: Post;
@@ -47,17 +48,17 @@ export const PostCard = ({ post, onEdit, onDelete, onPin, onComment, className =
                 </p>
 
                 {/* Type Badge */}
-                {post.type === 'announcement' && (
-                  <Badge variant="default" className="gap-1 text-xs">
-                    <Megaphone className="h-3 w-3" />
-                    {t('feed.post.badges.announcement')}
+                {post.type === 'Post' && (
+                  <Badge variant="secondary" className="gap-1 text-xs">
+                    <FileText className="h-3 w-3" />
+                    {t('feed.post.badges.post')}
                   </Badge>
                 )}
 
-                {post.type === 'schedule_event' && (
-                  <Badge variant="default" className="gap-1 bg-blue-500 text-xs hover:bg-blue-600">
-                    <CalendarDays className="h-3 w-3" />
-                    {t('feed.post.badges.schedule_event')}
+                {post.type === 'Assignment' && (
+                  <Badge variant="default" className="gap-1 bg-purple-600 text-xs hover:bg-purple-700">
+                    <ClipboardList className="h-3 w-3" />
+                    {t('feed.post.badges.assignment')}
                   </Badge>
                 )}
 
@@ -71,7 +72,10 @@ export const PostCard = ({ post, onEdit, onDelete, onPin, onComment, className =
 
               <p className="text-muted-foreground mt-0.5 flex items-center gap-1 text-xs">
                 <Clock className="h-3 w-3" />
-                {formatDistanceToNow(post.createdAt, { addSuffix: true, locale: getLocaleDateFns() })}
+                {formatDistanceToNow(parseDateSafe(post.createdAt), {
+                  addSuffix: true,
+                  locale: getLocaleDateFns(),
+                })}
               </p>
             </div>
 

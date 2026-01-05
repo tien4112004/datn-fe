@@ -636,6 +636,12 @@ export default {
       resourcesSelected: '{{count}} resource selected',
       resourcesSelected_other: '{{count}} resources selected',
     },
+    assignmentSelection: {
+      selectAssignment: 'Select assignment...',
+      searchAssignments: 'Search assignments...',
+      noAssignmentsFound: 'No assignments found.',
+      availableAssignments: 'Available Assignments',
+    },
   },
   calendar: {
     title: 'Class Calendar',
@@ -1076,6 +1082,7 @@ export default {
     creator: {
       actions: {
         createPost: 'Create Post',
+        createAssignment: 'Create Assignment',
         attachFiles: 'Attach Files',
         posting: 'Posting...',
         post: 'Post',
@@ -1092,6 +1099,7 @@ export default {
         attachments: 'Attachments',
         linkLessons: 'Link Lessons',
         linkResources: 'Link Resources',
+        selectAssignment: 'Select Assignment',
         deadline: 'Deadline',
         allowComments: 'Allow Comments',
       },
@@ -1101,16 +1109,23 @@ export default {
       },
       postType: {
         post: 'Post',
-        announcement: 'Announcement',
-        general: 'General',
-        schedule_event: 'Schedule Event',
         assignment: 'Assignment',
       },
     },
     list: {
       empty: {
-        title: 'No posts yet',
-        description: 'Be the first to share something with your class!',
+        all: {
+          title: 'No posts yet',
+          description: 'Be the first to share something with your class!',
+        },
+        post: {
+          title: 'No posts yet',
+          description: 'Create your first post to share updates with your class!',
+        },
+        assignment: {
+          title: 'No assignments yet',
+          description: 'Create your first assignment to get started!',
+        },
       },
       loading: 'Loading posts...',
       loadMore: 'Load More Posts',
@@ -1123,8 +1138,7 @@ export default {
     post: {
       badges: {
         pinned: 'Pinned',
-        announcement: 'Announcement',
-        schedule_event: 'Schedule Event',
+        post: 'Post',
         assignment: 'Assignment',
         dueDate: 'Due',
       },
@@ -1158,6 +1172,49 @@ export default {
       minutesAgo: '{{count}}m ago',
       hoursAgo: '{{count}}h ago',
       daysAgo: '{{count}}d ago',
+    },
+  },
+
+  roster: {
+    loadingRoster: 'Loading roster...',
+    studentCount: 'Total students: {{count}}',
+    noStudents: 'No students in this class yet',
+    addStudentButton: 'Add Student',
+    addFirstStudent: 'Add First Student',
+    table: {
+      fullName: 'Full Name',
+      dateOfBirth: 'Date of Birth',
+      gender: 'Gender',
+      parentName: 'Parent Name',
+      parentPhone: 'Parent Phone',
+      parentEmail: 'Parent Email',
+      actions: 'Actions',
+      edit: 'Edit {{studentName}}',
+      delete: 'Delete {{studentName}}',
+    },
+    addStudent: {
+      error: 'Failed to add student',
+    },
+    confirmation: {
+      deleteTitle: 'Delete Student',
+      deleteMessage: 'Are you sure you want to delete {{studentName}}? This action cannot be undone.',
+      cancel: 'Cancel',
+      delete: 'Delete',
+    },
+    validation: {
+      fullNameRequired: 'Full name is required',
+      fullNameTooLong: 'Full name must be 200 characters or less',
+      parentNameRequired: 'Parent name is required',
+      parentNameTooLong: 'Parent name must be 100 characters or less',
+      parentPhoneRequired: 'Parent phone is required',
+      parentPhoneTooLong: 'Parent phone must be 20 characters or less',
+      dateOfBirthInvalid: 'Date of birth must be a valid date',
+      genderInvalid: 'Gender must be a valid option',
+      addressTooLong: 'Address must be 500 characters or less',
+    },
+    form: {
+      dateOfBirth: 'Date of Birth',
+      gender: 'Gender',
     },
   },
 };

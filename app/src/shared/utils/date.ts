@@ -7,7 +7,7 @@
  * - UTC+0 (London): 0
  */
 
-export const LOCAL_TIMEZONE_OFFSET = 7; // UTC+7
+export const LOCAL_TIMEZONE_OFFSET: number = 7; // UTC+7
 
 /**
  * Parse date string or Date object, returns null if invalid

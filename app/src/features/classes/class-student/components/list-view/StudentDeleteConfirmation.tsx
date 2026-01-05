@@ -77,7 +77,7 @@ export function StudentDeleteConfirmation({
             disabled={isDeleting}
             className="bg-red-600 hover:bg-red-700"
           >
-            {isDeleting ? t('deleting', 'Removing...') : t('confirm')}
+            {isDeleting ? t('deleting') : t('confirm')}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

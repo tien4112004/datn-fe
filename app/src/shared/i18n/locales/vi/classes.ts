@@ -743,6 +743,11 @@ export default {
 
     table: {
       fullName: 'Họ và tên',
+      dateOfBirth: 'Ngày sinh',
+      gender: 'Giới tính',
+      parentName: 'Tên phụ huynh',
+      parentPhone: 'Điện thoại phụ huynh',
+      parentEmail: 'Email phụ huynh',
       status: 'Trạng thái',
       actions: 'Thao tác',
       edit: 'Chỉnh sửa',
@@ -1167,49 +1172,6 @@ export default {
       minutesAgo: '{{count}} phút trước',
       hoursAgo: '{{count}} giờ trước',
       daysAgo: '{{count}} ngày trước',
-    },
-  },
-
-  roster: {
-    loadingRoster: 'Đang tải danh sách học sinh...',
-    studentCount: 'Tổng số học sinh: {{count}}',
-    noStudents: 'Chưa có học sinh nào trong lớp này',
-    addStudentButton: 'Thêm Học Sinh',
-    addFirstStudent: 'Thêm Học Sinh Đầu Tiên',
-    table: {
-      fullName: 'Họ Tên',
-      dateOfBirth: 'Ngày Sinh',
-      gender: 'Giới Tính',
-      parentName: 'Tên Phụ Huynh',
-      parentPhone: 'Điện Thoại Phụ Huynh',
-      parentEmail: 'Email Phụ Huynh',
-      actions: 'Hành Động',
-      edit: 'Sửa {{studentName}}',
-      delete: 'Xóa {{studentName}}',
-    },
-    addStudent: {
-      error: 'Không thể thêm học sinh',
-    },
-    confirmation: {
-      deleteTitle: 'Xóa Học Sinh',
-      deleteMessage: 'Bạn có chắc chắn muốn xóa {{studentName}}? Hành động này không thể hoàn tác.',
-      cancel: 'Hủy',
-      delete: 'Xóa',
-    },
-    validation: {
-      fullNameRequired: 'Tên đầy đủ là bắt buộc',
-      fullNameTooLong: 'Tên đầy đủ không được vượt quá 200 ký tự',
-      parentNameRequired: 'Tên phụ huynh là bắt buộc',
-      parentNameTooLong: 'Tên phụ huynh không được vượt quá 100 ký tự',
-      parentPhoneRequired: 'Điện thoại phụ huynh là bắt buộc',
-      parentPhoneTooLong: 'Điện thoại phụ huynh không được vượt quá 20 ký tự',
-      dateOfBirthInvalid: 'Ngày sinh phải là một ngày hợp lệ',
-      genderInvalid: 'Giới tính phải là một lựa chọn hợp lệ',
-      addressTooLong: 'Địa chỉ không được vượt quá 500 ký tự',
-    },
-    form: {
-      dateOfBirth: 'Ngày Sinh',
-      gender: 'Giới Tính',
     },
   },
 };

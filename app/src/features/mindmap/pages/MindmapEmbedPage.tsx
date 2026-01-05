@@ -2,7 +2,6 @@ import { ReactFlowProvider } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { Background, BackgroundVariant, MiniMap } from '@xyflow/react';
 import { Flow, LogicHandler, Toolbar, MindmapControls } from '@/features/mindmap/components';
-import { TreePanel } from '@/features/mindmap/components/tree-panel';
 import { useState, useEffect } from 'react';
 import { useLoaderData } from 'react-router-dom';
 import { useCoreStore, useViewModeStore } from '../stores';
@@ -99,7 +98,6 @@ const MindmapEmbedPage = () => {
     <ReactFlowProvider>
       <PresenterProvider isPresenterMode={false}>
         <div className="flex h-screen w-full" style={{ backgroundColor: 'var(--background)' }}>
-          <TreePanel />
           <Flow isPanOnDrag={isPanOnDrag} isPresenterMode={false}>
             {/* Controls - simplified for embed */}
             {isDesktop && (

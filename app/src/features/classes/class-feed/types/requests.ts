@@ -1,5 +1,3 @@
-import type { Post } from './post';
-
 // Request types
 export interface PostCreateRequest {
   classId: string;

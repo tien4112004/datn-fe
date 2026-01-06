@@ -42,7 +42,7 @@ export function usePosts(classId: string) {
 
   // Feed methods
   const posts = postsQuery.data?.data || [];
-  const hasMore = currentPage < (postsQuery.data?.pagination.totalPages || 1);
+  const hasMore = currentPage < (postsQuery.data?.pagination?.totalPages || 1);
 
   const loadMore = useCallback(() => {
     if (!postsQuery.isLoading && hasMore) {

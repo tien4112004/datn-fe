@@ -15,7 +15,7 @@ export const I18N_NAMESPACES = {
   MINDMAP: 'mindmap',
   CLASSES: 'classes',
   ASSIGNMENT: 'assignment',
-  EXAM_MATRIX: 'examMatrix',
+  EXAM_MATRIX: 'assessmentMatrix',
 } as const;
 
 export type I18nNamespace = (typeof I18N_NAMESPACES)[keyof typeof I18N_NAMESPACES];

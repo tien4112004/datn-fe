@@ -56,7 +56,7 @@ i18n
       'classes',
       'assignment',
       'admin',
-      'examMatrix',
+      'assessmentMatrix',
     ],
     interpolation: {
       escapeValue: false,

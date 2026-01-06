@@ -3,7 +3,7 @@ import { persist } from 'zustand/middleware';
 import { devtools } from 'zustand/middleware';
 import { generateId } from '@/shared/lib/utils';
 import type { ExamDraft, Question } from '@aiprimary/core';
-import type { ExamMatrix } from '@/features/exam-matrix/types';
+import type { AssessmentMatrix } from '@/features/assessment-matrix/types';
 
 interface ExamDraftStore {
   // State
@@ -11,7 +11,11 @@ interface ExamDraftStore {
   currentDraft: ExamDraft | null;
 
   // Actions
-  createDraft: (matrix: ExamMatrix, questions: Question[], selections: Record<string, string>) => ExamDraft;
+  createDraft: (
+    matrix: AssessmentMatrix,
+    questions: Question[],
+    selections: Record<string, string>
+  ) => ExamDraft;
   setCurrentDraft: (draft: ExamDraft | null) => void;
   deleteDraft: (id: string) => void;
   getAllDrafts: () => ExamDraft[];

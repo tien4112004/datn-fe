@@ -15,7 +15,7 @@ import settings from './settings';
 import classes from './classes';
 import assignment from './assignment';
 import admin from './admin';
-import examMatrix from './examMatrix';
+import assessmentMatrix from './assessmentMatrix';
 
 export default {
   common,
@@ -31,5 +31,5 @@ export default {
   classes,
   assignment,
   admin,
-  examMatrix,
+  assessmentMatrix,
 };

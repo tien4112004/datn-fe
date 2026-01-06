@@ -8,7 +8,7 @@ export default {
       files: 'Tập tin',
       classes: 'Lớp học',
       subjects: 'Môn học',
-      examMatrix: 'Ma Trận Đề Thi',
+      assessmentMatrix: 'Ma Trận Đề Thi',
       schedules: 'Lịch',
       home: 'Trang chủ',
       admin: 'Quản Trị',

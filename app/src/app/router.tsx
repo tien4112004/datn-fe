@@ -145,15 +145,15 @@ const router = createBrowserRouter([
         }),
       },
       {
-        path: 'exam-matrix/builder',
+        path: 'assessment-matrix/builder',
         lazy: async () => ({
-          Component: (await import('@/features/exam-matrix/pages/MatrixBuilderPage')).MatrixBuilderPage,
+          Component: (await import('@/features/assessment-matrix/pages/MatrixBuilderPage')).MatrixBuilderPage,
         }),
       },
       {
-        path: 'exam-matrix/builder/:id',
+        path: 'assessment-matrix/builder/:id',
         lazy: async () => ({
-          Component: (await import('@/features/exam-matrix/pages/MatrixBuilderPage')).MatrixBuilderPage,
+          Component: (await import('@/features/assessment-matrix/pages/MatrixBuilderPage')).MatrixBuilderPage,
         }),
       },
       {

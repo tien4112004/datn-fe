@@ -1,16 +1,16 @@
 import type { Service } from '@/shared/api/base-service';
 import type { Comment, Post } from './index';
-import type {
-  CommentCreateRequest,
-  FeedFilter,
-  PostCreateRequest,
-  PostListResponse,
-  PostUpdateRequest,
-} from './requests';
+import type { CommentCreateRequest, FeedFilter, PostCreateRequest, PostUpdateRequest } from './requests';
+import type { ApiResponse } from '@aiprimary/api';
 
 export interface ClassFeedApiService extends Service {
   // Posts
-  getPosts(classId: string, filter?: FeedFilter, page?: number, pageSize?: number): Promise<PostListResponse>;
+  getPosts(
+    classId: string,
+    filter?: FeedFilter,
+    page?: number,
+    pageSize?: number
+  ): Promise<ApiResponse<Post[]>>;
   createPost(request: PostCreateRequest): Promise<Post>;
   updatePost(request: PostUpdateRequest): Promise<Post>;
   deletePost(postId: string): Promise<void>;

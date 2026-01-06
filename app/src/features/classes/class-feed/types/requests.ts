@@ -29,23 +29,6 @@ export interface CommentCreateRequest {
   content: string;
 }
 
-// Response types
-export interface PostResponse {
-  data: Post;
-  success: boolean;
-}
-
-export interface PostListResponse {
-  data: Post[];
-  pagination: {
-    page: number;
-    pageSize: number;
-    total: number;
-    totalPages: number;
-  };
-  success: boolean;
-}
-
 // Feed Filter
 export interface FeedFilter {
   type: 'all' | 'Post' | 'Assignment';

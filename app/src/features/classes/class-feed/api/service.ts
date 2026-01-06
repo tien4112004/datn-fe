@@ -8,7 +8,6 @@ import type {
   FeedFilter,
   Post,
   PostCreateRequest,
-  PostListResponse,
   PostUpdateRequest,
 } from '../types';
 
@@ -23,20 +22,22 @@ export default class ClassFeedRealApiService implements ClassFeedApiService {
     return API_MODE.real;
   }
 
-  async getPosts(classId: string, filter?: FeedFilter, page = 1, pageSize = 20): Promise<PostListResponse> {
-    const response = await api.get<ApiResponse<PostListResponse>>(
-      `${this.baseUrl}/api/classes/${classId}/posts`,
-      {
-        params: {
-          page: page.toString(),
-          size: pageSize.toString(),
-          type: filter?.type !== 'all' ? filter?.type : undefined,
-          search: filter?.search || undefined,
-        },
-      }
-    );
+  async getPosts(
+    classId: string,
+    filter?: FeedFilter,
+    page = 1,
+    pageSize = 20
+  ): Promise<ApiResponse<Post[]>> {
+    const response = await api.get<ApiResponse<Post[]>>(`${this.baseUrl}/api/classes/${classId}/posts`, {
+      params: {
+        page: page.toString(),
+        size: pageSize.toString(),
+        type: filter?.type !== 'all' ? filter?.type : undefined,
+        search: filter?.search || undefined,
+      },
+    });
 
-    return response.data.data;
+    return response.data;
   }
 
   async createPost(request: PostCreateRequest): Promise<Post> {

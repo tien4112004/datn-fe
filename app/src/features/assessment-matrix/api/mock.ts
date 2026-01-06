@@ -9,18 +9,7 @@ import type { AssessmentMatrix, Topic, MatrixCell, SubjectCode } from '@/feature
 import { generateId } from '@/shared/lib/utils';
 
 // Deterministic IDs for mock matrices (so URLs are stable)
-const MOCK_MATRIX_IDS = [
-  'eijkrw07o', // ID from the user's URL
-  'abc123def',
-  'xyz789ghi',
-  'mno456pqr',
-  'stu012vwx',
-  'jkl345mno',
-  'pqr678stu',
-  'vwx901yza',
-  'bcd234efg',
-  'hij567klm',
-];
+const MOCK_MATRIX_IDS = ['test-matrix-1', 'test-matrix-2'];
 
 // Create sample matrix - now with empty topics for freestyle creation
 const createSampleMatrix = (id: string, index: number): AssessmentMatrix => {

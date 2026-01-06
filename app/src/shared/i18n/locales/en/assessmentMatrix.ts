@@ -2,32 +2,6 @@ export default {
   title: 'Assessment Matrix Management',
   subtitle: 'Create and manage exam specifications (Table of Specifications)',
 
-  columns: {
-    name: 'Name',
-    subject: 'Subject',
-    targetPoints: 'Target Points',
-    topicCount: 'Topics',
-    cellCount: 'Cells',
-    createdAt: 'Created',
-  },
-
-  toolbar: {
-    createNew: 'Create New Matrix',
-    delete: 'Delete',
-    duplicate: 'Duplicate',
-    generateExam: 'Generate Exam',
-    export: 'Export',
-    import: 'Import',
-  },
-
-  filters: {
-    title: 'Filters',
-    searchPlaceholder: 'Search matrices...',
-    subject: 'Subject',
-    allSubjects: 'All Subjects',
-    clearFilters: 'Clear Filters',
-  },
-
   builder: {
     title: 'Matrix Builder',
     createTitle: 'Create Assessment Matrix',
@@ -198,25 +172,12 @@ export default {
   messages: {
     created: 'Matrix created successfully',
     updated: 'Matrix updated successfully',
-    deleted: 'Matrices deleted successfully',
-    duplicated: 'Matrix duplicated successfully',
-    exported: 'Matrices exported successfully',
-    imported: '{{success}} matrices imported successfully, {{failed}} failed',
     topicCreated: 'Topic created successfully',
     topicUpdated: 'Topic updated successfully',
     topicDeleted: 'Topic deleted successfully',
     topicInUse: 'Cannot delete topic that is used in matrices',
     validated: 'Matrix validation complete',
     error: 'An error occurred. Please try again.',
-  },
-
-  emptyState: 'No exam matrices found. Create your first matrix to get started.',
-
-  deleteDialog: {
-    title: 'Delete Matrices',
-    description: 'Are you sure you want to delete {{count}} matri(ces)? This action cannot be undone.',
-    cancel: 'Cancel',
-    confirm: 'Delete',
   },
 
   subjects: {
@@ -233,13 +194,6 @@ export default {
     thong_hieu: 'Comprehension',
     van_dung: 'Application',
     van_dung_cao: 'Advanced Application',
-  },
-
-  table: {
-    total: 'Total',
-    edit: 'Edit',
-    duplicate: 'Duplicate',
-    delete: 'Delete',
   },
 
   status: {
@@ -296,15 +250,15 @@ export default {
     examGenerated: 'Exam generated: {{name}}',
   },
 
-  confirmations: {
-    deleteMatrix: 'Are you sure you want to delete this matrix?',
-  },
-
   search: {
     placeholder: 'Search questions...',
   },
 
   fallbacks: {
     untitledQuestion: 'Untitled Question',
+  },
+
+  table: {
+    total: 'Total',
   },
 };

@@ -5,10 +5,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/components/ui
 import {
   Breadcrumb,
   BreadcrumbItem,
-  BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbPage,
-  BreadcrumbSeparator,
 } from '@/shared/components/ui/breadcrumb';
 import { useTranslation } from 'react-i18next';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
@@ -114,8 +112,8 @@ export function MatrixBuilderPage() {
         await createMutation.mutateAsync({ matrix: matrixData });
         toast.success(t('messages.created'));
       }
-      // Navigate back to question bank
-      navigate('/question-bank');
+      // Navigate back to previous page
+      navigate(-1);
     } catch (error) {
       console.error('Error saving matrix:', error);
       toast.error(t('messages.error'));
@@ -124,7 +122,7 @@ export function MatrixBuilderPage() {
 
   const handleCancel = () => {
     setCurrentMatrix(null);
-    navigate('/question-bank');
+    navigate(-1);
   };
 
   // Show loading state while fetching matrix in edit mode
@@ -141,7 +139,7 @@ export function MatrixBuilderPage() {
     return (
       <div className="flex h-full flex-col items-center justify-center gap-4">
         <div className="text-destructive">{t('emptyStates.matrixNotFound')}</div>
-        <Button variant="outline" onClick={() => navigate('/question-bank')}>
+        <Button variant="outline" onClick={() => navigate(-1)}>
           {t('buttons.backToList')}
         </Button>
       </div>
@@ -160,10 +158,6 @@ export function MatrixBuilderPage() {
           {/* Breadcrumb Navigation */}
           <Breadcrumb className="mb-6">
             <BreadcrumbList>
-              <BreadcrumbItem className="hidden md:block">
-                <BreadcrumbLink href="/question-bank">{t('breadcrumbs.AssignmentMatrix')}</BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator className="hidden md:block" />
               <BreadcrumbItem>
                 <BreadcrumbPage>
                   {isEditMode ? t('breadcrumbs.editMatrix') : t('breadcrumbs.createMatrix')}

@@ -294,7 +294,7 @@ export const useSlideThemes = () => {
   };
 };
 
-const PAGE_SIZE = 24;
+const PAGE_SIZE = 12;
 
 export const useInfiniteSlideThemes = () => {
   const apiService = usePresentationApiService();

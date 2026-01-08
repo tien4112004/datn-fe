@@ -30,7 +30,7 @@ export default class PresentationRealApiService implements PresentationApiServic
     const res = await api.get<ApiResponse<SlideTheme[]>>(`${this.baseUrl}/api/slide-themes`, {
       params: {
         page: (params?.page || 0) + 1,
-        limit: params?.pageSize,
+        pageSize: params?.pageSize,
       },
     });
     return res.data.data;

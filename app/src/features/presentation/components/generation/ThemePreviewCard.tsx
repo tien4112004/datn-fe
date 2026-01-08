@@ -47,7 +47,7 @@ export const ThemePreviewCard = ({
       onClick={onClick}
     >
       <div
-        className="absolute flex items-center font-bold"
+        className="absolute flex items-center truncate font-bold"
         style={{
           left: '8%',
           top: '8%',

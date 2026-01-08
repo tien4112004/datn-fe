@@ -66,7 +66,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem(REFRESH_TOKEN_KEY);
   };
 
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string, onSuccess?: () => void) => {
     try {
       // Use the login mutation
       await loginMutation.mutateAsync({ email, password });
@@ -79,6 +79,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await queryClient.refetchQueries({ queryKey: authKeys.profile });
 
       toast.success('Login successful');
+
+      // Call onSuccess callback if provided (for navigation)
+      onSuccess?.();
     } catch (error: unknown) {
       // Error toast is already shown by the mutation hook
       throw error;

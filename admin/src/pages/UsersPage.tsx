@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createColumnHelper, getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import { useUsers } from '@/hooks';
@@ -16,23 +16,27 @@ export function UsersPage() {
   const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const pageSize = 10;
 
-  const { data, isLoading, error } = useUsers({ page, pageSize });
+  // Debounce search query
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+      setPage(1); // Reset to first page when search changes
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  const { data, isLoading, error } = useUsers({
+    page,
+    pageSize,
+    search: debouncedSearch || undefined,
+  });
 
   const users: User[] = (data?.data as User[]) || [];
   const pagination = data?.pagination;
-
-  const filteredUsers = useMemo(
-    () =>
-      users.filter(
-        (user) =>
-          user.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          user.firstName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          user.lastName?.toLowerCase().includes(searchQuery.toLowerCase())
-      ),
-    [users, searchQuery]
-  );
 
   const columns = useMemo(
     () => [
@@ -79,7 +83,7 @@ export function UsersPage() {
   );
 
   const table = useReactTable({
-    data: filteredUsers,
+    data: users,
     columns,
     getCoreRowModel: getCoreRowModel(),
     manualPagination: true,

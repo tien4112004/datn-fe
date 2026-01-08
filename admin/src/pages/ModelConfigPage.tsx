@@ -41,7 +41,7 @@ export function ModelConfigPage() {
       try {
         await patchMutation.mutateAsync({
           id: model.id,
-          data: { enabled: newStatus },
+          data: { isEnabled: newStatus },
         });
         toast.success(`Model ${newStatus ? 'enabled' : 'disabled'} successfully`);
       } catch (error) {
@@ -55,7 +55,7 @@ export function ModelConfigPage() {
     async (_mediaType: ModelType, modelId: string) => {
       await patchMutation.mutateAsync({
         id: modelId,
-        data: { default: true },
+        data: { isDefault: true },
       });
       toast.success('Default model updated successfully');
     },

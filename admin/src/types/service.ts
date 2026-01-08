@@ -3,6 +3,7 @@ import type { User, LoginRequest, LoginResponse } from './auth';
 import type {
   ApiResponse,
   PaginationParams,
+  UserQueryParams,
   SlideTemplateParams,
   FAQPost,
   Book,
@@ -34,7 +35,7 @@ export interface AuthApiService extends Service {
  */
 export interface AdminApiService extends Service {
   // Users
-  getUsers(params?: PaginationParams): Promise<ApiResponse<User[]>>;
+  getUsers(params?: UserQueryParams): Promise<ApiResponse<User[]>>;
   getUserById(id: string): Promise<ApiResponse<User>>;
 
   // Slide Themes

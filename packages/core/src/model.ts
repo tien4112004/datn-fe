@@ -19,6 +19,6 @@ export type ModelType = (typeof MODEL_TYPES)[keyof typeof MODEL_TYPES];
 
 // Model patch data for updates
 export interface ModelPatchData {
-  enabled?: boolean;
-  default?: boolean;
+  isEnabled?: boolean;
+  isDefault?: boolean;
 }

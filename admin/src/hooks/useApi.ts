@@ -1,6 +1,13 @@
 import { getAdminApiService } from '@/api/admin';
 import { getAuthApiService } from '@/api/auth';
-import type { ArtStyleRequest, BookType, FAQPost, PaginationParams, SlideTemplateParams } from '@/types/api';
+import type {
+  ArtStyleRequest,
+  BookType,
+  FAQPost,
+  PaginationParams,
+  UserQueryParams,
+  SlideTemplateParams,
+} from '@/types/api';
 import type { ModelPatchData } from '@aiprimary/core';
 import type { LoginRequest } from '@/types/auth';
 import type { SlideTemplate, SlideTheme } from '@aiprimary/core';
@@ -19,7 +26,7 @@ export const adminKeys = {
   // Users
   users: {
     all: ['users'] as const,
-    list: (params?: PaginationParams) => [...adminKeys.users.all, 'list', params] as const,
+    list: (params?: UserQueryParams) => [...adminKeys.users.all, 'list', params] as const,
     detail: (id: string) => [...adminKeys.users.all, 'detail', id] as const,
   },
   // Slide Themes
@@ -152,7 +159,7 @@ export function useRefreshToken() {
 
 // ============= USERS =============
 
-export function useUsers(params?: PaginationParams) {
+export function useUsers(params?: UserQueryParams) {
   return useQuery({
     queryKey: adminKeys.users.list(params),
     queryFn: () => getAdminApiService().getUsers(params),

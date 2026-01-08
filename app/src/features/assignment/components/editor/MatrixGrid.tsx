@@ -22,7 +22,8 @@ export const MatrixGrid = () => {
       const updatedCells = syncMatrixCounts(questions, topics, matrixCells);
       setValue('matrixCells', updatedCells);
     }
-  }, [questions, topics, syncMatrixCounts, setValue, matrixCells]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [questions, topics]);
 
   if (!topics || topics.length === 0) {
     return (

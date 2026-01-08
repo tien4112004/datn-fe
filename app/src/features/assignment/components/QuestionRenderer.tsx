@@ -1,4 +1,5 @@
-import type { Question, ViewMode, Answer } from '../types';
+import type { Question, Answer } from '@aiprimary/core';
+import type { ViewMode } from '../types';
 import { QUESTION_TYPE, VIEW_MODE } from '../types';
 import {
   MultipleChoiceEditing,

@@ -1,5 +1,5 @@
-import { useCallback } from 'react';
-import { useFormContext, useFieldArray } from 'react-hook-form';
+import { useCallback, useMemo } from 'react';
+import { useFormContext } from 'react-hook-form';
 import {
   DndContext,
   KeyboardSensor,
@@ -14,17 +14,18 @@ import { useAssignmentEditorStore } from '../../stores/useAssignmentEditorStore'
 import type { AssignmentFormData } from '../../types';
 
 export const QuestionsList = () => {
-  const { control, watch, setValue } = useFormContext<AssignmentFormData>();
-  const { fields } = useFieldArray({
-    control,
-    name: 'questions',
-  });
-
+  const { watch, setValue } = useFormContext<AssignmentFormData>();
   const questions = watch('questions');
   const reorderQuestions = useAssignmentEditorStore((state) => state.reorderQuestions);
 
+  const items = useMemo(() => questions.map((field) => `question-${field.id}`), [questions]);
+
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })
@@ -52,29 +53,28 @@ export const QuestionsList = () => {
     [questions, reorderQuestions, setValue]
   );
 
-  if (fields.length === 0) {
+  if (questions.length === 0) {
     return (
       <div className="flex min-h-[200px] items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-900">
         <div className="text-center">
-          <p className="text-muted-foreground text-sm">No questions yet</p>
-          <p className="text-muted-foreground text-xs">Click "Add Question" to get started</p>
+          <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">No questions yet</p>
+          <p className="mt-2 text-xs text-gray-600 dark:text-gray-400">Click "Add Question" to get started</p>
         </div>
       </div>
     );
   }
 
   return (
-    <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
-      <SortableContext
-        items={fields.map((field) => `question-${field.id}`)}
-        strategy={verticalListSortingStrategy}
-      >
-        <div className="space-y-4">
-          {fields.map((field, index) => (
-            <DraggableQuestionCard key={field.id} id={field.id} index={index} />
-          ))}
-        </div>
-      </SortableContext>
-    </DndContext>
+    <div className="space-y-4">
+      <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+        <SortableContext items={items} strategy={verticalListSortingStrategy}>
+          <div className="space-y-4">
+            {questions.map((field, index) => (
+              <DraggableQuestionCard key={field.id} id={field.id} index={index} />
+            ))}
+          </div>
+        </SortableContext>
+      </DndContext>
+    </div>
   );
 };

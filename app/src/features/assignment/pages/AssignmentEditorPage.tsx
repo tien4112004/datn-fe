@@ -2,7 +2,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { ArrowLeft, Save, X } from 'lucide-react';
+import { Save, X } from 'lucide-react';
 import { toast } from 'sonner';
 import {
   Breadcrumb,
@@ -15,14 +15,19 @@ import {
 import { Button } from '@/shared/components/ui/button';
 import LoadingButton from '@/shared/components/common/LoadingButton';
 import { AssignmentEditorLayout } from '../components/editor/AssignmentEditorLayout';
+import { MetadataEditDialog } from '../components/editor/MetadataEditDialog';
+import { MatrixEditorDialog } from '../components/editor/MatrixEditorDialog';
+import { MatrixViewDialog } from '../components/editor/MatrixViewDialog';
 import type { AssignmentFormData } from '../types';
 import { DIFFICULTY } from '../types';
+import { useCreateAssignment, useUpdateAssignment } from '../hooks/useAssignmentApi';
 
 // Validation schema
 const assignmentSchema = z.object({
   title: z.string().min(1, 'Title is required'),
   description: z.string().optional(),
   subject: z.string().min(1, 'Subject is required'),
+  grade: z.string().optional(),
   topics: z.array(
     z.object({
       id: z.string(),
@@ -56,12 +61,16 @@ export const AssignmentEditorPage = () => {
   const navigate = useNavigate();
   const { id } = useParams();
 
+  const { mutateAsync: createAssignment } = useCreateAssignment();
+  const { mutateAsync: updateAssignment } = useUpdateAssignment();
+
   const form = useForm<AssignmentFormData>({
     resolver: zodResolver(assignmentSchema) as any,
     defaultValues: {
-      title: '',
+      title: 'Untitled Assignment',
       description: '',
       subject: '',
+      grade: '',
       topics: [
         {
           id: `topic-${Date.now()}`,
@@ -110,8 +119,15 @@ export const AssignmentEditorPage = () => {
 
   const handleSubmit = async (data: AssignmentFormData) => {
     try {
-      console.log('Saving assignment:', data);
-      toast.success('Assignment saved successfully!');
+      if (id) {
+        // Update existing assignment
+        await updateAssignment({ id, data: data as any });
+        toast.success('Assignment updated successfully!');
+      } else {
+        // Create new assignment
+        await createAssignment(data as any);
+        toast.success('Assignment created successfully!');
+      }
       navigate('/assignments');
     } catch (error) {
       console.error('Failed to save assignment:', error);
@@ -136,17 +152,6 @@ export const AssignmentEditorPage = () => {
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
-
-      <div className="mb-6 flex items-center gap-4">
-        <Button variant="outline" size="sm" onClick={handleGoBack}>
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back
-        </Button>
-        <div>
-          <h1 className="text-2xl font-bold">{id ? 'Edit Assignment' : 'Create New Assignment'}</h1>
-          <p className="text-muted-foreground">Build your assignment with questions and assessment matrix</p>
-        </div>
-      </div>
 
       <FormProvider {...form}>
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
@@ -174,6 +179,11 @@ export const AssignmentEditorPage = () => {
             </LoadingButton>
           </div>
         </form>
+
+        {/* Dialogs */}
+        <MetadataEditDialog />
+        <MatrixEditorDialog />
+        <MatrixViewDialog />
       </FormProvider>
     </div>
   );

@@ -43,6 +43,7 @@ export interface AssignmentFormData {
   title: string;
   description?: string;
   subject: string;
+  grade?: string;
   topics: AssignmentTopic[];
   questions: QuestionWithTopic[];
   matrixCells: MatrixCell[];

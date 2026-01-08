@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Bell, Command, Database, File, Home, Users, Grid3x3 } from 'lucide-react';
+import { Bell, Command, Database, File, Home, Users, Grid3x3, ClipboardList } from 'lucide-react';
 import { NavMain } from '@/shared/components/navigation/NavMain';
 import { NavSecondary } from '@/shared/components/navigation/NavSecondary';
 import { NavUser } from '@/shared/components/navigation/NavUser';
@@ -40,6 +40,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         title: t('classes'),
         url: '/classes',
         icon: Users,
+      },
+      {
+        title: t('assignments'),
+        url: '/assignments/create',
+        icon: ClipboardList,
       },
       {
         title: t('questionBank'),

@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 import { useQueryClient } from '@tanstack/react-query';
 import { authKeys } from '../hooks/useAuth';
+import { getAuthApiService } from '../api';
 
 export default function GoogleCallbackPage() {
   const { t } = useTranslation(I18N_NAMESPACES.AUTH);
@@ -25,10 +26,12 @@ export default function GoogleCallbackPage() {
 
     const handleCallback = async () => {
       try {
-        // Refetch the profile using React Query to get the user data
+        // Fetch the profile using React Query to get the user data
         // The backend has already set the auth cookies from the OAuth flow
-        const result = await queryClient.refetchQueries({ queryKey: authKeys.profile });
-        const user = result[0]?.data;
+        const user = await queryClient.fetchQuery({
+          queryKey: authKeys.profile,
+          queryFn: () => getAuthApiService().getCurrentUser(),
+        });
 
         if (user) {
           setUser(user);

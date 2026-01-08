@@ -1,5 +1,3 @@
-import type { Post } from './post';
-
 // Request types
 export interface PostCreateRequest {
   classId: string;
@@ -27,23 +25,6 @@ export interface PostUpdateRequest {
 export interface CommentCreateRequest {
   postId: string;
   content: string;
-}
-
-// Response types
-export interface PostResponse {
-  data: Post;
-  success: boolean;
-}
-
-export interface PostListResponse {
-  data: Post[];
-  pagination: {
-    page: number;
-    pageSize: number;
-    total: number;
-    totalPages: number;
-  };
-  success: boolean;
 }
 
 // Feed Filter

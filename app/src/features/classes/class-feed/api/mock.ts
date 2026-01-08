@@ -1,4 +1,4 @@
-import { API_MODE, type ApiMode } from '@aiprimary/api';
+import { API_MODE, type ApiMode, type ApiResponse } from '@aiprimary/api';
 import type {
   ClassFeedApiService,
   Comment,
@@ -6,7 +6,6 @@ import type {
   FeedFilter,
   Post,
   PostCreateRequest,
-  PostListResponse,
   PostUpdateRequest,
 } from '../types';
 
@@ -361,7 +360,12 @@ export default class ClassFeedMockApiService implements ClassFeedApiService {
   getType(): ApiMode {
     return API_MODE.mock;
   }
-  async getPosts(classId: string, filter?: FeedFilter, page = 1, pageSize = 20): Promise<PostListResponse> {
+  async getPosts(
+    classId: string,
+    filter?: FeedFilter,
+    page = 1,
+    pageSize = 20
+  ): Promise<ApiResponse<Post[]>> {
     await new Promise((resolve) => setTimeout(resolve, 500));
     let filteredPosts = mockPosts.filter((post) => post.classId === classId);
 
@@ -398,12 +402,13 @@ export default class ClassFeedMockApiService implements ClassFeedApiService {
     return {
       data: paginatedPosts,
       pagination: {
-        page,
+        currentPage: page,
         pageSize,
-        total: filteredPosts.length,
+        totalItems: filteredPosts.length,
         totalPages: Math.ceil(filteredPosts.length / pageSize),
       },
       success: true,
+      code: 200,
     };
   }
 

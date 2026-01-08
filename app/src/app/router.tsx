@@ -41,7 +41,7 @@ const router = createBrowserRouter([
       {
         index: true,
         lazy: async () => ({
-          Component: (await import('@/features/demo')).default.CardDemoPage,
+          Component: (await import('@/features/dashboard')).default.DashboardPage,
         }),
       },
       {

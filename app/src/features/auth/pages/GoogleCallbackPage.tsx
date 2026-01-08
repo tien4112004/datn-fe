@@ -5,12 +5,14 @@ import { useAuth } from '@/shared/context/auth';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
-import { getAuthApiService } from '../api';
+import { useQueryClient } from '@tanstack/react-query';
+import { authKeys } from '../hooks/useAuth';
 
 export default function GoogleCallbackPage() {
   const { t } = useTranslation(I18N_NAMESPACES.AUTH);
   const navigate = useNavigate();
   const { setUser } = useAuth();
+  const queryClient = useQueryClient();
   const [isLoading, setIsLoading] = useState(true);
   const hasHandledCallback = useRef(false);
 
@@ -23,11 +25,18 @@ export default function GoogleCallbackPage() {
 
     const handleCallback = async () => {
       try {
-        const authService = getAuthApiService();
-        const user = await authService.getCurrentUser();
-        setUser(user);
-        toast.success(t('login.googleSignInSuccess'));
-        navigate('/', { replace: true });
+        // Refetch the profile using React Query to get the user data
+        // The backend has already set the auth cookies from the OAuth flow
+        const result = await queryClient.refetchQueries({ queryKey: authKeys.profile });
+        const user = result[0]?.data;
+
+        if (user) {
+          setUser(user);
+          toast.success(t('login.googleSignInSuccess'));
+          navigate('/', { replace: true });
+        } else {
+          throw new Error('No user data received');
+        }
       } catch (error) {
         console.error('OAuth callback error:', error);
         toast.error(t('login.googleSignInFailed'));
@@ -40,7 +49,7 @@ export default function GoogleCallbackPage() {
     };
 
     handleCallback();
-  }, [navigate, setUser, t]);
+  }, [navigate, setUser, t, queryClient]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">

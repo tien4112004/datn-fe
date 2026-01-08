@@ -1,8 +1,30 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { useAuth as useAuthContext } from '@/shared/context/auth';
-import { useAuthApiService } from '../api';
+import { useAuthApiService, getAuthApiService } from '../api';
 import type { LoginRequest, SignupRequest } from '@/shared/types/auth';
+
+/**
+ * Query key factory for auth
+ */
+export const authKeys = {
+  profile: ['auth', 'profile'] as const,
+};
+
+/**
+ * Hook to get current user profile
+ * Used to check authentication status and get user data
+ */
+export const useProfile = (enabled: boolean = true) => {
+  return useQuery({
+    queryKey: authKeys.profile,
+    queryFn: () => getAuthApiService().getCurrentUser(),
+    enabled,
+    staleTime: 300000, // 5 minutes
+    gcTime: 600000, // 10 minutes
+    retry: false, // Don't retry on 401
+  });
+};
 
 /**
  * Hook for login mutation
@@ -14,7 +36,7 @@ export const useLogin = () => {
 
   return useMutation({
     mutationFn: async (request: LoginRequest) => {
-      // Call login to store tokens
+      // Call login to set cookies
       await authService.login(request);
 
       // Fetch current user data

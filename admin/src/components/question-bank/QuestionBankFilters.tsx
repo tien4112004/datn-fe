@@ -166,7 +166,7 @@ export function QuestionBankFilters({ filters, onChange }: QuestionBankFiltersPr
           {subjects.map((subject) => (
             <label key={subject} className="flex cursor-pointer items-center gap-2">
               <Checkbox
-                checked={Array.isArray(filters.subjectCode) && filters.subjectCode.includes(subject)}
+                checked={Array.isArray(filters.subjectCode) && filters.subjectCode.includes(subject as any)}
                 onCheckedChange={(checked) =>
                   handleCheckboxChange('subjectCode', subject, checked as boolean)
                 }

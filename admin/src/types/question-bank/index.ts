@@ -25,7 +25,7 @@ export interface QuestionBankParams {
   // Support both single and multi-select for filters
   questionType?: QuestionType | QuestionType[];
   difficulty?: Difficulty | Difficulty[];
-  subjectCode?: SubjectCode | SubjectCode[];
+  subjectCode?: SubjectCode | SubjectCode[] | string | string[]; // Support both predefined codes and custom strings from API
   // New filters for grade and chapter
   grade?: string | string[];
   chapter?: string | string[];

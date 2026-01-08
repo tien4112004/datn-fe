@@ -291,4 +291,24 @@ export default class QuestionBankMockApiService implements QuestionBankApiServic
 
     return { success, failed };
   }
+
+  async getSubjects(): Promise<string[]> {
+    // Return unique subjects from mock data
+    const subjects = new Set(this.questions.map((q) => q.subjectCode));
+    return Array.from(subjects);
+  }
+
+  async getGrades(): Promise<string[]> {
+    // Return mock grade data
+    return ['1', '2', '3', '4', '5'];
+  }
+
+  async getChapters(subject: string, grade: string): Promise<string[]> {
+    // Return mock chapter data based on subject and grade
+    return [
+      `${subject} - Grade ${grade} - Chapter 1`,
+      `${subject} - Grade ${grade} - Chapter 2`,
+      `${subject} - Grade ${grade} - Chapter 3`,
+    ];
+  }
 }

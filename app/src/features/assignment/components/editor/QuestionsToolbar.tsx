@@ -80,9 +80,6 @@ export const QuestionsToolbar = () => {
 
   const isAllPreviewing =
     questions?.length > 0 && questions.every((q) => questionViewModes.get(q.id || '') === VIEW_MODE.VIEWING);
-  const isAllEditing =
-    questions?.length === 0 ||
-    questions.every((q) => (questionViewModes.get(q.id || '') || VIEW_MODE.EDITING) === VIEW_MODE.EDITING);
 
   return (
     <div className="flex items-center justify-between gap-4">

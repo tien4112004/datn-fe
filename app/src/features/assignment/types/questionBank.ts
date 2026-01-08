@@ -15,8 +15,8 @@ export interface QuestionBankFilters {
   questionType?: QuestionType | QuestionType[];
   /** Filter by difficulty level (supports multi-select) */
   difficulty?: Difficulty | Difficulty[];
-  /** Filter by subject (supports multi-select) */
-  subjectCode?: SubjectCode | SubjectCode[];
+  /** Filter by subject (supports multi-select, both predefined and custom from API) */
+  subjectCode?: SubjectCode | SubjectCode[] | string | string[];
   /** Filter by grade (supports multi-select) */
   grade?: string | string[];
   /** Filter by chapter (supports multi-select) */

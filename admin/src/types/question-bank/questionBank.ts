@@ -21,9 +21,11 @@ export type QuestionBankItem = Question & {
  */
 export interface QuestionBankFilters {
   searchText?: string; // Search in title and content
-  questionType?: QuestionType; // Filter by question type
-  difficulty?: Difficulty; // Filter by difficulty level
-  subjectCode?: SubjectCode; // Filter by subject
+  questionType?: QuestionType | QuestionType[]; // Filter by question type (supports multi-select)
+  difficulty?: Difficulty | Difficulty[]; // Filter by difficulty level (supports multi-select)
+  subjectCode?: SubjectCode | SubjectCode[] | string | string[]; // Filter by subject (supports multi-select, both predefined and custom from API)
+  grade?: string | string[]; // Filter by grade (supports multi-select)
+  chapter?: string | string[]; // Filter by chapter (supports multi-select)
   bankType?: BankType; // Filter by personal or application bank
   page?: number; // Pagination: page number (1-indexed)
   limit?: number; // Pagination: items per page

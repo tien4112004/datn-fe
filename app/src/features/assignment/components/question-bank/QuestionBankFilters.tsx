@@ -116,7 +116,7 @@ export const QuestionBankFilters = () => {
           {subjects?.map((subject) => (
             <label key={subject} className="flex cursor-pointer items-center gap-2">
               <Checkbox
-                checked={Array.isArray(filters.subjectCode) && filters.subjectCode.includes(subject)}
+                checked={Array.isArray(filters.subjectCode) && filters.subjectCode.includes(subject as any)}
                 onCheckedChange={(checked) =>
                   handleCheckboxChange('subjectCode', subject, checked as boolean)
                 }
@@ -129,7 +129,7 @@ export const QuestionBankFilters = () => {
 
       {/* Grade - Multi-select */}
       <div>
-        <Label className="text-sm font-medium">{t('questionBank.filters.grade')}</Label>
+        <Label className="text-sm font-medium">Grade</Label>
         <div className="mt-2 space-y-2">
           {grades?.map((grade) => (
             <label key={grade} className="flex cursor-pointer items-center gap-2">
@@ -146,7 +146,7 @@ export const QuestionBankFilters = () => {
       {/* Conditional Chapter Filter */}
       {showChapters && chapters && chapters.length > 0 && (
         <Card className="border-blue-200 bg-blue-50 p-3 dark:border-blue-800 dark:bg-blue-950">
-          <Label className="text-sm font-medium">{t('questionBank.filters.chapter')}</Label>
+          <Label className="text-sm font-medium">Chapter</Label>
           <div className="mt-2 max-h-40 space-y-2 overflow-y-auto">
             {chapters.map((chapter) => (
               <label key={chapter} className="flex cursor-pointer items-center gap-2">
@@ -162,12 +162,14 @@ export const QuestionBankFilters = () => {
       )}
 
       {showChapters && chapters && chapters.length === 0 && (
-        <p className="text-muted-foreground text-sm italic">{t('questionBank.filters.noChapters')}</p>
+        <p className="text-muted-foreground text-sm italic">
+          No chapters available for selected subject and grade.
+        </p>
       )}
 
       {!showChapters && (
         <p className="text-muted-foreground text-xs italic">
-          {t('questionBank.filters.selectSubjectGradeForChapters')}
+          Select exactly 1 subject and 1 grade to see chapter options.
         </p>
       )}
 

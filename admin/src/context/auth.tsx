@@ -1,7 +1,8 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import type { User, AuthContextType } from '@/types/auth';
-import { useLogin as useLoginMutation, useProfile, useLogout as useLogoutMutation } from '@/hooks';
+import { useLogin as useLoginMutation, useProfile, useLogout as useLogoutMutation, authKeys } from '@/hooks';
 import { toast } from 'sonner';
+import { useQueryClient } from '@tanstack/react-query';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -12,55 +13,34 @@ const USER_KEY = 'admin_user';
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
+  const queryClient = useQueryClient();
 
-  // Use the profile query hook to get user data when tokens exist
-  const hasToken = Boolean(localStorage.getItem(TOKEN_KEY));
-  const { data: profileData, isLoading: isLoadingProfile } = useProfile(hasToken);
+  // Always fetch profile on mount to check authentication status
+  const { data: profileData, isLoading: isLoadingProfile } = useProfile(true);
 
   const loginMutation = useLoginMutation();
   const logoutMutation = useLogoutMutation();
 
-  // Initialize auth state from localStorage on mount
+  // Update user when profile data changes or loading completes
   useEffect(() => {
-    const initializeAuth = async () => {
-      try {
-        const storedUser = localStorage.getItem(USER_KEY);
-        const storedToken = localStorage.getItem(TOKEN_KEY);
+    if (!isLoadingProfile) {
+      setIsInitializing(false);
 
-        if (storedUser && storedToken) {
-          const parsedUser = JSON.parse(storedUser);
-          // Verify user has admin role
-          if (parsedUser.role === 'ADMIN' || parsedUser.role === 'admin') {
-            setUser(parsedUser);
-          } else {
-            // Clear non-admin user data
-            clearAuthData();
-          }
+      if (profileData) {
+        // Verify admin role
+        if (profileData.role === 'ADMIN' || profileData.role === 'admin') {
+          setUser(profileData);
+          localStorage.setItem(USER_KEY, JSON.stringify(profileData));
+        } else {
+          clearAuthData();
+          toast.error('Access denied. Admin privileges required.');
         }
-      } catch (error) {
-        console.error('Failed to initialize auth:', error);
-        clearAuthData();
-      } finally {
-        setIsInitializing(false);
-      }
-    };
-
-    initializeAuth();
-  }, []);
-
-  // Update user when profile data changes
-  useEffect(() => {
-    if (profileData) {
-      // Verify admin role
-      if (profileData.role === 'ADMIN' || profileData.role === 'admin') {
-        setUser(profileData);
-        localStorage.setItem(USER_KEY, JSON.stringify(profileData));
       } else {
-        clearAuthData();
-        toast.error('Access denied. Admin privileges required.');
+        // No profile data means user is not authenticated
+        setUser(null);
       }
     }
-  }, [profileData]);
+  }, [profileData, isLoadingProfile]);
 
   // Listen for unauthorized events from API
   useEffect(() => {
@@ -88,7 +68,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await loginMutation.mutateAsync({ email, password });
 
       // Tokens are stored by the mutation hook
-      // Profile will be fetched automatically via useProfile hook
+      // Now wait for the profile to be fetched and user state to be updated
+      await queryClient.refetchQueries({ queryKey: authKeys.profile });
 
       toast.success('Login successful');
     } catch (error: unknown) {

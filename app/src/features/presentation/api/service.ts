@@ -36,6 +36,17 @@ export default class PresentationRealApiService implements PresentationApiServic
     return res.data.data;
   }
 
+  async getSlideThemesByIds(ids: string[]): Promise<SlideTheme[]> {
+    if (ids.length === 0) {
+      return [];
+    }
+
+    const res = await api.post<ApiResponse<SlideTheme[]>>(`${this.baseUrl}/api/slide-themes/by-ids`, {
+      ids,
+    });
+    return res.data.data;
+  }
+
   async getSlideTemplates(): Promise<SlideTemplate[]> {
     const res = await api.get<ApiResponse<SlideTemplate[]>>(`${this.baseUrl}/api/slide-templates`);
     return res.data.data;

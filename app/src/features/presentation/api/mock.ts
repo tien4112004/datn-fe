@@ -281,6 +281,29 @@ export default class PresentationMockService implements PresentationApiService {
     });
   }
 
+  getSlideThemesByIds(ids: string[]): Promise<SlideTheme[]> {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        if (ids.length === 0) {
+          resolve([]);
+          return;
+        }
+
+        const allThemes = Object.values(THEMES_DATA).filter(
+          (theme): theme is SlideTheme => theme.id !== undefined
+        );
+
+        // Filter themes by IDs and preserve order
+        const themesById = new Map(allThemes.map((theme) => [theme.id, theme]));
+        const filteredThemes = ids
+          .map((id) => themesById.get(id))
+          .filter((theme): theme is SlideTheme => theme !== undefined);
+
+        resolve(filteredThemes);
+      }, 300);
+    });
+  }
+
   getSlideTemplates(): Promise<SlideTemplate[]> {
     return new Promise((resolve) => {
       setTimeout(() => {

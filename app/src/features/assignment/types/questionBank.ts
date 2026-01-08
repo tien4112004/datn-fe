@@ -11,12 +11,16 @@ export type { QuestionBankItem } from '@aiprimary/core';
 export interface QuestionBankFilters {
   /** Search in title and content */
   searchText?: string;
-  /** Filter by question type */
-  questionType?: QuestionType;
-  /** Filter by difficulty level */
-  difficulty?: Difficulty;
-  /** Filter by subject */
-  subjectCode?: SubjectCode;
+  /** Filter by question type (supports multi-select) */
+  questionType?: QuestionType | QuestionType[];
+  /** Filter by difficulty level (supports multi-select) */
+  difficulty?: Difficulty | Difficulty[];
+  /** Filter by subject (supports multi-select) */
+  subjectCode?: SubjectCode | SubjectCode[];
+  /** Filter by grade (supports multi-select) */
+  grade?: string | string[];
+  /** Filter by chapter (supports multi-select) */
+  chapter?: string | string[];
   /** Filter by personal or application bank */
   bankType?: BankType;
   /** Pagination: page number (1-indexed) */
@@ -76,4 +80,9 @@ export interface QuestionBankApiService {
   // Import/Export
   exportQuestions(filters?: QuestionBankFilters): Promise<Blob>;
   importQuestions(file: File): Promise<{ success: number; failed: number }>;
+
+  // Metadata
+  getSubjects(): Promise<string[]>;
+  getGrades(): Promise<string[]>;
+  getChapters(subject: string, grade: string): Promise<string[]>;
 }

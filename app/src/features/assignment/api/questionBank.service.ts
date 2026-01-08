@@ -14,8 +14,27 @@ export default class QuestionBankRealApiService implements QuestionBankApiServic
   }
 
   async getQuestions(filters?: QuestionBankFilters): Promise<QuestionBankResponse> {
+    // Convert arrays to comma-separated strings for API
+    const queryParams: any = { ...filters };
+
+    if (Array.isArray(filters?.difficulty)) {
+      queryParams.difficulty = filters.difficulty.join(',');
+    }
+    if (Array.isArray(filters?.subjectCode)) {
+      queryParams.subjectCode = filters.subjectCode.join(',');
+    }
+    if (Array.isArray(filters?.questionType)) {
+      queryParams.questionType = filters.questionType.join(',');
+    }
+    if (Array.isArray(filters?.grade)) {
+      queryParams.grade = filters.grade.join(',');
+    }
+    if (Array.isArray(filters?.chapter)) {
+      queryParams.chapter = filters.chapter.join(',');
+    }
+
     const response = await api.get(`${this.baseUrl}/api/question-bank`, {
-      params: filters,
+      params: queryParams,
     });
     return response.data.data;
   }
@@ -68,6 +87,23 @@ export default class QuestionBankRealApiService implements QuestionBankApiServic
     formData.append('file', file);
     const response = await api.post(`${this.baseUrl}/api/question-bank/import`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return response.data.data;
+  }
+
+  async getSubjects(): Promise<string[]> {
+    const response = await api.get(`${this.baseUrl}/api/question-bank/metadata/subjects`);
+    return response.data.data;
+  }
+
+  async getGrades(): Promise<string[]> {
+    const response = await api.get(`${this.baseUrl}/api/question-bank/metadata/grades`);
+    return response.data.data;
+  }
+
+  async getChapters(subject: string, grade: string): Promise<string[]> {
+    const response = await api.get(`${this.baseUrl}/api/question-bank/metadata/chapters`, {
+      params: { subject, grade },
     });
     return response.data.data;
   }

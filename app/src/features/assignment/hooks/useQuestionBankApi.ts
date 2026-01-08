@@ -16,6 +16,12 @@ export const questionBankKeys = {
   list: (filters: QuestionBankFilters) => [...questionBankKeys.lists(), filters] as const,
   details: () => [...questionBankKeys.all, 'detail'] as const,
   detail: (id: string) => [...questionBankKeys.details(), id] as const,
+  metadata: {
+    subjects: ['question-bank', 'metadata', 'subjects'] as const,
+    grades: ['question-bank', 'metadata', 'grades'] as const,
+    chapters: (subject: string, grade: string) =>
+      ['question-bank', 'metadata', 'chapters', subject, grade] as const,
+  },
 };
 
 // GET all questions with filters
@@ -140,5 +146,44 @@ export const useImportQuestions = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: questionBankKeys.lists() });
     },
+  });
+};
+
+// ============= QUESTION BANK METADATA =============
+
+// GET all subjects
+export const useQuestionBankSubjects = () => {
+  const apiService = useQuestionBankApiService();
+
+  return useQuery({
+    queryKey: questionBankKeys.metadata.subjects,
+    queryFn: () => apiService.getSubjects(),
+    staleTime: 600000, // 10 minutes
+    gcTime: 1200000, // 20 minutes
+  });
+};
+
+// GET all grades
+export const useQuestionBankGrades = () => {
+  const apiService = useQuestionBankApiService();
+
+  return useQuery({
+    queryKey: questionBankKeys.metadata.grades,
+    queryFn: () => apiService.getGrades(),
+    staleTime: 600000, // 10 minutes
+    gcTime: 1200000, // 20 minutes
+  });
+};
+
+// GET chapters for a subject and grade
+export const useQuestionBankChapters = (subject?: string, grade?: string) => {
+  const apiService = useQuestionBankApiService();
+
+  return useQuery({
+    queryKey: questionBankKeys.metadata.chapters(subject || '', grade || ''),
+    queryFn: () => apiService.getChapters(subject!, grade!),
+    enabled: !!subject && !!grade,
+    staleTime: 300000, // 5 minutes
+    gcTime: 600000, // 10 minutes
   });
 };

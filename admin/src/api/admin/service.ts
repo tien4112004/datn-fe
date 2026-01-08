@@ -548,33 +548,54 @@ export default class AdminRealApiService implements AdminApiService {
     return { success: true, data: undefined };
   }
 
-  // Question Bank (MOCK - Backend not implemented yet)
+  // Question Bank
   async getQuestionBank(params?: QuestionBankParams): Promise<ApiResponse<QuestionBankItem[]>> {
-    await delay();
-    let questions = MOCK_QUESTION_BANK;
+    // Convert arrays to comma-separated strings for API
+    const queryParams: any = { ...params };
 
-    // Apply filters
-    if (params?.searchText) {
-      const search = params.searchText.toLowerCase();
-      questions = questions.filter(
-        (q) => q.title.toLowerCase().includes(search) || q.explanation?.toLowerCase().includes(search)
-      );
+    if (Array.isArray(params?.difficulty)) {
+      queryParams.difficulty = params.difficulty.join(',');
+    }
+    if (Array.isArray(params?.subjectCode)) {
+      queryParams.subjectCode = params.subjectCode.join(',');
+    }
+    if (Array.isArray(params?.questionType)) {
+      queryParams.questionType = params.questionType.join(',');
+    }
+    if (Array.isArray(params?.grade)) {
+      queryParams.grade = params.grade.join(',');
+    }
+    if (Array.isArray(params?.chapter)) {
+      queryParams.chapter = params.chapter.join(',');
     }
 
-    if (params?.questionType) {
-      questions = questions.filter((q) => q.type === params.questionType);
-    }
+    const response = await api.get<ApiResponse<QuestionBankItem[]>>(`${this.baseUrl}/admin/question-bank`, {
+      params: queryParams,
+    });
+    return response.data;
+  }
 
-    if (params?.difficulty) {
-      questions = questions.filter((q) => q.difficulty === params.difficulty);
-    }
+  // Question Bank Metadata
+  async getQuestionBankSubjects(): Promise<ApiResponse<string[]>> {
+    const response = await api.get<ApiResponse<string[]>>(
+      `${this.baseUrl}/admin/question-bank/metadata/subjects`
+    );
+    return response.data;
+  }
 
-    if (params?.subjectCode) {
-      questions = questions.filter((q) => q.subjectCode === params.subjectCode);
-    }
+  async getQuestionBankGrades(): Promise<ApiResponse<string[]>> {
+    const response = await api.get<ApiResponse<string[]>>(
+      `${this.baseUrl}/admin/question-bank/metadata/grades`
+    );
+    return response.data;
+  }
 
-    const { data, pagination } = paginate(questions, params?.page, params?.pageSize);
-    return { success: true, data, pagination };
+  async getQuestionBankChapters(subject: string, grade: string): Promise<ApiResponse<string[]>> {
+    const response = await api.get<ApiResponse<string[]>>(
+      `${this.baseUrl}/admin/question-bank/metadata/chapters`,
+      { params: { subject, grade } }
+    );
+    return response.data;
   }
 
   async getQuestionById(id: string): Promise<ApiResponse<QuestionBankItem>> {

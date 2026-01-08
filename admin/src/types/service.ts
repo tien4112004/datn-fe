@@ -89,4 +89,8 @@ export interface AdminApiService extends Service {
   duplicateQuestion(id: string): Promise<ApiResponse<QuestionBankItem>>;
   exportQuestions(filters?: QuestionBankFilters): Promise<Blob>;
   importQuestions(file: File): Promise<ApiResponse<ImportResult>>;
+  // Question Bank Metadata
+  getQuestionBankSubjects(): Promise<ApiResponse<string[]>>;
+  getQuestionBankGrades(): Promise<ApiResponse<string[]>>;
+  getQuestionBankChapters(subject: string, grade: string): Promise<ApiResponse<string[]>>;
 }

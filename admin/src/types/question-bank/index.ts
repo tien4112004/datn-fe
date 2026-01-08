@@ -16,14 +16,19 @@ import type { QuestionBankItem } from './questionBank';
 
 /**
  * Query parameters for listing questions in admin panel
+ * Supports both single values and arrays for backward compatibility
  */
 export interface QuestionBankParams {
   page?: number;
   pageSize?: number;
   searchText?: string;
-  questionType?: QuestionType;
-  difficulty?: Difficulty;
-  subjectCode?: SubjectCode;
+  // Support both single and multi-select for filters
+  questionType?: QuestionType | QuestionType[];
+  difficulty?: Difficulty | Difficulty[];
+  subjectCode?: SubjectCode | SubjectCode[];
+  // New filters for grade and chapter
+  grade?: string | string[];
+  chapter?: string | string[];
 }
 
 /**

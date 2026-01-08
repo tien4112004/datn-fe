@@ -72,6 +72,12 @@ export const adminKeys = {
     all: ['question-bank'] as const,
     list: (params?: QuestionBankParams) => [...adminKeys.questionBank.all, 'list', params] as const,
     detail: (id: string) => [...adminKeys.questionBank.all, 'detail', id] as const,
+    metadata: {
+      subjects: ['question-bank', 'metadata', 'subjects'] as const,
+      grades: ['question-bank', 'metadata', 'grades'] as const,
+      chapters: (subject: string, grade: string) =>
+        ['question-bank', 'metadata', 'chapters', subject, grade] as const,
+    },
   },
 };
 
@@ -665,5 +671,35 @@ export function useImportQuestionBank() {
         description: error instanceof Error ? error.message : 'An error occurred',
       });
     },
+  });
+}
+
+// ============= QUESTION BANK METADATA =============
+
+export function useQuestionBankSubjects() {
+  return useQuery({
+    queryKey: adminKeys.questionBank.metadata.subjects,
+    queryFn: () => getAdminApiService().getQuestionBankSubjects(),
+    staleTime: 600000, // 10 minutes
+    gcTime: 1200000, // 20 minutes
+  });
+}
+
+export function useQuestionBankGrades() {
+  return useQuery({
+    queryKey: adminKeys.questionBank.metadata.grades,
+    queryFn: () => getAdminApiService().getQuestionBankGrades(),
+    staleTime: 600000, // 10 minutes
+    gcTime: 1200000, // 20 minutes
+  });
+}
+
+export function useQuestionBankChapters(subject?: string, grade?: string) {
+  return useQuery({
+    queryKey: adminKeys.questionBank.metadata.chapters(subject || '', grade || ''),
+    queryFn: () => getAdminApiService().getQuestionBankChapters(subject!, grade!),
+    enabled: !!subject && !!grade,
+    staleTime: 300000, // 5 minutes
+    gcTime: 600000, // 10 minutes
   });
 }

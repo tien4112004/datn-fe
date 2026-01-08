@@ -4,9 +4,11 @@ import type { Question, QuestionType, Difficulty, SubjectCode, BankType } from '
 
 interface QuestionBankFilters {
   searchText: string;
-  questionType?: QuestionType;
-  difficulty?: Difficulty;
-  subjectCode?: SubjectCode;
+  questionType?: QuestionType | QuestionType[];
+  difficulty?: Difficulty | Difficulty[];
+  subjectCode?: SubjectCode | SubjectCode[];
+  grade?: string | string[];
+  chapter?: string | string[];
   bankType?: BankType; // Filter by personal or application bank
 }
 
@@ -29,6 +31,7 @@ interface QuestionBankStore {
   setFilters: (filters: Partial<QuestionBankFilters>) => void;
   clearFilters: () => void;
   hasActiveFilters: () => boolean;
+  shouldShowChapterFilter: () => boolean;
 
   // Actions - Dialog
   openDialog: () => void;
@@ -45,6 +48,8 @@ const initialState = {
     questionType: undefined,
     difficulty: undefined,
     subjectCode: undefined,
+    grade: undefined,
+    chapter: undefined,
     bankType: 'personal' as BankType | undefined, // Default to personal bank
   },
   isDialogOpen: false,
@@ -89,19 +94,46 @@ const useQuestionBankStore = create<QuestionBankStore>()(
               questionType: undefined,
               difficulty: undefined,
               subjectCode: undefined,
+              grade: undefined,
+              chapter: undefined,
               bankType: 'personal' as BankType | undefined, // Reset to personal bank
             },
           }),
 
         hasActiveFilters: () => {
           const { filters } = get();
+          const hasQuestionType = Array.isArray(filters.questionType)
+            ? filters.questionType.length > 0
+            : filters.questionType !== undefined;
+          const hasDifficulty = Array.isArray(filters.difficulty)
+            ? filters.difficulty.length > 0
+            : filters.difficulty !== undefined;
+          const hasSubjectCode = Array.isArray(filters.subjectCode)
+            ? filters.subjectCode.length > 0
+            : filters.subjectCode !== undefined;
+          const hasGrade = Array.isArray(filters.grade)
+            ? filters.grade.length > 0
+            : filters.grade !== undefined;
+          const hasChapter = Array.isArray(filters.chapter)
+            ? filters.chapter.length > 0
+            : filters.chapter !== undefined;
+
           return (
             filters.searchText !== '' ||
-            filters.questionType !== undefined ||
-            filters.difficulty !== undefined ||
-            filters.subjectCode !== undefined ||
+            hasQuestionType ||
+            hasDifficulty ||
+            hasSubjectCode ||
+            hasGrade ||
+            hasChapter ||
             (filters.bankType !== undefined && filters.bankType !== 'personal')
           );
+        },
+
+        shouldShowChapterFilter: () => {
+          const { filters } = get();
+          const subjects = Array.isArray(filters.subjectCode) ? filters.subjectCode : [];
+          const grades = Array.isArray(filters.grade) ? filters.grade : [];
+          return subjects.length === 1 && grades.length === 1;
         },
 
         // Dialog actions

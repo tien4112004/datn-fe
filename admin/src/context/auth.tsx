@@ -15,8 +15,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isInitializing, setIsInitializing] = useState(true);
   const queryClient = useQueryClient();
 
-  // Always fetch profile on mount to check authentication status
-  const { data: profileData, isLoading: isLoadingProfile } = useProfile(true);
+  // Only fetch profile when access token exists
+  const hasToken = Boolean(localStorage.getItem(TOKEN_KEY));
+  const { data: profileData, isLoading: isLoadingProfile } = useProfile(hasToken);
 
   const loginMutation = useLoginMutation();
   const logoutMutation = useLogoutMutation();

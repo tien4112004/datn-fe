@@ -23,6 +23,8 @@ vi.mock('@/features/presentation/types', () => ({
     OpenAI: '/images/providers/openai.png',
     Deepseek: '/images/providers/deepseek.png',
     Google: '/images/providers/google.png',
+    LocalAI: '/images/providers/localai.png',
+    openRouter: '/images/providers/openrouter.png',
   },
 }));
 

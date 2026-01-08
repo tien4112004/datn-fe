@@ -23,7 +23,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/shared/components/ui/dropdown-menu';
-import { Plus, Upload, Download, Search, MoreVertical, Trash2, Copy, FileEdit } from 'lucide-react';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/shared/components/ui/sheet';
+import { Plus, Upload, Download, Search, MoreVertical, Trash2, Copy, FileEdit, Filter } from 'lucide-react';
 import { toast } from 'sonner';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 import DataTable from '@/shared/components/table/DataTable';
@@ -31,6 +32,7 @@ import {
   QuestionBankImportDialog,
   CopyToPersonalDialog,
   QuestionContentPreview,
+  QuestionBankFilters,
 } from '@/features/assignment/components/question-bank';
 
 const columnHelper = createColumnHelper<QuestionBankItem>();
@@ -314,7 +316,16 @@ export function TeacherQuestionBankPage() {
   });
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex h-full">
+      {/* Sidebar - Filters (Desktop) */}
+      <aside className="hidden w-72 flex-shrink-0 border-r md:block">
+        <div className="sticky top-0 h-screen overflow-y-auto p-4">
+          <h3 className="mb-4 text-lg font-semibold">Filters</h3>
+          <QuestionBankFilters />
+        </div>
+      </aside>
+
+      {/* Main Content */}
       <div className="flex flex-1 flex-col overflow-auto">
         <div className="mx-auto w-full max-w-7xl space-y-6 px-8 py-12">
           {/* Header */}
@@ -322,6 +333,24 @@ export function TeacherQuestionBankPage() {
             <h1 className="scroll-m-20 text-3xl font-semibold tracking-tight">{t('title')}</h1>
             <p className="text-muted-foreground text-sm">{t('subtitle')}</p>
           </div>
+
+          {/* Mobile Filter Sheet */}
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="outline" size="sm" className="gap-2 md:hidden">
+                <Filter className="h-4 w-4" />
+                Filters
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left">
+              <SheetHeader>
+                <SheetTitle>Filters</SheetTitle>
+              </SheetHeader>
+              <div className="mt-4">
+                <QuestionBankFilters />
+              </div>
+            </SheetContent>
+          </Sheet>
 
           {/* Action Bar */}
           <Card className="rounded-2xl border-2 shadow-md">

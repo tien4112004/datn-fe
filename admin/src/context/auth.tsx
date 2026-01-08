@@ -14,9 +14,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
   const queryClient = useQueryClient();
+  const [hasToken, setHasToken] = useState(() => Boolean(localStorage.getItem(TOKEN_KEY)));
 
-  // Only fetch profile when access token exists
-  const hasToken = Boolean(localStorage.getItem(TOKEN_KEY));
+  // Use the profile query hook to get user data when tokens exist
   const { data: profileData, isLoading: isLoadingProfile } = useProfile(hasToken);
 
   const loginMutation = useLoginMutation();
@@ -46,7 +46,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Listen for unauthorized events from API
   useEffect(() => {
     const handleUnauthorized = () => {
-      logout();
+      // Clear data immediately without calling API again
+      clearAuthData();
+      setHasToken(false);
+      toast.error('Session expired. Please login again.');
     };
 
     window.addEventListener('auth:unauthorized', handleUnauthorized);
@@ -68,6 +71,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Use the login mutation
       await loginMutation.mutateAsync({ email, password });
 
+      // Update hasToken state to enable profile query
+      setHasToken(true);
+
       // Tokens are stored by the mutation hook
       // Now wait for the profile to be fetched and user state to be updated
       await queryClient.refetchQueries({ queryKey: authKeys.profile });
@@ -80,10 +86,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const logout = () => {
+    // Disable profile query immediately to prevent /me calls
+    setHasToken(false);
+    setUser(null);
+
     // Use the logout mutation
     logoutMutation.mutate();
     // Data clearing is handled by the mutation hook
-    setUser(null);
   };
 
   const value: AuthContextType = {

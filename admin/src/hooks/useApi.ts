@@ -77,6 +77,8 @@ export function useProfile(enabled: boolean = true) {
     staleTime: 300000, // 5 minutes
     gcTime: 600000, // 10 minutes
     retry: false, // Don't retry on 401
+    refetchOnWindowFocus: false, // Prevent refetch on focus
+    refetchOnReconnect: false, // Prevent refetch on reconnect
   });
 }
 
@@ -113,7 +115,13 @@ export function useLogout() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: () => getAuthApiService().logout(),
+    mutationFn: async () => {
+      // Only call API if token exists
+      const token = localStorage.getItem('accessToken');
+      if (token) {
+        await getAuthApiService().logout();
+      }
+    },
     onSuccess: () => {
       // Clear tokens from localStorage
       localStorage.removeItem('accessToken');

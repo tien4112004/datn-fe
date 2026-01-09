@@ -21,6 +21,11 @@ api.stream = async function (url: string, request: any, signal: AbortSignal) {
       Accept: 'text/plain',
     };
 
+    const accessToken = window.localStorage.getItem('access_token');
+    if (accessToken) {
+      headers.Authorization = `Bearer ${accessToken}`;
+    }
+
     const response = await fetch(url, {
       method: 'POST',
       headers,
@@ -99,6 +104,21 @@ api.stream = async function (url: string, request: any, signal: AbortSignal) {
     throw new CriticalError('Network or unexpected error occurred', ERROR_TYPE.NETWORK);
   }
 };
+
+api.interceptors.request.use(
+  (config) => {
+    const accessToken = window.localStorage.getItem('access_token');
+    
+    if (accessToken && config.headers) {
+      config.headers.Authorization = `Bearer ${accessToken}`;
+    }
+    
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
 api.interceptors.response.use(
   (response) => response,

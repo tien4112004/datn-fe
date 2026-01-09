@@ -21,4 +21,5 @@ export type {
   FillInBlankAnswer,
   Submission,
   Grade,
+  AssignmentQuestion,
 } from '@aiprimary/core';

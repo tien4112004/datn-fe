@@ -8,15 +8,8 @@ export const QUESTION_TYPE = {
 
 export type QuestionType = (typeof QUESTION_TYPE)[keyof typeof QUESTION_TYPE];
 
-// Difficulty Levels (Vietnamese education system)
-export const DIFFICULTY = {
-  EASY: 'nhan_biet', // Nhận biết (Knowledge)
-  MEDIUM: 'thong_hieu', // Thông hiểu (Comprehension)
-  HARD: 'van_dung', // Vận dụng (Application)
-  SUPER_HARD: 'van_dung_cao', // Vận dụng cao (Advanced Application)
-} as const;
-
-export type Difficulty = (typeof DIFFICULTY)[keyof typeof DIFFICULTY];
+// Difficulty Levels - re-exported from core package
+export { DIFFICULTY, type Difficulty, DIFFICULTY_LABELS, getDifficultyName } from '@aiprimary/core';
 
 // Subject Codes (Vietnamese education system)
 export const SUBJECT_CODE = {
@@ -46,21 +39,8 @@ export const VIEW_MODE = {
 
 export type ViewMode = (typeof VIEW_MODE)[keyof typeof VIEW_MODE];
 
-// Difficulty labels for UI
-export const DIFFICULTY_LABELS: Record<Difficulty, string> = {
-  [DIFFICULTY.EASY]: 'Nhận biết',
-  [DIFFICULTY.MEDIUM]: 'Thông hiểu',
-  [DIFFICULTY.HARD]: 'Vận dụng',
-  [DIFFICULTY.SUPER_HARD]: 'Vận dụng cao',
-};
-
-// Question type labels for UI
-export const QUESTION_TYPE_LABELS: Record<QuestionType, string> = {
-  [QUESTION_TYPE.MULTIPLE_CHOICE]: 'Multiple Choice',
-  [QUESTION_TYPE.MATCHING]: 'Matching',
-  [QUESTION_TYPE.OPEN_ENDED]: 'Open-ended',
-  [QUESTION_TYPE.FILL_IN_BLANK]: 'Fill In Blank',
-};
+// Question type labels and helper - re-exported from core package
+export { QUESTION_TYPE_LABELS, getQuestionTypeName } from '@aiprimary/core';
 
 // View mode labels for UI
 export const VIEW_MODE_LABELS: Record<ViewMode, string> = {

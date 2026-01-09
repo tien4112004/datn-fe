@@ -70,7 +70,6 @@ export interface BaseQuestion {
   title: string; // Question text (Markdown-enabled)
   titleImageUrl?: string; // Optional image URL for the question
   explanation?: string; // Explanation shown in After Assessment mode (Markdown-enabled)
-  points?: number; // Points allocated for this question
   data: QuestionData; // Question-type-specific data (options, pairs, segments, etc.)
 }
 
@@ -120,12 +119,25 @@ export type Question = MultipleChoiceQuestion | MatchingQuestion | OpenEndedQues
  * Type guards for runtime type checking
  */
 
-export const isMultipleChoice = (q: Question): q is MultipleChoiceQuestion => // Check if a question is Multiple Choice
+export const isMultipleChoice = (q: Question): q is MultipleChoiceQuestion =>
+  // Check if a question is Multiple Choice
   q.type === QUESTION_TYPE.MULTIPLE_CHOICE;
 
 export const isMatching = (q: Question): q is MatchingQuestion => q.type === QUESTION_TYPE.MATCHING; // Check if a question is Matching
 
 export const isOpenEnded = (q: Question): q is OpenEndedQuestion => q.type === QUESTION_TYPE.OPEN_ENDED; // Check if a question is Open-ended
 
-export const isFillInBlank = (q: Question): q is FillInBlankQuestion => // Check if a question is Fill In Blank
+export const isFillInBlank = (q: Question): q is FillInBlankQuestion =>
+  // Check if a question is Fill In Blank
   q.type === QUESTION_TYPE.FILL_IN_BLANK;
+
+/**
+ * Assignment Question
+ * Wraps a Question with assignment-specific metadata like points.
+ * This separates the concern of scoring from the base question definition,
+ * allowing the same question to have different points in different assignments.
+ */
+export interface AssignmentQuestion {
+  question: Question; // The question content and structure
+  points: number; // Points allocated for this question in the assignment context (required)
+}

@@ -10,10 +10,10 @@ import { Textarea } from '@/shared/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
 import { Badge } from '@/shared/components/ui/badge';
 import type { AssignmentFormData } from '../../types';
-import { DIFFICULTY_LABELS, QUESTION_TYPE } from '../../types';
+import { DIFFICULTY_LABELS } from '../../types';
 import { QuestionRenderer } from '../QuestionRenderer';
 import { useAssignmentEditorStore } from '../../stores/useAssignmentEditorStore';
-import { VIEW_MODE, type Question } from '@aiprimary/core';
+import { VIEW_MODE, type Question, getQuestionTypeName } from '@aiprimary/core';
 
 interface DraggableQuestionCardProps {
   id: string;
@@ -38,14 +38,18 @@ export const DraggableQuestionCard = ({ id, index }: DraggableQuestionCardProps)
     willChange: isDragging ? 'transform' : 'auto',
   } as const;
 
-  const question = watch(`questions.${index}`);
+  const assignmentQuestion = watch(`questions.${index}`);
   const topics = watch('topics');
+
+  // Extract question and points from assignment question structure
+  const question = assignmentQuestion?.question;
+  const points = assignmentQuestion?.points || 0;
 
   const questionViewModes = useAssignmentEditorStore((state) => state.questionViewModes);
   const viewMode = questionViewModes.get(question?.id || '') || VIEW_MODE.EDITING;
 
   // Safety check - if question is not loaded yet, show debug state
-  if (!question) {
+  if (!assignmentQuestion || !question) {
     return (
       <div className="rounded-lg border-2 border-red-500 bg-white p-4 dark:bg-red-950/20">
         <div className="text-sm font-semibold text-red-600 dark:text-red-400">
@@ -56,18 +60,14 @@ export const DraggableQuestionCard = ({ id, index }: DraggableQuestionCardProps)
     );
   }
 
-  const questionTypeLabels: Record<string, string> = {
-    [QUESTION_TYPE.MULTIPLE_CHOICE]: 'Multiple Choice',
-    [QUESTION_TYPE.MATCHING]: 'Matching',
-    [QUESTION_TYPE.OPEN_ENDED]: 'Open Ended',
-    [QUESTION_TYPE.FILL_IN_BLANK]: 'Fill in the Blank',
-  };
-
   const handleQuestionChange = (updatedQuestion: Question) => {
     // Sync back to form - merge the updated question data
     setValue(`questions.${index}`, {
-      ...question,
-      ...updatedQuestion,
+      ...assignmentQuestion,
+      question: {
+        ...question,
+        ...updatedQuestion,
+      },
     });
   };
 
@@ -93,7 +93,7 @@ export const DraggableQuestionCard = ({ id, index }: DraggableQuestionCardProps)
           <div className="flex min-w-0 flex-wrap items-center gap-2">
             <span className="whitespace-nowrap text-sm font-semibold">Q{index + 1}</span>
             <Badge variant="outline" className="text-xs">
-              {questionTypeLabels[question.type as string] || 'Unknown'}
+              {getQuestionTypeName(question.type)}
             </Badge>
             {question.difficulty && (
               <Badge variant="secondary" className="text-xs">
@@ -118,7 +118,11 @@ export const DraggableQuestionCard = ({ id, index }: DraggableQuestionCardProps)
             type="button"
             variant="ghost"
             size="sm"
-            onClick={() => remove(index)}
+            onClick={() => {
+              if (question && window.confirm(`Remove this ${getQuestionTypeName(question.type)} question?`)) {
+                remove(index);
+              }
+            }}
             className="text-red-500 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20"
           >
             <Trash2 className="h-4 w-4" />
@@ -137,7 +141,7 @@ export const DraggableQuestionCard = ({ id, index }: DraggableQuestionCardProps)
               </Label>
               <Select
                 value={question.topicId}
-                onValueChange={(value) => setValue(`questions.${index}.topicId`, value)}
+                onValueChange={(value) => setValue(`questions.${index}.question.topicId`, value)}
               >
                 <SelectTrigger id={`topic-${index}`} className="h-9 text-sm">
                   <SelectValue placeholder="Select topic" />
@@ -158,7 +162,7 @@ export const DraggableQuestionCard = ({ id, index }: DraggableQuestionCardProps)
               </Label>
               <Select
                 value={question.difficulty}
-                onValueChange={(value) => setValue(`questions.${index}.difficulty`, value as any)}
+                onValueChange={(value) => setValue(`questions.${index}.question.difficulty`, value as any)}
               >
                 <SelectTrigger id={`difficulty-${index}`} className="h-9 text-sm">
                   <SelectValue />
@@ -181,7 +185,7 @@ export const DraggableQuestionCard = ({ id, index }: DraggableQuestionCardProps)
             </Label>
             <Textarea
               id={`title-${index}`}
-              {...register(`questions.${index}.title`)}
+              {...register(`questions.${index}.question.title`)}
               placeholder="Enter question text..."
               rows={2}
               className="resize-none text-sm"
@@ -193,6 +197,7 @@ export const DraggableQuestionCard = ({ id, index }: DraggableQuestionCardProps)
             <QuestionRenderer
               question={question as Question}
               viewMode={viewMode}
+              points={points}
               onChange={handleQuestionChange}
             />
           </div>
@@ -205,7 +210,7 @@ export const DraggableQuestionCard = ({ id, index }: DraggableQuestionCardProps)
               </Label>
               <Textarea
                 id={`explanation-${index}`}
-                {...register(`questions.${index}.explanation`)}
+                {...register(`questions.${index}.question.explanation`)}
                 placeholder="Provide an explanation or answer key..."
                 rows={2}
                 className="resize-none text-sm"
@@ -237,9 +242,9 @@ export const DraggableQuestionCard = ({ id, index }: DraggableQuestionCardProps)
                 {question.title || <span className="italic text-gray-400">No question text</span>}
               </p>
             </div>
-            {question.points && (
+            {points > 0 && (
               <span className="flex-shrink-0 whitespace-nowrap font-medium text-gray-900 dark:text-gray-100">
-                {question.points} pts
+                {points} pts
               </span>
             )}
           </div>

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import type { MatchingQuestion, MatchingAnswer } from '../../types';
 import { MarkdownPreview, DifficultyBadge } from '../shared';
-import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
+
 import { Button } from '@/shared/components/ui/button';
 import {
   DndContext,
@@ -125,10 +125,11 @@ const DroppableZone = ({ id, content, imageUrl, index, matchedItem, onRemove }: 
 interface MatchingDoingProps {
   question: MatchingQuestion;
   answer?: MatchingAnswer;
+  points?: number; // Optional points for display
   onAnswerChange: (answer: MatchingAnswer) => void;
 }
 
-export const MatchingDoing = ({ question, answer, onAnswerChange }: MatchingDoingProps) => {
+export const MatchingDoing = ({ question, answer, points, onAnswerChange }: MatchingDoingProps) => {
   const [matches, setMatches] = useState<Map<string, string>>(new Map());
   const [activeId, setActiveId] = useState<string | null>(null);
 
@@ -184,95 +185,94 @@ export const MatchingDoing = ({ question, answer, onAnswerChange }: MatchingDoin
   const activePair = activeId ? question.data.pairs.find((p) => p.id === activeId) : null;
 
   return (
-    <Card>
-      <CardHeader>
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-lg">Matching Question</CardTitle>
+          <h3 className="text-lg font-semibold">Matching Question</h3>
           <DifficultyBadge difficulty={question.difficulty} />
         </div>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        {/* Question Title */}
-        <div className="space-y-2">
-          <MarkdownPreview content={question.title} />
-          {question.titleImageUrl && (
-            <img src={question.titleImageUrl} alt="Question" className="mt-2 max-h-64 rounded-md border" />
-          )}
-        </div>
+      </div>
 
-        <p className="text-muted-foreground text-sm">Drag items from Column A to match with Column B</p>
+      {/* Question Title */}
+      <div className="space-y-2">
+        <MarkdownPreview content={question.title} />
+        {question.titleImageUrl && (
+          <img src={question.titleImageUrl} alt="Question" className="mt-2 max-h-64 rounded-md border" />
+        )}
+      </div>
 
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragStart={handleDragStart}
-          onDragEnd={handleDragEnd}
-        >
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            {/* Left Column - Draggable Items */}
-            <div className="space-y-2">
-              <h4 className="text-sm font-semibold">Column A (Drag from here)</h4>
-              {question.data.pairs.map((pair, index) => (
-                <DraggableItem
-                  key={pair.id}
-                  id={pair.id}
-                  content={pair.left}
-                  imageUrl={pair.leftImageUrl}
-                  index={index}
-                  isMatched={matchedLeftIds.has(pair.id)}
-                />
-              ))}
-            </div>
+      <p className="text-muted-foreground text-sm">Drag items from Column A to match with Column B</p>
 
-            {/* Right Column - Drop Zones */}
-            <div className="space-y-2">
-              <h4 className="text-sm font-semibold">Column B (Drop here)</h4>
-              {question.data.pairs.map((pair, index) => {
-                const matchedLeftId = matches.get(pair.id);
-                const matchedPair = matchedLeftId
-                  ? question.data.pairs.find((p) => p.id === matchedLeftId)
-                  : undefined;
-                const matchedItem = matchedPair
-                  ? {
-                      id: matchedPair.id,
-                      content: matchedPair.left,
-                      imageUrl: matchedPair.leftImageUrl,
-                      itemIndex: question.data.pairs.findIndex((p) => p.id === matchedPair.id),
-                    }
-                  : undefined;
-
-                return (
-                  <DroppableZone
-                    key={pair.id}
-                    id={pair.id}
-                    content={pair.right}
-                    imageUrl={pair.rightImageUrl}
-                    index={index}
-                    matchedItem={matchedItem}
-                    onRemove={() => handleRemoveMatch(pair.id)}
-                  />
-                );
-              })}
-            </div>
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+      >
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          {/* Left Column - Draggable Items */}
+          <div className="space-y-2">
+            <h4 className="text-sm font-semibold">Column A (Drag from here)</h4>
+            {question.data.pairs.map((pair, index) => (
+              <DraggableItem
+                key={pair.id}
+                id={pair.id}
+                content={pair.left}
+                imageUrl={pair.leftImageUrl}
+                index={index}
+                isMatched={matchedLeftIds.has(pair.id)}
+              />
+            ))}
           </div>
 
-          <DragOverlay>
-            {activeId && activePair && (
-              <div className="flex items-start gap-3 rounded-md border bg-blue-50 p-3 opacity-90 shadow-lg dark:bg-blue-900/20">
-                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-600 text-sm font-medium text-white">
-                  {question.data.pairs.findIndex((p) => p.id === activeId) + 1}
-                </div>
-                <div className="flex-1">
-                  <MarkdownPreview content={activePair.left} />
-                </div>
-              </div>
-            )}
-          </DragOverlay>
-        </DndContext>
+          {/* Right Column - Drop Zones */}
+          <div className="space-y-2">
+            <h4 className="text-sm font-semibold">Column B (Drop here)</h4>
+            {question.data.pairs.map((pair, index) => {
+              const matchedLeftId = matches.get(pair.id);
+              const matchedPair = matchedLeftId
+                ? question.data.pairs.find((p) => p.id === matchedLeftId)
+                : undefined;
+              const matchedItem = matchedPair
+                ? {
+                    id: matchedPair.id,
+                    content: matchedPair.left,
+                    imageUrl: matchedPair.leftImageUrl,
+                    itemIndex: question.data.pairs.findIndex((p) => p.id === matchedPair.id),
+                  }
+                : undefined;
 
-        {/* Points */}
-        {question.points && <p className="text-muted-foreground text-sm">Points: {question.points}</p>}
-      </CardContent>
-    </Card>
+              return (
+                <DroppableZone
+                  key={pair.id}
+                  id={pair.id}
+                  content={pair.right}
+                  imageUrl={pair.rightImageUrl}
+                  index={index}
+                  matchedItem={matchedItem}
+                  onRemove={() => handleRemoveMatch(pair.id)}
+                />
+              );
+            })}
+          </div>
+        </div>
+
+        <DragOverlay>
+          {activeId && activePair && (
+            <div className="flex items-start gap-3 rounded-md border bg-blue-50 p-3 opacity-90 shadow-lg dark:bg-blue-900/20">
+              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-600 text-sm font-medium text-white">
+                {question.data.pairs.findIndex((p) => p.id === activeId) + 1}
+              </div>
+              <div className="flex-1">
+                <MarkdownPreview content={activePair.left} />
+              </div>
+            </div>
+          )}
+        </DragOverlay>
+      </DndContext>
+
+      {/* Points */}
+      {points && <p className="text-muted-foreground text-sm">Points: {points}</p>}
+    </div>
   );
 };

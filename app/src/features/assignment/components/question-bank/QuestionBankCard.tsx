@@ -1,5 +1,4 @@
 import { useTranslation } from 'react-i18next';
-import { Card, CardContent } from '@/shared/components/ui/card';
 import { Checkbox } from '@/shared/components/ui/checkbox';
 import { Badge } from '@/shared/components/ui/badge';
 import { Lock } from 'lucide-react';
@@ -9,6 +8,7 @@ import type { Question, QuestionBankItem } from '../../types';
 import { BANK_TYPE } from '../../types';
 import { QuestionTypeIcon } from '../shared/QuestionTypeIcon';
 import { DifficultyBadge } from '../shared/DifficultyBadge';
+import { Card, CardContent } from '@/components/ui/card';
 
 interface QuestionBankCardProps {
   question: QuestionBankItem;
@@ -90,11 +90,8 @@ export const QuestionBankCard = ({ question, isSelected, onToggleSelection }: Qu
             <DifficultyBadge difficulty={question.difficulty} className="text-xs" />
           </div>
 
-          {/* Footer: Points */}
-          <div className="flex items-center justify-between text-xs">
-            <span className="text-muted-foreground">
-              {t('questionBank.card.points', { points: question.points || 10 })}
-            </span>
+          {/* Footer: Selected status */}
+          <div className="flex items-center justify-end text-xs">
             {isSelected && (
               <Badge variant="secondary" className="text-xs">
                 {t('questionBank.card.selected')}

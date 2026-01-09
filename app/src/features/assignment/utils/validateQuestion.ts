@@ -21,10 +21,6 @@ export function validateQuestion(question: Question | null): ValidationResult {
     errors.push('Question title is required');
   }
 
-  if (!question.points || question.points < 1) {
-    errors.push('Points must be at least 1');
-  }
-
   // Type-specific validations
   switch (question.type) {
     case QUESTION_TYPE.MULTIPLE_CHOICE: {

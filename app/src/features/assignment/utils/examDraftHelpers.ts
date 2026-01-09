@@ -8,13 +8,8 @@ export const validateDraft = (draft: ExamDraft): { valid: boolean; error?: strin
     return { valid: false, error: 'No questions selected' };
   }
 
-  const totalPoints = draft.questions.reduce((sum, q) => sum + (q.points || 0), 0);
-  if (Math.abs(totalPoints - draft.targetPoints) > 0.01) {
-    return {
-      valid: false,
-      error: `Point mismatch: ${totalPoints} vs ${draft.targetPoints}`,
-    };
-  }
+  // Note: Point validation should be done when converting to Assignment
+  // since ExamDraft questions don't have points assigned yet
 
   return { valid: true };
 };

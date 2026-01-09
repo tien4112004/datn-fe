@@ -6,7 +6,6 @@ import useAssignmentEditorStore from '@/features/assignment/stores/assignmentEdi
 import { QuestionCollectionManager } from '@/features/assignment/components/QuestionCollectionManager';
 import { QuestionBankDialog } from '@/features/assignment/components/question-bank/QuestionBankDialog';
 import type { Question } from '@/features/assignment/types';
-import { calculateTotalPoints } from '@/features/assignment/utils/assignmentHelpers';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 import { duplicateQuestion } from '@/features/assignment/utils/questionHelpers';
 
@@ -24,7 +23,7 @@ export function QuestionCollectionSection() {
     closeQuestionBankDialog,
   } = useAssignmentEditorStore();
 
-  const totalPoints = calculateTotalPoints(questions);
+  const totalPoints = questions.reduce((sum, q) => sum + ((q as any).points || 0), 0);
 
   const handleAddFromBank = (selectedQuestions: Question[]) => {
     // Deep copy questions with new IDs (same pattern as demo)

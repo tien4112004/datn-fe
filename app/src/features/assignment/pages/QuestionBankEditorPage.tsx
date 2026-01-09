@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Button } from '@/shared/components/ui/button';
-import { Input } from '@/shared/components/ui/input';
 import { Label } from '@/shared/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
 import { Alert, AlertDescription, AlertTitle } from '@/shared/components/ui/alert';
@@ -32,6 +31,7 @@ import type {
   OpenEndedQuestion,
 } from '@/features/assignment/types';
 import { QUESTION_TYPE, DIFFICULTY, SUBJECT_CODE, BANK_TYPE } from '@/features/assignment/types';
+import { getAllSubjects } from '@aiprimary/core';
 import { MultipleChoiceEditing } from '@/features/assignment/components/multiple-choice/MultipleChoiceEditing';
 import { MatchingEditing } from '@/features/assignment/components/matching/MatchingEditing';
 import { FillInBlankEditing } from '@/features/assignment/components/fill-in-blank/FillInBlankEditing';
@@ -51,13 +51,13 @@ function createDefaultQuestion(type: QuestionType): QuestionBankItem {
     bankType: BANK_TYPE.PERSONAL,
     title: '',
     explanation: '',
-    points: 10,
   };
 
   switch (type) {
     case QUESTION_TYPE.MULTIPLE_CHOICE:
       return {
         ...baseQuestion,
+        type: 'multiple_choice',
         data: {
           options: [
             { id: generateId(), text: '', isCorrect: false },
@@ -69,6 +69,7 @@ function createDefaultQuestion(type: QuestionType): QuestionBankItem {
     case QUESTION_TYPE.MATCHING:
       return {
         ...baseQuestion,
+        type: 'matching',
         data: {
           pairs: [
             { id: generateId(), left: '', right: '' },
@@ -80,6 +81,7 @@ function createDefaultQuestion(type: QuestionType): QuestionBankItem {
     case QUESTION_TYPE.FILL_IN_BLANK:
       return {
         ...baseQuestion,
+        type: 'fill_in_blank',
         data: {
           segments: [
             { id: generateId(), type: 'text', content: '' },
@@ -92,6 +94,7 @@ function createDefaultQuestion(type: QuestionType): QuestionBankItem {
     case QUESTION_TYPE.OPEN_ENDED:
       return {
         ...baseQuestion,
+        type: 'open_ended',
         data: {
           expectedAnswer: '',
           maxLength: 500,
@@ -194,7 +197,6 @@ export function QuestionBankEditorPage() {
         ...newQuestion,
         difficulty: questionData.difficulty,
         subjectCode: questionData.subjectCode,
-        points: questionData.points,
       });
     }
   };
@@ -297,9 +299,11 @@ export function QuestionBankEditorPage() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value={SUBJECT_CODE.MATH}>Math</SelectItem>
-                      <SelectItem value={SUBJECT_CODE.VIETNAMESE}>Vietnamese</SelectItem>
-                      <SelectItem value={SUBJECT_CODE.ENGLISH}>English</SelectItem>
+                      {getAllSubjects().map((subject) => (
+                        <SelectItem key={subject.code} value={subject.code}>
+                          {subject.name}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
@@ -322,19 +326,6 @@ export function QuestionBankEditorPage() {
                       <SelectItem value={DIFFICULTY.SUPER_HARD}>Vận dụng cao</SelectItem>
                     </SelectContent>
                   </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Points</Label>
-                  <Input
-                    type="number"
-                    value={questionData.points}
-                    onChange={(e) =>
-                      setQuestionData({ ...questionData, points: parseInt(e.target.value) || 0 })
-                    }
-                    min={1}
-                    max={100}
-                  />
                 </div>
               </div>
             </div>

@@ -1,4 +1,5 @@
 import { useFormContext, useFieldArray } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { Plus, Database, Wand2, Eye, Edit } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
 import {
@@ -16,6 +17,8 @@ import { useAssignmentEditorStore } from '../../stores/useAssignmentEditorStore'
 import { VIEW_MODE } from '@aiprimary/core';
 
 export const QuestionsToolbar = () => {
+  const { t } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.questions.toolbar' });
+  const { t: tTypes } = useTranslation('assignment', { keyPrefix: 'questionTypes' });
   const { control, watch } = useFormContext<AssignmentFormData>();
   const { append } = useFieldArray({
     control,
@@ -35,13 +38,13 @@ export const QuestionsToolbar = () => {
   const handleToggleAllMode = () => {
     if (isAllPreviewing) {
       // If all are previewing, switch all to editing
-      questions?.forEach((question) => {
-        setQuestionViewMode(question.id || '', VIEW_MODE.EDITING);
+      questions?.forEach((aq) => {
+        setQuestionViewMode(aq.question.id || '', VIEW_MODE.EDITING);
       });
     } else {
       // Otherwise switch all to previewing
-      questions?.forEach((question) => {
-        setQuestionViewMode(question.id || '', VIEW_MODE.VIEWING);
+      questions?.forEach((aq) => {
+        setQuestionViewMode(aq.question.id || '', VIEW_MODE.VIEWING);
       });
     }
   };
@@ -79,7 +82,8 @@ export const QuestionsToolbar = () => {
   };
 
   const isAllPreviewing =
-    questions?.length > 0 && questions.every((q) => questionViewModes.get(q.id || '') === VIEW_MODE.VIEWING);
+    questions?.length > 0 &&
+    questions.every((aq) => questionViewModes.get(aq.question.id || '') === VIEW_MODE.VIEWING);
 
   return (
     <div className="flex items-center justify-between gap-4">
@@ -106,18 +110,18 @@ export const QuestionsToolbar = () => {
                   {isAllPreviewing ? (
                     <>
                       <Eye className="h-4 w-4" />
-                      <span className="hidden sm:inline">Preview Mode</span>
+                      <span className="hidden sm:inline">{t('previewMode')}</span>
                     </>
                   ) : (
                     <>
                       <Edit className="h-4 w-4" />
-                      <span className="hidden sm:inline">Edit Mode</span>
+                      <span className="hidden sm:inline">{t('editMode')}</span>
                     </>
                   )}
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                {isAllPreviewing ? 'Switch all to edit mode' : 'Switch all to preview mode'}
+                {isAllPreviewing ? t('tooltips.switchToEdit') : t('tooltips.switchToPreview')}
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -128,10 +132,10 @@ export const QuestionsToolbar = () => {
             <TooltipTrigger asChild>
               <Button size="sm" variant="outline" disabled>
                 <Wand2 className="mr-2 h-4 w-4" />
-                Generate
+                {t('generate')}
               </Button>
             </TooltipTrigger>
-            <TooltipContent>AI generation coming soon</TooltipContent>
+            <TooltipContent>{t('tooltips.generate')}</TooltipContent>
           </Tooltip>
         </TooltipProvider>
 
@@ -142,26 +146,26 @@ export const QuestionsToolbar = () => {
                 <DropdownMenuTrigger asChild>
                   <Button size="sm" variant="default">
                     <Plus className="mr-2 h-4 w-4" />
-                    Add Question
+                    {t('addQuestion')}
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
                   <DropdownMenuItem onClick={() => handleAddQuestion(QUESTION_TYPE.MULTIPLE_CHOICE)}>
-                    Multiple Choice
+                    {tTypes('multipleChoice')}
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => handleAddQuestion(QUESTION_TYPE.MATCHING)}>
-                    Matching
+                    {tTypes('matching')}
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => handleAddQuestion(QUESTION_TYPE.OPEN_ENDED)}>
-                    Open Ended
+                    {tTypes('openEnded')}
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => handleAddQuestion(QUESTION_TYPE.FILL_IN_BLANK)}>
-                    Fill in the Blank
+                    {tTypes('fillInBlank')}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </TooltipTrigger>
-            <TooltipContent>Create a new question</TooltipContent>
+            <TooltipContent>{t('tooltips.addQuestion')}</TooltipContent>
           </Tooltip>
         </TooltipProvider>
 
@@ -170,10 +174,10 @@ export const QuestionsToolbar = () => {
             <TooltipTrigger asChild>
               <Button size="sm" variant="outline" onClick={() => setQuestionBankOpen(true)}>
                 <Database className="mr-2 h-4 w-4" />
-                From Bank
+                {t('fromBank')}
               </Button>
             </TooltipTrigger>
-            <TooltipContent>Import questions from question bank</TooltipContent>
+            <TooltipContent>{t('tooltips.fromBank')}</TooltipContent>
           </Tooltip>
         </TooltipProvider>
       </div>

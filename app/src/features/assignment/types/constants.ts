@@ -1,19 +1,5 @@
-// Vietnamese education system difficulty levels
-export const DIFFICULTY = {
-  EASY: 'nhan_biet',
-  MEDIUM: 'thong_hieu',
-  HARD: 'van_dung',
-  SUPER_HARD: 'van_dung_cao',
-} as const;
-
-export const DIFFICULTY_LABELS = {
-  nhan_biet: 'Nhận biết',
-  thong_hieu: 'Thông hiểu',
-  van_dung: 'Vận dụng',
-  van_dung_cao: 'Vận dụng cao',
-} as const;
-
-export type Difficulty = (typeof DIFFICULTY)[keyof typeof DIFFICULTY];
+// Vietnamese education system difficulty levels - re-exported from core package
+export { DIFFICULTY, type Difficulty, DIFFICULTY_LABELS, getDifficultyName } from '@aiprimary/core';
 
 // Question types
 export const QUESTION_TYPE = {
@@ -25,14 +11,9 @@ export const QUESTION_TYPE = {
 
 export type QuestionType = (typeof QUESTION_TYPE)[keyof typeof QUESTION_TYPE];
 
-// Subject codes
-export const SUBJECT_CODE = {
-  MATH: 'T',
-  VIETNAMESE: 'TV',
-  ENGLISH: 'TA',
-} as const;
-
-export type SubjectCode = (typeof SUBJECT_CODE)[keyof typeof SUBJECT_CODE];
+// Subject codes - re-exported from core package
+export { SUBJECT_CODE } from '@aiprimary/core';
+export type { SubjectCode } from '@aiprimary/core';
 
 // Question bank types
 export const BANK_TYPE = {

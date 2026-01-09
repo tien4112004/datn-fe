@@ -34,6 +34,7 @@ interface QuestionRendererProps {
   question: Question;
   viewMode: ViewMode;
   answer?: Answer;
+  points?: number; // Points for this question in assignment context (required for grading/after-assessment modes)
   onChange?: (question: Question) => void;
   onAnswerChange?: (answer: Answer) => void;
   onGradeChange?: (grade: { points: number; feedback?: string }) => void;
@@ -43,6 +44,7 @@ export const QuestionRenderer = ({
   question,
   viewMode,
   answer,
+  points,
   onChange,
   onAnswerChange,
   onGradeChange,
@@ -53,19 +55,29 @@ export const QuestionRenderer = ({
       return <MultipleChoiceEditing question={question} onChange={onChange!} />;
     }
     if (viewMode === VIEW_MODE.VIEWING) {
-      return <MultipleChoiceViewing question={question} />;
+      return <MultipleChoiceViewing question={question} points={points} />;
     }
     if (viewMode === VIEW_MODE.DOING) {
       return (
-        <MultipleChoiceDoing question={question} answer={answer as any} onAnswerChange={onAnswerChange!} />
+        <MultipleChoiceDoing
+          question={question}
+          answer={answer as any}
+          points={points}
+          onAnswerChange={onAnswerChange!}
+        />
       );
     }
     if (viewMode === VIEW_MODE.AFTER_ASSESSMENT) {
-      return <MultipleChoiceAfterAssessment question={question} answer={answer as any} />;
+      return <MultipleChoiceAfterAssessment question={question} answer={answer as any} points={points} />;
     }
     if (viewMode === VIEW_MODE.GRADING) {
       return (
-        <MultipleChoiceGrading question={question} answer={answer as any} onGradeChange={onGradeChange!} />
+        <MultipleChoiceGrading
+          question={question}
+          answer={answer as any}
+          points={points}
+          onGradeChange={onGradeChange!}
+        />
       );
     }
   }
@@ -76,16 +88,30 @@ export const QuestionRenderer = ({
       return <MatchingEditing question={question} onChange={onChange!} />;
     }
     if (viewMode === VIEW_MODE.VIEWING) {
-      return <MatchingViewing question={question} />;
+      return <MatchingViewing question={question} points={points} />;
     }
     if (viewMode === VIEW_MODE.DOING) {
-      return <MatchingDoing question={question} answer={answer as any} onAnswerChange={onAnswerChange!} />;
+      return (
+        <MatchingDoing
+          question={question}
+          answer={answer as any}
+          points={points}
+          onAnswerChange={onAnswerChange!}
+        />
+      );
     }
     if (viewMode === VIEW_MODE.AFTER_ASSESSMENT) {
-      return <MatchingAfterAssessment question={question} answer={answer as any} />;
+      return <MatchingAfterAssessment question={question} answer={answer as any} points={points} />;
     }
     if (viewMode === VIEW_MODE.GRADING) {
-      return <MatchingGrading question={question} answer={answer as any} onGradeChange={onGradeChange!} />;
+      return (
+        <MatchingGrading
+          question={question}
+          answer={answer as any}
+          points={points}
+          onGradeChange={onGradeChange!}
+        />
+      );
     }
   }
 
@@ -95,16 +121,30 @@ export const QuestionRenderer = ({
       return <OpenEndedEditing question={question} onChange={onChange!} />;
     }
     if (viewMode === VIEW_MODE.VIEWING) {
-      return <OpenEndedViewing question={question} />;
+      return <OpenEndedViewing question={question} points={points} />;
     }
     if (viewMode === VIEW_MODE.DOING) {
-      return <OpenEndedDoing question={question} answer={answer as any} onAnswerChange={onAnswerChange!} />;
+      return (
+        <OpenEndedDoing
+          question={question}
+          answer={answer as any}
+          points={points}
+          onAnswerChange={onAnswerChange!}
+        />
+      );
     }
     if (viewMode === VIEW_MODE.AFTER_ASSESSMENT) {
-      return <OpenEndedAfterAssessment question={question} answer={answer as any} />;
+      return <OpenEndedAfterAssessment question={question} answer={answer as any} points={points} />;
     }
     if (viewMode === VIEW_MODE.GRADING) {
-      return <OpenEndedGrading question={question} answer={answer as any} onGradeChange={onGradeChange!} />;
+      return (
+        <OpenEndedGrading
+          question={question}
+          answer={answer as any}
+          points={points}
+          onGradeChange={onGradeChange!}
+        />
+      );
     }
   }
 
@@ -114,16 +154,30 @@ export const QuestionRenderer = ({
       return <FillInBlankEditing question={question} onChange={onChange!} />;
     }
     if (viewMode === VIEW_MODE.VIEWING) {
-      return <FillInBlankViewing question={question} />;
+      return <FillInBlankViewing question={question} points={points} />;
     }
     if (viewMode === VIEW_MODE.DOING) {
-      return <FillInBlankDoing question={question} answer={answer as any} onAnswerChange={onAnswerChange!} />;
+      return (
+        <FillInBlankDoing
+          question={question}
+          answer={answer as any}
+          points={points}
+          onAnswerChange={onAnswerChange!}
+        />
+      );
     }
     if (viewMode === VIEW_MODE.AFTER_ASSESSMENT) {
-      return <FillInBlankAfterAssessment question={question} answer={answer as any} />;
+      return <FillInBlankAfterAssessment question={question} answer={answer as any} points={points} />;
     }
     if (viewMode === VIEW_MODE.GRADING) {
-      return <FillInBlankGrading question={question} answer={answer as any} onGradeChange={onGradeChange!} />;
+      return (
+        <FillInBlankGrading
+          question={question}
+          answer={answer as any}
+          points={points}
+          onGradeChange={onGradeChange!}
+        />
+      );
     }
   }
 

@@ -107,7 +107,7 @@ const useAssignmentEditorStore = create<AssignmentEditorState>()(
         loadAssignment: (assignment) =>
           set({
             currentAssignment: assignment,
-            questions: assignment.questions || [],
+            questions: assignment.questions?.map((aq) => aq.question) || [],
             hasUnsavedChanges: false,
           }),
 

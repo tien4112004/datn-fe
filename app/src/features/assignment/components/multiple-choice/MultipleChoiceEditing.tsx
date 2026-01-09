@@ -1,6 +1,5 @@
 import type { MultipleChoiceQuestion, MultipleChoiceOption } from '../../types';
 import { MarkdownEditor, ImageUploader, DifficultyBadge } from '../shared';
-import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
 import { Button } from '@/shared/components/ui/button';
 import { Label } from '@/shared/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/shared/components/ui/radio-group';
@@ -64,142 +63,136 @@ export const MultipleChoiceEditing = ({ question, onChange }: MultipleChoiceEdit
   const correctOptionId = question.data.options.find((o) => o.isCorrect)?.id || '';
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-lg">{t('title')}</CardTitle>
-          <DifficultyBadge difficulty={question.difficulty} />
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        {/* Shuffle Options */}
-        <div className="flex items-center justify-between rounded-lg border p-4">
-          <div className="space-y-0.5">
-            <div className="flex items-center gap-2">
-              <Shuffle className="h-4 w-4" />
-              <Label className="text-base font-medium">
-                {t('shuffle.shuffleOptions', { ns: 'assignment', defaultValue: 'Shuffle Options' })}
-              </Label>
-            </div>
-            <div className="text-muted-foreground text-sm">
-              {t('shuffle.shuffleOptionsDescription', {
-                ns: 'assignment',
-                defaultValue: 'Randomize the order of options for each student',
-              })}
-            </div>
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <h3 className="text-lg font-semibold">{t('title')}</h3>
+        <DifficultyBadge difficulty={question.difficulty} />
+      </div>
+      {/* Shuffle Options */}
+      <div className="flex items-center justify-between rounded-lg border p-4">
+        <div className="space-y-0.5">
+          <div className="flex items-center gap-2">
+            <Shuffle className="h-4 w-4" />
+            <Label className="text-base font-medium">
+              {t('shuffle.shuffleOptions', { ns: 'assignment', defaultValue: 'Shuffle Options' })}
+            </Label>
           </div>
-          <Switch
-            checked={question.data.shuffleOptions || false}
-            onCheckedChange={(shuffleOptions) =>
-              updateQuestion({ data: { ...question.data, shuffleOptions } })
-            }
-          />
+          <div className="text-muted-foreground text-sm">
+            {t('shuffle.shuffleOptionsDescription', {
+              ns: 'assignment',
+              defaultValue: 'Randomize the order of options for each student',
+            })}
+          </div>
         </div>
-
-        {/* Question Title */}
-        <div className="space-y-2">
-          <Label>{t('labels.question')}</Label>
-          <MarkdownEditor
-            value={question.title}
-            onChange={(title) => updateQuestion({ title })}
-            placeholder={t('placeholders.question')}
-          />
-        </div>
-
-        {/* Question Image */}
-        <ImageUploader
-          label={t('labels.questionImage')}
-          value={question.titleImageUrl}
-          onChange={(titleImageUrl) => updateQuestion({ titleImageUrl })}
+        <Switch
+          checked={question.data.shuffleOptions || false}
+          onCheckedChange={(shuffleOptions) => updateQuestion({ data: { ...question.data, shuffleOptions } })}
         />
+      </div>
 
-        {/* Options */}
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <Label>{t('labels.options')}</Label>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={addOption}
-              disabled={question.data.options.length >= 6}
-            >
-              <Plus className="mr-2 h-4 w-4" />
-              {t('buttons.addOption')}
-            </Button>
-          </div>
+      {/* Question Title */}
+      <div className="space-y-2">
+        <Label>{t('labels.question')}</Label>
+        <MarkdownEditor
+          value={question.title}
+          onChange={(title) => updateQuestion({ title })}
+          placeholder={t('placeholders.question')}
+        />
+      </div>
 
-          <RadioGroup value={correctOptionId} onValueChange={markAsCorrect}>
-            <div className="space-y-2">
-              {question.data.options.map((option, index) => (
-                <div key={option.id} className="space-y-2 rounded-md border p-3">
-                  <div className="flex items-center gap-2">
-                    <RadioGroupItem value={option.id} id={`correct-${option.id}`} />
-                    <Label htmlFor={`correct-${option.id}`} className="cursor-pointer text-sm font-medium">
-                      {String.fromCharCode(65 + index)}
-                    </Label>
-                    <MarkdownEditor
-                      value={option.text}
-                      onChange={(text) => updateOption(option.id, { text })}
-                      placeholder={t('placeholders.option')}
-                      minHeight={50}
-                      className="flex-1"
-                    />
-                    {option.imageUrl !== undefined ? (
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => updateOption(option.id, { imageUrl: undefined })}
-                        title={t('buttons.removeImage')}
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    ) : (
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => updateOption(option.id, { imageUrl: '' })}
-                        title={t('buttons.addImage')}
-                      >
-                        <ImagePlus className="h-4 w-4" />
-                      </Button>
-                    )}
+      {/* Question Image */}
+      <ImageUploader
+        label={t('labels.questionImage')}
+        value={question.titleImageUrl}
+        onChange={(titleImageUrl) => updateQuestion({ titleImageUrl })}
+      />
+
+      {/* Options */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <Label>{t('labels.options')}</Label>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={addOption}
+            disabled={question.data.options.length >= 6}
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            {t('buttons.addOption')}
+          </Button>
+        </div>
+
+        <RadioGroup value={correctOptionId} onValueChange={markAsCorrect}>
+          <div className="space-y-2">
+            {question.data.options.map((option, index) => (
+              <div key={option.id} className="space-y-2 rounded-md border p-3">
+                <div className="flex items-center gap-2">
+                  <RadioGroupItem value={option.id} id={`correct-${option.id}`} />
+                  <Label htmlFor={`correct-${option.id}`} className="cursor-pointer text-sm font-medium">
+                    {String.fromCharCode(65 + index)}
+                  </Label>
+                  <MarkdownEditor
+                    value={option.text}
+                    onChange={(text) => updateOption(option.id, { text })}
+                    placeholder={t('placeholders.option')}
+                    minHeight={50}
+                    className="flex-1"
+                  />
+                  {option.imageUrl !== undefined ? (
                     <Button
                       type="button"
                       variant="ghost"
                       size="sm"
-                      onClick={() => removeOption(option.id)}
-                      disabled={question.data.options.length <= 2}
+                      onClick={() => updateOption(option.id, { imageUrl: undefined })}
+                      title={t('buttons.removeImage')}
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <X className="h-4 w-4" />
                     </Button>
-                  </div>
-
-                  {option.imageUrl !== undefined && (
-                    <ImageUploader
-                      label="Option Image"
-                      value={option.imageUrl}
-                      onChange={(imageUrl) => updateOption(option.id, { imageUrl })}
-                    />
+                  ) : (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => updateOption(option.id, { imageUrl: '' })}
+                      title={t('buttons.addImage')}
+                    >
+                      <ImagePlus className="h-4 w-4" />
+                    </Button>
                   )}
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => removeOption(option.id)}
+                    disabled={question.data.options.length <= 2}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
                 </div>
-              ))}
-            </div>
-          </RadioGroup>
-        </div>
 
-        {/* Explanation */}
-        <div className="space-y-2">
-          <Label>{t('labels.explanation')}</Label>
-          <MarkdownEditor
-            value={question.explanation || ''}
-            onChange={(explanation) => updateQuestion({ explanation })}
-            placeholder={t('placeholders.explanation')}
-          />
-        </div>
-      </CardContent>
-    </Card>
+                {option.imageUrl !== undefined && (
+                  <ImageUploader
+                    label="Option Image"
+                    value={option.imageUrl}
+                    onChange={(imageUrl) => updateOption(option.id, { imageUrl })}
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+        </RadioGroup>
+      </div>
+
+      {/* Explanation */}
+      <div className="space-y-2">
+        <Label>{t('labels.explanation')}</Label>
+        <MarkdownEditor
+          value={question.explanation || ''}
+          onChange={(explanation) => updateQuestion({ explanation })}
+          placeholder={t('placeholders.explanation')}
+        />
+      </div>
+    </div>
   );
 };

@@ -7,6 +7,7 @@ import useAssessmentMatrixStore from '@/features/assessment-matrix/stores/assess
 import type { MatrixCell, Topic, TopicId } from '@/features/assessment-matrix/types';
 import type { Difficulty } from '@/features/assignment/types';
 import { DIFFICULTY } from '@/features/assignment/types';
+import { getDifficultyName } from '@aiprimary/core';
 import { MatrixCellEditor } from './MatrixCellEditor';
 import { cn } from '@/shared/lib/utils';
 
@@ -32,16 +33,6 @@ export const MatrixGridEditor = ({ open, onClose }: MatrixGridEditorProps) => {
   const [editingDifficulty, setEditingDifficulty] = useState<Difficulty | null>(null);
 
   if (!currentMatrix) return null;
-
-  const getDifficultyLabel = (difficulty: Difficulty) => {
-    const labels: Record<Difficulty, string> = {
-      nhan_biet: t('difficulty.easy'),
-      thong_hieu: t('difficulty.medium'),
-      van_dung: t('difficulty.hard'),
-      van_dung_cao: t('difficulty.van_dung_cao'),
-    };
-    return labels[difficulty];
-  };
 
   const handleCellClick = (topic: Topic, difficulty: Difficulty) => {
     const cell = getCellByTopicAndDifficulty(topic.id, difficulty);
@@ -134,7 +125,7 @@ export const MatrixGridEditor = ({ open, onClose }: MatrixGridEditorProps) => {
                         </th>
                         {difficultyLevels.map((difficulty) => (
                           <th key={difficulty} className="min-w-[120px] p-3 text-center font-medium">
-                            {getDifficultyLabel(difficulty)}
+                            {getDifficultyName(difficulty)}
                           </th>
                         ))}
                       </tr>

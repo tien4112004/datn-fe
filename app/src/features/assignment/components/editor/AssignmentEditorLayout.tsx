@@ -11,7 +11,7 @@ export const AssignmentEditorLayout = () => {
       </div>
 
       {/* Right: Assignment Info + Assessment Matrix (1/3 width on large screens) */}
-      <div className="space-y-0">
+      <div className="space-y-4">
         {/* Assignment Info - Top */}
         <AssignmentMetadataPanel />
 

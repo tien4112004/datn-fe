@@ -1,4 +1,5 @@
 import { useFormContext } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import {
   Dialog,
   DialogContent,
@@ -15,6 +16,7 @@ import { useAssignmentEditorStore } from '../../stores/useAssignmentEditorStore'
 import type { AssignmentFormData } from '../../types';
 
 export const MetadataEditDialog = () => {
+  const { t } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.metadataDialog' });
   const {
     register,
     formState: { errors },
@@ -30,47 +32,45 @@ export const MetadataEditDialog = () => {
     <Dialog open={isMetadataDialogOpen} onOpenChange={setMetadataDialogOpen}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Edit Assignment Details</DialogTitle>
-          <DialogDescription>
-            Update the assignment metadata. Changes are saved automatically when you close this dialog.
-          </DialogDescription>
+          <DialogTitle>{t('title')}</DialogTitle>
+          <DialogDescription>{t('description')}</DialogDescription>
         </DialogHeader>
 
         <div className="grid gap-4 py-4">
           <div className="space-y-2">
             <Label htmlFor="title">
-              Title <span className="text-red-500">*</span>
+              {t('fields.title')} <span className="text-red-500">*</span>
             </Label>
-            <Input id="title" {...register('title')} placeholder="Enter assignment title" />
+            <Input id="title" {...register('title')} placeholder={t('placeholders.title')} />
             {errors.title && <p className="text-xs text-red-500">{errors.title.message}</p>}
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="subject">
-              Subject <span className="text-red-500">*</span>
+              {t('fields.subject')} <span className="text-red-500">*</span>
             </Label>
-            <Input id="subject" {...register('subject')} placeholder="e.g., Math, English, Science" />
+            <Input id="subject" {...register('subject')} placeholder={t('placeholders.subject')} />
             {errors.subject && <p className="text-xs text-red-500">{errors.subject.message}</p>}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="grade">Grade</Label>
-            <Input id="grade" {...register('grade')} placeholder="e.g., 10, 11, 12" />
+            <Label htmlFor="grade">{t('fields.grade')}</Label>
+            <Input id="grade" {...register('grade')} placeholder={t('placeholders.grade')} />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
+            <Label htmlFor="description">{t('fields.description')}</Label>
             <Textarea
               id="description"
               {...register('description')}
-              placeholder="Optional assignment description"
+              placeholder={t('placeholders.description')}
               rows={3}
             />
           </div>
         </div>
 
         <DialogFooter>
-          <Button onClick={handleClose}>Done</Button>
+          <Button onClick={handleClose}>{t('done')}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

@@ -1,6 +1,5 @@
 import type { OpenEndedQuestion } from '../../types';
 import { MarkdownEditor, ImageUploader, DifficultyBadge } from '../shared';
-import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
 import { Input } from '@/shared/components/ui/input';
 import { Label } from '@/shared/components/ui/label';
 import { useTranslation } from 'react-i18next';
@@ -18,73 +17,69 @@ export const OpenEndedEditing = ({ question, onChange }: OpenEndedEditingProps) 
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-lg">{t('title')}</CardTitle>
-          <DifficultyBadge difficulty={question.difficulty} />
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        {/* Question */}
-        <div className="space-y-2">
-          <Label>{t('labels.question')}</Label>
-          <MarkdownEditor
-            value={question.title}
-            onChange={(title) => updateQuestion({ title })}
-            placeholder={t('placeholders.question')}
-          />
-        </div>
-
-        {/* Question Image */}
-        <ImageUploader
-          label={t('labels.questionImage')}
-          value={question.titleImageUrl}
-          onChange={(titleImageUrl) => updateQuestion({ titleImageUrl })}
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <h3 className="text-lg font-semibold">{t('title')}</h3>
+        <DifficultyBadge difficulty={question.difficulty} />
+      </div>
+      {/* Question */}
+      <div className="space-y-2">
+        <Label>{t('labels.question')}</Label>
+        <MarkdownEditor
+          value={question.title}
+          onChange={(title) => updateQuestion({ title })}
+          placeholder={t('placeholders.question')}
         />
+      </div>
 
-        {/* Max Length */}
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <Label className="text-sm">{t('labels.maxLength')}</Label>
-            <span className="text-muted-foreground text-xs">
-              {t('maxLengthInfo', { length: question.data.maxLength || 500 })}
-            </span>
-          </div>
-          <Input
-            type="number"
-            min="0"
-            max="5000"
-            value={question.data.maxLength || 500}
-            onChange={(e) =>
-              updateQuestion({ data: { ...question.data, maxLength: parseInt(e.target.value) || 500 } })
-            }
-            className="h-8"
-          />
-        </div>
+      {/* Question Image */}
+      <ImageUploader
+        label={t('labels.questionImage')}
+        value={question.titleImageUrl}
+        onChange={(titleImageUrl) => updateQuestion({ titleImageUrl })}
+      />
 
-        {/* Expected Answer */}
-        <div className="space-y-2">
-          <Label className="text-sm">{t('labels.expectedAnswer')}</Label>
-          <MarkdownEditor
-            value={question.data.expectedAnswer || ''}
-            onChange={(expectedAnswer) => updateQuestion({ data: { ...question.data, expectedAnswer } })}
-            placeholder={t('placeholders.expectedAnswer')}
-            minHeight={80}
-          />
+      {/* Max Length */}
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <Label className="text-sm">{t('labels.maxLength')}</Label>
+          <span className="text-muted-foreground text-xs">
+            {t('maxLengthInfo', { length: question.data.maxLength || 500 })}
+          </span>
         </div>
+        <Input
+          type="number"
+          min="0"
+          max="5000"
+          value={question.data.maxLength || 500}
+          onChange={(e) =>
+            updateQuestion({ data: { ...question.data, maxLength: parseInt(e.target.value) || 500 } })
+          }
+          className="h-8"
+        />
+      </div>
 
-        {/* Explanation */}
-        <div className="space-y-2">
-          <Label className="text-sm">{t('labels.explanation')}</Label>
-          <MarkdownEditor
-            value={question.explanation || ''}
-            onChange={(explanation) => updateQuestion({ explanation })}
-            placeholder={t('placeholders.explanation')}
-            minHeight={80}
-          />
-        </div>
-      </CardContent>
-    </Card>
+      {/* Expected Answer */}
+      <div className="space-y-2">
+        <Label className="text-sm">{t('labels.expectedAnswer')}</Label>
+        <MarkdownEditor
+          value={question.data.expectedAnswer || ''}
+          onChange={(expectedAnswer) => updateQuestion({ data: { ...question.data, expectedAnswer } })}
+          placeholder={t('placeholders.expectedAnswer')}
+          minHeight={80}
+        />
+      </div>
+
+      {/* Explanation */}
+      <div className="space-y-2">
+        <Label className="text-sm">{t('labels.explanation')}</Label>
+        <MarkdownEditor
+          value={question.explanation || ''}
+          onChange={(explanation) => updateQuestion({ explanation })}
+          placeholder={t('placeholders.explanation')}
+          minHeight={80}
+        />
+      </div>
+    </div>
   );
 };

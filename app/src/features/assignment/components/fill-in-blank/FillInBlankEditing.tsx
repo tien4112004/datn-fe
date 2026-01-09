@@ -1,6 +1,5 @@
 import type { FillInBlankQuestion, BlankSegment } from '../../types';
 import { MarkdownEditor, ImageUploader, DifficultyBadge } from '../shared';
-import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
 import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
 import { Label } from '@/shared/components/ui/label';
@@ -88,160 +87,154 @@ export const FillInBlankEditing = ({ question, onChange }: FillInBlankEditingPro
   };
 
   return (
-    <Card>
-      <CardHeader>
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <h3 className="text-lg font-semibold">{t('title')}</h3>
+        <DifficultyBadge difficulty={question.difficulty} />
+      </div>
+      {/* Title & Case Sensitive */}
+      <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-lg">{t('title')}</CardTitle>
-          <DifficultyBadge difficulty={question.difficulty} />
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        {/* Title & Case Sensitive */}
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <Label className="text-sm">{t('labels.title')}</Label>
-            <div className="flex items-center gap-2">
-              <Label htmlFor="case-sensitive" className="text-muted-foreground cursor-pointer text-xs">
-                {t('labels.caseSensitive')}
-              </Label>
-              <Switch
-                id="case-sensitive"
-                checked={question.data.caseSensitive || false}
-                onCheckedChange={(caseSensitive) =>
-                  updateQuestion({ data: { ...question.data, caseSensitive } })
-                }
-              />
-            </div>
+          <Label className="text-sm">{t('labels.title')}</Label>
+          <div className="flex items-center gap-2">
+            <Label htmlFor="case-sensitive" className="text-muted-foreground cursor-pointer text-xs">
+              {t('labels.caseSensitive')}
+            </Label>
+            <Switch
+              id="case-sensitive"
+              checked={question.data.caseSensitive || false}
+              onCheckedChange={(caseSensitive) =>
+                updateQuestion({ data: { ...question.data, caseSensitive } })
+              }
+            />
           </div>
-          <Input
-            value={question.title}
-            onChange={(e) => updateQuestion({ title: e.target.value })}
-            placeholder={t('placeholders.title')}
-            className="h-8"
-          />
         </div>
-
-        {/* Title Image */}
-        <ImageUploader
-          label={t('labels.titleImage')}
-          value={question.titleImageUrl}
-          onChange={(titleImageUrl) => updateQuestion({ titleImageUrl })}
+        <Input
+          value={question.title}
+          onChange={(e) => updateQuestion({ title: e.target.value })}
+          placeholder={t('placeholders.title')}
+          className="h-8"
         />
+      </div>
 
-        {/* Segments */}
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <Label>{t('labels.questionSegments')}</Label>
-            <div className="flex gap-2">
-              <Button type="button" variant="outline" size="sm" onClick={addTextSegment}>
-                <FileText className="mr-2 h-4 w-4" />
-                {t('buttons.addText')}
-              </Button>
-              <Button type="button" variant="outline" size="sm" onClick={addBlankSegment}>
-                <FilePlus2 className="mr-2 h-4 w-4" />
-                {t('buttons.addBlank')}
-              </Button>
-            </div>
+      {/* Title Image */}
+      <ImageUploader
+        label={t('labels.titleImage')}
+        value={question.titleImageUrl}
+        onChange={(titleImageUrl) => updateQuestion({ titleImageUrl })}
+      />
+
+      {/* Segments */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <Label>{t('labels.questionSegments')}</Label>
+          <div className="flex gap-2">
+            <Button type="button" variant="outline" size="sm" onClick={addTextSegment}>
+              <FileText className="mr-2 h-4 w-4" />
+              {t('buttons.addText')}
+            </Button>
+            <Button type="button" variant="outline" size="sm" onClick={addBlankSegment}>
+              <FilePlus2 className="mr-2 h-4 w-4" />
+              {t('buttons.addBlank')}
+            </Button>
           </div>
+        </div>
 
-          <div className="space-y-2">
-            {question.data.segments.map((segment, index) => (
-              <div key={segment.id} className="space-y-2 rounded-md border p-2">
-                <div className="flex items-center gap-2">
-                  <Badge variant={segment.type === 'text' ? 'secondary' : 'default'} className="text-xs">
-                    {segment.type === 'text' ? t('segmentTypes.text') : t('segmentTypes.blank')} #{index + 1}
-                  </Badge>
-                  {segment.type === 'text' ? (
-                    <Input
-                      value={segment.content}
-                      onChange={(e) => updateSegment(segment.id, { content: e.target.value })}
-                      placeholder={t('placeholders.text')}
-                      className="h-8 flex-1 font-mono"
-                    />
-                  ) : (
-                    <Input
-                      value={segment.content}
-                      onChange={(e) => updateSegment(segment.id, { content: e.target.value })}
-                      placeholder={t('placeholders.correctAnswer')}
-                      className="h-8 flex-1 font-mono"
-                    />
-                  )}
-                  <Button type="button" variant="ghost" size="sm" onClick={() => removeSegment(segment.id)}>
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
+        <div className="space-y-2">
+          {question.data.segments.map((segment, index) => (
+            <div key={segment.id} className="space-y-2 rounded-md border p-2">
+              <div className="flex items-center gap-2">
+                <Badge variant={segment.type === 'text' ? 'secondary' : 'default'} className="text-xs">
+                  {segment.type === 'text' ? t('segmentTypes.text') : t('segmentTypes.blank')} #{index + 1}
+                </Badge>
+                {segment.type === 'text' ? (
+                  <Input
+                    value={segment.content}
+                    onChange={(e) => updateSegment(segment.id, { content: e.target.value })}
+                    placeholder={t('placeholders.text')}
+                    className="h-8 flex-1 font-mono"
+                  />
+                ) : (
+                  <Input
+                    value={segment.content}
+                    onChange={(e) => updateSegment(segment.id, { content: e.target.value })}
+                    placeholder={t('placeholders.correctAnswer')}
+                    className="h-8 flex-1 font-mono"
+                  />
+                )}
+                <Button type="button" variant="ghost" size="sm" onClick={() => removeSegment(segment.id)}>
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
 
-                {segment.type === 'blank' && (
-                  <div className="ml-16 space-y-1">
-                    <div className="flex items-center justify-between">
-                      <Label className="text-muted-foreground text-xs">
-                        {t('labels.alternativeAnswers')}
-                      </Label>
+              {segment.type === 'blank' && (
+                <div className="ml-16 space-y-1">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-muted-foreground text-xs">{t('labels.alternativeAnswers')}</Label>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => addAcceptableAnswer(segment.id)}
+                      className="h-6 text-xs"
+                    >
+                      <Plus className="mr-1 h-3 w-3" />
+                      {t('buttons.add')}
+                    </Button>
+                  </div>
+                  {(segment.acceptableAnswers || []).map((alt, altIndex) => (
+                    <div key={altIndex} className="flex gap-1">
+                      <Input
+                        value={alt}
+                        onChange={(e) => updateAcceptableAnswer(segment.id, altIndex, e.target.value)}
+                        placeholder={t('placeholders.alternative')}
+                        className="h-7 font-mono text-xs"
+                      />
                       <Button
                         type="button"
                         variant="ghost"
                         size="sm"
-                        onClick={() => addAcceptableAnswer(segment.id)}
-                        className="h-6 text-xs"
+                        onClick={() => removeAcceptableAnswer(segment.id, altIndex)}
+                        className="h-7 w-7 p-0"
                       >
-                        <Plus className="mr-1 h-3 w-3" />
-                        {t('buttons.add')}
+                        <Trash2 className="h-3 w-3" />
                       </Button>
                     </div>
-                    {(segment.acceptableAnswers || []).map((alt, altIndex) => (
-                      <div key={altIndex} className="flex gap-1">
-                        <Input
-                          value={alt}
-                          onChange={(e) => updateAcceptableAnswer(segment.id, altIndex, e.target.value)}
-                          placeholder={t('placeholders.alternative')}
-                          className="h-7 font-mono text-xs"
-                        />
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => removeAcceptableAnswer(segment.id, altIndex)}
-                          className="h-7 w-7 p-0"
-                        >
-                          <Trash2 className="h-3 w-3" />
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+
+        {/* Preview */}
+        <div className="bg-muted/50 rounded-md p-4">
+          <p className="mb-2 text-sm font-medium">{t('labels.preview')}</p>
+          <div className="font-mono text-sm">
+            {question.data.segments.map((segment) => (
+              <span key={segment.id}>
+                {segment.type === 'text' ? (
+                  segment.content
+                ) : (
+                  <span className="border-primary mx-1 inline-block min-w-[100px] border-b-2 border-dashed px-2">
+                    _________
+                  </span>
                 )}
-              </div>
+              </span>
             ))}
           </div>
-
-          {/* Preview */}
-          <div className="bg-muted/50 rounded-md p-4">
-            <p className="mb-2 text-sm font-medium">{t('labels.preview')}</p>
-            <div className="font-mono text-sm">
-              {question.data.segments.map((segment) => (
-                <span key={segment.id}>
-                  {segment.type === 'text' ? (
-                    segment.content
-                  ) : (
-                    <span className="border-primary mx-1 inline-block min-w-[100px] border-b-2 border-dashed px-2">
-                      _________
-                    </span>
-                  )}
-                </span>
-              ))}
-            </div>
-          </div>
         </div>
+      </div>
 
-        {/* Explanation */}
-        <div className="space-y-2">
-          <Label>{t('labels.explanation')}</Label>
-          <MarkdownEditor
-            value={question.explanation || ''}
-            onChange={(explanation) => updateQuestion({ explanation })}
-            placeholder={t('placeholders.explanation')}
-          />
-        </div>
-      </CardContent>
-    </Card>
+      {/* Explanation */}
+      <div className="space-y-2">
+        <Label>{t('labels.explanation')}</Label>
+        <MarkdownEditor
+          value={question.explanation || ''}
+          onChange={(explanation) => updateQuestion({ explanation })}
+          placeholder={t('placeholders.explanation')}
+        />
+      </div>
+    </div>
   );
 };

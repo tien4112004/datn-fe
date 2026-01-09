@@ -243,55 +243,155 @@ export default {
     },
   },
   assignmentEditor: {
-    title: 'Soạn Bài Tập',
-    createNew: 'Tạo Bài Tập Mới',
-    editAssignment: 'Chỉnh Sửa Bài Tập',
+    // Điều hướng breadcrumb
+    breadcrumbs: {
+      assignments: 'Bài Tập',
+      createAssignment: 'Tạo Bài Tập',
+      editAssignment: 'Chỉnh Sửa Bài Tập',
+    },
 
+    // Nút hành động chính
+    actions: {
+      cancel: 'Hủy',
+      save: 'Lưu Bài Tập',
+      saving: 'Đang lưu...',
+    },
+
+    // Thông báo xác thực form
+    validation: {
+      titleRequired: 'Tiêu đề là bắt buộc',
+      subjectRequired: 'Môn học là bắt buộc',
+      topicNameRequired: 'Tên chủ đề là bắt buộc',
+    },
+
+    // Thông báo toast
+    toasts: {
+      createSuccess: 'Đã tạo bài tập thành công!',
+      updateSuccess: 'Đã cập nhật bài tập thành công!',
+      saveError: 'Không thể lưu bài tập',
+    },
+
+    // Bảng điều khiển câu hỏi
+    questions: {
+      panelTitle: 'Câu Hỏi',
+      title: 'Câu Hỏi',
+      stats: '{{count}} câu hỏi (tổng {{points}} điểm)',
+      stats_plural: '{{count}} câu hỏi (tổng {{points}} điểm)',
+      addFromBank: 'Thêm Từ Kho',
+      toolbar: {
+        addQuestion: 'Thêm Câu Hỏi',
+        generate: 'Tạo Tự Động',
+        fromBank: 'Từ Kho',
+        previewMode: 'Chế Độ Xem Trước',
+        editMode: 'Chế Độ Chỉnh Sửa',
+        tooltips: {
+          addQuestion: 'Tạo câu hỏi mới',
+          generate: 'Tạo bằng AI sắp ra mắt',
+          fromBank: 'Nhập câu hỏi từ kho câu hỏi',
+          switchToEdit: 'Chuyển tất cả sang chế độ chỉnh sửa',
+          switchToPreview: 'Chuyển tất cả sang chế độ xem trước',
+        },
+      },
+      emptyState: {
+        noQuestions: 'Chưa có câu hỏi',
+        hint: 'Nhấp "Thêm Câu Hỏi" để bắt đầu',
+        title: 'Chưa có câu hỏi nào',
+        description: 'Bắt đầu xây dựng bài tập bằng cách thêm câu hỏi từ kho câu hỏi',
+      },
+    },
+
+    // Bảng điều khiển thông tin bài tập
     metadata: {
+      panelTitle: 'Thông Tin Bài Tập',
+      edit: 'Chỉnh Sửa',
       title: 'Thông Tin Bài Tập',
       fields: {
         title: 'Tiêu Đề',
-        titlePlaceholder: 'Nhập tiêu đề bài tập...',
+        subject: 'Môn Học',
+        grade: 'Khối',
         class: 'Lớp',
-        classPlaceholder: 'Chọn lớp học',
         description: 'Mô Tả',
-        descriptionPlaceholder: 'Thêm hướng dẫn hoặc nội dung cho bài tập...',
         dueDate: 'Hạn Nộp',
+        emptyValue: '-',
+        titlePlaceholder: 'Nhập tiêu đề bài tập',
+        classPlaceholder: 'Chọn lớp',
+        descriptionPlaceholder: 'Nhập mô tả bài tập (tùy chọn)',
         dueDatePlaceholder: 'Chọn hạn nộp',
       },
     },
 
-    questions: {
-      title: 'Câu Hỏi',
-      addFromBank: 'Thêm Từ Kho Câu Hỏi',
-      emptyState: {
-        title: 'Chưa có câu hỏi',
-        description: 'Thêm câu hỏi từ kho để bắt đầu',
+    // Hộp thoại chỉnh sửa thông tin
+    metadataDialog: {
+      title: 'Chỉnh Sửa Thông Tin Bài Tập',
+      description: 'Cập nhật thông tin bài tập. Các thay đổi sẽ được lưu tự động khi bạn đóng hộp thoại này.',
+      fields: {
+        title: 'Tiêu Đề',
+        subject: 'Môn Học',
+        grade: 'Khối',
+        description: 'Mô Tả',
       },
-      stats: '{{count}} câu hỏi • {{points}} điểm',
-      stats_plural: '{{count}} câu hỏi • {{points}} điểm',
+      placeholders: {
+        title: 'Nhập tiêu đề bài tập',
+        subject: 'ví dụ: Toán, Văn, Anh',
+        grade: 'ví dụ: 10, 11, 12',
+        description: 'Mô tả bài tập (tùy chọn)',
+      },
+      done: 'Xong',
     },
 
-    actions: {
-      saveDraft: 'Lưu Nháp',
-      publish: 'Xuất Bản',
-      cancel: 'Hủy',
-      delete: 'Xóa Bài Tập',
+    // Bảng điều khiển ma trận đánh giá
+    matrix: {
+      panelTitle: 'Ma Trận Đánh Giá',
+      view: 'Xem',
+      edit: 'Chỉnh Sửa',
+      emptyState: {
+        message: 'Chưa cấu hình ma trận đánh giá',
+        create: 'Tạo',
+      },
+      preview: {
+        topics: '{{count}} chủ đề',
+        topics_plural: '{{count}} chủ đề',
+        questions: '{{count}} câu hỏi',
+        questions_plural: '{{count}} câu hỏi',
+        required: 'Yêu cầu: {{count}}',
+      },
     },
 
-    validation: {
-      titleRequired: 'Tiêu đề bài tập là bắt buộc',
-      classRequired: 'Vui lòng chọn lớp học',
-      noQuestions: 'Bài tập phải có ít nhất một câu hỏi',
-      dueDateRequired: 'Hạn nộp là bắt buộc khi xuất bản',
-      dueDatePast: 'Hạn nộp phải trong tương lai',
+    // Hộp thoại chỉnh sửa ma trận
+    matrixEditor: {
+      title: 'Chỉnh Sửa Ma Trận Đánh Giá',
+      description:
+        'Cấu hình các chủ đề và số lượng câu hỏi yêu cầu cho mỗi mức độ khó. Các thay đổi sẽ được lưu tự động.',
+      topicsLabel: 'Chủ Đề',
+      addTopic: 'Thêm Chủ Đề',
+      topicPlaceholder: 'Tên chủ đề...',
+      emptyMessage: 'Thêm chủ đề để xem ma trận',
+      done: 'Xong',
+      tableHeaders: {
+        topic: 'Chủ Đề',
+      },
     },
 
-    toast: {
-      draftSaved: 'Đã lưu bản nháp',
-      published: 'Đã xuất bản bài tập',
-      deleted: 'Đã xóa bài tập',
-      error: 'Không thể lưu bài tập',
+    // Hộp thoại xem ma trận
+    matrixView: {
+      title: 'Ma Trận Đánh Giá',
+      description: 'Xem ma trận đánh giá đầy đủ hiển thị số câu hỏi yêu cầu và hiện tại.',
+      summary: {
+        topics: '{{count}} chủ đề',
+        topics_plural: '{{count}} chủ đề',
+        questions: '{{count}} câu hỏi',
+        questions_plural: '{{count}} câu hỏi',
+      },
+      legend: {
+        valid: 'Hợp Lệ',
+        warning: 'Cảnh Báo',
+        empty: 'Trống',
+      },
+      tableHeaders: {
+        topic: 'Chủ Đề',
+        total: 'Tổng',
+      },
+      close: 'Đóng',
     },
   },
 

@@ -88,7 +88,7 @@ const useQuestionBankStore = create<QuestionBankStore>()(
           })),
 
         clearFilters: () =>
-          set({
+          set((state) => ({
             filters: {
               searchText: '',
               questionType: undefined,
@@ -96,9 +96,9 @@ const useQuestionBankStore = create<QuestionBankStore>()(
               subjectCode: undefined,
               grade: undefined,
               chapter: undefined,
-              bankType: 'personal' as BankType | undefined, // Reset to personal bank
+              bankType: state.filters.bankType, // Preserve current bank type
             },
-          }),
+          })),
 
         hasActiveFilters: () => {
           const { filters } = get();
@@ -124,8 +124,7 @@ const useQuestionBankStore = create<QuestionBankStore>()(
             hasDifficulty ||
             hasSubjectCode ||
             hasGrade ||
-            hasChapter ||
-            (filters.bankType !== undefined && filters.bankType !== 'personal')
+            hasChapter
           );
         },
 

@@ -243,55 +243,156 @@ export default {
     },
   },
   assignmentEditor: {
-    title: 'Assignment Editor',
-    createNew: 'Create New Assignment',
-    editAssignment: 'Edit Assignment',
+    // Breadcrumb navigation
+    breadcrumbs: {
+      assignments: 'Assignments',
+      createAssignment: 'Create Assignment',
+      editAssignment: 'Edit Assignment',
+    },
 
+    // Main action buttons
+    actions: {
+      cancel: 'Cancel',
+      save: 'Save Assignment',
+      saving: 'Saving...',
+    },
+
+    // Form validation messages
+    validation: {
+      titleRequired: 'Title is required',
+      subjectRequired: 'Subject is required',
+      topicNameRequired: 'Topic name is required',
+    },
+
+    // Toast notifications
+    toasts: {
+      createSuccess: 'Assignment created successfully!',
+      updateSuccess: 'Assignment updated successfully!',
+      saveError: 'Failed to save assignment',
+    },
+
+    // Questions panel and toolbar
+    questions: {
+      panelTitle: 'Questions',
+      title: 'Questions',
+      stats: '{{count}} question ({{points}} points total)',
+      stats_plural: '{{count}} questions ({{points}} points total)',
+      addFromBank: 'Add from Bank',
+      toolbar: {
+        addQuestion: 'Add Question',
+        generate: 'Generate',
+        fromBank: 'From Bank',
+        previewMode: 'Preview Mode',
+        editMode: 'Edit Mode',
+        tooltips: {
+          addQuestion: 'Create a new question',
+          generate: 'AI generation coming soon',
+          fromBank: 'Import questions from question bank',
+          switchToEdit: 'Switch all to edit mode',
+          switchToPreview: 'Switch all to preview mode',
+        },
+      },
+      emptyState: {
+        noQuestions: 'No questions yet',
+        hint: 'Click "Add Question" to get started',
+        title: 'No questions added yet',
+        description: 'Start building your assignment by adding questions from the question bank',
+      },
+    },
+
+    // Assignment metadata panel
     metadata: {
-      title: 'Assignment Details',
+      panelTitle: 'Assignment Info',
+      edit: 'Edit',
+      title: 'Assignment Metadata',
       fields: {
         title: 'Title',
-        titlePlaceholder: 'Enter assignment title...',
+        subject: 'Subject',
+        grade: 'Grade',
         class: 'Class',
-        classPlaceholder: 'Select a class',
         description: 'Description',
-        descriptionPlaceholder: 'Add instructions or context for this assignment...',
         dueDate: 'Due Date',
-        dueDatePlaceholder: 'Pick a due date',
+        emptyValue: '-',
+        titlePlaceholder: 'Enter assignment title',
+        classPlaceholder: 'Select a class',
+        descriptionPlaceholder: 'Enter assignment description (optional)',
+        dueDatePlaceholder: 'Select due date',
       },
     },
 
-    questions: {
-      title: 'Questions',
-      addFromBank: 'Add from Question Bank',
+    // Metadata edit dialog
+    metadataDialog: {
+      title: 'Edit Assignment Details',
+      description:
+        'Update the assignment metadata. Changes are saved automatically when you close this dialog.',
+      fields: {
+        title: 'Title',
+        subject: 'Subject',
+        grade: 'Grade',
+        description: 'Description',
+      },
+      placeholders: {
+        title: 'Enter assignment title',
+        subject: 'e.g., Math, English, Science',
+        grade: 'e.g., 10, 11, 12',
+        description: 'Optional assignment description',
+      },
+      done: 'Done',
+    },
+
+    // Assessment matrix panel
+    matrix: {
+      panelTitle: 'Assessment Matrix',
+      view: 'View',
+      edit: 'Edit',
       emptyState: {
-        title: 'No questions yet',
-        description: 'Add questions from the question bank to get started',
+        message: 'No assessment matrix configured',
+        create: 'Create',
       },
-      stats: '{{count}} question • {{points}} points total',
-      stats_plural: '{{count}} questions • {{points}} points total',
+      preview: {
+        topics: '{{count}} topic',
+        topics_plural: '{{count}} topics',
+        questions: '{{count}} question',
+        questions_plural: '{{count}} questions',
+        required: 'Required: {{count}}',
+      },
     },
 
-    actions: {
-      saveDraft: 'Save Draft',
-      publish: 'Publish',
-      cancel: 'Cancel',
-      delete: 'Delete Assignment',
+    // Matrix editor dialog
+    matrixEditor: {
+      title: 'Edit Assessment Matrix',
+      description:
+        'Configure topics and required question counts for each difficulty level. Changes are saved automatically.',
+      topicsLabel: 'Topics',
+      addTopic: 'Add Topic',
+      topicPlaceholder: 'Topic name...',
+      emptyMessage: 'Add topics to see the matrix',
+      done: 'Done',
+      tableHeaders: {
+        topic: 'Topic',
+      },
     },
 
-    validation: {
-      titleRequired: 'Assignment title is required',
-      classRequired: 'Please select a class',
-      noQuestions: 'Assignment must have at least one question',
-      dueDateRequired: 'Due date is required for published assignments',
-      dueDatePast: 'Due date must be in the future',
-    },
-
-    toast: {
-      draftSaved: 'Draft saved successfully',
-      published: 'Assignment published successfully',
-      deleted: 'Assignment deleted successfully',
-      error: 'Failed to save assignment',
+    // Matrix view dialog
+    matrixView: {
+      title: 'Assessment Matrix',
+      description: 'View the complete assessment matrix showing required vs current question counts.',
+      summary: {
+        topics: '{{count}} topic',
+        topics_plural: '{{count}} topics',
+        questions: '{{count}} question',
+        questions_plural: '{{count}} questions',
+      },
+      legend: {
+        valid: 'Valid',
+        warning: 'Warning',
+        empty: 'Empty',
+      },
+      tableHeaders: {
+        topic: 'Topic',
+        total: 'Total',
+      },
+      close: 'Close',
     },
   },
 

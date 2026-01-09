@@ -1,19 +1,15 @@
-import type { Difficulty, QuestionType, SubjectCode } from './constants';
+import type { Difficulty, SubjectCode } from './constants';
 import type { Question } from '@aiprimary/core';
-
-// Base question interface (for forms that don't need full question data)
-export interface BaseQuestion {
-  id: string;
-  type: QuestionType;
-  difficulty: Difficulty;
-  title: string;
-  explanation?: string;
-  points?: number;
-}
 
 // Question with topic assignment (intersection of core Question with topicId)
 export type QuestionWithTopic = Question & {
   topicId: string;
+};
+
+// Assignment Question with topic assignment
+export type AssignmentQuestionWithTopic = {
+  question: QuestionWithTopic;
+  points: number;
 };
 
 // Assignment topic
@@ -45,7 +41,7 @@ export interface AssignmentFormData {
   subject: string;
   grade?: string;
   topics: AssignmentTopic[];
-  questions: QuestionWithTopic[];
+  questions: AssignmentQuestionWithTopic[];
   matrixCells: MatrixCell[];
 }
 
@@ -58,7 +54,7 @@ export interface Assignment {
   subject: string;
   subjectCode?: SubjectCode;
   topics: AssignmentTopic[];
-  questions: QuestionWithTopic[];
+  questions: AssignmentQuestionWithTopic[];
   matrix: {
     cells: MatrixCell[];
   };
@@ -77,7 +73,7 @@ export interface CreateAssignmentRequest {
   description?: string;
   subject: string;
   topics?: AssignmentTopic[];
-  questions?: QuestionWithTopic[];
+  questions?: AssignmentQuestionWithTopic[];
   matrixCells?: MatrixCell[];
   dueDate?: string;
   totalPoints?: number;
@@ -88,6 +84,6 @@ export interface UpdateAssignmentRequest {
   title?: string;
   description?: string;
   dueDate?: string;
-  questions?: QuestionWithTopic[];
+  questions?: AssignmentQuestionWithTopic[];
   totalPoints?: number;
 }

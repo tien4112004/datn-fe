@@ -1,4 +1,5 @@
 import { useFormContext, useFieldArray } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { Plus, Trash2 } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
@@ -8,6 +9,7 @@ import { DIFFICULTY } from '../../types';
 import { generateId, createMatrixCellsForTopic } from '../../utils';
 
 export const TopicManager = () => {
+  const { t } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.matrixEditor' });
   const { control, register, watch } = useFormContext<AssignmentFormData>();
   const {
     fields: topicFields,
@@ -59,17 +61,21 @@ export const TopicManager = () => {
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <Label className="text-sm font-semibold">Topics</Label>
+        <Label className="text-sm font-semibold">{t('topicsLabel')}</Label>
         <Button type="button" size="sm" variant="outline" onClick={handleAddTopic}>
           <Plus className="mr-1 h-3 w-3" />
-          Add Topic
+          {t('addTopic')}
         </Button>
       </div>
 
       <div className="space-y-2">
         {topicFields.map((field, index) => (
           <div key={field.id} className="flex items-center gap-2">
-            <Input {...register(`topics.${index}.name`)} placeholder="Topic name..." className="text-sm" />
+            <Input
+              {...register(`topics.${index}.name`)}
+              placeholder={t('topicPlaceholder')}
+              className="text-sm"
+            />
             <Button
               type="button"
               size="sm"

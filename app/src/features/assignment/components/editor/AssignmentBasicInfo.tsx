@@ -1,21 +1,26 @@
-import { useFormContext } from 'react-hook-form';
+import { useFormContext, Controller } from 'react-hook-form';
 import { FileText } from 'lucide-react';
 import { Input } from '@/shared/components/ui/input';
 import { Label } from '@/shared/components/ui/label';
 import { Textarea } from '@/shared/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
 import {
   ColoredCard,
   ColoredCardHeader,
   ColoredCardTitle,
   ColoredCardContent,
 } from '@/shared/components/common/ColoredCard';
+import { getAllSubjects } from '@aiprimary/core';
 import type { AssignmentFormData } from '../../types';
 
 export const AssignmentBasicInfo = () => {
   const {
     register,
+    control,
     formState: { errors },
   } = useFormContext<AssignmentFormData>();
+
+  const subjects = getAllSubjects();
 
   return (
     <ColoredCard colorScheme="blue">
@@ -46,13 +51,25 @@ export const AssignmentBasicInfo = () => {
 
           <div className="space-y-2">
             <Label htmlFor="subject" className="text-sm font-semibold">
-              Subject *
+              Môn Học *
             </Label>
-            <Input
-              id="subject"
-              {...register('subject')}
-              placeholder="e.g., Math, Science, English"
-              className="border-2 transition-all focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+            <Controller
+              name="subject"
+              control={control}
+              render={({ field }) => (
+                <Select onValueChange={field.onChange} value={field.value}>
+                  <SelectTrigger className="border-2 transition-all focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
+                    <SelectValue placeholder="Chọn môn học" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {subjects.map((subject) => (
+                      <SelectItem key={subject.code} value={subject.code}>
+                        {subject.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
             />
             {errors.subject && <p className="text-sm text-red-500">{errors.subject.message}</p>}
           </div>

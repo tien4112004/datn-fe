@@ -1,5 +1,4 @@
 import { QUESTION_TYPE } from './constants';
-import type { Question } from './question';
 
 /**
  * Student answer types for each question type
@@ -23,7 +22,8 @@ export interface MultipleChoiceAnswer {
 export interface MatchingAnswer {
   questionId: string;
   type: typeof QUESTION_TYPE.MATCHING;
-  matches: Array<{ // Array of matched pairs (leftId → rightId)
+  matches: Array<{
+    // Array of matched pairs (leftId → rightId)
     leftId: string;
     rightId: string;
   }>;
@@ -46,7 +46,8 @@ export interface OpenEndedAnswer {
 export interface FillInBlankAnswer {
   questionId: string;
   type: typeof QUESTION_TYPE.FILL_IN_BLANK;
-  blanks: Array<{ // Array of blank answers (segmentId → value)
+  blanks: Array<{
+    // Array of blank answers (segmentId → value)
     segmentId: string;
     value: string;
   }>;
@@ -63,7 +64,7 @@ export type Answer = MultipleChoiceAnswer | MatchingAnswer | OpenEndedAnswer | F
  */
 export interface Grade {
   questionId: string; // ID of the question being graded
-  points: number; // Points awarded (0 to question's max points)
+  points: number; // Points awarded (0 to AssignmentQuestion's max points)
   feedback?: string; // Optional feedback from teacher
 }
 
@@ -94,7 +95,7 @@ export interface Assignment {
   classId: string; // Reference to the class this assignment belongs to
   title: string; // Assignment title
   description?: string; // Optional description (Markdown-enabled)
-  questions: Question[]; // Array of questions included in this assignment
+  questions: import('./question').AssignmentQuestion[]; // Array of questions with assigned points
   dueDate?: string; // Optional due date (ISO timestamp)
   totalPoints?: number; // Total points possible (sum of all question points)
   createdAt: string; // ISO timestamp of creation

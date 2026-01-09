@@ -1,6 +1,6 @@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useTranslation } from 'react-i18next';
-import { getSubjectByCode } from '../../../shared/types/constants/subjects';
+import { getSubjectByCode } from '@aiprimary/core';
 
 interface SubjectSelectorProps {
   subjectCodes: string[]; // Array of subject codes

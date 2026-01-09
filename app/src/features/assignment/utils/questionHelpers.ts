@@ -17,7 +17,7 @@ export const createEmptyQuestion = (
         difficulty,
         title: '',
         explanation: '',
-        points: 10,
+
         data: {
           options: [
             { id: generateId(), text: '', isCorrect: true },
@@ -33,7 +33,7 @@ export const createEmptyQuestion = (
         difficulty,
         title: '',
         explanation: '',
-        points: 10,
+
         data: {
           pairs: [
             { id: generateId(), left: '', right: '' },
@@ -49,7 +49,7 @@ export const createEmptyQuestion = (
         difficulty,
         title: '',
         explanation: '',
-        points: 10,
+
         data: {
           expectedAnswer: '',
           maxLength: 500,
@@ -63,7 +63,6 @@ export const createEmptyQuestion = (
         difficulty,
         title: '',
         explanation: '',
-        points: 10,
         data: {
           segments: [
             { id: generateId(), type: 'text', content: '' },

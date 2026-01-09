@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import {
   Dialog,
   DialogContent,
@@ -12,6 +13,7 @@ import { TopicManager } from './TopicManager';
 import { MatrixGrid } from './MatrixGrid';
 
 export const MatrixEditorDialog = () => {
+  const { t } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.matrixEditor' });
   const isMatrixEditorOpen = useAssignmentEditorStore((state) => state.isMatrixEditorOpen);
   const setMatrixEditorOpen = useAssignmentEditorStore((state) => state.setMatrixEditorOpen);
 
@@ -21,13 +23,10 @@ export const MatrixEditorDialog = () => {
 
   return (
     <Dialog open={isMatrixEditorOpen} onOpenChange={setMatrixEditorOpen}>
-      <DialogContent className="max-h-[90vh] max-w-6xl">
+      <DialogContent className="!max-h-[90vh] !max-w-6xl">
         <DialogHeader>
-          <DialogTitle>Edit Assessment Matrix</DialogTitle>
-          <DialogDescription>
-            Configure topics and required question counts for each difficulty level. Changes are saved
-            automatically.
-          </DialogDescription>
+          <DialogTitle>{t('title')}</DialogTitle>
+          <DialogDescription>{t('description')}</DialogDescription>
         </DialogHeader>
 
         <div className="flex-1 space-y-4 overflow-auto py-4">
@@ -39,7 +38,7 @@ export const MatrixEditorDialog = () => {
         </div>
 
         <DialogFooter>
-          <Button onClick={handleClose}>Done</Button>
+          <Button onClick={handleClose}>{t('done')}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

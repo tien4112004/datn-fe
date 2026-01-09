@@ -18,6 +18,29 @@ export const QUESTION_TYPE = {
 export type QuestionType = (typeof QUESTION_TYPE)[keyof typeof QUESTION_TYPE];
 
 /**
+ * Question Type Labels (Vietnamese)
+ * Display names for question types in Vietnamese
+ */
+export const QUESTION_TYPE_LABELS = {
+  multiple_choice: 'Trắc Nghiệm',
+  matching: 'Nối',
+  open_ended: 'Tự Luận',
+  fill_in_blank: 'Điền Vào Chỗ Trống',
+} as const;
+
+/**
+ * Get question type Vietnamese name from type code
+ * Returns the code itself if not found (graceful fallback)
+ *
+ * @example
+ * getQuestionTypeName('multiple_choice') // returns 'Trắc Nghiệm'
+ * getQuestionTypeName('matching') // returns 'Nối'
+ */
+export function getQuestionTypeName(type: string): string {
+  return QUESTION_TYPE_LABELS[type as QuestionType] || type;
+}
+
+/**
  * Difficulty Levels (Vietnamese education system)
  * Based on Bloom's Taxonomy adapted for Vietnamese curriculum
  */
@@ -29,6 +52,29 @@ export const DIFFICULTY = {
 } as const;
 
 export type Difficulty = (typeof DIFFICULTY)[keyof typeof DIFFICULTY];
+
+/**
+ * Difficulty Labels (Vietnamese)
+ * Display names for difficulty levels in Vietnamese education system
+ */
+export const DIFFICULTY_LABELS = {
+  nhan_biet: 'Nhận biết',
+  thong_hieu: 'Thông hiểu',
+  van_dung: 'Vận dụng',
+  van_dung_cao: 'Vận dụng cao',
+} as const;
+
+/**
+ * Get difficulty Vietnamese name from difficulty code
+ * Returns the code itself if not found (graceful fallback)
+ *
+ * @example
+ * getDifficultyName('nhan_biet') // returns 'Nhận biết'
+ * getDifficultyName('van_dung_cao') // returns 'Vận dụng cao'
+ */
+export function getDifficultyName(difficulty: string): string {
+  return DIFFICULTY_LABELS[difficulty as Difficulty] || difficulty;
+}
 
 /**
  * Subject Codes (Vietnamese education system)

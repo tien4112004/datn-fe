@@ -1,5 +1,5 @@
+import { useTranslation } from 'react-i18next';
 import { DIFFICULTY } from '@aiprimary/core';
-import { DIFFICULTY_LABELS } from '../../types';
 import type { AssignmentTopic, MatrixCell, QuestionWithTopic } from '../../types';
 import { Badge } from '@/shared/components/ui/badge';
 
@@ -16,7 +16,24 @@ const getCellStatus = (cell: MatrixCell): 'valid' | 'warning' | 'info' => {
 };
 
 export const MatrixPreviewSummary = ({ topics, matrixCells, questions }: MatrixPreviewSummaryProps) => {
+  const { t } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.matrix.preview' });
+  const { t: tDifficulty } = useTranslation('assignment', { keyPrefix: 'difficulty' });
+  const { t: tMatrix } = useTranslation('assignment', {
+    keyPrefix: 'assignmentEditor.matrixEditor.tableHeaders',
+  });
+
   const difficulties = [DIFFICULTY.EASY, DIFFICULTY.MEDIUM, DIFFICULTY.HARD, DIFFICULTY.SUPER_HARD];
+
+  const getDifficultyLabel = (difficulty: string) => {
+    const diffMap: Record<string, 'nhanBiet' | 'thongHieu' | 'vanDung' | 'vanDungCao'> = {
+      [DIFFICULTY.EASY]: 'nhanBiet',
+      [DIFFICULTY.MEDIUM]: 'thongHieu',
+      [DIFFICULTY.HARD]: 'vanDung',
+      [DIFFICULTY.SUPER_HARD]: 'vanDungCao',
+    };
+    const key = diffMap[difficulty] || 'nhanBiet';
+    return tDifficulty(key as 'nhanBiet' | 'thongHieu' | 'vanDung' | 'vanDungCao').charAt(0);
+  };
 
   const totalRequired = matrixCells.reduce((sum, cell) => sum + cell.requiredCount, 0);
   const totalCurrent = questions.length;
@@ -32,10 +49,10 @@ export const MatrixPreviewSummary = ({ topics, matrixCells, questions }: MatrixP
       {/* Summary Stats */}
       <div className="flex items-center justify-between text-xs">
         <div className="flex items-center gap-2">
-          <Badge variant="outline">{topics.length} Topics</Badge>
-          <Badge variant="outline">{totalCurrent} Questions</Badge>
+          <Badge variant="outline">{t('topics', { count: topics.length })}</Badge>
+          <Badge variant="outline">{t('questions', { count: totalCurrent })}</Badge>
         </div>
-        <div className="text-muted-foreground">Required: {totalRequired}</div>
+        <div className="text-muted-foreground">{t('required', { count: totalRequired })}</div>
       </div>
 
       {/* Compact Matrix Grid */}
@@ -43,10 +60,10 @@ export const MatrixPreviewSummary = ({ topics, matrixCells, questions }: MatrixP
         <table className="w-full border-collapse text-xs">
           <thead>
             <tr className="border-b">
-              <th className="border-r p-1 text-left font-medium">Topic</th>
+              <th className="border-r p-1 text-left font-medium">{tMatrix('topic')}</th>
               {difficulties.map((diff) => (
                 <th key={diff} className="p-1 text-center font-medium">
-                  {DIFFICULTY_LABELS[diff].charAt(0)}
+                  {getDifficultyLabel(diff)}
                 </th>
               ))}
             </tr>

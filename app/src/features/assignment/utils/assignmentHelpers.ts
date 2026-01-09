@@ -1,12 +1,12 @@
-import type { Question, Assignment } from '../types';
+import type { AssignmentQuestionWithTopic, Assignment, Question } from '../types';
 
 /**
- * Calculate total points from an array of questions
- * @param questions - Array of questions
+ * Calculate total points from an array of assignment questions
+ * @param questions - Array of assignment questions with points
  * @returns Total points sum
  */
-export function calculateTotalPoints(questions: Question[]): number {
-  return questions.reduce((sum, q) => sum + (q.points || 0), 0);
+export function calculateTotalPoints(questions: AssignmentQuestionWithTopic[]): number {
+  return questions.reduce((sum, aq) => sum + (aq.points || 0), 0);
 }
 
 /**

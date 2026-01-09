@@ -7,7 +7,6 @@ import {
   DialogFooter,
 } from '@/shared/components/ui/dialog';
 import { Button } from '@/shared/components/ui/button';
-import { Input } from '@/shared/components/ui/input';
 import { Label } from '@/shared/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
 import { useCreateQuestion, useUpdateQuestion } from '@/features/assignment/hooks/useQuestionBankApi';
@@ -24,6 +23,7 @@ import type {
   OpenEndedQuestion,
 } from '@/features/assignment/types';
 import { QUESTION_TYPE, DIFFICULTY, SUBJECT_CODE, BANK_TYPE } from '@/features/assignment/types';
+import { getAllSubjects } from '@aiprimary/core';
 import { MultipleChoiceEditing } from '@/features/assignment/components/multiple-choice/MultipleChoiceEditing';
 import { MatchingEditing } from '@/features/assignment/components/matching/MatchingEditing';
 import { FillInBlankEditing } from '@/features/assignment/components/fill-in-blank/FillInBlankEditing';
@@ -51,7 +51,6 @@ function createDefaultQuestion(type: QuestionType): QuestionBankItem {
     bankType: BANK_TYPE.PERSONAL,
     title: '',
     explanation: '',
-    points: 10,
   };
 
   switch (type) {
@@ -203,7 +202,6 @@ export function QuestionBankFormDialog({ open, onOpenChange, mode, question }: Q
         ...newQuestion,
         difficulty: questionData.difficulty,
         subjectCode: questionData.subjectCode,
-        points: questionData.points,
       });
     }
   };
@@ -253,9 +251,11 @@ export function QuestionBankFormDialog({ open, onOpenChange, mode, question }: Q
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value={SUBJECT_CODE.MATH}>Math</SelectItem>
-                      <SelectItem value={SUBJECT_CODE.VIETNAMESE}>Vietnamese</SelectItem>
-                      <SelectItem value={SUBJECT_CODE.ENGLISH}>English</SelectItem>
+                      {getAllSubjects().map((subject) => (
+                        <SelectItem key={subject.code} value={subject.code}>
+                          {subject.name}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
@@ -278,19 +278,6 @@ export function QuestionBankFormDialog({ open, onOpenChange, mode, question }: Q
                       <SelectItem value={DIFFICULTY.SUPER_HARD}>Vận dụng cao</SelectItem>
                     </SelectContent>
                   </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Points</Label>
-                  <Input
-                    type="number"
-                    value={questionData.points}
-                    onChange={(e) =>
-                      setQuestionData({ ...questionData, points: parseInt(e.target.value) || 0 })
-                    }
-                    min={1}
-                    max={100}
-                  />
                 </div>
               </div>
             </div>

@@ -5,7 +5,7 @@ import { mockAssignments } from '../api/data/assignments.data';
  * Load questions from mock data
  */
 export const loadMockQuestions = (): Question[] => {
-  return mockAssignments[0].questions;
+  return mockAssignments[0].questions.map((aq) => aq.question);
 };
 
 /**
@@ -17,7 +17,7 @@ export const validateQuestionCollection = (questions: Question[]): { valid: bool
     return { valid: false, error: 'At least one question is required' };
   }
 
-  const ids = questions.map((q) => q.id);
+  const ids = questions.map((q) => q.id || '');
   const uniqueIds = new Set(ids);
   if (ids.length !== uniqueIds.size) {
     return { valid: false, error: 'Duplicate question IDs found' };

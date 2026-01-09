@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { startOfMonth, endOfMonth, format } from 'date-fns';
 import { useClassApiService } from '../../shared/api';
-import { getSubjectsByGrade } from '../../shared/types/constants/subjects';
+import { getSubjectsByGrade } from '@aiprimary/core';
 import type {
   ScheduleCollectionRequest,
   SchedulePeriodCreateRequest,

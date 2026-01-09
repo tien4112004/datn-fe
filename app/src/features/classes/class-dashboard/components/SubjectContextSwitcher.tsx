@@ -5,7 +5,8 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { BookOpen, Clock, Target, FileText, Settings } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { type SchedulePeriod, type Lesson, getSubjectByCode } from '../../shared/types';
+import { type SchedulePeriod, type Lesson } from '../../shared/types';
+import { getSubjectByCode } from '@aiprimary/core';
 
 interface SubjectContextSwitcherProps {
   periods: SchedulePeriod[];

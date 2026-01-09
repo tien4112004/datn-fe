@@ -88,7 +88,6 @@ function parseQuestionRow(row: Record<string, string>, rowNumber: number): Quest
     difficulty,
     subjectCode,
     bankType: BANK_TYPE.PERSONAL, // IMPORTANT: Teacher imports go to personal bank
-    points: row.points ? parseInt(row.points) : 10,
     explanation: row.explanation || undefined,
   };
 
@@ -248,7 +247,7 @@ export function exportQuestionsToCSV(questions: QuestionBankItem[]): string {
   if (byType[QUESTION_TYPE.MULTIPLE_CHOICE].length > 0) {
     csvSections.push('# Multiple Choice Questions');
     csvSections.push(
-      'title,type,difficulty,subjectCode,points,option1,option2,option3,option4,correctOption,explanation'
+      'title,type,difficulty,subjectCode,option1,option2,option3,option4,correctOption,explanation'
     );
     byType[QUESTION_TYPE.MULTIPLE_CHOICE].forEach((q) => {
       if (q.type === QUESTION_TYPE.MULTIPLE_CHOICE) {
@@ -259,7 +258,6 @@ export function exportQuestionsToCSV(questions: QuestionBankItem[]): string {
             q.type,
             q.difficulty,
             q.subjectCode,
-            q.points || 10,
             ...q.data.options.map((o) => `"${o.text.replace(/"/g, '""')}"`),
             correctIndex,
             `"${(q.explanation || '').replace(/"/g, '""')}"`,
@@ -274,7 +272,7 @@ export function exportQuestionsToCSV(questions: QuestionBankItem[]): string {
   if (byType[QUESTION_TYPE.MATCHING].length > 0) {
     csvSections.push('# Matching Questions');
     csvSections.push(
-      'title,type,difficulty,subjectCode,points,pair1_left,pair1_right,pair2_left,pair2_right,pair3_left,pair3_right,explanation'
+      'title,type,difficulty,subjectCode,pair1_left,pair1_right,pair2_left,pair2_right,pair3_left,pair3_right,explanation'
     );
     byType[QUESTION_TYPE.MATCHING].forEach((q) => {
       if (q.type === QUESTION_TYPE.MATCHING) {
@@ -288,7 +286,6 @@ export function exportQuestionsToCSV(questions: QuestionBankItem[]): string {
             q.type,
             q.difficulty,
             q.subjectCode,
-            q.points || 10,
             ...pairValues,
             `"${(q.explanation || '').replace(/"/g, '""')}"`,
           ].join(',')
@@ -301,7 +298,7 @@ export function exportQuestionsToCSV(questions: QuestionBankItem[]): string {
   // Open-ended
   if (byType[QUESTION_TYPE.OPEN_ENDED].length > 0) {
     csvSections.push('# Open-ended Questions');
-    csvSections.push('title,type,difficulty,subjectCode,points,expectedAnswer,maxLength,explanation');
+    csvSections.push('title,type,difficulty,subjectCode,expectedAnswer,maxLength,explanation');
     byType[QUESTION_TYPE.OPEN_ENDED].forEach((q) => {
       if (q.type === QUESTION_TYPE.OPEN_ENDED) {
         csvSections.push(
@@ -310,7 +307,6 @@ export function exportQuestionsToCSV(questions: QuestionBankItem[]): string {
             q.type,
             q.difficulty,
             q.subjectCode,
-            q.points || 10,
             `"${(q.data.expectedAnswer || '').replace(/"/g, '""')}"`,
             q.data.maxLength || 500,
             `"${(q.explanation || '').replace(/"/g, '""')}"`,
@@ -324,7 +320,7 @@ export function exportQuestionsToCSV(questions: QuestionBankItem[]): string {
   // Fill in Blank
   if (byType[QUESTION_TYPE.FILL_IN_BLANK].length > 0) {
     csvSections.push('# Fill in Blank Questions');
-    csvSections.push('title,type,difficulty,subjectCode,points,text,blanks,caseSensitive,explanation');
+    csvSections.push('title,type,difficulty,subjectCode,text,blanks,caseSensitive,explanation');
     byType[QUESTION_TYPE.FILL_IN_BLANK].forEach((q) => {
       if (q.type === QUESTION_TYPE.FILL_IN_BLANK) {
         const text = q.data.segments.map((s) => (s.type === 'blank' ? '{blank}' : s.content)).join('');
@@ -338,7 +334,6 @@ export function exportQuestionsToCSV(questions: QuestionBankItem[]): string {
             q.type,
             q.difficulty,
             q.subjectCode,
-            q.points || 10,
             `"${text.replace(/"/g, '""')}"`,
             `"${blanks}"`,
             q.data.caseSensitive || false,

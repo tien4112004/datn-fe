@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import type { QuestionWithTopic, MatrixCell, AssignmentTopic } from '../types';
+import type { AssignmentQuestionWithTopic, MatrixCell, AssignmentTopic } from '../types';
 import { VIEW_MODE, type ViewMode } from '@aiprimary/core';
 
 interface AssignmentEditorState {
@@ -25,14 +25,14 @@ interface AssignmentEditorState {
 
   // Question operations (these will be used by components to update form)
   reorderQuestions: (
-    questions: QuestionWithTopic[],
+    questions: AssignmentQuestionWithTopic[],
     oldIndex: number,
     newIndex: number
-  ) => QuestionWithTopic[];
+  ) => AssignmentQuestionWithTopic[];
 
   // Matrix sync helper
   syncMatrixCounts: (
-    questions: QuestionWithTopic[],
+    questions: AssignmentQuestionWithTopic[],
     topics: AssignmentTopic[],
     matrixCells: MatrixCell[]
   ) => MatrixCell[];
@@ -83,9 +83,9 @@ export const useAssignmentEditorStore = create<AssignmentEditorState>()(
         // Count questions by topic × difficulty
         const counts = new Map<string, number>();
 
-        questions.forEach((question) => {
-          if (question.topicId) {
-            const key = `${question.topicId}-${question.difficulty}`;
+        questions.forEach((aq) => {
+          if (aq.question.topicId) {
+            const key = `${aq.question.topicId}-${aq.question.difficulty}`;
             counts.set(key, (counts.get(key) || 0) + 1);
           }
         });

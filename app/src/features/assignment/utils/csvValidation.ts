@@ -67,14 +67,6 @@ export function validateQuestionBankCSV(questions: QuestionBankItem[]): Validati
       });
     }
 
-    if (question.points && (question.points < 1 || question.points > 100)) {
-      warnings.push({
-        row: rowNumber,
-        field: 'points',
-        message: 'Points should be between 1 and 100',
-      });
-    }
-
     // Type-specific validation
     switch (question.type) {
       case QUESTION_TYPE.MULTIPLE_CHOICE:

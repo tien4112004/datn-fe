@@ -18,7 +18,7 @@ export const QuestionsList = () => {
   const questions = watch('questions');
   const reorderQuestions = useAssignmentEditorStore((state) => state.reorderQuestions);
 
-  const items = useMemo(() => questions.map((field) => `question-${field.id}`), [questions]);
+  const items = useMemo(() => questions.map((field) => `question-${field.question.id}`), [questions]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -41,8 +41,8 @@ export const QuestionsList = () => {
       const overId = over.id as string;
 
       if (activeId.startsWith('question-') && overId.startsWith('question-')) {
-        const activeIndex = questions.findIndex((q) => `question-${q.id}` === activeId);
-        const overIndex = questions.findIndex((q) => `question-${q.id}` === overId);
+        const activeIndex = questions.findIndex((q) => `question-${q.question.id}` === activeId);
+        const overIndex = questions.findIndex((q) => `question-${q.question.id}` === overId);
 
         if (activeIndex !== -1 && overIndex !== -1) {
           const reordered = reorderQuestions(questions, activeIndex, overIndex);
@@ -70,7 +70,7 @@ export const QuestionsList = () => {
         <SortableContext items={items} strategy={verticalListSortingStrategy}>
           <div className="space-y-4">
             {questions.map((field, index) => (
-              <DraggableQuestionCard key={field.id} id={field.id} index={index} />
+              <DraggableQuestionCard key={field.question.id} id={field.question.id} index={index} />
             ))}
           </div>
         </SortableContext>

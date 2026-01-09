@@ -11,7 +11,7 @@ import { cn } from '@/shared/lib/utils';
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import type { SchedulePeriod, Lesson } from '../../../shared/types';
-import { getSubjectByCode } from '../../../shared/types/constants/subjects';
+import { getSubjectByCode } from '@aiprimary/core';
 
 interface ScheduleLessonLinkerProps {
   classId: string;

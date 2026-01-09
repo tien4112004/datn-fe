@@ -4,9 +4,10 @@ import { Label } from '@/components/ui/label';
 import { Card } from '@/components/ui/card';
 import { X } from 'lucide-react';
 import type { QuestionBankParams } from '@/types/question-bank';
-import { QUESTION_TYPE, DIFFICULTY } from '@/types/question-bank';
+import { QUESTION_TYPE, DIFFICULTY, DIFFICULTY_LABELS } from '@/types/question-bank';
 import { useQuestionBankSubjects, useQuestionBankGrades, useQuestionBankChapters } from '@/hooks/useApi';
 import { useMemo, useEffect } from 'react';
+import { getSubjectName } from '@aiprimary/core';
 
 interface QuestionBankFiltersProps {
   filters: QuestionBankParams;
@@ -125,7 +126,7 @@ export function QuestionBankFilters({ filters, onChange }: QuestionBankFiltersPr
                 handleCheckboxChange('difficulty', DIFFICULTY.EASY, checked as boolean)
               }
             />
-            <span className="text-sm">Nhận biết (Knowledge)</span>
+            <span className="text-sm">{DIFFICULTY_LABELS.nhan_biet}</span>
           </label>
           <label className="flex cursor-pointer items-center gap-2">
             <Checkbox
@@ -134,7 +135,7 @@ export function QuestionBankFilters({ filters, onChange }: QuestionBankFiltersPr
                 handleCheckboxChange('difficulty', DIFFICULTY.MEDIUM, checked as boolean)
               }
             />
-            <span className="text-sm">Thông hiểu (Comprehension)</span>
+            <span className="text-sm">{DIFFICULTY_LABELS.thong_hieu}</span>
           </label>
           <label className="flex cursor-pointer items-center gap-2">
             <Checkbox
@@ -143,7 +144,7 @@ export function QuestionBankFilters({ filters, onChange }: QuestionBankFiltersPr
                 handleCheckboxChange('difficulty', DIFFICULTY.HARD, checked as boolean)
               }
             />
-            <span className="text-sm">Vận dụng (Application)</span>
+            <span className="text-sm">{DIFFICULTY_LABELS.van_dung}</span>
           </label>
           <label className="flex cursor-pointer items-center gap-2">
             <Checkbox
@@ -154,7 +155,7 @@ export function QuestionBankFilters({ filters, onChange }: QuestionBankFiltersPr
                 handleCheckboxChange('difficulty', DIFFICULTY.SUPER_HARD, checked as boolean)
               }
             />
-            <span className="text-sm">Vận dụng cao (Advanced)</span>
+            <span className="text-sm">{DIFFICULTY_LABELS.van_dung_cao}</span>
           </label>
         </div>
       </div>
@@ -171,7 +172,7 @@ export function QuestionBankFilters({ filters, onChange }: QuestionBankFiltersPr
                   handleCheckboxChange('subjectCode', subject, checked as boolean)
                 }
               />
-              <span className="text-sm">{subject}</span>
+              <span className="text-sm">{getSubjectName(subject)}</span>
             </label>
           ))}
         </div>

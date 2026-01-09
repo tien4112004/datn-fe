@@ -13,7 +13,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/shared/lib/utils';
 import type { Lesson, LessonStatus, LearningObjective, LessonResource } from '../../types';
-import { getSubjectByCode } from '../../../shared/types';
+import { getSubjectByCode } from '@aiprimary/core';
 
 interface LessonCardProps {
   lesson: Lesson;

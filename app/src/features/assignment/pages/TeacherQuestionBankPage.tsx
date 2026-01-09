@@ -12,9 +12,7 @@ import {
 import useQuestionBankStore from '@/features/assignment/stores/questionBankStore';
 import type { QuestionBankItem } from '@/features/assignment/types';
 import { BANK_TYPE } from '@/features/assignment/types';
-import { Card, CardContent, CardHeader } from '@/shared/components/ui/card';
 import { Button } from '@/shared/components/ui/button';
-import { Input } from '@/shared/components/ui/input';
 import { Checkbox } from '@/shared/components/ui/checkbox';
 import { Badge } from '@/shared/components/ui/badge';
 import {
@@ -23,8 +21,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/shared/components/ui/dropdown-menu';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/shared/components/ui/sheet';
-import { Plus, Upload, Download, Search, MoreVertical, Trash2, Copy, FileEdit, Filter } from 'lucide-react';
+import { Plus, Upload, Download, MoreVertical, Trash2, Copy, FileEdit } from 'lucide-react';
 import { toast } from 'sonner';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 import DataTable from '@/shared/components/table/DataTable';
@@ -34,6 +31,7 @@ import {
   QuestionContentPreview,
   QuestionBankFilters,
 } from '@/features/assignment/components/question-bank';
+import { getSubjectName, getQuestionTypeName, getDifficultyName } from '@aiprimary/core';
 
 const columnHelper = createColumnHelper<QuestionBankItem>();
 
@@ -44,7 +42,6 @@ export function TeacherQuestionBankPage() {
   const navigate = useNavigate();
 
   // State
-  const [searchQuery, setSearchQuery] = useState('');
   const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({});
   const [pagination, setPagination] = useState({
     pageIndex: 0,
@@ -62,7 +59,6 @@ export function TeacherQuestionBankPage() {
     page: pagination.pageIndex + 1,
     limit: pagination.pageSize,
     ...filters,
-    searchText: searchQuery,
   });
 
   const deleteQuestionsMutation = useDeleteQuestions();
@@ -76,37 +72,6 @@ export function TeacherQuestionBankPage() {
   // Permission helpers
   const canEdit = (q: QuestionBankItem) => q.bankType === BANK_TYPE.PERSONAL;
   const canDelete = (q: QuestionBankItem) => q.bankType === BANK_TYPE.PERSONAL;
-
-  // Localization helpers
-  const getDifficultyLabel = (difficulty: string) => {
-    const difficultyMap: Record<string, string> = {
-      nhan_biet: tCommon('difficulty.nhanBiet'),
-      thong_hieu: tCommon('difficulty.thongHieu'),
-      van_dung: tCommon('difficulty.vanDung'),
-      van_dung_cao: tCommon('difficulty.vanDungCao'),
-    };
-    return difficultyMap[difficulty] || difficulty;
-  };
-
-  const getSubjectLabel = (subjectCode: string) => {
-    // Map subject codes (T, TV, TA) to i18n keys
-    const subjectMap: Record<string, string> = {
-      T: tCommon('questionBank.subjects.toan'),
-      TV: tCommon('questionBank.subjects.tiengViet'),
-      TA: tCommon('questionBank.subjects.tiengAnh'),
-    };
-    return subjectMap[subjectCode] || subjectCode;
-  };
-
-  const getQuestionTypeLabel = (type: string) => {
-    const typeMap: Record<string, string> = {
-      multiple_choice: tCommon('questionTypes.multipleChoice'),
-      matching: tCommon('questionTypes.matching'),
-      open_ended: tCommon('questionTypes.openEnded'),
-      fill_in_blank: tCommon('questionTypes.fillInBlank'),
-    };
-    return typeMap[type] || type;
-  };
 
   // Get selected question IDs
   const selectedQuestionIds = Object.keys(rowSelection)
@@ -233,23 +198,18 @@ export function TeacherQuestionBankPage() {
       }),
       columnHelper.accessor('type', {
         header: t('table.columns.questionType'),
-        cell: (info) => <Badge variant="outline">{getQuestionTypeLabel(info.getValue())}</Badge>,
+        cell: (info) => <Badge variant="outline">{getQuestionTypeName(info.getValue())}</Badge>,
         size: 150,
       }),
       columnHelper.accessor('subjectCode', {
         header: t('table.columns.subject'),
-        cell: (info) => <Badge variant="secondary">{getSubjectLabel(info.getValue())}</Badge>,
+        cell: (info) => <Badge variant="secondary">{getSubjectName(info.getValue())}</Badge>,
         size: 120,
       }),
       columnHelper.accessor('difficulty', {
         header: t('table.columns.difficulty'),
-        cell: (info) => <Badge variant="secondary">{getDifficultyLabel(info.getValue())}</Badge>,
+        cell: (info) => <Badge variant="secondary">{getDifficultyName(info.getValue())}</Badge>,
         size: 140,
-      }),
-      columnHelper.accessor('points', {
-        header: t('table.columns.points'),
-        cell: (info) => info.getValue() || 10,
-        size: 80,
       }),
       columnHelper.display({
         id: 'actions',
@@ -316,134 +276,91 @@ export function TeacherQuestionBankPage() {
   });
 
   return (
-    <div className="flex h-full">
-      {/* Sidebar - Filters (Desktop) */}
-      <aside className="hidden w-72 flex-shrink-0 border-r md:block">
-        <div className="sticky top-0 h-screen overflow-y-auto p-4">
-          <h3 className="mb-4 text-lg font-semibold">Filters</h3>
-          <QuestionBankFilters />
+    <div className="flex h-full flex-col overflow-auto">
+      <div className="mx-auto w-full max-w-7xl space-y-6 px-8 py-12">
+        {/* Header */}
+        <div className="mb-8 space-y-1">
+          <h1 className="scroll-m-20 text-3xl font-semibold tracking-tight">{t('title')}</h1>
+          <p className="text-muted-foreground text-sm">{t('subtitle')}</p>
         </div>
-      </aside>
 
-      {/* Main Content */}
-      <div className="flex flex-1 flex-col overflow-auto">
-        <div className="mx-auto w-full max-w-7xl space-y-6 px-8 py-12">
-          {/* Header */}
-          <div className="mb-8 space-y-1">
-            <h1 className="scroll-m-20 text-3xl font-semibold tracking-tight">{t('title')}</h1>
-            <p className="text-muted-foreground text-sm">{t('subtitle')}</p>
-          </div>
-
-          {/* Mobile Filter Sheet */}
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="outline" size="sm" className="gap-2 md:hidden">
-                <Filter className="h-4 w-4" />
-                Filters
+        {/* Filters */}
+        <QuestionBankFilters
+          orientation="horizontal"
+          RightComponent={
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleExport}
+                disabled={exportMutation.isPending}
+                className="gap-2"
+              >
+                <Download className="h-4 w-4" />
+                {t('actions.export')}
               </Button>
-            </SheetTrigger>
-            <SheetContent side="left">
-              <SheetHeader>
-                <SheetTitle>Filters</SheetTitle>
-              </SheetHeader>
-              <div className="mt-4">
-                <QuestionBankFilters />
-              </div>
-            </SheetContent>
-          </Sheet>
 
-          {/* Action Bar */}
-          <Card className="rounded-2xl border-2 shadow-md">
-            <CardHeader className="py-4">
-              <div className="flex items-center justify-between gap-4">
-                {/* Search */}
-                <div className="relative max-w-md flex-1">
-                  <Search className="text-muted-foreground absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" />
-                  <Input
-                    placeholder="Search questions..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-9"
-                  />
-                </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsImportDialogOpen(true)}
+                className="gap-2"
+              >
+                <Upload className="h-4 w-4" />
+                {t('actions.import')}
+              </Button>
 
-                {/* Actions */}
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleExport}
-                    disabled={exportMutation.isPending}
-                    className="gap-2"
-                  >
-                    <Download className="h-4 w-4" />
-                    {t('actions.export')}
-                  </Button>
+              <Button size="sm" onClick={() => navigate('/question-bank/create')} className="gap-2">
+                <Plus className="h-4 w-4" />
+                {t('actions.create')}
+              </Button>
+            </div>
+          }
+        />
 
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setIsImportDialogOpen(true)}
-                    className="gap-2"
-                  >
-                    <Upload className="h-4 w-4" />
-                    {t('actions.import')}
-                  </Button>
+        {/* Action Bar */}
+        <div className="space-y-4">
+          {/* Bulk Actions */}
+          {selectedQuestionIds.length > 0 && (
+            <div className="bg-muted flex items-center justify-between rounded-md p-3">
+              <span className="text-sm font-medium">{selectedQuestionIds.length} question(s) selected</span>
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={handleBulkDelete}
+                disabled={deleteQuestionsMutation.isPending}
+                className="gap-2"
+              >
+                <Trash2 className="h-4 w-4" />
+                {t('actions.deleteSelected')}
+              </Button>
+            </div>
+          )}
 
-                  <Button size="sm" onClick={() => navigate('/question-bank/create')} className="gap-2">
-                    <Plus className="h-4 w-4" />
-                    {t('actions.create')}
-                  </Button>
-                </div>
-              </div>
-            </CardHeader>
-
-            <CardContent>
-              {/* Bulk Actions */}
-              {selectedQuestionIds.length > 0 && (
-                <div className="bg-muted mb-4 flex items-center justify-between rounded-md p-3">
-                  <span className="text-sm font-medium">
-                    {selectedQuestionIds.length} question(s) selected
-                  </span>
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={handleBulkDelete}
-                    disabled={deleteQuestionsMutation.isPending}
-                    className="gap-2"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                    {t('actions.deleteSelected')}
-                  </Button>
-                </div>
-              )}
-
-              {/* DataTable */}
-              <DataTable
-                table={table}
-                isLoading={isLoading}
-                emptyState={
-                  <div className="text-muted-foreground py-8 text-center">{t('table.noQuestions')}</div>
-                }
-                showPagination={true}
-              />
-            </CardContent>
-          </Card>
-
-          {/* Dialogs */}
-          <QuestionBankImportDialog open={isImportDialogOpen} onClose={() => setIsImportDialogOpen(false)} />
-
-          <CopyToPersonalDialog
-            open={isCopyDialogOpen}
-            onClose={() => {
-              setIsCopyDialogOpen(false);
-              setCopyingQuestion(null);
-            }}
-            onConfirm={handleCopyConfirm}
-            question={copyingQuestion}
-            isLoading={copyToPersonalMutation.isPending}
+          {/* DataTable */}
+          <DataTable
+            table={table}
+            isLoading={isLoading}
+            emptyState={
+              <div className="text-muted-foreground py-8 text-center">{t('table.noQuestions')}</div>
+            }
+            showPagination={true}
           />
         </div>
+
+        {/* Dialogs */}
+        <QuestionBankImportDialog open={isImportDialogOpen} onClose={() => setIsImportDialogOpen(false)} />
+
+        <CopyToPersonalDialog
+          open={isCopyDialogOpen}
+          onClose={() => {
+            setIsCopyDialogOpen(false);
+            setCopyingQuestion(null);
+          }}
+          onConfirm={handleCopyConfirm}
+          question={copyingQuestion}
+          isLoading={copyToPersonalMutation.isPending}
+        />
       </div>
     </div>
   );

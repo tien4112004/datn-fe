@@ -3,6 +3,7 @@
  *
  * Core types for the educational assessment system including:
  * - Questions (multiple choice, matching, open-ended, fill-in-blank)
+ * - Assignment questions with points
  * - Answers and submissions
  * - Question banks
  * - Exam matrices (table of specifications)
@@ -10,7 +11,7 @@
  *
  * @example
  * ```typescript
- * import { Question, DIFFICULTY, AssessmentMatrix } from '@aiprimary/core/assessment';
+ * import { Question, AssignmentQuestion, DIFFICULTY, AssessmentMatrix } from '@aiprimary/core/assessment';
  * ```
  */
 

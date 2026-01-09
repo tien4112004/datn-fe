@@ -40,7 +40,6 @@ export default class MindmapRealApiService implements MindmapApiService {
   }
 
   async getMindmapById(id: string): Promise<MindmapResponse> {
-    console.info(`[EMBED] getMindmapById ${id}`);
     const response = await api.get<ApiResponse<MindmapResponse>>(`${this.baseUrl}/api/mindmaps/${id}`);
     return response.data.data;
   }

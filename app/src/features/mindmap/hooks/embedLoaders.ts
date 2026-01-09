@@ -18,10 +18,6 @@ export const getPublicMindmapById = async ({
   }
 
   const mindmapApiService = getMindmapApiService();
-
-  const ourStorage =window.localStorage;
-  console.info(`[EMBED] getPublicMindmapById ${ourStorage.getItem('access_token')}`);
-
   const mindmap = await mindmapApiService.getMindmapById(params.id);
 
   if (!mindmap) {

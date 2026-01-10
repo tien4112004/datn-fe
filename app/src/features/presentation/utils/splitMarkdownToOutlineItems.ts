@@ -7,9 +7,8 @@ export default function splitMarkdownToOutlineItems(markdown: string): OutlineIt
     .replace(/```/, '')
     .trim();
 
-  // Split the markdown into sections based on headings (## and above)
-  const sections = cleanMarkdown.split(/(?=^#{2,}\s)/m).filter(Boolean);
-
+  // Split the markdown into sections based on '---' delimiters
+  const sections = cleanMarkdown.split(/---+/).filter(Boolean);
   const items = sections.map((section, index) => ({
     id: index.toString(),
     htmlContent: marked.parse(section.trim(), {

@@ -14,12 +14,12 @@ export default class AuthRealApiService implements AuthApiService {
   }
 
   async login(data: LoginRequest): Promise<LoginResponse> {
-    const response = await api.post<LoginResponse>(`${this.baseUrl}/api/auth/signin`, data);
+    const response = await api.post<LoginResponse>(`${this.baseUrl}/api/admin/auth/signin`, data);
     return response.data;
   }
 
   async logout(): Promise<void> {
-    await api.post(`${this.baseUrl}/api/auth/logout`);
+    await api.post(`${this.baseUrl}/api/admin/auth/logout`);
   }
 
   async getProfile(): Promise<User> {

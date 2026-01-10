@@ -32,18 +32,6 @@ const ProjectListPage = () => {
       content: viewMode === 'grid' ? <PresentationGrid /> : <PresentationTable />,
     },
     {
-      key: 'document',
-      value: 'document',
-      label: t('resources.document'),
-      content: <div className="text-muted-foreground py-8 text-center">Document resource coming soon...</div>,
-    },
-    {
-      key: 'video',
-      value: 'video',
-      label: t('resources.video'),
-      content: <div className="text-muted-foreground py-8 text-center">Video resource coming soon...</div>,
-    },
-    {
       key: 'mindmap',
       value: 'mindmap',
       label: t('resources.mindmap'),

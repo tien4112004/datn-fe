@@ -14,9 +14,10 @@ import { ModelSelect } from '@/features/model/components/ModelSelect';
 import { MODEL_TYPES, useModels } from '@/features/model';
 import type { UnifiedFormData } from '../../contexts/PresentationFormContext';
 import type { ArtStyle } from '@aiprimary/core';
-import { useCallback, useState, useEffect } from 'react';
+import { useCallback, useState, useEffect, useMemo } from 'react';
 import useOutlineStore from '../../stores/useOutlineStore';
-import { useSlideThemes } from '../../hooks';
+import { useSlideThemes, useRecentSlideThemes } from '../../hooks';
+import { getRecentThemeIds, addRecentThemeId } from '../../utils/recentThemes';
 import { useArtStyles } from '@/features/image/hooks';
 import { ThemePreviewCard } from './ThemePreviewCard';
 import ThemeGalleryDialog from './ThemeGalleryDialog';
@@ -41,19 +42,68 @@ const ThemeSection = ({ selectedTheme, onThemeSelect, disabled = false }: ThemeS
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [displayedThemes, setDisplayedThemes] = useState<SlideTheme[]>([]);
 
+  // Get recent theme IDs from localStorage
+  const recentThemeIds = useMemo(() => getRecentThemeIds(), []);
+
+  // Fetch recent themes by IDs
+  const { recentThemes, isLoading: isLoadingRecent } = useRecentSlideThemes(recentThemeIds);
+
+  // Merge and deduplicate themes
   useEffect(() => {
     if (themes.length > 0) {
-      setDisplayedThemes(themes.slice(0, 6));
-    }
-  }, [themes]);
+      // Create a Set of recent theme IDs for O(1) lookup
+      const recentThemeIdSet = new Set(recentThemes.map((t) => t.id));
 
-  const handleThemeSelectFromGallery = useCallback(
+      // Filter out recent themes from main theme list to avoid duplicates
+      const otherThemes = themes.filter((theme) => !recentThemeIdSet.has(theme.id));
+
+      // Merge: recent themes first, then others
+      const mergedThemes = [...recentThemes, ...otherThemes];
+
+      // Take first 6 for display
+      const displayThemes = mergedThemes.slice(0, 6);
+
+      // Only update if the themes actually changed
+      setDisplayedThemes((prev) => {
+        if (prev.length !== displayThemes.length) return displayThemes;
+        if (prev.every((theme, idx) => theme.id === displayThemes[idx]?.id)) return prev;
+        return displayThemes;
+      });
+    } else if (!isLoading && !isLoadingRecent) {
+      // Clear displayed themes if no themes loaded
+      setDisplayedThemes([]);
+    }
+  }, [themes, recentThemes, isLoading, isLoadingRecent]);
+
+  const handleThemeSelect = useCallback(
     (theme: SlideTheme) => {
-      setDisplayedThemes((prev) => [theme, ...prev.filter((t) => t.id !== theme.id)].slice(0, 6));
+      // Save to recent themes
+      if (theme.id) {
+        addRecentThemeId(theme.id);
+      }
+
+      // Update form
       onThemeSelect(theme);
     },
     [onThemeSelect]
   );
+
+  const handleThemeSelectFromGallery = useCallback(
+    (theme: SlideTheme) => {
+      // Save to recent themes
+      if (theme.id) {
+        addRecentThemeId(theme.id);
+      }
+
+      // Move selected theme to first position in displayed themes
+      setDisplayedThemes((prev) => [theme, ...prev.filter((t) => t.id !== theme.id)].slice(0, 6));
+
+      onThemeSelect(theme);
+    },
+    [onThemeSelect]
+  );
+
+  const isAnyLoading = isLoading || isLoadingRecent;
 
   return (
     <>
@@ -66,7 +116,7 @@ const ThemeSection = ({ selectedTheme, onThemeSelect, disabled = false }: ThemeS
             size="sm"
             className="shadow-none"
             type="button"
-            disabled={disabled || isLoading}
+            disabled={disabled || isAnyLoading}
             onClick={() => setGalleryOpen(true)}
           >
             <Palette className="h-4 w-4" />
@@ -75,7 +125,7 @@ const ThemeSection = ({ selectedTheme, onThemeSelect, disabled = false }: ThemeS
         </CardAction>
       </CardHeader>
       <CardContent className="flex flex-col gap-2">
-        {isLoading ? (
+        {isAnyLoading ? (
           <div className="grid grid-cols-3 gap-4">
             {Array.from({ length: 6 }).map((_, index) => (
               <div key={index} className="bg-muted h-24 animate-pulse rounded-lg" />
@@ -91,7 +141,7 @@ const ThemeSection = ({ selectedTheme, onThemeSelect, disabled = false }: ThemeS
                   disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer hover:scale-105',
                   selectedTheme?.id === theme.id && 'rounded-lg ring-2 ring-blue-500'
                 )}
-                onClick={() => !disabled && onThemeSelect(theme)}
+                onClick={() => !disabled && handleThemeSelect(theme)}
               >
                 <ThemePreviewCard
                   theme={theme}

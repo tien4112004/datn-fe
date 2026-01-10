@@ -6,7 +6,7 @@ import {
   type UseQueryResult,
 } from '@tanstack/react-query';
 import type { SortingState, PaginationState, Updater } from '@tanstack/react-table';
-import { usePresentationApiService } from '../api';
+import { usePresentationApiService, getPresentationApiService } from '../api';
 import { useImageApiService } from '@/features/image/api';
 import { useEffect, useState } from 'react';
 import type { Presentation, PresentationGenerateDraftRequest, UpdatePresentationRequest } from '../types';
@@ -279,29 +279,59 @@ export const useGeneratePresentationImage = (id: string) => {
 };
 
 export const useSlideThemes = () => {
-  const apiService = usePresentationApiService();
-
   const { data: themes, ...query } = useQuery<SlideTheme[]>({
-    queryKey: [apiService.getType(), 'slideThemes'],
-    queryFn: async () => apiService.getSlideThemes(),
+    queryKey: ['slideThemes'],
+    queryFn: async () => {
+      const apiService = getPresentationApiService();
+      return apiService.getSlideThemes();
+    },
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+    retry: 2,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 3000),
   });
 
   return {
-    themes: themes || [],
+    themes: themes ?? [],
     defaultTheme: themes?.find((t) => t.id === 'default') || themes?.[0],
     ...query,
   };
 };
 
-const PAGE_SIZE = 24;
+export const useRecentSlideThemes = (themeIds: string[]) => {
+  const { data: themes, ...query } = useQuery<SlideTheme[]>({
+    queryKey: ['slideThemes', 'recent', themeIds],
+    queryFn: async () => {
+      if (themeIds.length === 0) {
+        return [];
+      }
+      try {
+        const apiService = getPresentationApiService();
+        return await apiService.getSlideThemesByIds(themeIds);
+      } catch (error) {
+        console.warn('Failed to fetch recent themes by IDs:', error);
+        // Return empty array on error to prevent cascading failures
+        return [];
+      }
+    },
+    enabled: themeIds.length > 0,
+    staleTime: 10 * 60 * 1000, // Cache for 10 minutes (longer than regular themes)
+    gcTime: 30 * 60 * 1000, // Keep in cache for 30 minutes
+    retry: false, // Don't retry if specific IDs fail
+  });
+
+  return {
+    recentThemes: themes ?? [],
+    ...query,
+  };
+};
+
+const PAGE_SIZE = 12;
 
 export const useInfiniteSlideThemes = () => {
-  const apiService = usePresentationApiService();
-
   const { data, ...query } = useInfiniteQuery({
-    queryKey: [apiService.getType(), 'slideThemes', 'infinite'],
+    queryKey: ['slideThemes', 'infinite'],
     queryFn: async ({ pageParam = 0 }): Promise<SlideTheme[]> => {
+      const apiService = getPresentationApiService();
       const themes = await apiService.getSlideThemes({
         page: pageParam as number,
         pageSize: PAGE_SIZE,
@@ -328,11 +358,12 @@ export const useInfiniteSlideThemes = () => {
 };
 
 export const useSlideTemplates = () => {
-  const apiService = usePresentationApiService();
-
   const { data: templates, ...query } = useQuery<SlideTemplate[]>({
-    queryKey: [apiService.getType(), 'slideTemplates'],
-    queryFn: async () => apiService.getSlideTemplates(),
+    queryKey: ['slideTemplates'],
+    queryFn: async () => {
+      const apiService = getPresentationApiService();
+      return apiService.getSlideTemplates();
+    },
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
   });
 

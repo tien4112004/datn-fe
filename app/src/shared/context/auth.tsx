@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import type { User, AuthContextType } from '../types/auth';
+import { useProfile } from '@/features/auth/hooks/useAuth';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -10,29 +11,26 @@ const USER_KEY = 'user';
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isInitializing, setIsInitializing] = useState(true);
 
-  // Initialize auth state from localStorage on mount
+  // Always fetch profile on mount to check authentication status
+  const { data: profileData, isLoading: isLoadingProfile } = useProfile(true);
+
+  // Update user when profile data changes or loading completes
   useEffect(() => {
-    const initializeAuth = () => {
-      try {
-        const storedUser = localStorage.getItem(USER_KEY);
+    if (!isLoadingProfile) {
+      setIsInitializing(false);
 
-        // If we have user data, assume authenticated (cookies will be sent automatically)
-        if (storedUser) {
-          setUser(JSON.parse(storedUser));
-        }
-      } catch (error) {
-        console.error('Failed to initialize auth:', error);
-        // Clear corrupted data
+      if (profileData) {
+        setUser(profileData);
+        localStorage.setItem(USER_KEY, JSON.stringify(profileData));
+      } else {
+        // No profile data means user is not authenticated
+        setUser(null);
         localStorage.removeItem(USER_KEY);
-      } finally {
-        setIsLoading(false);
       }
-    };
-
-    initializeAuth();
-  }, []);
+    }
+  }, [profileData, isLoadingProfile]);
 
   // Listen for unauthorized events from API (401 responses)
   useEffect(() => {
@@ -59,7 +57,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const value: AuthContextType = {
     user,
     isAuthenticated: Boolean(user),
-    isLoading,
+    isLoading: isInitializing || isLoadingProfile,
     logout,
     setUser,
   };

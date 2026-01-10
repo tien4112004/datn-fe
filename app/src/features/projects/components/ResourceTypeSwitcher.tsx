@@ -1,6 +1,6 @@
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Presentation, Video, Image, FileText, Brain } from 'lucide-react';
+import { Presentation, Image, Brain } from 'lucide-react';
 import { Card, CardContent, CardTitle } from '@/shared/components/ui/card';
 
 export interface ResourceTypeSwitcherProps {
@@ -14,9 +14,7 @@ const ResourceTypeSwitcher = ({ className }: ResourceTypeSwitcherProps) => {
 
   const resources = [
     { type: 'presentation', label: t('resources.presentation'), icon: Presentation },
-    { type: 'video', label: t('resources.video'), icon: Video },
     { type: 'image', label: t('resources.image'), icon: Image },
-    { type: 'document', label: t('resources.document'), icon: FileText },
     { type: 'mindmap', label: t('resources.mindmap'), icon: Brain },
   ];
 

@@ -75,5 +75,6 @@ export interface PresentationApiService extends Service {
   updatePresentation(id: string, data: UpdatePresentationRequest): Promise<Presentation>;
   deletePresentation(id: string): Promise<void>;
   getSlideThemes(params?: GetSlideThemesParams): Promise<SlideTheme[]>;
+  getSlideThemesByIds(ids: string[]): Promise<SlideTheme[]>;
   getSlideTemplates(): Promise<SlideTemplate[]>;
 }

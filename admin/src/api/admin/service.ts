@@ -6,6 +6,7 @@ import type {
   FAQPost,
   Pagination,
   PaginationParams,
+  UserQueryParams,
   SlideTemplateParams,
 } from '@/types/api';
 import type { Model, ModelPatchData } from '@aiprimary/core';
@@ -218,13 +219,13 @@ export default class AdminRealApiService implements AdminApiService {
   }
 
   // Users
-  async getUsers(params?: PaginationParams): Promise<ApiResponse<User[]>> {
-    const response = await api.get<ApiResponse<User[]>>(`${this.baseUrl}/api/admin/users`, { params });
+  async getUsers(params?: UserQueryParams): Promise<ApiResponse<User[]>> {
+    const response = await api.get<ApiResponse<User[]>>(`${this.baseUrl}/api/users`, { params });
     return response.data;
   }
 
   async getUserById(id: string): Promise<ApiResponse<User>> {
-    const response = await api.get<ApiResponse<User>>(`${this.baseUrl}/api/admin/users/${id}`);
+    const response = await api.get<ApiResponse<User>>(`${this.baseUrl}/api/users/${id}`);
     return response.data;
   }
 
@@ -296,14 +297,44 @@ export default class AdminRealApiService implements AdminApiService {
 
   // AI Models
   async getModels(type?: string | null): Promise<ApiResponse<Model[]>> {
-    const params = type ? { type } : undefined;
-    const response = await api.get<ApiResponse<Model[]>>(`${this.baseUrl}/api/models`, { params });
-    return response.data;
+    const params = type ? { modelType: type } : undefined;
+    const response = await api.get<ApiResponse<any[]>>(`${this.baseUrl}/api/models`, { params });
+
+    // Map backend response to frontend Model interface
+    const mappedData = response.data.data.map((model: any) => ({
+      id: model.modelId,
+      name: model.modelName,
+      displayName: model.displayName,
+      enabled: model.enabled,
+      default: model.default,
+      provider: model.provider,
+      type: model.modelType,
+    }));
+
+    return {
+      ...response.data,
+      data: mappedData,
+    };
   }
 
   async patchModel(id: string, data: ModelPatchData): Promise<ApiResponse<Model>> {
-    const response = await api.patch<ApiResponse<Model>>(`${this.baseUrl}/api/models/${id}`, data);
-    return response.data;
+    const response = await api.patch<ApiResponse<any>>(`${this.baseUrl}/api/models/${id}`, data);
+
+    // Map backend response to frontend Model interface
+    const mappedData = {
+      id: response.data.data.modelId,
+      name: response.data.data.modelName,
+      displayName: response.data.data.displayName,
+      enabled: response.data.data.enabled,
+      default: response.data.data.default,
+      provider: response.data.data.provider,
+      type: response.data.data.modelType,
+    };
+
+    return {
+      ...response.data,
+      data: mappedData,
+    };
   }
 
   // FAQ Posts (MOCK - Backend not implemented yet)

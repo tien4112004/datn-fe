@@ -61,6 +61,10 @@ export interface PaginationParams {
   pageSize?: number;
 }
 
+export interface UserQueryParams extends PaginationParams {
+  search?: string;
+}
+
 export interface SlideTemplateParams extends PaginationParams {
   layout?: string;
 }

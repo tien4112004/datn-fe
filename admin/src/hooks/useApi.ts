@@ -1,6 +1,13 @@
 import { getAdminApiService } from '@/api/admin';
 import { getAuthApiService } from '@/api/auth';
-import type { ArtStyleRequest, BookType, FAQPost, PaginationParams, SlideTemplateParams } from '@/types/api';
+import type {
+  ArtStyleRequest,
+  BookType,
+  FAQPost,
+  PaginationParams,
+  UserQueryParams,
+  SlideTemplateParams,
+} from '@/types/api';
 import type { ModelPatchData } from '@aiprimary/core';
 import type { LoginRequest } from '@/types/auth';
 import type { SlideTemplate, SlideTheme } from '@aiprimary/core';
@@ -19,7 +26,7 @@ export const adminKeys = {
   // Users
   users: {
     all: ['users'] as const,
-    list: (params?: PaginationParams) => [...adminKeys.users.all, 'list', params] as const,
+    list: (params?: UserQueryParams) => [...adminKeys.users.all, 'list', params] as const,
     detail: (id: string) => [...adminKeys.users.all, 'detail', id] as const,
   },
   // Slide Themes
@@ -70,6 +77,8 @@ export function useProfile(enabled: boolean = true) {
     staleTime: 300000, // 5 minutes
     gcTime: 600000, // 10 minutes
     retry: false, // Don't retry on 401
+    refetchOnWindowFocus: false, // Prevent refetch on focus
+    refetchOnReconnect: false, // Prevent refetch on reconnect
   });
 }
 
@@ -106,7 +115,13 @@ export function useLogout() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: () => getAuthApiService().logout(),
+    mutationFn: async () => {
+      // Only call API if token exists
+      const token = localStorage.getItem('accessToken');
+      if (token) {
+        await getAuthApiService().logout();
+      }
+    },
     onSuccess: () => {
       // Clear tokens from localStorage
       localStorage.removeItem('accessToken');
@@ -152,7 +167,7 @@ export function useRefreshToken() {
 
 // ============= USERS =============
 
-export function useUsers(params?: PaginationParams) {
+export function useUsers(params?: UserQueryParams) {
   return useQuery({
     queryKey: adminKeys.users.list(params),
     queryFn: () => getAdminApiService().getUsers(params),

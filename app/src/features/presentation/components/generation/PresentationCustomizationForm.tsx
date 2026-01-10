@@ -61,9 +61,19 @@ const ThemeSection = ({ selectedTheme, onThemeSelect, disabled = false }: ThemeS
       const mergedThemes = [...recentThemes, ...otherThemes];
 
       // Take first 6 for display
-      setDisplayedThemes(mergedThemes.slice(0, 6));
+      const displayThemes = mergedThemes.slice(0, 6);
+
+      // Only update if the themes actually changed
+      setDisplayedThemes((prev) => {
+        if (prev.length !== displayThemes.length) return displayThemes;
+        if (prev.every((theme, idx) => theme.id === displayThemes[idx]?.id)) return prev;
+        return displayThemes;
+      });
+    } else if (!isLoading && !isLoadingRecent) {
+      // Clear displayed themes if no themes loaded
+      setDisplayedThemes([]);
     }
-  }, [themes, recentThemes]);
+  }, [themes, recentThemes, isLoading, isLoadingRecent]);
 
   const handleThemeSelect = useCallback(
     (theme: SlideTheme) => {

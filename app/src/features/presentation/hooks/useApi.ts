@@ -286,10 +286,12 @@ export const useSlideThemes = () => {
       return apiService.getSlideThemes();
     },
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+    retry: 2,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 3000),
   });
 
   return {
-    themes: themes || [],
+    themes: themes ?? [],
     defaultTheme: themes?.find((t) => t.id === 'default') || themes?.[0],
     ...query,
   };
@@ -302,16 +304,23 @@ export const useRecentSlideThemes = (themeIds: string[]) => {
       if (themeIds.length === 0) {
         return [];
       }
-      const apiService = getPresentationApiService();
-      return apiService.getSlideThemesByIds(themeIds);
+      try {
+        const apiService = getPresentationApiService();
+        return await apiService.getSlideThemesByIds(themeIds);
+      } catch (error) {
+        console.warn('Failed to fetch recent themes by IDs:', error);
+        // Return empty array on error to prevent cascading failures
+        return [];
+      }
     },
     enabled: themeIds.length > 0,
     staleTime: 10 * 60 * 1000, // Cache for 10 minutes (longer than regular themes)
     gcTime: 30 * 60 * 1000, // Keep in cache for 30 minutes
+    retry: false, // Don't retry if specific IDs fail
   });
 
   return {
-    recentThemes: themes || [],
+    recentThemes: themes ?? [],
     ...query,
   };
 };

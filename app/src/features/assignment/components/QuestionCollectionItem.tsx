@@ -19,9 +19,8 @@ import { cn } from '@/shared/lib/utils';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 import type { Question, ViewMode, Answer } from '../types';
 import { VIEW_MODE } from '../types';
-import { QuestionRenderer } from './QuestionRenderer';
-import { QuestionTypeIcon } from './shared/QuestionTypeIcon';
-import { DifficultyBadge } from './shared/DifficultyBadge';
+import { QuestionRenderer } from '@/features/question';
+import { QuestionTypeIcon, DifficultyBadge } from '@/features/question/components/shared';
 
 interface QuestionCollectionItemProps {
   question: Question;

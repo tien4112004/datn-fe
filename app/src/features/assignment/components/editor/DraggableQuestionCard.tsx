@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/shared/components/ui/badge';
 import type { AssignmentFormData } from '../../types';
 import { DIFFICULTY_LABELS } from '../../types';
-import { QuestionRenderer } from '../QuestionRenderer';
+import { QuestionRenderer } from '@/features/question';
 import { useAssignmentEditorStore } from '../../stores/useAssignmentEditorStore';
 import { VIEW_MODE, type Question, getQuestionTypeName } from '@aiprimary/core';
 

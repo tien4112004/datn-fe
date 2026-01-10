@@ -32,10 +32,12 @@ import type {
 } from '@/features/assignment/types';
 import { QUESTION_TYPE, DIFFICULTY, SUBJECT_CODE, BANK_TYPE } from '@/features/assignment/types';
 import { getAllSubjects } from '@aiprimary/core';
-import { MultipleChoiceEditing } from '@/features/assignment/components/multiple-choice/MultipleChoiceEditing';
-import { MatchingEditing } from '@/features/assignment/components/matching/MatchingEditing';
-import { FillInBlankEditing } from '@/features/assignment/components/fill-in-blank/FillInBlankEditing';
-import { OpenEndedEditing } from '@/features/assignment/components/open-ended/OpenEndedEditing';
+import {
+  MultipleChoiceEditing,
+  MatchingEditing,
+  FillInBlankEditing,
+  OpenEndedEditing,
+} from '@/features/question';
 import { generateId } from '@/shared/lib/utils';
 import { toast } from 'sonner';
 import { AlertCircle, Save, Settings, FileText } from 'lucide-react';

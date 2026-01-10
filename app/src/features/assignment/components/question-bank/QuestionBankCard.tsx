@@ -6,8 +6,7 @@ import { cn } from '@/shared/lib/utils';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 import type { Question, QuestionBankItem } from '../../types';
 import { BANK_TYPE } from '../../types';
-import { QuestionTypeIcon } from '../shared/QuestionTypeIcon';
-import { DifficultyBadge } from '../shared/DifficultyBadge';
+import { QuestionTypeIcon, DifficultyBadge } from '@/features/question/components/shared';
 import { Card, CardContent } from '@/components/ui/card';
 
 interface QuestionBankCardProps {

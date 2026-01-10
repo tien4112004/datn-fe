@@ -13,7 +13,7 @@ import type {
 } from '@aiprimary/core';
 import { DIFFICULTY } from '@aiprimary/core';
 import { QUESTION_TYPE, VIEW_MODE, type ViewMode } from '../types';
-import { QuestionRenderer } from '../components/QuestionRenderer';
+import { QuestionRenderer } from '@/features/question';
 
 // Sample Questions
 const multipleChoiceQuestion: MultipleChoiceQuestion = {

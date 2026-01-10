@@ -13,18 +13,6 @@
             </RadioGroup>
           </div>
           <div class="row">
-            <div class="title">{{ $t('files.export.pdf.perPageCount') }}</div>
-            <Select
-              class="config-item"
-              v-model:value="count"
-              :options="[
-                { label: '1', value: 1 },
-                { label: '2', value: 2 },
-                { label: '3', value: 3 },
-              ]"
-            />
-          </div>
-          <div class="row">
             <div class="title">{{ $t('files.export.pdf.edgePadding') }}</div>
             <div class="config-item">
               <Switch v-model:value="padding" />
@@ -54,16 +42,14 @@
               size="auto"
               v-if="rangeType === 'current'"
             />
-            <template v-else>
-              <ThumbnailSlide
-                class="thumbnail"
-                :class="{ 'break-page': (index + 1) % count === 0 }"
-                v-for="(slide, index) in slides"
-                :key="slide.id"
-                :slide="slide"
-                size="auto"
-              />
-            </template>
+            <ThumbnailSlide
+              class="thumbnail"
+              v-for="(slide, index) in slides"
+              :key="slide.id"
+              :slide="slide"
+              size="auto"
+              v-else
+            />
           </div>
         </div>
       </div>
@@ -72,18 +58,18 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, nextTick, watch } from 'vue';
+import { ref, nextTick, watch, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { storeToRefs } from 'pinia';
 import { useSlidesStore } from '@/store';
 import { exportSlidesToPDF, captureElementAsImage } from '@/utils/pdfExport';
+import type { Slide } from '@/types/slides';
 
 import ThumbnailSlide from '@/views/components/ThumbnailSlide/index.vue';
 import Switch from '@/components/Switch.vue';
 import Button from '@/components/Button.vue';
 import RadioButton from '@/components/RadioButton.vue';
 import RadioGroup from '@/components/RadioGroup.vue';
-import Select from '@/components/Select.vue';
 
 const { t } = useI18n();
 
@@ -95,7 +81,6 @@ const { slides, currentSlide, viewportRatio, viewportSize } = storeToRefs(useSli
 
 const pdfThumbnailsRef = ref<HTMLElement>();
 const rangeType = ref<'all' | 'current'>('all');
-const count = ref(1);
 const padding = ref(true);
 const isExporting = ref(false);
 const previewImages = ref<string[]>([]);
@@ -107,13 +92,10 @@ const expPDF = async () => {
   isExporting.value = true;
 
   try {
-    // Wait for next tick to ensure all thumbnails are rendered
     await nextTick();
-
-    // Additional delay to ensure rendering is complete
     await new Promise((resolve) => setTimeout(resolve, 200));
 
-    // Get all thumbnail slide elements
+    const slideElements: HTMLElement[] = [];
     const thumbnailElements = pdfThumbnailsRef.value.querySelectorAll('.thumbnail');
 
     if (thumbnailElements.length === 0) {
@@ -121,8 +103,6 @@ const expPDF = async () => {
       return;
     }
 
-    // Extract the actual .elements div from each thumbnail (the actual slide content)
-    const slideElements: HTMLElement[] = [];
     thumbnailElements.forEach((thumbnail) => {
       const elementsDiv = thumbnail.querySelector('.elements') as HTMLElement;
       if (elementsDiv) {
@@ -135,26 +115,22 @@ const expPDF = async () => {
       return;
     }
 
-    // For single slide per page: each slide should fill the entire page
-    const slideWidth = 1600;
-    const slideHeight = 1600 * viewportRatio.value;
+    const pageWidth = 1600;
+    const pageHeight = 1600 * viewportRatio.value;
 
     const pageSize = {
-      width: slideWidth,
-      height: slideHeight,
+      width: pageWidth,
+      height: pageHeight,
       margin: padding.value ? 50 : 0,
     };
 
-    // Render size for high quality capture
     const renderSize = {
-      width: slideWidth,
-      height: slideHeight,
+      width: pageWidth,
+      height: pageHeight,
     };
 
-    // Calculate scale factor to upscale from natural size (viewportSize) to target size (1600)
     const scaleFactor = 1600 / viewportSize.value;
 
-    // Export slides to PDF (one slide per page for now)
     await exportSlidesToPDF(slideElements, pageSize, renderSize, 1, scaleFactor);
   } catch (error) {
     console.error('PDF export failed:', error);
@@ -236,10 +212,6 @@ const expPDF = async () => {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   border-radius: 4px;
   overflow: hidden;
-
-  &.break-page {
-    break-after: page;
-  }
 }
 
 .configs {

@@ -300,7 +300,6 @@ onMounted(() => {
   flex-direction: row;
   flex-shrink: 0;
   height: 100%;
-  transition: width 0.2s ease-in-out;
 }
 
 .editor-sidebar {
@@ -310,6 +309,10 @@ onMounted(() => {
 .toolbar-panel {
   flex-shrink: 0;
   width: var(--toolbar-width, 320px);
+  min-width: var(--toolbar-width, 320px);
+  max-width: var(--toolbar-width, 320px);
+  transform: translateZ(0);
+  will-change: contents;
 }
 
 .preview-mode-banner {
@@ -512,11 +515,6 @@ onMounted(() => {
         }
       }
     }
-  }
-
-  // Reposition thumbnails to bottom with horizontal layout
-  .layout-content {
-    // Keep horizontal layout but constrain widths
   }
 
   .layout-content-main {

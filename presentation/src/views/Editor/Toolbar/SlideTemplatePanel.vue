@@ -1,5 +1,5 @@
 <template>
-  <div class="slide-template-panel tw-w-full tw-overflow-hidden">
+  <div class="slide-template-panel">
     <template v-if="!canSwitch">
       <div
         class="tw-flex tw-flex-col tw-items-center tw-justify-center tw-py-8 tw-px-4 tw-text-center tw-text-gray-500"

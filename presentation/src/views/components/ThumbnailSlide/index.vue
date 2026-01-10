@@ -71,18 +71,39 @@ onMounted(() => {
       scale.value = width / viewportSize.value;
     }
 
-    // Watch for resize changes
+    // Watch for resize changes with RAF debouncing
+    let rafId: number | null = null;
+    let isFirstResize = true;
     const resizeObserver = new ResizeObserver(() => {
-      if (props.size === 'auto' && thumbnail.value) {
-        const width = thumbnail.value.offsetWidth;
-        scale.value = width / viewportSize.value;
+      // Skip first resize event which fires on observe()
+      if (isFirstResize) {
+        isFirstResize = false;
+        return;
       }
+
+      if (rafId !== null) {
+        cancelAnimationFrame(rafId);
+      }
+      rafId = requestAnimationFrame(() => {
+        if (props.size === 'auto' && thumbnail.value) {
+          const width = thumbnail.value.offsetWidth;
+          const newScale = width / viewportSize.value;
+          // Only update if scale actually changed
+          if (Math.abs(newScale - scale.value) > 0.001) {
+            scale.value = newScale;
+          }
+        }
+        rafId = null;
+      });
     });
 
     resizeObserver.observe(thumbnail.value);
 
     // Cleanup on unmount
     return () => {
+      if (rafId !== null) {
+        cancelAnimationFrame(rafId);
+      }
       resizeObserver.disconnect();
     };
   }

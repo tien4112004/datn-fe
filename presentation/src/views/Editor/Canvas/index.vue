@@ -400,7 +400,7 @@ provide(injectKeySlideScale, canvasScale);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 9999;
+  z-index: 5000;
   pointer-events: auto;
 }
 </style>

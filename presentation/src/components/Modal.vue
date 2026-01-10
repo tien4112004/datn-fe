@@ -2,7 +2,7 @@
   <Teleport to="body">
     <Transition name="modal-fade">
       <div
-        class="tw-fixed tw-inset-0 tw-z-[10000] tw-flex tw-items-center tw-justify-center"
+        class="tw-fixed tw-inset-0 tw-z-[5000] tw-flex tw-items-center tw-justify-center"
         ref="modalRef"
         v-show="visible"
         tabindex="-1"
@@ -17,7 +17,7 @@
           @before-enter="contentVisible = true"
         >
           <div
-            class="tw-relative tw-z-[10001] tw-overflow-hidden tw-rounded tw-bg-background tw-p-6 tw-shadow-lg tw-duration-200"
+            class="tw-relative tw-z-[5001] tw-overflow-hidden tw-rounded tw-bg-background tw-p-6 tw-shadow-lg tw-duration-200"
             v-show="visible"
             :style="contentStyle"
           >

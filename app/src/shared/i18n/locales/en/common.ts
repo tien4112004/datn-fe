@@ -14,6 +14,7 @@ export default {
       admin: 'Administration',
       questionBank: 'Question Bank',
       assignments: 'Assignments',
+      questionRendererDemo: 'Question Renderer (Demo)',
     },
   },
   pages: {

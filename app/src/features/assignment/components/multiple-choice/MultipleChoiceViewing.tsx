@@ -12,7 +12,7 @@ interface MultipleChoiceViewingProps {
 
 export const MultipleChoiceViewing = ({ question, points }: MultipleChoiceViewingProps) => {
   return (
-    <div className="space-y-4">
+    <div className="space-y-2">
       <div className="flex items-center justify-between">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-semibold">Multiple Choice Question</h3>
@@ -21,7 +21,7 @@ export const MultipleChoiceViewing = ({ question, points }: MultipleChoiceViewin
       </div>
 
       {/* Question Title */}
-      <div className="space-y-2">
+      <div className="space-y-1">
         <MarkdownPreview content={question.title} />
         {question.titleImageUrl && (
           <img src={question.titleImageUrl} alt="Question" className="mt-2 max-h-64 rounded-md border" />
@@ -30,7 +30,7 @@ export const MultipleChoiceViewing = ({ question, points }: MultipleChoiceViewin
 
       {/* Shuffle Options Setting */}
       {question.data.shuffleOptions !== undefined && (
-        <div className="bg-muted/50 flex items-center gap-2 rounded-lg border p-2">
+        <div className="bg-muted/50 flex items-center gap-2 rounded-lg border border-gray-300 p-2 dark:border-gray-600">
           <Shuffle className="h-4 w-4" />
           <Label className="text-sm font-medium">Shuffle Options</Label>
           <Badge variant={question.data.shuffleOptions ? 'default' : 'secondary'} className="ml-auto">
@@ -71,7 +71,7 @@ export const MultipleChoiceViewing = ({ question, points }: MultipleChoiceViewin
 
       {/* Explanation */}
       {question.explanation && (
-        <div className="space-y-2 rounded-lg border bg-blue-50 p-3 dark:bg-blue-900/20">
+        <div className="space-y-2 rounded-lg border border-gray-300 bg-blue-50 p-3 dark:border-gray-600 dark:bg-blue-900/20">
           <Label className="text-sm font-medium">Explanation:</Label>
           <MarkdownPreview content={question.explanation} />
         </div>

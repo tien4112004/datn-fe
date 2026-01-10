@@ -160,7 +160,7 @@ export function MatrixBuilderPage() {
             <BreadcrumbList>
               <BreadcrumbItem>
                 <BreadcrumbPage>
-                  {isEditMode ? t('breadcrumbs.editMatrix') : t('breadcrumbs.createMatrix')}
+                  {isEditMode ? t('breadcrumbs.editMatrix') : t('breadcrumbs.createMatrix') + ' Demo'}
                 </BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>

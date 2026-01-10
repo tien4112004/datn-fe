@@ -190,6 +190,13 @@ const router = createBrowserRouter([
         }),
       },
       {
+        path: 'demo/question-renderer',
+        lazy: async () => ({
+          Component: (await import('@/features/assignment/pages/QuestionRendererDemoPage'))
+            .QuestionRendererDemoPage,
+        }),
+      },
+      {
         path: 'error',
         Component: () => {
           throw new CriticalError('This is a critical error page.');

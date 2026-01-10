@@ -10,14 +10,14 @@ interface FillInBlankViewingProps {
 
 export const FillInBlankViewing = ({ question, points }: FillInBlankViewingProps) => {
   return (
-    <div className="space-y-4">
+    <div className="space-y-2">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold">Fill In Blank Question</h3>
         <DifficultyBadge difficulty={question.difficulty} />
       </div>
       {/* Title */}
       {question.title && (
-        <div className="space-y-2">
+        <div className="space-y-1">
           <p className="font-medium">{question.title}</p>
           {question.titleImageUrl && (
             <img src={question.titleImageUrl} alt="Question" className="mt-2 max-h-64 rounded-md border" />
@@ -26,7 +26,7 @@ export const FillInBlankViewing = ({ question, points }: FillInBlankViewingProps
       )}
 
       {/* Question with blanks */}
-      <div className="bg-muted/50 rounded-md p-4 font-mono text-sm">
+      <div className="bg-muted/50 rounded-md border border-gray-300 p-4 font-mono text-sm dark:border-gray-600">
         {question.data.segments.map((segment) => (
           <span key={segment.id}>
             {segment.type === 'text' ? (
@@ -41,7 +41,7 @@ export const FillInBlankViewing = ({ question, points }: FillInBlankViewingProps
       </div>
 
       {/* Expected Answers */}
-      <div className="space-y-2 rounded-lg border bg-green-50 p-3 dark:bg-green-900/20">
+      <div className="space-y-2 rounded-lg border border-gray-300 bg-green-50 p-3 dark:border-gray-600 dark:bg-green-900/20">
         <Label className="text-sm font-medium">Expected Answers:</Label>
         <div className="space-y-1">
           {question.data.segments
@@ -57,7 +57,7 @@ export const FillInBlankViewing = ({ question, points }: FillInBlankViewingProps
 
       {/* Case Sensitivity */}
       {question.data.caseSensitive !== undefined && (
-        <div className="bg-muted/50 flex items-center gap-2 rounded-lg border p-2">
+        <div className="bg-muted/50 flex items-center gap-2 rounded-lg border border-gray-300 p-2 dark:border-gray-600">
           <Label className="text-sm font-medium">Case Sensitive</Label>
           <Badge variant={question.data.caseSensitive ? 'default' : 'secondary'} className="ml-auto">
             {question.data.caseSensitive ? 'Yes' : 'No'}
@@ -67,7 +67,7 @@ export const FillInBlankViewing = ({ question, points }: FillInBlankViewingProps
 
       {/* Explanation */}
       {question.explanation && (
-        <div className="space-y-2 rounded-lg border bg-blue-50 p-3 dark:bg-blue-900/20">
+        <div className="space-y-2 rounded-lg border border-gray-300 bg-blue-50 p-3 dark:border-gray-600 dark:bg-blue-900/20">
           <Label className="text-sm font-medium">Explanation:</Label>
           <MarkdownPreview content={question.explanation} />
         </div>

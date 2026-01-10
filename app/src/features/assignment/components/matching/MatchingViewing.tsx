@@ -11,7 +11,7 @@ interface MatchingViewingProps {
 
 export const MatchingViewing = ({ question, points }: MatchingViewingProps) => {
   return (
-    <div className="space-y-4">
+    <div className="space-y-2">
       <div className="flex items-center justify-between">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-semibold">Matching Question</h3>
@@ -20,7 +20,7 @@ export const MatchingViewing = ({ question, points }: MatchingViewingProps) => {
       </div>
 
       {/* Question Title */}
-      <div className="space-y-2">
+      <div className="space-y-1">
         <MarkdownPreview content={question.title} />
         {question.titleImageUrl && (
           <img src={question.titleImageUrl} alt="Question" className="mt-2 max-h-64 rounded-md border" />
@@ -29,7 +29,7 @@ export const MatchingViewing = ({ question, points }: MatchingViewingProps) => {
 
       {/* Shuffle Pairs Setting */}
       {question.data.shufflePairs !== undefined && (
-        <div className="bg-muted/50 flex items-center gap-2 rounded-lg border p-2">
+        <div className="bg-muted/50 flex items-center gap-2 rounded-lg border border-gray-300 p-2 dark:border-gray-600">
           <Shuffle className="h-4 w-4" />
           <Label className="text-sm font-medium">Shuffle Pairs</Label>
           <Badge variant={question.data.shufflePairs ? 'default' : 'secondary'} className="ml-auto">
@@ -41,7 +41,7 @@ export const MatchingViewing = ({ question, points }: MatchingViewingProps) => {
       {/* Matching Pairs */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         {/* Left Column */}
-        <div className="space-y-2">
+        <div className="space-y-1.5">
           <h4 className="text-sm font-semibold">Column A</h4>
           {question.data.pairs.map((pair, index) => (
             <div
@@ -66,7 +66,7 @@ export const MatchingViewing = ({ question, points }: MatchingViewingProps) => {
         </div>
 
         {/* Right Column */}
-        <div className="space-y-2">
+        <div className="space-y-1.5">
           <h4 className="text-sm font-semibold">Column B</h4>
           {question.data.pairs.map((pair, index) => (
             <div
@@ -93,7 +93,7 @@ export const MatchingViewing = ({ question, points }: MatchingViewingProps) => {
 
       {/* Explanation */}
       {question.explanation && (
-        <div className="space-y-2 rounded-lg border bg-blue-50 p-3 dark:bg-blue-900/20">
+        <div className="space-y-2 rounded-lg border border-gray-300 bg-blue-50 p-3 dark:border-gray-600 dark:bg-blue-900/20">
           <Label className="text-sm font-medium">Explanation:</Label>
           <MarkdownPreview content={question.explanation} />
         </div>

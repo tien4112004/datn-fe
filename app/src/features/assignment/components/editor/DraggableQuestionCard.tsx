@@ -5,8 +5,8 @@ import { CSS } from '@dnd-kit/utilities';
 import { GripVertical, Trash2, ChevronDown } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
+import { useTranslation } from 'react-i18next';
 import { Label } from '@/shared/components/ui/label';
-import { Textarea } from '@/shared/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
 import { Badge } from '@/shared/components/ui/badge';
 import type { AssignmentFormData } from '../../types';
@@ -47,15 +47,18 @@ export const DraggableQuestionCard = ({ id, index }: DraggableQuestionCardProps)
 
   const questionViewModes = useAssignmentEditorStore((state) => state.questionViewModes);
   const viewMode = questionViewModes.get(question?.id || '') || VIEW_MODE.EDITING;
+  const { t } = useTranslation('assignment');
 
   // Safety check - if question is not loaded yet, show debug state
   if (!assignmentQuestion || !question) {
     return (
       <div className="rounded-lg border-2 border-red-500 bg-white p-4 dark:bg-red-950/20">
         <div className="text-sm font-semibold text-red-600 dark:text-red-400">
-          Question {index + 1} - Data Missing (Debug)
+          {t('collection.item.dataMissingTitle', { number: index + 1 })}
         </div>
-        <div className="text-xs text-gray-600 dark:text-gray-400">Field ID: {id}</div>
+        <div className="text-xs text-gray-600 dark:text-gray-400">
+          {t('collection.item.dataMissingFieldId', { id })}
+        </div>
       </div>
     );
   }
@@ -119,8 +122,13 @@ export const DraggableQuestionCard = ({ id, index }: DraggableQuestionCardProps)
             variant="ghost"
             size="sm"
             onClick={() => {
-              if (question && window.confirm(`Remove this ${getQuestionTypeName(question.type)} question?`)) {
-                remove(index);
+              if (question) {
+                const confirmMessage = t('collection.item.removeQuestionConfirm', {
+                  type: getQuestionTypeName(question.type),
+                });
+                if (window.confirm(confirmMessage)) {
+                  remove(index);
+                }
               }
             }}
             className="text-red-500 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20"
@@ -132,19 +140,25 @@ export const DraggableQuestionCard = ({ id, index }: DraggableQuestionCardProps)
 
       {/* Content: Question Details - Collapsible */}
       {isExpanded && (
-        <div className="space-y-4 border-t border-gray-200 px-4 py-4 text-gray-900 dark:border-gray-700 dark:text-gray-100">
-          {/* Topic and Difficulty selects */}
-          <div className="grid gap-3 sm:grid-cols-2">
+        <div className="space-y-2 border-t border-gray-200 bg-gray-50/50 px-4 py-3 text-gray-900 dark:border-gray-700 dark:bg-gray-800/50 dark:text-gray-100">
+          {/* Topic, Difficulty, and Points in single horizontal row */}
+          <div className="grid gap-2 sm:grid-cols-3">
             <div>
-              <Label htmlFor={`topic-${index}`} className="mb-1.5 block text-xs font-medium">
-                Topic *
+              <Label
+                htmlFor={`topic-${index}`}
+                className="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300"
+              >
+                {t('collection.item.topicLabel')}
               </Label>
               <Select
                 value={question.topicId}
                 onValueChange={(value) => setValue(`questions.${index}.question.topicId`, value)}
               >
-                <SelectTrigger id={`topic-${index}`} className="h-9 text-sm">
-                  <SelectValue placeholder="Select topic" />
+                <SelectTrigger
+                  id={`topic-${index}`}
+                  className="h-9 border-gray-300 bg-white text-sm dark:border-gray-600 dark:bg-gray-900"
+                >
+                  <SelectValue placeholder={t('collection.item.selectTopicPlaceholder') as string} />
                 </SelectTrigger>
                 <SelectContent>
                   {topics.map((topic) => (
@@ -157,14 +171,20 @@ export const DraggableQuestionCard = ({ id, index }: DraggableQuestionCardProps)
             </div>
 
             <div>
-              <Label htmlFor={`difficulty-${index}`} className="mb-1.5 block text-xs font-medium">
-                Difficulty
+              <Label
+                htmlFor={`difficulty-${index}`}
+                className="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300"
+              >
+                {t('collection.item.difficultyLabel')}
               </Label>
               <Select
                 value={question.difficulty}
                 onValueChange={(value) => setValue(`questions.${index}.question.difficulty`, value as any)}
               >
-                <SelectTrigger id={`difficulty-${index}`} className="h-9 text-sm">
+                <SelectTrigger
+                  id={`difficulty-${index}`}
+                  className="h-9 border-gray-300 bg-white text-sm dark:border-gray-600 dark:bg-gray-900"
+                >
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -176,20 +196,22 @@ export const DraggableQuestionCard = ({ id, index }: DraggableQuestionCardProps)
                 </SelectContent>
               </Select>
             </div>
-          </div>
 
-          {/* Points */}
-          <div>
-            <Label htmlFor={`points-${index}`} className="mb-1.5 block text-xs font-medium">
-              Points *
-            </Label>
-            <Input
-              id={`points-${index}`}
-              type="number"
-              {...register(`questions.${index}.points`, { valueAsNumber: true })}
-              min={0}
-              className="h-9 text-sm"
-            />
+            <div>
+              <Label
+                htmlFor={`points-${index}`}
+                className="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300"
+              >
+                {t('collection.item.pointsLabel')}
+              </Label>
+              <Input
+                id={`points-${index}`}
+                type="number"
+                {...register(`questions.${index}.points`, { valueAsNumber: true })}
+                min={0}
+                className="h-9 border-gray-300 bg-white text-sm dark:border-gray-600 dark:bg-gray-900"
+              />
+            </div>
           </div>
 
           {/* QuestionRenderer for type-specific content */}
@@ -210,12 +232,14 @@ export const DraggableQuestionCard = ({ id, index }: DraggableQuestionCardProps)
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0 flex-1">
               <p className="line-clamp-2 text-gray-900 dark:text-gray-100">
-                {question.title || <span className="italic text-gray-400">No question text</span>}
+                {question.title || (
+                  <span className="italic text-gray-400">{t('collection.item.noQuestionText')}</span>
+                )}
               </p>
             </div>
             {points > 0 && (
               <span className="flex-shrink-0 whitespace-nowrap font-medium text-gray-900 dark:text-gray-100">
-                {points} pts
+                {t('collection.item.pointsShort', { points })}
               </span>
             )}
           </div>

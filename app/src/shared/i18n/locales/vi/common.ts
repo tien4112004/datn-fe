@@ -14,6 +14,7 @@ export default {
       admin: 'Quản Trị',
       questionBank: 'Kho Câu Hỏi',
       assignments: 'Bài Tập',
+      questionRendererDemo: 'Demo Trình Hiển Thị Câu Hỏi',
     },
   },
   pages: {

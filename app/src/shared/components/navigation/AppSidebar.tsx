@@ -63,6 +63,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         url: '/notification',
         icon: Bell,
       },
+      {
+        title: t('questionRendererDemo'),
+        url: '/demo/question-renderer',
+        icon: Grid3x3,
+      },
     ],
   };
 

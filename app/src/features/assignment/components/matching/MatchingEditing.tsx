@@ -46,33 +46,22 @@ export const MatchingEditing = ({ question, onChange }: MatchingEditingProps) =>
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-2">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold">{t('title')}</h3>
         <DifficultyBadge difficulty={question.difficulty} />
       </div>
-      {/* Shuffle Pairs */}
-      <div className="flex items-center justify-between rounded-lg border p-2">
-        <div className="flex items-center gap-2">
-          <Shuffle className="h-4 w-4" />
-          <Label className="text-sm font-medium">
-            {t('shuffle.shufflePairs', { ns: 'assignment', defaultValue: 'Shuffle Pairs' })}
-          </Label>
-        </div>
-        <Switch
-          checked={question.data.shufflePairs || false}
-          onCheckedChange={(shufflePairs) => updateQuestion({ data: { ...question.data, shufflePairs } })}
-        />
-      </div>
 
       {/* Question Title */}
-      <div className="space-y-2">
-        <Label>{t('labels.question')}</Label>
-        <MarkdownEditor
-          value={question.title}
-          onChange={(title) => updateQuestion({ title })}
-          placeholder={t('placeholders.question')}
-        />
+      <div className="space-y-1">
+        <Label className="text-xs font-medium text-gray-700 dark:text-gray-300">{t('labels.question')}</Label>
+        <div className="rounded-md border border-gray-300 bg-white p-2 dark:border-gray-600 dark:bg-gray-900">
+          <MarkdownEditor
+            value={question.title}
+            onChange={(title) => updateQuestion({ title })}
+            placeholder={t('placeholders.question')}
+          />
+        </div>
       </div>
 
       {/* Question Image */}
@@ -83,24 +72,30 @@ export const MatchingEditing = ({ question, onChange }: MatchingEditingProps) =>
       />
 
       {/* Pairs */}
-      <div className="space-y-3">
+      <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <Label>{t('labels.matchingPairs')}</Label>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={addPair}
-            disabled={question.data.pairs.length >= 8}
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            {t('buttons.addPair')}
-          </Button>
+          <Label className="text-xs font-medium text-gray-700 dark:text-gray-300">
+            {t('labels.matchingPairs')}
+          </Label>
+          {/* Shuffle Pairs */}
+          <div className="flex items-center gap-2">
+            <Shuffle className="h-3.5 w-3.5 text-gray-500" />
+            <Label className="text-xs font-medium text-gray-600 dark:text-gray-400">
+              {t('shuffle.shufflePairs', { ns: 'assignment', defaultValue: 'Shuffle Pairs' })}
+            </Label>
+            <Switch
+              checked={question.data.shufflePairs || false}
+              onCheckedChange={(shufflePairs) => updateQuestion({ data: { ...question.data, shufflePairs } })}
+            />
+          </div>
         </div>
 
         <div className="space-y-2">
           {question.data.pairs.map((pair, index) => (
-            <div key={pair.id} className="space-y-2 rounded-md border p-3">
+            <div
+              key={pair.id}
+              className="space-y-2 rounded-md border border-gray-300 bg-white p-2 dark:border-gray-600 dark:bg-gray-900"
+            >
               <div className="mb-2 flex items-center justify-between">
                 <h4 className="text-sm font-semibold">{t('pair', { number: index + 1 })}</h4>
                 <Button
@@ -204,16 +199,33 @@ export const MatchingEditing = ({ question, onChange }: MatchingEditingProps) =>
             </div>
           ))}
         </div>
+
+        {/* Add Pair button - now below the pairs list, aligned to the left */}
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={addPair}
+          disabled={question.data.pairs.length >= 8}
+          className="mt-2"
+        >
+          <Plus className="mr-2 h-4 w-4" />
+          {t('buttons.addPair')}
+        </Button>
       </div>
 
       {/* Explanation */}
-      <div className="space-y-2">
-        <Label>{t('labels.explanation')}</Label>
-        <MarkdownEditor
-          value={question.explanation || ''}
-          onChange={(explanation) => updateQuestion({ explanation })}
-          placeholder={t('placeholders.explanation')}
-        />
+      <div className="space-y-1">
+        <Label className="text-xs font-medium text-gray-700 dark:text-gray-300">
+          {t('labels.explanation')}
+        </Label>
+        <div className="rounded-md border border-gray-300 bg-white p-2 dark:border-gray-600 dark:bg-gray-900">
+          <MarkdownEditor
+            value={question.explanation || ''}
+            onChange={(explanation) => updateQuestion({ explanation })}
+            placeholder={t('placeholders.explanation')}
+          />
+        </div>
       </div>
     </div>
   );

@@ -87,15 +87,15 @@ export const FillInBlankEditing = ({ question, onChange }: FillInBlankEditingPro
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-2">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold">{t('title')}</h3>
         <DifficultyBadge difficulty={question.difficulty} />
       </div>
       {/* Title & Case Sensitive */}
-      <div className="space-y-2">
+      <div className="space-y-1">
         <div className="flex items-center justify-between">
-          <Label className="text-sm">{t('labels.title')}</Label>
+          <Label className="text-xs font-medium text-gray-700 dark:text-gray-300">{t('labels.title')}</Label>
           <div className="flex items-center gap-2">
             <Label htmlFor="case-sensitive" className="text-muted-foreground cursor-pointer text-xs">
               {t('labels.caseSensitive')}
@@ -113,7 +113,7 @@ export const FillInBlankEditing = ({ question, onChange }: FillInBlankEditingPro
           value={question.title}
           onChange={(e) => updateQuestion({ title: e.target.value })}
           placeholder={t('placeholders.title')}
-          className="h-8"
+          className="h-8 border-gray-300 bg-white dark:border-gray-600 dark:bg-gray-900"
         />
       </div>
 
@@ -125,24 +125,17 @@ export const FillInBlankEditing = ({ question, onChange }: FillInBlankEditingPro
       />
 
       {/* Segments */}
-      <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <Label>{t('labels.questionSegments')}</Label>
-          <div className="flex gap-2">
-            <Button type="button" variant="outline" size="sm" onClick={addTextSegment}>
-              <FileText className="mr-2 h-4 w-4" />
-              {t('buttons.addText')}
-            </Button>
-            <Button type="button" variant="outline" size="sm" onClick={addBlankSegment}>
-              <FilePlus2 className="mr-2 h-4 w-4" />
-              {t('buttons.addBlank')}
-            </Button>
-          </div>
-        </div>
+      <div className="space-y-2">
+        <Label className="text-xs font-medium text-gray-700 dark:text-gray-300">
+          {t('labels.questionSegments')}
+        </Label>
 
         <div className="space-y-2">
           {question.data.segments.map((segment, index) => (
-            <div key={segment.id} className="space-y-2 rounded-md border p-2">
+            <div
+              key={segment.id}
+              className="space-y-2 rounded-md border border-gray-300 bg-white p-2 dark:border-gray-600 dark:bg-gray-900"
+            >
               <div className="flex items-center gap-2">
                 <Badge variant={segment.type === 'text' ? 'secondary' : 'default'} className="text-xs">
                   {segment.type === 'text' ? t('segmentTypes.text') : t('segmentTypes.blank')} #{index + 1}
@@ -207,8 +200,20 @@ export const FillInBlankEditing = ({ question, onChange }: FillInBlankEditingPro
           ))}
         </div>
 
+        {/* Add buttons - now below the segments list, aligned to the left */}
+        <div className="mt-2 flex gap-2">
+          <Button type="button" variant="outline" size="sm" onClick={addTextSegment}>
+            <FileText className="mr-2 h-4 w-4" />
+            {t('buttons.addText')}
+          </Button>
+          <Button type="button" variant="outline" size="sm" onClick={addBlankSegment}>
+            <FilePlus2 className="mr-2 h-4 w-4" />
+            {t('buttons.addBlank')}
+          </Button>
+        </div>
+
         {/* Preview */}
-        <div className="bg-muted/50 rounded-md p-4">
+        <div className="bg-muted/50 rounded-md border border-gray-300 p-4 dark:border-gray-600">
           <p className="mb-2 text-sm font-medium">{t('labels.preview')}</p>
           <div className="font-mono text-sm">
             {question.data.segments.map((segment) => (
@@ -227,13 +232,17 @@ export const FillInBlankEditing = ({ question, onChange }: FillInBlankEditingPro
       </div>
 
       {/* Explanation */}
-      <div className="space-y-2">
-        <Label>{t('labels.explanation')}</Label>
-        <MarkdownEditor
-          value={question.explanation || ''}
-          onChange={(explanation) => updateQuestion({ explanation })}
-          placeholder={t('placeholders.explanation')}
-        />
+      <div className="space-y-1">
+        <Label className="text-xs font-medium text-gray-700 dark:text-gray-300">
+          {t('labels.explanation')}
+        </Label>
+        <div className="rounded-md border border-gray-300 bg-white p-2 dark:border-gray-600 dark:bg-gray-900">
+          <MarkdownEditor
+            value={question.explanation || ''}
+            onChange={(explanation) => updateQuestion({ explanation })}
+            placeholder={t('placeholders.explanation')}
+          />
+        </div>
       </div>
     </div>
   );

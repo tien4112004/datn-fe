@@ -36,10 +36,12 @@
         </div>
 
         <div class="btns">
-          <Button class="btn export" type="primary" @click="expPDF()">{{
-            $t('files.export.pdf.printExportPDF')
+          <Button class="btn export" type="primary" @click="expPDF()" :disabled="isExporting">{{
+            isExporting ? $t('files.export.common.exporting') : $t('files.export.pdf.printExportPDF')
           }}</Button>
-          <Button class="btn close" @click="emit('close')">{{ $t('files.export.common.close') }}</Button>
+          <Button class="btn close" @click="emit('close')" :disabled="isExporting">{{
+            $t('files.export.common.close')
+          }}</Button>
         </div>
       </div>
 
@@ -70,11 +72,11 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { ref, nextTick, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { storeToRefs } from 'pinia';
 import { useSlidesStore } from '@/store';
-import { print } from '@/utils/print';
+import { exportSlidesToPDF, captureElementAsImage } from '@/utils/pdfExport';
 
 import ThumbnailSlide from '@/views/components/ThumbnailSlide/index.vue';
 import Switch from '@/components/Switch.vue';
@@ -89,21 +91,76 @@ const emit = defineEmits<{
   (event: 'close'): void;
 }>();
 
-const { slides, currentSlide, viewportRatio } = storeToRefs(useSlidesStore());
+const { slides, currentSlide, viewportRatio, viewportSize } = storeToRefs(useSlidesStore());
 
 const pdfThumbnailsRef = ref<HTMLElement>();
 const rangeType = ref<'all' | 'current'>('all');
 const count = ref(1);
 const padding = ref(true);
+const isExporting = ref(false);
+const previewImages = ref<string[]>([]);
+const isGeneratingPreview = ref(false);
 
-const expPDF = () => {
+const expPDF = async () => {
   if (!pdfThumbnailsRef.value) return;
-  const pageSize = {
-    width: 1600,
-    height: rangeType.value === 'all' ? 1600 * viewportRatio.value * count.value : 1600 * viewportRatio.value,
-    margin: padding.value ? 50 : 0,
-  };
-  print(pdfThumbnailsRef.value, pageSize);
+
+  isExporting.value = true;
+
+  try {
+    // Wait for next tick to ensure all thumbnails are rendered
+    await nextTick();
+
+    // Additional delay to ensure rendering is complete
+    await new Promise((resolve) => setTimeout(resolve, 200));
+
+    // Get all thumbnail slide elements
+    const thumbnailElements = pdfThumbnailsRef.value.querySelectorAll('.thumbnail');
+
+    if (thumbnailElements.length === 0) {
+      console.error('No slide thumbnails found');
+      return;
+    }
+
+    // Extract the actual .elements div from each thumbnail (the actual slide content)
+    const slideElements: HTMLElement[] = [];
+    thumbnailElements.forEach((thumbnail) => {
+      const elementsDiv = thumbnail.querySelector('.elements') as HTMLElement;
+      if (elementsDiv) {
+        slideElements.push(elementsDiv);
+      }
+    });
+
+    if (slideElements.length === 0) {
+      console.error('No slide content elements found');
+      return;
+    }
+
+    // For single slide per page: each slide should fill the entire page
+    const slideWidth = 1600;
+    const slideHeight = 1600 * viewportRatio.value;
+
+    const pageSize = {
+      width: slideWidth,
+      height: slideHeight,
+      margin: padding.value ? 50 : 0,
+    };
+
+    // Render size for high quality capture
+    const renderSize = {
+      width: slideWidth,
+      height: slideHeight,
+    };
+
+    // Calculate scale factor to upscale from natural size (viewportSize) to target size (1600)
+    const scaleFactor = 1600 / viewportSize.value;
+
+    // Export slides to PDF (one slide per page for now)
+    await exportSlidesToPDF(slideElements, pageSize, renderSize, 1, scaleFactor);
+  } catch (error) {
+    console.error('PDF export failed:', error);
+  } finally {
+    isExporting.value = false;
+  }
 };
 </script>
 

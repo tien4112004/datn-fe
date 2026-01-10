@@ -1,5 +1,5 @@
 <template>
-  <div class="slide-template-panel">
+  <div class="slide-template-panel tw-w-full tw-overflow-hidden">
     <template v-if="!canSwitch">
       <div
         class="tw-flex tw-flex-col tw-items-center tw-justify-center tw-py-8 tw-px-4 tw-text-center tw-text-gray-500"
@@ -23,27 +23,33 @@
         <div class="tw-text-sm tw-text-muted-foreground">Loading previews...</div>
       </div>
 
-      <div v-else class="tw-grid tw-grid-cols-2 tw-gap-3 tw-mb-4">
+      <div
+        v-else
+        class="tw-grid tw-grid-cols-2 tw-gap-3 tw-mb-4 tw-min-w-0"
+        style="content-visibility: auto; contain-intrinsic-size: auto 500px"
+      >
         <div
           v-for="preview in templatePreviews"
           :key="preview.template.id"
-          class="tw-cursor-pointer tw-border-2 tw-rounded tw-overflow-hidden tw-transition-all tw-duration-200 hover:tw-border-primary hover:tw--translate-y-0.5 hover:tw-shadow-lg"
+          class="tw-cursor-pointer tw-border-2 tw-rounded tw-overflow-hidden tw-transition-all tw-duration-200 hover:tw-border-primary hover:tw--translate-y-0.5 hover:tw-shadow-lg tw-min-w-0"
           :class="{
             'tw-border-primary tw-shadow-lg': preview.template.id === currentTemplateId,
             'tw-border-border': preview.template.id !== currentTemplateId,
           }"
           @click="handleTemplateClick(preview.template.id)"
         >
-          <div class="tw-bg-gray-100 tw-aspect-video tw-relative tw-overflow-hidden">
+          <div class="tw-bg-gray-100 tw-aspect-video tw-relative tw-overflow-hidden tw-contain-layout">
             <ThumbnailSlide v-if="preview.slide" :slide="preview.slide" size="auto" />
           </div>
-          <div class="tw-flex tw-items-center tw-justify-between tw-px-2 tw-py-1.5 tw-bg-background">
-            <div class="tw-text-xs tw-font-medium tw-text-foreground">
+          <div
+            class="tw-flex tw-items-center tw-justify-between tw-px-2 tw-py-1.5 tw-bg-background tw-gap-2 tw-min-w-0"
+          >
+            <div class="tw-text-xs tw-font-medium tw-text-foreground tw-truncate tw-min-w-0">
               {{ preview.template.name }}
             </div>
             <div
               v-if="preview.template.id === currentTemplateId"
-              class="tw-text-xs tw-px-1.5 tw-py-0.5 tw-bg-primary tw-text-white tw-rounded tw-flex-shrink-0"
+              class="tw-text-xs tw-px-1.5 tw-py-0.5 tw-bg-primary tw-text-white tw-rounded tw-flex-shrink-0 tw-whitespace-nowrap"
             >
               {{ $t('toolbar.slideTemplate.active') }}
             </div>

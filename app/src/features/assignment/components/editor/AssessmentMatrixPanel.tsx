@@ -35,11 +35,11 @@ export const AssessmentMatrixPanel = () => {
         </div>
         {hasMatrix && (
           <div className="flex gap-2">
-            <Button size="sm" variant="outline" onClick={() => setMatrixViewOpen(true)}>
+            <Button type="button" size="sm" variant="outline" onClick={() => setMatrixViewOpen(true)}>
               <Eye className="mr-1 h-3 w-3" />
               {t('view')}
             </Button>
-            <Button size="sm" variant="outline" onClick={() => setMatrixEditorOpen(true)}>
+            <Button type="button" size="sm" variant="outline" onClick={() => setMatrixEditorOpen(true)}>
               {t('edit')}
             </Button>
           </div>

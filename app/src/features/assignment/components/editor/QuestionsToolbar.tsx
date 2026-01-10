@@ -70,14 +70,16 @@ export const QuestionsToolbar = () => {
     }
 
     append({
-      id: generateId(),
-      type: type as any,
-      difficulty: DIFFICULTY.EASY,
-      title: '',
-      topicId: defaultTopicId,
-      explanation: '',
+      question: {
+        id: generateId(),
+        type: type as any,
+        difficulty: DIFFICULTY.EASY,
+        title: '',
+        topicId: defaultTopicId,
+        explanation: '',
+        data,
+      },
       points: 10,
-      data,
     } as any);
   };
 
@@ -102,6 +104,7 @@ export const QuestionsToolbar = () => {
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
+                  type="button"
                   size="sm"
                   variant="outline"
                   onClick={handleToggleAllMode}
@@ -130,7 +133,7 @@ export const QuestionsToolbar = () => {
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button size="sm" variant="outline" disabled>
+              <Button type="button" size="sm" variant="outline" disabled>
                 <Wand2 className="mr-2 h-4 w-4" />
                 {t('generate')}
               </Button>
@@ -144,7 +147,7 @@ export const QuestionsToolbar = () => {
             <TooltipTrigger asChild>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button size="sm" variant="default">
+                  <Button type="button" size="sm" variant="default">
                     <Plus className="mr-2 h-4 w-4" />
                     {t('addQuestion')}
                   </Button>
@@ -172,7 +175,7 @@ export const QuestionsToolbar = () => {
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button size="sm" variant="outline" onClick={() => setQuestionBankOpen(true)}>
+              <Button type="button" size="sm" variant="outline" onClick={() => setQuestionBankOpen(true)}>
                 <Database className="mr-2 h-4 w-4" />
                 {t('fromBank')}
               </Button>

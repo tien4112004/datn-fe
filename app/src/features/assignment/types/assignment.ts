@@ -43,6 +43,7 @@ export interface AssignmentFormData {
   topics: AssignmentTopic[];
   questions: AssignmentQuestionWithTopic[];
   matrixCells: MatrixCell[];
+  shuffleQuestions?: boolean; // Shuffle questions for each student (default: false)
 }
 
 // Assignment (full entity)
@@ -60,6 +61,7 @@ export interface Assignment {
   };
   dueDate?: string; // ISO timestamp for assignment due date
   totalPoints?: number; // Total points for the assignment
+  shuffleQuestions?: boolean; // Shuffle questions for each student (default: false)
   status: 'draft' | 'published' | 'archived';
   createdAt?: string;
   updatedAt?: string;
@@ -77,6 +79,7 @@ export interface CreateAssignmentRequest {
   matrixCells?: MatrixCell[];
   dueDate?: string;
   totalPoints?: number;
+  shuffleQuestions?: boolean;
 }
 
 export interface UpdateAssignmentRequest {
@@ -86,4 +89,5 @@ export interface UpdateAssignmentRequest {
   dueDate?: string;
   questions?: AssignmentQuestionWithTopic[];
   totalPoints?: number;
+  shuffleQuestions?: boolean;
 }

@@ -34,6 +34,7 @@ export const AssignmentEditorPage = () => {
     description: z.string().optional(),
     subject: z.string().min(1, t('validation.subjectRequired')),
     grade: z.string().optional(),
+    shuffleQuestions: z.boolean().optional(),
     topics: z.array(
       z.object({
         id: z.string(),
@@ -73,6 +74,7 @@ export const AssignmentEditorPage = () => {
       description: '',
       subject: '',
       grade: '',
+      shuffleQuestions: false,
       topics: [
         {
           id: `topic-${Date.now()}`,

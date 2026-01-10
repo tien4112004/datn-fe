@@ -178,17 +178,17 @@ export const DraggableQuestionCard = ({ id, index }: DraggableQuestionCardProps)
             </div>
           </div>
 
-          {/* Question Title */}
+          {/* Points */}
           <div>
-            <Label htmlFor={`title-${index}`} className="mb-1.5 block text-xs font-medium">
-              Question Title *
+            <Label htmlFor={`points-${index}`} className="mb-1.5 block text-xs font-medium">
+              Points *
             </Label>
-            <Textarea
-              id={`title-${index}`}
-              {...register(`questions.${index}.question.title`)}
-              placeholder="Enter question text..."
-              rows={2}
-              className="resize-none text-sm"
+            <Input
+              id={`points-${index}`}
+              type="number"
+              {...register(`questions.${index}.points`, { valueAsNumber: true })}
+              min={0}
+              className="h-9 text-sm"
             />
           </div>
 
@@ -200,35 +200,6 @@ export const DraggableQuestionCard = ({ id, index }: DraggableQuestionCardProps)
               points={points}
               onChange={handleQuestionChange}
             />
-          </div>
-
-          {/* Explanation and Points */}
-          <div className="grid gap-3 sm:grid-cols-2">
-            <div>
-              <Label htmlFor={`explanation-${index}`} className="mb-1.5 block text-xs font-medium">
-                Explanation (optional)
-              </Label>
-              <Textarea
-                id={`explanation-${index}`}
-                {...register(`questions.${index}.question.explanation`)}
-                placeholder="Provide an explanation or answer key..."
-                rows={2}
-                className="resize-none text-sm"
-              />
-            </div>
-
-            <div>
-              <Label htmlFor={`points-${index}`} className="mb-1.5 block text-xs font-medium">
-                Points
-              </Label>
-              <Input
-                id={`points-${index}`}
-                type="number"
-                {...register(`questions.${index}.points`, { valueAsNumber: true })}
-                min={0}
-                className="h-9 text-sm"
-              />
-            </div>
           </div>
         </div>
       )}

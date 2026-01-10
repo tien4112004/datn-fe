@@ -38,7 +38,9 @@ export const MatrixEditorDialog = () => {
         </div>
 
         <DialogFooter>
-          <Button onClick={handleClose}>{t('done')}</Button>
+          <Button type="button" onClick={handleClose}>
+            {t('done')}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

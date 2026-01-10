@@ -29,6 +29,7 @@ export const AssignmentMetadataPanel = () => {
   const subject = watch('subject');
   const grade = watch('grade');
   const description = watch('description');
+  const shuffleQuestions = watch('shuffleQuestions');
 
   return (
     <div className="space-y-4">
@@ -40,7 +41,7 @@ export const AssignmentMetadataPanel = () => {
           </div>
           <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t('panelTitle')}</h2>
         </div>
-        <Button size="sm" variant="outline" onClick={() => setMetadataDialogOpen(true)}>
+        <Button type="button" size="sm" variant="outline" onClick={() => setMetadataDialogOpen(true)}>
           <Edit className="mr-1 h-3 w-3" />
           {t('edit')}
         </Button>
@@ -58,6 +59,12 @@ export const AssignmentMetadataPanel = () => {
             emptyValue={t('fields.emptyValue')}
           />
         )}
+        <ReadonlyField
+          label={t('fields.shuffleQuestions')}
+          value={
+            shuffleQuestions ? t('fields.shuffleQuestionsEnabled') : t('fields.shuffleQuestionsDisabled')
+          }
+        />
       </div>
 
       {/* Separator */}

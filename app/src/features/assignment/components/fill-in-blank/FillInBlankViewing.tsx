@@ -1,5 +1,7 @@
 import type { FillInBlankQuestion } from '../../types';
-import { DifficultyBadge } from '../shared';
+import { DifficultyBadge, MarkdownPreview } from '../shared';
+import { Label } from '@/shared/components/ui/label';
+import { Badge } from '@/shared/components/ui/badge';
 
 interface FillInBlankViewingProps {
   question: FillInBlankQuestion;
@@ -38,11 +40,41 @@ export const FillInBlankViewing = ({ question, points }: FillInBlankViewingProps
         ))}
       </div>
 
-      {/* Info */}
-      <div className="text-muted-foreground space-y-1 text-sm">
-        {question.data.caseSensitive && <p>Note: Answers are case-sensitive</p>}
-        {points && <p>Points: {points}</p>}
+      {/* Expected Answers */}
+      <div className="space-y-2 rounded-lg border bg-green-50 p-3 dark:bg-green-900/20">
+        <Label className="text-sm font-medium">Expected Answers:</Label>
+        <div className="space-y-1">
+          {question.data.segments
+            .filter((segment) => segment.type === 'blank')
+            .map((segment, index) => (
+              <div key={segment.id} className="flex items-center gap-2">
+                <Badge variant="outline">Blank {index + 1}</Badge>
+                <code className="bg-background rounded px-2 py-1 text-sm">{segment.content}</code>
+              </div>
+            ))}
+        </div>
       </div>
+
+      {/* Case Sensitivity */}
+      {question.data.caseSensitive !== undefined && (
+        <div className="bg-muted/50 flex items-center gap-2 rounded-lg border p-2">
+          <Label className="text-sm font-medium">Case Sensitive</Label>
+          <Badge variant={question.data.caseSensitive ? 'default' : 'secondary'} className="ml-auto">
+            {question.data.caseSensitive ? 'Yes' : 'No'}
+          </Badge>
+        </div>
+      )}
+
+      {/* Explanation */}
+      {question.explanation && (
+        <div className="space-y-2 rounded-lg border bg-blue-50 p-3 dark:bg-blue-900/20">
+          <Label className="text-sm font-medium">Explanation:</Label>
+          <MarkdownPreview content={question.explanation} />
+        </div>
+      )}
+
+      {/* Points */}
+      {points && <p className="text-muted-foreground text-sm">Points: {points}</p>}
     </div>
   );
 };

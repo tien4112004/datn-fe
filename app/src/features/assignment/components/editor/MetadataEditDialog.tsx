@@ -12,6 +12,9 @@ import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
 import { Label } from '@/shared/components/ui/label';
 import { Textarea } from '@/shared/components/ui/textarea';
+import { Checkbox } from '@/shared/components/ui/checkbox';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
+import { getAllSubjects, getElementaryGrades } from '@aiprimary/core';
 import { useAssignmentEditorStore } from '../../stores/useAssignmentEditorStore';
 import type { AssignmentFormData } from '../../types';
 
@@ -20,9 +23,17 @@ export const MetadataEditDialog = () => {
   const {
     register,
     formState: { errors },
+    watch,
+    setValue,
   } = useFormContext<AssignmentFormData>();
   const isMetadataDialogOpen = useAssignmentEditorStore((state) => state.isMetadataDialogOpen);
   const setMetadataDialogOpen = useAssignmentEditorStore((state) => state.setMetadataDialogOpen);
+
+  const shuffleQuestions = watch('shuffleQuestions') ?? false;
+  const subject = watch('subject');
+  const grade = watch('grade');
+  const subjects = getAllSubjects();
+  const grades = getElementaryGrades();
 
   const handleClose = () => {
     setMetadataDialogOpen(false);
@@ -49,13 +60,35 @@ export const MetadataEditDialog = () => {
             <Label htmlFor="subject">
               {t('fields.subject')} <span className="text-red-500">*</span>
             </Label>
-            <Input id="subject" {...register('subject')} placeholder={t('placeholders.subject')} />
+            <Select value={subject} onValueChange={(value) => setValue('subject', value)}>
+              <SelectTrigger id="subject">
+                <SelectValue placeholder={t('placeholders.subject')} />
+              </SelectTrigger>
+              <SelectContent>
+                {subjects.map((subjectOption) => (
+                  <SelectItem key={subjectOption.code} value={subjectOption.name}>
+                    {subjectOption.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             {errors.subject && <p className="text-xs text-red-500">{errors.subject.message}</p>}
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="grade">{t('fields.grade')}</Label>
-            <Input id="grade" {...register('grade')} placeholder={t('placeholders.grade')} />
+            <Select value={grade} onValueChange={(value) => setValue('grade', value)}>
+              <SelectTrigger id="grade">
+                <SelectValue placeholder={t('placeholders.grade')} />
+              </SelectTrigger>
+              <SelectContent>
+                {grades.map((gradeOption) => (
+                  <SelectItem key={gradeOption.code} value={gradeOption.code}>
+                    {gradeOption.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-2">
@@ -67,10 +100,26 @@ export const MetadataEditDialog = () => {
               rows={3}
             />
           </div>
+
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="shuffleQuestions"
+              checked={shuffleQuestions}
+              onCheckedChange={(checked) => setValue('shuffleQuestions', checked as boolean)}
+            />
+            <Label
+              htmlFor="shuffleQuestions"
+              className="text-sm font-normal leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              {t('fields.shuffleQuestions')}
+            </Label>
+          </div>
         </div>
 
         <DialogFooter>
-          <Button onClick={handleClose}>{t('done')}</Button>
+          <Button type="button" onClick={handleClose}>
+            {t('done')}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

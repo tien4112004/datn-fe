@@ -20,7 +20,23 @@ export {
   type BankType,
   VIEW_MODE,
   type ViewMode,
+  ELEMENTARY_GRADE,
+  GRADE,
+  type ElementaryGrade,
+  type GradeCode,
 } from './assessment/constants';
+export {
+  GRADE_LABELS,
+  GRADE_LABELS_EN,
+  getGradeName,
+  getGradeNameEn,
+  getElementaryGrades,
+  getAllGrades,
+  isValidGrade,
+  isElementaryGrade,
+  gradeNumberToString,
+  gradeStringToNumber,
+} from './assessment/grades';
 export * from './assessment/question';
 export * from './assessment/answer';
 export * from './assessment/questionBank';

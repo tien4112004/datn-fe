@@ -112,3 +112,10 @@ export const VIEW_MODE = {
 } as const;
 
 export type ViewMode = (typeof VIEW_MODE)[keyof typeof VIEW_MODE];
+
+/**
+ * Grade Constants and Utilities
+ * Re-exported from grades.ts for centralized access
+ */
+export { ELEMENTARY_GRADE, GRADE } from './grades';
+export type { ElementaryGrade, Grade as GradeCode } from './grades';

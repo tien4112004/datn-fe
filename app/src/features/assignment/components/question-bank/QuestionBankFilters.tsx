@@ -13,7 +13,7 @@ import {
   useQuestionBankChapters,
 } from '../../hooks/useQuestionBankApi';
 import { useEffect, useState } from 'react';
-import { getSubjectName, QUESTION_TYPE_LABELS, DIFFICULTY_LABELS } from '@aiprimary/core';
+import { getSubjectName, getGradeName, QUESTION_TYPE_LABELS, DIFFICULTY_LABELS } from '@aiprimary/core';
 import { motion } from 'motion/react';
 
 interface QuestionBankFiltersProps {
@@ -198,7 +198,7 @@ export const QuestionBankFilters = ({
                     checked={Array.isArray(filters.grade) && filters.grade.includes(grade)}
                     onCheckedChange={(checked) => handleCheckboxChange('grade', grade, checked as boolean)}
                   />
-                  <span className="text-xs font-medium">Grade {grade}</span>
+                  <span className="text-xs font-medium">{getGradeName(grade)}</span>
                 </label>
               ))}
             </div>

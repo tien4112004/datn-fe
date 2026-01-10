@@ -1,5 +1,8 @@
 import type { MatchingQuestion } from '../../types';
 import { MarkdownPreview, DifficultyBadge } from '../shared';
+import { Label } from '@/shared/components/ui/label';
+import { Badge } from '@/shared/components/ui/badge';
+import { Shuffle } from 'lucide-react';
 
 interface MatchingViewingProps {
   question: MatchingQuestion;
@@ -23,6 +26,17 @@ export const MatchingViewing = ({ question, points }: MatchingViewingProps) => {
           <img src={question.titleImageUrl} alt="Question" className="mt-2 max-h-64 rounded-md border" />
         )}
       </div>
+
+      {/* Shuffle Pairs Setting */}
+      {question.data.shufflePairs !== undefined && (
+        <div className="bg-muted/50 flex items-center gap-2 rounded-lg border p-2">
+          <Shuffle className="h-4 w-4" />
+          <Label className="text-sm font-medium">Shuffle Pairs</Label>
+          <Badge variant={question.data.shufflePairs ? 'default' : 'secondary'} className="ml-auto">
+            {question.data.shufflePairs ? 'Enabled' : 'Disabled'}
+          </Badge>
+        </div>
+      )}
 
       {/* Matching Pairs */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -76,6 +90,14 @@ export const MatchingViewing = ({ question, points }: MatchingViewingProps) => {
           ))}
         </div>
       </div>
+
+      {/* Explanation */}
+      {question.explanation && (
+        <div className="space-y-2 rounded-lg border bg-blue-50 p-3 dark:bg-blue-900/20">
+          <Label className="text-sm font-medium">Explanation:</Label>
+          <MarkdownPreview content={question.explanation} />
+        </div>
+      )}
 
       {/* Points */}
       {points && <p className="text-muted-foreground text-sm">Points: {points}</p>}

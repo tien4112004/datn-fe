@@ -52,20 +52,12 @@ export const MatchingEditing = ({ question, onChange }: MatchingEditingProps) =>
         <DifficultyBadge difficulty={question.difficulty} />
       </div>
       {/* Shuffle Pairs */}
-      <div className="flex items-center justify-between rounded-lg border p-4">
-        <div className="space-y-0.5">
-          <div className="flex items-center gap-2">
-            <Shuffle className="h-4 w-4" />
-            <Label className="text-base font-medium">
-              {t('shuffle.shufflePairs', { ns: 'assignment', defaultValue: 'Shuffle Pairs' })}
-            </Label>
-          </div>
-          <div className="text-muted-foreground text-sm">
-            {t('shuffle.shufflePairsDescription', {
-              ns: 'assignment',
-              defaultValue: 'Randomize the order of matching pairs for each student',
-            })}
-          </div>
+      <div className="flex items-center justify-between rounded-lg border p-2">
+        <div className="flex items-center gap-2">
+          <Shuffle className="h-4 w-4" />
+          <Label className="text-sm font-medium">
+            {t('shuffle.shufflePairs', { ns: 'assignment', defaultValue: 'Shuffle Pairs' })}
+          </Label>
         </div>
         <Switch
           checked={question.data.shufflePairs || false}

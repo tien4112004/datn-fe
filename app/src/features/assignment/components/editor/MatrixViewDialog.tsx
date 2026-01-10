@@ -165,7 +165,9 @@ export const MatrixViewDialog = () => {
         </div>
 
         <DialogFooter>
-          <Button onClick={handleClose}>{t('close')}</Button>
+          <Button type="button" onClick={handleClose}>
+            {t('close')}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

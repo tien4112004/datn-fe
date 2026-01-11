@@ -3,7 +3,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Save, X, Wand2, Database } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import {
@@ -14,14 +13,10 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/shared/components/ui/breadcrumb';
-import { Button } from '@/shared/components/ui/button';
-import LoadingButton from '@/shared/components/common/LoadingButton';
 import { AssignmentEditorLayout } from '../components/editor/AssignmentEditorLayout';
 import { MetadataEditDialog } from '../components/editor/MetadataEditDialog';
 import { MatrixEditorDialog } from '../components/editor/MatrixEditorDialog';
 import { MatrixViewDialog } from '../components/editor/MatrixViewDialog';
-import { AddQuestionButton } from '../components/editor/AddQuestionButton';
-import { useAssignmentEditorStore } from '../stores/useAssignmentEditorStore';
 import type { AssignmentFormData } from '../types';
 import { DIFFICULTY } from '../types';
 import { useCreateAssignment, useUpdateAssignment } from '../hooks/useAssignmentApi';
@@ -30,8 +25,6 @@ export const AssignmentEditorPage = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const { t } = useTranslation('assignment', { keyPrefix: 'assignmentEditor' });
-  const { t: tToolbar } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.questions.toolbar' });
-  const setQuestionBankOpen = useAssignmentEditorStore((state) => state.setQuestionBankOpen);
 
   // Validation schema
   const assignmentSchema = z.object({
@@ -154,7 +147,7 @@ export const AssignmentEditorPage = () => {
 
   return (
     <div className="flex min-h-screen flex-col bg-white dark:bg-gray-950">
-      <div className="p-8 pb-32">
+      <div className="p-8">
         <Breadcrumb className="mb-8">
           <BreadcrumbList>
             <BreadcrumbItem>
@@ -171,44 +164,17 @@ export const AssignmentEditorPage = () => {
 
         <FormProvider {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)}>
-            <AssignmentEditorLayout />
+            <AssignmentEditorLayout
+              onCancel={handleCancel}
+              onSave={form.handleSubmit(handleSubmit)}
+              isSaving={form.formState.isSubmitting}
+            />
           </form>
 
           {/* Dialogs */}
           <MetadataEditDialog />
           <MatrixEditorDialog />
           <MatrixViewDialog />
-
-          {/* Fixed Action Bar */}
-          <div className="fixed bottom-0 left-0 right-0 border-t bg-white/95 shadow-lg backdrop-blur-sm dark:bg-gray-950/95">
-            <div className="container mx-auto flex items-center justify-between gap-3 px-8 py-4">
-              <div className="flex items-center gap-2">
-                <AddQuestionButton />
-                <Button type="button" size="sm" variant="outline" disabled>
-                  <Wand2 className="mr-2 h-4 w-4" />
-                  {tToolbar('generate')}
-                </Button>
-                <Button type="button" size="sm" variant="outline" onClick={() => setQuestionBankOpen(true)}>
-                  <Database className="mr-2 h-4 w-4" />
-                  {tToolbar('fromBank')}
-                </Button>
-              </div>
-              <div className="flex items-center gap-3">
-                <Button type="button" variant="outline" onClick={handleCancel}>
-                  <X className="mr-2 h-4 w-4" />
-                  {t('actions.cancel')}
-                </Button>
-                <LoadingButton
-                  onClick={form.handleSubmit(handleSubmit)}
-                  loading={form.formState.isSubmitting}
-                  loadingText={t('actions.saving')}
-                >
-                  <Save className="mr-2 h-4 w-4" />
-                  {t('actions.save')}
-                </LoadingButton>
-              </div>
-            </div>
-          </div>
         </FormProvider>
       </div>
     </div>

@@ -13,7 +13,11 @@ import { QUESTION_TYPE, DIFFICULTY } from '../../types';
 import { generateId } from '@/shared/lib/utils';
 import { useAssignmentEditorStore } from '../../stores/useAssignmentEditorStore';
 
-export const AddQuestionButton = () => {
+interface AddQuestionButtonProps {
+  className?: string;
+}
+
+export const AddQuestionButton = ({ className }: AddQuestionButtonProps) => {
   const { t } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.questions.toolbar' });
   const { t: tTypes } = useTranslation('assignment', { keyPrefix: 'questionTypes' });
   const { control, watch } = useFormContext<AssignmentFormData>();
@@ -69,7 +73,7 @@ export const AddQuestionButton = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button type="button" size="sm">
+        <Button type="button" size="sm" className={className}>
           <Plus className="mr-2 h-4 w-4" />
           {t('addQuestion')}
         </Button>

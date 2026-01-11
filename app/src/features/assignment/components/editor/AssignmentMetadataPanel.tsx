@@ -119,15 +119,15 @@ export const AssignmentMetadataPanel = () => {
           />
         </div>
 
-        <div className="flex items-center justify-between pt-2">
-          <Label htmlFor="shuffle" className="text-sm text-gray-700 dark:text-gray-300">
-            {t('fields.shuffleQuestions')}
-          </Label>
+        <div className="flex items-center gap-2 pt-2">
           <Switch
             id="shuffle"
             checked={shuffleQuestions}
             onCheckedChange={(checked) => setValue('shuffleQuestions', checked)}
           />
+          <Label htmlFor="shuffle" className="text-sm text-gray-700 dark:text-gray-300">
+            {t('fields.shuffleQuestions')}
+          </Label>
         </div>
       </div>
     </div>

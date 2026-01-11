@@ -1,4 +1,4 @@
-export { default as api } from './client';
+export { default as api, type ApiClient } from './client';
 export { default as webviewApi } from './webview-client';
 export * from './types';
 export * from './api-mode';

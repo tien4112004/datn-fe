@@ -1,10 +1,8 @@
-import axios, { type AxiosInstance } from 'axios';
+import axios from 'axios';
 import { CriticalError, ExpectedError } from './types/errors';
 import { ERROR_TYPE } from './constants/errors';
 
-interface StreamableAxiosInstance extends AxiosInstance {
-  stream: (url: string, request: any, signal: AbortSignal) => Promise<Response>;
-}
+import type { ApiClient } from './client';
 
 /**
  * Webview API Client
@@ -16,12 +14,12 @@ interface StreamableAxiosInstance extends AxiosInstance {
  *
  * Used by: Mobile apps (datn-mobile) when displaying web content in authenticated webviews
  */
-const webviewApi: StreamableAxiosInstance = axios.create({
+const webviewApi: ApiClient = axios.create({
   allowAbsoluteUrls: true,
   headers: {
     'Content-Type': 'application/json',
   },
-}) as StreamableAxiosInstance;
+}) as ApiClient;
 
 // Request interceptor to add Authorization header from localStorage
 webviewApi.interceptors.request.use(

@@ -11,6 +11,12 @@ import type {
 import type { ModelPatchData } from '@aiprimary/core';
 import type { LoginRequest } from '@/types/auth';
 import type { SlideTemplate, SlideTheme } from '@aiprimary/core';
+import type {
+  QuestionBankParams,
+  QuestionBankFilters,
+  CreateQuestionPayload,
+  UpdateQuestionPayload,
+} from '@/types/question-bank';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
@@ -60,6 +66,18 @@ export const adminKeys = {
     list: (params?: PaginationParams & { type?: BookType }) =>
       [...adminKeys.books.all, 'list', params] as const,
     detail: (id: string) => [...adminKeys.books.all, 'detail', id] as const,
+  },
+  // Question Bank
+  questionBank: {
+    all: ['question-bank'] as const,
+    list: (params?: QuestionBankParams) => [...adminKeys.questionBank.all, 'list', params] as const,
+    detail: (id: string) => [...adminKeys.questionBank.all, 'detail', id] as const,
+    metadata: {
+      subjects: ['question-bank', 'metadata', 'subjects'] as const,
+      grades: ['question-bank', 'metadata', 'grades'] as const,
+      chapters: (subject: string, grade: string) =>
+        ['question-bank', 'metadata', 'chapters', subject, grade] as const,
+    },
   },
 };
 
@@ -501,5 +519,187 @@ export function useDeleteBook() {
         description: error instanceof Error ? error.message : 'An error occurred',
       });
     },
+  });
+}
+
+// ============= QUESTION BANK =============
+
+export function useQuestionBank(params?: QuestionBankParams) {
+  return useQuery({
+    queryKey: adminKeys.questionBank.list(params),
+    queryFn: () => getAdminApiService().getQuestionBank(params),
+    staleTime: 30000,
+    gcTime: 300000,
+  });
+}
+
+export function useQuestionBankItem(id: string) {
+  return useQuery({
+    queryKey: adminKeys.questionBank.detail(id),
+    queryFn: () => getAdminApiService().getQuestionById(id),
+    enabled: !!id,
+    staleTime: 300000,
+    gcTime: 600000,
+  });
+}
+
+export function useCreateQuestionBankItem() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (payload: CreateQuestionPayload) => getAdminApiService().createQuestion(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: adminKeys.questionBank.all });
+      toast.success('Question created successfully');
+    },
+    onError: (error) => {
+      toast.error('Failed to create question', {
+        description: error instanceof Error ? error.message : 'An error occurred',
+      });
+    },
+  });
+}
+
+export function useUpdateQuestionBankItem() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, payload }: { id: string; payload: UpdateQuestionPayload }) =>
+      getAdminApiService().updateQuestion(id, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: adminKeys.questionBank.all });
+      toast.success('Question updated successfully');
+    },
+    onError: (error) => {
+      toast.error('Failed to update question', {
+        description: error instanceof Error ? error.message : 'An error occurred',
+      });
+    },
+  });
+}
+
+export function useDeleteQuestionBankItem() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => getAdminApiService().deleteQuestion(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: adminKeys.questionBank.all });
+      toast.success('Question deleted successfully');
+    },
+    onError: (error) => {
+      toast.error('Failed to delete question', {
+        description: error instanceof Error ? error.message : 'An error occurred',
+      });
+    },
+  });
+}
+
+export function useBulkDeleteQuestionBankItems() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (ids: string[]) => getAdminApiService().bulkDeleteQuestions(ids),
+    onSuccess: (response) => {
+      queryClient.invalidateQueries({ queryKey: adminKeys.questionBank.all });
+      toast.success(`${response.data.deletedCount} question(s) deleted successfully`);
+    },
+    onError: (error) => {
+      toast.error('Failed to delete questions', {
+        description: error instanceof Error ? error.message : 'An error occurred',
+      });
+    },
+  });
+}
+
+export function useDuplicateQuestionBankItem() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => getAdminApiService().duplicateQuestion(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: adminKeys.questionBank.all });
+      toast.success('Question duplicated successfully');
+    },
+    onError: (error) => {
+      toast.error('Failed to duplicate question', {
+        description: error instanceof Error ? error.message : 'An error occurred',
+      });
+    },
+  });
+}
+
+export function useExportQuestionBank() {
+  return useMutation({
+    mutationFn: (filters?: QuestionBankFilters) => getAdminApiService().exportQuestions(filters),
+    onSuccess: (blob) => {
+      // Auto-download the file
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `question-bank-${new Date().toISOString().split('T')[0]}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      toast.success('Questions exported successfully');
+    },
+    onError: (error) => {
+      toast.error('Failed to export questions', {
+        description: error instanceof Error ? error.message : 'An error occurred',
+      });
+    },
+  });
+}
+
+export function useImportQuestionBank() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (file: File) => getAdminApiService().importQuestions(file),
+    onSuccess: (response) => {
+      queryClient.invalidateQueries({ queryKey: adminKeys.questionBank.all });
+      const { success, failed } = response.data;
+      if (failed > 0) {
+        toast.warning(`Import completed: ${success} succeeded, ${failed} failed`);
+      } else {
+        toast.success(`Successfully imported ${success} question(s)`);
+      }
+    },
+    onError: (error) => {
+      toast.error('Failed to import questions', {
+        description: error instanceof Error ? error.message : 'An error occurred',
+      });
+    },
+  });
+}
+
+// ============= QUESTION BANK METADATA =============
+
+export function useQuestionBankSubjects() {
+  return useQuery({
+    queryKey: adminKeys.questionBank.metadata.subjects,
+    queryFn: () => getAdminApiService().getQuestionBankSubjects(),
+    staleTime: 600000, // 10 minutes
+    gcTime: 1200000, // 20 minutes
+  });
+}
+
+export function useQuestionBankGrades() {
+  return useQuery({
+    queryKey: adminKeys.questionBank.metadata.grades,
+    queryFn: () => getAdminApiService().getQuestionBankGrades(),
+    staleTime: 600000, // 10 minutes
+    gcTime: 1200000, // 20 minutes
+  });
+}
+
+export function useQuestionBankChapters(subject?: string, grade?: string) {
+  return useQuery({
+    queryKey: adminKeys.questionBank.metadata.chapters(subject || '', grade || ''),
+    queryFn: () => getAdminApiService().getQuestionBankChapters(subject!, grade!),
+    enabled: !!subject && !!grade,
+    staleTime: 300000, // 5 minutes
+    gcTime: 600000, // 10 minutes
   });
 }

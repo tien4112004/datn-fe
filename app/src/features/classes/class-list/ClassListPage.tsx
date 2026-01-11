@@ -1,6 +1,4 @@
-import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbPage } from '@/components/ui/breadcrumb';
 import { Button } from '@/components/ui/button';
-import { Separator } from '@radix-ui/react-separator';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import { Plus } from 'lucide-react';
@@ -10,10 +8,11 @@ import { ViewToggle, type ViewMode } from './components/ViewToggle';
 import { ClassFilters } from './components/ClassFilters';
 import ClassGrid from './components/ClassGrid';
 import { ClassTable } from './components/ClassTable';
+import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage } from '@/components/ui/breadcrumb';
+import { Separator } from '@radix-ui/react-separator';
 
 export const ClassListPage = () => {
   const { t } = useTranslation('classes', { keyPrefix: 'list' });
-  const { t: tPage } = useTranslation('common', { keyPrefix: 'pages' });
   const [searchParams, setSearchParams] = useSearchParams();
 
   // Use selectors to prevent unnecessary re-renders
@@ -41,7 +40,7 @@ export const ClassListPage = () => {
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem className="hidden md:block">
-              <BreadcrumbPage>{tPage('classes')}</BreadcrumbPage>
+              <BreadcrumbPage>{t('title')}</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
@@ -69,7 +68,8 @@ export const ClassListPage = () => {
           <ViewToggle value={currentViewMode} onValueChange={handleViewModeChange} />
         </div>
 
-        {/* Content */}
+        <ClassFilters />
+
         {currentViewMode === 'list' ? <ClassTable /> : <ClassGrid />}
       </div>
     </>

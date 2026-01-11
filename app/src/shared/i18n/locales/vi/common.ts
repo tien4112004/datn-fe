@@ -8,8 +8,13 @@ export default {
       files: 'Tập tin',
       classes: 'Lớp học',
       subjects: 'Môn học',
+      assessmentMatrix: 'Ma Trận Đề Thi',
       schedules: 'Lịch',
       home: 'Trang chủ',
+      admin: 'Quản Trị',
+      questionBank: 'Kho Câu Hỏi',
+      assignments: 'Bài Tập',
+      questionRendererDemo: 'Demo Trình Hiển Thị Câu Hỏi',
     },
   },
   pages: {
@@ -20,6 +25,9 @@ export default {
     goBack: 'Quay lại',
     goHome: 'Về trang chủ',
     classes: 'Các lớp học',
+    examMatrices: 'Ma Trận Đề Thi',
+    createMatrix: 'Tạo Ma Trận',
+    editMatrix: 'Chỉnh Sửa Ma Trận',
   },
   status: {
     active: 'Hoạt động',

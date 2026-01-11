@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { FileUp, X } from 'lucide-react';
 import type { Book, BookType } from '@/types/api';
+import { getAllSubjects } from '@aiprimary/core';
 
 interface BookFormDialogProps {
   open: boolean;
@@ -18,22 +19,7 @@ interface BookFormDialogProps {
 }
 
 const GRADES = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'];
-const SUBJECTS = [
-  'Mathematics',
-  'Physics',
-  'Chemistry',
-  'Biology',
-  'Literature',
-  'English',
-  'History',
-  'Geography',
-  'Civics',
-  'Informatics',
-  'Technology',
-  'Music',
-  'Art',
-  'Physical Education',
-];
+const SUBJECTS = getAllSubjects();
 
 export function BookFormDialog({ open, onOpenChange, book, onSubmit, isPending }: BookFormDialogProps) {
   const [title, setTitle] = useState('');
@@ -168,8 +154,8 @@ export function BookFormDialog({ open, onOpenChange, book, onSubmit, isPending }
                 </SelectTrigger>
                 <SelectContent>
                   {SUBJECTS.map((s) => (
-                    <SelectItem key={s} value={s}>
-                      {s}
+                    <SelectItem key={s.code} value={s.code}>
+                      {s.name}
                     </SelectItem>
                   ))}
                 </SelectContent>

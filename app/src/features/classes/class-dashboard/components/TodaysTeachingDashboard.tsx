@@ -28,7 +28,7 @@ import type {
   DailySchedule,
   SchedulePeriod,
 } from '../../shared/types';
-import { getSubjectByCode } from '../../shared/types/constants/subjects';
+import { getSubjectByCode } from '@aiprimary/core';
 import { LessonStatusTracker, ObjectiveTracker, ResourceManager } from '../../class-lesson';
 
 interface TodaysTeachingDashboardProps {

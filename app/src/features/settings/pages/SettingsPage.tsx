@@ -64,19 +64,24 @@ function SettingsPage() {
   ];
 
   return (
-    <div className="flex flex-col gap-2 px-8 py-4">
-      <h1 className="scroll-m-20 text-balance text-4xl font-bold tracking-tight">{t('title')}</h1>
+    <div className="flex h-full flex-col">
+      <div className="flex flex-1 flex-col overflow-auto">
+        <div className="mx-auto w-full max-w-7xl space-y-6 px-8 py-12">
+          <div className="mb-8 space-y-1">
+            <h1 className="scroll-m-20 text-3xl font-semibold tracking-tight">{t('title')}</h1>
+            <p className="text-muted-foreground text-sm">{t('subtitle')}</p>
+          </div>
 
-      <p className="text-muted-foreground text-sm">{t('subtitle')}</p>
-
-      <div className="flex w-full flex-col gap-6">
-        <CommonTabs
-          value={currentTab}
-          onValueChange={handleTabChange}
-          items={tabItems}
-          tabsListClassName="bg-card flex w-full flex-row justify-start rounded-none border-b p-0"
-          tabsClassName="w-full"
-        />
+          <div className="flex w-full flex-col gap-6">
+            <CommonTabs
+              value={currentTab}
+              onValueChange={handleTabChange}
+              items={tabItems}
+              tabsListClassName="bg-card flex w-full flex-row justify-start rounded-none border-b p-0"
+              tabsClassName="w-full"
+            />
+          </div>
+        </div>
       </div>
     </div>
   );

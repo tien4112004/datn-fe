@@ -1,4 +1,4 @@
-import { getApiServiceFactory } from '@aiprimary/api';
+import { getApiServiceFactory, webViewApi } from '@aiprimary/api';
 import { PresentationApiService } from './service';
 import { MockPresentationApiService } from './mock';
 import type { PresentationGenerationRequest, PresentationGenerationStartResponse } from './types';
@@ -38,4 +38,13 @@ export interface IPresentationApi {
  */
 export const getPresentationApi = (): IPresentationApi => {
   return getApiServiceFactory<any>(MockPresentationApiService, PresentationApiService, BASE_URL);
+};
+
+/**
+ * Get presentation API service configured for WebView usage (no credentials/cookies).
+ * Use this for embedded pages like GenerationRemoteApp that run in Flutter WebView.
+ */
+export const getPresentationWebViewApi = (): IPresentationApi => {
+  // Always use real API service for webview (no mock support needed)
+  return new PresentationApiService(BASE_URL, webViewApi);
 };

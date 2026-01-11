@@ -1,5 +1,5 @@
-import { api } from '@aiprimary/api';
-import type { ApiResponse } from '@aiprimary/api';
+import { api, webViewApi } from '@aiprimary/api';
+import type { ApiResponse, StreamableAxiosInstance } from '@aiprimary/api';
 import type { PresentationGenerationRequest, PresentationGenerationStartResponse } from './types';
 import type { ImageGenerationParams } from '../image/types';
 import type { ApiService } from '@aiprimary/api';
@@ -10,9 +10,11 @@ const BASE_URL = getBackendUrl();
 
 export class PresentationApiService implements ApiService {
   baseUrl: string;
+  private apiClient: StreamableAxiosInstance;
 
-  constructor(baseUrl: string = BASE_URL) {
+  constructor(baseUrl: string = BASE_URL, apiClient: StreamableAxiosInstance = api) {
     this.baseUrl = baseUrl;
+    this.apiClient = apiClient;
   }
 
   getType() {
@@ -27,7 +29,9 @@ export class PresentationApiService implements ApiService {
     slides: SlideLayoutSchema[];
     generationOptions?: Omit<ImageGenerationParams, 'prompt' | 'slideId'>;
   }> {
-    const response = await api.get<ApiResponse<any>>(`${this.baseUrl}/api/presentations/${id}/ai-result`);
+    const response = await this.apiClient.get<ApiResponse<any>>(
+      `${this.baseUrl}/api/presentations/${id}/ai-result`
+    );
 
     const rawData = response.data.data;
 
@@ -63,7 +67,7 @@ export class PresentationApiService implements ApiService {
    * Used when updating slides after generation or parsing
    */
   async upsertSlide(presentationId: string, slide: Slide): Promise<Presentation> {
-    const response = await api.put<ApiResponse<Presentation>>(
+    const response = await this.apiClient.put<ApiResponse<Presentation>>(
       `${this.baseUrl}/api/presentations/${presentationId}/slides`,
       {
         slides: [
@@ -90,7 +94,7 @@ export class PresentationApiService implements ApiService {
       slides: slides.map((s) => ({ ...s, slideId: s.id })),
     };
 
-    await api.put<ApiResponse<Presentation>>(
+    await this.apiClient.put<ApiResponse<Presentation>>(
       `${this.baseUrl}/api/presentations/${presentationId}/slides`,
       payload,
       {
@@ -107,7 +111,9 @@ export class PresentationApiService implements ApiService {
    * Mark presentation as parsed (generation complete)
    */
   async setParsed(id: string): Promise<any> {
-    return await api.patch<ApiResponse<Presentation>>(`${this.baseUrl}/api/presentations/${id}/parse`);
+    return await this.apiClient.patch<ApiResponse<Presentation>>(
+      `${this.baseUrl}/api/presentations/${id}/parse`
+    );
   }
 
   /**
@@ -123,7 +129,7 @@ export class PresentationApiService implements ApiService {
     } & PresentationGenerationStartResponse
   > {
     try {
-      const response = await api.stream(
+      const response = await this.apiClient.stream(
         `${this.baseUrl}/api/presentations/generate`,
         {
           ...request,
@@ -177,7 +183,9 @@ export class PresentationApiService implements ApiService {
    * Get presentation by ID
    */
   async getPresentation(id: string): Promise<Presentation> {
-    const response = await api.get<ApiResponse<Presentation>>(`${this.baseUrl}/api/presentations/${id}`);
+    const response = await this.apiClient.get<ApiResponse<Presentation>>(
+      `${this.baseUrl}/api/presentations/${id}`
+    );
     return this._mapPresentationItem(response.data.data);
   }
 
@@ -187,7 +195,11 @@ export class PresentationApiService implements ApiService {
   async updatePresentation(id: string, data: Presentation | FormData): Promise<any> {
     const config = data instanceof FormData ? { headers: { 'Content-Type': 'multipart/form-data' } } : {};
 
-    await api.put<ApiResponse<Presentation>>(`${this.baseUrl}/api/presentations/${id}`, data, config);
+    await this.apiClient.put<ApiResponse<Presentation>>(
+      `${this.baseUrl}/api/presentations/${id}`,
+      data,
+      config
+    );
   }
 
   /**
@@ -203,7 +215,7 @@ export class PresentationApiService implements ApiService {
     const page = (params?.page ?? 0) + 1;
     const limit = params?.limit ?? 10;
 
-    const response = await api.get<ApiResponse<any>>(
+    const response = await this.apiClient.get<ApiResponse<any>>(
       `${this.baseUrl}/api/slide-themes?page=${page}&limit=${limit}`
     );
 

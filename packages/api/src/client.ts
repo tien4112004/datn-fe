@@ -2,7 +2,7 @@ import axios, { type AxiosInstance } from 'axios';
 import { CriticalError, ExpectedError } from './types/errors';
 import { ERROR_TYPE } from './constants/errors';
 
-interface StreamableAxiosInstance extends AxiosInstance {
+export interface StreamableAxiosInstance extends AxiosInstance {
   stream: (url: string, request: any, signal: AbortSignal) => Promise<Response>;
 }
 
@@ -112,6 +112,7 @@ api.interceptors.response.use(
           // We'll dispatch a custom event that the app can listen to
           window.dispatchEvent(new CustomEvent('auth:unauthorized'));
 
+          console.info(JSON.stringify(response.data));
           return Promise.reject(
             new ExpectedError(
               'Session expired. Please login again.',

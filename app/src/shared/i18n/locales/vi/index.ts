@@ -13,6 +13,9 @@ import image from './image';
 import projects from './projects';
 import settings from './settings';
 import classes from './classes';
+import assignment from './assignment';
+import admin from './admin';
+import assessmentMatrix from './assessmentMatrix';
 
 export default {
   common,
@@ -26,4 +29,7 @@ export default {
   projects,
   settings,
   classes,
+  assignment,
+  admin,
+  assessmentMatrix,
 };

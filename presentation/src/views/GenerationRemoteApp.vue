@@ -35,6 +35,7 @@ import type { PresentationGenerationRequest } from '../types/generation';
 import { usePresentationProcessor } from '@/hooks/usePresentationProcessor';
 import { useGenerationStore } from '@/store/generation';
 import { useSavePresentation } from '@/hooks/useSavePresentation';
+import { webViewTokenManager } from '@aiprimary/api';
 
 const _isPC = isPC();
 
@@ -152,6 +153,17 @@ const unwatchStreaming = ref<(() => void) | null>(null);
 const unwatchError = ref<(() => void) | null>(null);
 
 onMounted(() => {
+  // Extract token from URL query parameter
+  const urlParams = new URLSearchParams(window.location.search);
+  const token = urlParams.get('token');
+
+  if (token) {
+    console.log('[GenerationRemoteApp] Token found in URL, setting token');
+    webViewTokenManager.setToken(token);
+  } else {
+    console.warn('[GenerationRemoteApp] No token provided in URL query parameter');
+  }
+
   // Listen for messages from Flutter
   window.addEventListener('message', handlePresentationData);
 

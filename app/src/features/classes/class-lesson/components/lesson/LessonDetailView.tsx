@@ -39,7 +39,7 @@ import { getLocaleDateFns } from '@/shared/i18n/helper';
 import { formatTimeRange } from '../../../class-schedule/utils/calendarHelpers';
 import { LessonCreator } from '../form/LessonCreator';
 import { useUpdateLesson } from '../../hooks';
-import { getSubjectByCode } from '../../../shared/types';
+import { getSubjectByCode } from '@aiprimary/core';
 
 interface LessonDetailViewProps {
   lesson: Lesson;

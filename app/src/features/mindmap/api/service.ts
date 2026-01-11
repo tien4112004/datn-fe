@@ -11,12 +11,15 @@ import {
 } from '../types';
 import { api } from '@aiprimary/api';
 import { mapPagination, type ApiResponse, type Pagination } from '@aiprimary/api';
+import type { AxiosInstance } from 'axios';
 
 export default class MindmapRealApiService implements MindmapApiService {
   baseUrl: string;
+  private apiClient: AxiosInstance;
 
-  constructor(baseUrl: string) {
+  constructor(baseUrl: string, apiClient: AxiosInstance = api) {
     this.baseUrl = baseUrl;
+    this.apiClient = apiClient;
   }
 
   getType(): ApiMode {
@@ -61,7 +64,7 @@ export default class MindmapRealApiService implements MindmapApiService {
   }
 
   async deleteMindmap(id: string): Promise<void> {
-    await api.delete(`${this.baseUrl}/api/mindmaps/${id}`);
+    await this.apiClient.delete(`${this.baseUrl}/api/mindmaps/${id}`);
   }
 
   async updateMindmapTitle(id: string, name: string): Promise<MindmapTitleUpdateResponse> {

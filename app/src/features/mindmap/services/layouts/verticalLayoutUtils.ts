@@ -20,6 +20,10 @@ export interface VerticalLayoutConfig {
   sourceHandle: 'top' | 'bottom';
   targetHandle: 'top' | 'bottom';
   yDirection: 1 | -1;
+  /** Optional default horizontal spacing override */
+  defaultHorizontalSpacing?: number;
+  /** Optional default vertical spacing override */
+  defaultVerticalSpacing?: number;
 }
 
 /**

@@ -1,28 +1,28 @@
-import { Network, Workflow } from 'lucide-react';
-import { useState, memo, useCallback, useMemo } from 'react';
-import type { RootNode, PathType } from '../../types';
-import { PATH_TYPES, DRAGHANDLE } from '../../types';
-import { BaseNodeBlock } from './BaseNode';
-import { BaseNodeContent } from '../ui/base-node';
-import type { NodeProps } from '@xyflow/react';
-import { useCoreStore, useNodeManipulationStore, useNodeOperationsStore, useLayoutStore } from '../../stores';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/shared/components/ui/popover';
+import type { NodeProps } from '@xyflow/react';
+import { Network, Workflow } from 'lucide-react';
+import { memo, useCallback, useState } from 'react';
+import { useCoreStore, useLayoutStore, useNodeManipulationStore, useNodeOperationsStore } from '../../stores';
+import type { PathType, RootNode } from '../../types';
+import { DRAGHANDLE, PATH_TYPES } from '../../types';
+import { DEFAULT_LAYOUT_TYPE } from '../../services/utils';
+import { BaseNodeContent } from '../ui/base-node';
 import { BezierIcon, SmoothStepIcon, StraightIcon } from '../ui/icon';
-import { getTreeLayoutType } from '../../services/utils';
+import { BaseNodeBlock } from './BaseNode';
 
-import ColorPickerControl from '../controls/ColorPickerControl';
-import { BaseNodeControl } from '../controls/BaseNodeControl';
-import { NodeRichTextContent } from '../ui/node-rich-text-content';
 import { usePresenterContext } from '../../contexts/ReadOnlyContext';
+import { BaseNodeControl } from '../controls/BaseNodeControl';
+import ColorPickerControl from '../controls/ColorPickerControl';
+import { NodeRichTextContent } from '../ui/node-rich-text-content';
 
 const RootNodeBlock = memo(
   ({ ...node }: NodeProps<RootNode>) => {
     const { data, selected: isSelected, dragging, width, height } = node;
     const { isPresenterMode } = usePresenterContext();
 
-    const nodes = useCoreStore((state) => state.nodes);
-    const layoutType = useMemo(() => getTreeLayoutType(nodes), [nodes]);
+    // Root node IS the tree root, can directly look up its own layoutType
+    const layoutType = useCoreStore((state) => state.rootLayoutTypeMap.get(node.id) || DEFAULT_LAYOUT_TYPE);
 
     const updateNodeData = useNodeOperationsStore((state) => state.updateNodeDataWithUndo);
     const updateSubtreeLayout = useLayoutStore((state) => state.updateSubtreeLayout);

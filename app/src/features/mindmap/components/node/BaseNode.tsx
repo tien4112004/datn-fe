@@ -1,12 +1,12 @@
-import { type ReactNode, type HTMLAttributes, useCallback, memo, useMemo } from 'react';
-import { AnimatePresence, motion } from 'motion/react';
-import { cn } from '@/shared/lib/utils';
 import type { MindMapNode } from '@/features/mindmap/types';
-import { NodeResizer, type NodeProps } from '@xyflow/react';
 import { DRAGHANDLE } from '@/features/mindmap/types';
-import { useShallow } from 'zustand/react/shallow';
+import { DEFAULT_LAYOUT_TYPE } from '../../services/utils';
+import { cn } from '@/shared/lib/utils';
+import { NodeResizer, type NodeProps } from '@xyflow/react';
 import { isEqual } from 'lodash';
-
+import { AnimatePresence, motion } from 'motion/react';
+import { memo, useCallback, useMemo, type HTMLAttributes, type ReactNode } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import {
   useClipboardStore,
   useCoreStore,
@@ -14,7 +14,7 @@ import {
   useNodeOperationsStore,
 } from '@/features/mindmap/stores';
 import { ChildNodeControls, NodeHandlers } from '../controls/ChildNodeControls';
-import { getTreeLayoutType } from '@/features/mindmap/services/utils';
+import { useWhyDidYouUpdate } from '@/shared/hooks/use-debug';
 
 export interface BaseNodeBlockProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
   children: ReactNode;
@@ -28,13 +28,28 @@ const selectedCountSelector = (state: any) => state.selectedNodeIds.size;
 export const BaseNodeBlock = memo(
   ({ className, children, variant = 'card', node, ...props }: BaseNodeBlockProps) => {
     const { id, data, width, height, selected, dragging } = node;
+
+    // Debug: Track why this component rerenders
+    useWhyDidYouUpdate(`BaseNode[${id}]`, {
+      id,
+      data,
+      width,
+      height,
+      selected,
+      dragging,
+      variant,
+      className,
+    });
+
     const dragTargetNodeId = useClipboardStore(useShallow(clipboardSelector));
     const isDragTarget = dragTargetNodeId === id;
 
-    const nodes = useCoreStore((state) => state.nodes);
     const isLayouting = useLayoutStore((state) => state.isLayouting);
     const onNodeDelete = useNodeOperationsStore((state) => state.finalizeNodeDeletion);
-    const layoutType = useMemo(() => getTreeLayoutType(nodes), [nodes]);
+    const layoutType = useCoreStore((state) => {
+      const rootId = state.nodeToRootMap.get(id);
+      return (rootId && state.rootLayoutTypeMap.get(rootId)) || DEFAULT_LAYOUT_TYPE;
+    });
 
     const handleAnimationComplete = useCallback(() => {
       if (data.isDeleting && onNodeDelete) {

@@ -16,12 +16,33 @@ import ColorPickerControl from '../controls/ColorPickerControl';
 import { useCallback, useMemo } from 'react';
 import { SIDE, MINDMAP_TYPES, LAYOUT_TYPE, PATH_TYPES } from '../../types';
 import type { LayoutType, PathType } from '../../types';
-import { getAllDescendantNodes, getTreeLayoutType, getTreeForceLayout } from '../../services/utils';
+import { getAllDescendantNodes, DEFAULT_LAYOUT_TYPE } from '../../services/utils';
 import { BezierIcon, SmoothStepIcon, StraightIcon } from '../ui/icon';
+import { useWhyDidYouUpdate } from '@/shared/hooks/use-debug';
 
 interface NodeSelectionTabProps {
   className?: string;
 }
+
+// Stable Selectors
+const selectLayoutType = (state: any) => {
+  const firstNodeId = state.selectedNodeIds.values().next().value;
+  if (!firstNodeId) return DEFAULT_LAYOUT_TYPE;
+
+  const rootId = state.nodeToRootMap.get(firstNodeId);
+  return (rootId && state.rootLayoutTypeMap.get(rootId)) || DEFAULT_LAYOUT_TYPE;
+};
+
+const selectIsAutoLayoutEnabled = (state: any) => {
+  const firstNodeId = state.selectedNodeIds.values().next().value;
+  if (!firstNodeId) return false;
+
+  const rootId = state.nodeToRootMap.get(firstNodeId);
+  if (!rootId) return false;
+
+  const rootNode = state.nodes.find((n: any) => n.id === rootId);
+  return Boolean(rootNode?.data?.forceLayout ?? false);
+};
 
 const NodeSelectionTab = ({ className }: NodeSelectionTabProps) => {
   const { t } = useTranslation(I18N_NAMESPACES.MINDMAP);
@@ -37,7 +58,19 @@ const NodeSelectionTab = ({ className }: NodeSelectionTabProps) => {
     deselectAll,
   } = useNodeSelection();
 
-  const nodes = useCoreStore((state) => state.nodes);
+  // Debug: Track why NodeSelectionTab rerenders
+  if (process.env.NODE_ENV === 'development') {
+    useWhyDidYouUpdate('NodeSelectionTab', {
+      selectedCount,
+      hasSelection,
+      isSingleSelection,
+      isMultiSelection,
+      firstSelectedNodeId: firstSelectedNode?.id,
+      className,
+    });
+  }
+
+  // Actions only - no state subscriptions to avoid rerenders
   const setNodes = useCoreStore((state) => state.setNodes);
   const updateNodeData = useNodeOperationsStore((state) => state.updateNodeData);
   const addChildNode = useNodeOperationsStore((state) => state.addChildNode);
@@ -45,12 +78,17 @@ const NodeSelectionTab = ({ className }: NodeSelectionTabProps) => {
   const updateLayout = useLayoutStore((state) => state.updateLayout);
   const setLayoutType = useLayoutStore((state) => state.setLayoutType);
   const setAutoLayoutEnabled = useLayoutStore((state) => state.setAutoLayoutEnabled);
+  const getSpacingProfile = useLayoutStore((state) => state.getSpacingProfile);
+  const setSpacingProfile = useLayoutStore((state) => state.setSpacingProfile);
   const updateSubtreeEdgePathType = useNodeManipulationStore((state) => state.updateSubtreeEdgePathType);
   const updateSubtreeEdgeColor = useNodeManipulationStore((state) => state.updateSubtreeEdgeColor);
 
-  // Get layout data from root node
-  const layoutType = useMemo(() => getTreeLayoutType(nodes), [nodes]);
-  const isAutoLayoutEnabled = useMemo(() => getTreeForceLayout(nodes), [nodes]);
+  // Get layout data from root node using cached maps
+  const layoutType = useCoreStore(selectLayoutType);
+
+  // Get auto layout setting from first selected node's root
+  const isAutoLayoutEnabled: boolean = useCoreStore(selectIsAutoLayoutEnabled);
+  const spacingProfile = getSpacingProfile();
 
   // Get the background color of the first selected node (for single selection styling)
   const currentColor = (firstSelectedNode?.data?.backgroundColor as string) || '#ffffff';
@@ -62,8 +100,8 @@ const NodeSelectionTab = ({ className }: NodeSelectionTabProps) => {
 
   // Get the edge color for root node
   const currentEdgeColor = useMemo(() => {
-    if (!isRootNode || !firstSelectedNode) return 'var(--primary)';
-    return (firstSelectedNode?.data?.edgeColor as string) || 'var(--primary)';
+    if (!isRootNode || !firstSelectedNode) return '#3b82f6';
+    return (firstSelectedNode?.data?.edgeColor as string) || '#3b82f6';
   }, [isRootNode, firstSelectedNode]);
 
   // Get the current path type for root node
@@ -75,51 +113,44 @@ const NodeSelectionTab = ({ className }: NodeSelectionTabProps) => {
   // Get descendant count for single selection
   const descendantCount = useMemo(() => {
     if (!isSingleSelection || !firstSelectedNode) return 0;
+    const nodes = useCoreStore.getState().nodes;
     return getAllDescendantNodes(firstSelectedNode.id, nodes).length;
-  }, [isSingleSelection, firstSelectedNode, nodes]);
+  }, [isSingleSelection, firstSelectedNode]);
+
+  /**
+   * Handle spacing profile change
+   */
+  const handleSpacingProfileChange = useCallback(
+    (profile: string) => {
+      setSpacingProfile(profile as 'COMPACT' | 'DEFAULT' | 'SPACIOUS');
+      if (isAutoLayoutEnabled) {
+        updateLayout();
+      }
+    },
+    [setSpacingProfile, isAutoLayoutEnabled, updateLayout]
+  );
 
   /**
    * Layout type options for root node layout section
    */
-  const LAYOUT_OPTIONS: Array<{
-    type: LayoutType;
-    labelKey: string;
-  }> = [
-    { type: LAYOUT_TYPE.HORIZONTAL_BALANCED, labelKey: 'toolbar.layout.horizontalBalanced' },
-    { type: LAYOUT_TYPE.VERTICAL_BALANCED, labelKey: 'toolbar.layout.verticalBalanced' },
-    { type: LAYOUT_TYPE.RIGHT_ONLY, labelKey: 'toolbar.layout.rightOnly' },
-    { type: LAYOUT_TYPE.LEFT_ONLY, labelKey: 'toolbar.layout.leftOnly' },
-    { type: LAYOUT_TYPE.BOTTOM_ONLY, labelKey: 'toolbar.layout.bottomOnly' },
-    { type: LAYOUT_TYPE.TOP_ONLY, labelKey: 'toolbar.layout.topOnly' },
-  ];
+  const LAYOUT_OPTIONS = useMemo(
+    () => [
+      { type: LAYOUT_TYPE.HORIZONTAL_BALANCED, label: t('toolbar.layout.horizontalBalanced') },
+      { type: LAYOUT_TYPE.VERTICAL_BALANCED, label: t('toolbar.layout.verticalBalanced') },
+      { type: LAYOUT_TYPE.RIGHT_ONLY, label: t('toolbar.layout.rightOnly') },
+      { type: LAYOUT_TYPE.LEFT_ONLY, label: t('toolbar.layout.leftOnly') },
+      { type: LAYOUT_TYPE.BOTTOM_ONLY, label: t('toolbar.layout.bottomOnly') },
+      { type: LAYOUT_TYPE.TOP_ONLY, label: t('toolbar.layout.topOnly') },
+    ],
+    [t]
+  );
 
-  const getLayoutLabel = useCallback(
-    (type: LayoutType): string => {
-      const option = LAYOUT_OPTIONS.find((opt) => opt.type === type);
-      if (option) {
-        const translated = t(option.labelKey, { defaultValue: '' });
-        if (translated && translated !== option.labelKey) {
-          return translated;
-        }
-      }
-      // Fallback labels
-      switch (type) {
-        case LAYOUT_TYPE.HORIZONTAL_BALANCED:
-          return 'Horizontal Balanced';
-        case LAYOUT_TYPE.VERTICAL_BALANCED:
-          return 'Vertical Balanced';
-        case LAYOUT_TYPE.RIGHT_ONLY:
-          return 'Right Only';
-        case LAYOUT_TYPE.LEFT_ONLY:
-          return 'Left Only';
-        case LAYOUT_TYPE.BOTTOM_ONLY:
-          return 'Bottom Only';
-        case LAYOUT_TYPE.TOP_ONLY:
-          return 'Top Only';
-        default:
-          return 'None';
-      }
-    },
+  const SPACING_OPTIONS = useMemo(
+    () => [
+      { value: 'COMPACT' as const, label: t('toolbar.layout.spacingCompact') },
+      { value: 'DEFAULT' as const, label: t('toolbar.layout.spacingDefault') },
+      { value: 'SPACIOUS' as const, label: t('toolbar.layout.spacingSpacious') },
+    ],
     [t]
   );
 
@@ -192,6 +223,7 @@ const NodeSelectionTab = ({ className }: NodeSelectionTabProps) => {
   const handleSelectDescendants = useCallback(() => {
     if (!firstSelectedNode) return;
 
+    const nodes = useCoreStore.getState().nodes;
     const descendants = getAllDescendantNodes(firstSelectedNode.id, nodes);
     const descendantIds = new Set([firstSelectedNode.id, ...descendants.map((n) => n.id)]);
 
@@ -201,7 +233,7 @@ const NodeSelectionTab = ({ className }: NodeSelectionTabProps) => {
         selected: descendantIds.has(node.id),
       }))
     );
-  }, [firstSelectedNode, nodes, setNodes]);
+  }, [firstSelectedNode, setNodes]);
 
   // Layout subtree for the selected node
   const handleLayoutSubtree = useCallback(() => {
@@ -431,7 +463,7 @@ const NodeSelectionTab = ({ className }: NodeSelectionTabProps) => {
                   size="sm"
                   className="w-full justify-between focus:outline-none focus:ring-2 focus:ring-gray-500"
                 >
-                  {getLayoutLabel(layoutType)}
+                  {LAYOUT_OPTIONS.find((opt) => opt.type === layoutType)?.label || 'None'}
                   <ChevronDown size={16} />
                 </Button>
               </DropdownMenuTrigger>
@@ -443,8 +475,36 @@ const NodeSelectionTab = ({ className }: NodeSelectionTabProps) => {
                     className={layoutType === option.type ? 'bg-gray-100' : ''}
                   >
                     <div className="flex flex-col">
-                      <span className="font-medium">{getLayoutLabel(option.type)}</span>
+                      <span className="font-medium">{option.label}</span>
                     </div>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+
+          {/* Spacing Profile */}
+          <div className="space-y-1">
+            <Label className="text-xs font-medium text-gray-600">{t('toolbar.layout.spacing')}</Label>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full justify-between focus:outline-none focus:ring-2 focus:ring-gray-500"
+                >
+                  {SPACING_OPTIONS.find((opt) => opt.value === spacingProfile)?.label || spacingProfile}
+                  <ChevronDown size={16} />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-56">
+                {SPACING_OPTIONS.map((option) => (
+                  <DropdownMenuItem
+                    key={option.value}
+                    onClick={() => handleSpacingProfileChange(option.value)}
+                    className={spacingProfile === option.value ? 'bg-gray-100' : ''}
+                  >
+                    {option.label}
                   </DropdownMenuItem>
                 ))}
               </DropdownMenuContent>

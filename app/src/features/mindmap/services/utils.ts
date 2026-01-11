@@ -14,6 +14,41 @@ export const getAllDescendantNodes = (parentId: string, nodes: MindMapNode[]): M
   }, []);
 };
 
+/**
+ * Custom equality check for TreeView to ignore selection/position changes.
+ * Returns true if nodes are structurally the same.
+ */
+export const areNodesEqualForTree = (prev: MindMapNode[], next: MindMapNode[]) => {
+  if (prev === next) return true;
+  if (prev.length !== next.length) return false;
+
+  for (let i = 0; i < prev.length; i++) {
+    const p = prev[i];
+    const n = next[i];
+
+    // Fast identity check
+    if (p === n) continue;
+
+    // Check structural and content fields
+    if (p.id !== n.id) return false;
+    if (p.type !== n.type) return false;
+
+    // Check data reference (content updates change data ref)
+    if (p.data !== n.data) return false;
+
+    // Check parentId specifically if not in data (though it usually is)
+    // Most mindmap generic implementations keep parentId in data
+
+    // Intentionally IGNORING:
+    // - selected
+    // - position
+    // - measured dimensions
+    // - dragging
+  }
+
+  return true;
+};
+
 export const getRootNodeOfSubtree = (nodeId: string, nodes: MindMapNode[]): MindMapNode | null => {
   const node = nodes.find((n) => n.id === nodeId);
   if (!node) return null;
@@ -266,6 +301,23 @@ export const getTreeLayoutType = (nodes: MindMapNode[]): LayoutType => {
  */
 export const getRootLayoutType = (rootNode: RootNode | null): LayoutType => {
   return rootNode?.data?.layoutType ?? DEFAULT_LAYOUT_TYPE;
+};
+
+/**
+ * Get layout type for a specific node using cached mappings
+ * This replaces the inefficient getTreeLayoutType() for individual nodes
+ * Uses O(1) Map lookups instead of O(depth) recursive traversal
+ */
+export const getLayoutTypeForNode = (
+  nodeId: string,
+  nodeToRootMap: Map<string, string>,
+  rootLayoutTypeMap: Map<string, LayoutType>
+): LayoutType => {
+  const rootId = nodeToRootMap.get(nodeId);
+  if (!rootId) return DEFAULT_LAYOUT_TYPE;
+
+  const layoutType = rootLayoutTypeMap.get(rootId);
+  return layoutType ?? DEFAULT_LAYOUT_TYPE;
 };
 
 /**

@@ -108,6 +108,11 @@ export default {
       bottomOnlyDesc: 'Nút con bên dưới, căn giữa',
       topOnly: 'Chỉ bên trên',
       topOnlyDesc: 'Nút con bên trên, căn giữa',
+      // Spacing profiles
+      spacing: 'Khoảng cách nút',
+      spacingCompact: 'Gọn',
+      spacingDefault: 'Mặc định',
+      spacingSpacious: 'Rộng rãi',
     },
     tooltips: {
       addNode: 'Thêm nút mới',

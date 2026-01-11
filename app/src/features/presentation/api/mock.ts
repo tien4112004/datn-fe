@@ -328,6 +328,8 @@ Did you know computers can now think and learn just like humans? Let's discover 
 
 _AI doesn't get tired or forget - it keeps learning 24/7!_
 
+---
+
 ### How Does AI Actually Learn?
 
 The secret ingredient is massive amounts of **data**! AI systems feed on information to become smarter.
@@ -340,7 +342,7 @@ The secret ingredient is massive amounts of **data**! AI systems feed on informa
 
 > Just like we learn from our mistakes, AI gets better with every example!
 
-### AI in Our Daily Lives
+---### AI in Our Daily Lives
 
 From your smartphone to your favorite streaming service, AI is everywhere working behind the scenes.
 

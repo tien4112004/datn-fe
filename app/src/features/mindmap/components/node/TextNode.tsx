@@ -1,21 +1,33 @@
-import { useCallback, memo, useMemo } from 'react';
-import { DRAGHANDLE } from '@/features/mindmap/types/constants';
+import { Button } from '@/components/ui/button';
 import type { TextNode } from '@/features/mindmap/types';
-import { BaseNodeBlock } from './BaseNode';
-import { BaseNodeContent } from '../ui/base-node';
+import { DRAGHANDLE } from '@/features/mindmap/types/constants';
 import type { NodeProps } from '@xyflow/react';
+import { Network } from 'lucide-react';
+import { memo, useCallback, useMemo } from 'react';
+import { usePresenterContext } from '../../contexts/ReadOnlyContext';
 import { useCoreStore, useNodeOperationsStore } from '../../stores';
 import { useLayoutStore } from '../../stores/layout';
-import { Button } from '@/components/ui/button';
-import { Network } from 'lucide-react';
 import { BaseNodeControl } from '../controls/BaseNodeControl';
+import { BaseNodeContent } from '../ui/base-node';
 import { NodeRichTextContent } from '../ui/node-rich-text-content';
+import { BaseNodeBlock } from './BaseNode';
 import { getTreeLayoutType } from '../../services/utils';
-import { usePresenterContext } from '../../contexts/ReadOnlyContext';
+import { useWhyDidYouUpdate } from '@/shared/hooks/use-debug';
 
 const TextNodeBlock = memo(
   ({ ...node }: NodeProps<TextNode>) => {
     const { data, selected: isSelected, dragging, width, height } = node;
+
+    // Debug: Track why TextNode rerenders
+    useWhyDidYouUpdate(`TextNode[${node.id}]`, {
+      id: node.id,
+      data,
+      isSelected,
+      dragging,
+      width,
+      height,
+    });
+
     const { isPresenterMode } = usePresenterContext();
 
     const nodes = useCoreStore((state) => state.nodes);

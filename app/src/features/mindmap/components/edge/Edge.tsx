@@ -90,7 +90,7 @@ const EdgeBlock = memo(
         key={`edge-${id}`}
         d={edgePath}
         fill="none"
-        stroke={data?.strokeColor || 'var(--primary)'}
+        stroke={data?.strokeColor || '#3b82f6'}
         strokeWidth={selected ? (data?.strokeWidth || 2) + 1 : data?.strokeWidth || 2}
         animate={
           data && data.isDeleting
@@ -133,9 +133,7 @@ export const ConnectionLine = ({
     targetPosition: getOppositePosition(fromHandle.position),
   });
 
-  return (
-    <path d={edgePath} fill="none" stroke={rootNode.data.edgeColor || 'var(--primary)'} strokeWidth={2} />
-  );
+  return <path d={edgePath} fill="none" stroke={rootNode.data.edgeColor || '#3b82f6'} strokeWidth={2} />;
 };
 
 export default EdgeBlock;

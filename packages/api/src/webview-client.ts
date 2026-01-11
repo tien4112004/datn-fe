@@ -1,32 +1,64 @@
-import axios, { type AxiosInstance } from 'axios';
+import axios from 'axios';
 import { CriticalError, ExpectedError } from './types/errors';
 import { ERROR_TYPE } from './constants/errors';
 
-export interface ApiClient extends AxiosInstance {
-  stream: (url: string, request: any, signal: AbortSignal) => Promise<Response>;
-}
+import type { ApiClient } from './client';
 
-const api: ApiClient = axios.create({
+/**
+ * Webview API Client
+ *
+ * This client is specifically designed for use within mobile webviews where:
+ * - The access token is injected into localStorage by the native mobile app
+ * - Authentication is handled via Bearer token in Authorization header (not cookies)
+ * - The token is read from localStorage key 'access_token'
+ *
+ * Used by: Mobile apps (datn-mobile) when displaying web content in authenticated webviews
+ */
+const webviewApi: ApiClient = axios.create({
   allowAbsoluteUrls: true,
-  withCredentials: true, // Enable sending cookies with requests (HttpOnly cookies contain auth tokens)
   headers: {
     'Content-Type': 'application/json',
   },
 }) as ApiClient;
 
-api.stream = async function (url: string, request: any, signal: AbortSignal) {
+// Request interceptor to add Authorization header from localStorage
+webviewApi.interceptors.request.use(
+  (config) => {
+    // Read token from localStorage (injected by mobile app)
+    const token = localStorage.getItem('access_token');
+
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    } else {
+      console.warn('[Webview API] No access token found in localStorage!');
+    }
+
+    return config;
+  },
+  (error) => {
+    console.error('[Webview API] Request interceptor error:', error);
+    return Promise.reject(error);
+  }
+);
+
+webviewApi.stream = async function (url: string, request: any, signal: AbortSignal) {
   try {
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       Accept: 'text/plain',
     };
 
+    // Add Authorization header from localStorage
+    const token = localStorage.getItem('access_token');
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+
     const response = await fetch(url, {
       method: 'POST',
       headers,
       body: JSON.stringify(request),
       signal,
-      credentials: 'include', // Send HttpOnly cookies with fetch requests
     });
 
     // Handle HTTP error status codes
@@ -100,9 +132,26 @@ api.stream = async function (url: string, request: any, signal: AbortSignal) {
   }
 };
 
-api.interceptors.response.use(
-  (response) => response,
+webviewApi.interceptors.response.use(
+  (response) => {
+    // console.info('[Webview API] Response success', {
+    //   status: response.status,
+    //   url: response.config.url,
+    // });
+    return response;
+  },
   (error) => {
+    console.error('[Webview API] Response error', {
+      message: error.message,
+      isAxiosError: axios.isAxiosError(error),
+      status: error.response?.status,
+      data: error.response?.data,
+      config: {
+        method: error.config?.method,
+        url: error.config?.url,
+      },
+    });
+
     if (axios.isAxiosError(error)) {
       const { response } = error;
       if (response) {
@@ -147,4 +196,4 @@ api.interceptors.response.use(
   }
 );
 
-export default api;
+export default webviewApi;

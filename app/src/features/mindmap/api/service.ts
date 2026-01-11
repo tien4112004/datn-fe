@@ -9,14 +9,17 @@ import {
   type AiGeneratedNode,
   type MindmapGenerateRequest,
 } from '../types';
-import { api } from '@aiprimary/api';
 import { mapPagination, type ApiResponse, type Pagination } from '@aiprimary/api';
 
-export default class MindmapRealApiService implements MindmapApiService {
-  baseUrl: string;
+import type { ApiClient } from '@aiprimary/api';
 
-  constructor(baseUrl: string) {
+export default class MindmapServiceImpl implements MindmapApiService {
+  baseUrl: string;
+  client: ApiClient;
+
+  constructor(baseUrl: string, client: ApiClient) {
     this.baseUrl = baseUrl;
+    this.client = client;
   }
 
   getType(): ApiMode {
@@ -24,7 +27,7 @@ export default class MindmapRealApiService implements MindmapApiService {
   }
 
   async getMindmaps(request: MindmapCollectionRequest): Promise<ApiResponse<MindmapResponse[]>> {
-    const response = await api.get<ApiResponse<MindmapResponse[]>>(`${this.baseUrl}/api/mindmaps`, {
+    const response = await this.client.get<ApiResponse<MindmapResponse[]>>(`${this.baseUrl}/api/mindmaps`, {
       params: {
         page: (request.page || 0) + 1,
         pageSize: request.pageSize,
@@ -40,19 +43,24 @@ export default class MindmapRealApiService implements MindmapApiService {
   }
 
   async getMindmapById(id: string): Promise<MindmapResponse> {
-    const response = await api.get<ApiResponse<MindmapResponse>>(`${this.baseUrl}/api/mindmaps/${id}`);
+    const response = await this.client.get<ApiResponse<MindmapResponse>>(
+      `${this.baseUrl}/api/mindmaps/${id}`
+    );
     return response.data.data;
   }
 
   async createMindmap(data: MindmapCreateInput): Promise<MindmapResponse> {
-    const response = await api.post<ApiResponse<MindmapResponse>>(`${this.baseUrl}/api/mindmaps`, data);
+    const response = await this.client.post<ApiResponse<MindmapResponse>>(
+      `${this.baseUrl}/api/mindmaps`,
+      data
+    );
     return response.data.data;
   }
 
   async updateMindmap(id: string, data: MindmapUpdateInput): Promise<MindmapResponse> {
     const config = data instanceof FormData ? { headers: { 'Content-Type': 'multipart/form-data' } } : {};
 
-    const response = await api.put<ApiResponse<MindmapResponse>>(
+    const response = await this.client.put<ApiResponse<MindmapResponse>>(
       `${this.baseUrl}/api/mindmaps/${id}`,
       data,
       config
@@ -61,11 +69,11 @@ export default class MindmapRealApiService implements MindmapApiService {
   }
 
   async deleteMindmap(id: string): Promise<void> {
-    await api.delete(`${this.baseUrl}/api/mindmaps/${id}`);
+    await this.client.delete(`${this.baseUrl}/api/mindmaps/${id}`);
   }
 
   async updateMindmapTitle(id: string, name: string): Promise<MindmapTitleUpdateResponse> {
-    await api.patch(`${this.baseUrl}/api/mindmaps/${id}/title`, {
+    await this.client.patch(`${this.baseUrl}/api/mindmaps/${id}/title`, {
       title: name,
     });
     // API returns 204 No Content
@@ -73,7 +81,7 @@ export default class MindmapRealApiService implements MindmapApiService {
   }
 
   async generateMindmap(request: MindmapGenerateRequest): Promise<AiGeneratedNode> {
-    const response = await api.post<ApiResponse<AiGeneratedNode>>(
+    const response = await this.client.post<ApiResponse<AiGeneratedNode>>(
       `${this.baseUrl}/api/mindmaps/generate`,
       request
     );

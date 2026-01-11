@@ -11,7 +11,7 @@ import {
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/shared/components/ui/tooltip';
 import type { AssignmentFormData } from '../../types';
 import { QUESTION_TYPE, DIFFICULTY } from '../../types';
-import { generateId } from '../../utils';
+import { generateId } from '@/shared/lib/utils';
 import { QuestionCountIndicator } from './QuestionCountIndicator';
 import { useAssignmentEditorStore } from '../../stores/useAssignmentEditorStore';
 import { VIEW_MODE } from '@aiprimary/core';

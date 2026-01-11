@@ -5,6 +5,7 @@ import { Button } from '@/shared/components/ui/button';
 import { useAssignmentEditorStore } from '../../stores/useAssignmentEditorStore';
 import { MatrixEmptyState } from './MatrixEmptyState';
 import { MatrixPreviewSummary } from './MatrixPreviewSummary';
+import { CollapsibleSection } from './CollapsibleSection';
 import type { AssignmentFormData } from '../../types';
 
 export const AssessmentMatrixPanel = () => {
@@ -24,36 +25,29 @@ export const AssessmentMatrixPanel = () => {
   const hasMatrix = matrixCells.some((cell) => cell.requiredCount > 0);
 
   return (
-    <div className="space-y-4">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div className="flex items-center rounded-lg bg-green-500 p-2 text-white">
-            <Grid3x3 className="h-5 w-5" />
-          </div>
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t('panelTitle')}</h2>
-        </div>
-        {hasMatrix && (
+    <CollapsibleSection
+      title={t('panelTitle')}
+      icon={<Grid3x3 className="h-5 w-5" />}
+      defaultOpen={true}
+      actions={
+        hasMatrix ? (
           <div className="flex gap-2">
-            <Button type="button" size="sm" variant="outline" onClick={() => setMatrixViewOpen(true)}>
+            <Button type="button" size="sm" variant="ghost" onClick={() => setMatrixViewOpen(true)}>
               <Eye className="mr-1 h-3 w-3" />
               {t('view')}
             </Button>
-            <Button type="button" size="sm" variant="outline" onClick={() => setMatrixEditorOpen(true)}>
+            <Button type="button" size="sm" variant="ghost" onClick={() => setMatrixEditorOpen(true)}>
               {t('edit')}
             </Button>
           </div>
-        )}
-      </div>
-
-      {/* Content */}
-      <div>
-        {!hasMatrix ? (
-          <MatrixEmptyState onOpenEditor={() => setMatrixEditorOpen(true)} />
-        ) : (
-          <MatrixPreviewSummary topics={topics} matrixCells={matrixCells} questions={questions} />
-        )}
-      </div>
-    </div>
+        ) : undefined
+      }
+    >
+      {!hasMatrix ? (
+        <MatrixEmptyState onOpenEditor={() => setMatrixEditorOpen(true)} />
+      ) : (
+        <MatrixPreviewSummary topics={topics} matrixCells={matrixCells} questions={questions} />
+      )}
+    </CollapsibleSection>
   );
 };

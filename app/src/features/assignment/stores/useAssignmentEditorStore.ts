@@ -3,6 +3,8 @@ import { devtools } from 'zustand/middleware';
 import type { AssignmentQuestionWithTopic, MatrixCell, AssignmentTopic } from '../types';
 import { VIEW_MODE, type ViewMode } from '@aiprimary/core';
 
+type MainView = 'info' | 'questions';
+
 interface AssignmentEditorState {
   // UI State
   selectedQuestionId: string | null;
@@ -12,6 +14,7 @@ interface AssignmentEditorState {
   isMetadataDialogOpen: boolean;
   isMatrixEditorOpen: boolean;
   isMatrixViewOpen: boolean;
+  mainView: MainView;
 
   // Actions
   setSelectedQuestion: (id: string | null) => void;
@@ -22,6 +25,7 @@ interface AssignmentEditorState {
   setMetadataDialogOpen: (open: boolean) => void;
   setMatrixEditorOpen: (open: boolean) => void;
   setMatrixViewOpen: (open: boolean) => void;
+  setMainView: (view: MainView) => void;
 
   // Question operations (these will be used by components to update form)
   reorderQuestions: (
@@ -49,11 +53,13 @@ export const useAssignmentEditorStore = create<AssignmentEditorState>()(
       isMetadataDialogOpen: false,
       isMatrixEditorOpen: false,
       isMatrixViewOpen: false,
+      mainView: 'info',
 
       // UI actions
       setSelectedQuestion: (id) => set({ selectedQuestionId: id }),
       setQuestionBankOpen: (open) => set({ isQuestionBankOpen: open }),
       setCurrentQuestionIndex: (index) => set({ currentQuestionIndex: index }),
+      setMainView: (view) => set({ mainView: view }),
       setQuestionViewMode: (questionId, mode) => {
         const modes = new Map(get().questionViewModes);
         modes.set(questionId, mode);

@@ -52,7 +52,7 @@ export const DraggableQuestionCard = ({ id, index }: DraggableQuestionCardProps)
   // Safety check - if question is not loaded yet, show debug state
   if (!assignmentQuestion || !question) {
     return (
-      <div className="rounded-lg border-2 border-red-500 bg-white p-4 dark:bg-red-950/20">
+      <div className="border-l-4 border-red-500 bg-red-50 p-4 dark:bg-red-950/20">
         <div className="text-sm font-semibold text-red-600 dark:text-red-400">
           {t('collection.item.dataMissingTitle', { number: index + 1 })}
         </div>
@@ -78,30 +78,24 @@ export const DraggableQuestionCard = ({ id, index }: DraggableQuestionCardProps)
     <div
       ref={setNodeRef}
       style={style}
-      className={`rounded-lg bg-white shadow-sm dark:bg-gray-800 ${isDragging ? 'opacity-50 shadow-2xl' : 'border border-gray-200 hover:shadow-md dark:border-gray-700'}`}
+      className={`bg-white dark:bg-gray-950 ${isDragging ? 'opacity-50' : ''}`}
     >
       {/* Header */}
       <div className="flex flex-row items-center justify-between gap-3 px-4 py-3 text-gray-900 dark:text-gray-100">
         <div className="flex min-w-0 flex-1 items-center gap-3">
           {/* Drag handle */}
-          <div
-            {...attributes}
-            {...listeners}
-            className="flex-shrink-0 cursor-move rounded p-1 hover:bg-gray-100 dark:hover:bg-gray-700"
-          >
-            <GripVertical className="h-5 w-5 text-gray-400" />
+          <div {...attributes} {...listeners} className="flex-shrink-0 cursor-move p-1">
+            <GripVertical className="h-4 w-4 text-gray-400" />
           </div>
 
           {/* Question number and metadata */}
-          <div className="flex min-w-0 flex-wrap items-center gap-2">
-            <span className="whitespace-nowrap text-sm font-semibold">Q{index + 1}</span>
-            <Badge variant="outline" className="text-xs">
-              {getQuestionTypeName(question.type)}
-            </Badge>
+          <div className="flex min-w-0 flex-wrap items-center gap-3">
+            <span className="whitespace-nowrap text-sm font-medium text-gray-500">Q{index + 1}</span>
+            <span className="text-xs text-gray-500">{getQuestionTypeName(question.type)}</span>
             {question.difficulty && (
-              <Badge variant="secondary" className="text-xs">
+              <span className="text-xs text-gray-500">
                 {DIFFICULTY_LABELS[question.difficulty as keyof typeof DIFFICULTY_LABELS]}
-              </Badge>
+              </span>
             )}
           </div>
         </div>
@@ -113,7 +107,7 @@ export const DraggableQuestionCard = ({ id, index }: DraggableQuestionCardProps)
             variant="ghost"
             size="sm"
             onClick={() => setIsExpanded(!isExpanded)}
-            className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
+            className="h-8 w-8 p-0"
           >
             <ChevronDown className={`h-4 w-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
           </Button>
@@ -131,7 +125,7 @@ export const DraggableQuestionCard = ({ id, index }: DraggableQuestionCardProps)
                 }
               }
             }}
-            className="text-red-500 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20"
+            className="h-8 w-8 p-0 text-gray-400 hover:text-red-600"
           >
             <Trash2 className="h-4 w-4" />
           </Button>
@@ -140,13 +134,13 @@ export const DraggableQuestionCard = ({ id, index }: DraggableQuestionCardProps)
 
       {/* Content: Question Details - Collapsible */}
       {isExpanded && (
-        <div className="space-y-2 border-t border-gray-200 bg-gray-50/50 px-4 py-3 text-gray-900 dark:border-gray-700 dark:bg-gray-800/50 dark:text-gray-100">
+        <div className="space-y-4 px-4 py-4 text-gray-900 dark:text-gray-100">
           {/* Topic, Difficulty, and Points in single horizontal row */}
-          <div className="grid gap-2 sm:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-3">
             <div>
               <Label
                 htmlFor={`topic-${index}`}
-                className="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300"
+                className="mb-1.5 block text-xs font-medium text-gray-600 dark:text-gray-400"
               >
                 {t('collection.item.topicLabel')}
               </Label>
@@ -154,10 +148,7 @@ export const DraggableQuestionCard = ({ id, index }: DraggableQuestionCardProps)
                 value={question.topicId}
                 onValueChange={(value) => setValue(`questions.${index}.question.topicId`, value)}
               >
-                <SelectTrigger
-                  id={`topic-${index}`}
-                  className="h-9 border-gray-300 bg-white text-sm dark:border-gray-600 dark:bg-gray-900"
-                >
+                <SelectTrigger id={`topic-${index}`} className="h-9 text-sm">
                   <SelectValue placeholder={t('collection.item.selectTopicPlaceholder') as string} />
                 </SelectTrigger>
                 <SelectContent>
@@ -173,7 +164,7 @@ export const DraggableQuestionCard = ({ id, index }: DraggableQuestionCardProps)
             <div>
               <Label
                 htmlFor={`difficulty-${index}`}
-                className="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300"
+                className="mb-1.5 block text-xs font-medium text-gray-600 dark:text-gray-400"
               >
                 {t('collection.item.difficultyLabel')}
               </Label>
@@ -181,10 +172,7 @@ export const DraggableQuestionCard = ({ id, index }: DraggableQuestionCardProps)
                 value={question.difficulty}
                 onValueChange={(value) => setValue(`questions.${index}.question.difficulty`, value as any)}
               >
-                <SelectTrigger
-                  id={`difficulty-${index}`}
-                  className="h-9 border-gray-300 bg-white text-sm dark:border-gray-600 dark:bg-gray-900"
-                >
+                <SelectTrigger id={`difficulty-${index}`} className="h-9 text-sm">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -200,7 +188,7 @@ export const DraggableQuestionCard = ({ id, index }: DraggableQuestionCardProps)
             <div>
               <Label
                 htmlFor={`points-${index}`}
-                className="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300"
+                className="mb-1.5 block text-xs font-medium text-gray-600 dark:text-gray-400"
               >
                 {t('collection.item.pointsLabel')}
               </Label>
@@ -209,13 +197,13 @@ export const DraggableQuestionCard = ({ id, index }: DraggableQuestionCardProps)
                 type="number"
                 {...register(`questions.${index}.points`, { valueAsNumber: true })}
                 min={0}
-                className="h-9 border-gray-300 bg-white text-sm dark:border-gray-600 dark:bg-gray-900"
+                className="h-9 text-sm"
               />
             </div>
           </div>
 
           {/* QuestionRenderer for type-specific content */}
-          <div className="rounded-md bg-gray-50 p-3 dark:bg-gray-700/50">
+          <div className="pt-2">
             <QuestionRenderer
               question={question as Question}
               viewMode={viewMode}
@@ -228,17 +216,17 @@ export const DraggableQuestionCard = ({ id, index }: DraggableQuestionCardProps)
 
       {/* Collapsed view - Show quick preview */}
       {!isExpanded && (
-        <div className="border-t border-gray-200 px-4 py-3 text-sm text-gray-600 dark:border-gray-700 dark:text-gray-400">
+        <div className="px-4 py-3 text-sm">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0 flex-1">
-              <p className="line-clamp-2 text-gray-900 dark:text-gray-100">
+              <p className="line-clamp-2 text-gray-700 dark:text-gray-300">
                 {question.title || (
                   <span className="italic text-gray-400">{t('collection.item.noQuestionText')}</span>
                 )}
               </p>
             </div>
             {points > 0 && (
-              <span className="flex-shrink-0 whitespace-nowrap font-medium text-gray-900 dark:text-gray-100">
+              <span className="flex-shrink-0 whitespace-nowrap text-xs font-medium text-gray-500">
                 {t('collection.item.pointsShort', { points })}
               </span>
             )}

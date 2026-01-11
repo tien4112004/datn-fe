@@ -1,8 +1,9 @@
+import * as React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Save, X } from 'lucide-react';
+import { Save, X, Wand2, Database } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import {
@@ -19,6 +20,8 @@ import { AssignmentEditorLayout } from '../components/editor/AssignmentEditorLay
 import { MetadataEditDialog } from '../components/editor/MetadataEditDialog';
 import { MatrixEditorDialog } from '../components/editor/MatrixEditorDialog';
 import { MatrixViewDialog } from '../components/editor/MatrixViewDialog';
+import { AddQuestionButton } from '../components/editor/AddQuestionButton';
+import { useAssignmentEditorStore } from '../stores/useAssignmentEditorStore';
 import type { AssignmentFormData } from '../types';
 import { DIFFICULTY } from '../types';
 import { useCreateAssignment, useUpdateAssignment } from '../hooks/useAssignmentApi';
@@ -27,6 +30,8 @@ export const AssignmentEditorPage = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const { t } = useTranslation('assignment', { keyPrefix: 'assignmentEditor' });
+  const { t: tToolbar } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.questions.toolbar' });
+  const setQuestionBankOpen = useAssignmentEditorStore((state) => state.setQuestionBankOpen);
 
   // Validation schema
   const assignmentSchema = z.object({
@@ -67,6 +72,10 @@ export const AssignmentEditorPage = () => {
   const { mutateAsync: createAssignment } = useCreateAssignment();
   const { mutateAsync: updateAssignment } = useUpdateAssignment();
 
+  // Generate consistent IDs for default topic and matrix cells
+  const defaultTopicId = React.useMemo(() => `topic-${Date.now()}`, []);
+  const timestamp = React.useMemo(() => Date.now(), []);
+
   const form = useForm<AssignmentFormData>({
     resolver: zodResolver(assignmentSchema) as any,
     defaultValues: {
@@ -77,7 +86,7 @@ export const AssignmentEditorPage = () => {
       shuffleQuestions: false,
       topics: [
         {
-          id: `topic-${Date.now()}`,
+          id: defaultTopicId,
           name: 'General',
           description: '',
         },
@@ -86,29 +95,29 @@ export const AssignmentEditorPage = () => {
       matrixCells: [
         // Initialize matrix cells for default topic
         {
-          id: `cell-${Date.now()}-1`,
-          topicId: `topic-${Date.now()}`,
+          id: `cell-${timestamp}-1`,
+          topicId: defaultTopicId,
           difficulty: DIFFICULTY.EASY,
           requiredCount: 0,
           currentCount: 0,
         },
         {
-          id: `cell-${Date.now()}-2`,
-          topicId: `topic-${Date.now()}`,
+          id: `cell-${timestamp}-2`,
+          topicId: defaultTopicId,
           difficulty: DIFFICULTY.MEDIUM,
           requiredCount: 0,
           currentCount: 0,
         },
         {
-          id: `cell-${Date.now()}-3`,
-          topicId: `topic-${Date.now()}`,
+          id: `cell-${timestamp}-3`,
+          topicId: defaultTopicId,
           difficulty: DIFFICULTY.HARD,
           requiredCount: 0,
           currentCount: 0,
         },
         {
-          id: `cell-${Date.now()}-4`,
-          topicId: `topic-${Date.now()}`,
+          id: `cell-${timestamp}-4`,
+          topicId: defaultTopicId,
           difficulty: DIFFICULTY.SUPER_HARD,
           requiredCount: 0,
           currentCount: 0,
@@ -144,55 +153,64 @@ export const AssignmentEditorPage = () => {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-gray-50 p-8 dark:bg-gray-950">
-      <Breadcrumb className="mb-6">
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/assignments">{t('breadcrumbs.assignments')}</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>
-              {id ? t('breadcrumbs.editAssignment') : t('breadcrumbs.createAssignment')}
-            </BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
+    <div className="flex min-h-screen flex-col bg-white dark:bg-gray-950">
+      <div className="p-8 pb-32">
+        <Breadcrumb className="mb-8">
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/assignments">{t('breadcrumbs.assignments')}</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>
+                {id ? t('breadcrumbs.editAssignment') : t('breadcrumbs.createAssignment')}
+              </BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
 
-      <FormProvider {...form}>
-        <form onSubmit={form.handleSubmit(handleSubmit)} className="flex flex-1 flex-col space-y-6">
-          <div className="flex-1">
+        <FormProvider {...form}>
+          <form onSubmit={form.handleSubmit(handleSubmit)}>
             <AssignmentEditorLayout />
-          </div>
+          </form>
 
-          {/* Action bar */}
-          <div className="mt-auto flex justify-end gap-3 rounded-xl border-2 bg-white/95 p-4 shadow-lg backdrop-blur-sm dark:bg-gray-900/95">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleCancel}
-              className="border-2 transition-all hover:scale-105 hover:border-red-400 hover:bg-red-50 hover:text-red-600"
-            >
-              <X className="mr-2 h-4 w-4" />
-              {t('actions.cancel')}
-            </Button>
-            <LoadingButton
-              type="submit"
-              loading={form.formState.isSubmitting}
-              loadingText={t('actions.saving')}
-              className="shadow-lg transition-all hover:scale-105"
-            >
-              <Save className="mr-2 h-4 w-4" />
-              {t('actions.save')}
-            </LoadingButton>
-          </div>
-        </form>
+          {/* Dialogs */}
+          <MetadataEditDialog />
+          <MatrixEditorDialog />
+          <MatrixViewDialog />
 
-        {/* Dialogs */}
-        <MetadataEditDialog />
-        <MatrixEditorDialog />
-        <MatrixViewDialog />
-      </FormProvider>
+          {/* Fixed Action Bar */}
+          <div className="fixed bottom-0 left-0 right-0 border-t bg-white/95 shadow-lg backdrop-blur-sm dark:bg-gray-950/95">
+            <div className="container mx-auto flex items-center justify-between gap-3 px-8 py-4">
+              <div className="flex items-center gap-2">
+                <AddQuestionButton />
+                <Button type="button" size="sm" variant="outline" disabled>
+                  <Wand2 className="mr-2 h-4 w-4" />
+                  {tToolbar('generate')}
+                </Button>
+                <Button type="button" size="sm" variant="outline" onClick={() => setQuestionBankOpen(true)}>
+                  <Database className="mr-2 h-4 w-4" />
+                  {tToolbar('fromBank')}
+                </Button>
+              </div>
+              <div className="flex items-center gap-3">
+                <Button type="button" variant="outline" onClick={handleCancel}>
+                  <X className="mr-2 h-4 w-4" />
+                  {t('actions.cancel')}
+                </Button>
+                <LoadingButton
+                  onClick={form.handleSubmit(handleSubmit)}
+                  loading={form.formState.isSubmitting}
+                  loadingText={t('actions.saving')}
+                >
+                  <Save className="mr-2 h-4 w-4" />
+                  {t('actions.save')}
+                </LoadingButton>
+              </div>
+            </div>
+          </div>
+        </FormProvider>
+      </div>
     </div>
   );
 };

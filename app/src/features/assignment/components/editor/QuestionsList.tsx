@@ -55,24 +55,22 @@ export const QuestionsList = () => {
 
   if (questions.length === 0) {
     return (
-      <div className="flex min-h-[200px] items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-900">
+      <div className="flex min-h-[200px] items-center justify-center border border-dashed border-gray-300 dark:border-gray-700">
         <div className="text-center">
-          <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">No questions yet</p>
-          <p className="mt-2 text-xs text-gray-600 dark:text-gray-400">Click "Add Question" to get started</p>
+          <p className="text-sm text-gray-600 dark:text-gray-400">No questions yet</p>
+          <p className="mt-1 text-xs text-gray-500 dark:text-gray-500">Click "Add Question" to get started</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-4">
+    <div className="divide-y rounded-sm border">
       <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
         <SortableContext items={items} strategy={verticalListSortingStrategy}>
-          <div className="space-y-4">
-            {questions.map((field, index) => (
-              <DraggableQuestionCard key={field.question.id} id={field.question.id} index={index} />
-            ))}
-          </div>
+          {questions.map((field, index) => (
+            <DraggableQuestionCard key={field.question.id} id={field.question.id} index={index} />
+          ))}
         </SortableContext>
       </DndContext>
     </div>

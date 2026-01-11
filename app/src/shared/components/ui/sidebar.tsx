@@ -140,6 +140,7 @@ function SidebarProvider({
             'group/sidebar-wrapper has-data-[variant=inset]:bg-sidebar flex min-h-svh w-full',
             className
           )}
+          data-state={state}
           {...props}
         >
           {children}

@@ -5,8 +5,17 @@
   padding: 0;
   overflow: hidden;
 
+  [data-state='collapsed'] & {
+    width: calc(100vw - calc(var(--sidebar-width-lg-icon, 4rem) + 1rem));
+  }
+
+  [data-state='expanded'] & {
+    width: calc(100vw - var(--sidebar-width, 16rem));
+  }
+
   @media (max-width: 48rem) {
     height: calc(100vh);
+    width: 100vw;
   }
 
   .lucide {

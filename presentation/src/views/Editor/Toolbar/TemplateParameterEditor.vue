@@ -1,13 +1,13 @@
 <template>
-  <div v-if="hasParameters" class="template-parameter-editor">
+  <div v-if="hasParameters" class="template-parameter-editor tw-w-full tw-max-w-full tw-overflow-hidden">
     <div
       class="title-panel tw-font-medium tw-text-muted-foreground tw-mb-3 tw-pb-2 tw-border-b tw-border-gray-200"
     >
       {{ $t('toolbar.slideTemplate.customizeParameters') }}
     </div>
 
-    <div class="tw-space-y-4">
-      <div v-for="param in parameters" :key="param.key" class="parameter-control">
+    <div class="tw-space-y-4 tw-min-w-0">
+      <div v-for="param in parameters" :key="param.key" class="parameter-control tw-w-full tw-min-w-0">
         <!-- Boolean Parameter -->
         <div v-if="param.type === 'boolean'" class="tw-flex tw-items-center tw-justify-between">
           <div class="tw-flex-1">
@@ -46,6 +46,7 @@
             :max="param.max ?? 100"
             :step="param.step ?? 1"
             @update:value="(value) => handleParameterChange(param.key, value as any)"
+            class="tw-w-full tw-max-w-full"
           />
 
           <p

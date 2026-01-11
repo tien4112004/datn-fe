@@ -108,6 +108,11 @@ export default {
       bottomOnlyDesc: 'Children positioned below parent, centered',
       topOnly: 'Top Only',
       topOnlyDesc: 'Children positioned above parent, centered',
+      // Spacing profiles
+      spacing: 'Node Spacing',
+      spacingCompact: 'Compact',
+      spacingDefault: 'Default',
+      spacingSpacious: 'Spacious',
     },
     tooltips: {
       addNode: 'Add new node',

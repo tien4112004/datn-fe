@@ -13,6 +13,7 @@ import type {
 } from '../../types';
 import { LAYOUT_CONFIGS, LAYOUT_TYPE, SIDE } from '../../types';
 import { inferOrderFromPositions } from './siblingOrder';
+import { DEFAULT_HORIZONTAL_SPACING, DEFAULT_VERTICAL_SPACING } from './layoutConstants';
 import { getNextChildSide } from './layoutTransition';
 import {
   calculateHorizontalLayout,
@@ -223,8 +224,8 @@ export const horizontalBalancedLayoutStrategy: LayoutStrategy = {
     // Layout calculates positions and assigns sides based on final positions
     // No pre-assignment of sides needed - the layout function handles it
     const { nodes: layoutedNodes } = calculateBalancedHorizontalLayout(rootNode, descendants, edges, {
-      horizontalSpacing: options.horizontalSpacing ?? 200,
-      verticalSpacing: options.verticalSpacing ?? 80,
+      horizontalSpacing: options.horizontalSpacing ?? DEFAULT_HORIZONTAL_SPACING,
+      verticalSpacing: options.verticalSpacing ?? DEFAULT_VERTICAL_SPACING,
     });
 
     // Update edge handles
@@ -287,8 +288,8 @@ export const verticalBalancedLayoutStrategy: LayoutStrategy = {
     // Layout calculates positions and assigns sides based on final positions
     // No pre-assignment of sides needed - the layout function handles it
     const { nodes: layoutedNodes } = calculateBalancedVerticalLayout(rootNode, descendants, edges, {
-      horizontalSpacing: options.horizontalSpacing ?? 200,
-      verticalSpacing: options.verticalSpacing ?? 80,
+      horizontalSpacing: options.horizontalSpacing ?? DEFAULT_HORIZONTAL_SPACING,
+      verticalSpacing: options.verticalSpacing ?? DEFAULT_VERTICAL_SPACING,
     });
 
     // Update edge handles

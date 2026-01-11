@@ -1,12 +1,13 @@
 import { useMemo } from 'react';
 import { useCoreStore } from '../../stores';
-import { findAllRootNodes } from '../../services/utils';
+import { findAllRootNodes, areNodesEqualForTree } from '../../services/utils';
 import { TreeView } from './TreeView';
 import { useTreeKeyboardShortcuts } from '../../hooks/useTreeKeyboardShortcuts';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
 export const TreePanelContent = () => {
-  const nodes = useCoreStore((state) => state.nodes);
+  // Use custom equality check to prevent list rebuilds on selection
+  const nodes = (useCoreStore as any)((state: any) => state.nodes, areNodesEqualForTree);
   const rootNodes = useMemo(() => findAllRootNodes(nodes), [nodes]);
   // Activate keyboard shortcuts when tree tab is active
   useTreeKeyboardShortcuts();

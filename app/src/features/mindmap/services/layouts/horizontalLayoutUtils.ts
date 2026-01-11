@@ -28,6 +28,10 @@ export interface HorizontalLayoutConfig {
   sourceHandle: 'left' | 'right';
   targetHandle: 'left' | 'right';
   xDirection: 1 | -1;
+  /** Optional default horizontal spacing override */
+  defaultHorizontalSpacing?: number;
+  /** Optional default vertical spacing override */
+  defaultVerticalSpacing?: number;
 }
 
 // ============================================================================

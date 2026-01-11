@@ -1,16 +1,19 @@
-import { create } from 'zustand';
-import { addEdge, applyNodeChanges, applyEdgeChanges } from '@xyflow/react';
 import type { Connection } from '@xyflow/react';
-import { devtools, persist, createJSONStorage } from 'zustand/middleware';
-import type { MindMapNode, MindMapEdge } from '../types';
+import { addEdge, applyEdgeChanges, applyNodeChanges } from '@xyflow/react';
+import { create } from 'zustand';
+import { createJSONStorage, devtools, persist } from 'zustand/middleware';
+import { getRootNodeOfSubtree, DEFAULT_LAYOUT_TYPE } from '../services/utils';
+import type { LayoutType, MindMapEdge, MindMapNode } from '../types';
 import { MINDMAP_TYPES, PATH_TYPES } from '../types';
 import { SIDE } from '../types/constants';
-import { getRootNodeOfSubtree } from '../services/utils';
 
 export interface CoreState {
   nodes: MindMapNode[];
   edges: MindMapEdge[];
   selectedNodeIds: Set<string>;
+  // Multi-tree layout type caching
+  nodeToRootMap: Map<string, string>; // nodeId → rootId
+  rootLayoutTypeMap: Map<string, LayoutType>; // rootId → layoutType
   onNodesChange: (changes: any) => void;
   onEdgesChange: (changes: any) => void;
   onConnect: (connection: Connection) => void;
@@ -26,6 +29,61 @@ export interface CoreState {
   updateSelectedNodeIds: () => void;
 }
 
+/**
+ * Build mapping of every node to its root node ID
+ * Uses recursive traversal but only runs when nodes change
+ */
+const buildNodeToRootMapping = (nodes: MindMapNode[]): Map<string, string> => {
+  const map = new Map<string, string>();
+  const nodeMap = new Map(nodes.map((n) => [n.id, n]));
+
+  const findRoot = (nodeId: string, visited = new Set<string>()): string | null => {
+    if (visited.has(nodeId)) return null; // Prevent infinite loops
+    visited.add(nodeId);
+
+    const node = nodeMap.get(nodeId);
+    if (!node) return null;
+
+    // Root nodes point to themselves
+    if (node.type === MINDMAP_TYPES.ROOT_NODE) {
+      return nodeId;
+    }
+
+    // Traverse up via parentId
+    if (node.data.parentId) {
+      return findRoot(node.data.parentId, visited);
+    }
+
+    return null;
+  };
+
+  // Build mapping for all nodes
+  for (const node of nodes) {
+    const rootId = findRoot(node.id);
+    if (rootId) {
+      map.set(node.id, rootId);
+    }
+  }
+
+  return map;
+};
+
+/**
+ * Extract layout type for each root node
+ */
+const buildRootLayoutTypeMapping = (nodes: MindMapNode[]): Map<string, LayoutType> => {
+  const map = new Map<string, LayoutType>();
+
+  for (const node of nodes) {
+    if (node.type === MINDMAP_TYPES.ROOT_NODE) {
+      const layoutType: LayoutType = (node.data?.layoutType as LayoutType | undefined) ?? DEFAULT_LAYOUT_TYPE;
+      map.set(node.id, layoutType);
+    }
+  }
+
+  return map;
+};
+
 export const useCoreStore = create<CoreState>()(
   devtools(
     persist(
@@ -33,12 +91,47 @@ export const useCoreStore = create<CoreState>()(
         nodes: [],
         edges: [],
         selectedNodeIds: new Set<string>(),
+        nodeToRootMap: new Map(),
+        rootLayoutTypeMap: new Map(),
 
         onNodesChange: (changes) => {
           set(
-            (state) => ({
-              nodes: applyNodeChanges(changes, state.nodes),
-            }),
+            (state) => {
+              const newNodes = applyNodeChanges(changes, state.nodes);
+
+              // Check if any selection changes occurred
+              const hasSelectionChange = changes.some(
+                (change: any) =>
+                  change.type === 'select' || (change.type === 'replace' && 'selected' in change.item)
+              );
+
+              // Update selectedNodeIds if selection changed
+              const selectedNodeIds = hasSelectionChange
+                ? new Set(newNodes.filter((node) => node.selected).map((node) => node.id))
+                : state.selectedNodeIds;
+
+              // Only rebuild mappings if structure changes (not just selection)
+              const hasStructureChange = changes.some(
+                (change: any) =>
+                  change.type === 'add' ||
+                  change.type === 'remove' ||
+                  (change.type === 'replace' && ('data' in change.item || 'type' in change.item))
+              );
+
+              const nodeToRootMap = hasStructureChange
+                ? buildNodeToRootMapping(newNodes)
+                : state.nodeToRootMap;
+              const rootLayoutTypeMap = hasStructureChange
+                ? buildRootLayoutTypeMapping(newNodes)
+                : state.rootLayoutTypeMap;
+
+              return {
+                nodes: newNodes,
+                nodeToRootMap,
+                rootLayoutTypeMap,
+                selectedNodeIds,
+              };
+            },
             false,
             'mindmap/onNodesChange'
           );
@@ -90,9 +183,15 @@ export const useCoreStore = create<CoreState>()(
               const newSelectedNodeIds = new Set(
                 newNodes.filter((node) => node.selected).map((node) => node.id)
               );
+              // Rebuild mappings when nodes change
+              const nodeToRootMap = buildNodeToRootMapping(newNodes);
+              const rootLayoutTypeMap = buildRootLayoutTypeMapping(newNodes);
+
               return {
                 nodes: newNodes,
                 selectedNodeIds: newSelectedNodeIds,
+                nodeToRootMap,
+                rootLayoutTypeMap,
               };
             },
             false,
@@ -162,9 +261,15 @@ export const useCoreStore = create<CoreState>()(
             const newSelectedNodeIds = new Set(
               state.nodes.filter((node) => node.selected).map((node) => node.id)
             );
-            return {
-              selectedNodeIds: newSelectedNodeIds,
-            };
+            if (
+              newSelectedNodeIds.size !== state.selectedNodeIds.size ||
+              !Array.from(newSelectedNodeIds).every((id) => state.selectedNodeIds.has(id))
+            ) {
+              return {
+                selectedNodeIds: newSelectedNodeIds,
+              };
+            }
+            return state;
           });
         },
       }),
@@ -172,7 +277,7 @@ export const useCoreStore = create<CoreState>()(
         name: 'CoreStore',
         storage: createJSONStorage(() => localStorage, {
           reviver: (_key, value: unknown) => {
-            // Revive Set from array during deserialization
+            // Revive Set and rebuild Maps from persisted nodes
             if (
               value &&
               typeof value === 'object' &&
@@ -181,12 +286,23 @@ export const useCoreStore = create<CoreState>()(
               value.state &&
               'selectedNodeIds' in value.state
             ) {
-              const state = value.state as { selectedNodeIds: string[] };
+              const state = value.state as {
+                selectedNodeIds: string[];
+                nodes?: MindMapNode[];
+              };
+
+              // Rebuild maps from persisted nodes
+              const nodes = state.nodes || [];
+              const nodeToRootMap = buildNodeToRootMapping(nodes);
+              const rootLayoutTypeMap = buildRootLayoutTypeMapping(nodes);
+
               return {
                 ...value,
                 state: {
                   ...state,
                   selectedNodeIds: new Set(state.selectedNodeIds || []),
+                  nodeToRootMap,
+                  rootLayoutTypeMap,
                 },
               };
             }

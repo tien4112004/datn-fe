@@ -1,15 +1,15 @@
-import { memo, useState, useCallback, useRef, useMemo } from 'react';
-import { cn } from '@/shared/lib/utils';
-import { DRAGHANDLE } from '../../types/constants';
-import type { ImageNode } from '../../types';
-import { BaseNodeBlock } from './BaseNode';
-import { BaseNodeContent } from '../ui/base-node';
-import type { NodeProps } from '@xyflow/react';
 import { Button } from '@/components/ui/button';
-import { Upload, X, Loader2, Network } from 'lucide-react';
-import { useCoreStore, useNodeOperationsStore, useLayoutStore } from '../../stores';
+import { cn } from '@/shared/lib/utils';
+import type { NodeProps } from '@xyflow/react';
+import { Loader2, Network, Upload, X } from 'lucide-react';
+import { memo, useCallback, useRef, useState } from 'react';
+import { useCoreStore, useLayoutStore, useNodeOperationsStore } from '../../stores';
+import type { ImageNode } from '../../types';
+import { DRAGHANDLE } from '../../types/constants';
+import { DEFAULT_LAYOUT_TYPE } from '../../services/utils';
 import { BaseNodeControl } from '../controls/BaseNodeControl';
-import { getTreeLayoutType } from '../../services/utils';
+import { BaseNodeContent } from '../ui/base-node';
+import { BaseNodeBlock } from './BaseNode';
 
 /**
  * @deprecated ImageNode is deprecated and will be removed in a future version.
@@ -25,8 +25,11 @@ const ImageNodeBlock = memo(
         'Please use TextNode or other alternative node types instead.'
     );
 
-    const nodes = useCoreStore((state) => state.nodes);
-    const layoutType = useMemo(() => getTreeLayoutType(nodes), [nodes]);
+    // Get layoutType using cached maps - O(1) lookup
+    const layoutType = useCoreStore((state) => {
+      const rootId = state.nodeToRootMap.get(id);
+      return (rootId && state.rootLayoutTypeMap.get(rootId)) || DEFAULT_LAYOUT_TYPE;
+    });
     const updateNodeData = useNodeOperationsStore((state) => state.updateNodeData);
     const updateNodeDataWithUndo = useNodeOperationsStore((state) => state.updateNodeDataWithUndo);
     const updateSubtreeLayout = useLayoutStore((state) => state.updateSubtreeLayout);

@@ -1,9 +1,10 @@
-import { memo, useMemo, useEffect } from 'react';
 import { useReactFlow } from '@xyflow/react';
+import { memo, useEffect, useMemo } from 'react';
 import { useMindmapActions, useShortcuts } from '../../hooks';
-import { useUndoRedoStore } from '../../stores/undoredo';
 import { useSaveMindmap } from '../../hooks/useSaving';
+import { useUndoRedoStore } from '../../stores/undoredo';
 import type { MindmapMetadata } from '../../types';
+import { useWhyDidYouUpdate } from '@/shared/hooks/use-debug';
 
 interface LogicHandlerProps {
   mindmapId: string;
@@ -12,6 +13,13 @@ interface LogicHandlerProps {
 }
 
 const LogicHandler = memo(({ mindmapId, isPresenterMode = false, metadata }: LogicHandlerProps) => {
+  // Debug: Track why LogicHandler rerenders
+  useWhyDidYouUpdate('LogicHandler', {
+    mindmapId,
+    isPresenterMode,
+    metadata,
+  });
+
   const { selectAllHandler, copyHandler, pasteHandler, deleteHandler, deselectAllHandler } =
     useMindmapActions();
   const { setViewport } = useReactFlow();
@@ -65,6 +73,14 @@ const LogicHandler = memo(({ mindmapId, isPresenterMode = false, metadata }: Log
         shortcutKey: 'Ctrl+V',
         onKeyPressed: pasteHandler,
         disabled: isPresenterMode,
+        shouldExecute: () => {
+          const activeElement = document.activeElement as HTMLElement;
+          return (
+            activeElement.tagName !== 'INPUT' &&
+            activeElement.tagName !== 'TEXTAREA' &&
+            !activeElement.classList.contains('bn-editor')
+          );
+        },
       },
       {
         shortcutKey: 'Delete',

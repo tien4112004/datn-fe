@@ -1,3 +1,4 @@
+import { Button } from '@/components/ui/button';
 import {
   useClipboardStore,
   useCoreStore,
@@ -5,23 +6,23 @@ import {
   useNodeManipulationStore,
   useNodeOperationsStore,
 } from '@/features/mindmap/stores';
-import type { NodeManipulationState } from '@/features/mindmap/stores/nodeManipulation';
-import type { CoreState } from '@/features/mindmap/stores/core';
-import type { NodeOperationsState } from '@/features/mindmap/stores/nodeOperation';
-import type { LayoutState } from '@/features/mindmap/stores/layout';
 import type { ClipboardState } from '@/features/mindmap/stores/clipboard';
-import { Minus, Plus } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import type { MindMapNode, Side, MindMapTypes, LayoutType } from '@/features/mindmap/types';
-import { Position, type NodeProps, useUpdateNodeInternals } from '@xyflow/react';
-import { SIDE, MINDMAP_TYPES, LAYOUT_TYPE } from '@/features/mindmap/types';
+import type { CoreState } from '@/features/mindmap/stores/core';
+import type { LayoutState } from '@/features/mindmap/stores/layout';
+import type { NodeManipulationState } from '@/features/mindmap/stores/nodeManipulation';
+import type { NodeOperationsState } from '@/features/mindmap/stores/nodeOperation';
+import type { LayoutType, MindMapNode, MindMapTypes, Side } from '@/features/mindmap/types';
+import { LAYOUT_TYPE, MINDMAP_TYPES, SIDE } from '@/features/mindmap/types';
+import { DEFAULT_LAYOUT_TYPE } from '../../services/utils';
 import { cn } from '@/shared/lib/utils';
+import { Position, useUpdateNodeInternals, type NodeProps } from '@xyflow/react';
+import { Minus, Plus } from 'lucide-react';
 import { motion } from 'motion/react';
-import { memo, useCallback, useEffect, useMemo } from 'react';
+import { memo, useCallback, useEffect } from 'react';
 import { useShallow } from 'zustand/react/shallow';
-import { BaseHandle } from '../ui/base-handle';
-import { getTreeLayoutType } from '@/features/mindmap/services/utils';
 import { usePresenterContext } from '../../contexts/ReadOnlyContext';
+import { BaseHandle } from '../ui/base-handle';
+import { useWhyDidYouUpdate } from '@/shared/hooks/use-debug';
 
 interface ChildNodeControlsProps {
   node: NodeProps<MindMapNode>;
@@ -37,7 +38,6 @@ const nodeManipulationSelector = (state: NodeManipulationState) => ({
 const coreStoreSelector = (state: CoreState) => ({
   hasLeftChildren: state.hasLeftChildren,
   hasRightChildren: state.hasRightChildren,
-  nodes: state.nodes,
 });
 
 const nodeOperationsSelector = (state: NodeOperationsState) => state.addChildNode;
@@ -49,14 +49,25 @@ const layoutStoreSelector = (state: LayoutState) => ({
 const mouseOverSelector = (state: ClipboardState) => state.mouseOverNodeId;
 
 export const ChildNodeControls = ({ node, selected }: ChildNodeControlsProps) => {
+  // Debug: Track why this component rerenders
+  useWhyDidYouUpdate(`ChildNodeControls[${node.id}]`, {
+    nodeId: node.id,
+    nodeType: node.type,
+    nodeData: node.data,
+    selected,
+  });
+
   const { isPresenterMode } = usePresenterContext();
   const { collapse, expand } = useNodeManipulationStore(useShallow(nodeManipulationSelector));
-  const { hasLeftChildren, hasRightChildren, nodes } = useCoreStore(useShallow(coreStoreSelector));
+  const { hasLeftChildren, hasRightChildren } = useCoreStore(useShallow(coreStoreSelector));
   const addChildNodeStore = useNodeOperationsStore(nodeOperationsSelector);
   useLayoutStore(useShallow(layoutStoreSelector));
 
-  // Get layout type from root node
-  const layoutType = useMemo(() => getTreeLayoutType(nodes), [nodes]);
+  // Get layoutType using cached maps - O(1) lookup
+  const layoutType = useCoreStore((state) => {
+    const rootId = state.nodeToRootMap.get(node.id);
+    return (rootId && state.rootLayoutTypeMap.get(rootId)) || DEFAULT_LAYOUT_TYPE;
+  });
 
   const isRootNode = node.type === MINDMAP_TYPES.ROOT_NODE;
 
@@ -351,19 +362,16 @@ export const ChildNodeControls = ({ node, selected }: ChildNodeControlsProps) =>
 
 export const NodeHandlers = memo(
   ({ layoutType, side, id }: { layoutType: LayoutType; side: Side; id: string }) => {
+    // Debug: Track why NodeHandlers rerenders (causes updateNodeInternals calls)
+    useWhyDidYouUpdate(`NodeHandlers[${id}]`, {
+      id,
+      layoutType,
+      side,
+    });
+
     const updateNodeInternals = useUpdateNodeInternals();
 
-    // Get node to access measured dimensions
-    const node = useCoreStore((state) => state.nodes.find((n) => n.id === id));
-    const nodeWidth = node?.measured?.width;
-    const nodeHeight = node?.measured?.height;
-
     useEffect(() => {
-      // Only update if node has dimensions
-      if (!nodeWidth || !nodeHeight) {
-        return;
-      }
-
       updateNodeInternals(id);
 
       const timerId = setTimeout(() => {
@@ -383,7 +391,7 @@ export const NodeHandlers = memo(
         clearTimeout(timerId2);
         clearTimeout(timerId3);
       };
-    }, [layoutType, id, side, updateNodeInternals, nodeWidth, nodeHeight]);
+    }, [layoutType, id, side, updateNodeInternals]);
 
     /**
      * Determine which handles should be visible based on layout type and node side.

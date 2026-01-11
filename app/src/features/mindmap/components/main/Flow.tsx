@@ -8,6 +8,7 @@ import ShapeNodeBlock from '../node/ShapeNode';
 import TextNodeBlock from '../node/TextNode';
 import ImageNodeBlock from '../node/ImageNode';
 import { useCoreStore } from '../../stores';
+import { useWhyDidYouUpdate } from '@/shared/hooks/use-debug';
 
 /**
  * @deprecated ShapeNodeBlock and ImageNodeBlock are deprecated and will be removed in a future version.
@@ -47,6 +48,17 @@ const Flow = memo(
     const { nodes, edges, onNodesChange, onEdgesChange, onConnect } = useCoreStore(
       useShallow(handlersSelector)
     );
+
+    // Debug: Track why Flow component rerenders (causes full page rerender)
+    useWhyDidYouUpdate('Flow (MAIN COMPONENT)', {
+      nodesLength: nodes.length,
+      edgesLength: edges.length,
+      isPanOnDrag,
+      isPresenterMode,
+      onNodesChange,
+      onEdgesChange,
+      onConnect,
+    });
 
     const {
       onNodeDragStart,

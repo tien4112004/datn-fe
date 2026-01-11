@@ -2,9 +2,18 @@ import { create } from 'zustand';
 import * as d3 from 'd3';
 import type { MindMapEdge, MindMapNode, LayoutType, LayoutOptions } from '../types';
 import { MINDMAP_TYPES } from '../types';
+import { DEFAULT_LAYOUT_TYPE } from '../services/utils';
 import { useCoreStore } from './core';
 import { devtools } from 'zustand/middleware';
 import { layoutSingleTree, calculateLayout } from '../services/layouts/layoutStrategy';
+import {
+  DEFAULT_HORIZONTAL_SPACING,
+  DEFAULT_VERTICAL_SPACING,
+  DEFAULT_BASE_RADIUS,
+  DEFAULT_RADIUS_INCREMENT,
+  SPACING_PROFILES,
+  type SpacingProfileName,
+} from '../services/layouts/layoutConstants';
 import {
   getAllDescendantNodes,
   getTreeLayoutType,
@@ -24,12 +33,13 @@ interface AnimationData {
 
 /**
  * Default layout options for spacing
+ * Values imported from layoutConstants to avoid magic numbers
  */
 const DEFAULT_LAYOUT_OPTIONS: LayoutOptions = {
-  horizontalSpacing: 200,
-  verticalSpacing: 80,
-  baseRadius: 200,
-  radiusIncrement: 150,
+  horizontalSpacing: DEFAULT_HORIZONTAL_SPACING,
+  verticalSpacing: DEFAULT_VERTICAL_SPACING,
+  baseRadius: DEFAULT_BASE_RADIUS,
+  radiusIncrement: DEFAULT_RADIUS_INCREMENT,
 };
 
 export interface LayoutState {
@@ -40,9 +50,11 @@ export interface LayoutState {
 
   getLayoutType: () => LayoutType;
   isAutoLayoutEnabled: () => boolean;
+  getSpacingProfile: () => SpacingProfileName;
 
   setLayoutType: (layoutType: LayoutType) => void;
   setAutoLayoutEnabled: (enabled: boolean) => void;
+  setSpacingProfile: (profile: SpacingProfileName) => void;
 
   // Animation control
   setIsAnimating: (isAnimating: boolean) => void;
@@ -68,6 +80,8 @@ export interface LayoutState {
 
 const ANIMATION_DURATION = 800;
 
+let currentSpacingProfile: SpacingProfileName = 'DEFAULT';
+
 export const useLayoutStore = create<LayoutState>()(
   devtools(
     (set, get) => ({
@@ -78,13 +92,24 @@ export const useLayoutStore = create<LayoutState>()(
       animationData: [],
 
       getLayoutType: () => {
-        const nodes = useCoreStore.getState().nodes;
-        return getTreeLayoutType(nodes);
+        // BEFORE: O(n) search, finds first root only (broken for multi-tree)
+        // const nodes = useCoreStore.getState().nodes;
+        // return getTreeLayoutType(nodes);
+
+        // AFTER: For backward compatibility, return first root's layout
+        // Better: components should specify which tree they want
+        const { rootLayoutTypeMap } = useCoreStore.getState();
+        const firstRootType = rootLayoutTypeMap.values().next().value;
+        return firstRootType ?? DEFAULT_LAYOUT_TYPE;
       },
 
       isAutoLayoutEnabled: () => {
         const nodes = useCoreStore.getState().nodes;
         return getTreeForceLayout(nodes);
+      },
+
+      getSpacingProfile: () => {
+        return currentSpacingProfile;
       },
 
       setLayoutType: (layoutType) => {
@@ -95,6 +120,14 @@ export const useLayoutStore = create<LayoutState>()(
       setAutoLayoutEnabled: (enabled) => {
         const { setNodes } = useCoreStore.getState();
         setNodes((nodes) => setTreeForceLayout(nodes, enabled));
+      },
+
+      setSpacingProfile: (profile) => {
+        currentSpacingProfile = profile;
+        const spacing = SPACING_PROFILES[profile];
+        DEFAULT_LAYOUT_OPTIONS.horizontalSpacing = spacing.horizontal;
+        DEFAULT_LAYOUT_OPTIONS.verticalSpacing = spacing.vertical;
+        set({}, false, 'mindmap-layout/setSpacingProfile');
       },
 
       setIsAnimating: (isAnimating) => set({ isAnimating }, false, 'mindmap-layout/setIsAnimating'),

@@ -315,16 +315,8 @@ export function usePresentationProcessor(
       return;
     }
 
-    // Convert URL to base64 for portability
-    let imageData = url;
-    if (!url.startsWith('data:')) {
-      try {
-        imageData = await urlToBase64(url);
-      } catch (error) {
-        console.error('Failed to convert image to base64, using URL fallback:', error);
-        // Fall back to URL if conversion fails
-      }
-    }
+    // Store CDN URL directly for smaller file size
+    const imageData = url;
 
     const updatedElement = await updateImageSource(
       slide.elements[elementIndex] as PPTImageElement,

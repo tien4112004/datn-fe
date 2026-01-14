@@ -14,6 +14,7 @@ interface DataTableProps<TData> {
   isLoading: boolean;
   emptyState: React.ReactNode;
   onClickRow?: (row: Row<TData>) => void;
+  rowStyle?: string;
   contextMenu?: (row: Row<TData>) => React.ReactNode;
   showPagination?: boolean;
 }
@@ -23,6 +24,7 @@ function DataTable<TData>({
   isLoading,
   emptyState,
   onClickRow,
+  rowStyle,
   contextMenu,
   className,
   showPagination = true,
@@ -108,7 +110,7 @@ function DataTable<TData>({
               ));
 
               const tableRow = (
-                <TableRow key={row.id} onClick={() => onClickRow?.(row)}>
+                <TableRow key={row.id} onClick={() => onClickRow?.(row)} className={rowStyle}>
                   {cells}
                 </TableRow>
               );

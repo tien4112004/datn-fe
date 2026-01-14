@@ -192,6 +192,10 @@ const MindmapTable = () => {
       <DataTable
         table={table}
         isLoading={isLoading}
+        onClickRow={(row) => {
+          navigate(`/mindmap/${row.original.id}`, { replace: false });
+        }}
+        rowStyle="transition cursor-pointer"
         emptyState={<div className="text-muted-foreground">{t('mindmap.emptyState')}</div>}
         contextMenu={(row) => (
           <ActionContent

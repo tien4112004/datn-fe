@@ -140,6 +140,10 @@ const PresentationTable = () => {
       <DataTable
         table={table}
         isLoading={isLoading}
+        onClickRow={(row) => {
+          navigate(`/presentation/${row.original.id}`, { replace: false });
+        }}
+        rowStyle="transition cursor-pointer"
         emptyState={<div className="text-muted-foreground">{t('presentation.emptyState')}</div>}
         contextMenu={(row) => (
           <ActionContent

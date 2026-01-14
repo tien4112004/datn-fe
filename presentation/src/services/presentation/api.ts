@@ -1,7 +1,13 @@
 import { getApiServiceFactory, webViewApi } from '@aiprimary/api';
 import { PresentationApiService } from './service';
 import { MockPresentationApiService } from './mock';
-import type { PresentationGenerationRequest, PresentationGenerationStartResponse } from './types';
+import type {
+  PresentationGenerationRequest,
+  PresentationGenerationStartResponse,
+  SharedUserApiResponse,
+  SearchUserApiResponse,
+  SharePresentationRequest,
+} from './types';
 import type { ImageGenerationParams } from '../image/types';
 import { getBackendUrl } from '@aiprimary/api';
 import type { Presentation, SlideTheme, SlideLayoutSchema } from '@aiprimary/core';
@@ -30,6 +36,11 @@ export interface IPresentationApi {
     limit: number;
     hasMore: boolean;
   }>;
+  // Sharing methods
+  getSharedUsers(presentationId: string): Promise<SharedUserApiResponse[]>;
+  searchUsers(query: string): Promise<SearchUserApiResponse[]>;
+  sharePresentation(presentationId: string, request: SharePresentationRequest): Promise<void>;
+  revokeAccess(presentationId: string, userId: string): Promise<void>;
 }
 
 /**

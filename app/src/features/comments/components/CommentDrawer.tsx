@@ -4,6 +4,8 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/shared/component
 import { ScrollArea } from '@/shared/components/ui/scroll-area';
 import { Separator } from '@/shared/components/ui/separator';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
+import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 import { CommentForm } from './CommentForm';
 import { CommentList } from './CommentList';
 import { useCommentApiService } from '../api';
@@ -24,6 +26,7 @@ export function CommentDrawer({
   documentType,
   userPermission,
 }: CommentDrawerProps) {
+  const { t } = useTranslation(I18N_NAMESPACES.COMMENTS);
   const [comments, setComments] = useState<Comment[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -45,7 +48,7 @@ export function CommentDrawer({
       setComments(data);
     } catch (error) {
       console.error('Failed to fetch comments:', error);
-      toast.error('Failed to load comments');
+      toast.error(t('messages.loadFailed'));
     } finally {
       setIsLoading(false);
     }
@@ -59,105 +62,58 @@ export function CommentDrawer({
         mentionedUserIds,
       });
       setComments((prev) => [newComment, ...prev]);
-      toast.success('Comment added successfully');
+      toast.success(t('messages.addSuccess'));
     } catch (error) {
       console.error('Failed to create comment:', error);
-      toast.error('Failed to add comment');
+      toast.error(t('messages.addFailed'));
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleReply = (parentId: string) => async (content: string, mentionedUserIds: string[]) => {
-    try {
-      const reply = await apiService.replyToComment(documentType, documentId, parentId, {
-        content,
-        mentionedUserIds,
-      });
-
-      // Update comments tree with new reply
-      setComments((prev) => updateCommentsWithReply(prev, parentId, reply));
-      toast.success('Reply added successfully');
-    } catch (error) {
-      console.error('Failed to reply:', error);
-      toast.error('Failed to add reply');
-      throw error;
-    }
-  };
-
   const handleEdit = (commentId: string) => async (content: string, mentionedUserIds: string[]) => {
     try {
-      const updated = await apiService.updateComment(commentId, {
+      const updated = await apiService.updateComment(documentType, documentId, commentId, {
         content,
         mentionedUserIds,
       });
 
       // Update comment in the tree
       setComments((prev) => updateCommentInTree(prev, commentId, updated));
-      toast.success('Comment updated successfully');
+      toast.success(t('messages.updateSuccess'));
     } catch (error) {
       console.error('Failed to edit comment:', error);
-      toast.error('Failed to update comment');
+      toast.error(t('messages.updateFailed'));
       throw error;
     }
   };
 
   const handleDelete = (commentId: string) => async () => {
     try {
-      await apiService.deleteComment(commentId, documentId);
+      await apiService.deleteComment(documentType, documentId, commentId);
 
       // Remove comment from tree
       setComments((prev) => removeCommentFromTree(prev, commentId));
-      toast.success('Comment deleted successfully');
+      toast.success(t('messages.deleteSuccess'));
     } catch (error) {
       console.error('Failed to delete comment:', error);
-      toast.error('Failed to delete comment');
+      toast.error(t('messages.deleteFailed'));
       throw error;
     }
   };
 
   // Helper functions to update comment tree
-  const updateCommentsWithReply = (comments: Comment[], parentId: string, reply: Comment): Comment[] => {
-    return comments.map((comment) => {
-      if (comment.id === parentId) {
-        return {
-          ...comment,
-          replies: [...(comment.replies || []), reply],
-          replyCount: comment.replyCount + 1,
-        };
-      }
-      if (comment.replies && comment.replies.length > 0) {
-        return {
-          ...comment,
-          replies: updateCommentsWithReply(comment.replies, parentId, reply),
-        };
-      }
-      return comment;
-    });
-  };
-
   const updateCommentInTree = (comments: Comment[], commentId: string, updated: Comment): Comment[] => {
     return comments.map((comment) => {
       if (comment.id === commentId) {
         return { ...comment, ...updated };
-      }
-      if (comment.replies && comment.replies.length > 0) {
-        return {
-          ...comment,
-          replies: updateCommentInTree(comment.replies, commentId, updated),
-        };
       }
       return comment;
     });
   };
 
   const removeCommentFromTree = (comments: Comment[], commentId: string): Comment[] => {
-    return comments
-      .filter((comment) => comment.id !== commentId)
-      .map((comment) => ({
-        ...comment,
-        replies: comment.replies ? removeCommentFromTree(comment.replies, commentId) : undefined,
-      }));
+    return comments.filter((comment) => comment.id !== commentId);
   };
 
   return (
@@ -166,7 +122,7 @@ export function CommentDrawer({
         <SheetHeader className="flex-shrink-0 p-6 pb-4">
           <SheetTitle className="flex items-center gap-2">
             <MessageSquare className="h-5 w-5" />
-            Comments ({comments.length})
+            {t('drawer.titleWithCount', { count: comments.length })}
           </SheetTitle>
         </SheetHeader>
 
@@ -177,8 +133,8 @@ export function CommentDrawer({
             <div className="flex-shrink-0 p-6 pb-4">
               <CommentForm
                 onSubmit={handleCreateComment}
-                placeholder="Write a comment..."
-                submitLabel="Comment"
+                placeholder={t('form.placeholder')}
+                submitLabel={t('form.submit')}
                 isSubmitting={isSubmitting}
               />
             </div>
@@ -190,10 +146,8 @@ export function CommentDrawer({
             <div className="p-6 pt-4">
               <CommentList
                 comments={comments}
-                onReply={handleReply}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
-                canComment={canComment}
                 isLoading={isLoading}
               />
             </div>

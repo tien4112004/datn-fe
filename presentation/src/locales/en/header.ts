@@ -53,6 +53,12 @@ export default {
     buttons: {
       present: 'Present',
       share: 'Share',
+      comments: 'Comments',
+    },
+
+    // Comments
+    comments: {
+      tooltip: 'View and add comments',
     },
 
     // Breadcrumb Navigation
@@ -95,6 +101,14 @@ export default {
       commenter: 'Commenter',
       commenterDescription: 'Can view and comment',
       defaultPermissionForAnyone: 'Default permission for "Anyone" access',
+      userAdded: 'User added successfully',
+      accessRevoked: 'Access revoked successfully',
+      permissionUpdated: 'Permission updated successfully',
+      failedToLoadUsers: 'Failed to load shared users',
+      searchFailed: 'Failed to search users',
+      failedToShare: 'Failed to share presentation',
+      failedToRevoke: 'Failed to revoke access',
+      failedToUpdate: 'Failed to update permission',
     },
   },
 };

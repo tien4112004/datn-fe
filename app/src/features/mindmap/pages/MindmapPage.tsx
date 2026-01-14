@@ -231,7 +231,7 @@ const MindmapPage = () => {
               !isViewMode &&
               isToolbarVisible &&
               (isDesktop ? (
-                <Toolbar mindmapId={mindmap.id} />
+                <Toolbar mindmapId={mindmap.id} permission={mindmap.permission} />
               ) : (
                 <div
                   className={`bg-background fixed bottom-0 left-0 right-0 z-50 flex h-[40vh] flex-col rounded-t-2xl border-t shadow-lg transition-transform duration-300 ease-in-out sm:h-[65vh] ${
@@ -251,7 +251,7 @@ const MindmapPage = () => {
                     </Button>
                   </div>
                   <div className="flex-1 overflow-y-auto" style={{ touchAction: 'pan-y' }}>
-                    <Toolbar mindmapId={mindmap.id} isMobileSheet={true} />
+                    <Toolbar mindmapId={mindmap.id} isMobileSheet={true} permission={mindmap.permission} />
                   </div>
                 </div>
               ))}

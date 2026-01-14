@@ -5,10 +5,10 @@ import {
   type ImageOptions,
   type OutlineData,
 } from '../types';
-import type { User, SharedUserApiResponse, ShareRequest, ShareResponse } from '../types/share';
-import { splitMarkdownToOutlineItems } from '../utils';
+import type { SharedUserApiResponse, ShareRequest, ShareResponse } from '../types/share';
 import { api, API_MODE, type ApiMode } from '@aiprimary/api';
 import { mapPagination, type ApiResponse, type Pagination } from '@aiprimary/api';
+import { parsePermissionHeader } from '../../../shared/utils/permission';
 import type {
   Presentation,
   SlideLayoutSchema,
@@ -129,7 +129,15 @@ export default class PresentationRealApiService implements PresentationApiServic
 
   async getPresentationById(id: string): Promise<Presentation | null> {
     const response = await api.get<ApiResponse<Presentation>>(`${this.baseUrl}/api/presentations/${id}`);
-    return this._mapPresentationItem(response.data.data);
+    const presentation = this._mapPresentationItem(response.data.data);
+
+    // Extract permission from response header (added by backend PermissionHeaderResponseWrapper)
+    const permissionHeader = response.headers['permission']; // axios lowercases headers
+    if (permissionHeader) {
+      presentation.permission = parsePermissionHeader(permissionHeader);
+    }
+
+    return presentation;
   }
 
   async getAiResultById(id: string): Promise<{
@@ -220,13 +228,6 @@ export default class PresentationRealApiService implements PresentationApiServic
       createdAt: data?.createdAt,
       updatedAt: data?.updatedAt,
     };
-  }
-
-  async searchUsers(query: string): Promise<User[]> {
-    const response = await api.get<ApiResponse<User[]>>(`${this.baseUrl}/api/user/search`, {
-      params: { q: query, limit: 10 },
-    });
-    return response.data.data;
   }
 
   async sharePresentation(id: string, shareData: ShareRequest): Promise<ShareResponse> {

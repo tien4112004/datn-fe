@@ -4,27 +4,38 @@ export interface Comment {
   documentType: 'presentation' | 'mindmap';
   content: string;
 
+  // Author info (transformed from backend's userId/userName/userAvatar)
   author: {
     id: string;
     name: string;
-    email: string;
     avatarUrl?: string;
   };
 
-  parentCommentId?: string;
-  threadRootId?: string;
-  replyCount: number;
-  replies?: Comment[];
-
-  isEdited: boolean;
+  // Permission flags (derived from backend's isOwner)
   canEdit: boolean;
   canDelete: boolean;
 
-  mentions: Array<{
-    id: string;
-    name: string;
-  }>;
+  // Backend fields
+  mentionedUserIds: string[]; // Direct from backend
 
+  // Timestamps
+  createdAt: string;
+  updatedAt: string;
+
+  // Computed
+  isEdited: boolean; // createdAt !== updatedAt (rounded to seconds)
+}
+
+export interface CommentBackendResponse {
+  id: string;
+  presentationId?: string;
+  mindmapId?: string;
+  userId: string;
+  userName: string;
+  userAvatar?: string;
+  isOwner: boolean;
+  content: string;
+  mentionedUsers: string[];
   createdAt: string;
   updatedAt: string;
 }

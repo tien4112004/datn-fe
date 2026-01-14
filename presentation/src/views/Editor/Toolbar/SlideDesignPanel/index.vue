@@ -370,7 +370,7 @@
           </div>
 
           <div class="btns">
-            <Button type="primary" size="small" @click="applyPresetTheme(item)">{{
+            <Button type="primary" size="small" @click="applyPresetTheme(item)" class="tw-text-xs">{{
               $t('styling.slide.design.set')
             }}</Button>
             <Button
@@ -378,6 +378,7 @@
               size="small"
               style="margin-top: 3px"
               @click="applyPresetTheme(item, true)"
+              class="tw-text-xs"
               >{{ $t('styling.slide.design.setAndApply') }}</Button
             >
           </div>

@@ -1,6 +1,20 @@
 import { useState, useEffect } from 'react';
 import { api } from '@aiprimary/api';
 
+/**
+ * @deprecated This hook makes a separate API call to fetch permissions.
+ * Use the permission field from the document data instead:
+ *
+ * Example (Mindmap):
+ *   const { data: mindmap } = useMindmapById(id);
+ *   const permission = mindmap?.permission;
+ *
+ * Example (Presentation):
+ *   const { data: presentation } = usePresentationById(id);
+ *   const permission = presentation?.permission;
+ *
+ * This hook will be removed in a future version once all usages are migrated.
+ */
 export function useDocumentPermission(documentId: string | undefined) {
   const [permission, setPermission] = useState<'read' | 'comment' | 'edit' | null>(null);
   const [isLoading, setIsLoading] = useState(true);

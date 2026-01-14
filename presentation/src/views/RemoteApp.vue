@@ -38,6 +38,7 @@ const props = defineProps<{
   isRemote: boolean;
   presentation: Presentation;
   mode: 'view' | 'edit';
+  permission?: 'read' | 'comment' | 'edit';
   generationRequest?: PresentationGenerationRequest;
   isGenerating?: boolean;
 }>();

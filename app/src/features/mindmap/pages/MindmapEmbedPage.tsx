@@ -113,7 +113,7 @@ const MindmapEmbedPage = () => {
           </Flow>
 
           {/* Toolbar */}
-          {isToolbarVisible && <Toolbar mindmapId={mindmap.id} />}
+          {isToolbarVisible && <Toolbar mindmapId={mindmap.id} permission={mindmap.permission} />}
         </div>
       </PresenterProvider>
     </ReactFlowProvider>

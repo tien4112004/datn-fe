@@ -5,6 +5,7 @@ import {
   type UpdatePresentationRequest,
   type ImageOptions,
   type OutlineData,
+  type PresentationGenerateDraftRequest,
 } from '../types';
 import type { ApiResponse } from '@aiprimary/api';
 import type {
@@ -334,45 +335,6 @@ export default class PresentationMockService implements PresentationApiService {
     return draftPresentation;
   }
 
-  async searchUsers(query: string): Promise<User[]> {
-    await new Promise((resolve) => setTimeout(resolve, 500));
-
-    const mockUsers: User[] = [
-      {
-        id: '1',
-        email: 'john.doe@example.com',
-        firstName: 'John',
-        lastName: 'Doe',
-        avatarUrl: 'https://i.pravatar.cc/150?img=1',
-      },
-      {
-        id: '2',
-        email: 'jane.smith@example.com',
-        firstName: 'Jane',
-        lastName: 'Smith',
-        avatarUrl: 'https://i.pravatar.cc/150?img=2',
-      },
-      {
-        id: '3',
-        email: 'bob.johnson@example.com',
-        firstName: 'Bob',
-        lastName: 'Johnson',
-        avatarUrl: 'https://i.pravatar.cc/150?img=3',
-      },
-    ];
-
-    // Filter users based on query
-    if (!query) return mockUsers;
-
-    const lowerQuery = query.toLowerCase();
-    return mockUsers.filter(
-      (user) =>
-        user.email.toLowerCase().includes(lowerQuery) ||
-        user.firstName.toLowerCase().includes(lowerQuery) ||
-        user.lastName.toLowerCase().includes(lowerQuery)
-    );
-  }
-
   async sharePresentation(id: string, shareData: ShareRequest): Promise<ShareResponse> {
     await new Promise((resolve) => setTimeout(resolve, 500));
 
@@ -383,7 +345,7 @@ export default class PresentationMockService implements PresentationApiService {
     };
   }
 
-  async getSharedUsers(id: string): Promise<SharedUserApiResponse[]> {
+  async getSharedUsers(_id: string): Promise<SharedUserApiResponse[]> {
     await new Promise((resolve) => setTimeout(resolve, 500));
 
     const mockSharedUsers: SharedUserApiResponse[] = [
@@ -408,7 +370,7 @@ export default class PresentationMockService implements PresentationApiService {
     return mockSharedUsers;
   }
 
-  async revokeAccess(presentationId: string, userId: string): Promise<void> {
+  async revokeAccess(_presentationId: string, _userId: string): Promise<void> {
     await new Promise((resolve) => setTimeout(resolve, 500));
     // Mock implementation - no actual action needed
   }

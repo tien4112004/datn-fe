@@ -9,6 +9,7 @@ import {
   useMessageRemote,
   useSavingIndicator,
   useGeneratingStoreSync,
+  useCommentDrawerTrigger,
 } from '../hooks/useDetailPresentation';
 import { useUnsavedChangesBlocker } from '@/shared/hooks';
 import { UnsavedChangesDialog } from '@/shared/components/modals/UnsavedChangesDialog';
@@ -17,11 +18,7 @@ import usePresentationStore from '../stores/usePresentationStore';
 import { CriticalError } from '@aiprimary/api';
 import { ERROR_TYPE } from '@/shared/constants';
 import { useEffect, useRef, useState } from 'react';
-import { MessageSquare } from 'lucide-react';
-import { Button } from '@/shared/components/ui/button';
 import { CommentDrawer } from '@/features/comments';
-import { useDocumentPermission } from '@/shared/hooks/useDocumentPermission';
-import { PermissionBadge } from '@/shared/components/common/PermissionBadge';
 
 const DetailPage = () => {
   const { presentation } = useLoaderData() as { presentation: Presentation | null };
@@ -34,7 +31,7 @@ const DetailPage = () => {
   const [isCommentDrawerOpen, setIsCommentDrawerOpen] = useState(false);
 
   // Permission state
-  const { permission: userPermission } = useDocumentPermission(id);
+  const userPermission = presentation?.permission;
 
   // Validate and initialize - all processing logic is now in Vue
   usePresentationValidation(id, presentation, isGeneratingParam);
@@ -67,7 +64,17 @@ const DetailPage = () => {
     eventName: 'app.presentation.dirty-state-changed',
   });
 
+  // Listen for comment drawer open requests from Vue
+  useCommentDrawerTrigger(() => setIsCommentDrawerOpen(true));
+
   const { t } = useTranslation('glossary', { keyPrefix: 'loading' });
+
+  // Determine mode based on permission and view mode parameter
+  // - read permission: always 'view' (read-only)
+  // - comment permission: always 'view' (can view and comment, but not edit)
+  // - edit permission: respects isViewModeParam toggle
+  // - undefined permission: default to 'view' for safety
+  const mode = userPermission === 'edit' ? (isViewModeParam ? 'view' : 'edit') : 'view';
 
   return (
     <>
@@ -76,7 +83,8 @@ const DetailPage = () => {
         mountProps={{
           presentation,
           isRemote: true,
-          mode: isViewModeParam ? 'view' : 'edit',
+          mode,
+          permission: userPermission,
           ...(isGeneratingParam && { generationRequest: request, isGenerating: true }),
         }}
         className="vue-remote"
@@ -85,26 +93,7 @@ const DetailPage = () => {
       {isGenerating && <GlobalSpinner text={t('generatingPresentation')} lightBlur />}
       {!isGenerating && isSaving && <GlobalSpinner text={t('savingPresentation')} />}
 
-      {/* Permission Badge */}
-      {userPermission && !isViewModeParam && (
-        <div className="fixed right-6 top-6 z-40">
-          <PermissionBadge permission={userPermission} />
-        </div>
-      )}
-
-      {/* Floating Comment Button */}
-      {id && !isViewModeParam && (
-        <Button
-          onClick={() => setIsCommentDrawerOpen(true)}
-          className="fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full shadow-lg transition-shadow hover:shadow-xl"
-          size="icon"
-          title="Comments"
-        >
-          <MessageSquare className="h-6 w-6" />
-        </Button>
-      )}
-
-      {/* Comment Drawer */}
+      {/* Comment Drawer - Triggered by Vue app via 'app.presentation.open-comments' event */}
       {id && (
         <CommentDrawer
           isOpen={isCommentDrawerOpen}

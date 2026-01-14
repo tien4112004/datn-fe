@@ -11,6 +11,7 @@ import {
 } from '@/shared/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/components/ui/avatar';
 import { usePresentationApiService } from '../../api';
+import { useUserProfileApiService } from '@/features/user/api';
 import type { User, PermissionLevel } from '../../types/share';
 import { toast } from 'sonner';
 
@@ -30,6 +31,7 @@ export default function SharePresentationDialog({
   presentationId,
 }: SharePresentationDialogProps) {
   const apiService = usePresentationApiService();
+  const userService = useUserProfileApiService();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<User[]>([]);
@@ -71,7 +73,7 @@ export default function SharePresentationDialog({
       if (searchQuery.trim()) {
         setIsSearching(true);
         try {
-          const users = await apiService.searchUsers(searchQuery);
+          const users = await userService.searchUsers(searchQuery);
           // Filter out already selected users
           const filtered = users.filter((user) => !selectedUsers.some((selected) => selected.id === user.id));
           setSearchResults(filtered);

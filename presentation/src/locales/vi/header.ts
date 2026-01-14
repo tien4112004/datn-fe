@@ -53,6 +53,12 @@ export default {
     buttons: {
       present: 'Trình chiếu',
       share: 'Chia sẻ',
+      comments: 'Bình luận',
+    },
+
+    // Bình luận
+    comments: {
+      tooltip: 'Xem và thêm bình luận',
     },
 
     // Điều hướng breadcrumb
@@ -95,6 +101,14 @@ export default {
       commenter: 'Người bình luận',
       commenterDescription: 'Có thể xem và bình luận',
       defaultPermissionForAnyone: 'Quyền mặc định cho quyền truy cập "Bất kỳ ai"',
+      userAdded: 'Đã thêm người dùng thành công',
+      accessRevoked: 'Đã thu hồi quyền truy cập thành công',
+      permissionUpdated: 'Đã cập nhật quyền thành công',
+      failedToLoadUsers: 'Không thể tải người dùng đã chia sẻ',
+      searchFailed: 'Không thể tìm kiếm người dùng',
+      failedToShare: 'Không thể chia sẻ bài trình chiếu',
+      failedToRevoke: 'Không thể thu hồi quyền truy cập',
+      failedToUpdate: 'Không thể cập nhật quyền',
     },
   },
 };

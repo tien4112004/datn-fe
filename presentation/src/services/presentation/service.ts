@@ -1,6 +1,12 @@
 import { api, webViewApi } from '@aiprimary/api';
 import type { ApiResponse, StreamableAxiosInstance } from '@aiprimary/api';
-import type { PresentationGenerationRequest, PresentationGenerationStartResponse } from './types';
+import type {
+  PresentationGenerationRequest,
+  PresentationGenerationStartResponse,
+  SharedUserApiResponse,
+  SearchUserApiResponse,
+  SharePresentationRequest,
+} from './types';
 import type { ImageGenerationParams } from '../image/types';
 import type { ApiService } from '@aiprimary/api';
 import { getBackendUrl } from '@aiprimary/api';
@@ -257,5 +263,41 @@ export class PresentationApiService implements ApiService {
       slides: data.slides,
       isParsed: data.parsed || data.isParsed || false,
     };
+  }
+
+  /**
+   * Get shared users for a presentation
+   */
+  async getSharedUsers(presentationId: string): Promise<SharedUserApiResponse[]> {
+    const response = await api.get<ApiResponse<SharedUserApiResponse[]>>(
+      `${this.baseUrl}/api/presentations/${presentationId}/shared-users`
+    );
+    return response.data.data;
+  }
+
+  /**
+   * Search users by query string
+   */
+  async searchUsers(query: string): Promise<SearchUserApiResponse[]> {
+    const response = await api.get<ApiResponse<SearchUserApiResponse[]>>(
+      `${this.baseUrl}/api/users/search?q=${encodeURIComponent(query)}`
+    );
+    return response.data.data;
+  }
+
+  /**
+   * Share presentation with users
+   */
+  async sharePresentation(presentationId: string, request: SharePresentationRequest): Promise<void> {
+    await api.post<ApiResponse<void>>(`${this.baseUrl}/api/presentations/${presentationId}/share`, request);
+  }
+
+  /**
+   * Revoke access for a user
+   */
+  async revokeAccess(presentationId: string, userId: string): Promise<void> {
+    await api.delete<ApiResponse<void>>(
+      `${this.baseUrl}/api/presentations/${presentationId}/shared-users/${userId}`
+    );
   }
 }

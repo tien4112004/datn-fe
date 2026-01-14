@@ -14,10 +14,18 @@ import LoadingButton from '@/components/common/LoadingButton';
 import { cn } from '@/shared/lib/utils';
 import { TreePanelContent } from '../tree-panel';
 import { CommentDrawer } from '@/features/comments';
-import { useDocumentPermission } from '@/shared/hooks/useDocumentPermission';
 import { PermissionBadge } from '@/shared/components/common/PermissionBadge';
+import type { Permission } from '@/shared/utils/permission';
 
-const Toolbar = ({ mindmapId, isMobileSheet = false }: { mindmapId: string; isMobileSheet?: boolean }) => {
+const Toolbar = ({
+  mindmapId,
+  isMobileSheet = false,
+  permission,
+}: {
+  mindmapId: string;
+  isMobileSheet?: boolean;
+  permission?: Permission;
+}) => {
   const { t } = useTranslation(I18N_NAMESPACES.MINDMAP);
   const addNode = useNodeOperationsStore((state) => state.addNode);
   const undo = useUndoRedoStore((state) => state.undo);
@@ -29,7 +37,7 @@ const Toolbar = ({ mindmapId, isMobileSheet = false }: { mindmapId: string; isMo
   const { selectedCount, hasSelection } = useNodeSelection();
 
   // Permission state
-  const { permission: userPermission, isLoading: isPermissionLoading } = useDocumentPermission(mindmapId);
+  const userPermission = permission;
 
   // Save and Export states
   const { saveWithThumbnail, isLoading: isSaving } = useSaveMindmap();
@@ -63,7 +71,7 @@ const Toolbar = ({ mindmapId, isMobileSheet = false }: { mindmapId: string; isMo
       {!isMobileSheet && (
         <div className="flex items-center justify-between">
           <h2 className="text-base font-bold text-gray-800">{t('toolbar.title')}</h2>
-          {userPermission && <PermissionBadge permission={userPermission} isLoading={isPermissionLoading} />}
+          {userPermission && <PermissionBadge permission={userPermission} />}
         </div>
       )}
 

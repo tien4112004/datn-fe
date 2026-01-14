@@ -41,9 +41,11 @@
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
+      <!-- Permission Badge -->
     </div>
 
     <div class="tw-flex tw-items-center tw-gap-2 tw-flex-shrink-0">
+      <PermissionBadge v-if="permission" :permission="permission" class="tw-ml-2" />
       <Popover trigger="click" placement="bottom-end" v-model:value="mainMenuVisible">
         <template #content>
           <PopoverMenuItem
@@ -92,9 +94,7 @@
           >
         </template>
         <div class="menu-item">
-          <div class="handler-item">
-            <IconHamburgerButton class="icon" />
-          </div>
+          <IconHamburgerButton class="icon" />
         </div>
       </Popover>
       <Popover trigger="click" center contentClass="!tw-p-0 tw-min-w-[340px]">
@@ -116,32 +116,14 @@
           {{ $t('header.buttons.share') }}
         </Button>
       </Popover>
-      <!-- <div
-        class="menu-item"
-        v-tooltip="$t('header.ai.aiGeneratePPT')"
-        @click="
-          openAIPPTDialog();
-          mainMenuVisible = false;
-        "
-      >
-        <span class="text ai">AI</span>
-      </div> -->
+      <Button class="menu-item" v-tooltip="$t('header.comments.tooltip')" @click="handleOpenComments">
+        <IconComments class="icon" />
+        {{ $t('header.buttons.comments') }}
+      </Button>
       <Button class="menu-item" v-tooltip="$t('header.file.exportFile')" @click="setDialogForExport('pptx')">
         <IconDownload class="icon" />
         {{ $t('header.share.export') }}
       </Button>
-      <!-- <a
-        class="github-link"
-        v-tooltip="$t('header.meta.copyright')"
-        href="https://github.com/pipipi-pikachu/PPTist"
-        target="_blank"
-      >
-        <div class="menu-item">
-          <div class="handler-item">
-            <IconGithub class="icon" />
-          </div>
-        </div>
-      </a> -->
       <div class="menu-item" id="language-switcher">
         <LanguageSwitcher />
       </div>
@@ -194,15 +176,16 @@ import BreadcrumbItem from '@/components/ui/breadcrumb/BreadcrumbItem.vue';
 import BreadcrumbLink from '@/components/ui/breadcrumb/BreadcrumbLink.vue';
 import BreadcrumbPage from '@/components/ui/breadcrumb/BreadcrumbPage.vue';
 import BreadcrumbSeparator from '@/components/ui/breadcrumb/BreadcrumbSeparator.vue';
-import { Check as IconCheck, X as IconClose } from 'lucide-vue-next';
+import { Check as IconCheck, X as IconClose, MessageSquare as IconComments } from 'lucide-vue-next';
 import message from '@/utils/message';
+import PermissionBadge from '@/components/PermissionBadge.vue';
 const { t } = useI18n();
 const route = useRoute();
 const mainStore = useMainStore();
 const slidesStore = useSlidesStore();
 const containerStore = useContainerStore();
 const { title, theme } = storeToRefs(slidesStore);
-const { presentation } = storeToRefs(containerStore);
+const { presentation, permission } = storeToRefs(containerStore);
 const { enterScreening, enterScreeningFromStart, enterPresenterMode, openSeparatedPresentation } =
   useScreening();
 const { importSpecificFile, importPPTXFile, exporting } = useImport();
@@ -346,6 +329,10 @@ const handleShare = (options: { shareWithLink: boolean; allowEdit: boolean; user
   }
 
   message.success(shareMessage);
+};
+
+const handleOpenComments = () => {
+  window.dispatchEvent(new CustomEvent('app.presentation.open-comments'));
 };
 </script>
 

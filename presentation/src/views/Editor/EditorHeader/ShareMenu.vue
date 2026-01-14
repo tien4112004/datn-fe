@@ -232,9 +232,11 @@ import Popover from '@/components/Popover.vue';
 import message from '@/utils/message';
 import { useI18n } from 'vue-i18n';
 import { computed, ref, watch, onMounted } from 'vue';
-import { api } from '@aiprimary/api';
+import { getPresentationApi } from '@/services/presentation/api';
+import type { SharedUserApiResponse } from '@/services/presentation/types';
 
 const { t } = useI18n();
+const presentationService = getPresentationApi();
 
 interface User {
   id: string;
@@ -330,10 +332,11 @@ const loadSharedUsers = async () => {
 
   isLoadingSharedUsers.value = true;
   try {
-    const response = await api.get(`/api/resources/${props.presentationId}/shared-users`);
-    const sharedUsers = response.data.data || [];
-    selectedUsers.value = sharedUsers.map((user: any) => ({
-      id: user.userId, // Backend returns 'userId', frontend expects 'id'
+    const sharedUsers: SharedUserApiResponse[] = await presentationService.getSharedUsers(
+      props.presentationId
+    );
+    selectedUsers.value = sharedUsers.map((user) => ({
+      id: user.userId,
       name: `${user.firstName} ${user.lastName}`,
       email: user.email,
       permission: user.permission === 'read' ? 'Viewer' : 'Commenter',
@@ -359,11 +362,10 @@ watch(searchQuery, async () => {
   searchTimeout = setTimeout(async () => {
     isSearching.value = true;
     try {
-      const response = await api.get(`/api/user/search?q=${searchQuery.value}&limit=10`);
-      const users = response.data.data || [];
+      const users = await presentationService.searchUsers(searchQuery.value);
       searchResults.value = users
-        .filter((user: any) => !selectedUsers.value.some((selected) => selected.id === user.id))
-        .map((user: any) => ({
+        .filter((user) => !selectedUsers.value.some((selected) => selected.id === user.id))
+        .map((user) => ({
           id: user.id,
           name: `${user.firstName} ${user.lastName}`,
           email: user.email,
@@ -397,7 +399,7 @@ const addUser = async (user: User) => {
   searchResults.value = [];
 
   try {
-    await api.post(`/api/resources/${props.presentationId}/share`, {
+    await presentationService.sharePresentation(props.presentationId, {
       targetUserIds: [user.id],
       permission: 'read',
     });
@@ -416,9 +418,7 @@ const removeUser = async (userId: string) => {
   selectedUsers.value = selectedUsers.value.filter((u) => u.id !== userId);
 
   try {
-    await api.post(`/api/resources/${props.presentationId}/revoke`, {
-      targetUserId: userId,
-    });
+    await presentationService.revokeAccess(props.presentationId, userId);
     message.success(t('header.shareMenu.accessRevoked') || `${user?.name} no longer has access`);
   } catch (error) {
     console.error('Failed to revoke access:', error);
@@ -438,7 +438,7 @@ const updateUserPermission = async (userId: string, newPermission: string | numb
   permissionPopoverOpen.value[userId] = false;
 
   try {
-    await api.post(`/api/resources/${props.presentationId}/share`, {
+    await presentationService.sharePresentation(props.presentationId, {
       targetUserIds: [userId],
       permission: newPermission === 'Viewer' ? 'read' : 'comment',
     });

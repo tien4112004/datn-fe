@@ -38,6 +38,7 @@ export default class CommentMockService implements CommentApiService {
     documentId: string,
     data: CreateCommentRequest
   ): Promise<Comment> {
+    const timestamp = new Date().toISOString();
     const newComment: Comment = {
       id: Math.random().toString(36).substring(7),
       documentId,
@@ -46,58 +47,35 @@ export default class CommentMockService implements CommentApiService {
       author: {
         id: 'mock-user',
         name: 'Mock User',
-        email: 'mock@example.com',
+        avatarUrl: undefined,
       },
-      replyCount: 0,
-      isEdited: false,
       canEdit: true,
       canDelete: true,
-      mentions: [],
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      mentionedUserIds: data.mentionedUserIds || [],
+      createdAt: timestamp,
+      updatedAt: timestamp,
+      isEdited: false,
     };
     this.mockComments.push(newComment);
     return Promise.resolve(newComment);
   }
 
-  async replyToComment(
-    documentType: string,
-    documentId: string,
-    parentCommentId: string,
-    data: CreateCommentRequest
+  async updateComment(
+    _documentType: string,
+    _documentId: string,
+    commentId: string,
+    data: UpdateCommentRequest
   ): Promise<Comment> {
-    const reply: Comment = {
-      id: Math.random().toString(36).substring(7),
-      documentId,
-      documentType: documentType as 'presentation' | 'mindmap',
-      content: data.content,
-      author: {
-        id: 'mock-user',
-        name: 'Mock User',
-        email: 'mock@example.com',
-      },
-      parentCommentId,
-      replyCount: 0,
-      isEdited: false,
-      canEdit: true,
-      canDelete: true,
-      mentions: [],
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-    return Promise.resolve(reply);
-  }
-
-  async updateComment(commentId: string, data: UpdateCommentRequest): Promise<Comment> {
     const comment = this.mockComments.find((c) => c.id === commentId);
     if (comment) {
       comment.content = data.content;
+      comment.updatedAt = new Date().toISOString();
       comment.isEdited = true;
     }
     return Promise.resolve(comment!);
   }
 
-  async deleteComment(commentId: string, _documentId: string): Promise<void> {
+  async deleteComment(_documentType: string, _documentId: string, commentId: string): Promise<void> {
     this.mockComments = this.mockComments.filter((c) => c.id !== commentId);
     return Promise.resolve();
   }

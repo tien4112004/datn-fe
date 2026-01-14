@@ -36,3 +36,24 @@ export interface PresentationGenerationStartResponse {
   presentationId: string;
   error?: unknown;
 }
+
+// Sharing types
+export interface SharedUserApiResponse {
+  userId: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  permission: 'read' | 'comment';
+}
+
+export interface SearchUserApiResponse {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+}
+
+export interface SharePresentationRequest {
+  targetUserIds: string[];
+  permission: 'read' | 'comment';
+}

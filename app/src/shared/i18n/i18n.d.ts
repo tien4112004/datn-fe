@@ -17,6 +17,7 @@ import settings from './locales/en/settings';
 import classes from './locales/en/classes';
 import assignment from './locales/en/assignment';
 import assessmentMatrix from './locales/en/assessmentMatrix';
+import dashboard from './locales/en/dashboard';
 
 /**
  * Resources type based on English translations
@@ -36,6 +37,7 @@ export interface Resources {
   classes: typeof classes;
   assignment: typeof assignment;
   assessmentMatrix: typeof assessmentMatrix;
+  dashboard: typeof dashboard;
 }
 
 declare module 'i18next' {

@@ -5,6 +5,8 @@ import {
   type ImageOptions,
   type OutlineData,
 } from '../types';
+import type { User, SharedUserApiResponse, ShareRequest, ShareResponse } from '../types/share';
+import { splitMarkdownToOutlineItems } from '../utils';
 import { api, API_MODE, type ApiMode } from '@aiprimary/api';
 import { mapPagination, type ApiResponse, type Pagination } from '@aiprimary/api';
 import type {
@@ -218,5 +220,33 @@ export default class PresentationRealApiService implements PresentationApiServic
       createdAt: data?.createdAt,
       updatedAt: data?.updatedAt,
     };
+  }
+
+  async searchUsers(query: string): Promise<User[]> {
+    const response = await api.get<ApiResponse<User[]>>(`${this.baseUrl}/api/user/search`, {
+      params: { q: query, limit: 10 },
+    });
+    return response.data.data;
+  }
+
+  async sharePresentation(id: string, shareData: ShareRequest): Promise<ShareResponse> {
+    const response = await api.post<ApiResponse<ShareResponse>>(
+      `${this.baseUrl}/api/resources/${id}/share`,
+      shareData
+    );
+    return response.data.data;
+  }
+
+  async getSharedUsers(id: string): Promise<SharedUserApiResponse[]> {
+    const response = await api.get<ApiResponse<SharedUserApiResponse[]>>(
+      `${this.baseUrl}/api/resources/${id}/shared-users`
+    );
+    return response.data.data;
+  }
+
+  async revokeAccess(presentationId: string, userId: string): Promise<void> {
+    await api.post(`${this.baseUrl}/api/resources/${presentationId}/revoke`, {
+      targetUserId: userId,
+    });
   }
 }

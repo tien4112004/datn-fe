@@ -11,6 +11,7 @@ import {
   MINDMAP_TYPES,
   PATH_TYPES,
 } from '../types';
+import type { User, SharedUserApiResponse, ShareRequest, ShareResponse } from '../types/share';
 import { DRAGHANDLE, SIDE } from '../types/constants';
 import type { ApiResponse, Pagination } from '@aiprimary/api';
 import { mapPagination } from '@aiprimary/api';
@@ -450,6 +451,74 @@ export default class MindmapMockService implements MindmapApiService {
 
         resolve(generated);
       }, 800);
+    });
+  }
+
+  async searchUsers(query: string): Promise<User[]> {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const mockUsers: User[] = [
+          {
+            id: '1',
+            email: 'john.doe@example.com',
+            firstName: 'John',
+            lastName: 'Doe',
+            avatarUrl: 'https://i.pravatar.cc/150?img=1',
+          },
+          {
+            id: '2',
+            email: 'jane.smith@example.com',
+            firstName: 'Jane',
+            lastName: 'Smith',
+            avatarUrl: 'https://i.pravatar.cc/150?img=2',
+          },
+        ];
+        const filtered = mockUsers.filter(
+          (user) =>
+            user.email.toLowerCase().includes(query.toLowerCase()) ||
+            user.firstName.toLowerCase().includes(query.toLowerCase()) ||
+            user.lastName.toLowerCase().includes(query.toLowerCase())
+        );
+        resolve(filtered);
+      }, 300);
+    });
+  }
+
+  async shareMindmap(id: string, shareData: ShareRequest): Promise<ShareResponse> {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve({
+          resourceId: id,
+          successCount: shareData.targetUserIds.length,
+          failedCount: 0,
+        });
+      }, 300);
+    });
+  }
+
+  async getSharedUsers(_id: string): Promise<SharedUserApiResponse[]> {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const mockSharedUsers: SharedUserApiResponse[] = [
+          {
+            userId: '1', // Backend returns 'userId' not 'id'
+            email: 'john.doe@example.com',
+            firstName: 'John',
+            lastName: 'Doe',
+            avatarUrl: 'https://i.pravatar.cc/150?img=1',
+            permission: 'read',
+          },
+        ];
+        resolve(mockSharedUsers);
+      }, 300);
+    });
+  }
+
+  async revokeAccess(_mindmapId: string, _userId: string): Promise<void> {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve();
+      }, 300);
     });
   }
 }

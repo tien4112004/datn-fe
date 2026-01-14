@@ -124,58 +124,60 @@ pipeline {
             }
         }
 
-        stage('Pull Cache Images') {
-            steps {
-                script {
-                    echo "========== Pulling Cache Images for Build Optimization =========="
-                    
-                    sh '''
-                        # Try to pull existing images for cache (ignore failures if images don't exist)
-                        echo "Attempting to pull existing images for cache..."
-                        docker pull ${IMAGE_NAME}:app-latest 2>/dev/null || echo "No existing app image found, will build from scratch"
-                        docker pull ${IMAGE_NAME}:presentation-latest 2>/dev/null || echo "No existing presentation image found, will build from scratch"
-                        docker pull ${IMAGE_NAME}:admin-latest 2>/dev/null || echo "No existing admin image found, will build from scratch"
-                    '''
-                }
-            }
-        }
-
         stage('Build Docker Images') {
             steps {
                 script {
                     echo "========== Building Docker Images =========="
-                    
+
                     sh '''
                         # Get short commit SHA for tagging
                         COMMIT_SHA=$(git rev-parse --short HEAD)
-                        
+
+                        # Load environment variables from .env file
+                        if [ -f "${ENV_FILE}" ]; then
+                            echo "Loading environment variables from ${ENV_FILE}..."
+                            export $(grep -v '^#' ${ENV_FILE} | xargs)
+                            echo "✓ Environment variables loaded"
+                            echo "VITE_API_URL: ${VITE_API_URL}"
+                            echo "PRESENTATION_URL: ${PRESENTATION_URL}"
+                        else
+                            echo "WARNING: Environment file not found at ${ENV_FILE}"
+                            echo "Building without environment variables..."
+                        fi
+
                         # Build app image
                         echo "Building App image..."
-                        docker build \
+                        docker build --no-cache \
+                            --build-arg VITE_API_URL="${VITE_API_URL}" \
+                            --build-arg PRESENTATION_URL="${PRESENTATION_URL}" \
+                            --build-arg NODE_ENV=production \
                             --target app-production \
                             --tag ${IMAGE_NAME}:app-latest \
                             --tag ${IMAGE_NAME}:app-${COMMIT_SHA} \
-                            --cache-from ${IMAGE_NAME}:app-latest \
                             .
-                        
+
                         # Build presentation image
                         echo "Building Presentation image..."
-                        docker build \
+                        docker build --no-cache \
+                            --build-arg VITE_API_URL="${VITE_API_URL}" \
+                            --build-arg PRESENTATION_URL="${PRESENTATION_URL}" \
+                            --build-arg NODE_ENV=production \
                             --target presentation-production \
                             --tag ${IMAGE_NAME}:presentation-latest \
                             --tag ${IMAGE_NAME}:presentation-${COMMIT_SHA} \
-                            --cache-from ${IMAGE_NAME}:presentation-latest \
                             .
-                        
+
                         # Build admin image
                         echo "Building Admin image..."
-                        docker build \
+                        docker build --no-cache \
+                            --build-arg VITE_API_URL="${VITE_API_URL}" \
+                            --build-arg PRESENTATION_URL="${PRESENTATION_URL}" \
+                            --build-arg NODE_ENV=production \
                             --target admin-production \
                             --tag ${IMAGE_NAME}:admin-latest \
                             --tag ${IMAGE_NAME}:admin-${COMMIT_SHA} \
-                            --cache-from ${IMAGE_NAME}:admin-latest \
                             .
-                        
+
                         # Show built images
                         echo "========== Built Images =========="
                         docker images | grep ${GITHUB_REPO}
@@ -260,30 +262,30 @@ pipeline {
             steps {
                 script {
                     echo "========== Starting Deployment with Docker Compose =========="
-                    
+
                     sh '''
                         cd ${DEPLOY_DIR}
-                        
+
                         # Ensure network exists
                         docker network create network-aiprimary 2>/dev/null || true
-                        
+
                         # Start frontend services
                         echo "Starting frontend services..."
-                        
-                        if [ -f "${ENV_FILE}" ]; then
-                            docker compose -f ${DOCKER_COMPOSE_FILE} --env-file ${ENV_FILE} pull
-                            docker compose -f ${DOCKER_COMPOSE_FILE} --env-file ${ENV_FILE} up -d
-                        else
-                            docker compose -f ${DOCKER_COMPOSE_FILE} pull
-                            docker compose -f ${DOCKER_COMPOSE_FILE} up -d
-                        fi
-                        
+                        echo "Note: Using pre-built images from registry with environment variables baked in"
+
+                        # Pull the latest images from registry
+                        # These images were built with the environment variables from .env
+                        docker compose -f ${DOCKER_COMPOSE_FILE} pull
+
+                        # Start services without rebuilding (use pulled images)
+                        docker compose -f ${DOCKER_COMPOSE_FILE} up -d --no-build
+
                         echo "Frontend containers started successfully"
-                        
+
                         # Wait for services to initialize
                         echo "Waiting for services to initialize..."
                         sleep 10
-                        
+
                         # Show status of services
                         echo "========== Service Status =========="
                         docker compose -f ${DOCKER_COMPOSE_FILE} ps

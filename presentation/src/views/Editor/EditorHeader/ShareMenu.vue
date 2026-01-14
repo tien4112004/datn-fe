@@ -15,6 +15,13 @@
             class="tw-w-full tw-px-4 tw-py-2.5 tw-pr-20 tw-text-sm tw-border tw-border-gray-300 tw-rounded tw-outline-none focus:tw-border-blue-500 focus:tw-ring-1 focus:tw-ring-blue-500"
           />
 
+          <!-- Loading spinner for search -->
+          <div v-if="isSearching" class="tw-absolute tw-right-3 tw-top-3">
+            <div
+              class="tw-animate-spin tw-h-4 tw-w-4 tw-border-2 tw-border-blue-500 tw-border-t-transparent tw-rounded-full"
+            ></div>
+          </div>
+
           <!-- Search Results Dropdown -->
           <div
             v-if="searchResults.length > 0"
@@ -41,7 +48,21 @@
       </div>
 
       <!-- People with Access -->
-      <div v-if="selectedUsers.length > 0" class="tw-mb-6">
+      <div v-if="isLoadingSharedUsers" class="tw-mb-6">
+        <h3 class="tw-text-sm tw-font-medium tw-text-gray-900 tw-mb-3">
+          {{ t('header.shareMenu.peopleWithAccess') }}
+        </h3>
+        <div class="tw-space-y-2">
+          <div v-for="i in 3" :key="i" class="tw-flex tw-items-center tw-gap-3 tw-py-1.5">
+            <div class="tw-w-8 tw-h-8 tw-rounded-full tw-bg-gray-200 tw-animate-pulse"></div>
+            <div class="tw-flex-1 tw-space-y-2">
+              <div class="tw-h-3 tw-w-32 tw-bg-gray-200 tw-animate-pulse tw-rounded"></div>
+              <div class="tw-h-2 tw-w-48 tw-bg-gray-200 tw-animate-pulse tw-rounded"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div v-else-if="selectedUsers.length > 0" class="tw-mb-6">
         <h3 class="tw-text-sm tw-font-medium tw-text-gray-900 tw-mb-3">
           {{ t('header.shareMenu.peopleWithAccess') }}
         </h3>
@@ -210,7 +231,8 @@ import Input from '@/components/Input.vue';
 import Popover from '@/components/Popover.vue';
 import message from '@/utils/message';
 import { useI18n } from 'vue-i18n';
-import { computed, ref, watch } from 'vue';
+import { computed, ref, watch, onMounted } from 'vue';
+import { api } from '@aiprimary/api';
 
 const { t } = useI18n();
 
@@ -234,6 +256,10 @@ interface AccessOption {
   description: string;
   icon: string;
 }
+
+const props = defineProps<{
+  presentationId?: string;
+}>();
 
 const emit = defineEmits<{
   cancel: [];
@@ -281,6 +307,8 @@ const searchResults = ref<User[]>([]);
 const permissionPopoverOpen = ref<{ [key: string]: boolean }>({});
 const generalAccessPopoverOpen = ref(false);
 const anyonePermissionPopoverOpen = ref(false);
+const isLoadingSharedUsers = ref(false);
+const isSearching = ref(false);
 
 // Computed property to get the current access option
 const currentAccessOption = computed(() => {
@@ -290,28 +318,64 @@ const currentAccessOption = computed(() => {
   );
 });
 
-// Mock user data
-const mockUsers: User[] = [
-  { id: '1', name: 'John Doe', email: 'john.doe@example.com' },
-  { id: '2', name: 'Jane Smith', email: 'jane.smith@example.com' },
-  { id: '3', name: 'Bob Johnson', email: 'bob.johnson@example.com' },
-  { id: '4', name: 'Alice Brown', email: 'alice.brown@example.com' },
-  { id: '5', name: 'Charlie Wilson', email: 'charlie.wilson@example.com' },
-];
+// Load existing shared users on mount
+onMounted(() => {
+  if (props.presentationId) {
+    loadSharedUsers();
+  }
+});
 
-// Watch searchQuery and update search results
-watch(searchQuery, () => {
+const loadSharedUsers = async () => {
+  if (!props.presentationId) return;
+
+  isLoadingSharedUsers.value = true;
+  try {
+    const response = await api.get(`/api/resources/${props.presentationId}/shared-users`);
+    const sharedUsers = response.data.data || [];
+    selectedUsers.value = sharedUsers.map((user: any) => ({
+      id: user.userId, // Backend returns 'userId', frontend expects 'id'
+      name: `${user.firstName} ${user.lastName}`,
+      email: user.email,
+      permission: user.permission === 'read' ? 'Viewer' : 'Commenter',
+    }));
+  } catch (error) {
+    console.error('Failed to load shared users:', error);
+    message.error(t('header.shareMenu.failedToLoadUsers') || 'Failed to load shared users');
+  } finally {
+    isLoadingSharedUsers.value = false;
+  }
+};
+
+// Watch searchQuery and update search results with real API
+let searchTimeout: NodeJS.Timeout | null = null;
+watch(searchQuery, async () => {
+  if (searchTimeout) clearTimeout(searchTimeout);
+
   if (!searchQuery.value.trim()) {
     searchResults.value = [];
     return;
   }
 
-  const query = searchQuery.value.toLowerCase();
-  searchResults.value = mockUsers.filter(
-    (user) =>
-      !selectedUsers.value.some((selected) => selected.id === user.id) &&
-      (user.name.toLowerCase().includes(query) || user.email.toLowerCase().includes(query))
-  );
+  searchTimeout = setTimeout(async () => {
+    isSearching.value = true;
+    try {
+      const response = await api.get(`/api/user/search?q=${searchQuery.value}&limit=10`);
+      const users = response.data.data || [];
+      searchResults.value = users
+        .filter((user: any) => !selectedUsers.value.some((selected) => selected.id === user.id))
+        .map((user: any) => ({
+          id: user.id,
+          name: `${user.firstName} ${user.lastName}`,
+          email: user.email,
+        }));
+    } catch (error) {
+      console.error('Search failed:', error);
+      searchResults.value = [];
+      message.error(t('header.shareMenu.searchFailed') || 'Failed to search users');
+    } finally {
+      isSearching.value = false;
+    }
+  }, 300);
 });
 
 // Watch for changes and emit share event automatically
@@ -323,23 +387,66 @@ watch(
   { deep: true }
 );
 
-const addUser = (user: User) => {
-  if (!selectedUsers.value.some((u) => u.id === user.id)) {
-    selectedUsers.value.push({ ...user, permission: 'Viewer' });
-    searchQuery.value = '';
-    searchResults.value = [];
+const addUser = async (user: User) => {
+  if (!props.presentationId) return;
+  if (selectedUsers.value.some((u) => u.id === user.id)) return;
+
+  const newUser: User = { ...user, permission: 'Viewer' };
+  selectedUsers.value.push(newUser);
+  searchQuery.value = '';
+  searchResults.value = [];
+
+  try {
+    await api.post(`/api/resources/${props.presentationId}/share`, {
+      targetUserIds: [user.id],
+      permission: 'read',
+    });
+    message.success(t('header.shareMenu.userAdded') || `${user.name} can now view this presentation`);
+  } catch (error) {
+    console.error('Failed to share:', error);
+    selectedUsers.value = selectedUsers.value.filter((u) => u.id !== user.id);
+    message.error(t('header.shareMenu.failedToShare') || 'Failed to share presentation');
   }
 };
 
-const removeUser = (userId: string) => {
+const removeUser = async (userId: string) => {
+  if (!props.presentationId) return;
+
+  const user = selectedUsers.value.find((u) => u.id === userId);
   selectedUsers.value = selectedUsers.value.filter((u) => u.id !== userId);
+
+  try {
+    await api.post(`/api/resources/${props.presentationId}/revoke`, {
+      targetUserId: userId,
+    });
+    message.success(t('header.shareMenu.accessRevoked') || `${user?.name} no longer has access`);
+  } catch (error) {
+    console.error('Failed to revoke access:', error);
+    if (user) selectedUsers.value.push(user);
+    message.error(t('header.shareMenu.failedToRevoke') || 'Failed to revoke access');
+  }
 };
 
-const updateUserPermission = (userId: string, newPermission: string | number) => {
+const updateUserPermission = async (userId: string, newPermission: string | number) => {
+  if (!props.presentationId) return;
+
   const user = selectedUsers.value.find((u) => u.id === userId);
-  if (user) {
-    user.permission = newPermission.toString();
-    permissionPopoverOpen.value[userId] = false;
+  if (!user) return;
+
+  const oldPermission = user.permission;
+  user.permission = newPermission.toString();
+  permissionPopoverOpen.value[userId] = false;
+
+  try {
+    await api.post(`/api/resources/${props.presentationId}/share`, {
+      targetUserIds: [userId],
+      permission: newPermission === 'Viewer' ? 'read' : 'comment',
+    });
+    message.success(t('header.shareMenu.permissionUpdated') || `User is now a ${newPermission}`);
+  } catch (error) {
+    console.error('Failed to update permission:', error);
+    user.permission = oldPermission;
+    message.error(t('header.shareMenu.failedToUpdate') || 'Failed to update permission');
   }
 };
 

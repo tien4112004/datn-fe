@@ -14,6 +14,7 @@ import type {
   SlideTheme,
   SlideTemplate,
 } from '@aiprimary/core';
+import type { User, SharedUserApiResponse, ShareRequest, ShareResponse } from '../types/share';
 import { moduleMethodMap } from '../components/remote/module';
 import { THEMES_DATA } from '../utils/themes';
 
@@ -310,6 +311,106 @@ export default class PresentationMockService implements PresentationApiService {
         resolve(mockSlideTemplates);
       }, 300);
     });
+  }
+
+  async draftPresentation(request: PresentationGenerateDraftRequest): Promise<Presentation> {
+    // Simulate API delay
+    await new Promise((resolve) => setTimeout(resolve, 200));
+
+    const draftPresentation: Presentation = {
+      id: crypto.randomUUID(),
+      title: 'AI Generated Presentation',
+      slides: [],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      isParsed: false,
+      theme: request.presentation.theme,
+      viewport: request.presentation.viewport,
+    };
+
+    // Add the draft presentation to the mock list
+    mockPresentationItems = [draftPresentation, ...mockPresentationItems];
+
+    return draftPresentation;
+  }
+
+  async searchUsers(query: string): Promise<User[]> {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    const mockUsers: User[] = [
+      {
+        id: '1',
+        email: 'john.doe@example.com',
+        firstName: 'John',
+        lastName: 'Doe',
+        avatarUrl: 'https://i.pravatar.cc/150?img=1',
+      },
+      {
+        id: '2',
+        email: 'jane.smith@example.com',
+        firstName: 'Jane',
+        lastName: 'Smith',
+        avatarUrl: 'https://i.pravatar.cc/150?img=2',
+      },
+      {
+        id: '3',
+        email: 'bob.johnson@example.com',
+        firstName: 'Bob',
+        lastName: 'Johnson',
+        avatarUrl: 'https://i.pravatar.cc/150?img=3',
+      },
+    ];
+
+    // Filter users based on query
+    if (!query) return mockUsers;
+
+    const lowerQuery = query.toLowerCase();
+    return mockUsers.filter(
+      (user) =>
+        user.email.toLowerCase().includes(lowerQuery) ||
+        user.firstName.toLowerCase().includes(lowerQuery) ||
+        user.lastName.toLowerCase().includes(lowerQuery)
+    );
+  }
+
+  async sharePresentation(id: string, shareData: ShareRequest): Promise<ShareResponse> {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    return {
+      resourceId: id,
+      successCount: shareData.targetUserIds.length,
+      failedCount: 0,
+    };
+  }
+
+  async getSharedUsers(id: string): Promise<SharedUserApiResponse[]> {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    const mockSharedUsers: SharedUserApiResponse[] = [
+      {
+        userId: '1',
+        email: 'john.doe@example.com',
+        firstName: 'John',
+        lastName: 'Doe',
+        avatarUrl: 'https://i.pravatar.cc/150?img=1',
+        permission: 'read',
+      },
+      {
+        userId: '2',
+        email: 'jane.smith@example.com',
+        firstName: 'Jane',
+        lastName: 'Smith',
+        avatarUrl: 'https://i.pravatar.cc/150?img=2',
+        permission: 'comment',
+      },
+    ];
+
+    return mockSharedUsers;
+  }
+
+  async revokeAccess(presentationId: string, userId: string): Promise<void> {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    // Mock implementation - no actual action needed
   }
 }
 

@@ -1,6 +1,14 @@
 import type { Service } from '@/shared/api';
 import type { ApiResponse } from '@aiprimary/api';
 import type { Mindmap, AiGeneratedNode, MindMapNode, MindMapEdge, MindmapMetadata } from './mindmap';
+import type { User, SharedUserApiResponse, ShareRequest, ShareResponse } from './share';
+
+export interface MindmapCollectionRequest {
+  page?: number;
+  pageSize?: number;
+  sort?: 'asc' | 'desc';
+  filter?: string;
+}
 
 export interface MindmapApiService extends Service {
   getMindmapById(id: string): Promise<MindmapResponse>;
@@ -10,13 +18,12 @@ export interface MindmapApiService extends Service {
   deleteMindmap(id: string): Promise<void>;
   updateMindmapTitle(id: string, name: string): Promise<MindmapTitleUpdateResponse>;
   generateMindmap(request: MindmapGenerateRequest): Promise<AiGeneratedNode>;
-}
 
-export interface MindmapCollectionRequest {
-  page?: number;
-  pageSize?: number;
-  sort?: 'asc' | 'desc';
-  filter?: string;
+  // Share functionality
+  searchUsers(query: string): Promise<User[]>;
+  shareMindmap(id: string, shareData: ShareRequest): Promise<ShareResponse>;
+  getSharedUsers(id: string): Promise<SharedUserApiResponse[]>;
+  revokeAccess(mindmapId: string, userId: string): Promise<void>;
 }
 
 /**

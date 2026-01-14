@@ -57,6 +57,7 @@ i18n
       'assignment',
       'admin',
       'assessmentMatrix',
+      'dashboard',
     ],
     interpolation: {
       escapeValue: false,

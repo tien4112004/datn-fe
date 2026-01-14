@@ -109,7 +109,7 @@
 
       <Popover trigger="click" center contentClass="!tw-p-0">
         <template #content>
-          <ShareMenu @cancel="handleShareCancel" @share="handleShare" />
+          <ShareMenu :presentationId="presentationId" @cancel="handleShareCancel" @share="handleShare" />
         </template>
         <Button class="menu-item" v-tooltip="$t('header.share.sharePresentation')">
           <IconShare class="icon" />
@@ -167,6 +167,7 @@
 import { nextTick, ref, computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useI18n } from 'vue-i18n';
+import { useRoute } from 'vue-router';
 import { useMainStore, useSlidesStore, useContainerStore } from '@/store';
 import useScreening from '@/hooks/useScreening';
 import useImport from '@/hooks/useImport';
@@ -196,6 +197,7 @@ import BreadcrumbSeparator from '@/components/ui/breadcrumb/BreadcrumbSeparator.
 import { Check as IconCheck, X as IconClose } from 'lucide-vue-next';
 import message from '@/utils/message';
 const { t } = useI18n();
+const route = useRoute();
 const mainStore = useMainStore();
 const slidesStore = useSlidesStore();
 const containerStore = useContainerStore();
@@ -208,7 +210,7 @@ const { resetSlides } = useSlideHandler();
 const { createSlide, getThemes } = useSlideTemplates();
 
 // Get presentation ID from container store
-const presentationId = computed(() => presentation?.value?.id || '');
+const presentationId = computed(() => presentation?.value?.id || (route.params.id as string) || '');
 
 const mainMenuVisible = ref(false);
 const hotkeyDrawerVisible = ref(false);

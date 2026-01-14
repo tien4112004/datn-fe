@@ -9,6 +9,7 @@ import {
   type AiGeneratedNode,
   type MindmapGenerateRequest,
 } from '../types';
+import type { User, SharedUserApiResponse, ShareRequest, ShareResponse } from '../types/share';
 import { mapPagination, type ApiResponse, type Pagination } from '@aiprimary/api';
 
 export default class MindmapServiceImpl implements MindmapApiService {
@@ -84,5 +85,33 @@ export default class MindmapServiceImpl implements MindmapApiService {
       request
     );
     return response.data.data;
+  }
+
+  async searchUsers(query: string): Promise<User[]> {
+    const response = await api.get<ApiResponse<User[]>>(`${this.baseUrl}/api/user/search`, {
+      params: { q: query, limit: 10 },
+    });
+    return response.data.data;
+  }
+
+  async shareMindmap(id: string, shareData: ShareRequest): Promise<ShareResponse> {
+    const response = await api.post<ApiResponse<ShareResponse>>(
+      `${this.baseUrl}/api/resources/${id}/share`,
+      shareData
+    );
+    return response.data.data;
+  }
+
+  async getSharedUsers(id: string): Promise<SharedUserApiResponse[]> {
+    const response = await api.get<ApiResponse<SharedUserApiResponse[]>>(
+      `${this.baseUrl}/api/resources/${id}/shared-users`
+    );
+    return response.data.data;
+  }
+
+  async revokeAccess(mindmapId: string, userId: string): Promise<void> {
+    await api.post(`${this.baseUrl}/api/resources/${mindmapId}/revoke`, {
+      targetUserId: userId,
+    });
   }
 }

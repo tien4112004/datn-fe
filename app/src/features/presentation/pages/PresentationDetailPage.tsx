@@ -16,7 +16,12 @@ import { SmallScreenDialog } from '@/shared/components/modals/SmallScreenDialog'
 import usePresentationStore from '../stores/usePresentationStore';
 import { CriticalError } from '@aiprimary/api';
 import { ERROR_TYPE } from '@/shared/constants';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { MessageSquare } from 'lucide-react';
+import { Button } from '@/shared/components/ui/button';
+import { CommentDrawer } from '@/features/comments';
+import { useDocumentPermission } from '@/shared/hooks/useDocumentPermission';
+import { PermissionBadge } from '@/shared/components/common/PermissionBadge';
 
 const DetailPage = () => {
   const { presentation } = useLoaderData() as { presentation: Presentation | null };
@@ -26,6 +31,10 @@ const DetailPage = () => {
   const isGeneratingParam = getSearchParamAsBoolean('isGenerating', false) ?? false;
   const isViewModeParam = getSearchParamAsBoolean('view', false) ?? false;
   const previousIsGenerating = useRef<boolean>(false);
+  const [isCommentDrawerOpen, setIsCommentDrawerOpen] = useState(false);
+
+  // Permission state
+  const { permission: userPermission } = useDocumentPermission(id);
 
   // Validate and initialize - all processing logic is now in Vue
   usePresentationValidation(id, presentation, isGeneratingParam);
@@ -75,6 +84,37 @@ const DetailPage = () => {
       />
       {isGenerating && <GlobalSpinner text={t('generatingPresentation')} lightBlur />}
       {!isGenerating && isSaving && <GlobalSpinner text={t('savingPresentation')} />}
+
+      {/* Permission Badge */}
+      {userPermission && !isViewModeParam && (
+        <div className="fixed right-6 top-6 z-40">
+          <PermissionBadge permission={userPermission} />
+        </div>
+      )}
+
+      {/* Floating Comment Button */}
+      {id && !isViewModeParam && (
+        <Button
+          onClick={() => setIsCommentDrawerOpen(true)}
+          className="fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full shadow-lg transition-shadow hover:shadow-xl"
+          size="icon"
+          title="Comments"
+        >
+          <MessageSquare className="h-6 w-6" />
+        </Button>
+      )}
+
+      {/* Comment Drawer */}
+      {id && (
+        <CommentDrawer
+          isOpen={isCommentDrawerOpen}
+          onOpenChange={setIsCommentDrawerOpen}
+          documentId={id}
+          documentType="presentation"
+          userPermission={userPermission || 'read'}
+        />
+      )}
+
       <UnsavedChangesDialog
         open={showDialog}
         onOpenChange={setShowDialog}

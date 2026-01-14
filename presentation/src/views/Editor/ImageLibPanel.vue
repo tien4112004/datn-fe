@@ -45,8 +45,18 @@
             <div class="img-item">
               <img :src="props.src" />
               <div class="mask">
-                <Button type="primary" size="small" @click="createImageElement(props.src)">
-                  {{ t('panels.imageLibrary.insert') }}
+                <Button
+                  type="primary"
+                  size="small"
+                  :loading="uploadingImageId === props.id"
+                  :disabled="uploadingImageId !== null"
+                  @click="uploadAndInsertPexelsImage(props.src, props.id)"
+                >
+                  {{
+                    uploadingImageId === props.id
+                      ? t('panels.imageLibrary.uploading') || 'Uploading...'
+                      : t('panels.imageLibrary.insert')
+                  }}
                 </Button>
               </div>
             </div>
@@ -97,6 +107,7 @@
 import { onMounted, ref, computed, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { getImageApi } from '@/services/image/api';
+import { getMediaApi } from '@/services/media/api';
 import useCreateElement from '@/hooks/useCreateElement';
 import message from '@/utils/message';
 import Button from '@/components/Button.vue';
@@ -108,6 +119,7 @@ import Tabs from '@/components/Tabs.vue';
 
 const { t } = useI18n();
 const imageApi = getImageApi();
+const mediaApi = getMediaApi();
 
 // Common types
 interface PexelsImageItem {
@@ -143,6 +155,7 @@ const searchWord = ref('');
 const orientation = ref<Orientation>('all');
 const orientationOptions = ref<{ key: Orientation; label: string }[]>([]);
 const orientationMap = ref<{ [key: string]: string }>({});
+const uploadingImageId = ref<number | null>(null);
 
 // My Images Tab State
 const myImages = ref<any[]>([]);
@@ -193,6 +206,30 @@ const searchPexels = (q?: string) => {
 const setOrientation = (value: Orientation) => {
   orientation.value = value;
   if (searchWord.value) searchPexels();
+};
+
+// Upload Pexels image to server and insert
+const uploadAndInsertPexelsImage = async (imageUrl: string, imageId: number) => {
+  uploadingImageId.value = imageId;
+  try {
+    // Fetch Pexels image as blob
+    const response = await fetch(imageUrl);
+    const blob = await response.blob();
+
+    // Create File from blob
+    const file = new File([blob], `pexels-${imageId}.jpg`, { type: blob.type });
+
+    // Upload to server
+    const result = await mediaApi.uploadImage(file);
+
+    // Insert using CDN URL
+    createImageElement(result.cdnUrl);
+  } catch (error) {
+    console.error('Failed to upload Pexels image:', error);
+    message.error(t('panels.imageLibrary.uploadFailed') || 'Failed to upload image');
+  } finally {
+    uploadingImageId.value = null;
+  }
 };
 
 // My Images Functions

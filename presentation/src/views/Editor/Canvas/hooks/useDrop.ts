@@ -13,10 +13,10 @@ export default (elementRef: Ref<HTMLElement | undefined>) => {
   const { pasteDataTransfer } = usePasteDataTransfer();
 
   // Drag and drop elements/pages to canvas
-  const handleDrop = (e: DragEvent) => {
+  const handleDrop = async (e: DragEvent) => {
     if (!e.dataTransfer || e.dataTransfer.items.length === 0) return;
 
-    const { isFile, dataTransferFirstItem } = pasteDataTransfer(e.dataTransfer);
+    const { isFile, dataTransferFirstItem } = await pasteDataTransfer(e.dataTransfer);
     if (isFile) return;
 
     if (

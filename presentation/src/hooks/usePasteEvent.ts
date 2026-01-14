@@ -14,13 +14,13 @@ export default () => {
    * Paste event listener
    * @param e ClipboardEvent
    */
-  const pasteListener = (e: ClipboardEvent) => {
+  const pasteListener = async (e: ClipboardEvent) => {
     if (!editorAreaFocus.value && !thumbnailsFocus.value) return;
     if (disableHotkeys.value) return;
 
     if (!e.clipboardData) return;
 
-    const { isFile, dataTransferFirstItem } = pasteDataTransfer(e.clipboardData);
+    const { isFile, dataTransferFirstItem } = await pasteDataTransfer(e.clipboardData);
     if (isFile) return;
 
     // If there is no valid file in the clipboard, but there is text content, try to parse the text content

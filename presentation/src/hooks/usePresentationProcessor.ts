@@ -247,8 +247,7 @@ export function usePresentationProcessor(
     }
 
     // Set loading state
-    const loadingUrl =
-      'https://upload.wikimedia.org/wikipedia/commons/a/ad/YouTube_loading_symbol_3_%28transparent%29.gif';
+    const loadingUrl = 'https://storage.huy-devops.site/ai-primary/loading.gif';
     await updateSlideImageInStore(slideId, imageElement.id, loadingUrl);
 
     try {
@@ -315,16 +314,8 @@ export function usePresentationProcessor(
       return;
     }
 
-    // Convert URL to base64 for portability
-    let imageData = url;
-    if (!url.startsWith('data:')) {
-      try {
-        imageData = await urlToBase64(url);
-      } catch (error) {
-        console.error('Failed to convert image to base64, using URL fallback:', error);
-        // Fall back to URL if conversion fails
-      }
-    }
+    // Store CDN URL directly for smaller file size
+    const imageData = url;
 
     const updatedElement = await updateImageSource(
       slide.elements[elementIndex] as PPTImageElement,
@@ -357,8 +348,7 @@ export function usePresentationProcessor(
     const element = slide.elements[elementIndex] as PPTImageElement;
 
     // Use inline SVG error icon (no external fetch needed, avoids CORS issues)
-    const errorIconSrc =
-      'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48Y2lyY2xlIGN4PSIxNiIgY3k9IjE2IiByPSIxNSIgZmlsbD0iI2RjMzU0NSIvPjxsaW5lIHgxPSIxMCIgeTE9IjEwIiB4Mj0iMjIiIHkyPSIyMiIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48bGluZSB4MT0iMjIiIHkxPSIxMCIgeDI9IjEwIiB5Mj0iMjIiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMyIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PC9zdmc+';
+    const errorIconSrc = 'https://storage.huy-devops.site/ai-primary/error.svg';
 
     const updatedElement = {
       ...element,

@@ -2,12 +2,16 @@ import { MIME_MAP } from '@/configs/mime';
 import { getImageDataURL } from '@/utils/image';
 import useCreateElement from './useCreateElement';
 import useImport from './useImport';
+import { getMediaApi } from '@/services/media/api';
+import { validateImageFile } from '@/utils/fileValidation';
+import message from '@/utils/message';
 
 export default () => {
   const { createImageElement, createVideoElement, createAudioElement } = useCreateElement();
   const { importSpecificFile, importPPTXFile } = useImport();
+  const mediaApi = getMediaApi();
 
-  const pasteDataTransfer = (dataTransfer: DataTransfer) => {
+  const pasteDataTransfer = async (dataTransfer: DataTransfer) => {
     const dataItems = dataTransfer.items;
     const dataTransferFirstItem = dataItems[0];
 
@@ -19,7 +23,21 @@ export default () => {
         if (item.type.indexOf('image') !== -1) {
           const imageFile = item.getAsFile();
           if (imageFile) {
-            getImageDataURL(imageFile).then((dataURL) => createImageElement(dataURL));
+            // Validate file before upload
+            const validation = validateImageFile(imageFile);
+            if (!validation.valid) {
+              message.error(validation.error || 'Invalid file');
+              continue;
+            }
+
+            // Upload to server instead of base64
+            try {
+              const result = await mediaApi.uploadImage(imageFile);
+              createImageElement(result.cdnUrl);
+            } catch (error) {
+              console.error('Failed to upload pasted image:', error);
+              message.error('Failed to upload image');
+            }
             isFile = true;
           }
         } else if (item.type.indexOf('video') !== -1) {

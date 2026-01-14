@@ -79,11 +79,21 @@
 
     <div class="add-element-handler">
       <div class="group-btn" v-tooltip="$t('toolbar.tools.insertText')">
-        <div class="handler-item" @click="drawText()">
+        <div
+          class="handler-item"
+          :class="{ disable: isCurrentSlideLocked }"
+          @click="!isCurrentSlideLocked && drawText()"
+        >
           <IconFontSize class="icon" :class="{ active: creatingElement?.type === 'text' }" />
         </div>
 
-        <Popover trigger="click" v-model:value="textTypeSelectVisible" style="height: 100%" :offset="10">
+        <Popover
+          trigger="click"
+          v-model:value="textTypeSelectVisible"
+          style="height: 100%"
+          :offset="10"
+          :disabled="isCurrentSlideLocked"
+        >
           <template #content>
             <PopoverMenuItem
               center
@@ -110,17 +120,23 @@
               {{ $t('toolbar.tools.verticalTextBox') }}
             </PopoverMenuItem>
           </template>
-          <div class="handler-item">
+          <div class="handler-item" :class="{ disable: isCurrentSlideLocked }">
             <IconDown class="arrow" />
           </div>
         </Popover>
       </div>
       <div class="group-btn" v-tooltip="$t('toolbar.tools.insertShape')" :offset="10">
-        <Popover trigger="click" style="height: 100%" v-model:value="shapePoolVisible" :offset="10">
+        <Popover
+          trigger="click"
+          style="height: 100%"
+          v-model:value="shapePoolVisible"
+          :offset="10"
+          :disabled="isCurrentSlideLocked"
+        >
           <template #content>
             <ShapePool @select="(shape) => drawShape(shape)" />
           </template>
-          <div class="handler-item">
+          <div class="handler-item" :class="{ disable: isCurrentSlideLocked }">
             <IconGraphicDesign
               class="icon"
               :class="{ active: creatingCustomShape || creatingElement?.type === 'shape' }"
@@ -128,7 +144,13 @@
           </div>
         </Popover>
 
-        <Popover trigger="click" v-model:value="shapeMenuVisible" style="height: 100%" :offset="10">
+        <Popover
+          trigger="click"
+          v-model:value="shapeMenuVisible"
+          style="height: 100%"
+          :offset="10"
+          :disabled="isCurrentSlideLocked"
+        >
           <template #content>
             <PopoverMenuItem
               center
@@ -149,21 +171,33 @@
               ><IconWritingFluently class="icon" /> {{ $t('toolbar.tools.freehandDrawing') }}</PopoverMenuItem
             >
           </template>
-          <div class="handler-item">
+          <div class="handler-item" :class="{ disable: isCurrentSlideLocked }">
             <IconDown class="arrow" />
           </div>
         </Popover>
       </div>
       <div class="group-btn" v-tooltip="$t('toolbar.tools.insertImage')">
-        <FileInput style="height: 100%" @change="(files) => insertImageElement(files)">
-          <div class="handler-item">
-            <IconPicture class="icon" />
+        <FileInput
+          style="height: 100%"
+          @change="(files) => insertImageElement(files)"
+          :disabled="imageUploading || isCurrentSlideLocked"
+        >
+          <div class="handler-item" :class="{ uploading: imageUploading, disable: isCurrentSlideLocked }">
+            <IconPicture v-if="!imageUploading" class="icon" />
+            <div v-else class="icon spinner-icon"></div>
           </div>
         </FileInput>
 
-        <Popover trigger="click" v-model:value="imageMenuVisible" style="height: 100%" :offset="10">
+        <Popover
+          trigger="click"
+          v-model:value="imageMenuVisible"
+          style="height: 100%"
+          :offset="10"
+          :disabled="isCurrentSlideLocked"
+        >
           <template #content>
             <FileInput
+              :disabled="imageUploading || isCurrentSlideLocked"
               @change="
                 (files) => {
                   insertImageElement(files);
@@ -176,24 +210,24 @@
               >
             </FileInput>
           </template>
-          <div class="handler-item">
+          <div class="handler-item" :class="{ disable: isCurrentSlideLocked }">
             <IconDown class="arrow" />
           </div>
         </Popover>
       </div>
-      <Popover trigger="click" v-model:value="linePoolVisible" :offset="10">
+      <Popover trigger="click" v-model:value="linePoolVisible" :offset="10" :disabled="isCurrentSlideLocked">
         <template #content>
           <LinePool @select="(line) => drawLine(line)" />
         </template>
         <div
           class="handler-item"
-          :class="{ active: creatingElement?.type === 'line' }"
+          :class="{ active: creatingElement?.type === 'line', disable: isCurrentSlideLocked }"
           v-tooltip="$t('toolbar.tools.insertLine')"
         >
           <IconConnection />
         </div>
       </Popover>
-      <Popover trigger="click" v-model:value="chartPoolVisible" :offset="10">
+      <Popover trigger="click" v-model:value="chartPoolVisible" :offset="10" :disabled="isCurrentSlideLocked">
         <template #content>
           <ChartPool
             @select="
@@ -204,11 +238,20 @@
             "
           />
         </template>
-        <div class="handler-item" v-tooltip="$t('toolbar.tools.insertChart')">
+        <div
+          class="handler-item"
+          :class="{ disable: isCurrentSlideLocked }"
+          v-tooltip="$t('toolbar.tools.insertChart')"
+        >
           <IconChartProportion />
         </div>
       </Popover>
-      <Popover trigger="click" v-model:value="tableGeneratorVisible" :offset="10">
+      <Popover
+        trigger="click"
+        v-model:value="tableGeneratorVisible"
+        :offset="10"
+        :disabled="isCurrentSlideLocked"
+      >
         <template #content>
           <TableGenerator
             @close="tableGeneratorVisible = false"
@@ -220,18 +263,28 @@
             "
           />
         </template>
-        <div class="handler-item" v-tooltip="$t('toolbar.tools.insertTable')">
+        <div
+          class="handler-item"
+          :class="{ disable: isCurrentSlideLocked }"
+          v-tooltip="$t('toolbar.tools.insertTable')"
+        >
           <IconInsertTable />
         </div>
       </Popover>
       <div
         class="handler-item"
+        :class="{ disable: isCurrentSlideLocked }"
         v-tooltip="$t('toolbar.tools.insertFormula')"
-        @click="latexEditorVisible = true"
+        @click="!isCurrentSlideLocked && (latexEditorVisible = true)"
       >
         <IconFormula />
       </div>
-      <Popover trigger="click" v-model:value="mediaInputVisible" :offset="10">
+      <Popover
+        trigger="click"
+        v-model:value="mediaInputVisible"
+        :offset="10"
+        :disabled="isCurrentSlideLocked"
+      >
         <template #content>
           <MediaInput
             @close="mediaInputVisible = false"
@@ -249,7 +302,11 @@
             "
           />
         </template>
-        <div class="handler-item" v-tooltip="$t('toolbar.tools.insertAudioVideo')">
+        <div
+          class="handler-item"
+          :class="{ disable: isCurrentSlideLocked }"
+          v-tooltip="$t('toolbar.tools.insertAudioVideo')"
+        >
           <IconVideoTwo />
         </div>
       </Popover>
@@ -324,7 +381,10 @@ import type { LinePoolItem } from '@/configs/lines';
 import useScaleCanvas from '@/hooks/useScaleCanvas';
 import useHistorySnapshot from '@/hooks/useHistorySnapshot';
 import useCreateElement from '@/hooks/useCreateElement';
-
+import useSlideEditLock from '@/hooks/useSlideEditLock';
+import { getMediaApi } from '@/services/media/api';
+import { validateImageFile } from '@/utils/fileValidation';
+import message from '@/utils/message';
 import ShapePool from './ShapePool.vue';
 import LinePool from './LinePool.vue';
 import ChartPool from './ChartPool.vue';
@@ -348,6 +408,9 @@ const {
   showSymbolPanel,
 } = storeToRefs(mainStore);
 const { canUndo, canRedo } = storeToRefs(useSnapshotStore());
+const { isCurrentSlideLocked } = useSlideEditLock();
+
+const mediaApi = getMediaApi();
 
 const { redo, undo } = useHistorySnapshot();
 
@@ -370,10 +433,27 @@ const {
   createAudioElement,
 } = useCreateElement();
 
-const insertImageElement = (files: FileList) => {
+const insertImageElement = async (files: FileList) => {
   const imageFile = files[0];
   if (!imageFile) return;
-  getImageDataURL(imageFile).then((dataURL) => createImageElement(dataURL));
+
+  // Validate file before upload
+  const validation = validateImageFile(imageFile);
+  if (!validation.valid) {
+    message.error(validation.error || 'Invalid file');
+    return;
+  }
+
+  imageUploading.value = true;
+  try {
+    const result = await mediaApi.uploadImage(imageFile);
+    createImageElement(result.cdnUrl);
+  } catch (error) {
+    console.error('Failed to upload image:', error);
+    message.error('Failed to upload image');
+  } finally {
+    imageUploading.value = false;
+  }
 };
 
 const shapePoolVisible = ref(false);
@@ -386,6 +466,7 @@ const textTypeSelectVisible = ref(false);
 const shapeMenuVisible = ref(false);
 const imageMenuVisible = ref(false);
 const moreVisible = ref(false);
+const imageUploading = ref(false);
 
 // Insert text
 const drawText = (vertical = false) => {
@@ -593,5 +674,28 @@ const openImageLibPanel = () => {
       align-items: center;
     }
   }
+}
+
+@keyframes spinner {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner-icon {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--presentation-primary, #5b9bd5);
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spinner 0.8s linear infinite;
+}
+
+.handler-item.uploading {
+  cursor: not-allowed;
+  opacity: 0.7;
 }
 </style>

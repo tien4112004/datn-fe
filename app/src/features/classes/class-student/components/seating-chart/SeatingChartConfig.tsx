@@ -1,5 +1,12 @@
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { NumberInput } from '@/components/ui/number-input';
 import type { Layout } from '@/features/classes/shared/types';
@@ -22,6 +29,7 @@ export const SeatingChartConfig = ({
   const [rows, setRows] = useState(layout.rows);
   const [separatorInterval, setSeparatorInterval] = useState(layout.separatorInterval ?? 2);
   const [isExporting, setIsExporting] = useState(false);
+  const [open, setOpen] = useState(false);
   const { exportChart } = useExportStudentChart({
     filename: `student-chart-${new Date().toISOString().split('T')[0]}.png`,
   });
@@ -40,76 +48,84 @@ export const SeatingChartConfig = ({
     }
   };
 
+  const handleApply = () => {
+    onLayoutChange({ ...layout, columns: cols, rows: rows, separatorInterval });
+    setOpen(false);
+  };
+
   return (
-    <Card className="border-primary/20 bg-primary/5 mb-10 p-4">
-      <div className="flex flex-row gap-4">
-        <div className="text-primary flex items-center justify-center gap-2">
-          <Settings2 className="h-5 w-5" />
-          <h3 className="font-semibold">{t('students.layoutConfiguration')}</h3>
-        </div>
-        <div className="flex flex-1 items-center gap-4">
-          <div className="flex flex-1 items-center gap-2">
-            <Label htmlFor="columns" className="flex items-center gap-1.5 text-sm font-medium">
-              <Grid3x3 className="h-4 w-4" />
-              <span className="whitespace-nowrap">{t('students.columns')}</span>
-            </Label>
-            <NumberInput
-              id="columns"
-              min={1}
-              max={20}
-              value={cols}
-              onValueChange={(val: number) => setCols(val)}
-              className="h-10 w-full"
-            />
-          </div>
-          <div className="flex flex-1 items-center gap-2">
-            <Label htmlFor="rows" className="flex items-center gap-1.5 text-sm font-medium">
-              <Grid3x3 className="h-4 w-4" />
-              <span className="whitespace-nowrap">{t('students.rows')}</span>
-            </Label>
-            <NumberInput
-              id="rows"
-              min={1}
-              max={20}
-              value={rows}
-              onValueChange={(val: number) => setRows(val)}
-              className="h-10 w-full"
-            />
-          </div>
-          <div className="flex flex-1 items-center gap-2">
-            <Label htmlFor="separator" className="flex items-center gap-1.5 text-sm font-medium">
-              <Grid3x3 className="h-4 w-4" />
-              <span className="whitespace-nowrap">{t('students.separatorEvery')}</span>
-            </Label>
-            <NumberInput
-              id="separator"
-              min={1}
-              max={10}
-              value={separatorInterval}
-              onValueChange={(val: number) => setSeparatorInterval(val)}
-              className="h-10 w-full"
-            />
-          </div>
-          <Button
-            onClick={() => {
-              onLayoutChange({ ...layout, columns: cols, rows: rows, separatorInterval });
-            }}
-            className="h-10 min-w-[120px]"
-            variant="default"
-          >
-            {t('students.applyLayout')}
+    <div className="mb-4 flex items-center justify-between">
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogTrigger asChild>
+          <Button variant="outline" size="sm">
+            <Settings2 className="mr-2 h-4 w-4" />
+            {t('students.layoutConfiguration')}
           </Button>
-          <Button
-            onClick={handleExport}
-            disabled={isExporting}
-            className="h-10 min-w-[120px]"
-            variant="outline"
-          >
-            <Download className="mr-2 h-4 w-4" />
-            {isExporting ? t('students.exporting') : t('students.export')}
-          </Button>
-        </div>
-      </div>
-    </Card>
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Settings2 className="h-5 w-5" />
+              {t('students.layoutConfiguration')}
+            </DialogTitle>
+            <DialogDescription>Configure the seating chart layout and spacing</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="columns" className="flex items-center gap-1.5">
+                <Grid3x3 className="h-4 w-4" />
+                {t('students.columns')}
+              </Label>
+              <NumberInput
+                id="columns"
+                min={1}
+                max={20}
+                value={cols}
+                onValueChange={(val: number) => setCols(val)}
+                className="w-full"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="rows" className="flex items-center gap-1.5">
+                <Grid3x3 className="h-4 w-4" />
+                {t('students.rows')}
+              </Label>
+              <NumberInput
+                id="rows"
+                min={1}
+                max={20}
+                value={rows}
+                onValueChange={(val: number) => setRows(val)}
+                className="w-full"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="separator" className="flex items-center gap-1.5">
+                <Grid3x3 className="h-4 w-4" />
+                {t('students.separatorEvery')}
+              </Label>
+              <NumberInput
+                id="separator"
+                min={1}
+                max={10}
+                value={separatorInterval}
+                onValueChange={(val: number) => setSeparatorInterval(val)}
+                className="w-full"
+              />
+            </div>
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleApply}>{t('students.applyLayout')}</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+      <Button onClick={handleExport} disabled={isExporting} variant="outline" size="sm">
+        <Download className="mr-2 h-4 w-4" />
+        {isExporting ? t('students.exporting') : t('students.export')}
+      </Button>
+    </div>
   );
 };

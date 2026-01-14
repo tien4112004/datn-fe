@@ -6,6 +6,10 @@ import type {
   SharedUserApiResponse,
   SearchUserApiResponse,
   SharePresentationRequest,
+  PublicAccessRequest,
+  PublicAccessResponse,
+  ResourcePermissionResponse,
+  ShareStateResponse,
 } from './types';
 import type { ImageGenerationParams } from '../image/types';
 import type { ApiService } from '@aiprimary/api';
@@ -270,7 +274,7 @@ export class PresentationApiService implements ApiService {
    */
   async getSharedUsers(presentationId: string): Promise<SharedUserApiResponse[]> {
     const response = await api.get<ApiResponse<SharedUserApiResponse[]>>(
-      `${this.baseUrl}/api/presentations/${presentationId}/shared-users`
+      `${this.baseUrl}/api/resources/${presentationId}/shared-users`
     );
     return response.data.data;
   }
@@ -289,15 +293,47 @@ export class PresentationApiService implements ApiService {
    * Share presentation with users
    */
   async sharePresentation(presentationId: string, request: SharePresentationRequest): Promise<void> {
-    await api.post<ApiResponse<void>>(`${this.baseUrl}/api/presentations/${presentationId}/share`, request);
+    await api.post<ApiResponse<void>>(`${this.baseUrl}/api/resources/${presentationId}/share`, request);
   }
 
   /**
    * Revoke access for a user
    */
   async revokeAccess(presentationId: string, userId: string): Promise<void> {
-    await api.delete<ApiResponse<void>>(
-      `${this.baseUrl}/api/presentations/${presentationId}/shared-users/${userId}`
+    await api.post<ApiResponse<void>>(`${this.baseUrl}/api/resources/${presentationId}/revoke`, {
+      targetUserId: userId,
+    });
+  }
+
+  /**
+   * Set public access for presentation
+   */
+  async setPublicAccess(presentationId: string, request: PublicAccessRequest): Promise<PublicAccessResponse> {
+    const response = await api.put<ApiResponse<PublicAccessResponse>>(
+      `${this.baseUrl}/api/resources/${presentationId}/public-access`,
+      request
     );
+    return response.data.data;
+  }
+
+  /**
+   * Get public access status
+   */
+  async getPublicAccessStatus(presentationId: string): Promise<PublicAccessResponse> {
+    const response = await api.get<ApiResponse<PublicAccessResponse>>(
+      `${this.baseUrl}/api/resources/${presentationId}/public-access`
+    );
+    return response.data.data;
+  }
+
+  /**
+   * Get complete share state in a single API call
+   * Combines shared users, public access settings, and current user permission
+   */
+  async getShareState(presentationId: string): Promise<ShareStateResponse> {
+    const response = await api.get<ApiResponse<ShareStateResponse>>(
+      `${this.baseUrl}/api/resources/${presentationId}/share-state`
+    );
+    return response.data.data;
   }
 }

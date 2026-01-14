@@ -7,6 +7,10 @@ import type {
   SharedUserApiResponse,
   SearchUserApiResponse,
   SharePresentationRequest,
+  PublicAccessRequest,
+  PublicAccessResponse,
+  ResourcePermissionResponse,
+  ShareStateResponse,
 } from './types';
 import type { ImageGenerationParams } from '../image/types';
 import { getBackendUrl } from '@aiprimary/api';
@@ -41,6 +45,15 @@ export interface IPresentationApi {
   searchUsers(query: string): Promise<SearchUserApiResponse[]>;
   sharePresentation(presentationId: string, request: SharePresentationRequest): Promise<void>;
   revokeAccess(presentationId: string, userId: string): Promise<void>;
+  // Public access methods
+  setPublicAccess(presentationId: string, request: PublicAccessRequest): Promise<PublicAccessResponse>;
+  getPublicAccessStatus(presentationId: string): Promise<PublicAccessResponse>;
+  /**
+   * Get complete share state for initialization
+   * Combines shared users, public access settings, and current user permission in a single call
+   * Replaces separate calls to getSharedUsers() and getPublicAccessStatus()
+   */
+  getShareState(presentationId: string): Promise<ShareStateResponse>;
 }
 
 /**

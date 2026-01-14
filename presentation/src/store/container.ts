@@ -25,5 +25,8 @@ export const useContainerStore = defineStore('container', {
       this.mode = data?.mode || 'edit';
       this.permission = data?.permission;
     },
+    setPermission(permission: 'read' | 'comment' | 'edit') {
+      this.permission = permission;
+    },
   },
 });

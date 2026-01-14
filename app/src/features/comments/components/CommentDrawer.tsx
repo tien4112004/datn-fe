@@ -118,7 +118,11 @@ export function CommentDrawer({
 
   return (
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
-      <SheetContent side="right" className="flex w-full flex-col p-0 sm:max-w-lg">
+      <SheetContent
+        side="right"
+        className="flex w-full flex-col p-0 sm:max-w-lg"
+        aria-describedby={undefined}
+      >
         <SheetHeader className="flex-shrink-0 p-6 pb-4">
           <SheetTitle className="flex items-center gap-2">
             <MessageSquare className="h-5 w-5" />

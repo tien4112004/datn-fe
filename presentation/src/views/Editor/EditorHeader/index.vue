@@ -107,7 +107,7 @@
         </Button>
       </Popover>
 
-      <Popover trigger="click" center contentClass="!tw-p-0">
+      <Popover v-if="permission === 'edit'" trigger="click" center contentClass="!tw-p-0">
         <template #content>
           <ShareMenu :presentationId="presentationId" @cancel="handleShareCancel" @share="handleShare" />
         </template>
@@ -116,7 +116,12 @@
           {{ $t('header.buttons.share') }}
         </Button>
       </Popover>
-      <Button class="menu-item" v-tooltip="$t('header.comments.tooltip')" @click="handleOpenComments">
+      <Button
+        v-if="permission === 'comment' || permission === 'edit'"
+        class="menu-item"
+        v-tooltip="$t('header.comments.tooltip')"
+        @click="handleOpenComments"
+      >
         <IconComments class="icon" />
         {{ $t('header.buttons.comments') }}
       </Button>
@@ -313,22 +318,9 @@ const handleShareCancel = () => {
 };
 
 const handleShare = (options: { shareWithLink: boolean; allowEdit: boolean; users: any[] }) => {
-  const { shareWithLink, allowEdit, users } = options;
-
-  let shareMessage = t('header.share.shareSettingsUpdated');
-
-  if (shareWithLink) {
-    shareMessage +=
-      t('header.share.anyoneWithLinkCan') + (allowEdit ? t('header.share.comment') : t('header.share.view'));
-  } else {
-    shareMessage += t('header.share.restrictedAccess');
-  }
-
-  if (users.length > 0) {
-    shareMessage += ' | ' + users.length + t('header.share.usersAdded');
-  }
-
-  message.success(shareMessage);
+  // ShareMenu component now handles all its own success messages
+  // This handler kept for potential future logic (logging, analytics, etc.)
+  console.debug('Share settings updated:', options);
 };
 
 const handleOpenComments = () => {

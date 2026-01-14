@@ -3,8 +3,26 @@ import { Plus } from 'lucide-react';
 import { ClassListSimpleTable } from '../classes/class-list/components/ClassListSimpleTable';
 import { DashboardCalendar } from '../classes/class-list/components/DashboardCalendar';
 import { RecentDocuments } from '../classes/class-list/components/RecentDocuments';
+import { useAuth } from '@/shared/context/auth';
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export const DashboardPage = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  // Redirect students to student view
+  useEffect(() => {
+    if (user?.role === 'student') {
+      navigate('/student', { replace: true });
+    }
+  }, [user?.role, navigate]);
+
+  // Don't render dashboard for students (they'll be redirected)
+  if (user?.role === 'student') {
+    return null;
+  }
+
   return (
     <div className="flex h-screen flex-col">
       {/* Main Content Area */}

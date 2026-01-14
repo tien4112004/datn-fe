@@ -39,9 +39,11 @@ export function NavUser({
         toast.success(t('logout.success'));
         navigate('/login');
       },
-      onError: (error) => {
-        console.error('Logout failed:', error);
-        toast.error(t('logout.error'));
+      onError: () => {
+        // Even if backend logout fails, frontend session is cleared
+        // Still show success and redirect to login
+        toast.success(t('logout.success'));
+        navigate('/login');
       },
     });
   };

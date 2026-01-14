@@ -21,7 +21,7 @@ export function LoginForm() {
   const loginSchema = useMemo(
     () =>
       z.object({
-        email: z.string().email(t('validation.emailInvalid')),
+        email: z.string(),
         password: z.string(),
         rememberMe: z.boolean().default(false),
       }),
@@ -69,7 +69,7 @@ export function LoginForm() {
               <FormLabel>{t('login.email')}</FormLabel>
               <FormControl>
                 <Input
-                  type="email"
+                  type="text"
                   placeholder={t('login.emailPlaceholder')}
                   autoComplete="email"
                   disabled={loginMutation.isPending}

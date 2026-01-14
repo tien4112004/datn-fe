@@ -25,23 +25,32 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       email: user?.email || 'user@example.com',
       avatar: user?.avatar || '',
     },
-    navMain: [
-      {
-        title: t('home'),
-        url: '/',
-        icon: Home,
-      },
-      {
-        title: t('projects'),
-        url: '/projects',
-        icon: File,
-      },
-      {
-        title: t('classes'),
-        url: '/classes',
-        icon: Users,
-      },
-    ],
+    navMain:
+      user?.role === 'student'
+        ? [
+            {
+              title: t('classes'),
+              url: '/student',
+              icon: Users,
+            },
+          ]
+        : [
+            {
+              title: t('home'),
+              url: '/',
+              icon: Home,
+            },
+            {
+              title: t('projects'),
+              url: '/projects',
+              icon: File,
+            },
+            {
+              title: t('classes'),
+              url: '/classes',
+              icon: Users,
+            },
+          ],
     navSecondary: [
       {
         title: t('notification'),

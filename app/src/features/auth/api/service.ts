@@ -37,12 +37,18 @@ export default class AuthRealApiService implements AuthApiService {
 
   /**
    * Logout user with real API call
+   * Always clears frontend auth data, even if backend call fails
    */
   async logout(): Promise<void> {
-    await api.post(`${this.baseUrl}/api/auth/logout`);
-
-    // Clear all auth data
-    clearAuthData();
+    try {
+      await api.post(`${this.baseUrl}/api/auth/logout`);
+    } catch (error) {
+      // Log error but don't throw - we still want to clear frontend session
+      console.warn('Backend logout failed, but clearing frontend session:', error);
+    } finally {
+      // Always clear auth data regardless of backend response
+      clearAuthData();
+    }
   }
 
   /**

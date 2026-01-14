@@ -11,15 +11,9 @@ interface SeatingChartViewProps {
   classId: string;
   layout: Layout;
   students: Student[];
-  showLayoutConfig?: boolean;
 }
 
-export const SeatingChartView = ({
-  layout,
-  students,
-  showLayoutConfig = false,
-  classId,
-}: SeatingChartViewProps) => {
+export const SeatingChartView = ({ layout, students, classId }: SeatingChartViewProps) => {
   const [activeId, setActiveId] = useState<string | null>(null);
 
   const [localLayout, setLocalLayout] = useState<Layout | null>(null);
@@ -258,15 +252,6 @@ export const SeatingChartView = ({
       onDragEnd={handleDragEnd}
       onDragCancel={handleDragCancel}
     >
-      {/* Layout Configuration Section */}
-      {showLayoutConfig && (
-        <SeatingChartConfig
-          onLayoutChange={handleLayoutChange}
-          layout={localLayout || layout}
-          chartRef={chartRef}
-        />
-      )}
-
       {/* Main Seating Chart and Unassigned Students */}
       <div className="flex flex-col gap-6 lg:flex-row">
         {/* Seating Grid */}
@@ -276,6 +261,9 @@ export const SeatingChartView = ({
           isDirty={isDirty}
           saveSeatingChart={saveSeatingChart}
           handleSave={handleSave}
+          onLayoutChange={handleLayoutChange}
+          layout={localLayout || layout}
+          chartRef={chartRef}
         />
       </div>
 

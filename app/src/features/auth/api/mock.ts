@@ -27,12 +27,13 @@ export default class AuthMockService implements AuthApiService {
     await new Promise((resolve) => setTimeout(resolve, 500));
 
     // Create a mock user with the provided email (always succeeds)
+    const role = request.email.includes('teacher') ? 'teacher' : 'student';
     const mockUser = {
       id: `user-${Date.now()}-${Math.random().toString(36).substring(7)}`,
       email: request.email,
       name: request.email.split('@')[0], // Use email prefix as name
       avatar: 'https://github.com/shadcn.png',
-      role: 'student' as const,
+      role: role as 'student' | 'teacher',
     };
 
     // Store user data (simulates backend setting cookies + returning user)

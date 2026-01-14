@@ -1,6 +1,5 @@
 import { Users } from 'lucide-react';
 import { DraggableItem, DroppableArea } from './SeatingChartCore';
-import { Card } from '@/components/ui/card';
 import { useTranslation } from 'react-i18next';
 import type { Layout, Student } from '@/features/classes/shared/types';
 import { Fragment, forwardRef } from 'react';
@@ -29,41 +28,34 @@ export const SeatingChartGrid = forwardRef<HTMLDivElement, SeatingChartGridProps
 
                 return (
                   <Fragment key={seat.id}>
-                    <div className="min-w-[140px] flex-1">
+                    <div className="min-w-[120px] flex-1">
                       <DroppableArea id={seat.id} data={{ containerId: 'grid' }}>
                         <DraggableItem id={seat.id} data={{ containerId: 'grid' }} disabled={!student}>
-                          <Card
-                            className={`relative h-32 transition-all duration-200 ${
+                          <div
+                            className={`relative flex h-24 flex-col items-center justify-center gap-1.5 rounded-md border p-2 text-center transition-all ${
                               student
-                                ? 'border-primary/40 hover:border-primary bg-white shadow-md hover:scale-105 hover:shadow-xl'
-                                : 'hover:border-primary/40 border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100'
+                                ? 'border-primary/30 bg-primary/5 hover:border-primary hover:bg-primary/10'
+                                : 'border-muted-foreground/30 bg-muted/30 hover:bg-muted/50 border-dashed'
                             }`}
                           >
-                            <div className="flex h-full w-full flex-col items-center justify-center gap-1.5 p-3 text-center">
-                              {student ? (
-                                <>
-                                  <div className="bg-primary/10 text-primary mb-0.5 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full">
-                                    <Users className="h-5 w-5" />
-                                  </div>
-                                  <div className="min-w-0">
-                                    <p
-                                      className="overflow-hidden whitespace-nowrap text-sm font-semibold"
-                                      style={{ textOverflow: 'ellipsis' }}
-                                    >
-                                      {student.fullName}
-                                    </p>
-                                  </div>
-                                </>
-                              ) : (
-                                <>
-                                  <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-gray-200">
-                                    <Users className="h-5 w-5 text-gray-400" />
-                                  </div>
-                                  <p className="text-muted-foreground text-xs">{t('students.emptySeat')}</p>
-                                </>
-                              )}
-                            </div>
-                          </Card>
+                            {student ? (
+                              <>
+                                <div className="bg-primary/20 text-primary flex h-7 w-7 items-center justify-center rounded-full">
+                                  <Users className="h-4 w-4" />
+                                </div>
+                                <p className="truncate text-xs font-medium leading-tight">
+                                  {student.fullName}
+                                </p>
+                              </>
+                            ) : (
+                              <>
+                                <div className="bg-muted flex h-7 w-7 items-center justify-center rounded-full">
+                                  <Users className="text-muted-foreground h-4 w-4" />
+                                </div>
+                                <p className="text-muted-foreground text-xs">{t('students.emptySeat')}</p>
+                              </>
+                            )}
+                          </div>
                         </DraggableItem>
                       </DroppableArea>
                     </div>

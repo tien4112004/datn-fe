@@ -145,6 +145,58 @@ const router = createBrowserRouter([
         }),
       },
       {
+        path: 'assessment-matrix/builder',
+        lazy: async () => ({
+          Component: (await import('@/features/assessment-matrix/pages/MatrixBuilderPage')).MatrixBuilderPage,
+        }),
+      },
+      {
+        path: 'assessment-matrix/builder/:id',
+        lazy: async () => ({
+          Component: (await import('@/features/assessment-matrix/pages/MatrixBuilderPage')).MatrixBuilderPage,
+        }),
+      },
+      {
+        path: 'question-bank',
+        lazy: async () => ({
+          Component: (await import('@/features/assignment/pages/TeacherQuestionBankPage'))
+            .TeacherQuestionBankPage,
+        }),
+      },
+      {
+        path: 'question-bank/create',
+        lazy: async () => ({
+          Component: (await import('@/features/assignment/pages/QuestionBankEditorPage'))
+            .QuestionBankEditorPage,
+        }),
+      },
+      {
+        path: 'question-bank/edit/:id',
+        lazy: async () => ({
+          Component: (await import('@/features/assignment/pages/QuestionBankEditorPage'))
+            .QuestionBankEditorPage,
+        }),
+      },
+      {
+        path: 'assignments/create',
+        lazy: async () => ({
+          Component: (await import('@/features/assignment/pages/AssignmentEditorPage')).AssignmentEditorPage,
+        }),
+      },
+      {
+        path: 'assignments/edit/:id',
+        lazy: async () => ({
+          Component: (await import('@/features/assignment/pages/AssignmentEditorPage')).AssignmentEditorPage,
+        }),
+      },
+      {
+        path: 'demo/question-renderer',
+        lazy: async () => ({
+          Component: (await import('@/features/assignment/pages/QuestionRendererDemoPage'))
+            .QuestionRendererDemoPage,
+        }),
+      },
+      {
         path: 'error',
         Component: () => {
           throw new CriticalError('This is a critical error page.');

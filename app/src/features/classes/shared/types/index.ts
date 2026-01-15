@@ -13,7 +13,6 @@ export * from '../../class-student/types';
 export * from './constants/grades';
 export * from './constants/statuses';
 export * from './constants/periodCategories';
-export * from './constants/subjects';
 
 // Service types
 export * from './service';

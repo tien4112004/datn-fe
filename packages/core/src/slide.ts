@@ -1,4 +1,4 @@
-import type { LayoutType, TemplateConfig } from './types/template';
+import type { LayoutType, TemplateConfig } from './template';
 
 export const SHAPE_PATH_FORMULAS_KEYS = {
   ROUND_RECT: 'roundRect',
@@ -766,7 +766,7 @@ export interface SectionTag {
 }
 
 // Re-export LayoutType for convenience
-export type { LayoutType } from './types/template';
+export type { LayoutType } from './template';
 
 /**
  * Layout metadata for template switching

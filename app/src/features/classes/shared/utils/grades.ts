@@ -1,10 +1,12 @@
-import { GRADE_LABELS, type GradeLevel } from '../types';
+import { getGradeName as coreGetGradeName, gradeNumberToString } from '@aiprimary/core';
 
 /**
  * Get Vietnamese label for a grade
+ * Accepts both number and string formats for backward compatibility
  */
-export function getGradeLabel(grade: number): string {
-  return GRADE_LABELS[grade as GradeLevel] || `Lớp ${grade}`;
+export function getGradeLabel(grade: number | string): string {
+  const gradeStr = typeof grade === 'number' ? gradeNumberToString(grade) : grade;
+  return coreGetGradeName(gradeStr);
 }
 
 /**

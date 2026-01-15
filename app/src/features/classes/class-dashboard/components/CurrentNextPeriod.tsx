@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Clock, ArrowRight, MapPin, BookOpen } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { SchedulePeriod } from '../../shared/types';
-import { getSubjectByCode } from '../../shared/types/constants/subjects';
+import { getSubjectByCode } from '@aiprimary/core';
 
 interface CurrentNextPeriodProps {
   periods: SchedulePeriod[];

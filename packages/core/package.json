@@ -3,8 +3,10 @@
   "exports": {
     ".": "./src/index.ts",
     "./*": "./src/*",
-    "./templates": "./src/types/template/index.ts",
-    "./templates/*": "./src/types/template/*"
+    "./templates": "./src/template/index.ts",
+    "./templates/*": "./src/template/*",
+    "./assessment": "./src/assessment/index.ts",
+    "./assessment/*": "./src/assessment/*"
   },
   "devDependencies": {
     "typescript": "latest"

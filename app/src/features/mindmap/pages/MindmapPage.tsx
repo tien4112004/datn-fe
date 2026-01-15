@@ -11,8 +11,8 @@ import {
 } from '@/features/mindmap/components';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { useLoaderData, useSearchParams } from 'react-router-dom';
-import { useCoreStore, usePresenterModeStore, useViewModeStore } from '../stores';
+import { useLoaderData } from 'react-router-dom';
+import { useCoreStore, usePresenterModeStore } from '../stores';
 import { useMindmapDirtyTracking } from '../hooks/useDirtyTracking';
 import { useFullscreen } from '../hooks/useFullscreen';
 import { usePresenterMode } from '../hooks/usePresenterMode';
@@ -20,7 +20,7 @@ import { useCommentDrawerTrigger } from '../hooks/useCommentDrawer';
 import { useUnsavedChangesBlocker, useResponsiveBreakpoint } from '@/shared/hooks';
 import { useSidebar } from '@/shared/components/ui/sidebar';
 import { useIsMobile } from '@/shared/hooks/use-mobile';
-import { PresenterProvider } from '../contexts/ReadOnlyContext';
+import { MindmapPermissionProvider } from '../contexts/MindmapPermissionContext';
 import { UnsavedChangesDialog } from '@/shared/components/modals/UnsavedChangesDialog';
 import { SmallScreenDialog } from '@/shared/components/modals/SmallScreenDialog';
 import GlobalSpinner from '@/shared/components/common/GlobalSpinner';
@@ -71,7 +71,6 @@ const MindmapPage = () => {
   const setEdges = useCoreStore((state) => state.setEdges);
   const { isDesktop } = useResponsiveBreakpoint();
   const isMobile = useIsMobile();
-  const [searchParams] = useSearchParams();
 
   const [isPanOnDrag, setIsPanOnDrag] = useState(false);
   const [isToolbarVisible, setIsToolbarVisible] = useState(isDesktop);
@@ -91,10 +90,6 @@ const MindmapPage = () => {
   // Presenter mode functionality (user can toggle)
   const { isPresenterMode, togglePresenterMode } = usePresenterMode();
   const setPresenterModeStore = usePresenterModeStore((state) => state.setPresenterMode);
-
-  // View mode functionality (URL-driven, cannot toggle)
-  const isViewMode = useViewModeStore((state) => state.isViewMode);
-  const setViewMode = useViewModeStore((state) => state.setViewMode);
 
   // Permission state
   const userPermission = mindmap?.permission;
@@ -117,19 +112,6 @@ const MindmapPage = () => {
     setPresenterModeStore(isPresenterMode);
   }, [isPresenterMode, setPresenterModeStore]);
 
-  // Set View Mode based on URL search params and user permission
-  // - read permission: always 'view' (read-only)
-  // - comment permission: always 'view' (can view and comment, but not edit)
-  // - edit permission: respects ?view parameter toggle
-  // - undefined permission: respects ?view parameter (default behavior)
-  useEffect(() => {
-    const isViewModeParam = searchParams.has('view');
-    // Force view mode if user has read or comment permission
-    const shouldBeViewMode =
-      userPermission === 'read' || userPermission === 'comment' ? true : isViewModeParam;
-    setViewMode(shouldBeViewMode);
-  }, [searchParams, setViewMode, userPermission]);
-
   // Sync mindmap data from React Router loader to stores
   useEffect(() => {
     if (mindmap) {
@@ -148,16 +130,11 @@ const MindmapPage = () => {
   return (
     <>
       <ReactFlowProvider>
-        <PresenterProvider isPresenterMode={isPresenterMode} isViewMode={isViewMode}>
+        <MindmapPermissionProvider isPresenterMode={isPresenterMode} userPermission={userPermission}>
           <div className="flex h-screen w-full" style={{ backgroundColor: 'var(--background)' }}>
-            <Flow isPanOnDrag={isPanOnDrag} isPresenterMode={isPresenterMode} isViewMode={isViewMode}>
+            <Flow isPanOnDrag={isPanOnDrag}>
               {/* Breadcrumb Header */}
-              <MindmapBreadcrumbHeader
-                mindmapId={mindmap.id}
-                initialTitle={mindmap.title}
-                isPresenterMode={isPresenterMode}
-                isViewMode={isViewMode}
-              />
+              <MindmapBreadcrumbHeader mindmapId={mindmap.id} initialTitle={mindmap.title} />
               {/* Controls - always visible on desktop, toggleable on mobile */}
               {isDesktop ? (
                 // Desktop: Always visible controls
@@ -231,7 +208,7 @@ const MindmapPage = () => {
                   >
                     <MessageSquare size={18} />
                   </Button>
-                  {!isViewMode && (
+                  {userPermission === 'edit' && (
                     <Button
                       onClick={() => setIsToolbarVisible(!isToolbarVisible)}
                       title={isToolbarVisible ? 'Hide Toolbar' : 'Show Toolbar'}
@@ -267,7 +244,7 @@ const MindmapPage = () => {
               />
             </Flow>
             {!isPresenterMode &&
-              !isViewMode &&
+              userPermission === 'edit' &&
               isToolbarVisible &&
               (isDesktop ? (
                 <Toolbar mindmapId={mindmap.id} permission={mindmap.permission} />
@@ -295,7 +272,7 @@ const MindmapPage = () => {
                 </div>
               ))}
           </div>
-        </PresenterProvider>
+        </MindmapPermissionProvider>
       </ReactFlowProvider>
 
       {/* Comment Drawer - Triggered via 'app.mindmap.open-comments' event or button click */}

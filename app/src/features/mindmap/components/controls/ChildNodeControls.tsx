@@ -20,9 +20,8 @@ import { Minus, Plus } from 'lucide-react';
 import { motion } from 'motion/react';
 import { memo, useCallback, useEffect } from 'react';
 import { useShallow } from 'zustand/react/shallow';
-import { usePresenterContext } from '../../contexts/ReadOnlyContext';
+import { useMindmapPermissionContext } from '../../contexts/MindmapPermissionContext';
 import { BaseHandle } from '../ui/base-handle';
-import { useWhyDidYouUpdate } from '@/shared/hooks/use-debug';
 
 interface ChildNodeControlsProps {
   node: NodeProps<MindMapNode>;
@@ -49,15 +48,7 @@ const layoutStoreSelector = (state: LayoutState) => ({
 const mouseOverSelector = (state: ClipboardState) => state.mouseOverNodeId;
 
 export const ChildNodeControls = ({ node, selected }: ChildNodeControlsProps) => {
-  // Debug: Track why this component rerenders
-  useWhyDidYouUpdate(`ChildNodeControls[${node.id}]`, {
-    nodeId: node.id,
-    nodeType: node.type,
-    nodeData: node.data,
-    selected,
-  });
-
-  const { isReadOnly } = usePresenterContext();
+  const { canEdit } = useMindmapPermissionContext();
   const { collapse, expand } = useNodeManipulationStore(useShallow(nodeManipulationSelector));
   const { hasLeftChildren, hasRightChildren } = useCoreStore(useShallow(coreStoreSelector));
   const addChildNodeStore = useNodeOperationsStore(nodeOperationsSelector);
@@ -178,7 +169,7 @@ export const ChildNodeControls = ({ node, selected }: ChildNodeControlsProps) =>
               : 'invisible opacity-0'
           )}
         >
-          {!isReadOnly && (
+          {canEdit && (
             <Button
               variant="secondary"
               className={cn('cursor-pointer rounded-full transition-all duration-200')}
@@ -248,7 +239,7 @@ export const ChildNodeControls = ({ node, selected }: ChildNodeControlsProps) =>
               <Minus />
             </Button>
           </motion.div>
-          {!isReadOnly && (
+          {canEdit && (
             <Button
               variant="secondary"
               className={cn('cursor-pointer rounded-full transition-all duration-200')}
@@ -273,7 +264,7 @@ export const ChildNodeControls = ({ node, selected }: ChildNodeControlsProps) =>
               : 'invisible opacity-0'
           )}
         >
-          {!isReadOnly && (
+          {canEdit && (
             <Button
               variant="secondary"
               className={cn('cursor-pointer rounded-full transition-all duration-200')}
@@ -343,7 +334,7 @@ export const ChildNodeControls = ({ node, selected }: ChildNodeControlsProps) =>
               <Minus />
             </Button>
           </motion.div>
-          {!isReadOnly && (
+          {canEdit && (
             <Button
               variant="secondary"
               className={cn('cursor-pointer rounded-full transition-all duration-200')}
@@ -362,13 +353,6 @@ export const ChildNodeControls = ({ node, selected }: ChildNodeControlsProps) =>
 
 export const NodeHandlers = memo(
   ({ layoutType, side, id }: { layoutType: LayoutType; side: Side; id: string }) => {
-    // Debug: Track why NodeHandlers rerenders (causes updateNodeInternals calls)
-    useWhyDidYouUpdate(`NodeHandlers[${id}]`, {
-      id,
-      layoutType,
-      side,
-    });
-
     const updateNodeInternals = useUpdateNodeInternals();
 
     useEffect(() => {

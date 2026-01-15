@@ -5,7 +5,7 @@ import { useUpdateMindmapWithMetadata } from './useApi';
 import { useCoreStore } from '../stores/core';
 import { useMetadataStore } from '../stores/metadata';
 import { useDirtyStore } from '../stores/dirty';
-import { usePresenterModeStore, useViewModeStore } from '../stores';
+import { usePresenterModeStore } from '../stores';
 import { useSavingStore } from '../stores/saving';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
@@ -53,13 +53,12 @@ export const useSaveMindmap = () => {
     // Yield to the event loop to allow React to render the spinner before CPU-intensive work
     await new Promise((resolve) => setTimeout(resolve, 0));
 
-    // Prevent save in presenter mode or view mode
+    // Prevent save in presenter mode
     const isPresenterMode = usePresenterModeStore.getState().isPresenterMode;
-    const isViewMode = useViewModeStore.getState().isViewMode;
 
-    if (isPresenterMode || isViewMode) {
-      console.log('saveWithThumbnail: Skipping save in presenter/view mode');
-      toast.info(t(isViewMode ? 'saving.cannotSaveInViewMode' : 'saving.cannotSaveInPresenterMode'));
+    if (isPresenterMode) {
+      console.log('saveWithThumbnail: Skipping save in presenter mode');
+      toast.info(t('saving.cannotSaveInPresenterMode'));
       useSavingStore.getState().setIsSaving(false);
       return;
     }

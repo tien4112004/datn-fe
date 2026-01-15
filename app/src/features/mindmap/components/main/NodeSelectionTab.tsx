@@ -18,7 +18,6 @@ import { SIDE, MINDMAP_TYPES, LAYOUT_TYPE, PATH_TYPES } from '../../types';
 import type { LayoutType, PathType } from '../../types';
 import { getAllDescendantNodes, DEFAULT_LAYOUT_TYPE } from '../../services/utils';
 import { BezierIcon, SmoothStepIcon, StraightIcon } from '../ui/icon';
-import { useWhyDidYouUpdate } from '@/shared/hooks/use-debug';
 
 interface NodeSelectionTabProps {
   className?: string;
@@ -57,18 +56,6 @@ const NodeSelectionTab = ({ className }: NodeSelectionTabProps) => {
     copyToClipboard,
     deselectAll,
   } = useNodeSelection();
-
-  // Debug: Track why NodeSelectionTab rerenders
-  if (process.env.NODE_ENV === 'development') {
-    useWhyDidYouUpdate('NodeSelectionTab', {
-      selectedCount,
-      hasSelection,
-      isSingleSelection,
-      isMultiSelection,
-      firstSelectedNodeId: firstSelectedNode?.id,
-      className,
-    });
-  }
 
   // Actions only - no state subscriptions to avoid rerenders
   const setNodes = useCoreStore((state) => state.setNodes);

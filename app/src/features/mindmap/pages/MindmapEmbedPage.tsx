@@ -6,10 +6,10 @@ import { Flow, LogicHandler, Toolbar, MindmapControls } from '@/features/mindmap
 import { Button } from '@/components/ui/button';
 import { useState, useEffect } from 'react';
 import { useLoaderData } from 'react-router-dom';
-import { useCoreStore, useViewModeStore } from '../stores';
+import { useCoreStore } from '../stores';
 import { useFullscreen } from '../hooks/useFullscreen';
-import { PresenterProvider } from '../contexts/ReadOnlyContext';
 import type { Mindmap } from '../types';
+import { MindmapPermissionProvider } from '../contexts/MindmapPermissionContext';
 
 /**
  * Migrate layout data from mindmap metadata to root nodes.
@@ -34,17 +34,11 @@ const MindmapEmbedPage = () => {
   const { mindmap } = useLoaderData() as { mindmap: Mindmap };
   const setNodes = useCoreStore((state) => state.setNodes);
   const setEdges = useCoreStore((state) => state.setEdges);
-  const setViewMode = useViewModeStore((state) => state.setViewMode);
 
   const [isPanOnDrag, setIsPanOnDrag] = useState(false);
 
   // Fullscreen functionality
   const { isFullscreen, toggleFullscreen: toggleFullscreenMode } = useFullscreen();
-
-  // Force view-only mode for embed page (security)
-  useEffect(() => {
-    setViewMode(true);
-  }, [setViewMode]);
 
   // Sync mindmap data from React Router loader to stores
   useEffect(() => {
@@ -65,16 +59,16 @@ const MindmapEmbedPage = () => {
 
   return (
     <ReactFlowProvider>
-      <PresenterProvider isPresenterMode={false}>
+      <MindmapPermissionProvider isPresenterMode={false} userPermission="read">
         <div
           className="fixed inset-0 flex h-full w-full overflow-hidden"
           style={{ backgroundColor: 'var(--background)', touchAction: 'none' }}
         >
-          <Flow isPanOnDrag={true} isPresenterMode={false}>
+          <Flow isPanOnDrag={isPanOnDrag}>
             {/* Controls */}
             <div className={`fixed bottom-4 left-4 z-10`}>
               <MindmapControls
-                isPanOnDrag={true}
+                isPanOnDrag={isPanOnDrag}
                 isPresenterMode={false}
                 isFullscreen={isFullscreen}
                 onTogglePanOnDrag={togglePanOnDrag}
@@ -115,7 +109,7 @@ const MindmapEmbedPage = () => {
           {/* Toolbar */}
           {isToolbarVisible && <Toolbar mindmapId={mindmap.id} permission={mindmap.permission} />}
         </div>
-      </PresenterProvider>
+      </MindmapPermissionProvider>
     </ReactFlowProvider>
   );
 };

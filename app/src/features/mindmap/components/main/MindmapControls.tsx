@@ -3,7 +3,7 @@ import { useReactFlow } from '@xyflow/react';
 import { CustomControls, CustomControlButton } from '../controls/CustomControls';
 import { Move, MousePointer2, Maximize2, Minimize2, Eye, Edit, ZoomIn, ZoomOut, Scan } from 'lucide-react';
 import { useResponsiveBreakpoint } from '@/shared/hooks';
-import { useViewModeStore } from '../../stores';
+import { useMindmapPermissionContext } from '../../contexts/MindmapPermissionContext';
 
 interface MindmapControlsProps {
   isPanOnDrag: boolean;
@@ -25,17 +25,14 @@ const MindmapControls = memo(
   }: MindmapControlsProps) => {
     const { zoomIn, zoomOut, fitView } = useReactFlow();
     const { isMobile } = useResponsiveBreakpoint();
-    const isViewMode = useViewModeStore((state) => state.isViewMode);
+    const { canEdit } = useMindmapPermissionContext();
 
     // Use larger icons on mobile/tablet for better touch targets
     const iconSize = isMobile ? 14 : 16;
 
-    // Combined read-only state
-    const isReadOnly = isPresenterMode || isViewMode;
-
     return (
       <CustomControls>
-        {!isReadOnly && (
+        {canEdit && (
           <CustomControlButton
             onClick={onTogglePanOnDrag}
             title={isPanOnDrag ? 'Switch to Selection Mode' : 'Switch to Pan Mode'}
@@ -58,15 +55,13 @@ const MindmapControls = memo(
         >
           {isFullscreen ? <Minimize2 size={iconSize} /> : <Maximize2 size={iconSize} />}
         </CustomControlButton>
-        {/* Only show Presenter Mode toggle if NOT in View Mode (View Mode is server-driven) */}
-        {!isViewMode && (
-          <CustomControlButton
-            onClick={onTogglePresenterMode}
-            title={isPresenterMode ? 'Disable Presenter Mode' : 'Enable Presenter Mode'}
-          >
-            {isPresenterMode ? <Edit size={iconSize} /> : <Eye size={iconSize} />}
-          </CustomControlButton>
-        )}
+        {/* Presenter Mode toggle - available for all permission levels */}
+        <CustomControlButton
+          onClick={onTogglePresenterMode}
+          title={isPresenterMode ? 'Disable Presenter Mode' : 'Enable Presenter Mode'}
+        >
+          {isPresenterMode ? <Edit size={iconSize} /> : <Eye size={iconSize} />}
+        </CustomControlButton>
       </CustomControls>
     );
   }

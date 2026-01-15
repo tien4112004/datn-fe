@@ -4,7 +4,7 @@ import { useMindmapActions, useShortcuts } from '../../hooks';
 import { useSaveMindmap } from '../../hooks/useSaving';
 import { useUndoRedoStore } from '../../stores/undoredo';
 import type { MindmapMetadata } from '../../types';
-import { useWhyDidYouUpdate } from '@/shared/hooks/use-debug';
+import { useMindmapPermissionContext } from '../../contexts/MindmapPermissionContext';
 
 interface LogicHandlerProps {
   mindmapId: string;
@@ -13,13 +13,6 @@ interface LogicHandlerProps {
 }
 
 const LogicHandler = memo(({ mindmapId, isPresenterMode = false, metadata }: LogicHandlerProps) => {
-  // Debug: Track why LogicHandler rerenders
-  useWhyDidYouUpdate('LogicHandler', {
-    mindmapId,
-    isPresenterMode,
-    metadata,
-  });
-
   const { selectAllHandler, copyHandler, pasteHandler, deleteHandler, deselectAllHandler } =
     useMindmapActions();
   const { setViewport } = useReactFlow();
@@ -28,6 +21,9 @@ const LogicHandler = memo(({ mindmapId, isPresenterMode = false, metadata }: Log
   const redo = useUndoRedoStore((state) => state.redo);
 
   const { saveWithThumbnail } = useSaveMindmap();
+
+  // Get read-only state from permission context (single source of truth)
+  const { isReadOnly } = useMindmapPermissionContext();
 
   // Restore viewport from metadata on mount
   useEffect(() => {
@@ -72,7 +68,7 @@ const LogicHandler = memo(({ mindmapId, isPresenterMode = false, metadata }: Log
       {
         shortcutKey: 'Ctrl+V',
         onKeyPressed: pasteHandler,
-        disabled: isPresenterMode,
+        disabled: isReadOnly,
         shouldExecute: () => {
           const activeElement = document.activeElement as HTMLElement;
           return (
@@ -85,7 +81,7 @@ const LogicHandler = memo(({ mindmapId, isPresenterMode = false, metadata }: Log
       {
         shortcutKey: 'Delete',
         onKeyPressed: deleteHandler,
-        disabled: isPresenterMode,
+        disabled: isReadOnly,
       },
       {
         shortcutKey: 'Escape',
@@ -95,22 +91,22 @@ const LogicHandler = memo(({ mindmapId, isPresenterMode = false, metadata }: Log
       {
         shortcutKey: 'Ctrl+Z',
         onKeyPressed: undo,
-        disabled: isPresenterMode,
+        disabled: isReadOnly,
       },
       {
         shortcutKey: 'Ctrl+Y',
         onKeyPressed: redo,
-        disabled: isPresenterMode,
+        disabled: isReadOnly,
       },
       {
         shortcutKey: 'Ctrl+Shift+Z',
         onKeyPressed: redo,
-        disabled: isPresenterMode,
+        disabled: isReadOnly,
       },
       {
         shortcutKey: 'Ctrl+S',
         onKeyPressed: handleSave,
-        disabled: isPresenterMode, // Disable save in presenter mode
+        disabled: isReadOnly, // Disable save when read-only (no edit permission or presenter mode)
         shouldExecute: () => {
           const activeElement = document.activeElement as HTMLElement;
           return (
@@ -130,7 +126,7 @@ const LogicHandler = memo(({ mindmapId, isPresenterMode = false, metadata }: Log
       undo,
       redo,
       handleSave,
-      isPresenterMode,
+      isReadOnly,
     ]
   );
 

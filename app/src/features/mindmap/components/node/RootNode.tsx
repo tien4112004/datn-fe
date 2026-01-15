@@ -11,7 +11,7 @@ import { BaseNodeContent } from '../ui/base-node';
 import { BezierIcon, SmoothStepIcon, StraightIcon } from '../ui/icon';
 import { BaseNodeBlock } from './BaseNode';
 
-import { usePresenterContext } from '../../contexts/ReadOnlyContext';
+import { useMindmapPermissionContext } from '../../contexts/MindmapPermissionContext';
 import { BaseNodeControl } from '../controls/BaseNodeControl';
 import ColorPickerControl from '../controls/ColorPickerControl';
 import { NodeRichTextContent } from '../ui/node-rich-text-content';
@@ -19,7 +19,7 @@ import { NodeRichTextContent } from '../ui/node-rich-text-content';
 const RootNodeBlock = memo(
   ({ ...node }: NodeProps<RootNode>) => {
     const { data, selected: isSelected, dragging, width, height } = node;
-    const { isReadOnly } = usePresenterContext();
+    const { isReadOnly, canEdit } = useMindmapPermissionContext();
 
     // Root node IS the tree root, can directly look up its own layoutType
     const layoutType = useCoreStore((state) => state.rootLayoutTypeMap.get(node.id) || DEFAULT_LAYOUT_TYPE);
@@ -90,7 +90,7 @@ const RootNodeBlock = memo(
           />
         </BaseNodeContent>
 
-        {!isReadOnly && (
+        {canEdit && (
           <BaseNodeControl
             layoutType={layoutType}
             selected={isSelected}

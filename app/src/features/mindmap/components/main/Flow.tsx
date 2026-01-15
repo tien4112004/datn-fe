@@ -2,6 +2,7 @@ import { ReactFlow } from '@xyflow/react';
 import { memo, type ReactNode } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { useReactFlowIntegration } from '@/features/mindmap/hooks';
+import { useMindmapPermissionContext } from '../../contexts/MindmapPermissionContext';
 import EdgeBlock, { ConnectionLine } from '../edge/Edge';
 import RootNodeBlock from '../node/RootNode';
 import ShapeNodeBlock from '../node/ShapeNode';
@@ -34,72 +35,60 @@ const handlersSelector = (state: any) => ({
   onConnect: state.onConnect,
 });
 
-const Flow = memo(
-  ({
-    children,
-    isPanOnDrag,
-    isPresenterMode = false,
-    isViewMode = false,
-  }: {
-    children: ReactNode;
-    isPanOnDrag: boolean;
-    isPresenterMode?: boolean;
-    isViewMode?: boolean;
-  }) => {
-    const { nodes, edges, onNodesChange, onEdgesChange, onConnect } = useCoreStore(
-      useShallow(handlersSelector)
-    );
+const Flow = memo(({ children, isPanOnDrag }: { children: ReactNode; isPanOnDrag: boolean }) => {
+  const { nodes, edges, onNodesChange, onEdgesChange, onConnect } = useCoreStore(
+    useShallow(handlersSelector)
+  );
 
-    // Combined read-only state: true if either presenter mode OR view mode is active
-    const isReadOnly = isPresenterMode || isViewMode;
+  // Get read-only state from permission context
+  const { isReadOnly } = useMindmapPermissionContext();
 
-    const {
-      onNodeDragStart,
-      onNodeDrag,
-      onNodeDragStop,
-      onPaneMouseMove,
-      onPaneClick,
-      onInit,
-      onConnectEnd,
-      onNodeMouseEnter,
-      onNodeMouseLeave,
-      onSelectionChange,
-    } = useReactFlowIntegration();
+  const {
+    onNodeDragStart,
+    onNodeDrag,
+    onNodeDragStop,
+    onPaneMouseMove,
+    onPaneClick,
+    onInit,
+    onConnectEnd,
+    onNodeMouseEnter,
+    onNodeMouseLeave,
+    onSelectionChange,
+  } = useReactFlowIntegration();
 
-    return (
-      <ReactFlow
-        nodes={nodes}
-        edges={edges}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        onConnect={onConnect}
-        nodeTypes={nodeTypes}
-        edgeTypes={edgeTypes}
-        proOptions={{ hideAttribution: true }}
-        onPaneMouseMove={onPaneMouseMove}
-        onPaneClick={onPaneClick}
-        onNodeDragStart={onNodeDragStart}
-        onNodeDrag={onNodeDrag}
-        onNodeDragStop={onNodeDragStop}
-        onInit={onInit}
-        onConnectEnd={onConnectEnd}
-        onNodeMouseEnter={onNodeMouseEnter}
-        onNodeMouseLeave={onNodeMouseLeave}
-        onSelectionChange={onSelectionChange}
-        connectionLineComponent={ConnectionLine}
-        panOnDrag={isPanOnDrag}
-        panActivationKeyCode={!isPanOnDrag ? 'Shift' : null}
-        selectionOnDrag={!isPanOnDrag}
-        selectNodesOnDrag={false}
-        selectionKeyCode={isPanOnDrag ? 'Shift' : null}
-        nodesDraggable={!isReadOnly}
-        nodesConnectable={!isReadOnly}
-        fitViewOnInit={false}
-      >
-        {children}
-      </ReactFlow>
-    );
-  }
-);
+  return (
+    <ReactFlow
+      nodes={nodes}
+      edges={edges}
+      onNodesChange={onNodesChange}
+      onEdgesChange={onEdgesChange}
+      onConnect={onConnect}
+      nodeTypes={nodeTypes}
+      edgeTypes={edgeTypes}
+      proOptions={{ hideAttribution: true }}
+      onPaneMouseMove={onPaneMouseMove}
+      onPaneClick={onPaneClick}
+      onNodeDragStart={onNodeDragStart}
+      onNodeDrag={onNodeDrag}
+      onNodeDragStop={onNodeDragStop}
+      onInit={onInit}
+      onConnectEnd={onConnectEnd}
+      onNodeMouseEnter={onNodeMouseEnter}
+      onNodeMouseLeave={onNodeMouseLeave}
+      onSelectionChange={onSelectionChange}
+      connectionLineComponent={ConnectionLine}
+      panOnDrag={isPanOnDrag}
+      panActivationKeyCode={!isPanOnDrag ? 'Shift' : null}
+      selectionOnDrag={!isPanOnDrag}
+      selectNodesOnDrag={false}
+      selectionKeyCode={isPanOnDrag ? 'Shift' : null}
+      nodesDraggable={!isReadOnly}
+      nodesConnectable={!isReadOnly}
+      fitViewOnInit={false}
+    >
+      {children}
+    </ReactFlow>
+  );
+});
 
 export default Flow;

@@ -4,7 +4,7 @@ import { DRAGHANDLE } from '@/features/mindmap/types/constants';
 import type { NodeProps } from '@xyflow/react';
 import { Network } from 'lucide-react';
 import { memo, useCallback, useMemo } from 'react';
-import { usePresenterContext } from '../../contexts/ReadOnlyContext';
+import { useMindmapPermissionContext } from '../../contexts/MindmapPermissionContext';
 import { useCoreStore, useNodeOperationsStore } from '../../stores';
 import { useLayoutStore } from '../../stores/layout';
 import { BaseNodeControl } from '../controls/BaseNodeControl';
@@ -12,23 +12,12 @@ import { BaseNodeContent } from '../ui/base-node';
 import { NodeRichTextContent } from '../ui/node-rich-text-content';
 import { BaseNodeBlock } from './BaseNode';
 import { getTreeLayoutType } from '../../services/utils';
-import { useWhyDidYouUpdate } from '@/shared/hooks/use-debug';
 
 const TextNodeBlock = memo(
   ({ ...node }: NodeProps<TextNode>) => {
     const { data, selected: isSelected, dragging, width, height } = node;
 
-    // Debug: Track why TextNode rerenders
-    useWhyDidYouUpdate(`TextNode[${node.id}]`, {
-      id: node.id,
-      data,
-      isSelected,
-      dragging,
-      width,
-      height,
-    });
-
-    const { isReadOnly } = usePresenterContext();
+    const { isReadOnly, canEdit } = useMindmapPermissionContext();
 
     const nodes = useCoreStore((state) => state.nodes);
     const isLayouting = useLayoutStore((state) => state.isLayouting);
@@ -81,7 +70,7 @@ const TextNodeBlock = memo(
           />
         </BaseNodeContent>
 
-        {!isReadOnly && (
+        {canEdit && (
           <BaseNodeControl
             layoutType={layoutType}
             selected={isSelected}

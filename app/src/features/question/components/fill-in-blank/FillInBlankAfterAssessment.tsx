@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import type { FillInBlankQuestion, FillInBlankAnswer } from '@/features/assignment/types';
 import { MarkdownPreview, AnswerFeedback, DifficultyBadge } from '../shared';
 
@@ -8,13 +9,16 @@ interface FillInBlankAfterAssessmentProps {
   question: FillInBlankQuestion;
   answer?: FillInBlankAnswer;
   points?: number; // Points allocated for this question in the assignment
+  hideHeader?: boolean; // Hide type label and difficulty badge when used as sub-question
 }
 
 export const FillInBlankAfterAssessment = ({
   question,
   answer,
   points = 0,
+  hideHeader = false,
 }: FillInBlankAfterAssessmentProps) => {
+  const { t } = useTranslation('questions');
   const blankSegments = question.data.segments.filter((s) => s.type === 'blank');
   const answerMap = new Map(answer?.blanks.map((b) => [b.segmentId, b.value]) || []);
 
@@ -44,13 +48,6 @@ export const FillInBlankAfterAssessment = ({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold">Fill In Blank Question</h3>
-          <DifficultyBadge difficulty={question.difficulty} />
-        </div>
-      </div>
-
       {/* Title */}
       {question.title && (
         <div className="space-y-2">
@@ -62,7 +59,7 @@ export const FillInBlankAfterAssessment = ({
       )}
 
       {/* Answer Feedback */}
-      <AnswerFeedback isCorrect={isFullyCorrect} score={score} totalPoints={points} />
+      {!hideHeader && <AnswerFeedback isCorrect={isFullyCorrect} score={score} totalPoints={points} />}
 
       {/* Question with results */}
       <div className="bg-muted/50 rounded-md p-4 text-sm leading-relaxed">
@@ -89,7 +86,7 @@ export const FillInBlankAfterAssessment = ({
                 )}
               >
                 {result.isCorrect ? <CheckCircle2 className="h-3 w-3" /> : <XCircle className="h-3 w-3" />}
-                <span>{result.studentAnswer || '(empty)'}</span>
+                <span>{result.studentAnswer || t('fillInBlank.afterAssessment.empty')}</span>
               </span>
             </span>
           );
@@ -98,7 +95,7 @@ export const FillInBlankAfterAssessment = ({
 
       {/* Correct Answers */}
       <div className="space-y-2">
-        <h4 className="font-semibold">Correct Answers:</h4>
+        <h4 className="font-semibold">{t('fillInBlank.afterAssessment.correctAnswers')}</h4>
         <div className="rounded-md border border-green-200 bg-green-50 p-4 dark:border-green-800 dark:bg-green-900/20">
           <div className="font-mono text-sm leading-relaxed">
             {question.data.segments.map((segment) => (
@@ -119,14 +116,19 @@ export const FillInBlankAfterAssessment = ({
       {/* Explanation */}
       {question.explanation && (
         <div className="bg-muted/50 rounded-md p-4">
-          <h4 className="mb-2 font-semibold">Explanation:</h4>
+          <h4 className="mb-2 font-semibold">{t('common.explanation')}:</h4>
           <MarkdownPreview content={question.explanation} />
         </div>
       )}
 
       {/* Score Summary */}
       <p className="text-muted-foreground text-sm">
-        {correctCount} out of {totalCount} blanks correct • Score: {score}/{points || 0}
+        {t('fillInBlank.afterAssessment.scoreSummary', {
+          correct: correctCount,
+          total: totalCount,
+          score,
+          maxScore: points || 0,
+        })}
       </p>
     </div>
   );

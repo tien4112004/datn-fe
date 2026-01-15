@@ -13,13 +13,6 @@ interface MultipleChoiceViewingProps {
 export const MultipleChoiceViewing = ({ question, points }: MultipleChoiceViewingProps) => {
   return (
     <div className="space-y-2">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold">Multiple Choice Question</h3>
-          <DifficultyBadge difficulty={question.difficulty} />
-        </div>
-      </div>
-
       {/* Question Title */}
       <div className="space-y-1">
         <MarkdownPreview content={question.title} />
@@ -28,34 +21,31 @@ export const MultipleChoiceViewing = ({ question, points }: MultipleChoiceViewin
         )}
       </div>
 
-      {/* Shuffle Options Setting */}
-      {question.data.shuffleOptions !== undefined && (
-        <div className="bg-muted/50 flex items-center gap-2 rounded-lg border border-gray-300 p-2 dark:border-gray-600">
-          <Shuffle className="h-4 w-4" />
-          <Label className="text-sm font-medium">Shuffle Options</Label>
-          <Badge variant={question.data.shuffleOptions ? 'default' : 'secondary'} className="ml-auto">
-            {question.data.shuffleOptions ? 'Enabled' : 'Disabled'}
-          </Badge>
-        </div>
-      )}
-
       {/* Options */}
       <div className="space-y-2">
-        <Label className="text-sm font-medium">Options:</Label>
+        <div className="flex items-center gap-2">
+          <Label className="text-sm font-medium">Options:</Label>
+          {question.data.shuffleOptions && (
+            <Badge variant="secondary" className="flex items-center gap-1">
+              <Shuffle className="h-3 w-3" />
+              Shuffle
+            </Badge>
+          )}
+        </div>
         {question.data.options.map((option, index) => (
           <div
             key={option.id}
-            className={`flex items-start gap-3 rounded-md border p-3 ${option.isCorrect ? 'border-green-500 bg-green-50 dark:bg-green-900/20' : ''}`}
+            className={`flex items-center gap-3 rounded-md border p-3 ${option.isCorrect ? 'border-green-500 bg-green-50 dark:bg-green-900/20' : ''}`}
           >
             <div
-              className={`flex h-6 w-6 items-center justify-center rounded-full text-sm font-medium ${option.isCorrect ? 'bg-green-600 text-white' : 'bg-muted'}`}
+              className={`flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full text-sm font-medium ${option.isCorrect ? 'bg-green-600 text-white' : 'bg-muted'}`}
             >
               {String.fromCharCode(65 + index)}
             </div>
-            <div className="flex-1">
+            <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2">
                 <MarkdownPreview content={option.text} />
-                {option.isCorrect && <CheckCircle2 className="h-4 w-4 text-green-600" />}
+                {option.isCorrect && <CheckCircle2 className="h-4 w-4 flex-shrink-0 text-green-600" />}
               </div>
               {option.imageUrl && (
                 <img

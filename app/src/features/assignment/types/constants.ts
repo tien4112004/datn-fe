@@ -7,6 +7,7 @@ export const QUESTION_TYPE = {
   MATCHING: 'matching',
   OPEN_ENDED: 'open_ended',
   FILL_IN_BLANK: 'fill_in_blank',
+  GROUP: 'group',
 } as const;
 
 export type QuestionType = (typeof QUESTION_TYPE)[keyof typeof QUESTION_TYPE];

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { FillInBlankQuestion, FillInBlankAnswer } from '@/features/assignment/types';
 import { DifficultyBadge } from '../shared';
 import { Input } from '@/shared/components/ui/input';
@@ -9,9 +10,17 @@ interface FillInBlankDoingProps {
   answer?: FillInBlankAnswer;
   points?: number; // Optional points for display
   onAnswerChange: (answer: FillInBlankAnswer) => void;
+  hideHeader?: boolean; // Hide type label and difficulty badge when used as sub-question
 }
 
-export const FillInBlankDoing = ({ question, answer, points, onAnswerChange }: FillInBlankDoingProps) => {
+export const FillInBlankDoing = ({
+  question,
+  answer,
+  points,
+  onAnswerChange,
+  hideHeader = false,
+}: FillInBlankDoingProps) => {
+  const { t } = useTranslation('questions');
   const blankSegments = question.data.segments.filter((s) => s.type === 'blank');
   const [blanks, setBlanks] = useState<Record<string, string>>(() => {
     const initial: Record<string, string> = {};
@@ -45,10 +54,6 @@ export const FillInBlankDoing = ({ question, answer, points, onAnswerChange }: F
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold">Fill In Blank Question</h3>
-        <DifficultyBadge difficulty={question.difficulty} />
-      </div>
       {/* Title */}
       {question.title && (
         <div className="space-y-2">
@@ -60,7 +65,7 @@ export const FillInBlankDoing = ({ question, answer, points, onAnswerChange }: F
       )}
 
       {/* Question with input blanks */}
-      <div className="bg-muted/50 rounded-md p-4 text-sm leading-relaxed">
+      <div className="rounded-md border border-gray-300 bg-white p-4 text-sm leading-relaxed dark:border-gray-600 dark:bg-gray-800">
         {question.data.segments.map((segment) => (
           <span key={segment.id}>
             {segment.type === 'text' ? (
@@ -70,8 +75,10 @@ export const FillInBlankDoing = ({ question, answer, points, onAnswerChange }: F
                 type="text"
                 value={blanks[segment.id] || ''}
                 onChange={(e) => handleBlankChange(segment.id, e.target.value)}
-                className="mx-1 inline-block h-8 w-32 text-center font-mono"
-                placeholder={`Blank ${blankSegments.findIndex((s) => s.id === segment.id) + 1}`}
+                className="border-primary/30 focus:border-primary mx-1 inline-block h-9 w-36 border-2 text-center font-mono"
+                placeholder={t('fillInBlank.doing.blankPlaceholder', {
+                  number: blankSegments.findIndex((s) => s.id === segment.id) + 1,
+                })}
               />
             )}
           </span>
@@ -81,9 +88,15 @@ export const FillInBlankDoing = ({ question, answer, points, onAnswerChange }: F
       {/* Info */}
       <div className="text-muted-foreground space-y-1 text-sm">
         {question.data.caseSensitive && (
-          <p className="text-amber-600 dark:text-amber-400">⚠️ Answers are case-sensitive</p>
+          <div className="rounded-md border border-amber-200 bg-amber-50 p-2 text-xs text-amber-800 dark:border-amber-800 dark:bg-amber-900/20 dark:text-amber-200">
+            {t('fillInBlank.doing.caseSensitiveWarning')}
+          </div>
         )}
-        {points && <p>Points: {points}</p>}
+        {points && (
+          <p>
+            {t('common.points')}: {points}
+          </p>
+        )}
       </div>
     </div>
   );

@@ -1,5 +1,6 @@
 import { Badge } from '@/shared/components/ui/badge';
-import { DIFFICULTY, DIFFICULTY_LABELS, type Difficulty } from '@/features/assignment/types';
+import { useTranslation } from 'react-i18next';
+import { DIFFICULTY, type Difficulty } from '@/features/assignment/types';
 import { cn } from '@/shared/lib/utils';
 
 interface DifficultyBadgeProps {
@@ -14,10 +15,19 @@ const difficultyColors: Record<Difficulty, string> = {
   [DIFFICULTY.SUPER_HARD]: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100',
 };
 
+const difficultyI18nKeys: Record<Difficulty, string> = {
+  [DIFFICULTY.EASY]: 'difficulty.easy',
+  [DIFFICULTY.MEDIUM]: 'difficulty.medium',
+  [DIFFICULTY.HARD]: 'difficulty.hard',
+  [DIFFICULTY.SUPER_HARD]: 'difficulty.superHard',
+};
+
 export const DifficultyBadge = ({ difficulty, className }: DifficultyBadgeProps) => {
+  const { t } = useTranslation('questions');
+
   return (
     <Badge variant="outline" className={cn(difficultyColors[difficulty], className)}>
-      {DIFFICULTY_LABELS[difficulty]}
+      {t(difficultyI18nKeys[difficulty])}
     </Badge>
   );
 };

@@ -10,13 +10,6 @@ interface OpenEndedViewingProps {
 export const OpenEndedViewing = ({ question, points }: OpenEndedViewingProps) => {
   return (
     <div className="space-y-2">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold">Open-ended Question</h3>
-          <DifficultyBadge difficulty={question.difficulty} />
-        </div>
-      </div>
-
       {/* Question */}
       <div className="space-y-1">
         <MarkdownPreview content={question.title} />

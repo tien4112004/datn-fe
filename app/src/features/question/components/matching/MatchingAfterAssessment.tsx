@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import type { MatchingQuestion, MatchingAnswer } from '@/features/assignment/types';
 import { MarkdownPreview, AnswerFeedback, DifficultyBadge } from '../shared';
 
@@ -8,9 +9,16 @@ interface MatchingAfterAssessmentProps {
   question: MatchingQuestion;
   answer?: MatchingAnswer;
   points?: number; // Points allocated for this question in the assignment
+  hideHeader?: boolean; // Hide type label and difficulty badge when used as sub-question
 }
 
-export const MatchingAfterAssessment = ({ question, answer, points = 0 }: MatchingAfterAssessmentProps) => {
+export const MatchingAfterAssessment = ({
+  question,
+  answer,
+  points = 0,
+  hideHeader = false,
+}: MatchingAfterAssessmentProps) => {
+  const { t } = useTranslation('questions');
   const answerMap = new Map(answer?.matches.map((m) => [m.rightId, m.leftId]) || []);
 
   // Check correctness for each pair
@@ -35,13 +43,6 @@ export const MatchingAfterAssessment = ({ question, answer, points = 0 }: Matchi
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold">Matching Question</h3>
-          <DifficultyBadge difficulty={question.difficulty} />
-        </div>
-      </div>
-
       {/* Question Title */}
       <div className="space-y-2">
         <MarkdownPreview content={question.title} />
@@ -51,11 +52,11 @@ export const MatchingAfterAssessment = ({ question, answer, points = 0 }: Matchi
       </div>
 
       {/* Answer Feedback */}
-      <AnswerFeedback isCorrect={isFullyCorrect} score={score} totalPoints={points} />
+      {!hideHeader && <AnswerFeedback isCorrect={isFullyCorrect} score={score} totalPoints={points} />}
 
       {/* Results */}
       <div className="space-y-3">
-        <h4 className="font-semibold">Your Matches:</h4>
+        <h4 className="font-semibold">{t('matching.afterAssessment.yourMatches')}</h4>
         {results.map((result, index) => (
           <div
             key={result.correctPair.id}
@@ -66,9 +67,9 @@ export const MatchingAfterAssessment = ({ question, answer, points = 0 }: Matchi
                 : 'border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-900/20'
             )}
           >
-            <div className="flex items-start gap-3">
+            <div className="flex items-center gap-3">
               {/* Result Icon */}
-              <div className="mt-1">
+              <div className="flex-shrink-0">
                 {result.isCorrect ? (
                   <CheckCircle2 className="h-5 w-5 text-green-600" />
                 ) : (
@@ -91,7 +92,7 @@ export const MatchingAfterAssessment = ({ question, answer, points = 0 }: Matchi
                     </div>
                   ) : (
                     <div className="text-muted-foreground min-w-[200px] flex-1 rounded bg-gray-100 px-3 py-1 italic dark:bg-gray-800">
-                      (No match)
+                      {t('matching.afterAssessment.noMatch')}
                     </div>
                   )}
 
@@ -111,7 +112,7 @@ export const MatchingAfterAssessment = ({ question, answer, points = 0 }: Matchi
                 {/* Show correct match if wrong */}
                 {!result.isCorrect && (
                   <div className="text-muted-foreground border-t pl-7 pt-2 text-sm">
-                    <strong>Correct match:</strong>
+                    <strong>{t('matching.afterAssessment.correctMatch')}</strong>
                     <div className="mt-1 inline-block rounded bg-white px-2 py-1 dark:bg-gray-900">
                       <span className="mr-2 inline-flex h-5 w-5 items-center justify-center rounded-full bg-blue-600 text-xs font-medium text-white">
                         {question.data.pairs.findIndex((p) => p.id === result.correctPair.id) + 1}
@@ -129,14 +130,19 @@ export const MatchingAfterAssessment = ({ question, answer, points = 0 }: Matchi
       {/* Explanation */}
       {question.explanation && (
         <div className="bg-muted/50 rounded-md p-4">
-          <h4 className="mb-2 font-semibold">Explanation:</h4>
+          <h4 className="mb-2 font-semibold">{t('common.explanation')}:</h4>
           <MarkdownPreview content={question.explanation} />
         </div>
       )}
 
       {/* Score Summary */}
       <p className="text-muted-foreground text-sm">
-        {correctCount} out of {totalCount} pairs correct • Score: {score}/{points || 0}
+        {t('matching.afterAssessment.scoreSummary', {
+          correct: correctCount,
+          total: totalCount,
+          score,
+          maxScore: points || 0,
+        })}
       </p>
     </div>
   );

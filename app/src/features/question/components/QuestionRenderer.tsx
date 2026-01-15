@@ -1,4 +1,4 @@
-import type { Question, Answer } from '@aiprimary/core';
+import type { Question, Answer, GroupQuestion } from '@aiprimary/core';
 import type { ViewMode } from '@/features/assignment/types';
 import { QUESTION_TYPE, VIEW_MODE } from '@/features/assignment/types';
 import {
@@ -29,6 +29,7 @@ import {
   MatchingAfterAssessment,
   MatchingGrading,
 } from './matching';
+import { GroupEditing, GroupViewing, GroupDoing, GroupAfterAssessment, GroupGrading } from './group';
 
 interface QuestionRendererProps {
   question: Question;
@@ -174,6 +175,39 @@ export const QuestionRenderer = ({
         <FillInBlankGrading
           question={question}
           answer={answer as any}
+          points={points}
+          onGradeChange={onGradeChange!}
+        />
+      );
+    }
+  }
+
+  // Group Question
+  if (question.type === QUESTION_TYPE.GROUP) {
+    if (viewMode === VIEW_MODE.EDITING) {
+      return <GroupEditing question={question as GroupQuestion} onChange={onChange!} />;
+    }
+    if (viewMode === VIEW_MODE.VIEWING) {
+      return <GroupViewing question={question as GroupQuestion} points={points} />;
+    }
+    if (viewMode === VIEW_MODE.DOING) {
+      return (
+        <GroupDoing
+          question={question as GroupQuestion}
+          answer={answer}
+          points={points}
+          onAnswerChange={onAnswerChange!}
+        />
+      );
+    }
+    if (viewMode === VIEW_MODE.AFTER_ASSESSMENT) {
+      return <GroupAfterAssessment question={question as GroupQuestion} answer={answer} points={points} />;
+    }
+    if (viewMode === VIEW_MODE.GRADING) {
+      return (
+        <GroupGrading
+          question={question as GroupQuestion}
+          answer={answer}
           points={points}
           onGradeChange={onGradeChange!}
         />

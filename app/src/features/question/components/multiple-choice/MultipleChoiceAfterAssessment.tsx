@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import type { MultipleChoiceQuestion, MultipleChoiceAnswer } from '@/features/assignment/types';
 import { MarkdownPreview, AnswerFeedback, DifficultyBadge } from '../shared';
 
@@ -8,13 +9,16 @@ interface MultipleChoiceAfterAssessmentProps {
   question: MultipleChoiceQuestion;
   answer?: MultipleChoiceAnswer;
   points?: number; // Points allocated for this question in the assignment
+  hideHeader?: boolean; // Hide type label and difficulty badge when used as sub-question
 }
 
 export const MultipleChoiceAfterAssessment = ({
   question,
   answer,
   points = 0,
+  hideHeader = false,
 }: MultipleChoiceAfterAssessmentProps) => {
+  const { t } = useTranslation('questions');
   const selectedOption = answer
     ? question.data.options.find((o) => o.id === answer.selectedOptionId)
     : undefined;
@@ -22,13 +26,6 @@ export const MultipleChoiceAfterAssessment = ({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold">Multiple Choice Question</h3>
-          <DifficultyBadge difficulty={question.difficulty} />
-        </div>
-      </div>
-
       {/* Question Title */}
       <div className="space-y-2">
         <MarkdownPreview content={question.title} />
@@ -38,7 +35,9 @@ export const MultipleChoiceAfterAssessment = ({
       </div>
 
       {/* Answer Feedback */}
-      <AnswerFeedback isCorrect={isCorrect} score={isCorrect ? points : 0} totalPoints={points} />
+      {!hideHeader && (
+        <AnswerFeedback isCorrect={isCorrect} score={isCorrect ? points : 0} totalPoints={points} />
+      )}
 
       {/* Options with feedback */}
       <div className="space-y-2">
@@ -50,12 +49,12 @@ export const MultipleChoiceAfterAssessment = ({
             <div
               key={option.id}
               className={cn(
-                'flex items-start gap-3 rounded-md border p-3',
+                'flex items-center gap-3 rounded-md border p-3',
                 isCorrectOption && 'border-green-200 bg-green-50 dark:bg-green-900/20',
                 isSelected && !isCorrectOption && 'border-red-200 bg-red-50 dark:bg-red-900/20'
               )}
             >
-              <div className="flex h-6 w-6 items-center justify-center">
+              <div className="flex h-6 w-6 flex-shrink-0 items-center justify-center">
                 {isCorrectOption && <CheckCircle2 className="h-5 w-5 text-green-600" />}
                 {isSelected && !isCorrectOption && <XCircle className="h-5 w-5 text-red-600" />}
                 {!isSelected && !isCorrectOption && (
@@ -64,7 +63,7 @@ export const MultipleChoiceAfterAssessment = ({
                   </div>
                 )}
               </div>
-              <div className="flex-1">
+              <div className="min-w-0 flex-1">
                 <MarkdownPreview content={option.text} />
                 {option.imageUrl && (
                   <img
@@ -82,7 +81,7 @@ export const MultipleChoiceAfterAssessment = ({
       {/* Explanation */}
       {question.explanation && (
         <div className="bg-muted/50 rounded-md p-4">
-          <h4 className="mb-2 font-semibold">Explanation:</h4>
+          <h4 className="mb-2 font-semibold">{t('common.explanation')}:</h4>
           <MarkdownPreview content={question.explanation} />
         </div>
       )}
@@ -90,7 +89,7 @@ export const MultipleChoiceAfterAssessment = ({
       {/* Points */}
       {points > 0 && (
         <p className="text-muted-foreground text-sm">
-          Points: {isCorrect ? points : 0}/{points}
+          {t('common.points')}: {isCorrect ? points : 0}/{points}
         </p>
       )}
     </div>

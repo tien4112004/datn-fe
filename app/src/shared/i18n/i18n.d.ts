@@ -19,6 +19,7 @@ import assignment from './locales/en/assignment';
 import assessmentMatrix from './locales/en/assessmentMatrix';
 import dashboard from './locales/en/dashboard';
 import comments from './locales/en/comments';
+import questions from './locales/en/questions';
 
 /**
  * Resources type based on English translations
@@ -40,6 +41,7 @@ export interface Resources {
   assessmentMatrix: typeof assessmentMatrix;
   dashboard: typeof dashboard;
   comments: typeof comments;
+  questions: typeof questions;
 }
 
 declare module 'i18next' {

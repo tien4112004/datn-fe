@@ -1,4 +1,4 @@
-import { CheckCircle2, GitMerge, FileText, FileInput } from 'lucide-react';
+import { CheckCircle2, GitMerge, FileText, FileInput, Layers } from 'lucide-react';
 import { QUESTION_TYPE, type QuestionType } from '@/features/assignment/types';
 import { cn } from '@/shared/lib/utils';
 
@@ -12,6 +12,7 @@ const iconMap: Record<QuestionType, React.ComponentType<{ className?: string }>>
   [QUESTION_TYPE.MATCHING]: GitMerge,
   [QUESTION_TYPE.OPEN_ENDED]: FileText,
   [QUESTION_TYPE.FILL_IN_BLANK]: FileInput,
+  [QUESTION_TYPE.GROUP]: Layers,
 };
 
 export const QuestionTypeIcon = ({ type, className }: QuestionTypeIconProps) => {

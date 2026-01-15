@@ -58,6 +58,8 @@ i18n
       'admin',
       'assessmentMatrix',
       'dashboard',
+      'comments',
+      'questions',
     ],
     interpolation: {
       escapeValue: false,

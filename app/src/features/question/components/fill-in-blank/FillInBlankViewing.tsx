@@ -11,10 +11,6 @@ interface FillInBlankViewingProps {
 export const FillInBlankViewing = ({ question, points }: FillInBlankViewingProps) => {
   return (
     <div className="space-y-2">
-      <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold">Fill In Blank Question</h3>
-        <DifficultyBadge difficulty={question.difficulty} />
-      </div>
       {/* Title */}
       {question.title && (
         <div className="space-y-1">
@@ -56,12 +52,9 @@ export const FillInBlankViewing = ({ question, points }: FillInBlankViewingProps
       </div>
 
       {/* Case Sensitivity */}
-      {question.data.caseSensitive !== undefined && (
-        <div className="bg-muted/50 flex items-center gap-2 rounded-lg border border-gray-300 p-2 dark:border-gray-600">
-          <Label className="text-sm font-medium">Case Sensitive</Label>
-          <Badge variant={question.data.caseSensitive ? 'default' : 'secondary'} className="ml-auto">
-            {question.data.caseSensitive ? 'Yes' : 'No'}
-          </Badge>
+      {question.data.caseSensitive && (
+        <div className="rounded-md border border-amber-200 bg-amber-50 p-2 text-xs text-amber-800 dark:border-amber-800 dark:bg-amber-900/20 dark:text-amber-200">
+          ⚠️ Answers are case-sensitive
         </div>
       )}
 

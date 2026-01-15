@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { MultipleChoiceQuestion, MultipleChoiceAnswer } from '@/features/assignment/types';
 import { MarkdownPreview } from '../shared';
 
@@ -13,6 +14,7 @@ interface MultipleChoiceDoingProps {
   answer?: MultipleChoiceAnswer;
   points?: number; // Optional points for display
   onAnswerChange: (answer: MultipleChoiceAnswer) => void;
+  hideHeader?: boolean; // Hide type label and difficulty badge when used as sub-question
 }
 
 export const MultipleChoiceDoing = ({
@@ -20,7 +22,9 @@ export const MultipleChoiceDoing = ({
   answer,
   points,
   onAnswerChange,
+  hideHeader = false,
 }: MultipleChoiceDoingProps) => {
+  const { t } = useTranslation('questions');
   const [selectedId, setSelectedId] = useState<string>(answer?.selectedOptionId || '');
 
   useEffect(() => {
@@ -38,13 +42,6 @@ export const MultipleChoiceDoing = ({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold">Multiple Choice Question</h3>
-          <DifficultyBadge difficulty={question.difficulty} />
-        </div>
-      </div>
-
       {/* Question Title */}
       <div className="space-y-2">
         <MarkdownPreview content={question.title} />
@@ -60,12 +57,14 @@ export const MultipleChoiceDoing = ({
             <div
               key={option.id}
               className={cn(
-                'flex items-start gap-3 rounded-md border p-3 transition-colors',
-                selectedId === option.id && 'bg-primary/5 border-primary'
+                'hover:border-primary/50 flex items-center gap-3 rounded-md border-2 p-3 transition-colors',
+                selectedId === option.id
+                  ? 'border-primary bg-primary/5'
+                  : 'border-gray-300 dark:border-gray-600'
               )}
             >
-              <RadioGroupItem value={option.id} id={option.id} className="mt-1" />
-              <Label htmlFor={option.id} className="flex-1 cursor-pointer">
+              <RadioGroupItem value={option.id} id={option.id} className="flex-shrink-0" />
+              <Label htmlFor={option.id} className="min-w-0 flex-1 cursor-pointer">
                 <div className="mb-1 font-medium">{String.fromCharCode(65 + index)}</div>
                 <MarkdownPreview content={option.text} />
                 {option.imageUrl && (
@@ -82,7 +81,11 @@ export const MultipleChoiceDoing = ({
       </RadioGroup>
 
       {/* Points */}
-      {points && <p className="text-muted-foreground text-sm">Points: {points}</p>}
+      {points && (
+        <p className="text-muted-foreground text-sm">
+          {t('common.points')}: {points}
+        </p>
+      )}
     </div>
   );
 };

@@ -24,6 +24,9 @@ import type {
 } from '@/types/question-bank';
 import { QUESTION_TYPE, DIFFICULTY, BANK_TYPE } from '@/types/question-bank';
 import { parseQuestionBankCSV, exportQuestionsToCSV } from '@/utils/csvParser';
+import { toBackendQuestion, toFrontendQuestion } from '@/utils/questionMapper';
+import { toBackendDifficulty } from '@/utils/difficultyMapper';
+import { toBackendQuestionType } from '@/utils/questionTypeMapper';
 
 // ============= HELPER FUNCTIONS =============
 const delay = (ms: number = 300) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -228,7 +231,7 @@ let MOCK_QUESTION_BANK: QuestionBankItem[] = [
     explanation: '5 + 3 = 8',
     points: 5,
     subjectCode: 'T',
-    bankType: BANK_TYPE.APPLICATION,
+    bankType: BANK_TYPE.PUBLIC,
     createdAt: '2024-01-15T10:00:00Z',
     updatedAt: '2024-01-15T10:00:00Z',
     createdBy: 'admin',
@@ -247,7 +250,7 @@ let MOCK_QUESTION_BANK: QuestionBankItem[] = [
     explanation: 'The sky appears blue due to the scattering of sunlight by the atmosphere.',
     points: 10,
     subjectCode: 'TA',
-    bankType: BANK_TYPE.APPLICATION,
+    bankType: BANK_TYPE.PUBLIC,
     createdAt: '2024-02-10T09:00:00Z',
     updatedAt: '2024-02-10T09:00:00Z',
     createdBy: 'admin',
@@ -267,7 +270,7 @@ let MOCK_QUESTION_BANK: QuestionBankItem[] = [
     explanation: 'Ghép các số với cách viết bằng chữ.',
     points: 10,
     subjectCode: 'T',
-    bankType: BANK_TYPE.APPLICATION,
+    bankType: BANK_TYPE.PUBLIC,
     createdAt: '2024-03-05T14:00:00Z',
     updatedAt: '2024-03-05T14:00:00Z',
     createdBy: 'admin',
@@ -290,7 +293,7 @@ let MOCK_QUESTION_BANK: QuestionBankItem[] = [
     maxLength: 500,
     points: 15,
     subjectCode: 'TV',
-    bankType: BANK_TYPE.APPLICATION,
+    bankType: BANK_TYPE.PUBLIC,
     createdAt: '2024-04-12T16:30:00Z',
     updatedAt: '2024-04-12T16:30:00Z',
     createdBy: 'admin',
@@ -304,7 +307,7 @@ let MOCK_QUESTION_BANK: QuestionBankItem[] = [
     explanation: 'Thủ đô của Việt Nam là Hà Nội.',
     points: 5,
     subjectCode: 'TV',
-    bankType: BANK_TYPE.APPLICATION,
+    bankType: BANK_TYPE.PUBLIC,
     createdAt: '2024-05-20T10:00:00Z',
     updatedAt: '2024-05-20T10:00:00Z',
     createdBy: 'admin',
@@ -550,18 +553,39 @@ export default class AdminRealApiService implements AdminApiService {
 
   // Question Bank
   async getQuestionBank(params?: QuestionBankParams): Promise<ApiResponse<QuestionBankItem[]>> {
-    // Convert arrays to comma-separated strings for API
+    // Convert arrays to comma-separated strings for API and map frontend values to backend
     const queryParams: any = { ...params };
 
-    if (Array.isArray(params?.difficulty)) {
-      queryParams.difficulty = params.difficulty.join(',');
+    // Map difficulty values (frontend Vietnamese -> backend English)
+    if (params?.difficulty) {
+      if (Array.isArray(params.difficulty)) {
+        queryParams.difficulty = params.difficulty.map(toBackendDifficulty).join(',');
+      } else {
+        queryParams.difficulty = toBackendDifficulty(params.difficulty);
+      }
     }
-    if (Array.isArray(params?.subjectCode)) {
-      queryParams.subjectCode = params.subjectCode.join(',');
+
+    // Map subject code (frontend uses subjectCode, backend uses subject)
+    if (params?.subjectCode) {
+      if (Array.isArray(params.subjectCode)) {
+        queryParams.subject = params.subjectCode.join(',');
+      } else {
+        queryParams.subject = params.subjectCode;
+      }
+      delete queryParams.subjectCode;
     }
-    if (Array.isArray(params?.questionType)) {
-      queryParams.questionType = params.questionType.join(',');
+
+    // Map question type (frontend lowercase -> backend uppercase)
+    if (params?.questionType) {
+      if (Array.isArray(params.questionType)) {
+        queryParams.type = params.questionType.map(toBackendQuestionType).join(',');
+      } else {
+        queryParams.type = toBackendQuestionType(params.questionType);
+      }
+      delete queryParams.questionType;
     }
+
+    // Join grade and chapter arrays
     if (Array.isArray(params?.grade)) {
       queryParams.grade = params.grade.join(',');
     }
@@ -569,30 +593,26 @@ export default class AdminRealApiService implements AdminApiService {
       queryParams.chapter = params.chapter.join(',');
     }
 
-    const response = await api.get<ApiResponse<QuestionBankItem[]>>(`${this.baseUrl}/admin/question-bank`, {
-      params: queryParams,
-    });
-    return response.data;
+    const response = await api.get<ApiResponse<QuestionBankItem[]>>(
+      `${this.baseUrl}/api/admin/questionbank`,
+      {
+        params: queryParams,
+      }
+    );
+
+    // Transform backend questions to frontend format
+    const transformedData = response.data.data?.map(toFrontendQuestion) || [];
+
+    return {
+      ...response.data,
+      data: transformedData,
+    };
   }
 
   // Question Bank Metadata
-  async getQuestionBankSubjects(): Promise<ApiResponse<string[]>> {
-    const response = await api.get<ApiResponse<string[]>>(
-      `${this.baseUrl}/admin/question-bank/metadata/subjects`
-    );
-    return response.data;
-  }
-
-  async getQuestionBankGrades(): Promise<ApiResponse<string[]>> {
-    const response = await api.get<ApiResponse<string[]>>(
-      `${this.baseUrl}/admin/question-bank/metadata/grades`
-    );
-    return response.data;
-  }
-
   async getQuestionBankChapters(subject: string, grade: string): Promise<ApiResponse<string[]>> {
     const response = await api.get<ApiResponse<string[]>>(
-      `${this.baseUrl}/admin/question-bank/metadata/chapters`,
+      `${this.baseUrl}/api/admin/questionbank/metadata/chapters`,
       { params: { subject, grade } }
     );
     return response.data;
@@ -610,7 +630,7 @@ export default class AdminRealApiService implements AdminApiService {
     const newQuestion: QuestionBankItem = {
       ...payload.question,
       id: generateId('q'),
-      bankType: BANK_TYPE.APPLICATION, // Always application type for admin
+      bankType: BANK_TYPE.PUBLIC, // Always application type for admin
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       createdBy: 'admin', // TODO: Get from auth context
@@ -727,7 +747,7 @@ export default class AdminRealApiService implements AdminApiService {
           const newQuestion: QuestionBankItem = {
             ...q,
             id: generateId('q'),
-            bankType: BANK_TYPE.APPLICATION,
+            bankType: BANK_TYPE.PUBLIC,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
             createdBy: 'admin',

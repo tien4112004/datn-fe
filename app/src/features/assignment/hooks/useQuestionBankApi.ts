@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import { useQuestionBankApiService } from '../api/questionBank.index';
 import type {
   QuestionBankFilters,
@@ -17,8 +18,6 @@ export const questionBankKeys = {
   details: () => [...questionBankKeys.all, 'detail'] as const,
   detail: (id: string) => [...questionBankKeys.details(), id] as const,
   metadata: {
-    subjects: ['question-bank', 'metadata', 'subjects'] as const,
-    grades: ['question-bank', 'metadata', 'grades'] as const,
     chapters: (subject: string, grade: string) =>
       ['question-bank', 'metadata', 'chapters', subject, grade] as const,
   },
@@ -56,6 +55,11 @@ export const useCreateQuestion = () => {
     mutationFn: (data: CreateQuestionRequest) => apiService.createQuestion(data.question),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: questionBankKeys.lists() });
+      toast.success('Question created successfully');
+    },
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || 'Failed to create question';
+      toast.error(message);
     },
   });
 };
@@ -71,6 +75,11 @@ export const useUpdateQuestion = () => {
     onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: questionBankKeys.lists() });
       queryClient.invalidateQueries({ queryKey: questionBankKeys.detail(result.id) });
+      toast.success('Question updated successfully');
+    },
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || 'Failed to update question';
+      toast.error(message);
     },
   });
 };
@@ -84,6 +93,11 @@ export const useDeleteQuestion = () => {
     mutationFn: (id: string) => apiService.deleteQuestion(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: questionBankKeys.lists() });
+      toast.success('Question deleted successfully');
+    },
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || 'Failed to delete question';
+      toast.error(message);
     },
   });
 };
@@ -97,6 +111,11 @@ export const useDeleteQuestions = () => {
     mutationFn: (ids: string[]) => apiService.bulkDeleteQuestions(ids),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: questionBankKeys.lists() });
+      toast.success('Questions deleted successfully');
+    },
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || 'Failed to delete questions';
+      toast.error(message);
     },
   });
 };
@@ -110,6 +129,11 @@ export const useDuplicateQuestion = () => {
     mutationFn: (id: string) => apiService.duplicateQuestion(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: questionBankKeys.lists() });
+      toast.success('Question duplicated successfully');
+    },
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || 'Failed to duplicate question';
+      toast.error(message);
     },
   });
 };
@@ -123,6 +147,11 @@ export const useCopyToPersonal = () => {
     mutationFn: (id: string) => apiService.copyToPersonal(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: questionBankKeys.lists() });
+      toast.success('Question copied to personal bank successfully');
+    },
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || 'Failed to copy question to personal bank';
+      toast.error(message);
     },
   });
 };
@@ -133,6 +162,13 @@ export const useExportQuestions = () => {
 
   return useMutation({
     mutationFn: (filters?: QuestionBankFilters) => apiService.exportQuestions(filters),
+    onSuccess: () => {
+      toast.success('Questions exported successfully');
+    },
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || 'Failed to export questions';
+      toast.error(message);
+    },
   });
 };
 
@@ -143,37 +179,18 @@ export const useImportQuestions = () => {
 
   return useMutation({
     mutationFn: (file: File) => apiService.importQuestions(file),
-    onSuccess: () => {
+    onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: questionBankKeys.lists() });
+      toast.success(`Successfully imported ${result.success} questions`);
+    },
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || 'Failed to import questions';
+      toast.error(message);
     },
   });
 };
 
 // ============= QUESTION BANK METADATA =============
-
-// GET all subjects
-export const useQuestionBankSubjects = () => {
-  const apiService = useQuestionBankApiService();
-
-  return useQuery({
-    queryKey: questionBankKeys.metadata.subjects,
-    queryFn: () => apiService.getSubjects(),
-    staleTime: 600000, // 10 minutes
-    gcTime: 1200000, // 20 minutes
-  });
-};
-
-// GET all grades
-export const useQuestionBankGrades = () => {
-  const apiService = useQuestionBankApiService();
-
-  return useQuery({
-    queryKey: questionBankKeys.metadata.grades,
-    queryFn: () => apiService.getGrades(),
-    staleTime: 600000, // 10 minutes
-    gcTime: 1200000, // 20 minutes
-  });
-};
 
 // GET chapters for a subject and grade
 export const useQuestionBankChapters = (subject?: string, grade?: string) => {

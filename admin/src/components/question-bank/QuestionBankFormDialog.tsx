@@ -77,7 +77,7 @@ export function QuestionBankFormDialog({ open, onClose, mode, question }: Questi
           type: formData.type,
           difficulty: formData.difficulty,
           subjectCode: formData.subjectCode,
-          bankType: BANK_TYPE.APPLICATION,
+          bankType: BANK_TYPE.PUBLIC,
           title: formData.title,
           explanation: formData.explanation,
           points: formData.points,

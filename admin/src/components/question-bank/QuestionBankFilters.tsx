@@ -5,9 +5,9 @@ import { Card } from '@/components/ui/card';
 import { X } from 'lucide-react';
 import type { QuestionBankParams } from '@/types/question-bank';
 import { QUESTION_TYPE, DIFFICULTY, DIFFICULTY_LABELS } from '@/types/question-bank';
-import { useQuestionBankSubjects, useQuestionBankGrades, useQuestionBankChapters } from '@/hooks/useApi';
+import { useQuestionBankChapters } from '@/hooks/useApi';
 import { useMemo, useEffect } from 'react';
-import { getSubjectName } from '@aiprimary/core';
+import { getSubjectName, getAllGrades, getAllSubjects } from '@aiprimary/core';
 
 interface QuestionBankFiltersProps {
   filters: QuestionBankParams;
@@ -15,15 +15,15 @@ interface QuestionBankFiltersProps {
 }
 
 export function QuestionBankFilters({ filters, onChange }: QuestionBankFiltersProps) {
-  // Fetch metadata
-  const { data: subjectsData } = useQuestionBankSubjects();
-  const { data: gradesData } = useQuestionBankGrades();
+  // Get subjects and grades from constants
+  const subjects = getAllSubjects().map((s) => s.code);
+  const grades = getAllGrades().map((g) => g.code);
 
   // Conditional chapter fetch
   const shouldFetchChapters = useMemo(() => {
-    const subjects = Array.isArray(filters.subjectCode) ? filters.subjectCode : [];
-    const grades = Array.isArray(filters.grade) ? filters.grade : [];
-    return subjects.length === 1 && grades.length === 1;
+    const subjectsArr = Array.isArray(filters.subjectCode) ? filters.subjectCode : [];
+    const gradesArr = Array.isArray(filters.grade) ? filters.grade : [];
+    return subjectsArr.length === 1 && gradesArr.length === 1;
   }, [filters.subjectCode, filters.grade]);
 
   const { data: chaptersData } = useQuestionBankChapters(
@@ -31,8 +31,6 @@ export function QuestionBankFilters({ filters, onChange }: QuestionBankFiltersPr
     shouldFetchChapters && Array.isArray(filters.grade) ? filters.grade[0] : undefined
   );
 
-  const subjects = subjectsData?.data || [];
-  const grades = gradesData?.data || [];
   const chapters = chaptersData?.data || [];
 
   // Reset chapter filter when subject/grade changes

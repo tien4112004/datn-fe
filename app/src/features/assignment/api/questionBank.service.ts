@@ -5,6 +5,9 @@ import type {
   QuestionBankFilters,
   QuestionBankResponse,
 } from '../types/questionBank';
+import { toBackendQuestion, toFrontendQuestion } from '../utils/questionMapper';
+import { toBackendDifficulty } from '../utils/difficultyMapper';
+import { toBackendQuestionType } from '../utils/questionTypeMapper';
 
 export default class QuestionBankRealApiService implements QuestionBankApiService {
   baseUrl: string;
@@ -14,18 +17,39 @@ export default class QuestionBankRealApiService implements QuestionBankApiServic
   }
 
   async getQuestions(filters?: QuestionBankFilters): Promise<QuestionBankResponse> {
-    // Convert arrays to comma-separated strings for API
+    // Convert arrays to comma-separated strings for API and map frontend values to backend
     const queryParams: any = { ...filters };
 
-    if (Array.isArray(filters?.difficulty)) {
-      queryParams.difficulty = filters.difficulty.join(',');
+    // Map difficulty values (frontend Vietnamese -> backend English)
+    if (filters?.difficulty) {
+      if (Array.isArray(filters.difficulty)) {
+        queryParams.difficulty = filters.difficulty.map(toBackendDifficulty).join(',');
+      } else {
+        queryParams.difficulty = toBackendDifficulty(filters.difficulty);
+      }
     }
-    if (Array.isArray(filters?.subjectCode)) {
-      queryParams.subjectCode = filters.subjectCode.join(',');
+
+    // Map subject code (frontend uses subjectCode, backend uses subject)
+    if (filters?.subjectCode) {
+      if (Array.isArray(filters.subjectCode)) {
+        queryParams.subject = filters.subjectCode.join(',');
+      } else {
+        queryParams.subject = filters.subjectCode;
+      }
+      delete queryParams.subjectCode;
     }
-    if (Array.isArray(filters?.questionType)) {
-      queryParams.questionType = filters.questionType.join(',');
+
+    // Map question type (frontend lowercase -> backend uppercase)
+    if (filters?.questionType) {
+      if (Array.isArray(filters.questionType)) {
+        queryParams.type = filters.questionType.map(toBackendQuestionType).join(',');
+      } else {
+        queryParams.type = toBackendQuestionType(filters.questionType);
+      }
+      delete queryParams.questionType;
     }
+
+    // Join grade and chapter arrays
     if (Array.isArray(filters?.grade)) {
       queryParams.grade = filters.grade.join(',');
     }
@@ -33,27 +57,47 @@ export default class QuestionBankRealApiService implements QuestionBankApiServic
       queryParams.chapter = filters.chapter.join(',');
     }
 
+    // Ensure bankType is set (personal or public)
+    queryParams.bankType = filters?.bankType || 'personal';
+
     const response = await api.get(`${this.baseUrl}/api/question-bank`, {
       params: queryParams,
     });
-    return response.data.data;
+
+    // Unwrap AppResponseDto and transform each question
+    const backendData = response.data.data || [];
+    const pagination = response.data.pagination || {};
+
+    return {
+      questions: backendData.map(toFrontendQuestion),
+      total: pagination.totalItems || 0,
+      page: pagination.currentPage || 1,
+      limit: pagination.pageSize || 10,
+    };
   }
 
   async getQuestionById(id: string): Promise<QuestionBankItem> {
     const response = await api.get(`${this.baseUrl}/api/question-bank/${id}`);
-    return response.data.data;
+    return toFrontendQuestion(response.data.data);
   }
 
   async createQuestion(
     question: Omit<QuestionBankItem, 'id' | 'createdAt' | 'updatedAt'>
   ): Promise<QuestionBankItem> {
-    const response = await api.post(`${this.baseUrl}/api/question-bank`, question);
-    return response.data.data;
+    const backendQuestion = toBackendQuestion(question);
+
+    // Backend expects array for batch create
+    const response = await api.post(`${this.baseUrl}/api/question-bank`, [backendQuestion]);
+
+    // Extract first successful result from BatchCreateQuestionResponseDto
+    const result = response.data.data.successful[0];
+    return toFrontendQuestion(result);
   }
 
   async updateQuestion(id: string, question: Partial<QuestionBankItem>): Promise<QuestionBankItem> {
-    const response = await api.put(`${this.baseUrl}/api/question-bank/${id}`, question);
-    return response.data.data;
+    const backendQuestion = toBackendQuestion(question);
+    const response = await api.put(`${this.baseUrl}/api/question-bank/${id}`, backendQuestion);
+    return toFrontendQuestion(response.data.data);
   }
 
   async deleteQuestion(id: string): Promise<void> {
@@ -88,16 +132,6 @@ export default class QuestionBankRealApiService implements QuestionBankApiServic
     const response = await api.post(`${this.baseUrl}/api/question-bank/import`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
-    return response.data.data;
-  }
-
-  async getSubjects(): Promise<string[]> {
-    const response = await api.get(`${this.baseUrl}/api/question-bank/metadata/subjects`);
-    return response.data.data;
-  }
-
-  async getGrades(): Promise<string[]> {
-    const response = await api.get(`${this.baseUrl}/api/question-bank/metadata/grades`);
     return response.data.data;
   }
 

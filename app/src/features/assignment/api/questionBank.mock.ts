@@ -12,7 +12,7 @@ const createMockQuestion = (id: string, index: number): QuestionBankItem => {
     title: `Sample Question ${index + 1}`,
     points: 10,
     subjectCode: ['T', 'TV', 'TA'][index % 3] as 'T' | 'TV' | 'TA',
-    bankType: (index < 10 ? 'personal' : 'application') as 'personal' | 'application', // First 10 personal, rest application
+    bankType: (index < 10 ? 'personal' : 'public') as 'personal' | 'public', // First 10 personal, rest public
     createdAt: new Date(Date.now() - index * 86400000).toISOString(),
     updatedAt: new Date(Date.now() - index * 86400000).toISOString(),
   };
@@ -290,17 +290,6 @@ export default class QuestionBankMockApiService implements QuestionBankApiServic
     }
 
     return { success, failed };
-  }
-
-  async getSubjects(): Promise<string[]> {
-    // Return unique subjects from mock data
-    const subjects = new Set(this.questions.map((q) => q.subjectCode));
-    return Array.from(subjects);
-  }
-
-  async getGrades(): Promise<string[]> {
-    // Return mock grade data
-    return ['1', '2', '3', '4', '5'];
   }
 
   async getChapters(subject: string, grade: string): Promise<string[]> {

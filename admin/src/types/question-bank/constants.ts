@@ -23,7 +23,7 @@ export type SubjectCode = (typeof SUBJECT_CODE)[keyof typeof SUBJECT_CODE];
 // Question Bank Types
 export const BANK_TYPE = {
   PERSONAL: 'personal', // Teacher's private question bank
-  APPLICATION: 'application', // Shared application-wide question bank
+  PUBLIC: 'public', // Shared application-wide question bank
 } as const;
 
 export type BankType = (typeof BANK_TYPE)[keyof typeof BANK_TYPE];

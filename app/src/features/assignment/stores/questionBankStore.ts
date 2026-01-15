@@ -149,10 +149,18 @@ const useQuestionBankStore = create<QuestionBankStore>()(
       }),
       {
         name: 'question-bank-store',
+        version: 1, // Increment when storage structure changes
         partialize: (state) => ({
           // Only persist filters (not selection or dialog state)
           filters: state.filters,
         }),
+        migrate: (persistedState: any, version: number) => {
+          // Migrate from old 'application' to new 'public'
+          if (version === 0 && persistedState?.filters?.bankType === 'application') {
+            persistedState.filters.bankType = 'public';
+          }
+          return persistedState;
+        },
       }
     ),
     {

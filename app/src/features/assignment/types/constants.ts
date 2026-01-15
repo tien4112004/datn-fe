@@ -18,7 +18,7 @@ export type { SubjectCode } from '@aiprimary/core';
 // Question bank types
 export const BANK_TYPE = {
   PERSONAL: 'personal',
-  APPLICATION: 'application',
+  PUBLIC: 'public',
 } as const;
 
 export type BankType = (typeof BANK_TYPE)[keyof typeof BANK_TYPE];

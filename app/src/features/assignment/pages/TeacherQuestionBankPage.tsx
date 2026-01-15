@@ -35,6 +35,14 @@ import { getSubjectName, getQuestionTypeName, getDifficultyName } from '@aiprima
 
 const columnHelper = createColumnHelper<QuestionBankItem>();
 
+// Feature flags for Phase 2 features (currently not supported by backend)
+const FEATURE_FLAGS = {
+  BULK_OPERATIONS: false, // Bulk delete
+  DUPLICATE: false, // Duplicate question
+  COPY_TO_PERSONAL: false, // Copy application question to personal
+  IMPORT_EXPORT: false, // Import/Export CSV
+};
+
 export function TeacherQuestionBankPage() {
   const { t } = useTranslation(I18N_NAMESPACES.ASSIGNMENT, { keyPrefix: 'teacherQuestionBank' });
   const { t: tCommon } = useTranslation(I18N_NAMESPACES.ASSIGNMENT);
@@ -230,20 +238,24 @@ export function TeacherQuestionBankPage() {
                       <FileEdit className="mr-2 h-4 w-4" />
                       Edit
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleDuplicate(question.id)}>
-                      <Copy className="mr-2 h-4 w-4" />
-                      Duplicate
-                    </DropdownMenuItem>
+                    {FEATURE_FLAGS.DUPLICATE && (
+                      <DropdownMenuItem onClick={() => handleDuplicate(question.id)}>
+                        <Copy className="mr-2 h-4 w-4" />
+                        Duplicate
+                      </DropdownMenuItem>
+                    )}
                     <DropdownMenuItem className="text-destructive" onClick={() => handleDelete(question.id)}>
                       <Trash2 className="mr-2 h-4 w-4" />
                       Delete
                     </DropdownMenuItem>
                   </>
                 ) : (
-                  <DropdownMenuItem onClick={() => handleCopyToPersonal(question)}>
-                    <Copy className="mr-2 h-4 w-4" />
-                    {t('actions.copyToPersonal')}
-                  </DropdownMenuItem>
+                  FEATURE_FLAGS.COPY_TO_PERSONAL && (
+                    <DropdownMenuItem onClick={() => handleCopyToPersonal(question)}>
+                      <Copy className="mr-2 h-4 w-4" />
+                      {t('actions.copyToPersonal')}
+                    </DropdownMenuItem>
+                  )
                 )}
               </DropdownMenuContent>
             </DropdownMenu>
@@ -289,26 +301,30 @@ export function TeacherQuestionBankPage() {
           orientation="horizontal"
           RightComponent={
             <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleExport}
-                disabled={exportMutation.isPending}
-                className="gap-2"
-              >
-                <Download className="h-4 w-4" />
-                {t('actions.export')}
-              </Button>
+              {FEATURE_FLAGS.IMPORT_EXPORT && (
+                <>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleExport}
+                    disabled={exportMutation.isPending}
+                    className="gap-2"
+                  >
+                    <Download className="h-4 w-4" />
+                    {t('actions.export')}
+                  </Button>
 
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setIsImportDialogOpen(true)}
-                className="gap-2"
-              >
-                <Upload className="h-4 w-4" />
-                {t('actions.import')}
-              </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsImportDialogOpen(true)}
+                    className="gap-2"
+                  >
+                    <Upload className="h-4 w-4" />
+                    {t('actions.import')}
+                  </Button>
+                </>
+              )}
 
               <Button size="sm" onClick={() => navigate('/question-bank/create')} className="gap-2">
                 <Plus className="h-4 w-4" />
@@ -321,7 +337,7 @@ export function TeacherQuestionBankPage() {
         {/* Action Bar */}
         <div className="space-y-4">
           {/* Bulk Actions */}
-          {selectedQuestionIds.length > 0 && (
+          {FEATURE_FLAGS.BULK_OPERATIONS && selectedQuestionIds.length > 0 && (
             <div className="bg-muted flex items-center justify-between rounded-md p-3">
               <span className="text-sm font-medium">{selectedQuestionIds.length} question(s) selected</span>
               <Button

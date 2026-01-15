@@ -17,7 +17,7 @@ interface QuestionBankCardProps {
 
 export const QuestionBankCard = ({ question, isSelected, onToggleSelection }: QuestionBankCardProps) => {
   const { t } = useTranslation(I18N_NAMESPACES.ASSIGNMENT);
-  const isApplicationQuestion = question.bankType === BANK_TYPE.APPLICATION;
+  const isPublicQuestion = question.bankType === BANK_TYPE.PUBLIC;
 
   const getSubjectName = (subjectCode: 'T' | 'TV' | 'TA'): string => {
     switch (subjectCode) {
@@ -50,7 +50,7 @@ export const QuestionBankCard = ({ question, isSelected, onToggleSelection }: Qu
           'hover:scale-[1.01] hover:shadow-md',
           'active:scale-[0.99]',
         ],
-        isApplicationQuestion && !isSelected && 'bg-accent/10'
+        isPublicQuestion && !isSelected && 'bg-accent/10'
       )}
       onClick={() => onToggleSelection(question)}
     >
@@ -70,7 +70,7 @@ export const QuestionBankCard = ({ question, isSelected, onToggleSelection }: Qu
                 <h3 className="line-clamp-2 flex-1 text-sm font-medium">
                   {question.title || 'Untitled Question'}
                 </h3>
-                {isApplicationQuestion && (
+                {isPublicQuestion && (
                   <Badge variant="secondary" className="shrink-0 gap-1 text-xs">
                     <Lock className="h-3 w-3" />
                     {t('questionBank.card.applicationBadge')}

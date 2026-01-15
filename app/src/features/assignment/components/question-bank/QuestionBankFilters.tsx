@@ -7,13 +7,16 @@ import { X, Filter, ChevronDown } from 'lucide-react';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 import { QUESTION_TYPE, DIFFICULTY } from '../../types';
 import useQuestionBankStore from '../../stores/questionBankStore';
-import {
-  useQuestionBankSubjects,
-  useQuestionBankGrades,
-  useQuestionBankChapters,
-} from '../../hooks/useQuestionBankApi';
+import { useQuestionBankChapters } from '../../hooks/useQuestionBankApi';
 import { useEffect, useState } from 'react';
-import { getSubjectName, getGradeName, QUESTION_TYPE_LABELS, DIFFICULTY_LABELS } from '@aiprimary/core';
+import {
+  getSubjectName,
+  getGradeName,
+  QUESTION_TYPE_LABELS,
+  DIFFICULTY_LABELS,
+  getAllGrades,
+  getAllSubjects,
+} from '@aiprimary/core';
 import { motion } from 'motion/react';
 
 interface QuestionBankFiltersProps {
@@ -30,9 +33,9 @@ export const QuestionBankFilters = ({
     useQuestionBankStore();
   const [isFiltersOpen, setIsFiltersOpen] = useState(true);
 
-  // Fetch metadata
-  const { data: subjects } = useQuestionBankSubjects();
-  const { data: grades } = useQuestionBankGrades();
+  // Get subjects and grades from constants
+  const subjects = getAllSubjects().map((s) => s.code);
+  const grades = getAllGrades().map((g) => g.code);
 
   // Conditional chapter fetch
   const showChapters = shouldShowChapterFilter();

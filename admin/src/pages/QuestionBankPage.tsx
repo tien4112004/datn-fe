@@ -25,6 +25,13 @@ import { Badge } from '@/components/ui/badge';
 import { Plus, Upload, Download, Search, MoreVertical, Trash2, Copy, FileEdit, Filter } from 'lucide-react';
 import { QUESTION_TYPE_LABELS, DIFFICULTY_LABELS } from '@/types/question-bank';
 
+// Feature flags for Phase 2 features (currently not supported by backend)
+const FEATURE_FLAGS = {
+  BULK_OPERATIONS: false, // Bulk delete
+  DUPLICATE: false, // Duplicate question
+  IMPORT_EXPORT: false, // Import/Export CSV
+};
+
 export function QuestionBankPage() {
   // State
   const [page, setPage] = useState(1);
@@ -144,26 +151,30 @@ export function QuestionBankPage() {
 
                 {/* Actions */}
                 <div className="flex items-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setIsImportDialogOpen(true)}
-                    className="gap-2"
-                  >
-                    <Upload className="h-4 w-4" />
-                    Import
-                  </Button>
+                  {FEATURE_FLAGS.IMPORT_EXPORT && (
+                    <>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setIsImportDialogOpen(true)}
+                        className="gap-2"
+                      >
+                        <Upload className="h-4 w-4" />
+                        Import
+                      </Button>
 
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleExport}
-                    disabled={exportMutation.isPending}
-                    className="gap-2"
-                  >
-                    <Download className="h-4 w-4" />
-                    Export
-                  </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleExport}
+                        disabled={exportMutation.isPending}
+                        className="gap-2"
+                      >
+                        <Download className="h-4 w-4" />
+                        Export
+                      </Button>
+                    </>
+                  )}
 
                   <Button size="sm" onClick={() => setIsCreateDialogOpen(true)} className="gap-2">
                     <Plus className="h-4 w-4" />
@@ -175,7 +186,7 @@ export function QuestionBankPage() {
 
             <CardContent>
               {/* Bulk Actions */}
-              {selectedQuestions.length > 0 && (
+              {FEATURE_FLAGS.BULK_OPERATIONS && selectedQuestions.length > 0 && (
                 <div className="bg-muted mb-4 flex items-center justify-between rounded-md p-3">
                   <span className="text-sm font-medium">{selectedQuestions.length} question(s) selected</span>
                   <Button
@@ -260,10 +271,12 @@ export function QuestionBankPage() {
                                 <FileEdit className="mr-2 h-4 w-4" />
                                 Edit
                               </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handleDuplicate(question.id)}>
-                                <Copy className="mr-2 h-4 w-4" />
-                                Duplicate
-                              </DropdownMenuItem>
+                              {FEATURE_FLAGS.DUPLICATE && (
+                                <DropdownMenuItem onClick={() => handleDuplicate(question.id)}>
+                                  <Copy className="mr-2 h-4 w-4" />
+                                  Duplicate
+                                </DropdownMenuItem>
+                              )}
                               <DropdownMenuItem
                                 className="text-destructive"
                                 onClick={() => handleBulkDelete()}

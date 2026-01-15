@@ -21,7 +21,7 @@ export const questionBankData: QuestionBankItem[] = [
     title: '5 + 3 bằng bao nhiêu?',
     explanation: '5 + 3 = 8',
     subjectCode: 'T',
-    bankType: BANK_TYPE.APPLICATION,
+    bankType: BANK_TYPE.PUBLIC,
     createdAt: new Date().toISOString(),
     data: {
       options: [
@@ -39,7 +39,7 @@ export const questionBankData: QuestionBankItem[] = [
     title: 'Từ nào viết đúng chính tả?',
     explanation: 'Chữ "học" viết đúng chính tả trong tiếng Việt.',
     subjectCode: 'TV',
-    bankType: BANK_TYPE.APPLICATION,
+    bankType: BANK_TYPE.PUBLIC,
     createdAt: new Date().toISOString(),
     data: {
       options: [
@@ -57,7 +57,7 @@ export const questionBankData: QuestionBankItem[] = [
     title: 'What color is the sky?',
     explanation: 'The sky appears blue due to the scattering of sunlight by the atmosphere.',
     subjectCode: 'TA',
-    bankType: BANK_TYPE.APPLICATION,
+    bankType: BANK_TYPE.PUBLIC,
     createdAt: new Date().toISOString(),
     data: {
       options: [
@@ -75,7 +75,7 @@ export const questionBankData: QuestionBankItem[] = [
     title: '12 × 3 bằng bao nhiêu?',
     explanation: '12 nhân với 3 bằng 36.',
     subjectCode: 'T',
-    bankType: BANK_TYPE.APPLICATION,
+    bankType: BANK_TYPE.PUBLIC,
     createdAt: new Date().toISOString(),
     data: {
       options: [
@@ -93,7 +93,7 @@ export const questionBankData: QuestionBankItem[] = [
     title: 'Choose the correct sentence:',
     explanation: 'The correct form is "She goes to school every day" using the third person singular form.',
     subjectCode: 'TA',
-    bankType: BANK_TYPE.APPLICATION,
+    bankType: BANK_TYPE.PUBLIC,
     createdAt: new Date().toISOString(),
     data: {
       options: [
@@ -115,7 +115,7 @@ export const questionBankData: QuestionBankItem[] = [
     title: 'Nối số với chữ số tương ứng',
     explanation: 'Ghép các số với cách viết bằng chữ.',
     subjectCode: 'T',
-    bankType: BANK_TYPE.APPLICATION,
+    bankType: BANK_TYPE.PUBLIC,
     createdAt: new Date().toISOString(),
     data: {
       pairs: [
@@ -132,7 +132,7 @@ export const questionBankData: QuestionBankItem[] = [
     title: 'Match English words with Vietnamese meanings',
     explanation: 'Connect English words with their Vietnamese translations.',
     subjectCode: 'TA',
-    bankType: BANK_TYPE.APPLICATION,
+    bankType: BANK_TYPE.PUBLIC,
     createdAt: new Date().toISOString(),
     data: {
       pairs: [
@@ -150,7 +150,7 @@ export const questionBankData: QuestionBankItem[] = [
     title: 'Nối từ loại với ví dụ',
     explanation: 'Ghép các từ loại trong tiếng Việt với ví dụ tương ứng.',
     subjectCode: 'TV',
-    bankType: BANK_TYPE.APPLICATION,
+    bankType: BANK_TYPE.PUBLIC,
     createdAt: new Date().toISOString(),
     data: {
       pairs: [
@@ -168,7 +168,7 @@ export const questionBankData: QuestionBankItem[] = [
     title: 'Nối phép tính với kết quả',
     explanation: 'Tính toán và ghép các phép tính với kết quả đúng.',
     subjectCode: 'T',
-    bankType: BANK_TYPE.APPLICATION,
+    bankType: BANK_TYPE.PUBLIC,
     createdAt: new Date().toISOString(),
     data: {
       pairs: [
@@ -192,7 +192,7 @@ export const questionBankData: QuestionBankItem[] = [
     explanation:
       'Học sinh nên mô tả các thành viên trong gia đình, công việc và những điều đặc biệt về gia đình.',
     subjectCode: 'TV',
-    bankType: BANK_TYPE.APPLICATION,
+    bankType: BANK_TYPE.PUBLIC,
     createdAt: new Date().toISOString(),
     data: {
       expectedAnswer:
@@ -208,7 +208,7 @@ export const questionBankData: QuestionBankItem[] = [
     explanation:
       'Students should describe the animal, its characteristics, habitat, and explain why they like it.',
     subjectCode: 'TA',
-    bankType: BANK_TYPE.APPLICATION,
+    bankType: BANK_TYPE.PUBLIC,
     createdAt: new Date().toISOString(),
     data: {
       expectedAnswer:
@@ -224,7 +224,7 @@ export const questionBankData: QuestionBankItem[] = [
       'Giải thích cách giải bài toán: "Một cửa hàng có 156 quả cam. Người ta đã bán đi 3/4 số cam. Hỏi còn lại bao nhiêu quả cam?"',
     explanation: 'Học sinh cần trình bày đầy đủ các bước giải và giải thích lý do.',
     subjectCode: 'T',
-    bankType: BANK_TYPE.APPLICATION,
+    bankType: BANK_TYPE.PUBLIC,
     createdAt: new Date().toISOString(),
     data: {
       expectedAnswer:
@@ -243,7 +243,7 @@ export const questionBankData: QuestionBankItem[] = [
     title: 'Điền vào chỗ trống',
     explanation: 'Thủ đô của Việt Nam là Hà Nội.',
     subjectCode: 'TV',
-    bankType: BANK_TYPE.APPLICATION,
+    bankType: BANK_TYPE.PUBLIC,
     createdAt: new Date().toISOString(),
     data: {
       segments: [
@@ -266,7 +266,7 @@ export const questionBankData: QuestionBankItem[] = [
     title: 'Complete the sentence',
     explanation: 'The color of grass is green.',
     subjectCode: 'TA',
-    bankType: BANK_TYPE.APPLICATION,
+    bankType: BANK_TYPE.PUBLIC,
     createdAt: new Date().toISOString(),
     data: {
       segments: [
@@ -289,7 +289,7 @@ export const questionBankData: QuestionBankItem[] = [
     title: 'Điền số thích hợp vào chỗ trống',
     explanation: '5 + 7 = 12',
     subjectCode: 'T',
-    bankType: BANK_TYPE.APPLICATION,
+    bankType: BANK_TYPE.PUBLIC,
     createdAt: new Date().toISOString(),
     data: {
       segments: [
@@ -312,7 +312,7 @@ export const questionBankData: QuestionBankItem[] = [
     title: 'Fill in the blank with the correct form',
     explanation: 'Use "am" with "I" in present tense.',
     subjectCode: 'TA',
-    bankType: BANK_TYPE.APPLICATION,
+    bankType: BANK_TYPE.PUBLIC,
     createdAt: new Date().toISOString(),
     data: {
       segments: [

@@ -26,8 +26,8 @@ export const QuestionBankDialog = ({ open, onOpenChange, onAddQuestions }: Quest
   const { t } = useTranslation(I18N_NAMESPACES.ASSIGNMENT);
   const { selectedQuestions, clearSelection, filters, setFilters } = useQuestionBankStore();
 
-  // Detect if we're in application bank mode
-  const isApplicationBank = filters.bankType === 'application';
+  // Detect if we're in public bank mode
+  const isPublicBank = filters.bankType === 'public';
 
   // Clear selection when dialog closes
   useEffect(() => {
@@ -80,11 +80,11 @@ export const QuestionBankDialog = ({ open, onOpenChange, onAddQuestions }: Quest
         {/* Bank Type Tabs */}
         <Tabs
           value={filters.bankType || 'personal'}
-          onValueChange={(value) => setFilters({ bankType: value as 'personal' | 'application' })}
+          onValueChange={(value) => setFilters({ bankType: value as 'personal' | 'public' })}
         >
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="personal">{t('questionBank.bankTypes.personal')}</TabsTrigger>
-            <TabsTrigger value="application">{t('questionBank.bankTypes.application')}</TabsTrigger>
+            <TabsTrigger value="public">{t('questionBank.bankTypes.application')}</TabsTrigger>
           </TabsList>
         </Tabs>
 
@@ -114,7 +114,7 @@ export const QuestionBankDialog = ({ open, onOpenChange, onAddQuestions }: Quest
             <Button variant="outline" onClick={handleCancel}>
               {t('questionBank.selection.cancel')}
             </Button>
-            {isApplicationBank ? (
+            {isPublicBank ? (
               <Button onClick={handleCopyToPersonal} disabled={selectedQuestions.length === 0}>
                 {t('questionBank.selection.copyToPersonal', { count: selectedQuestions.length })}
               </Button>

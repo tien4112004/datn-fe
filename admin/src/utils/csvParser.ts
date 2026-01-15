@@ -87,7 +87,7 @@ function parseQuestionRow(row: Record<string, string>, rowNumber: number): Quest
     title: row.title,
     difficulty,
     subjectCode,
-    bankType: BANK_TYPE.APPLICATION,
+    bankType: BANK_TYPE.PUBLIC,
     points: row.points ? parseInt(row.points) : 10,
     explanation: row.explanation || undefined,
   };

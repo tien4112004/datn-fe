@@ -120,7 +120,7 @@ export function CommentDrawer({
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
       <SheetContent
         side="right"
-        className="flex w-full flex-col p-0 sm:max-w-lg"
+        className="z-[10000] flex w-full flex-col p-0 sm:max-w-lg"
         aria-describedby={undefined}
       >
         <SheetHeader className="flex-shrink-0 p-6 pb-4">

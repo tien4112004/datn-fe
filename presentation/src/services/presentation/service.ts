@@ -284,7 +284,7 @@ export class PresentationApiService implements ApiService {
    */
   async searchUsers(query: string): Promise<SearchUserApiResponse[]> {
     const response = await api.get<ApiResponse<SearchUserApiResponse[]>>(
-      `${this.baseUrl}/api/users/search?q=${encodeURIComponent(query)}`
+      `${this.baseUrl}/api/users?search=${encodeURIComponent(query)}`
     );
     return response.data.data;
   }

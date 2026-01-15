@@ -8,6 +8,7 @@
 
 <script lang="ts" setup>
 import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { Eye, MessageSquare, Edit } from 'lucide-vue-next';
 
 interface Props {
@@ -19,13 +20,15 @@ const props = withDefaults(defineProps<Props>(), {
   isLoading: false,
 });
 
+const { t } = useI18n();
+
 const badgeConfig = {
-  read: { label: 'Viewer', class: 'permission-badge-read', icon: Eye },
-  comment: { label: 'Commenter', class: 'permission-badge-comment', icon: MessageSquare },
-  edit: { label: 'Editor', class: 'permission-badge-edit', icon: Edit },
+  read: { labelKey: 'header.share.viewer', class: 'permission-badge-read', icon: Eye },
+  comment: { labelKey: 'header.share.commenter', class: 'permission-badge-comment', icon: MessageSquare },
+  edit: { labelKey: 'header.share.editor', class: 'permission-badge-edit', icon: Edit },
 };
 
-const badgeLabel = computed(() => badgeConfig[props.permission].label);
+const badgeLabel = computed(() => t(badgeConfig[props.permission].labelKey));
 const badgeClass = computed(() => badgeConfig[props.permission].class);
 const badgeIcon = computed(() => badgeConfig[props.permission].icon);
 </script>

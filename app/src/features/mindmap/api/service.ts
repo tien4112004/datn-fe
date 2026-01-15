@@ -56,7 +56,6 @@ export default class MindmapServiceImpl implements MindmapApiService {
 
     return mindmap;
   }
-
   async createMindmap(data: MindmapCreateInput): Promise<MindmapResponse> {
     const response = await this.client.post<ApiResponse<MindmapResponse>>(
       `${this.baseUrl}/api/mindmaps`,
@@ -93,6 +92,13 @@ export default class MindmapServiceImpl implements MindmapApiService {
       `${this.baseUrl}/api/mindmaps/generate`,
       request
     );
+    return response.data.data;
+  }
+
+  async searchUsers(query: string): Promise<User[]> {
+    const response = await api.get<ApiResponse<User[]>>(`${this.baseUrl}/api/user/search`, {
+      params: { q: query, limit: 10 },
+    });
     return response.data.data;
   }
 

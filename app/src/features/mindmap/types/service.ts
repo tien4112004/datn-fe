@@ -20,6 +20,7 @@ export interface MindmapApiService extends Service {
   generateMindmap(request: MindmapGenerateRequest): Promise<AiGeneratedNode>;
 
   // Share functionality
+  searchUsers(query: string): Promise<User[]>;
   shareMindmap(id: string, shareData: ShareRequest): Promise<ShareResponse>;
   getSharedUsers(id: string): Promise<SharedUserApiResponse[]>;
   revokeAccess(mindmapId: string, userId: string): Promise<void>;

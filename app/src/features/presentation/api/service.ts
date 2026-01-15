@@ -5,10 +5,10 @@ import {
   type ImageOptions,
   type OutlineData,
 } from '../types';
-import type { SharedUserApiResponse, ShareRequest, ShareResponse } from '../types/share';
+import type { User, SharedUserApiResponse, ShareRequest, ShareResponse } from '../types/share';
+import { splitMarkdownToOutlineItems } from '../utils';
 import { api, API_MODE, type ApiMode } from '@aiprimary/api';
 import { mapPagination, type ApiResponse, type Pagination } from '@aiprimary/api';
-import { parsePermissionHeader } from '../../../shared/utils/permission';
 import type {
   Presentation,
   SlideLayoutSchema,
@@ -16,6 +16,7 @@ import type {
   SlideTheme,
   SlideTemplate,
 } from '@aiprimary/core';
+import { parsePermissionHeader } from '../../../shared/utils/permission';
 
 export default class PresentationRealApiService implements PresentationApiService {
   baseUrl: string;
@@ -228,6 +229,13 @@ export default class PresentationRealApiService implements PresentationApiServic
       createdAt: data?.createdAt,
       updatedAt: data?.updatedAt,
     };
+  }
+
+  async searchUsers(query: string): Promise<User[]> {
+    const response = await api.get<ApiResponse<User[]>>(`${this.baseUrl}/api/user/search`, {
+      params: { q: query, limit: 10 },
+    });
+    return response.data.data;
   }
 
   async sharePresentation(id: string, shareData: ShareRequest): Promise<ShareResponse> {

@@ -104,6 +104,8 @@ export default {
       viewerDescription: 'Chỉ có thể xem',
       commenter: 'Người bình luận',
       commenterDescription: 'Có thể xem và bình luận',
+      editor: 'Người chỉnh sửa',
+      editorDescription: 'Có toàn quyền chỉnh sửa',
       defaultPermissionForAnyone: 'Quyền mặc định cho quyền truy cập "Bất kỳ ai"',
       userAdded: 'Đã thêm người dùng thành công',
       accessRevoked: 'Đã thu hồi quyền truy cập thành công',

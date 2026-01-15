@@ -92,7 +92,7 @@ export function CommentItem({ comment, onEdit, onDelete }: CommentItemProps) {
                         <MoreVertical className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
+                    <DropdownMenuContent align="end" className="z-[10001]">
                       {comment.canEdit && (
                         <DropdownMenuItem onClick={() => setIsEditing(true)}>
                           <Pencil className="mr-2 h-4 w-4" />

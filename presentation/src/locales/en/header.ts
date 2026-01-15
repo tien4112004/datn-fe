@@ -104,6 +104,8 @@ export default {
       viewerDescription: 'Can view only',
       commenter: 'Commenter',
       commenterDescription: 'Can view and comment',
+      editor: 'Editor',
+      editorDescription: 'Full editing access',
       defaultPermissionForAnyone: 'Default permission for "Anyone" access',
       userAdded: 'User added successfully',
       accessRevoked: 'Access revoked successfully',

@@ -392,8 +392,9 @@ let searchTimeout: NodeJS.Timeout | null = null;
 watch(searchQuery, async () => {
   if (searchTimeout) clearTimeout(searchTimeout);
 
-  if (!searchQuery.value.trim()) {
+  if (!searchQuery.value.trim() || searchQuery.value.trim().length < 3) {
     searchResults.value = [];
+    isSearching.value = false;
     return;
   }
 

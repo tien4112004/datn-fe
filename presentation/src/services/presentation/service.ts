@@ -1,5 +1,5 @@
 import { api, webViewApi } from '@aiprimary/api';
-import type { ApiResponse, StreamableAxiosInstance } from '@aiprimary/api';
+import type { ApiResponse, ApiClient } from '@aiprimary/api';
 import type {
   PresentationGenerationRequest,
   PresentationGenerationStartResponse,
@@ -20,9 +20,9 @@ const BASE_URL = getBackendUrl();
 
 export class PresentationApiService implements ApiService {
   baseUrl: string;
-  private apiClient: StreamableAxiosInstance;
+  private apiClient: ApiClient;
 
-  constructor(baseUrl: string = BASE_URL, apiClient: StreamableAxiosInstance = api) {
+  constructor(baseUrl: string = BASE_URL, apiClient: ApiClient = api) {
     this.baseUrl = baseUrl;
     this.apiClient = apiClient;
   }

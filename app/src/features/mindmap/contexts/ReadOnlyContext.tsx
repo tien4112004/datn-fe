@@ -2,18 +2,33 @@ import { createContext, useContext, type ReactNode } from 'react';
 
 interface PresenterContextValue {
   isPresenterMode: boolean;
+  isViewMode: boolean;
+  isReadOnly: boolean;
 }
 
-const PresenterContext = createContext<PresenterContextValue>({ isPresenterMode: false });
+const PresenterContext = createContext<PresenterContextValue>({
+  isPresenterMode: false,
+  isViewMode: false,
+  isReadOnly: false,
+});
 
 export const PresenterProvider = ({
   children,
   isPresenterMode,
+  isViewMode = false,
 }: {
   children: ReactNode;
   isPresenterMode: boolean;
+  isViewMode?: boolean;
 }) => {
-  return <PresenterContext.Provider value={{ isPresenterMode }}>{children}</PresenterContext.Provider>;
+  // Combined read-only state: true if either presenter mode OR view mode is active
+  const isReadOnly = isPresenterMode || isViewMode;
+
+  return (
+    <PresenterContext.Provider value={{ isPresenterMode, isViewMode, isReadOnly }}>
+      {children}
+    </PresenterContext.Provider>
+  );
 };
 
 export const usePresenterContext = () => {
@@ -26,6 +41,6 @@ export const ReadOnlyProvider = ({ children, isReadOnly }: { children: ReactNode
 );
 
 export const useReadOnlyContext = () => {
-  const { isPresenterMode } = usePresenterContext();
-  return { isReadOnly: isPresenterMode } as const;
+  const { isReadOnly } = usePresenterContext();
+  return { isReadOnly } as const;
 };

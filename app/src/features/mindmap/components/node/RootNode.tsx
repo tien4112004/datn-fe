@@ -19,7 +19,7 @@ import { NodeRichTextContent } from '../ui/node-rich-text-content';
 const RootNodeBlock = memo(
   ({ ...node }: NodeProps<RootNode>) => {
     const { data, selected: isSelected, dragging, width, height } = node;
-    const { isPresenterMode } = usePresenterContext();
+    const { isReadOnly } = usePresenterContext();
 
     // Root node IS the tree root, can directly look up its own layoutType
     const layoutType = useCoreStore((state) => state.rootLayoutTypeMap.get(node.id) || DEFAULT_LAYOUT_TYPE);
@@ -80,7 +80,7 @@ const RootNodeBlock = memo(
             isLayouting={isLayouting}
             onContentChange={handleContentChange}
             minimalToolbar={true}
-            isPresenterMode={isPresenterMode}
+            isPresenterMode={isReadOnly}
             style={{
               width: width ? `${width - 40}px` : undefined,
               height: height ? `${height - 16}px` : undefined,
@@ -90,7 +90,7 @@ const RootNodeBlock = memo(
           />
         </BaseNodeContent>
 
-        {!isPresenterMode && (
+        {!isReadOnly && (
           <BaseNodeControl
             layoutType={layoutType}
             selected={isSelected}

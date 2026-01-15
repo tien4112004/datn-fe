@@ -35,6 +35,25 @@ export interface RevokeAccessRequest {
   targetUserId: string;
 }
 
+// Public access types
+export interface PublicAccessRequest {
+  isPublic: boolean;
+  publicPermission: 'read' | 'comment';
+}
+
+export interface PublicAccessResponse {
+  documentId: string;
+  isPublic: boolean;
+  publicPermission: 'read' | 'comment';
+}
+
+// Share state response (optimized single call)
+export interface ShareStateResponse {
+  sharedUsers: SharedUserApiResponse[];
+  publicAccess: PublicAccessResponse;
+  currentUserPermission: 'read' | 'comment' | 'edit';
+}
+
 export type PermissionLevel = 'Viewer' | 'Commenter';
 
 export interface ShareDialogData {

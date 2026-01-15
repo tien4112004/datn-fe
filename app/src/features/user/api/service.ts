@@ -55,8 +55,11 @@ export default class UserProfileRealApiService implements UserProfileApiService 
   }
 
   async searchUsers(query: string): Promise<User[]> {
-    const response = await api.get<ApiResponse<User[]>>(`${this.baseUrl}/api/user/search`, {
-      params: { q: query, limit: 10 },
+    const response = await api.get<ApiResponse<User[]>>(`${this.baseUrl}/api/users`, {
+      params: {
+        search: query,
+        pageSize: 20,
+      },
     });
     return response.data.data;
   }

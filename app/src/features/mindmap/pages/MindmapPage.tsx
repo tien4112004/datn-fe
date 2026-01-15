@@ -1,7 +1,7 @@
 import { ReactFlowProvider } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { Background, BackgroundVariant, MiniMap } from '@xyflow/react';
-import { PanelRight, PanelRightOpen, Sliders, X } from 'lucide-react';
+import { PanelRight, PanelRightOpen, Sliders, X, MessageSquare } from 'lucide-react';
 import {
   Flow,
   LogicHandler,
@@ -16,6 +16,7 @@ import { useCoreStore, usePresenterModeStore, useViewModeStore } from '../stores
 import { useMindmapDirtyTracking } from '../hooks/useDirtyTracking';
 import { useFullscreen } from '../hooks/useFullscreen';
 import { usePresenterMode } from '../hooks/usePresenterMode';
+import { useCommentDrawerTrigger } from '../hooks/useCommentDrawer';
 import { useUnsavedChangesBlocker, useResponsiveBreakpoint } from '@/shared/hooks';
 import { useSidebar } from '@/shared/components/ui/sidebar';
 import { useIsMobile } from '@/shared/hooks/use-mobile';
@@ -24,6 +25,7 @@ import { UnsavedChangesDialog } from '@/shared/components/modals/UnsavedChangesD
 import { SmallScreenDialog } from '@/shared/components/modals/SmallScreenDialog';
 import GlobalSpinner from '@/shared/components/common/GlobalSpinner';
 import { useSavingStore } from '../stores/saving';
+import { CommentDrawer } from '@/features/comments';
 import type { Mindmap, MindMapNode } from '../types';
 import { MINDMAP_TYPES } from '../types';
 
@@ -74,6 +76,7 @@ const MindmapPage = () => {
   const [isPanOnDrag, setIsPanOnDrag] = useState(false);
   const [isToolbarVisible, setIsToolbarVisible] = useState(isDesktop);
   const [isControlsExpanded, setIsControlsExpanded] = useState(false);
+  const [isCommentDrawerOpen, setIsCommentDrawerOpen] = useState(false);
 
   // Track dirty state changes
   useMindmapDirtyTracking();
@@ -93,6 +96,12 @@ const MindmapPage = () => {
   const isViewMode = useViewModeStore((state) => state.isViewMode);
   const setViewMode = useViewModeStore((state) => state.setViewMode);
 
+  // Permission state
+  const userPermission = mindmap?.permission;
+
+  // Listen for comment drawer open requests
+  useCommentDrawerTrigger(() => setIsCommentDrawerOpen(true));
+
   // Handle unsaved changes blocking
   const { showDialog, setShowDialog, handleStay, handleProceed } = useUnsavedChangesBlocker({
     eventName: 'app.mindmap.dirty-state-changed',
@@ -108,12 +117,18 @@ const MindmapPage = () => {
     setPresenterModeStore(isPresenterMode);
   }, [isPresenterMode, setPresenterModeStore]);
 
-  // Set View Mode based on URL search params
-  // When ?view is present in the URL, enable view-only mode
+  // Set View Mode based on URL search params and user permission
+  // - read permission: always 'view' (read-only)
+  // - comment permission: always 'view' (can view and comment, but not edit)
+  // - edit permission: respects ?view parameter toggle
+  // - undefined permission: respects ?view parameter (default behavior)
   useEffect(() => {
-    const isViewMode = searchParams.has('view');
-    setViewMode(isViewMode);
-  }, [searchParams, setViewMode]);
+    const isViewModeParam = searchParams.has('view');
+    // Force view mode if user has read or comment permission
+    const shouldBeViewMode =
+      userPermission === 'read' || userPermission === 'comment' ? true : isViewModeParam;
+    setViewMode(shouldBeViewMode);
+  }, [searchParams, setViewMode, userPermission]);
 
   // Sync mindmap data from React Router loader to stores
   useEffect(() => {
@@ -133,9 +148,9 @@ const MindmapPage = () => {
   return (
     <>
       <ReactFlowProvider>
-        <PresenterProvider isPresenterMode={isPresenterMode}>
+        <PresenterProvider isPresenterMode={isPresenterMode} isViewMode={isViewMode}>
           <div className="flex h-screen w-full" style={{ backgroundColor: 'var(--background)' }}>
-            <Flow isPanOnDrag={isPanOnDrag} isPresenterMode={isPresenterMode}>
+            <Flow isPanOnDrag={isPanOnDrag} isPresenterMode={isPresenterMode} isViewMode={isViewMode}>
               {/* Breadcrumb Header */}
               <MindmapBreadcrumbHeader
                 mindmapId={mindmap.id}
@@ -157,52 +172,76 @@ const MindmapPage = () => {
                   />
                 </div>
               ) : (
-                // Mobile: Expandable controls with toggle button
-                <div className="fixed bottom-4 left-4 z-10 flex flex-col items-start">
-                  {/* Controls container with animation - expands upward */}
-                  <div
-                    className={`origin-bottom transition-all duration-300 ease-in-out ${
-                      isControlsExpanded
-                        ? 'scale-y-100 opacity-100'
-                        : 'pointer-events-none scale-y-0 opacity-0'
-                    }`}
-                  >
-                    <div className="mb-2">
-                      <MindmapControls
-                        isPanOnDrag={isPanOnDrag}
-                        isPresenterMode={isPresenterMode}
-                        isFullscreen={isFullscreen}
-                        onTogglePanOnDrag={togglePanOnDrag}
-                        onToggleFullscreen={toggleFullscreenMode}
-                        onTogglePresenterMode={togglePresenterMode}
-                      />
+                !isPresenterMode && (
+                  // Mobile: Expandable controls with toggle button
+                  <div className="fixed bottom-4 left-4 z-10 flex flex-col items-start">
+                    {/* Controls container with animation - expands upward */}
+                    <div
+                      className={`origin-bottom transition-all duration-300 ease-in-out ${
+                        isControlsExpanded
+                          ? 'scale-y-100 opacity-100'
+                          : 'pointer-events-none scale-y-0 opacity-0'
+                      }`}
+                    >
+                      <div className="mb-2">
+                        <MindmapControls
+                          isPanOnDrag={isPanOnDrag}
+                          isPresenterMode={isPresenterMode}
+                          isFullscreen={isFullscreen}
+                          onTogglePanOnDrag={togglePanOnDrag}
+                          onToggleFullscreen={toggleFullscreenMode}
+                          onTogglePresenterMode={togglePresenterMode}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Action buttons - always at the bottom */}
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={() => setIsCommentDrawerOpen(true)}
+                        variant="outline"
+                        size="icon"
+                        className="touch-manipulation shadow-md"
+                        title="Comments"
+                      >
+                        <MessageSquare size={18} />
+                      </Button>
+                      <Button
+                        onClick={() => setIsControlsExpanded(!isControlsExpanded)}
+                        variant="outline"
+                        size="icon"
+                        className="touch-manipulation shadow-md"
+                        title={isControlsExpanded ? 'Hide Controls' : 'Show Controls'}
+                      >
+                        {isControlsExpanded ? <X size={18} /> : <Sliders size={18} />}
+                      </Button>
                     </div>
                   </div>
-
-                  {/* Toggle button - always at the bottom */}
-                  <Button
-                    onClick={() => setIsControlsExpanded(!isControlsExpanded)}
-                    variant="outline"
-                    size="icon"
-                    className="touch-manipulation shadow-md"
-                    title={isControlsExpanded ? 'Hide Controls' : 'Show Controls'}
-                  >
-                    {isControlsExpanded ? <X size={18} /> : <Sliders size={18} />}
-                  </Button>
-                </div>
+                )
               )}
 
-              {!isPresenterMode && !isViewMode && (
+              {!isPresenterMode && (
                 <div className={`right-4 top-4 z-10 flex gap-2 ${isMobile ? 'fixed' : 'absolute'}`}>
                   <Button
-                    onClick={() => setIsToolbarVisible(!isToolbarVisible)}
-                    title={isToolbarVisible ? 'Hide Toolbar' : 'Show Toolbar'}
+                    onClick={() => setIsCommentDrawerOpen(true)}
+                    title="Comments"
                     variant="outline"
                     size="icon"
                     className="touch-manipulation shadow-md"
                   >
-                    {isToolbarVisible ? <PanelRightOpen size={18} /> : <PanelRight size={18} />}
+                    <MessageSquare size={18} />
                   </Button>
+                  {!isViewMode && (
+                    <Button
+                      onClick={() => setIsToolbarVisible(!isToolbarVisible)}
+                      title={isToolbarVisible ? 'Hide Toolbar' : 'Show Toolbar'}
+                      variant="outline"
+                      size="icon"
+                      className="touch-manipulation shadow-md"
+                    >
+                      {isToolbarVisible ? <PanelRightOpen size={18} /> : <PanelRight size={18} />}
+                    </Button>
+                  )}
                 </div>
               )}
 
@@ -258,6 +297,16 @@ const MindmapPage = () => {
           </div>
         </PresenterProvider>
       </ReactFlowProvider>
+
+      {/* Comment Drawer - Triggered via 'app.mindmap.open-comments' event or button click */}
+      <CommentDrawer
+        isOpen={isCommentDrawerOpen}
+        onOpenChange={setIsCommentDrawerOpen}
+        documentId={mindmap.id}
+        documentType="mindmap"
+        userPermission={userPermission || 'read'}
+      />
+
       <UnsavedChangesDialog
         open={showDialog}
         onOpenChange={setShowDialog}

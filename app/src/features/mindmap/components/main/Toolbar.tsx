@@ -1,4 +1,4 @@
-import { GitBranchPlus, Undo, Redo, Save, Sparkles, Download, Share2, MessageSquare } from 'lucide-react';
+import { GitBranchPlus, Undo, Redo, Save, Sparkles, Download, Share2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/shared/components/ui/tabs';
 import { useUndoRedoStore, useNodeOperationsStore } from '../../stores';
@@ -226,19 +226,6 @@ const Toolbar = ({
                   Share
                 </Button>
               )}
-              <Button
-                variant="outline"
-                onClick={() => setIsCommentDrawerOpen(true)}
-                className={cn(
-                  'w-full transition-colors hover:border-purple-300 hover:bg-purple-50 hover:text-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500',
-                  isMobileSheet && 'h-11 min-h-[44px] text-base'
-                )}
-                size="sm"
-                title="Comments"
-              >
-                <MessageSquare size={isMobileSheet ? 20 : 16} />
-                Comments
-              </Button>
             </div>
           </div>
         </TabsContent>

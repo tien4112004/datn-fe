@@ -57,7 +57,7 @@ export const ChildNodeControls = ({ node, selected }: ChildNodeControlsProps) =>
     selected,
   });
 
-  const { isPresenterMode } = usePresenterContext();
+  const { isReadOnly } = usePresenterContext();
   const { collapse, expand } = useNodeManipulationStore(useShallow(nodeManipulationSelector));
   const { hasLeftChildren, hasRightChildren } = useCoreStore(useShallow(coreStoreSelector));
   const addChildNodeStore = useNodeOperationsStore(nodeOperationsSelector);
@@ -178,7 +178,7 @@ export const ChildNodeControls = ({ node, selected }: ChildNodeControlsProps) =>
               : 'invisible opacity-0'
           )}
         >
-          {!isPresenterMode && (
+          {!isReadOnly && (
             <Button
               variant="secondary"
               className={cn('cursor-pointer rounded-full transition-all duration-200')}
@@ -248,7 +248,7 @@ export const ChildNodeControls = ({ node, selected }: ChildNodeControlsProps) =>
               <Minus />
             </Button>
           </motion.div>
-          {!isPresenterMode && (
+          {!isReadOnly && (
             <Button
               variant="secondary"
               className={cn('cursor-pointer rounded-full transition-all duration-200')}
@@ -273,7 +273,7 @@ export const ChildNodeControls = ({ node, selected }: ChildNodeControlsProps) =>
               : 'invisible opacity-0'
           )}
         >
-          {!isPresenterMode && (
+          {!isReadOnly && (
             <Button
               variant="secondary"
               className={cn('cursor-pointer rounded-full transition-all duration-200')}
@@ -343,7 +343,7 @@ export const ChildNodeControls = ({ node, selected }: ChildNodeControlsProps) =>
               <Minus />
             </Button>
           </motion.div>
-          {!isPresenterMode && (
+          {!isReadOnly && (
             <Button
               variant="secondary"
               className={cn('cursor-pointer rounded-full transition-all duration-200')}

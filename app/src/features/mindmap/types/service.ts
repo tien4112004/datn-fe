@@ -1,7 +1,15 @@
 import type { Service } from '@/shared/api';
 import type { ApiResponse } from '@aiprimary/api';
 import type { Mindmap, AiGeneratedNode, MindMapNode, MindMapEdge, MindmapMetadata } from './mindmap';
-import type { User, SharedUserApiResponse, ShareRequest, ShareResponse } from './share';
+import type {
+  User,
+  SharedUserApiResponse,
+  ShareRequest,
+  ShareResponse,
+  PublicAccessRequest,
+  PublicAccessResponse,
+  ShareStateResponse,
+} from './share';
 
 export interface MindmapCollectionRequest {
   page?: number;
@@ -24,6 +32,13 @@ export interface MindmapApiService extends Service {
   shareMindmap(id: string, shareData: ShareRequest): Promise<ShareResponse>;
   getSharedUsers(id: string): Promise<SharedUserApiResponse[]>;
   revokeAccess(mindmapId: string, userId: string): Promise<void>;
+
+  // Public access methods
+  setPublicAccess(mindmapId: string, request: PublicAccessRequest): Promise<PublicAccessResponse>;
+  getPublicAccessStatus(mindmapId: string): Promise<PublicAccessResponse>;
+
+  // Optimized single-call initialization
+  getShareState(mindmapId: string): Promise<ShareStateResponse>;
 }
 
 /**

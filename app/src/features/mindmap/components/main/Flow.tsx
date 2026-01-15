@@ -8,7 +8,6 @@ import ShapeNodeBlock from '../node/ShapeNode';
 import TextNodeBlock from '../node/TextNode';
 import ImageNodeBlock from '../node/ImageNode';
 import { useCoreStore } from '../../stores';
-import { useWhyDidYouUpdate } from '@/shared/hooks/use-debug';
 
 /**
  * @deprecated ShapeNodeBlock and ImageNodeBlock are deprecated and will be removed in a future version.
@@ -40,25 +39,19 @@ const Flow = memo(
     children,
     isPanOnDrag,
     isPresenterMode = false,
+    isViewMode = false,
   }: {
     children: ReactNode;
     isPanOnDrag: boolean;
     isPresenterMode?: boolean;
+    isViewMode?: boolean;
   }) => {
     const { nodes, edges, onNodesChange, onEdgesChange, onConnect } = useCoreStore(
       useShallow(handlersSelector)
     );
 
-    // Debug: Track why Flow component rerenders (causes full page rerender)
-    useWhyDidYouUpdate('Flow (MAIN COMPONENT)', {
-      nodesLength: nodes.length,
-      edgesLength: edges.length,
-      isPanOnDrag,
-      isPresenterMode,
-      onNodesChange,
-      onEdgesChange,
-      onConnect,
-    });
+    // Combined read-only state: true if either presenter mode OR view mode is active
+    const isReadOnly = isPresenterMode || isViewMode;
 
     const {
       onNodeDragStart,
@@ -99,8 +92,8 @@ const Flow = memo(
         selectionOnDrag={!isPanOnDrag}
         selectNodesOnDrag={false}
         selectionKeyCode={isPanOnDrag ? 'Shift' : null}
-        nodesDraggable={!isPresenterMode}
-        nodesConnectable={!isPresenterMode}
+        nodesDraggable={!isReadOnly}
+        nodesConnectable={!isReadOnly}
         fitViewOnInit={false}
       >
         {children}

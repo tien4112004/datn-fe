@@ -9,9 +9,17 @@ import {
   type AiGeneratedNode,
   type MindmapGenerateRequest,
 } from '../types';
-import type { SharedUserApiResponse, ShareRequest, ShareResponse } from '../types/share';
+import type {
+  SharedUserApiResponse,
+  ShareRequest,
+  ShareResponse,
+  PublicAccessRequest,
+  PublicAccessResponse,
+  ShareStateResponse,
+} from '../types/share';
 import { mapPagination, type ApiResponse, type Pagination } from '@aiprimary/api';
 import { parsePermissionHeader } from '../../../shared/utils/permission';
+import type { User } from '@/features/user/types';
 
 export default class MindmapServiceImpl implements MindmapApiService {
   baseUrl: string;
@@ -96,8 +104,8 @@ export default class MindmapServiceImpl implements MindmapApiService {
   }
 
   async searchUsers(query: string): Promise<User[]> {
-    const response = await api.get<ApiResponse<User[]>>(`${this.baseUrl}/api/user/search`, {
-      params: { q: query, limit: 10 },
+    const response = await this.client.get<ApiResponse<User[]>>(`${this.baseUrl}/api/users`, {
+      params: { search: query, pageSize: 20 },
     });
     return response.data.data;
   }
@@ -121,5 +129,27 @@ export default class MindmapServiceImpl implements MindmapApiService {
     await this.client.post(`${this.baseUrl}/api/resources/${mindmapId}/revoke`, {
       targetUserId: userId,
     });
+  }
+
+  async setPublicAccess(mindmapId: string, request: PublicAccessRequest): Promise<PublicAccessResponse> {
+    const response = await this.client.put<ApiResponse<PublicAccessResponse>>(
+      `${this.baseUrl}/api/resources/${mindmapId}/public-access`,
+      request
+    );
+    return response.data.data;
+  }
+
+  async getPublicAccessStatus(mindmapId: string): Promise<PublicAccessResponse> {
+    const response = await this.client.get<ApiResponse<PublicAccessResponse>>(
+      `${this.baseUrl}/api/resources/${mindmapId}/public-access`
+    );
+    return response.data.data;
+  }
+
+  async getShareState(mindmapId: string): Promise<ShareStateResponse> {
+    const response = await this.client.get<ApiResponse<ShareStateResponse>>(
+      `${this.baseUrl}/api/resources/${mindmapId}/share-state`
+    );
+    return response.data.data;
   }
 }

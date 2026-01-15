@@ -28,7 +28,7 @@ const TextNodeBlock = memo(
       height,
     });
 
-    const { isPresenterMode } = usePresenterContext();
+    const { isReadOnly } = usePresenterContext();
 
     const nodes = useCoreStore((state) => state.nodes);
     const isLayouting = useLayoutStore((state) => state.isLayouting);
@@ -71,7 +71,7 @@ const TextNodeBlock = memo(
             isLayouting={isLayouting}
             onContentChange={handleContentChange}
             minimalToolbar={true}
-            isPresenterMode={isPresenterMode}
+            isPresenterMode={isReadOnly}
             style={{
               width: width ? `${width - 40}px` : undefined,
               height: height ? `${height - 16}px` : undefined,
@@ -81,7 +81,7 @@ const TextNodeBlock = memo(
           />
         </BaseNodeContent>
 
-        {!isPresenterMode && (
+        {!isReadOnly && (
           <BaseNodeControl
             layoutType={layoutType}
             selected={isSelected}

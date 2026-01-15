@@ -2,17 +2,17 @@ import axios, { type AxiosInstance } from 'axios';
 import { CriticalError, ExpectedError } from './types/errors';
 import { ERROR_TYPE } from './constants/errors';
 
-export interface StreamableAxiosInstance extends AxiosInstance {
+export interface ApiClient extends AxiosInstance {
   stream: (url: string, request: any, signal: AbortSignal) => Promise<Response>;
 }
 
-const api: StreamableAxiosInstance = axios.create({
+const api: ApiClient = axios.create({
   allowAbsoluteUrls: true,
   withCredentials: true, // Enable sending cookies with requests (HttpOnly cookies contain auth tokens)
   headers: {
     'Content-Type': 'application/json',
   },
-}) as StreamableAxiosInstance;
+}) as ApiClient;
 
 api.stream = async function (url: string, request: any, signal: AbortSignal) {
   try {

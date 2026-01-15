@@ -1,52 +1,21 @@
 import { ReactFlowProvider } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { Background, BackgroundVariant, MiniMap } from '@xyflow/react';
+import { PanelRight, PanelRightOpen } from 'lucide-react';
 import { Flow, LogicHandler, Toolbar, MindmapControls } from '@/features/mindmap/components';
+import { Button } from '@/components/ui/button';
 import { useState, useEffect } from 'react';
 import { useLoaderData } from 'react-router-dom';
 import { useCoreStore, useViewModeStore } from '../stores';
 import { useFullscreen } from '../hooks/useFullscreen';
-import { useResponsiveBreakpoint } from '@/shared/hooks';
-import { useIsMobile } from '@/shared/hooks/use-mobile';
 import { PresenterProvider } from '../contexts/ReadOnlyContext';
-import type { Mindmap, MindMapNode } from '../types';
-import { MINDMAP_TYPES } from '../types';
+import type { Mindmap } from '../types';
 
 /**
  * Migrate layout data from mindmap metadata to root nodes.
  * This ensures backward compatibility with mindmaps that stored layout data globally.
  */
-const migrateLayoutDataToRootNodes = (
-  nodes: MindMapNode[],
-  metadata?: Mindmap['metadata']
-): MindMapNode[] => {
-  if (!metadata) return nodes;
-
-  const { layoutType, forceLayout } = metadata;
-
-  // If no layout data in metadata, return nodes as-is
-  if (!layoutType && forceLayout === undefined) return nodes;
-
-  // Apply layout data to all root nodes that don't have it set
-  return nodes.map((node) => {
-    if (node.type !== MINDMAP_TYPES.ROOT_NODE) return node;
-
-    const rootNode = node;
-    const needsLayoutType = layoutType && !rootNode.data.layoutType;
-    const needsForceLayout = forceLayout !== undefined && rootNode.data.forceLayout === undefined;
-
-    if (!needsLayoutType && !needsForceLayout) return node;
-
-    return {
-      ...rootNode,
-      data: {
-        ...rootNode.data,
-        ...(needsLayoutType && { layoutType }),
-        ...(needsForceLayout && { forceLayout }),
-      },
-    };
-  });
-};
+import { migrateLayoutDataToRootNodes } from '../utils/layoutUtils';
 
 /**
  * MindmapEmbedPage - Public mindmap viewer for webview embedding.
@@ -65,8 +34,6 @@ const MindmapEmbedPage = () => {
   const { mindmap } = useLoaderData() as { mindmap: Mindmap };
   const setNodes = useCoreStore((state) => state.setNodes);
   const setEdges = useCoreStore((state) => state.setEdges);
-  const { isDesktop } = useResponsiveBreakpoint();
-  const isMobile = useIsMobile();
   const setViewMode = useViewModeStore((state) => state.setViewMode);
 
   const [isPanOnDrag, setIsPanOnDrag] = useState(false);
@@ -90,6 +57,8 @@ const MindmapEmbedPage = () => {
     }
   }, [mindmap, setNodes, setEdges]);
 
+  const [isToolbarVisible, setIsToolbarVisible] = useState(false);
+
   const togglePanOnDrag = () => {
     setIsPanOnDrag(!isPanOnDrag);
   };
@@ -97,21 +66,34 @@ const MindmapEmbedPage = () => {
   return (
     <ReactFlowProvider>
       <PresenterProvider isPresenterMode={false}>
-        <div className="flex h-screen w-full" style={{ backgroundColor: 'var(--background)' }}>
-          <Flow isPanOnDrag={isPanOnDrag} isPresenterMode={false}>
-            {/* Controls - simplified for embed */}
-            {isDesktop && (
-              <div className={`bottom-4 left-4 z-10 ${isMobile ? 'fixed' : 'absolute'}`}>
-                <MindmapControls
-                  isPanOnDrag={isPanOnDrag}
-                  isPresenterMode={false}
-                  isFullscreen={isFullscreen}
-                  onTogglePanOnDrag={togglePanOnDrag}
-                  onToggleFullscreen={toggleFullscreenMode}
-                  onTogglePresenterMode={() => {}} // No-op for embed (view-only)
-                />
-              </div>
-            )}
+        <div
+          className="fixed inset-0 flex h-full w-full overflow-hidden"
+          style={{ backgroundColor: 'var(--background)', touchAction: 'none' }}
+        >
+          <Flow isPanOnDrag={true} isPresenterMode={false}>
+            {/* Controls */}
+            <div className={`fixed bottom-4 left-4 z-10`}>
+              <MindmapControls
+                isPanOnDrag={true}
+                isPresenterMode={false}
+                isFullscreen={isFullscreen}
+                onTogglePanOnDrag={togglePanOnDrag}
+                onToggleFullscreen={toggleFullscreenMode}
+                onTogglePresenterMode={() => {}} // No-op for embed (view-only)
+              />
+            </div>
+
+            <div className={`fixed right-4 top-4 z-10 flex gap-2`}>
+              <Button
+                onClick={() => setIsToolbarVisible(!isToolbarVisible)}
+                title={isToolbarVisible ? 'Hide Toolbar' : 'Show Toolbar'}
+                variant="outline"
+                size="icon"
+                className="touch-manipulation shadow-md"
+              >
+                {isToolbarVisible ? <PanelRightOpen size={18} /> : <PanelRight size={18} />}
+              </Button>
+            </div>
 
             {/* MiniMap - hidden on mobile for better UX */}
             <MiniMap
@@ -129,8 +111,9 @@ const MindmapEmbedPage = () => {
             <Background variant={BackgroundVariant.Dots} gap={20} size={1} />
             <LogicHandler mindmapId={mindmap.id} isPresenterMode={false} metadata={mindmap.metadata} />
           </Flow>
-          {/* Toolbar - always visible in read-only mode */}
-          <Toolbar mindmapId={mindmap.id} />
+
+          {/* Toolbar */}
+          {isToolbarVisible && <Toolbar mindmapId={mindmap.id} />}
         </div>
       </PresenterProvider>
     </ReactFlowProvider>

@@ -22,7 +22,6 @@ import { useIsMobile } from '@/shared/hooks/use-mobile';
 import { PresenterProvider } from '../contexts/ReadOnlyContext';
 import { UnsavedChangesDialog } from '@/shared/components/modals/UnsavedChangesDialog';
 import { SmallScreenDialog } from '@/shared/components/modals/SmallScreenDialog';
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/shared/components/ui/sheet';
 import GlobalSpinner from '@/shared/components/common/GlobalSpinner';
 import { useSavingStore } from '../stores/saving';
 import type { Mindmap, MindMapNode } from '../types';
@@ -234,16 +233,27 @@ const MindmapPage = () => {
               (isDesktop ? (
                 <Toolbar mindmapId={mindmap.id} />
               ) : (
-                <Sheet open={isToolbarVisible} onOpenChange={setIsToolbarVisible}>
-                  <SheetContent side="bottom" className="h-[85vh] rounded-t-2xl p-0 sm:h-[80vh]">
-                    <SheetHeader className="border-b px-4 pb-2 pt-4">
-                      <SheetTitle>Toolbar</SheetTitle>
-                    </SheetHeader>
-                    <div className="h-[calc(100%-60px)] overflow-y-auto">
-                      <Toolbar mindmapId={mindmap.id} isMobileSheet={true} />
-                    </div>
-                  </SheetContent>
-                </Sheet>
+                <div
+                  className={`bg-background fixed bottom-0 left-0 right-0 z-50 flex h-[40vh] flex-col rounded-t-2xl border-t shadow-lg transition-transform duration-300 ease-in-out sm:h-[65vh] ${
+                    isToolbarVisible ? 'translate-y-0' : 'translate-y-full'
+                  }`}
+                  style={{ willChange: 'transform', touchAction: 'none' }}
+                >
+                  <div className="flex items-center justify-between border-b px-4 py-3">
+                    <span className="font-semibold">Toolbar</span>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="-mr-2 h-8 w-8"
+                      onClick={() => setIsToolbarVisible(false)}
+                    >
+                      <X size={18} />
+                    </Button>
+                  </div>
+                  <div className="flex-1 overflow-y-auto" style={{ touchAction: 'pan-y' }}>
+                    <Toolbar mindmapId={mindmap.id} isMobileSheet={true} />
+                  </div>
+                </div>
               ))}
           </div>
         </PresenterProvider>

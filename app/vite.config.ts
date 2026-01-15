@@ -21,6 +21,18 @@ export default defineConfig(({ mode }) => {
       : env.VITE_PRESENTATION_URL || 'http://localhost:5174';
 
   return {
+    server: {
+      allowedHosts: ['nitro15.tail5769d8.ts.net'],
+      cors: {
+        origin: '*',
+        credentials: true,
+      },
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
+        'Access-Control-Allow-Headers': 'X-Requested-With, content-type, Authorization',
+      },
+    },
     plugins: [
       react(),
       tailwindcss(),

@@ -8,7 +8,6 @@ import { Switch } from '@/shared/components/ui/switch';
 import { Textarea } from '@/shared/components/ui/textarea';
 import { Plus, Trash2 } from 'lucide-react';
 import { generateId } from '@/shared/lib/utils';
-import { useTranslation } from 'react-i18next';
 
 interface FillInBlankEditingProps {
   question: FillInBlankQuestion;
@@ -75,7 +74,6 @@ const segmentsToText = (segments: BlankSegment[]): string => {
 };
 
 export const FillInBlankEditing = ({ question, onChange }: FillInBlankEditingProps) => {
-  const { t } = useTranslation('assignment', { keyPrefix: 'editing.fillInBlank' });
   const [questionText, setQuestionText] = useState(() => segmentsToText(question.data.segments));
 
   useEffect(() => {

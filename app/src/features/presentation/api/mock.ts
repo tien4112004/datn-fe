@@ -5,6 +5,7 @@ import {
   type UpdatePresentationRequest,
   type ImageOptions,
   type OutlineData,
+  type PresentationGenerateDraftRequest,
 } from '../types';
 import type { ApiResponse } from '@aiprimary/api';
 import type {
@@ -383,7 +384,7 @@ export default class PresentationMockService implements PresentationApiService {
     };
   }
 
-  async getSharedUsers(id: string): Promise<SharedUserApiResponse[]> {
+  async getSharedUsers(_id: string): Promise<SharedUserApiResponse[]> {
     await new Promise((resolve) => setTimeout(resolve, 500));
 
     const mockSharedUsers: SharedUserApiResponse[] = [
@@ -408,7 +409,7 @@ export default class PresentationMockService implements PresentationApiService {
     return mockSharedUsers;
   }
 
-  async revokeAccess(presentationId: string, userId: string): Promise<void> {
+  async revokeAccess(_presentationId: string, _userId: string): Promise<void> {
     await new Promise((resolve) => setTimeout(resolve, 500));
     // Mock implementation - no actual action needed
   }

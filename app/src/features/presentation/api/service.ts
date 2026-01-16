@@ -6,7 +6,6 @@ import {
   type OutlineData,
 } from '../types';
 import type { User, SharedUserApiResponse, ShareRequest, ShareResponse } from '../types/share';
-import { splitMarkdownToOutlineItems } from '../utils';
 import { api, API_MODE, type ApiMode } from '@aiprimary/api';
 import { mapPagination, type ApiResponse, type Pagination } from '@aiprimary/api';
 import type {

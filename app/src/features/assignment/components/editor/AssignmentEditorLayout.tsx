@@ -1,4 +1,4 @@
-import { Save, X, Wand2, Database } from 'lucide-react';
+import { Save, Wand2, Database } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/shared/components/ui/button';
 import LoadingButton from '@/shared/components/common/LoadingButton';
@@ -15,7 +15,7 @@ interface AssignmentEditorLayoutProps {
   isSaving: boolean;
 }
 
-export const AssignmentEditorLayout = ({ onCancel, onSave, isSaving }: AssignmentEditorLayoutProps) => {
+export const AssignmentEditorLayout = ({ onSave, isSaving }: AssignmentEditorLayoutProps) => {
   const mainView = useAssignmentEditorStore((state) => state.mainView);
   const setQuestionBankOpen = useAssignmentEditorStore((state) => state.setQuestionBankOpen);
   const { t } = useTranslation('assignment', { keyPrefix: 'assignmentEditor' });

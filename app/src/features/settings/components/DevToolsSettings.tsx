@@ -1,5 +1,4 @@
 import { useTranslation } from 'react-i18next';
-import { Label } from '@/shared/components/ui/label';
 import { Separator } from '@/shared/components/ui/separator';
 import { Button } from '@/shared/components/ui/button';
 import { toast } from 'sonner';

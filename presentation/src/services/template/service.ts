@@ -3,10 +3,13 @@ import type { SlideTemplate } from '@aiprimary/core';
 import type { ITemplateApi } from './types';
 
 export class TemplateService implements ITemplateApi {
-  constructor(
-    private readonly apiClient: ApiClient,
-    private readonly baseUrl: string
-  ) {}
+  baseUrl: string;
+  private readonly apiClient: ApiClient;
+
+  constructor(apiClient: ApiClient, baseUrl: string) {
+    this.apiClient = apiClient;
+    this.baseUrl = baseUrl;
+  }
 
   getType() {
     return 'real' as const;

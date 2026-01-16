@@ -10,10 +10,13 @@ import type {
 } from '../types';
 
 export default class ClassFeedService implements ClassFeedApiService {
-  constructor(
-    private readonly apiClient: ApiClient,
-    private readonly baseUrl: string
-  ) {}
+  private readonly apiClient: ApiClient;
+  private readonly baseUrl: string;
+
+  constructor(apiClient: ApiClient, baseUrl: string) {
+    this.apiClient = apiClient;
+    this.baseUrl = baseUrl;
+  }
 
   async getPosts(
     classId: string,

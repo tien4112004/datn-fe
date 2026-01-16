@@ -7,10 +7,13 @@ import type {
 } from '../types/questionBank';
 
 export default class QuestionBankService implements QuestionBankApiService {
-  constructor(
-    private readonly apiClient: ApiClient,
-    private readonly baseUrl: string
-  ) {}
+  private readonly apiClient: ApiClient;
+  private readonly baseUrl: string;
+
+  constructor(apiClient: ApiClient, baseUrl: string) {
+    this.apiClient = apiClient;
+    this.baseUrl = baseUrl;
+  }
 
   async getQuestions(filters?: QuestionBankFilters): Promise<QuestionBankResponse> {
     // Convert arrays to comma-separated strings for API

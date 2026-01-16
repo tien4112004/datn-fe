@@ -18,10 +18,13 @@ import type {
 import { parsePermissionHeader } from '../../../shared/utils/permission';
 
 export default class PresentationService implements PresentationApiService {
-  constructor(
-    private readonly apiClient: ApiClient,
-    private readonly baseUrl: string
-  ) {}
+  private readonly apiClient: ApiClient;
+  private readonly baseUrl: string;
+
+  constructor(apiClient: ApiClient, baseUrl: string) {
+    this.apiClient = apiClient;
+    this.baseUrl = baseUrl;
+  }
 
   getType() {
     return 'real' as const;

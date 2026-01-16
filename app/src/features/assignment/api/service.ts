@@ -4,10 +4,13 @@ import type { AssignmentApiService, AssignmentCollectionRequest } from '../types
 import type { CreateAssignmentRequest, UpdateAssignmentRequest } from '../types';
 
 export default class AssignmentService implements AssignmentApiService {
-  constructor(
-    private readonly apiClient: ApiClient,
-    private readonly baseUrl: string
-  ) {}
+  private readonly apiClient: ApiClient;
+  private readonly baseUrl: string;
+
+  constructor(apiClient: ApiClient, baseUrl: string) {
+    this.apiClient = apiClient;
+    this.baseUrl = baseUrl;
+  }
 
   async getAssignments(request: AssignmentCollectionRequest): Promise<ApiResponse<CoreAssignment[]>> {
     const response = await this.apiClient.get(`${this.baseUrl}/api/assignments`, { params: request });

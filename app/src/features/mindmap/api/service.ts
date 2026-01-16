@@ -22,10 +22,13 @@ import { parsePermissionHeader } from '../../../shared/utils/permission';
 import type { User } from '@/features/user/types';
 
 export default class MindmapService implements MindmapApiService {
-  constructor(
-    private readonly apiClient: ApiClient,
-    private readonly baseUrl: string
-  ) {}
+  private readonly apiClient: ApiClient;
+  private readonly baseUrl: string;
+
+  constructor(apiClient: ApiClient, baseUrl: string) {
+    this.apiClient = apiClient;
+    this.baseUrl = baseUrl;
+  }
 
   getType() {
     return 'real' as const;

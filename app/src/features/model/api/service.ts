@@ -2,10 +2,13 @@ import type { ApiClient, ApiResponse } from '@aiprimary/api';
 import type { ModelApiService, Model, ModelPatchData, ModelType } from '../types';
 
 export default class ModelService implements ModelApiService {
-  constructor(
-    private readonly apiClient: ApiClient,
-    private readonly baseUrl: string
-  ) {}
+  private readonly apiClient: ApiClient;
+  private readonly baseUrl: string;
+
+  constructor(apiClient: ApiClient, baseUrl: string) {
+    this.apiClient = apiClient;
+    this.baseUrl = baseUrl;
+  }
 
   getType() {
     return 'real' as const;

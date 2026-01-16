@@ -24,10 +24,13 @@ import {
 import { mapPagination, type Pagination } from '@aiprimary/api';
 
 export default class ClassService implements ClassApiService {
-  constructor(
-    private readonly apiClient: ApiClient,
-    private readonly baseUrl: string
-  ) {}
+  private readonly apiClient: ApiClient;
+  private readonly baseUrl: string;
+
+  constructor(apiClient: ApiClient, baseUrl: string) {
+    this.apiClient = apiClient;
+    this.baseUrl = baseUrl;
+  }
 
   async getClasses(request: ClassCollectionRequest): Promise<ApiResponse<Class[]>> {
     const response = await this.apiClient.get<ApiResponse<Class[]>>(`${this.baseUrl}/api/classes`, {

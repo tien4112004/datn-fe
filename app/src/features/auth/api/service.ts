@@ -4,10 +4,13 @@ import type { LoginRequest, SignupRequest, SignupResponse, User } from '@/shared
 import { setUserData, clearAuthData } from '@/shared/context/auth';
 
 export default class AuthService implements AuthApiService {
-  constructor(
-    private readonly apiClient: ApiClient,
-    private readonly baseUrl: string
-  ) {}
+  private readonly apiClient: ApiClient;
+  private readonly baseUrl: string;
+
+  constructor(apiClient: ApiClient, baseUrl: string) {
+    this.apiClient = apiClient;
+    this.baseUrl = baseUrl;
+  }
 
   /**
    * Login user with real API call

@@ -31,6 +31,7 @@ import type { PresentationGenerationRequest } from '../types/generation';
 import { usePresentationProcessor } from '@/hooks/usePresentationProcessor';
 import { useGenerationStore } from '@/store/generation';
 import { useSavePresentation } from '@/hooks/useSavePresentation';
+import { getPresentationApi } from '@/services/presentation/api';
 
 const _isPC = isPC();
 
@@ -38,6 +39,7 @@ const props = defineProps<{
   isRemote: boolean;
   presentation: Presentation;
   mode: 'view' | 'edit';
+  permission?: 'read' | 'comment' | 'edit';
   generationRequest?: PresentationGenerationRequest;
   isGenerating?: boolean;
 }>();

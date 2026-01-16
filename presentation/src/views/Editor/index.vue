@@ -7,8 +7,8 @@
         <div class="layout-content-columns">
           <Thumbnails class="layout-content-left layout-thumbnails" />
           <div class="layout-content-center">
-            <!-- Template Preview Mode Banner -->
-            <div v-if="isCurrentSlideLocked" class="preview-mode-banner">
+            <!-- Template Preview Mode Banner (hidden in view mode) -->
+            <div v-if="isCurrentSlideLocked && mode !== 'view'" class="preview-mode-banner">
               <div class="banner-content">
                 <div class="banner-icon">
                   <IconSwatchBook />

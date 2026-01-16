@@ -53,6 +53,12 @@ export default {
     buttons: {
       present: 'Present',
       share: 'Share',
+      comments: 'Comments',
+    },
+
+    // Comments
+    comments: {
+      tooltip: 'View and add comments',
     },
 
     // Breadcrumb Navigation
@@ -85,16 +91,33 @@ export default {
       peopleWithAccess: 'People with access',
       generalAccess: 'General access',
       copyLink: 'Copy link',
+      updateSuccess: 'Changes saved successfully',
       linkCopied: 'Link copied to clipboard!',
+      linkCopiedPublic: 'Link copied - Anyone with this link can access',
+      linkCopiedRestricted: 'Link copied - Only people with access can open',
       restricted: 'Restricted',
       restrictedDescription: 'Only people with access can open',
+      resourceRestricted: 'Resource is now restricted',
       anyoneWithLink: 'Anyone with the link',
       anyoneWithLinkDescription: 'Anyone on the internet can view',
       viewer: 'Viewer',
       viewerDescription: 'Can view only',
       commenter: 'Commenter',
       commenterDescription: 'Can view and comment',
+      editor: 'Editor',
+      editorDescription: 'Full editing access',
       defaultPermissionForAnyone: 'Default permission for "Anyone" access',
+      userAdded: 'User added successfully',
+      accessRevoked: 'Access revoked successfully',
+      permissionUpdated: 'Permission updated successfully',
+      failedToLoadUsers: 'Failed to load shared users',
+      failedToLoadShareState: 'Failed to load sharing settings',
+      searchFailed: 'Failed to search users',
+      failedToShare: 'Failed to share presentation',
+      failedToRevoke: 'Failed to revoke access',
+      failedToUpdate: 'Failed to update permission',
+      failedToUpdateAccess: 'Failed to update access settings',
+      failedToCopyLink: 'Failed to copy link',
     },
   },
 };

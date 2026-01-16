@@ -1,7 +1,17 @@
 import type { Presentation, Slide, SlideTheme } from '@aiprimary/core';
 import type { SlideLayoutSchema } from '@/utils/slideLayout/types/schemas';
 import { getSlideTemplates } from '@/hooks/useSlideTemplates';
-import type { PresentationGenerationRequest, PresentationGenerationStartResponse } from './types';
+import type {
+  PresentationGenerationRequest,
+  PresentationGenerationStartResponse,
+  SharedUserApiResponse,
+  SearchUserApiResponse,
+  SharePresentationRequest,
+  PublicAccessRequest,
+  PublicAccessResponse,
+  ResourcePermissionResponse,
+  ShareStateResponse,
+} from './types';
 import type { ImageGenerationParams } from '../image/types';
 import type { ApiService } from '@aiprimary/api';
 import { getBackendUrl } from '@aiprimary/api';
@@ -96,6 +106,7 @@ if (typeof process === 'undefined' || process.env.NODE_ENV !== 'test') {
 
 export class MockPresentationApiService implements ApiService {
   baseUrl: string;
+  private mockPublicAccess: Map<string, PublicAccessResponse> = new Map();
 
   constructor(baseUrl: string = BASE_URL) {
     this.baseUrl = baseUrl;
@@ -328,6 +339,119 @@ export class MockPresentationApiService implements ApiService {
       page,
       limit,
       hasMore: end < allThemes.length,
+    };
+  }
+
+  /**
+   * Get shared users for a presentation (mock implementation)
+   */
+  async getSharedUsers(presentationId: string): Promise<SharedUserApiResponse[]> {
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    return [
+      {
+        userId: 'user1',
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'john.doe@example.com',
+        permission: 'read',
+      },
+      {
+        userId: 'user2',
+        firstName: 'Jane',
+        lastName: 'Smith',
+        email: 'jane.smith@example.com',
+        permission: 'comment',
+      },
+    ];
+  }
+
+  /**
+   * Search users by query string (mock implementation)
+   */
+  async searchUsers(query: string): Promise<SearchUserApiResponse[]> {
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    const mockUsers = [
+      { id: 'user3', firstName: 'Alice', lastName: 'Johnson', email: 'alice.johnson@example.com' },
+      { id: 'user4', firstName: 'Bob', lastName: 'Williams', email: 'bob.williams@example.com' },
+      { id: 'user5', firstName: 'Charlie', lastName: 'Brown', email: 'charlie.brown@example.com' },
+      { id: 'user6', firstName: 'Diana', lastName: 'Davis', email: 'diana.davis@example.com' },
+    ];
+    return mockUsers.filter(
+      (user) =>
+        user.firstName.toLowerCase().includes(query.toLowerCase()) ||
+        user.lastName.toLowerCase().includes(query.toLowerCase()) ||
+        user.email.toLowerCase().includes(query.toLowerCase())
+    );
+  }
+
+  /**
+   * Share presentation with users (mock implementation)
+   */
+  async sharePresentation(presentationId: string, request: SharePresentationRequest): Promise<void> {
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    console.log('Mock: Shared presentation', presentationId, 'with users:', request);
+  }
+
+  /**
+   * Revoke access for a user (mock implementation)
+   */
+  async revokeAccess(presentationId: string, userId: string): Promise<void> {
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    console.log('Mock: Revoked access for user', userId, 'from presentation', presentationId);
+  }
+
+  /**
+   * Set public access for presentation (mock implementation)
+   */
+  async setPublicAccess(presentationId: string, request: PublicAccessRequest): Promise<PublicAccessResponse> {
+    await new Promise((resolve) => setTimeout(resolve, 300));
+
+    const response: PublicAccessResponse = {
+      documentId: presentationId,
+      isPublic: request.isPublic,
+      publicPermission: request.publicPermission,
+    };
+
+    this.mockPublicAccess.set(presentationId, response);
+    console.log('Mock: Set public access for presentation', presentationId, request);
+
+    return response;
+  }
+
+  /**
+   * Get public access status (mock implementation)
+   */
+  async getPublicAccessStatus(presentationId: string): Promise<PublicAccessResponse> {
+    await new Promise((resolve) => setTimeout(resolve, 200));
+
+    // Return stored status or default to restricted
+    const storedStatus = this.mockPublicAccess.get(presentationId);
+    if (storedStatus) {
+      return storedStatus;
+    }
+
+    return {
+      documentId: presentationId,
+      isPublic: false,
+      publicPermission: 'read',
+    };
+  }
+
+  /**
+   * Get complete share state in a single call (mock implementation)
+   * Combines shared users, public access settings, and current user permission
+   */
+  async getShareState(presentationId: string): Promise<ShareStateResponse> {
+    await new Promise((resolve) => setTimeout(resolve, 300)); // Simulate network delay
+
+    // Compose data from existing mock methods
+    const sharedUsers = await this.getSharedUsers(presentationId);
+    const publicAccess = await this.getPublicAccessStatus(presentationId);
+
+    return {
+      sharedUsers,
+      publicAccess,
+      currentUserPermission: 'edit', // Mock user always has edit permission
     };
   }
 }

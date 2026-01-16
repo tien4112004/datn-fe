@@ -3,10 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { useComments, useCreateComment } from '../hooks/useApi';
 import { UserAvatar } from '@/components/common/UserAvatar';
 import { Button } from '@/components/ui/button';
-import { formatDistanceToNow } from 'date-fns';
-import { getLocaleDateFns } from '@/shared/i18n/helper';
-import { parseDateSafe } from '@/shared/utils/date';
 import { useAuth } from '@/shared/context/auth';
+import { CommentListLoading, CommentListError, useCommentDate } from '@/shared/components/comments';
 
 interface CommentThreadProps {
   postId: string;
@@ -18,6 +16,7 @@ export const CommentThread = ({ postId, className = '' }: CommentThreadProps) =>
   const { user } = useAuth();
   const { comments, loading, error } = useComments(postId);
   const createComment = useCreateComment();
+  const { formatRelative } = useCommentDate();
 
   const [newComment, setNewComment] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -45,54 +44,38 @@ export const CommentThread = ({ postId, className = '' }: CommentThreadProps) =>
       {/* Comments List */}
       {comments.length > 0 && (
         <div className="space-y-2 md:space-y-3">
-          {comments.map((comment) => (
-            <div key={comment.id} className="flex space-x-2 md:space-x-3">
-              <UserAvatar
-                name={
-                  comment.user
-                    ? `${comment.user.firstName} ${comment.user.lastName}`
-                    : `User ${comment.userId.slice(0, 8)}`
-                }
-                src={comment.user?.avatarUrl || undefined}
-                size="sm"
-              />
-              <div className="flex-1">
-                <div className="rounded-lg bg-gray-100 px-2.5 py-1.5 md:px-3 md:py-2">
-                  <div className="mb-1 flex items-center space-x-2">
-                    <span className="text-sm font-medium">
-                      {comment.user
-                        ? `${comment.user.firstName} ${comment.user.lastName}`
-                        : `User ${comment.userId.slice(0, 8)}`}
-                    </span>
-                    <span className="text-xs text-gray-500">
-                      {formatDistanceToNow(parseDateSafe(comment.createdAt), {
-                        addSuffix: true,
-                        locale: getLocaleDateFns(),
-                      })}
-                    </span>
+          {comments.map((comment) => {
+            const user = {
+              id: comment.userId,
+              name: comment.user
+                ? `${comment.user.firstName} ${comment.user.lastName}`
+                : `User ${comment.userId.slice(0, 8)}`,
+              avatarUrl: comment.user?.avatarUrl || null,
+            };
+
+            return (
+              <div key={comment.id} className="flex space-x-2 md:space-x-3">
+                <UserAvatar name={user.name} src={user.avatarUrl || undefined} size="sm" />
+                <div className="flex-1">
+                  <div className="rounded-lg bg-gray-100 px-2.5 py-1.5 md:px-3 md:py-2">
+                    <div className="mb-1 flex items-center space-x-2">
+                      <span className="text-sm font-medium">{user.name}</span>
+                      <span className="text-xs text-gray-500">{formatRelative(comment.createdAt)}</span>
+                    </div>
+                    <p className="whitespace-pre-wrap break-words text-sm text-gray-800">{comment.content}</p>
                   </div>
-                  <p className="text-sm text-gray-800">{comment.content}</p>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
       {/* Loading State */}
-      {loading && (
-        <div className="py-4 text-center">
-          <div className="inline-block h-6 w-6 animate-spin rounded-full border-b-2 border-blue-500"></div>
-          <p className="mt-2 text-sm text-gray-500">{t('feed.list.loading')}</p>
-        </div>
-      )}
+      {loading && <CommentListLoading message={t('feed.list.loading')} />}
 
       {/* Error State */}
-      {error && (
-        <div className="rounded-lg border border-red-200 bg-red-50 p-3">
-          <p className="text-sm text-red-600">{error.message}</p>
-        </div>
-      )}
+      {error && <CommentListError error={error.message} />}
 
       {/* Add Comment Form */}
       <form onSubmit={handleSubmit} className="flex space-x-2 md:space-x-3">

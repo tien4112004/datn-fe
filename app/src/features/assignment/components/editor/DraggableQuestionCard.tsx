@@ -8,7 +8,6 @@ import { Input } from '@/shared/components/ui/input';
 import { useTranslation } from 'react-i18next';
 import { Label } from '@/shared/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
-import { Badge } from '@/shared/components/ui/badge';
 import type { AssignmentFormData } from '../../types';
 import { DIFFICULTY_LABELS } from '../../types';
 import { QuestionRenderer } from '@/features/question';

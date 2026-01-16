@@ -5,6 +5,7 @@ import {
   type ImageOptions,
   type OutlineData,
 } from '../types';
+import type { User, SharedUserApiResponse, ShareRequest, ShareResponse } from '../types/share';
 import { api, API_MODE, type ApiMode } from '@aiprimary/api';
 import { mapPagination, type ApiResponse, type Pagination } from '@aiprimary/api';
 import type {
@@ -14,6 +15,7 @@ import type {
   SlideTheme,
   SlideTemplate,
 } from '@aiprimary/core';
+import { parsePermissionHeader } from '../../../shared/utils/permission';
 
 export default class PresentationRealApiService implements PresentationApiService {
   baseUrl: string;
@@ -127,7 +129,15 @@ export default class PresentationRealApiService implements PresentationApiServic
 
   async getPresentationById(id: string): Promise<Presentation | null> {
     const response = await api.get<ApiResponse<Presentation>>(`${this.baseUrl}/api/presentations/${id}`);
-    return this._mapPresentationItem(response.data.data);
+    const presentation = this._mapPresentationItem(response.data.data);
+
+    // Extract permission from response header (added by backend PermissionHeaderResponseWrapper)
+    const permissionHeader = response.headers['permission']; // axios lowercases headers
+    if (permissionHeader) {
+      presentation.permission = parsePermissionHeader(permissionHeader);
+    }
+
+    return presentation;
   }
 
   async getAiResultById(id: string): Promise<{
@@ -218,5 +228,33 @@ export default class PresentationRealApiService implements PresentationApiServic
       createdAt: data?.createdAt,
       updatedAt: data?.updatedAt,
     };
+  }
+
+  async searchUsers(query: string): Promise<User[]> {
+    const response = await api.get<ApiResponse<User[]>>(`${this.baseUrl}/api/user/search`, {
+      params: { q: query, limit: 10 },
+    });
+    return response.data.data;
+  }
+
+  async sharePresentation(id: string, shareData: ShareRequest): Promise<ShareResponse> {
+    const response = await api.post<ApiResponse<ShareResponse>>(
+      `${this.baseUrl}/api/resources/${id}/share`,
+      shareData
+    );
+    return response.data.data;
+  }
+
+  async getSharedUsers(id: string): Promise<SharedUserApiResponse[]> {
+    const response = await api.get<ApiResponse<SharedUserApiResponse[]>>(
+      `${this.baseUrl}/api/resources/${id}/shared-users`
+    );
+    return response.data.data;
+  }
+
+  async revokeAccess(presentationId: string, userId: string): Promise<void> {
+    await api.post(`${this.baseUrl}/api/resources/${presentationId}/revoke`, {
+      targetUserId: userId,
+    });
   }
 }

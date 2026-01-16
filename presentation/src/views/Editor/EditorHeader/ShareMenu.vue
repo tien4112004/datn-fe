@@ -15,6 +15,13 @@
             class="tw-w-full tw-px-4 tw-py-2.5 tw-pr-20 tw-text-sm tw-border tw-border-gray-300 tw-rounded tw-outline-none focus:tw-border-blue-500 focus:tw-ring-1 focus:tw-ring-blue-500"
           />
 
+          <!-- Loading spinner for search -->
+          <div v-if="isSearching" class="tw-absolute tw-right-3 tw-top-3">
+            <div
+              class="tw-animate-spin tw-h-4 tw-w-4 tw-border-2 tw-border-blue-500 tw-border-t-transparent tw-rounded-full"
+            ></div>
+          </div>
+
           <!-- Search Results Dropdown -->
           <div
             v-if="searchResults.length > 0"
@@ -41,7 +48,21 @@
       </div>
 
       <!-- People with Access -->
-      <div v-if="selectedUsers.length > 0" class="tw-mb-6">
+      <div v-if="isLoadingShareState" class="tw-mb-6">
+        <h3 class="tw-text-sm tw-font-medium tw-text-gray-900 tw-mb-3">
+          {{ t('header.shareMenu.peopleWithAccess') }}
+        </h3>
+        <div class="tw-space-y-2">
+          <div v-for="i in 3" :key="i" class="tw-flex tw-items-center tw-gap-3 tw-py-1.5">
+            <div class="tw-w-8 tw-h-8 tw-rounded-full tw-bg-gray-200 tw-animate-pulse"></div>
+            <div class="tw-flex-1 tw-space-y-2">
+              <div class="tw-h-3 tw-w-32 tw-bg-gray-200 tw-animate-pulse tw-rounded"></div>
+              <div class="tw-h-2 tw-w-48 tw-bg-gray-200 tw-animate-pulse tw-rounded"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div v-else-if="selectedUsers.length > 0" class="tw-mb-6">
         <h3 class="tw-text-sm tw-font-medium tw-text-gray-900 tw-mb-3">
           {{ t('header.shareMenu.peopleWithAccess') }}
         </h3>
@@ -210,9 +231,11 @@ import Input from '@/components/Input.vue';
 import Popover from '@/components/Popover.vue';
 import message from '@/utils/message';
 import { useI18n } from 'vue-i18n';
-import { computed, ref, watch } from 'vue';
+import { computed, ref, watch, onMounted } from 'vue';
+import { getPresentationApi } from '@/services/presentation/api';
 
 const { t } = useI18n();
+const presentationService = getPresentationApi();
 
 interface User {
   id: string;
@@ -234,6 +257,10 @@ interface AccessOption {
   description: string;
   icon: string;
 }
+
+const props = defineProps<{
+  presentationId?: string;
+}>();
 
 const emit = defineEmits<{
   cancel: [];
@@ -281,6 +308,9 @@ const searchResults = ref<User[]>([]);
 const permissionPopoverOpen = ref<{ [key: string]: boolean }>({});
 const generalAccessPopoverOpen = ref(false);
 const anyonePermissionPopoverOpen = ref(false);
+const isLoadingShareState = ref(false);
+const isSearching = ref(false);
+const isInitialLoad = ref(true);
 
 // Computed property to get the current access option
 const currentAccessOption = computed(() => {
@@ -290,67 +320,213 @@ const currentAccessOption = computed(() => {
   );
 });
 
-// Mock user data
-const mockUsers: User[] = [
-  { id: '1', name: 'John Doe', email: 'john.doe@example.com' },
-  { id: '2', name: 'Jane Smith', email: 'jane.smith@example.com' },
-  { id: '3', name: 'Bob Johnson', email: 'bob.johnson@example.com' },
-  { id: '4', name: 'Alice Brown', email: 'alice.brown@example.com' },
-  { id: '5', name: 'Charlie Wilson', email: 'charlie.wilson@example.com' },
-];
+// Load existing shared users and public access status on mount
+onMounted(async () => {
+  if (props.presentationId) {
+    // Load initial data first
+    await loadShareState();
 
-// Watch searchQuery and update search results
-watch(searchQuery, () => {
-  if (!searchQuery.value.trim()) {
+    // Set up watcher AFTER initial data is loaded
+    // Debounce to prevent multiple emits when multiple values change together
+    let emitTimeout: NodeJS.Timeout | null = null;
+    watch(
+      [generalAccess, anyoneDefaultPermission, selectedUsers],
+      () => {
+        // Skip emission during initial load to prevent showing messages on mount
+        if (isInitialLoad.value) return;
+
+        if (emitTimeout) {
+          clearTimeout(emitTimeout);
+        }
+        emitTimeout = setTimeout(() => {
+          emitShareEvent();
+        }, 100); // Wait 100ms to batch multiple changes into one emit
+      },
+      { deep: true }
+    );
+  }
+});
+
+/**
+ * Load all ShareMenu data in a single API call
+ * Combines shared users, public access settings, and current user permission
+ * Replaces separate calls to loadSharedUsers() and loadPublicAccessStatus()
+ */
+const loadShareState = async () => {
+  if (!props.presentationId) return;
+
+  isLoadingShareState.value = true;
+  try {
+    const shareState = await presentationService.getShareState(props.presentationId);
+
+    // 1. Set shared users
+    selectedUsers.value = shareState.sharedUsers.map((user) => ({
+      id: user.userId,
+      name: `${user.firstName} ${user.lastName}`.trim(),
+      email: user.email,
+      permission: user.permission === 'read' ? 'Viewer' : 'Commenter',
+    }));
+
+    // 2. Set public access state
+    generalAccess.value = shareState.publicAccess.isPublic ? 'anyone' : 'restricted';
+    if (shareState.publicAccess.isPublic && shareState.publicAccess.publicPermission) {
+      anyoneDefaultPermission.value =
+        shareState.publicAccess.publicPermission === 'read' ? 'Viewer' : 'Commenter';
+    }
+
+    // 3. Optionally validate current user permission
+    if (shareState.currentUserPermission !== 'edit') {
+      console.warn('User does not have edit permission, share operations may fail');
+    }
+  } catch (error) {
+    console.error('Failed to load share state:', error);
+    message.error(t('header.shareMenu.failedToLoadShareState'));
+  } finally {
+    isLoadingShareState.value = false;
+    isInitialLoad.value = false;
+  }
+};
+
+// Watch searchQuery and update search results with real API
+let searchTimeout: NodeJS.Timeout | null = null;
+watch(searchQuery, async () => {
+  if (searchTimeout) clearTimeout(searchTimeout);
+
+  if (!searchQuery.value.trim() || searchQuery.value.trim().length < 3) {
     searchResults.value = [];
+    isSearching.value = false;
     return;
   }
 
-  const query = searchQuery.value.toLowerCase();
-  searchResults.value = mockUsers.filter(
-    (user) =>
-      !selectedUsers.value.some((selected) => selected.id === user.id) &&
-      (user.name.toLowerCase().includes(query) || user.email.toLowerCase().includes(query))
-  );
+  searchTimeout = setTimeout(async () => {
+    isSearching.value = true;
+    try {
+      const users = await presentationService.searchUsers(searchQuery.value);
+      searchResults.value = users
+        .filter((user) => !selectedUsers.value.some((selected) => selected.id === user.id))
+        .map((user) => ({
+          id: user.id,
+          name: `${user.firstName} ${user.lastName}`,
+          email: user.email,
+        }));
+    } catch (error) {
+      console.error('Search failed:', error);
+      searchResults.value = [];
+      message.error(t('header.shareMenu.searchFailed'));
+    } finally {
+      isSearching.value = false;
+    }
+  }, 300);
 });
 
-// Watch for changes and emit share event automatically
-watch(
-  [generalAccess, anyoneDefaultPermission, selectedUsers],
-  () => {
-    emitShareEvent();
-  },
-  { deep: true }
-);
+const addUser = async (user: User) => {
+  if (!props.presentationId) return;
+  if (selectedUsers.value.some((u) => u.id === user.id)) return;
 
-const addUser = (user: User) => {
-  if (!selectedUsers.value.some((u) => u.id === user.id)) {
-    selectedUsers.value.push({ ...user, permission: 'Viewer' });
-    searchQuery.value = '';
-    searchResults.value = [];
+  const newUser: User = { ...user, permission: 'Viewer' };
+  selectedUsers.value.push(newUser);
+  searchQuery.value = '';
+  searchResults.value = [];
+
+  try {
+    await presentationService.sharePresentation(props.presentationId, {
+      targetUserIds: [user.id],
+      permission: 'read',
+    });
+    message.success(t('header.shareMenu.updateSuccess'));
+  } catch (error) {
+    console.error('Failed to share:', error);
+    selectedUsers.value = selectedUsers.value.filter((u) => u.id !== user.id);
+    message.error(t('header.shareMenu.failedToShare'));
   }
 };
 
-const removeUser = (userId: string) => {
-  selectedUsers.value = selectedUsers.value.filter((u) => u.id !== userId);
-};
+const removeUser = async (userId: string) => {
+  if (!props.presentationId) return;
 
-const updateUserPermission = (userId: string, newPermission: string | number) => {
   const user = selectedUsers.value.find((u) => u.id === userId);
-  if (user) {
-    user.permission = newPermission.toString();
-    permissionPopoverOpen.value[userId] = false;
+  selectedUsers.value = selectedUsers.value.filter((u) => u.id !== userId);
+
+  try {
+    await presentationService.revokeAccess(props.presentationId, userId);
+    message.success(t('header.shareMenu.updateSuccess'));
+  } catch (error) {
+    console.error('Failed to revoke access:', error);
+    if (user) selectedUsers.value.push(user);
+    message.error(t('header.shareMenu.failedToRevoke'));
   }
 };
 
-const setGeneralAccess = (value: 'restricted' | 'anyone') => {
-  generalAccess.value = value;
-  generalAccessPopoverOpen.value = false;
+const updateUserPermission = async (userId: string, newPermission: string | number) => {
+  if (!props.presentationId) return;
+
+  const user = selectedUsers.value.find((u) => u.id === userId);
+  if (!user) return;
+
+  const oldPermission = user.permission;
+  user.permission = newPermission.toString();
+  permissionPopoverOpen.value[userId] = false;
+
+  try {
+    await presentationService.sharePresentation(props.presentationId, {
+      targetUserIds: [userId],
+      permission: newPermission === 'Viewer' ? 'read' : 'comment',
+    });
+    message.success(t('header.shareMenu.updateSuccess'));
+  } catch (error) {
+    console.error('Failed to update permission:', error);
+    user.permission = oldPermission;
+    message.error(t('header.shareMenu.failedToUpdate'));
+  }
 };
 
-const setAnyoneDefaultPermission = (permission: string) => {
-  anyoneDefaultPermission.value = permission;
-  anyonePermissionPopoverOpen.value = false;
+const setGeneralAccess = async (value: 'restricted' | 'anyone') => {
+  if (!props.presentationId) return;
+
+  const isPublic = value === 'anyone';
+  const permission = anyoneDefaultPermission.value === 'Viewer' ? 'read' : 'comment';
+
+  try {
+    await presentationService.setPublicAccess(props.presentationId, {
+      isPublic,
+      publicPermission: isPublic ? permission : 'read',
+    });
+
+    generalAccess.value = value;
+    generalAccessPopoverOpen.value = false;
+    message.success(t('header.shareMenu.updateSuccess'));
+  } catch (error) {
+    console.error('Failed to update public access:', error);
+    message.error(t('header.shareMenu.failedToUpdateAccess'));
+  }
+};
+
+const setAnyoneDefaultPermission = async (permission: string) => {
+  if (!props.presentationId) return;
+
+  // Only update if currently set to 'anyone'
+  if (generalAccess.value !== 'anyone') {
+    anyoneDefaultPermission.value = permission;
+    anyonePermissionPopoverOpen.value = false;
+    return;
+  }
+
+  const publicPermission = permission === 'Viewer' ? 'read' : 'comment';
+
+  try {
+    await presentationService.setPublicAccess(props.presentationId, {
+      isPublic: true,
+      publicPermission,
+    });
+
+    anyoneDefaultPermission.value = permission;
+    anyonePermissionPopoverOpen.value = false;
+
+    message.success(t('header.shareMenu.updateSuccess'));
+  } catch (error) {
+    console.error('Failed to update permission:', error);
+    message.error(t('header.shareMenu.failedToUpdate'));
+  }
 };
 
 const getSelectedPermissionLabel = (permissionValue: string): string => {
@@ -372,10 +548,20 @@ const getInitials = (name: string): string => {
     .slice(0, 2);
 };
 
-const copyLink = () => {
-  // In a real app, you'd copy the actual link
-  navigator.clipboard.writeText(window.location.href + '?shared=true');
-  message.success(t('header.shareMenu.linkCopied'));
+const copyLink = async () => {
+  if (!props.presentationId) return;
+
+  try {
+    // Construct share link locally with ?view=true query parameter
+    const shareLink = `${window.location.origin}/presentation/${props.presentationId}?view=true`;
+
+    await navigator.clipboard.writeText(shareLink);
+
+    message.success(t('header.shareMenu.linkCopied'));
+  } catch (error) {
+    console.error('Failed to copy link:', error);
+    message.error(t('header.shareMenu.failedToCopyLink'));
+  }
 };
 
 const emitShareEvent = () => {

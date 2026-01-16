@@ -14,7 +14,6 @@ import {
   useNodeOperationsStore,
 } from '@/features/mindmap/stores';
 import { ChildNodeControls, NodeHandlers } from '../controls/ChildNodeControls';
-import { useWhyDidYouUpdate } from '@/shared/hooks/use-debug';
 
 export interface BaseNodeBlockProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
   children: ReactNode;
@@ -28,18 +27,6 @@ const selectedCountSelector = (state: any) => state.selectedNodeIds.size;
 export const BaseNodeBlock = memo(
   ({ className, children, variant = 'card', node, ...props }: BaseNodeBlockProps) => {
     const { id, data, width, height, selected, dragging } = node;
-
-    // Debug: Track why this component rerenders
-    useWhyDidYouUpdate(`BaseNode[${id}]`, {
-      id,
-      data,
-      width,
-      height,
-      selected,
-      dragging,
-      variant,
-      className,
-    });
 
     const dragTargetNodeId = useClipboardStore(useShallow(clipboardSelector));
     const isDragTarget = dragTargetNodeId === id;

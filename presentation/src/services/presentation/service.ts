@@ -1,6 +1,16 @@
 import { api, webViewApi } from '@aiprimary/api';
-import type { ApiResponse, StreamableAxiosInstance } from '@aiprimary/api';
-import type { PresentationGenerationRequest, PresentationGenerationStartResponse } from './types';
+import type { ApiResponse, ApiClient } from '@aiprimary/api';
+import type {
+  PresentationGenerationRequest,
+  PresentationGenerationStartResponse,
+  SharedUserApiResponse,
+  SearchUserApiResponse,
+  SharePresentationRequest,
+  PublicAccessRequest,
+  PublicAccessResponse,
+  ResourcePermissionResponse,
+  ShareStateResponse,
+} from './types';
 import type { ImageGenerationParams } from '../image/types';
 import type { ApiService } from '@aiprimary/api';
 import { getBackendUrl } from '@aiprimary/api';
@@ -10,9 +20,9 @@ const BASE_URL = getBackendUrl();
 
 export class PresentationApiService implements ApiService {
   baseUrl: string;
-  private apiClient: StreamableAxiosInstance;
+  private apiClient: ApiClient;
 
-  constructor(baseUrl: string = BASE_URL, apiClient: StreamableAxiosInstance = api) {
+  constructor(baseUrl: string = BASE_URL, apiClient: ApiClient = api) {
     this.baseUrl = baseUrl;
     this.apiClient = apiClient;
   }
@@ -257,5 +267,73 @@ export class PresentationApiService implements ApiService {
       slides: data.slides,
       isParsed: data.parsed || data.isParsed || false,
     };
+  }
+
+  /**
+   * Get shared users for a presentation
+   */
+  async getSharedUsers(presentationId: string): Promise<SharedUserApiResponse[]> {
+    const response = await api.get<ApiResponse<SharedUserApiResponse[]>>(
+      `${this.baseUrl}/api/resources/${presentationId}/shared-users`
+    );
+    return response.data.data;
+  }
+
+  /**
+   * Search users by query string
+   */
+  async searchUsers(query: string): Promise<SearchUserApiResponse[]> {
+    const response = await api.get<ApiResponse<SearchUserApiResponse[]>>(
+      `${this.baseUrl}/api/users?search=${encodeURIComponent(query)}`
+    );
+    return response.data.data;
+  }
+
+  /**
+   * Share presentation with users
+   */
+  async sharePresentation(presentationId: string, request: SharePresentationRequest): Promise<void> {
+    await api.post<ApiResponse<void>>(`${this.baseUrl}/api/resources/${presentationId}/share`, request);
+  }
+
+  /**
+   * Revoke access for a user
+   */
+  async revokeAccess(presentationId: string, userId: string): Promise<void> {
+    await api.post<ApiResponse<void>>(`${this.baseUrl}/api/resources/${presentationId}/revoke`, {
+      targetUserId: userId,
+    });
+  }
+
+  /**
+   * Set public access for presentation
+   */
+  async setPublicAccess(presentationId: string, request: PublicAccessRequest): Promise<PublicAccessResponse> {
+    const response = await api.put<ApiResponse<PublicAccessResponse>>(
+      `${this.baseUrl}/api/resources/${presentationId}/public-access`,
+      request
+    );
+    return response.data.data;
+  }
+
+  /**
+   * Get public access status
+   */
+  async getPublicAccessStatus(presentationId: string): Promise<PublicAccessResponse> {
+    const response = await api.get<ApiResponse<PublicAccessResponse>>(
+      `${this.baseUrl}/api/resources/${presentationId}/public-access`
+    );
+    return response.data.data;
+  }
+
+  /**
+   * Get complete share state in a single API call
+   * Combines shared users, public access settings, and current user permission
+   */
+  async getShareState(presentationId: string): Promise<ShareStateResponse> {
+    const response = await api.get<ApiResponse<ShareStateResponse>>(
+      `${this.baseUrl}/api/resources/${presentationId}/share-state`
+    );
+    return response.data.data;
   }
 }

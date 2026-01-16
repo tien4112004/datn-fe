@@ -1,7 +1,7 @@
 import { api } from '@aiprimary/api';
 import { API_MODE, type ApiMode } from '@aiprimary/api';
 import type { ApiResponse } from '@aiprimary/api';
-import type { UserProfile, UserProfileUpdateRequest } from '../types';
+import type { User, UserProfile, UserProfileUpdateRequest } from '../types';
 
 export interface UserProfileApiService {
   baseUrl: string;
@@ -10,6 +10,7 @@ export interface UserProfileApiService {
   updateCurrentUserProfile(data: UserProfileUpdateRequest): Promise<UserProfile>;
   updateCurrentUserAvatar(avatar: File): Promise<{ avatarUrl: string }>;
   removeCurrentUserAvatar(): Promise<void>;
+  searchUsers(query: string): Promise<User[]>;
 }
 
 export default class UserProfileRealApiService implements UserProfileApiService {
@@ -51,5 +52,15 @@ export default class UserProfileRealApiService implements UserProfileApiService 
 
   async removeCurrentUserAvatar(): Promise<void> {
     await api.delete(`${this.baseUrl}/api/user/me/avatar`);
+  }
+
+  async searchUsers(query: string): Promise<User[]> {
+    const response = await api.get<ApiResponse<User[]>>(`${this.baseUrl}/api/users`, {
+      params: {
+        search: query,
+        pageSize: 20,
+      },
+    });
+    return response.data.data;
   }
 }

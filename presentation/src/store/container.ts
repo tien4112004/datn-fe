@@ -7,6 +7,7 @@ export interface ContainerState {
   isRemote: boolean;
   presentation?: Presentation;
   mode: 'edit' | 'view';
+  permission?: 'read' | 'comment' | 'edit';
 }
 
 export const useContainerStore = defineStore('container', {
@@ -14,6 +15,7 @@ export const useContainerStore = defineStore('container', {
     isRemote: false,
     presentation: undefined,
     mode: 'edit',
+    permission: undefined,
   }),
 
   actions: {
@@ -21,6 +23,10 @@ export const useContainerStore = defineStore('container', {
       this.isRemote = data?.isRemote || false;
       this.presentation = data?.presentation ? markRaw(data?.presentation as Presentation) : undefined;
       this.mode = data?.mode || 'edit';
+      this.permission = data?.permission;
+    },
+    setPermission(permission: 'read' | 'comment' | 'edit') {
+      this.permission = permission;
     },
   },
 });

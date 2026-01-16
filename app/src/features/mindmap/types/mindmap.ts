@@ -1,5 +1,6 @@
 import type { Node, Edge } from '@xyflow/react';
 import type { MINDMAP_TYPES, PATH_TYPES, SHAPES, SIDE, POSITION, LAYOUT_TYPE } from './constants';
+import type { Permission } from '../../../shared/utils/permission';
 
 export type MindMapTypes = (typeof MINDMAP_TYPES)[keyof typeof MINDMAP_TYPES];
 export type PathType = (typeof PATH_TYPES)[keyof typeof PATH_TYPES];
@@ -144,4 +145,5 @@ export interface Mindmap {
   edges: MindMapEdge[];
   createdAt: string;
   updatedAt: string;
+  permission?: Permission;
 }

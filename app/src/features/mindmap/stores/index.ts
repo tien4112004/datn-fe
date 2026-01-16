@@ -8,6 +8,5 @@ export { useUndoRedoStore } from './undoredo';
 export { useMetadataStore } from './metadata';
 export { useDirtyStore } from './dirty';
 export { useTreePanelStore } from './treePanel';
-export { usePresenterModeStore, useReadOnlyStore } from './readOnly';
-export { useViewModeStore } from './viewMode';
+export { usePresenterModeStore } from './presenterMode';
 export { useSavingStore } from './saving';

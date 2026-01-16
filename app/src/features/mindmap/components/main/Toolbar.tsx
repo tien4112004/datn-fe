@@ -1,4 +1,4 @@
-import { GitBranchPlus, Undo, Redo, Save, Sparkles, Download } from 'lucide-react';
+import { GitBranchPlus, Undo, Redo, Save, Sparkles, Download, Share2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/shared/components/ui/tabs';
 import { useUndoRedoStore, useNodeOperationsStore } from '../../stores';
@@ -8,12 +8,24 @@ import { useSaveMindmap, useNodeSelection } from '../../hooks';
 import { useState, useEffect } from 'react';
 import ExportMindmapDialog from '../export';
 import { GenerateTreeDialog } from '../generate';
+import ShareMindmapDialog from '../share/ShareMindmapDialog';
 import NodeSelectionTab from './NodeSelectionTab';
 import LoadingButton from '@/components/common/LoadingButton';
 import { cn } from '@/shared/lib/utils';
 import { TreePanelContent } from '../tree-panel';
+import { CommentDrawer } from '@/features/comments';
+import { PermissionBadge } from '@/shared/components/common/PermissionBadge';
+import type { Permission } from '@/shared/utils/permission';
 
-const Toolbar = ({ mindmapId, isMobileSheet = false }: { mindmapId: string; isMobileSheet?: boolean }) => {
+const Toolbar = ({
+  mindmapId,
+  isMobileSheet = false,
+  permission,
+}: {
+  mindmapId: string;
+  isMobileSheet?: boolean;
+  permission?: Permission;
+}) => {
   const { t } = useTranslation(I18N_NAMESPACES.MINDMAP);
   const addNode = useNodeOperationsStore((state) => state.addNode);
   const undo = useUndoRedoStore((state) => state.undo);
@@ -24,10 +36,15 @@ const Toolbar = ({ mindmapId, isMobileSheet = false }: { mindmapId: string; isMo
   // Selection state
   const { selectedCount, hasSelection } = useNodeSelection();
 
+  // Permission state
+  const userPermission = permission;
+
   // Save and Export states
   const { saveWithThumbnail, isLoading: isSaving } = useSaveMindmap();
   const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
   const [isGenerateDialogOpen, setIsGenerateDialogOpen] = useState(false);
+  const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
+  const [isCommentDrawerOpen, setIsCommentDrawerOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<string>('general');
 
   // Auto-switch to general tab when selection is cleared or to selection tab when selection exists
@@ -54,6 +71,7 @@ const Toolbar = ({ mindmapId, isMobileSheet = false }: { mindmapId: string; isMo
       {!isMobileSheet && (
         <div className="flex items-center justify-between">
           <h2 className="text-base font-bold text-gray-800">{t('toolbar.title')}</h2>
+          {userPermission && <PermissionBadge permission={userPermission} />}
         </div>
       )}
 
@@ -193,6 +211,21 @@ const Toolbar = ({ mindmapId, isMobileSheet = false }: { mindmapId: string; isMo
                 <Download size={isMobileSheet ? 20 : 16} />
                 {t('toolbar.export.export')}
               </Button>
+              {userPermission === 'edit' && (
+                <Button
+                  variant="outline"
+                  onClick={() => setIsShareDialogOpen(true)}
+                  className={cn(
+                    'w-full transition-colors hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500',
+                    isMobileSheet && 'h-11 min-h-[44px] text-base'
+                  )}
+                  size="sm"
+                  title="Share this mindmap"
+                >
+                  <Share2 size={isMobileSheet ? 20 : 16} />
+                  Share
+                </Button>
+              )}
             </div>
           </div>
         </TabsContent>
@@ -213,6 +246,22 @@ const Toolbar = ({ mindmapId, isMobileSheet = false }: { mindmapId: string; isMo
 
       {/* Generate Tree Dialog */}
       <GenerateTreeDialog isOpen={isGenerateDialogOpen} onOpenChange={setIsGenerateDialogOpen} />
+
+      {/* Share Dialog */}
+      <ShareMindmapDialog
+        isOpen={isShareDialogOpen}
+        onOpenChange={setIsShareDialogOpen}
+        mindmapId={mindmapId}
+      />
+
+      {/* Comment Drawer */}
+      <CommentDrawer
+        isOpen={isCommentDrawerOpen}
+        onOpenChange={setIsCommentDrawerOpen}
+        documentId={mindmapId}
+        documentType="mindmap"
+        userPermission={userPermission || 'read'}
+      />
     </div>
   );
 };

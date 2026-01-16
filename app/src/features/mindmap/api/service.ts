@@ -9,7 +9,17 @@ import {
   type AiGeneratedNode,
   type MindmapGenerateRequest,
 } from '../types';
+import type {
+  SharedUserApiResponse,
+  ShareRequest,
+  ShareResponse,
+  PublicAccessRequest,
+  PublicAccessResponse,
+  ShareStateResponse,
+} from '../types/share';
 import { mapPagination, type ApiResponse, type Pagination } from '@aiprimary/api';
+import { parsePermissionHeader } from '../../../shared/utils/permission';
+import type { User } from '@/features/user/types';
 
 export default class MindmapServiceImpl implements MindmapApiService {
   baseUrl: string;
@@ -44,9 +54,16 @@ export default class MindmapServiceImpl implements MindmapApiService {
     const response = await this.client.get<ApiResponse<MindmapResponse>>(
       `${this.baseUrl}/api/mindmaps/${id}`
     );
-    return response.data.data;
-  }
+    const mindmap = response.data.data;
 
+    // Extract permission from response header (added by backend PermissionHeaderResponseWrapper)
+    const permissionHeader = response.headers['permission']; // axios lowercases headers
+    if (permissionHeader) {
+      mindmap.permission = parsePermissionHeader(permissionHeader);
+    }
+
+    return mindmap;
+  }
   async createMindmap(data: MindmapCreateInput): Promise<MindmapResponse> {
     const response = await this.client.post<ApiResponse<MindmapResponse>>(
       `${this.baseUrl}/api/mindmaps`,
@@ -82,6 +99,56 @@ export default class MindmapServiceImpl implements MindmapApiService {
     const response = await this.client.post<ApiResponse<AiGeneratedNode>>(
       `${this.baseUrl}/api/mindmaps/generate`,
       request
+    );
+    return response.data.data;
+  }
+
+  async searchUsers(query: string): Promise<User[]> {
+    const response = await this.client.get<ApiResponse<User[]>>(`${this.baseUrl}/api/users`, {
+      params: { search: query, pageSize: 20 },
+    });
+    return response.data.data;
+  }
+
+  async shareMindmap(id: string, shareData: ShareRequest): Promise<ShareResponse> {
+    const response = await this.client.post<ApiResponse<ShareResponse>>(
+      `${this.baseUrl}/api/resources/${id}/share`,
+      shareData
+    );
+    return response.data.data;
+  }
+
+  async getSharedUsers(id: string): Promise<SharedUserApiResponse[]> {
+    const response = await this.client.get<ApiResponse<SharedUserApiResponse[]>>(
+      `${this.baseUrl}/api/resources/${id}/shared-users`
+    );
+    return response.data.data;
+  }
+
+  async revokeAccess(mindmapId: string, userId: string): Promise<void> {
+    await this.client.post(`${this.baseUrl}/api/resources/${mindmapId}/revoke`, {
+      targetUserId: userId,
+    });
+  }
+
+  async setPublicAccess(mindmapId: string, request: PublicAccessRequest): Promise<PublicAccessResponse> {
+    const response = await this.client.put<ApiResponse<PublicAccessResponse>>(
+      `${this.baseUrl}/api/resources/${mindmapId}/public-access`,
+      request
+    );
+    return response.data.data;
+  }
+
+  async getPublicAccessStatus(mindmapId: string): Promise<PublicAccessResponse> {
+    const response = await this.client.get<ApiResponse<PublicAccessResponse>>(
+      `${this.baseUrl}/api/resources/${mindmapId}/public-access`
+    );
+    return response.data.data;
+  }
+
+  async getShareState(mindmapId: string): Promise<ShareStateResponse> {
+    const response = await this.client.get<ApiResponse<ShareStateResponse>>(
+      `${this.baseUrl}/api/resources/${mindmapId}/share-state`
     );
     return response.data.data;
   }

@@ -11,6 +11,7 @@ import type {
   Slide,
   SlideViewport,
 } from '@aiprimary/core';
+import type { User, SharedUserApiResponse, ShareRequest, ShareResponse } from './share';
 
 export interface PresentationConfig {
   theme: SlideTheme;
@@ -77,4 +78,9 @@ export interface PresentationApiService extends Service {
   getSlideThemes(params?: GetSlideThemesParams): Promise<SlideTheme[]>;
   getSlideThemesByIds(ids: string[]): Promise<SlideTheme[]>;
   getSlideTemplates(): Promise<SlideTemplate[]>;
+  // Sharing methods
+  searchUsers(query: string): Promise<User[]>;
+  sharePresentation(id: string, shareData: ShareRequest): Promise<ShareResponse>;
+  getSharedUsers(id: string): Promise<SharedUserApiResponse[]>;
+  revokeAccess(presentationId: string, userId: string): Promise<void>;
 }

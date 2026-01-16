@@ -1,3 +1,11 @@
+export interface User {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  avatarUrl?: string;
+}
+
 export interface UserProfile {
   id: string;
   email: string;

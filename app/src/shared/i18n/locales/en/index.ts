@@ -16,6 +16,8 @@ import classes from './classes';
 import assignment from './assignment';
 import admin from './admin';
 import assessmentMatrix from './assessmentMatrix';
+import dashboard from './dashboard';
+import comments from './comments';
 
 export default {
   common,
@@ -29,7 +31,9 @@ export default {
   projects,
   settings,
   classes,
+  dashboard,
   assignment,
   admin,
   assessmentMatrix,
+  comments,
 };

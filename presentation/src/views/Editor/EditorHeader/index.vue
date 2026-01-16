@@ -41,9 +41,11 @@
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
+      <!-- Permission Badge -->
     </div>
 
     <div class="tw-flex tw-items-center tw-gap-2 tw-flex-shrink-0">
+      <PermissionBadge v-if="permission" :permission="permission" class="tw-ml-2" />
       <Popover trigger="click" placement="bottom-end" v-model:value="mainMenuVisible">
         <template #content>
           <PopoverMenuItem
@@ -92,9 +94,7 @@
           >
         </template>
         <div class="menu-item">
-          <div class="handler-item">
-            <IconHamburgerButton class="icon" />
-          </div>
+          <IconHamburgerButton class="icon" />
         </div>
       </Popover>
       <Popover trigger="click" center contentClass="!tw-p-0 tw-min-w-[340px]">
@@ -107,41 +107,28 @@
         </Button>
       </Popover>
 
-      <Popover trigger="click" center contentClass="!tw-p-0">
+      <Popover v-if="permission === 'edit'" trigger="click" center contentClass="!tw-p-0">
         <template #content>
-          <ShareMenu @cancel="handleShareCancel" @share="handleShare" />
+          <ShareMenu :presentationId="presentationId" @cancel="handleShareCancel" @share="handleShare" />
         </template>
         <Button class="menu-item" v-tooltip="$t('header.share.sharePresentation')">
           <IconShare class="icon" />
           {{ $t('header.buttons.share') }}
         </Button>
       </Popover>
-      <!-- <div
+      <Button
+        v-if="permission === 'comment' || permission === 'edit'"
         class="menu-item"
-        v-tooltip="$t('header.ai.aiGeneratePPT')"
-        @click="
-          openAIPPTDialog();
-          mainMenuVisible = false;
-        "
+        v-tooltip="$t('header.comments.tooltip')"
+        @click="handleOpenComments"
       >
-        <span class="text ai">AI</span>
-      </div> -->
+        <IconComments class="icon" />
+        {{ $t('header.buttons.comments') }}
+      </Button>
       <Button class="menu-item" v-tooltip="$t('header.file.exportFile')" @click="setDialogForExport('pptx')">
         <IconDownload class="icon" />
         {{ $t('header.share.export') }}
       </Button>
-      <!-- <a
-        class="github-link"
-        v-tooltip="$t('header.meta.copyright')"
-        href="https://github.com/pipipi-pikachu/PPTist"
-        target="_blank"
-      >
-        <div class="menu-item">
-          <div class="handler-item">
-            <IconGithub class="icon" />
-          </div>
-        </div>
-      </a> -->
       <div class="menu-item" id="language-switcher">
         <LanguageSwitcher />
       </div>
@@ -167,6 +154,7 @@
 import { nextTick, ref, computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useI18n } from 'vue-i18n';
+import { useRoute } from 'vue-router';
 import { useMainStore, useSlidesStore, useContainerStore } from '@/store';
 import useScreening from '@/hooks/useScreening';
 import useImport from '@/hooks/useImport';
@@ -193,14 +181,16 @@ import BreadcrumbItem from '@/components/ui/breadcrumb/BreadcrumbItem.vue';
 import BreadcrumbLink from '@/components/ui/breadcrumb/BreadcrumbLink.vue';
 import BreadcrumbPage from '@/components/ui/breadcrumb/BreadcrumbPage.vue';
 import BreadcrumbSeparator from '@/components/ui/breadcrumb/BreadcrumbSeparator.vue';
-import { Check as IconCheck, X as IconClose } from 'lucide-vue-next';
+import { Check as IconCheck, X as IconClose, MessageSquare as IconComments } from 'lucide-vue-next';
 import message from '@/utils/message';
+import PermissionBadge from '@/components/PermissionBadge.vue';
 const { t } = useI18n();
+const route = useRoute();
 const mainStore = useMainStore();
 const slidesStore = useSlidesStore();
 const containerStore = useContainerStore();
 const { title, theme } = storeToRefs(slidesStore);
-const { presentation } = storeToRefs(containerStore);
+const { presentation, permission } = storeToRefs(containerStore);
 const { enterScreening, enterScreeningFromStart, enterPresenterMode, openSeparatedPresentation } =
   useScreening();
 const { importSpecificFile, importPPTXFile, exporting } = useImport();
@@ -208,7 +198,7 @@ const { resetSlides } = useSlideHandler();
 const { createSlide, getThemes } = useSlideTemplates();
 
 // Get presentation ID from container store
-const presentationId = computed(() => presentation?.value?.id || '');
+const presentationId = computed(() => presentation?.value?.id || (route.params.id as string) || '');
 
 const mainMenuVisible = ref(false);
 const hotkeyDrawerVisible = ref(false);
@@ -328,22 +318,13 @@ const handleShareCancel = () => {
 };
 
 const handleShare = (options: { shareWithLink: boolean; allowEdit: boolean; users: any[] }) => {
-  const { shareWithLink, allowEdit, users } = options;
+  // ShareMenu component now handles all its own success messages
+  // This handler kept for potential future logic (logging, analytics, etc.)
+  console.debug('Share settings updated:', options);
+};
 
-  let shareMessage = t('header.share.shareSettingsUpdated');
-
-  if (shareWithLink) {
-    shareMessage +=
-      t('header.share.anyoneWithLinkCan') + (allowEdit ? t('header.share.comment') : t('header.share.view'));
-  } else {
-    shareMessage += t('header.share.restrictedAccess');
-  }
-
-  if (users.length > 0) {
-    shareMessage += ' | ' + users.length + t('header.share.usersAdded');
-  }
-
-  message.success(shareMessage);
+const handleOpenComments = () => {
+  window.dispatchEvent(new CustomEvent('app.presentation.open-comments'));
 };
 </script>
 

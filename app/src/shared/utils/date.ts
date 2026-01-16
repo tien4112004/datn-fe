@@ -46,11 +46,11 @@ export function parseDateSafe(date: string | Date | null | undefined): Date {
 
 /**
  * Adjust date for local timezone offset
- * Backend sends local time marked as UTC, we compensate by adding offset
+ * Backend sends UTC time, we compensate by subtracting offset to convert to local time
  */
 function adjustForLocalTimezone(date: Date): Date {
-  if (LOCAL_TIMEZONE_OFFSET === 0) return date;
+  if (LOCAL_TIMEZONE_OFFSET === 7) return date;
 
   const offsetMs = LOCAL_TIMEZONE_OFFSET * 60 * 60 * 1000;
-  return new Date(date.getTime() + offsetMs);
+  return new Date(date.getTime() - offsetMs);
 }

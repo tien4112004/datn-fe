@@ -53,6 +53,12 @@ export default {
     buttons: {
       present: 'Trình chiếu',
       share: 'Chia sẻ',
+      comments: 'Bình luận',
+    },
+
+    // Bình luận
+    comments: {
+      tooltip: 'Xem và thêm bình luận',
     },
 
     // Điều hướng breadcrumb
@@ -85,16 +91,33 @@ export default {
       peopleWithAccess: 'Mọi người có quyền truy cập',
       generalAccess: 'Quyền truy cập chung',
       copyLink: 'Sao chép liên kết',
+      updateSuccess: 'Đã lưu thay đổi thành công',
       linkCopied: 'Đã sao chép liên kết vào clipboard!',
+      linkCopiedPublic: 'Đã sao chép liên kết - Bất kỳ ai có liên kết này đều có thể truy cập',
+      linkCopiedRestricted: 'Đã sao chép liên kết - Chỉ những người có quyền truy cập mới có thể mở',
       restricted: 'Hạn chế',
       restrictedDescription: 'Chỉ những người có quyền truy cập mới có thể mở',
+      resourceRestricted: 'Tài nguyên hiện đã bị hạn chế',
       anyoneWithLink: 'Bất kỳ ai có liên kết',
       anyoneWithLinkDescription: 'Bất kỳ ai trên internet đều có thể xem',
       viewer: 'Người xem',
       viewerDescription: 'Chỉ có thể xem',
       commenter: 'Người bình luận',
       commenterDescription: 'Có thể xem và bình luận',
+      editor: 'Người chỉnh sửa',
+      editorDescription: 'Có toàn quyền chỉnh sửa',
       defaultPermissionForAnyone: 'Quyền mặc định cho quyền truy cập "Bất kỳ ai"',
+      userAdded: 'Đã thêm người dùng thành công',
+      accessRevoked: 'Đã thu hồi quyền truy cập thành công',
+      permissionUpdated: 'Đã cập nhật quyền thành công',
+      failedToLoadUsers: 'Không thể tải người dùng đã chia sẻ',
+      failedToLoadShareState: 'Không thể tải cài đặt chia sẻ',
+      searchFailed: 'Không thể tìm kiếm người dùng',
+      failedToShare: 'Không thể chia sẻ bài trình chiếu',
+      failedToRevoke: 'Không thể thu hồi quyền truy cập',
+      failedToUpdate: 'Không thể cập nhật quyền',
+      failedToUpdateAccess: 'Không thể cập nhật cài đặt truy cập',
+      failedToCopyLink: 'Không thể sao chép liên kết',
     },
   },
 };

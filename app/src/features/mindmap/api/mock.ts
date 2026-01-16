@@ -11,6 +11,15 @@ import {
   MINDMAP_TYPES,
   PATH_TYPES,
 } from '../types';
+import type {
+  SharedUserApiResponse,
+  ShareRequest,
+  ShareResponse,
+  User,
+  PublicAccessRequest,
+  PublicAccessResponse,
+  ShareStateResponse,
+} from '../types/share';
 import { DRAGHANDLE, SIDE } from '../types/constants';
 import type { ApiResponse, Pagination } from '@aiprimary/api';
 import { mapPagination } from '@aiprimary/api';
@@ -450,6 +459,140 @@ export default class MindmapMockService implements MindmapApiService {
 
         resolve(generated);
       }, 800);
+    });
+  }
+
+  async shareMindmap(id: string, shareData: ShareRequest): Promise<ShareResponse> {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve({
+          resourceId: id,
+          successCount: shareData.targetUserIds.length,
+          failedCount: 0,
+        });
+      }, 300);
+    });
+  }
+
+  async getSharedUsers(_id: string): Promise<SharedUserApiResponse[]> {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const mockSharedUsers: SharedUserApiResponse[] = [
+          {
+            userId: '1', // Backend returns 'userId' not 'id'
+            email: 'john.doe@example.com',
+            firstName: 'John',
+            lastName: 'Doe',
+            avatarUrl: 'https://i.pravatar.cc/150?img=1',
+            permission: 'read',
+          },
+        ];
+        resolve(mockSharedUsers);
+      }, 300);
+    });
+  }
+
+  async revokeAccess(_mindmapId: string, _userId: string): Promise<void> {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve();
+      }, 300);
+    });
+  }
+
+  async searchUsers(query: string): Promise<User[]> {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const mockUsers: User[] = [
+          {
+            id: '1',
+            email: 'john.doe@example.com',
+            firstName: 'John',
+            lastName: 'Doe',
+            avatarUrl: 'https://i.pravatar.cc/150?img=1',
+          },
+          {
+            id: '2',
+            email: 'jane.smith@example.com',
+            firstName: 'Jane',
+            lastName: 'Smith',
+            avatarUrl: 'https://i.pravatar.cc/150?img=2',
+          },
+          {
+            id: '3',
+            email: 'bob.johnson@example.com',
+            firstName: 'Bob',
+            lastName: 'Johnson',
+            avatarUrl: 'https://i.pravatar.cc/150?img=3',
+          },
+        ];
+
+        // Filter users based on query
+        if (!query) {
+          resolve(mockUsers);
+          return;
+        }
+
+        const lowerQuery = query.toLowerCase();
+        const filtered = mockUsers.filter(
+          (user) =>
+            user.email.toLowerCase().includes(lowerQuery) ||
+            user.firstName.toLowerCase().includes(lowerQuery) ||
+            user.lastName.toLowerCase().includes(lowerQuery)
+        );
+        resolve(filtered);
+      }, 300);
+    });
+  }
+
+  async setPublicAccess(mindmapId: string, request: PublicAccessRequest): Promise<PublicAccessResponse> {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve({
+          documentId: mindmapId,
+          isPublic: request.isPublic,
+          publicPermission: request.publicPermission,
+        });
+      }, 300);
+    });
+  }
+
+  async getPublicAccessStatus(mindmapId: string): Promise<PublicAccessResponse> {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve({
+          documentId: mindmapId,
+          isPublic: false,
+          publicPermission: 'read',
+        });
+      }, 300);
+    });
+  }
+
+  async getShareState(mindmapId: string): Promise<ShareStateResponse> {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const mockSharedUsers: SharedUserApiResponse[] = [
+          {
+            userId: '1',
+            email: 'john.doe@example.com',
+            firstName: 'John',
+            lastName: 'Doe',
+            avatarUrl: 'https://i.pravatar.cc/150?img=1',
+            permission: 'read',
+          },
+        ];
+
+        resolve({
+          sharedUsers: mockSharedUsers,
+          publicAccess: {
+            documentId: mindmapId,
+            isPublic: false,
+            publicPermission: 'read',
+          },
+          currentUserPermission: 'edit',
+        });
+      }, 300);
     });
   }
 }

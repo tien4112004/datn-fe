@@ -1,5 +1,5 @@
 import { API_MODE, type ApiMode } from '@aiprimary/api';
-import type { UserProfile, UserProfileUpdateRequest } from '../types';
+import type { User, UserProfile, UserProfileUpdateRequest } from '../types';
 import type { UserProfileApiService } from './service';
 
 const mockUserProfile: UserProfile = {
@@ -48,5 +48,44 @@ export default class UserProfileMockApiService implements UserProfileApiService 
     await new Promise((resolve) => setTimeout(resolve, 500));
     mockUserProfile.avatarUrl = null;
     return;
+  }
+
+  async searchUsers(query: string): Promise<User[]> {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    const mockUsers: User[] = [
+      {
+        id: '1',
+        email: 'john.doe@example.com',
+        firstName: 'John',
+        lastName: 'Doe',
+        avatarUrl: 'https://i.pravatar.cc/150?img=1',
+      },
+      {
+        id: '2',
+        email: 'jane.smith@example.com',
+        firstName: 'Jane',
+        lastName: 'Smith',
+        avatarUrl: 'https://i.pravatar.cc/150?img=2',
+      },
+      {
+        id: '3',
+        email: 'bob.johnson@example.com',
+        firstName: 'Bob',
+        lastName: 'Johnson',
+        avatarUrl: 'https://i.pravatar.cc/150?img=3',
+      },
+    ];
+
+    // Filter users based on query
+    if (!query) return mockUsers;
+
+    const lowerQuery = query.toLowerCase();
+    return mockUsers.filter(
+      (user) =>
+        user.email.toLowerCase().includes(lowerQuery) ||
+        user.firstName.toLowerCase().includes(lowerQuery) ||
+        user.lastName.toLowerCase().includes(lowerQuery)
+    );
   }
 }

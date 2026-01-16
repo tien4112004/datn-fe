@@ -130,3 +130,22 @@ export const useGeneratingStoreSync = () => {
     };
   }, [handleGeneratingStateChange]);
 };
+
+/**
+ * Hook to listen for comment drawer open requests from Vue
+ * The Vue app emits this event when the user clicks the comment button
+ */
+export const useCommentDrawerTrigger = (onOpen: () => void) => {
+  const handleOpenComments = useCallback(() => {
+    onOpen();
+  }, [onOpen]);
+
+  useEffect(() => {
+    const listener = handleOpenComments as unknown as EventListener;
+    window.addEventListener('app.presentation.open-comments', listener);
+
+    return () => {
+      window.removeEventListener('app.presentation.open-comments', listener);
+    };
+  }, [handleOpenComments]);
+};

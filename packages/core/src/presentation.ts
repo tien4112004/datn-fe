@@ -1,4 +1,5 @@
 import type { Slide, SlideTheme } from '@aiprimary/core';
+import type { Permission } from '../../../app/src/shared/utils/permission';
 
 export interface ModelConfig {
   name: string;
@@ -15,6 +16,7 @@ export interface Presentation {
   isParsed?: boolean;
   createdAt?: Date | string;
   updatedAt?: Date | string;
+  permission?: Permission;
 }
 
 export interface PresentationCollectionRequest {

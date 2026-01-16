@@ -1,0 +1,53 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "workspaces": {
+    "app": {
+      "entry": ["src/app/main.tsx!"],
+      "project": ["src/**/*.{ts,tsx}"]
+    },
+    "packages/api": {
+      "entry": ["src/index.ts!"],
+      "project": ["src/**/*.ts"]
+    },
+    "packages/core": {
+      "entry": ["src/index.ts!"],
+      "project": ["src/**/*.ts"]
+    }
+  },
+  "ignore": [
+    "presentation/**",
+    "admin/**",
+    "**/dist/**",
+    "**/node_modules/**",
+    "**/*.test.{ts,tsx}",
+    "**/*.spec.{ts,tsx}",
+    "**/*.config.{js,ts}",
+    "**/vite.config.ts",
+    "**/vitest.config.ts",
+    "**/eslint.config.js",
+    "**/tailwind.config.js",
+    "**/postcss.config.js",
+    "tests/**"
+  ],
+  "ignoreDependencies": [
+    "husky",
+    "prettier",
+    "eslint",
+    "turbo",
+    "@commitlint/*",
+    "@typescript-eslint/*",
+    "typescript-eslint",
+    "globals",
+    "knip",
+    "vite",
+    "vitest",
+    "@vitejs/*",
+    "tailwindcss",
+    "postcss",
+    "autoprefixer",
+    "@eslint/*",
+    "eslint-plugin-*"
+  ],
+  "eslint": false,
+  "vitest": false
+}

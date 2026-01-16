@@ -1,12 +1,4 @@
 import type { Question, Answer } from '../types';
-import { mockAssignments } from '../api/data/assignments.data';
-
-/**
- * Load questions from mock data
- */
-export const loadMockQuestions = (): Question[] => {
-  return mockAssignments[0].questions.map((aq) => aq.question);
-};
 
 /**
  * Validate question collection

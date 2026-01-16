@@ -6,8 +6,8 @@ import {
   type OutlineData,
 } from '../types';
 import type { User, SharedUserApiResponse, ShareRequest, ShareResponse } from '../types/share';
-import { api, API_MODE, type ApiMode } from '@aiprimary/api';
-import { mapPagination, type ApiResponse, type Pagination } from '@aiprimary/api';
+import type { ApiClient, ApiResponse } from '@aiprimary/api';
+import { mapPagination, type Pagination } from '@aiprimary/api';
 import type {
   Presentation,
   SlideLayoutSchema,
@@ -17,19 +17,18 @@ import type {
 } from '@aiprimary/core';
 import { parsePermissionHeader } from '../../../shared/utils/permission';
 
-export default class PresentationRealApiService implements PresentationApiService {
-  baseUrl: string;
+export default class PresentationService implements PresentationApiService {
+  constructor(
+    private readonly apiClient: ApiClient,
+    private readonly baseUrl: string
+  ) {}
 
-  constructor(baseUrl: string = '') {
-    this.baseUrl = baseUrl;
-  }
-
-  getType(): ApiMode {
-    return API_MODE.real;
+  getType() {
+    return 'real' as const;
   }
 
   async getSlideThemes(params?: GetSlideThemesParams): Promise<SlideTheme[]> {
-    const res = await api.get<ApiResponse<SlideTheme[]>>(`${this.baseUrl}/api/slide-themes`, {
+    const res = await this.apiClient.get<ApiResponse<SlideTheme[]>>(`${this.baseUrl}/api/slide-themes`, {
       params: {
         page: (params?.page || 0) + 1,
         pageSize: params?.pageSize,
@@ -43,14 +42,17 @@ export default class PresentationRealApiService implements PresentationApiServic
       return [];
     }
 
-    const res = await api.post<ApiResponse<SlideTheme[]>>(`${this.baseUrl}/api/slide-themes/by-ids`, {
-      ids,
-    });
+    const res = await this.apiClient.post<ApiResponse<SlideTheme[]>>(
+      `${this.baseUrl}/api/slide-themes/by-ids`,
+      {
+        ids,
+      }
+    );
     return res.data.data;
   }
 
   async getSlideTemplates(): Promise<SlideTemplate[]> {
-    const res = await api.get<ApiResponse<SlideTemplate[]>>(`${this.baseUrl}/api/slide-templates`);
+    const res = await this.apiClient.get<ApiResponse<SlideTemplate[]>>(`${this.baseUrl}/api/slide-templates`);
     return res.data.data;
   }
 
@@ -60,7 +62,7 @@ export default class PresentationRealApiService implements PresentationApiServic
   ): Promise<{ stream: AsyncIterable<string> }> {
     const baseUrl = this.baseUrl;
 
-    const response = await api.stream(
+    const response = await this.apiClient.stream(
       `${baseUrl}/api/presentations/outline-generate`,
       {
         ...request,
@@ -106,14 +108,17 @@ export default class PresentationRealApiService implements PresentationApiServic
   }
 
   async getPresentations(request: PresentationCollectionRequest): Promise<ApiResponse<Presentation[]>> {
-    const response = await api.get<ApiResponse<Presentation[]>>(`${this.baseUrl}/api/presentations`, {
-      params: {
-        page: (request.page || 0) + 1,
-        pageSize: request.pageSize,
-        sort: request.sort,
-        filter: request.filter,
-      },
-    });
+    const response = await this.apiClient.get<ApiResponse<Presentation[]>>(
+      `${this.baseUrl}/api/presentations`,
+      {
+        params: {
+          page: (request.page || 0) + 1,
+          pageSize: request.pageSize,
+          sort: request.sort,
+          filter: request.filter,
+        },
+      }
+    );
 
     return {
       ...response.data,
@@ -123,12 +128,17 @@ export default class PresentationRealApiService implements PresentationApiServic
   }
 
   async createPresentation(data: Presentation): Promise<Presentation> {
-    const response = await api.post<ApiResponse<Presentation>>(`${this.baseUrl}/api/presentations`, data);
+    const response = await this.apiClient.post<ApiResponse<Presentation>>(
+      `${this.baseUrl}/api/presentations`,
+      data
+    );
     return this._mapPresentationItem(response.data.data);
   }
 
   async getPresentationById(id: string): Promise<Presentation | null> {
-    const response = await api.get<ApiResponse<Presentation>>(`${this.baseUrl}/api/presentations/${id}`);
+    const response = await this.apiClient.get<ApiResponse<Presentation>>(
+      `${this.baseUrl}/api/presentations/${id}`
+    );
     const presentation = this._mapPresentationItem(response.data.data);
 
     // Extract permission from response header (added by backend PermissionHeaderResponseWrapper)
@@ -144,7 +154,9 @@ export default class PresentationRealApiService implements PresentationApiServic
     slides: SlideLayoutSchema[];
     generationOptions?: ImageOptions;
   }> {
-    const response = await api.get<ApiResponse<any>>(`${this.baseUrl}/api/presentations/${id}/ai-result`);
+    const response = await this.apiClient.get<ApiResponse<any>>(
+      `${this.baseUrl}/api/presentations/${id}/ai-result`
+    );
 
     const rawData = response.data.data;
 
@@ -199,7 +211,7 @@ export default class PresentationRealApiService implements PresentationApiServic
   }
 
   async updatePresentationTitle(id: string, name: string): Promise<any | null> {
-    await api.patch(`/api/presentations/${id}/title`, {
+    await this.apiClient.patch(`/api/presentations/${id}/title`, {
       title: name,
     });
     // API returns 204 No Content
@@ -209,11 +221,15 @@ export default class PresentationRealApiService implements PresentationApiServic
   async updatePresentation(id: string, data: UpdatePresentationRequest | FormData): Promise<any> {
     const config = data instanceof FormData ? { headers: { 'Content-Type': 'multipart/form-data' } } : {};
 
-    await api.put<ApiResponse<Presentation>>(`${this.baseUrl}/api/presentations/${id}`, data, config);
+    await this.apiClient.put<ApiResponse<Presentation>>(
+      `${this.baseUrl}/api/presentations/${id}`,
+      data,
+      config
+    );
   }
 
   async deletePresentation(id: string): Promise<void> {
-    await api.delete(`${this.baseUrl}/api/presentations/${id}`);
+    await this.apiClient.delete(`${this.baseUrl}/api/presentations/${id}`);
   }
 
   _mapPresentationItem(data: any): Presentation {
@@ -231,14 +247,14 @@ export default class PresentationRealApiService implements PresentationApiServic
   }
 
   async searchUsers(query: string): Promise<User[]> {
-    const response = await api.get<ApiResponse<User[]>>(`${this.baseUrl}/api/user/search`, {
+    const response = await this.apiClient.get<ApiResponse<User[]>>(`${this.baseUrl}/api/user/search`, {
       params: { q: query, limit: 10 },
     });
     return response.data.data;
   }
 
   async sharePresentation(id: string, shareData: ShareRequest): Promise<ShareResponse> {
-    const response = await api.post<ApiResponse<ShareResponse>>(
+    const response = await this.apiClient.post<ApiResponse<ShareResponse>>(
       `${this.baseUrl}/api/resources/${id}/share`,
       shareData
     );
@@ -246,14 +262,14 @@ export default class PresentationRealApiService implements PresentationApiServic
   }
 
   async getSharedUsers(id: string): Promise<SharedUserApiResponse[]> {
-    const response = await api.get<ApiResponse<SharedUserApiResponse[]>>(
+    const response = await this.apiClient.get<ApiResponse<SharedUserApiResponse[]>>(
       `${this.baseUrl}/api/resources/${id}/shared-users`
     );
     return response.data.data;
   }
 
   async revokeAccess(presentationId: string, userId: string): Promise<void> {
-    await api.post(`${this.baseUrl}/api/resources/${presentationId}/revoke`, {
+    await this.apiClient.post(`${this.baseUrl}/api/resources/${presentationId}/revoke`, {
       targetUserId: userId,
     });
   }

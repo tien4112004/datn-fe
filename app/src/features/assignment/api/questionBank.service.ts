@@ -1,4 +1,4 @@
-import { api } from '@aiprimary/api';
+import type { ApiClient } from '@aiprimary/api';
 import type {
   QuestionBankApiService,
   QuestionBankItem,
@@ -6,12 +6,11 @@ import type {
   QuestionBankResponse,
 } from '../types/questionBank';
 
-export default class QuestionBankRealApiService implements QuestionBankApiService {
-  baseUrl: string;
-
-  constructor(baseUrl: string = '') {
-    this.baseUrl = baseUrl;
-  }
+export default class QuestionBankService implements QuestionBankApiService {
+  constructor(
+    private readonly apiClient: ApiClient,
+    private readonly baseUrl: string
+  ) {}
 
   async getQuestions(filters?: QuestionBankFilters): Promise<QuestionBankResponse> {
     // Convert arrays to comma-separated strings for API
@@ -33,49 +32,52 @@ export default class QuestionBankRealApiService implements QuestionBankApiServic
       queryParams.chapter = filters.chapter.join(',');
     }
 
-    const response = await api.get(`${this.baseUrl}/api/question-bank`, {
+    // Ensure bankType is set (personal or public)
+    queryParams.bankType = filters?.bankType || 'personal';
+
+    const response = await this.apiClient.get(`${this.baseUrl}/api/question-bank`, {
       params: queryParams,
     });
     return response.data.data;
   }
 
   async getQuestionById(id: string): Promise<QuestionBankItem> {
-    const response = await api.get(`${this.baseUrl}/api/question-bank/${id}`);
+    const response = await this.apiClient.get(`${this.baseUrl}/api/question-bank/${id}`);
     return response.data.data;
   }
 
   async createQuestion(
     question: Omit<QuestionBankItem, 'id' | 'createdAt' | 'updatedAt'>
   ): Promise<QuestionBankItem> {
-    const response = await api.post(`${this.baseUrl}/api/question-bank`, question);
+    const response = await this.apiClient.post(`${this.baseUrl}/api/question-bank`, question);
     return response.data.data;
   }
 
   async updateQuestion(id: string, question: Partial<QuestionBankItem>): Promise<QuestionBankItem> {
-    const response = await api.put(`${this.baseUrl}/api/question-bank/${id}`, question);
+    const response = await this.apiClient.put(`${this.baseUrl}/api/question-bank/${id}`, question);
     return response.data.data;
   }
 
   async deleteQuestion(id: string): Promise<void> {
-    await api.delete(`${this.baseUrl}/api/question-bank/${id}`);
+    await this.apiClient.delete(`${this.baseUrl}/api/question-bank/${id}`);
   }
 
   async bulkDeleteQuestions(ids: string[]): Promise<void> {
-    await api.post(`${this.baseUrl}/api/question-bank/bulk-delete`, { ids });
+    await this.apiClient.post(`${this.baseUrl}/api/question-bank/bulk-delete`, { ids });
   }
 
   async duplicateQuestion(id: string): Promise<QuestionBankItem> {
-    const response = await api.post(`${this.baseUrl}/api/question-bank/${id}/duplicate`);
+    const response = await this.apiClient.post(`${this.baseUrl}/api/question-bank/${id}/duplicate`);
     return response.data.data;
   }
 
   async copyToPersonal(id: string): Promise<QuestionBankItem> {
-    const response = await api.post(`${this.baseUrl}/api/question-bank/${id}/copy-to-personal`);
+    const response = await this.apiClient.post(`${this.baseUrl}/api/question-bank/${id}/copy-to-personal`);
     return response.data.data;
   }
 
   async exportQuestions(filters?: QuestionBankFilters): Promise<Blob> {
-    const response = await api.get(`${this.baseUrl}/api/question-bank/export`, {
+    const response = await this.apiClient.get(`${this.baseUrl}/api/question-bank/export`, {
       params: filters,
       responseType: 'blob',
     });
@@ -85,24 +87,24 @@ export default class QuestionBankRealApiService implements QuestionBankApiServic
   async importQuestions(file: File): Promise<{ success: number; failed: number }> {
     const formData = new FormData();
     formData.append('file', file);
-    const response = await api.post(`${this.baseUrl}/api/question-bank/import`, formData, {
+    const response = await this.apiClient.post(`${this.baseUrl}/api/question-bank/import`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
     return response.data.data;
   }
 
   async getSubjects(): Promise<string[]> {
-    const response = await api.get(`${this.baseUrl}/api/question-bank/metadata/subjects`);
+    const response = await this.apiClient.get(`${this.baseUrl}/api/question-bank/metadata/subjects`);
     return response.data.data;
   }
 
   async getGrades(): Promise<string[]> {
-    const response = await api.get(`${this.baseUrl}/api/question-bank/metadata/grades`);
+    const response = await this.apiClient.get(`${this.baseUrl}/api/question-bank/metadata/grades`);
     return response.data.data;
   }
 
   async getChapters(subject: string, grade: string): Promise<string[]> {
-    const response = await api.get(`${this.baseUrl}/api/question-bank/metadata/chapters`, {
+    const response = await this.apiClient.get(`${this.baseUrl}/api/question-bank/metadata/chapters`, {
       params: { subject, grade },
     });
     return response.data.data;

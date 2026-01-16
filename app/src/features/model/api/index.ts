@@ -1,15 +1,12 @@
 import type { ModelApiService } from '../types/service';
-import ModelMockService from './mock';
-import ModelRealApiService from './service';
-import { createApiServiceFactory, getApiServiceFactory } from '@/shared/api';
+import ModelService from './service';
+import { api, type ApiClient } from '@aiprimary/api';
 import { getBackendUrl } from '@/shared/utils/backend-url';
 
 export const useModelApiService = (): ModelApiService => {
-  const baseUrl = getBackendUrl();
-  return createApiServiceFactory<ModelApiService>(ModelMockService, ModelRealApiService, baseUrl);
+  return new ModelService(api, getBackendUrl());
 };
 
-export const getModelApiService = (): ModelApiService => {
-  const baseUrl = getBackendUrl();
-  return getApiServiceFactory<ModelApiService>(ModelMockService, ModelRealApiService, baseUrl);
+export const getModelApiService = (apiClient: ApiClient = api): ModelApiService => {
+  return new ModelService(apiClient, getBackendUrl());
 };

@@ -1,14 +1,21 @@
 /**
  * API Mode Management
- * Provides functionality to switch between Mock and Real API implementations
- * Used across the application for consistent API behavior control
+ * @deprecated This entire module is deprecated. Services now use dependency injection with ApiClient.
+ * Use `new YourService(apiClient, baseUrl)` instead of mock/real switching.
+ * See fe/packages/api/src/service-factory.ts for new patterns.
  */
 
+/**
+ * @deprecated Use dependency injection with ApiClient instead. This constant is no longer needed.
+ */
 export const API_MODE = {
   mock: 'mock',
   real: 'real',
 } as const;
 
+/**
+ * @deprecated Use dependency injection with ApiClient instead.
+ */
 export type ApiMode = keyof typeof API_MODE;
 
 const LOCAL_STORAGE_KEY = 'apiMode';
@@ -42,6 +49,9 @@ export function isMockMode(): boolean {
   return getApiMode() === API_MODE.mock;
 }
 
+/**
+ * @deprecated No longer needed - services use dependency injection with ApiClient
+ */
 export interface ApiService {
   baseUrl: string;
   getType(): ApiMode;
@@ -49,7 +59,8 @@ export interface ApiService {
 
 /**
  * Get an API service instance based on current mode
- * Used with traditional JavaScript (non-reactive)
+ * @deprecated Use dependency injection instead: `new YourService(apiClient, baseUrl)`
+ * For creating ApiClient instances, use `getDefaultApiClient()` from service-factory.ts
  */
 export function getApiServiceFactory<T extends ApiService>(
   MockServiceClass: new (baseUrl: string) => T,

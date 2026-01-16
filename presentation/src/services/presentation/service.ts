@@ -273,7 +273,7 @@ export class PresentationApiService implements ApiService {
    * Get shared users for a presentation
    */
   async getSharedUsers(presentationId: string): Promise<SharedUserApiResponse[]> {
-    const response = await api.get<ApiResponse<SharedUserApiResponse[]>>(
+    const response = await this.apiClient.get<ApiResponse<SharedUserApiResponse[]>>(
       `${this.baseUrl}/api/resources/${presentationId}/shared-users`
     );
     return response.data.data;
@@ -283,7 +283,7 @@ export class PresentationApiService implements ApiService {
    * Search users by query string
    */
   async searchUsers(query: string): Promise<SearchUserApiResponse[]> {
-    const response = await api.get<ApiResponse<SearchUserApiResponse[]>>(
+    const response = await this.apiClient.get<ApiResponse<SearchUserApiResponse[]>>(
       `${this.baseUrl}/api/users?search=${encodeURIComponent(query)}`
     );
     return response.data.data;
@@ -293,14 +293,14 @@ export class PresentationApiService implements ApiService {
    * Share presentation with users
    */
   async sharePresentation(presentationId: string, request: SharePresentationRequest): Promise<void> {
-    await api.post<ApiResponse<void>>(`${this.baseUrl}/api/resources/${presentationId}/share`, request);
+    await this.apiClient.post<ApiResponse<void>>(`${this.baseUrl}/api/resources/${presentationId}/share`, request);
   }
 
   /**
    * Revoke access for a user
    */
   async revokeAccess(presentationId: string, userId: string): Promise<void> {
-    await api.post<ApiResponse<void>>(`${this.baseUrl}/api/resources/${presentationId}/revoke`, {
+    await this.apiClient.post<ApiResponse<void>>(`${this.baseUrl}/api/resources/${presentationId}/revoke`, {
       targetUserId: userId,
     });
   }
@@ -309,7 +309,7 @@ export class PresentationApiService implements ApiService {
    * Set public access for presentation
    */
   async setPublicAccess(presentationId: string, request: PublicAccessRequest): Promise<PublicAccessResponse> {
-    const response = await api.put<ApiResponse<PublicAccessResponse>>(
+    const response = await this.apiClient.put<ApiResponse<PublicAccessResponse>>(
       `${this.baseUrl}/api/resources/${presentationId}/public-access`,
       request
     );
@@ -320,7 +320,7 @@ export class PresentationApiService implements ApiService {
    * Get public access status
    */
   async getPublicAccessStatus(presentationId: string): Promise<PublicAccessResponse> {
-    const response = await api.get<ApiResponse<PublicAccessResponse>>(
+    const response = await this.apiClient.get<ApiResponse<PublicAccessResponse>>(
       `${this.baseUrl}/api/resources/${presentationId}/public-access`
     );
     return response.data.data;
@@ -331,7 +331,7 @@ export class PresentationApiService implements ApiService {
    * Combines shared users, public access settings, and current user permission
    */
   async getShareState(presentationId: string): Promise<ShareStateResponse> {
-    const response = await api.get<ApiResponse<ShareStateResponse>>(
+    const response = await this.apiClient.get<ApiResponse<ShareStateResponse>>(
       `${this.baseUrl}/api/resources/${presentationId}/share-state`
     );
     return response.data.data;

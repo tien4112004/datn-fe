@@ -1,6 +1,5 @@
 import type { ApiResponse } from '@aiprimary/api';
 
-import type { Service } from '@/shared/api';
 import type {
   Class,
   ClassCollectionRequest,
@@ -32,7 +31,7 @@ export interface ImportResult {
   errors?: string[];
 }
 
-export interface ClassApiService extends Service {
+export interface ClassApiService {
   // Class CRUD operations
   getClasses(request: ClassCollectionRequest): Promise<ApiResponse<Class[]>>;
   getClassById(id: string): Promise<Class | null>;

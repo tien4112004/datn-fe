@@ -1,4 +1,3 @@
-import type { Service } from '@/shared/api';
 import type { Model, ModelType } from './model';
 
 export interface ModelPatchData {
@@ -6,7 +5,8 @@ export interface ModelPatchData {
   enabled?: boolean;
 }
 
-export interface ModelApiService extends Service {
+export interface ModelApiService {
+  getType(): 'real' | 'mock';
   getModels(type: ModelType | null): Promise<Model[]>;
   getDefaultModel(type: ModelType): Promise<Model>;
   patchModel(modelId: string, data: ModelPatchData): Promise<Model>;

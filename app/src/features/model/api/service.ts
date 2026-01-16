@@ -1,22 +1,19 @@
-import { API_MODE, type ApiMode } from '@aiprimary/api';
+import type { ApiClient, ApiResponse } from '@aiprimary/api';
 import type { ModelApiService, Model, ModelPatchData, ModelType } from '../types';
-import { api } from '@aiprimary/api';
-import type { ApiResponse } from '@aiprimary/api';
 
-export default class ModelRealApiService implements ModelApiService {
-  baseUrl: string;
+export default class ModelService implements ModelApiService {
+  constructor(
+    private readonly apiClient: ApiClient,
+    private readonly baseUrl: string
+  ) {}
 
-  constructor(baseUrl: string) {
-    this.baseUrl = baseUrl;
-  }
-
-  getType(): ApiMode {
-    return API_MODE.real;
+  getType() {
+    return 'real' as const;
   }
 
   async getModels(type: ModelType | null): Promise<Model[]> {
     const baseUrl = this.baseUrl;
-    const response = await api.get<ApiResponse<Model[]>>(`${baseUrl}/api/models`, {
+    const response = await this.apiClient.get<ApiResponse<Model[]>>(`${baseUrl}/api/models`, {
       params: { modelType: type },
     });
     const models = response.data.data.map(this._mapModelOption);
@@ -39,7 +36,7 @@ export default class ModelRealApiService implements ModelApiService {
 
   async getDefaultModel(type: ModelType): Promise<Model> {
     const baseUrl = this.baseUrl;
-    const response = await api.get<ApiResponse<Model[]>>(`${baseUrl}/api/models`, {
+    const response = await this.apiClient.get<ApiResponse<Model[]>>(`${baseUrl}/api/models`, {
       params: { modelType: type },
     });
     return this._mapModelOption(response.data.data.find((model) => model.default));
@@ -47,7 +44,7 @@ export default class ModelRealApiService implements ModelApiService {
 
   async patchModel(modelId: string, data: ModelPatchData): Promise<Model> {
     const baseUrl = this.baseUrl;
-    const response = await api.patch<ApiResponse<Model>>(`${baseUrl}/api/models/${modelId}`, data);
+    const response = await this.apiClient.patch<ApiResponse<Model>>(`${baseUrl}/api/models/${modelId}`, data);
     return this._mapModelOption(response.data.data);
   }
 

@@ -1,9 +1,8 @@
-import type { Service } from '@/shared/api/base-service';
 import type { Comment, Post } from './index';
 import type { CommentCreateRequest, FeedFilter, PostCreateRequest, PostUpdateRequest } from './requests';
 import type { ApiResponse } from '@aiprimary/api';
 
-export interface ClassFeedApiService extends Service {
+export interface ClassFeedApiService {
   // Posts
   getPosts(
     classId: string,

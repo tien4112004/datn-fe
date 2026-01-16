@@ -1,11 +1,8 @@
-import { api } from '@aiprimary/api';
-import { API_MODE, type ApiMode } from '@aiprimary/api';
-import type { ApiResponse } from '@aiprimary/api';
+import type { ApiClient, ApiResponse } from '@aiprimary/api';
 import type { User, UserProfile, UserProfileUpdateRequest } from '../types';
 
 export interface UserProfileApiService {
-  baseUrl: string;
-  getType(): ApiMode;
+  getType(): 'real' | 'mock';
   getCurrentUserProfile(): Promise<UserProfile>;
   updateCurrentUserProfile(data: UserProfileUpdateRequest): Promise<UserProfile>;
   updateCurrentUserAvatar(avatar: File): Promise<{ avatarUrl: string }>;
@@ -13,24 +10,26 @@ export interface UserProfileApiService {
   searchUsers(query: string): Promise<User[]>;
 }
 
-export default class UserProfileRealApiService implements UserProfileApiService {
-  baseUrl: string;
+export default class UserProfileService implements UserProfileApiService {
+  constructor(
+    private readonly apiClient: ApiClient,
+    private readonly baseUrl: string
+  ) {}
 
-  constructor(baseUrl: string = '') {
-    this.baseUrl = baseUrl;
-  }
-
-  getType(): ApiMode {
-    return API_MODE.real;
+  getType() {
+    return 'real' as const;
   }
 
   async getCurrentUserProfile(): Promise<UserProfile> {
-    const response = await api.get<ApiResponse<UserProfile>>(`${this.baseUrl}/api/user/me`);
+    const response = await this.apiClient.get<ApiResponse<UserProfile>>(`${this.baseUrl}/api/user/me`);
     return response.data.data;
   }
 
   async updateCurrentUserProfile(data: UserProfileUpdateRequest): Promise<UserProfile> {
-    const response = await api.patch<ApiResponse<UserProfile>>(`${this.baseUrl}/api/user/me`, data);
+    const response = await this.apiClient.patch<ApiResponse<UserProfile>>(
+      `${this.baseUrl}/api/user/me`,
+      data
+    );
     return response.data.data;
   }
 
@@ -38,7 +37,7 @@ export default class UserProfileRealApiService implements UserProfileApiService 
     const formData = new FormData();
     formData.append('avatar', avatar);
 
-    const response = await api.patch<ApiResponse<{ avatarUrl: string }>>(
+    const response = await this.apiClient.patch<ApiResponse<{ avatarUrl: string }>>(
       `${this.baseUrl}/api/user/me/avatar`,
       formData,
       {
@@ -51,11 +50,11 @@ export default class UserProfileRealApiService implements UserProfileApiService 
   }
 
   async removeCurrentUserAvatar(): Promise<void> {
-    await api.delete(`${this.baseUrl}/api/user/me/avatar`);
+    await this.apiClient.delete(`${this.baseUrl}/api/user/me/avatar`);
   }
 
   async searchUsers(query: string): Promise<User[]> {
-    const response = await api.get<ApiResponse<User[]>>(`${this.baseUrl}/api/users`, {
+    const response = await this.apiClient.get<ApiResponse<User[]>>(`${this.baseUrl}/api/users`, {
       params: {
         search: query,
         pageSize: 20,

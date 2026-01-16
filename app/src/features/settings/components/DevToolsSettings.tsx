@@ -3,7 +3,6 @@ import { Separator } from '@/shared/components/ui/separator';
 import { Button } from '@/shared/components/ui/button';
 import { toast } from 'sonner';
 import BackendUrlForm from './BackendUrlForm';
-import AIModelsTable from './AIModelsTable';
 
 const DevToolsSettings = () => {
   const { t } = useTranslation('settings');
@@ -25,10 +24,6 @@ const DevToolsSettings = () => {
           </div>
         </div>
       </div>
-
-      <Separator />
-
-      <AIModelsTable />
 
       <Separator />
 

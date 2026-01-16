@@ -1,17 +1,16 @@
 import type { AuthApiService } from '../types';
-import AuthMockService from './mock';
-import AuthRealApiService from './service';
-import { createApiServiceFactory, getApiServiceFactory } from '@/shared/api';
+import AuthService from './service';
+import { api, type ApiClient } from '@aiprimary/api';
 import { getBackendUrl } from '@/shared/utils/backend-url';
 
 export const useAuthApiService = (): AuthApiService => {
-  const backendUrl = getBackendUrl();
-
-  return createApiServiceFactory<AuthApiService>(AuthMockService, AuthRealApiService, backendUrl);
+  return new AuthService(api, getBackendUrl());
 };
 
-export const getAuthApiService = (): AuthApiService => {
-  const backendUrl = getBackendUrl();
+export const getAuthApiService = (apiClient: ApiClient = api): AuthApiService => {
+  return new AuthService(apiClient, getBackendUrl());
+};
 
-  return getApiServiceFactory<AuthApiService>(AuthMockService, AuthRealApiService, backendUrl);
+export const createAuthApiService = (apiClient: ApiClient, baseUrl?: string): AuthApiService => {
+  return new AuthService(apiClient, baseUrl || getBackendUrl());
 };

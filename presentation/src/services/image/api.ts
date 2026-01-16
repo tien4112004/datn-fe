@@ -1,13 +1,9 @@
-import { getApiServiceFactory } from '@aiprimary/api';
-import { ImageApiService } from './service';
-import { MockImageApiService } from './mock';
+import { api, type ApiClient, getBackendUrl } from '@aiprimary/api';
+import { ImageService } from './service';
 import type { GeneratedImage, ImageGenerationParams, SingleImageResponse, ImageSearchPayload } from './types';
-import { getBackendUrl } from '@aiprimary/api';
 
 // Re-export types
 export type { GeneratedImage, ImageGenerationParams, SingleImageResponse, ImageSearchPayload };
-
-const BASE_URL = getBackendUrl();
 
 export interface IImageApi {
   generateImage(
@@ -20,9 +16,8 @@ export interface IImageApi {
 }
 
 /**
- * Get an image API service instance based on current API mode
- * Used with traditional JavaScript (non-reactive)
+ * Get an image API service instance
  */
-export const getImageApi = (): IImageApi => {
-  return getApiServiceFactory<any>(MockImageApiService, ImageApiService, BASE_URL);
+export const getImageApi = (apiClient: ApiClient = api): IImageApi => {
+  return new ImageService(apiClient, getBackendUrl());
 };

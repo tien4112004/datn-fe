@@ -1,32 +1,18 @@
 import type { ClassFeedApiService } from '../types';
-import ClassFeedMockApiService from './mock';
-import ClassFeedRealApiService from './service';
-import { createApiServiceFactory, getApiServiceFactory } from '@/shared/api';
+import ClassFeedService from './service';
+import { api, type ApiClient } from '@aiprimary/api';
 import { getBackendUrl } from '@/shared/utils/backend-url';
 
 export const useClassFeedApiService = (): ClassFeedApiService => {
-  const backendUrl = getBackendUrl();
-
-  return createApiServiceFactory<ClassFeedApiService>(
-    ClassFeedMockApiService,
-    ClassFeedRealApiService,
-    backendUrl
-  );
+  return new ClassFeedService(api, getBackendUrl());
 };
 
-export const getClassFeedApiService = (): ClassFeedApiService => {
-  const backendUrl = getBackendUrl();
-
-  return getApiServiceFactory<ClassFeedApiService>(
-    ClassFeedMockApiService,
-    ClassFeedRealApiService,
-    backendUrl
-  );
+export const getClassFeedApiService = (apiClient: ApiClient = api): ClassFeedApiService => {
+  return new ClassFeedService(apiClient, getBackendUrl());
 };
 
 // Deprecated: Use useClassFeedApiService() hook instead
 export const classFeedApi = getClassFeedApiService();
 
 export type { ClassFeedApiService } from '../types';
-export { default as ClassFeedMockApiService } from './mock';
-export { default as ClassFeedRealApiService } from './service';
+export { default as ClassFeedService } from './service';

@@ -1,4 +1,4 @@
-import { API_MODE, type ApiMode } from '@aiprimary/api';
+import type { ApiClient, ApiResponse } from '@aiprimary/api';
 import {
   type ImageApiService,
   type ImageGenerationRequest,
@@ -7,19 +7,19 @@ import {
   type GetImagesParams,
   type GetArtStylesParams,
 } from '../types/service';
-import { api } from '@aiprimary/api';
-import { type ApiResponse } from '@aiprimary/api';
 import type { ArtStyle } from '@aiprimary/core';
 
-export default class ImageRealApiService implements ImageApiService {
-  baseUrl: string;
+export default class ImageService implements ImageApiService {
+  private readonly apiClient: ApiClient;
+  private readonly baseUrl: string;
 
-  constructor(baseUrl: string = '') {
+  constructor(apiClient: ApiClient, baseUrl: string) {
+    this.apiClient = apiClient;
     this.baseUrl = baseUrl;
   }
 
-  getType(): ApiMode {
-    return API_MODE.real;
+  getType() {
+    return 'real' as const;
   }
 
   async generateImage(request: ImageGenerationRequest): Promise<ImageGenerationResponse> {
@@ -28,13 +28,13 @@ export default class ImageRealApiService implements ImageApiService {
       ? `${this.baseUrl}/api/image/generate/mock`
       : `${this.baseUrl}/api/images/generate`;
 
-    const response = await api.post<ApiResponse<ImageGenerationResponse>>(endpoint, request);
+    const response = await this.apiClient.post<ApiResponse<ImageGenerationResponse>>(endpoint, request);
     return this._mapImageResponse(response.data.data);
   }
 
   async getImageById(id: string): Promise<ImageData | null> {
     try {
-      const response = await api.get<ApiResponse<ImageData>>(`${this.baseUrl}/api/images/${id}`);
+      const response = await this.apiClient.get<ApiResponse<ImageData>>(`${this.baseUrl}/api/images/${id}`);
       return this._mapImageItem(response.data.data);
     } catch (error) {
       console.error('Failed to fetch image:', error);
@@ -44,7 +44,7 @@ export default class ImageRealApiService implements ImageApiService {
 
   async getImages(params?: GetImagesParams): Promise<ImageData[]> {
     try {
-      const response = await api.get<ApiResponse<ImageData[]>>(`${this.baseUrl}/api/images`, {
+      const response = await this.apiClient.get<ApiResponse<ImageData[]>>(`${this.baseUrl}/api/images`, {
         params: {
           page: params?.page,
           pageSize: params?.pageSize,
@@ -69,7 +69,7 @@ export default class ImageRealApiService implements ImageApiService {
       ? `${this.baseUrl}/api/image/generate-in-presentation/mock`
       : `${this.baseUrl}/api/images/generate-in-presentation`;
 
-    const res = await api.post<ApiResponse<{ cdnUrls: string[] }>>(
+    const res = await this.apiClient.post<ApiResponse<{ cdnUrls: string[] }>>(
       endpoint,
       {
         prompt: request.prompt,
@@ -111,7 +111,7 @@ export default class ImageRealApiService implements ImageApiService {
 
   async getArtStyles(params?: GetArtStylesParams): Promise<ArtStyle[]> {
     try {
-      const response = await api.get<ApiResponse<any[]>>(`${this.baseUrl}/api/art-styles`, {
+      const response = await this.apiClient.get<ApiResponse<any[]>>(`${this.baseUrl}/api/art-styles`, {
         params: {
           page: params?.page || 1,
           pageSize: params?.pageSize || 50,

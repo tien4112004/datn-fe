@@ -1,4 +1,3 @@
-import type { Service } from '@/shared/api';
 import type { ApiResponse } from '@aiprimary/api';
 import type { Mindmap, AiGeneratedNode, MindMapNode, MindMapEdge, MindmapMetadata } from './mindmap';
 import type {
@@ -18,7 +17,8 @@ export interface MindmapCollectionRequest {
   filter?: string;
 }
 
-export interface MindmapApiService extends Service {
+export interface MindmapApiService {
+  getType(): 'real' | 'mock';
   getMindmapById(id: string): Promise<MindmapResponse>;
   getMindmaps(request: MindmapCollectionRequest): Promise<ApiResponse<MindmapResponse[]>>;
   createMindmap(data: MindmapCreateInput): Promise<MindmapResponse>;

@@ -1,23 +1,11 @@
-import { getBackendUrl } from '@aiprimary/api';
+import { api, getBackendUrl, type ApiClient } from '@aiprimary/api';
 import type { QuestionBankApiService } from '../types/questionBank';
-import QuestionBankMockApiService from './questionBank.mock';
-import QuestionBankRealApiService from './questionBank.service';
-
-// Simple API mode detection based on environment variable
-const getApiMode = (): 'mock' | 'real' => {
-  return import.meta.env.VITE_API_MODE === 'real' ? 'real' : 'mock';
-};
+import QuestionBankService from './questionBank.service';
 
 export const useQuestionBankApiService = (): QuestionBankApiService => {
-  const baseUrl = getBackendUrl();
-  const apiMode = getApiMode();
-
-  if (apiMode === 'mock') {
-    return new QuestionBankMockApiService(baseUrl);
-  }
-  return new QuestionBankRealApiService(baseUrl);
+  return new QuestionBankService(api, getBackendUrl());
 };
 
-export const getQuestionBankApiService = (): QuestionBankApiService => {
-  return useQuestionBankApiService();
+export const getQuestionBankApiService = (apiClient: ApiClient = api): QuestionBankApiService => {
+  return new QuestionBankService(apiClient, getBackendUrl());
 };

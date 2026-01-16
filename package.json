@@ -15,7 +15,9 @@
     "test": "turbo run test",
     "test:run": "turbo run test:run",
     "prepare": "husky install",
-    "preview": "turbo run preview"
+    "preview": "turbo run preview",
+    "knip": "knip",
+    "knip:fix": "knip --fix"
   },
   "keywords": [],
   "author": "",
@@ -29,6 +31,7 @@
     "eslint": "^9.39.2",
     "globals": "^16.5.0",
     "husky": "^8.0.3",
+    "knip": "^5.81.0",
     "prettier": "^3.7.4",
     "prettier-plugin-tailwindcss": "^0.6.14",
     "turbo": "^2.7.2",

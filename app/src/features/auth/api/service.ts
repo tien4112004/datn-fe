@@ -1,18 +1,15 @@
-import { API_MODE, type ApiMode } from '@aiprimary/api';
+import type { ApiClient } from '@aiprimary/api';
 import type { AuthApiService } from '../types';
 import type { LoginRequest, SignupRequest, SignupResponse, User } from '@/shared/types/auth';
-import { api } from '@aiprimary/api';
 import { setUserData, clearAuthData } from '@/shared/context/auth';
 
-export default class AuthRealApiService implements AuthApiService {
-  baseUrl: string;
+export default class AuthService implements AuthApiService {
+  private readonly apiClient: ApiClient;
+  private readonly baseUrl: string;
 
-  constructor(baseUrl: string = '') {
+  constructor(apiClient: ApiClient, baseUrl: string) {
+    this.apiClient = apiClient;
     this.baseUrl = baseUrl;
-  }
-
-  getType(): ApiMode {
-    return API_MODE.real;
   }
 
   /**
@@ -20,7 +17,7 @@ export default class AuthRealApiService implements AuthApiService {
    * Authentication tokens are set as HttpOnly cookies by the backend
    */
   async login(request: LoginRequest): Promise<void> {
-    await api.post(`${this.baseUrl}/api/auth/signin`, request);
+    await this.apiClient.post(`${this.baseUrl}/api/auth/signin`, request);
     // Backend sets HttpOnly cookies automatically
     // No need to handle tokens on frontend
   }
@@ -29,7 +26,7 @@ export default class AuthRealApiService implements AuthApiService {
    * Register new user with real API call
    */
   async register(request: SignupRequest): Promise<SignupResponse> {
-    const response = await api.post<{ data: User }>(`${this.baseUrl}/api/auth/signup`, request);
+    const response = await this.apiClient.post<{ data: User }>(`${this.baseUrl}/api/auth/signup`, request);
 
     // Signup doesn't return tokens, just user data
     return { user: response.data.data };
@@ -39,7 +36,7 @@ export default class AuthRealApiService implements AuthApiService {
    * Logout user with real API call
    */
   async logout(): Promise<void> {
-    await api.post(`${this.baseUrl}/api/auth/logout`);
+    await this.apiClient.post(`${this.baseUrl}/api/auth/logout`);
 
     // Clear all auth data
     clearAuthData();
@@ -49,7 +46,7 @@ export default class AuthRealApiService implements AuthApiService {
    * Get current user from backend
    */
   async getCurrentUser(): Promise<User> {
-    const response = await api.get<{ data: User }>(`${this.baseUrl}/api/user/me`);
+    const response = await this.apiClient.get<{ data: User }>(`${this.baseUrl}/api/user/me`);
 
     // Store user data in localStorage for persistence across page reloads
     setUserData(response.data.data);

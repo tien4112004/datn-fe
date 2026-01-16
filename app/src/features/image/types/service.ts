@@ -1,4 +1,3 @@
-import type { Service } from '@/shared/api';
 import type { ArtStyle } from '@aiprimary/core';
 
 export interface ImageGenerationRequest {
@@ -44,7 +43,8 @@ export interface GetArtStylesParams {
   pageSize?: number;
 }
 
-export interface ImageApiService extends Service {
+export interface ImageApiService {
+  getType(): 'real' | 'mock';
   generateImage(request: ImageGenerationRequest): Promise<ImageGenerationResponse>;
   getImageById(id: string): Promise<ImageData | null>;
   getImages(params?: GetImagesParams): Promise<ImageData[]>;

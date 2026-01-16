@@ -1,4 +1,3 @@
-import type { Service } from '@/shared/api';
 import type { ApiResponse } from '@aiprimary/api';
 import type { OutlineData } from './outline';
 import type {
@@ -63,7 +62,8 @@ export interface GetSlideThemesParams {
   pageSize?: number;
 }
 
-export interface PresentationApiService extends Service {
+export interface PresentationApiService {
+  getType(): 'real' | 'mock';
   getStreamedOutline(request: OutlineData, signal: AbortSignal): Promise<{ stream: AsyncIterable<string> }>;
   getPresentations(request: PresentationCollectionRequest): Promise<ApiResponse<Presentation[]>>;
   createPresentation(data: CreatePresentationRequest): Promise<Presentation>;

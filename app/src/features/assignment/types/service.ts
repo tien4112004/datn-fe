@@ -1,4 +1,3 @@
-import type { Service } from '@/shared/api';
 import type { ApiResponse } from '@aiprimary/api';
 import type { Assignment as CoreAssignment, Submission } from '@aiprimary/core';
 import type { CreateAssignmentRequest, UpdateAssignmentRequest } from './assignment';
@@ -11,7 +10,7 @@ export interface AssignmentCollectionRequest {
   filter?: string;
 }
 
-export interface AssignmentApiService extends Service {
+export interface AssignmentApiService {
   // CRUD operations
   getAssignments(request: AssignmentCollectionRequest): Promise<ApiResponse<CoreAssignment[]>>;
   getAssignmentById(id: string): Promise<CoreAssignment>;

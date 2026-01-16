@@ -1,6 +1,4 @@
-import { API_MODE, type ApiMode } from '@aiprimary/api';
-import type { ApiResponse } from '@aiprimary/api';
-import { api } from '@aiprimary/api';
+import type { ApiClient, ApiResponse } from '@aiprimary/api';
 import type {
   ClassFeedApiService,
   Comment,
@@ -11,15 +9,13 @@ import type {
   PostUpdateRequest,
 } from '../types';
 
-export default class ClassFeedRealApiService implements ClassFeedApiService {
-  baseUrl: string;
+export default class ClassFeedService implements ClassFeedApiService {
+  private readonly apiClient: ApiClient;
+  private readonly baseUrl: string;
 
-  constructor(baseUrl: string = '') {
+  constructor(apiClient: ApiClient, baseUrl: string) {
+    this.apiClient = apiClient;
     this.baseUrl = baseUrl;
-  }
-
-  getType(): ApiMode {
-    return API_MODE.real;
   }
 
   async getPosts(
@@ -28,14 +24,17 @@ export default class ClassFeedRealApiService implements ClassFeedApiService {
     page = 1,
     pageSize = 20
   ): Promise<ApiResponse<Post[]>> {
-    const response = await api.get<ApiResponse<Post[]>>(`${this.baseUrl}/api/classes/${classId}/posts`, {
-      params: {
-        page: page.toString(),
-        size: pageSize.toString(),
-        type: filter?.type !== 'all' ? filter?.type : undefined,
-        search: filter?.search || undefined,
-      },
-    });
+    const response = await this.apiClient.get<ApiResponse<Post[]>>(
+      `${this.baseUrl}/api/classes/${classId}/posts`,
+      {
+        params: {
+          page: page.toString(),
+          size: pageSize.toString(),
+          type: filter?.type !== 'all' ? filter?.type : undefined,
+          search: filter?.search || undefined,
+        },
+      }
+    );
 
     return response.data;
   }
@@ -52,7 +51,7 @@ export default class ClassFeedRealApiService implements ClassFeedApiService {
       allowComments: request.allowComments,
     };
 
-    const response = await api.post<ApiResponse<Post>>(
+    const response = await this.apiClient.post<ApiResponse<Post>>(
       `${this.baseUrl}/api/classes/${request.classId}/posts`,
       payload
     );
@@ -72,17 +71,20 @@ export default class ClassFeedRealApiService implements ClassFeedApiService {
       allowComments: request.allowComments,
     };
 
-    const response = await api.put<ApiResponse<Post>>(`${this.baseUrl}/api/posts/${request.id}`, payload);
+    const response = await this.apiClient.put<ApiResponse<Post>>(
+      `${this.baseUrl}/api/posts/${request.id}`,
+      payload
+    );
 
     return response.data.data;
   }
 
   async deletePost(postId: string): Promise<void> {
-    await api.delete(`${this.baseUrl}/api/posts/${postId}`);
+    await this.apiClient.delete(`${this.baseUrl}/api/posts/${postId}`);
   }
 
   async pinPost(postId: string, pinned: boolean): Promise<Post> {
-    const response = await api.post<ApiResponse<Post>>(`${this.baseUrl}/api/posts/${postId}/pin`, {
+    const response = await this.apiClient.post<ApiResponse<Post>>(`${this.baseUrl}/api/posts/${postId}/pin`, {
       pinned,
     });
 
@@ -90,13 +92,15 @@ export default class ClassFeedRealApiService implements ClassFeedApiService {
   }
 
   async getComments(postId: string): Promise<Comment[]> {
-    const response = await api.get<ApiResponse<Comment[]>>(`${this.baseUrl}/api/posts/${postId}/comments`);
+    const response = await this.apiClient.get<ApiResponse<Comment[]>>(
+      `${this.baseUrl}/api/posts/${postId}/comments`
+    );
 
     return response.data.data;
   }
 
   async createComment(request: CommentCreateRequest): Promise<Comment> {
-    const response = await api.post<ApiResponse<Comment>>(
+    const response = await this.apiClient.post<ApiResponse<Comment>>(
       `${this.baseUrl}/api/posts/${request.postId}/comments`,
       { content: request.content }
     );
@@ -105,6 +109,6 @@ export default class ClassFeedRealApiService implements ClassFeedApiService {
   }
 
   async deleteComment(commentId: string): Promise<void> {
-    await api.delete(`${this.baseUrl}/api/comments/${commentId}`);
+    await this.apiClient.delete(`${this.baseUrl}/api/comments/${commentId}`);
   }
 }

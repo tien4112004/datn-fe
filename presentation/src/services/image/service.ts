@@ -1,26 +1,16 @@
-import { api } from '@aiprimary/api';
-import type { ApiResponse } from '@aiprimary/api';
+import type { ApiClient, ApiResponse } from '@aiprimary/api';
 import type {
   ImageGenerationParams,
   ImageGenerationResponse,
   SingleImageResponse,
   ImageSearchPayload,
 } from './types';
-import type { ApiService } from '@aiprimary/api';
-import { getBackendUrl } from '@aiprimary/api';
 
-const BASE_URL = getBackendUrl();
-
-export class ImageApiService implements ApiService {
-  baseUrl: string;
-
-  constructor(baseUrl: string = BASE_URL) {
-    this.baseUrl = baseUrl;
-  }
-
-  getType() {
-    return 'real' as const;
-  }
+export class ImageService {
+  constructor(
+    private readonly apiClient: ApiClient,
+    private readonly baseUrl: string
+  ) {}
 
   /**
    * Generate an image for a slide element
@@ -37,7 +27,7 @@ export class ImageApiService implements ApiService {
       : `${this.baseUrl}/api/images/generate-in-presentation`;
 
     const [response] = await Promise.all([
-      api.post<ApiResponse<any>>(
+      this.apiClient.post<ApiResponse<any>>(
         endpoint,
         {
           prompt: params.prompt,
@@ -63,7 +53,7 @@ export class ImageApiService implements ApiService {
 
   async searchImage(body: ImageSearchPayload): Promise<any> {
     try {
-      const response = await api.post(`${this.baseUrl}/api/images/search-pexels`, body);
+      const response = await this.apiClient.post(`${this.baseUrl}/api/images/search-pexels`, body);
       return response.data;
     } catch (error: any) {
       // Handle rate limit from Pexels API
@@ -76,7 +66,7 @@ export class ImageApiService implements ApiService {
 
   async getMyImages(page: number = 1, size: number = 20): Promise<any> {
     try {
-      const response = await api.get(`${this.baseUrl}/api/images`, {
+      const response = await this.apiClient.get(`${this.baseUrl}/api/images`, {
         params: { page, size },
       });
       return response.data;

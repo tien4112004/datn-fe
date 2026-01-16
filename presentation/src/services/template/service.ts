@@ -1,25 +1,28 @@
-import { API_MODE } from '@aiprimary/api';
-import { api } from '@aiprimary/api';
-import type { ApiResponse } from '@aiprimary/api';
+import type { ApiClient, ApiResponse } from '@aiprimary/api';
 import type { SlideTemplate } from '@aiprimary/core';
 import type { ITemplateApi } from './types';
 
-export class TemplateApiService implements ITemplateApi {
+export class TemplateService implements ITemplateApi {
   baseUrl: string;
+  private readonly apiClient: ApiClient;
 
-  constructor(baseUrl: string) {
+  constructor(apiClient: ApiClient, baseUrl: string) {
+    this.apiClient = apiClient;
     this.baseUrl = baseUrl;
   }
 
   getType() {
-    return API_MODE.real;
+    return 'real' as const;
   }
 
   async getSlideTemplates(): Promise<SlideTemplate[]> {
     try {
-      const res = await api.get<ApiResponse<SlideTemplate[]>>(`${this.baseUrl}/api/slide-templates`, {
-        params: { pageSize: 1000 },
-      });
+      const res = await this.apiClient.get<ApiResponse<SlideTemplate[]>>(
+        `${this.baseUrl}/api/slide-templates`,
+        {
+          params: { pageSize: 1000 },
+        }
+      );
 
       // Check if response has expected structure
       if (!res?.data?.data) {

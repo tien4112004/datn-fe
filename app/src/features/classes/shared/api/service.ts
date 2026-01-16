@@ -1,4 +1,4 @@
-import { API_MODE, type ApiMode } from '@aiprimary/api';
+import type { ApiClient, ApiResponse } from '@aiprimary/api';
 import {
   type ClassApiService,
   type Class,
@@ -21,22 +21,19 @@ import {
   type SchedulePeriod,
   type DailySchedule,
 } from '../types';
-import { api } from '@aiprimary/api';
-import { mapPagination, type ApiResponse, type Pagination } from '@aiprimary/api';
+import { mapPagination, type Pagination } from '@aiprimary/api';
 
-export default class ClassRealApiService implements ClassApiService {
-  baseUrl: string;
+export default class ClassService implements ClassApiService {
+  private readonly apiClient: ApiClient;
+  private readonly baseUrl: string;
 
-  constructor(baseUrl: string = '') {
+  constructor(apiClient: ApiClient, baseUrl: string) {
+    this.apiClient = apiClient;
     this.baseUrl = baseUrl;
   }
 
-  getType(): ApiMode {
-    return API_MODE.real;
-  }
-
   async getClasses(request: ClassCollectionRequest): Promise<ApiResponse<Class[]>> {
-    const response = await api.get<ApiResponse<Class[]>>(`${this.baseUrl}/api/classes`, {
+    const response = await this.apiClient.get<ApiResponse<Class[]>>(`${this.baseUrl}/api/classes`, {
       params: {
         page: (request.page || 0) + 1,
         pageSize: request.pageSize,
@@ -57,7 +54,7 @@ export default class ClassRealApiService implements ClassApiService {
 
   async getClassById(id: string): Promise<Class | null> {
     try {
-      const response = await api.get<ApiResponse<Class>>(`${this.baseUrl}/api/classes/${id}`);
+      const response = await this.apiClient.get<ApiResponse<Class>>(`${this.baseUrl}/api/classes/${id}`);
       return this._mapClass(response.data.data);
     } catch (error) {
       console.error('Failed to fetch class:', error);
@@ -66,29 +63,32 @@ export default class ClassRealApiService implements ClassApiService {
   }
 
   async createClass(data: ClassCreateRequest): Promise<Class> {
-    const response = await api.post<ApiResponse<Class>>(`${this.baseUrl}/api/classes`, data);
+    const response = await this.apiClient.post<ApiResponse<Class>>(`${this.baseUrl}/api/classes`, data);
     return this._mapClass(response.data.data);
   }
 
   async updateClass(data: ClassUpdateRequest): Promise<Class> {
     const { id, ...updateData } = data;
-    const response = await api.put<ApiResponse<Class>>(`${this.baseUrl}/api/classes/${id}`, updateData);
+    const response = await this.apiClient.put<ApiResponse<Class>>(
+      `${this.baseUrl}/api/classes/${id}`,
+      updateData
+    );
     return this._mapClass(response.data.data);
   }
 
   async deleteClass(id: string): Promise<void> {
-    await api.delete(`${this.baseUrl}/api/classes/${id}`);
+    await this.apiClient.delete(`${this.baseUrl}/api/classes/${id}`);
   }
 
   async getSeatingChart(classId: string): Promise<Layout | null> {
-    const response = await api.get<ApiResponse<Layout | null>>(
+    const response = await this.apiClient.get<ApiResponse<Layout | null>>(
       `${this.baseUrl}/api/classes/${classId}/seating-chart`
     );
     return response.data.data ?? null;
   }
 
   async saveSeatingChart(classId: string, layout: Layout): Promise<Layout> {
-    const response = await api.put<ApiResponse<Layout>>(
+    const response = await this.apiClient.put<ApiResponse<Layout>>(
       `${this.baseUrl}/api/classes/${classId}/seating-chart`,
       layout
     );
@@ -96,7 +96,7 @@ export default class ClassRealApiService implements ClassApiService {
   }
 
   async getStudentsByClassId(classId: string, page = 1, size = 10): Promise<Student[]> {
-    const response = await api.get<ApiResponse<Student[]>>(
+    const response = await this.apiClient.get<ApiResponse<Student[]>>(
       `${this.baseUrl}/api/classes/${classId}/students`,
       {
         params: { page, size },
@@ -106,12 +106,12 @@ export default class ClassRealApiService implements ClassApiService {
   }
 
   async removeStudentFromClass(classId: string, studentId: string): Promise<void> {
-    await api.delete(`${this.baseUrl}/api/classes/${classId}/students/${studentId}`);
+    await this.apiClient.delete(`${this.baseUrl}/api/classes/${classId}/students/${studentId}`);
   }
 
   // Student CRUD operations for roster management
   async createStudent(classId: string, data: StudentCreateRequest): Promise<Student> {
-    const response = await api.post<ApiResponse<Student>>(
+    const response = await this.apiClient.post<ApiResponse<Student>>(
       `${this.baseUrl}/api/classes/${classId}/students`,
       data
     );
@@ -120,7 +120,9 @@ export default class ClassRealApiService implements ClassApiService {
 
   async getStudentById(studentId: string): Promise<Student | null> {
     try {
-      const response = await api.get<ApiResponse<Student>>(`${this.baseUrl}/api/students/${studentId}`);
+      const response = await this.apiClient.get<ApiResponse<Student>>(
+        `${this.baseUrl}/api/students/${studentId}`
+      );
       return this._mapStudent(response.data.data);
     } catch (error) {
       console.error('Failed to fetch student:', error);
@@ -130,7 +132,7 @@ export default class ClassRealApiService implements ClassApiService {
 
   async updateStudent(studentId: string, data: StudentUpdateRequest): Promise<Student> {
     const { id, ...updateData } = data;
-    const response = await api.put<ApiResponse<Student>>(
+    const response = await this.apiClient.put<ApiResponse<Student>>(
       `${this.baseUrl}/api/students/${studentId}`,
       updateData
     );
@@ -138,7 +140,7 @@ export default class ClassRealApiService implements ClassApiService {
   }
 
   async enrollStudent(data: StudentEnrollmentRequest): Promise<Student> {
-    const response = await api.post<ApiResponse<Student>>(
+    const response = await this.apiClient.post<ApiResponse<Student>>(
       `${this.baseUrl}/api/classes/${data.classId}/students/enroll`,
       data
     );
@@ -146,25 +148,28 @@ export default class ClassRealApiService implements ClassApiService {
   }
 
   async deleteStudent(studentId: string): Promise<void> {
-    await api.delete(`${this.baseUrl}/api/students/${studentId}`);
+    await this.apiClient.delete(`${this.baseUrl}/api/students/${studentId}`);
   }
 
   // Lesson Management
 
   async getLessons(classId: string, params: LessonCollectionRequest): Promise<ApiResponse<Lesson[]>> {
-    const response = await api.get<ApiResponse<Lesson[]>>(`${this.baseUrl}/api/classes/${classId}/lessons`, {
-      params: {
-        page: params.page || 1,
-        size: params.pageSize || 20,
-        search: params.search || undefined,
-      },
-    });
+    const response = await this.apiClient.get<ApiResponse<Lesson[]>>(
+      `${this.baseUrl}/api/classes/${classId}/lessons`,
+      {
+        params: {
+          page: params.page || 1,
+          size: params.pageSize || 20,
+          search: params.search || undefined,
+        },
+      }
+    );
     return response.data;
   }
 
   async getLesson(id: string): Promise<Lesson | null> {
     try {
-      const response = await api.get<ApiResponse<Lesson>>(`${this.baseUrl}/api/lessons/${id}`);
+      const response = await this.apiClient.get<ApiResponse<Lesson>>(`${this.baseUrl}/api/lessons/${id}`);
       return response.data.data;
     } catch (error) {
       console.error('Failed to fetch lesson:', error);
@@ -174,25 +179,31 @@ export default class ClassRealApiService implements ClassApiService {
 
   // Lesson mutations
   async createLesson(data: LessonCreateRequest): Promise<Lesson> {
-    const response = await api.post<ApiResponse<Lesson>>(`${this.baseUrl}/api/lessons`, data);
+    const response = await this.apiClient.post<ApiResponse<Lesson>>(`${this.baseUrl}/api/lessons`, data);
     return response.data.data;
   }
 
   async updateLesson(data: LessonUpdateRequest): Promise<Lesson> {
     const { id, ...updateData } = data;
-    const response = await api.put<ApiResponse<Lesson>>(`${this.baseUrl}/api/lessons/${id}`, updateData);
+    const response = await this.apiClient.put<ApiResponse<Lesson>>(
+      `${this.baseUrl}/api/lessons/${id}`,
+      updateData
+    );
     return response.data.data;
   }
 
   async deleteLesson(id: string): Promise<void> {
-    await api.delete(`${this.baseUrl}/api/lessons/${id}`);
+    await this.apiClient.delete(`${this.baseUrl}/api/lessons/${id}`);
   }
 
   async updateLessonStatus(id: string, status: string, notes?: string): Promise<Lesson> {
-    const response = await api.patch<ApiResponse<Lesson>>(`${this.baseUrl}/api/lessons/${id}/status`, {
-      status,
-      notes,
-    });
+    const response = await this.apiClient.patch<ApiResponse<Lesson>>(
+      `${this.baseUrl}/api/lessons/${id}/status`,
+      {
+        status,
+        notes,
+      }
+    );
     return response.data.data;
   }
 
@@ -202,7 +213,7 @@ export default class ClassRealApiService implements ClassApiService {
     classId: string,
     params: ScheduleCollectionRequest
   ): Promise<ApiResponse<DailySchedule[]>> {
-    const response = await api.get<ApiResponse<DailySchedule[]>>(
+    const response = await this.apiClient.get<ApiResponse<DailySchedule[]>>(
       `${this.baseUrl}/api/classes/${classId}/schedules`,
       { params }
     );
@@ -213,7 +224,7 @@ export default class ClassRealApiService implements ClassApiService {
     classId: string,
     params: { date?: string; startDate?: string; endDate?: string }
   ): Promise<ApiResponse<SchedulePeriod[]>> {
-    const response = await api.get<ApiResponse<SchedulePeriod[]>>(
+    const response = await this.apiClient.get<ApiResponse<SchedulePeriod[]>>(
       `${this.baseUrl}/api/classes/${classId}/periods`,
       { params }
     );
@@ -222,7 +233,9 @@ export default class ClassRealApiService implements ClassApiService {
 
   async getPeriodById(id: string): Promise<SchedulePeriod | null> {
     try {
-      const response = await api.get<ApiResponse<SchedulePeriod>>(`${this.baseUrl}/api/periods/${id}`);
+      const response = await this.apiClient.get<ApiResponse<SchedulePeriod>>(
+        `${this.baseUrl}/api/periods/${id}`
+      );
       return response.data.data;
     } catch (error) {
       console.error('Failed to fetch period:', error);
@@ -231,7 +244,7 @@ export default class ClassRealApiService implements ClassApiService {
   }
 
   async getPeriodsBySubject(classId: string, subjectCode: string): Promise<SchedulePeriod[]> {
-    const response = await api.get<ApiResponse<SchedulePeriod[]>>(
+    const response = await this.apiClient.get<ApiResponse<SchedulePeriod[]>>(
       `${this.baseUrl}/api/classes/${classId}/periods`,
       {
         params: { subject: subjectCode },
@@ -241,7 +254,7 @@ export default class ClassRealApiService implements ClassApiService {
   }
 
   async addSchedulePeriod(classId: string, data: SchedulePeriodCreateRequest): Promise<SchedulePeriod> {
-    const response = await api.post<ApiResponse<SchedulePeriod>>(
+    const response = await this.apiClient.post<ApiResponse<SchedulePeriod>>(
       `${this.baseUrl}/api/classes/${classId}/periods`,
       data
     );
@@ -254,7 +267,7 @@ export default class ClassRealApiService implements ClassApiService {
     updates: SchedulePeriodUpdateRequest
   ): Promise<SchedulePeriod> {
     const { id: _id, ...updateData } = updates;
-    const response = await api.put<ApiResponse<SchedulePeriod>>(
+    const response = await this.apiClient.put<ApiResponse<SchedulePeriod>>(
       `${this.baseUrl}/api/classes/${classId}/periods/${id}`,
       updateData
     );
@@ -262,11 +275,15 @@ export default class ClassRealApiService implements ClassApiService {
   }
 
   async linkLessonToSchedulePeriod(classId: string, periodId: string, lessonId: string): Promise<void> {
-    await api.post(`${this.baseUrl}/api/classes/${classId}/periods/${periodId}/lessons`, { lessonId });
+    await this.apiClient.post(`${this.baseUrl}/api/classes/${classId}/periods/${periodId}/lessons`, {
+      lessonId,
+    });
   }
 
   async unlinkLessonFromSchedulePeriod(classId: string, periodId: string, lessonId: string): Promise<void> {
-    await api.delete(`${this.baseUrl}/api/classes/${classId}/periods/${periodId}/lessons/${lessonId}`);
+    await this.apiClient.delete(
+      `${this.baseUrl}/api/classes/${classId}/periods/${periodId}/lessons/${lessonId}`
+    );
   }
 
   private _mapClass(data: any): Class {
@@ -351,11 +368,15 @@ export default class ClassRealApiService implements ClassApiService {
     formData.append('file', file);
 
     try {
-      const response = await api.post(`${this.baseUrl}/api/classes/${classId}/students/import`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      const response = await this.apiClient.post(
+        `${this.baseUrl}/api/classes/${classId}/students/import`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
 
       return {
         success: true,

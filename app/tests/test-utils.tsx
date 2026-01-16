@@ -2,7 +2,6 @@ import { render, type RenderOptions } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { MemoryRouter, RouterProvider, createMemoryRouter, type RouteObject } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ApiSwitchingProvider } from '@/shared/context/api-switching';
 import { AuthProvider } from '@/shared/context/auth';
 import { I18nextProvider } from 'react-i18next';
 import i18n from '@/shared/i18n';
@@ -101,11 +100,6 @@ const renderWithProviders = (
       node = <RouterProvider router={router} />;
     } else {
       node = <MemoryRouter initialEntries={[route]}>{children}</MemoryRouter>;
-    }
-
-    // ApiSwitchingProvider
-    if (!excludeProviders.includes('api')) {
-      node = <ApiSwitchingProvider>{node}</ApiSwitchingProvider>;
     }
 
     // AuthProvider (opt-in via includeProviders)

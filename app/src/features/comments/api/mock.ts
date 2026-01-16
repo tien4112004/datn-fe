@@ -1,4 +1,4 @@
-import { API_MODE, type ApiMode } from '@aiprimary/api';
+import type { ApiClient } from '@aiprimary/api';
 import type {
   CommentApiService,
   Comment,
@@ -8,15 +8,10 @@ import type {
 } from '../types';
 
 export default class CommentMockService implements CommentApiService {
-  baseUrl: string;
   private mockComments: Comment[] = [];
 
-  constructor(baseUrl: string) {
-    this.baseUrl = baseUrl;
-  }
-
-  getType(): ApiMode {
-    return API_MODE.mock;
+  constructor(_apiClient: ApiClient, _baseUrl: string) {
+    // Mock service doesn't need to use these parameters
   }
 
   async getComments(

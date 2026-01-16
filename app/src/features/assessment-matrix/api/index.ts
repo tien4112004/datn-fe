@@ -1,18 +1,12 @@
 import type { AssessmentMatrixApiService } from '@/features/assessment-matrix/types/service';
-import AssessmentMatrixMockApiService from './mock';
-// import AssessmentMatrixRealApiService from './service'; // Uncomment when real API is ready
 
 /**
- * Get the appropriate Assessment Matrix API service based on environment
- * Currently uses mock service for development
+ * Get the Assessment Matrix API service
+ * NOTE: This feature currently has no backend implementation.
+ * A real service needs to be created when the backend API is available.
  */
 export const useAssessmentMatrixApiService = (): AssessmentMatrixApiService => {
-  // TODO: Switch based on environment variable or config
-  // const apiMode = import.meta.env.VITE_API_MODE || 'mock';
-
-  // For now, always use mock
-  return new AssessmentMatrixMockApiService();
-
-  // When real API is ready:
-  // return apiMode === 'real' ? new AssessmentMatrixRealApiService() : new AssessmentMatrixMockApiService();
+  // TODO: Create AssessmentMatrixService with DI pattern when backend is ready
+  // return new AssessmentMatrixService(api, getBackendUrl());
+  throw new Error('Assessment Matrix API service not implemented yet. Backend API required.');
 };

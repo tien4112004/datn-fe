@@ -1,7 +1,5 @@
-import { getApiServiceFactory } from '@aiprimary/api';
-import { MediaApiService } from './service';
-import { MockMediaApiService } from './mock';
-import { getBackendUrl } from '@aiprimary/api';
+import { api, type ApiClient, getBackendUrl } from '@aiprimary/api';
+import { MediaService } from './service';
 
 // Response type for uploaded media
 export interface UploadedMediaResponse {
@@ -11,16 +9,13 @@ export interface UploadedMediaResponse {
   id: number;
 }
 
-const BASE_URL = getBackendUrl();
-
 export interface IMediaApi {
   uploadImage(file: File): Promise<UploadedMediaResponse>;
 }
 
 /**
- * Get a media API service instance based on current API mode
- * Used with traditional JavaScript (non-reactive)
+ * Get a media API service instance
  */
-export const getMediaApi = (): IMediaApi => {
-  return getApiServiceFactory<any>(MockMediaApiService, MediaApiService, BASE_URL);
+export const getMediaApi = (apiClient: ApiClient = api): IMediaApi => {
+  return new MediaService(apiClient, getBackendUrl());
 };

@@ -1,25 +1,19 @@
 import type { PresentationApiService } from '../types/service';
-import PresentationMockService from './mock';
-import PresentationRealApiService from './service';
-import { createApiServiceFactory, getApiServiceFactory } from '@/shared/api';
+import PresentationService from './service';
+import { api, type ApiClient } from '@aiprimary/api';
 import { getBackendUrl } from '@/shared/utils/backend-url';
 
 export const usePresentationApiService = (): PresentationApiService => {
-  const backendUrl = getBackendUrl();
-
-  return createApiServiceFactory<PresentationApiService>(
-    PresentationMockService,
-    PresentationRealApiService,
-    backendUrl
-  );
+  return new PresentationService(api, getBackendUrl());
 };
 
-export const getPresentationApiService = (): PresentationApiService => {
-  const backendUrl = getBackendUrl();
+export const getPresentationApiService = (apiClient: ApiClient = api): PresentationApiService => {
+  return new PresentationService(apiClient, getBackendUrl());
+};
 
-  return getApiServiceFactory<PresentationApiService>(
-    PresentationMockService,
-    PresentationRealApiService,
-    backendUrl
-  );
+export const createPresentationApiService = (
+  apiClient: ApiClient,
+  baseUrl?: string
+): PresentationApiService => {
+  return new PresentationService(apiClient, baseUrl || getBackendUrl());
 };

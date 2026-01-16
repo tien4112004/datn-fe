@@ -1,4 +1,4 @@
-import { API_MODE, type ApiMode, type ApiClient } from '@aiprimary/api';
+import type { ApiClient, ApiResponse } from '@aiprimary/api';
 import {
   type MindmapApiService,
   type MindmapResponse,
@@ -17,31 +17,34 @@ import type {
   PublicAccessResponse,
   ShareStateResponse,
 } from '../types/share';
-import { mapPagination, type ApiResponse, type Pagination } from '@aiprimary/api';
+import { mapPagination, type Pagination } from '@aiprimary/api';
 import { parsePermissionHeader } from '../../../shared/utils/permission';
 import type { User } from '@/features/user/types';
 
-export default class MindmapServiceImpl implements MindmapApiService {
-  baseUrl: string;
-  client: ApiClient;
+export default class MindmapService implements MindmapApiService {
+  private readonly apiClient: ApiClient;
+  private readonly baseUrl: string;
 
-  constructor(baseUrl: string, client: ApiClient) {
+  constructor(apiClient: ApiClient, baseUrl: string) {
+    this.apiClient = apiClient;
     this.baseUrl = baseUrl;
-    this.client = client;
   }
 
-  getType(): ApiMode {
-    return API_MODE.real;
+  getType() {
+    return 'real' as const;
   }
 
   async getMindmaps(request: MindmapCollectionRequest): Promise<ApiResponse<MindmapResponse[]>> {
-    const response = await this.client.get<ApiResponse<MindmapResponse[]>>(`${this.baseUrl}/api/mindmaps`, {
-      params: {
-        page: (request.page || 0) + 1,
-        pageSize: request.pageSize,
-        sort: request.sort,
-      },
-    });
+    const response = await this.apiClient.get<ApiResponse<MindmapResponse[]>>(
+      `${this.baseUrl}/api/mindmaps`,
+      {
+        params: {
+          page: (request.page || 0) + 1,
+          pageSize: request.pageSize,
+          sort: request.sort,
+        },
+      }
+    );
 
     return {
       ...response.data,
@@ -51,7 +54,7 @@ export default class MindmapServiceImpl implements MindmapApiService {
   }
 
   async getMindmapById(id: string): Promise<MindmapResponse> {
-    const response = await this.client.get<ApiResponse<MindmapResponse>>(
+    const response = await this.apiClient.get<ApiResponse<MindmapResponse>>(
       `${this.baseUrl}/api/mindmaps/${id}`
     );
     const mindmap = response.data.data;
@@ -65,7 +68,7 @@ export default class MindmapServiceImpl implements MindmapApiService {
     return mindmap;
   }
   async createMindmap(data: MindmapCreateInput): Promise<MindmapResponse> {
-    const response = await this.client.post<ApiResponse<MindmapResponse>>(
+    const response = await this.apiClient.post<ApiResponse<MindmapResponse>>(
       `${this.baseUrl}/api/mindmaps`,
       data
     );
@@ -73,22 +76,19 @@ export default class MindmapServiceImpl implements MindmapApiService {
   }
 
   async updateMindmap(id: string, data: MindmapUpdateInput): Promise<MindmapResponse> {
-    const config = data instanceof FormData ? { headers: { 'Content-Type': 'multipart/form-data' } } : {};
-
-    const response = await this.client.put<ApiResponse<MindmapResponse>>(
+    const response = await this.apiClient.put<ApiResponse<MindmapResponse>>(
       `${this.baseUrl}/api/mindmaps/${id}`,
-      data,
-      config
+      data
     );
     return response.data.data;
   }
 
   async deleteMindmap(id: string): Promise<void> {
-    await this.client.delete(`${this.baseUrl}/api/mindmaps/${id}`);
+    await this.apiClient.delete(`${this.baseUrl}/api/mindmaps/${id}`);
   }
 
   async updateMindmapTitle(id: string, name: string): Promise<MindmapTitleUpdateResponse> {
-    await this.client.patch(`${this.baseUrl}/api/mindmaps/${id}/title`, {
+    await this.apiClient.patch(`${this.baseUrl}/api/mindmaps/${id}/title`, {
       title: name,
     });
     // API returns 204 No Content
@@ -96,7 +96,7 @@ export default class MindmapServiceImpl implements MindmapApiService {
   }
 
   async generateMindmap(request: MindmapGenerateRequest): Promise<AiGeneratedNode> {
-    const response = await this.client.post<ApiResponse<AiGeneratedNode>>(
+    const response = await this.apiClient.post<ApiResponse<AiGeneratedNode>>(
       `${this.baseUrl}/api/mindmaps/generate`,
       request
     );
@@ -104,14 +104,14 @@ export default class MindmapServiceImpl implements MindmapApiService {
   }
 
   async searchUsers(query: string): Promise<User[]> {
-    const response = await this.client.get<ApiResponse<User[]>>(`${this.baseUrl}/api/users`, {
+    const response = await this.apiClient.get<ApiResponse<User[]>>(`${this.baseUrl}/api/users`, {
       params: { search: query, pageSize: 20 },
     });
     return response.data.data;
   }
 
   async shareMindmap(id: string, shareData: ShareRequest): Promise<ShareResponse> {
-    const response = await this.client.post<ApiResponse<ShareResponse>>(
+    const response = await this.apiClient.post<ApiResponse<ShareResponse>>(
       `${this.baseUrl}/api/resources/${id}/share`,
       shareData
     );
@@ -119,20 +119,20 @@ export default class MindmapServiceImpl implements MindmapApiService {
   }
 
   async getSharedUsers(id: string): Promise<SharedUserApiResponse[]> {
-    const response = await this.client.get<ApiResponse<SharedUserApiResponse[]>>(
+    const response = await this.apiClient.get<ApiResponse<SharedUserApiResponse[]>>(
       `${this.baseUrl}/api/resources/${id}/shared-users`
     );
     return response.data.data;
   }
 
   async revokeAccess(mindmapId: string, userId: string): Promise<void> {
-    await this.client.post(`${this.baseUrl}/api/resources/${mindmapId}/revoke`, {
+    await this.apiClient.post(`${this.baseUrl}/api/resources/${mindmapId}/revoke`, {
       targetUserId: userId,
     });
   }
 
   async setPublicAccess(mindmapId: string, request: PublicAccessRequest): Promise<PublicAccessResponse> {
-    const response = await this.client.put<ApiResponse<PublicAccessResponse>>(
+    const response = await this.apiClient.put<ApiResponse<PublicAccessResponse>>(
       `${this.baseUrl}/api/resources/${mindmapId}/public-access`,
       request
     );
@@ -140,14 +140,14 @@ export default class MindmapServiceImpl implements MindmapApiService {
   }
 
   async getPublicAccessStatus(mindmapId: string): Promise<PublicAccessResponse> {
-    const response = await this.client.get<ApiResponse<PublicAccessResponse>>(
+    const response = await this.apiClient.get<ApiResponse<PublicAccessResponse>>(
       `${this.baseUrl}/api/resources/${mindmapId}/public-access`
     );
     return response.data.data;
   }
 
   async getShareState(mindmapId: string): Promise<ShareStateResponse> {
-    const response = await this.client.get<ApiResponse<ShareStateResponse>>(
+    const response = await this.apiClient.get<ApiResponse<ShareStateResponse>>(
       `${this.baseUrl}/api/resources/${mindmapId}/share-state`
     );
     return response.data.data;

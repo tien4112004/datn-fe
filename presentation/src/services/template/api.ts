@@ -1,14 +1,10 @@
-import { getApiServiceFactory } from '@aiprimary/api';
-import { TemplateApiService } from './service';
-import { MockTemplateApiService } from './mock';
+import { api, type ApiClient, getBackendUrl } from '@aiprimary/api';
+import { TemplateService } from './service';
 import type { ITemplateApi } from './types';
-import { getBackendUrl } from '@aiprimary/api';
-
-const BASE_URL = getBackendUrl();
 
 /**
- * Get a template API service instance based on current API mode
+ * Get a template API service instance
  */
-export const getTemplateApi = (): ITemplateApi => {
-  return getApiServiceFactory<ITemplateApi>(MockTemplateApiService, TemplateApiService, BASE_URL);
+export const getTemplateApi = (apiClient: ApiClient = api): ITemplateApi => {
+  return new TemplateService(apiClient, getBackendUrl());
 };

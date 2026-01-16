@@ -11,6 +11,7 @@ import {
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/shared/components/ui/tooltip';
 import type { AssignmentFormData } from '../../types';
 import { QUESTION_TYPE, DIFFICULTY } from '../../types';
+import { getAllQuestionTypes } from '@aiprimary/core';
 import { generateId } from '@/shared/lib/utils';
 import { QuestionCountIndicator } from './QuestionCountIndicator';
 import { useAssignmentEditorStore } from '../../stores/useAssignmentEditorStore';
@@ -18,7 +19,6 @@ import { VIEW_MODE } from '@aiprimary/core';
 
 export const QuestionsToolbar = () => {
   const { t } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.questions.toolbar' });
-  const { t: tTypes } = useTranslation('assignment', { keyPrefix: 'questionTypes' });
   const { control, watch } = useFormContext<AssignmentFormData>();
   const { append } = useFieldArray({
     control,
@@ -73,7 +73,7 @@ export const QuestionsToolbar = () => {
       question: {
         id: generateId(),
         type: type as any,
-        difficulty: DIFFICULTY.EASY,
+        difficulty: DIFFICULTY.KNOWLEDGE,
         title: '',
         topicId: defaultTopicId,
         explanation: '',
@@ -153,18 +153,11 @@ export const QuestionsToolbar = () => {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
-                  <DropdownMenuItem onClick={() => handleAddQuestion(QUESTION_TYPE.MULTIPLE_CHOICE)}>
-                    {tTypes('multipleChoice')}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleAddQuestion(QUESTION_TYPE.MATCHING)}>
-                    {tTypes('matching')}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleAddQuestion(QUESTION_TYPE.OPEN_ENDED)}>
-                    {tTypes('openEnded')}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleAddQuestion(QUESTION_TYPE.FILL_IN_BLANK)}>
-                    {tTypes('fillInBlank')}
-                  </DropdownMenuItem>
+                  {getAllQuestionTypes({ includeGroup: false }).map((type) => (
+                    <DropdownMenuItem key={type.value} onClick={() => handleAddQuestion(type.value)}>
+                      {type.label}
+                    </DropdownMenuItem>
+                  ))}
                 </DropdownMenuContent>
               </DropdownMenu>
             </TooltipTrigger>

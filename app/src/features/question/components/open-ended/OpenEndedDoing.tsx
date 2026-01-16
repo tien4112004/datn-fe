@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { OpenEndedQuestion, OpenEndedAnswer } from '@/features/assignment/types';
-import { MarkdownPreview, DifficultyBadge } from '../shared';
+import { MarkdownPreview } from '../shared';
 
 import { AutosizeTextarea } from '@/shared/components/ui/autosize-textarea';
 import { QUESTION_TYPE } from '@/features/assignment/types';
@@ -11,16 +11,9 @@ interface OpenEndedDoingProps {
   answer?: OpenEndedAnswer;
   points?: number; // Optional points for display
   onAnswerChange: (answer: OpenEndedAnswer) => void;
-  hideHeader?: boolean; // Hide type label and difficulty badge when used as sub-question
 }
 
-export const OpenEndedDoing = ({
-  question,
-  answer,
-  points,
-  onAnswerChange,
-  hideHeader = false,
-}: OpenEndedDoingProps) => {
+export const OpenEndedDoing = ({ question, answer, points, onAnswerChange }: OpenEndedDoingProps) => {
   const { t } = useTranslation('questions');
   const [text, setText] = useState(answer?.text || '');
 

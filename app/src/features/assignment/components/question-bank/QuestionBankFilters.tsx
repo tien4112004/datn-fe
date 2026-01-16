@@ -5,7 +5,6 @@ import { Label } from '@/shared/components/ui/label';
 import { SearchBar } from '@/shared/components/common/SearchBar';
 import { X, Filter, ChevronDown } from 'lucide-react';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
-import { QUESTION_TYPE, DIFFICULTY } from '../../types';
 import useQuestionBankStore from '../../stores/questionBankStore';
 import {
   useQuestionBankSubjects,
@@ -13,7 +12,7 @@ import {
   useQuestionBankChapters,
 } from '../../hooks/useQuestionBankApi';
 import { useEffect, useState } from 'react';
-import { getSubjectName, getGradeName, QUESTION_TYPE_LABELS, DIFFICULTY_LABELS } from '@aiprimary/core';
+import { getSubjectName, getGradeName, getAllQuestionTypes, getAllDifficulties } from '@aiprimary/core';
 import { motion } from 'motion/react';
 
 interface QuestionBankFiltersProps {
@@ -108,25 +107,18 @@ export const QuestionBankFilters = ({
               {t('questionBank.filters.type')}
             </Label>
             <div className="space-y-2">
-              {[
-                { value: QUESTION_TYPE.MULTIPLE_CHOICE, label: QUESTION_TYPE_LABELS.multiple_choice },
-                { value: QUESTION_TYPE.MATCHING, label: QUESTION_TYPE_LABELS.matching },
-                { value: QUESTION_TYPE.OPEN_ENDED, label: QUESTION_TYPE_LABELS.open_ended },
-                { value: QUESTION_TYPE.FILL_IN_BLANK, label: QUESTION_TYPE_LABELS.fill_in_blank },
-              ].map((option) => (
+              {getAllQuestionTypes({ includeGroup: false }).map((type) => (
                 <label
-                  key={option.value}
+                  key={type.value}
                   className="hover:bg-accent flex cursor-pointer items-center gap-2 rounded-md p-1 transition-colors"
                 >
                   <Checkbox
-                    checked={
-                      Array.isArray(filters.questionType) && filters.questionType.includes(option.value)
-                    }
+                    checked={Array.isArray(filters.questionType) && filters.questionType.includes(type.value)}
                     onCheckedChange={(checked) =>
-                      handleCheckboxChange('questionType', option.value, checked as boolean)
+                      handleCheckboxChange('questionType', type.value, checked as boolean)
                     }
                   />
-                  <span className="text-xs font-medium">{option.label}</span>
+                  <span className="text-xs font-medium">{type.label}</span>
                 </label>
               ))}
             </div>
@@ -138,23 +130,20 @@ export const QuestionBankFilters = ({
               {t('questionBank.filters.difficulty')}
             </Label>
             <div className="space-y-2">
-              {[
-                { value: DIFFICULTY.EASY, label: DIFFICULTY_LABELS.nhan_biet },
-                { value: DIFFICULTY.MEDIUM, label: DIFFICULTY_LABELS.thong_hieu },
-                { value: DIFFICULTY.HARD, label: DIFFICULTY_LABELS.van_dung },
-                { value: DIFFICULTY.SUPER_HARD, label: DIFFICULTY_LABELS.van_dung_cao },
-              ].map((option) => (
+              {getAllDifficulties().map((difficulty) => (
                 <label
-                  key={option.value}
+                  key={difficulty.value}
                   className="hover:bg-accent flex cursor-pointer items-center gap-2 rounded-md p-1 transition-colors"
                 >
                   <Checkbox
-                    checked={Array.isArray(filters.difficulty) && filters.difficulty.includes(option.value)}
+                    checked={
+                      Array.isArray(filters.difficulty) && filters.difficulty.includes(difficulty.value)
+                    }
                     onCheckedChange={(checked) =>
-                      handleCheckboxChange('difficulty', option.value, checked as boolean)
+                      handleCheckboxChange('difficulty', difficulty.value, checked as boolean)
                     }
                   />
-                  <span className="text-xs font-medium">{option.label}</span>
+                  <span className="text-xs font-medium">{difficulty.label}</span>
                 </label>
               ))}
             </div>

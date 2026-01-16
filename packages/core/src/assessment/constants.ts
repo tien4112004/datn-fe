@@ -9,11 +9,11 @@
  * Defines the supported question formats in the assessment system
  */
 export const QUESTION_TYPE = {
-  MULTIPLE_CHOICE: 'multiple_choice',
-  MATCHING: 'matching',
-  OPEN_ENDED: 'open_ended',
-  FILL_IN_BLANK: 'fill_in_blank',
-  GROUP: 'group',
+  MULTIPLE_CHOICE: 'MULTIPLE_CHOICE',
+  MATCHING: 'MATCHING',
+  OPEN_ENDED: 'OPEN_ENDED',
+  FILL_IN_BLANK: 'FILL_IN_BLANK',
+  GROUP: 'GROUP',
 } as const;
 
 export type QuestionType = (typeof QUESTION_TYPE)[keyof typeof QUESTION_TYPE];
@@ -23,11 +23,23 @@ export type QuestionType = (typeof QUESTION_TYPE)[keyof typeof QUESTION_TYPE];
  * Display names for question types in Vietnamese
  */
 export const QUESTION_TYPE_LABELS = {
-  multiple_choice: 'Trắc Nghiệm',
-  matching: 'Nối',
-  open_ended: 'Tự Luận',
-  fill_in_blank: 'Điền Vào Chỗ Trống',
-  group: 'Nhóm Câu Hỏi',
+  MULTIPLE_CHOICE: 'Trắc Nghiệm',
+  MATCHING: 'Nối',
+  OPEN_ENDED: 'Tự Luận',
+  FILL_IN_BLANK: 'Điền Vào Chỗ Trống',
+  GROUP: 'Nhóm Câu Hỏi',
+} as const;
+
+/**
+ * Question Type I18n Keys
+ * Localization keys for question types (for use with i18n)
+ */
+export const QUESTION_TYPE_I18N_KEYS = {
+  MULTIPLE_CHOICE: 'types.multipleChoice',
+  MATCHING: 'types.matching',
+  OPEN_ENDED: 'types.openEnded',
+  FILL_IN_BLANK: 'types.fillInBlank',
+  GROUP: 'types.group',
 } as const;
 
 /**
@@ -35,7 +47,7 @@ export const QUESTION_TYPE_LABELS = {
  * Returns the code itself if not found (graceful fallback)
  *
  * @example
- * getQuestionTypeName('multiple_choice') // returns 'Trắc Nghiệm'
+ * getQuestionTypeName('MULTIPLE_CHOICE') // returns 'Trắc Nghiệm'
  * getQuestionTypeName('matching') // returns 'Nối'
  */
 export function getQuestionTypeName(type: string): string {
@@ -47,10 +59,10 @@ export function getQuestionTypeName(type: string): string {
  * Based on Bloom's Taxonomy adapted for Vietnamese curriculum
  */
 export const DIFFICULTY = {
-  EASY: 'nhan_biet', // Nhận biết (Knowledge) - Recall facts and basic concepts
-  MEDIUM: 'thong_hieu', // Thông hiểu (Comprehension) - Explain ideas or concepts
-  HARD: 'van_dung', // Vận dụng (Application) - Use information in new situations
-  SUPER_HARD: 'van_dung_cao', // Vận dụng cao (Advanced Application) - Draw connections among ideas
+  KNOWLEDGE: 'KNOWLEDGE', // Nhận biết (Knowledge) - Recall facts and basic concepts
+  COMPREHENSION: 'COMPREHENSION', // Thông hiểu (Comprehension) - Explain ideas or concepts
+  APPLICATION: 'APPLICATION', // Vận dụng (Application) - Use information in new situations
+  ADVANCED_APPLICATION: 'ADVANCED_APPLICATION', // Vận dụng cao (Advanced Application) - Draw connections among ideas
 } as const;
 
 export type Difficulty = (typeof DIFFICULTY)[keyof typeof DIFFICULTY];
@@ -60,10 +72,21 @@ export type Difficulty = (typeof DIFFICULTY)[keyof typeof DIFFICULTY];
  * Display names for difficulty levels in Vietnamese education system
  */
 export const DIFFICULTY_LABELS = {
-  nhan_biet: 'Nhận biết',
-  thong_hieu: 'Thông hiểu',
-  van_dung: 'Vận dụng',
-  van_dung_cao: 'Vận dụng cao',
+  KNOWLEDGE: 'Nhận biết',
+  COMPREHENSION: 'Thông hiểu',
+  APPLICATION: 'Vận dụng',
+  ADVANCED_APPLICATION: 'Vận dụng cao',
+} as const;
+
+/**
+ * Difficulty I18n Keys
+ * Localization keys for difficulty levels (for use with i18n)
+ */
+export const DIFFICULTY_I18N_KEYS = {
+  KNOWLEDGE: 'difficulty.knowledge',
+  COMPREHENSION: 'difficulty.comprehension',
+  APPLICATION: 'difficulty.application',
+  ADVANCED_APPLICATION: 'difficulty.advancedApplication',
 } as const;
 
 /**
@@ -96,10 +119,28 @@ export type SubjectCode = (typeof SUBJECT_CODE)[keyof typeof SUBJECT_CODE];
  */
 export const BANK_TYPE = {
   PERSONAL: 'personal', // Teacher's private question bank
-  APPLICATION: 'application', // Shared application-wide question bank
+  PUBLIC: 'public', // Shared public question bank
 } as const;
 
 export type BankType = (typeof BANK_TYPE)[keyof typeof BANK_TYPE];
+
+/**
+ * Bank Type Labels (Vietnamese)
+ * Display names for bank types in Vietnamese
+ */
+export const BANK_TYPE_LABELS = {
+  personal: 'Cá nhân',
+  public: 'Công khai',
+} as const;
+
+/**
+ * Bank Type I18n Keys
+ * Localization keys for bank types (for use with i18n)
+ */
+export const BANK_TYPE_I18N_KEYS = {
+  personal: 'bankType.personal',
+  public: 'bankType.public',
+} as const;
 
 /**
  * View Modes

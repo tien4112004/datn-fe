@@ -1,4 +1,4 @@
-import type { Difficulty, SubjectCode } from './constants';
+import type { Difficulty, SubjectCode } from './';
 import type { Question } from '@aiprimary/core';
 
 // Question with topic assignment (intersection of core Question with topicId)

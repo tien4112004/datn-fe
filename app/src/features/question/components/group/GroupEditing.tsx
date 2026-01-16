@@ -43,11 +43,11 @@ export function GroupEditing({ question, onChange }: GroupEditingProps) {
   }, [description, questions, showQuestionNumbers, shuffleQuestions]);
 
   // Add a new sub-question
-  const handleAddQuestion = (type: 'multiple_choice' | 'matching' | 'open_ended' | 'fill_in_blank') => {
+  const handleAddQuestion = (type: 'MULTIPLE_CHOICE' | 'matching' | 'open_ended' | 'fill_in_blank') => {
     let initialData: any;
 
     switch (type) {
-      case 'multiple_choice':
+      case 'MULTIPLE_CHOICE':
         initialData = {
           options: [
             { id: generateId(), text: '', isCorrect: false },
@@ -165,7 +165,7 @@ export function GroupEditing({ question, onChange }: GroupEditingProps) {
             <p className="mb-3 text-sm text-gray-600 dark:text-gray-400">{t('group.editing.selectType')}</p>
             <div className="grid grid-cols-2 gap-2">
               <button
-                onClick={() => handleAddQuestion('multiple_choice')}
+                onClick={() => handleAddQuestion('MULTIPLE_CHOICE')}
                 className="rounded-md border border-gray-200 p-3 text-left transition-colors hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-700"
               >
                 <div className="font-medium text-gray-900 dark:text-gray-100">

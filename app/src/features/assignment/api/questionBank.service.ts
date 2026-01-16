@@ -5,6 +5,7 @@ import type {
   QuestionBankFilters,
   QuestionBankResponse,
 } from '../types/questionBank';
+import { getAllSubjects, getElementaryGrades } from '@aiprimary/core';
 
 export default class QuestionBankService implements QuestionBankApiService {
   private readonly apiClient: ApiClient;
@@ -97,19 +98,18 @@ export default class QuestionBankService implements QuestionBankApiService {
   }
 
   async getSubjects(): Promise<string[]> {
-    const response = await this.apiClient.get(`${this.baseUrl}/api/question-bank/metadata/subjects`);
-    return response.data.data;
+    // Return static subject codes from frontend
+    return getAllSubjects().map((s) => s.code);
   }
 
   async getGrades(): Promise<string[]> {
-    const response = await this.apiClient.get(`${this.baseUrl}/api/question-bank/metadata/grades`);
-    return response.data.data;
+    // Return static elementary grade codes (1-5) from frontend
+    return getElementaryGrades().map((g) => g.code);
   }
 
-  async getChapters(subject: string, grade: string): Promise<string[]> {
-    const response = await this.apiClient.get(`${this.baseUrl}/api/question-bank/metadata/chapters`, {
-      params: { subject, grade },
-    });
-    return response.data.data;
+  async getChapters(_subject: string, _grade: string): Promise<string[]> {
+    // Chapters are dynamic and curriculum-specific, return empty array
+    // In the future, this could be populated from a static curriculum definition
+    return [];
   }
 }

@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import type { OpenEndedQuestion, OpenEndedAnswer } from '@/features/assignment/types';
-import { MarkdownPreview, DifficultyBadge } from '../shared';
+import { MarkdownPreview } from '../shared';
 
 import { Badge } from '@/shared/components/ui/badge';
 
@@ -8,15 +8,9 @@ interface OpenEndedAfterAssessmentProps {
   question: OpenEndedQuestion;
   answer?: OpenEndedAnswer;
   points?: number; // Points allocated for this question in the assignment
-  hideHeader?: boolean; // Hide type label and difficulty badge when used as sub-question
 }
 
-export const OpenEndedAfterAssessment = ({
-  question,
-  answer,
-  points = 0,
-  hideHeader = false,
-}: OpenEndedAfterAssessmentProps) => {
+export const OpenEndedAfterAssessment = ({ question, answer, points = 0 }: OpenEndedAfterAssessmentProps) => {
   const { t } = useTranslation('questions');
 
   return (

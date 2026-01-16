@@ -7,7 +7,12 @@
  * - Matching pairs
  */
 
-import type { Question, MultipleChoiceQuestion, MatchingQuestion } from '@aiprimary/core';
+import {
+  type Question,
+  type MultipleChoiceQuestion,
+  type MatchingQuestion,
+  QUESTION_TYPE,
+} from '@aiprimary/core';
 
 /**
  * Fisher-Yates shuffle algorithm
@@ -96,12 +101,12 @@ export function shuffleMatchingPairs(question: MatchingQuestion, seed?: string):
  */
 export function shuffleQuestion(question: Question, seed?: string): Question {
   switch (question.type) {
-    case 'multiple_choice':
+    case QUESTION_TYPE.MULTIPLE_CHOICE:
       return shuffleMultipleChoiceOptions(question, seed);
-    case 'matching':
+    case QUESTION_TYPE.MATCHING:
       return shuffleMatchingPairs(question, seed);
-    case 'fill_in_blank':
-    case 'open_ended':
+    case QUESTION_TYPE.FILL_IN_BLANK:
+    case QUESTION_TYPE.OPEN_ENDED:
       // No shuffling for fill-in-blank and open-ended questions
       return question;
     default:

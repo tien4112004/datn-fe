@@ -4,6 +4,54 @@
 export default {
   title: 'Ngân hàng câu hỏi',
 
+  // Question Form Dialog
+  form: {
+    createTitle: 'Tạo câu hỏi mới',
+    editTitle: 'Chỉnh sửa câu hỏi',
+    metadataSection: 'Thông tin câu hỏi',
+    contentSection: 'Nội dung câu hỏi',
+    questionType: 'Loại câu hỏi',
+    subject: 'Môn học',
+    difficulty: 'Độ khó',
+    validationErrors: 'Lỗi xác thực',
+    cancel: 'Hủy',
+    create: 'Tạo câu hỏi',
+    save: 'Lưu thay đổi',
+
+    // Toast messages
+    createSuccess: 'Tạo câu hỏi thành công',
+    updateSuccess: 'Cập nhật câu hỏi thành công',
+    createError: 'Tạo câu hỏi thất bại',
+    updateError: 'Cập nhật câu hỏi thất bại',
+    missingData: 'Thiếu dữ liệu câu hỏi',
+    fixErrors: 'Vui lòng sửa lỗi xác thực trước khi lưu',
+  },
+
+  // Question Bank Editor Page
+  editor: {
+    breadcrumb: 'Ngân hàng câu hỏi',
+    createTitle: 'Tạo câu hỏi mới',
+    editTitle: 'Chỉnh sửa câu hỏi',
+    cancel: 'Hủy',
+    save: 'Lưu thay đổi',
+    saving: 'Đang lưu...',
+    loading: 'Đang tải câu hỏi...',
+    metadataSection: 'Thông tin câu hỏi',
+    contentSection: 'Nội dung câu hỏi',
+    questionType: 'Loại câu hỏi',
+    subject: 'Môn học',
+    difficulty: 'Độ khó',
+    validationErrors: 'Lỗi xác thực',
+
+    // Toast messages
+    createSuccess: 'Tạo câu hỏi thành công',
+    updateSuccess: 'Cập nhật câu hỏi thành công',
+    createError: 'Tạo câu hỏi thất bại',
+    updateError: 'Cập nhật câu hỏi thất bại',
+    missingData: 'Thiếu dữ liệu câu hỏi',
+    fixErrors: 'Vui lòng sửa lỗi xác thực trước khi lưu',
+  },
+
   types: {
     multipleChoice: 'Trắc nghiệm',
     matching: 'Nối',
@@ -21,10 +69,15 @@ export default {
   },
 
   difficulty: {
-    easy: 'Dễ',
-    medium: 'Trung bình',
-    hard: 'Khó',
-    superHard: 'Rất khó',
+    knowledge: 'Nhận biết',
+    comprehension: 'Thông hiểu',
+    application: 'Vận dụng',
+    advancedApplication: 'Vận dụng cao',
+  },
+
+  bankType: {
+    personal: 'Cá nhân',
+    public: 'Công khai',
   },
 
   common: {
@@ -44,6 +97,22 @@ export default {
     scoreDisplay: 'Điểm: {{score}}/{{total}} điểm',
     pointsAbbreviation: 'điểm',
     pointsAbbreviation_plural: 'điểm',
+  },
+
+  validation: {
+    titleRequired: 'Tiêu đề là bắt buộc',
+    optionTextRequired: 'Văn bản tùy chọn là bắt buộc',
+    minOptions: 'Cần ít nhất 2 tùy chọn',
+    maxOptions: 'Tối đa 6 tùy chọn',
+    exactlyOneCorrect: 'Phải có đúng một tùy chọn được đánh dấu là đúng',
+    leftItemRequired: 'Mục bên trái là bắt buộc',
+    rightItemRequired: 'Mục bên phải là bắt buộc',
+    minPairs: 'Cần ít nhất 2 cặp',
+    maxPairs: 'Tối đa 8 cặp',
+    maxLengthExceeded: 'Vượt quá độ dài tối đa',
+    minSegments: 'Cần ít nhất một phân đoạn',
+    subQuestionTitleRequired: 'Tiêu đề câu hỏi con là bắt buộc',
+    minSubQuestions: 'Cần ít nhất một câu hỏi con',
   },
 
   // Multiple Choice

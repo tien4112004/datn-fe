@@ -1,5 +1,5 @@
 import type { FillInBlankQuestion } from '@/features/assignment/types';
-import { DifficultyBadge, MarkdownPreview } from '../shared';
+import { MarkdownPreview } from '../shared';
 import { Label } from '@/shared/components/ui/label';
 import { Badge } from '@/shared/components/ui/badge';
 

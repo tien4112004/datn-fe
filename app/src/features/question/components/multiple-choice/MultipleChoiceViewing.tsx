@@ -1,6 +1,5 @@
 import type { MultipleChoiceQuestion } from '@/features/assignment/types';
 import { MarkdownPreview } from '../shared';
-import { DifficultyBadge } from '../shared';
 import { Label } from '@/shared/components/ui/label';
 import { Badge } from '@/shared/components/ui/badge';
 import { Shuffle, CheckCircle2 } from 'lucide-react';

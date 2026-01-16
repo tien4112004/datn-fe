@@ -17,11 +17,11 @@ export const questionBankData: QuestionBankItem[] = [
   {
     id: generateId(),
     type: QUESTION_TYPE.MULTIPLE_CHOICE,
-    difficulty: DIFFICULTY.EASY,
+    difficulty: DIFFICULTY.KNOWLEDGE,
     title: '5 + 3 bằng bao nhiêu?',
     explanation: '5 + 3 = 8',
     subjectCode: 'T',
-    bankType: BANK_TYPE.APPLICATION,
+    bankType: BANK_TYPE.PUBLIC,
     createdAt: new Date().toISOString(),
     data: {
       options: [
@@ -35,11 +35,11 @@ export const questionBankData: QuestionBankItem[] = [
   {
     id: generateId(),
     type: QUESTION_TYPE.MULTIPLE_CHOICE,
-    difficulty: DIFFICULTY.EASY,
+    difficulty: DIFFICULTY.KNOWLEDGE,
     title: 'Từ nào viết đúng chính tả?',
     explanation: 'Chữ "học" viết đúng chính tả trong tiếng Việt.',
     subjectCode: 'TV',
-    bankType: BANK_TYPE.APPLICATION,
+    bankType: BANK_TYPE.PUBLIC,
     createdAt: new Date().toISOString(),
     data: {
       options: [
@@ -53,11 +53,11 @@ export const questionBankData: QuestionBankItem[] = [
   {
     id: generateId(),
     type: QUESTION_TYPE.MULTIPLE_CHOICE,
-    difficulty: DIFFICULTY.MEDIUM,
+    difficulty: DIFFICULTY.COMPREHENSION,
     title: 'What color is the sky?',
     explanation: 'The sky appears blue due to the scattering of sunlight by the atmosphere.',
     subjectCode: 'TA',
-    bankType: BANK_TYPE.APPLICATION,
+    bankType: BANK_TYPE.PUBLIC,
     createdAt: new Date().toISOString(),
     data: {
       options: [
@@ -71,11 +71,11 @@ export const questionBankData: QuestionBankItem[] = [
   {
     id: generateId(),
     type: QUESTION_TYPE.MULTIPLE_CHOICE,
-    difficulty: DIFFICULTY.MEDIUM,
+    difficulty: DIFFICULTY.COMPREHENSION,
     title: '12 × 3 bằng bao nhiêu?',
     explanation: '12 nhân với 3 bằng 36.',
     subjectCode: 'T',
-    bankType: BANK_TYPE.APPLICATION,
+    bankType: BANK_TYPE.PUBLIC,
     createdAt: new Date().toISOString(),
     data: {
       options: [
@@ -89,11 +89,11 @@ export const questionBankData: QuestionBankItem[] = [
   {
     id: generateId(),
     type: QUESTION_TYPE.MULTIPLE_CHOICE,
-    difficulty: DIFFICULTY.HARD,
+    difficulty: DIFFICULTY.APPLICATION,
     title: 'Choose the correct sentence:',
     explanation: 'The correct form is "She goes to school every day" using the third person singular form.',
     subjectCode: 'TA',
-    bankType: BANK_TYPE.APPLICATION,
+    bankType: BANK_TYPE.PUBLIC,
     createdAt: new Date().toISOString(),
     data: {
       options: [
@@ -111,11 +111,11 @@ export const questionBankData: QuestionBankItem[] = [
   {
     id: generateId(),
     type: QUESTION_TYPE.MATCHING,
-    difficulty: DIFFICULTY.EASY,
+    difficulty: DIFFICULTY.KNOWLEDGE,
     title: 'Nối số với chữ số tương ứng',
     explanation: 'Ghép các số với cách viết bằng chữ.',
     subjectCode: 'T',
-    bankType: BANK_TYPE.APPLICATION,
+    bankType: BANK_TYPE.PUBLIC,
     createdAt: new Date().toISOString(),
     data: {
       pairs: [
@@ -128,11 +128,11 @@ export const questionBankData: QuestionBankItem[] = [
   {
     id: generateId(),
     type: QUESTION_TYPE.MATCHING,
-    difficulty: DIFFICULTY.MEDIUM,
+    difficulty: DIFFICULTY.COMPREHENSION,
     title: 'Match English words with Vietnamese meanings',
     explanation: 'Connect English words with their Vietnamese translations.',
     subjectCode: 'TA',
-    bankType: BANK_TYPE.APPLICATION,
+    bankType: BANK_TYPE.PUBLIC,
     createdAt: new Date().toISOString(),
     data: {
       pairs: [
@@ -146,11 +146,11 @@ export const questionBankData: QuestionBankItem[] = [
   {
     id: generateId(),
     type: QUESTION_TYPE.MATCHING,
-    difficulty: DIFFICULTY.MEDIUM,
+    difficulty: DIFFICULTY.COMPREHENSION,
     title: 'Nối từ loại với ví dụ',
     explanation: 'Ghép các từ loại trong tiếng Việt với ví dụ tương ứng.',
     subjectCode: 'TV',
-    bankType: BANK_TYPE.APPLICATION,
+    bankType: BANK_TYPE.PUBLIC,
     createdAt: new Date().toISOString(),
     data: {
       pairs: [
@@ -164,11 +164,11 @@ export const questionBankData: QuestionBankItem[] = [
   {
     id: generateId(),
     type: QUESTION_TYPE.MATCHING,
-    difficulty: DIFFICULTY.SUPER_HARD,
+    difficulty: DIFFICULTY.ADVANCED_APPLICATION,
     title: 'Nối phép tính với kết quả',
     explanation: 'Tính toán và ghép các phép tính với kết quả đúng.',
     subjectCode: 'T',
-    bankType: BANK_TYPE.APPLICATION,
+    bankType: BANK_TYPE.PUBLIC,
     createdAt: new Date().toISOString(),
     data: {
       pairs: [
@@ -187,12 +187,12 @@ export const questionBankData: QuestionBankItem[] = [
   {
     id: generateId(),
     type: QUESTION_TYPE.OPEN_ENDED,
-    difficulty: DIFFICULTY.MEDIUM,
+    difficulty: DIFFICULTY.COMPREHENSION,
     title: 'Em hãy viết một đoạn văn ngắn (5-7 câu) về gia đình của em.',
     explanation:
       'Học sinh nên mô tả các thành viên trong gia đình, công việc và những điều đặc biệt về gia đình.',
     subjectCode: 'TV',
-    bankType: BANK_TYPE.APPLICATION,
+    bankType: BANK_TYPE.PUBLIC,
     createdAt: new Date().toISOString(),
     data: {
       expectedAnswer:
@@ -203,12 +203,12 @@ export const questionBankData: QuestionBankItem[] = [
   {
     id: generateId(),
     type: QUESTION_TYPE.OPEN_ENDED,
-    difficulty: DIFFICULTY.HARD,
+    difficulty: DIFFICULTY.APPLICATION,
     title: 'Write a short paragraph (5-7 sentences) about your favorite animal.',
     explanation:
       'Students should describe the animal, its characteristics, habitat, and explain why they like it.',
     subjectCode: 'TA',
-    bankType: BANK_TYPE.APPLICATION,
+    bankType: BANK_TYPE.PUBLIC,
     createdAt: new Date().toISOString(),
     data: {
       expectedAnswer:
@@ -219,12 +219,12 @@ export const questionBankData: QuestionBankItem[] = [
   {
     id: generateId(),
     type: QUESTION_TYPE.OPEN_ENDED,
-    difficulty: DIFFICULTY.SUPER_HARD,
+    difficulty: DIFFICULTY.ADVANCED_APPLICATION,
     title:
       'Giải thích cách giải bài toán: "Một cửa hàng có 156 quả cam. Người ta đã bán đi 3/4 số cam. Hỏi còn lại bao nhiêu quả cam?"',
     explanation: 'Học sinh cần trình bày đầy đủ các bước giải và giải thích lý do.',
     subjectCode: 'T',
-    bankType: BANK_TYPE.APPLICATION,
+    bankType: BANK_TYPE.PUBLIC,
     createdAt: new Date().toISOString(),
     data: {
       expectedAnswer:
@@ -239,11 +239,11 @@ export const questionBankData: QuestionBankItem[] = [
   {
     id: generateId(),
     type: QUESTION_TYPE.FILL_IN_BLANK,
-    difficulty: DIFFICULTY.EASY,
+    difficulty: DIFFICULTY.KNOWLEDGE,
     title: 'Điền vào chỗ trống',
     explanation: 'Thủ đô của Việt Nam là Hà Nội.',
     subjectCode: 'TV',
-    bankType: BANK_TYPE.APPLICATION,
+    bankType: BANK_TYPE.PUBLIC,
     createdAt: new Date().toISOString(),
     data: {
       segments: [
@@ -262,11 +262,11 @@ export const questionBankData: QuestionBankItem[] = [
   {
     id: generateId(),
     type: QUESTION_TYPE.FILL_IN_BLANK,
-    difficulty: DIFFICULTY.EASY,
+    difficulty: DIFFICULTY.KNOWLEDGE,
     title: 'Complete the sentence',
     explanation: 'The color of grass is green.',
     subjectCode: 'TA',
-    bankType: BANK_TYPE.APPLICATION,
+    bankType: BANK_TYPE.PUBLIC,
     createdAt: new Date().toISOString(),
     data: {
       segments: [
@@ -285,11 +285,11 @@ export const questionBankData: QuestionBankItem[] = [
   {
     id: generateId(),
     type: QUESTION_TYPE.FILL_IN_BLANK,
-    difficulty: DIFFICULTY.MEDIUM,
+    difficulty: DIFFICULTY.COMPREHENSION,
     title: 'Điền số thích hợp vào chỗ trống',
     explanation: '5 + 7 = 12',
     subjectCode: 'T',
-    bankType: BANK_TYPE.APPLICATION,
+    bankType: BANK_TYPE.PUBLIC,
     createdAt: new Date().toISOString(),
     data: {
       segments: [
@@ -308,11 +308,11 @@ export const questionBankData: QuestionBankItem[] = [
   {
     id: generateId(),
     type: QUESTION_TYPE.FILL_IN_BLANK,
-    difficulty: DIFFICULTY.HARD,
+    difficulty: DIFFICULTY.APPLICATION,
     title: 'Fill in the blank with the correct form',
     explanation: 'Use "am" with "I" in present tense.',
     subjectCode: 'TA',
-    bankType: BANK_TYPE.APPLICATION,
+    bankType: BANK_TYPE.PUBLIC,
     createdAt: new Date().toISOString(),
     data: {
       segments: [

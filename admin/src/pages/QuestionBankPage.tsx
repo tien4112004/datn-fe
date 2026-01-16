@@ -5,7 +5,7 @@ import {
   useDuplicateQuestionBankItem,
   useExportQuestionBank,
 } from '@/hooks/useApi';
-import type { QuestionBankItem, QuestionBankParams } from '@/types/question-bank';
+import type { QuestionBankItem, QuestionBankParams } from '@/types/questionBank';
 import { QuestionBankFilters } from '@/components/question-bank/QuestionBankFilters';
 import { QuestionBankFormDialog } from '@/components/question-bank/QuestionBankFormDialog';
 import { QuestionBankImportDialog } from '@/components/question-bank/QuestionBankImportDialog';
@@ -23,7 +23,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { Plus, Upload, Download, Search, MoreVertical, Trash2, Copy, FileEdit, Filter } from 'lucide-react';
-import { QUESTION_TYPE_LABELS, DIFFICULTY_LABELS } from '@/types/question-bank';
+import { QUESTION_TYPE_LABELS, DIFFICULTY_LABELS } from '@/types/questionBank';
 
 export function QuestionBankPage() {
   // State
@@ -236,13 +236,17 @@ export function QuestionBankPage() {
                         </TableCell>
                         <TableCell className="max-w-md truncate font-medium">{question.title}</TableCell>
                         <TableCell>
-                          <Badge variant="outline">{QUESTION_TYPE_LABELS[question.type]}</Badge>
+                          <Badge variant="outline">
+                            {QUESTION_TYPE_LABELS[question.type as keyof typeof QUESTION_TYPE_LABELS]}
+                          </Badge>
                         </TableCell>
                         <TableCell>
                           <Badge variant="secondary">{question.subjectCode}</Badge>
                         </TableCell>
                         <TableCell>
-                          <Badge variant="secondary">{DIFFICULTY_LABELS[question.difficulty]}</Badge>
+                          <Badge variant="secondary">
+                            {DIFFICULTY_LABELS[question.difficulty as keyof typeof DIFFICULTY_LABELS]}
+                          </Badge>
                         </TableCell>
                         <TableCell>{question.points || 10}</TableCell>
                         <TableCell className="text-muted-foreground text-sm">

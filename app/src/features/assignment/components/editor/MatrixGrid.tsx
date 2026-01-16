@@ -5,23 +5,12 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { MatrixCell } from './MatrixCell';
 import { useAssignmentEditorStore } from '../../stores/useAssignmentEditorStore';
 import type { AssignmentFormData } from '../../types';
-import { DIFFICULTY } from '../../types';
+import { getAllDifficulties, getDifficultyI18nKey } from '@aiprimary/core';
 
 export const MatrixGrid = () => {
   const { t } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.matrixEditor' });
   const { t: tDifficulty } = useTranslation('assignment', { keyPrefix: 'difficulty' });
   const { control, setValue } = useFormContext<AssignmentFormData>();
-
-  const getDifficultyLabel = (difficulty: string) => {
-    const diffMap: Record<string, 'nhanBiet' | 'thongHieu' | 'vanDung' | 'vanDungCao'> = {
-      [DIFFICULTY.EASY]: 'nhanBiet',
-      [DIFFICULTY.MEDIUM]: 'thongHieu',
-      [DIFFICULTY.HARD]: 'vanDung',
-      [DIFFICULTY.SUPER_HARD]: 'vanDungCao',
-    };
-    const key = diffMap[difficulty] || 'nhanBiet';
-    return tDifficulty(key as 'nhanBiet' | 'thongHieu' | 'vanDung' | 'vanDungCao');
-  };
 
   // Watch for changes
   const questions = useWatch({ control, name: 'questions' });
@@ -47,7 +36,7 @@ export const MatrixGrid = () => {
     );
   }
 
-  const difficulties = [DIFFICULTY.EASY, DIFFICULTY.MEDIUM, DIFFICULTY.HARD, DIFFICULTY.SUPER_HARD];
+  const difficulties = getAllDifficulties();
 
   return (
     <div className="overflow-x-auto rounded-lg border">
@@ -58,8 +47,8 @@ export const MatrixGrid = () => {
               {t('tableHeaders.topic')}
             </TableHead>
             {difficulties.map((difficulty) => (
-              <TableHead key={difficulty} className="bg-gray-50 text-center text-xs dark:bg-gray-900">
-                {getDifficultyLabel(difficulty)}
+              <TableHead key={difficulty.value} className="bg-gray-50 text-center text-xs dark:bg-gray-900">
+                {tDifficulty(getDifficultyI18nKey(difficulty.value) as any)}
               </TableHead>
             ))}
           </TableRow>
@@ -69,9 +58,11 @@ export const MatrixGrid = () => {
             <TableRow key={topic.id}>
               <TableCell className="font-medium">{topic.name || t('tableHeaders.topic')}</TableCell>
               {difficulties.map((difficulty) => {
-                const cell = matrixCells?.find((c) => c.topicId === topic.id && c.difficulty === difficulty);
+                const cell = matrixCells?.find(
+                  (c) => c.topicId === topic.id && c.difficulty === difficulty.value
+                );
                 return (
-                  <TableCell key={`${topic.id}-${difficulty}`} className="p-2">
+                  <TableCell key={`${topic.id}-${difficulty.value}`} className="p-2">
                     {cell && <MatrixCell cell={cell} />}
                   </TableCell>
                 );

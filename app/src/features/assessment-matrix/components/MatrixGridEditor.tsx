@@ -6,8 +6,7 @@ import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 import useAssessmentMatrixStore from '@/features/assessment-matrix/stores/assessmentMatrixStore';
 import type { MatrixCell, Topic, TopicId } from '@/features/assessment-matrix/types';
 import type { Difficulty } from '@/features/assignment/types';
-import { DIFFICULTY } from '@/features/assignment/types';
-import { getDifficultyName } from '@aiprimary/core';
+import { getDifficultyName, getAllDifficulties } from '@aiprimary/core';
 import { MatrixCellEditor } from './MatrixCellEditor';
 import { cn } from '@/shared/lib/utils';
 
@@ -15,13 +14,6 @@ interface MatrixGridEditorProps {
   open: boolean;
   onClose: () => void;
 }
-
-const difficultyLevels: Difficulty[] = [
-  DIFFICULTY.EASY,
-  DIFFICULTY.MEDIUM,
-  DIFFICULTY.HARD,
-  DIFFICULTY.SUPER_HARD,
-];
 
 export const MatrixGridEditor = ({ open, onClose }: MatrixGridEditorProps) => {
   const { t } = useTranslation(I18N_NAMESPACES.EXAM_MATRIX);
@@ -31,6 +23,8 @@ export const MatrixGridEditor = ({ open, onClose }: MatrixGridEditorProps) => {
   const [editingCell, setEditingCell] = useState<MatrixCell | null>(null);
   const [editingTopic, setEditingTopic] = useState<Topic | null>(null);
   const [editingDifficulty, setEditingDifficulty] = useState<Difficulty | null>(null);
+
+  const difficultyLevels = getAllDifficulties();
 
   if (!currentMatrix) return null;
 
@@ -124,8 +118,8 @@ export const MatrixGridEditor = ({ open, onClose }: MatrixGridEditorProps) => {
                           {t('builder.grid.topic')}
                         </th>
                         {difficultyLevels.map((difficulty) => (
-                          <th key={difficulty} className="min-w-[120px] p-3 text-center font-medium">
-                            {getDifficultyName(difficulty)}
+                          <th key={difficulty.value} className="min-w-[120px] p-3 text-center font-medium">
+                            {getDifficultyName(difficulty.value)}
                           </th>
                         ))}
                       </tr>
@@ -135,13 +129,13 @@ export const MatrixGridEditor = ({ open, onClose }: MatrixGridEditorProps) => {
                         <tr key={topic.id} className="hover:bg-muted/50 border-b">
                           <td className="bg-background sticky left-0 p-3 font-medium">{topic.name}</td>
                           {difficultyLevels.map((difficulty) => {
-                            const cellContent = getCellContent(topic.id, difficulty);
+                            const cellContent = getCellContent(topic.id, difficulty.value);
                             const isEmpty = !cellContent;
 
                             return (
-                              <td key={difficulty} className="p-2">
+                              <td key={difficulty.value} className="p-2">
                                 <button
-                                  onClick={() => handleCellClick(topic, difficulty)}
+                                  onClick={() => handleCellClick(topic, difficulty.value)}
                                   className={cn(
                                     'hover:border-primary hover:bg-accent min-h-[60px] w-full rounded border-2 border-dashed p-2 transition-all',
                                     isEmpty

@@ -20,7 +20,7 @@ import { QuestionRenderer } from '@/features/question';
 const multipleChoiceQuestion: MultipleChoiceQuestion = {
   id: 'mc-1',
   type: QUESTION_TYPE.MULTIPLE_CHOICE,
-  difficulty: DIFFICULTY.EASY,
+  difficulty: DIFFICULTY.KNOWLEDGE,
   title: 'What is the capital of Vietnam?',
   explanation: 'Hanoi has been the capital of Vietnam since 1010 (under the Ly dynasty) and again from 1954.',
   data: {
@@ -37,7 +37,7 @@ const multipleChoiceQuestion: MultipleChoiceQuestion = {
 const matchingQuestion: MatchingQuestion = {
   id: 'match-1',
   type: QUESTION_TYPE.MATCHING,
-  difficulty: DIFFICULTY.MEDIUM,
+  difficulty: DIFFICULTY.COMPREHENSION,
   title: 'Match the famous Vietnamese landmarks with their cities',
   explanation: 'These are some of the most iconic landmarks in Vietnam.',
   data: {
@@ -54,7 +54,7 @@ const matchingQuestion: MatchingQuestion = {
 const openEndedQuestion: OpenEndedQuestion = {
   id: 'oe-1',
   type: QUESTION_TYPE.OPEN_ENDED,
-  difficulty: DIFFICULTY.HARD,
+  difficulty: DIFFICULTY.APPLICATION,
   title: 'Explain the significance of the Battle of Dien Bien Phu in Vietnamese history.',
   explanation:
     'The Battle of Dien Bien Phu (1954) was a decisive victory for the Viet Minh over French colonial forces, leading to the end of French Indochina and Vietnamese independence.',
@@ -68,7 +68,7 @@ const openEndedQuestion: OpenEndedQuestion = {
 const fillInBlankQuestion: FillInBlankQuestion = {
   id: 'fib-1',
   type: QUESTION_TYPE.FILL_IN_BLANK,
-  difficulty: DIFFICULTY.EASY,
+  difficulty: DIFFICULTY.KNOWLEDGE,
   title: 'Complete the sentence about Vietnam',
   explanation: 'These are basic facts about Vietnam.',
   data: {
@@ -91,7 +91,7 @@ const fillInBlankQuestion: FillInBlankQuestion = {
 const groupQuestion: GroupQuestion = {
   id: 'group-1',
   type: QUESTION_TYPE.GROUP,
-  difficulty: DIFFICULTY.MEDIUM,
+  difficulty: DIFFICULTY.COMPREHENSION,
   title: 'Reading Comprehension: The Solar System',
   explanation: 'This group question tests understanding of the solar system passage.',
   data: {

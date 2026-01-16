@@ -9,10 +9,15 @@ import { useTranslation } from 'react-i18next';
 import { Label } from '@/shared/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
 import type { AssignmentFormData } from '../../types';
-import { DIFFICULTY_LABELS } from '../../types';
 import { QuestionRenderer } from '@/features/question';
 import { useAssignmentEditorStore } from '../../stores/useAssignmentEditorStore';
-import { VIEW_MODE, type Question, getQuestionTypeName } from '@aiprimary/core';
+import {
+  VIEW_MODE,
+  type Question,
+  getQuestionTypeName,
+  getAllDifficulties,
+  getDifficultyName,
+} from '@aiprimary/core';
 
 interface DraggableQuestionCardProps {
   id: string;
@@ -92,9 +97,7 @@ export const DraggableQuestionCard = ({ id, index }: DraggableQuestionCardProps)
             <span className="whitespace-nowrap text-sm font-medium text-gray-500">Q{index + 1}</span>
             <span className="text-xs text-gray-500">{getQuestionTypeName(question.type)}</span>
             {question.difficulty && (
-              <span className="text-xs text-gray-500">
-                {DIFFICULTY_LABELS[question.difficulty as keyof typeof DIFFICULTY_LABELS]}
-              </span>
+              <span className="text-xs text-gray-500">{getDifficultyName(question.difficulty)}</span>
             )}
           </div>
         </div>
@@ -175,9 +178,9 @@ export const DraggableQuestionCard = ({ id, index }: DraggableQuestionCardProps)
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {Object.entries(DIFFICULTY_LABELS).map(([value, label]) => (
-                    <SelectItem key={value} value={value}>
-                      {label}
+                  {getAllDifficulties().map((difficulty) => (
+                    <SelectItem key={difficulty.value} value={difficulty.value}>
+                      {difficulty.label}
                     </SelectItem>
                   ))}
                 </SelectContent>

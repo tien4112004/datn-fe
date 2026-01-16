@@ -12,7 +12,7 @@ import { Label } from '@/shared/components/ui/label';
 import { useTranslation } from 'react-i18next';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 import type { MatrixCell, Topic } from '@/features/assessment-matrix/types';
-import type { Difficulty } from '@/features/assignment/types';
+import { getDifficultyName, type Difficulty } from '@/features/assignment/types';
 import { Badge } from '@/shared/components/ui/badge';
 
 interface MatrixCellEditorProps {
@@ -73,16 +73,6 @@ export const MatrixCellEditor = ({
 
   if (!topic || !difficulty) return null;
 
-  const getDifficultyLabel = (diff: Difficulty) => {
-    const labels: Record<Difficulty, string> = {
-      nhan_biet: t('difficulty.easy'),
-      thong_hieu: t('difficulty.medium'),
-      van_dung: t('difficulty.hard'),
-      van_dung_cao: t('difficulty.van_dung_cao'),
-    };
-    return labels[diff];
-  };
-
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-md">
@@ -99,7 +89,7 @@ export const MatrixCellEditor = ({
             </div>
             <div className="flex items-center gap-2">
               <span className="text-muted-foreground text-sm">{t('builder.cell.difficulty')}:</span>
-              <Badge variant="outline">{getDifficultyLabel(difficulty)}</Badge>
+              <Badge variant="outline">{getDifficultyName(difficulty)}</Badge>
             </div>
           </div>
 

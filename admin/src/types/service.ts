@@ -18,7 +18,7 @@ import type {
   CreateQuestionPayload,
   UpdateQuestionPayload,
   ImportResult,
-} from './question-bank';
+} from './questionBank';
 
 /**
  * Base service interface that all API services must extend

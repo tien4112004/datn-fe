@@ -18,37 +18,31 @@ import {
   useUpdateQuestion,
   useQuestionBankItem,
 } from '@/features/assignment/hooks/useQuestionBankApi';
-import type {
-  CreateQuestionRequest,
-  QuestionType,
-  Difficulty,
-  SubjectCode,
-  Question,
-  QuestionBankItem,
-  MultipleChoiceQuestion,
-  MatchingQuestion,
-  FillInBlankQuestion,
-  OpenEndedQuestion,
-} from '@/features/assignment/types';
-import { QUESTION_TYPE, DIFFICULTY, SUBJECT_CODE, BANK_TYPE } from '@/features/assignment/types';
-import { getAllSubjects } from '@aiprimary/core';
+import type { CreateQuestionRequest, Question, QuestionBankItem } from '@/features/assignment/types';
 import {
-  MultipleChoiceEditing,
-  MatchingEditing,
-  FillInBlankEditing,
-  OpenEndedEditing,
-} from '@/features/question';
+  BANK_TYPE,
+  DIFFICULTY,
+  getAllSubjects,
+  QUESTION_TYPE,
+  SUBJECT_CODE,
+  type Difficulty,
+  type QuestionType,
+  type SubjectCode,
+} from '@aiprimary/core';
+import { VIEW_MODE } from '@/features/assignment/types';
+import { QuestionRenderer } from '@/features/question';
 import { generateId } from '@/shared/lib/utils';
 import { toast } from 'sonner';
 import { AlertCircle, Save, Settings, FileText } from 'lucide-react';
 import { validateQuestion } from '@/features/assignment/utils/validateQuestion';
+import { useTranslation } from 'react-i18next';
 
 // Helper function to create default question based on type
 function createDefaultQuestion(type: QuestionType): QuestionBankItem {
   const baseQuestion = {
     id: generateId(),
     type,
-    difficulty: DIFFICULTY.EASY,
+    difficulty: DIFFICULTY.KNOWLEDGE,
     subjectCode: SUBJECT_CODE.MATH,
     bankType: BANK_TYPE.PERSONAL,
     title: '',
@@ -59,7 +53,7 @@ function createDefaultQuestion(type: QuestionType): QuestionBankItem {
     case QUESTION_TYPE.MULTIPLE_CHOICE:
       return {
         ...baseQuestion,
-        type: 'multiple_choice',
+        type: 'MULTIPLE_CHOICE',
         data: {
           options: [
             { id: generateId(), text: '', isCorrect: false },
@@ -71,7 +65,7 @@ function createDefaultQuestion(type: QuestionType): QuestionBankItem {
     case QUESTION_TYPE.MATCHING:
       return {
         ...baseQuestion,
-        type: 'matching',
+        type: 'MATCHING',
         data: {
           pairs: [
             { id: generateId(), left: '', right: '' },
@@ -83,7 +77,7 @@ function createDefaultQuestion(type: QuestionType): QuestionBankItem {
     case QUESTION_TYPE.FILL_IN_BLANK:
       return {
         ...baseQuestion,
-        type: 'fill_in_blank',
+        type: 'FILL_IN_BLANK',
         data: {
           segments: [
             { id: generateId(), type: 'text', content: '' },
@@ -96,7 +90,7 @@ function createDefaultQuestion(type: QuestionType): QuestionBankItem {
     case QUESTION_TYPE.OPEN_ENDED:
       return {
         ...baseQuestion,
-        type: 'open_ended',
+        type: 'OPEN_ENDED',
         data: {
           expectedAnswer: '',
           maxLength: 500,
@@ -109,6 +103,7 @@ function createDefaultQuestion(type: QuestionType): QuestionBankItem {
 }
 
 export function QuestionBankEditorPage() {
+  const { t } = useTranslation('questions');
   const { id } = useParams<{ id?: string }>();
   const navigate = useNavigate();
 
@@ -138,7 +133,7 @@ export function QuestionBankEditorPage() {
     e.preventDefault();
 
     if (!questionData) {
-      toast.error('Question data is missing');
+      toast.error(t('editor.missingData'));
       return;
     }
 
@@ -147,7 +142,7 @@ export function QuestionBankEditorPage() {
 
     if (!validation.isValid) {
       setValidationErrors(validation.errors);
-      toast.error('Please fix validation errors before saving');
+      toast.error(t('editor.fixErrors'));
       return;
     }
 
@@ -169,7 +164,7 @@ export function QuestionBankEditorPage() {
             question: questionData as any,
           },
         });
-        toast.success('Question updated successfully');
+        toast.success(t('editor.updateSuccess'));
       } else {
         const payload: CreateQuestionRequest = {
           question: {
@@ -178,12 +173,12 @@ export function QuestionBankEditorPage() {
           } as any,
         };
         await createMutation.mutateAsync(payload);
-        toast.success('Question created successfully');
+        toast.success(t('editor.createSuccess'));
       }
 
       navigate('/question-bank');
     } catch (error) {
-      toast.error(`Failed to ${isEditMode ? 'update' : 'create'} question`);
+      toast.error(isEditMode ? t('editor.updateError') : t('editor.createError'));
     }
   };
 
@@ -206,7 +201,7 @@ export function QuestionBankEditorPage() {
   if (isEditMode && isLoading) {
     return (
       <div className="flex h-full items-center justify-center">
-        <div className="text-muted-foreground">Loading question...</div>
+        <div className="text-muted-foreground">{t('editor.loading')}</div>
       </div>
     );
   }
@@ -223,11 +218,13 @@ export function QuestionBankEditorPage() {
           <Breadcrumb className="mb-6">
             <BreadcrumbList>
               <BreadcrumbItem className="hidden md:block">
-                <BreadcrumbLink href="/question-bank">Question Bank</BreadcrumbLink>
+                <BreadcrumbLink href="/question-bank">{t('editor.breadcrumb')}</BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator className="hidden md:block" />
               <BreadcrumbItem>
-                <BreadcrumbPage>{isEditMode ? 'Edit Question' : 'Create Question'}</BreadcrumbPage>
+                <BreadcrumbPage>
+                  {isEditMode ? t('editor.editTitle') : t('editor.createTitle')}
+                </BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
@@ -236,13 +233,13 @@ export function QuestionBankEditorPage() {
           <div className="mb-8 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <h1 className="scroll-m-20 text-3xl font-semibold tracking-tight">
-                {isEditMode ? 'Edit Question' : 'Create New Question'}
+                {isEditMode ? t('editor.editTitle') : t('editor.createTitle')}
               </h1>
             </div>
 
             <div className="flex items-center gap-2">
               <Button variant="outline" onClick={handleCancel}>
-                Cancel
+                {t('editor.cancel')}
               </Button>
               <Button
                 onClick={handleSubmit}
@@ -250,11 +247,7 @@ export function QuestionBankEditorPage() {
                 className="gap-2"
               >
                 <Save className="h-4 w-4" />
-                {createMutation.isPending || updateMutation.isPending
-                  ? 'Saving...'
-                  : isEditMode
-                    ? 'Save Changes'
-                    : 'Create Question'}
+                {createMutation.isPending || updateMutation.isPending ? t('editor.saving') : t('editor.save')}
               </Button>
             </div>
           </div>
@@ -265,23 +258,25 @@ export function QuestionBankEditorPage() {
             <div className="space-y-4">
               <div className="flex items-center gap-2">
                 <Settings className="text-primary h-5 w-5" />
-                <h3 className="text-lg font-semibold">Question Metadata</h3>
+                <h3 className="text-lg font-semibold">{t('editor.metadataSection')}</h3>
               </div>
               <Separator />
 
               {/* Question Type - Only for create mode */}
               {!isEditMode && (
                 <div className="space-y-2">
-                  <Label>Question Type</Label>
+                  <Label>{t('editor.questionType')}</Label>
                   <Select value={questionData.type} onValueChange={handleTypeChange}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value={QUESTION_TYPE.MULTIPLE_CHOICE}>Multiple Choice</SelectItem>
-                      <SelectItem value={QUESTION_TYPE.MATCHING}>Matching</SelectItem>
-                      <SelectItem value={QUESTION_TYPE.OPEN_ENDED}>Open-ended</SelectItem>
-                      <SelectItem value={QUESTION_TYPE.FILL_IN_BLANK}>Fill In Blank</SelectItem>
+                      <SelectItem value={QUESTION_TYPE.MULTIPLE_CHOICE}>
+                        {t('types.multipleChoice')}
+                      </SelectItem>
+                      <SelectItem value={QUESTION_TYPE.MATCHING}>{t('types.matching')}</SelectItem>
+                      <SelectItem value={QUESTION_TYPE.OPEN_ENDED}>{t('types.openEnded')}</SelectItem>
+                      <SelectItem value={QUESTION_TYPE.FILL_IN_BLANK}>{t('types.fillInBlank')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -290,7 +285,7 @@ export function QuestionBankEditorPage() {
               {/* Metadata Row */}
               <div className="grid grid-cols-3 gap-4">
                 <div className="space-y-2">
-                  <Label>Subject</Label>
+                  <Label>{t('editor.subject')}</Label>
                   <Select
                     value={questionData.subjectCode}
                     onValueChange={(value) =>
@@ -311,7 +306,7 @@ export function QuestionBankEditorPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Difficulty</Label>
+                  <Label>{t('editor.difficulty')}</Label>
                   <Select
                     value={questionData.difficulty}
                     onValueChange={(value) =>
@@ -322,10 +317,14 @@ export function QuestionBankEditorPage() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value={DIFFICULTY.EASY}>Nhận biết</SelectItem>
-                      <SelectItem value={DIFFICULTY.MEDIUM}>Thông hiểu</SelectItem>
-                      <SelectItem value={DIFFICULTY.HARD}>Vận dụng</SelectItem>
-                      <SelectItem value={DIFFICULTY.SUPER_HARD}>Vận dụng cao</SelectItem>
+                      <SelectItem value={DIFFICULTY.KNOWLEDGE}>{t('difficulty.knowledge')}</SelectItem>
+                      <SelectItem value={DIFFICULTY.COMPREHENSION}>
+                        {t('difficulty.comprehension')}
+                      </SelectItem>
+                      <SelectItem value={DIFFICULTY.APPLICATION}>{t('difficulty.application')}</SelectItem>
+                      <SelectItem value={DIFFICULTY.ADVANCED_APPLICATION}>
+                        {t('difficulty.advancedApplication')}
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -336,7 +335,7 @@ export function QuestionBankEditorPage() {
             {validationErrors.length > 0 && (
               <Alert variant="destructive">
                 <AlertCircle className="h-4 w-4" />
-                <AlertTitle>Validation Errors</AlertTitle>
+                <AlertTitle>{t('editor.validationErrors')}</AlertTitle>
                 <AlertDescription>
                   <ul className="mt-2 list-disc space-y-1 pl-4">
                     {validationErrors.map((error, i) => (
@@ -353,37 +352,15 @@ export function QuestionBankEditorPage() {
             <div className="space-y-4">
               <div className="flex items-center gap-2">
                 <FileText className="text-primary h-5 w-5" />
-                <h3 className="text-lg font-semibold">Question Content</h3>
+                <h3 className="text-lg font-semibold">{t('editor.contentSection')}</h3>
               </div>
               <Separator />
 
-              {questionData.type === QUESTION_TYPE.MULTIPLE_CHOICE && (
-                <MultipleChoiceEditing
-                  question={questionData as Question as MultipleChoiceQuestion}
-                  onChange={(updated) => setQuestionData({ ...questionData, ...updated })}
-                />
-              )}
-
-              {questionData.type === QUESTION_TYPE.MATCHING && (
-                <MatchingEditing
-                  question={questionData as Question as MatchingQuestion}
-                  onChange={(updated) => setQuestionData({ ...questionData, ...updated })}
-                />
-              )}
-
-              {questionData.type === QUESTION_TYPE.FILL_IN_BLANK && (
-                <FillInBlankEditing
-                  question={questionData as Question as FillInBlankQuestion}
-                  onChange={(updated) => setQuestionData({ ...questionData, ...updated })}
-                />
-              )}
-
-              {questionData.type === QUESTION_TYPE.OPEN_ENDED && (
-                <OpenEndedEditing
-                  question={questionData as Question as OpenEndedQuestion}
-                  onChange={(updated) => setQuestionData({ ...questionData, ...updated })}
-                />
-              )}
+              <QuestionRenderer
+                question={questionData as Question}
+                viewMode={VIEW_MODE.EDITING}
+                onChange={(updated) => setQuestionData({ ...questionData, ...updated })}
+              />
             </div>
           </form>
         </div>

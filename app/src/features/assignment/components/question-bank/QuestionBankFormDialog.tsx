@@ -10,31 +10,27 @@ import { Button } from '@/shared/components/ui/button';
 import { Label } from '@/shared/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
 import { useCreateQuestion, useUpdateQuestion } from '@/features/assignment/hooks/useQuestionBankApi';
-import type {
-  QuestionBankItem,
-  CreateQuestionRequest,
-  QuestionType,
-  Difficulty,
-  SubjectCode,
-  Question,
-  MultipleChoiceQuestion,
-  MatchingQuestion,
-  FillInBlankQuestion,
-  OpenEndedQuestion,
-} from '@/features/assignment/types';
-import { QUESTION_TYPE, DIFFICULTY, SUBJECT_CODE, BANK_TYPE } from '@/features/assignment/types';
-import { getAllSubjects } from '@aiprimary/core';
+import type { QuestionBankItem, CreateQuestionRequest, Question } from '@/features/assignment/types';
+import { VIEW_MODE } from '@/features/assignment/types';
 import {
-  MultipleChoiceEditing,
-  MatchingEditing,
-  FillInBlankEditing,
-  OpenEndedEditing,
-} from '@/features/question';
+  BANK_TYPE,
+  DIFFICULTY,
+  getAllSubjects,
+  getAllQuestionTypes,
+  getAllDifficulties,
+  QUESTION_TYPE,
+  SUBJECT_CODE,
+  type Difficulty,
+  type QuestionType,
+  type SubjectCode,
+} from '@aiprimary/core';
+import { QuestionRenderer } from '@/features/question';
 import { generateId } from '@/shared/lib/utils';
 import { toast } from 'sonner';
 import { Alert, AlertDescription, AlertTitle } from '@/shared/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
 import { validateQuestion } from '@/features/assignment/utils/validateQuestion';
+import { useTranslation } from 'react-i18next';
 
 interface QuestionBankFormDialogProps {
   open: boolean;
@@ -48,7 +44,7 @@ function createDefaultQuestion(type: QuestionType): QuestionBankItem {
   const baseQuestion = {
     id: generateId(),
     type,
-    difficulty: DIFFICULTY.EASY,
+    difficulty: DIFFICULTY.KNOWLEDGE,
     subjectCode: SUBJECT_CODE.MATH,
     bankType: BANK_TYPE.PERSONAL,
     title: '',
@@ -105,6 +101,7 @@ function createDefaultQuestion(type: QuestionType): QuestionBankItem {
 }
 
 export function QuestionBankFormDialog({ open, onOpenChange, mode, question }: QuestionBankFormDialogProps) {
+  const { t } = useTranslation('questions');
   const createMutation = useCreateQuestion();
   const updateMutation = useUpdateQuestion();
 
@@ -142,7 +139,7 @@ export function QuestionBankFormDialog({ open, onOpenChange, mode, question }: Q
     e.preventDefault();
 
     if (!questionData) {
-      toast.error('Question data is missing');
+      toast.error(t('form.missingData'));
       return;
     }
 
@@ -152,7 +149,7 @@ export function QuestionBankFormDialog({ open, onOpenChange, mode, question }: Q
     if (!validation.isValid) {
       // Show errors - block submission
       setValidationErrors(validation.errors);
-      toast.error('Please fix validation errors before saving');
+      toast.error(t('form.fixErrors'));
       return;
     }
 
@@ -177,7 +174,7 @@ export function QuestionBankFormDialog({ open, onOpenChange, mode, question }: Q
         };
 
         await createMutation.mutateAsync(payload);
-        toast.success('Question created successfully');
+        toast.success(t('form.createSuccess'));
       } else if (mode === 'edit' && question) {
         // Update with full question content
         await updateMutation.mutateAsync({
@@ -186,12 +183,12 @@ export function QuestionBankFormDialog({ open, onOpenChange, mode, question }: Q
             question: questionData as any,
           },
         });
-        toast.success('Question updated successfully');
+        toast.success(t('form.updateSuccess'));
       }
 
       onOpenChange(false);
     } catch (error) {
-      toast.error(`Failed to ${mode} question`);
+      toast.error(mode === 'create' ? t('form.createError') : t('form.updateError'));
     }
   };
 
@@ -212,28 +209,31 @@ export function QuestionBankFormDialog({ open, onOpenChange, mode, question }: Q
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[90vh] !max-w-6xl overflow-y-auto rounded-3xl border-2 shadow-2xl">
         <DialogHeader>
-          <DialogTitle>{mode === 'create' ? 'Create New Question' : 'Edit Question'}</DialogTitle>
+          <DialogTitle>{mode === 'create' ? t('form.createTitle') : t('form.editTitle')}</DialogTitle>
         </DialogHeader>
 
         {questionData && (
           <form onSubmit={handleSubmit} className="gap-6 space-y-6">
             {/* Metadata Section */}
             <div className="bg-muted/10 space-y-4 rounded-2xl border p-6 shadow-sm">
-              <h3 className="scroll-m-20 text-xl font-semibold tracking-tight">Question Metadata</h3>
+              <h3 className="scroll-m-20 text-xl font-semibold tracking-tight">
+                {t('form.metadataSection')}
+              </h3>
 
               {/* Question Type - Only for create mode */}
               {mode === 'create' && (
                 <div className="space-y-2">
-                  <Label>Question Type</Label>
+                  <Label>{t('form.questionType')}</Label>
                   <Select value={questionData.type} onValueChange={handleTypeChange}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value={QUESTION_TYPE.MULTIPLE_CHOICE}>Multiple Choice</SelectItem>
-                      <SelectItem value={QUESTION_TYPE.MATCHING}>Matching</SelectItem>
-                      <SelectItem value={QUESTION_TYPE.OPEN_ENDED}>Open-ended</SelectItem>
-                      <SelectItem value={QUESTION_TYPE.FILL_IN_BLANK}>Fill In Blank</SelectItem>
+                      {getAllQuestionTypes({ includeGroup: false }).map((type) => (
+                        <SelectItem key={type.value} value={type.value}>
+                          {t(type.i18nKey as any)}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
@@ -242,7 +242,7 @@ export function QuestionBankFormDialog({ open, onOpenChange, mode, question }: Q
               {/* Metadata Row */}
               <div className="grid grid-cols-3 gap-4">
                 <div className="space-y-2">
-                  <Label>Subject</Label>
+                  <Label>{t('form.subject')}</Label>
                   <Select
                     value={questionData.subjectCode}
                     onValueChange={(value) =>
@@ -263,7 +263,7 @@ export function QuestionBankFormDialog({ open, onOpenChange, mode, question }: Q
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Difficulty</Label>
+                  <Label>{t('form.difficulty')}</Label>
                   <Select
                     value={questionData.difficulty}
                     onValueChange={(value) =>
@@ -274,10 +274,11 @@ export function QuestionBankFormDialog({ open, onOpenChange, mode, question }: Q
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value={DIFFICULTY.EASY}>Nhận biết</SelectItem>
-                      <SelectItem value={DIFFICULTY.MEDIUM}>Thông hiểu</SelectItem>
-                      <SelectItem value={DIFFICULTY.HARD}>Vận dụng</SelectItem>
-                      <SelectItem value={DIFFICULTY.SUPER_HARD}>Vận dụng cao</SelectItem>
+                      {getAllDifficulties().map((difficulty) => (
+                        <SelectItem key={difficulty.value} value={difficulty.value}>
+                          {t(difficulty.i18nKey as any)}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
@@ -288,7 +289,7 @@ export function QuestionBankFormDialog({ open, onOpenChange, mode, question }: Q
             {validationErrors.length > 0 && (
               <Alert variant="destructive">
                 <AlertCircle className="h-4 w-4" />
-                <AlertTitle>Validation Errors</AlertTitle>
+                <AlertTitle>{t('form.validationErrors')}</AlertTitle>
                 <AlertDescription>
                   <ul className="mt-2 list-disc space-y-1 pl-4">
                     {validationErrors.map((error, i) => (
@@ -303,43 +304,21 @@ export function QuestionBankFormDialog({ open, onOpenChange, mode, question }: Q
 
             {/* Question Content Editor - Type Specific */}
             <div className="mt-6 space-y-4 rounded-2xl border p-6 shadow-sm">
-              <h3 className="scroll-m-20 text-xl font-semibold tracking-tight">Question Content</h3>
+              <h3 className="scroll-m-20 text-xl font-semibold tracking-tight">{t('form.contentSection')}</h3>
 
-              {questionData.type === QUESTION_TYPE.MULTIPLE_CHOICE && (
-                <MultipleChoiceEditing
-                  question={questionData as Question as MultipleChoiceQuestion}
-                  onChange={(updated) => setQuestionData({ ...questionData, ...updated })}
-                />
-              )}
-
-              {questionData.type === QUESTION_TYPE.MATCHING && (
-                <MatchingEditing
-                  question={questionData as Question as MatchingQuestion}
-                  onChange={(updated) => setQuestionData({ ...questionData, ...updated })}
-                />
-              )}
-
-              {questionData.type === QUESTION_TYPE.FILL_IN_BLANK && (
-                <FillInBlankEditing
-                  question={questionData as Question as FillInBlankQuestion}
-                  onChange={(updated) => setQuestionData({ ...questionData, ...updated })}
-                />
-              )}
-
-              {questionData.type === QUESTION_TYPE.OPEN_ENDED && (
-                <OpenEndedEditing
-                  question={questionData as Question as OpenEndedQuestion}
-                  onChange={(updated) => setQuestionData({ ...questionData, ...updated })}
-                />
-              )}
+              <QuestionRenderer
+                question={questionData as Question}
+                viewMode={VIEW_MODE.EDITING}
+                onChange={(updated) => setQuestionData({ ...questionData, ...updated })}
+              />
             </div>
 
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-                Cancel
+                {t('form.cancel')}
               </Button>
               <Button type="submit" disabled={createMutation.isPending || updateMutation.isPending}>
-                {mode === 'create' ? 'Create Question' : 'Save Changes'}
+                {mode === 'create' ? t('form.create') : t('form.save')}
               </Button>
             </DialogFooter>
           </form>

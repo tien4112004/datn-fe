@@ -11,7 +11,7 @@ import {
 import { Button } from '@/shared/components/ui/button';
 import { Badge } from '@/shared/components/ui/badge';
 import { useAssignmentEditorStore } from '../../stores/useAssignmentEditorStore';
-import { DIFFICULTY } from '@aiprimary/core';
+import { getAllDifficulties, getDifficultyI18nKey } from '@aiprimary/core';
 import type { AssignmentFormData, MatrixCell } from '../../types';
 
 const getCellStatus = (cell: MatrixCell): 'valid' | 'warning' | 'empty' => {
@@ -31,18 +31,7 @@ export const MatrixViewDialog = () => {
   const matrixCells = watch('matrixCells');
   const questions = watch('questions');
 
-  const difficulties = [DIFFICULTY.EASY, DIFFICULTY.MEDIUM, DIFFICULTY.HARD, DIFFICULTY.SUPER_HARD];
-
-  const getDifficultyLabel = (difficulty: string) => {
-    const diffMap: Record<string, 'nhanBiet' | 'thongHieu' | 'vanDung' | 'vanDungCao'> = {
-      [DIFFICULTY.EASY]: 'nhanBiet',
-      [DIFFICULTY.MEDIUM]: 'thongHieu',
-      [DIFFICULTY.HARD]: 'vanDung',
-      [DIFFICULTY.SUPER_HARD]: 'vanDungCao',
-    };
-    const key = diffMap[difficulty] || 'nhanBiet';
-    return tDifficulty(key as 'nhanBiet' | 'thongHieu' | 'vanDung' | 'vanDungCao');
-  };
+  const difficulties = getAllDifficulties();
 
   const totalRequired = matrixCells.reduce((sum, cell) => sum + cell.requiredCount, 0);
   const totalCurrent = questions.length;
@@ -91,8 +80,8 @@ export const MatrixViewDialog = () => {
                 <tr className="border-b bg-gray-50 dark:bg-gray-800">
                   <th className="border-r p-3 text-left font-semibold">{t('tableHeaders.topic')}</th>
                   {difficulties.map((diff) => (
-                    <th key={diff} className="p-3 text-center font-semibold">
-                      {getDifficultyLabel(diff)}
+                    <th key={diff.value} className="p-3 text-center font-semibold">
+                      {tDifficulty(getDifficultyI18nKey(diff.value) as any)}
                     </th>
                   ))}
                   <th className="p-3 text-center font-semibold">{t('tableHeaders.total')}</th>
@@ -102,10 +91,10 @@ export const MatrixViewDialog = () => {
                 {topics.map((topic, topicIdx) => {
                   const topicCells = difficulties.map(
                     (diff) =>
-                      matrixCells.find((c) => c.topicId === topic.id && c.difficulty === diff) || {
+                      matrixCells.find((c) => c.topicId === topic.id && c.difficulty === diff.value) || {
                         id: '',
                         topicId: topic.id,
-                        difficulty: diff,
+                        difficulty: diff.value,
                         requiredCount: 0,
                         currentCount: 0,
                       }
@@ -146,11 +135,11 @@ export const MatrixViewDialog = () => {
                 <tr className="border-t-2 bg-gray-100 font-semibold dark:bg-gray-800">
                   <td className="border-r p-3">{t('tableHeaders.total')}</td>
                   {difficulties.map((diff) => {
-                    const diffCells = matrixCells.filter((c) => c.difficulty === diff);
+                    const diffCells = matrixCells.filter((c) => c.difficulty === diff.value);
                     const diffRequired = diffCells.reduce((sum, c) => sum + c.requiredCount, 0);
                     const diffCurrent = diffCells.reduce((sum, c) => sum + c.currentCount, 0);
                     return (
-                      <td key={diff} className="p-3 text-center">
+                      <td key={diff.value} className="p-3 text-center">
                         {diffRequired > 0 ? `${diffCurrent} / ${diffRequired}` : '-'}
                       </td>
                     );

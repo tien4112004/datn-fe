@@ -1,5 +1,5 @@
 import type { QuestionBankItem } from '@aiprimary/core';
-import type { QuestionType, Difficulty, SubjectCode, BankType } from './constants';
+import type { QuestionType, Difficulty, SubjectCode, BankType } from '.';
 
 // Re-export core type
 export type { QuestionBankItem } from '@aiprimary/core';

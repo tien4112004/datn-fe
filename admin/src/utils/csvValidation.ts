@@ -1,5 +1,5 @@
-import type { QuestionBankItem } from '@/types/question-bank';
-import { QUESTION_TYPE, DIFFICULTY, SUBJECT_CODE } from '@/types/question-bank';
+import type { QuestionBankItem } from '@/types/questionBank';
+import { QUESTION_TYPE, DIFFICULTY, SUBJECT_CODE } from '@/types/questionBank';
 
 export interface ValidationError {
   row: number;
@@ -107,16 +107,16 @@ function validateMultipleChoice(
 ): void {
   if (question.type !== QUESTION_TYPE.MULTIPLE_CHOICE) return;
 
-  if (!question.options || question.options.length < 2) {
+  if (!question.data.options || question.data.options.length < 2) {
     errors.push({ row, field: 'options', message: 'At least 2 options are required' });
     return;
   }
 
-  if (question.options.length > 6) {
+  if (question.data.options.length > 6) {
     warnings.push({ row, field: 'options', message: 'More than 6 options may be confusing' });
   }
 
-  const correctCount = question.options.filter((o) => o.isCorrect).length;
+  const correctCount = question.data.options.filter((o) => o.isCorrect).length;
   if (correctCount === 0) {
     errors.push({ row, field: 'correctOption', message: 'At least one correct option is required' });
   } else if (correctCount > 1) {
@@ -127,7 +127,7 @@ function validateMultipleChoice(
     });
   }
 
-  question.options.forEach((option, idx) => {
+  question.data.options.forEach((option, idx) => {
     if (!option.text || option.text.trim().length === 0) {
       errors.push({
         row,
@@ -146,16 +146,16 @@ function validateMatching(
 ): void {
   if (question.type !== QUESTION_TYPE.MATCHING) return;
 
-  if (!question.pairs || question.pairs.length < 2) {
+  if (!question.data.pairs || question.data.pairs.length < 2) {
     errors.push({ row, field: 'pairs', message: 'At least 2 matching pairs are required' });
     return;
   }
 
-  if (question.pairs.length > 10) {
+  if (question.data.pairs.length > 10) {
     warnings.push({ row, field: 'pairs', message: 'More than 10 pairs may be difficult to match' });
   }
 
-  question.pairs.forEach((pair, idx) => {
+  question.data.pairs.forEach((pair, idx) => {
     if (!pair.left || pair.left.trim().length === 0) {
       errors.push({
         row,
@@ -181,15 +181,15 @@ function validateOpenEnded(
 ): void {
   if (question.type !== QUESTION_TYPE.OPEN_ENDED) return;
 
-  if (question.maxLength && question.maxLength < 10) {
+  if (question.data.maxLength && question.data.maxLength < 10) {
     warnings.push({ row, field: 'maxLength', message: 'Max length is very short (<10 chars)' });
   }
 
-  if (question.maxLength && question.maxLength > 5000) {
+  if (question.data.maxLength && question.data.maxLength > 5000) {
     warnings.push({ row, field: 'maxLength', message: 'Max length is very long (>5000 chars)' });
   }
 
-  if (!question.expectedAnswer || question.expectedAnswer.trim().length === 0) {
+  if (!question.data.expectedAnswer || question.data.expectedAnswer.trim().length === 0) {
     warnings.push({
       row,
       field: 'expectedAnswer',
@@ -206,12 +206,12 @@ function validateFillInBlank(
 ): void {
   if (question.type !== QUESTION_TYPE.FILL_IN_BLANK) return;
 
-  if (!question.segments || question.segments.length === 0) {
+  if (!question.data.segments || question.data.segments.length === 0) {
     errors.push({ row, field: 'segments', message: 'Question segments are required' });
     return;
   }
 
-  const blankCount = question.segments.filter((s) => s.type === 'blank').length;
+  const blankCount = question.data.segments.filter((s) => s.type === 'blank').length;
 
   if (blankCount === 0) {
     errors.push({ row, field: 'text', message: 'At least one {blank} placeholder is required' });
@@ -221,7 +221,7 @@ function validateFillInBlank(
     warnings.push({ row, field: 'text', message: 'More than 10 blanks may be confusing' });
   }
 
-  question.segments.forEach((segment, idx) => {
+  question.data.segments.forEach((segment, idx) => {
     if (segment.type === 'blank') {
       if (!segment.content || segment.content.trim().length === 0) {
         errors.push({

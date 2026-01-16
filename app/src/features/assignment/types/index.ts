@@ -1,4 +1,3 @@
-export * from './constants';
 export * from './assignment';
 export * from './questionBank';
 export * from './service';
@@ -25,4 +24,22 @@ export type {
   Submission,
   Grade,
   AssignmentQuestion,
+  BankType,
+  Difficulty,
+  QuestionType,
+  SubjectCode,
+  ViewMode,
+} from '@aiprimary/core';
+
+// Re-export core assessment constants
+export {
+  BANK_TYPE,
+  DIFFICULTY,
+  DIFFICULTY_LABELS,
+  getDifficultyName,
+  QUESTION_TYPE,
+  QUESTION_TYPE_LABELS,
+  getQuestionTypeName,
+  SUBJECT_CODE,
+  VIEW_MODE,
 } from '@aiprimary/core';

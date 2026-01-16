@@ -5,7 +5,7 @@ import { questionSchema } from '../types/validation';
 
 export const createEmptyQuestion = (
   type: QuestionType,
-  difficulty: Difficulty = DIFFICULTY.EASY
+  difficulty: Difficulty = DIFFICULTY.KNOWLEDGE
 ): Question => {
   const baseId = generateId();
 

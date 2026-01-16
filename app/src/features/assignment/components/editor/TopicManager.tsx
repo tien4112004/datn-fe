@@ -5,7 +5,7 @@ import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
 import { Label } from '@/shared/components/ui/label';
 import type { AssignmentFormData } from '../../types';
-import { DIFFICULTY } from '../../types';
+import { getAllDifficulties } from '@aiprimary/core';
 import { generateId, createMatrixCellsForTopic } from '../../utils';
 
 export const TopicManager = () => {
@@ -38,7 +38,7 @@ export const TopicManager = () => {
     });
 
     // Create matrix cells for all difficulties
-    const difficulties = [DIFFICULTY.EASY, DIFFICULTY.MEDIUM, DIFFICULTY.HARD, DIFFICULTY.SUPER_HARD];
+    const difficulties = getAllDifficulties().map((d) => d.value);
     const newCells = createMatrixCellsForTopic(newTopicId, difficulties);
 
     newCells.forEach((cell) => appendMatrixCell(cell));

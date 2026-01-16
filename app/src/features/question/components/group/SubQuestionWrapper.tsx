@@ -116,7 +116,6 @@ export function SubQuestionWrapper({
             answer={convertedAnswer}
             points={points}
             onAnswerChange={onAnswerChange!}
-            hideHeader={true}
           />
         );
       }
@@ -126,7 +125,6 @@ export function SubQuestionWrapper({
             question={convertedQuestion}
             answer={convertedAnswer}
             points={points}
-            hideHeader={true}
           />
         );
       }
@@ -157,18 +155,12 @@ export function SubQuestionWrapper({
             answer={convertedAnswer}
             points={points}
             onAnswerChange={onAnswerChange!}
-            hideHeader={true}
           />
         );
       }
       if (viewMode === VIEW_MODE.AFTER_ASSESSMENT) {
         return (
-          <MatchingAfterAssessment
-            question={convertedQuestion}
-            answer={convertedAnswer}
-            points={points}
-            hideHeader={true}
-          />
+          <MatchingAfterAssessment question={convertedQuestion} answer={convertedAnswer} points={points} />
         );
       }
       if (viewMode === VIEW_MODE.GRADING) {
@@ -198,18 +190,12 @@ export function SubQuestionWrapper({
             answer={convertedAnswer}
             points={points}
             onAnswerChange={onAnswerChange!}
-            hideHeader={true}
           />
         );
       }
       if (viewMode === VIEW_MODE.AFTER_ASSESSMENT) {
         return (
-          <OpenEndedAfterAssessment
-            question={convertedQuestion}
-            answer={convertedAnswer}
-            points={points}
-            hideHeader={true}
-          />
+          <OpenEndedAfterAssessment question={convertedQuestion} answer={convertedAnswer} points={points} />
         );
       }
       if (viewMode === VIEW_MODE.GRADING) {
@@ -239,18 +225,12 @@ export function SubQuestionWrapper({
             answer={convertedAnswer}
             points={points}
             onAnswerChange={onAnswerChange!}
-            hideHeader={true}
           />
         );
       }
       if (viewMode === VIEW_MODE.AFTER_ASSESSMENT) {
         return (
-          <FillInBlankAfterAssessment
-            question={convertedQuestion}
-            answer={convertedAnswer}
-            points={points}
-            hideHeader={true}
-          />
+          <FillInBlankAfterAssessment question={convertedQuestion} answer={convertedAnswer} points={points} />
         );
       }
       if (viewMode === VIEW_MODE.GRADING) {

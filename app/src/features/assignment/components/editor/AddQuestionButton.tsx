@@ -10,6 +10,7 @@ import {
 } from '@/shared/components/ui/dropdown-menu';
 import type { AssignmentFormData } from '../../types';
 import { QUESTION_TYPE, DIFFICULTY } from '../../types';
+import { getAllQuestionTypes } from '@aiprimary/core';
 import { generateId } from '@/shared/lib/utils';
 import { useAssignmentEditorStore } from '../../stores/useAssignmentEditorStore';
 
@@ -19,7 +20,6 @@ interface AddQuestionButtonProps {
 
 export const AddQuestionButton = ({ className }: AddQuestionButtonProps) => {
   const { t } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.questions.toolbar' });
-  const { t: tTypes } = useTranslation('assignment', { keyPrefix: 'questionTypes' });
   const { control, watch } = useFormContext<AssignmentFormData>();
   const { append } = useFieldArray({
     control,
@@ -56,7 +56,7 @@ export const AddQuestionButton = ({ className }: AddQuestionButtonProps) => {
       question: {
         id: generateId(),
         type: type as any,
-        difficulty: DIFFICULTY.EASY,
+        difficulty: DIFFICULTY.KNOWLEDGE,
         title: '',
         topicId: defaultTopicId,
         explanation: '',
@@ -79,18 +79,11 @@ export const AddQuestionButton = ({ className }: AddQuestionButtonProps) => {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-        <DropdownMenuItem onClick={() => handleAddQuestion(QUESTION_TYPE.MULTIPLE_CHOICE)}>
-          {tTypes('multipleChoice')}
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => handleAddQuestion(QUESTION_TYPE.MATCHING)}>
-          {tTypes('matching')}
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => handleAddQuestion(QUESTION_TYPE.OPEN_ENDED)}>
-          {tTypes('openEnded')}
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => handleAddQuestion(QUESTION_TYPE.FILL_IN_BLANK)}>
-          {tTypes('fillInBlank')}
-        </DropdownMenuItem>
+        {getAllQuestionTypes({ includeGroup: false }).map((type) => (
+          <DropdownMenuItem key={type.value} onClick={() => handleAddQuestion(type.value)}>
+            {type.label}
+          </DropdownMenuItem>
+        ))}
       </DropdownMenuContent>
     </DropdownMenu>
   );

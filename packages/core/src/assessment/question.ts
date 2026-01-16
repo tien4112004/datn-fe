@@ -59,7 +59,7 @@ export interface FillInBlankData {
  */
 export interface SubQuestion {
   id: string;
-  type: 'multiple_choice' | 'matching' | 'open_ended' | 'fill_in_blank';
+  type: 'MULTIPLE_CHOICE' | 'MATCHING' | 'OPEN_ENDED' | 'FILL_IN_BLANK';
   title: string;
   titleImageUrl?: string;
   explanation?: string;

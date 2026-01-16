@@ -1,25 +1,17 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { FillInBlankQuestion, FillInBlankAnswer } from '@/features/assignment/types';
-import { DifficultyBadge } from '../shared';
-import { Input } from '@/shared/components/ui/input';
 import { QUESTION_TYPE } from '@/features/assignment/types';
+import { Input } from '@/shared/components/ui/input';
 
 interface FillInBlankDoingProps {
   question: FillInBlankQuestion;
   answer?: FillInBlankAnswer;
   points?: number; // Optional points for display
   onAnswerChange: (answer: FillInBlankAnswer) => void;
-  hideHeader?: boolean; // Hide type label and difficulty badge when used as sub-question
 }
 
-export const FillInBlankDoing = ({
-  question,
-  answer,
-  points,
-  onAnswerChange,
-  hideHeader = false,
-}: FillInBlankDoingProps) => {
+export const FillInBlankDoing = ({ question, answer, points, onAnswerChange }: FillInBlankDoingProps) => {
   const { t } = useTranslation('questions');
   const blankSegments = question.data.segments.filter((s) => s.type === 'blank');
   const [blanks, setBlanks] = useState<Record<string, string>>(() => {

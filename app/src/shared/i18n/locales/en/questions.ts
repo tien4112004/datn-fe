@@ -4,6 +4,54 @@
 export default {
   title: 'Question Bank',
 
+  // Question Form Dialog
+  form: {
+    createTitle: 'Create New Question',
+    editTitle: 'Edit Question',
+    metadataSection: 'Question Metadata',
+    contentSection: 'Question Content',
+    questionType: 'Question Type',
+    subject: 'Subject',
+    difficulty: 'Difficulty',
+    validationErrors: 'Validation Errors',
+    cancel: 'Cancel',
+    create: 'Create Question',
+    save: 'Save Changes',
+
+    // Toast messages
+    createSuccess: 'Question created successfully',
+    updateSuccess: 'Question updated successfully',
+    createError: 'Failed to create question',
+    updateError: 'Failed to update question',
+    missingData: 'Question data is missing',
+    fixErrors: 'Please fix validation errors before saving',
+  },
+
+  // Question Bank Editor Page
+  editor: {
+    breadcrumb: 'Question Bank',
+    createTitle: 'Create New Question',
+    editTitle: 'Edit Question',
+    cancel: 'Cancel',
+    save: 'Save Changes',
+    saving: 'Saving...',
+    loading: 'Loading question...',
+    metadataSection: 'Question Metadata',
+    contentSection: 'Question Content',
+    questionType: 'Question Type',
+    subject: 'Subject',
+    difficulty: 'Difficulty',
+    validationErrors: 'Validation Errors',
+
+    // Toast messages
+    createSuccess: 'Question created successfully',
+    updateSuccess: 'Question updated successfully',
+    createError: 'Failed to create question',
+    updateError: 'Failed to update question',
+    missingData: 'Question data is missing',
+    fixErrors: 'Please fix validation errors before saving',
+  },
+
   types: {
     multipleChoice: 'Multiple Choice',
     matching: 'Matching',
@@ -21,10 +69,15 @@ export default {
   },
 
   difficulty: {
-    easy: 'Easy',
-    medium: 'Medium',
-    hard: 'Hard',
-    superHard: 'Super Hard',
+    knowledge: 'Knowledge',
+    comprehension: 'Comprehension',
+    application: 'Application',
+    advancedApplication: 'Advanced Application',
+  },
+
+  bankType: {
+    personal: 'Personal',
+    public: 'Public',
   },
 
   common: {
@@ -44,6 +97,22 @@ export default {
     scoreDisplay: 'Score: {{score}}/{{total}} points',
     pointsAbbreviation: 'pt',
     pointsAbbreviation_plural: 'pts',
+  },
+
+  validation: {
+    titleRequired: 'Title is required',
+    optionTextRequired: 'Option text is required',
+    minOptions: 'At least 2 options required',
+    maxOptions: 'Maximum 6 options allowed',
+    exactlyOneCorrect: 'Exactly one option must be marked as correct',
+    leftItemRequired: 'Left item is required',
+    rightItemRequired: 'Right item is required',
+    minPairs: 'At least 2 pairs required',
+    maxPairs: 'Maximum 8 pairs allowed',
+    maxLengthExceeded: 'Maximum length exceeded',
+    minSegments: 'At least one segment required',
+    subQuestionTitleRequired: 'Sub-question title is required',
+    minSubQuestions: 'At least one sub-question required',
   },
 
   // Multiple Choice

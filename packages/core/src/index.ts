@@ -9,15 +9,19 @@ export {
   QUESTION_TYPE,
   type QuestionType,
   QUESTION_TYPE_LABELS,
+  QUESTION_TYPE_I18N_KEYS,
   getQuestionTypeName,
   DIFFICULTY,
   type Difficulty,
   DIFFICULTY_LABELS,
+  DIFFICULTY_I18N_KEYS,
   getDifficultyName,
   SUBJECT_CODE,
   type SubjectCode,
   BANK_TYPE,
   type BankType,
+  BANK_TYPE_LABELS,
+  BANK_TYPE_I18N_KEYS,
   VIEW_MODE,
   type ViewMode,
   ELEMENTARY_GRADE,
@@ -37,6 +41,19 @@ export {
   gradeNumberToString,
   gradeStringToNumber,
 } from './assessment/grades';
+export {
+  getAllQuestionTypes,
+  getQuestionTypeI18nKey,
+  getQuestionTypeI18nMap,
+  getAllDifficulties,
+  getDifficultyI18nKey,
+  getDifficultyI18nMap,
+  getAllBankTypes,
+  getBankTypeI18nKey,
+  getBankTypeName,
+  toSelectItems,
+  type ConstantItem,
+} from './assessment/constantHelpers';
 export * from './assessment/question';
 export * from './assessment/answer';
 export * from './assessment/questionBank';

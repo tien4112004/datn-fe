@@ -12,8 +12,9 @@ import type {
   QuestionType,
   Difficulty,
   SubjectCode,
-} from '@/types/question-bank';
-import { QUESTION_TYPE, DIFFICULTY, SUBJECT_CODE, BANK_TYPE } from '@/types/question-bank';
+} from '@/types/questionBank';
+import { QUESTION_TYPE, DIFFICULTY, SUBJECT_CODE, BANK_TYPE } from '@/types/questionBank';
+import { getAllQuestionTypes, getAllDifficulties } from '@aiprimary/core';
 
 interface QuestionBankFormDialogProps {
   open: boolean;
@@ -36,7 +37,7 @@ export function QuestionBankFormDialog({ open, onClose, mode, question }: Questi
     points: number;
   }>({
     type: QUESTION_TYPE.MULTIPLE_CHOICE,
-    difficulty: DIFFICULTY.EASY,
+    difficulty: DIFFICULTY.KNOWLEDGE,
     subjectCode: SUBJECT_CODE.MATH,
     title: '',
     explanation: '',
@@ -58,7 +59,7 @@ export function QuestionBankFormDialog({ open, onClose, mode, question }: Questi
       // Reset form for create mode
       setFormData({
         type: QUESTION_TYPE.MULTIPLE_CHOICE,
-        difficulty: DIFFICULTY.EASY,
+        difficulty: DIFFICULTY.KNOWLEDGE,
         subjectCode: SUBJECT_CODE.MATH,
         title: '',
         explanation: '',
@@ -77,7 +78,7 @@ export function QuestionBankFormDialog({ open, onClose, mode, question }: Questi
           type: formData.type,
           difficulty: formData.difficulty,
           subjectCode: formData.subjectCode,
-          bankType: BANK_TYPE.APPLICATION,
+          bankType: BANK_TYPE.PUBLIC,
           title: formData.title,
           explanation: formData.explanation,
           points: formData.points,
@@ -147,10 +148,11 @@ export function QuestionBankFormDialog({ open, onClose, mode, question }: Questi
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value={QUESTION_TYPE.MULTIPLE_CHOICE}>Multiple Choice</SelectItem>
-                  <SelectItem value={QUESTION_TYPE.MATCHING}>Matching</SelectItem>
-                  <SelectItem value={QUESTION_TYPE.OPEN_ENDED}>Open-ended</SelectItem>
-                  <SelectItem value={QUESTION_TYPE.FILL_IN_BLANK}>Fill In Blank</SelectItem>
+                  {getAllQuestionTypes({ includeGroup: false }).map((type) => (
+                    <SelectItem key={type.value} value={type.value}>
+                      {type.label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -197,10 +199,11 @@ export function QuestionBankFormDialog({ open, onClose, mode, question }: Questi
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value={DIFFICULTY.EASY}>Nhận biết</SelectItem>
-                  <SelectItem value={DIFFICULTY.MEDIUM}>Thông hiểu</SelectItem>
-                  <SelectItem value={DIFFICULTY.HARD}>Vận dụng</SelectItem>
-                  <SelectItem value={DIFFICULTY.SUPER_HARD}>Vận dụng cao</SelectItem>
+                  {getAllDifficulties().map((difficulty) => (
+                    <SelectItem key={difficulty.value} value={difficulty.value}>
+                      {difficulty.label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>

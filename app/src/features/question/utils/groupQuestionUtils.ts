@@ -1,4 +1,4 @@
-import type { GroupQuestionData, SubQuestion } from '@aiprimary/core';
+import { QUESTION_TYPE, type GroupQuestionData, type SubQuestion } from '@aiprimary/core';
 import { generateId } from '@/shared/lib/utils';
 
 /**
@@ -28,7 +28,7 @@ export function validateGroupQuestion(data: GroupQuestionData): {
 
     // Type-specific validation
     switch (question.type) {
-      case 'multiple_choice': {
+      case QUESTION_TYPE.MULTIPLE_CHOICE: {
         const mcData = question.data as any;
         if (!mcData.options || mcData.options.length < 2) {
           errors.push(`Question ${index + 1}: At least two options are required`);
@@ -39,14 +39,14 @@ export function validateGroupQuestion(data: GroupQuestionData): {
         }
         break;
       }
-      case 'matching': {
+      case QUESTION_TYPE.MATCHING: {
         const matchData = question.data as any;
         if (!matchData.pairs || matchData.pairs.length === 0) {
           errors.push(`Question ${index + 1}: At least one matching pair is required`);
         }
         break;
       }
-      case 'fill_in_blank': {
+      case QUESTION_TYPE.FILL_IN_BLANK: {
         const fibData = question.data as any;
         if (!fibData.segments || fibData.segments.length === 0) {
           errors.push(`Question ${index + 1}: At least one segment is required`);
@@ -127,7 +127,7 @@ export function gradeMultipleChoice(
  */
 export function createEmptyQuestionData(type: SubQuestion['type']): any {
   switch (type) {
-    case 'multiple_choice':
+    case QUESTION_TYPE.MULTIPLE_CHOICE:
       return {
         options: [
           { id: generateId(), text: '', isCorrect: false },
@@ -135,17 +135,17 @@ export function createEmptyQuestionData(type: SubQuestion['type']): any {
         ],
         shuffleOptions: false,
       };
-    case 'matching':
+    case QUESTION_TYPE.MATCHING:
       return {
         pairs: [{ id: generateId(), left: '', right: '' }],
         shufflePairs: false,
       };
-    case 'open_ended':
+    case QUESTION_TYPE.OPEN_ENDED:
       return {
         expectedAnswer: '',
         maxLength: undefined,
       };
-    case 'fill_in_blank':
+    case QUESTION_TYPE.FILL_IN_BLANK:
       return {
         segments: [],
         caseSensitive: false,
@@ -153,27 +153,6 @@ export function createEmptyQuestionData(type: SubQuestion['type']): any {
     default:
       return { options: [], shuffleOptions: false };
   }
-}
-
-/**
- * Get question type display name
- */
-export function getQuestionTypeLabel(type: SubQuestion['type'], locale: 'en' | 'vi' = 'en'): string {
-  const labels = {
-    en: {
-      multiple_choice: 'Multiple Choice',
-      matching: 'Matching',
-      open_ended: 'Open Ended',
-      fill_in_blank: 'Fill in the Blank',
-    },
-    vi: {
-      multiple_choice: 'Trắc nghiệm',
-      matching: 'Nối',
-      open_ended: 'Tự luận',
-      fill_in_blank: 'Điền vào chỗ trống',
-    },
-  };
-  return labels[locale][type] || type;
 }
 
 /**

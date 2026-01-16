@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import type { FillInBlankQuestion, FillInBlankAnswer } from '@/features/assignment/types';
-import { MarkdownPreview, AnswerFeedback, DifficultyBadge } from '../shared';
+import { MarkdownPreview, AnswerFeedback } from '../shared';
 
 import { CheckCircle2, XCircle } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';

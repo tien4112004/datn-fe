@@ -1,5 +1,5 @@
-import type { QuestionType } from '@/types/question-bank';
-import { QUESTION_TYPE } from '@/types/question-bank';
+import type { QuestionType } from '@/types/questionBank';
+import { QUESTION_TYPE } from '@/types/questionBank';
 
 /**
  * CSV Template Structure for Question Bank Import
@@ -18,8 +18,8 @@ import { QUESTION_TYPE } from '@/types/question-bank';
  */
 
 const MULTIPLE_CHOICE_TEMPLATE = `title,type,difficulty,subjectCode,points,option1,option2,option3,option4,correctOption,explanation
-"What is 2+2?","multiple_choice","nhan_biet","T","10","2","3","4","5","4","Basic addition"
-"Choose the correct spelling","multiple_choice","thong_hieu","TV","10","hok","học","hóc","hộc","học","Vietnamese spelling"`;
+"What is 2+2?","MULTIPLE_CHOICE","nhan_biet","T","10","2","3","4","5","4","Basic addition"
+"Choose the correct spelling","MULTIPLE_CHOICE","thong_hieu","TV","10","hok","học","hóc","hộc","học","Vietnamese spelling"`;
 
 const MATCHING_TEMPLATE = `title,type,difficulty,subjectCode,points,pair1_left,pair1_right,pair2_left,pair2_right,pair3_left,pair3_right,explanation
 "Match numbers with words","matching","nhan_biet","T","15","1","One","2","Two","3","Three","Match numerical digits with written words"

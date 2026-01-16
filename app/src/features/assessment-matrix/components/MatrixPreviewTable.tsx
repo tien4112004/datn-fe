@@ -1,33 +1,17 @@
 import { useTranslation } from 'react-i18next';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 import useAssessmentMatrixStore from '@/features/assessment-matrix/stores/assessmentMatrixStore';
-import type { Difficulty } from '@/features/assignment/types';
-import { DIFFICULTY } from '@/features/assignment/types';
+import { getAllDifficulties, getDifficultyName } from '@aiprimary/core';
 import { Badge } from '@/shared/components/ui/badge';
 import { AlertCircle, CheckCircle } from 'lucide-react';
-
-const difficultyLevels: Difficulty[] = [
-  DIFFICULTY.EASY,
-  DIFFICULTY.MEDIUM,
-  DIFFICULTY.HARD,
-  DIFFICULTY.SUPER_HARD,
-];
 
 export const MatrixPreviewTable = () => {
   const { t } = useTranslation(I18N_NAMESPACES.EXAM_MATRIX);
   const { currentMatrix, getCellByTopicAndDifficulty } = useAssessmentMatrixStore();
 
-  if (!currentMatrix) return null;
+  const difficultyLevels = getAllDifficulties();
 
-  const getDifficultyLabel = (difficulty: Difficulty) => {
-    const labels: Record<Difficulty, string> = {
-      nhan_biet: t('difficulty.easy'),
-      thong_hieu: t('difficulty.medium'),
-      van_dung: t('difficulty.hard'),
-      van_dung_cao: t('difficulty.van_dung_cao'),
-    };
-    return labels[difficulty];
-  };
+  if (!currentMatrix) return null;
 
   // Calculate summary statistics
   const totalQuestions = currentMatrix.cells.reduce((sum, c) => sum + c.requiredQuestionCount, 0);
@@ -112,8 +96,8 @@ export const MatrixPreviewTable = () => {
                 {t('builder.grid.topic')}
               </th>
               {difficultyLevels.map((difficulty) => (
-                <th key={difficulty} className="min-w-[100px] p-3 text-center font-medium">
-                  {getDifficultyLabel(difficulty)}
+                <th key={difficulty.value} className="min-w-[100px] p-3 text-center font-medium">
+                  {getDifficultyName(difficulty.value)}
                 </th>
               ))}
               <th className="min-w-[100px] p-3 text-center font-medium">{t('table.total')}</th>
@@ -121,7 +105,7 @@ export const MatrixPreviewTable = () => {
           </thead>
           <tbody>
             {currentMatrix.topics.map((topic) => {
-              const topicCells = difficultyLevels.map((d) => getCellByTopicAndDifficulty(topic.id, d));
+              const topicCells = difficultyLevels.map((d) => getCellByTopicAndDifficulty(topic.id, d.value));
               const topicQuestions = topicCells.reduce((sum, c) => sum + (c?.requiredQuestionCount || 0), 0);
               const topicPoints = topicCells.reduce(
                 (sum, c) => sum + (c?.requiredQuestionCount || 0) * (c?.pointsPerQuestion || 0),
@@ -138,10 +122,10 @@ export const MatrixPreviewTable = () => {
                   </td>
 
                   {difficultyLevels.map((difficulty) => {
-                    const cell = getCellByTopicAndDifficulty(topic.id, difficulty);
+                    const cell = getCellByTopicAndDifficulty(topic.id, difficulty.value);
 
                     return (
-                      <td key={difficulty} className="p-2 text-center">
+                      <td key={difficulty.value} className="p-2 text-center">
                         {cell && cell.requiredQuestionCount > 0 ? (
                           <div className="space-y-1">
                             <Badge variant="secondary" className="text-xs">
@@ -170,7 +154,7 @@ export const MatrixPreviewTable = () => {
             <tr className="bg-muted font-semibold">
               <td className="bg-muted sticky left-0 p-3">{t('table.total')}</td>
               {difficultyLevels.map((difficulty) => {
-                const difficultyCells = currentMatrix.cells.filter((c) => c.difficulty === difficulty);
+                const difficultyCells = currentMatrix.cells.filter((c) => c.difficulty === difficulty.value);
                 const difficultyQuestions = difficultyCells.reduce(
                   (sum, c) => sum + c.requiredQuestionCount,
                   0
@@ -181,7 +165,7 @@ export const MatrixPreviewTable = () => {
                 );
 
                 return (
-                  <td key={difficulty} className="p-3 text-center">
+                  <td key={difficulty.value} className="p-3 text-center">
                     <div>{difficultyQuestions} Q</div>
                     <div className="text-xs">{difficultyPoints.toFixed(1)} pts</div>
                   </td>

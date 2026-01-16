@@ -1,5 +1,5 @@
 import type { MatchingQuestion } from '@/features/assignment/types';
-import { MarkdownPreview, DifficultyBadge } from '../shared';
+import { MarkdownPreview } from '../shared';
 import { Label } from '@/shared/components/ui/label';
 import { Badge } from '@/shared/components/ui/badge';
 import { Shuffle } from 'lucide-react';

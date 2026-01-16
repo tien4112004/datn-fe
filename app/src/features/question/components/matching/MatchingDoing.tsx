@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { MatchingQuestion, MatchingAnswer } from '@/features/assignment/types';
-import { MarkdownPreview, DifficultyBadge } from '../shared';
+import { MarkdownPreview } from '../shared';
 
 import { Button } from '@/shared/components/ui/button';
 import {

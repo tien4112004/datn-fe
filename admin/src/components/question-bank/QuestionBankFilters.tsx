@@ -3,11 +3,10 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Card } from '@/components/ui/card';
 import { X } from 'lucide-react';
-import type { QuestionBankParams } from '@/types/question-bank';
-import { QUESTION_TYPE, DIFFICULTY, DIFFICULTY_LABELS } from '@/types/question-bank';
+import type { QuestionBankParams } from '@/types/questionBank';
 import { useQuestionBankSubjects, useQuestionBankGrades, useQuestionBankChapters } from '@/hooks/useApi';
 import { useMemo, useEffect } from 'react';
-import { getSubjectName } from '@aiprimary/core';
+import { getSubjectName, getAllQuestionTypes, getAllDifficulties } from '@aiprimary/core';
 
 interface QuestionBankFiltersProps {
   filters: QuestionBankParams;
@@ -66,52 +65,17 @@ export function QuestionBankFilters({ filters, onChange }: QuestionBankFiltersPr
       <div>
         <Label className="text-sm font-medium">Question Type</Label>
         <div className="mt-2 space-y-2">
-          <label className="flex cursor-pointer items-center gap-2">
-            <Checkbox
-              checked={
-                Array.isArray(filters.questionType) &&
-                filters.questionType.includes(QUESTION_TYPE.MULTIPLE_CHOICE)
-              }
-              onCheckedChange={(checked) =>
-                handleCheckboxChange('questionType', QUESTION_TYPE.MULTIPLE_CHOICE, checked as boolean)
-              }
-            />
-            <span className="text-sm">Multiple Choice</span>
-          </label>
-          <label className="flex cursor-pointer items-center gap-2">
-            <Checkbox
-              checked={
-                Array.isArray(filters.questionType) && filters.questionType.includes(QUESTION_TYPE.MATCHING)
-              }
-              onCheckedChange={(checked) =>
-                handleCheckboxChange('questionType', QUESTION_TYPE.MATCHING, checked as boolean)
-              }
-            />
-            <span className="text-sm">Matching</span>
-          </label>
-          <label className="flex cursor-pointer items-center gap-2">
-            <Checkbox
-              checked={
-                Array.isArray(filters.questionType) && filters.questionType.includes(QUESTION_TYPE.OPEN_ENDED)
-              }
-              onCheckedChange={(checked) =>
-                handleCheckboxChange('questionType', QUESTION_TYPE.OPEN_ENDED, checked as boolean)
-              }
-            />
-            <span className="text-sm">Open-ended</span>
-          </label>
-          <label className="flex cursor-pointer items-center gap-2">
-            <Checkbox
-              checked={
-                Array.isArray(filters.questionType) &&
-                filters.questionType.includes(QUESTION_TYPE.FILL_IN_BLANK)
-              }
-              onCheckedChange={(checked) =>
-                handleCheckboxChange('questionType', QUESTION_TYPE.FILL_IN_BLANK, checked as boolean)
-              }
-            />
-            <span className="text-sm">Fill In Blank</span>
-          </label>
+          {getAllQuestionTypes({ includeGroup: false }).map((type) => (
+            <label key={type.value} className="flex cursor-pointer items-center gap-2">
+              <Checkbox
+                checked={Array.isArray(filters.questionType) && filters.questionType.includes(type.value)}
+                onCheckedChange={(checked) =>
+                  handleCheckboxChange('questionType', type.value, checked as boolean)
+                }
+              />
+              <span className="text-sm">{type.label}</span>
+            </label>
+          ))}
         </div>
       </div>
 
@@ -119,44 +83,17 @@ export function QuestionBankFilters({ filters, onChange }: QuestionBankFiltersPr
       <div>
         <Label className="text-sm font-medium">Difficulty</Label>
         <div className="mt-2 space-y-2">
-          <label className="flex cursor-pointer items-center gap-2">
-            <Checkbox
-              checked={Array.isArray(filters.difficulty) && filters.difficulty.includes(DIFFICULTY.EASY)}
-              onCheckedChange={(checked) =>
-                handleCheckboxChange('difficulty', DIFFICULTY.EASY, checked as boolean)
-              }
-            />
-            <span className="text-sm">{DIFFICULTY_LABELS.nhan_biet}</span>
-          </label>
-          <label className="flex cursor-pointer items-center gap-2">
-            <Checkbox
-              checked={Array.isArray(filters.difficulty) && filters.difficulty.includes(DIFFICULTY.MEDIUM)}
-              onCheckedChange={(checked) =>
-                handleCheckboxChange('difficulty', DIFFICULTY.MEDIUM, checked as boolean)
-              }
-            />
-            <span className="text-sm">{DIFFICULTY_LABELS.thong_hieu}</span>
-          </label>
-          <label className="flex cursor-pointer items-center gap-2">
-            <Checkbox
-              checked={Array.isArray(filters.difficulty) && filters.difficulty.includes(DIFFICULTY.HARD)}
-              onCheckedChange={(checked) =>
-                handleCheckboxChange('difficulty', DIFFICULTY.HARD, checked as boolean)
-              }
-            />
-            <span className="text-sm">{DIFFICULTY_LABELS.van_dung}</span>
-          </label>
-          <label className="flex cursor-pointer items-center gap-2">
-            <Checkbox
-              checked={
-                Array.isArray(filters.difficulty) && filters.difficulty.includes(DIFFICULTY.SUPER_HARD)
-              }
-              onCheckedChange={(checked) =>
-                handleCheckboxChange('difficulty', DIFFICULTY.SUPER_HARD, checked as boolean)
-              }
-            />
-            <span className="text-sm">{DIFFICULTY_LABELS.van_dung_cao}</span>
-          </label>
+          {getAllDifficulties().map((difficulty) => (
+            <label key={difficulty.value} className="flex cursor-pointer items-center gap-2">
+              <Checkbox
+                checked={Array.isArray(filters.difficulty) && filters.difficulty.includes(difficulty.value)}
+                onCheckedChange={(checked) =>
+                  handleCheckboxChange('difficulty', difficulty.value, checked as boolean)
+                }
+              />
+              <span className="text-sm">{difficulty.label}</span>
+            </label>
+          ))}
         </div>
       </div>
 

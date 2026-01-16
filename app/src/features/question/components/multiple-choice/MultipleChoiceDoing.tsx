@@ -5,7 +5,6 @@ import { MarkdownPreview } from '../shared';
 
 import { RadioGroup, RadioGroupItem } from '@/shared/components/ui/radio-group';
 import { Label } from '@/shared/components/ui/label';
-import { DifficultyBadge } from '../shared';
 import { QUESTION_TYPE } from '@/features/assignment/types';
 import { cn } from '@/shared/lib/utils';
 
@@ -14,7 +13,6 @@ interface MultipleChoiceDoingProps {
   answer?: MultipleChoiceAnswer;
   points?: number; // Optional points for display
   onAnswerChange: (answer: MultipleChoiceAnswer) => void;
-  hideHeader?: boolean; // Hide type label and difficulty badge when used as sub-question
 }
 
 export const MultipleChoiceDoing = ({
@@ -22,7 +20,6 @@ export const MultipleChoiceDoing = ({
   answer,
   points,
   onAnswerChange,
-  hideHeader = false,
 }: MultipleChoiceDoingProps) => {
   const { t } = useTranslation('questions');
   const [selectedId, setSelectedId] = useState<string>(answer?.selectedOptionId || '');

@@ -16,7 +16,7 @@ import type {
   QuestionBankFilters,
   CreateQuestionPayload,
   UpdateQuestionPayload,
-} from '@/types/question-bank';
+} from '@/types/questionBank';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 

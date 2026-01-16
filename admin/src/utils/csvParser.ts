@@ -1,6 +1,5 @@
-import type { QuestionBankItem } from '@/types/question-bank';
-import { QUESTION_TYPE, BANK_TYPE } from '@/types/question-bank';
-import type { QuestionType, Difficulty, SubjectCode } from '@/types/question-bank';
+import type { QuestionBankItem, QuestionType, Difficulty, SubjectCode } from '@/types/questionBank';
+import { QUESTION_TYPE, BANK_TYPE } from '@/types/questionBank';
 
 /**
  * Parse CSV content to QuestionBankItem array
@@ -87,7 +86,7 @@ function parseQuestionRow(row: Record<string, string>, rowNumber: number): Quest
     title: row.title,
     difficulty,
     subjectCode,
-    bankType: BANK_TYPE.APPLICATION,
+    bankType: BANK_TYPE.PUBLIC,
     points: row.points ? parseInt(row.points) : 10,
     explanation: row.explanation || undefined,
   };
@@ -130,7 +129,9 @@ function parseMultipleChoiceQuestion(base: any, row: Record<string, string>): Qu
   return {
     ...base,
     type: QUESTION_TYPE.MULTIPLE_CHOICE,
-    options,
+    data: {
+      options,
+    },
   } as QuestionBankItem;
 }
 
@@ -157,7 +158,9 @@ function parseMatchingQuestion(base: any, row: Record<string, string>): Question
   return {
     ...base,
     type: QUESTION_TYPE.MATCHING,
-    pairs,
+    data: {
+      pairs,
+    },
   } as QuestionBankItem;
 }
 
@@ -168,8 +171,10 @@ function parseOpenEndedQuestion(base: any, row: Record<string, string>): Questio
   return {
     ...base,
     type: QUESTION_TYPE.OPEN_ENDED,
-    expectedAnswer: row.expectedAnswer || undefined,
-    maxLength: row.maxLength ? parseInt(row.maxLength) : 500,
+    data: {
+      expectedAnswer: row.expectedAnswer || undefined,
+      maxLength: row.maxLength ? parseInt(row.maxLength) : 500,
+    },
   } as QuestionBankItem;
 }
 
@@ -217,8 +222,10 @@ function parseFillInBlankQuestion(base: any, row: Record<string, string>): Quest
   return {
     ...base,
     type: QUESTION_TYPE.FILL_IN_BLANK,
-    segments,
-    caseSensitive: row.caseSensitive === 'true',
+    data: {
+      segments,
+      caseSensitive: row.caseSensitive === 'true',
+    },
   } as QuestionBankItem;
 }
 
@@ -248,7 +255,7 @@ export function exportQuestionsToCSV(questions: QuestionBankItem[]): string {
     );
     byType[QUESTION_TYPE.MULTIPLE_CHOICE].forEach((q) => {
       if (q.type === QUESTION_TYPE.MULTIPLE_CHOICE) {
-        const correctIndex = q.options.findIndex((o) => o.isCorrect) + 1;
+        const correctIndex = q.data.options.findIndex((o) => o.isCorrect) + 1;
         csvSections.push(
           [
             `"${q.title.replace(/"/g, '""')}"`,
@@ -256,7 +263,7 @@ export function exportQuestionsToCSV(questions: QuestionBankItem[]): string {
             q.difficulty,
             q.subjectCode,
             q.points || 10,
-            ...q.options.map((o) => `"${o.text.replace(/"/g, '""')}"`),
+            ...q.data.options.map((o) => `"${o.text.replace(/"/g, '""')}"`),
             correctIndex,
             `"${(q.explanation || '').replace(/"/g, '""')}"`,
           ].join(',')
@@ -274,7 +281,7 @@ export function exportQuestionsToCSV(questions: QuestionBankItem[]): string {
     );
     byType[QUESTION_TYPE.MATCHING].forEach((q) => {
       if (q.type === QUESTION_TYPE.MATCHING) {
-        const pairValues = q.pairs.flatMap((p) => [
+        const pairValues = q.data.pairs.flatMap((p) => [
           `"${p.left.replace(/"/g, '""')}"`,
           `"${p.right.replace(/"/g, '""')}"`,
         ]);
@@ -307,8 +314,8 @@ export function exportQuestionsToCSV(questions: QuestionBankItem[]): string {
             q.difficulty,
             q.subjectCode,
             q.points || 10,
-            `"${(q.expectedAnswer || '').replace(/"/g, '""')}"`,
-            q.maxLength || 500,
+            `"${(q.data.expectedAnswer || '').replace(/"/g, '""')}"`,
+            q.data.maxLength || 500,
             `"${(q.explanation || '').replace(/"/g, '""')}"`,
           ].join(',')
         );
@@ -323,8 +330,8 @@ export function exportQuestionsToCSV(questions: QuestionBankItem[]): string {
     csvSections.push('title,type,difficulty,subjectCode,points,text,blanks,caseSensitive,explanation');
     byType[QUESTION_TYPE.FILL_IN_BLANK].forEach((q) => {
       if (q.type === QUESTION_TYPE.FILL_IN_BLANK) {
-        const text = q.segments.map((s) => (s.type === 'blank' ? '{blank}' : s.content)).join('');
-        const blanks = q.segments
+        const text = q.data.segments.map((s) => (s.type === 'blank' ? '{blank}' : s.content)).join('');
+        const blanks = q.data.segments
           .filter((s) => s.type === 'blank')
           .map((s) => s.content)
           .join('|');
@@ -337,7 +344,7 @@ export function exportQuestionsToCSV(questions: QuestionBankItem[]): string {
             q.points || 10,
             `"${text.replace(/"/g, '""')}"`,
             `"${blanks}"`,
-            q.caseSensitive || false,
+            q.data.caseSensitive || false,
             `"${(q.explanation || '').replace(/"/g, '""')}"`,
           ].join(',')
         );

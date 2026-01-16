@@ -1,5 +1,4 @@
-import { api, API_MODE, type ApiMode } from '@aiprimary/api';
-import type { ApiResponse } from '@aiprimary/api';
+import type { ApiClient, ApiResponse } from '@aiprimary/api';
 import type {
   CommentApiService,
   Comment,
@@ -68,14 +67,12 @@ function transformBackendComment(
 }
 
 export default class CommentRealApiService implements CommentApiService {
-  baseUrl: string;
+  private apiClient: ApiClient;
+  private baseUrl: string;
 
-  constructor(baseUrl: string) {
+  constructor(apiClient: ApiClient, baseUrl: string) {
+    this.apiClient = apiClient;
     this.baseUrl = baseUrl;
-  }
-
-  getType(): ApiMode {
-    return API_MODE.real;
   }
 
   async getComments(
@@ -84,7 +81,7 @@ export default class CommentRealApiService implements CommentApiService {
     page?: number,
     pageSize?: number
   ): Promise<Comment[]> {
-    const response = await api.get<ApiResponse<CommentBackendResponse[]>>(
+    const response = await this.apiClient.get<ApiResponse<CommentBackendResponse[]>>(
       `${this.baseUrl}/api/${documentType}s/${documentId}/comments`,
       { params: { page, pageSize } }
     );
@@ -95,7 +92,7 @@ export default class CommentRealApiService implements CommentApiService {
   }
 
   async getCommentCount(documentType: string, documentId: string): Promise<number> {
-    const response = await api.get<ApiResponse<number>>(
+    const response = await this.apiClient.get<ApiResponse<number>>(
       `${this.baseUrl}/api/${documentType}s/${documentId}/comments/count`
     );
     return response.data.data;
@@ -106,7 +103,7 @@ export default class CommentRealApiService implements CommentApiService {
     documentId: string,
     data: CreateCommentRequest
   ): Promise<Comment> {
-    const response = await api.post<ApiResponse<CommentBackendResponse>>(
+    const response = await this.apiClient.post<ApiResponse<CommentBackendResponse>>(
       `${this.baseUrl}/api/${documentType}s/${documentId}/comments`,
       { content: data.content, mentionedUsers: data.mentionedUserIds }
     );
@@ -119,7 +116,7 @@ export default class CommentRealApiService implements CommentApiService {
     commentId: string,
     data: UpdateCommentRequest
   ): Promise<Comment> {
-    const response = await api.put<ApiResponse<CommentBackendResponse>>(
+    const response = await this.apiClient.put<ApiResponse<CommentBackendResponse>>(
       `${this.baseUrl}/api/${documentType}s/${documentId}/comments/${commentId}`,
       { content: data.content, mentionedUsers: data.mentionedUserIds }
     );
@@ -127,17 +124,20 @@ export default class CommentRealApiService implements CommentApiService {
   }
 
   async deleteComment(documentType: string, documentId: string, commentId: string): Promise<void> {
-    await api.delete(`${this.baseUrl}/api/${documentType}s/${documentId}/comments/${commentId}`);
+    await this.apiClient.delete(`${this.baseUrl}/api/${documentType}s/${documentId}/comments/${commentId}`);
   }
 
   async getMentions(unreadOnly: boolean = false): Promise<Mention[]> {
-    const response = await api.get<ApiResponse<Mention[]>>(`${this.baseUrl}/api/comments/mentions`, {
-      params: { unreadOnly },
-    });
+    const response = await this.apiClient.get<ApiResponse<Mention[]>>(
+      `${this.baseUrl}/api/comments/mentions`,
+      {
+        params: { unreadOnly },
+      }
+    );
     return response.data.data;
   }
 
   async markMentionAsRead(mentionId: string): Promise<void> {
-    await api.patch(`${this.baseUrl}/api/comments/mentions/${mentionId}/read`);
+    await this.apiClient.patch(`${this.baseUrl}/api/comments/mentions/${mentionId}/read`);
   }
 }

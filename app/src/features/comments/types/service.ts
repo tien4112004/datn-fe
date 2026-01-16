@@ -1,7 +1,6 @@
-import type { Service } from '@/shared/api';
 import type { Comment, CreateCommentRequest, Mention, UpdateCommentRequest } from './comment';
 
-export interface CommentApiService extends Service {
+export interface CommentApiService {
   getComments(documentType: string, documentId: string, page?: number, pageSize?: number): Promise<Comment[]>;
   getCommentCount(documentType: string, documentId: string): Promise<number>;
   createComment(documentType: string, documentId: string, data: CreateCommentRequest): Promise<Comment>;

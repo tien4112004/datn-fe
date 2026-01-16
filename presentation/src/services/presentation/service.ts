@@ -293,7 +293,10 @@ export class PresentationApiService implements ApiService {
    * Share presentation with users
    */
   async sharePresentation(presentationId: string, request: SharePresentationRequest): Promise<void> {
-    await this.apiClient.post<ApiResponse<void>>(`${this.baseUrl}/api/resources/${presentationId}/share`, request);
+    await this.apiClient.post<ApiResponse<void>>(
+      `${this.baseUrl}/api/resources/${presentationId}/share`,
+      request
+    );
   }
 
   /**

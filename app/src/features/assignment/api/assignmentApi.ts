@@ -2,7 +2,7 @@ import type { Assignment as CoreAssignment } from '@aiprimary/core';
 import type { CreateAssignmentRequest, UpdateAssignmentRequest } from '../types';
 
 // Mock data store (in-memory for development)
-let mockAssignments: CoreAssignment[] = [];
+const mockAssignments: CoreAssignment[] = [];
 let mockIdCounter = 1;
 
 /**

@@ -1,10 +1,13 @@
 import { useFormContext } from 'react-hook-form';
-import { List, FileText } from 'lucide-react';
+import { List, FileText, ListOrdered } from 'lucide-react';
+import { Button } from '@/shared/components/ui/button';
+import { useTranslation } from 'react-i18next';
 import { CollapsibleSection } from './CollapsibleSection';
 import { useAssignmentEditorStore } from '../../stores/useAssignmentEditorStore';
 import type { AssignmentFormData } from '../../types';
 
 export const QuestionNavigator = () => {
+  const { t } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.navigator' });
   const { watch } = useFormContext<AssignmentFormData>();
   const questions = watch('questions');
 
@@ -12,13 +15,30 @@ export const QuestionNavigator = () => {
   const setMainView = useAssignmentEditorStore((state) => state.setMainView);
   const currentQuestionIndex = useAssignmentEditorStore((state) => state.currentQuestionIndex);
   const setCurrentQuestionIndex = useAssignmentEditorStore((state) => state.setCurrentQuestionIndex);
+  const setQuestionListDialogOpen = useAssignmentEditorStore((state) => state.setQuestionListDialogOpen);
 
   return (
     <CollapsibleSection
-      title={`${questions.length} Question${questions.length !== 1 ? 's' : ''}`}
+      title={t('questionsCount', { count: questions.length })}
       icon={<List className="h-5 w-5" />}
       defaultOpen={true}
     >
+      {/* List View Button */}
+      {questions.length > 0 && (
+        <div className="mb-3">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="w-full"
+            onClick={() => setQuestionListDialogOpen(true)}
+          >
+            <ListOrdered className="mr-2 h-4 w-4" />
+            {t('listView')}
+          </Button>
+        </div>
+      )}
+
       <div className="grid grid-cols-5 gap-1.5">
         {/* Assignment Info Icon */}
         <button
@@ -29,7 +49,7 @@ export const QuestionNavigator = () => {
               ? 'bg-primary text-primary-foreground'
               : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700'
           }`}
-          // title={t('assignmentInfo', { defaultValue: 'Assignment Info' })}
+          title={t('assignmentInfo')}
         >
           <FileText className="h-3 w-3" />
         </button>
@@ -55,7 +75,7 @@ export const QuestionNavigator = () => {
                     ? 'bg-blue-50 text-blue-700 hover:bg-blue-100 dark:bg-blue-950 dark:text-blue-300 dark:hover:bg-blue-900'
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700'
               }`}
-              // title={question.title || t('untitled', { defaultValue: 'Untitled' })}
+              title={question.title || t('untitled')}
             >
               {index + 1}
             </button>

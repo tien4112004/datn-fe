@@ -62,7 +62,9 @@ export const QuestionBankCard = ({ question, isSelected, onToggleSelection }: Qu
               className="mt-1"
             />
             <div className="min-w-0 flex-1">
-              <h3 className="line-clamp-2 text-sm font-medium">{question.title || 'Untitled Question'}</h3>
+              <h3 className="line-clamp-2 text-sm font-medium">
+                {question.title || t('questionBank.card.untitled')}
+              </h3>
             </div>
           </div>
 

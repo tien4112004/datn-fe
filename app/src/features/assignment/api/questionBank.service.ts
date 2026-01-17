@@ -53,8 +53,8 @@ export default class QuestionBankService implements QuestionBankApiService {
   async createQuestion(
     question: Omit<QuestionBankItem, 'id' | 'createdAt' | 'updatedAt'>
   ): Promise<QuestionBankItem> {
-    const response = await this.apiClient.post(`${this.baseUrl}/api/question-bank`, question);
-    return response.data.data;
+    const response = await this.apiClient.post(`${this.baseUrl}/api/question-bank`, [question]);
+    return response.data.data.created?.[0] || response.data.data;
   }
 
   async updateQuestion(id: string, question: Partial<QuestionBankItem>): Promise<QuestionBankItem> {

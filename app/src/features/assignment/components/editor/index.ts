@@ -1,9 +1,5 @@
 export { AssignmentEditorLayout } from './AssignmentEditorLayout';
-export { AssignmentBasicInfo } from './AssignmentBasicInfo';
 export { QuestionsEditorPanel } from './QuestionsEditorPanel';
-export { QuestionsToolbar } from './QuestionsToolbar';
-export { QuestionsList } from './QuestionsList';
-export { DraggableQuestionCard } from './DraggableQuestionCard';
 export { AssessmentMatrixPanel } from './AssessmentMatrixPanel';
 export { TopicManager } from './TopicManager';
 export { MatrixGrid } from './MatrixGrid';

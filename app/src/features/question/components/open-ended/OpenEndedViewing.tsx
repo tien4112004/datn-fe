@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import type { OpenEndedQuestion } from '@/features/assignment/types';
 import { MarkdownPreview } from '../shared';
 import { Label } from '@/shared/components/ui/label';
@@ -8,6 +9,7 @@ interface OpenEndedViewingProps {
 }
 
 export const OpenEndedViewing = ({ question, points }: OpenEndedViewingProps) => {
+  const { t } = useTranslation('questions');
   return (
     <div className="space-y-2">
       {/* Question */}
@@ -20,19 +22,21 @@ export const OpenEndedViewing = ({ question, points }: OpenEndedViewingProps) =>
 
       {/* Character Limit */}
       {question.data.maxLength && (
-        <p className="text-muted-foreground text-sm">Maximum length: {question.data.maxLength} characters</p>
+        <p className="text-muted-foreground text-sm">
+          {t('openEnded.viewing.maxLength', { maxLength: question.data.maxLength })}
+        </p>
       )}
 
       {/* Explanation */}
       {question.explanation && (
         <div className="space-y-2 rounded-lg border border-gray-300 bg-blue-50 p-3 dark:border-gray-600 dark:bg-blue-900/20">
-          <Label className="text-sm font-medium">Explanation:</Label>
+          <Label className="text-sm font-medium">{t('openEnded.viewing.explanation')}</Label>
           <MarkdownPreview content={question.explanation} />
         </div>
       )}
 
       {/* Points */}
-      {points && <p className="text-muted-foreground text-sm">Points: {points}</p>}
+      {points && <p className="text-muted-foreground text-sm">{t('openEnded.viewing.points', { points })}</p>}
     </div>
   );
 };

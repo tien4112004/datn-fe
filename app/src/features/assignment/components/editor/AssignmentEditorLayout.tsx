@@ -7,6 +7,7 @@ import { AssignmentMetadataPanel } from './AssignmentMetadataPanel';
 import { QuestionNavigator } from './QuestionNavigator';
 import { AssessmentMatrixPanel } from './AssessmentMatrixPanel';
 import { AddQuestionButton } from './AddQuestionButton';
+import { QuestionListDialog } from './QuestionListDialog';
 import { useAssignmentEditorStore } from '../../stores/useAssignmentEditorStore';
 
 interface AssignmentEditorLayoutProps {
@@ -31,7 +32,9 @@ export const AssignmentEditorLayout = ({ onSave, isSaving }: AssignmentEditorLay
       {/* Right: Sidebar (25% width on large screens) */}
       <div className="space-y-6">
         <div className="space-y-3 rounded-lg border bg-white p-4 dark:bg-gray-900">
-          <div className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">Actions</div>
+          <div className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+            {t('actions.actions')}
+          </div>
 
           {/* Question Actions */}
           <div className="space-y-2">
@@ -75,6 +78,9 @@ export const AssignmentEditorLayout = ({ onSave, isSaving }: AssignmentEditorLay
         {/* Assessment Matrix */}
         <AssessmentMatrixPanel />
       </div>
+
+      {/* Question List Dialog */}
+      <QuestionListDialog />
     </div>
   );
 };

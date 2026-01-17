@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import type { MatchingQuestion } from '@/features/assignment/types';
 import { MarkdownPreview } from '../shared';
 import { Label } from '@/shared/components/ui/label';
@@ -10,6 +11,7 @@ interface MatchingViewingProps {
 }
 
 export const MatchingViewing = ({ question, points }: MatchingViewingProps) => {
+  const { t } = useTranslation('questions');
   return (
     <div className="space-y-2">
       {/* Question Title */}
@@ -23,10 +25,10 @@ export const MatchingViewing = ({ question, points }: MatchingViewingProps) => {
       {/* Shuffle Pairs Setting */}
       {question.data.shufflePairs && (
         <div className="flex items-center gap-2">
-          <Label className="text-sm font-medium">Matching Pairs:</Label>
+          <Label className="text-sm font-medium">{t('matching.viewing.matchingPairs')}</Label>
           <Badge variant="secondary" className="flex items-center gap-1">
             <Shuffle className="h-3 w-3" />
-            Shuffle
+            {t('matching.viewing.shuffle')}
           </Badge>
         </div>
       )}
@@ -35,7 +37,7 @@ export const MatchingViewing = ({ question, points }: MatchingViewingProps) => {
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         {/* Left Column */}
         <div className="space-y-1.5">
-          <h4 className="text-sm font-semibold">Column A</h4>
+          <h4 className="text-sm font-semibold">{t('matching.viewing.columnA')}</h4>
           {question.data.pairs.map((pair, index) => (
             <div
               key={`left-${pair.id}`}
@@ -60,7 +62,7 @@ export const MatchingViewing = ({ question, points }: MatchingViewingProps) => {
 
         {/* Right Column */}
         <div className="space-y-1.5">
-          <h4 className="text-sm font-semibold">Column B</h4>
+          <h4 className="text-sm font-semibold">{t('matching.viewing.columnB')}</h4>
           {question.data.pairs.map((pair, index) => (
             <div
               key={`right-${pair.id}`}
@@ -87,13 +89,13 @@ export const MatchingViewing = ({ question, points }: MatchingViewingProps) => {
       {/* Explanation */}
       {question.explanation && (
         <div className="space-y-2 rounded-lg border border-gray-300 bg-blue-50 p-3 dark:border-gray-600 dark:bg-blue-900/20">
-          <Label className="text-sm font-medium">Explanation:</Label>
+          <Label className="text-sm font-medium">{t('matching.viewing.explanation')}</Label>
           <MarkdownPreview content={question.explanation} />
         </div>
       )}
 
       {/* Points */}
-      {points && <p className="text-muted-foreground text-sm">Points: {points}</p>}
+      {points && <p className="text-muted-foreground text-sm">{t('matching.viewing.points', { points })}</p>}
     </div>
   );
 };

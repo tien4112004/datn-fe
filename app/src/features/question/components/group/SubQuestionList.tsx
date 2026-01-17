@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { SubQuestion } from '@aiprimary/core';
 import type { ViewMode } from '@/features/assignment/types';
 import { SubQuestionWrapper } from './SubQuestionWrapper';
@@ -33,6 +34,8 @@ export function SubQuestionList({
   onChange,
   onGradeChange,
 }: SubQuestionListProps) {
+  const { t } = useTranslation('questions');
+
   // Apply shuffling if enabled
   const displayQuestions = useMemo(() => {
     if (!shuffle) return questions;
@@ -87,12 +90,14 @@ export function SubQuestionList({
       {/* Progress Indicator */}
       {showProgress && questions.length > 0 && (
         <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3 dark:bg-gray-800">
-          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Progress:</span>
+          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            {t('group.subQuestion.progress')}
+          </span>
           <span className="text-sm">
             <span className="font-bold text-blue-600 dark:text-blue-400">{getAnsweredCount()}</span>
             {' / '}
             <span className="text-gray-600 dark:text-gray-400">{questions.length}</span>
-            {' questions answered'}
+            {t('group.subQuestion.questionsAnswered')}
           </span>
         </div>
       )}
@@ -127,8 +132,10 @@ export function SubQuestionList({
       {/* Empty State */}
       {questions.length === 0 && (
         <div className="py-12 text-center text-gray-500 dark:text-gray-400">
-          <p>No questions in this group yet.</p>
-          {viewMode === 'editing' && <p className="mt-1 text-sm">Click "Add Question" to get started.</p>}
+          <p>{t('group.subQuestion.emptyStateTitle')}</p>
+          {viewMode === 'editing' && (
+            <p className="mt-1 text-sm">{t('group.subQuestion.emptyStateMessage')}</p>
+          )}
         </div>
       )}
     </div>

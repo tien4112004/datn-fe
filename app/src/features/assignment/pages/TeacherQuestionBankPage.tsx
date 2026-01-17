@@ -91,7 +91,7 @@ export function TeacherQuestionBankPage() {
       await deleteQuestionsMutation.mutateAsync(selectedQuestionIds);
       setRowSelection({});
       toast.success(t('toast.deleteSuccess'));
-    } catch (error) {
+    } catch {
       toast.error(t('toast.deleteError'));
     }
   };
@@ -100,7 +100,7 @@ export function TeacherQuestionBankPage() {
     try {
       await duplicateMutation.mutateAsync(id);
       toast.success(t('toast.duplicateSuccess'));
-    } catch (error) {
+    } catch {
       toast.error(t('toast.duplicateError'));
     }
   };
@@ -118,7 +118,7 @@ export function TeacherQuestionBankPage() {
       toast.success(t('toast.copySuccess'));
       setIsCopyDialogOpen(false);
       setCopyingQuestion(null);
-    } catch (error) {
+    } catch {
       toast.error(t('toast.copyError'));
     }
   };
@@ -152,7 +152,7 @@ export function TeacherQuestionBankPage() {
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
       toast.success(t('toast.exportSuccess'));
-    } catch (error) {
+    } catch {
       toast.error(t('toast.exportError'));
     }
   };

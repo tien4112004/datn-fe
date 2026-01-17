@@ -133,6 +133,7 @@ export default {
       points: 'Points: {{points}}',
       selected: 'Selected',
       applicationBadge: 'Read-Only',
+      untitled: 'Untitled Question',
     },
     subjects: {
       toan: 'Math',
@@ -276,6 +277,7 @@ export default {
 
     // Main action buttons
     actions: {
+      actions: 'Actions',
       cancel: 'Cancel',
       save: 'Save Assignment',
       saving: 'Saving...',
@@ -341,6 +343,8 @@ export default {
         shuffleQuestionsDisabled: 'Disabled',
         emptyValue: '-',
         titlePlaceholder: 'Enter assignment title',
+        subjectPlaceholder: 'Select subject',
+        gradePlaceholder: 'Select grade',
         classPlaceholder: 'Select a class',
         descriptionPlaceholder: 'Enter assignment description (optional)',
         dueDatePlaceholder: 'Select due date',
@@ -421,6 +425,93 @@ export default {
         total: 'Total',
       },
       close: 'Close',
+    },
+
+    // Assignment basic info
+    basicInfo: {
+      title: 'Assignment Info',
+      titleLabel: 'Title',
+      titlePlaceholder: 'Enter assignment title...',
+      subjectLabel: 'Subject',
+      subjectPlaceholder: 'Select subject',
+      descriptionLabel: 'Description',
+      descriptionPlaceholder: 'Describe the assignment...',
+    },
+
+    // Question count indicator
+    questionCountIndicator: {
+      noQuestions: 'No questions yet',
+      count: '{{count}} Question',
+      count_plural: '{{count}} Questions',
+    },
+
+    // View mode toggle
+    viewModeToggle: {
+      preview: 'Preview',
+      edit: 'Edit',
+    },
+
+    // Question Navigator
+    navigator: {
+      questionsCount: '{{count}} Question',
+      questionsCount_plural: '{{count}} Questions',
+      listView: 'List View',
+      assignmentInfo: 'Assignment Info',
+      untitled: 'Untitled',
+    },
+
+    // Question List Dialog
+    questionList: {
+      title: 'All Questions',
+      emptyMessage: 'No questions added yet',
+      dragHint: 'Drag questions to reorder them',
+      questionNumber: 'Q{{number}}',
+      close: 'Close',
+    },
+
+    // Matrix cell
+    matrixCell: {
+      required: 'Required:',
+      ok: 'OK',
+    },
+
+    // Current question view
+    currentQuestion: {
+      dataMissing: 'Question data missing',
+      questionOf: 'Question {{current}} of {{total}}',
+      edit: 'Edit',
+      preview: 'Preview',
+      noQuestions: 'No questions yet',
+      addQuestionHint: 'Click "Add Question" to get started',
+    },
+
+    // Questions list
+    questionsList: {
+      emptyTitle: 'No questions yet',
+      emptyHint: 'Click "Add Question" to get started',
+    },
+
+    // Question navigator
+    questionNavigator: {
+      questionCount: '{{count}} Question',
+      questionCount_plural: '{{count}} Questions',
+      assignmentInfo: 'Assignment Info',
+      untitled: 'Untitled',
+    },
+
+    // Question content preview
+    questionPreview: {
+      multipleChoice: '{{count}} options • Correct: {{correct}}',
+      matching: '{{count}} pair',
+      matching_plural: '{{count}} pairs',
+      fillInBlank: '{{count}} blank',
+      fillInBlank_plural: '{{count}} blanks',
+      openEnded: {
+        withLimit: 'Free response ({{limit}} chars)',
+        unlimited: 'Free response (unlimited)',
+      },
+      placeholderWarning: 'Has placeholder or empty content',
+      noAnswerWarning: 'No expected answer provided',
     },
   },
 

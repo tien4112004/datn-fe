@@ -12,6 +12,7 @@ export default {
     document: 'Document',
     video: 'Video',
     mindmap: 'Mindmap',
+    assignment: 'Assignment',
     image: 'Image',
   },
   creation: {

@@ -49,6 +49,7 @@ export default class ImageService implements ImageApiService {
           page: params?.page,
           pageSize: params?.pageSize,
           search: params?.search,
+          sort: params?.sort,
         },
       });
       return response.data.data.map((img) => this._mapImageItem(img));
@@ -134,6 +135,26 @@ export default class ImageService implements ImageApiService {
     } catch (error) {
       console.error('Failed to fetch art styles:', error);
       return [];
+    }
+  }
+
+  async uploadImage(file: File): Promise<string> {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await this.apiClient.post<
+        ApiResponse<{ cdnUrl: string; mediaType: string; extension: string; id: number }>
+      >(`${this.baseUrl}/api/media/upload`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      return response.data.data.cdnUrl;
+    } catch (error) {
+      console.error('Failed to upload image:', error);
+      throw new Error('Failed to upload image');
     }
   }
 }

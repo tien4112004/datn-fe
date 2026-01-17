@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import type { MultipleChoiceQuestion } from '@/features/assignment/types';
 import { MarkdownPreview } from '../shared';
 import { Label } from '@/shared/components/ui/label';
@@ -10,6 +11,7 @@ interface MultipleChoiceViewingProps {
 }
 
 export const MultipleChoiceViewing = ({ question, points }: MultipleChoiceViewingProps) => {
+  const { t } = useTranslation('questions');
   return (
     <div className="space-y-2">
       {/* Question Title */}
@@ -23,11 +25,11 @@ export const MultipleChoiceViewing = ({ question, points }: MultipleChoiceViewin
       {/* Options */}
       <div className="space-y-2">
         <div className="flex items-center gap-2">
-          <Label className="text-sm font-medium">Options:</Label>
+          <Label className="text-sm font-medium">{t('multipleChoice.viewing.options')}</Label>
           {question.data.shuffleOptions && (
             <Badge variant="secondary" className="flex items-center gap-1">
               <Shuffle className="h-3 w-3" />
-              Shuffle
+              {t('multipleChoice.viewing.shuffle')}
             </Badge>
           )}
         </div>
@@ -61,13 +63,15 @@ export const MultipleChoiceViewing = ({ question, points }: MultipleChoiceViewin
       {/* Explanation */}
       {question.explanation && (
         <div className="space-y-2 rounded-lg border border-gray-300 bg-blue-50 p-3 dark:border-gray-600 dark:bg-blue-900/20">
-          <Label className="text-sm font-medium">Explanation:</Label>
+          <Label className="text-sm font-medium">{t('multipleChoice.viewing.explanation')}</Label>
           <MarkdownPreview content={question.explanation} />
         </div>
       )}
 
       {/* Points */}
-      {points && <p className="text-muted-foreground text-sm">Points: {points}</p>}
+      {points && (
+        <p className="text-muted-foreground text-sm">{t('multipleChoice.viewing.points', { points })}</p>
+      )}
     </div>
   );
 };

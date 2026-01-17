@@ -72,6 +72,7 @@ export const useImages = (search?: string): UseImagesReturn => {
         page: pageParam,
         pageSize: PAGE_SIZE,
         search,
+        sort: 'desc',
       });
       return images;
     },

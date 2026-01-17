@@ -1,4 +1,3 @@
-export * from './useViewMode';
 export * from './useQuestionBankApi';
 export {
   useAssignmentList,

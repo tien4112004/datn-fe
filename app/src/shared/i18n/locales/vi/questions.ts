@@ -36,6 +36,8 @@ export default {
     save: 'Lưu thay đổi',
     saving: 'Đang lưu...',
     loading: 'Đang tải câu hỏi...',
+    preview: 'Xem trước',
+    edit: 'Chỉnh sửa',
     metadataSection: 'Thông tin câu hỏi',
     contentSection: 'Nội dung câu hỏi',
     questionType: 'Loại câu hỏi',
@@ -97,6 +99,7 @@ export default {
     scoreDisplay: 'Điểm: {{score}}/{{total}} điểm',
     pointsAbbreviation: 'điểm',
     pointsAbbreviation_plural: 'điểm',
+    markdownPlaceholder: 'Nhập văn bản ở đây... (Hỗ trợ Markdown)',
   },
 
   validation: {
@@ -127,8 +130,16 @@ export default {
       correctAnswer: 'Đánh dấu là đáp án đúng',
       shuffleOptions: 'Xáo trộn lựa chọn',
       imageUrl: 'URL hình ảnh (Tùy chọn)',
+      questionImage: 'Hình ảnh câu hỏi',
+      optionImage: 'Hình ảnh lựa chọn',
       explanation: 'Giải thích (Tùy chọn)',
       explanationPlaceholder: 'Thêm giải thích cho đáp án đúng...',
+    },
+    viewing: {
+      options: 'Các lựa chọn:',
+      shuffle: 'Xáo trộn',
+      explanation: 'Giải thích:',
+      points: 'Điểm: {{points}}',
     },
     doing: {
       selectAnswer: 'Chọn câu trả lời của bạn',
@@ -168,6 +179,14 @@ export default {
       shufflePairs: 'Xáo trộn các cặp',
       imageUrl: 'URL hình ảnh (Tùy chọn)',
       explanation: 'Giải thích (Tùy chọn)',
+    },
+    viewing: {
+      matchingPairs: 'Các cặp nối:',
+      shuffle: 'Xáo trộn',
+      columnA: 'Cột A',
+      columnB: 'Cột B',
+      explanation: 'Giải thích:',
+      points: 'Điểm: {{points}}',
     },
     doing: {
       instruction: 'Kéo các mục từ Cột A để nối với Cột B',
@@ -212,6 +231,11 @@ export default {
       imageUrl: 'URL hình ảnh (Tùy chọn)',
       explanation: 'Giải thích (Tùy chọn)',
     },
+    viewing: {
+      maxLength: 'Độ dài tối đa: {{maxLength}} ký tự',
+      explanation: 'Giải thích:',
+      points: 'Điểm: {{points}}',
+    },
     doing: {
       placeholder: 'Nhập câu trả lời của bạn...',
       characterCount: '{{current}} / {{max}} ký tự',
@@ -245,16 +269,36 @@ export default {
   // Fill in Blank
   fillInBlank: {
     editing: {
-      title: 'Tiêu đề câu hỏi (Tùy chọn)',
-      titlePlaceholder: 'Nhập ngữ cảnh bổ sung nếu cần...',
+      title: 'Tiêu đề câu hỏi',
+      titlePlaceholder: 'Nhập tiêu đề câu hỏi (tùy chọn)',
+      questionImage: 'Hình ảnh câu hỏi',
+      questionText: 'Văn bản câu hỏi',
+      questionTextPlaceholder:
+        'Sử dụng {{answer}} để đánh dấu chỗ trống. Ví dụ: Tôi {{là}} một {{sinh viên}}.',
+      questionTextInstruction: 'Sử dụng {{answer}} để tạo chỗ trống trong văn bản.',
+      questionTextExample: 'Ví dụ: "Tôi {{là}} một {{sinh viên}}." sẽ tạo ra 2 chỗ trống.',
+      preview: 'Xem trước',
+      previewBlank: 'chỗ trống',
+      alternativeAnswers: 'Đáp án thay thế',
+      blankLabel: 'Chỗ trống {{index}}:',
+      addAlternative: 'Thêm đáp án thay thế',
+      alternativePlaceholder: 'Đáp án thay thế',
+      explanation: 'Giải thích',
+      explanationPlaceholder: 'Giải thích đáp án (tùy chọn, hiển thị sau khi đánh giá)',
       sentence: 'Câu có chỗ trống',
       blankPlaceholder: 'Chỗ trống {{number}}',
       addBlank: 'Thêm chỗ trống',
       caseSensitive: 'Phân biệt chữ hoa chữ thường',
       imageUrl: 'URL hình ảnh (Tùy chọn)',
-      explanation: 'Giải thích (Tùy chọn)',
       correctAnswer: 'Đáp án đúng',
       acceptableAnswers: 'Các đáp án thay thế chấp nhận được',
+    },
+    viewing: {
+      expectedAnswers: 'Đáp án mong đợi:',
+      blankLabel: 'Chỗ trống {{index}}',
+      caseSensitiveWarning: '⚠️ Phân biệt chữ hoa chữ thường',
+      explanation: 'Giải thích:',
+      points: 'Điểm: {{points}}',
     },
     doing: {
       blankPlaceholder: 'Chỗ trống {{number}}',
@@ -349,6 +393,10 @@ export default {
     subQuestion: {
       questionNumber: 'Câu hỏi {{number}}',
       points: '{{points}} điểm',
+      progress: 'Tiến độ:',
+      questionsAnswered: ' câu hỏi đã trả lời',
+      emptyStateTitle: 'Chưa có câu hỏi nào trong nhóm này.',
+      emptyStateMessage: 'Nhấn "Thêm câu hỏi" để bắt đầu.',
     },
   },
 };

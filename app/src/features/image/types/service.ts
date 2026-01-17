@@ -36,6 +36,7 @@ export interface GetImagesParams {
   page?: number;
   pageSize?: number;
   search?: string;
+  sort?: 'asc' | 'desc';
 }
 
 export interface GetArtStylesParams {
@@ -55,4 +56,5 @@ export interface ImageApiService {
     request: ImageGenerationRequest
   ): Promise<ImageGenerationResponse>;
   getArtStyles(params?: GetArtStylesParams): Promise<ArtStyle[]>;
+  uploadImage(file: File): Promise<string>;
 }

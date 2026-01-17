@@ -6,10 +6,9 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/shared/components/ui/dialog';
-import { Input } from '@/shared/components/ui/input';
 import { Button } from '@/shared/components/ui/button';
 import { useImages } from '@/features/image/hooks/useApi';
-import { Search, Loader2, ImageIcon } from 'lucide-react';
+import { Loader2, ImageIcon } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import { useTranslation } from 'react-i18next';
 import type { ImageData } from '@/features/image/types/service';
@@ -22,23 +21,20 @@ interface ImageStorageDialogProps {
 
 export const ImageStorageDialog = ({ open, onClose, onSelect }: ImageStorageDialogProps) => {
   const { t } = useTranslation('assignment', { keyPrefix: 'shared.imageStorageDialog' });
-  const [searchTerm, setSearchTerm] = useState('');
   const [selectedImage, setSelectedImage] = useState<ImageData | null>(null);
 
-  const { images, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage } = useImages(searchTerm);
+  const { images, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage } = useImages();
 
   const handleSelect = () => {
     if (selectedImage) {
       onSelect(selectedImage.url);
       setSelectedImage(null);
-      setSearchTerm('');
       onClose();
     }
   };
 
   const handleCancel = () => {
     setSelectedImage(null);
-    setSearchTerm('');
     onClose();
   };
 
@@ -53,17 +49,6 @@ export const ImageStorageDialog = ({ open, onClose, onSelect }: ImageStorageDial
           <DialogTitle>{t('title')}</DialogTitle>
           <DialogDescription>{t('description')}</DialogDescription>
         </DialogHeader>
-
-        {/* Search Input */}
-        <div className="relative">
-          <Search className="text-muted-foreground absolute left-2 top-2.5 h-4 w-4" />
-          <Input
-            placeholder={t('searchPlaceholder')}
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-8"
-          />
-        </div>
 
         {/* Image Grid */}
         <div className="flex-1 overflow-y-auto">

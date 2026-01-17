@@ -14,7 +14,7 @@ interface MultipleChoiceEditingProps {
 }
 
 export const MultipleChoiceEditing = ({ question, onChange }: MultipleChoiceEditingProps) => {
-  const { t } = useTranslation('assignment', { keyPrefix: 'editing.multipleChoice' });
+  const { t } = useTranslation('questions', { keyPrefix: 'multipleChoice.editing' });
 
   const updateQuestion = (updates: Partial<MultipleChoiceQuestion>) => {
     onChange({ ...question, ...updates });
@@ -31,7 +31,7 @@ export const MultipleChoiceEditing = ({ question, onChange }: MultipleChoiceEdit
 
   const removeOption = (optionId: string) => {
     if (question.data.options.length <= 2) {
-      alert(t('alerts.minOptions'));
+      alert(t('validation.minOptions', { ns: 'questions', defaultValue: 'At least 2 options required' }));
       return;
     }
     updateQuestion({
@@ -65,25 +65,27 @@ export const MultipleChoiceEditing = ({ question, onChange }: MultipleChoiceEdit
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold">{t('title')}</h3>
+        <h3 className="text-lg font-semibold">
+          {t('types.multipleChoice', { ns: 'questions', defaultValue: 'Multiple Choice' })}
+        </h3>
         <DifficultyBadge difficulty={question.difficulty} />
       </div>
 
       {/* Question Title */}
       <div className="space-y-1">
-        <Label className="text-xs font-medium text-gray-700 dark:text-gray-300">{t('labels.question')}</Label>
+        <Label className="text-xs font-medium text-gray-700 dark:text-gray-300">{t('title')}</Label>
         <div className="rounded-md border border-gray-300 bg-white p-2 dark:border-gray-600 dark:bg-gray-900">
           <MarkdownEditor
             value={question.title}
             onChange={(title) => updateQuestion({ title })}
-            placeholder={t('placeholders.question')}
+            placeholder={t('titlePlaceholder')}
           />
         </div>
       </div>
 
       {/* Question Image */}
       <ImageUploader
-        label={t('labels.questionImage')}
+        label={t('questionImage')}
         value={question.titleImageUrl}
         onChange={(titleImageUrl) => updateQuestion({ titleImageUrl })}
       />
@@ -91,14 +93,12 @@ export const MultipleChoiceEditing = ({ question, onChange }: MultipleChoiceEdit
       {/* Options */}
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <Label className="text-xs font-medium text-gray-700 dark:text-gray-300">
-            {t('labels.options')}
-          </Label>
+          <Label className="text-xs font-medium text-gray-700 dark:text-gray-300">{t('options')}</Label>
           {/* Shuffle Options */}
           <div className="flex items-center gap-2">
             <Shuffle className="h-3.5 w-3.5 text-gray-500" />
             <Label className="text-xs font-medium text-gray-600 dark:text-gray-400">
-              {t('shuffle.shuffleOptions', { ns: 'assignment', defaultValue: 'Shuffle Options' })}
+              {t('shuffleOptions')}
             </Label>
             <Switch
               checked={question.data.shuffleOptions || false}
@@ -124,7 +124,7 @@ export const MultipleChoiceEditing = ({ question, onChange }: MultipleChoiceEdit
                   <MarkdownEditor
                     value={option.text}
                     onChange={(text) => updateOption(option.id, { text })}
-                    placeholder={t('placeholders.option')}
+                    placeholder={t('optionPlaceholder', { letter: String.fromCharCode(65 + index) })}
                     minHeight={50}
                     className="flex-1"
                   />
@@ -134,7 +134,7 @@ export const MultipleChoiceEditing = ({ question, onChange }: MultipleChoiceEdit
                       variant="ghost"
                       size="sm"
                       onClick={() => updateOption(option.id, { imageUrl: undefined })}
-                      title={t('buttons.removeImage')}
+                      title={t('removeOption')}
                     >
                       <X className="h-4 w-4" />
                     </Button>
@@ -144,7 +144,7 @@ export const MultipleChoiceEditing = ({ question, onChange }: MultipleChoiceEdit
                       variant="ghost"
                       size="sm"
                       onClick={() => updateOption(option.id, { imageUrl: '' })}
-                      title={t('buttons.addImage')}
+                      title={t('imageUrl')}
                     >
                       <ImagePlus className="h-4 w-4" />
                     </Button>
@@ -162,7 +162,7 @@ export const MultipleChoiceEditing = ({ question, onChange }: MultipleChoiceEdit
 
                 {option.imageUrl !== undefined && (
                   <ImageUploader
-                    label="Option Image"
+                    label={t('optionImage')}
                     value={option.imageUrl}
                     onChange={(imageUrl) => updateOption(option.id, { imageUrl })}
                   />
@@ -182,20 +182,18 @@ export const MultipleChoiceEditing = ({ question, onChange }: MultipleChoiceEdit
           className="mt-2"
         >
           <Plus className="mr-2 h-4 w-4" />
-          {t('buttons.addOption')}
+          {t('addOption')}
         </Button>
       </div>
 
       {/* Explanation */}
       <div className="space-y-1">
-        <Label className="text-xs font-medium text-gray-700 dark:text-gray-300">
-          {t('labels.explanation')}
-        </Label>
+        <Label className="text-xs font-medium text-gray-700 dark:text-gray-300">{t('explanation')}</Label>
         <div className="rounded-md border border-gray-300 bg-white p-2 dark:border-gray-600 dark:bg-gray-900">
           <MarkdownEditor
             value={question.explanation || ''}
             onChange={(explanation) => updateQuestion({ explanation })}
-            placeholder={t('placeholders.explanation')}
+            placeholder={t('explanationPlaceholder')}
           />
         </div>
       </div>

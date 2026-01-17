@@ -32,48 +32,38 @@ const validateImageFile = async (file: File): Promise<void> => {
   }
 };
 
-// Mock implementation for demo (real would upload to server)
 export const uploadImage = async (file: File): Promise<string> => {
-  return new Promise(async (resolve, reject) => {
+  try {
+    // Validate file first
+    await validateImageFile(file);
+
+    // Create object URL for dimension check
+    const objectUrl = URL.createObjectURL(file);
+
     try {
-      // Validate file first
-      await validateImageFile(file);
+      // Validate dimensions
+      const dimensions = await getImageDimensions(objectUrl);
+      URL.revokeObjectURL(objectUrl);
 
-      // Create object URL for dimension check
-      const objectUrl = URL.createObjectURL(file);
-
-      try {
-        // Validate dimensions
-        const dimensions = await getImageDimensions(objectUrl);
-        if (dimensions.width > MAX_DIMENSIONS.width || dimensions.height > MAX_DIMENSIONS.height) {
-          URL.revokeObjectURL(objectUrl);
-          reject(
-            new Error(
-              `Image dimensions (${dimensions.width}x${dimensions.height}) exceed maximum allowed (${MAX_DIMENSIONS.width}x${MAX_DIMENSIONS.height})`
-            )
-          );
-          return;
-        }
-
-        // Read file as data URL
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          URL.revokeObjectURL(objectUrl);
-          resolve(e.target?.result as string);
-        };
-        reader.onerror = () => {
-          URL.revokeObjectURL(objectUrl);
-          reject(new Error('Failed to read file'));
-        };
-        reader.readAsDataURL(file);
-      } catch (error) {
-        URL.revokeObjectURL(objectUrl);
-        reject(error);
+      if (dimensions.width > MAX_DIMENSIONS.width || dimensions.height > MAX_DIMENSIONS.height) {
+        throw new Error(
+          `Image dimensions (${dimensions.width}x${dimensions.height}) exceed maximum allowed (${MAX_DIMENSIONS.width}x${MAX_DIMENSIONS.height})`
+        );
       }
+
+      // Upload to server using API
+      const { getImageApiService } = await import('@/features/image/api');
+      const imageService = getImageApiService();
+      const imageUrl = await imageService.uploadImage(file);
+
+      return imageUrl;
     } catch (error) {
-      reject(error);
+      URL.revokeObjectURL(objectUrl);
+      throw error;
     }
-  });
+  } catch (error) {
+    throw error;
+  }
 };
 
 export const isValidImageUrl = (url: string): boolean => {

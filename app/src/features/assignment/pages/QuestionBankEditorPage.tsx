@@ -34,7 +34,7 @@ import { VIEW_MODE } from '@/features/assignment/types';
 import { QuestionRenderer } from '@/features/question';
 import { generateId } from '@/shared/lib/utils';
 import { toast } from 'sonner';
-import { AlertCircle, Save, Settings, FileText } from 'lucide-react';
+import { AlertCircle, Save, Settings, FileText, Eye, Edit3 } from 'lucide-react';
 import { validateQuestion } from '@/features/assignment/utils/validateQuestion';
 import { useTranslation } from 'react-i18next';
 
@@ -112,6 +112,7 @@ export function QuestionBankEditorPage() {
   // Form state
   const [questionData, setQuestionData] = useState<QuestionBankItem | null>(null);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
+  const [isPreviewMode, setIsPreviewMode] = useState(false);
 
   // Fetch existing question if editing
   const { data: existingQuestion, isLoading } = useQuestionBankItem(id || '');
@@ -174,7 +175,7 @@ export function QuestionBankEditorPage() {
       }
 
       navigate('/question-bank');
-    } catch (error) {
+    } catch {
       toast.error(isEditMode ? t('editor.updateError') : t('editor.createError'));
     }
   };
@@ -235,12 +236,29 @@ export function QuestionBankEditorPage() {
             </div>
 
             <div className="flex items-center gap-2">
+              <Button
+                variant={isPreviewMode ? 'default' : 'outline'}
+                onClick={() => setIsPreviewMode(!isPreviewMode)}
+                className="gap-2"
+              >
+                {isPreviewMode ? (
+                  <>
+                    <Edit3 className="h-4 w-4" />
+                    {t('editor.edit')}
+                  </>
+                ) : (
+                  <>
+                    <Eye className="h-4 w-4" />
+                    {t('editor.preview')}
+                  </>
+                )}
+              </Button>
               <Button variant="outline" onClick={handleCancel}>
                 {t('editor.cancel')}
               </Button>
               <Button
                 onClick={handleSubmit}
-                disabled={createMutation.isPending || updateMutation.isPending}
+                disabled={createMutation.isPending || updateMutation.isPending || isPreviewMode}
                 className="gap-2"
               >
                 <Save className="h-4 w-4" />
@@ -252,80 +270,82 @@ export function QuestionBankEditorPage() {
           {/* Form Content */}
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Metadata Section */}
-            <div className="space-y-4">
-              <div className="flex items-center gap-2">
-                <Settings className="text-primary h-5 w-5" />
-                <h3 className="text-lg font-semibold">{t('editor.metadataSection')}</h3>
+            {!isPreviewMode && (
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <Settings className="text-primary h-5 w-5" />
+                  <h3 className="text-lg font-semibold">{t('editor.metadataSection')}</h3>
+                </div>
+                <Separator />
+
+                {/* Question Type - Only for create mode */}
+                {!isEditMode && (
+                  <div className="space-y-2">
+                    <Label>{t('form.questionType')}</Label>
+                    <Select value={questionData.type} onValueChange={handleTypeChange}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {getAllQuestionTypes({ includeGroup: true }).map((type) => (
+                          <SelectItem key={type.value} value={type.value}>
+                            {t(type.i18nKey as any)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+
+                {/* Metadata Row */}
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <Label>{t('form.subject')}</Label>
+                    <Select
+                      value={questionData.subject}
+                      onValueChange={(value) =>
+                        setQuestionData({ ...questionData, subject: value as SubjectCode })
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {getAllSubjects().map((subject) => (
+                          <SelectItem key={subject.code} value={subject.code}>
+                            {subject.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>{t('form.difficulty')}</Label>
+                    <Select
+                      value={questionData.difficulty}
+                      onValueChange={(value) =>
+                        setQuestionData({ ...questionData, difficulty: value as Difficulty })
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {getAllDifficulties().map((difficulty) => (
+                          <SelectItem key={difficulty.value} value={difficulty.value}>
+                            {t(difficulty.i18nKey as any)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
               </div>
-              <Separator />
-
-              {/* Question Type - Only for create mode */}
-              {!isEditMode && (
-                <div className="space-y-2">
-                  <Label>{t('form.questionType')}</Label>
-                  <Select value={questionData.type} onValueChange={handleTypeChange}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {getAllQuestionTypes({ includeGroup: true }).map((type) => (
-                        <SelectItem key={type.value} value={type.value}>
-                          {t(type.i18nKey as any)}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
-
-              {/* Metadata Row */}
-              <div className="grid grid-cols-3 gap-4">
-                <div className="space-y-2">
-                  <Label>{t('form.subject')}</Label>
-                  <Select
-                    value={questionData.subject}
-                    onValueChange={(value) =>
-                      setQuestionData({ ...questionData, subject: value as SubjectCode })
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {getAllSubjects().map((subject) => (
-                        <SelectItem key={subject.code} value={subject.code}>
-                          {subject.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label>{t('form.difficulty')}</Label>
-                  <Select
-                    value={questionData.difficulty}
-                    onValueChange={(value) =>
-                      setQuestionData({ ...questionData, difficulty: value as Difficulty })
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {getAllDifficulties().map((difficulty) => (
-                        <SelectItem key={difficulty.value} value={difficulty.value}>
-                          {t(difficulty.i18nKey as any)}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            </div>
+            )}
 
             {/* Validation Errors */}
-            {validationErrors.length > 0 && (
+            {!isPreviewMode && validationErrors.length > 0 && (
               <Alert variant="destructive">
                 <AlertCircle className="h-4 w-4" />
                 <AlertTitle>{t('editor.validationErrors')}</AlertTitle>
@@ -351,7 +371,7 @@ export function QuestionBankEditorPage() {
 
               <QuestionRenderer
                 question={questionData as Question}
-                viewMode={VIEW_MODE.EDITING}
+                viewMode={isPreviewMode ? VIEW_MODE.VIEWING : VIEW_MODE.EDITING}
                 onChange={(updated) => setQuestionData({ ...questionData, ...updated })}
               />
             </div>

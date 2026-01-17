@@ -13,6 +13,7 @@ import { useFieldArray } from 'react-hook-form';
 
 export const CurrentQuestionView = () => {
   const { t } = useTranslation('assignment');
+  const { t: tQuestion } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.currentQuestion' });
   const { register, watch, setValue, control } = useFormContext<AssignmentFormData>();
   const { remove } = useFieldArray({
     control,
@@ -75,8 +76,8 @@ export const CurrentQuestionView = () => {
     return (
       <div className="flex min-h-[400px] items-center justify-center border border-dashed border-gray-300 dark:border-gray-700">
         <div className="text-center">
-          <p className="text-sm text-gray-600 dark:text-gray-400">No questions yet</p>
-          <p className="mt-1 text-xs text-gray-500 dark:text-gray-500">Click "Add Question" to get started</p>
+          <p className="text-sm text-gray-600 dark:text-gray-400">{tQuestion('noQuestions')}</p>
+          <p className="mt-1 text-xs text-gray-500 dark:text-gray-500">{tQuestion('addQuestionHint')}</p>
         </div>
       </div>
     );
@@ -85,7 +86,7 @@ export const CurrentQuestionView = () => {
   if (!assignmentQuestion || !question) {
     return (
       <div className="border-l-4 border-red-500 bg-red-50 p-4 dark:bg-red-950/20">
-        <div className="text-sm font-semibold text-red-600 dark:text-red-400">Question data missing</div>
+        <div className="text-sm font-semibold text-red-600 dark:text-red-400">{tQuestion('dataMissing')}</div>
       </div>
     );
   }
@@ -106,7 +107,7 @@ export const CurrentQuestionView = () => {
             <ChevronLeft className="h-4 w-4" />
           </Button>
           <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-            Question {currentQuestionIndex + 1} of {questions.length}
+            {tQuestion('questionOf', { current: currentQuestionIndex + 1, total: questions.length })}
           </span>
           <Button
             type="button"
@@ -133,7 +134,7 @@ export const CurrentQuestionView = () => {
               className="h-7 rounded-r-none px-2"
             >
               <Pencil className="mr-1 h-3 w-3" />
-              <span className="text-xs">Edit</span>
+              <span className="text-xs">{tQuestion('edit')}</span>
             </Button>
             <Button
               type="button"
@@ -143,7 +144,7 @@ export const CurrentQuestionView = () => {
               className="h-7 rounded-l-none px-2"
             >
               <Eye className="mr-1 h-3 w-3" />
-              <span className="text-xs">Preview</span>
+              <span className="text-xs">{tQuestion('preview')}</span>
             </Button>
           </div>
 
@@ -206,7 +207,7 @@ export const CurrentQuestionView = () => {
               <SelectContent>
                 {getAllDifficulties().map((difficulty) => (
                   <SelectItem key={difficulty.value} value={difficulty.value}>
-                    {difficulty.label}
+                    {t(difficulty.i18nKey as any)}
                   </SelectItem>
                 ))}
               </SelectContent>

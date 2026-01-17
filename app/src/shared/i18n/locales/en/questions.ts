@@ -36,6 +36,8 @@ export default {
     save: 'Save Changes',
     saving: 'Saving...',
     loading: 'Loading question...',
+    preview: 'Preview',
+    edit: 'Edit',
     metadataSection: 'Question Metadata',
     contentSection: 'Question Content',
     questionType: 'Question Type',
@@ -97,6 +99,7 @@ export default {
     scoreDisplay: 'Score: {{score}}/{{total}} points',
     pointsAbbreviation: 'pt',
     pointsAbbreviation_plural: 'pts',
+    markdownPlaceholder: 'Enter text here... (Markdown supported)',
   },
 
   validation: {
@@ -127,8 +130,16 @@ export default {
       correctAnswer: 'Mark as correct answer',
       shuffleOptions: 'Shuffle options',
       imageUrl: 'Image URL (Optional)',
+      questionImage: 'Question Image',
+      optionImage: 'Option Image',
       explanation: 'Explanation (Optional)',
       explanationPlaceholder: 'Add an explanation for the correct answer...',
+    },
+    viewing: {
+      options: 'Options:',
+      shuffle: 'Shuffle',
+      explanation: 'Explanation:',
+      points: 'Points: {{points}}',
     },
     doing: {
       selectAnswer: 'Select your answer',
@@ -168,6 +179,14 @@ export default {
       shufflePairs: 'Shuffle pairs',
       imageUrl: 'Image URL (Optional)',
       explanation: 'Explanation (Optional)',
+    },
+    viewing: {
+      matchingPairs: 'Matching Pairs:',
+      shuffle: 'Shuffle',
+      columnA: 'Column A',
+      columnB: 'Column B',
+      explanation: 'Explanation:',
+      points: 'Points: {{points}}',
     },
     doing: {
       instruction: 'Drag items from Column A to match with Column B',
@@ -212,6 +231,11 @@ export default {
       imageUrl: 'Image URL (Optional)',
       explanation: 'Explanation (Optional)',
     },
+    viewing: {
+      maxLength: 'Maximum length: {{maxLength}} characters',
+      explanation: 'Explanation:',
+      points: 'Points: {{points}}',
+    },
     doing: {
       placeholder: 'Type your answer here...',
       characterCount: '{{current}} / {{max}} characters',
@@ -245,16 +269,35 @@ export default {
   // Fill in Blank
   fillInBlank: {
     editing: {
-      title: 'Question Title (Optional)',
-      titlePlaceholder: 'Enter additional context if needed...',
+      title: 'Question Title',
+      titlePlaceholder: 'Enter question title (optional)',
+      questionImage: 'Question Image',
+      questionText: 'Question Text',
+      questionTextPlaceholder: 'Use {{answer}} to mark blanks. Example: I {{am}} a {{student}}.',
+      questionTextInstruction: 'Use {{answer}} to create blanks in the text.',
+      questionTextExample: 'Example: "I {{am}} a {{student}}." will create 2 blanks.',
+      preview: 'Preview',
+      previewBlank: 'blank',
+      alternativeAnswers: 'Alternative Answers',
+      blankLabel: 'Blank {{index}}:',
+      addAlternative: 'Add Alternative',
+      alternativePlaceholder: 'Alternative answer',
+      explanation: 'Explanation',
+      explanationPlaceholder: 'Explain the answer (optional, shown after assessment)',
       sentence: 'Sentence with Blanks',
       blankPlaceholder: 'Blank {{number}}',
       addBlank: 'Add Blank',
-      caseSensitive: 'Case sensitive answers',
+      caseSensitive: 'Case Sensitive',
       imageUrl: 'Image URL (Optional)',
-      explanation: 'Explanation (Optional)',
       correctAnswer: 'Correct answer',
       acceptableAnswers: 'Alternative acceptable answers',
+    },
+    viewing: {
+      expectedAnswers: 'Expected Answers:',
+      blankLabel: 'Blank {{index}}',
+      caseSensitiveWarning: '⚠️ Answers are case-sensitive',
+      explanation: 'Explanation:',
+      points: 'Points: {{points}}',
     },
     doing: {
       blankPlaceholder: 'Blank {{number}}',
@@ -349,6 +392,10 @@ export default {
     subQuestion: {
       questionNumber: 'Question {{number}}',
       points: '{{points}} pts',
+      progress: 'Progress:',
+      questionsAnswered: ' questions answered',
+      emptyStateTitle: 'No questions in this group yet.',
+      emptyStateMessage: 'Click "Add Question" to get started.',
     },
   },
 };

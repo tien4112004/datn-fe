@@ -133,6 +133,7 @@ export default {
       points: 'Điểm: {{points}}',
       selected: 'Đã Chọn',
       applicationBadge: 'Chỉ đọc',
+      untitled: 'Câu hỏi chưa có tiêu đề',
     },
     subjects: {
       toan: 'Toán',
@@ -276,6 +277,7 @@ export default {
 
     // Nút hành động chính
     actions: {
+      actions: 'Hành động',
       cancel: 'Hủy',
       save: 'Lưu Bài Tập',
       saving: 'Đang lưu...',
@@ -341,6 +343,8 @@ export default {
         shuffleQuestionsDisabled: 'Tắt',
         emptyValue: '-',
         titlePlaceholder: 'Nhập tiêu đề bài tập',
+        subjectPlaceholder: 'Chọn môn học',
+        gradePlaceholder: 'Chọn khối',
         classPlaceholder: 'Chọn lớp',
         descriptionPlaceholder: 'Nhập mô tả bài tập (tùy chọn)',
         dueDatePlaceholder: 'Chọn hạn nộp',
@@ -420,6 +424,84 @@ export default {
         total: 'Tổng',
       },
       close: 'Đóng',
+    },
+
+    // Thông tin cơ bản bài tập
+    basicInfo: {
+      title: 'Thông Tin Bài Tập',
+      titleLabel: 'Tiêu đề',
+      titlePlaceholder: 'Nhập tiêu đề bài tập...',
+      subjectLabel: 'Môn học',
+      subjectPlaceholder: 'Chọn môn học',
+      descriptionLabel: 'Mô tả',
+      descriptionPlaceholder: 'Mô tả bài tập...',
+    },
+
+    // Chỉ số số lượng câu hỏi
+    questionCountIndicator: {
+      noQuestions: 'Chưa có câu hỏi',
+      count: '{{count}} Câu hỏi',
+      count_plural: '{{count}} Câu hỏi',
+    },
+
+    // Chuyển đổi chế độ xem
+    viewModeToggle: {
+      preview: 'Xem trước',
+      edit: 'Chỉnh sửa',
+    },
+
+    // Điều hướng câu hỏi
+    navigator: {
+      questionsCount: '{{count}} Câu hỏi',
+      questionsCount_plural: '{{count}} Câu hỏi',
+      listView: 'Xem Danh Sách',
+      assignmentInfo: 'Thông Tin Bài Tập',
+      untitled: 'Chưa có tiêu đề',
+    },
+
+    // Ô ma trận
+    matrixCell: {
+      required: 'Yêu cầu:',
+      ok: 'OK',
+    },
+
+    // Xem câu hỏi hiện tại
+    currentQuestion: {
+      dataMissing: 'Thiếu dữ liệu câu hỏi',
+      questionOf: 'Câu hỏi {{current}} trên {{total}}',
+      edit: 'Chỉnh sửa',
+      preview: 'Xem trước',
+      noQuestions: 'Chưa có câu hỏi',
+      addQuestionHint: 'Nhấn "Thêm Câu Hỏi" để bắt đầu',
+    },
+
+    // Danh sách câu hỏi
+    questionsList: {
+      emptyTitle: 'Chưa có câu hỏi',
+      emptyHint: 'Nhấn "Thêm Câu Hỏi" để bắt đầu',
+    },
+
+    // Điều hướng câu hỏi
+    questionNavigator: {
+      questionCount: '{{count}} Câu hỏi',
+      questionCount_plural: '{{count}} Câu hỏi',
+      assignmentInfo: 'Thông Tin Bài Tập',
+      untitled: 'Chưa có tiêu đề',
+    },
+
+    // Xem trước nội dung câu hỏi
+    questionPreview: {
+      multipleChoice: '{{count}} lựa chọn • Đúng: {{correct}}',
+      matching: '{{count}} cặp',
+      matching_plural: '{{count}} cặp',
+      fillInBlank: '{{count}} chỗ trống',
+      fillInBlank_plural: '{{count}} chỗ trống',
+      openEnded: {
+        withLimit: 'Trả lời tự do ({{limit}} ký tự)',
+        unlimited: 'Trả lời tự do (không giới hạn)',
+      },
+      placeholderWarning: 'Có nội dung giữ chỗ hoặc trống',
+      noAnswerWarning: 'Chưa có câu trả lời mong đợi',
     },
   },
 

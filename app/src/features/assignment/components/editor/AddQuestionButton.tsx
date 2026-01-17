@@ -33,20 +33,54 @@ export const AddQuestionButton = ({ className }: AddQuestionButtonProps) => {
   const questions = watch('questions');
 
   const handleAddQuestion = (type: string) => {
-    // Create appropriate data structure based on question type
+    // Create appropriate data structure based on question type with better defaults
     let data: any;
     switch (type) {
       case QUESTION_TYPE.MULTIPLE_CHOICE:
-        data = { options: [] };
+        data = {
+          options: [
+            { id: generateId(), content: '', isCorrect: false },
+            { id: generateId(), content: '', isCorrect: false },
+            { id: generateId(), content: '', isCorrect: false },
+            { id: generateId(), content: '', isCorrect: false },
+          ],
+        };
         break;
       case QUESTION_TYPE.MATCHING:
-        data = { pairs: [] };
+        data = {
+          pairs: [
+            { id: generateId(), left: '', right: '' },
+            { id: generateId(), left: '', right: '' },
+            { id: generateId(), left: '', right: '' },
+          ],
+        };
         break;
       case QUESTION_TYPE.OPEN_ENDED:
         data = { expectedAnswer: '', maxLength: 500 };
         break;
       case QUESTION_TYPE.FILL_IN_BLANK:
-        data = { segments: [], caseSensitive: false };
+        data = {
+          segments: [
+            { type: 'text', content: '' },
+            { type: 'blank', correctAnswer: '', caseSensitive: false },
+            { type: 'text', content: '' },
+          ],
+          caseSensitive: false,
+        };
+        break;
+      case QUESTION_TYPE.GROUP:
+        data = {
+          groups: [
+            { id: generateId(), name: '', items: [] },
+            { id: generateId(), name: '', items: [] },
+          ],
+          items: [
+            { id: generateId(), content: '' },
+            { id: generateId(), content: '' },
+            { id: generateId(), content: '' },
+            { id: generateId(), content: '' },
+          ],
+        };
         break;
       default:
         data = {};
@@ -79,7 +113,7 @@ export const AddQuestionButton = ({ className }: AddQuestionButtonProps) => {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-        {getAllQuestionTypes({ includeGroup: false }).map((type) => (
+        {getAllQuestionTypes({ includeGroup: true }).map((type) => (
           <DropdownMenuItem key={type.value} onClick={() => handleAddQuestion(type.value)}>
             {type.label}
           </DropdownMenuItem>

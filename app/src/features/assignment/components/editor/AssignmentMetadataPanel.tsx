@@ -6,37 +6,8 @@ import { Textarea } from '@/shared/components/ui/textarea';
 import { Label } from '@/shared/components/ui/label';
 import { Switch } from '@/shared/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
+import { getAllSubjects, getElementaryGrades } from '@aiprimary/core';
 import type { AssignmentFormData } from '../../types';
-
-// Subject options - you can move these to a constants file
-const SUBJECTS = [
-  { value: 'math', label: 'Mathematics' },
-  { value: 'science', label: 'Science' },
-  { value: 'english', label: 'English' },
-  { value: 'history', label: 'History' },
-  { value: 'geography', label: 'Geography' },
-  { value: 'physics', label: 'Physics' },
-  { value: 'chemistry', label: 'Chemistry' },
-  { value: 'biology', label: 'Biology' },
-  { value: 'computer', label: 'Computer Science' },
-  { value: 'other', label: 'Other' },
-];
-
-// Grade options
-const GRADES = [
-  { value: '1', label: 'Grade 1' },
-  { value: '2', label: 'Grade 2' },
-  { value: '3', label: 'Grade 3' },
-  { value: '4', label: 'Grade 4' },
-  { value: '5', label: 'Grade 5' },
-  { value: '6', label: 'Grade 6' },
-  { value: '7', label: 'Grade 7' },
-  { value: '8', label: 'Grade 8' },
-  { value: '9', label: 'Grade 9' },
-  { value: '10', label: 'Grade 10' },
-  { value: '11', label: 'Grade 11' },
-  { value: '12', label: 'Grade 12' },
-];
 
 export const AssignmentMetadataPanel = () => {
   const { t } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.metadata' });
@@ -45,6 +16,9 @@ export const AssignmentMetadataPanel = () => {
   const shuffleQuestions = watch('shuffleQuestions');
   const subject = watch('subject');
   const grade = watch('grade');
+
+  const subjects = getAllSubjects();
+  const grades = getElementaryGrades();
 
   return (
     <div className="space-y-6">
@@ -62,7 +36,7 @@ export const AssignmentMetadataPanel = () => {
             id="title"
             {...register('title')}
             className="mt-1.5 h-9 text-sm"
-            placeholder={t('fields.titlePlaceholder', { defaultValue: 'Assignment title' })}
+            placeholder={t('fields.titlePlaceholder')}
           />
         </div>
 
@@ -73,14 +47,12 @@ export const AssignmentMetadataPanel = () => {
             </Label>
             <Select value={subject} onValueChange={(value) => setValue('subject', value)}>
               <SelectTrigger id="subject" className="mt-1.5 h-9 text-sm">
-                <SelectValue
-                  placeholder={t('fields.subjectPlaceholder', { defaultValue: 'Select subject' })}
-                />
+                <SelectValue placeholder={t('fields.subjectPlaceholder')} />
               </SelectTrigger>
               <SelectContent>
-                {SUBJECTS.map((subj) => (
-                  <SelectItem key={subj.value} value={subj.value}>
-                    {subj.label}
+                {subjects.map((subj) => (
+                  <SelectItem key={subj.code} value={subj.code}>
+                    {subj.name}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -93,12 +65,12 @@ export const AssignmentMetadataPanel = () => {
             </Label>
             <Select value={grade} onValueChange={(value) => setValue('grade', value)}>
               <SelectTrigger id="grade" className="mt-1.5 h-9 text-sm">
-                <SelectValue placeholder={t('fields.gradePlaceholder', { defaultValue: 'Select grade' })} />
+                <SelectValue placeholder={t('fields.gradePlaceholder')} />
               </SelectTrigger>
               <SelectContent>
-                {GRADES.map((g) => (
-                  <SelectItem key={g.value} value={g.value}>
-                    {g.label}
+                {grades.map((g) => (
+                  <SelectItem key={g.code} value={g.code}>
+                    {g.name}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -115,7 +87,7 @@ export const AssignmentMetadataPanel = () => {
             {...register('description')}
             className="mt-1.5 text-sm"
             rows={4}
-            placeholder={t('fields.descriptionPlaceholder', { defaultValue: 'Assignment description' })}
+            placeholder={t('fields.descriptionPlaceholder')}
           />
         </div>
 

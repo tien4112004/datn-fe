@@ -1081,13 +1081,13 @@ export default {
         general: 'General',
         schedule_event: 'Schedule Events',
         posts: 'Posts',
-        assignments: 'Assignments',
+        homework: 'Homework',
       },
     },
     creator: {
       actions: {
         createPost: 'Create Post',
-        createAssignment: 'Create Assignment',
+        createHomework: 'Create Homework',
         attachFiles: 'Attach Files',
         posting: 'Posting...',
         post: 'Post',
@@ -1114,7 +1114,7 @@ export default {
       },
       postType: {
         post: 'Post',
-        assignment: 'Assignment',
+        homework: 'Homework',
       },
     },
     list: {
@@ -1127,9 +1127,9 @@ export default {
           title: 'No posts yet',
           description: 'Create your first post to share updates with your class!',
         },
-        assignment: {
-          title: 'No assignments yet',
-          description: 'Create your first assignment to get started!',
+        homework: {
+          title: 'No homework yet',
+          description: 'Create your first homework to get started!',
         },
       },
       loading: 'Loading posts...',
@@ -1144,7 +1144,7 @@ export default {
       badges: {
         pinned: 'Pinned',
         post: 'Post',
-        assignment: 'Assignment',
+        homework: 'Homework',
         dueDate: 'Due',
       },
       actions: {

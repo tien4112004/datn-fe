@@ -1,4 +1,4 @@
-import { QUESTION_TYPE, type Difficulty, type QuestionType } from './constants';
+import { QUESTION_TYPE, type CoreQuestionType, type Difficulty, type QuestionType } from './constants';
 
 /**
  * Multiple Choice Question Data
@@ -59,7 +59,7 @@ export interface FillInBlankData {
  */
 export interface SubQuestion {
   id: string;
-  type: 'MULTIPLE_CHOICE' | 'MATCHING' | 'OPEN_ENDED' | 'FILL_IN_BLANK';
+  type: CoreQuestionType;
   title: string;
   titleImageUrl?: string;
   explanation?: string;

@@ -28,6 +28,9 @@ export function GroupAfterAssessment({ question, answer, points }: GroupAfterAss
       {/* Question Title and Score */}
       <div>
         <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100">{question.title}</h3>
+        {question.titleImageUrl && (
+          <img src={question.titleImageUrl} alt="Question" className="mt-2 max-h-64 rounded-md border" />
+        )}
         {points !== undefined && (
           <div className="mt-2 flex items-center gap-2">
             <p className="text-sm text-gray-600 dark:text-gray-400">

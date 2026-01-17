@@ -13,7 +13,7 @@ import type {
   Difficulty,
   SubjectCode,
 } from '@/types/questionBank';
-import { QUESTION_TYPE, DIFFICULTY, SUBJECT_CODE, BANK_TYPE } from '@/types/questionBank';
+import { QUESTION_TYPE, DIFFICULTY, SUBJECT_CODE } from '@/types/questionBank';
 import { getAllQuestionTypes, getAllDifficulties } from '@aiprimary/core';
 
 interface QuestionBankFormDialogProps {
@@ -78,7 +78,6 @@ export function QuestionBankFormDialog({ open, onClose, mode, question }: Questi
           type: formData.type,
           difficulty: formData.difficulty,
           subjectCode: formData.subjectCode,
-          bankType: BANK_TYPE.PUBLIC,
           title: formData.title,
           explanation: formData.explanation,
           points: formData.points,

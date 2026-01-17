@@ -176,7 +176,9 @@ export const QuestionBankFilters = ({
 
           {/* Grade - Multi-select */}
           <div className="space-y-2">
-            <Label className="text-foreground mb-3 block text-sm font-semibold">Grade</Label>
+            <Label className="text-foreground mb-3 block text-sm font-semibold">
+              {t('questionBank.filters.grade')}
+            </Label>
             <div className="max-h-32 space-y-2 overflow-y-auto">
               {grades?.map((grade) => (
                 <label
@@ -195,7 +197,9 @@ export const QuestionBankFilters = ({
 
           {/* Chapter - Multi-select */}
           <div className="space-y-2">
-            <Label className="text-foreground mb-3 block text-sm font-semibold">Chapter</Label>
+            <Label className="text-foreground mb-3 block text-sm font-semibold">
+              {t('questionBank.filters.chapter')}
+            </Label>
             {chapters && chapters.length > 0 ? (
               <div className="max-h-32 space-y-2 overflow-y-auto">
                 {chapters.map((chapter) => (
@@ -214,7 +218,7 @@ export const QuestionBankFilters = ({
                 ))}
               </div>
             ) : (
-              <p className="text-muted-foreground text-xs">No chapters</p>
+              <p className="text-muted-foreground text-xs">{t('questionBank.filters.noChapters')}</p>
             )}
           </div>
         </motion.div>

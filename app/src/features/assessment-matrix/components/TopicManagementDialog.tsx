@@ -70,7 +70,7 @@ export const TopicManagementDialog = ({ open, onClose }: TopicManagementDialogPr
       id: generateId(),
       name: newTopicName.trim(),
       description: newTopicDescription.trim() || undefined,
-      subjectCode: currentMatrix.subjectCode,
+      subject: currentMatrix.subjectCode,
     };
 
     addTopic(newTopic);

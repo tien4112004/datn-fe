@@ -105,5 +105,3 @@ export const ThemePreviewCard = ({
     </div>
   );
 };
-
-export default ThemePreviewCard;

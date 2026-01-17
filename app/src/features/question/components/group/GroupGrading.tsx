@@ -60,6 +60,9 @@ export function GroupGrading({ question, answer, points, onGradeChange }: GroupG
       {/* Question Title */}
       <div>
         <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100">{question.title}</h3>
+        {question.titleImageUrl && (
+          <img src={question.titleImageUrl} alt="Question" className="mt-2 max-h-64 rounded-md border" />
+        )}
         {points !== undefined && (
           <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
             {t('common.totalPoints')}: {points}

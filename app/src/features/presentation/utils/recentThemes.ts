@@ -39,14 +39,3 @@ export const addRecentThemeId = (themeId: string): void => {
     console.error('Failed to save recent theme ID to localStorage:', error);
   }
 };
-
-/**
- * Clear all recent theme IDs (useful for testing/debugging)
- */
-export const clearRecentThemeIds = (): void => {
-  try {
-    localStorage.removeItem(RECENT_THEMES_KEY);
-  } catch (error) {
-    console.error('Failed to clear recent theme IDs from localStorage:', error);
-  }
-};

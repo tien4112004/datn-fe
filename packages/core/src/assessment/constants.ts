@@ -19,6 +19,12 @@ export const QUESTION_TYPE = {
 export type QuestionType = (typeof QUESTION_TYPE)[keyof typeof QUESTION_TYPE];
 
 /**
+ * Core Question Types (excludes GROUP)
+ * These are the basic question types that can stand alone or be used as sub-questions
+ */
+export type CoreQuestionType = Exclude<QuestionType, typeof QUESTION_TYPE.GROUP>;
+
+/**
  * Question Type Labels (Vietnamese)
  * Display names for question types in Vietnamese
  */
@@ -42,17 +48,6 @@ export const QUESTION_TYPE_I18N_KEYS = {
   GROUP: 'types.group',
 } as const;
 
-/**
- * Get question type Vietnamese name from type code
- * Returns the code itself if not found (graceful fallback)
- *
- * @example
- * getQuestionTypeName('MULTIPLE_CHOICE') // returns 'Trắc Nghiệm'
- * getQuestionTypeName('matching') // returns 'Nối'
- */
-export function getQuestionTypeName(type: string): string {
-  return QUESTION_TYPE_LABELS[type as QuestionType] || type;
-}
 
 /**
  * Difficulty Levels (Vietnamese education system)
@@ -89,17 +84,6 @@ export const DIFFICULTY_I18N_KEYS = {
   ADVANCED_APPLICATION: 'difficulty.advancedApplication',
 } as const;
 
-/**
- * Get difficulty Vietnamese name from difficulty code
- * Returns the code itself if not found (graceful fallback)
- *
- * @example
- * getDifficultyName('nhan_biet') // returns 'Nhận biết'
- * getDifficultyName('van_dung_cao') // returns 'Vận dụng cao'
- */
-export function getDifficultyName(difficulty: string): string {
-  return DIFFICULTY_LABELS[difficulty as Difficulty] || difficulty;
-}
 
 /**
  * Subject Codes (Vietnamese education system)

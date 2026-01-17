@@ -1,5 +1,5 @@
 import type { QuestionBankItem } from '@/features/assignment/types';
-import { QUESTION_TYPE, BANK_TYPE } from '@/features/assignment/types';
+import { QUESTION_TYPE } from '@/features/assignment/types';
 import type { QuestionType, Difficulty, SubjectCode } from '@/features/assignment/types';
 
 /**
@@ -87,7 +87,6 @@ function parseQuestionRow(row: Record<string, string>, rowNumber: number): Quest
     title: row.title,
     difficulty,
     subjectCode,
-    bankType: BANK_TYPE.PERSONAL, // IMPORTANT: Teacher imports go to personal bank
     explanation: row.explanation || undefined,
   };
 
@@ -257,7 +256,7 @@ export function exportQuestionsToCSV(questions: QuestionBankItem[]): string {
             `"${q.title.replace(/"/g, '""')}"`,
             q.type,
             q.difficulty,
-            q.subjectCode,
+            q.subject,
             ...q.data.options.map((o) => `"${o.text.replace(/"/g, '""')}"`),
             correctIndex,
             `"${(q.explanation || '').replace(/"/g, '""')}"`,
@@ -285,7 +284,7 @@ export function exportQuestionsToCSV(questions: QuestionBankItem[]): string {
             `"${q.title.replace(/"/g, '""')}"`,
             q.type,
             q.difficulty,
-            q.subjectCode,
+            q.subject,
             ...pairValues,
             `"${(q.explanation || '').replace(/"/g, '""')}"`,
           ].join(',')
@@ -306,7 +305,7 @@ export function exportQuestionsToCSV(questions: QuestionBankItem[]): string {
             `"${q.title.replace(/"/g, '""')}"`,
             q.type,
             q.difficulty,
-            q.subjectCode,
+            q.subject,
             `"${(q.data.expectedAnswer || '').replace(/"/g, '""')}"`,
             q.data.maxLength || 500,
             `"${(q.explanation || '').replace(/"/g, '""')}"`,
@@ -333,7 +332,7 @@ export function exportQuestionsToCSV(questions: QuestionBankItem[]): string {
             `"${q.title.replace(/"/g, '""')}"`,
             q.type,
             q.difficulty,
-            q.subjectCode,
+            q.subject,
             `"${text.replace(/"/g, '""')}"`,
             `"${blanks}"`,
             q.data.caseSensitive || false,

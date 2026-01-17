@@ -23,8 +23,8 @@ export default class QuestionBankService implements QuestionBankApiService {
     if (Array.isArray(filters?.difficulty)) {
       queryParams.difficulty = filters.difficulty.join(',');
     }
-    if (Array.isArray(filters?.subjectCode)) {
-      queryParams.subjectCode = filters.subjectCode.join(',');
+    if (Array.isArray(filters?.subject)) {
+      queryParams.subjectCode = filters.subject.join(',');
     }
     if (Array.isArray(filters?.questionType)) {
       queryParams.questionType = filters.questionType.join(',');

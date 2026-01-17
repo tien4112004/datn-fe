@@ -57,13 +57,13 @@ export function validateQuestionBankCSV(questions: QuestionBankItem[]): Validati
       });
     }
 
-    if (!question.subjectCode) {
+    if (!question.subject) {
       errors.push({ row: rowNumber, field: 'subjectCode', message: 'Subject code is required' });
-    } else if (!Object.values(SUBJECT_CODE).includes(question.subjectCode as any)) {
+    } else if (!Object.values(SUBJECT_CODE).includes(question.subject as any)) {
       errors.push({
         row: rowNumber,
         field: 'subjectCode',
-        message: `Invalid subject code: ${question.subjectCode}`,
+        message: `Invalid subject code: ${question.subject}`,
       });
     }
 
@@ -239,7 +239,7 @@ export function checkDuplicates(
     const isDuplicate = existingQuestions.some(
       (existingQ) =>
         existingQ.title.toLowerCase().trim() === newQ.title.toLowerCase().trim() &&
-        existingQ.subjectCode === newQ.subjectCode &&
+        existingQ.subject === newQ.subject &&
         existingQ.type === newQ.type
     );
 

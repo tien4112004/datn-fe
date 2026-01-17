@@ -1,5 +1,5 @@
 import type { QuestionBankItem, QuestionType, Difficulty, SubjectCode } from '@/types/questionBank';
-import { QUESTION_TYPE, BANK_TYPE } from '@/types/questionBank';
+import { QUESTION_TYPE } from '@/types/questionBank';
 
 /**
  * Parse CSV content to QuestionBankItem array
@@ -86,7 +86,6 @@ function parseQuestionRow(row: Record<string, string>, rowNumber: number): Quest
     title: row.title,
     difficulty,
     subjectCode,
-    bankType: BANK_TYPE.PUBLIC,
     points: row.points ? parseInt(row.points) : 10,
     explanation: row.explanation || undefined,
   };

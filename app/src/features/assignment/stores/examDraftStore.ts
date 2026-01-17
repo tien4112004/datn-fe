@@ -36,7 +36,7 @@ export const useExamDraftStore = create<ExamDraftStore>()(
             name: `${matrix.name} - ${new Date().toLocaleDateString()}`,
             matrixId: matrix.id,
             matrixName: matrix.name,
-            subjectCode: matrix.subjectCode,
+            subject: matrix.subjectCode,
             targetPoints: matrix.targetTotalPoints,
             questions,
             questionSelections: selections,

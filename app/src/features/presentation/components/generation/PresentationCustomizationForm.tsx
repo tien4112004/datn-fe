@@ -8,7 +8,7 @@ import {
   CardTitle,
 } from '@/shared/components/ui/card';
 import { Button } from '@/shared/components/ui/button';
-import { Palette, Sparkles, AlignLeft, AlignCenter, AlignJustify } from 'lucide-react';
+import { Palette, Sparkles } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { ModelSelect } from '@/features/model/components/ModelSelect';
 import { MODEL_TYPES, useModels } from '@/features/model';
@@ -27,12 +27,6 @@ import { cn } from '@/shared/lib/utils';
 interface ThemeSectionProps {
   selectedTheme?: SlideTheme;
   onThemeSelect: (theme: SlideTheme) => void;
-  disabled?: boolean;
-}
-
-interface ContentSectionProps {
-  selectedContentLength: string;
-  onContentLengthSelect: (length: string) => void;
   disabled?: boolean;
 }
 
@@ -240,59 +234,6 @@ const ArtSection = ({ selectedStyle, onStyleSelect, disabled = false }: ArtSecti
   );
 };
 
-const ContentSection = ({
-  selectedContentLength,
-  onContentLengthSelect,
-  disabled = false,
-}: ContentSectionProps) => {
-  const { t } = useTranslation('presentation', { keyPrefix: 'customization' });
-
-  const contentOptions = [
-    {
-      key: 'short',
-      label: t('content.short'),
-      desc: t('content.shortDesc'),
-      icon: <AlignLeft className="h-5 w-5" />,
-    },
-    {
-      key: 'medium',
-      label: t('content.medium'),
-      desc: t('content.mediumDesc'),
-      icon: <AlignCenter className="h-5 w-5" />,
-    },
-    {
-      key: 'long',
-      label: t('content.long'),
-      desc: t('content.longDesc'),
-      icon: <AlignJustify className="h-5 w-5" />,
-    },
-  ];
-
-  return (
-    <>
-      <CardHeader>
-        <CardTitle>{t('content.title')}</CardTitle>
-        <CardDescription>{t('content.description')}</CardDescription>
-      </CardHeader>
-      <CardContent className="flex flex-col gap-2">
-        <div className="grid grid-cols-3 gap-4">
-          {contentOptions.map((content) => (
-            <div
-              key={content.key}
-              className={`bg-muted border-muted flex flex-col items-center justify-center rounded-lg border p-4 transition ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer hover:scale-105'} ${selectedContentLength === content.key ? 'ring-primary ring-2' : ''}`}
-              onClick={() => !disabled && onContentLengthSelect(content.key)}
-            >
-              {content.icon}
-              <span className="mt-2 text-sm font-medium">{t(`content.${content.key}` as never)}</span>
-              <span className="text-muted-foreground text-xs">{content.desc}</span>
-            </div>
-          ))}
-        </div>
-      </CardContent>
-    </>
-  );
-};
-
 interface CustomizationSectionProps {
   control: Control<UnifiedFormData>;
   watch: any;
@@ -380,4 +321,3 @@ const CustomizationSection = ({
 };
 
 export default CustomizationSection;
-export { ContentSection, ThemeSection, ArtSection };

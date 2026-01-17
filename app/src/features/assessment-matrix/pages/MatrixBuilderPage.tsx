@@ -22,7 +22,8 @@ import { MatrixConfigForm } from '../components/MatrixConfigForm';
 import { TopicManagementDialog } from '../components/TopicManagementDialog';
 import { MatrixGridEditor } from '../components/MatrixGridEditor';
 import { MatrixPreviewTable } from '../components/MatrixPreviewTable';
-import { Save } from 'lucide-react';
+import { Save, AlertCircle } from 'lucide-react';
+import { Alert, AlertDescription } from '@/shared/components/ui/alert';
 
 export function MatrixBuilderPage() {
   const { id } = useParams<{ id?: string }>();
@@ -165,6 +166,15 @@ export function MatrixBuilderPage() {
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
+
+          {/* Warning Banner - API Not Implemented */}
+          <Alert className="border-yellow-200 bg-yellow-50 dark:border-yellow-900 dark:bg-yellow-950">
+            <AlertCircle className="h-4 w-4 text-yellow-600 dark:text-yellow-500" />
+            <AlertDescription className="text-yellow-800 dark:text-yellow-200">
+              <strong>Demo Mode:</strong> Assessment Matrix API is not yet connected to the backend. Data will
+              be stored locally and not persisted to the server.
+            </AlertDescription>
+          </Alert>
 
           {/* Header */}
           <div className="mb-8 flex items-center justify-between">

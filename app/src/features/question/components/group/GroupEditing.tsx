@@ -5,6 +5,7 @@ import type { GroupQuestion, SubQuestion } from '@aiprimary/core';
 import { VIEW_MODE } from '@/features/assignment/types';
 import { SubQuestionList } from './SubQuestionList';
 import { generateId } from '@/shared/lib/utils';
+import { ImageUploader } from '../shared';
 
 interface GroupEditingProps {
   question: GroupQuestion;
@@ -22,28 +23,28 @@ interface GroupEditingProps {
  */
 export function GroupEditing({ question, onChange }: GroupEditingProps) {
   const { t } = useTranslation('questions');
-  const [description, setDescription] = useState(question.data.description || '');
-  const [questions, setQuestions] = useState<SubQuestion[]>(question.data.questions || []);
-  const [showQuestionNumbers, setShowQuestionNumbers] = useState(question.data.showQuestionNumbers ?? true);
-  const [shuffleQuestions, setShuffleQuestions] = useState(question.data.shuffleQuestions ?? false);
+  const [description, setDescription] = useState(question.data?.description || '');
+  const [questions, setQuestions] = useState<SubQuestion[]>(question.data?.questions || []);
+  const [titleImageUrl, setTitleImageUrl] = useState(question.titleImageUrl || '');
   const [showTypeSelector, setShowTypeSelector] = useState(false);
 
   // Notify parent of changes
   useEffect(() => {
     const updated: GroupQuestion = {
       ...question,
+      titleImageUrl,
       data: {
         description,
         questions,
-        showQuestionNumbers,
-        shuffleQuestions,
+        showQuestionNumbers: true, // Always show numbers as a, b, c, d
+        shuffleQuestions: false, // Never shuffle
       },
     };
     onChange(updated);
-  }, [description, questions, showQuestionNumbers, shuffleQuestions]);
+  }, [description, questions, titleImageUrl]);
 
   // Add a new sub-question
-  const handleAddQuestion = (type: 'MULTIPLE_CHOICE' | 'matching' | 'open_ended' | 'fill_in_blank') => {
+  const handleAddQuestion = (type: 'MULTIPLE_CHOICE' | 'MATCHING' | 'OPEN_ENDED' | 'FILL_IN_BLANK') => {
     let initialData: any;
 
     switch (type) {
@@ -56,19 +57,19 @@ export function GroupEditing({ question, onChange }: GroupEditingProps) {
           shuffleOptions: false,
         };
         break;
-      case 'matching':
+      case 'MATCHING':
         initialData = {
           pairs: [{ id: generateId(), left: '', right: '' }],
           shufflePairs: false,
         };
         break;
-      case 'open_ended':
+      case 'OPEN_ENDED':
         initialData = {
           expectedAnswer: '',
           maxLength: undefined,
         };
         break;
-      case 'fill_in_blank':
+      case 'FILL_IN_BLANK':
         initialData = {
           segments: [],
           caseSensitive: false,
@@ -112,29 +113,12 @@ export function GroupEditing({ question, onChange }: GroupEditingProps) {
         />
       </div>
 
-      {/* Display Settings */}
-      <div className="flex items-center gap-6 rounded-lg bg-gray-50 p-4 dark:bg-gray-800">
-        <label className="flex cursor-pointer items-center gap-2">
-          <input
-            type="checkbox"
-            checked={showQuestionNumbers}
-            onChange={(e) => setShowQuestionNumbers(e.target.checked)}
-            className="h-4 w-4 rounded"
-          />
-          <span className="text-sm text-gray-700 dark:text-gray-300">{t('group.editing.showNumbers')}</span>
-        </label>
-        <label className="flex cursor-pointer items-center gap-2">
-          <input
-            type="checkbox"
-            checked={shuffleQuestions}
-            onChange={(e) => setShuffleQuestions(e.target.checked)}
-            className="h-4 w-4 rounded"
-          />
-          <span className="text-sm text-gray-700 dark:text-gray-300">
-            {t('group.editing.shuffleQuestions')}
-          </span>
-        </label>
-      </div>
+      {/* Title Image Uploader */}
+      <ImageUploader
+        label={t('group.editing.titleImage')}
+        value={titleImageUrl}
+        onChange={setTitleImageUrl}
+      />
 
       {/* Total Points Display */}
       <div className="flex items-center justify-between rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
@@ -176,7 +160,7 @@ export function GroupEditing({ question, onChange }: GroupEditingProps) {
                 </div>
               </button>
               <button
-                onClick={() => handleAddQuestion('matching')}
+                onClick={() => handleAddQuestion('MATCHING')}
                 className="rounded-md border border-gray-200 p-3 text-left transition-colors hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-700"
               >
                 <div className="font-medium text-gray-900 dark:text-gray-100">
@@ -187,7 +171,7 @@ export function GroupEditing({ question, onChange }: GroupEditingProps) {
                 </div>
               </button>
               <button
-                onClick={() => handleAddQuestion('open_ended')}
+                onClick={() => handleAddQuestion('OPEN_ENDED')}
                 className="rounded-md border border-gray-200 p-3 text-left transition-colors hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-700"
               >
                 <div className="font-medium text-gray-900 dark:text-gray-100">
@@ -198,7 +182,7 @@ export function GroupEditing({ question, onChange }: GroupEditingProps) {
                 </div>
               </button>
               <button
-                onClick={() => handleAddQuestion('fill_in_blank')}
+                onClick={() => handleAddQuestion('FILL_IN_BLANK')}
                 className="rounded-md border border-gray-200 p-3 text-left transition-colors hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-700"
               >
                 <div className="font-medium text-gray-900 dark:text-gray-100">
@@ -226,7 +210,7 @@ export function GroupEditing({ question, onChange }: GroupEditingProps) {
         <SubQuestionList
           questions={questions}
           viewMode={VIEW_MODE.EDITING}
-          showNumbers={showQuestionNumbers}
+          showNumbers={true}
           onChange={setQuestions}
         />
       </div>

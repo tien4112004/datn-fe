@@ -295,6 +295,7 @@ export default {
       groupDescription: 'Mô tả nhóm',
       groupDescriptionPlaceholder: 'Nhập mô tả, đoạn văn hoặc ngữ cảnh cho nhóm câu hỏi này...',
       groupDescriptionHint: 'Cung cấp ngữ cảnh hoặc hướng dẫn cho tất cả các câu hỏi con',
+      titleImage: 'Hình ảnh tiêu đề (Tùy chọn)',
 
       displaySettings: 'Cài đặt hiển thị',
       showNumbers: 'Hiển thị số thứ tự câu hỏi',

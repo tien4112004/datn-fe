@@ -20,8 +20,9 @@ import {
 } from '@/features/assignment/hooks/useQuestionBankApi';
 import type { CreateQuestionRequest, Question, QuestionBankItem } from '@/features/assignment/types';
 import {
-  BANK_TYPE,
   DIFFICULTY,
+  getAllDifficulties,
+  getAllQuestionTypes,
   getAllSubjects,
   QUESTION_TYPE,
   SUBJECT_CODE,
@@ -43,8 +44,7 @@ function createDefaultQuestion(type: QuestionType): QuestionBankItem {
     id: generateId(),
     type,
     difficulty: DIFFICULTY.KNOWLEDGE,
-    subjectCode: SUBJECT_CODE.MATH,
-    bankType: BANK_TYPE.PERSONAL,
+    subject: SUBJECT_CODE.MATH,
     title: '',
     explanation: '',
   };
@@ -167,10 +167,7 @@ export function QuestionBankEditorPage() {
         toast.success(t('editor.updateSuccess'));
       } else {
         const payload: CreateQuestionRequest = {
-          question: {
-            ...questionData,
-            bankType: BANK_TYPE.PERSONAL,
-          } as any,
+          question: questionData as any,
         };
         await createMutation.mutateAsync(payload);
         toast.success(t('editor.createSuccess'));
@@ -193,7 +190,7 @@ export function QuestionBankEditorPage() {
       setQuestionData({
         ...newQuestion,
         difficulty: questionData.difficulty,
-        subjectCode: questionData.subjectCode,
+        subject: questionData.subject,
       });
     }
   };
@@ -265,18 +262,17 @@ export function QuestionBankEditorPage() {
               {/* Question Type - Only for create mode */}
               {!isEditMode && (
                 <div className="space-y-2">
-                  <Label>{t('editor.questionType')}</Label>
+                  <Label>{t('form.questionType')}</Label>
                   <Select value={questionData.type} onValueChange={handleTypeChange}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value={QUESTION_TYPE.MULTIPLE_CHOICE}>
-                        {t('types.multipleChoice')}
-                      </SelectItem>
-                      <SelectItem value={QUESTION_TYPE.MATCHING}>{t('types.matching')}</SelectItem>
-                      <SelectItem value={QUESTION_TYPE.OPEN_ENDED}>{t('types.openEnded')}</SelectItem>
-                      <SelectItem value={QUESTION_TYPE.FILL_IN_BLANK}>{t('types.fillInBlank')}</SelectItem>
+                      {getAllQuestionTypes({ includeGroup: true }).map((type) => (
+                        <SelectItem key={type.value} value={type.value}>
+                          {t(type.i18nKey as any)}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
@@ -285,11 +281,11 @@ export function QuestionBankEditorPage() {
               {/* Metadata Row */}
               <div className="grid grid-cols-3 gap-4">
                 <div className="space-y-2">
-                  <Label>{t('editor.subject')}</Label>
+                  <Label>{t('form.subject')}</Label>
                   <Select
-                    value={questionData.subjectCode}
+                    value={questionData.subject}
                     onValueChange={(value) =>
-                      setQuestionData({ ...questionData, subjectCode: value as SubjectCode })
+                      setQuestionData({ ...questionData, subject: value as SubjectCode })
                     }
                   >
                     <SelectTrigger>
@@ -306,7 +302,7 @@ export function QuestionBankEditorPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>{t('editor.difficulty')}</Label>
+                  <Label>{t('form.difficulty')}</Label>
                   <Select
                     value={questionData.difficulty}
                     onValueChange={(value) =>
@@ -317,14 +313,11 @@ export function QuestionBankEditorPage() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value={DIFFICULTY.KNOWLEDGE}>{t('difficulty.knowledge')}</SelectItem>
-                      <SelectItem value={DIFFICULTY.COMPREHENSION}>
-                        {t('difficulty.comprehension')}
-                      </SelectItem>
-                      <SelectItem value={DIFFICULTY.APPLICATION}>{t('difficulty.application')}</SelectItem>
-                      <SelectItem value={DIFFICULTY.ADVANCED_APPLICATION}>
-                        {t('difficulty.advancedApplication')}
-                      </SelectItem>
+                      {getAllDifficulties().map((difficulty) => (
+                        <SelectItem key={difficulty.value} value={difficulty.value}>
+                          {t(difficulty.i18nKey as any)}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>

@@ -33,7 +33,7 @@ export const QuestionBankGrid = () => {
 
     // Subject filter
     if (filters.subjectCode) {
-      result = result.filter((q) => q.subjectCode === filters.subjectCode);
+      result = result.filter((q) => q.subject === filters.subjectCode);
     }
 
     return result;

@@ -81,5 +81,4 @@ const ThumbnailWrapperV2 = ({ presentation, size, visible = true }: ThumbnailWra
   );
 };
 
-export default ThumbnailWrapper;
 export { ThumbnailWrapperV2 };

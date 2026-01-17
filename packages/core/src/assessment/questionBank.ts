@@ -1,4 +1,4 @@
-import type { SubjectCode, BankType } from './constants';
+import type { SubjectCode } from './constants';
 import type { Question } from './question';
 
 /**
@@ -12,8 +12,7 @@ import type { Question } from './question';
  * Uses intersection type to include all type-specific fields from Question
  */
 export type QuestionBankItem = Question & {
-  subjectCode: SubjectCode; // Subject classification (required for bank organization)
-  bankType: BankType; // Personal (teacher's own) or Application (school-wide)
+  subject: SubjectCode; // Subject classification (required for bank organization)
   createdAt?: string; // ISO timestamp of creation
   updatedAt?: string; // ISO timestamp of last update
 };

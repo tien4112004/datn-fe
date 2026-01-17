@@ -11,7 +11,6 @@ import {
 } from '@/features/assignment/hooks/useQuestionBankApi';
 import useQuestionBankStore from '@/features/assignment/stores/questionBankStore';
 import type { QuestionBankItem } from '@/features/assignment/types';
-import { BANK_TYPE } from '@/features/assignment/types';
 import { Button } from '@/shared/components/ui/button';
 import { Checkbox } from '@/shared/components/ui/checkbox';
 import { Badge } from '@/shared/components/ui/badge';
@@ -70,8 +69,9 @@ export function TeacherQuestionBankPage() {
   const totalItems = data?.total || 0;
 
   // Permission helpers
-  const canEdit = (q: QuestionBankItem) => q.bankType === BANK_TYPE.PERSONAL;
-  const canDelete = (q: QuestionBankItem) => q.bankType === BANK_TYPE.PERSONAL;
+  // Note: Permissions are now managed by API/filters, not item properties
+  const canEdit = (_q: QuestionBankItem) => true;
+  const canDelete = (_q: QuestionBankItem) => true;
 
   // Get selected question IDs
   const selectedQuestionIds = Object.keys(rowSelection)
@@ -201,7 +201,7 @@ export function TeacherQuestionBankPage() {
         cell: (info) => <Badge variant="outline">{getQuestionTypeName(info.getValue())}</Badge>,
         size: 150,
       }),
-      columnHelper.accessor('subjectCode', {
+      columnHelper.accessor('subject', {
         header: t('table.columns.subject'),
         cell: (info) => <Badge variant="secondary">{getSubjectName(info.getValue())}</Badge>,
         size: 120,

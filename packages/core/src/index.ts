@@ -8,14 +8,13 @@ export * from './subjects';
 export {
   QUESTION_TYPE,
   type QuestionType,
+  type CoreQuestionType,
   QUESTION_TYPE_LABELS,
   QUESTION_TYPE_I18N_KEYS,
-  getQuestionTypeName,
   DIFFICULTY,
   type Difficulty,
   DIFFICULTY_LABELS,
   DIFFICULTY_I18N_KEYS,
-  getDifficultyName,
   SUBJECT_CODE,
   type SubjectCode,
   BANK_TYPE,
@@ -43,9 +42,12 @@ export {
 } from './assessment/grades';
 export {
   getAllQuestionTypes,
+  getCoreQuestionTypes,
+  getQuestionTypeName,
   getQuestionTypeI18nKey,
   getQuestionTypeI18nMap,
   getAllDifficulties,
+  getDifficultyName,
   getDifficultyI18nKey,
   getDifficultyI18nMap,
   getAllBankTypes,

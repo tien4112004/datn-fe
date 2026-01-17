@@ -295,6 +295,7 @@ export default {
       groupDescription: 'Group Description',
       groupDescriptionPlaceholder: 'Enter a description, passage, or context for this group of questions...',
       groupDescriptionHint: 'Provide context or instructions for all sub-questions',
+      titleImage: 'Title Image (Optional)',
 
       displaySettings: 'Display Settings',
       showNumbers: 'Show question numbers',

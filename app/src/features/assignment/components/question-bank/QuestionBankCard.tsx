@@ -1,11 +1,9 @@
 import { useTranslation } from 'react-i18next';
 import { Checkbox } from '@/shared/components/ui/checkbox';
 import { Badge } from '@/shared/components/ui/badge';
-import { Lock } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 import type { Question, QuestionBankItem } from '../../types';
-import { BANK_TYPE } from '../../types';
 import { QuestionTypeIcon, DifficultyBadge } from '@/features/question/components/shared';
 import { Card, CardContent } from '@/components/ui/card';
 
@@ -17,7 +15,6 @@ interface QuestionBankCardProps {
 
 export const QuestionBankCard = ({ question, isSelected, onToggleSelection }: QuestionBankCardProps) => {
   const { t } = useTranslation(I18N_NAMESPACES.ASSIGNMENT);
-  const isApplicationQuestion = question.bankType === BANK_TYPE.APPLICATION;
 
   const getSubjectName = (subjectCode: 'T' | 'TV' | 'TA'): string => {
     switch (subjectCode) {
@@ -30,7 +27,7 @@ export const QuestionBankCard = ({ question, isSelected, onToggleSelection }: Qu
     }
   };
 
-  const subjectName = getSubjectName(question.subjectCode);
+  const subjectName = getSubjectName(question.subject);
 
   return (
     <Card
@@ -49,8 +46,7 @@ export const QuestionBankCard = ({ question, isSelected, onToggleSelection }: Qu
           'shadow-sm',
           'hover:scale-[1.01] hover:shadow-md',
           'active:scale-[0.99]',
-        ],
-        isApplicationQuestion && !isSelected && 'bg-accent/10'
+        ]
       )}
       onClick={() => onToggleSelection(question)}
     >
@@ -66,17 +62,7 @@ export const QuestionBankCard = ({ question, isSelected, onToggleSelection }: Qu
               className="mt-1"
             />
             <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-2">
-                <h3 className="line-clamp-2 flex-1 text-sm font-medium">
-                  {question.title || 'Untitled Question'}
-                </h3>
-                {isApplicationQuestion && (
-                  <Badge variant="secondary" className="shrink-0 gap-1 text-xs">
-                    <Lock className="h-3 w-3" />
-                    {t('questionBank.card.applicationBadge')}
-                  </Badge>
-                )}
-              </div>
+              <h3 className="line-clamp-2 text-sm font-medium">{question.title || 'Untitled Question'}</h3>
             </div>
           </div>
 

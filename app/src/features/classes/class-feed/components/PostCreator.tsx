@@ -29,7 +29,7 @@ interface PostCreatorProps {
   classId: string;
   onPostCreated?: () => void;
   className?: string;
-  initialType?: 'Post' | 'Assignment';
+  initialType?: 'Post' | 'Homework';
 }
 
 export const PostCreator = ({
@@ -42,7 +42,7 @@ export const PostCreator = ({
   const createPost = useCreatePost();
   const editor = useRichTextEditor();
   const [open, setOpen] = useState(false);
-  const [type, setType] = useState<'Post' | 'Assignment'>(initialType);
+  const [type, setType] = useState<'Post' | 'Homework'>(initialType);
   const [attachments, setAttachments] = useState<File[]>([]);
   const [linkedLessons, setLinkedLessons] = useState<Array<Lesson>>([]);
   const [linkedResources, setLinkedResources] = useState<Array<LessonResource>>([]);
@@ -65,7 +65,7 @@ export const PostCreator = ({
         linkedLessonId: type === 'Post' && linkedLessons.length > 0 ? linkedLessons[0].id : undefined,
         linkedResourceIds:
           type === 'Post' && linkedResources.length > 0 ? linkedResources.map((r) => r.id) : undefined,
-        assignmentId: type === 'Assignment' && selectedAssignment ? selectedAssignment.id : undefined,
+        assignmentId: type === 'Homework' && selectedAssignment ? selectedAssignment.id : undefined,
         allowComments,
       };
 
@@ -99,8 +99,8 @@ export const PostCreator = ({
   const canSubmit = editor && editor.document.length > 0 && !createPost.isPending;
 
   const buttonText =
-    initialType === 'Assignment'
-      ? t('feed.creator.actions.createAssignment')
+    initialType === 'Homework'
+      ? t('feed.creator.actions.createHomework')
       : t('feed.creator.actions.createPost');
 
   return (
@@ -122,7 +122,7 @@ export const PostCreator = ({
             <Label className="text-sm font-medium">{t('feed.creator.labels.postType')}</Label>
             <RadioGroup
               value={type}
-              onValueChange={(value) => setType(value as 'Post' | 'Assignment')}
+              onValueChange={(value) => setType(value as 'Post' | 'Homework')}
               className="flex gap-6"
             >
               <div className="flex items-center gap-2">
@@ -132,9 +132,9 @@ export const PostCreator = ({
                 </Label>
               </div>
               <div className="flex items-center gap-2">
-                <RadioGroupItem value="Assignment" id="assignment" />
-                <Label htmlFor="assignment" className="cursor-pointer font-normal">
-                  {t('feed.creator.postType.assignment')}
+                <RadioGroupItem value="Homework" id="homework" />
+                <Label htmlFor="homework" className="cursor-pointer font-normal">
+                  {t('feed.creator.postType.homework')}
                 </Label>
               </div>
             </RadioGroup>
@@ -158,7 +158,7 @@ export const PostCreator = ({
           <Separator />
 
           {/* Conditional Fields based on Post Type */}
-          {type === 'Assignment' ? (
+          {type === 'Homework' ? (
             /* Assignment Selector */
             <div className="space-y-2">
               <Label className="text-sm font-medium">{t('feed.creator.labels.selectAssignment')}</Label>

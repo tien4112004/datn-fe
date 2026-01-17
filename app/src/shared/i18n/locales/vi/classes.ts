@@ -1076,13 +1076,13 @@ export default {
         general: 'Chung',
         schedule_event: 'Sự kiện lịch trình',
         posts: 'Bài viết',
-        assignments: 'Bài tập',
+        homework: 'Bài tập về nhà',
       },
     },
     creator: {
       actions: {
         createPost: 'Tạo Bài Đăng',
-        createAssignment: 'Tạo Bài Tập',
+        createHomework: 'Tạo Bài Tập Về Nhà',
         attachFiles: 'Đính Kèm Tập Tin',
         posting: 'Đang Đăng...',
         post: 'Đăng',
@@ -1109,7 +1109,7 @@ export default {
       },
       postType: {
         post: 'Bài Đăng',
-        assignment: 'Bài Tập',
+        homework: 'Bài Tập Về Nhà',
       },
     },
     list: {
@@ -1122,9 +1122,9 @@ export default {
           title: 'Chưa có bài viết nào',
           description: 'Tạo bài đăng đầu tiên để chia sẻ cập nhật với lớp học của bạn!',
         },
-        assignment: {
-          title: 'Chưa có bài tập nào',
-          description: 'Tạo bài tập đầu tiên để bắt đầu!',
+        homework: {
+          title: 'Chưa có bài tập về nhà nào',
+          description: 'Tạo bài tập về nhà đầu tiên để bắt đầu!',
         },
       },
       loading: 'Đang tải bài viết...',
@@ -1139,7 +1139,7 @@ export default {
       badges: {
         pinned: 'Đã ghim',
         post: 'Bài Đăng',
-        assignment: 'Bài tập',
+        homework: 'Bài tập về nhà',
         dueDate: 'Hạn',
       },
       actions: {

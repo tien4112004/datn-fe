@@ -3,7 +3,7 @@ import type {
   QuestionBankApiService,
   QuestionBankItem,
   QuestionBankFilters,
-  QuestionBankResponse,
+  QuestionBankApiResponse,
 } from '../types/questionBank';
 import { getAllSubjects, getElementaryGrades } from '@aiprimary/core';
 
@@ -16,7 +16,7 @@ export default class QuestionBankService implements QuestionBankApiService {
     this.baseUrl = baseUrl;
   }
 
-  async getQuestions(filters?: QuestionBankFilters): Promise<QuestionBankResponse> {
+  async getQuestions(filters?: QuestionBankFilters): Promise<QuestionBankApiResponse> {
     // Convert arrays to comma-separated strings for API
     const queryParams: any = { ...filters };
 
@@ -42,7 +42,7 @@ export default class QuestionBankService implements QuestionBankApiService {
     const response = await this.apiClient.get(`${this.baseUrl}/api/question-bank`, {
       params: queryParams,
     });
-    return response.data.data;
+    return response.data;
   }
 
   async getQuestionById(id: string): Promise<QuestionBankItem> {

@@ -109,7 +109,14 @@ export const MatrixViewDialog = () => {
                         topicIdx % 2 === 0 ? 'bg-white dark:bg-gray-950' : 'bg-gray-50 dark:bg-gray-900'
                       }
                     >
-                      <td className="border-r p-3 font-medium">{topic.name}</td>
+                      <td className="border-r p-3 font-medium">
+                        <div className="space-y-1">
+                          <div>{topic.name}</div>
+                          {topic.description && (
+                            <div className="text-xs font-normal text-gray-500">{topic.description}</div>
+                          )}
+                        </div>
+                      </td>
                       {topicCells.map((cell) => {
                         const status = getCellStatus(cell as MatrixCell);
                         const bgColorMap = {

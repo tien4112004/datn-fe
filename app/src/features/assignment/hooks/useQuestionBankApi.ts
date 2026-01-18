@@ -30,7 +30,15 @@ export const useQuestionBankList = (filters: QuestionBankFilters = {}) => {
 
   return useQuery({
     queryKey: questionBankKeys.list(filters),
-    queryFn: () => apiService.getQuestions(filters),
+    queryFn: async () => {
+      const response = await apiService.getQuestions(filters);
+      return {
+        questions: response.data,
+        total: response.pagination?.totalItems || 0,
+        page: response.pagination?.currentPage || 1,
+        limit: response.pagination?.pageSize || 10,
+      };
+    },
     staleTime: 30000, // 30 seconds
     gcTime: 300000, // 5 minutes
   });

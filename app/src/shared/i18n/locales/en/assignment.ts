@@ -398,6 +398,7 @@ export default {
       topicsLabel: 'Topics',
       addTopic: 'Add Topic',
       topicPlaceholder: 'Topic name...',
+      descriptionPlaceholder: 'Topic description (optional)...',
       emptyMessage: 'Add topics to see the matrix',
       done: 'Done',
       tableHeaders: {

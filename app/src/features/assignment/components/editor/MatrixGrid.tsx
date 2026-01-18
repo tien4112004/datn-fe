@@ -40,7 +40,14 @@ export const MatrixGrid = () => {
         <TableBody>
           {topics.map((topic) => (
             <TableRow key={topic.id}>
-              <TableCell className="font-medium">{topic.name || t('tableHeaders.topic')}</TableCell>
+              <TableCell className="font-medium">
+                <div className="space-y-1">
+                  <div>{topic.name || t('tableHeaders.topic')}</div>
+                  {topic.description && (
+                    <div className="line-clamp-2 text-xs font-normal text-gray-500">{topic.description}</div>
+                  )}
+                </div>
+              </TableCell>
               {difficulties.map((difficulty) => {
                 const cell = matrixCells?.find(
                   (c) => c.topicId === topic.id && c.difficulty === difficulty.value

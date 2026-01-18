@@ -14,12 +14,15 @@ import { AssignmentEditorLayout } from '../components/editor/AssignmentEditorLay
 import { MetadataEditDialog } from '../components/editor/MetadataEditDialog';
 import { MatrixEditorDialog } from '../components/editor/MatrixEditorDialog';
 import { MatrixViewDialog } from '../components/editor/MatrixViewDialog';
+import { QuestionBankDialog } from '../components/question-bank';
 import { DIFFICULTY } from '../types';
+import type { Question } from '../types';
 import { useCreateAssignment, useUpdateAssignment } from '../hooks/useAssignmentApi';
 import { useDirtyFormTracking } from '../hooks/useDirtyFormTracking';
 import { useUnsavedChangesBlocker } from '@/shared/hooks';
 import { UnsavedChangesDialog } from '@/shared/components/modals/UnsavedChangesDialog';
 import { useAssignmentFormStore } from '../stores/useAssignmentFormStore';
+import { useAssignmentEditorStore } from '../stores/useAssignmentEditorStore';
 
 export const AssignmentEditorPage = () => {
   const navigate = useNavigate();
@@ -33,6 +36,10 @@ export const AssignmentEditorPage = () => {
   const isDirty = useAssignmentFormStore((state) => state.isDirty);
   const markClean = useAssignmentFormStore((state) => state.markClean);
   const initialize = useAssignmentFormStore((state) => state.initialize);
+
+  // Get editor UI state
+  const isQuestionBankOpen = useAssignmentEditorStore((state) => state.isQuestionBankOpen);
+  const setQuestionBankOpen = useAssignmentEditorStore((state) => state.setQuestionBankOpen);
 
   // Track if save was successful to prevent blocking on navigation after save
   const saveSuccessRef = React.useRef(false);
@@ -162,6 +169,32 @@ export const AssignmentEditorPage = () => {
     }
   };
 
+  const handleAddQuestionsFromBank = (questions: Question[]) => {
+    // Get current state from store
+    const { addQuestion, topics } = useAssignmentFormStore.getState();
+
+    // Use the first topic as default, or the default topic
+    const defaultTopic = topics[0];
+    if (!defaultTopic) {
+      toast.error(t('toasts.noTopicError'));
+      return;
+    }
+
+    // Convert each question and add to assignment
+    questions.forEach((question) => {
+      const assignmentQuestion = {
+        question: {
+          ...question,
+          topicId: defaultTopic.id,
+        },
+        points: question.points || 1,
+      };
+      addQuestion(assignmentQuestion);
+    });
+
+    toast.success(t('toasts.questionsAdded', { count: questions.length }));
+  };
+
   return (
     <div className="flex min-h-screen flex-col bg-white dark:bg-gray-950">
       <div className="p-8">
@@ -187,6 +220,11 @@ export const AssignmentEditorPage = () => {
         <MetadataEditDialog />
         <MatrixEditorDialog />
         <MatrixViewDialog />
+        <QuestionBankDialog
+          open={isQuestionBankOpen}
+          onOpenChange={setQuestionBankOpen}
+          onAddQuestions={handleAddQuestionsFromBank}
+        />
 
         {/* Unsaved Changes Dialog */}
         <UnsavedChangesDialog

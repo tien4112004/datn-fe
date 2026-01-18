@@ -397,6 +397,7 @@ export default {
       topicsLabel: 'Chủ Đề',
       addTopic: 'Thêm Chủ Đề',
       topicPlaceholder: 'Tên chủ đề...',
+      descriptionPlaceholder: 'Mô tả chủ đề (tùy chọn)...',
       emptyMessage: 'Thêm chủ đề để xem ma trận',
       done: 'Xong',
       tableHeaders: {

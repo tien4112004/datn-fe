@@ -27,7 +27,6 @@ import DataTable from '@/shared/components/table/DataTable';
 import {
   QuestionBankImportDialog,
   CopyToPersonalDialog,
-  QuestionContentPreview,
   QuestionBankFilters,
 } from '@/features/assignment/components/question-bank';
 import { getSubjectName, getQuestionTypeName, getDifficultyName } from '@aiprimary/core';
@@ -189,12 +188,6 @@ export function TeacherQuestionBankPage() {
         meta: {
           isGrow: true,
         },
-      }),
-      columnHelper.display({
-        id: 'content',
-        header: t('table.columns.content'),
-        cell: (info) => <QuestionContentPreview question={info.row.original} />,
-        size: 200,
       }),
       columnHelper.accessor('type', {
         header: t('table.columns.questionType'),

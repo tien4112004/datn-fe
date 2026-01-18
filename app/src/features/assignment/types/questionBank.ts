@@ -1,4 +1,5 @@
 import type { QuestionBankItem } from '@aiprimary/core';
+import type { ApiResponse } from '@aiprimary/api';
 import type { QuestionType, Difficulty, SubjectCode, BankType } from '.';
 
 // Re-export core type
@@ -30,10 +31,16 @@ export interface QuestionBankFilters {
 }
 
 /**
- * Response structure for question bank API
- * UI/API-specific type for paginated responses
+ * Response structure for question bank API service
+ * Uses standard ApiResponse with QuestionBankItem array
  */
-export interface QuestionBankResponse {
+export type QuestionBankApiResponse = ApiResponse<QuestionBankItem[]>;
+
+/**
+ * Response structure returned by useQuestionBankList hook
+ * Transforms ApiResponse into a flattened structure for easier use
+ */
+export interface QuestionBankListResponse {
   questions: QuestionBankItem[];
   /** Total matching questions */
   total: number;
@@ -61,7 +68,7 @@ export interface UpdateQuestionRequest {
  */
 export interface QuestionBankApiService {
   // Query operations
-  getQuestions(filters: QuestionBankFilters): Promise<QuestionBankResponse>;
+  getQuestions(filters: QuestionBankFilters): Promise<QuestionBankApiResponse>;
   getQuestionById(id: string): Promise<QuestionBankItem>;
 
   // CRUD operations

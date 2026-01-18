@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Grid3x3, Eye, Edit } from 'lucide-react';
+import { Grid3x3, Edit } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
 import { useAssignmentEditorStore } from '../../stores/useAssignmentEditorStore';
 import { useAssignmentFormStore } from '../../stores/useAssignmentFormStore';
@@ -9,8 +9,7 @@ import { CollapsibleSection } from './CollapsibleSection';
 
 export const AssessmentMatrixPanel = () => {
   const { t } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.matrix' });
-  const setMatrixEditorOpen = useAssignmentEditorStore((state) => state.setMatrixEditorOpen);
-  const setMatrixViewOpen = useAssignmentEditorStore((state) => state.setMatrixViewOpen);
+  const setMainView = useAssignmentEditorStore((state) => state.setMainView);
 
   // Get data from store
   const matrixCells = useAssignmentFormStore((state) => state.matrixCells);
@@ -26,17 +25,14 @@ export const AssessmentMatrixPanel = () => {
       defaultOpen={true}
       actions={
         <div className="flex gap-1">
-          <Button type="button" size="sm" variant="ghost" onClick={() => setMatrixViewOpen(true)}>
-            <Eye className="mr-1 h-3 w-3" />
-          </Button>
-          <Button type="button" size="sm" variant="ghost" onClick={() => setMatrixEditorOpen(true)}>
+          <Button type="button" size="sm" variant="ghost" onClick={() => setMainView('matrix')}>
             <Edit className="mr-1 h-3 w-3" />
           </Button>
         </div>
       }
     >
       {!hasQuestionsOrMatrix ? (
-        <MatrixEmptyState onOpenEditor={() => setMatrixEditorOpen(true)} />
+        <MatrixEmptyState onOpenEditor={() => setMainView('matrix')} />
       ) : (
         <MatrixPreviewSummary />
       )}

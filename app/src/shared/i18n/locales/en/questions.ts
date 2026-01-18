@@ -134,6 +134,8 @@ export default {
       optionImage: 'Option Image',
       explanation: 'Explanation (Optional)',
       explanationPlaceholder: 'Add an explanation for the correct answer...',
+      removeImage: 'Remove image',
+      addImage: 'Add image',
     },
     viewing: {
       options: 'Options:',

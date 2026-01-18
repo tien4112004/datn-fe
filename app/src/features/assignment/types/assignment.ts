@@ -82,6 +82,9 @@ export interface UpdateAssignmentRequest {
   id?: string;
   title?: string;
   description?: string;
+  subject?: string;
+  topics?: AssignmentTopic[];
+  matrixCells?: MatrixCell[];
   dueDate?: string;
   questions?: AssignmentQuestionWithTopic[];
   totalPoints?: number;

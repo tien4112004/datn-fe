@@ -51,11 +51,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         url: '/question-bank',
         icon: Database,
       },
-      {
-        title: t('assessmentMatrix'),
-        url: '/assessment-matrix/builder',
-        icon: Grid3x3,
-      },
     ],
     navSecondary: [
       {

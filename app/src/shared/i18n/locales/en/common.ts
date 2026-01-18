@@ -8,7 +8,6 @@ export default {
       files: 'Files',
       classes: 'Classes',
       subjects: 'Subjects',
-      assessmentMatrix: 'Exam Matrix',
       schedules: 'Schedules',
       home: 'Home',
       admin: 'Administration',

@@ -1,4 +1,4 @@
-import { List, FileText, ListOrdered } from 'lucide-react';
+import { List, FileText, ListOrdered, Grid3x3 } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
 import { useTranslation } from 'react-i18next';
 import { CollapsibleSection } from './CollapsibleSection';
@@ -52,6 +52,20 @@ export const QuestionNavigator = () => {
           title={t('assignmentInfo')}
         >
           <FileText className="h-3 w-3" />
+        </button>
+
+        {/* Matrix Builder Icon */}
+        <button
+          type="button"
+          onClick={() => setMainView('matrix')}
+          className={`flex h-8 w-full items-center justify-center rounded text-xs transition-colors ${
+            mainView === 'matrix'
+              ? 'bg-primary text-primary-foreground'
+              : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700'
+          }`}
+          title={t('matrixBuilder')}
+        >
+          <Grid3x3 className="h-3 w-3" />
         </button>
 
         {/* Question Numbers */}

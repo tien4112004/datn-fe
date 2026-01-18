@@ -134,6 +134,8 @@ export default {
       optionImage: 'Hình ảnh lựa chọn',
       explanation: 'Giải thích (Tùy chọn)',
       explanationPlaceholder: 'Thêm giải thích cho đáp án đúng...',
+      removeImage: 'Xóa hình ảnh',
+      addImage: 'Thêm hình ảnh',
     },
     viewing: {
       options: 'Các lựa chọn:',

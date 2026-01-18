@@ -15,7 +15,6 @@ import settings from './settings';
 import classes from './classes';
 import assignment from './assignment';
 import admin from './admin';
-import assessmentMatrix from './assessmentMatrix';
 import dashboard from './dashboard';
 import comments from './comments';
 import questions from './questions';
@@ -35,7 +34,6 @@ export default {
   dashboard,
   assignment,
   admin,
-  assessmentMatrix,
   comments,
   questions,
 };

@@ -68,8 +68,6 @@ export const ClassListPage = () => {
           <ViewToggle value={currentViewMode} onValueChange={handleViewModeChange} />
         </div>
 
-        <ClassFilters />
-
         {currentViewMode === 'list' ? <ClassTable /> : <ClassGrid />}
       </div>
     </>

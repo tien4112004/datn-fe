@@ -12,8 +12,6 @@ import {
 } from '@/shared/components/ui/breadcrumb';
 import { AssignmentEditorLayout } from '../components/editor/AssignmentEditorLayout';
 import { MetadataEditDialog } from '../components/editor/MetadataEditDialog';
-import { MatrixEditorDialog } from '../components/editor/MatrixEditorDialog';
-import { MatrixViewDialog } from '../components/editor/MatrixViewDialog';
 import { QuestionBankDialog } from '../components/question-bank';
 import { DIFFICULTY } from '../types';
 import type { Question } from '../types';
@@ -187,7 +185,7 @@ export const AssignmentEditorPage = () => {
           ...question,
           topicId: defaultTopic.id,
         },
-        points: question.points || 1,
+        points: 1,
       };
       addQuestion(assignmentQuestion);
     });
@@ -218,8 +216,6 @@ export const AssignmentEditorPage = () => {
 
         {/* Dialogs */}
         <MetadataEditDialog />
-        <MatrixEditorDialog />
-        <MatrixViewDialog />
         <QuestionBankDialog
           open={isQuestionBankOpen}
           onOpenChange={setQuestionBankOpen}

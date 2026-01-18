@@ -17,27 +17,51 @@ export default class QuestionBankService implements QuestionBankApiService {
   }
 
   async getQuestions(filters?: QuestionBankFilters): Promise<QuestionBankApiResponse> {
-    // Convert arrays to comma-separated strings for API
-    const queryParams: any = { ...filters };
+    // Build query params matching backend API expectations
+    // Field names must match Spring Boot controller parameters exactly
+    const queryParams: Record<string, any> = {};
 
-    if (Array.isArray(filters?.difficulty)) {
-      queryParams.difficulty = filters.difficulty.join(',');
-    }
-    if (Array.isArray(filters?.subject)) {
-      queryParams.subjectCode = filters.subject.join(',');
-    }
-    if (Array.isArray(filters?.questionType)) {
-      queryParams.questionType = filters.questionType.join(',');
-    }
-    if (Array.isArray(filters?.grade)) {
-      queryParams.grade = filters.grade.join(',');
-    }
-    if (Array.isArray(filters?.chapter)) {
-      queryParams.chapter = filters.chapter.join(',');
-    }
-
-    // Ensure bankType is set (personal or public)
+    // Required field
     queryParams.bankType = filters?.bankType || 'personal';
+
+    // Search (maps to 'search' param, searches in title field)
+    if (filters?.search) {
+      queryParams.search = filters.search;
+    }
+
+    // Filter fields (arrays for multi-select)
+    // Arrays will be sent as repeated query params: ?type=A&type=B
+    if (filters?.type && filters.type.length > 0) {
+      queryParams.type = filters.type;
+    }
+    if (filters?.difficulty && filters.difficulty.length > 0) {
+      queryParams.difficulty = filters.difficulty;
+    }
+    if (filters?.subject && filters.subject.length > 0) {
+      queryParams.subject = filters.subject;
+    }
+    if (filters?.grade && filters.grade.length > 0) {
+      queryParams.grade = filters.grade;
+    }
+    if (filters?.chapter && filters.chapter.length > 0) {
+      queryParams.chapter = filters.chapter;
+    }
+
+    // Pagination
+    if (filters?.page) {
+      queryParams.page = filters.page;
+    }
+    if (filters?.pageSize) {
+      queryParams.pageSize = filters.pageSize;
+    }
+
+    // Sorting
+    if (filters?.sortBy) {
+      queryParams.sortBy = filters.sortBy;
+    }
+    if (filters?.sortDirection) {
+      queryParams.sortDirection = filters.sortDirection;
+    }
 
     const response = await this.apiClient.get(`${this.baseUrl}/api/question-bank`, {
       params: queryParams,

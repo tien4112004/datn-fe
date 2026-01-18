@@ -1,7 +1,7 @@
 import { createColumnHelper, getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 
 import DataTable from '@/components/table/DataTable';
@@ -13,7 +13,12 @@ import { ClassActionsMenu } from './ClassActionsMenu';
 export const ClassTable = () => {
   const { t } = useTranslation('classes', { keyPrefix: 'table' });
   const { t: tCommon } = useTranslation('common');
+  const navigate = useNavigate();
   const columnHelper = createColumnHelper<Class>();
+
+  const handleRowClick = (row: any) => {
+    navigate(`/classes/${row.original.id}`);
+  };
 
   // Use selectors to prevent unnecessary re-renders
   const filters = useClassStore((state) => state.filters);
@@ -114,6 +119,8 @@ export const ClassTable = () => {
         table={table}
         isLoading={isLoading}
         emptyState={<div className="text-muted-foreground">{t('noClasses')}</div>}
+        onClickRow={handleRowClick}
+        rowStyle="cursor-pointer hover:bg-muted/50"
         showPagination={true}
       />
     </div>

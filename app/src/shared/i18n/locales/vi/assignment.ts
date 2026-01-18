@@ -295,6 +295,8 @@ export default {
       createSuccess: 'Đã tạo bài tập thành công!',
       updateSuccess: 'Đã cập nhật bài tập thành công!',
       saveError: 'Không thể lưu bài tập',
+      noTopicError: 'Vui lòng thêm ít nhất một chủ đề trước khi thêm câu hỏi từ ngân hàng',
+      questionsAdded: 'Đã thêm {{count}} câu hỏi vào bài tập',
     },
 
     // Bảng điều khiển câu hỏi
@@ -405,6 +407,13 @@ export default {
       },
     },
 
+    // Bảng xây dựng ma trận
+    matrixBuilder: {
+      panelTitle: 'Bảng Ma Trận Đánh Giá',
+      description:
+        'Cấu hình chủ đề và số lượng câu hỏi yêu cầu cho mỗi mức độ khó. Thay đổi được lưu tự động.',
+    },
+
     // Hộp thoại xem ma trận
     matrixView: {
       title: 'Ma Trận Đánh Giá',
@@ -457,6 +466,7 @@ export default {
       questionsCount_plural: '{{count}} Câu hỏi',
       listView: 'Xem Danh Sách',
       assignmentInfo: 'Thông Tin Bài Tập',
+      matrixBuilder: 'Ma Trận',
       untitled: 'Chưa có tiêu đề',
     },
 

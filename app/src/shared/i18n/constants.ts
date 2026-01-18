@@ -15,7 +15,6 @@ export const I18N_NAMESPACES = {
   MINDMAP: 'mindmap',
   CLASSES: 'classes',
   ASSIGNMENT: 'assignment',
-  EXAM_MATRIX: 'assessmentMatrix',
   COMMENTS: 'comments',
 } as const;
 

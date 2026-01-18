@@ -71,6 +71,10 @@ export const assignmentApi = {
       title: request.title,
       description: request.description,
       questions: request.questions || [],
+      topics: request.topics || [],
+      matrixCells: request.matrixCells || [],
+      subject: request.subject,
+      shuffleQuestions: request.shuffleQuestions || false,
       dueDate: request.dueDate,
       totalPoints: request.totalPoints || 0,
       status: 'draft',
@@ -100,6 +104,10 @@ export const assignmentApi = {
       ...(request.dueDate !== undefined && { dueDate: request.dueDate }),
       ...(request.questions !== undefined && { questions: request.questions }),
       ...(request.totalPoints !== undefined && { totalPoints: request.totalPoints }),
+      ...(request.subject !== undefined && { subject: request.subject }),
+      ...(request.topics !== undefined && { topics: request.topics }),
+      ...(request.matrixCells !== undefined && { matrixCells: request.matrixCells }),
+      ...(request.shuffleQuestions !== undefined && { shuffleQuestions: request.shuffleQuestions }),
       updatedAt: new Date().toISOString(),
     };
 

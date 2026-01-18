@@ -114,12 +114,12 @@ export function GroupEditing({ question, onChange }: GroupEditingProps) {
               className="min-h-[120px] w-full flex-1 resize-none border-0 bg-transparent text-gray-900 focus:outline-none focus:ring-0 dark:text-gray-100"
               rows={6}
             />
-            {titleImageUrl !== undefined ? (
+            {titleImageUrl ? (
               <Button
                 type="button"
                 variant="ghost"
                 size="sm"
-                onClick={() => setTitleImageUrl(undefined)}
+                onClick={() => setTitleImageUrl('')}
                 title={t('group.editing.removeImage', { defaultValue: 'Remove Image' })}
                 className="self-start"
               >

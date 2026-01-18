@@ -33,33 +33,28 @@ export const QuestionBankFilters = ({
   const { data: subjects } = useQuestionBankSubjects();
   const { data: grades } = useQuestionBankGrades();
 
-  // Conditional chapter fetch
+  // Conditional chapter fetch - only when exactly one subject and one grade are selected
   const showChapters = shouldShowChapterFilter();
-  const subjectForChapters =
-    Array.isArray(filters.subjectCode) && filters.subjectCode.length === 1
-      ? filters.subjectCode[0]
-      : undefined;
-  const gradeForChapters =
-    Array.isArray(filters.grade) && filters.grade.length === 1 ? filters.grade[0] : undefined;
+  const subjectForChapters = filters.subject?.length === 1 ? filters.subject[0] : undefined;
+  const gradeForChapters = filters.grade?.length === 1 ? filters.grade[0] : undefined;
 
   const { data: chapters } = useQuestionBankChapters(subjectForChapters, gradeForChapters);
 
-  // Reset chapter filter when subject/grade changes
+  // Reset chapter filter when subject/grade changes or becomes unavailable
   useEffect(() => {
     if (!showChapters && filters.chapter) {
       setFilters({ chapter: undefined });
     }
-  }, [showChapters]);
+  }, [showChapters, filters.subject, filters.grade]);
 
   const handleSearchChange = (value: string) => {
-    setFilters({ searchText: value });
+    setFilters({ search: value });
   };
 
   const handleCheckboxChange = (filterKey: keyof typeof filters, value: string, checked: boolean) => {
     const currentValues = (filters[filterKey] as string[]) || [];
     const newValues = checked ? [...currentValues, value] : currentValues.filter((v) => v !== value);
-
-    setFilters({ [filterKey]: newValues.length ? newValues : undefined });
+    setFilters({ [filterKey]: newValues.length > 0 ? newValues : undefined });
   };
 
   return (
@@ -82,7 +77,7 @@ export const QuestionBankFilters = ({
         </Button>
         <div className="flex flex-1 gap-2">
           <SearchBar
-            value={filters.searchText}
+            value={filters.search}
             onChange={handleSearchChange}
             placeholder={t('questionBank.filters.search')}
             debounceTime={300}
@@ -113,9 +108,9 @@ export const QuestionBankFilters = ({
                   className="hover:bg-accent flex cursor-pointer items-center gap-2 rounded-md p-1 transition-colors"
                 >
                   <Checkbox
-                    checked={Array.isArray(filters.questionType) && filters.questionType.includes(type.value)}
+                    checked={filters.type?.includes(type.value) || false}
                     onCheckedChange={(checked) =>
-                      handleCheckboxChange('questionType', type.value, checked as boolean)
+                      handleCheckboxChange('type', type.value, checked as boolean)
                     }
                   />
                   <span className="text-xs font-medium">{type.label}</span>
@@ -136,9 +131,7 @@ export const QuestionBankFilters = ({
                   className="hover:bg-accent flex cursor-pointer items-center gap-2 rounded-md p-1 transition-colors"
                 >
                   <Checkbox
-                    checked={
-                      Array.isArray(filters.difficulty) && filters.difficulty.includes(difficulty.value)
-                    }
+                    checked={filters.difficulty?.includes(difficulty.value) || false}
                     onCheckedChange={(checked) =>
                       handleCheckboxChange('difficulty', difficulty.value, checked as boolean)
                     }
@@ -161,11 +154,9 @@ export const QuestionBankFilters = ({
                   className="hover:bg-accent flex cursor-pointer items-center gap-2 rounded-md p-1 transition-colors"
                 >
                   <Checkbox
-                    checked={
-                      Array.isArray(filters.subjectCode) && filters.subjectCode.includes(subject as any)
-                    }
+                    checked={filters.subject?.includes(subject) || false}
                     onCheckedChange={(checked) =>
-                      handleCheckboxChange('subjectCode', subject, checked as boolean)
+                      handleCheckboxChange('subject', subject, checked as boolean)
                     }
                   />
                   <span className="text-xs font-medium">{getSubjectName(subject)}</span>
@@ -186,7 +177,7 @@ export const QuestionBankFilters = ({
                   className="hover:bg-accent flex cursor-pointer items-center gap-2 rounded-md p-1 transition-colors"
                 >
                   <Checkbox
-                    checked={Array.isArray(filters.grade) && filters.grade.includes(grade)}
+                    checked={filters.grade?.includes(grade) || false}
                     onCheckedChange={(checked) => handleCheckboxChange('grade', grade, checked as boolean)}
                   />
                   <span className="text-xs font-medium">{getGradeName(grade)}</span>
@@ -208,7 +199,7 @@ export const QuestionBankFilters = ({
                     className="hover:bg-accent flex cursor-pointer items-center gap-2 rounded-md p-1 transition-colors"
                   >
                     <Checkbox
-                      checked={Array.isArray(filters.chapter) && filters.chapter.includes(chapter)}
+                      checked={filters.chapter?.includes(chapter) || false}
                       onCheckedChange={(checked) =>
                         handleCheckboxChange('chapter', chapter, checked as boolean)
                       }

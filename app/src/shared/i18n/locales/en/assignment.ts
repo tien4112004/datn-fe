@@ -295,6 +295,8 @@ export default {
       createSuccess: 'Assignment created successfully!',
       updateSuccess: 'Assignment updated successfully!',
       saveError: 'Failed to save assignment',
+      noTopicError: 'Please add at least one topic before adding questions from the bank',
+      questionsAdded: '{{count}} question(s) added to the assignment',
     },
 
     // Questions panel and toolbar
@@ -406,6 +408,13 @@ export default {
       },
     },
 
+    // Matrix builder panel
+    matrixBuilder: {
+      panelTitle: 'Assessment Matrix Builder',
+      description:
+        'Configure topics and required question counts for each difficulty level. Changes are saved automatically.',
+    },
+
     // Matrix view dialog
     matrixView: {
       title: 'Assessment Matrix',
@@ -458,6 +467,7 @@ export default {
       questionsCount_plural: '{{count}} Questions',
       listView: 'List View',
       assignmentInfo: 'Assignment Info',
+      matrixBuilder: 'Matrix Builder',
       untitled: 'Untitled',
     },
 

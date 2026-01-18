@@ -3,7 +3,7 @@ import { devtools } from 'zustand/middleware';
 import type { AssignmentQuestionWithTopic, MatrixCell, AssignmentTopic } from '../types';
 import { VIEW_MODE, type ViewMode } from '@aiprimary/core';
 
-type MainView = 'info' | 'questions';
+type MainView = 'info' | 'questions' | 'matrix';
 
 interface AssignmentEditorState {
   // UI State
@@ -14,7 +14,6 @@ interface AssignmentEditorState {
   questionViewModes: Map<string, ViewMode>;
   isMetadataDialogOpen: boolean;
   isMatrixEditorOpen: boolean;
-  isMatrixViewOpen: boolean;
   mainView: MainView;
 
   // Actions
@@ -26,7 +25,6 @@ interface AssignmentEditorState {
   toggleQuestionViewMode: (questionId: string) => void;
   setMetadataDialogOpen: (open: boolean) => void;
   setMatrixEditorOpen: (open: boolean) => void;
-  setMatrixViewOpen: (open: boolean) => void;
   setMainView: (view: MainView) => void;
 
   // Question operations (these will be used by components to update form)
@@ -55,7 +53,6 @@ export const useAssignmentEditorStore = create<AssignmentEditorState>()(
       questionViewModes: new Map(),
       isMetadataDialogOpen: false,
       isMatrixEditorOpen: false,
-      isMatrixViewOpen: false,
       mainView: 'info',
 
       // UI actions
@@ -78,7 +75,6 @@ export const useAssignmentEditorStore = create<AssignmentEditorState>()(
       },
       setMetadataDialogOpen: (open) => set({ isMetadataDialogOpen: open }),
       setMatrixEditorOpen: (open) => set({ isMatrixEditorOpen: open }),
-      setMatrixViewOpen: (open) => set({ isMatrixViewOpen: open }),
 
       // Reorder questions (used with drag-drop)
       reorderQuestions: (questions, oldIndex, newIndex) => {

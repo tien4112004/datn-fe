@@ -1,9 +1,9 @@
 import { useTranslation } from 'react-i18next';
 import { Input } from '@/shared/components/ui/input';
-import { useFormContext, useWatch } from 'react-hook-form';
-import type { AssignmentFormData, MatrixCell as MatrixCellType } from '../../types';
+import type { MatrixCell as MatrixCellType } from '../../types';
 import { validateMatrixCell } from '../../utils';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
+import { useAssignmentFormStore } from '../../stores/useAssignmentFormStore';
 
 interface MatrixCellProps {
   cell: MatrixCellType;
@@ -11,11 +11,7 @@ interface MatrixCellProps {
 
 export const MatrixCell = ({ cell }: MatrixCellProps) => {
   const { t } = useTranslation(I18N_NAMESPACES.ASSIGNMENT, { keyPrefix: 'assignmentEditor.matrixCell' });
-  const { control, setValue } = useFormContext<AssignmentFormData>();
-  const matrixCells = useWatch({ control, name: 'matrixCells' });
-
-  // Find the index of this cell in the array
-  const cellIndex = matrixCells?.findIndex((c) => c.id === cell.id) ?? -1;
+  const updateMatrixCell = useAssignmentFormStore((state) => state.updateMatrixCell);
 
   // Validate the cell
   const validation = validateMatrixCell(cell);
@@ -29,9 +25,7 @@ export const MatrixCell = ({ cell }: MatrixCellProps) => {
 
   const handleRequiredCountChange = (value: string) => {
     const numValue = parseInt(value, 10) || 0;
-    if (cellIndex !== -1) {
-      setValue(`matrixCells.${cellIndex}.requiredCount`, numValue);
-    }
+    updateMatrixCell(cell.id, { requiredCount: numValue });
   };
 
   return (

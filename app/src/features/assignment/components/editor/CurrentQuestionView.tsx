@@ -1,4 +1,3 @@
-import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { ChevronLeft, ChevronRight, Trash2, Eye, Pencil } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
@@ -6,22 +5,20 @@ import { Input } from '@/shared/components/ui/input';
 import { Label } from '@/shared/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
 import { useAssignmentEditorStore } from '../../stores/useAssignmentEditorStore';
-import type { AssignmentFormData } from '../../types';
+import { useAssignmentFormStore } from '../../stores/useAssignmentFormStore';
 import { QuestionRenderer } from '@/features/question';
 import { VIEW_MODE, type Question, getQuestionTypeName, getAllDifficulties } from '@aiprimary/core';
-import { useFieldArray } from 'react-hook-form';
 
 export const CurrentQuestionView = () => {
   const { t } = useTranslation('assignment');
   const { t: tQuestion } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.currentQuestion' });
-  const { register, watch, setValue, control } = useFormContext<AssignmentFormData>();
-  const { remove } = useFieldArray({
-    control,
-    name: 'questions',
-  });
+  const { t: tQuestions } = useTranslation('questions');
 
-  const questions = watch('questions');
-  const topics = watch('topics');
+  // Get data and actions from stores
+  const questions = useAssignmentFormStore((state) => state.questions);
+  const topics = useAssignmentFormStore((state) => state.topics);
+  const removeQuestion = useAssignmentFormStore((state) => state.removeQuestion);
+  const updateQuestion = useAssignmentFormStore((state) => state.updateQuestion);
 
   const currentQuestionIndex = useAssignmentEditorStore((state) => state.currentQuestionIndex);
   const setCurrentQuestionIndex = useAssignmentEditorStore((state) => state.setCurrentQuestionIndex);
@@ -53,7 +50,7 @@ export const CurrentQuestionView = () => {
         type: getQuestionTypeName(question.type),
       });
       if (window.confirm(confirmMessage)) {
-        remove(currentQuestionIndex);
+        removeQuestion(currentQuestionIndex);
         // Adjust current index if needed
         if (currentQuestionIndex >= questions.length - 1 && currentQuestionIndex > 0) {
           setCurrentQuestionIndex(currentQuestionIndex - 1);
@@ -63,8 +60,7 @@ export const CurrentQuestionView = () => {
   };
 
   const handleQuestionChange = (updatedQuestion: Question) => {
-    setValue(`questions.${currentQuestionIndex}`, {
-      ...assignmentQuestion,
+    updateQuestion(currentQuestionIndex, {
       question: {
         ...question,
         ...updatedQuestion,
@@ -173,7 +169,11 @@ export const CurrentQuestionView = () => {
             </Label>
             <Select
               value={question.topicId}
-              onValueChange={(value) => setValue(`questions.${currentQuestionIndex}.question.topicId`, value)}
+              onValueChange={(value) =>
+                updateQuestion(currentQuestionIndex, {
+                  question: { ...question, topicId: value },
+                })
+              }
             >
               <SelectTrigger id={`topic-${currentQuestionIndex}`} className="h-9 text-sm">
                 <SelectValue placeholder={t('collection.item.selectTopicPlaceholder') as string} />
@@ -198,7 +198,9 @@ export const CurrentQuestionView = () => {
             <Select
               value={question.difficulty}
               onValueChange={(value) =>
-                setValue(`questions.${currentQuestionIndex}.question.difficulty`, value as any)
+                updateQuestion(currentQuestionIndex, {
+                  question: { ...question, difficulty: value as any },
+                })
               }
             >
               <SelectTrigger id={`difficulty-${currentQuestionIndex}`} className="h-9 text-sm">
@@ -207,7 +209,7 @@ export const CurrentQuestionView = () => {
               <SelectContent>
                 {getAllDifficulties().map((difficulty) => (
                   <SelectItem key={difficulty.value} value={difficulty.value}>
-                    {t(difficulty.i18nKey as any)}
+                    {(tQuestions as any)(difficulty.i18nKey!)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -224,7 +226,12 @@ export const CurrentQuestionView = () => {
             <Input
               id={`points-${currentQuestionIndex}`}
               type="number"
-              {...register(`questions.${currentQuestionIndex}.points`, { valueAsNumber: true })}
+              value={points}
+              onChange={(e) =>
+                updateQuestion(currentQuestionIndex, {
+                  points: parseInt(e.target.value, 10) || 0,
+                })
+              }
               min={0}
               className="h-9 text-sm"
             />

@@ -7,7 +7,7 @@ import { Input } from '@/shared/components/ui/input';
 import { Label } from '@/shared/components/ui/label';
 import { Switch } from '@/shared/components/ui/switch';
 import { Textarea } from '@/shared/components/ui/textarea';
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2, ImagePlus, X } from 'lucide-react';
 import { generateId } from '@/shared/lib/utils';
 
 interface FillInBlankEditingProps {
@@ -151,20 +151,46 @@ export const FillInBlankEditing = ({ question, onChange }: FillInBlankEditingPro
       {/* Title */}
       <div className="space-y-1.5">
         <Label className="text-sm font-medium">{t('fillInBlank.editing.title')}</Label>
-        <Input
-          value={question.title}
-          onChange={(e) => updateQuestion({ title: e.target.value })}
-          placeholder={t('fillInBlank.editing.titlePlaceholder')}
-          className="h-9"
-        />
-      </div>
+        <div className="space-y-2 rounded-md border border-gray-300 bg-white p-2 dark:border-gray-600 dark:bg-gray-900">
+          <div className="flex items-center gap-2">
+            <Input
+              value={question.title}
+              onChange={(e) => updateQuestion({ title: e.target.value })}
+              placeholder={t('fillInBlank.editing.titlePlaceholder')}
+              className="h-9 flex-1 border-0 p-0 focus-visible:ring-0"
+            />
+            {question.titleImageUrl !== undefined ? (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => updateQuestion({ titleImageUrl: undefined })}
+                title={t('fillInBlank.editing.removeImage', { defaultValue: 'Remove Image' })}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            ) : (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => updateQuestion({ titleImageUrl: '' })}
+                title={t('fillInBlank.editing.addImage', { defaultValue: 'Add Image' })}
+              >
+                <ImagePlus className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
 
-      {/* Title Image */}
-      <ImageUploader
-        label={t('fillInBlank.editing.questionImage')}
-        value={question.titleImageUrl}
-        onChange={(titleImageUrl) => updateQuestion({ titleImageUrl })}
-      />
+          {question.titleImageUrl !== undefined && (
+            <ImageUploader
+              label={t('fillInBlank.editing.questionImage')}
+              value={question.titleImageUrl}
+              onChange={(titleImageUrl) => updateQuestion({ titleImageUrl })}
+            />
+          )}
+        </div>
+      </div>
 
       {/* Question Text with {{}} syntax */}
       <div className="space-y-1.5">

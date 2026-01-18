@@ -1,32 +1,16 @@
-import { useFormContext, useWatch } from 'react-hook-form';
-import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/shared/components/ui/table';
 import { MatrixCell } from './MatrixCell';
-import { useAssignmentEditorStore } from '../../stores/useAssignmentEditorStore';
-import type { AssignmentFormData } from '../../types';
+import { useAssignmentFormStore } from '../../stores/useAssignmentFormStore';
 import { getAllDifficulties, getDifficultyI18nKey } from '@aiprimary/core';
 
 export const MatrixGrid = () => {
   const { t } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.matrixEditor' });
-  const { t: tDifficulty } = useTranslation('assignment', { keyPrefix: 'difficulty' });
-  const { control, setValue } = useFormContext<AssignmentFormData>();
+  const { t: tDifficulty } = useTranslation('questions');
 
-  // Watch for changes
-  const questions = useWatch({ control, name: 'questions' });
-  const topics = useWatch({ control, name: 'topics' });
-  const matrixCells = useWatch({ control, name: 'matrixCells' });
-
-  const syncMatrixCounts = useAssignmentEditorStore((state) => state.syncMatrixCounts);
-
-  // Sync matrix counts whenever questions or topics change
-  useEffect(() => {
-    if (questions && topics && matrixCells) {
-      const updatedCells = syncMatrixCounts(questions, topics, matrixCells);
-      setValue('matrixCells', updatedCells);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [questions, topics]);
+  // Get data from store (matrix counts are auto-synced)
+  const topics = useAssignmentFormStore((state) => state.topics);
+  const matrixCells = useAssignmentFormStore((state) => state.matrixCells);
 
   if (!topics || topics.length === 0) {
     return (

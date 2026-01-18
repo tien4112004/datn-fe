@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Plus, AlertCircle } from 'lucide-react';
+import { Plus, AlertCircle, ImagePlus, X } from 'lucide-react';
 import type { GroupQuestion, SubQuestion } from '@aiprimary/core';
 import { VIEW_MODE } from '@/features/assignment/types';
 import { SubQuestionList } from './SubQuestionList';
 import { generateId } from '@/shared/lib/utils';
 import { ImageUploader } from '../shared';
+import { Button } from '@/shared/components/ui/button';
 
 interface GroupEditingProps {
   question: GroupQuestion;
@@ -104,21 +105,49 @@ export function GroupEditing({ question, onChange }: GroupEditingProps) {
             ({t('group.editing.groupDescriptionHint')})
           </span>
         </label>
-        <textarea
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          placeholder={t('group.editing.groupDescriptionPlaceholder')}
-          className="min-h-[120px] w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
-          rows={6}
-        />
-      </div>
+        <div className="space-y-2 rounded-md border border-gray-300 bg-white p-2 dark:border-gray-600 dark:bg-gray-800">
+          <div className="flex items-center gap-2">
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder={t('group.editing.groupDescriptionPlaceholder')}
+              className="min-h-[120px] w-full flex-1 resize-none border-0 bg-transparent text-gray-900 focus:outline-none focus:ring-0 dark:text-gray-100"
+              rows={6}
+            />
+            {titleImageUrl !== undefined ? (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => setTitleImageUrl(undefined)}
+                title={t('group.editing.removeImage', { defaultValue: 'Remove Image' })}
+                className="self-start"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            ) : (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => setTitleImageUrl('')}
+                title={t('group.editing.addImage', { defaultValue: 'Add Image' })}
+                className="self-start"
+              >
+                <ImagePlus className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
 
-      {/* Title Image Uploader */}
-      <ImageUploader
-        label={t('group.editing.titleImage')}
-        value={titleImageUrl}
-        onChange={setTitleImageUrl}
-      />
+          {titleImageUrl !== undefined && (
+            <ImageUploader
+              label={t('group.editing.titleImage')}
+              value={titleImageUrl}
+              onChange={setTitleImageUrl}
+            />
+          )}
+        </div>
+      </div>
 
       {/* Total Points Display */}
       <div className="flex items-center justify-between rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20">

@@ -1,13 +1,8 @@
 import { useTranslation } from 'react-i18next';
 import { getAllDifficulties, getDifficultyI18nKey } from '@aiprimary/core';
-import type { AssignmentTopic, MatrixCell, QuestionWithTopic } from '../../types';
+import type { MatrixCell } from '../../types';
 import { Badge } from '@/shared/components/ui/badge';
-
-interface MatrixPreviewSummaryProps {
-  topics: AssignmentTopic[];
-  matrixCells: MatrixCell[];
-  questions: QuestionWithTopic[];
-}
+import { useAssignmentFormStore } from '../../stores/useAssignmentFormStore';
 
 const getCellStatus = (cell: MatrixCell): 'valid' | 'warning' | 'info' => {
   if (cell.requiredCount === 0) return 'info';
@@ -15,12 +10,17 @@ const getCellStatus = (cell: MatrixCell): 'valid' | 'warning' | 'info' => {
   return 'warning';
 };
 
-export const MatrixPreviewSummary = ({ topics, matrixCells, questions }: MatrixPreviewSummaryProps) => {
+export const MatrixPreviewSummary = () => {
   const { t } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.matrix.preview' });
-  const { t: tDifficulty } = useTranslation('assignment', { keyPrefix: 'difficulty' });
+  const { t: tDifficulty } = useTranslation('questions');
   const { t: tMatrix } = useTranslation('assignment', {
     keyPrefix: 'assignmentEditor.matrixEditor.tableHeaders',
   });
+
+  // Get data from store (auto-synced)
+  const topics = useAssignmentFormStore((state) => state.topics);
+  const matrixCells = useAssignmentFormStore((state) => state.matrixCells);
+  const questions = useAssignmentFormStore((state) => state.questions);
 
   const difficulties = getAllDifficulties();
 

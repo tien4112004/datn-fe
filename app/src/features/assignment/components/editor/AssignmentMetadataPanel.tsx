@@ -1,4 +1,3 @@
-import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { FileText } from 'lucide-react';
 import { Input } from '@/shared/components/ui/input';
@@ -7,15 +6,22 @@ import { Label } from '@/shared/components/ui/label';
 import { Switch } from '@/shared/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
 import { getAllSubjects, getElementaryGrades } from '@aiprimary/core';
-import type { AssignmentFormData } from '../../types';
+import { useAssignmentFormStore } from '../../stores/useAssignmentFormStore';
 
 export const AssignmentMetadataPanel = () => {
   const { t } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.metadata' });
-  const { register, watch, setValue } = useFormContext<AssignmentFormData>();
 
-  const shuffleQuestions = watch('shuffleQuestions');
-  const subject = watch('subject');
-  const grade = watch('grade');
+  // Get data and actions from store
+  const title = useAssignmentFormStore((state) => state.title);
+  const description = useAssignmentFormStore((state) => state.description);
+  const subject = useAssignmentFormStore((state) => state.subject);
+  const grade = useAssignmentFormStore((state) => state.grade);
+  const shuffleQuestions = useAssignmentFormStore((state) => state.shuffleQuestions);
+  const setTitle = useAssignmentFormStore((state) => state.setTitle);
+  const setDescription = useAssignmentFormStore((state) => state.setDescription);
+  const setSubject = useAssignmentFormStore((state) => state.setSubject);
+  const setGrade = useAssignmentFormStore((state) => state.setGrade);
+  const setShuffleQuestions = useAssignmentFormStore((state) => state.setShuffleQuestions);
 
   const subjects = getAllSubjects();
   const grades = getElementaryGrades();
@@ -34,7 +40,8 @@ export const AssignmentMetadataPanel = () => {
           </Label>
           <Input
             id="title"
-            {...register('title')}
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
             className="mt-1.5 h-9 text-sm"
             placeholder={t('fields.titlePlaceholder')}
           />
@@ -45,7 +52,7 @@ export const AssignmentMetadataPanel = () => {
             <Label htmlFor="subject" className="text-xs text-gray-600 dark:text-gray-400">
               {t('fields.subject')}
             </Label>
-            <Select value={subject} onValueChange={(value) => setValue('subject', value)}>
+            <Select value={subject} onValueChange={setSubject}>
               <SelectTrigger id="subject" className="mt-1.5 h-9 text-sm">
                 <SelectValue placeholder={t('fields.subjectPlaceholder')} />
               </SelectTrigger>
@@ -63,7 +70,7 @@ export const AssignmentMetadataPanel = () => {
             <Label htmlFor="grade" className="text-xs text-gray-600 dark:text-gray-400">
               {t('fields.grade')}
             </Label>
-            <Select value={grade} onValueChange={(value) => setValue('grade', value)}>
+            <Select value={grade} onValueChange={setGrade}>
               <SelectTrigger id="grade" className="mt-1.5 h-9 text-sm">
                 <SelectValue placeholder={t('fields.gradePlaceholder')} />
               </SelectTrigger>
@@ -84,7 +91,8 @@ export const AssignmentMetadataPanel = () => {
           </Label>
           <Textarea
             id="description"
-            {...register('description')}
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
             className="mt-1.5 text-sm"
             rows={4}
             placeholder={t('fields.descriptionPlaceholder')}
@@ -92,11 +100,7 @@ export const AssignmentMetadataPanel = () => {
         </div>
 
         <div className="flex items-center gap-2 pt-2">
-          <Switch
-            id="shuffle"
-            checked={shuffleQuestions}
-            onCheckedChange={(checked) => setValue('shuffleQuestions', checked)}
-          />
+          <Switch id="shuffle" checked={shuffleQuestions} onCheckedChange={setShuffleQuestions} />
           <Label htmlFor="shuffle" className="text-sm text-gray-700 dark:text-gray-300">
             {t('fields.shuffleQuestions')}
           </Label>

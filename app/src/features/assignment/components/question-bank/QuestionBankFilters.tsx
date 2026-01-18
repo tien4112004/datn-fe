@@ -107,7 +107,7 @@ export const QuestionBankFilters = ({
               {t('questionBank.filters.type')}
             </Label>
             <div className="space-y-2">
-              {getAllQuestionTypes({ includeGroup: false }).map((type) => (
+              {getAllQuestionTypes({ includeGroup: true }).map((type) => (
                 <label
                   key={type.value}
                   className="hover:bg-accent flex cursor-pointer items-center gap-2 rounded-md p-1 transition-colors"

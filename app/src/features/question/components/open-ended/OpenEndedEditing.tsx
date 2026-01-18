@@ -1,7 +1,9 @@
 import type { OpenEndedQuestion } from '@/features/assignment/types';
 import { MarkdownEditor, ImageUploader, DifficultyBadge } from '../shared';
+import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
 import { Label } from '@/shared/components/ui/label';
+import { ImagePlus, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 interface OpenEndedEditingProps {
@@ -25,21 +27,46 @@ export const OpenEndedEditing = ({ question, onChange }: OpenEndedEditingProps) 
       {/* Question */}
       <div className="space-y-1">
         <Label className="text-xs font-medium text-gray-700 dark:text-gray-300">{t('labels.question')}</Label>
-        <div className="rounded-md border border-gray-300 bg-white p-2 dark:border-gray-600 dark:bg-gray-900">
-          <MarkdownEditor
-            value={question.title}
-            onChange={(title) => updateQuestion({ title })}
-            placeholder={t('placeholders.question')}
-          />
+        <div className="space-y-2 rounded-md border border-gray-300 bg-white p-2 dark:border-gray-600 dark:bg-gray-900">
+          <div className="flex items-center gap-2">
+            <MarkdownEditor
+              value={question.title}
+              onChange={(title) => updateQuestion({ title })}
+              placeholder={t('placeholders.question')}
+              className="flex-1"
+            />
+            {question.titleImageUrl !== undefined ? (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => updateQuestion({ titleImageUrl: undefined })}
+                title={t('buttons.removeImage', { ns: 'assignment', defaultValue: 'Remove Image' })}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            ) : (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => updateQuestion({ titleImageUrl: '' })}
+                title={t('buttons.addImage', { ns: 'assignment', defaultValue: 'Add Image' })}
+              >
+                <ImagePlus className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
+
+          {question.titleImageUrl !== undefined && (
+            <ImageUploader
+              label={t('labels.questionImage')}
+              value={question.titleImageUrl}
+              onChange={(titleImageUrl) => updateQuestion({ titleImageUrl })}
+            />
+          )}
         </div>
       </div>
-
-      {/* Question Image */}
-      <ImageUploader
-        label={t('labels.questionImage')}
-        value={question.titleImageUrl}
-        onChange={(titleImageUrl) => updateQuestion({ titleImageUrl })}
-      />
 
       {/* Max Length */}
       <div className="space-y-1">

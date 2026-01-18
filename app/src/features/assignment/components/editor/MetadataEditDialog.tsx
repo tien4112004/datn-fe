@@ -1,4 +1,3 @@
-import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import {
   Dialog,
@@ -16,22 +15,26 @@ import { Checkbox } from '@/shared/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
 import { getAllSubjects, getElementaryGrades } from '@aiprimary/core';
 import { useAssignmentEditorStore } from '../../stores/useAssignmentEditorStore';
-import type { AssignmentFormData } from '../../types';
+import { useAssignmentFormStore } from '../../stores/useAssignmentFormStore';
 
 export const MetadataEditDialog = () => {
   const { t } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.metadataDialog' });
-  const {
-    register,
-    formState: { errors },
-    watch,
-    setValue,
-  } = useFormContext<AssignmentFormData>();
+
+  // Get data and actions from stores
+  const title = useAssignmentFormStore((state) => state.title);
+  const description = useAssignmentFormStore((state) => state.description);
+  const subject = useAssignmentFormStore((state) => state.subject);
+  const grade = useAssignmentFormStore((state) => state.grade);
+  const shuffleQuestions = useAssignmentFormStore((state) => state.shuffleQuestions);
+  const setTitle = useAssignmentFormStore((state) => state.setTitle);
+  const setDescription = useAssignmentFormStore((state) => state.setDescription);
+  const setSubject = useAssignmentFormStore((state) => state.setSubject);
+  const setGrade = useAssignmentFormStore((state) => state.setGrade);
+  const setShuffleQuestions = useAssignmentFormStore((state) => state.setShuffleQuestions);
+
   const isMetadataDialogOpen = useAssignmentEditorStore((state) => state.isMetadataDialogOpen);
   const setMetadataDialogOpen = useAssignmentEditorStore((state) => state.setMetadataDialogOpen);
 
-  const shuffleQuestions = watch('shuffleQuestions') ?? false;
-  const subject = watch('subject');
-  const grade = watch('grade');
   const subjects = getAllSubjects();
   const grades = getElementaryGrades();
 
@@ -52,15 +55,19 @@ export const MetadataEditDialog = () => {
             <Label htmlFor="title">
               {t('fields.title')} <span className="text-red-500">*</span>
             </Label>
-            <Input id="title" {...register('title')} placeholder={t('placeholders.title')} />
-            {errors.title && <p className="text-xs text-red-500">{errors.title.message}</p>}
+            <Input
+              id="title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder={t('placeholders.title')}
+            />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="subject">
               {t('fields.subject')} <span className="text-red-500">*</span>
             </Label>
-            <Select value={subject} onValueChange={(value) => setValue('subject', value)}>
+            <Select value={subject} onValueChange={setSubject}>
               <SelectTrigger id="subject">
                 <SelectValue placeholder={t('placeholders.subject')} />
               </SelectTrigger>
@@ -72,12 +79,11 @@ export const MetadataEditDialog = () => {
                 ))}
               </SelectContent>
             </Select>
-            {errors.subject && <p className="text-xs text-red-500">{errors.subject.message}</p>}
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="grade">{t('fields.grade')}</Label>
-            <Select value={grade} onValueChange={(value) => setValue('grade', value)}>
+            <Select value={grade} onValueChange={setGrade}>
               <SelectTrigger id="grade">
                 <SelectValue placeholder={t('placeholders.grade')} />
               </SelectTrigger>
@@ -95,7 +101,8 @@ export const MetadataEditDialog = () => {
             <Label htmlFor="description">{t('fields.description')}</Label>
             <Textarea
               id="description"
-              {...register('description')}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
               placeholder={t('placeholders.description')}
               rows={3}
             />
@@ -105,7 +112,7 @@ export const MetadataEditDialog = () => {
             <Checkbox
               id="shuffleQuestions"
               checked={shuffleQuestions}
-              onCheckedChange={(checked) => setValue('shuffleQuestions', checked as boolean)}
+              onCheckedChange={(checked) => setShuffleQuestions(checked as boolean)}
             />
             <Label
               htmlFor="shuffleQuestions"

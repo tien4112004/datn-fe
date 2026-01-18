@@ -1,4 +1,3 @@
-import { useFormContext, useFieldArray } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { Plus } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
@@ -8,11 +7,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/shared/components/ui/dropdown-menu';
-import type { AssignmentFormData } from '../../types';
 import { QUESTION_TYPE, DIFFICULTY } from '../../types';
 import { getAllQuestionTypes } from '@aiprimary/core';
 import { generateId } from '@/shared/lib/utils';
 import { useAssignmentEditorStore } from '../../stores/useAssignmentEditorStore';
+import { useAssignmentFormStore } from '../../stores/useAssignmentFormStore';
 
 interface AddQuestionButtonProps {
   className?: string;
@@ -20,17 +19,14 @@ interface AddQuestionButtonProps {
 
 export const AddQuestionButton = ({ className }: AddQuestionButtonProps) => {
   const { t } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.questions.toolbar' });
-  const { control, watch } = useFormContext<AssignmentFormData>();
-  const { append } = useFieldArray({
-    control,
-    name: 'questions',
-  });
 
-  const topics = watch('topics');
+  // Get data and actions from stores
+  const topics = useAssignmentFormStore((state) => state.topics);
+  const questions = useAssignmentFormStore((state) => state.questions);
+  const addQuestion = useAssignmentFormStore((state) => state.addQuestion);
   const defaultTopicId = topics[0]?.id || '';
   const setMainView = useAssignmentEditorStore((state) => state.setMainView);
   const setCurrentQuestionIndex = useAssignmentEditorStore((state) => state.setCurrentQuestionIndex);
-  const questions = watch('questions');
 
   const handleAddQuestion = (type: string) => {
     // Create appropriate data structure based on question type with better defaults
@@ -86,7 +82,7 @@ export const AddQuestionButton = ({ className }: AddQuestionButtonProps) => {
         data = {};
     }
 
-    append({
+    const newQuestion = {
       question: {
         id: generateId(),
         type: type as any,
@@ -97,7 +93,9 @@ export const AddQuestionButton = ({ className }: AddQuestionButtonProps) => {
         data,
       },
       points: 10,
-    } as any);
+    } as any;
+
+    addQuestion(newQuestion);
 
     // Switch to questions view and navigate to the new question
     setMainView('questions');

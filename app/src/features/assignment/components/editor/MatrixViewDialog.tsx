@@ -1,4 +1,3 @@
-import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import {
   Dialog,
@@ -11,8 +10,9 @@ import {
 import { Button } from '@/shared/components/ui/button';
 import { Badge } from '@/shared/components/ui/badge';
 import { useAssignmentEditorStore } from '../../stores/useAssignmentEditorStore';
+import { useAssignmentFormStore } from '../../stores/useAssignmentFormStore';
 import { getAllDifficulties, getDifficultyI18nKey } from '@aiprimary/core';
-import type { AssignmentFormData, MatrixCell } from '../../types';
+import type { MatrixCell } from '../../types';
 
 const getCellStatus = (cell: MatrixCell): 'valid' | 'warning' | 'empty' => {
   if (cell.requiredCount === 0) return 'empty';
@@ -22,14 +22,14 @@ const getCellStatus = (cell: MatrixCell): 'valid' | 'warning' | 'empty' => {
 
 export const MatrixViewDialog = () => {
   const { t } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.matrixView' });
-  const { t: tDifficulty } = useTranslation('assignment', { keyPrefix: 'difficulty' });
-  const { watch } = useFormContext<AssignmentFormData>();
+  const { t: tDifficulty } = useTranslation('questions');
+
+  // Get data from stores
+  const topics = useAssignmentFormStore((state) => state.topics);
+  const matrixCells = useAssignmentFormStore((state) => state.matrixCells);
+  const questions = useAssignmentFormStore((state) => state.questions);
   const isMatrixViewOpen = useAssignmentEditorStore((state) => state.isMatrixViewOpen);
   const setMatrixViewOpen = useAssignmentEditorStore((state) => state.setMatrixViewOpen);
-
-  const topics = watch('topics');
-  const matrixCells = watch('matrixCells');
-  const questions = watch('questions');
 
   const difficulties = getAllDifficulties();
 

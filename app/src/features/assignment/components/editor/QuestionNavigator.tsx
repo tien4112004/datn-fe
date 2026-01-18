@@ -1,15 +1,15 @@
-import { useFormContext } from 'react-hook-form';
 import { List, FileText, ListOrdered } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
 import { useTranslation } from 'react-i18next';
 import { CollapsibleSection } from './CollapsibleSection';
 import { useAssignmentEditorStore } from '../../stores/useAssignmentEditorStore';
-import type { AssignmentFormData } from '../../types';
+import { useAssignmentFormStore } from '../../stores/useAssignmentFormStore';
 
 export const QuestionNavigator = () => {
   const { t } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.navigator' });
-  const { watch } = useFormContext<AssignmentFormData>();
-  const questions = watch('questions');
+
+  // Get data from store
+  const questions = useAssignmentFormStore((state) => state.questions);
 
   const mainView = useAssignmentEditorStore((state) => state.mainView);
   const setMainView = useAssignmentEditorStore((state) => state.setMainView);

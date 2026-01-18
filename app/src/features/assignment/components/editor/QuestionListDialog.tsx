@@ -1,5 +1,4 @@
 import { useCallback, useMemo } from 'react';
-import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import {
   DndContext,
@@ -20,19 +19,19 @@ import {
 } from '@/shared/components/ui/dialog';
 import { SortableQuestionItem } from './SortableQuestionItem';
 import { useAssignmentEditorStore } from '../../stores/useAssignmentEditorStore';
-import type { AssignmentFormData } from '../../types';
+import { useAssignmentFormStore } from '../../stores/useAssignmentFormStore';
 import { Info } from 'lucide-react';
 
 export const QuestionListDialog = () => {
   const { t } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.questionList' });
-  const { watch, setValue } = useFormContext<AssignmentFormData>();
 
-  const questions = watch('questions');
-  const topics = watch('topics');
+  // Get data and actions from stores
+  const questions = useAssignmentFormStore((state) => state.questions);
+  const topics = useAssignmentFormStore((state) => state.topics);
+  const reorderQuestionsStore = useAssignmentFormStore((state) => state.reorderQuestions);
 
   const isOpen = useAssignmentEditorStore((state) => state.isQuestionListDialogOpen);
   const setOpen = useAssignmentEditorStore((state) => state.setQuestionListDialogOpen);
-  const reorderQuestions = useAssignmentEditorStore((state) => state.reorderQuestions);
 
   const items = useMemo(() => questions.map((field) => `question-${field.question.id}`), [questions]);
 
@@ -61,12 +60,11 @@ export const QuestionListDialog = () => {
         const overIndex = questions.findIndex((q) => `question-${q.question.id}` === overId);
 
         if (activeIndex !== -1 && overIndex !== -1) {
-          const reordered = reorderQuestions(questions, activeIndex, overIndex);
-          setValue('questions', reordered, { shouldDirty: true });
+          reorderQuestionsStore(activeIndex, overIndex);
         }
       }
     },
-    [questions, reorderQuestions, setValue]
+    [questions, reorderQuestionsStore]
   );
 
   return (

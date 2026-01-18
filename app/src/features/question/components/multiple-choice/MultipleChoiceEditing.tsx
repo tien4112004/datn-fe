@@ -74,21 +74,46 @@ export const MultipleChoiceEditing = ({ question, onChange }: MultipleChoiceEdit
       {/* Question Title */}
       <div className="space-y-1">
         <Label className="text-xs font-medium text-gray-700 dark:text-gray-300">{t('title')}</Label>
-        <div className="rounded-md border border-gray-300 bg-white p-2 dark:border-gray-600 dark:bg-gray-900">
-          <MarkdownEditor
-            value={question.title}
-            onChange={(title) => updateQuestion({ title })}
-            placeholder={t('titlePlaceholder')}
-          />
+        <div className="space-y-2 rounded-md border border-gray-300 bg-white p-2 dark:border-gray-600 dark:bg-gray-900">
+          <div className="flex items-center gap-2">
+            <MarkdownEditor
+              value={question.title}
+              onChange={(title) => updateQuestion({ title })}
+              placeholder={t('titlePlaceholder')}
+              className="flex-1"
+            />
+            {question.titleImageUrl !== undefined ? (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => updateQuestion({ titleImageUrl: undefined })}
+                title={t('removeImage')}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            ) : (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => updateQuestion({ titleImageUrl: '' })}
+                title={t('addImage')}
+              >
+                <ImagePlus className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
+
+          {question.titleImageUrl !== undefined && (
+            <ImageUploader
+              label={t('questionImage')}
+              value={question.titleImageUrl}
+              onChange={(titleImageUrl) => updateQuestion({ titleImageUrl })}
+            />
+          )}
         </div>
       </div>
-
-      {/* Question Image */}
-      <ImageUploader
-        label={t('questionImage')}
-        value={question.titleImageUrl}
-        onChange={(titleImageUrl) => updateQuestion({ titleImageUrl })}
-      />
 
       {/* Options */}
       <div className="space-y-2">

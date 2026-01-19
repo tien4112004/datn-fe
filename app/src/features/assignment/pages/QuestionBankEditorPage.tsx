@@ -24,6 +24,7 @@ import {
   getAllDifficulties,
   getAllQuestionTypes,
   getAllSubjects,
+  getAllGrades,
   QUESTION_TYPE,
   SUBJECT_CODE,
   type Difficulty,
@@ -335,6 +336,27 @@ export function QuestionBankEditorPage() {
                         {getAllDifficulties().map((difficulty) => (
                           <SelectItem key={difficulty.value} value={difficulty.value}>
                             {t(difficulty.i18nKey as any)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>{t('form.grade')}</Label>
+                    <Select
+                      value={questionData.grade || ''}
+                      onValueChange={(value) =>
+                        setQuestionData({ ...questionData, grade: value || undefined })
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select grade (optional)" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {getAllGrades().map((grade) => (
+                          <SelectItem key={grade.code} value={grade.code}>
+                            {grade.name}
                           </SelectItem>
                         ))}
                       </SelectContent>

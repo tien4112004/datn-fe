@@ -3,11 +3,13 @@ import { useTranslation } from 'react-i18next';
 import type { GroupQuestion, Answer } from '@aiprimary/core';
 import { VIEW_MODE } from '@/features/assignment/types';
 import { SubQuestionList } from './SubQuestionList';
+import { QuestionNumber } from '../shared';
 
 interface GroupGradingProps {
   question: GroupQuestion;
   answer?: Answer;
   points?: number;
+  number?: number;
   onGradeChange?: (grade: { points: number; feedback?: string }) => void;
 }
 
@@ -20,7 +22,7 @@ interface GroupGradingProps {
  * - Provide overall feedback
  * - Set total points earned
  */
-export function GroupGrading({ question, answer, points, onGradeChange }: GroupGradingProps) {
+export function GroupGrading({ question, answer, points, number, onGradeChange }: GroupGradingProps) {
   const { t } = useTranslation('questions');
   const userAnswers = (answer as any)?.subAnswers || {};
   const [gradeData, setGradeData] = useState({
@@ -56,7 +58,12 @@ export function GroupGrading({ question, answer, points, onGradeChange }: GroupG
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
+      {number !== undefined && (
+        <div className="flex items-center gap-3">
+          <QuestionNumber number={number} />
+        </div>
+      )}
       {/* Question Title */}
       <div>
         <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100">{question.title}</h3>

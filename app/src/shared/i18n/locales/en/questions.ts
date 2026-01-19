@@ -13,6 +13,7 @@ export default {
     questionType: 'Question Type',
     subject: 'Subject',
     difficulty: 'Difficulty',
+    grade: 'Grade',
     validationErrors: 'Validation Errors',
     cancel: 'Cancel',
     create: 'Create Question',
@@ -43,6 +44,7 @@ export default {
     questionType: 'Question Type',
     subject: 'Subject',
     difficulty: 'Difficulty',
+    grade: 'Grade',
     validationErrors: 'Validation Errors',
 
     // Toast messages

@@ -2,10 +2,12 @@ import { useTranslation } from 'react-i18next';
 import type { GroupQuestion } from '@aiprimary/core';
 import { VIEW_MODE } from '@/features/assignment/types';
 import { SubQuestionList } from './SubQuestionList';
+import { QuestionNumber } from '../shared';
 
 interface GroupViewingProps {
   question: GroupQuestion;
   points?: number;
+  number?: number;
 }
 
 /**
@@ -16,11 +18,16 @@ interface GroupViewingProps {
  * - All sub-questions in preview mode
  * - Total points
  */
-export function GroupViewing({ question, points }: GroupViewingProps) {
+export function GroupViewing({ question, points, number }: GroupViewingProps) {
   const { t } = useTranslation('questions');
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
+      {number !== undefined && (
+        <div className="flex items-center gap-3">
+          <QuestionNumber number={number} />
+        </div>
+      )}
       {/* Question Title */}
       <div>
         <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100">{question.title}</h3>

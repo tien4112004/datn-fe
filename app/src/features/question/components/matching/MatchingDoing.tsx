@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { MatchingQuestion, MatchingAnswer } from '@/features/assignment/types';
-import { MarkdownPreview } from '../shared';
+import { MarkdownPreview, QuestionNumber } from '../shared';
 
 import { Button } from '@/shared/components/ui/button';
 import {
@@ -140,6 +140,7 @@ interface MatchingDoingProps {
   points?: number; // Optional points for display
   onAnswerChange: (answer: MatchingAnswer) => void;
   hideHeader?: boolean; // Hide type label and difficulty badge when used as sub-question
+  number?: number;
 }
 
 export const MatchingDoing = ({
@@ -148,6 +149,7 @@ export const MatchingDoing = ({
   points,
   onAnswerChange,
   hideHeader = false,
+  number,
 }: MatchingDoingProps) => {
   const { t } = useTranslation('questions');
   const [matches, setMatches] = useState<Map<string, string>>(new Map());
@@ -206,6 +208,11 @@ export const MatchingDoing = ({
 
   return (
     <div className="space-y-4">
+      {number !== undefined && (
+        <div className="flex items-center gap-3">
+          <QuestionNumber number={number} />
+        </div>
+      )}
       {/* Question Title */}
       <div className="space-y-2">
         <MarkdownPreview content={question.title} />

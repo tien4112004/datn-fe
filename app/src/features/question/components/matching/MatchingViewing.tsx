@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import type { MatchingQuestion } from '@/features/assignment/types';
-import { MarkdownPreview } from '../shared';
+import { MarkdownPreview, QuestionNumber } from '../shared';
 import { Label } from '@/shared/components/ui/label';
 import { Badge } from '@/shared/components/ui/badge';
 import { Shuffle } from 'lucide-react';
@@ -8,12 +8,18 @@ import { Shuffle } from 'lucide-react';
 interface MatchingViewingProps {
   question: MatchingQuestion;
   points?: number; // Optional points for display
+  number?: number;
 }
 
-export const MatchingViewing = ({ question, points }: MatchingViewingProps) => {
+export const MatchingViewing = ({ question, points, number }: MatchingViewingProps) => {
   const { t } = useTranslation('questions');
   return (
-    <div className="space-y-2">
+    <div className="space-y-4">
+      {number !== undefined && (
+        <div className="flex items-center gap-3">
+          <QuestionNumber number={number} />
+        </div>
+      )}
       {/* Question Title */}
       <div className="space-y-1">
         <MarkdownPreview content={question.title} />

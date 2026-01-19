@@ -4,3 +4,5 @@ export { ImageUploader } from './ImageUploader';
 export { DifficultyBadge } from './DifficultyBadge';
 export { QuestionTypeIcon } from './QuestionTypeIcon';
 export { AnswerFeedback } from './AnswerFeedback';
+export { QuestionNumber } from './QuestionNumber';
+export { indexToLetter } from './numberingUtils';

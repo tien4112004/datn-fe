@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import type { MultipleChoiceQuestion, MultipleChoiceAnswer } from '@/features/assignment/types';
-import { MarkdownPreview, AnswerFeedback } from '../shared';
+import { MarkdownPreview, AnswerFeedback, QuestionNumber } from '../shared';
 
 import { CheckCircle2, XCircle } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
@@ -10,6 +10,7 @@ interface MultipleChoiceAfterAssessmentProps {
   answer?: MultipleChoiceAnswer;
   points?: number; // Points allocated for this question in the assignment
   hideHeader?: boolean; // Hide type label and difficulty badge when used as sub-question
+  number?: number;
 }
 
 export const MultipleChoiceAfterAssessment = ({
@@ -17,6 +18,7 @@ export const MultipleChoiceAfterAssessment = ({
   answer,
   points = 0,
   hideHeader = false,
+  number,
 }: MultipleChoiceAfterAssessmentProps) => {
   const { t } = useTranslation('questions');
   const selectedOption = answer
@@ -26,6 +28,11 @@ export const MultipleChoiceAfterAssessment = ({
 
   return (
     <div className="space-y-4">
+      {number !== undefined && (
+        <div className="flex items-center gap-3">
+          <QuestionNumber number={number} />
+        </div>
+      )}
       {/* Question Title */}
       <div className="space-y-2">
         <MarkdownPreview content={question.title} />

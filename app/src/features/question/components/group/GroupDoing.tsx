@@ -3,11 +3,13 @@ import { useTranslation } from 'react-i18next';
 import type { GroupQuestion, Answer } from '@aiprimary/core';
 import { VIEW_MODE } from '@/features/assignment/types';
 import { SubQuestionList } from './SubQuestionList';
+import { QuestionNumber } from '../shared';
 
 interface GroupDoingProps {
   question: GroupQuestion;
   answer?: Answer;
   points?: number;
+  number?: number;
   onAnswerChange: (answer: Answer) => void;
 }
 
@@ -19,7 +21,7 @@ interface GroupDoingProps {
  * - Answer all sub-questions
  * - See progress indicator
  */
-export function GroupDoing({ question, answer, points, onAnswerChange }: GroupDoingProps) {
+export function GroupDoing({ question, answer, points, number, onAnswerChange }: GroupDoingProps) {
   const { t } = useTranslation('questions');
   const [answers, setAnswers] = useState<Record<string, any>>((answer as any)?.subAnswers || {});
 
@@ -37,7 +39,12 @@ export function GroupDoing({ question, answer, points, onAnswerChange }: GroupDo
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
+      {number !== undefined && (
+        <div className="flex items-center gap-3">
+          <QuestionNumber number={number} />
+        </div>
+      )}
       {/* Question Title */}
       <div>
         <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100">{question.title}</h3>

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { MatchingQuestion, MatchingAnswer } from '@/features/assignment/types';
-import { MarkdownPreview } from '../shared';
+import { MarkdownPreview, QuestionNumber } from '../shared';
 
 import { Input } from '@/shared/components/ui/input';
 import { Label } from '@/shared/components/ui/label';
@@ -14,9 +14,16 @@ interface MatchingGradingProps {
   answer?: MatchingAnswer;
   points?: number; // Points allocated for this question in the assignment
   onGradeChange?: (grade: { points: number; feedback?: string }) => void;
+  number?: number;
 }
 
-export const MatchingGrading = ({ question, answer, points = 0, onGradeChange }: MatchingGradingProps) => {
+export const MatchingGrading = ({
+  question,
+  answer,
+  points = 0,
+  onGradeChange,
+  number,
+}: MatchingGradingProps) => {
   const { t } = useTranslation('questions');
 
   // Calculate score: each correct match gets equal points
@@ -61,6 +68,11 @@ export const MatchingGrading = ({ question, answer, points = 0, onGradeChange }:
 
   return (
     <div className="space-y-4">
+      {number !== undefined && (
+        <div className="flex items-center gap-3">
+          <QuestionNumber number={number} />
+        </div>
+      )}
       {/* Question Title */}
       <div className="space-y-2">
         <MarkdownPreview content={question.title} />

@@ -1,18 +1,24 @@
 import { useTranslation } from 'react-i18next';
 import type { FillInBlankQuestion } from '@/features/assignment/types';
-import { MarkdownPreview } from '../shared';
+import { MarkdownPreview, QuestionNumber } from '../shared';
 import { Label } from '@/shared/components/ui/label';
 import { Badge } from '@/shared/components/ui/badge';
 
 interface FillInBlankViewingProps {
   question: FillInBlankQuestion;
   points?: number; // Optional points for display
+  number?: number;
 }
 
-export const FillInBlankViewing = ({ question, points }: FillInBlankViewingProps) => {
+export const FillInBlankViewing = ({ question, points, number }: FillInBlankViewingProps) => {
   const { t } = useTranslation('questions');
   return (
-    <div className="space-y-2">
+    <div className="space-y-4">
+      {number !== undefined && (
+        <div className="flex items-center gap-3">
+          <QuestionNumber number={number} />
+        </div>
+      )}
       {/* Title */}
       {question.title && (
         <div className="space-y-1">

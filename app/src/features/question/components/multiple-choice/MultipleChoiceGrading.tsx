@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { MultipleChoiceQuestion, MultipleChoiceAnswer } from '@/features/assignment/types';
-import { MarkdownPreview } from '../shared';
+import { MarkdownPreview, QuestionNumber } from '../shared';
 
 import { Input } from '@/shared/components/ui/input';
 import { Label } from '@/shared/components/ui/label';
@@ -14,6 +14,7 @@ interface MultipleChoiceGradingProps {
   answer?: MultipleChoiceAnswer;
   points?: number; // Points allocated for this question in the assignment
   onGradeChange?: (grade: { points: number; feedback?: string }) => void;
+  number?: number;
 }
 
 export const MultipleChoiceGrading = ({
@@ -21,6 +22,7 @@ export const MultipleChoiceGrading = ({
   answer,
   points = 0,
   onGradeChange,
+  number,
 }: MultipleChoiceGradingProps) => {
   const { t } = useTranslation('questions');
 
@@ -48,6 +50,11 @@ export const MultipleChoiceGrading = ({
 
   return (
     <div className="space-y-4">
+      {number !== undefined && (
+        <div className="flex items-center gap-3">
+          <QuestionNumber number={number} />
+        </div>
+      )}
       {/* Question Title */}
       <div className="space-y-2">
         <MarkdownPreview content={question.title} />

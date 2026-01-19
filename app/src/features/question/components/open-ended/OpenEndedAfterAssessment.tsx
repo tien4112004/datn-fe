@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import type { OpenEndedQuestion, OpenEndedAnswer } from '@/features/assignment/types';
-import { MarkdownPreview } from '../shared';
+import { MarkdownPreview, QuestionNumber } from '../shared';
 
 import { Badge } from '@/shared/components/ui/badge';
 
@@ -8,13 +8,24 @@ interface OpenEndedAfterAssessmentProps {
   question: OpenEndedQuestion;
   answer?: OpenEndedAnswer;
   points?: number; // Points allocated for this question in the assignment
+  number?: number;
 }
 
-export const OpenEndedAfterAssessment = ({ question, answer, points = 0 }: OpenEndedAfterAssessmentProps) => {
+export const OpenEndedAfterAssessment = ({
+  question,
+  answer,
+  points = 0,
+  number,
+}: OpenEndedAfterAssessmentProps) => {
   const { t } = useTranslation('questions');
 
   return (
     <div className="space-y-4">
+      {number !== undefined && (
+        <div className="flex items-center gap-3">
+          <QuestionNumber number={number} />
+        </div>
+      )}
       {/* Question */}
       <div className="space-y-2">
         <MarkdownPreview content={question.title} />

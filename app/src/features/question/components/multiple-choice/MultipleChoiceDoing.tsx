@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { MultipleChoiceQuestion, MultipleChoiceAnswer } from '@/features/assignment/types';
-import { MarkdownPreview } from '../shared';
+import { MarkdownPreview, QuestionNumber } from '../shared';
 
 import { RadioGroup, RadioGroupItem } from '@/shared/components/ui/radio-group';
 import { Label } from '@/shared/components/ui/label';
@@ -13,6 +13,7 @@ interface MultipleChoiceDoingProps {
   answer?: MultipleChoiceAnswer;
   points?: number; // Optional points for display
   onAnswerChange: (answer: MultipleChoiceAnswer) => void;
+  number?: number;
 }
 
 export const MultipleChoiceDoing = ({
@@ -20,6 +21,7 @@ export const MultipleChoiceDoing = ({
   answer,
   points,
   onAnswerChange,
+  number,
 }: MultipleChoiceDoingProps) => {
   const { t } = useTranslation('questions');
   const [selectedId, setSelectedId] = useState<string>(answer?.selectedOptionId || '');
@@ -39,6 +41,11 @@ export const MultipleChoiceDoing = ({
 
   return (
     <div className="space-y-4">
+      {number !== undefined && (
+        <div className="flex items-center gap-3">
+          <QuestionNumber number={number} />
+        </div>
+      )}
       {/* Question Title */}
       <div className="space-y-2">
         <MarkdownPreview content={question.title} />

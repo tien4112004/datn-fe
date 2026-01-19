@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import type { MatchingQuestion, MatchingAnswer } from '@/features/assignment/types';
-import { MarkdownPreview, AnswerFeedback } from '../shared';
+import { MarkdownPreview, AnswerFeedback, QuestionNumber } from '../shared';
 
 import { CheckCircle2, XCircle, ArrowRight } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
@@ -10,6 +10,7 @@ interface MatchingAfterAssessmentProps {
   answer?: MatchingAnswer;
   points?: number; // Points allocated for this question in the assignment
   hideHeader?: boolean; // Hide type label and difficulty badge when used as sub-question
+  number?: number;
 }
 
 export const MatchingAfterAssessment = ({
@@ -17,6 +18,7 @@ export const MatchingAfterAssessment = ({
   answer,
   points = 0,
   hideHeader = false,
+  number,
 }: MatchingAfterAssessmentProps) => {
   const { t } = useTranslation('questions');
   const answerMap = new Map(answer?.matches.map((m) => [m.rightId, m.leftId]) || []);
@@ -43,6 +45,11 @@ export const MatchingAfterAssessment = ({
 
   return (
     <div className="space-y-4">
+      {number !== undefined && (
+        <div className="flex items-center gap-3">
+          <QuestionNumber number={number} />
+        </div>
+      )}
       {/* Question Title */}
       <div className="space-y-2">
         <MarkdownPreview content={question.title} />

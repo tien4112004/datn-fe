@@ -552,6 +552,7 @@ export default {
         content: 'Content',
         questionType: 'Question Type',
         subject: 'Subject',
+        grade: 'Grade',
         difficulty: 'Difficulty',
         points: 'Points',
       },

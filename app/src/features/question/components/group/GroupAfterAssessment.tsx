@@ -2,11 +2,13 @@ import { useTranslation } from 'react-i18next';
 import type { GroupQuestion, Answer } from '@aiprimary/core';
 import { VIEW_MODE } from '@/features/assignment/types';
 import { SubQuestionList } from './SubQuestionList';
+import { QuestionNumber } from '../shared';
 
 interface GroupAfterAssessmentProps {
   question: GroupQuestion;
   answer?: Answer;
   points?: number;
+  number?: number;
 }
 
 /**
@@ -18,13 +20,18 @@ interface GroupAfterAssessmentProps {
  * - Explanations for each sub-question
  * - Score breakdown
  */
-export function GroupAfterAssessment({ question, answer, points }: GroupAfterAssessmentProps) {
+export function GroupAfterAssessment({ question, answer, points, number }: GroupAfterAssessmentProps) {
   const { t } = useTranslation('questions');
   const userAnswers = (answer as any)?.subAnswers || {};
   const earnedPoints = (answer as any)?.earnedPoints;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
+      {number !== undefined && (
+        <div className="flex items-center gap-3">
+          <QuestionNumber number={number} />
+        </div>
+      )}
       {/* Question Title and Score */}
       <div>
         <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100">{question.title}</h3>

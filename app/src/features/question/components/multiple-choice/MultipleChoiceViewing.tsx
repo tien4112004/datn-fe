@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import type { MultipleChoiceQuestion } from '@/features/assignment/types';
-import { MarkdownPreview } from '../shared';
+import { MarkdownPreview, QuestionNumber } from '../shared';
 import { Label } from '@/shared/components/ui/label';
 import { Badge } from '@/shared/components/ui/badge';
 import { Shuffle, CheckCircle2 } from 'lucide-react';
@@ -8,12 +8,18 @@ import { Shuffle, CheckCircle2 } from 'lucide-react';
 interface MultipleChoiceViewingProps {
   question: MultipleChoiceQuestion;
   points?: number; // Optional points for display
+  number?: number;
 }
 
-export const MultipleChoiceViewing = ({ question, points }: MultipleChoiceViewingProps) => {
+export const MultipleChoiceViewing = ({ question, points, number }: MultipleChoiceViewingProps) => {
   const { t } = useTranslation('questions');
   return (
-    <div className="space-y-2">
+    <div className="space-y-4">
+      {number !== undefined && (
+        <div className="flex items-center gap-3">
+          <QuestionNumber number={number} />
+        </div>
+      )}
       {/* Question Title */}
       <div className="space-y-1">
         <MarkdownPreview content={question.title} />

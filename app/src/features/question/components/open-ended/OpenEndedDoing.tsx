@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { OpenEndedQuestion, OpenEndedAnswer } from '@/features/assignment/types';
-import { MarkdownPreview } from '../shared';
+import { MarkdownPreview, QuestionNumber } from '../shared';
 
 import { AutosizeTextarea } from '@/shared/components/ui/autosize-textarea';
 import { QUESTION_TYPE } from '@/features/assignment/types';
@@ -11,9 +11,10 @@ interface OpenEndedDoingProps {
   answer?: OpenEndedAnswer;
   points?: number; // Optional points for display
   onAnswerChange: (answer: OpenEndedAnswer) => void;
+  number?: number;
 }
 
-export const OpenEndedDoing = ({ question, answer, points, onAnswerChange }: OpenEndedDoingProps) => {
+export const OpenEndedDoing = ({ question, answer, points, onAnswerChange, number }: OpenEndedDoingProps) => {
   const { t } = useTranslation('questions');
   const [text, setText] = useState(answer?.text || '');
 
@@ -41,6 +42,11 @@ export const OpenEndedDoing = ({ question, answer, points, onAnswerChange }: Ope
 
   return (
     <div className="space-y-4">
+      {number !== undefined && (
+        <div className="flex items-center gap-3">
+          <QuestionNumber number={number} />
+        </div>
+      )}
       {/* Question */}
       <div className="space-y-2">
         <MarkdownPreview content={question.title} />

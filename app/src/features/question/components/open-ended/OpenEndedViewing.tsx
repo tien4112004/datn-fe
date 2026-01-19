@@ -1,17 +1,23 @@
 import { useTranslation } from 'react-i18next';
 import type { OpenEndedQuestion } from '@/features/assignment/types';
-import { MarkdownPreview } from '../shared';
+import { MarkdownPreview, QuestionNumber } from '../shared';
 import { Label } from '@/shared/components/ui/label';
 
 interface OpenEndedViewingProps {
   question: OpenEndedQuestion;
   points?: number; // Optional points for display
+  number?: number;
 }
 
-export const OpenEndedViewing = ({ question, points }: OpenEndedViewingProps) => {
+export const OpenEndedViewing = ({ question, points, number }: OpenEndedViewingProps) => {
   const { t } = useTranslation('questions');
   return (
-    <div className="space-y-2">
+    <div className="space-y-4">
+      {number !== undefined && (
+        <div className="flex items-center gap-3">
+          <QuestionNumber number={number} />
+        </div>
+      )}
       {/* Question */}
       <div className="space-y-1">
         <MarkdownPreview content={question.title} />

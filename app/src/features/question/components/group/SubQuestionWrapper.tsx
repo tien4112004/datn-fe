@@ -30,6 +30,7 @@ import {
   FillInBlankAfterAssessment,
   FillInBlankGrading,
 } from '../fill-in-blank';
+import { QuestionNumber, indexToLetter } from '../shared';
 
 interface SubQuestionWrapperProps {
   question: SubQuestion;
@@ -253,11 +254,7 @@ export function SubQuestionWrapper({
       {/* Question Header with Number and Points */}
       {(showNumber || points !== undefined) && (
         <div className="flex items-center gap-3">
-          {showNumber && index !== undefined && (
-            <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-blue-100 text-sm font-semibold text-blue-700 dark:bg-blue-900 dark:text-blue-300">
-              {index + 1}
-            </div>
-          )}
+          {showNumber && index !== undefined && <QuestionNumber number={indexToLetter(index)} />}
           {points !== undefined && (
             <span className="rounded bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700 dark:bg-gray-700 dark:text-gray-300">
               {points} {t('common.pointsAbbreviation', { count: points })}

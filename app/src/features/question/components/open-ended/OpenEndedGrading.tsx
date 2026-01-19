@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { OpenEndedQuestion, OpenEndedAnswer } from '@/features/assignment/types';
-import { MarkdownPreview } from '../shared';
+import { MarkdownPreview, QuestionNumber } from '../shared';
 
 import { Input } from '@/shared/components/ui/input';
 import { Label } from '@/shared/components/ui/label';
@@ -12,9 +12,16 @@ interface OpenEndedGradingProps {
   answer?: OpenEndedAnswer;
   points?: number; // Points allocated for this question in the assignment
   onGradeChange?: (grade: { points: number; feedback?: string }) => void;
+  number?: number;
 }
 
-export const OpenEndedGrading = ({ question, answer, points = 0, onGradeChange }: OpenEndedGradingProps) => {
+export const OpenEndedGrading = ({
+  question,
+  answer,
+  points = 0,
+  onGradeChange,
+  number,
+}: OpenEndedGradingProps) => {
   const { t } = useTranslation('questions');
   const [awardedPoints, setAwardedPoints] = useState<number>(0);
   const [feedback, setFeedback] = useState<string>('');
@@ -34,6 +41,11 @@ export const OpenEndedGrading = ({ question, answer, points = 0, onGradeChange }
 
   return (
     <div className="space-y-4">
+      {number !== undefined && (
+        <div className="flex items-center gap-3">
+          <QuestionNumber number={number} />
+        </div>
+      )}
       {/* Question Title */}
       <div className="space-y-2">
         <MarkdownPreview content={question.title} />

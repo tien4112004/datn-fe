@@ -15,6 +15,7 @@ interface MultipleChoiceEditingProps {
 
 export const MultipleChoiceEditing = ({ question, onChange }: MultipleChoiceEditingProps) => {
   const { t } = useTranslation('questions', { keyPrefix: 'multipleChoice.editing' });
+  const { t: tQuestions } = useTranslation('questions');
 
   const updateQuestion = (updates: Partial<MultipleChoiceQuestion>) => {
     onChange({ ...question, ...updates });
@@ -65,9 +66,7 @@ export const MultipleChoiceEditing = ({ question, onChange }: MultipleChoiceEdit
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold">
-          {t('types.multipleChoice', { ns: 'questions', defaultValue: 'Multiple Choice' })}
-        </h3>
+        <h3 className="text-lg font-semibold">{tQuestions('types.multipleChoice')}</h3>
         <DifficultyBadge difficulty={question.difficulty} />
       </div>
 

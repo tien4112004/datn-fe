@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import type { FillInBlankQuestion, FillInBlankAnswer } from '@/features/assignment/types';
-import { MarkdownPreview, AnswerFeedback } from '../shared';
+import { MarkdownPreview, AnswerFeedback, QuestionNumber } from '../shared';
 
 import { CheckCircle2, XCircle } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
@@ -10,6 +10,7 @@ interface FillInBlankAfterAssessmentProps {
   answer?: FillInBlankAnswer;
   points?: number; // Points allocated for this question in the assignment
   hideHeader?: boolean; // Hide type label and difficulty badge when used as sub-question
+  number?: number;
 }
 
 export const FillInBlankAfterAssessment = ({
@@ -17,6 +18,7 @@ export const FillInBlankAfterAssessment = ({
   answer,
   points = 0,
   hideHeader = false,
+  number,
 }: FillInBlankAfterAssessmentProps) => {
   const { t } = useTranslation('questions');
   const blankSegments = question.data.segments.filter((s) => s.type === 'blank');
@@ -48,6 +50,11 @@ export const FillInBlankAfterAssessment = ({
 
   return (
     <div className="space-y-4">
+      {number !== undefined && (
+        <div className="flex items-center gap-3">
+          <QuestionNumber number={number} />
+        </div>
+      )}
       {/* Title */}
       {question.title && (
         <div className="space-y-2">

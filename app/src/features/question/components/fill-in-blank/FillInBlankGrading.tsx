@@ -7,12 +7,14 @@ import { Label } from '@/shared/components/ui/label';
 import { Textarea } from '@/shared/components/ui/textarea';
 import { CheckCircle2, XCircle } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
+import { QuestionNumber } from '../shared';
 
 interface FillInBlankGradingProps {
   question: FillInBlankQuestion;
   answer?: FillInBlankAnswer;
   points?: number; // Points allocated for this question in the assignment
   onGradeChange?: (grade: { points: number; feedback?: string }) => void;
+  number?: number;
 }
 
 export const FillInBlankGrading = ({
@@ -20,6 +22,7 @@ export const FillInBlankGrading = ({
   answer,
   points = 0,
   onGradeChange,
+  number,
 }: FillInBlankGradingProps) => {
   const { t } = useTranslation('questions');
 
@@ -85,6 +88,11 @@ export const FillInBlankGrading = ({
 
   return (
     <div className="space-y-4">
+      {number !== undefined && (
+        <div className="flex items-center gap-3">
+          <QuestionNumber number={number} />
+        </div>
+      )}
       {/* Question Title */}
       {question.title && (
         <div className="space-y-2">

@@ -542,6 +542,7 @@ export default {
         content: 'Nội dung',
         questionType: 'Loại câu hỏi',
         subject: 'Môn học',
+        grade: 'Lớp',
         difficulty: 'Độ khó',
         points: 'Điểm',
       },

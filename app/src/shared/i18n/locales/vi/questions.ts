@@ -13,6 +13,7 @@ export default {
     questionType: 'Loại câu hỏi',
     subject: 'Môn học',
     difficulty: 'Độ khó',
+    grade: 'Lớp',
     validationErrors: 'Lỗi xác thực',
     cancel: 'Hủy',
     create: 'Tạo câu hỏi',
@@ -43,6 +44,7 @@ export default {
     questionType: 'Loại câu hỏi',
     subject: 'Môn học',
     difficulty: 'Độ khó',
+    grade: 'Lớp',
     validationErrors: 'Lỗi xác thực',
 
     // Toast messages

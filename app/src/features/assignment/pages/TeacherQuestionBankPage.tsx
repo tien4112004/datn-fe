@@ -29,9 +29,55 @@ import {
   CopyToPersonalDialog,
   QuestionBankFilters,
 } from '@/features/assignment/components/question-bank';
-import { getSubjectName, getQuestionTypeName, getDifficultyName } from '@aiprimary/core';
+import { getSubjectName, getQuestionTypeName, getDifficultyName, getGradeName } from '@aiprimary/core';
 
 const columnHelper = createColumnHelper<QuestionBankItem>();
+
+// Helper functions for colorful badges
+const getSubjectBadgeClass = (subject: string) => {
+  switch (subject) {
+    case 'T': // Math
+      return 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800';
+    case 'TV': // Vietnamese
+      return 'bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800';
+    case 'TA': // English
+      return 'bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-800';
+    default:
+      return 'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-900/30 dark:text-gray-300 dark:border-gray-800';
+  }
+};
+
+const getDifficultyBadgeClass = (difficulty: string) => {
+  switch (difficulty) {
+    case 'KNOWLEDGE':
+      return 'bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-300 dark:border-emerald-800';
+    case 'COMPREHENSION':
+      return 'bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-300 dark:border-yellow-800';
+    case 'APPLICATION':
+      return 'bg-orange-100 text-orange-800 border-orange-200 dark:bg-orange-900/30 dark:text-orange-300 dark:border-orange-800';
+    case 'ADVANCED_APPLICATION':
+      return 'bg-red-100 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800';
+    default:
+      return 'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-900/30 dark:text-gray-300 dark:border-gray-800';
+  }
+};
+
+const getQuestionTypeBadgeClass = (type: string) => {
+  switch (type) {
+    case 'MULTIPLE_CHOICE':
+      return 'bg-indigo-100 text-indigo-800 border-indigo-200 dark:bg-indigo-900/30 dark:text-indigo-300 dark:border-indigo-800';
+    case 'MATCHING':
+      return 'bg-pink-100 text-pink-800 border-pink-200 dark:bg-pink-900/30 dark:text-pink-300 dark:border-pink-800';
+    case 'FILL_IN_BLANK':
+      return 'bg-cyan-100 text-cyan-800 border-cyan-200 dark:bg-cyan-900/30 dark:text-cyan-300 dark:border-cyan-800';
+    case 'OPEN_ENDED':
+      return 'bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800';
+    case 'GROUP':
+      return 'bg-violet-100 text-violet-800 border-violet-200 dark:bg-violet-900/30 dark:text-violet-300 dark:border-violet-800';
+    default:
+      return 'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-900/30 dark:text-gray-300 dark:border-gray-800';
+  }
+};
 
 export function TeacherQuestionBankPage() {
   const { t } = useTranslation(I18N_NAMESPACES.ASSIGNMENT, { keyPrefix: 'teacherQuestionBank' });
@@ -191,17 +237,41 @@ export function TeacherQuestionBankPage() {
       }),
       columnHelper.accessor('type', {
         header: t('table.columns.questionType'),
-        cell: (info) => <Badge variant="outline">{getQuestionTypeName(info.getValue())}</Badge>,
+        cell: (info) => (
+          <Badge variant="outline" className={getQuestionTypeBadgeClass(info.getValue())}>
+            {getQuestionTypeName(info.getValue())}
+          </Badge>
+        ),
         size: 150,
       }),
       columnHelper.accessor('subject', {
         header: t('table.columns.subject'),
-        cell: (info) => <Badge variant="secondary">{getSubjectName(info.getValue())}</Badge>,
+        cell: (info) => (
+          <Badge variant="outline" className={getSubjectBadgeClass(info.getValue())}>
+            {getSubjectName(info.getValue())}
+          </Badge>
+        ),
         size: 120,
+      }),
+      columnHelper.accessor('grade', {
+        header: t('table.columns.grade'),
+        cell: (info) => {
+          const grade = info.getValue();
+          return grade ? (
+            <Badge variant="outline">{getGradeName(grade)}</Badge>
+          ) : (
+            <span className="text-muted-foreground text-xs">-</span>
+          );
+        },
+        size: 100,
       }),
       columnHelper.accessor('difficulty', {
         header: t('table.columns.difficulty'),
-        cell: (info) => <Badge variant="secondary">{getDifficultyName(info.getValue())}</Badge>,
+        cell: (info) => (
+          <Badge variant="outline" className={getDifficultyBadgeClass(info.getValue())}>
+            {getDifficultyName(info.getValue())}
+          </Badge>
+        ),
         size: 140,
       }),
       columnHelper.display({

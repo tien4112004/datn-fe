@@ -5,7 +5,6 @@ import { useAuth } from '@/shared/context/auth';
 import { SeatingChartSidebar } from './SeatingChartSidebar';
 import { SeatingChartGrid } from './SeatingChartGrid';
 import { SeatingChartOverlay } from './SeatingChartOverlay';
-import { SeatingChartConfig } from './SeatingChartConfig';
 import { useSaveSeatingChart } from '../../hooks';
 
 interface SeatingChartViewProps {

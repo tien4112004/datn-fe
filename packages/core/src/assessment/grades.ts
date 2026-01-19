@@ -1,7 +1,7 @@
 /**
  * Grade constants and utilities for the application.
  *
- * Provides type-safe grade constants for elementary (1-5) and all grades (1-12),
+ * Provides type-safe grade constants for elementary grades (1-5),
  * along with helper functions for grade display, validation, and conversion.
  *
  * @module assessment/grades
@@ -20,18 +20,11 @@ export const ELEMENTARY_GRADE = {
 } as const;
 
 /**
- * All grade constants (grades 1-12)
- * Includes both elementary (1-5) and secondary (6-12) grades
+ * All grade constants (grades 1-5)
+ * Same as ELEMENTARY_GRADE
  */
 export const GRADE = {
   ...ELEMENTARY_GRADE,
-  GRADE_6: '6',
-  GRADE_7: '7',
-  GRADE_8: '8',
-  GRADE_9: '9',
-  GRADE_10: '10',
-  GRADE_11: '11',
-  GRADE_12: '12',
 } as const;
 
 /**
@@ -40,7 +33,7 @@ export const GRADE = {
 export type ElementaryGrade = (typeof ELEMENTARY_GRADE)[keyof typeof ELEMENTARY_GRADE];
 
 /**
- * Type representing all grade values ('1' | '2' | ... | '12')
+ * Type representing all grade values ('1' | '2' | '3' | '4' | '5')
  */
 export type Grade = (typeof GRADE)[keyof typeof GRADE];
 
@@ -53,13 +46,6 @@ export const GRADE_LABELS = {
   '3': 'Lớp 3',
   '4': 'Lớp 4',
   '5': 'Lớp 5',
-  '6': 'Lớp 6',
-  '7': 'Lớp 7',
-  '8': 'Lớp 8',
-  '9': 'Lớp 9',
-  '10': 'Lớp 10',
-  '11': 'Lớp 11',
-  '12': 'Lớp 12',
 } as const;
 
 /**
@@ -71,13 +57,6 @@ export const GRADE_LABELS_EN = {
   '3': 'Grade 3',
   '4': 'Grade 4',
   '5': 'Grade 5',
-  '6': 'Grade 6',
-  '7': 'Grade 7',
-  '8': 'Grade 8',
-  '9': 'Grade 9',
-  '10': 'Grade 10',
-  '11': 'Grade 11',
-  '12': 'Grade 12',
 } as const;
 
 /**
@@ -139,7 +118,7 @@ export function getElementaryGrades(): Array<{ code: string; name: string; nameE
 }
 
 /**
- * Get all grades (1-12) as an array of objects
+ * Get all grades (1-5) as an array of objects
  *
  * @returns Array of grade objects with code, Vietnamese name, and English name
  *
@@ -151,7 +130,7 @@ export function getElementaryGrades(): Array<{ code: string; name: string; nameE
  * //   { code: '1', name: 'Lớp 1', nameEn: 'Grade 1' },
  * //   { code: '2', name: 'Lớp 2', nameEn: 'Grade 2' },
  * //   ...
- * //   { code: '12', name: 'Lớp 12', nameEn: 'Grade 12' }
+ * //   { code: '5', name: 'Lớp 5', nameEn: 'Grade 5' }
  * // ]
  * ```
  */
@@ -164,17 +143,17 @@ export function getAllGrades(): Array<{ code: string; name: string; nameEn: stri
 }
 
 /**
- * Check if a grade string is valid (1-12)
+ * Check if a grade string is valid (1-5)
  *
  * @param grade - The grade code to validate
- * @returns True if the grade is valid (1-12), false otherwise
+ * @returns True if the grade is valid (1-5), false otherwise
  *
  * @example
  * ```typescript
  * isValidGrade('3'); // Returns true
- * isValidGrade('12'); // Returns true
+ * isValidGrade('5'); // Returns true
  * isValidGrade('0'); // Returns false
- * isValidGrade('15'); // Returns false
+ * isValidGrade('6'); // Returns false
  * isValidGrade('abc'); // Returns false
  * ```
  */
@@ -203,13 +182,13 @@ export function isElementaryGrade(grade: string): boolean {
 /**
  * Convert a numeric grade to string format
  *
- * @param grade - The grade as a number (1-12)
+ * @param grade - The grade as a number (1-5)
  * @returns The grade as a string
  *
  * @example
  * ```typescript
  * gradeNumberToString(3); // Returns '3'
- * gradeNumberToString(10); // Returns '10'
+ * gradeNumberToString(5); // Returns '5'
  * ```
  */
 export function gradeNumberToString(grade: number): string {
@@ -225,7 +204,7 @@ export function gradeNumberToString(grade: number): string {
  * @example
  * ```typescript
  * gradeStringToNumber('3'); // Returns 3
- * gradeStringToNumber('10'); // Returns 10
+ * gradeStringToNumber('5'); // Returns 5
  * ```
  */
 export function gradeStringToNumber(grade: string): number {

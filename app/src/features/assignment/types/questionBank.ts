@@ -82,14 +82,15 @@ export interface QuestionBankApiService {
   createQuestion(
     question: Omit<QuestionBankItem, 'id' | 'createdAt' | 'updatedAt'>
   ): Promise<QuestionBankItem>;
+  createQuestions(
+    questions: Array<Omit<QuestionBankItem, 'id' | 'createdAt' | 'updatedAt'>>
+  ): Promise<QuestionBankItem[]>;
   updateQuestion(id: string, question: Partial<QuestionBankItem>): Promise<QuestionBankItem>;
   deleteQuestion(id: string): Promise<void>;
   bulkDeleteQuestions(ids: string[]): Promise<void>;
 
   // Utility operations
   duplicateQuestion(id: string): Promise<QuestionBankItem>;
-  /** Copy from application bank to personal */
-  copyToPersonal(id: string): Promise<QuestionBankItem>;
 
   // Import/Export
   exportQuestions(filters?: QuestionBankFilters): Promise<Blob>;

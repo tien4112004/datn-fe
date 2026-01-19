@@ -118,7 +118,9 @@ export default {
     selection: {
       selected: '{{count}} selected',
       addSelected: 'Add Selected ({{count}})',
+      copySelected: 'Copy Selected ({{count}})',
       copyToPersonal: 'Copy {{count}} to Personal Bank',
+      copying: 'Copying...',
       cancel: 'Cancel',
     },
     copyToPersonal: {
@@ -536,6 +538,7 @@ export default {
       export: 'Export CSV',
       deleteSelected: 'Delete Selected',
       copyToPersonal: 'Copy to Personal',
+      browsePublic: 'Browse Public Questions',
     },
 
     filters: {

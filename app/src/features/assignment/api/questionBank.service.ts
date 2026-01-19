@@ -78,7 +78,14 @@ export default class QuestionBankService implements QuestionBankApiService {
     question: Omit<QuestionBankItem, 'id' | 'createdAt' | 'updatedAt'>
   ): Promise<QuestionBankItem> {
     const response = await this.apiClient.post(`${this.baseUrl}/api/question-bank`, [question]);
-    return response.data.data.created?.[0] || response.data.data;
+    return response.data.data.successful?.[0] || response.data.data;
+  }
+
+  async createQuestions(
+    questions: Array<Omit<QuestionBankItem, 'id' | 'createdAt' | 'updatedAt'>>
+  ): Promise<QuestionBankItem[]> {
+    const response = await this.apiClient.post(`${this.baseUrl}/api/question-bank`, questions);
+    return response.data.data.successful || response.data.data;
   }
 
   async updateQuestion(id: string, question: Partial<QuestionBankItem>): Promise<QuestionBankItem> {
@@ -96,11 +103,6 @@ export default class QuestionBankService implements QuestionBankApiService {
 
   async duplicateQuestion(id: string): Promise<QuestionBankItem> {
     const response = await this.apiClient.post(`${this.baseUrl}/api/question-bank/${id}/duplicate`);
-    return response.data.data;
-  }
-
-  async copyToPersonal(id: string): Promise<QuestionBankItem> {
-    const response = await this.apiClient.post(`${this.baseUrl}/api/question-bank/${id}/copy-to-personal`);
     return response.data.data;
   }
 

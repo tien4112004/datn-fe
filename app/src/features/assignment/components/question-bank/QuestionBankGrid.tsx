@@ -1,8 +1,8 @@
-import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent } from '@/shared/components/ui/card';
+import { Loader2 } from 'lucide-react';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
-import { questionBankData } from '../../api/data/questionBank.data';
+import { useQuestionBankList } from '../../hooks/useQuestionBankApi';
 import useQuestionBankStore from '../../stores/questionBankStore';
 import { QuestionBankCard } from './QuestionBankCard';
 import { getStaggerDelay } from '../../constants/animations';
@@ -11,36 +11,23 @@ export const QuestionBankGrid = () => {
   const { t } = useTranslation(I18N_NAMESPACES.ASSIGNMENT);
   const { filters, toggleQuestionSelection, isQuestionSelected } = useQuestionBankStore();
 
-  // Apply filters to question bank data
-  const filteredQuestions = useMemo(() => {
-    let result = questionBankData;
+  // Fetch questions from API with current filters
+  const { data, isLoading } = useQuestionBankList(filters);
+  const questions = data?.questions || [];
 
-    // Search filter (case-insensitive, searches title)
-    if (filters.searchText) {
-      const search = filters.searchText.toLowerCase();
-      result = result.filter((q) => q.title.toLowerCase().includes(search));
-    }
+  // Loading state
+  if (isLoading) {
+    return (
+      <Card>
+        <CardContent className="flex items-center justify-center py-12">
+          <Loader2 className="text-primary h-8 w-8 animate-spin" />
+        </CardContent>
+      </Card>
+    );
+  }
 
-    // Type filter
-    if (filters.questionType) {
-      result = result.filter((q) => q.type === filters.questionType);
-    }
-
-    // Difficulty filter
-    if (filters.difficulty) {
-      result = result.filter((q) => q.difficulty === filters.difficulty);
-    }
-
-    // Subject filter
-    if (filters.subjectCode) {
-      result = result.filter((q) => q.subject === filters.subjectCode);
-    }
-
-    return result;
-  }, [filters]);
-
-  // Empty state - no questions match filters
-  if (filteredQuestions.length === 0) {
+  // Empty state - no questions found
+  if (questions.length === 0) {
     return (
       <Card>
         <CardContent className="py-12 text-center">
@@ -55,7 +42,7 @@ export const QuestionBankGrid = () => {
 
   return (
     <div className="animate-in fade-in grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-      {filteredQuestions.map((question, index) => (
+      {questions.map((question, index) => (
         <div key={question.id} className={getStaggerDelay(index)}>
           <QuestionBankCard
             question={question}

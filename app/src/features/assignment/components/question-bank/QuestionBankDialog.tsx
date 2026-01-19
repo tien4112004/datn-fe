@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Dialog,
@@ -11,8 +11,10 @@ import {
 import { Button } from '@/shared/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@/shared/components/ui/tabs';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
+import { toast } from 'sonner';
 import type { Question } from '../../types';
 import useQuestionBankStore from '../../stores/questionBankStore';
+import { useCreateQuestions } from '../../hooks/useQuestionBankApi';
 import { QuestionBankFilters } from './QuestionBankFilters';
 import { QuestionBankGrid } from './QuestionBankGrid';
 
@@ -20,14 +22,25 @@ interface QuestionBankDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onAddQuestions: (questions: Question[]) => void;
+  mode?: 'add-to-assignment' | 'copy-to-personal';
 }
 
-export const QuestionBankDialog = ({ open, onOpenChange, onAddQuestions }: QuestionBankDialogProps) => {
+export const QuestionBankDialog = ({
+  open,
+  onOpenChange,
+  onAddQuestions,
+  mode = 'add-to-assignment',
+}: QuestionBankDialogProps) => {
   const { t } = useTranslation(I18N_NAMESPACES.ASSIGNMENT);
   const { selectedQuestions, clearSelection, filters, setFilters } = useQuestionBankStore();
+  const [isCopying, setIsCopying] = useState(false);
+  const createQuestionsMutation = useCreateQuestions();
 
   // Detect if we're in public bank mode
   const isApplicationBank = filters.bankType === 'public';
+
+  // Determine dialog behavior based on mode
+  const showBothTabs = mode === 'add-to-assignment';
 
   // Clear selection when dialog closes
   useEffect(() => {
@@ -36,6 +49,13 @@ export const QuestionBankDialog = ({ open, onOpenChange, onAddQuestions }: Quest
     }
   }, [open, clearSelection]);
 
+  // Force public bank in copy-to-personal mode
+  useEffect(() => {
+    if (mode === 'copy-to-personal' && open && filters.bankType !== 'public') {
+      setFilters({ bankType: 'public' });
+    }
+  }, [mode, open, filters.bankType, setFilters]);
+
   const handleAddSelected = () => {
     if (selectedQuestions.length > 0) {
       onAddQuestions(selectedQuestions);
@@ -43,25 +63,40 @@ export const QuestionBankDialog = ({ open, onOpenChange, onAddQuestions }: Quest
     }
   };
 
-  const handleCopyToPersonal = () => {
+  const handleCopyToPersonal = async () => {
     if (selectedQuestions.length === 0) return;
 
-    // TODO: When backend is ready, call API to copy questions to personal bank
-    // For now, just show success message
-    // const duplicatedQuestions = selectedQuestions.map((q) => ({
-    //   ...q,
-    //   id: `copied-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-    //   bankType: 'personal' as const,
-    //   createdAt: new Date().toISOString(),
-    //   updatedAt: new Date().toISOString(),
-    // }));
+    setIsCopying(true);
+    try {
+      // Use selectedQuestions data directly (already fetched from GET all)
+      // Strip out id, createdAt, updatedAt - backend will create new personal copies
+      const questionsToCreate = selectedQuestions.map((q) => ({
+        type: q.type,
+        difficulty: q.difficulty,
+        title: q.title,
+        titleImageUrl: q.titleImageUrl,
+        explanation: q.explanation,
+        grade: q.grade,
+        chapter: q.chapter,
+        subject: q.subject,
+        data: q.data,
+      }));
 
-    // Show success message
-    alert(t('questionBank.copyToPersonal.success', { count: selectedQuestions.length }));
+      // Bulk create questions - backend assigns current user as owner
+      await createQuestionsMutation.mutateAsync(questionsToCreate);
 
-    // Clear selection and switch to personal tab
-    clearSelection();
-    setFilters({ bankType: 'personal' });
+      // Show success message
+      toast.success(t('questionBank.copyToPersonal.success', { count: selectedQuestions.length }));
+
+      // Clear selection and switch to personal tab
+      clearSelection();
+      setFilters({ bankType: 'personal' });
+    } catch (error) {
+      console.error('Failed to copy questions:', error);
+      toast.error(t('questionBank.copyToPersonal.error') || 'Failed to copy questions to personal bank');
+    } finally {
+      setIsCopying(false);
+    }
   };
 
   const handleCancel = () => {
@@ -77,16 +112,18 @@ export const QuestionBankDialog = ({ open, onOpenChange, onAddQuestions }: Quest
           <DialogDescription>{t('questionBank.subtitle')}</DialogDescription>
         </DialogHeader>
 
-        {/* Bank Type Tabs */}
-        <Tabs
-          value={filters.bankType || 'personal'}
-          onValueChange={(value) => setFilters({ bankType: value as 'personal' | 'public' })}
-        >
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="personal">{t('questionBank.bankTypes.personal')}</TabsTrigger>
-            <TabsTrigger value="public">{t('questionBank.bankTypes.application')}</TabsTrigger>
-          </TabsList>
-        </Tabs>
+        {/* Bank Type Tabs - Only show if in add-to-assignment mode */}
+        {showBothTabs && (
+          <Tabs
+            value={filters.bankType || 'personal'}
+            onValueChange={(value) => setFilters({ bankType: value as 'personal' | 'public' })}
+          >
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="personal">{t('questionBank.bankTypes.personal')}</TabsTrigger>
+              <TabsTrigger value="public">{t('questionBank.bankTypes.application')}</TabsTrigger>
+            </TabsList>
+          </Tabs>
+        )}
 
         {/* Filters */}
         <div className="gap-3 py-2">
@@ -111,14 +148,20 @@ export const QuestionBankDialog = ({ open, onOpenChange, onAddQuestions }: Quest
 
           {/* Action Buttons */}
           <div className="flex gap-2">
-            <Button variant="outline" onClick={handleCancel}>
+            <Button variant="outline" onClick={handleCancel} disabled={isCopying}>
               {t('questionBank.selection.cancel')}
             </Button>
-            {isApplicationBank ? (
-              <Button onClick={handleCopyToPersonal} disabled={selectedQuestions.length === 0}>
-                {t('questionBank.selection.copyToPersonal', { count: selectedQuestions.length })}
+
+            {/* Mode-based button rendering */}
+            {mode === 'copy-to-personal' ? (
+              // Copy to Personal mode: Always show copy button
+              <Button onClick={handleCopyToPersonal} disabled={selectedQuestions.length === 0 || isCopying}>
+                {isCopying
+                  ? t('questionBank.selection.copying')
+                  : t('questionBank.selection.copySelected', { count: selectedQuestions.length })}
               </Button>
             ) : (
+              // Add to Assignment mode: Always add to assignment (both personal and public tabs)
               <Button onClick={handleAddSelected} disabled={selectedQuestions.length === 0}>
                 {t('questionBank.selection.addSelected', { count: selectedQuestions.length })}
               </Button>

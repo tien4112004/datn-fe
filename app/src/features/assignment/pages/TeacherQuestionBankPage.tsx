@@ -6,7 +6,6 @@ import {
   useQuestionBankList,
   useDeleteQuestions,
   useDuplicateQuestion,
-  useCopyToPersonal,
   useExportQuestions,
 } from '@/features/assignment/hooks/useQuestionBankApi';
 import useQuestionBankStore from '@/features/assignment/stores/questionBankStore';
@@ -26,8 +25,8 @@ import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 import DataTable from '@/shared/components/table/DataTable';
 import {
   QuestionBankImportDialog,
-  CopyToPersonalDialog,
   QuestionBankFilters,
+  QuestionBankDialog,
 } from '@/features/assignment/components/question-bank';
 import { getSubjectName, getQuestionTypeName, getDifficultyName, getGradeName } from '@aiprimary/core';
 
@@ -92,8 +91,7 @@ export function TeacherQuestionBankPage() {
     pageSize: 10,
   });
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
-  const [isCopyDialogOpen, setIsCopyDialogOpen] = useState(false);
-  const [copyingQuestion, setCopyingQuestion] = useState<QuestionBankItem | null>(null);
+  const [isBrowseDialogOpen, setIsBrowseDialogOpen] = useState(false);
 
   // Store
   const { filters } = useQuestionBankStore();
@@ -107,7 +105,6 @@ export function TeacherQuestionBankPage() {
 
   const deleteQuestionsMutation = useDeleteQuestions();
   const duplicateMutation = useDuplicateQuestion();
-  const copyToPersonalMutation = useCopyToPersonal();
   const exportMutation = useExportQuestions();
 
   const questions = data?.questions || [];
@@ -147,24 +144,6 @@ export function TeacherQuestionBankPage() {
       toast.success(t('toast.duplicateSuccess'));
     } catch {
       toast.error(t('toast.duplicateError'));
-    }
-  };
-
-  const handleCopyToPersonal = (question: QuestionBankItem) => {
-    setCopyingQuestion(question);
-    setIsCopyDialogOpen(true);
-  };
-
-  const handleCopyConfirm = async () => {
-    if (!copyingQuestion) return;
-
-    try {
-      await copyToPersonalMutation.mutateAsync(copyingQuestion.id);
-      toast.success(t('toast.copySuccess'));
-      setIsCopyDialogOpen(false);
-      setCopyingQuestion(null);
-    } catch {
-      toast.error(t('toast.copyError'));
     }
   };
 
@@ -287,7 +266,7 @@ export function TeacherQuestionBankPage() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                {canEdit(question) ? (
+                {canEdit(question) && (
                   <>
                     <DropdownMenuItem onClick={() => handleEdit(question)}>
                       <FileEdit className="mr-2 h-4 w-4" />
@@ -302,11 +281,6 @@ export function TeacherQuestionBankPage() {
                       Delete
                     </DropdownMenuItem>
                   </>
-                ) : (
-                  <DropdownMenuItem onClick={() => handleCopyToPersonal(question)}>
-                    <Copy className="mr-2 h-4 w-4" />
-                    {t('actions.copyToPersonal')}
-                  </DropdownMenuItem>
                 )}
               </DropdownMenuContent>
             </DropdownMenu>
@@ -373,6 +347,16 @@ export function TeacherQuestionBankPage() {
                 {t('actions.import')}
               </Button>
 
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setIsBrowseDialogOpen(true)}
+                className="gap-2"
+              >
+                <Copy className="h-4 w-4" />
+                {t('actions.browsePublic')}
+              </Button>
+
               <Button size="sm" onClick={() => navigate('/question-bank/create')} className="gap-2">
                 <Plus className="h-4 w-4" />
                 {t('actions.create')}
@@ -414,15 +398,12 @@ export function TeacherQuestionBankPage() {
         {/* Dialogs */}
         <QuestionBankImportDialog open={isImportDialogOpen} onClose={() => setIsImportDialogOpen(false)} />
 
-        <CopyToPersonalDialog
-          open={isCopyDialogOpen}
-          onClose={() => {
-            setIsCopyDialogOpen(false);
-            setCopyingQuestion(null);
-          }}
-          onConfirm={handleCopyConfirm}
-          question={copyingQuestion}
-          isLoading={copyToPersonalMutation.isPending}
+        {/* Browse Public Questions Dialog */}
+        <QuestionBankDialog
+          open={isBrowseDialogOpen}
+          onOpenChange={setIsBrowseDialogOpen}
+          onAddQuestions={() => {}}
+          mode="copy-to-personal"
         />
       </div>
     </div>

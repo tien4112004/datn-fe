@@ -118,7 +118,9 @@ export default {
     selection: {
       selected: '{{count}} đã chọn',
       addSelected: 'Thêm Đã Chọn ({{count}})',
+      copySelected: 'Sao Chép Đã Chọn ({{count}})',
       copyToPersonal: 'Sao chép {{count}} vào Kho Cá Nhân',
+      copying: 'Đang sao chép...',
       cancel: 'Hủy',
     },
     copyToPersonal: {
@@ -526,6 +528,7 @@ export default {
       export: 'Xuất CSV',
       deleteSelected: 'Xóa đã chọn',
       copyToPersonal: 'Sao chép vào kho cá nhân',
+      browsePublic: 'Duyệt câu hỏi công khai',
     },
 
     filters: {

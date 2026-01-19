@@ -4,6 +4,7 @@ import type {
   QuestionBankFilters,
   CreateQuestionRequest,
   UpdateQuestionRequest,
+  QuestionBankItem,
 } from '../types/questionBank';
 
 // Export the API service hook for direct use
@@ -68,6 +69,20 @@ export const useCreateQuestion = () => {
   });
 };
 
+// CREATE multiple questions
+export const useCreateQuestions = () => {
+  const queryClient = useQueryClient();
+  const apiService = useQuestionBankApiService();
+
+  return useMutation({
+    mutationFn: (questions: Array<Omit<QuestionBankItem, 'id' | 'createdAt' | 'updatedAt'>>) =>
+      apiService.createQuestions(questions),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: questionBankKeys.lists() });
+    },
+  });
+};
+
 // UPDATE question
 export const useUpdateQuestion = () => {
   const queryClient = useQueryClient();
@@ -116,19 +131,6 @@ export const useDuplicateQuestion = () => {
 
   return useMutation({
     mutationFn: (id: string) => apiService.duplicateQuestion(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: questionBankKeys.lists() });
-    },
-  });
-};
-
-// COPY question to personal bank
-export const useCopyToPersonal = () => {
-  const queryClient = useQueryClient();
-  const apiService = useQuestionBankApiService();
-
-  return useMutation({
-    mutationFn: (id: string) => apiService.copyToPersonal(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: questionBankKeys.lists() });
     },

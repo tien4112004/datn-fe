@@ -36,9 +36,6 @@ export const QuestionBankDialog = ({
   const [isCopying, setIsCopying] = useState(false);
   const createQuestionsMutation = useCreateQuestions();
 
-  // Detect if we're in public bank mode
-  const isApplicationBank = filters.bankType === 'public';
-
   // Determine dialog behavior based on mode
   const showBothTabs = mode === 'add-to-assignment';
 

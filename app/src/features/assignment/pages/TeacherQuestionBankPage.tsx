@@ -99,7 +99,7 @@ export function TeacherQuestionBankPage() {
   // Hooks
   const { data, isLoading } = useQuestionBankList({
     page: pagination.pageIndex + 1,
-    limit: pagination.pageSize,
+    pageSize: pagination.pageSize,
     ...filters,
   });
 

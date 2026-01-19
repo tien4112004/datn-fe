@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist, devtools } from 'zustand/middleware';
-import type { Question, QuestionType, Difficulty, SubjectCode, BankType } from '../types';
+import type { QuestionBankItem, BankType } from '../types';
 
 /**
  * UI Filter State
@@ -22,7 +22,7 @@ interface QuestionBankFilters {
 
 interface QuestionBankStore {
   // Selection state (not persisted)
-  selectedQuestions: Question[];
+  selectedQuestions: QuestionBankItem[];
 
   // Filter state (persisted)
   filters: QuestionBankFilters;
@@ -31,7 +31,7 @@ interface QuestionBankStore {
   isDialogOpen: boolean;
 
   // Actions - Selection
-  toggleQuestionSelection: (question: Question) => void;
+  toggleQuestionSelection: (question: QuestionBankItem) => void;
   clearSelection: () => void;
   isQuestionSelected: (questionId: string) => boolean;
 
@@ -118,7 +118,7 @@ const useQuestionBankStore = create<QuestionBankStore>()(
 
         hasActiveFilters: () => {
           const { filters } = get();
-          return (
+          return !!(
             filters.search !== '' ||
             (filters.type && filters.type.length > 0) ||
             (filters.difficulty && filters.difficulty.length > 0) ||

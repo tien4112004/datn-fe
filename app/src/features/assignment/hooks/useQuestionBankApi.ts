@@ -26,7 +26,7 @@ export const questionBankKeys = {
 };
 
 // GET all questions with filters
-export const useQuestionBankList = (filters: QuestionBankFilters = {}) => {
+export const useQuestionBankList = (filters: QuestionBankFilters) => {
   const apiService = useQuestionBankApiService();
 
   return useQuery({

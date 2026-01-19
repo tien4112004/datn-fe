@@ -3,7 +3,7 @@ import { Checkbox } from '@/shared/components/ui/checkbox';
 import { Badge } from '@/shared/components/ui/badge';
 import { cn } from '@/shared/lib/utils';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
-import type { Question, QuestionBankItem } from '../../types';
+import type { QuestionBankItem } from '../../types';
 import { QuestionTypeIcon, DifficultyBadge } from '@/features/question/components/shared';
 import { Card, CardContent } from '@/components/ui/card';
 import { getGradeName } from '@aiprimary/core';
@@ -11,7 +11,7 @@ import { getGradeName } from '@aiprimary/core';
 interface QuestionBankCardProps {
   question: QuestionBankItem;
   isSelected: boolean;
-  onToggleSelection: (question: Question) => void;
+  onToggleSelection: (question: QuestionBankItem) => void;
 }
 
 // Helper functions for colorful badges

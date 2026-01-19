@@ -1,6 +1,6 @@
 import type { QuestionBankItem } from '@aiprimary/core';
 import type { ApiResponse } from '@aiprimary/api';
-import type { QuestionType, Difficulty, SubjectCode, BankType } from '.';
+import type { BankType } from '.';
 
 // Re-export core type
 export type { QuestionBankItem } from '@aiprimary/core';

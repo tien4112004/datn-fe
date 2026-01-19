@@ -1,19 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Plus, AlertCircle, ImagePlus, X, ChevronDown } from 'lucide-react';
+import { Plus, AlertCircle, ImagePlus, X } from 'lucide-react';
 import type { GroupQuestion, SubQuestion } from '@aiprimary/core';
-import { getCoreQuestionTypes, getQuestionTypeI18nKey } from '@aiprimary/core';
 import { VIEW_MODE } from '@/features/assignment/types';
 import { SubQuestionList } from './SubQuestionList';
 import { generateId } from '@/shared/lib/utils';
 import { ImageUploader } from '../shared';
 import { Button } from '@/shared/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/shared/components/ui/dropdown-menu';
 
 interface GroupEditingProps {
   question: GroupQuestion;
@@ -34,7 +27,7 @@ export function GroupEditing({ question, onChange }: GroupEditingProps) {
   const [description, setDescription] = useState(question.data?.description || '');
   const [questions, setQuestions] = useState<SubQuestion[]>(question.data?.questions || []);
   const [titleImageUrl, setTitleImageUrl] = useState(question.titleImageUrl || '');
-  const questionTypes = getCoreQuestionTypes();
+  const [showTypeSelector, setShowTypeSelector] = useState(false);
 
   // Notify parent of changes
   useEffect(() => {
@@ -94,6 +87,7 @@ export function GroupEditing({ question, onChange }: GroupEditingProps) {
     };
 
     setQuestions([...questions, newQuestion]);
+    setShowTypeSelector(false);
   };
 
   // Calculate total points

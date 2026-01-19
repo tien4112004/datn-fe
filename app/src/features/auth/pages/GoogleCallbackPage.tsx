@@ -36,7 +36,13 @@ export default function GoogleCallbackPage() {
         if (user) {
           setUser(user);
           toast.success(t('login.googleSignInSuccess'));
-          navigate('/', { replace: true });
+
+          // Redirect based on role
+          if (user.role === 'student') {
+            navigate('/student', { replace: true });
+          } else {
+            navigate('/', { replace: true });
+          }
         } else {
           throw new Error('No user data received');
         }

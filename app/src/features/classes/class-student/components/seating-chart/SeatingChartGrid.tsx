@@ -7,10 +7,11 @@ import { Fragment, forwardRef } from 'react';
 type SeatingChartGridProps = {
   layout: Layout;
   students: Student[];
+  isTeacher?: boolean;
 };
 
 export const SeatingChartGrid = forwardRef<HTMLDivElement, SeatingChartGridProps>(
-  ({ layout, students }, ref) => {
+  ({ layout, students, isTeacher = true }, ref) => {
     const { t } = useTranslation('classes', { keyPrefix: 'detail' });
 
     return (
@@ -29,35 +30,61 @@ export const SeatingChartGrid = forwardRef<HTMLDivElement, SeatingChartGridProps
                 return (
                   <Fragment key={seat.id}>
                     <div className="min-w-[120px] flex-1">
-                      <DroppableArea id={seat.id} data={{ containerId: 'grid' }}>
-                        <DraggableItem id={seat.id} data={{ containerId: 'grid' }} disabled={!student}>
-                          <div
-                            className={`relative flex h-24 flex-col items-center justify-center gap-1.5 rounded-md border p-2 text-center transition-all ${
-                              student
-                                ? 'border-primary/30 bg-primary/5 hover:border-primary hover:bg-primary/10'
-                                : 'border-muted-foreground/30 bg-muted/30 hover:bg-muted/50 border-dashed'
-                            }`}
-                          >
-                            {student ? (
-                              <>
-                                <div className="bg-primary/20 text-primary flex h-7 w-7 items-center justify-center rounded-full">
-                                  <Users className="h-4 w-4" />
-                                </div>
-                                <p className="truncate text-xs font-medium leading-tight">
-                                  {student.fullName}
-                                </p>
-                              </>
-                            ) : (
-                              <>
-                                <div className="bg-muted flex h-7 w-7 items-center justify-center rounded-full">
-                                  <Users className="text-muted-foreground h-4 w-4" />
-                                </div>
-                                <p className="text-muted-foreground text-xs">{t('students.emptySeat')}</p>
-                              </>
-                            )}
-                          </div>
-                        </DraggableItem>
-                      </DroppableArea>
+                      {isTeacher ? (
+                        <DroppableArea id={seat.id} data={{ containerId: 'grid' }}>
+                          <DraggableItem id={seat.id} data={{ containerId: 'grid' }} disabled={!student}>
+                            <div
+                              className={`relative flex h-24 flex-col items-center justify-center gap-1.5 rounded-md border p-2 text-center transition-all ${
+                                student
+                                  ? 'border-primary/30 bg-primary/5 hover:border-primary hover:bg-primary/10'
+                                  : 'border-muted-foreground/30 bg-muted/30 hover:bg-muted/50 border-dashed'
+                              }`}
+                            >
+                              {student ? (
+                                <>
+                                  <div className="bg-primary/20 text-primary flex h-7 w-7 items-center justify-center rounded-full">
+                                    <Users className="h-4 w-4" />
+                                  </div>
+                                  <p className="truncate text-xs font-medium leading-tight">
+                                    {student.fullName}
+                                  </p>
+                                </>
+                              ) : (
+                                <>
+                                  <div className="bg-muted flex h-7 w-7 items-center justify-center rounded-full">
+                                    <Users className="text-muted-foreground h-4 w-4" />
+                                  </div>
+                                  <p className="text-muted-foreground text-xs">{t('students.emptySeat')}</p>
+                                </>
+                              )}
+                            </div>
+                          </DraggableItem>
+                        </DroppableArea>
+                      ) : (
+                        <div
+                          className={`relative flex h-24 flex-col items-center justify-center gap-1.5 rounded-md border p-2 text-center ${
+                            student
+                              ? 'border-primary/30 bg-primary/5'
+                              : 'border-muted-foreground/30 bg-muted/30 border-dashed'
+                          }`}
+                        >
+                          {student ? (
+                            <>
+                              <div className="bg-primary/20 text-primary flex h-7 w-7 items-center justify-center rounded-full">
+                                <Users className="h-4 w-4" />
+                              </div>
+                              <p className="truncate text-xs font-medium leading-tight">{student.fullName}</p>
+                            </>
+                          ) : (
+                            <>
+                              <div className="bg-muted flex h-7 w-7 items-center justify-center rounded-full">
+                                <Users className="text-muted-foreground h-4 w-4" />
+                              </div>
+                              <p className="text-muted-foreground text-xs">{t('students.emptySeat')}</p>
+                            </>
+                          )}
+                        </div>
+                      )}
                     </div>
                     {colIndex < layout.columns - 1 &&
                       layout.separatorInterval &&

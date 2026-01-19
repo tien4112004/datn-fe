@@ -1,11 +1,12 @@
+import { api, getBackendUrl } from '@aiprimary/api';
+import type { ApiResponse } from '@aiprimary/api';
 import type { AIModificationRequest, AIModificationResponse } from '@/types/aiModification';
-import { generateMockResponse } from '@/views/Editor/Toolbar/AIModificationPanel/mockResponses';
+
+const BASE_URL = getBackendUrl();
 
 /**
- * Mock AI Modification Service
- *
- * This is a placeholder service that simulates AI processing with mock responses.
- * In production, this should be replaced with actual API calls to your AI backend.
+ * AI Modification Service
+ * Handles requests for content refinement, layout changes, and other AI-driven modifications.
  */
 export const aiModificationService = {
   /**
@@ -14,22 +15,74 @@ export const aiModificationService = {
    * @returns Promise resolving to the modification response
    */
   async processModification(request: AIModificationRequest): Promise<AIModificationResponse> {
-    // Simulate network delay (2 seconds)
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-
     try {
-      // Generate mock response based on action type
-      const mockData = generateMockResponse(request.action, request.context, request.parameters);
+      let endpoint = '';
+      let payload = {};
 
-      return {
-        success: true,
-        data: mockData,
-      };
-    } catch (err) {
+      // Map action to endpoint and payload
+      switch (request.action) {
+        case 'refine-content':
+          endpoint = '/api/ai/refine-content';
+          payload = {
+            content: request.context.slideContent || request.context.elementContent,
+            instruction: request.parameters.instruction || request.parameters.quickAction,
+            context: {
+              title: request.context.type === 'slide' ? 'Slide Title' : undefined, // In real app, pass actual title
+              slideId: request.context.slideId,
+            },
+          };
+          break;
+
+        case 'transform-layout':
+          endpoint = '/api/ai/transform-layout';
+          payload = {
+            currentSchema: request.context.slideContent, // current slide schema
+            targetType: request.parameters.targetType,
+          };
+          break;
+
+        case 'generate-image':
+          endpoint = '/api/ai/generate-image';
+          payload = {
+            description: request.parameters.description,
+            style: request.parameters.style,
+            slideId: request.context.slideId,
+          };
+          break;
+
+        case 'expand-slide':
+          endpoint = '/api/ai/expand-slide';
+          payload = {
+            currentSlide: request.context.slideContent,
+            count: request.parameters.count,
+          };
+          break;
+
+        default:
+          throw new Error(`Unsupported action: ${request.action}`);
+      }
+
+      // Make the API call
+      const response = await api.post<ApiResponse<any>>(`${BASE_URL}${endpoint}`, payload);
+
+      if (response.data && response.data.success !== false) {
+        return {
+          success: true,
+          data: response.data.data,
+        };
+      } else {
+        return {
+          success: false,
+          data: {},
+          error: response.data.message || 'Unknown error',
+        };
+      }
+    } catch (err: any) {
+      console.error('AI modification error:', err);
       return {
         success: false,
         data: {},
-        error: err instanceof Error ? err.message : 'Unknown error occurred',
+        error: err.response?.data?.message || err.message || 'Network error',
       };
     }
   },

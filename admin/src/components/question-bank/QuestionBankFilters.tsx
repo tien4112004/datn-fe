@@ -1,19 +1,32 @@
+import { useState, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
-import { Card } from '@/components/ui/card';
-import { X } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { X, Filter, ChevronDown, Search } from 'lucide-react';
 import type { QuestionBankParams } from '@/types/questionBank';
 import { useQuestionBankSubjects, useQuestionBankGrades, useQuestionBankChapters } from '@/hooks/useApi';
-import { useMemo, useEffect } from 'react';
 import { getSubjectName, getAllQuestionTypes, getAllDifficulties } from '@aiprimary/core';
 
 interface QuestionBankFiltersProps {
   filters: QuestionBankParams;
   onChange: (filters: QuestionBankParams) => void;
+  searchQuery?: string;
+  onSearchChange?: (value: string) => void;
+  orientation?: 'horizontal' | 'vertical';
+  RightComponent?: React.ReactNode;
 }
 
-export function QuestionBankFilters({ filters, onChange }: QuestionBankFiltersProps) {
+export function QuestionBankFilters({
+  filters,
+  onChange,
+  searchQuery = '',
+  onSearchChange,
+  orientation = 'horizontal',
+  RightComponent,
+}: QuestionBankFiltersProps) {
+  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+
   // Fetch metadata
   const { data: subjectsData } = useQuestionBankSubjects();
   const { data: gradesData } = useQuestionBankGrades();
@@ -59,13 +72,193 @@ export function QuestionBankFilters({ filters, onChange }: QuestionBankFiltersPr
     onChange({});
   };
 
+  // Horizontal layout with search bar and collapsible filters
+  if (orientation === 'horizontal') {
+    return (
+      <div className="space-y-4">
+        {/* Search Bar with Toggle Button */}
+        <div className="flex items-center gap-3">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setIsFiltersOpen(!isFiltersOpen)}
+            className="h-10 w-10 shrink-0"
+            title={isFiltersOpen ? 'Hide filters' : 'Show filters'}
+          >
+            <div className="flex items-center gap-1">
+              <Filter className="h-5 w-5" />
+              <ChevronDown
+                className={`h-4 w-4 transition-transform duration-200 ${isFiltersOpen ? 'rotate-180' : ''}`}
+              />
+            </div>
+          </Button>
+          <div className="flex flex-1 gap-2">
+            <div className="relative max-w-md flex-1">
+              <Search className="text-muted-foreground absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" />
+              <Input
+                placeholder="Search questions..."
+                value={searchQuery}
+                onChange={(e) => onSearchChange?.(e.target.value)}
+                className="pl-9"
+              />
+            </div>
+
+            {RightComponent}
+          </div>
+        </div>
+
+        {/* Filters Grid - Collapsible with CSS transitions */}
+        <div
+          className={`grid gap-4 overflow-hidden transition-all duration-300 ease-in-out ${
+            isFiltersOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
+          }`}
+        >
+          <div className="min-h-0">
+            <div className="grid grid-cols-5 gap-4">
+              {/* Question Type - Multi-select */}
+              <div className="space-y-2">
+                <Label className="text-foreground mb-3 block text-sm font-semibold">Question Type</Label>
+                <div className="space-y-2">
+                  {getAllQuestionTypes({ includeGroup: true }).map((type) => (
+                    <label
+                      key={type.value}
+                      className="hover:bg-accent flex cursor-pointer items-center gap-2 rounded-md p-1 transition-colors"
+                    >
+                      <Checkbox
+                        checked={
+                          Array.isArray(filters.questionType) && filters.questionType.includes(type.value)
+                        }
+                        onCheckedChange={(checked) =>
+                          handleCheckboxChange('questionType', type.value, checked as boolean)
+                        }
+                      />
+                      <span className="text-xs font-medium">{type.label}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* Difficulty - Multi-select */}
+              <div className="space-y-2">
+                <Label className="text-foreground mb-3 block text-sm font-semibold">Difficulty</Label>
+                <div className="space-y-2">
+                  {getAllDifficulties().map((difficulty) => (
+                    <label
+                      key={difficulty.value}
+                      className="hover:bg-accent flex cursor-pointer items-center gap-2 rounded-md p-1 transition-colors"
+                    >
+                      <Checkbox
+                        checked={
+                          Array.isArray(filters.difficulty) && filters.difficulty.includes(difficulty.value)
+                        }
+                        onCheckedChange={(checked) =>
+                          handleCheckboxChange('difficulty', difficulty.value, checked as boolean)
+                        }
+                      />
+                      <span className="text-xs font-medium">{difficulty.label}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* Subject - Multi-select */}
+              <div className="space-y-2">
+                <Label className="text-foreground mb-3 block text-sm font-semibold">Subject</Label>
+                <div className="max-h-32 space-y-2 overflow-y-auto">
+                  {subjects.map((subject) => (
+                    <label
+                      key={subject}
+                      className="hover:bg-accent flex cursor-pointer items-center gap-2 rounded-md p-1 transition-colors"
+                    >
+                      <Checkbox
+                        checked={
+                          Array.isArray(filters.subjectCode) && filters.subjectCode.includes(subject as any)
+                        }
+                        onCheckedChange={(checked) =>
+                          handleCheckboxChange('subjectCode', subject, checked as boolean)
+                        }
+                      />
+                      <span className="text-xs font-medium">{getSubjectName(subject)}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* Grade - Multi-select */}
+              <div className="space-y-2">
+                <Label className="text-foreground mb-3 block text-sm font-semibold">Grade</Label>
+                <div className="max-h-32 space-y-2 overflow-y-auto">
+                  {grades.map((grade) => (
+                    <label
+                      key={grade}
+                      className="hover:bg-accent flex cursor-pointer items-center gap-2 rounded-md p-1 transition-colors"
+                    >
+                      <Checkbox
+                        checked={Array.isArray(filters.grade) && filters.grade.includes(grade)}
+                        onCheckedChange={(checked) =>
+                          handleCheckboxChange('grade', grade, checked as boolean)
+                        }
+                      />
+                      <span className="text-xs font-medium">Grade {grade}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* Chapter - Multi-select (conditional) */}
+              <div className="space-y-2">
+                <Label className="text-foreground mb-3 block text-sm font-semibold">Chapter</Label>
+                {shouldFetchChapters && chapters.length > 0 ? (
+                  <div className="max-h-32 space-y-2 overflow-y-auto">
+                    {chapters.map((chapter) => (
+                      <label
+                        key={chapter}
+                        className="hover:bg-accent flex cursor-pointer items-center gap-2 rounded-md p-1 transition-colors"
+                      >
+                        <Checkbox
+                          checked={Array.isArray(filters.chapter) && filters.chapter.includes(chapter)}
+                          onCheckedChange={(checked) =>
+                            handleCheckboxChange('chapter', chapter, checked as boolean)
+                          }
+                        />
+                        <span className="text-xs font-medium">{chapter}</span>
+                      </label>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-muted-foreground text-xs">
+                    {shouldFetchChapters ? 'No chapters available' : 'Select 1 subject + 1 grade'}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Clear Filters Button */}
+        {hasActiveFilters && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleClearFilters}
+            className="w-full gap-2 font-semibold"
+          >
+            <X className="h-4 w-4" />
+            Clear All Filters
+          </Button>
+        )}
+      </div>
+    );
+  }
+
+  // Vertical layout (original)
   return (
     <div className="space-y-4">
       {/* Question Type */}
       <div>
         <Label className="text-sm font-medium">Question Type</Label>
         <div className="mt-2 space-y-2">
-          {getAllQuestionTypes({ includeGroup: false }).map((type) => (
+          {getAllQuestionTypes({ includeGroup: true }).map((type) => (
             <label key={type.value} className="flex cursor-pointer items-center gap-2">
               <Checkbox
                 checked={Array.isArray(filters.questionType) && filters.questionType.includes(type.value)}
@@ -133,7 +326,7 @@ export function QuestionBankFilters({ filters, onChange }: QuestionBankFiltersPr
 
       {/* Conditional Chapter */}
       {shouldFetchChapters && chapters.length > 0 && (
-        <Card className="border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-950">
+        <div className="rounded-md border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-950">
           <Label className="text-sm font-medium">Chapter (for selected Subject + Grade)</Label>
           <div className="mt-2 max-h-40 space-y-2 overflow-y-auto">
             {chapters.map((chapter) => (
@@ -146,7 +339,7 @@ export function QuestionBankFilters({ filters, onChange }: QuestionBankFiltersPr
               </label>
             ))}
           </div>
-        </Card>
+        </div>
       )}
 
       {shouldFetchChapters && chapters.length === 0 && (

@@ -14,6 +14,8 @@ import type { Question, QuestionType, Difficulty, SubjectCode, BankType } from '
 export type QuestionBankItem = Question & {
   subjectCode: SubjectCode;
   bankType: BankType;
+  grade?: string;
+  chapter?: string;
   createdAt?: string;
   updatedAt?: string;
   createdBy?: string; // User ID of creator
@@ -124,7 +126,22 @@ export interface QuestionBankApiService {
 }
 
 // Re-export core types and constants for convenience
-export type { Question, QuestionType, Difficulty, SubjectCode, BankType } from '@aiprimary/core';
+export type {
+  Question,
+  QuestionType,
+  Difficulty,
+  SubjectCode,
+  BankType,
+  MultipleChoiceQuestion,
+  MultipleChoiceOption,
+  MatchingQuestion,
+  MatchingPair,
+  OpenEndedQuestion,
+  FillInBlankQuestion,
+  BlankSegment,
+  BlankSegment as FillInBlankSegment,
+  GroupQuestion,
+} from '@aiprimary/core';
 
 export {
   QUESTION_TYPE,

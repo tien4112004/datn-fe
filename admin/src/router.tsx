@@ -29,6 +29,9 @@ const BooksPage = lazy(() => import('@/pages/BooksPage').then((m) => ({ default:
 const QuestionBankPage = lazy(() =>
   import('@/pages/QuestionBankPage').then((m) => ({ default: m.QuestionBankPage }))
 );
+const QuestionBankEditorPage = lazy(() =>
+  import('@/pages/QuestionBankEditorPage').then((m) => ({ default: m.QuestionBankEditorPage }))
+);
 
 const LazyWrapper = ({ children }: { children: React.ReactNode }) => (
   <Suspense fallback={<GlobalSpinner text="Loading..." />}>{children}</Suspense>
@@ -164,6 +167,22 @@ export const router = createBrowserRouter([
         element: (
           <LazyWrapper>
             <QuestionBankPage />
+          </LazyWrapper>
+        ),
+      },
+      {
+        path: 'question-bank/create',
+        element: (
+          <LazyWrapper>
+            <QuestionBankEditorPage />
+          </LazyWrapper>
+        ),
+      },
+      {
+        path: 'question-bank/edit/:id',
+        element: (
+          <LazyWrapper>
+            <QuestionBankEditorPage />
           </LazyWrapper>
         ),
       },

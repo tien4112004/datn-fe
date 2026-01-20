@@ -1,6 +1,7 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { MatchingQuestion, MatchingAnswer } from '@/features/assignment/types';
-import { MarkdownPreview, DifficultyBadge } from '../shared';
+import { MarkdownPreview, QuestionNumber } from '../shared';
 
 import { Input } from '@/shared/components/ui/input';
 import { Label } from '@/shared/components/ui/label';
@@ -13,9 +14,18 @@ interface MatchingGradingProps {
   answer?: MatchingAnswer;
   points?: number; // Points allocated for this question in the assignment
   onGradeChange?: (grade: { points: number; feedback?: string }) => void;
+  number?: number;
 }
 
-export const MatchingGrading = ({ question, answer, points = 0, onGradeChange }: MatchingGradingProps) => {
+export const MatchingGrading = ({
+  question,
+  answer,
+  points = 0,
+  onGradeChange,
+  number,
+}: MatchingGradingProps) => {
+  const { t } = useTranslation('questions');
+
   // Calculate score: each correct match gets equal points
   const pointsPerPair = points / question.data.pairs.length;
   let correctMatches = 0;
@@ -58,13 +68,11 @@ export const MatchingGrading = ({ question, answer, points = 0, onGradeChange }:
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold">Matching Question - Grading</h3>
-          <DifficultyBadge difficulty={question.difficulty} />
+      {number !== undefined && (
+        <div className="flex items-center gap-3">
+          <QuestionNumber number={number} />
         </div>
-      </div>
-
+      )}
       {/* Question Title */}
       <div className="space-y-2">
         <MarkdownPreview content={question.title} />
@@ -75,7 +83,7 @@ export const MatchingGrading = ({ question, answer, points = 0, onGradeChange }:
 
       {/* Student's Matches */}
       <div className="space-y-2">
-        <Label className="text-sm font-semibold">Student Answer:</Label>
+        <Label className="text-sm font-semibold">{t('matching.grading.studentAnswer')}</Label>
         <div className="space-y-2">
           {answer?.matches.map((match) => {
             const isCorrect = isMatchCorrect(match.leftId, match.rightId);
@@ -114,7 +122,7 @@ export const MatchingGrading = ({ question, answer, points = 0, onGradeChange }:
 
                 {!isCorrect && leftPair && (
                   <div className="text-muted-foreground border-l pl-3 text-xs">
-                    <span className="font-semibold">Correct: </span>
+                    <span className="font-semibold">{t('matching.grading.correctLabel')}</span>
                     <MarkdownPreview content={leftPair.right} />
                   </div>
                 )}
@@ -126,7 +134,7 @@ export const MatchingGrading = ({ question, answer, points = 0, onGradeChange }:
 
       {/* Correct Pairs Reference */}
       <div className="bg-muted/50 space-y-2 rounded-md p-3">
-        <Label className="text-sm font-semibold">Correct Pairs:</Label>
+        <Label className="text-sm font-semibold">{t('matching.grading.correctPairs')}</Label>
         <div className="space-y-1.5">
           {question.data.pairs.map((pair) => (
             <div key={pair.id} className="flex items-center gap-2 text-sm">
@@ -141,21 +149,25 @@ export const MatchingGrading = ({ question, answer, points = 0, onGradeChange }:
       {/* Auto Score Info */}
       <div className="bg-muted/50 rounded-md p-3 text-sm">
         <p>
-          <span className="font-semibold">Auto-calculated Score: </span>
+          <span className="font-semibold">{t('matching.grading.autoCalculatedScore')}</span>
           <span className="text-blue-600">
-            {correctMatches}/{question.data.pairs.length} correct matches - {autoScore.toFixed(1)} points
+            {t('matching.grading.correctMatchesScore', {
+              correct: correctMatches,
+              total: question.data.pairs.length,
+              score: autoScore.toFixed(1),
+            })}
           </span>
         </p>
       </div>
 
       {/* Grading Interface */}
       <div className="space-y-3 border-t pt-4">
-        <h4 className="text-sm font-semibold">Grading</h4>
+        <h4 className="text-sm font-semibold">{t('matching.grading.grading')}</h4>
 
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1.5">
             <Label htmlFor="points" className="text-sm">
-              Points Awarded
+              {t('matching.grading.pointsAwarded')}
             </Label>
             <Input
               id="points"
@@ -167,19 +179,21 @@ export const MatchingGrading = ({ question, answer, points = 0, onGradeChange }:
               onChange={(e) => handlePointsChange(e.target.value)}
               className="h-9"
             />
-            <p className="text-muted-foreground text-xs">Max: {points || 0} points</p>
+            <p className="text-muted-foreground text-xs">
+              {t('matching.grading.maxPoints', { points: points || 0 })}
+            </p>
           </div>
         </div>
 
         <div className="space-y-1.5">
           <Label htmlFor="feedback" className="text-sm">
-            Teacher Feedback (Optional)
+            {t('matching.grading.teacherFeedback')}
           </Label>
           <Textarea
             id="feedback"
             value={feedback}
             onChange={(e) => handleFeedbackChange(e.target.value)}
-            placeholder="Add comments or feedback for the student..."
+            placeholder={t('matching.grading.feedbackPlaceholder')}
             className="min-h-[80px] resize-none"
           />
         </div>

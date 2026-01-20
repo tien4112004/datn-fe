@@ -1,4 +1,4 @@
-import type { Difficulty, SubjectCode } from './constants';
+import type { Difficulty, SubjectCode } from './';
 import type { Question } from '@aiprimary/core';
 
 // Question with topic assignment (intersection of core Question with topicId)
@@ -49,23 +49,19 @@ export interface AssignmentFormData {
 // Assignment (full entity)
 export interface Assignment {
   id: string;
-  classId?: string; // Class this assignment belongs to (optional for drafts)
   title: string;
   description?: string;
-  subject: string;
-  subjectCode?: SubjectCode;
+  subject?: SubjectCode;
   topics: AssignmentTopic[];
   questions: AssignmentQuestionWithTopic[];
   matrix: {
     cells: MatrixCell[];
   };
-  dueDate?: string; // ISO timestamp for assignment due date
   totalPoints?: number; // Total points for the assignment
   shuffleQuestions?: boolean; // Shuffle questions for each student (default: false)
   status: 'draft' | 'published' | 'archived';
   createdAt?: string;
   updatedAt?: string;
-  createdBy?: string;
 }
 
 // API request types
@@ -86,6 +82,9 @@ export interface UpdateAssignmentRequest {
   id?: string;
   title?: string;
   description?: string;
+  subject?: string;
+  topics?: AssignmentTopic[];
+  matrixCells?: MatrixCell[];
   dueDate?: string;
   questions?: AssignmentQuestionWithTopic[];
   totalPoints?: number;

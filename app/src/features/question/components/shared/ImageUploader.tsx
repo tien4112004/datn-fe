@@ -3,9 +3,10 @@ import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
 import { Label } from '@/shared/components/ui/label';
 import { uploadImage, isValidImageUrl } from '@/features/assignment/utils';
-import { Upload, X } from 'lucide-react';
+import { Upload, X, Images } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import { useTranslation } from 'react-i18next';
+import { ImageStorageDialog } from './ImageStorageDialog';
 
 interface ImageUploaderProps {
   value?: string;
@@ -26,6 +27,7 @@ export const ImageUploader = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<string>('');
+  const [isStorageDialogOpen, setIsStorageDialogOpen] = useState(false);
 
   const defaultLabel = t('label');
 
@@ -53,6 +55,11 @@ export const ImageUploader = ({
     }
   };
 
+  const handleSelectFromStorage = (imageUrl: string) => {
+    setError('');
+    onChange(imageUrl);
+  };
+
   return (
     <div className={cn('space-y-2', className)}>
       {(label || defaultLabel) && <Label>{label || defaultLabel}</Label>}
@@ -78,6 +85,17 @@ export const ImageUploader = ({
           {isUploading ? t('uploading') : t('uploadButton')}
         </Button>
 
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => setIsStorageDialogOpen(true)}
+          disabled={disabled || isUploading}
+        >
+          <Images className="mr-2 h-4 w-4" />
+          {t('chooseFromStorage')}
+        </Button>
+
         {value && isValidImageUrl(value) && (
           <Button type="button" variant="ghost" size="sm" onClick={handleRemove} disabled={disabled}>
             <X className="h-4 w-4" />
@@ -92,6 +110,12 @@ export const ImageUploader = ({
           <img src={value} alt={t('preview')} className="rounded-md border" style={{ maxHeight: '200px' }} />
         </div>
       )}
+
+      <ImageStorageDialog
+        open={isStorageDialogOpen}
+        onClose={() => setIsStorageDialogOpen(false)}
+        onSelect={handleSelectFromStorage}
+      />
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, useRef } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import type { Presentation } from '../types';
 import { CriticalError } from '@aiprimary/api';
@@ -13,17 +13,6 @@ interface MessageDetail {
   type: 'success' | 'error' | 'warning' | 'info' | string;
   message: string;
 }
-
-// Hook to manage Vue app instance reference
-export const useVueApp = () => {
-  const app = useRef<VueEditorApp | null>(null);
-
-  const updateApp = useCallback((newInstance: VueEditorApp) => {
-    app.current = newInstance;
-  }, []);
-
-  return { app, updateApp };
-};
 
 export const usePresentationValidation = (
   id: string | undefined,

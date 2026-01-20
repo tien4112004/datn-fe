@@ -1,20 +1,28 @@
 import { create } from 'zustand';
 import { persist, devtools } from 'zustand/middleware';
-import type { Question, QuestionType, Difficulty, SubjectCode, BankType } from '../types';
+import type { QuestionBankItem, BankType } from '../types';
 
+/**
+ * UI Filter State
+ * All filter fields use arrays for consistency
+ */
 interface QuestionBankFilters {
-  searchText: string;
-  questionType?: QuestionType | QuestionType[];
-  difficulty?: Difficulty | Difficulty[];
-  subjectCode?: SubjectCode | SubjectCode[];
-  grade?: string | string[];
-  chapter?: string | string[];
-  bankType?: BankType; // Filter by personal or application bank
+  search: string;
+  type?: string[];
+  difficulty?: string[];
+  subject?: string[];
+  grade?: string[];
+  chapter?: string[];
+  bankType: BankType; // Required by backend
+  page?: number;
+  pageSize?: number;
+  sortBy?: string;
+  sortDirection?: 'ASC' | 'DESC';
 }
 
 interface QuestionBankStore {
   // Selection state (not persisted)
-  selectedQuestions: Question[];
+  selectedQuestions: QuestionBankItem[];
 
   // Filter state (persisted)
   filters: QuestionBankFilters;
@@ -23,7 +31,7 @@ interface QuestionBankStore {
   isDialogOpen: boolean;
 
   // Actions - Selection
-  toggleQuestionSelection: (question: Question) => void;
+  toggleQuestionSelection: (question: QuestionBankItem) => void;
   clearSelection: () => void;
   isQuestionSelected: (questionId: string) => boolean;
 
@@ -44,13 +52,17 @@ interface QuestionBankStore {
 const initialState = {
   selectedQuestions: [],
   filters: {
-    searchText: '',
-    questionType: undefined,
+    search: '',
+    type: undefined,
     difficulty: undefined,
-    subjectCode: undefined,
+    subject: undefined,
     grade: undefined,
     chapter: undefined,
-    bankType: 'personal' as BankType | undefined, // Default to personal bank
+    bankType: 'personal' as BankType, // Default to personal bank (required by backend)
+    page: 1,
+    pageSize: 20,
+    sortBy: 'createdAt',
+    sortDirection: 'DESC' as 'ASC' | 'DESC',
   },
   isDialogOpen: false,
 };
@@ -90,49 +102,36 @@ const useQuestionBankStore = create<QuestionBankStore>()(
         clearFilters: () =>
           set((state) => ({
             filters: {
-              searchText: '',
-              questionType: undefined,
+              search: '',
+              type: undefined,
               difficulty: undefined,
-              subjectCode: undefined,
+              subject: undefined,
               grade: undefined,
               chapter: undefined,
               bankType: state.filters.bankType, // Preserve current bank type
+              page: 1, // Reset to first page
+              pageSize: state.filters.pageSize, // Preserve page size
+              sortBy: state.filters.sortBy, // Preserve sort settings
+              sortDirection: state.filters.sortDirection,
             },
           })),
 
         hasActiveFilters: () => {
           const { filters } = get();
-          const hasQuestionType = Array.isArray(filters.questionType)
-            ? filters.questionType.length > 0
-            : filters.questionType !== undefined;
-          const hasDifficulty = Array.isArray(filters.difficulty)
-            ? filters.difficulty.length > 0
-            : filters.difficulty !== undefined;
-          const hasSubjectCode = Array.isArray(filters.subjectCode)
-            ? filters.subjectCode.length > 0
-            : filters.subjectCode !== undefined;
-          const hasGrade = Array.isArray(filters.grade)
-            ? filters.grade.length > 0
-            : filters.grade !== undefined;
-          const hasChapter = Array.isArray(filters.chapter)
-            ? filters.chapter.length > 0
-            : filters.chapter !== undefined;
-
-          return (
-            filters.searchText !== '' ||
-            hasQuestionType ||
-            hasDifficulty ||
-            hasSubjectCode ||
-            hasGrade ||
-            hasChapter
+          return !!(
+            filters.search !== '' ||
+            (filters.type && filters.type.length > 0) ||
+            (filters.difficulty && filters.difficulty.length > 0) ||
+            (filters.subject && filters.subject.length > 0) ||
+            (filters.grade && filters.grade.length > 0) ||
+            (filters.chapter && filters.chapter.length > 0)
           );
         },
 
         shouldShowChapterFilter: () => {
           const { filters } = get();
-          const subjects = Array.isArray(filters.subjectCode) ? filters.subjectCode : [];
-          const grades = Array.isArray(filters.grade) ? filters.grade : [];
-          return subjects.length === 1 && grades.length === 1;
+          // Chapters require exactly one subject and one grade selected
+          return filters.subject?.length === 1 && filters.grade?.length === 1;
         },
 
         // Dialog actions

@@ -1,43 +1,16 @@
-import { useFormContext, useWatch } from 'react-hook-form';
-import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/shared/components/ui/table';
 import { MatrixCell } from './MatrixCell';
-import { useAssignmentEditorStore } from '../../stores/useAssignmentEditorStore';
-import type { AssignmentFormData } from '../../types';
-import { DIFFICULTY } from '../../types';
+import { useAssignmentFormStore } from '../../stores/useAssignmentFormStore';
+import { getAllDifficulties, getDifficultyI18nKey } from '@aiprimary/core';
 
 export const MatrixGrid = () => {
   const { t } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.matrixEditor' });
-  const { t: tDifficulty } = useTranslation('assignment', { keyPrefix: 'difficulty' });
-  const { control, setValue } = useFormContext<AssignmentFormData>();
+  const { t: tDifficulty } = useTranslation('questions');
 
-  const getDifficultyLabel = (difficulty: string) => {
-    const diffMap: Record<string, 'nhanBiet' | 'thongHieu' | 'vanDung' | 'vanDungCao'> = {
-      [DIFFICULTY.EASY]: 'nhanBiet',
-      [DIFFICULTY.MEDIUM]: 'thongHieu',
-      [DIFFICULTY.HARD]: 'vanDung',
-      [DIFFICULTY.SUPER_HARD]: 'vanDungCao',
-    };
-    const key = diffMap[difficulty] || 'nhanBiet';
-    return tDifficulty(key as 'nhanBiet' | 'thongHieu' | 'vanDung' | 'vanDungCao');
-  };
-
-  // Watch for changes
-  const questions = useWatch({ control, name: 'questions' });
-  const topics = useWatch({ control, name: 'topics' });
-  const matrixCells = useWatch({ control, name: 'matrixCells' });
-
-  const syncMatrixCounts = useAssignmentEditorStore((state) => state.syncMatrixCounts);
-
-  // Sync matrix counts whenever questions or topics change
-  useEffect(() => {
-    if (questions && topics && matrixCells) {
-      const updatedCells = syncMatrixCounts(questions, topics, matrixCells);
-      setValue('matrixCells', updatedCells);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [questions, topics]);
+  // Get data from store (matrix counts are auto-synced)
+  const topics = useAssignmentFormStore((state) => state.topics);
+  const matrixCells = useAssignmentFormStore((state) => state.matrixCells);
 
   if (!topics || topics.length === 0) {
     return (
@@ -47,7 +20,7 @@ export const MatrixGrid = () => {
     );
   }
 
-  const difficulties = [DIFFICULTY.EASY, DIFFICULTY.MEDIUM, DIFFICULTY.HARD, DIFFICULTY.SUPER_HARD];
+  const difficulties = getAllDifficulties();
 
   return (
     <div className="overflow-x-auto rounded-lg border">
@@ -58,8 +31,8 @@ export const MatrixGrid = () => {
               {t('tableHeaders.topic')}
             </TableHead>
             {difficulties.map((difficulty) => (
-              <TableHead key={difficulty} className="bg-gray-50 text-center text-xs dark:bg-gray-900">
-                {getDifficultyLabel(difficulty)}
+              <TableHead key={difficulty.value} className="bg-gray-50 text-center text-xs dark:bg-gray-900">
+                {tDifficulty(getDifficultyI18nKey(difficulty.value) as any)}
               </TableHead>
             ))}
           </TableRow>
@@ -67,11 +40,20 @@ export const MatrixGrid = () => {
         <TableBody>
           {topics.map((topic) => (
             <TableRow key={topic.id}>
-              <TableCell className="font-medium">{topic.name || t('tableHeaders.topic')}</TableCell>
+              <TableCell className="font-medium">
+                <div className="space-y-1">
+                  <div>{topic.name || t('tableHeaders.topic')}</div>
+                  {topic.description && (
+                    <div className="line-clamp-2 text-xs font-normal text-gray-500">{topic.description}</div>
+                  )}
+                </div>
+              </TableCell>
               {difficulties.map((difficulty) => {
-                const cell = matrixCells?.find((c) => c.topicId === topic.id && c.difficulty === difficulty);
+                const cell = matrixCells?.find(
+                  (c) => c.topicId === topic.id && c.difficulty === difficulty.value
+                );
                 return (
-                  <TableCell key={`${topic.id}-${difficulty}`} className="p-2">
+                  <TableCell key={`${topic.id}-${difficulty.value}`} className="p-2">
                     {cell && <MatrixCell cell={cell} />}
                   </TableCell>
                 );

@@ -1,20 +1,24 @@
+import { useTranslation } from 'react-i18next';
 import type { FillInBlankQuestion } from '@/features/assignment/types';
-import { DifficultyBadge, MarkdownPreview } from '../shared';
+import { MarkdownPreview, QuestionNumber } from '../shared';
 import { Label } from '@/shared/components/ui/label';
 import { Badge } from '@/shared/components/ui/badge';
 
 interface FillInBlankViewingProps {
   question: FillInBlankQuestion;
   points?: number; // Optional points for display
+  number?: number;
 }
 
-export const FillInBlankViewing = ({ question, points }: FillInBlankViewingProps) => {
+export const FillInBlankViewing = ({ question, points, number }: FillInBlankViewingProps) => {
+  const { t } = useTranslation('questions');
   return (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold">Fill In Blank Question</h3>
-        <DifficultyBadge difficulty={question.difficulty} />
-      </div>
+    <div className="space-y-4">
+      {number !== undefined && (
+        <div className="flex items-center gap-3">
+          <QuestionNumber number={number} />
+        </div>
+      )}
       {/* Title */}
       {question.title && (
         <div className="space-y-1">
@@ -42,13 +46,13 @@ export const FillInBlankViewing = ({ question, points }: FillInBlankViewingProps
 
       {/* Expected Answers */}
       <div className="space-y-2 rounded-lg border border-gray-300 bg-green-50 p-3 dark:border-gray-600 dark:bg-green-900/20">
-        <Label className="text-sm font-medium">Expected Answers:</Label>
+        <Label className="text-sm font-medium">{t('fillInBlank.viewing.expectedAnswers')}</Label>
         <div className="space-y-1">
           {question.data.segments
             .filter((segment) => segment.type === 'blank')
             .map((segment, index) => (
               <div key={segment.id} className="flex items-center gap-2">
-                <Badge variant="outline">Blank {index + 1}</Badge>
+                <Badge variant="outline">{t('fillInBlank.viewing.blankLabel', { index: index + 1 })}</Badge>
                 <code className="bg-background rounded px-2 py-1 text-sm">{segment.content}</code>
               </div>
             ))}
@@ -56,25 +60,24 @@ export const FillInBlankViewing = ({ question, points }: FillInBlankViewingProps
       </div>
 
       {/* Case Sensitivity */}
-      {question.data.caseSensitive !== undefined && (
-        <div className="bg-muted/50 flex items-center gap-2 rounded-lg border border-gray-300 p-2 dark:border-gray-600">
-          <Label className="text-sm font-medium">Case Sensitive</Label>
-          <Badge variant={question.data.caseSensitive ? 'default' : 'secondary'} className="ml-auto">
-            {question.data.caseSensitive ? 'Yes' : 'No'}
-          </Badge>
+      {question.data.caseSensitive && (
+        <div className="rounded-md border border-amber-200 bg-amber-50 p-2 text-xs text-amber-800 dark:border-amber-800 dark:bg-amber-900/20 dark:text-amber-200">
+          {t('fillInBlank.viewing.caseSensitiveWarning')}
         </div>
       )}
 
       {/* Explanation */}
       {question.explanation && (
         <div className="space-y-2 rounded-lg border border-gray-300 bg-blue-50 p-3 dark:border-gray-600 dark:bg-blue-900/20">
-          <Label className="text-sm font-medium">Explanation:</Label>
+          <Label className="text-sm font-medium">{t('fillInBlank.viewing.explanation')}</Label>
           <MarkdownPreview content={question.explanation} />
         </div>
       )}
 
       {/* Points */}
-      {points && <p className="text-muted-foreground text-sm">Points: {points}</p>}
+      {points && (
+        <p className="text-muted-foreground text-sm">{t('fillInBlank.viewing.points', { points })}</p>
+      )}
     </div>
   );
 };

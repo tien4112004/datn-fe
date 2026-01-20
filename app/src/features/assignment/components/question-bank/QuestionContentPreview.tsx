@@ -1,12 +1,15 @@
+import { useTranslation } from 'react-i18next';
 import type { QuestionBankItem } from '@/features/assignment/types';
 import { QUESTION_TYPE } from '@/features/assignment/types';
 import { AlertCircle } from 'lucide-react';
+import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 
 interface QuestionContentPreviewProps {
   question: QuestionBankItem;
 }
 
 export function QuestionContentPreview({ question }: QuestionContentPreviewProps) {
+  const { t } = useTranslation(I18N_NAMESPACES.ASSIGNMENT, { keyPrefix: 'assignmentEditor.questionPreview' });
   const renderPreview = () => {
     switch (question.type) {
       case QUESTION_TYPE.MULTIPLE_CHOICE: {
@@ -21,10 +24,10 @@ export function QuestionContentPreview({ question }: QuestionContentPreviewProps
         return (
           <div className="flex items-center gap-2">
             <span className="text-muted-foreground text-sm">
-              {opts.length} options • Correct: {correctLetter}
+              {t('multipleChoice', { count: opts.length, correct: correctLetter })}
             </span>
             {(hasPlaceholder || hasEmptyOptions) && (
-              <AlertCircle className="h-3.5 w-3.5 text-yellow-500" title="Has placeholder or empty content" />
+              <AlertCircle className="h-3.5 w-3.5 text-yellow-500" title={t('placeholderWarning')} />
             )}
           </div>
         );
@@ -39,9 +42,9 @@ export function QuestionContentPreview({ question }: QuestionContentPreviewProps
 
         return (
           <div className="flex items-center gap-2">
-            <span className="text-muted-foreground text-sm">{pairs.length} pairs</span>
+            <span className="text-muted-foreground text-sm">{t('matching', { count: pairs.length })}</span>
             {(hasPlaceholder || hasEmpty) && (
-              <AlertCircle className="h-3.5 w-3.5 text-yellow-500" title="Has placeholder or empty content" />
+              <AlertCircle className="h-3.5 w-3.5 text-yellow-500" title={t('placeholderWarning')} />
             )}
           </div>
         );
@@ -55,23 +58,25 @@ export function QuestionContentPreview({ question }: QuestionContentPreviewProps
 
         return (
           <div className="flex items-center gap-2">
-            <span className="text-muted-foreground text-sm">{blankCount} blank(s)</span>
+            <span className="text-muted-foreground text-sm">{t('fillInBlank', { count: blankCount })}</span>
             {(hasPlaceholder || hasEmptyBlanks) && (
-              <AlertCircle className="h-3.5 w-3.5 text-yellow-500" title="Has placeholder or empty content" />
+              <AlertCircle className="h-3.5 w-3.5 text-yellow-500" title={t('placeholderWarning')} />
             )}
           </div>
         );
       }
 
       case QUESTION_TYPE.OPEN_ENDED: {
-        const limit = question.data.maxLength ? `${question.data.maxLength} chars` : 'unlimited';
+        const limit = question.data.maxLength
+          ? t('openEnded.withLimit', { limit: question.data.maxLength })
+          : t('openEnded.unlimited');
         const hasNoAnswer = !question.data.expectedAnswer?.trim();
 
         return (
           <div className="flex items-center gap-2">
-            <span className="text-muted-foreground text-sm">Free response ({limit})</span>
+            <span className="text-muted-foreground text-sm">{limit}</span>
             {hasNoAnswer && (
-              <AlertCircle className="h-3.5 w-3.5 text-yellow-500" title="No expected answer provided" />
+              <AlertCircle className="h-3.5 w-3.5 text-yellow-500" title={t('noAnswerWarning')} />
             )}
           </div>
         );

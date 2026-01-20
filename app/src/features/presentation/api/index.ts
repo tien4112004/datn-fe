@@ -10,10 +10,3 @@ export const usePresentationApiService = (): PresentationApiService => {
 export const getPresentationApiService = (apiClient: ApiClient = api): PresentationApiService => {
   return new PresentationService(apiClient, getBackendUrl());
 };
-
-export const createPresentationApiService = (
-  apiClient: ApiClient,
-  baseUrl?: string
-): PresentationApiService => {
-  return new PresentationService(apiClient, baseUrl || getBackendUrl());
-};

@@ -70,13 +70,13 @@ export const PostCard = ({ post, onEdit, onDelete, onPin, onComment, className =
                   </Badge>
                 )}
 
-                {post.type === 'Assignment' && (
+                {post.type === 'Homework' && (
                   <Badge
                     variant="default"
                     className="gap-1 bg-purple-600 text-[10px] hover:bg-purple-700 md:text-xs"
                   >
                     <ClipboardList className="h-3 w-3" />
-                    {t('feed.post.badges.assignment')}
+                    {t('feed.post.badges.homework')}
                   </Badge>
                 )}
 

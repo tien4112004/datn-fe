@@ -1,4 +1,5 @@
 import type { MatrixCell, MatrixCellWithValidation, Difficulty } from '../types';
+import type { ConstantItem } from '@aiprimary/core';
 
 /**
  * Validate a single matrix cell and return validation status
@@ -41,12 +42,12 @@ export const validateMatrix = (cells: MatrixCell[]): MatrixCellWithValidation[] 
  */
 export const createMatrixCellsForTopic = (
   topicId: string,
-  difficulties: readonly Difficulty[]
+  difficulties: readonly ConstantItem<Difficulty>[]
 ): MatrixCell[] => {
   return difficulties.map((difficulty, index) => ({
-    id: `${topicId}-${difficulty}-${Date.now()}-${index}`,
+    id: `${topicId}-${difficulty.value}-${Date.now()}-${index}`,
     topicId,
-    difficulty,
+    difficulty: difficulty.value,
     requiredCount: 0,
     currentCount: 0,
   }));

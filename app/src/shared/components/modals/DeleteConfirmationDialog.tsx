@@ -14,7 +14,7 @@ export interface DeleteConfirmationDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   itemName: string;
-  itemType: 'presentation' | 'mindmap';
+  itemType: 'presentation' | 'mindmap' | 'assignment';
   onConfirm: () => void;
   onCancel: () => void;
   isDeleting?: boolean;

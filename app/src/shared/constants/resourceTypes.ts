@@ -6,6 +6,7 @@ export const RESOURCE_TYPES = {
   MINDMAP: 'mindmap',
   DOCUMENT: 'document',
   VIDEO: 'video',
+  ASSIGNMENT: 'assignment',
   IMAGE: 'image',
 } as const;
 

@@ -107,15 +107,20 @@ export default {
       type: 'Loại Câu Hỏi',
       difficulty: 'Độ Khó',
       subject: 'Môn Học',
+      grade: 'Khối Lớp',
+      chapter: 'Chương',
       clearFilters: 'Xóa Bộ Lọc',
       allTypes: 'Tất Cả Loại',
       allDifficulties: 'Tất Cả Độ Khó',
       allSubjects: 'Tất Cả Môn',
+      noChapters: 'Không có chương',
     },
     selection: {
       selected: '{{count}} đã chọn',
       addSelected: 'Thêm Đã Chọn ({{count}})',
+      copySelected: 'Sao Chép Đã Chọn ({{count}})',
       copyToPersonal: 'Sao chép {{count}} vào Kho Cá Nhân',
+      copying: 'Đang sao chép...',
       cancel: 'Hủy',
     },
     copyToPersonal: {
@@ -130,6 +135,7 @@ export default {
       points: 'Điểm: {{points}}',
       selected: 'Đã Chọn',
       applicationBadge: 'Chỉ đọc',
+      untitled: 'Câu hỏi chưa có tiêu đề',
     },
     subjects: {
       toan: 'Toán',
@@ -144,6 +150,18 @@ export default {
       uploading: 'Đang tải lên...',
       preview: 'Xem Trước',
       uploadError: 'Không thể tải lên hình ảnh',
+      chooseFromStorage: 'Chọn từ Kho Lưu Trữ',
+    },
+    imageStorageDialog: {
+      title: 'Chọn Hình Ảnh từ Kho Lưu Trữ',
+      description: 'Chọn hình ảnh từ những hình ảnh đã tải lên trước đây',
+      searchPlaceholder: 'Tìm kiếm hình ảnh...',
+      noImages: 'Không tìm thấy hình ảnh',
+      imageAlt: 'Hình ảnh trong kho',
+      loadMore: 'Tải Thêm',
+      loadingMore: 'Đang tải...',
+      cancel: 'Hủy',
+      select: 'Chọn Hình Ảnh',
     },
   },
   editing: {
@@ -261,6 +279,7 @@ export default {
 
     // Nút hành động chính
     actions: {
+      actions: 'Hành động',
       cancel: 'Hủy',
       save: 'Lưu Bài Tập',
       saving: 'Đang lưu...',
@@ -278,6 +297,8 @@ export default {
       createSuccess: 'Đã tạo bài tập thành công!',
       updateSuccess: 'Đã cập nhật bài tập thành công!',
       saveError: 'Không thể lưu bài tập',
+      noTopicError: 'Vui lòng thêm ít nhất một chủ đề trước khi thêm câu hỏi từ ngân hàng',
+      questionsAdded: 'Đã thêm {{count}} câu hỏi vào bài tập',
     },
 
     // Bảng điều khiển câu hỏi
@@ -326,6 +347,8 @@ export default {
         shuffleQuestionsDisabled: 'Tắt',
         emptyValue: '-',
         titlePlaceholder: 'Nhập tiêu đề bài tập',
+        subjectPlaceholder: 'Chọn môn học',
+        gradePlaceholder: 'Chọn khối',
         classPlaceholder: 'Chọn lớp',
         descriptionPlaceholder: 'Nhập mô tả bài tập (tùy chọn)',
         dueDatePlaceholder: 'Chọn hạn nộp',
@@ -378,11 +401,19 @@ export default {
       topicsLabel: 'Chủ Đề',
       addTopic: 'Thêm Chủ Đề',
       topicPlaceholder: 'Tên chủ đề...',
+      descriptionPlaceholder: 'Mô tả chủ đề (tùy chọn)...',
       emptyMessage: 'Thêm chủ đề để xem ma trận',
       done: 'Xong',
       tableHeaders: {
         topic: 'Chủ Đề',
       },
+    },
+
+    // Bảng xây dựng ma trận
+    matrixBuilder: {
+      panelTitle: 'Bảng Ma Trận Đánh Giá',
+      description:
+        'Cấu hình chủ đề và số lượng câu hỏi yêu cầu cho mỗi mức độ khó. Thay đổi được lưu tự động.',
     },
 
     // Hộp thoại xem ma trận
@@ -406,6 +437,85 @@ export default {
       },
       close: 'Đóng',
     },
+
+    // Thông tin cơ bản bài tập
+    basicInfo: {
+      title: 'Thông Tin Bài Tập',
+      titleLabel: 'Tiêu đề',
+      titlePlaceholder: 'Nhập tiêu đề bài tập...',
+      subjectLabel: 'Môn học',
+      subjectPlaceholder: 'Chọn môn học',
+      descriptionLabel: 'Mô tả',
+      descriptionPlaceholder: 'Mô tả bài tập...',
+    },
+
+    // Chỉ số số lượng câu hỏi
+    questionCountIndicator: {
+      noQuestions: 'Chưa có câu hỏi',
+      count: '{{count}} Câu hỏi',
+      count_plural: '{{count}} Câu hỏi',
+    },
+
+    // Chuyển đổi chế độ xem
+    viewModeToggle: {
+      preview: 'Xem trước',
+      edit: 'Chỉnh sửa',
+    },
+
+    // Điều hướng câu hỏi
+    navigator: {
+      questionsCount: '{{count}} Câu hỏi',
+      questionsCount_plural: '{{count}} Câu hỏi',
+      listView: 'Xem Danh Sách',
+      assignmentInfo: 'Thông Tin Bài Tập',
+      matrixBuilder: 'Ma Trận',
+      untitled: 'Chưa có tiêu đề',
+    },
+
+    // Ô ma trận
+    matrixCell: {
+      required: 'Yêu cầu:',
+      ok: 'OK',
+    },
+
+    // Xem câu hỏi hiện tại
+    currentQuestion: {
+      dataMissing: 'Thiếu dữ liệu câu hỏi',
+      questionOf: 'Câu hỏi {{current}} trên {{total}}',
+      edit: 'Chỉnh sửa',
+      preview: 'Xem trước',
+      noQuestions: 'Chưa có câu hỏi',
+      addQuestionHint: 'Nhấn "Thêm Câu Hỏi" để bắt đầu',
+    },
+
+    // Danh sách câu hỏi
+    questionsList: {
+      emptyTitle: 'Chưa có câu hỏi',
+      emptyHint: 'Nhấn "Thêm Câu Hỏi" để bắt đầu',
+    },
+
+    // Điều hướng câu hỏi
+    questionNavigator: {
+      questionCount: '{{count}} Câu hỏi',
+      questionCount_plural: '{{count}} Câu hỏi',
+      assignmentInfo: 'Thông Tin Bài Tập',
+      untitled: 'Chưa có tiêu đề',
+    },
+
+    // Xem trước nội dung câu hỏi
+    questionPreview: {
+      multipleChoice: '{{count}} lựa chọn • Đúng: {{correct}}',
+      matching: '{{count}} cặp',
+      matching_plural: '{{count}} cặp',
+      fillInBlank: '{{count}} chỗ trống',
+      fillInBlank_plural: '{{count}} chỗ trống',
+      openEnded: {
+        withLimit: 'Trả lời tự do ({{limit}} ký tự)',
+        unlimited: 'Trả lời tự do (không giới hạn)',
+      },
+      placeholderWarning: 'Có nội dung giữ chỗ hoặc trống',
+      noAnswerWarning: 'Chưa có câu trả lời mong đợi',
+    },
   },
 
   teacherQuestionBank: {
@@ -418,6 +528,7 @@ export default {
       export: 'Xuất CSV',
       deleteSelected: 'Xóa đã chọn',
       copyToPersonal: 'Sao chép vào kho cá nhân',
+      browsePublic: 'Duyệt câu hỏi công khai',
     },
 
     filters: {
@@ -434,6 +545,7 @@ export default {
         content: 'Nội dung',
         questionType: 'Loại câu hỏi',
         subject: 'Môn học',
+        grade: 'Lớp',
         difficulty: 'Độ khó',
         points: 'Điểm',
       },

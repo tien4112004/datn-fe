@@ -2,7 +2,7 @@ import type { Assignment as CoreAssignment } from '@aiprimary/core';
 import type { CreateAssignmentRequest, UpdateAssignmentRequest } from '../types';
 
 // Mock data store (in-memory for development)
-let mockAssignments: CoreAssignment[] = [];
+const mockAssignments: CoreAssignment[] = [];
 let mockIdCounter = 1;
 
 /**
@@ -71,6 +71,7 @@ export const assignmentApi = {
       title: request.title,
       description: request.description,
       questions: request.questions || [],
+      shuffleQuestions: request.shuffleQuestions || false,
       dueDate: request.dueDate,
       totalPoints: request.totalPoints || 0,
       status: 'draft',
@@ -100,6 +101,10 @@ export const assignmentApi = {
       ...(request.dueDate !== undefined && { dueDate: request.dueDate }),
       ...(request.questions !== undefined && { questions: request.questions }),
       ...(request.totalPoints !== undefined && { totalPoints: request.totalPoints }),
+      ...(request.subject !== undefined && { subject: request.subject }),
+      ...(request.topics !== undefined && { topics: request.topics }),
+      ...(request.matrixCells !== undefined && { matrixCells: request.matrixCells }),
+      ...(request.shuffleQuestions !== undefined && { shuffleQuestions: request.shuffleQuestions }),
       updatedAt: new Date().toISOString(),
     };
 

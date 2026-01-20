@@ -3,28 +3,28 @@ import { devtools } from 'zustand/middleware';
 import type { AssignmentQuestionWithTopic, MatrixCell, AssignmentTopic } from '../types';
 import { VIEW_MODE, type ViewMode } from '@aiprimary/core';
 
-type MainView = 'info' | 'questions';
+type MainView = 'info' | 'questions' | 'matrix';
 
 interface AssignmentEditorState {
   // UI State
   selectedQuestionId: string | null;
   isQuestionBankOpen: boolean;
+  isQuestionListDialogOpen: boolean;
   currentQuestionIndex: number;
   questionViewModes: Map<string, ViewMode>;
   isMetadataDialogOpen: boolean;
   isMatrixEditorOpen: boolean;
-  isMatrixViewOpen: boolean;
   mainView: MainView;
 
   // Actions
   setSelectedQuestion: (id: string | null) => void;
   setQuestionBankOpen: (open: boolean) => void;
+  setQuestionListDialogOpen: (open: boolean) => void;
   setCurrentQuestionIndex: (index: number) => void;
   setQuestionViewMode: (questionId: string, mode: ViewMode) => void;
   toggleQuestionViewMode: (questionId: string) => void;
   setMetadataDialogOpen: (open: boolean) => void;
   setMatrixEditorOpen: (open: boolean) => void;
-  setMatrixViewOpen: (open: boolean) => void;
   setMainView: (view: MainView) => void;
 
   // Question operations (these will be used by components to update form)
@@ -48,16 +48,17 @@ export const useAssignmentEditorStore = create<AssignmentEditorState>()(
       // Initial state
       selectedQuestionId: null,
       isQuestionBankOpen: false,
+      isQuestionListDialogOpen: false,
       currentQuestionIndex: 0,
       questionViewModes: new Map(),
       isMetadataDialogOpen: false,
       isMatrixEditorOpen: false,
-      isMatrixViewOpen: false,
       mainView: 'info',
 
       // UI actions
       setSelectedQuestion: (id) => set({ selectedQuestionId: id }),
       setQuestionBankOpen: (open) => set({ isQuestionBankOpen: open }),
+      setQuestionListDialogOpen: (open) => set({ isQuestionListDialogOpen: open }),
       setCurrentQuestionIndex: (index) => set({ currentQuestionIndex: index }),
       setMainView: (view) => set({ mainView: view }),
       setQuestionViewMode: (questionId, mode) => {
@@ -74,7 +75,6 @@ export const useAssignmentEditorStore = create<AssignmentEditorState>()(
       },
       setMetadataDialogOpen: (open) => set({ isMetadataDialogOpen: open }),
       setMatrixEditorOpen: (open) => set({ isMatrixEditorOpen: open }),
-      setMatrixViewOpen: (open) => set({ isMatrixViewOpen: open }),
 
       // Reorder questions (used with drag-drop)
       reorderQuestions: (questions, oldIndex, newIndex) => {

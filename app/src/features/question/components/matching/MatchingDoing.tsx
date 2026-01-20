@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { MatchingQuestion, MatchingAnswer } from '@/features/assignment/types';
-import { MarkdownPreview, DifficultyBadge } from '../shared';
+import { MarkdownPreview, QuestionNumber } from '../shared';
 
 import { Button } from '@/shared/components/ui/button';
 import {
@@ -45,21 +46,21 @@ const DraggableItem = ({ id, content, imageUrl, index, isMatched }: DraggableIte
       {...listeners}
       {...attributes}
       className={cn(
-        'flex cursor-move items-start gap-3 rounded-md border bg-blue-50 p-3 transition-opacity dark:bg-blue-900/20',
+        'flex cursor-move items-center gap-3 rounded-md border-2 border-blue-300 bg-blue-50 p-3 transition-opacity hover:border-blue-400 dark:border-blue-700 dark:bg-blue-900/20',
         isDragging && 'opacity-50',
         isMatched && 'cursor-not-allowed opacity-40'
       )}
     >
-      <div className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-600 text-sm font-medium text-white">
+      <div className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-blue-600 text-sm font-medium text-white">
         {index + 1}
       </div>
-      <div className="flex-1">
+      <div className="min-w-0 flex-1">
         <MarkdownPreview content={content} />
         {imageUrl && (
           <img src={imageUrl} alt={`Item ${index + 1}`} className="mt-2 max-h-24 rounded-md border" />
         )}
       </div>
-      {!isMatched && <GripVertical className="text-muted-foreground h-4 w-4" />}
+      {!isMatched && <GripVertical className="text-muted-foreground h-4 w-4 flex-shrink-0" />}
     </div>
   );
 };
@@ -71,25 +72,36 @@ interface DroppableZoneProps {
   index: number;
   matchedItem?: { id: string; content: string; imageUrl?: string; itemIndex: number };
   onRemove?: () => void;
+  dropHereText: string;
 }
 
-const DroppableZone = ({ id, content, imageUrl, index, matchedItem, onRemove }: DroppableZoneProps) => {
+const DroppableZone = ({
+  id,
+  content,
+  imageUrl,
+  index,
+  matchedItem,
+  onRemove,
+  dropHereText,
+}: DroppableZoneProps) => {
   const { setNodeRef, isOver } = useDroppable({ id });
 
   return (
     <div
       ref={setNodeRef}
       className={cn(
-        'min-h-[80px] rounded-md border p-3 transition-colors',
+        'min-h-[80px] rounded-md border-2 p-3 transition-colors',
         isOver && 'border-green-400 bg-green-100 dark:bg-green-900/30',
-        matchedItem ? 'bg-green-50 dark:bg-green-900/20' : 'bg-background'
+        matchedItem
+          ? 'border-green-300 bg-green-50 dark:border-green-700 dark:bg-green-900/20'
+          : 'bg-background border-gray-300 dark:border-gray-600'
       )}
     >
-      <div className="mb-2 flex items-start gap-3">
-        <div className="flex h-6 w-6 items-center justify-center rounded-full bg-green-600 text-sm font-medium text-white">
+      <div className="mb-2 flex items-center gap-3">
+        <div className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-green-600 text-sm font-medium text-white">
           {String.fromCharCode(65 + index)}
         </div>
-        <div className="flex-1">
+        <div className="min-w-0 flex-1">
           <MarkdownPreview content={content} />
           {imageUrl && (
             <img src={imageUrl} alt={`Target ${index + 1}`} className="mt-2 max-h-24 rounded-md border" />
@@ -115,7 +127,7 @@ const DroppableZone = ({ id, content, imageUrl, index, matchedItem, onRemove }: 
         </div>
       ) : (
         <div className="mt-2 border-t border-dashed pt-2">
-          <p className="text-muted-foreground text-center text-xs">Drop item here</p>
+          <p className="text-muted-foreground text-center text-xs">{dropHereText}</p>
         </div>
       )}
     </div>
@@ -127,9 +139,19 @@ interface MatchingDoingProps {
   answer?: MatchingAnswer;
   points?: number; // Optional points for display
   onAnswerChange: (answer: MatchingAnswer) => void;
+  hideHeader?: boolean; // Hide type label and difficulty badge when used as sub-question
+  number?: number;
 }
 
-export const MatchingDoing = ({ question, answer, points, onAnswerChange }: MatchingDoingProps) => {
+export const MatchingDoing = ({
+  question,
+  answer,
+  points,
+  onAnswerChange,
+  hideHeader = false,
+  number,
+}: MatchingDoingProps) => {
+  const { t } = useTranslation('questions');
   const [matches, setMatches] = useState<Map<string, string>>(new Map());
   const [activeId, setActiveId] = useState<string | null>(null);
 
@@ -186,13 +208,11 @@ export const MatchingDoing = ({ question, answer, points, onAnswerChange }: Matc
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold">Matching Question</h3>
-          <DifficultyBadge difficulty={question.difficulty} />
+      {number !== undefined && (
+        <div className="flex items-center gap-3">
+          <QuestionNumber number={number} />
         </div>
-      </div>
-
+      )}
       {/* Question Title */}
       <div className="space-y-2">
         <MarkdownPreview content={question.title} />
@@ -201,7 +221,7 @@ export const MatchingDoing = ({ question, answer, points, onAnswerChange }: Matc
         )}
       </div>
 
-      <p className="text-muted-foreground text-sm">Drag items from Column A to match with Column B</p>
+      {!hideHeader && <p className="text-muted-foreground text-sm">{t('matching.doing.instruction')}</p>}
 
       <DndContext
         sensors={sensors}
@@ -212,7 +232,7 @@ export const MatchingDoing = ({ question, answer, points, onAnswerChange }: Matc
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {/* Left Column - Draggable Items */}
           <div className="space-y-2">
-            <h4 className="text-sm font-semibold">Column A (Drag from here)</h4>
+            <h4 className="text-sm font-semibold">{t('matching.doing.columnADrag')}</h4>
             {question.data.pairs.map((pair, index) => (
               <DraggableItem
                 key={pair.id}
@@ -227,7 +247,7 @@ export const MatchingDoing = ({ question, answer, points, onAnswerChange }: Matc
 
           {/* Right Column - Drop Zones */}
           <div className="space-y-2">
-            <h4 className="text-sm font-semibold">Column B (Drop here)</h4>
+            <h4 className="text-sm font-semibold">{t('matching.doing.columnBDrop')}</h4>
             {question.data.pairs.map((pair, index) => {
               const matchedLeftId = matches.get(pair.id);
               const matchedPair = matchedLeftId
@@ -251,6 +271,7 @@ export const MatchingDoing = ({ question, answer, points, onAnswerChange }: Matc
                   index={index}
                   matchedItem={matchedItem}
                   onRemove={() => handleRemoveMatch(pair.id)}
+                  dropHereText={t('matching.doing.dropHere')}
                 />
               );
             })}
@@ -259,11 +280,11 @@ export const MatchingDoing = ({ question, answer, points, onAnswerChange }: Matc
 
         <DragOverlay>
           {activeId && activePair && (
-            <div className="flex items-start gap-3 rounded-md border bg-blue-50 p-3 opacity-90 shadow-lg dark:bg-blue-900/20">
-              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-600 text-sm font-medium text-white">
+            <div className="flex items-center gap-3 rounded-md border-2 border-blue-300 bg-blue-50 p-3 opacity-90 shadow-lg dark:border-blue-700 dark:bg-blue-900/20">
+              <div className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-blue-600 text-sm font-medium text-white">
                 {question.data.pairs.findIndex((p) => p.id === activeId) + 1}
               </div>
-              <div className="flex-1">
+              <div className="min-w-0 flex-1">
                 <MarkdownPreview content={activePair.left} />
               </div>
             </div>
@@ -272,7 +293,11 @@ export const MatchingDoing = ({ question, answer, points, onAnswerChange }: Matc
       </DndContext>
 
       {/* Points */}
-      {points && <p className="text-muted-foreground text-sm">Points: {points}</p>}
+      {points && (
+        <p className="text-muted-foreground text-sm">
+          {t('common.points')}: {points}
+        </p>
+      )}
     </div>
   );
 };

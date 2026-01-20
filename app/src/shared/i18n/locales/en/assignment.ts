@@ -107,15 +107,20 @@ export default {
       type: 'Question Type',
       difficulty: 'Difficulty',
       subject: 'Subject',
+      grade: 'Grade',
+      chapter: 'Chapter',
       clearFilters: 'Clear Filters',
       allTypes: 'All Types',
       allDifficulties: 'All Difficulties',
       allSubjects: 'All Subjects',
+      noChapters: 'No chapters',
     },
     selection: {
       selected: '{{count}} selected',
       addSelected: 'Add Selected ({{count}})',
+      copySelected: 'Copy Selected ({{count}})',
       copyToPersonal: 'Copy {{count}} to Personal Bank',
+      copying: 'Copying...',
       cancel: 'Cancel',
     },
     copyToPersonal: {
@@ -130,6 +135,7 @@ export default {
       points: 'Points: {{points}}',
       selected: 'Selected',
       applicationBadge: 'Read-Only',
+      untitled: 'Untitled Question',
     },
     subjects: {
       toan: 'Math',
@@ -144,6 +150,18 @@ export default {
       uploading: 'Uploading...',
       preview: 'Preview',
       uploadError: 'Failed to upload image',
+      chooseFromStorage: 'Choose from My Storage',
+    },
+    imageStorageDialog: {
+      title: 'Choose Image from My Storage',
+      description: 'Select an image from your previously uploaded images',
+      searchPlaceholder: 'Search images...',
+      noImages: 'No images found',
+      imageAlt: 'Storage image',
+      loadMore: 'Load More',
+      loadingMore: 'Loading...',
+      cancel: 'Cancel',
+      select: 'Select Image',
     },
   },
   editing: {
@@ -261,6 +279,7 @@ export default {
 
     // Main action buttons
     actions: {
+      actions: 'Actions',
       cancel: 'Cancel',
       save: 'Save Assignment',
       saving: 'Saving...',
@@ -278,6 +297,8 @@ export default {
       createSuccess: 'Assignment created successfully!',
       updateSuccess: 'Assignment updated successfully!',
       saveError: 'Failed to save assignment',
+      noTopicError: 'Please add at least one topic before adding questions from the bank',
+      questionsAdded: '{{count}} question(s) added to the assignment',
     },
 
     // Questions panel and toolbar
@@ -326,6 +347,8 @@ export default {
         shuffleQuestionsDisabled: 'Disabled',
         emptyValue: '-',
         titlePlaceholder: 'Enter assignment title',
+        subjectPlaceholder: 'Select subject',
+        gradePlaceholder: 'Select grade',
         classPlaceholder: 'Select a class',
         descriptionPlaceholder: 'Enter assignment description (optional)',
         dueDatePlaceholder: 'Select due date',
@@ -379,11 +402,19 @@ export default {
       topicsLabel: 'Topics',
       addTopic: 'Add Topic',
       topicPlaceholder: 'Topic name...',
+      descriptionPlaceholder: 'Topic description (optional)...',
       emptyMessage: 'Add topics to see the matrix',
       done: 'Done',
       tableHeaders: {
         topic: 'Topic',
       },
+    },
+
+    // Matrix builder panel
+    matrixBuilder: {
+      panelTitle: 'Assessment Matrix Builder',
+      description:
+        'Configure topics and required question counts for each difficulty level. Changes are saved automatically.',
     },
 
     // Matrix view dialog
@@ -407,6 +438,94 @@ export default {
       },
       close: 'Close',
     },
+
+    // Assignment basic info
+    basicInfo: {
+      title: 'Assignment Info',
+      titleLabel: 'Title',
+      titlePlaceholder: 'Enter assignment title...',
+      subjectLabel: 'Subject',
+      subjectPlaceholder: 'Select subject',
+      descriptionLabel: 'Description',
+      descriptionPlaceholder: 'Describe the assignment...',
+    },
+
+    // Question count indicator
+    questionCountIndicator: {
+      noQuestions: 'No questions yet',
+      count: '{{count}} Question',
+      count_plural: '{{count}} Questions',
+    },
+
+    // View mode toggle
+    viewModeToggle: {
+      preview: 'Preview',
+      edit: 'Edit',
+    },
+
+    // Question Navigator
+    navigator: {
+      questionsCount: '{{count}} Question',
+      questionsCount_plural: '{{count}} Questions',
+      listView: 'List View',
+      assignmentInfo: 'Assignment Info',
+      matrixBuilder: 'Matrix Builder',
+      untitled: 'Untitled',
+    },
+
+    // Question List Dialog
+    questionList: {
+      title: 'All Questions',
+      emptyMessage: 'No questions added yet',
+      dragHint: 'Drag questions to reorder them',
+      questionNumber: 'Q{{number}}',
+      close: 'Close',
+    },
+
+    // Matrix cell
+    matrixCell: {
+      required: 'Required:',
+      ok: 'OK',
+    },
+
+    // Current question view
+    currentQuestion: {
+      dataMissing: 'Question data missing',
+      questionOf: 'Question {{current}} of {{total}}',
+      edit: 'Edit',
+      preview: 'Preview',
+      noQuestions: 'No questions yet',
+      addQuestionHint: 'Click "Add Question" to get started',
+    },
+
+    // Questions list
+    questionsList: {
+      emptyTitle: 'No questions yet',
+      emptyHint: 'Click "Add Question" to get started',
+    },
+
+    // Question navigator
+    questionNavigator: {
+      questionCount: '{{count}} Question',
+      questionCount_plural: '{{count}} Questions',
+      assignmentInfo: 'Assignment Info',
+      untitled: 'Untitled',
+    },
+
+    // Question content preview
+    questionPreview: {
+      multipleChoice: '{{count}} options • Correct: {{correct}}',
+      matching: '{{count}} pair',
+      matching_plural: '{{count}} pairs',
+      fillInBlank: '{{count}} blank',
+      fillInBlank_plural: '{{count}} blanks',
+      openEnded: {
+        withLimit: 'Free response ({{limit}} chars)',
+        unlimited: 'Free response (unlimited)',
+      },
+      placeholderWarning: 'Has placeholder or empty content',
+      noAnswerWarning: 'No expected answer provided',
+    },
   },
 
   teacherQuestionBank: {
@@ -419,6 +538,7 @@ export default {
       export: 'Export CSV',
       deleteSelected: 'Delete Selected',
       copyToPersonal: 'Copy to Personal',
+      browsePublic: 'Browse Public Questions',
     },
 
     filters: {
@@ -435,6 +555,7 @@ export default {
         content: 'Content',
         questionType: 'Question Type',
         subject: 'Subject',
+        grade: 'Grade',
         difficulty: 'Difficulty',
         points: 'Points',
       },

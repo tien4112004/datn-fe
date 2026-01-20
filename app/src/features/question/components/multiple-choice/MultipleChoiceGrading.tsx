@@ -1,6 +1,7 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { MultipleChoiceQuestion, MultipleChoiceAnswer } from '@/features/assignment/types';
-import { MarkdownPreview, DifficultyBadge } from '../shared';
+import { MarkdownPreview, QuestionNumber } from '../shared';
 
 import { Input } from '@/shared/components/ui/input';
 import { Label } from '@/shared/components/ui/label';
@@ -13,6 +14,7 @@ interface MultipleChoiceGradingProps {
   answer?: MultipleChoiceAnswer;
   points?: number; // Points allocated for this question in the assignment
   onGradeChange?: (grade: { points: number; feedback?: string }) => void;
+  number?: number;
 }
 
 export const MultipleChoiceGrading = ({
@@ -20,7 +22,10 @@ export const MultipleChoiceGrading = ({
   answer,
   points = 0,
   onGradeChange,
+  number,
 }: MultipleChoiceGradingProps) => {
+  const { t } = useTranslation('questions');
+
   const selectedOption = answer
     ? question.data.options.find((o) => o.id === answer.selectedOptionId)
     : undefined;
@@ -45,13 +50,11 @@ export const MultipleChoiceGrading = ({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold">Multiple Choice Question - Grading</h3>
-          <DifficultyBadge difficulty={question.difficulty} />
+      {number !== undefined && (
+        <div className="flex items-center gap-3">
+          <QuestionNumber number={number} />
         </div>
-      </div>
-
+      )}
       {/* Question Title */}
       <div className="space-y-2">
         <MarkdownPreview content={question.title} />
@@ -62,7 +65,7 @@ export const MultipleChoiceGrading = ({
 
       {/* Options with student selection */}
       <div className="space-y-2">
-        <Label className="text-sm font-semibold">Student Answer:</Label>
+        <Label className="text-sm font-semibold">{t('multipleChoice.grading.studentAnswer')}</Label>
         {question.data.options.map((option, index) => {
           const isSelected = answer ? option.id === answer.selectedOptionId : false;
           const isCorrectOption = option.isCorrect;
@@ -71,13 +74,13 @@ export const MultipleChoiceGrading = ({
             <div
               key={option.id}
               className={cn(
-                'flex items-start gap-3 rounded-md border p-3',
+                'flex items-center gap-3 rounded-md border p-3',
                 isCorrectOption && 'border-green-200 bg-green-50 dark:bg-green-900/20',
                 isSelected && !isCorrectOption && 'border-red-200 bg-red-50 dark:bg-red-900/20',
                 isSelected && isCorrectOption && 'border-green-300 bg-green-50 dark:bg-green-900/30'
               )}
             >
-              <div className="flex h-6 w-6 items-center justify-center">
+              <div className="flex h-6 w-6 flex-shrink-0 items-center justify-center">
                 {isCorrectOption && <CheckCircle2 className="h-5 w-5 text-green-600" />}
                 {isSelected && !isCorrectOption && <XCircle className="h-5 w-5 text-red-600" />}
                 {!isSelected && !isCorrectOption && (
@@ -86,11 +89,13 @@ export const MultipleChoiceGrading = ({
                   </div>
                 )}
               </div>
-              <div className="flex-1">
+              <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
                   <MarkdownPreview content={option.text} />
                   {isSelected && (
-                    <span className="text-xs font-semibold text-blue-600">(Student's answer)</span>
+                    <span className="text-xs font-semibold text-blue-600">
+                      {t('multipleChoice.grading.studentAnswerTag')}
+                    </span>
                   )}
                 </div>
                 {option.imageUrl && (
@@ -109,23 +114,25 @@ export const MultipleChoiceGrading = ({
       {/* Auto Score Info */}
       <div className="bg-muted/50 rounded-md p-3 text-sm">
         <p>
-          <span className="font-semibold">Auto-calculated Score: </span>
+          <span className="font-semibold">{t('multipleChoice.grading.autoCalculatedScore')}</span>
           {isCorrect ? (
-            <span className="text-green-600">Correct - {autoScore} points</span>
+            <span className="text-green-600">
+              {t('multipleChoice.grading.correctScore', { score: autoScore })}
+            </span>
           ) : (
-            <span className="text-red-600">Incorrect - 0 points</span>
+            <span className="text-red-600">{t('multipleChoice.grading.incorrectScore')}</span>
           )}
         </p>
       </div>
 
       {/* Grading Interface */}
       <div className="space-y-3 border-t pt-4">
-        <h4 className="text-sm font-semibold">Grading</h4>
+        <h4 className="text-sm font-semibold">{t('multipleChoice.grading.grading')}</h4>
 
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1.5">
             <Label htmlFor="points" className="text-sm">
-              Points Awarded
+              {t('multipleChoice.grading.pointsAwarded')}
             </Label>
             <Input
               id="points"
@@ -137,19 +144,21 @@ export const MultipleChoiceGrading = ({
               onChange={(e) => handlePointsChange(e.target.value)}
               className="h-9"
             />
-            <p className="text-muted-foreground text-xs">Max: {points || 0} points</p>
+            <p className="text-muted-foreground text-xs">
+              {t('multipleChoice.grading.maxPoints', { points: points || 0 })}
+            </p>
           </div>
         </div>
 
         <div className="space-y-1.5">
           <Label htmlFor="feedback" className="text-sm">
-            Teacher Feedback (Optional)
+            {t('multipleChoice.grading.teacherFeedback')}
           </Label>
           <Textarea
             id="feedback"
             value={feedback}
             onChange={(e) => handleFeedbackChange(e.target.value)}
-            placeholder="Add comments or feedback for the student..."
+            placeholder={t('multipleChoice.grading.feedbackPlaceholder')}
             className="min-h-[80px] resize-none"
           />
         </div>

@@ -1,4 +1,5 @@
 import { CheckCircle2, XCircle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { cn } from '@/shared/lib/utils';
 
 interface AnswerFeedbackProps {
@@ -9,6 +10,8 @@ interface AnswerFeedbackProps {
 }
 
 export const AnswerFeedback = ({ isCorrect, score, totalPoints, className }: AnswerFeedbackProps) => {
+  const { t } = useTranslation('questions');
+
   return (
     <div
       className={cn(
@@ -21,11 +24,9 @@ export const AnswerFeedback = ({ isCorrect, score, totalPoints, className }: Ans
     >
       {isCorrect ? <CheckCircle2 className="h-5 w-5" /> : <XCircle className="h-5 w-5" />}
       <div>
-        <p className="font-medium">{isCorrect ? 'Correct!' : 'Incorrect'}</p>
+        <p className="font-medium">{t(isCorrect ? 'common.correct' : 'common.incorrect')}</p>
         {score !== undefined && totalPoints !== undefined && (
-          <p className="text-sm opacity-80">
-            Score: {score}/{totalPoints} points
-          </p>
+          <p className="text-sm opacity-80">{t('common.scoreDisplay', { score, total: totalPoints })}</p>
         )}
       </div>
     </div>

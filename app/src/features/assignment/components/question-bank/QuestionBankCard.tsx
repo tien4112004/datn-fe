@@ -1,23 +1,35 @@
 import { useTranslation } from 'react-i18next';
 import { Checkbox } from '@/shared/components/ui/checkbox';
 import { Badge } from '@/shared/components/ui/badge';
-import { Lock } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
-import type { Question, QuestionBankItem } from '../../types';
-import { BANK_TYPE } from '../../types';
+import type { QuestionBankItem } from '../../types';
 import { QuestionTypeIcon, DifficultyBadge } from '@/features/question/components/shared';
 import { Card, CardContent } from '@/components/ui/card';
+import { getGradeName } from '@aiprimary/core';
 
 interface QuestionBankCardProps {
   question: QuestionBankItem;
   isSelected: boolean;
-  onToggleSelection: (question: Question) => void;
+  onToggleSelection: (question: QuestionBankItem) => void;
 }
+
+// Helper functions for colorful badges
+const getSubjectBadgeClass = (subject: string) => {
+  switch (subject) {
+    case 'T': // Math
+      return 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800';
+    case 'TV': // Vietnamese
+      return 'bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800';
+    case 'TA': // English
+      return 'bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-800';
+    default:
+      return 'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-900/30 dark:text-gray-300 dark:border-gray-800';
+  }
+};
 
 export const QuestionBankCard = ({ question, isSelected, onToggleSelection }: QuestionBankCardProps) => {
   const { t } = useTranslation(I18N_NAMESPACES.ASSIGNMENT);
-  const isApplicationQuestion = question.bankType === BANK_TYPE.APPLICATION;
 
   const getSubjectName = (subjectCode: 'T' | 'TV' | 'TA'): string => {
     switch (subjectCode) {
@@ -30,7 +42,7 @@ export const QuestionBankCard = ({ question, isSelected, onToggleSelection }: Qu
     }
   };
 
-  const subjectName = getSubjectName(question.subjectCode);
+  const subjectName = getSubjectName(question.subject);
 
   return (
     <Card
@@ -49,8 +61,7 @@ export const QuestionBankCard = ({ question, isSelected, onToggleSelection }: Qu
           'shadow-sm',
           'hover:scale-[1.01] hover:shadow-md',
           'active:scale-[0.99]',
-        ],
-        isApplicationQuestion && !isSelected && 'bg-accent/10'
+        ]
       )}
       onClick={() => onToggleSelection(question)}
     >
@@ -66,25 +77,25 @@ export const QuestionBankCard = ({ question, isSelected, onToggleSelection }: Qu
               className="mt-1"
             />
             <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-2">
-                <h3 className="line-clamp-2 flex-1 text-sm font-medium">
-                  {question.title || 'Untitled Question'}
-                </h3>
-                {isApplicationQuestion && (
-                  <Badge variant="secondary" className="shrink-0 gap-1 text-xs">
-                    <Lock className="h-3 w-3" />
-                    {t('questionBank.card.applicationBadge')}
-                  </Badge>
-                )}
-              </div>
+              <h3 className="line-clamp-2 text-sm font-medium">
+                {question.title || t('questionBank.card.untitled')}
+              </h3>
             </div>
           </div>
 
-          {/* Metadata: Subject + Type Icon + Difficulty Badge */}
+          {/* Metadata: Subject + Grade + Type Icon + Difficulty Badge */}
           <div className="flex flex-wrap items-center gap-2">
-            <Badge variant="outline" className="text-xs font-medium">
+            <Badge
+              variant="outline"
+              className={cn('text-xs font-medium', getSubjectBadgeClass(question.subject))}
+            >
               {subjectName}
             </Badge>
+            {question.grade && (
+              <Badge variant="outline" className="text-xs font-medium">
+                {getGradeName(question.grade)}
+              </Badge>
+            )}
             <QuestionTypeIcon type={question.type} className="h-3.5 w-3.5" />
             <DifficultyBadge difficulty={question.difficulty} className="text-xs" />
           </div>

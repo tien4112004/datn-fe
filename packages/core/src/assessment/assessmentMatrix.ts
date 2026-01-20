@@ -24,8 +24,7 @@ export interface Topic {
   id: TopicId; // Unique identifier for this topic
   name: string; // Topic name (e.g., "Algebra", "Đại số")
   description?: string; // Optional description of the topic
-  subjectCode: SubjectCode; // Subject this topic belongs to (T=Math, TV=Vietnamese, TA=English)
-  createdBy?: string; // User ID of creator (for multi-user support)
+  subject: SubjectCode; // Subject this topic belongs to (T=Math, TV=Vietnamese, TA=English)
   createdAt?: string; // ISO timestamp of creation
   updatedAt?: string; // ISO timestamp of last update
 }

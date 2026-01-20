@@ -18,7 +18,7 @@ export interface ExamDraft {
   name: string; // Auto-generated name from matrix name + date
   matrixId: string; // Reference to the source exam matrix
   matrixName: string; // Cached matrix name for display
-  subjectCode: SubjectCode; // Subject of the exam
+  subject: SubjectCode; // Subject of the exam
   targetPoints: number; // Target total points for the exam
   questions: Question[]; // Full question objects selected for this exam
   questionSelections: Record<string, string>; // Mapping of questionId → cellId (which matrix cell each question fulfills)

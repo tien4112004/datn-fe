@@ -5,7 +5,6 @@ import { Label } from '@/shared/components/ui/label';
 import { SearchBar } from '@/shared/components/common/SearchBar';
 import { X, Filter, ChevronDown } from 'lucide-react';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
-import { QUESTION_TYPE, DIFFICULTY } from '../../types';
 import useQuestionBankStore from '../../stores/questionBankStore';
 import {
   useQuestionBankSubjects,
@@ -13,8 +12,8 @@ import {
   useQuestionBankChapters,
 } from '../../hooks/useQuestionBankApi';
 import { useEffect, useState } from 'react';
-import { getSubjectName, getGradeName, QUESTION_TYPE_LABELS, DIFFICULTY_LABELS } from '@aiprimary/core';
-import { motion } from 'motion/react';
+import { getSubjectName, getGradeName, getAllQuestionTypes, getAllDifficulties } from '@aiprimary/core';
+import { motion, AnimatePresence } from 'motion/react';
 
 interface QuestionBankFiltersProps {
   orientation?: 'horizontal' | 'vertical';
@@ -28,39 +27,34 @@ export const QuestionBankFilters = ({
   const { t } = useTranslation(I18N_NAMESPACES.ASSIGNMENT);
   const { filters, setFilters, clearFilters, hasActiveFilters, shouldShowChapterFilter } =
     useQuestionBankStore();
-  const [isFiltersOpen, setIsFiltersOpen] = useState(true);
+  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
   // Fetch metadata
   const { data: subjects } = useQuestionBankSubjects();
   const { data: grades } = useQuestionBankGrades();
 
-  // Conditional chapter fetch
+  // Conditional chapter fetch - only when exactly one subject and one grade are selected
   const showChapters = shouldShowChapterFilter();
-  const subjectForChapters =
-    Array.isArray(filters.subjectCode) && filters.subjectCode.length === 1
-      ? filters.subjectCode[0]
-      : undefined;
-  const gradeForChapters =
-    Array.isArray(filters.grade) && filters.grade.length === 1 ? filters.grade[0] : undefined;
+  const subjectForChapters = filters.subject?.length === 1 ? filters.subject[0] : undefined;
+  const gradeForChapters = filters.grade?.length === 1 ? filters.grade[0] : undefined;
 
   const { data: chapters } = useQuestionBankChapters(subjectForChapters, gradeForChapters);
 
-  // Reset chapter filter when subject/grade changes
+  // Reset chapter filter when subject/grade changes or becomes unavailable
   useEffect(() => {
     if (!showChapters && filters.chapter) {
       setFilters({ chapter: undefined });
     }
-  }, [showChapters]);
+  }, [showChapters, filters.subject, filters.grade]);
 
   const handleSearchChange = (value: string) => {
-    setFilters({ searchText: value });
+    setFilters({ search: value });
   };
 
   const handleCheckboxChange = (filterKey: keyof typeof filters, value: string, checked: boolean) => {
     const currentValues = (filters[filterKey] as string[]) || [];
     const newValues = checked ? [...currentValues, value] : currentValues.filter((v) => v !== value);
-
-    setFilters({ [filterKey]: newValues.length ? newValues : undefined });
+    setFilters({ [filterKey]: newValues.length > 0 ? newValues : undefined });
   };
 
   return (
@@ -83,7 +77,7 @@ export const QuestionBankFilters = ({
         </Button>
         <div className="flex flex-1 gap-2">
           <SearchBar
-            value={filters.searchText}
+            value={filters.search}
             onChange={handleSearchChange}
             placeholder={t('questionBank.filters.search')}
             debounceTime={300}
@@ -94,142 +88,134 @@ export const QuestionBankFilters = ({
       </div>
 
       {/* Filters Grid - Collapsible */}
-      {isFiltersOpen && (
-        <motion.div
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: 'auto' }}
-          exit={{ opacity: 0, height: 0 }}
-          transition={{ duration: 0.3 }}
-          className={`grid gap-4 ${orientation === 'horizontal' ? 'grid-cols-5' : 'grid-cols-1'}`}
-        >
-          {/* Question Type - Multi-select */}
-          <div className="space-y-2">
-            <Label className="text-foreground mb-3 block text-sm font-semibold">
-              {t('questionBank.filters.type')}
-            </Label>
+      <AnimatePresence>
+        {isFiltersOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.3 }}
+            className={`grid gap-4 ${orientation === 'horizontal' ? 'grid-cols-5' : 'grid-cols-1'}`}
+          >
+            {/* Question Type - Multi-select */}
             <div className="space-y-2">
-              {[
-                { value: QUESTION_TYPE.MULTIPLE_CHOICE, label: QUESTION_TYPE_LABELS.multiple_choice },
-                { value: QUESTION_TYPE.MATCHING, label: QUESTION_TYPE_LABELS.matching },
-                { value: QUESTION_TYPE.OPEN_ENDED, label: QUESTION_TYPE_LABELS.open_ended },
-                { value: QUESTION_TYPE.FILL_IN_BLANK, label: QUESTION_TYPE_LABELS.fill_in_blank },
-              ].map((option) => (
-                <label
-                  key={option.value}
-                  className="hover:bg-accent flex cursor-pointer items-center gap-2 rounded-md p-1 transition-colors"
-                >
-                  <Checkbox
-                    checked={
-                      Array.isArray(filters.questionType) && filters.questionType.includes(option.value)
-                    }
-                    onCheckedChange={(checked) =>
-                      handleCheckboxChange('questionType', option.value, checked as boolean)
-                    }
-                  />
-                  <span className="text-xs font-medium">{option.label}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-
-          {/* Difficulty - Multi-select */}
-          <div className="space-y-2">
-            <Label className="text-foreground mb-3 block text-sm font-semibold">
-              {t('questionBank.filters.difficulty')}
-            </Label>
-            <div className="space-y-2">
-              {[
-                { value: DIFFICULTY.EASY, label: DIFFICULTY_LABELS.nhan_biet },
-                { value: DIFFICULTY.MEDIUM, label: DIFFICULTY_LABELS.thong_hieu },
-                { value: DIFFICULTY.HARD, label: DIFFICULTY_LABELS.van_dung },
-                { value: DIFFICULTY.SUPER_HARD, label: DIFFICULTY_LABELS.van_dung_cao },
-              ].map((option) => (
-                <label
-                  key={option.value}
-                  className="hover:bg-accent flex cursor-pointer items-center gap-2 rounded-md p-1 transition-colors"
-                >
-                  <Checkbox
-                    checked={Array.isArray(filters.difficulty) && filters.difficulty.includes(option.value)}
-                    onCheckedChange={(checked) =>
-                      handleCheckboxChange('difficulty', option.value, checked as boolean)
-                    }
-                  />
-                  <span className="text-xs font-medium">{option.label}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-
-          {/* Subject - Multi-select */}
-          <div className="space-y-2">
-            <Label className="text-foreground mb-3 block text-sm font-semibold">
-              {t('questionBank.filters.subject')}
-            </Label>
-            <div className="max-h-32 space-y-2 overflow-y-auto">
-              {subjects?.map((subject) => (
-                <label
-                  key={subject}
-                  className="hover:bg-accent flex cursor-pointer items-center gap-2 rounded-md p-1 transition-colors"
-                >
-                  <Checkbox
-                    checked={
-                      Array.isArray(filters.subjectCode) && filters.subjectCode.includes(subject as any)
-                    }
-                    onCheckedChange={(checked) =>
-                      handleCheckboxChange('subjectCode', subject, checked as boolean)
-                    }
-                  />
-                  <span className="text-xs font-medium">{getSubjectName(subject)}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-
-          {/* Grade - Multi-select */}
-          <div className="space-y-2">
-            <Label className="text-foreground mb-3 block text-sm font-semibold">Grade</Label>
-            <div className="max-h-32 space-y-2 overflow-y-auto">
-              {grades?.map((grade) => (
-                <label
-                  key={grade}
-                  className="hover:bg-accent flex cursor-pointer items-center gap-2 rounded-md p-1 transition-colors"
-                >
-                  <Checkbox
-                    checked={Array.isArray(filters.grade) && filters.grade.includes(grade)}
-                    onCheckedChange={(checked) => handleCheckboxChange('grade', grade, checked as boolean)}
-                  />
-                  <span className="text-xs font-medium">{getGradeName(grade)}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-
-          {/* Chapter - Multi-select */}
-          <div className="space-y-2">
-            <Label className="text-foreground mb-3 block text-sm font-semibold">Chapter</Label>
-            {chapters && chapters.length > 0 ? (
-              <div className="max-h-32 space-y-2 overflow-y-auto">
-                {chapters.map((chapter) => (
+              <Label className="text-foreground mb-3 block text-sm font-semibold">
+                {t('questionBank.filters.type')}
+              </Label>
+              <div className="space-y-2">
+                {getAllQuestionTypes({ includeGroup: true }).map((type) => (
                   <label
-                    key={chapter}
+                    key={type.value}
                     className="hover:bg-accent flex cursor-pointer items-center gap-2 rounded-md p-1 transition-colors"
                   >
                     <Checkbox
-                      checked={Array.isArray(filters.chapter) && filters.chapter.includes(chapter)}
+                      checked={filters.type?.includes(type.value) || false}
                       onCheckedChange={(checked) =>
-                        handleCheckboxChange('chapter', chapter, checked as boolean)
+                        handleCheckboxChange('type', type.value, checked as boolean)
                       }
                     />
-                    <span className="text-xs font-medium">{chapter}</span>
+                    <span className="text-xs font-medium">{type.label}</span>
                   </label>
                 ))}
               </div>
-            ) : (
-              <p className="text-muted-foreground text-xs">No chapters</p>
-            )}
-          </div>
-        </motion.div>
-      )}
+            </div>
+
+            {/* Difficulty - Multi-select */}
+            <div className="space-y-2">
+              <Label className="text-foreground mb-3 block text-sm font-semibold">
+                {t('questionBank.filters.difficulty')}
+              </Label>
+              <div className="space-y-2">
+                {getAllDifficulties().map((difficulty) => (
+                  <label
+                    key={difficulty.value}
+                    className="hover:bg-accent flex cursor-pointer items-center gap-2 rounded-md p-1 transition-colors"
+                  >
+                    <Checkbox
+                      checked={filters.difficulty?.includes(difficulty.value) || false}
+                      onCheckedChange={(checked) =>
+                        handleCheckboxChange('difficulty', difficulty.value, checked as boolean)
+                      }
+                    />
+                    <span className="text-xs font-medium">{difficulty.label}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            {/* Subject - Multi-select */}
+            <div className="space-y-2">
+              <Label className="text-foreground mb-3 block text-sm font-semibold">
+                {t('questionBank.filters.subject')}
+              </Label>
+              <div className="max-h-32 space-y-2 overflow-y-auto">
+                {subjects?.map((subject) => (
+                  <label
+                    key={subject}
+                    className="hover:bg-accent flex cursor-pointer items-center gap-2 rounded-md p-1 transition-colors"
+                  >
+                    <Checkbox
+                      checked={filters.subject?.includes(subject) || false}
+                      onCheckedChange={(checked) =>
+                        handleCheckboxChange('subject', subject, checked as boolean)
+                      }
+                    />
+                    <span className="text-xs font-medium">{getSubjectName(subject)}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            {/* Grade - Multi-select */}
+            <div className="space-y-2">
+              <Label className="text-foreground mb-3 block text-sm font-semibold">
+                {t('questionBank.filters.grade')}
+              </Label>
+              <div className="max-h-32 space-y-2 overflow-y-auto">
+                {grades?.map((grade) => (
+                  <label
+                    key={grade}
+                    className="hover:bg-accent flex cursor-pointer items-center gap-2 rounded-md p-1 transition-colors"
+                  >
+                    <Checkbox
+                      checked={filters.grade?.includes(grade) || false}
+                      onCheckedChange={(checked) => handleCheckboxChange('grade', grade, checked as boolean)}
+                    />
+                    <span className="text-xs font-medium">{getGradeName(grade)}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            {/* Chapter - Multi-select */}
+            <div className="space-y-2">
+              <Label className="text-foreground mb-3 block text-sm font-semibold">
+                {t('questionBank.filters.chapter')}
+              </Label>
+              {chapters && chapters.length > 0 ? (
+                <div className="max-h-32 space-y-2 overflow-y-auto">
+                  {chapters.map((chapter) => (
+                    <label
+                      key={chapter}
+                      className="hover:bg-accent flex cursor-pointer items-center gap-2 rounded-md p-1 transition-colors"
+                    >
+                      <Checkbox
+                        checked={filters.chapter?.includes(chapter) || false}
+                        onCheckedChange={(checked) =>
+                          handleCheckboxChange('chapter', chapter, checked as boolean)
+                        }
+                      />
+                      <span className="text-xs font-medium">{chapter}</span>
+                    </label>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-muted-foreground text-xs">{t('questionBank.filters.noChapters')}</p>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Clear Filters Button */}
       {hasActiveFilters() && (

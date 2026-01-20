@@ -1,2 +1,1 @@
-export { AssignmentMetadataForm } from './AssignmentMetadataForm';
-export { QuestionCollectionSection } from './QuestionCollectionSection';
+// All components moved or removed

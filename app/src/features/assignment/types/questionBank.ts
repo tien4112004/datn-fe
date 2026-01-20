@@ -1,5 +1,6 @@
 import type { QuestionBankItem } from '@aiprimary/core';
-import type { QuestionType, Difficulty, SubjectCode, BankType } from './constants';
+import type { ApiResponse } from '@aiprimary/api';
+import type { BankType } from '.';
 
 // Re-export core type
 export type { QuestionBankItem } from '@aiprimary/core';
@@ -7,33 +8,46 @@ export type { QuestionBankItem } from '@aiprimary/core';
 /**
  * Filters for querying the question bank
  * UI/API-specific type for filtering question bank lists
+ *
+ * Field names match backend Spring Boot API expectations
+ * All filter fields use arrays for consistency (multi-select support)
  */
 export interface QuestionBankFilters {
-  /** Search in title and content */
-  searchText?: string;
-  /** Filter by question type (supports multi-select) */
-  questionType?: QuestionType | QuestionType[];
-  /** Filter by difficulty level (supports multi-select) */
-  difficulty?: Difficulty | Difficulty[];
-  /** Filter by subject (supports multi-select, both predefined and custom from API) */
-  subjectCode?: SubjectCode | SubjectCode[] | string | string[];
-  /** Filter by grade (supports multi-select) */
-  grade?: string | string[];
-  /** Filter by chapter (supports multi-select) */
-  chapter?: string | string[];
-  /** Filter by personal or application bank */
-  bankType?: BankType;
-  /** Pagination: page number (1-indexed) */
+  /** Search in title (case-insensitive substring match) */
+  search?: string;
+  /** Filter by question types - array only */
+  type?: string[];
+  /** Filter by difficulty levels - array only */
+  difficulty?: string[];
+  /** Filter by subjects - array only */
+  subject?: string[];
+  /** Filter by grades - array only */
+  grade?: string[];
+  /** Filter by chapters - array only */
+  chapter?: string[];
+  /** Filter by personal or application bank (required by backend) */
+  bankType: BankType;
+  /** Pagination: page number (1-indexed, default: 1) */
   page?: number;
-  /** Pagination: items per page */
-  limit?: number;
+  /** Pagination: items per page (range: 1-100, default: 10) */
+  pageSize?: number;
+  /** Sort field name (default: "createdAt") */
+  sortBy?: string;
+  /** Sort direction: "ASC" or "DESC" (default: "DESC") */
+  sortDirection?: 'ASC' | 'DESC';
 }
 
 /**
- * Response structure for question bank API
- * UI/API-specific type for paginated responses
+ * Response structure for question bank API service
+ * Uses standard ApiResponse with QuestionBankItem array
  */
-export interface QuestionBankResponse {
+export type QuestionBankApiResponse = ApiResponse<QuestionBankItem[]>;
+
+/**
+ * Response structure returned by useQuestionBankList hook
+ * Transforms ApiResponse into a flattened structure for easier use
+ */
+export interface QuestionBankListResponse {
   questions: QuestionBankItem[];
   /** Total matching questions */
   total: number;
@@ -61,21 +75,22 @@ export interface UpdateQuestionRequest {
  */
 export interface QuestionBankApiService {
   // Query operations
-  getQuestions(filters: QuestionBankFilters): Promise<QuestionBankResponse>;
+  getQuestions(filters: QuestionBankFilters): Promise<QuestionBankApiResponse>;
   getQuestionById(id: string): Promise<QuestionBankItem>;
 
   // CRUD operations
   createQuestion(
     question: Omit<QuestionBankItem, 'id' | 'createdAt' | 'updatedAt'>
   ): Promise<QuestionBankItem>;
+  createQuestions(
+    questions: Array<Omit<QuestionBankItem, 'id' | 'createdAt' | 'updatedAt'>>
+  ): Promise<QuestionBankItem[]>;
   updateQuestion(id: string, question: Partial<QuestionBankItem>): Promise<QuestionBankItem>;
   deleteQuestion(id: string): Promise<void>;
   bulkDeleteQuestions(ids: string[]): Promise<void>;
 
   // Utility operations
   duplicateQuestion(id: string): Promise<QuestionBankItem>;
-  /** Copy from application bank to personal */
-  copyToPersonal(id: string): Promise<QuestionBankItem>;
 
   // Import/Export
   exportQuestions(filters?: QuestionBankFilters): Promise<Blob>;

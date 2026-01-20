@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { OpenEndedQuestion, OpenEndedAnswer } from '@/features/assignment/types';
-import { MarkdownPreview, DifficultyBadge } from '../shared';
+import { MarkdownPreview, QuestionNumber } from '../shared';
 
 import { AutosizeTextarea } from '@/shared/components/ui/autosize-textarea';
 import { QUESTION_TYPE } from '@/features/assignment/types';
@@ -10,9 +11,11 @@ interface OpenEndedDoingProps {
   answer?: OpenEndedAnswer;
   points?: number; // Optional points for display
   onAnswerChange: (answer: OpenEndedAnswer) => void;
+  number?: number;
 }
 
-export const OpenEndedDoing = ({ question, answer, points, onAnswerChange }: OpenEndedDoingProps) => {
+export const OpenEndedDoing = ({ question, answer, points, onAnswerChange, number }: OpenEndedDoingProps) => {
+  const { t } = useTranslation('questions');
   const [text, setText] = useState(answer?.text || '');
 
   useEffect(() => {
@@ -39,13 +42,11 @@ export const OpenEndedDoing = ({ question, answer, points, onAnswerChange }: Ope
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold">Open-ended Question</h3>
-          <DifficultyBadge difficulty={question.difficulty} />
+      {number !== undefined && (
+        <div className="flex items-center gap-3">
+          <QuestionNumber number={number} />
         </div>
-      </div>
-
+      )}
       {/* Question */}
       <div className="space-y-2">
         <MarkdownPreview content={question.title} />
@@ -59,18 +60,24 @@ export const OpenEndedDoing = ({ question, answer, points, onAnswerChange }: Ope
         <AutosizeTextarea
           value={text}
           onChange={handleChange}
-          placeholder="Type your answer here..."
+          placeholder={t('openEnded.doing.placeholder')}
           minHeight={150}
-          className="font-sans"
+          className="focus:border-primary border-2 border-gray-300 font-sans dark:border-gray-600"
         />
 
         {remainingChars !== null && (
-          <p className="text-muted-foreground text-right text-sm">{remainingChars} characters remaining</p>
+          <p className="text-muted-foreground text-right text-sm">
+            {t('common.characterRemaining', { count: remainingChars })}
+          </p>
         )}
       </div>
 
       {/* Points */}
-      {points && <p className="text-muted-foreground text-sm">Points: {points}</p>}
+      {points && (
+        <p className="text-muted-foreground text-sm">
+          {t('common.points')}: {points}
+        </p>
+      )}
     </div>
   );
 };

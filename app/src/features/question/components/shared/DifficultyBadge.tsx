@@ -1,6 +1,7 @@
 import { Badge } from '@/shared/components/ui/badge';
-import { DIFFICULTY, DIFFICULTY_LABELS, type Difficulty } from '@/features/assignment/types';
+import { useTranslation } from 'react-i18next';
 import { cn } from '@/shared/lib/utils';
+import { DIFFICULTY, type Difficulty, getDifficultyI18nKey } from '@aiprimary/core';
 
 interface DifficultyBadgeProps {
   difficulty: Difficulty;
@@ -8,16 +9,22 @@ interface DifficultyBadgeProps {
 }
 
 const difficultyColors: Record<Difficulty, string> = {
-  [DIFFICULTY.EASY]: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100',
-  [DIFFICULTY.MEDIUM]: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100',
-  [DIFFICULTY.HARD]: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-100',
-  [DIFFICULTY.SUPER_HARD]: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100',
+  [DIFFICULTY.KNOWLEDGE]:
+    'bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-300 dark:border-emerald-800',
+  [DIFFICULTY.COMPREHENSION]:
+    'bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-300 dark:border-yellow-800',
+  [DIFFICULTY.APPLICATION]:
+    'bg-orange-100 text-orange-800 border-orange-200 dark:bg-orange-900/30 dark:text-orange-300 dark:border-orange-800',
+  [DIFFICULTY.ADVANCED_APPLICATION]:
+    'bg-red-100 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800',
 };
 
 export const DifficultyBadge = ({ difficulty, className }: DifficultyBadgeProps) => {
+  const { t } = useTranslation('questions');
+
   return (
     <Badge variant="outline" className={cn(difficultyColors[difficulty], className)}>
-      {DIFFICULTY_LABELS[difficulty]}
+      {t(getDifficultyI18nKey(difficulty) as any)}
     </Badge>
   );
 };

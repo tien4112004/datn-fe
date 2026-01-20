@@ -1,6 +1,6 @@
+import { useTranslation } from 'react-i18next';
 import type { MultipleChoiceQuestion } from '@/features/assignment/types';
-import { MarkdownPreview } from '../shared';
-import { DifficultyBadge } from '../shared';
+import { MarkdownPreview, QuestionNumber } from '../shared';
 import { Label } from '@/shared/components/ui/label';
 import { Badge } from '@/shared/components/ui/badge';
 import { Shuffle, CheckCircle2 } from 'lucide-react';
@@ -8,18 +8,18 @@ import { Shuffle, CheckCircle2 } from 'lucide-react';
 interface MultipleChoiceViewingProps {
   question: MultipleChoiceQuestion;
   points?: number; // Optional points for display
+  number?: number;
 }
 
-export const MultipleChoiceViewing = ({ question, points }: MultipleChoiceViewingProps) => {
+export const MultipleChoiceViewing = ({ question, points, number }: MultipleChoiceViewingProps) => {
+  const { t } = useTranslation('questions');
   return (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold">Multiple Choice Question</h3>
-          <DifficultyBadge difficulty={question.difficulty} />
+    <div className="space-y-4">
+      {number !== undefined && (
+        <div className="flex items-center gap-3">
+          <QuestionNumber number={number} />
         </div>
-      </div>
-
+      )}
       {/* Question Title */}
       <div className="space-y-1">
         <MarkdownPreview content={question.title} />
@@ -28,34 +28,31 @@ export const MultipleChoiceViewing = ({ question, points }: MultipleChoiceViewin
         )}
       </div>
 
-      {/* Shuffle Options Setting */}
-      {question.data.shuffleOptions !== undefined && (
-        <div className="bg-muted/50 flex items-center gap-2 rounded-lg border border-gray-300 p-2 dark:border-gray-600">
-          <Shuffle className="h-4 w-4" />
-          <Label className="text-sm font-medium">Shuffle Options</Label>
-          <Badge variant={question.data.shuffleOptions ? 'default' : 'secondary'} className="ml-auto">
-            {question.data.shuffleOptions ? 'Enabled' : 'Disabled'}
-          </Badge>
-        </div>
-      )}
-
       {/* Options */}
       <div className="space-y-2">
-        <Label className="text-sm font-medium">Options:</Label>
+        <div className="flex items-center gap-2">
+          <Label className="text-sm font-medium">{t('multipleChoice.viewing.options')}</Label>
+          {question.data.shuffleOptions && (
+            <Badge variant="secondary" className="flex items-center gap-1">
+              <Shuffle className="h-3 w-3" />
+              {t('multipleChoice.viewing.shuffle')}
+            </Badge>
+          )}
+        </div>
         {question.data.options.map((option, index) => (
           <div
             key={option.id}
-            className={`flex items-start gap-3 rounded-md border p-3 ${option.isCorrect ? 'border-green-500 bg-green-50 dark:bg-green-900/20' : ''}`}
+            className={`flex items-center gap-3 rounded-md border p-3 ${option.isCorrect ? 'border-green-500 bg-green-50 dark:bg-green-900/20' : ''}`}
           >
             <div
-              className={`flex h-6 w-6 items-center justify-center rounded-full text-sm font-medium ${option.isCorrect ? 'bg-green-600 text-white' : 'bg-muted'}`}
+              className={`flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full text-sm font-medium ${option.isCorrect ? 'bg-green-600 text-white' : 'bg-muted'}`}
             >
               {String.fromCharCode(65 + index)}
             </div>
-            <div className="flex-1">
+            <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2">
                 <MarkdownPreview content={option.text} />
-                {option.isCorrect && <CheckCircle2 className="h-4 w-4 text-green-600" />}
+                {option.isCorrect && <CheckCircle2 className="h-4 w-4 flex-shrink-0 text-green-600" />}
               </div>
               {option.imageUrl && (
                 <img
@@ -72,13 +69,15 @@ export const MultipleChoiceViewing = ({ question, points }: MultipleChoiceViewin
       {/* Explanation */}
       {question.explanation && (
         <div className="space-y-2 rounded-lg border border-gray-300 bg-blue-50 p-3 dark:border-gray-600 dark:bg-blue-900/20">
-          <Label className="text-sm font-medium">Explanation:</Label>
+          <Label className="text-sm font-medium">{t('multipleChoice.viewing.explanation')}</Label>
           <MarkdownPreview content={question.explanation} />
         </div>
       )}
 
       {/* Points */}
-      {points && <p className="text-muted-foreground text-sm">Points: {points}</p>}
+      {points && (
+        <p className="text-muted-foreground text-sm">{t('multipleChoice.viewing.points', { points })}</p>
+      )}
     </div>
   );
 };

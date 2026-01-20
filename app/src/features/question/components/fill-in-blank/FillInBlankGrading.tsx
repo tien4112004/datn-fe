@@ -1,18 +1,20 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { FillInBlankQuestion, FillInBlankAnswer } from '@/features/assignment/types';
-import { DifficultyBadge } from '../shared';
 
 import { Input } from '@/shared/components/ui/input';
 import { Label } from '@/shared/components/ui/label';
 import { Textarea } from '@/shared/components/ui/textarea';
 import { CheckCircle2, XCircle } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
+import { QuestionNumber } from '../shared';
 
 interface FillInBlankGradingProps {
   question: FillInBlankQuestion;
   answer?: FillInBlankAnswer;
   points?: number; // Points allocated for this question in the assignment
   onGradeChange?: (grade: { points: number; feedback?: string }) => void;
+  number?: number;
 }
 
 export const FillInBlankGrading = ({
@@ -20,7 +22,10 @@ export const FillInBlankGrading = ({
   answer,
   points = 0,
   onGradeChange,
+  number,
 }: FillInBlankGradingProps) => {
+  const { t } = useTranslation('questions');
+
   // Calculate score: each correct blank gets equal points
   const blankSegments = question.data.segments.filter((s) => s.type === 'blank');
   const pointsPerBlank = points / blankSegments.length;
@@ -83,13 +88,11 @@ export const FillInBlankGrading = ({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold">Fill In Blank Question - Grading</h3>
-          <DifficultyBadge difficulty={question.difficulty} />
+      {number !== undefined && (
+        <div className="flex items-center gap-3">
+          <QuestionNumber number={number} />
         </div>
-      </div>
-
+      )}
       {/* Question Title */}
       {question.title && (
         <div className="space-y-2">
@@ -102,7 +105,7 @@ export const FillInBlankGrading = ({
 
       {/* Question with student's answers */}
       <div className="space-y-2">
-        <Label className="text-sm font-semibold">Student Answer:</Label>
+        <Label className="text-sm font-semibold">{t('fillInBlank.grading.studentAnswer')}</Label>
         <div className="bg-muted/50 rounded-md p-4 text-sm leading-relaxed">
           {question.data.segments.map((segment) => {
             if (segment.type === 'text') {
@@ -142,7 +145,7 @@ export const FillInBlankGrading = ({
 
       {/* Detailed Blank Review */}
       <div className="space-y-2">
-        <Label className="text-sm font-semibold">Blank-by-Blank Review:</Label>
+        <Label className="text-sm font-semibold">{t('fillInBlank.grading.blankByBlankReview')}</Label>
         <div className="space-y-2">
           {blankSegments.map((segment, index) => {
             const studentAnswer = getStudentAnswer(segment.id);
@@ -167,20 +170,25 @@ export const FillInBlankGrading = ({
                     )}
                   </div>
                   <div className="flex-1 space-y-1">
-                    <p className="font-semibold">Blank {index + 1}:</p>
+                    <p className="font-semibold">
+                      {t('fillInBlank.grading.blankNumber', { number: index + 1 })}:
+                    </p>
                     <div className="grid grid-cols-2 gap-2 text-xs">
                       <div>
-                        <span className="text-muted-foreground">Student: </span>
-                        <span className="font-mono">{studentAnswer || '(empty)'}</span>
+                        <span className="text-muted-foreground">{t('fillInBlank.grading.studentLabel')}</span>
+                        <span className="font-mono">
+                          {studentAnswer || t('fillInBlank.afterAssessment.empty')}
+                        </span>
                       </div>
                       <div>
-                        <span className="text-muted-foreground">Correct: </span>
+                        <span className="text-muted-foreground">{t('fillInBlank.grading.correctLabel')}</span>
                         <span className="font-mono">{segment.content}</span>
                       </div>
                     </div>
                     {segment.acceptableAnswers && segment.acceptableAnswers.length > 0 && (
                       <p className="text-muted-foreground text-xs">
-                        Also acceptable: {segment.acceptableAnswers.join(', ')}
+                        {t('fillInBlank.grading.alsoAcceptable')}
+                        {segment.acceptableAnswers.join(', ')}
                       </p>
                     )}
                   </div>
@@ -194,28 +202,32 @@ export const FillInBlankGrading = ({
       {/* Case Sensitivity Info */}
       {question.data.caseSensitive && (
         <div className="rounded-md border border-amber-200 bg-amber-50 p-2 text-xs text-amber-800 dark:border-amber-800 dark:bg-amber-900/20 dark:text-amber-200">
-          ⚠️ This question is case-sensitive
+          {t('fillInBlank.grading.caseSensitiveInfo')}
         </div>
       )}
 
       {/* Auto Score Info */}
       <div className="bg-muted/50 rounded-md p-3 text-sm">
         <p>
-          <span className="font-semibold">Auto-calculated Score: </span>
+          <span className="font-semibold">{t('fillInBlank.grading.autoCalculatedScore')}</span>
           <span className="text-blue-600">
-            {correctBlanks}/{blankSegments.length} correct blanks - {autoScore.toFixed(1)} points
+            {t('fillInBlank.grading.correctBlanksScore', {
+              correct: correctBlanks,
+              total: blankSegments.length,
+              score: autoScore.toFixed(1),
+            })}
           </span>
         </p>
       </div>
 
       {/* Grading Interface */}
       <div className="space-y-3 border-t pt-4">
-        <h4 className="text-sm font-semibold">Grading</h4>
+        <h4 className="text-sm font-semibold">{t('fillInBlank.grading.grading')}</h4>
 
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1.5">
             <Label htmlFor="points" className="text-sm">
-              Points Awarded
+              {t('fillInBlank.grading.pointsAwarded')}
             </Label>
             <Input
               id="points"
@@ -227,19 +239,21 @@ export const FillInBlankGrading = ({
               onChange={(e) => handlePointsChange(e.target.value)}
               className="h-9"
             />
-            <p className="text-muted-foreground text-xs">Max: {points || 0} points</p>
+            <p className="text-muted-foreground text-xs">
+              {t('fillInBlank.grading.maxPoints', { points: points || 0 })}
+            </p>
           </div>
         </div>
 
         <div className="space-y-1.5">
           <Label htmlFor="feedback" className="text-sm">
-            Teacher Feedback (Optional)
+            {t('fillInBlank.grading.teacherFeedback')}
           </Label>
           <Textarea
             id="feedback"
             value={feedback}
             onChange={(e) => handleFeedbackChange(e.target.value)}
-            placeholder="Add comments or feedback for the student..."
+            placeholder={t('fillInBlank.grading.feedbackPlaceholder')}
             className="min-h-[80px] resize-none"
           />
         </div>

@@ -6,6 +6,7 @@ import type {
   MatchingQuestion,
   OpenEndedQuestion,
   FillInBlankQuestion,
+  GroupQuestion,
   MultipleChoiceAnswer,
   MatchingAnswer,
   OpenEndedAnswer,
@@ -19,7 +20,7 @@ import { QuestionRenderer } from '@/features/question';
 const multipleChoiceQuestion: MultipleChoiceQuestion = {
   id: 'mc-1',
   type: QUESTION_TYPE.MULTIPLE_CHOICE,
-  difficulty: DIFFICULTY.EASY,
+  difficulty: DIFFICULTY.KNOWLEDGE,
   title: 'What is the capital of Vietnam?',
   explanation: 'Hanoi has been the capital of Vietnam since 1010 (under the Ly dynasty) and again from 1954.',
   data: {
@@ -36,7 +37,7 @@ const multipleChoiceQuestion: MultipleChoiceQuestion = {
 const matchingQuestion: MatchingQuestion = {
   id: 'match-1',
   type: QUESTION_TYPE.MATCHING,
-  difficulty: DIFFICULTY.MEDIUM,
+  difficulty: DIFFICULTY.COMPREHENSION,
   title: 'Match the famous Vietnamese landmarks with their cities',
   explanation: 'These are some of the most iconic landmarks in Vietnam.',
   data: {
@@ -53,7 +54,7 @@ const matchingQuestion: MatchingQuestion = {
 const openEndedQuestion: OpenEndedQuestion = {
   id: 'oe-1',
   type: QUESTION_TYPE.OPEN_ENDED,
-  difficulty: DIFFICULTY.HARD,
+  difficulty: DIFFICULTY.APPLICATION,
   title: 'Explain the significance of the Battle of Dien Bien Phu in Vietnamese history.',
   explanation:
     'The Battle of Dien Bien Phu (1954) was a decisive victory for the Viet Minh over French colonial forces, leading to the end of French Indochina and Vietnamese independence.',
@@ -67,7 +68,7 @@ const openEndedQuestion: OpenEndedQuestion = {
 const fillInBlankQuestion: FillInBlankQuestion = {
   id: 'fib-1',
   type: QUESTION_TYPE.FILL_IN_BLANK,
-  difficulty: DIFFICULTY.EASY,
+  difficulty: DIFFICULTY.KNOWLEDGE,
   title: 'Complete the sentence about Vietnam',
   explanation: 'These are basic facts about Vietnam.',
   data: {
@@ -84,6 +85,66 @@ const fillInBlankQuestion: FillInBlankQuestion = {
       { id: 'seg-5', type: 'text', content: '.' },
     ],
     caseSensitive: false,
+  },
+};
+
+const groupQuestion: GroupQuestion = {
+  id: 'group-1',
+  type: QUESTION_TYPE.GROUP,
+  difficulty: DIFFICULTY.COMPREHENSION,
+  title: 'Reading Comprehension: The Solar System',
+  explanation: 'This group question tests understanding of the solar system passage.',
+  data: {
+    description: `<p><strong>Read the following passage and answer the questions below:</strong></p>
+      <p>Our solar system consists of eight planets orbiting around the Sun. The four inner planets (Mercury, Venus, Earth, and Mars) are rocky, while the four outer planets (Jupiter, Saturn, Uranus, and Neptune) are gas giants.</p>
+      <p>The Sun, at the center of our solar system, contains 99.8% of the solar system's mass. It provides light and heat to all the planets. Each planet has unique characteristics, from Mercury's extreme temperatures to Neptune's distant blue appearance.</p>`,
+    questions: [
+      {
+        id: 'group-q1',
+        type: QUESTION_TYPE.MULTIPLE_CHOICE,
+        title: 'How many planets are in our solar system?',
+        points: 2,
+        data: {
+          options: [
+            { id: 'opt-1', text: 'Seven', isCorrect: false },
+            { id: 'opt-2', text: 'Eight', isCorrect: true },
+            { id: 'opt-3', text: 'Nine', isCorrect: false },
+            { id: 'opt-4', text: 'Ten', isCorrect: false },
+          ],
+          shuffleOptions: false,
+        },
+      },
+      {
+        id: 'group-q2',
+        type: QUESTION_TYPE.FILL_IN_BLANK,
+        title: 'Complete the sentence',
+        points: 2,
+        data: {
+          segments: [
+            { id: 'seg-1', type: 'text', content: 'The Sun contains ' },
+            { id: 'seg-2', type: 'blank', content: '99.8', acceptableAnswers: ['99.8%', '99.8 percent'] },
+            { id: 'seg-3', type: 'text', content: "% of the solar system's mass." },
+          ],
+          caseSensitive: false,
+        },
+      },
+      {
+        id: 'group-q3',
+        type: QUESTION_TYPE.MATCHING,
+        title: 'Match the planets with their categories',
+        points: 3,
+        data: {
+          pairs: [
+            { id: 'pair-1', left: 'Mercury', right: 'Inner Planet' },
+            { id: 'pair-2', left: 'Jupiter', right: 'Outer Planet' },
+            { id: 'pair-3', left: 'Earth', right: 'Inner Planet' },
+          ],
+          shufflePairs: false,
+        },
+      },
+    ],
+    showQuestionNumbers: true,
+    shuffleQuestions: false,
   },
 };
 
@@ -125,9 +186,16 @@ const allQuestions: Question[] = [
   matchingQuestion,
   openEndedQuestion,
   fillInBlankQuestion,
+  groupQuestion,
 ];
 
-const allAnswers: Answer[] = [multipleChoiceAnswer, matchingAnswer, openEndedAnswer, fillInBlankAnswer];
+const allAnswers: Answer[] = [
+  multipleChoiceAnswer,
+  matchingAnswer,
+  openEndedAnswer,
+  fillInBlankAnswer,
+  {} as Answer,
+];
 
 const VIEW_MODE_OPTIONS: { value: ViewMode; label: string }[] = [
   { value: VIEW_MODE.EDITING, label: 'Editing (Teacher)' },
@@ -195,6 +263,7 @@ export const QuestionRendererDemoPage = () => {
                 {q.type === QUESTION_TYPE.MATCHING && '🔗 Matching'}
                 {q.type === QUESTION_TYPE.OPEN_ENDED && '✍️ Open Ended'}
                 {q.type === QUESTION_TYPE.FILL_IN_BLANK && '📝 Fill in Blank'}
+                {q.type === QUESTION_TYPE.GROUP && '📋 Group Question'}
               </button>
             ))}
           </div>

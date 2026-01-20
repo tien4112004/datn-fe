@@ -1,61 +1,38 @@
-import { useFormContext, useFieldArray } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { Plus, Trash2 } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
+import { Textarea } from '@/shared/components/ui/textarea';
 import { Label } from '@/shared/components/ui/label';
-import type { AssignmentFormData } from '../../types';
-import { DIFFICULTY } from '../../types';
-import { generateId, createMatrixCellsForTopic } from '../../utils';
+import { useAssignmentFormStore } from '../../stores/useAssignmentFormStore';
+import { generateId } from '../../utils';
 
 export const TopicManager = () => {
   const { t } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.matrixEditor' });
-  const { control, register, watch } = useFormContext<AssignmentFormData>();
-  const {
-    fields: topicFields,
-    append: appendTopic,
-    remove: removeTopic,
-  } = useFieldArray({
-    control,
-    name: 'topics',
-  });
 
-  const { append: appendMatrixCell, remove: removeMatrixCell } = useFieldArray({
-    control,
-    name: 'matrixCells',
-  });
-
-  const matrixCells = watch('matrixCells');
+  // Get data and actions from store
+  const topics = useAssignmentFormStore((state) => state.topics);
+  const addTopic = useAssignmentFormStore((state) => state.addTopic);
+  const removeTopic = useAssignmentFormStore((state) => state.removeTopic);
+  const updateTopic = useAssignmentFormStore((state) => state.updateTopic);
 
   const handleAddTopic = () => {
     const newTopicId = generateId();
-
-    // Add the topic
-    appendTopic({
-      id: newTopicId,
-      name: '',
-      description: '',
-    });
-
-    // Create matrix cells for all difficulties
-    const difficulties = [DIFFICULTY.EASY, DIFFICULTY.MEDIUM, DIFFICULTY.HARD, DIFFICULTY.SUPER_HARD];
-    const newCells = createMatrixCellsForTopic(newTopicId, difficulties);
-
-    newCells.forEach((cell) => appendMatrixCell(cell));
+    // Store handles creating matrix cells atomically
+    addTopic({ id: newTopicId, name: '', description: '' });
   };
 
-  const handleRemoveTopic = (index: number, topicId: string) => {
-    // Find indices of matrix cells for this topic
-    const cellIndices = matrixCells
-      .map((cell: any, idx: number) => (cell.topicId === topicId ? idx : -1))
-      .filter((idx: number) => idx !== -1)
-      .reverse(); // Remove from end to start to maintain correct indices
+  const handleRemoveTopic = (topicId: string) => {
+    // Store handles removing topic and its matrix cells atomically
+    removeTopic(topicId);
+  };
 
-    // Remove matrix cells
-    cellIndices.forEach((cellIdx) => removeMatrixCell(cellIdx));
+  const handleTopicNameChange = (topicId: string, name: string) => {
+    updateTopic(topicId, { name });
+  };
 
-    // Remove topic
-    removeTopic(index);
+  const handleTopicDescriptionChange = (topicId: string, description: string) => {
+    updateTopic(topicId, { description });
   };
 
   return (
@@ -69,23 +46,33 @@ export const TopicManager = () => {
       </div>
 
       <div className="space-y-2">
-        {topicFields.map((field, index) => (
-          <div key={field.id} className="flex items-center gap-2">
-            <Input
-              {...register(`topics.${index}.name`)}
-              placeholder={t('topicPlaceholder')}
-              className="text-sm"
+        {topics?.map((topic) => (
+          <div key={topic.id} className="space-y-2 rounded-lg border p-3">
+            <div className="flex items-center gap-2">
+              <Input
+                value={topic.name}
+                onChange={(e) => handleTopicNameChange(topic.id, e.target.value)}
+                placeholder={t('topicPlaceholder')}
+                className="text-sm"
+              />
+              <Button
+                type="button"
+                size="sm"
+                variant="ghost"
+                onClick={() => handleRemoveTopic(topic.id)}
+                className="text-red-500 hover:bg-red-50 hover:text-red-600"
+                disabled={topics.length === 1}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
+            <Textarea
+              value={topic.description || ''}
+              onChange={(e) => handleTopicDescriptionChange(topic.id, e.target.value)}
+              placeholder={t('descriptionPlaceholder')}
+              rows={2}
+              className="resize-none text-sm"
             />
-            <Button
-              type="button"
-              size="sm"
-              variant="ghost"
-              onClick={() => handleRemoveTopic(index, field.id)}
-              className="text-red-500 hover:bg-red-50 hover:text-red-600"
-              disabled={topicFields.length === 1}
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
           </div>
         ))}
       </div>

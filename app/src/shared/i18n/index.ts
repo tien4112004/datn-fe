@@ -56,8 +56,9 @@ i18n
       'classes',
       'assignment',
       'admin',
-      'assessmentMatrix',
       'dashboard',
+      'comments',
+      'questions',
     ],
     interpolation: {
       escapeValue: false,

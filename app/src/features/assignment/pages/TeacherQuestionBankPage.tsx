@@ -6,12 +6,10 @@ import {
   useQuestionBankList,
   useDeleteQuestions,
   useDuplicateQuestion,
-  useCopyToPersonal,
   useExportQuestions,
 } from '@/features/assignment/hooks/useQuestionBankApi';
 import useQuestionBankStore from '@/features/assignment/stores/questionBankStore';
 import type { QuestionBankItem } from '@/features/assignment/types';
-import { BANK_TYPE } from '@/features/assignment/types';
 import { Button } from '@/shared/components/ui/button';
 import { Checkbox } from '@/shared/components/ui/checkbox';
 import { Badge } from '@/shared/components/ui/badge';
@@ -27,13 +25,58 @@ import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 import DataTable from '@/shared/components/table/DataTable';
 import {
   QuestionBankImportDialog,
-  CopyToPersonalDialog,
-  QuestionContentPreview,
   QuestionBankFilters,
+  QuestionBankDialog,
 } from '@/features/assignment/components/question-bank';
-import { getSubjectName, getQuestionTypeName, getDifficultyName } from '@aiprimary/core';
+import { getSubjectName, getQuestionTypeName, getDifficultyName, getGradeName } from '@aiprimary/core';
 
 const columnHelper = createColumnHelper<QuestionBankItem>();
+
+// Helper functions for colorful badges
+const getSubjectBadgeClass = (subject: string) => {
+  switch (subject) {
+    case 'T': // Math
+      return 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800';
+    case 'TV': // Vietnamese
+      return 'bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800';
+    case 'TA': // English
+      return 'bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-800';
+    default:
+      return 'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-900/30 dark:text-gray-300 dark:border-gray-800';
+  }
+};
+
+const getDifficultyBadgeClass = (difficulty: string) => {
+  switch (difficulty) {
+    case 'KNOWLEDGE':
+      return 'bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-300 dark:border-emerald-800';
+    case 'COMPREHENSION':
+      return 'bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-300 dark:border-yellow-800';
+    case 'APPLICATION':
+      return 'bg-orange-100 text-orange-800 border-orange-200 dark:bg-orange-900/30 dark:text-orange-300 dark:border-orange-800';
+    case 'ADVANCED_APPLICATION':
+      return 'bg-red-100 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800';
+    default:
+      return 'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-900/30 dark:text-gray-300 dark:border-gray-800';
+  }
+};
+
+const getQuestionTypeBadgeClass = (type: string) => {
+  switch (type) {
+    case 'MULTIPLE_CHOICE':
+      return 'bg-indigo-100 text-indigo-800 border-indigo-200 dark:bg-indigo-900/30 dark:text-indigo-300 dark:border-indigo-800';
+    case 'MATCHING':
+      return 'bg-pink-100 text-pink-800 border-pink-200 dark:bg-pink-900/30 dark:text-pink-300 dark:border-pink-800';
+    case 'FILL_IN_BLANK':
+      return 'bg-cyan-100 text-cyan-800 border-cyan-200 dark:bg-cyan-900/30 dark:text-cyan-300 dark:border-cyan-800';
+    case 'OPEN_ENDED':
+      return 'bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800';
+    case 'GROUP':
+      return 'bg-violet-100 text-violet-800 border-violet-200 dark:bg-violet-900/30 dark:text-violet-300 dark:border-violet-800';
+    default:
+      return 'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-900/30 dark:text-gray-300 dark:border-gray-800';
+  }
+};
 
 export function TeacherQuestionBankPage() {
   const { t } = useTranslation(I18N_NAMESPACES.ASSIGNMENT, { keyPrefix: 'teacherQuestionBank' });
@@ -48,8 +91,7 @@ export function TeacherQuestionBankPage() {
     pageSize: 10,
   });
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
-  const [isCopyDialogOpen, setIsCopyDialogOpen] = useState(false);
-  const [copyingQuestion, setCopyingQuestion] = useState<QuestionBankItem | null>(null);
+  const [isBrowseDialogOpen, setIsBrowseDialogOpen] = useState(false);
 
   // Store
   const { filters } = useQuestionBankStore();
@@ -57,21 +99,21 @@ export function TeacherQuestionBankPage() {
   // Hooks
   const { data, isLoading } = useQuestionBankList({
     page: pagination.pageIndex + 1,
-    limit: pagination.pageSize,
+    pageSize: pagination.pageSize,
     ...filters,
   });
 
   const deleteQuestionsMutation = useDeleteQuestions();
   const duplicateMutation = useDuplicateQuestion();
-  const copyToPersonalMutation = useCopyToPersonal();
   const exportMutation = useExportQuestions();
 
   const questions = data?.questions || [];
   const totalItems = data?.total || 0;
 
   // Permission helpers
-  const canEdit = (q: QuestionBankItem) => q.bankType === BANK_TYPE.PERSONAL;
-  const canDelete = (q: QuestionBankItem) => q.bankType === BANK_TYPE.PERSONAL;
+  // Note: Permissions are now managed by API/filters, not item properties
+  const canEdit = (_q: QuestionBankItem) => true;
+  const canDelete = (_q: QuestionBankItem) => true;
 
   // Get selected question IDs
   const selectedQuestionIds = Object.keys(rowSelection)
@@ -91,7 +133,7 @@ export function TeacherQuestionBankPage() {
       await deleteQuestionsMutation.mutateAsync(selectedQuestionIds);
       setRowSelection({});
       toast.success(t('toast.deleteSuccess'));
-    } catch (error) {
+    } catch {
       toast.error(t('toast.deleteError'));
     }
   };
@@ -100,26 +142,8 @@ export function TeacherQuestionBankPage() {
     try {
       await duplicateMutation.mutateAsync(id);
       toast.success(t('toast.duplicateSuccess'));
-    } catch (error) {
+    } catch {
       toast.error(t('toast.duplicateError'));
-    }
-  };
-
-  const handleCopyToPersonal = (question: QuestionBankItem) => {
-    setCopyingQuestion(question);
-    setIsCopyDialogOpen(true);
-  };
-
-  const handleCopyConfirm = async () => {
-    if (!copyingQuestion) return;
-
-    try {
-      await copyToPersonalMutation.mutateAsync(copyingQuestion.id);
-      toast.success(t('toast.copySuccess'));
-      setIsCopyDialogOpen(false);
-      setCopyingQuestion(null);
-    } catch (error) {
-      toast.error(t('toast.copyError'));
     }
   };
 
@@ -152,7 +176,7 @@ export function TeacherQuestionBankPage() {
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
       toast.success(t('toast.exportSuccess'));
-    } catch (error) {
+    } catch {
       toast.error(t('toast.exportError'));
     }
   };
@@ -190,25 +214,43 @@ export function TeacherQuestionBankPage() {
           isGrow: true,
         },
       }),
-      columnHelper.display({
-        id: 'content',
-        header: t('table.columns.content'),
-        cell: (info) => <QuestionContentPreview question={info.row.original} />,
-        size: 200,
-      }),
       columnHelper.accessor('type', {
         header: t('table.columns.questionType'),
-        cell: (info) => <Badge variant="outline">{getQuestionTypeName(info.getValue())}</Badge>,
+        cell: (info) => (
+          <Badge variant="outline" className={getQuestionTypeBadgeClass(info.getValue())}>
+            {getQuestionTypeName(info.getValue())}
+          </Badge>
+        ),
         size: 150,
       }),
-      columnHelper.accessor('subjectCode', {
+      columnHelper.accessor('subject', {
         header: t('table.columns.subject'),
-        cell: (info) => <Badge variant="secondary">{getSubjectName(info.getValue())}</Badge>,
+        cell: (info) => (
+          <Badge variant="outline" className={getSubjectBadgeClass(info.getValue())}>
+            {getSubjectName(info.getValue())}
+          </Badge>
+        ),
         size: 120,
+      }),
+      columnHelper.accessor('grade', {
+        header: t('table.columns.grade'),
+        cell: (info) => {
+          const grade = info.getValue();
+          return grade ? (
+            <Badge variant="outline">{getGradeName(grade)}</Badge>
+          ) : (
+            <span className="text-muted-foreground text-xs">-</span>
+          );
+        },
+        size: 100,
       }),
       columnHelper.accessor('difficulty', {
         header: t('table.columns.difficulty'),
-        cell: (info) => <Badge variant="secondary">{getDifficultyName(info.getValue())}</Badge>,
+        cell: (info) => (
+          <Badge variant="outline" className={getDifficultyBadgeClass(info.getValue())}>
+            {getDifficultyName(info.getValue())}
+          </Badge>
+        ),
         size: 140,
       }),
       columnHelper.display({
@@ -224,7 +266,7 @@ export function TeacherQuestionBankPage() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                {canEdit(question) ? (
+                {canEdit(question) && (
                   <>
                     <DropdownMenuItem onClick={() => handleEdit(question)}>
                       <FileEdit className="mr-2 h-4 w-4" />
@@ -239,11 +281,6 @@ export function TeacherQuestionBankPage() {
                       Delete
                     </DropdownMenuItem>
                   </>
-                ) : (
-                  <DropdownMenuItem onClick={() => handleCopyToPersonal(question)}>
-                    <Copy className="mr-2 h-4 w-4" />
-                    {t('actions.copyToPersonal')}
-                  </DropdownMenuItem>
                 )}
               </DropdownMenuContent>
             </DropdownMenu>
@@ -310,6 +347,16 @@ export function TeacherQuestionBankPage() {
                 {t('actions.import')}
               </Button>
 
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setIsBrowseDialogOpen(true)}
+                className="gap-2"
+              >
+                <Copy className="h-4 w-4" />
+                {t('actions.browsePublic')}
+              </Button>
+
               <Button size="sm" onClick={() => navigate('/question-bank/create')} className="gap-2">
                 <Plus className="h-4 w-4" />
                 {t('actions.create')}
@@ -351,15 +398,12 @@ export function TeacherQuestionBankPage() {
         {/* Dialogs */}
         <QuestionBankImportDialog open={isImportDialogOpen} onClose={() => setIsImportDialogOpen(false)} />
 
-        <CopyToPersonalDialog
-          open={isCopyDialogOpen}
-          onClose={() => {
-            setIsCopyDialogOpen(false);
-            setCopyingQuestion(null);
-          }}
-          onConfirm={handleCopyConfirm}
-          question={copyingQuestion}
-          isLoading={copyToPersonalMutation.isPending}
+        {/* Browse Public Questions Dialog */}
+        <QuestionBankDialog
+          open={isBrowseDialogOpen}
+          onOpenChange={setIsBrowseDialogOpen}
+          onAddQuestions={() => {}}
+          mode="copy-to-personal"
         />
       </div>
     </div>

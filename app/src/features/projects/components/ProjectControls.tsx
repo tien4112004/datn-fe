@@ -12,8 +12,8 @@ interface ProjectControlsProps {
 }
 
 // Type guard for supported resource types
-const isSupportedResourceType = (type: ResourceType): type is 'presentation' | 'mindmap' => {
-  return type === 'presentation' || type === 'mindmap';
+const isSupportedResourceType = (type: ResourceType): type is 'presentation' | 'mindmap' | 'assignment' => {
+  return type === 'presentation' || type === 'mindmap' || type === 'assignment';
 };
 
 // Resource-specific hook configuration
@@ -49,6 +49,11 @@ const useResourceHooks = (resourceType: ResourceType) => {
           },
         }),
     };
+  } else if (resourceType === 'assignment') {
+    return {
+      generate: null, // Assignments don't have AI generation yet
+      createBlank: () => navigate('/assignments/create'),
+    };
   } else if (resourceType === 'image') {
     return {
       generate: () => navigate('/image/generate'),
@@ -70,23 +75,26 @@ const CreatePresentationControls = ({ currentResourceType }: ProjectControlsProp
   };
 
   const handleGenerate = () => {
-    hooks?.generate();
+    hooks?.generate?.();
   };
 
   const showCreationButtons = isSupportedResourceType(currentResourceType);
+  const showGenerateButton = hooks?.generate;
 
   return (
     <div className="flex space-x-4">
-      <Button
-        variant="secondary"
-        className="text-primary-foreground dark:text-foreground flex h-28 flex-col bg-gradient-to-r from-blue-500 to-indigo-500 shadow hover:to-blue-500"
-        onClick={handleGenerate}
-      >
-        <Sparkles className="!size-6" />
-        <p className="text-lg font-semibold">{t('controls.generateNew')}</p>
-      </Button>
+      {showGenerateButton && (
+        <Button
+          variant="secondary"
+          className="text-primary-foreground dark:text-foreground flex h-28 flex-col bg-gradient-to-r from-blue-500 to-indigo-500 shadow hover:to-blue-500"
+          onClick={handleGenerate}
+        >
+          <Sparkles className="!size-6" />
+          <p className="text-lg font-semibold">{t('controls.generateNew')}</p>
+        </Button>
+      )}
 
-      {showCreationButtons && (
+      {showCreationButtons && hooks?.createBlank && (
         <Button
           variant="secondary"
           className="text-primary-foreground dark:text-foreground flex h-28 flex-col bg-gradient-to-r from-green-500 to-teal-500 shadow hover:to-green-500"

@@ -1,18 +1,17 @@
+import { useTranslation } from 'react-i18next';
 import { Input } from '@/shared/components/ui/input';
-import { useFormContext, useWatch } from 'react-hook-form';
-import type { AssignmentFormData, MatrixCell as MatrixCellType } from '../../types';
+import type { MatrixCell as MatrixCellType } from '../../types';
 import { validateMatrixCell } from '../../utils';
+import { I18N_NAMESPACES } from '@/shared/i18n/constants';
+import { useAssignmentFormStore } from '../../stores/useAssignmentFormStore';
 
 interface MatrixCellProps {
   cell: MatrixCellType;
 }
 
 export const MatrixCell = ({ cell }: MatrixCellProps) => {
-  const { control, setValue } = useFormContext<AssignmentFormData>();
-  const matrixCells = useWatch({ control, name: 'matrixCells' });
-
-  // Find the index of this cell in the array
-  const cellIndex = matrixCells?.findIndex((c) => c.id === cell.id) ?? -1;
+  const { t } = useTranslation(I18N_NAMESPACES.ASSIGNMENT, { keyPrefix: 'assignmentEditor.matrixCell' });
+  const updateMatrixCell = useAssignmentFormStore((state) => state.updateMatrixCell);
 
   // Validate the cell
   const validation = validateMatrixCell(cell);
@@ -26,15 +25,13 @@ export const MatrixCell = ({ cell }: MatrixCellProps) => {
 
   const handleRequiredCountChange = (value: string) => {
     const numValue = parseInt(value, 10) || 0;
-    if (cellIndex !== -1) {
-      setValue(`matrixCells.${cellIndex}.requiredCount`, numValue);
-    }
+    updateMatrixCell(cell.id, { requiredCount: numValue });
   };
 
   return (
     <div className="space-y-1.5">
       <div className="flex items-center gap-1">
-        <span className="text-xs text-gray-500">Required:</span>
+        <span className="text-xs text-gray-500">{t('required')}</span>
         <Input
           type="number"
           min="0"
@@ -46,7 +43,7 @@ export const MatrixCell = ({ cell }: MatrixCellProps) => {
 
       <div className={`rounded-md border-2 p-2 text-center ${statusColors[status]}`}>
         <div className="text-lg font-bold">{cell.currentCount}</div>
-        <div className="text-xs">{message || 'OK'}</div>
+        <div className="text-xs">{message || t('ok')}</div>
       </div>
     </div>
   );

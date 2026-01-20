@@ -12,6 +12,7 @@ export default {
     document: 'Tài liệu',
     video: 'Video',
     mindmap: 'Sơ đồ tư duy',
+    assignment: 'Bài tập',
     image: 'Hình ảnh',
   },
   creation: {

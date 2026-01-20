@@ -4,6 +4,7 @@ import type {
   QuestionBankFilters,
   CreateQuestionRequest,
   UpdateQuestionRequest,
+  QuestionBankItem,
 } from '../types/questionBank';
 
 // Export the API service hook for direct use
@@ -25,12 +26,20 @@ export const questionBankKeys = {
 };
 
 // GET all questions with filters
-export const useQuestionBankList = (filters: QuestionBankFilters = {}) => {
+export const useQuestionBankList = (filters: QuestionBankFilters) => {
   const apiService = useQuestionBankApiService();
 
   return useQuery({
     queryKey: questionBankKeys.list(filters),
-    queryFn: () => apiService.getQuestions(filters),
+    queryFn: async () => {
+      const response = await apiService.getQuestions(filters);
+      return {
+        questions: response.data,
+        total: response.pagination?.totalItems || 0,
+        page: response.pagination?.currentPage || 1,
+        limit: response.pagination?.pageSize || 10,
+      };
+    },
     staleTime: 30000, // 30 seconds
     gcTime: 300000, // 5 minutes
   });
@@ -54,6 +63,20 @@ export const useCreateQuestion = () => {
 
   return useMutation({
     mutationFn: (data: CreateQuestionRequest) => apiService.createQuestion(data.question),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: questionBankKeys.lists() });
+    },
+  });
+};
+
+// CREATE multiple questions
+export const useCreateQuestions = () => {
+  const queryClient = useQueryClient();
+  const apiService = useQuestionBankApiService();
+
+  return useMutation({
+    mutationFn: (questions: Array<Omit<QuestionBankItem, 'id' | 'createdAt' | 'updatedAt'>>) =>
+      apiService.createQuestions(questions),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: questionBankKeys.lists() });
     },
@@ -108,19 +131,6 @@ export const useDuplicateQuestion = () => {
 
   return useMutation({
     mutationFn: (id: string) => apiService.duplicateQuestion(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: questionBankKeys.lists() });
-    },
-  });
-};
-
-// COPY question to personal bank
-export const useCopyToPersonal = () => {
-  const queryClient = useQueryClient();
-  const apiService = useQuestionBankApiService();
-
-  return useMutation({
-    mutationFn: (id: string) => apiService.copyToPersonal(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: questionBankKeys.lists() });
     },

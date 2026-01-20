@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { AutosizeTextarea } from '@/shared/components/ui/autosize-textarea';
 import { cn } from '@/shared/lib/utils';
 
@@ -13,16 +14,18 @@ interface MarkdownEditorProps {
 export const MarkdownEditor = ({
   value,
   onChange,
-  placeholder = 'Enter text here... (Markdown supported)',
+  placeholder,
   minHeight = 100,
   className,
   disabled = false,
 }: MarkdownEditorProps) => {
+  const { t } = useTranslation('questions');
+  const defaultPlaceholder = t('common.markdownPlaceholder');
   return (
     <AutosizeTextarea
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      placeholder={placeholder}
+      placeholder={placeholder || defaultPlaceholder}
       minHeight={minHeight}
       disabled={disabled}
       className={cn('font-mono text-sm', className)}

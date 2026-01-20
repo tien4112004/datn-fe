@@ -1,13 +1,8 @@
 import { useTranslation } from 'react-i18next';
-import { DIFFICULTY } from '@aiprimary/core';
-import type { AssignmentTopic, MatrixCell, QuestionWithTopic } from '../../types';
+import { getAllDifficulties, getDifficultyI18nKey } from '@aiprimary/core';
+import type { MatrixCell } from '../../types';
 import { Badge } from '@/shared/components/ui/badge';
-
-interface MatrixPreviewSummaryProps {
-  topics: AssignmentTopic[];
-  matrixCells: MatrixCell[];
-  questions: QuestionWithTopic[];
-}
+import { useAssignmentFormStore } from '../../stores/useAssignmentFormStore';
 
 const getCellStatus = (cell: MatrixCell): 'valid' | 'warning' | 'info' => {
   if (cell.requiredCount === 0) return 'info';
@@ -15,25 +10,19 @@ const getCellStatus = (cell: MatrixCell): 'valid' | 'warning' | 'info' => {
   return 'warning';
 };
 
-export const MatrixPreviewSummary = ({ topics, matrixCells, questions }: MatrixPreviewSummaryProps) => {
+export const MatrixPreviewSummary = () => {
   const { t } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.matrix.preview' });
-  const { t: tDifficulty } = useTranslation('assignment', { keyPrefix: 'difficulty' });
+  const { t: tDifficulty } = useTranslation('questions');
   const { t: tMatrix } = useTranslation('assignment', {
     keyPrefix: 'assignmentEditor.matrixEditor.tableHeaders',
   });
 
-  const difficulties = [DIFFICULTY.EASY, DIFFICULTY.MEDIUM, DIFFICULTY.HARD, DIFFICULTY.SUPER_HARD];
+  // Get data from store (auto-synced)
+  const topics = useAssignmentFormStore((state) => state.topics);
+  const matrixCells = useAssignmentFormStore((state) => state.matrixCells);
+  const questions = useAssignmentFormStore((state) => state.questions);
 
-  const getDifficultyLabel = (difficulty: string) => {
-    const diffMap: Record<string, 'nhanBiet' | 'thongHieu' | 'vanDung' | 'vanDungCao'> = {
-      [DIFFICULTY.EASY]: 'nhanBiet',
-      [DIFFICULTY.MEDIUM]: 'thongHieu',
-      [DIFFICULTY.HARD]: 'vanDung',
-      [DIFFICULTY.SUPER_HARD]: 'vanDungCao',
-    };
-    const key = diffMap[difficulty] || 'nhanBiet';
-    return tDifficulty(key as 'nhanBiet' | 'thongHieu' | 'vanDung' | 'vanDungCao').charAt(0);
-  };
+  const difficulties = getAllDifficulties();
 
   const totalRequired = matrixCells.reduce((sum, cell) => sum + cell.requiredCount, 0);
   const totalCurrent = questions.length;
@@ -62,8 +51,8 @@ export const MatrixPreviewSummary = ({ topics, matrixCells, questions }: MatrixP
             <tr className="border-b">
               <th className="border-r p-1 text-left font-medium">{tMatrix('topic')}</th>
               {difficulties.map((diff) => (
-                <th key={diff} className="p-1 text-center font-medium">
-                  {getDifficultyLabel(diff)}
+                <th key={diff.value} className="p-1 text-center font-medium">
+                  {tDifficulty(getDifficultyI18nKey(diff.value) as any).charAt(0)}
                 </th>
               ))}
             </tr>
@@ -73,10 +62,10 @@ export const MatrixPreviewSummary = ({ topics, matrixCells, questions }: MatrixP
               <tr key={topic.id} className="border-b">
                 <td className="border-r p-1 font-medium">{topic.name}</td>
                 {difficulties.map((diff) => {
-                  const cell = matrixCells.find((c) => c.topicId === topic.id && c.difficulty === diff);
+                  const cell = matrixCells.find((c) => c.topicId === topic.id && c.difficulty === diff.value);
                   const status = cell ? getCellStatus(cell) : 'info';
                   return (
-                    <td key={diff} className="p-1 text-center">
+                    <td key={diff.value} className="p-1 text-center">
                       <span className={`inline-block rounded px-1 ${statusColorMap[status]}`}>
                         {cell ? `${cell.currentCount}/${cell.requiredCount}` : '-'}
                       </span>

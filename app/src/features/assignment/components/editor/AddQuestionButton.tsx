@@ -1,4 +1,3 @@
-import { useFormContext, useFieldArray } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { Plus } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
@@ -8,10 +7,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/shared/components/ui/dropdown-menu';
-import type { AssignmentFormData } from '../../types';
 import { QUESTION_TYPE, DIFFICULTY } from '../../types';
+import { getAllQuestionTypes } from '@aiprimary/core';
 import { generateId } from '@/shared/lib/utils';
 import { useAssignmentEditorStore } from '../../stores/useAssignmentEditorStore';
+import { useAssignmentFormStore } from '../../stores/useAssignmentFormStore';
 
 interface AddQuestionButtonProps {
   className?: string;
@@ -19,51 +19,83 @@ interface AddQuestionButtonProps {
 
 export const AddQuestionButton = ({ className }: AddQuestionButtonProps) => {
   const { t } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.questions.toolbar' });
-  const { t: tTypes } = useTranslation('assignment', { keyPrefix: 'questionTypes' });
-  const { control, watch } = useFormContext<AssignmentFormData>();
-  const { append } = useFieldArray({
-    control,
-    name: 'questions',
-  });
 
-  const topics = watch('topics');
+  // Get data and actions from stores
+  const topics = useAssignmentFormStore((state) => state.topics);
+  const questions = useAssignmentFormStore((state) => state.questions);
+  const addQuestion = useAssignmentFormStore((state) => state.addQuestion);
   const defaultTopicId = topics[0]?.id || '';
   const setMainView = useAssignmentEditorStore((state) => state.setMainView);
   const setCurrentQuestionIndex = useAssignmentEditorStore((state) => state.setCurrentQuestionIndex);
-  const questions = watch('questions');
 
   const handleAddQuestion = (type: string) => {
-    // Create appropriate data structure based on question type
+    // Create appropriate data structure based on question type with better defaults
     let data: any;
     switch (type) {
       case QUESTION_TYPE.MULTIPLE_CHOICE:
-        data = { options: [] };
+        data = {
+          options: [
+            { id: generateId(), content: '', isCorrect: false },
+            { id: generateId(), content: '', isCorrect: false },
+            { id: generateId(), content: '', isCorrect: false },
+            { id: generateId(), content: '', isCorrect: false },
+          ],
+        };
         break;
       case QUESTION_TYPE.MATCHING:
-        data = { pairs: [] };
+        data = {
+          pairs: [
+            { id: generateId(), left: '', right: '' },
+            { id: generateId(), left: '', right: '' },
+            { id: generateId(), left: '', right: '' },
+          ],
+        };
         break;
       case QUESTION_TYPE.OPEN_ENDED:
         data = { expectedAnswer: '', maxLength: 500 };
         break;
       case QUESTION_TYPE.FILL_IN_BLANK:
-        data = { segments: [], caseSensitive: false };
+        data = {
+          segments: [
+            { type: 'text', content: '' },
+            { type: 'blank', correctAnswer: '', caseSensitive: false },
+            { type: 'text', content: '' },
+          ],
+          caseSensitive: false,
+        };
+        break;
+      case QUESTION_TYPE.GROUP:
+        data = {
+          groups: [
+            { id: generateId(), name: '', items: [] },
+            { id: generateId(), name: '', items: [] },
+          ],
+          items: [
+            { id: generateId(), content: '' },
+            { id: generateId(), content: '' },
+            { id: generateId(), content: '' },
+            { id: generateId(), content: '' },
+          ],
+        };
         break;
       default:
         data = {};
     }
 
-    append({
+    const newQuestion = {
       question: {
         id: generateId(),
         type: type as any,
-        difficulty: DIFFICULTY.EASY,
+        difficulty: DIFFICULTY.KNOWLEDGE,
         title: '',
         topicId: defaultTopicId,
         explanation: '',
         data,
       },
       points: 10,
-    } as any);
+    } as any;
+
+    addQuestion(newQuestion);
 
     // Switch to questions view and navigate to the new question
     setMainView('questions');
@@ -79,18 +111,11 @@ export const AddQuestionButton = ({ className }: AddQuestionButtonProps) => {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-        <DropdownMenuItem onClick={() => handleAddQuestion(QUESTION_TYPE.MULTIPLE_CHOICE)}>
-          {tTypes('multipleChoice')}
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => handleAddQuestion(QUESTION_TYPE.MATCHING)}>
-          {tTypes('matching')}
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => handleAddQuestion(QUESTION_TYPE.OPEN_ENDED)}>
-          {tTypes('openEnded')}
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => handleAddQuestion(QUESTION_TYPE.FILL_IN_BLANK)}>
-          {tTypes('fillInBlank')}
-        </DropdownMenuItem>
+        {getAllQuestionTypes({ includeGroup: true }).map((type) => (
+          <DropdownMenuItem key={type.value} onClick={() => handleAddQuestion(type.value)}>
+            {type.label}
+          </DropdownMenuItem>
+        ))}
       </DropdownMenuContent>
     </DropdownMenu>
   );

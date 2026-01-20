@@ -8,6 +8,8 @@ import MindmapTable from '@/features/mindmap/components/table/MindmapTable';
 import MindmapGrid from '@/features/mindmap/components/table/MindmapGrid';
 import type { ResourceType } from '@/shared/constants/resourceTypes';
 import Image from '@/features/image';
+import AssignmentTable from '@/features/assignment/components/table/AssignmentTable';
+import AssignmentGrid from '@/features/assignment/components/table/AssignmentGrid';
 
 const ProjectListPage = () => {
   const { t } = useTranslation('projects');
@@ -36,6 +38,12 @@ const ProjectListPage = () => {
       value: 'mindmap',
       label: t('resources.mindmap'),
       content: viewMode === 'grid' ? <MindmapGrid /> : <MindmapTable />,
+    },
+    {
+      key: 'assignment',
+      value: 'assignment',
+      label: t('resources.assignment'),
+      content: viewMode === 'grid' ? <AssignmentGrid /> : <AssignmentTable />,
     },
     {
       key: 'image',

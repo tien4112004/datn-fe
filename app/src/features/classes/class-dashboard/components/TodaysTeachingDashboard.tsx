@@ -50,8 +50,8 @@ interface TodaysTeachingDashboardProps {
   ) => Promise<void>;
   onUpdateResource: (lessonId: string, resourceId: string, updates: Partial<LessonResource>) => Promise<void>;
   onDeleteResource: (lessonId: string, resourceId: string) => Promise<void>;
-  onSubjectChange: (subject: string, subject: string) => void;
-  onCreateLesson?: (subject: string, subject: string) => void;
+  onSubjectChange: (subjectName: string, subjectCode: string) => void;
+  onCreateLesson?: (subjectName: string, subjectCode: string) => void;
   onManageSchedule?: (subject: string) => void;
   currentSubject?: string;
 }

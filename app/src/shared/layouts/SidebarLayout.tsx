@@ -1,6 +1,6 @@
 import { Outlet, useNavigate, useNavigation, useRouteError, useLocation } from 'react-router-dom';
 import GlobalSpinner from '@/components/common/GlobalSpinner';
-import { SidebarInset, SidebarProvider, useSidebar } from '../components/ui/sidebar';
+import { SidebarInset, SidebarProvider, SidebarTrigger, useSidebar } from '../components/ui/sidebar';
 import { AppSidebar } from '../components/navigation/AppSidebar';
 import { subscribe, unsubscribe } from '@/shared/lib/event';
 import React from 'react';
@@ -40,6 +40,10 @@ function NavLayoutContent() {
     <>
       <AppSidebar />
       <SidebarInset className="bg-white">
+        {/* Mobile header with sidebar trigger */}
+        <header className="flex h-12 items-center border-b px-4 md:hidden">
+          <SidebarTrigger />
+        </header>
         {isLoading && <GlobalSpinner text={t('page')} />}
         <ErrorBoundary pathname={location.pathname}>
           <Outlet />
@@ -73,6 +77,10 @@ export function NavLayoutErrorBoundary() {
       <Toaster />
       <AppSidebar />
       <SidebarInset className="bg-white">
+        {/* Mobile header with sidebar trigger */}
+        <header className="flex h-12 items-center border-b px-4 md:hidden">
+          <SidebarTrigger />
+        </header>
         <ErrorPageFallback
           error={error as AppError}
           errorInfo={null}

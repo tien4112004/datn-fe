@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useQuestionBankApiService } from '../api/questionBank.index';
+import { getAllSubjects, getElementaryGrades } from '@aiprimary/core';
 import type {
   QuestionBankFilters,
   CreateQuestionRequest,
@@ -163,25 +164,21 @@ export const useImportQuestions = () => {
 
 // GET all subjects
 export const useQuestionBankSubjects = () => {
-  const apiService = useQuestionBankApiService();
-
   return useQuery({
     queryKey: questionBankKeys.metadata.subjects,
-    queryFn: () => apiService.getSubjects(),
-    staleTime: 600000, // 10 minutes
-    gcTime: 1200000, // 20 minutes
+    queryFn: () => getAllSubjects().map((s) => s.code),
+    staleTime: Infinity, // Static data, never stale
+    gcTime: Infinity,
   });
 };
 
 // GET all grades
 export const useQuestionBankGrades = () => {
-  const apiService = useQuestionBankApiService();
-
   return useQuery({
     queryKey: questionBankKeys.metadata.grades,
-    queryFn: () => apiService.getGrades(),
-    staleTime: 600000, // 10 minutes
-    gcTime: 1200000, // 20 minutes
+    queryFn: () => getElementaryGrades().map((g) => g.code),
+    staleTime: Infinity, // Static data, never stale
+    gcTime: Infinity,
   });
 };
 

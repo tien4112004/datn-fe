@@ -14,6 +14,7 @@ interface MatchingEditingProps {
 
 export const MatchingEditing = ({ question, onChange }: MatchingEditingProps) => {
   const { t } = useTranslation('assignment', { keyPrefix: 'editing.matching' });
+  const { t: tEditing } = useTranslation('assignment', { keyPrefix: 'editing' });
 
   const updateQuestion = (updates: Partial<MatchingQuestion>) => {
     onChange({ ...question, ...updates });
@@ -63,7 +64,7 @@ export const MatchingEditing = ({ question, onChange }: MatchingEditingProps) =>
               placeholder={t('placeholders.question')}
               className="flex-1"
             />
-            {question.titleImageUrl !== undefined ? (
+            {question.titleImageUrl ? (
               <Button
                 type="button"
                 variant="ghost"
@@ -86,7 +87,7 @@ export const MatchingEditing = ({ question, onChange }: MatchingEditingProps) =>
             )}
           </div>
 
-          {question.titleImageUrl !== undefined && (
+          {question.titleImageUrl && (
             <ImageUploader
               label={t('labels.questionImage')}
               value={question.titleImageUrl}
@@ -106,7 +107,7 @@ export const MatchingEditing = ({ question, onChange }: MatchingEditingProps) =>
           <div className="flex items-center gap-2">
             <Shuffle className="h-3.5 w-3.5 text-gray-500" />
             <Label className="text-xs font-medium text-gray-600 dark:text-gray-400">
-              {t('shuffle.shufflePairs', { ns: 'assignment', defaultValue: 'Shuffle Pairs' })}
+              {tEditing('shuffle.shufflePairs')}
             </Label>
             <Switch
               checked={question.data.shufflePairs || false}
@@ -139,7 +140,7 @@ export const MatchingEditing = ({ question, onChange }: MatchingEditingProps) =>
                 <div className="space-y-1">
                   <div className="flex items-center justify-between">
                     <Label className="text-muted-foreground text-xs">{t('labels.left')}</Label>
-                    {pair.leftImageUrl === undefined ? (
+                    {!pair.leftImageUrl ? (
                       <Button
                         type="button"
                         variant="ghost"
@@ -169,7 +170,7 @@ export const MatchingEditing = ({ question, onChange }: MatchingEditingProps) =>
                     placeholder={t('placeholders.leftItem')}
                     minHeight={50}
                   />
-                  {pair.leftImageUrl !== undefined && (
+                  {pair.leftImageUrl && (
                     <ImageUploader
                       label=""
                       value={pair.leftImageUrl}
@@ -182,7 +183,7 @@ export const MatchingEditing = ({ question, onChange }: MatchingEditingProps) =>
                 <div className="space-y-1">
                   <div className="flex items-center justify-between">
                     <Label className="text-muted-foreground text-xs">{t('labels.right')}</Label>
-                    {pair.rightImageUrl === undefined ? (
+                    {!pair.rightImageUrl ? (
                       <Button
                         type="button"
                         variant="ghost"
@@ -212,7 +213,7 @@ export const MatchingEditing = ({ question, onChange }: MatchingEditingProps) =>
                     placeholder={t('placeholders.rightItem')}
                     minHeight={50}
                   />
-                  {pair.rightImageUrl !== undefined && (
+                  {pair.rightImageUrl && (
                     <ImageUploader
                       label=""
                       value={pair.rightImageUrl}

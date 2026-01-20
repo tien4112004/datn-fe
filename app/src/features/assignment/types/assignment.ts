@@ -64,29 +64,52 @@ export interface Assignment {
   updatedAt?: string;
 }
 
+// Question item for API request (flat structure matching backend)
+export interface QuestionItemRequest {
+  id: string;
+  type: string;
+  difficulty: string;
+  title: string;
+  titleImageUrl?: string;
+  explanation?: string;
+  grade?: string;
+  chapter?: string;
+  subject?: string;
+  data: unknown;
+  point: number;
+}
+
+// Matrix cell for API request
+export interface MatrixCellRequest {
+  topicId: string;
+  difficulty: string;
+  requiredCount: number;
+}
+
+// Topic for API request
+export interface TopicRequest {
+  id: string;
+  name: string;
+  description?: string;
+}
+
 // API request types
 export interface CreateAssignmentRequest {
-  classId?: string;
   title: string;
   description?: string;
   subject: string;
-  topics?: AssignmentTopic[];
-  questions?: AssignmentQuestionWithTopic[];
-  matrixCells?: MatrixCell[];
-  dueDate?: string;
-  totalPoints?: number;
-  shuffleQuestions?: boolean;
+  grade?: string;
+  questions?: QuestionItemRequest[];
+  topics?: TopicRequest[];
+  matrixCells?: MatrixCellRequest[];
 }
 
 export interface UpdateAssignmentRequest {
-  id?: string;
   title?: string;
   description?: string;
   subject?: string;
-  topics?: AssignmentTopic[];
-  matrixCells?: MatrixCell[];
-  dueDate?: string;
-  questions?: AssignmentQuestionWithTopic[];
-  totalPoints?: number;
-  shuffleQuestions?: boolean;
+  grade?: string;
+  questions?: QuestionItemRequest[];
+  topics?: TopicRequest[];
+  matrixCells?: MatrixCellRequest[];
 }

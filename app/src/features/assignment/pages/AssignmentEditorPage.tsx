@@ -14,8 +14,8 @@ import { AssignmentEditorLayout } from '../components/editor/AssignmentEditorLay
 import { MetadataEditDialog } from '../components/editor/MetadataEditDialog';
 import { QuestionBankDialog } from '../components/question-bank';
 import { DIFFICULTY } from '../types';
-import type { Question } from '../types';
-import { useCreateAssignment, useUpdateAssignment } from '../hooks/useAssignmentApi';
+import type { Question, AssignmentQuestionWithTopic, QuestionItemRequest } from '../types';
+import { useCreateAssignment, useUpdateAssignment, useAssignment } from '../hooks/useAssignmentApi';
 import { useDirtyFormTracking } from '../hooks/useDirtyFormTracking';
 import { useUnsavedChangesBlocker } from '@/shared/hooks';
 import { UnsavedChangesDialog } from '@/shared/components/modals/UnsavedChangesDialog';
@@ -29,6 +29,9 @@ export const AssignmentEditorPage = () => {
 
   const { mutateAsync: createAssignment } = useCreateAssignment();
   const { mutateAsync: updateAssignment } = useUpdateAssignment();
+
+  // Fetch assignment detail when editing
+  const { data: assignmentData, isLoading: isLoadingAssignment } = useAssignment(id ?? '');
 
   // Get store data and actions
   const isDirty = useAssignmentFormStore((state) => state.isDirty);
@@ -47,61 +50,175 @@ export const AssignmentEditorPage = () => {
   const defaultTopicId = React.useMemo(() => `topic-${Date.now()}`, []);
   const timestamp = React.useMemo(() => Date.now(), []);
 
-  // Initialize store with default values on mount and cleanup on unmount
+  // Backend question format (flat structure with point)
+  interface BackendQuestion {
+    id: string;
+    type: string;
+    difficulty: string;
+    title: string;
+    titleImageUrl?: string;
+    explanation?: string;
+    grade?: string;
+    chapter?: string;
+    subject?: string;
+    data: unknown;
+    point: number;
+  }
+
+  // Transform backend questions (flat format) to frontend format (nested)
+  const transformQuestionsFromApi = React.useCallback(
+    (questions: BackendQuestion[]): AssignmentQuestionWithTopic[] => {
+      return questions.map((q) => {
+        // Construct the question object with all required fields
+        const question = {
+          id: q.id,
+          type: q.type,
+          difficulty: q.difficulty,
+          title: q.title,
+          titleImageUrl: q.titleImageUrl,
+          explanation: q.explanation,
+          data: q.data,
+          topicId: defaultTopicId, // Assign to default topic
+        } as AssignmentQuestionWithTopic['question'];
+
+        return {
+          question,
+          points: q.point,
+        };
+      });
+    },
+    [defaultTopicId]
+  );
+
+  // Initialize store with default values or fetched data
   React.useEffect(() => {
-    // Initialize store
-    initialize({
-      title: 'Untitled Assignment',
-      description: '',
-      subject: '',
-      grade: '',
-      shuffleQuestions: false,
-      topics: [
-        {
-          id: defaultTopicId,
-          name: 'General',
-          description: '',
-        },
-      ],
-      questions: [],
-      matrixCells: [
-        // Initialize matrix cells for default topic
-        {
-          id: `cell-${timestamp}-1`,
-          topicId: defaultTopicId,
-          difficulty: DIFFICULTY.KNOWLEDGE,
-          requiredCount: 0,
-          currentCount: 0,
-        },
-        {
-          id: `cell-${timestamp}-2`,
-          topicId: defaultTopicId,
-          difficulty: DIFFICULTY.COMPREHENSION,
-          requiredCount: 0,
-          currentCount: 0,
-        },
-        {
-          id: `cell-${timestamp}-3`,
-          topicId: defaultTopicId,
-          difficulty: DIFFICULTY.APPLICATION,
-          requiredCount: 0,
-          currentCount: 0,
-        },
-        {
-          id: `cell-${timestamp}-4`,
-          topicId: defaultTopicId,
-          difficulty: DIFFICULTY.ADVANCED_APPLICATION,
-          requiredCount: 0,
-          currentCount: 0,
-        },
-      ],
-    });
+    // Skip initialization while loading in edit mode
+    if (id && isLoadingAssignment) {
+      return;
+    }
+
+    if (id && assignmentData) {
+      // Edit mode: Initialize with fetched assignment data
+      // Cast to access backend fields that may not be in core type
+      const assignment = assignmentData as typeof assignmentData & {
+        subject?: string;
+        grade?: string;
+      };
+      // Cast questions to backend format (flat structure with point)
+      const backendQuestions = (assignment.questions || []) as unknown as BackendQuestion[];
+      const transformedQuestions = transformQuestionsFromApi(backendQuestions);
+
+      initialize({
+        title: assignment.title || 'Untitled Assignment',
+        description: assignment.description || '',
+        subject: assignment.subject || '',
+        grade: assignment.grade || '',
+        shuffleQuestions: assignment.shuffleQuestions || false,
+        topics: [
+          {
+            id: defaultTopicId,
+            name: 'General',
+            description: '',
+          },
+        ],
+        questions: transformedQuestions,
+        matrixCells: [
+          {
+            id: `cell-${timestamp}-1`,
+            topicId: defaultTopicId,
+            difficulty: DIFFICULTY.KNOWLEDGE,
+            requiredCount: 0,
+            currentCount: 0,
+          },
+          {
+            id: `cell-${timestamp}-2`,
+            topicId: defaultTopicId,
+            difficulty: DIFFICULTY.COMPREHENSION,
+            requiredCount: 0,
+            currentCount: 0,
+          },
+          {
+            id: `cell-${timestamp}-3`,
+            topicId: defaultTopicId,
+            difficulty: DIFFICULTY.APPLICATION,
+            requiredCount: 0,
+            currentCount: 0,
+          },
+          {
+            id: `cell-${timestamp}-4`,
+            topicId: defaultTopicId,
+            difficulty: DIFFICULTY.ADVANCED_APPLICATION,
+            requiredCount: 0,
+            currentCount: 0,
+          },
+        ],
+      });
+
+      // Mark form as clean after loading existing data
+      markClean();
+    } else if (!id) {
+      // Create mode: Initialize with default values
+      initialize({
+        title: 'Untitled Assignment',
+        description: '',
+        subject: '',
+        grade: '',
+        shuffleQuestions: false,
+        topics: [
+          {
+            id: defaultTopicId,
+            name: 'General',
+            description: '',
+          },
+        ],
+        questions: [],
+        matrixCells: [
+          {
+            id: `cell-${timestamp}-1`,
+            topicId: defaultTopicId,
+            difficulty: DIFFICULTY.KNOWLEDGE,
+            requiredCount: 0,
+            currentCount: 0,
+          },
+          {
+            id: `cell-${timestamp}-2`,
+            topicId: defaultTopicId,
+            difficulty: DIFFICULTY.COMPREHENSION,
+            requiredCount: 0,
+            currentCount: 0,
+          },
+          {
+            id: `cell-${timestamp}-3`,
+            topicId: defaultTopicId,
+            difficulty: DIFFICULTY.APPLICATION,
+            requiredCount: 0,
+            currentCount: 0,
+          },
+          {
+            id: `cell-${timestamp}-4`,
+            topicId: defaultTopicId,
+            difficulty: DIFFICULTY.ADVANCED_APPLICATION,
+            requiredCount: 0,
+            currentCount: 0,
+          },
+        ],
+      });
+    }
 
     // Cleanup: Reset store on unmount to prevent stale data
     return () => {
       useAssignmentFormStore.getState().reset();
     };
-  }, [defaultTopicId, timestamp, initialize]);
+  }, [
+    id,
+    assignmentData,
+    isLoadingAssignment,
+    defaultTopicId,
+    timestamp,
+    initialize,
+    markClean,
+    transformQuestionsFromApi,
+  ]);
 
   // Track dirty state with the hook (now reads from store)
   useDirtyFormTracking();
@@ -109,35 +226,104 @@ export const AssignmentEditorPage = () => {
   // Block navigation when there are unsaved changes
   const { showDialog, setShowDialog, handleStay, handleProceed } = useUnsavedChangesBlocker({
     eventName: 'app.assignment.dirty-state-changed',
+    skipBlockingRef: saveSuccessRef,
   });
 
   const handleGoBack = () => {
     navigate('/projects?resource=assignment');
   };
 
+  // Transform questions from frontend format to backend format
+  const transformQuestionsForApi = (questions: AssignmentQuestionWithTopic[]): QuestionItemRequest[] => {
+    return questions.map(({ question, points }) => {
+      // Cast to access backend-specific fields that may not be in core type
+      const q = question as typeof question & {
+        grade?: string;
+        chapter?: string;
+        subject?: string;
+      };
+      return {
+        id: q.id,
+        type: q.type,
+        difficulty: q.difficulty,
+        title: q.title,
+        titleImageUrl: q.titleImageUrl,
+        explanation: q.explanation,
+        grade: q.grade,
+        chapter: q.chapter,
+        subject: q.subject,
+        // Include type inside data for Jackson polymorphic deserialization
+        data: q.data ? { type: q.type, ...q.data } : null,
+        point: points,
+      };
+    });
+  };
+
+  // Validate form data before submission
+  const validateForm = (data: ReturnType<typeof useAssignmentFormStore.getState>): string | null => {
+    // Check title
+    if (!data.title || data.title.trim() === '') {
+      return t('validation.titleRequired');
+    }
+
+    // Check subject
+    if (!data.subject) {
+      return t('validation.subjectRequired');
+    }
+
+    // Validate questions have required fields
+    const invalidQuestions = data.questions.filter(
+      (q) => !q.question.id || !q.question.type || !q.question.title
+    );
+    if (invalidQuestions.length > 0) {
+      return t('validation.invalidQuestions');
+    }
+
+    return null;
+  };
+
   const handleSubmit = async () => {
+    // Get current state from store
+    const data = useAssignmentFormStore.getState();
+
+    // Validate form
+    const validationError = validateForm(data);
+    if (validationError) {
+      toast.error(validationError);
+      return;
+    }
+
     setIsSaving(true);
     try {
-      // Get current state from store
-      const data = useAssignmentFormStore.getState();
       const formData = {
         title: data.title,
         description: data.description,
         subject: data.subject,
         grade: data.grade,
-        topics: data.topics,
-        questions: data.questions,
-        matrixCells: data.matrixCells,
-        shuffleQuestions: data.shuffleQuestions,
+        questions: transformQuestionsForApi(data.questions),
+        // Include topics
+        topics: data.topics.map((topic) => ({
+          id: topic.id,
+          name: topic.name,
+          description: topic.description,
+        })),
+        // Include matrix cells (only those with requiredCount > 0)
+        matrixCells: data.matrixCells
+          .filter((cell) => cell.requiredCount > 0)
+          .map((cell) => ({
+            topicId: cell.topicId,
+            difficulty: cell.difficulty,
+            requiredCount: cell.requiredCount,
+          })),
       };
 
       if (id) {
         // Update existing assignment
-        await updateAssignment({ id, data: formData as any });
+        await updateAssignment({ id, data: formData });
         toast.success(t('toasts.updateSuccess'));
       } else {
         // Create new assignment
-        await createAssignment(formData as any);
+        await createAssignment(formData);
         toast.success(t('toasts.createSuccess'));
       }
 
@@ -192,6 +378,16 @@ export const AssignmentEditorPage = () => {
 
     toast.success(t('toasts.questionsAdded', { count: questions.length }));
   };
+
+  // Show loading indicator while fetching assignment in edit mode
+  if (id && isLoadingAssignment) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center bg-white dark:bg-gray-950">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-blue-500" />
+        <p className="mt-4 text-gray-500">{t('loading')}</p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen flex-col bg-white dark:bg-gray-950">

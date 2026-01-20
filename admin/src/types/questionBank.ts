@@ -12,7 +12,7 @@ import type { Question, QuestionType, Difficulty, SubjectCode, BankType } from '
  * QuestionBankItem combines Question with additional metadata for the bank
  */
 export type QuestionBankItem = Question & {
-  subjectCode: SubjectCode;
+  subject: SubjectCode;
   bankType: BankType;
   grade?: string;
   chapter?: string;
@@ -29,7 +29,7 @@ export interface QuestionBankFilters {
   searchText?: string;
   questionType?: QuestionType | QuestionType[];
   difficulty?: Difficulty | Difficulty[];
-  subjectCode?: SubjectCode | SubjectCode[] | string | string[];
+  subject?: SubjectCode | SubjectCode[] | string | string[];
   grade?: string | string[];
   chapter?: string | string[];
   bankType?: BankType;
@@ -47,9 +47,11 @@ export interface QuestionBankParams {
   searchText?: string;
   questionType?: QuestionType | QuestionType[];
   difficulty?: Difficulty | Difficulty[];
-  subjectCode?: SubjectCode | SubjectCode[] | string | string[];
+  subject?: SubjectCode | SubjectCode[] | string | string[];
   grade?: string | string[];
   chapter?: string | string[];
+  sortBy?: string;
+  sortDirection?: 'ASC' | 'DESC';
 }
 
 /**

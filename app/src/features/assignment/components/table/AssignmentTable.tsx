@@ -92,12 +92,6 @@ const AssignmentTable = () => {
         size: 120,
         enableSorting: true,
       }),
-      columnHelper.accessor('dueDate', {
-        header: t('assignment.dueDate'),
-        cell: (info) =>
-          info.getValue() ? format(new Date(info.getValue()!), 'E, P', { locale: getLocaleDateFns() }) : '-',
-        size: 180,
-      }),
       columnHelper.accessor('createdAt', {
         header: t('assignment.createdAt'),
         cell: (info) =>
@@ -199,14 +193,14 @@ const AssignmentTable = () => {
         table={table}
         isLoading={isLoading}
         onClickRow={(row) => {
-          navigate(`/assignment/editor/${row.original.id}`, { replace: false });
+          navigate(`/assignments/edit/${row.original.id}`, { replace: false });
         }}
         rowStyle="transition cursor-pointer"
         emptyState={<div className="text-muted-foreground">{t('assignment.emptyState')}</div>}
         contextMenu={(row) => (
           <ActionContent
             onViewDetail={() => {
-              navigate(`/assignment/editor/${row.original.id}`);
+              navigate(`/assignments/edit/${row.original.id}`);
             }}
             onDelete={() => {
               handleDelete(row.original);

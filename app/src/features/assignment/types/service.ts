@@ -4,10 +4,10 @@ import type { CreateAssignmentRequest, UpdateAssignmentRequest } from './assignm
 
 export interface AssignmentCollectionRequest {
   page?: number;
-  pageSize?: number;
+  size?: number;
   classId?: string;
   sort?: 'asc' | 'desc';
-  filter?: string;
+  search?: string;
 }
 
 export interface AssignmentApiService {

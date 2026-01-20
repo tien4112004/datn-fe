@@ -243,11 +243,11 @@ export default class ClassService implements ClassApiService {
     }
   }
 
-  async getPeriodsBySubject(classId: string, subjectCode: string): Promise<SchedulePeriod[]> {
+  async getPeriodsBySubject(classId: string, subject: string): Promise<SchedulePeriod[]> {
     const response = await this.apiClient.get<ApiResponse<SchedulePeriod[]>>(
       `${this.baseUrl}/api/classes/${classId}/periods`,
       {
-        params: { subject: subjectCode },
+        params: { subject: subject },
       }
     );
     return response.data.data;

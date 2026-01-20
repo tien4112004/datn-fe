@@ -12,14 +12,14 @@ interface SubjectContextSwitcherProps {
   periods: SchedulePeriod[];
   lessons: Lesson[];
   currentSubject?: string;
-  onSubjectChange: (subject: string, subjectCode: string) => void;
-  onCreateLesson?: (subject: string, subjectCode: string) => void;
+  onSubjectChange: (subject: string, subject: string) => void;
+  onCreateLesson?: (subject: string, subject: string) => void;
   onManageSchedule?: (subject: string) => void;
 }
 
 interface SubjectContext {
   subject: string;
-  subjectCode: string;
+  subject: string;
   totalPeriods: number;
   weeklyPeriods: number;
   nextPeriod?: SchedulePeriod;
@@ -70,7 +70,7 @@ export const SubjectContextSwitcher = ({
 
         subjectMap.set(subjectName || period.subject, {
           subject: subjectName || period.subject,
-          subjectCode: period.subject,
+          subject: period.subject,
           totalPeriods: periods.filter((p) => p.subject === period.subject).length,
           weeklyPeriods,
           nextPeriod,
@@ -87,7 +87,7 @@ export const SubjectContextSwitcher = ({
     const context = subjectContexts.find((ctx) => ctx.subject === subject);
     if (context) {
       setSelectedSubject(subject);
-      onSubjectChange(context.subject, context.subjectCode);
+      onSubjectChange(context.subject, context.subject);
     }
   };
 
@@ -138,7 +138,7 @@ export const SubjectContextSwitcher = ({
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => onCreateLesson(selectedContext.subject, selectedContext.subjectCode)}
+                    onClick={() => onCreateLesson(selectedContext.subject, selectedContext.subject)}
                   >
                     <FileText className="mr-2 h-4 w-4" />
                     {t('actions.createLesson')}
@@ -167,7 +167,7 @@ export const SubjectContextSwitcher = ({
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle>{selectedContext.subject}</CardTitle>
-              <Badge>{selectedContext.subjectCode}</Badge>
+              <Badge>{selectedContext.subject}</Badge>
             </div>
           </CardHeader>
           <CardContent>
@@ -265,7 +265,7 @@ export const SubjectContextSwitcher = ({
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <h3 className="font-semibold">{context.subject}</h3>
-                    <Badge variant="outline">{context.subjectCode}</Badge>
+                    <Badge variant="outline">{context.subject}</Badge>
                   </div>
 
                   <div className="text-muted-foreground space-y-2 text-sm">

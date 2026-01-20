@@ -351,7 +351,7 @@ export function QuestionBankEditorPage() {
                       }
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder="Select grade (optional)" />
+                        <SelectValue placeholder={t('form.selectGradeOptional')} />
                       </SelectTrigger>
                       <SelectContent>
                         {getAllGrades().map((grade) => (

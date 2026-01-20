@@ -31,8 +31,8 @@ const getSubjectBadgeClass = (subject: string) => {
 export const QuestionBankCard = ({ question, isSelected, onToggleSelection }: QuestionBankCardProps) => {
   const { t } = useTranslation(I18N_NAMESPACES.ASSIGNMENT);
 
-  const getSubjectName = (subjectCode: 'T' | 'TV' | 'TA'): string => {
-    switch (subjectCode) {
+  const getSubjectName = (subject: 'T' | 'TV' | 'TA'): string => {
+    switch (subject) {
       case 'T':
         return t('questionBank.subjects.toan');
       case 'TV':

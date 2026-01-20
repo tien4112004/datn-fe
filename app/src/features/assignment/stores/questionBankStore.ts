@@ -58,7 +58,7 @@ const initialState = {
     subject: undefined,
     grade: undefined,
     chapter: undefined,
-    bankType: 'personal' as BankType, // Default to personal bank (required by backend)
+    bankType: 'personal' as BankType,
     page: 1,
     pageSize: 20,
     sortBy: 'createdAt',

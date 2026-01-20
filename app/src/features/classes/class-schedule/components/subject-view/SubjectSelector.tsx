@@ -5,7 +5,7 @@ import { getSubjectByCode } from '@aiprimary/core';
 interface SubjectSelectorProps {
   subjectCodes: string[]; // Array of subject codes
   selectedSubjectCode: string | null;
-  onSubjectChange: (subjectCode: string) => void;
+  onSubjectChange: (subject: string) => void;
   isLoading?: boolean;
 }
 

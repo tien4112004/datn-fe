@@ -163,7 +163,7 @@ export function QuestionBankImportDialog({ open, onClose }: QuestionBankImportDi
               <p className="mb-1 font-medium">CSV Format Requirements:</p>
               <ul className="list-inside list-disc space-y-1 text-xs">
                 <li>First row must contain column headers</li>
-                <li>Required fields: title, type, difficulty, subjectCode, points</li>
+                <li>Required fields: title, type, difficulty, subject, points</li>
                 <li>Type-specific fields vary (options for multiple choice, pairs for matching, etc.)</li>
                 <li>Use "Download Template" button to get examples for each question type</li>
               </ul>

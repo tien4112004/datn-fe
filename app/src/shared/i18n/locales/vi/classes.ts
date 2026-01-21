@@ -1111,6 +1111,22 @@ export default {
         post: 'Bài Đăng',
         homework: 'Bài Tập Về Nhà',
       },
+      selectResources: 'Chọn tài nguyên...',
+      resourcesSelected: '{{count}} tài nguyên đã chọn',
+    },
+    resourceSelector: {
+      title: 'Liên Kết Tài Nguyên',
+      searchPlaceholder: 'Tìm kiếm tài nguyên...',
+      tabs: {
+        mindmaps: 'Sơ đồ tư duy',
+        presentations: 'Bài trình bày',
+        assignments: 'Bài tập',
+      },
+      noResources: 'Không có tài nguyên',
+      noSearchResults: 'Không tìm thấy tài nguyên',
+      selected: '{{count}} đã chọn',
+      clearSelection: 'Xóa',
+      confirm: 'Xác nhận',
     },
     list: {
       empty: {

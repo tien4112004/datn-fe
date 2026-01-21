@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useCreatePost } from '../hooks/useApi';
 import type { PostCreateRequest } from '../types';
+import type { LinkedResource } from '../types/resource';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/shared/components/ui/button';
 import RichTextEditor from '@/shared/components/rte/RichTextEditor';
@@ -15,10 +16,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/shared/components/ui/dialog';
-import { Paperclip, Plus, X } from 'lucide-react';
-import { LessonListCommand, ResourceListCommand, AssignmentListCommand } from '../../class-lesson/components';
-import type { Lesson, LessonResource } from '../../class-lesson';
+import { Paperclip, Plus, X, Link2, BrainCircuit, Presentation, ClipboardList } from 'lucide-react';
+import { LessonListCommand, AssignmentListCommand } from '../../class-lesson/components';
+import type { Lesson } from '../../class-lesson';
 import { Separator } from '@/shared/components/ui/separator';
+import { ResourceSelectorDialog } from './resource-selector';
 
 interface Assignment {
   id: string;
@@ -45,7 +47,8 @@ export const PostCreator = ({
   const [type, setType] = useState<'Post' | 'Homework'>(initialType);
   const [attachments, setAttachments] = useState<File[]>([]);
   const [linkedLessons, setLinkedLessons] = useState<Array<Lesson>>([]);
-  const [linkedResources, setLinkedResources] = useState<Array<LessonResource>>([]);
+  const [linkedResources, setLinkedResources] = useState<Array<LinkedResource>>([]);
+  const [resourceSelectorOpen, setResourceSelectorOpen] = useState(false);
   const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null);
   const [allowComments, setAllowComments] = useState(true);
 
@@ -111,7 +114,7 @@ export const PostCreator = ({
           {buttonText}
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-h-[85vh] max-w-3xl overflow-y-auto px-4 md:max-h-[90vh] md:px-6">
+      <DialogContent className="max-h-[85vh] !max-w-3xl overflow-y-auto px-4 md:max-h-[90vh] md:px-6">
         <DialogHeader>
           <DialogTitle>{t('feed.creator.dialog.title')}</DialogTitle>
         </DialogHeader>
@@ -235,16 +238,58 @@ export const PostCreator = ({
               {/* Link Resources */}
               <div className="space-y-2">
                 <Label className="text-sm font-medium">{t('feed.creator.labels.linkResources')}</Label>
-                <ResourceListCommand
-                  onResourcesSelect={function (resources: Array<LessonResource>): void {
-                    setLinkedResources(resources);
-                  }}
-                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setResourceSelectorOpen(true)}
+                  className="w-full justify-start"
+                >
+                  <Link2 className="mr-2 h-4 w-4" />
+                  {linkedResources.length > 0
+                    ? t('feed.creator.resourcesSelected', { count: linkedResources.length })
+                    : t('feed.creator.selectResources')}
+                </Button>
+
+                {/* Selected resources chips */}
                 {linkedResources.length > 0 && (
-                  <p className="text-muted-foreground text-xs">
-                    {linkedResources.length} resource{linkedResources.length > 1 ? 's' : ''} selected
-                  </p>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {linkedResources.map((resource) => {
+                      const Icon =
+                        resource.type === 'mindmap'
+                          ? BrainCircuit
+                          : resource.type === 'presentation'
+                            ? Presentation
+                            : ClipboardList;
+                      return (
+                        <div
+                          key={`${resource.type}:${resource.id}`}
+                          className="bg-secondary flex items-center gap-1.5 rounded-full px-3 py-1 text-sm"
+                        >
+                          <Icon className="h-3.5 w-3.5" />
+                          <span className="max-w-[150px] truncate">{resource.title}</span>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setLinkedResources((prev) =>
+                                prev.filter((r) => !(r.type === resource.type && r.id === resource.id))
+                              )
+                            }
+                            className="hover:text-destructive ml-1"
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
                 )}
+
+                <ResourceSelectorDialog
+                  open={resourceSelectorOpen}
+                  onOpenChange={setResourceSelectorOpen}
+                  initialSelection={linkedResources}
+                  onConfirm={setLinkedResources}
+                />
               </div>
             </>
           )}

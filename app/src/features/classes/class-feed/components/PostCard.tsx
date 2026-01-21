@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 import ReactMarkdown from 'react-markdown';
 import type { Post } from '../types';
 import { AttachmentPreview } from './AttachmentPreview';
+import { LinkedResourcesPreview } from './LinkedResourcesPreview';
 import { PostActions } from './PostActions';
 import { parseDateSafe } from '@/shared/utils/date';
 
@@ -115,6 +116,13 @@ export const PostCard = ({ post, onEdit, onDelete, onPin, onComment, className =
           {post.attachments.map((url, index) => (
             <AttachmentPreview key={`${post.id}-attachment-${index}`} url={url} />
           ))}
+        </div>
+      )}
+
+      {/* Linked Resources */}
+      {post.linkedResourceIds && post.linkedResourceIds.length > 0 && (
+        <div className="mb-2 ml-9 md:mb-3 md:ml-[52px]">
+          <LinkedResourcesPreview resourceIds={post.linkedResourceIds} />
         </div>
       )}
 

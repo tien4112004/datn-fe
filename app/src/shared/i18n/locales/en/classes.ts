@@ -1116,6 +1116,22 @@ export default {
         post: 'Post',
         homework: 'Homework',
       },
+      selectResources: 'Select resources...',
+      resourcesSelected: '{{count}} resource(s) selected',
+    },
+    resourceSelector: {
+      title: 'Link Resources',
+      searchPlaceholder: 'Search resources...',
+      tabs: {
+        mindmaps: 'Mindmaps',
+        presentations: 'Presentations',
+        assignments: 'Assignments',
+      },
+      noResources: 'No resources available',
+      noSearchResults: 'No resources found',
+      selected: '{{count}} selected',
+      clearSelection: 'Clear',
+      confirm: 'Confirm',
     },
     list: {
       empty: {

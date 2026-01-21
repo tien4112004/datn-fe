@@ -97,7 +97,5 @@ export interface QuestionBankApiService {
   importQuestions(file: File): Promise<{ success: number; failed: number }>;
 
   // Metadata
-  getSubjects(): Promise<string[]>;
-  getGrades(): Promise<string[]>;
   getChapters(subject: string, grade: string): Promise<string[]>;
 }

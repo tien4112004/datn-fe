@@ -43,7 +43,7 @@ function createDefaultQuestion(type: QuestionType): QuestionBankItem {
     id: generateId(),
     type,
     difficulty: DIFFICULTY.KNOWLEDGE as Difficulty,
-    subjectCode: SUBJECT_CODE.MATH as SubjectCode,
+    subject: SUBJECT_CODE.MATH as SubjectCode,
     bankType: 'public' as const,
     title: '',
     explanation: '',
@@ -131,7 +131,7 @@ function validateQuestion(question: QuestionBankItem): {
     errors.push('Question title is required');
   }
 
-  if (!question.subjectCode) {
+  if (!question.subject) {
     errors.push('Subject is required');
   }
 
@@ -238,8 +238,10 @@ export function QuestionBankEditorPage() {
         await updateMutation.mutateAsync({ id, payload });
         toast.success('Question updated successfully');
       } else {
+        // Strip client-generated id and timestamps before sending to backend
+        const { id: _id, createdAt, updatedAt, createdBy, ...questionWithoutId } = questionData;
         const payload: CreateQuestionPayload = {
-          question: questionData,
+          question: questionWithoutId,
         };
         await createMutation.mutateAsync(payload);
         toast.success('Question created successfully');
@@ -262,7 +264,7 @@ export function QuestionBankEditorPage() {
       setQuestionData({
         ...newQuestion,
         difficulty: questionData.difficulty,
-        subjectCode: questionData.subjectCode,
+        subject: questionData.subject,
       });
     }
   };
@@ -371,9 +373,9 @@ export function QuestionBankEditorPage() {
                   <div className="space-y-2">
                     <Label>Subject</Label>
                     <Select
-                      value={questionData.subjectCode}
+                      value={questionData.subject}
                       onValueChange={(value) =>
-                        setQuestionData({ ...questionData, subjectCode: value as SubjectCode })
+                        setQuestionData({ ...questionData, subject: value as SubjectCode })
                       }
                     >
                       <SelectTrigger>

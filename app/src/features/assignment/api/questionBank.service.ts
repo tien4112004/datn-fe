@@ -5,7 +5,8 @@ import type {
   QuestionBankFilters,
   QuestionBankApiResponse,
 } from '../types/questionBank';
-import { getAllSubjects, getElementaryGrades } from '@aiprimary/core';
+import { parseQuestionBankCSV, exportQuestionsToCSV } from '../utils/csvParser';
+import { validateQuestionBankCSV } from '../utils/csvValidation';
 
 export default class QuestionBankService implements QuestionBankApiService {
   private readonly apiClient: ApiClient;
@@ -98,39 +99,89 @@ export default class QuestionBankService implements QuestionBankApiService {
   }
 
   async bulkDeleteQuestions(ids: string[]): Promise<void> {
-    await this.apiClient.post(`${this.baseUrl}/api/question-bank/bulk-delete`, { ids });
+    // Client-side implementation: delete one by one using existing endpoint
+    for (const id of ids) {
+      await this.deleteQuestion(id);
+    }
   }
 
   async duplicateQuestion(id: string): Promise<QuestionBankItem> {
-    const response = await this.apiClient.post(`${this.baseUrl}/api/question-bank/${id}/duplicate`);
-    return response.data.data;
+    // Client-side implementation: fetch question then create a copy
+    const original = await this.getQuestionById(id);
+
+    // Strip fields that backend generates
+    const { id: _id, createdAt, updatedAt, ...questionData } = original;
+
+    // Create new question with same data
+    return this.createQuestion(questionData);
   }
 
   async exportQuestions(filters?: QuestionBankFilters): Promise<Blob> {
-    const response = await this.apiClient.get(`${this.baseUrl}/api/question-bank/export`, {
-      params: filters,
-      responseType: 'blob',
-    });
-    return response.data;
+    // Client-side implementation: fetch all questions and generate CSV
+    const allQuestions: QuestionBankItem[] = [];
+    let page = 1;
+    const pageSize = 100;
+
+    // Fetch all pages
+    while (true) {
+      const response = await this.getQuestions({
+        ...filters,
+        bankType: filters?.bankType || 'personal',
+        page,
+        pageSize,
+      });
+      const questions = response.data || [];
+      allQuestions.push(...questions);
+      if (questions.length < pageSize) break;
+      page++;
+    }
+
+    // Convert to CSV using existing utility
+    const csvContent = exportQuestionsToCSV(allQuestions);
+
+    return new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
   }
 
-  async importQuestions(file: File): Promise<{ success: number; failed: number }> {
-    const formData = new FormData();
-    formData.append('file', file);
-    const response = await this.apiClient.post(`${this.baseUrl}/api/question-bank/import`, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
-    return response.data.data;
-  }
+  async importQuestions(
+    file: File
+  ): Promise<{ success: number; failed: number; errors?: Array<{ row: number; error: string }> }> {
+    // Client-side implementation: parse CSV and create questions
+    const content = await file.text();
 
-  async getSubjects(): Promise<string[]> {
-    // Return static subject codes from frontend
-    return getAllSubjects().map((s) => s.code);
-  }
+    // Parse CSV to questions
+    let questions: QuestionBankItem[];
+    try {
+      questions = parseQuestionBankCSV(content);
+    } catch (error) {
+      return {
+        success: 0,
+        failed: 0,
+        errors: [{ row: 0, error: error instanceof Error ? error.message : 'Failed to parse CSV' }],
+      };
+    }
 
-  async getGrades(): Promise<string[]> {
-    // Return static elementary grade codes (1-5) from frontend
-    return getElementaryGrades().map((g) => g.code);
+    // Validate questions
+    const validation = validateQuestionBankCSV(questions);
+    if (!validation.isValid) {
+      return {
+        success: 0,
+        failed: questions.length,
+        errors: validation.errors.map((e) => ({ row: e.row, error: e.message })),
+      };
+    }
+
+    // Create questions using batch method
+    try {
+      const toCreate = questions.map(({ id: _id, createdAt, updatedAt, ...data }) => data);
+      await this.createQuestions(toCreate as any);
+      return { success: questions.length, failed: 0 };
+    } catch (error) {
+      return {
+        success: 0,
+        failed: questions.length,
+        errors: [{ row: 0, error: error instanceof Error ? error.message : 'Batch create failed' }],
+      };
+    }
   }
 
   async getChapters(_subject: string, _grade: string): Promise<string[]> {

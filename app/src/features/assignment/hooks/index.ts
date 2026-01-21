@@ -6,6 +6,4 @@ export {
   useCreateAssignment,
   useUpdateAssignment,
   useDeleteAssignment,
-  usePublishAssignment,
-  useArchiveAssignment,
 } from './useAssignmentApi';

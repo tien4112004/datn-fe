@@ -35,7 +35,7 @@ export const OpenEndedEditing = ({ question, onChange }: OpenEndedEditingProps) 
               placeholder={t('placeholders.question')}
               className="flex-1"
             />
-            {question.titleImageUrl !== undefined ? (
+            {question.titleImageUrl ? (
               <Button
                 type="button"
                 variant="ghost"
@@ -58,7 +58,7 @@ export const OpenEndedEditing = ({ question, onChange }: OpenEndedEditingProps) 
             )}
           </div>
 
-          {question.titleImageUrl !== undefined && (
+          {question.titleImageUrl && (
             <ImageUploader
               label={t('labels.questionImage')}
               value={question.titleImageUrl}

@@ -139,7 +139,7 @@ export function GroupEditing({ question, onChange }: GroupEditingProps) {
             )}
           </div>
 
-          {titleImageUrl !== undefined && (
+          {titleImageUrl && (
             <ImageUploader
               label={t('group.editing.titleImage')}
               value={titleImageUrl}

@@ -279,8 +279,8 @@ export function QuestionBankPage() {
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        <Badge variant="outline" className={getSubjectBadgeClass(question.subjectCode)}>
-                          {getSubjectName(question.subjectCode)}
+                        <Badge variant="outline" className={getSubjectBadgeClass(question.subject)}>
+                          {getSubjectName(question.subject)}
                         </Badge>
                       </TableCell>
                       <TableCell>

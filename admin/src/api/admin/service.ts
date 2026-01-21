@@ -23,6 +23,8 @@ import type {
   UpdateQuestionPayload,
   ImportResult,
 } from '@/types/questionBank';
+import { parseQuestionBankCSV, exportQuestionsToCSV } from '@/utils/csvParser';
+import { validateQuestionBankCSV } from '@/utils/csvValidation';
 
 // ============= HELPER FUNCTIONS =============
 const delay = (ms: number = 300) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -444,28 +446,39 @@ export default class AdminRealApiService implements AdminApiService {
 
   // Question Bank
   async getQuestionBank(params?: QuestionBankParams): Promise<ApiResponse<QuestionBankItem[]>> {
-    // Convert arrays to comma-separated strings for API
-    const queryParams: any = { ...params };
+    // Map frontend field names to backend field names
+    const queryParams: any = {
+      bankType: 'public', // Admin manages public questions
+      page: params?.page,
+      pageSize: params?.pageSize,
+      search: params?.searchText,
+      sortBy: params?.sortBy,
+      sortDirection: params?.sortDirection,
+    };
 
-    if (Array.isArray(params?.difficulty)) {
-      queryParams.difficulty = params.difficulty.join(',');
+    // Map subject -> subject, questionType -> type
+    if (params?.difficulty) {
+      queryParams.difficulty = params.difficulty;
     }
-    if (Array.isArray(params?.subjectCode)) {
-      queryParams.subjectCode = params.subjectCode.join(',');
+    if (params?.subject) {
+      queryParams.subject = params.subject; // Backend expects 'subject'
     }
-    if (Array.isArray(params?.questionType)) {
-      queryParams.questionType = params.questionType.join(',');
+    if (params?.questionType) {
+      queryParams.type = params.questionType; // Backend expects 'type'
     }
-    if (Array.isArray(params?.grade)) {
-      queryParams.grade = params.grade.join(',');
+    if (params?.grade) {
+      queryParams.grade = params.grade;
     }
-    if (Array.isArray(params?.chapter)) {
-      queryParams.chapter = params.chapter.join(',');
+    if (params?.chapter) {
+      queryParams.chapter = params.chapter;
     }
 
-    const response = await api.get<ApiResponse<QuestionBankItem[]>>(`${this.baseUrl}/admin/question-bank`, {
-      params: queryParams,
-    });
+    const response = await api.get<ApiResponse<QuestionBankItem[]>>(
+      `${this.baseUrl}/api/admin/questionbank`,
+      {
+        params: queryParams,
+      }
+    );
     return response.data;
   }
 
@@ -490,66 +503,153 @@ export default class AdminRealApiService implements AdminApiService {
 
   async getQuestionById(id: string): Promise<ApiResponse<QuestionBankItem>> {
     const response = await api.get<ApiResponse<QuestionBankItem>>(
-      `${this.baseUrl}/admin/question-bank/${id}`
+      `${this.baseUrl}/api/admin/questionbank/${id}`
     );
     return response.data;
   }
 
   async createQuestion(payload: CreateQuestionPayload): Promise<ApiResponse<QuestionBankItem>> {
+    // Map frontend field names to backend field names
+    const { subject, ...rest } = payload.question as any;
+    const backendPayload = [
+      {
+        ...rest,
+        subject: subject,
+      },
+    ];
+
     const response = await api.post<ApiResponse<QuestionBankItem>>(
-      `${this.baseUrl}/admin/question-bank`,
-      payload
+      `${this.baseUrl}/api/admin/questionbank`,
+      backendPayload
     );
     return response.data;
   }
 
   async updateQuestion(id: string, payload: UpdateQuestionPayload): Promise<ApiResponse<QuestionBankItem>> {
+    // Map frontend field names to backend field names
+    const { subject, ...rest } = payload.question as any;
+    const backendPayload = {
+      ...rest,
+      subject: subject, // Backend expects 'subject' not 'subject'
+    };
+
     const response = await api.put<ApiResponse<QuestionBankItem>>(
-      `${this.baseUrl}/admin/question-bank/${id}`,
-      payload
+      `${this.baseUrl}/api/admin/questionbank/${id}`,
+      backendPayload
     );
     return response.data;
   }
 
   async deleteQuestion(id: string): Promise<ApiResponse<void>> {
-    const response = await api.delete<ApiResponse<void>>(`${this.baseUrl}/admin/question-bank/${id}`);
+    const response = await api.delete<ApiResponse<void>>(`${this.baseUrl}/api/admin/questionbank/${id}`);
     return response.data;
   }
 
   async bulkDeleteQuestions(ids: string[]): Promise<ApiResponse<{ deletedCount: number }>> {
-    const response = await api.post<ApiResponse<{ deletedCount: number }>>(
-      `${this.baseUrl}/admin/question-bank/bulk-delete`,
-      { ids }
-    );
-    return response.data;
+    // Client-side implementation: delete one by one using existing endpoint
+    let deletedCount = 0;
+
+    for (const id of ids) {
+      try {
+        await this.deleteQuestion(id);
+        deletedCount++;
+      } catch {
+        // Continue deleting other items even if one fails
+      }
+    }
+
+    return {
+      success: true,
+      data: { deletedCount },
+    };
   }
 
   async duplicateQuestion(id: string): Promise<ApiResponse<QuestionBankItem>> {
-    const response = await api.post<ApiResponse<QuestionBankItem>>(
-      `${this.baseUrl}/admin/question-bank/${id}/duplicate`
-    );
-    return response.data;
+    // Client-side implementation: fetch question then create a copy
+    const original = await this.getQuestionById(id);
+
+    // Strip fields that backend generates
+    const { id: _id, createdAt, updatedAt, createdBy, ...questionData } = original.data;
+
+    // Create new question with same data
+    const payload: CreateQuestionPayload = {
+      question: questionData as Omit<QuestionBankItem, 'id' | 'createdAt' | 'updatedAt' | 'createdBy'>,
+    };
+
+    return this.createQuestion(payload);
   }
 
   async exportQuestions(filters?: QuestionBankFilters): Promise<Blob> {
-    const response = await api.get<Blob>(`${this.baseUrl}/admin/question-bank/export`, {
-      params: filters,
-      responseType: 'blob',
-    });
-    return response.data;
+    // Client-side implementation: fetch all questions and generate CSV
+    const allQuestions: QuestionBankItem[] = [];
+    let page = 1;
+    const pageSize = 100;
+
+    // Fetch all pages
+    while (true) {
+      const response = await this.getQuestionBank({ ...filters, page, pageSize });
+      allQuestions.push(...response.data);
+      if (response.data.length < pageSize) break;
+      page++;
+    }
+
+    // Convert to CSV using existing utility
+    const csvContent = exportQuestionsToCSV(allQuestions);
+
+    return new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
   }
 
   async importQuestions(file: File): Promise<ApiResponse<ImportResult>> {
-    const formData = new FormData();
-    formData.append('file', file);
+    // Client-side implementation: parse CSV and create questions one by one
+    const content = await file.text();
 
-    const response = await api.post<ApiResponse<ImportResult>>(
-      `${this.baseUrl}/admin/question-bank/import`,
-      formData,
-      {
-        headers: { 'Content-Type': 'multipart/form-data' },
+    // Parse CSV to questions
+    let questions: QuestionBankItem[];
+    try {
+      questions = parseQuestionBankCSV(content);
+    } catch (error) {
+      return {
+        success: false,
+        data: {
+          success: 0,
+          failed: 0,
+          errors: [{ row: 0, error: error instanceof Error ? error.message : 'Failed to parse CSV' }],
+        },
+      };
+    }
+
+    // Validate questions
+    const validation = validateQuestionBankCSV(questions);
+    if (!validation.isValid) {
+      return {
+        success: false,
+        data: {
+          success: 0,
+          failed: questions.length,
+          errors: validation.errors.map((e) => ({ row: e.row, error: e.message })),
+        },
+      };
+    }
+
+    // Create questions one by one, tracking success/failure
+    let successCount = 0;
+    let failedCount = 0;
+    const errors: Array<{ row: number; error: string }> = [];
+
+    for (let i = 0; i < questions.length; i++) {
+      try {
+        const { id: _id, createdAt, updatedAt, createdBy, ...data } = questions[i];
+        await this.createQuestion({ question: data as any });
+        successCount++;
+      } catch (error) {
+        failedCount++;
+        errors.push({ row: i + 2, error: error instanceof Error ? error.message : 'Unknown error' });
       }
-    );
-    return response.data;
+    }
+
+    return {
+      success: true,
+      data: { success: successCount, failed: failedCount, errors: errors.length > 0 ? errors : undefined },
+    };
   }
 }

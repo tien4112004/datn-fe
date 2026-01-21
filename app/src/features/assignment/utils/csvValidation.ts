@@ -1,5 +1,5 @@
-import type { QuestionBankItem } from '@/types/questionBank';
-import { QUESTION_TYPE, DIFFICULTY, SUBJECT_CODE } from '@/types/questionBank';
+import type { QuestionBankItem } from '@aiprimary/core';
+import { QUESTION_TYPE, DIFFICULTY, SUBJECT_CODE } from '@aiprimary/core';
 
 export interface ValidationError {
   row: number;
@@ -58,20 +58,12 @@ export function validateQuestionBankCSV(questions: QuestionBankItem[]): Validati
     }
 
     if (!question.subject) {
-      errors.push({ row: rowNumber, field: 'subject', message: 'Subject code is required' });
+      errors.push({ row: rowNumber, field: 'subject', message: 'Subject is required' });
     } else if (!Object.values(SUBJECT_CODE).includes(question.subject as any)) {
       errors.push({
         row: rowNumber,
         field: 'subject',
-        message: `Invalid subject code: ${question.subject}`,
-      });
-    }
-
-    if (question.points && (question.points < 1 || question.points > 100)) {
-      warnings.push({
-        row: rowNumber,
-        field: 'points',
-        message: 'Points should be between 1 and 100',
+        message: `Invalid subject: ${question.subject}`,
       });
     }
 
@@ -116,7 +108,7 @@ function validateMultipleChoice(
     warnings.push({ row, field: 'options', message: 'More than 6 options may be confusing' });
   }
 
-  const correctCount = question.data.options.filter((o) => o.isCorrect).length;
+  const correctCount = question.data.options.filter((o: any) => o.isCorrect).length;
   if (correctCount === 0) {
     errors.push({ row, field: 'correctOption', message: 'At least one correct option is required' });
   } else if (correctCount > 1) {
@@ -127,7 +119,7 @@ function validateMultipleChoice(
     });
   }
 
-  question.data.options.forEach((option, idx) => {
+  question.data.options.forEach((option: any, idx: number) => {
     if (!option.text || option.text.trim().length === 0) {
       errors.push({
         row,
@@ -155,7 +147,7 @@ function validateMatching(
     warnings.push({ row, field: 'pairs', message: 'More than 10 pairs may be difficult to match' });
   }
 
-  question.data.pairs.forEach((pair, idx) => {
+  question.data.pairs.forEach((pair: any, idx: number) => {
     if (!pair.left || pair.left.trim().length === 0) {
       errors.push({
         row,
@@ -211,7 +203,7 @@ function validateFillInBlank(
     return;
   }
 
-  const blankCount = question.data.segments.filter((s) => s.type === 'blank').length;
+  const blankCount = question.data.segments.filter((s: any) => s.type === 'blank').length;
 
   if (blankCount === 0) {
     errors.push({ row, field: 'text', message: 'At least one {blank} placeholder is required' });
@@ -221,7 +213,7 @@ function validateFillInBlank(
     warnings.push({ row, field: 'text', message: 'More than 10 blanks may be confusing' });
   }
 
-  question.data.segments.forEach((segment, idx) => {
+  question.data.segments.forEach((segment: any, idx: number) => {
     if (segment.type === 'blank') {
       if (!segment.content || segment.content.trim().length === 0) {
         errors.push({

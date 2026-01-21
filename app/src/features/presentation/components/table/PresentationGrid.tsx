@@ -14,6 +14,7 @@ import { ActionContent } from './ActionButton';
 import { RenameFileDialog } from '@/components/modals/RenameFileDialog';
 import { DeleteConfirmationDialog } from '@/shared/components/modals/DeleteConfirmationDialog';
 import ViewToggle, { type ViewMode } from '@/features/presentation/components/others/ViewToggle';
+import { SkeletonGrid } from '@/shared/components/ui/skeleton-card';
 
 const PresentationGrid = () => {
   const { t } = useTranslation('common', { keyPrefix: 'table' });
@@ -140,15 +141,7 @@ const PresentationGrid = () => {
           />
           <ViewToggle value={viewMode} onValueChange={setViewMode} />
         </div>
-        <div className="grid auto-rows-fr grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-6">
-          {Array.from({ length: 10 }).map((_, index) => (
-            <div key={index} className="w-full animate-pulse">
-              <div className="mb-3 aspect-video w-full rounded-lg bg-gray-200" />
-              <div className="mb-2 h-4 rounded bg-gray-200" />
-              <div className="h-3 w-2/3 rounded bg-gray-200" />
-            </div>
-          ))}
-        </div>
+        <SkeletonGrid count={10} />
       </div>
     );
   }

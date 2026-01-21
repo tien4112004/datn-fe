@@ -58,7 +58,7 @@ export interface ClassApiService {
     params: { date?: string; startDate?: string; endDate?: string }
   ): Promise<ApiResponse<SchedulePeriod[]>>;
   getPeriodById(id: string): Promise<SchedulePeriod | null>;
-  getPeriodsBySubject(classId: string, subjectCode: string): Promise<SchedulePeriod[]>;
+  getPeriodsBySubject(classId: string, subject: string): Promise<SchedulePeriod[]>;
   addSchedulePeriod(classId: string, data: SchedulePeriodCreateRequest): Promise<SchedulePeriod>;
   updateSchedulePeriod(
     classId: string,

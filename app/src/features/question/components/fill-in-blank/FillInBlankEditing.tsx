@@ -123,7 +123,7 @@ export const FillInBlankEditing = ({ question, onChange }: FillInBlankEditingPro
               placeholder={t('fillInBlank.editing.titlePlaceholder')}
               className="h-9 flex-1 border-0 p-0 focus-visible:ring-0"
             />
-            {question.titleImageUrl !== undefined ? (
+            {question.titleImageUrl ? (
               <Button
                 type="button"
                 variant="ghost"
@@ -146,7 +146,7 @@ export const FillInBlankEditing = ({ question, onChange }: FillInBlankEditingPro
             )}
           </div>
 
-          {question.titleImageUrl !== undefined && (
+          {question.titleImageUrl && (
             <ImageUploader
               label={t('fillInBlank.editing.questionImage')}
               value={question.titleImageUrl}

@@ -31,7 +31,7 @@ interface PeriodFormProps {
 
 interface PeriodFormData {
   periodTemplateId: string;
-  subjectCode: string;
+  subject: string;
   startTime: string;
   endTime: string;
   location?: string;
@@ -93,7 +93,7 @@ export const PeriodForm = forwardRef<PeriodFormRef, PeriodFormProps>(({ selected
       if (selectedTemplate) {
         return {
           periodTemplateId,
-          subjectCode: '', // No subject selection
+          subject: '', // No subject selection
           startTime: selectedTemplate.startTime,
           endTime: selectedTemplate.endTime,
           location: location || undefined,

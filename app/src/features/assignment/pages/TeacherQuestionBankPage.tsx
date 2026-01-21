@@ -98,9 +98,10 @@ export function TeacherQuestionBankPage() {
 
   // Hooks
   const { data, isLoading } = useQuestionBankList({
+    ...filters,
     page: pagination.pageIndex + 1,
     pageSize: pagination.pageSize,
-    ...filters,
+    bankType: 'personal',
   });
 
   const deleteQuestionsMutation = useDeleteQuestions();
@@ -270,15 +271,15 @@ export function TeacherQuestionBankPage() {
                   <>
                     <DropdownMenuItem onClick={() => handleEdit(question)}>
                       <FileEdit className="mr-2 h-4 w-4" />
-                      Edit
+                      {t('actions.edit')}
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => handleDuplicate(question.id)}>
                       <Copy className="mr-2 h-4 w-4" />
-                      Duplicate
+                      {t('actions.duplicate')}
                     </DropdownMenuItem>
                     <DropdownMenuItem className="text-destructive" onClick={() => handleDelete(question.id)}>
                       <Trash2 className="mr-2 h-4 w-4" />
-                      Delete
+                      {t('actions.delete')}
                     </DropdownMenuItem>
                   </>
                 )}

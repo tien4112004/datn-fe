@@ -54,7 +54,7 @@ export interface AssessmentMatrix {
   id: string; // Unique identifier for this matrix
   name: string; // Matrix name (e.g., "Midterm Exam - Grade 10 Math")
   description?: string; // Optional description
-  subjectCode: SubjectCode; // Subject of the exam
+  subject: SubjectCode; // Subject of the exam
   targetTotalPoints: number; // Target total points for the exam (e.g., 100)
   topics: Topic[]; // Topics included in this matrix
   cells: MatrixCell[]; // Matrix cell specifications (topic × difficulty combinations)

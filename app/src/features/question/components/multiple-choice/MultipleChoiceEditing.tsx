@@ -81,7 +81,7 @@ export const MultipleChoiceEditing = ({ question, onChange }: MultipleChoiceEdit
               placeholder={t('titlePlaceholder')}
               className="flex-1"
             />
-            {question.titleImageUrl !== undefined ? (
+            {question.titleImageUrl ? (
               <Button
                 type="button"
                 variant="ghost"
@@ -104,7 +104,7 @@ export const MultipleChoiceEditing = ({ question, onChange }: MultipleChoiceEdit
             )}
           </div>
 
-          {question.titleImageUrl !== undefined && (
+          {question.titleImageUrl && (
             <ImageUploader
               label={t('questionImage')}
               value={question.titleImageUrl}
@@ -152,7 +152,7 @@ export const MultipleChoiceEditing = ({ question, onChange }: MultipleChoiceEdit
                     minHeight={50}
                     className="flex-1"
                   />
-                  {option.imageUrl !== undefined ? (
+                  {option.imageUrl ? (
                     <Button
                       type="button"
                       variant="ghost"
@@ -184,7 +184,7 @@ export const MultipleChoiceEditing = ({ question, onChange }: MultipleChoiceEdit
                   </Button>
                 </div>
 
-                {option.imageUrl !== undefined && (
+                {option.imageUrl && (
                   <ImageUploader
                     label={t('optionImage')}
                     value={option.imageUrl}

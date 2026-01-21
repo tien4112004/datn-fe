@@ -14,6 +14,7 @@ export default {
     subject: 'Môn học',
     difficulty: 'Độ khó',
     grade: 'Lớp',
+    selectGradeOptional: 'Chọn lớp (tùy chọn)',
     validationErrors: 'Lỗi xác thực',
     cancel: 'Hủy',
     create: 'Tạo câu hỏi',

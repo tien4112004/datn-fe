@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, type RefObject } from 'react';
 import { useBlocker } from 'react-router-dom';
 
 interface DirtyStateChangedDetail {
@@ -11,6 +11,11 @@ export interface UseUnsavedChangesBlockerOptions {
    * Default: 'app.unsaved-changes'
    */
   eventName?: string;
+  /**
+   * Optional ref to skip blocking (e.g., after successful save)
+   * When ref.current is true, navigation will not be blocked
+   */
+  skipBlockingRef?: RefObject<boolean>;
 }
 
 /**
@@ -37,7 +42,7 @@ export interface UseUnsavedChangesBlockerOptions {
  * ```
  */
 export const useUnsavedChangesBlocker = (options: UseUnsavedChangesBlockerOptions = {}) => {
-  const { eventName = 'app.unsaved-changes' } = options;
+  const { eventName = 'app.unsaved-changes', skipBlockingRef } = options;
 
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [showDialog, setShowDialog] = useState(false);
@@ -63,10 +68,14 @@ export const useUnsavedChangesBlocker = (options: UseUnsavedChangesBlockerOption
   const blocker = useBlocker(
     useCallback(
       ({ currentLocation, nextLocation }: { currentLocation: any; nextLocation: any }) => {
+        // Skip blocking if ref indicates save was successful
+        if (skipBlockingRef?.current) {
+          return false;
+        }
         // Block if there are unsaved changes and user is navigating away
         return hasUnsavedChanges && currentLocation.pathname !== nextLocation.pathname;
       },
-      [hasUnsavedChanges]
+      [hasUnsavedChanges, skipBlockingRef]
     )
   );
 

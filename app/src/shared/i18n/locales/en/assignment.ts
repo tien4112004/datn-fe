@@ -285,11 +285,15 @@ export default {
       saving: 'Saving...',
     },
 
+    // Loading state
+    loading: 'Loading assignment...',
+
     // Form validation messages
     validation: {
       titleRequired: 'Title is required',
       subjectRequired: 'Subject is required',
       topicNameRequired: 'Topic name is required',
+      invalidQuestions: 'Some questions are missing required fields',
     },
 
     // Toast notifications
@@ -536,6 +540,9 @@ export default {
       create: 'Create Question',
       import: 'Import CSV',
       export: 'Export CSV',
+      edit: 'Edit',
+      duplicate: 'Duplicate',
+      delete: 'Delete',
       deleteSelected: 'Delete Selected',
       copyToPersonal: 'Copy to Personal',
       browsePublic: 'Browse Public Questions',

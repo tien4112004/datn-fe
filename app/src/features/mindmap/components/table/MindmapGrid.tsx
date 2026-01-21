@@ -16,6 +16,7 @@ import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { getLocaleDateFns } from '@/shared/i18n/helper';
 import ViewToggle, { type ViewMode } from '@/features/presentation/components/others/ViewToggle';
+import { SkeletonGrid } from '@/shared/components/ui/skeleton-card';
 
 const MindmapGrid = () => {
   const { t } = useTranslation('common', { keyPrefix: 'table' });
@@ -192,15 +193,7 @@ const MindmapGrid = () => {
           />
           <ViewToggle value={viewMode} onValueChange={setViewMode} />
         </div>
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-          {Array.from({ length: 10 }).map((_, index) => (
-            <div key={index} className="w-full animate-pulse">
-              <div className="mb-3 aspect-video w-full rounded-lg bg-gray-200" />
-              <div className="mb-2 h-4 rounded bg-gray-200" />
-              <div className="h-3 w-2/3 rounded bg-gray-200" />
-            </div>
-          ))}
-        </div>
+        <SkeletonGrid count={10} />
       </div>
     );
   }

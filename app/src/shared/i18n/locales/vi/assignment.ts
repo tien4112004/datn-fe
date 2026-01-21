@@ -285,11 +285,15 @@ export default {
       saving: 'Đang lưu...',
     },
 
+    // Trạng thái tải
+    loading: 'Đang tải bài tập...',
+
     // Thông báo xác thực form
     validation: {
       titleRequired: 'Tiêu đề là bắt buộc',
       subjectRequired: 'Môn học là bắt buộc',
       topicNameRequired: 'Tên chủ đề là bắt buộc',
+      invalidQuestions: 'Một số câu hỏi thiếu thông tin bắt buộc',
     },
 
     // Thông báo toast
@@ -526,6 +530,9 @@ export default {
       create: 'Tạo câu hỏi',
       import: 'Nhập CSV',
       export: 'Xuất CSV',
+      edit: 'Chỉnh sửa',
+      duplicate: 'Nhân bản',
+      delete: 'Xóa',
       deleteSelected: 'Xóa đã chọn',
       copyToPersonal: 'Sao chép vào kho cá nhân',
       browsePublic: 'Duyệt câu hỏi công khai',

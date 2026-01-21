@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { assignmentApi, assignmentKeys } from '../api/assignmentApi';
+import { getAssignmentApiService } from '../api';
+import { assignmentKeys } from '../api/assignmentApi';
 import type { CreateAssignmentRequest, UpdateAssignmentRequest } from '../types';
 
 /**
@@ -12,9 +13,20 @@ export const useAssignmentList = (filters?: {
   status?: 'draft' | 'published' | 'archived';
   searchText?: string;
 }) => {
+  const service = getAssignmentApiService();
+
   return useQuery({
     queryKey: assignmentKeys.list(filters),
-    queryFn: () => assignmentApi.getAssignments(filters),
+    queryFn: async () => {
+      const response = await service.getAssignments({
+        classId: filters?.classId,
+        search: filters?.searchText,
+      });
+      return {
+        assignments: response.data,
+        total: response.pagination?.totalItems ?? response.data.length,
+      };
+    },
     staleTime: 30 * 1000, // 30 seconds
   });
 };
@@ -25,9 +37,11 @@ export const useAssignmentList = (filters?: {
  * @returns Query result with assignment details
  */
 export const useAssignment = (id: string) => {
+  const service = getAssignmentApiService();
+
   return useQuery({
     queryKey: assignmentKeys.detail(id),
-    queryFn: () => assignmentApi.getAssignment(id),
+    queryFn: () => service.getAssignmentById(id),
     staleTime: 60 * 1000, // 1 minute
     enabled: !!id, // Only fetch if ID is provided
   });
@@ -40,9 +54,10 @@ export const useAssignment = (id: string) => {
  */
 export const useCreateAssignment = () => {
   const queryClient = useQueryClient();
+  const service = getAssignmentApiService();
 
   return useMutation({
-    mutationFn: (data: CreateAssignmentRequest) => assignmentApi.createAssignment(data),
+    mutationFn: (data: CreateAssignmentRequest) => service.createAssignment(data),
     onSuccess: () => {
       // Invalidate all assignment lists to refetch with new data
       queryClient.invalidateQueries({ queryKey: assignmentKeys.lists() });
@@ -57,10 +72,11 @@ export const useCreateAssignment = () => {
  */
 export const useUpdateAssignment = () => {
   const queryClient = useQueryClient();
+  const service = getAssignmentApiService();
 
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateAssignmentRequest }) =>
-      assignmentApi.updateAssignment(id, data),
+      service.updateAssignment(id, data),
     onSuccess: (_, variables) => {
       // Invalidate both the specific assignment and all lists
       queryClient.invalidateQueries({ queryKey: assignmentKeys.lists() });
@@ -78,50 +94,13 @@ export const useUpdateAssignment = () => {
  */
 export const useDeleteAssignment = () => {
   const queryClient = useQueryClient();
+  const service = getAssignmentApiService();
 
   return useMutation({
-    mutationFn: (id: string) => assignmentApi.deleteAssignment(id),
+    mutationFn: (id: string) => service.deleteAssignment(id),
     onSuccess: () => {
       // Invalidate all assignment lists
       queryClient.invalidateQueries({ queryKey: assignmentKeys.lists() });
-    },
-  });
-};
-
-/**
- * Hook to publish an assignment
- * Changes status from draft to published
- * Automatically invalidates related queries after successful publish
- * @returns Mutation function and state
- */
-export const usePublishAssignment = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: (id: string) => assignmentApi.publishAssignment(id),
-    onSuccess: (_, id) => {
-      // Invalidate both the specific assignment and all lists
-      queryClient.invalidateQueries({ queryKey: assignmentKeys.lists() });
-      queryClient.invalidateQueries({ queryKey: assignmentKeys.detail(id) });
-    },
-  });
-};
-
-/**
- * Hook to archive an assignment
- * Changes status to archived
- * Automatically invalidates related queries after successful archive
- * @returns Mutation function and state
- */
-export const useArchiveAssignment = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: (id: string) => assignmentApi.archiveAssignment(id),
-    onSuccess: (_, id) => {
-      // Invalidate both the specific assignment and all lists
-      queryClient.invalidateQueries({ queryKey: assignmentKeys.lists() });
-      queryClient.invalidateQueries({ queryKey: assignmentKeys.detail(id) });
     },
   });
 };

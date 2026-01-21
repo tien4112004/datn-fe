@@ -33,13 +33,13 @@ export function QuestionBankFilters({
 
   // Conditional chapter fetch
   const shouldFetchChapters = useMemo(() => {
-    const subjects = Array.isArray(filters.subjectCode) ? filters.subjectCode : [];
+    const subjects = Array.isArray(filters.subject) ? filters.subject : [];
     const grades = Array.isArray(filters.grade) ? filters.grade : [];
     return subjects.length === 1 && grades.length === 1;
-  }, [filters.subjectCode, filters.grade]);
+  }, [filters.subject, filters.grade]);
 
   const { data: chaptersData } = useQuestionBankChapters(
-    shouldFetchChapters && Array.isArray(filters.subjectCode) ? filters.subjectCode[0] : undefined,
+    shouldFetchChapters && Array.isArray(filters.subject) ? filters.subject[0] : undefined,
     shouldFetchChapters && Array.isArray(filters.grade) ? filters.grade[0] : undefined
   );
 
@@ -57,7 +57,7 @@ export function QuestionBankFilters({
   const hasActiveFilters =
     (Array.isArray(filters.questionType) && filters.questionType.length > 0) ||
     (Array.isArray(filters.difficulty) && filters.difficulty.length > 0) ||
-    (Array.isArray(filters.subjectCode) && filters.subjectCode.length > 0) ||
+    (Array.isArray(filters.subject) && filters.subject.length > 0) ||
     (Array.isArray(filters.grade) && filters.grade.length > 0) ||
     (Array.isArray(filters.chapter) && filters.chapter.length > 0);
 
@@ -171,11 +171,9 @@ export function QuestionBankFilters({
                       className="hover:bg-accent flex cursor-pointer items-center gap-2 rounded-md p-1 transition-colors"
                     >
                       <Checkbox
-                        checked={
-                          Array.isArray(filters.subjectCode) && filters.subjectCode.includes(subject as any)
-                        }
+                        checked={Array.isArray(filters.subject) && filters.subject.includes(subject as any)}
                         onCheckedChange={(checked) =>
-                          handleCheckboxChange('subjectCode', subject, checked as boolean)
+                          handleCheckboxChange('subject', subject, checked as boolean)
                         }
                       />
                       <span className="text-xs font-medium">{getSubjectName(subject)}</span>
@@ -297,10 +295,8 @@ export function QuestionBankFilters({
           {subjects.map((subject) => (
             <label key={subject} className="flex cursor-pointer items-center gap-2">
               <Checkbox
-                checked={Array.isArray(filters.subjectCode) && filters.subjectCode.includes(subject as any)}
-                onCheckedChange={(checked) =>
-                  handleCheckboxChange('subjectCode', subject, checked as boolean)
-                }
+                checked={Array.isArray(filters.subject) && filters.subject.includes(subject as any)}
+                onCheckedChange={(checked) => handleCheckboxChange('subject', subject, checked as boolean)}
               />
               <span className="text-sm">{getSubjectName(subject)}</span>
             </label>

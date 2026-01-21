@@ -157,18 +157,18 @@ export function usePeriod(id: string) {
   });
 }
 
-export function useSubjectPeriods(classId: string, subjectCode: string | null) {
+export function useSubjectPeriods(classId: string, subject: string | null) {
   const classApiService = useClassApiService();
 
   return useQuery({
-    queryKey: ['subject-periods', classId, subjectCode],
+    queryKey: ['subject-periods', classId, subject],
     queryFn: async () => {
-      if (!subjectCode) {
+      if (!subject) {
         return Promise.resolve([]);
       }
-      return await classApiService.getPeriodsBySubject(classId, subjectCode);
+      return await classApiService.getPeriodsBySubject(classId, subject);
     },
-    enabled: !!classId && !!subjectCode,
+    enabled: !!classId && !!subject,
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 }

@@ -88,4 +88,23 @@ export default {
     artStylesLoadFailed: 'Failed to load art styles',
     usingFallbackStyles: 'Using default styles instead',
   },
+  gallery: {
+    noImages: 'No images found',
+    noImagesHint: 'Create your first image to see it here',
+    gridSize: 'Grid size:',
+    noMoreImages: 'No more images to load',
+  },
+  preview: {
+    title: 'Image Preview',
+    description: 'Preview of AI generated image',
+    prompt: 'Prompt:',
+    download: 'Download',
+    share: 'Share',
+    shareTitle: 'AI Generated Image',
+  },
+  card: {
+    generatedImage: 'Generated image',
+    failedToLoad: 'Failed to load',
+    view: 'View',
+  },
 };

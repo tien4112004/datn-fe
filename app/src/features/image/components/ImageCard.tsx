@@ -1,4 +1,5 @@
 import { memo, useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { ImageData } from '../types/service';
 import { cn } from '@/shared/lib/utils';
 import { useImagePreview } from '../context/ImagePreviewContext';
@@ -23,6 +24,7 @@ const parseAspectRatio = (size?: string): number | null => {
 };
 
 const ImageCard = memo<ImageCardProps>(({ data }) => {
+  const { t } = useTranslation('image');
   const [isLoaded, setIsLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [naturalAspectRatio, setNaturalAspectRatio] = useState<number | null>(null);
@@ -64,7 +66,7 @@ const ImageCard = memo<ImageCardProps>(({ data }) => {
           {!imageError && (
             <img
               src={data.url}
-              alt={data.prompt || 'Generated image'}
+              alt={data.prompt || t('card.generatedImage')}
               className={cn(
                 'absolute inset-0 h-full w-full object-cover transition-all duration-300',
                 'group-hover:blur-sm',
@@ -79,13 +81,13 @@ const ImageCard = memo<ImageCardProps>(({ data }) => {
           {/* Error state */}
           {imageError && (
             <div className="absolute inset-0 flex items-center justify-center bg-gray-100 dark:bg-gray-900">
-              <span className="text-gray-400 dark:text-gray-600">Failed to load</span>
+              <span className="text-gray-400 dark:text-gray-600">{t('card.failedToLoad')}</span>
             </div>
           )}
 
           {/* Hover overlay */}
           <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
-            <span className="text-xl font-semibold text-white">View</span>
+            <span className="text-xl font-semibold text-white">{t('card.view')}</span>
           </div>
         </div>
       </div>

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Masonry } from 'masonic';
 import { useImageManager } from '../hooks';
 import ImageCard from '../components/ImageCard';
@@ -13,6 +14,7 @@ const COLUMN_SIZES = [150, 200, 250, 300, 350, 400];
 const DEFAULT_COLUMN_INDEX = 3; // 300px
 
 const ImageGalleryContent = () => {
+  const { t } = useTranslation('image');
   const loadMoreRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
   const { images, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useImageManager();
@@ -76,8 +78,8 @@ const ImageGalleryContent = () => {
   if (!isLoading && images.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
-        <p className="text-muted-foreground text-lg">No images found</p>
-        <p className="text-muted-foreground mt-2 text-sm">Create your first image to see it here</p>
+        <p className="text-muted-foreground text-lg">{t('gallery.noImages')}</p>
+        <p className="text-muted-foreground mt-2 text-sm">{t('gallery.noImagesHint')}</p>
       </div>
     );
   }
@@ -86,7 +88,7 @@ const ImageGalleryContent = () => {
     <div className="flex flex-col gap-4">
       {/* Grid size controls */}
       <div className="flex items-center justify-end gap-2">
-        <span className="text-muted-foreground text-sm">Grid size:</span>
+        <span className="text-muted-foreground text-sm">{t('gallery.gridSize')}</span>
         <Button
           variant="outline"
           size="icon"
@@ -124,7 +126,7 @@ const ImageGalleryContent = () => {
           </div>
         )}
         {!hasNextPage && images.length > 0 && (
-          <p className="text-muted-foreground text-sm">No more images to load</p>
+          <p className="text-muted-foreground text-sm">{t('gallery.noMoreImages')}</p>
         )}
       </div>
       <ImagePreviewDialog />

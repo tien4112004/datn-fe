@@ -1,4 +1,5 @@
 import { Share2, Download } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/shared/components/ui/button';
 import {
   Dialog,
@@ -10,6 +11,7 @@ import {
 import { useImagePreview } from '../context/ImagePreviewContext';
 
 const ImagePreviewDialog = () => {
+  const { t } = useTranslation('image');
   const { isOpen, selectedImage, closePreview } = useImagePreview();
 
   const handleShare = async () => {
@@ -20,7 +22,7 @@ const ImagePreviewDialog = () => {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: 'AI Generated Image',
+          title: t('preview.shareTitle'),
           text: selectedImage.prompt,
           url: shareUrl,
         });
@@ -49,15 +51,15 @@ const ImagePreviewDialog = () => {
     <Dialog open={isOpen} onOpenChange={(open) => !open && closePreview()}>
       <DialogContent className="flex max-h-[90vh] max-w-4xl flex-col">
         <DialogHeader>
-          <DialogTitle className="sr-only">Image Preview</DialogTitle>
-          <DialogDescription className="sr-only">Preview of AI generated image</DialogDescription>
+          <DialogTitle className="sr-only">{t('preview.title')}</DialogTitle>
+          <DialogDescription className="sr-only">{t('preview.description')}</DialogDescription>
         </DialogHeader>
 
         {/* Image Display */}
         <div className="flex flex-1 items-center justify-center overflow-hidden">
           <img
             src={selectedImage.url}
-            alt={selectedImage.prompt || 'Generated image'}
+            alt={selectedImage.prompt || t('card.generatedImage')}
             className="max-h-[60vh] max-w-full rounded-lg object-contain"
             onError={(e) => {
               const target = e.target as HTMLImageElement;
@@ -69,7 +71,7 @@ const ImagePreviewDialog = () => {
         {/* Prompt */}
         {selectedImage.prompt && (
           <div className="mt-4">
-            <p className="text-muted-foreground text-sm">Prompt:</p>
+            <p className="text-muted-foreground text-sm">{t('preview.prompt')}</p>
             <p className="text-foreground leading-relaxed">{selectedImage.prompt}</p>
           </div>
         )}
@@ -78,11 +80,11 @@ const ImagePreviewDialog = () => {
         <div className="mt-4 flex gap-3 border-t pt-4">
           <Button onClick={handleDownload} className="flex-1 gap-2">
             <Download className="h-4 w-4" />
-            Download
+            {t('preview.download')}
           </Button>
           <Button onClick={handleShare} variant="outline" className="flex-1 gap-2">
             <Share2 className="h-4 w-4" />
-            Share
+            {t('preview.share')}
           </Button>
         </div>
       </DialogContent>

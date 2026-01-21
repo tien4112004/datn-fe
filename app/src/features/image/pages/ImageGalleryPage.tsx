@@ -1,12 +1,51 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Masonry } from 'masonic';
 import { useImageManager } from '../hooks';
 import ImageCard from '../components/ImageCard';
-import { Loader2 } from 'lucide-react';
+import ImagePreviewDialog from '../components/ImagePreviewDialog';
+import { ImagePreviewProvider, useImagePreview } from '../context/ImagePreviewContext';
+import { Button } from '@/shared/components/ui/button';
+import { Loader2, Minus, Plus } from 'lucide-react';
+import type { ImageData } from '../types/service';
 
-const ImageGalleryPage = () => {
+const COLUMN_SIZES = [150, 200, 250, 300, 350, 400];
+const DEFAULT_COLUMN_INDEX = 3; // 300px
+
+const ImageGalleryContent = () => {
+  const { t } = useTranslation('image');
   const loadMoreRef = useRef<HTMLDivElement>(null);
+  const location = useLocation();
   const { images, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useImageManager();
+  const { openPreview } = useImagePreview();
+  const [columnSizeIndex, setColumnSizeIndex] = useState(DEFAULT_COLUMN_INDEX);
+
+  const columnWidth = COLUMN_SIZES[columnSizeIndex];
+
+  const handleDecrease = () => {
+    // Decrease column width = more images per row
+    if (columnSizeIndex > 0) {
+      setColumnSizeIndex(columnSizeIndex - 1);
+    }
+  };
+
+  const handleIncrease = () => {
+    // Increase column width = fewer images per row
+    if (columnSizeIndex < COLUMN_SIZES.length - 1) {
+      setColumnSizeIndex(columnSizeIndex + 1);
+    }
+  };
+
+  // Handle auto-open from CreateImagePage navigation
+  useEffect(() => {
+    const state = location.state as { newImage?: ImageData; openPreview?: boolean } | null;
+    if (state?.newImage && state?.openPreview) {
+      openPreview(state.newImage);
+      // Clear the state to prevent re-opening on navigation
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state, openPreview]);
 
   // Intersection Observer for infinite scroll
   useEffect(() => {
@@ -39,15 +78,45 @@ const ImageGalleryPage = () => {
   if (!isLoading && images.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
-        <p className="text-muted-foreground text-lg">No images found</p>
-        <p className="text-muted-foreground mt-2 text-sm">Create your first image to see it here</p>
+        <p className="text-muted-foreground text-lg">{t('gallery.noImages')}</p>
+        <p className="text-muted-foreground mt-2 text-sm">{t('gallery.noImagesHint')}</p>
       </div>
     );
   }
 
   return (
     <div className="flex flex-col gap-4">
-      <Masonry items={images} render={ImageCard} columnGutter={12} columnWidth={300} overscanBy={2} />
+      {/* Grid size controls */}
+      <div className="flex items-center justify-end gap-2">
+        <span className="text-muted-foreground text-sm">{t('gallery.gridSize')}</span>
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={handleDecrease}
+          disabled={columnSizeIndex === 0}
+          className="h-8 w-8"
+        >
+          <Plus className="h-4 w-4" />
+        </Button>
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={handleIncrease}
+          disabled={columnSizeIndex === COLUMN_SIZES.length - 1}
+          className="h-8 w-8"
+        >
+          <Minus className="h-4 w-4" />
+        </Button>
+      </div>
+
+      <Masonry
+        items={images}
+        render={ImageCard}
+        columnGutter={12}
+        columnWidth={columnWidth}
+        overscanBy={2}
+        key={columnWidth}
+      />
 
       {/* Load more trigger */}
       <div ref={loadMoreRef} className="py-8 text-center">
@@ -57,10 +126,19 @@ const ImageGalleryPage = () => {
           </div>
         )}
         {!hasNextPage && images.length > 0 && (
-          <p className="text-muted-foreground text-sm">No more images to load</p>
+          <p className="text-muted-foreground text-sm">{t('gallery.noMoreImages')}</p>
         )}
       </div>
+      <ImagePreviewDialog />
     </div>
+  );
+};
+
+const ImageGalleryPage = () => {
+  return (
+    <ImagePreviewProvider>
+      <ImageGalleryContent />
+    </ImagePreviewProvider>
   );
 };
 

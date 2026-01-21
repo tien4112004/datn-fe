@@ -88,4 +88,23 @@ export default {
     artStylesLoadFailed: 'Không thể tải phong cách nghệ thuật',
     usingFallbackStyles: 'Sử dụng phong cách mặc định thay thế',
   },
+  gallery: {
+    noImages: 'Không tìm thấy hình ảnh',
+    noImagesHint: 'Tạo hình ảnh đầu tiên của bạn để xem tại đây',
+    gridSize: 'Kích thước lưới:',
+    noMoreImages: 'Không còn hình ảnh để tải',
+  },
+  preview: {
+    title: 'Xem trước hình ảnh',
+    description: 'Xem trước hình ảnh được tạo bởi AI',
+    prompt: 'Mô tả:',
+    download: 'Tải xuống',
+    share: 'Chia sẻ',
+    shareTitle: 'Hình ảnh AI',
+  },
+  card: {
+    generatedImage: 'Hình ảnh đã tạo',
+    failedToLoad: 'Tải thất bại',
+    view: 'Xem',
+  },
 };

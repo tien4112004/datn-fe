@@ -65,12 +65,6 @@ const router = createBrowserRouter([
         }),
       },
       {
-        path: 'image/:id',
-        lazy: async () => ({
-          Component: (await import('@/features/image')).default.ImageDetailPage,
-        }),
-      },
-      {
         path: 'mindmap/generate',
         lazy: async () => ({
           Component: (await import('@/features/mindmap')).default.CreateMindmapPage,

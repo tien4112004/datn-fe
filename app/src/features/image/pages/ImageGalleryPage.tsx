@@ -1,12 +1,28 @@
 import { useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Masonry } from 'masonic';
 import { useImageManager } from '../hooks';
 import ImageCard from '../components/ImageCard';
+import ImagePreviewDialog from '../components/ImagePreviewDialog';
+import { ImagePreviewProvider, useImagePreview } from '../context/ImagePreviewContext';
 import { Loader2 } from 'lucide-react';
+import type { ImageData } from '../types/service';
 
-const ImageGalleryPage = () => {
+const ImageGalleryContent = () => {
   const loadMoreRef = useRef<HTMLDivElement>(null);
+  const location = useLocation();
   const { images, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useImageManager();
+  const { openPreview } = useImagePreview();
+
+  // Handle auto-open from CreateImagePage navigation
+  useEffect(() => {
+    const state = location.state as { newImage?: ImageData; openPreview?: boolean } | null;
+    if (state?.newImage && state?.openPreview) {
+      openPreview(state.newImage);
+      // Clear the state to prevent re-opening on navigation
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state, openPreview]);
 
   // Intersection Observer for infinite scroll
   useEffect(() => {
@@ -60,7 +76,16 @@ const ImageGalleryPage = () => {
           <p className="text-muted-foreground text-sm">No more images to load</p>
         )}
       </div>
+      <ImagePreviewDialog />
     </div>
+  );
+};
+
+const ImageGalleryPage = () => {
+  return (
+    <ImagePreviewProvider>
+      <ImageGalleryContent />
+    </ImagePreviewProvider>
   );
 };
 

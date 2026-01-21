@@ -99,8 +99,10 @@ const CreateImagePage = () => {
       const apiRequest = transformToApiRequest(data);
       const response = await generate.mutateAsync(apiRequest);
 
-      // Navigate to the image details page with the generated image ID
-      navigate(`/image/${response.images[0].id}`);
+      // Navigate to gallery and open the preview popup
+      navigate('/image', {
+        state: { newImage: response.images[0], openPreview: true },
+      });
       setValue('topic', '');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to generate image');

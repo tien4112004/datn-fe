@@ -1,7 +1,7 @@
 import { memo, useState } from 'react';
-import { Link } from 'react-router-dom';
 import type { ImageData } from '../types/service';
 import { cn } from '@/shared/lib/utils';
+import { useImagePreview } from '../context/ImagePreviewContext';
 
 interface ImageCardProps {
   data: ImageData;
@@ -11,12 +11,23 @@ interface ImageCardProps {
 const ImageCard = memo<ImageCardProps>(({ data }) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
+  const { openPreview } = useImagePreview();
 
   // Default aspect ratio for placeholder
   const aspectRatio = 75; // 4:3 ratio as default
 
+  const handleClick = () => {
+    openPreview(data);
+  };
+
   return (
-    <Link to={`/image/${data.id}`} className="group block">
+    <div
+      onClick={handleClick}
+      onKeyDown={(e) => e.key === 'Enter' && handleClick()}
+      role="button"
+      tabIndex={0}
+      className="group block"
+    >
       <div className="cursor-pointer overflow-hidden transition-shadow hover:shadow-lg">
         <div className="relative bg-gray-200 dark:bg-gray-800" style={{ paddingBottom: `${aspectRatio}%` }}>
           {/* Loading placeholder with gradient animation */}
@@ -53,7 +64,7 @@ const ImageCard = memo<ImageCardProps>(({ data }) => {
           </div>
         </div>
       </div>
-    </Link>
+    </div>
   );
 });
 

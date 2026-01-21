@@ -8,15 +8,19 @@ import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 
 export function LoginPage() {
   const { t } = useTranslation(I18N_NAMESPACES.AUTH);
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
 
   // Redirect if already authenticated
   useEffect(() => {
-    if (isAuthenticated) {
-      navigate('/');
+    if (isAuthenticated && user) {
+      if (user.role === 'student') {
+        navigate('/student');
+      } else {
+        navigate('/');
+      }
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, user, navigate]);
 
   return (
     <div className="relative flex min-h-screen">

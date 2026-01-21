@@ -4,6 +4,7 @@ import { type ColumnDef, flexRender, getCoreRowModel, useReactTable } from '@tan
 import { Button } from '@ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@ui/table';
 import { Pencil, Trash2 } from 'lucide-react';
+import { useAuth } from '@/shared/context/auth';
 import type { Student } from '../../types';
 import { StudentFormDialog } from './StudentFormDialog';
 import { StudentDeleteConfirmation } from './StudentDeleteConfirmation';
@@ -19,9 +20,12 @@ interface StudentListViewProps {
 
 export const StudentListView = ({ students, classId, isLoading = false }: StudentListViewProps) => {
   const { t } = useTranslation('classes', { keyPrefix: 'roster' });
+  const { user } = useAuth();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [editingStudent, setEditingStudent] = useState<Student | null>(null);
   const [dialogMode, setDialogMode] = useState<StudentFormMode>('create');
+
+  const isTeacher = user?.role === 'teacher';
 
   // Delete confirmation dialog state
   const deleteConfirmation = useConfirmDialog<Student>();
@@ -106,35 +110,39 @@ export const StudentListView = ({ students, classId, isLoading = false }: Studen
         return <div className="max-w-xs truncate text-sm">{email || '-'}</div>;
       },
     },
-    {
-      id: 'actions',
-      header: t('table.actions'),
-      cell: ({ row }) => {
-        const student = row.original;
+    ...(isTeacher
+      ? [
+          {
+            id: 'actions',
+            header: t('table.actions'),
+            cell: ({ row }) => {
+              const student = row.original;
 
-        return (
-          <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => handleEdit(student)}
-              aria-label={t('table.edit', { studentName: student.fullName })}
-            >
-              <Pencil className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => handleDelete(student)}
-              aria-label={t('table.delete', { studentName: student.fullName })}
-              className="text-red-600 hover:bg-red-50 hover:text-red-700"
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
-          </div>
-        );
-      },
-    },
+              return (
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleEdit(student)}
+                    aria-label={t('table.edit', { studentName: student.fullName })}
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleDelete(student)}
+                    aria-label={t('table.delete', { studentName: student.fullName })}
+                    className="text-red-600 hover:bg-red-50 hover:text-red-700"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              );
+            },
+          } as ColumnDef<Student>,
+        ]
+      : []),
   ];
 
   const table = useReactTable({
@@ -158,17 +166,19 @@ export const StudentListView = ({ students, classId, isLoading = false }: Studen
         <div>
           <p className="text-muted-foreground text-sm">{t('studentCount', { count: students.length })}</p>
         </div>
-        <div className="flex items-center gap-2">
-          <CsvImportButton classId={classId} />
-          <Button onClick={handleOpenAddDialog}>{t('addStudentButton')}</Button>
-        </div>
+        {isTeacher && (
+          <div className="flex items-center gap-2">
+            <CsvImportButton classId={classId} />
+            <Button onClick={handleOpenAddDialog}>{t('addStudentButton')}</Button>
+          </div>
+        )}
       </div>
 
       {/* Table */}
       {students.length === 0 ? (
         <div className="flex h-64 flex-col items-center justify-center rounded-lg border">
           <p className="text-muted-foreground mb-4">{t('noStudents')}</p>
-          <Button onClick={handleOpenAddDialog}>{t('addFirstStudent')}</Button>
+          {isTeacher && <Button onClick={handleOpenAddDialog}>{t('addFirstStudent')}</Button>}
         </div>
       ) : (
         <div className="rounded-md border">
@@ -202,31 +212,35 @@ export const StudentListView = ({ students, classId, isLoading = false }: Studen
       )}
 
       {/* Student Form Dialog */}
-      <StudentFormDialog
-        open={isAddDialogOpen || editingStudent !== null}
-        onOpenChange={(open) => {
-          if (!open) {
-            handleCloseDialog();
-          }
-        }}
-        classId={classId}
-        mode={dialogMode}
-        initialData={editingStudent || undefined}
-      />
+      {isTeacher && (
+        <StudentFormDialog
+          open={isAddDialogOpen || editingStudent !== null}
+          onOpenChange={(open) => {
+            if (!open) {
+              handleCloseDialog();
+            }
+          }}
+          classId={classId}
+          mode={dialogMode}
+          initialData={editingStudent || undefined}
+        />
+      )}
 
       {/* Delete Confirmation Dialog */}
-      <StudentDeleteConfirmation
-        open={deleteConfirmation.isOpen}
-        onOpenChange={(open) => {
-          if (!open) {
-            deleteConfirmation.cancel();
-          }
-        }}
-        studentName={deleteConfirmation.pendingAction?.fullName || ''}
-        onConfirm={handleConfirmDelete}
-        onCancel={deleteConfirmation.cancel}
-        isDeleting={isDeleting}
-      />
+      {isTeacher && (
+        <StudentDeleteConfirmation
+          open={deleteConfirmation.isOpen}
+          onOpenChange={(open) => {
+            if (!open) {
+              deleteConfirmation.cancel();
+            }
+          }}
+          studentName={deleteConfirmation.pendingAction?.fullName || ''}
+          onConfirm={handleConfirmDelete}
+          onCancel={deleteConfirmation.cancel}
+          isDeleting={isDeleting}
+        />
+      )}
     </div>
   );
 };

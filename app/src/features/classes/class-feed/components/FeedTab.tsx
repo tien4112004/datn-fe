@@ -5,6 +5,7 @@ import { usePosts } from '../hooks/useApi';
 import type { FeedFilter } from '../types';
 import { AlertCircle } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
+import { useAuth } from '@/shared/context/auth';
 
 interface FeedPageProps {
   classId: string;
@@ -12,7 +13,10 @@ interface FeedPageProps {
 
 export const FeedTab = ({ classId }: FeedPageProps) => {
   const { t } = useTranslation('classes');
+  const { user } = useAuth();
   const { posts, loading, error, hasMore, loadMore, refresh, filter, updateFilter } = usePosts(classId);
+
+  const isTeacher = user?.role === 'teacher';
 
   const handleFilterChange = (type: FeedFilter['type']) => {
     updateFilter({ type });
@@ -50,12 +54,13 @@ export const FeedTab = ({ classId }: FeedPageProps) => {
             </div>
           </nav>
 
-          {/* Create Post Button */}
-          <PostCreator
-            classId={classId}
-            onPostCreated={refresh}
-            initialType={filter.type === 'Homework' ? 'Homework' : 'Post'}
-          />
+          {isTeacher && (
+            <PostCreator
+              classId={classId}
+              onPostCreated={refresh}
+              initialType={filter.type === 'Homework' ? 'Homework' : 'Post'}
+            />
+          )}
         </div>
       </div>
 

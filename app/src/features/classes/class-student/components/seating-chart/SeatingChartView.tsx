@@ -1,26 +1,23 @@
 import { DndContext, closestCenter } from '@dnd-kit/core';
 import type { Layout, Student } from '@/features/classes/shared/types';
 import { useEffect, useState, useRef } from 'react';
+import { useAuth } from '@/shared/context/auth';
 import { SeatingChartSidebar } from './SeatingChartSidebar';
 import { SeatingChartGrid } from './SeatingChartGrid';
 import { SeatingChartOverlay } from './SeatingChartOverlay';
-import { SeatingChartConfig } from './SeatingChartConfig';
 import { useSaveSeatingChart } from '../../hooks';
 
 interface SeatingChartViewProps {
   classId: string;
   layout: Layout;
   students: Student[];
-  showLayoutConfig?: boolean;
 }
 
-export const SeatingChartView = ({
-  layout,
-  students,
-  showLayoutConfig = false,
-  classId,
-}: SeatingChartViewProps) => {
+export const SeatingChartView = ({ layout, students, classId }: SeatingChartViewProps) => {
+  const { user } = useAuth();
   const [activeId, setActiveId] = useState<string | null>(null);
+
+  const isTeacher = user?.role === 'teacher';
 
   const [localLayout, setLocalLayout] = useState<Layout | null>(null);
   const [unassignedStudents, setUnassignedStudents] = useState<any[]>([]);
@@ -53,10 +50,12 @@ export const SeatingChartView = ({
   }, [layout, students]);
 
   const handleDragStart = (event: any) => {
+    if (!isTeacher) return;
     setActiveId(event.active.id);
   };
 
   const handleDragEnd = (event: any) => {
+    if (!isTeacher) return;
     const { active, over } = event;
 
     if (!over) return;
@@ -258,24 +257,24 @@ export const SeatingChartView = ({
       onDragEnd={handleDragEnd}
       onDragCancel={handleDragCancel}
     >
-      {/* Layout Configuration Section */}
-      {showLayoutConfig && (
-        <SeatingChartConfig
-          onLayoutChange={handleLayoutChange}
-          layout={localLayout || layout}
-          chartRef={chartRef}
-        />
-      )}
-
       {/* Main Seating Chart and Unassigned Students */}
       <div className="flex flex-col gap-6 lg:flex-row">
         {/* Seating Grid */}
-        <SeatingChartGrid ref={chartRef} layout={localLayout || layout} students={students} />
+        <SeatingChartGrid
+          ref={chartRef}
+          layout={localLayout || layout}
+          students={students}
+          isTeacher={isTeacher}
+        />
         <SeatingChartSidebar
           unassignedStudents={unassignedStudents}
           isDirty={isDirty}
           saveSeatingChart={saveSeatingChart}
           handleSave={handleSave}
+          onLayoutChange={handleLayoutChange}
+          layout={localLayout || layout}
+          chartRef={chartRef}
+          isTeacher={isTeacher}
         />
       </div>
 

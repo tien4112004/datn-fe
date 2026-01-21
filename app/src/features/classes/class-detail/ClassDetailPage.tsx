@@ -6,15 +6,6 @@ import { useClass } from '../shared/hooks';
 import type { Class } from '../shared/types';
 import { useEffect } from 'react';
 import { UpdateClassModal } from '../class-list/components/controls/UpdateClassModal';
-import {
-  Breadcrumb,
-  BreadcrumbList,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb';
-import { Separator } from '@radix-ui/react-separator';
 
 interface LoaderData {
   class: Class;
@@ -22,7 +13,6 @@ interface LoaderData {
 
 export const ClassDetailPage = () => {
   const { t } = useTranslation('classes', { keyPrefix: 'detail' });
-  const { t: tPage } = useTranslation('common', { keyPrefix: 'pages' });
   const { id } = useParams<{ id: string }>();
   const loaderData = useLoaderData() as LoaderData;
 
@@ -50,22 +40,6 @@ export const ClassDetailPage = () => {
 
   return (
     <>
-      {/* Breadcrumb Header */}
-      <header className="flex h-14 shrink-0 items-center gap-2 border-b px-3 md:h-16 md:px-4">
-        <Separator orientation="vertical" className="mr-2 data-[orientation=vertical]:h-4" />
-        <Breadcrumb>
-          <BreadcrumbList>
-            <BreadcrumbItem className="hidden md:block">
-              <BreadcrumbLink href="/classes">{tPage('classes')}</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator className="hidden md:block" />
-            <BreadcrumbItem>
-              <BreadcrumbPage>{currentClass?.name}</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
-      </header>
-
       {/* Main Content with Sidebar */}
       {currentClass && (
         <ClassDetailTabs classId={id!} currentClass={currentClass} onEditClick={openEditModal} />

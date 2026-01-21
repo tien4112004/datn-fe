@@ -1,7 +1,9 @@
 import { createBrowserRouter } from 'react-router-dom';
 import NavLayout, { NavLayoutErrorBoundary } from '../shared/layouts/SidebarLayout';
+import StudentLayout from '../shared/layouts/StudentLayout';
 import { CriticalError } from '@aiprimary/api';
-import { ProtectedRoute } from '@/shared/components/ProtectedRoute';
+import { TeacherRoute } from '@/shared/components/TeacherRoute';
+import { StudentRoute } from '@/shared/components/StudentRoute';
 import { FeedTab } from '@/features/classes/class-feed';
 
 const router = createBrowserRouter([
@@ -32,9 +34,9 @@ const router = createBrowserRouter([
   },
   {
     element: (
-      <ProtectedRoute>
+      <TeacherRoute>
         <NavLayout />
-      </ProtectedRoute>
+      </TeacherRoute>
     ),
     errorElement: <NavLayoutErrorBoundary />,
     children: [
@@ -194,6 +196,28 @@ const router = createBrowserRouter([
         path: '*',
         lazy: async () => ({
           Component: (await import('@/shared/pages/NotFoundPage')).default,
+        }),
+      },
+    ],
+  },
+  {
+    element: (
+      <StudentRoute>
+        <StudentLayout />
+      </StudentRoute>
+    ),
+    children: [
+      {
+        path: 'student',
+        lazy: async () => ({
+          Component: (await import('@/features/student/pages/StudentLandingPage')).StudentLandingPage,
+        }),
+      },
+      {
+        path: 'student/classes/:id',
+        lazy: async () => ({
+          Component: (await import('@/features/student/pages/StudentClassDetailPage')).StudentClassDetailPage,
+          loader: (await import('@/features/classes/shared/hooks/loaders')).getClassById,
         }),
       },
     ],

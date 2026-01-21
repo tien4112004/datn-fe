@@ -48,8 +48,12 @@ export const useLogin = () => {
       // Update auth context
       setUser(user);
 
-      // Redirect to home page
-      navigate('/');
+      // Redirect based on role
+      if (user.role === 'student') {
+        navigate('/student');
+      } else {
+        navigate('/');
+      }
     },
   });
 };
@@ -82,9 +86,20 @@ export const useLogout = () => {
 
   return useMutation({
     mutationFn: async () => {
-      await authService.logout();
+      try {
+        await authService.logout();
+      } catch (error) {
+        // Even if backend logout fails (e.g., invalid refresh token),
+        // we should still clear the frontend session
+        console.warn('Backend logout failed, clearing frontend session anyway:', error);
+      }
     },
     onSuccess: () => {
+      // Always clear frontend session regardless of backend response
+      logout();
+    },
+    onError: () => {
+      // Even on error, clear frontend session
       logout();
     },
   });

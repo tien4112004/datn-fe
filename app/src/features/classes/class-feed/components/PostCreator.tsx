@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useCreatePost } from '../hooks/useApi';
 import { useAttachmentUpload } from '../hooks/useAttachmentUpload';
 import type { PostCreateRequest } from '../types';
-import type { LinkedResource } from '../types/resource';
+import type { LinkedResource } from '@/features/projects/types/resource';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/shared/components/ui/button';
 import RichTextEditor from '@/shared/components/rte/RichTextEditor';
@@ -21,7 +21,7 @@ import { Paperclip, Plus, X, Link2, BrainCircuit, Presentation, ClipboardList, L
 import { LessonListCommand, AssignmentListCommand } from '../../class-lesson/components';
 import type { Lesson } from '../../class-lesson';
 import { Separator } from '@/shared/components/ui/separator';
-import { ResourceSelectorDialog } from './resource-selector';
+import { ResourceSelectorDialog } from '@/features/projects/components/resource-selector';
 import { getAcceptString, formatFileSize } from '../utils/attachmentValidation';
 import { Progress } from '@/shared/components/ui/progress';
 

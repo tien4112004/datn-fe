@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { BrainCircuit, Presentation, ClipboardList, Loader2 } from 'lucide-react';
 import { useLinkedResources } from '../hooks/useLinkedResources';
-import type { LinkedResourceType, LinkedResourceResponse } from '../types/resource';
+import type { LinkedResourceType, LinkedResourceResponse } from '@/features/projects/types/resource';
 
 interface LinkedResourcesPreviewProps {
   resources: LinkedResourceResponse[];

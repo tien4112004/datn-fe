@@ -6,7 +6,7 @@ import {
   groupLinkedResourcesByType,
   type LinkedResource,
   type LinkedResourceResponse,
-} from '../types/resource';
+} from '@/features/projects/types/resource';
 
 interface UseLinkedResourcesOptions {
   linkedResources: LinkedResourceResponse[];

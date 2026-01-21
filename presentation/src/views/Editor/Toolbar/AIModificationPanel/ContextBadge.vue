@@ -7,7 +7,7 @@
 
 <script lang="ts" setup>
 import { computed } from 'vue';
-import { FileText, Square, Layers, Plus } from 'lucide-vue-next';
+import { FileText, Square, Layers, Plus, Type, Image } from 'lucide-vue-next';
 import type { CurrentContext } from '@/types/aiModification';
 
 interface Props {
@@ -21,6 +21,9 @@ const contextIcon = computed(() => {
     case 'slide':
       return FileText;
     case 'element':
+      // Show specific icon based on element type
+      if (props.context.elementType === 'text') return Type;
+      if (props.context.elementType === 'image') return Image;
       return Square;
     case 'elements':
       return Layers;
@@ -36,6 +39,9 @@ const contextText = computed(() => {
     case 'slide':
       return 'Current Slide';
     case 'element':
+      // Show specific text based on element type
+      if (props.context.elementType === 'text') return 'Text Element';
+      if (props.context.elementType === 'image') return 'Image Element';
       return 'Selected Element';
     case 'elements':
       return `${props.context.count || 0} Elements`;

@@ -13,7 +13,7 @@
       v-if="isSelected"
       :is="currentOperateComponent"
       :elementInfo="elementInfo"
-      :handlerVisible="!elementInfo.lock && (isActiveGroupElement || !isMultiSelect)"
+      :handlerVisible="!elementInfo.lock && !isCurrentSlideLocked && (isActiveGroupElement || !isMultiSelect)"
       :rotateElement="rotateElement"
       :scaleElement="scaleElement"
       :dragLineElement="dragLineElement"
@@ -40,6 +40,7 @@
 import { computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useMainStore, useSlidesStore } from '@/store';
+import useSlideEditLock from '@/hooks/useSlideEditLock';
 import {
   ELEMENT_TYPES,
   type PPTElement,
@@ -81,6 +82,7 @@ const props = defineProps<{
 
 const { canvasScale, toolbarState } = storeToRefs(useMainStore());
 const { formatedAnimations } = storeToRefs(useSlidesStore());
+const { isCurrentSlideLocked } = useSlideEditLock();
 
 const currentOperateComponent = computed<unknown>(() => {
   const elementTypeMap = {

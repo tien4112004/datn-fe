@@ -86,4 +86,72 @@ export const aiModificationService = {
       };
     }
   },
+
+  /**
+   * Refine text content of a specific text element
+   */
+  async refineElementText(request: {
+    slideId: string;
+    elementId: string;
+    currentText: string;
+    instruction: string;
+  }): Promise<AIModificationResponse> {
+    try {
+      const response = await api.post<ApiResponse<any>>(`${BASE_URL}/api/ai/refine-element-text`, request);
+
+      if (response.data && response.data.success !== false) {
+        return {
+          success: true,
+          data: response.data.data,
+        };
+      } else {
+        return {
+          success: false,
+          data: {},
+          error: response.data.message || 'Failed to refine text',
+        };
+      }
+    } catch (err: any) {
+      console.error('Text refinement error:', err);
+      return {
+        success: false,
+        data: {},
+        error: err.response?.data?.message || err.message || 'Network error',
+      };
+    }
+  },
+
+  /**
+   * Replace image of a specific image element
+   */
+  async replaceElementImage(request: {
+    slideId: string;
+    elementId: string;
+    description: string;
+    style: string;
+  }): Promise<AIModificationResponse> {
+    try {
+      const response = await api.post<ApiResponse<any>>(`${BASE_URL}/api/ai/replace-element-image`, request);
+
+      if (response.data && response.data.success !== false) {
+        return {
+          success: true,
+          data: response.data.data,
+        };
+      } else {
+        return {
+          success: false,
+          data: {},
+          error: response.data.message || 'Failed to replace image',
+        };
+      }
+    } catch (err: any) {
+      console.error('Image replacement error:', err);
+      return {
+        success: false,
+        data: {},
+        error: err.response?.data?.message || err.message || 'Network error',
+      };
+    }
+  },
 };

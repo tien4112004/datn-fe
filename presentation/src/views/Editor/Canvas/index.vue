@@ -9,16 +9,7 @@
     v-click-outside="removeEditorAreaFocus"
   >
     <!-- Preview Mode Overlay -->
-    <div
-      v-if="isCurrentSlideLocked || mode === 'view'"
-      class="preview-overlay"
-      @click.stop.prevent
-      @mousedown.stop.prevent
-      @mouseup.stop.prevent
-      @dblclick.stop.prevent
-      @contextmenu.stop.prevent
-      @wheel.stop.prevent
-    ></div>
+    <div v-if="isCurrentSlideLocked || mode === 'view'" class="preview-overlay"></div>
     <ElementCreateSelection
       v-if="creatingElement"
       @created="(data) => insertElementFromCreateSelection(data)"
@@ -401,6 +392,7 @@ provide(injectKeySlideScale, canvasScale);
   align-items: center;
   justify-content: center;
   z-index: 5000;
-  pointer-events: auto;
+  pointer-events: none;
+  border: 2px dashed rgba(100, 100, 255, 0.3);
 }
 </style>

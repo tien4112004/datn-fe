@@ -3,6 +3,7 @@ import { uniq } from 'lodash';
 import { storeToRefs } from 'pinia';
 import { useMainStore, useKeyboardStore } from '@/store';
 import type { PPTElement } from '@/types/slides';
+import useSlideEditLock from '@/hooks/useSlideEditLock';
 
 export default (
   elementList: Ref<PPTElement[]>,
@@ -12,6 +13,7 @@ export default (
   const { activeElementIdList, activeGroupElementId, handleElementId, editorAreaFocus } =
     storeToRefs(mainStore);
   const { ctrlOrShiftKeyActive } = storeToRefs(useKeyboardStore());
+  const { isCurrentSlideLocked } = useSlideEditLock();
 
   // Select element
   // startMove indicates whether to enter the start moving state after the selection operation
@@ -86,7 +88,8 @@ export default (
       };
     }
 
-    if (startMove) moveElement(e, element);
+    // Only allow movement if not in preview mode
+    if (startMove && !isCurrentSlideLocked.value) moveElement(e, element);
   };
 
   return {

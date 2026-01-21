@@ -19,41 +19,99 @@
     <div class="panel-content">
       <!-- TAP 1: REFINE (Chat + Chips) -->
       <div v-if="activeCategory === 'refine'" class="tab-content refine-tab">
-        <div class="quick-actions-row">
-          <button
-            v-for="action in quickActions"
-            :key="action.label"
-            class="chip-button"
-            @click="handleQuickAction(action)"
-            :disabled="isProcessing"
-          >
-            <component :is="action.icon" class="chip-icon" />
-            {{ action.label }}
-          </button>
+        <!-- Multi-select message -->
+        <div v-if="currentContext.type === 'elements'" class="info-message">
+          <IconInfo class="info-icon" />
+          <span>Select a single element to use AI modifications</span>
         </div>
 
-        <div class="chat-interface">
-          <div class="chat-input-wrapper">
-            <textarea
-              v-model="chatInput"
-              class="chat-textarea"
-              placeholder="Describe how to change this slide..."
-              :disabled="isProcessing"
-              @keydown.enter.prevent="handleChatSubmit"
-            ></textarea>
+        <!-- Text Element Context -->
+        <template v-else-if="currentContext.type === 'element' && currentContext.elementType === 'text'">
+          <div class="context-hint">
+            <IconText class="hint-icon" />
+            <span>Refining selected text element</span>
+          </div>
+
+          <div class="quick-actions-row">
             <button
-              class="send-button"
-              @click="handleChatSubmit"
-              :disabled="!chatInput.trim() || isProcessing"
+              v-for="action in textQuickActions"
+              :key="action.label"
+              class="chip-button"
+              @click="
+                () => {
+                  chatInput = action.instruction;
+                  handleRefineElementText();
+                }
+              "
+              :disabled="isProcessing"
             >
-              <IconSend v-if="!isProcessing" />
-              <div v-else class="spinner"></div>
+              <component :is="action.icon" class="chip-icon" />
+              {{ action.label }}
             </button>
           </div>
-          <div v-if="refineMessage" class="feedback-message" :class="refineType">
-            {{ refineMessage }}
+
+          <div class="chat-interface">
+            <div class="chat-input-wrapper">
+              <textarea
+                v-model="chatInput"
+                class="chat-textarea"
+                placeholder="Describe how to modify this text..."
+                :disabled="isProcessing"
+                @keydown.enter.prevent="handleRefineElementText"
+              ></textarea>
+              <button
+                class="send-button"
+                @click="handleRefineElementText"
+                :disabled="!chatInput.trim() || isProcessing"
+              >
+                <IconSend v-if="!isProcessing" />
+                <div v-else class="spinner"></div>
+              </button>
+            </div>
+            <div v-if="refineMessage" class="feedback-message" :class="refineType">
+              {{ refineMessage }}
+            </div>
           </div>
-        </div>
+        </template>
+
+        <!-- Slide Context (existing) -->
+        <template v-else-if="currentContext.type === 'slide'">
+          <div class="quick-actions-row">
+            <button
+              v-for="action in quickActions"
+              :key="action.label"
+              class="chip-button"
+              @click="handleQuickAction(action)"
+              :disabled="isProcessing"
+            >
+              <component :is="action.icon" class="chip-icon" />
+              {{ action.label }}
+            </button>
+          </div>
+
+          <div class="chat-interface">
+            <div class="chat-input-wrapper">
+              <textarea
+                v-model="chatInput"
+                class="chat-textarea"
+                placeholder="Describe how to change this slide..."
+                :disabled="isProcessing"
+                @keydown.enter.prevent="handleChatSubmit"
+              ></textarea>
+              <button
+                class="send-button"
+                @click="handleChatSubmit"
+                :disabled="!chatInput.trim() || isProcessing"
+              >
+                <IconSend v-if="!isProcessing" />
+                <div v-else class="spinner"></div>
+              </button>
+            </div>
+            <div v-if="refineMessage" class="feedback-message" :class="refineType">
+              {{ refineMessage }}
+            </div>
+          </div>
+        </template>
       </div>
 
       <!-- TAP 2: STRUCTURE -->
@@ -92,46 +150,81 @@
 
       <!-- TAP 3: VISUALS -->
       <div v-if="activeCategory === 'visuals'" class="tab-content visuals-tab">
-        <div class="section-title">Image Generation</div>
-        <div class="input-group">
-          <label>Description</label>
-          <input v-model="imagePrompt" class="panel-input" placeholder="Describe the image..." />
-        </div>
-        <div class="input-group">
-          <label>Art Style</label>
-          <select v-model="selectedStyle" class="panel-select">
-            <option value="photorealistic">Photorealistic</option>
-            <option value="minimalist">Minimalist Vector</option>
-            <option value="watercolor">Watercolor</option>
-            <option value="3d-render">3D Render</option>
-            <option value="corporate">Corporate Flat</option>
-          </select>
-        </div>
-        <Button
-          variant="primary"
-          fullWidth
-          @click="handleGenerateImage"
-          :disabled="isProcessing || !imagePrompt"
-        >
-          <IconImage class="btn-icon" /> Generate Image
-        </Button>
+        <!-- Image Element Context -->
+        <template v-if="currentContext.type === 'element' && currentContext.elementType === 'image'">
+          <div class="section-title">Replace This Image</div>
 
-        <Divider class="spacer" />
+          <div class="image-preview">
+            <img :src="currentContext.data.src" alt="Current image" class="preview-img" />
+          </div>
 
-        <div class="section-title">Global Theme</div>
-        <div class="input-group">
-          <label>Mood / Vibe</label>
-          <select v-model="selectedMood" class="panel-select">
-            <option value="professional">Professional</option>
-            <option value="creative">Creative / Playful</option>
-            <option value="dark-modern">Dark Modern</option>
-            <option value="luxury">Luxury / Elegant</option>
-            <option value="nature">Nature / Eco</option>
-          </select>
-        </div>
-        <Button variant="outline" fullWidth @click="handleSuggestTheme" :disabled="isProcessing">
-          <IconPalette class="btn-icon" /> Update Theme
-        </Button>
+          <div class="input-group">
+            <label>New Image Description</label>
+            <input v-model="imagePrompt" class="panel-input" placeholder="Describe the new image..." />
+          </div>
+
+          <div class="input-group">
+            <label>Art Style</label>
+            <select v-model="selectedStyle" class="panel-select">
+              <option value="photorealistic">Photorealistic</option>
+              <option value="minimalist">Minimalist Vector</option>
+              <option value="3d-render">3D Render</option>
+            </select>
+          </div>
+
+          <Button
+            variant="primary"
+            fullWidth
+            @click="handleReplaceElementImage"
+            :disabled="isProcessing || !imagePrompt"
+          >
+            <IconImage class="btn-icon" /> Replace Image
+          </Button>
+        </template>
+
+        <!-- Slide Context (existing) -->
+        <template v-else-if="currentContext.type === 'slide'">
+          <div class="section-title">Image Generation</div>
+          <div class="input-group">
+            <label>Description</label>
+            <input v-model="imagePrompt" class="panel-input" placeholder="Describe the image..." />
+          </div>
+          <div class="input-group">
+            <label>Art Style</label>
+            <select v-model="selectedStyle" class="panel-select">
+              <option value="photorealistic">Photorealistic</option>
+              <option value="minimalist">Minimalist Vector</option>
+              <option value="watercolor">Watercolor</option>
+              <option value="3d-render">3D Render</option>
+              <option value="corporate">Corporate Flat</option>
+            </select>
+          </div>
+          <Button
+            variant="primary"
+            fullWidth
+            @click="handleGenerateImage"
+            :disabled="isProcessing || !imagePrompt"
+          >
+            <IconImage class="btn-icon" /> Generate Image
+          </Button>
+
+          <Divider class="spacer" />
+
+          <div class="section-title">Global Theme</div>
+          <div class="input-group">
+            <label>Mood / Vibe</label>
+            <select v-model="selectedMood" class="panel-select">
+              <option value="professional">Professional</option>
+              <option value="creative">Creative / Playful</option>
+              <option value="dark-modern">Dark Modern</option>
+              <option value="luxury">Luxury / Elegant</option>
+              <option value="nature">Nature / Eco</option>
+            </select>
+          </div>
+          <Button variant="outline" fullWidth @click="handleSuggestTheme" :disabled="isProcessing">
+            <IconPalette class="btn-icon" /> Update Theme
+          </Button>
+        </template>
       </div>
     </div>
   </div>
@@ -147,6 +240,8 @@ import ContextBadge from './AIModificationPanel/ContextBadge.vue';
 import { useSlidesStore } from '@/store';
 import { useAIModificationState } from './AIModificationPanel/useAIModificationState';
 import { aiModificationService } from '@/services/ai/modifications';
+import emitter, { EmitterEvents } from '@/utils/emitter';
+import { htmlToText } from '@/utils/common';
 import {
   FileText,
   Maximize2,
@@ -161,6 +256,8 @@ import {
   Shuffle as IconShuffle,
   Grid,
   List as IconList,
+  Info as IconInfo,
+  Type as IconText,
 } from 'lucide-vue-next';
 import { selectNextTemplate } from '@/utils/slideLayout'; // Ensure this is available
 
@@ -194,6 +291,14 @@ const quickActions = [
   { label: 'Expand', icon: Maximize2, instruction: 'Expand on these points with more detail.' },
   { label: 'Grammar', icon: CheckCircle, instruction: 'Fix grammar and spelling errors.' },
   { label: 'Tone', icon: FileText, instruction: 'Make the tone more professional and engaging.' },
+];
+
+// Text Element Quick Actions
+const textQuickActions = [
+  { label: 'Fix Grammar', icon: CheckCircle, instruction: 'Fix grammar and spelling errors in this text.' },
+  { label: 'Shorten', icon: Minimize2, instruction: 'Make this text more concise.' },
+  { label: 'Expand', icon: Maximize2, instruction: 'Expand this text with more detail.' },
+  { label: 'Formal', icon: FileText, instruction: 'Rewrite this text in a more formal tone.' },
 ];
 
 const layoutTypes = [
@@ -257,6 +362,85 @@ const handleChatSubmit = async () => {
   } catch (e: any) {
     refineMessage.value = e.message;
     refineType.value = 'error';
+  } finally {
+    isProcessing.value = false;
+  }
+};
+
+// Handle text element refinement
+const handleRefineElementText = async () => {
+  if (!chatInput.value.trim() || isProcessing.value) return;
+  if (currentContext.value.type !== 'element' || currentContext.value.elementType !== 'text') return;
+
+  const element = currentContext.value.data;
+  if (!element || !element.content) return;
+
+  isProcessing.value = true;
+  refineMessage.value = '';
+
+  try {
+    // Extract plain text (same as existing AI feature)
+    const plainText = htmlToText(element.content);
+
+    // Call AI service
+    const result = await aiModificationService.refineElementText({
+      slideId: currentSlide.value!.id,
+      elementId: element.id,
+      currentText: plainText,
+      instruction: chatInput.value,
+    });
+
+    if (result.success && result.data?.refinedText) {
+      // Use emitRichTextCommand to update (preserves formatting!)
+      emitter.emit(EmitterEvents.RICH_TEXT_COMMAND, {
+        action: { command: 'replace', value: result.data.refinedText },
+      });
+
+      refineMessage.value = 'Text refined successfully!';
+      refineType.value = 'success';
+      chatInput.value = '';
+    } else {
+      throw new Error(result.error || 'Failed to refine text');
+    }
+  } catch (error: any) {
+    refineMessage.value = error.message || 'Failed to refine text';
+    refineType.value = 'error';
+  } finally {
+    isProcessing.value = false;
+  }
+};
+
+// Handle image element replacement
+const handleReplaceElementImage = async () => {
+  if (!imagePrompt.value || isProcessing.value) return;
+  if (currentContext.value.type !== 'element' || currentContext.value.elementType !== 'image') return;
+
+  const element = currentContext.value.data;
+  if (!element) return;
+
+  isProcessing.value = true;
+
+  try {
+    const result = await aiModificationService.replaceElementImage({
+      slideId: currentSlide.value!.id,
+      elementId: element.id,
+      description: imagePrompt.value,
+      style: selectedStyle.value,
+    });
+
+    if (result.success && result.data?.imageUrl) {
+      // Update only this image element
+      slidesStore.updateElement({
+        id: element.id,
+        props: { src: result.data.imageUrl },
+      });
+
+      imagePrompt.value = '';
+    } else {
+      throw new Error(result.error || 'Failed to replace image');
+    }
+  } catch (error: any) {
+    console.error('Failed to replace image:', error);
   } finally {
     isProcessing.value = false;
   }

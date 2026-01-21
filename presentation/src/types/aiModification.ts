@@ -58,7 +58,7 @@ export interface CurrentContext {
   elementType?: ElementType;
   elementTypes?: ElementType[];
   count?: number;
-  data: unknown;
+  data: any; // Using any for flexibility with different element types
 }
 
 // API Request/Response types
@@ -80,6 +80,9 @@ export interface AIModificationResponse {
     modifiedContent?: unknown;
     newSlides?: unknown[];
     suggestions?: unknown[];
+    refinedText?: string;
+    imageUrl?: string;
+    [key: string]: any; // Allow additional properties
   };
   error?: string;
 }

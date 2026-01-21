@@ -1,18 +1,39 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Masonry } from 'masonic';
 import { useImageManager } from '../hooks';
 import ImageCard from '../components/ImageCard';
 import ImagePreviewDialog from '../components/ImagePreviewDialog';
 import { ImagePreviewProvider, useImagePreview } from '../context/ImagePreviewContext';
-import { Loader2 } from 'lucide-react';
+import { Button } from '@/shared/components/ui/button';
+import { Loader2, Minus, Plus } from 'lucide-react';
 import type { ImageData } from '../types/service';
+
+const COLUMN_SIZES = [150, 200, 250, 300, 350, 400];
+const DEFAULT_COLUMN_INDEX = 3; // 300px
 
 const ImageGalleryContent = () => {
   const loadMoreRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
   const { images, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useImageManager();
   const { openPreview } = useImagePreview();
+  const [columnSizeIndex, setColumnSizeIndex] = useState(DEFAULT_COLUMN_INDEX);
+
+  const columnWidth = COLUMN_SIZES[columnSizeIndex];
+
+  const handleDecrease = () => {
+    // Decrease column width = more images per row
+    if (columnSizeIndex > 0) {
+      setColumnSizeIndex(columnSizeIndex - 1);
+    }
+  };
+
+  const handleIncrease = () => {
+    // Increase column width = fewer images per row
+    if (columnSizeIndex < COLUMN_SIZES.length - 1) {
+      setColumnSizeIndex(columnSizeIndex + 1);
+    }
+  };
 
   // Handle auto-open from CreateImagePage navigation
   useEffect(() => {
@@ -63,7 +84,37 @@ const ImageGalleryContent = () => {
 
   return (
     <div className="flex flex-col gap-4">
-      <Masonry items={images} render={ImageCard} columnGutter={12} columnWidth={300} overscanBy={2} />
+      {/* Grid size controls */}
+      <div className="flex items-center justify-end gap-2">
+        <span className="text-muted-foreground text-sm">Grid size:</span>
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={handleDecrease}
+          disabled={columnSizeIndex === 0}
+          className="h-8 w-8"
+        >
+          <Plus className="h-4 w-4" />
+        </Button>
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={handleIncrease}
+          disabled={columnSizeIndex === COLUMN_SIZES.length - 1}
+          className="h-8 w-8"
+        >
+          <Minus className="h-4 w-4" />
+        </Button>
+      </div>
+
+      <Masonry
+        items={images}
+        render={ImageCard}
+        columnGutter={12}
+        columnWidth={columnWidth}
+        overscanBy={2}
+        key={columnWidth}
+      />
 
       {/* Load more trigger */}
       <div ref={loadMoreRef} className="py-8 text-center">

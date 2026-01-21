@@ -1,4 +1,4 @@
-import { memo, useState } from 'react';
+import { memo, useState, useMemo } from 'react';
 import type { ImageData } from '../types/service';
 import { cn } from '@/shared/lib/utils';
 import { useImagePreview } from '../context/ImagePreviewContext';
@@ -8,16 +8,41 @@ interface ImageCardProps {
   index: number;
 }
 
+// Parse size string (e.g., "1024x1024", "1792x1024") to get aspect ratio
+const parseAspectRatio = (size?: string): number | null => {
+  if (!size) return null;
+  const match = size.match(/(\d+)x(\d+)/);
+  if (match) {
+    const width = parseInt(match[1], 10);
+    const height = parseInt(match[2], 10);
+    if (width > 0 && height > 0) {
+      return (height / width) * 100;
+    }
+  }
+  return null;
+};
+
 const ImageCard = memo<ImageCardProps>(({ data }) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
+  const [naturalAspectRatio, setNaturalAspectRatio] = useState<number | null>(null);
   const { openPreview } = useImagePreview();
 
-  // Default aspect ratio for placeholder
-  const aspectRatio = 75; // 4:3 ratio as default
+  // Calculate aspect ratio: prefer size field, then natural dimensions, then default
+  const sizeAspectRatio = useMemo(() => parseAspectRatio(data.size), [data.size]);
+  const aspectRatio = sizeAspectRatio ?? naturalAspectRatio ?? 75; // 4:3 default
 
   const handleClick = () => {
     openPreview(data);
+  };
+
+  const handleImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const img = e.currentTarget;
+    setIsLoaded(true);
+    // If no size field, use natural dimensions
+    if (!sizeAspectRatio && img.naturalWidth > 0 && img.naturalHeight > 0) {
+      setNaturalAspectRatio((img.naturalHeight / img.naturalWidth) * 100);
+    }
   };
 
   return (
@@ -46,7 +71,7 @@ const ImageCard = memo<ImageCardProps>(({ data }) => {
                 isLoaded ? 'opacity-100' : 'opacity-0'
               )}
               loading="lazy"
-              onLoad={() => setIsLoaded(true)}
+              onLoad={handleImageLoad}
               onError={() => setImageError(true)}
             />
           )}

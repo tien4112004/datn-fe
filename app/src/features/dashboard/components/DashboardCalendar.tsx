@@ -1,11 +1,30 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from 'react-i18next';
+import { format } from 'date-fns';
+import { getLocaleDateFns } from '@/shared/i18n/helper';
+import { useState } from 'react';
 
 export const DashboardCalendar = () => {
+  const { t } = useTranslation('dashboard');
+  const [currentDate, _] = useState(new Date(2024, 5, 1)); // June 2024
+
+  const monthString = format(currentDate, 'MMMM yyyy', { locale: getLocaleDateFns() });
+
+  const weekdays = [
+    t('calendar.weekdays.sunday'),
+    t('calendar.weekdays.monday'),
+    t('calendar.weekdays.tuesday'),
+    t('calendar.weekdays.wednesday'),
+    t('calendar.weekdays.thursday'),
+    t('calendar.weekdays.friday'),
+    t('calendar.weekdays.saturday'),
+  ];
+
   return (
     <div className="w-full">
       <div className="mb-4 flex items-center justify-between">
-        <h3 className="text-lg font-semibold">Calendar</h3>
+        <h3 className="text-lg font-semibold">{t('calendar.title')}</h3>
       </div>
       <div className="bg-card rounded-lg border p-4">
         {/* Custom Header */}
@@ -13,7 +32,7 @@ export const DashboardCalendar = () => {
           <Button variant="ghost" size="icon" className="h-8 w-8">
             <ChevronLeft className="h-4 w-4" />
           </Button>
-          <span className="text-sm font-medium">June 2024</span>
+          <span className="text-sm font-medium">{monthString}</span>
           <Button variant="ghost" size="icon" className="h-8 w-8">
             <ChevronRight className="h-4 w-4" />
           </Button>
@@ -23,7 +42,7 @@ export const DashboardCalendar = () => {
         <div className="space-y-2">
           {/* Weekday headers */}
           <div className="grid grid-cols-7 gap-1 text-center">
-            {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map((day) => (
+            {weekdays.map((day) => (
               <div key={day} className="text-muted-foreground text-xs font-medium">
                 {day}
               </div>
@@ -96,8 +115,8 @@ export const DashboardCalendar = () => {
 
         {/* Next Up Section */}
         <div className="bg-muted/50 mt-6 rounded-md p-4">
-          <h4 className="mb-1 text-sm font-semibold">Next Up: Parent-Teacher Meeting</h4>
-          <p className="text-muted-foreground text-xs">Today at 3:00 PM</p>
+          <h4 className="mb-1 text-sm font-semibold">{t('calendar.nextUp')}: Parent-Teacher Meeting</h4>
+          <p className="text-muted-foreground text-xs">{t('calendar.today')} at 3:00 PM</p>
         </div>
       </div>
     </div>

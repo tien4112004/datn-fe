@@ -1,15 +1,17 @@
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
-import { ClassListSimpleTable } from '../classes/class-list/components/ClassListSimpleTable';
-import { DashboardCalendar } from '../classes/class-list/components/DashboardCalendar';
-import { RecentDocuments } from '../classes/class-list/components/RecentDocuments';
+import { ClassListSimpleTable } from './components/ClassListSimpleTable';
+import { DashboardCalendar } from './components/DashboardCalendar';
+import { RecentDocuments } from './components/RecentDocuments';
 import { useAuth } from '@/shared/context/auth';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 export const DashboardPage = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation('dashboard');
 
   // Redirect students to student view
   useEffect(() => {
@@ -32,10 +34,10 @@ export const DashboardPage = () => {
           {/* My Classes Section */}
           <div className="space-y-6">
             <div className="flex items-center justify-between">
-              <h1 className="text-3xl font-semibold">My Classes</h1>
+              <h1 className="text-3xl font-semibold">{t('myClasses.title')}</h1>
               <Button className="gap-2">
                 <Plus className="h-4 w-4" />
-                Add Class
+                {t('myClasses.addClass')}
               </Button>
             </div>
             <ClassListSimpleTable />

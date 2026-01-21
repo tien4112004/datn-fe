@@ -1,22 +1,56 @@
 export default {
-  title: 'Bảng điều khiển',
-  welcome: 'Chào mừng trở lại!',
-  subtitle: 'Bắt đầu tạo nội dung tuyệt vời với công cụ AI',
-
-  quickActions: {
-    title: 'Thao tác nhanh',
+  recentDocuments: {
+    title: 'Tài Liệu Gần Đây',
+    empty: 'Không có tài liệu gần đây',
+    edited: 'Đã chỉnh sửa',
+    noPreview: 'Không có xem trước',
   },
-
-  recentProjects: {
-    title: 'Dự án gần đây',
-    empty: 'Chưa có dự án nào',
-    emptyHint: 'Bắt đầu tạo để xem các dự án gần đây của bạn',
+  myClasses: {
+    title: 'Lớp Học Của Tôi',
+    addClass: 'Thêm Lớp Học',
+    table: {
+      columns: {
+        className: 'Tên Lớp',
+        status: 'Trạng Thái',
+        createdAt: 'Ngày Tạo',
+      },
+      actions: {
+        manageStudents: 'Quản Lý Học Sinh',
+      },
+      empty: 'Không tìm thấy lớp học',
+      status: {
+        active: 'Hoạt Động',
+        inactive: 'Không Hoạt Động',
+      },
+    },
+    loading: 'Đang tải...',
   },
-
-  chat: {
-    title: 'Trợ lý AI',
-    greeting: 'Xin chào! Tôi là trợ lý AI của bạn. Tôi có thể giúp bạn tạo điều gì tuyệt vời hôm nay?',
-    online: 'Trực tuyến',
-    placeholder: 'Nhập tin nhắn của bạn...',
+  calendar: {
+    title: 'Lịch',
+    nextUp: 'Sắp Tới',
+    today: 'Hôm Nay',
+    weekdays: {
+      sunday: 'CN',
+      monday: 'T2',
+      tuesday: 'T3',
+      wednesday: 'T4',
+      thursday: 'T5',
+      friday: 'T6',
+      saturday: 'T7',
+    },
+    months: {
+      january: 'Tháng Một',
+      february: 'Tháng Hai',
+      march: 'Tháng Ba',
+      april: 'Tháng Tư',
+      may: 'Tháng Năm',
+      june: 'Tháng Sáu',
+      july: 'Tháng Bảy',
+      august: 'Tháng Tám',
+      september: 'Tháng Chín',
+      october: 'Tháng Mười',
+      november: 'Tháng Mười Một',
+      december: 'Tháng Mười Hai',
+    },
   },
 };

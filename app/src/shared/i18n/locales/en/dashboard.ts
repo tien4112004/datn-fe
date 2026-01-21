@@ -1,22 +1,56 @@
 export default {
-  title: 'Dashboard',
-  welcome: 'Welcome back!',
-  subtitle: 'Start creating amazing content with AI-powered tools',
-
-  quickActions: {
-    title: 'Quick Actions',
+  recentDocuments: {
+    title: 'Recent Documents',
+    empty: 'No recent documents',
+    edited: 'Edited',
+    noPreview: 'No preview',
   },
-
-  recentProjects: {
-    title: 'Recent Projects',
-    empty: 'No recent projects',
-    emptyHint: 'Start creating to see your recent work here',
+  myClasses: {
+    title: 'My Classes',
+    addClass: 'Add Class',
+    table: {
+      columns: {
+        className: 'Class Name',
+        status: 'Status',
+        createdAt: 'Created At',
+      },
+      actions: {
+        manageStudents: 'Manage Students',
+      },
+      empty: 'No classes found',
+      status: {
+        active: 'Active',
+        inactive: 'Inactive',
+      },
+    },
+    loading: 'Loading...',
   },
-
-  chat: {
-    title: 'AI Assistant',
-    greeting: "Hi! I'm your AI assistant. How can I help you create something amazing today?",
-    online: 'Online',
-    placeholder: 'Type your message...',
+  calendar: {
+    title: 'Calendar',
+    nextUp: 'Next Up',
+    today: 'Today',
+    weekdays: {
+      sunday: 'Sun',
+      monday: 'Mon',
+      tuesday: 'Tue',
+      wednesday: 'Wed',
+      thursday: 'Thu',
+      friday: 'Fri',
+      saturday: 'Sat',
+    },
+    months: {
+      january: 'January',
+      february: 'February',
+      march: 'March',
+      april: 'April',
+      may: 'May',
+      june: 'June',
+      july: 'July',
+      august: 'August',
+      september: 'September',
+      october: 'October',
+      november: 'November',
+      december: 'December',
+    },
   },
 };

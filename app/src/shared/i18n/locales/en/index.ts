@@ -15,9 +15,9 @@ import settings from './settings';
 import classes from './classes';
 import assignment from './assignment';
 import admin from './admin';
-import dashboard from './dashboard';
 import comments from './comments';
 import questions from './questions';
+import dashboard from './dashboard';
 
 export default {
   common,
@@ -31,9 +31,9 @@ export default {
   projects,
   settings,
   classes,
-  dashboard,
   assignment,
   admin,
   comments,
   questions,
+  dashboard,
 };

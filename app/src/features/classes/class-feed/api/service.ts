@@ -46,7 +46,7 @@ export default class ClassFeedService implements ClassFeedApiService {
       content: request.content,
       type: request.type,
       attachments: request.attachments || [],
-      linkedResourceIds: request.linkedResourceIds,
+      linkedResources: request.linkedResources,
       linkedLessonId: request.linkedLessonId,
       allowComments: request.allowComments,
     };
@@ -65,7 +65,7 @@ export default class ClassFeedService implements ClassFeedApiService {
       content: request.content,
       type: request.type,
       attachments: request.attachments || [],
-      linkedResourceIds: request.linkedResourceIds,
+      linkedResources: request.linkedResources,
       linkedLessonId: request.linkedLessonId,
       isPinned: request.isPinned,
       allowComments: request.allowComments,

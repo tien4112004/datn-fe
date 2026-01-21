@@ -2,26 +2,33 @@ import { useQuery } from '@tanstack/react-query';
 import { useMindmapApiService } from '@/features/mindmap/api';
 import { usePresentationApiService } from '@/features/presentation/api';
 import { getAssignmentApiService } from '@/features/assignment/api';
-import { groupCompositeIdsByType, type LinkedResource } from '../types/resource';
+import {
+  groupLinkedResourcesByType,
+  type LinkedResource,
+  type LinkedResourceResponse,
+} from '../types/resource';
 
 interface UseLinkedResourcesOptions {
-  compositeIds: string[];
+  linkedResources: LinkedResourceResponse[];
   enabled?: boolean;
 }
 
-export function useLinkedResources({ compositeIds, enabled = true }: UseLinkedResourcesOptions) {
+export function useLinkedResources({ linkedResources, enabled = true }: UseLinkedResourcesOptions) {
   const mindmapApiService = useMindmapApiService();
   const presentationApiService = usePresentationApiService();
 
   return useQuery({
-    queryKey: ['linkedResources', compositeIds],
+    queryKey: ['linkedResources', linkedResources],
     queryFn: async (): Promise<LinkedResource[]> => {
-      if (compositeIds.length === 0) {
+      if (linkedResources.length === 0) {
         return [];
       }
 
-      const grouped = groupCompositeIdsByType(compositeIds);
+      const grouped = groupLinkedResourcesByType(linkedResources);
       const results: LinkedResource[] = [];
+
+      // Create a map to preserve permission levels
+      const permissionMap = new Map(linkedResources.map((r) => [`${r.type}:${r.id}`, r.permissionLevel]));
 
       // Fetch mindmaps
       if (grouped.mindmap.length > 0) {
@@ -37,6 +44,7 @@ export function useLinkedResources({ compositeIds, enabled = true }: UseLinkedRe
                 type: 'mindmap',
                 title: mindmap.title,
                 thumbnail: mindmap.thumbnail,
+                permissionLevel: permissionMap.get(`mindmap:${mindmap.id}`),
               });
             }
           }
@@ -59,6 +67,7 @@ export function useLinkedResources({ compositeIds, enabled = true }: UseLinkedRe
                 type: 'presentation',
                 title: presentation.title,
                 thumbnail: typeof presentation.thumbnail === 'string' ? presentation.thumbnail : undefined,
+                permissionLevel: permissionMap.get(`presentation:${presentation.id}`),
               });
             }
           }
@@ -81,6 +90,7 @@ export function useLinkedResources({ compositeIds, enabled = true }: UseLinkedRe
                 id: assignment.id,
                 type: 'assignment',
                 title: assignment.title,
+                permissionLevel: permissionMap.get(`assignment:${assignment.id}`),
               });
             }
           }
@@ -91,7 +101,7 @@ export function useLinkedResources({ compositeIds, enabled = true }: UseLinkedRe
 
       return results;
     },
-    enabled: enabled && compositeIds.length > 0,
+    enabled: enabled && linkedResources.length > 0,
     staleTime: 60000, // 1 minute
     gcTime: 300000, // 5 minutes
   });

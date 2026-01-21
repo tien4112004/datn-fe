@@ -9,19 +9,22 @@ import {
 } from '@/shared/components/ui/dialog';
 import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
+import { Label } from '@/shared/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { BrainCircuit, Presentation, ClipboardList, Search, X } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
+import { BrainCircuit, Presentation, ClipboardList, Search, X, Eye, MessageSquare } from 'lucide-react';
 import { useMindmaps } from '@/features/mindmap/hooks/useApi';
 import { usePresentations } from '@/features/presentation/hooks/useApi';
 import { useAssignmentList } from '@/features/assignment/hooks/useAssignmentApi';
 import { ResourceSelectorGrid } from './ResourceSelectorGrid';
 import { useResourceSelector } from './useResourceSelector';
-import type { LinkedResource, LinkedResourceType } from '../../types/resource';
+import type { LinkedResource, LinkedResourceType, PermissionLevel } from '../../types/resource';
 
 interface ResourceSelectorDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   initialSelection?: LinkedResource[];
+  initialPermissionLevel?: PermissionLevel;
   onConfirm: (resources: LinkedResource[]) => void;
 }
 
@@ -31,14 +34,22 @@ export const ResourceSelectorDialog = ({
   open,
   onOpenChange,
   initialSelection = [],
+  initialPermissionLevel = 'view',
   onConfirm,
 }: ResourceSelectorDialogProps) => {
   const { t } = useTranslation('classes');
   const [activeTab, setActiveTab] = useState<TabValue>('mindmap');
   const [searchQuery, setSearchQuery] = useState('');
 
-  const { selectedResources, isSelected, toggleResource, clearSelection, setSelectedResources } =
-    useResourceSelector(initialSelection);
+  const {
+    selectedResources,
+    defaultPermissionLevel,
+    isSelected,
+    toggleResource,
+    clearSelection,
+    setSelectedResources,
+    setDefaultPermissionLevel,
+  } = useResourceSelector(initialSelection, initialPermissionLevel);
 
   // Fetch resources from each API
   const { data: mindmaps, isLoading: mindmapsLoading } = useMindmaps();
@@ -213,26 +224,57 @@ export const ResourceSelectorDialog = ({
 
         {/* Footer */}
         <DialogFooter className="flex-shrink-0 border-t pt-4">
-          <div className="flex w-full items-center justify-between">
-            <div className="text-muted-foreground text-sm">
-              {selectedResources.length > 0 && (
-                <>
-                  {t('feed.resourceSelector.selected', { count: selectedResources.length })}
-                  <button
-                    type="button"
-                    onClick={clearSelection}
-                    className="text-primary ml-2 hover:underline"
-                  >
-                    {t('feed.resourceSelector.clearSelection')}
-                  </button>
-                </>
-              )}
+          <div className="flex w-full flex-col gap-3">
+            {/* Permission Level Selector */}
+            <div className="flex items-center gap-3">
+              <Label className="text-muted-foreground whitespace-nowrap text-sm">
+                {t('feed.resourceSelector.permissionLevel', 'Permission for students:')}
+              </Label>
+              <Select
+                value={defaultPermissionLevel}
+                onValueChange={(value: PermissionLevel) => setDefaultPermissionLevel(value)}
+              >
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="view">
+                    <div className="flex items-center gap-2">
+                      <Eye className="h-4 w-4" />
+                      <span>{t('feed.resourceSelector.viewOnly', 'View only')}</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="comment">
+                    <div className="flex items-center gap-2">
+                      <MessageSquare className="h-4 w-4" />
+                      <span>{t('feed.resourceSelector.viewAndComment', 'View & Comment')}</span>
+                    </div>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-            <div className="flex gap-2">
-              <Button variant="outline" onClick={handleCancel}>
-                {t('feed.creator.actions.cancel')}
-              </Button>
-              <Button onClick={handleConfirm}>{t('feed.resourceSelector.confirm')}</Button>
+
+            <div className="flex w-full items-center justify-between">
+              <div className="text-muted-foreground text-sm">
+                {selectedResources.length > 0 && (
+                  <>
+                    {t('feed.resourceSelector.selected', { count: selectedResources.length })}
+                    <button
+                      type="button"
+                      onClick={clearSelection}
+                      className="text-primary ml-2 hover:underline"
+                    >
+                      {t('feed.resourceSelector.clearSelection')}
+                    </button>
+                  </>
+                )}
+              </div>
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={handleCancel}>
+                  {t('feed.creator.actions.cancel')}
+                </Button>
+                <Button onClick={handleConfirm}>{t('feed.resourceSelector.confirm')}</Button>
+              </div>
             </div>
           </div>
         </DialogFooter>

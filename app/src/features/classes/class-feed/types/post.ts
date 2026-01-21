@@ -1,3 +1,5 @@
+import type { LinkedResourceResponse } from './resource';
+
 // User minimal info from backend
 export interface UserMinimalInfo {
   id: string;
@@ -16,7 +18,7 @@ export interface Post {
   type: 'Post' | 'Homework';
   content: string;
   attachments?: string[]; // Array of URLs from backend
-  linkedResourceIds?: string[];
+  linkedResources?: LinkedResourceResponse[];
   linkedLessonId?: string;
   isPinned: boolean;
   allowComments?: boolean;

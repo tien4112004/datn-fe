@@ -1,10 +1,10 @@
 import { Link } from 'react-router-dom';
 import { BrainCircuit, Presentation, ClipboardList, Loader2 } from 'lucide-react';
 import { useLinkedResources } from '../hooks/useLinkedResources';
-import type { LinkedResourceType } from '../types/resource';
+import type { LinkedResourceType, LinkedResourceResponse } from '../types/resource';
 
 interface LinkedResourcesPreviewProps {
-  resourceIds: string[];
+  resources: LinkedResourceResponse[];
 }
 
 const resourceTypeIcons: Record<LinkedResourceType, React.ElementType> = {
@@ -19,9 +19,9 @@ const resourceTypeRoutes: Record<LinkedResourceType, string> = {
   assignment: '/assignment',
 };
 
-export const LinkedResourcesPreview = ({ resourceIds }: LinkedResourcesPreviewProps) => {
+export const LinkedResourcesPreview = ({ resources: linkedResources }: LinkedResourcesPreviewProps) => {
   const { data: resources, isLoading } = useLinkedResources({
-    compositeIds: resourceIds,
+    linkedResources,
   });
 
   if (isLoading) {

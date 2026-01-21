@@ -1,10 +1,12 @@
+import type { LinkedResourceRequest } from './resource';
+
 // Request types
 export interface PostCreateRequest {
   classId: string;
   type: 'Post' | 'Homework';
   content: string;
   attachments?: File[];
-  linkedResourceIds?: string[];
+  linkedResources?: LinkedResourceRequest[];
   linkedLessonId?: string; // Note: singular, not plural
   assignmentId?: string; // For Homework type posts
   allowComments?: boolean;
@@ -15,7 +17,7 @@ export interface PostUpdateRequest {
   content?: string;
   type?: 'Post' | 'Homework';
   attachments?: File[];
-  linkedResourceIds?: string[];
+  linkedResources?: LinkedResourceRequest[];
   linkedLessonId?: string;
   assignmentId?: string; // For Homework type posts
   isPinned?: boolean;

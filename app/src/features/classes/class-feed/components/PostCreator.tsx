@@ -66,8 +66,14 @@ export const PostCreator = ({
         content: contentMd,
         attachments: type === 'Post' && attachments.length > 0 ? attachments : undefined,
         linkedLessonId: type === 'Post' && linkedLessons.length > 0 ? linkedLessons[0].id : undefined,
-        linkedResourceIds:
-          type === 'Post' && linkedResources.length > 0 ? linkedResources.map((r) => r.id) : undefined,
+        linkedResources:
+          type === 'Post' && linkedResources.length > 0
+            ? linkedResources.map((r) => ({
+                type: r.type,
+                id: r.id,
+                permissionLevel: r.permissionLevel || 'view',
+              }))
+            : undefined,
         assignmentId: type === 'Homework' && selectedAssignment ? selectedAssignment.id : undefined,
         allowComments,
       };

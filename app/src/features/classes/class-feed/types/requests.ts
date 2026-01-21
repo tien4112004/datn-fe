@@ -5,7 +5,7 @@ export interface PostCreateRequest {
   classId: string;
   type: 'Post' | 'Homework';
   content: string;
-  attachments?: File[];
+  attachments?: string[]; // CDN URLs from upload endpoint
   linkedResources?: LinkedResourceRequest[];
   linkedLessonId?: string; // Note: singular, not plural
   assignmentId?: string; // For Homework type posts
@@ -16,7 +16,7 @@ export interface PostUpdateRequest {
   id: string;
   content?: string;
   type?: 'Post' | 'Homework';
-  attachments?: File[];
+  attachments?: string[]; // CDN URLs from upload endpoint
   linkedResources?: LinkedResourceRequest[];
   linkedLessonId?: string;
   assignmentId?: string; // For Homework type posts

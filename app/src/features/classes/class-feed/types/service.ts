@@ -19,4 +19,8 @@ export interface ClassFeedApiService {
   getComments(postId: string): Promise<Comment[]>;
   createComment(request: CommentCreateRequest): Promise<Comment>;
   deleteComment(commentId: string): Promise<void>;
+
+  // Attachments
+  uploadAttachment(file: File): Promise<string>;
+  uploadAttachments(files: File[]): Promise<string[]>;
 }

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useCreatePost } from '../hooks/useApi';
+import { useAttachmentUpload } from '../hooks/useAttachmentUpload';
 import type { PostCreateRequest } from '../types';
 import type { LinkedResource } from '../types/resource';
 import { useTranslation } from 'react-i18next';
@@ -16,11 +17,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/shared/components/ui/dialog';
-import { Paperclip, Plus, X, Link2, BrainCircuit, Presentation, ClipboardList } from 'lucide-react';
+import { Paperclip, Plus, X, Link2, BrainCircuit, Presentation, ClipboardList, Loader2 } from 'lucide-react';
 import { LessonListCommand, AssignmentListCommand } from '../../class-lesson/components';
 import type { Lesson } from '../../class-lesson';
 import { Separator } from '@/shared/components/ui/separator';
 import { ResourceSelectorDialog } from './resource-selector';
+import { getAcceptString, formatFileSize } from '../utils/attachmentValidation';
+import { Progress } from '@/shared/components/ui/progress';
 
 interface Assignment {
   id: string;
@@ -43,9 +46,18 @@ export const PostCreator = ({
   const { t } = useTranslation('classes');
   const createPost = useCreatePost();
   const editor = useRichTextEditor();
+  const {
+    uploadedUrls,
+    pendingFiles,
+    isUploading,
+    uploadProgress,
+    addFiles,
+    removePendingFile,
+    uploadAll,
+    clear: clearAttachments,
+  } = useAttachmentUpload();
   const [open, setOpen] = useState(false);
   const [type, setType] = useState<'Post' | 'Homework'>(initialType);
-  const [attachments, setAttachments] = useState<File[]>([]);
   const [linkedLessons, setLinkedLessons] = useState<Array<Lesson>>([]);
   const [linkedResources, setLinkedResources] = useState<Array<LinkedResource>>([]);
   const [resourceSelectorOpen, setResourceSelectorOpen] = useState(false);
@@ -58,13 +70,19 @@ export const PostCreator = ({
     if (!editor || editor.document.length === 0) return;
 
     try {
+      // Upload pending attachments first
+      let attachmentUrls: string[] = [];
+      if (type === 'Post' && (pendingFiles.length > 0 || uploadedUrls.length > 0)) {
+        attachmentUrls = await uploadAll();
+      }
+
       const contentMd = await editor.blocksToMarkdownLossy(editor.document);
 
       const request: PostCreateRequest = {
         classId,
         type,
         content: contentMd,
-        attachments: type === 'Post' && attachments.length > 0 ? attachments : undefined,
+        attachments: attachmentUrls.length > 0 ? attachmentUrls : undefined,
         linkedLessonId: type === 'Post' && linkedLessons.length > 0 ? linkedLessons[0].id : undefined,
         linkedResources:
           type === 'Post' && linkedResources.length > 0
@@ -82,7 +100,7 @@ export const PostCreator = ({
 
       // Reset form
       editor.replaceBlocks(editor.document, []);
-      setAttachments([]);
+      clearAttachments();
       setLinkedLessons([]);
       setLinkedResources([]);
       setSelectedAssignment(null);
@@ -98,14 +116,12 @@ export const PostCreator = ({
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    setAttachments((prev) => [...prev, ...files]);
+    addFiles(files);
+    // Reset the input so the same file can be selected again
+    e.target.value = '';
   };
 
-  const removeAttachment = (index: number) => {
-    setAttachments((prev) => prev.filter((_, i) => i !== index));
-  };
-
-  const canSubmit = editor && editor.document.length > 0 && !createPost.isPending;
+  const canSubmit = editor && editor.document.length > 0 && !createPost.isPending && !isUploading;
 
   const buttonText =
     initialType === 'Homework'
@@ -190,10 +206,18 @@ export const PostCreator = ({
                       onChange={handleFileChange}
                       className="hidden"
                       id="file-upload"
-                      accept="image/*,.pdf,.doc,.docx,.txt"
+                      accept={getAcceptString()}
+                      disabled={isUploading}
                     />
                     <label htmlFor="file-upload">
-                      <Button type="button" variant="outline" size="sm" className="w-full" asChild>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="w-full"
+                        asChild
+                        disabled={isUploading}
+                      >
                         <span className="cursor-pointer">
                           <Paperclip className="mr-2 h-4 w-4" />
                           {t('feed.creator.actions.attachFiles')}
@@ -201,20 +225,38 @@ export const PostCreator = ({
                       </Button>
                     </label>
 
-                    {attachments.length > 0 && (
+                    {/* Upload Progress */}
+                    {isUploading && (
                       <div className="mt-2 space-y-1">
-                        {attachments.map((file, index) => (
+                        <div className="text-muted-foreground flex items-center gap-2 text-sm">
+                          <Loader2 className="h-3 w-3 animate-spin" />
+                          <span>Uploading... {uploadProgress}%</span>
+                        </div>
+                        <Progress value={uploadProgress} className="h-1" />
+                      </div>
+                    )}
+
+                    {/* Pending files list */}
+                    {pendingFiles.length > 0 && (
+                      <div className="mt-2 space-y-1">
+                        {pendingFiles.map((pf) => (
                           <div
-                            key={index}
+                            key={pf.id}
                             className="bg-muted/30 flex items-center justify-between rounded border px-2 py-1.5 text-sm"
                           >
-                            <span className="truncate">{file.name}</span>
+                            <div className="flex flex-col truncate">
+                              <span className="truncate">{pf.file.name}</span>
+                              <span className="text-muted-foreground text-xs">
+                                {formatFileSize(pf.file.size)}
+                              </span>
+                            </div>
                             <Button
                               type="button"
-                              onClick={() => removeAttachment(index)}
+                              onClick={() => removePendingFile(pf.id)}
                               variant="ghost"
                               size="sm"
                               className="h-auto p-1"
+                              disabled={isUploading}
                             >
                               <X className="h-3 w-3" />
                             </Button>
@@ -326,11 +368,20 @@ export const PostCreator = ({
 
           {/* Actions */}
           <div className="flex justify-end gap-2">
-            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+            <Button type="button" variant="outline" onClick={() => setOpen(false)} disabled={isUploading}>
               {t('feed.creator.actions.cancel')}
             </Button>
             <Button type="submit" disabled={!canSubmit}>
-              {createPost.isPending ? t('feed.creator.actions.posting') : t('feed.creator.actions.post')}
+              {isUploading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Uploading...
+                </>
+              ) : createPost.isPending ? (
+                t('feed.creator.actions.posting')
+              ) : (
+                t('feed.creator.actions.post')
+              )}
             </Button>
           </div>
         </form>

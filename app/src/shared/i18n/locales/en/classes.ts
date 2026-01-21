@@ -1108,6 +1108,20 @@ export default {
         deadline: 'Deadline',
         allowComments: 'Allow Comments',
       },
+      attachments: {
+        validation: {
+          cannotAdd: 'Cannot add "{{fileName}}"',
+          filesAdded: '{{count}} file(s) added',
+          totalSize: 'Total size: {{size}}',
+          invalidFileType: 'File type ".{{extension}}" is not allowed',
+          fileTooLarge: 'File exceeds maximum size of {{maxSize}} (actual: {{actualSize}}MB)',
+          uploadFailed: 'Upload failed',
+        },
+        upload: {
+          failed: 'Failed to upload "{{fileName}}"',
+          failedDescription: 'Upload failed',
+        },
+      },
       placeholders: {
         content: 'Write your post content here...',
         comment: 'Write a comment...',

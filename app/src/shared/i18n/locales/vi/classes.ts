@@ -1103,6 +1103,20 @@ export default {
         deadline: 'Hạn chót',
         allowComments: 'Cho Phép Bình Luận',
       },
+      attachments: {
+        validation: {
+          cannotAdd: 'Không thể thêm "{{fileName}}"',
+          filesAdded: 'Đã thêm {{count}} tệp',
+          totalSize: 'Kích thước tổng cộng: {{size}}',
+          invalidFileType: 'Loại tệp ".{{extension}}" không được phép',
+          fileTooLarge: 'Tệp vượt quá kích thước tối đa {{maxSize}} (thực tế: {{actualSize}}MB)',
+          uploadFailed: 'Tải lên không thành công',
+        },
+        upload: {
+          failed: 'Không tải lên được "{{fileName}}"',
+          failedDescription: 'Tải lên không thành công',
+        },
+      },
       placeholders: {
         content: 'Viết nội dung bài đăng của bạn ở đây...',
         comment: 'Viết bình luận...',

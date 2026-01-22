@@ -220,10 +220,10 @@ const Toolbar = ({
                     isMobileSheet && 'h-11 min-h-[44px] text-base'
                   )}
                   size="sm"
-                  title="Share this mindmap"
+                  title={t('toolbar.tooltips.share')}
                 >
                   <Share2 size={isMobileSheet ? 20 : 16} />
-                  Share
+                  {t('toolbar.actions.share')}
                 </Button>
               )}
             </div>

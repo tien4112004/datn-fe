@@ -1,6 +1,7 @@
 import { ReactFlow } from '@xyflow/react';
-import { memo, type ReactNode } from 'react';
+import { memo, useState, useEffect, type ReactNode } from 'react';
 import { useShallow } from 'zustand/react/shallow';
+import { Loader2 } from 'lucide-react';
 import { useReactFlowIntegration } from '@/features/mindmap/hooks';
 import { useMindmapPermissionContext } from '../../contexts/MindmapPermissionContext';
 import EdgeBlock, { ConnectionLine } from '../edge/Edge';
@@ -36,6 +37,8 @@ const handlersSelector = (state: any) => ({
 });
 
 const Flow = memo(({ children, isPanOnDrag }: { children: ReactNode; isPanOnDrag: boolean }) => {
+  const [isInitializing, setIsInitializing] = useState(true);
+
   const { nodes, edges, onNodesChange, onEdgesChange, onConnect } = useCoreStore(
     useShallow(handlersSelector)
   );
@@ -56,38 +59,54 @@ const Flow = memo(({ children, isPanOnDrag }: { children: ReactNode; isPanOnDrag
     onSelectionChange,
   } = useReactFlowIntegration();
 
+  // Simple fixed-duration loading state
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsInitializing(false);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
-    <ReactFlow
-      nodes={nodes}
-      edges={edges}
-      onNodesChange={onNodesChange}
-      onEdgesChange={onEdgesChange}
-      onConnect={onConnect}
-      nodeTypes={nodeTypes}
-      edgeTypes={edgeTypes}
-      proOptions={{ hideAttribution: true }}
-      onPaneMouseMove={onPaneMouseMove}
-      onPaneClick={onPaneClick}
-      onNodeDragStart={onNodeDragStart}
-      onNodeDrag={onNodeDrag}
-      onNodeDragStop={onNodeDragStop}
-      onInit={onInit}
-      onConnectEnd={onConnectEnd}
-      onNodeMouseEnter={onNodeMouseEnter}
-      onNodeMouseLeave={onNodeMouseLeave}
-      onSelectionChange={onSelectionChange}
-      connectionLineComponent={ConnectionLine}
-      panOnDrag={isPanOnDrag}
-      panActivationKeyCode={!isPanOnDrag ? 'Shift' : null}
-      selectionOnDrag={!isPanOnDrag}
-      selectNodesOnDrag={false}
-      selectionKeyCode={isPanOnDrag ? 'Shift' : null}
-      nodesDraggable={!isReadOnly}
-      nodesConnectable={!isReadOnly}
-      fitViewOnInit={false}
-    >
-      {children}
-    </ReactFlow>
+    <>
+      {isInitializing && (
+        <div className="bg-background/80 absolute inset-0 z-50 flex items-center justify-center">
+          <Loader2 className="text-primary h-8 w-8 animate-spin" />
+        </div>
+      )}
+      <ReactFlow
+        nodes={nodes}
+        edges={edges}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
+        onConnect={onConnect}
+        nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
+        proOptions={{ hideAttribution: true }}
+        onPaneMouseMove={onPaneMouseMove}
+        onPaneClick={onPaneClick}
+        onNodeDragStart={onNodeDragStart}
+        onNodeDrag={onNodeDrag}
+        onNodeDragStop={onNodeDragStop}
+        onInit={onInit}
+        onConnectEnd={onConnectEnd}
+        onNodeMouseEnter={onNodeMouseEnter}
+        onNodeMouseLeave={onNodeMouseLeave}
+        onSelectionChange={onSelectionChange}
+        connectionLineComponent={ConnectionLine}
+        panOnDrag={isPanOnDrag}
+        panActivationKeyCode={!isPanOnDrag ? 'Shift' : null}
+        selectionOnDrag={!isPanOnDrag}
+        selectNodesOnDrag={false}
+        selectionKeyCode={isPanOnDrag ? 'Shift' : null}
+        nodesDraggable={!isReadOnly}
+        nodesConnectable={!isReadOnly}
+        fitViewOnInit={false}
+      >
+        {children}
+      </ReactFlow>
+    </>
   );
 });
 

@@ -1,4 +1,5 @@
 export { usePostPermissions } from './usePostPermissions';
+export { useAttachmentUpload } from './useAttachmentUpload';
 
 // Individual API hooks
 export {

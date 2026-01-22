@@ -46,7 +46,7 @@ export default class ClassFeedService implements ClassFeedApiService {
       content: request.content,
       type: request.type,
       attachments: request.attachments || [],
-      linkedResourceIds: request.linkedResourceIds,
+      linkedResources: request.linkedResources,
       linkedLessonId: request.linkedLessonId,
       allowComments: request.allowComments,
     };
@@ -65,7 +65,7 @@ export default class ClassFeedService implements ClassFeedApiService {
       content: request.content,
       type: request.type,
       attachments: request.attachments || [],
-      linkedResourceIds: request.linkedResourceIds,
+      linkedResources: request.linkedResources,
       linkedLessonId: request.linkedLessonId,
       isPinned: request.isPinned,
       allowComments: request.allowComments,
@@ -110,5 +110,25 @@ export default class ClassFeedService implements ClassFeedApiService {
 
   async deleteComment(commentId: string): Promise<void> {
     await this.apiClient.delete(`${this.baseUrl}/api/comments/${commentId}`);
+  }
+
+  async uploadAttachment(file: File): Promise<string> {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const response = await this.apiClient.post<
+      ApiResponse<{ cdnUrl: string; mediaType: string; extension: string; id: number }>
+    >(`${this.baseUrl}/api/media/upload`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+
+    return response.data.data.cdnUrl;
+  }
+
+  async uploadAttachments(files: File[]): Promise<string[]> {
+    const uploadPromises = files.map((file) => this.uploadAttachment(file));
+    return Promise.all(uploadPromises);
   }
 }

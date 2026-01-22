@@ -1108,6 +1108,20 @@ export default {
         deadline: 'Deadline',
         allowComments: 'Allow Comments',
       },
+      attachments: {
+        validation: {
+          cannotAdd: 'Cannot add "{{fileName}}"',
+          filesAdded: '{{count}} file(s) added',
+          totalSize: 'Total size: {{size}}',
+          invalidFileType: 'File type ".{{extension}}" is not allowed',
+          fileTooLarge: 'File exceeds maximum size of {{maxSize}} (actual: {{actualSize}}MB)',
+          uploadFailed: 'Upload failed',
+        },
+        upload: {
+          failed: 'Failed to upload "{{fileName}}"',
+          failedDescription: 'Upload failed',
+        },
+      },
       placeholders: {
         content: 'Write your post content here...',
         comment: 'Write a comment...',
@@ -1116,6 +1130,22 @@ export default {
         post: 'Post',
         homework: 'Homework',
       },
+      selectResources: 'Select resources...',
+      resourcesSelected: '{{count}} resource(s) selected',
+    },
+    resourceSelector: {
+      title: 'Link Resources',
+      searchPlaceholder: 'Search resources...',
+      tabs: {
+        mindmaps: 'Mindmaps',
+        presentations: 'Presentations',
+        assignments: 'Assignments',
+      },
+      noResources: 'No resources available',
+      noSearchResults: 'No resources found',
+      selected: '{{count}} selected',
+      clearSelection: 'Clear',
+      confirm: 'Confirm',
     },
     list: {
       empty: {

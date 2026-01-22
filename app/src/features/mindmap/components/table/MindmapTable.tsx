@@ -18,6 +18,7 @@ import { DeleteConfirmationDialog } from '@/shared/components/modals/DeleteConfi
 import { toast } from 'sonner';
 import { ActionContent } from '@/features/presentation/components';
 import { format } from 'date-fns';
+import { BrainCircuit } from 'lucide-react';
 import { getLocaleDateFns } from '@/shared/i18n/helper';
 import ViewToggle, { type ViewMode } from '@/features/presentation/components/others/ViewToggle';
 
@@ -61,22 +62,15 @@ const MindmapTable = () => {
               <img
                 src={thumbnail}
                 alt="Mindmap Thumbnail"
-                className="aspect-[16/9] w-[120px] rounded border object-cover"
-                onError={(e) => {
-                  // Fallback to placeholder if image fails to load
-                  const target = e.target as HTMLImageElement;
-                  target.src = '/images/placeholder-image.webp';
-                }}
+                className="aspect-video w-[120px] rounded border object-cover"
               />
             );
           }
-          // Fallback placeholder
+          // Fallback to icon
           return (
-            <img
-              src="/images/placeholder-image.webp"
-              alt="No Thumbnail"
-              className={`aspect-[16/9] w-[120px]`}
-            />
+            <div className="bg-muted/50 flex aspect-video w-[120px] items-center justify-center rounded border">
+              <BrainCircuit className="text-muted-foreground h-8 w-8" />
+            </div>
           );
         },
         enableResizing: false,

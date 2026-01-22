@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
+import { BrainCircuit, Presentation } from 'lucide-react';
 
 interface DocumentItem {
   id: string;
@@ -9,6 +10,11 @@ interface DocumentItem {
   type: 'presentation' | 'mindmap';
   path: string;
 }
+
+const documentTypeIcons: Record<DocumentItem['type'], React.ElementType> = {
+  presentation: Presentation,
+  mindmap: BrainCircuit,
+};
 
 // Mock data
 const mockDocuments: DocumentItem[] = [
@@ -90,29 +96,32 @@ export const RecentDocuments = () => {
     <div className="w-full">
       <h2 className="mb-6 text-2xl font-semibold">Recent Documents</h2>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {documents.map((doc) => (
-          <Link
-            key={doc.id}
-            to={doc.path}
-            className="hover:bg-muted/50 bg-card group flex flex-col rounded-lg border p-4 transition-colors"
-          >
-            <div className="bg-muted mb-3 aspect-video w-full overflow-hidden rounded-md">
-              {doc.thumbnail ? (
-                <img
-                  src={doc.thumbnail}
-                  alt={doc.title}
-                  className="h-full w-full object-cover transition-transform group-hover:scale-105"
-                />
-              ) : (
-                <div className="flex h-full items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
-                  <span className="text-muted-foreground text-xs">No preview</span>
-                </div>
-              )}
-            </div>
-            <h3 className="mb-1 truncate text-sm font-medium">{doc.title}</h3>
-            <p className="text-muted-foreground text-xs">{formatDate(doc.updatedAt)}</p>
-          </Link>
-        ))}
+        {documents.map((doc) => {
+          const Icon = documentTypeIcons[doc.type];
+          return (
+            <Link
+              key={doc.id}
+              to={doc.path}
+              className="hover:bg-muted/50 bg-card group flex flex-col rounded-lg border p-4 transition-colors"
+            >
+              <div className="bg-muted mb-3 aspect-video w-full overflow-hidden rounded-md">
+                {doc.thumbnail ? (
+                  <img
+                    src={doc.thumbnail}
+                    alt={doc.title}
+                    className="h-full w-full object-cover transition-transform group-hover:scale-105"
+                  />
+                ) : (
+                  <div className="bg-muted/50 flex h-full items-center justify-center">
+                    <Icon className="text-muted-foreground h-8 w-8" />
+                  </div>
+                )}
+              </div>
+              <h3 className="mb-1 truncate text-sm font-medium">{doc.title}</h3>
+              <p className="text-muted-foreground text-xs">{formatDate(doc.updatedAt)}</p>
+            </Link>
+          );
+        })}
       </div>
     </div>
   );

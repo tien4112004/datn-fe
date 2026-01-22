@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import { ClassListSimpleTable } from './components/ClassListSimpleTable';
 import { DashboardCalendar } from './components/DashboardCalendar';
+import { QuickNavigation } from './components/QuickNavigation';
 import { RecentDocuments } from './components/RecentDocuments';
 import { useAuth } from '@/shared/context/auth';
 import { useEffect } from 'react';
@@ -31,17 +32,8 @@ export const DashboardPage = () => {
       <div className="flex flex-1 overflow-hidden">
         {/* Left Main Content */}
         <div className="flex-1 space-y-8 overflow-y-auto p-8">
-          {/* My Classes Section */}
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h1 className="text-3xl font-semibold">{t('myClasses.title')}</h1>
-              <Button className="gap-2">
-                <Plus className="h-4 w-4" />
-                {t('myClasses.addClass')}
-              </Button>
-            </div>
-            <ClassListSimpleTable />
-          </div>
+          {/* Quick Navigation Section */}
+          <QuickNavigation />
 
           {/* Recent Documents Section */}
           <RecentDocuments />
@@ -50,6 +42,18 @@ export const DashboardPage = () => {
         {/* Right Sidebar */}
         <div className="bg-muted/10 w-[380px] space-y-6 overflow-y-auto border-l p-6">
           <DashboardCalendar />
+
+          {/* My Classes Section */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold">{t('myClasses.title')}</h2>
+              <Button size="sm" className="gap-1">
+                <Plus className="h-3 w-3" />
+                {t('myClasses.addClass')}
+              </Button>
+            </div>
+            <ClassListSimpleTable />
+          </div>
         </div>
       </div>
     </div>

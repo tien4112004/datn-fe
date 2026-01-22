@@ -1,4 +1,11 @@
 export default {
+  quickNav: {
+    title: 'Quick Actions',
+    assignment: 'Create Assignment',
+    image: 'Generate Image',
+    mindmap: 'Generate Mindmap',
+    presentation: 'Generate Presentation',
+  },
   recentDocuments: {
     title: 'Recent Documents',
     empty: 'No recent documents',

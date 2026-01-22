@@ -1,4 +1,11 @@
 export default {
+  quickNav: {
+    title: 'Thao Tác Nhanh',
+    assignment: 'Tạo Bài Tập',
+    image: 'Tạo Hình Ảnh',
+    mindmap: 'Tạo Sơ Đồ Tư Duy',
+    presentation: 'Tạo Bài Thuyết Trình',
+  },
   recentDocuments: {
     title: 'Tài Liệu Gần Đây',
     empty: 'Không có tài liệu gần đây',

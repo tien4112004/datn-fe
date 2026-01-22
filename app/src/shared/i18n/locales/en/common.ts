@@ -32,6 +32,11 @@ export default {
     active: 'Active',
     inactive: 'Inactive',
   },
+  permission: {
+    viewer: 'Viewer',
+    commenter: 'Commenter',
+    editor: 'Editor',
+  },
   actions: {
     view: 'View',
     edit: 'Edit',

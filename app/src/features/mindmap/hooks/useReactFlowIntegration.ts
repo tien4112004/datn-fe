@@ -43,7 +43,11 @@ export const useReactFlowIntegration = () => {
   }, []);
 
   const onInit = useCallback(async () => {
-    updateLayout();
+    // Only apply layout on init if auto-layout is enabled
+    // Otherwise, respect the saved node positions
+    if (isAutoLayoutEnabled) {
+      updateLayout();
+    }
 
     // Only fit view on the very first initialization to prevent
     // unwanted zooming during collapse/expand operations
@@ -53,7 +57,7 @@ export const useReactFlowIntegration = () => {
         fitView({ duration: 2000, padding: 0.1 });
       }, 800);
     }
-  }, [updateLayout, fitView]);
+  }, [updateLayout, fitView, isAutoLayoutEnabled]);
 
   const determineSideFromPosition = useCallback((draggedNode: MindMapNode, targetNode: any) => {
     const targetCenterX = targetNode.position.x + (targetNode.measured?.width ?? 0) / 2;

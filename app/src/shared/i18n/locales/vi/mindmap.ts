@@ -57,6 +57,7 @@ export default {
       redo: 'Làm lại',
       applyLayout: 'Áp dụng bố cục',
       logData: 'Ghi nhật ký dữ liệu',
+      share: 'Chia sẻ',
     },
     selection: {
       noSelection: 'Chưa chọn nút nào',
@@ -125,6 +126,7 @@ export default {
       logData: 'Ghi nhật ký nút và cạnh',
       saveMindmap: 'Lưu sơ đồ tư duy với hình thu nhỏ',
       download: 'Tải xuống dưới dạng PNG',
+      share: 'Chia sẻ sơ đồ tư duy này',
     },
     save: {
       save: 'Lưu',

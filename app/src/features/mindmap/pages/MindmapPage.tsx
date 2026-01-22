@@ -13,6 +13,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { useLoaderData } from 'react-router-dom';
 import { useCoreStore, usePresenterModeStore } from '../stores';
+import { useDirtyStore } from '../stores/dirty';
 import { useMindmapDirtyTracking } from '../hooks/useDirtyTracking';
 import { useFullscreen } from '../hooks/useFullscreen';
 import { usePresenterMode } from '../hooks/usePresenterMode';
@@ -112,6 +113,9 @@ const MindmapPage = () => {
     setPresenterModeStore(isPresenterMode);
   }, [isPresenterMode, setPresenterModeStore]);
 
+  // Reset dirty state when component mounts (navigating to a mindmap)
+  const resetDirty = useDirtyStore((state) => state.reset);
+
   // Sync mindmap data from React Router loader to stores
   useEffect(() => {
     if (mindmap) {
@@ -120,8 +124,14 @@ const MindmapPage = () => {
 
       setNodes(migratedNodes);
       setEdges(mindmap.edges);
+
+      // Reset dirty state after loading data - this is not a user edit
+      // Use setTimeout to ensure this runs after dirty tracking detects the "change"
+      setTimeout(() => {
+        resetDirty();
+      }, 0);
     }
-  }, [mindmap, setNodes, setEdges]);
+  }, [mindmap, setNodes, setEdges, resetDirty]);
 
   const togglePanOnDrag = () => {
     setIsPanOnDrag(!isPanOnDrag);

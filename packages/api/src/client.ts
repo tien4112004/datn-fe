@@ -9,10 +9,19 @@ export interface ApiClient extends AxiosInstance {
 const api: ApiClient = axios.create({
   allowAbsoluteUrls: true,
   withCredentials: true, // Enable sending cookies with requests (HttpOnly cookies contain auth tokens)
-  headers: {
-    'Content-Type': 'application/json',
-  },
 }) as ApiClient;
+
+// Add request interceptor to set Content-Type based on data type
+api.interceptors.request.use((config) => {
+  // Only set Content-Type for requests with data
+  if (config.data !== undefined) {
+    // Let axios handle Content-Type for FormData (sets multipart/form-data with boundary)
+    if (!(config.data instanceof FormData)) {
+      config.headers['Content-Type'] = 'application/json';
+    }
+  }
+  return config;
+});
 
 api.stream = async function (url: string, request: any, signal: AbortSignal) {
   try {

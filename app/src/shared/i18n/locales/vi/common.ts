@@ -32,6 +32,11 @@ export default {
     active: 'Hoạt động',
     inactive: 'Không hoạt động',
   },
+  permission: {
+    viewer: 'Người xem',
+    commenter: 'Người bình luận',
+    editor: 'Người chỉnh sửa',
+  },
   actions: {
     view: 'Xem',
     edit: 'Chỉnh sửa',

@@ -57,6 +57,7 @@ export default {
       redo: 'Redo',
       applyLayout: 'Apply Layout Manually',
       logData: 'Log Nodes and Edges',
+      share: 'Share',
     },
     selection: {
       noSelection: 'No nodes selected',
@@ -125,6 +126,7 @@ export default {
       logData: 'Log Nodes and Edges',
       saveMindmap: 'Save mindmap with thumbnail',
       download: 'Download as PNG',
+      share: 'Share this mindmap',
     },
     save: {
       save: 'Save',

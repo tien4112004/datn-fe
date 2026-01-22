@@ -5,7 +5,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import type { Mindmap } from '@/features/mindmap/types';
 import { useMindmaps, useUpdateMindmapTitle, useDeleteMindmap } from '@/features/mindmap/hooks';
 import { Button } from '@/components/ui/button';
-import { MoreHorizontal } from 'lucide-react';
+import { MoreHorizontal, BrainCircuit } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { SearchBar } from '@/shared/components/common/SearchBar';
 import TablePagination from '@/shared/components/table/TablePagination';
@@ -131,15 +131,17 @@ const MindmapGrid = () => {
         onClick={() => navigate(`/mindmap/${mindmap.id}`)}
       >
         {/* Thumbnail Image */}
-        <img
-          src={mindmap.thumbnail || '/images/placeholder-image.webp'}
-          alt={mindmap.title || 'Mindmap Thumbnail'}
-          className="aspect-video w-full rounded-lg object-cover"
-          onError={(e) => {
-            const target = e.target as HTMLImageElement;
-            target.src = '/images/placeholder-image.webp';
-          }}
-        />
+        {mindmap.thumbnail ? (
+          <img
+            src={mindmap.thumbnail}
+            alt={mindmap.title || 'Mindmap Thumbnail'}
+            className="h-full w-full object-cover"
+          />
+        ) : (
+          <div className="bg-muted/50 flex h-full w-full items-center justify-center">
+            <BrainCircuit className="text-muted-foreground h-12 w-12" />
+          </div>
+        )}
 
         {/* Action Menu (appears on hover) */}
         <div className="absolute right-2 top-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100">

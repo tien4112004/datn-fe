@@ -5,7 +5,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import type { Assignment } from '@aiprimary/core';
 import { useAssignmentList } from '@/features/assignment/hooks/useAssignmentApi';
 import { Button } from '@/components/ui/button';
-import { MoreHorizontal, FileText } from 'lucide-react';
+import { MoreHorizontal, ClipboardList } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { SearchBar } from '@/shared/components/common/SearchBar';
 import TablePagination from '@/shared/components/table/TablePagination';
@@ -147,7 +147,7 @@ const AssignmentGrid = () => {
         className="relative flex aspect-video w-full flex-col items-center justify-center overflow-hidden rounded-lg bg-gradient-to-br from-indigo-50 to-blue-50 p-6 transition-shadow duration-200 hover:shadow-md"
         onClick={() => navigate(`/assignments/edit/${assignment.id}`)}
       >
-        <FileText className="mb-3 h-12 w-12 text-indigo-500" />
+        <ClipboardList className="mb-3 h-12 w-12 text-indigo-500" />
         <div className="text-center">
           <div className="mb-2">{getStatusBadge(assignment.status)}</div>
         </div>

@@ -1,6 +1,7 @@
 import type { Slide } from '../../types/slide';
-import type { Presentation } from '../../types/presentation';
+import type { Presentation as PresentationType } from '../../types/presentation';
 import VueRemoteWrapper from '../remote/VueRemoteWrapper';
+import { Presentation as PresentationIcon } from 'lucide-react';
 
 interface ThumbnailWrapperProps {
   slide: Slide;
@@ -43,7 +44,7 @@ const ThumbnailWrapper = ({ slide, size, visible }: ThumbnailWrapperProps) => {
 };
 
 interface ThumbnailWrapperV2Props {
-  presentation: Presentation;
+  presentation: PresentationType;
   size: number | 'auto';
   visible?: boolean;
 }
@@ -71,13 +72,14 @@ const ThumbnailWrapperV2 = ({ presentation, size, visible = true }: ThumbnailWra
     return <ThumbnailWrapper slide={presentation.slides[0]} size={size} visible={visible} />;
   }
 
-  // Fallback to placeholder image
+  // Fallback to icon
   return (
-    <img
-      src="/images/placeholder-image.webp"
-      alt="No Thumbnail"
+    <div
+      className="bg-muted/50 flex h-full w-full items-center justify-center"
       style={size !== 'auto' ? { width: `${size}px` } : { width: '100%' }}
-    />
+    >
+      <PresentationIcon className="text-muted-foreground h-12 w-12" />
+    </div>
   );
 };
 

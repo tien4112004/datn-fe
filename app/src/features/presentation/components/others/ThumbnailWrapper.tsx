@@ -61,7 +61,7 @@ const ThumbnailWrapperV2 = ({ presentation, size, visible = true }: ThumbnailWra
       <img
         src={presentation.thumbnail}
         alt="Presentation Thumbnail"
-        className="aspect-[16/9]"
+        className="aspect-video h-full w-full object-cover"
         style={size !== 'auto' ? { width: `${size}px` } : { width: '100%' }}
       />
     );
@@ -75,7 +75,7 @@ const ThumbnailWrapperV2 = ({ presentation, size, visible = true }: ThumbnailWra
   // Fallback to icon
   return (
     <div
-      className="bg-muted/50 flex h-full w-full items-center justify-center"
+      className="bg-muted/50 flex aspect-video h-full w-full items-center justify-center"
       style={size !== 'auto' ? { width: `${size}px` } : { width: '100%' }}
     >
       <PresentationIcon className="text-muted-foreground h-12 w-12" />

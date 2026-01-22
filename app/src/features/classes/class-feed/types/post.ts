@@ -1,4 +1,4 @@
-import type { LinkedResourceResponse } from './resource';
+import type { LinkedResourceResponse } from '@/features/projects/types/resource';
 
 // User minimal info from backend
 export interface UserMinimalInfo {

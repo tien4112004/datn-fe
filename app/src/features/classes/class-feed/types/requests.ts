@@ -1,4 +1,4 @@
-import type { LinkedResourceRequest } from './resource';
+import type { LinkedResourceRequest } from '@/features/projects/types/resource';
 
 // Request types
 export interface PostCreateRequest {

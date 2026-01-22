@@ -5,6 +5,7 @@ export default {
     image: 'Tạo Hình Ảnh',
     mindmap: 'Tạo Sơ Đồ Tư Duy',
     presentation: 'Tạo Bài Thuyết Trình',
+    questionsBank: 'Ngân Hàng Câu Hỏi',
   },
   recentDocuments: {
     title: 'Tài Liệu Gần Đây',

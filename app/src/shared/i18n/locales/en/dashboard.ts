@@ -5,6 +5,7 @@ export default {
     image: 'Generate Image',
     mindmap: 'Generate Mindmap',
     presentation: 'Generate Presentation',
+    questionsBank: 'Questions Bank',
   },
   recentDocuments: {
     title: 'Recent Documents',

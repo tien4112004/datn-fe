@@ -32,6 +32,8 @@ export const RecentDocuments = () => {
         return `/presentation/${doc.id}`;
       case 'mindmap':
         return `/mindmap/${doc.id}`;
+      case 'assignment':
+        return `/assignments/edit/${doc.id}`;
       default:
         return '/';
     }
@@ -41,7 +43,7 @@ export const RecentDocuments = () => {
     return (
       <div className="w-full">
         <h2 className="mb-6 text-2xl font-semibold">{t('recentDocuments.title')}</h2>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
           {[1, 2, 3, 4].map((i) => (
             <div key={i} className="bg-card flex flex-col rounded-lg border p-4">
               <div className="bg-muted mb-3 aspect-video w-full animate-pulse rounded-md" />
@@ -57,7 +59,7 @@ export const RecentDocuments = () => {
   return (
     <div className="w-full">
       <h2 className="mb-6 text-2xl font-semibold">{t('recentDocuments.title')}</h2>
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
         {documents.map((doc) => {
           const Icon = documentTypeIcons[doc.type] || Presentation;
           return (

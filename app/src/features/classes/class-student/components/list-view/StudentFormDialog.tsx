@@ -145,7 +145,7 @@ export function StudentFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
+      <DialogContent className="max-h-[90vh] !max-w-2xl overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{mode === 'create' ? t('addStudentButton') : t('editStudent')}</DialogTitle>
           <DialogDescription>
@@ -161,9 +161,9 @@ export function StudentFormDialog({
             {/* Full Name */}
             <div className="space-y-2">
               <Label htmlFor="fullName">
-                Full Name <span className="text-red-500">*</span>
+                {t('form.fullName')} <span className="text-red-500">*</span>
               </Label>
-              <Input id="fullName" {...register('fullName')} placeholder="Enter full name" />
+              <Input id="fullName" {...register('fullName')} placeholder={t('form.fullNamePlaceholder')} />
               {errors.fullName && <p className="text-sm text-red-500">{getErrorMessage(errors.fullName)}</p>}
             </div>
           </div>

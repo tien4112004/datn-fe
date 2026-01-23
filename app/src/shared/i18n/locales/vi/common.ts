@@ -11,8 +11,6 @@ export default {
       schedules: 'Lịch',
       home: 'Trang chủ',
       admin: 'Quản Trị',
-      questionBank: 'Kho Câu Hỏi',
-      assignments: 'Bài Tập',
       questionRendererDemo: 'Demo Trình Hiển Thị Câu Hỏi',
     },
   },

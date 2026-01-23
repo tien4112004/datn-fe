@@ -54,27 +54,21 @@ const ProjectListPage = () => {
   ];
 
   return (
-    <div className="flex h-full flex-col">
-      <div className="flex flex-1 flex-col overflow-auto">
-        <div className="mx-auto w-full max-w-7xl space-y-6 px-8 py-12">
-          <div className="mb-8 space-y-1">
-            <h1 className="scroll-m-20 text-3xl font-semibold tracking-tight">{t('title')}</h1>
-            <p className="text-muted-foreground text-sm">
-              Manage your presentations, documents, videos, mindmaps and images
-            </p>
-          </div>
-
-          <ProjectControls currentResourceType={resourceType as ResourceType} />
-          <CommonTabs
-            value={resourceType}
-            onValueChange={handleResourceChange}
-            items={tabItems}
-            tabsListClassName="bg-card flex w-full flex-row justify-start rounded-none border-b p-0 mb-2"
-            tabsClassName="w-full"
-            tabsContentClassName="flex flex-col gap-2"
-          />
-        </div>
+    <div className="mx-auto w-full max-w-7xl space-y-6 px-6 py-8">
+      <div className="mb-8 space-y-1">
+        <h1 className="scroll-m-20 text-3xl font-semibold tracking-tight">{t('title')}</h1>
+        <p className="text-muted-foreground text-sm">{t('description')}</p>
       </div>
+
+      <ProjectControls currentResourceType={resourceType as ResourceType} />
+      <CommonTabs
+        value={resourceType}
+        onValueChange={handleResourceChange}
+        items={tabItems}
+        tabsListClassName="bg-card flex w-full flex-row justify-start rounded-none border-b p-0 mb-2"
+        tabsClassName="w-full"
+        tabsContentClassName="flex flex-col gap-2"
+      />
     </div>
   );
 };

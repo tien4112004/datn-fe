@@ -3,6 +3,7 @@
  */
 export default {
   title: 'My Project',
+  description: 'Manage your presentations, images, mindmaps, and assignments all in one place.',
   controls: {
     generateNew: 'Generate New',
     createBlank: 'Create Blank?',

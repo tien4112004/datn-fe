@@ -32,7 +32,7 @@ export const ClassActionsMenu = ({
   const { t } = useTranslation('classes');
 
   return (
-    <DropdownMenu>
+    <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className={triggerClassName || 'h-8 w-8 p-0'}>
           <MoreHorizontal className="h-4 w-4" />

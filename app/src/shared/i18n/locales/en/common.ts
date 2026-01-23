@@ -11,8 +11,6 @@ export default {
       schedules: 'Schedules',
       home: 'Home',
       admin: 'Administration',
-      questionBank: 'Question Bank',
-      assignments: 'Assignments',
       questionRendererDemo: 'Question Renderer (Demo)',
     },
   },

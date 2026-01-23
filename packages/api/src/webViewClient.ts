@@ -1,7 +1,6 @@
 import axios, { type AxiosInstance } from 'axios';
 import { CriticalError, ExpectedError } from './types/errors';
 import { ERROR_TYPE } from './constants/errors';
-import { webViewTokenManager } from './webViewTokenManager';
 
 interface StreamableAxiosInstance extends AxiosInstance {
   stream: (url: string, request: any, signal: AbortSignal) => Promise<Response>;
@@ -35,8 +34,8 @@ webViewApi.stream = async function (url: string, request: any, signal: AbortSign
       Accept: 'text/plain',
     };
 
-    // Add Authorization header if token is available
-    const token = webViewTokenManager.getToken();
+    // Add Authorization header if token is available from localStorage
+    const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
     if (token) {
       headers.Authorization = `Bearer ${token}`;
     }
@@ -109,7 +108,8 @@ webViewApi.stream = async function (url: string, request: any, signal: AbortSign
 // Request interceptor to add Authorization header
 webViewApi.interceptors.request.use(
   (config) => {
-    const token = webViewTokenManager.getToken();
+    // Get token from localStorage (injected by Flutter)
+    const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }

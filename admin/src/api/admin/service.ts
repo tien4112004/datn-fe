@@ -22,6 +22,7 @@ import type {
   CreateQuestionPayload,
   UpdateQuestionPayload,
   ImportResult,
+  ChapterResponse,
 } from '@/types/questionBank';
 import { parseQuestionBankCSV, exportQuestionsToCSV } from '@/utils/csvParser';
 import { validateQuestionBankCSV } from '@/utils/csvValidation';
@@ -495,10 +496,11 @@ export default class AdminRealApiService implements AdminApiService {
     return { success: true, data: grades };
   }
 
-  async getQuestionBankChapters(_subject: string, _grade: string): Promise<ApiResponse<string[]>> {
-    // Chapters are dynamic and curriculum-specific, return empty array
-    // In the future, this could be populated from a static curriculum definition
-    return { success: true, data: [] };
+  async getQuestionBankChapters(subject: string, grade: string): Promise<ApiResponse<ChapterResponse[]>> {
+    const response = await api.get<ApiResponse<ChapterResponse[]>>(`${this.baseUrl}/api/chapters`, {
+      params: { subject, grade },
+    });
+    return response.data;
   }
 
   async getQuestionById(id: string): Promise<ApiResponse<QuestionBankItem>> {

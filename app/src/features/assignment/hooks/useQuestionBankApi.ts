@@ -6,6 +6,7 @@ import type {
   CreateQuestionRequest,
   UpdateQuestionRequest,
   QuestionBankItem,
+  ChapterResponse,
 } from '../types/questionBank';
 
 // Export the API service hook for direct use
@@ -186,7 +187,7 @@ export const useQuestionBankGrades = () => {
 export const useQuestionBankChapters = (subject?: string, grade?: string) => {
   const apiService = useQuestionBankApiService();
 
-  return useQuery({
+  return useQuery<ChapterResponse[]>({
     queryKey: questionBankKeys.metadata.chapters(subject || '', grade || ''),
     queryFn: () => apiService.getChapters(subject!, grade!),
     enabled: !!subject && !!grade,

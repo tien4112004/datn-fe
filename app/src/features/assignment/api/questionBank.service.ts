@@ -4,6 +4,7 @@ import type {
   QuestionBankItem,
   QuestionBankFilters,
   QuestionBankApiResponse,
+  ChapterResponse,
 } from '../types/questionBank';
 import { parseQuestionBankCSV, exportQuestionsToCSV } from '../utils/csvParser';
 import { validateQuestionBankCSV } from '../utils/csvValidation';
@@ -184,9 +185,10 @@ export default class QuestionBankService implements QuestionBankApiService {
     }
   }
 
-  async getChapters(_subject: string, _grade: string): Promise<string[]> {
-    // Chapters are dynamic and curriculum-specific, return empty array
-    // In the future, this could be populated from a static curriculum definition
-    return [];
+  async getChapters(subject: string, grade: string): Promise<ChapterResponse[]> {
+    const response = await this.apiClient.get(`${this.baseUrl}/api/chapters`, {
+      params: { subject, grade },
+    });
+    return response.data.data || [];
   }
 }

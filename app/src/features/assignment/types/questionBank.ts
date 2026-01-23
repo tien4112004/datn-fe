@@ -73,6 +73,17 @@ export interface UpdateQuestionRequest {
  * API service interface for question bank operations
  * UI/API-specific interface defining the service contract
  */
+/**
+ * Response structure for chapter from backend API
+ */
+export interface ChapterResponse {
+  id: string;
+  name: string;
+  grade: string;
+  subject: string;
+  sortOrder: string;
+}
+
 export interface QuestionBankApiService {
   // Query operations
   getQuestions(filters: QuestionBankFilters): Promise<QuestionBankApiResponse>;
@@ -97,5 +108,5 @@ export interface QuestionBankApiService {
   importQuestions(file: File): Promise<{ success: number; failed: number }>;
 
   // Metadata
-  getChapters(subject: string, grade: string): Promise<string[]>;
+  getChapters(subject: string, grade: string): Promise<ChapterResponse[]>;
 }

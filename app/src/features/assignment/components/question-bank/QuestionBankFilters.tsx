@@ -95,7 +95,7 @@ export const QuestionBankFilters = ({
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3 }}
-            className={`grid gap-4 ${orientation === 'horizontal' ? 'grid-cols-5' : 'grid-cols-1'}`}
+            className={`grid gap-4 ${orientation === 'horizontal' ? (chapters && chapters.length > 0 ? 'grid-cols-[1fr_1fr_1fr_1fr_2fr]' : 'grid-cols-4') : 'grid-cols-1'}`}
           >
             {/* Question Type - Multi-select */}
             <div className="space-y-2">
@@ -187,32 +187,32 @@ export const QuestionBankFilters = ({
               </div>
             </div>
 
-            {/* Chapter - Multi-select */}
-            <div className="space-y-2">
-              <Label className="text-foreground mb-3 block text-sm font-semibold">
-                {t('questionBank.filters.chapter')}
-              </Label>
-              {chapters && chapters.length > 0 ? (
+            {/* Chapter - Multi-select (only shown when chapters exist) */}
+            {chapters && chapters.length > 0 && (
+              <div className="space-y-2">
+                <Label className="text-foreground mb-3 block text-sm font-semibold">
+                  {t('questionBank.filters.chapter')}
+                </Label>
                 <div className="max-h-32 space-y-2 overflow-y-auto">
                   {chapters.map((chapter) => (
                     <label
-                      key={chapter}
+                      key={chapter.id}
                       className="hover:bg-accent flex cursor-pointer items-center gap-2 rounded-md p-1 transition-colors"
                     >
                       <Checkbox
-                        checked={filters.chapter?.includes(chapter) || false}
+                        checked={filters.chapter?.includes(chapter.name) || false}
                         onCheckedChange={(checked) =>
-                          handleCheckboxChange('chapter', chapter, checked as boolean)
+                          handleCheckboxChange('chapter', chapter.name, checked as boolean)
                         }
                       />
-                      <span className="text-xs font-medium">{chapter}</span>
+                      <span className="max-w-full truncate text-xs font-medium" title={chapter.name}>
+                        {chapter.name}
+                      </span>
                     </label>
                   ))}
                 </div>
-              ) : (
-                <p className="text-muted-foreground text-xs">{t('questionBank.filters.noChapters')}</p>
-              )}
-            </div>
+              </div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>

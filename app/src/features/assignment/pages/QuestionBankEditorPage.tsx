@@ -17,6 +17,7 @@ import {
   useCreateQuestion,
   useUpdateQuestion,
   useQuestionBankItem,
+  useQuestionBankChapters,
 } from '@/features/assignment/hooks/useQuestionBankApi';
 import type { CreateQuestionRequest, Question, QuestionBankItem } from '@/features/assignment/types';
 import {
@@ -121,6 +122,9 @@ export function QuestionBankEditorPage() {
   // Mutations
   const createMutation = useCreateQuestion();
   const updateMutation = useUpdateQuestion();
+
+  // Fetch chapters when subject and grade are selected
+  const { data: chapters } = useQuestionBankChapters(questionData?.subject, questionData?.grade);
 
   // Initialize form data
   useEffect(() => {
@@ -299,13 +303,17 @@ export function QuestionBankEditorPage() {
                 )}
 
                 {/* Metadata Row */}
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-4 gap-4">
                   <div className="space-y-2">
                     <Label>{t('form.subject')}</Label>
                     <Select
                       value={questionData.subject}
                       onValueChange={(value) =>
-                        setQuestionData({ ...questionData, subject: value as SubjectCode })
+                        setQuestionData({
+                          ...questionData,
+                          subject: value as SubjectCode,
+                          chapter: undefined,
+                        })
                       }
                     >
                       <SelectTrigger>
@@ -347,7 +355,7 @@ export function QuestionBankEditorPage() {
                     <Select
                       value={questionData.grade || ''}
                       onValueChange={(value) =>
-                        setQuestionData({ ...questionData, grade: value || undefined })
+                        setQuestionData({ ...questionData, grade: value || undefined, chapter: undefined })
                       }
                     >
                       <SelectTrigger>
@@ -357,6 +365,34 @@ export function QuestionBankEditorPage() {
                         {getAllGrades().map((grade) => (
                           <SelectItem key={grade.code} value={grade.code}>
                             {grade.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>{t('form.chapter')}</Label>
+                    <Select
+                      value={questionData.chapter || ''}
+                      onValueChange={(value) =>
+                        setQuestionData({ ...questionData, chapter: value || undefined })
+                      }
+                      disabled={!questionData.subject || !questionData.grade}
+                    >
+                      <SelectTrigger>
+                        <SelectValue
+                          placeholder={
+                            !questionData.subject || !questionData.grade
+                              ? t('form.selectSubjectGradeFirst')
+                              : t('form.selectChapterOptional')
+                          }
+                        />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {chapters?.map((chapter) => (
+                          <SelectItem key={chapter.id} value={chapter.name}>
+                            {chapter.name}
                           </SelectItem>
                         ))}
                       </SelectContent>

@@ -23,6 +23,7 @@ export interface StudentFormDialogProps {
   mode?: StudentFormMode;
   initialData?: Student;
   onSuccess?: () => void;
+  onStudentCreated?: (student: Student) => void;
 }
 
 /**
@@ -63,6 +64,7 @@ export function StudentFormDialog({
   mode = 'create',
   initialData,
   onSuccess,
+  onStudentCreated,
 }: StudentFormDialogProps) {
   const { t } = useTranslation('classes', { keyPrefix: 'roster' });
   const { t: tValidation } = useTranslation('classes');
@@ -107,10 +109,11 @@ export function StudentFormDialog({
   const onSubmit = handleSubmit((data: StudentFormData) => {
     if (mode === 'create') {
       createStudent.mutate(data, {
-        onSuccess: () => {
+        onSuccess: (student) => {
           reset();
           onOpenChange(false);
           onSuccess?.();
+          onStudentCreated?.(student);
         },
       });
     } else if (mode === 'edit' && initialData) {

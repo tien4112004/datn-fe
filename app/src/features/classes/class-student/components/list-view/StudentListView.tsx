@@ -8,6 +8,7 @@ import { useAuth } from '@/shared/context/auth';
 import type { Student } from '../../types';
 import { StudentFormDialog } from './StudentFormDialog';
 import { StudentDeleteConfirmation } from './StudentDeleteConfirmation';
+import { StudentCredentialsModal, type StudentCredential } from '../credentials';
 import { type StudentFormMode, useStudentMutations } from '../../hooks';
 import { useConfirmDialog } from '@/shared/hooks/useConfirmDialog';
 import { CsvImportButton } from '../../../import-student';
@@ -24,6 +25,8 @@ export const StudentListView = ({ students, classId, isLoading = false }: Studen
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [editingStudent, setEditingStudent] = useState<Student | null>(null);
   const [dialogMode, setDialogMode] = useState<StudentFormMode>('create');
+  const [credentialsToShow, setCredentialsToShow] = useState<StudentCredential[]>([]);
+  const [isCredentialsModalOpen, setIsCredentialsModalOpen] = useState(false);
 
   const isTeacher = user?.role === 'teacher';
 
@@ -62,6 +65,11 @@ export const StudentListView = ({ students, classId, isLoading = false }: Studen
     setDialogMode('create');
     setEditingStudent(null);
     setIsAddDialogOpen(true);
+  };
+
+  const handleShowCredentials = (credentials: StudentCredential[]) => {
+    setCredentialsToShow(credentials);
+    setIsCredentialsModalOpen(true);
   };
 
   const columns: ColumnDef<Student>[] = [
@@ -223,6 +231,20 @@ export const StudentListView = ({ students, classId, isLoading = false }: Studen
           classId={classId}
           mode={dialogMode}
           initialData={editingStudent || undefined}
+          onStudentCreated={(student) => {
+            // Only show credentials on creation (username/password only returned then)
+            if (student.username && student.password) {
+              handleShowCredentials([
+                {
+                  studentId: student.id,
+                  fullName: student.fullName || `${student.firstName} ${student.lastName}`,
+                  username: student.username,
+                  password: student.password,
+                  email: student.parentContactEmail || undefined,
+                },
+              ]);
+            }
+          }}
         />
       )}
 
@@ -241,6 +263,14 @@ export const StudentListView = ({ students, classId, isLoading = false }: Studen
           isDeleting={isDeleting}
         />
       )}
+
+      {/* Student Credentials Modal */}
+      <StudentCredentialsModal
+        open={isCredentialsModalOpen}
+        onOpenChange={setIsCredentialsModalOpen}
+        credentials={credentialsToShow}
+        mode="single"
+      />
     </div>
   );
 };

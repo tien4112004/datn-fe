@@ -6,7 +6,7 @@
 export default {
   loading: {
     page: 'Đang tải trang...',
-    presentation: 'Đang tải trình chỉnh sửa thuyết trình...',
+    presentation: 'Đang tải thuyết trình...',
     generatingPresentation: 'Đang tạo thuyết trình...',
     processingPresentation: 'Đang xử lý thuyết trình...',
     savingPresentation: 'Đang lưu thuyết trình...',

@@ -48,6 +48,7 @@ export default defineConfig(({ mode }) => {
     ],
 
     server: {
+      allowedHosts: ['nitro15.tail5769d8.ts.net'],
       fs: {
         allow: ['.', '../shared'],
       },

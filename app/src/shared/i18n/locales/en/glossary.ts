@@ -6,7 +6,7 @@
 export default {
   loading: {
     page: 'Loading page...',
-    presentation: 'Loading presentation editor...',
+    presentation: 'Loading presentation...',
     generatingPresentation: 'Generating presentation...',
     processingPresentation: 'Processing presentation...',
     savingPresentation: 'Saving presentation...',

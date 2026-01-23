@@ -6,6 +6,7 @@ import { Flow, LogicHandler, Toolbar, MindmapControls } from '@/features/mindmap
 import { Button } from '@/components/ui/button';
 import { useState, useEffect } from 'react';
 import { useLoaderData } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useCoreStore } from '../stores';
 import type { Mindmap } from '../types';
 import { MindmapPermissionProvider } from '../contexts/MindmapPermissionContext';
@@ -34,11 +35,20 @@ const MindmapEmbedPage = () => {
   const { mindmap } = useLoaderData() as { mindmap: Mindmap };
   const setNodes = useCoreStore((state) => state.setNodes);
   const setEdges = useCoreStore((state) => state.setEdges);
+  const { i18n } = useTranslation();
 
   const [isPanOnDrag, setIsPanOnDrag] = useState(false);
   const [isCommentDrawerOpen, setIsCommentDrawerOpen] = useState(false);
 
   const userPermission = mindmap?.permission;
+
+  // Apply locale from localStorage (injected by Flutter WebView)
+  useEffect(() => {
+    const savedLocale = localStorage.getItem('i18nextLng');
+    if (savedLocale && savedLocale !== i18n.language) {
+      i18n.changeLanguage(savedLocale);
+    }
+  }, [i18n]);
 
   // Fullscreen functionality
 
@@ -50,6 +60,14 @@ const MindmapEmbedPage = () => {
 
       setNodes(migratedNodes);
       setEdges(mindmap.edges);
+
+      // Notify Flutter that mindmap is loaded (hides native loader)
+      if ((window as any).flutter_inappwebview) {
+        (window as any).flutter_inappwebview.callHandler('mindmapLoaded', {
+          success: true,
+          nodeCount: migratedNodes.length,
+        });
+      }
     }
   }, [mindmap, setNodes, setEdges]);
 

@@ -4,6 +4,27 @@ import { FONTS } from '@/configs/font';
 
 const loadedFonts = new Set<string>();
 
+// System fonts that are NOT available on Google Fonts - skip loading attempts
+const SYSTEM_FONTS = new Set([
+  'Arial',
+  'Verdana',
+  'Georgia',
+  'Times New Roman',
+  'Courier New',
+  'Trebuchet MS',
+  'Impact',
+  'Comic Sans MS',
+  'Tahoma',
+  'Lucida Console',
+  'sans-serif',
+  'serif',
+  'monospace',
+]);
+
+function isSystemFont(fontFamily: string): boolean {
+  return SYSTEM_FONTS.has(fontFamily);
+}
+
 function loadGoogleFont(fontFamily: string): Promise<void> {
   return new Promise((resolve, reject) => {
     if (loadedFonts.has(fontFamily)) {
@@ -44,7 +65,8 @@ export function testFontRendering(fontFamily: string): boolean {
 }
 
 export async function ensureFontAvailability(fontFamily: string): Promise<boolean> {
-  if (fontFamily === 'sans-serif') return true;
+  // System fonts are assumed available (browser will use fallback if not)
+  if (isSystemFont(fontFamily)) return true;
 
   const isAvailable = testFontRendering(fontFamily);
 
@@ -65,10 +87,13 @@ export async function initializeFonts(): Promise<void> {
   const fallbackFonts: string[] = [];
 
   FONTS.forEach((font) => {
+    // Skip system fonts - they're not on Google Fonts
+    if (isSystemFont(font.value)) return;
+
     const available = testFontRendering(font.value);
     // console.log(`${font.label}: ${available ? 'AVAILABLE' : 'FALLBACK'}`);
 
-    if (!available && font.value !== 'sans-serif') {
+    if (!available) {
       fallbackFonts.push(font.value);
     }
   });

@@ -77,13 +77,13 @@ const Toolbar = ({
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="flex flex-1 flex-col">
-        <TabsList className={cn('grid w-full grid-cols-3', isMobileSheet && 'h-12')}>
-          <TabsTrigger value="general" className={cn(isMobileSheet && 'text-base')}>
+        <TabsList className={cn('grid w-full grid-cols-3', isMobileSheet ? 'h-12' : 'h-10')}>
+          <TabsTrigger value="general" className={cn(isMobileSheet ? 'text-base' : 'text-sm')}>
             {t('toolbar.tabs.general')}
           </TabsTrigger>
           <TabsTrigger
             value="selection"
-            className={cn(hasSelection && 'relative', isMobileSheet && 'text-base')}
+            className={cn(hasSelection && 'relative', isMobileSheet ? 'text-base' : 'text-sm')}
           >
             {t('toolbar.tabs.selection')}
             {hasSelection && (
@@ -97,7 +97,7 @@ const Toolbar = ({
               </span>
             )}
           </TabsTrigger>
-          <TabsTrigger value="tree" className={cn(isMobileSheet && 'text-base')}>
+          <TabsTrigger value="tree" className={cn(isMobileSheet ? 'text-base' : 'text-sm')}>
             {t('toolbar.tabs.tree')}
           </TabsTrigger>
         </TabsList>
@@ -119,7 +119,7 @@ const Toolbar = ({
                 size="sm"
                 className={cn(
                   'w-full transition-colors hover:bg-blue-600 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-500',
-                  isMobileSheet && 'h-11 min-h-[44px] text-base'
+                  isMobileSheet ? 'h-11 min-h-[44px] text-base' : 'h-9 text-sm'
                 )}
               >
                 <GitBranchPlus size={isMobileSheet ? 20 : 16} />
@@ -132,7 +132,7 @@ const Toolbar = ({
                 size="sm"
                 className={cn(
                   'w-full gap-2 transition-colors hover:border-purple-400 hover:bg-purple-50 hover:text-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500',
-                  isMobileSheet && 'h-11 min-h-[44px] text-base'
+                  isMobileSheet ? 'h-11 min-h-[44px] text-base' : 'h-9 text-sm'
                 )}
               >
                 <Sparkles size={isMobileSheet ? 20 : 16} />
@@ -155,7 +155,7 @@ const Toolbar = ({
                 size="sm"
                 className={cn(
                   'w-full transition-colors hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500 disabled:opacity-50',
-                  isMobileSheet && 'h-11 min-h-[44px] text-base'
+                  isMobileSheet ? 'h-11 min-h-[44px] text-base' : 'h-9 text-sm'
                 )}
               >
                 <Undo size={isMobileSheet ? 20 : 16} />
@@ -169,7 +169,7 @@ const Toolbar = ({
                 size="sm"
                 className={cn(
                   'w-full transition-colors hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500 disabled:opacity-50',
-                  isMobileSheet && 'h-11 min-h-[44px] text-base'
+                  isMobileSheet ? 'h-11 min-h-[44px] text-base' : 'h-9 text-sm'
                 )}
               >
                 <Redo size={isMobileSheet ? 20 : 16} />
@@ -191,7 +191,7 @@ const Toolbar = ({
                 loadingText={t('toolbar.save.saving')}
                 className={cn(
                   'w-full transition-colors hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500',
-                  isMobileSheet && 'h-11 min-h-[44px] text-base'
+                  isMobileSheet ? 'h-11 min-h-[44px] text-base' : 'h-9 text-sm'
                 )}
                 title={t('toolbar.tooltips.saveMindmap')}
                 size="sm"
@@ -204,7 +204,7 @@ const Toolbar = ({
                 onClick={() => setIsExportDialogOpen(true)}
                 className={cn(
                   'w-full transition-colors hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500',
-                  isMobileSheet && 'h-11 min-h-[44px] text-base'
+                  isMobileSheet ? 'h-11 min-h-[44px] text-base' : 'h-9 text-sm'
                 )}
                 size="sm"
               >
@@ -217,7 +217,7 @@ const Toolbar = ({
                   onClick={() => setIsShareDialogOpen(true)}
                   className={cn(
                     'w-full transition-colors hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500',
-                    isMobileSheet && 'h-11 min-h-[44px] text-base'
+                    isMobileSheet ? 'h-11 min-h-[44px] text-base' : 'h-9 text-sm'
                   )}
                   size="sm"
                   title={t('toolbar.tooltips.share')}

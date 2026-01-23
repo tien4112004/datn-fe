@@ -1,7 +1,7 @@
 import { ReactFlowProvider } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { Background, BackgroundVariant, MiniMap } from '@xyflow/react';
-import { PanelRight, PanelRightOpen, Sliders, X, MessageSquare } from 'lucide-react';
+import { PanelRight, PanelRightOpen, X, MessageSquare } from 'lucide-react';
 import {
   Flow,
   LogicHandler,
@@ -18,9 +18,8 @@ import { useMindmapDirtyTracking } from '../hooks/useDirtyTracking';
 import { useFullscreen } from '../hooks/useFullscreen';
 import { usePresenterMode } from '../hooks/usePresenterMode';
 import { useCommentDrawerTrigger } from '../hooks/useCommentDrawer';
-import { useUnsavedChangesBlocker, useResponsiveBreakpoint } from '@/shared/hooks';
+import { useUnsavedChangesBlocker, useResponsiveBreakpoint, useIsMobile } from '@/shared/hooks';
 import { useSidebar } from '@/shared/components/ui/sidebar';
-import { useIsMobile } from '@/shared/hooks/use-mobile';
 import { MindmapPermissionProvider } from '../contexts/MindmapPermissionContext';
 import { UnsavedChangesDialog } from '@/shared/components/modals/UnsavedChangesDialog';
 import { SmallScreenDialog } from '@/shared/components/modals/SmallScreenDialog';
@@ -75,7 +74,6 @@ const MindmapPage = () => {
 
   const [isPanOnDrag, setIsPanOnDrag] = useState(false);
   const [isToolbarVisible, setIsToolbarVisible] = useState(isDesktop);
-  const [isControlsExpanded, setIsControlsExpanded] = useState(false);
   const [isCommentDrawerOpen, setIsCommentDrawerOpen] = useState(false);
 
   // Track dirty state changes
@@ -145,70 +143,20 @@ const MindmapPage = () => {
             <Flow isPanOnDrag={isPanOnDrag}>
               {/* Breadcrumb Header */}
               <MindmapBreadcrumbHeader mindmapId={mindmap.id} initialTitle={mindmap.title} />
-              {/* Controls - always visible on desktop, toggleable on mobile */}
-              {isDesktop ? (
-                // Desktop: Always visible controls
-                <div className={`bottom-4 left-4 z-10 ${isMobile ? 'fixed' : 'absolute'}`}>
-                  <MindmapControls
-                    isPanOnDrag={isPanOnDrag}
-                    isPresenterMode={isPresenterMode}
-                    isFullscreen={isFullscreen}
-                    onTogglePanOnDrag={togglePanOnDrag}
-                    onToggleFullscreen={toggleFullscreenMode}
-                    onTogglePresenterMode={togglePresenterMode}
-                  />
-                </div>
-              ) : (
-                !isPresenterMode && (
-                  // Mobile: Expandable controls with toggle button
-                  <div className="fixed bottom-4 left-4 z-10 flex flex-col items-start">
-                    {/* Controls container with animation - expands upward */}
-                    <div
-                      className={`origin-bottom transition-all duration-300 ease-in-out ${
-                        isControlsExpanded
-                          ? 'scale-y-100 opacity-100'
-                          : 'pointer-events-none scale-y-0 opacity-0'
-                      }`}
-                    >
-                      <div className="mb-2">
-                        <MindmapControls
-                          isPanOnDrag={isPanOnDrag}
-                          isPresenterMode={isPresenterMode}
-                          isFullscreen={isFullscreen}
-                          onTogglePanOnDrag={togglePanOnDrag}
-                          onToggleFullscreen={toggleFullscreenMode}
-                          onTogglePresenterMode={togglePresenterMode}
-                        />
-                      </div>
-                    </div>
-
-                    {/* Action buttons - always at the bottom */}
-                    <div className="flex gap-2">
-                      <Button
-                        onClick={() => setIsCommentDrawerOpen(true)}
-                        variant="outline"
-                        size="icon"
-                        className="touch-manipulation shadow-md"
-                        title="Comments"
-                      >
-                        <MessageSquare size={18} />
-                      </Button>
-                      <Button
-                        onClick={() => setIsControlsExpanded(!isControlsExpanded)}
-                        variant="outline"
-                        size="icon"
-                        className="touch-manipulation shadow-md"
-                        title={isControlsExpanded ? 'Hide Controls' : 'Show Controls'}
-                      >
-                        {isControlsExpanded ? <X size={18} /> : <Sliders size={18} />}
-                      </Button>
-                    </div>
-                  </div>
-                )
-              )}
+              {/* Controls */}
+              <div className={`absolute bottom-4 left-4 z-10`}>
+                <MindmapControls
+                  isPanOnDrag={isPanOnDrag}
+                  isPresenterMode={isPresenterMode}
+                  isFullscreen={isFullscreen}
+                  onTogglePanOnDrag={togglePanOnDrag}
+                  onToggleFullscreen={isMobile ? null : toggleFullscreenMode}
+                  onTogglePresenterMode={isMobile ? null : togglePresenterMode}
+                />
+              </div>
 
               {!isPresenterMode && (
-                <div className={`right-4 top-4 z-10 flex gap-2 ${isMobile ? 'fixed' : 'absolute'}`}>
+                <div className={`absolute right-4 top-4 z-10 flex gap-2`}>
                   <Button
                     onClick={() => setIsCommentDrawerOpen(true)}
                     title="Comments"
@@ -231,7 +179,6 @@ const MindmapPage = () => {
                   )}
                 </div>
               )}
-
               {!isPresenterMode && (
                 <MiniMap
                   className="!border-border !mb-4 !mr-4 hidden !bg-white/90 lg:block"
@@ -245,7 +192,6 @@ const MindmapPage = () => {
                   position="bottom-right"
                 />
               )}
-
               <Background variant={BackgroundVariant.Dots} gap={20} size={1} />
               <LogicHandler
                 mindmapId={mindmap.id}

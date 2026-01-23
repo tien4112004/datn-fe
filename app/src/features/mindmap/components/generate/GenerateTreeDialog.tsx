@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Sparkles, Settings2, Eye, Wand2 } from 'lucide-react';
+import { Sparkles, Settings2 } from 'lucide-react';
+import { useForm, Controller } from 'react-hook-form';
+import { useReactFlow } from '@xyflow/react';
 
 import {
   Dialog,
@@ -10,68 +12,130 @@ import {
   DialogFooter,
 } from '@/shared/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/shared/components/ui/textarea';
+import { AutosizeTextarea } from '@/components/ui/autosize-textarea';
 import { Label } from '@/shared/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
-import { Slider } from '@/shared/components/ui/slider';
-import { Switch } from '@/shared/components/ui/switch';
 import { Separator } from '@/shared/components/ui/separator';
 import { ScrollArea } from '@/shared/components/ui/scroll-area';
-import { cn } from '@/shared/lib/utils';
 import { LAYOUT_TYPE } from '../../types';
-import type { LayoutType } from '../../types';
+import type { MindMapNode, MindMapEdge } from '../../types';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
+import { ModelSelect } from '@/features/model/components/ModelSelect';
+import { useModels, MODEL_TYPES } from '@/features/model';
+import { LANGUAGE_OPTIONS, MAX_DEPTH_OPTIONS, MAX_BRANCHES_OPTIONS } from '../../types/form';
+import type { CreateMindmapFormData } from '../../types/form';
+import { useGenerateMindmap } from '../../hooks/useApi';
+import { convertAiDataToMindMapNodes, getTreeLayoutType } from '../../services/utils';
+import { useCoreStore, useLayoutStore, useUndoRedoStore } from '../../stores';
+import { MINDMAP_TYPES } from '../../types/constants';
 
 interface GenerateTreeDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  onGenerate?: (prompt: string, options: GenerateOptions) => void;
 }
 
-interface GenerateOptions {
-  layoutType: LayoutType;
-  maxDepth: number;
-  maxChildren: number;
-  includeDescriptions: boolean;
-}
-
-// Mock preview data for UI demonstration
-const MOCK_PREVIEW_NODES = [
-  { id: '1', label: 'Main Topic', level: 0 },
-  { id: '2', label: 'Subtopic 1', level: 1 },
-  { id: '3', label: 'Subtopic 2', level: 1 },
-  { id: '4', label: 'Detail 1.1', level: 2 },
-  { id: '5', label: 'Detail 1.2', level: 2 },
-  { id: '6', label: 'Detail 2.1', level: 2 },
-];
-
-function GenerateTreeDialog({ isOpen, onOpenChange, onGenerate }: GenerateTreeDialogProps) {
+function GenerateTreeDialog({ isOpen, onOpenChange }: GenerateTreeDialogProps) {
   const { t } = useTranslation(I18N_NAMESPACES.MINDMAP);
+  const reactFlowInstance = useReactFlow();
 
-  // Form state
-  const [prompt, setPrompt] = useState('');
-  const [layoutType, setLayoutType] = useState<LayoutType>(LAYOUT_TYPE.HORIZONTAL_BALANCED);
-  const [maxDepth, setMaxDepth] = useState(3);
-  const [maxChildren, setMaxChildren] = useState(5);
-  const [includeDescriptions, setIncludeDescriptions] = useState(false);
+  // Get models
+  const { models, isLoading: isModelsLoading, isError: isModelsError } = useModels(MODEL_TYPES.TEXT);
 
-  const handleGenerate = () => {
-    onGenerate?.(prompt, {
-      layoutType,
-      maxDepth,
-      maxChildren,
-      includeDescriptions,
-    });
-    onOpenChange(false);
+  // Get stores
+  const { nodes, setNodes, setEdges } = useCoreStore();
+  const { applyAutoLayout } = useLayoutStore();
+  const { prepareToPushUndo, pushToUndoStack } = useUndoRedoStore();
+
+  // Get API hook
+  const generateMutation = useGenerateMindmap();
+
+  // Get current layout type from existing nodes
+  const currentLayoutType = nodes.length > 0 ? getTreeLayoutType(nodes) : LAYOUT_TYPE.HORIZONTAL_BALANCED;
+
+  // Form state using react-hook-form
+  const form = useForm<CreateMindmapFormData>({
+    defaultValues: {
+      topic: '',
+      model: {
+        name: '',
+        provider: '',
+      },
+      language: 'en',
+      maxDepth: 3,
+      maxBranchesPerNode: 5,
+    },
+  });
+
+  const { control, handleSubmit, watch, reset } = form;
+  const topicValue = watch('topic');
+
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const onSubmit = async (data: CreateMindmapFormData) => {
+    setError(null);
+    setIsGenerating(true);
+    prepareToPushUndo();
+
+    try {
+      // Generate AI nodes using the API
+      const aiResponse = await generateMutation.mutateAsync({
+        topic: data.topic,
+        model: data.model.name,
+        provider: data.model.provider,
+        language: data.language,
+        maxDepth: data.maxDepth,
+        maxBranchesPerNode: data.maxBranchesPerNode,
+      });
+
+      // Get current viewport center as base position
+      const viewportCenter = reactFlowInstance.screenToFlowPosition({
+        x: window.innerWidth / 2,
+        y: window.innerHeight / 2,
+      });
+
+      // Convert AI response to mindmap nodes/edges with layout applied
+      const { nodes: aiNodes, edges: aiEdges } = await convertAiDataToMindMapNodes(
+        aiResponse,
+        viewportCenter,
+        currentLayoutType
+      );
+
+      // Add generated nodes to the existing mindmap
+      setNodes((existingNodes: MindMapNode[]) => [
+        ...existingNodes.map((node) => ({ ...node, selected: false })),
+        ...aiNodes.map((node) => ({ ...node, selected: true })),
+      ]);
+      setEdges((existingEdges: MindMapEdge[]) => [...existingEdges, ...aiEdges]);
+
+      // Apply layout to the newly added root node
+      const newRootNode = aiNodes.find((n) => n.type === MINDMAP_TYPES.ROOT_NODE);
+      if (newRootNode) {
+        setTimeout(() => {
+          applyAutoLayout(newRootNode.id);
+        }, 200);
+      }
+
+      pushToUndoStack();
+      reset();
+      onOpenChange(false);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to generate mindmap tree');
+      console.error('Tree generation failed:', err);
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const handleCancel = () => {
+    reset();
+    setError(null);
     onOpenChange(false);
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[85vh] !max-w-5xl overflow-hidden p-0">
+      <DialogContent className="max-h-[85vh] !max-w-4xl p-0">
         <DialogHeader className="border-b px-6 py-4">
           <DialogTitle className="flex items-center gap-2">
             <Sparkles className="text-primary h-5 w-5" />
@@ -79,241 +143,173 @@ function GenerateTreeDialog({ isOpen, onOpenChange, onGenerate }: GenerateTreeDi
           </DialogTitle>
         </DialogHeader>
 
-        <div className="flex flex-1 overflow-hidden">
-          {/* Left Side - Prompt and Options */}
-          <div className="flex w-1/2 flex-col border-r">
-            <ScrollArea className="flex-1 p-6">
-              {/* Prompt Section */}
-              <div className="space-y-4">
-                <div className="flex items-center gap-2">
-                  <Wand2 className="text-muted-foreground h-4 w-4" />
-                  <h3 className="font-semibold">{t('generate.prompt.title')}</h3>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="prompt">{t('generate.prompt.label')}</Label>
-                  <Textarea
-                    id="prompt"
-                    placeholder={t('generate.prompt.placeholder')}
-                    value={prompt}
-                    onChange={(e) => setPrompt(e.target.value)}
-                    className="min-h-[120px] resize-none"
-                  />
-                  <p className="text-muted-foreground text-xs">{t('generate.prompt.hint')}</p>
-                </div>
-              </div>
-
-              <Separator className="my-6" />
-
-              {/* Options Section */}
-              <div className="space-y-6">
-                <div className="flex items-center gap-2">
-                  <Settings2 className="text-muted-foreground h-4 w-4" />
-                  <h3 className="font-semibold">{t('generate.options.title')}</h3>
-                </div>
-
-                {/* Max Depth */}
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <Label>{t('generate.options.maxDepth')}</Label>
-                    <span className="text-muted-foreground text-sm font-medium">{maxDepth}</span>
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-1 flex-col overflow-hidden px-4">
+          <div className="flex flex-1">
+            {/* Left Side - Form and Options */}
+            <div className="flex w-full flex-col border-r">
+              <ScrollArea className="flex-1 p-6">
+                {/* Topic Section */}
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="topic">{t('create.promptTitle')}</Label>
+                    <Controller
+                      name="topic"
+                      control={control}
+                      rules={{ required: true, minLength: 1, maxLength: 500 }}
+                      render={({ field }) => (
+                        <div className="px-2">
+                          <AutosizeTextarea
+                            id="topic"
+                            placeholder={t('create.promptPlaceholder')}
+                            value={field.value}
+                            onChange={(e) => field.onChange(e.target.value)}
+                            minHeight={80}
+                            maxHeight={200}
+                            className="w-full"
+                          />
+                        </div>
+                      )}
+                    />
+                    <p className="text-muted-foreground text-xs">{t('generate.prompt.hint')}</p>
                   </div>
-                  <Slider
-                    value={[maxDepth]}
-                    onValueChange={([value]) => setMaxDepth(value)}
-                    min={1}
-                    max={5}
-                    step={1}
-                    className="w-full"
-                  />
-                  <p className="text-muted-foreground text-xs">{t('generate.options.maxDepthHint')}</p>
                 </div>
 
-                {/* Max Children per Node */}
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <Label>{t('generate.options.maxChildren')}</Label>
-                    <span className="text-muted-foreground text-sm font-medium">{maxChildren}</span>
-                  </div>
-                  <Slider
-                    value={[maxChildren]}
-                    onValueChange={([value]) => setMaxChildren(value)}
-                    min={2}
-                    max={10}
-                    step={1}
-                    className="w-full"
-                  />
-                  <p className="text-muted-foreground text-xs">{t('generate.options.maxChildrenHint')}</p>
-                </div>
+                <Separator className="my-6" />
 
-                {/* Include Descriptions */}
-                <div className="flex items-center justify-between rounded-lg border p-4">
-                  <div className="space-y-0.5">
-                    <Label>{t('generate.options.includeDescriptions')}</Label>
-                    <p className="text-muted-foreground text-xs">
-                      {t('generate.options.includeDescriptionsHint')}
-                    </p>
+                {/* Advanced Options Section */}
+                <div className="space-y-6">
+                  <div className="flex items-center gap-2">
+                    <Settings2 className="text-muted-foreground h-4 w-4" />
+                    <h3 className="font-semibold">{t('generate.options.title')}</h3>
                   </div>
-                  <Switch checked={includeDescriptions} onCheckedChange={setIncludeDescriptions} />
+
+                  {/* Model and Language Row */}
+                  <div className="grid grid-cols-2 gap-4">
+                    {/* Model */}
+                    <div className="space-y-2">
+                      <Label>{t('create.model.label')}</Label>
+                      <Controller
+                        name="model"
+                        control={control}
+                        rules={{ required: true }}
+                        render={({ field }) => (
+                          <ModelSelect
+                            models={models}
+                            value={field.value}
+                            onValueChange={field.onChange}
+                            placeholder={t('create.model.placeholder')}
+                            label={t('create.model.label')}
+                            isLoading={isModelsLoading}
+                            isError={isModelsError}
+                          />
+                        )}
+                      />
+                    </div>
+
+                    {/* Language */}
+                    <div className="space-y-2">
+                      <Label>{t('create.language.label')}</Label>
+                      <Controller
+                        name="language"
+                        control={control}
+                        render={({ field }) => (
+                          <Select value={field.value} onValueChange={field.onChange}>
+                            <SelectTrigger>
+                              <SelectValue placeholder={t('create.language.placeholder')} />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {LANGUAGE_OPTIONS.map((opt) => (
+                                <SelectItem key={opt.value} value={opt.value}>
+                                  {t(`create.language.${opt.labelKey}` as never)}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        )}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Max Depth and Max Branches Row */}
+                  <div className="grid grid-cols-2 gap-4">
+                    {/* Max Depth */}
+                    <div className="space-y-2">
+                      <Label>{t('create.maxDepth.label')}</Label>
+                      <Controller
+                        name="maxDepth"
+                        control={control}
+                        render={({ field }) => (
+                          <Select
+                            value={String(field.value)}
+                            onValueChange={(v) => field.onChange(Number(v))}
+                          >
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {MAX_DEPTH_OPTIONS.map((depth) => (
+                                <SelectItem key={depth} value={String(depth)}>
+                                  {depth}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        )}
+                      />
+                      <p className="text-muted-foreground text-xs">{t('create.maxDepth.description')}</p>
+                    </div>
+
+                    {/* Max Branches Per Node */}
+                    <div className="space-y-2">
+                      <Label>{t('create.maxBranches.label')}</Label>
+                      <Controller
+                        name="maxBranchesPerNode"
+                        control={control}
+                        render={({ field }) => (
+                          <Select
+                            value={String(field.value)}
+                            onValueChange={(v) => field.onChange(Number(v))}
+                          >
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {MAX_BRANCHES_OPTIONS.map((branches) => (
+                                <SelectItem key={branches} value={String(branches)}>
+                                  {branches}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        )}
+                      />
+                      <p className="text-muted-foreground text-xs">{t('create.maxBranches.description')}</p>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </ScrollArea>
+              </ScrollArea>
+            </div>
           </div>
 
-          {/* Right Side - Preview */}
-          <div className="bg-muted/30 flex w-1/2 flex-col">
-            <div className="flex items-center justify-between border-b px-6 py-3">
-              <div className="flex items-center gap-2">
-                <Eye className="text-muted-foreground h-4 w-4" />
-                <h3 className="font-semibold">{t('generate.preview.title')}</h3>
-              </div>
-
-              {/* Layout Selector */}
-              <Select value={layoutType} onValueChange={(value) => setLayoutType(value as LayoutType)}>
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder={t('generate.preview.selectLayout')} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={LAYOUT_TYPE.HORIZONTAL_BALANCED}>
-                    {t('toolbar.layout.horizontalBalanced')}
-                  </SelectItem>
-                  <SelectItem value={LAYOUT_TYPE.VERTICAL_BALANCED}>
-                    {t('toolbar.layout.verticalBalanced')}
-                  </SelectItem>
-                  <SelectItem value={LAYOUT_TYPE.RIGHT_ONLY}>{t('toolbar.layout.rightOnly')}</SelectItem>
-                  <SelectItem value={LAYOUT_TYPE.LEFT_ONLY}>{t('toolbar.layout.leftOnly')}</SelectItem>
-                  <SelectItem value={LAYOUT_TYPE.BOTTOM_ONLY}>{t('toolbar.layout.bottomOnly')}</SelectItem>
-                  <SelectItem value={LAYOUT_TYPE.TOP_ONLY}>{t('toolbar.layout.topOnly')}</SelectItem>
-                </SelectContent>
-              </Select>
+          {/* Error Display */}
+          {error && (
+            <div className="border-t bg-red-50 px-6 py-3">
+              <p className="text-sm text-red-600">{error}</p>
             </div>
+          )}
 
-            {/* Preview Area */}
-            <div className="flex flex-1 items-center justify-center p-6">
-              <PreviewMindmap nodes={MOCK_PREVIEW_NODES} layoutType={layoutType} />
-            </div>
-          </div>
-        </div>
-
-        <DialogFooter className="border-t px-6 py-4">
-          <Button variant="outline" onClick={handleCancel}>
-            {t('generate.actions.cancel')}
-          </Button>
-          <Button onClick={handleGenerate} disabled={!prompt.trim()} className="gap-2">
-            <Sparkles className="h-4 w-4" />
-            {t('generate.actions.generate')}
-          </Button>
-        </DialogFooter>
+          <DialogFooter className="border-t px-6 py-4">
+            <Button type="button" variant="outline" onClick={handleCancel} disabled={isGenerating}>
+              {t('generate.actions.cancel')}
+            </Button>
+            <Button type="submit" disabled={!topicValue.trim() || isGenerating} className="gap-2">
+              <Sparkles className="h-4 w-4" />
+              {isGenerating ? t('create.generating') : t('generate.actions.generate')}
+            </Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
-  );
-}
-
-// Simple preview component to visualize the mindmap structure
-interface PreviewNode {
-  id: string;
-  label: string;
-  level: number;
-}
-
-interface PreviewMindmapProps {
-  nodes: PreviewNode[];
-  layoutType: LayoutType;
-}
-
-function PreviewMindmap({ nodes, layoutType }: PreviewMindmapProps) {
-  const isVertical =
-    layoutType === LAYOUT_TYPE.VERTICAL_BALANCED ||
-    layoutType === LAYOUT_TYPE.TOP_ONLY ||
-    layoutType === LAYOUT_TYPE.BOTTOM_ONLY;
-
-  const rootNode = nodes.find((n) => n.level === 0);
-  const level1Nodes = nodes.filter((n) => n.level === 1);
-  const level2Nodes = nodes.filter((n) => n.level === 2);
-
-  // Group level 2 nodes by their parent (simplified for demo)
-  const level2ByParent: Record<string, PreviewNode[]> = {
-    '2': level2Nodes.filter((n) => n.id === '4' || n.id === '5'),
-    '3': level2Nodes.filter((n) => n.id === '6'),
-  };
-
-  return (
-    <div className={cn('flex items-center justify-center gap-8', isVertical ? 'flex-col' : 'flex-row')}>
-      {/* Left/Top side nodes */}
-      {(layoutType === LAYOUT_TYPE.HORIZONTAL_BALANCED ||
-        layoutType === LAYOUT_TYPE.LEFT_ONLY ||
-        layoutType === LAYOUT_TYPE.VERTICAL_BALANCED ||
-        layoutType === LAYOUT_TYPE.TOP_ONLY) && (
-        <div className={cn('flex gap-4', isVertical ? 'flex-row' : 'flex-col')}>
-          {level1Nodes.slice(0, 1).map((node) => (
-            <div
-              key={node.id}
-              className={cn('flex items-center gap-2', isVertical ? 'flex-col' : 'flex-row')}
-            >
-              <div className={cn('flex gap-2', isVertical ? 'flex-row' : 'flex-col')}>
-                {level2ByParent[node.id]?.map((child) => (
-                  <PreviewNodeCard key={child.id} label={child.label} level={child.level} />
-                ))}
-              </div>
-              <PreviewNodeCard label={node.label} level={node.level} />
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Root Node */}
-      {rootNode && <PreviewNodeCard label={rootNode.label} level={rootNode.level} isRoot />}
-
-      {/* Right/Bottom side nodes */}
-      {(layoutType === LAYOUT_TYPE.HORIZONTAL_BALANCED ||
-        layoutType === LAYOUT_TYPE.RIGHT_ONLY ||
-        layoutType === LAYOUT_TYPE.VERTICAL_BALANCED ||
-        layoutType === LAYOUT_TYPE.BOTTOM_ONLY) && (
-        <div className={cn('flex gap-4', isVertical ? 'flex-row' : 'flex-col')}>
-          {level1Nodes
-            .slice(
-              layoutType === LAYOUT_TYPE.HORIZONTAL_BALANCED || layoutType === LAYOUT_TYPE.VERTICAL_BALANCED
-                ? 1
-                : 0
-            )
-            .map((node) => (
-              <div
-                key={node.id}
-                className={cn('flex items-center gap-2', isVertical ? 'flex-col' : 'flex-row')}
-              >
-                <PreviewNodeCard label={node.label} level={node.level} />
-                <div className={cn('flex gap-2', isVertical ? 'flex-row' : 'flex-col')}>
-                  {level2ByParent[node.id]?.map((child) => (
-                    <PreviewNodeCard key={child.id} label={child.label} level={child.level} />
-                  ))}
-                </div>
-              </div>
-            ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-interface PreviewNodeCardProps {
-  label: string;
-  level: number;
-  isRoot?: boolean;
-}
-
-function PreviewNodeCard({ label, level, isRoot }: PreviewNodeCardProps) {
-  return (
-    <div
-      className={cn(
-        'rounded-md border px-3 py-1.5 text-xs font-medium shadow-sm transition-colors',
-        isRoot
-          ? 'border-primary from-primary/10 to-primary/20 text-primary bg-gradient-to-br'
-          : level === 1
-            ? 'border-border bg-card text-card-foreground'
-            : 'border-border/50 bg-muted/50 text-muted-foreground'
-      )}
-    >
-      {label}
-    </div>
   );
 }
 

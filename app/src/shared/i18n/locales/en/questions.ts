@@ -34,7 +34,6 @@ export default {
 
   // Question Bank Editor Page
   editor: {
-    breadcrumb: 'Question Bank',
     createTitle: 'Create New Question',
     editTitle: 'Edit Question',
     cancel: 'Cancel',

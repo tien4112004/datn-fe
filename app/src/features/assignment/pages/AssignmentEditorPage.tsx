@@ -2,14 +2,6 @@ import * as React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
-import {
-  Breadcrumb,
-  BreadcrumbList,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from '@/shared/components/ui/breadcrumb';
 import { AssignmentEditorLayout } from '../components/editor/AssignmentEditorLayout';
 import { MetadataEditDialog } from '../components/editor/MetadataEditDialog';
 import { QuestionBankDialog } from '../components/question-bank';
@@ -392,22 +384,6 @@ export const AssignmentEditorPage = () => {
   return (
     <div className="flex min-h-screen flex-col bg-white dark:bg-gray-950">
       <div className="p-8">
-        <Breadcrumb className="mb-8">
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink href="/projects?resource=assignment">
-                {t('breadcrumbs.assignments')}
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage>
-                {id ? t('breadcrumbs.editAssignment') : t('breadcrumbs.createAssignment')}
-              </BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
-
         <AssignmentEditorLayout onCancel={handleCancel} onSave={handleSubmit} isSaving={isSaving} />
 
         {/* Dialogs */}

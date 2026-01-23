@@ -270,13 +270,6 @@ export default {
     },
   },
   assignmentEditor: {
-    // Điều hướng breadcrumb
-    breadcrumbs: {
-      assignments: 'Bài Tập',
-      createAssignment: 'Tạo Bài Tập',
-      editAssignment: 'Chỉnh Sửa Bài Tập',
-    },
-
     // Nút hành động chính
     actions: {
       actions: 'Hành động',

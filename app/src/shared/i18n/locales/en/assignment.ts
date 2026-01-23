@@ -270,13 +270,6 @@ export default {
     },
   },
   assignmentEditor: {
-    // Breadcrumb navigation
-    breadcrumbs: {
-      assignments: 'Assignments',
-      createAssignment: 'Create Assignment',
-      editAssignment: 'Edit Assignment',
-    },
-
     // Main action buttons
     actions: {
       actions: 'Actions',

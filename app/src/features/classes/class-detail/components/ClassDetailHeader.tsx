@@ -1,12 +1,4 @@
 import { useTranslation } from 'react-i18next';
-import {
-  Breadcrumb,
-  BreadcrumbList,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb';
 import { Separator } from '@radix-ui/react-separator';
 import { Badge } from '@/components/ui/badge';
 import { getGradeLabel } from '../../shared/utils/grades';
@@ -22,21 +14,6 @@ export const ClassDetailHeader = ({ currentClass }: ClassDetailHeaderProps) => {
 
   return (
     <>
-      <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
-        <Separator orientation="vertical" className="mr-2 data-[orientation=vertical]:h-4" />
-        <Breadcrumb>
-          <BreadcrumbList>
-            <BreadcrumbItem className="hidden md:block">
-              <BreadcrumbLink href="/classes">{tPage('classes')}</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator className="hidden md:block" />
-            <BreadcrumbItem>
-              <BreadcrumbPage>{currentClass.name}</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
-      </header>
-
       <div className="space-y-6 px-8 py-6">
         {/* Class Header */}
         <div className="space-y-4">

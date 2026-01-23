@@ -6,14 +6,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Alert, AlertDescription, AlertTitle } from '@/shared/components/ui/alert';
 import { Separator } from '@/shared/components/ui/separator';
 import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from '@/shared/components/ui/breadcrumb';
-import {
   useCreateQuestion,
   useUpdateQuestion,
   useQuestionBankItem,
@@ -217,21 +209,6 @@ export function QuestionBankEditorPage() {
     <div className="flex h-full flex-col">
       <div className="flex flex-1 flex-col overflow-auto">
         <div className="mx-auto w-full max-w-7xl space-y-6 px-8 py-12">
-          {/* Breadcrumb Navigation */}
-          <Breadcrumb className="mb-6">
-            <BreadcrumbList>
-              <BreadcrumbItem className="hidden md:block">
-                <BreadcrumbLink href="/question-bank">{t('editor.breadcrumb')}</BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator className="hidden md:block" />
-              <BreadcrumbItem>
-                <BreadcrumbPage>
-                  {isEditMode ? t('editor.editTitle') : t('editor.createTitle')}
-                </BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
-
           {/* Header */}
           <div className="mb-8 flex items-center justify-between">
             <div className="flex items-center gap-3">

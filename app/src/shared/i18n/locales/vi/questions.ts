@@ -34,7 +34,6 @@ export default {
 
   // Question Bank Editor Page
   editor: {
-    breadcrumb: 'Ngân hàng câu hỏi',
     createTitle: 'Tạo câu hỏi mới',
     editTitle: 'Chỉnh sửa câu hỏi',
     cancel: 'Hủy',

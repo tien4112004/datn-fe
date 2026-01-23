@@ -1,5 +1,7 @@
 import type { Slide, SlideTheme } from '@aiprimary/core';
-import type { Permission } from '../../../app/src/shared/utils/permission';
+
+/** Permission levels (kept local to avoid deep-import from application code) */
+export type Permission = 'read' | 'comment' | 'edit';
 
 export interface ModelConfig {
   name: string;

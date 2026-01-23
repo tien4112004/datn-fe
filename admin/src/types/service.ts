@@ -92,5 +92,8 @@ export interface AdminApiService extends Service {
   // Question Bank Metadata
   getQuestionBankSubjects(): Promise<ApiResponse<string[]>>;
   getQuestionBankGrades(): Promise<ApiResponse<string[]>>;
-  getQuestionBankChapters(subject: string, grade: string): Promise<ApiResponse<string[]>>;
+  getQuestionBankChapters(
+    subject: string,
+    grade: string
+  ): Promise<ApiResponse<import('./questionBank').ChapterResponse[]>>;
 }

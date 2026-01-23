@@ -114,7 +114,9 @@ export function QuestionBankFilters({
           }`}
         >
           <div className="min-h-0">
-            <div className="grid grid-cols-5 gap-4">
+            <div
+              className={`grid gap-4 ${shouldFetchChapters && chapters.length > 0 ? 'grid-cols-[1fr_1fr_1fr_1fr_2fr]' : 'grid-cols-4'}`}
+            >
               {/* Question Type - Multi-select */}
               <div className="space-y-2">
                 <Label className="text-foreground mb-3 block text-sm font-semibold">Question Type</Label>
@@ -204,31 +206,29 @@ export function QuestionBankFilters({
               </div>
 
               {/* Chapter - Multi-select (conditional) */}
-              <div className="space-y-2">
-                <Label className="text-foreground mb-3 block text-sm font-semibold">Chapter</Label>
-                {shouldFetchChapters && chapters.length > 0 ? (
+              {shouldFetchChapters && chapters.length > 0 && (
+                <div className="space-y-2">
+                  <Label className="text-foreground mb-3 block text-sm font-semibold">Chapter</Label>
                   <div className="max-h-32 space-y-2 overflow-y-auto">
                     {chapters.map((chapter) => (
                       <label
-                        key={chapter}
+                        key={chapter.id}
                         className="hover:bg-accent flex cursor-pointer items-center gap-2 rounded-md p-1 transition-colors"
                       >
                         <Checkbox
-                          checked={Array.isArray(filters.chapter) && filters.chapter.includes(chapter)}
+                          checked={Array.isArray(filters.chapter) && filters.chapter.includes(chapter.name)}
                           onCheckedChange={(checked) =>
-                            handleCheckboxChange('chapter', chapter, checked as boolean)
+                            handleCheckboxChange('chapter', chapter.name, checked as boolean)
                           }
                         />
-                        <span className="text-xs font-medium">{chapter}</span>
+                        <span className="max-w-full truncate text-xs font-medium" title={chapter.name}>
+                          {chapter.name}
+                        </span>
                       </label>
                     ))}
                   </div>
-                ) : (
-                  <p className="text-muted-foreground text-xs">
-                    {shouldFetchChapters ? 'No chapters available' : 'Select 1 subject + 1 grade'}
-                  </p>
-                )}
-              </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -326,12 +326,14 @@ export function QuestionBankFilters({
           <Label className="text-sm font-medium">Chapter (for selected Subject + Grade)</Label>
           <div className="mt-2 max-h-40 space-y-2 overflow-y-auto">
             {chapters.map((chapter) => (
-              <label key={chapter} className="flex cursor-pointer items-center gap-2">
+              <label key={chapter.id} className="flex cursor-pointer items-center gap-2">
                 <Checkbox
-                  checked={Array.isArray(filters.chapter) && filters.chapter.includes(chapter)}
-                  onCheckedChange={(checked) => handleCheckboxChange('chapter', chapter, checked as boolean)}
+                  checked={Array.isArray(filters.chapter) && filters.chapter.includes(chapter.name)}
+                  onCheckedChange={(checked) =>
+                    handleCheckboxChange('chapter', chapter.name, checked as boolean)
+                  }
                 />
-                <span className="text-sm">{chapter}</span>
+                <span className="text-sm">{chapter.name}</span>
               </label>
             ))}
           </div>

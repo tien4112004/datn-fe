@@ -127,6 +127,17 @@ export interface QuestionBankApiService {
   importQuestions(file: File): Promise<{ success: number; failed: number }>;
 }
 
+/**
+ * Response structure for chapter from backend API
+ */
+export interface ChapterResponse {
+  id: string;
+  name: string;
+  grade: string;
+  subject: string;
+  sortOrder: string;
+}
+
 // Re-export core types and constants for convenience
 export type {
   Question,

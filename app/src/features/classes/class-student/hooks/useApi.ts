@@ -119,7 +119,7 @@ export function useStudentMutations(classId: string) {
 
     onSuccess: () => {
       // Invalidate and refetch to get fresh server data
-      queryClient.invalidateQueries({ queryKey: ['classes', classId, 'students'] });
+      queryClient.invalidateQueries({ queryKey: classKeys.students(classId) });
       toast.success(t('roster.addStudent.success'));
     },
   });
@@ -163,7 +163,7 @@ export function useStudentMutations(classId: string) {
 
     onSuccess: () => {
       // Invalidate and refetch to get fresh server data
-      queryClient.invalidateQueries({ queryKey: ['classes', classId, 'students'] });
+      queryClient.invalidateQueries({ queryKey: classKeys.students(classId) });
       toast.success(t('roster.updateStudent.success'));
     },
   });
@@ -186,7 +186,7 @@ export function useStudentMutations(classId: string) {
 
     onSuccess: () => {
       // Invalidate and refetch to get fresh server data
-      queryClient.invalidateQueries({ queryKey: ['classes', classId, 'students'] });
+      queryClient.invalidateQueries({ queryKey: classKeys.students(classId) });
       toast.success(t('roster.deleteStudent.success'));
     },
   });

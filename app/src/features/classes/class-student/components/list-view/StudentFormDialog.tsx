@@ -133,10 +133,11 @@ export function StudentFormDialog({
   const genderValue = watch('gender');
 
   const getErrorMessage = (error: FieldError | undefined): string => {
-    if (!error?.message) return '';
+    if (!error?.message || typeof error.message !== 'string') {
+      return '';
+    }
     // Error message is a i18n key from Zod schema, translate it
-    const translated = tValidation(error.message);
-    return typeof translated === 'string' ? translated : '';
+    return tValidation(error.message as any);
   };
 
   return (

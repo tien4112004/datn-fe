@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import type { FieldError } from 'react-hook-form';
 import {
   Dialog,
   DialogContent,
@@ -64,7 +65,7 @@ export function StudentFormDialog({
   onSuccess,
 }: StudentFormDialogProps) {
   const { t } = useTranslation('classes', { keyPrefix: 'roster' });
-  const { t: tValidation } = useTranslation('classes', { keyPrefix: 'validation' });
+  const { t: tValidation } = useTranslation('classes');
   const { createStudent, isCreating, updateStudent, isUpdating } = useStudentMutations(classId);
 
   const form = useStudentForm({
@@ -131,16 +132,11 @@ export function StudentFormDialog({
 
   const genderValue = watch('gender');
 
-  const getErrorMessage = (error: any) => {
+  const getErrorMessage = (error: FieldError | undefined): string => {
     if (!error?.message) return '';
     // Error message is a i18n key from Zod schema, translate it
-    const translated = tValidation(error.message as any);
-    // If translation returns an object (multiple validation messages), extract first string value
-    if (typeof translated === 'object' && translated !== null) {
-      const firstKey = Object.keys(translated)[0];
-      return (translated as Record<string, string>)[firstKey] || '';
-    }
-    return translated || '';
+    const translated = tValidation(error.message);
+    return typeof translated === 'string' ? translated : '';
   };
 
   return (
@@ -209,7 +205,9 @@ export function StudentFormDialog({
 
             {/* Parent/Guardian Name */}
             <div className="space-y-2">
-              <Label htmlFor="parentName">{t('form.parentName')}</Label>
+              <Label htmlFor="parentName">
+                {t('form.parentName')} <span className="text-red-500">*</span>
+              </Label>
               <Input
                 id="parentName"
                 {...register('parentName')}
@@ -222,7 +220,9 @@ export function StudentFormDialog({
 
             {/* Parent/Guardian Phone */}
             <div className="space-y-2">
-              <Label htmlFor="parentPhone">{t('form.parentPhone')}</Label>
+              <Label htmlFor="parentPhone">
+                {t('form.parentPhone')} <span className="text-red-500">*</span>
+              </Label>
               <Input
                 id="parentPhone"
                 {...register('parentPhone')}
@@ -244,11 +244,7 @@ export function StudentFormDialog({
               {t('form.cancel')}
             </Button>
             <Button type="submit" disabled={!isValid || !isDirty || isSubmitting}>
-              {isSubmitting
-                ? t('form.saving', 'Saving...')
-                : mode === 'create'
-                  ? t('form.submit')
-                  : t('form.save')}
+              {isSubmitting ? t('form.saving') : mode === 'create' ? t('form.submit') : t('form.save')}
             </Button>
           </DialogFooter>
         </form>

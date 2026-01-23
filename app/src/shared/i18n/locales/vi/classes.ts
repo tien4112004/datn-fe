@@ -705,7 +705,7 @@ export default {
       fullName: 'Họ và tên',
       address: 'Địa chỉ',
       parentName: 'Tên phụ huynh',
-      parentPhone: 'Số điện thoại phụ huynh',
+      parentPhone: 'SĐT phụ huynh',
       dateOfBirth: 'Ngày sinh',
       gender: 'Giới tính',
 
@@ -713,7 +713,7 @@ export default {
       fullNamePlaceholder: 'Nhập họ và tên',
       addressPlaceholder: 'Nhập địa chỉ',
       parentNamePlaceholder: 'Nhập tên phụ huynh',
-      parentPhonePlaceholder: 'Nhập số điện thoại phụ huynh',
+      parentPhonePlaceholder: 'Nhập SĐT phụ huynh',
       genderPlaceholder: 'Chọn giới tính',
 
       // Gender options
@@ -735,7 +735,9 @@ export default {
       fullNameRequired: 'Họ và tên là bắt buộc',
       fullNameTooLong: 'Họ và tên không được vượt quá 100 ký tự',
       addressTooLong: 'Địa chỉ không được vượt quá 500 ký tự',
+      parentNameRequired: 'Tên phụ huynh là bắt buộc',
       parentNameTooLong: 'Tên phụ huynh không được vượt quá 100 ký tự',
+      parentPhoneRequired: 'Số điện thoại phụ huynh là bắt buộc',
       parentPhoneTooLong: 'Số điện thoại phụ huynh không được vượt quá 20 ký tự',
       dateOfBirthInvalid: 'Vui lòng nhập ngày sinh hợp lệ',
       genderInvalid: 'Vui lòng chọn giới tính hợp lệ',
@@ -746,7 +748,7 @@ export default {
       dateOfBirth: 'Ngày sinh',
       gender: 'Giới tính',
       parentName: 'Tên phụ huynh',
-      parentPhone: 'Điện thoại phụ huynh',
+      parentPhone: 'SĐT phụ huynh',
       parentEmail: 'Email phụ huynh',
       status: 'Trạng thái',
       actions: 'Thao tác',

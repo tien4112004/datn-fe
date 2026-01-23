@@ -22,8 +22,7 @@ export const ClassTable = () => {
 
   // Use selectors to prevent unnecessary re-renders
   const filters = useClassStore((state) => state.filters);
-  const openEditModal = useClassStore((state) => state.openEditModal);
-  const openEnrollmentModal = useClassStore((state) => state.openEnrollmentModal);
+  const { openEditModal, openEnrollmentModal } = useClassStore();
 
   const columns = useMemo(
     () => [
@@ -41,6 +40,7 @@ export const ClassTable = () => {
           isGrow: true,
         },
         enableSorting: true,
+        enableResizing: true,
       }),
       columnHelper.display({
         header: t('columns.status'),
@@ -68,20 +68,21 @@ export const ClassTable = () => {
         cell: (info) => {
           const classItem = info.row.original;
           return (
-            <ClassActionsMenu
-              classData={classItem}
-              onEdit={openEditModal}
-              onManageStudents={openEnrollmentModal}
-              onDelete={() => console.log('Delete class:', classItem.id)}
-            />
+            <div onClick={(e) => e.stopPropagation()}>
+              <ClassActionsMenu
+                classData={classItem}
+                onEdit={openEditModal}
+                onManageStudents={openEnrollmentModal}
+                onDelete={() => console.log('Delete class:', classItem.id)}
+              />
+            </div>
           );
         },
         size: 50,
         enableResizing: false,
       }),
     ],
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [t, tCommon]
+    []
   );
 
   // Use the updated hook with sorting, pagination, and search management

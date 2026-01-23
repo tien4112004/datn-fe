@@ -3,7 +3,7 @@ import { TableHeader, TableRow, TableHead, TableBody, TableCell, Table } from '@
 import TablePagination from './TablePagination';
 import SkeletonTable from './SkeletonTable';
 import { ContextMenu, ContextMenuContent, ContextMenuTrigger } from '@/components/ui/context-menu';
-import { useLayoutEffect, useRef } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 import calculateTableSizing from './tableSizing';
 import { useWindowSize } from 'usehooks-ts';
 import './style.css';
@@ -17,6 +17,7 @@ interface DataTableProps<TData> {
   rowStyle?: string;
   contextMenu?: (row: Row<TData>) => React.ReactNode;
   showPagination?: boolean;
+  enableColumnResizing?: boolean;
 }
 
 function DataTable<TData>({
@@ -33,13 +34,22 @@ function DataTable<TData>({
   const tableContainerRef = useRef<HTMLDivElement>(null);
   const windowDimensions = useWindowSize();
   const headers = table.getFlatHeaders();
+  const [isSizingInitialized, setIsSizingInitialized] = useState(false);
 
   useLayoutEffect(() => {
-    if (tableContainerRef.current && tableContainerRef.current.clientWidth > 0) {
-      const initialColumnSizing = calculateTableSizing(headers, tableContainerRef.current.clientWidth);
-      table.setColumnSizing(initialColumnSizing);
-    }
-  }, [headers, windowDimensions.width, table]);
+    if (isLoading) return;
+
+    const frame = requestAnimationFrame(() => {
+      if (tableContainerRef.current) {
+        const width = tableContainerRef.current.clientWidth;
+        const initialColumnSizing = calculateTableSizing(headers, width);
+        table.setColumnSizing(initialColumnSizing);
+        setIsSizingInitialized(true);
+      }
+    });
+
+    return () => cancelAnimationFrame(frame);
+  }, [isLoading, windowDimensions.width, headers]);
 
   if (isLoading) {
     return <SkeletonTable rows={5} columns={6} />;
@@ -49,10 +59,15 @@ function DataTable<TData>({
     <>
       <div
         ref={tableContainerRef}
-        style={{ direction: table.options.columnResizeDirection }}
+        style={{
+          direction: table.options.columnResizeDirection,
+          overflowX: 'auto',
+          visibility: isSizingInitialized ? 'visible' : 'hidden',
+          minHeight: isSizingInitialized ? 'auto' : '0',
+        }}
         className={className}
       >
-        <Table>
+        <Table style={{ tableLayout: 'fixed', width: table.getTotalSize() }}>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
@@ -67,8 +82,9 @@ function DataTable<TData>({
                     sortable={header.column.getCanSort()}
                     style={{
                       width: header.column.getSize(),
-                      maxWidth: header.column.getSize(),
-                      minWidth: header.column.getSize(),
+                      flex: (header.column.columnDef.meta as any)?.isGrow ? '1 1 auto' : '0 0 auto',
+                      minWidth: header.column.columnDef.minSize,
+                      maxWidth: header.column.columnDef.maxSize,
                     }}
                   >
                     {header.isPlaceholder
@@ -98,8 +114,9 @@ function DataTable<TData>({
                   align={(cell.column.columnDef.meta as any)?.style?.align}
                   style={{
                     width: cell.column.getSize(),
-                    maxWidth: cell.column.getSize(),
-                    minWidth: cell.column.getSize(),
+                    flex: (cell.column.columnDef.meta as any)?.isGrow ? '1 1 auto' : '0 0 auto',
+                    maxWidth: cell.column.columnDef.maxSize,
+                    minWidth: cell.column.columnDef.minSize,
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                     whiteSpace: 'nowrap',

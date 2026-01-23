@@ -5,7 +5,7 @@ export interface DocumentItem {
   title: string;
   thumbnail?: string;
   updatedAt: string;
-  type: 'presentation' | 'mindmap';
+  type: 'presentation' | 'mindmap' | 'assignment';
 }
 
 export interface RecentDocumentsRequest {

@@ -3,6 +3,7 @@
  */
 export default {
   title: 'Dự án của tôi',
+  description: 'Quản lý các bài thuyết trình, hình ảnh, sơ đồ tư duy và bài tập của bạn tất cả ở một nơi.',
   controls: {
     generateNew: 'Tạo sinh mới',
     createBlank: 'Tạo tài liệu trống?',

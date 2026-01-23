@@ -36,7 +36,7 @@ export const AddClassModal = ({ isOpen, onClose }: AddClassModalProps) => {
       };
 
       await createClassMutation.mutateAsync(createRequest);
-      toast.success(`Class "${data.name}" added successfully.`, {
+      toast.success(t('addClass.success', { name: data.name }), {
         id: toastId,
       });
       closeCreateModal();

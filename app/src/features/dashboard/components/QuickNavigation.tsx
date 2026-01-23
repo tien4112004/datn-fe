@@ -45,7 +45,7 @@ const navigationItems: NavigationItem[] = [
     hoverBg: 'hover:bg-purple-100 dark:hover:bg-purple-950/50',
   },
   {
-    path: '/questions-bank/list',
+    path: '/question-bank',
     icon: HelpCircle,
     labelKey: 'quickNav.questionsBank',
     bgColor: 'bg-cyan-50 dark:bg-cyan-950/30',
@@ -60,7 +60,7 @@ export const QuickNavigation = () => {
   return (
     <div className="w-full">
       <h2 className="mb-6 text-2xl font-semibold">{t('quickNav.title')}</h2>
-      <div className="grid grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
         {navigationItems.map((item) => {
           const Icon = item.icon;
           return (

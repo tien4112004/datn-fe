@@ -10,8 +10,8 @@ interface MindmapControlsProps {
   isPresenterMode: boolean;
   isFullscreen: boolean;
   onTogglePanOnDrag: () => void;
-  onToggleFullscreen: () => void;
-  onTogglePresenterMode: () => void;
+  onToggleFullscreen: (() => void) | null;
+  onTogglePresenterMode: (() => void) | null;
 }
 
 const MindmapControls = memo(
@@ -49,19 +49,22 @@ const MindmapControls = memo(
         <CustomControlButton onClick={() => fitView()} title="Fit View">
           <Scan size={iconSize} />
         </CustomControlButton>
-        <CustomControlButton
-          onClick={onToggleFullscreen}
-          title={isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}
-        >
-          {isFullscreen ? <Minimize2 size={iconSize} /> : <Maximize2 size={iconSize} />}
-        </CustomControlButton>
-        {/* Presenter Mode toggle - available for all permission levels */}
-        <CustomControlButton
-          onClick={onTogglePresenterMode}
-          title={isPresenterMode ? 'Disable Presenter Mode' : 'Enable Presenter Mode'}
-        >
-          {isPresenterMode ? <Edit size={iconSize} /> : <Eye size={iconSize} />}
-        </CustomControlButton>
+        {onToggleFullscreen && (
+          <CustomControlButton
+            onClick={onToggleFullscreen}
+            title={isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}
+          >
+            {isFullscreen ? <Minimize2 size={iconSize} /> : <Maximize2 size={iconSize} />}
+          </CustomControlButton>
+        )}
+        {onTogglePresenterMode && (
+          <CustomControlButton
+            onClick={onTogglePresenterMode}
+            title={isPresenterMode ? 'Disable Presenter Mode' : 'Enable Presenter Mode'}
+          >
+            {isPresenterMode ? <Edit size={iconSize} /> : <Eye size={iconSize} />}
+          </CustomControlButton>
+        )}
       </CustomControls>
     );
   }

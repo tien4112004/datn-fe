@@ -384,6 +384,13 @@ export const AssignmentEditorPage = () => {
   return (
     <div className="flex min-h-screen flex-col bg-white dark:bg-gray-950">
       <div className="p-8">
+        {/* Page Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold tracking-tight">
+            {id ? t('pageTitle.edit') : t('pageTitle.create')}
+          </h1>
+        </div>
+
         <AssignmentEditorLayout onCancel={handleCancel} onSave={handleSubmit} isSaving={isSaving} />
 
         {/* Dialogs */}

@@ -270,6 +270,12 @@ export default {
     },
   },
   assignmentEditor: {
+    // Page titles
+    pageTitle: {
+      create: 'Create New Assignment',
+      edit: 'Edit Assignment',
+    },
+
     // Main action buttons
     actions: {
       actions: 'Actions',
@@ -398,10 +404,17 @@ export default {
         'Configure topics and required question counts for each difficulty level. Changes are saved automatically.',
       topicsLabel: 'Topics',
       addTopic: 'Add Topic',
+      editTopic: 'Edit Topic',
+      editTopicDescription: 'Update the topic name and description',
+      topicName: 'Topic Name',
+      topicDescription: 'Topic Description',
       topicPlaceholder: 'Topic name...',
       descriptionPlaceholder: 'Topic description (optional)...',
+      deleteTopic: 'Delete Topic',
       emptyMessage: 'Add topics to see the matrix',
       done: 'Done',
+      cancel: 'Cancel',
+      save: 'Save',
       tableHeaders: {
         topic: 'Topic',
       },
@@ -487,6 +500,7 @@ export default {
 
     // Current question view
     currentQuestion: {
+      panelTitle: 'Question {{number}}',
       dataMissing: 'Question data missing',
       questionOf: 'Question {{current}} of {{total}}',
       edit: 'Edit',

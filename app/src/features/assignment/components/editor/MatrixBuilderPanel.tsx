@@ -1,6 +1,5 @@
 import { useTranslation } from 'react-i18next';
 import { Grid3x3 } from 'lucide-react';
-import { TopicManager } from './TopicManager';
 import { MatrixGrid } from './MatrixGrid';
 
 export const MatrixBuilderPanel = () => {
@@ -18,11 +17,6 @@ export const MatrixBuilderPanel = () => {
 
       {/* Description */}
       <p className="text-sm text-gray-600 dark:text-gray-400">{t('description')}</p>
-
-      {/* Topic Management */}
-      <div className="space-y-4">
-        <TopicManager />
-      </div>
 
       {/* Matrix Grid */}
       <div className="space-y-4">

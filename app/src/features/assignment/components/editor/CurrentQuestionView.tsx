@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { ChevronLeft, ChevronRight, Trash2, Eye, Pencil } from 'lucide-react';
+import { Trash2, Eye, Pencil, FileQuestion } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
 import { Label } from '@/shared/components/ui/label';
@@ -31,18 +31,6 @@ export const CurrentQuestionView = () => {
 
   const viewMode = questionViewModes.get(question?.id || '') || VIEW_MODE.EDITING;
   const isEditing = viewMode === VIEW_MODE.EDITING;
-
-  const handlePrevious = () => {
-    if (currentQuestionIndex > 0) {
-      setCurrentQuestionIndex(currentQuestionIndex - 1);
-    }
-  };
-
-  const handleNext = () => {
-    if (currentQuestionIndex < questions.length - 1) {
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
-    }
-  };
 
   const handleDelete = () => {
     if (question) {
@@ -88,37 +76,15 @@ export const CurrentQuestionView = () => {
   }
 
   return (
-    <div className="border">
-      {/* Navigation Header */}
-      <div className="flex items-center justify-between gap-3 border-b bg-gray-50 px-4 py-3 dark:bg-gray-900">
-        <div className="flex items-center gap-2">
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={handlePrevious}
-            disabled={currentQuestionIndex === 0}
-            className="h-8 w-8 p-0"
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-            {tQuestion('questionOf', { current: currentQuestionIndex + 1, total: questions.length })}
-          </span>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={handleNext}
-            disabled={currentQuestionIndex === questions.length - 1}
-            className="h-8 w-8 p-0"
-          >
-            <ChevronRight className="h-4 w-4" />
-          </Button>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <span className="text-xs text-gray-500">{getQuestionTypeName(question.type)}</span>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between gap-3 border-b pb-4">
+        <div className="flex w-full items-center gap-3">
+          <FileQuestion className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+            {tQuestion('panelTitle', { number: currentQuestionIndex + 1 })}
+          </h2>
+          <span className="ml-auto text-xs text-gray-500">{getQuestionTypeName(question.type)}</span>
 
           {/* Edit/Preview Toggle */}
           <div className="flex items-center rounded border">
@@ -157,13 +123,13 @@ export const CurrentQuestionView = () => {
       </div>
 
       {/* Question Details */}
-      <div className="space-y-4 px-4 py-4">
+      <div className="space-y-4">
         {/* Topic, Difficulty, and Points */}
         <div className="grid gap-4 sm:grid-cols-3">
           <div>
             <Label
               htmlFor={`topic-${currentQuestionIndex}`}
-              className="mb-1.5 block text-xs font-medium text-gray-600 dark:text-gray-400"
+              className="text-xs text-gray-600 dark:text-gray-400"
             >
               {t('collection.item.topicLabel')}
             </Label>
@@ -175,7 +141,7 @@ export const CurrentQuestionView = () => {
                 })
               }
             >
-              <SelectTrigger id={`topic-${currentQuestionIndex}`} className="h-9 text-sm">
+              <SelectTrigger id={`topic-${currentQuestionIndex}`} className="mt-1.5 h-9 text-sm">
                 <SelectValue placeholder={t('collection.item.selectTopicPlaceholder') as string} />
               </SelectTrigger>
               <SelectContent>
@@ -191,7 +157,7 @@ export const CurrentQuestionView = () => {
           <div>
             <Label
               htmlFor={`difficulty-${currentQuestionIndex}`}
-              className="mb-1.5 block text-xs font-medium text-gray-600 dark:text-gray-400"
+              className="text-xs text-gray-600 dark:text-gray-400"
             >
               {t('collection.item.difficultyLabel')}
             </Label>
@@ -203,7 +169,7 @@ export const CurrentQuestionView = () => {
                 })
               }
             >
-              <SelectTrigger id={`difficulty-${currentQuestionIndex}`} className="h-9 text-sm">
+              <SelectTrigger id={`difficulty-${currentQuestionIndex}`} className="mt-1.5 h-9 text-sm">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -219,7 +185,7 @@ export const CurrentQuestionView = () => {
           <div>
             <Label
               htmlFor={`points-${currentQuestionIndex}`}
-              className="mb-1.5 block text-xs font-medium text-gray-600 dark:text-gray-400"
+              className="text-xs text-gray-600 dark:text-gray-400"
             >
               {t('collection.item.pointsLabel')}
             </Label>
@@ -233,7 +199,7 @@ export const CurrentQuestionView = () => {
                 })
               }
               min={0}
-              className="h-9 text-sm"
+              className="mt-1.5 h-9 text-sm"
             />
           </div>
         </div>

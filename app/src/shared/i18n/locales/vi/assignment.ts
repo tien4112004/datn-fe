@@ -270,11 +270,17 @@ export default {
     },
   },
   assignmentEditor: {
+    // Tiêu đề trang
+    pageTitle: {
+      create: 'Tạo bài tập mới',
+      edit: 'Chỉnh sửa bài tập',
+    },
+
     // Nút hành động chính
     actions: {
       actions: 'Hành động',
       cancel: 'Hủy',
-      save: 'Lưu Bài Tập',
+      save: 'Lưu bài tập',
       saving: 'Đang lưu...',
     },
 
@@ -397,10 +403,17 @@ export default {
         'Cấu hình các chủ đề và số lượng câu hỏi yêu cầu cho mỗi mức độ khó. Các thay đổi sẽ được lưu tự động.',
       topicsLabel: 'Chủ Đề',
       addTopic: 'Thêm Chủ Đề',
+      editTopic: 'Chỉnh Sửa Chủ Đề',
+      editTopicDescription: 'Cập nhật tên và mô tả chủ đề',
+      topicName: 'Tên Chủ Đề',
+      topicDescription: 'Mô Tả Chủ Đề',
       topicPlaceholder: 'Tên chủ đề...',
       descriptionPlaceholder: 'Mô tả chủ đề (tùy chọn)...',
+      deleteTopic: 'Xóa Chủ Đề',
       emptyMessage: 'Thêm chủ đề để xem ma trận',
       done: 'Xong',
+      cancel: 'Hủy',
+      save: 'Lưu',
       tableHeaders: {
         topic: 'Chủ Đề',
       },
@@ -477,6 +490,7 @@ export default {
 
     // Xem câu hỏi hiện tại
     currentQuestion: {
+      panelTitle: 'Câu Hỏi {{number}}',
       dataMissing: 'Thiếu dữ liệu câu hỏi',
       questionOf: 'Câu hỏi {{current}} trên {{total}}',
       edit: 'Chỉnh sửa',

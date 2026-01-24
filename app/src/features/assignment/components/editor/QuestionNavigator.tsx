@@ -81,7 +81,11 @@ export const QuestionNavigator = () => {
   const setCurrentQuestionIndex = useAssignmentEditorStore((state) => state.setCurrentQuestionIndex);
 
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8, // Require 8px movement before activating drag
+      },
+    }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })
@@ -154,7 +158,7 @@ export const QuestionNavigator = () => {
 
               return (
                 <SortableQuestionButton
-                  key={question.id}
+                  key={index}
                   id={question.id}
                   index={index}
                   isActive={isActive}

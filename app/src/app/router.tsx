@@ -33,6 +33,12 @@ const router = createBrowserRouter([
     }),
   },
   {
+    path: '/presentation/embed/:id',
+    lazy: async () => ({
+      Component: (await import('@/features/presentation')).default.PresentationEmbedPage,
+    }),
+  },
+  {
     element: (
       <TeacherRoute>
         <NavLayout />

@@ -34,7 +34,6 @@ webViewApi.stream = async function (url: string, request: any, signal: AbortSign
       Accept: 'text/plain',
     };
 
-    // Add Authorization header if token is available from localStorage
     const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
     if (token) {
       headers.Authorization = `Bearer ${token}`;
@@ -108,8 +107,8 @@ webViewApi.stream = async function (url: string, request: any, signal: AbortSign
 // Request interceptor to add Authorization header
 webViewApi.interceptors.request.use(
   (config) => {
-    // Get token from localStorage (injected by Flutter)
     const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
+
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }

@@ -635,6 +635,7 @@ export default {
       searchAssignments: 'Tìm kiếm bài tập...',
       noAssignmentsFound: 'Không tìm thấy bài tập nào.',
       availableAssignments: 'Bài tập có sẵn',
+      loading: 'Đang tải bài tập...',
     },
   },
   calendar: {
@@ -1122,6 +1123,7 @@ export default {
       placeholders: {
         content: 'Viết nội dung bài đăng của bạn ở đây...',
         comment: 'Viết bình luận...',
+        selectDeadline: 'Chọn hạn nộp',
       },
       postType: {
         post: 'Bài Đăng',
@@ -1184,6 +1186,12 @@ export default {
       },
       confirm: {
         delete: 'Bạn có chắc chắn muốn xóa bài viết này?',
+      },
+      loadingAssignment: 'Đang tải bài tập...',
+      assignmentNotFound: 'Không tìm thấy bài tập',
+      assignment: {
+        questionCount: '{{count}} câu hỏi',
+        totalPoints: '{{points}} điểm',
       },
     },
     comments: {

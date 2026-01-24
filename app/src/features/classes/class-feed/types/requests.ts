@@ -9,6 +9,7 @@ export interface PostCreateRequest {
   linkedResources?: LinkedResourceRequest[];
   linkedLessonId?: string; // Note: singular, not plural
   assignmentId?: string; // For Homework type posts
+  dueDate?: string; // ISO string for Homework type posts
   allowComments?: boolean;
 }
 
@@ -20,6 +21,7 @@ export interface PostUpdateRequest {
   linkedResources?: LinkedResourceRequest[];
   linkedLessonId?: string;
   assignmentId?: string; // For Homework type posts
+  dueDate?: string; // ISO string for Homework type posts
   isPinned?: boolean;
   allowComments?: boolean;
 }

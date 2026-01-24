@@ -20,6 +20,8 @@ export interface Post {
   attachments?: string[]; // Array of URLs from backend
   linkedResources?: LinkedResourceResponse[];
   linkedLessonId?: string;
+  assignmentId?: string;
+  dueDate?: string;
   isPinned: boolean;
   allowComments?: boolean;
   commentCount: number;

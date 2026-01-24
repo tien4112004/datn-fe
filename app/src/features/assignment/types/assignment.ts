@@ -1,4 +1,4 @@
-import type { Difficulty, SubjectCode } from './';
+import type { Difficulty, SubjectCode, AssignmentQuestion } from '@aiprimary/core';
 import type { Question } from '@aiprimary/core';
 
 // Question with topic assignment (intersection of core Question with topicId)
@@ -52,13 +52,14 @@ export interface Assignment {
   title: string;
   description?: string;
   subject?: SubjectCode;
-  topics: AssignmentTopic[];
-  questions: AssignmentQuestionWithTopic[];
-  matrix: {
+  grade?: string;
+  topics?: AssignmentTopic[];
+  questions: (AssignmentQuestion | AssignmentQuestionWithTopic)[];
+  matrix?: {
     cells: MatrixCell[];
   };
-  totalPoints?: number; // Total points for the assignment
-  shuffleQuestions?: boolean; // Shuffle questions for each student (default: false)
+  totalPoints?: number;
+  shuffleQuestions?: boolean;
   status: 'draft' | 'published' | 'archived';
   createdAt?: string;
   updatedAt?: string;

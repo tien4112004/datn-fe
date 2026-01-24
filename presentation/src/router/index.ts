@@ -13,7 +13,7 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/MobileApp.vue'),
   },
   {
-    path: '/generation',
+    path: '/generation/:id',
     name: 'generation',
     component: () => import('@/views/GenerationRemoteApp.vue'),
   },

@@ -27,7 +27,6 @@ export const TopicEditModal = ({ topicId, open, onOpenChange }: TopicEditModalPr
   const topics = useAssignmentFormStore((state) => state.topics);
   const updateTopic = useAssignmentFormStore((state) => state.updateTopic);
   const removeTopic = useAssignmentFormStore((state) => state.removeTopic);
-  const addTopic = useAssignmentFormStore((state) => state.addTopic);
 
   const topic = topics?.find((t) => t.id === topicId);
 

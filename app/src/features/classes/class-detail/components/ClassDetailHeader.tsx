@@ -1,5 +1,4 @@
 import { useTranslation } from 'react-i18next';
-import { Separator } from '@radix-ui/react-separator';
 import { Badge } from '@/components/ui/badge';
 import { getGradeLabel } from '../../shared/utils/grades';
 import type { Class } from '../../shared/types';
@@ -10,7 +9,6 @@ interface ClassDetailHeaderProps {
 
 export const ClassDetailHeader = ({ currentClass }: ClassDetailHeaderProps) => {
   const { t } = useTranslation('classes', { keyPrefix: 'detail' });
-  const { t: tPage } = useTranslation('common', { keyPrefix: 'pages' });
 
   return (
     <>

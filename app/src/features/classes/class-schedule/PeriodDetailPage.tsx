@@ -2,14 +2,12 @@ import { useParams } from 'react-router-dom';
 import { usePeriod } from './hooks/useApi';
 import { PeriodDetailView } from './components/detail/PeriodDetailView';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useClass } from '../shared/hooks';
 import { useTranslation } from 'react-i18next';
 
 export const PeriodDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const { t } = useTranslation('classes');
   const { data: period, isLoading, isError } = usePeriod(id!);
-  const { data: classData } = useClass(period?.classId || '');
 
   if (isLoading) {
     return (

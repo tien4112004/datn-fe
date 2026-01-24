@@ -5,7 +5,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
-import { useClass } from '../shared/hooks';
 import { useCreateLesson } from './hooks';
 import { usePeriod } from '../class-schedule';
 
@@ -30,7 +29,6 @@ export const LessonCreatorPage = () => {
   }
 
   const { data: period, isLoading: periodLoading, isError: periodError } = usePeriod(periodId);
-  const { data: classData } = useClass(period?.classId || '');
   const createLessonMutation = useCreateLesson();
 
   const handleGoBack = () => {

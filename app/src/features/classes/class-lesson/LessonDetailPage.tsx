@@ -1,7 +1,6 @@
 import { useParams } from 'react-router-dom';
 import { useLesson } from './hooks/useApi';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useClass } from '../shared/hooks/useApi';
 import { useTranslation } from 'react-i18next';
 import { LessonDetailView } from './components';
 
@@ -9,7 +8,6 @@ export const LessonDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const { t } = useTranslation('classes');
   const { data: lesson, isLoading, isError } = useLesson(id!);
-  const { data: classData } = useClass(lesson?.classId || '');
 
   if (isLoading) {
     return (

@@ -2,22 +2,12 @@ import { useParams } from 'react-router-dom';
 import { usePeriod } from './hooks/useApi';
 import { PeriodDetailView } from './components/detail/PeriodDetailView';
 import { Skeleton } from '@/components/ui/skeleton';
-import {
-  Breadcrumb,
-  BreadcrumbList,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb';
-import { useClass } from '../shared/hooks';
 import { useTranslation } from 'react-i18next';
 
 export const PeriodDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const { t } = useTranslation('classes');
   const { data: period, isLoading, isError } = usePeriod(id!);
-  const { data: classData } = useClass(period?.classId || '');
 
   if (isLoading) {
     return (
@@ -52,25 +42,6 @@ export const PeriodDetailPage = () => {
 
   return (
     <div className="p-8">
-      {/* Breadcrumb Navigation */}
-      {period && classData && (
-        <Breadcrumb className="mb-6">
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink href="/classes">{t('navigation.classes')}</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbLink href={`/classes/${period.classId}`}>{classData.name}</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage>{period.name}</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
-      )}
-
       <div className="mx-12">
         <PeriodDetailView period={period} />
       </div>

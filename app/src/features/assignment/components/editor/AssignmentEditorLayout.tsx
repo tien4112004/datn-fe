@@ -23,9 +23,9 @@ export const AssignmentEditorLayout = ({ onSave, isSaving }: AssignmentEditorLay
   const { t: tToolbar } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.questions.toolbar' });
 
   return (
-    <div className="grid grid-cols-1 gap-6 pb-4 lg:grid-cols-4">
+    <div className="grid grid-cols-1 gap-6 pb-4 lg:h-[calc(100vh-8rem)] lg:grid-cols-4">
       {/* Left/Main: Content Area (75% width on large screens) */}
-      <div className="lg:col-span-3">
+      <div className="lg:col-span-3 lg:overflow-y-auto lg:pr-2">
         {mainView === 'info' ? (
           <AssignmentMetadataPanel />
         ) : mainView === 'questions' ? (
@@ -36,7 +36,7 @@ export const AssignmentEditorLayout = ({ onSave, isSaving }: AssignmentEditorLay
       </div>
 
       {/* Right: Sidebar (25% width on large screens) */}
-      <div className="space-y-6">
+      <div className="space-y-6 lg:overflow-y-auto lg:pr-2">
         <div className="space-y-3 rounded-lg border bg-white p-4 dark:bg-gray-900">
           <div className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
             {t('actions.actions')}

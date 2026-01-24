@@ -1,21 +1,109 @@
-import { List, FileText, ListOrdered, Grid3x3 } from 'lucide-react';
-import { Button } from '@/shared/components/ui/button';
+import { List, FileText, Grid3x3 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { CollapsibleSection } from './CollapsibleSection';
 import { useAssignmentEditorStore } from '../../stores/useAssignmentEditorStore';
 import { useAssignmentFormStore } from '../../stores/useAssignmentFormStore';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  rectSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+
+interface SortableQuestionButtonProps {
+  id: string;
+  index: number;
+  isActive: boolean;
+  hasTitle: boolean;
+  title: string;
+  onClick: () => void;
+  untitledLabel: string;
+}
+
+const SortableQuestionButton = ({
+  id,
+  index,
+  isActive,
+  hasTitle,
+  title,
+  onClick,
+  untitledLabel,
+}: SortableQuestionButtonProps) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <button
+      ref={setNodeRef}
+      style={style}
+      type="button"
+      onClick={onClick}
+      className={`flex h-8 w-full items-center justify-center rounded text-xs font-medium transition-colors ${
+        isActive
+          ? 'bg-primary text-primary-foreground'
+          : hasTitle
+            ? 'bg-blue-50 text-blue-700 hover:bg-blue-100 dark:bg-blue-950 dark:text-blue-300 dark:hover:bg-blue-900'
+            : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700'
+      } ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+      title={title || untitledLabel}
+      {...attributes}
+      {...listeners}
+    >
+      {index + 1}
+    </button>
+  );
+};
 
 export const QuestionNavigator = () => {
   const { t } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.navigator' });
 
-  // Get data from store
   const questions = useAssignmentFormStore((state) => state.questions);
+  const reorderQuestions = useAssignmentFormStore((state) => state.reorderQuestions);
 
   const mainView = useAssignmentEditorStore((state) => state.mainView);
   const setMainView = useAssignmentEditorStore((state) => state.setMainView);
-  const currentQuestionIndex = useAssignmentEditorStore((state) => state.currentQuestionIndex);
-  const setCurrentQuestionIndex = useAssignmentEditorStore((state) => state.setCurrentQuestionIndex);
-  const setQuestionListDialogOpen = useAssignmentEditorStore((state) => state.setQuestionListDialogOpen);
+  const currentQuestionId = useAssignmentEditorStore((state) => state.currentQuestionId);
+  const setCurrentQuestionId = useAssignmentEditorStore((state) => state.setCurrentQuestionId);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8, // Require 8px movement before activating drag
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      const oldIndex = questions.findIndex((q) => q.question.id === active.id);
+      const newIndex = questions.findIndex((q) => q.question.id === over.id);
+
+      if (oldIndex !== -1 && newIndex !== -1) {
+        reorderQuestions(oldIndex, newIndex);
+        // Current question ID remains the same, no need to update
+      }
+    }
+  };
 
   return (
     <CollapsibleSection
@@ -23,79 +111,62 @@ export const QuestionNavigator = () => {
       icon={<List className="h-5 w-5" />}
       defaultOpen={true}
     >
-      {/* List View Button */}
-      {questions.length > 0 && (
-        <div className="mb-3">
-          <Button
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <div className="grid grid-cols-5 gap-1.5 overflow-hidden">
+          {/* Assignment Info Icon */}
+          <button
             type="button"
-            variant="outline"
-            size="sm"
-            className="w-full"
-            onClick={() => setQuestionListDialogOpen(true)}
+            onClick={() => setMainView('info')}
+            className={`flex h-8 w-full items-center justify-center rounded text-xs transition-colors ${
+              mainView === 'info'
+                ? 'bg-primary text-primary-foreground'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700'
+            }`}
+            title={t('assignmentInfo')}
           >
-            <ListOrdered className="mr-2 h-4 w-4" />
-            {t('listView')}
-          </Button>
+            <FileText className="h-3 w-3" />
+          </button>
+
+          {/* Matrix Builder Icon */}
+          <button
+            type="button"
+            onClick={() => setMainView('matrix')}
+            className={`flex h-8 w-full items-center justify-center rounded text-xs transition-colors ${
+              mainView === 'matrix'
+                ? 'bg-primary text-primary-foreground'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700'
+            }`}
+            title={t('matrixBuilder')}
+          >
+            <Grid3x3 className="h-3 w-3" />
+          </button>
+
+          {/* Question Numbers */}
+          <SortableContext items={questions.map((q) => q.question.id)} strategy={rectSortingStrategy}>
+            {questions.map((aq, index) => {
+              const isActive = mainView === 'questions' && currentQuestionId === aq.question.id;
+              const question = aq.question;
+              const hasTitle = Boolean(question.title) && question.title.trim() !== '';
+
+              return (
+                <SortableQuestionButton
+                  key={question.id}
+                  id={question.id}
+                  index={index}
+                  isActive={isActive}
+                  hasTitle={hasTitle}
+                  title={question.title}
+                  untitledLabel={t('untitled')}
+                  onClick={() => {
+                    setMainView('questions');
+                    setCurrentQuestionId(question.id);
+                  }}
+                />
+              );
+            })}
+          </SortableContext>
         </div>
-      )}
-
-      <div className="grid grid-cols-5 gap-1.5">
-        {/* Assignment Info Icon */}
-        <button
-          type="button"
-          onClick={() => setMainView('info')}
-          className={`flex h-8 w-full items-center justify-center rounded text-xs transition-colors ${
-            mainView === 'info'
-              ? 'bg-primary text-primary-foreground'
-              : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700'
-          }`}
-          title={t('assignmentInfo')}
-        >
-          <FileText className="h-3 w-3" />
-        </button>
-
-        {/* Matrix Builder Icon */}
-        <button
-          type="button"
-          onClick={() => setMainView('matrix')}
-          className={`flex h-8 w-full items-center justify-center rounded text-xs transition-colors ${
-            mainView === 'matrix'
-              ? 'bg-primary text-primary-foreground'
-              : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700'
-          }`}
-          title={t('matrixBuilder')}
-        >
-          <Grid3x3 className="h-3 w-3" />
-        </button>
-
-        {/* Question Numbers */}
-        {questions.map((aq, index) => {
-          const isActive = mainView === 'questions' && currentQuestionIndex === index;
-          const question = aq.question;
-          const hasTitle = question.title && question.title.trim() !== '';
-
-          return (
-            <button
-              key={question.id}
-              type="button"
-              onClick={() => {
-                setMainView('questions');
-                setCurrentQuestionIndex(index);
-              }}
-              className={`flex h-8 w-full items-center justify-center rounded text-xs font-medium transition-colors ${
-                isActive
-                  ? 'bg-primary text-primary-foreground'
-                  : hasTitle
-                    ? 'bg-blue-50 text-blue-700 hover:bg-blue-100 dark:bg-blue-950 dark:text-blue-300 dark:hover:bg-blue-900'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700'
-              }`}
-              title={question.title || t('untitled')}
-            >
-              {index + 1}
-            </button>
-          );
-        })}
-      </div>
+      </DndContext>
     </CollapsibleSection>
   );
 };

@@ -7,6 +7,7 @@ export default {
       projects: 'Dự án',
       files: 'Tập tin',
       classes: 'Lớp học',
+      questionBank: 'Kho câu hỏi',
       subjects: 'Môn học',
       schedules: 'Lịch',
       home: 'Trang chủ',

@@ -7,8 +7,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/shared/components/ui/dropdown-menu';
-import { QUESTION_TYPE, DIFFICULTY } from '../../types';
-import { getAllQuestionTypes } from '@aiprimary/core';
+import {
+  QUESTION_TYPE,
+  DIFFICULTY,
+  type AssignmentQuestionWithTopic,
+  type QuestionWithTopic,
+} from '../../types';
+import { getAllQuestionTypes, type Question } from '@aiprimary/core';
 import { generateId } from '@/shared/lib/utils';
 import { useAssignmentEditorStore } from '../../stores/useAssignmentEditorStore';
 import { useAssignmentFormStore } from '../../stores/useAssignmentFormStore';
@@ -22,23 +27,22 @@ export const AddQuestionButton = ({ className }: AddQuestionButtonProps) => {
 
   // Get data and actions from stores
   const topics = useAssignmentFormStore((state) => state.topics);
-  const questions = useAssignmentFormStore((state) => state.questions);
   const addQuestion = useAssignmentFormStore((state) => state.addQuestion);
   const defaultTopicId = topics[0]?.id || '';
   const setMainView = useAssignmentEditorStore((state) => state.setMainView);
-  const setCurrentQuestionIndex = useAssignmentEditorStore((state) => state.setCurrentQuestionIndex);
+  const setCurrentQuestionId = useAssignmentEditorStore((state) => state.setCurrentQuestionId);
 
-  const handleAddQuestion = (type: string) => {
+  const handleAddQuestion = (questionType: string) => {
     // Create appropriate data structure based on question type with better defaults
-    let data: any;
-    switch (type) {
+    let data: Question['data'] = {};
+    switch (questionType) {
       case QUESTION_TYPE.MULTIPLE_CHOICE:
         data = {
           options: [
-            { id: generateId(), content: '', isCorrect: false },
-            { id: generateId(), content: '', isCorrect: false },
-            { id: generateId(), content: '', isCorrect: false },
-            { id: generateId(), content: '', isCorrect: false },
+            { id: generateId(), text: '', isCorrect: false },
+            { id: generateId(), text: '', isCorrect: false },
+            { id: generateId(), text: '', isCorrect: false },
+            { id: generateId(), text: '', isCorrect: false },
           ],
         };
         break;
@@ -57,49 +61,39 @@ export const AddQuestionButton = ({ className }: AddQuestionButtonProps) => {
       case QUESTION_TYPE.FILL_IN_BLANK:
         data = {
           segments: [
-            { type: 'text', content: '' },
-            { type: 'blank', correctAnswer: '', caseSensitive: false },
-            { type: 'text', content: '' },
+            { id: generateId(), type: 'text', content: '' },
+            { id: generateId(), type: 'blank', content: '' },
+            { id: generateId(), type: 'text', content: '' },
           ],
           caseSensitive: false,
         };
         break;
       case QUESTION_TYPE.GROUP:
         data = {
-          groups: [
-            { id: generateId(), name: '', items: [] },
-            { id: generateId(), name: '', items: [] },
-          ],
-          items: [
-            { id: generateId(), content: '' },
-            { id: generateId(), content: '' },
-            { id: generateId(), content: '' },
-            { id: generateId(), content: '' },
-          ],
+          description: '',
+          questions: [],
         };
         break;
-      default:
-        data = {};
     }
 
-    const newQuestion = {
+    const newQuestion: AssignmentQuestionWithTopic = {
       question: {
         id: generateId(),
-        type: type as any,
+        type: questionType,
         difficulty: DIFFICULTY.KNOWLEDGE,
         title: '',
         topicId: defaultTopicId,
         explanation: '',
         data,
-      },
+      } as QuestionWithTopic,
       points: 10,
-    } as any;
+    };
 
     addQuestion(newQuestion);
 
     // Switch to questions view and navigate to the new question
     setMainView('questions');
-    setCurrentQuestionIndex(questions.length); // New question will be at the end
+    setCurrentQuestionId(newQuestion.question.id); // Navigate to the newly added question
   };
 
   return (

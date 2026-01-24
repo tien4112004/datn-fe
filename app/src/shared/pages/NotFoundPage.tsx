@@ -1,6 +1,4 @@
-import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbPage } from '@/components/ui/breadcrumb';
 import { useSidebar } from '@/components/ui/sidebar';
-import { Separator } from '@radix-ui/react-separator';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -19,17 +17,6 @@ const NotFoundPage = () => {
 
   return (
     <>
-      <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
-        {/* <SidebarTrigger className="-ml-1" /> */}
-        <Separator orientation="vertical" className="mr-2 data-[orientation=vertical]:h-4" />
-        <Breadcrumb>
-          <BreadcrumbList>
-            <BreadcrumbItem className="hidden md:block">
-              <BreadcrumbPage>{t('notFound.title')}</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
-      </header>
       <div className="flex flex-1 flex-col items-center justify-center px-8 py-16">
         <div className="text-center">
           <h1 className="text-muted-foreground mb-4 text-6xl font-bold">404</h1>

@@ -10,7 +10,7 @@ interface AssignmentEditorState {
   selectedQuestionId: string | null;
   isQuestionBankOpen: boolean;
   isQuestionListDialogOpen: boolean;
-  currentQuestionIndex: number;
+  currentQuestionId: string | null;
   questionViewModes: Map<string, ViewMode>;
   isMetadataDialogOpen: boolean;
   isMatrixEditorOpen: boolean;
@@ -20,7 +20,7 @@ interface AssignmentEditorState {
   setSelectedQuestion: (id: string | null) => void;
   setQuestionBankOpen: (open: boolean) => void;
   setQuestionListDialogOpen: (open: boolean) => void;
-  setCurrentQuestionIndex: (index: number) => void;
+  setCurrentQuestionId: (id: string | null) => void;
   setQuestionViewMode: (questionId: string, mode: ViewMode) => void;
   toggleQuestionViewMode: (questionId: string) => void;
   setMetadataDialogOpen: (open: boolean) => void;
@@ -49,7 +49,7 @@ export const useAssignmentEditorStore = create<AssignmentEditorState>()(
       selectedQuestionId: null,
       isQuestionBankOpen: false,
       isQuestionListDialogOpen: false,
-      currentQuestionIndex: 0,
+      currentQuestionId: null,
       questionViewModes: new Map(),
       isMetadataDialogOpen: false,
       isMatrixEditorOpen: false,
@@ -59,7 +59,7 @@ export const useAssignmentEditorStore = create<AssignmentEditorState>()(
       setSelectedQuestion: (id) => set({ selectedQuestionId: id }),
       setQuestionBankOpen: (open) => set({ isQuestionBankOpen: open }),
       setQuestionListDialogOpen: (open) => set({ isQuestionListDialogOpen: open }),
-      setCurrentQuestionIndex: (index) => set({ currentQuestionIndex: index }),
+      setCurrentQuestionId: (id) => set({ currentQuestionId: id }),
       setMainView: (view) => set({ mainView: view }),
       setQuestionViewMode: (questionId, mode) => {
         const modes = new Map(get().questionViewModes);

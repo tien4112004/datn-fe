@@ -7,6 +7,7 @@ export default {
       projects: 'Projects',
       files: 'Files',
       classes: 'Classes',
+      questionBank: 'Question Bank',
       subjects: 'Subjects',
       schedules: 'Schedules',
       home: 'Home',

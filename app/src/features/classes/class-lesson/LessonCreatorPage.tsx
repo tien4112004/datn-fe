@@ -2,18 +2,9 @@ import { useSearchParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { LessonCreator } from './components';
 import { Skeleton } from '@/components/ui/skeleton';
-import {
-  Breadcrumb,
-  BreadcrumbList,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
-import { useClass } from '../shared/hooks';
 import { useCreateLesson } from './hooks';
 import { usePeriod } from '../class-schedule';
 
@@ -38,7 +29,6 @@ export const LessonCreatorPage = () => {
   }
 
   const { data: period, isLoading: periodLoading, isError: periodError } = usePeriod(periodId);
-  const { data: classData } = useClass(period?.classId || '');
   const createLessonMutation = useCreateLesson();
 
   const handleGoBack = () => {
@@ -87,28 +77,6 @@ export const LessonCreatorPage = () => {
 
   return (
     <div className="p-8">
-      {period && classData && (
-        <Breadcrumb className="mb-6">
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink href="/classes">{t('navigation.classes', 'Classes')}</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbLink href={`/classes/${period.classId}`}>{classData.name}</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbLink href={`/periods/${period.id}`}>{period.name}</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage>Create Lesson</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
-      )}
-
       <div className="mb-6 flex items-center gap-4">
         <Button variant="outline" size="sm" onClick={handleGoBack}>
           <ArrowLeft className="mr-2 h-4 w-4" />

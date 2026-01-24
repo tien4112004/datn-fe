@@ -20,11 +20,12 @@ export const CurrentQuestionView = () => {
   const removeQuestion = useAssignmentFormStore((state) => state.removeQuestion);
   const updateQuestion = useAssignmentFormStore((state) => state.updateQuestion);
 
-  const currentQuestionIndex = useAssignmentEditorStore((state) => state.currentQuestionIndex);
-  const setCurrentQuestionIndex = useAssignmentEditorStore((state) => state.setCurrentQuestionIndex);
+  const currentQuestionId = useAssignmentEditorStore((state) => state.currentQuestionId);
+  const setCurrentQuestionId = useAssignmentEditorStore((state) => state.setCurrentQuestionId);
   const questionViewModes = useAssignmentEditorStore((state) => state.questionViewModes);
   const toggleQuestionViewMode = useAssignmentEditorStore((state) => state.toggleQuestionViewMode);
 
+  const currentQuestionIndex = questions.findIndex((q) => q.question.id === currentQuestionId);
   const assignmentQuestion = questions[currentQuestionIndex];
   const question = assignmentQuestion?.question;
   const points = assignmentQuestion?.points || 0;
@@ -33,15 +34,19 @@ export const CurrentQuestionView = () => {
   const isEditing = viewMode === VIEW_MODE.EDITING;
 
   const handleDelete = () => {
-    if (question) {
+    if (question && currentQuestionIndex !== -1) {
       const confirmMessage = t('collection.item.removeQuestionConfirm', {
         type: getQuestionTypeName(question.type),
       });
       if (window.confirm(confirmMessage)) {
         removeQuestion(currentQuestionIndex);
-        // Adjust current index if needed
-        if (currentQuestionIndex >= questions.length - 1 && currentQuestionIndex > 0) {
-          setCurrentQuestionIndex(currentQuestionIndex - 1);
+        // Set current question to the next one or previous if at end
+        if (questions.length > 1) {
+          const nextIndex =
+            currentQuestionIndex >= questions.length - 1 ? currentQuestionIndex - 1 : currentQuestionIndex;
+          setCurrentQuestionId(questions[nextIndex]?.question.id || null);
+        } else {
+          setCurrentQuestionId(null);
         }
       }
     }

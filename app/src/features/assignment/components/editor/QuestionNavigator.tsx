@@ -77,8 +77,8 @@ export const QuestionNavigator = () => {
 
   const mainView = useAssignmentEditorStore((state) => state.mainView);
   const setMainView = useAssignmentEditorStore((state) => state.setMainView);
-  const currentQuestionIndex = useAssignmentEditorStore((state) => state.currentQuestionIndex);
-  const setCurrentQuestionIndex = useAssignmentEditorStore((state) => state.setCurrentQuestionIndex);
+  const currentQuestionId = useAssignmentEditorStore((state) => state.currentQuestionId);
+  const setCurrentQuestionId = useAssignmentEditorStore((state) => state.setCurrentQuestionId);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -100,15 +100,7 @@ export const QuestionNavigator = () => {
 
       if (oldIndex !== -1 && newIndex !== -1) {
         reorderQuestions(oldIndex, newIndex);
-
-        // Update current question index if the current question was moved
-        if (currentQuestionIndex === oldIndex) {
-          setCurrentQuestionIndex(newIndex);
-        } else if (currentQuestionIndex > oldIndex && currentQuestionIndex <= newIndex) {
-          setCurrentQuestionIndex(currentQuestionIndex - 1);
-        } else if (currentQuestionIndex < oldIndex && currentQuestionIndex >= newIndex) {
-          setCurrentQuestionIndex(currentQuestionIndex + 1);
-        }
+        // Current question ID remains the same, no need to update
       }
     }
   };
@@ -152,13 +144,13 @@ export const QuestionNavigator = () => {
           {/* Question Numbers */}
           <SortableContext items={questions.map((q) => q.question.id)} strategy={rectSortingStrategy}>
             {questions.map((aq, index) => {
-              const isActive = mainView === 'questions' && currentQuestionIndex === index;
+              const isActive = mainView === 'questions' && currentQuestionId === aq.question.id;
               const question = aq.question;
               const hasTitle = Boolean(question.title) && question.title.trim() !== '';
 
               return (
                 <SortableQuestionButton
-                  key={index}
+                  key={question.id}
                   id={question.id}
                   index={index}
                   isActive={isActive}
@@ -167,7 +159,7 @@ export const QuestionNavigator = () => {
                   untitledLabel={t('untitled')}
                   onClick={() => {
                     setMainView('questions');
-                    setCurrentQuestionIndex(index);
+                    setCurrentQuestionId(question.id);
                   }}
                 />
               );

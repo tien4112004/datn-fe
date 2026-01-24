@@ -48,6 +48,8 @@ export default class ClassFeedService implements ClassFeedApiService {
       attachments: request.attachments || [],
       linkedResources: request.linkedResources,
       linkedLessonId: request.linkedLessonId,
+      assignmentId: request.assignmentId,
+      dueDate: request.dueDate,
       allowComments: request.allowComments,
     };
 
@@ -67,6 +69,8 @@ export default class ClassFeedService implements ClassFeedApiService {
       attachments: request.attachments || [],
       linkedResources: request.linkedResources,
       linkedLessonId: request.linkedLessonId,
+      assignmentId: request.assignmentId,
+      dueDate: request.dueDate,
       isPinned: request.isPinned,
       allowComments: request.allowComments,
     };

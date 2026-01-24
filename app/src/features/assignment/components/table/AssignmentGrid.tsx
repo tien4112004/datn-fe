@@ -145,7 +145,7 @@ const AssignmentGrid = () => {
     <div className="group w-full cursor-pointer">
       <div
         className="relative flex aspect-video w-full flex-col items-center justify-center overflow-hidden rounded-lg bg-gradient-to-br from-indigo-50 to-blue-50 p-6 transition-shadow duration-200 hover:shadow-md"
-        onClick={() => navigate(`/assignments/edit/${assignment.id}`)}
+        onClick={() => navigate(`/assignments/${assignment.id}`)}
       >
         <ClipboardList className="mb-3 h-12 w-12 text-indigo-500" />
         <div className="text-center">
@@ -166,7 +166,7 @@ const AssignmentGrid = () => {
             </DropdownMenuTrigger>
             <DropdownMenuContent onClick={(e) => e.stopPropagation()}>
               <ActionContent
-                onViewDetail={() => navigate(`/assignments/edit/${assignment.id}`)}
+                onViewDetail={() => navigate(`/assignments/${assignment.id}`)}
                 onDelete={() => handleDelete(assignment)}
                 onRename={() => handleRename(assignment)}
               />
@@ -178,7 +178,7 @@ const AssignmentGrid = () => {
       <div className="mt-3 space-y-1">
         <h3
           className="cursor-pointer truncate text-sm font-medium text-gray-900 transition-colors hover:text-blue-600"
-          onClick={() => navigate(`/assignments/edit/${assignment.id}`)}
+          onClick={() => navigate(`/assignments/${assignment.id}`)}
         >
           {assignment.title || t('assignment.untitled')}
         </h3>

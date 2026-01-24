@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useCreatePost } from '../hooks/useApi';
 import { useAttachmentUpload } from '../hooks/useAttachmentUpload';
 import type { PostCreateRequest } from '../types';
@@ -17,13 +17,28 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/shared/components/ui/dialog';
-import { Paperclip, Plus, X, Link2, BrainCircuit, Presentation, ClipboardList, Loader2 } from 'lucide-react';
+import {
+  Paperclip,
+  Plus,
+  X,
+  Link2,
+  BrainCircuit,
+  Presentation,
+  ClipboardList,
+  Loader2,
+  CalendarIcon,
+} from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger } from '@/shared/components/ui/popover';
+import { Calendar } from '@/shared/components/ui/calendar';
+import { format } from 'date-fns';
+import { cn } from '@/shared/lib/utils';
 import { LessonListCommand, AssignmentListCommand } from '../../class-lesson/components';
 import type { Lesson } from '../../class-lesson';
 import { Separator } from '@/shared/components/ui/separator';
 import { ResourceSelectorDialog } from '@/features/projects/components/resource-selector';
 import { getAcceptString, formatFileSize } from '../utils/attachmentValidation';
 import { Progress } from '@/shared/components/ui/progress';
+import { getLocaleDateFns } from '@/shared/i18n/helper';
 
 interface Assignment {
   id: string;
@@ -62,7 +77,13 @@ export const PostCreator = ({
   const [linkedResources, setLinkedResources] = useState<Array<LinkedResource>>([]);
   const [resourceSelectorOpen, setResourceSelectorOpen] = useState(false);
   const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null);
+  const [dueDate, setDueDate] = useState<Date | undefined>(undefined);
   const [allowComments, setAllowComments] = useState(true);
+
+  // Sync type with initialType when it changes (e.g., when filter switches to Homework)
+  useEffect(() => {
+    setType(initialType);
+  }, [initialType]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -93,6 +114,7 @@ export const PostCreator = ({
               }))
             : undefined,
         assignmentId: type === 'Homework' && selectedAssignment ? selectedAssignment.id : undefined,
+        dueDate: type === 'Homework' && dueDate ? dueDate.toISOString() : undefined,
         allowComments,
       };
 
@@ -104,6 +126,7 @@ export const PostCreator = ({
       setLinkedLessons([]);
       setLinkedResources([]);
       setSelectedAssignment(null);
+      setDueDate(undefined);
       setType(initialType);
       setAllowComments(true);
       setOpen(false);
@@ -184,13 +207,44 @@ export const PostCreator = ({
 
           {/* Conditional Fields based on Post Type */}
           {type === 'Homework' ? (
-            /* Assignment Selector */
-            <div className="space-y-2">
-              <Label className="text-sm font-medium">{t('feed.creator.labels.selectAssignment')}</Label>
-              <AssignmentListCommand onAssignmentSelect={(assignment) => setSelectedAssignment(assignment)} />
-              {selectedAssignment && (
-                <p className="text-muted-foreground text-xs">Selected: {selectedAssignment.title}</p>
-              )}
+            <div className="space-y-4">
+              {/* Assignment Selector */}
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">{t('feed.creator.labels.selectAssignment')}</Label>
+                <AssignmentListCommand
+                  classId={classId}
+                  onAssignmentSelect={(assignment) => setSelectedAssignment(assignment)}
+                />
+              </div>
+
+              {/* Due Date Picker */}
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">{t('feed.creator.labels.deadline')}</Label>
+                <Popover modal={true}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        'w-full justify-start text-left font-normal',
+                        !dueDate && 'text-muted-foreground'
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {dueDate
+                        ? format(dueDate, 'PPPP', { locale: getLocaleDateFns() })
+                        : t('feed.creator.labels.deadline')}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={dueDate}
+                      onSelect={setDueDate}
+                      disabled={(date) => date < new Date()}
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
             </div>
           ) : (
             <>

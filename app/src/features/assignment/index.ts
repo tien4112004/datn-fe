@@ -10,6 +10,9 @@ export * from './hooks';
 // Utils
 export * from './utils';
 
+// Pages
+export * from './pages';
+
 // Components
 // Re-export from question feature for backward compatibility
 export { QuestionRenderer } from '@/features/question';

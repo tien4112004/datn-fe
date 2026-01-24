@@ -2,15 +2,17 @@ import { UserAvatar } from '@/components/common/UserAvatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { getLocaleDateFns } from '@/shared/i18n/helper';
-import { formatDistanceToNow } from 'date-fns';
-import { Clock, FileText, ClipboardList, MessageCircleMore, Pin } from 'lucide-react';
+import { format, formatDistanceToNow } from 'date-fns';
+import { Clock, FileText, ClipboardList, MessageCircleMore, Pin, ExternalLink } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import ReactMarkdown from 'react-markdown';
+import { Link } from 'react-router-dom';
 import type { Post } from '../types';
 import { AttachmentPreview } from './AttachmentPreview';
 import { LinkedResourcesPreview } from './LinkedResourcesPreview';
 import { PostActions } from './PostActions';
 import { parseDateSafe } from '@/shared/utils/date';
+import { useAssignment } from '@/features/assignment/hooks';
 
 interface PostCardProps {
   post: Post;
@@ -23,6 +25,9 @@ interface PostCardProps {
 
 export const PostCard = ({ post, onEdit, onDelete, onPin, onComment, className = '' }: PostCardProps) => {
   const { t } = useTranslation('classes');
+
+  // Fetch assignment details if this is a Homework post with an assignmentId
+  const { data: assignment, isLoading: isAssignmentLoading } = useAssignment(post.assignmentId ?? '');
 
   return (
     <article
@@ -81,6 +86,13 @@ export const PostCard = ({ post, onEdit, onDelete, onPin, onComment, className =
                   </Badge>
                 )}
 
+                {post.type === 'Homework' && post.dueDate && (
+                  <Badge variant="outline" className="gap-1 text-[10px] md:text-xs">
+                    <Clock className="h-3 w-3" />
+                    {t('feed.post.badges.dueDate')}: {format(parseDateSafe(post.dueDate), 'MMM d, yyyy')}
+                  </Badge>
+                )}
+
                 {post.isPinned && (
                   <Badge variant="secondary" className="gap-1 text-[10px] md:text-xs">
                     <Pin className="h-3 w-3" />
@@ -123,6 +135,48 @@ export const PostCard = ({ post, onEdit, onDelete, onPin, onComment, className =
       {post.linkedResources && post.linkedResources.length > 0 && (
         <div className="mb-2 ml-9 md:mb-3 md:ml-[52px]">
           <LinkedResourcesPreview resources={post.linkedResources} />
+        </div>
+      )}
+
+      {/* Linked Assignment (for Homework posts) */}
+      {post.type === 'Homework' && post.assignmentId && (
+        <div className="mb-2 ml-9 w-fit md:mb-3 md:ml-[52px]">
+          <div className="rounded-lg border border-purple-200 bg-purple-50/50 p-3 transition-colors hover:bg-purple-50 dark:border-purple-900 dark:bg-purple-950/30 dark:hover:bg-purple-950/50">
+            {isAssignmentLoading ? (
+              <div className="text-muted-foreground flex items-center gap-2 text-sm">
+                <ClipboardList className="h-4 w-4" />
+                <span>{t('feed.post.loadingAssignment')}</span>
+              </div>
+            ) : assignment ? (
+              <Link to={`/assignments/${post.assignmentId}`} className="block space-y-2">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <ClipboardList className="h-5 w-5 text-purple-600" />
+                    <span className="font-semibold">{assignment.title}</span>
+                  </div>
+                  <ExternalLink className="text-muted-foreground h-4 w-4 flex-shrink-0" />
+                </div>
+                {assignment.description && (
+                  <p className="text-muted-foreground line-clamp-2 text-sm">{assignment.description}</p>
+                )}
+                <div className="text-muted-foreground flex flex-wrap gap-3 text-xs">
+                  {assignment.questions && assignment.questions.length > 0 && (
+                    <span>
+                      {t('feed.post.assignment.questionCount', { count: assignment.questions.length })}
+                    </span>
+                  )}
+                  {assignment.totalPoints && (
+                    <span>{t('feed.post.assignment.totalPoints', { points: assignment.totalPoints })}</span>
+                  )}
+                </div>
+              </Link>
+            ) : (
+              <div className="text-muted-foreground flex items-center gap-2 text-sm">
+                <ClipboardList className="h-4 w-4" />
+                <span>{t('feed.post.assignmentNotFound')}</span>
+              </div>
+            )}
+          </div>
         </div>
       )}
 

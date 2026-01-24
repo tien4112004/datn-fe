@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/shared/lib/utils';
-import { Check } from 'lucide-react';
+import { Check, Loader2 } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -12,6 +12,7 @@ import {
   CommandList,
   Command,
 } from '@/components/ui/command';
+import { useAssignmentList } from '@/features/assignment/hooks';
 
 interface Assignment {
   id: string;
@@ -19,22 +20,34 @@ interface Assignment {
 }
 
 interface AssignmentListCommandProps {
+  classId?: string;
+  selectedAssignmentId?: string;
   onAssignmentSelect: (assignment: Assignment | null) => void;
 }
 
-export const AssignmentListCommand = ({ onAssignmentSelect }: AssignmentListCommandProps) => {
+export const AssignmentListCommand = ({
+  classId,
+  selectedAssignmentId,
+  onAssignmentSelect,
+}: AssignmentListCommandProps) => {
   const { t } = useTranslation('classes');
   const [assignmentSearchOpen, setAssignmentSearchOpen] = useState(false);
   const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null);
 
-  // TODO: Replace with actual API call to fetch assignments
-  const availableAssignments: Assignment[] = [
-    { id: 'assignment-1', title: 'Math Homework #1' },
-    { id: 'assignment-2', title: 'English Essay' },
-    { id: 'assignment-3', title: 'Science Lab Report' },
-    { id: 'assignment-4', title: 'History Research Paper' },
-    { id: 'assignment-5', title: 'Programming Project' },
-  ];
+  // Fetch assignments from API
+  const { data, isLoading } = useAssignmentList({ classId });
+
+  // Map API response to Assignment interface
+  const availableAssignments: Assignment[] =
+    data?.assignments?.map((a) => ({
+      id: a.id,
+      title: a.title,
+    })) ?? [];
+
+  // If selectedAssignmentId is provided and no local selection, find and set it
+  const effectiveSelection =
+    selectedAssignment ??
+    (selectedAssignmentId ? availableAssignments.find((a) => a.id === selectedAssignmentId) : null);
 
   const handleSelectAssignment = (assignment: Assignment) => {
     setSelectedAssignment(assignment);
@@ -50,28 +63,40 @@ export const AssignmentListCommand = ({ onAssignmentSelect }: AssignmentListComm
           role="combobox"
           aria-expanded={assignmentSearchOpen}
           className="w-full justify-between"
+          disabled={isLoading}
         >
-          {selectedAssignment
-            ? selectedAssignment.title
-            : t('integration.assignmentSelection.selectAssignment')}
+          {isLoading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              {t('integration.assignmentSelection.loading')}
+            </>
+          ) : effectiveSelection ? (
+            effectiveSelection.title
+          ) : (
+            t('integration.assignmentSelection.selectAssignment')
+          )}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="pointer-events-auto z-50 w-full p-0" align="start">
         <Command>
           <CommandInput placeholder={t('integration.assignmentSelection.searchAssignments')} />
           <CommandList>
-            <CommandEmpty>{t('integration.assignmentSelection.noAssignmentsFound')}</CommandEmpty>
+            <CommandEmpty>
+              {isLoading
+                ? t('integration.assignmentSelection.loading')
+                : t('integration.assignmentSelection.noAssignmentsFound')}
+            </CommandEmpty>
             <CommandGroup heading={t('integration.assignmentSelection.availableAssignments')}>
               {availableAssignments.map((assignment) => (
                 <CommandItem
                   key={assignment.id}
-                  value={assignment.id}
+                  value={assignment.title}
                   onSelect={() => handleSelectAssignment(assignment)}
                 >
                   <Check
                     className={cn(
                       'mr-2 h-4 w-4',
-                      selectedAssignment?.id === assignment.id ? 'opacity-100' : 'opacity-0'
+                      effectiveSelection?.id === assignment.id ? 'opacity-100' : 'opacity-0'
                     )}
                   />
                   {assignment.title}

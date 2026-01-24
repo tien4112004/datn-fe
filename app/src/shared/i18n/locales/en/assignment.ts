@@ -729,4 +729,103 @@ export default {
   common: {
     unsavedChanges: 'Unsaved changes',
   },
+
+  viewer: {
+    metadata: {
+      panelTitle: 'Assignment Information',
+      fields: {
+        title: 'Title',
+        subject: 'Subject',
+        grade: 'Grade',
+        description: 'Description',
+        shuffleQuestions: 'Shuffle Questions',
+        createdAt: 'Created At',
+      },
+    },
+    questions: {
+      panelTitle: 'Question {{number}}',
+      topic: 'Topic',
+      difficulty: 'Difficulty',
+      points: 'Points',
+      noQuestions: 'No Questions',
+      noQuestionsDescription: 'This assignment has no questions yet.',
+      noQuestionSelected: 'No Question Selected',
+      selectQuestion: 'Select a question to view',
+    },
+    matrix: {
+      panelTitle: 'Assessment Matrix',
+      viewDescription: 'This matrix shows the distribution of questions by topic and difficulty level.',
+    },
+    navigator: {
+      questionsCount: 'Questions ({{count}})',
+      assignmentInfo: 'Assignment Info',
+      matrixBuilder: 'Assessment Matrix',
+    },
+    actions: {
+      title: 'Actions',
+      edit: 'Edit Assignment',
+      delete: 'Delete Assignment',
+    },
+  },
+
+  view: {
+    pageTitle: 'View Assignment',
+    notFound: 'Assignment not found',
+    notFoundDescription: 'The assignment you are looking for does not exist or has been deleted.',
+    noDescription: 'No description provided',
+    noQuestions: 'No questions',
+    noQuestionsDescription: 'This assignment has no questions yet.',
+    noMatrix: 'No assessment matrix',
+    noMatrixDescription: 'This assignment has no assessment matrix configured.',
+    deleteSuccess: 'Assignment deleted successfully',
+    deleteError: 'Failed to delete assignment',
+
+    tabs: {
+      overview: 'Overview',
+      questions: 'Questions',
+    },
+
+    status: {
+      draft: 'Draft',
+      published: 'Published',
+      archived: 'Archived',
+    },
+
+    metadata: {
+      totalQuestions: '{{count}} question',
+      totalQuestions_plural: '{{count}} questions',
+      totalPoints: '{{points}} points',
+      createdAt: 'Created {{date}}',
+    },
+
+    actions: {
+      edit: 'Edit',
+      delete: 'Delete',
+    },
+
+    deleteDialog: {
+      title: 'Delete Assignment?',
+      description:
+        'This action cannot be undone. This will permanently delete the assignment and all its questions.',
+      cancel: 'Cancel',
+      delete: 'Delete',
+    },
+
+    overview: {
+      totalQuestions: 'Total Questions',
+      totalPoints: 'Total Points',
+      status: 'Status',
+      description: 'Description',
+      questionsByType: 'Questions by Type',
+      questionsByDifficulty: 'Questions by Difficulty',
+    },
+
+    questions: {
+      title: '{{count}} Question',
+      title_plural: '{{count}} Questions',
+      totalPoints: '{{points}} points total',
+      questionNumber: 'Question {{number}}',
+      points: '{{points}} pts',
+    },
+  },
 };

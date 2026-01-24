@@ -717,4 +717,102 @@ export default {
   common: {
     unsavedChanges: 'Thay đổi chưa lưu',
   },
+
+  viewer: {
+    metadata: {
+      panelTitle: 'Thông tin bài tập',
+      fields: {
+        title: 'Tiêu đề',
+        subject: 'Môn học',
+        grade: 'Khối',
+        description: 'Mô tả',
+        shuffleQuestions: 'Xáo trộn câu hỏi',
+        createdAt: 'Tạo ngày',
+      },
+    },
+    questions: {
+      panelTitle: 'Câu {{number}}',
+      topic: 'Chủ đề',
+      difficulty: 'Độ khó',
+      points: 'Điểm',
+      noQuestions: 'Không có câu hỏi',
+      noQuestionsDescription: 'Bài tập này chưa có câu hỏi nào.',
+      noQuestionSelected: 'Chưa chọn câu hỏi',
+      selectQuestion: 'Chọn một câu hỏi để xem',
+    },
+    matrix: {
+      panelTitle: 'Ma trận đánh giá',
+      viewDescription: 'Ma trận này hiển thị phân bố câu hỏi theo chủ đề và mức độ khó.',
+    },
+    navigator: {
+      questionsCount: 'Câu hỏi ({{count}})',
+      assignmentInfo: 'Thông tin bài tập',
+      matrixBuilder: 'Ma trận đánh giá',
+    },
+    actions: {
+      title: 'Hành động',
+      edit: 'Chỉnh sửa bài tập',
+      delete: 'Xóa bài tập',
+    },
+  },
+
+  view: {
+    pageTitle: 'Xem bài tập',
+    notFound: 'Không tìm thấy bài tập',
+    notFoundDescription: 'Bài tập bạn đang tìm không tồn tại hoặc đã bị xóa.',
+    noDescription: 'Chưa có mô tả',
+    noQuestions: 'Chưa có câu hỏi',
+    noQuestionsDescription: 'Bài tập này chưa có câu hỏi nào.',
+    noMatrix: 'Chưa có ma trận đánh giá',
+    noMatrixDescription: 'Bài tập này chưa được cấu hình ma trận đánh giá.',
+    deleteSuccess: 'Xóa bài tập thành công',
+    deleteError: 'Không thể xóa bài tập',
+
+    tabs: {
+      overview: 'Tổng quan',
+      questions: 'Câu hỏi',
+    },
+
+    status: {
+      draft: 'Bản nháp',
+      published: 'Đã xuất bản',
+      archived: 'Đã lưu trữ',
+    },
+
+    metadata: {
+      totalQuestions: '{{count}} câu hỏi',
+      totalQuestions_plural: '{{count}} câu hỏi',
+      totalPoints: '{{points}} điểm',
+      createdAt: 'Tạo ngày {{date}}',
+    },
+
+    actions: {
+      edit: 'Chỉnh sửa',
+      delete: 'Xóa',
+    },
+
+    deleteDialog: {
+      title: 'Xóa bài tập?',
+      description: 'Hành động này không thể hoàn tác. Bài tập và tất cả câu hỏi sẽ bị xóa vĩnh viễn.',
+      cancel: 'Hủy',
+      delete: 'Xóa',
+    },
+
+    overview: {
+      totalQuestions: 'Tổng số câu hỏi',
+      totalPoints: 'Tổng điểm',
+      status: 'Trạng thái',
+      description: 'Mô tả',
+      questionsByType: 'Câu hỏi theo loại',
+      questionsByDifficulty: 'Câu hỏi theo độ khó',
+    },
+
+    questions: {
+      title: '{{count}} câu hỏi',
+      title_plural: '{{count}} câu hỏi',
+      totalPoints: 'Tổng {{points}} điểm',
+      questionNumber: 'Câu {{number}}',
+      points: '{{points}} điểm',
+    },
+  },
 };

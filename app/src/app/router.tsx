@@ -180,6 +180,12 @@ const router = createBrowserRouter([
         }),
       },
       {
+        path: 'assignments/:id',
+        lazy: async () => ({
+          Component: (await import('@/features/assignment/pages/AssignmentViewPage')).AssignmentViewPage,
+        }),
+      },
+      {
         path: 'demo/question-renderer',
         lazy: async () => ({
           Component: (await import('@/features/assignment/pages/QuestionRendererDemoPage'))

@@ -42,16 +42,41 @@ export const AttachmentPreview = ({ url, className = '' }: AttachmentPreviewProp
     return mimeTypes[ext] || 'application/octet-stream';
   };
 
+  const handleDownload = async () => {
+    try {
+      const response = await fetch(url);
+      const blob = await response.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(blobUrl);
+    } catch (error) {
+      console.error('Download failed:', error);
+      // Fallback to simple link
+      window.open(url, '_blank');
+    }
+  };
+
   const fileName = getFileName(url);
   const fileType = getFileType(url);
   const isImage = fileType.startsWith('image/');
 
   if (isImage) {
     return (
-      <div className={`overflow-hidden rounded-lg border ${className}`}>
-        <img src={url} alt={fileName} className="h-32 w-full object-cover sm:h-40 md:h-48" />
-        <div className="bg-muted p-2">
-          <p className="truncate text-sm font-medium">{fileName}</p>
+      <div className={`relative overflow-hidden rounded-lg border ${className}`}>
+        <div className="group relative aspect-video w-full max-w-md">
+          <img src={url} alt={fileName} className="h-full w-full object-cover" />
+          <button
+            onClick={handleDownload}
+            className="absolute right-2 top-2 flex cursor-pointer items-center rounded-lg bg-black/60 p-2 text-white transition-all hover:bg-black/80"
+            title={fileName}
+          >
+            <FileDown className="h-4 w-4" />
+          </button>
         </div>
       </div>
     );
@@ -76,9 +101,9 @@ export const AttachmentPreview = ({ url, className = '' }: AttachmentPreviewProp
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-medium">{fileName}</p>
       </div>
-      <a href={url} download={fileName} className="text-primary hover:text-primary/80">
+      <button onClick={handleDownload} className="text-primary hover:text-primary/80">
         <FileDown className="h-5 w-5" />
-      </a>
+      </button>
     </div>
   );
 };

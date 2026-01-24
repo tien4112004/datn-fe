@@ -641,6 +641,7 @@ export default {
       searchAssignments: 'Search assignments...',
       noAssignmentsFound: 'No assignments found.',
       availableAssignments: 'Available Assignments',
+      loading: 'Loading assignments...',
     },
   },
   calendar: {
@@ -1127,6 +1128,7 @@ export default {
       placeholders: {
         content: 'Write your post content here...',
         comment: 'Write a comment...',
+        selectDeadline: 'Select deadline',
       },
       postType: {
         post: 'Post',
@@ -1189,6 +1191,12 @@ export default {
       },
       confirm: {
         deletePost: 'Are you sure you want to delete this post?',
+      },
+      loadingAssignment: 'Loading assignment...',
+      assignmentNotFound: 'Assignment not found',
+      assignment: {
+        questionCount: '{{count}} questions',
+        totalPoints: '{{points}} points',
       },
     },
     comments: {

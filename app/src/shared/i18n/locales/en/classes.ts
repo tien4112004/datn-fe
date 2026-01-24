@@ -1231,4 +1231,26 @@ export default {
       daysAgo: '{{count}}d ago',
     },
   },
+
+  credentials: {
+    modal: {
+      title: 'Student Account Credentials',
+      description:
+        'These are the login credentials for the student accounts. Please save or print them securely.',
+      warning:
+        'Important: This is the only time these credentials will be displayed. Please save or print them immediately.',
+      close: 'Close',
+      print: 'Print',
+    },
+    table: {
+      studentName: 'Student Name',
+      username: 'Username',
+      password: 'Password',
+    },
+    print: {
+      title: 'Student Account Credentials',
+      subtitle: 'Please keep these credentials secure and provide them to the students.',
+      footer: 'Generated on {{date}}',
+    },
+  },
 };

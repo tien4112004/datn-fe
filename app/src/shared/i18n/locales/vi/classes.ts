@@ -1227,4 +1227,26 @@ export default {
       daysAgo: '{{count}} ngày trước',
     },
   },
+
+  credentials: {
+    modal: {
+      title: 'Thông tin tài khoản học sinh',
+      description:
+        'Đây là thông tin đăng nhập cho tài khoản học sinh. Vui lòng lưu hoặc in chúng một cách an toàn.',
+      warning:
+        'Lưu ý quan trọng: Đây là lần duy nhất thông tin này được hiển thị. Vui lòng lưu hoặc in ngay.',
+      close: 'Đóng',
+      print: 'In',
+    },
+    table: {
+      studentName: 'Tên học sinh',
+      username: 'Tên đăng nhập',
+      password: 'Mật khẩu',
+    },
+    print: {
+      title: 'Thông tin tài khoản học sinh',
+      subtitle: 'Vui lòng giữ thông tin này an toàn và cung cấp cho học sinh.',
+      footer: 'Tạo ngày {{date}}',
+    },
+  },
 };

@@ -120,7 +120,7 @@ export const QuestionNavigator = () => {
       defaultOpen={true}
     >
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-        <div className="grid grid-cols-5 gap-1.5">
+        <div className="grid grid-cols-5 gap-1.5 overflow-hidden">
           {/* Assignment Info Icon */}
           <button
             type="button"

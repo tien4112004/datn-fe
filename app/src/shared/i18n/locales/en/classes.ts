@@ -792,26 +792,6 @@ export default {
     },
   },
 
-  credentials: {
-    modal: {
-      title: 'Student Credentials Created',
-      description: 'Login credentials have been generated. Please save or print them.',
-      warning: '⚠️ Important: These credentials will only be shown once. Print or save before closing.',
-      close: 'Close',
-      print: 'Print Credentials',
-    },
-    table: {
-      studentName: 'Student Name',
-      username: 'Username',
-      password: 'Temporary Password',
-    },
-    print: {
-      title: 'Student Login Credentials',
-      subtitle: 'Keep these credentials secure and distribute appropriately.',
-      footer: 'Generated on {{date}}',
-    },
-  },
-
   csvImport: {
     button: 'Import from CSV',
     buttonText: 'Import Students',
@@ -1229,6 +1209,28 @@ export default {
       minutesAgo: '{{count}}m ago',
       hoursAgo: '{{count}}h ago',
       daysAgo: '{{count}}d ago',
+    },
+  },
+
+  credentials: {
+    modal: {
+      title: 'Student Account Credentials',
+      description:
+        'These are the login credentials for the student accounts. Please save or print them securely.',
+      warning:
+        'Important: This is the only time these credentials will be displayed. Please save or print them immediately.',
+      close: 'Close',
+      print: 'Print',
+    },
+    table: {
+      studentName: 'Student Name',
+      username: 'Username',
+      password: 'Password',
+    },
+    print: {
+      title: 'Student Account Credentials',
+      subtitle: 'Please keep these credentials secure and provide them to the students.',
+      footer: 'Generated on {{date}}',
     },
   },
 };

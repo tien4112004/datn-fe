@@ -786,27 +786,6 @@ export default {
     },
   },
 
-  credentials: {
-    modal: {
-      title: 'Thông tin đăng nhập học sinh đã được tạo',
-      description: 'Thông tin đăng nhập đã được tạo. Vui lòng lưu hoặc in chúng.',
-      warning:
-        '⚠️ Quan trọng: Thông tin đăng nhập này sẽ chỉ được hiển thị một lần. In hoặc lưu trước khi đóng.',
-      close: 'Đóng',
-      print: 'In thông tin đăng nhập',
-    },
-    table: {
-      studentName: 'Tên học sinh',
-      username: 'Tên đăng nhập',
-      password: 'Mật khẩu tạm thời',
-    },
-    print: {
-      title: 'Thông tin đăng nhập học sinh',
-      subtitle: 'Giữ an toàn thông tin đăng nhập và phân phối thích hợp.',
-      footer: 'Được tạo vào {{date}}',
-    },
-  },
-
   csvImport: {
     button: 'Nhập từ CSV',
     buttonText: 'Nhập học sinh',
@@ -1225,6 +1204,28 @@ export default {
       minutesAgo: '{{count}} phút trước',
       hoursAgo: '{{count}} giờ trước',
       daysAgo: '{{count}} ngày trước',
+    },
+  },
+
+  credentials: {
+    modal: {
+      title: 'Thông tin tài khoản học sinh',
+      description:
+        'Đây là thông tin đăng nhập cho tài khoản học sinh. Vui lòng lưu hoặc in chúng một cách an toàn.',
+      warning:
+        'Lưu ý quan trọng: Đây là lần duy nhất thông tin này được hiển thị. Vui lòng lưu hoặc in ngay.',
+      close: 'Đóng',
+      print: 'In',
+    },
+    table: {
+      studentName: 'Tên học sinh',
+      username: 'Tên đăng nhập',
+      password: 'Mật khẩu',
+    },
+    print: {
+      title: 'Thông tin tài khoản học sinh',
+      subtitle: 'Vui lòng giữ thông tin này an toàn và cung cấp cho học sinh.',
+      footer: 'Tạo ngày {{date}}',
     },
   },
 };

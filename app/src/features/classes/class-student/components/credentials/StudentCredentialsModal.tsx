@@ -10,8 +10,18 @@ import {
 } from '@ui/dialog';
 import { Button } from '@ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@ui/table';
-import type { CredentialsModalProps } from '../../types/credentials';
 import './print-styles.css';
+import type { StudentCredential } from '../../types/credentials';
+
+/**
+ * Props for the StudentCredentialsModal component
+ */
+export interface CredentialsModalProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  credentials: StudentCredential[];
+  mode: 'single' | 'bulk'; // single = manual creation, bulk = CSV import
+}
 
 /**
  * Modal component for displaying student credentials after creation/import
@@ -38,7 +48,7 @@ import './print-styles.css';
  * />
  * ```
  */
-export function StudentCredentialsModal({ open, onOpenChange, credentials, mode }: CredentialsModalProps) {
+export function StudentCredentialsModal({ open, onOpenChange, credentials }: CredentialsModalProps) {
   const { t } = useTranslation('classes', { keyPrefix: 'credentials' });
 
   // Don't render if no credentials

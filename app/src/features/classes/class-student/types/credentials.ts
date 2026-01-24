@@ -16,13 +16,3 @@ export interface StudentCredential {
   password: string;
   email?: string;
 }
-
-/**
- * Props for the StudentCredentialsModal component
- */
-export interface CredentialsModalProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  credentials: StudentCredential[];
-  mode: 'single' | 'bulk'; // single = manual creation, bulk = CSV import
-}

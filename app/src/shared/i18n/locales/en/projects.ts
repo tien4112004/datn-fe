@@ -15,6 +15,7 @@ export default {
     mindmap: 'Mindmap',
     assignment: 'Assignment',
     image: 'Image',
+    sharedWithMe: 'Shared with Me',
   },
   creation: {
     createPresentationError: 'Failed to create blank presentation: {{error}}',

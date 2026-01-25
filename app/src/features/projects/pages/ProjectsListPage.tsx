@@ -10,6 +10,7 @@ import type { ResourceType } from '@/shared/constants/resourceTypes';
 import Image from '@/features/image';
 import AssignmentTable from '@/features/assignment/components/table/AssignmentTable';
 import AssignmentGrid from '@/features/assignment/components/table/AssignmentGrid';
+import { SharedResourcesTable, SharedResourcesGrid } from '@/features/shared-resources';
 
 const ProjectListPage = () => {
   const { t } = useTranslation('projects');
@@ -50,6 +51,12 @@ const ProjectListPage = () => {
       value: 'image',
       label: t('resources.image', 'Image'),
       content: <Image.ImageGalleryPage />,
+    },
+    {
+      key: 'shared',
+      value: 'shared',
+      label: t('resources.sharedWithMe'),
+      content: viewMode === 'grid' ? <SharedResourcesGrid /> : <SharedResourcesTable />,
     },
   ];
 

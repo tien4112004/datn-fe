@@ -22,6 +22,3 @@ export { FillInBlankEditing, FillInBlankViewing } from './fill-in-blank';
 
 // Open Ended Components
 export { OpenEndedEditing, OpenEndedViewing } from './open-ended';
-
-// Group Components
-export { GroupEditing, GroupViewing, SubQuestionList, SubQuestionWrapper } from './group';

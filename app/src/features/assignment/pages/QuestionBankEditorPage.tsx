@@ -269,7 +269,7 @@ export function QuestionBankEditorPage() {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        {getAllQuestionTypes({ includeGroup: true }).map((type) => (
+                        {getAllQuestionTypes().map((type) => (
                           <SelectItem key={type.value} value={type.value}>
                             {t(type.i18nKey as any)}
                           </SelectItem>

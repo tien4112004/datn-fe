@@ -68,12 +68,6 @@ export const AddQuestionButton = ({ className }: AddQuestionButtonProps) => {
           caseSensitive: false,
         };
         break;
-      case QUESTION_TYPE.GROUP:
-        data = {
-          description: '',
-          questions: [],
-        };
-        break;
     }
 
     const newQuestion: AssignmentQuestionWithTopic = {
@@ -105,7 +99,7 @@ export const AddQuestionButton = ({ className }: AddQuestionButtonProps) => {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-        {getAllQuestionTypes({ includeGroup: true }).map((type) => (
+        {getAllQuestionTypes().map((type) => (
           <DropdownMenuItem key={type.value} onClick={() => handleAddQuestion(type.value)}>
             {type.label}
           </DropdownMenuItem>

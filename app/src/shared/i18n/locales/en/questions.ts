@@ -64,7 +64,6 @@ export default {
     matching: 'Matching',
     openEnded: 'Open Ended',
     fillInBlank: 'Fill in the Blank',
-    group: 'Group Question',
   },
 
   typeLabels: {
@@ -72,7 +71,6 @@ export default {
     matching: 'Matching Question',
     openEnded: 'Open-ended Question',
     fillInBlank: 'Fill In Blank Question',
-    group: 'Group Question',
   },
 
   difficulty: {
@@ -119,8 +117,6 @@ export default {
     maxPairs: 'Maximum 8 pairs allowed',
     maxLengthExceeded: 'Maximum length exceeded',
     minSegments: 'At least one segment required',
-    subQuestionTitleRequired: 'Sub-question title is required',
-    minSubQuestions: 'At least one sub-question required',
   },
 
   // Multiple Choice
@@ -336,76 +332,6 @@ export default {
       maxPoints: 'Max: {{points}} points',
       teacherFeedback: 'Teacher Feedback (Optional)',
       feedbackPlaceholder: 'Add comments or feedback for the student...',
-    },
-  },
-
-  group: {
-    title: 'Group Question',
-    description: 'Create a question group containing multiple sub-questions',
-
-    // Editing mode
-    editing: {
-      groupDescription: 'Group Description',
-      groupDescriptionPlaceholder: 'Enter a description, passage, or context for this group of questions...',
-      groupDescriptionHint: 'Provide context or instructions for all sub-questions',
-      titleImage: 'Title Image (Optional)',
-
-      displaySettings: 'Display Settings',
-      showNumbers: 'Show question numbers',
-      shuffleQuestions: 'Shuffle questions',
-      totalPoints: 'Total Points',
-
-      addQuestion: 'Add Question',
-      selectType: 'Select question type:',
-      subQuestions: 'Sub-Questions',
-
-      validationWarning: 'A group question must contain at least one sub-question.',
-
-      types: {
-        multipleChoice: 'Multiple Choice',
-        multipleChoiceDesc: 'Single correct answer',
-        matching: 'Matching',
-        matchingDesc: 'Match pairs',
-        openEnded: 'Open Ended',
-        openEndedDesc: 'Free text answer',
-        fillInBlank: 'Fill in Blank',
-        fillInBlankDesc: 'Complete sentence',
-      },
-    },
-
-    // Viewing mode
-    viewing: {
-      preview: 'Preview',
-    },
-
-    // Doing mode
-    doing: {
-      progress: 'Progress',
-      answered: '{{count}} of {{total}} answered',
-    },
-
-    // After Assessment mode
-    afterAssessment: {
-      results: 'Results',
-      yourScore: 'Your Score',
-    },
-
-    // Grading mode
-    grading: {
-      overallGrade: 'Overall Grade',
-      totalPointsEarned: 'Total Points Earned',
-      overallFeedback: 'Overall Feedback (Optional)',
-      feedbackPlaceholder: 'Add feedback for the student...',
-    },
-
-    // Sub-question wrapper
-    subQuestion: {
-      questionNumber: 'Question {{number}}',
-      points: '{{points}} pts',
-      progress: 'Progress:',
-      questionsAnswered: ' questions answered',
-      emptyStateTitle: 'No questions in this group yet.',
-      emptyStateMessage: 'Click "Add Question" to get started.',
     },
   },
 };

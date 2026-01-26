@@ -6,7 +6,6 @@
 import {
   QUESTION_TYPE,
   type QuestionType,
-  type CoreQuestionType,
   QUESTION_TYPE_LABELS,
   QUESTION_TYPE_I18N_KEYS,
   DIFFICULTY,
@@ -35,33 +34,20 @@ export interface ConstantItem<T = string> {
 /**
  * Get all question types as constant items
  */
-export function getAllQuestionTypes(options?: { includeGroup?: boolean }): ConstantItem<QuestionType>[] {
-  const { includeGroup = true } = options || {};
-
-  const types = Object.values(QUESTION_TYPE).map((type) => ({
+export function getAllQuestionTypes(): ConstantItem<QuestionType>[] {
+  return Object.values(QUESTION_TYPE).map((type) => ({
     value: type,
     label: QUESTION_TYPE_LABELS[type],
     i18nKey: QUESTION_TYPE_I18N_KEYS[type],
   }));
-
-  if (!includeGroup) {
-    return types.filter((type) => type.value !== QUESTION_TYPE.GROUP);
-  }
-
-  return types;
 }
 
 /**
- * Get core question types (excludes GROUP) as constant items
+ * Get core question types (same as getAllQuestionTypes since GROUP is removed)
+ * @deprecated Use getAllQuestionTypes instead
  */
-export function getCoreQuestionTypes(): ConstantItem<CoreQuestionType>[] {
-  return Object.values(QUESTION_TYPE)
-    .filter((type) => type !== QUESTION_TYPE.GROUP)
-    .map((type) => ({
-      value: type as CoreQuestionType,
-      label: QUESTION_TYPE_LABELS[type],
-      i18nKey: QUESTION_TYPE_I18N_KEYS[type],
-    }));
+export function getCoreQuestionTypes(): ConstantItem<QuestionType>[] {
+  return getAllQuestionTypes();
 }
 
 /**

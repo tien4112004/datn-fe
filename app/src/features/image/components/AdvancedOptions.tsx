@@ -2,16 +2,15 @@ import { AnimatePresence, motion } from 'motion/react';
 import { Label } from '@/components/ui/label';
 import { AutosizeTextarea } from '@/components/ui/autosize-textarea';
 import { CardTitle } from '@/shared/components/ui/card';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown, ChevronUp, Ban } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-import { MODEL_TYPES, useModels } from '@/features/model';
-import { ModelSelect } from '@/features/model/components/ModelSelect';
-import { IMAGE_DIMENSION_OPTIONS } from '@/features/image/types';
+import { IMAGE_DIMENSION_OPTIONS, ART_STYLE_OPTIONS } from '@/features/image/types';
 import type { CreateImageFormData } from '@/features/image/types';
 import type { Control, UseFormRegister } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
 import { useArtStyles } from '../hooks';
+import { useMemo } from 'react';
 
 interface AdvancedOptionsProps {
   register: UseFormRegister<CreateImageFormData>;
@@ -22,8 +21,14 @@ interface AdvancedOptionsProps {
 
 const AdvancedOptions = ({ register, control, isOpen, onToggle }: AdvancedOptionsProps) => {
   const { t } = useTranslation('image', { keyPrefix: 'create' });
-  const { models, isLoading, isError } = useModels(MODEL_TYPES.IMAGE);
-  const { artStyles, isLoading: isLoadingStyles } = useArtStyles();
+  const { artStyles: apiArtStyles, isLoading: isLoadingStyles } = useArtStyles();
+
+  // Ensure "None" option is always first
+  const noneStyle = ART_STYLE_OPTIONS.find((s) => s.id === '');
+  const artStyles = useMemo(() => {
+    const stylesWithoutNone = apiArtStyles.filter((s) => s.id !== '' && s.name !== '');
+    return noneStyle ? [noneStyle, ...stylesWithoutNone] : stylesWithoutNone;
+  }, [apiArtStyles, noneStyle]);
 
   const toggleOptions = () => {
     onToggle(!isOpen);
@@ -53,29 +58,6 @@ const AdvancedOptions = ({ register, control, isOpen, onToggle }: AdvancedOption
             style={{ overflow: 'hidden' }}
           >
             <div className="mt-4 space-y-4 px-1">
-              {/* 1x2 Grid for Model and Art Style */}
-              <div className="grid grid-cols-2 gap-4">
-                {/* Image Models */}
-                <div className="space-y-2">
-                  <Label>{t('model.label')}</Label>
-                  <Controller
-                    name="model"
-                    control={control}
-                    render={({ field }) => (
-                      <ModelSelect
-                        models={models}
-                        value={field.value}
-                        onValueChange={field.onChange}
-                        placeholder={t('model.placeholder')}
-                        label={t('model.label')}
-                        isLoading={isLoading}
-                        isError={isError}
-                      />
-                    )}
-                  />
-                </div>
-              </div>
-
               {/* Image Dimensions - Full Width Visual Options */}
               <div className="space-y-3">
                 <Label>{t('dimension.label')}</Label>
@@ -149,21 +131,30 @@ const AdvancedOptions = ({ register, control, isOpen, onToggle }: AdvancedOption
                           {artStyles.map((style) => {
                             const styleValue = style.id || style.name;
                             const isSelected = field.value === styleValue;
+                            const isNoneStyle = style.id === '' && style.labelKey === 'none';
 
                             return (
                               <div
-                                key={styleValue}
+                                key={styleValue || 'none'}
                                 className={`group relative cursor-pointer overflow-hidden rounded-lg border-2 transition-all hover:scale-105 ${
                                   isSelected ? 'border-primary shadow-md' : 'border-border'
                                 }`}
                                 onClick={() => field.onChange(styleValue)}
                               >
-                                <div
-                                  className="h-36 w-full bg-cover bg-center"
-                                  style={{
-                                    background: `url(${style.visual}) center/cover no-repeat`,
-                                  }}
-                                />
+                                {isNoneStyle ? (
+                                  <div className="bg-muted/30 flex h-36 w-full items-center justify-center">
+                                    <Ban
+                                      className={`h-12 w-12 ${isSelected ? 'text-primary' : 'text-muted-foreground'}`}
+                                    />
+                                  </div>
+                                ) : (
+                                  <div
+                                    className="h-36 w-full bg-cover bg-center"
+                                    style={{
+                                      background: `url(${style.visual}) center/cover no-repeat`,
+                                    }}
+                                  />
+                                )}
 
                                 <div className="bg-card flex items-center justify-center p-2">
                                   <span className="text-xs font-medium">

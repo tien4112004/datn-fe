@@ -44,6 +44,8 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
       slideCount: getValues().slideCount,
       language: getValues().language,
       model: getValues().model,
+      grade: getValues().grade || undefined,
+      subject: getValues().subject || undefined,
     },
     setOutlines,
     { manual: true }
@@ -73,6 +75,8 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
       slideCount: data.slideCount,
       language: data.language,
       model: data.model,
+      grade: data.grade || undefined,
+      subject: data.subject || undefined,
     };
     restartStream(outlineData);
   }, []);

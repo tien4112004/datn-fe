@@ -96,4 +96,8 @@ export type MindmapGenerateRequest = {
   maxDepth?: number;
   /** Maximum number of branches per node (1-10, default 5) */
   maxBranchesPerNode?: number;
+  /** The grade level for the content (max 50 chars) */
+  grade?: string;
+  /** The subject area for the content (max 100 chars) */
+  subject?: string;
 };

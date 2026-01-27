@@ -25,6 +25,16 @@ export default {
       label: 'Số nhánh tối đa',
       description: 'Số nhánh tối đa mỗi nút (1-10)',
     },
+    grade: {
+      label: 'Cấp độ lớp',
+      placeholder: 'Chọn cấp độ lớp',
+      none: 'Không',
+    },
+    subject: {
+      label: 'Môn học',
+      placeholder: 'Chọn môn học',
+      none: 'Không',
+    },
     examples: {
       title: 'Ví Dụ Chủ Đề Sơ Đồ Tư Duy',
       prompt1: 'Nền tảng Machine Learning',

@@ -32,6 +32,9 @@ export type UnifiedFormData = {
     name: string;
     provider: string;
   };
+  // Metadata fields (optional)
+  grade?: string;
+  subject?: string;
 };
 
 interface PresentationFormContextValue {
@@ -86,6 +89,8 @@ export const PresentationFormProvider = ({ children }: PresentationFormProviderP
             provider: z.string().min(1),
           })
           .optional(),
+        grade: z.string().max(50).optional(),
+        subject: z.string().max(100).optional(),
       }),
     []
   );
@@ -95,7 +100,7 @@ export const PresentationFormProvider = ({ children }: PresentationFormProviderP
     defaultValues: {
       topic: '',
       slideCount: 10,
-      language: 'en',
+      language: 'vi',
       model: {
         name: '',
         provider: '',
@@ -107,6 +112,8 @@ export const PresentationFormProvider = ({ children }: PresentationFormProviderP
         name: '',
         provider: '',
       },
+      grade: '',
+      subject: '',
       ...persistedData,
     },
   });

@@ -50,7 +50,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     navSecondary: [
       {
         title: t('notification'),
-        url: '/notification',
+        url: '/notifications',
         icon: Bell,
       },
       {

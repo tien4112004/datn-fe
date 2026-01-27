@@ -110,8 +110,11 @@ export function useFCM() {
   const initialize = useCallback(async () => {
     // If already have a token and registered, just setup foreground listener
     if (fcmToken && isRegistered) {
+      console.log('[useFCM] Already registered with token:', fcmToken);
       return;
     }
+
+    console.log('[useFCM] Starting initialization...');
 
     // Request permission and get token
     const token = await requestPermissionAndGetToken();

@@ -12,16 +12,7 @@ export default defineConfig(({ mode }) => {
 
   // Configure URLs with production fallbacks
   const apiUrl = process.env.VITE_API_URL;
-  // env.NODE_ENV === 'production'
-  //   ? 'https://api.huy-devops.site'
-  //   : env.VITE_API_URL || 'http://localhost:3000';
-
   const presentationUrl = process.env.VITE_PRESENTATION_URL;
-  // env.NODE_ENV === 'production'
-  //   ? 'https://presentation.huy-devops.site'
-  //   : env.VITE_PRESENTATION_URL || 'http://localhost:5174';
-
-  console.log('ENV: ', process.env);
 
   return {
     server: {

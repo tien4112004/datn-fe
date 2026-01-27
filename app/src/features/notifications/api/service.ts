@@ -1,5 +1,11 @@
 import type { ApiClient, ApiResponse } from '@aiprimary/api';
-import type { NotificationApiService, RegisterDeviceRequest, SendNotificationRequest } from '../types';
+import type {
+  NotificationApiService,
+  RegisterDeviceRequest,
+  SendNotificationRequest,
+  PaginatedNotificationsResponse,
+  UnreadCountResponse,
+} from '../types';
 
 export default class NotificationService implements NotificationApiService {
   private readonly apiClient: ApiClient;
@@ -20,5 +26,28 @@ export default class NotificationService implements NotificationApiService {
       request
     );
     return response.data.data;
+  }
+
+  async getNotifications(page: number, size: number): Promise<PaginatedNotificationsResponse> {
+    const response = await this.apiClient.get<ApiResponse<PaginatedNotificationsResponse>>(
+      `${this.baseUrl}/api/notifications`,
+      { params: { page, size } }
+    );
+    return response.data.data;
+  }
+
+  async getUnreadCount(): Promise<UnreadCountResponse> {
+    const response = await this.apiClient.get<ApiResponse<UnreadCountResponse>>(
+      `${this.baseUrl}/api/notifications/unread-count`
+    );
+    return response.data.data;
+  }
+
+  async markAsRead(notificationId: string): Promise<void> {
+    await this.apiClient.put(`${this.baseUrl}/api/notifications/${notificationId}/read`);
+  }
+
+  async markAllAsRead(): Promise<void> {
+    await this.apiClient.put(`${this.baseUrl}/api/notifications/read-all`);
   }
 }

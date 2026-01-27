@@ -18,7 +18,15 @@ function initializeFirebase() {
     return;
   }
 
-  firebase.initializeApp(firebaseConfig);
+  if (firebase.apps.length === 0) {
+    firebase.initializeApp(firebaseConfig);
+  } else {
+    // If it already exists, we might want to check if config changed, but for now just reuse/re-init
+    // Note: firebase-compat usually handles singleton, but explicit check avoids error
+    // If we strictly need to re-init with new config, we'd need to delete app first.
+    // But usually we just want to avoid the crash.
+    console.log('[firebase-messaging-sw.js] Firebase already initialized');
+  }
   const messaging = firebase.messaging();
 
   messaging.onBackgroundMessage((payload) => {

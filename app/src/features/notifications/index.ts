@@ -4,6 +4,7 @@ export type { NotificationApiService } from './api';
 
 // Components
 export { NotificationInitializer } from './components';
+export { NotificationsPage } from './pages/NotificationsPage';
 
 // Hooks
 export { useRegisterDevice, useSendNotification, useFCM } from './hooks';

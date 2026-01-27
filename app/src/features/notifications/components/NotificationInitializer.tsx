@@ -17,11 +17,14 @@ export function NotificationInitializer() {
       return;
     }
 
-    // Only auto-initialize if user hasn't been prompted before
-    // This prevents annoying permission prompts on every login
-    if (!hasRequestedPermission) {
+    const permission = Notification.permission;
+    const shouldInitialize = permission === 'default' || permission === 'granted';
+
+    if (shouldInitialize) {
       hasInitialized.current = true;
       initialize();
+    } else if (permission === 'denied') {
+      console.warn('[NotificationInitializer] Notifications are explicitly blocked by the user/browser.');
     }
   }, [isAuthenticated, isLoading, isSupported, hasRequestedPermission, initialize]);
 

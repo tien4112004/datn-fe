@@ -32,6 +32,8 @@ export const useNotificationStore = create<NotificationState>()(
       name: 'notification-store',
       partialize: (state) => ({
         hasRequestedPermission: state.hasRequestedPermission,
+        fcmToken: state.fcmToken,
+        isRegistered: state.isRegistered,
       }),
     }
   )

@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useState } from 'react';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 import { useClassFeedApiService } from '../api';
 import type {
   Comment,
@@ -105,6 +106,7 @@ export function useComments(postId: string) {
 export function useCreatePost() {
   const queryClient = useQueryClient();
   const classFeedApi = useClassFeedApiService();
+  const { t } = useTranslation('classes');
 
   return useMutation({
     mutationFn: (request: PostCreateRequest) => classFeedApi.createPost(request),
@@ -121,14 +123,11 @@ export function useCreatePost() {
         };
       });
 
-      toast.success('Post created successfully');
+      toast.success(t('feed.success.postCreated'));
     },
     onError: (error) => {
-      toast.error('Failed to create post', {
-        description:
-          error instanceof Error
-            ? error.message
-            : 'Network error. Please check your connection and try again.',
+      toast.error(t('feed.errors.createFailed'), {
+        description: error instanceof Error ? error.message : t('feed.errors.genericError'),
       });
     },
   });
@@ -140,6 +139,7 @@ export function useCreatePost() {
 export function useUpdatePost() {
   const queryClient = useQueryClient();
   const classFeedApi = useClassFeedApiService();
+  const { t } = useTranslation('classes');
 
   return useMutation({
     mutationFn: (request: PostUpdateRequest) => classFeedApi.updatePost(request),
@@ -153,14 +153,11 @@ export function useUpdatePost() {
         };
       });
 
-      toast.success('Post updated successfully');
+      toast.success(t('feed.success.postUpdated'));
     },
     onError: (error) => {
-      toast.error('Failed to update post', {
-        description:
-          error instanceof Error
-            ? error.message
-            : 'Network error. Please check your connection and try again.',
+      toast.error(t('feed.errors.updateFailed'), {
+        description: error instanceof Error ? error.message : t('feed.errors.genericError'),
       });
     },
   });
@@ -172,6 +169,7 @@ export function useUpdatePost() {
 export function useDeletePost() {
   const queryClient = useQueryClient();
   const classFeedApi = useClassFeedApiService();
+  const { t } = useTranslation('classes');
 
   return useMutation({
     mutationFn: (postId: string) => classFeedApi.deletePost(postId),
@@ -185,14 +183,11 @@ export function useDeletePost() {
         };
       });
 
-      toast.success('Post deleted successfully');
+      toast.success(t('feed.success.postDeleted'));
     },
     onError: (error) => {
-      toast.error('Failed to delete post', {
-        description:
-          error instanceof Error
-            ? error.message
-            : 'Network error. Please check your connection and try again.',
+      toast.error(t('feed.errors.deleteFailed'), {
+        description: error instanceof Error ? error.message : t('feed.errors.genericError'),
       });
     },
   });
@@ -204,6 +199,7 @@ export function useDeletePost() {
 export function usePinPost() {
   const queryClient = useQueryClient();
   const classFeedApi = useClassFeedApiService();
+  const { t } = useTranslation('classes');
 
   return useMutation({
     mutationFn: ({ postId, pinned }: { postId: string; pinned: boolean }) =>
@@ -218,15 +214,15 @@ export function usePinPost() {
         };
       });
 
-      toast.success(`Post ${variables.pinned ? 'pinned' : 'unpinned'} successfully`);
+      toast.success(variables.pinned ? t('feed.success.postPinned') : t('feed.success.postUnpinned'));
     },
     onError: (error, variables) => {
-      toast.error(`Failed to ${variables.pinned ? 'pin' : 'unpin'} post`, {
-        description:
-          error instanceof Error
-            ? error.message
-            : 'Network error. Please check your connection and try again.',
-      });
+      toast.error(
+        variables.pinned ? t('feed.errors.pinFailed', { action: 'pin' }) : t('feed.errors.unpinFailed'),
+        {
+          description: error instanceof Error ? error.message : t('feed.errors.genericError'),
+        }
+      );
     },
   });
 }
@@ -237,6 +233,7 @@ export function usePinPost() {
 export function useCreateComment() {
   const queryClient = useQueryClient();
   const classFeedApi = useClassFeedApiService();
+  const { t } = useTranslation('classes');
 
   return useMutation({
     mutationFn: (request: CommentCreateRequest) => classFeedApi.createComment(request),
@@ -247,14 +244,11 @@ export function useCreateComment() {
         newComment,
       ]);
 
-      toast.success('Comment added successfully');
+      toast.success(t('feed.success.commentAdded'));
     },
     onError: (error) => {
-      toast.error('Failed to add comment', {
-        description:
-          error instanceof Error
-            ? error.message
-            : 'Network error. Please check your connection and try again.',
+      toast.error(t('feed.errors.commentFailed'), {
+        description: error instanceof Error ? error.message : t('feed.errors.genericError'),
       });
     },
   });
@@ -266,6 +260,7 @@ export function useCreateComment() {
 export function useDeleteComment() {
   const queryClient = useQueryClient();
   const classFeedApi = useClassFeedApiService();
+  const { t } = useTranslation('classes');
 
   return useMutation({
     mutationFn: (commentId: string) => classFeedApi.deleteComment(commentId),
@@ -275,14 +270,11 @@ export function useDeleteComment() {
         oldComments.filter((comment) => comment.id !== commentId)
       );
 
-      toast.success('Comment deleted successfully');
+      toast.success(t('feed.success.commentDeleted'));
     },
     onError: (error) => {
-      toast.error('Failed to delete comment', {
-        description:
-          error instanceof Error
-            ? error.message
-            : 'Network error. Please check your connection and try again.',
+      toast.error(t('feed.errors.deleteCommentFailed'), {
+        description: error instanceof Error ? error.message : t('feed.errors.genericError'),
       });
     },
   });

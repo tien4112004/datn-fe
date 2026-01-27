@@ -43,14 +43,6 @@ export function getAllQuestionTypes(): ConstantItem<QuestionType>[] {
 }
 
 /**
- * Get core question types (same as getAllQuestionTypes since GROUP is removed)
- * @deprecated Use getAllQuestionTypes instead
- */
-export function getCoreQuestionTypes(): ConstantItem<QuestionType>[] {
-  return getAllQuestionTypes();
-}
-
-/**
  * Get the Vietnamese name for a question type
  */
 export function getQuestionTypeName(type: QuestionType): string {

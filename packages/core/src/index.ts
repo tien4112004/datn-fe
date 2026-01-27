@@ -41,7 +41,6 @@ export {
 } from './assessment/grades';
 export {
   getAllQuestionTypes,
-  getCoreQuestionTypes,
   getQuestionTypeName,
   getQuestionTypeI18nKey,
   getQuestionTypeI18nMap,

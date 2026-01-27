@@ -15,7 +15,7 @@ export interface Post {
   classId: string;
   authorId: string;
   author?: UserMinimalInfo; // User info from backend
-  type: 'Post' | 'Homework';
+  type: 'Post' | 'Exercise';
   content: string;
   attachments?: string[]; // Array of URLs from backend
   linkedResources?: LinkedResourceResponse[];

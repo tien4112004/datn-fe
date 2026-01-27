@@ -14,7 +14,7 @@ interface PostListProps {
   hasMore?: boolean;
   loading?: boolean;
   className?: string;
-  filterType?: 'all' | 'Post' | 'Homework';
+  filterType?: 'all' | 'Post' | 'Exercise';
 }
 
 export const PostList = ({
@@ -67,7 +67,7 @@ export const PostList = ({
 
   if (posts.length === 0 && !loading) {
     const emptyStateKey =
-      filterType === 'Homework'
+      filterType === 'Exercise'
         ? 'feed.list.empty.homework'
         : filterType === 'Post'
           ? 'feed.list.empty.post'

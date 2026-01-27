@@ -153,7 +153,6 @@ export type {
   FillInBlankQuestion,
   BlankSegment,
   BlankSegment as FillInBlankSegment,
-  GroupQuestion,
 } from '@aiprimary/core';
 
 export {

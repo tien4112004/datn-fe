@@ -25,7 +25,7 @@ export const FeedTab = ({ classId }: FeedPageProps) => {
   const filterOptions = [
     { value: 'all' as const, label: t('feed.header.filters.all') },
     { value: 'Post' as const, label: t('feed.header.filters.posts') },
-    { value: 'Homework' as const, label: t('feed.header.filters.homework') },
+    { value: 'Exercise' as const, label: t('feed.header.filters.homework') },
   ];
 
   return (
@@ -58,7 +58,7 @@ export const FeedTab = ({ classId }: FeedPageProps) => {
             <PostCreator
               classId={classId}
               onPostCreated={refresh}
-              initialType={filter.type === 'Homework' ? 'Homework' : 'Post'}
+              initialType={filter.type === 'Exercise' ? 'Exercise' : 'Post'}
             />
           )}
         </div>

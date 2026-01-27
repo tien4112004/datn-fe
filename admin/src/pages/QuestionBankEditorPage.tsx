@@ -102,18 +102,6 @@ function createDefaultQuestion(type: QuestionType): QuestionBankItem {
         },
       } as QuestionBankItem;
 
-    case QUESTION_TYPE.GROUP:
-      return {
-        ...baseQuestion,
-        type: 'GROUP',
-        data: {
-          description: '',
-          questions: [],
-          showQuestionNumbers: true,
-          shuffleQuestions: false,
-        },
-      } as QuestionBankItem;
-
     default:
       return baseQuestion as QuestionBankItem;
   }
@@ -128,11 +116,7 @@ function validateQuestion(question: QuestionBankItem): {
   const errors: string[] = [];
   const warnings: string[] = [];
 
-  if (
-    !question.title &&
-    question.type !== QUESTION_TYPE.FILL_IN_BLANK &&
-    question.type !== QUESTION_TYPE.GROUP
-  ) {
+  if (!question.title && question.type !== QUESTION_TYPE.FILL_IN_BLANK) {
     errors.push('Question title is required');
   }
 
@@ -171,14 +155,11 @@ function validateQuestion(question: QuestionBankItem): {
     }
   }
 
-  if (question.type === QUESTION_TYPE.GROUP) {
-    const data = question.data as any;
-    if (!data?.questions || data.questions.length === 0) {
-      errors.push('Group questions must have at least one sub-question');
-    }
-  }
-
-  return { isValid: errors.length === 0, errors, warnings };
+  return {
+    isValid: errors.length === 0,
+    errors,
+    warnings,
+  };
 }
 
 export function QuestionBankEditorPage() {
@@ -367,7 +348,7 @@ export function QuestionBankEditorPage() {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        {getAllQuestionTypes({ includeGroup: true }).map((type) => (
+                        {getAllQuestionTypes().map((type) => (
                           <SelectItem key={type.value} value={type.value}>
                             {type.label}
                           </SelectItem>

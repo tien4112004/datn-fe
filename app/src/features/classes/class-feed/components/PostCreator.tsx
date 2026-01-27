@@ -49,7 +49,7 @@ interface PostCreatorProps {
   classId: string;
   onPostCreated?: () => void;
   className?: string;
-  initialType?: 'Post' | 'Homework';
+  initialType?: 'Post' | 'Exercise';
 }
 
 export const PostCreator = ({
@@ -72,7 +72,7 @@ export const PostCreator = ({
     clear: clearAttachments,
   } = useAttachmentUpload();
   const [open, setOpen] = useState(false);
-  const [type, setType] = useState<'Post' | 'Homework'>(initialType);
+  const [type, setType] = useState<'Post' | 'Exercise'>(initialType);
   const [linkedLessons, setLinkedLessons] = useState<Array<Lesson>>([]);
   const [linkedResources, setLinkedResources] = useState<Array<LinkedResource>>([]);
   const [resourceSelectorOpen, setResourceSelectorOpen] = useState(false);
@@ -80,7 +80,7 @@ export const PostCreator = ({
   const [dueDate, setDueDate] = useState<Date | undefined>(undefined);
   const [allowComments, setAllowComments] = useState(true);
 
-  // Sync type with initialType when it changes (e.g., when filter switches to Homework)
+  // Sync type with initialType when it changes (e.g., when filter switches to Exercise)
   useEffect(() => {
     setType(initialType);
   }, [initialType]);
@@ -113,8 +113,8 @@ export const PostCreator = ({
                 permissionLevel: r.permissionLevel || 'view',
               }))
             : undefined,
-        assignmentId: type === 'Homework' && selectedAssignment ? selectedAssignment.id : undefined,
-        dueDate: type === 'Homework' && dueDate ? dueDate.toISOString() : undefined,
+        assignmentId: type === 'Exercise' && selectedAssignment ? selectedAssignment.id : undefined,
+        dueDate: type === 'Exercise' && dueDate ? dueDate.toISOString() : undefined,
         allowComments,
       };
 
@@ -147,7 +147,7 @@ export const PostCreator = ({
   const canSubmit = editor && editor.document.length > 0 && !createPost.isPending && !isUploading;
 
   const buttonText =
-    initialType === 'Homework'
+    initialType === 'Exercise'
       ? t('feed.creator.actions.createHomework')
       : t('feed.creator.actions.createPost');
 
@@ -170,7 +170,7 @@ export const PostCreator = ({
             <Label className="text-sm font-medium">{t('feed.creator.labels.postType')}</Label>
             <RadioGroup
               value={type}
-              onValueChange={(value) => setType(value as 'Post' | 'Homework')}
+              onValueChange={(value) => setType(value as 'Post' | 'Exercise')}
               className="flex gap-6"
             >
               <div className="flex items-center gap-2">
@@ -180,7 +180,7 @@ export const PostCreator = ({
                 </Label>
               </div>
               <div className="flex items-center gap-2">
-                <RadioGroupItem value="Homework" id="homework" />
+                <RadioGroupItem value="Exercise" id="homework" />
                 <Label htmlFor="homework" className="cursor-pointer font-normal">
                   {t('feed.creator.postType.homework')}
                 </Label>
@@ -206,7 +206,7 @@ export const PostCreator = ({
           <Separator />
 
           {/* Conditional Fields based on Post Type */}
-          {type === 'Homework' ? (
+          {type === 'Exercise' ? (
             <div className="space-y-4">
               {/* Assignment Selector */}
               <div className="space-y-2">

@@ -1079,13 +1079,13 @@ export default {
         general: 'Chung',
         schedule_event: 'Sự kiện lịch trình',
         posts: 'Bài viết',
-        homework: 'Bài tập về nhà',
+        homework: 'Bài tập',
       },
     },
     creator: {
       actions: {
         createPost: 'Tạo Bài Đăng',
-        createHomework: 'Tạo Bài Tập Về Nhà',
+        createHomework: 'Tạo Bài Tập',
         attachFiles: 'Đính Kèm Tập Tin',
         posting: 'Đang Đăng...',
         post: 'Đăng',
@@ -1127,7 +1127,7 @@ export default {
       },
       postType: {
         post: 'Bài Đăng',
-        homework: 'Bài Tập Về Nhà',
+        homework: 'Bài Tập',
       },
       selectResources: 'Chọn tài nguyên...',
       resourcesSelected: '{{count}} tài nguyên đã chọn',
@@ -1157,8 +1157,8 @@ export default {
           description: 'Tạo bài đăng đầu tiên để chia sẻ cập nhật với lớp học của bạn!',
         },
         homework: {
-          title: 'Chưa có bài tập về nhà nào',
-          description: 'Tạo bài tập về nhà đầu tiên để bắt đầu!',
+          title: 'Chưa có bài tập nào',
+          description: 'Tạo bài tập đầu tiên để bắt đầu!',
         },
       },
       loading: 'Đang tải bài viết...',
@@ -1173,7 +1173,7 @@ export default {
       badges: {
         pinned: 'Đã ghim',
         post: 'Bài Đăng',
-        homework: 'Bài tập về nhà',
+        homework: 'Bài tập',
         dueDate: 'Hạn',
       },
       actions: {
@@ -1204,8 +1204,20 @@ export default {
       updateFailed: 'Không thể cập nhật bài viết',
       deleteFailed: 'Không thể xóa bài viết',
       commentFailed: 'Không thể thêm bình luận',
+      deleteCommentFailed: 'Không thể xóa bình luận',
       pinFailed: 'Không thể {{action}} bài viết',
+      unpinFailed: 'Không thể bỏ ghim bài viết',
+      genericError: 'Đã xảy ra lỗi. Vui lòng thử lại.',
       tryAgain: 'Thử lại',
+    },
+    success: {
+      postCreated: 'Tạo bài viết thành công',
+      postUpdated: 'Cập nhật bài viết thành công',
+      postDeleted: 'Xóa bài viết thành công',
+      postPinned: 'Ghim bài viết thành công',
+      postUnpinned: 'Bỏ ghim bài viết thành công',
+      commentAdded: 'Thêm bình luận thành công',
+      commentDeleted: 'Xóa bình luận thành công',
     },
     time: {
       justNow: 'Vừa xong',

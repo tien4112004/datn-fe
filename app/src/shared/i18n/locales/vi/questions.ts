@@ -64,7 +64,6 @@ export default {
     matching: 'Nối',
     openEnded: 'Tự luận',
     fillInBlank: 'Điền vào chỗ trống',
-    group: 'Nhóm câu hỏi',
   },
 
   typeLabels: {
@@ -72,7 +71,6 @@ export default {
     matching: 'Câu hỏi nối',
     openEnded: 'Câu hỏi tự luận',
     fillInBlank: 'Câu hỏi điền vào chỗ trống',
-    group: 'Nhóm câu hỏi',
   },
 
   difficulty: {
@@ -119,8 +117,6 @@ export default {
     maxPairs: 'Tối đa 8 cặp',
     maxLengthExceeded: 'Vượt quá độ dài tối đa',
     minSegments: 'Cần ít nhất một phân đoạn',
-    subQuestionTitleRequired: 'Tiêu đề câu hỏi con là bắt buộc',
-    minSubQuestions: 'Cần ít nhất một câu hỏi con',
   },
 
   // Multiple Choice
@@ -338,76 +334,6 @@ export default {
       maxPoints: 'Tối đa: {{points}} điểm',
       teacherFeedback: 'Nhận xét của giáo viên (Tùy chọn)',
       feedbackPlaceholder: 'Thêm nhận xét hoặc phản hồi cho học sinh...',
-    },
-  },
-
-  group: {
-    title: 'Nhóm câu hỏi',
-    description: 'Tạo nhóm câu hỏi chứa nhiều câu hỏi con',
-
-    // Editing mode
-    editing: {
-      groupDescription: 'Mô tả nhóm',
-      groupDescriptionPlaceholder: 'Nhập mô tả, đoạn văn hoặc ngữ cảnh cho nhóm câu hỏi này...',
-      groupDescriptionHint: 'Cung cấp ngữ cảnh hoặc hướng dẫn cho tất cả các câu hỏi con',
-      titleImage: 'Hình ảnh tiêu đề (Tùy chọn)',
-
-      displaySettings: 'Cài đặt hiển thị',
-      showNumbers: 'Hiển thị số thứ tự câu hỏi',
-      shuffleQuestions: 'Xáo trộn câu hỏi',
-      totalPoints: 'Tổng điểm',
-
-      addQuestion: 'Thêm câu hỏi',
-      selectType: 'Chọn loại câu hỏi:',
-      subQuestions: 'Câu hỏi con',
-
-      validationWarning: 'Nhóm câu hỏi phải chứa ít nhất một câu hỏi con.',
-
-      types: {
-        multipleChoice: 'Trắc nghiệm',
-        multipleChoiceDesc: 'Một đáp án đúng',
-        matching: 'Nối',
-        matchingDesc: 'Nối các cặp',
-        openEnded: 'Tự luận',
-        openEndedDesc: 'Trả lời văn bản tự do',
-        fillInBlank: 'Điền vào chỗ trống',
-        fillInBlankDesc: 'Hoàn thành câu',
-      },
-    },
-
-    // Viewing mode
-    viewing: {
-      preview: 'Xem trước',
-    },
-
-    // Doing mode
-    doing: {
-      progress: 'Tiến độ',
-      answered: '{{count}} trên {{total}} đã trả lời',
-    },
-
-    // After Assessment mode
-    afterAssessment: {
-      results: 'Kết quả',
-      yourScore: 'Điểm của bạn',
-    },
-
-    // Grading mode
-    grading: {
-      overallGrade: 'Điểm tổng thể',
-      totalPointsEarned: 'Tổng điểm đạt được',
-      overallFeedback: 'Nhận xét tổng thể (Tùy chọn)',
-      feedbackPlaceholder: 'Thêm nhận xét cho học sinh...',
-    },
-
-    // Sub-question wrapper
-    subQuestion: {
-      questionNumber: 'Câu hỏi {{number}}',
-      points: '{{points}} điểm',
-      progress: 'Tiến độ:',
-      questionsAnswered: ' câu hỏi đã trả lời',
-      emptyStateTitle: 'Chưa có câu hỏi nào trong nhóm này.',
-      emptyStateMessage: 'Nhấn "Thêm câu hỏi" để bắt đầu.',
     },
   },
 };

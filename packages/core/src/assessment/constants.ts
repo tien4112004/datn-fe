@@ -13,16 +13,9 @@ export const QUESTION_TYPE = {
   MATCHING: 'MATCHING',
   OPEN_ENDED: 'OPEN_ENDED',
   FILL_IN_BLANK: 'FILL_IN_BLANK',
-  GROUP: 'GROUP',
 } as const;
 
 export type QuestionType = (typeof QUESTION_TYPE)[keyof typeof QUESTION_TYPE];
-
-/**
- * Core Question Types (excludes GROUP)
- * These are the basic question types that can stand alone or be used as sub-questions
- */
-export type CoreQuestionType = Exclude<QuestionType, typeof QUESTION_TYPE.GROUP>;
 
 /**
  * Question Type Labels (Vietnamese)
@@ -33,7 +26,6 @@ export const QUESTION_TYPE_LABELS = {
   MATCHING: 'Nối',
   OPEN_ENDED: 'Tự Luận',
   FILL_IN_BLANK: 'Điền Vào Chỗ Trống',
-  GROUP: 'Nhóm Câu Hỏi',
 } as const;
 
 /**
@@ -45,9 +37,7 @@ export const QUESTION_TYPE_I18N_KEYS = {
   MATCHING: 'types.matching',
   OPEN_ENDED: 'types.openEnded',
   FILL_IN_BLANK: 'types.fillInBlank',
-  GROUP: 'types.group',
 } as const;
-
 
 /**
  * Difficulty Levels (Vietnamese education system)
@@ -83,7 +73,6 @@ export const DIFFICULTY_I18N_KEYS = {
   APPLICATION: 'difficulty.application',
   ADVANCED_APPLICATION: 'difficulty.advancedApplication',
 } as const;
-
 
 /**
  * Subject Codes (Vietnamese education system)

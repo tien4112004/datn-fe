@@ -1,10 +1,9 @@
-import type { Question, GroupQuestion } from '@aiprimary/core';
+import type { Question } from '@aiprimary/core';
 import { QUESTION_TYPE } from '@/types/questionBank';
 import { MultipleChoiceEditing, MultipleChoiceViewing } from './multiple-choice';
 import { MatchingEditing, MatchingViewing } from './matching';
 import { OpenEndedEditing, OpenEndedViewing } from './open-ended';
 import { FillInBlankEditing, FillInBlankViewing } from './fill-in-blank';
-import { GroupEditing, GroupViewing } from './group';
 
 type ViewMode = 'editing' | 'viewing';
 
@@ -60,16 +59,6 @@ export const QuestionRenderer = ({ question, viewMode, points, onChange, number 
     }
     if (viewMode === 'viewing') {
       return <FillInBlankViewing question={question as any} points={points} number={number} />;
-    }
-  }
-
-  // Group Question
-  if (question.type === QUESTION_TYPE.GROUP) {
-    if (viewMode === 'editing') {
-      return <GroupEditing question={question as GroupQuestion} onChange={onChange!} />;
-    }
-    if (viewMode === 'viewing') {
-      return <GroupViewing question={question as GroupQuestion} points={points} number={number} />;
     }
   }
 

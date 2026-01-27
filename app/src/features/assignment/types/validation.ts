@@ -15,8 +15,6 @@ const VALIDATION_KEYS = {
   MAX_PAIRS: 'questions:validation.maxPairs',
   MAX_LENGTH_EXCEEDED: 'questions:validation.maxLengthExceeded',
   MIN_SEGMENTS: 'questions:validation.minSegments',
-  SUB_QUESTION_TITLE_REQUIRED: 'questions:validation.subQuestionTitleRequired',
-  MIN_SUB_QUESTIONS: 'questions:validation.minSubQuestions',
 };
 
 // Base schema
@@ -88,50 +86,12 @@ export const fillInBlankQuestionSchema = baseQuestionSchema.extend({
   caseSensitive: z.boolean().optional(),
 });
 
-// Sub-question schema for Group Questions
-export const subQuestionSchema = z.object({
-  id: z.string(),
-  type: z.enum(['MULTIPLE_CHOICE', 'MATCHING', 'OPEN_ENDED', 'FILL_IN_BLANK']),
-  title: z.string().min(1, VALIDATION_KEYS.SUB_QUESTION_TITLE_REQUIRED),
-  titleImageUrl: z.string().url().optional().or(z.literal('')),
-  explanation: z.string().optional(),
-  data: z.union([
-    z.object({
-      options: z.array(multipleChoiceOptionSchema),
-      shuffleOptions: z.boolean().optional(),
-    }),
-    z.object({
-      pairs: z.array(matchingPairSchema),
-      shufflePairs: z.boolean().optional(),
-    }),
-    z.object({
-      expectedAnswer: z.string().optional(),
-      maxLength: z.number().positive().max(5000, VALIDATION_KEYS.MAX_LENGTH_EXCEEDED).optional(),
-    }),
-    z.object({
-      segments: z.array(blankSegmentSchema),
-      caseSensitive: z.boolean().optional(),
-    }),
-  ]),
-  points: z.number().positive().optional(),
-});
-
-// Group Question schema
-export const groupQuestionSchema = baseQuestionSchema.extend({
-  type: z.literal(QUESTION_TYPE.GROUP),
-  description: z.string().optional(),
-  questions: z.array(subQuestionSchema).min(1, VALIDATION_KEYS.MIN_SUB_QUESTIONS),
-  showQuestionNumbers: z.boolean().optional(),
-  shuffleQuestions: z.boolean().optional(),
-});
-
 // Union schema for all question types
 export const questionSchema = z.discriminatedUnion('type', [
   multipleChoiceQuestionSchema,
   matchingQuestionSchema,
   openEndedQuestionSchema,
   fillInBlankQuestionSchema,
-  groupQuestionSchema,
 ]);
 
 export type QuestionSchema = z.infer<typeof questionSchema>;

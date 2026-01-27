@@ -1084,13 +1084,13 @@ export default {
         general: 'General',
         schedule_event: 'Schedule Events',
         posts: 'Posts',
-        homework: 'Homework',
+        homework: 'Exercise',
       },
     },
     creator: {
       actions: {
         createPost: 'Create Post',
-        createHomework: 'Create Homework',
+        createHomework: 'Create Exercise',
         attachFiles: 'Attach Files',
         posting: 'Posting...',
         post: 'Post',
@@ -1132,7 +1132,7 @@ export default {
       },
       postType: {
         post: 'Post',
-        homework: 'Homework',
+        homework: 'Exercise',
       },
       selectResources: 'Select resources...',
       resourcesSelected: '{{count}} resource(s) selected',
@@ -1162,8 +1162,8 @@ export default {
           description: 'Create your first post to share updates with your class!',
         },
         homework: {
-          title: 'No homework yet',
-          description: 'Create your first homework to get started!',
+          title: 'No exercises yet',
+          description: 'Create your first exercise to get started!',
         },
       },
       loading: 'Loading posts...',
@@ -1178,7 +1178,7 @@ export default {
       badges: {
         pinned: 'Pinned',
         post: 'Post',
-        homework: 'Homework',
+        homework: 'Exercise',
         dueDate: 'Due',
       },
       actions: {
@@ -1209,8 +1209,20 @@ export default {
       updateFailed: 'Failed to update post',
       deleteFailed: 'Failed to delete post',
       commentFailed: 'Failed to add comment',
+      deleteCommentFailed: 'Failed to delete comment',
       pinFailed: 'Failed to {{action}} post',
+      unpinFailed: 'Failed to unpin post',
+      genericError: 'An error occurred. Please try again.',
       tryAgain: 'Try again',
+    },
+    success: {
+      postCreated: 'Post created successfully',
+      postUpdated: 'Post updated successfully',
+      postDeleted: 'Post deleted successfully',
+      postPinned: 'Post pinned successfully',
+      postUnpinned: 'Post unpinned successfully',
+      commentAdded: 'Comment added successfully',
+      commentDeleted: 'Comment deleted successfully',
     },
     time: {
       justNow: 'Just now',

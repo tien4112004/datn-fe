@@ -26,7 +26,7 @@ interface PostCardProps {
 export const PostCard = ({ post, onEdit, onDelete, onPin, onComment, className = '' }: PostCardProps) => {
   const { t } = useTranslation('classes');
 
-  // Fetch assignment details if this is a Homework post with an assignmentId
+  // Fetch assignment details if this is an Exercise post with an assignmentId
   const { data: assignment, isLoading: isAssignmentLoading } = useAssignment(post.assignmentId ?? '');
 
   return (
@@ -76,7 +76,7 @@ export const PostCard = ({ post, onEdit, onDelete, onPin, onComment, className =
                   </Badge>
                 )}
 
-                {post.type === 'Homework' && (
+                {post.type === 'Exercise' && (
                   <Badge
                     variant="default"
                     className="gap-1 bg-purple-600 text-[10px] hover:bg-purple-700 md:text-xs"
@@ -86,7 +86,7 @@ export const PostCard = ({ post, onEdit, onDelete, onPin, onComment, className =
                   </Badge>
                 )}
 
-                {post.type === 'Homework' && post.dueDate && (
+                {post.type === 'Exercise' && post.dueDate && (
                   <Badge variant="outline" className="gap-1 text-[10px] md:text-xs">
                     <Clock className="h-3 w-3" />
                     {t('feed.post.badges.dueDate')}: {format(parseDateSafe(post.dueDate), 'MMM d, yyyy')}
@@ -138,8 +138,8 @@ export const PostCard = ({ post, onEdit, onDelete, onPin, onComment, className =
         </div>
       )}
 
-      {/* Linked Assignment (for Homework posts) */}
-      {post.type === 'Homework' && post.assignmentId && (
+      {/* Linked Assignment (for Exercise posts) */}
+      {post.type === 'Exercise' && post.assignmentId && (
         <div className="mb-2 ml-9 w-fit md:mb-3 md:ml-[52px]">
           <div className="rounded-lg border border-purple-200 bg-purple-50/50 p-3 transition-colors hover:bg-purple-50 dark:border-purple-900 dark:bg-purple-950/30 dark:hover:bg-purple-950/50">
             {isAssignmentLoading ? (

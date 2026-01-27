@@ -121,7 +121,7 @@ export function QuestionBankFilters({
               <div className="space-y-2">
                 <Label className="text-foreground mb-3 block text-sm font-semibold">Question Type</Label>
                 <div className="space-y-2">
-                  {getAllQuestionTypes({ includeGroup: true }).map((type) => (
+                  {getAllQuestionTypes().map((type) => (
                     <label
                       key={type.value}
                       className="hover:bg-accent flex cursor-pointer items-center gap-2 rounded-md p-1 transition-colors"
@@ -256,7 +256,7 @@ export function QuestionBankFilters({
       <div>
         <Label className="text-sm font-medium">Question Type</Label>
         <div className="mt-2 space-y-2">
-          {getAllQuestionTypes({ includeGroup: true }).map((type) => (
+          {getAllQuestionTypes().map((type) => (
             <label key={type.value} className="flex cursor-pointer items-center gap-2">
               <Checkbox
                 checked={Array.isArray(filters.questionType) && filters.questionType.includes(type.value)}

@@ -8,7 +8,6 @@ export * from './subjects';
 export {
   QUESTION_TYPE,
   type QuestionType,
-  type CoreQuestionType,
   QUESTION_TYPE_LABELS,
   QUESTION_TYPE_I18N_KEYS,
   DIFFICULTY,
@@ -42,7 +41,6 @@ export {
 } from './assessment/grades';
 export {
   getAllQuestionTypes,
-  getCoreQuestionTypes,
   getQuestionTypeName,
   getQuestionTypeI18nKey,
   getQuestionTypeI18nMap,

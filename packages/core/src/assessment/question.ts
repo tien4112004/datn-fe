@@ -1,4 +1,4 @@
-import { QUESTION_TYPE, type CoreQuestionType, type Difficulty, type QuestionType } from './constants';
+import { QUESTION_TYPE, type Difficulty, type QuestionType } from './constants';
 
 /**
  * Multiple Choice Question Data
@@ -55,38 +55,13 @@ export interface FillInBlankData {
 }
 
 /**
- * Sub-Question within a Group Question
- */
-export interface SubQuestion {
-  id: string;
-  type: CoreQuestionType;
-  title: string;
-  titleImageUrl?: string;
-  explanation?: string;
-  data: MultipleChoiceData | MatchingData | OpenEndedData | FillInBlankData;
-  points?: number;
-}
-
-/**
- * Group Question Data
- * Contains a description/context and multiple sub-questions
- */
-export interface GroupQuestionData {
-  description?: string; // Rich text introduction/context (e.g., reading passage)
-  questions: SubQuestion[]; // Array of sub-questions
-  showQuestionNumbers?: boolean; // Whether to show question numbers
-  shuffleQuestions?: boolean; // Shuffle questions for each student
-}
-
-/**
  * Union type for all question data types
  */
 export type QuestionData =
   | MultipleChoiceData
   | MatchingData
   | OpenEndedData
-  | FillInBlankData
-  | GroupQuestionData;
+  | FillInBlankData;
 
 /**
  * Base interface for all questions
@@ -139,15 +114,6 @@ export interface FillInBlankQuestion extends BaseQuestion {
 }
 
 /**
- * Group Question
- * Contains multiple sub-questions with a shared context/description
- */
-export interface GroupQuestion extends BaseQuestion {
-  type: typeof QUESTION_TYPE.GROUP;
-  data: GroupQuestionData;
-}
-
-/**
  * Union type for all question types
  * Use type guards to narrow to specific question type
  */
@@ -155,8 +121,7 @@ export type Question =
   | MultipleChoiceQuestion
   | MatchingQuestion
   | OpenEndedQuestion
-  | FillInBlankQuestion
-  | GroupQuestion;
+  | FillInBlankQuestion;
 
 /**
  * Type guards for runtime type checking
@@ -173,10 +138,6 @@ export const isOpenEnded = (q: Question): q is OpenEndedQuestion => q.type === Q
 export const isFillInBlank = (q: Question): q is FillInBlankQuestion =>
   // Check if a question is Fill In Blank
   q.type === QUESTION_TYPE.FILL_IN_BLANK;
-
-export const isGroup = (q: Question): q is GroupQuestion =>
-  // Check if a question is Group
-  q.type === QUESTION_TYPE.GROUP;
 
 /**
  * Assignment Question

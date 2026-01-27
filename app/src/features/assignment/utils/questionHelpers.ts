@@ -72,21 +72,6 @@ export const createEmptyQuestion = (
         },
       };
 
-    case QUESTION_TYPE.GROUP:
-      return {
-        id: baseId,
-        type,
-        difficulty,
-        title: '',
-        explanation: '',
-        data: {
-          description: '',
-          questions: [],
-          showQuestionNumbers: true,
-          shuffleQuestions: false,
-        },
-      };
-
     default:
       throw new Error(`Unknown question type: ${type}`);
   }
@@ -131,36 +116,6 @@ export const duplicateQuestion = (question: Question): Question => {
       ...seg,
       id: generateId(),
     }));
-  }
-
-  if (duplicate.type === QUESTION_TYPE.GROUP && duplicate.data.questions) {
-    duplicate.data.questions = duplicate.data.questions.map((subQ) => {
-      const newSubQ = { ...subQ, id: generateId() };
-
-      // Also regenerate IDs for nested items within sub-questions
-      if (newSubQ.type === QUESTION_TYPE.MULTIPLE_CHOICE && (newSubQ.data as any).options) {
-        (newSubQ.data as any).options = (newSubQ.data as any).options.map((opt: any) => ({
-          ...opt,
-          id: generateId(),
-        }));
-      }
-
-      if (newSubQ.type === QUESTION_TYPE.MATCHING && (newSubQ.data as any).pairs) {
-        (newSubQ.data as any).pairs = (newSubQ.data as any).pairs.map((pair: any) => ({
-          ...pair,
-          id: generateId(),
-        }));
-      }
-
-      if (newSubQ.type === QUESTION_TYPE.FILL_IN_BLANK && (newSubQ.data as any).segments) {
-        (newSubQ.data as any).segments = (newSubQ.data as any).segments.map((seg: any) => ({
-          ...seg,
-          id: generateId(),
-        }));
-      }
-
-      return newSubQ;
-    });
   }
 
   return duplicate;

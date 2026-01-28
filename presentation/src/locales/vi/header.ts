@@ -9,10 +9,10 @@ export default {
       resetSlides: 'Đặt lại tất cả slide',
       resetCurrentPage: 'Đặt lại trang hiện tại',
       importing: 'Đang nhập...',
-      duplicatePresentation: 'Sao chép bài trình chiếu này',
-      duplicateSuccess: 'Đã sao chép bài trình chiếu: {title}',
-      duplicateError: 'Lỗi khi sao chép bài trình chiếu',
-      duplicateConfirm: 'Tạo bản sao của bài trình chiếu này?',
+      duplicatePresentation: 'Lưu thành bản sao',
+      duplicateSuccess: 'Đã lưu bài trình chiếu thành bản sao: {title}',
+      duplicateError: 'Không thể lưu thành bản sao',
+      duplicateConfirm: 'Lưu bài trình chiếu này thành bản sao mới?',
     },
 
     // Tính năng AI
@@ -66,7 +66,7 @@ export default {
       present: 'Trình bày',
       share: 'Chia sẻ',
       comments: 'Bình luận',
-      duplicate: 'Sao chép',
+      duplicate: 'Lưu bản sao',
       cancel: 'Hủy',
       confirm: 'Xác nhận',
     },

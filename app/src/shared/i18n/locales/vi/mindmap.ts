@@ -72,6 +72,7 @@ export default {
       duplicateSuccess: 'Đã sao chép sơ đồ: {{title}}',
       duplicateError: 'Lỗi khi sao chép sơ đồ',
       duplicateConfirm: 'Tạo bản sao của sơ đồ này?',
+      duplicateLoading: 'Đang sao chép sơ đồ tư duy...',
       cancel: 'Hủy',
       confirm: 'Xác nhận',
     },

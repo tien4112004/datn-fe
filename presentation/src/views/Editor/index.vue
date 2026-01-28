@@ -84,11 +84,12 @@
       </template>
       <Remark v-model:height="remarkHeight" :style="{ height: `${remarkHeight}px` }" />
     </Drawer>
-
-    <Modal :visible="!!dialogForExport" :width="1000" @closed="closeExportDialog()">
-      <ExportDialog />
-    </Modal>
   </template>
+
+  <!-- Export dialog available in all modes -->
+  <Modal :visible="!!dialogForExport" :width="1000" @closed="closeExportDialog()">
+    <ExportDialog />
+  </Modal>
 </template>
 
 <script lang="ts" setup>

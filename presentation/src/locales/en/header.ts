@@ -9,10 +9,10 @@ export default {
       resetSlides: 'Reset Slides',
       resetCurrentPage: 'Reset Current Page',
       importing: 'Importing...',
-      duplicatePresentation: 'Duplicate this presentation',
-      duplicateSuccess: 'Presentation duplicated: {title}',
-      duplicateError: 'Failed to duplicate presentation',
-      duplicateConfirm: 'Create a copy of this presentation?',
+      duplicatePresentation: 'Save as Copy',
+      duplicateSuccess: 'Presentation saved as copy: {title}',
+      duplicateError: 'Failed to save as copy',
+      duplicateConfirm: 'Save this presentation as a new copy?',
     },
 
     // AI Features
@@ -66,7 +66,7 @@ export default {
       present: 'Present',
       share: 'Share',
       comments: 'Comments',
-      duplicate: 'Duplicate',
+      duplicate: 'Save as Copy',
       cancel: 'Cancel',
       confirm: 'Confirm',
     },

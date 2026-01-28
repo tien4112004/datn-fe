@@ -17,6 +17,9 @@ export function useLinkedResources({ linkedResources, enabled = true }: UseLinke
   const mindmapApiService = useMindmapApiService();
   const presentationApiService = usePresentationApiService();
 
+  // Check if all resources are already enriched (have title from backend)
+  const allEnriched = linkedResources.length > 0 && linkedResources.every((r) => r.title);
+
   return useQuery({
     queryKey: ['linkedResources', linkedResources],
     queryFn: async (): Promise<LinkedResource[]> => {
@@ -24,6 +27,18 @@ export function useLinkedResources({ linkedResources, enabled = true }: UseLinke
         return [];
       }
 
+      // If all resources are already enriched by the backend, use them directly
+      if (allEnriched) {
+        return linkedResources.map((r) => ({
+          id: r.id,
+          type: r.type,
+          title: r.title!,
+          thumbnail: r.thumbnail,
+          permissionLevel: r.permissionLevel,
+        }));
+      }
+
+      // Otherwise fall back to individual API calls (for backward compatibility)
       const grouped = groupLinkedResourcesByType(linkedResources);
       const results: LinkedResource[] = [];
 

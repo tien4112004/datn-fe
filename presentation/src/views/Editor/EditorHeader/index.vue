@@ -6,7 +6,7 @@
         <BreadcrumbList>
           <BreadcrumbItem class="tw-hidden md:tw-block tw-pl-4">
             <BreadcrumbLink @click="navigateToList" class="tw-cursor-pointer">
-              {{ $t('header.breadcrumb.presentations') }}
+              {{ isStudent ? $t('header.breadcrumb.backToClass') : $t('header.breadcrumb.presentations') }}
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator class="tw-hidden md:tw-block" />
@@ -31,6 +31,7 @@
             <div v-else class="tw-flex tw-items-center tw-gap-2">
               <BreadcrumbPage class="tw-max-w-32 sm:tw-max-w-48 tw-truncate">{{ title }}</BreadcrumbPage>
               <Button
+                v-if="permission === 'edit'"
                 size="small"
                 class="tw-p-1 tw-bg-transparent hover:tw-bg-gray-100"
                 @click="startEditTitle"
@@ -46,7 +47,12 @@
 
     <div class="tw-flex tw-items-center tw-gap-2 tw-flex-shrink-0">
       <PermissionBadge v-if="permission" :permission="permission" class="tw-ml-2" />
-      <Popover trigger="click" placement="bottom-end" v-model:value="mainMenuVisible">
+      <Popover
+        v-if="!hideStudentOptions"
+        trigger="click"
+        placement="bottom-end"
+        v-model:value="mainMenuVisible"
+      >
         <template #content>
           <PopoverMenuItem
             @click="
@@ -125,7 +131,21 @@
         <IconComments class="icon" />
         {{ $t('header.buttons.comments') }}
       </Button>
-      <Button class="menu-item" v-tooltip="$t('header.file.exportFile')" @click="setDialogForExport('pptx')">
+      <Button
+        v-if="!hideStudentOptions"
+        class="menu-item"
+        v-tooltip="$t('header.file.duplicatePresentation')"
+        @click="handleRequestDuplicate"
+      >
+        <IconCopy class="icon" />
+        {{ $t('header.buttons.duplicate') }}
+      </Button>
+      <Button
+        v-if="!hideStudentOptions"
+        class="menu-item"
+        v-tooltip="$t('header.file.exportFile')"
+        @click="setDialogForExport('pptx')"
+      >
         <IconDownload class="icon" />
         {{ $t('header.share.export') }}
       </Button>
@@ -181,7 +201,12 @@ import BreadcrumbItem from '@/components/ui/breadcrumb/BreadcrumbItem.vue';
 import BreadcrumbLink from '@/components/ui/breadcrumb/BreadcrumbLink.vue';
 import BreadcrumbPage from '@/components/ui/breadcrumb/BreadcrumbPage.vue';
 import BreadcrumbSeparator from '@/components/ui/breadcrumb/BreadcrumbSeparator.vue';
-import { Check as IconCheck, X as IconClose, MessageSquare as IconComments } from 'lucide-vue-next';
+import {
+  Check as IconCheck,
+  X as IconClose,
+  MessageSquare as IconComments,
+  Copy as IconCopy,
+} from 'lucide-vue-next';
 import message from '@/utils/message';
 import PermissionBadge from '@/components/PermissionBadge.vue';
 const { t } = useI18n();
@@ -190,7 +215,10 @@ const mainStore = useMainStore();
 const slidesStore = useSlidesStore();
 const containerStore = useContainerStore();
 const { title, theme } = storeToRefs(slidesStore);
-const { presentation, permission } = storeToRefs(containerStore);
+const { presentation, permission, mode, isStudent } = storeToRefs(containerStore);
+
+// Computed for hiding student-restricted items
+const hideStudentOptions = computed(() => isStudent?.value && mode.value === 'view');
 const { enterScreening, enterScreeningFromStart, enterPresenterMode, openSeparatedPresentation } =
   useScreening();
 const { importSpecificFile, importPPTXFile, exporting } = useImport();
@@ -274,7 +302,11 @@ const handleKeyDown = (e: KeyboardEvent) => {
 };
 
 const navigateToList = () => {
-  window.location.href = '/projects?type=presentation';
+  if (isStudent?.value) {
+    window.location.href = '/student/classes';
+  } else {
+    window.location.href = '/projects?type=presentation';
+  }
 };
 
 const setDialogForExport = (type: DialogForExportTypes) => {
@@ -325,6 +357,21 @@ const handleShare = (options: { shareWithLink: boolean; allowEdit: boolean; user
 
 const handleOpenComments = () => {
   window.dispatchEvent(new CustomEvent('app.presentation.open-comments'));
+};
+
+const handleRequestDuplicate = () => {
+  if (!presentationId.value) {
+    console.error('No presentation ID available');
+    message.error(t('header.file.duplicateError'));
+    return;
+  }
+
+  // Dispatch event to React app to show confirmation dialog
+  window.dispatchEvent(
+    new CustomEvent('app.presentation.confirm-duplicate', {
+      detail: { presentationId: presentationId.value },
+    })
+  );
 };
 </script>
 

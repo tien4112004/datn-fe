@@ -9,6 +9,7 @@ import { useMetadataStore } from '../stores';
 import { useCoreStore } from '../stores/core';
 import { getTreeLayoutType, getTreeForceLayout } from '../services/utils';
 import { t } from 'i18next';
+import { toast } from 'sonner';
 
 /**
  * Convert data URL (base64) to Blob for multipart upload
@@ -156,6 +157,45 @@ export const useCreateBlankMindmap = () => {
       });
 
       return { mindmap };
+    },
+  });
+};
+
+export const useDuplicateMindmap = () => {
+  const mindmapApiService = useMindmapApiService();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      // 1. Fetch the existing mindmap
+      const original = await mindmapApiService.getMindmapById(id);
+
+      // 2. Transform data for duplication
+      const duplicateData = {
+        title: `${original.title} (Copy)`,
+        description: original.description || '',
+        nodes: original.nodes,
+        edges: original.edges,
+        metadata: original.metadata,
+        thumbnail: original.thumbnail,
+      };
+
+      // 3. Create new mindmap using existing POST endpoint
+      const duplicated = await mindmapApiService.createMindmap(duplicateData);
+
+      return duplicated;
+    },
+    onSuccess: (data) => {
+      // Invalidate queries to refresh list
+      queryClient.invalidateQueries({
+        queryKey: [mindmapApiService.getType(), 'mindmaps'],
+      });
+
+      toast.success(t('mindmap:toolbar.actions.duplicateSuccess', { title: data.title }));
+    },
+    onError: (error) => {
+      toast.error(t('mindmap:toolbar.actions.duplicateError'));
+      console.error('Failed to duplicate mindmap:', error);
     },
   });
 };

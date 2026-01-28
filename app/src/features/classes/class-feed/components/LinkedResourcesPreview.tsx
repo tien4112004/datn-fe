@@ -54,7 +54,13 @@ export const LinkedResourcesPreview = ({ resources: linkedResources }: LinkedRes
     <div className="grid auto-rows-fr grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-2">
       {resources.map((resource) => {
         const Icon = resourceTypeIcons[resource.type];
-        const baseRoute = resourceTypeRoutes[resource.type];
+        let baseRoute = resourceTypeRoutes[resource.type];
+
+        // If we are in student view, prepend /student to the route
+        if (window.location.pathname.startsWith('/student')) {
+          baseRoute = `/student${baseRoute}`;
+        }
+
         const colorClasses = resourceTypeColors[resource.type];
         const iconColorClass = resourceTypeIconColors[resource.type];
         // Map 'view' to 'read' for PermissionBadge compatibility

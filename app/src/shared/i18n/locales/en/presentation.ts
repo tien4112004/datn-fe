@@ -149,6 +149,19 @@ export default {
       placeholder: 'Enter new name for the presentation',
     },
   },
+  actions: {
+    duplicate: 'Save as Copy',
+    duplicateSuccess: 'Presentation duplicated: {{title}}',
+    duplicateError: 'Failed to duplicate presentation',
+    duplicateConfirm: 'Create a copy of this presentation?',
+  },
+  duplicate: {
+    title: 'Duplicate Presentation',
+    description: 'Are you sure you want to create a copy of this presentation?',
+    cancel: 'Cancel',
+    confirm: 'Confirm',
+    loading: 'Duplicating presentation...',
+  },
   validation: {
     topicRequired: 'Topic is required',
     slideCountRequired: 'Slide count is required',

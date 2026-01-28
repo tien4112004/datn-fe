@@ -9,6 +9,10 @@ export default {
       resetSlides: 'Reset Slides',
       resetCurrentPage: 'Reset Current Page',
       importing: 'Importing...',
+      duplicatePresentation: 'Save as Copy',
+      duplicateSuccess: 'Presentation saved as copy: {title}',
+      duplicateError: 'Failed to save as copy',
+      duplicateConfirm: 'Save this presentation as a new copy?',
     },
 
     // AI Features
@@ -47,13 +51,9 @@ export default {
       comment: 'comment',
       restrictedAccess: 'Restricted access',
       usersAdded: ' user(s) added',
-    },
-
-    // Button Labels
-    buttons: {
-      present: 'Present',
-      share: 'Share',
-      comments: 'Comments',
+      viewer: 'Viewer',
+      commenter: 'Commenter',
+      editor: 'Editor',
     },
 
     // Comments
@@ -61,9 +61,20 @@ export default {
       tooltip: 'View and add comments',
     },
 
+    // Buttons
+    buttons: {
+      present: 'Present',
+      share: 'Share',
+      comments: 'Comments',
+      duplicate: 'Save as Copy',
+      cancel: 'Cancel',
+      confirm: 'Confirm',
+    },
+
     // Breadcrumb Navigation
     breadcrumb: {
       presentations: 'Presentations',
+      backToClass: 'Back to Class',
     },
 
     // Title Editing

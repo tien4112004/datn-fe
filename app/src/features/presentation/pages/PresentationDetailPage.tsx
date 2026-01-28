@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useLoaderData, useParams, useNavigate, useLocation } from 'react-router-dom';
 import type { Presentation } from '../types';
 import { getSearchParamAsBoolean } from '@/shared/utils/searchParams';
+import { useAuth } from '@/shared/context/auth';
 import {
   usePresentationValidation,
   useMessageRemote,
@@ -26,6 +27,7 @@ const DetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const location = useLocation();
+  const { user } = useAuth();
   const isGeneratingParam = getSearchParamAsBoolean('isGenerating', false) ?? false;
   const isViewModeParam = getSearchParamAsBoolean('view', false) ?? false;
   const previousIsGenerating = useRef<boolean>(false);
@@ -33,6 +35,7 @@ const DetailPage = () => {
 
   // Permission state
   const userPermission = presentation?.permission;
+  const isStudent = user?.role === 'student';
 
   // Validate and initialize - all processing logic is now in Vue
   usePresentationValidation(id, presentation, isGeneratingParam);
@@ -109,6 +112,7 @@ const DetailPage = () => {
           isRemote: true,
           mode,
           permission: userPermission,
+          isStudent,
           ...(isGeneratingParam && { generationRequest: request, isGenerating: true }),
         }}
         className="vue-remote"

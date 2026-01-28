@@ -74,6 +74,7 @@ export default {
     // Breadcrumb Navigation
     breadcrumb: {
       presentations: 'Presentations',
+      backToClass: 'Back to Class',
     },
 
     // Title Editing

@@ -3,7 +3,7 @@ import { moduleMap } from './module';
 
 interface VueRemoteWrapperProps<T = any> {
   modulePath: string;
-  mountProps: T;
+  mountProps: T & { isStudent?: boolean };
   className?: string;
   LoadingComponent?: React.ComponentType;
   ErrorComponent?: React.ComponentType<{ error: Error }>;
@@ -54,9 +54,11 @@ const VueRemoteWrapper = <T,>({
       });
   }, [modulePath, mountProps, onMountSuccess, onMountError]);
 
+  const isStudent = mountProps?.isStudent;
+
   return (
     <>
-      <div ref={containerRef} className={className} />
+      <div ref={containerRef} className={className} data-student-view={isStudent ? 'true' : undefined} />
       {isLoading && LoadingComponent && <LoadingComponent />}
       {error && ErrorComponent && <ErrorComponent error={error} />}
     </>

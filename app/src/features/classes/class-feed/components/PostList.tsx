@@ -6,6 +6,7 @@ import { usePinPost, useDeletePost } from '../hooks/useApi';
 import type { Post } from '../types';
 import { useConfirmDialog } from '@/shared/hooks/useConfirmDialog';
 import { DeleteConfirmation } from '@/shared/components/common/DeleteConfirmation';
+import { SpinnerIcon } from '@/shared/components/common/GlobalSpinner';
 import { AnimatePresence, motion } from 'motion/react';
 
 interface PostListProps {
@@ -141,7 +142,7 @@ export const PostList = ({
       {/* Loading State */}
       {loading && posts.length === 0 && (
         <div className="py-12 text-center">
-          <div className="inline-block h-8 w-8 animate-spin rounded-full border-b-2 border-blue-500"></div>
+          <SpinnerIcon size={32} />
           <p className="mt-4 text-sm text-gray-500">{t('feed.list.loading')}</p>
         </div>
       )}

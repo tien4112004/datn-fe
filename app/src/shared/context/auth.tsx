@@ -23,7 +23,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (profileData) {
         setUser(profileData);
-        localStorage.setItem(USER_KEY, JSON.stringify(profileData));
+        // Exclude role from localStorage - role should only exist in memory
+        const { role, ...userWithoutRole } = profileData;
+        localStorage.setItem(USER_KEY, JSON.stringify(userWithoutRole));
       } else {
         // No profile data means user is not authenticated
         setUser(null);
@@ -75,7 +77,9 @@ export function useAuth() {
 
 // Helper function to store user data in localStorage
 export const setUserData = (user: User) => {
-  localStorage.setItem(USER_KEY, JSON.stringify(user));
+  // Exclude role from localStorage - role should only exist in memory
+  const { role, ...userWithoutRole } = user;
+  localStorage.setItem(USER_KEY, JSON.stringify(userWithoutRole));
 };
 
 // Helper function to clear all auth data

@@ -3,7 +3,7 @@ interface SpinnerProps {
   lightBlur?: boolean;
 }
 
-const SpinnerIcon = ({ size = 36 }: { size?: number }) => {
+export const SpinnerIcon = ({ size = 36 }: { size?: number }) => {
   const segments = 12;
   const segmentWidth = 2;
 

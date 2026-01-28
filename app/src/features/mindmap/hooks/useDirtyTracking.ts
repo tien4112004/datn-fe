@@ -3,7 +3,7 @@ import { isEqual } from 'lodash';
 import { useCoreStore } from '../stores/core';
 import { useDirtyStore } from '../stores/dirty';
 
-export const useMindmapDirtyTracking = () => {
+export const useMindmapDirtyTracking = (enabled: boolean = true) => {
   const { nodes, edges } = useCoreStore();
   const markDirty = useDirtyStore((state) => state.markDirty);
   const isDirty = useDirtyStore((state) => state.isDirty);
@@ -12,6 +12,8 @@ export const useMindmapDirtyTracking = () => {
   const prevStateRef = useRef({ nodes, edges });
 
   useEffect(() => {
+    if (!enabled) return;
+
     const currentState = { nodes, edges };
 
     // Check if state has actually changed using deep equality
@@ -25,5 +27,5 @@ export const useMindmapDirtyTracking = () => {
       }
       prevStateRef.current = currentState;
     }
-  }, [nodes, edges, isDirty, markDirty]);
+  }, [nodes, edges, isDirty, markDirty, enabled]);
 };

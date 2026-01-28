@@ -218,7 +218,7 @@ const { title, theme } = storeToRefs(slidesStore);
 const { presentation, permission, mode, isStudent } = storeToRefs(containerStore);
 
 // Computed for hiding student-restricted items
-const hideStudentOptions = computed(() => isStudent.value && mode.value === 'view');
+const hideStudentOptions = computed(() => isStudent?.value && mode.value === 'view');
 const { enterScreening, enterScreeningFromStart, enterPresenterMode, openSeparatedPresentation } =
   useScreening();
 const { importSpecificFile, importPPTXFile, exporting } = useImport();
@@ -302,7 +302,7 @@ const handleKeyDown = (e: KeyboardEvent) => {
 };
 
 const navigateToList = () => {
-  if (isStudent.value) {
+  if (isStudent?.value) {
     window.location.href = '/student/classes';
   } else {
     window.location.href = '/projects?type=presentation';

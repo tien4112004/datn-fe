@@ -27,13 +27,14 @@ import {
   ClipboardList,
   Loader2,
   CalendarIcon,
+  Eye,
+  MessageSquare,
 } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/shared/components/ui/popover';
 import { Calendar } from '@/shared/components/ui/calendar';
 import { format } from 'date-fns';
 import { cn } from '@/shared/lib/utils';
-import { LessonListCommand, AssignmentListCommand } from '../../class-lesson/components';
-import type { Lesson } from '../../class-lesson';
+import { AssignmentListCommand } from '../../class-lesson/components';
 import { Separator } from '@/shared/components/ui/separator';
 import { ResourceSelectorDialog } from '@/features/projects/components/resource-selector';
 import { getAcceptString, formatFileSize } from '../utils/attachmentValidation';
@@ -73,7 +74,6 @@ export const PostCreator = ({
   } = useAttachmentUpload();
   const [open, setOpen] = useState(false);
   const [type, setType] = useState<'Post' | 'Exercise'>(initialType);
-  const [linkedLessons, setLinkedLessons] = useState<Array<Lesson>>([]);
   const [linkedResources, setLinkedResources] = useState<Array<LinkedResource>>([]);
   const [resourceSelectorOpen, setResourceSelectorOpen] = useState(false);
   const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null);
@@ -104,7 +104,6 @@ export const PostCreator = ({
         type,
         content: contentMd,
         attachments: attachmentUrls.length > 0 ? attachmentUrls : undefined,
-        linkedLessonId: type === 'Post' && linkedLessons.length > 0 ? linkedLessons[0].id : undefined,
         linkedResources:
           type === 'Post' && linkedResources.length > 0
             ? linkedResources.map((r) => ({
@@ -123,7 +122,6 @@ export const PostCreator = ({
       // Reset form
       editor.replaceBlocks(editor.document, []);
       clearAttachments();
-      setLinkedLessons([]);
       setLinkedResources([]);
       setSelectedAssignment(null);
       setDueDate(undefined);
@@ -248,91 +246,73 @@ export const PostCreator = ({
             </div>
           ) : (
             <>
-              {/* Attachments, Lessons, Resources - Only for Post type */}
-              <div className="grid gap-3 md:grid-cols-2 md:gap-4">
-                {/* Attachments */}
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium">{t('feed.creator.labels.attachments')}</Label>
-                  <div>
-                    <input
-                      type="file"
-                      multiple
-                      onChange={handleFileChange}
-                      className="hidden"
-                      id="file-upload"
-                      accept={getAcceptString()}
-                      disabled={isUploading}
-                    />
-                    <label htmlFor="file-upload">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        className="w-full"
-                        asChild
-                        disabled={isUploading}
-                      >
-                        <span className="cursor-pointer">
-                          <Paperclip className="mr-2 h-4 w-4" />
-                          {t('feed.creator.actions.attachFiles')}
-                        </span>
-                      </Button>
-                    </label>
-
-                    {/* Upload Progress */}
-                    {isUploading && (
-                      <div className="mt-2 space-y-1">
-                        <div className="text-muted-foreground flex items-center gap-2 text-sm">
-                          <Loader2 className="h-3 w-3 animate-spin" />
-                          <span>Uploading... {uploadProgress}%</span>
-                        </div>
-                        <Progress value={uploadProgress} className="h-1" />
-                      </div>
-                    )}
-
-                    {/* Pending files list */}
-                    {pendingFiles.length > 0 && (
-                      <div className="mt-2 space-y-1">
-                        {pendingFiles.map((pf) => (
-                          <div
-                            key={pf.id}
-                            className="bg-muted/30 flex items-center justify-between rounded border px-2 py-1.5 text-sm"
-                          >
-                            <div className="flex flex-col truncate">
-                              <span className="truncate">{pf.file.name}</span>
-                              <span className="text-muted-foreground text-xs">
-                                {formatFileSize(pf.file.size)}
-                              </span>
-                            </div>
-                            <Button
-                              type="button"
-                              onClick={() => removePendingFile(pf.id)}
-                              variant="ghost"
-                              size="sm"
-                              className="h-auto p-1"
-                              disabled={isUploading}
-                            >
-                              <X className="h-3 w-3" />
-                            </Button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Link Lessons */}
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium">{t('feed.creator.labels.linkLessons')}</Label>
-                  <LessonListCommand
-                    onLessonsSelect={function (lessons: Array<Lesson>): void {
-                      setLinkedLessons(lessons);
-                    }}
+              {/* Attachments - Only for Post type */}
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">{t('feed.creator.labels.attachments')}</Label>
+                <div>
+                  <input
+                    type="file"
+                    multiple
+                    onChange={handleFileChange}
+                    className="hidden"
+                    id="file-upload"
+                    accept={getAcceptString()}
+                    disabled={isUploading}
                   />
-                  {linkedLessons.length > 0 && (
-                    <p className="text-muted-foreground text-xs">
-                      {linkedLessons.length} lesson{linkedLessons.length > 1 ? 's' : ''} selected
-                    </p>
+                  <label htmlFor="file-upload">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="w-full"
+                      asChild
+                      disabled={isUploading}
+                    >
+                      <span className="cursor-pointer">
+                        <Paperclip className="mr-2 h-4 w-4" />
+                        {t('feed.creator.actions.attachFiles')}
+                      </span>
+                    </Button>
+                  </label>
+
+                  {/* Upload Progress */}
+                  {isUploading && (
+                    <div className="mt-2 space-y-1">
+                      <div className="text-muted-foreground flex items-center gap-2 text-sm">
+                        <Loader2 className="h-3 w-3 animate-spin" />
+                        <span>Uploading... {uploadProgress}%</span>
+                      </div>
+                      <Progress value={uploadProgress} className="h-1" />
+                    </div>
+                  )}
+
+                  {/* Pending files list */}
+                  {pendingFiles.length > 0 && (
+                    <div className="mt-2 space-y-1">
+                      {pendingFiles.map((pf) => (
+                        <div
+                          key={pf.id}
+                          className="bg-muted/30 flex items-center justify-between rounded border px-2 py-1.5 text-sm"
+                        >
+                          <div className="flex flex-col truncate">
+                            <span className="truncate">{pf.file.name}</span>
+                            <span className="text-muted-foreground text-xs">
+                              {formatFileSize(pf.file.size)}
+                            </span>
+                          </div>
+                          <Button
+                            type="button"
+                            onClick={() => removePendingFile(pf.id)}
+                            variant="ghost"
+                            size="sm"
+                            className="h-auto p-1"
+                            disabled={isUploading}
+                          >
+                            <X className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
                   )}
                 </div>
               </div>
@@ -362,13 +342,17 @@ export const PostCreator = ({
                           : resource.type === 'presentation'
                             ? Presentation
                             : ClipboardList;
+                      const PermissionIcon = resource.permissionLevel === 'comment' ? MessageSquare : Eye;
                       return (
                         <div
                           key={`${resource.type}:${resource.id}`}
                           className="bg-secondary flex items-center gap-1.5 rounded-full px-3 py-1 text-sm"
                         >
                           <Icon className="h-3.5 w-3.5" />
-                          <span className="max-w-[150px] truncate">{resource.title}</span>
+                          <span className="max-w-[120px] truncate">{resource.title}</span>
+                          <span className="text-muted-foreground flex items-center gap-0.5 text-xs">
+                            <PermissionIcon className="h-3 w-3" />
+                          </span>
                           <button
                             type="button"
                             onClick={() =>

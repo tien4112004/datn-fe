@@ -32,6 +32,10 @@ const QuestionBankPage = lazy(() =>
 const QuestionBankEditorPage = lazy(() =>
   import('@/pages/QuestionBankEditorPage').then((m) => ({ default: m.QuestionBankEditorPage }))
 );
+const ContextsPage = lazy(() => import('@/pages/ContextsPage').then((m) => ({ default: m.ContextsPage })));
+const ContextFormPage = lazy(() =>
+  import('@/pages/ContextFormPage').then((m) => ({ default: m.ContextFormPage }))
+);
 
 const LazyWrapper = ({ children }: { children: React.ReactNode }) => (
   <Suspense fallback={<GlobalSpinner text="Loading..." />}>{children}</Suspense>
@@ -183,6 +187,40 @@ export const router = createBrowserRouter([
         element: (
           <LazyWrapper>
             <QuestionBankEditorPage />
+          </LazyWrapper>
+        ),
+      },
+    ],
+  },
+  {
+    path: '/',
+    element: (
+      <ProtectedRoute>
+        <AdminLayout />
+      </ProtectedRoute>
+    ),
+    children: [
+      {
+        path: 'contexts',
+        element: (
+          <LazyWrapper>
+            <ContextsPage />
+          </LazyWrapper>
+        ),
+      },
+      {
+        path: 'contexts/new',
+        element: (
+          <LazyWrapper>
+            <ContextFormPage />
+          </LazyWrapper>
+        ),
+      },
+      {
+        path: 'contexts/:id',
+        element: (
+          <LazyWrapper>
+            <ContextFormPage />
           </LazyWrapper>
         ),
       },

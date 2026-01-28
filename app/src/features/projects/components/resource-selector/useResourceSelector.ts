@@ -12,6 +12,7 @@ export interface UseResourceSelectorReturn {
   setSelectedResources: (resources: LinkedResource[]) => void;
   setDefaultPermissionLevel: (level: PermissionLevel) => void;
   updateResourcePermission: (type: LinkedResourceType, id: string, permissionLevel: PermissionLevel) => void;
+  setAllResourcesPermission: (permissionLevel: PermissionLevel) => void;
 }
 
 export function useResourceSelector(
@@ -94,6 +95,11 @@ export function useResourceSelector(
     []
   );
 
+  const setAllResourcesPermission = useCallback((permissionLevel: PermissionLevel) => {
+    setSelectedResources((prev) => prev.map((r) => ({ ...r, permissionLevel })));
+    setDefaultPermissionLevel(permissionLevel);
+  }, []);
+
   return {
     selectedResources,
     defaultPermissionLevel,
@@ -105,5 +111,6 @@ export function useResourceSelector(
     setSelectedResources,
     setDefaultPermissionLevel,
     updateResourcePermission,
+    setAllResourcesPermission,
   };
 }

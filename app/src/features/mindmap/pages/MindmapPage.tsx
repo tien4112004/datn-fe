@@ -65,11 +65,7 @@ const migrateLayoutDataToRootNodes = (
   });
 };
 
-interface MindmapPageProps {
-  isStudent?: boolean;
-}
-
-const MindmapPage = ({ isStudent = false }: MindmapPageProps) => {
+const MindmapPage = () => {
   const { mindmap } = useLoaderData() as { mindmap: Mindmap };
   const setNodes = useCoreStore((state) => state.setNodes);
   const setEdges = useCoreStore((state) => state.setEdges);
@@ -146,11 +142,7 @@ const MindmapPage = ({ isStudent = false }: MindmapPageProps) => {
           <div className="flex h-screen w-full" style={{ backgroundColor: 'var(--background)' }}>
             <Flow isPanOnDrag={isPanOnDrag}>
               {/* Breadcrumb Header */}
-              <MindmapBreadcrumbHeader
-                mindmapId={mindmap.id}
-                initialTitle={mindmap.title}
-                isStudent={isStudent}
-              />
+              <MindmapBreadcrumbHeader mindmapId={mindmap.id} initialTitle={mindmap.title} />
               {/* Controls */}
               <div className={`absolute bottom-4 left-4 z-10`}>
                 <MindmapControls

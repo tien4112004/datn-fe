@@ -4,7 +4,7 @@ import MindmapPage from './MindmapPage';
 const StudentMindmapPage = () => {
   return (
     <SidebarProvider defaultOpen={false}>
-      <MindmapPage isStudent={true} />
+      <MindmapPage />
     </SidebarProvider>
   );
 };

@@ -74,6 +74,7 @@ export default {
     // Điều hướng breadcrumb
     breadcrumb: {
       presentations: 'Bài trình chiếu',
+      backToClass: 'Quay lại lớp học',
     },
 
     // Chỉnh sửa tiêu đề

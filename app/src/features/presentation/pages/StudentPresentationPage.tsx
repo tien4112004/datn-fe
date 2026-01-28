@@ -14,7 +14,7 @@ const StudentPresentationPage = () => {
   };
 
   return (
-    <SidebarProvider defaultOpen={false}>
+    <SidebarProvider open={false}>
       {classId && (
         <div className="absolute left-4 top-4 z-50">
           <button

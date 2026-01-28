@@ -193,14 +193,14 @@ const AssignmentTable = () => {
         table={table}
         isLoading={isLoading}
         onClickRow={(row) => {
-          navigate(`/assignments/${row.original.id}`, { replace: false });
+          navigate(`/assignment/${row.original.id}`, { replace: false });
         }}
         rowStyle="transition cursor-pointer"
         emptyState={<div className="text-muted-foreground">{t('assignment.emptyState')}</div>}
         contextMenu={(row) => (
           <ActionContent
             onViewDetail={() => {
-              navigate(`/assignments/${row.original.id}`);
+              navigate(`/assignment/${row.original.id}`);
             }}
             onDelete={() => {
               handleDelete(row.original);

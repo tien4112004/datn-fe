@@ -17,6 +17,7 @@ import type {
   CreateQuestionPayload,
   UpdateQuestionPayload,
 } from '@/types/questionBank';
+import type { Context } from '@/types/context';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
@@ -78,6 +79,12 @@ export const adminKeys = {
       chapters: (subject: string, grade: string) =>
         ['question-bank', 'metadata', 'chapters', subject, grade] as const,
     },
+  },
+  // Contexts
+  contexts: {
+    all: ['contexts'] as const,
+    list: (params?: PaginationParams) => [...adminKeys.contexts.all, 'list', params] as const,
+    detail: (id: string) => [...adminKeys.contexts.all, 'detail', id] as const,
   },
 };
 
@@ -701,5 +708,79 @@ export function useQuestionBankChapters(subject?: string, grade?: string) {
     enabled: !!subject && !!grade,
     staleTime: 300000, // 5 minutes
     gcTime: 600000, // 10 minutes
+  });
+}
+
+// ============= CONTEXTS =============
+
+export function useContexts(params?: PaginationParams) {
+  return useQuery({
+    queryKey: adminKeys.contexts.list(params),
+    queryFn: () => getAdminApiService().getContexts(params),
+    staleTime: 30000,
+    gcTime: 300000,
+  });
+}
+
+export function useContextById(id: string) {
+  return useQuery({
+    queryKey: adminKeys.contexts.detail(id),
+    queryFn: () => getAdminApiService().getContextById(id),
+    enabled: !!id,
+    staleTime: 300000,
+    gcTime: 600000,
+  });
+}
+
+export function useCreateContext() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: Omit<Context, 'id' | 'createdAt' | 'updatedAt'>) =>
+      getAdminApiService().createContext(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: adminKeys.contexts.all });
+      toast.success('Context created successfully');
+    },
+    onError: (error) => {
+      toast.error('Failed to create context', {
+        description: error instanceof Error ? error.message : 'An error occurred',
+      });
+    },
+  });
+}
+
+export function useUpdateContext() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Partial<Context> }) =>
+      getAdminApiService().updateContext(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: adminKeys.contexts.all });
+      toast.success('Context updated successfully');
+    },
+    onError: (error) => {
+      toast.error('Failed to update context', {
+        description: error instanceof Error ? error.message : 'An error occurred',
+      });
+    },
+  });
+}
+
+export function useDeleteContext() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => getAdminApiService().deleteContext(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: adminKeys.contexts.all });
+      toast.success('Context deleted successfully');
+    },
+    onError: (error) => {
+      toast.error('Failed to delete context', {
+        description: error instanceof Error ? error.message : 'An error occurred',
+      });
+    },
   });
 }

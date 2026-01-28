@@ -12,6 +12,7 @@ import { Input } from '@/shared/components/ui/input';
 import { Label } from '@/shared/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
+import { ScrollArea } from '@/shared/components/ui/scroll-area';
 import { BrainCircuit, Presentation, ClipboardList, Search, X, Eye, MessageSquare } from 'lucide-react';
 import { useMindmaps } from '@/features/mindmap/hooks/useApi';
 import { usePresentations } from '@/features/presentation/hooks/useApi';
@@ -48,7 +49,8 @@ export const ResourceSelectorDialog = ({
     toggleResource,
     clearSelection,
     setSelectedResources,
-    setDefaultPermissionLevel,
+    updateResourcePermission,
+    setAllResourcesPermission,
   } = useResourceSelector(initialSelection, initialPermissionLevel);
 
   // Fetch resources from each API
@@ -125,6 +127,18 @@ export const ResourceSelectorDialog = ({
     }
     return counts;
   }, [selectedResources]);
+
+  // Get icon for resource type
+  const getResourceIcon = (type: LinkedResourceType) => {
+    switch (type) {
+      case 'mindmap':
+        return BrainCircuit;
+      case 'presentation':
+        return Presentation;
+      case 'assignment':
+        return ClipboardList;
+    }
+  };
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
@@ -222,17 +236,83 @@ export const ResourceSelectorDialog = ({
           </div>
         </Tabs>
 
+        {/* Selected Resources Panel */}
+        {selectedResources.length > 0 && (
+          <div className="flex-shrink-0 border-t pt-3">
+            <div className="mb-2 flex items-center justify-between">
+              <Label className="text-sm font-medium">
+                {t('feed.resourceSelector.selectedResources', 'Selected Resources')} (
+                {selectedResources.length})
+              </Label>
+              <button
+                type="button"
+                onClick={clearSelection}
+                className="text-muted-foreground hover:text-foreground text-xs hover:underline"
+              >
+                {t('feed.resourceSelector.clearSelection')}
+              </button>
+            </div>
+            <ScrollArea className="max-h-[120px]">
+              <div className="space-y-1.5 pr-3">
+                {selectedResources.map((resource) => {
+                  const Icon = getResourceIcon(resource.type);
+                  return (
+                    <div
+                      key={`${resource.type}:${resource.id}`}
+                      className="bg-muted/30 flex items-center gap-2 rounded-md border px-2 py-1.5"
+                    >
+                      <Icon className="text-muted-foreground h-4 w-4 flex-shrink-0" />
+                      <span className="min-w-0 flex-1 truncate text-sm">{resource.title}</span>
+                      <Select
+                        value={resource.permissionLevel || 'view'}
+                        onValueChange={(value: PermissionLevel) =>
+                          updateResourcePermission(resource.type, resource.id, value)
+                        }
+                      >
+                        <SelectTrigger className="h-7 w-[110px] flex-shrink-0 text-xs">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="view">
+                            <div className="flex items-center gap-1.5">
+                              <Eye className="h-3 w-3" />
+                              <span>{t('feed.resourceSelector.viewOnly', 'View only')}</span>
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="comment">
+                            <div className="flex items-center gap-1.5">
+                              <MessageSquare className="h-3 w-3" />
+                              <span>{t('feed.resourceSelector.viewAndComment', 'View & Comment')}</span>
+                            </div>
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <button
+                        type="button"
+                        onClick={() => toggleResource(resource)}
+                        className="text-muted-foreground hover:text-destructive flex-shrink-0"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            </ScrollArea>
+          </div>
+        )}
+
         {/* Footer */}
         <DialogFooter className="flex-shrink-0 border-t pt-4">
           <div className="flex w-full flex-col gap-3">
-            {/* Permission Level Selector */}
+            {/* Set All Permissions */}
             <div className="flex items-center gap-3">
               <Label className="text-muted-foreground whitespace-nowrap text-sm">
-                {t('feed.resourceSelector.permissionLevel', 'Permission for students:')}
+                {t('feed.resourceSelector.setAllPermissions', 'Set all permissions:')}
               </Label>
               <Select
                 value={defaultPermissionLevel}
-                onValueChange={(value: PermissionLevel) => setDefaultPermissionLevel(value)}
+                onValueChange={(value: PermissionLevel) => setAllResourcesPermission(value)}
               >
                 <SelectTrigger className="w-[180px]">
                   <SelectValue />
@@ -254,21 +334,7 @@ export const ResourceSelectorDialog = ({
               </Select>
             </div>
 
-            <div className="flex w-full items-center justify-between">
-              <div className="text-muted-foreground text-sm">
-                {selectedResources.length > 0 && (
-                  <>
-                    {t('feed.resourceSelector.selected', { count: selectedResources.length })}
-                    <button
-                      type="button"
-                      onClick={clearSelection}
-                      className="text-primary ml-2 hover:underline"
-                    >
-                      {t('feed.resourceSelector.clearSelection')}
-                    </button>
-                  </>
-                )}
-              </div>
+            <div className="flex w-full items-center justify-end">
               <div className="flex gap-2">
                 <Button variant="outline" onClick={handleCancel}>
                   {t('feed.creator.actions.cancel')}

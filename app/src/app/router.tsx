@@ -168,19 +168,19 @@ const router = createBrowserRouter([
         }),
       },
       {
-        path: 'assignments/create',
+        path: 'assignment/create',
         lazy: async () => ({
           Component: (await import('@/features/assignment/pages/AssignmentEditorPage')).AssignmentEditorPage,
         }),
       },
       {
-        path: 'assignments/edit/:id',
+        path: 'assignment/edit/:id',
         lazy: async () => ({
           Component: (await import('@/features/assignment/pages/AssignmentEditorPage')).AssignmentEditorPage,
         }),
       },
       {
-        path: 'assignments/:id',
+        path: 'assignment/:id',
         lazy: async () => ({
           Component: (await import('@/features/assignment/pages/AssignmentViewPage')).AssignmentViewPage,
         }),

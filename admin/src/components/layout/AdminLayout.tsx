@@ -13,6 +13,7 @@ import {
   Menu,
   X,
   Library,
+  BookOpen,
 } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
@@ -21,6 +22,7 @@ import { getBackendUrl } from '@aiprimary/api';
 const navItems = [
   { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/users', icon: Users, label: 'Users' },
+  { to: '/contexts', icon: BookOpen, label: 'Contexts' },
   { to: '/slide-themes', icon: Palette, label: 'Slide Themes' },
   { to: '/slide-templates', icon: LayoutTemplate, label: 'Slide Templates' },
   { to: '/art-styles', icon: Brush, label: 'Art Styles' },

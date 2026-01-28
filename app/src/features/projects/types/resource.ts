@@ -26,6 +26,8 @@ export interface LinkedResourceResponse {
   type: LinkedResourceType;
   id: string;
   permissionLevel: PermissionLevel;
+  title?: string; // Enriched by backend (optional for backward compatibility)
+  thumbnail?: string; // Enriched by backend (optional, null for assignments)
 }
 
 /**

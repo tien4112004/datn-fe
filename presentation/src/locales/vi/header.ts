@@ -9,6 +9,10 @@ export default {
       resetSlides: 'Đặt lại tất cả slide',
       resetCurrentPage: 'Đặt lại trang hiện tại',
       importing: 'Đang nhập...',
+      duplicatePresentation: 'Sao chép bài trình chiếu này',
+      duplicateSuccess: 'Đã sao chép bài trình chiếu: {title}',
+      duplicateError: 'Lỗi khi sao chép bài trình chiếu',
+      duplicateConfirm: 'Tạo bản sao của bài trình chiếu này?',
     },
 
     // Tính năng AI
@@ -47,18 +51,24 @@ export default {
       comment: 'bình luận',
       restrictedAccess: 'Quyền truy cập hạn chế',
       usersAdded: ' người dùng đã thêm',
-    },
-
-    // Nhãn nút
-    buttons: {
-      present: 'Trình chiếu',
-      share: 'Chia sẻ',
-      comments: 'Bình luận',
+      viewer: 'Người xem',
+      commenter: 'Người bình luận',
+      editor: 'Người chỉnh sửa',
     },
 
     // Bình luận
     comments: {
       tooltip: 'Xem và thêm bình luận',
+    },
+
+    // Nút bấm
+    buttons: {
+      present: 'Trình bày',
+      share: 'Chia sẻ',
+      comments: 'Bình luận',
+      duplicate: 'Sao chép',
+      cancel: 'Hủy',
+      confirm: 'Xác nhận',
     },
 
     // Điều hướng breadcrumb

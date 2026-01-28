@@ -19,6 +19,7 @@ import { CriticalError } from '@aiprimary/api';
 import { ERROR_TYPE } from '@/shared/constants';
 import { useEffect, useRef, useState } from 'react';
 import { CommentDrawer } from '@/features/comments';
+import { useDuplicatePresentation } from '../hooks/useApi';
 
 const DetailPage = () => {
   const { presentation } = useLoaderData() as { presentation: Presentation | null };
@@ -66,6 +67,29 @@ const DetailPage = () => {
 
   // Listen for comment drawer open requests from Vue
   useCommentDrawerTrigger(() => setIsCommentDrawerOpen(true));
+
+  // Handle duplicate presentation requests from Vue
+  const duplicateMutation = useDuplicatePresentation();
+  useEffect(() => {
+    const handleDuplicate = async (event: Event) => {
+      const customEvent = event as CustomEvent<{ presentationId: string }>;
+      const presentationId = customEvent.detail.presentationId;
+
+      if (presentationId) {
+        try {
+          const duplicated = await duplicateMutation.mutateAsync(presentationId);
+          // Navigate to the duplicated presentation
+          navigate(`/presentation/${duplicated.id}`);
+        } catch (error) {
+          // Error handling is done in the mutation
+          console.error('Duplicate failed:', error);
+        }
+      }
+    };
+
+    window.addEventListener('app.presentation.duplicate', handleDuplicate);
+    return () => window.removeEventListener('app.presentation.duplicate', handleDuplicate);
+  }, [duplicateMutation, navigate]);
 
   const { t } = useTranslation('glossary', { keyPrefix: 'loading' });
 

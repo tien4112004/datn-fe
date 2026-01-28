@@ -124,6 +124,49 @@ export const useCreateBlankPresentation = () => {
   });
 };
 
+export const useDuplicatePresentation = () => {
+  const presentationApiService = usePresentationApiService();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      // 1. Fetch the existing presentation
+      const original = await presentationApiService.getPresentationById(id);
+
+      if (!original) {
+        throw new Error('Presentation not found');
+      }
+
+      // 2. Transform data for duplication
+      const duplicateData = {
+        title: `${original.title} (Copy)`,
+        slides: original.slides || [],
+        theme: original.theme,
+        viewport: original.viewport,
+        isParsed: original.isParsed,
+        thumbnail: typeof original.thumbnail === 'string' ? original.thumbnail : undefined,
+      };
+
+      // 3. Create new presentation using existing POST endpoint
+      const duplicated = await presentationApiService.createPresentation(duplicateData);
+
+      return duplicated;
+    },
+    onSuccess: (data) => {
+      // Invalidate queries to refresh list
+      queryClient.invalidateQueries({
+        queryKey: [presentationApiService.getType(), 'presentations'],
+      });
+
+      toast.success(t('presentation:actions.duplicateSuccess', { title: data.title }));
+    },
+    onError: (error) => {
+      toast.error(t('presentation:actions.duplicateError'));
+      console.error('Failed to duplicate presentation:', error);
+    },
+  });
+};
+
 // Removed: Test presentation creation hook (not needed for production)
 // export const useCreateTestPresentations = () => {
 //   const presentationApiService = usePresentationApiService();

@@ -1,10 +1,22 @@
-import { GitBranchPlus, Undo, Redo, Save, Sparkles, Download, Share2 } from 'lucide-react';
+import { GitBranchPlus, Undo, Redo, Save, Sparkles, Download, Share2, Copy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/shared/components/ui/tabs';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/shared/components/ui/alert-dialog';
 import { useUndoRedoStore, useNodeOperationsStore } from '../../stores';
 import { useTranslation } from 'react-i18next';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 import { useSaveMindmap, useNodeSelection } from '../../hooks';
+import { useDuplicateMindmap } from '../../hooks/useApi';
 import { useState, useEffect } from 'react';
 import ExportMindmapDialog from '../export';
 import { GenerateTreeDialog } from '../generate';
@@ -41,6 +53,7 @@ const Toolbar = ({
 
   // Save and Export states
   const { saveWithThumbnail, isLoading: isSaving } = useSaveMindmap();
+  const duplicateMutation = useDuplicateMindmap();
   const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
   const [isGenerateDialogOpen, setIsGenerateDialogOpen] = useState(false);
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
@@ -211,6 +224,35 @@ const Toolbar = ({
                 <Download size={isMobileSheet ? 20 : 16} />
                 {t('toolbar.export.export')}
               </Button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    variant="outline"
+                    disabled={duplicateMutation.isPending}
+                    className={cn(
+                      'w-full transition-colors hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500 disabled:opacity-50',
+                      isMobileSheet ? 'h-11 min-h-[44px] text-base' : 'h-9 text-sm'
+                    )}
+                    size="sm"
+                    title={t('toolbar.actions.duplicate')}
+                  >
+                    <Copy size={isMobileSheet ? 20 : 16} />
+                    {duplicateMutation.isPending ? t('toolbar.save.saving') : t('toolbar.actions.duplicate')}
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>{t('toolbar.actions.duplicate')}</AlertDialogTitle>
+                    <AlertDialogDescription>{t('toolbar.actions.duplicateConfirm')}</AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>{t('toolbar.actions.cancel')}</AlertDialogCancel>
+                    <AlertDialogAction onClick={() => duplicateMutation.mutate(mindmapId)}>
+                      {t('toolbar.actions.confirm')}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
               {userPermission === 'edit' && (
                 <Button
                   variant="outline"

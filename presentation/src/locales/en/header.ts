@@ -9,6 +9,10 @@ export default {
       resetSlides: 'Reset Slides',
       resetCurrentPage: 'Reset Current Page',
       importing: 'Importing...',
+      duplicatePresentation: 'Duplicate this presentation',
+      duplicateSuccess: 'Presentation duplicated: {title}',
+      duplicateError: 'Failed to duplicate presentation',
+      duplicateConfirm: 'Create a copy of this presentation?',
     },
 
     // AI Features
@@ -47,18 +51,24 @@ export default {
       comment: 'comment',
       restrictedAccess: 'Restricted access',
       usersAdded: ' user(s) added',
-    },
-
-    // Button Labels
-    buttons: {
-      present: 'Present',
-      share: 'Share',
-      comments: 'Comments',
+      viewer: 'Viewer',
+      commenter: 'Commenter',
+      editor: 'Editor',
     },
 
     // Comments
     comments: {
       tooltip: 'View and add comments',
+    },
+
+    // Buttons
+    buttons: {
+      present: 'Present',
+      share: 'Share',
+      comments: 'Comments',
+      duplicate: 'Duplicate',
+      cancel: 'Cancel',
+      confirm: 'Confirm',
     },
 
     // Breadcrumb Navigation

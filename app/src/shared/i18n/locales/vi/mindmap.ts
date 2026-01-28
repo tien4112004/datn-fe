@@ -68,6 +68,12 @@ export default {
       applyLayout: 'Áp dụng bố cục',
       logData: 'Ghi nhật ký dữ liệu',
       share: 'Chia sẻ',
+      duplicate: 'Lưu bản sao',
+      duplicateSuccess: 'Đã sao chép sơ đồ: {{title}}',
+      duplicateError: 'Lỗi khi sao chép sơ đồ',
+      duplicateConfirm: 'Tạo bản sao của sơ đồ này?',
+      cancel: 'Hủy',
+      confirm: 'Xác nhận',
     },
     selection: {
       noSelection: 'Chưa chọn nút nào',

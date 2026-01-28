@@ -125,6 +125,24 @@
         <IconComments class="icon" />
         {{ $t('header.buttons.comments') }}
       </Button>
+      <AlertDialog>
+        <AlertDialogTrigger as-child>
+          <Button class="menu-item" v-tooltip="$t('header.file.duplicatePresentation')">
+            <IconCopy class="icon" />
+            {{ $t('header.buttons.duplicate') }}
+          </Button>
+        </AlertDialogTrigger>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{{ $t('header.file.duplicatePresentation') }}</AlertDialogTitle>
+            <AlertDialogDescription>{{ $t('header.file.duplicateConfirm') }}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{{ $t('header.buttons.cancel') }}</AlertDialogCancel>
+            <AlertDialogAction @click="handleDuplicate">{{ $t('header.buttons.confirm') }}</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       <Button class="menu-item" v-tooltip="$t('header.file.exportFile')" @click="setDialogForExport('pptx')">
         <IconDownload class="icon" />
         {{ $t('header.share.export') }}
@@ -181,7 +199,23 @@ import BreadcrumbItem from '@/components/ui/breadcrumb/BreadcrumbItem.vue';
 import BreadcrumbLink from '@/components/ui/breadcrumb/BreadcrumbLink.vue';
 import BreadcrumbPage from '@/components/ui/breadcrumb/BreadcrumbPage.vue';
 import BreadcrumbSeparator from '@/components/ui/breadcrumb/BreadcrumbSeparator.vue';
-import { Check as IconCheck, X as IconClose, MessageSquare as IconComments } from 'lucide-vue-next';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
+import {
+  Check as IconCheck,
+  X as IconClose,
+  MessageSquare as IconComments,
+  Copy as IconCopy,
+} from 'lucide-vue-next';
 import message from '@/utils/message';
 import PermissionBadge from '@/components/PermissionBadge.vue';
 const { t } = useI18n();
@@ -339,6 +373,21 @@ const handleShare = (options: { shareWithLink: boolean; allowEdit: boolean; user
 
 const handleOpenComments = () => {
   window.dispatchEvent(new CustomEvent('app.presentation.open-comments'));
+};
+
+const handleDuplicate = () => {
+  if (!presentationId.value) {
+    console.error('No presentation ID available');
+    message.error(t('header.file.duplicateError'));
+    return;
+  }
+
+  // Dispatch event to React app to handle duplication
+  window.dispatchEvent(
+    new CustomEvent('app.presentation.duplicate', {
+      detail: { presentationId: presentationId.value },
+    })
+  );
 };
 </script>
 

@@ -15,6 +15,7 @@ export default {
     mindmap: 'Sơ đồ tư duy',
     assignment: 'Bài tập',
     image: 'Hình ảnh',
+    sharedWithMe: 'Chia sẻ với tôi',
   },
   creation: {
     createPresentationError: 'Tạo bản trình bày trống thất bại: {{error}}',

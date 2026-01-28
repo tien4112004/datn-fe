@@ -65,7 +65,11 @@ const migrateLayoutDataToRootNodes = (
   });
 };
 
-const MindmapPage = () => {
+interface MindmapPageProps {
+  isStudent?: boolean;
+}
+
+const MindmapPage = ({ isStudent = false }: MindmapPageProps) => {
   const { mindmap } = useLoaderData() as { mindmap: Mindmap };
   const setNodes = useCoreStore((state) => state.setNodes);
   const setEdges = useCoreStore((state) => state.setEdges);
@@ -75,9 +79,10 @@ const MindmapPage = () => {
   const [isPanOnDrag, setIsPanOnDrag] = useState(false);
   const [isToolbarVisible, setIsToolbarVisible] = useState(isDesktop);
   const [isCommentDrawerOpen, setIsCommentDrawerOpen] = useState(false);
+  const userPermission = mindmap?.permission;
 
-  // Track dirty state changes
-  useMindmapDirtyTracking();
+  // Track dirty state changes - only if user can edit
+  useMindmapDirtyTracking(userPermission === 'edit');
 
   // Track saving state
   const isSaving = useSavingStore((state) => state.isSaving);
@@ -91,7 +96,6 @@ const MindmapPage = () => {
   const setPresenterModeStore = usePresenterModeStore((state) => state.setPresenterMode);
 
   // Permission state
-  const userPermission = mindmap?.permission;
 
   // Listen for comment drawer open requests
   useCommentDrawerTrigger(() => setIsCommentDrawerOpen(true));
@@ -142,7 +146,11 @@ const MindmapPage = () => {
           <div className="flex h-screen w-full" style={{ backgroundColor: 'var(--background)' }}>
             <Flow isPanOnDrag={isPanOnDrag}>
               {/* Breadcrumb Header */}
-              <MindmapBreadcrumbHeader mindmapId={mindmap.id} initialTitle={mindmap.title} />
+              <MindmapBreadcrumbHeader
+                mindmapId={mindmap.id}
+                initialTitle={mindmap.title}
+                isStudent={isStudent}
+              />
               {/* Controls */}
               <div className={`absolute bottom-4 left-4 z-10`}>
                 <MindmapControls

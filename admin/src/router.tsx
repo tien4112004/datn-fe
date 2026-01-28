@@ -237,4 +237,38 @@ export const router = createBrowserRouter([
       },
     ],
   },
+  {
+    path: '/',
+    element: (
+      <ProtectedRoute>
+        <AdminLayout />
+      </ProtectedRoute>
+    ),
+    children: [
+      {
+        path: 'contexts',
+        element: (
+          <LazyWrapper>
+            <ContextsPage />
+          </LazyWrapper>
+        ),
+      },
+      {
+        path: 'contexts/new',
+        element: (
+          <LazyWrapper>
+            <ContextFormPage />
+          </LazyWrapper>
+        ),
+      },
+      {
+        path: 'contexts/:id',
+        element: (
+          <LazyWrapper>
+            <ContextFormPage />
+          </LazyWrapper>
+        ),
+      },
+    ],
+  },
 ]);

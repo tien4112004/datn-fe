@@ -15,7 +15,9 @@ export default {
     slideCountPlaceholder: 'How many slides?',
     slideCountLabel: 'Slides',
     slideCountUnit: 'slides',
+    slideCountDescription: 'Number of slides to generate',
     generateOutline: 'Generate Outline',
+    advancedOptions: 'Advanced Options',
     style: {
       placeholder: 'Which style?',
       label: 'Style',
@@ -41,6 +43,16 @@ export default {
       chinese: 'Chinese',
       japanese: 'Japanese',
       korean: 'Korean',
+    },
+    grade: {
+      label: 'Grade Level',
+      placeholder: 'Select grade level',
+      none: 'None',
+    },
+    subject: {
+      label: 'Subject',
+      placeholder: 'Select subject',
+      none: 'None',
     },
     targetAge: {
       placeholder: 'For which age group?',

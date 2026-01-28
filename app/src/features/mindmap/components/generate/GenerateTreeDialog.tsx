@@ -22,6 +22,7 @@ import type { MindMapNode, MindMapEdge } from '../../types';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 import { ModelSelect } from '@/features/model/components/ModelSelect';
 import { useModels, MODEL_TYPES } from '@/features/model';
+import { getAllGrades, getAllSubjects } from '@aiprimary/core';
 import { LANGUAGE_OPTIONS, MAX_DEPTH_OPTIONS, MAX_BRANCHES_OPTIONS } from '../../types/form';
 import type { CreateMindmapFormData } from '../../types/form';
 import { useGenerateMindmap } from '../../hooks/useApi';
@@ -35,8 +36,10 @@ interface GenerateTreeDialogProps {
 }
 
 function GenerateTreeDialog({ isOpen, onOpenChange }: GenerateTreeDialogProps) {
-  const { t } = useTranslation(I18N_NAMESPACES.MINDMAP);
+  const { t, i18n } = useTranslation(I18N_NAMESPACES.MINDMAP);
   const reactFlowInstance = useReactFlow();
+  const grades = getAllGrades();
+  const subjects = getAllSubjects();
 
   // Get models
   const { models, isLoading: isModelsLoading, isError: isModelsError } = useModels(MODEL_TYPES.TEXT);
@@ -63,6 +66,8 @@ function GenerateTreeDialog({ isOpen, onOpenChange }: GenerateTreeDialogProps) {
       language: 'en',
       maxDepth: 3,
       maxBranchesPerNode: 5,
+      grade: '',
+      subject: '',
     },
   });
 
@@ -86,6 +91,8 @@ function GenerateTreeDialog({ isOpen, onOpenChange }: GenerateTreeDialogProps) {
         language: data.language,
         maxDepth: data.maxDepth,
         maxBranchesPerNode: data.maxBranchesPerNode,
+        grade: data.grade || undefined,
+        subject: data.subject || undefined,
       });
 
       // Get current viewport center as base position
@@ -284,6 +291,63 @@ function GenerateTreeDialog({ isOpen, onOpenChange }: GenerateTreeDialogProps) {
                         )}
                       />
                       <p className="text-muted-foreground text-xs">{t('create.maxBranches.description')}</p>
+                    </div>
+                  </div>
+
+                  {/* Grade and Subject Row */}
+                  <div className="grid grid-cols-2 gap-4">
+                    {/* Grade */}
+                    <div className="space-y-2">
+                      <Label>{t('create.grade.label')}</Label>
+                      <Controller
+                        name="grade"
+                        control={control}
+                        render={({ field }) => (
+                          <Select
+                            value={field.value || 'none'}
+                            onValueChange={(val) => field.onChange(val === 'none' ? '' : val)}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder={t('create.grade.placeholder')} />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="none">{t('create.grade.none')}</SelectItem>
+                              {grades.map((g) => (
+                                <SelectItem key={g.code} value={g.code}>
+                                  {i18n.language === 'vi' ? g.name : g.nameEn}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        )}
+                      />
+                    </div>
+
+                    {/* Subject */}
+                    <div className="space-y-2">
+                      <Label>{t('create.subject.label')}</Label>
+                      <Controller
+                        name="subject"
+                        control={control}
+                        render={({ field }) => (
+                          <Select
+                            value={field.value || 'none'}
+                            onValueChange={(val) => field.onChange(val === 'none' ? '' : val)}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder={t('create.subject.placeholder')} />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="none">{t('create.subject.none')}</SelectItem>
+                              {subjects.map((s) => (
+                                <SelectItem key={s.code} value={s.code}>
+                                  {s.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        )}
+                      />
                     </div>
                   </div>
                 </div>

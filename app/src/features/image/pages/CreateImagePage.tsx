@@ -13,6 +13,8 @@ import type { CreateImageFormData, ImageGenerationRequest } from '@/features/ima
 import { useGenerateImage } from '../hooks';
 import useFormPersist from 'react-hook-form-persist';
 import { getLocalStorageData } from '@/shared/lib/utils';
+import { MODEL_TYPES, useModels } from '@/features/model';
+import { ModelSelect } from '@/features/model/components/ModelSelect';
 
 const IMAGE_FORM_PERSIST = 'create-image-form';
 
@@ -21,6 +23,7 @@ const CreateImagePage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const generate = useGenerateImage();
+  const { models } = useModels(MODEL_TYPES.IMAGE);
 
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -140,6 +143,22 @@ const CreateImagePage = () => {
                     />
                   )}
                 />
+                <div className="my-2 flex flex-row gap-1">
+                  <Controller
+                    name="model"
+                    control={control}
+                    render={({ field }) => (
+                      <ModelSelect
+                        models={models}
+                        value={field.value}
+                        onValueChange={field.onChange}
+                        placeholder={t('create.model.placeholder')}
+                        label={t('create.model.label')}
+                        showProviderLogo={true}
+                      />
+                    )}
+                  />
+                </div>
               </div>
             </div>
             <ExamplePrompts

@@ -7,6 +7,8 @@ export interface CreateMindmapFormData {
   language: 'en' | 'vi';
   maxDepth: number;
   maxBranchesPerNode: number;
+  grade?: string;
+  subject?: string;
 }
 
 export const LANGUAGE_OPTIONS = [

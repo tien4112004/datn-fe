@@ -4,21 +4,15 @@ import { Controller } from 'react-hook-form';
 import { Sparkles } from 'lucide-react';
 import { Card, CardContent, CardTitle } from '@/shared/components/ui/card';
 import { AutosizeTextarea } from '@/shared/components/ui/autosize-textarea';
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from '@/shared/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
+import { useSearchParams } from 'react-router-dom';
 import ExamplePrompts from '@/features/projects/components/ExamplePrompts';
-import { SLIDE_COUNT_OPTIONS, LANGUAGE_OPTIONS } from '@/features/presentation/types';
-import { MODEL_TYPES, useModels } from '@/features/model';
-import { ModelSelect } from '@/features/model/components/ModelSelect';
 import { usePresentationForm } from '@/features/presentation/contexts/PresentationFormContext';
 import ResourceTypeSwitcher from '@/features/projects/components/ResourceTypeSwitcher';
+import AdvancedOptions from './AdvancedOptions';
+import { SLIDE_COUNT_OPTIONS } from '@/features/presentation/types';
+import { MODEL_TYPES, useModels } from '@/features/model';
+import { ModelSelect } from '@/features/model/components/ModelSelect';
 
 interface OutlineCreationViewProps {
   onCreateOutline: () => void;
@@ -27,10 +21,24 @@ interface OutlineCreationViewProps {
 const OutlineCreationView = ({ onCreateOutline }: OutlineCreationViewProps) => {
   const { t } = useTranslation('presentation', { keyPrefix: 'createOutline' });
   const { control, setValue, watch, trigger } = usePresentationForm();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { models } = useModels(MODEL_TYPES.TEXT);
 
-  // const topicValue = watch('topic');
-  const showExamplePrompts = watch('topic') === '';
+  // Read advanced options state directly from URL
+  const isAdvancedOpen = searchParams.get('advanced') === 'true';
+
+  // Update URL when advanced options state changes
+  const toggleAdvancedOptions = (open: boolean) => {
+    const newParams = new URLSearchParams(searchParams);
+    if (open) {
+      newParams.set('advanced', 'true');
+    } else {
+      newParams.delete('advanced');
+    }
+    setSearchParams(newParams, { replace: true });
+  };
+
+  const showExamplePrompts = watch('topic') === '' && !isAdvancedOpen;
 
   // Presentation-specific example prompts
   const presentationExamplePrompts = [
@@ -99,40 +107,15 @@ const OutlineCreationView = ({ onCreateOutline }: OutlineCreationViewProps) => {
                           <SelectValue placeholder={t('slideCountPlaceholder')} />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectGroup>
-                            <SelectLabel>{t('slideCountLabel')}</SelectLabel>
-                            {SLIDE_COUNT_OPTIONS.map((num) => (
-                              <SelectItem key={num} value={num.toString()}>
-                                {num} {t('slideCountUnit')}
-                              </SelectItem>
-                            ))}
-                          </SelectGroup>
+                          {SLIDE_COUNT_OPTIONS.map((num) => (
+                            <SelectItem key={num} value={num.toString()}>
+                              {num} {t('slideCountUnit')}
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                     )}
                   />
-                  <Controller
-                    name="language"
-                    control={control}
-                    render={({ field }) => (
-                      <Select value={field.value} onValueChange={field.onChange}>
-                        <SelectTrigger className="w-fit">
-                          <SelectValue placeholder={t('language.placeholder')} />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectGroup>
-                            <SelectLabel>{t('language.label')}</SelectLabel>
-                            {LANGUAGE_OPTIONS.map((languageOption) => (
-                              <SelectItem key={languageOption.value} value={languageOption.value}>
-                                {t(languageOption.labelKey as never)}
-                              </SelectItem>
-                            ))}
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
-                    )}
-                  />
-
                   <Controller
                     name="model"
                     control={control}
@@ -156,6 +139,8 @@ const OutlineCreationView = ({ onCreateOutline }: OutlineCreationViewProps) => {
               prompts={presentationExamplePrompts}
               title={t('examples.title')}
             />
+
+            <AdvancedOptions control={control} isOpen={isAdvancedOpen} onToggle={toggleAdvancedOptions} />
           </CardContent>
         </Card>
 

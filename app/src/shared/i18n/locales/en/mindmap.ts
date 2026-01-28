@@ -25,6 +25,16 @@ export default {
       label: 'Max Branches',
       description: 'Maximum branches per node (1-10)',
     },
+    grade: {
+      label: 'Grade Level',
+      placeholder: 'Select grade level',
+      none: 'None',
+    },
+    subject: {
+      label: 'Subject',
+      placeholder: 'Select subject',
+      none: 'None',
+    },
     examples: {
       title: 'Example Mindmap Topics',
       prompt1: 'Machine Learning Fundamentals',

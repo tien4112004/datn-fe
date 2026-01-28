@@ -13,6 +13,8 @@ import type { CreateMindmapFormData } from '@/features/mindmap/types';
 import { useGenerateMindmapFlow } from '../hooks/useGenerateMindmapFlow';
 import useFormPersist from 'react-hook-form-persist';
 import { getLocalStorageData } from '@/shared/lib/utils';
+import { MODEL_TYPES, useModels } from '@/features/model';
+import { ModelSelect } from '@/features/model/components/ModelSelect';
 
 const MINDMAP_FORM_PERSIST = 'create-mindmap-form';
 
@@ -21,6 +23,7 @@ const CreateMindmapPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const { generateMindmap, isGenerating: isFlowGenerating } = useGenerateMindmapFlow();
+  const { models } = useModels(MODEL_TYPES.TEXT);
 
   const [error, setError] = useState<string | null>(null);
   const persistedData = useMemo(() => getLocalStorageData(MINDMAP_FORM_PERSIST), []);
@@ -32,9 +35,11 @@ const CreateMindmapPage = () => {
         name: '',
         provider: '',
       },
-      language: 'en',
+      language: 'vi',
       maxDepth: 3,
       maxBranchesPerNode: 5,
+      grade: '',
+      subject: '',
       ...persistedData,
     },
   });
@@ -86,6 +91,8 @@ const CreateMindmapPage = () => {
       language: formData.language,
       maxDepth: formData.maxDepth,
       maxBranchesPerNode: formData.maxBranchesPerNode,
+      grade: formData.grade || undefined,
+      subject: formData.subject || undefined,
     };
   };
 
@@ -137,6 +144,22 @@ const CreateMindmapPage = () => {
                     />
                   )}
                 />
+                <div className="my-2 flex flex-row gap-1">
+                  <Controller
+                    name="model"
+                    control={control}
+                    render={({ field }) => (
+                      <ModelSelect
+                        models={models}
+                        value={field.value}
+                        onValueChange={field.onChange}
+                        placeholder={t('create.model.placeholder')}
+                        label={t('create.model.label')}
+                        showProviderLogo={true}
+                      />
+                    )}
+                  />
+                </div>
               </div>
             </div>
             <ExamplePrompts

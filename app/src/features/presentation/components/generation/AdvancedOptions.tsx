@@ -1,24 +1,24 @@
 import { AnimatePresence, motion } from 'motion/react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
+import { Label } from '@/shared/components/ui/label';
 import { CardTitle } from '@/shared/components/ui/card';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Controller } from 'react-hook-form';
 import { getAllGrades, getAllSubjects } from '@aiprimary/core';
 
-import { LANGUAGE_OPTIONS, MAX_DEPTH_OPTIONS, MAX_BRANCHES_OPTIONS } from '@/features/mindmap/types/form';
-import type { CreateMindmapFormData } from '@/features/mindmap/types/form';
+import { LANGUAGE_OPTIONS } from '@/features/presentation/types';
+import type { UnifiedFormData } from '@/features/presentation/contexts/PresentationFormContext';
 import type { Control } from 'react-hook-form';
 
 interface AdvancedOptionsProps {
-  control: Control<CreateMindmapFormData>;
+  control: Control<UnifiedFormData>;
   isOpen: boolean;
   onToggle: (open: boolean) => void;
 }
 
 const AdvancedOptions = ({ control, isOpen, onToggle }: AdvancedOptionsProps) => {
-  const { t, i18n } = useTranslation('mindmap', { keyPrefix: 'create' });
+  const { t, i18n } = useTranslation('presentation', { keyPrefix: 'createOutline' });
   const grades = getAllGrades();
   const subjects = getAllSubjects();
 
@@ -50,7 +50,7 @@ const AdvancedOptions = ({ control, isOpen, onToggle }: AdvancedOptionsProps) =>
             style={{ overflow: 'hidden' }}
           >
             <div className="mt-4 space-y-4 px-1">
-              {/* 1x2 Grid for Language and Max Depth */}
+              {/* 1x2 Grid for Language and Grade */}
               <div className="grid grid-cols-2 gap-4">
                 {/* Language */}
                 <div className="space-y-2">
@@ -66,64 +66,13 @@ const AdvancedOptions = ({ control, isOpen, onToggle }: AdvancedOptionsProps) =>
                         <SelectContent>
                           {LANGUAGE_OPTIONS.map((opt) => (
                             <SelectItem key={opt.value} value={opt.value}>
-                              {t(`language.${opt.labelKey}` as never)}
+                              {t(`language.${opt.labelKey.split('.')[1]}` as never)}
                             </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
                     )}
                   />
-                </div>
-
-                {/* Max Depth */}
-                <div className="space-y-2">
-                  <Label>{t('maxDepth.label')}</Label>
-                  <Controller
-                    name="maxDepth"
-                    control={control}
-                    render={({ field }) => (
-                      <Select value={String(field.value)} onValueChange={(v) => field.onChange(Number(v))}>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {MAX_DEPTH_OPTIONS.map((depth) => (
-                            <SelectItem key={depth} value={String(depth)}>
-                              {depth}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    )}
-                  />
-                  <p className="text-muted-foreground text-xs">{t('maxDepth.description')}</p>
-                </div>
-              </div>
-
-              {/* 1x2 Grid for Max Branches and Grade */}
-              <div className="grid grid-cols-2 gap-4">
-                {/* Max Branches Per Node */}
-                <div className="space-y-2">
-                  <Label>{t('maxBranches.label')}</Label>
-                  <Controller
-                    name="maxBranchesPerNode"
-                    control={control}
-                    render={({ field }) => (
-                      <Select value={String(field.value)} onValueChange={(v) => field.onChange(Number(v))}>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {MAX_BRANCHES_OPTIONS.map((branches) => (
-                            <SelectItem key={branches} value={String(branches)}>
-                              {branches}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    )}
-                  />
-                  <p className="text-muted-foreground text-xs">{t('maxBranches.description')}</p>
                 </div>
 
                 {/* Grade */}

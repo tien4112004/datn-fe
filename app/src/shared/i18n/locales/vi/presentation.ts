@@ -31,7 +31,9 @@ export default {
     slideCountPlaceholder: 'Số lượng trang?',
     slideCountLabel: 'Trang',
     slideCountUnit: 'trang',
+    slideCountDescription: 'Số lượng trang cần tạo',
     generateOutline: 'Tạo dàn ý',
+    advancedOptions: 'Tùy chọn nâng cao',
     style: {
       placeholder: 'Phong cách nào?',
       label: 'Phong cách',
@@ -57,6 +59,16 @@ export default {
       chinese: 'Tiếng Trung',
       japanese: 'Tiếng Nhật',
       korean: 'Tiếng Hàn',
+    },
+    grade: {
+      label: 'Cấp độ lớp',
+      placeholder: 'Chọn cấp độ lớp',
+      none: 'Không',
+    },
+    subject: {
+      label: 'Môn học',
+      placeholder: 'Chọn môn học',
+      none: 'Không',
     },
     targetAge: {
       placeholder: 'Cho độ tuổi nào?',

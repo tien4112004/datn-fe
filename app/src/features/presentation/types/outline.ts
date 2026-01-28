@@ -11,4 +11,6 @@ export type OutlineData = {
     name: string;
     provider: string;
   };
+  grade?: string;
+  subject?: string;
 };

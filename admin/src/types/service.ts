@@ -19,6 +19,7 @@ import type {
   UpdateQuestionPayload,
   ImportResult,
 } from './questionBank';
+import type { Context } from './context';
 
 /**
  * Base service interface that all API services must extend
@@ -96,4 +97,14 @@ export interface AdminApiService extends Service {
     subject: string,
     grade: string
   ): Promise<ApiResponse<import('./questionBank').ChapterResponse[]>>;
+
+  // Contexts
+  getContexts(params?: PaginationParams): Promise<ApiResponse<Context[]>>;
+  getContextById(id: string): Promise<ApiResponse<Context>>;
+  createContext(data: Omit<Context, 'id' | 'createdAt' | 'updatedAt'>): Promise<ApiResponse<Context>>;
+  updateContext(
+    id: string,
+    data: Partial<Omit<Context, 'id' | 'createdAt' | 'updatedAt'>>
+  ): Promise<ApiResponse<Context>>;
+  deleteContext(id: string): Promise<ApiResponse<void>>;
 }

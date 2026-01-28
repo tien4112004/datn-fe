@@ -24,6 +24,7 @@ import type {
   ImportResult,
   ChapterResponse,
 } from '@/types/questionBank';
+import type { Context } from '@/types/context';
 import { parseQuestionBankCSV, exportQuestionsToCSV } from '@/utils/csvParser';
 import { validateQuestionBankCSV } from '@/utils/csvValidation';
 
@@ -653,5 +654,36 @@ export default class AdminRealApiService implements AdminApiService {
       success: true,
       data: { success: successCount, failed: failedCount, errors: errors.length > 0 ? errors : undefined },
     };
+  }
+
+  // Contexts
+  async getContexts(params?: PaginationParams): Promise<ApiResponse<Context[]>> {
+    const response = await api.get<ApiResponse<Context[]>>(`${this.baseUrl}/api/contexts`, {
+      params: {
+        page: params?.page || 0,
+        size: params?.pageSize || 10,
+      },
+    });
+    return response.data;
+  }
+
+  async getContextById(id: string): Promise<ApiResponse<Context>> {
+    const response = await api.get<ApiResponse<Context>>(`${this.baseUrl}/api/contexts/${id}`);
+    return response.data;
+  }
+
+  async createContext(data: Omit<Context, 'id' | 'createdAt' | 'updatedAt'>): Promise<ApiResponse<Context>> {
+    const response = await api.post<ApiResponse<Context>>(`${this.baseUrl}/api/contexts`, data);
+    return response.data;
+  }
+
+  async updateContext(id: string, data: Partial<Context>): Promise<ApiResponse<Context>> {
+    const response = await api.put<ApiResponse<Context>>(`${this.baseUrl}/api/contexts/${id}`, data);
+    return response.data;
+  }
+
+  async deleteContext(id: string): Promise<ApiResponse<void>> {
+    const response = await api.delete<ApiResponse<void>>(`${this.baseUrl}/api/contexts/${id}`);
+    return response.data;
   }
 }

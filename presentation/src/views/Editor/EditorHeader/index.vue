@@ -31,7 +31,7 @@
             <div v-else class="tw-flex tw-items-center tw-gap-2">
               <BreadcrumbPage class="tw-max-w-32 sm:tw-max-w-48 tw-truncate">{{ title }}</BreadcrumbPage>
               <Button
-                v-if="!hideStudentOptions"
+                v-if="permission === 'edit'"
                 size="small"
                 class="tw-p-1 tw-bg-transparent hover:tw-bg-gray-100"
                 @click="startEditTitle"
@@ -131,24 +131,15 @@
         <IconComments class="icon" />
         {{ $t('header.buttons.comments') }}
       </Button>
-      <AlertDialog v-if="!hideStudentOptions">
-        <AlertDialogTrigger as-child>
-          <Button class="menu-item" v-tooltip="$t('header.file.duplicatePresentation')">
-            <IconCopy class="icon" />
-            {{ $t('header.buttons.duplicate') }}
-          </Button>
-        </AlertDialogTrigger>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>{{ $t('header.file.duplicatePresentation') }}</AlertDialogTitle>
-            <AlertDialogDescription>{{ $t('header.file.duplicateConfirm') }}</AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>{{ $t('header.buttons.cancel') }}</AlertDialogCancel>
-            <AlertDialogAction @click="handleDuplicate">{{ $t('header.buttons.confirm') }}</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <Button
+        v-if="!hideStudentOptions"
+        class="menu-item"
+        v-tooltip="$t('header.file.duplicatePresentation')"
+        @click="handleRequestDuplicate"
+      >
+        <IconCopy class="icon" />
+        {{ $t('header.buttons.duplicate') }}
+      </Button>
       <Button
         v-if="!hideStudentOptions"
         class="menu-item"
@@ -210,17 +201,6 @@ import BreadcrumbItem from '@/components/ui/breadcrumb/BreadcrumbItem.vue';
 import BreadcrumbLink from '@/components/ui/breadcrumb/BreadcrumbLink.vue';
 import BreadcrumbPage from '@/components/ui/breadcrumb/BreadcrumbPage.vue';
 import BreadcrumbSeparator from '@/components/ui/breadcrumb/BreadcrumbSeparator.vue';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
 import {
   Check as IconCheck,
   X as IconClose,
@@ -397,16 +377,16 @@ const handleOpenComments = () => {
   window.dispatchEvent(new CustomEvent('app.presentation.open-comments'));
 };
 
-const handleDuplicate = () => {
+const handleRequestDuplicate = () => {
   if (!presentationId.value) {
     console.error('No presentation ID available');
     message.error(t('header.file.duplicateError'));
     return;
   }
 
-  // Dispatch event to React app to handle duplication
+  // Dispatch event to React app to show confirmation dialog
   window.dispatchEvent(
-    new CustomEvent('app.presentation.duplicate', {
+    new CustomEvent('app.presentation.confirm-duplicate', {
       detail: { presentationId: presentationId.value },
     })
   );

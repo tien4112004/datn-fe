@@ -28,6 +28,8 @@ import { useSavingStore } from '../stores/saving';
 import { CommentDrawer } from '@/features/comments';
 import type { Mindmap, MindMapNode } from '../types';
 import { MINDMAP_TYPES } from '../types';
+import { useTranslation } from 'react-i18next';
+import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 
 /**
  * Migrate layout data from mindmap metadata to root nodes.
@@ -67,6 +69,7 @@ const migrateLayoutDataToRootNodes = (
 
 const MindmapPage = () => {
   const { mindmap } = useLoaderData() as { mindmap: Mindmap };
+  const { t } = useTranslation(I18N_NAMESPACES.MINDMAP);
   const setNodes = useCoreStore((state) => state.setNodes);
   const setEdges = useCoreStore((state) => state.setEdges);
   const { isDesktop } = useResponsiveBreakpoint();
@@ -80,8 +83,9 @@ const MindmapPage = () => {
   // Track dirty state changes - only if user can edit
   useMindmapDirtyTracking(userPermission === 'edit');
 
-  // Track saving state
+  // Track saving and duplicating state
   const isSaving = useSavingStore((state) => state.isSaving);
+  const isDuplicating = useSavingStore((state) => state.isDuplicating);
 
   // Fullscreen functionality
   const { isFullscreen, toggleFullscreen: toggleFullscreenMode } = useFullscreen();
@@ -247,7 +251,8 @@ const MindmapPage = () => {
         onLeave={handleProceed}
       />
       <SmallScreenDialog />
-      {isSaving && <GlobalSpinner text="Saving mindmap..." />}
+      {isSaving && <GlobalSpinner text={t('toolbar.save.saving')} />}
+      {isDuplicating && <GlobalSpinner text={t('toolbar.actions.duplicateLoading')} />}
     </>
   );
 };

@@ -13,11 +13,13 @@ import {
   AlertDialogTrigger,
 } from '@/shared/components/ui/alert-dialog';
 import { useUndoRedoStore, useNodeOperationsStore } from '../../stores';
+import { useSavingStore } from '../../stores/saving';
 import { useTranslation } from 'react-i18next';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 import { useSaveMindmap, useNodeSelection } from '../../hooks';
 import { useDuplicateMindmap } from '../../hooks/useApi';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import ExportMindmapDialog from '../export';
 import { GenerateTreeDialog } from '../generate';
 import ShareMindmapDialog from '../share/ShareMindmapDialog';
@@ -39,6 +41,7 @@ const Toolbar = ({
   permission?: Permission;
 }) => {
   const { t } = useTranslation(I18N_NAMESPACES.MINDMAP);
+  const navigate = useNavigate();
   const addNode = useNodeOperationsStore((state) => state.addNode);
   const undo = useUndoRedoStore((state) => state.undo);
   const redo = useUndoRedoStore((state) => state.redo);
@@ -54,6 +57,20 @@ const Toolbar = ({
   // Save and Export states
   const { saveWithThumbnail, isLoading: isSaving } = useSaveMindmap();
   const duplicateMutation = useDuplicateMindmap();
+  const setIsDuplicating = useSavingStore((state) => state.setIsDuplicating);
+
+  // Handle duplicate with navigation
+  const handleDuplicate = useCallback(async () => {
+    setIsDuplicating(true);
+    try {
+      const duplicated = await duplicateMutation.mutateAsync(mindmapId);
+      navigate(`/mindmap/${duplicated.id}`);
+    } catch (error) {
+      console.error('Duplicate failed:', error);
+    } finally {
+      setIsDuplicating(false);
+    }
+  }, [mindmapId, duplicateMutation, navigate, setIsDuplicating]);
   const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
   const [isGenerateDialogOpen, setIsGenerateDialogOpen] = useState(false);
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
@@ -247,7 +264,7 @@ const Toolbar = ({
                   </AlertDialogHeader>
                   <AlertDialogFooter>
                     <AlertDialogCancel>{t('toolbar.actions.cancel')}</AlertDialogCancel>
-                    <AlertDialogAction onClick={() => duplicateMutation.mutate(mindmapId)}>
+                    <AlertDialogAction onClick={handleDuplicate}>
                       {t('toolbar.actions.confirm')}
                     </AlertDialogAction>
                   </AlertDialogFooter>

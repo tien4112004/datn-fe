@@ -165,6 +165,13 @@ export default {
     duplicateError: 'Lỗi khi sao chép bài thuyết trình',
     duplicateConfirm: 'Tạo bản sao của bài thuyết trình này?',
   },
+  duplicate: {
+    title: 'Sao chép bài thuyết trình',
+    description: 'Bạn có chắc chắn muốn tạo bản sao của bài thuyết trình này không?',
+    cancel: 'Hủy',
+    confirm: 'Xác nhận',
+    loading: 'Đang sao chép bài thuyết trình...',
+  },
   validation: {
     topicRequired: 'Chủ đề là bắt buộc',
     slideCountRequired: 'Số slide là bắt buộc',

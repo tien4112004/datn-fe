@@ -20,6 +20,13 @@ import type {
   ImportResult,
 } from './questionBank';
 import type { Context } from './context';
+import type {
+  CoinPricing,
+  CoinPricingCreateRequest,
+  CoinPricingUpdateRequest,
+  CoinPricingQueryParams,
+  EnumOption,
+} from './coin';
 
 /**
  * Base service interface that all API services must extend
@@ -107,4 +114,13 @@ export interface AdminApiService extends Service {
     data: Partial<Omit<Context, 'id' | 'createdAt' | 'updatedAt'>>
   ): Promise<ApiResponse<Context>>;
   deleteContext(id: string): Promise<ApiResponse<void>>;
+
+  // Coin Pricing
+  getCoinPricing(params?: CoinPricingQueryParams): Promise<ApiResponse<CoinPricing[]>>;
+  getCoinPricingById(id: string): Promise<ApiResponse<CoinPricing>>;
+  createCoinPricing(data: CoinPricingCreateRequest): Promise<ApiResponse<CoinPricing>>;
+  updateCoinPricing(id: string, data: CoinPricingUpdateRequest): Promise<ApiResponse<CoinPricing>>;
+  deleteCoinPricing(id: string): Promise<ApiResponse<void>>;
+  getResourceTypes(): Promise<ApiResponse<EnumOption[]>>;
+  getUnitTypes(): Promise<ApiResponse<EnumOption[]>>;
 }

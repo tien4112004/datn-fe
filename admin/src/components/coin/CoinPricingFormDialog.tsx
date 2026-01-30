@@ -10,7 +10,6 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import type {
   CoinPricing,
@@ -21,6 +20,7 @@ import type {
 } from '@/types/coin';
 import { RESOURCE_TYPES, UNIT_TYPES } from '@/types/coin';
 import { useEffect, useState } from 'react';
+import { useModels } from '@/hooks';
 
 interface CoinPricingFormDialogProps {
   open: boolean;
@@ -32,23 +32,19 @@ interface CoinPricingFormDialogProps {
 
 interface FormData {
   resourceType: ResourceType;
-  modelName: string;
+  modelId: number | null;
   baseCost: string;
   unitType: UnitType;
-  unitMultiplier: string;
   description: string;
-  isActive: boolean;
 }
 
 function getDefaultFormData(): FormData {
   return {
     resourceType: 'PRESENTATION',
-    modelName: '',
+    modelId: null,
     baseCost: '',
     unitType: 'PER_REQUEST',
-    unitMultiplier: '1',
     description: '',
-    isActive: true,
   };
 }
 
@@ -62,18 +58,19 @@ export function CoinPricingFormDialog({
   const [formData, setFormData] = useState<FormData>(getDefaultFormData());
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
 
+  const { data: modelsResponse } = useModels();
+  const models = modelsResponse?.data || [];
+
   const isEditing = !!pricing?.id;
 
   useEffect(() => {
     if (pricing) {
       setFormData({
         resourceType: pricing.resourceType,
-        modelName: pricing.modelName || '',
+        modelId: pricing.modelId,
         baseCost: pricing.baseCost.toString(),
         unitType: pricing.unitType,
-        unitMultiplier: pricing.unitMultiplier.toString(),
         description: pricing.description || '',
-        isActive: pricing.isActive,
       });
     } else {
       setFormData(getDefaultFormData());
@@ -93,11 +90,6 @@ export function CoinPricingFormDialog({
       newErrors.baseCost = 'Base cost must be a non-negative number';
     }
 
-    const multiplierNum = parseFloat(formData.unitMultiplier);
-    if (isNaN(multiplierNum) || multiplierNum <= 0) {
-      newErrors.unitMultiplier = 'Unit multiplier must be a positive number';
-    }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -113,20 +105,16 @@ export function CoinPricingFormDialog({
       const updateData: CoinPricingUpdateRequest = {
         baseCost: parseInt(formData.baseCost, 10),
         unitType: formData.unitType,
-        unitMultiplier: parseFloat(formData.unitMultiplier),
         description: formData.description || null,
-        isActive: formData.isActive,
       };
       onSubmit(updateData);
     } else {
       const createData: CoinPricingCreateRequest = {
         resourceType: formData.resourceType,
-        modelName: formData.modelName || null,
+        modelId: formData.modelId,
         baseCost: parseInt(formData.baseCost, 10),
         unitType: formData.unitType,
-        unitMultiplier: parseFloat(formData.unitMultiplier),
         description: formData.description || null,
-        isActive: formData.isActive,
       };
       onSubmit(createData);
     }
@@ -170,18 +158,33 @@ export function CoinPricingFormDialog({
             )}
           </div>
 
-          {/* Model Name */}
+          {/* Model */}
           <div className="space-y-2">
-            <Label htmlFor="modelName">Model Name (Optional)</Label>
-            <Input
-              id="modelName"
-              value={formData.modelName}
-              onChange={(e) => setFormData({ ...formData, modelName: e.target.value })}
-              placeholder="e.g., gpt-4o, dall-e-3"
+            <Label htmlFor="modelId">Model (Optional)</Label>
+            <Select
+              value={formData.modelId?.toString() || 'default'}
+              onValueChange={(value) =>
+                setFormData({
+                  ...formData,
+                  modelId: value === 'default' ? null : parseInt(value, 10),
+                })
+              }
               disabled={isEditing}
-            />
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select model (optional)" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="default">Default (all models)</SelectItem>
+                {models.map((model) => (
+                  <SelectItem key={model.id} value={model.id}>
+                    {model.displayName} ({model.provider})
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             <p className="text-muted-foreground text-xs">
-              Leave empty for default pricing. Specify a model name for model-specific pricing.
+              Select "Default" for default pricing. Choose a specific model for model-specific pricing.
             </p>
           </div>
 
@@ -222,24 +225,6 @@ export function CoinPricingFormDialog({
             </p>
           </div>
 
-          {/* Unit Multiplier */}
-          <div className="space-y-2">
-            <Label htmlFor="unitMultiplier">Unit Multiplier</Label>
-            <Input
-              id="unitMultiplier"
-              type="number"
-              step="0.01"
-              min="0.01"
-              value={formData.unitMultiplier}
-              onChange={(e) => setFormData({ ...formData, unitMultiplier: e.target.value })}
-              placeholder="1.0"
-            />
-            {errors.unitMultiplier && <p className="text-sm text-red-500">{errors.unitMultiplier}</p>}
-            <p className="text-muted-foreground text-xs">
-              Multiplier for quantity-based pricing (total = baseCost * quantity * multiplier)
-            </p>
-          </div>
-
           {/* Description */}
           <div className="space-y-2">
             <Label htmlFor="description">Description</Label>
@@ -249,19 +234,6 @@ export function CoinPricingFormDialog({
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               placeholder="Describe this pricing rule..."
               rows={2}
-            />
-          </div>
-
-          {/* Active Status */}
-          <div className="flex items-center justify-between rounded-lg border p-3">
-            <div className="space-y-0.5">
-              <Label htmlFor="isActive">Active</Label>
-              <p className="text-muted-foreground text-xs">Enable or disable this pricing rule</p>
-            </div>
-            <Switch
-              id="isActive"
-              checked={formData.isActive}
-              onCheckedChange={(checked) => setFormData({ ...formData, isActive: checked })}
             />
           </div>
 

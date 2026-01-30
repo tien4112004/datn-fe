@@ -13,38 +13,33 @@ export interface CoinPricing {
   id: string;
   resourceType: ResourceType;
   resourceTypeDisplayName: string;
+  modelId: number | null;
   modelName: string | null;
+  modelDisplayName: string | null;
   baseCost: number;
   unitType: UnitType;
   unitTypeDisplayName: string;
-  unitMultiplier: number;
   description: string | null;
-  isActive: boolean;
   createdAt: string;
   updatedAt: string;
 }
 
 export interface CoinPricingCreateRequest {
   resourceType: ResourceType;
-  modelName?: string | null;
+  modelId?: number | null;
   baseCost: number;
   unitType?: UnitType;
-  unitMultiplier?: number;
   description?: string | null;
-  isActive?: boolean;
 }
 
 export interface CoinPricingUpdateRequest {
   baseCost?: number;
   unitType?: UnitType;
-  unitMultiplier?: number;
   description?: string | null;
-  isActive?: boolean;
 }
 
 export interface CoinPricingQueryParams {
   resourceType?: ResourceType;
-  isActive?: boolean;
 }
 
 export interface EnumOption {

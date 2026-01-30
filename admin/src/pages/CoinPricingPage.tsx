@@ -4,7 +4,6 @@ import { createColumnHelper, getCoreRowModel, useReactTable } from '@tanstack/re
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
   AlertDialog,
@@ -86,20 +85,6 @@ export function CoinPricingPage() {
     }
   }, [deletingPricing, deleteMutation]);
 
-  const toggleActive = useCallback(
-    async (pricing: CoinPricing) => {
-      try {
-        await updateMutation.mutateAsync({
-          id: pricing.id,
-          data: { isActive: !pricing.isActive },
-        });
-      } catch {
-        // Error is handled by the mutation hook
-      }
-    },
-    [updateMutation]
-  );
-
   const columns = useMemo(
     () => [
       columnHelper.accessor('resourceType', {
@@ -116,12 +101,12 @@ export function CoinPricingPage() {
           );
         },
       }),
-      columnHelper.accessor('modelName', {
+      columnHelper.accessor('modelId', {
         header: 'Model',
         cell: (info) => {
-          const modelName = info.getValue();
-          return modelName ? (
-            <span className="font-mono text-sm">{modelName}</span>
+          const displayName = info.row.original.modelDisplayName;
+          return displayName ? (
+            <span className="font-mono text-sm">{displayName}</span>
           ) : (
             <span className="text-muted-foreground text-sm italic">Default</span>
           );
@@ -140,21 +125,6 @@ export function CoinPricingPage() {
         header: 'Unit Type',
         cell: (info) => (
           <span className="text-muted-foreground text-sm">{info.row.original.unitTypeDisplayName}</span>
-        ),
-      }),
-      columnHelper.accessor('unitMultiplier', {
-        header: 'Multiplier',
-        cell: (info) => <span className="font-mono text-sm">{info.getValue()}x</span>,
-      }),
-      columnHelper.display({
-        id: 'active',
-        header: 'Active',
-        cell: ({ row }) => (
-          <Switch
-            checked={row.original.isActive}
-            onCheckedChange={() => toggleActive(row.original)}
-            disabled={updateMutation.isPending}
-          />
         ),
       }),
       columnHelper.display({
@@ -178,7 +148,7 @@ export function CoinPricingPage() {
         ),
       }),
     ],
-    [toggleActive, updateMutation.isPending, handleEdit, handleDelete]
+    [handleEdit, handleDelete]
   );
 
   const table = useReactTable({
@@ -304,10 +274,10 @@ export function CoinPricingPage() {
             <AlertDialogDescription>
               Are you sure you want to delete the pricing configuration for{' '}
               <strong>{deletingPricing?.resourceTypeDisplayName}</strong>
-              {deletingPricing?.modelName && (
+              {deletingPricing?.modelDisplayName && (
                 <>
                   {' '}
-                  (model: <code>{deletingPricing.modelName}</code>)
+                  (model: <code>{deletingPricing.modelDisplayName}</code>)
                 </>
               )}
               ? This action cannot be undone.

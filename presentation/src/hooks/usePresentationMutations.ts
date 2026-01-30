@@ -1,11 +1,17 @@
-import { useMutation, useQueryClient } from '@tanstack/vue-query';
+import {
+  useUpsertSlides,
+  useUpdatePresentation as useUpdatePresentationQuery,
+  useSetParsed as useSetParsedQuery,
+} from '@/services/presentation/queries';
 import { getPresentationApi } from '@/services/presentation/api';
-import type { Slide, Presentation } from '@/types/slides';
+import { useMutation } from '@tanstack/vue-query';
+import type { Slide } from '@/types/slides';
 
 const presentationApi = getPresentationApi();
 
 /**
  * Fetch AI result for a presentation (used for parsing unparsed presentations)
+ * Note: This is kept as a custom mutation since getAiResultById is not a standard CRUD operation
  */
 export function useAiResultById(presentationId: string) {
   return useMutation({
@@ -18,63 +24,69 @@ export function useAiResultById(presentationId: string) {
 
 /**
  * Update presentation slides (batch upsert)
+ * @deprecated Use useUpsertSlides from @/services/presentation/queries instead
  */
 export function useUpdateSlides(presentationId: string) {
-  const queryClient = useQueryClient();
+  const mutation = useUpsertSlides();
 
-  return useMutation({
-    mutationFn: async (slides: Slide[]) => {
-      const updatedPresentation = await presentationApi.upsertSlides(presentationId, slides);
-      return updatedPresentation;
+  return {
+    ...mutation,
+    mutate: (slides: Slide[], options?: any) => {
+      mutation.mutate({ presentationId, slides }, options);
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['presentation', presentationId],
-      });
+    mutateAsync: (slides: Slide[]) => {
+      return mutation.mutateAsync({ presentationId, slides });
     },
-  });
+  };
 }
 
 /**
  * Mark presentation as parsed (generation complete)
+ * @deprecated Use useSetParsed from @/services/presentation/queries instead
  */
 export function useSetParsed(presentationId: string) {
-  const queryClient = useQueryClient();
+  const mutation = useSetParsedQuery();
 
-  return useMutation({
-    mutationFn: async () => {
-      const updatedPresentation = await presentationApi.setParsed(presentationId);
-      return updatedPresentation;
+  return {
+    ...mutation,
+    mutate: (options?: any) => {
+      mutation.mutate(presentationId, options);
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['presentation', presentationId],
-      });
+    mutateAsync: () => {
+      return mutation.mutateAsync(presentationId);
     },
-  });
+  };
 }
 
 /**
  * Update full presentation (title, slides, theme, viewport, thumbnail)
+ * @deprecated Use useUpdatePresentation from @/services/presentation/queries instead
  */
 export function useUpdatePresentation(presentationId: string) {
-  const queryClient = useQueryClient();
+  const mutation = useUpdatePresentationQuery();
 
-  return useMutation({
-    mutationFn: async (data: {
+  return {
+    ...mutation,
+    mutate: (
+      data: {
+        title?: string;
+        slides?: Slide[];
+        theme?: any;
+        viewport?: any;
+        thumbnail?: string;
+      },
+      options?: any
+    ) => {
+      mutation.mutate({ presentationId, data }, options);
+    },
+    mutateAsync: (data: {
       title?: string;
       slides?: Slide[];
       theme?: any;
       viewport?: any;
       thumbnail?: string;
     }) => {
-      const updatedPresentation = await presentationApi.updatePresentation(presentationId, data);
-      return updatedPresentation;
+      return mutation.mutateAsync({ presentationId, data });
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['presentation', presentationId],
-      });
-    },
-  });
+  };
 }

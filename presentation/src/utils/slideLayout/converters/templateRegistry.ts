@@ -1,4 +1,6 @@
 import { isMockMode } from '@aiprimary/api';
+import { queryClient } from '@/lib/query-client';
+import { queryKeys } from '@/services/query-keys';
 import { getTemplateApi } from '@/services/template/api';
 import type { Template } from '@aiprimary/core/templates';
 import type { SlideTemplate } from '@/types/slides';
@@ -25,14 +27,28 @@ class TemplateRegistry {
       return this.getFrontendDataTemplates(layoutType);
     }
 
-    // Ensure templates are initialized
+    // Try to get from TanStack Query cache first
+    const cachedTemplates = queryClient.getQueryData<SlideTemplate[]>(queryKeys.templates.lists());
+
+    if (cachedTemplates) {
+      // Filter by layout type
+      const filtered = cachedTemplates
+        .filter((t) => t.layout === layoutType)
+        .map((t) => this.convertApiTemplateToTemplate(t));
+
+      if (filtered.length > 0) {
+        return filtered;
+      }
+    }
+
+    // If not in cache, ensure templates are initialized
     if (!this.initialized && !this.initPromise) {
       await this.prefetchAll();
     } else if (this.initPromise) {
       await this.initPromise;
     }
 
-    // Check cache
+    // Check local cache after initialization
     if (this.cache.has(layoutType)) {
       return this.cache.get(layoutType)!;
     }
@@ -96,8 +112,12 @@ class TemplateRegistry {
 
   private async doInitialize(): Promise<void> {
     try {
-      const templateApi = getTemplateApi();
-      const allTemplates = await templateApi.getSlideTemplates();
+      // Use TanStack Query to fetch and cache templates
+      const allTemplates = await queryClient.fetchQuery({
+        queryKey: queryKeys.templates.lists(),
+        queryFn: () => getTemplateApi().getSlideTemplates(),
+        staleTime: 1000 * 60 * 10, // 10 minutes
+      });
 
       // Validate that allTemplates is an array
       if (!Array.isArray(allTemplates)) {
@@ -110,7 +130,7 @@ class TemplateRegistry {
         return;
       }
 
-      // Group by layout type
+      // Group by layout type for local cache
       const grouped = new Map<string, Template[]>();
 
       for (const apiTemplate of allTemplates) {
@@ -123,7 +143,7 @@ class TemplateRegistry {
         grouped.get(layout)!.push(template);
       }
 
-      // Cache all groups
+      // Cache all groups locally
       for (const [layout, templates] of grouped.entries()) {
         this.cache.set(layout, templates);
       }

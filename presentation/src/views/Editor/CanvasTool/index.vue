@@ -382,7 +382,7 @@ import useScaleCanvas from '@/hooks/useScaleCanvas';
 import useHistorySnapshot from '@/hooks/useHistorySnapshot';
 import useCreateElement from '@/hooks/useCreateElement';
 import useSlideEditLock from '@/hooks/useSlideEditLock';
-import { getMediaApi } from '@/services/media/api';
+import { useUploadImage } from '@/services/media/queries';
 import { validateImageFile } from '@/utils/fileValidation';
 import message from '@/utils/message';
 import ShapePool from './ShapePool.vue';
@@ -410,7 +410,7 @@ const {
 const { canUndo, canRedo } = storeToRefs(useSnapshotStore());
 const { isCurrentSlideLocked } = useSlideEditLock();
 
-const mediaApi = getMediaApi();
+const uploadImageMutation = useUploadImage();
 
 const { redo, undo } = useHistorySnapshot();
 
@@ -445,15 +445,17 @@ const insertImageElement = async (files: FileList) => {
   }
 
   imageUploading.value = true;
-  try {
-    const result = await mediaApi.uploadImage(imageFile);
-    createImageElement(result.cdnUrl);
-  } catch (error) {
-    console.error('Failed to upload image:', error);
-    message.error('Failed to upload image');
-  } finally {
-    imageUploading.value = false;
-  }
+  uploadImageMutation.mutate(imageFile, {
+    onSuccess: (result) => {
+      createImageElement(result.cdnUrl);
+      imageUploading.value = false;
+    },
+    onError: (error) => {
+      console.error('Failed to upload image:', error);
+      message.error('Failed to upload image');
+      imageUploading.value = false;
+    },
+  });
 };
 
 const shapePoolVisible = ref(false);

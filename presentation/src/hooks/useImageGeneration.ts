@@ -1,23 +1,19 @@
-import { useMutation, useQueryClient } from '@tanstack/vue-query';
-import { getImageApi } from '@/services/image/api';
+import { useQueryClient } from '@tanstack/vue-query';
+import { useGenerateImage as useGenerateImageQuery } from '@/services/image/queries';
+import { queryKeys } from '@/services/query-keys';
 
 /**
  * Generate an image for a slide element
+ * @deprecated This hook is a wrapper that adds presentation cache invalidation.
+ * Consider using the base useGenerateImage from queries directly.
  */
 export function useGenerateImage(presentationId: string) {
   const queryClient = useQueryClient();
-  const imageApi = getImageApi();
+  const generateImageMutation = useGenerateImageQuery();
 
-  return useMutation({
-    mutationFn: async ({
-      slideId,
-      prompt,
-      model,
-      themeStyle,
-      themeDescription,
-      artStyle,
-      artStyleModifiers,
-    }: {
+  return {
+    ...generateImageMutation,
+    mutate: (variables: {
       slideId: string;
       prompt: string;
       model: {
@@ -29,27 +25,65 @@ export function useGenerateImage(presentationId: string) {
       artStyle?: string;
       artStyleModifiers?: string;
     }) => {
-      console.log('[ImageGen] Starting image generation for slide:', slideId);
-      const result = await imageApi.generateImage(presentationId, slideId, {
-        prompt,
-        imageModel: model,
-        themeStyle,
-        themeDescription,
-        artStyle,
-        artStyleModifiers,
+      console.log('[ImageGen] Starting image generation for slide:', variables.slideId);
+      generateImageMutation.mutate(
+        {
+          presentationId,
+          slideId: variables.slideId,
+          params: {
+            prompt: variables.prompt,
+            imageModel: variables.model,
+            themeStyle: variables.themeStyle,
+            themeDescription: variables.themeDescription,
+            artStyle: variables.artStyle,
+            artStyleModifiers: variables.artStyleModifiers,
+          },
+        },
+        {
+          onSuccess: (result) => {
+            console.log('[ImageGen] Image generation completed for slide:', variables.slideId, result);
+            // Invalidate presentation query to refetch with new image
+            queryClient.invalidateQueries({
+              queryKey: queryKeys.presentations.detail(presentationId),
+            });
+          },
+          onError: (error) => {
+            console.error('[ImageGen] Image generation failed for slide:', variables.slideId, error);
+          },
+        }
+      );
+    },
+    mutateAsync: async (variables: {
+      slideId: string;
+      prompt: string;
+      model: {
+        name: string;
+        provider: string;
+      };
+      themeStyle?: string;
+      themeDescription?: string;
+      artStyle?: string;
+      artStyleModifiers?: string;
+    }) => {
+      console.log('[ImageGen] Starting async image generation for slide:', variables.slideId);
+      const result = await generateImageMutation.mutateAsync({
+        presentationId,
+        slideId: variables.slideId,
+        params: {
+          prompt: variables.prompt,
+          imageModel: variables.model,
+          themeStyle: variables.themeStyle,
+          themeDescription: variables.themeDescription,
+          artStyle: variables.artStyle,
+          artStyleModifiers: variables.artStyleModifiers,
+        },
       });
-      console.log('[ImageGen] Image generation completed for slide:', slideId, result);
+      console.log('[ImageGen] Image generation completed for slide:', variables.slideId, result);
+      // Invalidate presentation query to refetch with new image
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.presentations.detail(presentationId),
+      });
       return result;
     },
-    retry: 3, // Retry failed requests 3 times
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000), // Exponential backoff: 1s, 2s, 4s
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['presentation', presentationId],
-      });
-    },
-    onError: (error, variables) => {
-      console.error('[ImageGen] Image generation failed for slide:', variables.slideId, error);
-    },
-  });
+  };
 }

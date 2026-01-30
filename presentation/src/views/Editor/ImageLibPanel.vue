@@ -106,8 +106,7 @@
 <script lang="ts" setup>
 import { onMounted, ref, computed, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { getImageApi } from '@/services/image/api';
-import { getMediaApi } from '@/services/media/api';
+import { useImageSearch, useMyImages, useGenerateImage, useUploadImage } from '@/services/queries';
 import useCreateElement from '@/hooks/useCreateElement';
 import message from '@/utils/message';
 import Button from '@/components/Button.vue';
@@ -118,8 +117,6 @@ import PopoverMenuItem from '@/components/PopoverMenuItem.vue';
 import Tabs from '@/components/Tabs.vue';
 
 const { t } = useI18n();
-const imageApi = getImageApi();
-const mediaApi = getMediaApi();
 
 // Common types
 interface PexelsImageItem {
@@ -148,8 +145,6 @@ const tabOptions = computed(() => [
 ]);
 
 // Pexels Tab State
-const pexelsImages = ref<PexelsImageItem[]>([]);
-const pexelsLoading = ref(false);
 const orientationVisible = ref(false);
 const searchWord = ref('');
 const orientation = ref<Orientation>('all');
@@ -157,14 +152,41 @@ const orientationOptions = ref<{ key: Orientation; label: string }[]>([]);
 const orientationMap = ref<{ [key: string]: string }>({});
 const uploadingImageId = ref<number | null>(null);
 
+// Pexels search query
+const pexelsSearchPayload = computed(() => ({
+  query: searchWord.value,
+  per_page: 50,
+  orientation: orientation.value,
+}));
+
+const {
+  data: pexelsSearchData,
+  isLoading: pexelsLoading,
+  refetch: refetchPexels,
+} = useImageSearch(pexelsSearchPayload, {
+  enabled: computed(() => searchWord.value.length > 0),
+});
+
+const pexelsImages = computed(() => pexelsSearchData.value?.data || []);
+
 // My Images Tab State
-const myImages = ref<any[]>([]);
-const myImagesLoading = ref(false);
-const loadingMore = ref(false);
 const myImagesScrollContainer = ref<HTMLElement | null>(null);
 const currentPage = ref(1);
-const totalPages = ref(1);
+
+const {
+  data: myImagesData,
+  isLoading: myImagesLoading,
+  refetch: refetchMyImages,
+} = useMyImages(currentPage, 20);
+
+const myImages = computed(() => myImagesData.value?.data || []);
+const totalPages = computed(() => Math.ceil((myImagesData.value?.total || 0) / 20));
 const hasMore = computed(() => currentPage.value < totalPages.value);
+const loadingMore = ref(false);
+
+// Mutations
+const generateImageMutation = useGenerateImage();
+const uploadImageMutation = useUploadImage();
 
 // Initialize orientation options with translations
 const initOrientationOptions = () => {
@@ -186,26 +208,13 @@ const initOrientationOptions = () => {
 const searchPexels = (q?: string) => {
   const query = q || searchWord.value;
   if (!query) return message.error(t('panels.imageLibrary.errorNoQuery'));
-  pexelsLoading.value = true;
-
-  imageApi
-    .searchImage({
-      query,
-      per_page: 50,
-      orientation: orientation.value,
-    })
-    .then((ret: any) => {
-      pexelsImages.value = ret.data;
-      pexelsLoading.value = false;
-    })
-    .catch(() => {
-      pexelsLoading.value = false;
-    });
+  searchWord.value = query;
+  // The query will auto-trigger via the computed pexelsSearchPayload
 };
 
 const setOrientation = (value: Orientation) => {
   orientation.value = value;
-  if (searchWord.value) searchPexels();
+  if (searchWord.value) refetchPexels();
 };
 
 // Upload Pexels image to server and insert
@@ -219,59 +228,24 @@ const uploadAndInsertPexelsImage = async (imageUrl: string, imageId: number) => 
     // Create File from blob
     const file = new File([blob], `pexels-${imageId}.jpg`, { type: blob.type });
 
-    // Upload to server
-    const result = await mediaApi.uploadImage(file);
-
-    // Insert using CDN URL
-    createImageElement(result.cdnUrl);
+    // Upload to server using mutation
+    uploadImageMutation.mutate(file, {
+      onSuccess: (result) => {
+        // Insert using CDN URL
+        createImageElement(result.cdnUrl);
+        uploadingImageId.value = null;
+      },
+      onError: (error) => {
+        console.error('Failed to upload Pexels image:', error);
+        message.error(t('panels.imageLibrary.errorUploadFailed'));
+        uploadingImageId.value = null;
+      },
+    });
   } catch (error) {
-    console.error('Failed to upload Pexels image:', error);
+    console.error('Failed to fetch Pexels image:', error);
     message.error(t('panels.imageLibrary.uploadFailed') || 'Failed to upload image');
   } finally {
     uploadingImageId.value = null;
-  }
-};
-
-// My Images Functions
-const loadMyImages = async (page: number = 1) => {
-  if (page === 1) {
-    myImagesLoading.value = true;
-  } else {
-    loadingMore.value = true;
-  }
-
-  try {
-    const response = await imageApi.getMyImages(page, 20);
-
-    // Response is already the API response object {success, code, timestamp, data, pagination}
-    const apiData = response.data || [];
-    const apiPagination = response.pagination;
-
-    // Transform MediaResponseDto to match ImageWaterfallViewer interface
-    const transformedData = apiData.map((item: MyImageItem) => ({
-      id: item.id,
-      width: 300,
-      height: 200,
-      src: item.url,
-      url: item.url,
-    }));
-
-    if (page === 1) {
-      myImages.value = transformedData;
-    } else {
-      myImages.value = [...myImages.value, ...transformedData];
-    }
-
-    if (apiPagination) {
-      currentPage.value = apiPagination.currentPage + 1;
-      totalPages.value = apiPagination.totalPages;
-    }
-  } catch (error) {
-    console.error('Failed to load images:', error);
-    message.error(t('panels.imageLibrary.failedToLoad'));
-  } finally {
-    myImagesLoading.value = false;
-    loadingMore.value = false;
   }
 };
 
@@ -286,20 +260,29 @@ const onMyImagesScroll = () => {
 
   // Trigger load when 80% scrolled
   if (scrollTop + clientHeight >= scrollHeight * 0.8) {
-    loadMyImages(currentPage.value);
+    loadingMore.value = true;
+    currentPage.value++;
+    // The query will auto-refetch with the new page number
   }
 };
 
-// Watch tab changes to load data
+// Watch for loading state changes
+watch([myImagesData, myImagesLoading], () => {
+  if (!myImagesLoading.value) {
+    loadingMore.value = false;
+  }
+});
+
+// Watch tab changes to ensure data is loaded
 watch(activeTab, (newTab) => {
-  if (newTab === 'myImages' && myImages.value.length === 0) {
-    loadMyImages(1);
+  if (newTab === 'myImages' && currentPage.value === 1) {
+    refetchMyImages();
   }
 });
 
 onMounted(() => {
   initOrientationOptions();
-  searchPexels(t('panels.imageLibrary.defaultSearch'));
+  searchWord.value = t('panels.imageLibrary.defaultSearch');
 });
 </script>
 

@@ -2,7 +2,7 @@ import { ref } from 'vue';
 import type { Pinia } from 'pinia';
 import { useSaveStore, useContainerStore, useSlidesStore } from '@/store';
 import { generateThumbnail } from '@/utils/thumbnail';
-import { getPresentationApi } from '@/services/presentation/api';
+import { useUpdatePresentation } from '@/services/presentation/queries';
 import type { Slide, SlideTheme, SlideViewport } from '@/types/slides';
 
 /**
@@ -30,7 +30,7 @@ export function useSavePresentation(presentationId: string, pinia: Pinia) {
   const saveStore = useSaveStore();
   const containerStore = useContainerStore();
   const slidesStore = useSlidesStore();
-  const presentationApi = getPresentationApi();
+  const updatePresentationMutation = useUpdatePresentation();
 
   /**
    * Save presentation with all data from store (title, slides, theme, viewport, thumbnail)
@@ -45,66 +45,70 @@ export function useSavePresentation(presentationId: string, pinia: Pinia) {
     viewport?: SlideViewport;
     thumbnail?: string;
   }): Promise<void> {
-    try {
-      // Set saving state and notify React
-      isSaving.value = true;
-      dispatchSavingEvent(true);
+    // Set saving state and notify React
+    isSaving.value = true;
+    dispatchSavingEvent(true);
 
-      // Use provided thumbnail or generate a new one
-      let thumbnailToUse = overrides?.thumbnail;
+    // Use provided thumbnail or generate a new one
+    let thumbnailToUse = overrides?.thumbnail;
 
-      // Only generate thumbnail if not provided or if it's not a valid data URL
-      if (!thumbnailToUse || !thumbnailToUse.startsWith('data:')) {
-        // Generate thumbnail from first slide (base64)
-        thumbnailToUse = await generateThumbnail(pinia);
-      }
-
-      // Get data from store or use overrides
-      const viewport: SlideViewport = overrides?.viewport ?? {
-        width: slidesStore.viewportSize,
-        height: slidesStore.viewportSize * slidesStore.viewportRatio,
-      };
-
-      // Convert base64 thumbnail to Blob (only if it's a data URL)
-      const thumbnailBlob =
-        thumbnailToUse && thumbnailToUse.startsWith('data:') ? dataURLtoBlob(thumbnailToUse) : null;
-
-      // Build data object with all non-file fields
-      const data = {
-        title: overrides?.title ?? slidesStore.title,
-        slides: overrides?.slides ?? slidesStore.slides,
-        isParsed: false,
-        metadata: {},
-        // Include thumbnail URL if we're not uploading a new file (i.e., it's already an R2 URL)
-        // This prevents the backend from setting thumbnail to null when no file is uploaded
-        ...(thumbnailBlob ? {} : { thumbnail: thumbnailToUse }),
-      };
-
-      // Create FormData for multipart upload
-      const formData = new FormData();
-      formData.append('data', new Blob([JSON.stringify(data)], { type: 'application/json' }));
-
-      if (thumbnailBlob) {
-        formData.append('file', thumbnailBlob, 'thumbnail.png');
-      }
-
-      // Call API to update presentation with FormData
-      await presentationApi.updatePresentation(presentationId, formData);
-
-      // Mark as saved in store
-      saveStore.markSaved();
-
-      // Dispatch success message
-      dispatchMessage('success', 'Presentation saved successfully');
-    } catch (error) {
-      console.error('Failed to save presentation:', error);
-      dispatchMessage('error', 'Failed to save presentation');
-      throw error;
-    } finally {
-      // Clear saving state and notify React
-      isSaving.value = false;
-      dispatchSavingEvent(false);
+    // Only generate thumbnail if not provided or if it's not a valid data URL
+    if (!thumbnailToUse || !thumbnailToUse.startsWith('data:')) {
+      // Generate thumbnail from first slide (base64)
+      thumbnailToUse = await generateThumbnail(pinia);
     }
+
+    // Get data from store or use overrides
+    const viewport: SlideViewport = overrides?.viewport ?? {
+      width: slidesStore.viewportSize,
+      height: slidesStore.viewportSize * slidesStore.viewportRatio,
+    };
+
+    // Convert base64 thumbnail to Blob (only if it's a data URL)
+    const thumbnailBlob =
+      thumbnailToUse && thumbnailToUse.startsWith('data:') ? dataURLtoBlob(thumbnailToUse) : null;
+
+    // Build data object with all non-file fields
+    const data = {
+      title: overrides?.title ?? slidesStore.title,
+      slides: overrides?.slides ?? slidesStore.slides,
+      isParsed: false,
+      metadata: {},
+      // Include thumbnail URL if we're not uploading a new file (i.e., it's already an R2 URL)
+      // This prevents the backend from setting thumbnail to null when no file is uploaded
+      ...(thumbnailBlob ? {} : { thumbnail: thumbnailToUse }),
+    };
+
+    // Create FormData for multipart upload
+    const formData = new FormData();
+    formData.append('data', new Blob([JSON.stringify(data)], { type: 'application/json' }));
+
+    if (thumbnailBlob) {
+      formData.append('file', thumbnailBlob, 'thumbnail.png');
+    }
+
+    // Call API to update presentation with FormData
+    updatePresentationMutation.mutate(
+      { presentationId, data: formData },
+      {
+        onSuccess: () => {
+          // Mark as saved in store
+          saveStore.markSaved();
+          // Dispatch success message
+          dispatchMessage('success', 'Presentation saved successfully');
+        },
+        onError: (error) => {
+          console.error('Failed to save presentation:', error);
+          dispatchMessage('error', 'Failed to save presentation');
+          throw error;
+        },
+        onSettled: () => {
+          // Clear saving state and notify React (always run after success or error)
+          isSaving.value = false;
+          dispatchSavingEvent(false);
+        },
+      }
+    );
   }
 
   /**

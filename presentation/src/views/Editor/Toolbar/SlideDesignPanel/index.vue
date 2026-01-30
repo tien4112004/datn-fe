@@ -339,7 +339,9 @@
     <!-- Error State -->
     <div v-else-if="themesError" class="themes-error">
       <div class="error-message">{{ themesError }}</div>
-      <Button size="small" @click="fetchThemes">{{ $t('styling.slide.design.retry') || 'Retry' }}</Button>
+      <Button size="small" @click="themesQuery.refetch">{{
+        $t('styling.slide.design.retry') || 'Retry'
+      }}</Button>
     </div>
 
     <!-- Empty State -->
@@ -428,7 +430,7 @@ import type { PresetTheme } from '@/configs/theme';
 import { FONTS } from '@/configs/font';
 import useHistorySnapshot from '@/hooks/useHistorySnapshot';
 import useSlideTheme from '@/hooks/useSlideTheme';
-import { getPresentationApi } from '@/services/presentation/api';
+import { useSlideThemes } from '@/services/presentation/queries';
 import { getImageDataURL } from '@/utils/image';
 import { useI18n } from 'vue-i18n';
 
@@ -454,6 +456,14 @@ import useCreateElement from '@/hooks/useCreateElement';
 const slidesStore = useSlidesStore();
 const { slides, currentSlide, slideIndex, viewportRatio, viewportSize, theme } = storeToRefs(slidesStore);
 
+const { addHistorySnapshot } = useHistorySnapshot();
+const { applyPresetTheme, applyThemeToAllSlides, applyFontToAllSlides } = useSlideTheme();
+
+// updateTheme helper for theme updates
+const updateTheme = (themeProps: Partial<SlideTheme>) => {
+  slidesStore.setTheme({ ...theme.value, ...themeProps });
+};
+
 const moreThemeConfigsVisible = ref(false);
 const themeStylesExtractVisible = ref(false);
 const themeColorsSettingVisible = ref(false);
@@ -462,91 +472,34 @@ const currentGradientIndex = ref(0);
 const lineStyleOptions = ref<LineStyleType[]>(['solid', 'dashed', 'dotted']);
 
 // Themes from API with infinite scroll support
-const presetThemes = ref<PresetTheme[]>([]);
-const themesLoading = ref(false);
-const themesLoadingMore = ref(false);
-const themesError = ref<string | null>(null);
 const currentPage = ref(0);
-const hasMoreThemes = ref(true);
 const themesLimit = ref(10);
 const themeListRef = ref<HTMLElement | null>(null);
 
-const background = computed(() => {
-  if (!currentSlide.value.background) {
-    return {
-      type: 'solid',
-      value: 'var(--presentation-background)',
-    } as SlideBackground;
-  }
+// Use TanStack Query for themes with pagination
+const themesQuery = useSlideThemes(computed(() => ({ page: currentPage.value, limit: themesLimit.value })));
 
-  return currentSlide.value.background;
+// Map query data to component format
+const presetThemes = computed(() => {
+  if (!themesQuery.data.value?.data) return [];
+  return themesQuery.data.value.data.map((theme) => ({
+    background: typeof theme.backgroundColor === 'string' ? theme.backgroundColor : '#ffffff',
+    fontColor: theme.fontColor,
+    borderColor: theme.outline?.color || '#525252',
+    fontname: theme.fontName,
+    colors: theme.themeColors,
+  }));
 });
 
-const { addHistorySnapshot } = useHistorySnapshot();
-const { applyPresetTheme, applyThemeToAllSlides, applyFontToAllSlides } = useSlideTheme();
-const { createTextElement } = useCreateElement();
-const { t } = useI18n();
+const themesLoading = computed(() => themesQuery.isLoading.value && currentPage.value === 0);
+const themesLoadingMore = computed(() => themesQuery.isLoading.value && currentPage.value > 0);
+const themesError = computed(() => (themesQuery.error.value ? 'Failed to load themes' : null));
+const hasMoreThemes = computed(() => themesQuery.data.value?.hasMore ?? false);
 
-watch(slideIndex, () => {
-  currentGradientIndex.value = 0;
-});
-
-// Fetch initial themes from API
-const fetchThemes = async () => {
-  themesLoading.value = true;
-  themesError.value = null;
-  currentPage.value = 0;
-  presetThemes.value = [];
-
-  try {
-    const api = getPresentationApi();
-    const result = await api.getSlideThemes({ page: 0, limit: themesLimit.value });
-    presetThemes.value = result.data.map((theme) => ({
-      background: typeof theme.backgroundColor === 'string' ? theme.backgroundColor : '#ffffff',
-      fontColor: theme.fontColor,
-      borderColor: theme.outline?.color || '#525252',
-      fontname: theme.fontName,
-      colors: theme.themeColors,
-    }));
-    hasMoreThemes.value = result.hasMore;
-    // Keep currentPage at 0, don't rely on backend response
-  } catch (error) {
-    console.error('Failed to fetch themes:', error);
-    themesError.value = 'Failed to load themes';
-    presetThemes.value = [];
-    hasMoreThemes.value = false;
-  } finally {
-    themesLoading.value = false;
-  }
-};
-
-// Load more themes for infinite scroll
-const loadMoreThemes = async () => {
-  if (!hasMoreThemes.value || themesLoadingMore.value) return;
-
-  themesLoadingMore.value = true;
-
-  try {
-    const api = getPresentationApi();
-    const nextPage = currentPage.value + 1;
-    const result = await api.getSlideThemes({ page: nextPage, limit: themesLimit.value });
-
-    const newThemes = result.data.map((theme) => ({
-      background: typeof theme.backgroundColor === 'string' ? theme.backgroundColor : '#ffffff',
-      fontColor: theme.fontColor,
-      borderColor: theme.outline?.color || '#525252',
-      fontname: theme.fontName,
-      colors: theme.themeColors,
-    }));
-
-    presetThemes.value.push(...newThemes);
-    hasMoreThemes.value = result.hasMore;
-    // Increment currentPage after successful fetch
-    currentPage.value = nextPage;
-  } catch (error) {
-    console.error('Failed to load more themes:', error);
-  } finally {
-    themesLoadingMore.value = false;
+// Load more themes for infinite scroll - just increment page, query auto-refetches
+const loadMoreThemes = () => {
+  if (hasMoreThemes.value && !themesLoadingMore.value) {
+    currentPage.value++;
   }
 };
 
@@ -563,8 +516,18 @@ const handleThemeListScroll = (event: Event) => {
   }
 };
 
-onMounted(() => {
-  fetchThemes();
+const background = computed(() => {
+  if (!currentSlide.value.background) {
+    return {
+      type: 'solid' as SlideBackgroundType,
+      color: 'var(--presentation-background)',
+    };
+  }
+  return currentSlide.value.background;
+});
+
+watch(slideIndex, () => {
+  currentGradientIndex.value = 0;
 });
 
 // Set background mode: solid color, image, gradient
@@ -605,9 +568,9 @@ const updateBackgroundType = (type: SlideBackgroundType) => {
   addHistorySnapshot();
 };
 
-//  Set background
+// Set background
 const updateBackground = (props: Partial<SlideBackground>) => {
-  slidesStore.updateSlide({ background: { ...background.value, ...props } });
+  slidesStore.updateSlide({ background: { ...background.value, ...props } as SlideBackground });
   addHistorySnapshot();
 };
 
@@ -645,11 +608,6 @@ const applyBackgroundAllSlide = () => {
   });
   slidesStore.setSlides(newSlides);
   addHistorySnapshot();
-};
-
-// Set theme
-const updateTheme = (themeProps: Partial<SlideTheme>) => {
-  slidesStore.setTheme(themeProps);
 };
 
 // Set canvas size (aspect ratio)

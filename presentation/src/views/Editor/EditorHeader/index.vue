@@ -160,7 +160,7 @@ import useScreening from '@/hooks/useScreening';
 import useImport from '@/hooks/useImport';
 import useSlideHandler from '@/hooks/useSlideHandler';
 import useSlideTemplates from '@/hooks/useSlideTemplates';
-import { getPresentationApi } from '@/services/presentation/api';
+import { useUpdatePresentation } from '@/services/presentation/queries';
 import type { DialogForExportTypes } from '@/types/export';
 
 import HotkeyDoc from './HotkeyDoc.vue';
@@ -199,6 +199,8 @@ const { createSlide, getThemes } = useSlideTemplates();
 
 // Get presentation ID from container store
 const presentationId = computed(() => presentation?.value?.id || (route.params.id as string) || '');
+
+const updatePresentationMutation = useUpdatePresentation();
 
 const mainMenuVisible = ref(false);
 const hotkeyDrawerVisible = ref(false);
@@ -239,23 +241,30 @@ const handleUpdateTitle = async () => {
     return;
   }
 
-  try {
-    // Update in store first (optimistic update)
-    const previousTitle = title.value;
-    slidesStore.setTitle(trimmedTitle);
-    editingTitle.value = false;
+  // Update in store first (optimistic update)
+  const previousTitle = title.value;
+  slidesStore.setTitle(trimmedTitle);
+  editingTitle.value = false;
 
-    // Call API to persist the change
-    const presentationApi = getPresentationApi();
-    await presentationApi.updatePresentation(presentationId.value, { title: trimmedTitle });
-    message.success(t('header.title.updateSuccess'));
-  } catch (error) {
-    console.error('Failed to update title:', error);
-    message.error(t('header.title.updateError'));
-    // Revert the title on error
-    titleValue.value = title.value;
-    slidesStore.setTitle(title.value);
-  }
+  // Call API to persist the change using mutation
+  updatePresentationMutation.mutate(
+    {
+      presentationId: presentationId.value,
+      data: { title: trimmedTitle },
+    },
+    {
+      onSuccess: () => {
+        message.success(t('header.title.updateSuccess'));
+      },
+      onError: (error) => {
+        console.error('Failed to update title:', error);
+        message.error(t('header.title.updateError'));
+        // Revert the title on error
+        titleValue.value = previousTitle;
+        slidesStore.setTitle(previousTitle);
+      },
+    }
+  );
 };
 
 const handleCancelEdit = () => {

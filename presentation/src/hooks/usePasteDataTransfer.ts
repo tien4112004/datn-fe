@@ -2,14 +2,14 @@ import { MIME_MAP } from '@/configs/mime';
 import { getImageDataURL } from '@/utils/image';
 import useCreateElement from './useCreateElement';
 import useImport from './useImport';
-import { getMediaApi } from '@/services/media/api';
+import { useUploadImage } from '@/services/media/queries';
 import { validateImageFile } from '@/utils/fileValidation';
 import message from '@/utils/message';
 
 export default () => {
   const { createImageElement, createVideoElement, createAudioElement } = useCreateElement();
   const { importSpecificFile, importPPTXFile } = useImport();
-  const mediaApi = getMediaApi();
+  const uploadImageMutation = useUploadImage();
 
   const pasteDataTransfer = async (dataTransfer: DataTransfer) => {
     const dataItems = dataTransfer.items;
@@ -31,13 +31,15 @@ export default () => {
             }
 
             // Upload to server instead of base64
-            try {
-              const result = await mediaApi.uploadImage(imageFile);
-              createImageElement(result.cdnUrl);
-            } catch (error) {
-              console.error('Failed to upload pasted image:', error);
-              message.error('Failed to upload image');
-            }
+            uploadImageMutation.mutate(imageFile, {
+              onSuccess: (result) => {
+                createImageElement(result.cdnUrl);
+              },
+              onError: (error) => {
+                console.error('Failed to upload pasted image:', error);
+                message.error('Failed to upload image');
+              },
+            });
             isFile = true;
           }
         } else if (item.type.indexOf('video') !== -1) {

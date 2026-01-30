@@ -52,7 +52,7 @@ const useResourceHooks = (resourceType: ResourceType) => {
   } else if (resourceType === 'assignment') {
     return {
       generate: null, // Assignments don't have AI generation yet
-      createBlank: () => navigate('/assignments/create'),
+      createBlank: () => navigate('/assignment/create'),
     };
   } else if (resourceType === 'image') {
     return {

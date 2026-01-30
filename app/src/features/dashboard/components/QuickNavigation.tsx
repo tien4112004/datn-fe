@@ -37,7 +37,7 @@ const navigationItems: NavigationItem[] = [
     hoverBg: 'hover:bg-green-100 dark:hover:bg-green-950/50',
   },
   {
-    path: '/assignments/create',
+    path: '/assignment/create',
     icon: ClipboardList,
     labelKey: 'quickNav.assignment',
     bgColor: 'bg-purple-50 dark:bg-purple-950/30',

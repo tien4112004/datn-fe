@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pencil, Plus } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/components/ui/tooltip';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/shared/components/ui/table';
 import { Button } from '@/shared/components/ui/button';
 import { MatrixCell } from './MatrixCell';
@@ -11,6 +12,7 @@ import { generateId } from '../../utils';
 
 export const MatrixGrid = () => {
   const { t } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.matrixEditor' });
+  const { t: tMatrix } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.matrixBuilder' });
   const { t: tDifficulty } = useTranslation('questions');
 
   // Get data from store (matrix counts are auto-synced)
@@ -31,10 +33,17 @@ export const MatrixGrid = () => {
     return (
       <div className="space-y-4">
         <div className="flex justify-end">
-          <Button type="button" size="sm" variant="outline" onClick={handleAddTopic}>
-            <Plus className="mr-1 h-3 w-3" />
-            {t('addTopic')}
-          </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button type="button" size="sm" variant="outline" onClick={handleAddTopic}>
+                <Plus className="mr-1 h-3 w-3" />
+                {t('addTopic')}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{tMatrix('tooltips.addTopic')}</p>
+            </TooltipContent>
+          </Tooltip>
         </div>
         <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 text-center dark:border-gray-700 dark:bg-gray-900">
           <p className="text-sm text-gray-500">{t('emptyMessage')}</p>
@@ -53,10 +62,17 @@ export const MatrixGrid = () => {
   return (
     <div className="space-y-4">
       <div className="flex justify-end">
-        <Button type="button" size="sm" variant="outline" onClick={handleAddTopic}>
-          <Plus className="mr-1 h-3 w-3" />
-          {t('addTopic')}
-        </Button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button type="button" size="sm" variant="outline" onClick={handleAddTopic}>
+              <Plus className="mr-1 h-3 w-3" />
+              {t('addTopic')}
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>{tMatrix('tooltips.addTopic')}</p>
+          </TooltipContent>
+        </Tooltip>
       </div>
 
       <div className="overflow-x-auto rounded-lg border">
@@ -91,15 +107,22 @@ export const MatrixGrid = () => {
                         </div>
                       )}
                     </div>
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => setEditingTopicId(topic.id)}
-                      className="h-8 w-8 shrink-0 p-0"
-                    >
-                      <Pencil className="h-3.5 w-3.5" />
-                    </Button>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => setEditingTopicId(topic.id)}
+                          className="h-8 w-8 shrink-0 p-0"
+                        >
+                          <Pencil className="h-3.5 w-3.5" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>{tMatrix('tooltips.editTopic')}</p>
+                      </TooltipContent>
+                    </Tooltip>
                   </div>
                 </TableCell>
                 {difficulties.map((difficulty) => {

@@ -1,9 +1,10 @@
 import { useTranslation } from 'react-i18next';
-import { FileText } from 'lucide-react';
+import { FileText, HelpCircle } from 'lucide-react';
 import { Input } from '@/shared/components/ui/input';
 import { Textarea } from '@/shared/components/ui/textarea';
 import { Label } from '@/shared/components/ui/label';
 import { Switch } from '@/shared/components/ui/switch';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/components/ui/tooltip';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
 import { getAllSubjects, getElementaryGrades } from '@aiprimary/core';
 import { useAssignmentFormStore } from '../../stores/useAssignmentFormStore';
@@ -35,25 +36,45 @@ export const AssignmentMetadataPanel = () => {
 
       <div className="space-y-4">
         <div>
-          <Label htmlFor="title" className="text-xs text-gray-600 dark:text-gray-400">
-            {t('fields.title')}
-          </Label>
+          <div className="mb-1.5 flex items-center gap-1.5">
+            <Label htmlFor="title" className="text-xs text-gray-600 dark:text-gray-400">
+              {t('fields.title')}
+            </Label>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <HelpCircle className="h-3.5 w-3.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="max-w-xs">{t('tooltips.title')}</p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
           <Input
             id="title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="mt-1.5 h-9 text-sm"
+            className="h-9 text-sm"
             placeholder={t('fields.titlePlaceholder')}
           />
         </div>
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <Label htmlFor="subject" className="text-xs text-gray-600 dark:text-gray-400">
-              {t('fields.subject')}
-            </Label>
+            <div className="mb-1.5 flex items-center gap-1.5">
+              <Label htmlFor="subject" className="text-xs text-gray-600 dark:text-gray-400">
+                {t('fields.subject')}
+              </Label>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <HelpCircle className="h-3.5 w-3.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="max-w-xs">{t('tooltips.subject')}</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
             <Select value={subject} onValueChange={setSubject}>
-              <SelectTrigger id="subject" className="mt-1.5 h-9 text-sm">
+              <SelectTrigger id="subject" className="h-9 text-sm">
                 <SelectValue placeholder={t('fields.subjectPlaceholder')} />
               </SelectTrigger>
               <SelectContent>
@@ -67,11 +88,21 @@ export const AssignmentMetadataPanel = () => {
           </div>
 
           <div>
-            <Label htmlFor="grade" className="text-xs text-gray-600 dark:text-gray-400">
-              {t('fields.grade')}
-            </Label>
+            <div className="mb-1.5 flex items-center gap-1.5">
+              <Label htmlFor="grade" className="text-xs text-gray-600 dark:text-gray-400">
+                {t('fields.grade')}
+              </Label>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <HelpCircle className="h-3.5 w-3.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="max-w-xs">{t('tooltips.grade')}</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
             <Select value={grade} onValueChange={setGrade}>
-              <SelectTrigger id="grade" className="mt-1.5 h-9 text-sm">
+              <SelectTrigger id="grade" className="h-9 text-sm">
                 <SelectValue placeholder={t('fields.gradePlaceholder')} />
               </SelectTrigger>
               <SelectContent>
@@ -86,14 +117,24 @@ export const AssignmentMetadataPanel = () => {
         </div>
 
         <div>
-          <Label htmlFor="description" className="text-xs text-gray-600 dark:text-gray-400">
-            {t('fields.description')}
-          </Label>
+          <div className="mb-1.5 flex items-center gap-1.5">
+            <Label htmlFor="description" className="text-xs text-gray-600 dark:text-gray-400">
+              {t('fields.description')}
+            </Label>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <HelpCircle className="h-3.5 w-3.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="max-w-xs">{t('tooltips.description')}</p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
           <Textarea
             id="description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="mt-1.5 text-sm"
+            className="text-sm"
             rows={4}
             placeholder={t('fields.descriptionPlaceholder')}
           />
@@ -101,8 +142,19 @@ export const AssignmentMetadataPanel = () => {
 
         <div className="flex items-center gap-2 pt-2">
           <Switch id="shuffle" checked={shuffleQuestions} onCheckedChange={setShuffleQuestions} />
-          <Label htmlFor="shuffle" className="text-sm text-gray-700 dark:text-gray-300">
+          <Label
+            htmlFor="shuffle"
+            className="flex items-center gap-1.5 text-sm text-gray-700 dark:text-gray-300"
+          >
             {t('fields.shuffleQuestions')}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <HelpCircle className="h-3.5 w-3.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="max-w-xs">{t('tooltips.shuffleQuestions')}</p>
+              </TooltipContent>
+            </Tooltip>
           </Label>
         </div>
       </div>

@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Input } from '@/shared/components/ui/input';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/components/ui/tooltip';
 import type { MatrixCell as MatrixCellType } from '../../types';
 import { validateMatrixCell } from '../../utils';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
@@ -11,6 +12,9 @@ interface MatrixCellProps {
 
 export const MatrixCell = ({ cell }: MatrixCellProps) => {
   const { t } = useTranslation(I18N_NAMESPACES.ASSIGNMENT, { keyPrefix: 'assignmentEditor.matrixCell' });
+  const { t: tMatrix } = useTranslation(I18N_NAMESPACES.ASSIGNMENT, {
+    keyPrefix: 'assignmentEditor.matrixBuilder',
+  });
   const updateMatrixCell = useAssignmentFormStore((state) => state.updateMatrixCell);
 
   // Validate the cell
@@ -32,13 +36,20 @@ export const MatrixCell = ({ cell }: MatrixCellProps) => {
     <div className="space-y-1.5">
       <div className="flex items-center gap-1">
         <span className="text-xs text-gray-500">{t('required')}</span>
-        <Input
-          type="number"
-          min="0"
-          value={cell.requiredCount}
-          onChange={(e) => handleRequiredCountChange(e.target.value)}
-          className="h-7 w-16 text-xs"
-        />
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Input
+              type="number"
+              min="0"
+              value={cell.requiredCount}
+              onChange={(e) => handleRequiredCountChange(e.target.value)}
+              className="h-7 w-16 text-xs"
+            />
+          </TooltipTrigger>
+          <TooltipContent>
+            <p className="max-w-xs">{tMatrix('tooltips.cellInput')}</p>
+          </TooltipContent>
+        </Tooltip>
       </div>
 
       <div className={`rounded-md border-2 p-2 text-center ${statusColors[status]}`}>

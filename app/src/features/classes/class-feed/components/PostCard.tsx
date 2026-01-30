@@ -148,7 +148,7 @@ export const PostCard = ({ post, onEdit, onDelete, onPin, onComment, className =
                 <span>{t('feed.post.loadingAssignment')}</span>
               </div>
             ) : assignment ? (
-              <Link to={`/assignments/${post.assignmentId}`} className="block space-y-2">
+              <Link to={`/assignment/${post.assignmentId}`} className="block space-y-2">
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
                     <ClipboardList className="h-5 w-5 text-purple-600" />

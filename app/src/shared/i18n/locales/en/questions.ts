@@ -73,6 +73,13 @@ export default {
     fillInBlank: 'Fill In Blank Question',
   },
 
+  typeTooltips: {
+    multipleChoice: 'Select correct answer(s) from options',
+    matching: 'Match items between two columns',
+    openEnded: 'Free-form written response',
+    fillInBlank: 'Fill in missing words',
+  },
+
   difficulty: {
     knowledge: 'Knowledge',
     comprehension: 'Comprehension',

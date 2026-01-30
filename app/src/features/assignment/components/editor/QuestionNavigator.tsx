@@ -1,5 +1,6 @@
 import { List, FileText, Grid3x3 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/components/ui/tooltip';
 import { CollapsibleSection } from './CollapsibleSection';
 import { useAssignmentEditorStore } from '../../stores/useAssignmentEditorStore';
 import { useAssignmentFormStore } from '../../stores/useAssignmentFormStore';
@@ -114,32 +115,44 @@ export const QuestionNavigator = () => {
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <div className="grid grid-cols-5 gap-1.5 overflow-hidden">
           {/* Assignment Info Icon */}
-          <button
-            type="button"
-            onClick={() => setMainView('info')}
-            className={`flex h-8 w-full items-center justify-center rounded text-xs transition-colors ${
-              mainView === 'info'
-                ? 'bg-primary text-primary-foreground'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700'
-            }`}
-            title={t('assignmentInfo')}
-          >
-            <FileText className="h-3 w-3" />
-          </button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                type="button"
+                onClick={() => setMainView('info')}
+                className={`flex h-8 w-full items-center justify-center rounded text-xs transition-colors ${
+                  mainView === 'info'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700'
+                }`}
+              >
+                <FileText className="h-3 w-3" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{t('tooltips.assignmentInfo')}</p>
+            </TooltipContent>
+          </Tooltip>
 
           {/* Matrix Builder Icon */}
-          <button
-            type="button"
-            onClick={() => setMainView('matrix')}
-            className={`flex h-8 w-full items-center justify-center rounded text-xs transition-colors ${
-              mainView === 'matrix'
-                ? 'bg-primary text-primary-foreground'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700'
-            }`}
-            title={t('matrixBuilder')}
-          >
-            <Grid3x3 className="h-3 w-3" />
-          </button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                type="button"
+                onClick={() => setMainView('matrix')}
+                className={`flex h-8 w-full items-center justify-center rounded text-xs transition-colors ${
+                  mainView === 'matrix'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700'
+                }`}
+              >
+                <Grid3x3 className="h-3 w-3" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{t('tooltips.matrixBuilder')}</p>
+            </TooltipContent>
+          </Tooltip>
 
           {/* Question Numbers */}
           <SortableContext items={questions.map((q) => q.question.id)} strategy={rectSortingStrategy}>
@@ -149,19 +162,27 @@ export const QuestionNavigator = () => {
               const hasTitle = Boolean(question.title) && question.title.trim() !== '';
 
               return (
-                <SortableQuestionButton
-                  key={question.id}
-                  id={question.id}
-                  index={index}
-                  isActive={isActive}
-                  hasTitle={hasTitle}
-                  title={question.title}
-                  untitledLabel={t('untitled')}
-                  onClick={() => {
-                    setMainView('questions');
-                    setCurrentQuestionId(question.id);
-                  }}
-                />
+                <Tooltip key={question.id}>
+                  <TooltipTrigger asChild>
+                    <div>
+                      <SortableQuestionButton
+                        id={question.id}
+                        index={index}
+                        isActive={isActive}
+                        hasTitle={hasTitle}
+                        title={question.title}
+                        untitledLabel={t('untitled')}
+                        onClick={() => {
+                          setMainView('questions');
+                          setCurrentQuestionId(question.id);
+                        }}
+                      />
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{t('tooltips.questionNumber')}</p>
+                  </TooltipContent>
+                </Tooltip>
               );
             })}
           </SortableContext>

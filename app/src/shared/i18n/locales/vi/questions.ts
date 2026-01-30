@@ -73,6 +73,13 @@ export default {
     fillInBlank: 'Câu hỏi điền vào chỗ trống',
   },
 
+  typeTooltips: {
+    multipleChoice: 'Chọn đáp án đúng từ các lựa chọn',
+    matching: 'Nối các cặp từ hai cột',
+    openEnded: 'Trả lời tự luận tự do',
+    fillInBlank: 'Điền từ còn thiếu',
+  },
+
   difficulty: {
     knowledge: 'Nhận biết',
     comprehension: 'Thông hiểu',

@@ -11,7 +11,7 @@ import { getImageApi } from './api';
 import { queryKeys } from '../query-keys';
 import type { ImageGenerationParams, SingleImageResponse, ImageSearchPayload } from './types';
 import type { MaybeRef } from 'vue';
-import { unref } from 'vue';
+import { unref, computed } from 'vue';
 
 // ============================================================================
 // QUERY HOOKS
@@ -36,7 +36,7 @@ export function useMyImages(
   const imageApi = getImageApi();
 
   return useQuery({
-    queryKey: () => queryKeys.images.my(unref(page), unref(pageSize), unref(sort)),
+    queryKey: computed(() => queryKeys.images.my(unref(page), unref(pageSize), unref(sort))),
     queryFn: () => imageApi.getMyImages(unref(page), unref(pageSize), unref(sort)),
     staleTime: 1000 * 60, // 1 minute
     ...options,
@@ -59,7 +59,7 @@ export function useImageSearch(
   const imageApi = getImageApi();
 
   return useQuery({
-    queryKey: () => queryKeys.images.search(unref(payload)),
+    queryKey: computed(() => queryKeys.images.search(unref(payload))),
     queryFn: () => imageApi.searchImage(unref(payload)),
     enabled: () => !!unref(payload)?.query && unref(payload).query.length > 0,
     staleTime: 1000 * 60 * 5, // Search results are cached for 5 minutes

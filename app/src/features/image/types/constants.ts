@@ -10,9 +10,6 @@ export const IMAGE_DIMENSION_OPTIONS = [
   { value: '1024x1536', labelKey: '1024x1536' },
 ];
 
-// Supported aspect ratios by the API
-const SUPPORTED_ASPECT_RATIOS = ['1:1', '16:9', '9:16', '4:3', '3:4'] as const;
-
 // Convert size string (e.g., "1024x1024") to the nearest supported aspect ratio
 export const convertSizeToAspectRatio = (size: string): string => {
   const [width, height] = size.split('x').map(Number);

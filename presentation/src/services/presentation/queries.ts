@@ -22,7 +22,7 @@ import type {
 } from './types';
 import type { ImageGenerationParams } from '../image/types';
 import type { MaybeRef } from 'vue';
-import { unref } from 'vue';
+import { unref, computed } from 'vue';
 
 // ============================================================================
 // QUERY HOOKS
@@ -131,7 +131,7 @@ export function useSlideThemes(
   const presentationApi = getPresentationApi();
 
   return useQuery({
-    queryKey: () => queryKeys.slideThemes.list(unref(params)),
+    queryKey: computed(() => queryKeys.slideThemes.list(unref(params))),
     queryFn: () => presentationApi.getSlideThemes(unref(params)),
     staleTime: 1000 * 60 * 5, // 5 minutes
     ...options,
@@ -222,7 +222,7 @@ export function useSearchUsers(
   const presentationApi = getPresentationApi();
 
   return useQuery({
-    queryKey: () => queryKeys.users.search(unref(query)),
+    queryKey: computed(() => queryKeys.users.search(unref(query))),
     queryFn: () => presentationApi.searchUsers(unref(query)),
     enabled: () => !!unref(query) && unref(query).length > 0,
     staleTime: 1000 * 30, // 30 seconds

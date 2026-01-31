@@ -3,7 +3,7 @@ import { getTemplateApi } from './api';
 import { queryKeys } from '../query-keys';
 import type { SlideTemplate } from '@aiprimary/core';
 import type { MaybeRef } from 'vue';
-import { unref } from 'vue';
+import { unref, computed } from 'vue';
 
 /**
  * Hook to fetch all slide templates
@@ -43,7 +43,7 @@ export function useSlideTemplatesByLayout(
   const templateApi = getTemplateApi();
 
   return useQuery({
-    queryKey: () => queryKeys.templates.byLayout(unref(layoutType)),
+    queryKey: computed(() => queryKeys.templates.byLayout(unref(layoutType))),
     queryFn: () => templateApi.getSlideTemplatesByLayout(unref(layoutType)),
     staleTime: 1000 * 60 * 10, // Templates don't change often, cache for 10 minutes
     enabled: () => !!unref(layoutType), // Only run query if layoutType is provided

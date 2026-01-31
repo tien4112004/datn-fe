@@ -111,12 +111,6 @@ const router = createBrowserRouter([
         Component: () => <FeedTab classId="class1" />,
       },
       {
-        path: 'periods/:id',
-        lazy: async () => ({
-          Component: (await import('@/features/classes')).default.PeriodDetailPage,
-        }),
-      },
-      {
         path: 'settings',
         lazy: async () => ({
           Component: (await import('@/features/settings')).default.SettingsPage,

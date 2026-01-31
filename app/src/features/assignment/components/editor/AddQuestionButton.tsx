@@ -114,7 +114,9 @@ export const AddQuestionButton = ({ className }: AddQuestionButtonProps) => {
               <DropdownMenuItem onClick={() => handleAddQuestion(type.value)}>{type.label}</DropdownMenuItem>
             </TooltipTrigger>
             <TooltipContent side="right">
-              <p className="max-w-xs">{tQuestions(`typeTooltips.${type.value}`)}</p>
+              <p className="max-w-xs">
+                {tQuestions((type.i18nKey?.replace('types.', 'typeTooltips.') || type.value) as any)}
+              </p>
             </TooltipContent>
           </Tooltip>
         ))}

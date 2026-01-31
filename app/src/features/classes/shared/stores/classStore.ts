@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist, devtools } from 'zustand/middleware';
 import type { Class, Student } from '../types';
-import type { ClassesViewMode, ClassTabs } from '../types/ui';
+import type { ClassTabs } from '../types/ui';
 
 interface ClassFilters {
   search?: string;
@@ -20,7 +20,6 @@ interface ClassStore {
 
   // Filters and view state
   filters: ClassFilters;
-  viewMode: ClassesViewMode;
   sortBy: string;
   sortDirection: 'asc' | 'desc';
 
@@ -42,7 +41,6 @@ interface ClassStore {
   // Actions - Filters and view
   setFilters: (filters: Partial<ClassFilters>) => void;
   clearFilters: () => void;
-  setViewMode: (mode: ClassesViewMode) => void;
   setSorting: (sortBy: string, direction: 'asc' | 'desc') => void;
 
   // Actions - Modals
@@ -62,7 +60,6 @@ const initialState = {
   selectedClass: null,
   selectedStudents: [],
   filters: {},
-  viewMode: 'list' as const,
   sortBy: 'name',
   sortDirection: 'asc' as const,
   isCreateModalOpen: false,
@@ -106,8 +103,6 @@ const useClassStore = create<ClassStore>()(
 
         clearFilters: () => set({ filters: {} }),
 
-        setViewMode: (mode) => set({ viewMode: mode }),
-
         setSorting: (sortBy, direction) => set({ sortBy, sortDirection: direction }),
 
         // Modal actions
@@ -147,7 +142,6 @@ const useClassStore = create<ClassStore>()(
         partialize: (state) => ({
           // Only persist certain parts of the state
           filters: state.filters,
-          viewMode: state.viewMode,
           sortBy: state.sortBy,
           sortDirection: state.sortDirection,
         }),

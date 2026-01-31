@@ -26,9 +26,11 @@ export const classSchema = z
 
     academicYear: z
       .string()
-      .regex(/^\d{4}-\d{4}$/, { message: 'classes.form.validation.academicYearInvalid' })
+      .regex(/^\d{4}-\d{4}$/, { message: 'classes.form.validation.academicYearFormat' })
       .optional()
       .or(z.literal('')),
+
+    includeAcademicYear: z.boolean().optional(),
 
     class: z
       .string()

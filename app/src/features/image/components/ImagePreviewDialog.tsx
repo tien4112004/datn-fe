@@ -23,7 +23,6 @@ const ImagePreviewDialog = () => {
       try {
         await navigator.share({
           title: t('preview.shareTitle'),
-          text: selectedImage.prompt,
           url: shareUrl,
         });
       } catch {
@@ -43,7 +42,7 @@ const ImagePreviewDialog = () => {
         if (!response.ok) throw new Error('Network response was not ok');
         const blob = await response.blob();
         // Try to extract file name from selectedImage or fallback
-        let fileName = selectedImage.fileName || '';
+        let fileName = selectedImage.originalFilename || '';
         if (!fileName) {
           // Try to extract from URL
           try {
@@ -81,7 +80,7 @@ const ImagePreviewDialog = () => {
         <div className="flex flex-1 items-center justify-center overflow-hidden">
           <img
             src={selectedImage.url}
-            alt={selectedImage.prompt || t('card.generatedImage')}
+            alt={t('card.generatedImage')}
             className="max-h-[60vh] max-w-full rounded-lg object-contain"
             onError={(e) => {
               const target = e.target as HTMLImageElement;
@@ -89,14 +88,6 @@ const ImagePreviewDialog = () => {
             }}
           />
         </div>
-
-        {/* Prompt */}
-        {selectedImage.prompt && (
-          <div className="mt-4">
-            <p className="text-muted-foreground text-sm">{t('preview.prompt')}</p>
-            <p className="text-foreground leading-relaxed">{selectedImage.prompt}</p>
-          </div>
-        )}
 
         {/* Action Buttons */}
         <div className="mt-4 flex gap-3 border-t pt-4">

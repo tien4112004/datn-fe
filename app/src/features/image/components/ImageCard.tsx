@@ -1,4 +1,4 @@
-import { memo, useState, useMemo } from 'react';
+import { memo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { ImageData } from '../types/service';
 import { cn } from '@/shared/lib/utils';
@@ -9,20 +9,6 @@ interface ImageCardProps {
   index: number;
 }
 
-// Parse size string (e.g., "1024x1024", "1792x1024") to get aspect ratio
-const parseAspectRatio = (size?: string): number | null => {
-  if (!size) return null;
-  const match = size.match(/(\d+)x(\d+)/);
-  if (match) {
-    const width = parseInt(match[1], 10);
-    const height = parseInt(match[2], 10);
-    if (width > 0 && height > 0) {
-      return (height / width) * 100;
-    }
-  }
-  return null;
-};
-
 const ImageCard = memo<ImageCardProps>(({ data }) => {
   const { t } = useTranslation('image');
   const [isLoaded, setIsLoaded] = useState(false);
@@ -30,9 +16,8 @@ const ImageCard = memo<ImageCardProps>(({ data }) => {
   const [naturalAspectRatio, setNaturalAspectRatio] = useState<number | null>(null);
   const { openPreview } = useImagePreview();
 
-  // Calculate aspect ratio: prefer size field, then natural dimensions, then default
-  const sizeAspectRatio = useMemo(() => parseAspectRatio(data.size), [data.size]);
-  const aspectRatio = sizeAspectRatio ?? naturalAspectRatio ?? 75; // 4:3 default
+  // Calculate aspect ratio from natural dimensions, default to 4:3
+  const aspectRatio = naturalAspectRatio ?? 75;
 
   const handleClick = () => {
     openPreview(data);
@@ -41,8 +26,7 @@ const ImageCard = memo<ImageCardProps>(({ data }) => {
   const handleImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
     const img = e.currentTarget;
     setIsLoaded(true);
-    // If no size field, use natural dimensions
-    if (!sizeAspectRatio && img.naturalWidth > 0 && img.naturalHeight > 0) {
+    if (img.naturalWidth > 0 && img.naturalHeight > 0) {
       setNaturalAspectRatio((img.naturalHeight / img.naturalWidth) * 100);
     }
   };
@@ -66,7 +50,7 @@ const ImageCard = memo<ImageCardProps>(({ data }) => {
           {!imageError && (
             <img
               src={data.url}
-              alt={data.prompt || t('card.generatedImage')}
+              alt={t('card.generatedImage')}
               className={cn(
                 'absolute inset-0 h-full w-full object-cover transition-all duration-300',
                 'group-hover:blur-sm',

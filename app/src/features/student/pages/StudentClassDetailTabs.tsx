@@ -1,6 +1,6 @@
 import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { MessageSquare, BookOpen, GraduationCap, Calendar, Users } from 'lucide-react';
+import { MessageSquare, GraduationCap, Calendar, Users } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import { getGradeLabel } from '@/features/classes/shared/utils/grades';
 

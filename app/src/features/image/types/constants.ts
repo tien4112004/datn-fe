@@ -10,15 +10,35 @@ export const IMAGE_DIMENSION_OPTIONS = [
   { value: '1024x1536', labelKey: '1024x1536' },
 ];
 
-// Convert size string (e.g., "1024x1024") to aspect ratio (e.g., "1:1")
+// Supported aspect ratios by the API
+const SUPPORTED_ASPECT_RATIOS = ['1:1', '16:9', '9:16', '4:3', '3:4'] as const;
+
+// Convert size string (e.g., "1024x1024") to the nearest supported aspect ratio
 export const convertSizeToAspectRatio = (size: string): string => {
   const [width, height] = size.split('x').map(Number);
+  const ratio = width / height;
 
-  // Calculate GCD to simplify ratio
-  const gcd = (a: number, b: number): number => (b === 0 ? a : gcd(b, a % b));
-  const divisor = gcd(width, height);
+  // Find the closest supported aspect ratio
+  const ratioValues: Record<string, number> = {
+    '1:1': 1,
+    '16:9': 16 / 9,
+    '9:16': 9 / 16,
+    '4:3': 4 / 3,
+    '3:4': 3 / 4,
+  };
 
-  return `${width / divisor}:${height / divisor}`;
+  let closestRatio = '1:1';
+  let smallestDiff = Infinity;
+
+  for (const [ratioKey, ratioValue] of Object.entries(ratioValues)) {
+    const diff = Math.abs(ratio - ratioValue);
+    if (diff < smallestDiff) {
+      smallestDiff = diff;
+      closestRatio = ratioKey;
+    }
+  }
+
+  return closestRatio;
 };
 
 export const ART_STYLE_OPTIONS: ArtStyle[] = [

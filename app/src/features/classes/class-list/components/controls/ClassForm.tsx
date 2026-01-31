@@ -5,9 +5,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
 import { AlertCircle, Loader2, BookOpen, Calendar, MapPin } from 'lucide-react';
+import { getElementaryGrades } from '@aiprimary/core';
+import { Checkbox } from '@/components/ui/checkbox';
+import { getCurrentAcademicYear } from '../../../shared/utils/grades';
 
 interface ClassFormProps {
   initialData?: ClassSchema;
@@ -21,6 +25,12 @@ export const ClassForm = ({ initialData, onSubmit, isEditMode = false }: ClassFo
   const { formData, setFormData, errors, validateForm } = useClassForm({ initialData, onSubmit });
   const [isLoading, setIsLoading] = useState(false);
   const [generalError, setGeneralError] = useState<string | null>(null);
+
+  // Get grade options from core package
+  const gradeOptions = getElementaryGrades();
+
+  // Get current academic year
+  const currentAcademicYear = getCurrentAcademicYear();
 
   // Only re-validate when formData changes and we already have errors
   useEffect(() => {
@@ -84,23 +94,61 @@ export const ClassForm = ({ initialData, onSubmit, isEditMode = false }: ClassFo
         </div>
         <Separator />
 
+        <div className="space-y-2">
+          <Label htmlFor="name" className="text-sm font-medium">
+            {t('name')} <span className="text-destructive">*</span>
+          </Label>
+          <Input
+            type="text"
+            name="name"
+            id="name"
+            value={formData.name}
+            onChange={handleChange}
+            disabled={isLoading}
+            placeholder={t('namePlaceholder')}
+            className={getFieldError('name') ? 'border-destructive' : ''}
+          />
+          {getFieldError('name') && (
+            <p className="text-destructive text-sm font-medium">{getErrorMessage(getFieldError('name'))}</p>
+          )}
+        </div>
+      </div>
+
+      {/* Optional Details Section */}
+      <div className="space-y-4">
+        <div className="flex items-center gap-2">
+          <Calendar className="text-primary h-5 w-5" />
+          <h3 className="text-lg font-semibold">{t('optionalInformation')}</h3>
+        </div>
+        <Separator />
+
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
-            <Label htmlFor="name" className="text-sm font-medium">
-              {t('name')} <span className="text-destructive">*</span>
+            <Label htmlFor="grade" className="text-sm font-medium">
+              {t('grade')}
             </Label>
-            <Input
-              type="text"
-              name="name"
-              id="name"
-              value={formData.name}
-              onChange={handleChange}
+            <Select
+              value={formData.grade?.toString() || ''}
+              onValueChange={(value) =>
+                setFormData((prev) => ({ ...prev, grade: value ? Number(value) : undefined }))
+              }
               disabled={isLoading}
-              placeholder={t('namePlaceholder')}
-              className={getFieldError('name') ? 'border-destructive' : ''}
-            />
-            {getFieldError('name') && (
-              <p className="text-destructive text-sm font-medium">{getErrorMessage(getFieldError('name'))}</p>
+            >
+              <SelectTrigger id="grade" className={getFieldError('grade') ? 'border-destructive' : ''}>
+                <SelectValue placeholder={t('gradePlaceholder')} />
+              </SelectTrigger>
+              <SelectContent>
+                {gradeOptions.map((grade) => (
+                  <SelectItem key={grade.code} value={grade.code}>
+                    {grade.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {getFieldError('grade') && (
+              <p className="text-destructive text-sm font-medium">
+                {getErrorMessage(getFieldError('grade'))}
+              </p>
             )}
           </div>
 
@@ -147,60 +195,19 @@ export const ClassForm = ({ initialData, onSubmit, isEditMode = false }: ClassFo
             </p>
           )}
         </div>
-      </div>
 
-      {/* Academic Details Section */}
-      <div className="space-y-4">
-        <div className="flex items-center gap-2">
-          <Calendar className="text-primary h-5 w-5" />
-          <h3 className="text-lg font-semibold">{t('optionalInformation')}</h3>
-        </div>
-        <Separator />
-
-        <div className="grid gap-4 md:grid-cols-2">
-          <div className="space-y-2">
-            <Label htmlFor="grade" className="text-sm font-medium">
-              {t('grade')}
-            </Label>
-            <Input
-              type="number"
-              name="grade"
-              id="grade"
-              value={formData.grade || ''}
-              onChange={handleChange}
-              disabled={isLoading}
-              placeholder={t('gradePlaceholder')}
-              min="1"
-              max="12"
-              className={getFieldError('grade') ? 'border-destructive' : ''}
-            />
-            {getFieldError('grade') && (
-              <p className="text-destructive text-sm font-medium">
-                {getErrorMessage(getFieldError('grade'))}
-              </p>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="academicYear" className="text-sm font-medium">
-              {t('academicYear')}
-            </Label>
-            <Input
-              type="text"
-              name="academicYear"
-              id="academicYear"
-              value={formData.academicYear || ''}
-              onChange={handleChange}
-              disabled={isLoading}
-              placeholder={t('academicYearPlaceholder')}
-              className={getFieldError('academicYear') ? 'border-destructive' : ''}
-            />
-            {getFieldError('academicYear') && (
-              <p className="text-destructive text-sm font-medium">
-                {getErrorMessage(getFieldError('academicYear'))}
-              </p>
-            )}
-          </div>
+        <div className="flex items-center space-x-2">
+          <Checkbox
+            id="includeAcademicYear"
+            checked={formData.includeAcademicYear || false}
+            onCheckedChange={(checked) =>
+              setFormData((prev) => ({ ...prev, includeAcademicYear: checked === true }))
+            }
+            disabled={isLoading}
+          />
+          <Label htmlFor="includeAcademicYear" className="cursor-pointer text-sm font-medium">
+            {t('includeAcademicYear')} ({currentAcademicYear})
+          </Label>
         </div>
       </div>
 

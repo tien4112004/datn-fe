@@ -111,6 +111,12 @@ const router = createBrowserRouter([
         Component: () => <FeedTab classId="class1" />,
       },
       {
+        path: 'classes/:classId/posts/:postId',
+        lazy: async () => ({
+          Component: (await import('@/features/classes/class-feed')).PostDetailPage,
+        }),
+      },
+      {
         path: 'settings',
         lazy: async () => ({
           Component: (await import('@/features/settings')).default.SettingsPage,
@@ -196,6 +202,12 @@ const router = createBrowserRouter([
         }),
       },
       {
+        path: 'submissions/:id/grade',
+        lazy: async () => ({
+          Component: (await import('@/features/assignment/pages')).TeacherGradingPage,
+        }),
+      },
+      {
         path: 'error',
         Component: () => {
           throw new CriticalError('This is a critical error page.');
@@ -221,6 +233,30 @@ const router = createBrowserRouter([
         lazy: async () => ({
           Component: (await import('@/features/student/pages/StudentClassDetailPage')).StudentClassDetailPage,
           loader: (await import('@/features/classes/shared/hooks/loaders')).getClassById,
+        }),
+      },
+      {
+        path: 'student/classes/:classId/posts/:postId',
+        lazy: async () => ({
+          Component: (await import('@/features/classes/class-feed')).PostDetailPage,
+        }),
+      },
+      {
+        path: 'student/assignments/:id/do',
+        lazy: async () => ({
+          Component: (await import('@/features/assignment/pages')).AssignmentDoingPage,
+        }),
+      },
+      {
+        path: 'student/assignments/:id/submissions',
+        lazy: async () => ({
+          Component: (await import('@/features/assignment/pages')).StudentSubmissionsPage,
+        }),
+      },
+      {
+        path: 'student/submissions/:id/result',
+        lazy: async () => ({
+          Component: (await import('@/features/assignment/pages')).SubmissionResultPage,
         }),
       },
       {

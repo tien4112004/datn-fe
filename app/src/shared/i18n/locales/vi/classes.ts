@@ -1190,6 +1190,7 @@ export default {
       },
     },
     comments: {
+      title: 'Bình luận',
       loading: 'Đang tải bình luận...',
       empty: 'Chưa có bình luận nào',
     },

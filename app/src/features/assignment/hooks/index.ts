@@ -7,6 +7,13 @@ export {
   useUpdateAssignment,
   useDeleteAssignment,
 } from './useAssignmentApi';
+export {
+  useSubmissionsByPost,
+  useSubmission,
+  useCreateSubmission,
+  useGradeSubmission,
+  useDeleteSubmission,
+} from './useSubmissionApi';
 
 // Re-export context hooks from context feature for backward compatibility
 export { useContextList, useContext, contextKeys } from '@/features/context';

@@ -5,3 +5,7 @@ export { QuestionBankEditorPage } from './QuestionBankEditorPage';
 export { QuestionBankViewPage } from './QuestionBankViewPage';
 export { QuestionRendererDemoPage } from './QuestionRendererDemoPage';
 export { GeneratedQuestionsPage } from './GeneratedQuestionsPage';
+export { AssignmentDoingPage } from './AssignmentDoingPage';
+export { StudentSubmissionsPage } from './StudentSubmissionsPage';
+export { TeacherGradingPage } from './TeacherGradingPage';
+export { SubmissionResultPage } from './SubmissionResultPage';

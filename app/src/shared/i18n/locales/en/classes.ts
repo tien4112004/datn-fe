@@ -1164,6 +1164,7 @@ export default {
       },
     },
     comments: {
+      title: 'Comments',
       loading: 'Loading comments...',
       empty: 'No comments yet',
     },

@@ -35,6 +35,10 @@
     "@aiprimary/core": "workspace:*"
   },
   "devDependencies": {
-    "typescript": "latest"
+    "@eslint/js": "^9.39.2",
+    "eslint": "^9.39.2",
+    "globals": "^17.2.0",
+    "typescript": "latest",
+    "typescript-eslint": "^8.54.0"
   }
 }

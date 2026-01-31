@@ -8,11 +8,13 @@ import type { CreateAssignmentRequest, UpdateAssignmentRequest, GenerateMatrixRe
  * @param filters - Optional filters for assignments
  * @returns Query result with assignments list
  */
-export const useAssignmentList = (filters?: {
+type AssignmentListFilters = {
   classId?: string;
   status?: 'draft' | 'published' | 'archived';
   searchText?: string;
-}) => {
+};
+
+export const useAssignmentList = (filters?: AssignmentListFilters) => {
   const service = getAssignmentApiService();
 
   return useQuery({
@@ -33,15 +35,18 @@ export const useAssignmentList = (filters?: {
 
 /**
  * Hook to fetch a single assignment by ID
- * @param id - Assignment ID
+ * @param id - Assignment ID (optional, query disabled if undefined)
  * @returns Query result with assignment details
  */
-export const useAssignment = (id: string) => {
+export const useAssignment = (id?: string) => {
   const service = getAssignmentApiService();
 
   return useQuery({
-    queryKey: assignmentKeys.detail(id),
-    queryFn: () => service.getAssignmentById(id),
+    queryKey: id ? assignmentKeys.detail(id) : assignmentKeys.details(),
+    queryFn: async () => {
+      if (!id) throw new Error('Missing assignment id');
+      return service.getAssignmentById(id);
+    },
     staleTime: 60 * 1000, // 1 minute
     enabled: !!id, // Only fetch if ID is provided
   });

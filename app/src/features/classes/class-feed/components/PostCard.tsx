@@ -29,6 +29,15 @@ export const PostCard = ({ post, onEdit, onDelete, onPin, onComment, className =
   // Fetch assignment details if this is an Exercise post with an assignmentId
   const { data: assignment, isLoading: isAssignmentLoading } = useAssignment(post.assignmentId ?? '');
 
+  // Determine the appropriate link path based on whether we're in student or teacher mode
+  const getPostDetailPath = () => {
+    const isStudentMode = window.location.pathname.includes('/student/');
+    if (isStudentMode) {
+      return `/student/classes/${post.classId}/posts/${post.id}`;
+    }
+    return `/classes/${post.classId}/posts/${post.id}`;
+  };
+
   return (
     <article
       className={`hover:bg-muted/30 border-b px-3 py-3 transition-colors md:px-6 md:py-4 ${className}`}
@@ -116,11 +125,11 @@ export const PostCard = ({ post, onEdit, onDelete, onPin, onComment, className =
       </div>
 
       {/* Content */}
-      <div className="mb-2 ml-9 md:mb-3 md:ml-[52px]">
+      <Link to={getPostDetailPath()} className="mb-2 ml-9 block md:mb-3 md:ml-[52px]">
         <article className="prose prose-sm !max-w-none">
           <ReactMarkdown>{post.content}</ReactMarkdown>
         </article>
-      </div>
+      </Link>
 
       {/* Attachments */}
       {post.attachments && post.attachments.length > 0 && (

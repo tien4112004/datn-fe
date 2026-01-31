@@ -30,29 +30,29 @@ export const FeedTab = ({ classId }: FeedPageProps) => {
 
   return (
     <div className="flex h-full flex-col">
-      {/* Top Bar */}
-      <div className="bg-background/95 supports-[backdrop-filter]:bg-background/60 border-b px-3 py-3 backdrop-blur md:px-6 md:py-4">
-        <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:gap-4">
-          {/* Filter Tabs */}
-          <nav className="-mx-3 overflow-x-auto md:mx-0">
-            <div className="flex min-w-max gap-1 px-3 sm:min-w-0 md:px-0">
-              {filterOptions.map((option) => (
-                <button
-                  key={option.value}
-                  onClick={() => handleFilterChange(option.value)}
-                  className={cn(
-                    'px-4 py-2 text-sm font-medium transition-colors',
-                    'border-b-2',
-                    filter.type === option.value
-                      ? 'border-primary text-foreground'
-                      : 'text-muted-foreground hover:text-foreground border-transparent'
-                  )}
-                >
-                  {option.label}
-                </button>
-              ))}
-            </div>
-          </nav>
+      {/* Sticky Top Bar */}
+      <div className="bg-background/95 supports-[backdrop-filter]:bg-background/80 sticky top-0 z-10 border-b backdrop-blur">
+        <div className="container mx-auto max-w-4xl px-4 py-3 md:px-6 md:py-4">
+          <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+            {/* Filter Tabs */}
+            <nav className="flex-1">
+              <div className="flex gap-1">
+                {filterOptions.map((option) => (
+                  <button
+                    key={option.value}
+                    onClick={() => handleFilterChange(option.value)}
+                    className={cn(
+                      'rounded-lg px-4 py-2 text-sm font-medium transition-all',
+                      filter.type === option.value
+                        ? 'bg-primary text-primary-foreground shadow-sm'
+                        : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                    )}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+            </nav>
 
           {isTeacher && (
             <PostCreator
@@ -66,24 +66,26 @@ export const FeedTab = ({ classId }: FeedPageProps) => {
 
       {/* Content Area */}
       <div className="flex-1 overflow-y-auto">
-        {/* Error State */}
-        {error && (
-          <div className="border-destructive bg-destructive/10 mx-3 mt-4 border-l-4 p-3 md:mx-6 md:mt-6 md:p-4">
-            <div className="flex items-center gap-2">
-              <AlertCircle className="text-destructive h-5 w-5" />
-              <p className="text-destructive text-sm font-medium">{error?.message || String(error)}</p>
+        <div className="container mx-auto max-w-4xl">
+          {/* Error State */}
+          {error && (
+            <div className="border-destructive bg-destructive/10 mt-4 border-l-4 p-3 md:mt-6 md:p-4">
+              <div className="flex items-center gap-2">
+                <AlertCircle className="text-destructive h-5 w-5" />
+                <p className="text-destructive text-sm font-medium">{error?.message || String(error)}</p>
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Posts List */}
-        <PostList
-          posts={posts}
-          onLoadMore={loadMore}
-          hasMore={hasMore}
-          loading={loading}
-          filterType={filter.type}
-        />
+          {/* Posts List */}
+          <PostList
+            posts={posts}
+            onLoadMore={loadMore}
+            hasMore={hasMore}
+            loading={loading}
+            filterType={filter.type}
+          />
+        </div>
       </div>
     </div>
   );

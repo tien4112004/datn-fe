@@ -75,8 +75,8 @@ export const PostList = ({
           : 'feed.list.empty.all';
 
     return (
-      <div className={`px-4 py-8 text-center md:py-12 ${className}`}>
-        <div className="mb-4 text-gray-400">
+      <div className={`py-12 text-center md:py-16 ${className}`}>
+        <div className="text-muted-foreground mb-4">
           <svg
             className="mx-auto h-12 w-12 md:h-16 md:w-16"
             fill="none"
@@ -91,8 +91,8 @@ export const PostList = ({
             />
           </svg>
         </div>
-        <h3 className="mb-2 text-lg font-medium text-gray-900">{t(`${emptyStateKey}.title`)}</h3>
-        <p className="text-gray-500">{t(`${emptyStateKey}.description`)}</p>
+        <h3 className="mb-2 text-lg font-medium">{t(`${emptyStateKey}.title`)}</h3>
+        <p className="text-muted-foreground text-sm">{t(`${emptyStateKey}.description`)}</p>
       </div>
     );
   }
@@ -117,7 +117,7 @@ export const PostList = ({
                 exit={{ opacity: 0, scaleY: 0 }}
                 transition={{ duration: 0.2, ease: 'easeInOut' }}
                 style={{ transformOrigin: 'top' }}
-                className="bg-muted/20 border-b px-3 py-3 pl-9 md:px-6 md:py-4 md:pl-14"
+                className="bg-muted/10 border-b border-t px-3 py-4 pl-9 md:px-6 md:py-6 md:pl-14"
               >
                 <CommentThread postId={post.id} />
               </motion.div>
@@ -128,11 +128,11 @@ export const PostList = ({
 
       {/* Load More Button */}
       {hasMore && (
-        <div className="py-6 text-center">
+        <div className="border-t py-6 text-center">
           <button
             onClick={onLoadMore}
             disabled={loading}
-            className="rounded-lg bg-gray-100 px-6 py-3 font-medium text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+            className="hover:bg-muted focus:ring-primary rounded-lg px-6 py-3 font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {loading ? t('feed.list.loadingMore') : t('feed.list.loadMore')}
           </button>

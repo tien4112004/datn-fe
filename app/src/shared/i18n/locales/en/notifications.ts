@@ -38,6 +38,12 @@ export default {
     loading: 'Loading notifications...',
     empty: 'No notifications yet',
   },
+  dropdown: {
+    title: 'Notifications',
+    markAllAsRead: 'Mark all read',
+    empty: 'No notifications yet',
+    viewAll: 'View all notifications',
+  },
   pagination: {
     previous: 'Previous',
     next: 'Next',

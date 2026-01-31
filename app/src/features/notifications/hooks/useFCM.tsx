@@ -1,4 +1,5 @@
 import { useEffect, useCallback, useRef } from 'react';
+import { ExternalLink } from 'lucide-react';
 import { toast } from 'sonner';
 import {
   isNotificationSupported,
@@ -8,6 +9,36 @@ import {
 } from '@/shared/config/firebase';
 import { useNotificationStore } from '../stores/notificationStore';
 import { useRegisterDevice } from './useApi';
+
+function getUrlFromNotificationData(data: Record<string, string> | undefined): string {
+  if (!data) return '/notifications';
+
+  const { type, referenceId } = data;
+
+  if (type && referenceId) {
+    switch (type) {
+      case 'POST':
+      case 'ANNOUNCEMENT':
+        return `/classes/${referenceId}`;
+      case 'ASSIGNMENT':
+        return `/assignments/${referenceId}`;
+      case 'GRADE':
+        return `/grades/${referenceId}`;
+      case 'SHARED_PRESENTATION':
+        return `/presentation/${referenceId}`;
+      case 'SHARED_MINDMAP':
+        return `/mindmap/${referenceId}`;
+      default:
+        return '/notifications';
+    }
+  }
+
+  if (data.url) {
+    return data.url;
+  }
+
+  return '/notifications';
+}
 
 export function useFCM() {
   const {
@@ -28,40 +59,21 @@ export function useFCM() {
     }
 
     try {
-      const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
-      console.log('Service Worker registered:', registration);
-
-      // Send Firebase config to service worker
-      if (registration.active) {
-        registration.active.postMessage({
-          type: 'FIREBASE_CONFIG',
-          config: {
-            apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-            authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-            projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-            storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-            messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-            appId: import.meta.env.VITE_FIREBASE_APP_ID,
-          },
-        });
-      }
-
-      // Wait for service worker to be ready
-      navigator.serviceWorker.ready.then((reg) => {
-        reg.active?.postMessage({
-          type: 'FIREBASE_CONFIG',
-          config: {
-            apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-            authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-            projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-            storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-            messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-            appId: import.meta.env.VITE_FIREBASE_APP_ID,
-          },
-        });
+      // Pass Firebase config via URL search params so it's available immediately
+      // when the service worker loads (required for push event handlers)
+      const params = new URLSearchParams({
+        apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+        authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+        projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+        storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+        messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+        appId: import.meta.env.VITE_FIREBASE_APP_ID,
       });
-    } catch (error) {
-      console.error('Service Worker registration failed:', error);
+
+      const swUrl = `/firebase-messaging-sw.js?${params.toString()}`;
+      await navigator.serviceWorker.register(swUrl);
+    } catch {
+      // Service worker registration failed
     }
   }, []);
 
@@ -99,22 +111,17 @@ export function useFCM() {
       try {
         await registerDevice.mutateAsync({ token });
         setIsRegistered(true);
-        console.log('Device registered with backend');
-      } catch (error) {
-        console.error('Failed to register device with backend:', error);
+      } catch {
+        // Failed to register device
       }
     },
     [isRegistered, registerDevice, setIsRegistered]
   );
 
   const initialize = useCallback(async () => {
-    // If already have a token and registered, just setup foreground listener
     if (fcmToken && isRegistered) {
-      console.log('[useFCM] Already registered with token:', fcmToken);
       return;
     }
-
-    console.log('[useFCM] Starting initialization...');
 
     // Request permission and get token
     const token = await requestPermissionAndGetToken();
@@ -126,29 +133,27 @@ export function useFCM() {
   // Setup foreground message listener
   useEffect(() => {
     if (!fcmToken) {
-      console.log('[useFCM] No fcmToken, skipping listener setup');
       return;
     }
 
-    console.log('[useFCM] Setting up foreground listener with token:', fcmToken.substring(0, 20) + '...');
-
     const unsubscribe = onForegroundMessage((payload) => {
-      console.log('[useFCM] Foreground message received:', payload);
-
       const title = payload.notification?.title || 'New Notification';
       const body = payload.notification?.body || '';
+      const url = getUrlFromNotificationData(payload.data);
 
-      // Show toast notification for foreground messages
       toast(title, {
         description: body,
-        duration: 5000,
+        closeButton: true,
+        duration: Infinity,
+        classNames: {
+          actionButton: '!bg-transparent !text-primary hover:!bg-primary/10 ',
+        },
+        action: {
+          label: <ExternalLink className="size-4" />,
+          onClick: () => (window.location.href = url),
+        },
       });
     });
-
-    console.log(
-      '[useFCM] Listener result:',
-      unsubscribe ? 'subscribed successfully' : 'FAILED - null returned'
-    );
 
     if (unsubscribe) {
       unsubscribeRef.current = unsubscribe;
@@ -156,7 +161,6 @@ export function useFCM() {
 
     return () => {
       if (unsubscribeRef.current) {
-        console.log('[useFCM] Cleaning up foreground listener');
         unsubscribeRef.current();
         unsubscribeRef.current = null;
       }

@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { Check, Loader2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/shared/components/ui/button';
 import { ScrollArea } from '@/shared/components/ui/scroll-area';
 import { Separator } from '@/shared/components/ui/separator';
@@ -12,6 +13,7 @@ interface NotificationDropdownProps {
 }
 
 export function NotificationDropdown({ onClose }: NotificationDropdownProps) {
+  const { t } = useTranslation('notifications', { keyPrefix: 'dropdown' });
   const navigate = useNavigate();
   const { data, isLoading } = useNotifications(0, 5);
   const { data: unreadData } = useUnreadCount();
@@ -62,7 +64,7 @@ export function NotificationDropdown({ onClose }: NotificationDropdownProps) {
   return (
     <div className="w-80">
       <div className="flex items-center justify-between px-4 py-3">
-        <h3 className="font-semibold">Notifications</h3>
+        <h3 className="font-semibold">{t('title')}</h3>
         {unreadCount > 0 && (
           <Button
             variant="ghost"
@@ -76,7 +78,7 @@ export function NotificationDropdown({ onClose }: NotificationDropdownProps) {
             ) : (
               <Check className="mr-1 h-3 w-3" />
             )}
-            Mark all read
+            {t('markAllAsRead')}
           </Button>
         )}
       </div>
@@ -88,7 +90,7 @@ export function NotificationDropdown({ onClose }: NotificationDropdownProps) {
           </div>
         ) : notifications.length === 0 ? (
           <div className="text-muted-foreground flex h-[200px] items-center justify-center text-sm">
-            No notifications yet
+            {t('empty')}
           </div>
         ) : (
           <div className="p-2">
@@ -105,7 +107,7 @@ export function NotificationDropdown({ onClose }: NotificationDropdownProps) {
       <Separator />
       <div className="p-2">
         <Button variant="ghost" className="w-full" onClick={handleViewAll}>
-          View all notifications
+          {t('viewAll')}
         </Button>
       </div>
     </div>

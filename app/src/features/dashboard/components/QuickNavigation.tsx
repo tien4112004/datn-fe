@@ -59,22 +59,22 @@ export const QuickNavigation = () => {
 
   return (
     <div className="w-full">
-      <h2 className="mb-6 text-2xl font-semibold">{t('quickNav.title')}</h2>
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
+      <h2 className="mb-4 text-xl font-semibold sm:mb-6 sm:text-2xl">{t('quickNav.title')}</h2>
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-3 xl:grid-cols-5">
         {navigationItems.map((item) => {
           const Icon = item.icon;
           return (
             <Link
               key={item.path}
               to={item.path}
-              className={`group flex flex-col items-center justify-center gap-3 rounded-xl border p-6 transition-all ${item.bgColor} ${item.hoverBg}`}
+              className={`group flex flex-col items-center justify-center gap-2 rounded-xl border p-4 transition-all sm:gap-3 sm:p-6 ${item.bgColor} ${item.hoverBg}`}
             >
               <div
-                className={`flex h-12 w-12 items-center justify-center rounded-full bg-white/80 dark:bg-black/20 ${item.iconColor}`}
+                className={`flex h-10 w-10 items-center justify-center rounded-full bg-white/80 sm:h-12 sm:w-12 dark:bg-black/20 ${item.iconColor}`}
               >
-                <Icon className="h-6 w-6" />
+                <Icon className="h-5 w-5 sm:h-6 sm:w-6" />
               </div>
-              <span className="text-center text-sm font-medium">{t(item.labelKey)}</span>
+              <span className="text-center text-xs font-medium sm:text-sm">{t(item.labelKey)}</span>
             </Link>
           );
         })}

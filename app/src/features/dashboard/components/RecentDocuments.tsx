@@ -42,13 +42,13 @@ export const RecentDocuments = () => {
   if (isLoading) {
     return (
       <div className="w-full">
-        <h2 className="mb-6 text-2xl font-semibold">{t('recentDocuments.title')}</h2>
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
+        <h2 className="mb-4 text-xl font-semibold sm:mb-6 sm:text-2xl">{t('recentDocuments.title')}</h2>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-3 xl:grid-cols-5">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="bg-card flex flex-col rounded-lg border p-4">
-              <div className="bg-muted mb-3 aspect-video w-full animate-pulse rounded-md" />
-              <div className="bg-muted mb-2 h-4 w-3/4 animate-pulse rounded" />
-              <div className="bg-muted h-3 w-1/2 animate-pulse rounded" />
+            <div key={i} className="bg-card flex flex-col rounded-lg border p-3 sm:p-4">
+              <div className="bg-muted mb-2 aspect-video w-full animate-pulse rounded-md sm:mb-3" />
+              <div className="bg-muted mb-2 h-3 w-3/4 animate-pulse rounded sm:h-4" />
+              <div className="bg-muted h-2 w-1/2 animate-pulse rounded sm:h-3" />
             </div>
           ))}
         </div>
@@ -58,17 +58,17 @@ export const RecentDocuments = () => {
 
   return (
     <div className="w-full">
-      <h2 className="mb-6 text-2xl font-semibold">{t('recentDocuments.title')}</h2>
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
+      <h2 className="mb-4 text-xl font-semibold sm:mb-6 sm:text-2xl">{t('recentDocuments.title')}</h2>
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-3 xl:grid-cols-5">
         {documents.map((doc) => {
           const Icon = documentTypeIcons[doc.type] || Presentation;
           return (
             <Link
               key={doc.id}
               to={buildPath(doc)}
-              className="hover:bg-muted/50 bg-card group flex flex-col rounded-lg border p-4 transition-colors"
+              className="hover:bg-muted/50 bg-card group flex flex-col rounded-lg border p-3 transition-colors sm:p-4"
             >
-              <div className="bg-muted mb-3 aspect-video w-full overflow-hidden rounded-md">
+              <div className="bg-muted mb-2 aspect-video w-full overflow-hidden rounded-md sm:mb-3">
                 {doc.thumbnail ? (
                   <img
                     src={doc.thumbnail}
@@ -77,12 +77,14 @@ export const RecentDocuments = () => {
                   />
                 ) : (
                   <div className="flex h-full items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
-                    <Icon className="text-muted-foreground h-12 w-12" />
+                    <Icon className="text-muted-foreground h-8 w-8 sm:h-12 sm:w-12" />
                   </div>
                 )}
               </div>
-              <h3 className="mb-1 truncate text-sm font-medium">{doc.title}</h3>
-              <p className="text-muted-foreground text-xs">{formatDate(doc.updatedAt)}</p>
+              <h3 className="mb-1 line-clamp-2 text-xs font-medium sm:text-sm">{doc.title}</h3>
+              <p className="text-muted-foreground truncate text-[10px] sm:text-xs">
+                {formatDate(doc.updatedAt)}
+              </p>
             </Link>
           );
         })}

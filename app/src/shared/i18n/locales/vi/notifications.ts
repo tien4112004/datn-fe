@@ -39,6 +39,12 @@ export default {
     loading: 'Đang tải thông báo...',
     empty: 'Chưa có thông báo nào',
   },
+  dropdown: {
+    title: 'Thông báo',
+    markAllAsRead: 'Đánh dấu đã đọc',
+    empty: 'Chưa có thông báo nào',
+    viewAll: 'Xem tất cả thông báo',
+  },
   pagination: {
     previous: 'Trước',
     next: 'Tiếp',

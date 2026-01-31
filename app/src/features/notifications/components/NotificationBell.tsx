@@ -1,4 +1,5 @@
 import { Bell } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/shared/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/shared/components/ui/popover';
 import { useUnreadCount } from '../hooks/useApi';
@@ -6,6 +7,7 @@ import { NotificationDropdown } from './NotificationDropdown';
 import { useState } from 'react';
 
 export function NotificationBell() {
+  const { t } = useTranslation('notifications', { keyPrefix: 'dropdown' });
   const [open, setOpen] = useState(false);
   const { data } = useUnreadCount();
   const unreadCount = data?.count ?? 0;
@@ -20,7 +22,7 @@ export function NotificationBell() {
               {unreadCount > 99 ? '99+' : unreadCount}
             </span>
           )}
-          <span className="sr-only">Notifications</span>
+          <span className="sr-only">{t('title')}</span>
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="end">

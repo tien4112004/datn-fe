@@ -1,48 +1,99 @@
 /* eslint-disable no-undef */
-importScripts('https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js');
-importScripts('https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/11.0.0/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/11.0.0/firebase-messaging-compat.js');
 
-// Initialize Firebase with placeholder config
-// The actual config will be passed via postMessage from the main app
+// Get config from URL params (available during registration)
+const params = new URLSearchParams(self.location.search);
 let firebaseConfig = null;
 
-self.addEventListener('message', (event) => {
-  if (event.data && event.data.type === 'FIREBASE_CONFIG') {
-    firebaseConfig = event.data.config;
-    initializeFirebase();
-  }
-});
+if (params.get('apiKey')) {
+  firebaseConfig = {
+    apiKey: params.get('apiKey'),
+    authDomain: params.get('authDomain'),
+    projectId: params.get('projectId'),
+    storageBucket: params.get('storageBucket'),
+    messagingSenderId: params.get('messagingSenderId'),
+    appId: params.get('appId'),
+  };
 
-function initializeFirebase() {
-  if (!firebaseConfig) {
+  // Save to IndexedDB for future loads
+  saveConfigToDB(firebaseConfig).catch(() => {});
+}
+
+// IndexedDB helpers
+function openDB() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open('firebase-messaging-sw', 1);
+    request.onerror = () => reject(request.error);
+    request.onsuccess = () => resolve(request.result);
+    request.onupgradeneeded = (event) => {
+      const db = event.target.result;
+      if (!db.objectStoreNames.contains('config')) {
+        db.createObjectStore('config');
+      }
+    };
+  });
+}
+
+async function saveConfigToDB(config) {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction('config', 'readwrite');
+    tx.objectStore('config').put(config, 'firebaseConfig');
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
+async function getConfigFromDB() {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction('config', 'readonly');
+    const request = tx.objectStore('config').get('firebaseConfig');
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+function handleBackgroundMessage(payload) {
+  const notificationTitle = payload.notification?.title || 'New Notification';
+  const notificationOptions = {
+    body: payload.notification?.body || '',
+    icon: '/favicon.svg',
+    badge: '/favicon.svg',
+    data: payload.data,
+    tag: payload.data?.tag || 'default',
+  };
+
+  self.registration.showNotification(notificationTitle, notificationOptions);
+}
+
+// Async initialization fallback for when config isn't in URL params
+async function initializeFromDB() {
+  if (firebase.apps.length > 0) {
     return;
   }
 
-  if (firebase.apps.length === 0) {
-    firebase.initializeApp(firebaseConfig);
-  } else {
-    // If it already exists, we might want to check if config changed, but for now just reuse/re-init
-    // Note: firebase-compat usually handles singleton, but explicit check avoids error
-    // If we strictly need to re-init with new config, we'd need to delete app first.
-    // But usually we just want to avoid the crash.
-    console.log('[firebase-messaging-sw.js] Firebase already initialized');
+  try {
+    const config = await getConfigFromDB();
+    if (config && config.apiKey) {
+      firebase.initializeApp(config);
+      const messaging = firebase.messaging();
+      messaging.onBackgroundMessage(handleBackgroundMessage);
+    }
+  } catch {
+    // Failed to initialize from IndexedDB
   }
+}
+
+// Synchronous initialization if config available from URL params
+if (firebaseConfig) {
+  firebase.initializeApp(firebaseConfig);
   const messaging = firebase.messaging();
-
-  messaging.onBackgroundMessage((payload) => {
-    console.log('[firebase-messaging-sw.js] Received background message:', payload);
-
-    const notificationTitle = payload.notification?.title || 'New Notification';
-    const notificationOptions = {
-      body: payload.notification?.body || '',
-      icon: '/favicon.svg',
-      badge: '/favicon.svg',
-      data: payload.data,
-      tag: payload.data?.tag || 'default',
-    };
-
-    self.registration.showNotification(notificationTitle, notificationOptions);
-  });
+  messaging.onBackgroundMessage(handleBackgroundMessage);
+} else {
+  // Fallback: try to load from IndexedDB
+  initializeFromDB();
 }
 
 // Compute URL from notification type and referenceId
@@ -69,7 +120,6 @@ function getUrlFromNotificationData(data) {
     }
   }
 
-  // Fallback: legacy url field
   if (data.url) {
     return data.url;
   }
@@ -79,14 +129,12 @@ function getUrlFromNotificationData(data) {
 
 // Handle notification click
 self.addEventListener('notificationclick', (event) => {
-  console.log('[firebase-messaging-sw.js] Notification click received:', event);
   event.notification.close();
 
   const urlToOpen = getUrlFromNotificationData(event.notification.data);
 
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
-      // If a window is already open, focus it and navigate
       for (const client of clientList) {
         if (client.url.includes(self.location.origin) && 'focus' in client) {
           client.focus();
@@ -94,7 +142,6 @@ self.addEventListener('notificationclick', (event) => {
           return;
         }
       }
-      // Otherwise, open a new window
       if (clients.openWindow) {
         return clients.openWindow(urlToOpen);
       }

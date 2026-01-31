@@ -69,13 +69,10 @@ export async function getFCMToken(): Promise<string | null> {
 
 export function onForegroundMessage(callback: (payload: any) => void): (() => void) | null {
   const messaging = getFirebaseMessaging();
-  console.log('[Firebase] onForegroundMessage - messaging instance:', messaging);
   if (!messaging) {
-    console.error('[Firebase] Messaging is null! Cannot subscribe to messages.');
     return null;
   }
 
-  console.log('[Firebase] Subscribing to onMessage...');
   return onMessage(messaging, callback);
 }
 

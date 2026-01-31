@@ -109,7 +109,7 @@
         </template>
         <Button class="menu-item" v-tooltip="$t('header.presentation.slideShow')">
           <IconPpt />
-          {{ $t('header.buttons.present') }}
+          <span class="tw-hidden sm:tw-inline">{{ $t('header.buttons.present') }}</span>
         </Button>
       </Popover>
 
@@ -119,7 +119,7 @@
         </template>
         <Button class="menu-item" v-tooltip="$t('header.share.sharePresentation')">
           <IconShare class="icon" />
-          {{ $t('header.buttons.share') }}
+          <span class="tw-hidden sm:tw-inline">{{ $t('header.buttons.share') }}</span>
         </Button>
       </Popover>
       <Button
@@ -129,7 +129,7 @@
         @click="handleOpenComments"
       >
         <IconComments class="icon" />
-        {{ $t('header.buttons.comments') }}
+        <span class="tw-hidden sm:tw-inline">{{ $t('header.buttons.comments') }}</span>
       </Button>
       <Button
         v-if="!hideStudentOptions"
@@ -138,7 +138,7 @@
         @click="handleRequestDuplicate"
       >
         <IconCopy class="icon" />
-        {{ $t('header.buttons.duplicate') }}
+        <span class="tw-hidden sm:tw-inline">{{ $t('header.buttons.duplicate') }}</span>
       </Button>
       <Button
         v-if="!hideStudentOptions"
@@ -147,7 +147,7 @@
         @click="setDialogForExport('pptx')"
       >
         <IconDownload class="icon" />
-        {{ $t('header.share.export') }}
+        <span class="tw-hidden sm:tw-inline">{{ $t('header.share.export') }}</span>
       </Button>
       <div class="menu-item" id="language-switcher">
         <LanguageSwitcher />
@@ -317,7 +317,8 @@ const navigateToList = () => {
       new CustomEvent('app.presentation.navigate', {
         detail: { path: '/student/classes' },
       })
-    );  } else {
+    );
+  } else {
     window.dispatchEvent(
       new CustomEvent('app.presentation.navigate', {
         detail: { path: '/projects?type=presentation' },

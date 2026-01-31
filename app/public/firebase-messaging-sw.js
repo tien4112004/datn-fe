@@ -45,22 +45,52 @@ function initializeFirebase() {
   });
 }
 
+// Compute URL from notification type and referenceId
+function getUrlFromNotificationData(data) {
+  if (!data) return '/notifications';
+
+  const { type, referenceId } = data;
+
+  if (type && referenceId) {
+    switch (type) {
+      case 'POST':
+      case 'ANNOUNCEMENT':
+        return `/classes/${referenceId}`;
+      case 'ASSIGNMENT':
+        return `/assignments/${referenceId}`;
+      case 'GRADE':
+        return `/grades/${referenceId}`;
+      case 'SHARED_PRESENTATION':
+        return `/presentation/${referenceId}`;
+      case 'SHARED_MINDMAP':
+        return `/mindmap/${referenceId}`;
+      default:
+        return '/notifications';
+    }
+  }
+
+  // Fallback: legacy url field
+  if (data.url) {
+    return data.url;
+  }
+
+  return '/notifications';
+}
+
 // Handle notification click
 self.addEventListener('notificationclick', (event) => {
   console.log('[firebase-messaging-sw.js] Notification click received:', event);
   event.notification.close();
 
-  const urlToOpen = event.notification.data?.url || '/';
+  const urlToOpen = getUrlFromNotificationData(event.notification.data);
 
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
-      // If a window is already open, focus it
+      // If a window is already open, focus it and navigate
       for (const client of clientList) {
         if (client.url.includes(self.location.origin) && 'focus' in client) {
           client.focus();
-          if (event.notification.data?.url) {
-            client.navigate(urlToOpen);
-          }
+          client.navigate(urlToOpen);
           return;
         }
       }

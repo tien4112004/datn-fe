@@ -36,6 +36,12 @@ export function NotificationDropdown({ onClose }: NotificationDropdownProps) {
         case 'GRADE':
           navigate(`/grades/${notification.referenceId}`);
           break;
+        case 'SHARED_PRESENTATION':
+          navigate(`/presentation/${notification.referenceId}`);
+          break;
+        case 'SHARED_MINDMAP':
+          navigate(`/mindmap/${notification.referenceId}`);
+          break;
         default:
           navigate('/notifications');
       }

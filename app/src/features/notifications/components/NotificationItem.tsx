@@ -6,6 +6,8 @@ import {
   Clock,
   Settings,
   ClipboardList,
+  Presentation,
+  Network,
 } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import type { AppNotification, NotificationType } from '../types';
@@ -23,6 +25,8 @@ const typeIcons: Record<NotificationType, React.ElementType> = {
   ANNOUNCEMENT: Megaphone,
   REMINDER: Clock,
   SYSTEM: Settings,
+  SHARED_PRESENTATION: Presentation,
+  SHARED_MINDMAP: Network,
 };
 
 const typeColors: Record<NotificationType, string> = {
@@ -33,6 +37,8 @@ const typeColors: Record<NotificationType, string> = {
   ANNOUNCEMENT: 'text-red-500 bg-red-100 dark:bg-red-900/30',
   REMINDER: 'text-yellow-500 bg-yellow-100 dark:bg-yellow-900/30',
   SYSTEM: 'text-gray-500 bg-gray-100 dark:bg-gray-900/30',
+  SHARED_PRESENTATION: 'text-pink-500 bg-pink-100 dark:bg-pink-900/30',
+  SHARED_MINDMAP: 'text-indigo-500 bg-indigo-100 dark:bg-indigo-900/30',
 };
 
 function formatTimeAgo(dateString: string): string {

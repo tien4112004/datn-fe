@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNotificationApiService } from '../api';
 import type { RegisterDeviceRequest, SendNotificationRequest } from '../types';
+import { useAuth } from '@/shared/context/auth';
 
 export const notificationQueryKeys = {
   all: ['notifications'] as const,
@@ -26,20 +27,24 @@ export function useSendNotification() {
 
 export function useNotifications(page = 0, size = 20) {
   const notificationService = useNotificationApiService();
+  const { isAuthenticated } = useAuth();
 
   return useQuery({
     queryKey: notificationQueryKeys.list(page, size),
     queryFn: () => notificationService.getNotifications(page, size),
+    enabled: isAuthenticated,
   });
 }
 
 export function useUnreadCount() {
   const notificationService = useNotificationApiService();
+  const { isAuthenticated } = useAuth();
 
   return useQuery({
     queryKey: notificationQueryKeys.unreadCount(),
     queryFn: () => notificationService.getUnreadCount(),
-    refetchInterval: 60000, // Refetch every 60 seconds
+    refetchInterval: isAuthenticated ? 60000 : false, // Refetch every 60 seconds if authenticated
+    enabled: isAuthenticated,
   });
 }
 

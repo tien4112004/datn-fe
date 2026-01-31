@@ -16,7 +16,9 @@ export type NotificationType =
   | 'GRADE'
   | 'ANNOUNCEMENT'
   | 'REMINDER'
-  | 'SYSTEM';
+  | 'SYSTEM'
+  | 'SHARED_PRESENTATION'
+  | 'SHARED_MINDMAP';
 
 export interface AppNotification {
   id: string;

@@ -10,6 +10,17 @@ export const IMAGE_DIMENSION_OPTIONS = [
   { value: '1024x1536', labelKey: '1024x1536' },
 ];
 
+// Convert size string (e.g., "1024x1024") to aspect ratio (e.g., "1:1")
+export const convertSizeToAspectRatio = (size: string): string => {
+  const [width, height] = size.split('x').map(Number);
+
+  // Calculate GCD to simplify ratio
+  const gcd = (a: number, b: number): number => (b === 0 ? a : gcd(b, a % b));
+  const divisor = gcd(width, height);
+
+  return `${width / divisor}:${height / divisor}`;
+};
+
 export const ART_STYLE_OPTIONS: ArtStyle[] = [
   {
     id: '',

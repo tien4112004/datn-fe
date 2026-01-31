@@ -13,9 +13,14 @@ import type { ImageData } from '../types/service';
 const COLUMN_SIZES = [150, 200, 250, 300, 350, 400];
 const DEFAULT_COLUMN_INDEX = 3; // 300px
 
-const ImageGalleryContent = () => {
+interface ImageGalleryContentProps {
+  initialImage?: ImageData;
+}
+
+const ImageGalleryContent = ({ initialImage }: ImageGalleryContentProps) => {
   const { t } = useTranslation('image');
   const loadMoreRef = useRef<HTMLDivElement>(null);
+  const hasOpenedInitialImage = useRef(false);
   const location = useLocation();
   const { images, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useImageManager();
   const { openPreview } = useImagePreview();
@@ -37,15 +42,21 @@ const ImageGalleryContent = () => {
     }
   };
 
-  // Handle auto-open from CreateImagePage navigation
+  // Handle auto-open from initialImage prop or location state
   useEffect(() => {
-    const state = location.state as { newImage?: ImageData; openPreview?: boolean } | null;
-    if (state?.newImage && state?.openPreview) {
-      openPreview(state.newImage);
-      // Clear the state to prevent re-opening on navigation
-      window.history.replaceState({}, document.title);
+    if (initialImage && !hasOpenedInitialImage.current) {
+      // Open preview for the provided image only once
+      openPreview(initialImage);
+      hasOpenedInitialImage.current = true;
+    } else if (!initialImage) {
+      const state = location.state as { newImage?: ImageData; openPreview?: boolean } | null;
+      if (state?.newImage && state?.openPreview) {
+        openPreview(state.newImage);
+        // Clear the state to prevent re-opening on navigation
+        window.history.replaceState({}, document.title);
+      }
     }
-  }, [location.state, openPreview]);
+  }, [initialImage, location.state, openPreview]);
 
   // Intersection Observer for infinite scroll
   useEffect(() => {
@@ -134,10 +145,10 @@ const ImageGalleryContent = () => {
   );
 };
 
-const ImageGalleryPage = () => {
+const ImageGalleryPage = ({ initialImage }: { initialImage?: ImageData }) => {
   return (
     <ImagePreviewProvider>
-      <ImageGalleryContent />
+      <ImageGalleryContent initialImage={initialImage} />
     </ImagePreviewProvider>
   );
 };

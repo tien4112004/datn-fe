@@ -9,20 +9,9 @@ export default {
   errors: {
     general: 'Error',
     invalidAccess: 'Invalid Access',
-    lessonsRequirePeriod: 'Lessons must be created for a specific period.',
     failedToLoadPeriodDetails: 'Failed to load period details.',
-    failedToLoadLessonDetails: 'Failed to load lesson details.',
     periodNotFound: 'Period not found',
     periodNotFoundDescription: 'The requested period could not be found.',
-    lessonNotFound: 'Lesson not found',
-    lessonNotFoundDescription: 'The requested lesson could not be found.',
-  },
-
-  controls: {
-    viewToggle: {
-      listView: 'List view',
-      gridView: 'Grid view',
-    },
   },
 
   form: {
@@ -35,14 +24,13 @@ export default {
     // Field labels
     name: 'Class Name',
     grade: 'Grade',
-    academicYear: 'Academic Year',
+    includeAcademicYear: 'Include Academic Year',
     class: 'Class',
     description: 'Description',
 
     // Placeholders
-    namePlaceholder: 'e.g., Class 10A',
-    gradePlaceholder: '10',
-    academicYearPlaceholder: '2024-2025',
+    namePlaceholder: 'e.g., Class 5A',
+    gradePlaceholder: '5',
     classPlaceholder: 'e.g., Room 301',
     descriptionPlaceholder: 'Add a brief description about this class...',
 
@@ -66,17 +54,6 @@ export default {
     academicYearInvalid: 'Academic year must be in format YYYY-YYYY (e.g., 2024-2025)',
     classTooLong: 'Class must be 100 characters or less',
     descriptionTooLong: 'Description must be 500 characters or less',
-    // Lesson validation messages
-    lesson: {
-      titleRequired: 'Title is required',
-      subjectNameRequired: 'Subject name is required',
-      subjectCodeRequired: 'Subject code is required',
-      objectiveDescriptionRequired: 'Objective description is required',
-      objectiveTypeRequired: 'Objective type is required',
-      atLeastOneObjective: 'At least one objective is required',
-      resourceNameRequired: 'Resource name is required',
-      resourceTypeRequired: 'Resource type is required',
-    },
   },
 
   modals: {
@@ -111,7 +88,6 @@ export default {
       feed: 'Feed',
       teaching: 'Teaching',
       schedule: 'Schedule',
-      lessons: 'Lessons',
       overview: 'Overview',
       students: 'Students',
       settings: 'Settings',
@@ -192,35 +168,30 @@ export default {
     },
     noClasses: 'No classes found',
   },
-  grid: {
-    academicYear: 'Academic Year',
-    enrollment: 'Enrollment',
-    class: 'Class',
-    actions: {
-      manageStudents: 'Manage Students',
-    },
-    error: 'Failed to load classes',
-    noClasses: 'No classes found',
-    pagination: {
-      showing: 'Showing {{start}} to {{end}} of {{total}} classes',
-    },
-  },
   filters: {
     search: {
       placeholder: 'Search by class name...',
+      label: 'Search',
     },
     grade: {
       placeholder: 'Select grade',
+      label: 'Grade',
+      all: 'All Grades',
     },
     academicYear: {
       placeholder: 'Select academic year',
+      label: 'Academic Year',
+      all: 'All Years',
     },
     status: {
       placeholder: 'Select status',
+      label: 'Status',
+      all: 'All Statuses',
       active: 'Active',
       inactive: 'Inactive',
     },
-    clearFilters: 'Clear Filters',
+    clearAll: 'Clear All',
+    activeFilters: 'Active filters',
   },
   dashboard: {
     today: {
@@ -228,26 +199,19 @@ export default {
       urgentTasks: 'urgent tasks',
       stats: {
         periodsToday: 'Periods Today',
-        lessonsCompleted: 'Lessons Completed',
         objectivesAchieved: 'Objectives Achieved',
         resourcesPrepared: 'Resources Prepared',
       },
       tabs: {
         overview: 'Overview',
         schedule: 'Schedule',
-        lessons: 'Lessons',
         objectives: 'Objectives',
         resources: 'Resources',
       },
       quickActions: 'Quick Actions',
       actions: {
-        startCurrentLesson: 'Start Current Lesson',
-        prepareNextLesson: 'Prepare Next Lesson',
         reviewObjectives: 'Review Objectives',
       },
-      noCurrentLesson: 'No current lesson',
-      selectLessonToViewObjectives: 'Select a lesson to view objectives',
-      selectLessonToViewResources: 'Select a lesson to view resources',
       todayObjectivesSummary: "Today's Objectives Summary",
       todayResourcesSummary: "Today's Resources Summary",
       achieved: 'achieved',

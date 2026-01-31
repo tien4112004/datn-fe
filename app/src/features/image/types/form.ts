@@ -6,5 +6,6 @@ export interface CreateImageFormData {
   };
   imageDimension: string;
   artStyle: string;
+  artDescription: string;
   negativePrompt: string;
 }

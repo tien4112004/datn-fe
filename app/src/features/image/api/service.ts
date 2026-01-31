@@ -76,6 +76,7 @@ export default class ImageService implements ImageApiService {
         prompt: request.prompt,
         model: request.model,
         provider: request.provider.toLowerCase(),
+        aspectRatio: request.aspectRatio || '1:1',
         themeStyle: request.themeStyle,
         themeDescription: request.themeDescription,
         artStyle: request.artStyle,

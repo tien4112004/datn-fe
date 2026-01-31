@@ -9,20 +9,9 @@ export default {
   errors: {
     general: 'Lỗi',
     invalidAccess: 'Truy cập không hợp lệ',
-    lessonsRequirePeriod: 'bài học phải được tạo cho một tiết học cụ thể.',
     failedToLoadPeriodDetails: 'Không thể tải chi tiết tiết học.',
-    failedToLoadLessonDetails: 'Không thể tải chi tiết bài học.',
     periodNotFound: 'Không tìm thấy tiết học',
     periodNotFoundDescription: 'Không thể tìm thấy tiết học được yêu cầu.',
-    lessonNotFound: 'Không tìm thấy bài học',
-    lessonNotFoundDescription: 'Không thể tìm thấy bài học được yêu cầu.',
-  },
-
-  controls: {
-    viewToggle: {
-      listView: 'Chế độ danh sách',
-      gridView: 'Chế độ lưới',
-    },
   },
 
   form: {
@@ -35,14 +24,13 @@ export default {
     // Field labels
     name: 'Tên lớp',
     grade: 'Khối',
-    academicYear: 'Năm học',
+    includeAcademicYear: 'Bao gồm năm học',
     class: 'Phòng học',
     description: 'Mô tả',
 
     // Placeholders
-    namePlaceholder: 'ví dụ: Lớp 10A',
-    gradePlaceholder: '10',
-    academicYearPlaceholder: '2024-2025',
+    namePlaceholder: 'ví dụ: Lớp 5A',
+    gradePlaceholder: '5',
     classPlaceholder: 'ví dụ: Phòng 301',
     descriptionPlaceholder: 'Thêm mô tả ngắn gọn về lớp học này...',
 
@@ -104,7 +92,6 @@ export default {
       feed: 'Bảng tin',
       teaching: 'Giảng dạy',
       schedule: 'Lịch biểu',
-      lessons: 'Bài học',
       overview: 'Tổng quan',
       students: 'Học sinh',
       settings: 'Cài đặt',
@@ -201,19 +188,27 @@ export default {
   filters: {
     search: {
       placeholder: 'Tìm kiếm theo tên lớp...',
+      label: 'Tìm kiếm',
     },
     grade: {
       placeholder: 'Chọn khối',
+      label: 'Khối',
+      all: 'Tất cả khối',
     },
     academicYear: {
       placeholder: 'Chọn năm học',
+      label: 'Năm học',
+      all: 'Tất cả năm',
     },
     status: {
       placeholder: 'Chọn trạng thái',
+      label: 'Trạng thái',
+      all: 'Tất cả',
       active: 'Hoạt động',
       inactive: 'Không hoạt động',
     },
-    clearFilters: 'Xóa bộ lọc',
+    clearAll: 'Xóa tất cả',
+    activeFilters: 'Bộ lọc đang áp dụng',
   },
   dashboard: {
     today: {

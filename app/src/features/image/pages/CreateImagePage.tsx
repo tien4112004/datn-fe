@@ -7,14 +7,20 @@ import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
 import { useForm, Controller } from 'react-hook-form';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import AdvancedOptions from '@/features/image/components/AdvancedOptions';
-import type { CreateImageFormData, ImageGenerationRequest } from '@/features/image/types';
+import type {
+  CreateImageFormData,
+  ImageGenerationRequest,
+  ImageGenerationResponse,
+} from '@/features/image/types';
+import { convertSizeToAspectRatio } from '@/features/image/types';
 import { useGenerateImage } from '../hooks';
 import useFormPersist from 'react-hook-form-persist';
 import { getLocalStorageData } from '@/shared/lib/utils';
 import { MODEL_TYPES, useModels } from '@/features/model';
 import { ModelSelect } from '@/features/model/components/ModelSelect';
+import { useArtStyles } from '../hooks';
 
 const IMAGE_FORM_PERSIST = 'create-image-form';
 
@@ -24,10 +30,14 @@ const CreateImagePage = () => {
   const navigate = useNavigate();
   const generate = useGenerateImage();
   const { models } = useModels(MODEL_TYPES.IMAGE);
+  const { artStyles } = useArtStyles();
 
-  const [isGenerating, setIsGenerating] = useState(false);
+  const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const persistedData = useMemo(() => getLocalStorageData(IMAGE_FORM_PERSIST), []);
+  const persistedData = useMemo<Partial<CreateImageFormData>>(
+    () => getLocalStorageData(IMAGE_FORM_PERSIST) as Partial<CreateImageFormData>,
+    []
+  );
 
   const form = useForm<CreateImageFormData>({
     defaultValues: {
@@ -38,6 +48,7 @@ const CreateImagePage = () => {
       },
       imageDimension: '',
       artStyle: '',
+      artDescription: '',
       negativePrompt: '',
       ...persistedData,
     },
@@ -52,11 +63,27 @@ const CreateImagePage = () => {
     exclude: ['negativePrompt'],
   });
 
+  // Synchronize artDescription with artStyle selection
+  const selectedArtStyle = watch('artStyle');
+  useEffect(() => {
+    if (selectedArtStyle) {
+      const matchedStyle = artStyles.find(
+        (style) => style.id === selectedArtStyle || style.name === selectedArtStyle
+      );
+      if (matchedStyle?.modifiers) {
+        setValue('artDescription', matchedStyle.modifiers);
+      } else if (selectedArtStyle === '') {
+        // Clear artDescription when "None" is selected
+        setValue('artDescription', '');
+      }
+    }
+  }, [selectedArtStyle, artStyles, setValue]);
+
   // Read advanced options state directly from URL
-  const isAdvancedOpen = searchParams.get('advanced') === 'true';
+  const isAdvancedOpen: boolean = searchParams.get('advanced') === 'true';
 
   // Update URL when advanced options state changes
-  const toggleAdvancedOptions = (open: boolean) => {
+  const toggleAdvancedOptions = (open: boolean): void => {
     const newParams = new URLSearchParams(searchParams);
     if (open) {
       newParams.set('advanced', 'true');
@@ -66,11 +93,11 @@ const CreateImagePage = () => {
     setSearchParams(newParams, { replace: true });
   };
 
-  // const topicValue = watch('topic') as string;
-  const showExamplePrompts = watch('topic').trim() === '' && !isAdvancedOpen;
+  const topicValue = watch('topic');
+  const showExamplePrompts: boolean = topicValue.trim() === '' && !isAdvancedOpen;
 
   // Image-specific example prompts
-  const imageExamplePrompts = [
+  const imageExamplePrompts: string[] = [
     t('create.examples.prompt1'),
     t('create.examples.prompt2'),
     t('create.examples.prompt3'),
@@ -79,36 +106,57 @@ const CreateImagePage = () => {
     t('create.examples.prompt6'),
   ];
 
-  const handleExampleClick = (example: string) => {
+  const handleExampleClick = (example: string): void => {
     setValue('topic', example);
   };
 
   // Transform form data to API request format
   const transformToApiRequest = (formData: CreateImageFormData): ImageGenerationRequest => {
-    return {
+    const request: ImageGenerationRequest = {
       prompt: formData.topic,
-      artStyle: formData.artStyle,
-      size: formData.imageDimension,
       model: formData.model.name,
       provider: formData.model.provider,
+      aspectRatio: formData.imageDimension ? convertSizeToAspectRatio(formData.imageDimension) : '1:1',
     };
+
+    // Include artStyle and artDescription if artStyle is selected
+    if (formData.artStyle && formData.artStyle !== '') {
+      request.artStyle = formData.artStyle;
+      if (formData.artDescription) {
+        request.artDescription = formData.artDescription;
+      }
+    }
+
+    // Include negativePrompt if provided
+    if (formData.negativePrompt && formData.negativePrompt.trim() !== '') {
+      request.negativePrompt = formData.negativePrompt;
+    }
+
+    return request;
   };
 
-  const onSubmit = async (data: CreateImageFormData) => {
+  const onSubmit = async (data: CreateImageFormData): Promise<void> => {
     setIsGenerating(true);
     setError(null);
 
     try {
-      const apiRequest = transformToApiRequest(data);
-      const response = await generate.mutateAsync(apiRequest);
+      const apiRequest: ImageGenerationRequest = transformToApiRequest(data);
+      const response: ImageGenerationResponse = await generate.mutateAsync(apiRequest);
 
-      // Navigate to gallery and open the preview popup
-      navigate('/image', {
-        state: { newImage: response.images[0], openPreview: true },
-      });
+      // Navigate to project list page with image tab and open preview
+      const firstImage = response?.images?.[0];
+      if (firstImage) {
+        navigate('/projects?resource=image', {
+          state: { newImage: firstImage, openPreview: true },
+        });
+      } else {
+        // Fallback to gallery if no image
+        navigate('/projects?resource=image');
+      }
       setValue('topic', '');
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to generate image');
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to generate image';
+      setError(errorMessage);
       console.error('Image generation failed:', err);
     } finally {
       setIsGenerating(false);

@@ -126,11 +126,14 @@ export function useFCM() {
   // Setup foreground message listener
   useEffect(() => {
     if (!fcmToken) {
+      console.log('[useFCM] No fcmToken, skipping listener setup');
       return;
     }
 
+    console.log('[useFCM] Setting up foreground listener with token:', fcmToken.substring(0, 20) + '...');
+
     const unsubscribe = onForegroundMessage((payload) => {
-      console.log('Foreground message received:', payload);
+      console.log('[useFCM] Foreground message received:', payload);
 
       const title = payload.notification?.title || 'New Notification';
       const body = payload.notification?.body || '';
@@ -142,12 +145,18 @@ export function useFCM() {
       });
     });
 
+    console.log(
+      '[useFCM] Listener result:',
+      unsubscribe ? 'subscribed successfully' : 'FAILED - null returned'
+    );
+
     if (unsubscribe) {
       unsubscribeRef.current = unsubscribe;
     }
 
     return () => {
       if (unsubscribeRef.current) {
+        console.log('[useFCM] Cleaning up foreground listener');
         unsubscribeRef.current();
         unsubscribeRef.current = null;
       }

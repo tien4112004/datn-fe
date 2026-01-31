@@ -18,6 +18,7 @@ import admin from './admin';
 import comments from './comments';
 import questions from './questions';
 import dashboard from './dashboard';
+import notifications from './notifications';
 
 export default {
   common,
@@ -36,4 +37,5 @@ export default {
   comments,
   questions,
   dashboard,
+  notifications,
 };

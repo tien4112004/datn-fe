@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Bell, Command, File, Home, Users, Grid3x3, Database } from 'lucide-react';
+import { Command, File, Home, Users, Grid3x3, Database } from 'lucide-react';
 import { NavMain } from '@/shared/components/navigation/NavMain';
 import { NavSecondary } from '@/shared/components/navigation/NavSecondary';
 import { NavUser } from '@/shared/components/navigation/NavUser';
@@ -48,11 +48,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       },
     ],
     navSecondary: [
-      {
-        title: t('notification'),
-        url: '/notifications',
-        icon: Bell,
-      },
       {
         title: t('questionRendererDemo'),
         url: '/demo/question-renderer',

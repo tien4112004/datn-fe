@@ -9,6 +9,7 @@ import {
   SidebarMenuItem,
 } from '@/shared/components/ui/sidebar';
 import SidebarLanguageSwitcher from './SidebarLanguageSwitcher';
+import SidebarNotificationBell from './SidebarNotificationBell';
 
 export function NavSecondary({
   items,
@@ -26,6 +27,7 @@ export function NavSecondary({
         <SidebarMenu>
           {/* <SidebarApiSwitcher /> */}
           <SidebarLanguageSwitcher />
+          <SidebarNotificationBell />
           {items.map((item) => (
             <SidebarMenuItem key={item.title}>
               <SidebarMenuButton asChild size="sm">

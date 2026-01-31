@@ -29,16 +29,18 @@ export default class NotificationService implements NotificationApiService {
   }
 
   async getNotifications(page: number, size: number): Promise<PaginatedNotificationsResponse> {
-    const response = await this.apiClient.get<ApiResponse<PaginatedNotificationsResponse>>(
-      `${this.baseUrl}/api/notifications`,
-      { params: { page, size } }
-    );
-    return (
-      response.data.data ?? {
-        data: [],
-        pagination: { currentPage: page, pageSize: size, totalItems: 0, totalPages: 0 },
-      }
-    );
+    const response = await this.apiClient.get<ApiResponse<any>>(`${this.baseUrl}/api/notifications`, {
+      params: { page, size },
+    });
+    return {
+      data: response.data.data ?? [],
+      pagination: response.data.pagination ?? {
+        currentPage: page,
+        pageSize: size,
+        totalItems: 0,
+        totalPages: 0,
+      },
+    };
   }
 
   async getUnreadCount(): Promise<UnreadCountResponse> {

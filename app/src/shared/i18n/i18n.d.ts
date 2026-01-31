@@ -19,6 +19,7 @@ import assignment from './locales/en/assignment';
 import comments from './locales/en/comments';
 import questions from './locales/en/questions';
 import dashboard from './locales/en/dashboard';
+import notifications from './locales/en/notifications';
 
 /**
  * Resources type based on English translations
@@ -39,6 +40,7 @@ export interface Resources {
   comments: typeof comments;
   questions: typeof questions;
   dashboard: typeof dashboard;
+  notifications: typeof notifications;
 }
 
 declare module 'i18next' {

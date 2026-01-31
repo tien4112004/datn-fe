@@ -283,7 +283,12 @@ const handleKeyDown = (e: KeyboardEvent) => {
 };
 
 const navigateToList = () => {
-  window.location.href = '/projects?type=presentation';
+  // Dispatch event to React for proper navigation (respects unsaved changes blocker)
+  window.dispatchEvent(
+    new CustomEvent('app.presentation.navigate', {
+      detail: { path: '/projects?type=presentation' },
+    })
+  );
 };
 
 const setDialogForExport = (type: DialogForExportTypes) => {

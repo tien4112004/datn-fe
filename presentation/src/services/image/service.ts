@@ -64,10 +64,10 @@ export class ImageService {
     }
   }
 
-  async getMyImages(page: number = 1, size: number = 20): Promise<any> {
+  async getMyImages(page: number = 1, pageSize: number = 20, sort: 'asc' | 'desc' = 'desc'): Promise<any> {
     try {
       const response = await this.apiClient.get(`${this.baseUrl}/api/images`, {
-        params: { page, size },
+        params: { page, pageSize, sort },
       });
       return response.data;
     } catch (error: any) {

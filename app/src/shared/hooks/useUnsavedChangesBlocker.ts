@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, type RefObject } from 'react';
+import { useEffect, useState, useCallback, useRef, type RefObject } from 'react';
 import { useBlocker } from 'react-router-dom';
 
 interface DirtyStateChangedDetail {
@@ -47,6 +47,10 @@ export const useUnsavedChangesBlocker = (options: UseUnsavedChangesBlockerOption
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [showDialog, setShowDialog] = useState(false);
 
+  // Use ref to avoid stale closure in useBlocker callback
+  const hasUnsavedChangesRef = useRef(hasUnsavedChanges);
+  hasUnsavedChangesRef.current = hasUnsavedChanges;
+
   // Listen to dirty state changes
   useEffect(() => {
     const handleDirtyStateChange = (event: Event) => {
@@ -65,6 +69,7 @@ export const useUnsavedChangesBlocker = (options: UseUnsavedChangesBlockerOption
   }, [eventName]);
 
   // Block navigation when there are unsaved changes
+  // Use ref to always get latest value, avoiding stale closure issues
   const blocker = useBlocker(
     useCallback(
       ({ currentLocation, nextLocation }: { currentLocation: any; nextLocation: any }) => {
@@ -73,9 +78,9 @@ export const useUnsavedChangesBlocker = (options: UseUnsavedChangesBlockerOption
           return false;
         }
         // Block if there are unsaved changes and user is navigating away
-        return hasUnsavedChanges && currentLocation.pathname !== nextLocation.pathname;
+        return hasUnsavedChangesRef.current && currentLocation.pathname !== nextLocation.pathname;
       },
-      [hasUnsavedChanges, skipBlockingRef]
+      [skipBlockingRef]
     )
   );
 

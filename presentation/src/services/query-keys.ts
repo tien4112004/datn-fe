@@ -35,7 +35,8 @@ export const queryKeys = {
   // Image keys
   images: {
     all: ['images'] as const,
-    my: (page?: number, size?: number) => [...queryKeys.images.all, 'my', { page, size }] as const,
+    my: (page?: number, pageSize?: number, sort?: string) =>
+      [...queryKeys.images.all, 'my', { page, pageSize, sort }] as const,
     search: (payload: any) => [...queryKeys.images.all, 'search', payload] as const,
   },
 

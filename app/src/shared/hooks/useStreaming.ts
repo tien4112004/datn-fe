@@ -45,7 +45,19 @@ function useStreaming<TRequest = any, TProcessed = any, TExtractResult = any>({
     queryKey: [...queryKey, queryCounter],
     queryFn: streamedQuery({
       queryFn: async ({ signal }) => {
-        const { stream, ...rest } = await extractFn(requestData.current, signal);
+        const result = await extractFn(requestData.current, signal);
+        // Defensive: ensure we always return an AsyncIterable (never undefined)
+        if (!result?.stream) {
+          // Helpful debug info if extractFn unexpectedly doesn't provide a stream
+          // eslint-disable-next-line no-console
+          console.warn(
+            'useStreaming: extractFn did not return a stream for queryKey',
+            [...queryKey, queryCounter],
+            { request: requestData.current }
+          );
+        }
+        const stream = result?.stream ?? (async function* () {})();
+        const { stream: _s, ...rest } = result || {};
         setExtractResult(rest as TExtractResult);
         return stream;
       },

@@ -105,6 +105,7 @@
 
 <script lang="ts" setup>
 import { onMounted, ref, computed, watch } from 'vue';
+import { refDebounced } from '@vueuse/core';
 import { useI18n } from 'vue-i18n';
 import { useImageSearch, useMyImages, useGenerateImage, useUploadImage } from '@/services/queries';
 import useCreateElement from '@/hooks/useCreateElement';
@@ -147,14 +148,15 @@ const tabOptions = computed(() => [
 // Pexels Tab State
 const orientationVisible = ref(false);
 const searchWord = ref('');
+const debouncedSearchWord = refDebounced(searchWord, 500); // Debounce search input by 500ms
 const orientation = ref<Orientation>('all');
 const orientationOptions = ref<{ key: Orientation; label: string }[]>([]);
 const orientationMap = ref<{ [key: string]: string }>({});
 const uploadingImageId = ref<number | null>(null);
 
-// Pexels search query
+// Pexels search query - use debounced search word to avoid excessive API calls
 const pexelsSearchPayload = computed(() => ({
-  query: searchWord.value,
+  query: debouncedSearchWord.value,
   per_page: 50,
   orientation: orientation.value,
 }));
@@ -164,25 +166,81 @@ const {
   isLoading: pexelsLoading,
   refetch: refetchPexels,
 } = useImageSearch(pexelsSearchPayload, {
-  enabled: computed(() => searchWord.value.length > 0),
+  enabled: computed(() => debouncedSearchWord.value.length > 0),
+  refetchOnMount: false, // Don't refetch when switching tabs - use cached data
+  refetchOnWindowFocus: false,
 });
 
-const pexelsImages = computed(() => pexelsSearchData.value?.data || []);
+const pexelsImages = computed(() => {
+  const data = pexelsSearchData.value?.data?.photos || pexelsSearchData.value?.data || [];
+  // Map Pexels API response to ImageWaterfallViewer format
+  return data.map((item: any) => ({
+    id: item.id,
+    width: item.width || 200,
+    height: item.height || 200,
+    // Pexels API returns src as an object with different sizes
+    src: typeof item.src === 'string' ? item.src : item.src?.large || item.src?.medium || item.src?.original,
+  }));
+});
 
 // My Images Tab State
 const myImagesScrollContainer = ref<HTMLElement | null>(null);
 const currentPage = ref(1);
+const accumulatedMyImages = ref<any[]>([]); // Accumulated images for infinite scroll
 
 const {
   data: myImagesData,
   isLoading: myImagesLoading,
   refetch: refetchMyImages,
-} = useMyImages(currentPage, 20);
+} = useMyImages(currentPage, 20, 'desc', {
+  refetchOnMount: false, // Don't refetch when switching tabs - use cached data
+  refetchOnWindowFocus: false,
+});
 
-const myImages = computed(() => myImagesData.value?.data || []);
-const totalPages = computed(() => Math.ceil((myImagesData.value?.total || 0) / 20));
+// Watch for new data and accumulate for infinite scroll
+watch(
+  myImagesData,
+  (newData, oldData) => {
+    if (newData?.data) {
+      const newImages = newData.data;
+      if (currentPage.value === 1) {
+        // Reset accumulated images on first page (refresh)
+        accumulatedMyImages.value = [...newImages];
+      } else {
+        // Append new images, avoiding duplicates by id
+        const existingIds = new Set(accumulatedMyImages.value.map((img: any) => img.id));
+        const filteredNewImages = newImages.filter((img: any) => !existingIds.has(img.id));
+        if (filteredNewImages.length > 0) {
+          accumulatedMyImages.value = [...accumulatedMyImages.value, ...filteredNewImages];
+        }
+      }
+      loadingMore.value = false;
+    }
+  },
+  { immediate: true }
+);
+
+const myImages = computed(() => {
+  // Map accumulated images to ImageWaterfallViewer format (needs id, width, height, src)
+  return accumulatedMyImages.value.map((item: any, index: number) => ({
+    id: item.id || index,
+    width: item.width || 200,
+    height: item.height || 200,
+    src: item.url || item.cdnUrl || item.src,
+  }));
+});
+
+// Use pagination from API response
+const totalPages = computed(() => myImagesData.value?.pagination?.totalPages || 1);
 const hasMore = computed(() => currentPage.value < totalPages.value);
 const loadingMore = ref(false);
+
+// Reset and refresh my images
+const resetMyImages = () => {
+  currentPage.value = 1;
+  accumulatedMyImages.value = [];
+  refetchMyImages();
+};
 
 // Mutations
 const generateImageMutation = useGenerateImage();
@@ -252,7 +310,7 @@ const uploadAndInsertPexelsImage = async (imageUrl: string, imageId: number) => 
 // Infinite Scroll Handler
 const onMyImagesScroll = () => {
   const container = myImagesScrollContainer.value;
-  if (!container || loadingMore.value || !hasMore.value) return;
+  if (!container || loadingMore.value || myImagesLoading.value || !hasMore.value) return;
 
   const scrollTop = container.scrollTop;
   const scrollHeight = container.scrollHeight;
@@ -266,16 +324,9 @@ const onMyImagesScroll = () => {
   }
 };
 
-// Watch for loading state changes
-watch([myImagesData, myImagesLoading], () => {
-  if (!myImagesLoading.value) {
-    loadingMore.value = false;
-  }
-});
-
-// Watch tab changes to ensure data is loaded
+// Watch tab changes to ensure data is loaded (only if not already cached)
 watch(activeTab, (newTab) => {
-  if (newTab === 'myImages' && currentPage.value === 1) {
+  if (newTab === 'myImages' && accumulatedMyImages.value.length === 0) {
     refetchMyImages();
   }
 });

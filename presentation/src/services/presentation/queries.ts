@@ -131,7 +131,7 @@ export function useSlideThemes(
   const presentationApi = getPresentationApi();
 
   return useQuery({
-    queryKey: queryKeys.slideThemes.list(unref(params)),
+    queryKey: () => queryKeys.slideThemes.list(unref(params)),
     queryFn: () => presentationApi.getSlideThemes(unref(params)),
     staleTime: 1000 * 60 * 5, // 5 minutes
     ...options,
@@ -222,7 +222,7 @@ export function useSearchUsers(
   const presentationApi = getPresentationApi();
 
   return useQuery({
-    queryKey: queryKeys.users.search(unref(query)),
+    queryKey: () => queryKeys.users.search(unref(query)),
     queryFn: () => presentationApi.searchUsers(unref(query)),
     enabled: () => !!unref(query) && unref(query).length > 0,
     staleTime: 1000 * 30, // 30 seconds

@@ -19,23 +19,25 @@ import { unref } from 'vue';
 
 /**
  * Hook to fetch user's generated images with pagination
+ * Sorting is always by createdAt field (handled by backend)
  *
  * @example
  * ```ts
  * const page = ref(1);
- * const { data, isLoading, error } = useMyImages(page, 20);
+ * const { data, isLoading, error } = useMyImages(page, 20, 'desc');
  * ```
  */
 export function useMyImages(
   page?: MaybeRef<number>,
-  size?: MaybeRef<number>,
+  pageSize?: MaybeRef<number>,
+  sort?: MaybeRef<'asc' | 'desc'>,
   options?: Omit<UseQueryOptions<any, Error>, 'queryKey' | 'queryFn'>
 ): UseQueryReturnType<any, Error> {
   const imageApi = getImageApi();
 
   return useQuery({
-    queryKey: queryKeys.images.my(unref(page), unref(size)),
-    queryFn: () => imageApi.getMyImages(unref(page), unref(size)),
+    queryKey: () => queryKeys.images.my(unref(page), unref(pageSize), unref(sort)),
+    queryFn: () => imageApi.getMyImages(unref(page), unref(pageSize), unref(sort)),
     staleTime: 1000 * 60, // 1 minute
     ...options,
   });
@@ -57,7 +59,7 @@ export function useImageSearch(
   const imageApi = getImageApi();
 
   return useQuery({
-    queryKey: queryKeys.images.search(unref(payload)),
+    queryKey: () => queryKeys.images.search(unref(payload)),
     queryFn: () => imageApi.searchImage(unref(payload)),
     enabled: () => !!unref(payload)?.query && unref(payload).query.length > 0,
     staleTime: 1000 * 60 * 5, // Search results are cached for 5 minutes

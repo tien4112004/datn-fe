@@ -1,4 +1,4 @@
-import { ref } from 'vue';
+import { computed, watch } from 'vue';
 import type { Pinia } from 'pinia';
 import { useSaveStore, useContainerStore, useSlidesStore } from '@/store';
 import { generateThumbnail } from '@/utils/thumbnail';
@@ -26,11 +26,18 @@ function dataURLtoBlob(dataURL: string): Blob {
  * Handles thumbnail generation, API calls, and state management
  */
 export function useSavePresentation(presentationId: string, pinia: Pinia) {
-  const isSaving = ref(false);
   const saveStore = useSaveStore();
   const containerStore = useContainerStore();
   const slidesStore = useSlidesStore();
   const updatePresentationMutation = useUpdatePresentation();
+
+  // Use mutation's isPending state directly
+  const isSaving = computed(() => updatePresentationMutation.isPending.value);
+
+  // Watch mutation state to dispatch events to React
+  watch(isSaving, (saving) => {
+    dispatchSavingEvent(saving);
+  });
 
   /**
    * Save presentation with all data from store (title, slides, theme, viewport, thumbnail)
@@ -45,9 +52,8 @@ export function useSavePresentation(presentationId: string, pinia: Pinia) {
     viewport?: SlideViewport;
     thumbnail?: string;
   }): Promise<void> {
-    // Set saving state and notify React
-    isSaving.value = true;
-    dispatchSavingEvent(true);
+    // Prevent duplicate saves while mutation is in progress
+    if (updatePresentationMutation.isPending.value) return;
 
     // Use provided thumbnail or generate a new one
     let thumbnailToUse = overrides?.thumbnail;
@@ -100,12 +106,6 @@ export function useSavePresentation(presentationId: string, pinia: Pinia) {
         onError: (error) => {
           console.error('Failed to save presentation:', error);
           dispatchMessage('error', 'Failed to save presentation');
-          throw error;
-        },
-        onSettled: () => {
-          // Clear saving state and notify React (always run after success or error)
-          isSaving.value = false;
-          dispatchSavingEvent(false);
         },
       }
     );

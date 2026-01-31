@@ -10,6 +10,7 @@ import {
   useSavingIndicator,
   useGeneratingStoreSync,
   useCommentDrawerTrigger,
+  useNavigationRequest,
 } from '../hooks/useDetailPresentation';
 import { useUnsavedChangesBlocker } from '@/shared/hooks';
 import { UnsavedChangesDialog } from '@/shared/components/modals/UnsavedChangesDialog';
@@ -66,6 +67,9 @@ const DetailPage = () => {
 
   // Listen for comment drawer open requests from Vue
   useCommentDrawerTrigger(() => setIsCommentDrawerOpen(true));
+
+  // Listen for navigation requests from Vue (triggers React Router, respects unsaved changes blocker)
+  useNavigationRequest(navigate);
 
   const { t } = useTranslation('glossary', { keyPrefix: 'loading' });
 

@@ -43,7 +43,7 @@ export function useSlideTemplatesByLayout(
   const templateApi = getTemplateApi();
 
   return useQuery({
-    queryKey: queryKeys.templates.byLayout(unref(layoutType)),
+    queryKey: () => queryKeys.templates.byLayout(unref(layoutType)),
     queryFn: () => templateApi.getSlideTemplatesByLayout(unref(layoutType)),
     staleTime: 1000 * 60 * 10, // Templates don't change often, cache for 10 minutes
     enabled: () => !!unref(layoutType), // Only run query if layoutType is provided

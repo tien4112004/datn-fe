@@ -9,6 +9,7 @@ import { LessonTab } from '@/features/classes/class-lesson';
 import { ClassStudentView } from '@/features/classes/class-student';
 import type { Class } from '@/features/classes/shared/types';
 import { LanguageSettingsDropdown } from '@/features/student/components/LanguageSettingsDropdown';
+import { NotificationBell } from '@/features/notifications/components/NotificationBell';
 
 interface StudentClassDetailTabsProps {
   classId: string;
@@ -50,8 +51,10 @@ export const StudentClassDetailTabs = ({ classId, currentClass }: StudentClassDe
               </div>
             </div>
 
-            {/* Settings Dropdown */}
-            <LanguageSettingsDropdown />
+            <div className="flex items-center gap-1">
+              <NotificationBell />
+              <LanguageSettingsDropdown />
+            </div>
           </div>
         </div>
 
@@ -87,7 +90,10 @@ export const StudentClassDetailTabs = ({ classId, currentClass }: StudentClassDe
               <h1 className="text-2xl font-bold tracking-tight">{currentClass.name}</h1>
             </div>
 
-            <LanguageSettingsDropdown />
+            <div className="flex items-center gap-1">
+              <NotificationBell />
+              <LanguageSettingsDropdown />
+            </div>
           </div>
 
           <div className="text-muted-foreground space-y-2 text-sm">

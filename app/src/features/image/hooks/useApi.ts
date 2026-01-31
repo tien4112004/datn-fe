@@ -188,3 +188,36 @@ export const useArtStyles = (): UseArtStylesReturn => {
     error: error as Error | null,
   };
 };
+
+/**
+ * Hook to upload an image file
+ *
+ * @example
+ * ```ts
+ * const uploadImageMutation = useUploadImage();
+ *
+ * uploadImageMutation.mutate(file, {
+ *   onSuccess: (cdnUrl) => {
+ *     console.log('Uploaded:', cdnUrl);
+ *   }
+ * });
+ * ```
+ */
+export const useUploadImage = (
+  options?: UseMutationOptions<string, Error, File>
+): UseMutationResult<string, Error, File, unknown> => {
+  const queryClient = useQueryClient();
+  const imageApiService = useImageApiService();
+
+  return useMutation({
+    mutationFn: async (file: File) => {
+      const cdnUrl = await imageApiService.uploadImage(file);
+      return cdnUrl;
+    },
+    onSuccess: () => {
+      // Invalidate images list after successful upload
+      queryClient.invalidateQueries({ queryKey: [imageApiService.getType(), 'images'] });
+    },
+    ...options,
+  });
+};

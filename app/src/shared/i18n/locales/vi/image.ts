@@ -107,4 +107,24 @@ export default {
     failedToLoad: 'Tải thất bại',
     view: 'Xem',
   },
+  upload: {
+    title: 'Tải lên hình ảnh',
+    description: 'Chọn tệp hình ảnh để tải lên. Kích thước tối đa là 5MB.',
+    dropzone: {
+      title: 'Thả hình ảnh vào đây',
+      subtitle: 'hoặc nhấp để duyệt',
+      formats: 'JPEG, PNG, GIF, WebP tối đa 5MB',
+    },
+    preview: 'Xem trước',
+    cancel: 'Hủy',
+    uploadButton: 'Tải lên',
+    uploading: 'Đang tải lên...',
+    success: 'Tải lên hình ảnh thành công',
+    errors: {
+      emptyFile: 'Tệp trống',
+      fileTooLarge: 'Kích thước tệp ({{size}} MB) vượt quá kích thước tối đa cho phép {{max}} MB',
+      invalidType: 'Tệp phải là hình ảnh (JPEG, PNG, GIF hoặc WebP)',
+      uploadFailed: 'Tải lên hình ảnh thất bại',
+    },
+  },
 };

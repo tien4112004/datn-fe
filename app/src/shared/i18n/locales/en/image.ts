@@ -107,4 +107,24 @@ export default {
     failedToLoad: 'Failed to load',
     view: 'View',
   },
+  upload: {
+    title: 'Upload Image',
+    description: 'Select an image file to upload. Maximum size is 5MB.',
+    dropzone: {
+      title: 'Drop your image here',
+      subtitle: 'or click to browse',
+      formats: 'JPEG, PNG, GIF, WebP up to 5MB',
+    },
+    preview: 'Preview',
+    cancel: 'Cancel',
+    uploadButton: 'Upload',
+    uploading: 'Uploading...',
+    success: 'Image uploaded successfully',
+    errors: {
+      emptyFile: 'File is empty',
+      fileTooLarge: 'File size ({{size}} MB) exceeds the maximum allowed size of {{max}} MB',
+      invalidType: 'File must be an image (JPEG, PNG, GIF, or WebP)',
+      uploadFailed: 'Failed to upload image',
+    },
+  },
 };

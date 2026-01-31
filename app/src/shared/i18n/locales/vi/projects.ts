@@ -7,6 +7,8 @@ export default {
   controls: {
     generateNew: 'Tạo sinh mới',
     createBlank: 'Tạo tài liệu trống?',
+    uploadImage: 'Tải lên hình ảnh',
+    uploadSuccess: 'Tải lên hình ảnh thành công',
   },
   resources: {
     presentation: 'Bài trình bày',

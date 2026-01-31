@@ -7,6 +7,8 @@ export default {
   controls: {
     generateNew: 'Generate New',
     createBlank: 'Create Blank?',
+    uploadImage: 'Upload Image',
+    uploadSuccess: 'Image uploaded successfully',
   },
   resources: {
     presentation: 'Presentation',

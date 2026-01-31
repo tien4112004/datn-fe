@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { Toaster } from 'sonner';
 import ErrorBoundary, { ErrorPageFallback } from '@/components/common/ErrorBoundary';
 import type { AppError } from '@aiprimary/api';
+import { NotificationBell } from '@/features/notifications/components';
 
 function NavLayoutContent() {
   const navigation = useNavigation();
@@ -41,8 +42,9 @@ function NavLayoutContent() {
       <AppSidebar />
       <SidebarInset className="bg-white">
         {/* Mobile header with sidebar trigger */}
-        <header className="flex h-12 items-center border-b px-4 md:hidden">
+        <header className="flex h-12 items-center justify-between border-b px-4 md:hidden">
           <SidebarTrigger />
+          <NotificationBell />
         </header>
         {isLoading && <GlobalSpinner text={t('page')} />}
         <ErrorBoundary pathname={location.pathname}>
@@ -78,8 +80,9 @@ export function NavLayoutErrorBoundary() {
       <AppSidebar />
       <SidebarInset className="bg-white">
         {/* Mobile header with sidebar trigger */}
-        <header className="flex h-12 items-center border-b px-4 md:hidden">
+        <header className="flex h-12 items-center justify-between border-b px-4 md:hidden">
           <SidebarTrigger />
+          <NotificationBell />
         </header>
         <ErrorPageFallback
           error={error as AppError}

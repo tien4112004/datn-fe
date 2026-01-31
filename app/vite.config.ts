@@ -8,17 +8,11 @@ import path from 'path';
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
+  process.env = { ...process.env, ...env };
 
   // Configure URLs with production fallbacks
-  const apiUrl =
-    env.NODE_ENV === 'production'
-      ? 'https://api.huy-devops.site'
-      : env.VITE_API_URL || 'http://localhost:3000';
-
-  const presentationUrl =
-    env.NODE_ENV === 'production'
-      ? 'https://presentation.huy-devops.site'
-      : env.VITE_PRESENTATION_URL || 'http://localhost:5174';
+  const apiUrl = process.env.VITE_API_URL;
+  const presentationUrl = process.env.VITE_PRESENTATION_URL;
 
   return {
     server: {
@@ -90,6 +84,18 @@ export default defineConfig(({ mode }) => {
     },
     define: {
       'import.meta.env.VITE_API_URL': JSON.stringify(apiUrl),
+      'import.meta.env.VITE_PRESENTATION_URL': JSON.stringify(process.env.VITE_PRESENTATION_URL),
+      'import.meta.env.VITE_FIREBASE_API_KEY': JSON.stringify(process.env.VITE_FIREBASE_API_KEY),
+      'import.meta.env.VITE_FIREBASE_AUTH_DOMAIN': JSON.stringify(process.env.VITE_FIREBASE_AUTH_DOMAIN),
+      'import.meta.env.VITE_FIREBASE_PROJECT_ID': JSON.stringify(process.env.VITE_FIREBASE_PROJECT_ID),
+      'import.meta.env.VITE_FIREBASE_STORAGE_BUCKET': JSON.stringify(
+        process.env.VITE_FIREBASE_STORAGE_BUCKET
+      ),
+      'import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID': JSON.stringify(
+        process.env.VITE_FIREBASE_MESSAGING_SENDER_ID
+      ),
+      'import.meta.env.VITE_FIREBASE_APP_ID': JSON.stringify(process.env.VITE_FIREBASE_APP_ID),
+      'import.meta.env.VITE_FIREBASE_VAPID_KEY': JSON.stringify(process.env.VITE_FIREBASE_VAPID_KEY),
     },
   };
 });

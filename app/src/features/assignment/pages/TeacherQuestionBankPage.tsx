@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { createColumnHelper, getCoreRowModel, useReactTable } from '@tanstack/react-table';
+import ReactMarkdown from 'react-markdown';
 import {
   useQuestionBankList,
   useDeleteQuestions,
@@ -209,7 +210,11 @@ export function TeacherQuestionBankPage() {
       }),
       columnHelper.accessor('title', {
         header: t('table.columns.title'),
-        cell: (info) => <span className="max-w-md truncate font-medium">{info.getValue()}</span>,
+        cell: (info) => (
+          <div className="max-w-md truncate font-medium">
+            <ReactMarkdown>{info.getValue()}</ReactMarkdown>
+          </div>
+        ),
         minSize: 200,
         meta: {
           isGrow: true,

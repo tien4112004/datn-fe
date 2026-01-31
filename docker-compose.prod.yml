@@ -7,6 +7,13 @@ services:
       args:
         - VITE_API_URL=${VITE_API_URL}
         - VITE_PRESENTATION_URL=${VITE_PRESENTATION_URL}
+        - VITE_FIREBASE_API_KEY=${VITE_FIREBASE_API_KEY}
+        - VITE_FIREBASE_AUTH_DOMAIN=${VITE_FIREBASE_AUTH_DOMAIN}
+        - VITE_FIREBASE_PROJECT_ID=${VITE_FIREBASE_PROJECT_ID}
+        - VITE_FIREBASE_STORAGE_BUCKET=${VITE_FIREBASE_STORAGE_BUCKET}
+        - VITE_FIREBASE_MESSAGING_SENDER_ID=${VITE_FIREBASE_MESSAGING_SENDER_ID}
+        - VITE_FIREBASE_APP_ID=${VITE_FIREBASE_APP_ID}
+        - VITE_FIREBASE_VAPID_KEY=${VITE_FIREBASE_VAPID_KEY}
         - NODE_ENV=production
     image: ghcr.io/tien4112004/datn-fe:app-latest
     container_name: frontend-app-aiprimary
@@ -28,6 +35,13 @@ services:
       args:
         - VITE_API_URL=${VITE_API_URL}
         - VITE_PRESENTATION_URL=${VITE_PRESENTATION_URL}
+        - VITE_FIREBASE_API_KEY=${VITE_FIREBASE_API_KEY}
+        - VITE_FIREBASE_AUTH_DOMAIN=${VITE_FIREBASE_AUTH_DOMAIN}
+        - VITE_FIREBASE_PROJECT_ID=${VITE_FIREBASE_PROJECT_ID}
+        - VITE_FIREBASE_STORAGE_BUCKET=${VITE_FIREBASE_STORAGE_BUCKET}
+        - VITE_FIREBASE_MESSAGING_SENDER_ID=${VITE_FIREBASE_MESSAGING_SENDER_ID}
+        - VITE_FIREBASE_APP_ID=${VITE_FIREBASE_APP_ID}
+        - VITE_FIREBASE_VAPID_KEY=${VITE_FIREBASE_VAPID_KEY}
         - NODE_ENV=production
     image: ghcr.io/tien4112004/datn-fe:presentation-latest
     container_name: frontend-presentation-aiprimary
@@ -49,6 +63,13 @@ services:
       args:
         - VITE_API_URL=${VITE_API_URL}
         - VITE_PRESENTATION_URL=${VITE_PRESENTATION_URL}
+        - VITE_FIREBASE_API_KEY=${VITE_FIREBASE_API_KEY}
+        - VITE_FIREBASE_AUTH_DOMAIN=${VITE_FIREBASE_AUTH_DOMAIN}
+        - VITE_FIREBASE_PROJECT_ID=${VITE_FIREBASE_PROJECT_ID}
+        - VITE_FIREBASE_STORAGE_BUCKET=${VITE_FIREBASE_STORAGE_BUCKET}
+        - VITE_FIREBASE_MESSAGING_SENDER_ID=${VITE_FIREBASE_MESSAGING_SENDER_ID}
+        - VITE_FIREBASE_APP_ID=${VITE_FIREBASE_APP_ID}
+        - VITE_FIREBASE_VAPID_KEY=${VITE_FIREBASE_VAPID_KEY}
         - NODE_ENV=production
     image: ghcr.io/tien4112004/datn-fe:admin-latest
     container_name: frontend-admin-aiprimary
@@ -65,4 +86,3 @@ services:
 networks:
   network-aiprimary:
     name: network-aiprimary
-    external: true

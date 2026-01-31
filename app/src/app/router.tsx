@@ -141,6 +141,12 @@ const router = createBrowserRouter([
         }),
       },
       {
+        path: 'notifications',
+        lazy: async () => ({
+          Component: (await import('@/features/notifications')).NotificationsPage,
+        }),
+      },
+      {
         path: 'profile',
         lazy: async () => ({
           Component: (await import('@/features/user/components/UserProfile')).default,

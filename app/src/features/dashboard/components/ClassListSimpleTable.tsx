@@ -30,7 +30,7 @@ export const ClassListSimpleTable = () => {
       columnHelper.accessor('name', {
         header: t('myClasses.table.columns.className'),
         cell: (info) => {
-          return <span className="font-medium">{info.getValue()}</span>;
+          return <span className="truncate text-sm font-medium sm:text-base">{info.getValue()}</span>;
         },
         enableSorting: false,
       }),
@@ -39,7 +39,7 @@ export const ClassListSimpleTable = () => {
         cell: (info) => {
           const classItem = info.row.original;
           return (
-            <Badge variant={classItem.isActive ? 'default' : 'secondary'}>
+            <Badge variant={classItem.isActive ? 'default' : 'secondary'} className="text-[10px] sm:text-xs">
               {classItem.isActive ? t('myClasses.table.status.active') : t('myClasses.table.status.inactive')}
             </Badge>
           );

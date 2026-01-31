@@ -342,7 +342,9 @@ export default function ShareMindmapDialog({ isOpen, onOpenChange, mindmapId }: 
                   >
                     <Avatar className="h-8 w-8">
                       <AvatarImage src={user.avatarUrl} alt={`${user.firstName} ${user.lastName}`} />
-                      <AvatarFallback>{getInitials(user.firstName, user.lastName)}</AvatarFallback>
+                      <AvatarFallback className="bg-blue-500 text-white">
+                        {getInitials(user.firstName, user.lastName)}
+                      </AvatarFallback>
                     </Avatar>
                     <div className="flex-1 text-left">
                       <p className="text-sm font-medium">
@@ -385,7 +387,9 @@ export default function ShareMindmapDialog({ isOpen, onOpenChange, mindmapId }: 
                   <div key={user.id} className="flex items-center gap-3 py-1.5">
                     <Avatar className="h-8 w-8">
                       <AvatarImage src={user.avatarUrl} alt={`${user.firstName} ${user.lastName}`} />
-                      <AvatarFallback>{getInitials(user.firstName, user.lastName)}</AvatarFallback>
+                      <AvatarFallback className="bg-blue-500 text-white">
+                        {getInitials(user.firstName, user.lastName)}
+                      </AvatarFallback>
                     </Avatar>
                     <div className="flex-1">
                       <p className="text-sm font-medium">

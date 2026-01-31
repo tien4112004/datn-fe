@@ -12,11 +12,14 @@ import { Checkbox } from '@/shared/components/ui/checkbox';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/shared/components/ui/form';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 import { useLogin } from '../hooks/useAuth';
+import { useFCM, useNotificationStore } from '@/features/notifications';
 import { GoogleSignInButton } from './GoogleSignInButton';
 
 export function LoginForm() {
   const { t, i18n } = useTranslation(I18N_NAMESPACES.AUTH);
   const loginMutation = useLogin();
+  const { initialize: initializeNotifications } = useFCM();
+  const setIsRegistered = useNotificationStore((state) => state.setIsRegistered);
 
   const loginSchema = useMemo(
     () =>
@@ -50,6 +53,12 @@ export function LoginForm() {
       {
         onSuccess: (user) => {
           toast.success(t('login.welcomeBack', { name: user.firstName || user.email }));
+          // Reset registered state to force re-registration with backend
+          // This handles cases where backend DB was reset but frontend still thinks it's registered
+          setIsRegistered(false);
+          // Initialize notifications after successful login
+          // This is a good place because it's triggered by a user action (submit)
+          initializeNotifications();
         },
         onError: () => {
           toast.error(t('login.loginFailed'));

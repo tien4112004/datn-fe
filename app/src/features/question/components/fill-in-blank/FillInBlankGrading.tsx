@@ -37,6 +37,9 @@ export const FillInBlankGrading = ({
     const correctAnswer = segment.content;
     const caseSensitive = question.data.caseSensitive || false;
 
+    // Return false if student answer or correct answer is undefined/empty
+    if (!studentAnswer || !correctAnswer) return false;
+
     // Check main answer
     const mainMatch = caseSensitive
       ? studentAnswer === correctAnswer
@@ -46,11 +49,12 @@ export const FillInBlankGrading = ({
 
     // Check acceptable alternatives
     if (segment.acceptableAnswers) {
-      return segment.acceptableAnswers.some((acceptable) =>
-        caseSensitive
+      return segment.acceptableAnswers.some((acceptable) => {
+        if (!acceptable) return false;
+        return caseSensitive
           ? studentAnswer === acceptable
-          : studentAnswer.toLowerCase() === acceptable.toLowerCase()
-      );
+          : studentAnswer.toLowerCase() === acceptable.toLowerCase();
+      });
     }
 
     return false;

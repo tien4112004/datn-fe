@@ -1,5 +1,6 @@
 // Main exports
 export { FeedTab } from './components';
+export { PostDetailPage } from './pages/PostDetailPage';
 
 // Re-export components for external use
 export * from './components';

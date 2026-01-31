@@ -7,3 +7,10 @@ export {
   useUpdateAssignment,
   useDeleteAssignment,
 } from './useAssignmentApi';
+export {
+  useSubmissionsByPost,
+  useSubmission,
+  useCreateSubmission,
+  useGradeSubmission,
+  useDeleteSubmission,
+} from './useSubmissionApi';

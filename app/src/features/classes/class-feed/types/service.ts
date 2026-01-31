@@ -10,6 +10,7 @@ export interface ClassFeedApiService {
     page?: number,
     pageSize?: number
   ): Promise<ApiResponse<Post[]>>;
+  getPostById(postId: string): Promise<Post>;
   createPost(request: PostCreateRequest): Promise<Post>;
   updatePost(request: PostUpdateRequest): Promise<Post>;
   deletePost(postId: string): Promise<void>;

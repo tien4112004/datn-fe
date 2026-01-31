@@ -78,6 +78,28 @@ export function usePosts(classId: string) {
 }
 
 /**
+ * Hook for fetching a single post by ID
+ */
+export function usePost(postId: string) {
+  const classFeedApi = useClassFeedApiService();
+
+  const postQuery = useQuery({
+    queryKey: feedQueryKeys.post(postId),
+    queryFn: () => classFeedApi.getPostById(postId),
+    enabled: !!postId,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
+  });
+
+  return {
+    post: postQuery.data,
+    loading: postQuery.isLoading,
+    error: postQuery.error,
+    refetch: postQuery.refetch,
+  };
+}
+
+/**
  * Hook for managing comments query for a specific post
  */
 export function useComments(postId: string) {
@@ -153,6 +175,9 @@ export function useUpdatePost() {
         };
       });
 
+      // Update the single post query
+      queryClient.setQueryData(feedQueryKeys.post(updatedPost.id), updatedPost);
+
       toast.success('Post updated successfully');
     },
     onError: (error) => {
@@ -217,6 +242,9 @@ export function usePinPost() {
           data: oldData.data?.map((post: Post) => (post.id === updatedPost.id ? updatedPost : post)) || [],
         };
       });
+
+      // Update the single post query
+      queryClient.setQueryData(feedQueryKeys.post(updatedPost.id), updatedPost);
 
       toast.success(`Post ${variables.pinned ? 'pinned' : 'unpinned'} successfully`);
     },

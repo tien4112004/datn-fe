@@ -6,3 +6,5 @@ export { AttachmentPreview } from './AttachmentPreview';
 export { PostActions } from './PostActions';
 export { PostCard } from './PostCard';
 export { CommentThread } from './CommentThread';
+export { SubmissionStatistics } from './SubmissionStatistics';
+export { StudentAssignmentActions } from './StudentAssignmentActions';

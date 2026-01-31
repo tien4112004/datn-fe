@@ -12,7 +12,7 @@ export interface IImageApi {
     params: ImageGenerationParams
   ): Promise<SingleImageResponse>;
   searchImage(body: ImageSearchPayload): Promise<any>;
-  getMyImages(page?: number, size?: number): Promise<any>;
+  getMyImages(page?: number, pageSize?: number, sort?: 'asc' | 'desc'): Promise<any>;
 }
 
 /**

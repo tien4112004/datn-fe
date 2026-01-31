@@ -138,3 +138,26 @@ export const useCommentDrawerTrigger = (onOpen: () => void) => {
     };
   }, [handleOpenComments]);
 };
+
+/**
+ * Hook to listen for navigation requests from Vue
+ * This allows Vue to request navigation through React Router,
+ * which properly triggers the unsaved changes blocker
+ */
+export const useNavigationRequest = (navigate: (path: string) => void) => {
+  const handleNavigationRequest = useCallback(
+    (event: CustomEvent<{ path: string }>) => {
+      navigate(event.detail.path);
+    },
+    [navigate]
+  );
+
+  useEffect(() => {
+    const listener = handleNavigationRequest as unknown as EventListener;
+    window.addEventListener('app.presentation.navigate', listener);
+
+    return () => {
+      window.removeEventListener('app.presentation.navigate', listener);
+    };
+  }, [handleNavigationRequest]);
+};

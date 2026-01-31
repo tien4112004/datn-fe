@@ -282,6 +282,11 @@ export default {
       cancel: 'Hủy',
       save: 'Lưu bài tập',
       saving: 'Đang lưu...',
+      tooltips: {
+        save: 'Lưu thay đổi',
+        generate: 'Tạo bằng AI (sắp có)',
+        fromBank: 'Thêm từ kho câu hỏi',
+      },
     },
 
     // Trạng thái tải
@@ -356,6 +361,13 @@ export default {
         descriptionPlaceholder: 'Nhập mô tả bài tập (tùy chọn)',
         dueDatePlaceholder: 'Chọn hạn nộp',
       },
+      tooltips: {
+        title: 'Đặt tên bài tập',
+        subject: 'Chọn môn học',
+        grade: 'Chọn khối lớp',
+        description: 'Thêm hướng dẫn (tùy chọn)',
+        shuffleQuestions: 'Xáo trộn câu hỏi mỗi học sinh',
+      },
     },
 
     // Hộp thoại chỉnh sửa thông tin
@@ -424,6 +436,11 @@ export default {
       panelTitle: 'Bảng ma trận đánh giá',
       description:
         'Cấu hình chủ đề và số lượng câu hỏi yêu cầu cho mỗi mức độ khó. Thay đổi được lưu tự động.',
+      tooltips: {
+        addTopic: 'Thêm chủ đề mới',
+        editTopic: 'Sửa thông tin chủ đề',
+        cellInput: 'Số câu hỏi yêu cầu',
+      },
     },
 
     // Hộp thoại xem ma trận
@@ -480,6 +497,11 @@ export default {
       assignmentInfo: 'Thông tin bài tập',
       matrixBuilder: 'Ma trận',
       untitled: 'Chưa có tiêu đề',
+      tooltips: {
+        assignmentInfo: 'Sửa thông tin bài tập',
+        matrixBuilder: 'Cấu hình ma trận đánh giá',
+        questionNumber: 'Nhấp để sửa, kéo để sắp xếp',
+      },
     },
 
     // Ô ma trận

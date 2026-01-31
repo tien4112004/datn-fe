@@ -2,12 +2,15 @@ import {
   useQuery,
   useInfiniteQuery,
   useMutation,
+  useQueryClient,
   type UseQueryResult,
   type UseInfiniteQueryResult,
   type InfiniteData,
+  type UseMutationOptions,
+  type UseMutationResult,
 } from '@tanstack/react-query';
 import { useImageApiService } from '../api';
-import type { ImageGenerationRequest, ImageData } from '../types/service';
+import type { ImageGenerationRequest, ImageData, ImageGenerationResponse } from '../types/service';
 import { ART_STYLE_OPTIONS } from '../types/constants';
 import { useMemo, useEffect } from 'react';
 import { toast } from 'sonner';
@@ -19,7 +22,25 @@ export interface UseImageByIdReturn extends Omit<UseQueryResult<ImageData | null
   image: ImageData | null;
 }
 
-export const useGenerateImage = () => {
+/**
+ * Hook to generate an image
+ *
+ * @example
+ * ```ts
+ * const generateImageMutation = useGenerateImage();
+ *
+ * generateImageMutation.mutate({
+ *   prompt: 'A beautiful sunset',
+ *   model: 'dall-e-3',
+ *   provider: 'openai',
+ *   artStyle: 'photorealistic'
+ * });
+ * ```
+ */
+export const useGenerateImage = (
+  options?: UseMutationOptions<ImageGenerationResponse, Error, ImageGenerationRequest>
+): UseMutationResult<ImageGenerationResponse, Error, ImageGenerationRequest, unknown> => {
+  const queryClient = useQueryClient();
   const imageApiService = useImageApiService();
 
   return useMutation({
@@ -27,6 +48,11 @@ export const useGenerateImage = () => {
       const generatedImage = await imageApiService.generateImage(request);
       return generatedImage;
     },
+    onSuccess: () => {
+      // Invalidate images list after successful generation
+      queryClient.invalidateQueries({ queryKey: [imageApiService.getType(), 'images'] });
+    },
+    ...options,
   });
 };
 

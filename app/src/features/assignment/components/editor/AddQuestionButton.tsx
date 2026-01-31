@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { Plus } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/components/ui/tooltip';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,6 +25,7 @@ interface AddQuestionButtonProps {
 
 export const AddQuestionButton = ({ className }: AddQuestionButtonProps) => {
   const { t } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.questions.toolbar' });
+  const { t: tQuestions } = useTranslation('questions');
 
   // Get data and actions from stores
   const topics = useAssignmentFormStore((state) => state.topics);
@@ -93,16 +95,30 @@ export const AddQuestionButton = ({ className }: AddQuestionButtonProps) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button type="button" size="sm" className={className}>
-          <Plus className="mr-2 h-4 w-4" />
-          {t('addQuestion')}
-        </Button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button type="button" size="sm" className={className}>
+              <Plus className="mr-2 h-4 w-4" />
+              {t('addQuestion')}
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>{t('tooltips.addQuestion')}</p>
+          </TooltipContent>
+        </Tooltip>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         {getAllQuestionTypes().map((type) => (
-          <DropdownMenuItem key={type.value} onClick={() => handleAddQuestion(type.value)}>
-            {type.label}
-          </DropdownMenuItem>
+          <Tooltip key={type.value}>
+            <TooltipTrigger asChild>
+              <DropdownMenuItem onClick={() => handleAddQuestion(type.value)}>{type.label}</DropdownMenuItem>
+            </TooltipTrigger>
+            <TooltipContent side="right">
+              <p className="max-w-xs">
+                {tQuestions((type.i18nKey?.replace('types.', 'typeTooltips.') || type.value) as any)}
+              </p>
+            </TooltipContent>
+          </Tooltip>
         ))}
       </DropdownMenuContent>
     </DropdownMenu>

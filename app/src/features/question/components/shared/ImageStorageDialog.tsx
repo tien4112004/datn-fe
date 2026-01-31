@@ -75,11 +75,7 @@ export const ImageStorageDialog = ({ open, onClose, onSelect }: ImageStorageDial
                         : 'hover:border-muted-foreground/50 border-transparent'
                     )}
                   >
-                    <img
-                      src={image.url}
-                      alt={image.prompt || t('imageAlt')}
-                      className="h-full w-full object-cover"
-                    />
+                    <img src={image.url} alt={t('imageAlt')} className="h-full w-full object-cover" />
                     {selectedImage?.id === image.id && (
                       <div className="bg-primary/20 absolute inset-0 flex items-center justify-center">
                         <div className="bg-primary text-primary-foreground rounded-full p-2">

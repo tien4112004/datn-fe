@@ -90,7 +90,7 @@ export default {
         portrait: 'Dọc',
         square: 'Vuông',
       },
-      defaultSearch: 'phong cảnh',
+      defaultSearch: '',
       errorNoQuery: 'Vui lòng nhập từ khóa tìm kiếm',
       emptyStates: {
         noImages: 'Chưa có ảnh nào được tải lên',

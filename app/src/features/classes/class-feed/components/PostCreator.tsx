@@ -26,20 +26,13 @@ import {
   Presentation,
   ClipboardList,
   Loader2,
-  CalendarIcon,
   Eye,
   MessageSquare,
 } from 'lucide-react';
-import { Popover, PopoverContent, PopoverTrigger } from '@/shared/components/ui/popover';
-import { Calendar } from '@/shared/components/ui/calendar';
-import { format } from 'date-fns';
-import { cn } from '@/shared/lib/utils';
-import { AssignmentListCommand } from '../../class-lesson/components';
 import { Separator } from '@/shared/components/ui/separator';
 import { ResourceSelectorDialog } from '@/features/projects/components/resource-selector';
 import { getAcceptString, formatFileSize } from '../utils/attachmentValidation';
 import { Progress } from '@/shared/components/ui/progress';
-import { getLocaleDateFns } from '@/shared/i18n/helper';
 
 interface Assignment {
   id: string;
@@ -177,12 +170,14 @@ export const PostCreator = ({
                   {t('feed.creator.postType.post')}
                 </Label>
               </div>
+              {/* Exercise type temporarily disabled - requires assignment selector
               <div className="flex items-center gap-2">
                 <RadioGroupItem value="Exercise" id="homework" />
                 <Label htmlFor="homework" className="cursor-pointer font-normal">
                   {t('feed.creator.postType.homework')}
                 </Label>
               </div>
+              */}
             </RadioGroup>
           </div>
 
@@ -204,9 +199,9 @@ export const PostCreator = ({
           <Separator />
 
           {/* Conditional Fields based on Post Type */}
+          {/* Exercise type temporarily disabled - requires assignment selector
           {type === 'Exercise' ? (
             <div className="space-y-4">
-              {/* Assignment Selector */}
               <div className="space-y-2">
                 <Label className="text-sm font-medium">{t('feed.creator.labels.selectAssignment')}</Label>
                 <AssignmentListCommand
@@ -215,7 +210,6 @@ export const PostCreator = ({
                 />
               </div>
 
-              {/* Due Date Picker */}
               <div className="space-y-2">
                 <Label className="text-sm font-medium">{t('feed.creator.labels.deadline')}</Label>
                 <Popover modal={true}>
@@ -245,140 +239,142 @@ export const PostCreator = ({
               </div>
             </div>
           ) : (
-            <>
-              {/* Attachments - Only for Post type */}
-              <div className="space-y-2">
-                <Label className="text-sm font-medium">{t('feed.creator.labels.attachments')}</Label>
-                <div>
-                  <input
-                    type="file"
-                    multiple
-                    onChange={handleFileChange}
-                    className="hidden"
-                    id="file-upload"
-                    accept={getAcceptString()}
+          */}
+          {/* Attachments and Linked Resources */}
+          <>
+            {/* Attachments - Only for Post type */}
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">{t('feed.creator.labels.attachments')}</Label>
+              <div>
+                <input
+                  type="file"
+                  multiple
+                  onChange={handleFileChange}
+                  className="hidden"
+                  id="file-upload"
+                  accept={getAcceptString()}
+                  disabled={isUploading}
+                />
+                <label htmlFor="file-upload">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="w-full"
+                    asChild
                     disabled={isUploading}
-                  />
-                  <label htmlFor="file-upload">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      className="w-full"
-                      asChild
-                      disabled={isUploading}
-                    >
-                      <span className="cursor-pointer">
-                        <Paperclip className="mr-2 h-4 w-4" />
-                        {t('feed.creator.actions.attachFiles')}
-                      </span>
-                    </Button>
-                  </label>
+                  >
+                    <span className="cursor-pointer">
+                      <Paperclip className="mr-2 h-4 w-4" />
+                      {t('feed.creator.actions.attachFiles')}
+                    </span>
+                  </Button>
+                </label>
 
-                  {/* Upload Progress */}
-                  {isUploading && (
-                    <div className="mt-2 space-y-1">
-                      <div className="text-muted-foreground flex items-center gap-2 text-sm">
-                        <Loader2 className="h-3 w-3 animate-spin" />
-                        <span>Uploading... {uploadProgress}%</span>
-                      </div>
-                      <Progress value={uploadProgress} className="h-1" />
+                {/* Upload Progress */}
+                {isUploading && (
+                  <div className="mt-2 space-y-1">
+                    <div className="text-muted-foreground flex items-center gap-2 text-sm">
+                      <Loader2 className="h-3 w-3 animate-spin" />
+                      <span>Uploading... {uploadProgress}%</span>
                     </div>
-                  )}
-
-                  {/* Pending files list */}
-                  {pendingFiles.length > 0 && (
-                    <div className="mt-2 space-y-1">
-                      {pendingFiles.map((pf) => (
-                        <div
-                          key={pf.id}
-                          className="bg-muted/30 flex items-center justify-between rounded border px-2 py-1.5 text-sm"
-                        >
-                          <div className="flex flex-col truncate">
-                            <span className="truncate">{pf.file.name}</span>
-                            <span className="text-muted-foreground text-xs">
-                              {formatFileSize(pf.file.size)}
-                            </span>
-                          </div>
-                          <Button
-                            type="button"
-                            onClick={() => removePendingFile(pf.id)}
-                            variant="ghost"
-                            size="sm"
-                            className="h-auto p-1"
-                            disabled={isUploading}
-                          >
-                            <X className="h-3 w-3" />
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Link Resources */}
-              <div className="space-y-2">
-                <Label className="text-sm font-medium">{t('feed.creator.labels.linkResources')}</Label>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setResourceSelectorOpen(true)}
-                  className="w-full justify-start"
-                >
-                  <Link2 className="mr-2 h-4 w-4" />
-                  {linkedResources.length > 0
-                    ? t('feed.creator.resourcesSelected', { count: linkedResources.length })
-                    : t('feed.creator.selectResources')}
-                </Button>
-
-                {/* Selected resources chips */}
-                {linkedResources.length > 0 && (
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {linkedResources.map((resource) => {
-                      const Icon =
-                        resource.type === 'mindmap'
-                          ? BrainCircuit
-                          : resource.type === 'presentation'
-                            ? Presentation
-                            : ClipboardList;
-                      const PermissionIcon = resource.permissionLevel === 'comment' ? MessageSquare : Eye;
-                      return (
-                        <div
-                          key={`${resource.type}:${resource.id}`}
-                          className="bg-secondary flex items-center gap-1.5 rounded-full px-3 py-1 text-sm"
-                        >
-                          <Icon className="h-3.5 w-3.5" />
-                          <span className="max-w-[120px] truncate">{resource.title}</span>
-                          <span className="text-muted-foreground flex items-center gap-0.5 text-xs">
-                            <PermissionIcon className="h-3 w-3" />
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setLinkedResources((prev) =>
-                                prev.filter((r) => !(r.type === resource.type && r.id === resource.id))
-                              )
-                            }
-                            className="hover:text-destructive ml-1"
-                          >
-                            <X className="h-3 w-3" />
-                          </button>
-                        </div>
-                      );
-                    })}
+                    <Progress value={uploadProgress} className="h-1" />
                   </div>
                 )}
 
-                <ResourceSelectorDialog
-                  open={resourceSelectorOpen}
-                  onOpenChange={setResourceSelectorOpen}
-                  initialSelection={linkedResources}
-                  onConfirm={setLinkedResources}
-                />
+                {/* Pending files list */}
+                {pendingFiles.length > 0 && (
+                  <div className="mt-2 space-y-1">
+                    {pendingFiles.map((pf) => (
+                      <div
+                        key={pf.id}
+                        className="bg-muted/30 flex items-center justify-between rounded border px-2 py-1.5 text-sm"
+                      >
+                        <div className="flex flex-col truncate">
+                          <span className="truncate">{pf.file.name}</span>
+                          <span className="text-muted-foreground text-xs">
+                            {formatFileSize(pf.file.size)}
+                          </span>
+                        </div>
+                        <Button
+                          type="button"
+                          onClick={() => removePendingFile(pf.id)}
+                          variant="ghost"
+                          size="sm"
+                          className="h-auto p-1"
+                          disabled={isUploading}
+                        >
+                          <X className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
-            </>
-          )}
+            </div>
+
+            {/* Link Resources */}
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">{t('feed.creator.labels.linkResources')}</Label>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setResourceSelectorOpen(true)}
+                className="w-full justify-start"
+              >
+                <Link2 className="mr-2 h-4 w-4" />
+                {linkedResources.length > 0
+                  ? t('feed.creator.resourcesSelected', { count: linkedResources.length })
+                  : t('feed.creator.selectResources')}
+              </Button>
+
+              {/* Selected resources chips */}
+              {linkedResources.length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {linkedResources.map((resource) => {
+                    const Icon =
+                      resource.type === 'mindmap'
+                        ? BrainCircuit
+                        : resource.type === 'presentation'
+                          ? Presentation
+                          : ClipboardList;
+                    const PermissionIcon = resource.permissionLevel === 'comment' ? MessageSquare : Eye;
+                    return (
+                      <div
+                        key={`${resource.type}:${resource.id}`}
+                        className="bg-secondary flex items-center gap-1.5 rounded-full px-3 py-1 text-sm"
+                      >
+                        <Icon className="h-3.5 w-3.5" />
+                        <span className="max-w-[120px] truncate">{resource.title}</span>
+                        <span className="text-muted-foreground flex items-center gap-0.5 text-xs">
+                          <PermissionIcon className="h-3 w-3" />
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setLinkedResources((prev) =>
+                              prev.filter((r) => !(r.type === resource.type && r.id === resource.id))
+                            )
+                          }
+                          className="hover:text-destructive ml-1"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              <ResourceSelectorDialog
+                open={resourceSelectorOpen}
+                onOpenChange={setResourceSelectorOpen}
+                initialSelection={linkedResources}
+                onConfirm={setLinkedResources}
+              />
+            </div>
+          </>
+          {/* )} */}
 
           {/* Allow Comments */}
           <div className="flex items-center space-x-2">

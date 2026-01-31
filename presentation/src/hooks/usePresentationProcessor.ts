@@ -1,13 +1,15 @@
 import { ref, watch, onUnmounted, type Ref } from 'vue';
 import type { Pinia } from 'pinia';
+import { useQueryClient } from '@tanstack/vue-query';
 import { convertToSlide, updateImageSource, selectRandomTemplate } from '@/utils/slideLayout';
 import type { SlideLayoutSchema, SlideViewport } from '@/utils/slideLayout/types';
 import type { PPTImageElement, SlideTheme } from '@/types/slides';
 import { useSlidesStore } from '@/store';
 import { useGenerationStore, type AiResultSlide } from '@/store/generation';
 import { useSaveStore } from '@/store/save';
-import { useAiResultById, useUpdateSlides, useSetParsed } from './usePresentationMutations';
-import { useGenerateImage } from './useImageGeneration';
+import { useAiResult, useSetParsed } from '@/services/presentation/queries';
+import { useGenerateImage } from '@/services/image/queries';
+import { queryKeys } from '@/services/query-keys';
 import type { PresentationGenerationRequest } from '@/types/generation';
 import { useSavePresentation } from './useSavePresentation';
 
@@ -41,10 +43,42 @@ export function usePresentationProcessor(
   const pendingImageGenerations = ref<Set<Promise<any>>>(new Set());
   const pendingSlideProcessing = ref<Set<Promise<void>>>(new Set());
 
-  // API Mutations
-  const { mutateAsync: getAiResult } = useAiResultById(presentationId);
-  const { mutateAsync: setParsed } = useSetParsed(presentationId);
-  const { mutateAsync: generateImage } = useGenerateImage(presentationId);
+  // API Hooks
+  const queryClient = useQueryClient();
+  const { refetch: fetchAiResult } = useAiResult(presentationId, { enabled: false });
+  const { mutateAsync: setParsedMutation } = useSetParsed();
+  const { mutateAsync: generateImageMutation } = useGenerateImage();
+
+  // Wrapper to preserve existing interface and add cache invalidation
+  async function generateImage(variables: {
+    slideId: string;
+    prompt: string;
+    model: { name: string; provider: string };
+    themeStyle?: string;
+    themeDescription?: string;
+    artStyle?: string;
+    artStyleModifiers?: string;
+  }) {
+    const result = await generateImageMutation({
+      presentationId,
+      slideId: variables.slideId,
+      params: {
+        prompt: variables.prompt,
+        imageModel: variables.model,
+        themeStyle: variables.themeStyle,
+        themeDescription: variables.themeDescription,
+        artStyle: variables.artStyle,
+        artStyleModifiers: variables.artStyleModifiers,
+      },
+    });
+
+    // Preserve cache invalidation from old wrapper
+    queryClient.invalidateQueries({
+      queryKey: queryKeys.presentations.detail(presentationId),
+    });
+
+    return result;
+  }
 
   // Stores
   const generationStore = useGenerationStore();
@@ -87,7 +121,11 @@ export function usePresentationProcessor(
       isProcessing.value = true;
 
       // Get both slides and generation options from AI result
-      const { slides: aiResultSlides, generationOptions } = await getAiResult();
+      const { data: aiResultData } = await fetchAiResult();
+      if (!aiResultData) {
+        throw new Error('Failed to fetch AI result');
+      }
+      const { slides: aiResultSlides, generationOptions } = aiResultData;
 
       // Restore generation options to store if available
       if (generationOptions) {
@@ -171,7 +209,7 @@ export function usePresentationProcessor(
           });
         }
 
-        await setParsed();
+        await setParsedMutation(presentationId);
       } finally {
         dispatchGeneratingEvent(false);
       }
@@ -419,7 +457,7 @@ export function usePresentationProcessor(
               thumbnail: presentation?.thumbnail,
             });
 
-            await setParsed();
+            await setParsedMutation(presentationId);
           } finally {
             // Always clear generating state
             dispatchGeneratingEvent(false);

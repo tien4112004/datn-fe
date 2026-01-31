@@ -282,6 +282,11 @@ export default {
       cancel: 'Cancel',
       save: 'Save Assignment',
       saving: 'Saving...',
+      tooltips: {
+        save: 'Save changes',
+        generate: 'AI generate (coming soon)',
+        fromBank: 'Add from question bank',
+      },
     },
 
     // Loading state
@@ -356,6 +361,13 @@ export default {
         descriptionPlaceholder: 'Enter assignment description (optional)',
         dueDatePlaceholder: 'Select due date',
       },
+      tooltips: {
+        title: 'Name your assignment',
+        subject: 'Choose subject area',
+        grade: 'Select grade level',
+        description: 'Add optional instructions',
+        shuffleQuestions: 'Randomize question order per student',
+      },
     },
 
     // Metadata edit dialog
@@ -425,6 +437,11 @@ export default {
       panelTitle: 'Assessment Matrix Builder',
       description:
         'Configure topics and required question counts for each difficulty level. Changes are saved automatically.',
+      tooltips: {
+        addTopic: 'Add new topic',
+        editTopic: 'Edit topic details',
+        cellInput: 'Required question count',
+      },
     },
 
     // Matrix view dialog
@@ -481,6 +498,11 @@ export default {
       assignmentInfo: 'Assignment Info',
       matrixBuilder: 'Matrix Builder',
       untitled: 'Untitled',
+      tooltips: {
+        assignmentInfo: 'Edit assignment details',
+        matrixBuilder: 'Configure assessment matrix',
+        questionNumber: 'Click to edit, drag to reorder',
+      },
     },
 
     // Question List Dialog

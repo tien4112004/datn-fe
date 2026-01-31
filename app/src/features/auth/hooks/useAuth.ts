@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { useAuth as useAuthContext } from '@/shared/context/auth';
 import { useAuthApiService, getAuthApiService } from '../api';
@@ -83,6 +83,7 @@ export const useRegister = () => {
 export const useLogout = () => {
   const { logout } = useAuthContext();
   const authService = useAuthApiService();
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async () => {
@@ -97,10 +98,14 @@ export const useLogout = () => {
     onSuccess: () => {
       // Always clear frontend session regardless of backend response
       logout();
+      // Clear all cached queries to prevent data leakage between users
+      queryClient.clear();
     },
     onError: () => {
       // Even on error, clear frontend session
       logout();
+      // Clear all cached queries to prevent data leakage between users
+      queryClient.clear();
     },
   });
 };

@@ -8,7 +8,7 @@ import {
   CardTitle,
 } from '@/shared/components/ui/card';
 import { Button } from '@/shared/components/ui/button';
-import { Palette, Sparkles } from 'lucide-react';
+import { Palette, Sparkles, Loader2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { ModelSelect } from '@/features/model/components/ModelSelect';
 import { MODEL_TYPES, useModels } from '@/features/model';
@@ -253,6 +253,8 @@ const CustomizationSection = ({
   const disabled = useOutlineStore((state) => state.isStreaming);
   const { models } = useModels(MODEL_TYPES.IMAGE);
 
+  const isFormDisabled = disabled || isGenerating;
+
   const onThemeSelect = useCallback(
     (theme: SlideTheme) => {
       setValue('theme', theme, { shouldValidate: true, shouldDirty: true });
@@ -280,12 +282,20 @@ const CustomizationSection = ({
         {t('workspace.customizeSection')}
       </div>
       <Card className="w-full max-w-3xl">
-        <ThemeSection selectedTheme={watch('theme')} onThemeSelect={onThemeSelect} disabled={disabled} />
-        <ArtSection selectedStyle={watch('artStyle')} onStyleSelect={onArtStyleSelect} disabled={disabled} />
+        <ThemeSection
+          selectedTheme={watch('theme')}
+          onThemeSelect={onThemeSelect}
+          disabled={isFormDisabled}
+        />
+        <ArtSection
+          selectedStyle={watch('artStyle')}
+          onStyleSelect={onArtStyleSelect}
+          disabled={isFormDisabled}
+        />
         {/* <ContentSection
           selectedContentLength={watch('contentLength')}
           onContentLengthSelect={onContentLengthSelect}
-          disabled={disabled}
+          disabled={isFormDisabled}
         /> */}
 
         <CardContent className="flex flex-row items-center gap-2">
@@ -301,19 +311,14 @@ const CustomizationSection = ({
                 placeholder={t('createOutline.model.placeholder')}
                 label={t('createOutline.model.label')}
                 showProviderLogo={true}
-                disabled={disabled}
+                disabled={isFormDisabled}
               />
             )}
           />
         </CardContent>
       </Card>
-      <Button
-        className="mt-5"
-        type="button"
-        onClick={onGeneratePresentation}
-        disabled={disabled || isGenerating}
-      >
-        <Sparkles />
+      <Button className="mt-5" type="button" onClick={onGeneratePresentation} disabled={isFormDisabled}>
+        {isGenerating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles />}
         {isGenerating ? t('workspace.generatingPresentation') : t('workspace.generatePresentation')}
       </Button>
     </div>

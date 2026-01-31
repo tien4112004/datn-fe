@@ -2,13 +2,14 @@ import type { ArtStyle } from '@aiprimary/core';
 
 export interface ImageGenerationRequest {
   prompt: string;
-  size?: string;
+  aspectRatio?: string;
   model: string;
   provider: string;
   themeStyle?: string;
   themeDescription?: string;
   artStyle?: string;
   artDescription?: string;
+  negativePrompt?: string;
 }
 
 export interface ImageGenerationResponse {
@@ -24,10 +25,8 @@ export interface ImageGenerationResponse {
 export interface ImageData {
   id: string;
   url: string;
-  prompt?: string;
-  style?: string;
-  size?: string;
-  quality?: string;
+  originalFilename?: string;
+  fileSize?: number;
   createdAt?: string;
   updatedAt?: string;
 }

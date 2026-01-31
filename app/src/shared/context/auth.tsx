@@ -9,6 +9,17 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 // User data is kept in memory only and refreshed on page load via /me endpoint
 const USER_KEY = 'user';
 
+// User-specific localStorage keys that should be cleared on logout
+const USER_SPECIFIC_STORAGE_KEYS = [
+  'recent-slide-theme-ids', // Recent presentation themes
+  'outline-store', // Presentation outlines (Zustand persist)
+  'CoreStore', // Mindmap nodes and edges (Zustand persist)
+  'TreePanelStore', // Mindmap tree panel state (Zustand persist)
+  'mindmap-metadata-store', // Mindmap thumbnail (Zustand persist)
+  'class-store', // Class filters and selection (Zustand persist)
+  'question-bank-store', // Question bank filters (Zustand persist)
+];
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
@@ -52,6 +63,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Clear user data from localStorage
     // Note: HttpOnly cookies will be cleared by calling backend logout endpoint
     localStorage.removeItem(USER_KEY);
+
+    // Clear all user-specific cached data (Zustand stores, recent themes, etc.)
+    USER_SPECIFIC_STORAGE_KEYS.forEach((key) => {
+      localStorage.removeItem(key);
+    });
   };
 
   const value: AuthContextType = {
@@ -81,4 +97,9 @@ export const setUserData = (user: User) => {
 // Helper function to clear all auth data
 export const clearAuthData = () => {
   localStorage.removeItem(USER_KEY);
+
+  // Clear all user-specific cached data (Zustand stores, recent themes, etc.)
+  USER_SPECIFIC_STORAGE_KEYS.forEach((key) => {
+    localStorage.removeItem(key);
+  });
 };

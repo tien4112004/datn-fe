@@ -27,7 +27,7 @@ export const AssignmentViewPage = () => {
   const deleteAssignment = useDeleteAssignment();
 
   const handleEdit = () => {
-    navigate(`/assignments/edit/${id}`);
+    navigate(`/assignment/edit/${id}`);
   };
 
   const handleDelete = async () => {

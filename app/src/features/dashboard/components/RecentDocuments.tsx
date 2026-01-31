@@ -33,7 +33,7 @@ export const RecentDocuments = () => {
       case 'mindmap':
         return `/mindmap/${doc.id}`;
       case 'assignment':
-        return `/assignments/edit/${doc.id}`;
+        return `/assignment/edit/${doc.id}`;
       default:
         return '/';
     }

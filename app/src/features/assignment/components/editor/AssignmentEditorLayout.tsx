@@ -2,6 +2,7 @@ import { Save, Wand2, Database } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/shared/components/ui/button';
 import LoadingButton from '@/shared/components/common/LoadingButton';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/components/ui/tooltip';
 import { QuestionsEditorPanel } from './QuestionsEditorPanel';
 import { AssignmentMetadataPanel } from './AssignmentMetadataPanel';
 import { MatrixBuilderPanel } from './MatrixBuilderPanel';
@@ -21,6 +22,7 @@ export const AssignmentEditorLayout = ({ onSave, isSaving }: AssignmentEditorLay
   const setQuestionBankOpen = useAssignmentEditorStore((state) => state.setQuestionBankOpen);
   const { t } = useTranslation('assignment', { keyPrefix: 'assignmentEditor' });
   const { t: tToolbar } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.questions.toolbar' });
+  const { t: tActions } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.actions' });
 
   return (
     <div className="grid grid-cols-1 gap-6 pb-4 lg:h-[calc(100vh-8rem)] lg:grid-cols-4">
@@ -47,20 +49,34 @@ export const AssignmentEditorLayout = ({ onSave, isSaving }: AssignmentEditorLay
             <>
               <div className="space-y-2">
                 <AddQuestionButton className="w-full" />
-                <Button type="button" size="sm" variant="outline" disabled className="w-full">
-                  <Wand2 className="mr-2 h-4 w-4" />
-                  {tToolbar('generate')}
-                </Button>
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="outline"
-                  onClick={() => setQuestionBankOpen(true)}
-                  className="w-full"
-                >
-                  <Database className="mr-2 h-4 w-4" />
-                  {tToolbar('fromBank')}
-                </Button>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button type="button" size="sm" variant="outline" disabled className="w-full">
+                      <Wand2 className="mr-2 h-4 w-4" />
+                      {tToolbar('generate')}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{tActions('tooltips.generate')}</p>
+                  </TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setQuestionBankOpen(true)}
+                      className="w-full"
+                    >
+                      <Database className="mr-2 h-4 w-4" />
+                      {tToolbar('fromBank')}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{tActions('tooltips.fromBank')}</p>
+                  </TooltipContent>
+                </Tooltip>
               </div>
 
               {/* Divider */}
@@ -70,15 +86,22 @@ export const AssignmentEditorLayout = ({ onSave, isSaving }: AssignmentEditorLay
 
           {/* Save/Cancel Actions */}
           <div className="space-y-2">
-            <LoadingButton
-              onClick={onSave}
-              loading={isSaving}
-              loadingText={t('actions.saving')}
-              className="w-full"
-            >
-              <Save className="mr-2 h-4 w-4" />
-              {t('actions.save')}
-            </LoadingButton>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <LoadingButton
+                  onClick={onSave}
+                  loading={isSaving}
+                  loadingText={t('actions.saving')}
+                  className="w-full"
+                >
+                  <Save className="mr-2 h-4 w-4" />
+                  {t('actions.save')}
+                </LoadingButton>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{tActions('tooltips.save')}</p>
+              </TooltipContent>
+            </Tooltip>
           </div>
         </div>
 

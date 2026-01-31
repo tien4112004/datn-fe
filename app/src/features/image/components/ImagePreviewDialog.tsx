@@ -23,7 +23,6 @@ const ImagePreviewDialog = () => {
       try {
         await navigator.share({
           title: t('preview.shareTitle'),
-          text: selectedImage.prompt,
           url: shareUrl,
         });
       } catch {
@@ -37,19 +36,41 @@ const ImagePreviewDialog = () => {
   const handleDownload = () => {
     if (!selectedImage) return;
 
-    const link = document.createElement('a');
-    link.href = selectedImage.url;
-    link.download = `ai-image-${selectedImage.id}.jpg`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    // Try to fetch the image as a blob and download with the original file name if possible
+    fetch(selectedImage.url)
+      .then(async (response) => {
+        if (!response.ok) throw new Error('Network response was not ok');
+        const blob = await response.blob();
+        // Try to extract file name from selectedImage or fallback
+        let fileName = selectedImage.originalFilename || '';
+        if (!fileName) {
+          // Try to extract from URL
+          try {
+            const urlParts = selectedImage.url.split('/');
+            fileName = urlParts[urlParts.length - 1].split('?')[0];
+          } catch {
+            fileName = `ai-image-${selectedImage.id}.jpg`;
+          }
+        }
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+      })
+      .catch(() => {
+        // fallback: open image in new tab
+        window.open(selectedImage.url, '_blank');
+      });
   };
 
   if (!selectedImage) return null;
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && closePreview()}>
-      <DialogContent className="flex max-h-[90vh] max-w-4xl flex-col">
+    <Dialog open={isOpen} onOpenChange={closePreview}>
+      <DialogContent className="flex max-h-[90vh] max-w-4xl flex-col" showCloseButton={true}>
         <DialogHeader>
           <DialogTitle className="sr-only">{t('preview.title')}</DialogTitle>
           <DialogDescription className="sr-only">{t('preview.description')}</DialogDescription>
@@ -59,7 +80,7 @@ const ImagePreviewDialog = () => {
         <div className="flex flex-1 items-center justify-center overflow-hidden">
           <img
             src={selectedImage.url}
-            alt={selectedImage.prompt || t('card.generatedImage')}
+            alt={t('card.generatedImage')}
             className="max-h-[60vh] max-w-full rounded-lg object-contain"
             onError={(e) => {
               const target = e.target as HTMLImageElement;
@@ -68,21 +89,13 @@ const ImagePreviewDialog = () => {
           />
         </div>
 
-        {/* Prompt */}
-        {selectedImage.prompt && (
-          <div className="mt-4">
-            <p className="text-muted-foreground text-sm">{t('preview.prompt')}</p>
-            <p className="text-foreground leading-relaxed">{selectedImage.prompt}</p>
-          </div>
-        )}
-
         {/* Action Buttons */}
         <div className="mt-4 flex gap-3 border-t pt-4">
           <Button onClick={handleDownload} className="flex-1 gap-2">
             <Download className="h-4 w-4" />
             {t('preview.download')}
           </Button>
-          <Button onClick={handleShare} variant="outline" className="flex-1 gap-2">
+          <Button onClick={handleShare} variant="outline" className="invisible flex-1 gap-2">
             <Share2 className="h-4 w-4" />
             {t('preview.share')}
           </Button>

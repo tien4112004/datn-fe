@@ -10,6 +10,7 @@
 <script lang="ts" setup>
 import { onMounted, ref, watch, computed, provide, getCurrentInstance } from 'vue';
 import { storeToRefs } from 'pinia';
+import { nanoid } from 'nanoid';
 import {
   useScreenStore,
   useMainStore,
@@ -21,6 +22,7 @@ import {
 import { LOCALSTORAGE_KEY_DISCARDED_DB } from '@/configs/storage';
 import { deleteDiscardedDB } from '@/utils/database';
 import { isPC } from '@/utils/common';
+import type { Slide } from '@/types/slides';
 
 import Editor from '../views/Editor/index.vue';
 import Mobile from '../views/Mobile/index.vue';
@@ -102,7 +104,26 @@ onMounted(async () => {
   saveStore.reset();
 
   // RemoteApp always receives slides from the parent app via props
-  slidesStore.setSlides(containerStore.presentation?.slides || []);
+  // Deep clone to ensure reactivity (containerStore.presentation is markRaw'd)
+  const presentationSlides = containerStore.presentation?.slides
+    ? JSON.parse(JSON.stringify(containerStore.presentation.slides))
+    : [];
+
+  // If presentation has no slides, create a blank slide
+  if (presentationSlides.length === 0) {
+    const { theme } = storeToRefs(slidesStore);
+    const emptySlide: Slide = {
+      id: nanoid(10),
+      elements: [],
+      background: {
+        type: 'solid',
+        color: typeof theme.value.backgroundColor === 'string' ? theme.value.backgroundColor : '#ffffff',
+      },
+    };
+    slidesStore.setSlides([emptySlide]);
+  } else {
+    slidesStore.setSlides(presentationSlides);
+  }
 
   await deleteDiscardedDB();
   snapshotStore.initSnapshotDatabase();

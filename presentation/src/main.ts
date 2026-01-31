@@ -5,6 +5,7 @@ import router from '@/router';
 import i18n from '@/locales';
 import { initializeFonts } from '@/utils/font';
 import { templateRegistry } from '@/utils/slideLayout/converters/templateRegistry';
+import { VueQueryPlugin, vueQueryPluginOptions } from '@/lib/query-client';
 
 import 'prosemirror-view/style/prosemirror.css';
 import 'animate.css';
@@ -22,6 +23,7 @@ app.use(Directive);
 app.use(createPinia());
 app.use(router);
 app.use(i18n);
+app.use(VueQueryPlugin, vueQueryPluginOptions);
 app.mount('#app');
 
 // Initialize Google Fonts for fallback fonts

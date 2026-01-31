@@ -76,6 +76,7 @@ export default class ImageService implements ImageApiService {
         prompt: request.prompt,
         model: request.model,
         provider: request.provider.toLowerCase(),
+        aspectRatio: request.aspectRatio || '1:1',
         themeStyle: request.themeStyle,
         themeDescription: request.themeDescription,
         artStyle: request.artStyle,
@@ -95,10 +96,8 @@ export default class ImageService implements ImageApiService {
     return {
       id: data.id,
       url: data.url || data.cdnUrl,
-      prompt: data.prompt,
-      style: data.style,
-      size: data.size,
-      quality: data.quality,
+      originalFilename: data.originalFilename,
+      fileSize: data.fileSize,
       createdAt: data.createdAt,
       updatedAt: data.updatedAt,
     };

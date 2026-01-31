@@ -59,12 +59,6 @@ const router = createBrowserRouter([
         }),
       },
       {
-        path: 'image',
-        lazy: async () => ({
-          Component: (await import('@/features/image')).default.ImageGalleryPage,
-        }),
-      },
-      {
         path: 'image/generate',
         lazy: async () => ({
           Component: (await import('@/features/image')).default.CreateImagePage,
@@ -115,24 +109,6 @@ const router = createBrowserRouter([
       {
         path: 'classes/:id/feed',
         Component: () => <FeedTab classId="class1" />,
-      },
-      {
-        path: 'periods/:id',
-        lazy: async () => ({
-          Component: (await import('@/features/classes')).default.PeriodDetailPage,
-        }),
-      },
-      {
-        path: 'lessons/:id',
-        lazy: async () => ({
-          Component: (await import('@/features/classes')).default.LessonDetailPage,
-        }),
-      },
-      {
-        path: 'lessons/create',
-        lazy: async () => ({
-          Component: (await import('@/features/classes')).default.LessonCreatorPage,
-        }),
       },
       {
         path: 'settings',

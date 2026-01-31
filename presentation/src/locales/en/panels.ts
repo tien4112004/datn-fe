@@ -90,7 +90,7 @@ export default {
         portrait: 'Portrait',
         square: 'Square',
       },
-      defaultSearch: 'landscape',
+      defaultSearch: '',
       errorNoQuery: 'Please enter search keywords',
       emptyStates: {
         noImages: 'No images uploaded yet',

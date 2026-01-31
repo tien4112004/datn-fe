@@ -1,11 +1,10 @@
 import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { MessageSquare, BookOpen, GraduationCap, Calendar, Users } from 'lucide-react';
+import { MessageSquare, GraduationCap, Calendar, Users } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import { getGradeLabel } from '@/features/classes/shared/utils/grades';
 
 import { FeedTab } from '@/features/classes/class-feed/components';
-import { LessonTab } from '@/features/classes/class-lesson';
 import { ClassStudentView } from '@/features/classes/class-student';
 import type { Class } from '@/features/classes/shared/types';
 import { LanguageSettingsDropdown } from '@/features/student/components/LanguageSettingsDropdown';
@@ -19,7 +18,6 @@ interface StudentClassDetailTabsProps {
 const tabs = [
   { value: 'feed', icon: MessageSquare, labelKey: 'tabs.feed' },
   { value: 'students', icon: Users, labelKey: 'tabs.students' },
-  { value: 'lessons', icon: BookOpen, labelKey: 'tabs.lessons' },
 ] as const;
 
 type StartTab = (typeof tabs)[number]['value'];
@@ -155,12 +153,6 @@ export const StudentClassDetailTabs = ({ classId, currentClass }: StudentClassDe
         {currentTab === 'students' && (
           <div className="p-6">
             <ClassStudentView classData={currentClass} />
-          </div>
-        )}
-
-        {currentTab === 'lessons' && (
-          <div className="p-6">
-            <LessonTab classId={classId} currentClass={currentClass} />
           </div>
         )}
       </main>

@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useLocation } from 'react-router-dom';
 import PresentationTable from '@/features/presentation/components/table/PresentationTable';
 import PresentationGrid from '@/features/presentation/components/table/PresentationGrid';
 import ProjectControls from '@/features/projects/components/ProjectControls';
@@ -15,9 +15,15 @@ import { SharedResourcesTable, SharedResourcesGrid } from '@/features/shared-res
 const ProjectListPage = () => {
   const { t } = useTranslation('projects');
   const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
 
   const viewMode = searchParams.get('view') || 'list';
   const resourceType = searchParams.get('resource') || 'presentation';
+
+  // Extract new image from location state for auto-preview
+  const locationState = location.state as { newImage?: any; openPreview?: boolean } | null;
+  const newImageToPreview =
+    locationState?.newImage && locationState?.openPreview ? locationState.newImage : undefined;
 
   const handleResourceChange = (value: string) => {
     setSearchParams((prev) => {
@@ -50,7 +56,7 @@ const ProjectListPage = () => {
       key: 'image',
       value: 'image',
       label: t('resources.image', 'Image'),
-      content: <Image.ImageGalleryPage />,
+      content: <Image.ImageGalleryPage initialImage={newImageToPreview} />,
     },
     {
       key: 'shared',

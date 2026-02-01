@@ -5,13 +5,13 @@ import { AssignmentEditorLayout } from '../components/editor/AssignmentEditorLay
 import { MetadataEditDialog } from '../components/editor/MetadataEditDialog';
 import { QuestionBankImportManager } from '../components/editor/QuestionBankImportManager';
 import { UnsavedChangesDialog } from '@/shared/components/modals/UnsavedChangesDialog';
-import type { Assignment } from '@aiprimary/core';
-import { CriticalError } from '@aiprimary/api';
-import { ERROR_TYPE } from '@/shared/constants';
 import { useAssignmentFormStore } from '../stores/useAssignmentFormStore';
 import { useAssignmentDirtyState } from '../hooks/useAssignmentDirtyState';
 import { useSaveAssignment } from '../hooks/useSaveAssignment';
 import { createEmptyFormData, transformAssignmentToFormData } from '../utils/defaultFormData';
+import { ERROR_TYPE } from '@/shared/constants';
+import { CriticalError } from '@aiprimary/api';
+import type { Assignment } from '@aiprimary/core';
 
 export const AssignmentEditorPage = () => {
   const navigate = useNavigate();

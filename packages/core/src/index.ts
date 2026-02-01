@@ -67,3 +67,4 @@ export * from './assessment/answer';
 export * from './assessment/questionBank';
 export * from './assessment/examDraft';
 export * from './assessment/assessmentMatrix';
+export * from './assessment/assessmentMatrixUtils';

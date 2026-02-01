@@ -552,6 +552,10 @@ export default {
     matrixCell: {
       required: 'Yêu cầu:',
       ok: 'OK',
+      needMore: 'Cần thêm {{count}}',
+      extra: 'Thừa {{count}}',
+      missing: '−{{count}}',
+      surplus: '+{{count}}',
     },
 
     // Xem câu hỏi hiện tại

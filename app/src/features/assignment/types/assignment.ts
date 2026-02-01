@@ -1,4 +1,4 @@
-import type { Difficulty, SubjectCode, AssignmentQuestion } from '@aiprimary/core';
+import type { Difficulty, QuestionType, SubjectCode, AssignmentQuestion } from '@aiprimary/core';
 import type { Question } from '@aiprimary/core';
 
 // Context stored at assignment level (cloned & editable)
@@ -28,11 +28,13 @@ export interface AssignmentTopic {
   description?: string;
 }
 
-// Matrix cell (topic × difficulty)
+// Matrix cell (topic × difficulty × questionType) - flat representation for UI
 export interface MatrixCell {
-  id: string;
+  id: string; // e.g., "topicId-difficulty-questionType"
   topicId: string;
+  topicName: string;
   difficulty: Difficulty;
+  questionType: QuestionType;
   requiredCount: number;
   currentCount: number;
 }
@@ -95,7 +97,8 @@ export interface QuestionItemRequest {
 // Matrix cell for API request
 export interface MatrixCellRequest {
   topicId: string;
-  difficulty: string;
+  difficulty: Difficulty;
+  questionType: QuestionType;
   requiredCount: number;
 }
 
@@ -128,3 +131,13 @@ export interface UpdateAssignmentRequest {
   contexts?: AssignmentContext[];
   matrixCells?: MatrixCellRequest[];
 }
+
+// Re-export core types for convenience
+export type {
+  AssessmentMatrix,
+  MatrixMetadata,
+  MatrixDimensions,
+  MatrixDimensionTopic,
+  MatrixCellStatus,
+  MatrixValidationResult,
+} from '@aiprimary/core';

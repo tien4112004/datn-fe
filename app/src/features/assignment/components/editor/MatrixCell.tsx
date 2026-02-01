@@ -19,7 +19,7 @@ export const MatrixCell = ({ cell }: MatrixCellProps) => {
 
   // Validate the cell
   const validation = validateMatrixCell(cell);
-  const { status, message } = validation;
+  const { status } = validation;
 
   const statusColors: Record<string, string> = {
     valid: 'bg-green-100 text-green-800 border-green-300 dark:bg-green-900 dark:text-green-200',
@@ -32,30 +32,63 @@ export const MatrixCell = ({ cell }: MatrixCellProps) => {
     updateMatrixCell(cell.id, { requiredCount: numValue });
   };
 
-  return (
-    <div className="space-y-1.5">
-      <div className="flex items-center gap-1">
-        <span className="text-xs text-gray-500">{t('required')}</span>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Input
-              type="number"
-              min="0"
-              value={cell.requiredCount}
-              onChange={(e) => handleRequiredCountChange(e.target.value)}
-              className="h-7 w-16 text-xs"
-            />
-          </TooltipTrigger>
-          <TooltipContent>
-            <p className="max-w-xs">{tMatrix('tooltips.cellInput')}</p>
-          </TooltipContent>
-        </Tooltip>
-      </div>
+  // Compact status display
+  const getStatusDisplay = () => {
+    const diff = cell.currentCount - cell.requiredCount;
+    if (cell.requiredCount === 0 && cell.currentCount === 0) {
+      return { text: '0', fullText: t('ok'), compactText: t('ok') };
+    }
+    if (diff === 0) {
+      return { text: `${cell.currentCount}`, fullText: t('ok'), compactText: t('ok') };
+    }
+    if (diff < 0) {
+      const missing = cell.requiredCount - cell.currentCount;
+      return {
+        text: `${cell.currentCount}`,
+        fullText: t('needMore', { count: missing }),
+        compactText: t('missing', { count: missing }),
+      };
+    }
+    const surplus = cell.currentCount - cell.requiredCount;
+    return {
+      text: `${cell.currentCount}`,
+      fullText: t('extra', { count: surplus }),
+      compactText: t('surplus', { count: surplus }),
+    };
+  };
 
-      <div className={`rounded-md border-2 p-2 text-center ${statusColors[status]}`}>
-        <div className="text-lg font-bold">{cell.currentCount}</div>
-        <div className="text-xs">{message || t('ok')}</div>
-      </div>
+  const statusDisplay = getStatusDisplay();
+
+  return (
+    <div className="space-y-1">
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Input
+            type="number"
+            min="0"
+            value={cell.requiredCount}
+            onChange={(e) => handleRequiredCountChange(e.target.value)}
+            className="h-7 w-full text-center text-xs"
+          />
+        </TooltipTrigger>
+        <TooltipContent>
+          <p className="max-w-xs">{tMatrix('tooltips.cellInput')}</p>
+        </TooltipContent>
+      </Tooltip>
+
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <div
+            className={`overflow-hidden rounded-md border px-1 py-1.5 text-center ${statusColors[status]}`}
+          >
+            <div className="truncate text-sm font-bold leading-none">{statusDisplay.text}</div>
+            <div className="mt-0.5 truncate text-[10px] leading-none">{statusDisplay.compactText}</div>
+          </div>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>{statusDisplay.fullText || t('ok')}</p>
+        </TooltipContent>
+      </Tooltip>
     </div>
   );
 };

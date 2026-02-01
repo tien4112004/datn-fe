@@ -1,11 +1,13 @@
-import { DIFFICULTY } from '../types';
-import type {
-  Assignment,
-  AssignmentTopic,
-  AssignmentQuestionWithTopic,
-  MatrixCell,
-  AssignmentContext,
+import {
+  type Assignment,
+  type AssignmentTopic,
+  type AssignmentQuestionWithTopic,
+  type MatrixCell,
+  type AssignmentContext,
+  DIFFICULTY,
+  QUESTION_TYPE,
 } from '../types';
+import { createMatrixCellsForTopic } from './matrixHelpers';
 
 export interface AssignmentFormInitData {
   title: string;
@@ -28,21 +30,8 @@ export function createDefaultTopic(): AssignmentTopic {
   };
 }
 
-export function createDefaultMatrixCells(topicId: string): MatrixCell[] {
-  const ts = Date.now();
-  return [
-    { id: `cell-${ts}-1`, topicId, difficulty: DIFFICULTY.KNOWLEDGE, requiredCount: 0, currentCount: 0 },
-    { id: `cell-${ts}-2`, topicId, difficulty: DIFFICULTY.COMPREHENSION, requiredCount: 0, currentCount: 0 },
-    { id: `cell-${ts}-3`, topicId, difficulty: DIFFICULTY.APPLICATION, requiredCount: 0, currentCount: 0 },
-    {
-      id: `cell-${ts}-4`,
-      topicId,
-      difficulty: DIFFICULTY.ADVANCED_APPLICATION,
-      requiredCount: 0,
-      currentCount: 0,
-    },
-  ];
-}
+const difficulties = Object.values(DIFFICULTY);
+const questionTypes = Object.values(QUESTION_TYPE);
 
 export function createEmptyFormData(): AssignmentFormInitData {
   const topic = createDefaultTopic();
@@ -55,7 +44,7 @@ export function createEmptyFormData(): AssignmentFormInitData {
     topics: [topic],
     contexts: [],
     questions: [],
-    matrixCells: createDefaultMatrixCells(topic.id),
+    matrixCells: createMatrixCellsForTopic(topic.id, topic.name, difficulties, questionTypes),
   };
 }
 
@@ -80,7 +69,7 @@ export function transformAssignmentToFormData(assignment: Assignment): Assignmen
   const matrixCells =
     extendedAssignment.matrix?.cells && extendedAssignment.matrix.cells.length > 0
       ? extendedAssignment.matrix.cells
-      : createDefaultMatrixCells(topics[0].id);
+      : createMatrixCellsForTopic(topics[0].id, topics[0].name, difficulties, questionTypes);
 
   return {
     title: extendedAssignment.title || 'Untitled Assignment',

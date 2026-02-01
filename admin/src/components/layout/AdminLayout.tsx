@@ -14,6 +14,7 @@ import {
   X,
   Library,
   BookOpen,
+  Coins,
 } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
@@ -28,6 +29,7 @@ const navItems = [
   { to: '/art-styles', icon: Brush, label: 'Art Styles' },
   { to: '/question-bank', icon: Library, label: 'Question Bank' },
   { to: '/model-config', icon: Settings, label: 'Model Config' },
+  { to: '/coin-pricing', icon: Coins, label: 'Coin Pricing' },
 ];
 
 export function AdminLayout() {

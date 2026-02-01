@@ -25,6 +25,13 @@ import type {
   ChapterResponse,
 } from '@/types/questionBank';
 import type { Context } from '@/types/context';
+import type {
+  CoinPricing,
+  CoinPricingCreateRequest,
+  CoinPricingUpdateRequest,
+  CoinPricingQueryParams,
+  EnumOption,
+} from '@/types/coin';
 import { parseQuestionBankCSV, exportQuestionsToCSV } from '@/utils/csvParser';
 import { validateQuestionBankCSV } from '@/utils/csvValidation';
 
@@ -684,6 +691,51 @@ export default class AdminRealApiService implements AdminApiService {
 
   async deleteContext(id: string): Promise<ApiResponse<void>> {
     const response = await api.delete<ApiResponse<void>>(`${this.baseUrl}/api/contexts/${id}`);
+    return response.data;
+  }
+
+  // Coin Pricing
+  async getCoinPricing(params?: CoinPricingQueryParams): Promise<ApiResponse<CoinPricing[]>> {
+    const response = await api.get<ApiResponse<CoinPricing[]>>(`${this.baseUrl}/api/admin/coin-pricing`, {
+      params,
+    });
+    return response.data;
+  }
+
+  async getCoinPricingById(id: string): Promise<ApiResponse<CoinPricing>> {
+    const response = await api.get<ApiResponse<CoinPricing>>(`${this.baseUrl}/api/admin/coin-pricing/${id}`);
+    return response.data;
+  }
+
+  async createCoinPricing(data: CoinPricingCreateRequest): Promise<ApiResponse<CoinPricing>> {
+    const response = await api.post<ApiResponse<CoinPricing>>(`${this.baseUrl}/api/admin/coin-pricing`, data);
+    return response.data;
+  }
+
+  async updateCoinPricing(id: string, data: CoinPricingUpdateRequest): Promise<ApiResponse<CoinPricing>> {
+    const response = await api.put<ApiResponse<CoinPricing>>(
+      `${this.baseUrl}/api/admin/coin-pricing/${id}`,
+      data
+    );
+    return response.data;
+  }
+
+  async deleteCoinPricing(id: string): Promise<ApiResponse<void>> {
+    const response = await api.delete<ApiResponse<void>>(`${this.baseUrl}/api/admin/coin-pricing/${id}`);
+    return response.data;
+  }
+
+  async getResourceTypes(): Promise<ApiResponse<EnumOption[]>> {
+    const response = await api.get<ApiResponse<EnumOption[]>>(
+      `${this.baseUrl}/api/admin/coin-pricing/resource-types`
+    );
+    return response.data;
+  }
+
+  async getUnitTypes(): Promise<ApiResponse<EnumOption[]>> {
+    const response = await api.get<ApiResponse<EnumOption[]>>(
+      `${this.baseUrl}/api/admin/coin-pricing/unit-types`
+    );
     return response.data;
   }
 }

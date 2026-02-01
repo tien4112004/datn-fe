@@ -36,6 +36,9 @@ const ContextsPage = lazy(() => import('@/pages/ContextsPage').then((m) => ({ de
 const ContextFormPage = lazy(() =>
   import('@/pages/ContextFormPage').then((m) => ({ default: m.ContextFormPage }))
 );
+const CoinPricingPage = lazy(() =>
+  import('@/pages/CoinPricingPage').then((m) => ({ default: m.CoinPricingPage }))
+);
 
 const LazyWrapper = ({ children }: { children: React.ReactNode }) => (
   <Suspense fallback={<GlobalSpinner text="Loading..." />}>{children}</Suspense>
@@ -187,6 +190,14 @@ export const router = createBrowserRouter([
         element: (
           <LazyWrapper>
             <QuestionBankEditorPage />
+          </LazyWrapper>
+        ),
+      },
+      {
+        path: 'coin-pricing',
+        element: (
+          <LazyWrapper>
+            <CoinPricingPage />
           </LazyWrapper>
         ),
       },

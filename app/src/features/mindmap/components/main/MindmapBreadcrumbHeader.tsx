@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Input } from '@/shared/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useMindmapPermissionContext } from '../../contexts/MindmapPermissionContext';
+import { useAuth } from '@/shared/context/auth';
 import {
   Breadcrumb,
   BreadcrumbList,
@@ -27,6 +28,8 @@ const MindmapBreadcrumbHeader = memo(({ mindmapId, initialTitle }: MindmapBreadc
   const { t } = useTranslation(I18N_NAMESPACES.MINDMAP);
   const navigate = useNavigate();
   const { canEdit } = useMindmapPermissionContext();
+  const { user } = useAuth();
+  const isStudent = user?.role === 'student';
   const [title, setTitle] = useState(initialTitle);
   const [isEditing, setIsEditing] = useState(false);
   const [originalTitle, setOriginalTitle] = useState(initialTitle);
@@ -111,8 +114,12 @@ const MindmapBreadcrumbHeader = memo(({ mindmapId, initialTitle }: MindmapBreadc
   }, [isEditing, handleSave]);
 
   const handleNavigateToMindmaps = useCallback(() => {
-    navigate('/projects?resource=mindmap');
-  }, [navigate]);
+    if (isStudent) {
+      navigate(`/student/classes`);
+    } else {
+      navigate('/projects?resource=mindmap');
+    }
+  }, [navigate, isStudent]);
 
   return (
     <div className="absolute left-4 top-4 z-10 max-w-md rounded-lg border bg-white/95 px-4 py-3 shadow-md backdrop-blur-sm">
@@ -120,8 +127,8 @@ const MindmapBreadcrumbHeader = memo(({ mindmapId, initialTitle }: MindmapBreadc
         <BreadcrumbList>
           <BreadcrumbItem className="hidden md:block">
             <BreadcrumbLink asChild>
-              <button onClick={handleNavigateToMindmaps} className="cursor-pointer">
-                Mindmaps
+              <button onClick={handleNavigateToMindmaps} className="flex cursor-pointer items-center gap-1">
+                {isStudent ? 'Back to Class' : 'Mindmaps'}
               </button>
             </BreadcrumbLink>
           </BreadcrumbItem>

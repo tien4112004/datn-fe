@@ -68,6 +68,13 @@ export default {
       applyLayout: 'Apply Layout Manually',
       logData: 'Log Nodes and Edges',
       share: 'Share',
+      duplicate: 'Save as Copy',
+      duplicateSuccess: 'Mindmap duplicated: {{title}}',
+      duplicateError: 'Failed to duplicate mindmap',
+      duplicateConfirm: 'Create a copy of this mindmap?',
+      duplicateLoading: 'Duplicating mindmap...',
+      cancel: 'Cancel',
+      confirm: 'Confirm',
     },
     selection: {
       noSelection: 'No nodes selected',

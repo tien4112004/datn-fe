@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useLoaderData, useParams, useNavigate, useLocation } from 'react-router-dom';
 import type { Presentation } from '../types';
 import { getSearchParamAsBoolean } from '@/shared/utils/searchParams';
+import { useAuth } from '@/shared/context/auth';
 import {
   usePresentationValidation,
   useMessageRemote,
@@ -18,14 +19,26 @@ import { SmallScreenDialog } from '@/shared/components/modals/SmallScreenDialog'
 import usePresentationStore from '../stores/usePresentationStore';
 import { CriticalError } from '@aiprimary/api';
 import { ERROR_TYPE } from '@/shared/constants';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { CommentDrawer } from '@/features/comments';
+import { useDuplicatePresentation } from '../hooks/useApi';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/shared/components/ui/alert-dialog';
 
 const DetailPage = () => {
   const { presentation } = useLoaderData() as { presentation: Presentation | null };
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const location = useLocation();
+  const { user } = useAuth();
   const isGeneratingParam = getSearchParamAsBoolean('isGenerating', false) ?? false;
   const isViewModeParam = getSearchParamAsBoolean('view', false) ?? false;
   const previousIsGenerating = useRef<boolean>(false);
@@ -33,6 +46,7 @@ const DetailPage = () => {
 
   // Permission state
   const userPermission = presentation?.permission;
+  const isStudent = user?.role === 'student';
 
   // Validate and initialize - all processing logic is now in Vue
   usePresentationValidation(id, presentation, isGeneratingParam);
@@ -71,7 +85,49 @@ const DetailPage = () => {
   // Listen for navigation requests from Vue (triggers React Router, respects unsaved changes blocker)
   useNavigationRequest(navigate);
 
+  // Handle duplicate presentation requests from Vue
+  const duplicateMutation = useDuplicatePresentation();
+  const isDuplicating = duplicateMutation.isPending;
+  const [duplicateDialogOpen, setDuplicateDialogOpen] = useState(false);
+  const [pendingDuplicateId, setPendingDuplicateId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const handleConfirmDuplicate = (event: Event) => {
+      const customEvent = event as CustomEvent<{ presentationId: string }>;
+      const presentationId = customEvent.detail.presentationId;
+
+      if (presentationId) {
+        setPendingDuplicateId(presentationId);
+        setDuplicateDialogOpen(true);
+      }
+    };
+
+    window.addEventListener('app.presentation.confirm-duplicate', handleConfirmDuplicate);
+    return () => window.removeEventListener('app.presentation.confirm-duplicate', handleConfirmDuplicate);
+  }, []);
+
+  const handleDuplicateConfirm = useCallback(async () => {
+    if (pendingDuplicateId) {
+      try {
+        const duplicated = await duplicateMutation.mutateAsync(pendingDuplicateId);
+        // Navigate to the duplicated presentation
+        navigate(`/presentation/${duplicated.id}`);
+      } catch (error) {
+        // Error handling is done in the mutation
+        console.error('Duplicate failed:', error);
+      }
+    }
+    setDuplicateDialogOpen(false);
+    setPendingDuplicateId(null);
+  }, [pendingDuplicateId, duplicateMutation, navigate]);
+
+  const handleDuplicateCancel = useCallback(() => {
+    setDuplicateDialogOpen(false);
+    setPendingDuplicateId(null);
+  }, []);
+
   const { t } = useTranslation('glossary', { keyPrefix: 'loading' });
+  const { t: tPresentation } = useTranslation('presentation');
 
   // Determine mode based on permission and view mode parameter
   // - read permission: always 'view' (read-only)
@@ -83,12 +139,14 @@ const DetailPage = () => {
   return (
     <>
       <VueRemoteWrapper
+        key={id}
         modulePath="editor"
         mountProps={{
           presentation,
           isRemote: true,
           mode,
           permission: userPermission,
+          isStudent,
           ...(isGeneratingParam && { generationRequest: request, isGenerating: true }),
         }}
         className="vue-remote"
@@ -96,6 +154,7 @@ const DetailPage = () => {
       />
       {isGenerating && <GlobalSpinner text={t('generatingPresentation')} lightBlur />}
       {!isGenerating && isSaving && <GlobalSpinner text={t('savingPresentation')} />}
+      {isDuplicating && <GlobalSpinner text={tPresentation('duplicate.loading')} />}
 
       {/* Comment Drawer - Triggered by Vue app via 'app.presentation.open-comments' event */}
       {id && (
@@ -115,6 +174,24 @@ const DetailPage = () => {
         onLeave={handleProceed}
       />
       <SmallScreenDialog />
+
+      {/* Duplicate Confirmation Dialog - Triggered by Vue app */}
+      <AlertDialog open={duplicateDialogOpen} onOpenChange={setDuplicateDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{tPresentation('duplicate.title')}</AlertDialogTitle>
+            <AlertDialogDescription>{tPresentation('duplicate.description')}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={handleDuplicateCancel}>
+              {tPresentation('duplicate.cancel')}
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handleDuplicateConfirm}>
+              {tPresentation('duplicate.confirm')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 };

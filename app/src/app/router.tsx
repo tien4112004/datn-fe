@@ -196,16 +196,30 @@ const router = createBrowserRouter([
     ),
     children: [
       {
-        path: 'student',
-        lazy: async () => ({
-          Component: (await import('@/features/student/pages/StudentLandingPage')).StudentLandingPage,
-        }),
-      },
-      {
         path: 'student/classes/:id',
         lazy: async () => ({
           Component: (await import('@/features/student/pages/StudentClassDetailPage')).StudentClassDetailPage,
           loader: (await import('@/features/classes/shared/hooks/loaders')).getClassById,
+        }),
+      },
+      {
+        path: 'student/presentation/:id',
+        lazy: async () => ({
+          Component: (await import('@/features/presentation')).default.StudentPresentationPage,
+          loader: (await import('@/features/presentation/hooks/loaders')).getPresentationById,
+        }),
+      },
+      {
+        path: 'student/mindmap/:id',
+        lazy: async () => ({
+          Component: (await import('@/features/mindmap')).default.StudentMindmapPage,
+          loader: (await import('@/features/mindmap/hooks/loaders')).getMindmapById,
+        }),
+      },
+      {
+        path: 'student',
+        lazy: async () => ({
+          Component: (await import('@/features/student/pages/StudentLandingPage')).StudentLandingPage,
         }),
       },
     ],

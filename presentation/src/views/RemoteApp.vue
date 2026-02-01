@@ -42,6 +42,7 @@ const props = defineProps<{
   presentation: Presentation;
   mode: 'view' | 'edit';
   permission?: 'read' | 'comment' | 'edit';
+  isStudent?: boolean;
   generationRequest?: PresentationGenerationRequest;
   isGenerating?: boolean;
 }>();

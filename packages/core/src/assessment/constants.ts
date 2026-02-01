@@ -47,7 +47,6 @@ export const DIFFICULTY = {
   KNOWLEDGE: 'KNOWLEDGE', // Nhận biết (Knowledge) - Recall facts and basic concepts
   COMPREHENSION: 'COMPREHENSION', // Thông hiểu (Comprehension) - Explain ideas or concepts
   APPLICATION: 'APPLICATION', // Vận dụng (Application) - Use information in new situations
-  ADVANCED_APPLICATION: 'ADVANCED_APPLICATION', // Vận dụng cao (Advanced Application) - Draw connections among ideas
 } as const;
 
 export type Difficulty = (typeof DIFFICULTY)[keyof typeof DIFFICULTY];
@@ -60,7 +59,6 @@ export const DIFFICULTY_LABELS = {
   KNOWLEDGE: 'Nhận biết',
   COMPREHENSION: 'Thông hiểu',
   APPLICATION: 'Vận dụng',
-  ADVANCED_APPLICATION: 'Vận dụng cao',
 } as const;
 
 /**
@@ -71,7 +69,6 @@ export const DIFFICULTY_I18N_KEYS = {
   KNOWLEDGE: 'difficulty.knowledge',
   COMPREHENSION: 'difficulty.comprehension',
   APPLICATION: 'difficulty.application',
-  ADVANCED_APPLICATION: 'difficulty.advancedApplication',
 } as const;
 
 /**

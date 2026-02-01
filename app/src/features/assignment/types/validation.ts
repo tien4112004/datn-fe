@@ -20,12 +20,7 @@ const VALIDATION_KEYS = {
 // Base schema
 const baseQuestionSchema = z.object({
   id: z.string(),
-  difficulty: z.enum([
-    DIFFICULTY.KNOWLEDGE,
-    DIFFICULTY.COMPREHENSION,
-    DIFFICULTY.APPLICATION,
-    DIFFICULTY.ADVANCED_APPLICATION,
-  ]),
+  difficulty: z.enum([DIFFICULTY.KNOWLEDGE, DIFFICULTY.COMPREHENSION, DIFFICULTY.APPLICATION]),
   title: z.string().min(1, VALIDATION_KEYS.TITLE_REQUIRED),
   titleImageUrl: z.string().url().optional().or(z.literal('')),
   explanation: z.string().optional(),

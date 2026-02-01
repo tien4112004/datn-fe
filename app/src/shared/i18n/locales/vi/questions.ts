@@ -84,7 +84,6 @@ export default {
     knowledge: 'Nhận biết',
     comprehension: 'Thông hiểu',
     application: 'Vận dụng',
-    advancedApplication: 'Vận dụng cao',
   },
 
   bankType: {

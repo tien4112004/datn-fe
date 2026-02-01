@@ -9,12 +9,7 @@ interface MatrixGridViewProps {
 }
 
 const getAllDifficulties = (): Difficulty[] => {
-  return [
-    DIFFICULTY.KNOWLEDGE,
-    DIFFICULTY.COMPREHENSION,
-    DIFFICULTY.APPLICATION,
-    DIFFICULTY.ADVANCED_APPLICATION,
-  ];
+  return [DIFFICULTY.KNOWLEDGE, DIFFICULTY.COMPREHENSION, DIFFICULTY.APPLICATION];
 };
 
 export const MatrixGridView = ({ topics, matrixCells }: MatrixGridViewProps) => {

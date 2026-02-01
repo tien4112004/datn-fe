@@ -1,19 +1,20 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import type { AssignmentTopic, AssignmentQuestionWithTopic, MatrixCell } from '../types';
-import { getAllDifficulties } from '@aiprimary/core';
+import { getAllDifficulties, getAllQuestionTypes } from '@aiprimary/core';
 
 /**
  * Sync matrix cell counts based on current questions
  * This runs automatically whenever questions change
+ * Now includes questionType in the matching key
  */
 function syncMatrixCounts(questions: AssignmentQuestionWithTopic[], matrixCells: MatrixCell[]): MatrixCell[] {
-  // Count questions by topic-difficulty combination
+  // Count questions by topic-difficulty-questionType combination
   const counts = new Map<string, number>();
 
   questions.forEach((aq) => {
-    if (aq.question.topicId && aq.question.difficulty) {
-      const key = `${aq.question.topicId}-${aq.question.difficulty}`;
+    if (aq.question.topicId && aq.question.difficulty && aq.question.type) {
+      const key = `${aq.question.topicId}-${aq.question.difficulty}-${aq.question.type}`;
       counts.set(key, (counts.get(key) || 0) + 1);
     }
   });
@@ -21,7 +22,7 @@ function syncMatrixCounts(questions: AssignmentQuestionWithTopic[], matrixCells:
   // Update currentCount for all cells
   const updatedCells = matrixCells.map((cell) => ({
     ...cell,
-    currentCount: counts.get(`${cell.topicId}-${cell.difficulty}`) || 0,
+    currentCount: counts.get(`${cell.topicId}-${cell.difficulty}-${cell.questionType}`) || 0,
   }));
 
   return updatedCells;
@@ -39,17 +40,28 @@ function dispatchDirtyEvent(isDirty: boolean): void {
 }
 
 /**
- * Create matrix cells for a new topic across all difficulties
+ * Create matrix cells for a new topic across all difficulties and question types
  */
-function createMatrixCellsForTopic(topicId: string): MatrixCell[] {
+function createMatrixCellsForTopic(topicId: string, topicName: string): MatrixCell[] {
   const difficulties = getAllDifficulties();
-  return difficulties.map((difficulty, index) => ({
-    id: `${topicId}-${difficulty.value}-${Date.now()}-${index}`,
-    topicId,
-    difficulty: difficulty.value,
-    requiredCount: 0,
-    currentCount: 0,
-  }));
+  const questionTypes = getAllQuestionTypes();
+  const cells: MatrixCell[] = [];
+
+  difficulties.forEach((difficulty) => {
+    questionTypes.forEach((questionType) => {
+      cells.push({
+        id: `${topicId}-${difficulty.value}-${questionType.value}`,
+        topicId,
+        topicName,
+        difficulty: difficulty.value,
+        questionType: questionType.value,
+        requiredCount: 0,
+        currentCount: 0,
+      });
+    });
+  });
+
+  return cells;
 }
 
 interface AssignmentFormStore {
@@ -158,7 +170,7 @@ export const useAssignmentFormStore = create<AssignmentFormStore>()(
         set(
           (state) => {
             const newTopics = [...state.topics, topic];
-            const newCells = createMatrixCellsForTopic(topic.id);
+            const newCells = createMatrixCellsForTopic(topic.id, topic.name);
             const allCells = [...state.matrixCells, ...newCells];
 
             return {
@@ -195,10 +207,22 @@ export const useAssignmentFormStore = create<AssignmentFormStore>()(
 
       updateTopic: (topicId, updates) => {
         set(
-          (state) => ({
-            topics: state.topics.map((t) => (t.id === topicId ? { ...t, ...updates } : t)),
-            isDirty: true,
-          }),
+          (state) => {
+            const newTopics = state.topics.map((t) => (t.id === topicId ? { ...t, ...updates } : t));
+            // Also update topicName in matrixCells if name changed
+            const newMatrixCells =
+              updates.name !== undefined
+                ? state.matrixCells.map((c) =>
+                    c.topicId === topicId ? { ...c, topicName: updates.name! } : c
+                  )
+                : state.matrixCells;
+
+            return {
+              topics: newTopics,
+              matrixCells: newMatrixCells,
+              isDirty: true,
+            };
+          },
           false,
           'assignment/updateTopic'
         );
@@ -209,10 +233,23 @@ export const useAssignmentFormStore = create<AssignmentFormStore>()(
       addQuestion: (question) => {
         set(
           (state) => {
+            let newCells = [...state.matrixCells];
+            let newTopics = [...state.topics];
+
+            const q = question.question;
+
+            // Auto-expand: Add topic if not exists
+            if (q.topicId && !newTopics.find((t) => t.id === q.topicId)) {
+              const newTopic = { id: q.topicId, name: q.topicId }; // User should edit name
+              newTopics.push(newTopic);
+              newCells.push(...createMatrixCellsForTopic(q.topicId, q.topicId));
+            }
+
             const newQuestions = [...state.questions, question];
-            const updatedCells = syncMatrixCounts(newQuestions, state.matrixCells);
+            const updatedCells = syncMatrixCounts(newQuestions, newCells);
 
             return {
+              topics: newTopics,
               questions: newQuestions,
               matrixCells: updatedCells,
               isDirty: true,

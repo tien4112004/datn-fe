@@ -84,7 +84,6 @@ export default {
     knowledge: 'Knowledge',
     comprehension: 'Comprehension',
     application: 'Application',
-    advancedApplication: 'Advanced Application',
   },
 
   bankType: {

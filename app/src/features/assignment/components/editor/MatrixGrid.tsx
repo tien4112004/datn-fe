@@ -7,13 +7,21 @@ import { Button } from '@/shared/components/ui/button';
 import { MatrixCell } from './MatrixCell';
 import { TopicEditModal } from './TopicEditModal';
 import { useAssignmentFormStore } from '../../stores/useAssignmentFormStore';
-import { getAllDifficulties, getDifficultyI18nKey } from '@aiprimary/core';
+import {
+  getAllDifficulties,
+  getAllQuestionTypes,
+  getDifficultyI18nKey,
+  getQuestionTypeI18nKey,
+} from '@aiprimary/core';
 import { generateId } from '../../utils';
+import { QuestionTypeIcon } from '@/features/question/components/shared/QuestionTypeIcon';
+import type { QuestionType } from '@/features/assignment/types';
 
 export const MatrixGrid = () => {
   const { t } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.matrixEditor' });
   const { t: tMatrix } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.matrixBuilder' });
   const { t: tDifficulty } = useTranslation('questions');
+  const { t: tQuestionType } = useTranslation('questions');
 
   // Get data from store (matrix counts are auto-synced)
   const topics = useAssignmentFormStore((state) => state.topics);
@@ -58,6 +66,7 @@ export const MatrixGrid = () => {
   }
 
   const difficulties = getAllDifficulties();
+  const questionTypes = getAllQuestionTypes();
 
   return (
     <div className="space-y-4">
@@ -78,24 +87,48 @@ export const MatrixGrid = () => {
       <div className="overflow-x-auto rounded-lg border">
         <Table className="table-fixed">
           <TableHeader>
+            {/* First header row: Topic + Difficulties spanning questionTypes */}
             <TableRow>
-              <TableHead className="w-[300px] bg-gray-50 font-semibold dark:bg-gray-900">
+              <TableHead rowSpan={2} className="w-[160px] bg-gray-50 font-semibold dark:bg-gray-900">
                 {t('tableHeaders.topic')}
               </TableHead>
               {difficulties.map((difficulty) => (
                 <TableHead
                   key={difficulty.value}
-                  className="w-[150px] bg-gray-50 text-center text-xs dark:bg-gray-900"
+                  colSpan={questionTypes.length}
+                  className="bg-gray-50 text-center text-xs font-semibold dark:bg-gray-900"
                 >
                   {tDifficulty(getDifficultyI18nKey(difficulty.value) as any)}
                 </TableHead>
               ))}
             </TableRow>
+            {/* Second header row: Question types under each difficulty */}
+            <TableRow>
+              {difficulties.map((difficulty) =>
+                questionTypes.map((questionType) => (
+                  <TableHead
+                    key={`${difficulty.value}-${questionType.value}`}
+                    className="w-[70px] bg-gray-100 text-center dark:bg-gray-800"
+                  >
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className="flex justify-center">
+                          <QuestionTypeIcon type={questionType.value as QuestionType} className="h-4 w-4" />
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>{tQuestionType(getQuestionTypeI18nKey(questionType.value) as any)}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TableHead>
+                ))
+              )}
+            </TableRow>
           </TableHeader>
           <TableBody>
             {topics.map((topic) => (
               <TableRow key={topic.id}>
-                <TableCell className="w-[300px] align-top font-medium">
+                <TableCell className="w-[160px] align-top font-medium">
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0 flex-1 space-y-1">
                       <div className="whitespace-normal break-words">
@@ -125,16 +158,24 @@ export const MatrixGrid = () => {
                     </Tooltip>
                   </div>
                 </TableCell>
-                {difficulties.map((difficulty) => {
-                  const cell = matrixCells?.find(
-                    (c) => c.topicId === topic.id && c.difficulty === difficulty.value
-                  );
-                  return (
-                    <TableCell key={`${topic.id}-${difficulty.value}`} className="w-[150px] p-2">
-                      {cell && <MatrixCell cell={cell} />}
-                    </TableCell>
-                  );
-                })}
+                {difficulties.map((difficulty) =>
+                  questionTypes.map((questionType) => {
+                    const cell = matrixCells?.find(
+                      (c) =>
+                        c.topicId === topic.id &&
+                        c.difficulty === difficulty.value &&
+                        c.questionType === questionType.value
+                    );
+                    return (
+                      <TableCell
+                        key={`${topic.id}-${difficulty.value}-${questionType.value}`}
+                        className="w-[70px] p-1"
+                      >
+                        {cell && <MatrixCell cell={cell} />}
+                      </TableCell>
+                    );
+                  })
+                )}
               </TableRow>
             ))}
           </TableBody>

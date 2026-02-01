@@ -518,6 +518,10 @@ export default {
     matrixCell: {
       required: 'Required:',
       ok: 'OK',
+      needMore: 'Need {{count}} more',
+      extra: '{{count}} extra',
+      missing: '−{{count}}',
+      surplus: '+{{count}}',
     },
 
     // Current question view

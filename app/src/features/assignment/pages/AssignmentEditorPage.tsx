@@ -5,8 +5,8 @@ import { useTranslation } from 'react-i18next';
 import { AssignmentEditorLayout } from '../components/editor/AssignmentEditorLayout';
 import { MetadataEditDialog } from '../components/editor/MetadataEditDialog';
 import { QuestionBankDialog } from '../components/question-bank';
-import { DIFFICULTY } from '../types';
-import type { Question, AssignmentQuestionWithTopic, QuestionItemRequest } from '../types';
+import { DIFFICULTY, QUESTION_TYPE } from '../types';
+import type { Question, AssignmentQuestionWithTopic, QuestionItemRequest, MatrixCell } from '../types';
 import { useCreateAssignment, useUpdateAssignment, useAssignment } from '../hooks/useAssignmentApi';
 import { useDirtyFormTracking } from '../hooks/useDirtyFormTracking';
 import { useUnsavedChangesBlocker } from '@/shared/hooks';
@@ -41,6 +41,32 @@ export const AssignmentEditorPage = () => {
   // Generate consistent IDs for default topic and matrix cells
   const defaultTopicId = React.useMemo(() => `topic-${Date.now()}`, []);
   const timestamp = React.useMemo(() => Date.now(), []);
+
+  // Helper to create full 3D matrix cells for a topic
+  const createMatrixCellsForTopic = React.useCallback(
+    (topicId: string, topicName: string): MatrixCell[] => {
+      const difficulties = Object.values(DIFFICULTY);
+      const questionTypes = Object.values(QUESTION_TYPE);
+      const cells: MatrixCell[] = [];
+
+      difficulties.forEach((difficulty, dIdx) => {
+        questionTypes.forEach((questionType, qIdx) => {
+          cells.push({
+            id: `cell-${timestamp}-${topicId}-${dIdx}-${qIdx}`,
+            topicId,
+            topicName,
+            difficulty,
+            questionType,
+            requiredCount: 0,
+            currentCount: 0,
+          });
+        });
+      });
+
+      return cells;
+    },
+    [timestamp]
+  );
 
   // Backend question format (flat structure with point)
   interface BackendQuestion {
@@ -114,36 +140,7 @@ export const AssignmentEditorPage = () => {
           },
         ],
         questions: transformedQuestions,
-        matrixCells: [
-          {
-            id: `cell-${timestamp}-1`,
-            topicId: defaultTopicId,
-            difficulty: DIFFICULTY.KNOWLEDGE,
-            requiredCount: 0,
-            currentCount: 0,
-          },
-          {
-            id: `cell-${timestamp}-2`,
-            topicId: defaultTopicId,
-            difficulty: DIFFICULTY.COMPREHENSION,
-            requiredCount: 0,
-            currentCount: 0,
-          },
-          {
-            id: `cell-${timestamp}-3`,
-            topicId: defaultTopicId,
-            difficulty: DIFFICULTY.APPLICATION,
-            requiredCount: 0,
-            currentCount: 0,
-          },
-          {
-            id: `cell-${timestamp}-4`,
-            topicId: defaultTopicId,
-            difficulty: DIFFICULTY.ADVANCED_APPLICATION,
-            requiredCount: 0,
-            currentCount: 0,
-          },
-        ],
+        matrixCells: createMatrixCellsForTopic(defaultTopicId, 'General'),
       });
 
       // Mark form as clean after loading existing data
@@ -164,36 +161,7 @@ export const AssignmentEditorPage = () => {
           },
         ],
         questions: [],
-        matrixCells: [
-          {
-            id: `cell-${timestamp}-1`,
-            topicId: defaultTopicId,
-            difficulty: DIFFICULTY.KNOWLEDGE,
-            requiredCount: 0,
-            currentCount: 0,
-          },
-          {
-            id: `cell-${timestamp}-2`,
-            topicId: defaultTopicId,
-            difficulty: DIFFICULTY.COMPREHENSION,
-            requiredCount: 0,
-            currentCount: 0,
-          },
-          {
-            id: `cell-${timestamp}-3`,
-            topicId: defaultTopicId,
-            difficulty: DIFFICULTY.APPLICATION,
-            requiredCount: 0,
-            currentCount: 0,
-          },
-          {
-            id: `cell-${timestamp}-4`,
-            topicId: defaultTopicId,
-            difficulty: DIFFICULTY.ADVANCED_APPLICATION,
-            requiredCount: 0,
-            currentCount: 0,
-          },
-        ],
+        matrixCells: createMatrixCellsForTopic(defaultTopicId, 'General'),
       });
     }
 
@@ -206,10 +174,10 @@ export const AssignmentEditorPage = () => {
     assignmentData,
     isLoadingAssignment,
     defaultTopicId,
-    timestamp,
     initialize,
     markClean,
     transformQuestionsFromApi,
+    createMatrixCellsForTopic,
   ]);
 
   // Track dirty state with the hook (now reads from store)
@@ -305,6 +273,7 @@ export const AssignmentEditorPage = () => {
           .map((cell) => ({
             topicId: cell.topicId,
             difficulty: cell.difficulty,
+            questionType: cell.questionType,
             requiredCount: cell.requiredCount,
           })),
       };

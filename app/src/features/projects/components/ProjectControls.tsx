@@ -1,4 +1,5 @@
-import { Sparkles, Plus } from 'lucide-react';
+import { useState } from 'react';
+import { Sparkles, Plus, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { useCreateBlankPresentation } from '@/features/presentation/hooks';
@@ -6,6 +7,7 @@ import { useCreateBlankMindmap } from '@/features/mindmap/hooks';
 import { toast } from 'sonner';
 import type { ResourceType } from '@/shared/constants/resourceTypes';
 import { useTranslation } from 'react-i18next';
+import { ImageUploadDialog } from '@/features/image/components/ImageUploadDialog';
 
 interface ProjectControlsProps {
   currentResourceType: ResourceType;
@@ -67,6 +69,7 @@ const useResourceHooks = (resourceType: ResourceType) => {
 const CreatePresentationControls = ({ currentResourceType }: ProjectControlsProps) => {
   const { t } = useTranslation('projects');
   const hooks = useResourceHooks(currentResourceType);
+  const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
 
   const handleCreateBlank = () => {
     if (hooks?.createBlank) {
@@ -78,33 +81,59 @@ const CreatePresentationControls = ({ currentResourceType }: ProjectControlsProp
     hooks?.generate?.();
   };
 
+  const handleUploadSuccess = () => {
+    toast.success(t('controls.uploadSuccess'));
+  };
+
   const showCreationButtons = isSupportedResourceType(currentResourceType);
   const showGenerateButton = hooks?.generate;
+  const showUploadButton = currentResourceType === 'image';
 
   return (
-    <div className="flex space-x-4">
-      {showGenerateButton && (
-        <Button
-          variant="secondary"
-          className="text-primary-foreground dark:text-foreground flex h-28 flex-col bg-gradient-to-r from-blue-500 to-indigo-500 shadow hover:to-blue-500"
-          onClick={handleGenerate}
-        >
-          <Sparkles className="!size-6" />
-          <p className="text-lg font-semibold">{t('controls.generateNew')}</p>
-        </Button>
-      )}
+    <>
+      <div className="flex space-x-4">
+        {showGenerateButton && (
+          <Button
+            variant="secondary"
+            className="text-primary-foreground dark:text-foreground flex h-28 flex-col bg-gradient-to-r from-blue-500 to-indigo-500 shadow hover:to-blue-500"
+            onClick={handleGenerate}
+          >
+            <Sparkles className="!size-6" />
+            <p className="text-lg font-semibold">{t('controls.generateNew')}</p>
+          </Button>
+        )}
 
-      {showCreationButtons && hooks?.createBlank && (
-        <Button
-          variant="secondary"
-          className="text-primary-foreground dark:text-foreground flex h-28 flex-col bg-gradient-to-r from-green-500 to-teal-500 shadow hover:to-green-500"
-          onClick={handleCreateBlank}
-        >
-          <Plus className="!size-6" />
-          <p className="text-lg font-semibold">{t('controls.createBlank')}</p>
-        </Button>
+        {showUploadButton && (
+          <Button
+            variant="secondary"
+            className="text-primary-foreground dark:text-foreground flex h-28 flex-col bg-gradient-to-r from-green-500 to-teal-500 shadow hover:to-green-500"
+            onClick={() => setIsUploadDialogOpen(true)}
+          >
+            <Upload className="!size-6" />
+            <p className="text-lg font-semibold">{t('controls.uploadImage')}</p>
+          </Button>
+        )}
+
+        {showCreationButtons && hooks?.createBlank && (
+          <Button
+            variant="secondary"
+            className="text-primary-foreground dark:text-foreground flex h-28 flex-col bg-gradient-to-r from-green-500 to-teal-500 shadow hover:to-green-500"
+            onClick={handleCreateBlank}
+          >
+            <Plus className="!size-6" />
+            <p className="text-lg font-semibold">{t('controls.createBlank')}</p>
+          </Button>
+        )}
+      </div>
+
+      {showUploadButton && (
+        <ImageUploadDialog
+          open={isUploadDialogOpen}
+          onClose={() => setIsUploadDialogOpen(false)}
+          onSuccess={handleUploadSuccess}
+        />
       )}
-    </div>
+    </>
   );
 };
 

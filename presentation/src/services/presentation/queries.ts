@@ -7,7 +7,7 @@ import {
   type UseMutationOptions,
   type UseMutationReturnType,
 } from '@tanstack/vue-query';
-import { getPresentationApi, getPresentationWebViewApi } from './api';
+import { getPresentationApi } from './api';
 import { queryKeys } from '../query-keys';
 import type { Presentation, SlideTheme, SlideLayoutSchema, Slide } from '@aiprimary/core';
 import type {

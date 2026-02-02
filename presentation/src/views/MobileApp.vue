@@ -1,91 +1,83 @@
 <template>
-  <div v-if="loading" class="fixed inset-0 z-50 flex items-center justify-center bg-white">
-    <div class="border-primary h-8 w-8 animate-spin rounded-full border-b-2"></div>
+  <!-- Loading state only for view mode (generation mode loading is handled by Flutter) -->
+  <div
+    v-if="loading && !isGenerationMode"
+    class="fixed inset-0 z-50 flex items-center justify-center bg-white"
+  >
+    <div class="text-center">
+      <div class="border-primary mx-auto h-8 w-8 animate-spin rounded-full border-b-2"></div>
+    </div>
   </div>
 
   <div v-else-if="error" class="fixed inset-0 z-50 flex items-center justify-center bg-white p-4">
     <div class="text-center text-red-500">
-      <p class="font-bold">Error loading presentation</p>
+      <p class="font-bold">{{ isGenerationMode ? 'Generation Error' : 'Error loading presentation' }}</p>
       <p class="text-sm">{{ error }}</p>
     </div>
   </div>
 
-  <Mobile v-if="isInitialized" />
+  <!-- Generation Mode: Use MobileGenerationViewer (handles its own streaming) -->
+  <MobileGenerationViewer
+    v-else-if="isGenerationMode && presentation && generationRequest"
+    :presentation="presentation"
+    :generationRequest="generationRequest"
+    @ready="onViewerReady"
+    @completed="onGenerationCompleted"
+    @error="onGenerationError"
+  />
+
+  <!-- View Mode: Use RemoteApp -->
+  <RemoteApp v-else-if="presentation" :isRemote="true" :presentation="presentation" :mode="'view'" />
 </template>
 
 <script lang="ts" setup>
-import { onMounted, onUnmounted, ref } from 'vue';
+import { onMounted, onUnmounted, ref, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { storeToRefs } from 'pinia';
-import { useMainStore, useSnapshotStore, useSlidesStore, useContainerStore } from '@/store';
-import { getPresentationWebViewApi } from '@/services/presentation/api';
+import { useSlidesStore } from '@/store';
+import { getPresentationApi } from '@/services/presentation/api';
 import { changeLocale } from '@/locales';
 import type { Presentation } from '@/types/slides';
-import Mobile from './Mobile/index.vue';
+import RemoteApp from './RemoteApp.vue';
+import MobileGenerationViewer from './MobileGenerationViewer.vue';
+import { useGenerationStore } from '@/store/generation';
 
 const route = useRoute();
-const mainStore = useMainStore();
 const slidesStore = useSlidesStore();
-const snapshotStore = useSnapshotStore();
-const containerStore = useContainerStore();
+const generationStore = useGenerationStore();
 const { slides } = storeToRefs(slidesStore);
 
 const loading = ref(true);
 const error = ref<string | null>(null);
-const isInitialized = ref(false);
+const presentation = ref<Presentation | null>(null);
+const generationRequest = ref<any>(null);
 
-const api = getPresentationWebViewApi();
+// Determine mode from route meta
+const isGenerationMode = computed(() => route.meta.mode === 'generate');
 
-// Initialize the application with fetched data
-const initPresentation = async (presentation: Presentation) => {
-  try {
-    if (!presentation || !presentation.slides) {
-      throw new Error('Invalid presentation data: missing slides');
-    }
+const api = getPresentationApi();
 
-    // Initialize container store
-    containerStore.initialize({
-      isRemote: true,
-      presentation: presentation,
-    });
-
-    // Set slides in store
-    slidesStore.setSlides(presentation.slides);
-
-    // Initialize snapshot database
-    await snapshotStore.initSnapshotDatabase();
-
-    // Mark as initialized
-    isInitialized.value = true;
-    loading.value = false;
-
-    // Notify Flutter that presentation is loaded (useful for hiding native loaders)
-    if ((window as any).flutter_inappwebview) {
-      (window as any).flutter_inappwebview.callHandler('presentationLoaded', {
-        success: true,
-        slideCount: presentation.slides.length,
-      });
-    }
-  } catch (err) {
-    handleError(err);
+// Notify Flutter helper
+const notifyFlutter = (handler: string, data: any) => {
+  if ((window as any).flutter_inappwebview) {
+    (window as any).flutter_inappwebview.callHandler(handler, data);
   }
 };
 
 const handleError = (err: unknown) => {
-  console.error('Error loading presentation:', err);
-  error.value = err instanceof Error ? err.message : 'Failed to load presentation';
+  console.error('Error:', err);
+  error.value = err instanceof Error ? err.message : 'Failed to load';
   loading.value = false;
 
   // Notify Flutter of error
-  if ((window as any).flutter_inappwebview) {
-    (window as any).flutter_inappwebview.callHandler('presentationLoaded', {
-      success: false,
-      error: error.value,
-    });
+  if (isGenerationMode.value) {
+    notifyFlutter('generationCompleted', { success: false, error: error.value });
+  } else {
+    notifyFlutter('presentationLoaded', { success: false, error: error.value });
   }
 };
 
-// Handle slide navigation commands from Flutter (Keep this for remote control)
+// Handle slide navigation commands from Flutter (for viewing mode)
 const handleSlideNavigation = (event: MessageEvent) => {
   const { type, data } = event.data;
 
@@ -97,51 +89,137 @@ const handleSlideNavigation = (event: MessageEvent) => {
   }
 };
 
+// Handle viewer ready - signal Flutter to show WebView
+const onViewerReady = () => {
+  console.log('[MobileApp] Generation viewer ready');
+  notifyFlutter('generationViewReady', {});
+};
+
+// Handle generation completed from MobileGenerationViewer
+const onGenerationCompleted = (data: { success: boolean; slideCount: number }) => {
+  console.log('[MobileApp] Generation completed:', data);
+  notifyFlutter('generationCompleted', data);
+};
+
+// Handle generation error from MobileGenerationViewer
+const onGenerationError = (errorMsg: string) => {
+  console.error('[MobileApp] Generation error:', errorMsg);
+  error.value = errorMsg;
+  notifyFlutter('generationCompleted', { success: false, error: errorMsg });
+};
+
+// Poll localStorage for generation request from Flutter
+const pollForGenerationRequest = (): Promise<any> => {
+  return new Promise((resolve, reject) => {
+    let attempts = 0;
+    const maxAttempts = 50; // 5 seconds max
+
+    const poll = () => {
+      const stored = localStorage.getItem('generationRequest');
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          localStorage.removeItem('generationRequest'); // Clean up
+          resolve(parsed);
+        } catch (e) {
+          reject(new Error('Invalid generation request format'));
+        }
+      } else if (attempts < maxAttempts) {
+        attempts++;
+        setTimeout(poll, 100);
+      } else {
+        reject(new Error('Generation request not found'));
+      }
+    };
+
+    poll();
+  });
+};
+
 onMounted(async () => {
-  // 1. Apply locale from localStorage (injected by Flutter WebView)
-  const savedLocale = localStorage.getItem('i18nextLng');
-  if (savedLocale) {
-    changeLocale(savedLocale);
-  }
-
-  // 2. Setup Listeners for Navigation (Remote Control)
-  window.addEventListener('message', handleSlideNavigation);
-
-  // Expose navigation helper for Flutter
-  (window as any).setSlideIndex = (index: number) => {
-    handleSlideNavigation({
-      data: {
-        type: 'setSlideIndex',
-        data: { index },
-      },
-    } as MessageEvent);
-  };
-
-  // 3. Notify Flutter view is ready
-  if ((window as any).flutter_inappwebview) {
-    (window as any).flutter_inappwebview.callHandler('mobileViewReady');
-  }
-
-  // 4. Fetch Data Directly via API
-  const presentationId = route.params.id as string;
-
-  if (!presentationId) {
-    error.value = 'No presentation ID found in URL';
-    loading.value = false;
-    return;
-  }
-
   try {
-    loading.value = true;
-    const presentation = await api.getPresentation(presentationId);
-    await initPresentation(presentation);
+    // 1. Apply locale from localStorage
+    const savedLocale = localStorage.getItem('i18nextLng');
+    if (savedLocale) {
+      changeLocale(savedLocale);
+    }
+
+    // 2. Extract token from URL (for generation mode)
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
+    if (token) {
+      localStorage.setItem('access_token', token);
+    }
+
+    // 3. Get presentation ID from route
+    const presentationId = route.params.id as string;
+    if (!presentationId) {
+      throw new Error('No presentation ID found in URL');
+    }
+
+    // 4. Setup based on mode
+    if (isGenerationMode.value) {
+      // Generation mode: Vue handles streaming
+      // Flutter shows loading until we signal ready
+
+      // Fetch presentation first
+      const fetchedPresentation = await api.getPresentation(presentationId);
+
+      console.info('[MobileApp] Presentation loaded for generation:', {
+        presentationId: fetchedPresentation.id,
+        title: fetchedPresentation.title,
+      });
+
+      presentation.value = fetchedPresentation;
+
+      // Poll for generation request from Flutter (stored in localStorage)
+      console.log('[MobileApp] Waiting for generation request from Flutter...');
+      const request = await pollForGenerationRequest();
+      console.log('[MobileApp] Got generation request:', request);
+      generationRequest.value = request;
+
+      // Don't set loading to false here - MobileGenerationViewer will signal ready
+      loading.value = false;
+    } else {
+      // View mode: setup navigation listeners
+      window.addEventListener('message', handleSlideNavigation);
+      (window as any).setSlideIndex = (index: number) => {
+        handleSlideNavigation({
+          data: { type: 'setSlideIndex', data: { index } },
+        } as MessageEvent);
+      };
+
+      notifyFlutter('mobileViewReady', {});
+
+      // Fetch presentation
+      const fetchedPresentation = await api.getPresentation(presentationId);
+
+      if (!fetchedPresentation || !fetchedPresentation.slides) {
+        throw new Error('Invalid presentation data');
+      }
+
+      presentation.value = fetchedPresentation;
+      loading.value = false;
+
+      // Notify Flutter that presentation is loaded
+      notifyFlutter('presentationLoaded', {
+        success: true,
+        slideCount: fetchedPresentation.slides.length,
+      });
+    }
   } catch (err) {
     handleError(err);
   }
 });
 
 onUnmounted(() => {
+  // Clean up view mode listeners
   window.removeEventListener('message', handleSlideNavigation);
   delete (window as any).setSlideIndex;
+
+  // Stop streaming if active
+  if (generationStore.isStreaming) {
+    generationStore.stopStreaming();
+  }
 });
 </script>

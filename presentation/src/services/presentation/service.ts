@@ -160,7 +160,6 @@ export class PresentationApiService implements ApiService {
             while (true) {
               const { done, value } = await reader.read();
               if (done) {
-                // Stream completed successfully - cancel to properly close the HTTP/2 stream
                 await reader.cancel();
                 break;
               }
@@ -169,12 +168,10 @@ export class PresentationApiService implements ApiService {
               yield text;
             }
           } catch (error) {
-            // Cancel the reader on error to properly close the stream
             try {
               await reader.cancel();
-            } catch (cancelError) {
+            } catch {
               // Ignore cancel errors
-              console.warn('Failed to cancel reader:', cancelError);
             }
             throw error;
           } finally {

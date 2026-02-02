@@ -1,14 +1,26 @@
 FROM node:20-slim AS base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
-RUN corepack enable
-
-COPY . /app
+RUN corepack enable && corepack prepare pnpm@10.18.1 --activate
 WORKDIR /app
 
+# --- STAGE 1: Dependencies ---
+# Only copy files that affect the install
+FROM base AS deps
+COPY pnpm-lock.yaml package.json pnpm-workspace.yaml ./
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
+    pnpm install --frozen-lockfile
+
+# --- STAGE 2: Builder ---
 FROM base AS builder
 
-# Build-time environment variable injection
+# 1. Copy dependencies from deps stage
+COPY --from=deps /app/node_modules ./node_modules
+
+# 2. Copy the rest of the source code
+COPY . .
+
+# 3. Inject build-time environment variables
 ARG VITE_API_URL
 ARG VITE_PRESENTATION_URL
 ARG VITE_FIREBASE_API_KEY
@@ -31,14 +43,6 @@ ENV VITE_FIREBASE_MESSAGING_SENDER_ID=$VITE_FIREBASE_MESSAGING_SENDER_ID
 ENV VITE_FIREBASE_APP_ID=$VITE_FIREBASE_APP_ID
 ENV VITE_FIREBASE_VAPID_KEY=$VITE_FIREBASE_VAPID_KEY
 ENV NODE_ENV=$NODE_ENV
-
-COPY pnpm-lock.yaml ./
-RUN --mount=type=cache,target=/pnpm/store \
-    pnpm fetch --frozen-lockfile
-COPY package.json ./
-RUN --mount=type=cache,target=/pnpm/store CI=true pnpm install --frozen-lockfile
-
-COPY . .
 
 RUN pnpm build
 

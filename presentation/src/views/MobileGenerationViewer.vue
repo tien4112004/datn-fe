@@ -11,7 +11,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { computed, onMounted, onUnmounted, ref, getCurrentInstance } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useSlidesStore, useContainerStore, useSaveStore, useSnapshotStore } from '@/store';
 import { useGenerationStore } from '@/store/generation';
@@ -19,8 +19,10 @@ import { convertToSlide, selectRandomTemplate } from '@/utils/slideLayout';
 import type { SlideLayoutSchema } from '@/utils/slideLayout/types';
 import type { PPTImageElement, Presentation } from '@/types/slides';
 import { useGenerateImage } from '@/services/image/queries';
+import { useSetParsed } from '@/services/presentation/queries';
 import { deleteDiscardedDB } from '@/utils/database';
 import { getPresentationApi } from '@/services/presentation/api';
+import { useSavePresentation } from '@/hooks/useSavePresentation';
 import Mobile from './Mobile/index.vue';
 import FullscreenSpin from '@/components/FullscreenSpin.vue';
 
@@ -41,6 +43,16 @@ const containerStore = useContainerStore();
 const saveStore = useSaveStore();
 const snapshotStore = useSnapshotStore();
 const { slides } = storeToRefs(slidesStore);
+
+// Get pinia instance for save hook
+const instance = getCurrentInstance();
+const pinia = instance?.appContext.config.globalProperties.$pinia;
+
+// Save presentation hook
+const { savePresentation } = useSavePresentation(props.presentation.id, pinia!);
+
+// Set parsed mutation
+const { mutateAsync: setParsedMutation } = useSetParsed();
 
 const isStreaming = ref(true);
 const abortController = ref<AbortController | null>(null);
@@ -79,12 +91,30 @@ async function processSlide(slideData: any, order: number, theme: any) {
     const imageElement = slide.elements.find((el) => el.type === 'image') as PPTImageElement;
     const imagePrompt = (slideData as any).data?.image;
 
+    console.log('[MobileGenerationViewer] Checking for image in slide:', {
+      order,
+      slideId: slide.id,
+      hasImageElement: !!imageElement,
+      hasImagePrompt: !!imagePrompt,
+      imagePrompt: imagePrompt ? imagePrompt.substring(0, 50) + '...' : null,
+      slideDataKeys: Object.keys(slideData.data || {}),
+    });
+
     if (imageElement && imagePrompt) {
+      console.log('[MobileGenerationViewer] Starting image generation for slide:', order);
       const promise = handleImageGeneration(slide.id, imageElement, imagePrompt);
       pendingImageGenerations.value.add(promise);
       promise.finally(() => {
         pendingImageGenerations.value.delete(promise);
+        console.log(
+          '[MobileGenerationViewer] Image generation finished for slide:',
+          order,
+          'Pending:',
+          pendingImageGenerations.value.size
+        );
       });
+    } else if (imageElement && !imagePrompt) {
+      console.warn('[MobileGenerationViewer] Slide has image element but no image prompt:', order);
     }
   } catch (error) {
     console.error('[MobileGenerationViewer] Error processing slide:', error);
@@ -99,16 +129,34 @@ async function handleImageGeneration(
 ): Promise<void> {
   const imageModel = props.generationRequest?.others?.imageModel;
 
+  console.log('[MobileGenerationViewer] Image generation requested:', {
+    slideId,
+    elementId: imageElement.id,
+    prompt: prompt.substring(0, 50) + '...',
+    imageModel,
+  });
+
   if (!imageModel) {
-    console.warn('[MobileGenerationViewer] No image model configured');
+    console.warn('[MobileGenerationViewer] No image model configured, skipping image generation');
     return;
   }
 
   // Set loading state
   updateSlideImage(slideId, imageElement.id, 'https://storage.huy-devops.site/ai-primary/loading.gif');
+  console.log('[MobileGenerationViewer] Set loading state for image:', {
+    slideId,
+    elementId: imageElement.id,
+  });
 
   try {
     const currentTheme = props.presentation.theme || slidesStore.theme;
+
+    console.log('[MobileGenerationViewer] Calling generateImageMutation:', {
+      presentationId: props.presentation.id,
+      slideId,
+      imageModel,
+      themeStyle: currentTheme.id,
+    });
 
     const response = await generateImageMutation({
       presentationId: props.presentation.id,
@@ -123,13 +171,29 @@ async function handleImageGeneration(
       },
     });
 
+    console.log('[MobileGenerationViewer] Image generation response:', {
+      slideId,
+      imageUrl: response.imageUrl,
+      fullResponse: response,
+    });
+
     if (response.imageUrl) {
       updateSlideImage(slideId, imageElement.id, response.imageUrl);
+      console.log('[MobileGenerationViewer] Updated slide image successfully:', {
+        slideId,
+        elementId: imageElement.id,
+        imageUrl: response.imageUrl,
+      });
     } else {
+      console.warn('[MobileGenerationViewer] No imageUrl in response, setting error state');
       updateSlideImageError(slideId, imageElement.id);
     }
   } catch (error) {
-    console.error('[MobileGenerationViewer] Image generation failed:', error);
+    console.error('[MobileGenerationViewer] Image generation failed:', {
+      slideId,
+      elementId: imageElement.id,
+      error,
+    });
     updateSlideImageError(slideId, imageElement.id);
   }
 }
@@ -163,6 +227,8 @@ async function startStreaming() {
 
   try {
     console.log('[MobileGenerationViewer] Starting streaming...');
+    console.log('[MobileGenerationViewer] Generation request others:', props.generationRequest?.others);
+    console.log('[MobileGenerationViewer] Image model:', props.generationRequest?.others?.imageModel);
     abortController.value = new AbortController();
 
     // Build the request for the API
@@ -259,6 +325,46 @@ async function startStreaming() {
     }
 
     console.log('[MobileGenerationViewer] All images complete');
+
+    // Log final state of all slides with their images
+    console.log(
+      '[MobileGenerationViewer] Final slides state:',
+      slides.value.map((slide, index) => {
+        const imageElements = slide.elements.filter((el) => el.type === 'image');
+        return {
+          index,
+          slideId: slide.id,
+          imageElements: imageElements.map((img: any) => ({
+            id: img.id,
+            src: img.src,
+          })),
+        };
+      })
+    );
+
+    // Save presentation to backend
+    try {
+      console.log('[MobileGenerationViewer] Saving presentation to backend...');
+      await savePresentation({
+        title: props.presentation.title || slidesStore.title,
+        slides: slides.value,
+        theme: props.presentation.theme || slidesStore.theme,
+        viewport: {
+          width: slidesStore.viewportSize,
+          height: slidesStore.viewportSize * slidesStore.viewportRatio,
+        },
+        thumbnail: props.presentation.thumbnail,
+      });
+      console.log('[MobileGenerationViewer] Presentation saved successfully');
+
+      // Mark as parsed on backend
+      console.log('[MobileGenerationViewer] Marking presentation as parsed...');
+      await setParsedMutation(props.presentation.id);
+      console.log('[MobileGenerationViewer] Presentation marked as parsed');
+    } catch (saveError) {
+      console.error('[MobileGenerationViewer] Failed to save presentation:', saveError);
+      // Continue anyway - user can still see the slides
+    }
 
     emit('completed', {
       success: true,

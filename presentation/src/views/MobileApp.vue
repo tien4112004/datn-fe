@@ -138,14 +138,22 @@ const pollForGenerationRequest = (): Promise<any> => {
 
 onMounted(async () => {
   try {
-    // 1. Apply locale from localStorage
+    // 1. Extract URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+
+    // 2. Apply locale from URL (from Flutter) or localStorage
+    const urlLocale = urlParams.get('locale');
     const savedLocale = localStorage.getItem('i18nextLng');
-    if (savedLocale) {
-      changeLocale(savedLocale);
+    const localeToApply = urlLocale || savedLocale;
+    if (localeToApply) {
+      changeLocale(localeToApply);
+      // Save to localStorage so it persists
+      if (urlLocale) {
+        localStorage.setItem('i18nextLng', urlLocale);
+      }
     }
 
-    // 2. Extract token from URL (for generation mode)
-    const urlParams = new URLSearchParams(window.location.search);
+    // 3. Extract token from URL (for generation mode)
     const token = urlParams.get('token');
     if (token) {
       localStorage.setItem('access_token', token);

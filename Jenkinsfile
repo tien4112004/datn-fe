@@ -149,7 +149,14 @@ pipeline {
                         echo "Building App image..."
                         docker build --no-cache \
                             --build-arg VITE_API_URL="${VITE_API_URL}" \
-                            --build-arg PRESENTATION_URL="${PRESENTATION_URL}" \
+                            --build-arg VITE_PRESENTATION_URL="${PRESENTATION_URL}" \
+                            --build-arg VITE_FIREBASE_API_KEY="${VITE_FIREBASE_API_KEY}" \
+                            --build-arg VITE_FIREBASE_AUTH_DOMAIN="${VITE_FIREBASE_AUTH_DOMAIN}" \
+                            --build-arg VITE_FIREBASE_PROJECT_ID="${VITE_FIREBASE_PROJECT_ID}" \
+                            --build-arg VITE_FIREBASE_STORAGE_BUCKET="${VITE_FIREBASE_STORAGE_BUCKET}" \
+                            --build-arg VITE_FIREBASE_MESSAGING_SENDER_ID="${VITE_FIREBASE_MESSAGING_SENDER_ID}" \
+                            --build-arg VITE_FIREBASE_APP_ID="${VITE_FIREBASE_APP_ID}" \
+                            --build-arg VITE_FIREBASE_VAPID_KEY="${VITE_FIREBASE_VAPID_KEY}" \
                             --build-arg NODE_ENV=production \
                             --target app-production \
                             --tag ${IMAGE_NAME}:app-latest \
@@ -160,7 +167,14 @@ pipeline {
                         echo "Building Presentation image..."
                         docker build --no-cache \
                             --build-arg VITE_API_URL="${VITE_API_URL}" \
-                            --build-arg PRESENTATION_URL="${PRESENTATION_URL}" \
+                            --build-arg VITE_PRESENTATION_URL="${PRESENTATION_URL}" \
+                            --build-arg VITE_FIREBASE_API_KEY="${VITE_FIREBASE_API_KEY}" \
+                            --build-arg VITE_FIREBASE_AUTH_DOMAIN="${VITE_FIREBASE_AUTH_DOMAIN}" \
+                            --build-arg VITE_FIREBASE_PROJECT_ID="${VITE_FIREBASE_PROJECT_ID}" \
+                            --build-arg VITE_FIREBASE_STORAGE_BUCKET="${VITE_FIREBASE_STORAGE_BUCKET}" \
+                            --build-arg VITE_FIREBASE_MESSAGING_SENDER_ID="${VITE_FIREBASE_MESSAGING_SENDER_ID}" \
+                            --build-arg VITE_FIREBASE_APP_ID="${VITE_FIREBASE_APP_ID}" \
+                            --build-arg VITE_FIREBASE_VAPID_KEY="${VITE_FIREBASE_VAPID_KEY}" \
                             --build-arg NODE_ENV=production \
                             --target presentation-production \
                             --tag ${IMAGE_NAME}:presentation-latest \
@@ -171,7 +185,14 @@ pipeline {
                         echo "Building Admin image..."
                         docker build --no-cache \
                             --build-arg VITE_API_URL="${VITE_API_URL}" \
-                            --build-arg PRESENTATION_URL="${PRESENTATION_URL}" \
+                            --build-arg VITE_PRESENTATION_URL="${PRESENTATION_URL}" \
+                            --build-arg VITE_FIREBASE_API_KEY="${VITE_FIREBASE_API_KEY}" \
+                            --build-arg VITE_FIREBASE_AUTH_DOMAIN="${VITE_FIREBASE_AUTH_DOMAIN}" \
+                            --build-arg VITE_FIREBASE_PROJECT_ID="${VITE_FIREBASE_PROJECT_ID}" \
+                            --build-arg VITE_FIREBASE_STORAGE_BUCKET="${VITE_FIREBASE_STORAGE_BUCKET}" \
+                            --build-arg VITE_FIREBASE_MESSAGING_SENDER_ID="${VITE_FIREBASE_MESSAGING_SENDER_ID}" \
+                            --build-arg VITE_FIREBASE_APP_ID="${VITE_FIREBASE_APP_ID}" \
+                            --build-arg VITE_FIREBASE_VAPID_KEY="${VITE_FIREBASE_VAPID_KEY}" \
                             --build-arg NODE_ENV=production \
                             --target admin-production \
                             --tag ${IMAGE_NAME}:admin-latest \

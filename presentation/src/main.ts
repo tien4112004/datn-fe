@@ -17,6 +17,15 @@ import '@/assets/styles/font.scss';
 import Icon from '@/plugins/icon';
 import Directive from '@/plugins/directive';
 
+// Polyfill for crypto.randomUUID (not available in Android WebView)
+if (typeof crypto !== 'undefined' && !crypto.randomUUID) {
+  crypto.randomUUID = function () {
+    return '10000000-1000-4000-8000-100000000000'.replace(/[018]/g, (c) =>
+      (Number(c) ^ (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (Number(c) / 4)))).toString(16)
+    ) as `${string}-${string}-${string}-${string}-${string}`;
+  };
+}
+
 const app = createApp(App);
 app.use(Icon);
 app.use(Directive);

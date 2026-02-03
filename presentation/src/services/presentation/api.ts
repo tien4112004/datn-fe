@@ -1,4 +1,4 @@
-import { api, webViewApi } from '@aiprimary/api';
+import { api, webViewApi, getDefaultApiClient } from '@aiprimary/api';
 import { PresentationApiService } from './service';
 import type {
   PresentationGenerationRequest,
@@ -57,14 +57,16 @@ export interface IPresentationApi {
 
 /**
  * Get a presentation API service instance
+ * Automatically detects WebView context and uses appropriate auth method
  */
 export const getPresentationApi = (): IPresentationApi => {
-  return new PresentationApiService(BASE_URL, api);
+  return new PresentationApiService(BASE_URL, getDefaultApiClient());
 };
 
 /**
  * Get presentation API service configured for WebView usage (no credentials/cookies).
- * Use this for embedded pages like GenerationRemoteApp that run in Flutter WebView.
+ * Use this for embedded pages like MobileApp that run in Flutter WebView.
+ * @deprecated Use getPresentationApi() instead - it now auto-detects context
  */
 export const getPresentationWebViewApi = (): IPresentationApi => {
   return new PresentationApiService(BASE_URL, webViewApi);

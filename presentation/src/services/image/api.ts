@@ -1,4 +1,4 @@
-import { api, type ApiClient, getBackendUrl } from '@aiprimary/api';
+import { type ApiClient, getBackendUrl, getDefaultApiClient } from '@aiprimary/api';
 import { ImageService } from './service';
 import type { GeneratedImage, ImageGenerationParams, SingleImageResponse, ImageSearchPayload } from './types';
 
@@ -17,7 +17,8 @@ export interface IImageApi {
 
 /**
  * Get an image API service instance
+ * Automatically detects WebView context and uses appropriate auth method
  */
-export const getImageApi = (apiClient: ApiClient = api): IImageApi => {
+export const getImageApi = (apiClient: ApiClient = getDefaultApiClient()): IImageApi => {
   return new ImageService(apiClient, getBackendUrl());
 };

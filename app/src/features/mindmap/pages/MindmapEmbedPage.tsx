@@ -42,11 +42,19 @@ const MindmapEmbedPage = () => {
 
   const userPermission = mindmap?.permission;
 
-  // Apply locale from localStorage (injected by Flutter WebView)
+  // Apply locale from URL (from Flutter) or localStorage
   useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlLocale = urlParams.get('locale');
     const savedLocale = localStorage.getItem('i18nextLng');
-    if (savedLocale && savedLocale !== i18n.language) {
-      i18n.changeLanguage(savedLocale);
+    const localeToApply = urlLocale || savedLocale;
+
+    if (localeToApply && localeToApply !== i18n.language) {
+      i18n.changeLanguage(localeToApply);
+      // Save to localStorage so it persists
+      if (urlLocale) {
+        localStorage.setItem('i18nextLng', urlLocale);
+      }
     }
   }, [i18n]);
 

@@ -1,26 +1,35 @@
 FROM node:20-slim AS base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
-RUN corepack enable && corepack prepare pnpm@10.18.1 --activate
+RUN corepack enable
 WORKDIR /app
 
-# --- STAGE 1: Dependencies ---
-# Only copy files that affect the install
 FROM base AS deps
+# Copy workspace configuration first
 COPY pnpm-lock.yaml package.json pnpm-workspace.yaml ./
+COPY .npmrc* .pnpmfile.cjs* ./
+# Copy all package.json files (including nested packages)
+COPY app/package.json ./app/package.json
+COPY presentation/package.json ./presentation/package.json
+COPY admin/package.json ./admin/package.json
+COPY packages ./packages
+
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
     pnpm install --frozen-lockfile
 
-# --- STAGE 2: Builder ---
 FROM base AS builder
 
-# 1. Copy dependencies from deps stage
+# Copy installed dependencies from deps stage
 COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /app/app/node_modules ./app/node_modules
+COPY --from=deps /app/presentation/node_modules ./presentation/node_modules
+COPY --from=deps /app/admin/node_modules ./admin/node_modules
+COPY --from=deps /app/packages ./packages
 
-# 2. Copy the rest of the source code
+# Copy source code
 COPY . .
 
-# 3. Inject build-time environment variables
+# Build-time environment variable injection
 ARG VITE_API_URL
 ARG VITE_PRESENTATION_URL
 ARG VITE_FIREBASE_API_KEY
@@ -32,7 +41,6 @@ ARG VITE_FIREBASE_APP_ID
 ARG VITE_FIREBASE_VAPID_KEY
 ARG NODE_ENV=production
 
-# Set as environment variables for the build process
 ENV VITE_API_URL=$VITE_API_URL
 ENV VITE_PRESENTATION_URL=$VITE_PRESENTATION_URL
 ENV VITE_FIREBASE_API_KEY=$VITE_FIREBASE_API_KEY
@@ -47,40 +55,40 @@ ENV NODE_ENV=$NODE_ENV
 RUN pnpm build
 
 # Production stage for app
-FROM node:20-alpine AS app-production
-
-WORKDIR /app
-
-COPY --from=builder /app/app/dist ./dist
-
-RUN npm install -g serve
-
+FROM nginx:alpine AS app-production
+COPY --from=builder /app/app/dist /usr/share/nginx/html
+RUN printf 'server {\n\
+    listen 5173;\n\
+    root /usr/share/nginx/html;\n\
+    location / {\n\
+        try_files $uri $uri/ /index.html;\n\
+    }\n\
+}\n' > /etc/nginx/conf.d/default.conf
 EXPOSE 5173
-
-CMD ["serve", "-s", "dist", "-l", "5173"]
+CMD ["nginx", "-g", "daemon off;"]
 
 # Production stage for presentation
-FROM node:20-alpine AS presentation-production
-
-WORKDIR /app
-
-COPY --from=builder /app/presentation/dist ./dist
-
-RUN npm install -g serve
-
+FROM nginx:alpine AS presentation-production
+COPY --from=builder /app/presentation/dist /usr/share/nginx/html
+RUN printf 'server {\n\
+    listen 5174;\n\
+    root /usr/share/nginx/html;\n\
+    location / {\n\
+        try_files $uri $uri/ /index.html;\n\
+    }\n\
+}\n' > /etc/nginx/conf.d/default.conf
 EXPOSE 5174
-
-CMD ["serve", "-s", "dist", "-l", "5174"]
+CMD ["nginx", "-g", "daemon off;"]
 
 # Production stage for admin
-FROM node:20-alpine AS admin-production
-
-WORKDIR /app
-
-COPY --from=builder /app/admin/dist ./dist
-
-RUN npm install -g serve
-
+FROM nginx:alpine AS admin-production
+COPY --from=builder /app/admin/dist /usr/share/nginx/html
+RUN printf 'server {\n\
+    listen 5175;\n\
+    root /usr/share/nginx/html;\n\
+    location / {\n\
+        try_files $uri $uri/ /index.html;\n\
+    }\n\
+}\n' > /etc/nginx/conf.d/default.conf
 EXPOSE 5175
-
-CMD ["serve", "-s", "dist", "-l", "5175"]
+CMD ["nginx", "-g", "daemon off;"]

@@ -1,10 +1,47 @@
 import type { AssessmentMatrix } from './assessmentMatrix';
+import type { Difficulty, QuestionType } from './constants';
 
 /**
  * Assessment Matrix Utility Functions
  *
  * Utilities for working with 3D matrix cell values in "count:points" format
  */
+
+// ============================================================================
+// API Case Conversion Helpers
+// ============================================================================
+
+/**
+ * Convert frontend difficulty (UPPERCASE) to API format (lowercase)
+ */
+export function difficultyToApi(difficulty: Difficulty): string {
+  return difficulty.toLowerCase();
+}
+
+/**
+ * Convert API difficulty (lowercase) to frontend format (UPPERCASE)
+ */
+export function difficultyFromApi(apiValue: string): Difficulty {
+  return apiValue.toUpperCase() as Difficulty;
+}
+
+/**
+ * Convert frontend questionType (UPPERCASE) to API format (lowercase)
+ */
+export function questionTypeToApi(questionType: QuestionType): string {
+  return questionType.toLowerCase();
+}
+
+/**
+ * Convert API questionType (lowercase) to frontend format (UPPERCASE)
+ */
+export function questionTypeFromApi(apiValue: string): QuestionType {
+  return apiValue.toUpperCase() as QuestionType;
+}
+
+// ============================================================================
+// Cell Value Utilities
+// ============================================================================
 
 /**
  * Parsed cell value from "count:points" format

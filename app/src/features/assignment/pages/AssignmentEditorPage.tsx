@@ -8,6 +8,7 @@ import { QuestionBankDialog } from '../components/question-bank';
 import { DIFFICULTY, QUESTION_TYPE } from '../types';
 import type { Question, AssignmentQuestionWithTopic, QuestionItemRequest, MatrixCell } from '../types';
 import { useCreateAssignment, useUpdateAssignment, useAssignment } from '../hooks/useAssignmentApi';
+import { cellsToApiMatrix } from '../utils/matrixConversion';
 import { useDirtyFormTracking } from '../hooks/useDirtyFormTracking';
 import { useUnsavedChangesBlocker } from '@/shared/hooks';
 import { UnsavedChangesDialog } from '@/shared/components/modals/UnsavedChangesDialog';
@@ -255,6 +256,12 @@ export const AssignmentEditorPage = () => {
 
     setIsSaving(true);
     try {
+      // Build the 3D matrix structure for API (with lowercase enums)
+      const apiMatrix = cellsToApiMatrix(data.matrixCells, {
+        grade: data.grade || null,
+        subject: data.subject || null,
+      });
+
       const formData = {
         title: data.title,
         description: data.description,
@@ -267,15 +274,8 @@ export const AssignmentEditorPage = () => {
           name: topic.name,
           description: topic.description,
         })),
-        // Include matrix cells (only those with requiredCount > 0)
-        matrixCells: data.matrixCells
-          .filter((cell) => cell.requiredCount > 0)
-          .map((cell) => ({
-            topicId: cell.topicId,
-            difficulty: cell.difficulty,
-            questionType: cell.questionType,
-            requiredCount: cell.requiredCount,
-          })),
+        // Include full 3D matrix structure
+        matrix: apiMatrix,
       };
 
       if (id) {

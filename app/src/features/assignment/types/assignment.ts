@@ -82,19 +82,26 @@ export interface QuestionItemRequest {
   point: number;
 }
 
-// Matrix cell for API request
-export interface MatrixCellRequest {
-  topicId: string;
-  difficulty: Difficulty;
-  questionType: QuestionType;
-  requiredCount: number;
-}
-
 // Topic for API request
 export interface TopicRequest {
   id: string;
   name: string;
   description?: string;
+}
+
+// Matrix structure for API requests/responses (lowercase enums)
+export interface ApiMatrix {
+  grade: string | null;
+  subject: string | null;
+  createdAt: string;
+  dimensions: {
+    topics: { id: string; name: string }[];
+    difficulties: string[]; // lowercase: "knowledge", "comprehension", "application"
+    questionTypes: string[]; // lowercase: "multiple_choice", "fill_in_blank", etc.
+  };
+  matrix: string[][][]; // "count:points" format, e.g., "3:3.0"
+  totalQuestions: number;
+  totalPoints: number;
 }
 
 // API request types
@@ -105,7 +112,7 @@ export interface CreateAssignmentRequest {
   grade?: string;
   questions?: QuestionItemRequest[];
   topics?: TopicRequest[];
-  matrixCells?: MatrixCellRequest[];
+  matrix?: ApiMatrix; // Full 3D matrix structure with lowercase enums
 }
 
 export interface UpdateAssignmentRequest {
@@ -115,7 +122,7 @@ export interface UpdateAssignmentRequest {
   grade?: string;
   questions?: QuestionItemRequest[];
   topics?: TopicRequest[];
-  matrixCells?: MatrixCellRequest[];
+  matrix?: ApiMatrix; // Full 3D matrix structure with lowercase enums
 }
 
 // Re-export core types for convenience

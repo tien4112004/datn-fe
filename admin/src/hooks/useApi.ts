@@ -2,11 +2,12 @@ import { getAdminApiService } from '@/api/admin';
 import { getAuthApiService } from '@/api/auth';
 import type {
   ArtStyleRequest,
-  BookType,
   FAQPost,
   PaginationParams,
   UserQueryParams,
   SlideTemplateParams,
+  MatrixTemplate,
+  MatrixTemplateParams,
 } from '@/types/api';
 import type { ModelPatchData } from '@aiprimary/core';
 import type { LoginRequest } from '@/types/auth';
@@ -61,13 +62,6 @@ export const adminKeys = {
     all: ['faq-posts'] as const,
     list: (params?: PaginationParams) => [...adminKeys.faq.all, 'list', params] as const,
   },
-  // Books
-  books: {
-    all: ['books'] as const,
-    list: (params?: PaginationParams & { type?: BookType }) =>
-      [...adminKeys.books.all, 'list', params] as const,
-    detail: (id: string) => [...adminKeys.books.all, 'detail', id] as const,
-  },
   // Question Bank
   questionBank: {
     all: ['question-bank'] as const,
@@ -85,6 +79,12 @@ export const adminKeys = {
     all: ['contexts'] as const,
     list: (params?: PaginationParams) => [...adminKeys.contexts.all, 'list', params] as const,
     detail: (id: string) => [...adminKeys.contexts.all, 'detail', id] as const,
+  },
+  // Matrix Templates
+  matrixTemplates: {
+    all: ['matrix-templates'] as const,
+    list: (params?: MatrixTemplateParams) => [...adminKeys.matrixTemplates.all, 'list', params] as const,
+    detail: (id: string) => [...adminKeys.matrixTemplates.all, 'detail', id] as const,
   },
 };
 
@@ -457,78 +457,6 @@ export function useDeleteFAQPost() {
   });
 }
 
-// ============= BOOKS =============
-
-export function useBooks(params?: PaginationParams & { type?: BookType }) {
-  return useQuery({
-    queryKey: adminKeys.books.list(params),
-    queryFn: () => getAdminApiService().getBooks(params),
-    staleTime: 30000,
-    gcTime: 300000,
-  });
-}
-
-export function useBookById(id: string) {
-  return useQuery({
-    queryKey: adminKeys.books.detail(id),
-    queryFn: () => getAdminApiService().getBookById(id),
-    enabled: !!id,
-    staleTime: 300000,
-    gcTime: 600000,
-  });
-}
-
-export function useCreateBook() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: (data: FormData) => getAdminApiService().createBook(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: adminKeys.books.all });
-      toast.success('Book created successfully');
-    },
-    onError: (error) => {
-      toast.error('Failed to create book', {
-        description: error instanceof Error ? error.message : 'An error occurred',
-      });
-    },
-  });
-}
-
-export function useUpdateBook() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: FormData }) => getAdminApiService().updateBook(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: adminKeys.books.all });
-      toast.success('Book updated successfully');
-    },
-    onError: (error) => {
-      toast.error('Failed to update book', {
-        description: error instanceof Error ? error.message : 'An error occurred',
-      });
-    },
-  });
-}
-
-export function useDeleteBook() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: (id: string) => getAdminApiService().deleteBook(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: adminKeys.books.all });
-      toast.success('Book deleted successfully');
-    },
-    onError: (error) => {
-      toast.error('Failed to delete book', {
-        description: error instanceof Error ? error.message : 'An error occurred',
-      });
-    },
-  });
-}
-
 // ============= QUESTION BANK =============
 
 export function useQuestionBank(params?: QuestionBankParams) {
@@ -779,6 +707,79 @@ export function useDeleteContext() {
     },
     onError: (error) => {
       toast.error('Failed to delete context', {
+        description: error instanceof Error ? error.message : 'An error occurred',
+      });
+    },
+  });
+}
+
+// ============= MATRIX TEMPLATES =============
+
+export function useMatrixTemplates(params?: MatrixTemplateParams) {
+  return useQuery({
+    queryKey: adminKeys.matrixTemplates.list(params),
+    queryFn: () => getAdminApiService().getMatrixTemplates(params),
+    staleTime: 30000,
+    gcTime: 300000,
+  });
+}
+
+export function useMatrixTemplateById(id: string) {
+  return useQuery({
+    queryKey: adminKeys.matrixTemplates.detail(id),
+    queryFn: () => getAdminApiService().getMatrixTemplateById(id),
+    enabled: !!id,
+    staleTime: 300000,
+    gcTime: 600000,
+  });
+}
+
+export function useCreateMatrixTemplate() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: Partial<MatrixTemplate>) => getAdminApiService().createMatrixTemplate(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: adminKeys.matrixTemplates.all });
+      toast.success('Matrix template created successfully');
+    },
+    onError: (error) => {
+      toast.error('Failed to create matrix template', {
+        description: error instanceof Error ? error.message : 'An error occurred',
+      });
+    },
+  });
+}
+
+export function useUpdateMatrixTemplate() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Partial<MatrixTemplate> }) =>
+      getAdminApiService().updateMatrixTemplate(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: adminKeys.matrixTemplates.all });
+      toast.success('Matrix template updated successfully');
+    },
+    onError: (error) => {
+      toast.error('Failed to update matrix template', {
+        description: error instanceof Error ? error.message : 'An error occurred',
+      });
+    },
+  });
+}
+
+export function useDeleteMatrixTemplate() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => getAdminApiService().deleteMatrixTemplate(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: adminKeys.matrixTemplates.all });
+      toast.success('Matrix template deleted successfully');
+    },
+    onError: (error) => {
+      toast.error('Failed to delete matrix template', {
         description: error instanceof Error ? error.message : 'An error occurred',
       });
     },

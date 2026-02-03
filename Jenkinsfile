@@ -147,7 +147,7 @@ pipeline {
 
                         # Build app image
                         echo "Building App image..."
-                        docker build --no-cache \
+                        docker build  \
                             --build-arg VITE_API_URL="${VITE_API_URL}" \
                             --build-arg VITE_PRESENTATION_URL="${PRESENTATION_URL}" \
                             --build-arg VITE_FIREBASE_API_KEY="${VITE_FIREBASE_API_KEY}" \
@@ -165,7 +165,7 @@ pipeline {
 
                         # Build presentation image
                         echo "Building Presentation image..."
-                        docker build --no-cache \
+                        docker build  \
                             --build-arg VITE_API_URL="${VITE_API_URL}" \
                             --build-arg VITE_PRESENTATION_URL="${PRESENTATION_URL}" \
                             --build-arg VITE_FIREBASE_API_KEY="${VITE_FIREBASE_API_KEY}" \
@@ -183,7 +183,7 @@ pipeline {
 
                         # Build admin image
                         echo "Building Admin image..."
-                        docker build --no-cache \
+                        docker build  \
                             --build-arg VITE_API_URL="${VITE_API_URL}" \
                             --build-arg VITE_PRESENTATION_URL="${PRESENTATION_URL}" \
                             --build-arg VITE_FIREBASE_API_KEY="${VITE_FIREBASE_API_KEY}" \

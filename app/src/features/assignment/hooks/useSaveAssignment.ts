@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useCreateAssignment, useUpdateAssignment } from './useAssignmentApi';
 import { useAssignmentFormStore } from '../stores/useAssignmentFormStore';
 import { transformQuestionsForApi } from '../utils/questionTransform';
+import { cellsToApiMatrix } from '../utils';
 
 interface UseSaveAssignmentOptions {
   id?: string;
@@ -44,6 +45,11 @@ export function useSaveAssignment({ id, onSaveSuccess, onSaveError }: UseSaveAss
 
     setIsSaving(true);
     try {
+      const apiMatrix = cellsToApiMatrix(data.matrixCells, {
+        grade: data.grade || null,
+        subject: data.subject || null,
+      });
+
       const formData = {
         title: data.title,
         description: data.description,
@@ -56,13 +62,7 @@ export function useSaveAssignment({ id, onSaveSuccess, onSaveError }: UseSaveAss
           description: topic.description,
         })),
         contexts: data.contexts,
-        matrixCells: data.matrixCells
-          .filter((cell) => cell.requiredCount > 0)
-          .map((cell) => ({
-            topicId: cell.topicId,
-            difficulty: cell.difficulty,
-            requiredCount: cell.requiredCount,
-          })),
+        matrix: apiMatrix,
       };
 
       let savedId = id;

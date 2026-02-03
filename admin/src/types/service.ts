@@ -6,9 +6,9 @@ import type {
   UserQueryParams,
   SlideTemplateParams,
   FAQPost,
-  Book,
-  BookType,
   ArtStyleRequest,
+  MatrixTemplate,
+  MatrixTemplateParams,
 } from './api';
 import type { SlideTheme, SlideTemplate, ArtStyle, Model, ModelPatchData } from '@aiprimary/core';
 import type {
@@ -80,13 +80,6 @@ export interface AdminApiService extends Service {
   updateFAQPost(id: string, data: FAQPost): Promise<ApiResponse<FAQPost>>;
   deleteFAQPost(id: string): Promise<ApiResponse<void>>;
 
-  // Books
-  getBooks(params?: PaginationParams & { type?: BookType }): Promise<ApiResponse<Book[]>>;
-  getBookById(id: string): Promise<ApiResponse<Book>>;
-  createBook(data: FormData): Promise<ApiResponse<Book>>;
-  updateBook(id: string, data: FormData): Promise<ApiResponse<Book>>;
-  deleteBook(id: string): Promise<ApiResponse<void>>;
-
   // Question Bank
   getQuestionBank(params?: QuestionBankParams): Promise<ApiResponse<QuestionBankItem[]>>;
   getQuestionById(id: string): Promise<ApiResponse<QuestionBankItem>>;
@@ -123,4 +116,11 @@ export interface AdminApiService extends Service {
   deleteCoinPricing(id: string): Promise<ApiResponse<void>>;
   getResourceTypes(): Promise<ApiResponse<EnumOption[]>>;
   getUnitTypes(): Promise<ApiResponse<EnumOption[]>>;
+
+  // Matrix Templates
+  getMatrixTemplates(params?: MatrixTemplateParams): Promise<ApiResponse<MatrixTemplate[]>>;
+  getMatrixTemplateById(id: string): Promise<ApiResponse<MatrixTemplate>>;
+  createMatrixTemplate(data: Partial<MatrixTemplate>): Promise<ApiResponse<MatrixTemplate>>;
+  updateMatrixTemplate(id: string, data: Partial<MatrixTemplate>): Promise<ApiResponse<MatrixTemplate>>;
+  deleteMatrixTemplate(id: string): Promise<ApiResponse<void>>;
 }

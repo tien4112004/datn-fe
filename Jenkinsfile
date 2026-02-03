@@ -147,7 +147,7 @@ pipeline {
 
                         # Build app image
                         echo "Building App image..."
-                        docker build --no-cache \
+                        docker build  \
                             --build-arg VITE_API_URL="${VITE_API_URL}" \
                             --build-arg PRESENTATION_URL="${PRESENTATION_URL}" \
                             --build-arg NODE_ENV=production \
@@ -158,7 +158,7 @@ pipeline {
 
                         # Build presentation image
                         echo "Building Presentation image..."
-                        docker build --no-cache \
+                        docker build  \
                             --build-arg VITE_API_URL="${VITE_API_URL}" \
                             --build-arg PRESENTATION_URL="${PRESENTATION_URL}" \
                             --build-arg NODE_ENV=production \
@@ -169,7 +169,7 @@ pipeline {
 
                         # Build admin image
                         echo "Building Admin image..."
-                        docker build --no-cache \
+                        docker build  \
                             --build-arg VITE_API_URL="${VITE_API_URL}" \
                             --build-arg PRESENTATION_URL="${PRESENTATION_URL}" \
                             --build-arg NODE_ENV=production \

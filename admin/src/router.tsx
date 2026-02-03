@@ -25,7 +25,6 @@ const ModelConfigPage = lazy(() =>
   import('@/pages/ModelConfigPage').then((m) => ({ default: m.ModelConfigPage }))
 );
 const FAQPostsPage = lazy(() => import('@/pages/FAQPostsPage').then((m) => ({ default: m.FAQPostsPage })));
-const BooksPage = lazy(() => import('@/pages/BooksPage').then((m) => ({ default: m.BooksPage })));
 const QuestionBankPage = lazy(() =>
   import('@/pages/QuestionBankPage').then((m) => ({ default: m.QuestionBankPage }))
 );
@@ -38,6 +37,12 @@ const ContextFormPage = lazy(() =>
 );
 const CoinPricingPage = lazy(() =>
   import('@/pages/CoinPricingPage').then((m) => ({ default: m.CoinPricingPage }))
+);
+const MatrixTemplatesPage = lazy(() =>
+  import('@/pages/MatrixTemplatesPage').then((m) => ({ default: m.MatrixTemplatesPage }))
+);
+const MatrixTemplateFormPage = lazy(() =>
+  import('@/pages/MatrixTemplateFormPage').then((m) => ({ default: m.MatrixTemplateFormPage }))
 );
 
 const LazyWrapper = ({ children }: { children: React.ReactNode }) => (
@@ -162,14 +167,6 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: 'books',
-        element: (
-          <LazyWrapper>
-            <BooksPage />
-          </LazyWrapper>
-        ),
-      },
-      {
         path: 'question-bank',
         element: (
           <LazyWrapper>
@@ -198,6 +195,30 @@ export const router = createBrowserRouter([
         element: (
           <LazyWrapper>
             <CoinPricingPage />
+          </LazyWrapper>
+        ),
+      },
+      {
+        path: 'matrix-templates',
+        element: (
+          <LazyWrapper>
+            <MatrixTemplatesPage />
+          </LazyWrapper>
+        ),
+      },
+      {
+        path: 'matrix-templates/new',
+        element: (
+          <LazyWrapper>
+            <MatrixTemplateFormPage />
+          </LazyWrapper>
+        ),
+      },
+      {
+        path: 'matrix-templates/:id',
+        element: (
+          <LazyWrapper>
+            <MatrixTemplateFormPage />
           </LazyWrapper>
         ),
       },

@@ -39,23 +39,6 @@ export interface FAQPost {
   updatedAt?: string;
 }
 
-export type BookType = 'TEXTBOOK' | 'TEACHERBOOK';
-
-export interface Book {
-  id?: string;
-  title: string;
-  description?: string;
-  type: BookType;
-  grade?: string;
-  subject?: string;
-  publisher?: string;
-  pdfUrl?: string;
-  thumbnailUrl?: string;
-  isPublished?: boolean;
-  createdAt?: string;
-  updatedAt?: string;
-}
-
 export interface PaginationParams {
   page?: number;
   pageSize?: number;
@@ -81,4 +64,28 @@ export interface ApiResponse<T> {
   message?: string;
   data: T;
   pagination?: Pagination;
+}
+
+// Matrix Template Types
+export interface MatrixDimensions {
+  topics: { id: string; name: string }[];
+  difficulties: string[]; // lowercase: "knowledge", "comprehension", "application"
+  questionTypes: string[]; // lowercase: "multiple_choice", "fill_in_blank", etc.
+}
+
+export interface MatrixTemplate {
+  id: string;
+  title: string;
+  grade: string | null;
+  subject: string | null;
+  createdAt: string;
+  updatedAt: string;
+  dimensions: MatrixDimensions;
+  matrix: string[][][]; // 3D: [topic][difficulty][questionType] = "count:points"
+  totalQuestions: number;
+  totalPoints: number;
+}
+
+export interface MatrixTemplateParams extends PaginationParams {
+  search?: string;
 }

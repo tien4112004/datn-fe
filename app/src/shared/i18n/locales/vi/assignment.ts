@@ -601,6 +601,31 @@ export default {
     },
   },
 
+  generatedQuestions: {
+    title: 'Câu hỏi đã tạo',
+    subtitle: 'Xem lại và quản lý các câu hỏi được tạo bởi AI',
+    summary: 'Đã tạo thành công {{count}} câu hỏi',
+    promptLabel: 'Mô tả',
+    noQuestions: 'Không có câu hỏi được tạo để hiển thị',
+    backToQuestionBank: 'Quay lại ngân hàng câu hỏi',
+    generateMore: 'Tạo thêm',
+    toast: {
+      deleteSuccess: 'Xóa câu hỏi thành công',
+      deleteError: 'Không thể xóa câu hỏi',
+    },
+    actions: {
+      edit: 'Chỉnh sửa',
+      delete: 'Xóa',
+      deleteSelected: 'Xóa đã chọn',
+    },
+    dialogs: {
+      delete: {
+        description: 'Bạn có chắc chắn muốn xóa {{count}} câu hỏi? Hành động này không thể hoàn tác.',
+      },
+    },
+    selectedCount: '{{count}} câu hỏi đã chọn',
+  },
+
   teacherQuestionBank: {
     title: 'Ngân hàng câu hỏi của tôi',
     subtitle: 'Quản lý thư viện câu hỏi cá nhân',
@@ -609,12 +634,62 @@ export default {
       create: 'Tạo câu hỏi',
       import: 'Nhập CSV',
       export: 'Xuất CSV',
+      generate: 'Tạo bằng AI',
       edit: 'Chỉnh sửa',
       duplicate: 'Nhân bản',
       delete: 'Xóa',
       deleteSelected: 'Xóa đã chọn',
       copyToPersonal: 'Sao chép vào kho cá nhân',
       browsePublic: 'Duyệt câu hỏi công khai',
+    },
+
+    generate: {
+      title: 'Tạo câu hỏi bằng AI',
+      description: 'Sử dụng AI để tự động tạo câu hỏi theo yêu cầu của bạn.',
+      fields: {
+        prompt: 'Mô tả',
+        promptPlaceholder: 'Mô tả nội dung câu hỏi cần tạo (ví dụ: "Phép cộng trừ trong phạm vi 20")',
+        promptHelp: 'Hãy cụ thể về nội dung mà câu hỏi cần đề cập',
+        grade: 'Khối lớp',
+        gradePlaceholder: 'Chọn khối',
+        subject: 'Môn học',
+        subjectPlaceholder: 'Chọn môn',
+        chapter: 'Chương',
+        chapterPlaceholder: 'Chọn chương (tùy chọn)',
+        chapterHelp: 'Câu hỏi được tạo sẽ phù hợp hơn nếu bạn chỉ định chương',
+        questionTypes: 'Loại câu hỏi',
+        questionTypesHelp: 'Chọn ít nhất một loại câu hỏi để tạo',
+        questionsPerDifficulty: 'Số câu theo độ khó',
+        difficultyKnowledge: 'Nhận biết',
+        difficultyComprehension: 'Thông hiểu',
+        difficultyApplication: 'Vận dụng',
+        model: 'Mô hình AI',
+        modelPlaceholder: 'Chọn mô hình (tùy chọn)',
+      },
+      questionTypes: {
+        MULTIPLE_CHOICE: 'Trắc nghiệm',
+        MATCHING: 'Nối',
+        FILL_IN_BLANK: 'Điền vào chỗ trống',
+        OPEN_ENDED: 'Tự luận',
+      },
+      actions: {
+        cancel: 'Hủy',
+        generate: 'Tạo câu hỏi',
+        generating: 'Đang tạo...',
+      },
+      toast: {
+        success: 'Đã tạo thành công {{count}} câu hỏi',
+        error: 'Không thể tạo câu hỏi',
+        noQuestionTypes: 'Vui lòng chọn ít nhất một loại câu hỏi',
+        noQuestionsRequested: 'Vui lòng chỉ định ít nhất một câu hỏi cần tạo',
+      },
+      validation: {
+        promptRequired: 'Mô tả là bắt buộc',
+        gradeRequired: 'Khối lớp là bắt buộc',
+        subjectRequired: 'Môn học là bắt buộc',
+        questionTypesRequired: 'Cần chọn ít nhất một loại câu hỏi',
+        questionsRequired: 'Cần yêu cầu ít nhất một câu hỏi',
+      },
     },
 
     filters: {

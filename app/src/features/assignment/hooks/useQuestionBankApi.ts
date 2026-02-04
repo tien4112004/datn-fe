@@ -7,6 +7,7 @@ import type {
   UpdateQuestionRequest,
   QuestionBankItem,
   ChapterResponse,
+  GenerateQuestionsRequest,
 } from '../types/questionBank';
 
 // Export the API service hook for direct use
@@ -155,6 +156,19 @@ export const useImportQuestions = () => {
 
   return useMutation({
     mutationFn: (file: File) => apiService.importQuestions(file),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: questionBankKeys.lists() });
+    },
+  });
+};
+
+// GENERATE questions with AI
+export const useGenerateQuestions = () => {
+  const queryClient = useQueryClient();
+  const apiService = useQuestionBankApiService();
+
+  return useMutation({
+    mutationFn: (request: GenerateQuestionsRequest) => apiService.generateQuestions(request),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: questionBankKeys.lists() });
     },

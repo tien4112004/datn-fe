@@ -611,6 +611,31 @@ export default {
     },
   },
 
+  generatedQuestions: {
+    title: 'Generated Questions',
+    subtitle: 'Review and manage your AI-generated questions',
+    summary: 'Successfully generated {{count}} question(s)',
+    promptLabel: 'Prompt',
+    noQuestions: 'No generated questions to display',
+    backToQuestionBank: 'Back to Question Bank',
+    generateMore: 'Generate More',
+    toast: {
+      deleteSuccess: 'Question(s) deleted successfully',
+      deleteError: 'Failed to delete question(s)',
+    },
+    actions: {
+      edit: 'Edit',
+      delete: 'Delete',
+      deleteSelected: 'Delete Selected',
+    },
+    dialogs: {
+      delete: {
+        description: 'Are you sure you want to delete {{count}} question(s)? This action cannot be undone.',
+      },
+    },
+    selectedCount: '{{count}} question(s) selected',
+  },
+
   teacherQuestionBank: {
     title: 'My Question Bank',
     subtitle: 'Manage your personal question library',
@@ -619,12 +644,62 @@ export default {
       create: 'Create Question',
       import: 'Import CSV',
       export: 'Export CSV',
+      generate: 'Generate with AI',
       edit: 'Edit',
       duplicate: 'Duplicate',
       delete: 'Delete',
       deleteSelected: 'Delete Selected',
       copyToPersonal: 'Copy to Personal',
       browsePublic: 'Browse Public Questions',
+    },
+
+    generate: {
+      title: 'Generate Questions with AI',
+      description: 'Use AI to automatically generate questions based on your specifications.',
+      fields: {
+        prompt: 'Prompt',
+        promptPlaceholder: 'Describe what questions to generate (e.g., "Addition and subtraction within 20")',
+        promptHelp: 'Be specific about what content the questions should cover',
+        grade: 'Grade Level',
+        gradePlaceholder: 'Select grade',
+        subject: 'Subject',
+        subjectPlaceholder: 'Select subject',
+        chapter: 'Chapter',
+        chapterPlaceholder: 'Select chapter (optional)',
+        chapterHelp: 'The generated questions will be more relevant if you specify the chapter',
+        questionTypes: 'Question Types',
+        questionTypesHelp: 'Select at least one question type to generate',
+        questionsPerDifficulty: 'Questions per Difficulty',
+        difficultyKnowledge: 'Knowledge',
+        difficultyComprehension: 'Comprehension',
+        difficultyApplication: 'Application',
+        model: 'AI Model',
+        modelPlaceholder: 'Select model (optional)',
+      },
+      questionTypes: {
+        MULTIPLE_CHOICE: 'Multiple Choice',
+        MATCHING: 'Matching',
+        FILL_IN_BLANK: 'Fill in Blank',
+        OPEN_ENDED: 'Open Ended',
+      },
+      actions: {
+        cancel: 'Cancel',
+        generate: 'Generate Questions',
+        generating: 'Generating...',
+      },
+      toast: {
+        success: 'Successfully generated {{count}} question(s)',
+        error: 'Failed to generate questions',
+        noQuestionTypes: 'Please select at least one question type',
+        noQuestionsRequested: 'Please specify at least one question to generate',
+      },
+      validation: {
+        promptRequired: 'Prompt is required',
+        gradeRequired: 'Grade is required',
+        subjectRequired: 'Subject is required',
+        questionTypesRequired: 'At least one question type is required',
+        questionsRequired: 'At least one question must be requested',
+      },
     },
 
     filters: {

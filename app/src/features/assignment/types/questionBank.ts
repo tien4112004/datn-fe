@@ -84,6 +84,44 @@ export interface ChapterResponse {
   sortOrder: string;
 }
 
+/**
+ * Request type for generating questions with AI
+ * Matches backend GenerateQuestionsFromTopicRequest
+ */
+export interface GenerateQuestionsRequest {
+  /** Grade level: "1", "2", "3", "4", or "5" */
+  gradeLevel: string;
+  /** Prompt description for generating questions */
+  prompt: string;
+  /** Subject code: "T" (Math), "TV" (Vietnamese), "TA" (English) */
+  subject: string;
+  /** Chapter name (optional) - improves question relevance */
+  chapter?: string;
+  /** Number of questions to generate per difficulty level */
+  questionsPerDifficulty: {
+    KNOWLEDGE?: number;
+    COMPREHENSION?: number;
+    APPLICATION?: number;
+  };
+  /** Question types to generate */
+  questionTypes: string[];
+  /** AI provider (optional) */
+  provider?: string;
+  /** AI model (optional) */
+  model?: string;
+}
+
+/**
+ * Response type for generated questions
+ * Matches backend GeneratedQuestionsResponse
+ */
+export interface GenerateQuestionsResponse {
+  /** Total number of questions generated */
+  totalGenerated: number;
+  /** Array of generated questions */
+  questions: QuestionBankItem[];
+}
+
 export interface QuestionBankApiService {
   // Query operations
   getQuestions(filters: QuestionBankFilters): Promise<QuestionBankApiResponse>;
@@ -106,6 +144,9 @@ export interface QuestionBankApiService {
   // Import/Export
   exportQuestions(filters?: QuestionBankFilters): Promise<Blob>;
   importQuestions(file: File): Promise<{ success: number; failed: number }>;
+
+  // AI Generation
+  generateQuestions(request: GenerateQuestionsRequest): Promise<GenerateQuestionsResponse>;
 
   // Metadata
   getChapters(subject: string, grade: string): Promise<ChapterResponse[]>;

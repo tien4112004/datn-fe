@@ -1,8 +1,11 @@
+import { useTranslation } from 'react-i18next';
 import type { Question, Answer } from '@aiprimary/core';
 import type { ViewMode } from '@/features/assignment/types';
-import type { Context } from '@/features/assignment/types/context';
+import type { Context } from '@/features/context';
 import { QUESTION_TYPE, VIEW_MODE } from '@/features/assignment/types';
-import { ContextDisplay } from '@/features/assignment/components/context/ContextDisplay';
+import { ContextDisplay, useContext as useContextQuery } from '@/features/context';
+import { Label } from '@/shared/components/ui/label';
+import { ContextSelector } from './shared/ContextSelector';
 import {
   MultipleChoiceEditing,
   MultipleChoiceViewing,
@@ -36,11 +39,13 @@ interface QuestionRendererProps {
   question: Question;
   viewMode: ViewMode;
   context?: Context; // Optional context (reading passage) to display above question
+  contextId?: string; // Context ID for EDITING mode - used to fetch and display context
   answer?: Answer;
   points?: number; // Points for this question in assignment context (required for grading/after-assessment modes)
   onChange?: (question: Question) => void;
   onAnswerChange?: (answer: Answer) => void;
   onGradeChange?: (grade: { points: number; feedback?: string }) => void;
+  onContextChange?: (contextId: string | undefined) => void; // Callback for context changes in EDITING mode
   number?: number;
 }
 
@@ -48,13 +53,20 @@ export const QuestionRenderer = ({
   question,
   viewMode,
   context,
+  contextId,
   answer,
   points,
   onChange,
   onAnswerChange,
   onGradeChange,
+  onContextChange,
   number,
 }: QuestionRendererProps) => {
+  const { t } = useTranslation('assignment', { keyPrefix: 'context' });
+
+  // Fetch context when contextId is provided (for EDITING mode)
+  const { data: fetchedContext } = useContextQuery(contextId);
+  const displayContext = context || fetchedContext;
   // Render question content based on type and view mode
   const renderQuestionContent = () => {
     // Multiple Choice
@@ -235,10 +247,34 @@ export const QuestionRenderer = ({
   // Render with optional context display
   const questionContent = renderQuestionContent();
 
-  if (context) {
+  // EDITING mode: show context selector (if enabled) and read-only context display
+  if (viewMode === VIEW_MODE.EDITING) {
+    // Only show context UI if onContextChange is provided
+    if (onContextChange) {
+      return (
+        <div className="space-y-4">
+          {/* Context Selection */}
+          <div className="space-y-2">
+            <Label className="text-sm font-medium">{t('contextLabel')}</Label>
+            <ContextSelector value={contextId} onChange={onContextChange} />
+          </div>
+
+          {/* Read-only Context Display (if context is linked) */}
+          {displayContext && <ContextDisplay context={displayContext} defaultCollapsed={false} />}
+
+          {/* Question editing content */}
+          {questionContent}
+        </div>
+      );
+    }
+    return questionContent;
+  }
+
+  // Non-EDITING modes: show context if provided
+  if (displayContext) {
     return (
       <div className="space-y-4">
-        <ContextDisplay context={context} />
+        <ContextDisplay context={displayContext} />
         {questionContent}
       </div>
     );

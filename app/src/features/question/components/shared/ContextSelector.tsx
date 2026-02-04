@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Check, ChevronsUpDown, X, BookOpen } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
@@ -12,8 +12,7 @@ import {
   CommandItem,
   CommandList,
 } from '@/shared/components/ui/command';
-import { useContextList } from '@/features/context';
-import { useAssignmentFormStore } from '../../stores/useAssignmentFormStore';
+import { useContextList, useContext } from '@/features/context';
 
 interface ContextSelectorProps {
   value?: string;
@@ -23,6 +22,11 @@ interface ContextSelectorProps {
   className?: string;
 }
 
+/**
+ * A reusable context selector that fetches contexts from the library.
+ * Unlike the assignment ContextSelector, this does not clone contexts -
+ * it simply returns the library context ID directly.
+ */
 export const ContextSelector = ({
   value,
   onChange,
@@ -34,11 +38,7 @@ export const ContextSelector = ({
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Get form store actions for context cloning
-  const assignmentContexts = useAssignmentFormStore((state) => state.contexts);
-  const addContext = useAssignmentFormStore((state) => state.addContext);
-  const getContextBySourceId = useAssignmentFormStore((state) => state.getContextBySourceId);
-
+  // Fetch contexts from library with search
   const { data, isLoading } = useContextList({
     search: searchQuery || undefined,
     pageSize: 20,
@@ -46,41 +46,15 @@ export const ContextSelector = ({
 
   const contexts = data?.contexts || [];
 
-  // Look up selected context from assignment's cloned contexts first, then from library
-  const selectedContext = useMemo(() => {
-    if (!value) return null;
-    // First check assignment's cloned contexts
-    const localContext = assignmentContexts.find((ctx) => ctx.id === value);
-    if (localContext) {
-      return { id: localContext.id, title: localContext.title, content: localContext.content };
-    }
-    // Fallback to library contexts (for backwards compatibility)
-    return contexts.find((ctx) => ctx.id === value) || null;
-  }, [value, assignmentContexts, contexts]);
+  // Fetch the selected context details
+  const { data: selectedContext } = useContext(value);
 
-  const handleSelect = (sourceContextId: string) => {
-    // Find the source context from library
-    const sourceContext = contexts.find((ctx) => ctx.id === sourceContextId);
-    if (!sourceContext) return;
-
-    // Check if this context is already cloned in the assignment
-    let localContextId = getContextBySourceId(sourceContextId)?.id;
-
-    if (!localContextId) {
-      // Clone the context to the assignment
-      localContextId = addContext({
-        title: sourceContext.title,
-        content: sourceContext.content,
-        author: sourceContext.author,
-        sourceContextId: sourceContextId,
-      });
-    }
-
+  const handleSelect = (contextId: string) => {
     // Toggle selection: if already selected, deselect
-    if (localContextId === value) {
+    if (contextId === value) {
       onChange(undefined);
     } else {
-      onChange(localContextId);
+      onChange(contextId);
     }
     setOpen(false);
   };
@@ -127,9 +101,7 @@ export const ContextSelector = ({
             ) : (
               <CommandGroup>
                 {contexts.map((context) => {
-                  // Check if this library context is cloned and currently selected
-                  const clonedContext = getContextBySourceId(context.id);
-                  const isSelected = value && clonedContext?.id === value;
+                  const isSelected = context.id === value;
 
                   return (
                     <CommandItem

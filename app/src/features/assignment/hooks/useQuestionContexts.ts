@@ -1,10 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
-import { useContextApiService } from '../api/context.index';
-import { contextKeys } from './useContextApi';
+import { useContextApiService, contextKeys, type Context } from '@/features/context';
 import { getUniqueContextIds } from '../utils/questionGrouping';
 import type { AssignmentQuestionWithTopic } from '../types/assignment';
-import type { Context } from '../types/context';
 
 /**
  * Hook to batch fetch all contexts for questions in an assignment.

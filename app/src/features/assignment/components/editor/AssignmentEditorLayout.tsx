@@ -39,6 +39,9 @@ export const AssignmentEditorLayout = ({ onSave, isSaving }: AssignmentEditorLay
 
       {/* Right: Sidebar (25% width on large screens) */}
       <div className="space-y-6 lg:overflow-y-auto lg:pr-2">
+        {/* Navigation */}
+        <QuestionNavigator />
+
         <div className="space-y-3 rounded-lg border bg-white p-4 dark:bg-gray-900">
           <div className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
             {t('actions.actions')}
@@ -104,9 +107,6 @@ export const AssignmentEditorLayout = ({ onSave, isSaving }: AssignmentEditorLay
             </Tooltip>
           </div>
         </div>
-
-        {/* Navigation */}
-        <QuestionNavigator />
       </div>
 
       {/* Question List Dialog */}

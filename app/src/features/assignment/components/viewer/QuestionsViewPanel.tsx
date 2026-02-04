@@ -7,7 +7,7 @@ import { Badge } from '@/shared/components/ui/badge';
 import type { Assignment, AssignmentQuestionWithTopic, AssignmentContext } from '../../types';
 import { useAssignmentViewerStore } from '../../stores/useAssignmentViewerStore';
 import { LabelValuePair } from './LabelValuePair';
-import { ContextDisplay } from '../context/ContextDisplay';
+import { ContextDisplay } from '@/features/context';
 import { ContextGroupView } from '../context/ContextGroupView';
 import { useQuestionContexts } from '../../hooks/useQuestionContexts';
 import {

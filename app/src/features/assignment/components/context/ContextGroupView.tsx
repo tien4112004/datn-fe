@@ -1,9 +1,8 @@
 import { useTranslation } from 'react-i18next';
 import { ScrollArea } from '@/shared/components/ui/scroll-area';
 import { QuestionRenderer } from '@/features/question/components/QuestionRenderer';
-import { ContextDisplay } from './ContextDisplay';
+import { ContextDisplay, type Context } from '@/features/context';
 import { EditableContextDisplay } from './EditableContextDisplay';
-import type { Context } from '../../types/context';
 import type { AssignmentQuestionWithTopic, AssignmentContext, ViewMode } from '../../types';
 import type { Answer, Question } from '@aiprimary/core';
 import type { GroupingContext } from '../../utils/questionGrouping';

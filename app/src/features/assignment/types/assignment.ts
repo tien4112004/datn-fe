@@ -1,9 +1,19 @@
 import type { Difficulty, SubjectCode, AssignmentQuestion } from '@aiprimary/core';
 import type { Question } from '@aiprimary/core';
 
+// Context stored at assignment level (cloned & editable)
+export interface AssignmentContext {
+  id: string; // Local ID within assignment
+  title: string;
+  content: string;
+  author?: string; // Author of the reading passage
+  sourceContextId?: string; // Original context ID for reference
+}
+
 // Question with topic assignment (intersection of core Question with topicId)
 export type QuestionWithTopic = Question & {
   topicId: string;
+  contextId?: string; // References AssignmentContext.id within the assignment
 };
 
 // Assignment Question with topic assignment

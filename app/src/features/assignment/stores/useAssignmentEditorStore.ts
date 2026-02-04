@@ -11,6 +11,7 @@ interface AssignmentEditorState {
   isQuestionBankOpen: boolean;
   isQuestionListDialogOpen: boolean;
   currentQuestionId: string | null;
+  currentContextId: string | null; // Selected context group (mutually exclusive with currentQuestionId)
   questionViewModes: Map<string, ViewMode>;
   isMetadataDialogOpen: boolean;
   isMatrixEditorOpen: boolean;
@@ -21,6 +22,7 @@ interface AssignmentEditorState {
   setQuestionBankOpen: (open: boolean) => void;
   setQuestionListDialogOpen: (open: boolean) => void;
   setCurrentQuestionId: (id: string | null) => void;
+  setCurrentContextId: (id: string | null) => void;
   setQuestionViewMode: (questionId: string, mode: ViewMode) => void;
   toggleQuestionViewMode: (questionId: string) => void;
   setMetadataDialogOpen: (open: boolean) => void;
@@ -50,6 +52,7 @@ export const useAssignmentEditorStore = create<AssignmentEditorState>()(
       isQuestionBankOpen: false,
       isQuestionListDialogOpen: false,
       currentQuestionId: null,
+      currentContextId: null,
       questionViewModes: new Map(),
       isMetadataDialogOpen: false,
       isMatrixEditorOpen: false,
@@ -59,7 +62,10 @@ export const useAssignmentEditorStore = create<AssignmentEditorState>()(
       setSelectedQuestion: (id) => set({ selectedQuestionId: id }),
       setQuestionBankOpen: (open) => set({ isQuestionBankOpen: open }),
       setQuestionListDialogOpen: (open) => set({ isQuestionListDialogOpen: open }),
-      setCurrentQuestionId: (id) => set({ currentQuestionId: id }),
+      // Setting currentQuestionId clears currentContextId (mutually exclusive)
+      setCurrentQuestionId: (id) => set({ currentQuestionId: id, currentContextId: null }),
+      // Setting currentContextId clears currentQuestionId (mutually exclusive)
+      setCurrentContextId: (id) => set({ currentContextId: id, currentQuestionId: null }),
       setMainView: (view) => set({ mainView: view }),
       setQuestionViewMode: (questionId, mode) => {
         const modes = new Map(get().questionViewModes);

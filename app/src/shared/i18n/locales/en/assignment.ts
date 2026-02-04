@@ -529,6 +529,8 @@ export default {
       preview: 'Preview',
       noQuestions: 'No questions yet',
       addQuestionHint: 'Click "Add Question" to get started',
+      noQuestionSelected: 'No question selected',
+      selectQuestionHint: 'Select a question from the navigator to edit',
     },
 
     // Questions list
@@ -849,5 +851,26 @@ export default {
       questionNumber: 'Question {{number}}',
       points: '{{points}} pts',
     },
+  },
+
+  context: {
+    readingPassage: 'Reading Passage',
+    collapse: 'Collapse',
+    expand: 'Expand',
+    edit: 'Edit',
+    preview: 'Preview',
+    selectContext: 'Select reading passage...',
+    searchContext: 'Search reading passages...',
+    loading: 'Loading...',
+    noContextFound: 'No reading passages found',
+    contextLabel: 'Reading Passage',
+    noContext: 'None',
+    questionInGroup: 'Question {{current}} of {{total}} (Q{{number}})',
+    points: 'pts',
+    questionsCount: '{{count}} questions',
+    contextGroupEditTip: 'Click individual question numbers in the navigator to edit them separately.',
+    titlePlaceholder: 'Enter reading passage title...',
+    contentPlaceholder: 'Enter reading passage content...',
+    authorPlaceholder: 'Author (optional)',
   },
 };

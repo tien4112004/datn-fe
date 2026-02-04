@@ -3,6 +3,9 @@ export * from './questionBank';
 export * from './service';
 export * from './validation';
 
+// Re-export context types from context feature for backward compatibility
+export type { Context, ContextFilters, ContextListResponse } from '@/features/context';
+
 // Re-export core assessment types
 export type {
   Question,

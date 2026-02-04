@@ -7,3 +7,6 @@ export {
   useUpdateAssignment,
   useDeleteAssignment,
 } from './useAssignmentApi';
+
+// Re-export context hooks from context feature for backward compatibility
+export { useContextList, useContext, contextKeys } from '@/features/context';

@@ -519,6 +519,8 @@ export default {
       preview: 'Xem trước',
       noQuestions: 'Chưa có câu hỏi',
       addQuestionHint: 'Nhấn "Thêm câu hỏi" để bắt đầu',
+      noQuestionSelected: 'Chưa chọn câu hỏi',
+      selectQuestionHint: 'Chọn một câu hỏi từ thanh điều hướng để chỉnh sửa',
     },
 
     // Danh sách câu hỏi
@@ -836,5 +838,26 @@ export default {
       questionNumber: 'Câu {{number}}',
       points: '{{points}} điểm',
     },
+  },
+
+  context: {
+    readingPassage: 'Đoạn văn đọc hiểu',
+    collapse: 'Thu gọn',
+    expand: 'Mở rộng',
+    edit: 'Chỉnh sửa',
+    preview: 'Xem trước',
+    selectContext: 'Chọn đoạn văn đọc hiểu...',
+    searchContext: 'Tìm kiếm đoạn văn...',
+    loading: 'Đang tải...',
+    noContextFound: 'Không tìm thấy đoạn văn nào',
+    contextLabel: 'Đoạn văn đọc hiểu',
+    noContext: 'Không có',
+    questionInGroup: 'Câu {{current}}/{{total}} (Câu {{number}})',
+    points: 'điểm',
+    questionsCount: '{{count}} câu hỏi',
+    contextGroupEditTip: 'Nhấn vào số câu hỏi trong thanh điều hướng để chỉnh sửa riêng từng câu.',
+    titlePlaceholder: 'Nhập tiêu đề đoạn văn...',
+    contentPlaceholder: 'Nhập nội dung đoạn văn...',
+    authorPlaceholder: 'Tác giả (tùy chọn)',
   },
 };

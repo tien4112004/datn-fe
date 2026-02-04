@@ -1,7 +1,8 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import type { AssignmentTopic, AssignmentQuestionWithTopic, MatrixCell } from '../types';
+import type { AssignmentTopic, AssignmentQuestionWithTopic, MatrixCell, AssignmentContext } from '../types';
 import { getAllDifficulties } from '@aiprimary/core';
+import { generateId } from '@/shared/lib/utils';
 
 /**
  * Sync matrix cell counts based on current questions
@@ -61,6 +62,7 @@ interface AssignmentFormStore {
   topics: AssignmentTopic[];
   questions: AssignmentQuestionWithTopic[];
   matrixCells: MatrixCell[];
+  contexts: AssignmentContext[]; // Cloned contexts for this assignment
   shuffleQuestions: boolean;
 
   // === FORM STATE ===
@@ -78,6 +80,12 @@ interface AssignmentFormStore {
   addTopic: (topic: AssignmentTopic) => void;
   removeTopic: (topicId: string) => void;
   updateTopic: (topicId: string, updates: Partial<AssignmentTopic>) => void;
+
+  // === ACTIONS: Contexts ===
+  addContext: (context: Omit<AssignmentContext, 'id'>) => string; // Returns new ID
+  updateContext: (contextId: string, updates: Partial<AssignmentContext>) => void;
+  removeContext: (contextId: string) => void;
+  getContextBySourceId: (sourceContextId: string) => AssignmentContext | undefined;
 
   // === ACTIONS: Questions ===
   addQuestion: (question: AssignmentQuestionWithTopic) => void;
@@ -105,6 +113,7 @@ interface AssignmentFormStore {
     topics?: AssignmentTopic[];
     questions?: AssignmentQuestionWithTopic[];
     matrixCells?: MatrixCell[];
+    contexts?: AssignmentContext[];
     shuffleQuestions?: boolean;
   }) => void;
 }
@@ -117,6 +126,7 @@ const initialState = {
   topics: [],
   questions: [],
   matrixCells: [],
+  contexts: [] as AssignmentContext[],
   shuffleQuestions: false,
   isDirty: false,
   errors: {},
@@ -203,6 +213,63 @@ export const useAssignmentFormStore = create<AssignmentFormStore>()(
           'assignment/updateTopic'
         );
         dispatchDirtyEvent(true);
+      },
+
+      // === CONTEXT ACTIONS ===
+      addContext: (context) => {
+        const newId = generateId();
+        set(
+          (state) => ({
+            contexts: [...state.contexts, { ...context, id: newId }],
+            isDirty: true,
+          }),
+          false,
+          'assignment/addContext'
+        );
+        dispatchDirtyEvent(true);
+        return newId;
+      },
+
+      updateContext: (contextId, updates) => {
+        set(
+          (state) => ({
+            contexts: state.contexts.map((c) => (c.id === contextId ? { ...c, ...updates } : c)),
+            isDirty: true,
+          }),
+          false,
+          'assignment/updateContext'
+        );
+        dispatchDirtyEvent(true);
+      },
+
+      removeContext: (contextId) => {
+        set(
+          (state) => {
+            // Remove the context
+            const newContexts = state.contexts.filter((c) => c.id !== contextId);
+            // Clear contextId from all questions that reference this context
+            const newQuestions = state.questions.map((q) => {
+              if ((q.question as any).contextId === contextId) {
+                const { contextId: _, ...questionWithoutContext } = q.question as any;
+                return { ...q, question: questionWithoutContext };
+              }
+              return q;
+            });
+
+            return {
+              contexts: newContexts,
+              questions: newQuestions,
+              isDirty: true,
+            };
+          },
+          false,
+          'assignment/removeContext'
+        );
+        dispatchDirtyEvent(true);
+      },
+
+      getContextBySourceId: (sourceContextId) => {
+        return get().contexts.find((c) => c.sourceContextId === sourceContextId);
       },
 
       // === QUESTION ACTIONS ===
@@ -337,6 +404,7 @@ export const useAssignmentFormStore = create<AssignmentFormStore>()(
           topics: data.topics || [],
           questions: data.questions || [],
           matrixCells: data.matrixCells || [],
+          contexts: data.contexts || [],
           shuffleQuestions: data.shuffleQuestions || false,
           isDirty: false,
           errors: {},
